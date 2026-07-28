@@ -8,3 +8,11 @@ tasks:
       PYTHON: '{{.PYTHON | default "C:/Program Files/Blender Foundation/Blender 4.4/4.4/python/bin/python.exe"}}'
     cmds:
       - uv run --no-cache --no-managed-python --python "{{.PYTHON}}" --no-project python tools/pipeline.py --job "{{.JOB}}"
+
+  verify:static:
+    requires:
+      vars: [JOB]
+    vars:
+      PYTHON: '{{.PYTHON | default "C:/Program Files/Blender Foundation/Blender 4.4/4.4/python/bin/python.exe"}}'
+    cmds:
+      - uv run --no-cache --no-managed-python --python "{{.PYTHON}}" --no-project python tools/pipeline.py --mode static --job "{{.JOB}}"

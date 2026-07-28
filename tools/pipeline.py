@@ -161,7 +161,7 @@ def copy_generated_assets(fbx_path: Path, prefab_path: Path, delivery_dir: Path)
     return sorted(path for path in destination_root.rglob("*") if path.is_file())
 
 
-def normal_mode(job_path: Path) -> int:
+def normal_mode(job_path: Path, static_only: bool = False) -> int:
     job = load_job(job_path)
     artifact_dir = repo_path(job["artifactDir"])
     delivery_dir = repo_path(job["deliveryDir"])
@@ -251,7 +251,9 @@ def normal_mode(job_path: Path) -> int:
                     "-projectPath",
                     str(ROOT),
                     "-executeMethod",
-                    "Image2Outfit.Editor.Pipeline.Run",
+                    "Image2Outfit.Editor.Pipeline.RunStatic"
+                    if static_only
+                    else "Image2Outfit.Editor.Pipeline.Run",
                     "-image2outfitJob",
                     str(job_path),
                     "-logFile",
@@ -385,7 +387,7 @@ def blender_gate(job_path: Path) -> int:
 def parse_args() -> argparse.Namespace:
     args = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else sys.argv[1:]
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=("run", "blender-gate"), default="run")
+    parser.add_argument("--mode", choices=("run", "static", "blender-gate"), default="run")
     parser.add_argument("--job", required=True)
     return parser.parse_args(args)
 
@@ -396,7 +398,7 @@ def main() -> int:
     try:
         if options.mode == "blender-gate":
             return blender_gate(job_path)
-        return normal_mode(job_path)
+        return normal_mode(job_path, static_only=options.mode == "static")
     except Exception as exc:
         print(f"image2outfit: {exc}", file=sys.stderr)
         return 1

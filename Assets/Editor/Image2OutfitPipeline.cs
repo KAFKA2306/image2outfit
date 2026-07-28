@@ -74,6 +74,16 @@ namespace Image2Outfit.Editor
 
         public static void Run()
         {
+            RunInternal(true);
+        }
+
+        public static void RunStatic()
+        {
+            RunInternal(false);
+        }
+
+        private static void RunInternal(bool runBuildAndTest)
+        {
             try
             {
                 var jobPath = GetArgument("-image2outfitJob");
@@ -86,13 +96,31 @@ namespace Image2Outfit.Editor
 
                 var report = Execute(job);
                 WriteReport(job, report);
-                if (report.passed)
+                if (report.passed && runBuildAndTest)
                 {
                     EditorApplication.delayCall += () => FinishRun(job, report);
                     return;
                 }
 
-                var buildTest = new BuildTestReport
+                if (report.passed)
+                {
+                    var buildTest = new BuildTestReport
+                    {
+                        status = "SKIPPED",
+                        checkedAt = DateTime.UtcNow.ToString("O"),
+                        passed = false,
+                        unityVersion = Application.unityVersion,
+                        combinedPrefabAssetPath = job.integratedPrefabAssetPath,
+                        error = "VRChat client test is performed by a human outside the repository"
+                    };
+                    report.buildAndTestPassed = false;
+                    WriteBuildTestReport(job, buildTest);
+                    WriteReport(job, report);
+                    EditorApplication.Exit(0);
+                    return;
+                }
+
+                var failedBuildTest = new BuildTestReport
                 {
                     status = "FAIL",
                     checkedAt = DateTime.UtcNow.ToString("O"),
@@ -102,7 +130,7 @@ namespace Image2Outfit.Editor
                     error = "static integration gate failed"
                 };
                 report.buildAndTestPassed = false;
-                WriteBuildTestReport(job, buildTest);
+                WriteBuildTestReport(job, failedBuildTest);
                 WriteReport(job, report);
                 EditorApplication.Exit(2);
             }

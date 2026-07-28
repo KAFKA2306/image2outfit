@@ -1,0 +1,36 @@
+name: Remote static verification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: [self-hosted, windows]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: false
+
+      - uses: arduino/setup-task@v2
+
+      - name: Require ignored HAOLAN source
+        shell: pwsh
+        run: |
+          if (!(Test-Path -LiteralPath "Assets/HAOLAN_Quest/FBX/HAOLAN_Lowpoly.fbx")) { throw "HAOLAN source is required under the ignored Assets/HAOLAN_Quest path" }
+          if (!(Test-Path -LiteralPath "Assets/HAOLAN_Quest/HAOLAN_Lowpoly Variant.prefab")) { throw "HAOLAN prefab is required under the ignored Assets/HAOLAN_Quest path" }
+          New-Item -ItemType Directory -Force -Path "Assets/_Local/Jobs/haolan" | Out-Null
+          Copy-Item -LiteralPath "config/haolan-job.template.json" -Destination "Assets/_Local/Jobs/haolan/job.json" -Force
+
+      - name: Run Blender and Unity static verification
+        shell: pwsh
+        run: task verify:static JOB=Assets/_Local/Jobs/haolan/job.json
+
+      - name: Upload generated evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: haolan-static-evidence
+          if-no-files-found: ignore
+          path: |
+            Artifacts/haolan
+            Delivery/haolan/audit.json
