@@ -33,8 +33,15 @@ jobs:
         run: |
           if (!(Test-Path -LiteralPath "Assets/HAOLAN_Quest/FBX/HAOLAN_Lowpoly.fbx")) { throw "HAOLAN source is required under the ignored Assets/HAOLAN_Quest path" }
           if (!(Test-Path -LiteralPath "Assets/HAOLAN_Quest/HAOLAN_Lowpoly Variant.prefab")) { throw "HAOLAN prefab is required under the ignored Assets/HAOLAN_Quest path" }
+          foreach ($generatedPath in @("Assets/_Local/Generated/haolan", "Artifacts/haolan", "Delivery/haolan")) {
+            if (Test-Path -LiteralPath $generatedPath) {
+              Remove-Item -LiteralPath $generatedPath -Recurse -Force
+            }
+          }
           New-Item -ItemType Directory -Force -Path "Assets/_Local/Jobs/haolan" | Out-Null
+          New-Item -ItemType Directory -Force -Path "Artifacts/haolan" | Out-Null
           Copy-Item -LiteralPath "config/haolan-job.template.json" -Destination "Assets/_Local/Jobs/haolan/job.json" -Force
+          Copy-Item -LiteralPath "config/haolan-license.json" -Destination "Artifacts/haolan/license.json" -Force
 
       - name: Run Blender and Unity static verification
         shell: pwsh
