@@ -2,14 +2,29 @@ name: Remote static verification
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/run/haolan-static.txt
+
+permissions:
+  contents: read
+
+concurrency:
+  group: haolan-remote-static
+  cancel-in-progress: false
 
 jobs:
   verify:
     runs-on: [self-hosted, windows]
+    timeout-minutes: 120
+
     steps:
       - uses: actions/checkout@v4
         with:
           clean: false
+          persist-credentials: false
+          fetch-depth: 1
 
       - uses: arduino/setup-task@v2
 
@@ -25,12 +40,14 @@ jobs:
         shell: pwsh
         run: task verify:static JOB=Assets/_Local/Jobs/haolan/job.json
 
-      - name: Upload generated evidence
+      - name: Upload generated outfit and evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: haolan-static-evidence
+          name: haolan-static-outfit-${{ github.run_id }}
           if-no-files-found: ignore
+          retention-days: 14
           path: |
             Artifacts/haolan
             Delivery/haolan/audit.json
+            Delivery/haolan/UnityAssets
