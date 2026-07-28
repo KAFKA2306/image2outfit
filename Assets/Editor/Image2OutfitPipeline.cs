@@ -3,8 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using nadena.dev.modular_avatar.core;
 using UnityEditor;
 using UnityEngine;
+using VRC.SDK3A.Editor;
+using VRC.SDKBase.Editor;
 
 namespace Image2Outfit.Editor
 {
@@ -17,6 +21,7 @@ namespace Image2Outfit.Editor
             public string productName;
             public string fbxAssetPath;
             public string prefabAssetPath;
+            public string integratedPrefabAssetPath;
             public string targetAvatarAssetPath;
             public string artifactDir;
             public string[] allowedExtraBones;
@@ -45,16 +50,30 @@ namespace Image2Outfit.Editor
         {
             public bool passed;
             public bool targetValidated;
+            public bool buildAndTestPassed;
             public string unityVersion;
             public string prefabAssetPath;
+            public string integratedPrefabAssetPath;
             public Metrics metrics = new Metrics();
             public List<string> errors = new List<string>();
             public List<string> warnings = new List<string>();
         }
 
+        [Serializable]
+        private sealed class BuildTestReport
+        {
+            public string status;
+            public string checkedAt;
+            public bool passed;
+            public string unityVersion;
+            public string combinedPrefabAssetPath;
+            public string builderType;
+            public string buildState;
+            public string error;
+        }
+
         public static void Run()
         {
-            var exitCode = 1;
             try
             {
                 var jobPath = GetArgument("-image2outfitJob");
@@ -67,15 +86,48 @@ namespace Image2Outfit.Editor
 
                 var report = Execute(job);
                 WriteReport(job, report);
-                exitCode = report.passed ? 0 : 2;
+                if (report.passed)
+                {
+                    EditorApplication.delayCall += () => FinishRun(job, report);
+                    return;
+                }
+
+                var buildTest = new BuildTestReport
+                {
+                    status = "FAIL",
+                    checkedAt = DateTime.UtcNow.ToString("O"),
+                    passed = false,
+                    unityVersion = Application.unityVersion,
+                    combinedPrefabAssetPath = job.integratedPrefabAssetPath,
+                    error = "static integration gate failed"
+                };
+                report.buildAndTestPassed = false;
+                WriteBuildTestReport(job, buildTest);
+                WriteReport(job, report);
+                EditorApplication.Exit(2);
             }
             catch (Exception exception)
             {
                 Debug.LogException(exception);
+                EditorApplication.Exit(1);
             }
-            finally
+        }
+
+        private static async void FinishRun(Job job, Report report)
+        {
+            try
             {
-                EditorApplication.Exit(exitCode);
+                var buildTest = await RunBuildAndTest(job);
+                report.buildAndTestPassed = buildTest.passed;
+                report.passed = report.passed && buildTest.passed;
+                WriteBuildTestReport(job, buildTest);
+                WriteReport(job, report);
+                EditorApplication.Exit(report.passed ? 0 : 2);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                EditorApplication.Exit(1);
             }
         }
 
@@ -84,11 +136,13 @@ namespace Image2Outfit.Editor
             var report = new Report
             {
                 unityVersion = Application.unityVersion,
-                prefabAssetPath = job.prefabAssetPath
+                prefabAssetPath = job.prefabAssetPath,
+                integratedPrefabAssetPath = job.integratedPrefabAssetPath
             };
 
             RequireAssetPath(job.fbxAssetPath, nameof(job.fbxAssetPath));
             RequireAssetPath(job.prefabAssetPath, nameof(job.prefabAssetPath));
+            RequireAssetPath(job.integratedPrefabAssetPath, nameof(job.integratedPrefabAssetPath));
             RequireAssetPath(job.targetAvatarAssetPath, nameof(job.targetAvatarAssetPath));
 
             var importer = AssetImporter.GetAtPath(job.fbxAssetPath) as ModelImporter;
@@ -125,10 +179,13 @@ namespace Image2Outfit.Editor
                     CreatePrefab(model, job.prefabAssetPath, report);
 
                 ValidateTarget(model, job, report);
+                if (!report.errors.Any())
+                    CreateIntegratedPrefab(job, report);
                 report.passed =
                     !report.errors.Any()
                     && report.targetValidated
-                    && AssetDatabase.LoadAssetAtPath<GameObject>(job.prefabAssetPath) != null;
+                    && AssetDatabase.LoadAssetAtPath<GameObject>(job.prefabAssetPath) != null
+                    && AssetDatabase.LoadAssetAtPath<GameObject>(job.integratedPrefabAssetPath) != null;
                 return report;
             }
             finally
@@ -287,6 +344,7 @@ namespace Image2Outfit.Editor
             try
             {
                 instance.name = Path.GetFileNameWithoutExtension(prefabPath);
+                ConfigureOutfitPrefab(instance, report);
                 var saved = PrefabUtility.SaveAsPrefabAsset(instance, prefabPath);
                 if (saved == null)
                     report.errors.Add("could not save prefab");
@@ -295,6 +353,100 @@ namespace Image2Outfit.Editor
             {
                 UnityEngine.Object.DestroyImmediate(instance);
             }
+        }
+
+        private static void ConfigureOutfitPrefab(GameObject outfitRoot, Report report)
+        {
+            var renderer = outfitRoot.GetComponentsInChildren<SkinnedMeshRenderer>(true).FirstOrDefault();
+            if (renderer == null || renderer.rootBone == null)
+            {
+                report.errors.Add("outfit root bone not found");
+                return;
+            }
+
+            var armature = renderer.rootBone;
+            while (armature.parent != null && armature.parent != outfitRoot.transform)
+                armature = armature.parent;
+
+            var merge = armature.GetComponent<ModularAvatarMergeArmature>();
+            if (merge == null)
+                merge = armature.gameObject.AddComponent<ModularAvatarMergeArmature>();
+            merge.mergeTarget = new AvatarObjectReference
+            {
+                referencePath = armature.name
+            };
+            merge.LockMode = ArmatureLockMode.BaseToMerge;
+            merge.mangleNames = false;
+
+            var settings = outfitRoot.GetComponent<ModularAvatarMeshSettings>();
+            if (settings == null)
+                settings = outfitRoot.AddComponent<ModularAvatarMeshSettings>();
+            settings.InheritProbeAnchor = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
+            settings.InheritBounds = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
+            settings.ProbeAnchor = new AvatarObjectReference
+            {
+                referencePath = $"{armature.name}/{renderer.rootBone.name}"
+            };
+            settings.RootBone = new AvatarObjectReference
+            {
+                referencePath = $"{armature.name}/{renderer.rootBone.name}"
+            };
+            settings.Bounds = renderer.localBounds;
+        }
+
+        private static void CreateIntegratedPrefab(Job job, Report report)
+        {
+            var target = AssetDatabase.LoadAssetAtPath<GameObject>(job.targetAvatarAssetPath);
+            var outfit = AssetDatabase.LoadAssetAtPath<GameObject>(job.prefabAssetPath);
+            var targetInstance = PrefabUtility.InstantiatePrefab(target) as GameObject;
+            var outfitInstance = PrefabUtility.InstantiatePrefab(outfit) as GameObject;
+            outfitInstance.transform.SetParent(targetInstance.transform, false);
+            outfitInstance.name = Path.GetFileNameWithoutExtension(job.prefabAssetPath);
+            ConfigureOutfitPrefab(outfitInstance, report);
+            EnsureAssetFolder(Path.GetDirectoryName(job.integratedPrefabAssetPath)?.Replace('\\', '/'));
+            var saved = PrefabUtility.SaveAsPrefabAsset(targetInstance, job.integratedPrefabAssetPath);
+            if (saved == null)
+                report.errors.Add("could not save integrated avatar prefab");
+            UnityEngine.Object.DestroyImmediate(targetInstance);
+        }
+
+        private static async Task<BuildTestReport> RunBuildAndTest(Job job)
+        {
+            var report = new BuildTestReport
+            {
+                status = "FAIL",
+                checkedAt = DateTime.UtcNow.ToString("O"),
+                unityVersion = Application.unityVersion,
+                combinedPrefabAssetPath = job.integratedPrefabAssetPath
+            };
+            if (VRCSdkControlPanel.window == null)
+                VRCSdkControlPanel.window = ScriptableObject.CreateInstance<VRCSdkControlPanel>();
+            if (!VRCSdkControlPanel.TryGetBuilder<IVRCSdkAvatarBuilderApi>(out var builder))
+            {
+                report.error = "VRChat SDK avatar builder unavailable";
+                return report;
+            }
+
+            var avatar = PrefabUtility.LoadPrefabContents(job.integratedPrefabAssetPath);
+            builder.SelectAvatar(avatar);
+            report.builderType = builder.GetType().FullName;
+            var buildTask = builder.BuildAndTest(avatar);
+            var completedTask = await Task.WhenAny(buildTask, Task.Delay(TimeSpan.FromSeconds(60)));
+            if (completedTask != buildTask)
+            {
+                report.buildState = builder.BuildState.ToString();
+                report.error = "VRChat SDK Build & Test timed out while waiting for the local VRChat client";
+                PrefabUtility.UnloadPrefabContents(avatar);
+                return report;
+            }
+            await buildTask;
+            report.buildState = builder.BuildState.ToString();
+            report.passed = builder.BuildState == SdkBuildState.Success;
+            report.status = report.passed ? "PASS" : "FAIL";
+            if (!report.passed)
+                report.error = "VRChat SDK Build & Test did not finish successfully";
+            PrefabUtility.UnloadPrefabContents(avatar);
+            return report;
         }
 
         private static void ValidateTarget(GameObject outfitModel, Job job, Report report)
@@ -368,6 +520,16 @@ namespace Image2Outfit.Editor
             Directory.CreateDirectory(reportDirectory);
             File.WriteAllText(
                 Path.Combine(reportDirectory, "unity.json"),
+                JsonUtility.ToJson(report, true));
+        }
+
+        private static void WriteBuildTestReport(Job job, BuildTestReport report)
+        {
+            var projectRoot = Path.GetDirectoryName(Application.dataPath);
+            var reportDirectory = Path.GetFullPath(Path.Combine(projectRoot, job.artifactDir));
+            Directory.CreateDirectory(reportDirectory);
+            File.WriteAllText(
+                Path.Combine(reportDirectory, "vrchat-build-test.json"),
                 JsonUtility.ToJson(report, true));
         }
 

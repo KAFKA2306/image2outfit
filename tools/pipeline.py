@@ -248,8 +248,6 @@ def normal_mode(job_path: Path) -> int:
                 [
                     unity,
                     "-batchmode",
-                    "-nographics",
-                    "-quit",
                     "-projectPath",
                     str(ROOT),
                     "-executeMethod",
