@@ -7,6 +7,7 @@ When the user requests an outfit from an image or description, execute the compl
 ## Required flow
 
 1. Resolve the requested avatar, outfit parts, references, and requested deliverables from the prompt.
+   The customer validation target is HAOLAN v1.6. Do not substitute another avatar without an explicit request.
 2. Verify the current official avatar page, license, supported Unity/SDK versions, and required shaders. Record only source URLs and facts needed for the audit.
 3. Put purchased, licensed, reference, and generated working files only under the existing ignored paths:
    - `Assets/_Reference/` target avatar and reference assets
