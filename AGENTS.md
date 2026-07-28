@@ -15,9 +15,9 @@ When the user requests an outfit from an image or description, execute the compl
    - `Assets/_Local/Generated/<job-id>/` FBX, materials, textures, and prefab source folder
    - `Artifacts/<job-id>/` machine-readable validation evidence
    - `Delivery/<job-id>/` customer deliverables
-4. Never commit avatar source files, generated models, textures, previews, delivery files, credentials, or task-specific scripts.
+4. Never commit avatar source files, generated models, textures, previews, delivery files, credentials, or one-off task scripts. Reusable source-only generators may be tracked.
 5. Create the model in Blender. Do not substitute placeholder primitives, renamed existing assets, or fabricated metrics.
-6. Create `Assets/_Local/Jobs/<job-id>/job.json` and a task-specific Blender build script. Run:
+6. Create `Assets/_Local/Jobs/<job-id>/job.json` and use a tracked reusable Blender build script or an ignored task-specific script. Run:
    `python tools/pipeline.py --job Assets/_Local/Jobs/<job-id>/job.json`
 7. The pipeline must produce the requested FBX and Unity prefab, run Blender and Unity gates, and write `Delivery/<job-id>/audit.json`.
 8. Report `GO` only when every requested deliverable exists, Blender and Unity gates pass, the exact target avatar source was tested, licensing permits the intended delivery, and any required VRChat SDK Build & Test evidence exists. Otherwise report `NO-GO` with the exact failed gates.
@@ -47,4 +47,4 @@ Use repository-relative paths.
 
 The license evidence must contain `sourceUrl`, `checkedAt`, `commercialOutfitAllowed: true`, and `avatarFilesRedistributed: false`.
 
-The Blender build script must accept `--job <absolute-job-json>`, save `blendPath`, and export `fbxAssetPath`. `requiredEvidence` is for checks that cannot be inferred from assets, such as an actual VRChat SDK Build & Test result. Missing evidence forces `NO-GO`.
+The Blender build script must accept `--job <absolute-job-json>`, save `blendPath`, and export `fbxAssetPath`. `requiredEvidence` is for checks that cannot be inferred from assets, such as an actual VRChat SDK Build & Test result. Each required evidence JSON must contain `status: "PASS"` and `checkedAt`; missing or incomplete evidence forces `NO-GO`. Remote runs must inject the avatar source under ignored paths and must never commit it.

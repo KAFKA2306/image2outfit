@@ -145,6 +145,11 @@ def validate_license(path: Path) -> tuple[bool, str]:
     return passed, "" if passed else "license evidence is missing or does not permit delivery"
 
 
+def validate_required_evidence(path: Path) -> bool:
+    evidence = read_json(path)
+    return evidence.get("status") == "PASS" and bool(evidence.get("checkedAt"))
+
+
 def copy_generated_assets(fbx_path: Path, prefab_path: Path, delivery_dir: Path) -> list[Path]:
     if fbx_path.parent != prefab_path.parent:
         raise ValueError("fbxAssetPath and prefabAssetPath must share one generated asset folder")
@@ -267,7 +272,7 @@ def normal_mode(job_path: Path) -> int:
     missing_evidence = [
         str(path.relative_to(ROOT)).replace("\\", "/")
         for path in required_evidence
-        if not path.is_file()
+        if not path.is_file() or not validate_required_evidence(path)
     ]
 
     if fbx_path.is_file() and prefab_path.is_file():
