@@ -1,0 +1,103 @@
+name: Build HAOLAN cow hood knit set
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/run/haolan-cow-hood.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: haolan-cow-hood-knit-set
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: [self-hosted, windows]
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: false
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Generate candidate, WebP, and audit evidence
+        shell: pwsh
+        env:
+          UV_NO_PROGRESS: "1"
+        run: |
+          $ErrorActionPreference = "Stop"
+          $source = Get-ChildItem -Path . -Filter "HAOLAN_Lowpoly.fbx" -Recurse -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -notmatch "\\Published\\" -and $_.FullName -notmatch "\\Delivery\\" } |
+            Select-Object -First 1
+          if (-not $source) { throw "Local licensed HAOLAN_Lowpoly.fbx was not found on the self-hosted runner" }
+
+          $out = "Published/haolan/cow-hood-knit-set-v1"
+          if (Test-Path -LiteralPath $out) { Remove-Item -LiteralPath $out -Recurse -Force }
+
+          uv run --no-project --with numpy --with pillow --with trimesh --with scipy python tools/haolan_cow_generator.py --source $source.FullName --out $out
+          if ($LASTEXITCODE -ne 0) { throw "Generator failed with exit code $LASTEXITCODE" }
+
+          $required = @(
+            "$out/HAOLAN_CowHoodKnitSet.fbx",
+            "$out/HAOLAN_CowHoodKnitSet.prefab",
+            "$out/HAOLAN_CowHoodKnitSet_preview.webp",
+            "$out/HAOLAN_CowHoodKnitSet_preview.glb",
+            "$out/audit.json",
+            "$out/AUDIT_REPORT.md"
+          )
+          foreach ($path in $required) {
+            if (-not (Test-Path -LiteralPath $path)) { throw "Missing generated deliverable: $path" }
+          }
+
+          $audit = Get-Content -LiteralPath "$out/audit.json" -Raw | ConvertFrom-Json
+          if ($audit.decision -ne "NO-GO") { throw "Audit must remain NO-GO until Unity/VRChat runtime gates pass" }
+          if ([int]$audit.fbx.meshObjects -ne 19 -or [int]$audit.fbx.vertices -ne 4302 -or [int]$audit.fbx.triangles -ne 7710) {
+            throw "Generated geometry metrics differ from the audited candidate"
+          }
+
+          $tempZip = Join-Path $env:RUNNER_TEMP "HAOLAN_CowHoodKnitSet_v1.zip"
+          if (Test-Path -LiteralPath $tempZip) { Remove-Item -LiteralPath $tempZip -Force }
+          Compress-Archive -Path "$out/*" -DestinationPath $tempZip -CompressionLevel Optimal
+          Move-Item -LiteralPath $tempZip -Destination "$out/HAOLAN_CowHoodKnitSet_v1.zip" -Force
+
+          $manifest = Get-ChildItem -LiteralPath $out -Recurse -File |
+            Where-Object { $_.Name -ne "SOURCE_HASHES.txt" } |
+            Sort-Object FullName |
+            ForEach-Object {
+              $relative = [System.IO.Path]::GetRelativePath((Resolve-Path $out), $_.FullName).Replace("\\", "/")
+              "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $relative"
+            }
+          Set-Content -LiteralPath "$out/SOURCE_HASHES.txt" -Value $manifest -Encoding utf8
+
+          $forbidden = Get-ChildItem -LiteralPath $out -Recurse -File |
+            Where-Object { $_.Name -in @("HAOLAN_Lowpoly.fbx", "HAOLAN_Lowpoly Variant.prefab", "15841.jpg") }
+          if ($forbidden) { throw "Licensed/reference source leaked into publish tree" }
+
+      - name: Commit generated candidate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $out = "Published/haolan/cow-hood-knit-set-v1"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f -- $out
+          if (-not (git status --porcelain -- $out)) { throw "No generated candidate changes to commit" }
+          git commit -m "Add HAOLAN cow hood knit set candidate"
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
+
+      - name: Upload generated evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: haolan-cow-hood-knit-set-${{ github.run_id }}
+          retention-days: 14
+          if-no-files-found: error
+          path: Published/haolan/cow-hood-knit-set-v1
