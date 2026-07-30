@@ -1,142 +1,85 @@
-name: image2outfit E2E
+name: Build outfit candidate
 
 on:
   workflow_dispatch:
     inputs:
       job_path:
-        description: Repository-relative local job.json path
+        description: Repository-relative local schemaVersion 2 job.json path
         required: true
         type: string
-        default: Assets/_Local/Jobs/haolan-bordeaux-knit-set/job.json
 
 permissions:
   contents: read
 
 concurrency:
-  group: image2outfit-e2e-${{ github.repository }}
+  group: image2outfit-candidate-${{ github.repository }}
   cancel-in-progress: false
 
 jobs:
-  build-and-audit:
+  candidate:
     runs-on: [self-hosted, windows, x64, image2outfit]
     timeout-minutes: 120
 
     steps:
-      - name: Checkout tracked pipeline files
+      - name: Checkout tracked pipeline files without deleting licensed local sources
         uses: actions/checkout@v4
         with:
           clean: false
           persist-credentials: false
           fetch-depth: 1
 
-      - name: Validate local job configuration
+      - uses: arduino/setup-task@v2
+
+      - name: Validate local v2 job
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $jobPath = '${{ inputs.job_path }}'
-
           if ($jobPath -notmatch '^Assets/_Local/Jobs/[A-Za-z0-9._-]+/job\.json$') {
-            throw "job_path must match Assets/_Local/Jobs/<job-id>/job.json"
+            throw 'job_path must match Assets/_Local/Jobs/<job-id>/job.json'
           }
           if (-not (Test-Path -LiteralPath $jobPath -PathType Leaf)) {
             throw "Local job file was not found: $jobPath"
           }
-
-          $root = [IO.Path]::GetFullPath((Get-Location).Path)
           $job = Get-Content -LiteralPath $jobPath -Raw | ConvertFrom-Json
-          foreach ($field in @('id', 'artifactDir', 'deliveryDir')) {
+          if ([int]$job.schemaVersion -ne 2) {
+            throw 'Only schemaVersion 2 jobs are accepted'
+          }
+          foreach ($field in @('id', 'artifactDir', 'candidateDir', 'releaseDir', 'licenseEvidence')) {
             if ([string]::IsNullOrWhiteSpace([string]$job.$field)) {
               throw "job.json is missing required field: $field"
             }
           }
-
-          foreach ($entry in @($jobPath, [string]$job.artifactDir, [string]$job.deliveryDir)) {
-            $full = [IO.Path]::GetFullPath((Join-Path $root $entry))
-            if (-not $full.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
-              throw "Path escapes the repository: $entry"
-            }
-          }
-
           "JOB_PATH=$jobPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "JOB_ID=$($job.id)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "ARTIFACT_DIR=$($job.artifactDir)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "DELIVERY_DIR=$($job.deliveryDir)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "CANDIDATE_DIR=$($job.candidateDir)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "RELEASE_DIR=$($job.releaseDir)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "IMAGE2OUTFIT_RUN_ID=$env:GITHUB_RUN_ID" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Run Blender and Unity pipeline
+      - name: Build technical candidate
+        shell: pwsh
+        run: task candidate JOB="$env:JOB_PATH"
+
+      - name: Assert review boundary
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Continue'
-          python tools/pipeline.py --job "$env:JOB_PATH"
-          $pipelineExitCode = $LASTEXITCODE
-          "PIPELINE_EXIT_CODE=$pipelineExitCode" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          Write-Host "image2outfit pipeline exit code: $pipelineExitCode"
-          exit 0
-
-      - name: Collect public-safe evidence and deliverables
-        if: always()
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $uploadRoot = Join-Path (Get-Location) '.actions-output'
-          if (Test-Path -LiteralPath $uploadRoot) {
-            Remove-Item -LiteralPath $uploadRoot -Recurse -Force
+          if (Test-Path -LiteralPath $env:RELEASE_DIR) {
+            throw 'Candidate workflow must not create Release/'
           }
-          New-Item -ItemType Directory -Path $uploadRoot | Out-Null
-
-          $allowedExtensions = @(
-            '.json', '.log', '.txt', '.md',
-            '.fbx', '.prefab', '.mat', '.meta',
-            '.png', '.jpg', '.jpeg', '.tga',
-            '.asset', '.controller', '.anim'
-          )
-
-          function Copy-AllowedFiles([string]$source, [string]$destination) {
-            if ([string]::IsNullOrWhiteSpace($source) -or -not (Test-Path -LiteralPath $source)) {
-              return
-            }
-            $sourceFull = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $source).Path)
-            Get-ChildItem -LiteralPath $sourceFull -File -Recurse | ForEach-Object {
-              if ($allowedExtensions -notcontains $_.Extension.ToLowerInvariant()) {
-                return
-              }
-              $relative = [IO.Path]::GetRelativePath($sourceFull, $_.FullName)
-              $target = Join-Path $destination $relative
-              $targetParent = Split-Path -Parent $target
-              New-Item -ItemType Directory -Path $targetParent -Force | Out-Null
-              Copy-Item -LiteralPath $_.FullName -Destination $target -Force
-            }
+          $audit = Get-Content -LiteralPath (Join-Path $env:ARTIFACT_DIR 'audit.json') -Raw | ConvertFrom-Json
+          if ([string]$audit.decision -ne 'REVIEW_REQUIRED') {
+            throw "Expected REVIEW_REQUIRED after technical build, got $($audit.decision)"
           }
 
-          Copy-AllowedFiles $env:ARTIFACT_DIR (Join-Path $uploadRoot 'Artifacts')
-          Copy-AllowedFiles $env:DELIVERY_DIR (Join-Path $uploadRoot 'Delivery')
-
-          $manifest = Get-ChildItem -LiteralPath $uploadRoot -File -Recurse | ForEach-Object {
-            [ordered]@{
-              path = [IO.Path]::GetRelativePath($uploadRoot, $_.FullName).Replace('\\', '/')
-              bytes = $_.Length
-              sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
-            }
-          }
-          $manifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $uploadRoot 'actions-manifest.json') -Encoding utf8
-
-      - name: Upload audit artifact
+      - name: Upload candidate and evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: image2outfit-${{ env.JOB_ID }}-${{ github.run_id }}
-          path: .actions-output
+          name: image2outfit-candidate-${{ env.JOB_ID }}-${{ github.run_id }}
+          path: |
+            ${{ env.ARTIFACT_DIR }}
+            ${{ env.CANDIDATE_DIR }}
           if-no-files-found: error
           retention-days: 14
           compression-level: 6
-
-      - name: Enforce release gate
-        if: always()
-        shell: pwsh
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:PIPELINE_EXIT_CODE)) {
-            throw 'Pipeline did not produce an exit code.'
-          }
-          $exitCode = [int]$env:PIPELINE_EXIT_CODE
-          if ($exitCode -ne 0) {
-            throw "image2outfit release gate failed with exit code $exitCode. Review the uploaded audit artifact."
-          }
