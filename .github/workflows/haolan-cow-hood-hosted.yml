@@ -6,6 +6,10 @@ on:
     branches: [main]
     paths:
       - .github/run/haolan-cow-hood-hosted.txt
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/run/haolan-cow-hood-pr.txt
   schedule:
     - cron: '*/5 * * * *'
 
@@ -24,6 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           persist-credentials: true
           fetch-depth: 1
 
