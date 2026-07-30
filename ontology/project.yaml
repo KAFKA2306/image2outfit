@@ -1,0 +1,83 @@
+project:
+  id: kafka:image2outfit
+  name: image2outfit
+  repository: https://github.com/KAFKA2306/image2outfit
+  pages: null
+  version: 0.1.0
+  updated: 2026-07-30
+  core_ontology: https://raw.githubusercontent.com/KAFKA2306/know/main/ontology/causal-evidence-core.yaml
+  schema: https://raw.githubusercontent.com/KAFKA2306/know/main/ontology/project.schema.json
+
+purpose:
+  problem: Convert a garment specification into an auditable VRChat customer-delivery candidate without confusing structural validity with product quality.
+  intended_decisions: [REVIEW_REQUIRED, NO-GO, GO, RELEASED]
+  success_conditions:
+    - Exact licensed target avatar is used locally without redistribution.
+    - Blender and Unity artifacts are structurally valid and traceable.
+    - Required visual, pose, and runtime evidence passes human review.
+    - Release files match the reviewed candidate manifest hashes.
+  falsification_conditions:
+    - Missing rights evidence or target-avatar integration proof.
+    - Critical penetration, broken weighting, invalid import, or missing required views.
+    - Candidate inputs or outputs change after review.
+
+scope:
+  included: [garment specification, Blender model, FBX, Unity Prefab, preview evidence, pose evidence, VRChat runtime evidence, release manifest]
+  excluded: [redistribution of private avatars, automatic aesthetic approval, legacy snapshots as customer releases]
+  temporal: Candidate and evidence are bound to immutable hashes at review time.
+  abstraction_level: Customer-delivery pipeline and audit contract.
+
+competency_questions:
+  - Which exact avatar, garment candidate, tools, and versions produced this result?
+  - Which states and gates has the candidate passed or failed?
+  - What evidence supports structural, visual, pose, and runtime claims?
+  - Can the release be reproduced without exposing private source assets?
+  - Has any reviewed input or output changed since approval?
+
+domain_mapping:
+  System: AvatarGarmentIntegration
+  State: [SpecificationState, ModelState, TechnicalState, VisualState, PoseState, RuntimeState, ReleaseState]
+  Action: [ModelGarment, ExportFBX, ImportUnity, ReviewVisuals, ExecutePoseTest, ExecuteRuntimeTest, PromoteRelease]
+  Process: [BlenderBuild, UnityImport, StaticValidation, HumanReview, VRChatBuildAndTest, ReleasePromotion]
+  Observation: [MeshAuditResult, UnityImportResult, PreviewImage, PoseTestResult, RuntimeReview]
+  Model: [LinearBlendSkinning, MaterialModel, ClothOrPhysBoneConfiguration, CandidateStateMachine]
+  Requirement: [RightsSeparation, StructuralValidity, FiveViewCoverage, VisualQuality, PoseIntegrity, RuntimeIntegrity, HashBinding]
+  Claim: [Importable, FitsTargetAvatar, ProductQuality, NoCriticalPenetration, RuntimeCompatible, Releasable]
+  Evidence: [audit.json, candidate-manifest.json, release-manifest.json, preview files, human evidence files, Unity logs, VRChat runtime record]
+  Decision: [REVIEW_REQUIRED, NO-GO, GO, RELEASED]
+
+claims_and_evidence:
+  assertion_types: [ObservedFact, CalculatedValue, ModelEstimate, RequirementAssertion, DecisionAssertion]
+  required_evidence:
+    Importable: [Blender export log, Unity import log, Prefab validation]
+    ProductQuality: [front preview, back preview, left preview, right preview, three-quarter preview, human approval]
+    NoCriticalPenetration: [neutral, arms-up, arm-cross, crouch, sit, prone]
+    RuntimeCompatible: [VRChat SDK Build & Test, in-client human check]
+    Releasable: [all prior evidence, unchanged candidate manifest hash, rights separation]
+  unknown_policy: Missing human, target-avatar, rights, pose, runtime, or hash evidence cannot produce GO.
+
+decision_rules:
+  - id: technical-to-review
+    when: All structural checks pass but mandatory human evidence is not complete.
+    result: REVIEW_REQUIRED
+  - id: any-required-gate-fails
+    when: Any non-waivable requirement fails or required evidence is missing.
+    result: NO-GO
+  - id: reviewed-candidate-go
+    when: All requirements pass and evidence hashes match the candidate manifest.
+    result: GO
+  - id: release-promotion
+    when: A GO candidate is promoted without rebuilding and release hashes are recorded.
+    result: RELEASED
+
+provenance:
+  sources: [local licensed avatar assets, garment job specification, Blender scene, Unity project]
+  generated_artifacts: [blend, FBX, Prefab, audit JSON, candidate manifest, previews, release manifest, ZIP]
+  agents: [Blender, Unity 2022.3.22f1, GitHub Actions, human reviewer, VRChat client]
+  lineage: Every evidence record and decision is bound to candidate inputs, tool versions, and SHA-256 hashes.
+
+validation:
+  structural: Blender mesh checks, FBX export checks, Unity import and Prefab checks.
+  semantic: Job schema and release policy distinguish candidate, review, GO, and release states.
+  evidence: Mandatory view, pose, human-review, runtime, and hash-binding records.
+  publication: Release artifacts exist only after GO; Published snapshots are not treated as releases.
