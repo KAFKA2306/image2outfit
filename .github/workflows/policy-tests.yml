@@ -1,0 +1,49 @@
+name: Release policy tests
+
+on:
+  pull_request:
+    paths:
+      - tools/**
+      - tests/**
+      - config/**
+      - Taskfile.yml
+      - .github/workflows/**
+  push:
+    branches: [main]
+    paths:
+      - tools/**
+      - tests/**
+      - config/**
+      - Taskfile.yml
+      - .github/workflows/**
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Compile Python
+        run: python -m py_compile tools/pipeline.py tools/release_gate.py tests/test_release_gate.py
+
+      - name: Run release policy tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Parse JSON contracts
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for name in ('config/release-policy.json', 'config/job.schema.v2.json'):
+              json.loads(Path(name).read_text(encoding='utf-8'))
+              print(f'{name}: PASS')
+          PY
