@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "primaryAdapterId": "pochi-v1.1.0",
+  "blockedReleaseAdapterIds": [
+    "haolan-v1.6"
+  ],
+  "minimumPreview": {
+    "width": 1024,
+    "height": 1024,
+    "requiredViews": [
+      "front",
+      "back",
+      "left",
+      "right",
+      "three-quarter"
+    ]
+  },
+  "minimumVisualScore": 4,
+  "requiredPoses": [
+    "neutral",
+    "arms-up",
+    "arm-cross",
+    "crouch",
+    "sit",
+    "prone"
+  ],
+  "requiredHumanEvidenceKinds": [
+    "visual-review",
+    "pose-penetration-review",
+    "vrchat-runtime-review"
+  ],
+  "allowedDeliveryExtensions": [
+    ".fbx",
+    ".prefab",
+    ".mat",
+    ".meta",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".tga",
+    ".asset",
+    ".controller",
+    ".anim",
+    ".txt",
+    ".md",
+    ".json"
+  ]
+}
