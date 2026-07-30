@@ -63,4 +63,19 @@ Private or purchased avatar data stays under ignored local roots such as `Assets
 - `config/job.schema.v2.json`: job contract
 - `config/release-policy.json`: non-waivable release policy
 
+## Project ontology
+
+The machine-readable project description is [`ontology/project.yaml`](ontology/project.yaml). It maps the garment pipeline to the shared causal-evidence chain:
+
+```text
+AvatarGarmentIntegration
+  -> model/export/import actions
+  -> structural, visual, pose, and runtime observations
+  -> product and compatibility claims
+  -> hash-bound evidence
+  -> REVIEW_REQUIRED / NO-GO / GO / RELEASED
+```
+
+Observed facts, calculated checks, human judgments, requirements, and release decisions remain separate assertion types. A file existing or importing successfully is not evidence that the garment has product quality.
+
 Checked-in files under `Published/` are legacy snapshots, not customer releases. New generated garments are distributed only as release workflow artifacts after `GO`.
