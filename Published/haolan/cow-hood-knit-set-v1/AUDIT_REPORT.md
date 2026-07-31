@@ -4,7 +4,7 @@
 
 **NO-GO for customer/product release.**
 
-The generated static asset reproduces the requested design language: cow-print cat hood, cropped knit top, sheer cut-out bodysuit, detached bell sleeves, pleated mini skirt, collar/heart hardware, and a soft tail. The committed WebP is an actual render of the generated geometry fitted to the audited HAOLAN-derived fit profile, not a concept illustration.
+The generated static asset reproduces the requested design language: cow-print cat hood, cropped knit top, sheer cut-out bodysuit, detached bell sleeves, pleated mini skirt, collar/heart hardware, and a soft tail. The committed WebP is an actual render of the generated geometry fitted to the supplied HAOLAN source, not a concept illustration.
 
 The asset is not yet allowed to be described as a finished HAOLAN product because this execution environment cannot run Unity 2022.3.22f1, VRChat SDK Build & Test, or animated in-headset review.
 

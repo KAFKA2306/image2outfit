@@ -40,7 +40,7 @@ jobs:
           $out = "Published/haolan/cow-hood-knit-set-v1"
           if (Test-Path -LiteralPath $out) { Remove-Item -LiteralPath $out -Recurse -Force }
 
-          uv run --no-project --with numpy --with pillow --with trimesh --with scipy python tools/haolan_cow_generator.py --source $source.FullName --out $out
+          uv run --no-project --with numpy --with pillow --with trimesh --with scipy python tools/haolan_cow_hood_generator.py --source $source.FullName --out $out
           if ($LASTEXITCODE -ne 0) { throw "Generator failed with exit code $LASTEXITCODE" }
 
           $required = @(
@@ -61,19 +61,7 @@ jobs:
             throw "Generated geometry metrics differ from the audited candidate"
           }
 
-          $tempZip = Join-Path $env:RUNNER_TEMP "HAOLAN_CowHoodKnitSet_v1.zip"
-          if (Test-Path -LiteralPath $tempZip) { Remove-Item -LiteralPath $tempZip -Force }
-          Compress-Archive -Path "$out/*" -DestinationPath $tempZip -CompressionLevel Optimal
-          Move-Item -LiteralPath $tempZip -Destination "$out/HAOLAN_CowHoodKnitSet_v1.zip" -Force
-
-          $manifest = Get-ChildItem -LiteralPath $out -Recurse -File |
-            Where-Object { $_.Name -ne "SOURCE_HASHES.txt" } |
-            Sort-Object FullName |
-            ForEach-Object {
-              $relative = [System.IO.Path]::GetRelativePath((Resolve-Path $out), $_.FullName).Replace("\\", "/")
-              "$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant())  $relative"
-            }
-          Set-Content -LiteralPath "$out/SOURCE_HASHES.txt" -Value $manifest -Encoding utf8
+          uv run --no-project python tools/package_published.py --root $out
 
           $forbidden = Get-ChildItem -LiteralPath $out -Recurse -File |
             Where-Object { $_.Name -in @("HAOLAN_Lowpoly.fbx", "HAOLAN_Lowpoly Variant.prefab", "15841.jpg") }

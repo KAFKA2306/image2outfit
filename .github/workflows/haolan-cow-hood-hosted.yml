@@ -30,47 +30,14 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install generator dependencies
-        run: python -m pip install --disable-pip-version-check numpy pillow trimesh scipy matplotlib
-
-      - name: Generate FBX, prefab, textures, WebP, and audit
+      - name: Generate FBX, prefab, textures, WebP, audit, and package
         run: |
           set -euo pipefail
           out='Published/haolan/cow-hood-knit-set-v1'
           rm -rf "$out"
-          python tools/haolan_cow_generator_hosted.py --out "$out"
-          python - <<'PY'
-          from pathlib import Path
-          import hashlib, json, zipfile
-          root = Path('Published/haolan/cow-hood-knit-set-v1')
-          audit = json.loads((root / 'audit.json').read_text(encoding='utf-8'))
-          assert audit['decision'] == 'NO-GO'
-          assert audit['fbx']['meshObjects'] == 19
-          assert audit['fbx']['vertices'] == 4302
-          assert audit['fbx']['triangles'] == 7710
-          required = [
-              'HAOLAN_CowHoodKnitSet.fbx',
-              'HAOLAN_CowHoodKnitSet.prefab',
-              'HAOLAN_CowHoodKnitSet_preview.webp',
-              'HAOLAN_CowHoodKnitSet_preview.glb',
-              'audit.json',
-              'AUDIT_REPORT.md',
-          ]
-          for name in required:
-              assert (root / name).is_file(), name
-          archive = root / 'HAOLAN_CowHoodKnitSet_v1.zip'
-          with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
-              for path in sorted(root.rglob('*')):
-                  if path.is_file() and path != archive:
-                      z.write(path, Path('HAOLAN_CowHoodKnitSet_v1') / path.relative_to(root))
-          lines = []
-          for path in sorted(root.rglob('*')):
-              if path.is_file() and path.name != 'SOURCE_HASHES.txt':
-                  lines.append(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(root).as_posix()}")
-          (root / 'SOURCE_HASHES.txt').write_text('\n'.join(lines) + '\n', encoding='utf-8')
-          forbidden = {'HAOLAN_Lowpoly.fbx', 'HAOLAN_Lowpoly Variant.prefab', '15841.jpg'}
-          assert not [p for p in root.rglob('*') if p.is_file() and p.name in forbidden]
-          PY
+          uv run --no-project --with numpy --with pillow --with trimesh --with scipy --with matplotlib python tools/haolan_cow_generator_hosted.py --out "$out"
+          uv run --no-project python tools/package_published.py --root "$out"
+          uv run --no-project python -c "import json; from pathlib import Path; a=json.loads((Path('$out')/'audit.json').read_text()); assert a['decision']=='NO-GO'; assert a['fbx']['meshObjects']==19; assert a['fbx']['vertices']==4302; assert a['fbx']['triangles']==7710"
 
       - name: Commit generated candidate
         run: |

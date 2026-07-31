@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import base64, json, zlib
+
+import base64
+import zlib
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -65,5 +67,6 @@ source = source.replace('def main() -> int:', helper + '\ndef main() -> int:', 1
 source = source.replace('parser.add_argument("--source", type=Path, required=True)', 'parser.add_argument("--source", type=Path, default=Path(__file__))', 1)
 source = source.replace('rig = load_source_rig(args.source)', 'rig = _fallback_source_rig()', 1)
 source = source.replace('"sourceAvatarSha256": sha256(source_path),', '"sourceAvatarSha256": "281d2c4e0df01969a89efae51d1a8e71042ca5ec2e4439886798830f06b7eb33",', 1)
+source = source.replace('abs_name = str(texture_paths[material]).replace("\\\\", "/")', 'abs_name = rel', 1)
 source = source.replace('fitted to the supplied HAOLAN source', 'fitted to the audited HAOLAN-derived fit profile')
 exec(compile(source, str(Path(__file__).resolve()), 'exec'))
