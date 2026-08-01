@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import blender_python_env
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -61,12 +63,17 @@ def find_executable(env_name: str, names: tuple[str, ...], candidates: tuple[str
     raise FileNotFoundError(f"{env_name} is not set and executable was not found")
 
 
-def run_command(command: list[str], log_path: Path) -> int:
+def run_command(
+    command: list[str],
+    log_path: Path,
+    environment: dict[str, str] | None = None,
+) -> int:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("w", encoding="utf-8", errors="replace") as log:
         process = subprocess.run(
             command,
             cwd=ROOT,
+            env=environment,
             stdout=log,
             stderr=subprocess.STDOUT,
             check=False,
@@ -198,9 +205,22 @@ def normal_mode(job_path: Path, static_only: bool = False) -> int:
                 r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",
             ),
         )
+        prepared = blender_python_env.prepare(blender, root=ROOT)
+        stages["blenderPython"] = prepared.report
         build_exit = run_command(
-            [blender, "--background", "--python", str(build_script), "--", "--job", str(job_path)],
+            [
+                *prepared.command_prefix,
+                "--background",
+                "--python-exit-code",
+                "1",
+                "--python",
+                str(build_script),
+                "--",
+                "--job",
+                str(job_path),
+            ],
             artifact_dir / "blender-build.log",
+            prepared.environment,
         )
         stages["blenderBuild"]["exitCode"] = build_exit
         stages["blenderBuild"]["passed"] = (
@@ -210,9 +230,11 @@ def normal_mode(job_path: Path, static_only: bool = False) -> int:
         if stages["blenderBuild"]["passed"]:
             gate_exit = run_command(
                 [
-                    blender,
+                    *prepared.command_prefix,
                     "--background",
                     str(blend_path),
+                    "--python-exit-code",
+                    "1",
                     "--python",
                     str(Path(__file__).resolve()),
                     "--",
@@ -222,6 +244,7 @@ def normal_mode(job_path: Path, static_only: bool = False) -> int:
                     str(job_path),
                 ],
                 artifact_dir / "blender-gate.log",
+                prepared.environment,
             )
             stages["blenderGate"]["exitCode"] = gate_exit
             blender_report = read_json(artifact_dir / "blender.json")
@@ -230,6 +253,7 @@ def normal_mode(job_path: Path, static_only: bool = False) -> int:
             )
     except Exception as exc:
         stages["blenderBuild"]["error"] = str(exc)
+        stages.setdefault("blenderPython", {"passed": False, "error": str(exc)})
 
     if stages["blenderGate"]["passed"]:
         try:

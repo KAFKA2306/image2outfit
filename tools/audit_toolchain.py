@@ -44,6 +44,24 @@ def project_unity_version(root: Path) -> str:
     return ""
 
 
+def exact_requirements(path: Path) -> dict[str, str]:
+    result: dict[str, str] = {}
+    try:
+        lines = path.read_text(encoding="utf-8-sig").splitlines()
+    except OSError:
+        return result
+    for raw in lines:
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "==" not in line:
+            result[line] = ""
+            continue
+        name, version = line.split("==", 1)
+        result[name.strip()] = version.strip()
+    return result
+
+
 def audit(root: Path = ROOT, require_unity_lock: bool = False) -> dict[str, Any]:
     lock_path = root / "config" / "toolchain-lock.json"
     manifest_path = root / "Packages" / "vpm-manifest.json"
@@ -112,6 +130,40 @@ def audit(root: Path = ROOT, require_unity_lock: bool = False) -> dict[str, Any]
         errors.append(
             f"Blender must be pinned to an exact 4.4 patch, found {blender_version or 'missing'}"
         )
+    blender_python = lock.get("blender", {}).get("python", {})
+    blender_python_version = str(blender_python.get("version", ""))
+    if not re.fullmatch(r"3\.11\.\d+", blender_python_version):
+        errors.append(
+            "Blender Python must be pinned to an exact 3.11 patch, "
+            f"found {blender_python_version or 'missing'}"
+        )
+    requirements_value = str(blender_python.get("requirements", ""))
+    requirements_path = (root / requirements_value).resolve()
+    if not requirements_value.startswith("config/") or not requirements_path.is_file():
+        errors.append(
+            "Blender Python requirements must be a tracked file under config/"
+        )
+    actual_python_packages = exact_requirements(requirements_path)
+    expected_python_packages: dict[str, str] = {}
+    for distribution, package in blender_python.get("packages", {}).items():
+        version = str(package.get("version", ""))
+        import_name = str(package.get("importName", ""))
+        source = str(package.get("source", ""))
+        expected_python_packages[distribution] = version
+        if not version or PRERELEASE.search(version):
+            errors.append(
+                f"Blender Python package must use a stable exact version: "
+                f"{distribution}@{version or 'missing'}"
+            )
+        if not import_name:
+            errors.append(f"Blender Python import name missing: {distribution}")
+        if not source.startswith("https://"):
+            errors.append(f"Blender Python source must use https: {distribution}")
+    if actual_python_packages != expected_python_packages:
+        errors.append(
+            "Blender Python requirements mismatch: "
+            f"expected {expected_python_packages}, found {actual_python_packages}"
+        )
 
     unity_lock_present = upm_lock_path.is_file()
     if require_unity_lock and not unity_lock_present:
@@ -129,7 +181,12 @@ def audit(root: Path = ROOT, require_unity_lock: bool = False) -> dict[str, Any]
         "passed": not errors,
         "stableOnly": lock.get("stableOnly") is True,
         "unity": {"expected": expected_unity, "project": actual_unity},
-        "blender": {"expected": blender_version},
+        "blender": {
+            "expected": blender_version,
+            "pythonExpected": blender_python_version,
+            "requirements": requirements_value,
+            "packages": actual_python_packages,
+        },
         "packages": package_results,
         "unityPackageLockPresent": unity_lock_present,
         "errors": errors,

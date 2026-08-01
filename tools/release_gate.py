@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import audit_toolchain
+import blender_python_env
 import pipeline as legacy
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,6 +138,7 @@ def inputs(job_path: Path, job: dict[str, Any]) -> dict[str, str]:
         "job": job_path,
         "policy": POLICY_PATH,
         "toolchainLock": ROOT / "config" / "toolchain-lock.json",
+        "blenderPythonRequirements": ROOT / "config" / "blender-python-requirements.txt",
         "vpmManifest": ROOT / "Packages" / "vpm-manifest.json",
         "upmManifest": ROOT / "Packages" / "manifest.json",
         "projectVersion": ROOT / "ProjectSettings" / "ProjectVersion.txt",
@@ -217,20 +219,36 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",
         ),
     )
-    build_exit = legacy.run_command(
-        [
-            blender,
-            "--background",
-            "--python",
-            str(path(job["buildScript"])),
-            "--",
-            "--job",
-            str(job_path),
-        ],
-        artifact / "blender-build.log",
-    )
+    try:
+        prepared = blender_python_env.prepare(blender, root=ROOT)
+        stages["blenderPython"] = prepared.report
+    except Exception as exc:
+        stages["blenderPython"] = {"passed": False, "error": str(exc)}
+        stages["blenderBuild"] = {"passed": False, "error": "not run"}
+        stages["blenderStructure"] = {"passed": False, "error": "not run"}
+        prepared = None
+
+    if prepared is None:
+        build_exit = None
+    else:
+        build_exit = legacy.run_command(
+            [
+                *prepared.command_prefix,
+                "--background",
+                "--python-exit-code",
+                "1",
+                "--python",
+                str(path(job["buildScript"])),
+                "--",
+                "--job",
+                str(job_path),
+            ],
+            artifact / "blender-build.log",
+            prepared.environment,
+        )
     stages["blenderBuild"] = {
-        "passed": build_exit == 0
+        "passed": prepared is not None
+        and build_exit == 0
         and path(job["blendPath"]).is_file()
         and path(job["fbxAssetPath"]).is_file(),
         "exitCode": build_exit,
@@ -246,9 +264,11 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
     if stages["blenderBuild"]["passed"]:
         gate_exit = legacy.run_command(
             [
-                blender,
+                *prepared.command_prefix,
                 "--background",
                 str(path(job["blendPath"])),
+                "--python-exit-code",
+                "1",
                 "--python",
                 str(ROOT / "tools" / "pipeline.py"),
                 "--",
@@ -258,6 +278,7 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                 str(temporary_job_path),
             ],
             artifact / "blender-gate.log",
+            prepared.environment,
         )
         blender_report = read(artifact / "blender.json")
         expected_blender = toolchain.get("blender", {}).get("expected")

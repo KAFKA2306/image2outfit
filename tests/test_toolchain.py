@@ -26,6 +26,12 @@ class ToolchainAuditTest(unittest.TestCase):
             (PROJECT / "Packages" / "vpm-manifest.json").read_text(encoding="utf-8")
         )
         self.write_json(self.root / "config" / "toolchain-lock.json", self.lock)
+        (self.root / "config" / "blender-python-requirements.txt").write_text(
+            (PROJECT / "config" / "blender-python-requirements.txt").read_text(
+                encoding="utf-8"
+            ),
+            encoding="utf-8",
+        )
         self.write_json(self.root / "Packages" / "vpm-manifest.json", self.manifest)
         (self.root / "ProjectSettings" / "ProjectVersion.txt").write_text(
             "m_EditorVersion: 2022.3.22f1\n", encoding="utf-8"
@@ -69,6 +75,25 @@ class ToolchainAuditTest(unittest.TestCase):
         self.assertFalse(result["passed"])
         self.assertTrue(
             any("dependency contract" in error for error in result["errors"])
+        )
+
+    def test_blender_python_requirement_drift_is_rejected(self) -> None:
+        (self.root / "config" / "blender-python-requirements.txt").write_text(
+            "Pillow==12.2.0\n", encoding="utf-8"
+        )
+        result = audit_toolchain.audit(self.root)
+        self.assertFalse(result["passed"])
+        self.assertTrue(
+            any("Blender Python requirements mismatch" in error for error in result["errors"])
+        )
+
+    def test_blender_python_version_drift_is_rejected(self) -> None:
+        self.lock["blender"]["python"]["version"] = "3.12.0"
+        self.write_json(self.root / "config" / "toolchain-lock.json", self.lock)
+        result = audit_toolchain.audit(self.root)
+        self.assertFalse(result["passed"])
+        self.assertTrue(
+            any("exact 3.11 patch" in error for error in result["errors"])
         )
 
 
