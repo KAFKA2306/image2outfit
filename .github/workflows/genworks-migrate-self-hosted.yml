@@ -1,0 +1,114 @@
+name: Migrate existing assets to GenWorks
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/run/genworks-migrate.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: image2outfit-genworks-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: [self-hosted, windows, x64, image2outfit]
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout without deleting ignored avatar and job sources
+        uses: actions/checkout@v4
+        with:
+          clean: false
+          persist-credentials: true
+          fetch-depth: 0
+
+      - uses: arduino/setup-task@v2
+
+      - name: Create migration report directory
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force -Path Artifacts/genworks-migration | Out-Null
+
+      - name: Preview migration plan
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          uv run --no-cache --no-project python tools/migrate_jobs_to_genworks.py |
+            Tee-Object -FilePath Artifacts/genworks-migration/plan.json
+          if ($LASTEXITCODE -ne 0) { throw 'GenWorks migration planning failed' }
+
+      - name: Apply existing job migration
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          uv run --no-cache --no-project python tools/migrate_jobs_to_genworks.py --apply |
+            Tee-Object -FilePath Artifacts/genworks-migration/applied.json
+          if ($LASTEXITCODE -ne 0) { throw 'GenWorks migration failed' }
+
+      - name: Restore VPM dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Get-Command vpm -ErrorAction SilentlyContinue)) {
+            throw 'The official VPM CLI is required on the image2outfit runner'
+          }
+          foreach ($repo in @('https://vpm.nadena.dev/vpm.json', 'https://vpm.anatawa12.com/vpm.json')) {
+            $repos = (& vpm list repos 2>&1 | Out-String)
+            if ($repos -notmatch [regex]::Escape($repo)) {
+              & vpm add repo $repo
+              if ($LASTEXITCODE -ne 0) { throw "Could not add VPM repository: $repo" }
+            }
+          }
+          & vpm resolve project .
+          if ($LASTEXITCODE -ne 0) { throw 'vpm resolve project failed' }
+
+      - name: Import GenWorks in Unity and generate meta files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $unity = if ($env:UNITY_EXE) {
+            $env:UNITY_EXE
+          } else {
+            'C:/Program Files/Unity/Hub/Editor/2022.3.22f1/Editor/Unity.exe'
+          }
+          if (-not (Test-Path -LiteralPath $unity -PathType Leaf)) {
+            throw "Unity executable not found: $unity"
+          }
+          & $unity -batchmode -projectPath . -quit -logFile Artifacts/genworks-migration/unity-import.log
+          if ($LASTEXITCODE -ne 0) { throw "Unity import failed with exit code $LASTEXITCODE" }
+
+      - name: Audit canonical layout
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          uv run --no-cache --no-project python tools/audit_genworks_layout.py --output Artifacts/genworks-migration/audit.json
+          if ($LASTEXITCODE -ne 0) { throw 'GenWorks layout audit failed' }
+
+      - name: Commit migrated public product assets
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f -- Assets/GenWorks
+          if (git diff --cached --quiet) {
+            Write-Host 'No additional local products required migration.'
+            exit 0
+          }
+          git commit -m 'Migrate existing outfit assets into GenWorks'
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
+
+      - name: Upload migration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: genworks-migration-${{ github.run_id }}
+          path: Artifacts/genworks-migration
+          if-no-files-found: warn
+          retention-days: 30
