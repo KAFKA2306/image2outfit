@@ -57,7 +57,7 @@ jobs:
             --background \
             --factory-startup \
             --python-exit-code 1 \
-            --python tools/siroino_wide_cargo_entry_v8.py \
+            --python tools/siroino_wide_cargo_release_refit.py \
             -- \
             --job config/siroino-wide-cargo-job.json \
             | tee Artifacts/siroino-wide-cargo/hosted-blender.log
@@ -81,7 +81,7 @@ jobs:
           path = Path('Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json')
           data = json.loads(path.read_text(encoding='utf-8-sig'))
           data['status'] = 'MODELED'
-          data['designRevision'] = 'v9-third-pass-refit'
+          data['designRevision'] = 'v10-release-refit'
           data['technicalGates'] = {
               'blender': 'PASS',
               'uvMapping': 'PASS',
