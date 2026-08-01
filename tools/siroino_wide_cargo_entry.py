@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""UV-aware entry point for the Siroino Wide Cargo generator."""
+"""UV-aware and distribution-safe entry point for Siroino Wide Cargo."""
 from __future__ import annotations
 
 import math
+
+import bpy
 
 import siroino_wide_cargo_build as build
 
@@ -32,7 +34,29 @@ def mesh_obj_with_uv(*args, **kwargs):
     return obj
 
 
+def save_distribution_blend() -> None:
+    _, job = build.c.load_job()
+    blend_path = build.c.repo_path(job["blendPath"])
+    for obj in list(bpy.data.objects):
+        preview_only = (
+            obj.name.startswith("SiroinoSotai_PC")
+            or obj.name == "Studio_Floor"
+            or obj.name == "Product_Camera"
+            or obj.type in {"LIGHT", "CAMERA"}
+        )
+        if preview_only:
+            bpy.data.objects.remove(obj, do_unlink=True)
+    for collection in (bpy.data.meshes, bpy.data.materials, bpy.data.images):
+        for datablock in list(collection):
+            if datablock.users == 0:
+                collection.remove(datablock)
+    bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
+
+
 build.mesh_obj = mesh_obj_with_uv
 
 if __name__ == "__main__":
-    raise SystemExit(build.main())
+    exit_code = build.main()
+    if exit_code == 0:
+        save_distribution_blend()
+    raise SystemExit(exit_code)
