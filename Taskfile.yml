@@ -5,19 +5,23 @@ tasks:
     desc: Build a technically valid candidate. Never creates a customer release.
     requires:
       vars: [JOB]
-    vars:
-      PYTHON: '{{.PYTHON | default "C:/Program Files/Blender Foundation/Blender 4.4/4.4/python/bin/python.exe"}}'
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
-      - uv run --no-cache --no-managed-python --python "{{.PYTHON}}" --no-project python tools/release_gate.py --mode candidate --job "{{.JOB}}"
+      - uv run --no-cache --python 3.11 python tools/release_gate.py --mode candidate --job "{{.JOB}}"
 
   release:
     desc: Promote an unchanged reviewed candidate to Release/ after every mandatory evidence gate passes.
     requires:
       vars: [JOB]
-    vars:
-      PYTHON: '{{.PYTHON | default "C:/Program Files/Blender Foundation/Blender 4.4/4.4/python/bin/python.exe"}}'
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
-      - uv run --no-cache --no-managed-python --python "{{.PYTHON}}" --no-project python tools/release_gate.py --mode release --job "{{.JOB}}"
+      - uv run --no-cache --python 3.11 python tools/release_gate.py --mode release --job "{{.JOB}}"
 
   audit:haolan:
     desc: Verify the committed HAOLAN candidate hashes, archive, and regeneration output.

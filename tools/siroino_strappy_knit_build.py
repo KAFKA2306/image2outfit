@@ -190,7 +190,12 @@ def plain_material(
     material = bpy.data.materials.new(name)
     material.use_nodes = True
     material.diffuse_color = color
-    shader = material.node_tree.nodes.get("Principled BSDF")
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    nodes.clear()
+    output = nodes.new("ShaderNodeOutputMaterial")
+    shader = nodes.new("ShaderNodeBsdfPrincipled")
+    links.new(shader.outputs["BSDF"], output.inputs["Surface"])
     shader.inputs["Base Color"].default_value = color
     shader.inputs["Roughness"].default_value = roughness
     shader.inputs["Metallic"].default_value = metallic
@@ -202,7 +207,7 @@ def plain_material(
 
 def set_skin_material(body: bpy.types.Object) -> None:
     skin = plain_material("Preview_Skin", (0.43, 0.18, 0.11, 1.0), roughness=0.52)
-    shader = skin.node_tree.nodes.get("Principled BSDF")
+    shader = next(node for node in skin.node_tree.nodes if node.type == "BSDF_PRINCIPLED")
     shader.inputs["Subsurface Weight"].default_value = 0.08
     body.data.materials.clear()
     body.data.materials.append(skin)

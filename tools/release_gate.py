@@ -217,10 +217,16 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",
         ),
     )
+    os.environ["PYTHONPATH"] = next(
+        entry for entry in sys.path if entry.endswith("site-packages")
+    )
     build_exit = legacy.run_command(
         [
             blender,
             "--background",
+            "--python-exit-code",
+            "1",
+            "--python-use-system-env",
             "--python",
             str(path(job["buildScript"])),
             "--",
@@ -248,6 +254,9 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             [
                 blender,
                 "--background",
+                "--python-exit-code",
+                "1",
+                "--python-use-system-env",
                 str(path(job["blendPath"])),
                 "--python",
                 str(ROOT / "tools" / "pipeline.py"),
