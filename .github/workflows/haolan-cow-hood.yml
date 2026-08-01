@@ -33,11 +33,11 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $source = Get-ChildItem -Path . -Filter "HAOLAN_Lowpoly.fbx" -Recurse -File -ErrorAction SilentlyContinue |
-            Where-Object { $_.FullName -notmatch "\\Published\\" -and $_.FullName -notmatch "\\Delivery\\" } |
+            Where-Object { $_.FullName -notmatch "\\Assets\\GenWorks\\Legacy\\Published\\" -and $_.FullName -notmatch "\\Delivery\\" } |
             Select-Object -First 1
           if (-not $source) { throw "Local licensed HAOLAN_Lowpoly.fbx was not found on the self-hosted runner" }
 
-          $out = "Published/haolan/cow-hood-knit-set-v1"
+          $out = "Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1"
           if (Test-Path -LiteralPath $out) { Remove-Item -LiteralPath $out -Recurse -Force }
 
           uv run --no-project --with numpy --with pillow --with trimesh --with scipy python tools/haolan_cow_hood_generator.py --source $source.FullName --out $out
@@ -67,16 +67,16 @@ jobs:
             Where-Object { $_.Name -in @("HAOLAN_Lowpoly.fbx", "HAOLAN_Lowpoly Variant.prefab", "15841.jpg") }
           if ($forbidden) { throw "Licensed/reference source leaked into publish tree" }
 
-      - name: Commit generated candidate
+      - name: Commit generated legacy snapshot
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
-          $out = "Published/haolan/cow-hood-knit-set-v1"
+          $out = "Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f -- $out
           if (-not (git status --porcelain -- $out)) { throw "No generated candidate changes to commit" }
-          git commit -m "Add HAOLAN cow hood knit set candidate"
+          git commit -m "Update HAOLAN cow hood legacy snapshot"
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
@@ -88,4 +88,4 @@ jobs:
           name: haolan-cow-hood-knit-set-${{ github.run_id }}
           retention-days: 14
           if-no-files-found: error
-          path: Published/haolan/cow-hood-knit-set-v1
+          path: Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1
