@@ -16,6 +16,9 @@ import siroino_wide_cargo_build as build
 
 _original_mesh_object = build.mesh_object
 _original_create_outfit = build.create_outfit
+_original_asymmetric_leg_shell = build.asymmetric_leg_shell
+_original_flat_ellipse_band = build.flat_ellipse_band
+_original_flat_path_ribbon = build.flat_path_ribbon
 
 
 def mesh_object_with_uv(*args, **kwargs):
@@ -41,14 +44,77 @@ def mesh_object_with_uv(*args, **kwargs):
     return obj
 
 
-def create_outfit_with_fitted_pelvis(body, armature, fabric, strap, metal):
-    """Close the crotch while retaining deliberate side cutouts.
+def fitted_leg_shell(name, side, rings, material, armature, body, segments=48):
+    if "UpperLeg" in name:
+        adjusted = []
+        for index, (z, _inner, outer, front, back) in enumerate(rings):
+            inner = 0.006 + index * 0.002
+            adjusted.append((z, inner, outer, front, back))
+        rings = adjusted
+    return _original_asymmetric_leg_shell(
+        name,
+        side,
+        rings,
+        material,
+        armature,
+        body,
+        segments=segments,
+    )
 
-    The first modeled candidate read as open chaps in front and back. These two
-    exact-body-derived panels create a conventional fly and rear yoke, tapering
-    toward the crotch and widening toward the waist. The outer hips remain open
-    enough for the asymmetric straps and rings to read clearly in VRChat.
-    """
+
+def fitted_waist_band(
+    name,
+    center_x,
+    radius_x,
+    radius_y,
+    z,
+    width,
+    material,
+    armature,
+    body,
+    **kwargs,
+):
+    if name == "Primary_Waist_Belt":
+        radius_x, radius_y, z, width = 0.157, 0.108, 0.787, 0.014
+    elif name == "Asymmetric_Waist_Belt":
+        radius_x, radius_y, z, width = 0.161, 0.112, 0.798, 0.011
+        kwargs["slope"] = 0.012
+    return _original_flat_ellipse_band(
+        name,
+        center_x,
+        radius_x,
+        radius_y,
+        z,
+        width,
+        material,
+        armature,
+        body,
+        **kwargs,
+    )
+
+
+def trimmed_path_ribbon(name, points, width, material, armature, body):
+    if name.startswith("Hip_Cutout_Strap_"):
+        points = [
+            (
+                math.copysign(min(abs(x), 0.158), x),
+                y,
+                z,
+            )
+            for x, y, z in points
+        ]
+    return _original_flat_path_ribbon(
+        name,
+        points,
+        width,
+        material,
+        armature,
+        body,
+    )
+
+
+def create_outfit_with_fitted_pelvis(body, armature, fabric, strap, metal):
+    """Create a conventional crotch and inner-thigh seam with open outer hips."""
     objects = _original_create_outfit(body, armature, fabric, strap, metal)
 
     front = build.c.extract_surface(
@@ -56,10 +122,10 @@ def create_outfit_with_fitted_pelvis(body, armature, fabric, strap, metal):
         armature,
         "Cargo_Fitted_Front_Pelvis",
         lambda point: (
-            0.615 <= point.z <= 0.792
-            and point.y < 0.002
+            0.520 <= point.z <= 0.792
+            and point.y < 0.006
             and abs(point.x)
-            <= 0.052 + max(0.0, point.z - 0.615) * 0.46
+            <= 0.028 + max(0.0, point.z - 0.520) * 0.39
         ),
         fabric,
         0.0055,
@@ -69,10 +135,10 @@ def create_outfit_with_fitted_pelvis(body, armature, fabric, strap, metal):
         armature,
         "Cargo_Fitted_Back_Yoke",
         lambda point: (
-            0.610 <= point.z <= 0.792
-            and point.y >= -0.004
+            0.515 <= point.z <= 0.792
+            and point.y >= -0.008
             and abs(point.x)
-            <= 0.066 + max(0.0, point.z - 0.610) * 0.38
+            <= 0.034 + max(0.0, point.z - 0.515) * 0.36
         ),
         fabric,
         0.0055,
@@ -102,6 +168,9 @@ def save_distribution_blend() -> None:
 
 
 build.mesh_object = mesh_object_with_uv
+build.asymmetric_leg_shell = fitted_leg_shell
+build.flat_ellipse_band = fitted_waist_band
+build.flat_path_ribbon = trimmed_path_ribbon
 build.create_outfit = create_outfit_with_fitted_pelvis
 
 if __name__ == "__main__":
