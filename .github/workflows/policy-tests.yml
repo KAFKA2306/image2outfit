@@ -39,7 +39,7 @@ jobs:
           python-version: '3.12'
 
       - name: Compile Python
-        run: python -m py_compile tools/pipeline.py tools/audit_toolchain.py tools/release_gate.py tests/test_release_gate.py tests/test_toolchain.py
+        run: python -m py_compile tools/pipeline.py tools/audit_toolchain.py tools/blender_python_env.py tools/release_gate.py tests/test_release_gate.py tests/test_toolchain.py tests/test_blender_python_env.py
 
       - name: Audit pinned toolchain
         run: python tools/audit_toolchain.py
@@ -62,3 +62,6 @@ jobs:
               json.loads(Path(name).read_text(encoding='utf-8'))
               print(f'{name}: PASS')
           PY
+
+      - name: Check Blender Python requirements
+        run: test -s config/blender-python-requirements.txt

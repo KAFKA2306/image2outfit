@@ -5,6 +5,7 @@
 | Layer | Pinned version | Why it is in the gate | Official source |
 | --- | --- | --- | --- |
 | Blender | 4.4.3 | Deterministic generator, Cycles preview, and FBX export baseline | [4.4 corrective releases](https://developer.blender.org/docs/release_notes/4.4/corrective_releases/) |
+| Blender Python | 3.11.11 + Pillow 12.3.0 | Pinned image generation, preview inspection, and contact-sheet runtime | [Blender 4.4 library update](https://projects.blender.org/blender/blender/issues/128577), [Pillow 12.3.0](https://pillow.readthedocs.io/en/stable/releasenotes/12.3.0.html) |
 | Unity | 2022.3.22f1 | VRChat-supported editor baseline | [VPM CLI Unity requirement](https://vcc.docs.vrchat.com/vpm/cli/#install-unity) |
 | VRChat SDK | 3.10.4 | Avatar descriptor and Build & Test integration | [SDK 3.10.4 release](https://creators.vrchat.com/releases/release-3-10-4/) |
 | Modular Avatar | 1.17.1 | Preset configuration and armature merge | [1.17.1 release](https://github.com/bdunderscore/modular-avatar/releases/tag/1.17.1) |
@@ -24,6 +25,22 @@ vpm resolve project .
 python tools/audit_toolchain.py
 ```
 
+`task candidate` probes the actual Blender process before generation. It requires
+Blender `4.4.3` with its bundled Python `3.11.11`, restores the exact packages in
+`config/blender-python-requirements.txt` to the ignored
+`.image2outfit/blender-python/` directory with `uv`, and verifies their imported
+distribution versions. Blender is launched with `--python-use-system-env` and an
+explicit `PYTHONPATH`; no package is installed into Program Files or a user's
+global Python. The requirements file is included in every candidate input hash.
+
+The environment can be inspected without modifying Blender itself:
+
+```powershell
+$blender = "C:/Program Files/Blender Foundation/Blender 4.4/blender.exe"
+& $blender --background --factory-startup --python-exit-code 1 --python-expr `
+  "import bpy,platform; print(bpy.app.version_string); print(platform.python_version())"
+```
+
 The VPM resolver restores the packages listed in `Packages/vpm-manifest.json`; Unity then owns `Packages/packages-lock.json`. Do not hand-edit the Unity lock file. The candidate workflow requires it after Unity resolution, following the [Unity lock-file guidance](https://docs.unity3d.com/2022.3/Documentation/Manual/upm-conflicts-auto.html) and [VPM source-control guidance](https://vcc.docs.vrchat.com/vpm/source-control/).
 
 ## Outfit rules encoded in Unity
@@ -33,4 +50,4 @@ The VPM resolver restores the packages listed in `Packages/vpm-manifest.json`; U
 - The saved integrated prefab is instantiated and processed with NDMF; unresolved mappings, new missing scripts, renderer loss, or invalid skinned renderers fail the technical gate.
 - Avatar Optimizer is installed but no optimizer component is injected automatically. Optimization is an avatar-level decision and cannot substitute for fit, pose, or runtime evidence.
 
-These defaults follow the official [Merge Armature reference](https://modular-avatar.nadena.dev/docs/reference/merge-armature), [outfit-creator guidance](https://modular-avatar.nadena.dev/docs/distributing-prefabs/for-outfit-creators), [Blender command-line documentation](https://docs.blender.org/manual/en/4.4/advanced/command_line/index.html), and [VRChat avatar optimization guidance](https://creators.vrchat.com/avatars/avatar-optimizing-tips/).
+These defaults follow the official [Merge Armature reference](https://modular-avatar.nadena.dev/docs/reference/merge-armature), [outfit-creator guidance](https://modular-avatar.nadena.dev/docs/distributing-prefabs/for-outfit-creators), [Blender command-line documentation](https://docs.blender.org/manual/en/4.4/advanced/command_line/arguments.html), [uv target installation reference](https://docs.astral.sh/uv/reference/cli/#uv-pip-install), and [VRChat avatar optimization guidance](https://creators.vrchat.com/avatars/avatar-optimizing-tips/).

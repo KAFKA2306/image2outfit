@@ -19,13 +19,13 @@ The current primary adapter is `pochi-v1.1.0`. `haolan-v1.6` is blocked from rel
 
 ## Pinned toolchain
 
-The reproducible build contract is machine-readable in `config/toolchain-lock.json`. It pins Blender 4.4.3, Unity 2022.3.22f1, VRChat SDK 3.10.4, Modular Avatar 1.17.1, NDMF 1.14.1, and Avatar Optimizer 1.9.16. Validate source control before a build with:
+The reproducible build contract is machine-readable in `config/toolchain-lock.json`. It pins Blender 4.4.3, Blender Python 3.11.11 with Pillow 12.3.0, Unity 2022.3.22f1, VRChat SDK 3.10.4, Modular Avatar 1.17.1, NDMF 1.14.1, and Avatar Optimizer 1.9.16. Validate source control before a build with:
 
 ```shell
 python tools/audit_toolchain.py
 ```
 
-The Windows candidate runner restores the exact VPM graph before opening Unity and requires Unity to generate `Packages/packages-lock.json`. See `docs/TOOLCHAIN.md` for the official sources and update policy.
+The Windows candidate runner restores the isolated Blender Python packages and exact VPM graph before opening Unity, then requires Unity to generate `Packages/packages-lock.json`. See `docs/TOOLCHAIN.md` for the official sources and update policy.
 
 ## State machine
 
