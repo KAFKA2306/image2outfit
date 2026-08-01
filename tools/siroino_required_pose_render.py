@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Render six release-policy poses against the exact SiroinoSotai body."""
+"""Render six release-policy poses against the exact SiroinoSotai body.
+
+Every frame uses the same generated garment and exact target body. The prone
+case rotates both armatures into an actual horizontal body orientation rather
+than merely bending the legs of an upright avatar.
+"""
 from __future__ import annotations
 
 import argparse
@@ -9,6 +14,7 @@ import sys
 from pathlib import Path
 
 import bpy
+from mathutils import Euler, Vector
 from PIL import Image, ImageDraw, ImageFont
 
 TOOLS = Path(__file__).resolve().parent
@@ -27,7 +33,15 @@ def args() -> argparse.Namespace:
     return parser.parse_args(raw)
 
 
-def clear(armature: bpy.types.Object) -> None:
+def clear(
+    armature: bpy.types.Object,
+    base_transform: tuple[Vector, Euler, Vector],
+) -> None:
+    location, rotation, scale = base_transform
+    armature.location = location.copy()
+    armature.rotation_mode = "XYZ"
+    armature.rotation_euler = rotation.copy()
+    armature.scale = scale.copy()
     for bone in armature.pose.bones:
         bone.rotation_mode = "XYZ"
         bone.rotation_euler = (0.0, 0.0, 0.0)
@@ -42,9 +56,13 @@ def rotate(armature: bpy.types.Object, name: str, degrees: tuple[float, float, f
         bone.rotation_euler = tuple(math.radians(value) for value in degrees)
 
 
-def apply_pose(armatures: list[bpy.types.Object], name: str) -> None:
+def apply_pose(
+    armatures: list[bpy.types.Object],
+    base_transforms: dict[str, tuple[Vector, Euler, Vector]],
+    name: str,
+) -> None:
     for armature in armatures:
-        clear(armature)
+        clear(armature, base_transforms[armature.name])
         if name == "arms-up":
             rotate(armature, "UpperArm_L", (-105.0, 0.0, -8.0))
             rotate(armature, "UpperArm_R", (-105.0, 0.0, 8.0))
@@ -70,10 +88,19 @@ def apply_pose(armatures: list[bpy.types.Object], name: str) -> None:
             if armature.pose.bones.get("Hips"):
                 armature.pose.bones["Hips"].location.z = -0.16
         elif name == "prone":
-            rotate(armature, "UpperLeg_L", (-18.0, 0.0, 3.0))
-            rotate(armature, "UpperLeg_R", (-18.0, 0.0, -3.0))
-            rotate(armature, "LowerLeg_L", (24.0, 0.0, 0.0))
-            rotate(armature, "LowerLeg_R", (24.0, 0.0, 0.0))
+            # Rotate the complete imported rig so the body axis is horizontal.
+            # Both garment and target armatures receive the identical transform.
+            armature.rotation_euler.rotate_axis("X", math.radians(90.0))
+            armature.location.y += 0.10
+            armature.location.z += 0.16
+            rotate(armature, "UpperLeg_L", (-10.0, 0.0, 3.0))
+            rotate(armature, "UpperLeg_R", (-10.0, 0.0, -3.0))
+            rotate(armature, "LowerLeg_L", (20.0, 0.0, 0.0))
+            rotate(armature, "LowerLeg_R", (20.0, 0.0, 0.0))
+            rotate(armature, "UpperArm_L", (-34.0, 0.0, -18.0))
+            rotate(armature, "UpperArm_R", (-34.0, 0.0, 18.0))
+            rotate(armature, "LowerArm_L", (-48.0, 0.0, 0.0))
+            rotate(armature, "LowerArm_R", (-48.0, 0.0, 0.0))
     bpy.context.view_layer.update()
 
 
@@ -124,9 +151,16 @@ def main() -> int:
     ]
     _, target_armature = import_target(job)
     armatures = [*garment_armatures, target_armature]
+    base_transforms = {
+        armature.name: (
+            armature.location.copy(),
+            armature.rotation_euler.copy(),
+            armature.scale.copy(),
+        )
+        for armature in armatures
+    }
 
     _, camera = common.studio_setup()
-    camera.data.ortho_scale = 1.23
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
@@ -141,26 +175,33 @@ def main() -> int:
     scene.render.image_settings.color_mode = "RGBA"
     scene.view_settings.look = "AgX - Medium High Contrast"
 
+    camera_settings = {
+        "neutral": ((1.62, -1.90, 0.64), (0.0, 0.0, 0.40), 1.23),
+        "arms-up": ((1.62, -1.90, 0.64), (0.0, 0.0, 0.40), 1.23),
+        "arm-cross": ((1.62, -1.90, 0.64), (0.0, 0.0, 0.40), 1.23),
+        "crouch": ((1.72, -2.05, 0.46), (0.0, 0.0, 0.32), 1.23),
+        "sit": ((1.72, -2.05, 0.46), (0.0, 0.0, 0.30), 1.23),
+        "prone": ((1.90, -0.46, 0.70), (0.0, -0.44, 0.17), 1.32),
+    }
+
     paths: dict[str, Path] = {}
     for name in ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"):
-        apply_pose(armatures, name)
+        apply_pose(armatures, base_transforms, name)
         path = pose_dir / f"{name}.png"
-        location = (
-            (1.72, -2.05, 0.46)
-            if name in ("sit", "crouch")
-            else (1.62, -1.90, 0.64)
-        )
-        common.point_camera(camera, location, (0.0, 0.0, 0.40))
+        location, target, ortho_scale = camera_settings[name]
+        camera.data.ortho_scale = ortho_scale
+        common.point_camera(camera, location, target)
         scene.render.filepath = str(path)
         bpy.ops.render.render(write_still=True)
         paths[name] = path
-    apply_pose(armatures, "neutral")
+    apply_pose(armatures, base_transforms, "neutral")
     sheet(paths, root / "Previews" / "siroino-wide-cargo-pose-review.webp")
     print(
         json.dumps(
             {
                 "passed": True,
                 "targetSource": job["targetSourcePath"],
+                "proneBodyOrientation": "horizontal",
                 "poses": {name: str(path) for name, path in paths.items()},
             },
             indent=2,
