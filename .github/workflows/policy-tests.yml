@@ -51,6 +51,7 @@ jobs:
           tools/migrate_jobs_to_genworks.py
           tools/refresh_candidate_manifest.py
           tools/update_product_hashes.py
+          tools/materialize_review_evidence.py
           tools/siroino_wide_cargo_build.py
           tools/siroino_wide_cargo_entry.py
           tools/siroino_required_pose_render.py
@@ -80,6 +81,7 @@ jobs:
               'config/genworks-layout.json',
               'config/siroino-wide-cargo-job.json',
               'config/siroino-wide-cargo-license.json',
+              'config/siroino-wide-cargo-approval.json',
               'Packages/vpm-manifest.json',
               'Packages/manifest.json',
               'Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json',
