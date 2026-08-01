@@ -11,6 +11,10 @@ from pathlib import Path
 import bpy
 from PIL import Image, ImageDraw, ImageFont
 
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
 import siroino_strappy_knit_build as common
 
 ROOT = Path(__file__).resolve().parents[1]
