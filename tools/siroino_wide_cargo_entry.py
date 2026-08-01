@@ -15,6 +15,7 @@ if str(TOOLS) not in sys.path:
 import siroino_wide_cargo_build as build
 
 _original_mesh_object = build.mesh_object
+_original_create_outfit = build.create_outfit
 
 
 def mesh_object_with_uv(*args, **kwargs):
@@ -40,6 +41,47 @@ def mesh_object_with_uv(*args, **kwargs):
     return obj
 
 
+def create_outfit_with_fitted_pelvis(body, armature, fabric, strap, metal):
+    """Close the crotch while retaining deliberate side cutouts.
+
+    The first modeled candidate read as open chaps in front and back. These two
+    exact-body-derived panels create a conventional fly and rear yoke, tapering
+    toward the crotch and widening toward the waist. The outer hips remain open
+    enough for the asymmetric straps and rings to read clearly in VRChat.
+    """
+    objects = _original_create_outfit(body, armature, fabric, strap, metal)
+
+    front = build.c.extract_surface(
+        body,
+        armature,
+        "Cargo_Fitted_Front_Pelvis",
+        lambda point: (
+            0.615 <= point.z <= 0.792
+            and point.y < 0.002
+            and abs(point.x)
+            <= 0.052 + max(0.0, point.z - 0.615) * 0.46
+        ),
+        fabric,
+        0.0055,
+    )
+    back = build.c.extract_surface(
+        body,
+        armature,
+        "Cargo_Fitted_Back_Yoke",
+        lambda point: (
+            0.610 <= point.z <= 0.792
+            and point.y >= -0.004
+            and abs(point.x)
+            <= 0.066 + max(0.0, point.z - 0.610) * 0.38
+        ),
+        fabric,
+        0.0055,
+    )
+    build.finish_skinned(front, body)
+    build.finish_skinned(back, body)
+    return [front, back, *objects]
+
+
 def save_distribution_blend() -> None:
     _, job = build.c.load_job()
     blend_path = build.c.repo_path(job["blendPath"])
@@ -60,6 +102,7 @@ def save_distribution_blend() -> None:
 
 
 build.mesh_object = mesh_object_with_uv
+build.create_outfit = create_outfit_with_fitted_pelvis
 
 if __name__ == "__main__":
     exit_code = build.main()
