@@ -57,6 +57,30 @@ jobs:
           "RELEASE_DIR=$($job.releaseDir)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "IMAGE2OUTFIT_RUN_ID=$env:GITHUB_RUN_ID" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Restore pinned VPM packages
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Get-Command vpm -ErrorAction SilentlyContinue)) {
+            throw 'The official VPM CLI is required on the image2outfit runner'
+          }
+          $repoOutput = (& vpm list repos 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0) {
+            throw "vpm list repos failed: $repoOutput"
+          }
+          foreach ($repo in @('https://vpm.nadena.dev/vpm.json', 'https://vpm.anatawa12.com/vpm.json')) {
+            if ($repoOutput -notmatch [regex]::Escape($repo)) {
+              & vpm add repo $repo
+              if ($LASTEXITCODE -ne 0) {
+                throw "Could not register required VPM repository: $repo"
+              }
+            }
+          }
+          & vpm resolve project .
+          if ($LASTEXITCODE -ne 0) {
+            throw 'vpm resolve project failed'
+          }
+
       - name: Build technical candidate
         shell: pwsh
         run: task candidate JOB="$env:JOB_PATH"

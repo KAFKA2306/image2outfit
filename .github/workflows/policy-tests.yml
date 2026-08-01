@@ -6,6 +6,9 @@ on:
       - tools/**
       - tests/**
       - config/**
+      - Packages/*.json
+      - ProjectSettings/ProjectVersion.txt
+      - Assets/Editor/**
       - Taskfile.yml
       - .github/workflows/**
   push:
@@ -14,6 +17,9 @@ on:
       - tools/**
       - tests/**
       - config/**
+      - Packages/*.json
+      - ProjectSettings/ProjectVersion.txt
+      - Assets/Editor/**
       - Taskfile.yml
       - .github/workflows/**
 
@@ -33,7 +39,10 @@ jobs:
           python-version: '3.12'
 
       - name: Compile Python
-        run: python -m py_compile tools/pipeline.py tools/release_gate.py tests/test_release_gate.py
+        run: python -m py_compile tools/pipeline.py tools/audit_toolchain.py tools/release_gate.py tests/test_release_gate.py tests/test_toolchain.py
+
+      - name: Audit pinned toolchain
+        run: python tools/audit_toolchain.py
 
       - name: Run release policy tests
         run: python -m unittest discover -s tests -v
@@ -43,7 +52,13 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          for name in ('config/release-policy.json', 'config/job.schema.v2.json'):
+          for name in (
+              'config/release-policy.json',
+              'config/job.schema.v2.json',
+              'config/toolchain-lock.json',
+              'Packages/vpm-manifest.json',
+              'Packages/manifest.json',
+          ):
               json.loads(Path(name).read_text(encoding='utf-8'))
               print(f'{name}: PASS')
           PY

@@ -42,6 +42,9 @@ class ReleaseGateTest(unittest.TestCase):
         self.root = Path(self.temporary.name)
         (self.root / "config").mkdir(parents=True)
         (self.root / "tools").mkdir(parents=True)
+        (self.root / "Packages").mkdir(parents=True)
+        (self.root / "ProjectSettings").mkdir(parents=True)
+        (self.root / "Assets" / "Editor").mkdir(parents=True)
         (self.root / "Assets" / "PochibyKT").mkdir(parents=True)
         (self.root / "Assets" / "_Local" / "Generated" / "pochi").mkdir(parents=True)
         (self.root / "Assets" / "_Local" / "Jobs" / "pochi-test").mkdir(parents=True)
@@ -49,6 +52,15 @@ class ReleaseGateTest(unittest.TestCase):
 
         self.policy_path = self.root / "config" / "release-policy.json"
         self.write_json(self.policy_path, POLICY)
+        self.write_json(self.root / "config" / "toolchain-lock.json", {"schemaVersion": 1})
+        self.write_json(self.root / "Packages" / "vpm-manifest.json", {})
+        self.write_json(self.root / "Packages" / "manifest.json", {})
+        (self.root / "ProjectSettings" / "ProjectVersion.txt").write_text(
+            "m_EditorVersion: 2022.3.22f1\n", encoding="utf-8"
+        )
+        (self.root / "Assets" / "Editor" / "Image2OutfitPipeline.cs").write_text(
+            "// test pipeline\n", encoding="utf-8"
+        )
         self.build_script = self.root / "tools" / "build.py"
         self.build_script.write_text("print('build')\n", encoding="utf-8")
         self.avatar = self.root / "Assets" / "PochibyKT" / "Pochi.prefab"
