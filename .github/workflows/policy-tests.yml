@@ -49,6 +49,8 @@ jobs:
           tools/release_gate.py
           tools/audit_genworks_layout.py
           tools/migrate_jobs_to_genworks.py
+          tools/audit_snapshot.py
+          tools/package_snapshot.py
           tools/refresh_candidate_manifest.py
           tools/update_product_hashes.py
           tools/materialize_review_evidence.py
@@ -59,6 +61,7 @@ jobs:
           tests/test_toolchain.py
           tests/test_blender_python_env.py
           tests/test_genworks_layout.py
+          tests/test_snapshot_paths.py
 
       - name: Audit pinned toolchain
         run: python tools/audit_toolchain.py
@@ -85,6 +88,7 @@ jobs:
               'Packages/vpm-manifest.json',
               'Packages/manifest.json',
               'Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json',
+              'Assets/GenWorks/Legacy/Snapshots/LegacyManifest.json',
           ):
               json.loads(Path(name).read_text(encoding='utf-8'))
               print(f'{name}: PASS')

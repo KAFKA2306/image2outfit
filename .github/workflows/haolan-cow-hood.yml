@@ -61,7 +61,7 @@ jobs:
             throw "Generated geometry metrics differ from the audited candidate"
           }
 
-          uv run --no-project python tools/package_published.py --root $out
+          uv run --no-project python tools/package_snapshot.py --root $out
 
           $forbidden = Get-ChildItem -LiteralPath $out -Recurse -File |
             Where-Object { $_.Name -in @("HAOLAN_Lowpoly.fbx", "HAOLAN_Lowpoly Variant.prefab", "15841.jpg") }
