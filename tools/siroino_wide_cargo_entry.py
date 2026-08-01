@@ -14,11 +14,11 @@ if str(TOOLS) not in sys.path:
 
 import siroino_wide_cargo_build as build
 
-_original_mesh_obj = build.mesh_obj
+_original_mesh_object = build.mesh_object
 
 
-def mesh_obj_with_uv(*args, **kwargs):
-    obj = _original_mesh_obj(*args, **kwargs)
+def mesh_object_with_uv(*args, **kwargs):
+    obj = _original_mesh_object(*args, **kwargs)
     mesh = obj.data
     if mesh.uv_layers.active is None:
         uv_layer = mesh.uv_layers.new(name="UVMap")
@@ -59,7 +59,7 @@ def save_distribution_blend() -> None:
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
 
 
-build.mesh_obj = mesh_obj_with_uv
+build.mesh_object = mesh_object_with_uv
 
 if __name__ == "__main__":
     exit_code = build.main()
