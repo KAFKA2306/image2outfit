@@ -1,4 +1,4 @@
-name: Build HAOLAN cow hood candidate on hosted runner
+name: Build HAOLAN cow hood legacy snapshot on hosted runner
 
 on:
   workflow_dispatch:
@@ -33,24 +33,24 @@ jobs:
       - name: Generate FBX, prefab, textures, WebP, audit, and package
         run: |
           set -euo pipefail
-          out='Published/haolan/cow-hood-knit-set-v1'
+          out='Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1'
           rm -rf "$out"
           uv run --no-project --with numpy --with pillow --with trimesh --with scipy --with matplotlib python tools/haolan_cow_generator_hosted.py --out "$out"
           uv run --no-project python tools/package_published.py --root "$out"
           uv run --no-project python -c "import json; from pathlib import Path; a=json.loads((Path('$out')/'audit.json').read_text()); assert a['decision']=='NO-GO'; assert a['fbx']['meshObjects']==19; assert a['fbx']['vertices']==4302; assert a['fbx']['triangles']==7710"
 
-      - name: Commit generated candidate
+      - name: Commit generated legacy snapshot
         run: |
           set -euo pipefail
-          out='Published/haolan/cow-hood-knit-set-v1'
+          out='Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f -- "$out"
           if git diff --cached --quiet; then
-            echo 'Generated candidate already matches main; no commit required.'
+            echo 'Generated legacy snapshot already matches main; no commit required.'
             exit 0
           fi
-          git commit -m 'Add HAOLAN cow hood knit set candidate'
+          git commit -m 'Update HAOLAN cow hood legacy snapshot'
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
@@ -60,6 +60,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: haolan-cow-hood-knit-set-${{ github.run_id }}
-          path: Published/haolan/cow-hood-knit-set-v1
+          path: Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1
           retention-days: 14
           if-no-files-found: error
