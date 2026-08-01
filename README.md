@@ -17,7 +17,8 @@ image2outfitは、参考画像からVRChatアバター向け衣装を制作し�
 - 制作物の正規ルートを`Assets/GenWorks/`へ統一
 - Unity内の`GenWorks > Product Catalog`から製品、Prefab、統合確認Prefab、プレビュー、文書へ直接移動可能
 - 既存ローカルjobの成果物と`.meta`をGenWorksへ移す移行ツールを追加
-- 旧`Published/`スナップショットを`Assets/GenWorks/Legacy/Published/`へ移し、Unityから直接検証可能にする
+- 履歴スナップショットを`Assets/GenWorks/Legacy/Snapshots/`へ統一し、Unityから直接検証可能にする
+- 旧`Published/`および`Assets/GenWorks/Legacy/Published/`の再作成をCIで禁止
 
 `config/release-policy.json`上の主要アダプターは`pochi-v1.1.0`です。`haolan-v1.6`はリリース禁止対象であり、現時点では過去候補の研究・監査用途に限定します。
 
@@ -50,14 +51,14 @@ Assets/GenWorks/
     Templates/
     Validation/
   Legacy/
-    Published/
+    Snapshots/
       LegacyManifest.json
       <historical snapshots>/
 ```
 
 新規製品は`ProductManifest.json`を持ち、製品内の主要アセットをUnityカタログへ公開します。購入・非公開アバター本体、ライセンス証拠、ローカルjob、キャッシュは製品フォルダへ混入させません。
 
-`Assets/GenWorks/Legacy/Published/`はUnityから過去のFBX、Prefab、テクスチャ、プレビュー、監査証拠を確認するための履歴領域です。現行製品カタログには登録せず、販売可能判定へ自動昇格させません。
+`Assets/GenWorks/Legacy/Snapshots/`はUnityから過去のFBX、Prefab、テクスチャ、プレビュー、監査証拠を確認するための唯一の履歴領域です。現行製品カタログには登録せず、販売可能判定へ自動昇格させません。
 
 既存jobの移行計画を確認します。
 
@@ -165,7 +166,7 @@ Assets/HAOLAN_Quest/
 - `Candidates/<job-id>/candidate-manifest.json` — 候補の入力・出力・ハッシュ
 - `Release/<job-id>/release-manifest.json` — GO後の変更不能な記録
 - `Assets/GenWorks/Products/<product-slug>/ProductManifest.json` — Unity製品カタログ
-- `Assets/GenWorks/Legacy/Published/LegacyManifest.json` — Unity可視の履歴スナップショット境界
+- `Assets/GenWorks/Legacy/Snapshots/LegacyManifest.json` — Unity可視の履歴スナップショット境界
 - `docs/GENWORKS_LAYOUT.md` — Unityアセット配置と移行仕様
 - `docs/REVIEW_EVIDENCE.md` — 人間レビュー証拠の仕様
 - `config/job.schema.v2.json` — job定義
@@ -173,6 +174,6 @@ Assets/HAOLAN_Quest/
 - `config/release-policy.json` — 免除できないリリース条件
 - `ontology/project.yaml` — 制作・観測・判断の証拠モデル
 
-`Assets/GenWorks/Legacy/Published/`配下のファイルは過去のスナップショットであり、新しい顧客向けリリースではありません。既存のローカルjob成果物は`task migrate:genworks:apply`でUnity可視の製品構造へ移行します。
+`Assets/GenWorks/Legacy/Snapshots/`配下のファイルは過去のスナップショットであり、新しい顧客向けリリースではありません。既存のローカルjob成果物は`task migrate:genworks:apply`でUnity可視の製品構造へ移行します。
 
 **README最終監査:** 2026-08-02

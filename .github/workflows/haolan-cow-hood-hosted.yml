@@ -33,7 +33,7 @@ jobs:
       - name: Generate FBX, prefab, textures, WebP, audit, and package
         run: |
           set -euo pipefail
-          out='Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1'
+          out='Assets/GenWorks/Legacy/Snapshots/haolan/cow-hood-knit-set-v1'
           rm -rf "$out"
           uv run --no-project --with numpy --with pillow --with trimesh --with scipy --with matplotlib python tools/haolan_cow_generator_hosted.py --out "$out"
           uv run --no-project python tools/package_published.py --root "$out"
@@ -42,7 +42,7 @@ jobs:
       - name: Commit generated legacy snapshot
         run: |
           set -euo pipefail
-          out='Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1'
+          out='Assets/GenWorks/Legacy/Snapshots/haolan/cow-hood-knit-set-v1'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f -- "$out"
@@ -60,6 +60,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: haolan-cow-hood-knit-set-${{ github.run_id }}
-          path: Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1
+          path: Assets/GenWorks/Legacy/Snapshots/haolan/cow-hood-knit-set-v1
           retention-days: 14
           if-no-files-found: error

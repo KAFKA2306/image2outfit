@@ -1,8 +1,10 @@
 # Legacy snapshots
 
-This directory contains historical image2outfit snapshots moved from the repository-root `Published/` directory so Unity can import and inspect them under `Assets/` without keeping a Unity-visible folder named `Published`.
+This is the only Unity-visible location for historical image2outfit snapshots.
 
-- Existing file blobs and committed Unity `.meta` files are preserved.
-- These files are retained for reproducibility, visual inspection, and hash verification.
-- They are not current customer releases and must not be promoted automatically.
-- New products belong in `Assets/GenWorks/Products/<product-slug>/` and require the full release evidence gates.
+- Canonical root: `Assets/GenWorks/Legacy/Snapshots/`
+- Repository-root `Published/` is forbidden.
+- `Assets/GenWorks/Legacy/Published/` is forbidden.
+- Existing asset blobs and committed Unity `.meta` files are preserved during migration.
+- Legacy snapshots are evidence-only and are excluded from the current product catalog and automatic release promotion.
+- New products belong in `Assets/GenWorks/Products/<product-slug>/` and require all release gates.

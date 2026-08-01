@@ -29,14 +29,14 @@ Assets/GenWorks/
     Templates/
     Validation/
   Legacy/
-    Published/
+    Snapshots/
       LegacyManifest.json
       <historical snapshots>/
 ```
 
 A current product must remain self-contained under its own root. Shared assets are allowed only when they are genuinely reused by multiple products and have a stable compatibility contract.
 
-`Assets/GenWorks/Legacy/Published/` is intentionally Unity-visible so developers can inspect historical FBX, Prefab, textures, previews, and audit evidence without leaving the Project window. Legacy snapshots are not current products, do not receive a `ProductManifest.json`, and cannot be promoted automatically to a customer release.
+`Assets/GenWorks/Legacy/Snapshots/` is the only Unity-visible historical snapshot root. Repository-root `Published/` and `Assets/GenWorks/Legacy/Published/` are deprecated and forbidden. Legacy snapshots are not current products, do not receive a `ProductManifest.json`, and cannot be promoted automatically to a customer release.
 
 ## Unity inspection
 
@@ -49,7 +49,7 @@ Open `GenWorks > Product Catalog` in Unity. The window reads each current produc
 - installation or product documentation
 - product folder and manifest
 
-Historical snapshots are inspected directly under `Assets/GenWorks/Legacy/Published/`. This keeps them available to Unity without presenting them as saleable products.
+Historical snapshots are inspected directly under `Assets/GenWorks/Legacy/Snapshots/`. This keeps them available to Unity without presenting them as saleable products.
 
 ## Existing jobs and assets
 
@@ -67,7 +67,7 @@ task migrate:genworks:apply
 
 The migration scans `Assets/_Local/Jobs/**/job.json`, moves existing generated deliverables into the corresponding product root, moves Unity `.meta` files together with assets to preserve GUIDs, rewrites job paths, and creates a product manifest. Private avatar sources and license evidence are not moved.
 
-The former repository-root `Published/` snapshot tree is preserved under `Assets/GenWorks/Legacy/Published/`. Existing file blobs and committed Unity `.meta` files are retained so historical evidence and asset GUIDs are not rewritten merely because the directory changed.
+Historical snapshot files formerly stored under the two deprecated Published paths are retained under `Assets/GenWorks/Legacy/Snapshots/`. Existing file blobs and committed Unity `.meta` files are retained so historical evidence and asset GUIDs are not rewritten merely because the directory changed.
 
 ## Audit
 
@@ -75,7 +75,7 @@ The former repository-root `Published/` snapshot tree is preserved under `Assets
 task audit:genworks
 ```
 
-`tools/audit_genworks_layout.py` validates manifest identity, product-root containment, duplicate product IDs, missing referenced assets, and production-like assets that still live outside the canonical root. The machine-readable contract is `config/genworks-layout.json`.
+`tools/audit_genworks_layout.py` validates manifest identity, product-root containment, duplicate product IDs, missing referenced assets, and production-like assets that still live outside the canonical root. `tests/test_no_published_directories.py` rejects either deprecated Published directory if it reappears. The machine-readable contract is `config/genworks-layout.json`.
 
 ## Distribution boundary
 
