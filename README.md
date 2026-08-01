@@ -1,91 +1,111 @@
-# image2outfit
+# image2outfit — VRChat衣装の再現可能な制作・納品パイプライン
 
-`image2outfit` is a customer-delivery pipeline for VRChat avatar garments. It is not a mesh generator demo and it does not equate structural validity with product quality.
+**リポジトリ:** https://github.com/KAFKA2306/image2outfit
 
-## Product contract
+image2outfitは、参考画像からVRChatアバター向け衣装を制作し、Blender、Unity、VRChatでの検証証拠をそろえてから納品候補へ進めるためのパイプラインです。
 
-A garment can be released only after all of the following are true:
+メッシュが生成できた、FBXが読み込めた、Prefabが存在するというだけでは完成扱いにしません。見た目、身体へのフィット、ポーズ時の貫通、VRChat内動作、人間による確認までを別々のゲートとして記録します。
 
-1. The exact private target avatar and license evidence are present locally and are never redistributed.
-2. Blender creates an editable `.blend` and exportable FBX without structural failures.
-3. Unity 2022.3.22f1 imports the FBX, saves the outfit Prefab, and validates integration with the exact target avatar.
-4. Five full-quality previews exist: front, back, left, right, and three-quarter.
-5. A human approves silhouette, body fit, material expression, and presentation quality.
-6. Neutral, arms-up, arm-cross, crouch, sit, and prone tests have no critical penetration.
-7. VRChat SDK Build & Test and an in-client human runtime check pass.
-8. Every review is bound to the exact candidate manifest hash.
+## 現在の状態
 
-The current primary adapter is `pochi-v1.1.0`. `haolan-v1.6` is blocked from release by `config/release-policy.json` and remains legacy research only.
+- 再現可能なBlender → FBX → Unity Prefab候補生成を実装
+- Blender Python環境とVPM依存関係を固定・監査
+- SiroinoSotaiのCC0アセットを用いた衣装候補生成を追加
+- 正面、背面、左右、斜めの5方向プレビューを必須化
+- 候補ファイルとレビュー証拠をハッシュで固定
+- 技術検証だけでは自動的に販売・リリース判定へ進まない
 
-## Pinned toolchain
+`config/release-policy.json`上の主要アダプターは`pochi-v1.1.0`です。`haolan-v1.6`はリリース禁止対象であり、現時点では過去候補の研究・監査用途に限定します。
 
-The reproducible build contract is machine-readable in `config/toolchain-lock.json`. It pins Blender 4.4.3, Blender Python 3.11.11 with Pillow 12.3.0, Unity 2022.3.22f1, VRChat SDK 3.10.4, Modular Avatar 1.17.1, NDMF 1.14.1, and Avatar Optimizer 1.9.16. Validate source control before a build with:
+## リリース条件
 
-```shell
-python tools/audit_toolchain.py
-```
+衣装を`GO / RELEASED`へ進めるには、少なくとも次をすべて満たす必要があります。
 
-The Windows candidate runner restores the isolated Blender Python packages and exact VPM graph before opening Unity, then requires Unity to generate `Packages/packages-lock.json`. See `docs/TOOLCHAIN.md` for the official sources and update policy.
+1. 対象アバター本体と利用許諾の証拠がローカルに存在する
+2. Blenderで編集可能な`.blend`と構造エラーのないFBXを生成できる
+3. Unity 2022.3.22f1でFBXを読み込み、対象アバターとの統合を検証できる
+4. 1024×1024以上の5方向プレビューがある
+5. 人間がシルエット、フィット、素材表現、見栄えを承認する
+6. 通常、腕上げ、腕組み、しゃがみ、座り、伏せで重大な貫通がない
+7. VRChat SDK Build & TestとVRChatクライアント内確認を通過する
+8. すべてのレビューが同一候補のmanifest hashへ結び付いている
 
-## State machine
+## 状態遷移
 
 ```text
 SPECIFIED
-  -> MODELED
-  -> TECHNICAL_PASS
-  -> REVIEW_REQUIRED
-  -> VISUAL_PASS
-  -> POSE_PASS
-  -> RUNTIME_PASS
-  -> GO / RELEASED
+  → MODELED
+  → TECHNICAL_PASS
+  → REVIEW_REQUIRED
+  → VISUAL_PASS
+  → POSE_PASS
+  → RUNTIME_PASS
+  → GO / RELEASED
 ```
 
-Any failed or missing gate produces `NO-GO`. There is no automatic path from `TECHNICAL_PASS` to `GO`.
+失敗または証拠不足がある場合は`NO-GO`です。`TECHNICAL_PASS`から`GO`へ自動昇格する経路はありません。
 
-## Two workflows
+## 固定ツールチェーン
 
-### 1. Build a candidate
+`config/toolchain-lock.json`で次を固定します。
+
+- Blender 4.4.3
+- Blender Python 3.11.11
+- Pillow 12.3.0
+- Unity 2022.3.22f1
+- VRChat SDK 3.10.4
+- Modular Avatar 1.17.1
+- NDMF 1.14.1
+- Avatar Optimizer 1.9.16
+
+検証:
+
+```bash
+python tools/audit_toolchain.py
+```
+
+詳細は[docs/TOOLCHAIN.md](docs/TOOLCHAIN.md)を参照してください。
+
+## 1. 納品候補を作る
 
 ```powershell
 task candidate JOB=Assets/_Local/Jobs/<job-id>/job.json
 ```
 
-This runs Blender and Unity static validation, validates five preview files, copies only the explicit `deliveryAssets`, and writes an immutable candidate manifest. The final decision is always `REVIEW_REQUIRED` when technical checks pass. It never writes `Release/`.
+この処理はBlender・Unityの静的検証、5方向プレビュー、`deliveryAssets`の明示的な収集、候補manifestの生成を行います。
 
-### 2. Promote a reviewed release
+技術検証が成功しても判定は`REVIEW_REQUIRED`です。`Release/`には書き込みません。
+
+## 2. レビュー済み候補をリリースする
 
 ```powershell
 task release JOB=Assets/_Local/Jobs/<job-id>/job.json
 ```
 
-This does not rebuild. It verifies that the reviewed candidate and every input hash remain unchanged, validates the three mandatory human evidence files, then writes `Release/<job-id>/` and a ZIP only when the decision is `GO`.
+再ビルドは行わず、レビュー済み候補、入力ファイル、証拠ファイルのハッシュが変わっていないことを確認します。判定が`GO`の場合だけ`Release/<job-id>/`とZIPを生成します。
 
-## Rights separation
+## 権利と秘密情報の分離
 
-Private or purchased avatar data stays under ignored local roots such as `Assets/_Local/`, `Assets/_Vendor/`, `Assets/PochibyKT/`, and other roots listed in `privateSourceRoots`. A job must explicitly enumerate every output file in `deliveryAssets`. The pipeline rejects any delivery file located under a private source root.
-
-## Evidence and audit
-
-- `Artifacts/<job-id>/audit.json`: current decision and stage results
-- `Candidates/<job-id>/candidate-manifest.json`: exact candidate lineage and hashes
-- `Release/<job-id>/release-manifest.json`: immutable GO release record
-- `docs/REVIEW_EVIDENCE.md`: mandatory human evidence schema
-- `config/job.schema.v2.json`: job contract
-- `config/release-policy.json`: non-waivable release policy
-
-## Project ontology
-
-The machine-readable project description is [`ontology/project.yaml`](ontology/project.yaml). It maps the garment pipeline to the shared causal-evidence chain:
+購入・非公開アバターやライセンス対象データは、Git管理外の次のようなローカル領域に保持します。
 
 ```text
-AvatarGarmentIntegration
-  -> model/export/import actions
-  -> structural, visual, pose, and runtime observations
-  -> product and compatibility claims
-  -> hash-bound evidence
-  -> REVIEW_REQUIRED / NO-GO / GO / RELEASED
+Assets/_Local/
+Assets/_Vendor/
+Assets/PochibyKT/
 ```
 
-Observed facts, calculated checks, human judgments, requirements, and release decisions remain separate assertion types. A file existing or importing successfully is not evidence that the garment has product quality.
+納品対象はjob内の`deliveryAssets`へ明示的に列挙します。非公開ルート配下のファイルを納品物へ混入させると検証に失敗します。
 
-Checked-in files under `Published/` are legacy snapshots, not customer releases. New generated garments are distributed only as release workflow artifacts after `GO`.
+## 証拠ファイル
+
+- `Artifacts/<job-id>/audit.json` — 現在の判定と各ゲート結果
+- `Candidates/<job-id>/candidate-manifest.json` — 候補の入力・出力・ハッシュ
+- `Release/<job-id>/release-manifest.json` — GO後の変更不能な記録
+- `docs/REVIEW_EVIDENCE.md` — 人間レビュー証拠の仕様
+- `config/job.schema.v2.json` — job定義
+- `config/release-policy.json` — 免除できないリリース条件
+- `ontology/project.yaml` — 制作・観測・判断の証拠モデル
+
+`Published/`配下の既存ファイルは過去のスナップショットであり、新しい顧客向けリリースではありません。
+
+**README最終監査:** 2026-08-01
