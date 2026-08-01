@@ -46,7 +46,6 @@ jobs:
 
           $avatar = Get-ChildItem -Path . -Filter 'HAOLAN_Lowpoly.fbx' -Recurse -File -ErrorAction SilentlyContinue |
             Where-Object {
-              $_.FullName -notmatch '\\Published\\' -and
               $_.FullName -notmatch '\\Delivery\\' -and
               $_.FullName -notmatch '\\Assets\\GenWorks\\Legacy\\'
             } |
@@ -97,7 +96,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $out = 'Published/haolan/candidate/Previews'
+          $out = 'Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate/Previews'
           if (Test-Path -LiteralPath $out) { Remove-Item -LiteralPath $out -Recurse -Force }
           New-Item -ItemType Directory -Force -Path $out | Out-Null
 
@@ -118,7 +117,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $root = 'Published/haolan/candidate/Previews'
+          $root = 'Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate/Previews'
           $required = @(
             'front.png',
             'back.png',
@@ -143,7 +142,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $root = 'Published/haolan/candidate/Previews'
+          $root = 'Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate/Previews'
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -f -- $root
@@ -151,7 +150,7 @@ jobs:
             Write-Host 'Five-view preview already matches the committed candidate.'
             exit 0
           }
-          git commit -m 'Add HAOLAN Bordeaux five-view preview'
+          git commit -m 'Add HAOLAN Bordeaux five-view preview under GenWorks'
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
@@ -161,7 +160,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: haolan-bordeaux-five-view-${{ github.run_id }}
-          path: Published/haolan/candidate/Previews
+          path: Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate/Previews
           if-no-files-found: error
           retention-days: 30
           compression-level: 6
