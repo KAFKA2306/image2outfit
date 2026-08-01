@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import audit_toolchain
 import pipeline as legacy
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -135,12 +136,20 @@ def inputs(job_path: Path, job: dict[str, Any]) -> dict[str, str]:
     files = {
         "job": job_path,
         "policy": POLICY_PATH,
+        "toolchainLock": ROOT / "config" / "toolchain-lock.json",
+        "vpmManifest": ROOT / "Packages" / "vpm-manifest.json",
+        "upmManifest": ROOT / "Packages" / "manifest.json",
+        "projectVersion": ROOT / "ProjectSettings" / "ProjectVersion.txt",
+        "unityPipeline": ROOT / "Assets" / "Editor" / "Image2OutfitPipeline.cs",
         "buildScript": path(job["buildScript"]),
         "licenseEvidence": path(job["licenseEvidence"]),
         "targetAvatarAsset": path(job["targetAvatarAssetPath"]),
     }
     if job.get("targetSourcePath"):
         files["targetSource"] = path(job["targetSourcePath"])
+    upm_lock = ROOT / "Packages" / "packages-lock.json"
+    if upm_lock.is_file():
+        files["upmLock"] = upm_lock
     missing = [name for name, file in files.items() if not file.is_file()]
     if missing:
         raise FileNotFoundError(f"input missing: {', '.join(missing)}")
@@ -190,6 +199,14 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
     run_id = os.environ.get("IMAGE2OUTFIT_RUN_ID") or os.environ.get("GITHUB_RUN_ID") or now()
     stages: dict[str, Any] = {}
 
+    toolchain = audit_toolchain.audit(ROOT)
+    write(artifact / "toolchain-source.json", toolchain)
+    stages["toolchainSource"] = {
+        "passed": toolchain.get("passed") is True,
+        "errors": toolchain.get("errors", []),
+        "warnings": toolchain.get("warnings", []),
+    }
+
     passed, errors = license_gate(job)
     stages["license"] = {"passed": passed, "errors": errors}
 
@@ -197,7 +214,6 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
         "BLENDER_EXE",
         ("blender",),
         (
-            r"%ProgramFiles%\Blender Foundation\Blender 4.5\blender.exe",
             r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",
         ),
     )
@@ -244,9 +260,14 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             artifact / "blender-gate.log",
         )
         blender_report = read(artifact / "blender.json")
+        expected_blender = toolchain.get("blender", {}).get("expected")
         stages["blenderStructure"] = {
-            "passed": gate_exit == 0 and blender_report.get("passed") is True,
+            "passed": gate_exit == 0
+            and blender_report.get("passed") is True
+            and blender_report.get("blenderVersion") == expected_blender,
             "exitCode": gate_exit,
+            "expectedVersion": expected_blender,
+            "actualVersion": blender_report.get("blenderVersion"),
         }
     else:
         stages["blenderStructure"] = {"passed": False, "error": "not run"}
@@ -279,11 +300,26 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
         stages["unityStatic"] = {
             "passed": unity_exit == 0
             and unity_report.get("passed") is True
-            and unity_report.get("targetValidated") is True,
+            and unity_report.get("targetValidated") is True
+            and unity_report.get("toolchainValidated") is True
+            and unity_report.get("modularAvatarValidated") is True,
             "exitCode": unity_exit,
+            "toolchainValidated": unity_report.get("toolchainValidated") is True,
+            "modularAvatarValidated": unity_report.get("modularAvatarValidated") is True,
         }
     else:
         stages["unityStatic"] = {"passed": False, "error": "not run"}
+
+    if stages["unityStatic"]["passed"]:
+        resolved_toolchain = audit_toolchain.audit(ROOT, require_unity_lock=True)
+        write(artifact / "toolchain-resolved.json", resolved_toolchain)
+        stages["toolchainResolved"] = {
+            "passed": resolved_toolchain.get("passed") is True,
+            "unityPackageLockPresent": resolved_toolchain.get("unityPackageLockPresent") is True,
+            "errors": resolved_toolchain.get("errors", []),
+        }
+    else:
+        stages["toolchainResolved"] = {"passed": False, "error": "not run"}
 
     preview_passed, previews = (
         preview_gate(job, policy)

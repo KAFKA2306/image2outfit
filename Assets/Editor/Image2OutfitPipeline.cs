@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using nadena.dev.modular_avatar.core;
+using nadena.dev.ndmf;
 using UnityEditor;
 using UnityEngine;
 using VRC.SDK3A.Editor;
@@ -50,8 +51,14 @@ namespace Image2Outfit.Editor
         {
             public bool passed;
             public bool targetValidated;
+            public bool toolchainValidated;
+            public bool modularAvatarValidated;
             public bool buildAndTestPassed;
             public string unityVersion;
+            public string modularAvatarVersion;
+            public string ndmfVersion;
+            public string avatarOptimizerVersion;
+            public string vrchatAvatarsVersion;
             public string prefabAssetPath;
             public string integratedPrefabAssetPath;
             public Metrics metrics = new Metrics();
@@ -172,6 +179,9 @@ namespace Image2Outfit.Editor
             RequireAssetPath(job.prefabAssetPath, nameof(job.prefabAssetPath));
             RequireAssetPath(job.integratedPrefabAssetPath, nameof(job.integratedPrefabAssetPath));
             RequireAssetPath(job.targetAvatarAssetPath, nameof(job.targetAvatarAssetPath));
+            ValidateToolchain(report);
+            if (report.errors.Any())
+                return report;
 
             var importer = AssetImporter.GetAtPath(job.fbxAssetPath) as ModelImporter;
             if (importer == null)
@@ -212,6 +222,8 @@ namespace Image2Outfit.Editor
                 report.passed =
                     !report.errors.Any()
                     && report.targetValidated
+                    && report.toolchainValidated
+                    && report.modularAvatarValidated
                     && AssetDatabase.LoadAssetAtPath<GameObject>(job.prefabAssetPath) != null
                     && AssetDatabase.LoadAssetAtPath<GameObject>(job.integratedPrefabAssetPath) != null;
                 return report;
@@ -229,6 +241,39 @@ namespace Image2Outfit.Editor
                 }
                 AssetDatabase.SaveAssets();
             }
+        }
+
+        private static void ValidateToolchain(Report report)
+        {
+            report.modularAvatarVersion = InstalledPackageVersion("nadena.dev.modular-avatar");
+            report.ndmfVersion = InstalledPackageVersion("nadena.dev.ndmf");
+            report.avatarOptimizerVersion = InstalledPackageVersion("com.anatawa12.avatar-optimizer");
+            report.vrchatAvatarsVersion = InstalledPackageVersion("com.vrchat.avatars");
+
+            if (Application.unityVersion != "2022.3.22f1")
+                report.errors.Add($"Unity version mismatch: expected 2022.3.22f1, found {Application.unityVersion}");
+
+            var expectedPackages = new Dictionary<string, string>
+            {
+                { "nadena.dev.modular-avatar", "1.17.1" },
+                { "nadena.dev.ndmf", "1.14.1" },
+                { "com.anatawa12.avatar-optimizer", "1.9.16" },
+                { "com.vrchat.avatars", "3.10.4" }
+            };
+            foreach (var package in expectedPackages)
+            {
+                var actual = InstalledPackageVersion(package.Key);
+                if (actual != package.Value)
+                    report.errors.Add($"package version mismatch: {package.Key} expected {package.Value}, found {actual ?? "missing"}");
+            }
+
+            report.toolchainValidated = !report.errors.Any();
+        }
+
+        private static string InstalledPackageVersion(string packageName)
+        {
+            return UnityEditor.PackageManager.PackageInfo.GetAllRegisteredPackages()
+                .FirstOrDefault(package => package.name == packageName)?.version;
         }
 
         private static void ValidateHierarchy(GameObject root, Report report)
@@ -398,13 +443,27 @@ namespace Image2Outfit.Editor
 
             var merge = armature.GetComponent<ModularAvatarMergeArmature>();
             if (merge == null)
+            {
+                var baseArmatureName = armature.name;
+                armature.name = baseArmatureName + ".1";
                 merge = armature.gameObject.AddComponent<ModularAvatarMergeArmature>();
+                merge.mergeTarget = new AvatarObjectReference
+                {
+                    referencePath = baseArmatureName
+                };
+            }
+            var targetArmatureName = merge.mergeTarget?.referencePath;
+            if (string.IsNullOrWhiteSpace(targetArmatureName))
+            {
+                report.errors.Add("Merge Armature target path is empty");
+                return;
+            }
             merge.mergeTarget = new AvatarObjectReference
             {
-                referencePath = armature.name
+                referencePath = targetArmatureName
             };
             merge.LockMode = ArmatureLockMode.BaseToMerge;
-            merge.mangleNames = false;
+            merge.mangleNames = true;
 
             var settings = outfitRoot.GetComponent<ModularAvatarMeshSettings>();
             if (settings == null)
@@ -413,11 +472,11 @@ namespace Image2Outfit.Editor
             settings.InheritBounds = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
             settings.ProbeAnchor = new AvatarObjectReference
             {
-                referencePath = $"{armature.name}/{renderer.rootBone.name}"
+                referencePath = $"{targetArmatureName}/{renderer.rootBone.name}"
             };
             settings.RootBone = new AvatarObjectReference
             {
-                referencePath = $"{armature.name}/{renderer.rootBone.name}"
+                referencePath = $"{targetArmatureName}/{renderer.rootBone.name}"
             };
             settings.Bounds = renderer.localBounds;
         }
@@ -426,16 +485,139 @@ namespace Image2Outfit.Editor
         {
             var target = AssetDatabase.LoadAssetAtPath<GameObject>(job.targetAvatarAssetPath);
             var outfit = AssetDatabase.LoadAssetAtPath<GameObject>(job.prefabAssetPath);
-            var targetInstance = PrefabUtility.InstantiatePrefab(target) as GameObject;
-            var outfitInstance = PrefabUtility.InstantiatePrefab(outfit) as GameObject;
-            outfitInstance.transform.SetParent(targetInstance.transform, false);
-            outfitInstance.name = Path.GetFileNameWithoutExtension(job.prefabAssetPath);
-            ConfigureOutfitPrefab(outfitInstance, report);
-            EnsureAssetFolder(Path.GetDirectoryName(job.integratedPrefabAssetPath)?.Replace('\\', '/'));
-            var saved = PrefabUtility.SaveAsPrefabAsset(targetInstance, job.integratedPrefabAssetPath);
-            if (saved == null)
-                report.errors.Add("could not save integrated avatar prefab");
-            UnityEngine.Object.DestroyImmediate(targetInstance);
+            if (target == null || outfit == null)
+            {
+                report.errors.Add("target or outfit prefab could not be loaded for integration");
+                return;
+            }
+
+            GameObject targetInstance = null;
+            GameObject outfitInstance = null;
+            try
+            {
+                targetInstance = PrefabUtility.InstantiatePrefab(target) as GameObject;
+                outfitInstance = PrefabUtility.InstantiatePrefab(outfit) as GameObject;
+                if (targetInstance == null || outfitInstance == null)
+                {
+                    report.errors.Add("target or outfit prefab could not be instantiated");
+                    return;
+                }
+
+                outfitInstance.transform.SetParent(targetInstance.transform, false);
+                var outfitName = Path.GetFileNameWithoutExtension(job.prefabAssetPath);
+                outfitInstance.name = outfitName;
+                ConfigureOutfitPrefab(outfitInstance, report);
+                if (report.errors.Any())
+                    return;
+
+                EnsureAssetFolder(Path.GetDirectoryName(job.integratedPrefabAssetPath)?.Replace('\\', '/'));
+                var saved = PrefabUtility.SaveAsPrefabAsset(targetInstance, job.integratedPrefabAssetPath);
+                if (saved == null)
+                {
+                    report.errors.Add("could not save integrated avatar prefab");
+                    return;
+                }
+                ValidateModularAvatarBake(saved, outfitName, report);
+            }
+            finally
+            {
+                if (targetInstance != null)
+                    UnityEngine.Object.DestroyImmediate(targetInstance);
+                else if (outfitInstance != null)
+                    UnityEngine.Object.DestroyImmediate(outfitInstance);
+            }
+        }
+
+        private static void ValidateModularAvatarBake(GameObject integratedPrefab, string outfitName, Report report)
+        {
+            var instance = PrefabUtility.InstantiatePrefab(integratedPrefab) as GameObject;
+            if (instance == null)
+            {
+                report.errors.Add("integrated prefab could not be instantiated for NDMF validation");
+                return;
+            }
+
+            var startingErrors = report.errors.Count;
+            var temporaryAssetsCleaned = false;
+            try
+            {
+                var outfit = instance.transform.Cast<Transform>()
+                    .FirstOrDefault(child => child.name == outfitName);
+                if (outfit == null)
+                {
+                    report.errors.Add("integrated outfit root not found for NDMF validation");
+                    return;
+                }
+
+                var merges = outfit.GetComponentsInChildren<ModularAvatarMergeArmature>(true);
+                if (merges.Length != 1)
+                {
+                    report.errors.Add($"expected exactly one outfit Merge Armature, found {merges.Length}");
+                    return;
+                }
+
+                var merge = merges[0];
+                var mapping = merge.GetBonesMapping();
+                if (mapping == null || mapping.Count == 0)
+                    report.errors.Add("Merge Armature did not resolve any target bone mappings");
+                if (merge.LockMode != ArmatureLockMode.BaseToMerge)
+                    report.errors.Add("Merge Armature must use BaseToMerge position lock");
+                if (!merge.mangleNames)
+                    report.errors.Add("Merge Armature must avoid unique-bone name collisions");
+                if (outfit.GetComponent<ModularAvatarMeshSettings>() == null)
+                    report.errors.Add("outfit Mesh Settings component is missing");
+                if (!AvatarProcessor.CanProcessObject(instance))
+                    report.errors.Add("NDMF cannot process the integrated avatar");
+                if (report.errors.Count != startingErrors)
+                    return;
+
+                var beforeRenderers = instance.GetComponentsInChildren<SkinnedMeshRenderer>(true).Length;
+                var beforeInvalid = InvalidSkinnedRenderers(instance);
+                var beforeMissingScripts = MissingScriptCount(instance);
+                AvatarProcessor.ProcessAvatar(instance);
+                var afterRenderers = instance.GetComponentsInChildren<SkinnedMeshRenderer>(true).Length;
+                var afterInvalid = InvalidSkinnedRenderers(instance);
+                var afterMissingScripts = MissingScriptCount(instance);
+                if (afterRenderers < beforeRenderers)
+                    report.errors.Add($"NDMF removed skinned renderers: before {beforeRenderers}, after {afterRenderers}");
+                if (afterInvalid > beforeInvalid)
+                    report.errors.Add($"NDMF introduced invalid skinned renderers: before {beforeInvalid}, after {afterInvalid}");
+                if (afterMissingScripts > beforeMissingScripts)
+                    report.errors.Add($"NDMF introduced missing scripts: before {beforeMissingScripts}, after {afterMissingScripts}");
+            }
+            catch (Exception exception)
+            {
+                report.errors.Add($"NDMF processing failed: {exception.GetType().Name}: {exception.Message}");
+            }
+            finally
+            {
+                try
+                {
+                    AvatarProcessor.CleanTemporaryAssets();
+                    temporaryAssetsCleaned = true;
+                }
+                catch (Exception exception)
+                {
+                    report.errors.Add($"NDMF temporary asset cleanup failed: {exception.Message}");
+                }
+                UnityEngine.Object.DestroyImmediate(instance);
+            }
+
+            report.modularAvatarValidated = temporaryAssetsCleaned && report.errors.Count == startingErrors;
+        }
+
+        private static int InvalidSkinnedRenderers(GameObject root)
+        {
+            return root.GetComponentsInChildren<SkinnedMeshRenderer>(true).Count(renderer =>
+                renderer.sharedMesh == null
+                || renderer.rootBone == null
+                || renderer.bones.Any(bone => bone == null));
+        }
+
+        private static int MissingScriptCount(GameObject root)
+        {
+            return root.GetComponentsInChildren<Transform>(true)
+                .Sum(transform => GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(transform.gameObject));
         }
 
         private static async Task<BuildTestReport> RunBuildAndTest(Job job)

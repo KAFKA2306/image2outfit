@@ -195,10 +195,7 @@ def normal_mode(job_path: Path, static_only: bool = False) -> int:
             "BLENDER_EXE",
             ("blender",),
             (
-                r"%ProgramFiles%\Blender Foundation\Blender 4.5\blender.exe",
                 r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",
-                r"%ProgramFiles%\Blender Foundation\Blender 4.3\blender.exe",
-                r"%ProgramFiles%\Blender Foundation\Blender 4.2\blender.exe",
             ),
         )
         build_exit = run_command(
