@@ -68,7 +68,7 @@ jobs:
           .image2outfit/blender/blender \
             --background Assets/GenWorks/Products/siroino-wide-cargo/Source/Blender/SiroinoWideCargo.blend \
             --python-exit-code 1 \
-            --python tools/siroino_required_pose_render.py \
+            --python tools/siroino_required_pose_entry.py \
             -- \
             --job config/siroino-wide-cargo-job.json \
             | tee Artifacts/siroino-wide-cargo/hosted-poses.log
