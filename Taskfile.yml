@@ -40,14 +40,14 @@ tasks:
       - uv run --no-cache --no-project python tools/audit_genworks_layout.py
 
   audit:haolan:
-    desc: Verify the committed HAOLAN candidate hashes, archive, and regeneration output.
+    desc: Verify the preserved HAOLAN legacy snapshot hashes, archive, and regeneration output.
     cmds:
-      - uv run --no-cache --no-project --with numpy --with pillow --with trimesh --with scipy --with matplotlib python tools/audit_published.py --candidate Published/haolan/cow-hood-knit-set-v1 --source Assets/HAOLAN_Quest/FBX/HAOLAN_Lowpoly.fbx
+      - uv run --no-cache --no-project --with numpy --with pillow --with trimesh --with scipy --with matplotlib python tools/audit_published.py --candidate Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1 --source Assets/HAOLAN_Quest/FBX/HAOLAN_Lowpoly.fbx
 
   package:haolan:
-    desc: Rebuild the deterministic HAOLAN candidate archive and source hash manifest.
+    desc: Rebuild the deterministic HAOLAN legacy snapshot archive and source hash manifest.
     cmds:
-      - uv run --no-cache --no-project python tools/package_published.py --root Published/haolan/cow-hood-knit-set-v1
+      - uv run --no-cache --no-project python tools/package_published.py --root Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1
 
   check:python:
     desc: Check the reproducibility and GenWorks tooling.
