@@ -1,9 +1,11 @@
-trigger=siroino-wide-cargo-v4
-requested_at=2026-08-02T03:10:00+09:00
-goal=issue-5-release-candidate
+trigger=siroino-wide-cargo-v5
+requested_at=2026-08-02T04:50:00+09:00
+goal=issue-5-final-unity-vrchat-candidate
 product_root=Assets/GenWorks/Products/siroino-wide-cargo
 runner_labels=self-hosted,windows
+modeled_commit=latest-main
 uv_mapping=required
-workflow_status=.github/status/siroino-wide-cargo.json
+require_unity_import=true
+require_modular_avatar_ndmf=true
 require_vrchat_build_and_test=true
 require_runtime_screenshot=true
