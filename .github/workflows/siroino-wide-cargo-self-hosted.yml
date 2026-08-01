@@ -145,6 +145,13 @@ jobs:
           path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           '@ | python -
 
+      - name: Refresh product source hashes
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          uv run --no-cache --no-project python tools/update_product_hashes.py --root $env:PRODUCT_ROOT
+          if ($LASTEXITCODE -ne 0) { throw 'Product hash inventory failed' }
+
       - name: Commit generated public product assets
         shell: pwsh
         run: |
