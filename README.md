@@ -14,8 +14,64 @@ image2outfitは、参考画像からVRChatアバター向け衣装を制作し�
 - 正面、背面、左右、斜めの5方向プレビューを必須化
 - 候補ファイルとレビュー証拠をハッシュで固定
 - 技術検証だけでは自動的に販売・リリース判定へ進まない
+- 制作物の正規ルートを`Assets/GenWorks/`へ統一
+- Unity内の`GenWorks > Product Catalog`から製品、Prefab、統合確認Prefab、プレビュー、文書へ直接移動可能
+- 既存ローカルjobの成果物と`.meta`をGenWorksへ移す移行ツールを追加
 
 `config/release-policy.json`上の主要アダプターは`pochi-v1.1.0`です。`haolan-v1.6`はリリース禁止対象であり、現時点では過去候補の研究・監査用途に限定します。
+
+## Assets/GenWorks
+
+Unityで開発者と購入者が迷わないよう、販売対象、統合確認用、制作ソース、プレビュー、検証コードを製品単位で分離します。
+
+```text
+Assets/GenWorks/
+  Products/
+    <product-slug>/
+      ProductManifest.json
+      README.md
+      Source/Blender/
+      Models/
+      Textures/
+      Materials/
+      Prefabs/
+        Outfit/
+        Integrated/<target-avatar>/
+      Previews/
+      Demo/
+      Editor/
+      Tests/
+      Documentation/
+  Shared/
+    Editor/
+    Materials/
+    Shaders/
+    Templates/
+    Validation/
+  Legacy/
+```
+
+新規製品は`ProductManifest.json`を持ち、製品内の主要アセットをUnityカタログへ公開します。購入・非公開アバター本体、ライセンス証拠、ローカルjob、キャッシュは製品フォルダへ混入させません。
+
+既存jobの移行計画を確認します。
+
+```powershell
+task migrate:genworks
+```
+
+確認後に移行します。アセットとUnityの`.meta`を一緒に移動し、jobパスと製品manifestを更新します。
+
+```powershell
+task migrate:genworks:apply
+```
+
+構造監査:
+
+```powershell
+task audit:genworks
+```
+
+詳細は[docs/GENWORKS_LAYOUT.md](docs/GENWORKS_LAYOUT.md)を参照してください。
 
 ## リリース条件
 
@@ -92,6 +148,7 @@ task release JOB=Assets/_Local/Jobs/<job-id>/job.json
 Assets/_Local/
 Assets/_Vendor/
 Assets/PochibyKT/
+Assets/HAOLAN_Quest/
 ```
 
 納品対象はjob内の`deliveryAssets`へ明示的に列挙します。非公開ルート配下のファイルを納品物へ混入させると検証に失敗します。
@@ -101,11 +158,14 @@ Assets/PochibyKT/
 - `Artifacts/<job-id>/audit.json` — 現在の判定と各ゲート結果
 - `Candidates/<job-id>/candidate-manifest.json` — 候補の入力・出力・ハッシュ
 - `Release/<job-id>/release-manifest.json` — GO後の変更不能な記録
+- `Assets/GenWorks/Products/<product-slug>/ProductManifest.json` — Unity製品カタログ
+- `docs/GENWORKS_LAYOUT.md` — Unityアセット配置と移行仕様
 - `docs/REVIEW_EVIDENCE.md` — 人間レビュー証拠の仕様
 - `config/job.schema.v2.json` — job定義
+- `config/genworks-layout.json` — GenWorks配置契約
 - `config/release-policy.json` — 免除できないリリース条件
 - `ontology/project.yaml` — 制作・観測・判断の証拠モデル
 
-`Published/`配下の既存ファイルは過去のスナップショットであり、新しい顧客向けリリースではありません。
+`Published/`配下の既存ファイルは過去のスナップショットであり、新しい顧客向けリリースではありません。既存のローカルjob成果物は`task migrate:genworks:apply`でUnity可視の製品構造へ移行します。
 
-**README最終監査:** 2026-08-01
+**README最終監査:** 2026-08-02
