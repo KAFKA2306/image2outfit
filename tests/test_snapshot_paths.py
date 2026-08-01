@@ -30,7 +30,11 @@ class SnapshotPathPolicyTests(unittest.TestCase):
             for path in ROOT.rglob("*")
             if path.is_dir() and path.name.casefold() == "published"
         )
-        self.assertEqual([], existing, f"Deprecated snapshot directories exist: {existing}")
+        self.assertEqual(
+            [],
+            existing,
+            f"Deprecated snapshot directories exist: {existing}",
+        )
 
     def test_legacy_snapshots_are_unity_visible(self) -> None:
         self.assertTrue(
@@ -52,12 +56,26 @@ class SnapshotPathPolicyTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             for token in forbidden_tokens:
                 if token in text:
-                    violations.append(f"{path.relative_to(ROOT).as_posix()}: {token}")
-        self.assertEqual([], violations, f"Deprecated snapshot paths remain: {violations}")
+                    violations.append(
+                        f"{path.relative_to(ROOT).as_posix()}: {token}"
+                    )
+        self.assertEqual(
+            [],
+            violations,
+            f"Deprecated snapshot paths remain: {violations}",
+        )
 
     def test_snapshot_tools_use_current_names(self) -> None:
-        stale = [path.relative_to(ROOT).as_posix() for path in DEPRECATED_TOOL_PATHS if path.exists()]
-        missing = [path.relative_to(ROOT).as_posix() for path in REQUIRED_TOOL_PATHS if not path.is_file()]
+        stale = [
+            path.relative_to(ROOT).as_posix()
+            for path in DEPRECATED_TOOL_PATHS
+            if path.exists()
+        ]
+        missing = [
+            path.relative_to(ROOT).as_posix()
+            for path in REQUIRED_TOOL_PATHS
+            if not path.is_file()
+        ]
         self.assertEqual([], stale, f"Deprecated snapshot tools remain: {stale}")
         self.assertEqual([], missing, f"Required snapshot tools are missing: {missing}")
 
