@@ -11,12 +11,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: image2outfit-siroino-wide-cargo-release
-  cancel-in-progress: false
+  group: image2outfit-siroino-wide-cargo-release-v2
+  cancel-in-progress: true
 
 jobs:
   release:
-    runs-on: [self-hosted, windows, x64, image2outfit]
+    runs-on: [self-hosted, windows]
     timeout-minutes: 45
 
     steps:
