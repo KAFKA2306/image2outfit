@@ -1,0 +1,177 @@
+name: One-shot migrate Published into GenWorks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/run/published-to-genworks.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: image2outfit-published-to-genworks
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Move legacy snapshots under Unity Assets and update every path reference
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          src='Published'
+          dst='Assets/GenWorks/Legacy/Published'
+
+          test -d "$src"
+          test ! -e "$dst"
+          mkdir -p "$(dirname "$dst")"
+          git mv "$src" "$dst"
+
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          from pathlib import Path
+
+          root = Path('.')
+          old_root = 'Published/'
+          new_root = 'Assets/GenWorks/Legacy/Published/'
+          changed: list[str] = []
+
+          for path in root.rglob('*'):
+              if not path.is_file() or '.git' in path.parts:
+                  continue
+              try:
+                  raw = path.read_bytes()
+                  text = raw.decode('utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+
+              updated = text.replace(old_root, new_root)
+              updated = updated.replace(
+                  r'\\Published\\',
+                  r'\\Assets\\GenWorks\\Legacy\\Published\\',
+              )
+              if updated != text:
+                  path.write_text(updated, encoding='utf-8', newline='')
+                  changed.append(path.as_posix())
+
+          legacy_root = Path('Assets/GenWorks/Legacy/Published')
+          (legacy_root / 'README.md').write_text(
+              '# Legacy Published snapshots\n\n'
+              'This directory contains historical image2outfit snapshots moved from the repository-root '
+              '`Published/` directory so Unity can import and inspect them under `Assets/`.\n\n'
+              '- These files are preserved for reproducibility, visual inspection, and hash verification.\n'
+              '- They are not current customer releases and must not be promoted automatically.\n'
+              '- Release eligibility remains controlled by the candidate/review/runtime evidence gates.\n'
+              '- New products belong in `Assets/GenWorks/Products/<product-slug>/`.\n',
+              encoding='utf-8',
+              newline='',
+          )
+          (legacy_root / 'LegacyManifest.json').write_text(
+              json.dumps(
+                  {
+                      'schemaVersion': 1,
+                      'canonicalPath': 'Assets/GenWorks/Legacy/Published',
+                      'migratedFrom': 'Published',
+                      'migratedOn': '2026-08-02',
+                      'unityVisible': True,
+                      'classification': 'legacy-snapshot',
+                      'releaseEligible': False,
+                      'decision': 'NO-GO',
+                      'reason': 'Historical snapshot retained for Unity inspection and reproducibility; mandatory runtime and review gates are incomplete.',
+                  },
+                  ensure_ascii=False,
+                  indent=2,
+              ) + '\n',
+              encoding='utf-8',
+              newline='',
+          )
+
+          genworks_readme = Path('Assets/GenWorks/README.md')
+          note = (
+              '\n## Legacy snapshots\n\n'
+              '`Assets/GenWorks/Legacy/Published/` contains historical snapshots that were previously stored '
+              'at repository root. They are Unity-visible for inspection but are excluded from the current product catalog and release promotion.\n'
+          )
+          current = genworks_readme.read_text(encoding='utf-8')
+          if '## Legacy snapshots' not in current:
+              genworks_readme.write_text(current.rstrip() + '\n' + note, encoding='utf-8', newline='')
+
+          print('updated text references:')
+          for item in changed:
+              print(f'- {item}')
+          PY
+
+          python - <<'PY'
+          from pathlib import Path
+
+          old_root = 'Published/'
+          new_root = 'Assets/GenWorks/Legacy/Published/'
+          stale: list[str] = []
+          for path in Path('.').rglob('*'):
+              if not path.is_file() or '.git' in path.parts:
+                  continue
+              try:
+                  text = path.read_text(encoding='utf-8')
+              except (UnicodeDecodeError, OSError):
+                  continue
+              residual = text.replace(new_root, '')
+              if old_root in residual or r'\\Published\\' in residual:
+                  stale.append(path.as_posix())
+          if stale:
+              raise SystemExit('stale root Published references remain: ' + ', '.join(stale))
+          PY
+
+          test ! -e Published
+          test -f Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1/HAOLAN_CowHoodKnitSet.prefab
+          test -f Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1/HAOLAN_CowHoodKnitSet.fbx
+          test -f Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1/audit.json
+
+      - name: Validate the canonical GenWorks contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/audit_genworks_layout.py
+          python -m unittest discover -s tests -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          json.loads(Path('Assets/GenWorks/Legacy/Published/LegacyManifest.json').read_text(encoding='utf-8'))
+          json.loads(Path('Assets/GenWorks/Legacy/Published/haolan/cow-hood-knit-set-v1/audit.json').read_text(encoding='utf-8'))
+          print('legacy manifests: PASS')
+          PY
+
+      - name: Trigger Unity import and meta-file verification on the image2outfit runner
+        shell: bash
+        run: |
+          cat > .github/run/genworks-migrate.txt <<'EOF'
+          operation=import-migrated-published-under-assets
+          requested_at=2026-08-02T02:23:00+09:00
+          canonical_path=Assets/GenWorks/Legacy/Published
+          EOF
+
+      - name: Remove one-shot workflow and commit the migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -f .github/workflows/migrate-published-to-genworks.yml
+          rm -f .github/run/published-to-genworks.txt
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Move Published snapshots into Assets GenWorks Legacy'
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
