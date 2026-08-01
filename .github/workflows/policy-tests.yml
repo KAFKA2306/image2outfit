@@ -49,6 +49,9 @@ jobs:
           tools/release_gate.py
           tools/audit_genworks_layout.py
           tools/migrate_jobs_to_genworks.py
+          tools/refresh_candidate_manifest.py
+          tools/siroino_wide_cargo_build.py
+          tools/siroino_required_pose_render.py
           tests/test_release_gate.py
           tests/test_toolchain.py
           tests/test_blender_python_env.py
@@ -73,6 +76,8 @@ jobs:
               'config/job.schema.v2.json',
               'config/toolchain-lock.json',
               'config/genworks-layout.json',
+              'config/siroino-wide-cargo-job.json',
+              'config/siroino-wide-cargo-license.json',
               'Packages/vpm-manifest.json',
               'Packages/manifest.json',
               'Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json',
