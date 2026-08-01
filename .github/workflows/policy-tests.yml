@@ -9,6 +9,7 @@ on:
       - Packages/*.json
       - ProjectSettings/ProjectVersion.txt
       - Assets/Editor/**
+      - Assets/GenWorks/**
       - Taskfile.yml
       - .github/workflows/**
   push:
@@ -20,6 +21,7 @@ on:
       - Packages/*.json
       - ProjectSettings/ProjectVersion.txt
       - Assets/Editor/**
+      - Assets/GenWorks/**
       - Taskfile.yml
       - .github/workflows/**
 
@@ -39,10 +41,24 @@ jobs:
           python-version: '3.12'
 
       - name: Compile Python
-        run: python -m py_compile tools/pipeline.py tools/audit_toolchain.py tools/blender_python_env.py tools/release_gate.py tests/test_release_gate.py tests/test_toolchain.py tests/test_blender_python_env.py
+        run: >-
+          python -m py_compile
+          tools/pipeline.py
+          tools/audit_toolchain.py
+          tools/blender_python_env.py
+          tools/release_gate.py
+          tools/audit_genworks_layout.py
+          tools/migrate_jobs_to_genworks.py
+          tests/test_release_gate.py
+          tests/test_toolchain.py
+          tests/test_blender_python_env.py
+          tests/test_genworks_layout.py
 
       - name: Audit pinned toolchain
         run: python tools/audit_toolchain.py
+
+      - name: Audit GenWorks layout
+        run: python tools/audit_genworks_layout.py
 
       - name: Run release policy tests
         run: python -m unittest discover -s tests -v
@@ -56,8 +72,10 @@ jobs:
               'config/release-policy.json',
               'config/job.schema.v2.json',
               'config/toolchain-lock.json',
+              'config/genworks-layout.json',
               'Packages/vpm-manifest.json',
               'Packages/manifest.json',
+              'Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json',
           ):
               json.loads(Path(name).read_text(encoding='utf-8'))
               print(f'{name}: PASS')
