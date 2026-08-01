@@ -30,7 +30,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p .github/status
-          for workflow in siroino-wide-cargo-self-hosted.yml haolan-cow-hood.yml; do
+          for workflow in \
+            siroino-wide-cargo-self-hosted.yml \
+            siroino-wide-cargo-hosted.yml \
+            haolan-cow-hood.yml; do
             name="${workflow%.yml}"
             gh api \
               -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -56,7 +59,7 @@ jobs:
           if git diff --cached --quiet; then
             exit 0
           fi
-          git commit -m "Query Windows self-hosted workflow status"
+          git commit -m "Query Siroino modeling and runner status"
           for attempt in 1 2 3 4 5; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
             sleep $((attempt * 2))
