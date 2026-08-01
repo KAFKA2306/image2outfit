@@ -23,6 +23,22 @@ tasks:
     cmds:
       - uv run --no-cache --python 3.11 python tools/release_gate.py --mode release --job "{{.JOB}}"
 
+  audit:genworks:
+    desc: Audit the canonical Assets/GenWorks product catalog and path containment.
+    cmds:
+      - uv run --no-cache --no-project python tools/audit_genworks_layout.py
+
+  migrate:genworks:
+    desc: Show the migration plan for all existing local image2outfit jobs.
+    cmds:
+      - uv run --no-cache --no-project python tools/migrate_jobs_to_genworks.py
+
+  migrate:genworks:apply:
+    desc: Move existing job outputs and their Unity meta files into Assets/GenWorks.
+    cmds:
+      - uv run --no-cache --no-project python tools/migrate_jobs_to_genworks.py --apply
+      - uv run --no-cache --no-project python tools/audit_genworks_layout.py
+
   audit:haolan:
     desc: Verify the committed HAOLAN candidate hashes, archive, and regeneration output.
     cmds:
@@ -34,13 +50,14 @@ tasks:
       - uv run --no-cache --no-project python tools/package_published.py --root Published/haolan/cow-hood-knit-set-v1
 
   check:python:
-    desc: Check the reproducibility tooling.
+    desc: Check the reproducibility and GenWorks tooling.
     cmds:
-      - uv run --no-cache --no-project --with ruff --with ty ruff check --ignore S102 tools/audit_published.py tools/package_published.py tools/haolan_cow_hood_generator.py tools/haolan_cow_generator_hosted.py
-      - uv run --no-cache --no-project --with ruff --with ty ruff format --check tools/audit_published.py tools/package_published.py
-      - uv run --no-cache --no-project --with ruff --with ty ty check tools/audit_published.py tools/package_published.py
+      - uv run --no-cache --no-project python -m py_compile tools/audit_genworks_layout.py tools/migrate_jobs_to_genworks.py
+      - uv run --no-cache --no-project --with ruff --with ty ruff check --ignore S102 tools/audit_published.py tools/package_published.py tools/haolan_cow_hood_generator.py tools/haolan_cow_generator_hosted.py tools/audit_genworks_layout.py tools/migrate_jobs_to_genworks.py
+      - uv run --no-cache --no-project --with ruff --with ty ruff format --check tools/audit_published.py tools/package_published.py tools/audit_genworks_layout.py tools/migrate_jobs_to_genworks.py
+      - uv run --no-cache --no-project --with ruff --with ty ty check tools/audit_published.py tools/package_published.py tools/audit_genworks_layout.py tools/migrate_jobs_to_genworks.py
 
   format:python:
-    desc: Format the reproducibility tooling.
+    desc: Format the reproducibility and GenWorks tooling.
     cmds:
-      - uv run --no-cache --no-project --with ruff ruff format tools/audit_published.py tools/package_published.py
+      - uv run --no-cache --no-project --with ruff ruff format tools/audit_published.py tools/package_published.py tools/audit_genworks_layout.py tools/migrate_jobs_to_genworks.py
