@@ -1,9 +1,8 @@
 name: Publish reviewed wide cargo v38 artifact
 
 on:
-  push:
-    branches:
-      - agent/wide-cargo-review-v36-20260802
+  pull_request:
+    branches: [main]
     paths:
       - .github/workflows/publish-wide-cargo-v38.yml
 
@@ -17,7 +16,7 @@ concurrency:
 
 jobs:
   publish:
-    if: github.repository == 'KAFKA2306/image2outfit'
+    if: github.repository == 'KAFKA2306/image2outfit' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
