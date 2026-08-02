@@ -6,6 +6,10 @@ on:
       - feat/siroino-military-sheer-romper-large
     paths:
       - .github/workflows/materialize-military-romper.yml
+      - config/products/siroino-military-sheer-romper-large/job.json
+      - tools/siroino_military_sheer_romper_build.py
+      - tools/siroino_military_sheer_romper_smooth.py
+      - tools/siroino_military_sheer_romper_pose.py
 
 permissions:
   contents: write
@@ -54,8 +58,9 @@ jobs:
       - name: Generate Blend, FBX, Prefabs, textures, and five-view evidence
         run: |
           set -euo pipefail
+          BUILD_SCRIPT="$(python -c 'import json; print(json.load(open("config/products/siroino-military-sheer-romper-large/job.json"))["buildScript"])')"
           .image2outfit/blender/blender --python-use-system-env --background --factory-startup --python-exit-code 1 \
-            --python tools/siroino_military_sheer_romper_build.py -- \
+            --python "$BUILD_SCRIPT" -- \
             --job config/products/siroino-military-sheer-romper-large/job.json
 
       - name: Render pose evidence
@@ -74,5 +79,5 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add Assets/GenWorks/siroino-military-sheer-romper-large
           git diff --cached --stat
-          git commit -m "Materialize military sheer-back romper checkpoint"
+          git commit -m "Materialize smooth military sheer-back romper checkpoint"
           git push origin HEAD:feat/siroino-military-sheer-romper-large
