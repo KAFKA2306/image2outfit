@@ -2,7 +2,7 @@
 
 **Status: `REJECTED` / `NO-GO`.**
 
-This is the canonical resumable workspace for the Bordeaux HAOLAN outfit. It was moved from `Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate` so the repository has one product root per outfit.
+This is the single canonical resumable workspace for the Bordeaux HAOLAN outfit. The repository now uses one direct product root per outfit and does not maintain a separate avatar-grouped copy.
 
 ## Preserved checkpoint
 
