@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Enforce PR-only main, converge workstreams, and remove stale branches
+      - name: Detect direct main pushes, converge workstreams, and remove stale branches
         uses: actions/github-script@v9
         with:
           script: |
@@ -209,17 +209,22 @@ jobs:
               );
               if (mergedThroughPull) return false;
 
-              const message = `Direct push ${after} to ${defaultBranch} is forbidden; restoring ${before}.`;
+              const message = `Direct push ${after} to ${defaultBranch} was not produced by a merged pull request.`;
               if (dryRun) {
                 core.warning(`[dry-run] ${message}`);
                 return false;
               }
-              await github.rest.git.updateRef({
+              await github.rest.issues.create({
                 owner,
                 repo,
-                ref: `heads/${defaultBranch}`,
-                sha: before,
-                force: true,
+                title: `Direct push detected on ${defaultBranch}: ${after.slice(0, 12)}`,
+                body: [
+                  "<!-- pr-governance:direct-push -->",
+                  message,
+                  `Previous SHA: \`${before}\``,
+                  `Actor: \`${context.actor}\``,
+                  "Enable a GitHub branch ruleset requiring pull requests and the Release policy tests check to block this before the ref moves.",
+                ].join("\n\n"),
               });
               core.setFailed(message);
               return true;
