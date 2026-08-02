@@ -62,14 +62,18 @@ def _marked_json(output: str, marker: str) -> dict[str, Any]:
     raise RuntimeError(f"Blender output did not contain {marker}")
 
 
-def probe_runtime(blender: str) -> dict[str, str]:
-    expression = (
+def runtime_probe_expression() -> str:
+    """Return the syntactically validated Blender runtime probe."""
+    return (
         "import bpy,json,platform,sys;"
         f"print('{PROBE_MARKER}'+json.dumps({{"
         "'blenderVersion':bpy.app.version_string.split()[0],"
         "'pythonVersion':platform.python_version(),"
-        "'pythonPrefix':sys.prefix}}))"
+        "'pythonPrefix':sys.prefix}))"
     )
+
+
+def probe_runtime(blender: str) -> dict[str, str]:
     output = _run(
         [
             blender,
@@ -78,7 +82,7 @@ def probe_runtime(blender: str) -> dict[str, str]:
             "--python-exit-code",
             "1",
             "--python-expr",
-            expression,
+            runtime_probe_expression(),
         ]
     )
     return _marked_json(output, PROBE_MARKER)
