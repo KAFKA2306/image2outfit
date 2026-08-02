@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-heather-hooded-bodysuit",
+  "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab",
+  "previewPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/README.md",
+  "sourceJobPath": "config/products/siroino-heather-hooded-bodysuit/job.json",
+  "productBuildScript": "tools/siroino_heather_hooded_bodysuit_build.py",
+  "designRevision": "v1-dmap-pattern-coordinate-hooded-bodysuit",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "tools/siroino_heather_hooded_bodysuit_build.py",
+    "lastAttempt": {
+      "result": "NOT_RUN",
+      "visualRevision": "v1-dmap-pattern-coordinate-hooded-bodysuit"
+    },
+    "blockers": [
+      "Run hosted Blender generation",
+      "Inspect actual five-view and pose-review images",
+      "Import/save/reload both Prefabs in pinned Unity",
+      "Pass Modular Avatar/NDMF and VRChat Build & Test",
+      "Complete human visual, pose and runtime reviews"
+    ]
+  },
+  "technicalGates": {
+    "standardTargetResolved": "PENDING",
+    "blender": "PENDING",
+    "fbx": "PENDING",
+    "fiveViewRender": "PENDING",
+    "poseRender": "PENDING",
+    "patternCoordinateTrial": "PENDING",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
+    "fbx": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Models/SiroinoHeatherHoodedBodysuit.fbx",
+    "prefab": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab",
+    "multiview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-pose-review.webp"
+  }
+}
