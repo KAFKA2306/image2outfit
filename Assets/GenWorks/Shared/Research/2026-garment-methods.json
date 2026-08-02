@@ -1,0 +1,279 @@
+{
+  "schemaVersion": 1,
+  "baselineId": "garment-methods-2026-08-02",
+  "surveyYear": 2026,
+  "reviewedAt": "2026-08-02T06:55:00Z",
+  "freshnessDays": 180,
+  "officialSourceHosts": [
+    "openaccess.thecvf.com",
+    "arxiv.org"
+  ],
+  "requiredCapabilities": [
+    "structured-patterns",
+    "stitch-assembly",
+    "topology-uv",
+    "layering-collision",
+    "pbr-texture",
+    "runtime-deformation",
+    "dynamic-evaluation"
+  ],
+  "methods": [
+    {
+      "id": "reweaver-cvpr-2026",
+      "title": "ReWeaver: Towards Simulation-Ready and Topology-Accurate Garment Reconstruction",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "publicationStatus": "PEER_REVIEWED",
+      "officialUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Li_ReWeaver_Towards_Simulation-Ready_and_Topology-Accurate_Garment_Reconstruction_CVPR_2026_paper.html",
+      "capabilities": [
+        "structured-patterns",
+        "stitch-assembly",
+        "topology-uv"
+      ],
+      "implementationTrack": "ADOPT_PRINCIPLE",
+      "evidence": "The paper reconstructs panels, seams and connectivity in 2D UV and 3D from as few as four RGB views, targeting simulation-ready garments.",
+      "implementationImplications": [
+        "Represent image-derived garments as explicit panels and seam connectivity before final meshing.",
+        "Persist both 2D pattern-space and 3D garment-space correspondence when reconstruction is used.",
+        "Reject visually similar but unstructured shells as the canonical source when panel topology is recoverable."
+      ],
+      "rejectionCriteria": [
+        "No traceable panel or seam model for an image-reconstructed garment.",
+        "Topology cannot support controlled edits or simulation-oriented validation."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    },
+    {
+      "id": "autosew-wacv-2026",
+      "title": "AutoSew: A Geometric Approach to Stitching Prediction with Graph Neural Networks",
+      "year": 2026,
+      "venue": "WACV 2026",
+      "publicationStatus": "PEER_REVIEWED",
+      "officialUrl": "https://openaccess.thecvf.com/content/WACV2026/html/Rios-Navarro_AutoSew_A_Geometric_Approach_to_Stitching_Prediction_with_Graph_Neural_WACV_2026_paper.html",
+      "capabilities": [
+        "stitch-assembly",
+        "structured-patterns"
+      ],
+      "implementationTrack": "PROTOTYPE",
+      "evidence": "The paper predicts stitch correspondences directly from 2D contours with graph matching and differentiable optimal transport, including multi-edge connections.",
+      "implementationImplications": [
+        "Store seam pairing as a graph instead of relying on object names or manual adjacency alone.",
+        "Validate edge-length compatibility, orientation and multi-edge connectivity before cloth assembly.",
+        "Keep manual stitching as an auditable fallback until the learned predictor is licensed and reproduced."
+      ],
+      "rejectionCriteria": [
+        "Unpaired or ambiguous pattern edges remain in a release candidate.",
+        "Stitch topology changes without an explicit connectivity diff."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    },
+    {
+      "id": "exmesh-cvpr-2026",
+      "title": "ExMesh: EXplicit Mesh Reconstruction with Topology Adaptation",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "publicationStatus": "PEER_REVIEWED",
+      "officialUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Fan_ExMesh_EXplicit_Mesh_Reconstruction_with_Topology_Adaptation_CVPR_2026_paper.html",
+      "capabilities": [
+        "topology-uv"
+      ],
+      "implementationTrack": "ADOPT_PRINCIPLE",
+      "evidence": "The paper combines explicit mesh optimization with adaptive splitting and merging while maintaining UV coordinates.",
+      "implementationImplications": [
+        "Any topology refinement must preserve UV continuity and material alignment.",
+        "Record vertex and face count changes and reject new degenerate or fragmented geometry.",
+        "Prefer coarse-to-fine refinement over uniformly dense generation."
+      ],
+      "rejectionCriteria": [
+        "Topology edits create degenerate faces, UV discontinuity or unnecessary density.",
+        "High detail is produced only by uncontrolled subdivision."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    },
+    {
+      "id": "dama-cvprw-2026",
+      "title": "DAMA: Disentangled Body-Anchored Gaussians for Controllable Multi-Layered Avatars",
+      "year": 2026,
+      "venue": "CVPR Workshops 2026",
+      "publicationStatus": "PEER_REVIEWED",
+      "officialUrl": "https://openaccess.thecvf.com/content/CVPR2026W/PhysHuman/html/Eskandar_DAMA_Disentangled_Body-Anchored_Gaussians_for_Controllable_Multi-Layered_Avatars_CVPRW_2026_paper.html",
+      "capabilities": [
+        "layering-collision"
+      ],
+      "implementationTrack": "ADOPT_PRINCIPLE",
+      "evidence": "The paper explicitly models garment separation, stacking order, penetration rate and penetration depth for multi-layer avatars.",
+      "implementationImplications": [
+        "Declare layer order and body anchoring for every garment component.",
+        "Measure penetration count and depth, not only render appearance.",
+        "Keep body-conforming layers separate from outer loose layers."
+      ],
+      "rejectionCriteria": [
+        "Layer order is implicit or inconsistent across poses.",
+        "Critical body or inter-garment penetration remains unresolved."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    },
+    {
+      "id": "ni-tex-cvpr-2026",
+      "title": "NI-Tex: Non-isometric Image-based Garment Texture Generation",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "publicationStatus": "PEER_REVIEWED",
+      "officialUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Shan_NI-Tex_Non-isometric_Image-based_Garment_Texture_Generation_CVPR_2026_paper.html",
+      "capabilities": [
+        "pbr-texture"
+      ],
+      "implementationTrack": "PROTOTYPE",
+      "evidence": "The paper generates spatially aligned PBR materials from non-isometric image and geometry pairs and uses uncertainty-guided multi-view baking.",
+      "implementationImplications": [
+        "Generate or author PBR channels separately from geometry.",
+        "Bake from multiple views and prioritize uncertain or occluded regions in later passes.",
+        "Evaluate seam continuity, cross-view color consistency and material response."
+      ],
+      "rejectionCriteria": [
+        "A single projected image is treated as production-ready texture.",
+        "Visible seams, cross-view color drift or material-channel mismatch remain."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    },
+    {
+      "id": "natex-cvpr-2026",
+      "title": "NaTex: Seamless Texture Generation as Latent Color Diffusion",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "publicationStatus": "PEER_REVIEWED",
+      "officialUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Lai_NaTex_Seamless_Texture_Generation_as_Latent_Color_Diffusion_CVPR_2026_paper.html",
+      "capabilities": [
+        "pbr-texture",
+        "topology-uv"
+      ],
+      "implementationTrack": "BENCHMARK",
+      "evidence": "The paper generates texture color directly in 3D to address occlusion, boundary alignment and cross-view consistency limitations of multi-view baking.",
+      "implementationImplications": [
+        "Benchmark texture seams and occluded regions against a 3D-consistent representation.",
+        "Do not accept multi-view texture baking when hidden regions are unreviewed."
+      ],
+      "rejectionCriteria": [
+        "Occluded texture regions are filled without evidence or review.",
+        "Boundary alignment fails at UV islands or garment edges."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    },
+    {
+      "id": "physkin-arxiv-2026",
+      "title": "PhySkin: Physics-based Bone-driven Neural Garment Simulation",
+      "year": 2026,
+      "venue": "arXiv preprint",
+      "publicationStatus": "PREPRINT",
+      "officialUrl": "https://arxiv.org/abs/2603.27013",
+      "capabilities": [
+        "runtime-deformation",
+        "layering-collision"
+      ],
+      "implementationTrack": "PROTOTYPE",
+      "evidence": "The preprint uses reduced-space bone handles and self-supervised physics objectives for fast garment draping with gravity, stretch, bending and collision avoidance.",
+      "implementationImplications": [
+        "Treat bone handles as a reduced deformation space rather than assigning arbitrary weights only.",
+        "Separate offline physics fitting from runtime handle evaluation.",
+        "Benchmark loose garments across body shapes and required poses before runtime adoption."
+      ],
+      "rejectionCriteria": [
+        "Loose garments rely only on static linear blend skinning without deformation evidence.",
+        "Runtime claims are made without measured cost and pose/body generalization tests."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    },
+    {
+      "id": "unic-arxiv-2026",
+      "title": "UNIC: Neural Garment Deformation Field for Real-time Clothed Character Animation",
+      "year": 2026,
+      "venue": "arXiv preprint",
+      "publicationStatus": "PREPRINT",
+      "officialUrl": "https://arxiv.org/abs/2603.25580",
+      "capabilities": [
+        "runtime-deformation"
+      ],
+      "implementationTrack": "BENCHMARK",
+      "evidence": "The preprint learns an instance-specific continuous deformation field for complex garment topology and new motion sequences.",
+      "implementationImplications": [
+        "Use per-garment deformation evaluation when topology is complex.",
+        "Benchmark continuous-field deformation against bone-driven and physics baselines.",
+        "Do not require one model to generalize across unrelated garments."
+      ],
+      "rejectionCriteria": [
+        "A deformation method is selected without a garment-specific benchmark.",
+        "Real-time suitability is assumed without target-device measurement."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    },
+    {
+      "id": "human-geometry-distribution-cvpr-2026",
+      "title": "Human Geometry Distribution for 3D Animation Generation",
+      "year": 2026,
+      "venue": "CVPR 2026",
+      "publicationStatus": "PEER_REVIEWED",
+      "officialUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Tang_Human_Geometry_Distribution_for_3D_Animation_Generation_CVPR_2026_paper.html",
+      "capabilities": [
+        "dynamic-evaluation",
+        "runtime-deformation"
+      ],
+      "implementationTrack": "BENCHMARK",
+      "evidence": "The paper evaluates high-fidelity human geometry animation with detailed clothing dynamics and reports both geometric metrics and a perceptual user study.",
+      "implementationImplications": [
+        "Evaluate deformation with both geometric error and perceptual review.",
+        "Test short transitions and long motion consistency instead of isolated poses only.",
+        "Preserve garment identity and fine detail across animation."
+      ],
+      "rejectionCriteria": [
+        "Only static poses are used to claim dynamic garment quality.",
+        "Temporal flicker or identity drift is not reviewed."
+      ],
+      "codeReuseAllowed": false,
+      "codeLicense": "UNVERIFIED"
+    }
+  ],
+  "productionRequirements": {
+    "structured-patterns": [
+      "Image-derived garments must have an explicit panel model or an auditable reason for a non-panel construction.",
+      "The editable source must preserve the relationship between design references, panels and the final mesh."
+    ],
+    "stitch-assembly": [
+      "Seam connectivity must be stored explicitly and checked for unmatched, reversed or incompatible edges.",
+      "Assembly changes require a connectivity diff and regenerated pose evidence."
+    ],
+    "topology-uv": [
+      "Topology changes must preserve UV continuity, face orientation and material assignment.",
+      "Degenerate faces, fragmented shells and uncontrolled density are release blockers."
+    ],
+    "layering-collision": [
+      "Every component must declare its body or garment layer and intended clearance.",
+      "Penetration must be measured across required poses, including depth or severity, not only counted visually."
+    ],
+    "pbr-texture": [
+      "Textures must be reviewed across all required views with separate material channels where applicable.",
+      "Seams, occluded regions and cross-view color/material consistency must be explicitly inspected."
+    ],
+    "runtime-deformation": [
+      "Tight and loose garments must use different deformation strategies where needed.",
+      "Loose garments require a measured bone-handle, physics or neural deformation benchmark before runtime claims."
+    ],
+    "dynamic-evaluation": [
+      "Required static poses are necessary but not sufficient for loose or layered garments.",
+      "A motion sequence must be reviewed for temporal consistency, collision, detail retention and customer-visible artifacts."
+    ]
+  },
+  "reusePolicy": {
+    "paperIdeasMayBeReimplemented": true,
+    "paperCodeOrModelsMayBeCopiedWithoutVerifiedLicense": false,
+    "unverifiedCodeLicenseValue": "UNVERIFIED",
+    "commercialReleaseRequiresIndependentLicenseReview": true
+  }
+}
