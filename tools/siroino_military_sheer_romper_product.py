@@ -16,6 +16,7 @@ if str(TOOLS) not in sys.path:
 import siroino_military_sheer_romper_target_fit as fit  # noqa: E402
 
 ORIGINAL_EXTRACT = fit.extract_surface
+ORIGINAL_FINISH_SKINNED = fit.finish_skinned
 
 
 def _world_bounds(body: bpy.types.Object) -> tuple[Vector, Vector]:
@@ -73,6 +74,27 @@ def _neck_predicate(
     )
 
 
+def preserve_world_finish_skinned(
+    obj: bpy.types.Object,
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    values: dict[str, float],
+    *,
+    fit_audit: bool,
+) -> bpy.types.Object:
+    world = obj.matrix_world.copy()
+    result = ORIGINAL_FINISH_SKINNED(
+        obj,
+        body,
+        armature,
+        values,
+        fit_audit=fit_audit,
+    )
+    result.matrix_world = world
+    bpy.context.view_layer.update()
+    return result
+
+
 def robust_extract(
     body: bpy.types.Object,
     armature: bpy.types.Object,
@@ -114,8 +136,9 @@ def robust_extract(
 
 
 def main() -> int:
+    fit.finish_skinned = preserve_world_finish_skinned
     fit.extract_surface = robust_extract
-    fit.REVISION = "siroino-pc-surface-fit-v8"
+    fit.REVISION = "siroino-pc-surface-fit-v8.2"
     return fit.main()
 
 
