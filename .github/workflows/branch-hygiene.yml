@@ -17,13 +17,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  delete-merged-branches:
-    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+  delete-closed-and-merged-branches:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Delete merged branches through GitHub API
+      - name: Delete closed or merged branches through GitHub API
         uses: actions/github-script@v7
         with:
           script: |
@@ -31,7 +30,7 @@ jobs:
             const repo = context.repo.repo;
             const protectedBranches = new Set(['main']);
 
-            async function deleteBranch(branch) {
+            async function deleteBranch(branch, reason) {
               if (!branch || protectedBranches.has(branch)) return;
               try {
                 await github.rest.git.deleteRef({
@@ -39,7 +38,7 @@ jobs:
                   repo,
                   ref: `heads/${branch}`,
                 });
-                core.info(`Deleted merged branch: ${branch}`);
+                core.info(`Deleted ${reason} branch: ${branch}`);
               } catch (error) {
                 if (error.status === 422 || error.status === 404) {
                   core.info(`Branch already absent or not deletable: ${branch}`);
@@ -51,8 +50,14 @@ jobs:
 
             if (context.eventName === 'pull_request') {
               const pullRequest = context.payload.pull_request;
-              if (pullRequest?.merged && pullRequest.head.repo.full_name === context.payload.repository.full_name) {
-                await deleteBranch(pullRequest.head.ref);
+              if (
+                pullRequest?.state === 'closed' &&
+                pullRequest.head.repo.full_name === context.payload.repository.full_name
+              ) {
+                await deleteBranch(
+                  pullRequest.head.ref,
+                  pullRequest.merged ? 'merged' : 'closed/superseded',
+                );
               }
               return;
             }
@@ -66,6 +71,25 @@ jobs:
             for (const branch of branches) {
               if (protectedBranches.has(branch.name) || branch.protected) continue;
 
+              const pulls = await github.paginate(github.rest.pulls.list, {
+                owner,
+                repo,
+                state: 'all',
+                head: `${owner}:${branch.name}`,
+                per_page: 100,
+              });
+              const hasOpenPullRequest = pulls.some((pull) => pull.state === 'open');
+              const hasClosedPullRequest = pulls.some((pull) => pull.state === 'closed');
+
+              if (hasOpenPullRequest) {
+                core.info(`Keeping branch with open PR: ${branch.name}`);
+                continue;
+              }
+              if (hasClosedPullRequest) {
+                await deleteBranch(branch.name, 'closed/superseded');
+                continue;
+              }
+
               const comparison = await github.rest.repos.compareCommitsWithBasehead({
                 owner,
                 repo,
@@ -73,6 +97,6 @@ jobs:
               });
 
               if (comparison.data.status === 'ahead' || comparison.data.status === 'identical') {
-                await deleteBranch(branch.name);
+                await deleteBranch(branch.name, 'merged');
               }
             }
