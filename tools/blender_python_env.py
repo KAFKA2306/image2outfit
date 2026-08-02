@@ -68,7 +68,7 @@ def probe_runtime(blender: str) -> dict[str, str]:
         f"print('{PROBE_MARKER}'+json.dumps({{"
         "'blenderVersion':bpy.app.version_string.split()[0],"
         "'pythonVersion':platform.python_version(),"
-        "'pythonPrefix':sys.prefix}}))"
+        "'pythonPrefix':sys.prefix}))"
     )
     output = _run(
         [
