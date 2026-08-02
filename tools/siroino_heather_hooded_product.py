@@ -15,7 +15,7 @@ if str(TOOLS) not in sys.path:
 import siroino_heather_hooded_bodysuit_build as build
 import siroino_heather_hooded_pattern as pattern
 
-DESIGN_REVISION = "v8-smooth-sampled-panels-distance-field-sleeves"
+DESIGN_REVISION = "v9-continuous-interpolation-fitted-cuffs"
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Henley_Placket",
     "Heather_Henley_Button_01",
@@ -35,7 +35,6 @@ def normalize_four_influences(
     objects: list[bpy.types.Object],
     maximum: int = 4,
 ) -> dict[str, int]:
-    """Normalize every vertex, pruning to the VRChat four-influence limit."""
     changed: dict[str, int] = {}
     for obj in objects:
         if obj.type != "MESH":
@@ -50,11 +49,7 @@ def normalize_four_influences(
                 for item in list(vertex.groups)
                 if item.weight > 1e-10
             ]
-            ranked = sorted(
-                assignments,
-                key=lambda item: item[1],
-                reverse=True,
-            )[:maximum]
+            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[:maximum]
             if not ranked:
                 ranked = [(fallback.name, 1.0)]
             total = sum(weight for _, weight in ranked)
@@ -69,9 +64,7 @@ def normalize_four_influences(
                 obj.vertex_groups[group_name].remove([vertex.index])
             for group_name, weight in ranked:
                 obj.vertex_groups[group_name].add(
-                    [vertex.index],
-                    weight / total,
-                    "REPLACE",
+                    [vertex.index], weight / total, "REPLACE"
                 )
             if requires_change:
                 affected += 1
@@ -83,20 +76,17 @@ def preserve_authored_weights(
     garments: list[bpy.types.Object],
     _body: bpy.types.Object,
 ) -> dict[str, object]:
-    """Do not overwrite sampled and source-derived weights with another pass."""
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "nearest tracked SiroinoSotai_PC weights for sampled panels and authored accessories; "
-            "direct source-vertex weights for distance-field sleeves and cuffs"
+            "nearest tracked SiroinoSotai_PC weights for continuous sampled panels and accessories; "
+            "direct source-vertex weights for fitted sleeves; explicit lower-arm/hand weights for cuffs"
         ),
         "rebound": False,
     }
 
 
 def wrap_pattern_writer(original):
-    """Persist exact generated object identities in the pattern contract."""
-
     def wrapped(*args, **kwargs):
         pattern_path, research_path = original(*args, **kwargs)
         contract = json.loads(pattern_path.read_text(encoding="utf-8"))
@@ -112,8 +102,6 @@ def wrap_pattern_writer(original):
 
 
 def enforce_manifest_contract(original):
-    """Keep generated state truthful and compatible with canonical contracts."""
-
     def wrapped(*args, **kwargs):
         result = original(*args, **kwargs)
         job = args[0]
@@ -128,27 +116,32 @@ def enforce_manifest_contract(original):
         )
 
         report_path = (
-            root
-            / ".image2outfit"
-            / "products"
-            / job["id"]
-            / "reports"
-            / "product-build-report.json"
+            root / ".image2outfit" / "products" / job["id"] / "reports" / "product-build-report.json"
         )
         if report_path.is_file():
             report = json.loads(report_path.read_text(encoding="utf-8"))
             report["designRevision"] = DESIGN_REVISION
             rejected = report.setdefault("rejectedHistory", [])
-            v71 = {
-                "revision": "v7.1-continuous-shell-fit",
-                "reason": (
-                    "actual five-view inspection found sawtooth panel edges, elbow/cuff holes, "
-                    "an over-wide neckline, a shield-like rear hood and heather moire; evaluated "
-                    "BVH audit reported 6660 garment/body triangle overlap pairs across six poses"
-                ),
-            }
-            if not any(item.get("revision") == v71["revision"] for item in rejected):
-                rejected.append(v71)
+            failures = [
+                {
+                    "revision": "v7.1-continuous-shell-fit",
+                    "reason": (
+                        "actual five-view inspection found sawtooth panel edges, elbow/cuff holes, "
+                        "an over-wide neckline, a shield-like rear hood and heather moire; evaluated "
+                        "BVH audit reported 6660 garment/body triangle overlap pairs across six poses"
+                    ),
+                },
+                {
+                    "revision": "v8-smooth-sampled-panels-distance-field-sleeves",
+                    "reason": (
+                        "actual five-view inspection found discontinuous sampled-panel spikes, oversized "
+                        "rectangular cuffs and an inflated spherical hood; evaluated BVH audit reported "
+                        "7133 garment/body triangle overlap pairs across six poses"
+                    ),
+                },
+            ]
+            existing = {item.get("revision") for item in rejected}
+            rejected.extend(item for item in failures if item["revision"] not in existing)
             report_path.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
