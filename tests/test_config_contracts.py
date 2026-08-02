@@ -30,6 +30,9 @@ class ConfigContractTest(unittest.TestCase):
         self.assertEqual(tuple(schema["required"]), gate.required_job_fields())
         self.assertEqual(schema["properties"]["schemaVersion"]["const"], 2)
         self.assertIn("hostedPoseScript", schema["properties"])
+        for field in ("artifactDir", "candidateDir", "releaseDir"):
+            self.assertNotIn(field, schema["required"])
+            self.assertNotIn(field, schema["properties"])
 
     def test_product_config_is_namespaced(self) -> None:
         product_id = "siroino-wide-cargo"
@@ -41,6 +44,8 @@ class ConfigContractTest(unittest.TestCase):
         job = json.loads(job_path.read_text(encoding="utf-8"))
         self.assertEqual(job["id"], product_id)
         self.assertEqual(job["licenseEvidence"], f"config/products/{product_id}/license.json")
+        for field in ("artifactDir", "candidateDir", "releaseDir"):
+            self.assertNotIn(field, job)
         self.assertFalse((ROOT / "config" / f"{product_id}-job.json").exists())
         self.assertFalse((ROOT / "config" / f"{product_id}-license.json").exists())
         self.assertFalse((ROOT / "config" / f"{product_id}-approval.json").exists())
