@@ -36,6 +36,8 @@ Assets/GenWorks/
 
 A current product must remain self-contained under its own root. Shared assets are allowed only when they are genuinely reused by multiple products and have a stable compatibility contract.
 
+Project-owned Unity Editor tooling belongs in `Assets/GenWorks/Shared/Editor/`. The repository-root Unity folder `Assets/Editor/` is forbidden so that image2outfit code has one canonical maintenance location. Moving an existing editor script must preserve its `.meta` file and GUID.
+
 `Assets/GenWorks/Legacy/Snapshots/` is the only Unity-visible historical snapshot root. Repository-root `Published/` and `Assets/GenWorks/Legacy/Published/` are deprecated and forbidden. Legacy snapshots are not current products, do not receive a `ProductManifest.json`, and cannot be promoted automatically to a customer release.
 
 ## Unity inspection
@@ -75,7 +77,7 @@ Historical snapshot files formerly stored under the two deprecated Published pat
 task audit:genworks
 ```
 
-`tools/audit_genworks_layout.py` validates manifest identity, product-root containment, duplicate product IDs, missing referenced assets, and production-like assets that still live outside the canonical root. `tests/test_no_published_directories.py` rejects either deprecated Published directory if it reappears. The machine-readable contract is `config/genworks-layout.json`.
+`tools/audit_genworks_layout.py` validates manifest identity, product-root containment, duplicate product IDs, missing referenced assets, forbidden asset roots, and production-like assets that still live outside the canonical root. `tests/test_no_published_directories.py` rejects either deprecated Published directory if it reappears. The machine-readable contract is `config/genworks-layout.json`.
 
 ## Distribution boundary
 

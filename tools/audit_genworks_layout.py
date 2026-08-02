@@ -55,6 +55,10 @@ def load_manifests(
     return manifests
 
 
+def matches_root(path: str, root: str) -> bool:
+    return path == root or path == f"{root}.meta" or path.startswith(root + "/")
+
+
 def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     config = read_json(config_path)
     findings: list[Finding] = []
@@ -164,6 +168,7 @@ def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, An
                 )
 
     allowed_external = tuple(config["allowedExternalAssetRoots"])
+    forbidden_roots = tuple(config.get("forbiddenAssetRoots", []))
     production_extensions = {
         value.lower() for value in config["productionExtensions"]
     }
@@ -172,14 +177,21 @@ def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, An
             rel = relative(file, root)
         except ValueError:
             continue
+        if any(matches_root(rel, prefix) for prefix in forbidden_roots):
+            findings.append(
+                Finding(
+                    "error",
+                    "forbidden-asset-root",
+                    rel,
+                    "project-owned Unity assets must use the canonical Assets/GenWorks layout",
+                )
+            )
+            continue
         if not rel.startswith("Assets/") or file.suffix.lower() not in production_extensions:
             continue
         if rel.startswith(config["canonicalRoot"] + "/"):
             continue
-        if any(
-            rel == prefix or rel.startswith(prefix + "/")
-            for prefix in allowed_external
-        ):
+        if any(matches_root(rel, prefix) for prefix in allowed_external):
             continue
         findings.append(
             Finding(

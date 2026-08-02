@@ -32,13 +32,13 @@ CONFIG = {
         "previewPath",
         "documentationPath",
     ],
-    "productionExtensions": [".fbx", ".prefab", ".mat", ".png"],
+    "productionExtensions": [".fbx", ".prefab", ".mat", ".png", ".cs"],
     "allowedExternalAssetRoots": [
         "Assets/_Local",
         "Assets/_Vendor",
         "Assets/SiroinoWorks",
-        "Assets/Editor",
     ],
+    "forbiddenAssetRoots": ["Assets/Editor"],
 }
 
 
@@ -114,6 +114,22 @@ class GenWorksLayoutTest(unittest.TestCase):
         self.assertTrue(
             any(
                 item["code"] == "asset-outside-product"
+                for item in result["findings"]
+            )
+        )
+
+    def test_root_editor_folder_is_forbidden(self) -> None:
+        editor = self.root / "Assets" / "Editor"
+        editor.mkdir(parents=True)
+        (editor / "LegacyTool.cs").write_text("class LegacyTool {}", encoding="utf-8")
+        result = audit_genworks_layout.audit(
+            self.root, self.root / "config" / "genworks-layout.json"
+        )
+        self.assertFalse(result["passed"])
+        self.assertTrue(
+            any(
+                item["code"] == "forbidden-asset-root"
+                and item["path"] == "Assets/Editor/LegacyTool.cs"
                 for item in result["findings"]
             )
         )
