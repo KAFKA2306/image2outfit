@@ -1,0 +1,125 @@
+name: Render validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - tools/siroino_wide_cargo_release_refit.py
+      - config/products/siroino-wide-cargo/job.json
+      - .github/workflows/render-validation.yml
+
+env:
+  SIROINO_RENDER_REVISION: v17-single-shell-wide-cargo-1
+
+permissions:
+  contents: write
+
+concurrency:
+  group: render-validation-siroino-wide-cargo
+  cancel-in-progress: false
+
+jobs:
+  siroino-wide-cargo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Publish run locator
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .github/status
+          printf '{\n  "runId": %s,\n  "headSha": "%s",\n  "revision": "%s",\n  "status": "running"\n}\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_SHA" "$SIROINO_RENDER_REVISION" > .github/status/render-validation.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/status/render-validation.json
+          git commit -m "Record render validation ${GITHUB_RUN_ID} start" || exit 0
+          git pull --rebase --autostash origin main
+          git push origin HEAD:main
+
+      - name: Install Blender runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 \
+            libgl1 libegl1 libx11-6 libxxf86vm1
+          curl --fail --location --retry 4 --retry-all-errors \
+            https://download.blender.org/release/Blender4.4/blender-4.4.3-linux-x64.tar.xz \
+            --output blender.tar.xz
+          mkdir -p .image2outfit/blender
+          tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
+          python_exe=.image2outfit/blender/4.4/python/bin/python3.11
+          "$python_exe" -m ensurepip
+          "$python_exe" -m pip install --disable-pip-version-check --no-deps --only-binary=:all: \
+            -r config/blender-python-requirements.txt
+
+      - name: Generate five-view evidence
+        id: generate
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          mkdir -p Artifacts/siroino-wide-cargo
+          .image2outfit/blender/blender \
+            --background --factory-startup --python-exit-code 1 \
+            --python tools/siroino_wide_cargo_release_refit.py \
+            -- --job config/products/siroino-wide-cargo/job.json \
+            2>&1 | tee Artifacts/siroino-wide-cargo/hosted-blender.log
+
+      - name: Generate pose evidence
+        id: poses
+        shell: bash
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          blend=Assets/GenWorks/Products/siroino-wide-cargo/Source/Blender/SiroinoWideCargo.blend
+          if [ ! -f "$blend" ]; then exit 1; fi
+          .image2outfit/blender/blender \
+            --background "$blend" --python-exit-code 1 \
+            --python tools/siroino_required_pose_entry.py \
+            -- --job config/products/siroino-wide-cargo/job.json \
+            2>&1 | tee Artifacts/siroino-wide-cargo/hosted-poses.log
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-validation-${{ github.run_id }}
+          path: |
+            Artifacts/siroino-wide-cargo
+            Assets/GenWorks/Products/siroino-wide-cargo
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 6
+
+      - name: Commit generated product when both stages pass
+        if: steps.generate.outcome == 'success' && steps.poses.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/update_product_hashes.py --root Assets/GenWorks/Products/siroino-wide-cargo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f Assets/GenWorks/Products/siroino-wide-cargo
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Model Siroino wide cargo outfit"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase --autostash origin main && git push origin HEAD:main && exit 0
+            sleep $((attempt * 3))
+          done
+          exit 1
+
+      - name: Enforce generation result
+        if: always()
+        shell: bash
+        run: |
+          test '${{ steps.generate.outcome }}' = success
+          test '${{ steps.poses.outcome }}' = success
