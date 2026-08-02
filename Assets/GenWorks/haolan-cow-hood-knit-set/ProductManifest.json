@@ -1,40 +1,62 @@
 {
   "schemaVersion": 1,
   "productId": "haolan-cow-hood-knit-set",
-  "productName": "HAOLAN Cow Hood Knit Set v1.0",
-  "status": "REJECTED",
+  "productName": "HAOLAN Cow Hood Knit Set v1.2",
+  "version": "1.2",
+  "status": "WORKING",
+  "classification": "PARTIAL_CHECKPOINT",
   "targetAdapterId": "haolan-v1.6",
   "productRoot": "Assets/GenWorks/haolan-cow-hood-knit-set",
   "outfitPrefabPath": "Assets/GenWorks/haolan-cow-hood-knit-set/Prefab/HAOLAN_CowHoodKnitSet.prefab",
+  "modelPath": "Assets/GenWorks/haolan-cow-hood-knit-set/Models/HAOLAN_CowHoodKnitSet.fbx",
+  "previewPaths": {
+    "front": "Assets/GenWorks/haolan-cow-hood-knit-set/Previews/front.png",
+    "back": "Assets/GenWorks/haolan-cow-hood-knit-set/Previews/back.png",
+    "left": "Assets/GenWorks/haolan-cow-hood-knit-set/Previews/left.png",
+    "right": "Assets/GenWorks/haolan-cow-hood-knit-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/haolan-cow-hood-knit-set/Previews/three-quarter.png"
+  },
   "previewPath": "Assets/GenWorks/haolan-cow-hood-knit-set/Previews/HAOLAN_CowHoodKnitSet_preview.webp",
   "documentationPath": "Assets/GenWorks/haolan-cow-hood-knit-set/README.md",
   "sourceJobPath": "config/products/haolan-cow-hood-knit-set/job.json",
+  "metrics": {
+    "meshObjects": 24,
+    "vertices": 18394,
+    "triangles": 34778,
+    "materials": 5,
+    "bones": 16,
+    "maxBoneInfluences": 3
+  },
   "technicalGates": {
-    "blender": "MISSING_EDITABLE_SOURCE",
-    "fbx": "PASS_STATIC_AUDIT",
+    "blender": "NOT_RUN",
+    "fbx": "PASS",
     "unityImport": "NOT_RUN",
-    "prefabSerialized": "PRESERVED_UNVERIFIED",
+    "prefabSerialized": "PASS",
     "prefabReload": "NOT_RUN",
-    "modularAvatar": "NOT_RUN"
+    "modularAvatar": "NOT_RUN",
+    "humanVisualReview": "PASS",
+    "humanPoseReview": "NOT_RUN",
+    "humanRuntimeReview": "NOT_RUN"
   },
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/haolan-cow-hood-knit-set",
     "doNotRebuildFromZero": true,
     "decision": "NO-GO",
-    "resumeFrom": "Assets/GenWorks/haolan-cow-hood-knit-set/Models/HAOLAN_CowHoodKnitSet.fbx",
+    "resumeFrom": "Assets/GenWorks/haolan-cow-hood-knit-set/ProductManifest.json",
     "blockers": [
-      "Replace the blockout-level hood, sleeves, seams, hardware, and material finish identified in Documentation/Audit/VISUAL_REVIEW.md",
-      "Create and serialize the HAOLAN-integrated Modular Avatar prefab",
-      "Capture distinct front, back, left, right, three-quarter, pose-review, Unity, and VRChat runtime evidence",
-      "Pass Unity 2022.3.22f1 import/save-reload, animated clipping, and VRChat Build & Test"
+      "Pass Unity 2022.3.22f1 import/save-reload",
+      "Pass animated clipping and pose review",
+      "Create and validate the HAOLAN-integrated Modular Avatar prefab",
+      "Pass VRChat Build & Test and in-headset review"
     ]
   },
   "knownEvidence": {
     "staticGeometry": "PASS",
-    "manualVisualReview": "REJECTED",
+    "manualVisualReview": "PASS_WITH_RUNTIME_GATES_OPEN",
     "unityImport": "NOT_RUN",
     "animatedClipping": "NOT_RUN",
     "vrchatRuntime": "NOT_RUN"
-  }
+  },
+  "generatedAt": "2026-08-02T06:54:34.878517+00:00"
 }

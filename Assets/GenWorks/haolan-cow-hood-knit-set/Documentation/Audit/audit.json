@@ -1,19 +1,19 @@
 {
-  "product": "HAOLAN Cow Hood Knit Set v1.0",
-  "generatedAt": "2026-07-30T03:40:00Z",
+  "product": "HAOLAN Cow Hood Knit Set v1.2",
+  "generatedAt": "2026-08-02T06:54:34.680414+00:00",
   "reference": "user-provided screenshot 15841.jpg; source image is not redistributed",
   "targetAvatar": "HAOLAN Lowpoly",
   "sourceAvatarSha256": "281d2c4e0df01969a89efae51d1a8e71042ca5ec2e4439886798830f06b7eb33",
   "decision": "NO-GO",
-  "decisionScope": "customer/product release",
+  "decisionScope": "customer release; canonical static checkpoint PASS",
   "staticGeometry": {
     "passed": true,
     "errors": [],
     "warnings": [],
     "metrics": {
-      "meshObjects": 19,
-      "vertices": 4302,
-      "triangles": 7710,
+      "meshObjects": 24,
+      "vertices": 18394,
+      "triangles": 34778,
       "materials": 5,
       "maxBoneInfluences": 3,
       "nonFiniteValues": 0,
@@ -22,99 +22,124 @@
       "weightSumErrors": 0,
       "staticBodyClearance": {
         "SheerBodysuit": {
-          "minNearestVertexDistanceM": 0.003408223156635703,
-          "p05NearestVertexDistanceM": 0.008377610896037328,
-          "medianNearestVertexDistanceM": 0.019595372825899703
+          "minNearestVertexDistanceM": 0.00475738690760433,
+          "p05NearestVertexDistanceM": 0.00964035506191423,
+          "medianNearestVertexDistanceM": 0.025075455670537646
         },
         "CroppedHoodieTop": {
-          "minNearestVertexDistanceM": 0.001902811679421908,
-          "p05NearestVertexDistanceM": 0.008276058476952577,
-          "medianNearestVertexDistanceM": 0.017169584994014615
+          "minNearestVertexDistanceM": 0.008947738054003253,
+          "p05NearestVertexDistanceM": 0.012510961216918042,
+          "medianNearestVertexDistanceM": 0.023782911098504916
+        },
+        "TopHem": {
+          "minNearestVertexDistanceM": 0.0020880613017821128,
+          "p05NearestVertexDistanceM": 0.005506608446360892,
+          "medianNearestVertexDistanceM": 0.016897894731507136
         },
         "Sleeve_L": {
-          "minNearestVertexDistanceM": 0.0025723182428235495,
-          "p05NearestVertexDistanceM": 0.030966088279865096,
-          "medianNearestVertexDistanceM": 0.057021314886444616
+          "minNearestVertexDistanceM": 0.0017221625625901745,
+          "p05NearestVertexDistanceM": 0.011382760168686579,
+          "medianNearestVertexDistanceM": 0.03936786688217399
         },
         "Sleeve_R": {
-          "minNearestVertexDistanceM": 0.0025723182428235495,
-          "p05NearestVertexDistanceM": 0.030966088279865096,
-          "medianNearestVertexDistanceM": 0.057021314886444616
+          "minNearestVertexDistanceM": 0.001722162562590172,
+          "p05NearestVertexDistanceM": 0.011393115174823784,
+          "medianNearestVertexDistanceM": 0.039676456395470544
         },
         "FuzzyCuff_L": {
-          "minNearestVertexDistanceM": 0.03255045650214307,
-          "p05NearestVertexDistanceM": 0.035284984946890925,
-          "medianNearestVertexDistanceM": 0.05016419021937292
+          "minNearestVertexDistanceM": 0.003559519614268776,
+          "p05NearestVertexDistanceM": 0.009461811405736268,
+          "medianNearestVertexDistanceM": 0.028671548477044742
         },
         "FuzzyCuff_R": {
-          "minNearestVertexDistanceM": 0.03255045650214307,
-          "p05NearestVertexDistanceM": 0.035284984946890925,
-          "medianNearestVertexDistanceM": 0.05016419021937292
+          "minNearestVertexDistanceM": 0.0035595196142687857,
+          "p05NearestVertexDistanceM": 0.009461811405736277,
+          "medianNearestVertexDistanceM": 0.02867154847704472
         },
         "WristCuff_L": {
-          "minNearestVertexDistanceM": 0.016379639977525867,
-          "p05NearestVertexDistanceM": 0.0225541896348869,
-          "medianNearestVertexDistanceM": 0.04507380758630766
+          "minNearestVertexDistanceM": 0.002709935159121339,
+          "p05NearestVertexDistanceM": 0.009814276398064198,
+          "medianNearestVertexDistanceM": 0.07368770571556987
         },
         "WristCuff_R": {
-          "minNearestVertexDistanceM": 0.016379639977525867,
-          "p05NearestVertexDistanceM": 0.0225541896348869,
-          "medianNearestVertexDistanceM": 0.04507380758630766
+          "minNearestVertexDistanceM": 0.002709935159121385,
+          "p05NearestVertexDistanceM": 0.009814276398064216,
+          "medianNearestVertexDistanceM": 0.07368770571556987
         },
         "PleatedSkirt": {
-          "minNearestVertexDistanceM": 0.00254193209000148,
-          "p05NearestVertexDistanceM": 0.01112474201580551,
-          "medianNearestVertexDistanceM": 0.028172533933328445
+          "minNearestVertexDistanceM": 0.0004438360910821013,
+          "p05NearestVertexDistanceM": 0.006848774203012567,
+          "medianNearestVertexDistanceM": 0.01604187571851573
+        },
+        "SkirtHem": {
+          "minNearestVertexDistanceM": 0.015275517824265405,
+          "p05NearestVertexDistanceM": 0.01929653937476973,
+          "medianNearestVertexDistanceM": 0.032269958457852035
         },
         "Waistband": {
-          "minNearestVertexDistanceM": 0.002098271391177872,
-          "p05NearestVertexDistanceM": 0.006432846697610274,
-          "medianNearestVertexDistanceM": 0.016649027573526105
+          "minNearestVertexDistanceM": 0.003983757439060871,
+          "p05NearestVertexDistanceM": 0.004261190015017759,
+          "medianNearestVertexDistanceM": 0.014595967170983602
         },
         "CatHood": {
-          "minNearestVertexDistanceM": 0.005466266116611983,
-          "p05NearestVertexDistanceM": 0.025557846198424918,
-          "medianNearestVertexDistanceM": 0.16108998986862128
+          "minNearestVertexDistanceM": 0.0042655974705917594,
+          "p05NearestVertexDistanceM": 0.03016301907253907,
+          "medianNearestVertexDistanceM": 0.14480258187637057
+        },
+        "HoodFaceRib": {
+          "minNearestVertexDistanceM": 0.028307974203199568,
+          "p05NearestVertexDistanceM": 0.0350117849874304,
+          "medianNearestVertexDistanceM": 0.10674818743242886
         },
         "HoodEar_L": {
-          "minNearestVertexDistanceM": 0.17517986882071845,
-          "p05NearestVertexDistanceM": 0.17518347877823084,
-          "medianNearestVertexDistanceM": 0.19878195339787186
+          "minNearestVertexDistanceM": 0.10354226190305095,
+          "p05NearestVertexDistanceM": 0.11677999950547087,
+          "medianNearestVertexDistanceM": 0.17972546811766754
         },
         "HoodEar_R": {
-          "minNearestVertexDistanceM": 0.17517986882071845,
-          "p05NearestVertexDistanceM": 0.17518347877823084,
-          "medianNearestVertexDistanceM": 0.19878195339787186
+          "minNearestVertexDistanceM": 0.10354226190305095,
+          "p05NearestVertexDistanceM": 0.11677999950547087,
+          "medianNearestVertexDistanceM": 0.17972546811766754
         },
         "EarInner_L": {
-          "minNearestVertexDistanceM": 0.18988681685617714,
-          "p05NearestVertexDistanceM": 0.1900139258981233,
-          "medianNearestVertexDistanceM": 0.20531383693329858
+          "minNearestVertexDistanceM": 0.12256018929489297,
+          "p05NearestVertexDistanceM": 0.13045803689262853,
+          "medianNearestVertexDistanceM": 0.1747932292638879
         },
         "EarInner_R": {
-          "minNearestVertexDistanceM": 0.18988681685617714,
-          "p05NearestVertexDistanceM": 0.1900139258981233,
-          "medianNearestVertexDistanceM": 0.20531383693329858
+          "minNearestVertexDistanceM": 0.12256018929489297,
+          "p05NearestVertexDistanceM": 0.13045803689262853,
+          "medianNearestVertexDistanceM": 0.1747932292638879
         },
         "NeckCollar": {
-          "minNearestVertexDistanceM": 0.0013050043017484878,
-          "p05NearestVertexDistanceM": 0.007089148665495119,
-          "medianNearestVertexDistanceM": 0.016475881919632264
+          "minNearestVertexDistanceM": 0.004615524604118772,
+          "p05NearestVertexDistanceM": 0.012735321371252842,
+          "medianNearestVertexDistanceM": 0.03366074399887438
         },
         "HeartRing": {
-          "minNearestVertexDistanceM": 0.01949811531625094,
-          "p05NearestVertexDistanceM": 0.02073364690420579,
-          "medianNearestVertexDistanceM": 0.03457706158457901
+          "minNearestVertexDistanceM": 0.006419005652549932,
+          "p05NearestVertexDistanceM": 0.006958953743284333,
+          "medianNearestVertexDistanceM": 0.01672425485023056
+        },
+        "Drawstring_L": {
+          "minNearestVertexDistanceM": 0.006091204525967917,
+          "p05NearestVertexDistanceM": 0.00991639681738813,
+          "medianNearestVertexDistanceM": 0.024837666869502374
+        },
+        "Drawstring_R": {
+          "minNearestVertexDistanceM": 0.006091204525967952,
+          "p05NearestVertexDistanceM": 0.009916396817388153,
+          "medianNearestVertexDistanceM": 0.024837666869502388
         },
         "SoftTail": {
-          "minNearestVertexDistanceM": 0.006021734724053426,
-          "p05NearestVertexDistanceM": 0.018374876804527974,
-          "medianNearestVertexDistanceM": 0.12308972501681284
+          "minNearestVertexDistanceM": 0.00527582096801911,
+          "p05NearestVertexDistanceM": 0.01696756227098362,
+          "medianNearestVertexDistanceM": 0.0845824331724259
         },
         "TailTip": {
-          "minNearestVertexDistanceM": 0.1952353902002922,
-          "p05NearestVertexDistanceM": 0.19606372713734532,
-          "medianNearestVertexDistanceM": 0.21949847247429694
+          "minNearestVertexDistanceM": 0.1554885346188334,
+          "p05NearestVertexDistanceM": 0.15644632312233528,
+          "medianNearestVertexDistanceM": 0.1801192802139538
         }
       }
     }
@@ -127,44 +152,54 @@
         "material": "SheerBlack"
       },
       "CroppedHoodieTop": {
-        "vertices": 264,
-        "triangles": 440,
+        "vertices": 504,
+        "triangles": 864,
         "material": "CowKnit"
       },
+      "TopHem": {
+        "vertices": 216,
+        "triangles": 288,
+        "material": "BlackKnit"
+      },
       "Sleeve_L": {
-        "vertices": 532,
-        "triangles": 1008,
+        "vertices": 2128,
+        "triangles": 4144,
         "material": "CowKnit"
       },
       "Sleeve_R": {
-        "vertices": 532,
-        "triangles": 1008,
+        "vertices": 2128,
+        "triangles": 4144,
         "material": "CowKnit"
       },
       "FuzzyCuff_L": {
-        "vertices": 140,
-        "triangles": 224,
+        "vertices": 504,
+        "triangles": 896,
         "material": "BlackFuzzy"
       },
       "FuzzyCuff_R": {
-        "vertices": 140,
-        "triangles": 224,
+        "vertices": 504,
+        "triangles": 896,
         "material": "BlackFuzzy"
       },
       "WristCuff_L": {
-        "vertices": 140,
-        "triangles": 224,
+        "vertices": 504,
+        "triangles": 896,
         "material": "BlackKnit"
       },
       "WristCuff_R": {
-        "vertices": 140,
-        "triangles": 224,
+        "vertices": 504,
+        "triangles": 896,
         "material": "BlackKnit"
       },
       "PleatedSkirt": {
-        "vertices": 480,
-        "triangles": 864,
+        "vertices": 2304,
+        "triangles": 4416,
         "material": "CowKnit"
+      },
+      "SkirtHem": {
+        "vertices": 288,
+        "triangles": 384,
+        "material": "BlackKnit"
       },
       "Waistband": {
         "vertices": 96,
@@ -172,39 +207,54 @@
         "material": "CowKnit"
       },
       "CatHood": {
-        "vertices": 612,
-        "triangles": 1122,
+        "vertices": 4896,
+        "triangles": 9646,
         "material": "CowKnit"
       },
+      "HoodFaceRib": {
+        "vertices": 848,
+        "triangles": 1664,
+        "material": "BlackKnit"
+      },
       "HoodEar_L": {
-        "vertices": 6,
-        "triangles": 8,
+        "vertices": 220,
+        "triangles": 396,
         "material": "CowKnit"
       },
       "HoodEar_R": {
-        "vertices": 6,
-        "triangles": 8,
+        "vertices": 220,
+        "triangles": 396,
         "material": "CowKnit"
       },
       "EarInner_L": {
-        "vertices": 6,
-        "triangles": 8,
+        "vertices": 220,
+        "triangles": 396,
         "material": "BlackKnit"
       },
       "EarInner_R": {
-        "vertices": 6,
-        "triangles": 8,
+        "vertices": 220,
+        "triangles": 396,
         "material": "BlackKnit"
       },
       "NeckCollar": {
-        "vertices": 400,
-        "triangles": 800,
+        "vertices": 672,
+        "triangles": 1344,
         "material": "BlackKnit"
       },
       "HeartRing": {
         "vertices": 82,
         "triangles": 160,
         "material": "SilverMetal"
+      },
+      "Drawstring_L": {
+        "vertices": 308,
+        "triangles": 588,
+        "material": "BlackKnit"
+      },
+      "Drawstring_R": {
+        "vertices": 308,
+        "triangles": 588,
+        "material": "BlackKnit"
       },
       "SoftTail": {
         "vertices": 324,
@@ -217,9 +267,9 @@
         "material": "BlackFuzzy"
       }
     },
-    "vertices": 4302,
-    "triangles": 7710,
-    "meshObjects": 19,
+    "vertices": 18394,
+    "triangles": 34778,
+    "meshObjects": 24,
     "materials": 5,
     "bones": 16,
     "maxBoneInfluences": 3
@@ -247,72 +297,83 @@
   ],
   "deliverables": {
     "HAOLAN_CowHoodKnitSet.fbx": {
-      "sha256": "6e92deb1dabec8dfc8e86916807a34b63d086e33a796aebd342b2aba2b93ca0c",
-      "bytes": 775727
+      "sha256": "462ce00b7e82e0f59fe0e69ea04ac858aaabc1fb70bf0620f4b4d748fc7236b1",
+      "bytes": 3169059
     },
     "HAOLAN_CowHoodKnitSet.fbx.meta": {
-      "sha256": "dc252e443dfb746c0f3d58f1096ad313e4be568a0ccffbef539f8e2a0f483640",
-      "bytes": 1933
+      "sha256": "e1d6c85186a74944e56bf8d128bc1ed7f56610a4d7beba800b5c35de507cd3ee",
+      "bytes": 1857
     },
     "HAOLAN_CowHoodKnitSet.prefab": {
-      "sha256": "e79aa3399531ff442872bfe6a1ecab4643d318efd920d81963055ccc1bc07d74",
-      "bytes": 1820
+      "sha256": "319dbfdf791be835cd968a7827500ac56f2b8c7004f9b09ea1c9428b839f8867",
+      "bytes": 1773
     },
     "HAOLAN_CowHoodKnitSet.prefab.meta": {
-      "sha256": "d4b184ec3920675c325f7a922b9c4759a1e04efef306201b0dbf054704dc718c",
-      "bytes": 161
+      "sha256": "df9814b981a6f0dea1e8ca6792660ffbea1d5710621f66322c4da0308b50d8fe",
+      "bytes": 154
     },
     "HAOLAN_CowHoodKnitSet_preview.glb": {
-      "sha256": "a08b5bf1f3061a26ea4b8cef008a5e8684670b93f66eed4ebcbe78cd30ab8cd7",
-      "bytes": 169340
+      "sha256": "3ae59a17e96b53a3c665048e30420be1ea8b749d0457cb017af5016b96a9716f",
+      "bytes": 624252
     },
     "HAOLAN_CowHoodKnitSet_preview.obj": {
-      "sha256": "c4df44c0cb062fd90d4656d240ff8a78019953a931573787fbbf756436489eb2",
-      "bytes": 433834
+      "sha256": "5ad1bea3baa4c7c1904e98b3dddf5d4153ef32403e55ac525554d8b09a39f59c",
+      "bytes": 1903186
     },
     "HAOLAN_CowHoodKnitSet_preview.webp": {
-      "sha256": "0ebb15fb0c3f9281df98b9d9f4a62dc09eef0daa5e464ecb8b1c016bedf80965",
-      "bytes": 85902
+      "sha256": "3bb52e64ffdce38796908a4a4fbffb089e49ee639c88e76115603ee57306ee08",
+      "bytes": 113622
     },
     "Preview/back.png": {
-      "sha256": "0d5302e07069f0104c119a05efb3c6f98bcf70038fdbc6f10e03e75432af1e59",
-      "bytes": 275499
+      "sha256": "53d6ca067115a35109f8e70f1aa4fa917d22c9728e554e4de7a35673aee22cc9",
+      "bytes": 192872
     },
     "Preview/front.png": {
-      "sha256": "03adbb6e1f6adb9e2a06de8e18db4d448381d99df56792894069dc66937ad462",
-      "bytes": 255146
+      "sha256": "dc0dd221d75e97a98335b16dc348f778757314310e9d182f5ec4fc2a91f7337f",
+      "bytes": 295338
     },
-    "Preview/side.png": {
-      "sha256": "93a1060c7124258057a161c9ddff277e6d61c4df4ecc7354cb9692225c67812d",
-      "bytes": 231177
+    "Preview/left.png": {
+      "sha256": "5b5aeb4d4215e04f60a812969edfb5bbae55f910f2cac7ce236c3af4071b4306",
+      "bytes": 184883
+    },
+    "Preview/right.png": {
+      "sha256": "cdbe1fb4de452e0de1ce3c4b595e080a633670792513c063ec72da1acca9607e",
+      "bytes": 173612
     },
     "Preview/three_quarter.png": {
-      "sha256": "f43f06ef2ca5e6ce158750ead229bb26c6e388a7d4a41406ef9b3af0d3c5fdda",
-      "bytes": 298411
+      "sha256": "fa6aa015b65cba58444d0b845caaca8de804b4580cce7464b16c93f40389b986",
+      "bytes": 304340
     },
     "Textures/black_fuzzy_albedo.png": {
-      "sha256": "5e957ed289ffa7bf20d06117a6858a74c0449f6655f9d7686390eaf5977c5f83",
-      "bytes": 82643
+      "sha256": "7be55df495487e681eb15f10a3fc9067a68b71a65e20fbb2e1f2f5b9fd72475f",
+      "bytes": 86323
     },
     "Textures/black_knit_albedo.png": {
-      "sha256": "265d27d1d3c2f1027c0ce7d359f8854b7f55660b078a2f824b0d53e8a1015a0a",
-      "bytes": 1974
+      "sha256": "2383c13d77ce9b4ffb71ba175a7e97e1c1b7319819b9c248f8819176398ecb0a",
+      "bytes": 1976
     },
     "Textures/cow_knit_albedo.png": {
-      "sha256": "1b6d6671d4af20c809f6931aedbfa673b87bf5b69014b71ed4e275a2e886755f",
-      "bytes": 68795
+      "sha256": "33fa34379069c713c061ad59747590166c2c6594df53f40ae0a1e5c2afc2a98a",
+      "bytes": 66965
     },
     "Textures/cow_knit_normal.png": {
-      "sha256": "dc69dfc30f1d095bd3763777808a6eee47730d5cb9f926ca599cad3894c562a2",
-      "bytes": 20328
+      "sha256": "d6dfcc43756760dea1e5c175a528330ef0494172dfc72fdc5212f9a13a157f7b",
+      "bytes": 9357
     },
     "Textures/cow_knit_roughness.png": {
-      "sha256": "a52650470c7b02e80bc86a0d5b94542d87b5f520aaab1c0c15d4ff5d26ae51a2",
-      "bytes": 107319
+      "sha256": "03504a90de8eadb4cab304be83cde0c7c0ed64f5d6f30953d9120ccd3d068751",
+      "bytes": 110281
     },
     "Textures/sheer_black_albedo.png": {
-      "sha256": "9751e6035fd43f4f304d28197248ed5e03697c8259082447f18317299948238c",
-      "bytes": 3010
+      "sha256": "17f84872f9fe4fd9123099d15bca7342c6d3be5d45d279d46d51643ff2c1af0b",
+      "bytes": 2577
     }
+  },
+  "productRoot": "Assets/GenWorks/haolan-cow-hood-knit-set",
+  "pathReview": {
+    "canonicalRoot": "PASS",
+    "canonicalPrefabPattern": "PASS",
+    "frontBackLabelsCorrected": true,
+    "legacyRemoved": true
   }
 }
