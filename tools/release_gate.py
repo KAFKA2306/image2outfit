@@ -19,6 +19,10 @@ import pipeline as legacy
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "release-policy.json"
+JOB_SCHEMA_PATH = ROOT / "config" / "job.schema.v2.json"
+UNITY_PIPELINE_PATH = (
+    ROOT / "Assets" / "GenWorks" / "Shared" / "Editor" / "Image2OutfitPipeline.cs"
+)
 
 
 def now() -> str:
@@ -59,6 +63,21 @@ def inside(value: Path, root: Path) -> bool:
     return value == root or root in value.parents
 
 
+def required_job_fields() -> tuple[str, ...]:
+    schema = read(JOB_SCHEMA_PATH)
+    required = schema.get("required")
+    if not isinstance(required, list) or not required or not all(
+        isinstance(value, str) and value for value in required
+    ):
+        raise ValueError("job.schema.v2.json must define a non-empty required array")
+    expected_version = (
+        schema.get("properties", {}).get("schemaVersion", {}).get("const")
+    )
+    if expected_version != 2:
+        raise ValueError("job.schema.v2.json must require schemaVersion 2")
+    return tuple(required)
+
+
 def load(job_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     policy = read(POLICY_PATH)
     job = read(job_path)
@@ -66,12 +85,7 @@ def load(job_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         raise ValueError("release-policy.json must use schemaVersion 1")
     if job.get("schemaVersion") != 2:
         raise ValueError("legacy jobs are disabled; schemaVersion must be 2")
-    required = (
-        "id", "productName", "adapterId", "buildScript", "blendPath", "fbxAssetPath",
-        "prefabAssetPath", "integratedPrefabAssetPath", "targetAvatarAssetPath",
-        "artifactDir", "candidateDir", "releaseDir", "licenseEvidence",
-        "privateSourceRoots", "deliveryAssets", "previewPaths", "humanEvidence",
-    )
+    required = required_job_fields()
     missing = [key for key in required if key not in job or job[key] in (None, "")]
     if missing:
         raise ValueError(f"job v2 missing: {', '.join(missing)}")
@@ -137,12 +151,13 @@ def inputs(job_path: Path, job: dict[str, Any]) -> dict[str, str]:
     files = {
         "job": job_path,
         "policy": POLICY_PATH,
+        "jobSchema": JOB_SCHEMA_PATH,
         "toolchainLock": ROOT / "config" / "toolchain-lock.json",
         "blenderPythonRequirements": ROOT / "config" / "blender-python-requirements.txt",
         "vpmManifest": ROOT / "Packages" / "vpm-manifest.json",
         "upmManifest": ROOT / "Packages" / "manifest.json",
         "projectVersion": ROOT / "ProjectSettings" / "ProjectVersion.txt",
-        "unityPipeline": ROOT / "Assets" / "Editor" / "Image2OutfitPipeline.cs",
+        "unityPipeline": UNITY_PIPELINE_PATH,
         "buildScript": path(job["buildScript"]),
         "licenseEvidence": path(job["licenseEvidence"]),
         "targetAvatarAsset": path(job["targetAvatarAssetPath"]),
