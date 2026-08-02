@@ -24,7 +24,7 @@ on:
       - ProjectSettings/ProjectVersion.txt
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: image2outfit-self-hosted-${{ github.event.pull_request.number || inputs.job_path }}
@@ -39,8 +39,9 @@ jobs:
       - name: Checkout tracked pipeline without deleting private avatar sources
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref || github.ref_name }}
           clean: false
-          persist-credentials: false
+          persist-credentials: true
           fetch-depth: 0
 
       - uses: arduino/setup-task@v2
@@ -143,6 +144,27 @@ jobs:
           }
           uv run --no-cache --no-project python tools/audit_repository_hygiene.py
           if ($LASTEXITCODE -ne 0) { throw 'Repository hygiene audit failed' }
+
+      - name: Persist generated product workspace to pull request branch
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: pwsh
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- $env:PRODUCT_ROOT
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host 'Generated product workspace already matches the tracked branch.'
+            exit 0
+          }
+          if ($LASTEXITCODE -ne 1) { throw 'Could not inspect generated product diff' }
+          git commit -m "build: materialize $env:JOB_ID candidate"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not commit generated product workspace' }
+          git push origin "HEAD:$env:HEAD_REF"
+          if ($LASTEXITCODE -ne 0) { throw 'Could not push generated product workspace' }
 
       - name: Upload product, candidate, and evidence
         if: always()
