@@ -16,13 +16,15 @@ image2outfitは、衣装仕様からBlender、FBX、Unity Prefab、実レンダ�
 ## 正規構成
 
 ```text
+pyproject.toml
+uv.lock
+
 config/
   job.schema.v2.json
   release-policy.json
   genworks-layout.json
   genworks-handoff-policy.json
   toolchain-lock.json
-  blender-python-requirements.txt
   products/<slug>/
     job.json
     license.json
@@ -118,7 +120,7 @@ vpm resolve project .
 python tools/audit_toolchain.py
 ```
 
-`Packages/vpm-manifest.json` がVPM依存を宣言し、Unityが `Packages/packages-lock.json` を管理します。lockファイルを手作業で書き換えません。Blender用Python依存は `config/blender-python-requirements.txt` から、Git管理外のローカル環境へ復元します。
+`Packages/vpm-manifest.json` がVPM依存を宣言し、Unityが `Packages/packages-lock.json` を管理します。lockファイルを手作業で書き換えません。Python依存は `pyproject.toml` を唯一の宣言元、`uv.lock` を解決結果の正本とし、Blender内蔵Python向け環境は `tools/blender_python_env.py` がGit管理外のローカル領域へ復元・検証します。
 
 ## Unity／Modular Avatarの契約
 
@@ -153,6 +155,7 @@ python tools/audit_toolchain.py
 
 ## 正規の契約ファイル
 
+- `pyproject.toml` / `uv.lock` — Python依存の宣言と固定解決結果
 - `config/job.schema.v2.json` — job必須フィールド
 - `config/products/<slug>/job.json` — 製品固有の生成・検証・納品定義
 - `config/products/<slug>/license.json` — 権利・再配布境界
