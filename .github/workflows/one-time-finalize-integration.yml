@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
+          test -f tools/migrate_genworks_layout_once.py
           python tools/migrate_genworks_layout_once.py
 
           for job in config/products/*/job.json; do
