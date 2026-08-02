@@ -14,9 +14,9 @@
   "previewPaths": {
     "front": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/front.png",
     "back": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/back.png",
-    "side": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/side.png",
-    "threeQuarter": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/three_quarter.png",
-    "multiview": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/cow-hood-knit-set-v1-multiview.webp"
+    "left": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/left.png",
+    "right": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/three_quarter.png"
   },
   "metrics": {
     "meshObjects": 24,
@@ -26,6 +26,23 @@
     "bones": 16,
     "maxBoneInfluences": 3
   },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/cow-hood-knit-set-v1",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "ProductManifest.json and audit.json"
+  },
+  "technicalGates": {
+    "blender": "NOT_RUN",
+    "fbx": "PASS",
+    "unityImport": "NOT_RUN",
+    "prefabSerialized": "PASS",
+    "prefabReload": "NOT_RUN",
+    "modularAvatar": "NOT_RUN",
+    "humanVisualReview": "PASS",
+    "humanPoseReview": "NOT_RUN",
+    "humanRuntimeReview": "NOT_RUN"
+  },
   "qualityGates": {
     "staticGeometry": "PASS",
     "manualVisualCheckpoint": "PASS_WITH_RUNTIME_GATES_OPEN",
@@ -34,5 +51,6 @@
     "vrchatBuildTest": "NOT_RUN",
     "inHeadset": "NOT_RUN"
   },
-  "generatedAt": "2026-08-02T06:28:41.333777+00:00"
+  "multiviewPath": "Assets/GenWorks/cow-hood-knit-set-v1/Previews/cow-hood-knit-set-v1-multiview.webp",
+  "generatedAt": "2026-08-02T06:34:30.481345+00:00"
 }
