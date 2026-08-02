@@ -3,9 +3,8 @@
 
 The seed is expected to contain the target body and armature. This tool exports
 only that body/armature to a temporary FBX, verifies required body shape keys,
-materializes a temporary job, and delegates to the product's normal build
-script. It is a Blender-only fallback; Unity integration remains a separate
-self-hosted gate.
+materializes a temporary job, and delegates to ``productBuildScript``. It is a
+Blender-only fallback; Unity integration remains a separate self-hosted gate.
 """
 from __future__ import annotations
 
@@ -26,7 +25,7 @@ def parse_args() -> argparse.Namespace:
     raw = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else sys.argv[1:]
     parser = argparse.ArgumentParser()
     parser.add_argument("--job", required=True)
-    parser.add_argument("--seed-config", required=True)
+    parser.add_argument("--seed-config")
     return parser.parse_args(raw)
 
 
@@ -91,8 +90,14 @@ def verify_large_keys(body: bpy.types.Object, profile: dict[str, float]) -> dict
 def main() -> int:
     args = parse_args()
     tracked_job = Path(args.job).resolve()
-    seed_config_path = Path(args.seed_config).resolve()
+    seed_config_path = (
+        Path(args.seed_config).resolve()
+        if args.seed_config
+        else tracked_job.parent / "hosted-seed.json"
+    )
     job = json.loads(tracked_job.read_text(encoding="utf-8-sig"))
+    if not seed_config_path.is_file():
+        raise FileNotFoundError(f"hosted seed config not found: {seed_config_path}")
     seed_config = json.loads(seed_config_path.read_text(encoding="utf-8-sig"))
     seed_value = seed_config.get("targetSeedBlendPath")
     if not isinstance(seed_value, str) or not seed_value:
@@ -134,9 +139,14 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    build_script = repo_path(job["buildScript"])
+    build_script_value = job.get("productBuildScript")
+    if not isinstance(build_script_value, str) or not build_script_value:
+        raise ValueError("job.productBuildScript is required for hosted seed builds")
+    build_script = repo_path(build_script_value)
+    if build_script.resolve() == Path(__file__).resolve():
+        raise RuntimeError("productBuildScript cannot point back to the seed wrapper")
     if not build_script.is_file():
-        raise FileNotFoundError(f"product build script not found: {job['buildScript']}")
+        raise FileNotFoundError(f"product build script not found: {build_script_value}")
     sys.argv = [str(build_script), "--", "--job", str(materialized_path)]
     try:
         runpy.run_path(str(build_script), run_name="__main__")
