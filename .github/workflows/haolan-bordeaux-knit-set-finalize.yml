@@ -1,0 +1,233 @@
+name: Finalize HAOLAN Bordeaux knit set
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - config/products/haolan-bordeaux-knit-set/**
+      - Assets/GenWorks/haolan-bordeaux-knit-set/**
+      - tools/build_haolan_bordeaux_knit_set.py
+      - tools/haolan_knit_build.py
+      - tools/render_haolan_candidate_turnaround.py
+      - tools/render_haolan_candidate_poses.py
+      - tools/compose_turnaround.py
+      - tools/compose_pose_review.py
+      - .github/workflows/haolan-bordeaux-knit-set-finalize.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: haolan-bordeaux-knit-set-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: [self-hosted, windows, x64, image2outfit]
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout PR branch without deleting licensed local sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          clean: false
+          persist-credentials: true
+          fetch-depth: 0
+
+      - uses: arduino/setup-task@v2
+
+      - name: Resolve exact private HAOLAN assets and local job
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = (Get-Location).Path
+          $excluded = '\\.git\\|\\Assets\\GenWorks\\|\\Artifacts\\|\\Candidates\\|\\Release\\|\\Delivery\\'
+
+          $avatar = Get-ChildItem -Path Assets -Filter 'HAOLAN_Lowpoly.fbx' -Recurse -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -notmatch $excluded } |
+            Select-Object -First 1
+          $prefab = Get-ChildItem -Path Assets -Filter 'HAOLAN_Lowpoly Variant.prefab' -Recurse -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -notmatch $excluded } |
+            Select-Object -First 1
+          if (-not $avatar) { throw 'Exact private HAOLAN_Lowpoly.fbx was not found on the self-hosted runner' }
+          if (-not $prefab) { throw 'Exact private HAOLAN_Lowpoly Variant.prefab was not found on the self-hosted runner' }
+
+          $avatarRel = [IO.Path]::GetRelativePath($root, $avatar.FullName).Replace('\\', '/')
+          $prefabRel = [IO.Path]::GetRelativePath($root, $prefab.FullName).Replace('\\', '/')
+          if (-not $avatarRel.StartsWith('Assets/') -or -not $prefabRel.StartsWith('Assets/')) {
+            throw 'Resolved HAOLAN assets must remain inside ignored Assets roots'
+          }
+
+          $trackedJob = Get-Content -LiteralPath 'config/products/haolan-bordeaux-knit-set/job.json' -Raw | ConvertFrom-Json
+          $trackedJob.targetSourcePath = $avatarRel
+          $trackedJob.targetAvatarAssetPath = $prefabRel
+          $localJob = 'Assets/_Local/Jobs/haolan-bordeaux-knit-set/job.json'
+          New-Item -ItemType Directory -Force -Path (Split-Path -Parent $localJob) | Out-Null
+          $trackedJob | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $localJob -Encoding utf8
+
+          "JOB_PATH=$localJob" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "HAOLAN_AVATAR=$($avatar.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "HAOLAN_PREFAB=$($prefab.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Locate Blender
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $candidates = @()
+          if ($env:BLENDER_EXE) { $candidates += $env:BLENDER_EXE }
+          $command = Get-Command blender -ErrorAction SilentlyContinue
+          if ($command) { $candidates += $command.Source }
+          $candidates += @(
+            'C:/Program Files/Blender Foundation/Blender 4.4/blender.exe',
+            'C:/Program Files/Blender Foundation/Blender 4.3/blender.exe',
+            'C:/Program Files/Blender Foundation/Blender 4.2/blender.exe'
+          )
+          $blender = $candidates | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Leaf) } | Select-Object -First 1
+          if (-not $blender) { throw 'Blender executable was not found' }
+          "BLENDER_EXE=$blender" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Build canonical Blender and FBX checkpoint
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & $env:BLENDER_EXE --background --factory-startup --python-exit-code 1 `
+            --python tools/build_haolan_bordeaux_knit_set.py -- `
+            --job $env:JOB_PATH
+          if ($LASTEXITCODE -ne 0) { throw "HAOLAN Bordeaux Blender build failed: $LASTEXITCODE" }
+
+      - name: Render actual five-view and required-pose evidence
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = 'Assets/GenWorks/haolan-bordeaux-knit-set'
+          $preview = Join-Path $root 'Previews'
+          $poses = Join-Path $preview 'Poses'
+          New-Item -ItemType Directory -Force -Path $preview, $poses | Out-Null
+          $outfit = Join-Path (Get-Location) 'Assets/GenWorks/haolan-bordeaux-knit-set/Models/HAOLAN_BordeauxKnitSet.fbx'
+
+          & $env:BLENDER_EXE --background --factory-startup --python-exit-code 1 `
+            --python tools/render_haolan_candidate_turnaround.py -- `
+            --avatar $env:HAOLAN_AVATAR `
+            --outfit $outfit `
+            --outdir $preview `
+            --resolution 1024
+          if ($LASTEXITCODE -ne 0) { throw "Five-view render failed: $LASTEXITCODE" }
+
+          & $env:BLENDER_EXE --background --factory-startup --python-exit-code 1 `
+            --python tools/render_haolan_candidate_poses.py -- `
+            --avatar $env:HAOLAN_AVATAR `
+            --outfit $outfit `
+            --outdir $poses `
+            --resolution 1024
+          if ($LASTEXITCODE -ne 0) { throw "Required-pose render failed: $LASTEXITCODE" }
+
+          uv run --no-cache --no-project --with pillow python tools/compose_turnaround.py `
+            --input-dir $preview `
+            --output "$preview/HAOLAN_BordeauxKnitSet_multiview.webp"
+          if ($LASTEXITCODE -ne 0) { throw 'Five-view sheet composition failed' }
+
+          uv run --no-cache --no-project --with pillow python tools/compose_pose_review.py `
+            --input-dir $poses `
+            --output "$preview/HAOLAN_BordeauxKnitSet_pose-review.webp"
+          if ($LASTEXITCODE -ne 0) { throw 'Pose-review sheet composition failed' }
+
+      - name: Restore pinned VPM packages
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Get-Command vpm -ErrorAction SilentlyContinue)) { throw 'The official VPM CLI is required' }
+          $repos = (& vpm list repos 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0) { throw "vpm list repos failed: $repos" }
+          foreach ($repo in @('https://vpm.nadena.dev/vpm.json', 'https://vpm.anatawa12.com/vpm.json')) {
+            if ($repos -notmatch [regex]::Escape($repo)) {
+              & vpm add repo $repo
+              if ($LASTEXITCODE -ne 0) { throw "Could not register VPM repository: $repo" }
+            }
+          }
+          & vpm resolve project .
+          if ($LASTEXITCODE -ne 0) { throw 'vpm resolve project failed' }
+
+      - name: Run canonical Blender Unity Modular Avatar and preview gates
+        shell: pwsh
+        run: task candidate JOB="$env:JOB_PATH"
+
+      - name: Persist technical audit and handoff state
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = 'Assets/GenWorks/haolan-bordeaux-knit-set'
+          $auditRoot = Join-Path $root 'Audit'
+          New-Item -ItemType Directory -Force -Path $auditRoot | Out-Null
+          foreach ($name in @('audit.json', 'unity.json', 'vrchat-build-test.json', 'toolchain-source.json', 'toolchain-resolved.json')) {
+            $source = Join-Path 'Artifacts/haolan-bordeaux-knit-set' $name
+            if (Test-Path -LiteralPath $source -PathType Leaf) {
+              Copy-Item -LiteralPath $source -Destination (Join-Path $auditRoot $name) -Force
+            }
+          }
+
+          $audit = Get-Content -LiteralPath (Join-Path $auditRoot 'audit.json') -Raw | ConvertFrom-Json
+          if ([string]$audit.decision -ne 'REVIEW_REQUIRED') {
+            throw "Expected REVIEW_REQUIRED after technical candidate build, got $($audit.decision)"
+          }
+          $manifestPath = Join-Path $root 'ProductManifest.json'
+          $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+          $manifest.status = 'HUMAN_REVIEW_PENDING'
+          $manifest.generatedAt = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
+          $manifest.releaseDecision = 'NO-GO'
+          foreach ($gate in @(
+            'canonicalBlenderBuild',
+            'canonicalFbxStructure',
+            'unityImport',
+            'prefabSerialized',
+            'prefabReload',
+            'modularAvatar',
+            'ndmf',
+            'actualFiveView',
+            'requiredPoseReview'
+          )) {
+            $manifest.technicalGates.$gate = 'PASS'
+          }
+          $manifest.technicalGates.vrchatBuildAndTest = 'PENDING'
+          $manifest.technicalGates.humanVisualReview = 'PENDING'
+          $manifest.technicalGates.humanPoseReview = 'PENDING'
+          $manifest.technicalGates.humanRuntimeReview = 'PENDING'
+          $manifest.handoff.blockers = @(
+            'Inspect the committed five-view and pose-review images for clipping, penetration, silhouette, fit, UV, normal, material, and weight defects',
+            'Run the unchanged integrated Prefab through VRChat SDK Build & Test and local runtime inspection',
+            'Record human visual, pose-penetration, and runtime evidence before release promotion'
+          )
+          $manifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -Encoding utf8
+
+      - name: Commit canonical resumable checkpoint to the PR branch
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $root = 'Assets/GenWorks/haolan-bordeaux-knit-set'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f -- $root
+          if (git diff --cached --quiet) {
+            Write-Host 'Canonical HAOLAN Bordeaux checkpoint already matches the generated candidate.'
+            exit 0
+          }
+          git commit -m 'build: materialize HAOLAN Bordeaux candidate [haolan-bordeaux-generated]'
+          git fetch origin '${{ github.event.pull_request.head.ref }}'
+          git rebase 'origin/${{ github.event.pull_request.head.ref }}'
+          git push origin HEAD:'${{ github.event.pull_request.head.ref }}'
+
+      - name: Upload candidate and technical evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: haolan-bordeaux-knit-set-${{ github.run_id }}
+          path: |
+            Assets/GenWorks/haolan-bordeaux-knit-set
+            Artifacts/haolan-bordeaux-knit-set
+            Candidates/haolan-bordeaux-knit-set
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
