@@ -35,12 +35,12 @@ def resolve_job(product_id: str, root: Path = ROOT) -> Path:
 
 
 def _commercial_policy(root: Path) -> dict[str, Any]:
-    policy = read_json(root / "config" / "release-policy.json").get(
+    value = read_json(root / "config" / "release-policy.json").get(
         "commercialMethodPolicy"
     )
-    if not isinstance(policy, dict):
+    if not isinstance(value, dict):
         raise ValueError("release-policy.json is missing commercialMethodPolicy")
-    return policy
+    return value
 
 
 def _construction_path(root: Path, product_id: str) -> Path:
@@ -48,9 +48,8 @@ def _construction_path(root: Path, product_id: str) -> Path:
 
 
 def _construction_profile(root: Path, product_id: str) -> tuple[str | None, list[str]]:
-    path = _construction_path(root, product_id)
     try:
-        value = read_json(path)
+        value = read_json(_construction_path(root, product_id))
     except (OSError, json.JSONDecodeError) as exc:
         return None, [f"construction config unreadable: {exc}"]
     errors: list[str] = []
@@ -83,8 +82,13 @@ def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
             errors.append(f"unknown construction profile: {profile_name}")
         profile = {}
 
-    if job.get("productRoot") != f"Assets/GenWorks/{product_id}":
-        errors.append("productRoot must match Assets/GenWorks/<product-id>")
+    product_root = job.get("productRoot")
+    valid_product_roots = {
+        f"Assets/GenWorks/{product_id}",
+        f"Assets/GenWorks/Products/{product_id}",
+    }
+    if product_root not in valid_product_roots:
+        errors.append("productRoot must end in the declared product id")
 
     build_script = job.get("buildScript")
     if not isinstance(build_script, str) or not build_script.startswith("tools/"):
@@ -119,20 +123,22 @@ def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
             "research baseline does not cover selected profile: " + ", ".join(missing)
         )
 
-    construction_path = _construction_path(root, product_id)
     return {
         "schemaVersion": 1,
         "passed": not errors,
         "productId": product_id,
+        "productRoot": product_root,
         "commercialProfile": commercial.get("profileId"),
         "constructionProfile": profile_name,
-        "constructionPath": construction_path.relative_to(root).as_posix(),
+        "constructionPath": _construction_path(root, product_id)
+        .relative_to(root)
+        .as_posix(),
         "description": profile.get("description"),
         "buildScript": build_script,
         "hostedPoseScript": pose_script,
         "requiredCapabilities": required_capabilities,
         "requiredCommercialEvidence": list(profile.get("requiredEvidence", [])),
-        "evidenceRoot": f"Assets/GenWorks/{product_id}/Evidence/Commercial",
+        "evidenceRoot": f"{product_root}/Evidence/Commercial",
         "researchBaselineId": research.get("baselineId"),
         "researchProductionCoverage": sorted(coverage),
         "errors": errors,
@@ -210,7 +216,9 @@ def validate_commercial_evidence(
             "status": contract.get("passStatus"),
         }
         item_errors.extend(
-            f"{field} mismatch" for field, value in expected.items() if evidence.get(field) != value
+            f"{field} mismatch"
+            for field, value in expected.items()
+            if evidence.get(field) != value
         )
         if not _valid_timestamp(evidence.get("checkedAt")):
             item_errors.append("checkedAt must be timezone-aware ISO-8601")
