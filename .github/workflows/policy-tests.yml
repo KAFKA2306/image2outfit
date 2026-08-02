@@ -15,6 +15,8 @@ on:
       - ProjectSettings/ProjectVersion.txt
       - Assets/GenWorks/**
       - Taskfile.yml
+      - pyproject.toml
+      - uv.lock
       - .gitignore
       - .github/workflows/**
   push:
@@ -32,6 +34,8 @@ on:
       - ProjectSettings/ProjectVersion.txt
       - Assets/GenWorks/**
       - Taskfile.yml
+      - pyproject.toml
+      - uv.lock
       - .gitignore
       - .github/workflows/**
 
@@ -64,11 +68,13 @@ jobs:
       - name: Run release policy tests
         run: python -m unittest discover -s tests -v
 
-      - name: Parse tracked JSON contracts
+      - name: Parse tracked contracts
         run: |
           python - <<'PY'
           import json
+          import tomllib
           from pathlib import Path
+
           roots = (Path('config'), Path('examples'), Path('Packages'), Path('Assets/GenWorks'))
           paths = sorted(path for root in roots if root.exists() for path in root.rglob('*.json'))
           if not paths:
@@ -76,7 +82,11 @@ jobs:
           for path in paths:
               json.loads(path.read_text(encoding='utf-8-sig'))
               print(f'{path}: PASS')
-          PY
 
-      - name: Check Blender Python requirements
-        run: test -s config/blender-python-requirements.txt
+          with Path('pyproject.toml').open('rb') as stream:
+              project = tomllib.load(stream)
+          dependencies = project.get('project', {}).get('dependencies', [])
+          if 'Pillow==12.3.0' not in dependencies:
+              raise SystemExit('Pillow==12.3.0 must be declared in pyproject.toml')
+          print('pyproject.toml: PASS')
+          PY

@@ -153,7 +153,7 @@ def inputs(job_path: Path, job: dict[str, Any]) -> dict[str, str]:
         "policy": POLICY_PATH,
         "jobSchema": JOB_SCHEMA_PATH,
         "toolchainLock": ROOT / "config" / "toolchain-lock.json",
-        "blenderPythonRequirements": ROOT / "config" / "blender-python-requirements.txt",
+        "pythonProject": ROOT / "pyproject.toml",
         "vpmManifest": ROOT / "Packages" / "vpm-manifest.json",
         "upmManifest": ROOT / "Packages" / "manifest.json",
         "projectVersion": ROOT / "ProjectSettings" / "ProjectVersion.txt",

@@ -12,9 +12,14 @@ from __future__ import annotations
 
 import json
 import math
+import sys
 from pathlib import Path
 
 import bpy
+
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
 
 import siroino_wide_cargo_release_refit as legacy
 

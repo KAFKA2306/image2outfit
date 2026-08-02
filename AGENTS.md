@@ -12,6 +12,8 @@ This repository is both a working Unity project and an auditable, resumable garm
 - `config/products/<slug>/job.json` and `license.json` define each tracked product.
 - `Assets/GenWorks/OutfitCatalog.json` must reconcile configured products with their canonical workspaces.
 - Common automation must remain product-neutral. Product-specific implementation needed to reproduce or continue a checkpoint is valid repository state when it is referenced by the job or manifest; do not delete it merely because it is product-specific.
+- The repository root is reserved for repository-wide entry points and contracts. Product-specific Python modules must live under `tools/` or the canonical `Assets/GenWorks/<slug>/` workspace; never add product shims to the root.
+- `pyproject.toml` is the sole Python dependency and environment-group declaration. Do not add requirements files or ad-hoc `uv --with` dependency lists elsewhere.
 
 ## Documentation ownership
 

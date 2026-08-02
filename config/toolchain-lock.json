@@ -11,14 +11,14 @@
     "source": "https://developer.blender.org/docs/release_notes/4.4/corrective_releases/",
     "python": {
       "version": "3.11.11",
-      "requirements": "config/blender-python-requirements.txt",
       "packages": {
         "Pillow": {
           "version": "12.3.0",
           "importName": "PIL",
           "source": "https://pillow.readthedocs.io/en/stable/releasenotes/12.3.0.html"
         }
-      }
+      },
+      "dependencyGroup": "project"
     }
   },
   "vpmPackages": {
