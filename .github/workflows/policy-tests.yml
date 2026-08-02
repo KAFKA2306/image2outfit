@@ -64,17 +64,20 @@ jobs:
       - name: Compile Python
         run: uv run --locked --no-default-groups python -m compileall -q tools tests
 
-      - name: Audit pinned toolchain
-        run: uv run --locked --no-default-groups python tools/audit_toolchain.py
-
       - name: Audit repository hygiene
-        run: uv run --locked --no-default-groups python tools/audit_repository_hygiene.py
+        run: uv run --locked --no-default-groups python tools/manage.py audit repository
 
       - name: Audit GenWorks layout
-        run: uv run --locked --no-default-groups python tools/audit_genworks_layout.py
+        run: uv run --locked --no-default-groups python tools/manage.py audit genworks
 
-      - name: Audit 2026 garment research baseline
-        run: uv run --locked --no-default-groups python tools/audit_research_baseline.py
+      - name: Audit 2026 research baseline
+        run: uv run --locked --no-default-groups python tools/manage.py audit research
+
+      - name: Audit tool ownership and depth
+        run: uv run --locked --no-default-groups python tools/manage.py audit tools
+
+      - name: Audit construction method selection
+        run: uv run --locked --no-default-groups python tools/manage.py audit methods
 
       - name: Run release policy tests
         run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
