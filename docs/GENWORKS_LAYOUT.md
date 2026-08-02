@@ -7,7 +7,7 @@
 ```text
 Assets/GenWorks/
   Products/
-    <product-slug>/
+    <product-id>/
       ProductManifest.json
       README.md
       Source/Blender/
@@ -40,6 +40,18 @@ Project-owned Unity Editor tooling belongs in `Assets/GenWorks/Shared/Editor/`. 
 
 `Assets/GenWorks/Legacy/Snapshots/` is the only Unity-visible historical snapshot root. Repository-root `Published/` and `Assets/GenWorks/Legacy/Published/` are deprecated and forbidden. Legacy snapshots are not current products, do not receive a `ProductManifest.json`, and cannot be promoted automatically to a customer release.
 
+## Product configuration
+
+Every tracked product has a matching configuration directory outside Unity assets.
+
+```text
+config/products/<product-id>/
+  job.json
+  license.json
+```
+
+The directory name, `job.json` ID, `Assets/GenWorks/Products/<product-id>` root, product manifest path, and license evidence path must agree. Product-specific JSON files are forbidden directly under `config/`.
+
 ## Unity inspection
 
 Open `GenWorks > Product Catalog` in Unity. The window reads each current product `ProductManifest.json`, shows the product state and target adapter, validates that paths remain inside the product root, and provides direct buttons for:
@@ -58,13 +70,13 @@ Historical snapshots are inspected directly under `Assets/GenWorks/Legacy/Snapsh
 Run a dry-run first:
 
 ```powershell
-task migrate:genworks
+task maintenance:migrate:genworks
 ```
 
 Apply the migration after reviewing the JSON plan:
 
 ```powershell
-task migrate:genworks:apply
+task maintenance:migrate:genworks:apply
 ```
 
 The migration scans `Assets/_Local/Jobs/**/job.json`, moves existing generated deliverables into the corresponding product root, moves Unity `.meta` files together with assets to preserve GUIDs, rewrites job paths, and creates a product manifest. Private avatar sources and license evidence are not moved.
@@ -74,20 +86,20 @@ Historical snapshot files formerly stored under the two deprecated Published pat
 ## Audit
 
 ```powershell
+task audit:repo
 task audit:genworks
 ```
 
-`tools/audit_genworks_layout.py` validates manifest identity, product-root containment, duplicate product IDs, missing referenced assets, forbidden asset roots, and production-like assets that still live outside the canonical root. `tests/test_no_published_directories.py` rejects either deprecated Published directory if it reappears. The machine-readable contract is `config/genworks-layout.json`.
+`tools/audit_repository_hygiene.py` rejects committed workflow state, self-mutating workflows, product-specific global configuration, and hard-coded product workflows or tasks. `tools/audit_genworks_layout.py` validates manifest identity, product-root containment, duplicate product IDs, missing referenced assets, forbidden asset roots, and production-like assets outside the canonical root. The machine-readable layout contract is `config/genworks-layout.json`.
 
 ## Distribution boundary
 
-The following stay outside product roots and must not enter a customer package:
+The canonical private roots stay outside product roots and must not enter a customer package:
 
 ```text
 Assets/_Local/
 Assets/_Vendor/
-Assets/PochibyKT/
-Assets/HAOLAN_Quest/
+Assets/_Reference/
 ```
 
 Target-avatar integration Prefabs may reference local avatar assets for developer verification, but the release allowlist must contain only the outfit product files that the customer is permitted to receive. Legacy snapshots remain evidence-only until they are rebuilt as a current product and pass all mandatory review and runtime gates.
