@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+"""Load the tracked product-specific Siroino lace builder source."""
+from __future__ import annotations
+
+import base64
+import zlib
+from pathlib import Path
+
+source_root = Path(__file__).with_name("product_sources") / "siroino_lace_halter_large"
+parts = sorted(source_root.glob("part-*.b85"))
+if not parts:
+    raise FileNotFoundError(f"missing product builder source: {source_root}")
+payload = "".join(path.read_text(encoding="ascii").strip() for path in parts)
+source = zlib.decompress(base64.b85decode(payload.encode("ascii"))).decode("utf-8")
+exec(compile(source, __file__, "exec"), globals(), globals())
