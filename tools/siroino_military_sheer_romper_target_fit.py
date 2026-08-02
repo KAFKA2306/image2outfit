@@ -804,8 +804,8 @@ def mesh_metrics(garments: list[bpy.types.Object]) -> dict[str, int]:
     for obj in garments:
         if obj.type != "MESH":
             continue
-        result["meshObjects"] += 1
         obj.data.calc_loop_triangles()
+        result["meshObjects"] += 1
         result["vertices"] += len(obj.data.vertices)
         result["triangles"] += len(obj.data.loop_triangles)
         result["unweightedVertices"] += sum(
