@@ -18,11 +18,19 @@
     "canonicalWorkspace": "Assets/GenWorks/Products/siroino-wide-cargo",
     "resumeFrom": "Assets/GenWorks/Products/siroino-wide-cargo/Prefabs/Integrated/SiroinoSotai/SiroinoSotai_WideCargo.prefab",
     "doNotRebuildFromZero": true,
+    "lastRejectedAttempt": {
+      "pullRequest": 22,
+      "sourceCommit": "78792fd1a16cb4b75639485d19054a12a63bf36d",
+      "hostedRun": 30732261886,
+      "result": "REJECTED",
+      "reason": "The rendered candidate contained extreme spike vertices and failed finite-bounds and foot-exclusion auditing. It also had no completed Unity import/save/reload or Modular Avatar checkpoint."
+    },
     "blockers": [
-      "Latest wide-volume render candidate still requires a spike-free regenerated checkpoint",
-      "Unity import/save/reload has not been revalidated for the latest geometry",
-      "Modular Avatar/NDMF integration is pending",
-      "Final human visual, pose, and VRChat runtime reviews are pending"
+      "Continue from the tracked integrated Prefab and diagnosed PR #22 source; do not create another unrelated wide-cargo branch",
+      "Regenerate a spike-free five-view and pose checkpoint",
+      "Reimport the accepted FBX into Unity and save/reload both Prefabs",
+      "Complete Modular Avatar/NDMF integration and applicable Unity component setup",
+      "Complete final human visual, pose, and VRChat runtime reviews"
     ]
   },
   "metrics": {
@@ -41,6 +49,7 @@
     "blender": "PASS",
     "uvMapping": "PASS",
     "exactBodyPoseRenders": "PASS",
+    "latestGeometryRender": "FAIL",
     "unityImport": "PENDING",
     "prefabSerialized": "PENDING",
     "prefabReload": "PENDING",
