@@ -8,13 +8,17 @@ review snapshots, and release packages are local runtime state under
 from __future__ import annotations
 
 import re
-import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 PRODUCT_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
-LEGACY_RUNTIME_ROOTS = ("Artifacts", "Candidates", "Release")
+LEGACY_RUNTIME_MAPPING = {
+    "Artifacts": "reports",
+    "Candidates": "candidate",
+    "Release": "release",
+}
+LEGACY_RUNTIME_ROOTS = tuple(LEGACY_RUNTIME_MAPPING)
 
 
 @dataclass(frozen=True)
@@ -51,18 +55,34 @@ def relative(repository_root: Path, path: Path) -> str:
     return path.resolve().relative_to(repository_root.resolve()).as_posix()
 
 
-def remove_legacy_product_outputs(repository_root: Path, product_id: str) -> list[str]:
-    """Remove obsolete generated roots for one product and empty parents."""
+def migrate_legacy_product_outputs(
+    repository_root: Path,
+    product_id: str,
+) -> list[str]:
+    """Move legacy product outputs into the single internal runtime layout."""
     root = repository_root.resolve()
-    removed: list[str] = []
-    for directory_name in LEGACY_RUNTIME_ROOTS:
+    paths = for_product(root, product_id)
+    migrated: list[str] = []
+    for directory_name, target_name in LEGACY_RUNTIME_MAPPING.items():
         parent = root / directory_name
-        target = parent / product_id
-        if target.exists():
-            if not target.is_dir():
-                raise RuntimeError(f"legacy runtime output is not a directory: {target}")
-            shutil.rmtree(target)
-            removed.append(target.relative_to(root).as_posix())
+        source = parent / product_id
+        target = getattr(paths, target_name)
+        if source.exists():
+            if not source.is_dir():
+                raise RuntimeError(
+                    f"legacy runtime output is not a directory: {source}"
+                )
+            if target.exists():
+                raise RuntimeError(
+                    "both legacy and canonical runtime outputs exist: "
+                    f"{source} and {target}"
+                )
+            target.parent.mkdir(parents=True, exist_ok=True)
+            source.replace(target)
+            migrated.append(
+                f"{source.relative_to(root).as_posix()}"
+                f" -> {target.relative_to(root).as_posix()}"
+            )
         if parent.is_dir() and not any(parent.iterdir()):
             parent.rmdir()
-    return removed
+    return migrated
