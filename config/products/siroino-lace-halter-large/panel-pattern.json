@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lace-halter-large",
+  "representation": "explicit-panel-seam-graph",
+  "units": "normalized-avatar-height-and-measured-sections",
+  "design": {
+    "hemAboveKnee": 0.075,
+    "waistAboveHips": 0.09,
+    "underbustBelowChest": 0.045,
+    "strapAnchorBelowNeck": 0.034,
+    "backOpeningBelowUpperChest": 0.075,
+    "clearance": 0.0065,
+    "hemFlare": 1.1,
+    "waistbandHalfHeight": 0.012,
+    "strapWidth": 0.018,
+    "hemLaceHeight": 0.036,
+    "scallopDepth": 0.01,
+    "scallops": 9,
+    "hardwareRadius": 0.01
+  },
+  "panels": [
+    {"id": "front-skirt", "role": "structural", "side": "front", "edges": ["left-side", "right-side", "top-left", "top-right", "hem"]},
+    {"id": "back-skirt", "role": "structural", "side": "back", "edges": ["left-side", "right-side", "top", "hem"]},
+    {"id": "front-bodice-left", "role": "structural", "side": "front", "edges": ["lower", "outer", "inner-v", "neck"]},
+    {"id": "front-bodice-right", "role": "structural", "side": "front", "edges": ["lower", "outer", "inner-v", "neck"]},
+    {"id": "back-bodice", "role": "structural", "side": "back", "edges": ["lower", "left-side", "right-side", "top-left", "top-right", "open-back"]},
+    {"id": "halter-strap-left", "role": "structural", "side": "left", "edges": ["front", "back", "inner", "outer"]},
+    {"id": "halter-strap-right", "role": "structural", "side": "right", "edges": ["front", "back", "inner", "outer"]},
+    {"id": "waistband-front", "role": "trim", "side": "front", "edges": ["left", "right", "top", "bottom"]},
+    {"id": "waistband-back", "role": "trim", "side": "back", "edges": ["left", "right", "top", "bottom"]},
+    {"id": "lace-overlay-left", "role": "overlay", "side": "front", "edges": ["lower", "outer", "inner", "neck"]},
+    {"id": "lace-overlay-right", "role": "overlay", "side": "front", "edges": ["lower", "outer", "inner", "neck"]},
+    {"id": "hem-lace-front", "role": "overlay", "side": "front", "edges": ["left", "right", "top", "scalloped-hem"]},
+    {"id": "hem-lace-back", "role": "overlay", "side": "back", "edges": ["left", "right", "top", "scalloped-hem"]}
+  ],
+  "seams": [
+    {"id": "skirt-left-side", "a": "front-skirt:left-side", "b": "back-skirt:left-side", "type": "structural"},
+    {"id": "skirt-right-side", "a": "front-skirt:right-side", "b": "back-skirt:right-side", "type": "structural"},
+    {"id": "front-bodice-left-waist", "a": "front-bodice-left:lower", "b": "front-skirt:top-left", "type": "structural"},
+    {"id": "front-bodice-right-waist", "a": "front-bodice-right:lower", "b": "front-skirt:top-right", "type": "structural"},
+    {"id": "back-bodice-waist", "a": "back-bodice:lower", "b": "back-skirt:top", "type": "structural"},
+    {"id": "left-strap-front", "a": "halter-strap-left:front", "b": "front-bodice-left:neck", "type": "structural"},
+    {"id": "left-strap-back", "a": "halter-strap-left:back", "b": "back-bodice:top-left", "type": "structural"},
+    {"id": "right-strap-front", "a": "halter-strap-right:front", "b": "front-bodice-right:neck", "type": "structural"},
+    {"id": "right-strap-back", "a": "halter-strap-right:back", "b": "back-bodice:top-right", "type": "structural"},
+    {"id": "waistband-left", "a": "waistband-front:left", "b": "waistband-back:left", "type": "trim"},
+    {"id": "waistband-right", "a": "waistband-front:right", "b": "waistband-back:right", "type": "trim"},
+    {"id": "hem-lace-left", "a": "hem-lace-front:left", "b": "hem-lace-back:left", "type": "overlay"},
+    {"id": "hem-lace-right", "a": "hem-lace-front:right", "b": "hem-lace-back:right", "type": "overlay"}
+  ],
+  "materialRoles": {
+    "structural": "wine-satin",
+    "overlay": "black-procedural-lace",
+    "trim": "matte-black",
+    "hardware": "silver-metal"
+  },
+  "acceptance": {
+    "recognizableWithoutProductName": ["front", "back", "three-quarter"],
+    "rejectBodySurfaceCopying": true,
+    "rejectBalloonLowerBody": true,
+    "rejectUniformPlasticMaterial": true
+  }
+}
