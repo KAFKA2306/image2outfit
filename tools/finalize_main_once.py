@@ -3,11 +3,17 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+BINARY_SUFFIXES = {
+    ".blend", ".fbx", ".png", ".jpg", ".jpeg", ".webp", ".zip",
+    ".glb", ".obj", ".dll", ".so", ".a", ".exe", ".xz", ".tar",
+    ".woff", ".woff2",
+}
 
 
 def run(*args: str) -> None:
@@ -79,6 +85,20 @@ def fold_lace_contract() -> None:
     path.write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def normalize_prefab_directory_references() -> None:
+    pattern = re.compile(r"(Assets/GenWorks/(?:Products/)?[^/\\\s\"']+)/Prefabs/")
+    for path in ROOT.rglob("*"):
+        if not path.is_file() or ".git" in path.parts or path.suffix.lower() in BINARY_SUFFIXES:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        updated = pattern.sub(lambda match: f"{match.group(1)}/Prefab/", text)
+        if updated != text:
+            path.write_text(updated, encoding="utf-8", newline="")
+
+
 def patch_migrator() -> None:
     path = ROOT / "tools/migrate_genworks_layout_once.py"
     text = path.read_text(encoding="utf-8")
@@ -113,19 +133,12 @@ def patch_migrator() -> None:
         "        (asset_backed if classification == 'ASSET_BACKED' else planned).append(entry)\n",
         1,
     )
-    path_anchor = "        if updated != text:\n"
-    path_replacement = (
-        "        updated = re.sub(r\"(Assets/GenWorks/[^/\\\\\\s\\\"']+)/Prefabs/\", r\"\\\\1/Prefab/\", updated)\n"
-        "        if updated != text:\n"
-    )
-    if path_anchor not in text:
-        raise SystemExit("migration text-replacement anchor not found")
-    text = text.replace(path_anchor, path_replacement, 1)
     path.write_text(text, encoding="utf-8")
 
 
 def main() -> int:
     fold_lace_contract()
+    normalize_prefab_directory_references()
     patch_migrator()
     run(sys.executable, "tools/migrate_genworks_layout_once.py")
     for job_path in sorted((ROOT / "config/products").glob("*/job.json")):
