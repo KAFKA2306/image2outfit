@@ -2,9 +2,9 @@ version: '3'
 
 tasks:
   candidate:
-    desc: Build a technically valid candidate without risking the last-good candidate or customer release.
+    desc: Build a candidate by product slug after deterministic method selection.
     requires:
-      vars: [JOB]
+      vars: [PRODUCT]
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
@@ -12,12 +12,12 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
-        python tools/manage.py candidate --job "{{.JOB}}"
+        python tools/manage.py candidate --product "{{.PRODUCT}}"
 
   release:
-    desc: Promote an unchanged reviewed candidate only after strict customer-quality evidence passes.
+    desc: Release a product only after profile-specific commercial evidence and customer-quality evidence pass.
     requires:
-      vars: [JOB]
+      vars: [PRODUCT]
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
@@ -25,7 +25,16 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
-        python tools/manage.py release --job "{{.JOB}}"
+        python tools/manage.py release --product "{{.PRODUCT}}"
+
+  explain:
+    desc: Show the selected construction profile, research capabilities, and required commercial evidence.
+    requires:
+      vars: [PRODUCT]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py explain --product "{{.PRODUCT}}"
 
   audit:repo:
     desc: Reject committed runtime state, product-specific global config, and self-mutating workflows.
@@ -41,6 +50,11 @@ tasks:
     desc: Reject unowned, duplicate, opaque, or excessively layered tools and payloads.
     cmds:
       - uv run --no-cache --locked --no-default-groups python tools/manage.py audit tools
+
+  audit:methods:
+    desc: Reject missing, ambiguous, or unstable product-to-method selection.
+    cmds:
+      - uv run --no-cache --locked --no-default-groups python tools/manage.py audit methods
 
   audit:research:
     desc: Reject stale, incomplete, non-primary, or license-unsafe garment research baselines.
@@ -97,6 +111,8 @@ tasks:
         uv run --no-cache --locked --no-default-groups --group dev
         ruff check --ignore S102
         tools/manage.py
+        tools/method_selection.py
+        tools/audit_method_selection.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
         tools/audit_tool_ownership.py
@@ -106,6 +122,7 @@ tasks:
         tools/package_snapshot.py
         tools/customer_quality.py
         tools/production_gate.py
+        tests/test_method_selection.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
@@ -119,6 +136,8 @@ tasks:
         uv run --no-cache --locked --no-default-groups --group dev
         ruff format --check
         tools/manage.py
+        tools/method_selection.py
+        tools/audit_method_selection.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
         tools/audit_tool_ownership.py
@@ -128,6 +147,7 @@ tasks:
         tools/package_snapshot.py
         tools/customer_quality.py
         tools/production_gate.py
+        tests/test_method_selection.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
@@ -145,6 +165,8 @@ tasks:
         uv run --no-cache --locked --no-default-groups --group dev
         ruff format
         tools/manage.py
+        tools/method_selection.py
+        tools/audit_method_selection.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
         tools/audit_tool_ownership.py
@@ -154,6 +176,7 @@ tasks:
         tools/package_snapshot.py
         tools/customer_quality.py
         tools/production_gate.py
+        tests/test_method_selection.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
