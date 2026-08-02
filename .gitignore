@@ -86,6 +86,10 @@ Thumbs.db
 .vscode/
 *.blend[0-9]
 
+# GitHub Actions runtime state must remain in Actions, never in git
+/.github/run/
+/.github/status/
+
 # Local licensed source and generated artifacts
 /Assets/_Local/
 /Assets/_Local.meta
