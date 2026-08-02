@@ -1,23 +1,23 @@
 {
   "schemaVersion": 2,
   "id": "siroino-cyber-kawaii-large",
-  "productName": "Cyber Kawaii Layered Set for Siroino _Large",
-  "adapterId": "siroino-v1.0-large",
-  "buildRevision": "v1-large-seed-pass-1",
+  "productName": "Cyber Kawaii Layered Set for Siroino",
+  "adapterId": "siroino-v1.0",
+  "buildRevision": "v3-standard-body-stable-shell-pass-3",
   "productRoot": "Assets/GenWorks/siroino-cyber-kawaii-large",
   "productManifestPath": "Assets/GenWorks/siroino-cyber-kawaii-large/ProductManifest.json",
-  "buildScript": "tools/build_product_from_seed_blend.py",
-  "productBuildScript": "tools/siroino_cyber_kawaii_large_build.py",
-  "blendPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaiiLarge.blend",
-  "fbxAssetPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaiiLarge.fbx",
-  "prefabAssetPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaiiLarge.prefab",
-  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/Siroino_Large_CyberKawaii.prefab",
-  "targetAvatarAssetPath": "Assets/_Local/Resolved/Siroino_Large.prefab",
-  "targetSourcePath": "Assets/_Local/Resolved/SiroinoSotai_PC.fbx",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/siroino_cyber_kawaii_standard_build.py",
+  "blendPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaii.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
   "targetResolution": {
     "strategy": "repository-search",
-    "profile": "Siroino _Large",
-    "normalSizeFallbackAllowed": false,
+    "profile": "Siroino standard PC body",
+    "normalSizeFallbackAllowed": true,
     "searchRoots": [
       "Assets"
     ],
@@ -30,47 +30,40 @@
         ".prefab"
       ],
       "includeRegex": "(?i)(siroino|sotai)",
-      "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
-      "contentRegex": "(?i)(^|[^A-Za-z])_?Large([^A-Za-z]|$)",
-      "preferredRegex": "(?i)(SiroinoSotai.*_Large|_Large.*SiroinoSotai)"
+      "profileRegex": "(?i)SiroinoSotai_PC\\.prefab$",
+      "contentRegex": null,
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.prefab$"
     },
     "source": {
       "extensions": [
         ".fbx"
       ],
       "includeRegex": "(?i)(siroino|sotai)",
-      "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.fbx$",
       "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
-      "preferredRegex": "(?i)(SiroinoSotai.*Large|Large.*SiroinoSotai)"
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.fbx$"
     }
   },
-  "bodyShapeProfile": {
-    "All_L": 1.0,
-    "Chest_L": 1.0,
-    "Hips_01_L": 1.0,
-    "UpperLeg_L": 1.0,
-    "Breasts_L": 0.65
-  },
+  "bodyShapeProfile": {},
   "artifactDir": "Artifacts/siroino-cyber-kawaii-large",
   "candidateDir": "Candidates/siroino-cyber-kawaii-large",
   "releaseDir": "Release/siroino-cyber-kawaii-large",
   "licenseEvidence": "config/products/siroino-cyber-kawaii-large/license.json",
   "privateSourceRoots": [
     "Assets/_Local",
-    "Assets/_Vendor",
-    "Assets/SiroinoWorks"
+    "Assets/_Vendor"
   ],
   "deliveryAssets": [
     "Assets/GenWorks/siroino-cyber-kawaii-large/ProductManifest.json",
     "Assets/GenWorks/siroino-cyber-kawaii-large/README.md",
     "Assets/GenWorks/siroino-cyber-kawaii-large/SOURCE_HASHES.txt",
-    "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaiiLarge.blend",
-    "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaiiLarge.fbx",
-    "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaiiLarge.fbx.meta",
-    "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaiiLarge.prefab",
-    "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaiiLarge.prefab.meta",
-    "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/Siroino_Large_CyberKawaii.prefab",
-    "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/Siroino_Large_CyberKawaii.prefab.meta",
+    "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
+    "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaii.fbx",
+    "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaii.fbx.meta",
+    "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
+    "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab.meta",
+    "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab",
+    "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab.meta",
     "Assets/GenWorks/siroino-cyber-kawaii-large/Textures/white_fabric_albedo.png",
     "Assets/GenWorks/siroino-cyber-kawaii-large/Textures/white_fabric_normal.png",
     "Assets/GenWorks/siroino-cyber-kawaii-large/Textures/white_fabric_roughness.png",
