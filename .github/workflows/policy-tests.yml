@@ -64,8 +64,20 @@ jobs:
       - name: Compile Python
         run: uv run --locked --no-default-groups python -m compileall -q tools tests
 
-      - name: Audit repository, research, tools, and method selection
-        run: uv run --locked --no-default-groups python tools/manage.py audit all
+      - name: Audit repository hygiene
+        run: uv run --locked --no-default-groups python tools/manage.py audit repository
+
+      - name: Audit GenWorks layout
+        run: uv run --locked --no-default-groups python tools/manage.py audit genworks
+
+      - name: Audit 2026 research baseline
+        run: uv run --locked --no-default-groups python tools/manage.py audit research
+
+      - name: Audit tool ownership and depth
+        run: uv run --locked --no-default-groups python tools/manage.py audit tools
+
+      - name: Audit construction method selection
+        run: uv run --locked --no-default-groups python tools/manage.py audit methods
 
       - name: Run release policy tests
         run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
