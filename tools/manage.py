@@ -33,7 +33,10 @@ def _run(script: str, *arguments: str) -> int:
 
 def _write(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(value, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def _product(command: str, product_id: str) -> int:
@@ -54,16 +57,8 @@ def _product(command: str, product_id: str) -> int:
         print(json.dumps(selection, ensure_ascii=False, indent=2))
         return 2
 
-    if command == "release":
-        candidate_manifest = ROOT / str(job["candidateDir"]) / "candidate-manifest.json"
-        commercial = method_selection.validate_commercial_evidence(
-            job, candidate_manifest, ROOT
-        )
-        _write(artifact / "commercial-method-quality.json", commercial)
-        if not commercial["passed"]:
-            print(json.dumps(commercial, ensure_ascii=False, indent=2))
-            return 2
-
+    # Commercial evidence enforcement belongs to production_gate.py itself.
+    # Keeping it there prevents direct gate invocation from bypassing the contract.
     return _run(
         "production_gate.py",
         "--mode",
