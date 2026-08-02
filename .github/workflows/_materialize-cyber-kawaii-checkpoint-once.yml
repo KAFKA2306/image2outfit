@@ -1,0 +1,85 @@
+name: Materialize Cyber Kawaii checkpoint once
+
+on:
+  pull_request:
+    branches: [main]
+    types: [synchronize]
+    paths:
+      - .github/workflows/_materialize-cyber-kawaii-checkpoint-once.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  materialize:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'fix/cyber-kawaii-skirt-pattern'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+          token: ${{ github.token }}
+
+      - name: Download reviewed hosted Blender artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download 30741167087 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name image2outfit-hosted-siroino-cyber-kawaii-large-30741167087 \
+            --dir /tmp/generated
+
+      - name: Replace canonical generated checkpoint
+        run: |
+          set -euo pipefail
+          product='Assets/GenWorks/siroino-cyber-kawaii-large'
+          rsync -a --delete \
+            --exclude 'README.md' \
+            --exclude 'README.md.meta' \
+            --exclude 'Source/Patterns/' \
+            --exclude '*.blend1' \
+            "/tmp/generated/$product/" "$product/"
+          rm -f "$product/Source/Blender/SiroinoCyberKawaii.blend1"
+          cat > "$product/README.md" <<'EOF'
+          # Cyber Kawaii Layered Set for Siroino _Large
+
+          Target: **Siroino `_Large`**, baked from the official shape keys on `SiroinoSotai_PC.fbx`.
+
+          ## Visual revision v6
+
+          - waist and hip sections are measured from the baked target body
+          - the four skirt layers are resolved from the tracked pattern contract
+          - front/back ease is lower than side ease to correct the oversized right-view silhouette
+          - skirt weights follow the hips and side-specific upper legs with at most four influences
+          - Blender, FBX, five-view, and six-pose evidence are generated from the same checkpoint
+
+          ## Pattern-first production stages
+
+          1. GarmentCode-compatible editable pattern and seam contract
+          2. ZOZO Contact Solver sewing/contact output before release
+          3. Material Maker editable `.ptex` cloth sources and PBR exports before release
+          4. Blender rig transfer, pose verification, FBX, Prefab, and render evidence
+
+          The current checkpoint passes Blender generation, topology, weighting, clearance, five-view, and pose-render gates. ZOZO solved-mesh evidence, editable Material Maker sources, Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test, and human runtime review remain explicit pending gates.
+          EOF
+          sed -i 's/^          //' "$product/README.md"
+          python tools/update_product_hashes.py --root "$product"
+
+      - name: Commit checkpoint and remove one-time workflow
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/_materialize-cyber-kawaii-checkpoint-once.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- \
+            Assets/GenWorks/siroino-cyber-kawaii-large \
+            .github/workflows/_materialize-cyber-kawaii-checkpoint-once.yml
+          git diff --cached --check
+          git commit -m 'Track reviewed Cyber Kawaii pattern-fit checkpoint'
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
