@@ -79,7 +79,7 @@ def fold_lace_contract() -> None:
     path.write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def allow_partial_working_prefabs() -> None:
+def patch_migrator() -> None:
     path = ROOT / "tools/migrate_genworks_layout_once.py"
     text = path.read_text(encoding="utf-8")
     old = '''        if all_prefabs:
@@ -113,12 +113,20 @@ def allow_partial_working_prefabs() -> None:
         "        (asset_backed if classification == 'ASSET_BACKED' else planned).append(entry)\n",
         1,
     )
+    path_anchor = "        if updated != text:\n"
+    path_replacement = (
+        "        updated = re.sub(r\"(Assets/GenWorks/[^/\\\\\\s\\\"']+)/Prefabs/\", r\"\\\\1/Prefab/\", updated)\n"
+        "        if updated != text:\n"
+    )
+    if path_anchor not in text:
+        raise SystemExit("migration text-replacement anchor not found")
+    text = text.replace(path_anchor, path_replacement, 1)
     path.write_text(text, encoding="utf-8")
 
 
 def main() -> int:
     fold_lace_contract()
-    allow_partial_working_prefabs()
+    patch_migrator()
     run(sys.executable, "tools/migrate_genworks_layout_once.py")
     for job_path in sorted((ROOT / "config/products").glob("*/job.json")):
         run(
