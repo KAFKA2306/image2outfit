@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-cyber-kawaii-large",
+  "units": "m",
+  "intent": "Correct the oversized right-view skirt silhouette while preserving side flare and four-layer separation.",
+  "stages": {
+    "garmentCode": {
+      "source": "https://github.com/maria-korosteleva/GarmentCode",
+      "package": "pygarment",
+      "minimumVersion": "2.0.2",
+      "role": "canonical editable panel and seam representation"
+    },
+    "zozoContactSolver": {
+      "source": "https://github.com/st-tech/ppf-contact-solver",
+      "minimumBlenderVersion": "5.0.0",
+      "minimumCuda": "12.8",
+      "role": "sewing, multilayer contact, and drape"
+    },
+    "materialMaker": {
+      "source": "https://github.com/RodZill4/material-maker",
+      "executable": "material_maker",
+      "role": "editable cloth PBR source and deterministic export"
+    },
+    "blender": {
+      "source": "https://www.blender.org/",
+      "role": "solved-mesh import, rig transfer, pose validation, and delivery export"
+    }
+  },
+  "bodyAnchors": {
+    "waist": {"z": 0.787, "halfBand": 0.012},
+    "hip": {"z": 0.710, "halfBand": 0.018}
+  },
+  "layers": [
+    {
+      "objectName": "Black_Skirt_Waistband",
+      "order": 0,
+      "pleats": 16,
+      "thickness": 0.0014,
+      "rings": [
+        {"z": 0.795, "anchor": "waist", "easeX": 0.006, "easeY": 0.003},
+        {"z": 0.777, "anchor": "waist", "easeX": 0.008, "easeY": 0.004}
+      ]
+    },
+    {
+      "objectName": "Black_Pink_Plaid_Pleated_Skirt",
+      "order": 1,
+      "pleats": 16,
+      "thickness": 0.0015,
+      "rings": [
+        {"z": 0.790, "anchor": "waist", "easeX": 0.008, "easeY": 0.004},
+        {"z": 0.706, "anchor": "hip", "easeX": 0.016, "easeY": 0.009},
+        {"z": 0.625, "anchor": "hip", "easeX": 0.052, "easeY": 0.034}
+      ]
+    },
+    {
+      "objectName": "White_Ruffle_Underskirt",
+      "order": 2,
+      "pleats": 20,
+      "thickness": 0.0013,
+      "rings": [
+        {"z": 0.650, "anchor": "hip", "easeX": 0.044, "easeY": 0.029},
+        {"z": 0.595, "anchor": "hip", "easeX": 0.062, "easeY": 0.041}
+      ]
+    },
+    {
+      "objectName": "Pink_Underskirt_Hem",
+      "order": 3,
+      "pleats": 20,
+      "thickness": 0.0012,
+      "rings": [
+        {"z": 0.605, "anchor": "hip", "easeX": 0.058, "easeY": 0.038},
+        {"z": 0.590, "anchor": "hip", "easeX": 0.064, "easeY": 0.043}
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "id": "plaid",
+      "source": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Materials/plaid.ptex",
+      "output": "Assets/GenWorks/siroino-cyber-kawaii-large/Textures",
+      "target": "Blender"
+    },
+    {
+      "id": "white-ruffle",
+      "source": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Materials/white-ruffle.ptex",
+      "output": "Assets/GenWorks/siroino-cyber-kawaii-large/Textures",
+      "target": "Blender"
+    },
+    {
+      "id": "pink-satin",
+      "source": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Materials/pink-satin.ptex",
+      "output": "Assets/GenWorks/siroino-cyber-kawaii-large/Textures",
+      "target": "Blender"
+    }
+  ],
+  "acceptance": {
+    "maximumBodyPenetrationMm": 1.5,
+    "maximumLayerPenetrationMm": 1.0,
+    "maximumStrainPercent": 12.0,
+    "maximumBoneInfluences": 4,
+    "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "twist"]
+  }
+}
