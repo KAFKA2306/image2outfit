@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Build the Siroino _Large lace-halter from the exact tracked body surface.
 
-The historical encoded product source still owns delivery/reporting behavior,
-but its original garment geometry was visibly detached from the avatar. This
-loader replaces only ``create_garment`` with a body-derived implementation:
-every fabric panel is extracted from the baked ``_Large`` surface and every
-trim receives nearest-body weights.
+The encoded product source remains the reproducible delivery/reporting shell,
+but every visible garment object is rebuilt from the baked ``_Large`` body.
+No free-standing curves, rails, torus hardware, or rigid banner panels are
+used: collars, straps, bands, eyelets, and lace decoration are all weighted
+surface extracts, eliminating the floating geometry rejected in prior reviews.
 """
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ import math
 import sys
 import zlib
 from pathlib import Path
+from typing import Callable
 
 import bpy
 from mathutils import Vector
@@ -24,101 +25,46 @@ if str(TOOLS) not in sys.path:
 
 import siroino_strappy_knit_build as _base
 
-
-def _front_point(
-    body: bpy.types.Object,
-    x: float,
-    z: float,
-    offset: float = 0.0065,
-) -> tuple[float, float, float]:
-    return (x, _base.body_front_y(body, x, z) - offset, z)
+Predicate = Callable[[Vector], bool]
 
 
-def _surface_path(
-    body: bpy.types.Object,
-    coordinates: list[tuple[float, float]],
-    offset: float = 0.0065,
-) -> list[tuple[float, float, float]]:
-    return [_front_point(body, x, z, offset) for x, z in coordinates]
-
-
-def _curve(
-    name: str,
+def _surface(
     body: bpy.types.Object,
     armature: bpy.types.Object,
+    name: str,
+    predicate: Predicate,
     material: bpy.types.Material,
-    coordinates: list[tuple[float, float]],
-    radius: float,
-    group: str,
-    *,
-    cyclic: bool = False,
+    offset: float,
 ) -> bpy.types.Object:
-    return _base.curve_tube(
-        name,
-        _surface_path(body, coordinates),
-        radius,
-        material,
+    """Extract one fitted, armature-weighted garment surface."""
+    obj = _base.extract_surface(
+        body,
         armature,
-        group,
-        cyclic=cyclic,
-        resolution=3,
+        name,
+        predicate,
+        material,
+        offset,
     )
+    if not obj.data.vertices or not obj.data.polygons:
+        raise RuntimeError(f"surface mask produced an empty garment: {name}")
+    return obj
 
 
-def _surface_flower(
-    name: str,
+def _joined_surface(
     body: bpy.types.Object,
     armature: bpy.types.Object,
+    name: str,
+    masks: list[tuple[str, Predicate]],
     material: bpy.types.Material,
-    center_x: float,
-    center_z: float,
-    scale: float,
-) -> list[bpy.types.Object]:
-    pieces: list[bpy.types.Object] = []
-    for petal in range(6):
-        angle = math.tau * petal / 6.0
-        radial_x = math.cos(angle) * scale * 0.82
-        radial_z = math.sin(angle) * scale * 0.82
-        points: list[tuple[float, float]] = []
-        for segment in range(25):
-            phase = math.tau * segment / 24.0
-            local_x = scale * 0.42 * math.cos(phase)
-            local_z = scale * 0.85 * math.sin(phase)
-            x = center_x + radial_x + local_x * math.cos(angle) - local_z * math.sin(angle)
-            z = center_z + radial_z + local_x * math.sin(angle) + local_z * math.cos(angle)
-            points.append((x, z))
-        pieces.append(
-            _curve(
-                f"{name}_Petal_{petal}",
-                body,
-                armature,
-                material,
-                points,
-                scale * 0.105,
-                "Hips" if center_z < 0.78 else "Chest",
-                cyclic=True,
-            )
-        )
-    center_points = [
-        (
-            center_x + scale * 0.34 * math.cos(math.tau * index / 32.0),
-            center_z + scale * 0.34 * math.sin(math.tau * index / 32.0),
-        )
-        for index in range(32)
+    offset: float,
+) -> bpy.types.Object:
+    parts = [
+        _surface(body, armature, part_name, predicate, material, offset)
+        for part_name, predicate in masks
     ]
-    pieces.append(
-        _curve(
-            f"{name}_Center",
-            body,
-            armature,
-            material,
-            center_points,
-            scale * 0.12,
-            "Hips" if center_z < 0.78 else "Chest",
-            cyclic=True,
-        )
-    )
-    return pieces
+    joined = _base.join_objects(name, parts)
+    _base.transfer_nearest_body_weights(joined, body)
+    return joined
 
 
 def _create_garment(
@@ -128,15 +74,18 @@ def _create_garment(
 ) -> list[bpy.types.Object]:
     glossy, sheer, lace, metal = materials
 
+    def front(coordinate: Vector) -> bool:
+        return coordinate.y < -0.002
+
     def halter_wings(coordinate: Vector) -> bool:
-        if coordinate.y >= -0.002 or not 0.795 <= coordinate.z <= 1.018:
+        if not front(coordinate) or not 0.795 <= coordinate.z <= 1.018:
             return False
-        t = (coordinate.z - 0.795) / (1.018 - 0.795)
-        outer = 0.143 - 0.041 * t + 0.010 * math.sin(math.pi * t)
-        inner = 0.018 + 0.024 * t
+        progress = (coordinate.z - 0.795) / 0.223
+        outer = 0.143 - 0.041 * progress + 0.010 * math.sin(math.pi * progress)
+        inner = 0.018 + 0.024 * progress
         return inner <= abs(coordinate.x) <= outer
 
-    wings = _base.extract_surface(
+    wings = _surface(
         body,
         armature,
         "Glossy_Keyhole_Halter_Wings",
@@ -146,40 +95,40 @@ def _create_garment(
     )
 
     def sheer_torso(coordinate: Vector) -> bool:
-        if coordinate.y >= -0.002:
+        if not front(coordinate):
             return False
         center_inset = (
             0.815 <= coordinate.z <= 0.990
-            and abs(coordinate.x) <= 0.036 + 0.012 * (0.990 - coordinate.z) / 0.175
+            and abs(coordinate.x)
+            <= 0.040 + 0.015 * (0.990 - coordinate.z) / 0.175
         )
         underbust = (
             0.665 <= coordinate.z < 0.825
-            and abs(coordinate.x) <= 0.112 + 0.020 * (coordinate.z - 0.665) / 0.160
+            and abs(coordinate.x)
+            <= 0.118 + 0.018 * (coordinate.z - 0.665) / 0.160
         )
         return center_inset or underbust
 
-    torso = _base.extract_surface(
+    torso = _surface(
         body,
         armature,
         "Sheer_Fitted_Torso",
         sheer_torso,
         sheer,
-        0.0072,
+        0.0070,
     )
 
     def highcut_base(coordinate: Vector) -> bool:
         z = coordinate.z
-        if coordinate.y < 0.0:
-            if not 0.555 <= z <= 0.755:
-                return False
-            width = min(0.142, 0.030 + (z - 0.555) * 0.62)
-            return abs(coordinate.x) <= width
-        if not 0.595 <= z <= 0.755:
+        if not 0.555 <= z <= 0.755:
             return False
-        width = 0.068 + (z - 0.595) * 0.42
-        return abs(coordinate.x) <= min(width, 0.132)
+        if front(coordinate):
+            width = min(0.145, 0.034 + (z - 0.555) * 0.62)
+        else:
+            width = min(0.138, 0.072 + (z - 0.555) * 0.40)
+        return abs(coordinate.x) <= width
 
-    highcut = _base.extract_surface(
+    highcut = _surface(
         body,
         armature,
         "Glossy_Highcut_Front",
@@ -188,153 +137,121 @@ def _create_garment(
         0.0052,
     )
 
-    def sheer_skirt(coordinate: Vector) -> bool:
-        z = coordinate.z
-        if not 0.405 <= z <= 0.710:
-            return False
-        outer = min(0.155, 0.095 + (z - 0.405) * 0.24)
-        if abs(coordinate.x) > outer:
-            return False
-        if z >= 0.565:
-            return True
-        return abs(coordinate.x) >= 0.030 + (0.565 - z) * 0.10
+    def collar_band(coordinate: Vector) -> bool:
+        return 1.020 <= coordinate.z <= 1.052 and abs(coordinate.x) <= 0.070
 
-    skirt = _base.extract_surface(
+    collar = _surface(
+        body,
+        armature,
+        "Glossy_High_Collar",
+        collar_band,
+        glossy,
+        0.0055,
+    )
+
+    def fitted_front_panel(coordinate: Vector) -> bool:
+        if not front(coordinate) or not 0.405 <= coordinate.z <= 0.700:
+            return False
+        progress = (coordinate.z - 0.405) / 0.295
+        outer = 0.088 + 0.052 * progress
+        return abs(coordinate.x) <= outer
+
+    skirt = _surface(
         body,
         armature,
         "Long_Sheer_Front_Panel",
-        sheer_skirt,
+        fitted_front_panel,
         sheer,
         0.0080,
     )
 
-    collar_parts = []
-    for index, z in enumerate((1.027, 1.047)):
-        collar_parts.append(
-            _base.curve_tube(
-                f"Collar_Rail_{index}",
-                _base.surface_cross_section_loop(body, z, -0.048, 0.048, 0.0055, 30),
-                0.0021,
-                glossy,
-                armature,
-                "Neck",
-                cyclic=True,
-                resolution=3,
-            )
+    def halter_trim(coordinate: Vector) -> bool:
+        if not front(coordinate) or not 0.805 <= coordinate.z <= 1.030:
+            return False
+        progress = (coordinate.z - 0.805) / 0.225
+        x = abs(coordinate.x)
+        outer_center = 0.124 - 0.086 * progress
+        inner_center = 0.052 - 0.021 * progress
+        return (
+            abs(x - outer_center) <= 0.0065
+            or abs(x - inner_center) <= 0.0050
         )
-    collar = _base.join_objects("Glossy_High_Collar", collar_parts)
-    _base.transfer_nearest_body_weights(collar, body)
 
-    strap_parts: list[bpy.types.Object] = []
-    for sign in (-1.0, 1.0):
-        strap_parts.append(
-            _curve(
-                f"Halter_Outer_{int(sign)}",
-                body,
-                armature,
-                lace,
-                [
-                    (sign * 0.118, 0.825),
-                    (sign * 0.124, 0.875),
-                    (sign * 0.105, 0.925),
-                    (sign * 0.072, 0.980),
-                    (sign * 0.039, 1.032),
-                ],
-                0.0017,
-                "Chest",
-            )
-        )
-        strap_parts.append(
-            _curve(
-                f"Halter_Inner_{int(sign)}",
-                body,
-                armature,
-                lace,
-                [
-                    (sign * 0.048, 0.815),
-                    (sign * 0.044, 0.865),
-                    (sign * 0.040, 0.915),
-                    (sign * 0.034, 0.970),
-                    (sign * 0.028, 1.028),
-                ],
-                0.00135,
-                "Chest",
-            )
-        )
-    for name, z, radius, group in (
-        ("Underbust_Lace_Band", 0.792, 0.00145, "Chest"),
-        ("Waist_Lace_Band", 0.718, 0.00155, "Hips"),
-    ):
-        strap_parts.append(
-            _base.curve_tube(
-                name,
-                _base.surface_cross_section_loop(body, z, -0.143, 0.143, 0.0065, 44),
-                radius,
-                lace,
-                armature,
-                group,
-                cyclic=True,
-                resolution=3,
-            )
-        )
-    straps = _base.join_objects("Lace_And_Halter_Straps", strap_parts)
-    _base.transfer_nearest_body_weights(straps, body)
+    def underbust_band(coordinate: Vector) -> bool:
+        return 0.782 <= coordinate.z <= 0.798 and abs(coordinate.x) <= 0.150
 
-    eyelet_parts: list[bpy.types.Object] = []
-    for row, z in enumerate((0.925, 0.875)):
-        for sign in (-1.0, 1.0):
-            x = sign * (0.031 + row * 0.005)
-            location = _front_point(body, x, z, 0.0090)
-            eyelet_parts.append(
-                _base.torus(
-                    f"Eyelet_{row}_{int(sign)}",
-                    location,
-                    0.0024,
-                    0.00055,
-                    metal,
-                    armature,
-                    "Chest",
-                )
-            )
-    eyelets = _base.join_objects("Dark_Eyelets", eyelet_parts)
-    _base.transfer_nearest_body_weights(eyelets, body)
+    def waist_band(coordinate: Vector) -> bool:
+        return 0.706 <= coordinate.z <= 0.725 and abs(coordinate.x) <= 0.155
 
-    applique_parts: list[bpy.types.Object] = []
-    for index, (x, z, scale) in enumerate(
-        (
-            (0.0, 0.765, 0.012),
-            (-0.068, 0.665, 0.014),
-            (0.068, 0.665, 0.014),
-            (0.0, 0.585, 0.015),
-            (-0.058, 0.500, 0.013),
-            (0.058, 0.500, 0.013),
+    straps = _joined_surface(
+        body,
+        armature,
+        "Lace_And_Halter_Straps",
+        [
+            ("Lace_Halter_Surface", halter_trim),
+            ("Lace_Underbust_Surface", underbust_band),
+            ("Lace_Waist_Surface", waist_band),
+        ],
+        lace,
+        0.0085,
+    )
+
+    eyelet_centers = (
+        (-0.036, 0.925),
+        (0.036, 0.925),
+        (-0.041, 0.875),
+        (0.041, 0.875),
+    )
+
+    def fitted_eyelets(coordinate: Vector) -> bool:
+        if not front(coordinate):
+            return False
+        return any(
+            (coordinate.x - center_x) ** 2 + (coordinate.z - center_z) ** 2
+            <= 0.0075**2
+            for center_x, center_z in eyelet_centers
         )
-    ):
-        applique_parts.extend(
-            _surface_flower(
-                f"Lace_Rosette_{index}", body, armature, lace, x, z, scale
-            )
+
+    eyelets = _surface(
+        body,
+        armature,
+        "Dark_Eyelets",
+        fitted_eyelets,
+        metal,
+        0.0105,
+    )
+
+    rosettes = (
+        (0.000, 0.765, 0.017),
+        (-0.066, 0.665, 0.019),
+        (0.066, 0.665, 0.019),
+        (0.000, 0.585, 0.020),
+        (-0.055, 0.500, 0.018),
+        (0.055, 0.500, 0.018),
+    )
+
+    def fitted_applique(coordinate: Vector) -> bool:
+        if not front(coordinate) or not 0.455 <= coordinate.z <= 0.790:
+            return False
+        progress = (coordinate.z - 0.455) / 0.335
+        vine_center = 0.040 + 0.009 * math.sin(progress * math.tau * 1.5)
+        on_vine = abs(abs(coordinate.x) - vine_center) <= 0.0065
+        on_center_vine = abs(coordinate.x) <= 0.0060
+        on_rosette = any(
+            (coordinate.x - center_x) ** 2 + (coordinate.z - center_z) ** 2
+            <= radius**2
+            for center_x, center_z, radius in rosettes
         )
-    for sign in (-1.0, 1.0):
-        vine = []
-        for index in range(28):
-            t = index / 27.0
-            z = 0.455 + 0.330 * t
-            x = sign * (0.038 + 0.008 * math.sin(t * math.tau * 1.5))
-            vine.append((x, z))
-        applique_parts.append(
-            _curve(
-                f"Lace_Vine_{int(sign)}",
-                body,
-                armature,
-                lace,
-                vine,
-                0.00135,
-                "Hips",
-            )
-        )
-    applique = _base.join_objects("Lace_Applique", applique_parts)
-    _base.transfer_nearest_body_weights(applique, body)
+        return on_vine or on_center_vine or on_rosette
+
+    applique = _surface(
+        body,
+        armature,
+        "Lace_Applique",
+        fitted_applique,
+        lace,
+        0.0100,
+    )
 
     return [
         wings,
