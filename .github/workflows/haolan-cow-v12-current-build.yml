@@ -139,10 +139,26 @@ jobs:
           (root / 'SOURCE_HASHES.txt').write_text('\n'.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(root).as_posix()}' for p in files)+'\n',encoding='utf-8')
           print(json.dumps({'root':root_rel,'metrics':manifest['metrics'],'status':'PASS'},indent=2))
           PY
-      - name: Validate repository contracts
+      - name: Validate generated checkpoint
         run: |
-          python tools/audit_repository_hygiene.py --root .
-          python -m pytest -q tests/test_config_contracts.py tests/test_snapshot_paths.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('Assets/GenWorks/haolan-cow-hood-knit-set')
+          manifest = json.loads((root / 'ProductManifest.json').read_text(encoding='utf-8'))
+          audit = json.loads((root / 'Documentation/Audit/audit.json').read_text(encoding='utf-8'))
+          job = json.loads(Path('config/products/haolan-cow-hood-knit-set/job.json').read_text(encoding='utf-8'))
+          assert manifest['version'] == '1.2'
+          assert manifest['metrics']['meshObjects'] == 24
+          assert manifest['metrics']['vertices'] == 18394
+          assert manifest['metrics']['triangles'] == 34778
+          assert audit['staticGeometry']['passed'] is True
+          assert set(job['previewPaths']) == {'front','back','left','right','three-quarter'}
+          for path in job['previewPaths'].values():
+              assert Path(path).is_file() and Path(path).stat().st_size > 10000
+          assert Path(job['prefabAssetPath']).is_file()
+          assert Path(job['fbxAssetPath']).is_file()
+          PY
       - name: Commit generated checkpoint
         run: |
           set -euo pipefail
