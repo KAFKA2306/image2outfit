@@ -20,11 +20,11 @@ Repository-wide prose has exactly two owners:
 - `README.md` contains user and developer orientation, commands, layout, toolchain summary, and release requirements.
 - this root `AGENTS.md` contains agent execution, quality, handoff, Git, and automation rules.
 
-Do not create a repository-level `docs/` tree, nested `AGENTS.md`, `.github/AGENTS.md`, workflow operating manuals, or another general policy document. Product-specific instructions and current state belong beside the product in `Assets/GenWorks/<slug>/README.md` and `ProductManifest.json`. Machine-readable configuration and executable checks remain authoritative; prose must summarize them rather than fork their values. When guidance changes, update the owning root document, repair references and tests, and delete the superseded document in the same change.
+Do not create a repository-level `docs/` tree, `Assets/GenWorks/README.md`, nested `AGENTS.md`, `.github/AGENTS.md`, workflow operating manuals, or another general policy document. Product-specific instructions and current state belong beside the product in `Assets/GenWorks/<slug>/README.md` and `ProductManifest.json`. Machine-readable configuration and executable checks remain authoritative; prose must summarize them rather than fork their values. When guidance changes, update the owning root document, repair references and tests, and delete the superseded document in the same change.
 
 ## Canonical product workspace
 
-Every active tracked outfit uses exactly one slug and one canonical root:
+Every active tracked outfit—including incomplete and rejected checkpoints—uses exactly one slug and one canonical root:
 
 ```text
 config/products/<slug>/
@@ -40,12 +40,15 @@ Assets/GenWorks/<slug>/
   Materials/*
   Textures/*
   Previews/*
+  Documentation/*
 ```
 
 Rules:
 
-- Do not introduce `Assets/GenWorks/Products/` or another intermediate product directory.
+- Do not introduce `Assets/GenWorks/Products/`, avatar-name grouping folders, or another intermediate product directory.
 - Product Prefabs must be direct children of `Assets/GenWorks/<slug>/Prefab/`.
+- `REJECTED` does not mean legacy. If a garment has a useful FBX, Prefab, source, render, audit, or explicit continuation path, keep it as a canonical product workspace and preserve the diagnosis.
+- Use `Assets/GenWorks/Legacy/Snapshots/` only for non-resumable historical evidence that cannot be represented as a tracked product. Never aggregate current products under `Legacy/Snapshots/<avatar>/`.
 - `job.id`, the config directory name, `job.productRoot`, `job.productManifestPath`, `job.licenseEvidence`, delivery assets, and manifest product identity must agree.
 - Preserve Unity `.meta` files and GUIDs when moving or replacing tracked assets.
 - Keep private or licensed avatar sources under ignored roots such as `Assets/_Local/`, `Assets/_Vendor/`, `Assets/_Reference/`, or the job-declared private source roots.
