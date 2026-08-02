@@ -29,7 +29,7 @@ Assets/GenWorks/
 
 Current products remain self-contained under their product root. Shared assets are permitted only when genuinely reused. Project-owned Unity Editor tooling belongs in `Assets/GenWorks/Shared/Editor/`; repository-root `Assets/Editor/` is forbidden.
 
-`Assets/GenWorks/Legacy/Snapshots/` is the only Unity-visible historical root. `Published/` and `Assets/GenWorks/Legacy/Published/` are forbidden. Legacy snapshots are evidence-only and cannot be promoted automatically.
+`Assets/GenWorks/Legacy/Snapshots/` is the only Unity-visible historical root. Deprecated publication-style snapshot roots are forbidden. Legacy snapshots are evidence-only and cannot be promoted automatically.
 
 ## Product configuration
 
