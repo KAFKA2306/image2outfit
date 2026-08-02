@@ -10,11 +10,10 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-PROFILE_PATH = ROOT / "config" / "construction-profiles.json"
-RESEARCH_PATH = (
-    ROOT / "Assets" / "GenWorks" / "Shared" / "Research" / "2026-garment-methods.json"
+UNSTABLE_ENTRYPOINT = re.compile(
+    r"(?:^|_)(?:v\d+|entry|refit|legacy)(?:_|\.|$)",
+    re.IGNORECASE,
 )
-UNSTABLE_ENTRYPOINT = re.compile(r"(?:^|_)(?:v\d+|entry|refit|legacy)(?:_|\.|$)", re.IGNORECASE)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -51,23 +50,19 @@ def _research(root: Path) -> dict[str, Any]:
 
 def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
     config = _profile_config(root)
-    profile_name = job.get("constructionProfile")
+    product_id = job.get("id")
+    profile_name = config.get("productAssignments", {}).get(product_id)
     profile = config.get("profiles", {}).get(profile_name)
     errors: list[str] = []
+
+    if not isinstance(product_id, str) or not product_id:
+        errors.append("job.id is required")
     if not isinstance(profile_name, str) or not profile_name:
-        errors.append("constructionProfile is required")
+        errors.append(f"product has no construction profile assignment: {product_id}")
     elif not isinstance(profile, dict):
-        errors.append(f"unknown constructionProfile: {profile_name}")
+        errors.append(f"unknown construction profile assignment: {profile_name}")
         profile = {}
 
-    commercial_profile = job.get("commercialProfile")
-    expected_commercial = config.get("defaultCommercialProfile")
-    if commercial_profile != expected_commercial:
-        errors.append(
-            f"commercialProfile must be {expected_commercial!r}, got {commercial_profile!r}"
-        )
-
-    product_id = job.get("id")
     product_root = job.get("productRoot")
     if product_root != f"Assets/GenWorks/{product_id}":
         errors.append("productRoot must match Assets/GenWorks/<product-id>")
@@ -97,7 +92,8 @@ def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
     covered = {
         capability
         for method in research.get("methods", [])
-        if method.get("implementationTrack") in {"ADOPT_PRINCIPLE", "PROTOTYPE", "BENCHMARK"}
+        if method.get("implementationTrack")
+        in {"ADOPT_PRINCIPLE", "PROTOTYPE", "BENCHMARK"}
         for capability in method.get("capabilities", [])
     }
     missing_capabilities = sorted(set(required_capabilities) - covered)
@@ -111,7 +107,7 @@ def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
         "schemaVersion": 1,
         "passed": not errors,
         "productId": product_id,
-        "commercialProfile": commercial_profile,
+        "commercialProfile": config.get("defaultCommercialProfile"),
         "constructionProfile": profile_name,
         "description": profile.get("description"),
         "buildScript": build_script,
@@ -135,7 +131,11 @@ def _iso_datetime(value: Any) -> bool:
     return parsed.tzinfo is not None
 
 
-def _metric_errors(kind: str, metrics: dict[str, Any], rules: dict[str, Any]) -> list[str]:
+def _metric_errors(
+    kind: str,
+    metrics: dict[str, Any],
+    rules: dict[str, Any],
+) -> list[str]:
     errors: list[str] = []
     for name, threshold in rules.get("minimum", {}).items():
         value = metrics.get(name)
@@ -170,7 +170,7 @@ def validate_commercial_evidence(
     required_fields = contract.get("requiredFields", [])
     rules = contract.get("metricRules", {})
     product_id = str(job.get("id", ""))
-    profile_name = job.get("constructionProfile")
+    profile_name = selection.get("constructionProfile")
     evidence_root = root / str(job.get("productRoot")) / "Evidence" / "Commercial"
 
     for kind in selection.get("requiredCommercialEvidence", []):
@@ -235,6 +235,7 @@ def validate_commercial_evidence(
         "schemaVersion": 1,
         "passed": not errors,
         "productId": product_id,
+        "commercialProfile": selection.get("commercialProfile"),
         "constructionProfile": profile_name,
         "candidateManifestSha256": candidate_hash or None,
         "selection": selection,
@@ -250,7 +251,15 @@ def audit_all(root: Path = ROOT) -> dict[str, Any]:
         report = select(job, root)
         report["jobPath"] = path.relative_to(root).as_posix()
         products.append(report)
-    errors = [
+
+    config = _profile_config(root)
+    known_products = {item.get("productId") for item in products}
+    assigned_products = set(config.get("productAssignments", {}))
+    assignment_errors = [
+        f"profile assignment has no job: {product_id}"
+        for product_id in sorted(assigned_products - known_products)
+    ]
+    errors = assignment_errors + [
         f"{item['productId']}: {error}"
         for item in products
         for error in item.get("errors", [])
