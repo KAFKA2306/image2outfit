@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-military-sheer-romper-large",
+  "productName": "Military Sheer-Back Romper for Siroino _Large",
+  "status": "WORKING",
+  "classification": "BUILD_SCRIPT_READY",
+  "targetAdapterId": "siroino-v1.0-large",
+  "productRoot": "Assets/GenWorks/siroino-military-sheer-romper-large",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/SiroinoMilitarySheerRomperLarge.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/Siroino_Large_MilitarySheerRomper.prefab",
+  "previewPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-military-sheer-romper-large/README.md",
+  "sourceJobPath": "config/products/siroino-military-sheer-romper-large/job.json",
+  "constructionProfile": "panel-sewn",
+  "designRevision": "panel-sewn-v1",
+  "reference": {
+    "sourceImageRedistributed": false,
+    "sourceImageSha256": "3f69a72daa79102c0af5679e2c54d4f078231bdab124314703e2626bcef0e460",
+    "sourceImageDimensions": [1200, 1022],
+    "interpretation": "black military short romper with stand collar, asymmetric front, gold hardware, shoulder chains, belt, short sleeves, and sheer upper back"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-military-sheer-romper-large",
+    "resumeFrom": "tools/siroino_military_sheer_romper_build.py",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "Hosted Blender generation has not yet produced the Blend, FBX, Prefab wrapper, and visual evidence.",
+      "Unity import/reload and integrated Modular Avatar Prefab remain pending.",
+      "Human visual, pose, and runtime reviews remain pending."
+    ]
+  },
+  "technicalGates": {
+    "buildScript": "READY",
+    "hostedBlender": "PENDING",
+    "fbxExport": "PENDING",
+    "fiveViewRender": "PENDING",
+    "unityPrefabYamlGenerated": "PENDING",
+    "unityImport": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "ndmf": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING"
+  }
+}
