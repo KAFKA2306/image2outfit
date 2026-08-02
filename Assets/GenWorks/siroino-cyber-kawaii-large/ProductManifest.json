@@ -1,26 +1,27 @@
 {
   "schemaVersion": 1,
   "productId": "siroino-cyber-kawaii-large",
-  "productName": "Cyber Kawaii Layered Set for Siroino",
+  "productName": "Cyber Kawaii Layered Set for Siroino _Large",
   "status": "WORKING",
-  "targetAdapterId": "siroino-v1.0",
-  "target": "Siroino standard PC body",
+  "targetAdapterId": "siroino-v1.0-large",
+  "target": "Siroino _Large via official shape keys",
   "productRoot": "Assets/GenWorks/siroino-cyber-kawaii-large",
   "outfitPrefabPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
   "integratedPrefabPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab",
   "previewPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-cyber-kawaii-large/README.md",
   "sourceJobPath": "config/products/siroino-cyber-kawaii-large/job.json",
-  "productBuildScript": "tools/siroino_cyber_kawaii_standard_final_build.py",
-  "designRevision": "v3-standard-body-stable-shell",
+  "productBuildScript": "tools/siroino_cyber_kawaii_shape_profile_build.py",
+  "designRevision": "v5-large-shape-profile-deforming-skirt",
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-cyber-kawaii-large",
     "doNotRebuildFromZero": true,
-    "resumeFrom": "tools/siroino_cyber_kawaii_standard_final_build.py",
+    "resumeFrom": "tools/siroino_cyber_kawaii_shape_profile_build.py",
     "lastAttempt": {
       "result": "HOSTED_MODELED",
-      "visualRevision": "v3-standard-body-stable-shell"
+      "visualRevision": "v5-large-shape-profile-deforming-skirt",
+      "shapeProfile": "Siroino _Large via official shape keys"
     },
     "blockers": [
       "Import and save both Prefabs in pinned Unity",
@@ -42,7 +43,9 @@
     "vrchatBuildAndTest": "PENDING",
     "humanVisualReview": "PENDING",
     "humanPoseReview": "PENDING",
-    "humanRuntimeReview": "PENDING"
+    "humanRuntimeReview": "PENDING",
+    "shapeProfileApplied": "PASS",
+    "skirtWeightTransfer": "PASS"
   },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
@@ -51,5 +54,59 @@
     "integratedPrefab": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab",
     "multiview": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-multiview.webp",
     "poseReview": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-pose-review.webp"
+  },
+  "shapeProfile": {
+    "profile": "Siroino _Large via official shape keys",
+    "appliedShapeKeys": {
+      "All_L": 1.0,
+      "Chest_L": 1.0,
+      "Hips_01_L": 1.0,
+      "UpperLeg_L": 1.0,
+      "Breasts_L": 0.65
+    },
+    "vertices": 8421,
+    "sourceBody": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+    "profileMode": "shape-key-bake",
+    "requestedShapeKeys": {
+      "All_L": 1.0,
+      "Chest_L": 1.0,
+      "Hips_01_L": 1.0,
+      "UpperLeg_L": 1.0,
+      "Breasts_L": 0.65
+    }
+  },
+  "skirtWeightTransfer": {
+    "Black_Pink_Plaid_Pleated_Skirt": {
+      "fallbackVertices": 0,
+      "maximumHipAnchor": 0.8,
+      "maximumInfluences": 2,
+      "maximumLegAnchor": 0.22,
+      "minimumHipAnchor": 0.34,
+      "vertices": 384
+    },
+    "Black_Skirt_Waistband": {
+      "fallbackVertices": 0,
+      "maximumHipAnchor": 0.8,
+      "maximumInfluences": 3,
+      "maximumLegAnchor": 0.22,
+      "minimumHipAnchor": 0.34,
+      "vertices": 256
+    },
+    "Pink_Underskirt_Hem": {
+      "fallbackVertices": 0,
+      "maximumHipAnchor": 0.8,
+      "maximumInfluences": 2,
+      "maximumLegAnchor": 0.22,
+      "minimumHipAnchor": 0.34,
+      "vertices": 320
+    },
+    "White_Ruffle_Underskirt": {
+      "fallbackVertices": 0,
+      "maximumHipAnchor": 0.8,
+      "maximumInfluences": 2,
+      "maximumLegAnchor": 0.22,
+      "minimumHipAnchor": 0.34,
+      "vertices": 320
+    }
   }
 }

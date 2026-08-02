@@ -1,4 +1,4 @@
-# Cyber Kawaii Layered Set for Siroino
+# Cyber Kawaii Layered Set for Siroino _Large
 
 Target: **Siroino standard PC body**. No `_Large` shape keys are required or applied. The historical workspace slug is retained to preserve existing links and handoff continuity.
 
