@@ -12,7 +12,7 @@
   "documentationPath": "Assets/GenWorks/siroino-cyber-kawaii-large/README.md",
   "sourceJobPath": "config/products/siroino-cyber-kawaii-large/job.json",
   "productBuildScript": "tools/siroino_cyber_kawaii_shape_profile_build.py",
-  "designRevision": "v5-large-shape-profile-deforming-skirt",
+  "designRevision": "v6-large-body-measured-pattern-fit",
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-cyber-kawaii-large",
@@ -20,7 +20,7 @@
     "resumeFrom": "tools/siroino_cyber_kawaii_shape_profile_build.py",
     "lastAttempt": {
       "result": "HOSTED_MODELED",
-      "visualRevision": "v5-large-shape-profile-deforming-skirt",
+      "visualRevision": "v6-large-body-measured-pattern-fit",
       "shapeProfile": "Siroino _Large via official shape keys"
     },
     "blockers": [
@@ -45,7 +45,10 @@
     "humanPoseReview": "PENDING",
     "humanRuntimeReview": "PENDING",
     "shapeProfileApplied": "PASS",
-    "skirtWeightTransfer": "PASS"
+    "patternContract": "PASS",
+    "skirtWeightTransfer": "PASS",
+    "zozoContactSolver": "PENDING",
+    "materialMakerSource": "PENDING"
   },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
@@ -74,6 +77,153 @@
       "UpperLeg_L": 1.0,
       "Breasts_L": 0.65
     }
+  },
+  "patternPipeline": {
+    "schemaVersion": 1,
+    "patternPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Patterns/cyber-kawaii-skirt.pattern.json",
+    "patternSha256": "fcde3905ec35d757c9874f07d7bb430c4d5f747ab621fe955708f023bf5218ec",
+    "bodySections": {
+      "waist": {
+        "z": 0.787,
+        "radiusX": 0.10032012939453125,
+        "radiusY": 0.09508061826229096,
+        "samples": 79
+      },
+      "hip": {
+        "z": 0.71,
+        "radiusX": 0.1276600956916809,
+        "radiusY": 0.08288811147212982,
+        "samples": 135
+      }
+    },
+    "layers": {
+      "Black_Skirt_Waistband": {
+        "objectName": "Black_Skirt_Waistband",
+        "resolvedRings": [
+          {
+            "z": 0.795,
+            "radiusX": 0.10632012939453125,
+            "radiusY": 0.09808061826229096
+          },
+          {
+            "z": 0.777,
+            "radiusX": 0.10832012939453126,
+            "radiusY": 0.09908061826229096
+          }
+        ],
+        "sourceExtents": [
+          {
+            "z": 0.795,
+            "radiusX": 0.15321600437164307,
+            "radiusY": 0.11289600282907486
+          },
+          {
+            "z": 0.777,
+            "radiusX": 0.15624000132083893,
+            "radiusY": 0.1149120032787323
+          }
+        ],
+        "frontBackReductionApplied": true
+      },
+      "Black_Pink_Plaid_Pleated_Skirt": {
+        "objectName": "Black_Pink_Plaid_Pleated_Skirt",
+        "resolvedRings": [
+          {
+            "z": 0.79,
+            "radiusX": 0.10832012939453126,
+            "radiusY": 0.09908061826229096
+          },
+          {
+            "z": 0.706,
+            "radiusX": 0.14366009569168092,
+            "radiusY": 0.09188811147212982
+          },
+          {
+            "z": 0.625,
+            "radiusX": 0.1796600956916809,
+            "radiusY": 0.11688811147212982
+          }
+        ],
+        "sourceExtents": [
+          {
+            "z": 0.79,
+            "radiusX": 0.15299999713897705,
+            "radiusY": 0.11219999939203262
+          },
+          {
+            "z": 0.706,
+            "radiusX": 0.17747999727725983,
+            "radiusY": 0.1305599957704544
+          },
+          {
+            "z": 0.625,
+            "radiusX": 0.2019599974155426,
+            "radiusY": 0.14993999898433685
+          }
+        ],
+        "frontBackReductionApplied": true
+      },
+      "White_Ruffle_Underskirt": {
+        "objectName": "White_Ruffle_Underskirt",
+        "resolvedRings": [
+          {
+            "z": 0.65,
+            "radiusX": 0.1716600956916809,
+            "radiusY": 0.11188811147212982
+          },
+          {
+            "z": 0.595,
+            "radiusX": 0.1896600956916809,
+            "radiusY": 0.12388811147212983
+          }
+        ],
+        "sourceExtents": [
+          {
+            "z": 0.65,
+            "radiusX": 0.18694399297237396,
+            "radiusY": 0.13919200003147125
+          },
+          {
+            "z": 0.595,
+            "radiusX": 0.21031199395656586,
+            "radiusY": 0.15646399557590485
+          }
+        ],
+        "frontBackReductionApplied": true
+      },
+      "Pink_Underskirt_Hem": {
+        "objectName": "Pink_Underskirt_Hem",
+        "resolvedRings": [
+          {
+            "z": 0.605,
+            "radiusX": 0.1856600956916809,
+            "radiusY": 0.12088811147212983
+          },
+          {
+            "z": 0.59,
+            "radiusX": 0.1916600956916809,
+            "radiusY": 0.1258881114721298
+          }
+        ],
+        "sourceExtents": [
+          {
+            "z": 0.605,
+            "radiusX": 0.20482799410820007,
+            "radiusY": 0.15311400592327118
+          },
+          {
+            "z": 0.59,
+            "radiusX": 0.21091200411319733,
+            "radiusY": 0.15716999769210815
+          }
+        ],
+        "frontBackReductionApplied": true
+      }
+    },
+    "solverMode": "body-measured-pattern-fit",
+    "solverMeshPresent": false,
+    "solverReportPresent": false,
+    "materialMakerSourcePresent": false
   },
   "skirtWeightTransfer": {
     "Black_Pink_Plaid_Pleated_Skirt": {

@@ -1,22 +1,20 @@
 # Cyber Kawaii Layered Set for Siroino _Large
 
-Target: **Siroino standard PC body**. No `_Large` shape keys are required or applied. The historical workspace slug is retained to preserve existing links and handoff continuity.
+Target: **Siroino `_Large`**, baked from the official shape keys on `SiroinoSotai_PC.fbx`.
 
-## Visual revision v3
+## Visual revision v6
 
-- closed, non-degenerate plaid skirt shell weighted to the pelvis
-- body-weighted shoulder and forearm sleeves for pose stability
-- ankle-safe thigh-high stockings that do not cover the feet
-- fitted black waistband and pink underskirt hem
-- compact chest bow without free-floating waist/thigh ornaments
+- waist and hip sections are measured from the baked target body
+- the four skirt layers are resolved from the tracked pattern contract
+- front/back ease is lower than side ease to correct the oversized right-view silhouette
+- skirt weights follow the hips and side-specific upper legs with at most four influences
+- Blender, FBX, five-view, and six-pose evidence are generated from the same checkpoint
 
-## Outputs
+## Pattern-first production stages
 
-- Blender source: `Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend`
-- FBX: `Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaii.fbx`
-- outfit Prefab: `Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab`
-- integrated Prefab: `Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab`
-- five-view render: `Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-multiview.webp`
-- pose review: `Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-pose-review.webp`
+1. GarmentCode-compatible editable pattern and seam contract
+2. ZOZO Contact Solver sewing/contact output before release
+3. Material Maker editable `.ptex` cloth sources and PBR exports before release
+4. Blender rig transfer, pose verification, FBX, Prefab, and render evidence
 
-Unity import, Prefab reload, Modular Avatar/NDMF, and runtime review remain explicit gates.
+The current checkpoint passes Blender generation, topology, weighting, clearance, five-view, and pose-render gates. ZOZO solved-mesh evidence, editable Material Maker sources, Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test, and human runtime review remain explicit pending gates.
