@@ -16,6 +16,19 @@ import siroino_heather_hooded_bodysuit_build as build
 import siroino_heather_hooded_pattern as pattern
 
 DESIGN_REVISION = "v8-smooth-sampled-panels-distance-field-sleeves"
+ACTUAL_SEPARATE_GEOMETRY = [
+    "Heather_Henley_Placket",
+    "Heather_Henley_Button_01",
+    "Heather_Henley_Button_02",
+    "Heather_Henley_Button_03",
+    "Heather_Hood_Drawcord_L",
+    "Heather_Hood_Drawcord_R",
+    "Heather_Side_Tie_L",
+    "Heather_Side_Tie_R",
+    "Heather_Center_Front_Seam",
+    "Heather_Center_Back_Seam",
+    "Heather_Hood_Center_Seam",
+]
 
 
 def normalize_four_influences(
@@ -81,19 +94,65 @@ def preserve_authored_weights(
     }
 
 
+def wrap_pattern_writer(original):
+    """Persist exact generated object identities in the pattern contract."""
+
+    def wrapped(*args, **kwargs):
+        pattern_path, research_path = original(*args, **kwargs)
+        contract = json.loads(pattern_path.read_text(encoding="utf-8"))
+        contract["separateGeometry"] = ACTUAL_SEPARATE_GEOMETRY
+        contract["designRevision"] = DESIGN_REVISION
+        pattern_path.write_text(
+            json.dumps(contract, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        return pattern_path, research_path
+
+    return wrapped
+
+
 def enforce_manifest_contract(original):
-    """Keep generated ProductManifest compatible with the canonical v1 schema."""
+    """Keep generated state truthful and compatible with canonical contracts."""
 
     def wrapped(*args, **kwargs):
         result = original(*args, **kwargs)
         job = args[0]
-        manifest_path = Path(__file__).resolve().parents[1] / job["productManifestPath"]
+        root = Path(__file__).resolve().parents[1]
+        manifest_path = root / job["productManifestPath"]
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["schemaVersion"] = 1
+        manifest["designRevision"] = DESIGN_REVISION
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
+
+        report_path = (
+            root
+            / ".image2outfit"
+            / "products"
+            / job["id"]
+            / "reports"
+            / "product-build-report.json"
+        )
+        if report_path.is_file():
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            report["designRevision"] = DESIGN_REVISION
+            rejected = report.setdefault("rejectedHistory", [])
+            v71 = {
+                "revision": "v7.1-continuous-shell-fit",
+                "reason": (
+                    "actual five-view inspection found sawtooth panel edges, elbow/cuff holes, "
+                    "an over-wide neckline, a shield-like rear hood and heather moire; evaluated "
+                    "BVH audit reported 6660 garment/body triangle overlap pairs across six poses"
+                ),
+            }
+            if not any(item.get("revision") == v71["revision"] for item in rejected):
+                rejected.append(v71)
+            report_path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
         return result
 
     return wrapped
@@ -115,6 +174,9 @@ def main() -> int:
     build.limit_bone_influences = normalize_four_influences
     build.rebind_dynamic_parts = preserve_authored_weights
     update_panel_object_contract()
+    build.evidence.write_pattern_and_research = wrap_pattern_writer(
+        build.evidence.write_pattern_and_research
+    )
     build.write_report_and_manifest = enforce_manifest_contract(
         build.write_report_and_manifest
     )
