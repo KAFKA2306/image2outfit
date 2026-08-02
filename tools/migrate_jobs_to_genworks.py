@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Move existing image2outfit job outputs into Assets/GenWorks.
+"""Move existing image2outfit job outputs into Assets/GenWorks/{slug}.
 
 The command is dry-run by default. Use --apply after reviewing the plan.
 Unity .meta files are moved together with their assets so existing GUID references survive.
@@ -57,11 +57,11 @@ def destination_for(product_root: str, source: str, job: dict[str, Any]) -> str:
         return f"{product_root}/Source/Blender/{name}"
     if source == job.get("fbxAssetPath") or suffix == ".fbx":
         return f"{product_root}/Models/{name}"
-    if source == job.get("integratedPrefabAssetPath"):
-        adapter = str(job.get("adapterId", "target")).replace("/", "-")
-        return f"{product_root}/Prefabs/Integrated/{adapter}/{name}"
-    if source == job.get("prefabAssetPath") or suffix == ".prefab":
-        return f"{product_root}/Prefabs/Outfit/{name}"
+    if source in {
+        job.get("prefabAssetPath"),
+        job.get("integratedPrefabAssetPath"),
+    } or suffix == ".prefab":
+        return f"{product_root}/Prefab/{name}"
     if suffix == ".mat":
         return f"{product_root}/Materials/{name}"
     if suffix in {".png", ".jpg", ".jpeg", ".tga", ".psd", ".webp"}:
@@ -108,7 +108,7 @@ def migrate_job(root: Path, job_path: Path, apply: bool) -> dict[str, Any]:
     product_id = str(job.get("id", "")).strip()
     if not product_id:
         raise ValueError(f"job id is missing: {job_path}")
-    product_root = f"Assets/GenWorks/Products/{product_id}"
+    product_root = f"Assets/GenWorks/{product_id}"
     original_fields = {
         field: job.get(field)
         for field in (
@@ -129,6 +129,14 @@ def migrate_job(root: Path, job_path: Path, apply: bool) -> dict[str, Any]:
     mapping = {
         source: destination_for(product_root, source, job) for source in inputs
     }
+
+    destinations = [mapping[source] for source in inputs]
+    duplicates = sorted({value for value in destinations if destinations.count(value) > 1})
+    if duplicates:
+        raise ValueError(
+            "multiple job assets map to the same canonical destination: "
+            + ", ".join(duplicates)
+        )
 
     moves = [
         move_file(root, source, destination, apply)
