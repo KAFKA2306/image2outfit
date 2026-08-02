@@ -76,8 +76,15 @@ jobs:
           if ([int]$job.schemaVersion -ne 2) { throw 'Only schemaVersion 2 jobs are accepted' }
           $productId = Split-Path -Leaf (Split-Path -Parent $jobPath)
           if ([string]$job.id -ne $productId) { throw 'Product job id does not match its namespace' }
-          if ([string]$job.productRoot -ne "Assets/GenWorks/Products/$productId") {
+          $expectedRoot = "Assets/GenWorks/$productId"
+          if ([string]$job.productRoot -ne $expectedRoot) {
             throw 'Product root does not match its namespace'
+          }
+          foreach ($field in @('prefabAssetPath', 'integratedPrefabAssetPath')) {
+            $value = [string]$job.$field
+            if (-not [string]::IsNullOrWhiteSpace($value) -and $value -notmatch "^Assets/GenWorks/$([regex]::Escape($productId))/Prefab/[^/]+\.prefab$") {
+              throw "$field must match Assets/GenWorks/$productId/Prefab/*.prefab"
+            }
           }
           $localJob = "Assets/_Local/Jobs/$productId/job.json"
           New-Item -ItemType Directory -Force -Path (Split-Path -Parent $localJob), $job.artifactDir | Out-Null
