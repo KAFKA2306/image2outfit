@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import math
-from collections import Counter
 from collections.abc import Callable
 
 import bmesh
@@ -31,7 +30,11 @@ def _group_index(body: bpy.types.Object, name: str) -> int | None:
     return None if group is None else group.index
 
 
-def _vertex_weight(body: bpy.types.Object, vertex_index: int, group_index: int | None) -> float:
+def _vertex_weight(
+    body: bpy.types.Object,
+    vertex_index: int,
+    group_index: int | None,
+) -> float:
     if group_index is None:
         return 0.0
     for assignment in body.data.vertices[vertex_index].groups:
@@ -45,11 +48,10 @@ def _polygon_average_weight(
     polygon: bpy.types.MeshPolygon,
     group_indices: tuple[int | None, ...],
 ) -> float:
-    values = []
-    for vertex_index in polygon.vertices:
-        values.append(
-            sum(_vertex_weight(body, vertex_index, index) for index in group_indices)
-        )
+    values = [
+        sum(_vertex_weight(body, vertex_index, index) for index in group_indices)
+        for vertex_index in polygon.vertices
+    ]
     return sum(values) / max(1, len(values))
 
 
@@ -64,7 +66,7 @@ def _copy_shell(
     thickness: float = 0.0012,
     bevel: float = 0.00035,
 ) -> bpy.types.Object:
-    """Copy selected Siroino faces and preserve their UVs and skin weights."""
+    """Copy selected Siroino faces and preserve UVs and source skin weights."""
     source_uv = body.data.uv_layers.active
     used: dict[int, int] = {}
     vertices: list[Vector] = []
@@ -108,6 +110,7 @@ def _copy_shell(
         for loop_index, uv in zip(polygon.loop_indices, polygon_uvs):
             uv_layer.data[loop_index].uv = uv
     mesh.materials.append(material)
+
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     obj.parent = armature
@@ -141,6 +144,7 @@ def _copy_shell(
     bpy.ops.object.select_all(action="DESELECT")
     obj.select_set(True)
     bpy.context.view_layer.objects.active = obj
+
     solidify = obj.modifiers.new("Outward jersey thickness", "SOLIDIFY")
     solidify.thickness = thickness
     solidify.offset = 1.0
@@ -148,6 +152,7 @@ def _copy_shell(
     while obj.modifiers.find(solidify.name) > 0:
         bpy.ops.object.modifier_move_up(modifier=solidify.name)
     bpy.ops.object.modifier_apply(modifier=solidify.name)
+
     if bevel > 0.0:
         edge_finish = obj.modifiers.new("Finished pattern edge", "BEVEL")
         edge_finish.width = bevel
@@ -158,7 +163,11 @@ def _copy_shell(
 
     cleanup = bmesh.new()
     cleanup.from_mesh(mesh)
-    bmesh.ops.dissolve_degenerate(cleanup, dist=1e-7, edges=list(cleanup.edges))
+    bmesh.ops.dissolve_degenerate(
+        cleanup,
+        dist=1e-7,
+        edges=list(cleanup.edges),
+    )
     zero_area = [face for face in cleanup.faces if face.calc_area() <= 1e-12]
     if zero_area:
         bmesh.ops.delete(cleanup, geom=zero_area, context="FACES")
@@ -174,21 +183,23 @@ def _copy_shell(
 
 def _torso_width(z: float) -> float:
     if z < 0.835:
-        return 0.118
-    if z < 0.910:
-        return 0.150
+        return 0.132
+    if z < 0.915:
+        return 0.170
     if z < 0.985:
-        return 0.178
-    return max(0.078, 0.178 - (z - 0.985) * 1.75)
+        return 0.205
+    if z < 1.025:
+        return 0.228
+    return 0.185
 
 
 def _torso_top(x: float) -> float:
-    return 1.004 + min(abs(x), 0.12) * 0.20
+    return 1.026 + min(abs(x), 0.18) * 0.16
 
 
 def _highcut_width(z: float) -> float:
-    t = max(0.0, min(1.0, (z - 0.640) / (0.825 - 0.640)))
-    return 0.026 + 0.096 * (t ** 0.86)
+    t = max(0.0, min(1.0, (z - 0.625) / (0.835 - 0.625)))
+    return 0.038 + 0.100 * (t**0.82)
 
 
 def _front(center: Vector) -> bool:
@@ -205,28 +216,31 @@ def _torso_shells(
     material: bpy.types.Material,
 ) -> list[bpy.types.Object]:
     def common(center: Vector) -> bool:
+        neckline = center.z > 1.025 and abs(center.x) < 0.050
         return (
-            0.792 <= center.z <= _torso_top(center.x)
+            0.785 <= center.z <= _torso_top(center.x)
             and abs(center.x) <= _torso_width(center.z)
+            and not neckline
         )
 
-    front = _copy_shell(
-        "Heather_Front_Upper_Panel",
-        body,
-        armature,
-        material,
-        lambda _polygon, center: common(center) and _front(center),
-        offset=0.0065,
-    )
-    back = _copy_shell(
-        "Heather_Back_Upper_Panel",
-        body,
-        armature,
-        material,
-        lambda _polygon, center: common(center) and _back(center),
-        offset=0.0065,
-    )
-    return [front, back]
+    return [
+        _copy_shell(
+            "Heather_Front_Upper_Panel",
+            body,
+            armature,
+            material,
+            lambda _polygon, center: common(center) and _front(center),
+            offset=0.0080,
+        ),
+        _copy_shell(
+            "Heather_Back_Upper_Panel",
+            body,
+            armature,
+            material,
+            lambda _polygon, center: common(center) and _back(center),
+            offset=0.0080,
+        ),
+    ]
 
 
 def _highcut_shells(
@@ -236,27 +250,28 @@ def _highcut_shells(
 ) -> list[bpy.types.Object]:
     def common(center: Vector) -> bool:
         return (
-            0.630 <= center.z <= 0.830
+            0.615 <= center.z <= 0.840
             and abs(center.x) <= _highcut_width(center.z)
         )
 
-    front = _copy_shell(
-        "Heather_Highcut_Front_Panel",
-        body,
-        armature,
-        material,
-        lambda _polygon, center: common(center) and _front(center),
-        offset=0.0068,
-    )
-    back = _copy_shell(
-        "Heather_Highcut_Back_Panel",
-        body,
-        armature,
-        material,
-        lambda _polygon, center: common(center) and _back(center),
-        offset=0.0068,
-    )
-    return [front, back]
+    return [
+        _copy_shell(
+            "Heather_Highcut_Front_Panel",
+            body,
+            armature,
+            material,
+            lambda _polygon, center: common(center) and _front(center),
+            offset=0.0083,
+        ),
+        _copy_shell(
+            "Heather_Highcut_Back_Panel",
+            body,
+            armature,
+            material,
+            lambda _polygon, center: common(center) and _back(center),
+            offset=0.0083,
+        ),
+    ]
 
 
 def _sleeves_and_cuffs(
@@ -270,14 +285,15 @@ def _sleeves_and_cuffs(
         upper = _group_index(body, f"UpperArm_{side}")
         lower = _group_index(body, f"LowerArm_{side}")
         hand = _group_index(body, f"Hand_{side}")
-        _, lower_end = bone_segment(armature, f"LowerArm_{side}")
+        _, wrist = bone_segment(armature, f"LowerArm_{side}")
 
         def sleeve_predicate(
             polygon: bpy.types.MeshPolygon,
-            _center: Vector,
+            center: Vector,
             upper_index: int | None = upper,
             lower_index: int | None = lower,
             hand_index: int | None = hand,
+            wrist_point: Vector = wrist,
         ) -> bool:
             arm_weight = _polygon_average_weight(
                 body,
@@ -285,21 +301,25 @@ def _sleeves_and_cuffs(
                 (upper_index, lower_index),
             )
             hand_weight = _polygon_average_weight(body, polygon, (hand_index,))
-            return arm_weight >= 0.085 and hand_weight <= 0.44
+            return (
+                arm_weight >= 0.035
+                and hand_weight <= 0.28
+                and (center - wrist_point).length >= 0.030
+            )
 
         def cuff_predicate(
             polygon: bpy.types.MeshPolygon,
             center: Vector,
             lower_index: int | None = lower,
             hand_index: int | None = hand,
-            wrist: Vector = lower_end,
+            wrist_point: Vector = wrist,
         ) -> bool:
             wrist_weight = _polygon_average_weight(
                 body,
                 polygon,
                 (lower_index, hand_index),
             )
-            return wrist_weight >= 0.12 and (center - wrist).length <= 0.046
+            return wrist_weight >= 0.10 and (center - wrist_point).length <= 0.042
 
         garments.append(
             _copy_shell(
@@ -308,7 +328,7 @@ def _sleeves_and_cuffs(
                 armature,
                 fabric,
                 sleeve_predicate,
-                offset=0.0068,
+                offset=0.0080,
             )
         )
         garments.append(
@@ -318,7 +338,7 @@ def _sleeves_and_cuffs(
                 armature,
                 trim,
                 cuff_predicate,
-                offset=0.0088,
+                offset=0.0100,
                 thickness=0.0016,
                 bevel=0.00045,
             )
@@ -394,22 +414,23 @@ def _hood_panel(
 ) -> bpy.types.Object:
     sign = -1.0 if side == "L" else 1.0
     rows = [
-        (1.035, 0.052, 0.070, 0.032),
-        (1.006, 0.078, 0.106, 0.056),
-        (0.972, 0.096, 0.126, 0.068),
-        (0.938, 0.088, 0.120, 0.063),
-        (0.906, 0.060, 0.101, 0.047),
-        (0.880, 0.014, 0.079, 0.017),
+        (1.038, 0.052, 0.072, 0.030),
+        (1.010, 0.076, 0.104, 0.051),
+        (0.978, 0.092, 0.122, 0.064),
+        (0.946, 0.090, 0.120, 0.064),
+        (0.916, 0.070, 0.105, 0.052),
+        (0.892, 0.040, 0.088, 0.030),
+        (0.878, 0.012, 0.078, 0.010),
     ]
-    columns = 16
+    columns = 18
     vertices: list[tuple[float, float, float]] = []
     for z, width, center_y, wrap in rows:
         for column in range(columns + 1):
             u = column / columns
             x = sign * width * u
-            fold = 0.009 * math.sin(math.pi * u)
+            fold = 0.008 * math.sin(math.pi * u)
             y = center_y - wrap * u + fold
-            row_drop = 0.005 * math.sin(math.pi * u)
+            row_drop = 0.004 * math.sin(math.pi * u)
             vertices.append((x, y, z - row_drop))
     return _grid_mesh(
         f"Heather_Hood_Outer_{side}",
@@ -435,8 +456,8 @@ def _neck_band(
         points.append(
             (
                 0.064 * math.cos(angle),
-                -0.002 + 0.047 * math.sin(angle),
-                1.010 - 0.004 * max(0.0, -math.sin(angle)),
+                -0.002 + 0.048 * math.sin(angle),
+                1.014 - 0.004 * max(0.0, -math.sin(angle)),
             )
         )
     band = base.curve_tube(
@@ -477,13 +498,19 @@ def _surface_y(
     return min(point.y for point in candidates) if front else max(point.y for point in candidates)
 
 
+def _side_y(body: bpy.types.Object, x: float, z: float) -> float:
+    front = _surface_y(body, x, z, front=True)
+    back = _surface_y(body, x, z, front=False)
+    return (front + back) * 0.5
+
+
 def _placket_and_buttons(
     body: bpy.types.Object,
     armature: bpy.types.Object,
     trim: bpy.types.Material,
     buttons: bpy.types.Material,
 ) -> list[bpy.types.Object]:
-    y = _surface_y(body, 0.0, 0.966, front=True) - 0.010
+    y = _surface_y(body, 0.0, 0.966, front=True) - 0.013
     placket = legacy.rounded_box(
         "Heather_Henley_Placket",
         (0.0, y, 0.966),
@@ -516,16 +543,16 @@ def _cords_and_ties(
     armature: bpy.types.Object,
     trim: bpy.types.Material,
 ) -> list[bpy.types.Object]:
-    front_neck_y = _surface_y(body, 0.034, 1.000, front=True) - 0.016
-    result = []
+    front_neck_y = _surface_y(body, 0.034, 1.000, front=True) - 0.018
+    result: list[bpy.types.Object] = []
     for side, sign in (("L", -1.0), ("R", 1.0)):
         cord = base.curve_tube(
             f"Heather_Hood_Drawcord_{side}",
             [
                 (sign * 0.035, front_neck_y, 1.006),
-                (sign * 0.040, front_neck_y - 0.006, 0.978),
-                (sign * 0.043, front_neck_y - 0.008, 0.946),
-                (sign * 0.038, front_neck_y - 0.004, 0.925),
+                (sign * 0.040, front_neck_y - 0.005, 0.978),
+                (sign * 0.043, front_neck_y - 0.007, 0.946),
+                (sign * 0.038, front_neck_y - 0.003, 0.925),
             ],
             0.00145,
             trim,
@@ -536,16 +563,16 @@ def _cords_and_ties(
         base.transfer_nearest_body_weights(cord, body)
         result.append(cord)
 
-        hip_x = sign * 0.108
-        hip_z = 0.790
-        hip_y = _surface_y(body, hip_x, hip_z, front=True) - 0.014
+        hip_x = sign * 0.132
+        hip_z = 0.795
+        hip_y = _side_y(body, hip_x, hip_z) - 0.006
         tie = base.curve_tube(
             f"Heather_Side_Tie_{side}",
             [
                 (hip_x, hip_y, hip_z),
-                (sign * 0.132, hip_y - 0.006, hip_z + 0.004),
-                (sign * 0.158, hip_y - 0.004, hip_z - 0.012),
-                (sign * 0.176, hip_y + 0.002, hip_z - 0.034),
+                (sign * 0.151, hip_y - 0.004, hip_z + 0.003),
+                (sign * 0.171, hip_y, hip_z - 0.012),
+                (sign * 0.184, hip_y + 0.006, hip_z - 0.034),
             ],
             0.0016,
             trim,
@@ -563,16 +590,14 @@ def _seams(
     armature: bpy.types.Object,
     trim: bpy.types.Material,
 ) -> list[bpy.types.Object]:
-    front_points = []
-    for z in (0.650, 0.700, 0.755, 0.810, 0.865, 0.920):
-        front_points.append(
-            (0.0, _surface_y(body, 0.0, z, front=True) - 0.0085, z)
-        )
-    back_points = []
-    for z in (0.650, 0.700, 0.755, 0.810, 0.865, 0.920):
-        back_points.append(
-            (0.0, _surface_y(body, 0.0, z, front=False) + 0.0085, z)
-        )
+    front_points = [
+        (0.0, _surface_y(body, 0.0, z, front=True) - 0.011, z)
+        for z in (0.635, 0.690, 0.750, 0.810, 0.870, 0.930)
+    ]
+    back_points = [
+        (0.0, _surface_y(body, 0.0, z, front=False) + 0.011, z)
+        for z in (0.635, 0.690, 0.750, 0.810, 0.870, 0.930)
+    ]
     front = base.curve_tube(
         "Heather_Center_Front_Seam",
         front_points,
@@ -594,12 +619,13 @@ def _seams(
     hood = base.curve_tube(
         "Heather_Hood_Center_Seam",
         [
-            (0.0, 0.070, 1.035),
-            (0.0, 0.106, 1.006),
-            (0.0, 0.126, 0.972),
-            (0.0, 0.120, 0.938),
-            (0.0, 0.101, 0.906),
-            (0.0, 0.079, 0.880),
+            (0.0, 0.072, 1.038),
+            (0.0, 0.104, 1.010),
+            (0.0, 0.122, 0.978),
+            (0.0, 0.120, 0.946),
+            (0.0, 0.105, 0.916),
+            (0.0, 0.088, 0.892),
+            (0.0, 0.078, 0.878),
         ],
         0.00065,
         trim,
@@ -630,9 +656,7 @@ def create_outfit(
             _neck_band(body, armature, fabric),
         ]
     )
-    garments.extend(
-        _placket_and_buttons(body, armature, trim, button_material)
-    )
+    garments.extend(_placket_and_buttons(body, armature, trim, button_material))
     garments.extend(_cords_and_ties(body, armature, trim))
     garments.extend(_seams(body, armature, trim))
     return garments
