@@ -272,7 +272,21 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
 
 def main() -> int:
     result = audit()
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    compact = {
+        "schemaVersion": result["schemaVersion"],
+        "passed": result["passed"],
+        "scriptCount": result["scriptCount"],
+        "unreferenced": result["unreferenced"],
+        "duplicateGroups": result["duplicateGroups"],
+        "semanticDuplicateGroups": result["semanticDuplicateGroups"],
+        "invalidOpaqueLoaders": result["invalidOpaqueLoaders"],
+        "unreferencedResources": result["unreferencedResources"],
+        "duplicateResourceGroups": result["duplicateResourceGroups"],
+        "maximumProductImportDepth": result["maximumProductImportDepth"],
+        "excessiveProductImportChains": result["excessiveProductImportChains"],
+        "productImportCycles": result["productImportCycles"],
+    }
+    print(json.dumps(compact, ensure_ascii=False, indent=2))
     return 0 if result["passed"] else 1
 
 
