@@ -63,6 +63,9 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          find . -type d -name __pycache__ -prune -exec rm -rf {} +
+          find . -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
+          git restore --source=origin/main -- .github/workflows
           git add -A
           git commit -m 'refactor: finalize canonical GenWorks integration [skip-hosted-product-build]'
           git pull --rebase origin main
