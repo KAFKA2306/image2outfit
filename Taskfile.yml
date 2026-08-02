@@ -37,6 +37,11 @@ tasks:
     cmds:
       - uv run --no-cache --locked --no-default-groups python tools/audit_genworks_layout.py
 
+  audit:research:
+    desc: Reject stale, incomplete, non-primary, or license-unsafe garment research baselines.
+    cmds:
+      - uv run --no-cache --locked --no-default-groups python tools/audit_research_baseline.py
+
   audit:snapshot:
     desc: Verify any preserved legacy snapshot against its original local source.
     requires:
@@ -72,6 +77,7 @@ tasks:
         python tools/migrate_jobs_to_genworks.py --apply
       - uv run --no-cache --locked --no-default-groups python tools/audit_genworks_layout.py
       - uv run --no-cache --locked --no-default-groups python tools/audit_repository_hygiene.py
+      - uv run --no-cache --locked --no-default-groups python tools/audit_research_baseline.py
 
   check:python:
     desc: Check repository contracts and generic reproducibility tooling.
@@ -82,6 +88,7 @@ tasks:
         python -m compileall -q tools tests
       - uv run --no-cache --locked --no-default-groups python tools/audit_repository_hygiene.py
       - uv run --no-cache --locked --no-default-groups python tools/audit_genworks_layout.py
+      - uv run --no-cache --locked --no-default-groups python tools/audit_research_baseline.py
       - >-
         uv run --no-cache --locked --no-default-groups
         python -m unittest discover -s tests -v
@@ -90,6 +97,7 @@ tasks:
         ruff check --ignore S102
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
+        tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
         tools/package_snapshot.py
@@ -102,11 +110,13 @@ tasks:
         tests/test_snapshot_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
+        tests/test_research_baseline.py
       - >-
         uv run --no-cache --locked --no-default-groups --group dev
         ruff format --check
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
+        tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
         tools/package_snapshot.py
@@ -119,6 +129,7 @@ tasks:
         tests/test_snapshot_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
+        tests/test_research_baseline.py
 
   format:python:
     desc: Format generic repository and GenWorks tooling.
@@ -128,6 +139,7 @@ tasks:
         ruff format
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
+        tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
         tools/package_snapshot.py
@@ -140,3 +152,4 @@ tasks:
         tests/test_snapshot_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
+        tests/test_research_baseline.py
