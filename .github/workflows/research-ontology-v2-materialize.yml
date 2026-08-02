@@ -1,0 +1,33 @@
+name: Materialize research ontology v2
+
+on:
+  push:
+    branches: [agent/research-ontology-v2]
+    paths:
+      - .github/workflows/research-ontology-v2-materialize.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format-and-remove-self:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/research-ontology-v2
+          fetch-depth: 0
+      - name: Pretty-print baseline and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          target='Assets/GenWorks/Shared/Research/2026-garment-methods.json'
+          python -m json.tool "$target" > "$target.tmp"
+          mv "$target.tmp" "$target"
+          rm .github/workflows/research-ontology-v2-materialize.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$target" .github/workflows/research-ontology-v2-materialize.yml
+          git commit -m 'Format research ontology baseline'
+          git push origin HEAD:agent/research-ontology-v2
