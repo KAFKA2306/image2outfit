@@ -16,10 +16,11 @@ REQUIRED_TOOL_PATHS = (
 )
 ACTIVE_PATH_FILES = (
     ROOT / "Taskfile.yml",
-    ROOT / ".github/workflows/haolan-cow-hood.yml",
-    ROOT / ".github/workflows/haolan-cow-hood-hosted.yml",
-    ROOT / ".github/workflows/haolan-bordeaux-preview.yml",
-    ROOT / ".github/run/genworks-migrate.txt",
+    ROOT / "README.md",
+    ROOT / "AGENTS.md",
+    ROOT / "docs/GENWORKS_LAYOUT.md",
+    ROOT / "tools/audit_snapshot.py",
+    ROOT / "tools/package_snapshot.py",
 )
 
 
@@ -43,12 +44,14 @@ class SnapshotPathPolicyTests(unittest.TestCase):
         )
         self.assertTrue((CANONICAL_SNAPSHOT_ROOT / "LegacyManifest.json").is_file())
 
-    def test_active_generation_paths_target_snapshots(self) -> None:
+    def test_active_snapshot_paths_use_current_contract(self) -> None:
         forbidden_tokens = (
             "Assets/GenWorks/Legacy/Published",
             "Published/haolan/",
             "tools/audit_published.py",
             "tools/package_published.py",
+            ".github/run/",
+            ".github/status/",
         )
         violations: list[str] = []
         for path in ACTIVE_PATH_FILES:
@@ -62,7 +65,7 @@ class SnapshotPathPolicyTests(unittest.TestCase):
         self.assertEqual(
             [],
             violations,
-            f"Deprecated snapshot paths remain: {violations}",
+            f"Deprecated snapshot or runtime paths remain: {violations}",
         )
 
     def test_snapshot_tools_use_current_names(self) -> None:
