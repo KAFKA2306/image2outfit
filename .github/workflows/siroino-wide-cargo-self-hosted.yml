@@ -2,10 +2,6 @@ name: Build Siroino Wide Cargo
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - .github/run/siroino-wide-cargo.txt
 
 permissions:
   contents: write
@@ -130,6 +126,7 @@ jobs:
           @'
           import json
           from pathlib import Path
+
           path = Path('Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json')
           data = json.loads(path.read_text(encoding='utf-8-sig'))
           data['status'] = 'REVIEW_REQUIRED'
