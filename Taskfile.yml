@@ -39,8 +39,7 @@ tasks:
       vars: [SNAPSHOT, SOURCE]
     cmds:
       - >-
-        uv run --no-cache --no-project
-        --with numpy --with pillow --with trimesh --with scipy --with matplotlib
+        uv run --no-cache --group snapshot
         python tools/audit_snapshot.py
         --candidate "{{.SNAPSHOT}}"
         --source "{{.SOURCE}}"
@@ -72,7 +71,7 @@ tasks:
       - uv run --no-cache --no-project python tools/audit_genworks_layout.py
       - uv run --no-cache --no-project python -m unittest discover -s tests -v
       - >-
-        uv run --no-cache --no-project --with ruff
+        uv run --no-cache --group dev
         ruff check --ignore S102
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
@@ -85,7 +84,7 @@ tasks:
         tests/test_genworks_layout.py
         tests/test_snapshot_paths.py
       - >-
-        uv run --no-cache --no-project --with ruff
+        uv run --no-cache --group dev
         ruff format --check
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
@@ -102,7 +101,7 @@ tasks:
     desc: Format generic repository and GenWorks tooling.
     cmds:
       - >-
-        uv run --no-cache --no-project --with ruff
+        uv run --no-cache --group dev
         ruff format
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py

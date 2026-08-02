@@ -3,5 +3,16 @@ name = "image2outfit"
 version = "0.1.0"
 requires-python = "==3.11.*"
 dependencies = [
-  "pillow==12.2.0",
+  "Pillow==12.3.0",
+]
+
+[dependency-groups]
+dev = [
+  "ruff",
+]
+snapshot = [
+  "matplotlib",
+  "numpy",
+  "scipy",
+  "trimesh",
 ]

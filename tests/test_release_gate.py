@@ -83,7 +83,10 @@ class ReleaseGateTest(unittest.TestCase):
             },
         )
         self.write_json(self.root / "config" / "toolchain-lock.json", {"schemaVersion": 1})
-        (self.root / "config" / "blender-python-requirements.txt").write_text("Pillow==12.3.0\n", encoding="utf-8")
+        (self.root / "pyproject.toml").write_text(
+            '[project]\nname = "test"\nversion = "0.0.0"\ndependencies = ["Pillow==12.3.0"]\n',
+            encoding="utf-8",
+        )
         self.write_json(self.root / "Packages" / "vpm-manifest.json", {})
         self.write_json(self.root / "Packages" / "manifest.json", {})
         (self.root / "ProjectSettings" / "ProjectVersion.txt").write_text("m_EditorVersion: 2022.3.22f1\n", encoding="utf-8")

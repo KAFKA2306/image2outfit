@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import subprocess
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -112,6 +113,24 @@ def blender_command(blender: str, arguments: list[str]) -> list[str]:
     return [blender, "--python-use-system-env", *arguments]
 
 
+def _project_dependencies(root: Path, group: str) -> list[str]:
+    pyproject = root / "pyproject.toml"
+    if not pyproject.is_file():
+        raise FileNotFoundError(f"Python project configuration missing: {pyproject}")
+    with pyproject.open("rb") as stream:
+        configuration = tomllib.load(stream)
+    project = configuration.get("project", {})
+    if group == "project":
+        requirements = project.get("dependencies", [])
+    else:
+        requirements = project.get("optional-dependencies", {}).get(group)
+    if not isinstance(requirements, list) or not requirements:
+        raise ValueError(f"pyproject dependency group is empty or missing: {group}")
+    if not all(isinstance(value, str) and value for value in requirements):
+        raise ValueError(f"pyproject dependency group contains invalid entries: {group}")
+    return requirements
+
+
 def _expected_packages(lock: dict[str, Any]) -> dict[str, dict[str, str]]:
     packages = lock.get("blender", {}).get("python", {}).get("packages", {})
     if not isinstance(packages, dict) or not packages:
@@ -160,7 +179,8 @@ def prepare(
     python_lock = blender_lock.get("python", {})
     expected_blender = str(blender_lock.get("version", ""))
     expected_python = str(python_lock.get("version", ""))
-    requirements = root / str(python_lock.get("requirements", ""))
+    dependency_group = str(python_lock.get("dependencyGroup", ""))
+    requirements = _project_dependencies(root, dependency_group)
     packages = _expected_packages(lock)
     runtime = probe_runtime(blender)
     if runtime.get("blenderVersion") != expected_blender:
@@ -173,12 +193,11 @@ def prepare(
             f"Blender Python version mismatch: expected {expected_python}, "
             f"found {runtime.get('pythonVersion') or 'missing'}"
         )
-    if not requirements.is_file():
-        raise FileNotFoundError(f"Blender Python requirements missing: {requirements}")
-
     dependency_target = target or root / ".image2outfit" / "blender-python"
     stamp_path = dependency_target / "image2outfit-environment.json"
-    requirements_sha = sha256(requirements)
+    requirements_sha = hashlib.sha256(
+        json.dumps(requirements, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
     expected_stamp = {
         "schemaVersion": 1,
         "blenderVersion": expected_blender,
@@ -207,11 +226,10 @@ def prepare(
                 str(python_executable),
                 "--target",
                 str(dependency_target),
-                "--requirements",
-                str(requirements),
                 "--only-binary",
                 ":all:",
                 "--no-deps",
+                *requirements,
             ]
         )
 
@@ -231,8 +249,9 @@ def prepare(
     report = {
         "passed": True,
         **runtime,
-        "requirements": str(requirements.relative_to(root)).replace("\\", "/"),
-        "requirementsSha256": requirements_sha,
+        "dependencySource": "pyproject.toml",
+        "dependencyGroup": dependency_group,
+        "dependencySetSha256": requirements_sha,
         "packages": actual_packages,
     }
     return PreparedEnvironment(
