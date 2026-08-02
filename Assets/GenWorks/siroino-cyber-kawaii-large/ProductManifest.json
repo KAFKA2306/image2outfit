@@ -12,7 +12,7 @@
   "documentationPath": "Assets/GenWorks/siroino-cyber-kawaii-large/README.md",
   "sourceJobPath": "config/products/siroino-cyber-kawaii-large/job.json",
   "productBuildScript": "tools/siroino_cyber_kawaii_shape_profile_build.py",
-  "designRevision": "v5-large-shape-profile-deforming-skirt",
+  "designRevision": "v6-large-fitted-skirt-silhouette",
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-cyber-kawaii-large",
@@ -20,7 +20,7 @@
     "resumeFrom": "tools/siroino_cyber_kawaii_shape_profile_build.py",
     "lastAttempt": {
       "result": "HOSTED_MODELED",
-      "visualRevision": "v5-large-shape-profile-deforming-skirt",
+      "visualRevision": "v6-large-fitted-skirt-silhouette",
       "shapeProfile": "Siroino _Large via official shape keys"
     },
     "blockers": [
@@ -45,7 +45,8 @@
     "humanPoseReview": "PENDING",
     "humanRuntimeReview": "PENDING",
     "shapeProfileApplied": "PASS",
-    "skirtWeightTransfer": "PASS"
+    "skirtWeightTransfer": "PASS",
+    "skirtSilhouette": "PASS"
   },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
@@ -78,35 +79,69 @@
   "skirtWeightTransfer": {
     "Black_Pink_Plaid_Pleated_Skirt": {
       "fallbackVertices": 0,
-      "maximumHipAnchor": 0.8,
+      "maximumHipAnchor": 0.88,
       "maximumInfluences": 2,
-      "maximumLegAnchor": 0.22,
-      "minimumHipAnchor": 0.34,
+      "maximumLegAnchor": 0.3,
+      "minimumHipAnchor": 0.42,
       "vertices": 384
     },
     "Black_Skirt_Waistband": {
       "fallbackVertices": 0,
-      "maximumHipAnchor": 0.8,
+      "maximumHipAnchor": 0.88,
       "maximumInfluences": 3,
-      "maximumLegAnchor": 0.22,
-      "minimumHipAnchor": 0.34,
+      "maximumLegAnchor": 0.3,
+      "minimumHipAnchor": 0.42,
       "vertices": 256
     },
     "Pink_Underskirt_Hem": {
       "fallbackVertices": 0,
-      "maximumHipAnchor": 0.8,
+      "maximumHipAnchor": 0.88,
       "maximumInfluences": 2,
-      "maximumLegAnchor": 0.22,
-      "minimumHipAnchor": 0.34,
+      "maximumLegAnchor": 0.3,
+      "minimumHipAnchor": 0.42,
       "vertices": 320
     },
     "White_Ruffle_Underskirt": {
       "fallbackVertices": 0,
-      "maximumHipAnchor": 0.8,
+      "maximumHipAnchor": 0.88,
       "maximumInfluences": 2,
-      "maximumLegAnchor": 0.22,
-      "minimumHipAnchor": 0.34,
+      "maximumLegAnchor": 0.3,
+      "minimumHipAnchor": 0.42,
       "vertices": 320
+    }
+  },
+  "skirtSilhouette": {
+    "Black_Pink_Plaid_Pleated_Skirt": {
+      "bottomScale": 0.835,
+      "pleatScale": 0.56,
+      "ringCount": 3,
+      "topScale": 0.985,
+      "vertices": 384,
+      "zOffset": -0.006
+    },
+    "Black_Skirt_Waistband": {
+      "bottomScale": 0.965,
+      "pleatScale": 0.5,
+      "ringCount": 2,
+      "topScale": 0.975,
+      "vertices": 256,
+      "zOffset": -0.008
+    },
+    "Pink_Underskirt_Hem": {
+      "bottomScale": 0.855,
+      "pleatScale": 0.58,
+      "ringCount": 2,
+      "topScale": 0.885,
+      "vertices": 320,
+      "zOffset": -0.004
+    },
+    "White_Ruffle_Underskirt": {
+      "bottomScale": 0.86,
+      "pleatScale": 0.62,
+      "ringCount": 2,
+      "topScale": 0.9,
+      "vertices": 320,
+      "zOffset": -0.004
     }
   }
 }
