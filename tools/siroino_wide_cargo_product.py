@@ -2,6 +2,13 @@
 """Stable product entrypoint for the current Siroino Wide Cargo implementation."""
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
 import siroino_wide_cargo_parametric_v36 as implementation
 
 
