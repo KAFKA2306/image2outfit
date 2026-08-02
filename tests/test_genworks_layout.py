@@ -16,13 +16,13 @@ import migrate_jobs_to_genworks
 CONFIG = {
     "schemaVersion": 1,
     "canonicalRoot": "Assets/GenWorks",
-    "productRoot": "Assets/GenWorks/Products",
+    "productRoot": "Assets/GenWorks",
     "manifestName": "ProductManifest.json",
     "requiredProductDirectories": [
         "Models",
         "Textures",
         "Materials",
-        "Prefabs",
+        "Prefab",
         "Previews",
         "Documentation",
     ],
@@ -47,7 +47,7 @@ class GenWorksLayoutTest(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
         (self.root / "config").mkdir(parents=True)
-        (self.root / "Assets" / "GenWorks" / "Products").mkdir(parents=True)
+        (self.root / "Assets" / "GenWorks").mkdir(parents=True)
         (self.root / "config" / "genworks-layout.json").write_text(
             json.dumps(CONFIG), encoding="utf-8"
         )
@@ -56,10 +56,10 @@ class GenWorksLayoutTest(unittest.TestCase):
         self.temporary.cleanup()
 
     def test_valid_product_manifest_passes(self) -> None:
-        product = self.root / "Assets" / "GenWorks" / "Products" / "test-outfit"
+        product = self.root / "Assets" / "GenWorks" / "test-outfit"
         for name in CONFIG["requiredProductDirectories"]:
             (product / name).mkdir(parents=True)
-        prefab = product / "Prefabs" / "Outfit.prefab"
+        prefab = product / "Prefab" / "Outfit.prefab"
         preview = product / "Previews" / "front.png"
         readme = product / "Documentation" / "README.md"
         for file in (prefab, preview, readme):
@@ -69,10 +69,10 @@ class GenWorksLayoutTest(unittest.TestCase):
                 {
                     "schemaVersion": 1,
                     "productId": "test-outfit",
-                    "productRoot": "Assets/GenWorks/Products/test-outfit",
-                    "outfitPrefabPath": "Assets/GenWorks/Products/test-outfit/Prefabs/Outfit.prefab",
-                    "previewPath": "Assets/GenWorks/Products/test-outfit/Previews/front.png",
-                    "documentationPath": "Assets/GenWorks/Products/test-outfit/Documentation/README.md",
+                    "productRoot": "Assets/GenWorks/test-outfit",
+                    "outfitPrefabPath": "Assets/GenWorks/test-outfit/Prefab/Outfit.prefab",
+                    "previewPath": "Assets/GenWorks/test-outfit/Previews/front.png",
+                    "documentationPath": "Assets/GenWorks/test-outfit/Documentation/README.md",
                 }
             ),
             encoding="utf-8",
@@ -84,16 +84,9 @@ class GenWorksLayoutTest(unittest.TestCase):
         self.assertEqual(result["products"], 1)
 
     def test_manifest_cannot_reference_another_product(self) -> None:
-        product = self.root / "Assets" / "GenWorks" / "Products" / "one"
+        product = self.root / "Assets" / "GenWorks" / "one"
         product.mkdir(parents=True)
-        outside = (
-            self.root
-            / "Assets"
-            / "GenWorks"
-            / "Products"
-            / "two"
-            / "Outfit.prefab"
-        )
+        outside = self.root / "Assets" / "GenWorks" / "two" / "Outfit.prefab"
         outside.parent.mkdir(parents=True)
         outside.write_text("test", encoding="utf-8")
         (product / "ProductManifest.json").write_text(
@@ -101,8 +94,8 @@ class GenWorksLayoutTest(unittest.TestCase):
                 {
                     "schemaVersion": 1,
                     "productId": "one",
-                    "productRoot": "Assets/GenWorks/Products/one",
-                    "outfitPrefabPath": "Assets/GenWorks/Products/two/Outfit.prefab",
+                    "productRoot": "Assets/GenWorks/one",
+                    "outfitPrefabPath": "Assets/GenWorks/two/Outfit.prefab",
                 }
             ),
             encoding="utf-8",
@@ -168,8 +161,14 @@ class GenWorksLayoutTest(unittest.TestCase):
         job_path.write_text(json.dumps(job), encoding="utf-8")
         migrate_jobs_to_genworks.migrate_job(self.root, job_path, True)
         updated = json.loads(job_path.read_text(encoding="utf-8"))
+        self.assertEqual(updated["productRoot"], "Assets/GenWorks/sample")
         self.assertEqual(
-            updated["productRoot"], "Assets/GenWorks/Products/sample"
+            updated["prefabAssetPath"],
+            "Assets/GenWorks/sample/Prefab/Outfit.prefab",
+        )
+        self.assertEqual(
+            updated["integratedPrefabAssetPath"],
+            "Assets/GenWorks/sample/Prefab/Integrated.prefab",
         )
         destination = self.root / updated["fbxAssetPath"]
         self.assertTrue(destination.is_file())
