@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "id": "haolan-bordeaux-knit-set",
+  "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
+  "adapterId": "haolan-v1.6",
+  "productRoot": "Assets/GenWorks/haolan-bordeaux-knit-set",
+  "productManifestPath": "Assets/GenWorks/haolan-bordeaux-knit-set/ProductManifest.json",
+  "buildScript": "tools/render_haolan_candidate_turnaround.py",
+  "hostedPoseScript": "tools/render_haolan_candidate_turnaround.py",
+  "buildCapability": "recovery-and-preview-only-until-fbx-is-restored",
+  "blendPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Source/Blender/HAOLAN_BordeauxKnitSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Models/HAOLAN_BordeauxKnitSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet_Integrated.prefab",
+  "targetAvatarAssetPath": "Assets/_Local/Resolved/HAOLAN_Lowpoly Variant.prefab",
+  "targetSourcePath": "Assets/_Local/Resolved/HAOLAN_Lowpoly.fbx",
+  "artifactDir": "Artifacts/haolan-bordeaux-knit-set",
+  "candidateDir": "Candidates/haolan-bordeaux-knit-set",
+  "releaseDir": "Release/haolan-bordeaux-knit-set",
+  "licenseEvidence": "config/products/haolan-bordeaux-knit-set/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local",
+    "Assets/_Vendor",
+    "Assets/HAOLAN_Quest"
+  ],
+  "deliveryAssets": [
+    "Assets/GenWorks/haolan-bordeaux-knit-set/ProductManifest.json",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/README.md",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab.meta",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Documentation/Audit/AUDIT_REPORT.md",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Documentation/Audit/audit-summary.json",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Documentation/Audit/preview-requirements.json"
+  ],
+  "previewPaths": {},
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/haolan-bordeaux-knit-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/haolan-bordeaux-knit-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/haolan-bordeaux-knit-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": []
+}
