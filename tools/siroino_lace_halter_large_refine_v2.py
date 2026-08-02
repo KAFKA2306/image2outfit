@@ -6,6 +6,9 @@ import base64
 import zlib
 from pathlib import Path
 
+# Keep the shared review implementation statically visible to ownership audits.
+import siroino_lace_halter_large_refine_and_review as _review_base  # noqa: F401
+
 source_root = Path(__file__).with_name("product_sources") / "siroino_lace_halter_large_panel"
 parts = sorted(source_root.glob("part-*.b85"))
 if not parts:
