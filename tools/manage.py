@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import method_selection
+import runtime_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -43,13 +44,13 @@ def _product(command: str, product_id: str) -> int:
     try:
         job_path = method_selection.resolve_job(product_id, ROOT)
         job = method_selection.read_json(job_path)
+        runtime = runtime_paths.for_job(ROOT, job)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"image2outfit: {exc}", file=sys.stderr)
         return 1
 
-    artifact = ROOT / str(job["artifactDir"])
     selection = method_selection.select(job, ROOT)
-    _write(artifact / "method-selection.json", selection)
+    _write(runtime.reports / "method-selection.json", selection)
     if command == "explain":
         print(json.dumps(selection, ensure_ascii=False, indent=2))
         return 0 if selection["passed"] else 2
