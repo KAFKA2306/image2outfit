@@ -153,6 +153,126 @@
       ]
     }
   },
+  "commercialMethodPolicy": {
+    "profileId": "commercial-v1",
+    "profiles": {
+      "fitted": {
+        "description": "Body-conforming garment whose primary deformation is inherited from the avatar rig.",
+        "requiredCapabilities": [
+          "topology-uv",
+          "pbr-texture",
+          "dynamic-evaluation"
+        ],
+        "requiredEvidence": [
+          "topology-audit",
+          "pbr-audit",
+          "motion-review"
+        ]
+      },
+      "panel-sewn": {
+        "description": "Garment assembled from editable pattern panels and explicit seam connectivity.",
+        "requiredCapabilities": [
+          "structured-patterns",
+          "stitch-assembly",
+          "topology-uv",
+          "pbr-texture",
+          "dynamic-evaluation"
+        ],
+        "requiredEvidence": [
+          "panel-graph",
+          "seam-graph",
+          "connectivity-audit",
+          "topology-audit",
+          "pbr-audit",
+          "motion-review"
+        ]
+      },
+      "loose-layered": {
+        "description": "Loose or layered garment that requires explicit layer, collision, and runtime deformation evaluation.",
+        "requiredCapabilities": [
+          "structured-patterns",
+          "stitch-assembly",
+          "topology-uv",
+          "layering-collision",
+          "pbr-texture",
+          "runtime-deformation",
+          "dynamic-evaluation"
+        ],
+        "requiredEvidence": [
+          "panel-graph",
+          "seam-graph",
+          "connectivity-audit",
+          "layer-map",
+          "penetration-report",
+          "topology-audit",
+          "pbr-audit",
+          "deformation-benchmark",
+          "runtime-performance",
+          "motion-review"
+        ]
+      }
+    },
+    "evidenceContract": {
+      "schemaVersion": 1,
+      "passStatus": "PASS",
+      "requiredFields": [
+        "schemaVersion",
+        "kind",
+        "productId",
+        "constructionProfile",
+        "candidateManifestSha256",
+        "status",
+        "checkedAt",
+        "tool",
+        "sourceArtifacts",
+        "metrics",
+        "notes"
+      ],
+      "evidenceRootTemplate": "Assets/GenWorks/{productId}/Evidence/Commercial",
+      "metricRules": {
+        "panel-graph": {
+          "minimum": {"panelCount": 1},
+          "maximum": {"unmappedPanels": 0}
+        },
+        "seam-graph": {
+          "minimum": {"seamPairCount": 1},
+          "maximum": {"unmatchedEdges": 0, "ambiguousEdges": 0, "reversedEdges": 0}
+        },
+        "connectivity-audit": {
+          "requiredTrue": ["edgeLengthCompatibilityPassed", "orientationPassed", "assemblyPassed"]
+        },
+        "layer-map": {
+          "minimum": {"declaredLayerCount": 1},
+          "maximum": {"undeclaredComponents": 0}
+        },
+        "penetration-report": {
+          "maximum": {"blockerPenetrations": 0, "criticalPenetrations": 0, "maxPenetrationDepthMm": 3.0}
+        },
+        "topology-audit": {
+          "maximum": {"nonFiniteVertices": 0, "degenerateTriangles": 0, "maxBoneInfluences": 4},
+          "requiredTrue": ["uvContinuityPassed", "materialAssignmentsPassed"]
+        },
+        "pbr-audit": {
+          "maximum": {"visibleSeamDefects": 0, "unreviewedOccludedRegions": 0, "crossViewColorDeltaE95": 5.0},
+          "requiredTrue": ["albedoPassed", "normalPassed", "roughnessPassed"]
+        },
+        "deformation-benchmark": {
+          "maximum": {"blockingPoseFailures": 0, "temporalArtifacts": 0},
+          "requiredTrue": ["requiredPosesPassed", "selectedMethodMeasuredOnTarget"]
+        },
+        "runtime-performance": {
+          "minimum": {"fpsP05": 45.0},
+          "maximum": {"frameTimeP95Ms": 22.3},
+          "requiredTrue": ["targetDeviceMeasured"]
+        },
+        "motion-review": {
+          "minimum": {"sequencesReviewed": 3},
+          "maximum": {"blockingTemporalDefects": 0},
+          "requiredTrue": ["identityRetentionPassed", "detailRetentionPassed", "collisionReviewPassed"]
+        }
+      }
+    }
+  },
   "allowedDeliveryExtensions": [
     ".blend",
     ".fbx",
