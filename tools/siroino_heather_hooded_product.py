@@ -15,6 +15,8 @@ if str(TOOLS) not in sys.path:
 import siroino_heather_hooded_bodysuit_build as build
 import siroino_heather_hooded_pattern as pattern
 
+DESIGN_REVISION = "v7-continuous-body-derived-shells"
+
 
 def normalize_four_influences(
     objects: list[bpy.types.Object],
@@ -64,6 +66,21 @@ def normalize_four_influences(
     return changed
 
 
+def preserve_authored_weights(
+    garments: list[bpy.types.Object],
+    _body: bpy.types.Object,
+) -> dict[str, object]:
+    """Do not overwrite v7 body-derived weights with a nearest-point pass."""
+    return {
+        "objects": [obj.name for obj in garments if obj.type == "MESH"],
+        "weightSource": (
+            "direct SiroinoSotai_PC source-vertex weights for body-derived shells; "
+            "explicit nearest-body or rigid weights for authored accessories"
+        ),
+        "rebound": False,
+    }
+
+
 def enforce_manifest_contract(original):
     """Keep generated ProductManifest compatible with the canonical v1 schema."""
 
@@ -82,10 +99,22 @@ def enforce_manifest_contract(original):
     return wrapped
 
 
+def update_panel_object_contract() -> None:
+    replacements = {
+        "Heather_Hood_Back_Drape_L": "Heather_Hood_Outer_L",
+        "Heather_Hood_Back_Drape_R": "Heather_Hood_Outer_R",
+        "Heather_Hood_Cowl": "Heather_Hood_Neck_Band",
+    }
+    for panel in build.evidence.PANELS:
+        panel["object"] = replacements.get(panel["object"], panel["object"])
+
+
 def main() -> int:
     build.geometry = pattern
-    build.DESIGN_REVISION = "v6-fitted-sleeves-split-hood-seam-graph"
+    build.DESIGN_REVISION = DESIGN_REVISION
     build.limit_bone_influences = normalize_four_influences
+    build.rebind_dynamic_parts = preserve_authored_weights
+    update_panel_object_contract()
     build.write_report_and_manifest = enforce_manifest_contract(
         build.write_report_and_manifest
     )
