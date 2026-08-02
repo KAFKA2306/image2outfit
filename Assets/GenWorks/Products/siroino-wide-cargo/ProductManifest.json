@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-wide-cargo",
+  "productName": "Siroino Wide Cargo",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/Products/siroino-wide-cargo",
+  "outfitPrefabPath": "Assets/GenWorks/Products/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/Products/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab",
+  "previewPath": "Assets/GenWorks/Products/siroino-wide-cargo/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/Products/siroino-wide-cargo/README.md",
+  "demoScenePath": "Assets/GenWorks/Products/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
+  "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/Products/siroino-wide-cargo",
+    "resumeFrom": "Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json",
+    "doNotRebuildFromZero": true,
+    "lastRejectedAttempt": {
+      "hostedRun": 30738152777,
+      "artifactId": 8830414968,
+      "artifactSha256": "2a3d1d68346e07de8cf7af94e12639121aa25c59d8ddacda254b11e5e8cfd038",
+      "result": "REJECTED",
+      "reason": "Actual v34 render retained serrated waist and leg boundaries, disconnected-looking knee regions, rigid rectangular lower legs, oversized upper-thigh volume, and neutral-only pose evidence."
+    },
+    "blockers": [
+      "Generate and inspect fresh five-view and full pose-review images",
+      "Pass Unity 2022.3.22f1, Modular Avatar, NDMF, VRChat Build & Test and runtime screenshot gates",
+      "Bind approval to exact candidate-manifest SHA-256 before release"
+    ]
+  },
+  "technicalGates": {
+    "blender": "PENDING",
+    "fbx": "PENDING",
+    "uvMapping": "PENDING",
+    "latestGeometryRender": "PENDING",
+    "exactBodyPoseRenders": "PENDING",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "ndmf": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING"
+  },
+  "designRevision": "v35-parametric-voxel-union"
+}
