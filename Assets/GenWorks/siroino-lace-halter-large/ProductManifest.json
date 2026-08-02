@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lace-halter-large",
   "productName": "Lace Halter Sheer Dress for Siroino _Large",
-  "status": "WORKING",
+  "status": "REJECTED",
   "targetAdapterId": "siroino-v1.0-large",
   "productRoot": "Assets/GenWorks/siroino-lace-halter-large",
   "outfitPrefabPath": "Assets/GenWorks/siroino-lace-halter-large/Prefab/SiroinoLaceHalterLarge.prefab",
@@ -15,11 +15,12 @@
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lace-halter-large",
-    "resumeFrom": "Assets/GenWorks/siroino-lace-halter-large/Prefab/Siroino_Large_LaceHalter.prefab",
+    "resumeFrom": "Assets/GenWorks/siroino-lace-halter-large/Source/Blender/SiroinoLaceHalterLarge.blend",
     "doNotRebuildFromZero": true,
     "blockers": [
-      "Complete Unity import/save/reload and Modular Avatar technical gates",
-      "Complete VRChat runtime review before release"
+      "Replace the body-derived shell with an explicit panel-and-seam garment design.",
+      "Rebuild the silhouette and materials using the 2026 OSS adoption plan.",
+      "Pass customer-facing visual review before Unity and runtime release work resumes."
     ]
   },
   "metrics": {
@@ -48,6 +49,20 @@
     "humanVisualReview": "PENDING",
     "humanPoseReview": "PENDING",
     "humanRuntimeReview": "PENDING"
+  },
+  "rejection": {
+    "decidedAt": "2026-08-02",
+    "decisionType": "CUSTOMER_VISUAL_NO_GO",
+    "reason": "The rendered result is technically attached but commercially unattractive: it reads as an inflated plastic body covering rather than a lace halter dress.",
+    "visibleDefects": [
+      "The lower-body silhouette is bulky and balloon-like.",
+      "The material reads as plastic or rubber rather than fabric and lace.",
+      "The halter-neck construction is not visually legible.",
+      "Decorative bands do not read as sewn garment structure.",
+      "The technical review renders do not create purchase intent."
+    ],
+    "researchPlan": "Assets/GenWorks/Shared/Research/2026-garment-oss.json",
+    "nextAction": "Preserve this checkpoint as rejection evidence, define a GarmentCode panel-and-seam pattern, drape it with ZOZO's Contact Solver, author fabric PBR channels with Material Maker, and rerender before any release claim."
   },
   "designRevision": "v1-large-lace-pass-8-continuous-bodycon"
 }
