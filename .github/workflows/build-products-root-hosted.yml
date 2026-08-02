@@ -1,0 +1,138 @@
+name: Build Products-root candidate with hosted Blender
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - config/products/**/job.json
+      - tools/**/*_parametric_v*.py
+      - Assets/GenWorks/Products/**
+  workflow_dispatch:
+    inputs:
+      job_path:
+        description: Product job path
+        required: true
+        default: config/products/siroino-wide-cargo/job.json
+
+permissions:
+  contents: read
+
+concurrency:
+  group: products-root-hosted-${{ inputs.job_path || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  blender:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve one Products-root job
+        env:
+          INPUT_JOB: ${{ inputs.job_path }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          python - <<'PY'
+          import json, os, re, subprocess
+          from pathlib import Path
+
+          job_path = (os.environ.get('INPUT_JOB') or '').strip()
+          if not job_path:
+              before = os.environ.get('BEFORE_SHA', '')
+              current = os.environ['CURRENT_SHA']
+              command = (
+                  ['git', 'diff', '--name-only', before, current]
+                  if before and before != '0' * 40
+                  else ['git', 'show', '--pretty=', '--name-only', current]
+              )
+              changed = sorted({
+                  line.strip()
+                  for line in subprocess.check_output(command, text=True).splitlines()
+                  if re.fullmatch(r'config/products/[a-z0-9][a-z0-9._-]*/job\.json', line.strip())
+              })
+              if len(changed) != 1:
+                  raise SystemExit(f'Exactly one changed product job is required; found {changed}')
+              job_path = changed[0]
+          if not re.fullmatch(r'config/products/[a-z0-9][a-z0-9._-]*/job\.json', job_path):
+              raise SystemExit(f'Invalid product job path: {job_path}')
+          path = Path(job_path)
+          job = json.loads(path.read_text(encoding='utf-8-sig'))
+          product_id = path.parent.name
+          product_root = f'Assets/GenWorks/Products/{product_id}'
+          if job.get('id') != product_id or job.get('productRoot') != product_root:
+              raise SystemExit(f'Products-root identity mismatch: {job.get("productRoot")}')
+          lock = json.loads(Path('config/toolchain-lock.json').read_text(encoding='utf-8'))
+          version = lock['blender']['version']
+          values = {
+              'JOB_PATH': job_path,
+              'JOB_ID': product_id,
+              'PRODUCT_ROOT': product_root,
+              'ARTIFACT_DIR': job['artifactDir'],
+              'BUILD_SCRIPT': job['buildScript'],
+              'BLEND_PATH': job['blendPath'],
+              'POSE_SCRIPT': job.get('hostedPoseScript', ''),
+              'BLENDER_VERSION': version,
+              'BLENDER_SERIES': '.'.join(version.split('.')[:2]),
+          }
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+              for key, value in values.items():
+                  stream.write(f'{key}={value}\n')
+          PY
+
+      - name: Install Blender runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
+
+      - name: Download pinned Blender
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+            --output blender.tar.xz
+          mkdir -p .image2outfit/blender
+          tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Restore Blender Python packages
+        run: |
+          python - <<'PY'
+          import os
+          from tools.blender_python_env import prepare
+          prepared = prepare('.image2outfit/blender/blender')
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+              stream.write(f"PYTHONPATH={prepared.environment['PYTHONPATH']}\n")
+          PY
+
+      - name: Generate fresh product and static renders
+        run: |
+          set -euo pipefail
+          mkdir -p "$ARTIFACT_DIR"
+          .image2outfit/blender/blender --python-use-system-env --background --factory-startup --python-exit-code 1 --python "$BUILD_SCRIPT" -- --job "$JOB_PATH" | tee "$ARTIFACT_DIR/hosted-blender.log"
+
+      - name: Generate fresh required poses
+        if: env.POSE_SCRIPT != ''
+        run: |
+          set -euo pipefail
+          .image2outfit/blender/blender --python-use-system-env --background "$BLEND_PATH" --python-exit-code 1 --python "$POSE_SCRIPT" -- --job "$JOB_PATH" | tee "$ARTIFACT_DIR/hosted-poses.log"
+
+      - name: Upload product and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: image2outfit-products-hosted-${{ env.JOB_ID }}-${{ github.run_id }}
+          path: |
+            ${{ env.ARTIFACT_DIR }}
+            ${{ env.PRODUCT_ROOT }}
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 6
