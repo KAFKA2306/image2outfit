@@ -3,8 +3,8 @@ project:
   name: image2outfit
   repository: https://github.com/KAFKA2306/image2outfit
   pages: null
-  version: 0.1.0
-  updated: 2026-07-30
+  version: 0.2.0
+  updated: 2026-08-02
   core_ontology: https://raw.githubusercontent.com/KAFKA2306/know/main/ontology/causal-evidence-core.yaml
   schema: https://raw.githubusercontent.com/KAFKA2306/know/main/ontology/project.schema.json
 
@@ -25,10 +25,10 @@ scope:
   included: [garment specification, Blender model, FBX, Unity Prefab, preview evidence, pose evidence, VRChat runtime evidence, release manifest]
   excluded: [redistribution of private avatars, automatic aesthetic approval, legacy snapshots as customer releases]
   temporal: Candidate and evidence are bound to immutable hashes at review time.
-  abstraction_level: Customer-delivery pipeline and audit contract.
+  abstraction_level: Product-neutral customer-delivery pipeline and audit contract.
 
 competency_questions:
-  - Which exact avatar, garment candidate, tools, and versions produced this result?
+  - Which exact product, avatar, garment candidate, tools, and versions produced this result?
   - Which states and gates has the candidate passed or failed?
   - What evidence supports structural, visual, pose, and runtime claims?
   - Can the release be reproduced without exposing private source assets?
@@ -71,13 +71,14 @@ decision_rules:
     result: RELEASED
 
 provenance:
-  sources: [local licensed avatar assets, garment job specification, Blender scene, Unity project]
+  sources: [local licensed avatar assets, tracked or local product job, Blender scene, Unity project]
   generated_artifacts: [blend, FBX, Prefab, audit JSON, candidate manifest, previews, release manifest, ZIP]
-  agents: [Blender, Unity 2022.3.22f1, GitHub Actions, human reviewer, VRChat client]
+  agents: [Blender, Unity, GitHub Actions, human reviewer, VRChat client]
   lineage: Every evidence record and decision is bound to candidate inputs, tool versions, and SHA-256 hashes.
 
 validation:
   structural: Blender mesh checks, FBX export checks, Unity import and Prefab checks.
   semantic: Job schema and release policy distinguish candidate, review, GO, and release states.
   evidence: Mandatory view, pose, human-review, runtime, and hash-binding records.
-  publication: Release artifacts exist only after GO; Published snapshots are not treated as releases.
+  repository: Product-neutral workflows, namespaced product config, and no committed runtime state.
+  publication: Release artifacts exist only after GO; legacy snapshots are not treated as releases.
