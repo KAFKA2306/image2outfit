@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "id": "haolan-bordeaux-knit-set",
+  "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
+  "adapterId": "haolan-v1.6",
+  "buildRevision": "v2-canonical-finalize-pass-1",
+  "productRoot": "Assets/GenWorks/haolan-bordeaux-knit-set",
+  "productManifestPath": "Assets/GenWorks/haolan-bordeaux-knit-set/ProductManifest.json",
+  "buildScript": "tools/build_haolan_bordeaux_knit_set.py",
+  "hostedPoseScript": "tools/render_haolan_candidate_poses.py",
+  "blendPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Source/Blender/HAOLAN_BordeauxKnitSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Models/HAOLAN_BordeauxKnitSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_Lowpoly_BordeauxKnitSet.prefab",
+  "targetAvatarAssetPath": "Assets/_Local/HAOLAN/HAOLAN_Lowpoly Variant.prefab",
+  "targetSourcePath": "Assets/_Local/HAOLAN/HAOLAN_Lowpoly.fbx",
+  "artifactDir": "Artifacts/haolan-bordeaux-knit-set",
+  "candidateDir": "Candidates/haolan-bordeaux-knit-set",
+  "releaseDir": "Release/haolan-bordeaux-knit-set",
+  "licenseEvidence": "config/products/haolan-bordeaux-knit-set/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local",
+    "Assets/_Vendor",
+    "Assets/_Reference",
+    "Assets/HAOLAN_Quest"
+  ],
+  "deliveryAssets": [
+    "Assets/GenWorks/haolan-bordeaux-knit-set/ProductManifest.json",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/README.md",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Source/Blender/HAOLAN_BordeauxKnitSet.blend",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Models/HAOLAN_BordeauxKnitSet.fbx",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Models/HAOLAN_BordeauxKnitSet.fbx.meta",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab.meta",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_Lowpoly_BordeauxKnitSet.prefab",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_Lowpoly_BordeauxKnitSet.prefab.meta",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/front.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/back.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/left.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/right.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/three-quarter.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/HAOLAN_BordeauxKnitSet_multiview.webp",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/preview-manifest.json",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/Poses/neutral.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/Poses/crouch.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/Poses/sit.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/Poses/prone.png",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/HAOLAN_BordeauxKnitSet_pose-review.webp",
+    "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/pose-manifest.json"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/front.png",
+    "back": "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/back.png",
+    "left": "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/left.png",
+    "right": "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/haolan-bordeaux-knit-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/haolan-bordeaux-knit-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/haolan-bordeaux-knit-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "targetResolution": {
+    "strategy": "self-hosted-repository-search",
+    "profile": "HAOLAN v1.6",
+    "sourceFilename": "HAOLAN_Lowpoly.fbx",
+    "prefabFilename": "HAOLAN_Lowpoly Variant.prefab"
+  },
+  "legacySource": "Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate"
+}
