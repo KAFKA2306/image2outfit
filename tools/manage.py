@@ -17,6 +17,7 @@ TOOLS = ROOT / "tools"
 AUDITS = {
     "toolchain": "audit_toolchain.py",
     "repository": "audit_repository_hygiene.py",
+    "runtime": "audit_runtime_layout.py",
     "genworks": "audit_genworks_layout.py",
     "tools": "audit_tool_ownership.py",
     "research": "audit_research_baseline.py",
