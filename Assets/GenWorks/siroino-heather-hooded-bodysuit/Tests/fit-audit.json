@@ -1,0 +1,1035 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-02T22:36:55.230876Z",
+  "target": "SiroinoSotai_PC",
+  "method": "Blender evaluated-mesh BVH narrow-phase triangle overlap",
+  "requiredZones": [
+    "chest",
+    "underarm",
+    "shoulder",
+    "elbow",
+    "wrist",
+    "abdomen",
+    "hip-crest",
+    "buttocks",
+    "groin",
+    "inner-thigh",
+    "leg-root",
+    "hood",
+    "drawcord",
+    "side-tie"
+  ],
+  "poses": {
+    "neutral": {
+      "triangleOverlapPairs": 788,
+      "objects": [
+        {
+          "object": "Heather_Front_Upper_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "underarm",
+            "abdomen"
+          ]
+        },
+        {
+          "object": "Heather_Back_Upper_Panel",
+          "triangleOverlapPairs": 118,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "back"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Placket",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_01",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_02",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_03",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Drawcords_And_Side_Ties",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Front_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "abdomen",
+            "hip-crest",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Back_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "hip-crest",
+            "buttocks",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Cowl",
+          "triangleOverlapPairs": 104,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_L",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_R",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_L",
+          "triangleOverlapPairs": 267,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_L",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_R",
+          "triangleOverlapPairs": 267,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_R",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Editable_Seams",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "center-seam"
+          ]
+        }
+      ],
+      "zoneSignals": {
+        "shoulder": 652,
+        "underarm": 652,
+        "back": 118,
+        "neck": 104,
+        "hood": 104,
+        "drawcord": 104,
+        "elbow": 534,
+        "wrist": 566
+      },
+      "pass": false,
+      "interpretation": "A nonzero value is a narrow-phase triangle intersection signal and requires visual inspection; zero is required for automatic PASS."
+    },
+    "arms-up": {
+      "triangleOverlapPairs": 4524,
+      "objects": [
+        {
+          "object": "Heather_Front_Upper_Panel",
+          "triangleOverlapPairs": 973,
+          "zones": [
+            "chest",
+            "underarm",
+            "abdomen"
+          ]
+        },
+        {
+          "object": "Heather_Back_Upper_Panel",
+          "triangleOverlapPairs": 1380,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "back"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Placket",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_01",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_02",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_03",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Drawcords_And_Side_Ties",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Front_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "abdomen",
+            "hip-crest",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Back_Panel",
+          "triangleOverlapPairs": 144,
+          "zones": [
+            "hip-crest",
+            "buttocks",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Cowl",
+          "triangleOverlapPairs": 108,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_L",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_R",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_L",
+          "triangleOverlapPairs": 861,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_L",
+          "triangleOverlapPairs": 88,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_R",
+          "triangleOverlapPairs": 866,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_R",
+          "triangleOverlapPairs": 88,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Editable_Seams",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "center-seam"
+          ]
+        }
+      ],
+      "zoneSignals": {
+        "chest": 973,
+        "underarm": 4080,
+        "abdomen": 973,
+        "shoulder": 3107,
+        "back": 1380,
+        "hip-crest": 144,
+        "buttocks": 144,
+        "groin": 144,
+        "inner-thigh": 144,
+        "leg-root": 144,
+        "neck": 108,
+        "hood": 108,
+        "drawcord": 108,
+        "elbow": 1727,
+        "wrist": 1903,
+        "center-seam": 16
+      },
+      "pass": false,
+      "interpretation": "A nonzero value is a narrow-phase triangle intersection signal and requires visual inspection; zero is required for automatic PASS."
+    },
+    "forward-bend": {
+      "triangleOverlapPairs": 762,
+      "objects": [
+        {
+          "object": "Heather_Front_Upper_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "underarm",
+            "abdomen"
+          ]
+        },
+        {
+          "object": "Heather_Back_Upper_Panel",
+          "triangleOverlapPairs": 112,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "back"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Placket",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_01",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_02",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_03",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Drawcords_And_Side_Ties",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Front_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "abdomen",
+            "hip-crest",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Back_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "hip-crest",
+            "buttocks",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Cowl",
+          "triangleOverlapPairs": 104,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_L",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_R",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_L",
+          "triangleOverlapPairs": 257,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_L",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_R",
+          "triangleOverlapPairs": 257,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_R",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Editable_Seams",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "center-seam"
+          ]
+        }
+      ],
+      "zoneSignals": {
+        "shoulder": 626,
+        "underarm": 626,
+        "back": 112,
+        "neck": 104,
+        "hood": 104,
+        "drawcord": 104,
+        "elbow": 514,
+        "wrist": 546
+      },
+      "pass": false,
+      "interpretation": "A nonzero value is a narrow-phase triangle intersection signal and requires visual inspection; zero is required for automatic PASS."
+    },
+    "legs-apart": {
+      "triangleOverlapPairs": 834,
+      "objects": [
+        {
+          "object": "Heather_Front_Upper_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "underarm",
+            "abdomen"
+          ]
+        },
+        {
+          "object": "Heather_Back_Upper_Panel",
+          "triangleOverlapPairs": 112,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "back"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Placket",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_01",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_02",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_03",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Drawcords_And_Side_Ties",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Front_Panel",
+          "triangleOverlapPairs": 86,
+          "zones": [
+            "abdomen",
+            "hip-crest",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Back_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "hip-crest",
+            "buttocks",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Cowl",
+          "triangleOverlapPairs": 104,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_L",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_R",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_L",
+          "triangleOverlapPairs": 250,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_L",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_R",
+          "triangleOverlapPairs": 250,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_R",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Editable_Seams",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "center-seam"
+          ]
+        }
+      ],
+      "zoneSignals": {
+        "shoulder": 612,
+        "underarm": 612,
+        "back": 112,
+        "abdomen": 86,
+        "hip-crest": 86,
+        "groin": 86,
+        "inner-thigh": 86,
+        "leg-root": 86,
+        "neck": 104,
+        "hood": 104,
+        "drawcord": 104,
+        "elbow": 500,
+        "wrist": 532
+      },
+      "pass": false,
+      "interpretation": "A nonzero value is a narrow-phase triangle intersection signal and requires visual inspection; zero is required for automatic PASS."
+    },
+    "walk": {
+      "triangleOverlapPairs": 794,
+      "objects": [
+        {
+          "object": "Heather_Front_Upper_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "underarm",
+            "abdomen"
+          ]
+        },
+        {
+          "object": "Heather_Back_Upper_Panel",
+          "triangleOverlapPairs": 115,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "back"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Placket",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_01",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_02",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_03",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Drawcords_And_Side_Ties",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Front_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "abdomen",
+            "hip-crest",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Back_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "hip-crest",
+            "buttocks",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Cowl",
+          "triangleOverlapPairs": 104,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_L",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_R",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_L",
+          "triangleOverlapPairs": 239,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_L",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_R",
+          "triangleOverlapPairs": 304,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_R",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Editable_Seams",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "center-seam"
+          ]
+        }
+      ],
+      "zoneSignals": {
+        "shoulder": 658,
+        "underarm": 658,
+        "back": 115,
+        "neck": 104,
+        "hood": 104,
+        "drawcord": 104,
+        "elbow": 543,
+        "wrist": 575
+      },
+      "pass": false,
+      "interpretation": "A nonzero value is a narrow-phase triangle intersection signal and requires visual inspection; zero is required for automatic PASS."
+    },
+    "crouch": {
+      "triangleOverlapPairs": 788,
+      "objects": [
+        {
+          "object": "Heather_Front_Upper_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "underarm",
+            "abdomen"
+          ]
+        },
+        {
+          "object": "Heather_Back_Upper_Panel",
+          "triangleOverlapPairs": 118,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "back"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Placket",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_01",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_02",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Henley_Button_03",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "chest",
+            "placket"
+          ]
+        },
+        {
+          "object": "Heather_Drawcords_And_Side_Ties",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Front_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "abdomen",
+            "hip-crest",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Highcut_Back_Panel",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "hip-crest",
+            "buttocks",
+            "groin",
+            "inner-thigh",
+            "leg-root"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Cowl",
+          "triangleOverlapPairs": 104,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_L",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Hood_Back_Drape_R",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "neck",
+            "hood",
+            "drawcord"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_L",
+          "triangleOverlapPairs": 267,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_L",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Long_Sleeve_R",
+          "triangleOverlapPairs": 267,
+          "zones": [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Rib_Cuff_R",
+          "triangleOverlapPairs": 16,
+          "zones": [
+            "wrist"
+          ]
+        },
+        {
+          "object": "Heather_Editable_Seams",
+          "triangleOverlapPairs": 0,
+          "zones": [
+            "center-seam"
+          ]
+        }
+      ],
+      "zoneSignals": {
+        "shoulder": 652,
+        "underarm": 652,
+        "back": 118,
+        "neck": 104,
+        "hood": 104,
+        "drawcord": 104,
+        "elbow": 534,
+        "wrist": 566
+      },
+      "pass": false,
+      "interpretation": "A nonzero value is a narrow-phase triangle intersection signal and requires visual inspection; zero is required for automatic PASS."
+    }
+  },
+  "pass": false,
+  "failureCondition": "Any evaluated garment/body triangle intersection in any required pose produces FAIL and must be visually diagnosed before completion."
+}
