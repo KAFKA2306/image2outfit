@@ -30,19 +30,18 @@ def lower_wrap_shell(fabric, armature):
     """Create continuous opaque lower coverage with a short tailored hem."""
     segments = 64
     sections = [
-        (0.765, 0.188, 0.116),
-        (0.690, 0.205, 0.128),
-        (0.565, 0.218, 0.139),
-        (0.455, 0.205, 0.134),
+        (0.785, 0.192, 0.142),
+        (0.700, 0.212, 0.150),
+        (0.565, 0.225, 0.158),
+        (0.455, 0.210, 0.150),
     ]
     vertices = []
     for z, rx, ry in sections:
         for index in range(segments):
             angle = math.tau * index / segments
-            # A slightly flatter front reads as a tailored skort rather than a tube.
             y = ry * math.sin(angle)
-            if y < 0:
-                y *= 0.93
+            # Keep the front tailored while adding reliable opaque back coverage.
+            y *= 0.96 if y < 0 else 1.12
             vertices.append((rx * math.cos(angle), y, z))
     faces = []
     for ring in range(len(sections) - 1):
@@ -104,9 +103,9 @@ def sheer_material(path: Path):
         if alpha_input is not None:
             for link in list(alpha_input.links):
                 links.remove(link)
-            alpha_input.default_value = 0.38
-        shader.inputs["Roughness"].default_value = 0.50
-    material.diffuse_color = (0.012, 0.014, 0.018, 0.38)
+            alpha_input.default_value = 0.48
+        shader.inputs["Roughness"].default_value = 0.52
+    material.diffuse_color = (0.010, 0.012, 0.016, 0.48)
     return material
 
 
@@ -118,7 +117,7 @@ def configure_scene():
     return camera
 
 
-base.REVISION = "smooth-tailored-v5"
+base.REVISION = "smooth-tailored-v6"
 base.build_garment = build_garment
 base.sheer_material = sheer_material
 base.configure_scene = configure_scene
