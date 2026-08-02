@@ -19,6 +19,8 @@ on:
       - pyproject.toml
       - uv.lock
       - tools/blender_python_env.py
+      - tools/siroino_wide_cargo_release_refit_v*.py
+      - Assets/GenWorks/Products/**
 
 env:
   STATUS_CONTEXT: image2outfit-hosted
@@ -35,7 +37,6 @@ jobs:
   blender:
     runs-on: ubuntu-latest
     timeout-minutes: 120
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,10 +49,10 @@ jobs:
           python - <<'PY' > /tmp/status.json
           import json, os
           print(json.dumps({
-              'state': 'pending',
-              'target_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-              'description': f"Hosted Blender run {os.environ['GITHUB_RUN_ID']}",
-              'context': os.environ['STATUS_CONTEXT'],
+              "state": "pending",
+              "target_url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              "description": f"Hosted Blender run {os.environ['GITHUB_RUN_ID']}",
+              "context": os.environ["STATUS_CONTEXT"],
           }))
           PY
           curl --fail-with-body --silent --show-error \
@@ -64,7 +65,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Resolve product build scope
         env:
@@ -80,98 +81,77 @@ jobs:
           from pathlib import Path
 
           root = Path.cwd().resolve()
-          job_path_text = (os.environ.get('JOB_PATH_INPUT') or '').strip()
+          job_path_text = (os.environ.get("JOB_PATH_INPUT") or "").strip()
           if not job_path_text:
-              event_name = os.environ.get('EVENT_NAME', '')
-              if event_name == 'pull_request':
-                  command = [
-                      'git', 'diff', '--name-only',
-                      os.environ['PR_BASE_SHA'], os.environ['PR_HEAD_SHA'],
-                  ]
+              if os.environ.get("EVENT_NAME") == "pull_request":
+                  command = ["git", "diff", "--name-only", os.environ["PR_BASE_SHA"], os.environ["PR_HEAD_SHA"]]
               else:
-                  before = os.environ.get('EVENT_BEFORE', '')
-                  sha = os.environ['EVENT_SHA']
-                  command = (
-                      ['git', 'diff', '--name-only', before, sha]
-                      if before and before != '0' * 40
-                      else ['git', 'show', '--pretty=', '--name-only', sha]
-                  )
+                  before = os.environ.get("EVENT_BEFORE", "")
+                  sha = os.environ["EVENT_SHA"]
+                  command = ["git", "diff", "--name-only", before, sha] if before and before != "0" * 40 else ["git", "show", "--pretty=", "--name-only", sha]
               changed = sorted({
                   line.strip()
                   for line in subprocess.check_output(command, text=True).splitlines()
-                  if re.fullmatch(
-                      r'config/products/[a-z0-9][a-z0-9._-]*/job\.json',
-                      line.strip(),
-                  )
+                  if re.fullmatch(r"config/products/[a-z0-9][a-z0-9._-]*/job\.json", line.strip())
               })
               if len(changed) != 1:
-                  with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
-                      stream.write('SKIP_PRODUCT_BUILD=true\n')
-                      stream.write(f'BUILD_SCOPE_REASON=changed-product-jobs-{len(changed)}\n')
-                  print(
-                      'Skipping product generation because this change does not select exactly '
-                      f'one product job: {changed}. Repository contracts will still be audited.'
-                  )
+                  with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
+                      stream.write("SKIP_PRODUCT_BUILD=true\n")
+                      stream.write(f"BUILD_SCOPE_REASON=changed-product-jobs-{len(changed)}\n")
+                  print(f"No unique product job selected: {changed}; contract audit only")
                   raise SystemExit(0)
               job_path_text = changed[0]
 
-          if not re.fullmatch(
-              r'config/products/[a-z0-9][a-z0-9._-]*/job\.json',
-              job_path_text,
-          ):
-              raise SystemExit('job_path must match config/products/<product-id>/job.json')
+          if not re.fullmatch(r"config/products/[a-z0-9][a-z0-9._-]*/job\.json", job_path_text):
+              raise SystemExit("job_path must match config/products/<product-id>/job.json")
           job_path = (root / job_path_text).resolve()
           if root not in job_path.parents or not job_path.is_file():
-              raise SystemExit(f'product job not found: {job_path_text}')
-          job = json.loads(job_path.read_text(encoding='utf-8-sig'))
-          if job.get('schemaVersion') != 2:
-              raise SystemExit('Only schemaVersion 2 jobs are accepted')
-          required = ('id', 'productRoot', 'artifactDir', 'buildScript', 'blendPath')
+              raise SystemExit(f"product job not found: {job_path_text}")
+          job = json.loads(job_path.read_text(encoding="utf-8-sig"))
+          if job.get("schemaVersion") != 2:
+              raise SystemExit("Only schemaVersion 2 jobs are accepted")
+          required = ("id", "productRoot", "artifactDir", "buildScript", "blendPath")
           missing = [name for name in required if not job.get(name)]
           if missing:
-              raise SystemExit('job is missing: ' + ', '.join(missing))
-          product_id = job_path.parent.name
-          expected_root = f'Assets/GenWorks/{product_id}'
-          if job['id'] != product_id or job['productRoot'] != expected_root:
-              raise SystemExit('product job identity does not match its namespace')
-          prefab_pattern = re.compile(
-              rf'^Assets/GenWorks/{re.escape(product_id)}/Prefab/[^/]+\.prefab$'
-          )
-          for field in ('prefabAssetPath', 'integratedPrefabAssetPath'):
-              value = str(job.get(field, ''))
-              if value and not prefab_pattern.fullmatch(value):
-                  raise SystemExit(
-                      f'{field} must match Assets/GenWorks/{product_id}/Prefab/*.prefab'
-                  )
+              raise SystemExit("job is missing: " + ", ".join(missing))
 
-          if job.get('automaticBuild') is False:
-              with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
-                  stream.write('SKIP_PRODUCT_BUILD=true\n')
-                  stream.write(f'BUILD_SCOPE_REASON={product_id}-manual-recovery\n')
-              print(
-                  f'Skipping automatic generation for {product_id}; '
-                  'the tracked job declares automaticBuild=false. '
-                  'Repository contracts will still be audited.'
-              )
+          product_id = job_path.parent.name
+          allowed_roots = {
+              f"Assets/GenWorks/{product_id}",
+              f"Assets/GenWorks/Products/{product_id}",
+          }
+          product_root = str(job["productRoot"])
+          if job["id"] != product_id or product_root not in allowed_roots:
+              raise SystemExit(f"product job identity/root mismatch: {product_root}; allowed={sorted(allowed_roots)}")
+          prefab_pattern = re.compile(rf"^{re.escape(product_root)}/Prefab/[^/]+\.prefab$")
+          for field in ("prefabAssetPath", "integratedPrefabAssetPath"):
+              value = str(job.get(field, ""))
+              if value and not prefab_pattern.fullmatch(value):
+                  raise SystemExit(f"{field} must match {product_root}/Prefab/*.prefab")
+
+          if job.get("automaticBuild") is False:
+              with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
+                  stream.write("SKIP_PRODUCT_BUILD=true\n")
+                  stream.write(f"BUILD_SCOPE_REASON={product_id}-manual-recovery\n")
               raise SystemExit(0)
 
           paths = {
-              'SKIP_PRODUCT_BUILD': 'false',
-              'JOB_PATH': job_path_text,
-              'JOB_ID': job['id'],
-              'PRODUCT_ROOT': job['productRoot'],
-              'ARTIFACT_DIR': job['artifactDir'],
-              'BUILD_SCRIPT': job['buildScript'],
-              'BLEND_PATH': job['blendPath'],
-              'HOSTED_POSE_SCRIPT': job.get('hostedPoseScript', ''),
+              "SKIP_PRODUCT_BUILD": "false",
+              "JOB_PATH": job_path_text,
+              "JOB_ID": job["id"],
+              "PRODUCT_ROOT": product_root,
+              "ARTIFACT_DIR": job["artifactDir"],
+              "BUILD_SCRIPT": job["buildScript"],
+              "BLEND_PATH": job["blendPath"],
+              "HOSTED_POSE_SCRIPT": job.get("hostedPoseScript", ""),
           }
-          lock = json.loads(Path('config/toolchain-lock.json').read_text(encoding='utf-8'))
-          version = lock['blender']['version']
-          paths['BLENDER_VERSION'] = version
-          paths['BLENDER_SERIES'] = '.'.join(version.split('.')[:2])
-          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+          lock = json.loads(Path("config/toolchain-lock.json").read_text(encoding="utf-8"))
+          version = lock["blender"]["version"]
+          paths["BLENDER_VERSION"] = version
+          paths["BLENDER_SERIES"] = ".".join(version.split(".")[:2])
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
               for name, value in paths.items():
-                  stream.write(f'{name}={value}\n')
+                  stream.write(f"{name}={value}\n")
           PY
 
       - name: Install Blender runtime libraries
@@ -199,9 +179,8 @@ jobs:
           python - <<'PY'
           import json, os
           from tools.blender_python_env import prepare
-
-          prepared = prepare('.image2outfit/blender/blender')
-          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+          prepared = prepare(".image2outfit/blender/blender")
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
               stream.write(f"PYTHONPATH={prepared.environment['PYTHONPATH']}\n")
           print(json.dumps(prepared.report, ensure_ascii=False, indent=2))
           PY
@@ -248,12 +227,12 @@ jobs:
         run: |
           python - <<'PY' > /tmp/status.json
           import json, os
-          passed = os.environ['JOB_STATUS'] == 'success'
+          passed = os.environ["JOB_STATUS"] == "success"
           print(json.dumps({
-              'state': 'success' if passed else 'failure',
-              'target_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-              'description': f"Hosted Blender run {os.environ['GITHUB_RUN_ID']} · {os.environ['JOB_STATUS']}",
-              'context': os.environ['STATUS_CONTEXT'],
+              "state": "success" if passed else "failure",
+              "target_url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              "description": f"Hosted Blender run {os.environ['GITHUB_RUN_ID']} · {os.environ['JOB_STATUS']}",
+              "context": os.environ["STATUS_CONTEXT"],
           }))
           PY
           curl --fail-with-body --silent --show-error \
