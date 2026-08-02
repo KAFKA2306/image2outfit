@@ -26,9 +26,9 @@ Unity Prefab・Modular Avatar / NDMF設定
 
 - 衣装ごとに一つの正規ワークスペースを持つ
 - Blender、FBX、Prefab、画像、検証状態を同じ製品IDで追跡する
-- candidate生成と顧客向けreleaseを分離する
+- 技術候補の作成と顧客向けリリース判定を分離する
 - Unity Import、Prefab再読込、Modular Avatar／NDMF、見た目、ポーズ、runtimeを別々に確認する
-- 失敗時も最後に使えた候補と再開地点を保持する
+- 失敗時も最後に使えた制作状態と再開地点を保持する
 - リポジトリ全体の配置、依存関係、研究基準、残骸を自動監査する
 
 ## 読むファイル
@@ -112,6 +112,8 @@ Assets/GenWorks/sample-outfit/
 
 製品Prefabは `Assets/GenWorks/<slug>/Prefab/`、最新の画像は `Previews/`、編集可能な制作データは `Source/`、現在の状態は `ProductManifest.json` にあります。
 
+**`Assets/GenWorks/<slug>/` が、その衣装について人間とツールが参照する唯一の正規ワークスペースです。** 技術実行中に作られる監査ログ、レビュー用コピー、配布用ZIPなどは生成可能なランタイム出力であり、リポジトリ構造や引き継ぎ状態の正本ではありません。
+
 Unity Editorでは `GenWorks > Product Catalog` から、製品状態、Prefab、プレビュー、製品READMEを一覧できます。
 
 ## 基本操作
@@ -124,21 +126,21 @@ task explain PRODUCT=<slug>
 
 選択された制作方式、必要な入力、利用する研究手法、生成対象、未完了ゲートを表示します。
 
-### candidateを作る
+### 技術候補を作る
 
 ```powershell
 task candidate PRODUCT=<slug>
 ```
 
-candidateは、技術検証と人間レビューに渡す候補です。既存の正常な候補とreleaseを保護しながら、新しい制作・書き出し・監査処理を実行します。
+このコマンドは、正規ワークスペースの制作物を検証し、人間レビューへ進められる技術候補かを判定します。既存の正常な状態を保護しながら、制作、書き出し、監査を実行します。
 
-### releaseへ昇格する
+### リリース判定と配布物を作る
 
 ```powershell
 task release PRODUCT=<slug>
 ```
 
-releaseは、同一candidateに対する必要な技術ゲートと人間レビューが揃った場合だけ作成されます。candidate生成だけではreleaseになりません。
+同一候補に対する必要な技術ゲートと人間レビューが揃った場合だけ、配布用パッケージを生成します。技術候補の生成だけではリリース済みになりません。
 
 ### リポジトリを監査する
 
@@ -189,13 +191,13 @@ RELEASED
 | `TECHNICAL_READY` | 必要な自動技術ゲートを通過している |
 | `HUMAN_REVIEW_PENDING` | 技術作業と証拠が揃い、人間による見た目・ポーズ・runtime確認待ち |
 | `REJECTED` | 問題と再開地点を記録した却下済み候補 |
-| `RELEASED` | 同一candidateが必要な技術確認と人間レビューをすべて通過した状態 |
+| `RELEASED` | 同一候補が必要な技術確認と人間レビューをすべて通過した状態 |
 
 `REJECTED`は削除対象を意味しません。再制作や監査に使えるBlend、FBX、Prefab、画像、診断がある場合は、その製品ワークスペースに保持されます。
 
 ## 品質確認
 
-顧客向けreleaseでは、ファイルが存在するだけでなく、同一candidateに対する複数の確認結果を扱います。
+顧客向けリリースでは、ファイルが存在するだけでなく、同一候補に対する複数の確認結果を扱います。
 
 ### 見た目
 
@@ -220,23 +222,20 @@ RELEASED
 - VRChat Build & Test
 - runtime表示と操作
 
-具体的なrelease証拠の形式と基準は [`config/release-policy.json`](config/release-policy.json) にあります。
+具体的なリリース証拠の形式と基準は [`config/release-policy.json`](config/release-policy.json) にあります。
 
 ## リポジトリ構成
 
 ```text
 Assets/GenWorks/          製品ワークスペースと共有Unity実装
 config/products/          製品jobとライセンス情報
-config/                   スキーマ、配置、状態、release、ツールチェーン契約
+config/                   スキーマ、配置、状態、リリース、ツールチェーン契約
 tools/                    制作入口と汎用監査
 Tests / tests/            UnityおよびPythonの検証
 .github/workflows/        hosted／self-hostedの自動検証
-Artifacts/                一時的な技術出力
-Candidates/               レビュー対象candidate
-Release/                  顧客向けrelease出力
 ```
 
-`Assets/GenWorks/<slug>/` が再開可能な制作状態の正本です。Actions artifact、`Artifacts/`、`Candidates/`、`Release/` は輸送、監査、パッケージングのための出力です。
+この一覧には、再生成可能な監査ログ、候補コピー、配布パッケージなどのランタイム出力を含めません。それらは実行結果であり、開発者が理解すべき恒久的なリポジトリ構造ではないためです。
 
 ## 主な契約ファイル
 
@@ -247,7 +246,7 @@ Release/                  顧客向けrelease出力
 | `config/products/<slug>/license.json` | 利用権と再配布境界 |
 | `config/genworks-layout.json` | Unity内の正規配置 |
 | `config/genworks-handoff-policy.json` | 製品状態と引き継ぎ条件 |
-| `config/release-policy.json` | 顧客向けreleaseの証拠条件 |
+| `config/release-policy.json` | 顧客向けリリースの証拠条件 |
 | `config/toolchain-lock.json` | 対応ツールと固定バージョン |
 | `Assets/GenWorks/OutfitCatalog.json` | 製品カタログ |
 | `Assets/GenWorks/<slug>/ProductManifest.json` | 製品の現在状態とハッシュ |
