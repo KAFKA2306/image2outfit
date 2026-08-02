@@ -6,6 +6,16 @@ on:
       - agent/fix-haolan-cow-hood-v11
     paths:
       - .github/run/haolan-cow-v11.txt
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/run/haolan-cow-v11.txt
+      - .github/workflows/haolan-cow-v11-branch-build.yml
+      - tools/haolan_cow_generator_hosted.py
+      - tools/haolan_cow_hood_generator.py
+      - tools/haolan_cow_v11_overrides.b85
+      - tools/package_haolan_cow_v11.py
 
 permissions:
   contents: write
