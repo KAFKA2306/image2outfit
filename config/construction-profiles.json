@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "defaultCommercialProfile": "commercial-v1",
+  "profiles": {
+    "fitted": {
+      "description": "Body-conforming garment whose primary deformation is inherited from the avatar rig.",
+      "requiredCapabilities": [
+        "topology-uv",
+        "pbr-texture",
+        "dynamic-evaluation"
+      ],
+      "requiredCommercialEvidence": [
+        "topology-audit",
+        "pbr-audit",
+        "motion-review"
+      ]
+    },
+    "panel-sewn": {
+      "description": "Garment assembled from editable pattern panels and explicit seam connectivity.",
+      "requiredCapabilities": [
+        "structured-patterns",
+        "stitch-assembly",
+        "topology-uv",
+        "pbr-texture",
+        "dynamic-evaluation"
+      ],
+      "requiredCommercialEvidence": [
+        "panel-graph",
+        "seam-graph",
+        "connectivity-audit",
+        "topology-audit",
+        "pbr-audit",
+        "motion-review"
+      ]
+    },
+    "loose-layered": {
+      "description": "Loose or layered garment that requires explicit layer, collision, and runtime deformation evaluation.",
+      "requiredCapabilities": [
+        "structured-patterns",
+        "stitch-assembly",
+        "topology-uv",
+        "layering-collision",
+        "pbr-texture",
+        "runtime-deformation",
+        "dynamic-evaluation"
+      ],
+      "requiredCommercialEvidence": [
+        "panel-graph",
+        "seam-graph",
+        "connectivity-audit",
+        "layer-map",
+        "penetration-report",
+        "topology-audit",
+        "pbr-audit",
+        "deformation-benchmark",
+        "runtime-performance",
+        "motion-review"
+      ]
+    }
+  },
+  "evidenceContract": {
+    "schemaVersion": 1,
+    "status": "PASS",
+    "requiredFields": [
+      "schemaVersion",
+      "kind",
+      "productId",
+      "constructionProfile",
+      "candidateManifestSha256",
+      "status",
+      "checkedAt",
+      "tool",
+      "sourceArtifacts",
+      "metrics",
+      "notes"
+    ],
+    "evidenceRootTemplate": "Assets/GenWorks/{productId}/Evidence/Commercial"
+  }
+}
