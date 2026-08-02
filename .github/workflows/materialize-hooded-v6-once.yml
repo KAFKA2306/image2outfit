@@ -1,0 +1,161 @@
+name: Materialize hooded bodysuit v6 once
+
+on:
+  push:
+    branches:
+      - agent/siroino-heather-hooded-bodysuit-v1
+    paths:
+      - .github/workflows/materialize-hooded-v6-once.yml
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: materialize-hooded-v6-once
+  cancel-in-progress: false
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/siroino-heather-hooded-bodysuit-v1
+          fetch-depth: 0
+
+      - name: Download exact hosted Blender artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/actions/artifacts/8840348373/zip > /tmp/hooded-v6.zip
+          rm -rf /tmp/hooded-v6
+          mkdir -p /tmp/hooded-v6
+          unzip -q /tmp/hooded-v6.zip -d /tmp/hooded-v6
+          test -f /tmp/hooded-v6/Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json
+
+      - name: Materialize canonical WORKING checkpoint
+        run: |
+          rm -rf Assets/GenWorks/siroino-heather-hooded-bodysuit
+          mkdir -p Assets/GenWorks
+          cp -a /tmp/hooded-v6/Assets/GenWorks/siroino-heather-hooded-bodysuit Assets/GenWorks/
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path('Assets/GenWorks/siroino-heather-hooded-bodysuit')
+          manifest_path = root / 'ProductManifest.json'
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          manifest['schemaVersion'] = 1
+          manifest['status'] = 'WORKING'
+          manifest['handoff']['lastAttempt']['result'] = 'HOSTED_MODELED_FIT_REJECTED'
+          manifest['handoff']['blockers'] = [
+              'Close shoulder and underarm gaps between the upper body and sleeves',
+              'Remove outward-pointing waist fins and rebuild smooth high-cut side transitions',
+              'Replace the detached wing-like hood back panels with a continuous hood volume',
+              'Resolve all intersections reported in Tests/fit-audit.json',
+              'Import/save/reload both Prefabs in pinned Unity',
+              'Pass Modular Avatar/NDMF and VRChat Build & Test',
+          ]
+          manifest['technicalGates']['humanVisualReview'] = 'FAIL'
+          manifest['technicalGates']['humanPoseReview'] = 'FAIL'
+          manifest['technicalGates']['humanRuntimeReview'] = 'PENDING'
+          manifest['outputs']['visualReview'] = (
+              'Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/visual-review.json'
+          )
+          manifest['humanReviewSummary'] = {
+              'result': 'FAIL',
+              'reviewedAt': '2026-08-03T07:15:00+09:00',
+              'reviewedEvidence': [
+                  'Previews/siroino-heather-hooded-bodysuit-multiview.webp',
+                  'Previews/siroino-heather-hooded-bodysuit-pose-review.webp',
+              ],
+              'blockingFindings': [
+                  'Sleeves do not form a continuous garment connection at the shoulders and underarms.',
+                  'Waist transitions project outward as rigid triangular fins.',
+                  'The rear hood panels read as detached wings rather than a wearable hood.',
+                  'BVH fit audit reports intersections in every required pose.',
+              ],
+          }
+          manifest_path.write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+
+          review = {
+              'schemaVersion': 1,
+              'checkedAt': '2026-08-03T07:15:00+09:00',
+              'productId': 'siroino-heather-hooded-bodysuit',
+              'target': 'SiroinoSotai_PC',
+              'result': 'FAIL',
+              'releaseDecision': 'WORKING_CHECKPOINT_ONLY',
+              'evidence': {
+                  'multiview': 'Previews/siroino-heather-hooded-bodysuit-multiview.webp',
+                  'poseReview': 'Previews/siroino-heather-hooded-bodysuit-pose-review.webp',
+                  'fitAudit': 'Tests/fit-audit.json',
+              },
+              'blockingFindings': [
+                  {
+                      'zone': 'shoulder/underarm',
+                      'finding': 'Visible gaps leave the sleeves disconnected from the upper body.',
+                      'requiredFix': 'Rebuild or bridge the armhole and transfer continuous body weights.',
+                  },
+                  {
+                      'zone': 'waist/hip crest',
+                      'finding': 'Rigid triangular fins project from both sides.',
+                      'requiredFix': 'Replace the transition with a smooth high-cut edge and controlled side ties.',
+                  },
+                  {
+                      'zone': 'hood/back',
+                      'finding': 'Back hood panels appear as detached wing-like strips.',
+                      'requiredFix': 'Build a continuous hood shell with a closed center seam and wearable volume.',
+                  },
+                  {
+                      'zone': 'all required poses',
+                      'finding': 'The fit audit reports 8,490 garment/body triangle overlap pairs.',
+                      'requiredFix': 'Clear the BVH audit or replace it with a validated contact-distance metric.',
+                  },
+              ],
+              'nonBlockingPasses': [
+                  'Five directional renders exist.',
+                  'Six required pose renders exist.',
+                  'FBX and Blender source were generated.',
+                  'Maximum bone influences is four; no unweighted vertices or degenerate triangles were reported.',
+                  'The 2026 seam-correspondence metadata trial passed.',
+              ],
+          }
+          (root / 'Tests').mkdir(exist_ok=True)
+          (root / 'Tests/visual-review.json').write_text(
+              json.dumps(review, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+
+          readme = root / 'README.md'
+          text = readme.read_text(encoding='utf-8')
+          text = text.replace(
+              '## Remaining gates\n\n- inspect the exact five-view and required-pose renders for silhouette and penetration',
+              '## Current review result\n\n'
+              'The v6 multiview and required-pose evidence was reviewed on 2026-08-03 and rejected for shoulder/underarm gaps, rigid waist fins, detached hood-back panels and intersections in every required pose. The files are preserved as a resumable `WORKING` checkpoint, not a completed outfit.\n\n'
+              '## Remaining gates\n\n- rebuild the shoulder/underarm, waist transition and hood geometry',
+          )
+          readme.write_text(text, encoding='utf-8')
+
+          hashes = []
+          for path in sorted(root.rglob('*')):
+              if path.is_file() and path.name != 'SOURCE_HASHES.txt':
+                  digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                  hashes.append(f'{digest}  {path.relative_to(root).as_posix()}')
+          (root / 'SOURCE_HASHES.txt').write_text(
+              '\n'.join(hashes) + '\n', encoding='utf-8'
+          )
+          PY
+
+      - name: Commit canonical outputs and remove one-shot workflow
+        run: |
+          rm .github/workflows/materialize-hooded-v6-once.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add Assets/GenWorks/siroino-heather-hooded-bodysuit .github/workflows/materialize-hooded-v6-once.yml
+          git commit -m "Materialize hooded bodysuit v6 WORKING checkpoint"
+          git push origin HEAD:agent/siroino-heather-hooded-bodysuit-v1
