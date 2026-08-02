@@ -1,0 +1,168 @@
+name: Build product with hosted Blender
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_path:
+        description: Tracked product job at config/products/<product-id>/job.json
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image2outfit-hosted-${{ inputs.job_path }}
+  cancel-in-progress: false
+
+jobs:
+  blender:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate product job and expose paths
+        env:
+          JOB_PATH_INPUT: ${{ inputs.job_path }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          root = Path.cwd().resolve()
+          job_path_text = os.environ['JOB_PATH_INPUT']
+          if not re.fullmatch(r'config/products/[a-z0-9][a-z0-9._-]*/job\.json', job_path_text):
+              raise SystemExit('job_path must match config/products/<product-id>/job.json')
+          job_path = (root / job_path_text).resolve()
+          if root not in job_path.parents or not job_path.is_file():
+              raise SystemExit(f'product job not found: {job_path_text}')
+          job = json.loads(job_path.read_text(encoding='utf-8-sig'))
+          if job.get('schemaVersion') != 2:
+              raise SystemExit('Only schemaVersion 2 jobs are accepted')
+          required = ('id', 'productRoot', 'artifactDir', 'buildScript', 'blendPath')
+          missing = [name for name in required if not job.get(name)]
+          if missing:
+              raise SystemExit('job is missing: ' + ', '.join(missing))
+          product_id = job_path.parent.name
+          if job['id'] != product_id:
+              raise SystemExit('job id must match its config/products directory')
+          expected_root = f'Assets/GenWorks/Products/{product_id}'
+          if job['productRoot'] != expected_root:
+              raise SystemExit(f'productRoot must be {expected_root}')
+          paths = {
+              'JOB_PATH': job_path_text,
+              'JOB_ID': job['id'],
+              'PRODUCT_ROOT': job['productRoot'],
+              'ARTIFACT_DIR': job['artifactDir'],
+              'BUILD_SCRIPT': job['buildScript'],
+              'BLEND_PATH': job['blendPath'],
+              'HOSTED_POSE_SCRIPT': job.get('hostedPoseScript', ''),
+          }
+          for name, value in paths.items():
+              resolved = (root / value).resolve() if name not in {'JOB_ID'} and value else root
+              if value and name not in {'JOB_ID'} and root not in resolved.parents:
+                  raise SystemExit(f'{name} escapes repository: {value}')
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+              for name, value in paths.items():
+                  stream.write(f'{name}={value}\n')
+
+          lock = json.loads(Path('config/toolchain-lock.json').read_text(encoding='utf-8'))
+          blender_version = lock['blender']['version']
+          blender_series = '.'.join(blender_version.split('.')[:2])
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+              stream.write(f'BLENDER_VERSION={blender_version}\n')
+              stream.write(f'BLENDER_SERIES={blender_series}\n')
+          PY
+
+      - name: Install Blender runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 \
+            libgl1 libegl1 libx11-6 libxxf86vm1
+
+      - name: Download pinned Blender
+        run: |
+          set -euo pipefail
+          url="https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          curl --fail --location --retry 4 --retry-all-errors "$url" --output blender.tar.xz
+          mkdir -p .image2outfit/blender
+          tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
+          .image2outfit/blender/blender --background --factory-startup --python-expr \
+            "import bpy; assert bpy.app.version_string.split()[0]=='${BLENDER_VERSION}'; print(bpy.app.version_string)"
+
+      - name: Restore pinned Blender Python packages
+        run: |
+          set -euo pipefail
+          python_exe=".image2outfit/blender/${BLENDER_SERIES}/python/bin/python3.11"
+          "$python_exe" -m ensurepip
+          "$python_exe" -m pip install \
+            --disable-pip-version-check \
+            --no-deps \
+            --only-binary=:all: \
+            -r config/blender-python-requirements.txt
+
+      - name: Generate product assets and previews
+        run: |
+          set -euo pipefail
+          mkdir -p "$ARTIFACT_DIR"
+          .image2outfit/blender/blender \
+            --background \
+            --factory-startup \
+            --python-exit-code 1 \
+            --python "$BUILD_SCRIPT" \
+            -- \
+            --job "$JOB_PATH" \
+            | tee "$ARTIFACT_DIR/hosted-blender.log"
+
+      - name: Render configured verification poses
+        if: env.HOSTED_POSE_SCRIPT != ''
+        run: |
+          set -euo pipefail
+          test -f "$HOSTED_POSE_SCRIPT"
+          test -f "$BLEND_PATH"
+          .image2outfit/blender/blender \
+            --background "$BLEND_PATH" \
+            --python-exit-code 1 \
+            --python "$HOSTED_POSE_SCRIPT" \
+            -- \
+            --job "$JOB_PATH" \
+            | tee "$ARTIFACT_DIR/hosted-poses.log"
+
+      - name: Audit generated product
+        run: |
+          set -euo pipefail
+          python tools/update_product_hashes.py --root "$PRODUCT_ROOT"
+          python tools/audit_genworks_layout.py
+          python tools/audit_repository_hygiene.py
+
+      - name: Publish build summary
+        run: |
+          {
+            echo "## Hosted product build"
+            echo ""
+            echo "- Product: \`$JOB_ID\`"
+            echo "- Job: \`$JOB_PATH\`"
+            echo "- Product root: \`$PRODUCT_ROOT\`"
+            echo "- Generated files are uploaded as an artifact; this workflow never commits to \`main\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload generated product and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: image2outfit-hosted-${{ env.JOB_ID }}-${{ github.run_id }}
+          path: |
+            ${{ env.ARTIFACT_DIR }}
+            ${{ env.PRODUCT_ROOT }}
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 6
