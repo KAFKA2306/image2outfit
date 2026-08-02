@@ -1,6 +1,9 @@
 name: Apply direct-main rollback patch
 
 on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened]
   push:
     branches: [fix/rollback-direct-main-push]
 
@@ -9,6 +12,7 @@ permissions:
 
 jobs:
   patch:
+    if: github.event_name == 'push' || github.head_ref == 'fix/rollback-direct-main-push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
