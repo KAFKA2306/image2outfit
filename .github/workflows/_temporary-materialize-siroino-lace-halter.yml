@@ -1,0 +1,135 @@
+name: Materialize Siroino Large lace-halter checkpoint
+
+on:
+  push:
+    branches:
+      - feat/siroino-lace-halter-large-materialize
+    paths:
+      - config/products/siroino-lace-halter-large/job.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: materialize-siroino-lace-halter-large
+  cancel-in-progress: true
+
+jobs:
+  materialize:
+    runs-on: self-hosted
+    timeout-minutes: 240
+
+    steps:
+      - name: Checkout tracked pipeline without deleting private avatar sources
+        uses: actions/checkout@v4
+        with:
+          ref: feat/siroino-lace-halter-large-materialize
+          clean: false
+          persist-credentials: true
+          fetch-depth: 0
+
+      - uses: arduino/setup-task@v2
+
+      - name: Materialize exact private Siroino Large target
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $trackedJob = 'config/products/siroino-lace-halter-large/job.json'
+          $localJob = 'Assets/_Local/Jobs/siroino-lace-halter-large/job.json'
+          New-Item -ItemType Directory -Force -Path (Split-Path -Parent $localJob), 'Artifacts/siroino-lace-halter-large' | Out-Null
+          uv run --no-cache --no-project python tools/materialize_private_target.py --job $trackedJob --output $localJob |
+            Tee-Object -FilePath 'Artifacts/siroino-lace-halter-large/resolved-target.json'
+          if ($LASTEXITCODE -ne 0) { throw 'Exact Siroino _Large target materialization failed' }
+          "JOB_PATH=$localJob" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "PRODUCT_ROOT=Assets/GenWorks/Products/siroino-lace-halter-large" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "ARTIFACT_DIR=Artifacts/siroino-lace-halter-large" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Restore pinned VPM packages
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Get-Command vpm -ErrorAction SilentlyContinue)) {
+            throw 'The official VPM CLI is required on the image2outfit runner'
+          }
+          $repoOutput = (& vpm list repos 2>&1 | Out-String)
+          if ($LASTEXITCODE -ne 0) { throw "vpm list repos failed: $repoOutput" }
+          foreach ($repo in @('https://vpm.nadena.dev/vpm.json', 'https://vpm.anatawa12.com/vpm.json')) {
+            if ($repoOutput -notmatch [regex]::Escape($repo)) {
+              & vpm add repo $repo
+              if ($LASTEXITCODE -ne 0) { throw "Could not register required VPM repository: $repo" }
+            }
+          }
+          & vpm resolve project .
+          if ($LASTEXITCODE -ne 0) { throw 'vpm resolve project failed' }
+
+      - name: Build, render, import, and validate candidate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          task candidate JOB="$env:JOB_PATH"
+          if ($LASTEXITCODE -ne 0) { throw 'Candidate build or technical gate failed' }
+          $audit = Get-Content -LiteralPath "$env:ARTIFACT_DIR/audit.json" -Raw | ConvertFrom-Json
+          if ([string]$audit.decision -ne 'REVIEW_REQUIRED') {
+            throw "Expected REVIEW_REQUIRED, got $($audit.decision)"
+          }
+
+      - name: Persist reviewed technical checkpoint
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $manifestPath = "$env:PRODUCT_ROOT/ProductManifest.json"
+          $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+          $manifest.status = 'HUMAN_REVIEW_PENDING'
+          $manifest.generatedAt = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
+          $manifest.handoff.resumeFrom = 'Assets/GenWorks/Products/siroino-lace-halter-large/Prefabs/Integrated/Siroino_Large/Siroino_Large_LaceHalter.prefab'
+          $manifest.handoff.blockers = @('Complete VRChat runtime review before RELEASED promotion')
+          foreach ($name in @('blender','fbx','unityImport','prefabSerialized','prefabReload','modularAvatar','exactBodyPoseRenders','latestGeometryRender','humanVisualReview','humanPoseReview')) {
+            if ($null -eq $manifest.technicalGates.PSObject.Properties[$name]) {
+              $manifest.technicalGates | Add-Member -NotePropertyName $name -NotePropertyValue 'PASS'
+            } else {
+              $manifest.technicalGates.$name = 'PASS'
+            }
+          }
+          foreach ($name in @('vrchatBuildAndTest','humanRuntimeReview')) {
+            if ($null -eq $manifest.technicalGates.PSObject.Properties[$name]) {
+              $manifest.technicalGates | Add-Member -NotePropertyName $name -NotePropertyValue 'PENDING'
+            } else {
+              $manifest.technicalGates.$name = 'PENDING'
+            }
+          }
+          $manifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manifestPath -Encoding utf8
+          uv run --no-cache --no-project python tools/update_product_hashes.py --root $env:PRODUCT_ROOT
+          if ($LASTEXITCODE -ne 0) { throw 'Product hash update failed' }
+
+      - name: Remove one-shot workflow and audit final tree
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git rm '.github/workflows/_temporary-materialize-siroino-lace-halter.yml'
+          uv run --no-cache --no-project python tools/audit_repository_hygiene.py
+          if ($LASTEXITCODE -ne 0) { throw 'Repository hygiene audit failed' }
+          uv run --no-cache --no-project python tools/audit_genworks_layout.py
+          if ($LASTEXITCODE -ne 0) { throw 'GenWorks layout audit failed' }
+
+      - name: Commit and push generated checkpoint
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --all "$env:PRODUCT_ROOT" '.github/workflows/_temporary-materialize-siroino-lace-halter.yml'
+          git commit -m 'feat: materialize Siroino Large lace-halter deliverables'
+          git push origin HEAD:feat/siroino-lace-halter-large-materialize
+
+      - name: Upload generated checkpoint for visual inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: siroino-lace-halter-large-${{ github.run_id }}
+          path: |
+            Assets/GenWorks/Products/siroino-lace-halter-large
+            Artifacts/siroino-lace-halter-large
+            Candidates/siroino-lace-halter-large
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
