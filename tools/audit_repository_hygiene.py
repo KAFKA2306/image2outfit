@@ -45,6 +45,27 @@ def add(findings: list[Finding], code: str, path: Path, root: Path, message: str
     findings.append(Finding(code, relative(path, root), message))
 
 
+def is_ref_only_branch_hygiene(workflow: Path, lowered: str) -> bool:
+    """Allow only the narrow workflow that deletes obsolete non-main branch refs."""
+    required = (
+        workflow.name == "branch-hygiene.yml",
+        "contents: write" in lowered,
+        "actions/github-script" in lowered,
+        "github.rest.git.deleteref" in lowered,
+        "protectedbranches" in lowered,
+        "'main'" in lowered or '"main"' in lowered,
+    )
+    forbidden = (
+        "actions/checkout" in lowered,
+        bool(re.search(r"\bgit\s+push\b", lowered)),
+        "createorupdatefilecontents" in lowered,
+        "github.rest.git.updateref" in lowered,
+        "github.rest.git.createref" in lowered,
+        "github.rest.repos.createcommitstatus" in lowered,
+    )
+    return all(required) and not any(forbidden)
+
+
 def audit(root: Path = ROOT) -> dict[str, Any]:
     root = root.resolve()
     findings: list[Finding] = []
@@ -376,13 +397,17 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
     if workflow_root.is_dir():
         for workflow in sorted(workflow_root.glob("*.y*ml")):
             lowered = workflow.read_text(encoding="utf-8").lower()
-            if "contents: write" in lowered or re.search(r"\bgit\s+push\b", lowered):
+            has_contents_write = "contents: write" in lowered
+            has_git_push = bool(re.search(r"\bgit\s+push\b", lowered))
+            if has_git_push or (
+                has_contents_write and not is_ref_only_branch_hygiene(workflow, lowered)
+            ):
                 add(
                     findings,
                     "self-mutating-workflow",
                     workflow,
                     root,
-                    "CI must upload artifacts, not push directly to main",
+                    "CI may delete obsolete branch refs only; it must not modify repository contents or push commits",
                 )
             if any(value in lowered for value in (".github/run/", ".github/status/")):
                 add(
