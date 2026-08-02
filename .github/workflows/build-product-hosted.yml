@@ -19,6 +19,8 @@ on:
       - pyproject.toml
       - uv.lock
       - tools/blender_python_env.py
+      - tools/siroino_wide_cargo_release_refit_v*.py
+      - Assets/GenWorks/Products/**
 
 env:
   STATUS_CONTEXT: image2outfit-hosted
@@ -131,17 +133,24 @@ jobs:
           if missing:
               raise SystemExit('job is missing: ' + ', '.join(missing))
           product_id = job_path.parent.name
-          expected_root = f'Assets/GenWorks/{product_id}'
-          if job['id'] != product_id or job['productRoot'] != expected_root:
-              raise SystemExit('product job identity does not match its namespace')
+          allowed_roots = {
+              f'Assets/GenWorks/{product_id}',
+              f'Assets/GenWorks/Products/{product_id}',
+          }
+          product_root = str(job['productRoot'])
+          if job['id'] != product_id or product_root not in allowed_roots:
+              raise SystemExit(
+                  f'product job identity/root mismatch: {product_root}; '
+                  f'allowed={sorted(allowed_roots)}'
+              )
           prefab_pattern = re.compile(
-              rf'^Assets/GenWorks/{re.escape(product_id)}/Prefab/[^/]+\.prefab$'
+              rf'^{re.escape(product_root)}/Prefab/[^/]+\.prefab$'
           )
           for field in ('prefabAssetPath', 'integratedPrefabAssetPath'):
               value = str(job.get(field, ''))
               if value and not prefab_pattern.fullmatch(value):
                   raise SystemExit(
-                      f'{field} must match Assets/GenWorks/{product_id}/Prefab/*.prefab'
+                      f'{field} must match {product_root}/Prefab/*.prefab'
                   )
 
           if job.get('automaticBuild') is False:
@@ -159,7 +168,7 @@ jobs:
               'SKIP_PRODUCT_BUILD': 'false',
               'JOB_PATH': job_path_text,
               'JOB_ID': job['id'],
-              'PRODUCT_ROOT': job['productRoot'],
+              'PRODUCT_ROOT': product_root,
               'ARTIFACT_DIR': job['artifactDir'],
               'BUILD_SCRIPT': job['buildScript'],
               'BLEND_PATH': job['blendPath'],
@@ -192,6 +201,8 @@ jobs:
 
       - uses: astral-sh/setup-uv@v6
         if: env.SKIP_PRODUCT_BUILD != 'true'
+        with:
+          version: '0.11.32'
 
       - name: Restore pinned Blender Python environment
         if: env.SKIP_PRODUCT_BUILD != 'true'
