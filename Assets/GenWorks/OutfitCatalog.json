@@ -1,13 +1,41 @@
 {
   "schemaVersion": 1,
   "canonicalPattern": "Assets/GenWorks/{slug}/Prefab/*.prefab",
-  "configuredProductCount": 3,
-  "activeAssetBackedCount": 0,
-  "plannedContractCount": 3,
-  "legacySnapshotCount": 2,
-  "assetBackedOutfitCount": 2,
+  "configuredProductCount": 5,
+  "activeAssetBackedCount": 3,
+  "plannedContractCount": 2,
+  "legacySnapshotCount": 0,
+  "assetBackedOutfitCount": 3,
   "knownOutfitConceptCount": 5,
   "activeProducts": [
+    {
+      "productId": "haolan-bordeaux-knit-set",
+      "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
+      "status": "REJECTED",
+      "classification": "REJECTED_PARTIAL_CHECKPOINT",
+      "productRoot": "Assets/GenWorks/haolan-bordeaux-knit-set",
+      "configuredPrefabPaths": [
+        "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+        "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet_Integrated.prefab"
+      ],
+      "trackedPrefabs": [
+        "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab"
+      ]
+    },
+    {
+      "productId": "haolan-cow-hood-knit-set",
+      "productName": "HAOLAN Cow Hood Knit Set v1.0",
+      "status": "REJECTED",
+      "classification": "REJECTED_CHECKPOINT",
+      "productRoot": "Assets/GenWorks/haolan-cow-hood-knit-set",
+      "configuredPrefabPaths": [
+        "Assets/GenWorks/haolan-cow-hood-knit-set/Prefab/HAOLAN_CowHoodKnitSet.prefab",
+        "Assets/GenWorks/haolan-cow-hood-knit-set/Prefab/HAOLAN_CowHoodKnitSet_Integrated.prefab"
+      ],
+      "trackedPrefabs": [
+        "Assets/GenWorks/haolan-cow-hood-knit-set/Prefab/HAOLAN_CowHoodKnitSet.prefab"
+      ]
+    },
     {
       "productId": "siroino-cyber-kawaii-large",
       "productName": "Cyber Kawaii Layered Set for Siroino _Large",
@@ -47,7 +75,50 @@
       ]
     }
   ],
-  "assetBackedProducts": [],
+  "assetBackedProducts": [
+    {
+      "productId": "haolan-bordeaux-knit-set",
+      "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
+      "status": "REJECTED",
+      "classification": "REJECTED_PARTIAL_CHECKPOINT",
+      "productRoot": "Assets/GenWorks/haolan-bordeaux-knit-set",
+      "configuredPrefabPaths": [
+        "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+        "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet_Integrated.prefab"
+      ],
+      "trackedPrefabs": [
+        "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab"
+      ]
+    },
+    {
+      "productId": "haolan-cow-hood-knit-set",
+      "productName": "HAOLAN Cow Hood Knit Set v1.0",
+      "status": "REJECTED",
+      "classification": "REJECTED_CHECKPOINT",
+      "productRoot": "Assets/GenWorks/haolan-cow-hood-knit-set",
+      "configuredPrefabPaths": [
+        "Assets/GenWorks/haolan-cow-hood-knit-set/Prefab/HAOLAN_CowHoodKnitSet.prefab",
+        "Assets/GenWorks/haolan-cow-hood-knit-set/Prefab/HAOLAN_CowHoodKnitSet_Integrated.prefab"
+      ],
+      "trackedPrefabs": [
+        "Assets/GenWorks/haolan-cow-hood-knit-set/Prefab/HAOLAN_CowHoodKnitSet.prefab"
+      ]
+    },
+    {
+      "productId": "siroino-wide-cargo",
+      "productName": "Siroino Wide Cargo",
+      "status": "WORKING",
+      "classification": "PARTIAL_CHECKPOINT",
+      "productRoot": "Assets/GenWorks/siroino-wide-cargo",
+      "configuredPrefabPaths": [
+        "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
+        "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab"
+      ],
+      "trackedPrefabs": [
+        "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab"
+      ]
+    }
+  ],
   "plannedProducts": [
     {
       "productId": "siroino-cyber-kawaii-large",
@@ -72,38 +143,7 @@
         "Assets/GenWorks/siroino-lace-halter-large/Prefab/Siroino_Large_LaceHalter.prefab"
       ],
       "trackedPrefabs": []
-    },
-    {
-      "productId": "siroino-wide-cargo",
-      "productName": "Siroino Wide Cargo",
-      "status": "WORKING",
-      "classification": "PARTIAL_CHECKPOINT",
-      "productRoot": "Assets/GenWorks/siroino-wide-cargo",
-      "configuredPrefabPaths": [
-        "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
-        "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab"
-      ],
-      "trackedPrefabs": [
-        "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab"
-      ]
     }
   ],
-  "legacySnapshots": [
-    {
-      "snapshotId": "bordeaux-knit-set-candidate",
-      "status": "LEGACY_SNAPSHOT",
-      "productRoot": "Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate",
-      "trackedPrefabs": [
-        "Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate/HAOLAN_BordeauxKnitSet.prefab"
-      ]
-    },
-    {
-      "snapshotId": "cow-hood-knit-set-v1",
-      "status": "LEGACY_SNAPSHOT",
-      "productRoot": "Assets/GenWorks/Legacy/Snapshots/haolan/cow-hood-knit-set-v1",
-      "trackedPrefabs": [
-        "Assets/GenWorks/Legacy/Snapshots/haolan/cow-hood-knit-set-v1/HAOLAN_CowHoodKnitSet.prefab"
-      ]
-    }
-  ]
+  "legacySnapshots": []
 }
