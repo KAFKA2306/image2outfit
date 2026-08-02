@@ -1,0 +1,80 @@
+name: One-time finalize merged branches
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/one-time-finalize-integration.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: image2outfit-finalize-merged-branches
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Migrate, validate, and remove one-time machinery
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python tools/migrate_genworks_layout_once.py
+
+          for job in config/products/*/job.json; do
+            product_id="$(basename "$(dirname "$job")")"
+            python tools/update_product_hashes.py --root "Assets/GenWorks/${product_id}"
+          done
+
+          git rm -f --ignore-unmatch \
+            .github/run/genworks-layout.txt \
+            .github/run/genworks-layout-pr.txt \
+            .github/workflows/one-time-genworks-canonical-layout.yml \
+            .github/workflows/one-time-genworks-layout-trigger.yml \
+            .github/workflows/one-time-finalize-integration.yml \
+            tools/migrate_genworks_layout_once.py
+          rmdir .github/run 2>/dev/null || true
+
+          python -m compileall -q tools tests
+          python tools/audit_genworks_layout.py
+          python tools/audit_repository_hygiene.py
+          python -m unittest discover -s tests -v
+          git diff --check
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m 'refactor: finalize canonical GenWorks integration [skip-hosted-product-build]'
+          fi
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Delete integrated work branches
+        shell: bash
+        run: |
+          set -euo pipefail
+          for branch in \
+            agent/genworks-canonical-layout \
+            agent/siroino-v23-spike-guard \
+            feat/siroino-lace-halter-large-v1
+          do
+            if git ls-remote --exit-code --heads origin "refs/heads/${branch}" >/dev/null 2>&1; then
+              git push origin --delete "${branch}"
+            fi
+          done
