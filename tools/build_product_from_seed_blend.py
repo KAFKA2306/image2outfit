@@ -14,11 +14,14 @@ import runpy
 import sys
 from pathlib import Path
 
-import bpy
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
 
+import bpy
 import genworks_product_common as common
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = TOOLS_DIR.parent
 
 
 def parse_args() -> argparse.Namespace:
