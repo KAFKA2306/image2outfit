@@ -1,0 +1,112 @@
+name: One-time canonical GenWorks layout trigger
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/run/genworks-layout.txt
+
+permissions:
+  contents: write
+
+concurrency:
+  group: image2outfit-genworks-canonical-layout
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Pause hosted product auto-builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          hosted='.github/workflows/build-product-hosted.yml'
+          cp "$hosted" /tmp/build-product-hosted.original.yml
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/build-product-hosted.yml')
+          text = path.read_text(encoding='utf-8')
+          start = text.index('on:\n')
+          end = text.index('\nenv:\n', start)
+          dispatch = (
+              'on:\n'
+              '  workflow_dispatch:\n'
+              '    inputs:\n'
+              '      job_path:\n'
+              '        description: Tracked product job at config/products/<product-id>/job.json\n'
+              '        required: true\n'
+              '        type: string\n'
+          )
+          path.write_text(text[:start] + dispatch + text[end:], encoding='utf-8', newline='')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$hosted"
+          git commit -m 'ci: pause hosted builds for GenWorks layout migration'
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Migrate and validate canonical product layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/migrate_genworks_layout_once.py
+          for job in config/products/*/job.json; do
+            product_id="$(basename "$(dirname "$job")")"
+            python tools/update_product_hashes.py --root "Assets/GenWorks/${product_id}"
+          done
+          python -m compileall -q tools tests
+          python tools/audit_genworks_layout.py
+          python tools/audit_repository_hygiene.py
+          python -m unittest discover -s tests -v
+          git diff --check
+          git add -A
+          git commit -m 'refactor: standardize GenWorks slug and Prefab layout'
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Restore hosted triggers and remove migration machinery
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          hosted = Path('.github/workflows/build-product-hosted.yml')
+          current = hosted.read_text(encoding='utf-8')
+          original = Path('/tmp/build-product-hosted.original.yml').read_text(encoding='utf-8')
+          current_start = current.index('on:\n')
+          current_end = current.index('\nenv:\n', current_start)
+          original_start = original.index('on:\n')
+          original_end = original.index('\nenv:\n', original_start)
+          hosted.write_text(
+              current[:current_start]
+              + original[original_start:original_end]
+              + current[current_end:],
+              encoding='utf-8',
+              newline='',
+          )
+          PY
+          git rm -f \
+            .github/run/genworks-layout.txt \
+            .github/workflows/one-time-genworks-canonical-layout.yml \
+            .github/workflows/one-time-genworks-layout-trigger.yml \
+            tools/migrate_genworks_layout_once.py
+          git add .github/workflows/build-product-hosted.yml
+          git commit -m 'chore: finalize canonical GenWorks layout migration'
+          git pull --rebase origin main
+          git push origin HEAD:main
