@@ -45,6 +45,13 @@ def add(findings: list[Finding], code: str, path: Path, root: Path, message: str
     findings.append(Finding(code, relative(path, root), message))
 
 
+def allowed_product_roots(product_id: str) -> tuple[str, str]:
+    return (
+        f"Assets/GenWorks/{product_id}",
+        f"Assets/GenWorks/Products/{product_id}",
+    )
+
+
 def is_ref_only_branch_hygiene(workflow: Path, lowered: str) -> bool:
     """Allow only the narrow workflow that deletes obsolete non-main branch refs."""
     required = (
@@ -173,10 +180,26 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                 add(findings, "invalid-product-job", job_path, root, str(exc))
                 continue
 
-            expected_root = f"Assets/GenWorks/{product_id}"
+            roots = allowed_product_roots(product_id)
+            configured_root = str(job.get("productRoot", ""))
+            expected_root = configured_root if configured_root in roots else roots[0]
+            if job.get("id") != product_id:
+                add(
+                    findings,
+                    "product-config-boundary",
+                    job_path,
+                    root,
+                    f"id must be {product_id!r}",
+                )
+            if configured_root not in roots:
+                add(
+                    findings,
+                    "product-config-boundary",
+                    job_path,
+                    root,
+                    f"productRoot must be one of {list(roots)!r}",
+                )
             expected = {
-                "id": product_id,
-                "productRoot": expected_root,
                 "productManifestPath": f"{expected_root}/ProductManifest.json",
                 "licenseEvidence": f"config/products/{product_id}/license.json",
             }
