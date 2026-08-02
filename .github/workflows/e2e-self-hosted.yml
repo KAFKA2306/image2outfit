@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       job_path:
-        description: Repository-relative local schemaVersion 2 job.json path
+        description: Repository-relative schemaVersion 2 job.json path
         required: true
         type: string
 
@@ -30,16 +30,18 @@ jobs:
 
       - uses: arduino/setup-task@v2
 
-      - name: Validate local v2 job
+      - name: Validate v2 job
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $jobPath = '${{ inputs.job_path }}'
-          if ($jobPath -notmatch '^Assets/_Local/Jobs/[A-Za-z0-9._-]+/job\.json$') {
-            throw 'job_path must match Assets/_Local/Jobs/<job-id>/job.json'
+          $localPattern = '^Assets/_Local/Jobs/[A-Za-z0-9._-]+/job\.json$'
+          $trackedPattern = '^config/products/[A-Za-z0-9._-]+/job\.json$'
+          if ($jobPath -notmatch $localPattern -and $jobPath -notmatch $trackedPattern) {
+            throw 'job_path must match Assets/_Local/Jobs/<job-id>/job.json or config/products/<product-id>/job.json'
           }
           if (-not (Test-Path -LiteralPath $jobPath -PathType Leaf)) {
-            throw "Local job file was not found: $jobPath"
+            throw "Job file was not found: $jobPath"
           }
           $job = Get-Content -LiteralPath $jobPath -Raw | ConvertFrom-Json
           if ([int]$job.schemaVersion -ne 2) {
