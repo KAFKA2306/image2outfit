@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-03T07:15:00+09:00",
+  "productId": "siroino-heather-hooded-bodysuit",
+  "target": "SiroinoSotai_PC",
+  "result": "FAIL",
+  "releaseDecision": "WORKING_CHECKPOINT_ONLY",
+  "evidence": {
+    "multiview": "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+    "poseReview": "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+    "fitAudit": "Tests/fit-audit.json"
+  },
+  "blockingFindings": [
+    {
+      "zone": "shoulder/underarm",
+      "finding": "Visible gaps leave the sleeves disconnected from the upper body.",
+      "requiredFix": "Rebuild or bridge the armhole and transfer continuous body weights."
+    },
+    {
+      "zone": "waist/hip crest",
+      "finding": "Rigid triangular fins project from both sides.",
+      "requiredFix": "Replace the transition with a smooth high-cut edge and controlled side ties."
+    },
+    {
+      "zone": "hood/back",
+      "finding": "Back hood panels appear as detached wing-like strips.",
+      "requiredFix": "Build a continuous hood shell with a closed center seam and wearable volume."
+    },
+    {
+      "zone": "all required poses",
+      "finding": "The fit audit reports 8,490 garment/body triangle overlap pairs.",
+      "requiredFix": "Clear the BVH audit or replace it with a validated contact-distance metric."
+    }
+  ],
+  "nonBlockingPasses": [
+    "Five directional renders exist.",
+    "Six required pose renders exist.",
+    "FBX and Blender source were generated.",
+    "Maximum bone influences is four; no unweighted vertices or degenerate triangles were reported.",
+    "The 2026 seam-correspondence metadata trial passed."
+  ]
+}

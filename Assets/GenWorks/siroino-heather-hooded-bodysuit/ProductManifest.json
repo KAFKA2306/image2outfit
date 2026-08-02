@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-heather-hooded-bodysuit",
+  "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab",
+  "previewPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/README.md",
+  "sourceJobPath": "config/products/siroino-heather-hooded-bodysuit/job.json",
+  "productBuildScript": "tools/siroino_heather_hooded_product.py",
+  "designRevision": "v6-fitted-sleeves-split-hood-seam-graph",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "tools/siroino_heather_hooded_product.py",
+    "lastAttempt": {
+      "result": "HOSTED_MODELED_FIT_REJECTED",
+      "visualRevision": "v6-fitted-sleeves-split-hood-seam-graph"
+    },
+    "blockers": [
+      "Close shoulder and underarm gaps between the upper body and sleeves",
+      "Remove outward-pointing waist fins and rebuild smooth high-cut side transitions",
+      "Replace the detached wing-like hood back panels with a continuous hood volume",
+      "Resolve all intersections reported in Tests/fit-audit.json",
+      "Import/save/reload both Prefabs in pinned Unity",
+      "Pass Modular Avatar/NDMF and VRChat Build & Test"
+    ]
+  },
+  "technicalGates": {
+    "standardTargetResolved": "PASS",
+    "blender": "PASS",
+    "fbx": "PASS",
+    "fiveViewRender": "PASS",
+    "poseRender": "PASS",
+    "seamCorrespondenceTrial": "PASS",
+    "fourInfluenceLimit": "PASS",
+    "fitPenetration": "FAIL",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "FAIL",
+    "humanPoseReview": "FAIL",
+    "humanRuntimeReview": "PENDING"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
+    "fbx": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Models/SiroinoHeatherHoodedBodysuit.fbx",
+    "prefab": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab",
+    "multiview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+    "fitAudit": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
+    "visualReview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/visual-review.json"
+  },
+  "research": {
+    "source": {
+      "title": "Learning-based Seam Correspondence Reconstruction in Sewing Patterns",
+      "authors": [
+        "Zhendong Wang",
+        "Jintong Wang",
+        "Chen Liu",
+        "Yao Jin",
+        "Ligang Liu",
+        "Huamin Wang"
+      ],
+      "submitted": "2026-07-23T11:26:39Z",
+      "arxiv": "https://arxiv.org/abs/2607.21213",
+      "doi": "https://doi.org/10.48550/arXiv.2607.21213",
+      "paperLicense": "CC BY-NC-ND 4.0",
+      "paperLicenseUrl": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+      "officialCode": null,
+      "officialCodeStatus": "No official implementation located as of 2026-08-03"
+    },
+    "result": "PASS",
+    "decision": "ADOPT_METADATA_ONLY",
+    "baselineF1": 0.228571,
+    "semanticGraphF1": 1.0,
+    "deltaF1": 0.771429,
+    "evidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/seam-correspondence-graph-trial.json",
+    "patternContract": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Documentation/pattern-spec.json"
+  },
+  "metrics": {
+    "meshObjects": 17,
+    "vertices": 18056,
+    "triangles": 35750,
+    "materialSlots": 17,
+    "shapeKeys": 255,
+    "maxBoneInfluences": 4,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "boundaryEdges": 446
+  },
+  "dynamicRebind": {
+    "objects": [
+      "Heather_Hood_Cowl",
+      "Heather_Hood_Back_Drape_L",
+      "Heather_Hood_Back_Drape_R",
+      "Heather_Long_Sleeve_L",
+      "Heather_Rib_Cuff_L",
+      "Heather_Long_Sleeve_R",
+      "Heather_Rib_Cuff_R",
+      "Heather_Editable_Seams"
+    ],
+    "weightSource": "nearest tracked SiroinoSotai_PC body vertices"
+  },
+  "influencePruning": {
+    "Heather_Front_Upper_Panel": 0,
+    "Heather_Back_Upper_Panel": 0,
+    "Heather_Henley_Placket": 0,
+    "Heather_Henley_Button_01": 0,
+    "Heather_Henley_Button_02": 0,
+    "Heather_Henley_Button_03": 0,
+    "Heather_Drawcords_And_Side_Ties": 0,
+    "Heather_Highcut_Front_Panel": 0,
+    "Heather_Highcut_Back_Panel": 8,
+    "Heather_Hood_Cowl": 0,
+    "Heather_Hood_Back_Drape_L": 0,
+    "Heather_Hood_Back_Drape_R": 0,
+    "Heather_Long_Sleeve_L": 0,
+    "Heather_Rib_Cuff_L": 0,
+    "Heather_Long_Sleeve_R": 0,
+    "Heather_Rib_Cuff_R": 0,
+    "Heather_Editable_Seams": 0
+  },
+  "meshCleanup": {
+    "Heather_Front_Upper_Panel": 22,
+    "Heather_Back_Upper_Panel": 0,
+    "Heather_Henley_Placket": 0,
+    "Heather_Henley_Button_01": 0,
+    "Heather_Henley_Button_02": 0,
+    "Heather_Henley_Button_03": 0,
+    "Heather_Drawcords_And_Side_Ties": 0,
+    "Heather_Highcut_Front_Panel": 0,
+    "Heather_Highcut_Back_Panel": 180,
+    "Heather_Hood_Cowl": 0,
+    "Heather_Hood_Back_Drape_L": 0,
+    "Heather_Hood_Back_Drape_R": 0,
+    "Heather_Long_Sleeve_L": 0,
+    "Heather_Rib_Cuff_L": 0,
+    "Heather_Long_Sleeve_R": 0,
+    "Heather_Rib_Cuff_R": 0,
+    "Heather_Editable_Seams": 0
+  },
+  "poseEvidence": {
+    "neutral": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/neutral.png",
+      "sha256": "4d582696e369ab87b016c2567be94277e9ecfdbf5aadd6f1cf735e9425bb07d6"
+    },
+    "arms-up": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/arms-up.png",
+      "sha256": "ef61669dd688637de1a8357d8e60ba418f5ea1ac038c489e8608d3622691b2fe"
+    },
+    "forward-bend": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/forward-bend.png",
+      "sha256": "23483b8e944affe32ddeeb61a956205eb50f3329f6b9913dba162b76b29a9aac"
+    },
+    "legs-apart": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/legs-apart.png",
+      "sha256": "661ed8b9aa591ee0f2c5e162dc674ed98e5c008a2d89ed04445b280f31d53d1c"
+    },
+    "walk": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/walk.png",
+      "sha256": "22b6e6b5b383282cdbff47fc6436b2669f291f46d3201f4dde1fb9de82d1bb5b"
+    },
+    "crouch": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/crouch.png",
+      "sha256": "d1234d68492fa855c70f5ff6ad1dbaea53805a9f3677350190f05780696a9a0e"
+    },
+    "sheet": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+      "sha256": "b774d162ac1b1e73cee55f47964be9f8b251533e5c17a50617725a0297b42bc0"
+    }
+  },
+  "fitAuditSummary": {
+    "pass": false,
+    "posesWithIntersections": [
+      "neutral",
+      "arms-up",
+      "forward-bend",
+      "legs-apart",
+      "walk",
+      "crouch"
+    ],
+    "totalTriangleOverlapPairs": 8490
+  },
+  "humanReviewSummary": {
+    "result": "FAIL",
+    "reviewedAt": "2026-08-03T07:15:00+09:00",
+    "reviewedEvidence": [
+      "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+      "Previews/siroino-heather-hooded-bodysuit-pose-review.webp"
+    ],
+    "blockingFindings": [
+      "Sleeves do not form a continuous garment connection at the shoulders and underarms.",
+      "Waist transitions project outward as rigid triangular fins.",
+      "The rear hood panels read as detached wings rather than a wearable hood.",
+      "BVH fit audit reports intersections in every required pose."
+    ]
+  }
+}
