@@ -6,7 +6,7 @@ on:
     branches: [main]
     paths:
       - tools/siroino_wide_cargo_release_refit.py
-      - config/siroino-wide-cargo-job.json
+      - config/products/siroino-wide-cargo/job.json
       - .github/workflows/render-validation.yml
 
 permissions:
@@ -68,7 +68,7 @@ jobs:
           .image2outfit/blender/blender \
             --background --factory-startup --python-exit-code 1 \
             --python tools/siroino_wide_cargo_release_refit.py \
-            -- --job config/siroino-wide-cargo-job.json \
+            -- --job config/products/siroino-wide-cargo/job.json \
             2>&1 | tee Artifacts/siroino-wide-cargo/hosted-blender.log
 
       - name: Generate pose evidence
@@ -82,7 +82,7 @@ jobs:
           .image2outfit/blender/blender \
             --background "$blend" --python-exit-code 1 \
             --python tools/siroino_required_pose_entry.py \
-            -- --job config/siroino-wide-cargo-job.json \
+            -- --job config/products/siroino-wide-cargo/job.json \
             2>&1 | tee Artifacts/siroino-wide-cargo/hosted-poses.log
 
       - name: Upload evidence
