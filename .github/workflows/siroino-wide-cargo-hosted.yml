@@ -2,19 +2,13 @@ name: Build Siroino Wide Cargo Hosted
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/siroino-wide-cargo-hosted.yml
-      - tools/siroino_wide_cargo_release_refit.py
-      - config/siroino-wide-cargo-job.json
 
 permissions:
   contents: write
 
 concurrency:
   group: image2outfit-siroino-wide-cargo-hosted
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   blender:
@@ -25,40 +19,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Record hosted run start
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          import os
-          from datetime import datetime, timezone
-          from pathlib import Path
-
-          path = Path('.github/status/siroino-wide-cargo-hosted.json')
-          path.parent.mkdir(parents=True, exist_ok=True)
-          path.write_text(json.dumps({
-              'schemaVersion': 1,
-              'workflow': 'Build Siroino Wide Cargo Hosted',
-              'runId': int(os.environ['GITHUB_RUN_ID']),
-              'runAttempt': int(os.environ['GITHUB_RUN_ATTEMPT']),
-              'headSha': os.environ['GITHUB_SHA'],
-              'status': 'running',
-              'conclusion': None,
-              'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-              'updatedAt': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
-          }, indent=2) + '\n', encoding='utf-8')
-          PY
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/status/siroino-wide-cargo-hosted.json
-          git commit -m "Record Siroino hosted run ${GITHUB_RUN_ID} start"
-          for attempt in 1 2 3 4 5; do
-            git pull --rebase origin main && git push origin HEAD:main && exit 0
-            sleep $((attempt * 3))
-          done
-          exit 1
 
       - name: Install Blender runtime libraries
         run: |
@@ -114,6 +74,7 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
+
           path = Path('Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json')
           data = json.loads(path.read_text(encoding='utf-8-sig'))
           data['status'] = 'MODELED'
@@ -140,6 +101,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f Assets/GenWorks/Products/siroino-wide-cargo
+          if git diff --cached --quiet; then
+            echo 'Modeled product already matches main; no commit required.'
+            exit 0
+          fi
           git commit -m "Model Siroino wide cargo outfit"
           for attempt in 1 2 3 4 5; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
@@ -158,40 +123,3 @@ jobs:
           if-no-files-found: error
           retention-days: 30
           compression-level: 6
-
-      - name: Record hosted run conclusion
-        if: always()
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          import os
-          from datetime import datetime, timezone
-          from pathlib import Path
-
-          path = Path('.github/status/siroino-wide-cargo-hosted.json')
-          path.parent.mkdir(parents=True, exist_ok=True)
-          path.write_text(json.dumps({
-              'schemaVersion': 1,
-              'workflow': 'Build Siroino Wide Cargo Hosted',
-              'runId': int(os.environ['GITHUB_RUN_ID']),
-              'runAttempt': int(os.environ['GITHUB_RUN_ATTEMPT']),
-              'headSha': os.environ['GITHUB_SHA'],
-              'status': 'completed',
-              'conclusion': os.environ['JOB_STATUS'],
-              'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-              'updatedAt': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
-          }, indent=2) + '\n', encoding='utf-8')
-          PY
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/status/siroino-wide-cargo-hosted.json
-          git commit -m "Record Siroino hosted run ${GITHUB_RUN_ID} ${JOB_STATUS}" || true
-          for attempt in 1 2 3 4 5; do
-            git pull --rebase origin main && git push origin HEAD:main && exit 0
-            sleep $((attempt * 3))
-          done
-          exit 1
-        env:
-          JOB_STATUS: ${{ job.status }}
