@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Run the retained HAOLAN Bordeaux generator from any schema-v2 job location.
+"""Run the retained HAOLAN Bordeaux generator from a tracked schema-v2 job.
 
-The original generator predates tracked jobs and resolves the repository root
-from an Assets/_Local/Jobs/<id>/job.json path. This adapter preserves that
-validated implementation while making config/products/<id>/job.json the
-canonical, reproducible entry point.
+The licensed HAOLAN avatar is used when it exists on a self-hosted runner. On a
+public runner, a geometry-free skeleton seed reproduces the garment rig without
+redistributing HAOLAN meshes, materials, textures, or Prefabs.
 """
 from __future__ import annotations
 
@@ -13,9 +12,12 @@ import runpy
 import sys
 from pathlib import Path
 
+import bpy
+
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY_BUILDER = ROOT / "tools" / "haolan_knit_build.py"
 LOCAL_JOB = ROOT / "Assets" / "_Local" / "Jobs" / "haolan-bordeaux-knit-set" / "job.json"
+SEED_FBX = ROOT / "Assets" / "_Local" / "GeneratedSeeds" / "haolan-v1.6-skeleton.fbx"
 
 
 def parse_job_path() -> Path:
@@ -28,6 +30,58 @@ def parse_job_path() -> Path:
     return value if value.is_absolute() else (ROOT / value).resolve()
 
 
+def resolve(value: str) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else (ROOT / path).resolve()
+
+
+def materialize_skeleton(seed_path: Path) -> Path:
+    seed = json.loads(seed_path.read_text(encoding="utf-8-sig"))
+    if seed.get("adapterId") != "haolan-v1.6":
+        raise ValueError("Unexpected skeleton adapter")
+    if seed.get("source", {}).get("avatarGeometryIncluded") is not False:
+        raise ValueError("Skeleton seed must not contain avatar geometry")
+
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    armature_data = bpy.data.armatures.new("Armature")
+    armature = bpy.data.objects.new("Armature", armature_data)
+    bpy.context.collection.objects.link(armature)
+    bpy.context.view_layer.objects.active = armature
+    armature.select_set(True)
+    bpy.ops.object.mode_set(mode="EDIT")
+
+    created = {}
+    for item in seed["bones"]:
+        bone = armature_data.edit_bones.new(item["name"])
+        bone.head = item["head"]
+        bone.tail = item["tail"]
+        if (bone.tail - bone.head).length < 0.001:
+            raise ValueError(f"Bone is too short: {bone.name}")
+        created[bone.name] = bone
+    for item in seed["bones"]:
+        parent = item.get("parent")
+        if parent:
+            created[item["name"]].parent = created[parent]
+            created[item["name"]].use_connect = False
+
+    bpy.ops.object.mode_set(mode="OBJECT")
+    SEED_FBX.parent.mkdir(parents=True, exist_ok=True)
+    bpy.ops.export_scene.fbx(
+        filepath=str(SEED_FBX),
+        use_selection=True,
+        object_types={"ARMATURE"},
+        add_leaf_bones=False,
+        bake_anim=False,
+        apply_unit_scale=True,
+        apply_scale_options="FBX_SCALE_UNITS",
+        axis_forward="-Z",
+        axis_up="Y",
+    )
+    if not SEED_FBX.is_file() or SEED_FBX.stat().st_size < 1_000:
+        raise RuntimeError("Failed to materialize the geometry-free HAOLAN skeleton seed")
+    return SEED_FBX
+
+
 def main() -> int:
     source_job = parse_job_path()
     job = json.loads(source_job.read_text(encoding="utf-8-sig"))
@@ -35,6 +89,20 @@ def main() -> int:
         raise ValueError("HAOLAN Bordeaux build requires schemaVersion 2")
     if job.get("id") != "haolan-bordeaux-knit-set":
         raise ValueError("Unexpected job id for HAOLAN Bordeaux builder")
+
+    target = resolve(job["targetSourcePath"])
+    if not target.is_file():
+        seed_value = job.get("skeletonSeedPath")
+        if not seed_value:
+            raise FileNotFoundError(
+                f"HAOLAN target source is unavailable and no skeletonSeedPath is configured: {target}"
+            )
+        target = materialize_skeleton(resolve(seed_value))
+        job["targetSourcePath"] = str(target)
+        job["buildInputMode"] = "geometry-free-skeleton-seed"
+    else:
+        job["targetSourcePath"] = str(target)
+        job["buildInputMode"] = "licensed-local-avatar-source"
 
     LOCAL_JOB.parent.mkdir(parents=True, exist_ok=True)
     LOCAL_JOB.write_text(
