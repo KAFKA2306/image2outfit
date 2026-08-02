@@ -46,10 +46,41 @@ class ConfigContractTest(unittest.TestCase):
         self.assertFalse((ROOT / "config" / f"{product_id}-approval.json").exists())
 
     def test_unity_pipeline_uses_the_genworks_canonical_path(self) -> None:
-        expected = ROOT / "Assets" / "GenWorks" / "Shared" / "Editor" / "Image2OutfitPipeline.cs"
+        expected = (
+            ROOT
+            / "Assets"
+            / "GenWorks"
+            / "Shared"
+            / "Editor"
+            / "Image2OutfitPipeline.cs"
+        )
         self.assertEqual(gate.UNITY_PIPELINE_PATH, expected)
         self.assertTrue(expected.is_file())
         self.assertFalse((ROOT / "Assets" / "Editor").exists())
+
+    def test_generated_outfit_prefabs_are_modular_avatar_ready(self) -> None:
+        configurator = (
+            ROOT
+            / "Assets"
+            / "GenWorks"
+            / "Shared"
+            / "Editor"
+            / "GeneratedOutfitPrefabConfigurator.cs"
+        )
+        self.assertTrue(configurator.is_file())
+        self.assertTrue(configurator.with_suffix(".cs.meta").is_file())
+        source = configurator.read_text(encoding="utf-8")
+        for required in (
+            'OutfitPrefabSegment = "/Prefabs/Outfit/"',
+            "OnPostprocessAllAssets",
+            "PrefabUtility.LoadPrefabContents",
+            "ModularAvatarMergeArmature",
+            "ModularAvatarMeshSettings",
+            "ArmatureLockMode.BaseToMerge",
+            "mangleNames = true",
+        ):
+            self.assertIn(required, source)
+        self.assertNotIn("VRCAvatarDescriptor", source)
 
 
 if __name__ == "__main__":
