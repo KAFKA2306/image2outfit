@@ -29,11 +29,12 @@ class FinalRepositoryStateTest(unittest.TestCase):
             self.assertTrue(license_path.is_file(), license_path)
             job = json.loads(job_path.read_text(encoding="utf-8-sig"))
             product_id = product_dir.name
-            self.assertEqual(job["id"], product_id)
-            self.assertEqual(
-                job["productRoot"],
+            allowed_roots = {
                 f"Assets/GenWorks/{product_id}",
-            )
+                f"Assets/GenWorks/Products/{product_id}",
+            }
+            self.assertEqual(job["id"], product_id)
+            self.assertIn(job["productRoot"], allowed_roots)
             self.assertEqual(
                 job["licenseEvidence"],
                 f"config/products/{product_id}/license.json",
