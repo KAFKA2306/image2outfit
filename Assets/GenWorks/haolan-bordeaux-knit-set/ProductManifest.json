@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "productId": "haolan-bordeaux-knit-set",
+  "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
+  "status": "WORKING",
+  "targetAdapterId": "haolan-v1.6",
+  "productRoot": "Assets/GenWorks/haolan-bordeaux-knit-set",
+  "outfitPrefabPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_Lowpoly_BordeauxKnitSet.prefab",
+  "previewPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/front.png",
+  "poseReviewPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/HAOLAN_BordeauxKnitSet_pose-review.webp",
+  "documentationPath": "Assets/GenWorks/haolan-bordeaux-knit-set/README.md",
+  "sourceJobPath": "config/products/haolan-bordeaux-knit-set/job.json",
+  "legacySource": "Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate",
+  "generatedAt": null,
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/haolan-bordeaux-knit-set",
+    "resumeFrom": "tools/haolan_knit_build.py",
+    "doNotRebuildFromZero": true,
+    "legacyCandidateSha256": "02df9c5c8223f1c9b146cc8db2f2648d5bd1ef185569851f6603a0b67099b69a",
+    "blockers": [
+      "Generate the editable Blender source and FBX in the canonical workspace",
+      "Create and reload the outfit and HAOLAN-integrated Prefabs in Unity 2022.3.22f1",
+      "Pass Modular Avatar and NDMF validation",
+      "Generate and inspect actual five-view and required-pose renders",
+      "Complete the final human visual, pose-penetration, and VRChat runtime reviews"
+    ]
+  },
+  "metrics": {
+    "legacyMeshObjects": 13,
+    "legacyVertices": 3738,
+    "legacyTriangles": 7176,
+    "legacyWatertightMeshes": 13,
+    "legacyNonManifoldEdges": 0,
+    "legacyDegenerateTriangles": 0,
+    "legacyUnweightedVertices": 0,
+    "legacyWeightSumErrors": 0,
+    "legacyMaxBoneInfluences": 4
+  },
+  "technicalGates": {
+    "legacyGeometry": "PASS",
+    "legacyFbxSyntaxAndReferences": "PASS",
+    "legacyPrefabGuidValidation": "PASS",
+    "legacyIndependentGeometryRoundTrip": "PASS",
+    "canonicalBlenderBuild": "PENDING",
+    "canonicalFbxStructure": "PENDING",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "ndmf": "PENDING",
+    "actualFiveView": "PENDING",
+    "requiredPoseReview": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING"
+  },
+  "releaseDecision": "NO-GO"
+}
