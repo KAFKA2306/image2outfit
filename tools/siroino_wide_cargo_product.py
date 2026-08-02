@@ -2,7 +2,6 @@
 """Stable entrypoint for the reviewed Siroino Wide Cargo v38 product."""
 from __future__ import annotations
 
-import importlib.util
 import json
 import shutil
 import sys
@@ -14,24 +13,7 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-IMPLEMENTATION_PATH = TOOLS / "siroino_wide_cargo_current.py"
-
-
-def load_implementation() -> ModuleType:
-    if not IMPLEMENTATION_PATH.is_file():
-        raise FileNotFoundError(
-            f"Wide Cargo implementation missing: {IMPLEMENTATION_PATH}"
-        )
-    name = "siroino_wide_cargo_current"
-    spec = importlib.util.spec_from_file_location(name, IMPLEMENTATION_PATH)
-    if spec is None or spec.loader is None:
-        raise ImportError(
-            f"cannot load Wide Cargo implementation: {IMPLEMENTATION_PATH}"
-        )
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
-    return module
+import siroino_wide_cargo_current as current
 
 
 def clear_stale_evidence(implementation: ModuleType) -> None:
@@ -233,7 +215,7 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
 
 
 def main() -> int:
-    implementation = load_implementation()
+    implementation = current
     clear_stale_evidence(implementation)
     baseline_audit = implementation.audit
     implementation.build_geometry = lambda segments=48: reviewed_geometry(
