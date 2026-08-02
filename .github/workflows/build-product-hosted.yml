@@ -185,9 +185,10 @@ jobs:
           path: |
             ${{ env.ARTIFACT_DIR }}
             ${{ env.PRODUCT_ROOT }}
+            blender.tar.xz
           if-no-files-found: error
-          retention-days: 30
-          compression-level: 6
+          retention-days: 1
+          compression-level: 0
 
       - name: Publish final commit status
         if: always()
