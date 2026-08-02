@@ -86,3 +86,11 @@ def migrate_legacy_product_outputs(
         if parent.is_dir() and not any(parent.iterdir()):
             parent.rmdir()
     return migrated
+
+
+def remove_legacy_product_outputs(
+    repository_root: Path,
+    product_id: str,
+) -> list[str]:
+    """Compatibility entrypoint; legacy outputs are migrated, never discarded."""
+    return migrate_legacy_product_outputs(repository_root, product_id)
