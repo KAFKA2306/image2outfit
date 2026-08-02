@@ -18,7 +18,9 @@ class MethodSelectionTest(unittest.TestCase):
     def test_all_products_have_one_valid_profile(self) -> None:
         report = method_selection.audit_all(ROOT)
         self.assertTrue(report["passed"], report["errors"])
-        self.assertEqual(report["productCount"], 5)
+        configured_jobs = list((ROOT / "config" / "products").glob("*/job.json"))
+        self.assertEqual(report["productCount"], len(configured_jobs))
+        self.assertGreater(report["productCount"], 0)
 
     def test_loose_layered_requires_runtime_and_motion_evidence(self) -> None:
         job = method_selection.read_json(
