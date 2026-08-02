@@ -17,6 +17,7 @@ import siroino_military_sheer_romper_target_fit as fit  # noqa: E402
 
 ORIGINAL_EXTRACT = fit.extract_surface
 ORIGINAL_FINISH_SKINNED = fit.finish_skinned
+ORIGINAL_CONFIGURE_SCENE = fit.configure_scene
 
 
 def _world_bounds(body: bpy.types.Object) -> tuple[Vector, Vector]:
@@ -74,7 +75,7 @@ def _neck_predicate(
     )
 
 
-def preserve_world_finish_skinned(
+def mirror_body_parent_finish_skinned(
     obj: bpy.types.Object,
     body: bpy.types.Object,
     armature: bpy.types.Object,
@@ -82,6 +83,13 @@ def preserve_world_finish_skinned(
     *,
     fit_audit: bool,
 ) -> bpy.types.Object:
+    """Skin the garment, then mirror the target body's parent-space contract.
+
+    Imported FBX bodies can carry a non-identity parent transform. Parenting a
+    new mesh directly to the armature without copying the body's parent inverse
+    applies that transform twice. The garment must use the same parent,
+    parent-inverse, and world transform as the source body.
+    """
     world = obj.matrix_world.copy()
     result = ORIGINAL_FINISH_SKINNED(
         obj,
@@ -90,6 +98,11 @@ def preserve_world_finish_skinned(
         values,
         fit_audit=fit_audit,
     )
+    result.parent = body.parent
+    result.parent_type = body.parent_type
+    result.parent_bone = body.parent_bone
+    if body.parent is not None:
+        result.matrix_parent_inverse = body.matrix_parent_inverse.copy()
     result.matrix_world = world
     bpy.context.view_layer.update()
     return result
@@ -135,10 +148,20 @@ def robust_extract(
         )
 
 
+def configure_review_scene(body: bpy.types.Object) -> bpy.types.Object:
+    camera = ORIGINAL_CONFIGURE_SCENE(body)
+    scene = bpy.context.scene
+    scene.render.resolution_x = 512
+    scene.render.resolution_y = 512
+    scene.render.resolution_percentage = 100
+    return camera
+
+
 def main() -> int:
-    fit.finish_skinned = preserve_world_finish_skinned
+    fit.finish_skinned = mirror_body_parent_finish_skinned
     fit.extract_surface = robust_extract
-    fit.REVISION = "siroino-pc-surface-fit-v8.2"
+    fit.configure_scene = configure_review_scene
+    fit.REVISION = "siroino-pc-surface-fit-v8.3"
     return fit.main()
 
 
