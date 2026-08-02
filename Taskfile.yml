@@ -42,35 +42,15 @@ tasks:
     cmds:
       - uv run --no-cache --locked --no-default-groups python tools/audit_research_baseline.py
 
-  audit:snapshot:
-    desc: Verify any preserved legacy snapshot against its original local source.
-    requires:
-      vars: [SNAPSHOT, SOURCE]
-    cmds:
-      - >-
-        uv run --no-cache --locked --no-default-groups --group snapshot
-        python tools/audit_snapshot.py
-        --candidate "{{.SNAPSHOT}}"
-        --source "{{.SOURCE}}"
-
-  package:snapshot:
-    desc: Rebuild a deterministic archive and source hash manifest for any legacy snapshot.
-    requires:
-      vars: [SNAPSHOT]
-    cmds:
-      - >-
-        uv run --no-cache --locked --no-default-groups
-        python tools/package_snapshot.py --root "{{.SNAPSHOT}}"
-
   maintenance:migrate:genworks:
-    desc: Show the migration plan for legacy local image2outfit jobs.
+    desc: Show the migration plan for local image2outfit jobs that are outside canonical product roots.
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
         python tools/migrate_jobs_to_genworks.py
 
   maintenance:migrate:genworks:apply:
-    desc: Move legacy local job outputs and their Unity meta files into Assets/GenWorks.
+    desc: Move local job outputs and their Unity meta files directly into Assets/GenWorks/<slug>.
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
@@ -99,15 +79,13 @@ tasks:
         tools/audit_genworks_layout.py
         tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
-        tools/audit_snapshot.py
-        tools/package_snapshot.py
         tools/customer_quality.py
         tools/production_gate.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
         tests/test_genworks_layout.py
-        tests/test_snapshot_paths.py
+        tests/test_canonical_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
         tests/test_research_baseline.py
@@ -118,15 +96,13 @@ tasks:
         tools/audit_genworks_layout.py
         tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
-        tools/audit_snapshot.py
-        tools/package_snapshot.py
         tools/customer_quality.py
         tools/production_gate.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
         tests/test_genworks_layout.py
-        tests/test_snapshot_paths.py
+        tests/test_canonical_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
         tests/test_research_baseline.py
@@ -141,15 +117,13 @@ tasks:
         tools/audit_genworks_layout.py
         tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
-        tools/audit_snapshot.py
-        tools/package_snapshot.py
         tools/customer_quality.py
         tools/production_gate.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
         tests/test_genworks_layout.py
-        tests/test_snapshot_paths.py
+        tests/test_canonical_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
         tests/test_research_baseline.py

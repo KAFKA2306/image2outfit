@@ -3,7 +3,6 @@
   "canonicalRoot": "Assets/GenWorks",
   "productRoot": "Assets/GenWorks",
   "sharedRoot": "Assets/GenWorks/Shared",
-  "legacyRoot": "Assets/GenWorks/Legacy",
   "manifestName": "ProductManifest.json",
   "requiredProductDirectories": [
     "Source",
@@ -49,6 +48,7 @@
     "Assets/SiroinoWorks"
   ],
   "forbiddenAssetRoots": [
-    "Assets/Editor"
+    "Assets/Editor",
+    "Assets/GenWorks/Legacy"
   ]
 }
