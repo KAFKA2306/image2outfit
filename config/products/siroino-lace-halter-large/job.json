@@ -6,21 +6,20 @@
   "productRoot": "Assets/GenWorks/siroino-lace-halter-large",
   "productManifestPath": "Assets/GenWorks/siroino-lace-halter-large/ProductManifest.json",
   "buildScript": "tools/siroino_lace_halter_large_build.py",
-  "hostedPoseScript": "tools/siroino_required_pose_entry.py",
+  "hostedPoseScript": "tools/siroino_lace_halter_large_pose_review.py",
   "blendPath": "Assets/GenWorks/siroino-lace-halter-large/Source/Blender/SiroinoLaceHalterLarge.blend",
   "fbxAssetPath": "Assets/GenWorks/siroino-lace-halter-large/Models/SiroinoLaceHalterLarge.fbx",
   "prefabAssetPath": "Assets/GenWorks/siroino-lace-halter-large/Prefab/SiroinoLaceHalterLarge.prefab",
   "integratedPrefabAssetPath": "Assets/GenWorks/siroino-lace-halter-large/Prefab/Siroino_Large_LaceHalter.prefab",
-  "targetAvatarAssetPath": "Assets/_Local/Resolved/Siroino_Large.prefab",
-  "targetSourcePath": "Assets/_Local/Resolved/SiroinoSotai_PC.fbx",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
   "artifactDir": "Artifacts/siroino-lace-halter-large",
   "candidateDir": "Candidates/siroino-lace-halter-large",
   "releaseDir": "Release/siroino-lace-halter-large",
   "licenseEvidence": "config/products/siroino-lace-halter-large/license.json",
   "privateSourceRoots": [
     "Assets/_Local",
-    "Assets/_Vendor",
-    "Assets/SiroinoWorks"
+    "Assets/_Vendor"
   ],
   "deliveryAssets": [
     "Assets/GenWorks/siroino-lace-halter-large/ProductManifest.json",
@@ -46,6 +45,7 @@
     "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/crouch.png",
     "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/sit.png",
     "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/twist.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/prone.png",
     "Assets/GenWorks/siroino-lace-halter-large/Prefab/Siroino_Large_LaceHalter.prefab",
     "Assets/GenWorks/siroino-lace-halter-large/Prefab/Siroino_Large_LaceHalter.prefab.meta"
   ],
@@ -62,7 +62,7 @@
     "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-lace-halter-large/vrchat-runtime-review.json"
   },
   "allowedExtraBones": [],
-  "buildRevision": "v1-large-lace-pass-2-final",
+  "buildRevision": "v1-large-lace-pass-7-all-surface-trim",
   "targetResolution": {
     "strategy": "repository-search",
     "profile": "Siroino _Large",
@@ -79,7 +79,7 @@
         ".prefab"
       ],
       "includeRegex": "(?i)(siroino|sotai)",
-      "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
+      "profileRegex": "(?i)(^|[_\\/ .-])_?large([_\\/ .-]|$)",
       "contentRegex": "(?i)(^|[^A-Za-z])_?Large([^A-Za-z]|$)",
       "preferredRegex": "(?i)(SiroinoSotai.*_Large|_Large.*SiroinoSotai)"
     },
@@ -88,7 +88,7 @@
         ".fbx"
       ],
       "includeRegex": "(?i)(siroino|sotai)",
-      "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
+      "profileRegex": "(?i)(^|[_\\/ .-])_?large([_\\/ .-]|$)",
       "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
       "preferredRegex": "(?i)(SiroinoSotai.*Large|Large.*SiroinoSotai)"
     }

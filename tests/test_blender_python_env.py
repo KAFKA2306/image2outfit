@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import os
 import sys
 import tempfile
@@ -20,6 +21,12 @@ class BlenderPythonEnvironmentTest(unittest.TestCase):
             "blender", ["--background", "--python", "build.py"]
         )
         self.assertEqual(command[0:2], ["blender", "--python-use-system-env"])
+
+    def test_runtime_probe_expression_is_valid_python(self) -> None:
+        expression = blender_python_env.runtime_probe_expression()
+        ast.parse(expression)
+        self.assertIn(blender_python_env.PROBE_MARKER, expression)
+        self.assertIn("'pythonPrefix':sys.prefix", expression)
 
     def test_dependency_target_is_first_on_pythonpath(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
