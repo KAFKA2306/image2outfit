@@ -19,7 +19,6 @@ if str(TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(TOOLS_DIR))
 
 import bpy
-import genworks_product_common as common
 
 ROOT = TOOLS_DIR.parent
 
@@ -41,6 +40,51 @@ def repo_path(value: str) -> Path:
 
 def relative(path: Path) -> str:
     return path.resolve().relative_to(ROOT).as_posix()
+
+
+def shape_key_count(obj: bpy.types.Object) -> int:
+    keys = obj.data.shape_keys.key_blocks if obj.data.shape_keys else None
+    return len(keys) if keys is not None else 0
+
+
+def select_seed_body_and_armature() -> tuple[bpy.types.Object, bpy.types.Object, list[dict[str, object]]]:
+    armatures = [obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"]
+    if not armatures:
+        raise RuntimeError("The tracked seed contains no armature")
+    armature = max(armatures, key=lambda obj: len(obj.data.bones))
+    meshes = [obj for obj in bpy.context.scene.objects if obj.type == "MESH"]
+    if not meshes:
+        raise RuntimeError("The tracked seed contains no mesh")
+
+    diagnostics: list[dict[str, object]] = []
+    ranked: list[tuple[int, bpy.types.Object]] = []
+    for obj in meshes:
+        name = obj.name.lower()
+        keys = shape_key_count(obj)
+        vertices = len(obj.data.vertices)
+        score = keys * 1_000_000 + vertices
+        if "siroinosotai" in name or ("siroino" in name and "sotai" in name):
+            score += 1_000_000_000
+        if any(token in name for token in ("widecargo", "outfit", "cloth", "preview", "floor")):
+            score -= 1_000_000_000
+        ranked.append((score, obj))
+        diagnostics.append(
+            {
+                "name": obj.name,
+                "vertices": vertices,
+                "shapeKeys": keys,
+                "score": score,
+            }
+        )
+    ranked.sort(key=lambda item: item[0], reverse=True)
+    body = ranked[0][1]
+    diagnostics.sort(key=lambda item: int(item["score"]), reverse=True)
+    if shape_key_count(body) < 50:
+        raise RuntimeError(
+            "No high-confidence Siroino body was found in the seed. Top candidates: "
+            + json.dumps(diagnostics[:8], ensure_ascii=False)
+        )
+    return body, armature, diagnostics
 
 
 def export_seed_target(body: bpy.types.Object, armature: bpy.types.Object, output: Path) -> None:
@@ -110,7 +154,7 @@ def main() -> int:
         raise FileNotFoundError(f"tracked seed blend not found: {seed_value}")
 
     bpy.ops.wm.open_mainfile(filepath=str(seed))
-    body, armature = common.select_body_and_armature()
+    body, armature, candidates = select_seed_body_and_armature()
     profile = job.get("bodyShapeProfile")
     if not isinstance(profile, dict) or not profile:
         raise ValueError("job.bodyShapeProfile is required")
@@ -128,6 +172,9 @@ def main() -> int:
         "strategy": "tracked-seed-blend",
         "profile": seed_config.get("profile", "Siroino _Large"),
         "seedBlend": seed_value,
+        "selectedBody": body.name,
+        "selectedArmature": armature.name,
+        "bodyCandidates": candidates[:12],
         "sourceFbx": relative(temporary_fbx),
         "shapeKeyEvidence": key_evidence,
         "unityIntegration": "PENDING_SELF_HOSTED",
