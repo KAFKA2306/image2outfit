@@ -3,7 +3,7 @@
   "id": "siroino-cyber-kawaii-large",
   "productName": "Cyber Kawaii Layered Set for Siroino _Large",
   "adapterId": "siroino-v1.0-large",
-  "buildRevision": "v1-large-seed-pass-1",
+  "buildRevision": "v1-large-seed-pass-2",
   "productRoot": "Assets/GenWorks/Products/siroino-cyber-kawaii-large",
   "productManifestPath": "Assets/GenWorks/Products/siroino-cyber-kawaii-large/ProductManifest.json",
   "buildScript": "tools/build_product_from_seed_blend.py",
@@ -18,26 +18,17 @@
     "strategy": "repository-search",
     "profile": "Siroino _Large",
     "normalSizeFallbackAllowed": false,
-    "searchRoots": [
-      "Assets"
-    ],
-    "excludePrefixes": [
-      "Assets/GenWorks",
-      "Assets/_Local/Jobs"
-    ],
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"],
     "prefab": {
-      "extensions": [
-        ".prefab"
-      ],
+      "extensions": [".prefab"],
       "includeRegex": "(?i)(siroino|sotai)",
       "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
       "contentRegex": "(?i)(^|[^A-Za-z])_?Large([^A-Za-z]|$)",
       "preferredRegex": "(?i)(SiroinoSotai.*_Large|_Large.*SiroinoSotai)"
     },
     "source": {
-      "extensions": [
-        ".fbx"
-      ],
+      "extensions": [".fbx"],
       "includeRegex": "(?i)(siroino|sotai)",
       "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
       "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
@@ -55,11 +46,7 @@
   "candidateDir": "Candidates/siroino-cyber-kawaii-large",
   "releaseDir": "Release/siroino-cyber-kawaii-large",
   "licenseEvidence": "config/products/siroino-cyber-kawaii-large/license.json",
-  "privateSourceRoots": [
-    "Assets/_Local",
-    "Assets/_Vendor",
-    "Assets/SiroinoWorks"
-  ],
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
   "deliveryAssets": [
     "Assets/GenWorks/Products/siroino-cyber-kawaii-large/ProductManifest.json",
     "Assets/GenWorks/Products/siroino-cyber-kawaii-large/README.md",
