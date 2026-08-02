@@ -2,23 +2,22 @@ name: PR convergence and branch hygiene
 
 on:
   pull_request_target:
-    types: [opened, reopened, synchronize, ready_for_review, closed]
+    types: [opened, reopened, synchronize, ready_for_review, edited, closed]
   push:
     branches: [main]
-    paths:
-      - .github/workflows/branch-hygiene.yml
-      - .github/pull_request_template.md
   schedule:
     - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       dry_run:
-        description: Report convergence actions without mutating PRs or branches
+        description: Report governance actions without mutating PRs or branches
         required: false
         type: boolean
         default: false
 
 permissions:
+  actions: read
+  checks: read
   contents: write
   pull-requests: write
   issues: write
@@ -28,25 +27,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  converge:
+  govern:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Keep one active PR per workstream and remove stale branches
+      - name: Detect direct main pushes, converge workstreams, and remove stale branches
         uses: actions/github-script@v9
         with:
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const dryRun = context.eventName === "workflow_dispatch" && core.getInput("dry_run") === "true";
-            const managedPrefixes = ["agent/", "fix/", "feat/", "release/", "ops/", "chore/", "ci/"];
+            const allowedPrefixes = [
+              "agent/",
+              "fix/",
+              "feat/",
+              "work/",
+              "release/",
+              "ops/",
+              "chore/",
+              "ci/",
+              "dependabot/",
+            ];
             const protectedBranches = new Set(["main", "master", "gh-pages"]);
             const supersededMarker = "<!-- pr-convergence:superseded -->";
+            const invalidBranchMarker = "<!-- pr-convergence:invalid-branch -->";
             const workstreamPlaceholder = "replace-with-product-slug-or-repository-scope";
 
             const repository = (await github.rest.repos.get({ owner, repo })).data;
             const defaultBranch = repository.default_branch;
             protectedBranches.add(defaultBranch);
+
+            function isAllowedBranch(ref) {
+              return allowedPrefixes.some(prefix => String(ref || "").startsWith(prefix));
+            }
 
             async function allOpenPulls() {
               return github.paginate(github.rest.pulls.list, {
@@ -73,9 +87,18 @@ jobs:
               return value && value !== workstreamPlaceholder ? value : null;
             }
 
+            function supersededPullNumbers(body) {
+              const values = new Set();
+              const pattern = /<!--\s*supersedes:\s*#?(\d+)\s*-->/gi;
+              for (const match of String(body || "").matchAll(pattern)) {
+                values.add(Number(match[1]));
+              }
+              return values;
+            }
+
             function normalizeBranch(ref) {
               let value = String(ref || "").toLowerCase().replace(/_/g, "-");
-              value = value.replace(/^(agent|fix|feat|release|ops|chore|ci)\//, "");
+              value = value.replace(/^(agent|fix|feat|work|release|ops|chore|ci|dependabot)\//, "");
               value = value.replace(/^(re-?run|run|continue|finalize|validate|build|fix)-/, "");
               let previous;
               do {
@@ -89,22 +112,40 @@ jobs:
             }
 
             async function workstreamKey(pr) {
-              const explicit = explicitWorkstream(pr.body);
-              if (explicit) return `explicit:${explicit}`;
-
               const files = await changedFiles(pr.number);
               const products = new Set();
               for (const file of files) {
                 const path = file.filename;
                 let match = path.match(/^Assets\/GenWorks\/(?:Products\/)?([^/]+)\//);
                 if (!match) match = path.match(/^config\/products\/([^/]+)\//);
-                if (match && !["Legacy", "Shared", "Editor", "Products"].includes(match[1])) {
+                if (match && !["legacy", "shared", "editor", "products"].includes(match[1].toLowerCase())) {
                   products.add(match[1].toLowerCase());
                 }
               }
+
+              // Product ownership is authoritative. A PR cannot evade convergence by choosing another marker.
               if (products.size === 1) return `product:${[...products][0]}`;
 
+              const explicit = explicitWorkstream(pr.body);
+              if (explicit) return `explicit:${explicit}`;
               return `branch:${normalizeBranch(pr.head.ref)}`;
+            }
+
+            async function releasePolicyState(pr) {
+              const response = await github.rest.actions.listWorkflowRunsForRepo({
+                owner,
+                repo,
+                event: "pull_request",
+                head_sha: pr.head.sha,
+                per_page: 100,
+              });
+              const runs = response.data.workflow_runs
+                .filter(run => run.name === "Release policy tests")
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              const latest = runs[0];
+              if (!latest) return { state: "missing", url: null };
+              if (latest.status !== "completed") return { state: "pending", url: latest.html_url };
+              return { state: latest.conclusion === "success" ? "success" : "failure", url: latest.html_url };
             }
 
             async function deleteBranch(ref, reason, openPulls) {
@@ -126,50 +167,128 @@ jobs:
               }
             }
 
-            async function supersede(loser, winner, key, openPulls) {
-              const message = `${supersededMarker}\nSuperseded by #${winner.number}. This repository permits one active pull request per workstream (\`${key}\`). Continue work only in #${winner.number}.`;
-              if (dryRun) {
-                core.info(`[dry-run] close #${loser.number} in favor of #${winner.number} (${key})`);
-              } else {
-                const comments = await github.paginate(github.rest.issues.listComments, {
-                  owner,
-                  repo,
-                  issue_number: loser.number,
-                  per_page: 100,
-                });
-                if (!comments.some(comment => String(comment.body || "").includes(supersededMarker))) {
-                  await github.rest.issues.createComment({ owner, repo, issue_number: loser.number, body: message });
-                }
-                await github.rest.pulls.update({ owner, repo, pull_number: loser.number, state: "closed" });
-                core.info(`Closed superseded PR #${loser.number} in favor of #${winner.number}`);
-              }
-
-              const remainingOpen = openPulls.filter(pr => pr.number !== loser.number);
-              if (loser.head.repo?.full_name === `${owner}/${repo}`) {
-                await deleteBranch(loser.head.ref, `superseded by #${winner.number}`, remainingOpen);
+            async function ensureComment(prNumber, marker, body) {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number: prNumber,
+                per_page: 100,
+              });
+              if (!comments.some(comment => String(comment.body || "").includes(marker))) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: prNumber, body });
               }
             }
 
+            async function closePull(pr, reason, marker, openPulls) {
+              if (dryRun) {
+                core.info(`[dry-run] close #${pr.number}: ${reason}`);
+              } else {
+                await ensureComment(pr.number, marker, `${marker}\n${reason}`);
+                await github.rest.pulls.update({ owner, repo, pull_number: pr.number, state: "closed" });
+                core.info(`Closed PR #${pr.number}: ${reason}`);
+              }
+              const remainingOpen = openPulls.filter(candidate => candidate.number !== pr.number);
+              if (pr.head.repo?.full_name === `${owner}/${repo}`) {
+                await deleteBranch(pr.head.ref, `pull request #${pr.number} closed`, remainingOpen);
+              }
+              return remainingOpen;
+            }
+
+            async function guardDefaultBranchPush() {
+              if (context.eventName !== "push" || context.ref !== `refs/heads/${defaultBranch}`) return false;
+              const before = String(context.payload.before || "");
+              const after = String(context.payload.after || "");
+              if (!before || /^0+$/.test(before) || !after || before === after) return false;
+
+              const associated = await github.paginate(
+                github.rest.repos.listPullRequestsAssociatedWithCommit,
+                { owner, repo, commit_sha: after, per_page: 100 },
+              );
+              const mergedThroughPull = associated.some(pr =>
+                Boolean(pr.merged_at) && pr.base?.ref === defaultBranch && pr.merge_commit_sha === after,
+              );
+              if (mergedThroughPull) return false;
+
+              const message = `Direct push ${after} to ${defaultBranch} was not produced by a merged pull request.`;
+              if (dryRun) {
+                core.warning(`[dry-run] ${message}`);
+                return false;
+              }
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title: `Direct push detected on ${defaultBranch}: ${after.slice(0, 12)}`,
+                body: [
+                  "<!-- pr-governance:direct-push -->",
+                  message,
+                  `Previous SHA: \`${before}\``,
+                  `Actor: \`${context.actor}\``,
+                  "Enable a GitHub branch ruleset requiring pull requests and the Release policy tests check to block this before the ref moves.",
+                ].join("\n\n"),
+              });
+              core.setFailed(message);
+              return true;
+            }
+
+            if (await guardDefaultBranchPush()) return;
+
             let openPulls = await allOpenPulls();
+
+            // Same-repository pull requests must use a managed branch namespace.
+            for (const pr of [...openPulls]) {
+              if (pr.head.repo?.full_name !== `${owner}/${repo}` || isAllowedBranch(pr.head.ref)) continue;
+              const reason = `Branch \`${pr.head.ref}\` is not allowed. Use one of: ${allowedPrefixes.map(prefix => `\`${prefix}\``).join(", ")}.`;
+              openPulls = await closePull(pr, reason, invalidBranchMarker, openPulls);
+            }
+
             const keyed = [];
             for (const pr of openPulls) {
-              keyed.push({ pr, key: await workstreamKey(pr) });
+              keyed.push({
+                pr,
+                key: await workstreamKey(pr),
+                policy: await releasePolicyState(pr),
+                supersedes: supersededPullNumbers(pr.body),
+              });
             }
 
             const groups = new Map();
             for (const entry of keyed) {
               const group = groups.get(entry.key) || [];
-              group.push(entry.pr);
+              group.push(entry);
               groups.set(entry.key, group);
             }
 
-            for (const [key, pulls] of groups) {
-              if (pulls.length < 2) continue;
-              pulls.sort((a, b) => b.number - a.number);
-              const winner = pulls[0];
-              for (const loser of pulls.slice(1)) {
-                await supersede(loser, winner, key, openPulls);
-                openPulls = openPulls.filter(pr => pr.number !== loser.number);
+            for (const [key, entries] of groups) {
+              if (entries.length < 2) continue;
+
+              const explicitSuccessors = entries
+                .filter(entry => [...entry.supersedes].some(number => entries.some(candidate => candidate.pr.number === number)))
+                .sort((a, b) => b.pr.number - a.pr.number);
+              const successful = entries
+                .filter(entry => entry.policy.state === "success")
+                .sort((a, b) => Number(a.pr.draft) - Number(b.pr.draft) || b.pr.number - a.pr.number);
+
+              let winner = null;
+              let losers = [];
+              if (explicitSuccessors.length > 0) {
+                winner = explicitSuccessors[0];
+                losers = entries.filter(entry =>
+                  entry.pr.number !== winner.pr.number &&
+                  (winner.policy.state === "success" || winner.supersedes.has(entry.pr.number)),
+                );
+              } else if (successful.length > 0) {
+                winner = successful[0];
+                losers = entries.filter(entry => entry.pr.number !== winner.pr.number);
+              }
+
+              if (!winner || losers.length === 0) {
+                core.warning(`Keeping ${entries.length} PRs for ${key}: no successful policy run or explicit supersedes marker.`);
+                continue;
+              }
+
+              for (const loser of losers) {
+                const reason = `${supersededMarker}\nSuperseded by #${winner.pr.number}. Product paths take precedence over free-form workstream names. Winner policy state: \`${winner.policy.state}\`.`;
+                openPulls = await closePull(loser.pr, reason, supersededMarker, openPulls);
               }
             }
 
@@ -192,8 +311,8 @@ jobs:
             for (const branch of branches) {
               const ref = branch.name;
               if (branch.protected || protectedBranches.has(ref) || openHeads.has(ref)) continue;
-              if (!managedPrefixes.some(prefix => ref.startsWith(prefix))) continue;
 
+              // Any branch whose latest PR is closed is disposable, even if an older process used no prefix.
               const related = await github.paginate(github.rest.pulls.list, {
                 owner,
                 repo,
@@ -204,6 +323,11 @@ jobs:
               if (related.length > 0) {
                 related.sort((a, b) => b.number - a.number);
                 await deleteBranch(ref, `latest related PR #${related[0].number} is closed`, openPulls);
+                continue;
+              }
+
+              if (!isAllowedBranch(ref)) {
+                core.warning(`Keeping invalid orphan branch for manual recovery: ${ref}`);
                 continue;
               }
 
@@ -219,8 +343,9 @@ jobs:
               }
             }
 
+            const finalOpen = await allOpenPulls();
             core.summary
               .addHeading("PR convergence")
-              .addRaw(`Open PRs after convergence: ${openPulls.length}\n`)
+              .addRaw(`Open PRs after convergence: ${finalOpen.length}\n`)
               .addRaw(`Mode: ${dryRun ? "dry-run" : "apply"}\n`)
               .write();
