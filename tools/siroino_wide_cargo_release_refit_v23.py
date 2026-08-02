@@ -21,10 +21,9 @@ TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import siroino_wide_cargo_release_refit as legacy
+import siroino_wide_cargo_entry as base
 
-build = legacy.build
-base = legacy.base
+build = base.build
 
 
 def clamp(value: float, lo: float, hi: float) -> float:
