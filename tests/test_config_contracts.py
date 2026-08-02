@@ -31,6 +31,25 @@ class ConfigContractTest(unittest.TestCase):
         )
         self.assertEqual(tuple(schema["required"]), gate.required_job_fields())
         self.assertEqual(schema["properties"]["schemaVersion"]["const"], 2)
+        self.assertIn("hostedPoseScript", schema["properties"])
+
+    def test_product_config_is_namespaced(self) -> None:
+        product_id = "siroino-wide-cargo"
+        product_config = ROOT / "config" / "products" / product_id
+        job_path = product_config / "job.json"
+        license_path = product_config / "license.json"
+        self.assertTrue(job_path.is_file())
+        self.assertTrue(license_path.is_file())
+        job = json.loads(job_path.read_text(encoding="utf-8"))
+        self.assertEqual(job["id"], product_id)
+        self.assertEqual(
+            job["licenseEvidence"],
+            f"config/products/{product_id}/license.json",
+        )
+        self.assertEqual(job["buildScript"], "tools/siroino_wide_cargo_release_refit.py")
+        self.assertFalse((ROOT / "config" / f"{product_id}-job.json").exists())
+        self.assertFalse((ROOT / "config" / f"{product_id}-license.json").exists())
+        self.assertFalse((ROOT / "config" / f"{product_id}-approval.json").exists())
 
     def test_unity_pipeline_uses_the_genworks_canonical_path(self) -> None:
         expected = (
