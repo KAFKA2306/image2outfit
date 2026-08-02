@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
   "id": "siroino-cyber-kawaii-large",
-  "productName": "Cyber Kawaii Layered Set for Siroino",
-  "adapterId": "siroino-v1.0",
-  "buildRevision": "v3-standard-body-stable-shell-pass-5-reviewed",
+  "productName": "Cyber Kawaii Layered Set for Siroino _Large",
+  "adapterId": "siroino-v1.0-large",
+  "buildRevision": "v5-large-shape-profile-deforming-skirt-pass-1",
   "productRoot": "Assets/GenWorks/siroino-cyber-kawaii-large",
   "productManifestPath": "Assets/GenWorks/siroino-cyber-kawaii-large/ProductManifest.json",
   "buildScript": "tools/run_product_build.py",
-  "productBuildScript": "tools/siroino_cyber_kawaii_standard_final_build.py",
+  "productBuildScript": "tools/siroino_cyber_kawaii_shape_profile_build.py",
   "blendPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
   "fbxAssetPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaii.fbx",
   "prefabAssetPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
@@ -16,43 +16,37 @@
   "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
   "targetResolution": {
     "strategy": "repository-search",
-    "profile": "Siroino standard PC body",
+    "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
     "normalSizeFallbackAllowed": true,
-    "searchRoots": [
-      "Assets"
-    ],
-    "excludePrefixes": [
-      "Assets/GenWorks",
-      "Assets/_Local/Jobs"
-    ],
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"],
     "prefab": {
-      "extensions": [
-        ".prefab"
-      ],
+      "extensions": [".prefab"],
       "includeRegex": "(?i)(siroino|sotai)",
       "profileRegex": "(?i)SiroinoSotai_PC\\.prefab$",
       "contentRegex": null,
       "preferredRegex": "(?i)SiroinoSotai_PC\\.prefab$"
     },
     "source": {
-      "extensions": [
-        ".fbx"
-      ],
+      "extensions": [".fbx"],
       "includeRegex": "(?i)(siroino|sotai)",
       "profileRegex": "(?i)SiroinoSotai_PC\\.fbx$",
       "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
       "preferredRegex": "(?i)SiroinoSotai_PC\\.fbx$"
     }
   },
-  "bodyShapeProfile": {},
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
   "artifactDir": "Artifacts/siroino-cyber-kawaii-large",
   "candidateDir": "Candidates/siroino-cyber-kawaii-large",
   "releaseDir": "Release/siroino-cyber-kawaii-large",
   "licenseEvidence": "config/products/siroino-cyber-kawaii-large/license.json",
-  "privateSourceRoots": [
-    "Assets/_Local",
-    "Assets/_Vendor"
-  ],
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor"],
   "deliveryAssets": [
     "Assets/GenWorks/siroino-cyber-kawaii-large/ProductManifest.json",
     "Assets/GenWorks/siroino-cyber-kawaii-large/README.md",
