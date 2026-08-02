@@ -19,7 +19,7 @@ import siroino_heather_hooded_materials as materials
 import siroino_strappy_knit_build as base
 
 ROOT = Path(__file__).resolve().parents[1]
-DESIGN_REVISION = "v4-continuous-sleeve-draped-hood"
+DESIGN_REVISION = "v6-fitted-sleeves-split-hood-seam-graph"
 
 
 def rebind_dynamic_parts(
@@ -30,7 +30,8 @@ def rebind_dynamic_parts(
         "Heather_Long_Sleeve_",
         "Heather_Rib_Cuff_",
         "Heather_Hood_Cowl",
-        "Heather_Hood_Back_Drape",
+        "Heather_Hood_Back_Drape_",
+        "Heather_Editable_Seams",
     )
     rebound = []
     for obj in garments:
@@ -60,7 +61,9 @@ def limit_bone_influences(
             ]
             if len(assignments) <= maximum:
                 continue
-            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[:maximum]
+            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[
+                :maximum
+            ]
             total = sum(weight for _, weight in ranked) or 1.0
             for group_name, _ in assignments:
                 obj.vertex_groups[group_name].remove([vertex.index])
@@ -90,8 +93,9 @@ def write_report_and_manifest(
 ) -> None:
     report_dir = ROOT / ".image2outfit" / "products" / job["id"] / "reports"
     report_dir.mkdir(parents=True, exist_ok=True)
+    research_trial = json.loads(research_path.read_text(encoding="utf-8"))
     report = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "passed": passed,
         "checkedAt": base.utc_now(),
         "blenderVersion": bpy.app.version_string,
@@ -106,7 +110,11 @@ def write_report_and_manifest(
         "shapeKeysAdded": shape_keys_added,
         "researchTrial": {
             "source": evidence.RESEARCH_SOURCE,
-            "result": "PASS",
+            "result": research_trial["result"],
+            "decision": research_trial["productionDecision"],
+            "baselineF1": research_trial["baseline"]["metrics"]["f1"],
+            "semanticGraphF1": research_trial["semanticGraph"]["metrics"]["f1"],
+            "deltaF1": research_trial["deltaF1"],
             "evidence": str(research_path.relative_to(ROOT)).replace("\\", "/"),
             "patternContract": str(pattern_path.relative_to(ROOT)).replace("\\", "/"),
         },
@@ -132,16 +140,21 @@ def write_report_and_manifest(
                 "revision": "v3-body-weighted-fitted-sleeves",
                 "reason": "elbow gaps, lateral hood wings and bifurcated lower panel",
             },
+            {
+                "revision": "v5-rounded-hood-pointed-highcut",
+                "reason": "visual inspection found inflated sleeves, short cuffs, a wide neckline and detached shield-like rear hood",
+            },
         ],
         "notes": [
             "The garment is fitted to the tracked SiroinoSotai_PC FBX.",
-            "Sleeves are continuous shoulder-to-wrist tubes with overlapping rib cuffs.",
-            "The hood is a compact cowl plus a back drape rather than a lateral shell.",
-            "The lower front and back are continuous sampled body-surface panels.",
+            "Sleeves are continuous shoulder-to-hand tubes with separate wrist cuffs.",
+            "The hood is split into left and right editable shell panels with a central seam and rolled neck edge.",
+            "The lower front and back are sharply tapered sampled body-surface panels.",
+            "Buttons, Henley placket, drawcords, side ties and visible seams are separate geometry.",
             "All exported vertices are limited to four normalized bone influences.",
             "Five views are actual Blender Cycles renders of generated geometry.",
-            "The DMap neural model was not executed; only its explicit pattern-coordinate principle was trialed.",
-            "Unity and runtime review remain pending.",
+            "The 2026 paper's code, learned model, weights and dataset were not used; the trial is an independent deterministic ablation.",
+            "Required pose, Unity and runtime review remain separate gates.",
         ],
     }
     (report_dir / "product-build-report.json").write_text(
@@ -150,7 +163,7 @@ def write_report_and_manifest(
     )
     evidence.write_readme(product_root / "README.md", job, measured)
     manifest = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "productId": job["id"],
         "productName": job["productName"],
         "status": "WORKING" if passed else "REJECTED",
@@ -174,7 +187,8 @@ def write_report_and_manifest(
                 "visualRevision": DESIGN_REVISION,
             },
             "blockers": [
-                "Inspect actual five-view and pose-review images",
+                "Inspect actual five-view and required-pose images",
+                "Resolve every pose penetration reported by fit-audit.json",
                 "Import/save/reload both Prefabs in pinned Unity",
                 "Pass Modular Avatar/NDMF and VRChat Build & Test",
                 "Complete human visual, pose and runtime reviews",
@@ -188,10 +202,11 @@ def write_report_and_manifest(
                 "PASS" if all(path.is_file() for path in previews.values()) else "FAIL"
             ),
             "poseRender": "PENDING",
-            "patternCoordinateTrial": "PASS",
+            "seamCorrespondenceTrial": research_trial["result"],
             "fourInfluenceLimit": (
                 "PASS" if measured["maxBoneInfluences"] <= 4 else "FAIL"
             ),
+            "fitPenetration": "PENDING",
             "unityImport": "PENDING",
             "prefabSerialized": "PENDING",
             "prefabReload": "PENDING",
@@ -208,6 +223,7 @@ def write_report_and_manifest(
             "integratedPrefab": job["integratedPrefabAssetPath"],
             "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"),
             "poseReview": f"{job['productRoot']}/Previews/{job['id']}-pose-review.webp",
+            "fitAudit": f"{job['productRoot']}/Tests/fit-audit.json",
         },
         "research": report["researchTrial"],
         "metrics": measured,
@@ -258,6 +274,7 @@ def main() -> int:
         if obj.type == "MESH"
     }
     pattern_path, research_path = evidence.write_pattern_and_research(product_root)
+    research_trial = json.loads(research_path.read_text(encoding="utf-8"))
 
     blend_path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
@@ -277,13 +294,14 @@ def main() -> int:
     evidence.write_integrated_prefab(job, sidecars)
     measured = base.metrics(garments)
     passed = (
-        measured["meshObjects"] >= 12
-        and measured["vertices"] > 2500
-        and measured["triangles"] > 3500
+        measured["meshObjects"] >= 14
+        and measured["vertices"] > 3000
+        and measured["triangles"] > 4500
         and measured["unweightedVertices"] == 0
         and measured["weightSumErrors"] == 0
         and measured["degenerateTriangles"] == 0
         and measured["maxBoneInfluences"] <= 4
+        and research_trial["result"] == "PASS"
     )
     write_report_and_manifest(
         job,
@@ -319,6 +337,7 @@ def main() -> int:
                 "passed": passed,
                 "designRevision": DESIGN_REVISION,
                 "metrics": measured,
+                "researchTrial": research_trial["result"],
             },
             ensure_ascii=False,
             indent=2,
