@@ -38,6 +38,13 @@ def _runtime_job(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
     return enriched
 
 
+def _materialize_runtime_job(job: dict[str, Any], root: Path = ROOT) -> Path:
+    paths = runtime_paths.for_job(root, job)
+    runtime_job_path = paths.root / "job.json"
+    core.legacy.write(runtime_job_path, job)
+    return runtime_job_path
+
+
 def _load(job_path: Path, root: Path = ROOT) -> tuple[dict[str, Any], dict[str, Any]]:
     policy_path = root / "config" / "release-policy.json"
     policy = core.legacy.read(policy_path)
@@ -153,7 +160,7 @@ def _bound_method_errors(
     try:
         expected = _binding_snapshot(job, selection, root)
     except (OSError, ValueError, KeyError) as exc:
-        return [f"construction method binding cannot be resolved: {exc}"]
+        return [f"candidate construction method binding cannot be resolved: {exc}"]
     actual = candidate_manifest.get("constructionMethod")
     if not isinstance(actual, dict):
         return ["candidate construction method binding is missing"]
@@ -256,12 +263,13 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     options = build_parser().parse_args()
     try:
-        job_path = Path(options.job).resolve()
-        job, policy = _load(job_path)
+        source_job_path = Path(options.job).resolve()
+        job, policy = _load(source_job_path)
         runtime_paths.remove_legacy_product_outputs(ROOT, str(job["id"]))
+        runtime_job_path = _materialize_runtime_job(job)
         if options.mode == "release":
-            return _run_release(job_path, job, policy)
-        return _run_candidate(job_path, job, policy)
+            return _run_release(runtime_job_path, job, policy)
+        return _run_candidate(runtime_job_path, job, policy)
     except Exception as exc:
         print(f"image2outfit production gate: {exc}", file=sys.stderr)
         return 1
