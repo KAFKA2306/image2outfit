@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "id": "siroino-cyber-kawaii-large",
-  "productName": "Cyber Kawaii Layered Set for Siroino",
-  "adapterId": "siroino-v1.0",
-  "buildRevision": "v3-standard-body-stable-shell-pass-5-reviewed",
+  "productName": "Cyber Kawaii Layered Set for Siroino _Large",
+  "adapterId": "siroino-v1.0-large",
+  "buildRevision": "v4-large-shape-profile-pass-1",
   "productRoot": "Assets/GenWorks/siroino-cyber-kawaii-large",
   "productManifestPath": "Assets/GenWorks/siroino-cyber-kawaii-large/ProductManifest.json",
   "buildScript": "tools/run_product_build.py",
@@ -16,7 +16,7 @@
   "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
   "targetResolution": {
     "strategy": "repository-search",
-    "profile": "Siroino standard PC body",
+    "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
     "normalSizeFallbackAllowed": true,
     "searchRoots": [
       "Assets"
@@ -44,7 +44,13 @@
       "preferredRegex": "(?i)SiroinoSotai_PC\\.fbx$"
     }
   },
-  "bodyShapeProfile": {},
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
   "artifactDir": "Artifacts/siroino-cyber-kawaii-large",
   "candidateDir": "Candidates/siroino-cyber-kawaii-large",
   "releaseDir": "Release/siroino-cyber-kawaii-large",
