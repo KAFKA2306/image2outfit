@@ -2,9 +2,13 @@
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
+
+import method_selection
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
@@ -15,12 +19,62 @@ AUDITS = {
     "genworks": "audit_genworks_layout.py",
     "tools": "audit_tool_ownership.py",
     "research": "audit_research_baseline.py",
+    "methods": "audit_method_selection.py",
 }
 
 
 def _run(script: str, *arguments: str) -> int:
     command = [sys.executable, str(TOOLS / script), *arguments]
     return subprocess.run(command, cwd=ROOT, check=False).returncode
+
+
+def _write(path: Path, value: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _load_product(product_id: str) -> tuple[Path, dict[str, Any], Path]:
+    job_path = method_selection.resolve_job(product_id, ROOT)
+    job = method_selection.read_json(job_path)
+    artifact = ROOT / str(job["artifactDir"])
+    return job_path, job, artifact
+
+
+def _run_product(command: str, product_id: str) -> int:
+    try:
+        job_path, job, artifact = _load_product(product_id)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"image2outfit: {exc}", file=sys.stderr)
+        return 1
+
+    selection = method_selection.select(job, ROOT)
+    _write(artifact / "method-selection.json", selection)
+    if command == "explain":
+        print(json.dumps(selection, ensure_ascii=False, indent=2))
+        return 0 if selection["passed"] else 2
+    if not selection["passed"]:
+        print(json.dumps(selection, ensure_ascii=False, indent=2))
+        return 2
+
+    if command == "release":
+        candidate_manifest = ROOT / str(job["candidateDir"]) / "candidate-manifest.json"
+        commercial = method_selection.validate_commercial_evidence(
+            job,
+            candidate_manifest,
+            ROOT,
+        )
+        _write(artifact / "commercial-method-quality.json", commercial)
+        if not commercial["passed"]:
+            print(json.dumps(commercial, ensure_ascii=False, indent=2))
+            return 2
+
+    return _run(
+        "production_gate.py",
+        "--mode",
+        command,
+        "--job",
+        str(job_path),
+    )
 
 
 def _run_all_audits() -> int:
@@ -42,9 +96,13 @@ def parser() -> argparse.ArgumentParser:
     )
     commands = root.add_subparsers(dest="command", required=True)
 
-    for name in ("candidate", "release"):
+    for name in ("candidate", "release", "explain"):
         command = commands.add_parser(name)
-        command.add_argument("--job", required=True)
+        command.add_argument(
+            "--product",
+            required=True,
+            help="Product slug under config/products/<slug>",
+        )
 
     audit = commands.add_parser("audit")
     audit.add_argument("target", choices=(*AUDITS, "all"))
@@ -63,14 +121,8 @@ def parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     options = parser().parse_args()
-    if options.command in {"candidate", "release"}:
-        return _run(
-            "production_gate.py",
-            "--mode",
-            options.command,
-            "--job",
-            options.job,
-        )
+    if options.command in {"candidate", "release", "explain"}:
+        return _run_product(options.command, options.product)
     if options.command == "audit":
         if options.target == "all":
             return _run_all_audits()
