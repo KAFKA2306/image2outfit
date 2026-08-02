@@ -18,6 +18,21 @@ class HygieneDocumentationTest(unittest.TestCase):
         ):
             self.assertIn(required, text)
 
+    def test_only_generic_hosted_build_workflow_remains(self) -> None:
+        workflows = ROOT / ".github" / "workflows"
+        generic = workflows / "build-product-hosted.yml"
+        self.assertTrue(generic.is_file())
+        self.assertIn("job_path", generic.read_text(encoding="utf-8"))
+        for obsolete in (
+            "siroino-wide-cargo-hosted.yml",
+            "siroino-wide-cargo-self-hosted.yml",
+            "siroino-wide-cargo-release.yml",
+            "siroino-cyber-kawaii-large.yml",
+            "genworks-siroino-render-loop.yml",
+            "render-validation.yml",
+        ):
+            self.assertFalse((workflows / obsolete).exists(), obsolete)
+
 
 if __name__ == "__main__":
     unittest.main()
