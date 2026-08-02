@@ -8,11 +8,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class HygieneDocumentationTest(unittest.TestCase):
     def test_documented_boundaries_are_enforced(self) -> None:
-        text = (ROOT / "docs" / "REPOSITORY_HYGIENE.md").read_text(encoding="utf-8")
+        text = "\n".join(
+            path.read_text(encoding="utf-8")
+            for path in (ROOT / "README.md", ROOT / "AGENTS.md")
+        )
         for required in (
-            "config/products/<product-id>/",
-            "Assets/GenWorks/",
-            "contents: write",
+            "config/products/<slug>/",
+            "Assets/GenWorks/<slug>/",
+            "contents: read",
             "task audit:repo",
         ):
             self.assertIn(required, text)
