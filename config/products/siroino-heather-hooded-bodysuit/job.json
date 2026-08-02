@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-heather-hooded-bodysuit",
+  "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
+  "adapterId": "siroino-v1.0",
+  "buildRevision": "v1-dmap-pattern-coordinate-hooded-bodysuit",
+  "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
+  "productManifestPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
+  "buildScript": "tools/siroino_heather_hooded_bodysuit_build.py",
+  "productBuildScript": "tools/siroino_heather_hooded_bodysuit_build.py",
+  "hostedPoseScript": "tools/siroino_heather_hooded_bodysuit_pose.py",
+  "blendPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Models/SiroinoHeatherHoodedBodysuit.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "SiroinoSotai_PC neutral official body",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"],
+    "prefab": {
+      "extensions": [".prefab"],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.prefab$",
+      "contentRegex": null,
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.prefab$"
+    },
+    "source": {
+      "extensions": [".fbx"],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.fbx$",
+      "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.fbx$"
+    }
+  },
+  "researchMethod": {
+    "name": "Spatio-Temporal Garment Reconstruction Using Diffusion Mapping via Pattern Coordinates",
+    "published": "2026-02-27",
+    "paperUrl": "https://arxiv.org/abs/2602.24043",
+    "codeUrl": "https://github.com/kasvii/DMap",
+    "codeLicense": "NO-LICENSE-FILE-FOUND",
+    "trialScope": "Explicit panel UV domains and seam-pair graph only; no neural weights or source code incorporated"
+  },
+  "licenseEvidence": "config/products/siroino-heather-hooded-bodysuit/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/README.md",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Documentation/pattern-spec.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dmap-pattern-coordinate-trial.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Models/SiroinoHeatherHoodedBodysuit.fbx",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Models/SiroinoHeatherHoodedBodysuit.fbx.meta",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab.meta",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab.meta",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Textures/heather_grey_albedo.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Textures/heather_grey_normal.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Textures/heather_grey_roughness.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/front.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/back.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/left.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/right.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/prone.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-heather-hooded-bodysuit/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-heather-hooded-bodysuit/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-heather-hooded-bodysuit/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": []
+}
