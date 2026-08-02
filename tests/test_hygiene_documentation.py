@@ -33,6 +33,10 @@ class HygieneDocumentationTest(unittest.TestCase):
         ):
             self.assertFalse((workflows / obsolete).exists(), obsolete)
 
+    def test_runtime_state_directories_are_not_committed(self) -> None:
+        self.assertFalse((ROOT / ".github" / "run").exists())
+        self.assertFalse((ROOT / ".github" / "status").exists())
+
 
 if __name__ == "__main__":
     unittest.main()
