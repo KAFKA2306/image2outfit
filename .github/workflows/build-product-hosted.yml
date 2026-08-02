@@ -17,6 +17,8 @@ on:
       - config/products/**/job.json
       - .github/workflows/build-product-hosted.yml
       - tools/build_product_from_seed_blend.py
+      - tools/run_product_build.py
+      - tools/**/*_build.py
 
 env:
   STATUS_CONTEXT: image2outfit-hosted
@@ -27,7 +29,7 @@ permissions:
 
 concurrency:
   group: image2outfit-hosted-${{ inputs.job_path || github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   blender:
