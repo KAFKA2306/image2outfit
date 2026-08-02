@@ -7,12 +7,16 @@ on:
         description: Tracked product job at config/products/<product-id>/job.json
         required: true
         type: string
+  push:
+    branches: [main]
+    paths:
+      - config/products/*/job.json
 
 permissions:
   contents: read
 
 concurrency:
-  group: image2outfit-hosted-${{ inputs.job_path }}
+  group: image2outfit-hosted-${{ inputs.job_path || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -22,19 +26,45 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Validate product job and expose paths
+      - name: Resolve, validate, and expose product job
         env:
           JOB_PATH_INPUT: ${{ inputs.job_path }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_BEFORE: ${{ github.event.before }}
+          EVENT_SHA: ${{ github.sha }}
         run: |
           python - <<'PY'
-          import json, os, re
+          import json, os, re, subprocess
           from pathlib import Path
+
           root = Path.cwd().resolve()
-          job_path_text = os.environ['JOB_PATH_INPUT']
+          job_path_text = (os.environ.get('JOB_PATH_INPUT') or '').strip()
+          if not job_path_text:
+              before = os.environ.get('EVENT_BEFORE', '')
+              sha = os.environ['EVENT_SHA']
+              if before and before != '0' * 40:
+                  command = ['git', 'diff', '--name-only', before, sha, '--', 'config/products/*/job.json']
+              else:
+                  command = ['git', 'show', '--pretty=', '--name-only', sha, '--', 'config/products/*/job.json']
+              changed = [
+                  line.strip()
+                  for line in subprocess.check_output(command, text=True).splitlines()
+                  if line.strip()
+              ]
+              changed = sorted(set(changed))
+              if len(changed) != 1:
+                  raise SystemExit(
+                      'Push-triggered hosted build requires exactly one changed product job; '
+                      f'found {changed}'
+                  )
+              job_path_text = changed[0]
+
           if not re.fullmatch(r'config/products/[a-z0-9][a-z0-9._-]*/job\.json', job_path_text):
               raise SystemExit('job_path must match config/products/<product-id>/job.json')
           job_path = (root / job_path_text).resolve()
