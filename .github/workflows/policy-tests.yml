@@ -6,11 +6,12 @@ on:
       - tools/**
       - tests/**
       - config/**
+      - examples/**
       - Packages/*.json
       - ProjectSettings/ProjectVersion.txt
-      - Assets/Editor/**
       - Assets/GenWorks/**
       - Taskfile.yml
+      - .gitignore
       - .github/workflows/**
   push:
     branches: [main]
@@ -18,11 +19,12 @@ on:
       - tools/**
       - tests/**
       - config/**
+      - examples/**
       - Packages/*.json
       - ProjectSettings/ProjectVersion.txt
-      - Assets/Editor/**
       - Assets/GenWorks/**
       - Taskfile.yml
+      - .gitignore
       - .github/workflows/**
 
 permissions:
@@ -41,30 +43,13 @@ jobs:
           python-version: '3.12'
 
       - name: Compile Python
-        run: >-
-          python -m py_compile
-          tools/pipeline.py
-          tools/audit_toolchain.py
-          tools/blender_python_env.py
-          tools/release_gate.py
-          tools/audit_genworks_layout.py
-          tools/migrate_jobs_to_genworks.py
-          tools/audit_snapshot.py
-          tools/package_snapshot.py
-          tools/refresh_candidate_manifest.py
-          tools/update_product_hashes.py
-          tools/materialize_review_evidence.py
-          tools/siroino_wide_cargo_build.py
-          tools/siroino_wide_cargo_entry.py
-          tools/siroino_required_pose_render.py
-          tests/test_release_gate.py
-          tests/test_toolchain.py
-          tests/test_blender_python_env.py
-          tests/test_genworks_layout.py
-          tests/test_snapshot_paths.py
+        run: python -m compileall -q tools tests
 
       - name: Audit pinned toolchain
         run: python tools/audit_toolchain.py
+
+      - name: Audit repository hygiene
+        run: python tools/audit_repository_hygiene.py
 
       - name: Audit GenWorks layout
         run: python tools/audit_genworks_layout.py
@@ -72,26 +57,29 @@ jobs:
       - name: Run release policy tests
         run: python -m unittest discover -s tests -v
 
-      - name: Parse JSON contracts
+      - name: Parse tracked JSON contracts
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          for name in (
-              'config/release-policy.json',
-              'config/job.schema.v2.json',
-              'config/toolchain-lock.json',
-              'config/genworks-layout.json',
-              'config/siroino-wide-cargo-job.json',
-              'config/siroino-wide-cargo-license.json',
-              'config/siroino-wide-cargo-approval.json',
-              'Packages/vpm-manifest.json',
-              'Packages/manifest.json',
-              'Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json',
-              'Assets/GenWorks/Legacy/Snapshots/LegacyManifest.json',
-          ):
-              json.loads(Path(name).read_text(encoding='utf-8'))
-              print(f'{name}: PASS')
+
+          roots = (
+              Path('config'),
+              Path('examples'),
+              Path('Packages'),
+              Path('Assets/GenWorks'),
+          )
+          paths = sorted(
+              path
+              for root in roots
+              if root.exists()
+              for path in root.rglob('*.json')
+          )
+          if not paths:
+              raise SystemExit('No JSON contracts found')
+          for path in paths:
+              json.loads(path.read_text(encoding='utf-8-sig'))
+              print(f'{path}: PASS')
           PY
 
       - name: Check Blender Python requirements
