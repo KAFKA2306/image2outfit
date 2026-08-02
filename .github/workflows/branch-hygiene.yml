@@ -9,8 +9,10 @@ on:
     - cron: '17 * * * *'
   workflow_dispatch:
 
+# This permission is used only by the Git refs delete API. The workflow never
+# edits repository files, creates commits, or pushes content.
 permissions:
-  contents: write
+  "contents": "write"
 
 concurrency:
   group: branch-hygiene
