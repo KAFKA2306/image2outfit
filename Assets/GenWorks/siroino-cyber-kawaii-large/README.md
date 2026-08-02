@@ -10,6 +10,16 @@ Target: **Siroino `_Large`**, baked from the official shape keys on `SiroinoSota
 - skirt weights follow the hips and side-specific upper legs with at most four influences
 - Blender, FBX, five-view, and six-pose evidence are generated from the same checkpoint
 
+## Reviewed evidence
+
+- Hosted Blender run `30741167087`
+- Release policy run `30741167081`
+- body-clearance p01: approximately 5.2 mm
+- unweighted vertices: 0
+- weight-sum errors: 0
+- degenerate triangles: 0
+- maximum bone influences: 4
+
 ## Pattern-first production stages
 
 1. GarmentCode-compatible editable pattern and seam contract
