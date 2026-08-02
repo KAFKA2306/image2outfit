@@ -44,7 +44,24 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
     for value in FORBIDDEN_STATE_DIRS:
         path = root / value
         if path.exists():
-            add(findings, "committed-runtime-state", path, root, "workflow runtime state belongs in GitHub Actions")
+            files = sorted(item for item in path.rglob("*") if item.is_file())
+            if files:
+                for file in files:
+                    add(
+                        findings,
+                        "committed-runtime-state",
+                        file,
+                        root,
+                        "workflow runtime state belongs in GitHub Actions",
+                    )
+            else:
+                add(
+                    findings,
+                    "committed-runtime-state",
+                    path,
+                    root,
+                    "workflow runtime state directory must not be tracked",
+                )
 
     config_root = root / "config"
     if config_root.is_dir():
