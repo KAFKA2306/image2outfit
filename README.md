@@ -80,6 +80,7 @@ vpm resolve project .
 
 ```powershell
 task audit:repo
+task audit:runtime
 task audit:genworks
 task check:python
 ```
@@ -112,7 +113,9 @@ Assets/GenWorks/sample-outfit/
 
 製品Prefabは `Assets/GenWorks/<slug>/Prefab/`、最新の画像は `Previews/`、編集可能な制作データは `Source/`、現在の状態は `ProductManifest.json` にあります。
 
-**`Assets/GenWorks/<slug>/` が、その衣装について人間とツールが参照する唯一の正規ワークスペースです。** 技術実行中に作られる監査ログ、レビュー用コピー、配布用ZIPなどは生成可能なランタイム出力であり、リポジトリ構造や引き継ぎ状態の正本ではありません。
+**`Assets/GenWorks/<slug>/` が、その衣装について人間とツールが参照する唯一の正規ワークスペースです。** 技術実行中に作られる監査ログ、レビュー用コピー、配布用ZIPなどは `.image2outfit/products/<slug>/{reports,candidate,release}` にまとめられ、Git管理されません。
+
+以前の `Artifacts/`、`Candidates/`、`Release/` は使用しません。旧出力が残っている場合は、最初の実行時に同じ製品IDの内部領域へ移されます。レビュー済みcandidateや既存releaseを黙って破棄する移行は行いません。
 
 Unity Editorでは `GenWorks > Product Catalog` から、製品状態、Prefab、プレビュー、製品READMEを一覧できます。
 
@@ -146,6 +149,7 @@ task release PRODUCT=<slug>
 
 ```powershell
 task audit:repo
+task audit:runtime
 task audit:genworks
 task audit:tools
 task audit:methods
@@ -156,6 +160,7 @@ task check:python
 | コマンド | 確認内容 |
 | --- | --- |
 | `task audit:repo` | 一時状態、重複管理、自己変更workflowなどのリポジトリ残骸 |
+| `task audit:runtime` | 製品job内の一時パス、旧出力ルート、Git ignore設定 |
 | `task audit:genworks` | 製品ルート、Manifest、Prefab、アセット配置 |
 | `task audit:tools` | ツールの所有関係、重複、循環、過剰な階層 |
 | `task audit:methods` | 製品要件から制作方式を選ぶロジック |
@@ -235,7 +240,7 @@ Tests / tests/            UnityおよびPythonの検証
 .github/workflows/        hosted／self-hostedの自動検証
 ```
 
-この一覧には、再生成可能な監査ログ、候補コピー、配布パッケージなどのランタイム出力を含めません。それらは実行結果であり、開発者が理解すべき恒久的なリポジトリ構造ではないためです。
+この一覧には、再生成可能な監査ログ、候補コピー、配布パッケージなどのランタイム出力を含めません。それらは `.image2outfit/` 内部に閉じた実行結果であり、開発者が理解すべき恒久的なリポジトリ構造ではないためです。
 
 ## 主な契約ファイル
 

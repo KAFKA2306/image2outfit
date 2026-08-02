@@ -11,6 +11,7 @@ TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
 import production_gate  # noqa: E402
+import runtime_paths  # noqa: E402
 
 
 class ProductionGateCommercialTest(unittest.TestCase):
@@ -27,9 +28,6 @@ class ProductionGateCommercialTest(unittest.TestCase):
         job = {
             "id": "demo",
             "adapterId": "demo-v1",
-            "artifactDir": "Artifacts/demo",
-            "candidateDir": "Candidates/demo",
-            "releaseDir": "Release/demo",
             "buildScript": "tools/demo_product.py",
         }
         selection = {
@@ -53,7 +51,7 @@ class ProductionGateCommercialTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             job, selection = self._fixture(root)
-            manifest = root / job["candidateDir"] / "candidate-manifest.json"
+            manifest = runtime_paths.for_job(root, job).candidate / "candidate-manifest.json"
             manifest.parent.mkdir(parents=True)
             manifest.write_text(
                 json.dumps({"schemaVersion": 2, "jobId": "demo"}) + "\n",
@@ -72,7 +70,9 @@ class ProductionGateCommercialTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             job, selection = self._fixture(root)
-            manifest_path = root / job["candidateDir"] / "candidate-manifest.json"
+            manifest_path = (
+                runtime_paths.for_job(root, job).candidate / "candidate-manifest.json"
+            )
             manifest_path.parent.mkdir(parents=True)
             binding = production_gate._binding_snapshot(job, selection, root)
             manifest = {"schemaVersion": 2, "constructionMethod": binding}
@@ -94,7 +94,8 @@ class ProductionGateCommercialTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             job, selection = self._fixture(root)
-            manifest_path = root / job["candidateDir"] / "candidate-manifest.json"
+            paths = runtime_paths.for_job(root, job)
+            manifest_path = paths.candidate / "candidate-manifest.json"
             manifest_path.parent.mkdir(parents=True)
             manifest_path.write_text(
                 json.dumps(
@@ -135,7 +136,7 @@ class ProductionGateCommercialTest(unittest.TestCase):
             self.assertEqual(result, 2)
             runner.assert_not_called()
             report = json.loads(
-                (root / job["artifactDir"] / "commercial-method-quality.json").read_text(
+                (paths.reports / "commercial-method-quality.json").read_text(
                     encoding="utf-8"
                 )
             )

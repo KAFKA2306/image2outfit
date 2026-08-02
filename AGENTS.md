@@ -98,7 +98,9 @@ Mandatory constraints:
 - preserve Unity `.meta` files and GUIDs when moving tracked assets;
 - keep private or licensed avatar sources under job-approved ignored roots;
 - never commit credentials, caches, temporary triggers, machine-local state, private packages, or unreviewed customer release packages;
-- Actions artifacts, `Artifacts/`, `Candidates/`, and `Release/` are transport or packaging outputs, not the sole canonical work state.
+- product jobs must not configure runtime output paths;
+- local reports, candidate snapshots, and release packages belong only under `.image2outfit/products/<slug>/{reports,candidate,release}` and are not canonical tracked state;
+- legacy root directories `Artifacts/`, `Candidates/`, and `Release/` are forbidden and must be migrated without discarding an existing reviewed candidate or release.
 
 ## Change discipline
 
@@ -137,6 +139,7 @@ task candidate PRODUCT=<slug>
 task release PRODUCT=<slug>
 
 task audit:repo
+task audit:runtime
 task audit:genworks
 task audit:tools
 task audit:methods
@@ -183,7 +186,7 @@ Do not use `complete`, `finished`, `production-ready`, `GO`, or `RELEASED` unles
 
 Run checks proportional to the diff, then run the repository contract checks expected by CI.
 
-For documentation-only changes, at minimum verify documentation contracts and repository hygiene. For generic Python or configuration changes, run `task check:python`. For layout changes, run `task audit:genworks`. For product changes, run the product-specific candidate flow and inspect generated evidence. For release changes, run the release flow only after the human evidence contract is satisfied.
+For documentation-only changes, at minimum verify documentation contracts and repository hygiene. For generic Python or configuration changes, run `task check:python`. For runtime-layout changes, run `task audit:runtime`. For layout changes, run `task audit:genworks`. For product changes, run the product-specific candidate flow and inspect generated evidence. For release changes, run the release flow only after the human evidence contract is satisfied.
 
 If a required local tool is unavailable, do not invent a PASS. Run every available static check, use CI where appropriate, and report the exact unverified boundary.
 

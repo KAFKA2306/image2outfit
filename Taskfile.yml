@@ -41,6 +41,11 @@ tasks:
     cmds:
       - uv run --no-cache --locked --no-default-groups python tools/manage.py audit repository
 
+  audit:runtime:
+    desc: Reject legacy output roots and product-configured runtime paths.
+    cmds:
+      - uv run --no-cache --locked --no-default-groups python tools/manage.py audit runtime
+
   audit:genworks:
     desc: Audit the canonical Assets/GenWorks product catalog and path containment.
     cmds:
@@ -92,6 +97,8 @@ tasks:
         ruff check --ignore S102
         tools/manage.py
         tools/method_selection.py
+        tools/runtime_paths.py
+        tools/audit_runtime_layout.py
         tools/audit_tool_ownership.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
@@ -100,6 +107,8 @@ tasks:
         tools/customer_quality.py
         tools/production_gate.py
         tools/production_gate_core.py
+        tests/test_runtime_paths.py
+        tests/test_runtime_layout.py
         tests/test_method_selection.py
         tests/test_tool_ownership.py
         tests/test_repository_hygiene.py
@@ -116,6 +125,8 @@ tasks:
         ruff format --check
         tools/manage.py
         tools/method_selection.py
+        tools/runtime_paths.py
+        tools/audit_runtime_layout.py
         tools/audit_tool_ownership.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
@@ -124,6 +135,8 @@ tasks:
         tools/customer_quality.py
         tools/production_gate.py
         tools/production_gate_core.py
+        tests/test_runtime_paths.py
+        tests/test_runtime_layout.py
         tests/test_method_selection.py
         tests/test_tool_ownership.py
         tests/test_repository_hygiene.py
@@ -144,6 +157,8 @@ tasks:
         ruff format
         tools/manage.py
         tools/method_selection.py
+        tools/runtime_paths.py
+        tools/audit_runtime_layout.py
         tools/audit_tool_ownership.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
@@ -152,6 +167,8 @@ tasks:
         tools/customer_quality.py
         tools/production_gate.py
         tools/production_gate_core.py
+        tests/test_runtime_paths.py
+        tests/test_runtime_layout.py
         tests/test_method_selection.py
         tests/test_tool_ownership.py
         tests/test_repository_hygiene.py

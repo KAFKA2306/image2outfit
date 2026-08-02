@@ -90,7 +90,7 @@ Thumbs.db
 /.github/run/
 /.github/status/
 
-# Local licensed source and generated artifacts
+# Local licensed source and machine-specific Unity state
 /Assets/_Local/
 /Assets/_Local.meta
 /Assets/_Vendor/
@@ -109,12 +109,14 @@ Thumbs.db
 /Assets/RyukuLab.meta
 /ProjectSettings/Packages/
 /ProjectSettings/XRPackageSettings.asset
-/Artifacts/
-/Candidates/
-/Release/
+
+# All reports, candidate snapshots, and release packages are internal runtime state
+/.image2outfit/
+
+# Historical generated roots are intentionally not ignored. If they reappear,
+# git status and repository audits must expose them for removal.
 /Delivery/
 /Preview/
-/.image2outfit/
 
 __pycache__/
 *.py[cod]

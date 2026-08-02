@@ -67,6 +67,9 @@ jobs:
       - name: Audit repository hygiene
         run: uv run --locked --no-default-groups python tools/manage.py audit repository
 
+      - name: Audit runtime layout
+        run: uv run --locked --no-default-groups python tools/manage.py audit runtime
+
       - name: Audit GenWorks layout
         run: uv run --locked --no-default-groups python tools/manage.py audit genworks
 
