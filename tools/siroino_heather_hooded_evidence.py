@@ -32,7 +32,7 @@ def write_pattern_and_research(product_root: Path) -> tuple[Path, Path]:
         {"id": "back-lower", "object": "Heather_Highcut_Back_Panel", "uvDomain": [0, 0, 1, 1]},
         {"id": "sleeve-l", "objects": ["Heather_Upper_Sleeve_L", "Heather_Lower_Sleeve_L"], "uvDomain": [0, 0, 1, 1]},
         {"id": "sleeve-r", "objects": ["Heather_Upper_Sleeve_R", "Heather_Lower_Sleeve_R"], "uvDomain": [0, 0, 1, 1]},
-        {"id": "hood", "object": "Heather_Sculpted_Hood", "uvDomain": [0, 0, 1, 1]},
+        {"id": "hood", "object": "Heather_Folded_Hood", "uvDomain": [0, 0, 1, 1]},
     ]
     seam_pairs = [
         ["front-upper:left-side", "back-upper:right-side"],
@@ -103,8 +103,8 @@ This is a resumable `WORKING` checkpoint for a heather-grey hooded high-cut body
 ## Authored structure
 
 - separate front/back upper and high-cut lower panels
-- paired two-segment sleeves and rib cuffs
-- open-front sculpted hood
+- paired bone-aligned sleeve sections and compact rib cuffs
+- compact folded hood with a modeled neck binding
 - three-button Henley placket
 - modeled drawcords and paired side ties
 - explicit UV pattern coordinates and seam-pair graph
