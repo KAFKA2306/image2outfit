@@ -24,6 +24,37 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Record hosted run start
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          path = Path('.github/run/siroino-wide-cargo-last-run.json')
+          path.parent.mkdir(parents=True, exist_ok=True)
+          path.write_text(json.dumps({
+              'schemaVersion': 1,
+              'runId': int(os.environ['GITHUB_RUN_ID']),
+              'runAttempt': int(os.environ['GITHUB_RUN_ATTEMPT']),
+              'headSha': os.environ['GITHUB_SHA'],
+              'status': 'running',
+              'updatedAt': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+          }, indent=2) + '\n', encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/run/siroino-wide-cargo-last-run.json
+          git commit -m "Record Siroino hosted run ${GITHUB_RUN_ID} start"
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((attempt * 3))
+          done
+          exit 1
+
       - name: Install Blender runtime libraries
         run: |
           sudo apt-get update
@@ -81,11 +112,12 @@ jobs:
           path = Path('Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json')
           data = json.loads(path.read_text(encoding='utf-8-sig'))
           data['status'] = 'MODELED'
-          data['designRevision'] = 'v10-release-refit'
+          data['designRevision'] = 'v14-body-clearance-wearable'
           data['technicalGates'] = {
               'blender': 'PASS',
               'uvMapping': 'PASS',
               'exactBodyPoseRenders': 'PASS',
+              'geometricWearability': 'PASS',
               'unityImport': 'PENDING',
               'modularAvatar': 'PENDING',
               'vrchatBuildAndTest': 'PENDING',
@@ -121,3 +153,36 @@ jobs:
           if-no-files-found: error
           retention-days: 30
           compression-level: 6
+
+      - name: Record hosted run conclusion
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          path = Path('.github/run/siroino-wide-cargo-last-run.json')
+          path.write_text(json.dumps({
+              'schemaVersion': 1,
+              'runId': int(os.environ['GITHUB_RUN_ID']),
+              'runAttempt': int(os.environ['GITHUB_RUN_ATTEMPT']),
+              'headSha': os.environ['GITHUB_SHA'],
+              'status': os.environ['JOB_STATUS'],
+              'updatedAt': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+          }, indent=2) + '\n', encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/run/siroino-wide-cargo-last-run.json
+          git commit -m "Record Siroino hosted run ${GITHUB_RUN_ID} ${JOB_STATUS}" || true
+          for attempt in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep $((attempt * 3))
+          done
+          exit 1
+        env:
+          JOB_STATUS: ${{ job.status }}
