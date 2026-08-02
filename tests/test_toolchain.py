@@ -26,10 +26,8 @@ class ToolchainAuditTest(unittest.TestCase):
             (PROJECT / "Packages" / "vpm-manifest.json").read_text(encoding="utf-8")
         )
         self.write_json(self.root / "config" / "toolchain-lock.json", self.lock)
-        (self.root / "config" / "blender-python-requirements.txt").write_text(
-            (PROJECT / "config" / "blender-python-requirements.txt").read_text(
-                encoding="utf-8"
-            ),
+        (self.root / "pyproject.toml").write_text(
+            (PROJECT / "pyproject.toml").read_text(encoding="utf-8"),
             encoding="utf-8",
         )
         self.write_json(self.root / "Packages" / "vpm-manifest.json", self.manifest)
@@ -77,14 +75,16 @@ class ToolchainAuditTest(unittest.TestCase):
             any("dependency contract" in error for error in result["errors"])
         )
 
-    def test_blender_python_requirement_drift_is_rejected(self) -> None:
-        (self.root / "config" / "blender-python-requirements.txt").write_text(
-            "Pillow==12.2.0\n", encoding="utf-8"
+    def test_blender_python_dependency_drift_is_rejected(self) -> None:
+        pyproject = (self.root / "pyproject.toml").read_text(encoding="utf-8")
+        (self.root / "pyproject.toml").write_text(
+            pyproject.replace("Pillow==12.3.0", "Pillow==12.2.0"),
+            encoding="utf-8",
         )
         result = audit_toolchain.audit(self.root)
         self.assertFalse(result["passed"])
         self.assertTrue(
-            any("Blender Python requirements mismatch" in error for error in result["errors"])
+            any("Blender Python dependency mismatch" in error for error in result["errors"])
         )
 
     def test_blender_python_version_drift_is_rejected(self) -> None:

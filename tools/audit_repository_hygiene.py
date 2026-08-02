@@ -9,7 +9,6 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 GLOBAL_CONFIG_FILES = {
-    "blender-python-requirements.txt",
     "genworks-handoff-policy.json",
     "genworks-layout.json",
     "job.schema.v2.json",
@@ -99,6 +98,25 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                     root,
                     "product configuration must live under config/products/<product-id>/",
                 )
+
+    pyproject = root / "pyproject.toml"
+    if not pyproject.is_file():
+        add(
+            findings,
+            "missing-python-project",
+            pyproject,
+            root,
+            "Python dependencies and environment groups must be declared in pyproject.toml",
+        )
+    if config_root.is_dir():
+        for requirements_file in sorted(config_root.glob("*requirements*.txt")):
+            add(
+                findings,
+                "environment-config-residue",
+                requirements_file,
+                root,
+                "Python environment declarations belong in pyproject.toml",
+            )
 
     allowed_statuses = set(handoff_policy.get("statuses", []))
     automated_gates = tuple(
@@ -340,6 +358,19 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                             root,
                             f"{gate} must PASS before RELEASED",
                         )
+
+    product_tokens = {
+        product_id.replace("-", "_").replace(".", "_") for product_id in product_ids
+    }
+    for root_script in sorted(root.glob("*.py")):
+        if any(token and token in root_script.stem.lower() for token in product_tokens):
+            add(
+                findings,
+                "product-script-at-repository-root",
+                root_script,
+                root,
+                "product-specific Python scripts must live under tools/ or the product workspace",
+            )
 
     workflow_root = root / ".github" / "workflows"
     if workflow_root.is_dir():
