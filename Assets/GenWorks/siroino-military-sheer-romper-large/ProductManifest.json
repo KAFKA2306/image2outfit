@@ -3,7 +3,7 @@
   "productId": "siroino-military-sheer-romper-large",
   "productName": "Military Sheer-Back Romper for Siroino _Large",
   "status": "WORKING",
-  "classification": "BUILD_SCRIPT_READY",
+  "classification": "BUILD_SCRIPT_V3_READY",
   "targetAdapterId": "siroino-v1.0-large",
   "productRoot": "Assets/GenWorks/siroino-military-sheer-romper-large",
   "outfitPrefabPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/SiroinoMilitarySheerRomperLarge.prefab",
@@ -12,7 +12,7 @@
   "documentationPath": "Assets/GenWorks/siroino-military-sheer-romper-large/README.md",
   "sourceJobPath": "config/products/siroino-military-sheer-romper-large/job.json",
   "constructionProfile": "panel-sewn",
-  "designRevision": "panel-sewn-v1",
+  "designRevision": "panel-sewn-v3",
   "reference": {
     "sourceImageRedistributed": false,
     "sourceImageSha256": "3f69a72daa79102c0af5679e2c54d4f078231bdab124314703e2626bcef0e460",
@@ -25,8 +25,8 @@
     "resumeFrom": "tools/siroino_military_sheer_romper_build.py",
     "doNotRebuildFromZero": true,
     "blockers": [
-      "Hosted Blender generation has not yet produced the Blend, FBX, Prefab wrapper, and visual evidence.",
-      "Unity import/reload and integrated Modular Avatar Prefab remain pending.",
+      "Hosted Blender v3 generation has not yet produced the Blend, FBX, Prefab wrappers, and visual evidence.",
+      "Unity import/reload and Modular Avatar/NDMF integration remain pending.",
       "Human visual, pose, and runtime reviews remain pending."
     ]
   },
