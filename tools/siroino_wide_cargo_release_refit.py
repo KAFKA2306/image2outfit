@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
-"""Body-clearance refit for Siroino Wide Cargo.
+"""Continuous wearable refit for Siroino Wide Cargo.
 
-The previous release layer compressed already-fitted geometry a second time.
-That pushed the waist and leg profile into the avatar and produced renders that
-looked detached or unworn despite passing topology checks. This layer keeps the
-wide silhouette, restores body depth, enforces positive body clearance, and
-adds a geometric wearability audit before any generated asset can be pushed.
+The rendered v14 candidate still read as separate armor panels rather than
+pants: the inner calves were exposed, the pelvis was assembled from disconnected
+front/back/hip pieces, and several belts and straps floated away from the body.
+
+This revision deliberately simplifies the product into a stable wearable base:
+
+* one continuous body-derived shell from waist through the upper legs,
+* lower-leg shells widened inward until they cover the inner calves,
+* a single close-fitting waistband,
+* no floating hip diagonals, rings, duplicate waist belt, or knee hoops,
+* no post-solidify clearance operation on body-derived cloth surfaces.
+
+Decorative complexity can be reintroduced only after the continuous garment
+passes actual rendered front/back/side and pose review.
 """
 from __future__ import annotations
 
@@ -38,19 +47,6 @@ def _single_bone(obj: bpy.types.Object, bone: str) -> None:
     _replace(obj, {bone: [(vertex.index, 1.0) for vertex in obj.data.vertices]})
 
 
-def _upper_leg_gradient(obj: bpy.types.Object, side: str) -> None:
-    assignments = {"Hips": [], f"UpperLeg_{side}": []}
-    zs = [vertex.co.z for vertex in obj.data.vertices]
-    low, high = min(zs, default=0.0), max(zs, default=1.0)
-    span = max(high - low, 1e-6)
-    for vertex in obj.data.vertices:
-        t = base.clamp((vertex.co.z - low) / span, 0.0, 1.0)
-        upper_weight = 0.94 - 0.48 * t
-        assignments[f"UpperLeg_{side}"].append((vertex.index, upper_weight))
-        assignments["Hips"].append((vertex.index, 1.0 - upper_weight))
-    _replace(obj, assignments)
-
-
 def _lower_leg_gradient(obj: bpy.types.Object, side: str) -> None:
     assignments = {f"UpperLeg_{side}": [], f"LowerLeg_{side}": []}
     zs = [vertex.co.z for vertex in obj.data.vertices]
@@ -58,7 +54,7 @@ def _lower_leg_gradient(obj: bpy.types.Object, side: str) -> None:
     span = max(high - low, 1e-6)
     for vertex in obj.data.vertices:
         t = base.clamp((vertex.co.z - low) / span, 0.0, 1.0)
-        upper_weight = 0.06 + 0.72 * t
+        upper_weight = 0.08 + 0.74 * t
         assignments[f"UpperLeg_{side}"].append((vertex.index, upper_weight))
         assignments[f"LowerLeg_{side}"].append((vertex.index, 1.0 - upper_weight))
     _replace(obj, assignments)
@@ -84,7 +80,12 @@ def _ensure_body_clearance(
     body: bpy.types.Object,
     clearance: float,
 ) -> None:
-    """Push vertices outside the nearest body surface instead of scaling inward."""
+    """Move rigid/decorative geometry outside the body.
+
+    Do not use this on body-derived cloth after solidify: moving both thickness
+    surfaces to the same signed distance collapses side walls and creates
+    degenerate triangles.
+    """
     tree, positions, normals = _body_index(body)
     inverse = obj.matrix_world.inverted_safe()
     changed = False
@@ -101,46 +102,32 @@ def _ensure_body_clearance(
         obj.data.update(calc_edges=True)
 
 
-def _signed_clearances(obj: bpy.types.Object, body: bpy.types.Object) -> list[float]:
-    tree, positions, normals = _body_index(body)
-    values: list[float] = []
-    for vertex in obj.data.vertices:
-        world = obj.matrix_world @ vertex.co
-        _, index, _ = tree.find(world)
-        values.append((world - positions[index]).dot(normals[index]))
-    return values
-
-
 def refined_leg_shell(name, side, rings, material, armature, body, segments=48):
     obj = _current_leg_shell(name, side, rings, material, armature, body, segments=segments)
+    if "LowerLeg" not in name:
+        return obj
+
     coordinates = [vertex.co.copy() for vertex in obj.data.vertices]
     center_x = sum(value.x for value in coordinates) / max(1, len(coordinates))
     side_name = "L" if side < 0 else "R"
+    zs = [vertex.co.z for vertex in obj.data.vertices]
+    low, high = min(zs, default=0.0), max(zs, default=1.0)
+    span = max(high - low, 1e-6)
 
-    if "UpperLeg" in name:
-        for vertex in obj.data.vertices:
-            vertex.co.x = center_x + (vertex.co.x - center_x) * 1.04
-            vertex.co.y *= 1.03
-            if vertex.co.z < 0.50:
-                vertex.co.z -= 0.015
-        _upper_leg_gradient(obj, side_name)
-    elif "LowerLeg" in name:
-        zs = [vertex.co.z for vertex in obj.data.vertices]
-        low, high = min(zs, default=0.0), max(zs, default=1.0)
-        span = max(high - low, 1e-6)
-        for vertex in obj.data.vertices:
-            t = base.clamp((vertex.co.z - low) / span, 0.0, 1.0)
-            width_scale = 1.06 + 0.06 * (1.0 - t)
-            vertex.co.x = center_x + (vertex.co.x - center_x) * width_scale
-            vertex.co.y *= 1.04
-            if vertex.co.z > 0.34:
-                vertex.co.z += 0.018
-            if vertex.co.z < 0.14:
-                vertex.co.z += 0.015
-        _lower_leg_gradient(obj, side_name)
-
+    # The prior shell spanned roughly |x| >= 0.027, leaving a conspicuous strip
+    # of bare inner calf. Increase the radius around each leg centre so the
+    # inner boundary approaches the body centreline while retaining wide hems.
+    for vertex in obj.data.vertices:
+        t = base.clamp((vertex.co.z - low) / span, 0.0, 1.0)
+        radial_scale = 1.22 + 0.08 * t
+        vertex.co.x = center_x + (vertex.co.x - center_x) * radial_scale
+        vertex.co.y *= 1.08
+        if vertex.co.z > high - 0.07:
+            vertex.co.z += 0.020
+        if vertex.co.z < low + 0.08:
+            vertex.co.z += 0.012
     obj.data.update(calc_edges=True)
-    _ensure_body_clearance(obj, body, 0.0045)
+    _lower_leg_gradient(obj, side_name)
     return obj
 
 
@@ -168,24 +155,15 @@ def refined_band(
         body,
         **kwargs,
     )
-    vertices = list(obj.data.vertices)
-    if name in {"Primary_Waist_Belt", "Asymmetric_Waist_Belt"}:
-        for vertex in vertices:
-            vertex.co.x *= 1.01
-            vertex.co.y *= 1.04
-            vertex.co.z -= 0.002
+    if name == "Primary_Waist_Belt":
+        # The prior band floated several centimetres beyond the waist.
+        for vertex in obj.data.vertices:
+            vertex.co.x *= 0.84
+            vertex.co.y *= 0.86
+            vertex.co.z -= 0.004
         _single_bone(obj, "Hips")
-        _ensure_body_clearance(obj, body, 0.0055)
-    elif name.startswith("Knee_Strap_"):
-        side_name = "L" if "_L_" in name else "R"
-        local_center = sum(vertex.co.x for vertex in vertices) / max(1, len(vertices))
-        for vertex in vertices:
-            vertex.co.x = local_center + (vertex.co.x - local_center) * 0.96
-            vertex.co.y *= 1.04
-            vertex.co.z -= 0.001
-        _lower_leg_gradient(obj, side_name)
-        _ensure_body_clearance(obj, body, 0.0050)
-    obj.data.update(calc_edges=True)
+        _ensure_body_clearance(obj, body, 0.0035)
+        obj.data.update(calc_edges=True)
     return obj
 
 
@@ -194,138 +172,148 @@ def _remove_object(obj: bpy.types.Object) -> None:
         bpy.data.objects.remove(obj, do_unlink=True)
 
 
-def refined_create_outfit(body, armature, fabric, strap, metal):
-    objects = _current_create_outfit(body, armature, fabric, strap, metal)
+def _is_removed_decoration(name: str) -> bool:
+    return (
+        name in {
+            "Cargo_Fitted_Front_Pelvis",
+            "Cargo_Fitted_Back_Yoke",
+            "Cargo_Fitted_Hip_L",
+            "Cargo_Fitted_Hip_R",
+            "Cargo_UpperLeg_L",
+            "Cargo_UpperLeg_R",
+            "Asymmetric_Waist_Belt",
+            "Side_Belt_Buckle",
+        }
+        or name.startswith("Hip_Cutout_Strap_")
+        or name.startswith("Hip_Ring_")
+        or name.startswith("Knee_Strap_")
+        or name.startswith("Knee_Zipper_")
+        or name.startswith("Knee_Zip_Pull_")
+    )
 
+
+def refined_create_outfit(body, armature, fabric, strap, metal):
+    generated = _current_create_outfit(body, armature, fabric, strap, metal)
     retained: list[bpy.types.Object] = []
-    for obj in objects:
-        if obj.name in {"Cargo_Fitted_Front_Pelvis", "Cargo_Fitted_Back_Yoke"}:
+    for obj in generated:
+        if _is_removed_decoration(obj.name):
             _remove_object(obj)
         else:
             retained.append(obj)
 
-    front = build.c.extract_surface(
+    # One circumferential shell replaces the disconnected front/back/hip and
+    # left/right upper-leg pieces. Selecting the complete source-body surface
+    # in this height band guarantees actual inner-thigh and crotch coverage.
+    upper = build.c.extract_surface(
         body,
         armature,
-        "Cargo_Fitted_Front_Pelvis",
-        lambda point: (
-            0.432 <= point.z <= 0.792
-            and point.y < 0.030
-            and abs(point.x) <= 0.116 + max(0.0, point.z - 0.432) * 0.07
-        ),
+        "Cargo_Continuous_Upper",
+        lambda point: 0.355 <= point.z <= 0.795,
         fabric,
-        0.0070,
+        0.0080,
     )
-    back = build.c.extract_surface(
-        body,
-        armature,
-        "Cargo_Fitted_Back_Yoke",
-        lambda point: (
-            0.430 <= point.z <= 0.792
-            and point.y >= -0.030
-            and abs(point.x) <= 0.120 + max(0.0, point.z - 0.430) * 0.06
-        ),
-        fabric,
-        0.0070,
-    )
-    build.finish_skinned(front, body)
-    build.finish_skinned(back, body)
-    _ensure_body_clearance(front, body, 0.0055)
-    _ensure_body_clearance(back, body, 0.0055)
+    for vertex in upper.data.vertices:
+        t = base.clamp((vertex.co.z - 0.355) / 0.440, 0.0, 1.0)
+        vertex.co.x *= 1.035 - 0.010 * t
+        vertex.co.y *= 1.045 - 0.010 * t
+    upper.data.update(calc_edges=True)
+    build.c.add_nearest_shape_keys(upper, body)
 
     for obj in retained:
         name = obj.name
-        if name.startswith("Cargo_Pocket_"):
-            # Vertices are local to an object whose location already stores the
-            # pocket center. Scaling around obj.location moved the mesh twice.
+        if name.startswith("Cargo_Pocket_Flap_"):
             for vertex in obj.data.vertices:
-                vertex.co.x *= 0.82
-                vertex.co.y *= 0.75
-                vertex.co.z *= 0.92
+                vertex.co.x *= 0.76
+                vertex.co.y *= 0.58
+                vertex.co.z *= 0.82
+            obj.location.y += 0.006
+            obj.data.update(calc_edges=True)
             _single_bone(obj, "UpperLeg_L" if name.endswith("_L") else "UpperLeg_R")
-            obj.data.update(calc_edges=True)
-            _ensure_body_clearance(obj, body, 0.0065)
-        elif name.startswith("Hip_Cutout_Strap_"):
+            _ensure_body_clearance(obj, body, 0.0045)
+        elif name.startswith("Cargo_Pocket_"):
             for vertex in obj.data.vertices:
-                vertex.co.x *= 0.94
-                vertex.co.y *= 1.02
-            _single_bone(obj, "Hips")
+                vertex.co.x *= 0.80
+                vertex.co.y *= 0.62
+                vertex.co.z *= 0.84
+            obj.location.y += 0.006
             obj.data.update(calc_edges=True)
-            _ensure_body_clearance(obj, body, 0.0060)
-        elif name.startswith("Hip_Ring_"):
-            obj.scale *= 0.72
-            _single_bone(obj, "Hips")
-        elif name.startswith("Knee_Zipper_") or name.startswith("Knee_Zip_Pull_"):
-            side_name = "L" if name.endswith("_L") else "R"
-            _lower_leg_gradient(obj, side_name)
-            _ensure_body_clearance(obj, body, 0.0060)
+            _single_bone(obj, "UpperLeg_L" if name.endswith("_L") else "UpperLeg_R")
+            _ensure_body_clearance(obj, body, 0.0045)
+        elif name in {"Front_Belt_Buckle", "Long_Center_Zipper", "Center_Zip_Pull"}:
+            _ensure_body_clearance(obj, body, 0.0040)
 
-    return [front, back, *retained]
+    return [upper, *retained]
+
+
+def _mesh_degenerate_triangles(obj: bpy.types.Object) -> int:
+    mesh = obj.data
+    mesh.calc_loop_triangles()
+    count = 0
+    for triangle in mesh.loop_triangles:
+        a, b, c = (mesh.vertices[index].co for index in triangle.vertices)
+        if (b - a).cross(c - a).length_squared <= 1e-20:
+            count += 1
+    return count
 
 
 def audit_wearability() -> dict[str, object]:
-    body = next(
-        (
-            obj
-            for obj in bpy.data.objects
-            if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
-        ),
-        None,
-    )
-    if body is None:
-        raise RuntimeError("wearability audit could not find the exact Siroino body")
-
     required = (
-        "Cargo_UpperLeg_L",
-        "Cargo_UpperLeg_R",
+        "Cargo_Continuous_Upper",
         "Cargo_LowerLeg_L",
         "Cargo_LowerLeg_R",
-        "Cargo_Fitted_Front_Pelvis",
-        "Cargo_Fitted_Back_Yoke",
         "Primary_Waist_Belt",
     )
     missing = [name for name in required if name not in bpy.data.objects]
     checks: dict[str, object] = {"requiredObjectsPresent": not missing, "missing": missing}
 
-    clearance_report: dict[str, float] = {}
-    clearance_pass = True
-    for name in required:
+    upper = bpy.data.objects.get("Cargo_Continuous_Upper")
+    upper_metrics: dict[str, float | int] = {}
+    upper_pass = False
+    if upper:
+        xs = [vertex.co.x for vertex in upper.data.vertices]
+        zs = [vertex.co.z for vertex in upper.data.vertices]
+        inner_vertices = sum(
+            1
+            for vertex in upper.data.vertices
+            if 0.38 <= vertex.co.z <= 0.62 and abs(vertex.co.x) <= 0.085
+        )
+        upper_metrics = {
+            "width": round(max(xs, default=0.0) - min(xs, default=0.0), 6),
+            "minimumZ": round(min(zs, default=1.0), 6),
+            "maximumZ": round(max(zs, default=0.0), 6),
+            "innerThighVertices": inner_vertices,
+            "degenerateTriangles": _mesh_degenerate_triangles(upper),
+        }
+        upper_pass = (
+            upper_metrics["width"] >= 0.24
+            and upper_metrics["minimumZ"] <= 0.38
+            and upper_metrics["maximumZ"] >= 0.78
+            and inner_vertices >= 80
+            and upper_metrics["degenerateTriangles"] == 0
+        )
+    checks["continuousUpper"] = upper_metrics
+    checks["continuousUpperPassed"] = upper_pass
+
+    lower_report: dict[str, dict[str, float | int]] = {}
+    lower_pass = True
+    for name in ("Cargo_LowerLeg_L", "Cargo_LowerLeg_R"):
         obj = bpy.data.objects.get(name)
         if obj is None:
+            lower_pass = False
             continue
-        values = sorted(_signed_clearances(obj, body))
-        percentile_index = min(len(values) - 1, max(0, int(len(values) * 0.05)))
-        p05 = values[percentile_index] if values else -1.0
-        clearance_report[name] = round(float(p05), 6)
-        clearance_pass = clearance_pass and p05 >= -0.0015
-    checks["signedClearanceP05Meters"] = clearance_report
-    checks["bodyClearancePassed"] = clearance_pass
-
-    front = bpy.data.objects.get("Cargo_Fitted_Front_Pelvis")
-    back = bpy.data.objects.get("Cargo_Fitted_Back_Yoke")
-    panel_pass = False
-    panel_metrics: dict[str, dict[str, float]] = {}
-    if front and back:
-        for obj in (front, back):
-            xs = [vertex.co.x for vertex in obj.data.vertices]
-            zs = [vertex.co.z for vertex in obj.data.vertices]
-            panel_metrics[obj.name] = {
-                "width": round(max(xs, default=0.0) - min(xs, default=0.0), 6),
-                "height": round(max(zs, default=0.0) - min(zs, default=0.0), 6),
-                "minimumZ": round(min(zs, default=1.0), 6),
-            }
-        panel_pass = all(
-            value["width"] >= 0.18
-            and value["height"] >= 0.30
-            and value["minimumZ"] <= 0.46
-            for value in panel_metrics.values()
-        )
-    checks["pelvisPanels"] = panel_metrics
-    checks["continuousPelvisCoveragePassed"] = panel_pass
+        inner_edge = min((abs(vertex.co.x) for vertex in obj.data.vertices), default=1.0)
+        degenerates = _mesh_degenerate_triangles(obj)
+        lower_report[name] = {
+            "innerEdgeAbsX": round(inner_edge, 6),
+            "degenerateTriangles": degenerates,
+        }
+        lower_pass = lower_pass and inner_edge <= 0.012 and degenerates == 0
+    checks["lowerLegCoverage"] = lower_report
+    checks["innerCalfCoveragePassed"] = lower_pass
 
     waist = bpy.data.objects.get("Primary_Waist_Belt")
-    waist_pass = False
     waist_metrics: dict[str, float] = {}
+    waist_pass = False
     if waist:
         xs = [vertex.co.x for vertex in waist.data.vertices]
         ys = [vertex.co.y for vertex in waist.data.vertices]
@@ -333,16 +321,21 @@ def audit_wearability() -> dict[str, object]:
             "width": round(max(xs, default=0.0) - min(xs, default=0.0), 6),
             "depth": round(max(ys, default=0.0) - min(ys, default=0.0), 6),
         }
-        waist_pass = waist_metrics["width"] >= 0.24 and waist_metrics["depth"] >= 0.15
+        waist_pass = 0.18 <= waist_metrics["width"] <= 0.25 and 0.11 <= waist_metrics["depth"] <= 0.18
     checks["waistDimensions"] = waist_metrics
-    checks["waistNotCollapsedPassed"] = waist_pass
+    checks["waistAttachedPassed"] = waist_pass
 
-    passed = not missing and clearance_pass and panel_pass and waist_pass
-    return {
-        "schemaVersion": 1,
-        "passed": passed,
-        "checks": checks,
-    }
+    removed_present = sorted(
+        name
+        for name in bpy.data.objects.keys()
+        if _is_removed_decoration(name)
+    )
+    checks["removedFloatingObjectsPresent"] = removed_present
+    decoration_pass = not removed_present
+    checks["floatingDecorationRemovalPassed"] = decoration_pass
+
+    passed = not missing and upper_pass and lower_pass and waist_pass and decoration_pass
+    return {"schemaVersion": 1, "passed": passed, "checks": checks}
 
 
 def record_wearability(report: dict[str, object]) -> None:
@@ -350,7 +343,7 @@ def record_wearability(report: dict[str, object]) -> None:
     manifest_path = build.c.repo_path(job["productManifestPath"])
     manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
     manifest["wearabilityAudit"] = report
-    manifest["designRevision"] = "v14-body-clearance-wearable"
+    manifest["designRevision"] = "v15-continuous-pants"
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
