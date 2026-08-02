@@ -3,11 +3,12 @@
   "id": "haolan-bordeaux-knit-set",
   "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
   "adapterId": "haolan-v1.6",
-  "buildRevision": "v2-canonical-finalize-pass-1",
+  "buildRevision": "v2-canonical-finalize-pass-2",
   "productRoot": "Assets/GenWorks/haolan-bordeaux-knit-set",
   "productManifestPath": "Assets/GenWorks/haolan-bordeaux-knit-set/ProductManifest.json",
   "buildScript": "tools/build_haolan_bordeaux_knit_set.py",
   "hostedPoseScript": "tools/render_haolan_candidate_poses.py",
+  "skeletonSeedPath": "config/products/haolan-bordeaux-knit-set/skeleton.json",
   "blendPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Source/Blender/HAOLAN_BordeauxKnitSet.blend",
   "fbxAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Models/HAOLAN_BordeauxKnitSet.fbx",
   "prefabAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
@@ -64,10 +65,11 @@
   },
   "allowedExtraBones": [],
   "targetResolution": {
-    "strategy": "self-hosted-repository-search",
+    "strategy": "licensed-local-source-or-derived-skeleton-seed",
     "profile": "HAOLAN v1.6",
     "sourceFilename": "HAOLAN_Lowpoly.fbx",
-    "prefabFilename": "HAOLAN_Lowpoly Variant.prefab"
+    "prefabFilename": "HAOLAN_Lowpoly Variant.prefab",
+    "avatarSourceRequiredForFinalFitAndRuntimeReview": true
   },
   "legacySource": "Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate"
 }
