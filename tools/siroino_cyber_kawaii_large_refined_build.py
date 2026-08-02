@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""Refine the Cyber Kawaii Large garment proportions and handoff metadata.
+"""Build the refined Cyber Kawaii set for the official Siroino ``_Large`` profile.
 
-This module reuses the established material/export pipeline while replacing the
-first-pass oversized sleeve and rigid skirt geometry.  It keeps the official
-Siroino PC source and applies the declared ``_Large`` shape keys before fit.
+The first generated revision proved that the official PC FBX and Large shape
+keys resolve correctly, but its rigid ornaments and skirt deformed poorly in
+crouch/sit/twist poses. This revision keeps all resumable source outputs while
+using body-weighted sleeves and a closed, non-degenerate pelvis-weighted skirt
+shell. The technical gate remains strict; no tolerance is relaxed.
 """
 from __future__ import annotations
 
 import json
-import sys
+import math
 from pathlib import Path
 
+import bmesh
 import bpy
 from mathutils import Vector
 
@@ -20,17 +23,26 @@ import siroino_strappy_knit_build as base
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def repo_path(value: str) -> Path:
+    return base.repo_path(value)
+
+
 def bone_segment(armature: bpy.types.Object, bone_name: str) -> tuple[Vector, Vector]:
     bone = armature.data.bones.get(bone_name)
     if bone is None:
         raise RuntimeError(f"Required Siroino bone missing: {bone_name}")
-    return (
-        armature.matrix_world @ bone.head_local,
-        armature.matrix_world @ bone.tail_local,
-    )
+    return armature.matrix_world @ bone.head_local, armature.matrix_world @ bone.tail_local
 
 
-def near_segment(point: Vector, start: Vector, end: Vector, *, t0: float, t1: float, radius: float) -> bool:
+def near_segment(
+    point: Vector,
+    start: Vector,
+    end: Vector,
+    *,
+    t0: float,
+    t1: float,
+    radius: float,
+) -> bool:
     direction = end - start
     length_squared = direction.length_squared
     if length_squared <= 1e-12:
@@ -42,6 +54,164 @@ def near_segment(point: Vector, start: Vector, end: Vector, *, t0: float, t1: fl
     return (point - closest).length <= radius
 
 
+def stable_shell(
+    name: str,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+    rings: tuple[tuple[float, float, float], ...],
+    *,
+    pleats: int,
+    thickness: float,
+    group: str = "Hips",
+    uv_repeats: float = 2.5,
+    fold_strength: float = 0.024,
+) -> bpy.types.Object:
+    """Create a closed skirt or band shell without bevel/solidify degeneracy."""
+
+    if len(rings) < 2:
+        raise ValueError("stable_shell requires at least two rings")
+    segments = max(48, pleats * 4)
+    outer_count = len(rings) * segments
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, int, int, int]] = []
+
+    def ring_vertex(
+        z: float,
+        rx: float,
+        ry: float,
+        index: int,
+        inset: float,
+    ) -> tuple[float, float, float]:
+        angle = math.tau * index / segments
+        fold = 1.0 + fold_strength * math.cos(angle * pleats)
+        return (
+            max(0.001, rx - inset) * fold * math.cos(angle),
+            max(0.001, ry - inset) * fold * math.sin(angle),
+            z,
+        )
+
+    for z, rx, ry in rings:
+        vertices.extend(ring_vertex(z, rx, ry, index, 0.0) for index in range(segments))
+    for z, rx, ry in rings:
+        vertices.extend(ring_vertex(z, rx, ry, index, thickness) for index in range(segments))
+
+    ring_count = len(rings)
+    for ring_index in range(ring_count - 1):
+        outer_a = ring_index * segments
+        outer_b = (ring_index + 1) * segments
+        inner_a = outer_count + ring_index * segments
+        inner_b = outer_count + (ring_index + 1) * segments
+        for index in range(segments):
+            nxt = (index + 1) % segments
+            faces.append((outer_a + index, outer_a + nxt, outer_b + nxt, outer_b + index))
+            faces.append((inner_a + index, inner_b + index, inner_b + nxt, inner_a + nxt))
+
+    for ring_index in (0, ring_count - 1):
+        outer = ring_index * segments
+        inner = outer_count + ring_index * segments
+        reverse = ring_index == 0
+        for index in range(segments):
+            nxt = (index + 1) % segments
+            if reverse:
+                faces.append((outer + index, inner + index, inner + nxt, outer + nxt))
+            else:
+                faces.append((outer + index, outer + nxt, inner + nxt, inner + index))
+
+    mesh = bpy.data.meshes.new(f"{name}_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    z_top = rings[0][0]
+    z_bottom = rings[-1][0]
+    z_span = max(1e-6, abs(z_top - z_bottom))
+    for polygon in mesh.polygons:
+        for loop_index in polygon.loop_indices:
+            vertex_index = mesh.loops[loop_index].vertex_index
+            local_index = vertex_index % segments
+            z = mesh.vertices[vertex_index].co.z
+            u = (local_index / segments) * uv_repeats
+            v = abs(z_top - z) / z_span
+            if vertex_index >= outer_count:
+                u = -u
+            uv_layer.data[loop_index].uv = (u, v)
+    mesh.materials.append(material)
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    base.rigid_mesh_weight(obj, armature, group)
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = True
+    return obj
+
+
+def box_ribbon(
+    name: str,
+    center: tuple[float, float, float],
+    size: tuple[float, float, float],
+    material: bpy.types.Material,
+    armature: bpy.types.Object,
+    group: str,
+) -> bpy.types.Object:
+    """Create a compact closed accessory with deterministic clean topology."""
+
+    cx, cy, cz = center
+    sx, sy, sz = size
+    vertices = [
+        (cx + dx * sx, cy + dy * sy, cz + dz * sz)
+        for dz in (-1.0, 1.0)
+        for dy in (-1.0, 1.0)
+        for dx in (-1.0, 1.0)
+    ]
+    faces = [
+        (0, 1, 3, 2),
+        (4, 6, 7, 5),
+        (0, 4, 5, 1),
+        (2, 3, 7, 6),
+        (0, 2, 6, 4),
+        (1, 5, 7, 3),
+    ]
+    mesh = bpy.data.meshes.new(f"{name}_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    mesh.materials.append(material)
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    base.rigid_mesh_weight(obj, armature, group)
+    return obj
+
+
+def chest_bow(
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    pink: bpy.types.Material,
+) -> list[bpy.types.Object]:
+    y = base.body_front_y(body, 0.0, 0.958) - 0.016
+    left = box_ribbon(
+        "Pink_Collar_Bow_L",
+        (-0.014, y, 0.958),
+        (0.014, 0.0032, 0.008),
+        pink,
+        armature,
+        "Chest",
+    )
+    right = box_ribbon(
+        "Pink_Collar_Bow_R",
+        (0.014, y, 0.958),
+        (0.014, 0.0032, 0.008),
+        pink,
+        armature,
+        "Chest",
+    )
+    knot = box_ribbon(
+        "Pink_Collar_Bow_Knot",
+        (0.0, y - 0.001, 0.958),
+        (0.006, 0.0040, 0.006),
+        pink,
+        armature,
+        "Chest",
+    )
+    return [left, right, knot]
+
+
 def create_outfit(
     body: bpy.types.Object,
     armature: bpy.types.Object,
@@ -51,7 +221,6 @@ def create_outfit(
     plaid = materials["plaid"]
     pink = materials["pink"]
     black = materials["black"]
-    silver = materials["silver"]
     garments: list[bpy.types.Object] = []
 
     garments.append(
@@ -61,7 +230,7 @@ def create_outfit(
             "White_Cropped_Blouse_Front",
             lambda c: 0.835 <= c.z <= 1.018 and c.y < 0.005 and abs(c.x) <= 0.145,
             white,
-            0.0062,
+            0.0080,
         )
     )
     garments.append(
@@ -69,9 +238,9 @@ def create_outfit(
             body,
             armature,
             "White_Cropped_Blouse_Back",
-            lambda c: 0.842 <= c.z <= 0.985 and c.y >= -0.006 and abs(c.x) <= 0.143,
+            lambda c: 0.842 <= c.z <= 0.990 and c.y >= -0.006 and abs(c.x) <= 0.143,
             white,
-            0.0060,
+            0.0078,
         )
     )
     garments.append(
@@ -79,64 +248,99 @@ def create_outfit(
             body,
             armature,
             "White_Waist_Base",
-            lambda c: 0.705 <= c.z <= 0.792 and abs(c.x) <= 0.155,
+            lambda c: 0.708 <= c.z <= 0.795 and abs(c.x) <= 0.155,
             white,
-            0.0052,
+            0.0070,
         )
     )
 
-    outer_skirt = legacy.ring_skirt(
-        "Black_Pink_Plaid_Pleated_Skirt",
-        body,
-        armature,
-        plaid,
-        top_z=0.786,
-        bottom_z=0.625,
-        top_rx=0.148,
-        top_ry=0.106,
-        bottom_rx=0.205,
-        bottom_ry=0.148,
-        pleats=16,
+    garments.append(
+        stable_shell(
+            "Black_Pink_Plaid_Pleated_Skirt",
+            armature,
+            plaid,
+            (
+                (0.790, 0.154, 0.113),
+                (0.706, 0.180, 0.132),
+                (0.625, 0.207, 0.153),
+            ),
+            pleats=16,
+            thickness=0.0015,
+            uv_repeats=3.0,
+            fold_strength=0.020,
+        )
     )
-    underskirt = legacy.ring_skirt(
-        "White_Ruffle_Underskirt",
-        body,
-        armature,
-        white,
-        top_z=0.648,
-        bottom_z=0.585,
-        top_rx=0.187,
-        top_ry=0.134,
-        bottom_rx=0.216,
-        bottom_ry=0.156,
-        pleats=20,
-        scallop=0.008,
+    garments.append(
+        stable_shell(
+            "White_Ruffle_Underskirt",
+            armature,
+            white,
+            (
+                (0.650, 0.193, 0.142),
+                (0.595, 0.216, 0.160),
+            ),
+            pleats=20,
+            thickness=0.0013,
+            uv_repeats=2.0,
+            fold_strength=0.016,
+        )
     )
-    garments.extend((outer_skirt, underskirt))
+    garments.append(
+        stable_shell(
+            "Black_Skirt_Waistband",
+            armature,
+            black,
+            (
+                (0.795, 0.156, 0.115),
+                (0.777, 0.159, 0.117),
+            ),
+            pleats=16,
+            thickness=0.0014,
+            uv_repeats=1.0,
+            fold_strength=0.008,
+        )
+    )
+    garments.append(
+        stable_shell(
+            "Pink_Underskirt_Hem",
+            armature,
+            pink,
+            (
+                (0.605, 0.211, 0.157),
+                (0.590, 0.217, 0.161),
+            ),
+            pleats=20,
+            thickness=0.0012,
+            uv_repeats=1.0,
+            fold_strength=0.014,
+        )
+    )
 
     garments.append(
         base.extract_surface(
             body,
             armature,
             "White_Thigh_High_Stockings",
-            lambda c: 0.045 <= c.z <= 0.492 and abs(c.x) >= 0.016,
+            lambda c: 0.090 <= c.z <= 0.490 and abs(c.x) >= 0.016,
             white,
-            0.0045,
+            0.0062,
         )
     )
 
     for side_name in ("L", "R"):
         upper_start, upper_end = bone_segment(armature, f"UpperArm_{side_name}")
-        shoulder = upper_start.lerp(upper_end, 0.18)
-        puff = legacy.ellipsoid(
-            f"White_Puff_Sleeve_{side_name}",
-            tuple(shoulder),
-            (0.050, 0.046, 0.058),
-            white,
-            body,
-            armature,
+        garments.append(
+            base.extract_surface(
+                body,
+                armature,
+                f"White_Puff_Sleeve_{side_name}",
+                lambda c, a=upper_start, b=upper_end: near_segment(
+                    c, a, b, t0=0.02, t1=0.32, radius=0.072
+                ),
+                white,
+                0.0105,
+            )
         )
-        garments.append(puff)
 
         lower_start, lower_end = bone_segment(armature, f"LowerArm_{side_name}")
         garments.append(
@@ -145,120 +349,111 @@ def create_outfit(
                 armature,
                 f"White_Detached_Sleeve_{side_name}",
                 lambda c, a=lower_start, b=lower_end: near_segment(
-                    c, a, b, t0=0.10, t1=0.84, radius=0.052
+                    c, a, b, t0=0.10, t1=0.82, radius=0.050
                 ),
                 white,
-                0.0050,
+                0.0075,
             )
         )
 
-        x = -0.067 if side_name == "L" else 0.067
-        thigh_loop = base.surface_cross_section_loop(
-            body, 0.497, x - 0.043, x + 0.043, 0.005, 32
-        )
-        garments.append(
-            base.curve_tube(
-                f"Black_Thigh_Band_{side_name}",
-                thigh_loop,
-                0.0022,
-                black,
-                armature,
-                f"UpperLeg_{side_name}",
-                cyclic=True,
-            )
-        )
-        pink_loop = [(px, py - 0.001, pz - 0.010) for px, py, pz in thigh_loop]
-        garments.append(
-            base.curve_tube(
-                f"Pink_Thigh_Trim_{side_name}",
-                pink_loop,
-                0.0012,
-                pink,
-                armature,
-                f"UpperLeg_{side_name}",
-                cyclic=True,
-            )
-        )
-
-    neck_loop = base.surface_cross_section_loop(body, 1.022, -0.050, 0.050, 0.004, 40)
-    garments.append(
-        base.curve_tube(
-            "Black_Neck_Choker", neck_loop, 0.0020, black, armature, "Chest", cyclic=True
-        )
-    )
-    neck_y = base.body_front_y(body, 0.0, 0.982) - 0.010
-    garments.extend(
-        legacy.bow("Pink_Collar_Bow", (0.0, neck_y, 0.982), 0.018, pink, body, armature)
-    )
-
-    waist_loop = base.surface_cross_section_loop(body, 0.773, -0.155, 0.155, 0.006, 56)
-    garments.append(
-        base.curve_tube(
-            "Black_Waist_Harness", waist_loop, 0.0024, black, armature, "Hips", cyclic=True
-        )
-    )
-    pink_waist_loop = [(x, y - 0.001, z - 0.014) for x, y, z in waist_loop]
-    garments.append(
-        base.curve_tube(
-            "Pink_Waist_Accent",
-            pink_waist_loop,
-            0.0012,
-            pink,
-            armature,
-            "Hips",
-            cyclic=True,
-        )
-    )
-
-    for side, x in (("L", -0.145), ("R", 0.145)):
-        garments.extend(
-            legacy.bow(
-                f"Pink_Skirt_Bow_{side}",
-                (x, -0.142, 0.665),
-                0.016,
-                pink,
-                body,
-                armature,
-            )
-        )
-        garments.append(
-            base.heart_curve(
-                f"Silver_Heart_{side}",
-                (x, -0.153, 0.705),
-                0.00044,
-                silver,
-                armature,
-                "Hips",
-            )
-        )
-
-    hem_loop = base.ellipse_points((0.0, 0.0, 0.590), (0.216, 0.156), 96)
-    garments.append(
-        base.curve_tube(
-            "Pink_Underskirt_Hem", hem_loop, 0.0016, pink, armature, "Hips", cyclic=True
-        )
-    )
-
-    for obj in garments:
-        if obj.type == "MESH" and obj.parent is None:
-            legacy.finish_mesh(obj, body, armature)
+    garments.extend(chest_bow(body, armature, pink))
     return garments
 
 
+def robust_clean_meshes(objects: list[bpy.types.Object]) -> None:
+    """Remove exact zero-area geometry using the same triangle test as metrics."""
+
+    for obj in objects:
+        if obj.type != "MESH":
+            continue
+        mesh = obj.data
+        for _ in range(3):
+            bm = bmesh.new()
+            bm.from_mesh(mesh)
+            bmesh.ops.dissolve_degenerate(bm, dist=1e-8, edges=list(bm.edges))
+            zero_faces = [face for face in bm.faces if face.calc_area() <= 1e-12]
+            if zero_faces:
+                bmesh.ops.delete(bm, geom=zero_faces, context="FACES")
+            if bm.faces:
+                bmesh.ops.triangulate(bm, faces=list(bm.faces))
+            loose = [vertex for vertex in bm.verts if not vertex.link_faces]
+            if loose:
+                bmesh.ops.delete(bm, geom=loose, context="VERTS")
+            bm.to_mesh(mesh)
+            bm.free()
+            mesh.update(calc_edges=True)
+
+            mesh.calc_loop_triangles()
+            degenerate_polygons = {
+                triangle.polygon_index
+                for triangle in mesh.loop_triangles
+                if (
+                    (mesh.vertices[triangle.vertices[1]].co - mesh.vertices[triangle.vertices[0]].co)
+                    .cross(mesh.vertices[triangle.vertices[2]].co - mesh.vertices[triangle.vertices[0]].co)
+                    .length_squared
+                    <= 1e-20
+                )
+            }
+            if not degenerate_polygons:
+                break
+            cleanup = bmesh.new()
+            cleanup.from_mesh(mesh)
+            cleanup.faces.ensure_lookup_table()
+            doomed = [
+                cleanup.faces[index]
+                for index in sorted(degenerate_polygons)
+                if index < len(cleanup.faces)
+            ]
+            if doomed:
+                bmesh.ops.delete(cleanup, geom=doomed, context="FACES")
+            loose = [vertex for vertex in cleanup.verts if not vertex.link_faces]
+            if loose:
+                bmesh.ops.delete(cleanup, geom=loose, context="VERTS")
+            cleanup.to_mesh(mesh)
+            cleanup.free()
+            mesh.update(calc_edges=True)
+
+        for vertex in mesh.vertices:
+            assignments = [item for item in vertex.groups if item.weight > 1e-8]
+            total = sum(item.weight for item in assignments)
+            if total <= 0:
+                fallback = "Chest" if vertex.co.z > 0.84 else "Hips"
+                group = obj.vertex_groups.get(fallback) or obj.vertex_groups.new(name=fallback)
+                group.add([vertex.index], 1.0, "REPLACE")
+                continue
+            for item in assignments:
+                obj.vertex_groups[item.group].add([vertex.index], item.weight / total, "REPLACE")
+
+
+def strict_improve_clearance(body, garments, *, targets, movable):
+    """Increase physical clearance while preserving the strict 3 mm gate."""
+
+    return ORIGINAL_IMPROVE_CLEARANCE(
+        body,
+        garments,
+        targets=(0.0028, 0.0042, 0.0052),
+        movable=movable,
+    )
+
+
 def rewrite_handoff(job: dict, return_code: int) -> None:
-    product_root = legacy.repo_path(job["productRoot"])
-    artifact_dir = legacy.repo_path(job["artifactDir"])
+    product_root = repo_path(job["productRoot"])
+    artifact_dir = repo_path(job["artifactDir"])
     report_path = artifact_dir / "product-build-report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
     passed = bool(report.get("passed")) and return_code == 0
-    report["visualRevision"] = "v2-proportional-sleeves-soft-skirt"
+    report["visualRevision"] = "v3-stable-weighted-shell"
     report["notes"] = [
         "The tracked official SiroinoSotai PC FBX is the target source.",
         "The declared All_L, Chest_L, Hips_01_L, UpperLeg_L, and Breasts_L shape keys are verified and applied before garment extraction.",
+        "The skirt is a closed non-degenerate shell weighted to Hips; sleeves and stockings inherit official body weights.",
         "The output delivery contains only original garment assets; the shared CC0 avatar reference is outside the product payload.",
         "Five-view and pose images are actual Blender renders of this generated scene.",
     ]
-    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    report_path.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
     manifest = {
         "schemaVersion": 1,
@@ -273,7 +468,7 @@ def rewrite_handoff(job: dict, return_code: int) -> None:
         "documentationPath": f"{job['productRoot']}/README.md",
         "sourceJobPath": f"config/products/{job['id']}/job.json",
         "productBuildScript": job["productBuildScript"],
-        "designRevision": "v2-proportional-sleeves-soft-skirt",
+        "designRevision": "v3-stable-weighted-shell",
         "handoff": {
             "resumable": True,
             "canonicalWorkspace": job["productRoot"],
@@ -281,7 +476,7 @@ def rewrite_handoff(job: dict, return_code: int) -> None:
             "resumeFrom": job["productBuildScript"],
             "lastAttempt": {
                 "result": "HOSTED_MODELED" if passed else "REJECTED",
-                "visualRevision": "v2-proportional-sleeves-soft-skirt",
+                "visualRevision": "v3-stable-weighted-shell",
             },
             "blockers": [
                 "Import and save both Prefabs in pinned Unity",
@@ -314,8 +509,9 @@ def rewrite_handoff(job: dict, return_code: int) -> None:
             "poseReview": f"{job['productRoot']}/Previews/{job['id']}-pose-review.webp",
         },
     }
-    legacy.repo_path(job["productManifestPath"]).write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    repo_path(job["productManifestPath"]).write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
     )
 
     (product_root / "README.md").write_text(
@@ -323,13 +519,13 @@ def rewrite_handoff(job: dict, return_code: int) -> None:
 
 Target: **Siroino `_Large`**. The tracked official `SiroinoSotai_PC.fbx` is fitted by applying the declared official Large shape keys before garment extraction.
 
-## Visual revision v2
+## Visual revision v3
 
-- proportionally reduced shoulder puffs
-- body-fitted detached forearm sleeves instead of oversized ellipsoids
-- softer, narrower pleated mini-skirt silhouette
-- fitted waist/choker bands instead of floating wire harnesses
-- white thigh-high legwear, pink bows, and silver heart accents
+- closed, non-degenerate plaid skirt shell weighted to the pelvis
+- body-weighted shoulder and forearm sleeves for pose stability
+- ankle-safe thigh-high stockings that do not cover the feet
+- fitted black waistband and pink underskirt hem
+- compact chest bow without free-floating waist/thigh ornaments
 
 ## Outputs
 
@@ -349,9 +545,14 @@ The shared CC0 avatar reference is build input and is not part of the outfit del
 def main() -> int:
     _, job = base.load_job()
     legacy.create_outfit = create_outfit
+    legacy.clean_meshes = robust_clean_meshes
+    legacy.g.improve_clearance = strict_improve_clearance
     return_code = legacy.main()
     rewrite_handoff(job, return_code)
     return return_code
+
+
+ORIGINAL_IMPROVE_CLEARANCE = legacy.g.improve_clearance
 
 
 if __name__ == "__main__":
