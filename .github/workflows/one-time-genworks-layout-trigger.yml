@@ -1,27 +1,28 @@
-name: One-time canonical GenWorks layout trigger
+name: One-time canonical GenWorks layout PR
 
 on:
-  push:
+  pull_request:
     branches: [main]
     paths:
-      - .github/run/genworks-layout.txt
+      - .github/run/genworks-layout-pr.txt
 
 permissions:
   contents: write
 
 concurrency:
-  group: image2outfit-genworks-canonical-layout
+  group: image2outfit-genworks-canonical-layout-${{ github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
   migrate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.head_ref }}
           persist-credentials: true
           fetch-depth: 0
 
@@ -29,36 +30,28 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Pause hosted product auto-builds
+      - name: Add an explicit skip contract for repository-wide product migrations
         shell: bash
         run: |
           set -euo pipefail
-          hosted='.github/workflows/build-product-hosted.yml'
-          cp "$hosted" /tmp/build-product-hosted.original.yml
           python - <<'PY'
           from pathlib import Path
 
           path = Path('.github/workflows/build-product-hosted.yml')
           text = path.read_text(encoding='utf-8')
-          start = text.index('on:\n')
-          end = text.index('\nenv:\n', start)
-          dispatch = (
-              'on:\n'
-              '  workflow_dispatch:\n'
-              '    inputs:\n'
-              '      job_path:\n'
-              '        description: Tracked product job at config/products/<product-id>/job.json\n'
-              '        required: true\n'
-              '        type: string\n'
+          needle = '  blender:\n    runs-on: ubuntu-latest\n'
+          replacement = (
+              '  blender:\n'
+              '    if: >-\n'
+              "      github.event_name == 'workflow_dispatch' ||\n"
+              "      (github.event_name == 'pull_request' && github.head_ref != 'agent/genworks-canonical-layout') ||\n"
+              "      (github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip-hosted-product-build]'))\n"
+              '    runs-on: ubuntu-latest\n'
           )
-          path.write_text(text[:start] + dispatch + text[end:], encoding='utf-8', newline='')
+          if needle not in text:
+              raise SystemExit('Hosted Blender job anchor not found')
+          path.write_text(text.replace(needle, replacement, 1), encoding='utf-8', newline='')
           PY
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add "$hosted"
-          git commit -m 'ci: pause hosted builds for GenWorks layout migration'
-          git pull --rebase origin main
-          git push origin HEAD:main
 
       - name: Migrate and validate canonical product layout
         shell: bash
@@ -74,39 +67,22 @@ jobs:
           python tools/audit_repository_hygiene.py
           python -m unittest discover -s tests -v
           git diff --check
-          git add -A
-          git commit -m 'refactor: standardize GenWorks slug and Prefab layout'
-          git pull --rebase origin main
-          git push origin HEAD:main
 
-      - name: Restore hosted triggers and remove migration machinery
+      - name: Commit the migration and remove one-time machinery
         shell: bash
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          hosted = Path('.github/workflows/build-product-hosted.yml')
-          current = hosted.read_text(encoding='utf-8')
-          original = Path('/tmp/build-product-hosted.original.yml').read_text(encoding='utf-8')
-          current_start = current.index('on:\n')
-          current_end = current.index('\nenv:\n', current_start)
-          original_start = original.index('on:\n')
-          original_end = original.index('\nenv:\n', original_start)
-          hosted.write_text(
-              current[:current_start]
-              + original[original_start:original_end]
-              + current[current_end:],
-              encoding='utf-8',
-              newline='',
-          )
-          PY
           git rm -f \
             .github/run/genworks-layout.txt \
+            .github/run/genworks-layout-pr.txt \
             .github/workflows/one-time-genworks-canonical-layout.yml \
             .github/workflows/one-time-genworks-layout-trigger.yml \
             tools/migrate_genworks_layout_once.py
-          git add .github/workflows/build-product-hosted.yml
-          git commit -m 'chore: finalize canonical GenWorks layout migration'
-          git pull --rebase origin main
-          git push origin HEAD:main
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'refactor: standardize GenWorks slug and Prefab layout'
+          git pull --rebase origin "$HEAD_BRANCH"
+          git push origin "HEAD:$HEAD_BRANCH"
