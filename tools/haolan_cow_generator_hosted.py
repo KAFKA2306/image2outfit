@@ -6,9 +6,8 @@ import zlib
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-payload = ''.join((HERE / 'haolan_cow_payload' / f'{i:02d}.txt').read_text(encoding='ascii') for i in range(9))
-source = zlib.decompress(base64.b85decode(payload)).decode('utf-8')
-profile = (HERE / 'haolan_cow_fit_profile.b85').read_text(encoding='ascii').strip()
+payload = "".join((HERE / "haolan_cow_payload" / f"{index:02d}.txt").read_text(encoding="ascii").strip() for index in range(9))
+source = zlib.decompress(base64.b85decode(payload)).decode("utf-8")
 helper = r'''
 def _fallback_source_rig():
     import base64 as _b64, json as _json, zlib as _zl
@@ -63,10 +62,16 @@ def _fallback_source_rig():
     )
 
 '''
-source = source.replace('def main() -> int:', helper + '\ndef main() -> int:', 1)
+override_payload = (HERE / "haolan_cow_v12_overrides.b85").read_text(encoding="ascii").strip()
+overrides = zlib.decompress(base64.b85decode(override_payload)).decode("utf-8")
+source = source.replace("import zlib\n", "import zlib\nfrom datetime import datetime, timezone\n", 1)
+source = source.replace("def main() -> int:", helper + "\n" + overrides + "\n\ndef main() -> int:", 1)
 source = source.replace('parser.add_argument("--source", type=Path, required=True)', 'parser.add_argument("--source", type=Path, default=Path(__file__))', 1)
-source = source.replace('rig = load_source_rig(args.source)', 'rig = _fallback_source_rig()', 1)
+source = source.replace("rig = load_source_rig(args.source)", "rig = _fallback_source_rig()", 1)
 source = source.replace('"sourceAvatarSha256": sha256(source_path),', '"sourceAvatarSha256": "281d2c4e0df01969a89efae51d1a8e71042ca5ec2e4439886798830f06b7eb33",', 1)
-source = source.replace('abs_name = str(texture_paths[material]).replace("\\\\", "/")', 'abs_name = rel', 1)
-source = source.replace('fitted to the supplied HAOLAN source', 'fitted to the audited HAOLAN-derived fit profile')
-exec(compile(source, str(Path(__file__).resolve()), 'exec'))
+source = source.replace('abs_name = str(texture_paths[material]).replace("\\\\", "/")', "abs_name = rel", 1)
+source = source.replace("fitted to the supplied HAOLAN source", "fitted to the audited HAOLAN-derived fit profile")
+source = source.replace('"generatedAt": "2026-07-30T03:40:00Z",', '"generatedAt": datetime.now(timezone.utc).isoformat(),')
+source = source.replace("HAOLAN Cow Hood Knit Set v1.0", "HAOLAN Cow Hood Knit Set v1.2")
+source = source.replace("image2outfit HAOLAN cow hood knit set v1.0", "image2outfit HAOLAN cow hood knit set v1.2")
+exec(compile(source, str(Path(__file__).resolve()), "exec"))
