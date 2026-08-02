@@ -15,7 +15,7 @@ if str(TOOLS) not in sys.path:
 import siroino_heather_hooded_bodysuit_build as build
 import siroino_heather_hooded_pattern as pattern
 
-DESIGN_REVISION = "v7-continuous-body-derived-shells"
+DESIGN_REVISION = "v7.1-continuous-shell-fit"
 
 
 def normalize_four_influences(
@@ -70,7 +70,7 @@ def preserve_authored_weights(
     garments: list[bpy.types.Object],
     _body: bpy.types.Object,
 ) -> dict[str, object]:
-    """Do not overwrite v7 body-derived weights with a nearest-point pass."""
+    """Do not overwrite body-derived weights with a nearest-point pass."""
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
