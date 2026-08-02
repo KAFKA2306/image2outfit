@@ -1,4 +1,4 @@
-# HAOLAN Cow Hood Knit Set v1.1 — Visual Review
+# HAOLAN Cow Hood Knit Set v1.2 — Visual Review
 
 **Canonical checkpoint: PASS. Customer release: NO-GO.**
 
@@ -8,6 +8,7 @@ Fixed from Legacy:
 - rebuilt sleeves with curved centerlines, elbow drop, bell flare, gathering and shaped cuffs;
 - rebuilt the hood as a dense inner/outer shell with thickness, controlled opening, back drape and ribbed edge;
 - resized the crop top, added top/skirt hems, twelve broad skirt pleats, subdivided ears and drawstrings;
+- replaced per-triangle cow pattern shading with smooth normals and rounded continuous patches;
 - removed engineering wire edges from the review render.
 
 Static result: 24 objects, 18,394 vertices, 34,778 triangles; non-finite, degenerate, unweighted and weight-sum errors are all zero.

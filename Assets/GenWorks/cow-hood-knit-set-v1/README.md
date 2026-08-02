@@ -1,4 +1,4 @@
-# HAOLAN Cow Hood Knit Set v1.1
+# HAOLAN Cow Hood Knit Set v1.2
 
 Canonical resumable checkpoint. The old blockout remains only as evidence at `Assets/GenWorks/Legacy/Snapshots/haolan/cow-hood-knit-set-v1/`.
 

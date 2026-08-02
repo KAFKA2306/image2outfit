@@ -1,4 +1,4 @@
-# HAOLAN Cow Hood Knit Set v1.1 — Visual and Product Audit
+# HAOLAN Cow Hood Knit Set v1.2 — Visual and Product Audit
 
 ## Decision
 
