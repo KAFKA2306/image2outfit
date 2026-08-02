@@ -19,8 +19,8 @@ AUDITS = {
     "genworks": "audit_genworks_layout.py",
     "tools": "audit_tool_ownership.py",
     "research": "audit_research_baseline.py",
-    "methods": "audit_method_selection.py",
 }
+AUDIT_TARGETS = (*AUDITS, "methods")
 
 
 def _run(script: str, *arguments: str) -> int:
@@ -77,11 +77,23 @@ def _run_product(command: str, product_id: str) -> int:
     )
 
 
+def _run_method_audit() -> int:
+    report = method_selection.audit_all(ROOT)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    return 0 if report["passed"] else 1
+
+
+def _run_audit(name: str) -> int:
+    if name == "methods":
+        return _run_method_audit()
+    return _run(AUDITS[name])
+
+
 def _run_all_audits() -> int:
     failed = []
-    for name, script in AUDITS.items():
+    for name in AUDIT_TARGETS:
         print(f"\n=== audit:{name} ===", flush=True)
-        result = _run(script)
+        result = _run_audit(name)
         if result != 0:
             failed.append(name)
     if failed:
@@ -105,7 +117,7 @@ def parser() -> argparse.ArgumentParser:
         )
 
     audit = commands.add_parser("audit")
-    audit.add_argument("target", choices=(*AUDITS, "all"))
+    audit.add_argument("target", choices=(*AUDIT_TARGETS, "all"))
 
     snapshot_audit = commands.add_parser("snapshot-audit")
     snapshot_audit.add_argument("--candidate", required=True)
@@ -126,7 +138,7 @@ def main() -> int:
     if options.command == "audit":
         if options.target == "all":
             return _run_all_audits()
-        return _run(AUDITS[options.target])
+        return _run_audit(options.target)
     if options.command == "snapshot-audit":
         return _run(
             "audit_snapshot.py",
