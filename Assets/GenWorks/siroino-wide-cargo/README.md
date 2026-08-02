@@ -4,4 +4,4 @@ Original, logo-free wide cargo outfit for SiroinoSotai v1.0. The product uses se
 
 Place `Prefabs/Outfit/SiroinoWideCargo.prefab` directly under the avatar root. Modular Avatar merges the garment armature during the NDMF build.
 
-Static metrics: 19848 vertices, 38540 triangles, 3 maximum bone influences.
+Static metrics: 1168 vertices, 2040 triangles, 3 maximum bone influences.
