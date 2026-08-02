@@ -2,7 +2,7 @@ version: '3'
 
 tasks:
   candidate:
-    desc: Build a technically valid candidate. Never creates a customer release.
+    desc: Build a technically valid candidate without risking the last-good candidate or customer release.
     requires:
       vars: [JOB]
     env:
@@ -12,10 +12,10 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
-        python tools/release_gate.py --mode candidate --job "{{.JOB}}"
+        python tools/production_gate.py --mode candidate --job "{{.JOB}}"
 
   release:
-    desc: Promote an unchanged reviewed candidate to Release/ after every mandatory evidence gate passes.
+    desc: Promote an unchanged reviewed candidate only after strict customer-quality evidence passes.
     requires:
       vars: [JOB]
     env:
@@ -25,7 +25,7 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
-        python tools/release_gate.py --mode release --job "{{.JOB}}"
+        python tools/production_gate.py --mode release --job "{{.JOB}}"
 
   audit:repo:
     desc: Reject committed runtime state, product-specific global config, and self-mutating workflows.
@@ -93,11 +93,15 @@ tasks:
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
         tools/package_snapshot.py
+        tools/customer_quality.py
+        tools/production_gate.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
         tests/test_genworks_layout.py
         tests/test_snapshot_paths.py
+        tests/test_customer_quality.py
+        tests/test_production_gate.py
       - >-
         uv run --no-cache --locked --no-default-groups --group dev
         ruff format --check
@@ -106,11 +110,15 @@ tasks:
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
         tools/package_snapshot.py
+        tools/customer_quality.py
+        tools/production_gate.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
         tests/test_genworks_layout.py
         tests/test_snapshot_paths.py
+        tests/test_customer_quality.py
+        tests/test_production_gate.py
 
   format:python:
     desc: Format generic repository and GenWorks tooling.
@@ -123,8 +131,12 @@ tasks:
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
         tools/package_snapshot.py
+        tools/customer_quality.py
+        tools/production_gate.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
         tests/test_documentation_contract.py
         tests/test_genworks_layout.py
         tests/test_snapshot_paths.py
+        tests/test_customer_quality.py
+        tests/test_production_gate.py
