@@ -12,10 +12,16 @@ TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import siroino_military_sheer_romper_entry as entry  # noqa: E402
+import siroino_military_sheer_romper_build as base  # noqa: E402
 
-base = entry.base
-smooth = entry.smooth
+# Keep the smooth layer compatible with the canonical build helpers without
+# routing through a product-specific compatibility entrypoint.
+base.box = base.cube
+base.plain_material = base.simple_material
+
+import siroino_military_sheer_romper_smooth as smooth  # noqa: E402
+
+base.build_preview_body = smooth.build_preview_body
 ORIGINAL_BUILD_GARMENT = smooth.build_garment
 ORIGINAL_CONFIGURE_SCENE = smooth.configure_scene
 ORIGINAL_SHEER_MATERIAL = base.sheer_material
