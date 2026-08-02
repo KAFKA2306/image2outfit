@@ -2,6 +2,7 @@
 """Stable product entrypoint for the Siroino heather hooded bodysuit."""
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -63,10 +64,31 @@ def normalize_four_influences(
     return changed
 
 
+def enforce_manifest_contract(original):
+    """Keep generated ProductManifest compatible with the canonical v1 schema."""
+
+    def wrapped(*args, **kwargs):
+        result = original(*args, **kwargs)
+        job = args[0]
+        manifest_path = Path(__file__).resolve().parents[1] / job["productManifestPath"]
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["schemaVersion"] = 1
+        manifest_path.write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        return result
+
+    return wrapped
+
+
 def main() -> int:
     build.geometry = pattern
     build.DESIGN_REVISION = "v6-fitted-sleeves-split-hood-seam-graph"
     build.limit_bone_influences = normalize_four_influences
+    build.write_report_and_manifest = enforce_manifest_contract(
+        build.write_report_and_manifest
+    )
     return build.main()
 
 
