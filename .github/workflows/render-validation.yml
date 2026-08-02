@@ -10,10 +10,12 @@ on:
       - .github/workflows/render-validation.yml
 
 env:
-  SIROINO_RENDER_REVISION: v17-single-shell-wide-cargo-1
+  SIROINO_RENDER_REVISION: v17-single-shell-wide-cargo-2
+  STATUS_CONTEXT: render-validation/siroino-wide-cargo
 
 permissions:
-  contents: write
+  contents: read
+  statuses: write
 
 concurrency:
   group: render-validation-siroino-wide-cargo
@@ -27,21 +29,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          persist-credentials: false
 
-      - name: Publish run locator
+      - name: Publish pending commit status
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p .github/status
-          printf '{\n  "runId": %s,\n  "headSha": "%s",\n  "revision": "%s",\n  "status": "running"\n}\n' \
-            "$GITHUB_RUN_ID" "$GITHUB_SHA" "$SIROINO_RENDER_REVISION" > .github/status/render-validation.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/status/render-validation.json
-          git commit -m "Record render validation ${GITHUB_RUN_ID} start" || exit 0
-          git pull --rebase --autostash origin main
-          git push origin HEAD:main
+          python - <<'PY' > /tmp/status.json
+          import json, os
+          print(json.dumps({
+              'state': 'pending',
+              'target_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              'description': f"Run {os.environ['GITHUB_RUN_ID']} · {os.environ['SIROINO_RENDER_REVISION']}",
+              'context': os.environ['STATUS_CONTEXT'],
+          }))
+          PY
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            --data-binary @/tmp/status.json
 
       - name: Install Blender runtime
         shell: bash
@@ -100,22 +112,32 @@ jobs:
           retention-days: 30
           compression-level: 6
 
-      - name: Commit generated product when both stages pass
-        if: steps.generate.outcome == 'success' && steps.poses.outcome == 'success'
+      - name: Publish final commit status
+        if: always()
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GENERATE_OUTCOME: ${{ steps.generate.outcome }}
+          POSES_OUTCOME: ${{ steps.poses.outcome }}
         run: |
           set -euo pipefail
-          python tools/update_product_hashes.py --root Assets/GenWorks/Products/siroino-wide-cargo
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f Assets/GenWorks/Products/siroino-wide-cargo
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m "Model Siroino wide cargo outfit"
-          for attempt in 1 2 3 4 5; do
-            git pull --rebase --autostash origin main && git push origin HEAD:main && exit 0
-            sleep $((attempt * 3))
-          done
-          exit 1
+          python - <<'PY' > /tmp/status.json
+          import json, os
+          passed = os.environ['GENERATE_OUTCOME'] == 'success' and os.environ['POSES_OUTCOME'] == 'success'
+          print(json.dumps({
+              'state': 'success' if passed else 'failure',
+              'target_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              'description': f"Run {os.environ['GITHUB_RUN_ID']} · render={os.environ['GENERATE_OUTCOME']} · poses={os.environ['POSES_OUTCOME']}",
+              'context': os.environ['STATUS_CONTEXT'],
+          }))
+          PY
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            --data-binary @/tmp/status.json
 
       - name: Enforce generation result
         if: always()
