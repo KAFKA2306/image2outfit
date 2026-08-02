@@ -1,0 +1,102 @@
+name: Apply direct-main rollback patch
+
+on:
+  push:
+    branches: [fix/rollback-direct-main-push]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/rollback-direct-main-push
+          fetch-depth: 0
+      - name: Patch governance workflow and remove this transport workflow
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          target = Path('.github/workflows/branch-hygiene.yml')
+          text = target.read_text(encoding='utf-8')
+          old = '''              const message = `Direct push ${after} to ${defaultBranch} was not produced by a merged pull request.`;
+              if (dryRun) {
+                core.warning(`[dry-run] ${message}`);
+                return false;
+              }
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title: `Direct push detected on ${defaultBranch}: ${after.slice(0, 12)}`,
+                body: [
+                  "<!-- pr-governance:direct-push -->",
+                  message,
+                  `Previous SHA: \\`${before}\\``,
+                  `Actor: \\`${context.actor}\\``,
+                  "Enable a GitHub branch ruleset requiring pull requests and the Release policy tests check to block this before the ref moves.",
+                ].join("\\n\\n"),
+              });
+              core.setFailed(message);
+              return true;
+'''
+          new = '''              const trustedBeforePulls = await github.paginate(
+                github.rest.repos.listPullRequestsAssociatedWithCommit,
+                { owner, repo, commit_sha: before, per_page: 100 },
+              );
+              const trustedBefore = trustedBeforePulls.some(pr =>
+                Boolean(pr.merged_at) && pr.base?.ref === defaultBranch && pr.merge_commit_sha === before,
+              );
+
+              const message = `Direct push ${after} to ${defaultBranch} was not produced by a merged pull request.`;
+              if (dryRun) {
+                core.warning(`[dry-run] ${message}`);
+                return false;
+              }
+
+              let restored = false;
+              if (trustedBefore) {
+                await github.request("PATCH /repos/{owner}/{repo}/git/refs/{ref}", {
+                  owner,
+                  repo,
+                  ref: `heads/${defaultBranch}`,
+                  sha: before,
+                  force: true,
+                });
+                restored = true;
+                core.notice(`Restored ${defaultBranch} from ${after} to trusted merge commit ${before}`);
+              } else {
+                core.error(`Ref restoration skipped because ${before} is not a verified merge commit for ${defaultBranch}`);
+              }
+
+              await github.rest.issues.create({
+                owner,
+                repo,
+                title: `Direct push detected on ${defaultBranch}: ${after.slice(0, 12)}`,
+                body: [
+                  "<!-- pr-governance:direct-push -->",
+                  message,
+                  `Previous SHA: \\`${before}\\``,
+                  `Actor: \\`${context.actor}\\``,
+                  restored
+                    ? `The default branch ref was automatically restored to verified merge commit \\`${before}\\`.`
+                    : "Automatic restoration was skipped because the previous SHA could not be verified as a merged pull request commit.",
+                  "A GitHub ruleset requiring pull requests and Release policy tests remains the preferred pre-receive control.",
+                ].join("\\n\\n"),
+              });
+              core.setFailed(`${message} ${restored ? "The ref was restored." : "Manual recovery is required."}`);
+              return true;
+'''
+          if text.count(old) != 1:
+              raise SystemExit(f'expected exactly one guard block, found {text.count(old)}')
+          target.write_text(text.replace(old, new, 1), encoding='utf-8')
+          Path('.github/workflows/patch-direct-main-rollback.yml').unlink()
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add .github/workflows/branch-hygiene.yml .github/workflows/patch-direct-main-rollback.yml
+          git commit -m "fix: automatically restore unauthorized main pushes"
+          git push origin HEAD:fix/rollback-direct-main-push
