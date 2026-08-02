@@ -1,99 +1,105 @@
 # image2outfit — VRChat衣装の再現可能な制作・納品パイプライン
 
-**リポジトリ:** https://github.com/KAFKA2306/image2outfit
+image2outfitは、衣装の仕様からBlender、FBX、Unity Prefab、プレビュー、レビュー証拠、リリースまでを再現可能に管理するUnityプロジェクトです。
 
-image2outfitは、参考画像からVRChatアバター向け衣装を制作し、Blender、Unity、VRChatでの検証証拠をそろえてから納品候補へ進めるためのパイプラインです。
+メッシュやPrefabが存在するだけでは完成扱いにしません。構造、見た目、ポーズ貫通、VRChat実動作、人間レビューを別々のゲートとして記録し、同一候補のハッシュへ結び付けます。
 
-メッシュが生成できた、FBXが読み込めた、Prefabが存在するというだけでは完成扱いにしません。見た目、身体へのフィット、ポーズ時の貫通、VRChat内動作、人間による確認までを別々のゲートとして記録します。
-
-## 現在の状態
-
-- 再現可能なBlender → FBX → Unity Prefab候補生成を実装
-- Blender Python環境とVPM依存関係を固定・監査
-- SiroinoSotaiのCC0アセットを用いた衣装候補生成を追加
-- 正面、背面、左右、斜めの5方向プレビューを必須化
-- 候補ファイルとレビュー証拠をハッシュで固定
-- 技術検証だけでは自動的に販売・リリース判定へ進まない
-- 制作物の正規ルートを`Assets/GenWorks/`へ統一
-- Unity内の`GenWorks > Product Catalog`から製品、Prefab、統合確認Prefab、プレビュー、文書へ直接移動可能
-- 既存ローカルjobの成果物と`.meta`をGenWorksへ移す移行ツールを追加
-- 履歴スナップショットを`Assets/GenWorks/Legacy/Snapshots/`へ統一し、Unityから直接検証可能にする
-- 旧`Published/`および`Assets/GenWorks/Legacy/Published/`の再作成をCIで禁止
-
-`config/release-policy.json`はアバターごとの主要対象を固定せず、禁止対象と共通リリース条件だけを定義します。`haolan-v1.6`はリリース禁止対象であり、現時点では過去候補の研究・監査用途に限定します。制作対象は各job v2の`adapterId`で明示します。
-
-## Assets/GenWorks
-
-Unityで開発者と購入者が迷わないよう、販売対象、統合確認用、制作ソース、プレビュー、検証コードを製品単位で分離します。
+## 境界
 
 ```text
+config/
+  job.schema.v2.json
+  release-policy.json
+  genworks-layout.json
+  toolchain-lock.json
+  blender-python-requirements.txt
+  products/
+    <product-id>/
+      job.json
+      license.json
+
 Assets/GenWorks/
-  Products/
-    <product-slug>/
-      ProductManifest.json
-      README.md
-      Source/Blender/
-      Models/
-      Textures/
-      Materials/
-      Prefabs/
-        Outfit/
-        Integrated/<target-avatar>/
-      Previews/
-      Demo/
-      Editor/
-      Tests/
-      Documentation/
+  Products/<product-id>/
   Shared/
-    Editor/
-    Materials/
-    Shaders/
-    Templates/
-    Validation/
-  Legacy/
-    Snapshots/
-      LegacyManifest.json
-      <historical snapshots>/
+  Legacy/Snapshots/
+
+examples/
+  review-approval.json
 ```
 
-新規製品は`ProductManifest.json`を持ち、製品内の主要アセットをUnityカタログへ公開します。購入・非公開アバター本体、ライセンス証拠、ローカルjob、キャッシュは製品フォルダへ混入させません。
+- `config/`直下には全製品共通の契約だけを置きます。
+- 製品固有のjobとライセンス証拠は`config/products/<product-id>/`へ分離します。
+- 現行製品アセットは`Assets/GenWorks/Products/<product-id>/`へ置きます。
+- 共通Unity Editorコードは`Assets/GenWorks/Shared/Editor/`へ置きます。
+- 過去候補は`Assets/GenWorks/Legacy/Snapshots/`に限定し、自動的に販売対象へ昇格させません。
+- 非公開アバター、ローカルjob、人間レビュー証拠、キャッシュは`Assets/_Local/`、`Assets/_Vendor/`、`Assets/_Reference/`へ置き、Git管理しません。
+- GitHub Actionsの実行状態、トリガーマーカー、生成途中の成果物を`main`へコミットしません。
 
-`Assets/GenWorks/Legacy/Snapshots/`はUnityから過去のFBX、Prefab、テクスチャ、プレビュー、監査証拠を確認するための唯一の履歴領域です。現行製品カタログには登録せず、販売可能判定へ自動昇格させません。
+## 基本操作
 
-既存jobの移行計画を確認します。
+リポジトリ全体の残骸と境界違反を監査します。
 
 ```powershell
-task migrate:genworks
+task audit:repo
 ```
 
-確認後に移行します。アセットとUnityの`.meta`を一緒に移動し、jobパスと製品manifestを更新します。
-
-```powershell
-task migrate:genworks:apply
-```
-
-構造監査:
+GenWorks配置を監査します。
 
 ```powershell
 task audit:genworks
 ```
 
-詳細は[docs/GENWORKS_LAYOUT.md](docs/GENWORKS_LAYOUT.md)を参照してください。
+追跡済み製品jobから候補を作ります。
+
+```powershell
+task candidate JOB=config/products/<product-id>/job.json
+```
+
+ローカル専用jobも同じコマンドで扱います。
+
+```powershell
+task candidate JOB=Assets/_Local/Jobs/<job-id>/job.json
+```
+
+技術検証に成功しても判定は`REVIEW_REQUIRED`で、`Release/`は生成しません。人間レビュー証拠を同一candidate manifest hashへ結び付けた後、変更されていない候補を昇格します。
+
+```powershell
+task release JOB=<same-job-path>
+```
+
+既存ローカルjobの移行は保守タスクとして明示的に実行します。
+
+```powershell
+task maintenance:migrate:genworks
+task maintenance:migrate:genworks:apply
+```
+
+任意の履歴スナップショットを監査・再パッケージできます。
+
+```powershell
+task audit:snapshot SNAPSHOT=<snapshot-path> SOURCE=<local-source-path>
+task package:snapshot SNAPSHOT=<snapshot-path>
+```
+
+## GitHub Actions
+
+- `Build product with hosted Blender`は`config/products/<product-id>/job.json`を入力として、製品名をハードコードせずBlender生成とプレビューを実行します。
+- 生成物はActions artifactへ保存し、workflow自身は`main`を変更しません。
+- Unity、ローカルアバター、VRChat検証が必要な場合はself-hosted candidate/release workflowを使います。
+- policy workflowはPython、JSON契約、ツールチェーン、GenWorks配置、リポジトリ衛生、unit testsを横断検証します。
 
 ## リリース条件
 
-衣装を`GO / RELEASED`へ進めるには、少なくとも次をすべて満たす必要があります。
+`GO / RELEASED`には少なくとも次が必要です。
 
-1. 対象アバター本体と利用許諾の証拠がローカルに存在する
-2. Blenderで編集可能な`.blend`と構造エラーのないFBXを生成できる
-3. Unity 2022.3.22f1でFBXを読み込み、対象アバターとの統合を検証できる
-4. 1024×1024以上の5方向プレビューがある
-5. 人間がシルエット、フィット、素材表現、見栄えを承認する
-6. 通常、腕上げ、腕組み、しゃがみ、座り、伏せで重大な貫通がない
-7. VRChat SDK Build & TestとVRChatクライアント内確認を通過する
-8. すべてのレビューが同一候補のmanifest hashへ結び付いている
-
-## 状態遷移
+1. 対象アバターと権利証拠
+2. 編集可能なBlendと構造エラーのないFBX
+3. 固定Unity環境でのImport・Prefab統合
+4. 1024×1024以上の正面、背面、左右、斜めプレビュー
+5. シルエット、フィット、素材、提示品質の人間承認
+6. neutral、arms-up、arm-cross、crouch、sit、proneで重大な貫通なし
+7. VRChat SDK Build & Testとクライアント内確認
+8. 全証拠とcandidate manifestのハッシュ一致
 
 ```text
 SPECIFIED
@@ -106,74 +112,20 @@ SPECIFIED
   → GO / RELEASED
 ```
 
-失敗または証拠不足がある場合は`NO-GO`です。`TECHNICAL_PASS`から`GO`へ自動昇格する経路はありません。
+証拠不足、権利不明、候補変更、重大な貫通、Import・runtime失敗は`NO-GO`です。
 
-## 固定ツールチェーン
+## 主な契約と証拠
 
-`config/toolchain-lock.json`で次を固定します。
-
-- Blender 4.4.3
-- Blender Python 3.11.11
-- Pillow 12.3.0
-- Unity 2022.3.22f1
-- VRChat SDK 3.10.4
-- Modular Avatar 1.17.1
-- NDMF 1.14.1
-- Avatar Optimizer 1.9.16
-
-検証:
-
-```bash
-python tools/audit_toolchain.py
-```
-
-詳細は[docs/TOOLCHAIN.md](docs/TOOLCHAIN.md)を参照してください。
-
-## 1. 納品候補を作る
-
-```powershell
-task candidate JOB=Assets/_Local/Jobs/<job-id>/job.json
-```
-
-この処理はBlender・Unityの静的検証、5方向プレビュー、`deliveryAssets`の明示的な収集、候補manifestの生成を行います。
-
-技術検証が成功しても判定は`REVIEW_REQUIRED`です。`Release/`には書き込みません。
-
-## 2. レビュー済み候補をリリースする
-
-```powershell
-task release JOB=Assets/_Local/Jobs/<job-id>/job.json
-```
-
-再ビルドは行わず、レビュー済み候補、入力ファイル、証拠ファイルのハッシュが変わっていないことを確認します。判定が`GO`の場合だけ`Release/<job-id>/`とZIPを生成します。
-
-## 権利と秘密情報の分離
-
-購入・非公開アバターやライセンス対象データは、Git管理外の次のようなローカル領域に保持します。
-
-```text
-Assets/_Local/
-Assets/_Vendor/
-Assets/PochibyKT/
-Assets/HAOLAN_Quest/
-```
-
-納品対象はjob内の`deliveryAssets`へ明示的に列挙します。非公開ルート配下のファイルを納品物へ混入させると検証に失敗します。
-
-## 証拠ファイル
-
-- `Artifacts/<job-id>/audit.json` — 現在の判定と各ゲート結果
+- `config/job.schema.v2.json` — job必須フィールドの唯一の情報源
+- `config/products/<product-id>/job.json` — 製品固有の生成・検証・納品定義
+- `config/release-policy.json` — 共通リリース条件
+- `config/genworks-layout.json` — Unity可視アセット配置
+- `tools/release_gate.py` — candidate／review／release境界
+- `tools/audit_repository_hygiene.py` — 残骸と汎用性違反の再発防止
+- `Artifacts/<job-id>/audit.json` — 現在の判定
 - `Candidates/<job-id>/candidate-manifest.json` — 候補の入力・出力・ハッシュ
 - `Release/<job-id>/release-manifest.json` — GO後の変更不能な記録
-- `Assets/GenWorks/Products/<product-slug>/ProductManifest.json` — Unity製品カタログ
-- `Assets/GenWorks/Legacy/Snapshots/LegacyManifest.json` — Unity可視の履歴スナップショット境界
-- `docs/GENWORKS_LAYOUT.md` — Unityアセット配置と移行仕様
-- `config/job.schema.v2.json` — job定義と必須フィールドの唯一の情報源
-- `config/genworks-layout.json` — GenWorks配置契約
-- `config/release-policy.json` — 免除できないリリース条件
-- `tools/release_gate.py` — 人間レビュー証拠、候補hash、リリース昇格の実装
-- `ontology/project.yaml` — 制作・観測・判断の証拠モデル
 
-`Assets/GenWorks/Legacy/Snapshots/`配下のファイルは過去のスナップショットであり、新しい顧客向けリリースではありません。既存のローカルjob成果物は`task migrate:genworks:apply`でUnity可視の製品構造へ移行します。
+詳細は[GenWorks配置仕様](docs/GENWORKS_LAYOUT.md)と[固定ツールチェーン](docs/TOOLCHAIN.md)を参照してください。
 
 **README最終監査:** 2026-08-02
