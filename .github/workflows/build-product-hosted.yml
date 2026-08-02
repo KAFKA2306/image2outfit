@@ -29,7 +29,7 @@ permissions:
 
 concurrency:
   group: image2outfit-hosted-${{ inputs.job_path || github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   blender:
