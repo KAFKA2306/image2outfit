@@ -19,139 +19,77 @@ import siroino_heather_hooded_materials as materials
 import siroino_strappy_knit_build as base
 
 ROOT = Path(__file__).resolve().parents[1]
-DESIGN_REVISION = "v3-body-weighted-fitted-sleeves"
-
-
-def shrink_around_segment(
-    obj: bpy.types.Object,
-    start,
-    end,
-    scale: float,
-) -> None:
-    direction = end - start
-    denominator = max(direction.length_squared, 1e-12)
-    inverse = obj.matrix_world.inverted()
-    for vertex in obj.data.vertices:
-        world = obj.matrix_world @ vertex.co
-        t = max(0.0, min(1.0, (world - start).dot(direction) / denominator))
-        center = start + direction * t
-        vertex.co = inverse @ (center + (world - center) * scale)
-    obj.data.update(calc_edges=True)
+DESIGN_REVISION = "v4-continuous-sleeve-draped-hood"
 
 
 def rebind_dynamic_parts(
     garments: list[bpy.types.Object],
     body: bpy.types.Object,
-    armature: bpy.types.Object,
 ) -> dict[str, object]:
-    by_name = {obj.name: obj for obj in garments}
-    rebound: list[str] = []
-    for side in ("L", "R"):
-        upper_start, upper_end = geometry.bone_segment(
-            armature, f"UpperArm_{side}"
-        )
-        lower_start, lower_end = geometry.bone_segment(
-            armature, f"LowerArm_{side}"
-        )
-        targets = [
-            (f"Heather_Upper_Sleeve_{side}", upper_start, upper_end, 0.78),
-            (f"Heather_Lower_Sleeve_{side}", lower_start, lower_end, 0.80),
-            (f"Heather_Rib_Cuff_{side}", lower_start, lower_end, 0.82),
-        ]
-        for name, start, end, scale in targets:
-            obj = by_name[name]
-            shrink_around_segment(obj, start, end, scale)
+    prefixes = (
+        "Heather_Long_Sleeve_",
+        "Heather_Rib_Cuff_",
+        "Heather_Hood_Cowl",
+        "Heather_Hood_Back_Drape",
+    )
+    rebound = []
+    for obj in garments:
+        if obj.type == "MESH" and obj.name.startswith(prefixes):
             base.transfer_nearest_body_weights(obj, body)
-            rebound.append(name)
-    hood = by_name["Heather_Folded_Hood"]
-    base.transfer_nearest_body_weights(hood, body)
-    bpy.context.view_layer.objects.active = hood
-    hood.select_set(True)
-    subdivision = hood.modifiers.new("Folded hood smoothing", "SUBSURF")
-    subdivision.subdivision_type = "CATMULL_CLARK"
-    subdivision.levels = 1
-    subdivision.render_levels = 1
-    bpy.ops.object.modifier_apply(modifier=subdivision.name)
-    hood.select_set(False)
-    rebound.append(hood.name)
+            rebound.append(obj.name)
     return {
         "objects": rebound,
         "weightSource": "nearest tracked SiroinoSotai_PC body vertices",
-        "sleeveRadiusScale": {
-            "upper": 0.78,
-            "lower": 0.80,
-            "cuff": 0.82,
-        },
     }
 
 
-def main() -> int:
-    _, job = base.load_job()
-    base.clean_scene()
-    source = base.repo_path(job["targetSourcePath"])
-    product_root = base.repo_path(job["productRoot"])
-    blend_path = base.repo_path(job["blendPath"])
-    fbx_path = base.repo_path(job["fbxAssetPath"])
-    prefab_path = base.repo_path(job["prefabAssetPath"])
+def limit_bone_influences(
+    objects: list[bpy.types.Object],
+    maximum: int = 4,
+) -> dict[str, int]:
+    pruned: dict[str, int] = {}
+    for obj in objects:
+        if obj.type != "MESH":
+            continue
+        affected = 0
+        for vertex in obj.data.vertices:
+            assignments = [
+                (obj.vertex_groups[item.group].name, float(item.weight))
+                for item in vertex.groups
+                if item.weight > 1e-8
+            ]
+            if len(assignments) <= maximum:
+                continue
+            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[:maximum]
+            total = sum(weight for _, weight in ranked) or 1.0
+            for group_name, _ in assignments:
+                obj.vertex_groups[group_name].remove([vertex.index])
+            for group_name, weight in ranked:
+                obj.vertex_groups[group_name].add(
+                    [vertex.index], weight / total, "REPLACE"
+                )
+            affected += 1
+        pruned[obj.name] = affected
+    return pruned
+
+
+def write_report_and_manifest(
+    job: dict,
+    source: Path,
+    product_root: Path,
+    previews: dict[str, Path],
+    multiview: Path,
+    measured: dict,
+    cleanup: dict,
+    dynamic_rebind: dict,
+    influence_pruning: dict,
+    shape_keys_added: dict,
+    pattern_path: Path,
+    research_path: Path,
+    passed: bool,
+) -> None:
     report_dir = ROOT / ".image2outfit" / "products" / job["id"] / "reports"
-    product_root.mkdir(parents=True, exist_ok=True)
     report_dir.mkdir(parents=True, exist_ok=True)
-
-    bpy.ops.import_scene.fbx(filepath=str(source), use_anim=False)
-    body = next(
-        obj
-        for obj in bpy.context.scene.objects
-        if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
-    )
-    armature = next(
-        obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"
-    )
-    armature.name = "SiroinoSotai_Armature"
-    if body.data.shape_keys:
-        for key in body.data.shape_keys.key_blocks:
-            key.value = 0.0
-    bpy.context.view_layer.update()
-    base.set_skin_material(body)
-
-    _, fabric, trim, buttons = materials.create_materials(product_root / "Textures")
-    garments = geometry.create_outfit(body, armature, fabric, trim, buttons)
-    dynamic_rebind = rebind_dynamic_parts(garments, body, armature)
-    cleanup = geometry.clean_meshes(garments)
-    shape_keys_added = {
-        obj.name: base.add_nearest_shape_keys(obj, body)
-        for obj in garments
-        if obj.type == "MESH"
-    }
-    pattern_path, research_path = evidence.write_pattern_and_research(product_root)
-
-    blend_path.parent.mkdir(parents=True, exist_ok=True)
-    bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
-    _, camera = base.studio_setup()
-    base.preview_pose(armature)
-    previews = {
-        name: base.repo_path(value) for name, value in job["previewPaths"].items()
-    }
-    base.render_views(camera, previews)
-    multiview = product_root / "Previews" / f"{job['id']}-multiview.webp"
-    base.contact_sheet(previews, multiview)
-
-    base.reset_pose(armature)
-    body.hide_render = True
-    base.export_fbx(fbx_path, armature, garments)
-    sidecars = base.write_unity_sidecars(
-        fbx_path, prefab_path, job["productName"]
-    )
-    evidence.write_integrated_prefab(job, sidecars)
-    measured = base.metrics(garments)
-    passed = (
-        measured["meshObjects"] >= 12
-        and measured["vertices"] > 2500
-        and measured["triangles"] > 3500
-        and measured["unweightedVertices"] == 0
-        and measured["weightSumErrors"] == 0
-        and measured["degenerateTriangles"] == 0
-        and measured["maxBoneInfluences"] <= 4
-    )
     report = {
         "schemaVersion": 1,
         "passed": passed,
@@ -163,6 +101,7 @@ def main() -> int:
         "targetSourceSha256": base.sha256(source),
         "metrics": measured,
         "dynamicRebind": dynamic_rebind,
+        "influencePruning": influence_pruning,
         "meshCleanup": cleanup,
         "shapeKeysAdded": shape_keys_added,
         "researchTrial": {
@@ -180,11 +119,26 @@ def main() -> int:
             }
             for name, path in previews.items()
         },
+        "rejectedHistory": [
+            {
+                "revision": "v1-body-extracted-sleeves",
+                "reason": "oversized hood, sleeve spikes and split crotch silhouette",
+            },
+            {
+                "revision": "v2-manual-segmented-sleeves",
+                "reason": "sleeves remained detached in rest-pose space",
+            },
+            {
+                "revision": "v3-body-weighted-fitted-sleeves",
+                "reason": "elbow gaps, lateral hood wings and bifurcated lower panel",
+            },
+        ],
         "notes": [
             "The garment is fitted to the tracked SiroinoSotai_PC FBX.",
-            "The first body-extracted sleeve candidate was rejected for spikes.",
-            "The second manual-bone sleeve candidate was rejected because it remained in rest-pose space.",
-            "The current sleeve and hood geometry is rebound to exact nearest SiroinoSotai_PC body weights.",
+            "Sleeves are continuous shoulder-to-wrist tubes with overlapping rib cuffs.",
+            "The hood is a compact cowl plus a back drape rather than a lateral shell.",
+            "The lower front and back are continuous sampled body-surface panels.",
+            "All exported vertices are limited to four normalized bone influences.",
             "Five views are actual Blender Cycles renders of generated geometry.",
             "The DMap neural model was not executed; only its explicit pattern-coordinate principle was trialed.",
             "Unity and runtime review remain pending.",
@@ -229,12 +183,15 @@ def main() -> int:
         "technicalGates": {
             "standardTargetResolved": "PASS",
             "blender": "PASS" if passed else "FAIL",
-            "fbx": "PASS" if fbx_path.is_file() else "FAIL",
+            "fbx": "PASS" if base.repo_path(job["fbxAssetPath"]).is_file() else "FAIL",
             "fiveViewRender": (
                 "PASS" if all(path.is_file() for path in previews.values()) else "FAIL"
             ),
             "poseRender": "PENDING",
             "patternCoordinateTrial": "PASS",
+            "fourInfluenceLimit": (
+                "PASS" if measured["maxBoneInfluences"] <= 4 else "FAIL"
+            ),
             "unityImport": "PENDING",
             "prefabSerialized": "PENDING",
             "prefabReload": "PENDING",
@@ -250,18 +207,98 @@ def main() -> int:
             "prefab": job["prefabAssetPath"],
             "integratedPrefab": job["integratedPrefabAssetPath"],
             "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"),
-            "poseReview": (
-                f"{job['productRoot']}/Previews/{job['id']}-pose-review.webp"
-            ),
+            "poseReview": f"{job['productRoot']}/Previews/{job['id']}-pose-review.webp",
         },
         "research": report["researchTrial"],
         "metrics": measured,
         "dynamicRebind": dynamic_rebind,
+        "influencePruning": influence_pruning,
         "meshCleanup": cleanup,
     }
     base.repo_path(job["productManifestPath"]).write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
+    )
+
+
+def main() -> int:
+    _, job = base.load_job()
+    base.clean_scene()
+    source = base.repo_path(job["targetSourcePath"])
+    product_root = base.repo_path(job["productRoot"])
+    blend_path = base.repo_path(job["blendPath"])
+    fbx_path = base.repo_path(job["fbxAssetPath"])
+    prefab_path = base.repo_path(job["prefabAssetPath"])
+    product_root.mkdir(parents=True, exist_ok=True)
+
+    bpy.ops.import_scene.fbx(filepath=str(source), use_anim=False)
+    body = next(
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
+    )
+    armature = next(
+        obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"
+    )
+    armature.name = "SiroinoSotai_Armature"
+    if body.data.shape_keys:
+        for key in body.data.shape_keys.key_blocks:
+            key.value = 0.0
+    bpy.context.view_layer.update()
+    base.set_skin_material(body)
+
+    _, fabric, trim, buttons = materials.create_materials(product_root / "Textures")
+    garments = geometry.create_outfit(body, armature, fabric, trim, buttons)
+    dynamic_rebind = rebind_dynamic_parts(garments, body)
+    cleanup = geometry.clean_meshes(garments)
+    influence_pruning = limit_bone_influences(garments, 4)
+    shape_keys_added = {
+        obj.name: base.add_nearest_shape_keys(obj, body)
+        for obj in garments
+        if obj.type == "MESH"
+    }
+    pattern_path, research_path = evidence.write_pattern_and_research(product_root)
+
+    blend_path.parent.mkdir(parents=True, exist_ok=True)
+    bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
+    _, camera = base.studio_setup()
+    base.preview_pose(armature)
+    previews = {
+        name: base.repo_path(value) for name, value in job["previewPaths"].items()
+    }
+    base.render_views(camera, previews)
+    multiview = product_root / "Previews" / f"{job['id']}-multiview.webp"
+    base.contact_sheet(previews, multiview)
+
+    base.reset_pose(armature)
+    body.hide_render = True
+    base.export_fbx(fbx_path, armature, garments)
+    sidecars = base.write_unity_sidecars(fbx_path, prefab_path, job["productName"])
+    evidence.write_integrated_prefab(job, sidecars)
+    measured = base.metrics(garments)
+    passed = (
+        measured["meshObjects"] >= 12
+        and measured["vertices"] > 2500
+        and measured["triangles"] > 3500
+        and measured["unweightedVertices"] == 0
+        and measured["weightSumErrors"] == 0
+        and measured["degenerateTriangles"] == 0
+        and measured["maxBoneInfluences"] <= 4
+    )
+    write_report_and_manifest(
+        job,
+        source,
+        product_root,
+        previews,
+        multiview,
+        measured,
+        cleanup,
+        dynamic_rebind,
+        influence_pruning,
+        shape_keys_added,
+        pattern_path,
+        research_path,
+        passed,
     )
     tracked_files = sorted(
         path
@@ -276,7 +313,17 @@ def main() -> int:
         + "\n",
         encoding="utf-8",
     )
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            {
+                "passed": passed,
+                "designRevision": DESIGN_REVISION,
+                "metrics": measured,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
     return 0 if passed else 2
 
 
