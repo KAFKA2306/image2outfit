@@ -3,6 +3,10 @@ name: Release policy tests
 on:
   pull_request:
     paths:
+      - README.md
+      - AGENTS.md
+      - docs/**
+      - .github/AGENTS.md
       - tools/**
       - tests/**
       - config/**
@@ -16,6 +20,10 @@ on:
   push:
     branches: [main]
     paths:
+      - README.md
+      - AGENTS.md
+      - docs/**
+      - .github/AGENTS.md
       - tools/**
       - tests/**
       - config/**

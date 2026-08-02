@@ -18,7 +18,6 @@ ACTIVE_PATH_FILES = (
     ROOT / "Taskfile.yml",
     ROOT / "README.md",
     ROOT / "AGENTS.md",
-    ROOT / "docs/GENWORKS_LAYOUT.md",
     ROOT / "tools/audit_snapshot.py",
     ROOT / "tools/package_snapshot.py",
 )

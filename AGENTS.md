@@ -7,9 +7,20 @@ This repository is both a working Unity project and an auditable, resumable garm
 - The user request defines the product goal, target avatar, visual intent, and required deliverables.
 - `config/job.schema.v2.json` defines the job contract.
 - `config/genworks-handoff-policy.json` defines lifecycle and handoff requirements.
+- `config/genworks-layout.json` defines the canonical Unity-visible layout.
+- `config/toolchain-lock.json` defines exact supported tool versions and their official sources.
 - `config/products/<slug>/job.json` and `license.json` define each tracked product.
 - `Assets/GenWorks/OutfitCatalog.json` must reconcile configured products with their canonical workspaces.
 - Common automation must remain product-neutral. Product-specific implementation needed to reproduce or continue a checkpoint is valid repository state when it is referenced by the job or manifest; do not delete it merely because it is product-specific.
+
+## Documentation ownership
+
+Repository-wide prose has exactly two owners:
+
+- `README.md` contains user and developer orientation, commands, layout, toolchain summary, and release requirements.
+- this root `AGENTS.md` contains agent execution, quality, handoff, Git, and automation rules.
+
+Do not create a repository-level `docs/` tree, nested `AGENTS.md`, `.github/AGENTS.md`, workflow operating manuals, or another general policy document. Product-specific instructions and current state belong beside the product in `Assets/GenWorks/<slug>/README.md` and `ProductManifest.json`. Machine-readable configuration and executable checks remain authoritative; prose must summarize them rather than fork their values. When guidance changes, update the owning root document, repair references and tests, and delete the superseded document in the same change.
 
 ## Canonical product workspace
 
@@ -125,6 +136,7 @@ Do not use "complete", "finished", "production-ready", or equivalent language un
 
 ## GitHub Actions and automation
 
+- `.github/` contains reusable workflows and GitHub metadata, not a second policy hierarchy.
 - Build and validation workflows should use the minimum required permissions; read-only workflows use `contents: read`.
 - CI may upload generated products and evidence as artifacts, but artifacts must never be the only copy of resumable work.
 - CI must not commit telemetry, run status, trigger markers, or mutable workflow state to `main`.
@@ -134,6 +146,6 @@ Do not use "complete", "finished", "production-ready", or equivalent language un
 
 ## Repository hygiene
 
-`tools/audit_repository_hygiene.py` is authoritative for repository residue, and `tools/audit_genworks_layout.py` is authoritative for the canonical product layout. Fix their findings rather than weakening them.
+`tools/audit_repository_hygiene.py` is authoritative for operational residue, and `tools/audit_genworks_layout.py` is authoritative for the canonical product layout. Unit tests enforce the two-document repository policy and other contracts. Fix findings rather than weakening the checks.
 
-The repository must remain understandable from `main`: canonical product work under `Assets/GenWorks/<slug>/`, declared jobs under `config/products/<slug>/`, no hidden artifact-only handoff, no lost intermediate work, no false completion claim, and no abandoned branch.
+The repository must remain understandable from `main`: canonical product work under `Assets/GenWorks/<slug>/`, declared jobs under `config/products/<slug>/`, no hidden artifact-only handoff, no lost intermediate work, no duplicate policy tree, no false completion claim, and no abandoned branch.
