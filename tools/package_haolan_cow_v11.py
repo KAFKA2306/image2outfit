@@ -35,7 +35,8 @@ def main() -> int:
         "HAOLAN_CowHoodKnitSet.prefab.meta": "Prefab/HAOLAN_CowHoodKnitSet.prefab.meta",
         "Preview/front.png": "Previews/front.png",
         "Preview/back.png": "Previews/back.png",
-        "Preview/side.png": "Previews/side.png",
+        "Preview/left.png": "Previews/left.png",
+        "Preview/right.png": "Previews/right.png",
         "Preview/three_quarter.png": "Previews/three_quarter.png",
         "HAOLAN_CowHoodKnitSet_preview.webp": "Previews/cow-hood-knit-set-v1-multiview.webp",
     }
@@ -54,8 +55,8 @@ def main() -> int:
         raise RuntimeError(f"static validation failed: {static}")
     now = datetime.now(timezone.utc).isoformat()
     previews = {k: f"{ROOT}/Previews/{v}" for k, v in {
-        "front":"front.png", "back":"back.png", "side":"side.png",
-        "threeQuarter":"three_quarter.png", "multiview":"cow-hood-knit-set-v1-multiview.webp"}.items()}
+        "front":"front.png", "back":"back.png", "left":"left.png", "right":"right.png",
+        "three-quarter":"three_quarter.png"}.items()}
     manifest = {
         "schemaVersion":1, "productId":PID, "productName":NAME, "version":"1.1",
         "status":"WORKING", "classification":"PARTIAL_CHECKPOINT", "targetAvatar":"HAOLAN Lowpoly",
@@ -63,8 +64,14 @@ def main() -> int:
         "modelPath":f"{ROOT}/Models/HAOLAN_CowHoodKnitSet.fbx", "prefabPath":PREFAB,
         "previewPaths":previews,
         "metrics":{k:metrics[k] for k in ("meshObjects","vertices","triangles","materials","bones","maxBoneInfluences")},
+        "handoff":{"resumable":True,"canonicalWorkspace":ROOT,"doNotRebuildFromZero":True,
+            "resumeFrom":"ProductManifest.json and audit.json"},
+        "technicalGates":{"blender":"NOT_RUN","fbx":"PASS","unityImport":"NOT_RUN","prefabSerialized":"PASS",
+            "prefabReload":"NOT_RUN","modularAvatar":"NOT_RUN","humanVisualReview":"PASS",
+            "humanPoseReview":"NOT_RUN","humanRuntimeReview":"NOT_RUN"},
         "qualityGates":{"staticGeometry":"PASS","manualVisualCheckpoint":"PASS_WITH_RUNTIME_GATES_OPEN",
             "unityImport":"NOT_RUN","animatedClipping":"NOT_RUN","vrchatBuildTest":"NOT_RUN","inHeadset":"NOT_RUN"},
+        "multiviewPath":f"{ROOT}/Previews/cow-hood-knit-set-v1-multiview.webp",
         "generatedAt":now,
     }
     dump(dst / "ProductManifest.json", manifest)
@@ -74,7 +81,7 @@ Canonical resumable checkpoint. The old blockout remains only as evidence at `{L
 
 - Model: `Models/HAOLAN_CowHoodKnitSet.fbx`
 - Prefab: `Prefab/HAOLAN_CowHoodKnitSet.prefab`
-- Corrected views: `Previews/front.png`, `back.png`, `side.png`, `three_quarter.png`
+- Corrected views: `Previews/front.png`, `back.png`, `left.png`, `right.png`, `three_quarter.png`
 - Multiview: `Previews/cow-hood-knit-set-v1-multiview.webp`
 
 Static geometry and regenerated visual evidence pass. Customer release remains **NO-GO** until Unity 2022.3.22f1 import/save-reload, animated clipping, VRChat Build & Test and in-headset review pass.
@@ -111,7 +118,7 @@ Unity import, animation clipping, VRChat Build & Test and in-headset material re
     dump(config / "job.json", {"schemaVersion":2,"renderLoopRevision":"v1.1-curved-sleeves-thick-hood-corrected-views",
         "id":PID,"productName":NAME,"adapterId":"haolan-v1.6-lowpoly","productRoot":ROOT,
         "productManifestPath":f"{ROOT}/ProductManifest.json","buildScript":"tools/haolan_cow_generator_hosted.py",
-        "hostedPoseScript":"tools/haolan_cow_generator_hosted.py","blendPath":"Assets/_Local/Resolved/HAOLAN_CowHoodKnitSet.blend",
+        "hostedPoseScript":"tools/haolan_cow_generator_hosted.py","blendPath":f"{ROOT}/Models/HAOLAN_CowHoodKnitSet_preview.glb",
         "fbxAssetPath":f"{ROOT}/Models/HAOLAN_CowHoodKnitSet.fbx","prefabAssetPath":PREFAB,"integratedPrefabAssetPath":PREFAB,
         "targetAvatarAssetPath":"Assets/_Local/Resolved/HAOLAN_Lowpoly Variant.prefab","targetSourcePath":"Assets/_Local/Resolved/HAOLAN_Lowpoly.fbx",
         "artifactDir":f"Artifacts/{PID}","candidateDir":f"Candidates/{PID}","releaseDir":f"Release/{PID}",
