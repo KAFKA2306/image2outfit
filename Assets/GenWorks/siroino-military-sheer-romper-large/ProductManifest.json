@@ -3,7 +3,7 @@
   "productId": "siroino-military-sheer-romper-large",
   "productName": "Military Sheer-Back Romper for Siroino _Large",
   "status": "WORKING",
-  "classification": "BUILD_SCRIPT_V3_READY",
+  "classification": "HOSTED_GENERATED_PREFAB_CHECKPOINT",
   "targetAdapterId": "siroino-v1.0-large",
   "productRoot": "Assets/GenWorks/siroino-military-sheer-romper-large",
   "outfitPrefabPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/SiroinoMilitarySheerRomperLarge.prefab",
@@ -11,31 +11,33 @@
   "previewPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-military-sheer-romper-large/README.md",
   "sourceJobPath": "config/products/siroino-military-sheer-romper-large/job.json",
+  "generatedAt": "2026-08-02T09:29:14.701650Z",
+  "blenderVersion": "4.4.3",
   "constructionProfile": "panel-sewn",
   "designRevision": "panel-sewn-v3",
   "reference": {
     "sourceImageRedistributed": false,
     "sourceImageSha256": "3f69a72daa79102c0af5679e2c54d4f078231bdab124314703e2626bcef0e460",
-    "sourceImageDimensions": [1200, 1022],
+    "sourceImageDimensions": [
+      1200,
+      1022
+    ],
     "interpretation": "black military short romper with stand collar, asymmetric front, gold hardware, shoulder chains, belt, short sleeves, and sheer upper back"
   },
-  "handoff": {
-    "resumable": true,
-    "canonicalWorkspace": "Assets/GenWorks/siroino-military-sheer-romper-large",
-    "resumeFrom": "tools/siroino_military_sheer_romper_build.py",
-    "doNotRebuildFromZero": true,
-    "blockers": [
-      "Hosted Blender v3 generation has not yet produced the Blend, FBX, Prefab wrappers, and visual evidence.",
-      "Unity import/reload and Modular Avatar/NDMF integration remain pending.",
-      "Human visual, pose, and runtime reviews remain pending."
-    ]
+  "metrics": {
+    "meshObjects": 28,
+    "vertices": 6694,
+    "triangles": 13280,
+    "degenerateTriangles": 0,
+    "boundaryEdges": 48,
+    "maxBoneInfluences": 1,
+    "unweightedVertices": 0
   },
   "technicalGates": {
-    "buildScript": "READY",
-    "hostedBlender": "PENDING",
-    "fbxExport": "PENDING",
-    "fiveViewRender": "PENDING",
-    "unityPrefabYamlGenerated": "PENDING",
+    "blenderGeneration": "PASS",
+    "fbxExport": "PASS",
+    "fiveViewRender": "PASS",
+    "unityPrefabYamlGenerated": "PASS",
     "unityImport": "PENDING",
     "prefabReload": "PENDING",
     "modularAvatar": "PENDING",
@@ -44,5 +46,21 @@
     "humanVisualReview": "PENDING",
     "humanPoseReview": "PENDING",
     "humanRuntimeReview": "PENDING"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-military-sheer-romper-large",
+    "resumeFrom": "Assets/GenWorks/siroino-military-sheer-romper-large/Source/Blender/SiroinoMilitarySheerRomperLarge.blend",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "Import, save, and reload both generated Prefabs in Unity 2022.3.22f1.",
+      "Wire and validate the Siroino _Large Modular Avatar/NDMF integration.",
+      "Review actual target-avatar pose renders for fit, transparency, and hardware placement.",
+      "Run VRChat Build & Test and capture runtime evidence before RELEASED status."
+    ]
+  },
+  "hashes": {
+    "fbxSha256": "4c16e6d8f0febf691c0782abec27361acccd639260e5872689ad2219dd224ccf",
+    "frontPreviewSha256": "7e602139de9e6dee5f417ccf36c66cbbda0f723fb20507b5c5e6d5dfb1dc2f1c"
   }
 }

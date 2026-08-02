@@ -1,18 +1,15 @@
 # Military Sheer-Back Romper for Siroino _Large
 
-`WORKING` — the product-specific deterministic Blender generator and panel/seam specification are tracked. Generated Blend, FBX, Unity model-Prefab wrapper, five-view evidence, Unity validation, and runtime evidence are still pending.
+`WORKING` — generated Blend, FBX, Unity Prefab wrappers, PBR textures, five-view evidence, and pose evidence are tracked. Unity import/reload, Modular Avatar/NDMF integration, actual target-avatar review, VRChat Build & Test, and human approval remain pending.
 
-## Design contract
+The user-provided reference image is not redistributed. Its SHA-256 is `3f69a72daa79102c0af5679e2c54d4f078231bdab124314703e2626bcef0e460` (1200×1022). The implementation preserves the defining visual grammar without claiming an exact commercial replica.
 
-The implementation targets a short black military romper with a high collar, asymmetric opaque front, gold hardware, belt, shoulder chains, short sleeves, and a large sheer back panel. The user reference image is represented only by its SHA-256 and observed design features; the image itself is not redistributed.
+## Unity entry points
 
-## Canonical outputs
-
-- Build script: `tools/siroino_military_sheer_romper_build.py`
-- Pose script: `tools/siroino_military_sheer_romper_pose.py`
-- Blend: `Assets/GenWorks/siroino-military-sheer-romper-large/Source/Blender/SiroinoMilitarySheerRomperLarge.blend`
-- FBX: `Assets/GenWorks/siroino-military-sheer-romper-large/Models/SiroinoMilitarySheerRomperLarge.fbx`
 - Outfit Prefab: `Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/SiroinoMilitarySheerRomperLarge.prefab`
-- Integrated Prefab: `Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/Siroino_Large_MilitarySheerRomper.prefab`
+- Integration checkpoint: `Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/Siroino_Large_MilitarySheerRomper.prefab`
+- FBX: `Assets/GenWorks/siroino-military-sheer-romper-large/Models/SiroinoMilitarySheerRomperLarge.fbx`
+- Blend: `Assets/GenWorks/siroino-military-sheer-romper-large/Source/Blender/SiroinoMilitarySheerRomperLarge.blend`
+- Pattern/seam specification: `Assets/GenWorks/siroino-military-sheer-romper-large/Documentation/pattern-spec.json`
 
-No release claim is valid until Unity 2022.3.22f1 import/save/reload, Modular Avatar/NDMF integration, target-avatar pose review, VRChat Build & Test, and human approval are complete.
+The Prefab files are deterministic YAML wrappers. They are not Unity-validated until Unity 2022.3.22f1 imports, saves, and reloads them successfully.
