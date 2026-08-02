@@ -108,8 +108,8 @@ def audit(root: Path = ROOT, *, now: datetime | None = None) -> dict[str, Any]:
 
     ids: set[str] = set()
     covered: set[str] = set()
-    production_tracks = {"ADOPT_PRINCIPLE", "PROTOTYPE"}
-    valid_tracks = production_tracks | {"BENCHMARK", "WATCH"}
+    production_tracks = {"ADOPT_PRINCIPLE", "PROTOTYPE", "BENCHMARK"}
+    valid_tracks = production_tracks | {"WATCH"}
     valid_statuses = {"PEER_REVIEWED", "PREPRINT"}
 
     for index, method in enumerate(methods):
@@ -177,7 +177,7 @@ def audit(root: Path = ROOT, *, now: datetime | None = None) -> dict[str, Any]:
     missing_coverage = required_capabilities - covered
     if missing_coverage:
         errors.append(
-            "required capabilities lack ADOPT_PRINCIPLE or PROTOTYPE coverage: "
+            "required capabilities lack an implementation or mandatory benchmark track: "
             + ", ".join(sorted(missing_coverage))
         )
 
