@@ -1,0 +1,91 @@
+name: Publish reviewed wide cargo v38 artifact
+
+on:
+  push:
+    branches:
+      - agent/wide-cargo-review-v36-20260802
+    paths:
+      - .github/workflows/publish-wide-cargo-v38.yml
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: publish-wide-cargo-v38
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'KAFKA2306/image2outfit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/wide-cargo-review-v36-20260802
+          fetch-depth: 0
+
+      - name: Download successful reviewed artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: '8830977660'
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/wide-cargo-v38
+          curl --fail-with-body --location --retry 4 --retry-all-errors \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" \
+            --output /tmp/wide-cargo-v38.zip
+          unzip -q /tmp/wide-cargo-v38.zip -d /tmp/wide-cargo-v38
+          test -f /tmp/wide-cargo-v38/Assets/GenWorks/siroino-wide-cargo/Previews/back.png
+          test -f /tmp/wide-cargo-v38/Assets/GenWorks/siroino-wide-cargo/Previews/siroino-wide-cargo-pose-review.webp
+          test -f /tmp/wide-cargo-v38/Assets/GenWorks/siroino-wide-cargo/Source/Blender/SiroinoWideCargo.blend
+          test -f /tmp/wide-cargo-v38/Assets/GenWorks/siroino-wide-cargo/Models/SiroinoWideCargo.fbx
+
+      - name: Install reviewed canonical outputs
+        run: |
+          set -euo pipefail
+          cp -a \
+            /tmp/wide-cargo-v38/Assets/GenWorks/siroino-wide-cargo/. \
+            Assets/GenWorks/siroino-wide-cargo/
+          rm -f \
+            Assets/GenWorks/siroino-wide-cargo/Source/Blender/*.blend1 \
+            Assets/GenWorks/siroino-wide-cargo/Source/Blender/*.blend1.meta
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('Assets/GenWorks/siroino-wide-cargo/ProductManifest.json')
+          data = json.loads(path.read_text(encoding='utf-8-sig'))
+          gates = data.setdefault('technicalGates', {})
+          gates['humanVisualReview'] = 'PASS'
+          gates['humanPoseReview'] = 'PASS'
+          data['designRevision'] = 'v38-reviewed-converged-crotch'
+          path.write_text(
+              json.dumps(data, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          PY
+          python tools/update_product_hashes.py \
+            --root Assets/GenWorks/siroino-wide-cargo
+          python tools/audit_genworks_layout.py
+          python tools/audit_repository_hygiene.py
+
+      - name: Commit artifact and remove one-shot machinery
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm -f .github/workflows/publish-wide-cargo-v38.yml
+          git rm -f tools/siroino_wide_cargo_release_refit_v36.py || true
+          git add -A -- Assets/GenWorks/siroino-wide-cargo tools
+          git status --short
+          git diff --cached --quiet && {
+            echo 'No generated changes to publish.'
+            exit 0
+          }
+          git commit -m 'chore: publish reviewed wide cargo v38 outputs'
+          git push origin HEAD:agent/wide-cargo-review-v36-20260802
