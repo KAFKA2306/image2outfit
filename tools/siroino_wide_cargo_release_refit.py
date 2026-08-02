@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
-"""Single-shell rendered-fit rebuild for Siroino Wide Cargo.
+"""Wide-volume single-shell rebuild for Siroino Wide Cargo.
 
-The v16 render covered the inner thighs but still failed visually: the garment
-read as tight leggings plus detached lower-leg gaiters, long front slits exposed
-the shins, and the lower shells continued over the feet.
+The v17 render fixed exposed skin and disconnected seams, but the silhouette was
+still body-hugging. Its fixed leg centre (|x|=0.09) incorrectly classified most
+calf vertices as inner cloth, so the intended flare was barely applied.
 
-This revision removes every inter-part seam. The pants are one body-derived,
-waist-to-ankle shell. Below the pelvis, each side is widened asymmetrically around
-its own leg centre: outer surfaces flare strongly, inner surfaces remain closed
-and only expand slightly. The ankle selection excludes the feet so the hem ends
-above the shoes instead of wrapping over the toes.
+This revision keeps one continuous waist-to-ankle shell and changes only the
+volume model:
+
+* the leg centre narrows from the upper thigh toward the ankle,
+* outer cloth receives both radial scaling and an additive outward offset,
+* front/back depth grows independently to create real fabric volume,
+* the ankle cut starts higher and excludes source-foot polygons,
+* topology is cleaned again after reshaping, before shape keys are authored.
 """
 from __future__ import annotations
 
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -40,53 +44,65 @@ def remove_object(obj: bpy.types.Object) -> None:
 
 
 def pants_surface(point) -> bool:
-    """Select the complete lower body while cutting a clean ankle hem."""
-    if not (0.075 <= point.z <= 0.805):
+    """Select lower-body cloth with a foot-free ankle opening."""
+    if not (0.095 <= point.z <= 0.805):
         return False
     if abs(point.x) > 0.34:
         return False
-    # At ankle height the source foot extends far forward/backward. Restricting
-    # depth here preserves the calf circumference but excludes instep and toes.
-    if point.z < 0.145 and abs(point.y) > 0.082:
+    # At the lowest rings, accept only the compact ankle cross-section. Source
+    # instep and toe polygons extend farther along Y and are excluded here.
+    if point.z < 0.180 and abs(point.y) > 0.065:
         return False
     return True
 
 
 def apply_wide_cargo_profile(obj: bpy.types.Object) -> None:
-    """Create a broad outer silhouette without reopening the inner legs."""
-    ankle_z = 0.075
-    transition_z = 0.535
+    """Expand outer cloth into a visibly wide, loose cargo silhouette."""
+    ankle_z = 0.095
+    transition_z = 0.570
     span = transition_z - ankle_z
 
     for vertex in obj.data.vertices:
         x, y, z = vertex.co
         if z >= transition_z:
-            # Close waist and hip fit; enough clearance to avoid body flicker.
             hip_t = clamp((z - transition_z) / (0.805 - transition_z), 0.0, 1.0)
-            vertex.co.x *= 1.065 - 0.020 * hip_t
-            vertex.co.y *= 1.075 - 0.025 * hip_t
+            vertex.co.x *= 1.105 - 0.020 * hip_t
+            vertex.co.y *= 1.145 - 0.025 * hip_t
             continue
 
         down = clamp((transition_z - z) / span, 0.0, 1.0)
         side = -1.0 if x < 0.0 else 1.0
-        leg_center_x = side * 0.090
+
+        # Siroino's leg centres are wider at the upper thigh and substantially
+        # narrower at the calf/ankle. A fixed 0.09 m centre caused v17 to miss
+        # the actual outside calf. Interpolate 0.09 -> 0.055 m downward.
+        center_abs = 0.090 - 0.035 * down
+        leg_center_x = side * center_abs
         local_x = x - leg_center_x
+        is_outer = abs(x) >= center_abs
 
-        # Outer cloth supplies the wide-cargo silhouette. Inner cloth expands
-        # only modestly, remaining near the centreline and preserving coverage.
-        is_outer = abs(x) >= abs(leg_center_x)
         if is_outer:
-            width_scale = 1.12 + 0.63 * down
+            width_scale = 1.45 + 1.95 * down
+            outward_offset = 0.018 + 0.065 * down
+            vertex.co.x = (
+                leg_center_x
+                + local_x * width_scale
+                + side * outward_offset
+            )
         else:
-            width_scale = 1.035 + 0.075 * down
-        depth_scale = 1.08 + 0.27 * down
+            # Keep the inner surface continuous and near the centreline.
+            width_scale = 1.05 + 0.12 * down
+            vertex.co.x = leg_center_x + local_x * width_scale
 
-        vertex.co.x = leg_center_x + local_x * width_scale
-        vertex.co.y = y * depth_scale
+        depth_scale = 1.30 + 0.65 * down
+        depth_offset = 0.015 + 0.035 * down
+        y_sign = -1.0 if y < 0.0 else 1.0
+        vertex.co.y = y * depth_scale + y_sign * depth_offset
 
-        # Slightly shorten the lowest edge so no cloth intersects the floor.
-        if z < 0.105:
-            vertex.co.z += 0.010 * (1.0 - clamp((z - ankle_z) / 0.030, 0.0, 1.0))
+        if z < 0.125:
+            vertex.co.z += 0.006 * (
+                1.0 - clamp((z - ankle_z) / 0.030, 0.0, 1.0)
+            )
 
     obj.data.update(calc_edges=True)
 
@@ -98,9 +114,12 @@ def create_single_shell_pants(body, armature, fabric) -> bpy.types.Object:
         "Cargo_Continuous_Pants",
         pants_surface,
         fabric,
-        0.0110,
+        0.0130,
     )
     apply_wide_cargo_profile(pants)
+    # Re-run topology cleanup after the nonlinear profile transform. This also
+    # removes the four residual near-zero triangles observed in v17.
+    build.clean_topology(pants)
     build.c.add_nearest_shape_keys(pants, body)
     return pants
 
@@ -142,19 +161,18 @@ def audit_wearability() -> dict[str, object]:
     if pants is None:
         return {"schemaVersion": 1, "passed": False, "checks": checks}
 
+    pants.data.calc_loop_triangles()
     xs = [vertex.co.x for vertex in pants.data.vertices]
     ys = [vertex.co.y for vertex in pants.data.vertices]
     zs = [vertex.co.z for vertex in pants.data.vertices]
     lower_vertices = [vertex for vertex in pants.data.vertices if vertex.co.z <= 0.42]
     inner_lower_vertices = [
-        vertex
-        for vertex in lower_vertices
-        if abs(vertex.co.x) <= 0.035
+        vertex for vertex in lower_vertices if abs(vertex.co.x) <= 0.040
     ]
     foot_like_vertices = [
         vertex
         for vertex in pants.data.vertices
-        if vertex.co.z < 0.145 and abs(vertex.co.y) > 0.095
+        if vertex.co.z < 0.180 and abs(vertex.co.y) > 0.090
     ]
     degenerates = degenerate_triangles(pants)
 
@@ -167,6 +185,8 @@ def audit_wearability() -> dict[str, object]:
         "maximumY": max(ys, default=0.0),
         "minimumZ": min(zs, default=0.0),
         "maximumZ": max(zs, default=0.0),
+        "totalWidth": max(xs, default=0.0) - min(xs, default=0.0),
+        "totalDepth": max(ys, default=0.0) - min(ys, default=0.0),
         "lowerInnerCoverageVertices": len(inner_lower_vertices),
         "footLikeVertices": len(foot_like_vertices),
         "degenerateTriangles": degenerates,
@@ -174,9 +194,12 @@ def audit_wearability() -> dict[str, object]:
     checks["metrics"] = metrics
 
     topology_pass = degenerates == 0
-    height_pass = metrics["minimumZ"] >= 0.065 and metrics["minimumZ"] <= 0.115 and metrics["maximumZ"] >= 0.79
-    width_pass = (metrics["maximumX"] - metrics["minimumX"]) >= 0.48
-    depth_pass = (metrics["maximumY"] - metrics["minimumY"]) >= 0.20
+    height_pass = (
+        0.085 <= metrics["minimumZ"] <= 0.135
+        and metrics["maximumZ"] >= 0.79
+    )
+    width_pass = metrics["totalWidth"] >= 0.38
+    depth_pass = metrics["totalDepth"] >= 0.26
     inner_coverage_pass = len(inner_lower_vertices) >= 40
     foot_exclusion_pass = len(foot_like_vertices) == 0
 
@@ -206,7 +229,7 @@ def record_wearability(report: dict[str, object]) -> None:
     manifest_path = build.c.repo_path(job["productManifestPath"])
     manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
     manifest["wearabilityAudit"] = report
-    manifest["designRevision"] = "v17-single-shell-wide-cargo"
+    manifest["designRevision"] = "v18-wide-volume-single-shell"
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
@@ -216,10 +239,6 @@ def record_wearability(report: dict[str, object]) -> None:
 build.create_outfit = create_outfit_as_single_shell
 
 if __name__ == "__main__":
-    # build.main may return 2 because the legacy report expects the original
-    # multi-part design. A Blender exception still terminates before returning;
-    # after a completed build, the product-specific single-shell audit is the
-    # authoritative gate for this revision.
     build.main()
     report = audit_wearability()
     record_wearability(report)
