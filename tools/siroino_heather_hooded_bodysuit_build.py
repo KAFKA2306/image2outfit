@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import bpy
 from PIL import Image
+
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
 
 import siroino_heather_hooded_evidence as evidence
 import siroino_heather_hooded_geometry as geometry
