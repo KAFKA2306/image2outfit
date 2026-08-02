@@ -42,6 +42,7 @@ jobs:
             const managedPrefixes = ["agent/", "fix/", "feat/", "release/", "ops/", "chore/", "ci/"];
             const protectedBranches = new Set(["main", "master", "gh-pages"]);
             const supersededMarker = "<!-- pr-convergence:superseded -->";
+            const workstreamPlaceholder = "replace-with-product-slug-or-repository-scope";
 
             const repository = (await github.rest.repos.get({ owner, repo })).data;
             const defaultBranch = repository.default_branch;
@@ -68,7 +69,8 @@ jobs:
 
             function explicitWorkstream(body) {
               const match = String(body || "").match(/<!--\s*workstream:\s*([a-z0-9][a-z0-9._/-]*)\s*-->/i);
-              return match ? match[1].toLowerCase() : null;
+              const value = match ? match[1].toLowerCase() : null;
+              return value && value !== workstreamPlaceholder ? value : null;
             }
 
             function normalizeBranch(ref) {
@@ -199,9 +201,22 @@ jobs:
                 head: `${owner}:${ref}`,
                 per_page: 100,
               });
-              if (related.length === 0) continue;
-              related.sort((a, b) => b.number - a.number);
-              await deleteBranch(ref, `latest related PR #${related[0].number} is closed`, openPulls);
+              if (related.length > 0) {
+                related.sort((a, b) => b.number - a.number);
+                await deleteBranch(ref, `latest related PR #${related[0].number} is closed`, openPulls);
+                continue;
+              }
+
+              const comparison = await github.rest.repos.compareCommitsWithBasehead({
+                owner,
+                repo,
+                basehead: `${defaultBranch}...${ref}`,
+              });
+              if (comparison.data.ahead_by === 0) {
+                await deleteBranch(ref, "contains no commits outside the default branch", openPulls);
+              } else {
+                core.warning(`Keeping orphan branch with ${comparison.data.ahead_by} unique commit(s): ${ref}`);
+              }
             }
 
             core.summary
