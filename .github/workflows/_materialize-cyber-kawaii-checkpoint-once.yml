@@ -1,9 +1,8 @@
 name: Materialize Cyber Kawaii checkpoint once
 
 on:
-  pull_request:
-    branches: [main]
-    types: [synchronize]
+  push:
+    branches: [fix/cyber-kawaii-skirt-pattern]
     paths:
       - .github/workflows/_materialize-cyber-kawaii-checkpoint-once.yml
 
@@ -13,15 +12,13 @@ permissions:
 
 jobs:
   materialize:
-    if: >-
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.head.ref == 'fix/cyber-kawaii-skirt-pattern'
+    if: github.repository == 'KAFKA2306/image2outfit'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: fix/cyber-kawaii-skirt-pattern
           fetch-depth: 0
           token: ${{ github.token }}
 
@@ -82,4 +79,4 @@ jobs:
             .github/workflows/_materialize-cyber-kawaii-checkpoint-once.yml
           git diff --cached --check
           git commit -m 'Track reviewed Cyber Kawaii pattern-fit checkpoint'
-          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
+          git push origin HEAD:fix/cyber-kawaii-skirt-pattern
