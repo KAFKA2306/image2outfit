@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Body-derived v7 pattern for the Siroino heather hooded bodysuit."""
+"""Smooth sampled-pattern v8 for the Siroino heather hooded bodysuit."""
 from __future__ import annotations
 
 import math
-from collections.abc import Callable
+from dataclasses import dataclass
 
-import bmesh
 import bpy
 from mathutils import Vector
 
@@ -16,101 +15,324 @@ bone_segment = legacy.bone_segment
 clean_meshes = legacy.clean_meshes
 
 
-def _world_vertex(body: bpy.types.Object, index: int) -> Vector:
-    return body.matrix_world @ body.data.vertices[index].co
+@dataclass(frozen=True)
+class SurfaceSample:
+    point: Vector
+    normal: Vector
 
 
-def _world_normal(body: bpy.types.Object, index: int) -> Vector:
-    normal = body.matrix_world.to_3x3() @ body.data.vertices[index].normal
-    return normal.normalized()
+class SurfaceSampler:
+    """Fast deterministic front/back sampling of the tracked Siroino body."""
+
+    def __init__(self, body: bpy.types.Object) -> None:
+        self.body = body
+        normal_matrix = body.matrix_world.to_3x3()
+        self.samples: list[tuple[Vector, Vector]] = [
+            (
+                body.matrix_world @ vertex.co,
+                (normal_matrix @ vertex.normal).normalized(),
+            )
+            for vertex in body.data.vertices
+        ]
+        self.z_bins: dict[int, list[tuple[Vector, Vector]]] = {}
+        for point, normal in self.samples:
+            self.z_bins.setdefault(round(point.z * 100), []).append((point, normal))
+
+    def sample(self, x: float, z: float, *, front: bool) -> SurfaceSample:
+        center_bin = round(z * 100)
+        candidates: list[tuple[Vector, Vector]] = []
+        for delta in range(-4, 5):
+            candidates.extend(self.z_bins.get(center_bin + delta, []))
+        close = [
+            item
+            for item in candidates
+            if abs(item[0].x - x) <= 0.030 and abs(item[0].z - z) <= 0.045
+        ]
+        if not close:
+            close = sorted(
+                candidates or self.samples,
+                key=lambda item: abs(item[0].x - x) * 1.8 + abs(item[0].z - z),
+            )[:40]
+        point, normal = (
+            min(close, key=lambda item: item[0].y)
+            if front
+            else max(close, key=lambda item: item[0].y)
+        )
+        return SurfaceSample(point.copy(), normal.copy())
+
+    def side_y(self, x: float, z: float) -> float:
+        front = self.sample(x, z, front=True).point.y
+        back = self.sample(x, z, front=False).point.y
+        return 0.5 * (front + back)
 
 
-def _group_index(body: bpy.types.Object, name: str) -> int | None:
-    group = body.vertex_groups.get(name)
-    return None if group is None else group.index
+def _uv_grid(mesh: bpy.types.Mesh, rows: int, columns: int) -> None:
+    uv = mesh.uv_layers.new(name="UVMap")
+    stride = columns + 1
+    for polygon in mesh.polygons:
+        for loop_index in polygon.loop_indices:
+            vertex_index = mesh.loops[loop_index].vertex_index
+            row, column = divmod(vertex_index, stride)
+            uv.data[loop_index].uv = (
+                column / max(1, columns),
+                1.0 - row / max(1, rows - 1),
+            )
 
 
-def _vertex_weight(
+def _grid_object(
+    name: str,
+    vertices: list[tuple[float, float, float]],
+    rows: int,
+    columns: int,
+    material: bpy.types.Material,
+    armature: bpy.types.Object,
     body: bpy.types.Object,
-    vertex_index: int,
-    group_index: int | None,
-) -> float:
-    if group_index is None:
-        return 0.0
-    for assignment in body.data.vertices[vertex_index].groups:
-        if assignment.group == group_index:
-            return float(assignment.weight)
-    return 0.0
-
-
-def _polygon_average_weight(
-    body: bpy.types.Object,
-    polygon: bpy.types.MeshPolygon,
-    group_indices: tuple[int | None, ...],
-) -> float:
-    values = [
-        sum(_vertex_weight(body, vertex_index, index) for index in group_indices)
-        for vertex_index in polygon.vertices
+    *,
+    thickness: float = 0.0012,
+    bevel: float = 0.0004,
+    subdivision: int = 0,
+) -> bpy.types.Object:
+    stride = columns + 1
+    faces = [
+        (
+            row * stride + column,
+            row * stride + column + 1,
+            (row + 1) * stride + column + 1,
+            (row + 1) * stride + column,
+        )
+        for row in range(rows - 1)
+        for column in range(columns)
     ]
-    return sum(values) / max(1, len(values))
+    mesh = bpy.data.meshes.new(f"{name}_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    _uv_grid(mesh, rows, columns)
+    mesh.materials.append(material)
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.parent = armature
+    armature_modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    armature_modifier.object = armature
+    armature_modifier.use_deform_preserve_volume = True
+    base.transfer_nearest_body_weights(obj, body)
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    if subdivision:
+        smooth = obj.modifiers.new("Pattern smoothing", "SUBSURF")
+        smooth.subdivision_type = "CATMULL_CLARK"
+        smooth.levels = subdivision
+        smooth.render_levels = subdivision
+        while obj.modifiers.find(smooth.name) > 0:
+            bpy.ops.object.modifier_move_up(modifier=smooth.name)
+        bpy.ops.object.modifier_apply(modifier=smooth.name)
+    solidify = obj.modifiers.new("Outward fabric thickness", "SOLIDIFY")
+    solidify.thickness = thickness
+    solidify.offset = 1.0
+    solidify.use_even_offset = True
+    while obj.modifiers.find(solidify.name) > 0:
+        bpy.ops.object.modifier_move_up(modifier=solidify.name)
+    bpy.ops.object.modifier_apply(modifier=solidify.name)
+    if bevel:
+        edge_finish = obj.modifiers.new("Finished pattern edge", "BEVEL")
+        edge_finish.width = bevel
+        edge_finish.segments = 2
+        while obj.modifiers.find(edge_finish.name) > 0:
+            bpy.ops.object.modifier_move_up(modifier=edge_finish.name)
+        bpy.ops.object.modifier_apply(modifier=edge_finish.name)
+    obj.select_set(False)
+    return obj
 
 
-def _copy_shell(
+def _sampled_panel(
+    name: str,
+    sampler: SurfaceSampler,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+    rows: list[tuple[float, float, float]],
+    *,
+    front: bool,
+    columns: int = 36,
+    offset: float = 0.014,
+) -> bpy.types.Object:
+    """Create a smooth variable-width panel sampled directly from the body surface.
+
+    Each row is ``(center_z, edge_z, half_width)``.  Curving the final row's
+    center and edge heights produces a clean neckline without polygon stair-steps.
+    """
+    vertices: list[tuple[float, float, float]] = []
+    for center_z, edge_z, half_width in rows:
+        for column in range(columns + 1):
+            s = -1.0 + 2.0 * column / columns
+            x = half_width * s
+            z = center_z + (edge_z - center_z) * (abs(s) ** 1.75)
+            sample = sampler.sample(x, z, front=front)
+            direction = sample.normal
+            if front and direction.y > 0.0:
+                direction = -direction
+            if not front and direction.y < 0.0:
+                direction = -direction
+            point = sample.point + direction.normalized() * offset
+            vertices.append((point.x, point.y, point.z))
+    return _grid_object(
+        name,
+        vertices,
+        len(rows),
+        columns,
+        material,
+        armature,
+        sampler.body,
+        thickness=0.0012,
+        bevel=0.00035,
+    )
+
+
+def _torso_panels(
+    sampler: SurfaceSampler,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+) -> list[bpy.types.Object]:
+    rows = [
+        (0.785, 0.785, 0.135),
+        (0.820, 0.820, 0.145),
+        (0.855, 0.855, 0.155),
+        (0.895, 0.895, 0.170),
+        (0.935, 0.936, 0.185),
+        (0.972, 0.982, 0.205),
+        (1.000, 1.032, 0.215),
+    ]
+    return [
+        _sampled_panel(
+            "Heather_Front_Upper_Panel",
+            sampler,
+            armature,
+            material,
+            rows,
+            front=True,
+        ),
+        _sampled_panel(
+            "Heather_Back_Upper_Panel",
+            sampler,
+            armature,
+            material,
+            rows,
+            front=False,
+        ),
+    ]
+
+
+def _highcut_panels(
+    sampler: SurfaceSampler,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+) -> list[bpy.types.Object]:
+    rows = [
+        (0.615, 0.615, 0.025),
+        (0.645, 0.645, 0.030),
+        (0.680, 0.680, 0.042),
+        (0.720, 0.720, 0.060),
+        (0.760, 0.760, 0.082),
+        (0.800, 0.800, 0.110),
+        (0.840, 0.840, 0.138),
+    ]
+    return [
+        _sampled_panel(
+            "Heather_Highcut_Front_Panel",
+            sampler,
+            armature,
+            material,
+            rows,
+            front=True,
+            columns=32,
+            offset=0.015,
+        ),
+        _sampled_panel(
+            "Heather_Highcut_Back_Panel",
+            sampler,
+            armature,
+            material,
+            rows,
+            front=False,
+            columns=32,
+            offset=0.015,
+        ),
+    ]
+
+
+def _segment_distance(point: Vector, start: Vector, end: Vector) -> tuple[float, float]:
+    vector = end - start
+    length_squared = vector.length_squared
+    if length_squared <= 1e-12:
+        return (point - start).length, 0.0
+    t = max(0.0, min(1.0, (point - start).dot(vector) / length_squared))
+    closest = start + vector * t
+    return (point - closest).length, t
+
+
+def _arm_shell(
     name: str,
     body: bpy.types.Object,
     armature: bpy.types.Object,
     material: bpy.types.Material,
-    predicate: Callable[[bpy.types.MeshPolygon, Vector], bool],
+    side: str,
     *,
-    offset: float,
-    thickness: float = 0.0012,
-    bevel: float = 0.00035,
+    cuff: bool,
 ) -> bpy.types.Object:
-    """Copy selected Siroino faces and preserve UVs and source skin weights."""
-    source_uv = body.data.uv_layers.active
-    used: dict[int, int] = {}
-    vertices: list[Vector] = []
-    source_indices: list[int] = []
-    faces: list[list[int]] = []
-    face_uvs: list[list[tuple[float, float]]] = []
-
+    upper_start, upper_end = bone_segment(armature, f"UpperArm_{side}")
+    lower_start, lower_end = bone_segment(armature, f"LowerArm_{side}")
+    selected: list[bpy.types.MeshPolygon] = []
     for polygon in body.data.polygons:
         center = body.matrix_world @ polygon.center
-        if not predicate(polygon, center):
-            continue
+        upper_distance, upper_t = _segment_distance(center, upper_start, upper_end)
+        lower_distance, lower_t = _segment_distance(center, lower_start, lower_end)
+        if cuff:
+            include = lower_distance <= 0.060 and lower_t >= 0.79
+        else:
+            include = (
+                (upper_distance <= 0.072 and upper_t >= 0.015)
+                or (lower_distance <= 0.060 and lower_t <= 0.86)
+            )
+        if include:
+            selected.append(polygon)
+    if not selected:
+        raise RuntimeError(f"Arm shell selection produced no faces: {name}")
+
+    used: dict[int, int] = {}
+    source_indices: list[int] = []
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[list[int]] = []
+    source_uv = body.data.uv_layers.active
+    face_uvs: list[list[tuple[float, float]]] = []
+    for polygon in selected:
         face: list[int] = []
         uvs: list[tuple[float, float]] = []
         for loop_index in polygon.loop_indices:
             source_index = body.data.loops[loop_index].vertex_index
             if source_index not in used:
                 used[source_index] = len(vertices)
-                vertices.append(
-                    _world_vertex(body, source_index)
-                    + _world_normal(body, source_index) * offset
-                )
                 source_indices.append(source_index)
+                coordinate = body.matrix_world @ body.data.vertices[source_index].co
+                vertices.append((coordinate.x, coordinate.y, coordinate.z))
             face.append(used[source_index])
-            if source_uv is not None:
+            if source_uv:
                 uv = source_uv.data[loop_index].uv
                 uvs.append((float(uv.x), float(uv.y)))
             else:
-                coordinate = _world_vertex(body, source_index)
-                uvs.append(((coordinate.x + 0.60) / 1.20, coordinate.z))
+                uvs.append((0.0, 0.0))
         faces.append(face)
         face_uvs.append(uvs)
-
-    if not faces:
-        raise RuntimeError(f"Siroino shell selection produced no faces: {name}")
 
     mesh = bpy.data.meshes.new(f"{name}_Mesh")
     mesh.from_pydata(vertices, [], faces)
     mesh.update(calc_edges=True)
     uv_layer = mesh.uv_layers.new(name="UVMap")
-    for polygon, polygon_uvs in zip(mesh.polygons, face_uvs):
-        for loop_index, uv in zip(polygon.loop_indices, polygon_uvs):
-            uv_layer.data[loop_index].uv = uv
+    for polygon, values in zip(mesh.polygons, face_uvs):
+        for loop_index, value in zip(polygon.loop_indices, values):
+            uv_layer.data[loop_index].uv = value
     mesh.materials.append(material)
-
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     obj.parent = armature
@@ -128,150 +350,51 @@ def _copy_shell(
         total = sum(item.weight for item in assignments if item.weight > 1e-8)
         if total <= 1e-8:
             fallback.add([new_index], 1.0, "REPLACE")
-            continue
-        for item in assignments:
-            if item.weight <= 1e-8:
-                continue
-            group_name = body.vertex_groups[item.group].name
-            groups[group_name].add(
-                [new_index],
-                float(item.weight) / total,
-                "REPLACE",
-            )
-
+        else:
+            for item in assignments:
+                if item.weight <= 1e-8:
+                    continue
+                groups[body.vertex_groups[item.group].name].add(
+                    [new_index],
+                    float(item.weight) / total,
+                    "REPLACE",
+                )
     for polygon in mesh.polygons:
         polygon.use_smooth = True
+
     bpy.ops.object.select_all(action="DESELECT")
     obj.select_set(True)
     bpy.context.view_layer.objects.active = obj
-
-    solidify = obj.modifiers.new("Outward jersey thickness", "SOLIDIFY")
-    solidify.thickness = thickness
+    smooth = obj.modifiers.new("Arm boundary smoothing", "SUBSURF")
+    smooth.subdivision_type = "CATMULL_CLARK"
+    smooth.levels = 1
+    smooth.render_levels = 1
+    while obj.modifiers.find(smooth.name) > 0:
+        bpy.ops.object.modifier_move_up(modifier=smooth.name)
+    bpy.ops.object.modifier_apply(modifier=smooth.name)
+    shrink = obj.modifiers.new("Siroino fitted clearance", "SHRINKWRAP")
+    shrink.target = body
+    shrink.wrap_method = "NEAREST_SURFACEPOINT"
+    shrink.wrap_mode = "OUTSIDE_SURFACE"
+    shrink.offset = 0.014 if not cuff else 0.016
+    while obj.modifiers.find(shrink.name) > 0:
+        bpy.ops.object.modifier_move_up(modifier=shrink.name)
+    bpy.ops.object.modifier_apply(modifier=shrink.name)
+    solidify = obj.modifiers.new("Sleeve fabric thickness", "SOLIDIFY")
+    solidify.thickness = 0.0013 if not cuff else 0.0017
     solidify.offset = 1.0
     solidify.use_even_offset = True
     while obj.modifiers.find(solidify.name) > 0:
         bpy.ops.object.modifier_move_up(modifier=solidify.name)
     bpy.ops.object.modifier_apply(modifier=solidify.name)
-
-    if bevel > 0.0:
-        edge_finish = obj.modifiers.new("Finished pattern edge", "BEVEL")
-        edge_finish.width = bevel
-        edge_finish.segments = 2
-        while obj.modifiers.find(edge_finish.name) > 0:
-            bpy.ops.object.modifier_move_up(modifier=edge_finish.name)
-        bpy.ops.object.modifier_apply(modifier=edge_finish.name)
-
-    cleanup = bmesh.new()
-    cleanup.from_mesh(mesh)
-    bmesh.ops.dissolve_degenerate(
-        cleanup,
-        dist=1e-7,
-        edges=list(cleanup.edges),
-    )
-    zero_area = [face for face in cleanup.faces if face.calc_area() <= 1e-12]
-    if zero_area:
-        bmesh.ops.delete(cleanup, geom=zero_area, context="FACES")
-    loose = [vertex for vertex in cleanup.verts if not vertex.link_faces]
-    if loose:
-        bmesh.ops.delete(cleanup, geom=loose, context="VERTS")
-    cleanup.to_mesh(mesh)
-    cleanup.free()
-    mesh.update(calc_edges=True)
+    edge_finish = obj.modifiers.new("Sleeve edge finish", "BEVEL")
+    edge_finish.width = 0.0004
+    edge_finish.segments = 2
+    while obj.modifiers.find(edge_finish.name) > 0:
+        bpy.ops.object.modifier_move_up(modifier=edge_finish.name)
+    bpy.ops.object.modifier_apply(modifier=edge_finish.name)
     obj.select_set(False)
     return obj
-
-
-def _torso_width(z: float) -> float:
-    if z < 0.835:
-        return 0.132
-    if z < 0.915:
-        return 0.170
-    if z < 0.985:
-        return 0.205
-    if z < 1.025:
-        return 0.228
-    return 0.185
-
-
-def _torso_top(x: float) -> float:
-    return 1.026 + min(abs(x), 0.18) * 0.16
-
-
-def _highcut_width(z: float) -> float:
-    t = max(0.0, min(1.0, (z - 0.625) / (0.835 - 0.625)))
-    return 0.038 + 0.100 * (t**0.82)
-
-
-def _front(center: Vector) -> bool:
-    return center.y <= 0.0
-
-
-def _back(center: Vector) -> bool:
-    return center.y > 0.0
-
-
-def _torso_shells(
-    body: bpy.types.Object,
-    armature: bpy.types.Object,
-    material: bpy.types.Material,
-) -> list[bpy.types.Object]:
-    def common(center: Vector) -> bool:
-        neckline = center.z > 1.025 and abs(center.x) < 0.050
-        return (
-            0.785 <= center.z <= _torso_top(center.x)
-            and abs(center.x) <= _torso_width(center.z)
-            and not neckline
-        )
-
-    return [
-        _copy_shell(
-            "Heather_Front_Upper_Panel",
-            body,
-            armature,
-            material,
-            lambda _polygon, center: common(center) and _front(center),
-            offset=0.0080,
-        ),
-        _copy_shell(
-            "Heather_Back_Upper_Panel",
-            body,
-            armature,
-            material,
-            lambda _polygon, center: common(center) and _back(center),
-            offset=0.0080,
-        ),
-    ]
-
-
-def _highcut_shells(
-    body: bpy.types.Object,
-    armature: bpy.types.Object,
-    material: bpy.types.Material,
-) -> list[bpy.types.Object]:
-    def common(center: Vector) -> bool:
-        return (
-            0.615 <= center.z <= 0.840
-            and abs(center.x) <= _highcut_width(center.z)
-        )
-
-    return [
-        _copy_shell(
-            "Heather_Highcut_Front_Panel",
-            body,
-            armature,
-            material,
-            lambda _polygon, center: common(center) and _front(center),
-            offset=0.0083,
-        ),
-        _copy_shell(
-            "Heather_Highcut_Back_Panel",
-            body,
-            armature,
-            material,
-            lambda _polygon, center: common(center) and _back(center),
-            offset=0.0083,
-        ),
-    ]
 
 
 def _sleeves_and_cuffs(
@@ -282,251 +405,122 @@ def _sleeves_and_cuffs(
 ) -> list[bpy.types.Object]:
     garments: list[bpy.types.Object] = []
     for side in ("L", "R"):
-        upper = _group_index(body, f"UpperArm_{side}")
-        lower = _group_index(body, f"LowerArm_{side}")
-        hand = _group_index(body, f"Hand_{side}")
-        _, wrist = bone_segment(armature, f"LowerArm_{side}")
-
-        def sleeve_predicate(
-            polygon: bpy.types.MeshPolygon,
-            center: Vector,
-            upper_index: int | None = upper,
-            lower_index: int | None = lower,
-            hand_index: int | None = hand,
-            wrist_point: Vector = wrist,
-        ) -> bool:
-            arm_weight = _polygon_average_weight(
-                body,
-                polygon,
-                (upper_index, lower_index),
-            )
-            hand_weight = _polygon_average_weight(body, polygon, (hand_index,))
-            return (
-                arm_weight >= 0.035
-                and hand_weight <= 0.28
-                and (center - wrist_point).length >= 0.030
-            )
-
-        def cuff_predicate(
-            polygon: bpy.types.MeshPolygon,
-            center: Vector,
-            lower_index: int | None = lower,
-            hand_index: int | None = hand,
-            wrist_point: Vector = wrist,
-        ) -> bool:
-            wrist_weight = _polygon_average_weight(
-                body,
-                polygon,
-                (lower_index, hand_index),
-            )
-            return wrist_weight >= 0.10 and (center - wrist_point).length <= 0.042
-
         garments.append(
-            _copy_shell(
+            _arm_shell(
                 f"Heather_Long_Sleeve_{side}",
                 body,
                 armature,
                 fabric,
-                sleeve_predicate,
-                offset=0.0080,
+                side,
+                cuff=False,
             )
         )
         garments.append(
-            _copy_shell(
+            _arm_shell(
                 f"Heather_Rib_Cuff_{side}",
                 body,
                 armature,
                 trim,
-                cuff_predicate,
-                offset=0.0100,
-                thickness=0.0016,
-                bevel=0.00045,
+                side,
+                cuff=True,
             )
         )
     return garments
 
 
-def _grid_mesh(
-    name: str,
-    vertices: list[tuple[float, float, float]],
-    rows: int,
-    columns: int,
-    material: bpy.types.Material,
-    armature: bpy.types.Object,
-    body: bpy.types.Object,
-    *,
-    thickness: float,
-) -> bpy.types.Object:
-    faces: list[tuple[int, int, int, int]] = []
-    stride = columns + 1
-    for row in range(rows - 1):
-        for column in range(columns):
-            a = row * stride + column
-            faces.append((a, a + 1, a + stride + 1, a + stride))
-    mesh = bpy.data.meshes.new(f"{name}_Mesh")
-    mesh.from_pydata(vertices, [], faces)
-    mesh.update(calc_edges=True)
-    uv = mesh.uv_layers.new(name="UVMap")
-    for polygon in mesh.polygons:
-        for loop_index in polygon.loop_indices:
-            vertex_index = mesh.loops[loop_index].vertex_index
-            row, column = divmod(vertex_index, stride)
-            uv.data[loop_index].uv = (
-                column / max(1, columns),
-                1.0 - row / max(1, rows - 1),
-            )
-    mesh.materials.append(material)
-    obj = bpy.data.objects.new(name, mesh)
-    bpy.context.collection.objects.link(obj)
-    obj.parent = armature
-    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
-    modifier.object = armature
-    modifier.use_deform_preserve_volume = True
-    base.transfer_nearest_body_weights(obj, body)
-    for polygon in mesh.polygons:
-        polygon.use_smooth = True
-    bpy.ops.object.select_all(action="DESELECT")
-    obj.select_set(True)
-    bpy.context.view_layer.objects.active = obj
-    solidify = obj.modifiers.new("Hood fabric thickness", "SOLIDIFY")
-    solidify.thickness = thickness
-    solidify.offset = 0.0
-    solidify.use_even_offset = True
-    bpy.ops.object.modifier_apply(modifier=solidify.name)
-    subdivision = obj.modifiers.new("Hood drape smoothing", "SUBSURF")
-    subdivision.subdivision_type = "CATMULL_CLARK"
-    subdivision.levels = 1
-    subdivision.render_levels = 1
-    bpy.ops.object.modifier_apply(modifier=subdivision.name)
-    edge_finish = obj.modifiers.new("Hood edge finish", "BEVEL")
-    edge_finish.width = 0.0005
-    edge_finish.segments = 2
-    bpy.ops.object.modifier_apply(modifier=edge_finish.name)
-    obj.select_set(False)
-    return obj
-
-
-def _hood_panel(
+def _hood_half(
     body: bpy.types.Object,
     armature: bpy.types.Object,
     material: bpy.types.Material,
     side: str,
 ) -> bpy.types.Object:
-    sign = -1.0 if side == "L" else 1.0
-    rows = [
-        (1.038, 0.052, 0.072, 0.030),
-        (1.010, 0.076, 0.104, 0.051),
-        (0.978, 0.092, 0.122, 0.064),
-        (0.946, 0.090, 0.120, 0.064),
-        (0.916, 0.070, 0.105, 0.052),
-        (0.892, 0.040, 0.088, 0.030),
-        (0.878, 0.012, 0.078, 0.010),
+    profiles = [
+        (1.025, 0.068, -0.026, 0.050),
+        (1.000, 0.095, -0.002, 0.105),
+        (0.965, 0.108, 0.008, 0.132),
+        (0.928, 0.102, 0.014, 0.132),
+        (0.895, 0.075, 0.018, 0.108),
+        (0.875, 0.030, 0.020, 0.070),
     ]
-    columns = 18
+    columns = 20
     vertices: list[tuple[float, float, float]] = []
-    for z, width, center_y, wrap in rows:
+    if side == "L":
+        start_angle, end_angle = math.pi / 2.0, math.pi
+    else:
+        start_angle, end_angle = 0.0, math.pi / 2.0
+    for z, radius_x, center_y, radius_y in profiles:
         for column in range(columns + 1):
             u = column / columns
-            x = sign * width * u
-            fold = 0.008 * math.sin(math.pi * u)
-            y = center_y - wrap * u + fold
-            row_drop = 0.004 * math.sin(math.pi * u)
-            vertices.append((x, y, z - row_drop))
-    return _grid_mesh(
+            angle = start_angle + (end_angle - start_angle) * u
+            fold = 0.006 * math.sin(math.pi * u)
+            x = radius_x * math.cos(angle)
+            y = center_y + radius_y * math.sin(angle) + fold
+            vertices.append((x, y, z - 0.003 * math.sin(math.pi * u)))
+    return _grid_object(
         f"Heather_Hood_Outer_{side}",
         vertices,
-        len(rows),
+        len(profiles),
         columns,
         material,
         armature,
         body,
-        thickness=0.0018,
+        thickness=0.0020,
+        bevel=0.0005,
+        subdivision=1,
     )
 
 
 def _neck_band(
-    body: bpy.types.Object,
+    sampler: SurfaceSampler,
     armature: bpy.types.Object,
     material: bpy.types.Material,
 ) -> bpy.types.Object:
-    points = []
-    segments = 72
-    for index in range(segments):
-        angle = math.tau * index / segments
-        points.append(
-            (
-                0.064 * math.cos(angle),
-                -0.002 + 0.048 * math.sin(angle),
-                1.014 - 0.004 * max(0.0, -math.sin(angle)),
-            )
+    points = [
+        (
+            0.080 * math.cos(math.tau * index / 80),
+            0.002 + 0.066 * math.sin(math.tau * index / 80),
+            1.018 - 0.004 * max(0.0, -math.sin(math.tau * index / 80)),
         )
+        for index in range(80)
+    ]
     band = base.curve_tube(
         "Heather_Hood_Neck_Band",
         points,
-        0.0030,
+        0.0027,
         material,
         armature,
         "Chest",
         cyclic=True,
         resolution=3,
     )
-    base.transfer_nearest_body_weights(band, body)
+    base.transfer_nearest_body_weights(band, sampler.body)
     return band
 
 
-def _surface_y(
-    body: bpy.types.Object,
-    x: float,
-    z: float,
-    *,
-    front: bool,
-) -> float:
-    candidates = [
-        _world_vertex(body, vertex.index)
-        for vertex in body.data.vertices
-        if abs(_world_vertex(body, vertex.index).x - x) <= 0.020
-        and abs(_world_vertex(body, vertex.index).z - z) <= 0.028
-    ]
-    if not candidates:
-        candidates = [
-            _world_vertex(body, vertex.index)
-            for vertex in body.data.vertices
-            if abs(_world_vertex(body, vertex.index).z - z) <= 0.045
-        ]
-    if not candidates:
-        raise RuntimeError(f"Could not sample body surface at x={x}, z={z}")
-    return min(point.y for point in candidates) if front else max(point.y for point in candidates)
-
-
-def _side_y(body: bpy.types.Object, x: float, z: float) -> float:
-    front = _surface_y(body, x, z, front=True)
-    back = _surface_y(body, x, z, front=False)
-    return (front + back) * 0.5
-
-
 def _placket_and_buttons(
-    body: bpy.types.Object,
+    sampler: SurfaceSampler,
     armature: bpy.types.Object,
     trim: bpy.types.Material,
     buttons: bpy.types.Material,
 ) -> list[bpy.types.Object]:
-    y = _surface_y(body, 0.0, 0.966, front=True) - 0.013
+    surface = sampler.sample(0.0, 0.965, front=True)
+    y = surface.point.y - 0.018
     placket = legacy.rounded_box(
         "Heather_Henley_Placket",
-        (0.0, y, 0.966),
-        (0.015, 0.0030, 0.050),
+        (0.0, y, 0.965),
+        (0.014, 0.0028, 0.047),
         trim,
         armature,
         "Chest",
-        bevel=0.0015,
+        bevel=0.0014,
     )
     result = [placket]
-    for index, z in enumerate((0.992, 0.963, 0.934), start=1):
+    for index, z in enumerate((0.990, 0.963, 0.936), start=1):
         bpy.ops.mesh.primitive_uv_sphere_add(
             segments=24,
             ring_count=12,
-            location=(0.0, y - 0.0065, z),
-            scale=(0.0053, 0.0025, 0.0053),
+            location=(0.0, y - 0.006, z),
+            scale=(0.0048, 0.0023, 0.0048),
         )
         button = bpy.context.active_object
         button.name = f"Heather_Henley_Button_{index:02d}"
@@ -539,69 +533,77 @@ def _placket_and_buttons(
 
 
 def _cords_and_ties(
-    body: bpy.types.Object,
+    sampler: SurfaceSampler,
     armature: bpy.types.Object,
     trim: bpy.types.Material,
 ) -> list[bpy.types.Object]:
-    front_neck_y = _surface_y(body, 0.034, 1.000, front=True) - 0.018
+    front_y = sampler.sample(0.035, 1.000, front=True).point.y - 0.020
     result: list[bpy.types.Object] = []
     for side, sign in (("L", -1.0), ("R", 1.0)):
         cord = base.curve_tube(
             f"Heather_Hood_Drawcord_{side}",
             [
-                (sign * 0.035, front_neck_y, 1.006),
-                (sign * 0.040, front_neck_y - 0.005, 0.978),
-                (sign * 0.043, front_neck_y - 0.007, 0.946),
-                (sign * 0.038, front_neck_y - 0.003, 0.925),
+                (sign * 0.040, front_y, 1.008),
+                (sign * 0.044, front_y - 0.005, 0.982),
+                (sign * 0.046, front_y - 0.007, 0.954),
+                (sign * 0.041, front_y - 0.003, 0.932),
             ],
-            0.00145,
+            0.00135,
             trim,
             armature,
             "Chest",
             resolution=3,
         )
-        base.transfer_nearest_body_weights(cord, body)
+        base.transfer_nearest_body_weights(cord, sampler.body)
         result.append(cord)
 
-        hip_x = sign * 0.132
-        hip_z = 0.795
-        hip_y = _side_y(body, hip_x, hip_z) - 0.006
+        x = sign * 0.140
+        z = 0.800
+        y = sampler.side_y(x, z)
         tie = base.curve_tube(
             f"Heather_Side_Tie_{side}",
             [
-                (hip_x, hip_y, hip_z),
-                (sign * 0.151, hip_y - 0.004, hip_z + 0.003),
-                (sign * 0.171, hip_y, hip_z - 0.012),
-                (sign * 0.184, hip_y + 0.006, hip_z - 0.034),
+                (x, y, z),
+                (sign * 0.158, y - 0.002, z + 0.003),
+                (sign * 0.177, y + 0.003, z - 0.012),
+                (sign * 0.188, y + 0.010, z - 0.032),
             ],
-            0.0016,
+            0.0015,
             trim,
             armature,
             "Hips",
             resolution=3,
         )
-        base.transfer_nearest_body_weights(tie, body)
+        base.transfer_nearest_body_weights(tie, sampler.body)
         result.append(tie)
     return result
 
 
 def _seams(
-    body: bpy.types.Object,
+    sampler: SurfaceSampler,
     armature: bpy.types.Object,
     trim: bpy.types.Material,
 ) -> list[bpy.types.Object]:
     front_points = [
-        (0.0, _surface_y(body, 0.0, z, front=True) - 0.011, z)
-        for z in (0.635, 0.690, 0.750, 0.810, 0.870, 0.930)
+        (
+            0.0,
+            sampler.sample(0.0, z, front=True).point.y - 0.017,
+            z,
+        )
+        for z in (0.625, 0.675, 0.730, 0.790, 0.850, 0.915)
     ]
     back_points = [
-        (0.0, _surface_y(body, 0.0, z, front=False) + 0.011, z)
-        for z in (0.635, 0.690, 0.750, 0.810, 0.870, 0.930)
+        (
+            0.0,
+            sampler.sample(0.0, z, front=False).point.y + 0.017,
+            z,
+        )
+        for z in (0.625, 0.675, 0.730, 0.790, 0.850, 0.915)
     ]
     front = base.curve_tube(
         "Heather_Center_Front_Seam",
         front_points,
-        0.00055,
+        0.0005,
         trim,
         armature,
         "Spine",
@@ -610,7 +612,7 @@ def _seams(
     back = base.curve_tube(
         "Heather_Center_Back_Seam",
         back_points,
-        0.00055,
+        0.0005,
         trim,
         armature,
         "Spine",
@@ -619,13 +621,12 @@ def _seams(
     hood = base.curve_tube(
         "Heather_Hood_Center_Seam",
         [
-            (0.0, 0.072, 1.038),
-            (0.0, 0.104, 1.010),
-            (0.0, 0.122, 0.978),
-            (0.0, 0.120, 0.946),
-            (0.0, 0.105, 0.916),
-            (0.0, 0.088, 0.892),
-            (0.0, 0.078, 0.878),
+            (0.0, 0.052, 1.025),
+            (0.0, 0.103, 1.000),
+            (0.0, 0.140, 0.965),
+            (0.0, 0.146, 0.928),
+            (0.0, 0.126, 0.895),
+            (0.0, 0.090, 0.875),
         ],
         0.00065,
         trim,
@@ -634,7 +635,7 @@ def _seams(
         resolution=2,
     )
     for obj in (front, back, hood):
-        base.transfer_nearest_body_weights(obj, body)
+        base.transfer_nearest_body_weights(obj, sampler.body)
     return [front, back, hood]
 
 
@@ -645,18 +646,19 @@ def create_outfit(
     trim: bpy.types.Material,
     button_material: bpy.types.Material,
 ) -> list[bpy.types.Object]:
+    sampler = SurfaceSampler(body)
     garments: list[bpy.types.Object] = []
-    garments.extend(_torso_shells(body, armature, fabric))
-    garments.extend(_highcut_shells(body, armature, fabric))
+    garments.extend(_torso_panels(sampler, armature, fabric))
+    garments.extend(_highcut_panels(sampler, armature, fabric))
     garments.extend(_sleeves_and_cuffs(body, armature, fabric, trim))
     garments.extend(
         [
-            _hood_panel(body, armature, fabric, "L"),
-            _hood_panel(body, armature, fabric, "R"),
-            _neck_band(body, armature, fabric),
+            _hood_half(body, armature, fabric, "L"),
+            _hood_half(body, armature, fabric, "R"),
+            _neck_band(sampler, armature, fabric),
         ]
     )
-    garments.extend(_placket_and_buttons(body, armature, trim, button_material))
-    garments.extend(_cords_and_ties(body, armature, trim))
-    garments.extend(_seams(body, armature, trim))
+    garments.extend(_placket_and_buttons(sampler, armature, trim, button_material))
+    garments.extend(_cords_and_ties(sampler, armature, trim))
+    garments.extend(_seams(sampler, armature, trim))
     return garments
