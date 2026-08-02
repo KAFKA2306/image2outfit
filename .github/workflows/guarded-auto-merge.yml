@@ -1,0 +1,145 @@
+name: Guarded auto-merge
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review, edited]
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  statuses: read
+
+concurrency:
+  group: guarded-auto-merge
+  cancel-in-progress: false
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge only validated opt-in pull requests
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const marker = '<!-- guarded-auto-merge -->';
+            const allowedConclusions = new Set(['success', 'neutral', 'skipped']);
+
+            async function candidates() {
+              if (context.payload.pull_request) {
+                return [context.payload.pull_request.number];
+              }
+              const pulls = await github.paginate(github.rest.pulls.list, {
+                owner,
+                repo,
+                state: 'open',
+                per_page: 100,
+              });
+              return pulls
+                .filter(pr => (pr.body || '').includes(marker))
+                .map(pr => pr.number);
+            }
+
+            async function evaluate(number) {
+              const {data: pr} = await github.rest.pulls.get({owner, repo, pull_number: number});
+              if (!(pr.body || '').includes(marker)) return;
+              if (pr.draft) {
+                core.info(`#${number}: draft; skip`);
+                return;
+              }
+              if (pr.head.repo.full_name !== `${owner}/${repo}`) {
+                core.info(`#${number}: fork PRs are not eligible`);
+                return;
+              }
+              if (!['OWNER', 'MEMBER', 'COLLABORATOR'].includes(pr.author_association)) {
+                core.info(`#${number}: untrusted author association ${pr.author_association}`);
+                return;
+              }
+
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                owner,
+                repo,
+                pull_number: number,
+                per_page: 100,
+              });
+              const names = new Set(files.map(file => file.filename));
+
+              if (pr.head.ref === 'agent/genworks-canonical-layout') {
+                const required = [
+                  'Assets/GenWorks/OutfitCatalog.json',
+                  'config/genworks-layout.json',
+                  'config/genworks-handoff-policy.json',
+                ];
+                const missing = required.filter(path => !names.has(path));
+                const canonicalPrefab = files.some(file =>
+                  /^Assets\/GenWorks\/[^/]+\/Prefab\/[^/]+\.prefab$/.test(file.filename)
+                  && file.status !== 'removed'
+                );
+                if (missing.length || !canonicalPrefab) {
+                  core.info(`#${number}: migration evidence incomplete; missing=${missing.join(',') || 'none'}, canonicalPrefab=${canonicalPrefab}`);
+                  return;
+                }
+              }
+
+              const checkRuns = await github.paginate(github.rest.checks.listForRef, {
+                owner,
+                repo,
+                ref: pr.head.sha,
+                per_page: 100,
+              });
+              const otherChecks = checkRuns.filter(check =>
+                !(check.details_url || '').includes(`/actions/runs/${context.runId}`)
+              );
+              if (otherChecks.length === 0) {
+                core.info(`#${number}: no independent checks reported yet`);
+                return;
+              }
+              const unfinished = otherChecks.filter(check => check.status !== 'completed');
+              const failed = otherChecks.filter(check =>
+                check.status === 'completed' && !allowedConclusions.has(check.conclusion)
+              );
+              if (unfinished.length || failed.length) {
+                core.info(`#${number}: checks not ready; unfinished=${unfinished.map(c => c.name)}, failed=${failed.map(c => `${c.name}:${c.conclusion}`)}`);
+                return;
+              }
+
+              const {data: combined} = await github.rest.repos.getCombinedStatusForRef({
+                owner,
+                repo,
+                ref: pr.head.sha,
+              });
+              if (combined.status === 'failure' || combined.status === 'error' || combined.status === 'pending') {
+                core.info(`#${number}: combined status=${combined.status}`);
+                return;
+              }
+
+              const refreshed = (await github.rest.pulls.get({owner, repo, pull_number: number})).data;
+              if (refreshed.mergeable !== true) {
+                core.info(`#${number}: mergeable=${refreshed.mergeable}; retry later`);
+                return;
+              }
+
+              const result = await github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: number,
+                sha: refreshed.head.sha,
+                merge_method: 'squash',
+                commit_title: `${refreshed.title} (#${number})`,
+                commit_message: 'Merged automatically after canonical layout evidence and all independent checks passed.',
+              });
+              if (!result.data.merged) {
+                core.setFailed(`#${number}: GitHub declined merge: ${result.data.message}`);
+                return;
+              }
+              core.info(`#${number}: merged as ${result.data.sha}`);
+            }
+
+            for (const number of await candidates()) {
+              await evaluate(number);
+            }
