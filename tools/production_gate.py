@@ -1,395 +1,236 @@
 #!/usr/bin/env python3
+"""Mandatory construction-method and customer-quality production gate.
+
+The historical transactional implementation lives in ``production_gate_core``.
+This module is the only supported executable and makes the commercial method
+contract intrinsic to both candidate creation and release promotion.
+"""
 from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-import audit_research_baseline
-import customer_quality
-import release_gate as legacy
+import method_selection
+import production_gate_core as core
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
-@dataclass
-class DirectoryTransaction:
-    target: Path
-
-    @property
-    def backup(self) -> Path:
-        return self.target.parent / f".{self.target.name}.last-good"
-
-    @property
-    def journal(self) -> Path:
-        return self.target.parent / f".{self.target.name}.transaction.json"
-
-    def _write_journal(self, phase: str, had_original: bool) -> None:
-        self.target.parent.mkdir(parents=True, exist_ok=True)
-        self.journal.write_text(
-            json.dumps(
-                {
-                    "schemaVersion": 1,
-                    "phase": phase,
-                    "target": self.target.name,
-                    "backup": self.backup.name,
-                    "hadOriginal": had_original,
-                },
-                indent=2,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
-
-    def recover(self) -> None:
-        if not self.journal.exists():
-            if self.backup.exists() and not self.target.exists():
-                self.backup.replace(self.target)
-            elif self.backup.exists() and self.target.exists():
-                raise RuntimeError(
-                    f"ambiguous interrupted transaction: {self.target} and {self.backup} both exist"
-                )
-            return
-
-        try:
-            state = json.loads(self.journal.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            raise RuntimeError(f"invalid transaction journal: {self.journal}: {exc}") from exc
-
-        phase = state.get("phase")
-        had_original = state.get("hadOriginal") is True
-        if phase == "PREPARED":
-            if had_original:
-                if self.target.exists() and not self.backup.exists():
-                    pass
-                elif self.backup.exists() and not self.target.exists():
-                    self.backup.replace(self.target)
-                else:
-                    raise RuntimeError(f"ambiguous prepared transaction: {self.target}")
-            elif self.backup.exists():
-                raise RuntimeError(f"unexpected backup for new target: {self.backup}")
-        elif phase in {"PROTECTED", "ROLLING_BACK"}:
-            if self.target.exists():
-                shutil.rmtree(self.target)
-            if had_original:
-                if not self.backup.exists():
-                    raise RuntimeError(f"last-good backup is missing: {self.backup}")
-                self.backup.replace(self.target)
-            elif self.backup.exists():
-                shutil.rmtree(self.backup)
-        elif phase == "COMMITTING":
-            if not self.target.exists():
-                raise RuntimeError(f"committed target is missing: {self.target}")
-            if self.backup.exists():
-                shutil.rmtree(self.backup)
-        else:
-            raise RuntimeError(f"unknown transaction phase: {phase!r}")
-        self.journal.unlink(missing_ok=True)
-
-    def begin(self) -> bool:
-        self.recover()
-        had_original = self.target.exists()
-        self._write_journal("PREPARED", had_original)
-        if had_original:
-            if self.backup.exists():
-                raise RuntimeError(f"stale last-good backup exists: {self.backup}")
-            self.target.replace(self.backup)
-        self._write_journal("PROTECTED", had_original)
-        return had_original
-
-    def rollback(self, had_original: bool) -> None:
-        self._write_journal("ROLLING_BACK", had_original)
-        if self.target.exists():
-            shutil.rmtree(self.target)
-        if had_original:
-            if not self.backup.exists():
-                raise RuntimeError(f"last-good backup is missing: {self.backup}")
-            self.backup.replace(self.target)
-        elif self.backup.exists():
-            shutil.rmtree(self.backup)
-        self.journal.unlink(missing_ok=True)
-
-    def commit(self, had_original: bool) -> None:
-        if not self.target.exists():
-            self.rollback(had_original)
-            raise RuntimeError(f"new transaction target is missing: {self.target}")
-        self._write_journal("COMMITTING", had_original)
-        if self.backup.exists():
-            shutil.rmtree(self.backup)
-        self.journal.unlink(missing_ok=True)
+def _repo_path(root: Path, value: str) -> Path:
+    path = (root / value).resolve()
+    if path != root and root not in path.parents:
+        raise ValueError(f"path escapes repository: {value}")
+    return path
 
 
-def _augment_audit(artifact: Path, values: dict[str, Any]) -> None:
-    audit_path = artifact / "audit.json"
-    audit = legacy.read(audit_path)
-    audit.setdefault("schemaVersion", 2)
-    audit["stateProtection"] = values
-    legacy.write(audit_path, audit)
+def _candidate_manifest_path(job: dict[str, Any], root: Path = ROOT) -> Path:
+    return _repo_path(root, str(job["candidateDir"])) / "candidate-manifest.json"
 
 
-def _research_state() -> tuple[dict[str, Any], dict[str, Any], str]:
-    report = audit_research_baseline.audit(legacy.ROOT)
-    baseline_path = audit_research_baseline.BASELINE_PATH
-    baseline = legacy.read(baseline_path)
-    baseline_hash = legacy.digest(baseline_path) if baseline_path.is_file() else ""
-    return report, baseline, baseline_hash
+def _artifact_path(job: dict[str, Any], root: Path = ROOT) -> Path:
+    return _repo_path(root, str(job["artifactDir"]))
 
 
-def _write_research_failure(
-    artifact: Path,
+def _binding_snapshot(
+    job: dict[str, Any], selection: dict[str, Any], root: Path = ROOT
+) -> dict[str, Any]:
+    construction_path = _repo_path(root, str(selection["constructionPath"]))
+    policy_path = root / "config" / "release-policy.json"
+    if not construction_path.is_file():
+        raise FileNotFoundError(f"construction config missing: {construction_path}")
+    if not policy_path.is_file():
+        raise FileNotFoundError(f"release policy missing: {policy_path}")
+    return {
+        "schemaVersion": 1,
+        "commercialProfile": selection.get("commercialProfile"),
+        "constructionProfile": selection.get("constructionProfile"),
+        "constructionPath": selection.get("constructionPath"),
+        "constructionSha256": method_selection.digest(construction_path),
+        "releasePolicySha256": method_selection.digest(policy_path),
+        "requiredCapabilities": list(selection.get("requiredCapabilities", [])),
+        "requiredCommercialEvidence": list(
+            selection.get("requiredCommercialEvidence", [])
+        ),
+        "buildScript": job.get("buildScript"),
+    }
+
+
+def _write_selection(
+    job: dict[str, Any], selection: dict[str, Any], root: Path = ROOT
+) -> None:
+    artifact = _artifact_path(job, root)
+    core.legacy.write(artifact / "method-selection.json", selection)
+
+
+def _write_no_go(
     job: dict[str, Any],
-    report: dict[str, Any],
+    phase: str,
+    errors: list[str],
+    root: Path = ROOT,
+    **details: Any,
 ) -> None:
-    artifact.mkdir(parents=True, exist_ok=True)
-    legacy.write(artifact / "research-baseline.json", report)
-    legacy.write(
-        artifact / "audit.json",
-        {
-            "schemaVersion": 2,
-            "phase": "candidate",
-            "jobId": job["id"],
-            "adapterId": job["adapterId"],
-            "checkedAt": legacy.now(),
-            "decision": "NO-GO",
-            "releaseEligible": False,
-            "stages": {
-                "researchBaseline": {
-                    "passed": False,
-                    "errors": report.get("errors", []),
-                    "warnings": report.get("warnings", []),
-                }
-            },
-            "note": "Candidate generation is blocked until the current primary-source research baseline passes.",
+    artifact = _artifact_path(job, root)
+    release = _repo_path(root, str(job["releaseDir"]))
+    value: dict[str, Any] = {
+        "schemaVersion": 2,
+        "phase": phase,
+        "jobId": job.get("id"),
+        "adapterId": job.get("adapterId"),
+        "checkedAt": core.legacy.now(),
+        "decision": "NO-GO",
+        "releaseEligible": False,
+        "errors": errors,
+        "stateProtection": {
+            "customerReleaseProtected": True,
+            "previousReleasePreserved": release.exists(),
         },
-    )
+    }
+    value.update(details)
+    core.legacy.write(artifact / "audit.json", value)
 
 
-def _bind_research_to_candidate(
-    candidate: Path,
-    artifact: Path,
-    report: dict[str, Any],
-    baseline: dict[str, Any],
-    baseline_hash: str,
-) -> None:
-    manifest_path = candidate / "candidate-manifest.json"
-    manifest = legacy.read(manifest_path)
+def _bind_method_to_candidate(
+    job: dict[str, Any], selection: dict[str, Any], root: Path = ROOT
+) -> dict[str, Any]:
+    manifest_path = _candidate_manifest_path(job, root)
+    manifest = core.legacy.read(manifest_path)
     if not manifest_path.is_file() or not manifest:
-        raise RuntimeError("candidate manifest is missing after a successful candidate run")
-    manifest["researchBaseline"] = {
-        "path": report["path"],
-        "baselineId": baseline["baselineId"],
-        "surveyYear": baseline["surveyYear"],
-        "reviewedAt": baseline["reviewedAt"],
-        "sha256": baseline_hash,
-        "requiredCapabilities": baseline["requiredCapabilities"],
-    }
-    legacy.write(manifest_path, manifest)
+        raise RuntimeError("candidate manifest is missing after candidate generation")
+    binding = _binding_snapshot(job, selection, root)
+    manifest["constructionMethod"] = binding
+    core.legacy.write(manifest_path, manifest)
 
+    artifact = _artifact_path(job, root)
     audit_path = artifact / "audit.json"
-    audit = legacy.read(audit_path)
+    audit = core.legacy.read(audit_path)
     stages = audit.setdefault("stages", {})
-    stages["researchBaseline"] = {
+    stages["constructionMethod"] = {
         "passed": True,
-        "baselineId": baseline["baselineId"],
-        "surveyYear": baseline["surveyYear"],
-        "reviewedAt": baseline["reviewedAt"],
-        "sha256": baseline_hash,
-        "methodCount": report.get("methodCount"),
-        "productionCoverage": report.get("productionCoverage", []),
-        "warnings": report.get("warnings", []),
+        **binding,
     }
-    audit["candidateManifestSha256"] = legacy.digest(manifest_path)
-    legacy.write(audit_path, audit)
+    audit["candidateManifestSha256"] = method_selection.digest(manifest_path)
+    core.legacy.write(audit_path, audit)
+    _write_selection(job, selection, root)
+    return binding
 
 
-def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
-    candidate = legacy.path(job["candidateDir"])
-    release = legacy.path(job["releaseDir"])
-    artifact = legacy.path(job["artifactDir"])
-    research, baseline, baseline_hash = _research_state()
-    if research.get("passed") is not True:
-        _write_research_failure(artifact, job, research)
-        return 2
-
-    candidate_tx = DirectoryTransaction(candidate)
-    release_tx = DirectoryTransaction(release)
-    candidate_had_original = candidate_tx.begin()
-    release_started = False
-    release_had_original = False
-
+def _bound_method_errors(
+    job: dict[str, Any],
+    selection: dict[str, Any],
+    candidate_manifest: dict[str, Any],
+    root: Path = ROOT,
+) -> list[str]:
     try:
-        release_had_original = release_tx.begin()
-        release_started = True
-        result = legacy.run_candidate(job_path, job, policy)
-        legacy.write(artifact / "research-baseline.json", research)
-        release_tx.rollback(release_had_original)
-        release_started = False
-        if result == 0:
-            _bind_research_to_candidate(
-                candidate,
-                artifact,
-                research,
-                baseline,
-                baseline_hash,
-            )
-            candidate_tx.commit(candidate_had_original)
-        else:
-            candidate_tx.rollback(candidate_had_original)
-        _augment_audit(
-            artifact,
-            {
-                "candidateLastGoodProtected": True,
-                "previousCandidateExisted": candidate_had_original,
-                "previousCandidateRestored": result != 0 and candidate_had_original,
-                "customerReleaseProtected": True,
-                "previousReleaseExisted": release_had_original,
-                "previousReleaseRestored": release_had_original,
-            },
-        )
-        return result
-    except Exception:
-        if release_started:
-            release_tx.rollback(release_had_original)
-        candidate_tx.rollback(candidate_had_original)
-        raise
+        expected = _binding_snapshot(job, selection, root)
+    except (OSError, ValueError, KeyError) as exc:
+        return [f"construction method binding cannot be resolved: {exc}"]
+    actual = candidate_manifest.get("constructionMethod")
+    if not isinstance(actual, dict):
+        return ["candidate construction method binding is missing"]
+    return [
+        f"candidate construction method changed: {field}"
+        for field, value in expected.items()
+        if actual.get(field) != value
+    ]
 
 
-def _strict_release_audit(
+def _evaluate_release(
+    job: dict[str, Any], root: Path = ROOT
+) -> tuple[dict[str, Any], dict[str, Any], list[str]]:
+    selection = method_selection.select(job, root)
+    manifest_path = _candidate_manifest_path(job, root)
+    manifest = core.legacy.read(manifest_path)
+    binding_errors = _bound_method_errors(job, selection, manifest, root)
+    commercial = method_selection.validate_commercial_evidence(job, manifest_path, root)
+    errors = list(selection.get("errors", []))
+    errors.extend(binding_errors)
+    errors.extend(commercial.get("errors", []))
+    errors = list(dict.fromkeys(errors))
+    commercial["bindingErrors"] = binding_errors
+    commercial["passed"] = not errors
+    commercial["errors"] = errors
+    return selection, commercial, errors
+
+
+def _run_candidate(
     job_path: Path,
     job: dict[str, Any],
     policy: dict[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any], list[str], str]:
-    candidate = legacy.path(job["candidateDir"])
-    candidate_manifest_path = candidate / "candidate-manifest.json"
-    candidate_manifest = legacy.read(candidate_manifest_path)
-    candidate_hash = (
-        legacy.digest(candidate_manifest_path) if candidate_manifest_path.is_file() else ""
-    )
-    errors = legacy.verify_candidate(job_path, job, candidate, candidate_manifest)
-    if job["adapterId"] in policy.get("blockedReleaseAdapterIds", []):
-        errors.append(f"adapter blocked from release: {job['adapterId']}")
+    root: Path = ROOT,
+) -> int:
+    selection = method_selection.select(job, root)
+    if selection.get("passed") is not True:
+        _write_selection(job, selection, root)
+        errors = list(selection.get("errors", []))
+        _write_no_go(job, "candidate", errors, root, methodSelection=selection)
+        return 2
 
-    research, baseline, baseline_hash = _research_state()
-    if research.get("passed") is not True:
-        errors.extend(f"researchBaseline: {value}" for value in research.get("errors", []))
-    bound = candidate_manifest.get("researchBaseline")
-    if not isinstance(bound, dict):
-        errors.append("candidate research baseline is missing")
-    else:
-        expected = {
-            "path": research.get("path"),
-            "baselineId": baseline.get("baselineId"),
-            "surveyYear": baseline.get("surveyYear"),
-            "reviewedAt": baseline.get("reviewedAt"),
-            "sha256": baseline_hash,
-            "requiredCapabilities": baseline.get("requiredCapabilities"),
-        }
-        for field, value in expected.items():
-            if bound.get(field) != value:
-                errors.append(f"candidate research baseline changed: {field}")
-
-    evidence = {
-        kind: legacy.read(legacy.path(job["humanEvidence"][kind]))
-        for kind in policy.get("requiredHumanEvidenceKinds", [])
-    }
-    quality, quality_errors = customer_quality.validate(
-        job=job,
-        policy=policy,
-        candidate_manifest=candidate_manifest,
-        candidate_hash=candidate_hash,
-        evidence=evidence,
-        resolve_repo_path=legacy.path,
-        digest=legacy.digest,
-    )
-    errors.extend(quality_errors)
-    return quality, research, errors, candidate_hash
+    result = core._run_candidate(job_path, job, policy)
+    if result != 0:
+        _write_selection(job, selection, root)
+        return result
+    try:
+        _bind_method_to_candidate(job, selection, root)
+    except Exception as exc:
+        error = f"candidate construction method binding failed: {exc}"
+        _write_no_go(job, "candidate", [error], root, methodSelection=selection)
+        print(f"image2outfit production gate: {error}", file=sys.stderr)
+        return 1
+    return 0
 
 
-def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
-    artifact = legacy.path(job["artifactDir"])
-    release = legacy.path(job["releaseDir"])
-    artifact.mkdir(parents=True, exist_ok=True)
-    quality, research, errors, candidate_hash = _strict_release_audit(
-        job_path, job, policy
-    )
-    legacy.write(artifact / "research-baseline.json", research)
-    legacy.write(
-        artifact / "customer-quality.json",
-        {
-            "schemaVersion": 1,
-            "phase": "customer-quality",
-            "jobId": job["id"],
-            "adapterId": job["adapterId"],
-            "candidateManifestSha256": candidate_hash or None,
-            "passed": not errors,
-            "errors": errors,
-            "evidence": quality,
-            "researchBaseline": {
-                "passed": research.get("passed") is True,
-                "baselineId": research.get("baselineId"),
-                "reviewedAt": research.get("reviewedAt"),
-            },
-        },
-    )
+def _run_release(
+    job_path: Path,
+    job: dict[str, Any],
+    policy: dict[str, Any],
+    root: Path = ROOT,
+) -> int:
+    selection, commercial, errors = _evaluate_release(job, root)
+    artifact = _artifact_path(job, root)
+    _write_selection(job, selection, root)
+    core.legacy.write(artifact / "commercial-method-quality.json", commercial)
     if errors:
-        legacy.write(
-            artifact / "audit.json",
-            {
-                "schemaVersion": 2,
-                "phase": "release",
-                "jobId": job["id"],
-                "adapterId": job["adapterId"],
-                "checkedAt": legacy.now(),
-                "decision": "NO-GO",
-                "releaseEligible": False,
-                "errors": errors,
-                "evidence": quality,
-                "researchBaseline": research,
-                "candidateManifestSha256": candidate_hash or None,
-                "stateProtection": {
-                    "customerReleaseProtected": True,
-                    "previousReleasePreserved": release.exists(),
-                },
-            },
+        _write_no_go(
+            job,
+            "release",
+            errors,
+            root,
+            methodSelection=selection,
+            commercialMethodQuality=commercial,
+            candidateManifestSha256=commercial.get("candidateManifestSha256"),
         )
         return 2
 
-    release_tx = DirectoryTransaction(release)
-    release_had_original = release_tx.begin()
-    try:
-        result = legacy.run_release(job_path, job, policy)
-        if result == 0:
-            release_tx.commit(release_had_original)
-        else:
-            release_tx.rollback(release_had_original)
-        _augment_audit(
+    result = core._run_release(job_path, job, policy)
+    if result == 0:
+        core._augment_audit(
             artifact,
             {
-                "customerReleaseProtected": True,
-                "previousReleaseExisted": release_had_original,
-                "previousReleaseRestored": result != 0 and release_had_original,
-                "strictCustomerQualityPassed": True,
-                "researchBaselinePassed": True,
+                "commercialMethodPassed": True,
+                "commercialProfile": selection.get("commercialProfile"),
+                "constructionProfile": selection.get("constructionProfile"),
             },
         )
-        return result
-    except Exception:
-        release_tx.rollback(release_had_original)
-        raise
+    return result
 
 
-def main() -> int:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Transactional, research-bound customer-quality gate for image2outfit"
+        description="Transactional, research-bound commercial and customer-quality gate"
     )
     parser.add_argument("--mode", choices=("candidate", "release"), required=True)
     parser.add_argument("--job", required=True)
-    options = parser.parse_args()
+    return parser
+
+
+def main() -> int:
+    options = build_parser().parse_args()
     try:
         job_path = Path(options.job).resolve()
-        job, policy = legacy.load(job_path)
+        job, policy = core.legacy.load(job_path)
         if options.mode == "release":
             return _run_release(job_path, job, policy)
         return _run_candidate(job_path, job, policy)
