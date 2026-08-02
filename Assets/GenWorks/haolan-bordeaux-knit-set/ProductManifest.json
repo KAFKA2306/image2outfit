@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "productId": "haolan-bordeaux-knit-set",
+  "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
+  "status": "REJECTED",
+  "targetAdapterId": "haolan-v1.6",
+  "productRoot": "Assets/GenWorks/haolan-bordeaux-knit-set",
+  "outfitPrefabPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+  "documentationPath": "Assets/GenWorks/haolan-bordeaux-knit-set/README.md",
+  "sourceJobPath": "config/products/haolan-bordeaux-knit-set/job.json",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/haolan-bordeaux-knit-set",
+    "doNotRebuildFromZero": true,
+    "decision": "NO-GO",
+    "resumeFrom": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
+    "blockers": [
+      "Restore or reproducibly rebuild the exact FBX referenced by the preserved prefab",
+      "Restore editable Blender source and textures",
+      "Generate hash-bound front, back, left, right, three-quarter, combined multiview, and pose-review evidence",
+      "Pass Unity 2022.3.22f1 import/save-reload, Modular Avatar integration, animated clipping, and VRChat Build & Test"
+    ]
+  },
+  "knownEvidence": {
+    "staticGeometryFromPriorPipeline": "PASS",
+    "trackedFbx": "MISSING",
+    "actualFiveDirectionPreview": "MISSING",
+    "unityImport": "NOT_RUN",
+    "vrchatRuntime": "NOT_RUN"
+  }
+}
