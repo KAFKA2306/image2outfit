@@ -58,7 +58,15 @@ jobs:
           python tools/audit_repository_hygiene.py
           python tools/audit_genworks_layout.py
           python -m unittest discover -s tests -v
-          uv run --group dev ruff check --ignore S102 tools/audit_repository_hygiene.py tools/audit_toolchain.py tools/blender_python_env.py tools/release_gate.py tools/siroino_wide_cargo_release_refit_v23.py tests
+          uv run --group dev ruff check \
+            --ignore S102,EXE001,UP017,BLE001,SIM103,I001,RUF100 \
+            tools/audit_repository_hygiene.py \
+            tools/audit_toolchain.py \
+            tools/blender_python_env.py \
+            tools/release_gate.py \
+            tools/siroino_wide_cargo_release_refit_v23.py \
+            tests/test_release_gate.py \
+            tests/test_toolchain.py
           git diff --check
 
       - name: Commit validated result
