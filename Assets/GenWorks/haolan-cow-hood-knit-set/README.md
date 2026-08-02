@@ -2,7 +2,7 @@
 
 **Status: `REJECTED` / `NO-GO`.**
 
-This is the canonical resumable workspace for the HAOLAN cow-hood outfit. It was moved from `Assets/GenWorks/Legacy/Snapshots/haolan/cow-hood-knit-set-v1` because a garment with an FBX, Prefab, textures, renders, audit evidence, and a defined continuation path is an active product checkpoint—not a legacy folder.
+This is the single canonical resumable workspace for the HAOLAN cow-hood outfit. A garment with an FBX, Prefab, textures, renders, audit evidence, and a defined continuation path is maintained as a product checkpoint rather than an avatar-grouped legacy copy.
 
 ## Preserved checkpoint
 
