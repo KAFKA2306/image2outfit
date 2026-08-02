@@ -99,6 +99,7 @@ tasks:
         tools/migrate_jobs_to_genworks.py
         tools/customer_quality.py
         tools/production_gate.py
+        tools/production_gate_core.py
         tests/test_method_selection.py
         tests/test_tool_ownership.py
         tests/test_repository_hygiene.py
@@ -108,6 +109,7 @@ tasks:
         tests/test_canonical_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
+        tests/test_production_gate_commercial.py
         tests/test_research_baseline.py
       - >-
         uv run --no-cache --locked --no-default-groups --group dev
@@ -121,6 +123,7 @@ tasks:
         tools/migrate_jobs_to_genworks.py
         tools/customer_quality.py
         tools/production_gate.py
+        tools/production_gate_core.py
         tests/test_method_selection.py
         tests/test_tool_ownership.py
         tests/test_repository_hygiene.py
@@ -130,6 +133,7 @@ tasks:
         tests/test_canonical_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
+        tests/test_production_gate_commercial.py
         tests/test_research_baseline.py
 
   format:python:
@@ -147,6 +151,7 @@ tasks:
         tools/migrate_jobs_to_genworks.py
         tools/customer_quality.py
         tools/production_gate.py
+        tools/production_gate_core.py
         tests/test_method_selection.py
         tests/test_tool_ownership.py
         tests/test_repository_hygiene.py
@@ -156,4 +161,5 @@ tasks:
         tests/test_canonical_paths.py
         tests/test_customer_quality.py
         tests/test_production_gate.py
+        tests/test_production_gate_commercial.py
         tests/test_research_baseline.py
