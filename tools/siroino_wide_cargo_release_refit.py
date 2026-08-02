@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""Straight-leg single-shell rebuild for Siroino Wide Cargo.
+"""Shape-key-isolated straight-leg rebuild for Siroino Wide Cargo.
 
-v19 removed exposed skin and the hard knee step, but the rendered silhouette
-still narrowed through the upper thigh and bulged around the knee. Its Blender
-Smooth modifier also produced a handful of extreme coordinates because it was
-applied in a skinned modifier stack. v20 removes that modifier entirely and
-moves the smooth transition into the upper pelvis, so the target wide-leg
-cross-section is already established above the knee.
+v20 produced the intended continuous wide silhouette, but the actual five-view
+render exposed long spikes from the waist and crotch. The same build reported
+otherwise impossible Basis bounds while every height-band measurement remained
+normal. The shared helper creates Basis and target keys with Blender's default
+``from_mix=True`` behavior, so this revision removes shape-key generation from
+the fit-validation stage and leaves the proven base mesh and bone weights intact.
+
+The purpose of v21 is controlled isolation: five-view and six-pose renders must
+first prove that the base pants are spike-free and wearable. Size shape keys are
+reintroduced only through a safe ``from_mix=False`` implementation after that
+visual gate passes.
 """
 from __future__ import annotations
 
@@ -66,8 +71,6 @@ def target_cross_section(x: float, y: float, z: float) -> tuple[float, float]:
     side = -1.0 if x < 0.0 else 1.0
     down = profile_down(z)
 
-    # Outer edge stays nearly vertical: 0.088 + 0.118 = 0.206 m at the
-    # upper thigh and 0.070 + 0.132 = 0.202 m at the hem.
     center_abs = lerp(0.088, 0.070, down)
     outer_radius = lerp(0.118, 0.132, down)
     inner_gap = lerp(0.010, 0.009, down)
@@ -91,17 +94,12 @@ def apply_straight_leg_profile(obj: bpy.types.Object) -> None:
     for vertex in obj.data.vertices:
         x, y, z = vertex.co
 
-        # Keep the waistband attached, then establish full wide-leg volume by
-        # z=0.54. v19 did not reach full volume until z=0.45, creating the
-        # visually narrow upper thigh and the apparent knee bulge.
         upper_amount = smoothstep(0.620, 0.805, z)
         fitted_x = x * lerp(1.105, 1.055, upper_amount)
         fitted_y = y * lerp(1.125, 1.075, upper_amount)
         target_x, target_y = target_cross_section(x, y, z)
         target_amount = 1.0 - smoothstep(0.540, 0.680, z)
 
-        # Preserve only the small central crotch bridge. All lateral upper-thigh
-        # vertices receive the same smooth target profile as the knee and hem.
         if z >= 0.430 and abs(x) < 0.022:
             bridge_amount = smoothstep(0.003, 0.022, abs(x))
             target_amount *= lerp(0.25, 1.0, bridge_amount)
@@ -125,7 +123,8 @@ def create_single_shell_pants(body, armature, fabric) -> bpy.types.Object:
     )
     apply_straight_leg_profile(pants)
     build.clean_topology(pants)
-    build.c.add_nearest_shape_keys(pants, body)
+    # Deliberately no shape keys in this isolation pass. The armature modifier
+    # and transferred body weights remain active for all required pose renders.
     return pants
 
 
@@ -180,6 +179,7 @@ def audit_wearability() -> dict[str, object]:
         "garmentMeshNames": garment_meshes,
         "singleShellPresent": pants is not None,
         "singleShellOnly": garment_meshes == [expected_name],
+        "shapeKeysDeferred": True,
     }
     if pants is None:
         return {"schemaVersion": 1, "passed": False, "checks": checks}
@@ -213,6 +213,7 @@ def audit_wearability() -> dict[str, object]:
     metrics = {
         "vertices": len(pants.data.vertices),
         "triangles": len(pants.data.loop_triangles),
+        "shapeKeys": 0 if pants.data.shape_keys is None else len(pants.data.shape_keys.key_blocks) - 1,
         "minimumX": min(xs, default=0.0),
         "maximumX": max(xs, default=0.0),
         "minimumY": min(ys, default=0.0),
@@ -249,6 +250,7 @@ def audit_wearability() -> dict[str, object]:
         and depth_jump_knee_hem <= 0.16
     )
     inner_coverage_pass = len(inner_lower_vertices) >= 40
+    no_shape_keys_pass = metrics["shapeKeys"] == 0
     checks.update({
         "topologyPassed": topology_pass,
         "finiteBoundsPassed": finite_bounds_pass,
@@ -257,12 +259,13 @@ def audit_wearability() -> dict[str, object]:
         "profileBandsPopulated": band_population_pass,
         "profileContinuityPassed": continuity_pass,
         "innerLegCoveragePassed": inner_coverage_pass,
+        "shapeKeyIsolationPassed": no_shape_keys_pass,
     })
     passed = (
         garment_meshes == [expected_name]
         and topology_pass and finite_bounds_pass and height_pass
         and width_pass and depth_pass and band_population_pass
-        and continuity_pass and inner_coverage_pass
+        and continuity_pass and inner_coverage_pass and no_shape_keys_pass
     )
     return {"schemaVersion": 1, "passed": passed, "checks": checks}
 
@@ -272,7 +275,7 @@ def record_wearability(report: dict[str, object]) -> None:
     manifest_path = build.c.repo_path(job["productManifestPath"])
     manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
     manifest["wearabilityAudit"] = report
-    manifest["designRevision"] = "v20-straight-leg-wide-cargo"
+    manifest["designRevision"] = "v21-shape-key-isolation"
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
