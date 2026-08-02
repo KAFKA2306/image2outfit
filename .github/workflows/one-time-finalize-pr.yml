@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: image2outfit-finalize-merged-branches
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   finalize:
