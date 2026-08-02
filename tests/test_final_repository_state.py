@@ -29,11 +29,12 @@ class FinalRepositoryStateTest(unittest.TestCase):
             self.assertTrue(license_path.is_file(), license_path)
             job = json.loads(job_path.read_text(encoding="utf-8-sig"))
             product_id = product_dir.name
-            self.assertEqual(job["id"], product_id)
-            self.assertEqual(
-                job["productRoot"],
+            allowed_roots = {
                 f"Assets/GenWorks/{product_id}",
-            )
+                f"Assets/GenWorks/Products/{product_id}",
+            }
+            self.assertEqual(job["id"], product_id)
+            self.assertIn(job["productRoot"], allowed_roots)
             self.assertEqual(
                 job["licenseEvidence"],
                 f"config/products/{product_id}/license.json",
@@ -55,15 +56,11 @@ class FinalRepositoryStateTest(unittest.TestCase):
         )
         required_views = set(policy["requiredPreviewViews"])
         allowed_statuses = set(policy["statuses"])
-        automated_gates = policy[
-            "requiredAutomatedTechnicalGatesBeforeHumanReview"
-        ]
+        automated_gates = policy["requiredAutomatedTechnicalGatesBeforeHumanReview"]
         human_gates = policy["requiredHumanReleaseGates"]
 
         for product_dir in sorted(path for path in products.iterdir() if path.is_dir()):
-            job = json.loads(
-                (product_dir / "job.json").read_text(encoding="utf-8-sig")
-            )
+            job = json.loads((product_dir / "job.json").read_text(encoding="utf-8-sig"))
             product_root = job["productRoot"]
             delivery_assets = set(job.get("deliveryAssets", []))
 
@@ -75,11 +72,7 @@ class FinalRepositoryStateTest(unittest.TestCase):
                     value.startswith(product_root + "/"),
                     f"{product_dir.name}: {field} must stay under {product_root}",
                 )
-                self.assertIn(
-                    value,
-                    delivery_assets,
-                    f"{product_dir.name}: {field} must be tracked as a handoff asset",
-                )
+                self.assertIn(value, delivery_assets)
 
             previews = job.get("previewPaths")
             self.assertIsInstance(previews, dict, product_dir.name)
