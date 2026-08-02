@@ -128,7 +128,7 @@ def weighted_tube(
     return obj
 
 
-def sleeve_segments(
+def continuous_sleeve(
     armature: bpy.types.Object,
     side: str,
     fabric: bpy.types.Material,
@@ -138,152 +138,243 @@ def sleeve_segments(
     lower_start, lower_end = bone_segment(armature, f"LowerArm_{side}")
     upper_direction = upper_end - upper_start
     lower_direction = lower_end - lower_start
-    upper_points = [
-        upper_start + upper_direction * 0.04,
-        upper_start + upper_direction * 0.48,
-        upper_start + upper_direction * 0.93,
-        upper_end + lower_direction * 0.08,
+    points = [
+        upper_start + upper_direction * 0.02,
+        upper_start + upper_direction * 0.34,
+        upper_start + upper_direction * 0.70,
+        upper_end,
+        lower_start + lower_direction * 0.22,
+        lower_start + lower_direction * 0.56,
+        lower_start + lower_direction * 0.86,
+        lower_end,
     ]
-    upper_weights = [
+    weights = [
         {f"UpperArm_{side}": 1.0},
         {f"UpperArm_{side}": 1.0},
-        {f"UpperArm_{side}": 0.82, f"LowerArm_{side}": 0.18},
-        {f"UpperArm_{side}": 0.30, f"LowerArm_{side}": 0.70},
-    ]
-    lower_points = [
-        lower_start - lower_direction * 0.05,
-        lower_start + lower_direction * 0.36,
-        lower_start + lower_direction * 0.76,
-        lower_start + lower_direction * 0.94,
-    ]
-    lower_weights = [
-        {f"UpperArm_{side}": 0.18, f"LowerArm_{side}": 0.82},
+        {f"UpperArm_{side}": 0.92, f"LowerArm_{side}": 0.08},
+        {f"UpperArm_{side}": 0.50, f"LowerArm_{side}": 0.50},
+        {f"UpperArm_{side}": 0.12, f"LowerArm_{side}": 0.88},
         {f"LowerArm_{side}": 1.0},
         {f"LowerArm_{side}": 1.0},
         {f"LowerArm_{side}": 1.0},
     ]
+    sleeve = weighted_tube(
+        f"Heather_Long_Sleeve_{side}",
+        points,
+        [0.045, 0.043, 0.040, 0.037, 0.035, 0.032, 0.029, 0.027],
+        weights,
+        fabric,
+        armature,
+        segments=40,
+    )
     cuff_points = [
-        lower_start + lower_direction * 0.80,
-        lower_start + lower_direction * 0.94,
-        lower_end + lower_direction * 0.02,
+        lower_start + lower_direction * 0.78,
+        lower_start + lower_direction * 0.92,
+        lower_end + lower_direction * 0.03,
     ]
-    cuff_weights = [{f"LowerArm_{side}": 1.0}] * 3
-    return [
-        weighted_tube(
-            f"Heather_Upper_Sleeve_{side}",
-            upper_points,
-            [0.052, 0.049, 0.045, 0.044],
-            upper_weights,
-            fabric,
-            armature,
-        ),
-        weighted_tube(
-            f"Heather_Lower_Sleeve_{side}",
-            lower_points,
-            [0.046, 0.041, 0.036, 0.034],
-            lower_weights,
-            fabric,
-            armature,
-        ),
-        weighted_tube(
-            f"Heather_Rib_Cuff_{side}",
-            cuff_points,
-            [0.037, 0.035, 0.034],
-            cuff_weights,
-            trim,
-            armature,
-            segments=32,
-            thickness=0.0018,
-        ),
-    ]
+    cuff = weighted_tube(
+        f"Heather_Rib_Cuff_{side}",
+        cuff_points,
+        [0.030, 0.029, 0.028],
+        [{f"LowerArm_{side}": 1.0}] * 3,
+        trim,
+        armature,
+        segments=36,
+        thickness=0.0018,
+    )
+    return [sleeve, cuff]
 
 
-def hood_shell(armature: bpy.types.Object, material: bpy.types.Material) -> bpy.types.Object:
-    segments = 56
-    rings = [
-        (1.016, 0.056, 0.018, 0.030),
-        (1.054, 0.095, 0.030, 0.050),
-        (1.098, 0.104, 0.050, 0.070),
-        (1.138, 0.078, 0.064, 0.058),
+def _body_surface_y(
+    body: bpy.types.Object,
+    x: float,
+    z: float,
+    *,
+    front: bool,
+) -> float:
+    points = [
+        body.matrix_world @ vertex.co
+        for vertex in body.data.vertices
+        if abs((body.matrix_world @ vertex.co).x - x) <= 0.018
+        and abs((body.matrix_world @ vertex.co).z - z) <= 0.026
     ]
+    if not points:
+        points = [
+            body.matrix_world @ vertex.co
+            for vertex in body.data.vertices
+            if abs((body.matrix_world @ vertex.co).z - z) <= 0.045
+        ]
+    if not points:
+        raise RuntimeError(f"Could not sample Siroino body surface at x={x}, z={z}")
+    return min(point.y for point in points) if front else max(point.y for point in points)
+
+
+def fitted_center_panel(
+    name: str,
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+    rows: list[tuple[float, float]],
+    *,
+    front: bool,
+    segments: int = 20,
+) -> bpy.types.Object:
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, int, int, int]] = []
-    for z, radius_x, center_y, radius_y in rings:
-        for segment in range(segments + 1):
-            angle = math.pi * segment / segments
-            x = radius_x * math.cos(angle)
-            y = center_y + radius_y * math.sin(angle)
+    offset = -0.0075 if front else 0.0075
+    for z, half_width in rows:
+        for index in range(segments + 1):
+            x = -half_width + 2.0 * half_width * index / segments
+            y = _body_surface_y(body, x, z, front=front) + offset
             vertices.append((x, y, z))
     stride = segments + 1
-    for ring_index in range(len(rings) - 1):
-        for segment in range(segments):
-            a = ring_index * stride + segment
+    for row in range(len(rows) - 1):
+        for index in range(segments):
+            a = row * stride + index
             faces.append((a, a + 1, a + stride + 1, a + stride))
-    mesh = bpy.data.meshes.new("Heather_Hood_Mesh")
+    mesh = bpy.data.meshes.new(f"{name}_Mesh")
     mesh.from_pydata(vertices, [], faces)
     mesh.update(calc_edges=True)
     uv = mesh.uv_layers.new(name="UVMap")
     for polygon in mesh.polygons:
         for loop_index in polygon.loop_indices:
             vertex_index = mesh.loops[loop_index].vertex_index
-            ring_index, segment = divmod(vertex_index, stride)
+            row, column = divmod(vertex_index, stride)
             uv.data[loop_index].uv = (
-                segment / segments,
-                ring_index / (len(rings) - 1),
+                column / segments,
+                row / max(1, len(rows) - 1),
             )
     mesh.materials.append(material)
-    obj = bpy.data.objects.new("Heather_Folded_Hood", mesh)
+    obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     obj.parent = armature
     modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
     modifier.object = armature
     modifier.use_deform_preserve_volume = True
-    neck = obj.vertex_groups.new(name="Neck")
-    chest = obj.vertex_groups.new(name="Chest")
-    for ring_index in range(len(rings)):
-        indices = list(range(ring_index * stride, (ring_index + 1) * stride))
-        neck_weight = 0.42 + 0.16 * ring_index
-        neck.add(indices, neck_weight, "REPLACE")
-        chest.add(indices, 1.0 - neck_weight, "REPLACE")
+    base.transfer_nearest_body_weights(obj, body)
     for polygon in mesh.polygons:
         polygon.use_smooth = True
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
-    solidify = obj.modifiers.new("Hood fabric thickness", "SOLIDIFY")
-    solidify.thickness = 0.0020
+    solidify = obj.modifiers.new("Center panel thickness", "SOLIDIFY")
+    solidify.thickness = 0.0016
     solidify.offset = 0.0
     solidify.use_even_offset = True
     bpy.ops.object.modifier_apply(modifier=solidify.name)
-    bevel = obj.modifiers.new("Hood finished opening", "BEVEL")
-    bevel.width = 0.0009
+    bevel = obj.modifiers.new("Center panel finished edge", "BEVEL")
+    bevel.width = 0.0008
     bevel.segments = 2
     bpy.ops.object.modifier_apply(modifier=bevel.name)
     obj.select_set(False)
     return obj
 
 
-def neckline_binding(
+def hood_cowl(
+    body: bpy.types.Object,
     armature: bpy.types.Object,
-    trim: bpy.types.Material,
+    material: bpy.types.Material,
 ) -> bpy.types.Object:
-    points = []
-    for index in range(65):
-        angle = math.tau * index / 64
-        points.append((
-            0.057 * math.cos(angle),
-            -0.002 + 0.039 * math.sin(angle),
-            1.025 + 0.004 * math.cos(angle),
-        ))
-    return base.curve_tube(
-        "Heather_Hood_Neck_Binding",
-        points,
-        0.0021,
-        trim,
-        armature,
-        "Neck",
-        cyclic=True,
-        resolution=3,
-    )
+    segments = 56
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, int, int, int]] = []
+    for radius_x, radius_y, z in ((0.083, 0.054, 1.026), (0.057, 0.035, 1.018)):
+        for index in range(segments + 1):
+            angle = math.pi * index / segments
+            vertices.append(
+                (
+                    radius_x * math.cos(angle),
+                    -0.005 + radius_y * math.sin(angle),
+                    z - 0.006 * math.sin(angle),
+                )
+            )
+    stride = segments + 1
+    for index in range(segments):
+        faces.append((index, index + 1, stride + index + 1, stride + index))
+    mesh = bpy.data.meshes.new("Heather_Hood_Cowl_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    uv = mesh.uv_layers.new(name="UVMap")
+    for polygon in mesh.polygons:
+        for loop_index in polygon.loop_indices:
+            vertex_index = mesh.loops[loop_index].vertex_index
+            row, column = divmod(vertex_index, stride)
+            uv.data[loop_index].uv = (column / segments, float(row))
+    mesh.materials.append(material)
+    obj = bpy.data.objects.new("Heather_Hood_Cowl", mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.parent = armature
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+    base.transfer_nearest_body_weights(obj, body)
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    solidify = obj.modifiers.new("Cowl fabric thickness", "SOLIDIFY")
+    solidify.thickness = 0.0030
+    solidify.offset = 0.0
+    solidify.use_even_offset = True
+    bpy.ops.object.modifier_apply(modifier=solidify.name)
+    bevel = obj.modifiers.new("Cowl rolled edge", "BEVEL")
+    bevel.width = 0.0012
+    bevel.segments = 3
+    bpy.ops.object.modifier_apply(modifier=bevel.name)
+    obj.select_set(False)
+    return obj
+
+
+def hood_back_drape(
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+) -> bpy.types.Object:
+    vertices = [
+        (-0.055, 0.055, 1.030),
+        (0.055, 0.055, 1.030),
+        (-0.080, 0.070, 0.988),
+        (0.080, 0.070, 0.988),
+        (-0.045, 0.082, 0.946),
+        (0.045, 0.082, 0.946),
+        (0.0, 0.092, 0.910),
+    ]
+    faces = [(0, 1, 3, 2), (2, 3, 5, 4), (4, 5, 6)]
+    mesh = bpy.data.meshes.new("Heather_Hood_Back_Drape_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    uv = mesh.uv_layers.new(name="UVMap")
+    uv_values = [(0.18, 1.0), (0.82, 1.0), (0.0, 0.70), (1.0, 0.70), (0.22, 0.34), (0.78, 0.34), (0.50, 0.0)]
+    for polygon in mesh.polygons:
+        for loop_index in polygon.loop_indices:
+            uv.data[loop_index].uv = uv_values[mesh.loops[loop_index].vertex_index]
+    mesh.materials.append(material)
+    obj = bpy.data.objects.new("Heather_Hood_Back_Drape", mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.parent = armature
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+    base.transfer_nearest_body_weights(obj, body)
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    solidify = obj.modifiers.new("Hood drape thickness", "SOLIDIFY")
+    solidify.thickness = 0.0022
+    solidify.offset = 0.0
+    solidify.use_even_offset = True
+    bpy.ops.object.modifier_apply(modifier=solidify.name)
+    bevel = obj.modifiers.new("Hood drape finished edge", "BEVEL")
+    bevel.width = 0.0010
+    bevel.segments = 3
+    bpy.ops.object.modifier_apply(modifier=bevel.name)
+    subdivision = obj.modifiers.new("Hood drape smoothing", "SUBSURF")
+    subdivision.subdivision_type = "CATMULL_CLARK"
+    subdivision.levels = 1
+    subdivision.render_levels = 1
+    bpy.ops.object.modifier_apply(modifier=subdivision.name)
+    obj.select_set(False)
+    return obj
 
 
 def create_outfit(body, armature, fabric, trim, button_material):
@@ -294,10 +385,7 @@ def create_outfit(body, armature, fabric, trim, button_material):
             "Heather_Front_Upper_Panel",
             lambda c: 0.770 <= c.z <= 1.045
             and c.y < 0.006
-            and abs(c.x) <= min(
-                0.150,
-                0.058 + max(0.0, c.z - 0.700) * 0.40,
-            ),
+            and abs(c.x) <= min(0.150, 0.058 + max(0.0, c.z - 0.700) * 0.40),
             fabric,
             0.0080,
         ),
@@ -307,37 +395,33 @@ def create_outfit(body, armature, fabric, trim, button_material):
             "Heather_Back_Upper_Panel",
             lambda c: 0.770 <= c.z <= 1.040
             and c.y >= -0.010
-            and abs(c.x) <= min(
-                0.150,
-                0.062 + max(0.0, c.z - 0.700) * 0.38,
-            ),
+            and abs(c.x) <= min(0.150, 0.062 + max(0.0, c.z - 0.700) * 0.38),
             fabric,
             0.0080,
         ),
-        base.extract_surface(
-            body,
-            armature,
+        fitted_center_panel(
             "Heather_Highcut_Front_Panel",
-            lambda c: 0.575 <= c.z <= 0.790
-            and c.y < 0.002
-            and abs(c.x) <= 0.025 + max(0.0, c.z - 0.575) * 0.31,
-            fabric,
-            0.0075,
-        ),
-        base.extract_surface(
             body,
             armature,
-            "Heather_Highcut_Back_Panel",
-            lambda c: 0.565 <= c.z <= 0.790
-            and c.y >= -0.008
-            and abs(c.x) <= 0.038 + max(0.0, c.z - 0.565) * 0.27,
             fabric,
-            0.0075,
+            [(0.575, 0.022), (0.625, 0.029), (0.690, 0.043), (0.745, 0.064), (0.795, 0.094)],
+            front=True,
+        ),
+        fitted_center_panel(
+            "Heather_Highcut_Back_Panel",
+            body,
+            armature,
+            fabric,
+            [(0.570, 0.026), (0.625, 0.034), (0.690, 0.050), (0.745, 0.071), (0.795, 0.098)],
+            front=False,
         ),
     ]
     for side in ("L", "R"):
-        garments.extend(sleeve_segments(armature, side, fabric, trim))
-    garments.extend([hood_shell(armature, fabric), neckline_binding(armature, trim)])
+        garments.extend(continuous_sleeve(armature, side, fabric, trim))
+    garments.extend([
+        hood_cowl(body, armature, fabric),
+        hood_back_drape(body, armature, fabric),
+    ])
 
     front_y = base.body_front_y(body, 0.0, 0.970) - 0.012
     garments.append(
@@ -373,8 +457,8 @@ def create_outfit(body, armature, fabric, trim, button_material):
             base.curve_tube(
                 f"Heather_Hood_Drawcord_{label}",
                 [
-                    (x, front_y - 0.001, 1.030),
-                    (x * 1.08, front_y - 0.004, 0.975),
+                    (x, front_y - 0.001, 1.025),
+                    (x * 1.08, front_y - 0.004, 0.970),
                     (x * 1.12, front_y - 0.006, 0.915),
                 ],
                 0.00135,
@@ -408,11 +492,7 @@ def create_outfit(body, armature, fabric, trim, button_material):
                 ),
                 base.curve_tube(
                     f"Heather_Side_Tie_Upper_{label}",
-                    [
-                        (sign * 0.092, hip_y, 0.779),
-                        (hip_x, hip_y - 0.003, 0.760),
-                        (hip_x + sign * 0.016, hip_y, 0.713),
-                    ],
+                    [(sign * 0.092, hip_y, 0.779), (hip_x, hip_y - 0.003, 0.760), (hip_x + sign * 0.016, hip_y, 0.713)],
                     0.00125,
                     trim,
                     armature,
@@ -420,11 +500,7 @@ def create_outfit(body, armature, fabric, trim, button_material):
                 ),
                 base.curve_tube(
                     f"Heather_Side_Tie_Lower_{label}",
-                    [
-                        (hip_x, hip_y - 0.003, 0.760),
-                        (hip_x + sign * 0.021, hip_y + 0.001, 0.727),
-                        (hip_x + sign * 0.010, hip_y + 0.003, 0.682),
-                    ],
+                    [(hip_x, hip_y - 0.003, 0.760), (hip_x + sign * 0.021, hip_y + 0.001, 0.727), (hip_x + sign * 0.010, hip_y + 0.003, 0.682)],
                     0.00125,
                     trim,
                     armature,
@@ -467,14 +543,8 @@ def clean_meshes(objects: Iterable[bpy.types.Object]) -> dict[str, int]:
             triangle.polygon_index
             for triangle in mesh.loop_triangles
             if (
-                (
-                    mesh.vertices[triangle.vertices[1]].co
-                    - mesh.vertices[triangle.vertices[0]].co
-                )
-                .cross(
-                    mesh.vertices[triangle.vertices[2]].co
-                    - mesh.vertices[triangle.vertices[0]].co
-                )
+                (mesh.vertices[triangle.vertices[1]].co - mesh.vertices[triangle.vertices[0]].co)
+                .cross(mesh.vertices[triangle.vertices[2]].co - mesh.vertices[triangle.vertices[0]].co)
                 .length_squared
                 <= 1e-18
             )
@@ -483,11 +553,7 @@ def clean_meshes(objects: Iterable[bpy.types.Object]) -> dict[str, int]:
             cleanup = bmesh.new()
             cleanup.from_mesh(mesh)
             cleanup.faces.ensure_lookup_table()
-            doomed = [
-                cleanup.faces[index]
-                for index in sorted(degenerate_polygons)
-                if index < len(cleanup.faces)
-            ]
+            doomed = [cleanup.faces[index] for index in sorted(degenerate_polygons) if index < len(cleanup.faces)]
             if doomed:
                 bmesh.ops.delete(cleanup, geom=doomed, context="FACES")
             loose = [vertex for vertex in cleanup.verts if not vertex.link_faces]
