@@ -1,0 +1,119 @@
+name: Materialize Cyber Kawaii artifact once
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/materialize-cyber-kawaii.yml
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: materialize-cyber-kawaii-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  materialize:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+
+      - name: Download verified hosted artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 --retry-all-errors \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/8829942064/zip" \
+            --output /tmp/cyber-kawaii.zip
+          rm -rf /tmp/cyber-kawaii
+          mkdir -p /tmp/cyber-kawaii
+          unzip -q /tmp/cyber-kawaii.zip -d /tmp/cyber-kawaii
+          test -f /tmp/cyber-kawaii/Artifacts/siroino-cyber-kawaii-large/product-build-report.json
+          test -f /tmp/cyber-kawaii/Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend
+
+      - name: Verify and materialize product workspace
+        run: |
+          set -euo pipefail
+          uv run --locked --no-default-groups python - <<'PY'
+          import hashlib
+          import json
+          import shutil
+          from pathlib import Path
+          from PIL import Image, ImageDraw, ImageFont
+
+          extracted = Path('/tmp/cyber-kawaii')
+          report = json.loads((extracted / 'Artifacts/siroino-cyber-kawaii-large/product-build-report.json').read_text(encoding='utf-8'))
+          if report.get('passed') is not True:
+              raise SystemExit('Hosted artifact did not pass its technical gate')
+          metrics = report.get('metrics', {})
+          required = {
+              'degenerateTriangles': 0,
+              'unweightedVertices': 0,
+              'weightSumErrors': 0,
+          }
+          for name, expected in required.items():
+              if metrics.get(name) != expected:
+                  raise SystemExit(f'{name} expected {expected}, found {metrics.get(name)}')
+          clearance = report.get('improvementLoop', [])[-1].get('clearance', {}).get('p01', 0)
+          if clearance < 0.003:
+              raise SystemExit(f'1% clearance below 3 mm: {clearance}')
+
+          source = extracted / 'Assets/GenWorks/siroino-cyber-kawaii-large'
+          target = Path('Assets/GenWorks/siroino-cyber-kawaii-large')
+          shutil.rmtree(target, ignore_errors=True)
+          shutil.copytree(source, target)
+
+          sheet = target / 'Previews/siroino-cyber-kawaii-large-multiview.webp'
+          image = Image.open(sheet).convert('RGB')
+          draw = ImageDraw.Draw(image)
+          draw.rectangle((0, 0, image.width, 72), fill=(29, 32, 45))
+          font_path = Path('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf')
+          font = ImageFont.truetype(str(font_path), 36)
+          draw.text((28, 14), 'CYBER KAWAII LAYERED SET / SIROINO', font=font, fill=(245, 245, 248))
+          image.save(sheet, 'WEBP', quality=92, method=6)
+
+          manifest_path = target / 'ProductManifest.json'
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          manifest['productBuildScript'] = 'tools/siroino_cyber_kawaii_standard_final_build.py'
+          manifest['handoff']['resumeFrom'] = 'tools/siroino_cyber_kawaii_standard_final_build.py'
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          files = sorted(path for path in target.rglob('*') if path.is_file() and path.name != 'SOURCE_HASHES.txt')
+          hashes = [
+              f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(target).as_posix()}"
+              for path in files
+          ]
+          (target / 'SOURCE_HASHES.txt').write_text('\n'.join(hashes) + '\n', encoding='utf-8')
+          PY
+
+      - name: Commit product and remove one-time workflow
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/materialize-cyber-kawaii.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- Assets/GenWorks/siroino-cyber-kawaii-large .github/workflows/materialize-cyber-kawaii.yml
+          git commit -m 'build: materialize standard Siroino Cyber Kawaii workspace'
+          git push origin "HEAD:$HEAD_REF"
