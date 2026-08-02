@@ -61,6 +61,20 @@ class CyberKawaiiSkirtContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "front/back ease"):
             contract.validate_contract(data)
 
+    def test_tracked_checkpoint_matches_pattern_revision(self) -> None:
+        manifest_path = (
+            ROOT
+            / "Assets/GenWorks/siroino-cyber-kawaii-large/ProductManifest.json"
+        )
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            manifest["designRevision"],
+            "v6-large-body-measured-pattern-fit",
+        )
+        self.assertEqual(manifest["technicalGates"]["patternContract"], "PASS")
+        self.assertEqual(manifest["technicalGates"]["zozoContactSolver"], "PENDING")
+        self.assertEqual(manifest["technicalGates"]["materialMakerSource"], "PENDING")
+
 
 if __name__ == "__main__":
     unittest.main()
