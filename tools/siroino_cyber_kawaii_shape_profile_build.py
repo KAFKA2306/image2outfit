@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Build Cyber Kawaii for Siroino _Large with shape keys and deforming skirt weights."""
+"""Build Cyber Kawaii for Siroino _Large with shape keys and fitted skirt geometry."""
 from __future__ import annotations
 
 import json
+import math
 from typing import Any
 
 import bpy
@@ -21,11 +22,37 @@ SKIRT_OBJECTS = {
     "Black_Skirt_Waistband",
     "Pink_Underskirt_Hem",
 }
+SILHOUETTE_PROFILES = {
+    "Black_Pink_Plaid_Pleated_Skirt": {
+        "topScale": 0.985,
+        "bottomScale": 0.835,
+        "pleatScale": 0.56,
+        "zOffset": -0.006,
+    },
+    "White_Ruffle_Underskirt": {
+        "topScale": 0.900,
+        "bottomScale": 0.860,
+        "pleatScale": 0.62,
+        "zOffset": -0.004,
+    },
+    "Black_Skirt_Waistband": {
+        "topScale": 0.975,
+        "bottomScale": 0.965,
+        "pleatScale": 0.50,
+        "zOffset": -0.008,
+    },
+    "Pink_Underskirt_Hem": {
+        "topScale": 0.885,
+        "bottomScale": 0.855,
+        "pleatScale": 0.58,
+        "zOffset": -0.004,
+    },
+}
 
 
 def contact_sheet(images, output, *, order, title):
     if title == "CYBER KAWAII LAYERED SET / SIROINO _LARGE":
-        title = "CYBER KAWAII LAYERED SET / SIROINO _LARGE (SHAPE PROFILE)"
+        title = "CYBER KAWAII LAYERED SET / SIROINO _LARGE (FITTED SILHOUETTE)"
     return ORIGINAL_CONTACT_SHEET(images, output, order=order, title=title)
 
 
@@ -49,6 +76,52 @@ def apply_configured_shape_profile(body, requested=None) -> dict[str, object]:
     )
     LAST_TARGET_PROFILE = dict(result)
     return result
+
+
+def reshape_skirt_shell(garment) -> dict[str, float | int]:
+    profile = SILHOUETTE_PROFILES[garment.name]
+    vertices = list(garment.data.vertices)
+    z_min = min(vertex.co.z for vertex in vertices)
+    z_max = max(vertex.co.z for vertex in vertices)
+    z_span = max(1e-6, z_max - z_min)
+
+    rings: dict[float, list] = {}
+    for vertex in vertices:
+        rings.setdefault(round(float(vertex.co.z), 5), []).append(vertex)
+
+    for ring in rings.values():
+        rx = max(abs(float(vertex.co.x)) for vertex in ring)
+        ry = max(abs(float(vertex.co.y)) for vertex in ring)
+        rx = max(rx, 1e-6)
+        ry = max(ry, 1e-6)
+        for vertex in ring:
+            height = max(0.0, min(1.0, (float(vertex.co.z) - z_min) / z_span))
+            # Keep the upper 40% close to the hips and only permit flare near the hem.
+            fitted_height = height * height * (3.0 - 2.0 * height)
+            radial_scale = profile["bottomScale"] + (
+                profile["topScale"] - profile["bottomScale"]
+            ) * fitted_height
+            normalized_radius = math.sqrt(
+                (float(vertex.co.x) / rx) ** 2 + (float(vertex.co.y) / ry) ** 2
+            )
+            if normalized_radius > 1e-8:
+                softened_radius = 1.0 + profile["pleatScale"] * (normalized_radius - 1.0)
+                correction = softened_radius / normalized_radius
+            else:
+                correction = 1.0
+            vertex.co.x *= radial_scale * correction
+            vertex.co.y *= radial_scale * correction
+            vertex.co.z += profile["zOffset"]
+
+    garment.data.update(calc_edges=True)
+    return {
+        "vertices": len(vertices),
+        "ringCount": len(rings),
+        "topScale": profile["topScale"],
+        "bottomScale": profile["bottomScale"],
+        "pleatScale": profile["pleatScale"],
+        "zOffset": profile["zOffset"],
+    }
 
 
 def transfer_deforming_weights(body, armature, garment) -> dict[str, float | int]:
@@ -80,9 +153,9 @@ def transfer_deforming_weights(body, armature, garment) -> dict[str, float | int
             if assignment.weight > 1e-8:
                 source_weights[name] = source_weights.get(name, 0.0) + float(assignment.weight)
         height = max(0.0, min(1.0, (vertex.co.z - z_min) / z_span))
-        hip_anchor = 0.34 + 0.46 * height
-        side_factor = min(1.0, abs(vertex.co.x) / 0.075)
-        leg_anchor = 0.22 * (1.0 - height) * side_factor
+        hip_anchor = 0.42 + 0.46 * height
+        side_factor = min(1.0, abs(vertex.co.x) / 0.070)
+        leg_anchor = 0.30 * (1.0 - height) * side_factor
         source_scale = max(0.0, 1.0 - hip_anchor - leg_anchor)
         weights = {
             name: weight * source_scale
@@ -117,21 +190,24 @@ def transfer_deforming_weights(body, armature, garment) -> dict[str, float | int
         "vertices": len(garment.data.vertices),
         "fallbackVertices": fallback_vertices,
         "maximumInfluences": maximum_influences,
-        "minimumHipAnchor": 0.34,
-        "maximumHipAnchor": 0.80,
-        "maximumLegAnchor": 0.22,
+        "minimumHipAnchor": 0.42,
+        "maximumHipAnchor": 0.88,
+        "maximumLegAnchor": 0.30,
     }
 
 
 def create_deforming_outfit(body, armature, materials):
     garments = ORIGINAL_CREATE_OUTFIT(body, armature, materials)
-    audits = {}
+    weight_audits = {}
+    silhouette_audits = {}
     for garment in garments:
         if garment.name in SKIRT_OBJECTS:
-            audits[garment.name] = transfer_deforming_weights(body, armature, garment)
-    if set(audits) != SKIRT_OBJECTS:
-        raise RuntimeError(f"Required deforming skirt objects missing: {sorted(SKIRT_OBJECTS - set(audits))}")
-    bpy.context.scene["cyberKawaiiSkirtWeightAudit"] = json.dumps(audits, sort_keys=True)
+            silhouette_audits[garment.name] = reshape_skirt_shell(garment)
+            weight_audits[garment.name] = transfer_deforming_weights(body, armature, garment)
+    if set(weight_audits) != SKIRT_OBJECTS:
+        raise RuntimeError(f"Required deforming skirt objects missing: {sorted(SKIRT_OBJECTS - set(weight_audits))}")
+    bpy.context.scene["cyberKawaiiSkirtWeightAudit"] = json.dumps(weight_audits, sort_keys=True)
+    bpy.context.scene["cyberKawaiiSilhouetteAudit"] = json.dumps(silhouette_audits, sort_keys=True)
     return garments
 
 
@@ -143,15 +219,18 @@ def rewrite_shape_profile_handoff(job: dict, return_code: int) -> None:
     report_path = standard.repo_path(job["artifactDir"]) / "product-build-report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
     skirt_audit = json.loads(bpy.context.scene.get("cyberKawaiiSkirtWeightAudit", "{}"))
+    silhouette_audit = json.loads(bpy.context.scene.get("cyberKawaiiSilhouetteAudit", "{}"))
     report["targetProfile"] = profile
     report["skirtWeightTransfer"] = skirt_audit
-    report["visualRevision"] = "v5-large-shape-profile-deforming-skirt"
+    report["skirtSilhouette"] = silhouette_audit
+    report["visualRevision"] = "v6-large-fitted-skirt-silhouette"
     report["notes"] = [
         "The tracked SiroinoSotai_PC FBX is the source body.",
         "Official Siroino _Large shape keys are baked before garment extraction and fitting.",
-        "Skirt shells use nearest official body weights plus continuous Hips and side upper-leg anchors.",
+        "The skirt stays close to the hips through the upper section and flares only toward the hem.",
+        "Pleat radial amplitude, overall hem width, and waistband height are reduced.",
+        "Skirt shells use nearest official body weights plus stronger Hips and side upper-leg anchors.",
         "Each generated vertex is reduced to at most four normalized bone influences.",
-        "Configured shape keys are required and never silently replaced by the neutral body.",
     ]
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     manifest_path = standard.repo_path(job["productManifestPath"])
@@ -161,18 +240,20 @@ def rewrite_shape_profile_handoff(job: dict, return_code: int) -> None:
             "productName": job["productName"],
             "targetAdapterId": job["adapterId"],
             "target": profile["profile"],
-            "designRevision": "v5-large-shape-profile-deforming-skirt",
+            "designRevision": "v6-large-fitted-skirt-silhouette",
             "shapeProfile": profile,
             "skirtWeightTransfer": skirt_audit,
+            "skirtSilhouette": silhouette_audit,
         }
     )
     manifest["handoff"]["lastAttempt"] = {
         "result": "HOSTED_MODELED" if return_code == 0 and report.get("passed") else "REJECTED",
-        "visualRevision": "v5-large-shape-profile-deforming-skirt",
+        "visualRevision": "v6-large-fitted-skirt-silhouette",
         "shapeProfile": profile["profile"],
     }
     manifest["technicalGates"]["shapeProfileApplied"] = "PASS" if profile.get("appliedShapeKeys") else "FAIL"
     manifest["technicalGates"]["skirtWeightTransfer"] = "PASS" if len(skirt_audit) == len(SKIRT_OBJECTS) else "FAIL"
+    manifest["technicalGates"]["skirtSilhouette"] = "PASS" if len(silhouette_audit) == len(SKIRT_OBJECTS) else "FAIL"
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     standard.refresh_hashes(standard.repo_path(job["productRoot"]))
 
