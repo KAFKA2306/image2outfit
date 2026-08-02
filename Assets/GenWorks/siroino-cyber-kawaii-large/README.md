@@ -19,6 +19,7 @@ Target: **Siroino `_Large`**, baked from the official shape keys on `SiroinoSota
 - weight-sum errors: 0
 - degenerate triangles: 0
 - maximum bone influences: 4
+- multiview and six-pose contact sheets reviewed directly
 
 ## Pattern-first production stages
 
