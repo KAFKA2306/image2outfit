@@ -27,7 +27,7 @@ examples/review-approval.json
 
 - `config/`直下には全製品共通の契約だけを置きます。
 - 製品固有のjobとライセンス証拠は`config/products/<product-id>/`へ分離します。
-- 現行製品アセットは`Assets/GenWorks/Products/<product-id>/`へ置きます。
+- 現行製品アセットは`Assets/GenWorks/<product-id>/`へ置きます。
 - 共通Unity Editorコードは`Assets/GenWorks/Shared/Editor/`へ置きます。
 - 過去候補は`Assets/GenWorks/Legacy/Snapshots/`に限定し、自動的に販売対象へ昇格させません。
 - 非公開アバター、ローカルjob、人間レビュー証拠、キャッシュは`Assets/_Local/`、`Assets/_Vendor/`、`Assets/_Reference/`へ置き、Git管理しません。

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "canonicalWorkspacePattern": "Assets/GenWorks/Products/<product-id>",
+  "canonicalWorkspacePattern": "Assets/GenWorks/<product-id>",
   "statuses": [
     "WORKING",
     "TECHNICAL_READY",
@@ -44,5 +44,6 @@
     "humanReviewRequiredForRelease": true,
     "rebuildFromZeroWhenCheckpointExists": false,
     "retainRejectedCheckpointAndReason": true
-  }
+  },
+  "canonicalPrefabPattern": "Assets/GenWorks/<product-id>/Prefab/*.prefab"
 }

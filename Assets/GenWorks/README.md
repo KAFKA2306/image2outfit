@@ -39,7 +39,7 @@
 
 ## 運用原則
 
-Actions artifactはログ・一時バンドル・監査証拠の輸送に使用しますが、唯一の成果物保管場所にはしません。技術的に有効な途中成果は、通常のbranch/PRを通じて `Assets/GenWorks/Products/<product-id>/` に反映します。
+Actions artifactはログ・一時バンドル・監査証拠の輸送に使用しますが、唯一の成果物保管場所にはしません。技術的に有効な途中成果は、通常のbranch/PRを通じて `Assets/GenWorks/<product-id>/` に反映します。
 
 作業開始時は、既存の `ProductManifest.json`、Prefab、統合Prefab、最新レンダリング、監査結果を先に確認します。既存チェックポイントがある場合、別branchでゼロから同じ生成を繰り返してはいけません。
 

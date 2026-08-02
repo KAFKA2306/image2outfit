@@ -8,12 +8,12 @@ This product is tracked as a resumable GenWorks workspace. It is not complete an
 
 - Product contract: `config/products/siroino-cyber-kawaii-large/job.json`
 - Product generator: `tools/siroino_cyber_kawaii_large_build.py`
-- Product manifest: `Assets/GenWorks/Products/siroino-cyber-kawaii-large/ProductManifest.json`
+- Product manifest: `Assets/GenWorks/siroino-cyber-kawaii-large/ProductManifest.json`
 - Intended target: official Siroino `_Large` Prefab and compatible complete body/armature FBX
 
 ## Rejected hosted attempt
 
-PR #21 attempted to use `Assets/GenWorks/Products/siroino-wide-cargo/Source/Blender/SiroinoWideCargo.blend` as a hosted target seed. That file was a generated product scene, not a complete Siroino body source. The selected mesh covered only the cargo pelvis region, so the blouse torso extraction produced no faces. This attempt is retained as a diagnosed failure and must not be repeated.
+PR #21 attempted to use `Assets/GenWorks/siroino-wide-cargo/Source/Blender/SiroinoWideCargo.blend` as a hosted target seed. That file was a generated product scene, not a complete Siroino body source. The selected mesh covered only the cargo pelvis region, so the blouse torso extraction produced no faces. This attempt is retained as a diagnosed failure and must not be repeated.
 
 ## Required continuation
 

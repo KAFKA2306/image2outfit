@@ -43,7 +43,7 @@ The directory name, `job.id`, `job.productRoot`, `job.productManifestPath`, and 
 
 ## Generated Modular Avatar prefab contract
 
-Every prefab under `Assets/GenWorks/Products/<product-id>/Prefabs/Outfit/` is configured automatically when Unity imports it and again after an editor domain reload. `GeneratedOutfitPrefabConfigurator.cs` writes the Modular Avatar components into the prefab asset itself:
+Every prefab under `Assets/GenWorks/<product-id>/Prefab/Outfit/` is configured automatically when Unity imports it and again after an editor domain reload. `GeneratedOutfitPrefabConfigurator.cs` writes the Modular Avatar components into the prefab asset itself:
 
 - `ModularAvatarMergeArmature` on the generated armature, with the generated armature renamed to the `.1` convention
 - merge target set to the corresponding avatar armature path

@@ -15,7 +15,7 @@ This repository is a working Unity project and an auditable product pipeline. Au
 1. Resolve the target avatar, outfit specification, source references, product ID, and deliverables.
 2. Verify authoritative licensing and environment requirements.
 3. Keep private sources under ignored roots such as `Assets/_Local/`, `Assets/_Vendor/`, and `Assets/_Reference/`.
-4. Keep current product assets under `Assets/GenWorks/Products/<product-id>/`.
+4. Keep current product assets under `Assets/GenWorks/<product-id>/`.
 5. Keep historical snapshots only under `Assets/GenWorks/Legacy/Snapshots/`.
 6. Do not commit credentials, private avatar packages, local review evidence, workflow state, trigger markers, caches, candidates, or releases.
 7. Preserve Unity `.meta` files and GUIDs when moving tracked assets.
@@ -36,7 +36,7 @@ config/products/<product-id>/
   license.json
 ```
 
-The directory name, `job.id`, `job.productRoot`, `job.productManifestPath`, and `job.licenseEvidence` must agree. Product outputs belong in `Assets/GenWorks/Products/<product-id>/`; local avatar sources and human evidence remain outside it.
+The directory name, `job.id`, `job.productRoot`, `job.productManifestPath`, and `job.licenseEvidence` must agree. Product outputs belong in `Assets/GenWorks/<product-id>/`; local avatar sources and human evidence remain outside it.
 
 ## GitHub Actions
 

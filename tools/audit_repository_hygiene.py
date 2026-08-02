@@ -134,7 +134,7 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                 add(findings, "invalid-product-job", job_path, root, str(exc))
                 continue
 
-            expected_root = f"Assets/GenWorks/Products/{product_id}"
+            expected_root = f"Assets/GenWorks/{product_id}"
             expected = {
                 "id": product_id,
                 "productRoot": expected_root,

@@ -32,7 +32,7 @@ class FinalRepositoryStateTest(unittest.TestCase):
             self.assertEqual(job["id"], product_id)
             self.assertEqual(
                 job["productRoot"],
-                f"Assets/GenWorks/Products/{product_id}",
+                f"Assets/GenWorks/{product_id}",
             )
             self.assertEqual(
                 job["licenseEvidence"],

@@ -1,19 +1,18 @@
 {
   "schemaVersion": 2,
-  "renderLoopRevision": "v1-large-lace-halter-working",
   "id": "siroino-lace-halter-large",
-  "productName": "Siroino Large Lace Halter Dress",
+  "productName": "Lace Halter Sheer Dress for Siroino _Large",
   "adapterId": "siroino-v1.0-large",
-  "productRoot": "Assets/GenWorks/Products/siroino-lace-halter-large",
-  "productManifestPath": "Assets/GenWorks/Products/siroino-lace-halter-large/ProductManifest.json",
+  "productRoot": "Assets/GenWorks/siroino-lace-halter-large",
+  "productManifestPath": "Assets/GenWorks/siroino-lace-halter-large/ProductManifest.json",
   "buildScript": "tools/siroino_lace_halter_large_build.py",
   "hostedPoseScript": "tools/siroino_required_pose_entry.py",
-  "blendPath": "Assets/GenWorks/Products/siroino-lace-halter-large/Source/Blender/SiroinoLaceHalterLarge.blend",
-  "fbxAssetPath": "Assets/GenWorks/Products/siroino-lace-halter-large/Models/SiroinoLaceHalterLarge.fbx",
-  "prefabAssetPath": "Assets/GenWorks/Products/siroino-lace-halter-large/Prefabs/Outfit/SiroinoLaceHalterLarge.prefab",
-  "integratedPrefabAssetPath": "Assets/GenWorks/Products/siroino-lace-halter-large/Prefabs/Integrated/SiroinoSotai/SiroinoSotai_LaceHalterLarge.prefab",
-  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
-  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "blendPath": "Assets/GenWorks/siroino-lace-halter-large/Source/Blender/SiroinoLaceHalterLarge.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-lace-halter-large/Models/SiroinoLaceHalterLarge.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-lace-halter-large/Prefab/SiroinoLaceHalterLarge.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-lace-halter-large/Prefab/Siroino_Large_LaceHalter.prefab",
+  "targetAvatarAssetPath": "Assets/_Local/Resolved/Siroino_Large.prefab",
+  "targetSourcePath": "Assets/_Local/Resolved/SiroinoSotai_PC.fbx",
   "artifactDir": "Artifacts/siroino-lace-halter-large",
   "candidateDir": "Candidates/siroino-lace-halter-large",
   "releaseDir": "Release/siroino-lace-halter-large",
@@ -24,32 +23,81 @@
     "Assets/SiroinoWorks"
   ],
   "deliveryAssets": [
-    "Assets/GenWorks/Products/siroino-lace-halter-large/ProductManifest.json",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/README.md",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/SOURCE_HASHES.txt",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Source/Blender/SiroinoLaceHalterLarge.blend",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Models/SiroinoLaceHalterLarge.fbx",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Prefabs/Outfit/SiroinoLaceHalterLarge.prefab",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Prefabs/Integrated/SiroinoSotai/SiroinoSotai_LaceHalterLarge.prefab",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/front.png",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/back.png",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/left.png",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/right.png",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/three-quarter.png",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/siroino-lace-halter-large-multiview.webp",
-    "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/siroino-lace-halter-large-pose-review.webp"
+    "Assets/GenWorks/siroino-lace-halter-large/ProductManifest.json",
+    "Assets/GenWorks/siroino-lace-halter-large/README.md",
+    "Assets/GenWorks/siroino-lace-halter-large/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-lace-halter-large/Source/Blender/SiroinoLaceHalterLarge.blend",
+    "Assets/GenWorks/siroino-lace-halter-large/Models/SiroinoLaceHalterLarge.fbx",
+    "Assets/GenWorks/siroino-lace-halter-large/Prefab/SiroinoLaceHalterLarge.prefab",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/front.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/back.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/left.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/right.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/siroino-lace-halter-large-multiview.webp",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/siroino-lace-halter-large-pose-review.webp",
+    "Assets/GenWorks/siroino-lace-halter-large/MaterialVariants.json",
+    "Assets/GenWorks/siroino-lace-halter-large/Evidence/improvement-loop.json",
+    "Assets/GenWorks/siroino-lace-halter-large/Models/SiroinoLaceHalterLarge.fbx.meta",
+    "Assets/GenWorks/siroino-lace-halter-large/Prefab/SiroinoLaceHalterLarge.prefab.meta",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/twist.png",
+    "Assets/GenWorks/siroino-lace-halter-large/Prefab/Siroino_Large_LaceHalter.prefab",
+    "Assets/GenWorks/siroino-lace-halter-large/Prefab/Siroino_Large_LaceHalter.prefab.meta"
   ],
   "previewPaths": {
-    "front": "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/front.png",
-    "back": "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/back.png",
-    "left": "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/left.png",
-    "right": "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/right.png",
-    "three-quarter": "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/three-quarter.png"
+    "front": "Assets/GenWorks/siroino-lace-halter-large/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-lace-halter-large/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-lace-halter-large/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-lace-halter-large/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-lace-halter-large/Previews/three-quarter.png"
   },
   "humanEvidence": {
     "visual-review": "Assets/_Local/Evidence/siroino-lace-halter-large/visual-review.json",
     "pose-penetration-review": "Assets/_Local/Evidence/siroino-lace-halter-large/pose-penetration-review.json",
     "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-lace-halter-large/vrchat-runtime-review.json"
   },
-  "allowedExtraBones": []
+  "allowedExtraBones": [],
+  "buildRevision": "v1-large-lace-pass-2-final",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "Siroino _Large",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ],
+    "prefab": {
+      "extensions": [
+        ".prefab"
+      ],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
+      "contentRegex": "(?i)(^|[^A-Za-z])_?Large([^A-Za-z]|$)",
+      "preferredRegex": "(?i)(SiroinoSotai.*_Large|_Large.*SiroinoSotai)"
+    },
+    "source": {
+      "extensions": [
+        ".fbx"
+      ],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
+      "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
+      "preferredRegex": "(?i)(SiroinoSotai.*Large|Large.*SiroinoSotai)"
+    }
+  },
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  }
 }

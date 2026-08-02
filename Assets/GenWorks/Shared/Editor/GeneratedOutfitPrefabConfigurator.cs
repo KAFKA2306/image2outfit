@@ -16,7 +16,7 @@ namespace Image2Outfit.Editor
     [InitializeOnLoad]
     internal static class GeneratedOutfitPrefabConfigurator
     {
-        private const string ProductRoot = "Assets/GenWorks/Products";
+        private const string ProductRoot = "Assets/GenWorks";
         private const string OutfitPrefabSegment = "/Prefabs/Outfit/";
         private const string GeneratedArmatureSuffix = ".1";
 

@@ -6,7 +6,7 @@
 
 The canonical, resumable state of every product is tracked under:
 
-`Assets/GenWorks/Products/<product-id>/`
+`Assets/GenWorks/<product-id>/`
 
 A run must not leave the only usable result inside an Actions artifact. Before work is handed to another agent or person, the product workspace must contain the latest reproducible checkpoint, including all applicable files below:
 
