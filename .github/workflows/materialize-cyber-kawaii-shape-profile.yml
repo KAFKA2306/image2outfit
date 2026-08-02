@@ -1,0 +1,91 @@
+name: Materialize Cyber Kawaii shape-profile artifact once
+
+on:
+  push:
+    branches:
+      - fix/cyber-kawaii-shape-profile
+    paths:
+      - .github/workflows/materialize-cyber-kawaii-shape-profile.yml
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: materialize-cyber-kawaii-shape-profile
+  cancel-in-progress: false
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/cyber-kawaii-shape-profile
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Download verified hosted artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 --retry-all-errors \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/8830560356/zip" \
+            --output /tmp/cyber-kawaii-shape-profile.zip
+          rm -rf /tmp/cyber-kawaii-shape-profile
+          mkdir -p /tmp/cyber-kawaii-shape-profile
+          unzip -q /tmp/cyber-kawaii-shape-profile.zip -d /tmp/cyber-kawaii-shape-profile
+
+      - name: Verify shape profile and materialize workspace
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import shutil
+          from pathlib import Path
+
+          extracted = Path('/tmp/cyber-kawaii-shape-profile')
+          report_path = extracted / 'Artifacts/siroino-cyber-kawaii-large/product-build-report.json'
+          report = json.loads(report_path.read_text(encoding='utf-8'))
+          if report.get('passed') is not True:
+              raise SystemExit('Hosted artifact did not pass')
+          expected = {
+              'All_L': 1.0,
+              'Chest_L': 1.0,
+              'Hips_01_L': 1.0,
+              'UpperLeg_L': 1.0,
+              'Breasts_L': 0.65,
+          }
+          profile = report.get('targetProfile', {})
+          if profile.get('profileMode') != 'shape-key-bake':
+              raise SystemExit(f'Unexpected profile mode: {profile}')
+          if profile.get('appliedShapeKeys') != expected:
+              raise SystemExit(f'Shape-profile mismatch: {profile.get("appliedShapeKeys")}')
+          metrics = report.get('metrics', {})
+          for name in ('degenerateTriangles', 'unweightedVertices', 'weightSumErrors'):
+              if metrics.get(name) != 0:
+                  raise SystemExit(f'{name} must be zero: {metrics.get(name)}')
+          p01 = report.get('improvementLoop', [])[-1].get('clearance', {}).get('p01', 0)
+          if p01 < 0.005:
+              raise SystemExit(f'p01 clearance below 5 mm: {p01}')
+
+          source = extracted / 'Assets/GenWorks/siroino-cyber-kawaii-large'
+          target = Path('Assets/GenWorks/siroino-cyber-kawaii-large')
+          shutil.rmtree(target, ignore_errors=True)
+          shutil.copytree(source, target)
+          PY
+
+      - name: Commit artifact and remove one-time workflow
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/materialize-cyber-kawaii-shape-profile.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- Assets/GenWorks/siroino-cyber-kawaii-large .github/workflows/materialize-cyber-kawaii-shape-profile.yml
+          git commit -m 'build: materialize Large shape-profile Cyber Kawaii evidence'
+          git push origin HEAD:fix/cyber-kawaii-shape-profile
