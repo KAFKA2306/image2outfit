@@ -5,14 +5,16 @@ on:
   push:
     branches: [main]
     paths:
-      - .github/run/siroino-wide-cargo-hosted.txt
+      - .github/workflows/siroino-wide-cargo-hosted.yml
+      - tools/siroino_wide_cargo_release_refit.py
+      - config/siroino-wide-cargo-job.json
 
 permissions:
   contents: write
 
 concurrency:
   group: image2outfit-siroino-wide-cargo-hosted
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   blender:
@@ -34,20 +36,23 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
 
-          path = Path('.github/run/siroino-wide-cargo-last-run.json')
+          path = Path('.github/status/siroino-wide-cargo-hosted.json')
           path.parent.mkdir(parents=True, exist_ok=True)
           path.write_text(json.dumps({
               'schemaVersion': 1,
+              'workflow': 'Build Siroino Wide Cargo Hosted',
               'runId': int(os.environ['GITHUB_RUN_ID']),
               'runAttempt': int(os.environ['GITHUB_RUN_ATTEMPT']),
               'headSha': os.environ['GITHUB_SHA'],
               'status': 'running',
+              'conclusion': None,
+              'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
               'updatedAt': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
           }, indent=2) + '\n', encoding='utf-8')
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/run/siroino-wide-cargo-last-run.json
+          git add .github/status/siroino-wide-cargo-hosted.json
           git commit -m "Record Siroino hosted run ${GITHUB_RUN_ID} start"
           for attempt in 1 2 3 4 5; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
@@ -165,19 +170,23 @@ jobs:
           from datetime import datetime, timezone
           from pathlib import Path
 
-          path = Path('.github/run/siroino-wide-cargo-last-run.json')
+          path = Path('.github/status/siroino-wide-cargo-hosted.json')
+          path.parent.mkdir(parents=True, exist_ok=True)
           path.write_text(json.dumps({
               'schemaVersion': 1,
+              'workflow': 'Build Siroino Wide Cargo Hosted',
               'runId': int(os.environ['GITHUB_RUN_ID']),
               'runAttempt': int(os.environ['GITHUB_RUN_ATTEMPT']),
               'headSha': os.environ['GITHUB_SHA'],
-              'status': os.environ['JOB_STATUS'],
+              'status': 'completed',
+              'conclusion': os.environ['JOB_STATUS'],
+              'url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
               'updatedAt': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
           }, indent=2) + '\n', encoding='utf-8')
           PY
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/run/siroino-wide-cargo-last-run.json
+          git add .github/status/siroino-wide-cargo-hosted.json
           git commit -m "Record Siroino hosted run ${GITHUB_RUN_ID} ${JOB_STATUS}" || true
           for attempt in 1 2 3 4 5; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
