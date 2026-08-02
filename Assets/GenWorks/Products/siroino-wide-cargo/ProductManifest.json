@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-wide-cargo",
+  "productName": "Siroino Wide Cargo",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/Products/siroino-wide-cargo",
+  "outfitPrefabPath": "Assets/GenWorks/Products/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/Products/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab",
+  "previewPath": "Assets/GenWorks/Products/siroino-wide-cargo/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/Products/siroino-wide-cargo/README.md",
+  "demoScenePath": "Assets/GenWorks/Products/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
+  "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/Products/siroino-wide-cargo",
+    "resumeFrom": "Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json",
+    "doNotRebuildFromZero": true,
+    "lastRejectedAttempt": {
+      "pullRequest": 37,
+      "hostedRun": 30735369215,
+      "result": "REJECTED",
+      "reason": "Hosted validation stopped before Blender because the workflow still enforced the superseded direct-root namespace. No visual evidence was produced."
+    },
+    "blockers": [
+      "Generate and inspect actual five-view and pose-review images",
+      "Pass Unity 2022.3.22f1 import, Prefab save/reload, Modular Avatar and NDMF gates",
+      "Pass VRChat SDK Build & Test and runtime screenshot review",
+      "Bind all approvals to the exact candidate-manifest SHA-256"
+    ]
+  },
+  "technicalGates": {
+    "blender": "PENDING",
+    "fbx": "PENDING",
+    "uvMapping": "PENDING",
+    "latestGeometryRender": "PENDING",
+    "exactBodyPoseRenders": "PENDING",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "ndmf": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING"
+  },
+  "designRevision": "v29-products-root-rear-safe"
+}
