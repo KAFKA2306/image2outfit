@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-wide-cargo",
+  "productName": "Siroino Wide Cargo",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/Products/siroino-wide-cargo",
+  "outfitPrefabPath": "Assets/GenWorks/Products/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/Products/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab",
+  "previewPath": "Assets/GenWorks/Products/siroino-wide-cargo/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/Products/siroino-wide-cargo/README.md",
+  "demoScenePath": "Assets/GenWorks/Products/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
+  "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/Products/siroino-wide-cargo",
+    "resumeFrom": "Assets/GenWorks/Products/siroino-wide-cargo/ProductManifest.json",
+    "doNotRebuildFromZero": true,
+    "lastRejectedAttempt": {
+      "hostedRun": 30738670533,
+      "artifactId": 8830539056,
+      "artifactSha256": "420cc1ad4e6884e5b78dfa7f9f4573319c19987281bfbb5799a4dc329ee70faa",
+      "result": "REJECTED",
+      "reason": "v35 produced clean surfaces but left pelvis and leg volumes disconnected, with a large crotch opening and neutral-only pose evidence."
+    },
+    "blockers": [
+      "Inspect fresh v36 multiview and full pose-review images",
+      "Pass Unity 2022.3.22f1 import and prefab reload",
+      "Pass Modular Avatar, NDMF and VRChat SDK Build & Test",
+      "Pass runtime screenshot review",
+      "Bind approvals to exact candidate-manifest SHA-256"
+    ]
+  },
+  "technicalGates": {
+    "blender": "PENDING",
+    "fbx": "PENDING",
+    "uvMapping": "PENDING",
+    "latestGeometryRender": "PENDING",
+    "exactBodyPoseRenders": "PENDING",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "ndmf": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING"
+  },
+  "designRevision": "v36-exact-boolean-parametric"
+}
