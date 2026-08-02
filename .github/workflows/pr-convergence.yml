@@ -1,0 +1,210 @@
+name: PR convergence
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review, closed]
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/pr-convergence.yml
+      - .github/pull_request_template.md
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Report convergence actions without mutating PRs or branches
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: pr-convergence-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  converge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Keep one active PR per workstream and remove stale branches
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const dryRun = context.eventName === "workflow_dispatch" && core.getInput("dry_run") === "true";
+            const managedPrefixes = ["agent/", "fix/", "feat/", "release/", "ops/", "chore/", "ci/"];
+            const protectedBranches = new Set(["main", "master", "gh-pages"]);
+            const supersededMarker = "<!-- pr-convergence:superseded -->";
+
+            const repository = (await github.rest.repos.get({ owner, repo })).data;
+            const defaultBranch = repository.default_branch;
+            protectedBranches.add(defaultBranch);
+
+            async function allOpenPulls() {
+              return github.paginate(github.rest.pulls.list, {
+                owner,
+                repo,
+                state: "open",
+                base: defaultBranch,
+                per_page: 100,
+              });
+            }
+
+            async function changedFiles(prNumber) {
+              return github.paginate(github.rest.pulls.listFiles, {
+                owner,
+                repo,
+                pull_number: prNumber,
+                per_page: 100,
+              });
+            }
+
+            function explicitWorkstream(body) {
+              const match = String(body || "").match(/<!--\s*workstream:\s*([a-z0-9][a-z0-9._/-]*)\s*-->/i);
+              return match ? match[1].toLowerCase() : null;
+            }
+
+            function normalizeBranch(ref) {
+              let value = String(ref || "").toLowerCase().replace(/_/g, "-");
+              value = value.replace(/^(agent|fix|feat|release|ops|chore|ci)\//, "");
+              value = value.replace(/^(re-?run|run|continue|finalize|validate|build|fix)-/, "");
+              let previous;
+              do {
+                previous = value;
+                value = value
+                  .replace(/-(goal\d+)(?:-v?\d+)?$/, "")
+                  .replace(/-(?:v|r)\d+(?:-final)?$/, "")
+                  .replace(/-(?:final|release|checkpoint|retry|rerun|latest)$/, "");
+              } while (value !== previous);
+              return value || String(ref || "").toLowerCase();
+            }
+
+            async function workstreamKey(pr) {
+              const explicit = explicitWorkstream(pr.body);
+              if (explicit) return `explicit:${explicit}`;
+
+              const files = await changedFiles(pr.number);
+              const products = new Set();
+              for (const file of files) {
+                const path = file.filename;
+                let match = path.match(/^Assets\/GenWorks\/(?:Products\/)?([^/]+)\//);
+                if (!match) match = path.match(/^config\/products\/([^/]+)\//);
+                if (match && !["Legacy", "Shared", "Editor", "Products"].includes(match[1])) {
+                  products.add(match[1].toLowerCase());
+                }
+              }
+              if (products.size === 1) return `product:${[...products][0]}`;
+
+              return `branch:${normalizeBranch(pr.head.ref)}`;
+            }
+
+            async function deleteBranch(ref, reason, openPulls) {
+              if (!ref || protectedBranches.has(ref)) return;
+              if (openPulls.some(pr => pr.head.repo?.full_name === `${owner}/${repo}` && pr.head.ref === ref)) return;
+              if (dryRun) {
+                core.info(`[dry-run] delete branch ${ref}: ${reason}`);
+                return;
+              }
+              try {
+                await github.rest.git.deleteRef({ owner, repo, ref: `heads/${ref}` });
+                core.info(`Deleted branch ${ref}: ${reason}`);
+              } catch (error) {
+                if (error.status === 404 || error.status === 422) {
+                  core.info(`Branch ${ref} already absent or protected`);
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+            async function supersede(loser, winner, key, openPulls) {
+              const message = `${supersededMarker}\nSuperseded by #${winner.number}. This repository permits one active pull request per workstream (\`${key}\`). Continue work only in #${winner.number}.`;
+              if (dryRun) {
+                core.info(`[dry-run] close #${loser.number} in favor of #${winner.number} (${key})`);
+              } else {
+                const comments = await github.paginate(github.rest.issues.listComments, {
+                  owner,
+                  repo,
+                  issue_number: loser.number,
+                  per_page: 100,
+                });
+                if (!comments.some(comment => String(comment.body || "").includes(supersededMarker))) {
+                  await github.rest.issues.createComment({ owner, repo, issue_number: loser.number, body: message });
+                }
+                await github.rest.pulls.update({ owner, repo, pull_number: loser.number, state: "closed" });
+                core.info(`Closed superseded PR #${loser.number} in favor of #${winner.number}`);
+              }
+
+              const remainingOpen = openPulls.filter(pr => pr.number !== loser.number);
+              if (loser.head.repo?.full_name === `${owner}/${repo}`) {
+                await deleteBranch(loser.head.ref, `superseded by #${winner.number}`, remainingOpen);
+              }
+            }
+
+            let openPulls = await allOpenPulls();
+            const keyed = [];
+            for (const pr of openPulls) {
+              keyed.push({ pr, key: await workstreamKey(pr) });
+            }
+
+            const groups = new Map();
+            for (const entry of keyed) {
+              const group = groups.get(entry.key) || [];
+              group.push(entry.pr);
+              groups.set(entry.key, group);
+            }
+
+            for (const [key, pulls] of groups) {
+              if (pulls.length < 2) continue;
+              pulls.sort((a, b) => b.number - a.number);
+              const winner = pulls[0];
+              for (const loser of pulls.slice(1)) {
+                await supersede(loser, winner, key, openPulls);
+                openPulls = openPulls.filter(pr => pr.number !== loser.number);
+              }
+            }
+
+            if (context.eventName === "pull_request_target" && context.payload.action === "closed") {
+              const closed = context.payload.pull_request;
+              if (closed.head.repo?.full_name === `${owner}/${repo}`) {
+                openPulls = await allOpenPulls();
+                await deleteBranch(closed.head.ref, `pull request #${closed.number} closed`, openPulls);
+              }
+            }
+
+            openPulls = await allOpenPulls();
+            const openHeads = new Set(
+              openPulls
+                .filter(pr => pr.head.repo?.full_name === `${owner}/${repo}`)
+                .map(pr => pr.head.ref),
+            );
+            const branches = await github.paginate(github.rest.repos.listBranches, { owner, repo, per_page: 100 });
+
+            for (const branch of branches) {
+              const ref = branch.name;
+              if (branch.protected || protectedBranches.has(ref) || openHeads.has(ref)) continue;
+              if (!managedPrefixes.some(prefix => ref.startsWith(prefix))) continue;
+
+              const related = await github.paginate(github.rest.pulls.list, {
+                owner,
+                repo,
+                state: "closed",
+                head: `${owner}:${ref}`,
+                per_page: 100,
+              });
+              if (related.length === 0) continue;
+              related.sort((a, b) => b.number - a.number);
+              await deleteBranch(ref, `latest related PR #${related[0].number} is closed`, openPulls);
+            }
+
+            core.summary
+              .addHeading("PR convergence")
+              .addRaw(`Open PRs after convergence: ${openPulls.length}\n`)
+              .addRaw(`Mode: ${dryRun ? "dry-run" : "apply"}\n`)
+              .write();
