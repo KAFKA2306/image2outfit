@@ -15,6 +15,15 @@
     "nadena.dev.ndmf": {
       "version": "1.14.1"
     },
+    "jp.lilxyzw.liltoon": {
+      "version": "2.3.4"
+    },
+    "com.ajisaiflow.unityagent.sdk": {
+      "version": "0.13.0"
+    },
+    "com.ajisaiflow.unityagent": {
+      "version": "0.13.0"
+    },
     "com.anatawa12.avatar-optimizer": {
       "version": "1.9.16"
     }
@@ -42,6 +51,25 @@
     },
     "nadena.dev.ndmf": {
       "version": "1.14.1",
+      "dependencies": {}
+    },
+    "jp.lilxyzw.liltoon": {
+      "version": "2.3.4",
+      "dependencies": {}
+    },
+    "com.ajisaiflow.unityagent.sdk": {
+      "version": "0.13.0",
+      "dependencies": {}
+    },
+    "com.ajisaiflow.unityagent": {
+      "version": "0.13.0",
+      "dependencies": {
+        "com.ajisaiflow.unityagent.sdk": ">=0.13.0",
+        "net.ajisaiflow.md3sdk": ">=0.8.5"
+      }
+    },
+    "net.ajisaiflow.md3sdk": {
+      "version": "0.8.5",
       "dependencies": {}
     },
     "com.anatawa12.avatar-optimizer": {
