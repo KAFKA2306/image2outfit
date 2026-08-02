@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-heather-hooded-bodysuit",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-dmap-pattern-coordinate-hooded-bodysuit",
+  "panels": [
+    "front-upper",
+    "back-upper",
+    "front-lower",
+    "back-lower",
+    "upper-sleeve-left",
+    "lower-sleeve-left",
+    "upper-sleeve-right",
+    "lower-sleeve-right",
+    "cuff-left",
+    "cuff-right",
+    "hood"
+  ],
+  "separateGeometry": [
+    "Henley placket",
+    "three buttons",
+    "hood drawcords",
+    "left and right hip ties"
+  ],
+  "priorityFitZones": [
+    "shoulder",
+    "underarm",
+    "elbow",
+    "wrist",
+    "chest",
+    "waist",
+    "hip crest",
+    "groin",
+    "inner thigh",
+    "buttocks",
+    "neck and hood opening"
+  ],
+  "researchTrial": {
+    "paper": "https://arxiv.org/abs/2602.24043",
+    "implementation": "independent explicit UV panel domains and seam-pair graph",
+    "neuralModelExecuted": false
+  },
+  "releaseBoundary": "WORKING until Unity import/reload, Modular Avatar/NDMF, pose penetration, VRChat Build & Test and human runtime review pass"
+}
