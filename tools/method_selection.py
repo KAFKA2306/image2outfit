@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic construction-profile selection and commercial evidence validation."""
+"""Select one construction profile and enforce its commercial evidence contract."""
 from __future__ import annotations
 
 import hashlib
@@ -9,9 +9,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import audit_research_baseline
+
 ROOT = Path(__file__).resolve().parents[1]
 UNSTABLE_ENTRYPOINT = re.compile(
-    r"(?:^|_)(?:v\d+|entry|refit|legacy)(?:_|\.|$)",
+    r"(?:^|_)(?:v\d+|entry|refit|legacy)(?:_|$)",
     re.IGNORECASE,
 )
 
@@ -33,34 +35,56 @@ def resolve_job(product_id: str, root: Path = ROOT) -> Path:
     return path
 
 
-def _profile_config(root: Path) -> dict[str, Any]:
-    return read_json(root / "config" / "construction-profiles.json")
+def _commercial_policy(root: Path) -> dict[str, Any]:
+    release_policy = read_json(root / "config" / "release-policy.json")
+    policy = release_policy.get("commercialMethodPolicy")
+    if not isinstance(policy, dict):
+        raise ValueError("release-policy.json is missing commercialMethodPolicy")
+    return policy
 
 
-def _research(root: Path) -> dict[str, Any]:
-    return read_json(
-        root
-        / "Assets"
-        / "GenWorks"
-        / "Shared"
-        / "Research"
-        / "2026-garment-methods.json"
-    )
+def _construction_path(product_id: str, root: Path) -> Path:
+    return root / "config" / "products" / product_id / "construction.json"
+
+
+def _read_construction(product_id: str, root: Path) -> tuple[str | None, list[str]]:
+    path = _construction_path(product_id, root)
+    errors: list[str] = []
+    try:
+        value = read_json(path)
+    except (OSError, json.JSONDecodeError) as exc:
+        return None, [f"construction config unreadable: {exc}"]
+    if value.get("schemaVersion") != 1:
+        errors.append("construction.schemaVersion must be 1")
+    profile = value.get("profile")
+    if not isinstance(profile, str) or not profile:
+        errors.append("construction.profile is required")
+        return None, errors
+    return profile, errors
 
 
 def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
-    config = _profile_config(root)
-    product_id = job.get("id")
-    profile_name = config.get("productAssignments", {}).get(product_id)
-    profile = config.get("profiles", {}).get(profile_name)
+    root = root.resolve()
     errors: list[str] = []
-
+    product_id = job.get("id")
     if not isinstance(product_id, str) or not product_id:
+        product_id = ""
         errors.append("job.id is required")
-    if not isinstance(profile_name, str) or not profile_name:
-        errors.append(f"product has no construction profile assignment: {product_id}")
+
+    try:
+        policy = _commercial_policy(root)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        policy = {}
+        errors.append(f"commercial policy unreadable: {exc}")
+
+    profile_name, construction_errors = _read_construction(product_id, root)
+    errors.extend(construction_errors)
+    profiles = policy.get("profiles", {})
+    profile = profiles.get(profile_name) if isinstance(profiles, dict) else None
+    if profile_name and not isinstance(profile, dict):
+        errors.append(f"unknown construction profile: {profile_name}")
+        profile = {}
     elif not isinstance(profile, dict):
-        errors.append(f"unknown construction profile assignment: {profile_name}")
         profile = {}
 
     product_root = job.get("productRoot")
@@ -86,29 +110,30 @@ def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
         elif not (root / pose_script).is_file():
             errors.append(f"hostedPoseScript does not exist: {pose_script}")
 
+    research = audit_research_baseline.audit(root)
+    if research.get("passed") is not True:
+        errors.extend(
+            f"research baseline: {value}" for value in research.get("errors", [])
+        )
     required_capabilities = list(profile.get("requiredCapabilities", []))
-    required_evidence = list(profile.get("requiredCommercialEvidence", []))
-    research = _research(root)
-    covered = {
-        capability
-        for method in research.get("methods", [])
-        if method.get("implementationTrack")
-        in {"ADOPT_PRINCIPLE", "PROTOTYPE", "BENCHMARK"}
-        for capability in method.get("capabilities", [])
-    }
-    missing_capabilities = sorted(set(required_capabilities) - covered)
+    production_coverage = set(research.get("productionCoverage", []))
+    missing_capabilities = sorted(set(required_capabilities) - production_coverage)
     if missing_capabilities:
         errors.append(
             "research baseline does not cover selected profile: "
             + ", ".join(missing_capabilities)
         )
 
+    required_evidence = list(profile.get("requiredEvidence", []))
     return {
         "schemaVersion": 1,
         "passed": not errors,
         "productId": product_id,
-        "commercialProfile": config.get("defaultCommercialProfile"),
+        "commercialProfile": policy.get("profileId"),
         "constructionProfile": profile_name,
+        "constructionPath": _construction_path(product_id, root)
+        .relative_to(root)
+        .as_posix(),
         "description": profile.get("description"),
         "buildScript": build_script,
         "hostedPoseScript": pose_script,
@@ -116,6 +141,7 @@ def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
         "requiredCommercialEvidence": required_evidence,
         "evidenceRoot": f"Assets/GenWorks/{product_id}/Evidence/Commercial",
         "researchBaselineId": research.get("baselineId"),
+        "researchProductionCoverage": sorted(production_coverage),
         "errors": errors,
     }
 
@@ -156,6 +182,7 @@ def validate_commercial_evidence(
     candidate_manifest_path: Path,
     root: Path = ROOT,
 ) -> dict[str, Any]:
+    root = root.resolve()
     selection = select(job, root)
     errors = list(selection["errors"])
     evidence_results: dict[str, Any] = {}
@@ -165,8 +192,12 @@ def validate_commercial_evidence(
     else:
         candidate_hash = digest(candidate_manifest_path)
 
-    config = _profile_config(root)
-    contract = config.get("evidenceContract", {})
+    try:
+        policy = _commercial_policy(root)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        policy = {}
+        errors.append(f"commercial policy unreadable: {exc}")
+    contract = policy.get("evidenceContract", {})
     required_fields = contract.get("requiredFields", [])
     rules = contract.get("metricRules", {})
     product_id = str(job.get("id", ""))
@@ -195,7 +226,7 @@ def validate_commercial_evidence(
             item_errors.append("constructionProfile mismatch")
         if evidence.get("candidateManifestSha256") != candidate_hash:
             item_errors.append("candidateManifestSha256 mismatch")
-        if evidence.get("status") != contract.get("status"):
+        if evidence.get("status") != contract.get("passStatus"):
             item_errors.append("status must be PASS")
         if not _iso_datetime(evidence.get("checkedAt")):
             item_errors.append("checkedAt must be timezone-aware ISO-8601")
@@ -213,7 +244,7 @@ def validate_commercial_evidence(
                     item_errors.append("sourceArtifacts entries must be strings")
                     continue
                 artifact_path = (root / artifact).resolve()
-                if root.resolve() not in artifact_path.parents:
+                if root not in artifact_path.parents:
                     item_errors.append(f"source artifact escapes repository: {artifact}")
                 elif not artifact_path.is_file():
                     item_errors.append(f"source artifact missing: {artifact}")
@@ -245,25 +276,29 @@ def validate_commercial_evidence(
 
 
 def audit_all(root: Path = ROOT) -> dict[str, Any]:
+    root = root.resolve()
     products: list[dict[str, Any]] = []
-    for path in sorted((root / "config" / "products").glob("*/job.json")):
+    job_paths = sorted((root / "config" / "products").glob("*/job.json"))
+    for path in job_paths:
         job = read_json(path)
         report = select(job, root)
         report["jobPath"] = path.relative_to(root).as_posix()
         products.append(report)
 
-    config = _profile_config(root)
-    known_products = {item.get("productId") for item in products}
-    assigned_products = set(config.get("productAssignments", {}))
-    assignment_errors = [
-        f"profile assignment has no job: {product_id}"
-        for product_id in sorted(assigned_products - known_products)
+    job_products = {path.parent.name for path in job_paths}
+    construction_products = {
+        path.parent.name
+        for path in (root / "config" / "products").glob("*/construction.json")
+    }
+    errors = [
+        f"construction config has no job: {product_id}"
+        for product_id in sorted(construction_products - job_products)
     ]
-    errors = assignment_errors + [
+    errors.extend(
         f"{item['productId']}: {error}"
         for item in products
         for error in item.get("errors", [])
-    ]
+    )
     return {
         "schemaVersion": 1,
         "passed": not errors,
