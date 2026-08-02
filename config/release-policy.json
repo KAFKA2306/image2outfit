@@ -28,6 +28,71 @@
     "pose-penetration-review",
     "vrchat-runtime-review"
   ],
+  "humanEvidenceContracts": {
+    "commonRequiredFields": [
+      "schemaVersion",
+      "kind",
+      "jobId",
+      "adapterId",
+      "candidateManifestSha256",
+      "status",
+      "checkedAt",
+      "reviewer"
+    ],
+    "schemaVersion": 2,
+    "passStatus": "PASS",
+    "visual-review": {
+      "requiredFields": [
+        "scores",
+        "criticalDefects"
+      ],
+      "scoreFields": [
+        "silhouette",
+        "fit",
+        "material",
+        "presentation"
+      ],
+      "minimumScore": 4,
+      "maximumCriticalDefects": 0,
+      "optionalFields": [
+        "reviewedAssets",
+        "visualNotes"
+      ]
+    },
+    "pose-penetration-review": {
+      "requiredFields": [
+        "poses",
+        "criticalPenetrations"
+      ],
+      "requiredPoses": [
+        "neutral",
+        "arms-up",
+        "arm-cross",
+        "crouch",
+        "sit",
+        "prone"
+      ],
+      "passValue": "PASS",
+      "maximumCriticalPenetrations": 0,
+      "optionalFields": [
+        "reviewedAssets",
+        "poseNotes"
+      ]
+    },
+    "vrchat-runtime-review": {
+      "requiredFields": [
+        "vrchatBuildAndTest",
+        "testedInVRChat"
+      ],
+      "passValue": "PASS",
+      "testedInVRChat": true,
+      "optionalFields": [
+        "reviewedAssets",
+        "runtimeScreenshot",
+        "runtimeNotes"
+      ]
+    }
+  },
   "allowedDeliveryExtensions": [
     ".blend",
     ".fbx",
@@ -49,81 +114,5 @@
     ".txt",
     ".md",
     ".json"
-  ],
-  "humanEvidenceContracts": {
-    "visual-review": {
-      "requiredFields": [
-        "schemaVersion",
-        "jobId",
-        "adapterId",
-        "candidateManifestSha256",
-        "reviewer",
-        "checkedAt",
-        "decision",
-        "visualScores",
-        "reviewedAssets",
-        "visualNotes"
-      ],
-      "decisionValues": [
-        "APPROVE",
-        "REJECT"
-      ],
-      "scoreFields": [
-        "silhouette",
-        "fit",
-        "material",
-        "presentation"
-      ],
-      "minimumScore": 4
-    },
-    "pose-penetration-review": {
-      "requiredFields": [
-        "schemaVersion",
-        "jobId",
-        "adapterId",
-        "candidateManifestSha256",
-        "reviewer",
-        "checkedAt",
-        "decision",
-        "poses",
-        "reviewedAssets",
-        "poseNotes"
-      ],
-      "decisionValues": [
-        "APPROVE",
-        "REJECT"
-      ],
-      "requiredPoses": [
-        "neutral",
-        "arms-up",
-        "arm-cross",
-        "crouch",
-        "sit",
-        "prone"
-      ],
-      "passValue": "PASS"
-    },
-    "vrchat-runtime-review": {
-      "requiredFields": [
-        "schemaVersion",
-        "jobId",
-        "adapterId",
-        "candidateManifestSha256",
-        "reviewer",
-        "checkedAt",
-        "decision",
-        "vrchatBuildAndTest",
-        "testedInVRChat",
-        "reviewedAssets",
-        "runtimeScreenshot",
-        "runtimeNotes"
-      ],
-      "decisionValues": [
-        "APPROVE",
-        "REJECT"
-      ],
-      "passValue": "PASS",
-      "testedInVRChat": true
-    }
-  }
+  ]
 }
