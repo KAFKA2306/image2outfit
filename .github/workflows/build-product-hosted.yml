@@ -15,6 +15,8 @@ on:
     branches: [main]
     paths:
       - config/products/**/job.json
+      - .github/workflows/build-product-hosted.yml
+      - tools/build_product_from_seed_blend.py
 
 env:
   STATUS_CONTEXT: image2outfit-hosted
@@ -128,6 +130,7 @@ jobs:
                   raise SystemExit(
                       f'{field} must match Assets/GenWorks/{product_id}/Prefab/*.prefab'
                   )
+          hosted_enabled = bool(job.get('hostedBuildEnabled', True))
           paths = {
               'JOB_PATH': job_path_text,
               'JOB_ID': job['id'],
@@ -136,6 +139,10 @@ jobs:
               'BUILD_SCRIPT': job['buildScript'],
               'BLEND_PATH': job['blendPath'],
               'HOSTED_POSE_SCRIPT': job.get('hostedPoseScript', ''),
+              'HOSTED_BUILD_ENABLED': 'true' if hosted_enabled else 'false',
+              'HOSTED_BUILD_SKIP_REASON': str(
+                  job.get('hostedBuildSkipReason', 'Hosted build disabled by product contract')
+              ),
           }
           with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
               for name, value in paths.items():
@@ -147,12 +154,31 @@ jobs:
               stream.write(f'BLENDER_SERIES={".".join(version.split(".")[:2])}\n')
           PY
 
+      - name: Record hosted build skip
+        if: env.HOSTED_BUILD_ENABLED != 'true'
+        run: |
+          mkdir -p "$ARTIFACT_DIR"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          output = Path(os.environ['ARTIFACT_DIR']) / 'hosted-build-skip.json'
+          output.write_text(json.dumps({
+              'decision': 'SKIPPED_PRIVATE_TARGET_REQUIRED',
+              'productId': os.environ['JOB_ID'],
+              'reason': os.environ['HOSTED_BUILD_SKIP_REASON'],
+              'requiredGate': 'self-hosted candidate build',
+          }, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print(output.read_text(encoding='utf-8'))
+          PY
+
       - name: Install Blender runtime libraries
+        if: env.HOSTED_BUILD_ENABLED == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
 
       - name: Download pinned Blender
+        if: env.HOSTED_BUILD_ENABLED == 'true'
         run: |
           set -euo pipefail
           curl --fail --location --retry 4 --retry-all-errors \
@@ -162,24 +188,27 @@ jobs:
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
 
       - name: Restore Blender Python packages
+        if: env.HOSTED_BUILD_ENABLED == 'true'
         run: |
           python_exe=".image2outfit/blender/${BLENDER_SERIES}/python/bin/python3.11"
           "$python_exe" -m ensurepip
           "$python_exe" -m pip install --disable-pip-version-check --no-deps --only-binary=:all: -r config/blender-python-requirements.txt
 
       - name: Generate product assets and previews
+        if: env.HOSTED_BUILD_ENABLED == 'true'
         run: |
           set -euo pipefail
           mkdir -p "$ARTIFACT_DIR"
           .image2outfit/blender/blender --background --factory-startup --python-exit-code 1 --python "$BUILD_SCRIPT" -- --job "$JOB_PATH" | tee "$ARTIFACT_DIR/hosted-blender.log"
 
       - name: Render configured verification poses
-        if: env.HOSTED_POSE_SCRIPT != ''
+        if: env.HOSTED_BUILD_ENABLED == 'true' && env.HOSTED_POSE_SCRIPT != ''
         run: |
           set -euo pipefail
           .image2outfit/blender/blender --background "$BLEND_PATH" --python-exit-code 1 --python "$HOSTED_POSE_SCRIPT" -- --job "$JOB_PATH" | tee "$ARTIFACT_DIR/hosted-poses.log"
 
       - name: Audit generated product
+        if: env.HOSTED_BUILD_ENABLED == 'true'
         run: |
           python tools/update_product_hashes.py --root "$PRODUCT_ROOT"
           python tools/audit_genworks_layout.py
