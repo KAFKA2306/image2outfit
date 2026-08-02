@@ -8,7 +8,7 @@ from pathlib import Path
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
-from production_gate import DirectoryTransaction  # noqa: E402
+from production_gate_core import DirectoryTransaction  # noqa: E402
 
 
 class DirectoryTransactionTest(unittest.TestCase):
