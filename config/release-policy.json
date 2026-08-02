@@ -29,6 +29,8 @@
     "vrchat-runtime-review"
   ],
   "humanEvidenceContracts": {
+    "schemaVersion": 2,
+    "passStatus": "PASS",
     "commonRequiredFields": [
       "schemaVersion",
       "kind",
@@ -37,32 +39,82 @@
       "candidateManifestSha256",
       "status",
       "checkedAt",
-      "reviewer"
+      "reviewer",
+      "defects"
     ],
-    "schemaVersion": 2,
-    "passStatus": "PASS",
+    "common": {
+      "reviewerPrefix": "human:",
+      "forbiddenReviewers": [
+        "human:<name>",
+        "human:unknown",
+        "human:automation",
+        "human:bot"
+      ],
+      "allowedDefectSeverities": [
+        "blocker",
+        "critical",
+        "major",
+        "minor"
+      ],
+      "blockingDefectSeverities": [
+        "blocker",
+        "critical",
+        "major"
+      ],
+      "allowedDefectStatuses": [
+        "OPEN",
+        "CONFIRMED",
+        "RESOLVED",
+        "NOT_REPRODUCIBLE",
+        "ACCEPTED"
+      ],
+      "closedDefectStatuses": [
+        "RESOLVED",
+        "NOT_REPRODUCIBLE"
+      ],
+      "acceptedDefectStatus": "ACCEPTED"
+    },
     "visual-review": {
       "requiredFields": [
         "scores",
-        "criticalDefects"
+        "criticalDefects",
+        "defects",
+        "reviewedAssets",
+        "reviewSummary",
+        "customerUseCase"
       ],
       "scoreFields": [
+        "referenceFidelity",
         "silhouette",
-        "fit",
+        "fitCoverage",
+        "deformation",
         "material",
-        "presentation"
+        "presentation",
+        "customerUsability"
       ],
       "minimumScore": 4,
+      "minimumAverageScore": 4.5,
       "maximumCriticalDefects": 0,
-      "optionalFields": [
-        "reviewedAssets",
-        "visualNotes"
+      "requiredPreviewAssets": [
+        "Preview/front.png",
+        "Preview/back.png",
+        "Preview/left.png",
+        "Preview/right.png",
+        "Preview/three-quarter.png"
+      ],
+      "requiredTextFields": [
+        "reviewSummary",
+        "customerUseCase"
       ]
     },
     "pose-penetration-review": {
       "requiredFields": [
         "poses",
-        "criticalPenetrations"
+        "poseEvidence",
+        "criticalPenetrations",
+        "defects",
+        "reviewedAssets",
+        "poseNotes"
       ],
       "requiredPoses": [
         "neutral",
@@ -73,23 +125,31 @@
         "prone"
       ],
       "passValue": "PASS",
-      "maximumCriticalPenetrations": 0,
-      "optionalFields": [
-        "reviewedAssets",
-        "poseNotes"
-      ]
+      "maximumCriticalPenetrations": 0
     },
     "vrchat-runtime-review": {
       "requiredFields": [
         "vrchatBuildAndTest",
-        "testedInVRChat"
+        "testedInVRChat",
+        "runtimeScreenshot",
+        "runtimeScreenshotSha256",
+        "runtimeNotes",
+        "testedPlatform",
+        "installationStepsVerified",
+        "customerReady",
+        "customerAcceptance",
+        "defects"
       ],
       "passValue": "PASS",
       "testedInVRChat": true,
-      "optionalFields": [
-        "reviewedAssets",
-        "runtimeScreenshot",
-        "runtimeNotes"
+      "minimumScreenshotWidth": 1280,
+      "minimumScreenshotHeight": 720,
+      "customerAcceptanceFields": [
+        "appearance",
+        "fitDuringMotion",
+        "installation",
+        "menuOperation",
+        "runtimeStability"
       ]
     }
   },
