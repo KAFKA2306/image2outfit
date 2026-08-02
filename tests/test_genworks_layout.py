@@ -38,7 +38,10 @@ CONFIG = {
         "Assets/_Vendor",
         "Assets/SiroinoWorks",
     ],
-    "forbiddenAssetRoots": ["Assets/Editor"],
+    "forbiddenAssetRoots": [
+        "Assets/Editor",
+        "Assets/GenWorks/Legacy",
+    ],
 }
 
 
@@ -123,6 +126,22 @@ class GenWorksLayoutTest(unittest.TestCase):
             any(
                 item["code"] == "forbidden-asset-root"
                 and item["path"] == "Assets/Editor/LegacyTool.cs"
+                for item in result["findings"]
+            )
+        )
+
+    def test_genworks_legacy_folder_is_forbidden(self) -> None:
+        legacy = self.root / "Assets" / "GenWorks" / "Legacy"
+        legacy.mkdir(parents=True)
+        (legacy / "Historical.prefab").write_text("legacy", encoding="utf-8")
+        result = audit_genworks_layout.audit(
+            self.root, self.root / "config" / "genworks-layout.json"
+        )
+        self.assertFalse(result["passed"])
+        self.assertTrue(
+            any(
+                item["code"] == "forbidden-asset-root"
+                and item["path"] == "Assets/GenWorks/Legacy/Historical.prefab"
                 for item in result["findings"]
             )
         )

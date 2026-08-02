@@ -41,7 +41,6 @@ Assets/GenWorks/
     Previews/
     Documentation/
   Shared/
-  Legacy/Snapshots/
   OutfitCatalog.json
 
 tools/
@@ -53,8 +52,8 @@ tools/
 
 - 現行・作業中・却下済みを含む継続可能な製品は `Assets/GenWorks/<slug>/` に直接配置します。`Assets/GenWorks/Products/` やアバター名を挟む中間ディレクトリは使用しません。
 - 製品Prefabは `Assets/GenWorks/<slug>/Prefab/*.prefab` の直下に置きます。
-- `REJECTED`でも、FBX、Prefab、テクスチャ、監査証拠、再開地点があるものは製品ワークスペースです。`Legacy/Snapshots/`へ隔離しません。
-- `Legacy/Snapshots/`は、正規製品として継続できない純粋な履歴証拠だけに限定します。
+- `REJECTED`でも、FBX、Prefab、テクスチャ、監査証拠、再開地点があるものは製品ワークスペースです。別の隔離ルートへ移しません。
+- `Assets/GenWorks/Legacy/` は禁止です。継続・監査に必要な履歴証拠は該当製品の `Documentation/` へ統合し、一般的な変更履歴はGit履歴を正本とします。継続価値も法務・監査価値もない残骸は削除します。
 - HAOLANの既存チェックポイントは `Assets/GenWorks/haolan-bordeaux-knit-set/` と `Assets/GenWorks/haolan-cow-hood-knit-set/` に統合済みです。どちらも現在は `REJECTED` / `NO-GO` であり、製品READMEとManifestに不足ゲートを記録します。
 - `config/products/<slug>/job.json`、製品ルート、Manifest、ライセンス証拠、納品対象のslugを一致させます。
 - 共通Unity Editorコードは `Assets/GenWorks/Shared/Editor/` に置きます。`Assets/Editor/` は禁止です。
@@ -68,7 +67,7 @@ tools/
 - `tools/production_gate.py` — 利用者が実行するcandidate／release入口。既存candidateとreleaseをlast-goodとして保護し、成功時だけ置換し、失敗・例外・前回中断時は復旧します。
 - `tools/customer_quality.py` — 人間レビュー証拠を検査する製品非依存の品質層。生成処理や個別衣装ロジックを持ちません。
 - `tools/release_gate.py` — Blender、Unity、候補Manifest、パッケージングを扱う内部技術実行層。通常は直接実行しません。
-- `tools/audit_*.py` — リポジトリ、ツールチェーン、GenWorks配置、スナップショットを拒否型で監査します。
+- `tools/audit_*.py` — リポジトリ、ツールチェーン、GenWorks配置、研究基準を拒否型で監査します。
 - 製品固有の形状生成や修復は、jobまたはProductManifestから追跡できるファイルだけを置きます。単発の未参照スクリプトは残しません。
 
 ## 製品ライフサイクル
@@ -103,13 +102,11 @@ task check:python
 
 `task release` は、変更されていない候補、厳格な人間証拠、未解決の重大欠陥ゼロを確認してから昇格します。NO-GOや例外では既存releaseを保持します。
 
-スナップショットの監査・移行は明示的な保守操作です。
+旧配置からの移行は、既存ファイルとUnity `.meta` を製品の正規ルートへ直接統合する明示的な保守操作です。履歴専用ディレクトリやスナップショット用パッケージは作りません。
 
 ```powershell
 task maintenance:migrate:genworks
 task maintenance:migrate:genworks:apply
-task audit:snapshot SNAPSHOT=<snapshot-path> SOURCE=<local-source-path>
-task package:snapshot SNAPSHOT=<snapshot-path>
 ```
 
 Unityでは `GenWorks > Product Catalog` から製品状態、Prefab、プレビュー、製品READMEを確認できます。
@@ -154,7 +151,7 @@ Unityでは `GenWorks > Product Catalog` から製品状態、Prefab、プレビ
 | Unity | 2022.3.22f1 | [VRChat VPM CLI — Install Unity](https://vcc.docs.vrchat.com/vpm/cli/#install-unity) |
 | VRChat SDK Base／Avatars | 3.10.4 | [VRChat SDK 3.10.4](https://creators.vrchat.com/releases/release-3-10-4/) |
 | Modular Avatar | 1.17.1 | [Modular Avatar 1.17.1](https://github.com/bdunderscore/modular-avatar/releases/tag/1.17.1) |
-| NDMF | 1.14.1 | [NDMF 1.14.1](https://github.com/bdunderscore/ndmf/releases/tag/1.14.1) |
+| NDMF | 1.14.1 | [NDMF 1.14.1](https://github.com/bdunderscore/ndmf/releases/tag/v1.14.1) |
 | Avatar Optimizer | 1.9.16 | [Avatar Optimizer 1.9.16](https://github.com/anatawa12/AvatarOptimizer/releases/tag/v1.9.16) |
 
 ```powershell

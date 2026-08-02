@@ -19,7 +19,6 @@ namespace Image2Outfit.Editor
         private const string ProductRoot = "Assets/GenWorks";
         private const string CanonicalPrefabSegment = "/Prefab/";
         private const string SharedRoot = "Assets/GenWorks/Shared/";
-        private const string LegacyRoot = "Assets/GenWorks/Legacy/";
         private const string GeneratedArmatureSuffix = ".1";
 
         private static readonly HashSet<string> PendingPaths =
@@ -352,7 +351,6 @@ namespace Image2Outfit.Editor
             var normalized = path.Replace('\\', '/');
             if (!normalized.StartsWith(ProductRoot + "/", StringComparison.Ordinal)
                 || normalized.StartsWith(SharedRoot, StringComparison.Ordinal)
-                || normalized.StartsWith(LegacyRoot, StringComparison.Ordinal)
                 || !normalized.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase))
                 return false;
 
