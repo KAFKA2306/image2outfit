@@ -1,4 +1,4 @@
-name: Build product with hosted Blender
+name: Build product renders on hosted runner
 
 on:
   workflow_dispatch:
@@ -7,194 +7,153 @@ on:
         description: Tracked product job at config/products/<product-id>/job.json
         required: true
         type: string
-  push:
-    branches: [main]
+  pull_request:
     paths:
-      - config/products/*/job.json
-
-env:
-  STATUS_CONTEXT: image2outfit-hosted
+      - .github/workflows/build-product-hosted.yml
+      - config/products/**
+      - tools/build_product_from_seed_blend.py
+      - tools/genworks_product_common.py
+      - tools/**/*_build.py
+      - config/blender-python-requirements.txt
 
 permissions:
   contents: read
-  statuses: write
 
 concurrency:
-  group: image2outfit-hosted-${{ inputs.job_path || github.ref }}
-  cancel-in-progress: false
+  group: image2outfit-hosted-${{ github.event.pull_request.number || inputs.job_path }}
+  cancel-in-progress: true
 
 jobs:
-  blender:
+  render:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
-      - name: Publish pending commit status
+      - name: Resolve tracked product job and seed
+        shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          DISPATCH_JOB_PATH: ${{ inputs.job_path }}
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          python - <<'PY' > /tmp/status.json
-          import json, os
-          print(json.dumps({
-              'state': 'pending',
-              'target_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-              'description': f"Hosted Blender run {os.environ['GITHUB_RUN_ID']}",
-              'context': os.environ['STATUS_CONTEXT'],
-          }))
-          PY
-          curl --fail-with-body --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
-            --data-binary @/tmp/status.json
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Resolve, validate, and expose product job
-        env:
-          JOB_PATH_INPUT: ${{ inputs.job_path }}
-          EVENT_BEFORE: ${{ github.event.before }}
-          EVENT_SHA: ${{ github.sha }}
-        run: |
-          python - <<'PY'
-          import json, os, re, subprocess
-          from pathlib import Path
-
-          root = Path.cwd().resolve()
-          job_path_text = (os.environ.get('JOB_PATH_INPUT') or '').strip()
-          if not job_path_text:
-              before = os.environ.get('EVENT_BEFORE', '')
-              sha = os.environ['EVENT_SHA']
-              if before and before != '0' * 40:
-                  command = ['git', 'diff', '--name-only', before, sha]
-              else:
-                  command = ['git', 'show', '--pretty=', '--name-only', sha]
-              changed = [
-                  line.strip()
-                  for line in subprocess.check_output(command, text=True).splitlines()
-                  if re.fullmatch(r'config/products/[a-z0-9][a-z0-9._-]*/job\.json', line.strip())
-              ]
-              changed = sorted(set(changed))
-              if len(changed) != 1:
-                  raise SystemExit(
-                      'Push-triggered hosted build requires exactly one changed product job; '
-                      f'found {changed}'
-                  )
-              job_path_text = changed[0]
-
-          if not re.fullmatch(r'config/products/[a-z0-9][a-z0-9._-]*/job\.json', job_path_text):
-              raise SystemExit('job_path must match config/products/<product-id>/job.json')
-          job_path = (root / job_path_text).resolve()
-          if root not in job_path.parents or not job_path.is_file():
-              raise SystemExit(f'product job not found: {job_path_text}')
-          job = json.loads(job_path.read_text(encoding='utf-8-sig'))
-          if job.get('schemaVersion') != 2:
-              raise SystemExit('Only schemaVersion 2 jobs are accepted')
-          required = ('id', 'productRoot', 'artifactDir', 'buildScript', 'blendPath')
-          missing = [name for name in required if not job.get(name)]
-          if missing:
-              raise SystemExit('job is missing: ' + ', '.join(missing))
-          product_id = job_path.parent.name
-          expected_root = f'Assets/GenWorks/Products/{product_id}'
-          if job['id'] != product_id or job['productRoot'] != expected_root:
-              raise SystemExit('product job identity does not match its namespace')
-          paths = {
-              'JOB_PATH': job_path_text,
-              'JOB_ID': job['id'],
-              'PRODUCT_ROOT': job['productRoot'],
-              'ARTIFACT_DIR': job['artifactDir'],
-              'BUILD_SCRIPT': job['buildScript'],
-              'BLEND_PATH': job['blendPath'],
-              'HOSTED_POSE_SCRIPT': job.get('hostedPoseScript', ''),
+          set -euo pipefail
+          job_path="${DISPATCH_JOB_PATH:-}"
+          if [[ -z "$job_path" ]]; then
+            git fetch origin "$BASE_REF" --depth=1
+            mapfile -t changed < <(git diff --name-only "origin/$BASE_REF...HEAD" -- 'config/products/*/job.json' | sort -u)
+            if [[ ${#changed[@]} -ne 1 ]]; then
+              printf 'Pull request must change exactly one product job; found %s: %s\n' "${#changed[@]}" "${changed[*]}" >&2
+              exit 1
+            fi
+            job_path="${changed[0]}"
+          fi
+          [[ "$job_path" =~ ^config/products/[A-Za-z0-9._-]+/job\.json$ ]] || {
+            echo 'job_path must match config/products/<product-id>/job.json' >&2
+            exit 1
           }
-          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
-              for name, value in paths.items():
-                  stream.write(f'{name}={value}\n')
-          lock = json.loads(Path('config/toolchain-lock.json').read_text(encoding='utf-8'))
-          version = lock['blender']['version']
-          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
-              stream.write(f'BLENDER_VERSION={version}\n')
-              stream.write(f'BLENDER_SERIES={".".join(version.split(".")[:2])}\n')
+          test -f "$job_path"
+          product_dir="$(dirname "$job_path")"
+          seed_path="$product_dir/hosted-seed.json"
+          test -f "$seed_path" || {
+            echo "Hosted seed config not found: $seed_path" >&2
+            exit 1
+          }
+          python - "$job_path" "$seed_path" >> "$GITHUB_ENV" <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+          job_path = Path(sys.argv[1])
+          seed_path = Path(sys.argv[2])
+          job = json.loads(job_path.read_text(encoding='utf-8-sig'))
+          product_id = job_path.parent.name
+          if job.get('schemaVersion') != 2 or job.get('id') != product_id:
+              raise SystemExit('Invalid product namespace or schemaVersion')
+          if job.get('productRoot') != f'Assets/GenWorks/Products/{product_id}':
+              raise SystemExit('productRoot does not match product namespace')
+          print(f'TRACKED_JOB_PATH={job_path.as_posix()}')
+          print(f'SEED_CONFIG_PATH={seed_path.as_posix()}')
+          print(f'JOB_ID={product_id}')
+          print(f'PRODUCT_ROOT={job["productRoot"]}')
+          print(f'ARTIFACT_DIR={job["artifactDir"]}')
           PY
 
       - name: Install Blender runtime libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
+          sudo apt-get install -y --no-install-recommends \
+            xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 \
+            libgl1 libegl1 libx11-6 libxxf86vm1
 
-      - name: Download pinned Blender
+      - name: Download pinned Blender 4.4.3
         run: |
           set -euo pipefail
-          curl --fail --location --retry 4 --retry-all-errors \
-            "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
-            --output blender.tar.xz
+          url='https://download.blender.org/release/Blender4.4/blender-4.4.3-linux-x64.tar.xz'
+          curl --fail --location --retry 4 --retry-all-errors "$url" --output blender.tar.xz
           mkdir -p .image2outfit/blender
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
+          .image2outfit/blender/blender --background --factory-startup --python-expr \
+            "import bpy,platform; assert bpy.app.version_string.split()[0]=='4.4.3'; assert platform.python_version()=='3.11.11'; print(bpy.app.version_string, platform.python_version())"
 
-      - name: Restore Blender Python packages
+      - name: Restore pinned Blender Python packages
         run: |
-          python_exe=".image2outfit/blender/${BLENDER_SERIES}/python/bin/python3.11"
+          set -euo pipefail
+          python_exe='.image2outfit/blender/4.4/python/bin/python3.11'
           "$python_exe" -m ensurepip
           "$python_exe" -m pip install --disable-pip-version-check --no-deps --only-binary=:all: -r config/blender-python-requirements.txt
+          "$python_exe" -c "import PIL,importlib.metadata; assert importlib.metadata.version('Pillow')=='12.3.0'; print(PIL.__version__)"
 
-      - name: Generate product assets and previews
+      - name: Build FBX, Prefab, five views, and pose renders
         run: |
           set -euo pipefail
           mkdir -p "$ARTIFACT_DIR"
-          .image2outfit/blender/blender --background --factory-startup --python-exit-code 1 --python "$BUILD_SCRIPT" -- --job "$JOB_PATH" | tee "$ARTIFACT_DIR/hosted-blender.log"
+          .image2outfit/blender/blender \
+            --background \
+            --factory-startup \
+            --python-exit-code 1 \
+            --python tools/build_product_from_seed_blend.py \
+            -- \
+            --job "$TRACKED_JOB_PATH" \
+            --seed-config "$SEED_CONFIG_PATH" \
+            | tee "$ARTIFACT_DIR/hosted-build.log"
 
-      - name: Render configured verification poses
-        if: env.HOSTED_POSE_SCRIPT != ''
+      - name: Verify generated evidence
         run: |
-          set -euo pipefail
-          .image2outfit/blender/blender --background "$BLEND_PATH" --python-exit-code 1 --python "$HOSTED_POSE_SCRIPT" -- --job "$JOB_PATH" | tee "$ARTIFACT_DIR/hosted-poses.log"
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          job = json.loads(Path(os.environ['TRACKED_JOB_PATH']).read_text(encoding='utf-8-sig'))
+          artifact = Path(job['artifactDir'])
+          report = json.loads((artifact / 'product-build-report.json').read_text(encoding='utf-8-sig'))
+          if not report.get('passed'):
+              raise SystemExit('product-build-report.json is not PASS')
+          root = Path(job['productRoot'])
+          required = [
+              Path(job['fbxAssetPath']),
+              Path(job['prefabAssetPath']),
+              root / 'Previews' / f"{job['id']}-multiview.webp",
+              root / 'Previews' / f"{job['id']}-pose-review.webp",
+          ]
+          for path in required:
+              if not path.is_file() or path.stat().st_size <= 0:
+                  raise SystemExit(f'Missing generated evidence: {path}')
+          evidence = json.loads((artifact / 'hosted-target-evidence.json').read_text(encoding='utf-8-sig'))
+          if evidence.get('profile') != 'Siroino _Large':
+              raise SystemExit('Hosted build did not verify Siroino _Large')
+          print(json.dumps({'passed': True, 'required': [str(path) for path in required]}, indent=2))
+          PY
 
-      - name: Audit generated product
-        run: |
-          python tools/update_product_hashes.py --root "$PRODUCT_ROOT"
-          python tools/audit_genworks_layout.py
-          python tools/audit_repository_hygiene.py
-
-      - name: Upload generated product and evidence
+      - name: Upload product and render evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: image2outfit-hosted-${{ env.JOB_ID }}-${{ github.run_id }}
           path: |
-            ${{ env.ARTIFACT_DIR }}
             ${{ env.PRODUCT_ROOT }}
+            ${{ env.ARTIFACT_DIR }}
           if-no-files-found: error
           retention-days: 30
           compression-level: 6
-
-      - name: Publish final commit status
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          JOB_STATUS: ${{ job.status }}
-        run: |
-          python - <<'PY' > /tmp/status.json
-          import json, os
-          passed = os.environ['JOB_STATUS'] == 'success'
-          print(json.dumps({
-              'state': 'success' if passed else 'failure',
-              'target_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-              'description': f"Hosted Blender run {os.environ['GITHUB_RUN_ID']} · {os.environ['JOB_STATUS']}",
-              'context': os.environ['STATUS_CONTEXT'],
-          }))
-          PY
-          curl --fail-with-body --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
-            --data-binary @/tmp/status.json
