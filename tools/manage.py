@@ -45,8 +45,9 @@ def _product(command: str, product_id: str) -> int:
     try:
         job_path = method_selection.resolve_job(product_id, ROOT)
         job = method_selection.read_json(job_path)
+        runtime_paths.migrate_legacy_product_outputs(ROOT, product_id)
         runtime = runtime_paths.for_job(ROOT, job)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+    except (OSError, ValueError, json.JSONDecodeError, RuntimeError) as exc:
         print(f"image2outfit: {exc}", file=sys.stderr)
         return 1
 
