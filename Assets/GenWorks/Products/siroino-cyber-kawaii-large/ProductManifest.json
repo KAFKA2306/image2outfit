@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-cyber-kawaii-large",
+  "productName": "Cyber Kawaii Layered Set for Siroino _Large",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0-large",
+  "productRoot": "Assets/GenWorks/Products/siroino-cyber-kawaii-large",
+  "outfitPrefabPath": "Assets/GenWorks/Products/siroino-cyber-kawaii-large/Prefabs/Outfit/SiroinoCyberKawaiiLarge.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/Products/siroino-cyber-kawaii-large/Prefabs/Integrated/Siroino_Large/Siroino_Large_CyberKawaii.prefab",
+  "previewPath": "Assets/GenWorks/Products/siroino-cyber-kawaii-large/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/Products/siroino-cyber-kawaii-large/README.md",
+  "sourceJobPath": "config/products/siroino-cyber-kawaii-large/job.json",
+  "productBuildScript": "tools/siroino_cyber_kawaii_large_build.py",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/Products/siroino-cyber-kawaii-large",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "tools/siroino_cyber_kawaii_large_build.py",
+    "lastAttempt": {
+      "pullRequest": 21,
+      "result": "REJECTED",
+      "reason": "The hosted seed pointed to a generated wide-cargo garment blend rather than a complete Siroino body source. Torso extraction therefore selected no faces."
+    },
+    "blockers": [
+      "Resolve a complete official Siroino _Large body and armature source; do not use another product's generated blend as a target seed",
+      "Generate and track the Blender source, FBX, materials, textures, five-view and pose renders",
+      "Create the outfit Prefab and integrated Siroino _Large Prefab with required Unity settings",
+      "Pass Unity import/save/reload and Modular Avatar/NDMF automated checks",
+      "Complete final human visual, pose, and VRChat runtime reviews"
+    ]
+  },
+  "technicalGates": {
+    "targetLargeResolved": "FAIL",
+    "blender": "PENDING",
+    "fbx": "PENDING",
+    "fiveViewRender": "PENDING",
+    "poseRender": "PENDING",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING"
+  },
+  "designRevision": "v1-large-source-and-generator-checkpoint"
+}
