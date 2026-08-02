@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: read
+  statuses: write
 
 concurrency:
   group: image2outfit-hosted-${{ inputs.job_path || github.ref }}
@@ -35,7 +36,6 @@ jobs:
       - name: Resolve, validate, and expose product job
         env:
           JOB_PATH_INPUT: ${{ inputs.job_path }}
-          EVENT_NAME: ${{ github.event_name }}
           EVENT_BEFORE: ${{ github.event.before }}
           EVENT_SHA: ${{ github.sha }}
         run: |
@@ -89,6 +89,7 @@ jobs:
               'BUILD_SCRIPT': job['buildScript'],
               'BLEND_PATH': job['blendPath'],
               'HOSTED_POSE_SCRIPT': job.get('hostedPoseScript', ''),
+              'STATUS_CONTEXT': f'image2outfit-hosted/{job["id"]}',
           }
           with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
               for name, value in paths.items():
@@ -99,6 +100,27 @@ jobs:
               stream.write(f'BLENDER_VERSION={version}\n')
               stream.write(f'BLENDER_SERIES={".".join(version.split(".")[:2])}\n')
           PY
+
+      - name: Publish pending commit status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY' > /tmp/status.json
+          import json, os
+          print(json.dumps({
+              'state': 'pending',
+              'target_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              'description': f"Hosted Blender run {os.environ['GITHUB_RUN_ID']}",
+              'context': os.environ['STATUS_CONTEXT'],
+          }))
+          PY
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            --data-binary @/tmp/status.json
 
       - name: Install Blender runtime libraries
         run: |
@@ -149,3 +171,27 @@ jobs:
           if-no-files-found: error
           retention-days: 30
           compression-level: 6
+
+      - name: Publish final commit status
+        if: always() && env.STATUS_CONTEXT != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PY' > /tmp/status.json
+          import json, os
+          passed = os.environ['JOB_STATUS'] == 'success'
+          print(json.dumps({
+              'state': 'success' if passed else 'failure',
+              'target_url': f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              'description': f"Hosted Blender run {os.environ['GITHUB_RUN_ID']} · {os.environ['JOB_STATUS']}",
+              'context': os.environ['STATUS_CONTEXT'],
+          }))
+          PY
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            --data-binary @/tmp/status.json
