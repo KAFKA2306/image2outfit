@@ -32,7 +32,7 @@
         ".prefab"
       ],
       "includeRegex": "(?i)(siroino|sotai)",
-      "profileRegex": "(?i)(^|[_\\/ .-])_?large([_\\/ .-]|$)",
+      "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
       "contentRegex": "(?i)(^|[^A-Za-z])_?Large([^A-Za-z]|$)",
       "preferredRegex": "(?i)(SiroinoSotai.*_Large|_Large.*SiroinoSotai)"
     },
@@ -41,7 +41,7 @@
         ".fbx"
       ],
       "includeRegex": "(?i)(siroino|sotai)",
-      "profileRegex": "(?i)(^|[_\\/ .-])_?large([_\\/ .-]|$)",
+      "profileRegex": "(?i)(^|[_\\\\/ .-])_?large([_\\\\/ .-]|$)",
       "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
       "preferredRegex": "(?i)(SiroinoSotai.*Large|Large.*SiroinoSotai)"
     }
