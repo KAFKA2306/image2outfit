@@ -29,15 +29,10 @@
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
     "productName": { "type": "string", "minLength": 1 },
     "adapterId": { "type": "string", "minLength": 1 },
-    "productRoot": {
-      "type": "string",
-      "pattern": "^Assets/GenWorks/Products/[a-z0-9][a-z0-9._-]*$"
-    },
-    "productManifestPath": {
-      "type": "string",
-      "pattern": "^Assets/GenWorks/Products/[a-z0-9][a-z0-9._-]*/ProductManifest\\.json$"
-    },
+    "productRoot": { "type": "string", "pattern": "^Assets/GenWorks/Products/[a-z0-9][a-z0-9._-]*$" },
+    "productManifestPath": { "type": "string", "pattern": "^Assets/GenWorks/Products/[a-z0-9][a-z0-9._-]*/ProductManifest\\.json$" },
     "buildScript": { "type": "string" },
+    "hostedPoseScript": { "type": "string" },
     "blendPath": { "type": "string" },
     "fbxAssetPath": { "type": "string", "pattern": "^Assets/" },
     "prefabAssetPath": { "type": "string", "pattern": "^Assets/" },
@@ -48,32 +43,14 @@
     "candidateDir": { "type": "string", "pattern": "^Candidates/" },
     "releaseDir": { "type": "string", "pattern": "^Release/" },
     "licenseEvidence": { "type": "string" },
-    "privateSourceRoots": {
-      "type": "array",
-      "minItems": 1,
-      "items": { "type": "string", "pattern": "^Assets/" }
-    },
-    "deliveryAssets": {
-      "type": "array",
-      "minItems": 1,
-      "items": { "type": "string", "pattern": "^Assets/" }
-    },
-    "previewPaths": {
-      "type": "object",
-      "additionalProperties": { "type": "string", "pattern": "^Assets/" }
-    },
+    "privateSourceRoots": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^Assets/" } },
+    "deliveryAssets": { "type": "array", "minItems": 1, "items": { "type": "string", "pattern": "^Assets/" } },
+    "previewPaths": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^Assets/" } },
     "humanEvidence": {
       "type": "object",
-      "required": [
-        "visual-review",
-        "pose-penetration-review",
-        "vrchat-runtime-review"
-      ],
+      "required": ["visual-review", "pose-penetration-review", "vrchat-runtime-review"],
       "additionalProperties": { "type": "string" }
     },
-    "allowedExtraBones": {
-      "type": "array",
-      "items": { "type": "string" }
-    }
+    "allowedExtraBones": { "type": "array", "items": { "type": "string" } }
   }
 }
