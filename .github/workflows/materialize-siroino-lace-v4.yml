@@ -1,0 +1,57 @@
+name: Materialize reviewed Siroino lace artifacts
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  materialize:
+    if: github.head_ref == 'ops/materialize-siroino-lace-v4'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Download reviewed hosted Blender artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/siroino-generated
+          mkdir -p /tmp/siroino-generated
+          gh run download 30737604280 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name image2outfit-hosted-siroino-lace-halter-large-30737604280 \
+            --dir /tmp/siroino-generated
+          test -f /tmp/siroino-generated/Assets/GenWorks/siroino-lace-halter-large/Models/SiroinoLaceHalterLarge.fbx
+          test -f /tmp/siroino-generated/Assets/GenWorks/siroino-lace-halter-large/Source/Blender/SiroinoLaceHalterLarge.blend
+          test -f /tmp/siroino-generated/Assets/GenWorks/siroino-lace-halter-large/Previews/siroino-lace-halter-large-multiview.webp
+          test -f /tmp/siroino-generated/Assets/GenWorks/siroino-lace-halter-large/Previews/siroino-lace-halter-large-pose-review.webp
+
+      - name: Materialize the tracked checkpoint and remove this one-shot workflow
+        run: |
+          set -euo pipefail
+          source_root=/tmp/siroino-generated/Assets/GenWorks/siroino-lace-halter-large
+          target_root=Assets/GenWorks/siroino-lace-halter-large
+          mkdir -p "$target_root"
+          cp -a "$source_root"/. "$target_root"/
+          rm -f "$target_root/Source/Blender/SiroinoLaceHalterLarge.blend1"
+          rm -f .github/workflows/materialize-siroino-lace-v4.yml
+
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A -- "$target_root" .github/workflows/materialize-siroino-lace-v4.yml
+          git diff --cached --stat
+          git diff --cached --quiet && {
+            echo 'No artifact changes were produced.' >&2
+            exit 1
+          }
+          git commit -m 'build: materialize reviewed Siroino lace checkpoint'
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
