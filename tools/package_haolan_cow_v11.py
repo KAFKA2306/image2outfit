@@ -58,7 +58,7 @@ def main() -> int:
         "front":"front.png", "back":"back.png", "left":"left.png", "right":"right.png",
         "three-quarter":"three_quarter.png"}.items()}
     manifest = {
-        "schemaVersion":1, "productId":PID, "productName":NAME, "version":"1.1",
+        "schemaVersion":1, "productId":PID, "productName":NAME, "version":"1.2",
         "status":"WORKING", "classification":"PARTIAL_CHECKPOINT", "targetAvatar":"HAOLAN Lowpoly",
         "productRoot":ROOT, "legacySnapshot":LEGACY, "generator":"tools/haolan_cow_generator_hosted.py",
         "modelPath":f"{ROOT}/Models/HAOLAN_CowHoodKnitSet.fbx", "prefabPath":PREFAB,
@@ -75,7 +75,7 @@ def main() -> int:
         "generatedAt":now,
     }
     dump(dst / "ProductManifest.json", manifest)
-    (dst / "README.md").write_text(f'''# HAOLAN Cow Hood Knit Set v1.1
+    (dst / "README.md").write_text(f'''# HAOLAN Cow Hood Knit Set v1.2
 
 Canonical resumable checkpoint. The old blockout remains only as evidence at `{LEGACY}/`.
 
@@ -88,7 +88,7 @@ Static geometry and regenerated visual evidence pass. Customer release remains *
 
 HAOLAN credit: かなﾘぁさんち / HAOLAN. HAOLAN source files are not redistributed.
 ''', encoding="utf-8")
-    (dst / "VISUAL_REVIEW.md").write_text(f'''# HAOLAN Cow Hood Knit Set v1.1 — Visual Review
+    (dst / "VISUAL_REVIEW.md").write_text(f'''# HAOLAN Cow Hood Knit Set v1.2 — Visual Review
 
 **Canonical checkpoint: PASS. Customer release: NO-GO.**
 
@@ -98,24 +98,25 @@ Fixed from Legacy:
 - rebuilt sleeves with curved centerlines, elbow drop, bell flare, gathering and shaped cuffs;
 - rebuilt the hood as a dense inner/outer shell with thickness, controlled opening, back drape and ribbed edge;
 - resized the crop top, added top/skirt hems, twelve broad skirt pleats, subdivided ears and drawstrings;
+- replaced per-triangle cow pattern shading with smooth normals and rounded continuous patches;
 - removed engineering wire edges from the review render.
 
 Static result: 24 objects, 18,394 vertices, 34,778 triangles; non-finite, degenerate, unweighted and weight-sum errors are all zero.
 
 Unity import, animation clipping, VRChat Build & Test and in-headset material review remain open.
 ''', encoding="utf-8")
-    audit.update({"product":"HAOLAN Cow Hood Knit Set v1.1","productRoot":ROOT,"decision":"NO-GO",
+    audit.update({"product":"HAOLAN Cow Hood Knit Set v1.2","productRoot":ROOT,"decision":"NO-GO",
         "decisionScope":"customer/product release; canonical checkpoint PASS","legacySnapshot":LEGACY,
         "pathReview":{"canonicalRoot":"PASS","canonicalPrefabPattern":"PASS","legacyPreservedAsEvidence":True,
                       "frontBackLabelsCorrected":True}})
     audit["deliverables"] = {}
     dump(dst / "audit.json", audit)
-    (dst / "AUDIT_REPORT.md").write_text((src / "AUDIT_REPORT.md").read_text(encoding="utf-8").replace("v1.0","v1.1"), encoding="utf-8")
+    (dst / "AUDIT_REPORT.md").write_text((src / "AUDIT_REPORT.md").read_text(encoding="utf-8").replace("v1.0","v1.2"), encoding="utf-8")
 
     config = repo / f"config/products/{PID}"
     config.mkdir(parents=True, exist_ok=True)
     delivery = [p.relative_to(repo).as_posix() for p in sorted(dst.rglob("*")) if p.is_file()]
-    dump(config / "job.json", {"schemaVersion":2,"renderLoopRevision":"v1.1-curved-sleeves-thick-hood-corrected-views",
+    dump(config / "job.json", {"schemaVersion":2,"renderLoopRevision":"v1.2-smooth-shading-rounded-cow-patches-refined-silhouette",
         "id":PID,"productName":NAME,"adapterId":"haolan-v1.6-lowpoly","productRoot":ROOT,
         "productManifestPath":f"{ROOT}/ProductManifest.json","buildScript":"tools/haolan_cow_generator_hosted.py",
         "hostedPoseScript":"tools/haolan_cow_generator_hosted.py","blendPath":f"{ROOT}/Models/HAOLAN_CowHoodKnitSet_preview.glb",
