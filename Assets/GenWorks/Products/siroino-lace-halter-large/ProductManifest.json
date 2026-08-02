@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lace-halter-large",
+  "productName": "Siroino Large Lace Halter Dress",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0-large",
+  "productRoot": "Assets/GenWorks/Products/siroino-lace-halter-large",
+  "outfitPrefabPath": "Assets/GenWorks/Products/siroino-lace-halter-large/Prefabs/Outfit/SiroinoLaceHalterLarge.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/Products/siroino-lace-halter-large/Prefabs/Integrated/SiroinoSotai/SiroinoSotai_LaceHalterLarge.prefab",
+  "previewPath": "Assets/GenWorks/Products/siroino-lace-halter-large/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/Products/siroino-lace-halter-large/README.md",
+  "sourceJobPath": "config/products/siroino-lace-halter-large/job.json",
+  "generatedAt": "2026-08-02T05:25:00Z",
+  "blenderVersion": "4.4.3",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/Products/siroino-lace-halter-large",
+    "resumeFrom": "Assets/GenWorks/Products/siroino-lace-halter-large/Prefabs/Integrated/SiroinoSotai/SiroinoSotai_LaceHalterLarge.prefab",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "Generate and track the Blender, FBX, outfit Prefab, and integrated Prefab checkpoints",
+      "Attach five-view and pose-review renders",
+      "Complete Unity import/save/reload and Modular Avatar validation",
+      "Complete final human visual, pose, and VRChat runtime reviews"
+    ]
+  },
+  "technicalGates": {
+    "blender": "PENDING",
+    "fbx": "PENDING",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING"
+  },
+  "designRevision": "v1-large-lace-halter-working"
+}
