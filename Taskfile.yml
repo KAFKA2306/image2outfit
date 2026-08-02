@@ -70,6 +70,7 @@ tasks:
       - uv run --no-cache --no-project python -m compileall -q tools tests
       - uv run --no-cache --no-project python tools/audit_repository_hygiene.py
       - uv run --no-cache --no-project python tools/audit_genworks_layout.py
+      - uv run --no-cache --no-project python -m unittest discover -s tests -v
       - >-
         uv run --no-cache --no-project --with ruff
         ruff check --ignore S102
@@ -80,6 +81,7 @@ tasks:
         tools/package_snapshot.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
+        tests/test_documentation_contract.py
         tests/test_genworks_layout.py
         tests/test_snapshot_paths.py
       - >-
@@ -92,6 +94,7 @@ tasks:
         tools/package_snapshot.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
+        tests/test_documentation_contract.py
         tests/test_genworks_layout.py
         tests/test_snapshot_paths.py
 
@@ -108,5 +111,6 @@ tasks:
         tools/package_snapshot.py
         tests/test_repository_hygiene.py
         tests/test_config_contracts.py
+        tests/test_documentation_contract.py
         tests/test_genworks_layout.py
         tests/test_snapshot_paths.py
