@@ -50,7 +50,7 @@ Rules:
 - Do not introduce `Assets/GenWorks/Products/`, avatar-name grouping folders, or another intermediate product directory.
 - Product Prefabs must be direct children of `Assets/GenWorks/<slug>/Prefab/`.
 - `REJECTED` does not mean legacy. If a garment has a useful FBX, Prefab, source, render, audit, or explicit continuation path, keep it as a canonical product workspace and preserve the diagnosis.
-- Use `Assets/GenWorks/Legacy/Snapshots/` only for non-resumable historical evidence that cannot be represented as a tracked product. Never aggregate current products under `Legacy/Snapshots/<avatar>/`.
+- `Assets/GenWorks/Legacy/` is forbidden. Historical context belongs in Git history. Evidence required to continue or audit a product belongs under that product's `Documentation/`; material with neither continuation nor compliance value must be deleted rather than placed in a repository archive tree.
 - `job.id`, the config directory name, `job.productRoot`, `job.productManifestPath`, `job.licenseEvidence`, delivery assets, and manifest product identity must agree.
 - Preserve Unity `.meta` files and GUIDs when moving or replacing tracked assets.
 - Keep private or licensed avatar sources under ignored roots such as `Assets/_Local/`, `Assets/_Vendor/`, `Assets/_Reference/`, or the job-declared private source roots.
@@ -153,4 +153,4 @@ Do not use "complete", "finished", "production-ready", or equivalent language un
 
 `tools/audit_repository_hygiene.py` is authoritative for operational residue, and `tools/audit_genworks_layout.py` is authoritative for the canonical product layout. Unit tests enforce the two-document repository policy and other contracts. Fix findings rather than weakening the checks.
 
-The repository must remain understandable from `main`: canonical product work under `Assets/GenWorks/<slug>/`, declared jobs under `config/products/<slug>/`, no hidden artifact-only handoff, no lost intermediate work, no duplicate policy tree, no false completion claim, and no abandoned branch.
+The repository must remain understandable from `main`: canonical product work under `Assets/GenWorks/<slug>/`, declared jobs under `config/products/<slug>/`, no `Assets/GenWorks/Legacy/` archive, no hidden artifact-only handoff, no lost intermediate work, no duplicate policy tree, no false completion claim, and no abandoned branch.

@@ -73,7 +73,6 @@ class ConfigContractTest(unittest.TestCase):
         for required in (
             'CanonicalPrefabSegment = "/Prefab/"',
             'SharedRoot = "Assets/GenWorks/Shared/"',
-            'LegacyRoot = "Assets/GenWorks/Legacy/"',
             "filename.IndexOf('/') < 0",
             "OnPostprocessAllAssets",
             "PrefabUtility.LoadPrefabContents",
@@ -83,6 +82,7 @@ class ConfigContractTest(unittest.TestCase):
             "mangleNames = true",
         ):
             self.assertIn(required, source)
+        self.assertNotIn("LegacyRoot", source)
         self.assertNotIn("VRCAvatarDescriptor", source)
         self.assertNotIn('OutfitPrefabSegment = "/Prefabs/Outfit/"', source)
 
