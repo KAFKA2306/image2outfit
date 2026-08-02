@@ -1,27 +1,28 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "profile": "panel-sewn",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v1-dmap-pattern-coordinate-hooded-bodysuit",
+  "designRevision": "v6-fitted-sleeves-split-hood-seam-graph",
   "panels": [
     "front-upper",
     "back-upper",
     "front-lower",
     "back-lower",
-    "upper-sleeve-left",
-    "lower-sleeve-left",
-    "upper-sleeve-right",
-    "lower-sleeve-right",
+    "sleeve-left",
+    "sleeve-right",
     "cuff-left",
     "cuff-right",
-    "hood"
+    "hood-left",
+    "hood-right",
+    "hood-edge"
   ],
   "separateGeometry": [
     "Henley placket",
     "three buttons",
     "hood drawcords",
-    "left and right hip ties"
+    "left and right hip ties",
+    "center-front, center-back and hood seam piping"
   ],
   "priorityFitZones": [
     "shoulder",
@@ -29,17 +30,32 @@
     "elbow",
     "wrist",
     "chest",
-    "waist",
+    "abdomen",
     "hip crest",
     "groin",
     "inner thigh",
+    "leg root",
     "buttocks",
-    "neck and hood opening"
+    "neck and hood opening",
+    "drawcord",
+    "side tie"
+  ],
+  "requiredPoses": [
+    "neutral",
+    "arms-up",
+    "forward-bend",
+    "legs-apart",
+    "walk",
+    "crouch"
   ],
   "researchTrial": {
-    "paper": "https://arxiv.org/abs/2602.24043",
-    "implementation": "independent explicit UV panel domains and seam-pair graph",
-    "neuralModelExecuted": false
+    "paper": "https://arxiv.org/abs/2607.21213",
+    "paperTitle": "Learning-based Seam Correspondence Reconstruction in Sewing Patterns",
+    "submitted": "2026-07-23T11:26:39Z",
+    "paperLicense": "CC BY-NC-ND 4.0",
+    "implementation": "independent deterministic comparison of length-only seam pairing and semantic panel-graph filtering",
+    "authorsModelExecuted": false,
+    "officialCodeLocated": false
   },
-  "releaseBoundary": "WORKING until Unity import/reload, Modular Avatar/NDMF, pose penetration, VRChat Build & Test and human runtime review pass"
+  "releaseBoundary": "WORKING until actual renders, evaluated fit audit, Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test and human runtime review pass"
 }
