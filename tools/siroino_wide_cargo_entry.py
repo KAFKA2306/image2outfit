@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Production entry point for the Siroino Wide Cargo product.
 
-This layer keeps the reproducible base generator but replaces its first-pass
-cone-like proportions with an avatar-fitted, VRChat-readable silhouette:
+This layer keeps the reproducible base generator while enforcing a continuous,
+avatar-fitted wide-pants silhouette suitable for VRChat:
 
-- a close low-rise waist instead of a floating ring,
-- a substantially thinner hip and upper-thigh volume,
-- wide legs that read broad from the front but remain controlled in profile,
-- shorter hems that clear the floor and shoes,
-- smaller pockets and straps that remain legible without floating,
+- close low-rise waist instead of floating rings,
+- continuous front/back crotch and upper-thigh coverage,
+- broad frontal leg width with a controlled side profile,
+- intentional but compact knee openings,
+- hems above the floor and shoes,
+- smaller pockets and hardware,
 - explicit leg-bone weights for crouch and sitting deformation,
 - UV generation and a distribution-safe Blender file.
 """
@@ -67,7 +68,6 @@ def replace_vertex_weights(
     obj: bpy.types.Object,
     weights: dict[str, list[tuple[int, float]]],
 ) -> None:
-    """Replace transferred weights with a deterministic garment-specific map."""
     for group in list(obj.vertex_groups):
         obj.vertex_groups.remove(group)
     for bone_name, assignments in weights.items():
@@ -88,14 +88,12 @@ def reweight_leg_shell(obj: bpy.types.Object, side_name: str, upper: bool) -> No
     for vertex in obj.data.vertices:
         z = vertex.co.z
         if upper:
-            # The waistband follows Hips, then transitions quickly to UpperLeg.
-            hips_weight = 0.62 * clamp((z - 0.585) / 0.19, 0.0, 1.0)
+            hips_weight = 0.58 * clamp((z - 0.59) / 0.18, 0.0, 1.0)
             upper_weight = 1.0 - hips_weight
             weights["Hips"].append((vertex.index, hips_weight))
             weights[upper_bone].append((vertex.index, upper_weight))
         else:
-            # Only the knee edge receives a small UpperLeg contribution.
-            upper_weight = 0.30 * clamp((z - 0.285) / 0.115, 0.0, 1.0)
+            upper_weight = 0.26 * clamp((z - 0.30) / 0.10, 0.0, 1.0)
             lower_weight = 1.0 - upper_weight
             weights[upper_bone].append((vertex.index, upper_weight))
             weights[lower_bone].append((vertex.index, lower_weight))
@@ -103,24 +101,24 @@ def reweight_leg_shell(obj: bpy.types.Object, side_name: str, upper: bool) -> No
 
 
 def fitted_leg_shell(name, side, rings, material, armature, body, segments=48):
-    """Replace the oversized first pass with a controlled wide-leg profile."""
+    """Produce wide-from-front, thin-in-profile pant legs."""
     side_name = "L" if side < 0 else "R"
     if "UpperLeg" in name:
         rings = [
-            (0.782, 0.012, 0.145, 0.082, 0.078),
-            (0.714, 0.014, 0.151, 0.086, 0.082),
-            (0.623, 0.017, 0.159, 0.090, 0.087),
-            (0.526, 0.021, 0.168, 0.094, 0.091),
-            (0.458, 0.027, 0.174, 0.096, 0.094),
+            (0.782, 0.006, 0.148, 0.068, 0.066),
+            (0.714, 0.008, 0.154, 0.070, 0.068),
+            (0.623, 0.010, 0.164, 0.073, 0.071),
+            (0.526, 0.014, 0.174, 0.076, 0.074),
+            (0.458, 0.020, 0.182, 0.078, 0.076),
         ]
         upper = True
     elif "LowerLeg" in name:
         rings = [
-            (0.394, 0.035, 0.178, 0.091, 0.089),
-            (0.315, 0.034, 0.187, 0.095, 0.093),
-            (0.226, 0.033, 0.198, 0.099, 0.097),
-            (0.137, 0.032, 0.211, 0.103, 0.101),
-            (0.066, 0.035, 0.224, 0.107, 0.105),
+            (0.404, 0.027, 0.184, 0.073, 0.071),
+            (0.320, 0.025, 0.195, 0.076, 0.074),
+            (0.231, 0.023, 0.207, 0.079, 0.077),
+            (0.142, 0.022, 0.219, 0.082, 0.080),
+            (0.072, 0.028, 0.228, 0.084, 0.082),
         ]
         upper = False
     else:
@@ -152,17 +150,18 @@ def fitted_waist_band(
     **kwargs,
 ):
     if name == "Primary_Waist_Belt":
-        radius_x, radius_y, z, width = 0.148, 0.096, 0.785, 0.013
+        radius_x, radius_y, z, width = 0.136, 0.088, 0.783, 0.012
     elif name == "Asymmetric_Waist_Belt":
-        radius_x, radius_y, z, width = 0.153, 0.100, 0.797, 0.010
-        kwargs["slope"] = 0.010
+        radius_x, radius_y, z, width = 0.141, 0.091, 0.794, 0.009
+        kwargs["slope"] = 0.008
     elif name.startswith("Knee_Strap_"):
-        # Keep straps close to the redesigned upper/lower-leg seam.
-        center_x = math.copysign(0.1065, center_x)
-        radius_x = 0.076
-        radius_y = 0.096
-        z = 0.424 if name.endswith("_1") else 0.405
-        width = 0.009
+        center_x = math.copysign(0.105, center_x)
+        radius_x = 0.080
+        radius_y = 0.078
+        if name.endswith("_1"):
+            z, width = 0.432, 0.008
+        else:
+            z, width = 0.411, 0.0045
     return _original_flat_ellipse_band(
         name,
         center_x,
@@ -181,26 +180,18 @@ def trimmed_path_ribbon(name, points, width, material, armature, body):
     adjusted = list(points)
     if name.startswith("Hip_Cutout_Strap_"):
         adjusted = [
-            (
-                math.copysign(min(abs(x), 0.151), x),
-                y * 0.86,
-                z - 0.003,
-            )
+            (math.copysign(min(abs(x), 0.145), x), y * 0.72, z - 0.004)
             for x, y, z in adjusted
         ]
-        width = min(width, 0.0065)
+        width = min(width, 0.0058)
     elif name.startswith("Knee_Zipper_"):
         adjusted = [
-            (
-                math.copysign(min(abs(x), 0.171), x),
-                y * 0.84,
-                z - 0.012,
-            )
+            (math.copysign(min(abs(x), 0.177), x), y * 0.70, z - 0.011)
             for x, y, z in adjusted
         ]
-        width = min(width, 0.0032)
+        width = min(width, 0.0030)
     elif name == "Long_Center_Zipper":
-        adjusted = [(x, y * 0.86, z) for x, y, z in adjusted]
+        adjusted = [(x, y * 0.73, z) for x, y, z in adjusted]
     return _original_flat_path_ribbon(
         name,
         adjusted,
@@ -223,17 +214,17 @@ def fitted_rounded_box(
     x, y, z = location
     sx, sy, sz = scale
     if name.startswith("Cargo_Pocket_Flap_"):
-        x = math.copysign(0.166, x)
-        y = -0.037
-        z = 0.610
-        sx, sy, sz = 0.043, 0.0045, 0.013
-        kwargs["bevel"] = 0.0025
+        x = math.copysign(0.172, x)
+        y = -0.029
+        z = 0.600
+        sx, sy, sz = 0.039, 0.0038, 0.011
+        kwargs["bevel"] = 0.0022
     elif name.startswith("Cargo_Pocket_"):
-        x = math.copysign(0.165, x)
-        y = -0.018
-        z = 0.560
-        sx, sy, sz = 0.039, 0.014, 0.052
-        kwargs["bevel"] = 0.004
+        x = math.copysign(0.171, x)
+        y = -0.014
+        z = 0.552
+        sx, sy, sz = 0.035, 0.010, 0.047
+        kwargs["bevel"] = 0.0035
     return _original_rounded_box(
         name,
         (x, y, z),
@@ -248,14 +239,14 @@ def fitted_rounded_box(
 def fitted_buckle(name, center, width, height, material, armature, body):
     x, y, z = center
     if name == "Front_Belt_Buckle":
-        center, width, height = (0.064, -0.101, 0.789), 0.012, 0.011
+        center, width, height = (0.058, -0.090, 0.787), 0.010, 0.009
     elif name == "Side_Belt_Buckle":
-        center, width, height = (-0.139, -0.038, 0.806), 0.010, 0.009
+        center, width, height = (-0.131, -0.032, 0.802), 0.009, 0.008
     elif name == "Center_Zip_Pull":
-        center, width, height = (0.0, -0.107, 0.614), 0.005, 0.008
+        center, width, height = (0.0, -0.092, 0.614), 0.0045, 0.007
     elif name.startswith("Knee_Zip_Pull_"):
-        center = (math.copysign(0.172, x), y * 0.84, z - 0.012)
-        width, height = 0.0045, 0.0065
+        center = (math.copysign(0.178, x), y * 0.70, z - 0.011)
+        width, height = 0.004, 0.006
     return _original_buckle(
         name,
         center,
@@ -282,38 +273,41 @@ def tune_material(material: bpy.types.Material, *, base, roughness, metallic=0.0
 
 
 def create_outfit_with_fitted_pelvis(body, armature, fabric, strap, metal):
-    """Create a fitted pelvis and retain intentional outer-hip cutouts."""
-    tune_material(fabric, base=(0.012, 0.014, 0.020), roughness=0.63)
-    tune_material(strap, base=(0.006, 0.007, 0.010), roughness=0.42)
-    tune_material(metal, base=(0.22, 0.24, 0.28), roughness=0.24, metallic=0.88)
+    """Close the crotch while retaining small intentional outer-hip cutouts."""
+    tune_material(fabric, base=(0.010, 0.012, 0.018), roughness=0.68)
+    tune_material(strap, base=(0.004, 0.005, 0.008), roughness=0.39)
+    tune_material(metal, base=(0.24, 0.26, 0.31), roughness=0.21, metallic=0.90)
 
     objects = _original_create_outfit(body, armature, fabric, strap, metal)
 
+    # The first-pass pants exposed the complete inner thigh and read as chaps.
+    # These body-derived panels close the front and back through the crotch and
+    # overlap the upper-leg shells enough to remain continuous in animation.
     front = build.c.extract_surface(
         body,
         armature,
         "Cargo_Fitted_Front_Pelvis",
         lambda point: (
-            0.520 <= point.z <= 0.790
-            and point.y < 0.005
+            0.445 <= point.z <= 0.790
+            and point.y < 0.012
             and abs(point.x)
-            <= 0.026 + max(0.0, point.z - 0.520) * 0.37
+            <= 0.094 + max(0.0, point.z - 0.445) * 0.12
         ),
         fabric,
-        0.0047,
+        0.0052,
     )
     back = build.c.extract_surface(
         body,
         armature,
         "Cargo_Fitted_Back_Yoke",
         lambda point: (
-            0.515 <= point.z <= 0.790
-            and point.y >= -0.007
+            0.442 <= point.z <= 0.790
+            and point.y >= -0.014
             and abs(point.x)
-            <= 0.032 + max(0.0, point.z - 0.515) * 0.34
+            <= 0.100 + max(0.0, point.z - 0.442) * 0.10
         ),
         fabric,
-        0.0047,
+        0.0052,
     )
     build.finish_skinned(front, body)
     build.finish_skinned(back, body)
