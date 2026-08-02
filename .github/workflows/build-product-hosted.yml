@@ -116,9 +116,18 @@ jobs:
           if missing:
               raise SystemExit('job is missing: ' + ', '.join(missing))
           product_id = job_path.parent.name
-          expected_root = f'Assets/GenWorks/Products/{product_id}'
+          expected_root = f'Assets/GenWorks/{product_id}'
           if job['id'] != product_id or job['productRoot'] != expected_root:
               raise SystemExit('product job identity does not match its namespace')
+          prefab_pattern = re.compile(
+              rf'^Assets/GenWorks/{re.escape(product_id)}/Prefab/[^/]+\.prefab$'
+          )
+          for field in ('prefabAssetPath', 'integratedPrefabAssetPath'):
+              value = str(job.get(field, ''))
+              if value and not prefab_pattern.fullmatch(value):
+                  raise SystemExit(
+                      f'{field} must match Assets/GenWorks/{product_id}/Prefab/*.prefab'
+                  )
           paths = {
               'JOB_PATH': job_path_text,
               'JOB_ID': job['id'],
