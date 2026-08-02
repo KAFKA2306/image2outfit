@@ -336,8 +336,10 @@ jobs:
                 repo,
                 basehead: `${defaultBranch}...${ref}`,
               });
-              if (comparison.data.ahead_by === 0) {
-                await deleteBranch(ref, "contains no commits outside the default branch", openPulls);
+              if (comparison.data.ahead_by === 0 && comparison.data.behind_by > 0) {
+                await deleteBranch(ref, "contains no unique commits and is behind the default branch", openPulls);
+              } else if (comparison.data.ahead_by === 0 && comparison.data.behind_by === 0) {
+                core.info(`Keeping branch identical to current ${defaultBranch}; it may have just been created: ${ref}`);
               } else {
                 core.warning(`Keeping orphan branch with ${comparison.data.ahead_by} unique commit(s): ${ref}`);
               }
