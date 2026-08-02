@@ -65,7 +65,7 @@ def normalize_four_influences(
 
 def main() -> int:
     build.geometry = pattern
-    build.DESIGN_REVISION = "v5-rounded-hood-pointed-highcut"
+    build.DESIGN_REVISION = "v6-fitted-sleeves-split-hood-seam-graph"
     build.limit_bone_influences = normalize_four_influences
     return build.main()
 
