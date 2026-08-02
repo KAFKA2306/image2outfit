@@ -72,6 +72,6 @@ source = source.replace('"sourceAvatarSha256": sha256(source_path),', '"sourceAv
 source = source.replace('abs_name = str(texture_paths[material]).replace("\\\\", "/")', "abs_name = rel", 1)
 source = source.replace("fitted to the supplied HAOLAN source", "fitted to the audited HAOLAN-derived fit profile")
 source = source.replace('"generatedAt": "2026-07-30T03:40:00Z",', '"generatedAt": datetime.now(timezone.utc).isoformat(),')
-source = source.replace("HAOLAN Cow Hood Knit Set v1.0", "HAOLAN Cow Hood Knit Set v1.1")
-source = source.replace("image2outfit HAOLAN cow hood knit set v1.0", "image2outfit HAOLAN cow hood knit set v1.1")
+source = source.replace("HAOLAN Cow Hood Knit Set v1.0", "HAOLAN Cow Hood Knit Set v1.2")
+source = source.replace("image2outfit HAOLAN cow hood knit set v1.0", "image2outfit HAOLAN cow hood knit set v1.2")
 exec(compile(source, str(Path(__file__).resolve()), "exec"))
