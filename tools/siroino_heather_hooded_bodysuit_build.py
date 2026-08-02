@@ -19,7 +19,70 @@ import siroino_heather_hooded_materials as materials
 import siroino_strappy_knit_build as base
 
 ROOT = Path(__file__).resolve().parents[1]
-DESIGN_REVISION = "v2-fitted-sleeve-folded-hood"
+DESIGN_REVISION = "v3-body-weighted-fitted-sleeves"
+
+
+def shrink_around_segment(
+    obj: bpy.types.Object,
+    start,
+    end,
+    scale: float,
+) -> None:
+    direction = end - start
+    denominator = max(direction.length_squared, 1e-12)
+    inverse = obj.matrix_world.inverted()
+    for vertex in obj.data.vertices:
+        world = obj.matrix_world @ vertex.co
+        t = max(0.0, min(1.0, (world - start).dot(direction) / denominator))
+        center = start + direction * t
+        vertex.co = inverse @ (center + (world - center) * scale)
+    obj.data.update(calc_edges=True)
+
+
+def rebind_dynamic_parts(
+    garments: list[bpy.types.Object],
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+) -> dict[str, object]:
+    by_name = {obj.name: obj for obj in garments}
+    rebound: list[str] = []
+    for side in ("L", "R"):
+        upper_start, upper_end = geometry.bone_segment(
+            armature, f"UpperArm_{side}"
+        )
+        lower_start, lower_end = geometry.bone_segment(
+            armature, f"LowerArm_{side}"
+        )
+        targets = [
+            (f"Heather_Upper_Sleeve_{side}", upper_start, upper_end, 0.78),
+            (f"Heather_Lower_Sleeve_{side}", lower_start, lower_end, 0.80),
+            (f"Heather_Rib_Cuff_{side}", lower_start, lower_end, 0.82),
+        ]
+        for name, start, end, scale in targets:
+            obj = by_name[name]
+            shrink_around_segment(obj, start, end, scale)
+            base.transfer_nearest_body_weights(obj, body)
+            rebound.append(name)
+    hood = by_name["Heather_Folded_Hood"]
+    base.transfer_nearest_body_weights(hood, body)
+    bpy.context.view_layer.objects.active = hood
+    hood.select_set(True)
+    subdivision = hood.modifiers.new("Folded hood smoothing", "SUBSURF")
+    subdivision.subdivision_type = "CATMULL_CLARK"
+    subdivision.levels = 1
+    subdivision.render_levels = 1
+    bpy.ops.object.modifier_apply(modifier=subdivision.name)
+    hood.select_set(False)
+    rebound.append(hood.name)
+    return {
+        "objects": rebound,
+        "weightSource": "nearest tracked SiroinoSotai_PC body vertices",
+        "sleeveRadiusScale": {
+            "upper": 0.78,
+            "lower": 0.80,
+            "cuff": 0.82,
+        },
+    }
 
 
 def main() -> int:
@@ -52,6 +115,7 @@ def main() -> int:
 
     _, fabric, trim, buttons = materials.create_materials(product_root / "Textures")
     garments = geometry.create_outfit(body, armature, fabric, trim, buttons)
+    dynamic_rebind = rebind_dynamic_parts(garments, body, armature)
     cleanup = geometry.clean_meshes(garments)
     shape_keys_added = {
         obj.name: base.add_nearest_shape_keys(obj, body)
@@ -98,6 +162,7 @@ def main() -> int:
         "targetSource": str(source.relative_to(ROOT)).replace("\\", "/"),
         "targetSourceSha256": base.sha256(source),
         "metrics": measured,
+        "dynamicRebind": dynamic_rebind,
         "meshCleanup": cleanup,
         "shapeKeysAdded": shape_keys_added,
         "researchTrial": {
@@ -117,11 +182,12 @@ def main() -> int:
         },
         "notes": [
             "The garment is fitted to the tracked SiroinoSotai_PC FBX.",
-            "The rejected body-extracted sleeves were replaced by explicit bone-aligned sleeve panels.",
-            "The oversized hood was replaced by a compact folded back-hood shell.",
+            "The first body-extracted sleeve candidate was rejected for spikes.",
+            "The second manual-bone sleeve candidate was rejected because it remained in rest-pose space.",
+            "The current sleeve and hood geometry is rebound to exact nearest SiroinoSotai_PC body weights.",
             "Five views are actual Blender Cycles renders of generated geometry.",
             "The DMap neural model was not executed; only its explicit pattern-coordinate principle was trialed.",
-            "Unity, pose penetration and runtime review remain pending.",
+            "Unity and runtime review remain pending.",
         ],
     }
     (report_dir / "product-build-report.json").write_text(
@@ -190,6 +256,7 @@ def main() -> int:
         },
         "research": report["researchTrial"],
         "metrics": measured,
+        "dynamicRebind": dynamic_rebind,
         "meshCleanup": cleanup,
     }
     base.repo_path(job["productManifestPath"]).write_text(
