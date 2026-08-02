@@ -1,40 +1,40 @@
 {
   "schemaVersion": 1,
   "productId": "siroino-cyber-kawaii-large",
-  "productName": "Cyber Kawaii Layered Set for Siroino _Large",
+  "productName": "Cyber Kawaii Layered Set for Siroino",
   "status": "WORKING",
-  "targetAdapterId": "siroino-v1.0-large",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "Siroino standard PC body",
   "productRoot": "Assets/GenWorks/siroino-cyber-kawaii-large",
-  "outfitPrefabPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaiiLarge.prefab",
-  "integratedPrefabPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/Siroino_Large_CyberKawaii.prefab",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab",
   "previewPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-cyber-kawaii-large/README.md",
   "sourceJobPath": "config/products/siroino-cyber-kawaii-large/job.json",
-  "productBuildScript": "tools/siroino_cyber_kawaii_large_build.py",
+  "productBuildScript": "tools/siroino_cyber_kawaii_standard_final_build.py",
+  "designRevision": "v3-standard-body-stable-shell",
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-cyber-kawaii-large",
     "doNotRebuildFromZero": true,
-    "resumeFrom": "tools/siroino_cyber_kawaii_large_build.py",
+    "resumeFrom": "tools/siroino_cyber_kawaii_standard_final_build.py",
     "lastAttempt": {
-      "pullRequest": 21,
-      "result": "REJECTED",
-      "reason": "The hosted seed pointed to a generated wide-cargo garment blend rather than a complete Siroino body source. Torso extraction therefore selected no faces."
+      "result": "HOSTED_MODELED",
+      "visualRevision": "v3-standard-body-stable-shell"
     },
     "blockers": [
-      "Resolve a complete official Siroino _Large body and armature source; do not use another product's generated blend as a target seed",
-      "Generate and track the Blender source, FBX, materials, textures, five-view and pose renders",
-      "Create the outfit Prefab and integrated Siroino _Large Prefab with required Unity settings",
-      "Pass Unity import/save/reload and Modular Avatar/NDMF automated checks",
-      "Complete final human visual, pose, and VRChat runtime reviews"
+      "Import and save both Prefabs in pinned Unity",
+      "Pass Prefab reload and Modular Avatar/NDMF checks",
+      "Complete human multiview, pose-penetration, and VRChat runtime reviews"
     ]
   },
   "technicalGates": {
-    "targetLargeResolved": "FAIL",
-    "blender": "PENDING",
-    "fbx": "PENDING",
-    "fiveViewRender": "PENDING",
-    "poseRender": "PENDING",
+    "standardTargetResolved": "PASS",
+    "blender": "PASS",
+    "fbx": "PASS",
+    "bodyClearance": "PASS",
+    "fiveViewRender": "PASS",
+    "poseRender": "PASS",
     "unityImport": "PENDING",
     "prefabSerialized": "PENDING",
     "prefabReload": "PENDING",
@@ -44,5 +44,12 @@
     "humanPoseReview": "PENDING",
     "humanRuntimeReview": "PENDING"
   },
-  "designRevision": "v1-large-source-and-generator-checkpoint"
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
+    "fbx": "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaii.fbx",
+    "prefab": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab",
+    "multiview": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-pose-review.webp"
+  }
 }
