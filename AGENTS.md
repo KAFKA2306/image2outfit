@@ -1,50 +1,59 @@
 # image2outfit execution contract
 
-This repository is a working Unity project, not a documentation project.
+This repository is a working Unity project and an auditable product pipeline. Automation must produce verifiable assets, not only documentation or status notes.
 
-When the user requests an outfit from an image or description, execute the complete job in this repository. Do not only explain how to do it.
+## Product neutrality
+
+- Never assume a specific avatar, adapter, garment, or product ID.
+- Resolve the target from the user request and the selected schemaVersion 2 job.
+- Tracked jobs belong at `config/products/<product-id>/job.json`.
+- Private or machine-local jobs belong at `Assets/_Local/Jobs/<job-id>/job.json`.
+- Common workflows, tasks, tests, and global configuration must not hard-code a product ID.
 
 ## Required flow
 
-1. Resolve the requested avatar, outfit parts, references, and requested deliverables from the prompt.
-   The customer validation target is HAOLAN v1.6. Do not substitute another avatar without an explicit request.
-2. Verify the current official avatar page, license, supported Unity/SDK versions, and required shaders. Record only source URLs and facts needed for the audit.
-3. Put purchased, licensed, reference, and generated working files only under the existing ignored paths:
-   - `Assets/_Reference/` target avatar and reference assets
-   - `Assets/_Local/Jobs/<job-id>/` task-specific Blender scripts, `.blend`, configuration, and temporary files
-   - `Assets/_Local/Generated/<job-id>/` FBX, materials, textures, and prefab source folder
-   - `Artifacts/<job-id>/` machine-readable validation evidence
-   - `Delivery/<job-id>/` customer deliverables
-4. Never commit avatar source files, generated models, textures, previews, delivery files, credentials, or one-off task scripts. Reusable source-only generators may be tracked.
-5. Create the model in Blender. Do not substitute placeholder primitives, renamed existing assets, or fabricated metrics.
-6. Create `Assets/_Local/Jobs/<job-id>/job.json` and use a tracked reusable Blender build script or an ignored task-specific script. Run:
-   `python tools/pipeline.py --job Assets/_Local/Jobs/<job-id>/job.json`
-7. The pipeline must produce the requested FBX and Unity prefab, run Blender and Unity gates, and write `Delivery/<job-id>/audit.json`.
-8. Report `GO` only when every requested deliverable exists, Blender and Unity gates pass, the exact target avatar source was tested, licensing permits the intended delivery, and any required VRChat SDK Build & Test evidence exists. Otherwise report `NO-GO` with the exact failed gates.
-9. Do not silently replace the requested avatar. If its source data is unavailable, produce only work that can be honestly validated and keep the release `NO-GO`.
-10. Final user response must contain only: decision, deliverable paths, key measured metrics, failed gates, and the commit/PR when repository code changed. Do not create a long report unless requested.
+1. Resolve the target avatar, outfit specification, source references, product ID, and deliverables.
+2. Verify authoritative licensing and environment requirements.
+3. Keep private sources under ignored roots such as `Assets/_Local/`, `Assets/_Vendor/`, and `Assets/_Reference/`.
+4. Keep current product assets under `Assets/GenWorks/Products/<product-id>/`.
+5. Keep historical snapshots only under `Assets/GenWorks/Legacy/Snapshots/`.
+6. Do not commit credentials, private avatar packages, local review evidence, workflow state, trigger markers, caches, candidates, or releases.
+7. Preserve Unity `.meta` files and GUIDs when moving tracked assets.
+8. Build a technical candidate with `task candidate JOB=<job-path>`.
+9. A successful technical build must stop at `REVIEW_REQUIRED` and must not create a customer release.
+10. Bind visual, pose-penetration, and VRChat runtime evidence to the exact candidate manifest SHA-256.
+11. Promote the unchanged reviewed candidate with `task release JOB=<same-job-path>`.
+12. Report `GO` or `RELEASED` only when the release gate succeeds. Missing evidence, changed hashes, rights uncertainty, invalid import, critical penetration, or failed runtime validation is `NO-GO`.
+13. Garment production and audit reports must include actual multiview, pose review, and runtime screenshots when required.
 
-## job.json
+## Job and product boundary
 
-Use repository-relative paths.
+`config/job.schema.v2.json` is the only source of required fields.
 
-```json
-{
-  "id": "job-id",
-  "productName": "Outfit name",
-  "buildScript": "Assets/_Local/Jobs/job-id/build.py",
-  "blendPath": "Assets/_Local/Jobs/job-id/outfit.blend",
-  "fbxAssetPath": "Assets/_Local/Generated/job-id/outfit.fbx",
-  "prefabAssetPath": "Assets/_Local/Generated/job-id/outfit.prefab",
-  "targetAvatarAssetPath": "Assets/_Reference/avatar.prefab",
-  "artifactDir": "Artifacts/job-id",
-  "deliveryDir": "Delivery/job-id",
-  "licenseEvidence": "Artifacts/job-id/license.json",
-  "allowedExtraBones": [],
-  "requiredEvidence": ["Artifacts/job-id/vrchat-build-test.json"]
-}
+```text
+config/products/<product-id>/
+  job.json
+  license.json
 ```
 
-The license evidence must contain `sourceUrl`, `checkedAt`, `commercialOutfitAllowed: true`, and `avatarFilesRedistributed: false`.
+The directory name, `job.id`, `job.productRoot`, `job.productManifestPath`, and `job.licenseEvidence` must agree. Product outputs belong in `Assets/GenWorks/Products/<product-id>/`; local avatar sources and human evidence remain outside it.
 
-The Blender build script must accept `--job <absolute-job-json>`, save `blendPath`, and export `fbxAssetPath`. `requiredEvidence` is for checks that cannot be inferred from assets, such as an actual VRChat SDK Build & Test result. Each required evidence JSON must contain `status: "PASS"` and `checkedAt`; missing or incomplete evidence forces `NO-GO`. Remote runs must inject the avatar source under ignored paths and must never commit it.
+## GitHub Actions
+
+- CI uses `contents: read` for build and validation workflows.
+- Generated products and evidence are uploaded as Actions artifacts.
+- CI must not commit run status, trigger markers, generated model revisions, or telemetry to `main`.
+- Use `Build product with hosted Blender` for tracked product jobs when hosted Blender is sufficient.
+- Use self-hosted candidate/release workflows when Unity, local avatar sources, or VRChat validation is required.
+
+## Repository hygiene
+
+```powershell
+task audit:repo
+task audit:genworks
+task check:python
+```
+
+`tools/audit_repository_hygiene.py` is authoritative for repository-level residue. Fix findings instead of adding one-product exceptions.
+
+Do not claim completion for work that was not built, rendered, validated, committed, and pushed.
