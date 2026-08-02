@@ -1,0 +1,81 @@
+name: Observable one-time repository finalization
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/run/finalize-now.txt
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: image2outfit-finalize-merged-branches
+  cancel-in-progress: true
+
+jobs:
+  finalize:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fold contracts and migrate canonical layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/finalize_main_once.py
+
+      - name: Remove one-time machinery and validate final tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm -f --ignore-unmatch \
+            .github/run/genworks-layout.txt \
+            .github/run/genworks-layout-pr.txt \
+            .github/workflows/one-time-genworks-canonical-layout.yml \
+            .github/workflows/one-time-genworks-layout-trigger.yml \
+            .github/workflows/one-time-finalize-integration.yml \
+            .github/workflows/one-time-finalize-pr.yml \
+            tools/migrate_genworks_layout_once.py \
+            tools/finalize_main_once.py
+          rmdir .github/run 2>/dev/null || true
+          python -m compileall -q tools tests
+          python tools/audit_genworks_layout.py
+          python tools/audit_repository_hygiene.py
+          python -m unittest discover -s tests -v
+          git diff --check
+
+      - name: Commit canonical tree to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'refactor: finalize canonical GenWorks integration [skip-hosted-product-build]'
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Delete every non-main branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git ls-remote --heads origin |
+            awk '{sub("refs/heads/", "", $2); print $2}' |
+            while IFS= read -r branch; do
+              if [ -n "$branch" ] && [ "$branch" != 'main' ]; then
+                git push origin --delete "$branch"
+              fi
+            done
