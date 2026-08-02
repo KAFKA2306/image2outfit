@@ -1,6 +1,8 @@
 [project]
 name = "image2outfit"
 version = "0.1.0"
+description = "Reproducible Blender-to-Unity/VRChat garment production, verification, and release pipeline."
+readme = "README.md"
 requires-python = "==3.11.*"
 dependencies = [
   "Pillow==12.3.0",
@@ -16,3 +18,12 @@ snapshot = [
   "scipy",
   "trimesh",
 ]
+
+[tool.uv]
+package = false
+default-groups = []
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+src = ["tools", "tests"]
