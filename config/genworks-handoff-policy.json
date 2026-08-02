@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "canonicalWorkspacePattern": "Assets/GenWorks/Products/<product-id>",
+  "statuses": [
+    "WORKING",
+    "TECHNICAL_READY",
+    "HUMAN_REVIEW_PENDING",
+    "RELEASED",
+    "REJECTED"
+  ],
+  "requiredCheckpointJobFields": [
+    "productManifestPath",
+    "blendPath",
+    "fbxAssetPath",
+    "prefabAssetPath",
+    "integratedPrefabAssetPath",
+    "previewPaths",
+    "deliveryAssets"
+  ],
+  "requiredPreviewViews": [
+    "front",
+    "back",
+    "left",
+    "right",
+    "three-quarter"
+  ],
+  "requiredAutomatedTechnicalGatesBeforeHumanReview": [
+    "blender",
+    "fbx",
+    "unityImport",
+    "prefabSerialized",
+    "prefabReload",
+    "modularAvatar"
+  ],
+  "requiredHumanReleaseGates": [
+    "humanVisualReview",
+    "humanPoseReview",
+    "humanRuntimeReview"
+  ],
+  "rules": {
+    "actionsArtifactsAreCanonicalWorkState": false,
+    "trackedCheckpointRequiredForHandoff": true,
+    "unityConfiguredPrefabsRequiredForTechnicalReady": true,
+    "humanReviewRequiredForRelease": true,
+    "rebuildFromZeroWhenCheckpointExists": false,
+    "retainRejectedCheckpointAndReason": true
+  }
+}
