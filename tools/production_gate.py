@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import audit_research_baseline
 import customer_quality
 import release_gate as legacy
 
@@ -128,10 +129,90 @@ def _augment_audit(artifact: Path, values: dict[str, Any]) -> None:
     legacy.write(audit_path, audit)
 
 
+def _research_state() -> tuple[dict[str, Any], dict[str, Any], str]:
+    report = audit_research_baseline.audit(legacy.ROOT)
+    baseline_path = audit_research_baseline.BASELINE_PATH
+    baseline = legacy.read(baseline_path)
+    baseline_hash = legacy.digest(baseline_path) if baseline_path.is_file() else ""
+    return report, baseline, baseline_hash
+
+
+def _write_research_failure(
+    artifact: Path,
+    job: dict[str, Any],
+    report: dict[str, Any],
+) -> None:
+    artifact.mkdir(parents=True, exist_ok=True)
+    legacy.write(artifact / "research-baseline.json", report)
+    legacy.write(
+        artifact / "audit.json",
+        {
+            "schemaVersion": 2,
+            "phase": "candidate",
+            "jobId": job["id"],
+            "adapterId": job["adapterId"],
+            "checkedAt": legacy.now(),
+            "decision": "NO-GO",
+            "releaseEligible": False,
+            "stages": {
+                "researchBaseline": {
+                    "passed": False,
+                    "errors": report.get("errors", []),
+                    "warnings": report.get("warnings", []),
+                }
+            },
+            "note": "Candidate generation is blocked until the current primary-source research baseline passes.",
+        },
+    )
+
+
+def _bind_research_to_candidate(
+    candidate: Path,
+    artifact: Path,
+    report: dict[str, Any],
+    baseline: dict[str, Any],
+    baseline_hash: str,
+) -> None:
+    manifest_path = candidate / "candidate-manifest.json"
+    manifest = legacy.read(manifest_path)
+    if not manifest_path.is_file() or not manifest:
+        raise RuntimeError("candidate manifest is missing after a successful candidate run")
+    manifest["researchBaseline"] = {
+        "path": report["path"],
+        "baselineId": baseline["baselineId"],
+        "surveyYear": baseline["surveyYear"],
+        "reviewedAt": baseline["reviewedAt"],
+        "sha256": baseline_hash,
+        "requiredCapabilities": baseline["requiredCapabilities"],
+    }
+    legacy.write(manifest_path, manifest)
+
+    audit_path = artifact / "audit.json"
+    audit = legacy.read(audit_path)
+    stages = audit.setdefault("stages", {})
+    stages["researchBaseline"] = {
+        "passed": True,
+        "baselineId": baseline["baselineId"],
+        "surveyYear": baseline["surveyYear"],
+        "reviewedAt": baseline["reviewedAt"],
+        "sha256": baseline_hash,
+        "methodCount": report.get("methodCount"),
+        "productionCoverage": report.get("productionCoverage", []),
+        "warnings": report.get("warnings", []),
+    }
+    audit["candidateManifestSha256"] = legacy.digest(manifest_path)
+    legacy.write(audit_path, audit)
+
+
 def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
     candidate = legacy.path(job["candidateDir"])
     release = legacy.path(job["releaseDir"])
     artifact = legacy.path(job["artifactDir"])
+    research, baseline, baseline_hash = _research_state()
+    if research.get("passed") is not True:
+        _write_research_failure(artifact, job, research)
+        return 2
+
     candidate_tx = DirectoryTransaction(candidate)
     release_tx = DirectoryTransaction(release)
     candidate_had_original = candidate_tx.begin()
@@ -142,9 +223,17 @@ def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) 
         release_had_original = release_tx.begin()
         release_started = True
         result = legacy.run_candidate(job_path, job, policy)
+        legacy.write(artifact / "research-baseline.json", research)
         release_tx.rollback(release_had_original)
         release_started = False
         if result == 0:
+            _bind_research_to_candidate(
+                candidate,
+                artifact,
+                research,
+                baseline,
+                baseline_hash,
+            )
             candidate_tx.commit(candidate_had_original)
         else:
             candidate_tx.rollback(candidate_had_original)
@@ -171,7 +260,7 @@ def _strict_release_audit(
     job_path: Path,
     job: dict[str, Any],
     policy: dict[str, Any],
-) -> tuple[dict[str, Any], list[str], str]:
+) -> tuple[dict[str, Any], dict[str, Any], list[str], str]:
     candidate = legacy.path(job["candidateDir"])
     candidate_manifest_path = candidate / "candidate-manifest.json"
     candidate_manifest = legacy.read(candidate_manifest_path)
@@ -179,6 +268,28 @@ def _strict_release_audit(
         legacy.digest(candidate_manifest_path) if candidate_manifest_path.is_file() else ""
     )
     errors = legacy.verify_candidate(job_path, job, candidate, candidate_manifest)
+    if job["adapterId"] in policy.get("blockedReleaseAdapterIds", []):
+        errors.append(f"adapter blocked from release: {job['adapterId']}")
+
+    research, baseline, baseline_hash = _research_state()
+    if research.get("passed") is not True:
+        errors.extend(f"researchBaseline: {value}" for value in research.get("errors", []))
+    bound = candidate_manifest.get("researchBaseline")
+    if not isinstance(bound, dict):
+        errors.append("candidate research baseline is missing")
+    else:
+        expected = {
+            "path": research.get("path"),
+            "baselineId": baseline.get("baselineId"),
+            "surveyYear": baseline.get("surveyYear"),
+            "reviewedAt": baseline.get("reviewedAt"),
+            "sha256": baseline_hash,
+            "requiredCapabilities": baseline.get("requiredCapabilities"),
+        }
+        for field, value in expected.items():
+            if bound.get(field) != value:
+                errors.append(f"candidate research baseline changed: {field}")
+
     evidence = {
         kind: legacy.read(legacy.path(job["humanEvidence"][kind]))
         for kind in policy.get("requiredHumanEvidenceKinds", [])
@@ -193,14 +304,17 @@ def _strict_release_audit(
         digest=legacy.digest,
     )
     errors.extend(quality_errors)
-    return quality, errors, candidate_hash
+    return quality, research, errors, candidate_hash
 
 
 def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
     artifact = legacy.path(job["artifactDir"])
     release = legacy.path(job["releaseDir"])
     artifact.mkdir(parents=True, exist_ok=True)
-    quality, errors, candidate_hash = _strict_release_audit(job_path, job, policy)
+    quality, research, errors, candidate_hash = _strict_release_audit(
+        job_path, job, policy
+    )
+    legacy.write(artifact / "research-baseline.json", research)
     legacy.write(
         artifact / "customer-quality.json",
         {
@@ -212,6 +326,11 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
             "passed": not errors,
             "errors": errors,
             "evidence": quality,
+            "researchBaseline": {
+                "passed": research.get("passed") is True,
+                "baselineId": research.get("baselineId"),
+                "reviewedAt": research.get("reviewedAt"),
+            },
         },
     )
     if errors:
@@ -227,6 +346,7 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
                 "releaseEligible": False,
                 "errors": errors,
                 "evidence": quality,
+                "researchBaseline": research,
                 "candidateManifestSha256": candidate_hash or None,
                 "stateProtection": {
                     "customerReleaseProtected": True,
@@ -251,6 +371,7 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
                 "previousReleaseExisted": release_had_original,
                 "previousReleaseRestored": result != 0 and release_had_original,
                 "strictCustomerQualityPassed": True,
+                "researchBaselinePassed": True,
             },
         )
         return result
@@ -261,7 +382,7 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Transactional customer-quality entry point for image2outfit"
+        description="Transactional, research-bound customer-quality gate for image2outfit"
     )
     parser.add_argument("--mode", choices=("candidate", "release"), required=True)
     parser.add_argument("--job", required=True)
