@@ -31,7 +31,11 @@ class DocumentationContractTests(unittest.TestCase):
         )
 
     def test_root_documents_do_not_link_deleted_management_docs(self) -> None:
-        forbidden = ("docs/GENWORKS_LAYOUT.md", "docs/TOOLCHAIN.md", ".github/AGENTS.md")
+        forbidden = (
+            "docs/GENWORKS_LAYOUT.md",
+            "docs/TOOLCHAIN.md",
+            ".github/AGENTS.md",
+        )
         violations: list[str] = []
         for path in (ROOT / "README.md", ROOT / "AGENTS.md"):
             text = path.read_text(encoding="utf-8")
@@ -39,6 +43,14 @@ class DocumentationContractTests(unittest.TestCase):
                 if f"]({token})" in text:
                     violations.append(f"{path.name}: {token}")
         self.assertEqual([], violations, f"Deleted document links remain: {violations}")
+
+    def test_root_documents_define_one_internal_runtime_layout(self) -> None:
+        pattern = ".image2outfit/products/<slug>/{reports,candidate,release}"
+        for path in (ROOT / "README.md", ROOT / "AGENTS.md"):
+            text = path.read_text(encoding="utf-8")
+            self.assertIn(pattern, text, path.name)
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("以前の `Artifacts/`、`Candidates/`、`Release/` は使用しません", readme)
 
 
 if __name__ == "__main__":
