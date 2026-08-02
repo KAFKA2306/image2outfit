@@ -41,6 +41,19 @@ config/products/<product-id>/
 
 The directory name, `job.id`, `job.productRoot`, `job.productManifestPath`, and `job.licenseEvidence` must agree. Product-specific JSON files are forbidden directly under `config/`.
 
+## Generated Modular Avatar prefab contract
+
+Every prefab under `Assets/GenWorks/Products/<product-id>/Prefabs/Outfit/` is configured automatically when Unity imports it and again after an editor domain reload. `GeneratedOutfitPrefabConfigurator.cs` writes the Modular Avatar components into the prefab asset itself:
+
+- `ModularAvatarMergeArmature` on the generated armature, with the generated armature renamed to the `.1` convention
+- merge target set to the corresponding avatar armature path
+- position lock set to `BaseToMerge` and unique-bone name mangling enabled
+- `ModularAvatarMeshSettings` on the outfit root, including root-bone, probe-anchor, and bounds inheritance
+
+The customer-facing outfit prefab can therefore be placed directly below a compatible avatar root. Running Modular Avatar's interactive **Setup Outfit** command is not part of the image2outfit generation path; that command expects the selected object to already have a parent avatar containing a VRChat Avatar Descriptor. The integrated prefab remains the target-specific verification artifact and is still processed through the NDMF technical gate.
+
+A manual repair command is available at `Tools > Image2Outfit > Configure Generated Modular Avatar Prefabs` for previously generated assets.
+
 ## Inspection and maintenance
 
 Open `GenWorks > Product Catalog` in Unity to inspect current products.
