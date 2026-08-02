@@ -12,7 +12,7 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
-        python tools/production_gate.py --mode candidate --job "{{.JOB}}"
+        python tools/manage.py candidate --job "{{.JOB}}"
 
   release:
     desc: Promote an unchanged reviewed candidate only after strict customer-quality evidence passes.
@@ -25,22 +25,27 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
-        python tools/production_gate.py --mode release --job "{{.JOB}}"
+        python tools/manage.py release --job "{{.JOB}}"
 
   audit:repo:
     desc: Reject committed runtime state, product-specific global config, and self-mutating workflows.
     cmds:
-      - uv run --no-cache --locked --no-default-groups python tools/audit_repository_hygiene.py
+      - uv run --no-cache --locked --no-default-groups python tools/manage.py audit repository
 
   audit:genworks:
     desc: Audit the canonical Assets/GenWorks product catalog and path containment.
     cmds:
-      - uv run --no-cache --locked --no-default-groups python tools/audit_genworks_layout.py
+      - uv run --no-cache --locked --no-default-groups python tools/manage.py audit genworks
+
+  audit:tools:
+    desc: Reject unowned, duplicate, opaque, or excessively layered tools and payloads.
+    cmds:
+      - uv run --no-cache --locked --no-default-groups python tools/manage.py audit tools
 
   audit:research:
     desc: Reject stale, incomplete, non-primary, or license-unsafe garment research baselines.
     cmds:
-      - uv run --no-cache --locked --no-default-groups python tools/audit_research_baseline.py
+      - uv run --no-cache --locked --no-default-groups python tools/manage.py audit research
 
   audit:snapshot:
     desc: Verify any preserved legacy snapshot against its original local source.
@@ -49,7 +54,7 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --group snapshot
-        python tools/audit_snapshot.py
+        python tools/manage.py snapshot-audit
         --candidate "{{.SNAPSHOT}}"
         --source "{{.SOURCE}}"
 
@@ -60,24 +65,22 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
-        python tools/package_snapshot.py --root "{{.SNAPSHOT}}"
+        python tools/manage.py snapshot-package --root "{{.SNAPSHOT}}"
 
   maintenance:migrate:genworks:
     desc: Show the migration plan for legacy local image2outfit jobs.
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
-        python tools/migrate_jobs_to_genworks.py
+        python tools/manage.py migrate-genworks
 
   maintenance:migrate:genworks:apply:
     desc: Move legacy local job outputs and their Unity meta files into Assets/GenWorks.
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
-        python tools/migrate_jobs_to_genworks.py --apply
-      - uv run --no-cache --locked --no-default-groups python tools/audit_genworks_layout.py
-      - uv run --no-cache --locked --no-default-groups python tools/audit_repository_hygiene.py
-      - uv run --no-cache --locked --no-default-groups python tools/audit_research_baseline.py
+        python tools/manage.py migrate-genworks --apply
+      - uv run --no-cache --locked --no-default-groups python tools/manage.py audit all
 
   check:python:
     desc: Check repository contracts and generic reproducibility tooling.
@@ -86,17 +89,17 @@ tasks:
       - >-
         uv run --no-cache --locked --no-default-groups
         python -m compileall -q tools tests
-      - uv run --no-cache --locked --no-default-groups python tools/audit_repository_hygiene.py
-      - uv run --no-cache --locked --no-default-groups python tools/audit_genworks_layout.py
-      - uv run --no-cache --locked --no-default-groups python tools/audit_research_baseline.py
+      - uv run --no-cache --locked --no-default-groups python tools/manage.py audit all
       - >-
         uv run --no-cache --locked --no-default-groups
         python -m unittest discover -s tests -v
       - >-
         uv run --no-cache --locked --no-default-groups --group dev
         ruff check --ignore S102
+        tools/manage.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
+        tools/audit_tool_ownership.py
         tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
@@ -111,11 +114,14 @@ tasks:
         tests/test_customer_quality.py
         tests/test_production_gate.py
         tests/test_research_baseline.py
+        tests/test_tool_ownership.py
       - >-
         uv run --no-cache --locked --no-default-groups --group dev
         ruff format --check
+        tools/manage.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
+        tools/audit_tool_ownership.py
         tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
@@ -130,6 +136,7 @@ tasks:
         tests/test_customer_quality.py
         tests/test_production_gate.py
         tests/test_research_baseline.py
+        tests/test_tool_ownership.py
 
   format:python:
     desc: Format generic repository and GenWorks tooling.
@@ -137,8 +144,10 @@ tasks:
       - >-
         uv run --no-cache --locked --no-default-groups --group dev
         ruff format
+        tools/manage.py
         tools/audit_repository_hygiene.py
         tools/audit_genworks_layout.py
+        tools/audit_tool_ownership.py
         tools/audit_research_baseline.py
         tools/migrate_jobs_to_genworks.py
         tools/audit_snapshot.py
@@ -153,3 +162,4 @@ tasks:
         tests/test_customer_quality.py
         tests/test_production_gate.py
         tests/test_research_baseline.py
+        tests/test_tool_ownership.py
