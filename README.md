@@ -20,7 +20,7 @@ image2outfitは、参考画像からVRChatアバター向け衣装を制作し�
 - 履歴スナップショットを`Assets/GenWorks/Legacy/Snapshots/`へ統一し、Unityから直接検証可能にする
 - 旧`Published/`および`Assets/GenWorks/Legacy/Published/`の再作成をCIで禁止
 
-`config/release-policy.json`上の主要アダプターは`pochi-v1.1.0`です。`haolan-v1.6`はリリース禁止対象であり、現時点では過去候補の研究・監査用途に限定します。
+`config/release-policy.json`はアバターごとの主要対象を固定せず、禁止対象と共通リリース条件だけを定義します。`haolan-v1.6`はリリース禁止対象であり、現時点では過去候補の研究・監査用途に限定します。制作対象は各job v2の`adapterId`で明示します。
 
 ## Assets/GenWorks
 
@@ -168,10 +168,10 @@ Assets/HAOLAN_Quest/
 - `Assets/GenWorks/Products/<product-slug>/ProductManifest.json` — Unity製品カタログ
 - `Assets/GenWorks/Legacy/Snapshots/LegacyManifest.json` — Unity可視の履歴スナップショット境界
 - `docs/GENWORKS_LAYOUT.md` — Unityアセット配置と移行仕様
-- `docs/REVIEW_EVIDENCE.md` — 人間レビュー証拠の仕様
-- `config/job.schema.v2.json` — job定義
+- `config/job.schema.v2.json` — job定義と必須フィールドの唯一の情報源
 - `config/genworks-layout.json` — GenWorks配置契約
 - `config/release-policy.json` — 免除できないリリース条件
+- `tools/release_gate.py` — 人間レビュー証拠、候補hash、リリース昇格の実装
 - `ontology/project.yaml` — 制作・観測・判断の証拠モデル
 
 `Assets/GenWorks/Legacy/Snapshots/`配下のファイルは過去のスナップショットであり、新しい顧客向けリリースではありません。既存のローカルjob成果物は`task migrate:genworks:apply`でUnity可視の製品構造へ移行します。
