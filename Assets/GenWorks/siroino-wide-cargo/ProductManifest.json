@@ -10,8 +10,8 @@
   "previewPath": "Assets/GenWorks/siroino-wide-cargo/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-wide-cargo/README.md",
   "demoScenePath": "Assets/GenWorks/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
-  "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
-  "generatedAt": "2026-08-02T00:25:56.878442Z",
+  "sourceJobPath": "Assets/_Local/Jobs/siroino-wide-cargo/job.json",
+  "generatedAt": "2026-08-02T08:31:52.893383Z",
   "blenderVersion": "4.4.3",
   "handoff": {
     "resumable": true,
@@ -34,30 +34,107 @@
     ]
   },
   "metrics": {
-    "meshObjects": 32,
-    "vertices": 19848,
-    "triangles": 38540,
-    "materialSlots": 32,
-    "shapeKeys": 375,
+    "meshObjects": 1,
+    "vertices": 1168,
+    "triangles": 2040,
+    "materialSlots": 2,
+    "shapeKeys": 0,
     "maxBoneInfluences": 3,
     "unweightedVertices": 0,
     "weightSumErrors": 0,
     "degenerateTriangles": 0,
-    "boundaryEdges": 1854
+    "boundaryEdges": 288
   },
   "technicalGates": {
     "blender": "PASS",
     "uvMapping": "PASS",
     "exactBodyPoseRenders": "PASS",
-    "latestGeometryRender": "FAIL",
+    "latestGeometryRender": "PASS",
     "unityImport": "PENDING",
     "prefabSerialized": "PENDING",
     "prefabReload": "PENDING",
     "modularAvatar": "PENDING",
     "vrchatBuildAndTest": "PENDING",
-    "humanVisualReview": "PENDING",
-    "humanPoseReview": "PENDING",
+    "humanVisualReview": "PASS",
+    "humanPoseReview": "PASS",
     "humanRuntimeReview": "PENDING"
   },
-  "designRevision": "v10-release-refit"
+  "designRevision": "v38-reviewed-converged-crotch",
+  "wearabilityAudit": {
+    "schemaVersion": 1,
+    "passed": true,
+    "checks": {
+      "garmentMeshNames": [
+        "Cargo_Continuous_Pants"
+      ],
+      "metrics": {
+        "vertices": 1168,
+        "triangles": 2040,
+        "minimumZ": 0.10499999672174454,
+        "maximumZ": 0.8399999737739563,
+        "totalWidth": 0.35199999809265137,
+        "totalDepth": 0.26600000262260437,
+        "maximumEdgeLength": 0.12001666848481464,
+        "maximumEdgeZSpan": 0.12000000476837158,
+        "degenerateTriangles": 0,
+        "uvLayers": 1,
+        "materialSlots": 2,
+        "shapeKeys": 0,
+        "footIntrusionVertices": 0,
+        "unweightedVertices": 0,
+        "centerCoverageVertices": 160,
+        "bands": {
+          "seat": {
+            "width": 0.35199999809265137,
+            "depth": 0.26600000262260437,
+            "rear": 0.13600000739097595
+          },
+          "thigh": {
+            "width": 0.328000009059906,
+            "depth": 0.18900000303983688,
+            "rear": 0.09700000286102295
+          },
+          "knee": {
+            "width": 0.3199999928474426,
+            "depth": 0.1719999983906746,
+            "rear": 0.08799999952316284
+          },
+          "hem": {
+            "width": 0.3140000104904175,
+            "depth": 0.1639999970793724,
+            "rear": 0.08399999886751175
+          }
+        },
+        "frontCentreCoverageVertices": 41,
+        "rearCentreCoverageVertices": 41,
+        "centreCoverageLevels": [
+          0.64,
+          0.7,
+          0.735,
+          0.75,
+          0.775,
+          0.79
+        ]
+      },
+      "singleMeshObjectPassed": true,
+      "finiteCoordinatesPassed": true,
+      "topologyPassed": true,
+      "sourceFaceIndependencePassed": true,
+      "spikeGuardPassed": true,
+      "uvPassed": true,
+      "materialSeparationPassed": true,
+      "shapeKeyIsolationPassed": true,
+      "weightingPassed": true,
+      "footAndFloorClearancePassed": true,
+      "controlledVolumePassed": true,
+      "fittedSeatPassed": true,
+      "innerThighCoveragePassed": true,
+      "straightWideProfilePassed": true,
+      "waistCoveragePassed": true,
+      "frontCentreCoveragePassed": true,
+      "rearCentreCoveragePassed": true,
+      "continuousCentreLevelsPassed": true,
+      "panelFreeTransitionPassed": true
+    }
+  }
 }
