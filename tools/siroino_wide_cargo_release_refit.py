@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Release-candidate refit for Siroino Wide Cargo.
 
-This deterministic layer keeps the generated product reproducible while fixing
-visual defects found in hosted multiview and pose evidence: floating waist and
-knee rings, disconnected leg sections, rigid crouch/sit deformation, excessive
-pocket projection, and cylindrical lower-leg volume.
+This deterministic layer fixes defects observed in the actual hosted renders:
+floating belts, exposed inner thighs that read as chaps, cylindrical legs,
+disconnected knee sections, rigid pose deformation, and excessive projection.
 """
 from __future__ import annotations
 
@@ -35,37 +34,28 @@ def _single_bone(obj: bpy.types.Object, bone: str) -> None:
 
 
 def _upper_leg_gradient(obj: bpy.types.Object, side: str) -> None:
-    hips = "Hips"
-    upper = f"UpperLeg_{side}"
+    assignments = {"Hips": [], f"UpperLeg_{side}": []}
     zs = [vertex.co.z for vertex in obj.data.vertices]
-    low = min(zs, default=0.0)
-    high = max(zs, default=1.0)
+    low, high = min(zs, default=0.0), max(zs, default=1.0)
     span = max(high - low, 1e-6)
-    assignments = {hips: [], upper: []}
     for vertex in obj.data.vertices:
         t = base.clamp((vertex.co.z - low) / span, 0.0, 1.0)
-        # At the waist follow Hips; toward the knee follow UpperLeg.
-        upper_weight = 0.92 - 0.46 * t
-        assignments[upper].append((vertex.index, upper_weight))
-        assignments[hips].append((vertex.index, 1.0 - upper_weight))
+        upper_weight = 0.94 - 0.48 * t
+        assignments[f"UpperLeg_{side}"].append((vertex.index, upper_weight))
+        assignments["Hips"].append((vertex.index, 1.0 - upper_weight))
     _replace(obj, assignments)
 
 
 def _lower_leg_gradient(obj: bpy.types.Object, side: str) -> None:
-    upper = f"UpperLeg_{side}"
-    lower = f"LowerLeg_{side}"
+    assignments = {f"UpperLeg_{side}": [], f"LowerLeg_{side}": []}
     zs = [vertex.co.z for vertex in obj.data.vertices]
-    low = min(zs, default=0.0)
-    high = max(zs, default=1.0)
+    low, high = min(zs, default=0.0), max(zs, default=1.0)
     span = max(high - low, 1e-6)
-    assignments = {upper: [], lower: []}
     for vertex in obj.data.vertices:
         t = base.clamp((vertex.co.z - low) / span, 0.0, 1.0)
-        # Knee edge follows the thigh enough to close during flexion; the hem
-        # remains dominated by LowerLeg for stable walking deformation.
-        upper_weight = 0.08 + 0.68 * t
-        assignments[upper].append((vertex.index, upper_weight))
-        assignments[lower].append((vertex.index, 1.0 - upper_weight))
+        upper_weight = 0.06 + 0.72 * t
+        assignments[f"UpperLeg_{side}"].append((vertex.index, upper_weight))
+        assignments[f"LowerLeg_{side}"].append((vertex.index, 1.0 - upper_weight))
     _replace(obj, assignments)
 
 
@@ -77,28 +67,25 @@ def refined_leg_shell(name, side, rings, material, armature, body, segments=48):
 
     if "UpperLeg" in name:
         for vertex in obj.data.vertices:
-            # Preserve a wide frontal silhouette without a box-shaped side view.
-            vertex.co.x = center_x + (vertex.co.x - center_x) * 0.82
-            vertex.co.y *= 0.58
-            # Extend the shell into the knee zone to remove the disconnected gap.
+            # Preserve horizontal width while flattening the side profile.
+            vertex.co.x = center_x + (vertex.co.x - center_x) * 1.08
+            vertex.co.y *= 0.44
             if vertex.co.z < 0.50:
-                vertex.co.z -= 0.055
+                vertex.co.z -= 0.040
         _upper_leg_gradient(obj, side_name)
     elif "LowerLeg" in name:
         zs = [vertex.co.z for vertex in obj.data.vertices]
-        low = min(zs, default=0.0)
-        high = max(zs, default=1.0)
+        low, high = min(zs, default=0.0), max(zs, default=1.0)
         span = max(high - low, 1e-6)
         for vertex in obj.data.vertices:
             t = base.clamp((vertex.co.z - low) / span, 0.0, 1.0)
-            # Slightly wider at the knee and nearly parallel toward the hem.
-            width_scale = 0.68 + 0.08 * t
+            width_scale = 1.04 + 0.08 * (1.0 - t)
             vertex.co.x = center_x + (vertex.co.x - center_x) * width_scale
-            vertex.co.y *= 0.48
+            vertex.co.y *= 0.40
             if vertex.co.z > 0.34:
-                vertex.co.z += 0.060
+                vertex.co.z += 0.045
             if vertex.co.z < 0.14:
-                vertex.co.z += 0.040
+                vertex.co.z += 0.028
         _lower_leg_gradient(obj, side_name)
 
     obj.data.update(calc_edges=True)
@@ -123,53 +110,91 @@ def refined_band(
     )
     vertices = list(obj.data.vertices)
     if name in {"Primary_Waist_Belt", "Asymmetric_Waist_Belt"}:
-        # Previous evidence showed rigid hoops outside the torso. Conform them
-        # tightly enough to read as flat belts rather than detached rings.
         for vertex in vertices:
-            vertex.co.x *= 0.76
-            vertex.co.y *= 0.48
-            vertex.co.z -= 0.010
+            vertex.co.x *= 0.68
+            vertex.co.y *= 0.40
+            vertex.co.z -= 0.012
         _single_bone(obj, "Hips")
     elif name.startswith("Knee_Strap_"):
         side_name = "L" if "_L_" in name else "R"
         local_center = sum(vertex.co.x for vertex in vertices) / max(1, len(vertices))
         for vertex in vertices:
-            vertex.co.x = local_center + (vertex.co.x - local_center) * 0.56
-            vertex.co.y *= 0.38
-            vertex.co.z -= 0.004
+            vertex.co.x = local_center + (vertex.co.x - local_center) * 0.72
+            vertex.co.y *= 0.34
+            vertex.co.z -= 0.002
         _lower_leg_gradient(obj, side_name)
     obj.data.update(calc_edges=True)
     return obj
 
 
+def _remove_object(obj: bpy.types.Object) -> None:
+    if obj.name in bpy.data.objects:
+        bpy.data.objects.remove(obj, do_unlink=True)
+
+
 def refined_create_outfit(body, armature, fabric, strap, metal):
     objects = _current_create_outfit(body, armature, fabric, strap, metal)
+
+    # Remove the narrow center panels from the earlier pass. They left the full
+    # inner thighs exposed and made the product read as chaps rather than pants.
+    retained: list[bpy.types.Object] = []
     for obj in objects:
+        if obj.name in {"Cargo_Fitted_Front_Pelvis", "Cargo_Fitted_Back_Yoke"}:
+            _remove_object(obj)
+        else:
+            retained.append(obj)
+
+    front = build.c.extract_surface(
+        body,
+        armature,
+        "Cargo_Fitted_Front_Pelvis",
+        lambda point: (
+            0.438 <= point.z <= 0.790
+            and point.y < 0.020
+            and abs(point.x) <= 0.102 + max(0.0, point.z - 0.438) * 0.08
+        ),
+        fabric,
+        0.0052,
+    )
+    back = build.c.extract_surface(
+        body,
+        armature,
+        "Cargo_Fitted_Back_Yoke",
+        lambda point: (
+            0.435 <= point.z <= 0.790
+            and point.y >= -0.020
+            and abs(point.x) <= 0.108 + max(0.0, point.z - 0.435) * 0.07
+        ),
+        fabric,
+        0.0052,
+    )
+    build.finish_skinned(front, body)
+    build.finish_skinned(back, body)
+
+    for obj in retained:
         name = obj.name
         if name.startswith("Cargo_Pocket_"):
-            # Reduce projection so pockets remain readable without floating.
             center = obj.location.copy()
             for vertex in obj.data.vertices:
-                vertex.co.x = center.x + (vertex.co.x - center.x) * 0.78
-                vertex.co.y = center.y + (vertex.co.y - center.y) * 0.62
-                vertex.co.z = center.z + (vertex.co.z - center.z) * 0.88
+                vertex.co.x = center.x + (vertex.co.x - center.x) * 0.72
+                vertex.co.y = center.y + (vertex.co.y - center.y) * 0.50
+                vertex.co.z = center.z + (vertex.co.z - center.z) * 0.84
             _single_bone(obj, "UpperLeg_L" if name.endswith("_L") else "UpperLeg_R")
             obj.data.update(calc_edges=True)
         elif name.startswith("Hip_Cutout_Strap_"):
             for vertex in obj.data.vertices:
-                vertex.co.x *= 0.88
-                vertex.co.y *= 0.68
+                vertex.co.x *= 0.82
+                vertex.co.y *= 0.54
             _single_bone(obj, "Hips")
             obj.data.update(calc_edges=True)
         elif name.startswith("Hip_Ring_"):
-            # Decorative hip rings were visually detached; shrink them to the
-            # attachment point while retaining the asymmetric hardware cue.
-            obj.scale *= 0.64
+            obj.scale *= 0.52
             _single_bone(obj, "Hips")
         elif name.startswith("Knee_Zipper_") or name.startswith("Knee_Zip_Pull_"):
             side_name = "L" if name.endswith("_L") else "R"
             _lower_leg_gradient(obj, side_name)
-    return objects
+
+    return [front, back, *retained]
 
 
 build.asymmetric_leg_shell = refined_leg_shell
