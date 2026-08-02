@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "productId": "haolan-cow-hood-knit-set",
+  "productName": "HAOLAN Cow Hood Knit Set v1.0",
+  "status": "REJECTED",
+  "targetAdapterId": "haolan-v1.6",
+  "productRoot": "Assets/GenWorks/haolan-cow-hood-knit-set",
+  "outfitPrefabPath": "Assets/GenWorks/haolan-cow-hood-knit-set/Prefab/HAOLAN_CowHoodKnitSet.prefab",
+  "previewPath": "Assets/GenWorks/haolan-cow-hood-knit-set/Previews/HAOLAN_CowHoodKnitSet_preview.webp",
+  "documentationPath": "Assets/GenWorks/haolan-cow-hood-knit-set/README.md",
+  "sourceJobPath": "config/products/haolan-cow-hood-knit-set/job.json",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/haolan-cow-hood-knit-set",
+    "doNotRebuildFromZero": true,
+    "decision": "NO-GO",
+    "resumeFrom": "Assets/GenWorks/haolan-cow-hood-knit-set/Models/HAOLAN_CowHoodKnitSet.fbx",
+    "blockers": [
+      "Replace the blockout-level hood, sleeves, seams, hardware, and material finish identified in Documentation/Audit/VISUAL_REVIEW.md",
+      "Create and serialize the HAOLAN-integrated Modular Avatar prefab",
+      "Capture distinct front, back, left, right, three-quarter, pose-review, Unity, and VRChat runtime evidence",
+      "Pass Unity 2022.3.22f1 import/save-reload, animated clipping, and VRChat Build & Test"
+    ]
+  },
+  "knownEvidence": {
+    "staticGeometry": "PASS",
+    "manualVisualReview": "REJECTED",
+    "unityImport": "NOT_RUN",
+    "animatedClipping": "NOT_RUN",
+    "vrchatRuntime": "NOT_RUN"
+  }
+}
