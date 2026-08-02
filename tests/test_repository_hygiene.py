@@ -22,6 +22,72 @@ class RepositoryHygieneTest(unittest.TestCase):
             ),
         )
 
+    def test_ref_only_branch_cleanup_is_allowed(self) -> None:
+        workflow = Path("branch-hygiene.yml")
+        source = """
+permissions:
+  contents: write
+steps:
+  - uses: actions/github-script@v7
+    with:
+      script: |
+        const protectedBranches = new Set(['main']);
+        await github.rest.git.deleteRef({ref: `heads/${branch}`});
+""".lower()
+        self.assertTrue(
+            audit_repository_hygiene.is_ref_only_branch_hygiene(workflow, source)
+        )
+
+    def test_branch_cleanup_with_checkout_is_rejected(self) -> None:
+        workflow = Path("branch-hygiene.yml")
+        source = """
+permissions:
+  contents: write
+steps:
+  - uses: actions/checkout@v4
+  - uses: actions/github-script@v7
+    with:
+      script: |
+        const protectedBranches = new Set(['main']);
+        await github.rest.git.deleteRef({ref: `heads/${branch}`});
+""".lower()
+        self.assertFalse(
+            audit_repository_hygiene.is_ref_only_branch_hygiene(workflow, source)
+        )
+
+    def test_branch_cleanup_with_content_update_is_rejected(self) -> None:
+        workflow = Path("branch-hygiene.yml")
+        source = """
+permissions:
+  contents: write
+steps:
+  - uses: actions/github-script@v7
+    with:
+      script: |
+        const protectedBranches = new Set(['main']);
+        await github.rest.git.deleteRef({ref: `heads/${branch}`});
+        await github.rest.repos.createOrUpdateFileContents({path: 'state.json'});
+""".lower()
+        self.assertFalse(
+            audit_repository_hygiene.is_ref_only_branch_hygiene(workflow, source)
+        )
+
+    def test_unrelated_write_workflow_is_rejected(self) -> None:
+        workflow = Path("publish.yml")
+        source = """
+permissions:
+  contents: write
+steps:
+  - uses: actions/github-script@v7
+    with:
+      script: |
+        const protectedBranches = new Set(['main']);
+        await github.rest.git.deleteRef({ref: `heads/${branch}`});
+""".lower()
+        self.assertFalse(
+            audit_repository_hygiene.is_ref_only_branch_hygiene(workflow, source)
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

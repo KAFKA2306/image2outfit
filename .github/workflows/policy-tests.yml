@@ -73,6 +73,9 @@ jobs:
       - name: Audit GenWorks layout
         run: uv run --locked --no-default-groups python tools/audit_genworks_layout.py
 
+      - name: Audit 2026 garment research baseline
+        run: uv run --locked --no-default-groups python tools/audit_research_baseline.py
+
       - name: Run release policy tests
         run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
 

@@ -1,8 +1,8 @@
 # image2outfit — VRChat衣装の再現可能な制作・納品パイプライン
 
-image2outfitは、衣装仕様からBlender、FBX、Unity Prefab、実レンダリング、技術監査、人間レビュー、リリースまでを再現可能に管理するUnityプロジェクトです。
+image2outfitは、衣装仕様からBlender、FBX、Unity Prefab、実レンダリング、技術監査、人間レビュー、顧客向けリリースまでを再現可能に管理するUnityプロジェクトです。
 
-メッシュやPrefabが存在するだけでは完成扱いにしません。構造、見た目、ポーズ貫通、Unity／VRChat実動作、人間レビューを別々のゲートとして記録し、同一候補のハッシュへ結び付けます。作業途中や却下済みの状態も、別の開発者がゼロから作り直さず継続できるチェックポイントとしてGitに残します。
+メッシュやPrefabが存在するだけでは完成扱いにしません。構造、見た目、ポーズ貫通、Unity／VRChat実動作、導入手順、顧客利用時の操作を別々のゲートとして記録し、同一候補のハッシュへ結び付けます。新しい試作が失敗しても、最後に使えた候補や既存リリースを削除しません。
 
 ## 文書の情報源
 
@@ -11,7 +11,7 @@ image2outfitは、衣装仕様からBlender、FBX、Unity Prefab、実レンダ�
 - `README.md` — 利用者・開発者向けの構成、操作、環境、リリース条件
 - `AGENTS.md` — エージェント向けの実行契約、品質ゲート、Git／Actions運用
 
-`docs/` や `Assets/GenWorks/README.md`、`.github/AGENTS.md` のような重複する管理文書は置きません。製品固有の状態、導入方法、既知の問題は `Assets/GenWorks/<slug>/ProductManifest.json` と同じ製品ルートの `README.md` に記録します。履歴や一時的な作業説明を共通文書へ蓄積しません。
+`docs/`、`Assets/GenWorks/README.md`、`.github/AGENTS.md`のような重複管理文書は置きません。製品固有の状態、導入方法、既知の問題は `Assets/GenWorks/<slug>/ProductManifest.json` と同じ製品ルートの `README.md` に記録します。
 
 ## 正規構成
 
@@ -43,17 +43,33 @@ Assets/GenWorks/
   Shared/
   Legacy/Snapshots/
   OutfitCatalog.json
+
+tools/
+  production_gate.py
+  customer_quality.py
+  release_gate.py
+  audit_*.py
 ```
 
-- 現行・作業中・却下済みを含む、継続可能な製品は `Assets/GenWorks/<slug>/` に直接配置します。`Assets/GenWorks/Products/` やアバター名を挟む中間ディレクトリは使用しません。
+- 現行・作業中・却下済みを含む継続可能な製品は `Assets/GenWorks/<slug>/` に直接配置します。`Assets/GenWorks/Products/` やアバター名を挟む中間ディレクトリは使用しません。
 - 製品Prefabは `Assets/GenWorks/<slug>/Prefab/*.prefab` の直下に置きます。
-- `REJECTED` でも、FBX、Prefab、テクスチャ、監査証拠、再開地点があるものは製品ワークスペースです。`Legacy/Snapshots/` へ隔離しません。
-- `Legacy/Snapshots/` は、正規製品として継続できない純粋な履歴証拠だけに限定します。
+- `REJECTED`でも、FBX、Prefab、テクスチャ、監査証拠、再開地点があるものは製品ワークスペースです。`Legacy/Snapshots/`へ隔離しません。
+- `Legacy/Snapshots/`は、正規製品として継続できない純粋な履歴証拠だけに限定します。
 - HAOLANの既存チェックポイントは `Assets/GenWorks/haolan-bordeaux-knit-set/` と `Assets/GenWorks/haolan-cow-hood-knit-set/` に統合済みです。どちらも現在は `REJECTED` / `NO-GO` であり、製品READMEとManifestに不足ゲートを記録します。
 - `config/products/<slug>/job.json`、製品ルート、Manifest、ライセンス証拠、納品対象のslugを一致させます。
 - 共通Unity Editorコードは `Assets/GenWorks/Shared/Editor/` に置きます。`Assets/Editor/` は禁止です。
 - 非公開・購入済みアバター、ローカルjob、秘密情報、キャッシュ、人間レビューのローカル記録は、jobで許可された `Assets/_Local/`、`Assets/_Vendor/`、`Assets/_Reference/` などのGit管理外ルートに置きます。
 - Actions artifact、`Artifacts/`、`Candidates/`、`Release/` は輸送・監査・パッケージ用であり、再開可能な作業状態の正本ではありません。
+
+## toolsの責務境界
+
+`tools/`は製品を乱造するスクリプト置き場ではありません。
+
+- `tools/production_gate.py` — 利用者が実行するcandidate／release入口。既存candidateとreleaseをlast-goodとして保護し、成功時だけ置換し、失敗・例外・前回中断時は復旧します。
+- `tools/customer_quality.py` — 人間レビュー証拠を検査する製品非依存の品質層。生成処理や個別衣装ロジックを持ちません。
+- `tools/release_gate.py` — Blender、Unity、候補Manifest、パッケージングを扱う内部技術実行層。通常は直接実行しません。
+- `tools/audit_*.py` — リポジトリ、ツールチェーン、GenWorks配置、スナップショットを拒否型で監査します。
+- 製品固有の形状生成や修復は、jobまたはProductManifestから追跡できるファイルだけを置きます。単発の未参照スクリプトは残しません。
 
 ## 製品ライフサイクル
 
@@ -83,7 +99,9 @@ task audit:genworks
 task check:python
 ```
 
-`task candidate` は技術候補を作りますが、顧客向けリリースを確定しません。見た目、ポーズ、VRChat runtimeの人間レビューを同一候補ハッシュへ結び付けた後、変更されていない候補だけを `task release` で昇格します。
+`task candidate` は技術候補を作りますが、顧客向けリリースを確定しません。処理開始時に既存のcandidateとreleaseをlast-goodとして保護します。新候補が失敗した場合は以前のcandidateを復旧し、candidate生成中は既存releaseを変更しません。
+
+`task release` は、変更されていない候補、厳格な人間証拠、未解決の重大欠陥ゼロを確認してから昇格します。NO-GOや例外では既存releaseを保持します。
 
 スナップショットの監査・移行は明示的な保守操作です。
 
@@ -95,6 +113,34 @@ task package:snapshot SNAPSHOT=<snapshot-path>
 ```
 
 Unityでは `GenWorks > Product Catalog` から製品状態、Prefab、プレビュー、製品READMEを確認できます。
+
+## 顧客品質ゲート
+
+`config/release-policy.json` がrelease証拠の機械判定を定義します。単なる自己申告の`PASS`では通過しません。
+
+### visual-review
+
+- front、back、left、right、three-quarterの全画像を`reviewedAssets`へ明示する
+- reference fidelity、silhouette、fit／coverage、deformation、material、presentation、customer usabilityを採点する
+- 各項目4以上、平均4.5以上
+- 実際の用途と確認内容を文章で残す
+- blocker、critical、majorの未解決欠陥を0件にする
+
+### pose-penetration-review
+
+- neutral、arms-up、arm-cross、crouch、sit、proneを確認する
+- 各poseを候補内の実画像へ`poseEvidence`で結び付ける
+- critical penetrationを0件にする
+- ウェイト、脱落、変形、貫通の確認結果を文章で残す
+
+### vrchat-runtime-review
+
+- VRChat Build & Testと実際のruntimeを通す
+- 1280×720以上のPNG screenshotをSHA-256へ結び付ける
+- 導入手順、表示、動作中fit、メニュー操作、runtime安定性を確認する
+- reviewerは`human:<識別子>`とし、候補生成後の日時で記録する
+
+欠陥は`id`、`severity`、`status`、`category`、`description`、`evidencePaths`を持つ構造化データとして記録します。minorを受容する場合も理由が必要です。重大欠陥を件数だけ0に書き換える運用は通りません。
 
 ## 固定ツールチェーン
 
@@ -110,8 +156,6 @@ Unityでは `GenWorks > Product Catalog` から製品状態、Prefab、プレビ
 | Modular Avatar | 1.17.1 | [Modular Avatar 1.17.1](https://github.com/bdunderscore/modular-avatar/releases/tag/1.17.1) |
 | NDMF | 1.14.1 | [NDMF 1.14.1](https://github.com/bdunderscore/ndmf/releases/tag/1.14.1) |
 | Avatar Optimizer | 1.9.16 | [Avatar Optimizer 1.9.16](https://github.com/anatawa12/AvatarOptimizer/releases/tag/v1.9.16) |
-
-コミュニティVPMリポジトリを登録し、プロジェクトの固定Manifestを解決します。
 
 ```powershell
 vpm add repo https://vpm.nadena.dev/vpm.json
@@ -161,9 +205,11 @@ python tools/audit_toolchain.py
 - `config/products/<slug>/license.json` — 権利・再配布境界
 - `config/genworks-layout.json` — Unity可視アセット配置
 - `config/genworks-handoff-policy.json` — 状態・引き継ぎ・技術／人間ゲート
-- `config/release-policy.json` — リリース条件
+- `config/release-policy.json` — 顧客リリース条件と証拠契約
 - `config/toolchain-lock.json` — 固定ツールチェーン
-- `tools/release_gate.py` — candidate／release境界
+- `tools/production_gate.py` — 保護付きcandidate／release入口
+- `tools/customer_quality.py` — 顧客品質証拠の純粋検査
+- `tools/release_gate.py` — 内部技術実行層
 - `tools/audit_repository_hygiene.py` — 残骸、重複管理、汎用性違反
 - `tools/audit_genworks_layout.py` — 正規product root、Manifest、asset containment
 
