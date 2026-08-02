@@ -95,14 +95,19 @@ def transfer_deforming_weights(body, armature, garment) -> dict[str, float | int
             weights[side_group] = weights.get(side_group, 0.0) + leg_anchor
         else:
             weights["Hips"] += leg_anchor
-        total = sum(weights.values())
+        ranked = sorted(
+            ((name, weight) for name, weight in weights.items() if weight > 1e-8),
+            key=lambda item: item[1],
+            reverse=True,
+        )[:4]
+        total = sum(weight for _, weight in ranked)
         if total <= 1e-8:
-            weights = {"Hips": 1.0}
+            ranked = [("Hips", 1.0)]
             total = 1.0
             fallback_vertices += 1
         normalized = {
             name: weight / total
-            for name, weight in weights.items()
+            for name, weight in ranked
             if weight / total > 1e-5
         }
         maximum_influences = max(maximum_influences, len(normalized))
@@ -145,6 +150,7 @@ def rewrite_shape_profile_handoff(job: dict, return_code: int) -> None:
         "The tracked SiroinoSotai_PC FBX is the source body.",
         "Official Siroino _Large shape keys are baked before garment extraction and fitting.",
         "Skirt shells use nearest official body weights plus continuous Hips and side upper-leg anchors.",
+        "Each generated vertex is reduced to at most four normalized bone influences.",
         "Configured shape keys are required and never silently replaced by the neutral body.",
     ]
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
