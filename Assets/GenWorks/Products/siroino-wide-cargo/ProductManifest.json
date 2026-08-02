@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-wide-cargo",
   "productName": "Siroino Wide Cargo",
-  "status": "MODELED",
+  "status": "WORKING",
   "targetAdapterId": "siroino-v1.0",
   "productRoot": "Assets/GenWorks/Products/siroino-wide-cargo",
   "outfitPrefabPath": "Assets/GenWorks/Products/siroino-wide-cargo/Prefabs/Outfit/SiroinoWideCargo.prefab",
@@ -10,9 +10,21 @@
   "previewPath": "Assets/GenWorks/Products/siroino-wide-cargo/Previews/front.png",
   "documentationPath": "Assets/GenWorks/Products/siroino-wide-cargo/README.md",
   "demoScenePath": "Assets/GenWorks/Products/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
-  "sourceJobPath": "Assets/_Local/Jobs/siroino-wide-cargo/job.json",
+  "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
   "generatedAt": "2026-08-02T00:25:56.878442Z",
   "blenderVersion": "4.4.3",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/Products/siroino-wide-cargo",
+    "resumeFrom": "Assets/GenWorks/Products/siroino-wide-cargo/Prefabs/Integrated/SiroinoSotai/SiroinoSotai_WideCargo.prefab",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "Latest wide-volume render candidate still requires a spike-free regenerated checkpoint",
+      "Unity import/save/reload has not been revalidated for the latest geometry",
+      "Modular Avatar/NDMF integration is pending",
+      "Final human visual, pose, and VRChat runtime reviews are pending"
+    ]
+  },
   "metrics": {
     "meshObjects": 32,
     "vertices": 19848,
@@ -30,6 +42,8 @@
     "uvMapping": "PASS",
     "exactBodyPoseRenders": "PASS",
     "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
     "modularAvatar": "PENDING",
     "vrchatBuildAndTest": "PENDING",
     "humanVisualReview": "PENDING",
