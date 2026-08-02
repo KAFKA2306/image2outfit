@@ -27,26 +27,48 @@ class RuntimePathsTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 runtime_paths.for_product(Path(temporary), "../escape")
 
-    def test_legacy_product_outputs_are_removed(self) -> None:
+    def test_legacy_product_outputs_are_migrated(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             for directory in runtime_paths.LEGACY_RUNTIME_ROOTS:
-                target = root / directory / "sample-outfit"
-                target.mkdir(parents=True)
-                (target / "generated.txt").write_text("obsolete", encoding="utf-8")
-            removed = runtime_paths.remove_legacy_product_outputs(
+                source = root / directory / "sample-outfit"
+                source.mkdir(parents=True)
+                (source / "generated.txt").write_text("preserve", encoding="utf-8")
+
+            migrated = runtime_paths.migrate_legacy_product_outputs(
                 root, "sample-outfit"
             )
             self.assertEqual(
-                removed,
+                migrated,
                 [
-                    "Artifacts/sample-outfit",
-                    "Candidates/sample-outfit",
-                    "Release/sample-outfit",
+                    "Artifacts/sample-outfit"
+                    " -> .image2outfit/products/sample-outfit/reports",
+                    "Candidates/sample-outfit"
+                    " -> .image2outfit/products/sample-outfit/candidate",
+                    "Release/sample-outfit"
+                    " -> .image2outfit/products/sample-outfit/release",
                 ],
             )
+            paths = runtime_paths.for_product(root, "sample-outfit")
+            for target in (paths.reports, paths.candidate, paths.release):
+                self.assertEqual(
+                    (target / "generated.txt").read_text(encoding="utf-8"),
+                    "preserve",
+                )
             for directory in runtime_paths.LEGACY_RUNTIME_ROOTS:
                 self.assertFalse((root / directory).exists())
+
+    def test_migration_rejects_ambiguous_runtime_state(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "Candidates" / "sample-outfit"
+            source.mkdir(parents=True)
+            target = runtime_paths.for_product(root, "sample-outfit").candidate
+            target.mkdir(parents=True)
+            with self.assertRaises(RuntimeError):
+                runtime_paths.migrate_legacy_product_outputs(
+                    root, "sample-outfit"
+                )
 
 
 if __name__ == "__main__":
