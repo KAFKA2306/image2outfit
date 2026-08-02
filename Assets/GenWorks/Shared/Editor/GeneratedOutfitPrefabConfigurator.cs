@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Image2Outfit.Editor
 {
     /// <summary>
-    /// Makes every generated outfit prefab install-ready for Modular Avatar.
+    /// Makes every canonical generated outfit prefab install-ready for Modular Avatar.
     /// The prefab asset is configured directly, so Setup Outfit does not need
     /// to be invoked while the outfit is already parented under an avatar.
     /// </summary>
@@ -17,7 +17,9 @@ namespace Image2Outfit.Editor
     internal static class GeneratedOutfitPrefabConfigurator
     {
         private const string ProductRoot = "Assets/GenWorks";
-        private const string OutfitPrefabSegment = "/Prefabs/Outfit/";
+        private const string CanonicalPrefabSegment = "/Prefab/";
+        private const string SharedRoot = "Assets/GenWorks/Shared/";
+        private const string LegacyRoot = "Assets/GenWorks/Legacy/";
         private const string GeneratedArmatureSuffix = ".1";
 
         private static readonly HashSet<string> PendingPaths =
@@ -348,9 +350,18 @@ namespace Image2Outfit.Editor
                 return false;
 
             var normalized = path.Replace('\\', '/');
-            return normalized.StartsWith(ProductRoot + "/", StringComparison.Ordinal)
-                && normalized.IndexOf(OutfitPrefabSegment, StringComparison.Ordinal) >= 0
-                && normalized.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase);
+            if (!normalized.StartsWith(ProductRoot + "/", StringComparison.Ordinal)
+                || normalized.StartsWith(SharedRoot, StringComparison.Ordinal)
+                || normalized.StartsWith(LegacyRoot, StringComparison.Ordinal)
+                || !normalized.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var markerIndex = normalized.IndexOf(CanonicalPrefabSegment, StringComparison.Ordinal);
+            if (markerIndex < 0)
+                return false;
+
+            var filename = normalized.Substring(markerIndex + CanonicalPrefabSegment.Length);
+            return filename.Length > 0 && filename.IndexOf('/') < 0;
         }
     }
 

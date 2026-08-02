@@ -11,18 +11,20 @@ image2outfitは、衣装仕様からBlender、FBX、Unity Prefab、実レンダ�
 - `README.md` — 利用者・開発者向けの構成、操作、環境、リリース条件
 - `AGENTS.md` — エージェント向けの実行契約、品質ゲート、Git／Actions運用
 
-`docs/` や `.github/AGENTS.md` のような重複する管理文書は置きません。製品固有の状態、導入方法、既知の問題は `Assets/GenWorks/<slug>/ProductManifest.json` と同じ製品ルートの `README.md` に記録します。履歴や一時的な作業説明を共通文書へ蓄積しません。
+`docs/` や `Assets/GenWorks/README.md`、`.github/AGENTS.md` のような重複する管理文書は置きません。製品固有の状態、導入方法、既知の問題は `Assets/GenWorks/<slug>/ProductManifest.json` と同じ製品ルートの `README.md` に記録します。履歴や一時的な作業説明を共通文書へ蓄積しません。
 
 ## 正規構成
 
 ```text
+pyproject.toml
+uv.lock
+
 config/
   job.schema.v2.json
   release-policy.json
   genworks-layout.json
   genworks-handoff-policy.json
   toolchain-lock.json
-  blender-python-requirements.txt
   products/<slug>/
     job.json
     license.json
@@ -37,16 +39,19 @@ Assets/GenWorks/
     Materials/
     Textures/
     Previews/
+    Documentation/
   Shared/
   Legacy/Snapshots/
   OutfitCatalog.json
 ```
 
-- 現行製品は `Assets/GenWorks/<slug>/` に直接配置します。`Assets/GenWorks/Products/` は使用しません。
+- 現行・作業中・却下済みを含む、継続可能な製品は `Assets/GenWorks/<slug>/` に直接配置します。`Assets/GenWorks/Products/` やアバター名を挟む中間ディレクトリは使用しません。
 - 製品Prefabは `Assets/GenWorks/<slug>/Prefab/*.prefab` の直下に置きます。
+- `REJECTED` でも、FBX、Prefab、テクスチャ、監査証拠、再開地点があるものは製品ワークスペースです。`Legacy/Snapshots/` へ隔離しません。
+- `Legacy/Snapshots/` は、正規製品として継続できない純粋な履歴証拠だけに限定します。
+- HAOLANの既存チェックポイントは `Assets/GenWorks/haolan-bordeaux-knit-set/` と `Assets/GenWorks/haolan-cow-hood-knit-set/` に統合済みです。どちらも現在は `REJECTED` / `NO-GO` であり、製品READMEとManifestに不足ゲートを記録します。
 - `config/products/<slug>/job.json`、製品ルート、Manifest、ライセンス証拠、納品対象のslugを一致させます。
 - 共通Unity Editorコードは `Assets/GenWorks/Shared/Editor/` に置きます。`Assets/Editor/` は禁止です。
-- 過去の検査用スナップショットは `Assets/GenWorks/Legacy/Snapshots/` に限定し、自動的に販売対象へ昇格させません。
 - 非公開・購入済みアバター、ローカルjob、秘密情報、キャッシュ、人間レビューのローカル記録は、jobで許可された `Assets/_Local/`、`Assets/_Vendor/`、`Assets/_Reference/` などのGit管理外ルートに置きます。
 - Actions artifact、`Artifacts/`、`Candidates/`、`Release/` は輸送・監査・パッケージ用であり、再開可能な作業状態の正本ではありません。
 
@@ -115,7 +120,7 @@ vpm resolve project .
 python tools/audit_toolchain.py
 ```
 
-`Packages/vpm-manifest.json` がVPM依存を宣言し、Unityが `Packages/packages-lock.json` を管理します。lockファイルを手作業で書き換えません。Blender用Python依存は `config/blender-python-requirements.txt` から、Git管理外のローカル環境へ復元します。
+`Packages/vpm-manifest.json` がVPM依存を宣言し、Unityが `Packages/packages-lock.json` を管理します。lockファイルを手作業で書き換えません。Python依存は `pyproject.toml` を唯一の宣言元、`uv.lock` を解決結果の正本とし、Blender内蔵Python向け環境は `tools/blender_python_env.py` がGit管理外のローカル領域へ復元・検証します。
 
 ## Unity／Modular Avatarの契約
 
@@ -150,6 +155,7 @@ python tools/audit_toolchain.py
 
 ## 正規の契約ファイル
 
+- `pyproject.toml` / `uv.lock` — Python依存の宣言と固定解決結果
 - `config/job.schema.v2.json` — job必須フィールド
 - `config/products/<slug>/job.json` — 製品固有の生成・検証・納品定義
 - `config/products/<slug>/license.json` — 権利・再配布境界

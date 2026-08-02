@@ -36,17 +36,29 @@ class SnapshotPathPolicyTests(unittest.TestCase):
             f"Deprecated snapshot directories exist: {existing}",
         )
 
-    def test_legacy_snapshots_are_unity_visible(self) -> None:
-        self.assertTrue(
-            CANONICAL_SNAPSHOT_ROOT.is_dir(),
-            f"Missing canonical snapshot root: {CANONICAL_SNAPSHOT_ROOT}",
+    def test_resumable_haolan_products_are_not_legacy_snapshots(self) -> None:
+        legacy_haolan = CANONICAL_SNAPSHOT_ROOT / "haolan"
+        residuals = sorted(
+            path.relative_to(ROOT).as_posix()
+            for path in legacy_haolan.rglob("*")
+            if path.is_file() or path.is_symlink()
+        ) if legacy_haolan.exists() else []
+        self.assertEqual(
+            [],
+            residuals,
+            f"Resumable HAOLAN files must use Assets/GenWorks/<slug>: {residuals}",
         )
-        self.assertTrue((CANONICAL_SNAPSHOT_ROOT / "LegacyManifest.json").is_file())
+        for slug in ("haolan-bordeaux-knit-set", "haolan-cow-hood-knit-set"):
+            product_root = ROOT / "Assets" / "GenWorks" / slug
+            self.assertTrue((product_root / "ProductManifest.json").is_file())
+            self.assertTrue((product_root / "README.md").is_file())
+            self.assertTrue((product_root / "Prefab").is_dir())
 
     def test_active_snapshot_paths_use_current_contract(self) -> None:
         forbidden_tokens = (
             "Assets/GenWorks/Legacy/Published",
             "Published/haolan/",
+            "Assets/GenWorks/Legacy/Snapshots/haolan",
             "tools/audit_published.py",
             "tools/package_published.py",
             ".github/run/",

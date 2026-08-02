@@ -71,7 +71,10 @@ class ConfigContractTest(unittest.TestCase):
         self.assertTrue(configurator.with_suffix(".cs.meta").is_file())
         source = configurator.read_text(encoding="utf-8")
         for required in (
-            'OutfitPrefabSegment = "/Prefabs/Outfit/"',
+            'CanonicalPrefabSegment = "/Prefab/"',
+            'SharedRoot = "Assets/GenWorks/Shared/"',
+            'LegacyRoot = "Assets/GenWorks/Legacy/"',
+            "filename.IndexOf('/') < 0",
             "OnPostprocessAllAssets",
             "PrefabUtility.LoadPrefabContents",
             "ModularAvatarMergeArmature",
@@ -81,6 +84,7 @@ class ConfigContractTest(unittest.TestCase):
         ):
             self.assertIn(required, source)
         self.assertNotIn("VRCAvatarDescriptor", source)
+        self.assertNotIn('OutfitPrefabSegment = "/Prefabs/Outfit/"', source)
 
 
 if __name__ == "__main__":

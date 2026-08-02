@@ -1,5 +1,5 @@
 {
-  "jobId": "haolan-bordeaux-knitset-v1",
+  "jobId": "haolan-bordeaux-knit-set",
   "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
   "decision": "NO-GO",
   "sourceAvatarRedistributed": false,
@@ -23,18 +23,9 @@
   },
   "previewGates": {
     "actualFiveDirectionPreview": false,
-    "requiredViews": [
-      "front",
-      "back",
-      "left",
-      "right",
-      "three-quarter"
-    ],
-    "resolution": [
-      1024,
-      1024
-    ],
-    "manifestPath": "Assets/GenWorks/Legacy/Snapshots/haolan/bordeaux-knit-set-candidate/Previews/preview-manifest.json"
+    "requiredViews": ["front", "back", "left", "right", "three-quarter"],
+    "resolution": [1024, 1024],
+    "manifestPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Previews/preview-manifest.json"
   },
   "runtimeGates": {
     "unityImporter": false,
@@ -43,7 +34,8 @@
     "animationIntersectionReview": false
   },
   "failedGates": [
-    "actual front/back/left/right/three-quarter candidate preview not yet committed",
+    "tracked Bordeaux FBX is absent from the canonical workspace",
+    "actual front/back/left/right/three-quarter candidate preview is absent",
     "Unity 2022.3.22f1 ModelImporter execution not run",
     "Unity PrefabUtility save/reload gate not run",
     "VRChat SDK Build & Test not run",
