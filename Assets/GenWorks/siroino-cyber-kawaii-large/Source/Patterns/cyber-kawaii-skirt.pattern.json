@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 2,
+  "productId": "siroino-cyber-kawaii-large",
+  "units": "m",
+  "intent": "Preserve the reviewed fitted silhouette while replacing untracked tuning with an explicit panel, seam, solver, material, and verification contract.",
+  "stages": {
+    "garmentCode": {
+      "source": "https://github.com/maria-korosteleva/GarmentCode",
+      "status": "PENDING",
+      "representation": "Panel, Component, Interface, and seam graph",
+      "requiredOutput": "Source/Patterns/GarmentCode/cyber_kawaii_skirt_specification.json"
+    },
+    "zozoContactSolver": {
+      "source": "https://github.com/st-tech/ppf-contact-solver",
+      "status": "PENDING",
+      "minimumBlenderVersionForAddon": "5.0",
+      "minimumCuda": "12.8",
+      "requiredOutput": "Source/Solver/cyber-kawaii-skirt-solved.obj"
+    },
+    "materialMaker": {
+      "source": "https://github.com/RodZill4/material-maker",
+      "status": "PENDING",
+      "executable": "material_maker",
+      "requiredSources": [
+        "plaid.ptex",
+        "white-ruffle.ptex",
+        "black-waistband.ptex",
+        "pink-satin.ptex"
+      ]
+    },
+    "blender": {
+      "source": "https://www.blender.org/",
+      "status": "PASS",
+      "role": "Rig transfer, neutral and pose verification, FBX, Prefab, and render evidence"
+    }
+  },
+  "construction": {
+    "representation": "garmentcode-interface-contract",
+    "targetMeasurementProfile": "Siroino _Large via official shape keys",
+    "panels": [
+      {
+        "id": "waistband_front",
+        "layerObject": "Black_Skirt_Waistband",
+        "edges": ["waist", "side_left", "lower", "side_right"]
+      },
+      {
+        "id": "waistband_back",
+        "layerObject": "Black_Skirt_Waistband",
+        "edges": ["waist", "side_right", "lower", "side_left"]
+      },
+      {
+        "id": "plaid_front",
+        "layerObject": "Black_Pink_Plaid_Pleated_Skirt",
+        "pleats": 8,
+        "edges": ["waist", "side_left", "hem", "side_right"]
+      },
+      {
+        "id": "plaid_back",
+        "layerObject": "Black_Pink_Plaid_Pleated_Skirt",
+        "pleats": 8,
+        "edges": ["waist", "side_right", "hem", "side_left"]
+      },
+      {
+        "id": "ruffle_front",
+        "layerObject": "White_Ruffle_Underskirt",
+        "pleats": 10,
+        "edges": ["upper", "side_left", "hem", "side_right"]
+      },
+      {
+        "id": "ruffle_back",
+        "layerObject": "White_Ruffle_Underskirt",
+        "pleats": 10,
+        "edges": ["upper", "side_right", "hem", "side_left"]
+      },
+      {
+        "id": "pink_hem_front",
+        "layerObject": "Pink_Underskirt_Hem",
+        "edges": ["upper", "side_left", "hem", "side_right"]
+      },
+      {
+        "id": "pink_hem_back",
+        "layerObject": "Pink_Underskirt_Hem",
+        "edges": ["upper", "side_right", "hem", "side_left"]
+      }
+    ],
+    "seams": [
+      {"id": "waistband_left", "pair": ["waistband_front.side_left", "waistband_back.side_left"]},
+      {"id": "waistband_right", "pair": ["waistband_front.side_right", "waistband_back.side_right"]},
+      {"id": "plaid_left", "pair": ["plaid_front.side_left", "plaid_back.side_left"]},
+      {"id": "plaid_right", "pair": ["plaid_front.side_right", "plaid_back.side_right"]},
+      {"id": "ruffle_left", "pair": ["ruffle_front.side_left", "ruffle_back.side_left"]},
+      {"id": "ruffle_right", "pair": ["ruffle_front.side_right", "ruffle_back.side_right"]},
+      {"id": "pink_hem_left", "pair": ["pink_hem_front.side_left", "pink_hem_back.side_left"]},
+      {"id": "pink_hem_right", "pair": ["pink_hem_front.side_right", "pink_hem_back.side_right"]}
+    ]
+  },
+  "silhouetteProfiles": {
+    "Black_Pink_Plaid_Pleated_Skirt": {
+      "topScale": 0.985,
+      "bottomScale": 0.835,
+      "pleatScale": 0.56,
+      "zOffset": -0.006
+    },
+    "White_Ruffle_Underskirt": {
+      "topScale": 0.9,
+      "bottomScale": 0.86,
+      "pleatScale": 0.62,
+      "zOffset": -0.004
+    },
+    "Black_Skirt_Waistband": {
+      "topScale": 0.975,
+      "bottomScale": 0.965,
+      "pleatScale": 0.5,
+      "zOffset": -0.008
+    },
+    "Pink_Underskirt_Hem": {
+      "topScale": 0.885,
+      "bottomScale": 0.855,
+      "pleatScale": 0.58,
+      "zOffset": -0.004
+    }
+  },
+  "expectedOutputs": {
+    "solverMesh": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Solver/cyber-kawaii-skirt-solved.obj",
+    "solverReport": "Assets/GenWorks/siroino-cyber-kawaii-large/Evidence/Commercial/zozo-contact-solver.json",
+    "materialSourceRoot": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Materials",
+    "blend": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
+    "fbx": "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaii.fbx",
+    "prefab": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
+    "multiview": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-pose-review.webp"
+  },
+  "acceptance": {
+    "maximumBodyPenetrationMm": 1.5,
+    "maximumLayerPenetrationMm": 1.0,
+    "maximumStrainPercent": 12.0,
+    "maximumBoneInfluences": 4,
+    "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "twist"]
+  }
+}
