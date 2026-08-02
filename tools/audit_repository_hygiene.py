@@ -45,6 +45,215 @@ def add(findings: list[Finding], code: str, path: Path, root: Path, message: str
     findings.append(Finding(code, relative(path, root), message))
 
 
+def allowed_product_roots(product_id: str) -> tuple[str, str]:
+    return (
+        f"Assets/GenWorks/{product_id}",
+        f"Assets/GenWorks/Products/{product_id}",
+    )
+
+
+def audit_product(
+    root: Path,
+    product_dir: Path,
+    findings: list[Finding],
+    allowed_statuses: set[str],
+    automated_gates: tuple[str, ...],
+    human_gates: tuple[str, ...],
+) -> str | None:
+    product_id = product_dir.name
+    if not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", product_id):
+        add(findings, "invalid-product-id", product_dir, root, "invalid product directory name")
+        return None
+
+    job_path = product_dir / "job.json"
+    license_path = product_dir / "license.json"
+    for required in (job_path, license_path):
+        if not required.is_file():
+            add(findings, "missing-product-config", required, root, "required product config is missing")
+    if not job_path.is_file():
+        return product_id
+
+    try:
+        job = read_json(job_path)
+    except (OSError, json.JSONDecodeError) as exc:
+        add(findings, "invalid-product-job", job_path, root, str(exc))
+        return product_id
+
+    configured_root = str(job.get("productRoot", ""))
+    roots = allowed_product_roots(product_id)
+    expected_root = configured_root if configured_root in roots else roots[0]
+    if job.get("id") != product_id:
+        add(findings, "product-config-boundary", job_path, root, f"id must be {product_id!r}")
+    if configured_root not in roots:
+        add(
+            findings,
+            "product-config-boundary",
+            job_path,
+            root,
+            f"productRoot must be one of {list(roots)!r}",
+        )
+    expected_manifest = f"{expected_root}/ProductManifest.json"
+    if job.get("productManifestPath") != expected_manifest:
+        add(
+            findings,
+            "product-config-boundary",
+            job_path,
+            root,
+            f"productManifestPath must be {expected_manifest!r}",
+        )
+    expected_license = f"config/products/{product_id}/license.json"
+    if job.get("licenseEvidence") != expected_license:
+        add(
+            findings,
+            "product-config-boundary",
+            job_path,
+            root,
+            f"licenseEvidence must be {expected_license!r}",
+        )
+
+    for field in ("buildScript", "hostedPoseScript", "productBuildScript"):
+        value = job.get(field)
+        if value and not (root / str(value)).is_file():
+            add(findings, "missing-product-script", root / str(value), root, f"{field} does not exist")
+
+    delivery_assets = job.get("deliveryAssets")
+    if not isinstance(delivery_assets, list):
+        add(
+            findings,
+            "missing-delivery-contract",
+            job_path,
+            root,
+            "deliveryAssets must list the tracked handoff checkpoint",
+        )
+        delivery_set: set[str] = set()
+    else:
+        delivery_set = {str(value) for value in delivery_assets}
+
+    for field in CHECKPOINT_PATH_FIELDS:
+        value = job.get(field)
+        if not isinstance(value, str) or not value:
+            add(findings, "missing-checkpoint-path", job_path, root, f"{field} is required")
+            continue
+        if not value.startswith(expected_root + "/"):
+            add(
+                findings,
+                "checkpoint-outside-product",
+                job_path,
+                root,
+                f"{field} must stay under {expected_root}",
+            )
+        if value not in delivery_set:
+            add(
+                findings,
+                "checkpoint-not-delivered",
+                job_path,
+                root,
+                f"{field} must be present in deliveryAssets",
+            )
+
+    previews = job.get("previewPaths")
+    if not isinstance(previews, dict) or set(previews) != REQUIRED_PREVIEW_VIEWS:
+        add(
+            findings,
+            "invalid-preview-contract",
+            job_path,
+            root,
+            "previewPaths must contain front, back, left, right, and three-quarter",
+        )
+    else:
+        for name, value in previews.items():
+            if not isinstance(value, str) or not value.startswith(expected_root + "/"):
+                add(
+                    findings,
+                    "preview-outside-product",
+                    job_path,
+                    root,
+                    f"preview {name} must stay under {expected_root}",
+                )
+            elif value not in delivery_set:
+                add(
+                    findings,
+                    "preview-not-delivered",
+                    job_path,
+                    root,
+                    f"preview {name} must be present in deliveryAssets",
+                )
+
+    manifest_path = root / str(job.get("productManifestPath", ""))
+    if not manifest_path.is_file():
+        add(
+            findings,
+            "missing-working-manifest",
+            manifest_path,
+            root,
+            "each product must persist a tracked resumable manifest",
+        )
+        return product_id
+    try:
+        manifest = read_json(manifest_path)
+    except (OSError, json.JSONDecodeError) as exc:
+        add(findings, "invalid-working-manifest", manifest_path, root, str(exc))
+        return product_id
+
+    if manifest.get("productId") != product_id:
+        add(findings, "manifest-product-id", manifest_path, root, f"productId must be {product_id!r}")
+    if manifest.get("productRoot") != expected_root:
+        add(findings, "manifest-product-root", manifest_path, root, f"productRoot must be {expected_root!r}")
+
+    status = manifest.get("status")
+    if status not in allowed_statuses:
+        add(
+            findings,
+            "invalid-working-status",
+            manifest_path,
+            root,
+            f"status must be one of {sorted(allowed_statuses)}",
+        )
+
+    handoff = manifest.get("handoff")
+    if not isinstance(handoff, dict):
+        add(findings, "missing-handoff-state", manifest_path, root, "handoff metadata is required")
+    else:
+        if handoff.get("resumable") is not True:
+            add(findings, "non-resumable-product", manifest_path, root, "handoff.resumable must be true")
+        if handoff.get("canonicalWorkspace") != expected_root:
+            add(
+                findings,
+                "handoff-root-mismatch",
+                manifest_path,
+                root,
+                f"handoff.canonicalWorkspace must be {expected_root!r}",
+            )
+        if handoff.get("doNotRebuildFromZero") is not True:
+            add(
+                findings,
+                "zero-rebuild-not-blocked",
+                manifest_path,
+                root,
+                "handoff.doNotRebuildFromZero must be true",
+            )
+
+    gates = manifest.get("technicalGates")
+    if not isinstance(gates, dict):
+        add(findings, "missing-technical-gates", manifest_path, root, "technicalGates are required")
+        return product_id
+    if status in {"TECHNICAL_READY", "HUMAN_REVIEW_PENDING", "RELEASED"}:
+        for gate in automated_gates:
+            if gates.get(gate) != "PASS":
+                add(
+                    findings,
+                    "premature-technical-ready",
+                    manifest_path,
+                    root,
+                    f"{gate} must PASS before {status}",
+                )
+    if status == "RELEASED":
+        for gate in human_gates:
+            if gates.get(gate) != "PASS":
+                add(findings, "premature-release", manifest_path, root, f"{gate} must PASS before RELEASED")
+    return product_id
+
+
 def audit(root: Path = ROOT) -> dict[str, Any]:
     root = root.resolve()
     findings: list[Finding] = []
@@ -53,40 +262,25 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
         path = root / value
         if path.exists():
             files = sorted(item for item in path.rglob("*") if item.is_file())
-            if files:
-                for file in files:
-                    add(
-                        findings,
-                        "committed-runtime-state",
-                        file,
-                        root,
-                        "workflow runtime state belongs in GitHub Actions",
-                    )
-            else:
+            for item in files or [path]:
                 add(
                     findings,
                     "committed-runtime-state",
-                    path,
+                    item,
                     root,
-                    "workflow runtime state directory must not be tracked",
+                    "workflow runtime state belongs in GitHub Actions",
                 )
 
     config_root = root / "config"
-    handoff_policy_path = config_root / "genworks-handoff-policy.json"
-    handoff_policy: dict[str, Any] = {}
-    if not handoff_policy_path.is_file():
-        add(
-            findings,
-            "missing-handoff-policy",
-            handoff_policy_path,
-            root,
-            "the resumable GenWorks handoff policy is required",
-        )
+    policy_path = config_root / "genworks-handoff-policy.json"
+    policy: dict[str, Any] = {}
+    if not policy_path.is_file():
+        add(findings, "missing-handoff-policy", policy_path, root, "the handoff policy is required")
     else:
         try:
-            handoff_policy = read_json(handoff_policy_path)
+            policy = read_json(policy_path)
         except (OSError, json.JSONDecodeError) as exc:
-            add(findings, "invalid-handoff-policy", handoff_policy_path, root, str(exc))
+            add(findings, "invalid-handoff-policy", policy_path, root, str(exc))
 
     if config_root.is_dir():
         for path in sorted(config_root.iterdir()):
@@ -98,17 +292,6 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                     root,
                     "product configuration must live under config/products/<product-id>/",
                 )
-
-    pyproject = root / "pyproject.toml"
-    if not pyproject.is_file():
-        add(
-            findings,
-            "missing-python-project",
-            pyproject,
-            root,
-            "Python dependencies and environment groups must be declared in pyproject.toml",
-        )
-    if config_root.is_dir():
         for requirements_file in sorted(config_root.glob("*requirements*.txt")):
             add(
                 findings,
@@ -118,250 +301,29 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                 "Python environment declarations belong in pyproject.toml",
             )
 
-    allowed_statuses = set(handoff_policy.get("statuses", []))
-    automated_gates = tuple(
-        handoff_policy.get("requiredAutomatedTechnicalGatesBeforeHumanReview", [])
-    )
-    human_gates = tuple(handoff_policy.get("requiredHumanReleaseGates", []))
+    pyproject = root / "pyproject.toml"
+    if not pyproject.is_file():
+        add(findings, "missing-python-project", pyproject, root, "pyproject.toml is required")
 
+    allowed_statuses = set(policy.get("statuses", []))
+    automated_gates = tuple(policy.get("requiredAutomatedTechnicalGatesBeforeHumanReview", []))
+    human_gates = tuple(policy.get("requiredHumanReleaseGates", []))
     product_ids: set[str] = set()
     products_root = config_root / "products"
     if products_root.is_dir():
         for product_dir in sorted(path for path in products_root.iterdir() if path.is_dir()):
-            product_id = product_dir.name
-            product_ids.add(product_id)
-            if not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", product_id):
-                add(findings, "invalid-product-id", product_dir, root, "invalid product directory name")
-                continue
-            job_path = product_dir / "job.json"
-            license_path = product_dir / "license.json"
-            for required in (job_path, license_path):
-                if not required.is_file():
-                    add(
-                        findings,
-                        "missing-product-config",
-                        required,
-                        root,
-                        "required product config is missing",
-                    )
-            if not job_path.is_file():
-                continue
-            try:
-                job = read_json(job_path)
-            except (OSError, json.JSONDecodeError) as exc:
-                add(findings, "invalid-product-job", job_path, root, str(exc))
-                continue
+            product_id = audit_product(
+                root,
+                product_dir,
+                findings,
+                allowed_statuses,
+                automated_gates,
+                human_gates,
+            )
+            if product_id:
+                product_ids.add(product_id)
 
-            expected_root = f"Assets/GenWorks/{product_id}"
-            expected = {
-                "id": product_id,
-                "productRoot": expected_root,
-                "productManifestPath": f"{expected_root}/ProductManifest.json",
-                "licenseEvidence": f"config/products/{product_id}/license.json",
-            }
-            for field, expected_value in expected.items():
-                if job.get(field) != expected_value:
-                    add(
-                        findings,
-                        "product-config-boundary",
-                        job_path,
-                        root,
-                        f"{field} must be {expected_value!r}",
-                    )
-
-            for field in ("buildScript", "hostedPoseScript", "productBuildScript"):
-                value = job.get(field)
-                if value and not (root / value).is_file():
-                    add(
-                        findings,
-                        "missing-product-script",
-                        root / value,
-                        root,
-                        f"{field} does not exist",
-                    )
-
-            delivery_assets = job.get("deliveryAssets")
-            if not isinstance(delivery_assets, list):
-                add(
-                    findings,
-                    "missing-delivery-contract",
-                    job_path,
-                    root,
-                    "deliveryAssets must list the tracked handoff checkpoint",
-                )
-                delivery_set: set[str] = set()
-            else:
-                delivery_set = {str(value) for value in delivery_assets}
-
-            for field in CHECKPOINT_PATH_FIELDS:
-                value = job.get(field)
-                if not isinstance(value, str) or not value:
-                    add(
-                        findings,
-                        "missing-checkpoint-path",
-                        job_path,
-                        root,
-                        f"{field} is required for resumable work",
-                    )
-                    continue
-                if not value.startswith(expected_root + "/"):
-                    add(
-                        findings,
-                        "checkpoint-outside-product",
-                        job_path,
-                        root,
-                        f"{field} must stay under {expected_root}",
-                    )
-                if value not in delivery_set:
-                    add(
-                        findings,
-                        "checkpoint-not-delivered",
-                        job_path,
-                        root,
-                        f"{field} must be present in deliveryAssets",
-                    )
-
-            previews = job.get("previewPaths")
-            if not isinstance(previews, dict) or set(previews) != REQUIRED_PREVIEW_VIEWS:
-                add(
-                    findings,
-                    "invalid-preview-contract",
-                    job_path,
-                    root,
-                    "previewPaths must contain front, back, left, right, and three-quarter",
-                )
-            else:
-                for name, value in previews.items():
-                    if not isinstance(value, str) or not value.startswith(expected_root + "/"):
-                        add(
-                            findings,
-                            "preview-outside-product",
-                            job_path,
-                            root,
-                            f"preview {name} must stay under {expected_root}",
-                        )
-                    elif value not in delivery_set:
-                        add(
-                            findings,
-                            "preview-not-delivered",
-                            job_path,
-                            root,
-                            f"preview {name} must be present in deliveryAssets",
-                        )
-
-            manifest_path = root / str(job.get("productManifestPath", ""))
-            if not manifest_path.is_file():
-                add(
-                    findings,
-                    "missing-working-manifest",
-                    manifest_path,
-                    root,
-                    "each product must persist a tracked resumable manifest",
-                )
-                continue
-            try:
-                manifest = read_json(manifest_path)
-            except (OSError, json.JSONDecodeError) as exc:
-                add(findings, "invalid-working-manifest", manifest_path, root, str(exc))
-                continue
-
-            if manifest.get("productId") != product_id:
-                add(
-                    findings,
-                    "manifest-product-id",
-                    manifest_path,
-                    root,
-                    f"productId must be {product_id!r}",
-                )
-            if manifest.get("productRoot") != expected_root:
-                add(
-                    findings,
-                    "manifest-product-root",
-                    manifest_path,
-                    root,
-                    f"productRoot must be {expected_root!r}",
-                )
-
-            status = manifest.get("status")
-            if status not in allowed_statuses:
-                add(
-                    findings,
-                    "invalid-working-status",
-                    manifest_path,
-                    root,
-                    f"status must be one of {sorted(allowed_statuses)}",
-                )
-
-            handoff = manifest.get("handoff")
-            if not isinstance(handoff, dict):
-                add(
-                    findings,
-                    "missing-handoff-state",
-                    manifest_path,
-                    root,
-                    "handoff metadata is required",
-                )
-            else:
-                if handoff.get("resumable") is not True:
-                    add(
-                        findings,
-                        "non-resumable-product",
-                        manifest_path,
-                        root,
-                        "handoff.resumable must be true",
-                    )
-                if handoff.get("canonicalWorkspace") != expected_root:
-                    add(
-                        findings,
-                        "handoff-root-mismatch",
-                        manifest_path,
-                        root,
-                        f"handoff.canonicalWorkspace must be {expected_root!r}",
-                    )
-                if handoff.get("doNotRebuildFromZero") is not True:
-                    add(
-                        findings,
-                        "zero-rebuild-not-blocked",
-                        manifest_path,
-                        root,
-                        "handoff.doNotRebuildFromZero must be true",
-                    )
-
-            gates = manifest.get("technicalGates")
-            if not isinstance(gates, dict):
-                add(
-                    findings,
-                    "missing-technical-gates",
-                    manifest_path,
-                    root,
-                    "technicalGates are required",
-                )
-                continue
-
-            if status in {"TECHNICAL_READY", "HUMAN_REVIEW_PENDING", "RELEASED"}:
-                for gate in automated_gates:
-                    if gates.get(gate) != "PASS":
-                        add(
-                            findings,
-                            "premature-technical-ready",
-                            manifest_path,
-                            root,
-                            f"{gate} must PASS before {status}",
-                        )
-            if status == "RELEASED":
-                for gate in human_gates:
-                    if gates.get(gate) != "PASS":
-                        add(
-                            findings,
-                            "premature-release",
-                            manifest_path,
-                            root,
-                            f"{gate} must PASS before RELEASED",
-                        )
-
-    product_tokens = {
-        product_id.replace("-", "_").replace(".", "_") for product_id in product_ids
-    }
+    product_tokens = {value.replace("-", "_").replace(".", "_") for value in product_ids}
     for root_script in sorted(root.glob("*.py")):
         if any(token and token in root_script.stem.lower() for token in product_tokens):
             add(
@@ -377,21 +339,9 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
         for workflow in sorted(workflow_root.glob("*.y*ml")):
             lowered = workflow.read_text(encoding="utf-8").lower()
             if "contents: write" in lowered or re.search(r"\bgit\s+push\b", lowered):
-                add(
-                    findings,
-                    "self-mutating-workflow",
-                    workflow,
-                    root,
-                    "CI must upload artifacts, not push directly to main",
-                )
+                add(findings, "self-mutating-workflow", workflow, root, "CI must upload artifacts, not push")
             if any(value in lowered for value in (".github/run/", ".github/status/")):
-                add(
-                    findings,
-                    "workflow-runtime-state",
-                    workflow,
-                    root,
-                    "workflow runtime state must not enter git",
-                )
+                add(findings, "workflow-runtime-state", workflow, root, "runtime state must not enter git")
             for product_id in product_ids:
                 if product_id.lower() in lowered:
                     add(
@@ -407,34 +357,16 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
         lowered = taskfile.read_text(encoding="utf-8").lower()
         for product_id in product_ids:
             if product_id.lower() in lowered:
-                add(
-                    findings,
-                    "product-specific-task",
-                    taskfile,
-                    root,
-                    f"Taskfile hard-codes {product_id}",
-                )
+                add(findings, "product-specific-task", taskfile, root, f"Taskfile hard-codes {product_id}")
         if re.search(r"^\s{2}(audit|package):haolan:", lowered, flags=re.MULTILINE):
-            add(
-                findings,
-                "legacy-specific-task",
-                taskfile,
-                root,
-                "snapshot maintenance must accept arbitrary paths",
-            )
+            add(findings, "legacy-specific-task", taskfile, root, "snapshot maintenance must be generic")
 
     gitignore = root / ".gitignore"
     if gitignore.is_file():
         ignored = set(gitignore.read_text(encoding="utf-8").splitlines())
         for value in ("/.github/run/", "/.github/status/"):
             if value not in ignored:
-                add(
-                    findings,
-                    "missing-runtime-ignore",
-                    gitignore,
-                    root,
-                    f"missing ignore rule {value}",
-                )
+                add(findings, "missing-runtime-ignore", gitignore, root, f"missing ignore rule {value}")
 
     return {
         "schemaVersion": 1,
