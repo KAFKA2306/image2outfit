@@ -40,6 +40,11 @@ class FinalRepositoryStateTest(unittest.TestCase):
             )
 
     def test_every_product_declares_a_resumable_checkpoint(self) -> None:
+        policy = json.loads(
+            (ROOT / "config" / "genworks-handoff-policy.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
         products = ROOT / "config" / "products"
         required_fields = (
             "productManifestPath",
@@ -48,7 +53,12 @@ class FinalRepositoryStateTest(unittest.TestCase):
             "prefabAssetPath",
             "integratedPrefabAssetPath",
         )
-        required_views = {"front", "back", "left", "right", "three-quarter"}
+        required_views = set(policy["requiredPreviewViews"])
+        allowed_statuses = set(policy["statuses"])
+        automated_gates = policy[
+            "requiredAutomatedTechnicalGatesBeforeHumanReview"
+        ]
+        human_gates = policy["requiredHumanReleaseGates"]
 
         for product_dir in sorted(path for path in products.iterdir() if path.is_dir()):
             job = json.loads(
@@ -83,22 +93,37 @@ class FinalRepositoryStateTest(unittest.TestCase):
             manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
             self.assertEqual(manifest.get("productId"), job["id"])
             self.assertEqual(manifest.get("productRoot"), product_root)
-            self.assertIn(
-                manifest.get("status"),
-                {
-                    "WORKING",
-                    "TECHNICAL_READY",
-                    "HUMAN_REVIEW_PENDING",
-                    "RELEASED",
-                    "REJECTED",
-                },
-                manifest_path,
-            )
+
+            status = manifest.get("status")
+            self.assertIn(status, allowed_statuses, manifest_path)
             handoff = manifest.get("handoff")
             self.assertIsInstance(handoff, dict, manifest_path)
             self.assertTrue(handoff.get("resumable"), manifest_path)
             self.assertEqual(handoff.get("canonicalWorkspace"), product_root)
             self.assertTrue(handoff.get("doNotRebuildFromZero"), manifest_path)
+
+            gates = manifest.get("technicalGates")
+            self.assertIsInstance(gates, dict, manifest_path)
+            if status in {"TECHNICAL_READY", "HUMAN_REVIEW_PENDING", "RELEASED"}:
+                for gate in automated_gates:
+                    self.assertEqual(gates.get(gate), "PASS", (manifest_path, gate))
+            if status == "RELEASED":
+                for gate in human_gates:
+                    self.assertEqual(gates.get(gate), "PASS", (manifest_path, gate))
+
+    def test_handoff_policy_blocks_artifact_only_and_zero_rebuild_workflows(self) -> None:
+        policy = json.loads(
+            (ROOT / "config" / "genworks-handoff-policy.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+        rules = policy["rules"]
+        self.assertFalse(rules["actionsArtifactsAreCanonicalWorkState"])
+        self.assertTrue(rules["trackedCheckpointRequiredForHandoff"])
+        self.assertTrue(rules["unityConfiguredPrefabsRequiredForTechnicalReady"])
+        self.assertTrue(rules["humanReviewRequiredForRelease"])
+        self.assertFalse(rules["rebuildFromZeroWhenCheckpointExists"])
+        self.assertTrue(rules["retainRejectedCheckpointAndReason"])
 
     def test_runtime_state_is_not_tracked(self) -> None:
         self.assertFalse((ROOT / ".github" / "run").exists())
