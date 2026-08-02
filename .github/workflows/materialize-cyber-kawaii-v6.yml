@@ -1,0 +1,95 @@
+name: Materialize reviewed Cyber Kawaii v6 artifact once
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/materialize-cyber-kawaii-v6.yml
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: materialize-cyber-kawaii-v6
+  cancel-in-progress: false
+
+jobs:
+  materialize:
+    if: github.event.pull_request.head.ref == 'fix/cyber-kawaii-silhouette-v6'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/cyber-kawaii-silhouette-v6
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Download reviewed hosted artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 --retry-all-errors \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/8831307710/zip" \
+            --output /tmp/cyber-kawaii-v6.zip
+          rm -rf /tmp/cyber-kawaii-v6
+          mkdir -p /tmp/cyber-kawaii-v6
+          unzip -q /tmp/cyber-kawaii-v6.zip -d /tmp/cyber-kawaii-v6
+
+      - name: Verify fitted silhouette checkpoint
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import shutil
+          from pathlib import Path
+
+          extracted = Path('/tmp/cyber-kawaii-v6')
+          report = json.loads(
+              (extracted / 'Artifacts/siroino-cyber-kawaii-large/product-build-report.json')
+              .read_text(encoding='utf-8')
+          )
+          if report.get('passed') is not True:
+              raise SystemExit('Hosted product build did not pass')
+          if report.get('visualRevision') != 'v6-large-fitted-skirt-silhouette':
+              raise SystemExit(f"Unexpected visual revision: {report.get('visualRevision')}")
+          expected = {
+              'All_L': 1.0,
+              'Chest_L': 1.0,
+              'Hips_01_L': 1.0,
+              'UpperLeg_L': 1.0,
+              'Breasts_L': 0.65,
+          }
+          if report.get('targetProfile', {}).get('appliedShapeKeys') != expected:
+              raise SystemExit('Large shape profile mismatch')
+          metrics = report.get('metrics', {})
+          for name in ('unweightedVertices', 'weightSumErrors', 'degenerateTriangles'):
+              if metrics.get(name) != 0:
+                  raise SystemExit(f'{name}: {metrics.get(name)}')
+          if metrics.get('maxBoneInfluences', 99) > 4:
+              raise SystemExit('More than four bone influences')
+          if len(report.get('skirtSilhouette', {})) != 4:
+              raise SystemExit('Missing silhouette audits')
+          if len(report.get('skirtWeightTransfer', {})) != 4:
+              raise SystemExit('Missing skirt weight audits')
+
+          source = extracted / 'Assets/GenWorks/siroino-cyber-kawaii-large'
+          target = Path('Assets/GenWorks/siroino-cyber-kawaii-large')
+          shutil.rmtree(target, ignore_errors=True)
+          shutil.copytree(source, target)
+          (target / 'Source/Blender/SiroinoCyberKawaii.blend1').unlink(missing_ok=True)
+          PY
+
+      - name: Commit reviewed checkpoint and remove one-shot workflow
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/materialize-cyber-kawaii-v6.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A -- Assets/GenWorks/siroino-cyber-kawaii-large .github/workflows/materialize-cyber-kawaii-v6.yml
+          git commit -m 'build: materialize reviewed Cyber Kawaii v6 silhouette'
+          git push origin HEAD:fix/cyber-kawaii-silhouette-v6
