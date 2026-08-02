@@ -79,8 +79,46 @@ def fold_lace_contract() -> None:
     path.write_text(json.dumps(job, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def allow_partial_working_prefabs() -> None:
+    path = ROOT / "tools/migrate_genworks_layout_once.py"
+    text = path.read_text(encoding="utf-8")
+    old = '''        if all_prefabs:
+            missing = [value for value in configured_paths if not (ROOT / value).is_file()]
+            if missing:
+                raise SystemExit(f"asset-backed product is missing configured prefabs: {product_id}: {missing}")
+            classification = "ASSET_BACKED"
+        else:
+            if status not in {"WORKING", "REJECTED"}:
+                raise SystemExit(f"prefabless product cannot claim {status}: {product_id}")
+            classification = "PLANNED_CONTRACT"
+'''
+    new = '''        if all_prefabs:
+            missing = [value for value in configured_paths if not (ROOT / value).is_file()]
+            if missing:
+                if status not in {"WORKING", "REJECTED"}:
+                    raise SystemExit(f"asset-backed product is missing configured prefabs: {product_id}: {missing}")
+                classification = "PARTIAL_CHECKPOINT"
+            else:
+                classification = "ASSET_BACKED"
+        else:
+            if status not in {"WORKING", "REJECTED"}:
+                raise SystemExit(f"prefabless product cannot claim {status}: {product_id}")
+            classification = "PLANNED_CONTRACT"
+'''
+    if old not in text:
+        raise SystemExit("migration classification anchor not found")
+    text = text.replace(old, new, 1)
+    text = text.replace(
+        "        (asset_backed if all_prefabs else planned).append(entry)\n",
+        "        (asset_backed if classification == 'ASSET_BACKED' else planned).append(entry)\n",
+        1,
+    )
+    path.write_text(text, encoding="utf-8")
+
+
 def main() -> int:
     fold_lace_contract()
+    allow_partial_working_prefabs()
     run(sys.executable, "tools/migrate_genworks_layout_once.py")
     for job_path in sorted((ROOT / "config/products").glob("*/job.json")):
         run(
