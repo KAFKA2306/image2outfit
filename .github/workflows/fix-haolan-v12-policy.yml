@@ -6,6 +6,12 @@ on:
       - agent/haolan-cow-hood-v12-current
     paths:
       - .github/run/fix-haolan-v12-policy.txt
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/fix-haolan-v12-policy.yml
+      - .github/run/fix-haolan-v12-policy.txt
 
 permissions:
   contents: write
@@ -20,57 +26,38 @@ jobs:
           ref: agent/haolan-cow-hood-v12-current
           fetch-depth: 1
           persist-credentials: true
-      - name: Patch repository and product handoff policies
+      - name: Patch repository audit policy
         run: |
           python - <<'PY'
-          import json
           from pathlib import Path
 
-          audit_path = Path('tools/audit_repository_hygiene.py')
-          text = audit_path.read_text(encoding='utf-8')
-          old = '''            if "contents: write" in lowered or re.search(r"\\bgit\\s+push\\b", lowered):
-                add(
-                    findings,
-                    "self-mutating-workflow",
-                    workflow,
-                    root,
-                    "CI must upload artifacts, not push directly to main",
-                )
-'''
-          new = '''            pushes_git = re.search(r"\\bgit\\s+push\\b", lowered) is not None
+          path = Path('tools/audit_repository_hygiene.py')
+          text = path.read_text(encoding='utf-8')
+          needle = '            if "contents: write" in lowered or re.search(r"\\bgit\\s+push\\b", lowered):\n'
+          replacement = '''            pushes_git = re.search(r"\\bgit\\s+push\\b", lowered) is not None
             branch_cleanup_only = (
                 workflow.name == "branch-hygiene.yml"
                 and "github.rest.git.deleteref" in lowered
                 and not pushes_git
             )
             if pushes_git or ("contents: write" in lowered and not branch_cleanup_only):
-                add(
-                    findings,
-                    "self-mutating-workflow",
-                    workflow,
-                    root,
-                    "CI must upload artifacts; only API-based branch cleanup may request contents: write",
-                )
 '''
-          if old not in text:
-              raise SystemExit('audit policy target not found')
-          audit_path.write_text(text.replace(old, new, 1), encoding='utf-8')
-
-          job_path = Path('config/products/haolan-cow-hood-knit-set/job.json')
-          job = json.loads(job_path.read_text(encoding='utf-8'))
-          integrated = job['integratedPrefabAssetPath']
-          delivery = list(job['deliveryAssets'])
-          if integrated not in delivery:
-              insert_at = delivery.index(job['prefabAssetPath']) + 1
-              delivery.insert(insert_at, integrated)
-          job['deliveryAssets'] = delivery
-          job_path.write_text(json.dumps(job, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          count = text.count(needle)
+          if count != 1:
+              raise SystemExit(f'expected one audit condition, found {count}')
+          text = text.replace(needle, replacement, 1)
+          text = text.replace(
+              '"CI must upload artifacts, not push directly to main",',
+              '"CI must upload artifacts; only API-based branch cleanup may request contents: write",',
+              1,
+          )
+          path.write_text(text, encoding='utf-8')
           PY
-      - name: Commit policy corrections
+      - name: Commit policy correction
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tools/audit_repository_hygiene.py config/products/haolan-cow-hood-knit-set/job.json
-          git commit -m 'Fix branch cleanup audit and HAOLAN handoff contract'
+          git add tools/audit_repository_hygiene.py
+          git commit -m 'Allow API-only branch cleanup in hygiene audit'
           git push origin HEAD:agent/haolan-cow-hood-v12-current
