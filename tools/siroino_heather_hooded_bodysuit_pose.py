@@ -112,6 +112,17 @@ def apply_pose(
 
 
 def zone_for_object(name: str) -> list[str]:
+    if "Body_Shell" in name:
+        return [
+            "shoulder",
+            "underarm",
+            "elbow",
+            "wrist",
+            "chest",
+            "abdomen",
+            "hip-crest",
+            "back",
+        ]
     if "Sleeve" in name:
         return ["shoulder", "underarm", "elbow", "wrist"]
     if "Cuff" in name:
@@ -124,6 +135,8 @@ def zone_for_object(name: str) -> list[str]:
         return ["abdomen", "hip-crest", "groin", "inner-thigh", "leg-root"]
     if "Highcut_Back" in name:
         return ["hip-crest", "buttocks", "groin", "inner-thigh", "leg-root"]
+    if "Crotch_Bridge" in name:
+        return ["groin", "inner-thigh", "leg-root"]
     if "Hood" in name or "Drawcord" in name:
         return ["neck", "hood", "drawcord"]
     if "Tie" in name or "Bow" in name:
@@ -203,8 +216,7 @@ def update_manifest(
             if result["triangleOverlapPairs"] > 0
         ],
         "totalTriangleOverlapPairs": sum(
-            result["triangleOverlapPairs"]
-            for result in fit_audit["poses"].values()
+            result["triangleOverlapPairs"] for result in fit_audit["poses"].values()
         ),
     }
     manifest_path.write_text(
@@ -225,9 +237,7 @@ def main() -> int:
         for obj in bpy.context.scene.objects
         if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
     )
-    armature = next(
-        obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"
-    )
+    armature = next(obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE")
     garments = [
         obj
         for obj in bpy.context.scene.objects
