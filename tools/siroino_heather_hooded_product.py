@@ -20,12 +20,12 @@ support.install()
 
 import siroino_heather_hooded_pattern_v10 as pattern
 
-DESIGN_REVISION = "v11-unified-source-topology-fit"
+DESIGN_REVISION = "v12-continuous-source-shell"
 ACTUAL_SEPARATE_GEOMETRY = [
-    "Heather_Front_Body_Panel",
-    "Heather_Back_Body_Panel",
-    "Heather_Long_Sleeve_L",
-    "Heather_Long_Sleeve_R",
+    "Heather_Body_Shell",
+    "Heather_Highcut_Front_Panel",
+    "Heather_Highcut_Back_Panel",
+    "Heather_Crotch_Bridge",
     "Heather_Rib_Cuff_L",
     "Heather_Rib_Cuff_R",
     "Heather_Hood_Outer_L",
@@ -97,13 +97,13 @@ def preserve_authored_weights(
     garments: list[bpy.types.Object],
     _body: bpy.types.Object,
 ) -> dict[str, object]:
-    """Preserve source weights on fitted geometry and authored accessory weights."""
+    """Preserve source weights on fitted geometry and accessory weights."""
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "direct SiroinoSotai_PC source topology, UVs and normalized source "
-            "skin weights for body panels, sleeves and cuffs; nearest-body or "
-            "rigid weights only for authored hood and trim geometry"
+            "direct SiroinoSotai_PC topology, UVs and normalized source skin "
+            "weights for the connected torso-and-sleeve shell; nearest-body "
+            "weights for smooth high-cut, cuff, hood and trim geometry"
         ),
         "rebound": False,
     }
@@ -125,7 +125,7 @@ def wrap_pattern_writer(original):
 
 
 def enforce_manifest_contract(original):
-    """Keep generated reports truthful about the v11 lifecycle boundary."""
+    """Keep generated reports truthful about the current lifecycle boundary."""
 
     def wrapped(*args, **kwargs):
         result = original(*args, **kwargs)
@@ -188,6 +188,15 @@ def enforce_manifest_contract(original):
                         "BVH audit reported 8490 garment/body triangle overlap pairs"
                     ),
                 },
+                {
+                    "revision": "v11-unified-source-topology-fit",
+                    "reason": (
+                        "actual hosted five-view inspection still found separated "
+                        "shoulder, elbow and cuff regions, sawtooth neckline and high-cut "
+                        "edges, and a bag-like rear hood; evaluated six-pose BVH audit "
+                        "reported 12845 garment/body triangle overlap pairs"
+                    ),
+                },
             ]
             existing = {item.get("revision") for item in rejected}
             rejected.extend(
@@ -204,10 +213,12 @@ def enforce_manifest_contract(original):
 
 def update_panel_object_contract() -> None:
     replacements = {
-        "Heather_Front_Upper_Panel": "Heather_Front_Body_Panel",
-        "Heather_Back_Upper_Panel": "Heather_Back_Body_Panel",
-        "Heather_Highcut_Front_Panel": "Heather_Front_Body_Panel",
-        "Heather_Highcut_Back_Panel": "Heather_Back_Body_Panel",
+        "Heather_Front_Upper_Panel": "Heather_Body_Shell",
+        "Heather_Back_Upper_Panel": "Heather_Body_Shell",
+        "Heather_Long_Sleeve_L": "Heather_Body_Shell",
+        "Heather_Long_Sleeve_R": "Heather_Body_Shell",
+        "Heather_Highcut_Front_Panel": "Heather_Highcut_Front_Panel",
+        "Heather_Highcut_Back_Panel": "Heather_Highcut_Back_Panel",
         "Heather_Hood_Back_Drape_L": "Heather_Hood_Outer_L",
         "Heather_Hood_Back_Drape_R": "Heather_Hood_Outer_R",
         "Heather_Hood_Cowl": "Heather_Hood_Neck_Band",
