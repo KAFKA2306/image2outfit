@@ -1,20 +1,18 @@
 {
   "schemaVersion": 1,
-  "profile": "panel-sewn",
+  "profile": "source-topology-panel-sewn",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v6-fitted-sleeves-split-hood-seam-graph",
+  "designRevision": "v11-unified-source-topology-fit",
   "panels": [
-    "front-upper",
-    "back-upper",
-    "front-lower",
-    "back-lower",
-    "sleeve-left",
-    "sleeve-right",
-    "cuff-left",
-    "cuff-right",
-    "hood-left",
-    "hood-right",
+    "front-body-source-topology",
+    "back-body-source-topology",
+    "sleeve-left-source-topology",
+    "sleeve-right-source-topology",
+    "cuff-left-source-topology",
+    "cuff-right-source-topology",
+    "hood-left-neckline-anchored",
+    "hood-right-neckline-anchored",
     "hood-edge"
   ],
   "separateGeometry": [
@@ -39,6 +37,14 @@
     "neck and hood opening",
     "drawcord",
     "side tie"
+  ],
+  "requiredPoses": [
+    "neutral",
+    "arms-up",
+    "forward-bend",
+    "legs-apart",
+    "walk",
+    "crouch"
   ],
   "researchTrial": {
     "paper": "https://arxiv.org/abs/2607.21213",
