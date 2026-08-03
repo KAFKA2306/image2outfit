@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Body-topology v11 pattern for the Siroino heather hooded bodysuit.
+"""Continuous-shell v12 pattern for the Siroino heather hooded bodysuit.
 
-This revision removes the mixed construction that left the v10 torso attached
-to the body while keeping the v9 sleeves, cuffs, hood and trims on fixed,
-oversized offsets. All fitted parts are now derived from SiroinoSotai_PC
-topology, use the source UVs and weights, and share a 12 mm garment clearance.
+The fitted torso and sleeves are copied once from the connected
+SiroinoSotai_PC topology. Smooth sampled panels are limited to the high-cut
+lower body, while cuffs and hood pieces overlap the primary shell to hide cut
+boundaries and preserve deformation continuity.
 """
 
 from __future__ import annotations
@@ -17,7 +17,6 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
-# Preserve the geometry-module interface expected by the generic product build.
 clean_meshes = v9.clean_meshes
 bone_segment = v9.bone_segment
 
@@ -68,11 +67,11 @@ def _body_panel(
     material: bpy.types.Material,
     predicate: Callable[[Vector], bool],
     *,
-    offset: float = 0.012,
-    thickness: float = 0.0012,
-    bevel_width: float = 0.00030,
+    offset: float = 0.020,
+    thickness: float = 0.0014,
+    bevel_width: float = 0.00035,
 ) -> bpy.types.Object:
-    """Copy a fitted garment region directly from the target avatar topology."""
+    """Copy one connected fitted shell from the target avatar topology."""
     selected = _selected_polygons(body, predicate)
     if not selected:
         raise RuntimeError(f"No body faces selected for {name}")
@@ -170,98 +169,162 @@ def _body_panel(
     return obj
 
 
-def _panel_predicate(front: bool) -> Callable[[Vector], bool]:
-    def selected(point: Vector) -> bool:
-        side_ok = point.y <= 0.025 if front else point.y >= -0.025
-        if not side_ok:
-            return False
-
-        x = abs(point.x)
-        z = point.z
-        if x > 0.245:
-            return False
-
-        neck_center = 0.992 if front else 1.010
-        neck_side = 1.058 if front else 1.052
-        neck_t = min(1.0, x / 0.225)
-        neckline = neck_center + (neck_side - neck_center) * neck_t**1.65
-        torso = 0.785 <= z <= neckline
-
-        if 0.650 <= z < 0.825:
-            t = (z - 0.650) / 0.175
-            half_width = 0.048 + 0.132 * max(0.0, min(1.0, t)) ** 1.25
-            highcut = x <= half_width
-        else:
-            highcut = False
-        return torso or highcut
-
-    return selected
-
-
-def _sleeve_predicate(
+def _body_shell_predicate(
     armature: bpy.types.Object,
-    side: str,
 ) -> Callable[[Vector], bool]:
-    upper_start, upper_end = bone_segment(armature, f"UpperArm_{side}")
-    lower_start, lower_end = bone_segment(armature, f"LowerArm_{side}")
-
-    def selected(point: Vector) -> bool:
-        upper_distance, upper_t = _segment_distance(point, upper_start, upper_end)
-        lower_distance, lower_t = _segment_distance(point, lower_start, lower_end)
-        upper_radius = 0.084 - 0.012 * max(0.0, min(1.0, upper_t))
-        return (upper_distance <= upper_radius and -0.16 <= upper_t <= 1.06) or (
-            lower_distance <= 0.062 and -0.05 <= lower_t <= 1.02
+    segments = {
+        side: (
+            bone_segment(armature, f"UpperArm_{side}"),
+            bone_segment(armature, f"LowerArm_{side}"),
         )
-
-    return selected
-
-
-def _cuff_predicate(
-    armature: bpy.types.Object,
-    side: str,
-) -> Callable[[Vector], bool]:
-    lower_start, lower_end = bone_segment(armature, f"LowerArm_{side}")
+        for side in ("L", "R")
+    }
 
     def selected(point: Vector) -> bool:
-        distance, t = _segment_distance(point, lower_start, lower_end)
-        return distance <= 0.055 and 0.78 <= t <= 1.05
+        torso = abs(point.x) <= 0.265 and 0.775 <= point.z <= 1.038
+        if torso:
+            return True
+        for upper, lower in segments.values():
+            upper_distance, upper_t = _segment_distance(point, *upper)
+            if upper_distance <= 0.108 and -0.30 <= upper_t <= 1.18:
+                return True
+            lower_distance, lower_t = _segment_distance(point, *lower)
+            if lower_distance <= 0.082 and -0.20 <= lower_t <= 0.94:
+                return True
+        return False
 
     return selected
 
 
-def _sleeves_and_cuffs(
+def _highcut_panel(
+    sampler: v9.SurfaceSampler,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+    *,
+    front: bool,
+) -> bpy.types.Object:
+    rows = 18
+    columns = 24
+    vertices: list[tuple[float, float, float]] = []
+    for row in range(rows):
+        t = row / (rows - 1)
+        z = 0.640 + 0.205 * t
+        half_width = 0.046 + 0.145 * t**1.32
+        for column in range(columns + 1):
+            u = column / columns
+            x = -half_width + 2.0 * half_width * u
+            point = sampler.point(x, z, front=front, offset=0.025)
+            vertices.append((point.x, point.y, point.z))
+    side = "Front" if front else "Back"
+    return v9._grid_object(
+        f"Heather_Highcut_{side}_Panel",
+        vertices,
+        rows,
+        columns,
+        material,
+        armature,
+        sampler.body,
+        thickness=0.0014,
+        bevel=0.00030,
+        subdivision=1,
+    )
+
+
+def _crotch_bridge(
+    sampler: v9.SurfaceSampler,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+) -> bpy.types.Object:
+    rows = 13
+    columns = 12
+    z = 0.640
+    half_width = 0.047
+    vertices: list[tuple[float, float, float]] = []
+    for row in range(rows):
+        depth_t = row / (rows - 1)
+        for column in range(columns + 1):
+            x = -half_width + 2.0 * half_width * column / columns
+            front = sampler.point(x, z, front=True, offset=0.026)
+            back = sampler.point(x, z, front=False, offset=0.026)
+            point = front.lerp(back, depth_t)
+            point.z -= 0.075 * math.sin(math.pi * depth_t)
+            vertices.append((point.x, point.y, point.z))
+    return v9._grid_object(
+        "Heather_Crotch_Bridge",
+        vertices,
+        rows,
+        columns,
+        material,
+        armature,
+        sampler.body,
+        thickness=0.0014,
+        bevel=0.00030,
+        subdivision=1,
+    )
+
+
+def _forearm_radius(
+    body: bpy.types.Object,
+    start: Vector,
+    end: Vector,
+    t: float,
+) -> float:
+    vector = end - start
+    length_squared = vector.length_squared
+    center = start + vector * t
+    distances: list[float] = []
+    for vertex in body.data.vertices:
+        point = body.matrix_world @ vertex.co
+        projection = (point - start).dot(vector) / max(length_squared, 1e-12)
+        if abs(projection - t) > 0.075:
+            continue
+        radial = (point - (start + vector * projection)).length
+        if radial <= 0.10:
+            distances.append(radial)
+    if not distances:
+        return 0.052
+    distances.sort()
+    index = min(len(distances) - 1, int(0.82 * len(distances)))
+    return max(0.043, min(0.060, distances[index] + 0.020))
+
+
+def _cuff_tube(
     body: bpy.types.Object,
     armature: bpy.types.Object,
-    fabric: bpy.types.Material,
-    trim: bpy.types.Material,
-) -> list[bpy.types.Object]:
-    result: list[bpy.types.Object] = []
-    for side in ("L", "R"):
-        result.append(
-            _body_panel(
-                f"Heather_Long_Sleeve_{side}",
-                body,
-                armature,
-                fabric,
-                _sleeve_predicate(armature, side),
-                offset=0.012,
-                thickness=0.0013,
-                bevel_width=0.00030,
-            )
-        )
-        result.append(
-            _body_panel(
-                f"Heather_Rib_Cuff_{side}",
-                body,
-                armature,
-                trim,
-                _cuff_predicate(armature, side),
-                offset=0.012,
-                thickness=0.0015,
-                bevel_width=0.00025,
-            )
-        )
-    return result
+    material: bpy.types.Material,
+    side: str,
+) -> bpy.types.Object:
+    start, end = bone_segment(armature, f"LowerArm_{side}")
+    tangent = (end - start).normalized()
+    reference = Vector((0.0, 0.0, 1.0))
+    if abs(tangent.dot(reference)) > 0.92:
+        reference = Vector((0.0, 1.0, 0.0))
+    axis_a = tangent.cross(reference).normalized()
+    axis_b = tangent.cross(axis_a).normalized()
+    rows = 8
+    columns = 24
+    vertices: list[tuple[float, float, float]] = []
+    for row in range(rows):
+        t = 0.74 + 0.27 * row / (rows - 1)
+        center = start.lerp(end, t)
+        radius = _forearm_radius(body, start, end, min(t, 0.98))
+        for column in range(columns + 1):
+            angle = math.tau * column / columns
+            radial = axis_a * math.cos(angle) + axis_b * math.sin(angle)
+            point = center + radial * radius
+            vertices.append((point.x, point.y, point.z))
+    return v9._grid_object(
+        f"Heather_Rib_Cuff_{side}",
+        vertices,
+        rows,
+        columns,
+        material,
+        armature,
+        body,
+        thickness=0.0015,
+        bevel=0.00025,
+        subdivision=0,
+    )
 
 
 def _hood_half(
@@ -271,12 +334,12 @@ def _hood_half(
     side: str,
 ) -> bpy.types.Object:
     profiles = [
-        (1.030, 0.086, 0.010),
-        (1.006, 0.102, 0.025),
-        (0.976, 0.118, 0.047),
-        (0.944, 0.132, 0.066),
-        (0.912, 0.122, 0.055),
-        (0.886, 0.092, 0.027),
+        (1.045, 0.068, 0.010),
+        (1.015, 0.086, 0.020),
+        (0.985, 0.105, 0.030),
+        (0.955, 0.122, 0.036),
+        (0.925, 0.132, 0.030),
+        (0.900, 0.116, 0.018),
     ]
     columns = 20
     sign = -1.0 if side == "L" else 1.0
@@ -285,10 +348,9 @@ def _hood_half(
         for column in range(columns + 1):
             u = column / columns
             x = sign * half_width * u
-            point = sampler.point(x, z, front=False, offset=0.012)
-            edge_attachment = 1.0 - u**1.7
-            point.y += drape * edge_attachment
-            point.z += 0.005 * math.sin(math.pi * u)
+            point = sampler.point(x, z, front=False, offset=0.030)
+            point.y += drape * (1.0 - 0.55 * u)
+            point.z += 0.003 * math.sin(math.pi * u)
             vertices.append((point.x, point.y, point.z))
     return v9._grid_object(
         f"Heather_Hood_Outer_{side}",
@@ -298,7 +360,7 @@ def _hood_half(
         material,
         armature,
         sampler.body,
-        thickness=0.0016,
+        thickness=0.0015,
         bevel=0.00035,
         subdivision=1,
     )
@@ -313,19 +375,17 @@ def _neck_band(
     count = 72
     for index in range(count):
         angle = math.tau * index / count
-        x = 0.092 * math.cos(angle)
-        front = math.sin(angle) < 0.0
-        normalized_x = min(1.0, abs(x) / 0.092)
-        if front:
-            z = 0.996 + 0.044 * normalized_x**1.65
-        else:
-            z = 1.010 + 0.028 * normalized_x**1.55
-        point = sampler.point(x, z, front=front, offset=0.015)
+        x = 0.098 * math.cos(angle)
+        z = 1.038 + 0.004 * abs(math.cos(angle))
+        front_point = sampler.point(x, z, front=True, offset=0.024)
+        back_point = sampler.point(x, z, front=False, offset=0.024)
+        back_weight = 0.5 * (math.sin(angle) + 1.0)
+        point = front_point.lerp(back_point, back_weight)
         points.append((point.x, point.y, point.z))
     band = v9.base.curve_tube(
         "Heather_Hood_Neck_Band",
         points,
-        0.0021,
+        0.0024,
         material,
         armature,
         "Chest",
@@ -346,12 +406,12 @@ def _cords_ties_seams(
     for side, sign in (("L", -1.0), ("R", 1.0)):
         cord_points: list[tuple[float, float, float]] = []
         for x, z in (
-            (sign * 0.046, 1.014),
-            (sign * 0.050, 0.992),
-            (sign * 0.052, 0.970),
-            (sign * 0.048, 0.950),
+            (sign * 0.046, 1.026),
+            (sign * 0.050, 1.004),
+            (sign * 0.052, 0.982),
+            (sign * 0.048, 0.962),
         ):
-            point = sampler.point(x, z, front=True, offset=0.020)
+            point = sampler.point(x, z, front=True, offset=0.027)
             cord_points.append((point.x, point.y, point.z))
         cord = v9.base.curve_tube(
             f"Heather_Hood_Drawcord_{side}",
@@ -365,15 +425,15 @@ def _cords_ties_seams(
         v9.base.transfer_nearest_body_weights(cord, sampler.body)
         result.append(cord)
 
-        root_x = sign * 0.170
-        root_z = 0.807
+        root_x = sign * 0.205
+        root_z = 0.810
         tie = v9.base.curve_tube(
             f"Heather_Side_Tie_{side}",
             [
                 (root_x, 0.0, root_z),
-                (sign * 0.184, -0.002, root_z - 0.004),
-                (sign * 0.198, 0.004, root_z - 0.018),
-                (sign * 0.208, 0.010, root_z - 0.038),
+                (sign * 0.218, -0.002, root_z - 0.006),
+                (sign * 0.229, 0.004, root_z - 0.020),
+                (sign * 0.238, 0.010, root_z - 0.038),
             ],
             0.00125,
             trim,
@@ -385,23 +445,23 @@ def _cords_ties_seams(
         result.append(tie)
 
     front_points = [
-        sampler.point(0.0, z, front=True, offset=0.018)
-        for z in (0.674, 0.728, 0.786, 0.846, 0.906, 0.958)
+        sampler.point(0.0, z, front=True, offset=0.028)
+        for z in (0.655, 0.710, 0.770, 0.830, 0.895, 0.958, 1.010)
     ]
     back_points = [
-        sampler.point(0.0, z, front=False, offset=0.018)
-        for z in (0.674, 0.728, 0.786, 0.846, 0.906, 0.958)
+        sampler.point(0.0, z, front=False, offset=0.028)
+        for z in (0.655, 0.710, 0.770, 0.830, 0.895, 0.958, 1.010)
     ]
     hood_points = []
     for z, _half_width, drape in (
-        (1.030, 0.086, 0.010),
-        (1.006, 0.102, 0.025),
-        (0.976, 0.118, 0.047),
-        (0.944, 0.132, 0.066),
-        (0.912, 0.122, 0.055),
-        (0.886, 0.092, 0.027),
+        (1.045, 0.068, 0.010),
+        (1.015, 0.086, 0.020),
+        (0.985, 0.105, 0.030),
+        (0.955, 0.122, 0.036),
+        (0.925, 0.132, 0.030),
+        (0.900, 0.116, 0.018),
     ):
-        point = sampler.point(0.0, z, front=False, offset=0.012)
+        point = sampler.point(0.0, z, front=False, offset=0.030)
         point.y += drape + 0.0015
         hood_points.append(point)
 
@@ -434,28 +494,21 @@ def create_outfit(
     sampler = v9.SurfaceSampler(body)
     garments: list[bpy.types.Object] = [
         _body_panel(
-            "Heather_Front_Body_Panel",
+            "Heather_Body_Shell",
             body,
             armature,
             fabric,
-            _panel_predicate(True),
+            _body_shell_predicate(armature),
         ),
-        _body_panel(
-            "Heather_Back_Body_Panel",
-            body,
-            armature,
-            fabric,
-            _panel_predicate(False),
-        ),
+        _highcut_panel(sampler, armature, fabric, front=True),
+        _highcut_panel(sampler, armature, fabric, front=False),
+        _crotch_bridge(sampler, armature, fabric),
+        _cuff_tube(body, armature, trim, "L"),
+        _cuff_tube(body, armature, trim, "R"),
+        _hood_half(sampler, armature, fabric, "L"),
+        _hood_half(sampler, armature, fabric, "R"),
+        _neck_band(sampler, armature, fabric),
     ]
-    garments.extend(_sleeves_and_cuffs(body, armature, fabric, trim))
-    garments.extend(
-        [
-            _hood_half(sampler, armature, fabric, "L"),
-            _hood_half(sampler, armature, fabric, "R"),
-            _neck_band(sampler, armature, fabric),
-        ]
-    )
     garments.extend(v9._placket_and_buttons(sampler, armature, trim, button_material))
     garments.extend(_cords_ties_seams(sampler, armature, trim))
     return garments
