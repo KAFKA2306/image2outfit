@@ -3,12 +3,10 @@
   "profile": "panel-sewn",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v6-fitted-sleeves-split-hood-seam-graph",
+  "designRevision": "v10-body-topology-continuous-panels",
   "panels": [
-    "front-upper",
-    "back-upper",
-    "front-lower",
-    "back-lower",
+    "front-body",
+    "back-body",
     "sleeve-left",
     "sleeve-right",
     "cuff-left",
@@ -40,6 +38,14 @@
     "drawcord",
     "side tie"
   ],
+  "requiredPoses": [
+    "neutral",
+    "arms-up",
+    "forward-bend",
+    "legs-apart",
+    "walk",
+    "crouch"
+  ],
   "researchTrial": {
     "paper": "https://arxiv.org/abs/2607.21213",
     "paperTitle": "Learning-based Seam Correspondence Reconstruction in Sewing Patterns",
@@ -49,5 +55,5 @@
     "authorsModelExecuted": false,
     "officialCodeLocated": false
   },
-  "releaseBoundary": "WORKING until actual renders, evaluated fit audit, Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test and human runtime review pass"
+  "releaseBoundary": "Repository merge is permitted as WORKING after Blender, FBX, declared Prefab, five-view, pose and research gates pass; Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test and human runtime review remain required for later release states"
 }

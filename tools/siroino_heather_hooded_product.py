@@ -13,16 +13,37 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 import siroino_heather_hooded_bodysuit_build as build
-import siroino_heather_hooded_pattern as pattern
+import siroino_heather_hooded_pattern_v10 as pattern
 
-DESIGN_REVISION = "v7-continuous-body-derived-shells"
+DESIGN_REVISION = "v10-body-topology-continuous-panels"
+ACTUAL_SEPARATE_GEOMETRY = [
+    "Heather_Front_Body_Panel",
+    "Heather_Back_Body_Panel",
+    "Heather_Long_Sleeve_L",
+    "Heather_Long_Sleeve_R",
+    "Heather_Rib_Cuff_L",
+    "Heather_Rib_Cuff_R",
+    "Heather_Hood_Outer_L",
+    "Heather_Hood_Outer_R",
+    "Heather_Hood_Neck_Band",
+    "Heather_Henley_Placket",
+    "Heather_Henley_Button_01",
+    "Heather_Henley_Button_02",
+    "Heather_Henley_Button_03",
+    "Heather_Hood_Drawcord_L",
+    "Heather_Hood_Drawcord_R",
+    "Heather_Side_Tie_L",
+    "Heather_Side_Tie_R",
+    "Heather_Center_Front_Seam",
+    "Heather_Center_Back_Seam",
+    "Heather_Hood_Center_Seam",
+]
 
 
 def normalize_four_influences(
     objects: list[bpy.types.Object],
     maximum: int = 4,
 ) -> dict[str, int]:
-    """Normalize every vertex, pruning to the VRChat four-influence limit."""
     changed: dict[str, int] = {}
     for obj in objects:
         if obj.type != "MESH":
@@ -37,11 +58,7 @@ def normalize_four_influences(
                 for item in list(vertex.groups)
                 if item.weight > 1e-10
             ]
-            ranked = sorted(
-                assignments,
-                key=lambda item: item[1],
-                reverse=True,
-            )[:maximum]
+            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[:maximum]
             if not ranked:
                 ranked = [(fallback.name, 1.0)]
             total = sum(weight for _, weight in ranked)
@@ -56,9 +73,7 @@ def normalize_four_influences(
                 obj.vertex_groups[group_name].remove([vertex.index])
             for group_name, weight in ranked:
                 obj.vertex_groups[group_name].add(
-                    [vertex.index],
-                    weight / total,
-                    "REPLACE",
+                    [vertex.index], weight / total, "REPLACE"
                 )
             if requires_change:
                 affected += 1
@@ -70,30 +85,84 @@ def preserve_authored_weights(
     garments: list[bpy.types.Object],
     _body: bpy.types.Object,
 ) -> dict[str, object]:
-    """Do not overwrite v7 body-derived weights with a nearest-point pass."""
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "direct SiroinoSotai_PC source-vertex weights for body-derived shells; "
-            "explicit nearest-body or rigid weights for authored accessories"
+            "direct tracked SiroinoSotai_PC topology, UVs and normalized source skin weights "
+            "for front/back body panels and sleeves; explicit lower-arm/hand weights for cuffs"
         ),
         "rebound": False,
     }
 
 
-def enforce_manifest_contract(original):
-    """Keep generated ProductManifest compatible with the canonical v1 schema."""
+def wrap_pattern_writer(original):
+    def wrapped(*args, **kwargs):
+        pattern_path, research_path = original(*args, **kwargs)
+        contract = json.loads(pattern_path.read_text(encoding="utf-8"))
+        contract["separateGeometry"] = ACTUAL_SEPARATE_GEOMETRY
+        contract["designRevision"] = DESIGN_REVISION
+        pattern_path.write_text(
+            json.dumps(contract, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        return pattern_path, research_path
 
+    return wrapped
+
+
+def enforce_manifest_contract(original):
     def wrapped(*args, **kwargs):
         result = original(*args, **kwargs)
         job = args[0]
-        manifest_path = Path(__file__).resolve().parents[1] / job["productManifestPath"]
+        root = Path(__file__).resolve().parents[1]
+        manifest_path = root / job["productManifestPath"]
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["schemaVersion"] = 1
+        manifest["designRevision"] = DESIGN_REVISION
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
+
+        report_path = (
+            root / ".image2outfit" / "products" / job["id"] / "reports" / "product-build-report.json"
+        )
+        if report_path.is_file():
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            report["designRevision"] = DESIGN_REVISION
+            rejected = report.setdefault("rejectedHistory", [])
+            failures = [
+                {
+                    "revision": "v7.1-continuous-shell-fit",
+                    "reason": (
+                        "actual five-view inspection found sawtooth panel edges, elbow/cuff holes, "
+                        "an over-wide neckline, a shield-like rear hood and heather moire; evaluated "
+                        "BVH audit reported 6660 garment/body triangle overlap pairs across six poses"
+                    ),
+                },
+                {
+                    "revision": "v8-smooth-sampled-panels-distance-field-sleeves",
+                    "reason": (
+                        "actual five-view inspection found discontinuous sampled-panel spikes, oversized "
+                        "rectangular cuffs and an inflated spherical hood; evaluated BVH audit reported "
+                        "7133 garment/body triangle overlap pairs across six poses"
+                    ),
+                },
+                {
+                    "revision": "v9-continuous-interpolation-fitted-cuffs",
+                    "reason": (
+                        "actual hosted five-view inspection found detached plate-like torso panels, "
+                        "large shoulder/underarm gaps, rigid waist fins, a broken crotch strip and a "
+                        "floating hood; the 30 mm sampled-surface offset was unsuitable for a fitted bodysuit"
+                    ),
+                },
+            ]
+            existing = {item.get("revision") for item in rejected}
+            rejected.extend(item for item in failures if item["revision"] not in existing)
+            report_path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
         return result
 
     return wrapped
@@ -101,6 +170,10 @@ def enforce_manifest_contract(original):
 
 def update_panel_object_contract() -> None:
     replacements = {
+        "Heather_Front_Upper_Panel": "Heather_Front_Body_Panel",
+        "Heather_Back_Upper_Panel": "Heather_Back_Body_Panel",
+        "Heather_Highcut_Front_Panel": "Heather_Front_Body_Panel",
+        "Heather_Highcut_Back_Panel": "Heather_Back_Body_Panel",
         "Heather_Hood_Back_Drape_L": "Heather_Hood_Outer_L",
         "Heather_Hood_Back_Drape_R": "Heather_Hood_Outer_R",
         "Heather_Hood_Cowl": "Heather_Hood_Neck_Band",
@@ -115,6 +188,9 @@ def main() -> int:
     build.limit_bone_influences = normalize_four_influences
     build.rebind_dynamic_parts = preserve_authored_weights
     update_panel_object_contract()
+    build.evidence.write_pattern_and_research = wrap_pattern_writer(
+        build.evidence.write_pattern_and_research
+    )
     build.write_report_and_manifest = enforce_manifest_contract(
         build.write_report_and_manifest
     )

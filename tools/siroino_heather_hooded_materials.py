@@ -12,6 +12,7 @@ import siroino_strappy_knit_build as base
 
 
 def make_heather_maps(directory: Path) -> dict[str, Path]:
+    """Create subtle, non-periodic heather maps without render-scale moire."""
     directory.mkdir(parents=True, exist_ok=True)
     size = 512
     albedo: list[tuple[int, int, int]] = []
@@ -19,23 +20,22 @@ def make_heather_maps(directory: Path) -> dict[str, Path]:
     roughness: list[tuple[int, int, int]] = []
     for y in range(size):
         for x in range(size):
-            yarn = math.sin((x + y * 0.31) * math.tau / 7.0)
-            cross = math.sin((y - x * 0.17) * math.tau / 11.0)
-            fleck = math.sin(x * 0.73 + y * 1.17) * math.sin(x * 0.19 - y * 0.41)
-            long_fiber = math.sin((x * 0.11 + y * 0.47) * math.tau / 17.0)
-            value = max(
-                82,
-                min(132, int(106 + 7 * yarn + 5 * cross + 4 * fleck + 2 * long_fiber)),
+            broad = (
+                math.sin((x * 0.021 + y * 0.013) * math.tau)
+                + 0.55 * math.sin((x * 0.008 - y * 0.017) * math.tau + 1.7)
             )
-            albedo.append((value - 2, value, min(255, value + 4)))
+            fiber = math.sin((x * 0.113 + y * 0.071) * math.tau + 0.4)
+            fleck = math.sin(x * 0.173 + y * 0.289) * math.sin(x * 0.061 - y * 0.097)
+            value = max(78, min(112, int(94 + 3.5 * broad + 2.0 * fiber + 2.2 * fleck)))
+            albedo.append((value - 2, value, min(255, value + 3)))
             normal.append(
                 (
-                    int(128 + 9 * yarn + 2 * fleck),
-                    int(128 + 7 * cross),
-                    253,
+                    int(128 + 3.0 * fiber + 1.4 * fleck),
+                    int(128 + 2.6 * broad),
+                    254,
                 )
             )
-            rough = int(194 + 11 * abs(fleck) + 6 * (1.0 - abs(yarn)))
+            rough = max(188, min(218, int(202 + 5 * abs(fleck) + 3 * abs(broad))))
             roughness.append((rough, rough, rough))
     paths = {
         "albedo": directory / "heather_grey_albedo.png",
@@ -67,25 +67,25 @@ def create_materials(
         textures["albedo"],
         textures["normal"],
         textures["roughness"],
-        normal_strength=0.14,
-        sheen=0.08,
+        normal_strength=0.075,
+        sheen=0.06,
     )
     shader = next(
         node for node in fabric.node_tree.nodes if node.type == "BSDF_PRINCIPLED"
     )
     shader.inputs["IOR"].default_value = 1.46
     if "Coat Weight" in shader.inputs:
-        shader.inputs["Coat Weight"].default_value = 0.015
-    fabric.diffuse_color = (0.145, 0.155, 0.175, 1.0)
+        shader.inputs["Coat Weight"].default_value = 0.008
+    fabric.diffuse_color = (0.112, 0.118, 0.132, 1.0)
     trim = base.plain_material(
         "MAT_Heather_Rib_Trim",
-        (0.205, 0.220, 0.250, 1.0),
-        roughness=0.79,
+        (0.145, 0.152, 0.170, 1.0),
+        roughness=0.82,
     )
     buttons = base.plain_material(
         "MAT_Pearl_Grey_Buttons",
-        (0.39, 0.42, 0.48, 1.0),
-        roughness=0.36,
-        metallic=0.04,
+        (0.34, 0.36, 0.41, 1.0),
+        roughness=0.40,
+        metallic=0.03,
     )
     return textures, fabric, trim, buttons

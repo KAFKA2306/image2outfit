@@ -31,3 +31,16 @@ src = ["tools", "tests"]
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F"]
 ignore = ["E402"]
+
+[tool.image2outfit.garment-geometry]
+# Body-conforming garments must derive their primary shell from the target
+# avatar topology. Large sampled grids are acceptable for loose garments, but
+# not as the accepted bodycon shell because they can bridge shoulders, waist,
+# crotch, and other high-curvature regions.
+require-source-topology-for-bodycon = true
+forbid-sampled-grid-as-bodycon-shell = true
+
+# Offset is measured from the target avatar surface before fabric thickness.
+# Values above this threshold require an explicit product-level exception and
+# visual/pose evidence; they must not silently become the default construction.
+max-default-bodycon-surface-offset-m = 0.012
