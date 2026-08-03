@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Any
 
 import customer_quality
-from candidate_orchestrator import _research_state
 import production_contract as contract
 import release_gate as legacy
+from candidate_orchestrator import _research_state
 from runtime_transaction import DirectoryTransaction
 
 
@@ -16,13 +16,7 @@ def _strict_release_audit(
     job_path: Path,
     job: dict[str, Any],
     policy: dict[str, Any],
-) -> tuple[
-    dict[str, Any],
-    dict[str, Any],
-    list[str],
-    str,
-    dict[str, dict[str, Any]],
-]:
+) -> tuple[dict[str, Any], dict[str, Any], list[str], str]:
     candidate = legacy.path(job["candidateDir"])
     candidate_manifest_path = candidate / "candidate-manifest.json"
     candidate_manifest = legacy.read(candidate_manifest_path)
@@ -77,13 +71,7 @@ def _strict_release_audit(
         digest=legacy.digest,
     )
     errors.extend(quality_errors)
-    return (
-        quality,
-        research,
-        list(dict.fromkeys(errors)),
-        candidate_hash,
-        evidence_documents,
-    )
+    return quality, research, list(dict.fromkeys(errors)), candidate_hash
 
 
 def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
@@ -91,8 +79,8 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
     candidate = legacy.path(job["candidateDir"])
     release = legacy.path(job["releaseDir"])
     artifact.mkdir(parents=True, exist_ok=True)
-    quality, research, errors, candidate_hash, evidence_documents = (
-        _strict_release_audit(job_path, job, policy)
+    quality, research, errors, candidate_hash = _strict_release_audit(
+        job_path, job, policy
     )
     legacy.write(artifact / "research-baseline.json", research)
     legacy.write(
