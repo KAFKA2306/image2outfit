@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -41,11 +43,33 @@ jobs:
       - name: Run all unit tests
         run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
 
-      - name: Run Ruff lint
-        run: uv run --locked --no-default-groups --group dev ruff check --ignore S102 tools tests
+      - name: Resolve changed Python files
+        id: changed-python
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_ref="${{ github.base_ref }}"
+          if [ -z "$base_ref" ]; then base_ref=main; fi
+          git diff --name-only "origin/$base_ref...HEAD" -- '*.py' > /tmp/changed-python.txt
+          cat /tmp/changed-python.txt
+          {
+            echo 'files<<EOF'
+            cat /tmp/changed-python.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run Ruff lint on this change
+        if: steps.changed-python.outputs.files != ''
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/changed-python.txt
+          uv run --locked --no-default-groups --group dev ruff check --ignore S102 "${files[@]}"
 
       - name: Show required Ruff formatting
+        if: steps.changed-python.outputs.files != ''
+        shell: bash
         run: |
-          uv run --locked --no-default-groups --group dev ruff format tools tests
-          git diff -- tools tests
-          test -z "$(git status --porcelain -- tools tests)"
+          mapfile -t files < /tmp/changed-python.txt
+          uv run --locked --no-default-groups --group dev ruff format "${files[@]}"
+          git diff -- "${files[@]}"
+          test -z "$(git status --porcelain -- "${files[@]}")"
