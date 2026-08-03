@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Runtime support for the Siroino heather bodysuit v11 generator."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -71,8 +72,7 @@ class SurfaceSampler:
 
     def side_y(self, x: float, z: float) -> float:
         return 0.5 * (
-            self.sample(x, z, front=True).y
-            + self.sample(x, z, front=False).y
+            self.sample(x, z, front=True).y + self.sample(x, z, front=False).y
         )
 
 
