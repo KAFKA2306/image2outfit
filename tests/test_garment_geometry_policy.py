@@ -8,8 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "pyproject.toml"
-BASE_PATTERN_PATH = ROOT / "tools" / "siroino_heather_hooded_pattern_v10.py"
-SAFE_PATTERN_PATH = ROOT / "tools" / "siroino_heather_hooded_pattern_v13.py"
+PATTERN_PATH = ROOT / "tools" / "siroino_heather_hooded_pattern_v13.py"
 
 
 class GarmentGeometryPolicyTests(unittest.TestCase):
@@ -18,9 +17,8 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         cls.policy = tomllib.loads(POLICY_PATH.read_text(encoding="utf-8"))["tool"][
             "image2outfit"
         ]["garment-geometry"]
-        cls.base_source = BASE_PATTERN_PATH.read_text(encoding="utf-8")
-        cls.safe_source = SAFE_PATTERN_PATH.read_text(encoding="utf-8")
-        cls.safe_tree = ast.parse(cls.safe_source, filename=str(SAFE_PATTERN_PATH))
+        cls.source = PATTERN_PATH.read_text(encoding="utf-8")
+        cls.tree = ast.parse(cls.source, filename=str(PATTERN_PATH))
 
     def test_bodycon_policy_requires_one_continuous_source_shell(self) -> None:
         self.assertTrue(self.policy["require-source-topology-for-bodycon"])
@@ -31,7 +29,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         limit = float(self.policy["max-default-bodycon-surface-offset-m"])
         body_panel = next(
             node
-            for node in self.safe_tree.body
+            for node in self.tree.body
             if isinstance(node, ast.FunctionDef) and node.name == "_body_panel"
         )
         defaults = {
@@ -46,11 +44,10 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertLessEqual(float(defaults["offset"]), limit)
         self.assertEqual(float(defaults["bevel_width"]), 0.0)
 
-    def test_base_construction_builds_one_primary_body_shell(self) -> None:
-        base_tree = ast.parse(self.base_source, filename=str(BASE_PATTERN_PATH))
+    def test_pattern_builds_one_primary_body_shell(self) -> None:
         create_outfit = next(
             node
-            for node in base_tree.body
+            for node in self.tree.body
             if isinstance(node, ast.FunctionDef) and node.name == "create_outfit"
         )
         shell_calls = [
@@ -61,20 +58,19 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             and node.func.id == "_body_panel"
         ]
         self.assertEqual(len(shell_calls), 1)
-        self.assertIn("Heather_Body_Shell", self.base_source)
-        self.assertIn("_body_shell_predicate", self.base_source)
+        self.assertIn("Heather_Body_Shell", self.source)
+        self.assertIn("_body_shell_predicate", self.source)
 
-    def test_safe_patch_replaces_bevel_and_adds_edge_guard(self) -> None:
+    def test_safe_shell_has_no_bevel_and_has_edge_guard(self) -> None:
         required_fragments = (
-            "v12._body_panel = _body_panel",
             "The fitted source shell must not use a bevel modifier",
             "solidify.offset = 0.0",
             "max_edge > 0.20",
             "Garment geometry sanity gate failed",
         )
         for fragment in required_fragments:
-            self.assertIn(fragment, self.safe_source)
-        self.assertNotIn('modifiers.new("Finished edge", "BEVEL")', self.safe_source)
+            self.assertIn(fragment, self.source)
+        self.assertNotIn('modifiers.new("Finished edge", "BEVEL")', self.source)
 
     def test_primary_shell_copies_target_topology_and_weights(self) -> None:
         required_fragments = (
@@ -84,7 +80,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             "modifier.use_deform_preserve_volume = True",
         )
         for fragment in required_fragments:
-            self.assertIn(fragment, self.safe_source)
+            self.assertIn(fragment, self.source)
 
 
 if __name__ == "__main__":
