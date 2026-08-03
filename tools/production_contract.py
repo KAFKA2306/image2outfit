@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Canonical image2outfit validation contract."""
+
 from __future__ import annotations
 
 import json
@@ -23,12 +24,8 @@ from release_packager import package_release
 from workspace_transaction import WorkspaceSnapshot
 
 
-def validate_job(
-    job: dict[str, Any], policy: dict[str, Any], root: Path
-) -> list[str]:
-    errors = validate_schema_file(
-        job, root / "config" / "job.schema.v2.json", "job"
-    )
+def validate_job(job: dict[str, Any], policy: dict[str, Any], root: Path) -> list[str]:
+    errors = validate_schema_file(job, root / "config" / "job.schema.v2.json", "job")
     product_id = job.get("id")
     if not isinstance(product_id, str) or not PRODUCT_ID.fullmatch(product_id):
         errors.append("job.id must be a canonical product slug")
@@ -39,9 +36,7 @@ def validate_job(
             errors.append(f"job.productRoot must be {expected_root}")
         expected_manifest = canonical_manifest_path(product_id)
         if job.get("productManifestPath") != expected_manifest:
-            errors.append(
-                f"job.productManifestPath must be {expected_manifest}"
-            )
+            errors.append(f"job.productManifestPath must be {expected_manifest}")
 
     build_script = job.get("buildScript")
     if isinstance(build_script, str):
@@ -53,9 +48,7 @@ def validate_job(
         else:
             try:
                 if not repo_path(root, build_script).is_file():
-                    errors.append(
-                        f"job.buildScript does not exist: {build_script}"
-                    )
+                    errors.append(f"job.buildScript does not exist: {build_script}")
             except ValueError as exc:
                 errors.append(str(exc))
 
@@ -63,9 +56,7 @@ def validate_job(
     if isinstance(hosted_pose, str):
         try:
             if not repo_path(root, hosted_pose).is_file():
-                errors.append(
-                    f"job.hostedPoseScript does not exist: {hosted_pose}"
-                )
+                errors.append(f"job.hostedPoseScript does not exist: {hosted_pose}")
         except ValueError as exc:
             errors.append(str(exc))
 
@@ -84,8 +75,7 @@ def validate_job(
     canonical_poses = required_pose_paths(job, policy)
     if declared_pose_paths is not None and declared_pose_paths != canonical_poses:
         errors.append(
-            "job.posePaths must exactly match the canonical release-policy "
-            "pose paths"
+            "job.posePaths must exactly match the canonical release-policy pose paths"
         )
 
     for field in (
@@ -130,8 +120,7 @@ def validate_construction(
     if "requiredPoses" in value:
         if value.get("requiredPoses") != policy.get("requiredPoses"):
             errors.append(
-                "construction.requiredPoses conflicts with "
-                "release-policy.requiredPoses"
+                "construction.requiredPoses conflicts with release-policy.requiredPoses"
             )
         else:
             warnings.append(
@@ -163,9 +152,7 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
             for name, value in gates.items()
             if value == "FAIL" and not name.lower().startswith("human")
         )
-        errors.extend(
-            f"product technical gate failed: {name}" for name in failed
-        )
+        errors.extend(f"product technical gate failed: {name}" for name in failed)
     fit = manifest.get("fitAuditSummary")
     if isinstance(fit, dict) and fit.get("pass") is False:
         errors.append("product fit audit is explicitly failing")
@@ -183,9 +170,7 @@ def validate_hashed_artifacts(
     for index, item in enumerate(values):
         prefix = f"sourceArtifacts[{index}]"
         if not isinstance(item, dict):
-            errors.append(
-                f"{prefix} must be an object with path and sha256"
-            )
+            errors.append(f"{prefix} must be an object with path and sha256")
             continue
         path_value = item.get("path")
         expected_hash = item.get("sha256")
@@ -196,12 +181,8 @@ def validate_hashed_artifacts(
             errors.append(f"{prefix}.path is duplicated")
             continue
         seen.add(path_value)
-        if not isinstance(expected_hash, str) or not SHA256.fullmatch(
-            expected_hash
-        ):
-            errors.append(
-                f"{prefix}.sha256 must be a lowercase SHA-256"
-            )
+        if not isinstance(expected_hash, str) or not SHA256.fullmatch(expected_hash):
+            errors.append(f"{prefix}.sha256 must be a lowercase SHA-256")
             continue
         try:
             source = repo_path(root, path_value)
@@ -213,9 +194,7 @@ def validate_hashed_artifacts(
         elif digest(source) != expected_hash:
             errors.append(f"{prefix}.sha256 mismatch: {path_value}")
         else:
-            normalized.append(
-                {"path": path_value, "sha256": expected_hash}
-            )
+            normalized.append({"path": path_value, "sha256": expected_hash})
     return normalized, errors
 
 

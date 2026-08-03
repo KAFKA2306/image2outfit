@@ -23,8 +23,7 @@ class MethodSelectionTest(unittest.TestCase):
         self.assertGreater(report["productCount"], 0)
         self.assertTrue(
             all(
-                product.get("selectionMode")
-                == "DECLARED_CONSTRUCTION_CONTRACT"
+                product.get("selectionMode") == "DECLARED_CONSTRUCTION_CONTRACT"
                 for product in report["products"]
             )
         )
@@ -65,9 +64,7 @@ class MethodSelectionTest(unittest.TestCase):
                 json.dumps({"schemaVersion": 2, "jobId": job["id"]}) + "\n",
                 encoding="utf-8",
             )
-            report = method_selection.validate_commercial_evidence(
-                job, candidate, ROOT
-            )
+            report = method_selection.validate_commercial_evidence(job, candidate, ROOT)
         self.assertFalse(report["passed"])
         self.assertIn("runtime-performance", report["evidence"])
         self.assertIn("motion-review", report["evidence"])
@@ -77,11 +74,7 @@ class MethodSelectionTest(unittest.TestCase):
             ROOT / "config" / "products" / "siroino-wide-cargo" / "job.json"
         )
         construction_path = (
-            ROOT
-            / "config"
-            / "products"
-            / "siroino-wide-cargo"
-            / "construction.json"
+            ROOT / "config" / "products" / "siroino-wide-cargo" / "construction.json"
         )
         original = construction_path.read_text(encoding="utf-8")
         try:
@@ -94,9 +87,7 @@ class MethodSelectionTest(unittest.TestCase):
         finally:
             construction_path.write_text(original, encoding="utf-8")
         self.assertFalse(report["passed"])
-        self.assertIn(
-            "construction.productId must match job.id", report["errors"]
-        )
+        self.assertIn("construction.productId must match job.id", report["errors"])
 
 
 if __name__ == "__main__":

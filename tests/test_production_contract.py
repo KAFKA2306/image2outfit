@@ -68,13 +68,7 @@ class ProductionContractTest(unittest.TestCase):
     def test_known_fit_failure_blocks_candidate_promotion(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            manifest = (
-                root
-                / "Assets"
-                / "GenWorks"
-                / "demo"
-                / "ProductManifest.json"
-            )
+            manifest = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"
             manifest.parent.mkdir(parents=True)
             manifest.write_text(
                 json.dumps(

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Package one already validated candidate with its raw evidence."""
+
 from __future__ import annotations
 
 import shutil
@@ -24,9 +25,7 @@ def _copy_evidence_document(
     screenshot = value.get("runtimeScreenshot")
     if isinstance(screenshot, str) and screenshot:
         screenshot_path = repo_path(root, screenshot)
-        runtime_destination = (
-            destination.parent / "runtime" / screenshot_path.name
-        )
+        runtime_destination = destination.parent / "runtime" / screenshot_path.name
         runtime_destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(screenshot_path, runtime_destination)
         copied.append(runtime_destination)
@@ -43,18 +42,14 @@ def package_release(
     candidate_manifest: dict[str, Any],
     candidate_hash: str,
     human_evidence: dict[str, dict[str, Any]],
-    verify_candidate: Callable[
-        [Path, dict[str, Any], Path, dict[str, Any]], list[str]
-    ],
+    verify_candidate: Callable[[Path, dict[str, Any], Path, dict[str, Any]], list[str]],
     now: Callable[[], str],
 ) -> dict[str, Any]:
     errors = verify_candidate(job_path, job, candidate, candidate_manifest)
     if job.get("adapterId") in policy.get("blockedReleaseAdapterIds", []):
         errors.append(f"adapter blocked from release: {job.get('adapterId')}")
     if errors:
-        raise ValueError(
-            "release packaging refused: " + "; ".join(errors)
-        )
+        raise ValueError("release packaging refused: " + "; ".join(errors))
 
     package = release / "Package"
     shutil.copytree(candidate, package)
@@ -69,16 +64,12 @@ def package_release(
             copied=copied,
         )
 
-    commercial_source = repo_path(
-        root, f"{job['productRoot']}/Evidence/Commercial"
-    )
+    commercial_source = repo_path(root, f"{job['productRoot']}/Evidence/Commercial")
     if commercial_source.is_dir():
         commercial_destination = package / "Evidence" / "Commercial"
         shutil.copytree(commercial_source, commercial_destination)
         copied.extend(
-            path
-            for path in commercial_destination.rglob("*")
-            if path.is_file()
+            path for path in commercial_destination.rglob("*") if path.is_file()
         )
 
     evidence_summary = package / "Evidence" / "validated-human-evidence.json"

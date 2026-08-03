@@ -23,9 +23,7 @@ class CommercialEvidenceContractTest(unittest.TestCase):
             ["path", "sha256"],
         )
         self.assertIs(
-            evidence["sourceArtifactContract"][
-                "candidateHashBindingRequired"
-            ],
+            evidence["sourceArtifactContract"]["candidateHashBindingRequired"],
             True,
         )
 

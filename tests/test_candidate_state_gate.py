@@ -8,9 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class CandidateStateGateTest(unittest.TestCase):
     def test_candidate_orchestrator_checks_manifest_before_commit(self) -> None:
-        source = (ROOT / "tools/candidate_orchestrator.py").read_text(
-            encoding="utf-8"
-        )
+        source = (ROOT / "tools/candidate_orchestrator.py").read_text(encoding="utf-8")
         state_check = source.index("contract.product_state_errors")
         candidate_commit = source.index("candidate_tx.commit")
         workspace_commit = source.index("workspace_tx.commit")

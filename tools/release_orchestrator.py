@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Validate once and package the unchanged reviewed candidate."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -32,8 +33,7 @@ def _strict_release_audit(
     research, baseline, baseline_hash = _research_state()
     if research.get("passed") is not True:
         errors.extend(
-            f"researchBaseline: {value}"
-            for value in research.get("errors", [])
+            f"researchBaseline: {value}" for value in research.get("errors", [])
         )
     bound = candidate_manifest.get("researchBaseline")
     if not isinstance(bound, dict):

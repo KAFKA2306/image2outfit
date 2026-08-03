@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Candidate identity, input, preview, and file-manifest contracts."""
+
 from __future__ import annotations
 
 import json
@@ -63,8 +64,10 @@ def inside(value: Path, root: Path) -> bool:
 def required_job_fields() -> tuple[str, ...]:
     schema = read(JOB_SCHEMA_PATH)
     required = schema.get("required")
-    if not isinstance(required, list) or not required or not all(
-        isinstance(value, str) and value for value in required
+    if (
+        not isinstance(required, list)
+        or not required
+        or not all(isinstance(value, str) and value for value in required)
     ):
         raise ValueError("job.schema.v2.json must define a non-empty required array")
     expected_version = (
@@ -83,9 +86,7 @@ def load(job_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     if job.get("schemaVersion") != 2:
         raise ValueError("legacy jobs are disabled; schemaVersion must be 2")
     missing = [
-        key
-        for key in required_job_fields()
-        if key not in job or job[key] in (None, "")
+        key for key in required_job_fields() if key not in job or job[key] in (None, "")
     ]
     if missing:
         raise ValueError(f"job v2 missing: {', '.join(missing)}")
@@ -95,9 +96,7 @@ def load(job_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         ("releaseDir", ".image2outfit/products/"),
     ):
         if field not in job or not rel(path(job[field])).startswith(prefix):
-            raise ValueError(
-                f"{field} must use the derived .image2outfit runtime root"
-            )
+            raise ValueError(f"{field} must use the derived .image2outfit runtime root")
     views = set(policy["minimumPreview"]["requiredViews"])
     if views - set(job["previewPaths"]):
         raise ValueError("previewPaths does not contain every required view")
@@ -114,10 +113,8 @@ def license_gate(job: dict[str, Any]) -> tuple[bool, list[str]]:
         "adapterId": evidence.get("adapterId") == job["adapterId"],
         "sourceUrl": bool(evidence.get("sourceUrl")),
         "checkedAt": bool(evidence.get("checkedAt")),
-        "commercialOutfitAllowed": evidence.get("commercialOutfitAllowed")
-        is True,
-        "avatarFilesRedistributed": evidence.get("avatarFilesRedistributed")
-        is False,
+        "commercialOutfitAllowed": evidence.get("commercialOutfitAllowed") is True,
+        "avatarFilesRedistributed": evidence.get("avatarFilesRedistributed") is False,
     }
     errors.extend(name for name, passed in checks.items() if not passed)
     return not errors, errors
@@ -142,10 +139,7 @@ def preview_gate(
         try:
             width, height = png_size(file)
             item.update(width=width, height=height, sha256=digest(file))
-            item["passed"] = (
-                width >= minimum["width"]
-                and height >= minimum["height"]
-            )
+            item["passed"] = width >= minimum["width"] and height >= minimum["height"]
         except (OSError, ValueError) as exc:
             item["error"] = str(exc)
         passed = passed and item["passed"]
@@ -218,15 +212,9 @@ def verify_candidate(
     data: dict[str, Any],
 ) -> list[str]:
     errors = []
-    if (
-        data.get("schemaVersion") != 2
-        or data.get("kind") != "image2outfit-candidate"
-    ):
+    if data.get("schemaVersion") != 2 or data.get("kind") != "image2outfit-candidate":
         errors.append("candidate manifest invalid")
-    if (
-        data.get("jobId") != job["id"]
-        or data.get("adapterId") != job["adapterId"]
-    ):
+    if data.get("jobId") != job["id"] or data.get("adapterId") != job["adapterId"]:
         errors.append("candidate identity mismatch")
     current_commit = os.environ.get("GITHUB_SHA")
     if current_commit and data.get("sourceCommit") != current_commit:

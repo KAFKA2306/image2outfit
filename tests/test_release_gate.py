@@ -71,8 +71,7 @@ class ReleaseGateTest(unittest.TestCase):
         self.policy_path = self.root / "config/release-policy.json"
         self.schema_path = self.root / "config/job.schema.v2.json"
         self.unity_pipeline_path = (
-            self.root
-            / "Assets/GenWorks/Shared/Editor/Image2OutfitPipeline.cs"
+            self.root / "Assets/GenWorks/Shared/Editor/Image2OutfitPipeline.cs"
         )
         self.write_json(self.policy_path, POLICY)
         self.write_json(
@@ -83,9 +82,7 @@ class ReleaseGateTest(unittest.TestCase):
                 "properties": {"schemaVersion": {"const": 2}},
             },
         )
-        self.write_json(
-            self.root / "config/toolchain-lock.json", {"schemaVersion": 1}
-        )
+        self.write_json(self.root / "config/toolchain-lock.json", {"schemaVersion": 1})
         (self.root / "pyproject.toml").write_text(
             '[project]\nname = "test"\nversion = "0.0.0"\n'
             'dependencies = ["Pillow==12.3.0"]\n',
@@ -137,9 +134,7 @@ class ReleaseGateTest(unittest.TestCase):
             "releaseDir": ".image2outfit/products/test-product/release",
             "licenseEvidence": f"{evidence_root}/license.json",
             "privateSourceRoots": ["Assets/_Vendor/TestAvatar"],
-            "deliveryAssets": [
-                "Assets/GenWorks/test-product/Models/Outfit.fbx"
-            ],
+            "deliveryAssets": ["Assets/GenWorks/test-product/Models/Outfit.fbx"],
             "previewPaths": {
                 view: f"Assets/GenWorks/test-product/Previews/{view}.png"
                 for view in POLICY["minimumPreview"]["requiredViews"]
@@ -200,9 +195,7 @@ class ReleaseGateTest(unittest.TestCase):
             "files": gate.manifest([file], candidate),
         }
         file.write_text("tampered", encoding="utf-8")
-        errors = gate.verify_candidate(
-            self.job_path, self.job, candidate, manifest
-        )
+        errors = gate.verify_candidate(self.job_path, self.job, candidate, manifest)
         self.assertTrue(
             any("candidate file changed" in error for error in errors), errors
         )

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Build and promote one technically valid, policy-bound candidate."""
+
 from __future__ import annotations
 
 import shutil
@@ -28,9 +29,7 @@ def _research_state() -> tuple[dict[str, Any], dict[str, Any], str]:
     report = audit_research_baseline.audit(legacy.ROOT)
     baseline_path = audit_research_baseline.BASELINE_PATH
     baseline = legacy.read(baseline_path)
-    baseline_hash = (
-        legacy.digest(baseline_path) if baseline_path.is_file() else ""
-    )
+    baseline_hash = legacy.digest(baseline_path) if baseline_path.is_file() else ""
     return report, baseline, baseline_hash
 
 
@@ -258,12 +257,10 @@ def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) 
             {
                 "candidateLastGoodProtected": True,
                 "previousCandidateExisted": candidate_had_original,
-                "previousCandidateRestored": result != 0
-                and candidate_had_original,
+                "previousCandidateRestored": result != 0 and candidate_had_original,
                 "canonicalWorkspaceProtected": True,
                 "previousWorkspaceExisted": workspace_had_original,
-                "previousWorkspaceRestored": result != 0
-                and workspace_had_original,
+                "previousWorkspaceRestored": result != 0 and workspace_had_original,
                 "customerReleaseProtected": True,
                 "previousReleaseExisted": release_had_original,
                 "previousReleaseRestored": release_had_original,

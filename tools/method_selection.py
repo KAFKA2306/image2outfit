@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Validate the declared construction contract and its commercial evidence."""
+
 from __future__ import annotations
 
 import hashlib
@@ -81,8 +82,7 @@ def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
         research = {"passed": False, "errors": [str(exc)]}
     if research.get("passed") is not True:
         errors.extend(
-            f"research baseline: {message}"
-            for message in research.get("errors", [])
+            f"research baseline: {message}" for message in research.get("errors", [])
         )
     required_capabilities = list(profile.get("requiredCapabilities", []))
     coverage = set(research.get("productionCoverage", []))
@@ -178,9 +178,7 @@ def validate_commercial_evidence(
         candidate_manifest = {}
         errors.append(f"candidate manifest unreadable: {exc}")
     candidate_hash = (
-        digest(candidate_manifest_path)
-        if candidate_manifest_path.is_file()
-        else ""
+        digest(candidate_manifest_path) if candidate_manifest_path.is_file() else ""
     )
     candidate_hashes = _candidate_hashes(candidate_manifest)
     if not candidate_hash:

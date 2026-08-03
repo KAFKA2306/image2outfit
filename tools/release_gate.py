@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Technical-candidate compatibility facade. Release lives in production_gate."""
+
 from __future__ import annotations
 
 import argparse

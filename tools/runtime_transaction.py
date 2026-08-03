@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Transactional protection for derived runtime directories."""
+
 from __future__ import annotations
 
 import json
@@ -64,21 +65,15 @@ class DirectoryTransaction:
                 elif self.backup.exists() and not self.target.exists():
                     self.backup.replace(self.target)
                 else:
-                    raise RuntimeError(
-                        f"ambiguous prepared transaction: {self.target}"
-                    )
+                    raise RuntimeError(f"ambiguous prepared transaction: {self.target}")
             elif self.backup.exists():
-                raise RuntimeError(
-                    f"unexpected backup for new target: {self.backup}"
-                )
+                raise RuntimeError(f"unexpected backup for new target: {self.backup}")
         elif phase in {"PROTECTED", "ROLLING_BACK"}:
             if self.target.exists():
                 shutil.rmtree(self.target)
             if had_original:
                 if not self.backup.exists():
-                    raise RuntimeError(
-                        f"last-good backup is missing: {self.backup}"
-                    )
+                    raise RuntimeError(f"last-good backup is missing: {self.backup}")
                 self.backup.replace(self.target)
             elif self.backup.exists():
                 shutil.rmtree(self.backup)

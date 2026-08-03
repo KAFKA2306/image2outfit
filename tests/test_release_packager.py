@@ -37,22 +37,18 @@ class ReleasePackagerTest(unittest.TestCase):
             screenshot = root / "Assets/_Local/Evidence/demo/runtime.png"
             screenshot.parent.mkdir(parents=True)
             screenshot.write_bytes(b"runtime")
-            evidence_path = root / "Assets/_Local/Evidence/demo/vrchat-runtime-review.json"
+            evidence_path = (
+                root / "Assets/_Local/Evidence/demo/vrchat-runtime-review.json"
+            )
             evidence_path.write_text(
                 json.dumps(
-                    {
-                        "runtimeScreenshot": (
-                            "Assets/_Local/Evidence/demo/runtime.png"
-                        )
-                    }
+                    {"runtimeScreenshot": ("Assets/_Local/Evidence/demo/runtime.png")}
                 ),
                 encoding="utf-8",
             )
             commercial = root / "Assets/GenWorks/demo/Evidence/Commercial"
             commercial.mkdir(parents=True)
-            (commercial / "topology-audit.json").write_text(
-                "{}\n", encoding="utf-8"
-            )
+            (commercial / "topology-audit.json").write_text("{}\n", encoding="utf-8")
             job_path = root / "config/products/demo/job.json"
             job_path.parent.mkdir(parents=True)
             job_path.write_text("{}\n", encoding="utf-8")
@@ -81,7 +77,9 @@ class ReleasePackagerTest(unittest.TestCase):
                 now=lambda: datetime.now(timezone.utc).isoformat(),
             )
             self.assertTrue(
-                (release / "Package/Evidence/Human/vrchat-runtime-review.json").is_file()
+                (
+                    release / "Package/Evidence/Human/vrchat-runtime-review.json"
+                ).is_file()
             )
             self.assertTrue(
                 (release / "Package/Evidence/Human/runtime/runtime.png").is_file()
@@ -93,9 +91,7 @@ class ReleasePackagerTest(unittest.TestCase):
             self.assertTrue(archive.is_file())
             with zipfile.ZipFile(archive) as bundle:
                 names = set(bundle.namelist())
-            self.assertIn(
-                "Package/Evidence/Human/vrchat-runtime-review.json", names
-            )
+            self.assertIn("Package/Evidence/Human/vrchat-runtime-review.json", names)
             self.assertIn("Package/Evidence/Human/runtime/runtime.png", names)
 
 

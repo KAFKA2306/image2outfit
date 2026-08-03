@@ -92,9 +92,7 @@ class CustomerQualityTest(unittest.TestCase):
             f"Preview/{view}.png"
             for view in self.policy["minimumPreview"]["requiredViews"]
         ]
-        poses = {
-            pose: f"Pose/{pose}.png" for pose in self.policy["requiredPoses"]
-        }
+        poses = {pose: f"Pose/{pose}.png" for pose in self.policy["requiredPoses"]}
         score_fields = self.policy["humanEvidenceContracts"]["visual-review"][
             "scoreFields"
         ]
@@ -165,9 +163,7 @@ class CustomerQualityTest(unittest.TestCase):
     def test_visual_review_must_cover_every_required_view(self) -> None:
         self.evidence["visual-review"]["reviewedAssets"].remove("Preview/back.png")
         _, errors = self.validate()
-        self.assertIn(
-            "visual-review: reviewedAssets.required:Preview/back.png", errors
-        )
+        self.assertIn("visual-review: reviewedAssets.required:Preview/back.png", errors)
 
     def test_unresolved_major_defect_blocks_release(self) -> None:
         self.evidence["visual-review"]["defects"] = [

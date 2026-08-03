@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Execute Blender and Unity checks and materialize a technical candidate."""
+
 from __future__ import annotations
 
 import os
@@ -164,9 +165,7 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             and unity_report.get("modularAvatarValidated") is True,
             "exitCode": unity_exit,
             "toolchainValidated": unity_report.get("toolchainValidated") is True,
-            "modularAvatarValidated": unity_report.get(
-                "modularAvatarValidated"
-            )
+            "modularAvatarValidated": unity_report.get("modularAvatarValidated")
             is True,
         }
     else:
@@ -177,9 +176,7 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
         write(artifact / "toolchain-resolved.json", resolved_toolchain)
         stages["toolchainResolved"] = {
             "passed": resolved_toolchain.get("passed") is True,
-            "unityPackageLockPresent": resolved_toolchain.get(
-                "unityPackageLockPresent"
-            )
+            "unityPackageLockPresent": resolved_toolchain.get("unityPackageLockPresent")
             is True,
             "errors": resolved_toolchain.get("errors", []),
         }
@@ -197,9 +194,7 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
         copied = []
         for source in candidate_files(job, policy):
             destination = (
-                candidate
-                / "UnityAssets"
-                / source.relative_to(ROOT / "Assets")
+                candidate / "UnityAssets" / source.relative_to(ROOT / "Assets")
             )
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination)
@@ -240,9 +235,7 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             "releaseEligible": False,
             "stages": stages,
             "candidateManifest": (
-                rel(candidate_manifest)
-                if candidate_manifest.is_file()
-                else None
+                rel(candidate_manifest) if candidate_manifest.is_file() else None
             ),
             "candidateManifestSha256": digest(candidate_manifest)
             if candidate_manifest.is_file()

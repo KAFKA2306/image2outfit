@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Stable facade for candidate and release orchestration."""
+
 from __future__ import annotations
 
 import argparse
@@ -23,8 +24,7 @@ __all__ = [
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Transactional, research-bound customer-quality gate "
-            "for image2outfit"
+            "Transactional, research-bound customer-quality gate for image2outfit"
         )
     )
     parser.add_argument("--mode", choices=("candidate", "release"), required=True)

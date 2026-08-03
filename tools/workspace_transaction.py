@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Crash-recoverable snapshot of one canonical product workspace."""
+
 from __future__ import annotations
 
 import shutil
@@ -54,9 +55,7 @@ class WorkspaceSnapshot:
             if self.backup.exists():
                 shutil.rmtree(self.backup)
         else:
-            raise RuntimeError(
-                f"unknown workspace transaction phase: {phase!r}"
-            )
+            raise RuntimeError(f"unknown workspace transaction phase: {phase!r}")
         self.journal.unlink(missing_ok=True)
 
     def begin(self) -> bool:
@@ -84,9 +83,7 @@ class WorkspaceSnapshot:
     def commit(self, had_original: bool) -> None:
         if not self.target.exists():
             self.rollback(had_original)
-            raise RuntimeError(
-                f"canonical workspace disappeared: {self.target}"
-            )
+            raise RuntimeError(f"canonical workspace disappeared: {self.target}")
         self._write("COMMITTING", had_original)
         if self.backup.exists():
             shutil.rmtree(self.backup)

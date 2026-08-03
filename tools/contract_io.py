@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Small, dependency-free JSON, path, hash, and schema helpers."""
+
 from __future__ import annotations
 
 import hashlib
@@ -12,9 +13,7 @@ from urllib.parse import urlparse
 
 PRODUCT_ID = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
-STABLE_SCRIPT = re.compile(
-    r"(?:^|_)(?:v\d+|entry|refit|legacy)(?:_|$)", re.IGNORECASE
-)
+STABLE_SCRIPT = re.compile(r"(?:^|_)(?:v\d+|entry|refit|legacy)(?:_|$)", re.IGNORECASE)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -66,8 +65,9 @@ def validate_json_schema(
         "array": lambda item: isinstance(item, list),
         "string": lambda item: isinstance(item, str),
         "integer": lambda item: isinstance(item, int) and not isinstance(item, bool),
-        "number": lambda item: isinstance(item, (int, float))
-        and not isinstance(item, bool),
+        "number": lambda item: (
+            isinstance(item, (int, float)) and not isinstance(item, bool)
+        ),
         "boolean": lambda item: isinstance(item, bool),
         "null": lambda item: item is None,
     }
@@ -111,9 +111,7 @@ def validate_json_schema(
         for name, item in value.items():
             child_path = f"{path}.{name}"
             if name in properties:
-                errors.extend(
-                    validate_json_schema(item, properties[name], child_path)
-                )
+                errors.extend(validate_json_schema(item, properties[name], child_path))
             elif additional is False:
                 errors.append(f"{child_path} is not allowed")
             elif isinstance(additional, dict):
@@ -137,20 +135,16 @@ def canonical_manifest_path(product_id: str) -> str:
     return f"{canonical_product_root(product_id)}/ProductManifest.json"
 
 
-def required_pose_paths(
-    job: dict[str, Any], policy: dict[str, Any]
-) -> dict[str, str]:
+def required_pose_paths(job: dict[str, Any], policy: dict[str, Any]) -> dict[str, str]:
     product_root = str(job.get("productRoot", ""))
     poses = policy.get("requiredPoses")
-    if not isinstance(poses, list) or not poses or not all(
-        isinstance(value, str) and value for value in poses
+    if (
+        not isinstance(poses, list)
+        or not poses
+        or not all(isinstance(value, str) and value for value in poses)
     ):
-        raise ValueError(
-            "release-policy.requiredPoses must be a non-empty string list"
-        )
-    return {
-        pose: f"{product_root}/Previews/Poses/{pose}.png" for pose in poses
-    }
+        raise ValueError("release-policy.requiredPoses must be a non-empty string list")
+    return {pose: f"{product_root}/Previews/Poses/{pose}.png" for pose in poses}
 
 
 def valid_review_reference(value: Any, allowed_hosts: set[str]) -> bool:
@@ -161,8 +155,5 @@ def valid_review_reference(value: Any, allowed_hosts: set[str]) -> bool:
         parsed.scheme == "https"
         and parsed.hostname in allowed_hosts
         and "/pull/" in parsed.path
-        and (
-            "pullrequestreview-" in parsed.fragment
-            or "/reviews/" in parsed.path
-        )
+        and ("pullrequestreview-" in parsed.fragment or "/reviews/" in parsed.path)
     )
