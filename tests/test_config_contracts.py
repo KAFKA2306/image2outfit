@@ -50,9 +50,9 @@ class ConfigContractTest(unittest.TestCase):
 
     def test_construction_contract_schema_is_closed(self) -> None:
         schema = json.loads(
-            (ROOT / "config" / "construction.schema.v1.json").read_text(
-                encoding="utf-8"
-            )
+            (
+                ROOT / "config" / "products" / "construction.schema.v1.json"
+            ).read_text(encoding="utf-8")
         )
         self.assertIs(schema["additionalProperties"], False)
         self.assertEqual(
