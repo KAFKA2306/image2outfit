@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Render and audit the required SiroinoSotai_PC fit-pose suite."""
+
 from __future__ import annotations
 
 import argparse
@@ -196,8 +197,7 @@ def update_manifest(
             if result["triangleOverlapPairs"] > 0
         ],
         "totalTriangleOverlapPairs": sum(
-            result["triangleOverlapPairs"]
-            for result in fit_audit["poses"].values()
+            result["triangleOverlapPairs"] for result in fit_audit["poses"].values()
         ),
     }
     manifest_path.write_text(
@@ -218,9 +218,7 @@ def main() -> int:
         for obj in bpy.context.scene.objects
         if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
     )
-    armature = next(
-        obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"
-    )
+    armature = next(obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE")
     garments = [
         obj
         for obj in bpy.context.scene.objects

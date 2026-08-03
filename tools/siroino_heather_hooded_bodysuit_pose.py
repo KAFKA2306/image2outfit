@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Render required and diagnostic SiroinoSotai_PC fit poses for the heather suit."""
+
 from __future__ import annotations
 
 import json

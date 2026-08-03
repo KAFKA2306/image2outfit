@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Stable product entrypoint for the Siroino heather hooded bodysuit."""
+
 from __future__ import annotations
 
 import json
@@ -58,7 +59,9 @@ def normalize_four_influences(
                 for item in list(vertex.groups)
                 if item.weight > 1e-10
             ]
-            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[:maximum]
+            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[
+                :maximum
+            ]
             if not ranked:
                 ranked = [(fallback.name, 1.0)]
             total = sum(weight for _, weight in ranked)
@@ -125,7 +128,12 @@ def enforce_manifest_contract(original):
         )
 
         report_path = (
-            root / ".image2outfit" / "products" / job["id"] / "reports" / "product-build-report.json"
+            root
+            / ".image2outfit"
+            / "products"
+            / job["id"]
+            / "reports"
+            / "product-build-report.json"
         )
         if report_path.is_file():
             report = json.loads(report_path.read_text(encoding="utf-8"))
@@ -158,7 +166,9 @@ def enforce_manifest_contract(original):
                 },
             ]
             existing = {item.get("revision") for item in rejected}
-            rejected.extend(item for item in failures if item["revision"] not in existing)
+            rejected.extend(
+                item for item in failures if item["revision"] not in existing
+            )
             report_path.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Continuous sampled-pattern v9 for the Siroino heather hooded bodysuit."""
+
 from __future__ import annotations
 
 import math
@@ -76,8 +77,7 @@ class SurfaceSampler:
 
     def side_y(self, x: float, z: float) -> float:
         return 0.5 * (
-            self.sample(x, z, front=True).y
-            + self.sample(x, z, front=False).y
+            self.sample(x, z, front=True).y + self.sample(x, z, front=False).y
         )
 
 
@@ -286,12 +286,8 @@ def _copy_sleeve_shell(
         center = body.matrix_world @ polygon.center
         upper_distance, upper_t = _segment_distance(center, upper_start, upper_end)
         lower_distance, lower_t = _segment_distance(center, lower_start, lower_end)
-        if (
-            upper_distance <= 0.060
-            and 0.075 <= upper_t <= 1.0
-        ) or (
-            lower_distance <= 0.053
-            and lower_t <= 0.84
+        if (upper_distance <= 0.060 and 0.075 <= upper_t <= 1.0) or (
+            lower_distance <= 0.053 and lower_t <= 0.84
         ):
             selected.append(polygon)
     if not selected:

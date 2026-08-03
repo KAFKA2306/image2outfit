@@ -5,6 +5,7 @@ The v9 interpolated grids produced disconnected shoulder, waist and crotch edges
 This revision derives the torso and high-cut panels from the tracked
 SiroinoSotai_PC body topology, retaining source UVs and skin weights.
 """
+
 from __future__ import annotations
 
 from collections.abc import Callable
