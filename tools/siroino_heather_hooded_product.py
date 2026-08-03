@@ -13,10 +13,19 @@ if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
 import siroino_heather_hooded_bodysuit_build as build
-import siroino_heather_hooded_pattern as pattern
+import siroino_heather_hooded_pattern_v10 as pattern
 
-DESIGN_REVISION = "v9-continuous-interpolation-fitted-cuffs"
+DESIGN_REVISION = "v10-body-topology-continuous-panels"
 ACTUAL_SEPARATE_GEOMETRY = [
+    "Heather_Front_Body_Panel",
+    "Heather_Back_Body_Panel",
+    "Heather_Long_Sleeve_L",
+    "Heather_Long_Sleeve_R",
+    "Heather_Rib_Cuff_L",
+    "Heather_Rib_Cuff_R",
+    "Heather_Hood_Outer_L",
+    "Heather_Hood_Outer_R",
+    "Heather_Hood_Neck_Band",
     "Heather_Henley_Placket",
     "Heather_Henley_Button_01",
     "Heather_Henley_Button_02",
@@ -79,8 +88,8 @@ def preserve_authored_weights(
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "nearest tracked SiroinoSotai_PC weights for continuous sampled panels and accessories; "
-            "direct source-vertex weights for fitted sleeves; explicit lower-arm/hand weights for cuffs"
+            "direct tracked SiroinoSotai_PC topology, UVs and normalized source skin weights "
+            "for front/back body panels and sleeves; explicit lower-arm/hand weights for cuffs"
         ),
         "rebound": False,
     }
@@ -139,6 +148,14 @@ def enforce_manifest_contract(original):
                         "7133 garment/body triangle overlap pairs across six poses"
                     ),
                 },
+                {
+                    "revision": "v9-continuous-interpolation-fitted-cuffs",
+                    "reason": (
+                        "actual hosted five-view inspection found detached plate-like torso panels, "
+                        "large shoulder/underarm gaps, rigid waist fins, a broken crotch strip and a "
+                        "floating hood; the 30 mm sampled-surface offset was unsuitable for a fitted bodysuit"
+                    ),
+                },
             ]
             existing = {item.get("revision") for item in rejected}
             rejected.extend(item for item in failures if item["revision"] not in existing)
@@ -153,6 +170,10 @@ def enforce_manifest_contract(original):
 
 def update_panel_object_contract() -> None:
     replacements = {
+        "Heather_Front_Upper_Panel": "Heather_Front_Body_Panel",
+        "Heather_Back_Upper_Panel": "Heather_Back_Body_Panel",
+        "Heather_Highcut_Front_Panel": "Heather_Front_Body_Panel",
+        "Heather_Highcut_Back_Panel": "Heather_Back_Body_Panel",
         "Heather_Hood_Back_Drape_L": "Heather_Hood_Outer_L",
         "Heather_Hood_Back_Drape_R": "Heather_Hood_Outer_R",
         "Heather_Hood_Cowl": "Heather_Hood_Neck_Band",
