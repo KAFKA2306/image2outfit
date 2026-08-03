@@ -14,9 +14,9 @@ PATTERN_PATH = ROOT / "tools" / "siroino_heather_hooded_pattern_v10.py"
 class GarmentGeometryPolicyTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.policy = tomllib.loads(POLICY_PATH.read_text(encoding="utf-8"))[
-            "tool"
-        ]["image2outfit"]["garment-geometry"]
+        cls.policy = tomllib.loads(POLICY_PATH.read_text(encoding="utf-8"))["tool"][
+            "image2outfit"
+        ]["garment-geometry"]
         cls.source = PATTERN_PATH.read_text(encoding="utf-8")
         cls.tree = ast.parse(cls.source, filename=str(PATTERN_PATH))
 
