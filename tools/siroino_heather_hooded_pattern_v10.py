@@ -14,6 +14,10 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
+# Preserve the geometry-module interface expected by the generic product build.
+clean_meshes = v9.clean_meshes
+bone_segment = v9.bone_segment
+
 
 def _body_panel(
     name: str,
