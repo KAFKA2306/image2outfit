@@ -15,34 +15,60 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  format:
-    if: github.actor != 'github-actions[bot]'
+  quality:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.head_ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
         with:
           version: '0.11.32'
-      - name: Format and commit changed Python files
+          enable-cache: true
+
+      - name: Verify lock and compile
+        run: |
+          uv lock --check
+          uv run --locked --no-default-groups python -m compileall -q tools tests
+
+      - name: Run all repository audits
+        run: uv run --locked --no-default-groups python tools/manage.py audit all
+
+      - name: Run all unit tests
+        run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
+
+      - name: Resolve changed Python files
+        id: changed-python
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin "${{ github.base_ref }}"
-          mapfile -t files < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD" -- '*.py')
-          if [ "${#files[@]}" -eq 0 ]; then exit 0; fi
-          uv run --locked --no-default-groups --group dev ruff format "${files[@]}"
-          if git diff --quiet -- "${files[@]}"; then exit 0; fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -- "${files[@]}"
-          git commit -m 'Apply canonical Ruff formatting'
-          git push origin "HEAD:${{ github.head_ref }}"
+          base_ref="${{ github.base_ref }}"
+          if [ -z "$base_ref" ]; then base_ref=main; fi
+          git diff --name-only "origin/$base_ref...HEAD" -- '*.py' > /tmp/changed-python.txt
+          cat /tmp/changed-python.txt
+          {
+            echo 'files<<EOF'
+            cat /tmp/changed-python.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run stable Ruff lint on this change
+        if: steps.changed-python.outputs.files != ''
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/changed-python.txt
+          uv run --locked --no-default-groups --group dev ruff check \
+            --select E4,E7,E9,F --ignore E402 "${files[@]}"
+
+      - name: Verify Ruff formatting
+        if: steps.changed-python.outputs.files != ''
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/changed-python.txt
+          uv run --locked --no-default-groups --group dev ruff format --check "${files[@]}"
