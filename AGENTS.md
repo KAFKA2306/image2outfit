@@ -28,6 +28,7 @@ Mutable decisions have one owner.
 - `config/job.schema.v2.json` — allowed job fields and types. Unknown job fields are errors.
 - `config/products/<slug>/construction.json` — the construction profile explicitly adopted by the product.
 - `config/products/construction.schema.v1.json` — allowed construction-contract fields and types.
+- `config/genworks-handoff-policy.json` — repository merge, checkpoint, technical-ready, and release boundary.
 - `config/release-policy.json` — required views, required poses, evidence kinds, metrics, and release thresholds.
 - `Assets/GenWorks/<slug>/ProductManifest.json` — current state, gates, defects, hashes, and continuation point.
 - `tools/production_contract.py` — shared job, construction, product-state, and hashed-artifact validation.
@@ -108,13 +109,13 @@ task explain PRODUCT=<slug>
 task candidate PRODUCT=<slug>
 ```
 
-The candidate workflow must:
+The full candidate workflow must:
 
 1. fully validate the closed job schema and construction schema;
 2. bind the declared construction profile to current policy and research coverage;
 3. snapshot the canonical `Assets/GenWorks/<slug>/` workspace before generation;
 4. protect previous derived candidate and release state;
-5. run Blender, FBX, Unity import/save/reload, Modular Avatar／NDMF, preview, and applicable technical checks;
+5. run Blender, FBX, Unity import/save/reload, Modular Avatar／NDMF, preview, and applicable technical checks when those tools are available;
 6. reject explicit technical `FAIL` or fit-audit failure recorded in `ProductManifest.json`;
 7. verify every required view and every policy-required pose;
 8. reject duplicate pose images used as evidence for multiple poses;
@@ -122,6 +123,16 @@ The candidate workflow must:
 10. restore the last-good canonical workspace and previous candidate when any required stage fails.
 
 A candidate result is `REVIEW_REQUIRED`, not release approval.
+
+## Repository merge boundary
+
+Repository merge and customer release are separate gates.
+
+A garment checkpoint may be merged to `main` without Unity when every item in `requiredMergeCheckpointGates` from `config/genworks-handoff-policy.json` is verified. The checkpoint must include the editable Blender source, FBX, declared Unity Prefab assets, current five-view evidence, required pose evidence, and the recorded research trial. It must remain truthfully marked `WORKING`, and Unity, Modular Avatar／NDMF, VRChat runtime, and human runtime review must remain explicitly pending.
+
+Missing Unity is therefore not a repository-merge blocker. It is a blocker for `TECHNICAL_READY`, `HUMAN_REVIEW_PENDING`, `GO`, `RELEASED`, customer delivery, and any claim that the Prefab works in Unity or VRChat.
+
+Do not merge when a pre-Unity gate fails, current renders visibly fail the requested checkpoint acceptance criteria, evidence is stale or missing, or the canonical workspace would regress. Do not invent Unity results merely to advance lifecycle status.
 
 ## Human evidence and release workflow
 
@@ -159,7 +170,7 @@ Do not use `GO`, `RELEASED`, `complete`, or `production-ready` unless the exact 
 
 ## Visual inspection
 
-Garment work is not complete without opening the current evidence:
+Garment checkpoint work is not mergeable without opening the current pre-Unity evidence:
 
 - front;
 - back;
@@ -167,8 +178,9 @@ Garment work is not complete without opening the current evidence:
 - right;
 - three-quarter;
 - combined multiview;
-- every required pose;
-- Unity or VRChat runtime screenshot when required.
+- every required pose.
+
+Unity or VRChat runtime screenshots are additionally required for technical-ready and release states, but not for a truthfully labelled pre-Unity `WORKING` merge.
 
 File existence, dimensions, hashes, CI success, or another agent's text is not visual inspection. Reject or iterate on body penetration, clipping, detached geometry, wrong scale, broken silhouette, extreme vertices, UV stretching, visible seams, normal errors, material defects, floating hardware, broken weights, pose failure, or runtime failure.
 
@@ -186,9 +198,9 @@ task audit:research
 task check:python
 ```
 
-For product changes, also run the product candidate workflow and inspect the generated images. For release changes, test both rejection and successful packaging paths.
+For product changes, run every available pre-Unity build and evidence check and inspect the generated images. Run the full product candidate workflow when Unity is available. For release changes, test both rejection and successful packaging paths.
 
-If Blender, Unity, a private avatar, or VRChat runtime is unavailable, report the exact unverified boundary. Never invent a PASS.
+If Blender, Unity, a private avatar, or VRChat runtime is unavailable, report the exact unverified boundary. Never invent a PASS. Unity absence does not block a `WORKING` merge when the machine-readable pre-Unity merge contract passes.
 
 ## GitHub Actions
 
@@ -211,12 +223,13 @@ On generation, migration, validation, or release failure:
 - Use one short-lived branch per coherent change, or continue the current branch for the same workstream.
 - Commit only intended files.
 - Push the branch and open a PR describing root cause, behavior change, impact, and validation.
-- Merge only after required checks pass and the intended canonical state is present.
+- A truthfully labelled `WORKING` garment checkpoint may merge after the pre-Unity merge contract passes; Unity is required only for later lifecycle states and release.
+- Merge only after the required gates for the claimed lifecycle state pass and the intended canonical state is present.
 - Verify the resulting `main` contains the merged change.
 - Delete the merged, closed, or superseded branch.
 - Close superseded PRs with an explicit successor link.
 
-Commit, push, or PR creation is not completion. Completion means merged into verified `main` and the work branch removed.
+Commit, push, or PR creation is not completion. Completion of repository integration means merged into verified `main` and the work branch removed. Product release remains a separate later condition.
 
 ## Final response contract
 
