@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Render and audit the required SiroinoSotai_PC fit-pose suite."""
+
 from __future__ import annotations
 
 import argparse
@@ -20,7 +21,7 @@ import siroino_required_pose_render as generic
 import siroino_strappy_knit_build as common
 
 ROOT = Path(__file__).resolve().parents[1]
-POSES = ("neutral", "arms-up", "forward-bend", "legs-apart", "walk", "crouch")
+POSES = ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone")
 
 
 def args() -> argparse.Namespace:
@@ -69,29 +70,12 @@ def apply_pose(
         rotate(armature, "UpperArm_R", (-112.0, 0.0, 8.0))
         rotate(armature, "LowerArm_L", (-7.0, 0.0, 0.0))
         rotate(armature, "LowerArm_R", (-7.0, 0.0, 0.0))
-    elif name == "forward-bend":
-        rotate(armature, "Spine", (28.0, 0.0, 0.0))
-        rotate(armature, "Chest", (24.0, 0.0, 0.0))
-        rotate(armature, "UpperLeg_L", (-8.0, 0.0, 0.0))
-        rotate(armature, "UpperLeg_R", (-8.0, 0.0, 0.0))
-        rotate(armature, "UpperArm_L", (-18.0, 0.0, -10.0))
-        rotate(armature, "UpperArm_R", (-18.0, 0.0, 10.0))
-    elif name == "legs-apart":
-        rotate(armature, "UpperLeg_L", (0.0, 0.0, 25.0))
-        rotate(armature, "UpperLeg_R", (0.0, 0.0, -25.0))
-        rotate(armature, "LowerLeg_L", (-8.0, 0.0, 0.0))
-        rotate(armature, "LowerLeg_R", (-8.0, 0.0, 0.0))
-        rotate(armature, "UpperArm_L", (-18.0, 0.0, -14.0))
-        rotate(armature, "UpperArm_R", (-18.0, 0.0, 14.0))
-    elif name == "walk":
-        rotate(armature, "UpperLeg_L", (30.0, 0.0, 1.0))
-        rotate(armature, "LowerLeg_L", (-42.0, 0.0, 0.0))
-        rotate(armature, "UpperLeg_R", (-24.0, 0.0, -1.0))
-        rotate(armature, "LowerLeg_R", (12.0, 0.0, 0.0))
-        rotate(armature, "UpperArm_L", (-30.0, 0.0, -5.0))
-        rotate(armature, "UpperArm_R", (25.0, 0.0, 5.0))
-        rotate(armature, "LowerArm_L", (-18.0, 0.0, 0.0))
-        rotate(armature, "LowerArm_R", (-28.0, 0.0, 0.0))
+    elif name == "arm-cross":
+        rotate(armature, "UpperArm_L", (-42.0, 18.0, -54.0))
+        rotate(armature, "UpperArm_R", (-42.0, -18.0, 54.0))
+        rotate(armature, "LowerArm_L", (-82.0, 0.0, 16.0))
+        rotate(armature, "LowerArm_R", (-82.0, 0.0, -16.0))
+        rotate(armature, "Chest", (5.0, 0.0, 0.0))
     elif name == "crouch":
         rotate(armature, "UpperLeg_L", (48.0, 0.0, 7.0))
         rotate(armature, "UpperLeg_R", (48.0, 0.0, -7.0))
@@ -101,6 +85,29 @@ def apply_pose(
         hips = armature.pose.bones.get("Hips")
         if hips is not None:
             hips.location.z = -0.10
+    elif name == "sit":
+        rotate(armature, "UpperLeg_L", (78.0, 0.0, 4.0))
+        rotate(armature, "UpperLeg_R", (78.0, 0.0, -4.0))
+        rotate(armature, "LowerLeg_L", (-82.0, 0.0, 0.0))
+        rotate(armature, "LowerLeg_R", (-82.0, 0.0, 0.0))
+        rotate(armature, "Spine", (9.0, 0.0, 0.0))
+        rotate(armature, "Chest", (7.0, 0.0, 0.0))
+        rotate(armature, "UpperArm_L", (-18.0, 0.0, -14.0))
+        rotate(armature, "UpperArm_R", (-18.0, 0.0, 14.0))
+        hips = armature.pose.bones.get("Hips")
+        if hips is not None:
+            hips.location.z = -0.17
+    elif name == "prone":
+        armature.rotation_euler.x += math.radians(78.0)
+        armature.location.z += 0.46
+        rotate(armature, "Spine", (12.0, 0.0, 0.0))
+        rotate(armature, "Chest", (15.0, 0.0, 0.0))
+        rotate(armature, "UpperArm_L", (-126.0, 0.0, -16.0))
+        rotate(armature, "UpperArm_R", (-126.0, 0.0, 16.0))
+        rotate(armature, "LowerArm_L", (-18.0, 0.0, 0.0))
+        rotate(armature, "LowerArm_R", (-18.0, 0.0, 0.0))
+        rotate(armature, "UpperLeg_L", (-8.0, 0.0, 3.0))
+        rotate(armature, "UpperLeg_R", (-8.0, 0.0, -3.0))
     bpy.context.view_layer.update()
 
 
@@ -109,10 +116,10 @@ def zone_for_object(name: str) -> list[str]:
         return ["shoulder", "underarm", "elbow", "wrist"]
     if "Cuff" in name:
         return ["wrist"]
-    if "Front_Upper" in name:
-        return ["chest", "underarm", "abdomen"]
-    if "Back_Upper" in name:
-        return ["shoulder", "underarm", "back"]
+    if "Front_Body" in name or "Front_Upper" in name:
+        return ["chest", "underarm", "abdomen", "hip-crest", "groin"]
+    if "Back_Body" in name or "Back_Upper" in name:
+        return ["shoulder", "underarm", "back", "hip-crest", "buttocks", "groin"]
     if "Highcut_Front" in name:
         return ["abdomen", "hip-crest", "groin", "inner-thigh", "leg-root"]
     if "Highcut_Back" in name:
@@ -259,10 +266,10 @@ def main() -> int:
     camera_settings = {
         "neutral": ((1.62, -1.90, 0.64), (0.0, 0.0, 0.40), 1.23),
         "arms-up": ((1.62, -1.90, 0.68), (0.0, 0.0, 0.44), 1.30),
-        "forward-bend": ((1.65, -1.96, 0.62), (0.0, 0.0, 0.39), 1.30),
-        "legs-apart": ((1.68, -1.98, 0.55), (0.0, 0.0, 0.34), 1.34),
-        "walk": ((1.66, -1.98, 0.57), (0.0, 0.0, 0.35), 1.31),
+        "arm-cross": ((1.55, -1.86, 0.66), (0.0, 0.0, 0.43), 1.23),
         "crouch": ((1.72, -2.05, 0.46), (0.0, 0.0, 0.31), 1.28),
+        "sit": ((1.72, -2.04, 0.42), (0.0, 0.0, 0.28), 1.28),
+        "prone": ((1.75, -2.10, 0.50), (0.0, 0.0, 0.43), 1.34),
     }
 
     paths: dict[str, Path] = {}
