@@ -11,7 +11,7 @@ Blenderで衣装を制作し、FBX、Unity Prefab、Modular Avatar／NDMF、実�
 | 製品ID、入力、正規出力 | `config/products/<slug>/job.json` |
 | jobの型・許可フィールド | `config/job.schema.v2.json` |
 | 衣装構築方式 | `config/products/<slug>/construction.json` |
-| 構築方式の型 | `config/construction.schema.v1.json` |
+| 構築方式の型 | `config/products/construction.schema.v1.json` |
 | 必須ビュー、必須ポーズ、品質閾値 | `config/release-policy.json` |
 | 現在の製品状態、失敗、再開地点 | `Assets/GenWorks/<slug>/ProductManifest.json` |
 | 顧客品質の最終判定 | `tools/customer_quality.py` |
