@@ -27,7 +27,7 @@ Mutable decisions have one owner.
 - `config/products/<slug>/job.json` — product identity, inputs, canonical outputs, delivery files, and evidence locations.
 - `config/job.schema.v2.json` — allowed job fields and types. Unknown job fields are errors.
 - `config/products/<slug>/construction.json` — the construction profile explicitly adopted by the product.
-- `config/construction.schema.v1.json` — allowed construction-contract fields and types.
+- `config/products/construction.schema.v1.json` — allowed construction-contract fields and types.
 - `config/release-policy.json` — required views, required poses, evidence kinds, metrics, and release thresholds.
 - `Assets/GenWorks/<slug>/ProductManifest.json` — current state, gates, defects, hashes, and continuation point.
 - `tools/production_contract.py` — shared job, construction, product-state, and hashed-artifact validation.
@@ -189,6 +189,10 @@ task check:python
 For product changes, also run the product candidate workflow and inspect the generated images. For release changes, test both rejection and successful packaging paths.
 
 If Blender, Unity, a private avatar, or VRChat runtime is unavailable, report the exact unverified boundary. Never invent a PASS.
+
+## GitHub Actions
+
+Read-only workflow jobs use `contents: read`. Request write permissions only for the narrow mutation that requires them. CI artifacts may carry reports and generated candidates, but they are not the sole resumable checkpoint.
 
 ## Failure recovery
 
