@@ -7,6 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any, Callable
 
+import production_contract as contract
+
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 
@@ -39,7 +41,9 @@ def _candidate_path(value: Any) -> str | None:
     return path.as_posix()
 
 
-def _candidate_index(manifest: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+def _candidate_index(
+    manifest: dict[str, Any],
+) -> tuple[dict[str, dict[str, Any]], list[str]]:
     result: dict[str, dict[str, Any]] = {}
     errors: list[str] = []
     files = manifest.get("files")
@@ -79,6 +83,8 @@ def _reviewed_assets(
         if name is None:
             failures.append(f"reviewedAssets[{index}]")
             continue
+        if name in normalized:
+            failures.append(f"reviewedAssets.duplicate:{name}")
         normalized.add(name)
         if name not in candidate_files:
             failures.append(f"reviewedAssets.missing:{name}")
@@ -90,7 +96,7 @@ def _reviewed_assets(
 
 def _defects(
     evidence: dict[str, Any],
-    contract: dict[str, Any],
+    common: dict[str, Any],
     candidate_files: dict[str, dict[str, Any]],
 ) -> tuple[list[str], list[dict[str, Any]]]:
     failures: list[str] = []
@@ -99,11 +105,11 @@ def _defects(
     if not isinstance(defects, list):
         return ["defects"], blocking
 
-    severities = set(contract.get("allowedDefectSeverities", []))
-    statuses = set(contract.get("allowedDefectStatuses", []))
-    blocking_severities = set(contract.get("blockingDefectSeverities", []))
-    closed_statuses = set(contract.get("closedDefectStatuses", []))
-    accepted_status = contract.get("acceptedDefectStatus")
+    severities = set(common.get("allowedDefectSeverities", []))
+    statuses = set(common.get("allowedDefectStatuses", []))
+    blocking_severities = set(common.get("blockingDefectSeverities", []))
+    closed_statuses = set(common.get("closedDefectStatuses", []))
+    accepted_status = common.get("acceptedDefectStatus")
 
     seen: set[str] = set()
     for index, defect in enumerate(defects):
@@ -175,7 +181,9 @@ def validate(
     forbidden_reviewers = {
         str(value).strip().lower() for value in common.get("forbiddenReviewers", [])
     }
+    allowed_reference_hosts = set(common.get("reviewerReferenceHosts", ["github.com"]))
     required_kinds = policy.get("requiredHumanEvidenceKinds", [])
+    common_required = contracts.get("commonRequiredFields", [])
 
     for kind in required_kinds:
         item_failures: list[str] = []
@@ -184,14 +192,20 @@ def validate(
         if not isinstance(value, dict):
             value = {}
 
+        for field in common_required:
+            if field not in value:
+                item_failures.append(field)
+
         checked_at = _utc(value.get("checkedAt"))
         reviewer = value.get("reviewer")
         common_checks = {
-            "schemaVersion": value.get("schemaVersion") == contracts.get("schemaVersion"),
+            "schemaVersion": value.get("schemaVersion")
+            == contracts.get("schemaVersion"),
             "kind": value.get("kind") == kind,
             "jobId": value.get("jobId") == job.get("id"),
             "adapterId": value.get("adapterId") == job.get("adapterId"),
-            "candidateManifestSha256": value.get("candidateManifestSha256") == candidate_hash,
+            "candidateManifestSha256": value.get("candidateManifestSha256")
+            == candidate_hash,
             "status": value.get("status") == contracts.get("passStatus"),
             "checkedAt": checked_at is not None,
             "checkedAfterCandidate": checked_at is not None
@@ -200,14 +214,19 @@ def validate(
             "reviewer": _text(reviewer)
             and reviewer.startswith(reviewer_prefix)
             and reviewer.strip().lower() not in forbidden_reviewers,
+            "reviewerReference": contract.valid_review_reference(
+                value.get("reviewerReference"), allowed_reference_hosts
+            ),
         }
-        item_failures.extend(name for name, passed in common_checks.items() if not passed)
+        item_failures.extend(
+            name for name, passed in common_checks.items() if not passed
+        )
 
-        contract = contracts.get(kind)
-        if not isinstance(contract, dict):
+        evidence_contract = contracts.get(kind)
+        if not isinstance(evidence_contract, dict):
             item_failures.append("contract")
-            contract = {}
-        for field in contract.get("requiredFields", []):
+            evidence_contract = {}
+        for field in evidence_contract.get("requiredFields", []):
             if field not in value:
                 item_failures.append(field)
 
@@ -220,26 +239,26 @@ def validate(
             if not isinstance(scores, dict):
                 item_failures.append("scores")
                 scores = {}
-            for field in contract.get("scoreFields", []):
+            for field in evidence_contract.get("scoreFields", []):
                 score = scores.get(field)
                 if not isinstance(score, (int, float)) or isinstance(score, bool):
                     item_failures.append(f"scores.{field}")
                     continue
                 collected.append(float(score))
-                if score < contract.get("minimumScore", 0):
+                if score < evidence_contract.get("minimumScore", 0):
                     item_failures.append(f"scores.{field}")
-            minimum_average = contract.get("minimumAverageScore", 0)
+            minimum_average = evidence_contract.get("minimumAverageScore", 0)
             if not collected or sum(collected) / len(collected) < minimum_average:
                 item_failures.append("scores.average")
             if value.get("criticalDefects") != 0:
                 item_failures.append("criticalDefects")
-            for field in contract.get("requiredTextFields", []):
+            for field in evidence_contract.get("requiredTextFields", []):
                 if not _text(value.get(field)):
                     item_failures.append(field)
             item_failures.extend(
                 _reviewed_assets(
                     value,
-                    list(contract.get("requiredPreviewAssets", [])),
+                    list(evidence_contract.get("requiredPreviewAssets", [])),
                     candidate_files,
                 )
             )
@@ -254,22 +273,28 @@ def validate(
                 item_failures.append("poseEvidence")
                 pose_evidence = {}
             required_assets: list[str] = []
-            for pose in contract.get("requiredPoses", []):
-                if poses.get(pose) != contract.get("passValue"):
+            seen_pose_assets: set[str] = set()
+            for pose in policy.get("requiredPoses", []):
+                if poses.get(pose) != evidence_contract.get("passValue"):
                     item_failures.append(f"poses.{pose}")
                 name = _candidate_path(pose_evidence.get(pose))
                 if name is None or name not in candidate_files:
                     item_failures.append(f"poseEvidence.{pose}")
+                elif name in seen_pose_assets:
+                    item_failures.append(f"poseEvidence.duplicate:{name}")
                 else:
+                    seen_pose_assets.add(name)
                     required_assets.append(name)
             if value.get("criticalPenetrations") != 0:
                 item_failures.append("criticalPenetrations")
             if not _text(value.get("poseNotes")):
                 item_failures.append("poseNotes")
-            item_failures.extend(_reviewed_assets(value, required_assets, candidate_files))
+            item_failures.extend(
+                _reviewed_assets(value, required_assets, candidate_files)
+            )
 
         elif kind == "vrchat-runtime-review":
-            if value.get("vrchatBuildAndTest") != contract.get("passValue"):
+            if value.get("vrchatBuildAndTest") != evidence_contract.get("passValue"):
                 item_failures.append("vrchatBuildAndTest")
             if value.get("testedInVRChat") is not True:
                 item_failures.append("testedInVRChat")
@@ -283,8 +308,8 @@ def validate(
             if not isinstance(acceptance, dict):
                 item_failures.append("customerAcceptance")
                 acceptance = {}
-            for field in contract.get("customerAcceptanceFields", []):
-                if acceptance.get(field) != contract.get("passValue"):
+            for field in evidence_contract.get("customerAcceptanceFields", []):
+                if acceptance.get(field) != evidence_contract.get("passValue"):
                     item_failures.append(f"customerAcceptance.{field}")
 
             screenshot = value.get("runtimeScreenshot")
@@ -295,9 +320,9 @@ def validate(
                 try:
                     screenshot_path = resolve_repo_path(screenshot)
                     width, height = png_size(screenshot_path)
-                    if width < contract.get("minimumScreenshotWidth", 0):
+                    if width < evidence_contract.get("minimumScreenshotWidth", 0):
                         item_failures.append("runtimeScreenshot.width")
-                    if height < contract.get("minimumScreenshotHeight", 0):
+                    if height < evidence_contract.get("minimumScreenshotHeight", 0):
                         item_failures.append("runtimeScreenshot.height")
                     if not _SHA256.fullmatch(str(screenshot_hash or "")):
                         item_failures.append("runtimeScreenshotSha256")
@@ -310,6 +335,12 @@ def validate(
         result[kind] = {
             "passed": not unique,
             "failedFields": unique,
+            "reviewer": value.get("reviewer"),
+            "reviewerReference": value.get("reviewerReference"),
+            "evidenceSha256": digest(resolve_repo_path(job["humanEvidence"][kind]))
+            if kind in job.get("humanEvidence", {})
+            and resolve_repo_path(job["humanEvidence"][kind]).is_file()
+            else None,
             "blockingDefects": [
                 {
                     "id": defect.get("id"),
@@ -321,4 +352,4 @@ def validate(
         }
         errors.extend(f"{kind}: {failure}" for failure in unique)
 
-    return result, errors
+    return result, list(dict.fromkeys(errors))
