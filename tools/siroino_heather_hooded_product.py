@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Stable product entrypoint for the Siroino heather hooded bodysuit."""
+
 from __future__ import annotations
 
 import json
@@ -162,9 +163,7 @@ def enforce_manifest_contract(original):
                     ),
                 },
                 {
-                    "revision": (
-                        "v8-smooth-sampled-panels-distance-field-sleeves"
-                    ),
+                    "revision": ("v8-smooth-sampled-panels-distance-field-sleeves"),
                     "reason": (
                         "actual five-view inspection found discontinuous sampled-panel "
                         "spikes, oversized rectangular cuffs and an inflated spherical "
