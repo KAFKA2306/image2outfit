@@ -22,6 +22,15 @@ class ConfigContractTest(unittest.TestCase):
         )
         self.assertNotIn("primaryAdapterId", policy)
         self.assertIn("haolan-v1.6", policy["blockedReleaseAdapterIds"])
+        self.assertEqual(policy["singleReleaseValidator"], "tools/customer_quality.py")
+        self.assertEqual(
+            policy["requiredPoses"],
+            ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+        )
+        self.assertIn(
+            "reviewerReference",
+            policy["humanEvidenceContracts"]["commonRequiredFields"],
+        )
 
     def test_job_schema_is_the_required_field_source(self) -> None:
         schema = json.loads(
@@ -30,20 +39,40 @@ class ConfigContractTest(unittest.TestCase):
         self.assertEqual(tuple(schema["required"]), gate.required_job_fields())
         self.assertEqual(schema["properties"]["schemaVersion"]["const"], 2)
         self.assertIn("hostedPoseScript", schema["properties"])
+        self.assertIn("productRoot", schema["required"])
+        self.assertIn("productManifestPath", schema["required"])
+        self.assertIs(schema["additionalProperties"], False)
         for field in ("artifactDir", "candidateDir", "releaseDir"):
             self.assertNotIn(field, schema["required"])
             self.assertNotIn(field, schema["properties"])
+
+    def test_construction_contract_schema_is_closed(self) -> None:
+        schema = json.loads(
+            (ROOT / "config" / "products" / "construction.schema.v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertIs(schema["additionalProperties"], False)
+        self.assertEqual(
+            set(schema["required"]), {"schemaVersion", "productId", "profile"}
+        )
 
     def test_product_config_is_namespaced(self) -> None:
         product_id = "siroino-wide-cargo"
         product_config = ROOT / "config" / "products" / product_id
         job_path = product_config / "job.json"
         license_path = product_config / "license.json"
+        construction_path = product_config / "construction.json"
         self.assertTrue(job_path.is_file())
         self.assertTrue(license_path.is_file())
+        self.assertTrue(construction_path.is_file())
         job = json.loads(job_path.read_text(encoding="utf-8"))
+        construction = json.loads(construction_path.read_text(encoding="utf-8"))
         self.assertEqual(job["id"], product_id)
-        self.assertEqual(job["licenseEvidence"], f"config/products/{product_id}/license.json")
+        self.assertEqual(construction["productId"], product_id)
+        self.assertEqual(
+            job["licenseEvidence"], f"config/products/{product_id}/license.json"
+        )
         for field in ("artifactDir", "candidateDir", "releaseDir"):
             self.assertNotIn(field, job)
         self.assertFalse((ROOT / "config" / f"{product_id}-job.json").exists())
@@ -90,6 +119,16 @@ class ConfigContractTest(unittest.TestCase):
         self.assertNotIn("LegacyRoot", source)
         self.assertNotIn("VRCAvatarDescriptor", source)
         self.assertNotIn('OutfitPrefabSegment = "/Prefabs/Outfit/"', source)
+
+    def test_release_gate_contains_no_customer_release_validator(self) -> None:
+        source = (TOOLS / "release_gate.py").read_text(encoding="utf-8")
+        self.assertNotIn("def evidence_gate", source)
+        self.assertNotIn("def run_release", source)
+        core = (TOOLS / "production_gate_core.py").read_text(encoding="utf-8")
+        release = (TOOLS / "release_orchestrator.py").read_text(encoding="utf-8")
+        self.assertNotIn("legacy.run_release", core)
+        self.assertNotIn("legacy.run_release", release)
+        self.assertIn("contract.package_release", release)
 
 
 if __name__ == "__main__":

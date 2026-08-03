@@ -24,14 +24,22 @@ class CustomerQualityTest(unittest.TestCase):
         self.policy = json.loads(
             (ROOT / "config" / "release-policy.json").read_text(encoding="utf-8")
         )
-        self.job = {"id": "test-product", "adapterId": "test-adapter-v1"}
+        self.job = {
+            "id": "test-product",
+            "adapterId": "test-adapter-v1",
+            "humanEvidence": {},
+        }
         self.candidate_files = [
             {"path": f"Preview/{view}.png", "bytes": 24, "sha256": "0" * 64}
             for view in self.policy["minimumPreview"]["requiredViews"]
         ]
         self.candidate_files.extend(
-            {"path": f"Pose/{pose}.png", "bytes": 24, "sha256": "1" * 64}
-            for pose in self.policy["requiredPoses"]
+            {
+                "path": f"Pose/{pose}.png",
+                "bytes": 24,
+                "sha256": f"{index + 1:x}" * 64,
+            }
+            for index, pose in enumerate(self.policy["requiredPoses"])
         )
         self.manifest = {
             "schemaVersion": 2,
@@ -41,7 +49,7 @@ class CustomerQualityTest(unittest.TestCase):
             "createdAt": "2026-08-02T00:00:00Z",
             "files": self.candidate_files,
         }
-        self.candidate_hash = "2" * 64
+        self.candidate_hash = "a" * 64
         runtime = self.root / "Evidence" / "runtime.png"
         runtime.parent.mkdir(parents=True)
         runtime.write_bytes(
@@ -74,15 +82,17 @@ class CustomerQualityTest(unittest.TestCase):
             "status": "PASS",
             "checkedAt": "2026-08-02T00:01:00Z",
             "reviewer": "human:test-reviewer",
+            "reviewerReference": (
+                "https://github.com/KAFKA2306/image2outfit/"
+                "pull/123#pullrequestreview-456"
+            ),
             "defects": [],
         }
         previews = [
             f"Preview/{view}.png"
             for view in self.policy["minimumPreview"]["requiredViews"]
         ]
-        poses = {
-            pose: f"Pose/{pose}.png" for pose in self.policy["requiredPoses"]
-        }
+        poses = {pose: f"Pose/{pose}.png" for pose in self.policy["requiredPoses"]}
         score_fields = self.policy["humanEvidenceContracts"]["visual-review"][
             "scoreFields"
         ]
@@ -93,8 +103,12 @@ class CustomerQualityTest(unittest.TestCase):
                 "scores": {field: 5 for field in score_fields},
                 "criticalDefects": 0,
                 "reviewedAssets": previews,
-                "reviewSummary": "All required views were inspected at full resolution.",
-                "customerUseCase": "VRChat avatar outfit installation and normal social use.",
+                "reviewSummary": (
+                    "All required views were inspected at full resolution."
+                ),
+                "customerUseCase": (
+                    "VRChat avatar outfit installation and normal social use."
+                ),
             },
             "pose-penetration-review": {
                 **common,
@@ -103,7 +117,10 @@ class CustomerQualityTest(unittest.TestCase):
                 "poseEvidence": poses,
                 "criticalPenetrations": 0,
                 "reviewedAssets": list(poses.values()),
-                "poseNotes": "Required motion set shows no blocking penetration or detached parts.",
+                "poseNotes": (
+                    "Required motion set shows no blocking penetration or "
+                    "detached parts."
+                ),
             },
             "vrchat-runtime-review": {
                 **common,
@@ -112,7 +129,9 @@ class CustomerQualityTest(unittest.TestCase):
                 "testedInVRChat": True,
                 "runtimeScreenshot": self.runtime_path,
                 "runtimeScreenshotSha256": self.runtime_hash,
-                "runtimeNotes": "Installed, toggled and exercised in VRChat Build & Test.",
+                "runtimeNotes": (
+                    "Installed, toggled and exercised in VRChat Build & Test."
+                ),
                 "testedPlatform": "Windows PCVR",
                 "installationStepsVerified": True,
                 "customerReady": True,
@@ -144,9 +163,7 @@ class CustomerQualityTest(unittest.TestCase):
     def test_visual_review_must_cover_every_required_view(self) -> None:
         self.evidence["visual-review"]["reviewedAssets"].remove("Preview/back.png")
         _, errors = self.validate()
-        self.assertIn(
-            "visual-review: reviewedAssets.required:Preview/back.png", errors
-        )
+        self.assertIn("visual-review: reviewedAssets.required:Preview/back.png", errors)
 
     def test_unresolved_major_defect_blocks_release(self) -> None:
         self.evidence["visual-review"]["defects"] = [
@@ -171,6 +188,21 @@ class CustomerQualityTest(unittest.TestCase):
         self.evidence["visual-review"]["checkedAt"] = "2026-08-01T23:59:00Z"
         _, errors = self.validate()
         self.assertIn("visual-review: checkedAfterCandidate", errors)
+
+    def test_review_requires_auditable_github_reference(self) -> None:
+        self.evidence["visual-review"]["reviewerReference"] = "manual"
+        _, errors = self.validate()
+        self.assertIn("visual-review: reviewerReference", errors)
+
+    def test_one_image_cannot_prove_two_required_poses(self) -> None:
+        self.evidence["pose-penetration-review"]["poseEvidence"]["sit"] = (
+            "Pose/crouch.png"
+        )
+        _, errors = self.validate()
+        self.assertIn(
+            "pose-penetration-review: poseEvidence.duplicate:Pose/crouch.png",
+            errors,
+        )
 
 
 if __name__ == "__main__":

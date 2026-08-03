@@ -2,7 +2,7 @@ version: '3'
 
 tasks:
   candidate:
-    desc: Build a candidate by product slug after deterministic method selection.
+    desc: Build a candidate after validating its declared construction contract.
     requires:
       vars: [PRODUCT]
     env:
@@ -15,7 +15,7 @@ tasks:
         python tools/manage.py candidate --product "{{.PRODUCT}}"
 
   release:
-    desc: Release only after construction-specific commercial evidence and customer-quality evidence pass.
+    desc: Package the unchanged reviewed candidate through the single customer-quality validator.
     requires:
       vars: [PRODUCT]
     env:
@@ -28,7 +28,7 @@ tasks:
         python tools/manage.py release --product "{{.PRODUCT}}"
 
   explain:
-    desc: Show the selected construction profile, research capabilities, and required evidence.
+    desc: Show the declared construction contract, research capabilities, poses, and required evidence.
     requires:
       vars: [PRODUCT]
     cmds:
@@ -57,7 +57,7 @@ tasks:
       - uv run --no-cache --locked --no-default-groups python tools/manage.py audit tools
 
   audit:methods:
-    desc: Reject missing, ambiguous, or unstable product-to-method selection.
+    desc: Validate every declared construction contract and its research coverage.
     cmds:
       - uv run --no-cache --locked --no-default-groups python tools/manage.py audit methods
 
@@ -98,6 +98,16 @@ tasks:
         tools/manage.py
         tools/method_selection.py
         tools/runtime_paths.py
+        tools/contract_io.py
+        tools/workspace_transaction.py
+        tools/release_packager.py
+        tools/production_contract.py
+        tools/runtime_transaction.py
+        tools/candidate_manifest.py
+        tools/technical_candidate.py
+        tools/candidate_orchestrator.py
+        tools/release_orchestrator.py
+        tools/release_gate.py
         tools/audit_runtime_layout.py
         tools/audit_tool_ownership.py
         tools/audit_repository_hygiene.py
@@ -117,6 +127,7 @@ tasks:
         tests/test_genworks_layout.py
         tests/test_canonical_paths.py
         tests/test_customer_quality.py
+        tests/test_production_contract.py
         tests/test_production_gate.py
         tests/test_production_gate_commercial.py
         tests/test_research_baseline.py
@@ -126,6 +137,16 @@ tasks:
         tools/manage.py
         tools/method_selection.py
         tools/runtime_paths.py
+        tools/contract_io.py
+        tools/workspace_transaction.py
+        tools/release_packager.py
+        tools/production_contract.py
+        tools/runtime_transaction.py
+        tools/candidate_manifest.py
+        tools/technical_candidate.py
+        tools/candidate_orchestrator.py
+        tools/release_orchestrator.py
+        tools/release_gate.py
         tools/audit_runtime_layout.py
         tools/audit_tool_ownership.py
         tools/audit_repository_hygiene.py
@@ -145,6 +166,7 @@ tasks:
         tests/test_genworks_layout.py
         tests/test_canonical_paths.py
         tests/test_customer_quality.py
+        tests/test_production_contract.py
         tests/test_production_gate.py
         tests/test_production_gate_commercial.py
         tests/test_research_baseline.py
@@ -158,6 +180,16 @@ tasks:
         tools/manage.py
         tools/method_selection.py
         tools/runtime_paths.py
+        tools/contract_io.py
+        tools/workspace_transaction.py
+        tools/release_packager.py
+        tools/production_contract.py
+        tools/runtime_transaction.py
+        tools/candidate_manifest.py
+        tools/technical_candidate.py
+        tools/candidate_orchestrator.py
+        tools/release_orchestrator.py
+        tools/release_gate.py
         tools/audit_runtime_layout.py
         tools/audit_tool_ownership.py
         tools/audit_repository_hygiene.py
@@ -177,6 +209,7 @@ tasks:
         tests/test_genworks_layout.py
         tests/test_canonical_paths.py
         tests/test_customer_quality.py
+        tests/test_production_contract.py
         tests/test_production_gate.py
         tests/test_production_gate_commercial.py
         tests/test_research_baseline.py

@@ -15,12 +15,18 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class MethodSelectionTest(unittest.TestCase):
-    def test_all_products_have_one_valid_profile(self) -> None:
+    def test_all_products_have_one_valid_declared_contract(self) -> None:
         report = method_selection.audit_all(ROOT)
         self.assertTrue(report["passed"], report["errors"])
         configured_jobs = list((ROOT / "config" / "products").glob("*/job.json"))
         self.assertEqual(report["productCount"], len(configured_jobs))
         self.assertGreater(report["productCount"], 0)
+        self.assertTrue(
+            all(
+                product.get("selectionMode") == "DECLARED_CONSTRUCTION_CONTRACT"
+                for product in report["products"]
+            )
+        )
 
     def test_loose_layered_requires_runtime_and_motion_evidence(self) -> None:
         job = method_selection.read_json(
@@ -62,6 +68,26 @@ class MethodSelectionTest(unittest.TestCase):
         self.assertFalse(report["passed"])
         self.assertIn("runtime-performance", report["evidence"])
         self.assertIn("motion-review", report["evidence"])
+
+    def test_construction_contract_must_bind_its_product(self) -> None:
+        job = method_selection.read_json(
+            ROOT / "config" / "products" / "siroino-wide-cargo" / "job.json"
+        )
+        construction_path = (
+            ROOT / "config" / "products" / "siroino-wide-cargo" / "construction.json"
+        )
+        original = construction_path.read_text(encoding="utf-8")
+        try:
+            construction = json.loads(original)
+            construction["productId"] = "other-product"
+            construction_path.write_text(
+                json.dumps(construction) + "\n", encoding="utf-8"
+            )
+            report = method_selection.select(job, ROOT)
+        finally:
+            construction_path.write_text(original, encoding="utf-8")
+        self.assertFalse(report["passed"])
+        self.assertIn("construction.productId must match job.id", report["errors"])
 
 
 if __name__ == "__main__":
