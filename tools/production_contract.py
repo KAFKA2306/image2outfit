@@ -118,7 +118,7 @@ def validate_construction(
         return {}, [f"construction contract unreadable: {exc}"], warnings
     errors = validate_schema_file(
         value,
-        root / "config" / "construction.schema.v1.json",
+        root / "config" / "products" / "construction.schema.v1.json",
         "construction",
     )
     if value.get("productId") != product_id:
