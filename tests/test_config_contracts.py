@@ -32,6 +32,29 @@ class ConfigContractTest(unittest.TestCase):
             policy["humanEvidenceContracts"]["commonRequiredFields"],
         )
 
+    def test_handoff_policy_separates_merge_from_unity_release_gates(self) -> None:
+        policy = json.loads(
+            (ROOT / "config" / "genworks-handoff-policy.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(
+            policy["requiredMergeCheckpointGates"],
+            [
+                "blender",
+                "fbx",
+                "prefabDeclared",
+                "fiveViewEvidence",
+                "poseEvidence",
+                "researchTrial",
+            ],
+        )
+        rules = policy["rules"]
+        self.assertIs(rules["unityRequiredForRepositoryMerge"], False)
+        self.assertIs(rules["mergeWithoutUnityMustRemainWorking"], True)
+        self.assertIs(rules["unityConfiguredPrefabsRequiredForTechnicalReady"], True)
+        self.assertIs(rules["unityRequiredForRelease"], True)
+
     def test_job_schema_is_the_required_field_source(self) -> None:
         schema = json.loads(
             (ROOT / "config" / "job.schema.v2.json").read_text(encoding="utf-8")

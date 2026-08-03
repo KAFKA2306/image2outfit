@@ -24,6 +24,14 @@
     "right",
     "three-quarter"
   ],
+  "requiredMergeCheckpointGates": [
+    "blender",
+    "fbx",
+    "prefabDeclared",
+    "fiveViewEvidence",
+    "poseEvidence",
+    "researchTrial"
+  ],
   "requiredAutomatedTechnicalGatesBeforeHumanReview": [
     "blender",
     "fbx",
@@ -40,7 +48,10 @@
   "rules": {
     "actionsArtifactsAreCanonicalWorkState": false,
     "trackedCheckpointRequiredForHandoff": true,
+    "unityRequiredForRepositoryMerge": false,
     "unityConfiguredPrefabsRequiredForTechnicalReady": true,
+    "unityRequiredForRelease": true,
+    "mergeWithoutUnityMustRemainWorking": true,
     "humanReviewRequiredForRelease": true,
     "rebuildFromZeroWhenCheckpointExists": false,
     "retainRejectedCheckpointAndReason": true
