@@ -34,5 +34,6 @@ ignore = ["E402"]
 
 [tool.image2outfit.garment-geometry]
 require-source-topology-for-bodycon = true
-forbid-sampled-grid-as-bodycon-shell = true
-max-default-bodycon-surface-offset-m = 0.012
+require-continuous-torso-sleeve-shell = true
+forbid-detached-planar-bodycon-panels = true
+max-default-bodycon-surface-offset-m = 0.020
