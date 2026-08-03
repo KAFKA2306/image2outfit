@@ -6,6 +6,7 @@ to the body while keeping the v9 sleeves, cuffs, hood and trims on fixed,
 oversized offsets. All fitted parts are now derived from SiroinoSotai_PC
 topology, use the source UVs and weights, and share a 12 mm garment clearance.
 """
+
 from __future__ import annotations
 
 import math
@@ -208,12 +209,8 @@ def _sleeve_predicate(
         upper_distance, upper_t = _segment_distance(point, upper_start, upper_end)
         lower_distance, lower_t = _segment_distance(point, lower_start, lower_end)
         upper_radius = 0.084 - 0.012 * max(0.0, min(1.0, upper_t))
-        return (
-            upper_distance <= upper_radius
-            and -0.16 <= upper_t <= 1.06
-        ) or (
-            lower_distance <= 0.062
-            and -0.05 <= lower_t <= 1.02
+        return (upper_distance <= upper_radius and -0.16 <= upper_t <= 1.06) or (
+            lower_distance <= 0.062 and -0.05 <= lower_t <= 1.02
         )
 
     return selected
@@ -259,7 +256,7 @@ def _sleeves_and_cuffs(
                 armature,
                 trim,
                 _cuff_predicate(armature, side),
-                offset=0.014,
+                offset=0.012,
                 thickness=0.0015,
                 bevel_width=0.00025,
             )
