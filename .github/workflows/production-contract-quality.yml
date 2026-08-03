@@ -1,0 +1,48 @@
+name: Production contract quality
+
+on:
+  pull_request:
+    paths:
+      - 'tools/**'
+      - 'tests/**'
+      - 'config/**'
+      - 'Taskfile.yml'
+      - 'README.md'
+      - 'AGENTS.md'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/production-contract-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+          enable-cache: true
+
+      - name: Verify lock and compile
+        run: |
+          uv lock --check
+          uv run --locked --no-default-groups python -m compileall -q tools tests
+
+      - name: Run all repository audits
+        run: uv run --locked --no-default-groups python tools/manage.py audit all
+
+      - name: Run all unit tests
+        run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
+
+      - name: Run Ruff lint
+        run: uv run --locked --no-default-groups --group dev ruff check --ignore S102 tools tests
+
+      - name: Verify Ruff formatting
+        run: uv run --locked --no-default-groups --group dev ruff format --check tools tests
