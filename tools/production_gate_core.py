@@ -11,6 +11,14 @@ from candidate_orchestrator import _augment_audit, _run_candidate
 from release_orchestrator import _run_release
 from runtime_transaction import DirectoryTransaction
 
+__all__ = [
+    "DirectoryTransaction",
+    "_augment_audit",
+    "_run_candidate",
+    "_run_release",
+    "legacy",
+]
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(
