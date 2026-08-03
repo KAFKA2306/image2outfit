@@ -1,0 +1,39 @@
+name: Format production contract branch
+
+on:
+  push:
+    branches:
+      - agent/unify-production-contracts
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: agent/unify-production-contracts
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+      - name: Format changed Python files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          mapfile -t files < <(git diff --name-only origin/main...HEAD -- '*.py')
+          if [ "${#files[@]}" -eq 0 ]; then exit 0; fi
+          uv run --locked --no-default-groups --group dev ruff format "${files[@]}"
+          if git diff --quiet -- "${files[@]}"; then exit 0; fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -- "${files[@]}"
+          git commit -m 'Apply canonical Ruff formatting'
+          git push origin HEAD:agent/unify-production-contracts
