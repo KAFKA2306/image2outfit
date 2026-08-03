@@ -66,11 +66,23 @@ jobs:
           uv run --locked --no-default-groups --group dev ruff check \
             --select E4,E7,E9,F --ignore E402 "${files[@]}"
 
-      - name: Show required Ruff formatting
-        if: always() && steps.changed-python.outputs.files != ''
+      - name: Materialize Ruff-formatted files
+        if: steps.changed-python.outputs.files != ''
         shell: bash
         run: |
           mapfile -t files < /tmp/changed-python.txt
           uv run --locked --no-default-groups --group dev ruff format "${files[@]}"
-          git diff -- "${files[@]}"
-          test -z "$(git status --porcelain -- "${files[@]}")"
+          rm -rf /tmp/formatted-python
+          for file in "${files[@]}"; do
+            mkdir -p "/tmp/formatted-python/$(dirname "$file")"
+            cp "$file" "/tmp/formatted-python/$file"
+          done
+
+      - name: Upload Ruff-formatted files
+        if: steps.changed-python.outputs.files != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-contract-formatted-python
+          path: /tmp/formatted-python
+          if-no-files-found: error
+          retention-days: 1
