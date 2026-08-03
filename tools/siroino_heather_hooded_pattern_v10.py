@@ -271,7 +271,6 @@ def _forearm_radius(
 ) -> float:
     vector = end - start
     length_squared = vector.length_squared
-    center = start + vector * t
     distances: list[float] = []
     for vertex in body.data.vertices:
         point = body.matrix_world @ vertex.co
