@@ -15,6 +15,9 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
+bone_segment = v9.bone_segment
+clean_meshes = v9.clean_meshes
+
 
 def _body_panel(
     name: str,
