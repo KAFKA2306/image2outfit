@@ -18,9 +18,9 @@ import siroino_heather_hooded_v11_support as support
 
 support.install()
 
-import siroino_heather_hooded_pattern_v10 as pattern
+import siroino_heather_hooded_pattern_v13 as pattern
 
-DESIGN_REVISION = "v12-continuous-source-shell"
+DESIGN_REVISION = pattern.DESIGN_REVISION
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
     "Heather_Highcut_Front_Panel",
@@ -44,6 +44,56 @@ ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Hood_Center_Seam",
 ]
 
+REJECTED_REVISIONS = [
+    {
+        "revision": "v7.1-continuous-shell-fit",
+        "reason": (
+            "actual five-view inspection found sawtooth panel edges, elbow/cuff "
+            "holes, an over-wide neckline, a shield-like rear hood and heather "
+            "moire; evaluated BVH audit reported 6660 overlap pairs"
+        ),
+    },
+    {
+        "revision": "v8-smooth-sampled-panels-distance-field-sleeves",
+        "reason": (
+            "actual five-view inspection found sampled-panel spikes, oversized "
+            "rectangular cuffs and an inflated hood; evaluated BVH audit reported "
+            "7133 overlap pairs"
+        ),
+    },
+    {
+        "revision": "v9-continuous-interpolation-fitted-cuffs",
+        "reason": (
+            "actual hosted inspection found detached torso plates, shoulder and "
+            "underarm gaps, waist fins, a broken crotch strip and a floating hood"
+        ),
+    },
+    {
+        "revision": "v10-body-topology-continuous-panels",
+        "reason": (
+            "actual hosted inspection found detached sleeves and cuffs, a floating "
+            "hood and jagged high-cut edges; evaluated BVH audit reported 8490 "
+            "overlap pairs"
+        ),
+    },
+    {
+        "revision": "v11-unified-source-topology-fit",
+        "reason": (
+            "actual hosted inspection still found shoulder, elbow and cuff "
+            "discontinuities, sawtooth edges and a bag-like hood; evaluated BVH "
+            "audit reported 12845 overlap pairs"
+        ),
+    },
+    {
+        "revision": "v12-continuous-source-shell",
+        "reason": (
+            "actual hosted inspection found metre-scale bevel miter spikes, chest "
+            "and waist collapse, a hanging crotch sheet and hood penetration; "
+            "evaluated BVH audit reported 28593 overlap pairs"
+        ),
+    },
+]
+
 
 def normalize_four_influences(
     objects: list[bpy.types.Object],
@@ -64,11 +114,7 @@ def normalize_four_influences(
                 for item in list(vertex.groups)
                 if item.weight > 1e-10
             ]
-            ranked = sorted(
-                assignments,
-                key=lambda item: item[1],
-                reverse=True,
-            )[:maximum]
+            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[:maximum]
             if not ranked:
                 ranked = [(fallback.name, 1.0)]
             total = sum(weight for _, weight in ranked)
@@ -152,55 +198,9 @@ def enforce_manifest_contract(original):
             report = json.loads(report_path.read_text(encoding="utf-8"))
             report["designRevision"] = DESIGN_REVISION
             rejected = report.setdefault("rejectedHistory", [])
-            failures = [
-                {
-                    "revision": "v7.1-continuous-shell-fit",
-                    "reason": (
-                        "actual five-view inspection found sawtooth panel edges, "
-                        "elbow/cuff holes, an over-wide neckline, a shield-like rear "
-                        "hood and heather moire; evaluated BVH audit reported 6660 "
-                        "garment/body triangle overlap pairs across six poses"
-                    ),
-                },
-                {
-                    "revision": ("v8-smooth-sampled-panels-distance-field-sleeves"),
-                    "reason": (
-                        "actual five-view inspection found discontinuous sampled-panel "
-                        "spikes, oversized rectangular cuffs and an inflated spherical "
-                        "hood; evaluated BVH audit reported 7133 garment/body triangle "
-                        "overlap pairs across six poses"
-                    ),
-                },
-                {
-                    "revision": "v9-continuous-interpolation-fitted-cuffs",
-                    "reason": (
-                        "actual hosted five-view inspection found detached plate-like "
-                        "torso panels, large shoulder and underarm gaps, rigid waist "
-                        "fins, a broken crotch strip and a floating hood"
-                    ),
-                },
-                {
-                    "revision": "v10-body-topology-continuous-panels",
-                    "reason": (
-                        "actual hosted artifact inspection found the torso improved but "
-                        "sleeves and cuffs remained detached, the hood floated behind "
-                        "the back, high-cut edges were jagged, and the evaluated six-pose "
-                        "BVH audit reported 8490 garment/body triangle overlap pairs"
-                    ),
-                },
-                {
-                    "revision": "v11-unified-source-topology-fit",
-                    "reason": (
-                        "actual hosted five-view inspection still found separated "
-                        "shoulder, elbow and cuff regions, sawtooth neckline and high-cut "
-                        "edges, and a bag-like rear hood; evaluated six-pose BVH audit "
-                        "reported 12845 garment/body triangle overlap pairs"
-                    ),
-                },
-            ]
             existing = {item.get("revision") for item in rejected}
             rejected.extend(
-                item for item in failures if item["revision"] not in existing
+                item for item in REJECTED_REVISIONS if item["revision"] not in existing
             )
             report_path.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n",
@@ -217,8 +217,6 @@ def update_panel_object_contract() -> None:
         "Heather_Back_Upper_Panel": "Heather_Body_Shell",
         "Heather_Long_Sleeve_L": "Heather_Body_Shell",
         "Heather_Long_Sleeve_R": "Heather_Body_Shell",
-        "Heather_Highcut_Front_Panel": "Heather_Highcut_Front_Panel",
-        "Heather_Highcut_Back_Panel": "Heather_Highcut_Back_Panel",
         "Heather_Hood_Back_Drape_L": "Heather_Hood_Outer_L",
         "Heather_Hood_Back_Drape_R": "Heather_Hood_Outer_R",
         "Heather_Hood_Cowl": "Heather_Hood_Neck_Band",
