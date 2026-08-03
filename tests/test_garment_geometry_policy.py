@@ -20,9 +20,10 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         cls.source = PATTERN_PATH.read_text(encoding="utf-8")
         cls.tree = ast.parse(cls.source, filename=str(PATTERN_PATH))
 
-    def test_bodycon_policy_requires_source_topology(self) -> None:
+    def test_bodycon_policy_requires_one_continuous_source_shell(self) -> None:
         self.assertTrue(self.policy["require-source-topology-for-bodycon"])
-        self.assertTrue(self.policy["forbid-sampled-grid-as-bodycon-shell"])
+        self.assertTrue(self.policy["require-continuous-torso-sleeve-shell"])
+        self.assertTrue(self.policy["forbid-detached-planar-bodycon-panels"])
 
     def test_default_body_surface_offset_respects_policy(self) -> None:
         limit = float(self.policy["max-default-bodycon-surface-offset-m"])
@@ -42,27 +43,30 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertEqual(len(offsets), 1, "_body_panel must define one offset default")
         self.assertLessEqual(offsets[0], limit)
 
-    def test_bodycon_shell_does_not_use_sampled_panel_grid(self) -> None:
+    def test_create_outfit_builds_one_primary_body_shell(self) -> None:
         create_outfit = next(
             node
             for node in self.tree.body
             if isinstance(node, ast.FunctionDef) and node.name == "create_outfit"
         )
-        calls = {
-            node.func.attr
+        shell_calls = [
+            node
             for node in ast.walk(create_outfit)
-            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
-        }
-        self.assertNotIn("_sampled_panel", calls)
-        self.assertNotIn("_torso_panels", calls)
-        self.assertNotIn("_highcut_panels", calls)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "_body_panel"
+        ]
+        self.assertEqual(len(shell_calls), 1)
+        self.assertIn("Heather_Body_Shell", self.source)
+        self.assertIn("_body_shell_predicate", self.source)
 
-    def test_bodycon_shell_copies_target_topology_and_weights(self) -> None:
+    def test_primary_shell_copies_target_topology_and_weights(self) -> None:
         required_fragments = (
             "body.data.polygons",
             "body.data.vertices[source_index].groups",
             "body.data.uv_layers.active",
             "modifier.use_deform_preserve_volume = True",
+            "transfer_nearest_body_weights",
         )
         for fragment in required_fragments:
             self.assertIn(fragment, self.source)
