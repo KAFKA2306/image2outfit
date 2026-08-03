@@ -31,6 +31,30 @@ from candidate_manifest import (
 )
 from technical_candidate import run_candidate
 
+__all__ = [
+    "JOB_SCHEMA_PATH",
+    "POLICY_PATH",
+    "ROOT",
+    "UNITY_PIPELINE_PATH",
+    "candidate_files",
+    "digest",
+    "inputs",
+    "inside",
+    "license_gate",
+    "load",
+    "manifest",
+    "now",
+    "path",
+    "png_size",
+    "preview_gate",
+    "read",
+    "rel",
+    "required_job_fields",
+    "run_candidate",
+    "verify_candidate",
+    "write",
+]
+
 
 def main() -> int:
     parser = argparse.ArgumentParser()
