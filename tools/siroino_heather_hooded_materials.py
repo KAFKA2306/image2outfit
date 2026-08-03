@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Procedural heather-jersey material sources for the Siroino bodysuit."""
+
 from __future__ import annotations
 
 import math
@@ -20,9 +21,8 @@ def make_heather_maps(directory: Path) -> dict[str, Path]:
     roughness: list[tuple[int, int, int]] = []
     for y in range(size):
         for x in range(size):
-            broad = (
-                math.sin((x * 0.021 + y * 0.013) * math.tau)
-                + 0.55 * math.sin((x * 0.008 - y * 0.017) * math.tau + 1.7)
+            broad = math.sin((x * 0.021 + y * 0.013) * math.tau) + 0.55 * math.sin(
+                (x * 0.008 - y * 0.017) * math.tau + 1.7
             )
             fiber = math.sin((x * 0.113 + y * 0.071) * math.tau + 0.4)
             fleck = math.sin(x * 0.173 + y * 0.289) * math.sin(x * 0.061 - y * 0.097)
