@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "designRevision": "v15-refined-topology-folded-hood",
+  "designRevision": "v16-shoulder-bridged-refined-shell",
   "checkedAt": null,
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
@@ -12,36 +12,29 @@
     "fitAudit": "Tests/fit-audit.json"
   },
   "previousRevisionReview": {
-    "designRevision": "v14-source-topology-highcut-shell",
-    "result": "FAIL",
-    "hostedWorkflowRun": 30878640624,
+    "designRevision": "v15-refined-topology-folded-hood",
+    "result": "FAIL_BEFORE_RENDER",
+    "hostedWorkflowRun": 30880013304,
     "blockingFindings": [
       {
-        "zone": "elbow/sleeve",
-        "finding": "Visible missing-face openings remain around both elbows."
+        "zone": "topology",
+        "finding": "The executable geometry gate detected three disconnected primary-shell components."
       },
       {
-        "zone": "leg opening/groin",
-        "finding": "The coarse source-face selection creates a visibly serrated high-cut edge."
+        "zone": "garment openings",
+        "finding": "The executable geometry gate detected nine boundary loops across 572 boundary edges instead of the expected maximum of five."
       },
       {
-        "zone": "wrist",
-        "finding": "Separate cuffs float as oversized rigid rings."
-      },
-      {
-        "zone": "hood",
-        "finding": "The generated hood expands into an umbrella-like sheet above the shoulders."
-      },
-      {
-        "zone": "required poses",
-        "finding": "All six required poses failed the evaluated BVH audit; neutral reported 268 pairs and arms-up reported 1418 pairs."
+        "zone": "shoulder",
+        "finding": "The measurements imply that both sleeves remained detached from the torso across the shoulder openings."
       }
     ]
   },
   "currentRevisionRequirements": [
-    "Inspect all five directional renders generated from v15.",
+    "Inspect all five directional renders generated from v16.",
     "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders.",
     "Require one connected primary shell with no more than five boundary loops.",
+    "Require the explicit shoulder bridge to eliminate detached sleeve components.",
     "Require no visible sleeve holes, detached geometry or inflated hood shape.",
     "Do not mark PASS until the current-revision fit audit and images agree."
   ]
