@@ -15,9 +15,9 @@ on:
       - tests/test_pipeline_profile.py
       - tests/test_research_and_specs.py
       - tests/test_src_architecture.py
-      - config/architecture-policy.json
+      - config/pipeline/architecture-policy.json
       - config/pipeline-profiles/**
-      - config/pipeline-request.example.json
+      - examples/pipeline-request.example.json
       - .github/workflows/pipeline-architecture.yml
   push:
     branches: [main]
@@ -34,9 +34,9 @@ on:
       - tests/test_pipeline_profile.py
       - tests/test_research_and_specs.py
       - tests/test_src_architecture.py
-      - config/architecture-policy.json
+      - config/pipeline/architecture-policy.json
       - config/pipeline-profiles/**
-      - config/pipeline-request.example.json
+      - examples/pipeline-request.example.json
       - .github/workflows/pipeline-architecture.yml
 
 permissions:

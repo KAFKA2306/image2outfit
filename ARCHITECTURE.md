@@ -67,16 +67,16 @@ LangChain と LangGraph は固定された工程契約の実行器であり、�
 
 ```powershell
 uv run --locked --no-default-groups python tools/run_garment_pipeline.py `
-  --request config/pipeline-request.example.json
+  --request examples/pipeline-request.example.json
 
 uv run --with langchain-core==1.5.0 python tools/run_garment_pipeline.py `
   --engine langchain `
-  --request config/pipeline-request.example.json
+  --request examples/pipeline-request.example.json
 
 uv run --with langchain-core==1.5.0 --with langgraph==1.2.9 `
   python tools/run_garment_pipeline.py `
   --engine langgraph `
-  --request config/pipeline-request.example.json
+  --request examples/pipeline-request.example.json
 ```
 
 既定では各工程の呼び出し計画だけを生成します。実処理へ接続する場合は、工程プロファイルへ明示的なコマンドを設定し、`--execute` を付けます。見た目レビューは、現在の実画像を直接開かない限り PASS にしません。
