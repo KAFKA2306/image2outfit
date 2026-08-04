@@ -10,13 +10,7 @@ GENERATOR_PATH = ROOT / "tools" / "siroino_heather_fused_roll_v28.py"
 BASE_PATH = ROOT / "tools" / "siroino_heather_closed_components_v27.py"
 PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_product.py"
 POSE_PATH = ROOT / "tools" / "siroino_heather_hooded_fused_pose_probe.py"
-JOB_PATH = (
-    ROOT
-    / "config"
-    / "products"
-    / "siroino-heather-hooded-bodysuit"
-    / "job.json"
-)
+JOB_PATH = ROOT / "config" / "products" / "siroino-heather-hooded-bodysuit" / "job.json"
 
 
 class GarmentGeometryFusedRollTests(unittest.TestCase):
