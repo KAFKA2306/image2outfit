@@ -155,7 +155,8 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
 
     def test_build_gate_uses_required_objects_not_legacy_object_count(self) -> None:
         self.assertIn('"Heather_Hood_Folded_Roll"', self.build_source)
-        self.assertIn("required_objects <= garment_names", self.build_source)
+        self.assertIn("required_objects - garment_names", self.build_source)
+        self.assertIn("not missing_objects", self.build_source)
         self.assertNotIn('measured["meshObjects"] >= 14', self.build_source)
 
 
