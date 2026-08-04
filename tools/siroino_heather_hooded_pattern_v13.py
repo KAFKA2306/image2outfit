@@ -158,11 +158,12 @@ def _smooth_and_project_boundaries(
     if not weights:
         return
     group = obj.vertex_groups.new(name="Temporary_Boundary_Smoothing")
+    group_name = group.name
     for index, weight in weights.items():
         group.add([index], weight, "REPLACE")
 
     smooth = obj.modifiers.new("Opening boundary smoothing", "SMOOTH")
-    smooth.vertex_group = group.name
+    smooth.vertex_group = group_name
     smooth.factor = 0.62
     smooth.iterations = 7
     _move_modifier_before_armature(obj, smooth)
@@ -174,7 +175,10 @@ def _smooth_and_project_boundaries(
     shrinkwrap.offset = offset
     _move_modifier_before_armature(obj, shrinkwrap)
     bpy.ops.object.modifier_apply(modifier=shrinkwrap.name)
-    obj.vertex_groups.remove(group)
+
+    temporary_group = obj.vertex_groups.get(group_name)
+    if temporary_group is not None:
+        obj.vertex_groups.remove(temporary_group)
 
 
 def _body_panel(
