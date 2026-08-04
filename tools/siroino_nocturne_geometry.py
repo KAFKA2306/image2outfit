@@ -8,6 +8,7 @@ import sys
 
 import bpy
 from mathutils import Vector
+from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
 TOOLS = Path(__file__).resolve().parent
@@ -185,6 +186,21 @@ def axis_shell(name, start, end, radii, mat, *, segments=40):
     return finish(obj, mat)
 
 
+def _apply_modifier(obj, name):
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.modifier_apply(modifier=name)
+    obj.select_set(False)
+
+
+def triangulate(obj):
+    modifier = obj.modifiers.new("Explicit triangle export", "TRIANGULATE")
+    modifier.quad_method = "BEAUTY"
+    modifier.ngon_method = "BEAUTY"
+    _apply_modifier(obj, modifier.name)
+    return obj
+
+
 def panel(name, points, mat, thickness):
     mesh = bpy.data.meshes.new(f"{name}_Mesh")
     mesh.from_pydata(points, [], [tuple(range(len(points)))])
@@ -201,10 +217,8 @@ def panel(name, points, mat, thickness):
     modifier = obj.modifiers.new("Panel thickness", "SOLIDIFY")
     modifier.thickness = thickness
     modifier.offset = 0.0
-    bpy.context.view_layer.objects.active = obj
-    obj.select_set(True)
-    bpy.ops.object.modifier_apply(modifier=modifier.name)
-    obj.select_set(False)
+    _apply_modifier(obj, modifier.name)
+    triangulate(obj)
     obj["image2outfit_role"] = "garment"
     return obj
 
@@ -238,6 +252,21 @@ def rigid_weight(obj, armature, semantic):
     _parent_with_armature(obj, armature)
 
 
+def semantic_weights(obj, armature, assignments):
+    """Apply normalized semantic weights supplied per vertex index."""
+    groups = {}
+    for vertex_index, weighted_semantics in assignments.items():
+        total = sum(weight for _, weight in weighted_semantics) or 1.0
+        for semantic, weight in weighted_semantics:
+            group_name = resolve_bone_name(armature, semantic)
+            group = groups.get(group_name)
+            if group is None:
+                group = obj.vertex_groups.new(name=group_name)
+                groups[group_name] = group
+            group.add([vertex_index], weight / total, "REPLACE")
+    _parent_with_armature(obj, armature)
+
+
 def transfer_weights(obj, body, armature):
     tree = KDTree(len(body.data.vertices))
     for vertex in body.data.vertices:
@@ -266,6 +295,47 @@ def transfer_weights(obj, body, armature):
         for group, value in weights:
             groups[group].add([vertex.index], value / total, "REPLACE")
     _parent_with_armature(obj, armature)
+
+
+def enforce_body_clearance(obj, body, clearance):
+    """Project only penetrating or under-clearance vertices outward.
+
+    The garment topology remains independent. The target mesh is used only as
+    a nearest-surface collision constraint after explicit garment construction.
+    """
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    evaluated = body.evaluated_get(depsgraph)
+    body_mesh = evaluated.to_mesh()
+    try:
+        vertices = [evaluated.matrix_world @ vertex.co for vertex in body_mesh.vertices]
+        polygons = [tuple(polygon.vertices) for polygon in body_mesh.polygons]
+        tree = BVHTree.FromPolygons(vertices, polygons, all_triangles=False)
+        inverse = obj.matrix_world.inverted()
+        moved = 0
+        maximum_move = 0.0
+        for vertex in obj.data.vertices:
+            world = obj.matrix_world @ vertex.co
+            nearest = tree.find_nearest(world)
+            if nearest is None:
+                continue
+            location, normal, _, distance = nearest
+            signed = (world - location).dot(normal)
+            if signed >= clearance:
+                continue
+            corrected = location + normal * clearance
+            move = (corrected - world).length
+            vertex.co = inverse @ corrected
+            moved += 1
+            maximum_move = max(maximum_move, move)
+        obj.data.update(calc_edges=True)
+        return {
+            "object": obj.name,
+            "movedVertices": moved,
+            "maximumMove": maximum_move,
+            "clearance": clearance,
+        }
+    finally:
+        evaluated.to_mesh_clear()
 
 
 def bake_skirt(skirt, body):
