@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "status": "PENDING_EXECUTION",
   "result": "PENDING",
-  "designRevision": "v3-sewn-v-neck-stable-modules",
-  "method": "PatternGSL-inspired explicit sewn panel, seam and layer specification with Blender cloth",
+  "designRevision": "v4-clearance-articulated-silhouette",
+  "method": "PatternGSL-inspired explicit sewn panel, seam and layer specification with Blender cloth, independent nearest-surface clearance and semantic articulation weights",
   "sources": [
     {
       "title": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
@@ -22,7 +22,16 @@
     "bodyTopologyCopied": false,
     "externalResearchCodeExecuted": false,
     "bodicePanels": 5,
-    "stableRigidModules": ["skirt after cloth bake", "hem frill", "waist band", "leg warmers", "shoes", "wings"]
+    "bodySurfaceConstraint": "evaluated-body nearest surface, outward correction only",
+    "semanticArticulation": [
+      "chest-local bodice",
+      "upper-arm-local puff sleeves",
+      "lower-arm-local warmers and cuffs",
+      "lower-leg-local leg warmers",
+      "foot-local shoes",
+      "hips-to-upper-leg blended skirt and hem"
+    ],
+    "explicitTriangleExport": true
   },
   "acceptance": {
     "researchTrial": "PENDING",
