@@ -25,6 +25,14 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             if isinstance(node, ast.FunctionDef) and node.name == "_body_panel"
         )
         cls.body_panel_source = ast.get_source_segment(cls.source, cls.body_panel) or ""
+        cls.selection_helper = next(
+            node
+            for node in cls.tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == "_selected_polygons"
+        )
+        cls.selection_source = (
+            ast.get_source_segment(cls.source, cls.selection_helper) or ""
+        )
 
     def test_bodycon_policy_requires_one_continuous_source_shell(self) -> None:
         self.assertTrue(self.policy["require-source-topology-for-bodycon"])
@@ -77,13 +85,13 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         )
 
     def test_primary_shell_copies_target_topology_and_weights(self) -> None:
-        required_fragments = (
-            "body.data.polygons",
+        self.assertIn("body.data.polygons", self.selection_source)
+        required_body_panel_fragments = (
             "body.data.vertices[source_index].groups",
             "body.data.uv_layers.active",
             "modifier.use_deform_preserve_volume = True",
         )
-        for fragment in required_fragments:
+        for fragment in required_body_panel_fragments:
             self.assertIn(fragment, self.body_panel_source)
 
 
