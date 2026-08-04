@@ -92,12 +92,8 @@ def _torso_and_saddle(
     front_center = 3 * base.ANGLE_COUNT // 4
     back_center = base.ANGLE_COUNT // 4
     offsets = tuple(range(-14, 15, 2))
-    front_row = tuple(
-        (front_center + offset) % base.ANGLE_COUNT for offset in offsets
-    )
-    back_row = tuple(
-        (back_center - offset) % base.ANGLE_COUNT for offset in offsets
-    )
+    front_row = tuple((front_center + offset) % base.ANGLE_COUNT for offset in offsets)
+    back_row = tuple((back_center - offset) % base.ANGLE_COUNT for offset in offsets)
     saddle_rows: list[tuple[int, ...]] = [front_row]
     longitudinal_steps = 16
     for step in range(1, longitudinal_steps):
