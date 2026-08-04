@@ -653,7 +653,9 @@ def _validate(
                 failures.append(f"{obj.name}: non-finite vertex {vertex.index}")
                 break
     if failures:
-        raise RuntimeError("Angular polar cage validation failed: " + "; ".join(failures))
+        raise RuntimeError(
+            "Angular polar cage validation failed: " + "; ".join(failures)
+        )
     return {
         "meshObjects": [obj.name for obj in mesh_objects],
         "meshObjectCount": len(mesh_objects),
