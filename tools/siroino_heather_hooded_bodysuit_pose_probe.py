@@ -3,12 +3,9 @@
 
 from __future__ import annotations
 
-import importlib.util
 import json
 import sys
 from pathlib import Path
-from types import ModuleType
-from typing import TYPE_CHECKING
 
 TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
@@ -17,35 +14,10 @@ if str(TOOLS) not in sys.path:
 import bpy
 from mathutils.bvhtree import BVHTree
 
-if TYPE_CHECKING:
-    import siroino_heather_geometry_probe
-    import siroino_heather_hooded_bodysuit_pose
+import siroino_heather_geometry_probe as probe
+import siroino_heather_hooded_bodysuit_pose as pose
 
 ROOT = Path(__file__).resolve().parents[1]
-
-
-def _load_local_module(name: str, filename: str) -> ModuleType:
-    """Load one sibling module by verified path instead of ambient sys.path state."""
-    path = TOOLS / filename
-    if not path.is_file():
-        raise RuntimeError(f"Required local pose module is missing: {path}")
-    spec = importlib.util.spec_from_file_location(name, path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Could not create an import specification for {path}")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-probe = _load_local_module(
-    "siroino_heather_geometry_probe",
-    "siroino_heather_geometry_probe.py",
-)
-pose = _load_local_module(
-    "siroino_heather_hooded_bodysuit_pose",
-    "siroino_heather_hooded_bodysuit_pose.py",
-)
 _ORIGINAL_AUDIT = pose.audit_intersections
 
 
