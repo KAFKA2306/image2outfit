@@ -24,7 +24,10 @@ def build(body, armature, mats):
     minimum, maximum = bounds(body)
     height = maximum.z - minimum.z
     center = (minimum + maximum) * 0.5
-    z = lambda ratio: minimum.z + height * ratio
+
+    def z(ratio):
+        return minimum.z + height * ratio
+
     items = []
     items.append(
         cone(
