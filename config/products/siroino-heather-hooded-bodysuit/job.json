@@ -3,7 +3,7 @@
   "id": "siroino-heather-hooded-bodysuit",
   "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
   "adapterId": "siroino-v1.0",
-  "buildRevision": "v25-side-aware-taubin-shell",
+  "buildRevision": "v27-closed-saddle-sleevecap-folded-hood",
   "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
   "productManifestPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
   "buildScript": "tools/siroino_heather_hooded_product.py",
@@ -46,17 +46,24 @@
     }
   },
   "researchMethod": {
-    "name": "LoBoFit-inspired Local Bone Mapping with Side-Aware Taubin Fairing and Pose-Driven Clearance Repair",
-    "submitted": "2026-05-08T08:56:06Z",
-    "paperUrl": "https://arxiv.org/abs/2605.07450",
-    "paperLicense": "CC BY-NC-ND 4.0",
-    "paperLicenseUrl": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
-    "officialCodeUrl": "https://github.com/MengZephyr/LoBoFit",
-    "officialCodeLicense": "BSD-3-Clause",
-    "officialCodeStatus": "Official SIGGRAPH 2026 implementation located and reviewed on 2026-08-05; not executed in this trial",
+    "name": "Closed Garment Components with Bounded Clearance Projection",
+    "primaryReference": {
+      "title": "GarmentCode: Programming Parametric Sewing Patterns",
+      "paperUrl": "https://arxiv.org/abs/2306.03642",
+      "officialCodeUrl": "https://github.com/maria-korosteleva/GarmentCode",
+      "officialCodeLicense": "MIT"
+    },
+    "currentReference": {
+      "title": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
+      "submitted": "2026-06-23T13:32:04Z",
+      "paperUrl": "https://arxiv.org/abs/2606.24564",
+      "officialCodeUrl": "https://github.com/PatternGSL/PatternGSL",
+      "officialCodeStatus": "Referenced as a representation direction; authors implementation not executed or copied"
+    },
     "authorsImplementationExecuted": false,
-    "executionRequirements": "The official repository provides Coarse_to_Fine_GarmRefitting.py and downloadable sample data; this independent trial requires Blender 4.4.3, Python 3.11, bpy, bmesh and mathutils BVHTree with no GPU, model, checkpoint or training dataset",
-    "trialScope": "Independent deterministic four-bone local residual fitting followed by source-side-preserving Taubin fairing, body-section underbody separation, two-round required-pose BVH correction and a continuous folded-hood panel; the official implementation is not copied or executed"
+    "authorsCodeCopied": false,
+    "executionRequirements": "Blender 4.4.3, Python 3.11 and existing Siroino nearest-body skin-weight helpers; no model, checkpoint, GPU or external simulator",
+    "trialScope": "Independent 50-height by 72-angle torso envelope with a continuous yoke, eleven-column pelvic saddle, overlapping sleeve caps, fitted cuffs, a low folded-back hood and bounded post-topology body-clearance projection; avatar faces are not copied"
   },
   "licenseEvidence": "config/products/siroino-heather-hooded-bodysuit/license.json",
   "privateSourceRoots": [
@@ -73,6 +80,7 @@
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/side-aware-taubin-shell-trial.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/closed-components-clearance-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/geometry-diagnostics.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
