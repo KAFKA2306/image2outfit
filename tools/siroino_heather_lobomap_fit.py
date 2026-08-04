@@ -73,12 +73,7 @@ def _boundary_vertices(mesh: bpy.types.Mesh) -> set[int]:
         for index, left in enumerate(vertices):
             right = vertices[(index + 1) % len(vertices)]
             usage[tuple(sorted((left, right)))] += 1
-    return {
-        vertex
-        for edge, count in usage.items()
-        if count == 1
-        for vertex in edge
-    }
+    return {vertex for edge, count in usage.items() if count == 1 for vertex in edge}
 
 
 def _bone_rotations(armature: bpy.types.Object) -> dict[str, Matrix]:
@@ -164,10 +159,14 @@ def fit_shell(
         world = shell.matrix_world @ vertex.co
         nearest = bvh.find_nearest(world)
         if nearest is None:
-            raise RuntimeError(f"LoBoMap could not sample body near vertex {vertex.index}")
+            raise RuntimeError(
+                f"LoBoMap could not sample body near vertex {vertex.index}"
+            )
         anchor, normal, _polygon, distance = nearest
         if normal.length_squared <= 1e-12:
-            raise RuntimeError(f"LoBoMap received zero body normal at vertex {vertex.index}")
+            raise RuntimeError(
+                f"LoBoMap received zero body normal at vertex {vertex.index}"
+            )
         normal = normal.normalized()
         residual = world - anchor
         if residual.dot(normal) < 0.0:
@@ -179,16 +178,10 @@ def fit_shell(
         normals.append(normal)
         distances_before.append(float(distance))
         local_residuals.append(
-            {
-                bone: inverse_rotations[bone] @ residual
-                for bone in vertex_weights
-            }
+            {bone: inverse_rotations[bone] @ residual for bone in vertex_weights}
         )
         target_local.append(
-            {
-                bone: inverse_rotations[bone] @ desired
-                for bone in vertex_weights
-            }
+            {bone: inverse_rotations[bone] @ desired for bone in vertex_weights}
         )
 
     roughness_before = _edge_local_rms(local_residuals, weights, adjacency)
@@ -320,9 +313,7 @@ def install(pattern: ModuleType) -> None:
         garments = original(*args, **kwargs)
         body = args[0]
         armature = args[1]
-        shell = next(
-            obj for obj in garments if obj.name == "Heather_Body_Shell"
-        )
+        shell = next(obj for obj in garments if obj.name == "Heather_Body_Shell")
         report = fit_shell(shell, body, armature)
         write_report(report)
         print("LoBoFit-inspired local-bone trial: " + json.dumps(report["metrics"]))
