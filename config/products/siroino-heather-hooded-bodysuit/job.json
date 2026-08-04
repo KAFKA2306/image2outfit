@@ -3,7 +3,7 @@
   "id": "siroino-heather-hooded-bodysuit",
   "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
   "adapterId": "siroino-v1.0",
-  "buildRevision": "v24-smooth-normal-highcut-repair",
+  "buildRevision": "v25-side-aware-taubin-shell",
   "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
   "productManifestPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
   "buildScript": "tools/siroino_heather_hooded_product.py",
@@ -46,7 +46,7 @@
     }
   },
   "researchMethod": {
-    "name": "LoBoFit-inspired Local Bone Mapping Residual Fitting with Smooth-Normal High-Cut Repair",
+    "name": "LoBoFit-inspired Local Bone Mapping with Side-Aware Taubin Fairing and Pose-Driven Clearance Repair",
     "submitted": "2026-05-08T08:56:06Z",
     "paperUrl": "https://arxiv.org/abs/2605.07450",
     "paperLicense": "CC BY-NC-ND 4.0",
@@ -56,7 +56,7 @@
     "officialCodeStatus": "Official SIGGRAPH 2026 implementation located and reviewed on 2026-08-05; not executed in this trial",
     "authorsImplementationExecuted": false,
     "executionRequirements": "The official repository provides Coarse_to_Fine_GarmRefitting.py and downloadable sample data; this independent trial requires Blender 4.4.3, Python 3.11, bpy, bmesh and mathutils BVHTree with no GPU, model, checkpoint or training dataset",
-    "trialScope": "Independent deterministic four-bone local residual representation followed by micro-hole closure, barycentric smooth-normal body reprojection, bounded high-cut lift and folded-hood lateral compression; the official implementation is not copied or executed"
+    "trialScope": "Independent deterministic four-bone local residual fitting followed by source-side-preserving Taubin fairing, body-section underbody separation, two-round required-pose BVH correction and a continuous folded-hood panel; the official implementation is not copied or executed"
   },
   "licenseEvidence": "config/products/siroino-heather-hooded-bodysuit/license.json",
   "privateSourceRoots": [
@@ -72,7 +72,7 @@
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/seam-correspondence-graph-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
-    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smooth-normal-highcut-repair-trial.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/side-aware-taubin-shell-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/geometry-diagnostics.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
