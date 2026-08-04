@@ -23,7 +23,7 @@ import siroino_heather_hooded_pattern_v13 as pattern
 DESIGN_REVISION = pattern.DESIGN_REVISION
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
-    "Heather_Hood_Down_Cowl",
+    "Heather_Hood_Folded_Back_Drape",
     "Heather_Henley_Placket",
     "Heather_Henley_Button_01",
     "Heather_Henley_Button_02",
@@ -104,6 +104,15 @@ REJECTED_REVISIONS = [
             "remained detached at the shoulder and rendering was correctly stopped"
         ),
     },
+    {
+        "revision": "v16-shoulder-bridged-refined-shell",
+        "reason": (
+            "the topology gates passed, but the generated five-view evidence still "
+            "showed exposed inner arms, waist fins, excessively pointed front and "
+            "back high-cut panels, and a floating cowl; final save also reported an "
+            "orphan KEKey.001 Shape Key created by clearing the temporary source"
+        ),
+    },
 ]
 
 
@@ -159,13 +168,14 @@ def preserve_authored_weights(
     garments: list[bpy.types.Object],
     _body: bpy.types.Object,
 ) -> dict[str, object]:
-    """Preserve refined source weights and nearest-body accessory weights."""
+    """Preserve evaluated-source and nearest-body accessory weights."""
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "one-level subdivided SiroinoSotai_PC topology with interpolated UVs "
-            "and normalized source skin weights for the shoulder-bridged connected "
-            "body shell; nearest-body weights for the folded hood and trim geometry"
+            "evaluated SiroinoSotai_PC shape baked without Shape Keys, followed by "
+            "one topology-refinement subdivision with interpolated UVs and normalized "
+            "source skin weights for the connected body shell; nearest-body weights "
+            "for the back-surface hood drape and trim geometry"
         ),
         "rebound": False,
     }
@@ -219,16 +229,18 @@ def enforce_manifest_contract(original):
                 item for item in REJECTED_REVISIONS if item["revision"] not in existing
             )
             report["notes"] = [
-                "The fitted garment is extracted from a one-level subdivided "
-                "SiroinoSotai_PC source shell.",
+                "The displayed SiroinoSotai_PC shape is baked from the evaluated "
+                "dependency graph without retaining a Shape Key datablock.",
+                "The evaluated source must preserve the original vertex count before "
+                "one topology-refinement subdivision is applied.",
                 "The torso and arm capsules overlap through an explicit shoulder "
                 "bridge so the high-cut body and both sleeves form one mesh.",
                 "The primary shell must have one component and at most five expected "
                 "garment opening loops.",
-                "The hood is represented as a compact folded cowl behind the neck.",
+                "The high-cut lower body uses a shorter smoothstep transition.",
+                "The hood drape follows sampled upper-back surface positions.",
                 "Buttons, Henley placket and drawcords are separate geometry.",
                 "All exported vertices are limited to four normalized bone influences.",
-                "Five views are actual Blender Cycles renders of generated geometry.",
                 "Required pose, Unity and runtime review remain separate gates.",
             ]
             report_path.write_text(
@@ -250,11 +262,11 @@ def update_panel_object_contract() -> None:
         "Heather_Long_Sleeve_R": "Heather_Body_Shell",
         "Heather_Rib_Cuff_L": "Heather_Body_Shell",
         "Heather_Rib_Cuff_R": "Heather_Body_Shell",
-        "Heather_Hood_Back_Drape_L": "Heather_Hood_Down_Cowl",
-        "Heather_Hood_Back_Drape_R": "Heather_Hood_Down_Cowl",
-        "Heather_Hood_Outer_L": "Heather_Hood_Down_Cowl",
-        "Heather_Hood_Outer_R": "Heather_Hood_Down_Cowl",
-        "Heather_Hood_Cowl": "Heather_Hood_Down_Cowl",
+        "Heather_Hood_Back_Drape_L": "Heather_Hood_Folded_Back_Drape",
+        "Heather_Hood_Back_Drape_R": "Heather_Hood_Folded_Back_Drape",
+        "Heather_Hood_Outer_L": "Heather_Hood_Folded_Back_Drape",
+        "Heather_Hood_Outer_R": "Heather_Hood_Folded_Back_Drape",
+        "Heather_Hood_Cowl": "Heather_Hood_Folded_Back_Drape",
     }
     for panel in build.evidence.PANELS:
         panel["object"] = replacements.get(panel["object"], panel["object"])
