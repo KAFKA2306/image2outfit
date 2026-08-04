@@ -6,44 +6,38 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT = "siroino-heather-hooded-bodysuit"
-REVISION = "v23-dama-anchor-lobomap-residual-fit"
+REVISION = "v24-structured-template-cage"
 
 
-class SiroinoLoBoMapFitTests(unittest.TestCase):
-    def test_product_executes_body_anchor_then_lobomap(self) -> None:
+class SiroinoStructuredTemplateCageTests(unittest.TestCase):
+    def test_product_replaces_body_anchor_and_lobomap_active_path(self) -> None:
         product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
             encoding="utf-8"
         )
-        self.assertIn("import siroino_heather_lobomap_fit as lobomap", product)
-        self.assertIn("v21.install(pattern)", product)
-        self.assertIn("lobomap.install(pattern)", product)
-        self.assertLess(
-            product.index("v21.install(pattern)"),
-            product.index("lobomap.install(pattern)"),
-        )
-        self.assertLess(
-            product.index("lobomap.install(pattern)"),
-            product.index("DESIGN_REVISION = pattern.DESIGN_REVISION"),
-        )
+        self.assertIn("import siroino_heather_template_cage_v24 as template_cage", product)
+        self.assertIn("template_cage.install(pattern)", product)
+        self.assertNotIn("v21.install(pattern)", product)
+        self.assertNotIn("lobomap.install(pattern)", product)
 
-    def test_local_bone_trial_is_a_real_bounded_geometry_operation(self) -> None:
-        source = (ROOT / "tools" / "siroino_heather_lobomap_fit.py").read_text(
+    def test_template_cage_is_explicit_and_does_not_copy_body_topology(self) -> None:
+        source = (ROOT / "tools" / "siroino_heather_template_cage_v24.py").read_text(
             encoding="utf-8"
         )
         for token in (
-            "BVHTree.FromPolygons",
-            "armature.pose.bones",
-            "inverse_rotations",
-            "localResidualEdgeRmsBeforeM",
-            "localResidualEdgeRmsAfterM",
-            "MAX_STEP_M = 0.004",
+            'DESIGN_REVISION = "v24-structured-template-cage"',
+            "TORSO_COLUMNS = 64",
+            "shared-edge U-shaped gusset",
+            'obj["bodyTopologyCopied"] = False',
+            '"bodyRole": "surface and skin-weight reference only"',
             '"authorsImplementationExecuted": False',
             '"authorsCodeCopied": False',
-            "vertex.co = inverse_object @ candidate",
+            "pattern.create_outfit = lambda",
         ):
             self.assertIn(token, source)
+        self.assertNotIn("BVHTree.FromPolygons", source)
+        self.assertNotIn("_selected_polygons", source)
 
-    def test_job_and_construction_track_the_executed_trial(self) -> None:
+    def test_job_and_construction_track_structured_trial(self) -> None:
         config_root = ROOT / "config" / "products" / PRODUCT
         job = json.loads((config_root / "job.json").read_text(encoding="utf-8"))
         construction = json.loads(
@@ -51,17 +45,16 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
         )
         self.assertEqual(job["buildRevision"], REVISION)
         self.assertEqual(construction["designRevision"], REVISION)
-        self.assertEqual(
-            job["researchMethod"]["paperUrl"],
-            "https://arxiv.org/abs/2605.07450",
+        self.assertFalse(construction["representation"]["bodyTopologyCopied"])
+        evidence = (
+            f"Assets/GenWorks/{PRODUCT}/Research/"
+            "structured-template-cage-trial.json"
         )
+        self.assertEqual(construction["researchTrial"]["generatedEvidence"], evidence)
+        self.assertIn(evidence, job["deliveryAssets"])
         self.assertEqual(
-            construction["researchTrial"]["generatedEvidence"],
-            f"Assets/GenWorks/{PRODUCT}/Research/lobofit-local-bone-trial.json",
-        )
-        self.assertIn(
-            f"Assets/GenWorks/{PRODUCT}/Research/lobofit-local-bone-trial.json",
-            job["deliveryAssets"],
+            job["researchMethod"]["currentReference"]["paperUrl"],
+            "https://arxiv.org/abs/2606.24564",
         )
 
 
