@@ -96,20 +96,34 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             self.body_panel_source,
         )
 
-    def test_primary_shell_copies_refined_topology_uvs_and_weights(self) -> None:
+    def test_primary_shell_bakes_the_evaluated_target_shape(self) -> None:
         self.assertIn("body.data.polygons", self.selection_source)
-        required_body_panel_fragments = (
+        required_fragments = (
+            "bpy.context.evaluated_depsgraph_get()",
+            "body.evaluated_get(depsgraph)",
+            "bpy.data.meshes.new_from_object",
+            "preserve_all_data_layers=True",
+            "len(mesh.vertices) != len(body.data.vertices)",
+            "mesh.shape_keys is not None",
+            "subdivision.levels = 1",
             "body.data.vertices[source_index].groups",
             "body.data.uv_layers.active",
             "modifier.use_deform_preserve_volume = preserve_volume",
         )
-        for fragment in required_body_panel_fragments:
-            self.assertIn(fragment, self.body_panel_source)
-        self.assertIn("subdivision.levels = 1", self.source)
-        self.assertIn("source.shape_key_clear()", self.source)
+        for fragment in required_fragments:
+            self.assertIn(fragment, self.source)
+        self.assertNotIn("source.shape_key_clear()", self.source)
+        self.assertIn("_purge_orphan_shape_keys()", self.source)
 
-    def test_rejected_inflated_hood_is_replaced_by_folded_cowl(self) -> None:
-        self.assertIn("Heather_Hood_Down_Cowl", self.source)
+    def test_highcut_uses_a_short_smooth_transition(self) -> None:
+        self.assertIn("def _smoothstep", self.source)
+        self.assertIn("0.670 <= center.z <= 0.865", self.source)
+        self.assertIn("0.070 + 0.095 * _smoothstep(t)", self.source)
+
+    def test_rejected_cowl_is_replaced_by_surface_following_drape(self) -> None:
+        self.assertIn("Heather_Hood_Folded_Back_Drape", self.source)
+        self.assertIn("sampler.point(x, sample_z, front=False", self.source)
+        self.assertNotIn("Heather_Hood_Down_Cowl", self.source)
         self.assertNotIn("Heather_Hood_Shell", self.source)
         self.assertNotIn("Heather_Hood_Neck_Band", self.source)
 
