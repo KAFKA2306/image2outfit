@@ -42,9 +42,23 @@ def _update_hashes(product_root: Path) -> None:
     )
 
 
+def _render_with_complete_framing() -> int:
+    original_point_camera = common.point_camera
+
+    def wide_point_camera(camera, location, target=(0.0, 0.0, 0.60)):
+        original_point_camera(camera, location, target)
+        camera.data.ortho_scale = max(1.66, camera.data.ortho_scale * 1.34)
+
+    common.point_camera = wide_point_camera
+    try:
+        return pose.main()
+    finally:
+        common.point_camera = original_point_camera
+
+
 def main() -> int:
     job = json.loads(_job_path().read_text(encoding="utf-8-sig"))
-    result = pose.main()
+    result = _render_with_complete_framing()
     product_root = ROOT / job["productRoot"]
     manifest_path = ROOT / job["productManifestPath"]
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
