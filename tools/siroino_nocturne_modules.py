@@ -400,9 +400,13 @@ def build(body, armature, mats):
         (-34.0, 0.112, 0.019, 0.009, -0.040),
     )
     for side, sign in (("L", 1.0), ("R", -1.0)):
-        for index, (angle_degrees, length_ratio, width_ratio, depth_ratio, drop) in enumerate(
-            wing_specs
-        ):
+        for index, (
+            angle_degrees,
+            length_ratio,
+            width_ratio,
+            depth_ratio,
+            drop,
+        ) in enumerate(wing_specs):
             angle = math.radians(angle_degrees)
             root = wing_origin + Vector(
                 (sign * height * (0.010 + index * 0.003), 0.0, height * drop)
