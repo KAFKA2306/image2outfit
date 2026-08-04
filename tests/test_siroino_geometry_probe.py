@@ -8,17 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PROBE_PATH = ROOT / "tools" / "siroino_heather_geometry_probe.py"
-BASE_POSE_PROBE_PATH = (
-    ROOT / "tools" / "siroino_heather_hooded_bodysuit_pose_probe.py"
-)
+BASE_POSE_PROBE_PATH = ROOT / "tools" / "siroino_heather_hooded_bodysuit_pose_probe.py"
 POSE_ADAPTER_PATH = ROOT / "tools" / "siroino_heather_hooded_fused_pose_probe.py"
-JOB_PATH = (
-    ROOT
-    / "config"
-    / "products"
-    / "siroino-heather-hooded-bodysuit"
-    / "job.json"
-)
+JOB_PATH = ROOT / "config" / "products" / "siroino-heather-hooded-bodysuit" / "job.json"
 
 
 class SiroinoGeometryProbeTests(unittest.TestCase):
