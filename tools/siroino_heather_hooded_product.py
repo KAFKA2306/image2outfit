@@ -23,7 +23,7 @@ import siroino_heather_hooded_pattern_v13 as pattern
 DESIGN_REVISION = pattern.DESIGN_REVISION
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
-    "Heather_Hood_Folded_Back_Drape",
+    "Heather_Hood_Folded_Roll",
     "Heather_Henley_Placket",
     "Heather_Henley_Button_01",
     "Heather_Henley_Button_02",
@@ -36,17 +36,16 @@ REJECTED_REVISIONS = [
     {
         "revision": "v7.1-continuous-shell-fit",
         "reason": (
-            "actual five-view inspection found sawtooth panel edges, elbow/cuff "
-            "holes, an over-wide neckline, a shield-like rear hood and heather "
-            "moire; evaluated BVH audit reported 6660 overlap pairs"
+            "actual five-view inspection found sawtooth panel edges, elbow and cuff "
+            "holes, an over-wide neckline, a shield-like rear hood and 6660 "
+            "evaluated BVH overlap pairs"
         ),
     },
     {
         "revision": "v8-smooth-sampled-panels-distance-field-sleeves",
         "reason": (
             "actual five-view inspection found sampled-panel spikes, oversized "
-            "rectangular cuffs and an inflated hood; evaluated BVH audit reported "
-            "7133 overlap pairs"
+            "rectangular cuffs, an inflated hood and 7133 overlap pairs"
         ),
     },
     {
@@ -60,57 +59,59 @@ REJECTED_REVISIONS = [
         "revision": "v10-body-topology-continuous-panels",
         "reason": (
             "actual hosted inspection found detached sleeves and cuffs, a floating "
-            "hood and jagged high-cut edges; evaluated BVH audit reported 8490 "
-            "overlap pairs"
+            "hood, jagged high-cut edges and 8490 overlap pairs"
         ),
     },
     {
         "revision": "v11-unified-source-topology-fit",
         "reason": (
-            "actual hosted inspection still found shoulder, elbow and cuff "
-            "discontinuities, sawtooth edges and a bag-like hood; evaluated BVH "
-            "audit reported 12845 overlap pairs"
+            "actual hosted inspection found shoulder, elbow and cuff discontinuities, "
+            "sawtooth edges, a bag-like hood and 12845 overlap pairs"
         ),
     },
     {
         "revision": "v12-continuous-source-shell",
         "reason": (
-            "actual hosted inspection found metre-scale bevel miter spikes, chest "
-            "and waist collapse, a hanging crotch sheet and hood penetration; "
-            "evaluated BVH audit reported 28593 overlap pairs"
+            "actual hosted inspection found metre-scale bevel miter spikes, torso "
+            "collapse, a hanging crotch sheet and 28593 overlap pairs"
         ),
     },
     {
         "revision": "v13-bevel-safe-continuous-shell",
         "reason": (
-            "actual hosted inspection removed metre-scale spikes but still found "
-            "waist fins, a ruptured high-cut front, back and sleeve holes, detached "
-            "hood strips and 2506 neutral-pose triangle overlap pairs"
+            "metre-scale spikes were removed, but waist fins, ruptured high-cut "
+            "geometry, sleeve and back holes, and 2506 neutral overlaps remained"
         ),
     },
     {
         "revision": "v14-source-topology-highcut-shell",
         "reason": (
             "actual hosted inspection found elbow holes, jagged leg openings, "
-            "detached oversized cuffs and an umbrella-like hood; every required "
-            "pose failed, with 268 neutral and 1418 arms-up overlap pairs"
+            "detached cuffs and an umbrella-like hood; all six poses failed"
         ),
     },
     {
         "revision": "v15-refined-topology-folded-hood",
         "reason": (
-            "the executable pre-export gate detected three disconnected primary "
-            "shell components and nine boundary loops across 572 edges; both sleeves "
-            "remained detached at the shoulder and rendering was correctly stopped"
+            "the executable gate detected three disconnected primary-shell "
+            "components and nine boundary loops across 572 edges"
         ),
     },
     {
         "revision": "v16-shoulder-bridged-refined-shell",
         "reason": (
-            "the topology gates passed, but the generated five-view evidence still "
-            "showed exposed inner arms, waist fins, excessively pointed front and "
-            "back high-cut panels, and a floating cowl; final save also reported an "
-            "orphan KEKey.001 Shape Key created by clearing the temporary source"
+            "topology gates passed, but five-view evidence showed exposed inner arms, "
+            "waist fins, pointed panels and a floating cowl; save also reported an "
+            "orphan Shape Key"
+        ),
+    },
+    {
+        "revision": "v17-evaluated-shape-surface-drape",
+        "reason": (
+            "final Blender save succeeded, but actual five-view evidence still showed "
+            "jagged neckline, sleeve and leg openings, broad underarm wings, pointed "
+            "lower panels and a floating back drape; the legacy build gate also "
+            "incorrectly required 14 objects although the truthful construction had 8"
         ),
     },
 ]
@@ -172,10 +173,9 @@ def preserve_authored_weights(
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "evaluated SiroinoSotai_PC shape baked without Shape Keys, followed by "
-            "one topology-refinement subdivision with interpolated UVs and normalized "
-            "source skin weights for the connected body shell; nearest-body weights "
-            "for the back-surface hood drape and trim geometry"
+            "evaluated SiroinoSotai_PC topology refined twice with interpolated UVs "
+            "and skin weights; shoulders and sleeves selected from interpolated arm "
+            "weights; nearest-body weights used for the folded hood roll and trim"
         ),
         "rebound": False,
     }
@@ -229,18 +229,18 @@ def enforce_manifest_contract(original):
                 item for item in REJECTED_REVISIONS if item["revision"] not in existing
             )
             report["notes"] = [
-                "The displayed SiroinoSotai_PC shape is baked from the evaluated "
-                "dependency graph without retaining a Shape Key datablock.",
-                "The evaluated source must preserve the original vertex count before "
-                "one topology-refinement subdivision is applied.",
-                "The torso and arm capsules overlap through an explicit shoulder "
-                "bridge so the high-cut body and both sleeves form one mesh.",
-                "The primary shell must have one component and at most five expected "
-                "garment opening loops.",
-                "The high-cut lower body uses a shorter smoothstep transition.",
-                "The hood drape follows sampled upper-back surface positions.",
-                "Buttons, Henley placket and drawcords are separate geometry.",
-                "All exported vertices are limited to four normalized bone influences.",
+                "The neutral SiroinoSotai_PC mesh is baked from Blender's evaluated "
+                "dependency graph without retaining Shape Keys.",
+                "The source is subdivided twice before selection so opening boundaries "
+                "do not follow coarse source polygons.",
+                "Torso and high-cut regions use geometric predicates; shoulders and "
+                "sleeves use interpolated upper-arm and lower-arm weights.",
+                "Two boundary rings are smoothed and shrink-wrapped to the evaluated "
+                "source at 12 mm clearance.",
+                "The high-cut lower body uses a short, broad smoothstep transition.",
+                "The hood is a compact rolled curve sampled along the upper back.",
+                "The primary shell must be one component with at most five openings.",
+                "Buttons, Henley placket and drawcords remain separate geometry.",
                 "Required pose, Unity and runtime review remain separate gates.",
             ]
             report_path.write_text(
@@ -262,11 +262,11 @@ def update_panel_object_contract() -> None:
         "Heather_Long_Sleeve_R": "Heather_Body_Shell",
         "Heather_Rib_Cuff_L": "Heather_Body_Shell",
         "Heather_Rib_Cuff_R": "Heather_Body_Shell",
-        "Heather_Hood_Back_Drape_L": "Heather_Hood_Folded_Back_Drape",
-        "Heather_Hood_Back_Drape_R": "Heather_Hood_Folded_Back_Drape",
-        "Heather_Hood_Outer_L": "Heather_Hood_Folded_Back_Drape",
-        "Heather_Hood_Outer_R": "Heather_Hood_Folded_Back_Drape",
-        "Heather_Hood_Cowl": "Heather_Hood_Folded_Back_Drape",
+        "Heather_Hood_Back_Drape_L": "Heather_Hood_Folded_Roll",
+        "Heather_Hood_Back_Drape_R": "Heather_Hood_Folded_Roll",
+        "Heather_Hood_Outer_L": "Heather_Hood_Folded_Roll",
+        "Heather_Hood_Outer_R": "Heather_Hood_Folded_Roll",
+        "Heather_Hood_Cowl": "Heather_Hood_Folded_Roll",
     }
     for panel in build.evidence.PANELS:
         panel["object"] = replacements.get(panel["object"], panel["object"])
