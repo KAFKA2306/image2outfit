@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Build the Siroino Nocturne Angel modular cloth outfit."""
+
 from __future__ import annotations
 
 import json
@@ -52,9 +53,7 @@ def _materials() -> dict[str, bpy.types.Material]:
         "cream": material("MAT_Nocturne_Cream", (0.87, 0.80, 0.70), 0.72),
         "brown": material("MAT_Nocturne_Brown", (0.13, 0.08, 0.06), 0.62),
         "white": material("MAT_Nocturne_Wing_White", (0.94, 0.96, 1.0), 0.64),
-        "gold": material(
-            "MAT_Nocturne_Antique_Gold", (0.64, 0.40, 0.08), 0.24, 0.88
-        ),
+        "gold": material("MAT_Nocturne_Antique_Gold", (0.64, 0.40, 0.08), 0.24, 0.88),
     }
 
 
