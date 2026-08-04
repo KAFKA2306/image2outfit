@@ -181,14 +181,10 @@ def _body_shell_predicate(
         center: Vector,
     ) -> bool:
         x = abs(center.x)
-        torso = (
-            0.790 <= center.z <= _torso_top(center.x)
-            and x <= _torso_width(center.z)
+        torso = 0.790 <= center.z <= _torso_top(center.x) and x <= _torso_width(
+            center.z
         )
-        highcut = (
-            0.625 <= center.z <= 0.840
-            and x <= _highcut_width(center.z)
-        )
+        highcut = 0.625 <= center.z <= 0.840 and x <= _highcut_width(center.z)
         if torso or highcut:
             return True
 
