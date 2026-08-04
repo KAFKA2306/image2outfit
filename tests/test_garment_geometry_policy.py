@@ -83,7 +83,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             "The fitted source shell must not use a bevel modifier",
             "max_edge > 0.20",
             "disconnected source shell",
-            "expected at most 5 garment openings",
+            "expected exactly 5 anatomical garment openings",
             "Garment geometry sanity gate failed",
         )
         for fragment in required_fragments:
@@ -117,19 +117,23 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertNotIn("source.shape_key_clear()", self.source)
         self.assertIn("_purge_orphan_shape_keys()", self.source)
 
-    def test_unintended_openings_are_healed_from_source_topology(self) -> None:
+    def test_openings_are_classified_by_anatomical_role(self) -> None:
         required_fragments = (
             "def _polygon_adjacency",
+            "def _opening_components",
             "def _close_unintended_openings",
             "intended_openings: int = 5",
-            "opening_components[:intended_openings]",
-            "opening_components[intended_openings:]",
+            'role="wrist"',
+            'role="leg"',
+            "center.z >= 0.95",
+            "center.z <= 0.72",
             "selected_indices.update(restored_indices)",
             "_close_unintended_openings(body, selected)",
-            "Healed unintended garment openings",
+            "Healed unintended garment openings semantically",
         )
         for fragment in required_fragments:
             self.assertIn(fragment, self.source)
+        self.assertNotIn("opening_components[:intended_openings]", self.source)
 
     def test_openings_are_smoothed_and_reprojected(self) -> None:
         required_fragments = (
@@ -155,14 +159,17 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         for fragment in required_fragments:
             self.assertIn(fragment, self.source)
 
-    def test_highcut_uses_a_short_broad_smooth_transition(self) -> None:
+    def test_highcut_reaches_crotch_and_joins_torso(self) -> None:
         self.assertIn("def _smoothstep", self.source)
-        self.assertIn("0.695 <= center.z <= 0.885", self.source)
-        self.assertIn("0.090 + 0.085 * _smoothstep(t)", self.source)
+        self.assertIn("0.600 <= center.z <= 0.850", self.source)
+        self.assertIn("0.032 + 0.133 * _smoothstep(t)", self.source)
+        self.assertIn("0.815 <= center.z", self.source)
 
-    def test_rejected_drape_is_replaced_by_a_surface_sampled_roll(self) -> None:
+    def test_rejected_drape_is_replaced_by_a_body_clear_roll(self) -> None:
         self.assertIn("Heather_Hood_Folded_Roll", self.source)
         self.assertIn("sampler.point(x, z, front=False", self.source)
+        self.assertIn("0.046 + 0.010 * center_weight", self.source)
+        self.assertIn("0.0095", self.source)
         self.assertNotIn("Heather_Hood_Folded_Back_Drape", self.source)
         self.assertNotIn("Heather_Hood_Down_Cowl", self.source)
         self.assertNotIn("Heather_Hood_Shell", self.source)
