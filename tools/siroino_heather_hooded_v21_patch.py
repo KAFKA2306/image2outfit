@@ -31,7 +31,9 @@ def _highcut_width(z: float) -> float:
     return 0.024 + 0.141 * _smoothstep(t)
 
 
-def _body_shell_predicate(pattern: ModuleType, body: bpy.types.Object) -> PolygonPredicate:
+def _body_shell_predicate(
+    pattern: ModuleType, body: bpy.types.Object
+) -> PolygonPredicate:
     v9 = pattern.v9
     arm_groups = {
         side: (
@@ -47,10 +49,9 @@ def _body_shell_predicate(pattern: ModuleType, body: bpy.types.Object) -> Polygo
         center: Vector,
     ) -> bool:
         x = abs(center.x)
-        torso = (
-            0.815 <= center.z <= pattern._torso_top(center.x)
-            and x <= pattern._torso_width(center.z)
-        )
+        torso = 0.815 <= center.z <= pattern._torso_top(
+            center.x
+        ) and x <= pattern._torso_width(center.z)
         underbody = 0.515 <= center.z <= 0.850 and x <= _highcut_width(center.z)
         if torso or underbody:
             return True
@@ -163,8 +164,8 @@ def install(pattern: ModuleType) -> None:
     pattern._smoothstep = _smoothstep
     pattern._highcut_width = _highcut_width
     pattern._body_shell_predicate = lambda body: _body_shell_predicate(pattern, body)
-    pattern._smooth_and_project_boundaries = (
-        lambda obj, source, offset: _smooth_and_project_boundaries(
+    pattern._smooth_and_project_boundaries = lambda obj, source, offset: (
+        _smooth_and_project_boundaries(
             pattern,
             obj,
             source,
@@ -172,11 +173,9 @@ def install(pattern: ModuleType) -> None:
         )
     )
     pattern._body_panel = body_panel
-    pattern._hood_folded_roll = (
-        lambda sampler, armature, material: _hood_folded_roll(
-            pattern,
-            sampler,
-            armature,
-            material,
-        )
+    pattern._hood_folded_roll = lambda sampler, armature, material: _hood_folded_roll(
+        pattern,
+        sampler,
+        armature,
+        material,
     )
