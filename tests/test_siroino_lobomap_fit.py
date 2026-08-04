@@ -57,9 +57,7 @@ class SiroinoCrossSectionCageTests(unittest.TestCase):
             "body topology and binary front/back circumferential sampling are not used",
             construction["researchTrial"]["implementation"],
         )
-        evidence = (
-            f"Assets/GenWorks/{PRODUCT}/Research/cross-sectional-cage-trial.json"
-        )
+        evidence = f"Assets/GenWorks/{PRODUCT}/Research/cross-sectional-cage-trial.json"
         self.assertEqual(construction["researchTrial"]["generatedEvidence"], evidence)
         self.assertIn(evidence, job["deliveryAssets"])
         self.assertEqual(
