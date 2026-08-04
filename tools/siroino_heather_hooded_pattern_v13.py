@@ -114,9 +114,7 @@ def _source_preserve_volume(body: bpy.types.Object) -> bool:
 
 def _boundary_vertex_weights(mesh: bpy.types.Mesh) -> dict[int, float]:
     edge_use: Counter[tuple[int, int]] = Counter()
-    adjacency: dict[int, set[int]] = {
-        vertex.index: set() for vertex in mesh.vertices
-    }
+    adjacency: dict[int, set[int]] = {vertex.index: set() for vertex in mesh.vertices}
     for polygon in mesh.polygons:
         vertices = list(polygon.vertices)
         for index, left in enumerate(vertices):
@@ -127,10 +125,7 @@ def _boundary_vertex_weights(mesh: bpy.types.Mesh) -> dict[int, float]:
             adjacency[right].add(left)
 
     boundary = {
-        vertex
-        for edge, count in edge_use.items()
-        if count == 1
-        for vertex in edge
+        vertex for edge, count in edge_use.items() if count == 1 for vertex in edge
     }
     weights = {index: 1.0 for index in boundary}
     frontier = set(boundary)
