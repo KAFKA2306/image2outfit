@@ -360,7 +360,11 @@ def enforce_body_clearance(
             signed = (world - location).dot(normal)
             if signed >= clearance:
                 continue
-            if maximum_search is not None and distance > maximum_search and signed >= 0.0:
+            if (
+                maximum_search is not None
+                and distance > maximum_search
+                and signed >= 0.0
+            ):
                 continue
             corrected = location + normal * clearance
             move = (corrected - world).length
