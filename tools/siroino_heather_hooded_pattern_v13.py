@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Topology-refined fitted shell for the Siroino heather hooded bodysuit.
+"""Evaluated-shape fitted shell for the Siroino heather hooded bodysuit.
 
-The source body is subdivided once before garment extraction so implicit cut
-boundaries no longer follow coarse source polygons. Torso, high-cut pelvis,
-shoulders and sleeves are copied as one shell. An explicit shoulder bridge joins
-the torso and arm capsules. A compact hood-down cowl replaces the rejected
-inflated hood. The build stops on disconnected primary geometry, unexpected
-boundary loops, non-finite coordinates, or implausibly long edges.
+The currently displayed SiroinoSotai_PC shape is baked from the evaluated
+dependency graph before one topology-refinement subdivision. Torso, high-cut
+pelvis, shoulders and sleeves are copied as one shell. A compact back-surface
+hood drape follows the target instead of floating as an analytic cowl. The build
+stops on disconnected primary geometry, unexpected boundary loops, non-finite
+coordinates, or implausibly long edges.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
-DESIGN_REVISION = "v16-shoulder-bridged-refined-shell"
+DESIGN_REVISION = "v17-evaluated-shape-surface-drape"
 clean_meshes = v9.clean_meshes
 bone_segment = v9.bone_segment
 
@@ -37,19 +37,36 @@ def _move_modifier_before_armature(
 
 
 def _refined_body_source(body: bpy.types.Object) -> bpy.types.Object:
-    """Create a temporary shape-key-free source with interpolated UVs and weights."""
+    """Bake the displayed target shape without retaining a Shape Key datablock."""
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    evaluated = body.evaluated_get(depsgraph)
+    mesh = bpy.data.meshes.new_from_object(
+        evaluated,
+        preserve_all_data_layers=True,
+        depsgraph=depsgraph,
+    )
+    if len(mesh.vertices) != len(body.data.vertices):
+        evaluated_count = len(mesh.vertices)
+        source_count = len(body.data.vertices)
+        bpy.data.meshes.remove(mesh)
+        raise RuntimeError(
+            "Evaluated Siroino source changed topology before refinement: "
+            f"{source_count} -> {evaluated_count} vertices"
+        )
+    if mesh.shape_keys is not None:
+        bpy.data.meshes.remove(mesh)
+        raise RuntimeError("Evaluated source unexpectedly retained Shape Keys")
+
     source = body.copy()
-    source.data = body.data.copy()
-    source.name = "Heather_Temporary_Refined_Source"
-    source.data.name = "Heather_Temporary_Refined_Source_Mesh"
+    source.data = mesh
+    source.name = "Heather_Temporary_Evaluated_Source"
+    source.data.name = "Heather_Temporary_Evaluated_Source_Mesh"
     bpy.context.collection.objects.link(source)
     source.matrix_world = body.matrix_world.copy()
     source.hide_render = True
 
     for modifier in list(source.modifiers):
         source.modifiers.remove(modifier)
-    if source.data.shape_keys is not None:
-        source.shape_key_clear()
 
     bpy.ops.object.select_all(action="DESELECT")
     source.select_set(True)
@@ -69,6 +86,12 @@ def _remove_temporary_source(source: bpy.types.Object) -> None:
     bpy.data.objects.remove(source, do_unlink=True)
     if mesh.users == 0:
         bpy.data.meshes.remove(mesh)
+
+
+def _purge_orphan_shape_keys() -> None:
+    for shape_keys in list(bpy.data.shape_keys):
+        if shape_keys.users == 0:
+            bpy.data.shape_keys.remove(shape_keys)
 
 
 def _selected_polygons(
@@ -192,10 +215,10 @@ def _body_panel(
 
 
 def _torso_width(z: float) -> float:
-    if z < 0.835:
-        return 0.126
-    if z < 0.910:
-        return 0.160
+    if z < 0.860:
+        return 0.142
+    if z < 0.920:
+        return 0.166
     if z < 0.985:
         return 0.194
     return max(0.088, 0.194 - (z - 0.985) * 1.45)
@@ -205,9 +228,14 @@ def _torso_top(x: float) -> float:
     return 1.012 + min(abs(x), 0.145) * 0.27
 
 
+def _smoothstep(value: float) -> float:
+    value = max(0.0, min(1.0, value))
+    return value * value * (3.0 - 2.0 * value)
+
+
 def _highcut_width(z: float) -> float:
-    t = max(0.0, min(1.0, (z - 0.620) / (0.842 - 0.620)))
-    return 0.040 + 0.102 * t**0.78
+    t = (z - 0.675) / (0.860 - 0.675)
+    return 0.070 + 0.095 * _smoothstep(t)
 
 
 def _segment_coordinates(
@@ -238,10 +266,10 @@ def _body_shell_predicate(
         center: Vector,
     ) -> bool:
         x = abs(center.x)
-        torso = 0.785 <= center.z <= _torso_top(center.x) and x <= _torso_width(
+        torso = 0.825 <= center.z <= _torso_top(center.x) and x <= _torso_width(
             center.z
         )
-        highcut = 0.615 <= center.z <= 0.850 and x <= _highcut_width(center.z)
+        highcut = 0.670 <= center.z <= 0.865 and x <= _highcut_width(center.z)
         shoulder_bridge = 0.105 <= x <= 0.360 and 0.925 <= center.z <= 1.090
         if torso or highcut or shoulder_bridge:
             return True
@@ -258,37 +286,38 @@ def _body_shell_predicate(
     return selected
 
 
-def _hood_down_cowl(
+def _hood_back_drape(
+    sampler: v9.SurfaceSampler,
     body: bpy.types.Object,
     armature: bpy.types.Object,
     material: bpy.types.Material,
 ) -> bpy.types.Object:
-    rows = 9
-    columns = 32
+    rows = 11
+    columns = 24
     vertices: list[tuple[float, float, float]] = []
-    start_angle = math.radians(-118.0)
-    end_angle = math.radians(118.0)
     for row in range(rows):
-        v = row / (rows - 1)
-        radius = 0.092 + 0.048 * v
+        t = row / (rows - 1)
+        arch = math.sin(math.pi * t)
+        z = 1.038 - 0.150 * t
+        half_width = 0.070 + 0.086 * arch**0.9 - 0.014 * t
         for column in range(columns + 1):
-            u = column / columns
-            angle = start_angle + (end_angle - start_angle) * u
-            back_arch = max(0.0, math.cos(angle))
-            x = radius * math.sin(angle)
-            y = 0.018 + radius * 0.58 * math.cos(angle)
-            z = 1.042 - 0.052 * v + 0.012 * back_arch**2
-            vertices.append((x, y, z))
+            lateral = 2.0 * column / columns - 1.0
+            center_drop = 0.010 * arch * (1.0 - lateral * lateral)
+            sample_z = z - center_drop
+            x = half_width * lateral
+            offset = 0.011 + 0.017 * arch * (1.0 - 0.42 * abs(lateral))
+            point = sampler.point(x, sample_z, front=False, offset=offset)
+            vertices.append((point.x, point.y, point.z))
     return v9._grid_object(
-        "Heather_Hood_Down_Cowl",
+        "Heather_Hood_Folded_Back_Drape",
         vertices,
         rows,
         columns,
         material,
         armature,
         body,
-        thickness=0.0012,
-        bevel=0.00018,
+        thickness=0.0008,
+        bevel=0.00012,
         subdivision=1,
     )
 
@@ -426,10 +455,11 @@ def create_outfit(
         )
     finally:
         _remove_temporary_source(refined)
+        _purge_orphan_shape_keys()
 
     garments: list[bpy.types.Object] = [
         shell,
-        _hood_down_cowl(body, armature, fabric),
+        _hood_back_drape(sampler, body, armature, fabric),
     ]
     garments.extend(
         v9._placket_and_buttons(
