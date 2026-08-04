@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "designRevision": "v16-shoulder-bridged-refined-shell",
+  "designRevision": "v17-evaluated-shape-surface-drape",
   "checkedAt": null,
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
@@ -12,30 +12,41 @@
     "fitAudit": "Tests/fit-audit.json"
   },
   "previousRevisionReview": {
-    "designRevision": "v15-refined-topology-folded-hood",
-    "result": "FAIL_BEFORE_RENDER",
-    "hostedWorkflowRun": 30880013304,
+    "designRevision": "v16-shoulder-bridged-refined-shell",
+    "result": "FAIL",
+    "hostedWorkflowRun": 30880388240,
+    "artifactId": 8881088999,
     "blockingFindings": [
       {
-        "zone": "topology",
-        "finding": "The executable geometry gate detected three disconnected primary-shell components."
+        "zone": "shape source",
+        "finding": "The temporary source cleared Shape Keys and reverted to Basis, so the extracted garment did not match the displayed target body."
       },
       {
-        "zone": "garment openings",
-        "finding": "The executable geometry gate detected nine boundary loops across 572 boundary edges instead of the expected maximum of five."
+        "zone": "inner arms",
+        "finding": "The five-view evidence showed long exposed inner-arm regions and broad shoulder distortion."
       },
       {
-        "zone": "shoulder",
-        "finding": "The measurements imply that both sleeves remained detached from the torso across the shoulder openings."
+        "zone": "waist and high-cut lower body",
+        "finding": "Waist fins and excessively pointed front and back panels remained visible."
+      },
+      {
+        "zone": "hood",
+        "finding": "The analytic cowl floated away from the upper back as detached fins."
+      },
+      {
+        "zone": "Blender save",
+        "finding": "Final save reported invalid orphan Shape Key KEKey.001; the pose stage was skipped."
       }
     ]
   },
   "currentRevisionRequirements": [
-    "Inspect all five directional renders generated from v16.",
-    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders.",
+    "Require the evaluated target mesh to preserve the source vertex count and contain no Shape Key datablock.",
+    "Inspect all five directional renders generated from v17.",
+    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v17.",
     "Require one connected primary shell with no more than five boundary loops.",
-    "Require the explicit shoulder bridge to eliminate detached sleeve components.",
-    "Require no visible sleeve holes, detached geometry or inflated hood shape.",
+    "Require no exposed inner-arm strips, waist fins or pointed crotch panels.",
+    "Require the hood drape to follow the upper-back surface without floating geometry.",
+    "Require final Blender save to complete without orphan Shape Key warnings.",
     "Do not mark PASS until the current-revision fit audit and images agree."
   ]
 }
