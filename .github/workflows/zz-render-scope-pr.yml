@@ -1,0 +1,40 @@
+name: Apply render visual completion scope
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.head_ref == 'policy/render-visual-completion'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: policy/render-visual-completion
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Extract and run the one-time migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          awk '
+            /python - <<'"'"'PY'"'"'/ {capture=1; next}
+            capture && /^          PY$/ {capture=0; exit}
+            capture {sub(/^          /, ""); print}
+          ' .github/workflows/zz-render-visual-scope-once.yml > /tmp/render_scope_migration.py
+          python /tmp/render_scope_migration.py
+          rm -f .github/workflows/zz-render-scope-pr.yml
+          python -m py_compile tools/production_contract.py tools/review_console.py tests/test_config_contracts.py tests/test_production_contract.py tests/test_review_console_v2.py
+          python -m unittest tests.test_config_contracts tests.test_production_contract tests.test_review_console_v2 -v
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit -m "Define rendered visual completion scope"
+          git push origin HEAD:policy/render-visual-completion
