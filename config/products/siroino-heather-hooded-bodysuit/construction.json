@@ -3,16 +3,18 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v24-structured-template-cage",
+  "designRevision": "v25-cross-sectional-statistical-cage",
   "panels": [
-    "periodic-regular-torso-cage-with-analytic-high-cut-boundary",
+    "smoothed-height-indexed-torso-ellipse-cage",
+    "analytic-high-cut-lower-boundary",
     "shared-edge-u-shaped-underbody-gusset",
-    "left-and-right-regular-arm-tubes-along-bone-centerlines",
+    "reduced-radius-arm-tubes-with-inward-shoulder-extension",
     "left-and-right-independent-rib-cuffs",
-    "attached-three-ring-cowl-surface",
-    "body-used-only-for-surface-sampling-and-nearest-weight-transfer",
+    "analytic-attached-cowl-surface",
+    "body-used-for-cross-section-statistics-and-nearest-weight-transfer",
     "no-body-topology-copy-no-body-face-selection",
-    "supersedes-active-shrinkwrap-dama-anchor-and-lobofit-residual-paths"
+    "no-binary-front-back-sampling-for-primary-surface",
+    "supersedes-v24-binary-front-back-template-cage"
   ],
   "separateGeometry": [
     "Henley placket",
@@ -42,10 +44,10 @@
     "currentPaper": "https://arxiv.org/abs/2606.24564",
     "currentPaperTitle": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
     "currentOfficialCode": "https://github.com/PatternGSL/PatternGSL",
-    "implementation": "independent Blender implementation of explicit semantic template cages; body topology is not copied; the prior shrinkwrap, DAMA anchor and LoBoFit residual modules are superseded and removed; no author code or models are executed or copied",
+    "implementation": "independent Blender implementation of robust avatar cross-section quantiles smoothed across height; body topology and binary front/back circumferential sampling are not used; prior shrinkwrap, DAMA anchor, LoBoFit residual and v24 binary cage modules are superseded and removed; no author code or models are executed or copied",
     "authorsImplementationExecuted": false,
     "authorsCodeCopied": false,
-    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/structured-template-cage-trial.json"
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/cross-sectional-cage-trial.json"
   },
   "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
