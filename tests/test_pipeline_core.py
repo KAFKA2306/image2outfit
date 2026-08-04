@@ -17,7 +17,6 @@ from image2outfit.tooling import ToolDescriptor, ToolRegistry
 
 
 class PipelineCoreTests(unittest.TestCase):
-
     def test_pipeline_transitions_cover_adjacent_stage_pairs(self) -> None:
         self.assertEqual(len(PIPELINE_TRANSITIONS), len(PIPELINE_STAGES) - 1)
         self.assertEqual(
@@ -31,8 +30,9 @@ class PipelineCoreTests(unittest.TestCase):
         for stage in PIPELINE_STAGES:
             registry.register(
                 stage,
-                lambda state, stage_name=stage.value: seen.append(stage_name)
-                or {"stage": stage_name},
+                lambda state, stage_name=stage.value: (
+                    seen.append(stage_name) or {"stage": stage_name}
+                ),
                 ToolDescriptor(stage.value, stage.value, f"{stage.value}.json"),
             )
         result = run_pipeline(
@@ -52,6 +52,7 @@ class PipelineCoreTests(unittest.TestCase):
         called: list[str] = []
         failing = PIPELINE_STAGES[3]
         for stage in PIPELINE_STAGES:
+
             def handler(state, stage_name=stage.value):
                 called.append(stage_name)
                 if stage_name == failing.value:

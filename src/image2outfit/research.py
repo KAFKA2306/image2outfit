@@ -28,8 +28,7 @@ PATTERN_FIRST = ResearchPrinciple(
         "explicit intermediate data before Blender mesh generation."
     ),
     boundary=(
-        "Representation principle only; author code, model, and dataset are not "
-        "copied."
+        "Representation principle only; author code, model, and dataset are not copied."
     ),
 )
 
@@ -64,8 +63,7 @@ POSE_NORMALIZED_PATTERN_RECOVERY = ResearchPrinciple(
         "pattern drafting so each stage can be replaced and evaluated independently."
     ),
     boundary=(
-        "Pipeline decomposition principle only; author model is not executed or "
-        "copied."
+        "Pipeline decomposition principle only; author model is not executed or copied."
     ),
 )
 
@@ -81,9 +79,7 @@ PATTERN_COORDINATE_MAPPING = ResearchPrinciple(
         "Preserve correspondence identifiers between image evidence, two-dimensional "
         "pattern coordinates, and three-dimensional garment geometry."
     ),
-    boundary=(
-        "Correspondence principle only; author model and data are not copied."
-    ),
+    boundary=("Correspondence principle only; author model and data are not copied."),
 )
 
 DEFAULT_RESEARCH_PRINCIPLES = (

@@ -8,7 +8,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from image2outfit.research import DEFAULT_RESEARCH_PRINCIPLES
-from image2outfit.specs import BlenderInvocation, ClothSimulationSpec, RenderEvidenceSpec
+from image2outfit.specs import (
+    BlenderInvocation,
+    ClothSimulationSpec,
+    RenderEvidenceSpec,
+)
 
 
 class ResearchAndSpecsTests(unittest.TestCase):
