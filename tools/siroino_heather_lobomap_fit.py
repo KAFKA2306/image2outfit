@@ -21,6 +21,8 @@ import bpy
 from mathutils import Matrix, Vector
 from mathutils.bvhtree import BVHTree
 
+import siroino_heather_smooth_surface_repair as repair
+
 DESIGN_REVISION = "v23-dama-anchor-lobomap-residual-fit"
 PAPER_TITLE = "LoBoFit: Flexible Garment Refitting via Local Bone Mapping Blending"
 PAPER_URL = "https://arxiv.org/abs/2605.07450"
@@ -306,7 +308,7 @@ def write_report(report: dict[str, Any]) -> None:
 
 
 def install(pattern: ModuleType) -> None:
-    """Wrap the canonical outfit constructor with the local-bone fit trial."""
+    """Wrap the canonical constructor with local-bone fit and surface repair."""
     original = pattern.create_outfit
 
     def create_outfit(*args, **kwargs):
@@ -321,3 +323,4 @@ def install(pattern: ModuleType) -> None:
 
     pattern.create_outfit = create_outfit
     pattern.DESIGN_REVISION = DESIGN_REVISION
+    repair.install(pattern)
