@@ -6,20 +6,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT = "siroino-heather-hooded-bodysuit"
-REVISION = "v24-smooth-normal-highcut-repair"
+REVISION = "v25-side-aware-taubin-shell"
 
 
 class SiroinoLoBoMapFitTests(unittest.TestCase):
-    def test_product_executes_body_anchor_lobomap_then_surface_repair(self) -> None:
+    def test_product_executes_body_anchor_lobomap_then_side_aware_repair(self) -> None:
         product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
             encoding="utf-8"
         )
         lobomap = (ROOT / "tools" / "siroino_heather_lobomap_fit.py").read_text(
             encoding="utf-8"
         )
+        compatibility = (
+            ROOT / "tools" / "siroino_heather_smooth_surface_repair.py"
+        ).read_text(encoding="utf-8")
+        fairing = (
+            ROOT / "tools" / "siroino_heather_side_aware_fairing.py"
+        ).read_text(encoding="utf-8")
         self.assertIn("import siroino_heather_lobomap_fit as lobomap", product)
-        self.assertIn("v21.install(pattern)", product)
-        self.assertIn("lobomap.install(pattern)", product)
         self.assertLess(
             product.index("v21.install(pattern)"),
             product.index("lobomap.install(pattern)"),
@@ -29,10 +33,11 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
             lobomap,
         )
         self.assertIn("repair.install(pattern)", lobomap)
-        self.assertLess(
-            lobomap.index("pattern.create_outfit = create_outfit"),
-            lobomap.index("repair.install(pattern)"),
+        self.assertIn(
+            "from siroino_heather_side_aware_fairing import DESIGN_REVISION, install",
+            compatibility,
         )
+        self.assertIn("pattern.create_outfit = create_outfit", fairing)
 
     def test_local_bone_trial_is_a_real_bounded_geometry_operation(self) -> None:
         source = (ROOT / "tools" / "siroino_heather_lobomap_fit.py").read_text(
@@ -51,17 +56,18 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
         ):
             self.assertIn(token, source)
 
-    def test_surface_repair_mutates_real_mesh_with_bounded_operations(self) -> None:
+    def test_side_aware_repair_executes_measured_mesh_operations(self) -> None:
         source = (
-            ROOT / "tools" / "siroino_heather_smooth_surface_repair.py"
+            ROOT / "tools" / "siroino_heather_side_aware_fairing.py"
         ).read_text(encoding="utf-8")
         for token in (
             "bmesh.ops.holes_fill",
-            "barycentric interpolation of evaluated body vertex normals",
-            "HIGHCUT_MAX_LIFT_M = 0.090",
-            "REPAIR_MAX_WORLD_STEP_M = 0.095",
-            "HOOD_LATERAL_SCALE = 0.72",
-            "vertex.co = inverse_object @ candidate",
+            "FAIRING_LAMBDA = 0.24",
+            "FAIRING_MU = -0.245",
+            "UNDERBODY_CLEARANCE_M = 0.034",
+            "POSE_CORRECTION_ROUNDS = 2",
+            "body_tree.overlap(shell_tree)",
+            "continuous subdivided and solidified folded hood panel",
             '"completionClaim": False',
         ):
             self.assertIn(token, source)
@@ -84,7 +90,7 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
         )
         expected = (
             f"Assets/GenWorks/{PRODUCT}/Research/"
-            "smooth-normal-highcut-repair-trial.json"
+            "side-aware-taubin-shell-trial.json"
         )
         self.assertEqual(construction["researchTrial"]["generatedEvidence"], expected)
         self.assertIn(expected, job["deliveryAssets"])
