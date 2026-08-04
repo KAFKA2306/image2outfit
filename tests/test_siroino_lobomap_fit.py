@@ -64,8 +64,7 @@ class SiroinoClosedComponentsTests(unittest.TestCase):
             construction["researchTrial"]["implementation"],
         )
         evidence = (
-            f"Assets/GenWorks/{PRODUCT}/Research/"
-            "closed-components-clearance-trial.json"
+            f"Assets/GenWorks/{PRODUCT}/Research/closed-components-clearance-trial.json"
         )
         self.assertEqual(construction["researchTrial"]["generatedEvidence"], evidence)
         self.assertIn(evidence, job["deliveryAssets"])
