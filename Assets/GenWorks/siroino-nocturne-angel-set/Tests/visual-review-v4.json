@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 2,
+  "designRevision": "v4-clearance-articulated-silhouette",
+  "productId": "siroino-nocturne-angel-set",
+  "result": "VISUAL_REJECTED",
+  "visualAppearanceReview": "FAIL",
+  "reviewedAt": "2026-08-04T23:30:00Z",
+  "reviewer": "ChatGPT direct artifact image inspection",
+  "hostedWorkflowRun": 30959394549,
+  "artifactId": 8912558603,
+  "artifactSha256": "086c1fa3ab50d37d6f44bd1af2605d45800a4973623434a405fc2224d15d94c1",
+  "evidence": {
+    "multiview": {
+      "path": "Previews/siroino-nocturne-angel-set-multiview.webp",
+      "sha256": "bd7be2b3109ce095354357eab7bab8ff21975ad230d67687f2f626843af61430"
+    },
+    "poseReview": {
+      "path": "Previews/siroino-nocturne-angel-set-pose-review.webp",
+      "sha256": "65c19945f41f88a9fcc040224d286463b764a5c95f565ccfcc4b8ae19c6dd81d"
+    }
+  },
+  "generatedMetrics": {
+    "meshObjects": 36,
+    "vertices": 7382,
+    "triangles": 13612,
+    "maxBoneInfluences": 3,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0
+  },
+  "fitAudit": {
+    "neutral": 384,
+    "arms-up": 811,
+    "arm-cross": 759,
+    "crouch": 1268,
+    "sit": 1133,
+    "prone": 1013
+  },
+  "blockingFindings": [
+    "The five bodice panels remain visually disconnected and read as long rigid straps rather than one fitted sewn garment.",
+    "The skirt remains a thick inflated bucket-like shell with a nearly rectangular silhouette instead of a soft pleated skirt.",
+    "The skirt and hem separate from or intersect the legs in crouch, sit and prone despite the hips-to-thigh blend.",
+    "The wing modules remain flat clover-like cutouts rather than layered feathers with usable volume.",
+    "The leg warmers remain oversized tubes and the shoes remain crude ellipsoidal blobs.",
+    "The beret and ears float above the rendered body because their head-bone placement does not match the visible target geometry.",
+    "The fit audit reports body-garment triangle intersections in every required pose, led by the bodice back in neutral and the skirt in lower-body poses."
+  ],
+  "acceptedImprovements": [
+    "Hosted Blender generation, editable blend, FBX, prefab declarations, five views and all six required poses completed successfully.",
+    "The generated artifact has zero unweighted vertices, zero weight-sum errors and zero degenerate triangles.",
+    "Obsolete pull-request Blender runs are now cancelled automatically, so the latest revision no longer waits behind every intermediate commit.",
+    "The image framing is complete and directly reviewable."
+  ],
+  "nextAction": "Proceed to v5 using nearest-body skin-weight transfer for fitted panels and limb modules, a shorter pleated cloth skirt, volumetric feather primitives, and corrected head-accessory placement."
+}
