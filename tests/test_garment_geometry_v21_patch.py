@@ -54,10 +54,16 @@ class GarmentGeometryCrossSectionCageTests(unittest.TestCase):
     def test_primary_surface_uses_smoothed_cross_section_statistics(self) -> None:
         self.assertIn("class CrossSectionProfile", self.generator)
         self.assertIn("SAMPLE_COUNT = 54", self.generator)
-        self.assertIn("_quantile([abs(point.x) for point in points], 0.94)", self.generator)
+        self.assertIn(
+            "_quantile([abs(point.x) for point in points], 0.94)", self.generator
+        )
         self.assertIn("smooth_x = _moving_average(raw_x)", self.generator)
-        self.assertIn("point = profile.point(z, theta, BODY_CLEARANCE_M)", self.generator)
-        self.assertNotIn("sampler.point(\n                x,\n                z,", self.generator)
+        self.assertIn(
+            "point = profile.point(z, theta, BODY_CLEARANCE_M)", self.generator
+        )
+        self.assertNotIn(
+            "sampler.point(\n                x,\n                z,", self.generator
+        )
 
     def test_torso_has_analytic_high_cut_boundary(self) -> None:
         self.assertIn("TORSO_COLUMNS = 72", self.generator)
@@ -76,7 +82,9 @@ class GarmentGeometryCrossSectionCageTests(unittest.TestCase):
     def test_sleeves_are_reduced_and_extended_inward(self) -> None:
         self.assertIn('f"UpperArm_{side}"', self.generator)
         self.assertIn('f"LowerArm_{side}"', self.generator)
-        self.assertIn("shoulder_inner = upper_head - upper_direction * 0.018", self.generator)
+        self.assertIn(
+            "shoulder_inner = upper_head - upper_direction * 0.018", self.generator
+        )
         self.assertIn("radius = 0.047 - 0.018 * _smoothstep(t)", self.generator)
 
     def test_cowl_is_analytic_and_does_not_use_body_sampler(self) -> None:
