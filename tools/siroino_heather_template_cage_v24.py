@@ -304,7 +304,7 @@ def _sleeve(
     for ring in range(len(centers)):
         t = ring / (len(centers) - 1)
         radius = 0.062 - 0.021 * _smoothstep(t)
-        radius += 0.004 * math.exp(-((t - 0.48) / 0.18) ** 2)
+        radius += 0.004 * math.exp(-(((t - 0.48) / 0.18) ** 2))
         radii.append(radius)
     return _tube_component(
         pattern,
