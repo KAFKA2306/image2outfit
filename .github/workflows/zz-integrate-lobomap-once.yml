@@ -1,0 +1,194 @@
+name: One-time LoBoMap integration
+
+on:
+  push:
+    branches:
+      - fix/siroino-heather-v11-fit
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/siroino-heather-v11-fit
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Wire the LoBoFit-inspired trial into the product
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          product_path = Path("tools/siroino_heather_hooded_product.py")
+          text = product_path.read_text(encoding="utf-8")
+          old = (
+              "import siroino_heather_hooded_pattern_v13 as pattern\n"
+              "import siroino_heather_hooded_v21_patch as v21\n\n"
+              "v21.install(pattern)\n"
+          )
+          new = (
+              "import siroino_heather_hooded_pattern_v13 as pattern\n"
+              "import siroino_heather_hooded_v21_patch as v21\n"
+              "import siroino_heather_lobomap_fit as lobomap\n\n"
+              "v21.install(pattern)\n"
+              "lobomap.install(pattern)\n"
+          )
+          if old not in text and "lobomap.install(pattern)" not in text:
+              raise SystemExit("product import anchor not found")
+          text = text.replace(old, new)
+          rejected_anchor = "    {\n        \"revision\": \"v20-semantic-five-opening-highcut-shell\"," 
+          if "v21-pose-clear-underbody-five-opening-shell" not in text:
+              insertion = '''    {
+        "revision": "v21-pose-clear-underbody-five-opening-shell",
+        "reason": (
+            "exact five-opening topology and a body-clear hood were achieved, but "
+            "actual renders retained long crotch tabs, hip flaps and an excessively "
+            "loose tunic silhouette; all required poses failed"
+        ),
+    },
+'''
+              text = text.replace("\n]\n\n\ndef normalize_four_influences", "\n" + insertion + "]\n\n\ndef normalize_four_influences")
+          note_anchor = (
+              '                "The primary shell must be one component with exactly five openings.",\n'
+          )
+          note = (
+              '                "A LoBoFit-inspired trial encodes body-relative residuals in "\n'
+              '                "the four strongest bone-local frames, smooths them locally and "\n'
+              '                "decodes them with a 4 mm world-displacement bound.",\n'
+          )
+          if "LoBoFit-inspired trial encodes" not in text:
+              text = text.replace(note_anchor, note_anchor + note)
+          text = text.replace(
+              '                "Required pose, Unity and runtime review remain separate gates.",',
+              '                "Required pose renders and direct visual review remain completion "\n'
+              '                "gates; Unity and VRChat runtime validation are OUT_OF_SCOPE.",',
+          )
+          product_path.write_text(text, encoding="utf-8")
+
+          construction_path = Path(
+              "config/products/siroino-heather-hooded-bodysuit/construction.json"
+          )
+          construction = json.loads(construction_path.read_text(encoding="utf-8"))
+          construction["designRevision"] = "v22-lobomap-local-residual-fit"
+          panel = "four-bone-local-residual-smoothing-with-bounded-world-decoding"
+          if panel not in construction["panels"]:
+              construction["panels"].append(panel)
+          construction["researchTrial"] = {
+              "paper": "https://arxiv.org/abs/2605.07450",
+              "paperTitle": "LoBoFit: Flexible Garment Refitting via Local Bone Mapping Blending",
+              "submitted": "2026-05-08T08:56:06Z",
+              "paperLicense": "CC BY-NC-ND 4.0",
+              "implementation": "independent deterministic four-bone local residual encoding, smoothing, clearance pull and bounded decoding",
+              "authorsModelExecuted": False,
+              "officialCodeLocated": False,
+          }
+          construction["releaseBoundary"] = (
+              "COMPLETE requires Blender, editable source, FBX, declared Prefab, "
+              "current five-view and pose evidence, direct visualAppearanceReview PASS, "
+              "and a recorded research trial; Unity and VRChat runtime are OUT_OF_SCOPE"
+          )
+          construction_path.write_text(
+              json.dumps(construction, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+
+          job_path = Path("config/products/siroino-heather-hooded-bodysuit/job.json")
+          job = json.loads(job_path.read_text(encoding="utf-8"))
+          job["buildRevision"] = "v22-lobomap-local-residual-fit"
+          job["researchMethod"] = {
+              "name": "LoBoFit: Flexible Garment Refitting via Local Bone Mapping Blending",
+              "submitted": "2026-05-08T08:56:06Z",
+              "paperUrl": "https://arxiv.org/abs/2605.07450",
+              "paperLicense": "CC BY-NC-ND 4.0",
+              "paperLicenseUrl": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+              "officialCodeUrl": None,
+              "officialCodeStatus": "No official implementation located as of 2026-08-05",
+              "executionRequirements": "Blender 4.4.3, Python 3.11, bpy and mathutils BVHTree; no GPU, model or checkpoint",
+              "trialScope": "Independent deterministic local-bone residual prototype; authors' implementation is not used",
+          }
+          research_asset = (
+              "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/"
+              "lobofit-local-bone-trial.json"
+          )
+          if research_asset not in job["deliveryAssets"]:
+              index = job["deliveryAssets"].index(
+                  "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/seam-correspondence-graph-trial.json"
+              ) + 1
+              job["deliveryAssets"].insert(index, research_asset)
+          job_path.write_text(
+              json.dumps(job, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+
+          test_path = Path("tests/test_siroino_lobomap_fit.py")
+          test_path.write_text('''from __future__ import annotations
+
+import json
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class SiroinoLoBoMapFitTest(unittest.TestCase):
+    def test_product_executes_local_bone_fit(self) -> None:
+        product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("import siroino_heather_lobomap_fit as lobomap", product)
+        self.assertIn("lobomap.install(pattern)", product)
+        self.assertLess(
+            product.index("lobomap.install(pattern)"),
+            product.index("DESIGN_REVISION = pattern.DESIGN_REVISION"),
+        )
+
+    def test_trial_uses_local_bone_mapping_and_bounded_decoding(self) -> None:
+        source = (ROOT / "tools" / "siroino_heather_lobomap_fit.py").read_text(
+            encoding="utf-8"
+        )
+        for token in (
+            "BVHTree.FromPolygons",
+            "armature.pose.bones",
+            "inverse_rotations",
+            "localResidualEdgeRmsBeforeM",
+            "localResidualEdgeRmsAfterM",
+            "MAX_STEP_M = 0.004",
+            "authorsCodeCopied\": False",
+        ):
+            self.assertIn(token, source)
+
+    def test_product_contract_tracks_lobofit_trial(self) -> None:
+        config_root = ROOT / "config" / "products" / "siroino-heather-hooded-bodysuit"
+        job = json.loads((config_root / "job.json").read_text(encoding="utf-8"))
+        construction = json.loads(
+            (config_root / "construction.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(job["buildRevision"], "v22-lobomap-local-residual-fit")
+        self.assertEqual(construction["designRevision"], job["buildRevision"])
+        self.assertEqual(job["researchMethod"]["paperUrl"], "https://arxiv.org/abs/2605.07450")
+        self.assertIn(
+            "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
+            job["deliveryAssets"],
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
+''', encoding="utf-8")
+
+          Path(".github/workflows/zz-integrate-lobomap-once.yml").unlink()
+          Path(".lobomap-integration-trigger").unlink(missing_ok=True)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit -m "Integrate LoBoFit-inspired shell fitting trial"
+          git push origin HEAD:fix/siroino-heather-v11-fit
