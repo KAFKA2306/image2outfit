@@ -1,0 +1,30 @@
+name: Validate review console
+on:
+  pull_request:
+    paths:
+      - "tools/review_console.py"
+      - "tests/test_review_console.py"
+      - ".github/workflows/uiux-review-console.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile
+        run: python -m py_compile tools/review_console.py tests/test_review_console.py
+      - name: Test review console
+        run: python -m pytest -q tests/test_review_console.py
+      - name: Build repository console
+        run: python tools/review_console.py --root . --output /tmp/image2outfit-review-console
+      - name: Verify generated contract
+        run: |
+          test -s /tmp/image2outfit-review-console/index.html
+          test -s /tmp/image2outfit-review-console/review-console.json
+          grep -q 'READ ONLY · RELEASE EVIDENCE' /tmp/image2outfit-review-console/index.html
+          grep -q 'window.REVIEW_CONSOLE_DATA' /tmp/image2outfit-review-console/index.html
