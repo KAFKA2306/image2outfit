@@ -79,6 +79,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
     def test_safe_shell_has_topology_and_boundary_gates(self) -> None:
         required_fragments = (
             "The fitted source shell must not use a bevel modifier",
+            "shoulder_bridge",
             "max_edge > 0.20",
             "disconnected source shell",
             "expected at most 5 garment openings",
