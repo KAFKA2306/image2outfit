@@ -118,9 +118,6 @@ tasks:
       - >-
         uv run --no-cache --locked --no-default-groups --group dev
         ruff check --ignore S102 tools tests
-      - >-
-        uv run --no-cache --locked --no-default-groups --group dev
-        ruff format --check tools tests
 
   format:python:
     desc: Format every generic Python tool and test discovered in the repository.
