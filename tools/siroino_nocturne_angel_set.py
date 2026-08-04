@@ -11,6 +11,7 @@ TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
+import bmesh
 import bpy
 
 import siroino_strappy_knit_build as base
@@ -57,6 +58,57 @@ def _materials() -> dict[str, bpy.types.Material]:
     }
 
 
+def _remove_degenerate_polygons(
+    objects: list[bpy.types.Object],
+) -> dict[str, int]:
+    """Remove polygons that produce zero-area loop triangles.
+
+    The release metrics evaluate Blender's final loop-triangle tessellation, so
+    the cleanup uses the same predicate instead of relying on n-gon face area.
+    """
+    removed: dict[str, int] = {}
+    for obj in objects:
+        if obj.type != "MESH":
+            continue
+        mesh = obj.data
+        mesh.calc_loop_triangles()
+        degenerate_polygons = {
+            triangle.polygon_index
+            for triangle in mesh.loop_triangles
+            if (
+                (
+                    mesh.vertices[triangle.vertices[1]].co
+                    - mesh.vertices[triangle.vertices[0]].co
+                )
+                .cross(
+                    mesh.vertices[triangle.vertices[2]].co
+                    - mesh.vertices[triangle.vertices[0]].co
+                )
+                .length_squared
+                <= 1e-20
+            )
+        }
+        if not degenerate_polygons:
+            continue
+        cleanup = bmesh.new()
+        cleanup.from_mesh(mesh)
+        cleanup.faces.ensure_lookup_table()
+        doomed = [
+            cleanup.faces[index]
+            for index in sorted(degenerate_polygons)
+            if index < len(cleanup.faces)
+        ]
+        bmesh.ops.delete(cleanup, geom=doomed, context="FACES")
+        loose = [vertex for vertex in cleanup.verts if not vertex.link_faces]
+        if loose:
+            bmesh.ops.delete(cleanup, geom=loose, context="VERTS")
+        cleanup.to_mesh(mesh)
+        cleanup.free()
+        mesh.update(calc_edges=True)
+        removed[obj.name] = len(doomed)
+    return removed
+
+
 def _render_full_outfit(body, camera, previews):
     minimum, maximum = bounds(body)
     height = maximum.z - minimum.z
@@ -93,6 +145,7 @@ def main() -> int:
     bpy.context.view_layer.update()
     base.set_skin_material(body)
     garments, cloth = build(body, armature, _materials())
+    removed_degenerate = _remove_degenerate_polygons(garments)
 
     product_root = base.repo_path(job["productRoot"])
     for name in (
@@ -132,6 +185,8 @@ def main() -> int:
     write_integrated_prefab(job)
     metrics = base.metrics(garments)
     metrics["maxBoneInfluences"] = min(4, metrics.get("maxBoneInfluences", 4))
+    metrics["removedDegeneratePolygons"] = sum(removed_degenerate.values())
+    metrics["degenerateCleanupByObject"] = removed_degenerate
     passed = (
         metrics.get("meshObjects", 0) >= 25
         and metrics.get("vertices", 0) > 1000
