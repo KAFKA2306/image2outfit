@@ -200,20 +200,15 @@ def _close_unintended_openings(
     neck_candidates = [
         (component["center"].z, index)
         for index, component in enumerate(components)
-        if isinstance(component["center"], Vector)
-        and component["center"].z >= 0.95
+        if isinstance(component["center"], Vector) and component["center"].z >= 0.95
     ]
     if not neck_candidates:
         raise RuntimeError("Semantic opening classification could not find the neck")
     neck_index = max(neck_candidates)[1]
 
     retained = {neck_index}
-    retained.add(
-        _pick_side_component(components, retained, sign=-1.0, role="wrist")
-    )
-    retained.add(
-        _pick_side_component(components, retained, sign=1.0, role="wrist")
-    )
+    retained.add(_pick_side_component(components, retained, sign=-1.0, role="wrist"))
+    retained.add(_pick_side_component(components, retained, sign=1.0, role="wrist"))
     retained.add(_pick_side_component(components, retained, sign=-1.0, role="leg"))
     retained.add(_pick_side_component(components, retained, sign=1.0, role="leg"))
 
