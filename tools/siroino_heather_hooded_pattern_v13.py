@@ -2,10 +2,10 @@
 """Standalone bevel-safe v13 Siroino heather bodysuit pattern.
 
 The torso and sleeves are copied once from connected SiroinoSotai_PC topology.
-The acute fitted-shell boundary is deliberately not beveled because the v12
-hosted artifact proved that Blender's miter extrapolated vertices by about one
-metre. Smooth auxiliary panels overlap the shell and a geometry sanity gate
-rejects non-finite or implausibly long edges before export.
+The acute fitted-shell boundary is exported as a single surface: v12 proved
+that bevel mitering was unstable, and the first v13 run proved that Solidify's
+even-offset miter was equally unstable. Smooth auxiliary panels overlap the
+shell and a geometry sanity gate rejects non-finite or implausibly long edges.
 """
 
 from __future__ import annotations
@@ -70,10 +70,9 @@ def _body_panel(
     predicate: Callable[[Vector], bool],
     *,
     offset: float = 0.020,
-    thickness: float = 0.0014,
     bevel_width: float = 0.0,
 ) -> bpy.types.Object:
-    """Copy a fitted source shell without an unbounded bevel miter."""
+    """Copy a fitted source shell without miter-generating modifiers."""
     if bevel_width != 0.0:
         raise ValueError("The fitted source shell must not use a bevel modifier")
     selected = _selected_polygons(body, predicate)
@@ -151,14 +150,6 @@ def _body_panel(
     bpy.ops.object.select_all(action="DESELECT")
     obj.select_set(True)
     bpy.context.view_layer.objects.active = obj
-
-    solidify = obj.modifiers.new("Fabric thickness", "SOLIDIFY")
-    solidify.thickness = thickness
-    solidify.offset = 0.0
-    solidify.use_even_offset = True
-    _move_modifier_before_armature(obj, solidify)
-    bpy.ops.object.modifier_apply(modifier=solidify.name)
-
     triangulate = obj.modifiers.new("Export triangulation", "TRIANGULATE")
     _move_modifier_before_armature(obj, triangulate)
     bpy.ops.object.modifier_apply(modifier=triangulate.name)
