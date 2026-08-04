@@ -3,19 +3,15 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v14-source-topology-highcut-shell",
+  "designRevision": "v15-refined-topology-folded-hood",
   "panels": [
-    "single-connected-torso-pelvis-sleeve-source-topology-shell",
-    "fitted-cuff-left",
-    "fitted-cuff-right",
-    "single-smooth-hood-shell",
-    "hood-neck-band"
+    "one-level-subdivided-connected-torso-pelvis-sleeve-source-topology-shell",
+    "compact-folded-hood-cowl"
   ],
   "separateGeometry": [
     "Henley placket",
     "three buttons",
-    "hood drawcords",
-    "center-front, center-back and hood seam piping"
+    "hood drawcords"
   ],
   "priorityFitZones": [
     "shoulder",
@@ -29,9 +25,15 @@
     "inner thigh",
     "leg root",
     "buttocks",
-    "neck and hood opening",
+    "neck and folded hood",
     "drawcord"
   ],
+  "geometryGates": {
+    "primaryShellComponents": 1,
+    "maximumBoundaryLoops": 5,
+    "maximumEdgeLengthMeters": 0.2,
+    "maximumDefaultSurfaceOffsetMeters": 0.012
+  },
   "researchTrial": {
     "paper": "https://arxiv.org/abs/2607.21213",
     "paperTitle": "Learning-based Seam Correspondence Reconstruction in Sewing Patterns",
@@ -41,5 +43,5 @@
     "authorsModelExecuted": false,
     "officialCodeLocated": false
   },
-  "releaseBoundary": "WORKING until actual renders, evaluated fit audit, Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test and human runtime review pass"
+  "releaseBoundary": "WORKING until current-revision renders, evaluated fit audit, Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test and human runtime review pass"
 }
