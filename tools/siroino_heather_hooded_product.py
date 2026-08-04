@@ -19,6 +19,9 @@ import siroino_heather_hooded_v11_support as support
 support.install()
 
 import siroino_heather_hooded_pattern_v13 as pattern
+import siroino_heather_hooded_v21_patch as v21
+
+v21.install(pattern)
 
 DESIGN_REVISION = pattern.DESIGN_REVISION
 ACTUAL_SEPARATE_GEOMETRY = [
@@ -122,6 +125,23 @@ REJECTED_REVISIONS = [
             "three unintended holes remained and rendering was correctly stopped"
         ),
     },
+    {
+        "revision": "v19-topology-healed-weighted-shell",
+        "reason": (
+            "hosted Blender restored three accidental complement components, but five-"
+            "view evidence showed a shirt-like lower hem, hip fins and a body-"
+            "intersecting hood; all six evaluated poses failed"
+        ),
+    },
+    {
+        "revision": "v20-semantic-five-opening-highcut-shell",
+        "reason": (
+            "semantic classification retained five anatomical openings and restored "
+            "four accidental components, but front and rear crotch tabs, scalloped leg "
+            "openings and a knot-like hood remained; all six poses failed, including "
+            "396 shell overlaps in crouch and 636 in sit"
+        ),
+    },
 ]
 
 
@@ -183,8 +203,8 @@ def preserve_authored_weights(
         "weightSource": (
             "evaluated SiroinoSotai_PC topology refined twice with interpolated UVs "
             "and skin weights; shoulders and sleeves selected from interpolated arm "
-            "weights; unintended complement components restored from source topology; "
-            "nearest-body weights used for the folded hood roll and trim"
+            "weights; semantic neck, wrist and leg openings retained; nonanatomical "
+            "complement components restored; nearest-body weights used for trim"
         ),
         "rebound": False,
     }
@@ -244,15 +264,17 @@ def enforce_manifest_contract(original):
                 "do not follow coarse source polygons.",
                 "Torso and high-cut regions use geometric predicates; shoulders and "
                 "sleeves use interpolated upper-arm and lower-arm weights.",
-                "Unselected source polygons are split into connected complement "
-                "components; only the five largest intended openings are retained.",
-                "Smaller complement components adjacent to the shell are restored to "
-                "heal accidental holes before mesh extraction.",
-                "Two boundary rings are smoothed and shrink-wrapped to the evaluated "
-                "source at 12 mm clearance.",
-                "The high-cut lower body uses a short, broad smoothstep transition.",
-                "The hood is a compact rolled curve sampled along the upper back.",
-                "The primary shell must be one component with at most five openings.",
+                "Adjacent complement components are classified by anatomical position "
+                "as neck, left and right wrist, and left and right leg openings.",
+                "Every nonanatomical adjacent complement component is restored before "
+                "mesh extraction.",
+                "Four boundary rings are relaxed for 14 iterations and reprojected to "
+                "the evaluated source at 22 mm shell clearance.",
+                "The lower-body strip reaches the underbody at z=0.515 and blends "
+                "continuously into the torso by z=0.850.",
+                "The folded hood is a slim continuous upper-back roll sampled at "
+                "74-86 mm body clearance.",
+                "The primary shell must be one component with exactly five openings.",
                 "Buttons, Henley placket and drawcords remain separate geometry.",
                 "Required pose, Unity and runtime review remain separate gates.",
             ]
