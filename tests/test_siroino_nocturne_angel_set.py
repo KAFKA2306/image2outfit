@@ -43,16 +43,12 @@ class NocturneAngelSetContractTest(unittest.TestCase):
             (CONFIG / "construction.json").read_text(encoding="utf-8")
         )
         self.assertEqual(construction["profile"], "loose-layered")
-        joined = " ".join(
-            construction["panels"] + construction["separateGeometry"]
-        )
+        joined = " ".join(construction["panels"] + construction["separateGeometry"])
         for required in ("skirt", "sailor collar", "wings", "beret", "leg warmers"):
             self.assertIn(required, joined)
 
     def test_reference_is_hash_bound_but_not_redistributed(self) -> None:
-        reference = json.loads(
-            (CONFIG / "reference.json").read_text(encoding="utf-8")
-        )
+        reference = json.loads((CONFIG / "reference.json").read_text(encoding="utf-8"))
         self.assertEqual(
             reference["sha256"],
             "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67",
