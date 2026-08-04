@@ -224,9 +224,7 @@ def _boundary_loops(obj: bpy.types.Object, armature: bpy.types.Object) -> list[d
             for left, right in boundary_edges
             if left in component and right in component
         )
-        center = sum(local_points, Vector((0.0, 0.0, 0.0))) / max(
-            len(local_points), 1
-        )
+        center = sum(local_points, Vector((0.0, 0.0, 0.0))) / max(len(local_points), 1)
         loops.append(
             {
                 "vertexCount": len(component),
