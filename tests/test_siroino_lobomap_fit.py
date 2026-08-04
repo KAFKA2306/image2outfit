@@ -14,9 +14,9 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
         product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
             encoding="utf-8"
         )
-        wrapper = (
-            ROOT / "tools" / "siroino_heather_hooded_product_v24.py"
-        ).read_text(encoding="utf-8")
+        lobomap = (ROOT / "tools" / "siroino_heather_lobomap_fit.py").read_text(
+            encoding="utf-8"
+        )
         self.assertIn("import siroino_heather_lobomap_fit as lobomap", product)
         self.assertIn("v21.install(pattern)", product)
         self.assertIn("lobomap.install(pattern)", product)
@@ -26,10 +26,13 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
         )
         self.assertIn(
             "import siroino_heather_smooth_surface_repair as repair",
-            wrapper,
+            lobomap,
         )
-        self.assertIn("repair.install(base.pattern)", wrapper)
-        self.assertIn("base.DESIGN_REVISION = base.pattern.DESIGN_REVISION", wrapper)
+        self.assertIn("repair.install(pattern)", lobomap)
+        self.assertLess(
+            lobomap.index("pattern.create_outfit = create_outfit"),
+            lobomap.index("repair.install(pattern)"),
+        )
 
     def test_local_bone_trial_is_a_real_bounded_geometry_operation(self) -> None:
         source = (ROOT / "tools" / "siroino_heather_lobomap_fit.py").read_text(
@@ -73,7 +76,7 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
         self.assertEqual(construction["designRevision"], REVISION)
         self.assertEqual(
             job["buildScript"],
-            "tools/siroino_heather_hooded_product_v24.py",
+            "tools/siroino_heather_hooded_product.py",
         )
         self.assertEqual(
             job["researchMethod"]["paperUrl"],
