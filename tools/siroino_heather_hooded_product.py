@@ -18,15 +18,15 @@ import siroino_heather_hooded_v11_support as support
 
 support.install()
 
+import siroino_heather_closed_components_v27 as closed_components
 import siroino_heather_hooded_pattern_v13 as pattern
-import siroino_heather_polar_yoke_v26 as polar_yoke
 
-polar_yoke.install(pattern)
+closed_components.install(pattern)
 
 DESIGN_REVISION = pattern.DESIGN_REVISION
-POLAR_YOKE_TRIAL = (
+CLOSED_COMPONENTS_TRIAL = (
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/"
-    "angular-polar-yoke-trial.json"
+    "closed-components-clearance-trial.json"
 )
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
@@ -78,6 +78,14 @@ REJECTED_REVISIONS = [
             "all six required poses intersected for 15,897 total overlap pairs"
         ),
     },
+    {
+        "revision": "v26-angular-polar-yoke-hood",
+        "reason": (
+            "the angular body field stabilized the torso and reduced total overlaps to "
+            "14,192, but direct artifact review still found upper-back body holes, open "
+            "sleeve roots, an oversized dome hood and pointed two-column crotch flaps"
+        ),
+    },
 ]
 
 
@@ -100,11 +108,7 @@ def normalize_four_influences(
                 for item in list(vertex.groups)
                 if item.weight > 1e-10
             ]
-            ranked = sorted(
-                assignments,
-                key=lambda item: item[1],
-                reverse=True,
-            )[:maximum]
+            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[:maximum]
             if not ranked:
                 ranked = [(fallback.name, 1.0)]
             total = sum(weight for _, weight in ranked)
@@ -119,9 +123,7 @@ def normalize_four_influences(
                 obj.vertex_groups[group_name].remove([vertex.index])
             for group_name, weight in ranked:
                 obj.vertex_groups[group_name].add(
-                    [vertex.index],
-                    weight / total,
-                    "REPLACE",
+                    [vertex.index], weight / total, "REPLACE"
                 )
             if requires_change:
                 affected += 1
@@ -138,13 +140,14 @@ def preserve_authored_weights(
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
             "the torso envelope is reconstructed from smoothed height-by-angle body "
-            "radius statistics; shoulder yoke, gusset, sleeves, cuffs and hood are "
-            "garment-native components; SiroinoSotai_PC is used only as a statistical "
-            "shape and nearest-body skin-weight reference; four normalized influences "
-            "are enforced after construction"
+            "statistics; the yoke, eleven-column pelvic saddle, overlapping sleeve "
+            "caps, cuffs and folded-back hood are garment-native components; bounded "
+            "body-clearance projection is applied only after topology construction; "
+            "four normalized influences are enforced after construction"
         ),
         "bodyTopologyCopied": False,
-        "ellipseOnlyProfileUsed": False,
+        "boundedClearanceProjection": True,
+        "pelvicSaddleColumns": 11,
         "rebound": False,
     }
 
@@ -156,20 +159,20 @@ def wrap_pattern_writer(original):
         contract["separateGeometry"] = ACTUAL_SEPARATE_GEOMETRY
         contract["designRevision"] = DESIGN_REVISION
         contract["representation"] = {
-            "canonical": "angular polar garment field with explicit yoke and hood",
+            "canonical": "polar torso with closed garment-native components",
             "bodyTopologyCopied": False,
-            "ellipseOnlyProfileUsed": False,
+            "boundedClearanceProjection": True,
             "components": [
-                "smoothed height-by-angle torso radius field",
-                "integrated shoulder yoke and neck ring",
-                "short widened shared-edge gusset",
-                "fitted left and right sleeve caps and tubes",
+                "smoothed height-by-angle torso field",
+                "continuous shoulder yoke and neck ring",
+                "eleven-column pelvic saddle",
+                "overlapping left and right sleeve caps and tubes",
                 "left and right cuffs",
-                "three-dimensional open-front hood shell",
+                "low folded-back hood shell",
             ],
-            "bodyRole": "angular radial statistics and skin-weight reference",
+            "bodyRole": "polar statistics, bounded clearance and skin-weight reference",
         }
-        contract["researchTrialEvidence"] = POLAR_YOKE_TRIAL
+        contract["researchTrialEvidence"] = CLOSED_COMPONENTS_TRIAL
         pattern_path.write_text(
             json.dumps(contract, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
@@ -186,7 +189,7 @@ def enforce_manifest_contract(original):
         result = original(*args, **kwargs)
         job = args[0]
         root = Path(__file__).resolve().parents[1]
-        trial_path = root / POLAR_YOKE_TRIAL
+        trial_path = root / CLOSED_COMPONENTS_TRIAL
         trial = (
             json.loads(trial_path.read_text(encoding="utf-8"))
             if trial_path.is_file()
@@ -212,11 +215,11 @@ def enforce_manifest_contract(original):
             "humanRuntimeReview",
         ):
             manifest["technicalGates"][key] = "OUT_OF_SCOPE"
-        manifest["outputs"]["researchTrial"] = POLAR_YOKE_TRIAL
+        manifest["outputs"]["researchTrial"] = CLOSED_COMPONENTS_TRIAL
         manifest["research"] = {
             "result": trial.get("result", "FAIL"),
-            "evidence": POLAR_YOKE_TRIAL,
-            "representation": "angular polar garment field with yoke and hood",
+            "evidence": CLOSED_COMPONENTS_TRIAL,
+            "representation": "polar torso with closed garment-native components",
             "authorsImplementationExecuted": False,
             "authorsCodeCopied": False,
         }
@@ -243,18 +246,16 @@ def enforce_manifest_contract(original):
                 item for item in REJECTED_REVISIONS if item["revision"] not in existing
             )
             report["notes"] = [
-                "Body-face selection, DAMA anchoring, LoBoMap residual smoothing, "
-                "binary front/back sampling and ellipse-only torso sections are not "
-                "in the active path.",
-                "The torso is reconstructed from robust radial quantiles for each "
-                "height and polar angle, then smoothed circularly and vertically.",
-                "The upper torso expands into an integrated shoulder yoke and closes "
-                "toward a fitted neck ring, removing the v25 upper-back openings.",
-                "Sleeve roots extend inward beneath the yoke and use reduced radii.",
-                "The lower high-cut panels are shorter and use a wider, shallower "
-                "shared-edge gusset.",
-                "The hood is an open-front three-dimensional shell rather than a thin "
-                "transverse cowl band.",
+                "The stable angular torso field is retained, but all v26 blocking "
+                "component mechanisms are replaced.",
+                "The underbody is an eleven-column surface saddle rather than a single "
+                "two-vertex-wide strip.",
+                "Sleeve caps start farther beneath the yoke and use enlarged root rings "
+                "that overlap the shoulder shell.",
+                "The hood is a low folded-back rear-neck shell instead of a head-sized "
+                "dome.",
+                "A bounded nearest-body clearance projection is applied only after "
+                "garment-native topology exists, so it cannot redefine garment regions.",
                 "Required five-view and pose renders plus direct visual review remain "
                 "completion gates; Unity and VRChat runtime validation are OUT_OF_SCOPE.",
             ]
