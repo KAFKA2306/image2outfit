@@ -4,6 +4,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import sys
+
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
 
 import bpy
 
@@ -12,7 +17,6 @@ from siroino_nocturne_geometry import material
 from siroino_nocturne_modules import build
 from siroino_nocturne_records import write_integrated_prefab, write_records
 
-ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-nocturne-angel-set"
 
 
