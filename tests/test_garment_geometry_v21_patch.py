@@ -37,14 +37,20 @@ class GarmentGeometryV22BodyAnchorTests(unittest.TestCase):
             "The flat patch must not add another internal import level",
         )
 
-    def test_job_declares_v22_revision(self) -> None:
+    def test_job_retains_dama_anchor_as_the_v23_preconditioner(self) -> None:
         self.assertEqual(
             self.job["buildRevision"],
-            "v22-dama-inspired-body-anchored-shell",
+            "v23-dama-anchor-lobomap-residual-fit",
         )
         self.assertEqual(
             self.job["buildScript"],
             "tools/siroino_heather_hooded_product.py",
+        )
+        self.assertIn("v21.install(pattern)", self.product)
+        self.assertIn("lobomap.install(pattern)", self.product)
+        self.assertLess(
+            self.product.index("v21.install(pattern)"),
+            self.product.index("lobomap.install(pattern)"),
         )
 
     def test_underbody_strip_reaches_below_v20_cutoff(self) -> None:
