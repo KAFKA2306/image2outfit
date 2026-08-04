@@ -43,6 +43,13 @@ tasks:
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py audit all
 
+  audit:toolchain:
+    desc: Audit pinned Python, Blender, Unity, VPM, and package contracts.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit toolchain
+
   audit:repo:
     desc: Reject runtime residue, global product config, and mutating workflows.
     cmds:
