@@ -81,8 +81,7 @@ class CrossSectionProfile:
             selected = [
                 point
                 for point in self.points
-                if abs(point.z - z) <= band
-                and abs(point.x) <= self._x_limit(z)
+                if abs(point.z - z) <= band and abs(point.x) <= self._x_limit(z)
             ]
             if len(selected) >= 48:
                 return selected
@@ -93,8 +92,7 @@ class CrossSectionProfile:
 
     def _build_samples(self) -> list[tuple[float, float, float, float]]:
         levels = [
-            self.Z_MIN
-            + (self.Z_MAX - self.Z_MIN) * index / (self.SAMPLE_COUNT - 1)
+            self.Z_MIN + (self.Z_MAX - self.Z_MIN) * index / (self.SAMPLE_COUNT - 1)
             for index in range(self.SAMPLE_COUNT)
         ]
         raw_x: list[float] = []
