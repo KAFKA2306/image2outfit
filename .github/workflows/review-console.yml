@@ -1,0 +1,44 @@
+name: Review console
+
+on:
+  pull_request:
+    paths:
+      - "tools/review_console.py"
+      - "tests/test_review_console_v2.py"
+      - ".github/workflows/review-console.yml"
+      - "config/release-policy.json"
+  push:
+    branches:
+      - main
+    paths:
+      - "tools/review_console.py"
+      - "tests/test_review_console_v2.py"
+      - ".github/workflows/review-console.yml"
+      - "config/release-policy.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: review-console-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Python 3.11 fixture contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Compile review console
+        run: python -m py_compile tools/review_console.py tests/test_review_console_v2.py
+
+      - name: Run fixture tests
+        run: python -m unittest tests.test_review_console_v2 -v
