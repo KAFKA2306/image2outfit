@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 import sys
 
@@ -18,6 +19,7 @@ BONES = {
     "head": ("Head", "J_Bip_C_Head"),
     "neck": ("Neck", "J_Bip_C_Neck"),
     "chest": ("Chest", "UpperChest", "J_Bip_C_Chest"),
+    "hips": ("Hips", "J_Bip_C_Hips"),
     "upper_arm_l": ("UpperArm_L", "LeftUpperArm"),
     "upper_arm_r": ("UpperArm_R", "RightUpperArm"),
     "lower_arm_l": ("LowerArm_L", "LeftLowerArm"),
@@ -26,6 +28,8 @@ BONES = {
     "upper_leg_r": ("UpperLeg_R", "RightUpperLeg"),
     "lower_leg_l": ("LowerLeg_L", "LeftLowerLeg"),
     "lower_leg_r": ("LowerLeg_R", "RightLowerLeg"),
+    "foot_l": ("Foot_L", "LeftFoot"),
+    "foot_r": ("Foot_R", "RightFoot"),
 }
 
 
@@ -37,18 +41,15 @@ def bounds(body):
     )
 
 
+def resolve_bone_name(armature, semantic):
+    for name in BONES[semantic]:
+        if armature.data.bones.get(name) is not None:
+            return name
+    raise RuntimeError(f"missing Siroino bone: {semantic}")
+
+
 def bone_segment(armature, semantic):
-    aliases = BONES[semantic]
-    bone = next(
-        (
-            armature.data.bones.get(name)
-            for name in aliases
-            if armature.data.bones.get(name)
-        ),
-        None,
-    )
-    if bone is None:
-        raise RuntimeError(f"missing Siroino bone: {semantic}")
+    bone = armature.data.bones[resolve_bone_name(armature, semantic)]
     return (
         armature.matrix_world @ bone.head_local,
         armature.matrix_world @ bone.tail_local,
@@ -72,6 +73,18 @@ def finish(obj, mat):
     return obj
 
 
+def _cylindrical_uv(mesh, segments, rings):
+    uv = mesh.uv_layers.new(name="UVMap")
+    for polygon in mesh.polygons:
+        for loop_index in polygon.loop_indices:
+            vertex_index = mesh.loops[loop_index].vertex_index
+            ring_index, segment_index = divmod(vertex_index, segments)
+            uv.data[loop_index].uv = (
+                segment_index / segments,
+                ring_index / max(1, rings - 1),
+            )
+
+
 def sphere(name, location, scale, mat, rotation=(0.0, 0.0, 0.0)):
     bpy.ops.mesh.primitive_uv_sphere_add(
         segments=32,
@@ -86,20 +99,6 @@ def sphere(name, location, scale, mat, rotation=(0.0, 0.0, 0.0)):
     return obj
 
 
-def cone(name, location, radius1, radius2, depth, mat, *, end_fill_type="NGON"):
-    bpy.ops.mesh.primitive_cone_add(
-        vertices=64,
-        radius1=radius1,
-        radius2=radius2,
-        depth=depth,
-        location=location,
-        end_fill_type=end_fill_type,
-    )
-    obj = finish(bpy.context.object, mat)
-    obj.name = name
-    return obj
-
-
 def cube(name, location, scale, mat, rotation=(0.0, 0.0, 0.0)):
     bpy.ops.mesh.primitive_cube_add(location=location, rotation=rotation)
     obj = finish(bpy.context.object, mat)
@@ -107,34 +106,97 @@ def cube(name, location, scale, mat, rotation=(0.0, 0.0, 0.0)):
     obj.scale = scale
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     bevel = obj.modifiers.new("Finished edges", "BEVEL")
-    bevel.width = min(scale) * 0.15
-    bevel.segments = 2
+    bevel.width = min(scale) * 0.22
+    bevel.segments = 4
     bpy.context.view_layer.objects.active = obj
     bpy.ops.object.modifier_apply(modifier=bevel.name)
     return obj
 
 
-def tube(name, start, end, radius_start, radius_end, mat):
+def frustum_shell(name, center, rings, mat, *, segments=64, scallops=0):
+    """Create an open multi-ring elliptical garment shell."""
+    vertices = []
+    for ring_index, (z, radius_x, radius_y, y_offset) in enumerate(rings):
+        blend = ring_index / max(1, len(rings) - 1)
+        for segment in range(segments):
+            angle = math.tau * segment / segments
+            wave = 1.0
+            if scallops and ring_index == 0:
+                wave += 0.035 * math.sin(scallops * angle)
+            vertices.append(
+                (
+                    center.x + radius_x * wave * math.cos(angle),
+                    center.y + y_offset + radius_y * wave * math.sin(angle),
+                    z,
+                )
+            )
+    faces = []
+    for ring_index in range(len(rings) - 1):
+        for segment in range(segments):
+            next_segment = (segment + 1) % segments
+            first = ring_index * segments + segment
+            second = ring_index * segments + next_segment
+            third = (ring_index + 1) * segments + next_segment
+            fourth = (ring_index + 1) * segments + segment
+            faces.append((first, second, third, fourth))
+    mesh = bpy.data.meshes.new(f"{name}_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    _cylindrical_uv(mesh, segments, len(rings))
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    return finish(obj, mat)
+
+
+def axis_shell(name, start, end, radii, mat, *, segments=40):
+    """Create an open sleeve-like shell around an arbitrary bone segment."""
     axis = end - start
-    obj = cone(
-        name,
-        (start + end) * 0.5,
-        radius_end,
-        radius_start,
-        axis.length,
-        mat,
-    )
-    obj.rotation_mode = "QUATERNION"
-    obj.rotation_quaternion = Vector((0.0, 0.0, 1.0)).rotation_difference(
-        axis.normalized()
-    )
-    return obj
+    direction = axis.normalized()
+    reference = Vector((0.0, 0.0, 1.0))
+    if abs(direction.dot(reference)) > 0.92:
+        reference = Vector((1.0, 0.0, 0.0))
+    first_basis = direction.cross(reference).normalized()
+    second_basis = direction.cross(first_basis).normalized()
+    vertices = []
+    for ring_index, radius in enumerate(radii):
+        t = ring_index / max(1, len(radii) - 1)
+        center = start.lerp(end, t)
+        for segment in range(segments):
+            angle = math.tau * segment / segments
+            vertices.append(
+                center
+                + first_basis * radius * math.cos(angle)
+                + second_basis * radius * math.sin(angle)
+            )
+    faces = []
+    for ring_index in range(len(radii) - 1):
+        for segment in range(segments):
+            next_segment = (segment + 1) % segments
+            first = ring_index * segments + segment
+            second = ring_index * segments + next_segment
+            third = (ring_index + 1) * segments + next_segment
+            fourth = (ring_index + 1) * segments + segment
+            faces.append((first, second, third, fourth))
+    mesh = bpy.data.meshes.new(f"{name}_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    _cylindrical_uv(mesh, segments, len(radii))
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    return finish(obj, mat)
 
 
 def panel(name, points, mat, thickness):
     mesh = bpy.data.meshes.new(f"{name}_Mesh")
     mesh.from_pydata(points, [], [tuple(range(len(points)))])
     mesh.materials.append(mat)
+    uv = mesh.uv_layers.new(name="UVMap")
+    for polygon in mesh.polygons:
+        for order, loop_index in enumerate(polygon.loop_indices):
+            uv.data[loop_index].uv = (
+                1.0 if order in (1, 2) else 0.0,
+                1.0 if order in (2, 3) else 0.0,
+            )
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     modifier = obj.modifiers.new("Panel thickness", "SOLIDIFY")
@@ -146,6 +208,35 @@ def panel(name, points, mat, thickness):
     obj.select_set(False)
     obj["image2outfit_role"] = "garment"
     return obj
+
+
+def feather(name, root, tip, width, mat):
+    axis = tip - root
+    normal = Vector((0.0, 1.0, 0.0))
+    side = normal.cross(axis).normalized() * width
+    middle = root.lerp(tip, 0.48)
+    return panel(
+        name,
+        [root, middle + side, tip, middle - side],
+        mat,
+        max(0.0012, width * 0.08),
+    )
+
+
+def _parent_with_armature(obj, armature):
+    world = obj.matrix_world.copy()
+    obj.parent = armature
+    obj.matrix_world = world
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+
+
+def rigid_weight(obj, armature, semantic):
+    group_name = resolve_bone_name(armature, semantic)
+    group = obj.vertex_groups.new(name=group_name)
+    group.add(range(len(obj.data.vertices)), 1.0, "REPLACE")
+    _parent_with_armature(obj, armature)
 
 
 def transfer_weights(obj, body, armature):
@@ -175,12 +266,7 @@ def transfer_weights(obj, body, armature):
         total = sum(value for _, value in weights) or 1.0
         for group, value in weights:
             groups[group].add([vertex.index], value / total, "REPLACE")
-    world = obj.matrix_world.copy()
-    obj.parent = armature
-    obj.matrix_world = world
-    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
-    modifier.object = armature
-    modifier.use_deform_preserve_volume = True
+    _parent_with_armature(obj, armature)
 
 
 def bake_skirt(skirt, body):
@@ -195,16 +281,16 @@ def bake_skirt(skirt, body):
     except RuntimeError:
         pass
     cloth = skirt.modifiers.new("Nocturne cloth simulation", "CLOTH")
-    cloth.settings.quality = 6
-    cloth.settings.mass = 0.24
+    cloth.settings.quality = 7
+    cloth.settings.mass = 0.20
     cloth.settings.vertex_group_mass = group.name
     cloth.collision_settings.use_collision = True
-    cloth.collision_settings.distance_min = 0.004
+    cloth.collision_settings.distance_min = 0.005
     cloth.collision_settings.use_self_collision = True
-    cloth.collision_settings.self_distance_min = 0.004
+    cloth.collision_settings.self_distance_min = 0.005
     scene = bpy.context.scene
-    scene.frame_end = 24
-    for frame in range(1, 25):
+    scene.frame_end = 32
+    for frame in range(1, 33):
         scene.frame_set(frame)
         bpy.context.view_layer.update()
     depsgraph = bpy.context.evaluated_depsgraph_get()
@@ -218,11 +304,14 @@ def bake_skirt(skirt, body):
     skirt.data = baked
     bpy.data.meshes.remove(previous)
     skirt.modifiers.clear()
+    pin_group = skirt.vertex_groups.get("Cloth_Pin")
+    if pin_group is not None:
+        skirt.vertex_groups.remove(pin_group)
     scene.frame_set(1)
-    skirt["clothSimulationFrames"] = 24
+    skirt["clothSimulationFrames"] = 32
     return {
         "object": skirt.name,
-        "frames": 24,
+        "frames": 32,
         "pinVertices": len(pinned),
         "bodyCollision": True,
         "selfCollision": True,
