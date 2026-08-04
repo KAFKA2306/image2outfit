@@ -2,7 +2,8 @@
   "schemaVersion": 1,
   "status": "PENDING_EXECUTION",
   "result": "PENDING",
-  "method": "PatternGSL-inspired explicit panel/seam/layer specification with Blender cloth",
+  "designRevision": "v3-sewn-v-neck-stable-modules",
+  "method": "PatternGSL-inspired explicit sewn panel, seam and layer specification with Blender cloth",
   "sources": [
     {
       "title": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
@@ -17,6 +18,12 @@
       "url": "https://docs.blender.org/manual/en/4.4/physics/cloth/index.html"
     }
   ],
+  "implementation": {
+    "bodyTopologyCopied": false,
+    "externalResearchCodeExecuted": false,
+    "bodicePanels": 5,
+    "stableRigidModules": ["skirt after cloth bake", "hem frill", "waist band", "leg warmers", "shoes", "wings"]
+  },
   "acceptance": {
     "researchTrial": "PENDING",
     "visualAppearanceReview": "PENDING"
