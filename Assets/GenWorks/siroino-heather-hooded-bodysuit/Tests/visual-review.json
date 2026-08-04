@@ -1,42 +1,48 @@
 {
-  "schemaVersion": 1,
-  "checkedAt": "2026-08-03T07:15:00+09:00",
+  "schemaVersion": 2,
+  "designRevision": "v15-refined-topology-folded-hood",
+  "checkedAt": null,
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "result": "FAIL",
+  "result": "PENDING_CURRENT_REVISION_REVIEW",
   "releaseDecision": "WORKING_CHECKPOINT_ONLY",
   "evidence": {
     "multiview": "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
     "poseReview": "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
     "fitAudit": "Tests/fit-audit.json"
   },
-  "blockingFindings": [
-    {
-      "zone": "shoulder/underarm",
-      "finding": "Visible gaps leave the sleeves disconnected from the upper body.",
-      "requiredFix": "Rebuild or bridge the armhole and transfer continuous body weights."
-    },
-    {
-      "zone": "waist/hip crest",
-      "finding": "Rigid triangular fins project from both sides.",
-      "requiredFix": "Replace the transition with a smooth high-cut edge and controlled side ties."
-    },
-    {
-      "zone": "hood/back",
-      "finding": "Back hood panels appear as detached wing-like strips.",
-      "requiredFix": "Build a continuous hood shell with a closed center seam and wearable volume."
-    },
-    {
-      "zone": "all required poses",
-      "finding": "The fit audit reports 8,490 garment/body triangle overlap pairs.",
-      "requiredFix": "Clear the BVH audit or replace it with a validated contact-distance metric."
-    }
-  ],
-  "nonBlockingPasses": [
-    "Five directional renders exist.",
-    "Six required pose renders exist.",
-    "FBX and Blender source were generated.",
-    "Maximum bone influences is four; no unweighted vertices or degenerate triangles were reported.",
-    "The 2026 seam-correspondence metadata trial passed."
+  "previousRevisionReview": {
+    "designRevision": "v14-source-topology-highcut-shell",
+    "result": "FAIL",
+    "hostedWorkflowRun": 30878640624,
+    "blockingFindings": [
+      {
+        "zone": "elbow/sleeve",
+        "finding": "Visible missing-face openings remain around both elbows."
+      },
+      {
+        "zone": "leg opening/groin",
+        "finding": "The coarse source-face selection creates a visibly serrated high-cut edge."
+      },
+      {
+        "zone": "wrist",
+        "finding": "Separate cuffs float as oversized rigid rings."
+      },
+      {
+        "zone": "hood",
+        "finding": "The generated hood expands into an umbrella-like sheet above the shoulders."
+      },
+      {
+        "zone": "required poses",
+        "finding": "All six required poses failed the evaluated BVH audit; neutral reported 268 pairs and arms-up reported 1418 pairs."
+      }
+    ]
+  },
+  "currentRevisionRequirements": [
+    "Inspect all five directional renders generated from v15.",
+    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders.",
+    "Require one connected primary shell with no more than five boundary loops.",
+    "Require no visible sleeve holes, detached geometry or inflated hood shape.",
+    "Do not mark PASS until the current-revision fit audit and images agree."
   ]
 }
