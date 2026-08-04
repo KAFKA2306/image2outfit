@@ -1,4 +1,4 @@
-"""Generated contracts and Unity declarations for the Nocturne Angel set."""
+"""Generated records and Unity declarations for the Nocturne Angel set."""
 
 from __future__ import annotations
 
@@ -11,21 +11,36 @@ import siroino_strappy_knit_build as base
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-nocturne-angel-set"
 PRODUCT_NAME = "Nocturne Angel Modular Set for Siroino"
-REVISION = "v2-open-multiring-reference-silhouette"
+REVISION = "v3-sewn-v-neck-stable-modules"
 REFERENCE_SHA256 = "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67"
-V1_ARTIFACT_SHA256 = "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c0392551a"
+
+REJECTED_HISTORY = [
+    {
+        "revision": "v1-pattern-gsl-modular-cloth",
+        "result": "VISUAL_REJECTED",
+        "hostedWorkflowRun": 30934884455,
+        "artifactId": 8903072226,
+        "artifactSha256": (
+            "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c0392551a"
+        ),
+        "evidence": "Tests/visual-review-v1.json",
+    },
+    {
+        "revision": "v2-open-multiring-reference-silhouette",
+        "result": "VISUAL_REJECTED",
+        "hostedWorkflowRun": 30937377321,
+        "artifactId": 8904078622,
+        "artifactSha256": (
+            "5f3465dc50486b627df520142a7a74fa2b5b98d22089a509d124a5d1936be3fc"
+        ),
+        "evidence": "Tests/visual-review-v2.json",
+    },
+]
 
 
 def _guid(label: str) -> str:
     value = f"image2outfit:{PRODUCT_ID}:{label}".encode()
     return hashlib.md5(value).hexdigest()
-
-
-def _read_guid(path: Path) -> str:
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if line.startswith("guid: "):
-            return line.removeprefix("guid: ").strip()
-    raise RuntimeError(f"Unity meta file has no guid: {path}")
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -36,12 +51,18 @@ def _write_json(path: Path, payload: dict) -> None:
     )
 
 
+def _read_guid(path: Path) -> str:
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("guid: "):
+            return line.removeprefix("guid: ").strip()
+    raise RuntimeError(f"Unity meta file has no guid: {path}")
+
+
 def write_integrated_prefab(job: dict) -> Path:
     outfit = base.repo_path(job["prefabAssetPath"])
     outfit_meta = outfit.with_suffix(outfit.suffix + ".meta")
     if not outfit.is_file() or not outfit_meta.is_file():
         raise RuntimeError("outfit Prefab declaration is missing")
-
     outfit_guid = _read_guid(outfit_meta)
     integrated = base.repo_path(job["integratedPrefabAssetPath"])
     integrated.parent.mkdir(parents=True, exist_ok=True)
@@ -68,8 +89,7 @@ PrefabInstance:
 """,
         encoding="utf-8",
     )
-    meta = integrated.with_suffix(integrated.suffix + ".meta")
-    meta.write_text(
+    integrated.with_suffix(integrated.suffix + ".meta").write_text(
         "\n".join(
             [
                 "fileFormatVersion: 2",
@@ -87,66 +107,62 @@ PrefabInstance:
     return integrated
 
 
-def _panel(identifier: str, object_name: str, layer: str, cloth: bool = False) -> dict:
-    return {
-        "id": identifier,
-        "object": object_name,
-        "layer": layer,
-        "cloth": cloth,
-    }
-
-
 def _pattern(cloth: list[dict]) -> dict:
     panels = [
-        _panel("bodice", "Nocturne_Cropped_Bodice", "base"),
-        _panel("collar-left", "Nocturne_Sailor_Collar_L", "overlay"),
-        _panel("collar-right", "Nocturne_Sailor_Collar_R", "overlay"),
-        _panel("collar-back", "Nocturne_Sailor_Collar_Back", "overlay"),
-        _panel("skirt", "Nocturne_Cloth_Skirt", "outer", True),
-        _panel("hem-frill", "Nocturne_Cream_Hem_Frill", "outer-trim"),
-        _panel("waist-band", "Nocturne_Waist_Band", "closure"),
-        _panel("puff-sleeve-left", "Nocturne_Puff_Sleeve_L", "outer"),
-        _panel("puff-sleeve-right", "Nocturne_Puff_Sleeve_R", "outer"),
-        _panel(
-            "arm-warmer-left",
-            "Nocturne_Detached_Arm_Warmer_L",
-            "detached",
-        ),
-        _panel(
-            "arm-warmer-right",
-            "Nocturne_Detached_Arm_Warmer_R",
-            "detached",
-        ),
-        _panel("leg-warmer-left", "Nocturne_Leg_Warmer_L", "detached"),
-        _panel("leg-warmer-right", "Nocturne_Leg_Warmer_R", "detached"),
+        ("bodice-front-left", "Nocturne_Bodice_Front_L", "base"),
+        ("bodice-front-right", "Nocturne_Bodice_Front_R", "base"),
+        ("bodice-back", "Nocturne_Bodice_Back", "base"),
+        ("bodice-side-left", "Nocturne_Bodice_Side_L", "base"),
+        ("bodice-side-right", "Nocturne_Bodice_Side_R", "base"),
+        ("collar-left", "Nocturne_Sailor_Collar_L", "overlay"),
+        ("collar-right", "Nocturne_Sailor_Collar_R", "overlay"),
+        ("collar-back", "Nocturne_Sailor_Collar_Back", "overlay"),
+        ("skirt", "Nocturne_Cloth_Skirt", "outer"),
+        ("hem-frill", "Nocturne_Cream_Hem_Frill", "outer-trim"),
+        ("waist-band", "Nocturne_Waist_Band", "closure"),
+        ("puff-sleeve-left", "Nocturne_Puff_Sleeve_L", "outer"),
+        ("puff-sleeve-right", "Nocturne_Puff_Sleeve_R", "outer"),
+        ("arm-warmer-left", "Nocturne_Detached_Arm_Warmer_L", "detached"),
+        ("arm-warmer-right", "Nocturne_Detached_Arm_Warmer_R", "detached"),
+        ("leg-warmer-left", "Nocturne_Leg_Warmer_L", "detached"),
+        ("leg-warmer-right", "Nocturne_Leg_Warmer_R", "detached"),
     ]
     seams = [
-        ("bodice-side-left", "bodice.left", "bodice.back-left"),
-        ("bodice-side-right", "bodice.right", "bodice.back-right"),
-        ("collar-left", "collar-left.neck", "bodice.neck-left"),
-        ("collar-right", "collar-right.neck", "bodice.neck-right"),
-        ("collar-back", "collar-back.neck", "bodice.neck-back"),
+        ("front-center", "front-left.center", "front-right.center"),
+        ("front-side-left", "front-left.side", "side-left.front"),
+        ("front-side-right", "front-right.side", "side-right.front"),
+        ("back-side-left", "back.left", "side-left.back"),
+        ("back-side-right", "back.right", "side-right.back"),
+        ("collar-left", "collar-left.inner", "front-left.neckline"),
+        ("collar-right", "collar-right.inner", "front-right.neckline"),
+        ("collar-back", "collar-back.inner", "back.neckline"),
         ("skirt-waist", "skirt.waist", "waist-band.lower"),
         ("hem-frill", "hem-frill.upper", "skirt.hem"),
-        ("sleeve-left", "puff-sleeve-left.cap", "bodice.armhole-left"),
-        ("sleeve-right", "puff-sleeve-right.cap", "bodice.armhole-right"),
     ]
     return {
         "schemaVersion": 2,
         "productId": PRODUCT_ID,
         "designRevision": REVISION,
         "status": "GENERATED",
-        "representation": "explicit open multi-ring panels, seams and layer map",
+        "representation": "explicit sewn panels, seams, layers and rigid modules",
         "bodyTopologyCopied": False,
-        "panels": panels,
+        "panels": [
+            {
+                "id": identifier,
+                "object": object_name,
+                "layer": layer,
+                "cloth": identifier == "skirt",
+            }
+            for identifier, object_name, layer in panels
+        ],
         "seams": [
             {"id": identifier, "a": first, "b": second}
             for identifier, first, second in seams
         ],
         "modules": {
-            "core": ["bodice", "skirt", "collar", "sleeves"],
+            "core": ["sewn bodice", "skirt", "collar", "sleeves"],
             "head": ["beret", "animal ears"],
-            "back": ["planar feather wings", "tail"],
+            "back": ["rounded layered feather wings", "tail"],
             "legs": ["leg warmers", "shoes"],
             "accessories": ["choker", "amber charm", "rabbit charm"],
         },
@@ -161,7 +177,7 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
         "result": "PASS",
         "executedAt": base.utc_now(),
         "method": (
-            "PatternGSL-inspired explicit panel, seam and layer specification "
+            "PatternGSL-inspired explicit sewn panel, seam and layer specification "
             "with Blender cloth"
         ),
         "sources": [
@@ -186,6 +202,15 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
             ),
             "panelCount": len(pattern["panels"]),
             "seamPairCount": len(pattern["seams"]),
+            "stableRigidModules": [
+                "skirt after cloth bake",
+                "waist band",
+                "hem frill",
+                "leg warmers",
+                "shoes",
+                "wings",
+                "head accessories",
+            ],
         },
         "clothSimulation": cloth,
         "acceptance": {
@@ -195,7 +220,7 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
     }
 
 
-def _technical_gates() -> dict:
+def _gates() -> dict:
     return {
         "blender": "PASS",
         "editableSource": "PASS",
@@ -217,13 +242,7 @@ def _technical_gates() -> dict:
     }
 
 
-def _manifest(
-    job: dict,
-    previews: dict[str, Path],
-    multiview: Path,
-    metrics: dict,
-    cloth: list[dict],
-) -> dict:
+def _manifest(job, previews, multiview, metrics, cloth):
     root = job["productRoot"]
     return {
         "schemaVersion": 1,
@@ -246,7 +265,7 @@ def _manifest(
             "sourceImageSha256": REFERENCE_SHA256,
             "sourceImageDimensions": [2048, 1229],
         },
-        "technicalGates": _technical_gates(),
+        "technicalGates": _gates(),
         "outputs": {
             "blend": job["blendPath"],
             "fbx": job["fbxAssetPath"],
@@ -255,9 +274,7 @@ def _manifest(
             "multiview": multiview.relative_to(ROOT).as_posix(),
             "poseReview": f"{root}/Previews/{PRODUCT_ID}-pose-review.webp",
             "patternSpec": f"{root}/Documentation/pattern-spec.json",
-            "researchTrial": (
-                f"{root}/Research/patterngsl-autosew-cloth-trial.json"
-            ),
+            "researchTrial": f"{root}/Research/patterngsl-autosew-cloth-trial.json",
             "fitAudit": f"{root}/Tests/fit-audit.json",
             "visualReview": f"{root}/Tests/visual-review.json",
         },
@@ -270,16 +287,7 @@ def _manifest(
             }
             for name, path in previews.items()
         },
-        "rejectedHistory": [
-            {
-                "revision": "v1-pattern-gsl-modular-cloth",
-                "result": "VISUAL_REJECTED",
-                "hostedWorkflowRun": 30934884455,
-                "artifactId": 8903072226,
-                "artifactSha256": V1_ARTIFACT_SHA256,
-                "evidence": "Tests/visual-review-v1.json",
-            }
-        ],
+        "rejectedHistory": REJECTED_HISTORY,
         "handoff": {
             "resumable": True,
             "canonicalWorkspace": root,
@@ -309,13 +317,7 @@ def _write_hashes(root: Path) -> None:
     )
 
 
-def write_records(
-    job: dict,
-    previews: dict[str, Path],
-    multiview: Path,
-    metrics: dict,
-    cloth: list[dict],
-) -> None:
+def write_records(job, previews, multiview, metrics, cloth) -> None:
     root = base.repo_path(job["productRoot"])
     pattern = _pattern(cloth)
     _write_json(root / "Documentation" / "pattern-spec.json", pattern)
@@ -342,7 +344,6 @@ def write_records(
         base.repo_path(job["productManifestPath"]),
         _manifest(job, previews, multiview, metrics, cloth),
     )
-
     cloth_frames = cloth[0]["frames"]
     (root / "README.md").write_text(
         f"""# {PRODUCT_NAME}
@@ -350,11 +351,12 @@ def write_records(
 `WORKING` — SiroinoSotai_PC向けの黒・ベージュ・白のモジュール式衣装です。
 
 - revision: `{REVISION}`
-- explicit open multi-ring panel / seam / layer specification
+- five explicit sewn bodice panels with V neckline and armholes
 - Blender cloth simulation: {cloth_frames} frames
-- modular beret, ears, planar feather wings, tail, leg warmers and charms
+- hip-stable skirt layers, lower-leg-stable warmers and foot-stable shoes
+- rounded layered feather wings and optional head modules
 - reference image is hash-bound but not redistributed
-- v1 rejected visual evidence is retained in `Tests/visual-review-v1.json`
+- rejected v1 and v2 evidence remains under `Tests/`
 
 5面レンダリングまで生成済みです。必須6ポーズと直接画像監査が完了するまで `COMPLETE` ではありません。Unity、Modular Avatar、NDMF、VRChat runtimeは `OUT_OF_SCOPE` です。
 """,
