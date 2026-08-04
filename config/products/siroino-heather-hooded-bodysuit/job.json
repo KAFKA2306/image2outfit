@@ -3,7 +3,7 @@
   "id": "siroino-heather-hooded-bodysuit",
   "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
   "adapterId": "siroino-v1.0",
-  "buildRevision": "v23-dama-anchor-lobomap-residual-fit",
+  "buildRevision": "v24-structured-template-cage",
   "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
   "productManifestPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
   "buildScript": "tools/siroino_heather_hooded_product.py",
@@ -46,17 +46,24 @@
     }
   },
   "researchMethod": {
-    "name": "LoBoFit-inspired Local Bone Mapping Residual Fitting",
-    "submitted": "2026-05-08T08:56:06Z",
-    "paperUrl": "https://arxiv.org/abs/2605.07450",
-    "paperLicense": "CC BY-NC-ND 4.0",
-    "paperLicenseUrl": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
-    "officialCodeUrl": "https://github.com/MengZephyr/LoBoFit",
-    "officialCodeLicense": "BSD-3-Clause",
-    "officialCodeStatus": "Official SIGGRAPH 2026 implementation located and reviewed on 2026-08-05; not executed in this trial",
+    "name": "Structured Template-Cage Garment Construction",
+    "primaryReference": {
+      "title": "GarmentCode: Programming Parametric Sewing Patterns",
+      "paperUrl": "https://arxiv.org/abs/2306.03642",
+      "officialCodeUrl": "https://github.com/maria-korosteleva/GarmentCode",
+      "officialCodeLicense": "MIT"
+    },
+    "currentReference": {
+      "title": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
+      "submitted": "2026-06-23T13:32:04Z",
+      "paperUrl": "https://arxiv.org/abs/2606.24564",
+      "officialCodeUrl": "https://github.com/PatternGSL/PatternGSL",
+      "officialCodeStatus": "Referenced as a representation direction; authors implementation not executed or copied"
+    },
     "authorsImplementationExecuted": false,
-    "executionRequirements": "The official repository provides Coarse_to_Fine_GarmRefitting.py and downloadable sample data; this independent trial requires Blender 4.4.3, Python 3.11, bpy and mathutils BVHTree with no GPU, model, checkpoint or training dataset",
-    "trialScope": "Independent deterministic four-bone local residual representation and bounded refinement, executed after the DAMA-inspired body-triangle anchor preconditioner; the official implementation is not copied or executed"
+    "authorsCodeCopied": false,
+    "executionRequirements": "Blender 4.4.3, Python 3.11 and existing Siroino surface/weight sampling helpers; no model, checkpoint, GPU or external simulator",
+    "trialScope": "Independent explicit periodic torso cage, shared-edge U-shaped gusset, arm tubes, cuffs and attached cowl; body topology is not copied"
   },
   "licenseEvidence": "config/products/siroino-heather-hooded-bodysuit/license.json",
   "privateSourceRoots": [
@@ -72,6 +79,7 @@
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/seam-correspondence-graph-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/structured-template-cage-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/geometry-diagnostics.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
