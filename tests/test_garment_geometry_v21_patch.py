@@ -1,104 +1,107 @@
 from __future__ import annotations
 
 import ast
+import json
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-GENERATOR_PATH = ROOT / "tools" / "siroino_heather_closed_components_v27.py"
-PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_product.py"
-RETIRED_PATHS = (
-    ROOT / "tools" / "siroino_heather_hooded_v21_patch.py",
-    ROOT / "tools" / "siroino_heather_lobomap_fit.py",
-    ROOT / "tools" / "siroino_heather_smooth_surface_repair.py",
-    ROOT / "tools" / "siroino_heather_side_aware_fairing.py",
+GENERATOR_PATH = ROOT / "tools" / "siroino_heather_fused_roll_v28.py"
+BASE_PATH = ROOT / "tools" / "siroino_heather_closed_components_v27.py"
+PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_fused_product.py"
+POSE_PATH = ROOT / "tools" / "siroino_heather_hooded_fused_pose_probe.py"
+JOB_PATH = (
+    ROOT
+    / "config"
+    / "products"
+    / "siroino-heather-hooded-bodysuit"
+    / "job.json"
 )
 
 
-class GarmentGeometryClosedComponentsTests(unittest.TestCase):
+class GarmentGeometryFusedRollTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.generator = GENERATOR_PATH.read_text(encoding="utf-8")
+        cls.base = BASE_PATH.read_text(encoding="utf-8")
         cls.product = PRODUCT_PATH.read_text(encoding="utf-8")
+        cls.pose = POSE_PATH.read_text(encoding="utf-8")
+        cls.job = json.loads(JOB_PATH.read_text(encoding="utf-8"))
         cls.tree = ast.parse(cls.generator, filename=str(GENERATOR_PATH))
 
-    def test_active_product_installs_closed_components(self) -> None:
+    def test_stable_entrypoints_install_v28(self) -> None:
+        self.assertEqual(
+            self.job["buildScript"],
+            "tools/siroino_heather_hooded_fused_product.py",
+        )
+        self.assertEqual(
+            self.job["hostedPoseScript"],
+            "tools/siroino_heather_hooded_fused_pose_probe.py",
+        )
         self.assertIn(
-            "import siroino_heather_closed_components_v27 as closed_components",
+            "import siroino_heather_fused_roll_v28 as fused_roll",
             self.product,
         )
-        self.assertLess(
-            self.product.index("closed_components.install(pattern)"),
-            self.product.index("DESIGN_REVISION = pattern.DESIGN_REVISION"),
-        )
-        for token in (
-            "v21.install(pattern)",
-            "lobomap.install(pattern)",
-            "repair.install(pattern)",
-        ):
-            self.assertNotIn(token, self.product)
+        self.assertIn("fused_roll.install(product.pattern)", self.product)
 
-    def test_superseded_fit_modules_are_removed(self) -> None:
-        for path in RETIRED_PATHS:
-            self.assertFalse(path.exists(), str(path))
-
-    def test_generator_has_one_internal_pattern_parameter(self) -> None:
+    def test_v28_reuses_one_validated_geometry_base(self) -> None:
         imports = {
             alias.name
             for node in self.tree.body
             if isinstance(node, ast.Import)
             for alias in node.names
+            if alias.name.startswith("siroino_")
         }
-        self.assertFalse(
-            any(name.startswith("siroino_") for name in imports),
-            "The closed-components module must not add another internal import level",
-        )
-        self.assertIn("pattern: ModuleType", self.generator)
-
-    def test_primary_surface_uses_height_by_angle_radius_field(self) -> None:
+        self.assertEqual(imports, {"siroino_heather_closed_components_v27"})
         for token in (
             "class PolarBodyProfile",
             "HEIGHT_SAMPLES = 50",
             "ANGLE_COUNT = 72",
-            "_angle_distance(angle, theta)",
-            "_circular_average(_circular_average(radii, 2), 2)",
-            "field[level][angle_index] = value",
-            "point = profile.point(z, theta",
+            "BVHTree.FromPolygons",
+            "_enforce_clearance",
+            '"bodyTopologyCopied": False',
         ):
-            self.assertIn(token, self.generator)
+            self.assertIn(token, self.base)
 
-    def test_underbody_is_an_eleven_column_surface_saddle(self) -> None:
-        self.assertIn("offsets = tuple(range(-10, 11, 2))", self.generator)
-        self.assertIn("longitudinal_steps = 18", self.generator)
-        self.assertIn("point.z -= 0.035 * math.sin(math.pi * t)", self.generator)
-        self.assertIn('obj["pelvicSaddleColumns"] = len(front_row)', self.generator)
-        self.assertIn('"pelvicSaddleColumns": 11', self.generator)
+    def test_underbody_is_flat_and_fifteen_columns_wide(self) -> None:
+        self.assertIn("return 0.665 + 0.105 * (side**1.80)", self.generator)
+        self.assertIn("offsets = tuple(range(-14, 15, 2))", self.generator)
+        self.assertIn("longitudinal_steps = 16", self.generator)
+        self.assertIn("point.z -= 0.012 * math.sin(math.pi * t)", self.generator)
+        self.assertIn("subdivision_levels=0", self.generator)
+        self.assertIn('result["pelvicSaddleColumns"] = 15', self.generator)
 
-    def test_sleeve_caps_overlap_the_yoke(self) -> None:
-        self.assertIn('f"UpperArm_{side}"', self.generator)
-        self.assertIn('f"LowerArm_{side}"', self.generator)
-        self.assertIn("shoulder_inner = upper_head - direction * 0.058", self.generator)
-        self.assertIn("radius = 0.058 - 0.019", self.generator)
+    def test_sleeve_root_has_a_contoured_radius_profile(self) -> None:
+        self.assertIn("shoulder_inner = upper_head - direction * 0.038", self.generator)
+        self.assertIn("radius = 0.034 + 0.014", self.generator)
+        self.assertIn("radius = 0.048 - 0.010", self.generator)
+        self.assertIn("radius = 0.038 - 0.012", self.generator)
+        self.assertNotIn("radius = 0.058 - 0.019", self.generator)
 
-    def test_hood_is_a_low_folded_back_shell(self) -> None:
-        self.assertIn("def _folded_back_hood(", self.generator)
-        self.assertIn("columns = 40", self.generator)
-        self.assertIn("rows = 9", self.generator)
-        self.assertIn("theta = math.pi * column / (columns - 1)", self.generator)
+    def test_hood_is_a_u_shaped_roll_not_a_sheet(self) -> None:
+        self.assertIn("samples = 33", self.generator)
+        self.assertIn("0.088 * math.cos(theta)", self.generator)
+        self.assertIn("0.019,", self.generator)
         self.assertIn(
-            '"low folded-back hood shell attached around the rear neck"',
+            '"contoured U-shaped folded hood roll around rear neck"',
             self.generator,
         )
+        self.assertNotIn("columns = 40", self.generator)
+        self.assertNotIn("faces.append", self.generator.split("def _folded_back_hood(", 1)[1].split("def _validate(", 1)[0])
 
-    def test_clearance_projection_occurs_after_topology_creation(self) -> None:
-        self.assertLess(
-            self.generator.index("mesh.from_pydata(vertices, [], faces)"),
-            self.generator.index('obj["clearanceProjection"] = _enforce_clearance('),
+    def test_pose_adapter_widens_every_required_view(self) -> None:
+        self.assertIn("camera.data.ortho_scale *= 1.24", self.pose)
+        self.assertIn("target[2] + 0.075", self.pose)
+        self.assertIn("return probe.main()", self.pose)
+
+    def test_v28_preserves_truth_boundary(self) -> None:
+        self.assertIn('manifest["status"] = "WORKING"', self.product)
+        self.assertIn(
+            'manifest["technicalGates"]["visualAppearanceReview"] = "PENDING"',
+            self.product,
         )
-        self.assertIn("maximum_step: float = 0.040", self.generator)
-        self.assertIn("BVHTree.FromPolygons", self.generator)
-        self.assertIn('"bodyTopologyCopied": False', self.generator)
-        self.assertNotIn("_selected_polygons", self.generator)
+        self.assertIn('"authorsImplementationExecuted": False', self.product)
+        self.assertIn('"authorsCodeCopied": False', self.product)
 
 
 if __name__ == "__main__":
