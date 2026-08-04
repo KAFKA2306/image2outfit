@@ -70,6 +70,8 @@ Mandatory constraints:
 - preserve Unity `.meta` files and GUIDs for tracked assets;
 - do not commit credentials, caches, private packages, or machine state.
 
+Local reports, candidate copies, and optional external results use the single untracked layout `.image2outfit/products/<slug>/{reports,candidate,release}`.
+
 ## Start-of-task protocol
 
 Before editing:
@@ -180,6 +182,17 @@ task check:python
 `audit:runtime` may inspect stored metadata, but must not require Unity or VRChat executables and must treat policy-listed runtime gates as out of scope.
 
 If Blender or the private target avatar is unavailable, report the exact boundary and do not claim completion. Unity or VRChat unavailability is expected and is not a blocker.
+
+## GitHub Actions permissions
+
+Validation workflows default to:
+
+```yaml
+permissions:
+  contents: read
+```
+
+Grant write permission only to an explicitly scoped maintenance workflow. Do not use a general validation workflow to mutate repository contents.
 
 ## Failure recovery
 
