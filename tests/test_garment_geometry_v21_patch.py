@@ -9,13 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PATCH_PATH = ROOT / "tools" / "siroino_heather_hooded_v21_patch.py"
 PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_product.py"
-JOB_PATH = (
-    ROOT
-    / "config"
-    / "products"
-    / "siroino-heather-hooded-bodysuit"
-    / "job.json"
-)
+JOB_PATH = ROOT / "config" / "products" / "siroino-heather-hooded-bodysuit" / "job.json"
 
 
 class GarmentGeometryV21PatchTests(unittest.TestCase):
