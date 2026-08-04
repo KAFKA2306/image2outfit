@@ -308,8 +308,7 @@ def _write_hashes(root: Path) -> None:
         if path.is_file() and path.name != "SOURCE_HASHES.txt"
     )
     lines = [
-        f"{base.sha256(path)}  {path.relative_to(root).as_posix()}"
-        for path in tracked
+        f"{base.sha256(path)}  {path.relative_to(root).as_posix()}" for path in tracked
     ]
     (root / "SOURCE_HASHES.txt").write_text(
         "\n".join(lines) + "\n",
