@@ -1,0 +1,616 @@
+name: One-time render visual completion scope migration
+
+on:
+  push:
+    branches:
+      - policy/render-visual-completion
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: policy/render-visual-completion
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Rewrite completion scope and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from __future__ import annotations
+
+          import json
+          import re
+          from pathlib import Path
+
+          root = Path.cwd()
+
+          policy = {
+              "schemaVersion": 2,
+              "canonicalWorkspacePattern": "Assets/GenWorks/<product-id>",
+              "statuses": ["WORKING", "COMPLETE", "REJECTED"],
+              "completionStatus": "COMPLETE",
+              "requiredCheckpointJobFields": [
+                  "productManifestPath",
+                  "blendPath",
+                  "fbxAssetPath",
+                  "prefabAssetPath",
+                  "integratedPrefabAssetPath",
+                  "previewPaths",
+                  "deliveryAssets",
+              ],
+              "requiredPreviewViews": [
+                  "front",
+                  "back",
+                  "left",
+                  "right",
+                  "three-quarter",
+              ],
+              "requiredCompletionGates": [
+                  "blender",
+                  "editableSource",
+                  "fbx",
+                  "prefabDeclared",
+                  "fiveViewEvidence",
+                  "poseEvidence",
+                  "visualAppearanceReview",
+                  "researchTrial",
+              ],
+              "outOfScopeGates": [
+                  "unityImport",
+                  "unitySaveReload",
+                  "prefabReload",
+                  "modularAvatar",
+                  "ndmf",
+                  "vrchatBuildTest",
+                  "vrchatRuntime",
+                  "humanRuntimeReview",
+              ],
+              "rules": {
+                  "actionsArtifactsAreCanonicalWorkState": False,
+                  "trackedCheckpointRequiredForHandoff": True,
+                  "completionDeterminedByRenderedEvidence": True,
+                  "visualAppearanceReviewRequired": True,
+                  "visualAppearanceReviewMayBePerformedByChatGPT": True,
+                  "unityRequiredForCompletion": False,
+                  "runtimeValidationInScope": False,
+                  "outOfScopeFailuresAreBlockers": False,
+                  "fitAuditFailureBlocksCompletion": False,
+                  "runtimeCompatibilityMustNotBeClaimedWithoutExternalEvidence": True,
+                  "rebuildFromZeroWhenCheckpointExists": False,
+                  "retainRejectedCheckpointAndReason": True,
+              },
+              "canonicalPrefabPattern": "Assets/GenWorks/<product-id>/Prefab/*.prefab",
+          }
+          (root / "config" / "genworks-handoff-policy.json").write_text(
+              json.dumps(policy, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+          )
+
+          agents_path = root / "AGENTS.md"
+          agents = agents_path.read_text(encoding="utf-8")
+
+          def replace_section(text: str, start: str, end: str, replacement: str) -> str:
+              pattern = rf"(?ms)^{re.escape(start)}\n.*?(?=^{re.escape(end)}\n)"
+              updated, count = re.subn(pattern, replacement.rstrip() + "\n\n", text)
+              if count != 1:
+                  raise RuntimeError(f"section replacement failed: {start} -> {end}: {count}")
+              return updated
+
+          agents = replace_section(
+              agents,
+              "## Candidate workflow",
+              "## Repository merge boundary",
+              """## Build workflow
+
+Use:
+
+```powershell
+task explain PRODUCT=<slug>
+task candidate PRODUCT=<slug>
+```
+
+The in-scope build workflow must validate the closed job and construction schemas, protect the last-good workspace, run Blender, produce editable source and FBX, preserve declared Prefab assets, render all required views and poses, record the research trial, and bind current evidence by hash. Unity, Modular Avatar／NDMF, VRChat Build & Test, and runtime review are not part of this workflow.
+
+A failed build, missing render, stale render, or visible defect restores the last-good checkpoint. A successful build is not complete until the generated images have been opened and accepted by `visualAppearanceReview`.""",
+          )
+          agents = replace_section(
+              agents,
+              "## Repository merge boundary",
+              "## Human evidence and release workflow",
+              """## Completion boundary
+
+The project completion state is `COMPLETE`. It is defined only by `requiredCompletionGates` in `config/genworks-handoff-policy.json`.
+
+Completion requires editable Blender source, FBX, declared Prefab assets, current SiroinoSotai_PC five-view renders, current required-pose renders, a recorded 2026 research trial, and an explicit `visualAppearanceReview: PASS` after opening the actual images. The visual review may be performed by ChatGPT when it directly inspects the generated artifact images. It must reject clipping, detached geometry, wrong scale, broken silhouette, extreme vertices, visible penetration, floating parts, asymmetric failures, UV or normal defects, and pose breakage.
+
+Unity 2022.3.22f1 import/save/reload, Modular Avatar／NDMF, VRChat Build & Test, VRChat runtime, and human runtime review are permanently out of scope. Their absence, `NOT_RUN`, or `FAIL` values do not block `COMPLETE` and must be displayed as `OUT_OF_SCOPE`, not as pending work.
+
+Do not claim that an out-of-scope Unity or VRChat operation passed. `COMPLETE` means the repository's rendered garment deliverable is complete; it is not a claim of externally verified runtime compatibility.""",
+          )
+          agents = replace_section(
+              agents,
+              "## Human evidence and release workflow",
+              "## Visual inspection",
+              """## Optional external runtime validation
+
+The repository may retain legacy Unity, Modular Avatar／NDMF, VRChat, customer-quality, and release-packaging utilities for an external operator. They are optional extensions and are not invoked, awaited, or reported as blockers by the ChatGPT garment-production workflow.
+
+External results may be recorded as additional evidence, but they cannot change a visually rejected garment into `COMPLETE`. Missing external evidence must never downgrade an otherwise valid rendered completion.""",
+          )
+          agents = replace_section(
+              agents,
+              "## Visual inspection",
+              "## Validation",
+              """## Visual inspection
+
+Garment work is not complete without opening the current evidence for front, back, left, right, three-quarter, combined multiview, and every required pose. File existence, dimensions, hashes, CI success, or another agent's prose is not visual inspection.
+
+The accepted images must show SiroinoSotai_PC wearing the actual generated garment. Reject or iterate on body penetration, clipping, detached geometry, wrong scale, broken silhouette, extreme vertices, UV stretching, visible seams, normal errors, material defects, floating hardware, broken weights, asymmetry, or pose failure.
+
+Record the result as `visualAppearanceReview: PASS` or `FAIL` with the inspected image paths and a concise defect list. This rendered appearance review is the final in-scope acceptance gate.""",
+          )
+          agents = replace_section(
+              agents,
+              "## Validation",
+              "## GitHub Actions",
+              """## Validation
+
+Run checks proportional to the diff and then the repository contract checks:
+
+```powershell
+task audit:repo
+task audit:runtime
+task audit:genworks
+task audit:tools
+task audit:methods
+task audit:research
+task check:python
+```
+
+For product changes, run every available Blender and pre-Unity evidence check and inspect all generated images. `audit:runtime` may audit stored metadata, but it must not require a Unity or VRChat executable and must treat configured runtime gates as out of scope.
+
+If Blender or the private target avatar is unavailable, report that exact boundary and do not claim completion. Unity or VRChat unavailability is expected and is not a completion blocker.""",
+          )
+          agents = agents.replace(
+              "A truthfully labelled `WORKING` garment checkpoint may merge after the pre-Unity merge contract passes; Unity is required only for later lifecycle states and release.",
+              "A garment may be marked `COMPLETE` and merged after all rendered-completion gates pass; out-of-scope Unity and VRChat gates are never awaited.",
+          )
+          agents = agents.replace(
+              "Merge only after the required gates for the claimed lifecycle state pass and the intended canonical state is present.",
+              "Merge only after all `requiredCompletionGates` pass for `COMPLETE`, or after a truthful resumable `WORKING` checkpoint is intentionally accepted.",
+          )
+          agents = agents.replace(
+              "Completion of repository integration means merged into verified `main` and the work branch removed. Product release remains a separate later condition.",
+              "Completion means the rendered product is `COMPLETE`, merged into verified `main`, and the work branch is removed.",
+          )
+          agents_path.write_text(agents, encoding="utf-8")
+
+          readme = """# image2outfit
+
+SiroinoSotai_PC向け衣装をBlenderで制作し、編集可能ソース、FBX、宣言済みPrefab、実レンダリング、研究記録を一つの再現可能な製品ワークスペースで管理するプロジェクトです。
+
+## 完了の定義
+
+正本は `config/genworks-handoff-policy.json` です。製品は次を満たしたとき `COMPLETE` です。
+
+- Blender生成が成功している
+- 編集可能な制作ソースとFBXがある
+- Prefab資産が正規パスへ宣言されている
+- SiroinoSotai_PC装着済みの正面・背面・左・右・斜めレンダリングが現在の生成物である
+- 必須ポーズの実レンダリングが現在の生成物である
+- 2026年の研究手法の実試行が記録されている
+- 実画像を開いて確認した `visualAppearanceReview` が `PASS` である
+
+`visualAppearanceReview` はChatGPTが実artifact画像を直接開いて実施できます。画像の存在やCI成功だけではPASSになりません。
+
+## スコープ外
+
+次は本プロジェクトの完了条件ではありません。
+
+- Unity 2022.3.22f1 import/save/reload
+- Modular Avatar／NDMF
+- VRChat Build & Test
+- VRChat runtime確認
+- 人間によるruntime視覚確認
+
+これらは `OUT_OF_SCOPE` です。未実行・失敗・環境不在でも `COMPLETE` を妨げません。一方、外部検証なしにUnityやVRChatで動作確認済みとは表現しません。
+
+## 正準配置
+
+```text
+config/products/<slug>/
+  job.json
+  construction.json
+  license.json
+
+Assets/GenWorks/<slug>/
+  ProductManifest.json
+  README.md
+  Source/
+  Models/
+  Textures/
+  Materials/
+  Prefab/
+  Previews/
+    front.png
+    back.png
+    left.png
+    right.png
+    three-quarter.png
+    Poses/<release-policyの必須ポーズ>.png
+  Research/
+  Tests/
+  Documentation/
+```
+
+`Assets/GenWorks/<slug>/` が唯一の正規ワークスペースです。
+
+## 基本操作
+
+```powershell
+uv sync --locked
+
+task explain PRODUCT=<slug>
+task candidate PRODUCT=<slug>
+
+task audit:repo
+task audit:runtime
+task audit:genworks
+task audit:tools
+task audit:methods
+task audit:research
+task check:python
+```
+
+## 状態
+
+- `WORKING`: 再開可能だが、レンダリングまたは見た目の完了ゲートが残る
+- `COMPLETE`: 必須レンダリングと見た目レビューを含む全スコープ内ゲートを通過
+- `REJECTED`: 問題と再開地点を保持した却下結果
+
+Unity／VRChat関連の結果は状態遷移に使用しません。
+"""
+          (root / "README.md").write_text(readme, encoding="utf-8")
+
+          contract_path = root / "tools" / "production_contract.py"
+          contract = contract_path.read_text(encoding="utf-8")
+          replacement = '''def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
+              manifest_value = job.get("productManifestPath")
+              if not isinstance(manifest_value, str):
+                  return ["job.productManifestPath is required"]
+              try:
+                  manifest = read_json(repo_path(root, manifest_value))
+              except (OSError, json.JSONDecodeError, ValueError) as exc:
+                  return [f"product manifest unreadable: {exc}"]
+              try:
+                  handoff = read_json(root / "config" / "genworks-handoff-policy.json")
+              except (OSError, json.JSONDecodeError, ValueError):
+                  handoff = {}
+
+              errors: list[str] = []
+              if manifest.get("schemaVersion") != 1:
+                  errors.append("product manifest schemaVersion must be 1")
+              if manifest.get("productId") != job.get("id"):
+                  errors.append("product manifest productId must match job.id")
+              if manifest.get("productRoot") != job.get("productRoot"):
+                  errors.append("product manifest productRoot must match job.productRoot")
+
+              normalize = lambda value: "".join(
+                  character for character in str(value).lower() if character.isalnum()
+              )
+              out_of_scope = {
+                  normalize(name) for name in handoff.get("outOfScopeGates", [])
+              }
+              gates = manifest.get("technicalGates")
+              if isinstance(gates, dict):
+                  failed = sorted(
+                      name
+                      for name, value in gates.items()
+                      if value == "FAIL"
+                      and normalize(name) not in out_of_scope
+                      and not name.lower().startswith("human")
+                  )
+                  errors.extend(f"product technical gate failed: {name}" for name in failed)
+
+              rules = handoff.get("rules", {}) if isinstance(handoff, dict) else {}
+              fit = manifest.get("fitAuditSummary")
+              if (
+                  isinstance(fit, dict)
+                  and fit.get("pass") is False
+                  and rules.get("fitAuditFailureBlocksCompletion", True)
+              ):
+                  errors.append("product fit audit is explicitly failing")
+
+              state = str(manifest.get("state", manifest.get("status", "WORKING"))).upper()
+              completion_status = str(handoff.get("completionStatus", "COMPLETE")).upper()
+              if state == completion_status:
+                  if not isinstance(gates, dict):
+                      errors.append("complete product requires technicalGates")
+                  else:
+                      for name in handoff.get("requiredCompletionGates", []):
+                          if gates.get(name) != "PASS":
+                              errors.append(f"complete product gate is not PASS: {name}")
+              return list(dict.fromkeys(errors))
+          '''
+          replacement = re.sub(r"(?m)^ {10}", "", replacement)
+          contract, count = re.subn(
+              r"(?ms)^def product_state_errors\(.*?^    return errors\n",
+              replacement,
+              contract,
+              count=1,
+          )
+          if count != 1:
+              raise RuntimeError("production_contract product_state_errors replacement failed")
+          contract_path.write_text(contract, encoding="utf-8")
+
+          config_test_path = root / "tests" / "test_config_contracts.py"
+          config_test = config_test_path.read_text(encoding="utf-8")
+          new_test = '''    def test_handoff_policy_defines_render_visual_completion_scope(self) -> None:
+              policy = json.loads(
+                  (ROOT / "config" / "genworks-handoff-policy.json").read_text(
+                      encoding="utf-8"
+                  )
+              )
+              self.assertEqual(policy["schemaVersion"], 2)
+              self.assertEqual(policy["statuses"], ["WORKING", "COMPLETE", "REJECTED"])
+              self.assertEqual(policy["completionStatus"], "COMPLETE")
+              self.assertEqual(
+                  policy["requiredCompletionGates"],
+                  [
+                      "blender",
+                      "editableSource",
+                      "fbx",
+                      "prefabDeclared",
+                      "fiveViewEvidence",
+                      "poseEvidence",
+                      "visualAppearanceReview",
+                      "researchTrial",
+                  ],
+              )
+              self.assertEqual(
+                  set(policy["outOfScopeGates"]),
+                  {
+                      "unityImport",
+                      "unitySaveReload",
+                      "prefabReload",
+                      "modularAvatar",
+                      "ndmf",
+                      "vrchatBuildTest",
+                      "vrchatRuntime",
+                      "humanRuntimeReview",
+                  },
+              )
+              rules = policy["rules"]
+              self.assertIs(rules["completionDeterminedByRenderedEvidence"], True)
+              self.assertIs(rules["visualAppearanceReviewMayBePerformedByChatGPT"], True)
+              self.assertIs(rules["unityRequiredForCompletion"], False)
+              self.assertIs(rules["runtimeValidationInScope"], False)
+              self.assertIs(rules["outOfScopeFailuresAreBlockers"], False)
+          '''
+          new_test = re.sub(r"(?m)^ {10}", "", new_test)
+          config_test, count = re.subn(
+              r"(?ms)^    def test_handoff_policy_separates_merge_from_unity_release_gates\(self\) -> None:.*?(?=^    def test_job_schema_is_the_required_field_source)",
+              new_test + "\n",
+              config_test,
+              count=1,
+          )
+          if count != 1:
+              raise RuntimeError("config contract test replacement failed")
+          config_test_path.write_text(config_test, encoding="utf-8")
+
+          production_test_path = root / "tests" / "test_production_contract.py"
+          production_test = production_test_path.read_text(encoding="utf-8")
+          additional_test = '''
+              def test_runtime_failures_are_out_of_scope_for_complete_products(self) -> None:
+                  with tempfile.TemporaryDirectory() as temporary:
+                      root = Path(temporary)
+                      (root / "config").mkdir(parents=True)
+                      (root / "config" / "genworks-handoff-policy.json").write_text(
+                          json.dumps(
+                              {
+                                  "completionStatus": "COMPLETE",
+                                  "requiredCompletionGates": [
+                                      "blender",
+                                      "fiveViewEvidence",
+                                      "poseEvidence",
+                                      "visualAppearanceReview",
+                                  ],
+                                  "outOfScopeGates": [
+                                      "unityImport",
+                                      "modularAvatar",
+                                      "vrchatBuildTest",
+                                      "humanRuntimeReview",
+                                  ],
+                                  "rules": {"fitAuditFailureBlocksCompletion": False},
+                              }
+                          ),
+                          encoding="utf-8",
+                      )
+                      manifest = (
+                          root
+                          / "Assets"
+                          / "GenWorks"
+                          / "demo"
+                          / "ProductManifest.json"
+                      )
+                      manifest.parent.mkdir(parents=True)
+                      manifest.write_text(
+                          json.dumps(
+                              {
+                                  "schemaVersion": 1,
+                                  "productId": "demo",
+                                  "productRoot": "Assets/GenWorks/demo",
+                                  "state": "COMPLETE",
+                                  "technicalGates": {
+                                      "blender": "PASS",
+                                      "fiveViewEvidence": "PASS",
+                                      "poseEvidence": "PASS",
+                                      "visualAppearanceReview": "PASS",
+                                      "unityImport": "FAIL",
+                                      "modularAvatar": "FAIL",
+                                      "vrchatBuildTest": "NOT_RUN",
+                                  },
+                                  "fitAuditSummary": {"pass": False},
+                              }
+                          ),
+                          encoding="utf-8",
+                      )
+                      errors = contract.product_state_errors(
+                          {
+                              "id": "demo",
+                              "productRoot": "Assets/GenWorks/demo",
+                              "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+                          },
+                          root,
+                      )
+                  self.assertEqual(errors, [])
+
+              def test_complete_product_requires_render_visual_gates(self) -> None:
+                  with tempfile.TemporaryDirectory() as temporary:
+                      root = Path(temporary)
+                      (root / "config").mkdir(parents=True)
+                      (root / "config" / "genworks-handoff-policy.json").write_text(
+                          json.dumps(
+                              {
+                                  "completionStatus": "COMPLETE",
+                                  "requiredCompletionGates": ["visualAppearanceReview"],
+                                  "outOfScopeGates": [],
+                                  "rules": {"fitAuditFailureBlocksCompletion": False},
+                              }
+                          ),
+                          encoding="utf-8",
+                      )
+                      manifest = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"
+                      manifest.parent.mkdir(parents=True)
+                      manifest.write_text(
+                          json.dumps(
+                              {
+                                  "schemaVersion": 1,
+                                  "productId": "demo",
+                                  "productRoot": "Assets/GenWorks/demo",
+                                  "state": "COMPLETE",
+                                  "technicalGates": {"visualAppearanceReview": "FAIL"},
+                              }
+                          ),
+                          encoding="utf-8",
+                      )
+                      errors = contract.product_state_errors(
+                          {
+                              "id": "demo",
+                              "productRoot": "Assets/GenWorks/demo",
+                              "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+                          },
+                          root,
+                      )
+                  self.assertIn(
+                      "product technical gate failed: visualAppearanceReview", errors
+                  )
+                  self.assertIn(
+                      "complete product gate is not PASS: visualAppearanceReview", errors
+                  )
+          '''
+          additional_test = re.sub(r"(?m)^ {14}", "    ", additional_test)
+          production_test = production_test.replace(
+              "\n\nif __name__ == \"__main__\":\n",
+              additional_test + "\n\nif __name__ == \"__main__\":\n",
+          )
+          production_test_path.write_text(production_test, encoding="utf-8")
+
+          console_path = root / "tools" / "review_console.py"
+          console = console_path.read_text(encoding="utf-8")
+          console = console.replace(
+              'STATES = (\n    "WORKING",\n    "TECHNICAL_READY",\n    "HUMAN_REVIEW_PENDING",\n    "REJECTED",\n    "RELEASED",\n)',
+              'STATES = (\n    "WORKING",\n    "COMPLETE",\n    "REJECTED",\n    "TECHNICAL_READY",\n    "HUMAN_REVIEW_PENDING",\n    "RELEASED",\n)',
+          )
+          console = console.replace(
+              '    return aliases.get(normalized, normalized)\n\n\ndef relative_href',
+              '    return aliases.get(normalized, normalized)\n\n\ndef normalize_gate_name(value: Any) -> str:\n    return "".join(\n        character for character in str(value).lower() if character.isalnum()\n    )\n\n\ndef relative_href',
+          )
+          console = console.replace(
+              'def parse_gate_rows(\n    manifest: dict[str, Any], workspace: Path, output_dir: Path\n) -> list[Gate]:',
+              'def parse_gate_rows(\n    manifest: dict[str, Any],\n    workspace: Path,\n    output_dir: Path,\n    out_of_scope: set[str] | None = None,\n) -> list[Gate]:',
+          )
+          console = console.replace(
+              '        href: str | None = None\n        if raw_path:',
+              '        if normalize_gate_name(name) in (out_of_scope or set()):\n            status = "OUT_OF_SCOPE"\n            detail = detail or "project scope outside"\n        href: str | None = None\n        if raw_path:',
+              1,
+          )
+          console = console.replace(
+              '    required_poses: list[str],\n) -> Product:',
+              '    required_poses: list[str],\n    out_of_scope: set[str] | None = None,\n) -> Product:',
+          )
+          console = console.replace(
+              '        gates=parse_gate_rows(manifest, workspace, output_dir),',
+              '        gates=parse_gate_rows(manifest, workspace, output_dir, out_of_scope),',
+          )
+          console = console.replace(
+              '    policy = load_json(root / "config" / "release-policy.json", {})\n    required_views, required_poses = policy_requirements(policy)',
+              '    policy = load_json(root / "config" / "release-policy.json", {})\n    handoff = load_json(root / "config" / "genworks-handoff-policy.json", {})\n    out_of_scope = {\n        normalize_gate_name(name) for name in handoff.get("outOfScopeGates", [])\n    }\n    required_views, required_poses = policy_requirements(policy)',
+          )
+          console = console.replace(
+              '                    collect_product(workspace, output, required_views, required_poses)\n',
+              '                    collect_product(\n                        workspace, output, required_views, required_poses, out_of_scope\n                    )\n',
+          )
+          console = console.replace(
+              '.state-TECHNICAL_READY,.state-RELEASED{color:var(--pass)}',
+              '.state-COMPLETE,.state-TECHNICAL_READY,.state-RELEASED{color:var(--pass)}',
+          )
+          console = console.replace(
+              '.state-TECHNICAL_READY::before,.state-RELEASED::before{content:\'●\'}',
+              '.state-COMPLETE::before,.state-TECHNICAL_READY::before,.state-RELEASED::before{content:\'●\'}',
+          )
+          console = console.replace(
+              '.gate-status-PENDING,.gate-status-NOT_RUN{color:var(--warn)}',
+              '.gate-status-PENDING,.gate-status-NOT_RUN{color:var(--warn)}.gate-status-OUT_OF_SCOPE{color:var(--muted)}',
+          )
+          console = console.replace(
+              '.gate-status-PENDING::before,.gate-status-NOT_RUN::before{content:\'△\'}',
+              '.gate-status-PENDING::before,.gate-status-NOT_RUN::before{content:\'△\'}.gate-status-OUT_OF_SCOPE::before{content:\'—\'}',
+          )
+          console = console.replace("READ ONLY · RELEASE EVIDENCE", "READ ONLY · RENDER COMPLETION")
+          console = console.replace("release gate", "completion gate")
+          console = console.replace("release前の欠損", "レンダリング完了前の欠損")
+          console_path.write_text(console, encoding="utf-8")
+
+          review_test_path = root / "tests" / "test_review_console_v2.py"
+          review_test = review_test_path.read_text(encoding="utf-8")
+          review_test = review_test.replace(
+              '        product = self.root / "Assets" / "GenWorks" / "demo-outfit"\n',
+              '        (self.root / "config" / "genworks-handoff-policy.json").write_text(\n            json.dumps({"outOfScopeGates": ["runtime"]}), encoding="utf-8"\n        )\n        product = self.root / "Assets" / "GenWorks" / "demo-outfit"\n',
+          )
+          review_test = review_test.replace('"state": "HUMAN_REVIEW_PENDING"', '"state": "COMPLETE"')
+          review_test = review_test.replace('"resume_point": "human review"', '"resume_point": "render complete"')
+          review_test = review_test.replace('record["state"], "HUMAN_REVIEW_PENDING"', 'record["state"], "COMPLETE"')
+          review_test = review_test.replace('record["resume_point"], "human review"', 'record["resume_point"], "render complete"')
+          review_test = review_test.replace('["PASS", "FAIL"]', '["PASS", "OUT_OF_SCOPE"]')
+          review_test = review_test.replace('"READ ONLY · RELEASE EVIDENCE"', '"READ ONLY · RENDER COMPLETION"')
+          review_test = review_test.replace('"release gate"', '"completion gate"')
+          review_test_path.write_text(review_test, encoding="utf-8")
+
+          workflow_path = root / ".github" / "workflows" / "review-console.yml"
+          workflow = workflow_path.read_text(encoding="utf-8")
+          workflow = workflow.replace(
+              '      - "config/release-policy.json"\n',
+              '      - "config/release-policy.json"\n      - "config/genworks-handoff-policy.json"\n',
+          )
+          workflow_path.write_text(workflow, encoding="utf-8")
+
+          temporary = root / ".github" / "workflows" / "zz-render-visual-scope-once.yml"
+          temporary.unlink()
+          PY
+
+          python -m py_compile tools/production_contract.py tools/review_console.py tests/test_config_contracts.py tests/test_production_contract.py tests/test_review_console_v2.py
+          python -m unittest tests.test_config_contracts tests.test_production_contract tests.test_review_console_v2 -v
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit -m "Define rendered visual completion scope"
+          git push origin HEAD:policy/render-visual-completion
