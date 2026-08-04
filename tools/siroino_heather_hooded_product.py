@@ -20,8 +20,10 @@ support.install()
 
 import siroino_heather_hooded_pattern_v13 as pattern
 import siroino_heather_hooded_v21_patch as v21
+import siroino_heather_lobomap_fit as lobomap
 
 v21.install(pattern)
+lobomap.install(pattern)
 
 DESIGN_REVISION = pattern.DESIGN_REVISION
 ACTUAL_SEPARATE_GEOMETRY = [
@@ -142,6 +144,14 @@ REJECTED_REVISIONS = [
             "396 shell overlaps in crouch and 636 in sit"
         ),
     },
+    {
+        "revision": "v21-pose-clear-underbody-five-opening-shell",
+        "reason": (
+            "exact five-opening topology and a body-clear hood were achieved, but "
+            "actual renders retained long crotch tabs, hip flaps and an excessively "
+            "loose tunic silhouette; all required poses failed"
+        ),
+    },
 ]
 
 
@@ -204,7 +214,9 @@ def preserve_authored_weights(
             "evaluated SiroinoSotai_PC topology refined twice with interpolated UVs "
             "and skin weights; shoulders and sleeves selected from interpolated arm "
             "weights; semantic neck, wrist and leg openings retained; nonanatomical "
-            "complement components restored; nearest-body weights used for trim"
+            "complement components restored; DAMA-inspired body-triangle anchoring "
+            "followed by LoBoFit-inspired four-bone local residual smoothing; "
+            "nearest-body weights used for trim"
         ),
         "rebound": False,
     }
@@ -268,15 +280,20 @@ def enforce_manifest_contract(original):
                 "as neck, left and right wrist, and left and right leg openings.",
                 "Every nonanatomical adjacent complement component is restored before "
                 "mesh extraction.",
-                "Four boundary rings are relaxed for 14 iterations and reprojected to "
-                "the evaluated source at 22 mm shell clearance.",
+                "Four boundary rings are relaxed for 14 iterations before body-relative "
+                "fitting.",
                 "The lower-body strip reaches the underbody at z=0.515 and blends "
                 "continuously into the torso by z=0.850.",
                 "The folded hood is a slim continuous upper-back roll sampled at "
                 "74-86 mm body clearance.",
                 "The primary shell must be one component with exactly five openings.",
+                "DAMA-inspired triangle anchoring establishes a positive body-normal "
+                "offset before the LoBoFit-inspired local-bone residual pass.",
+                "LoBoMap fitting uses the four strongest bone frames, six smoothing "
+                "iterations, a 22 mm target clearance and a 4 mm displacement cap.",
                 "Buttons, Henley placket and drawcords remain separate geometry.",
-                "Required pose, Unity and runtime review remain separate gates.",
+                "Required pose renders and direct visual review remain completion gates; "
+                "Unity and VRChat runtime validation are OUT_OF_SCOPE.",
             ]
             report_path.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n",
