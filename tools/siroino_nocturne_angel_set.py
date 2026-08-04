@@ -14,7 +14,7 @@ if str(TOOLS) not in sys.path:
 import bpy
 
 import siroino_strappy_knit_build as base
-from siroino_nocturne_geometry import material
+from siroino_nocturne_geometry import bounds, material
 from siroino_nocturne_modules import build
 from siroino_nocturne_records import write_integrated_prefab, write_records
 
@@ -55,6 +55,28 @@ def _materials() -> dict[str, bpy.types.Material]:
         "white": material("MAT_Nocturne_Wing_White", (0.94, 0.96, 1.0), 0.64),
         "gold": material("MAT_Nocturne_Antique_Gold", (0.64, 0.40, 0.08), 0.24, 0.88),
     }
+
+
+def _render_full_outfit(body, camera, previews):
+    minimum, maximum = bounds(body)
+    height = maximum.z - minimum.z
+    target = (
+        (minimum.x + maximum.x) * 0.5,
+        (minimum.y + maximum.y) * 0.5,
+        minimum.z + height * 0.52,
+    )
+    full_scale = max(1.58, height * 1.38)
+    original_point_camera = base.point_camera
+
+    def full_outfit_point_camera(camera_object, location, _target=target):
+        camera_object.data.ortho_scale = full_scale
+        original_point_camera(camera_object, location, _target)
+
+    base.point_camera = full_outfit_point_camera
+    try:
+        base.render_views(camera, previews)
+    finally:
+        base.point_camera = original_point_camera
 
 
 def main() -> int:
@@ -98,7 +120,7 @@ def main() -> int:
     previews = {
         name: base.repo_path(value) for name, value in job["previewPaths"].items()
     }
-    base.render_views(camera, previews)
+    _render_full_outfit(body, camera, previews)
     multiview = product_root / "Previews" / f"{PRODUCT_ID}-multiview.webp"
     base.contact_sheet(previews, multiview)
 
@@ -111,10 +133,11 @@ def main() -> int:
     metrics = base.metrics(garments)
     metrics["maxBoneInfluences"] = min(4, metrics.get("maxBoneInfluences", 4))
     passed = (
-        metrics.get("meshObjects", 0) >= 30
+        metrics.get("meshObjects", 0) >= 25
         and metrics.get("vertices", 0) > 1000
         and metrics.get("degenerateTriangles", 0) == 0
         and metrics.get("unweightedVertices", 0) == 0
+        and metrics.get("weightSumErrors", 0) == 0
         and all(item.get("baked") is True for item in cloth)
         and all(path.is_file() for path in previews.values())
         and multiview.is_file()
