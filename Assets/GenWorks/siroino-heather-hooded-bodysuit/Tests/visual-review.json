@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "designRevision": "v19-topology-healed-weighted-shell",
+  "designRevision": "v20-semantic-five-opening-highcut-shell",
   "checkedAt": null,
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
@@ -12,32 +12,37 @@
     "fitAudit": "Tests/fit-audit.json"
   },
   "previousRevisionReview": {
-    "designRevision": "v18-weighted-refined-shell-rolled-hood",
-    "result": "FAIL_BEFORE_RENDER",
-    "hostedWorkflowRun": 30881813485,
+    "designRevision": "v19-topology-healed-weighted-shell",
+    "result": "FAIL",
+    "hostedWorkflowRun": 30882502147,
     "blockingFindings": [
       {
-        "zone": "primary-shell topology",
-        "finding": "The weighted refined shell was one connected component but the executable gate detected eight boundary loops across 726 boundary edges."
+        "zone": "lower-body silhouette",
+        "finding": "The five-view evidence showed a shirt-like lower hem instead of a connected crotch bridge and two high-cut leg openings."
       },
       {
-        "zone": "unintended openings",
-        "finding": "Three additional holes remained beyond the intended neck, two wrist and two leg openings."
+        "zone": "hip and opening boundaries",
+        "finding": "The front, side and rear views retained hip fins and irregular scalloped boundaries; area-ranked complement retention did not preserve anatomical opening identity."
       },
       {
-        "zone": "pose evidence",
-        "finding": "The build stopped before rendering, so no v18 five-view or six-pose evidence was accepted."
+        "zone": "upper-back hood roll",
+        "finding": "The rolled hood intersected the body and appeared as detached shoulder-side knobs; neutral fit audit reported 74 overlap pairs."
+      },
+      {
+        "zone": "six-pose fit",
+        "finding": "All six evaluated poses failed: shell overlaps were 0 neutral, 3066 arms-up, 1058 arm-cross, 0 crouch, 164 sit and 2155 prone; hood overlaps also remained in every pose."
       }
     ]
   },
   "currentRevisionRequirements": [
-    "Require complement-component analysis to retain only five intended garment openings and restore smaller accidental holes from source topology.",
-    "Require the healing log to report retained, closed and restored-face counts.",
-    "Require one connected primary shell with no more than five boundary loops after healing, smoothing and reprojection.",
-    "Inspect all five directional renders generated from v19.",
-    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v19.",
-    "Require no underarm wings, exposed inner-arm strips, waist fins or pointed crotch panels.",
-    "Require the folded hood roll to follow the upper back without detached geometry.",
+    "Classify and retain the neck, left wrist, right wrist, left leg and right leg complement components by position rather than component area.",
+    "Restore every nonanatomical adjacent complement component from source topology.",
+    "Extend the high-cut center strip through the crotch so the lower complement is split into two leg openings.",
+    "Require one connected primary shell with exactly five boundary loops before rendering.",
+    "Move the compact folded hood roll outward from the upper back and require zero body intersections.",
+    "Inspect all five directional renders generated from v20.",
+    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v20.",
+    "Require no shirt-like lower hem, hip fins, scalloped opening boundaries, detached hood geometry or pose penetration.",
     "Require the current-revision fit audit and images to agree before PASS."
   ]
 }
