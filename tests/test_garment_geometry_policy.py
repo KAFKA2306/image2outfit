@@ -19,6 +19,12 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         ]["garment-geometry"]
         cls.source = PATTERN_PATH.read_text(encoding="utf-8")
         cls.tree = ast.parse(cls.source, filename=str(PATTERN_PATH))
+        cls.body_panel = next(
+            node
+            for node in cls.tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == "_body_panel"
+        )
+        cls.body_panel_source = ast.get_source_segment(cls.source, cls.body_panel) or ""
 
     def test_bodycon_policy_requires_one_continuous_source_shell(self) -> None:
         self.assertTrue(self.policy["require-source-topology-for-bodycon"])
@@ -27,16 +33,11 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
 
     def test_safe_shell_offset_respects_policy(self) -> None:
         limit = float(self.policy["max-default-bodycon-surface-offset-m"])
-        body_panel = next(
-            node
-            for node in self.tree.body
-            if isinstance(node, ast.FunctionDef) and node.name == "_body_panel"
-        )
         defaults = {
             argument.arg: default.value
             for argument, default in zip(
-                body_panel.args.kwonlyargs,
-                body_panel.args.kw_defaults,
+                self.body_panel.args.kwonlyargs,
+                self.body_panel.args.kw_defaults,
                 strict=True,
             )
             if isinstance(default, ast.Constant)
@@ -61,16 +62,19 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertIn("Heather_Body_Shell", self.source)
         self.assertIn("_body_shell_predicate", self.source)
 
-    def test_safe_shell_has_no_bevel_and_has_edge_guard(self) -> None:
+    def test_safe_shell_has_no_miter_generating_modifiers(self) -> None:
         required_fragments = (
             "The fitted source shell must not use a bevel modifier",
-            "solidify.offset = 0.0",
             "max_edge > 0.20",
             "Garment geometry sanity gate failed",
         )
         for fragment in required_fragments:
             self.assertIn(fragment, self.source)
-        self.assertNotIn('modifiers.new("Finished edge", "BEVEL")', self.source)
+        self.assertNotIn('modifiers.new("Finished edge", "BEVEL")', self.body_panel_source)
+        self.assertNotIn(
+            'modifiers.new("Fabric thickness", "SOLIDIFY")',
+            self.body_panel_source,
+        )
 
     def test_primary_shell_copies_target_topology_and_weights(self) -> None:
         required_fragments = (
@@ -80,7 +84,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             "modifier.use_deform_preserve_volume = True",
         )
         for fragment in required_fragments:
-            self.assertIn(fragment, self.source)
+            self.assertIn(fragment, self.body_panel_source)
 
 
 if __name__ == "__main__":
