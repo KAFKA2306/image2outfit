@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Standalone bevel-safe v13 Siroino heather bodysuit pattern.
+"""Bevel-safe source-topology shell for the Siroino heather bodysuit.
 
-The torso and sleeves are copied once from connected SiroinoSotai_PC topology.
-The acute fitted-shell boundary is exported as a single surface: v12 proved
-that bevel mitering was unstable, and the first v13 run proved that Solidify's
-even-offset miter was equally unstable. Smooth auxiliary panels overlap the
-shell and a geometry sanity gate rejects non-finite or implausibly long edges.
+The fitted torso, high-cut lower body, shoulders, and sleeves are selected from
+one SiroinoSotai_PC source mesh and copied as one connected shell. Smooth
+accessories are generated separately. The build stops on disconnected primary
+geometry, non-finite coordinates, or implausibly long edges.
 """
 
 from __future__ import annotations
@@ -18,23 +17,12 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
-DESIGN_REVISION = "v13-bevel-safe-continuous-shell"
+DESIGN_REVISION = "v14-source-topology-highcut-shell"
 clean_meshes = v9.clean_meshes
 bone_segment = v9.bone_segment
 
 
-def _segment_distance(
-    point: Vector,
-    start: Vector,
-    end: Vector,
-) -> tuple[float, float]:
-    vector = end - start
-    length_squared = vector.length_squared
-    if length_squared <= 1e-12:
-        return (point - start).length, 0.0
-    raw_t = (point - start).dot(vector) / length_squared
-    closest = start + vector * raw_t
-    return (point - closest).length, raw_t
+PolygonPredicate = Callable[[bpy.types.MeshPolygon, Vector], bool]
 
 
 def _move_modifier_before_armature(
@@ -47,19 +35,13 @@ def _move_modifier_before_armature(
 
 def _selected_polygons(
     body: bpy.types.Object,
-    predicate: Callable[[Vector], bool],
+    predicate: PolygonPredicate,
 ) -> list[bpy.types.MeshPolygon]:
-    selected: list[bpy.types.MeshPolygon] = []
-    for polygon in body.data.polygons:
-        center = body.matrix_world @ polygon.center
-        vertex_hits = sum(
-            predicate(body.matrix_world @ body.data.vertices[index].co)
-            for index in polygon.vertices
-        )
-        required = max(2, math.ceil(len(polygon.vertices) * 0.5))
-        if predicate(center) or vertex_hits >= required:
-            selected.append(polygon)
-    return selected
+    return [
+        polygon
+        for polygon in body.data.polygons
+        if predicate(polygon, body.matrix_world @ polygon.center)
+    ]
 
 
 def _body_panel(
@@ -67,9 +49,9 @@ def _body_panel(
     body: bpy.types.Object,
     armature: bpy.types.Object,
     material: bpy.types.Material,
-    predicate: Callable[[Vector], bool],
+    predicate: PolygonPredicate,
     *,
-    offset: float = 0.020,
+    offset: float = 0.0065,
     bevel_width: float = 0.0,
 ) -> bpy.types.Object:
     """Copy a fitted source shell without miter-generating modifiers."""
@@ -113,8 +95,12 @@ def _body_panel(
     mesh.from_pydata(vertices, [], faces)
     mesh.update(calc_edges=True)
     uv_layer = mesh.uv_layers.new(name="UVMap")
-    for polygon, polygon_uvs in zip(mesh.polygons, face_uvs):
-        for loop_index, uv in zip(polygon.loop_indices, polygon_uvs):
+    for polygon, polygon_uvs in zip(mesh.polygons, face_uvs, strict=True):
+        for loop_index, uv in zip(
+            polygon.loop_indices,
+            polygon_uvs,
+            strict=True,
+        ):
             uv_layer.data[loop_index].uv = uv
     mesh.materials.append(material)
 
@@ -159,98 +145,65 @@ def _body_panel(
     return obj
 
 
+def _torso_width(z: float) -> float:
+    if z < 0.835:
+        return 0.122
+    if z < 0.910:
+        return 0.154
+    if z < 0.985:
+        return 0.184
+    return max(0.082, 0.184 - (z - 0.985) * 1.65)
+
+
+def _torso_top(x: float) -> float:
+    return 1.008 + min(abs(x), 0.13) * 0.23
+
+
+def _highcut_width(z: float) -> float:
+    t = max(0.0, min(1.0, (z - 0.625) / (0.835 - 0.625)))
+    return 0.032 + 0.100 * t**0.86
+
+
 def _body_shell_predicate(
-    armature: bpy.types.Object,
-) -> Callable[[Vector], bool]:
-    segments = {
+    body: bpy.types.Object,
+) -> PolygonPredicate:
+    arm_groups = {
         side: (
-            bone_segment(armature, f"UpperArm_{side}"),
-            bone_segment(armature, f"LowerArm_{side}"),
+            v9._group_index(body, f"UpperArm_{side}"),
+            v9._group_index(body, f"LowerArm_{side}"),
+            v9._group_index(body, f"Hand_{side}"),
         )
         for side in ("L", "R")
     }
 
-    def selected(point: Vector) -> bool:
-        torso = abs(point.x) <= 0.265 and 0.775 <= point.z <= 1.038
-        if torso:
+    def selected(
+        polygon: bpy.types.MeshPolygon,
+        center: Vector,
+    ) -> bool:
+        x = abs(center.x)
+        torso = (
+            0.790 <= center.z <= _torso_top(center.x)
+            and x <= _torso_width(center.z)
+        )
+        highcut = (
+            0.625 <= center.z <= 0.840
+            and x <= _highcut_width(center.z)
+        )
+        if torso or highcut:
             return True
-        for upper, lower in segments.values():
-            upper_distance, upper_t = _segment_distance(point, *upper)
-            if upper_distance <= 0.108 and -0.30 <= upper_t <= 1.18:
-                return True
-            lower_distance, lower_t = _segment_distance(point, *lower)
-            if lower_distance <= 0.082 and -0.20 <= lower_t <= 0.94:
+
+        for upper, lower, hand in arm_groups.values():
+            arm_weight = v9._polygon_average_weight(
+                body,
+                polygon,
+                (upper, lower),
+            )
+            hand_weight = v9._polygon_average_weight(body, polygon, (hand,))
+            if arm_weight >= 0.025 and hand_weight <= 0.48:
                 return True
         return False
 
     return selected
-
-
-def _highcut_panel(
-    sampler: v9.SurfaceSampler,
-    armature: bpy.types.Object,
-    material: bpy.types.Material,
-    *,
-    front: bool,
-) -> bpy.types.Object:
-    rows = 18
-    columns = 24
-    vertices: list[tuple[float, float, float]] = []
-    for row in range(rows):
-        t = row / (rows - 1)
-        z = 0.640 + 0.205 * t
-        half_width = 0.046 + 0.145 * t**1.32
-        for column in range(columns + 1):
-            u = column / columns
-            x = -half_width + 2.0 * half_width * u
-            point = sampler.point(x, z, front=front, offset=0.025)
-            vertices.append((point.x, point.y, point.z))
-    side = "Front" if front else "Back"
-    return v9._grid_object(
-        f"Heather_Highcut_{side}_Panel",
-        vertices,
-        rows,
-        columns,
-        material,
-        armature,
-        sampler.body,
-        thickness=0.0014,
-        bevel=0.00030,
-        subdivision=1,
-    )
-
-
-def _crotch_bridge(
-    sampler: v9.SurfaceSampler,
-    armature: bpy.types.Object,
-    material: bpy.types.Material,
-) -> bpy.types.Object:
-    rows = 13
-    columns = 12
-    z = 0.640
-    half_width = 0.047
-    vertices: list[tuple[float, float, float]] = []
-    for row in range(rows):
-        depth_t = row / (rows - 1)
-        for column in range(columns + 1):
-            x = -half_width + 2.0 * half_width * column / columns
-            front = sampler.point(x, z, front=True, offset=0.026)
-            back = sampler.point(x, z, front=False, offset=0.026)
-            point = front.lerp(back, depth_t)
-            point.z -= 0.018 * math.sin(math.pi * depth_t)
-            vertices.append((point.x, point.y, point.z))
-    return v9._grid_object(
-        "Heather_Crotch_Bridge",
-        vertices,
-        rows,
-        columns,
-        material,
-        armature,
-        sampler.body,
-        thickness=0.0014,
-        bevel=0.00030,
-        subdivision=1,
-    )
 
 
 def _forearm_radius(
@@ -274,7 +227,7 @@ def _forearm_radius(
         return 0.052
     distances.sort()
     index = min(len(distances) - 1, int(0.82 * len(distances)))
-    return max(0.043, min(0.060, distances[index] + 0.020))
+    return max(0.043, min(0.060, distances[index] + 0.012))
 
 
 def _cuff_tube(
@@ -294,7 +247,7 @@ def _cuff_tube(
     columns = 24
     vertices: list[tuple[float, float, float]] = []
     for row in range(rows):
-        t = 0.74 + 0.27 * row / (rows - 1)
+        t = 0.79 + 0.22 * row / (rows - 1)
         center = start.lerp(end, t)
         radius = _forearm_radius(body, start, end, min(t, 0.98))
         for column in range(columns + 1):
@@ -310,47 +263,49 @@ def _cuff_tube(
         material,
         armature,
         body,
-        thickness=0.0015,
-        bevel=0.00025,
+        thickness=0.0012,
+        bevel=0.00020,
         subdivision=0,
     )
 
 
-def _hood_half(
-    sampler: v9.SurfaceSampler,
+def _hood_profile(t: float) -> tuple[float, float, float, float]:
+    z = 1.035 + 0.345 * t
+    radius_x = 0.105 + 0.070 * math.sin(math.pi * t) - 0.070 * t**4
+    radius_y = 0.085 + 0.072 * math.sin(math.pi * t) - 0.050 * t**4
+    center_y = 0.018 + 0.040 * t
+    return z, radius_x, radius_y, center_y
+
+
+def _hood_shell(
+    body: bpy.types.Object,
     armature: bpy.types.Object,
     material: bpy.types.Material,
-    side: str,
 ) -> bpy.types.Object:
-    profiles = [
-        (1.045, 0.068, 0.010),
-        (1.015, 0.086, 0.020),
-        (0.985, 0.105, 0.030),
-        (0.955, 0.122, 0.036),
-        (0.925, 0.132, 0.030),
-        (0.900, 0.116, 0.018),
-    ]
-    columns = 20
-    sign = -1.0 if side == "L" else 1.0
+    rows = 18
+    columns = 32
     vertices: list[tuple[float, float, float]] = []
-    for z, half_width, drape in profiles:
+    start_angle = math.radians(-122.0)
+    end_angle = math.radians(122.0)
+    for row in range(rows):
+        t = row / (rows - 1)
+        z, radius_x, radius_y, center_y = _hood_profile(t)
         for column in range(columns + 1):
             u = column / columns
-            x = sign * half_width * u
-            point = sampler.point(x, z, front=False, offset=0.030)
-            point.y += drape * (1.0 - 0.55 * u)
-            point.z += 0.003 * math.sin(math.pi * u)
-            vertices.append((point.x, point.y, point.z))
+            angle = start_angle + (end_angle - start_angle) * u
+            x = radius_x * math.sin(angle)
+            y = center_y + radius_y * math.cos(angle)
+            vertices.append((x, y, z))
     return v9._grid_object(
-        f"Heather_Hood_Outer_{side}",
+        "Heather_Hood_Shell",
         vertices,
-        len(profiles),
+        rows,
         columns,
         material,
         armature,
-        sampler.body,
-        thickness=0.0015,
-        bevel=0.00035,
+        body,
+        thickness=0.0014,
+        bevel=0.00025,
         subdivision=1,
     )
 
@@ -364,17 +319,17 @@ def _neck_band(
     count = 72
     for index in range(count):
         angle = math.tau * index / count
-        x = 0.098 * math.cos(angle)
-        z = 1.038 + 0.004 * abs(math.cos(angle))
-        front_point = sampler.point(x, z, front=True, offset=0.024)
-        back_point = sampler.point(x, z, front=False, offset=0.024)
+        x = 0.100 * math.cos(angle)
+        z = 1.036 + 0.004 * abs(math.cos(angle))
+        front_point = sampler.point(x, z, front=True, offset=0.011)
+        back_point = sampler.point(x, z, front=False, offset=0.011)
         back_weight = 0.5 * (math.sin(angle) + 1.0)
         point = front_point.lerp(back_point, back_weight)
         points.append((point.x, point.y, point.z))
     band = v9.base.curve_tube(
         "Heather_Hood_Neck_Band",
         points,
-        0.0024,
+        0.0022,
         material,
         armature,
         "Chest",
@@ -385,7 +340,7 @@ def _neck_band(
     return band
 
 
-def _cords_ties_seams(
+def _cords_and_seams(
     sampler: v9.SurfaceSampler,
     armature: bpy.types.Object,
     trim: bpy.types.Material,
@@ -395,17 +350,17 @@ def _cords_ties_seams(
     for side, sign in (("L", -1.0), ("R", 1.0)):
         cord_points: list[tuple[float, float, float]] = []
         for x, z in (
-            (sign * 0.046, 1.026),
-            (sign * 0.050, 1.004),
-            (sign * 0.052, 0.982),
-            (sign * 0.048, 0.962),
+            (sign * 0.078, 1.040),
+            (sign * 0.082, 1.016),
+            (sign * 0.080, 0.992),
+            (sign * 0.074, 0.970),
         ):
-            point = sampler.point(x, z, front=True, offset=0.027)
+            point = sampler.point(x, z, front=True, offset=0.014)
             cord_points.append((point.x, point.y, point.z))
         cord = v9.base.curve_tube(
             f"Heather_Hood_Drawcord_{side}",
             cord_points,
-            0.00115,
+            0.00105,
             trim,
             armature,
             "Chest",
@@ -414,55 +369,29 @@ def _cords_ties_seams(
         v9.base.transfer_nearest_body_weights(cord, sampler.body)
         result.append(cord)
 
-        root_x = sign * 0.205
-        root_z = 0.810
-        tie = v9.base.curve_tube(
-            f"Heather_Side_Tie_{side}",
-            [
-                (root_x, 0.0, root_z),
-                (sign * 0.218, -0.002, root_z - 0.006),
-                (sign * 0.229, 0.004, root_z - 0.020),
-                (sign * 0.238, 0.010, root_z - 0.038),
-            ],
-            0.00125,
-            trim,
-            armature,
-            "Hips",
-            resolution=3,
-        )
-        v9.base.transfer_nearest_body_weights(tie, sampler.body)
-        result.append(tie)
-
     front_points = [
-        sampler.point(0.0, z, front=True, offset=0.028)
+        sampler.point(0.0, z, front=True, offset=0.012)
         for z in (0.655, 0.710, 0.770, 0.830, 0.895, 0.958, 1.010)
     ]
     back_points = [
-        sampler.point(0.0, z, front=False, offset=0.028)
+        sampler.point(0.0, z, front=False, offset=0.012)
         for z in (0.655, 0.710, 0.770, 0.830, 0.895, 0.958, 1.010)
     ]
-    hood_points = []
-    for z, _half_width, drape in (
-        (1.045, 0.068, 0.010),
-        (1.015, 0.086, 0.020),
-        (0.985, 0.105, 0.030),
-        (0.955, 0.122, 0.036),
-        (0.925, 0.132, 0.030),
-        (0.900, 0.116, 0.018),
-    ):
-        point = sampler.point(0.0, z, front=False, offset=0.030)
-        point.y += drape + 0.0015
-        hood_points.append(point)
+    hood_points: list[Vector] = []
+    for index in range(13):
+        t = index / 12
+        z, _radius_x, radius_y, center_y = _hood_profile(t)
+        hood_points.append(Vector((0.0, center_y + radius_y + 0.0015, z)))
 
     for name, points, bone in (
         ("Heather_Center_Front_Seam", front_points, "Spine"),
         ("Heather_Center_Back_Seam", back_points, "Spine"),
-        ("Heather_Hood_Center_Seam", hood_points, "Chest"),
+        ("Heather_Hood_Center_Seam", hood_points, "Head"),
     ):
         seam = v9.base.curve_tube(
             name,
             [(point.x, point.y, point.z) for point in points],
-            0.00042,
+            0.00038,
             trim,
             armature,
             bone,
@@ -471,6 +400,28 @@ def _cords_ties_seams(
         v9.base.transfer_nearest_body_weights(seam, sampler.body)
         result.append(seam)
     return result
+
+
+def _component_count(obj: bpy.types.Object) -> int:
+    adjacency: dict[int, set[int]] = {
+        vertex.index: set() for vertex in obj.data.vertices
+    }
+    for edge in obj.data.edges:
+        left, right = edge.vertices
+        adjacency[left].add(right)
+        adjacency[right].add(left)
+
+    remaining = set(adjacency)
+    components = 0
+    while remaining:
+        components += 1
+        stack = [remaining.pop()]
+        while stack:
+            current = stack.pop()
+            neighbours = adjacency[current] & remaining
+            remaining.difference_update(neighbours)
+            stack.extend(neighbours)
+    return components
 
 
 def _validate_geometry(objects: list[bpy.types.Object]) -> None:
@@ -492,8 +443,16 @@ def _validate_geometry(objects: list[bpy.types.Object]) -> None:
         )
         if max_edge > 0.20:
             failures.append(f"{obj.name}: implausible edge {max_edge:.6f} m")
+        if obj.name == "Heather_Body_Shell":
+            components = _component_count(obj)
+            if components != 1:
+                failures.append(
+                    f"{obj.name}: disconnected source shell has {components} components"
+                )
     if failures:
-        raise RuntimeError("Garment geometry sanity gate failed: " + "; ".join(failures))
+        raise RuntimeError(
+            "Garment geometry sanity gate failed: " + "; ".join(failures)
+        )
 
 
 def create_outfit(
@@ -510,18 +469,21 @@ def create_outfit(
             body,
             armature,
             fabric,
-            _body_shell_predicate(armature),
+            _body_shell_predicate(body),
         ),
-        _highcut_panel(sampler, armature, fabric, front=True),
-        _highcut_panel(sampler, armature, fabric, front=False),
-        _crotch_bridge(sampler, armature, fabric),
         _cuff_tube(body, armature, trim, "L"),
         _cuff_tube(body, armature, trim, "R"),
-        _hood_half(sampler, armature, fabric, "L"),
-        _hood_half(sampler, armature, fabric, "R"),
+        _hood_shell(body, armature, fabric),
         _neck_band(sampler, armature, fabric),
     ]
-    garments.extend(v9._placket_and_buttons(sampler, armature, trim, button_material))
-    garments.extend(_cords_ties_seams(sampler, armature, trim))
+    garments.extend(
+        v9._placket_and_buttons(
+            sampler,
+            armature,
+            trim,
+            button_material,
+        )
+    )
+    garments.extend(_cords_and_seams(sampler, armature, trim))
     _validate_geometry(garments)
     return garments
