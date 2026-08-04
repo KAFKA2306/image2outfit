@@ -3,7 +3,7 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v24-smooth-normal-highcut-repair",
+  "designRevision": "v25-side-aware-taubin-shell",
   "panels": [
     "evaluated-shape-two-level-subdivided-connected-torso-underbody-weighted-sleeve-shell",
     "semantic-neck-wrist-leg-complement-classification",
@@ -13,13 +13,15 @@
     "body-triangle-barycentric-anchors-with-positive-normal-offset-field",
     "four-bone-local-residual-smoothing-with-bounded-world-decoding",
     "micro-boundary-hole-closure-with-existing-vertices",
-    "barycentric-smooth-body-normal-reprojection",
-    "bounded-high-cut-underbody-lift",
-    "laterally-compressed-upper-back-folded-hood-roll"
+    "source-side-preserving-boundary-protected-taubin-fairing",
+    "body-cross-section-front-rear-underbody-separation",
+    "two-round-six-pose-bvh-clearance-correction",
+    "continuous-subdivided-solidified-folded-hood-panel"
   ],
   "separateGeometry": [
     "Henley placket",
     "three buttons",
+    "folded hood panel",
     "hood drawcords"
   ],
   "priorityFitZones": [
@@ -36,7 +38,7 @@
     "inner thigh",
     "leg root",
     "buttocks",
-    "upper-back hood roll",
+    "folded hood",
     "drawcord"
   ],
   "researchTrial": {
@@ -46,13 +48,13 @@
     "paperLicense": "CC BY-NC-ND 4.0",
     "officialCode": "https://github.com/MengZephyr/LoBoFit",
     "officialCodeLicense": "BSD-3-Clause",
-    "implementation": "independent deterministic four-bone local residual encoding followed by micro-hole closure, barycentric smooth-normal body reprojection, bounded high-cut lift and folded-hood lateral compression",
+    "implementation": "independent deterministic four-bone local residual fitting followed by source-side-preserving Taubin fairing, body-section underbody separation, two-round required-pose BVH correction and continuous folded-hood reconstruction",
     "authorsModelExecuted": false,
     "officialCodeLocated": true,
     "officialCodeExecuted": false,
     "preconditionerEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
     "localBoneEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
-    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smooth-normal-highcut-repair-trial.json"
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/side-aware-taubin-shell-trial.json"
   },
   "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
