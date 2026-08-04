@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Structured template-cage generator for the Siroino hooded bodysuit.
 
-This revision deliberately stops deriving garment topology by selecting body faces.
-It creates regular, semantic garment components first and uses the body only for
+Garment topology is authored explicitly. The avatar body is used only for
 surface sampling and nearest-body skin-weight transfer.
 """
 
 from __future__ import annotations
 
+from itertools import pairwise
 import json
 import math
 from pathlib import Path
@@ -69,16 +69,16 @@ def _create_mesh_object(
     mesh.update(calc_edges=True)
     mesh.materials.append(material)
 
-    uv = mesh.uv_layers.new(name="UVMap")
+    uv_layer = mesh.uv_layers.new(name="UVMap")
     for polygon in mesh.polygons:
+        polygon.use_smooth = True
         for loop_index in polygon.loop_indices:
-            index = mesh.loops[loop_index].vertex_index
-            point = mesh.vertices[index].co
-            uv.data[loop_index].uv = (
+            vertex_index = mesh.loops[loop_index].vertex_index
+            point = mesh.vertices[vertex_index].co
+            uv_layer.data[loop_index].uv = (
                 0.5 + math.atan2(point.y, point.x) / math.tau,
                 max(0.0, min(1.0, point.z)),
             )
-        polygon.use_smooth = True
 
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
@@ -129,10 +129,13 @@ def _torso_and_gusset(
             bottom = _bottom_z(theta)
             top = _top_z(theta)
             z = bottom + (top - bottom) * v
-            width = _torso_width(z)
-            x = width * math.cos(theta)
-            front = math.sin(theta) < 0.0
-            point = sampler.point(x, z, front=front, offset=BODY_CLEARANCE_M)
+            x = _torso_width(z) * math.cos(theta)
+            point = sampler.point(
+                x,
+                z,
+                front=math.sin(theta) < 0.0,
+                offset=BODY_CLEARANCE_M,
+            )
             vertices.append((point.x, point.y, point.z))
 
     for row in range(TORSO_ROWS - 1):
@@ -149,39 +152,42 @@ def _torso_and_gusset(
                 )
             )
 
-    # Explicit U-shaped gusset. It shares the front/back low-boundary vertices,
-    # so it splits the lower boundary into left and right leg openings rather
-    # than producing two unconstrained hanging tabs.
+    # Explicit shared-edge U-shaped gusset. The front and rear endpoints reuse
+    # lower torso-boundary vertices, preventing independent hanging crotch tabs.
     front_center = 3 * TORSO_COLUMNS // 4
     back_center = TORSO_COLUMNS // 4
     half_span = 2
-    front_pair = [
-        (front_center - half_span) % TORSO_COLUMNS,
-        (front_center + half_span) % TORSO_COLUMNS,
-    ]
-    back_pair = [
-        (back_center - half_span) % TORSO_COLUMNS,
-        (back_center + half_span) % TORSO_COLUMNS,
-    ]
-    front_pair.sort(key=lambda index: vertices[index][0])
-    back_pair.sort(key=lambda index: vertices[index][0])
+    front_pair = sorted(
+        (
+            (front_center - half_span) % TORSO_COLUMNS,
+            (front_center + half_span) % TORSO_COLUMNS,
+        ),
+        key=lambda index: vertices[index][0],
+    )
+    back_pair = sorted(
+        (
+            (back_center - half_span) % TORSO_COLUMNS,
+            (back_center + half_span) % TORSO_COLUMNS,
+        ),
+        key=lambda index: vertices[index][0],
+    )
 
     pair_rows: list[tuple[int, int]] = [(front_pair[0], front_pair[1])]
     steps = 10
     for step in range(1, steps):
         t = step / steps
-        indices = []
-        for left_or_right in range(2):
-            first = Vector(vertices[front_pair[left_or_right]])
-            last = Vector(vertices[back_pair[left_or_right]])
-            point = first.lerp(last, t)
+        row_indices: list[int] = []
+        for side_index in range(2):
+            front_point = Vector(vertices[front_pair[side_index]])
+            back_point = Vector(vertices[back_pair[side_index]])
+            point = front_point.lerp(back_point, t)
             point.z -= 0.070 * math.sin(math.pi * t)
-            indices.append(len(vertices))
+            row_indices.append(len(vertices))
             vertices.append((point.x, point.y, point.z))
-        pair_rows.append((indices[0], indices[1]))
+        pair_rows.append((row_indices[0], row_indices[1]))
     pair_rows.append((back_pair[0], back_pair[1]))
 
-    for current, following in zip(pair_rows, pair_rows[1:], strict=True):
+    for current, following in pairwise(pair_rows):
         faces.append((current[0], current[1], following[1], following[0]))
 
     obj = _create_mesh_object(
@@ -196,7 +202,7 @@ def _torso_and_gusset(
         subdivision_levels=1,
     )
     obj["constructionRepresentation"] = (
-        "structured periodic torso cage plus shared-edge U gusset"
+        "structured periodic torso cage plus shared-edge U-shaped gusset"
     )
     obj["bodyTopologyCopied"] = False
     return obj
@@ -223,25 +229,28 @@ def _arm_centers(
     for ring in range(SLEEVE_RINGS):
         t = ring / (SLEEVE_RINGS - 1)
         if t <= 0.48:
-            local = t / 0.48
-            centers.append(upper_head.lerp(upper_tail, local))
+            centers.append(upper_head.lerp(upper_tail, t / 0.48))
         else:
-            local = (t - 0.48) / 0.52
-            centers.append(lower_head.lerp(lower_tail, local))
+            centers.append(lower_head.lerp(lower_tail, (t - 0.48) / 0.52))
     return centers
 
 
-def _sleeve(
+def _tube_component(
     pattern: ModuleType,
-    body: bpy.types.Object,
-    armature: bpy.types.Object,
+    name: str,
+    centers: list[Vector],
+    radii: list[float],
     material: bpy.types.Material,
-    side: str,
+    armature: bpy.types.Object,
+    body: bpy.types.Object,
+    *,
+    thickness: float,
 ) -> bpy.types.Object:
-    centers = _arm_centers(pattern, armature, side)
+    if len(centers) != len(radii):
+        raise ValueError("tube centers and radii must have identical lengths")
+
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, ...]] = []
-
     for ring, center in enumerate(centers):
         if ring == 0:
             tangent = centers[1] - center
@@ -250,13 +259,10 @@ def _sleeve(
         else:
             tangent = centers[ring + 1] - centers[ring - 1]
         first, second = _frame(tangent)
-        t = ring / (len(centers) - 1)
-        radius = 0.062 - 0.021 * _smoothstep(t)
-        radius += 0.004 * math.exp(-((t - 0.48) / 0.18) ** 2)
         for column in range(SLEEVE_COLUMNS):
             angle = math.tau * column / SLEEVE_COLUMNS
-            point = center + first * (math.cos(angle) * radius)
-            point += second * (math.sin(angle) * radius)
+            point = center + first * (math.cos(angle) * radii[ring])
+            point += second * (math.sin(angle) * radii[ring])
             vertices.append((point.x, point.y, point.z))
 
     for ring in range(len(centers) - 1):
@@ -275,14 +281,40 @@ def _sleeve(
 
     return _create_mesh_object(
         pattern,
-        f"Heather_Long_Sleeve_{side}",
+        name,
         vertices,
         faces,
         material,
         armature,
         body,
-        thickness=0.0013,
+        thickness=thickness,
         subdivision_levels=1,
+    )
+
+
+def _sleeve(
+    pattern: ModuleType,
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+    side: str,
+) -> bpy.types.Object:
+    centers = _arm_centers(pattern, armature, side)
+    radii = []
+    for ring in range(len(centers)):
+        t = ring / (len(centers) - 1)
+        radius = 0.062 - 0.021 * _smoothstep(t)
+        radius += 0.004 * math.exp(-((t - 0.48) / 0.18) ** 2)
+        radii.append(radius)
+    return _tube_component(
+        pattern,
+        f"Heather_Long_Sleeve_{side}",
+        centers,
+        radii,
+        material,
+        armature,
+        body,
+        thickness=0.0013,
     )
 
 
@@ -294,35 +326,19 @@ def _cuff(
     side: str,
 ) -> bpy.types.Object:
     centers = _arm_centers(pattern, armature, side)[-4:]
-    vertices: list[tuple[float, float, float]] = []
-    faces: list[tuple[int, ...]] = []
-    for ring, center in enumerate(centers):
-        tangent = centers[-1] - centers[0]
-        first, second = _frame(tangent)
-        radius = 0.0435 - 0.0015 * ring / max(1, len(centers) - 1)
-        for column in range(SLEEVE_COLUMNS):
-            angle = math.tau * column / SLEEVE_COLUMNS
-            point = center + first * (math.cos(angle) * radius)
-            point += second * (math.sin(angle) * radius)
-            vertices.append((point.x, point.y, point.z))
-    for ring in range(len(centers) - 1):
-        current = ring * SLEEVE_COLUMNS
-        following = (ring + 1) * SLEEVE_COLUMNS
-        for column in range(SLEEVE_COLUMNS):
-            nxt = (column + 1) % SLEEVE_COLUMNS
-            faces.append(
-                (current + column, current + nxt, following + nxt, following + column)
-            )
-    return _create_mesh_object(
+    radii = [
+        0.0435 - 0.0015 * ring / max(1, len(centers) - 1)
+        for ring in range(len(centers))
+    ]
+    return _tube_component(
         pattern,
         f"Heather_Rib_Cuff_{side}",
-        vertices,
-        faces,
+        centers,
+        radii,
         material,
         armature,
         body,
         thickness=0.0017,
-        subdivision_levels=1,
     )
 
 
@@ -333,27 +349,37 @@ def _attached_hood_roll(
     material: bpy.types.Material,
 ) -> bpy.types.Object:
     columns = 56
+    rows = (
+        (0.995, 0.078, 0.019),
+        (1.025, 0.086, 0.026),
+        (1.050, 0.074, 0.032),
+    )
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, ...]] = []
-    for row, (z, width, offset) in enumerate(
-        ((0.995, 0.078, 0.019), (1.025, 0.086, 0.026), (1.050, 0.074, 0.032))
-    ):
+    for row_index, (z, width, offset) in enumerate(rows):
         for column in range(columns):
             theta = math.tau * column / columns
             x = width * math.cos(theta)
             front = math.sin(theta) < 0.0
             point = sampler.point(x, z, front=front, offset=offset)
             if not front:
-                point.y += 0.018 * math.sin(math.pi * row / 2.0)
+                point.y += 0.018 * math.sin(math.pi * row_index / 2.0)
             vertices.append((point.x, point.y, point.z))
-    for row in range(2):
+
+    for row in range(len(rows) - 1):
         current = row * columns
         following = (row + 1) * columns
         for column in range(columns):
             nxt = (column + 1) % columns
             faces.append(
-                (current + column, current + nxt, following + nxt, following + column)
+                (
+                    current + column,
+                    current + nxt,
+                    following + nxt,
+                    following + column,
+                )
             )
+
     obj = _create_mesh_object(
         pattern,
         "Heather_Hood_Folded_Roll",
@@ -395,13 +421,9 @@ def _cords(pattern: ModuleType, sampler, armature, material) -> list[bpy.types.O
 
 
 def _validate(objects: list[bpy.types.Object]) -> dict[str, object]:
-    names = [obj.name for obj in objects if obj.type == "MESH"]
-    vertices = sum(len(obj.data.vertices) for obj in objects if obj.type == "MESH")
-    polygons = sum(len(obj.data.polygons) for obj in objects if obj.type == "MESH")
+    mesh_objects = [obj for obj in objects if obj.type == "MESH"]
     failures: list[str] = []
-    for obj in objects:
-        if obj.type != "MESH":
-            continue
+    for obj in mesh_objects:
         for vertex in obj.data.vertices:
             if not all(math.isfinite(value) for value in vertex.co):
                 failures.append(f"{obj.name}: non-finite vertex {vertex.index}")
@@ -411,10 +433,10 @@ def _validate(objects: list[bpy.types.Object]) -> dict[str, object]:
             "Structured template cage validation failed: " + "; ".join(failures)
         )
     return {
-        "meshObjects": names,
-        "meshObjectCount": len(names),
-        "vertices": vertices,
-        "polygons": polygons,
+        "meshObjects": [obj.name for obj in mesh_objects],
+        "meshObjectCount": len(mesh_objects),
+        "vertices": sum(len(obj.data.vertices) for obj in mesh_objects),
+        "polygons": sum(len(obj.data.polygons) for obj in mesh_objects),
         "bodyTopologyCopied": False,
         "primaryRepresentation": "explicit regular template cages",
     }
