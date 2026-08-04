@@ -13,7 +13,7 @@
   "documentationPath": "Assets/GenWorks/siroino-nocturne-angel-set/README.md",
   "sourceJobPath": "config/products/siroino-nocturne-angel-set/job.json",
   "productBuildScript": "tools/siroino_nocturne_angel_set.py",
-  "designRevision": "v4-clearance-articulated-silhouette",
+  "designRevision": "v5-skinweighted-pleated-volume",
   "reference": {
     "sourceImageRedistributed": false,
     "sourceImageSha256": "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67",
@@ -74,6 +74,14 @@
       "artifactId": 8911782998,
       "artifactSha256": "0921d4d449985ef757db808dc9b316421f1a70374f8cd5c4f75d562f254f3d2b",
       "evidence": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v3.json"
+    },
+    {
+      "revision": "v4-clearance-articulated-silhouette",
+      "result": "VISUAL_REJECTED",
+      "hostedWorkflowRun": 30959394549,
+      "artifactId": 8912558603,
+      "artifactSha256": "086c1fa3ab50d37d6f44bd1af2605d45800a4973623434a405fc2224d15d94c1",
+      "evidence": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v4.json"
     }
   ],
   "handoff": {
@@ -82,7 +90,7 @@
     "doNotRebuildFromZero": true,
     "resumeFrom": "tools/siroino_nocturne_angel_set.py",
     "blockers": [
-      "Run Blender 4.4.3 generation for revision v4.",
+      "Run Blender 4.4.3 generation for revision v5.",
       "Generate five-view and required-pose evidence.",
       "Open all current images and complete direct visualAppearanceReview."
     ]
