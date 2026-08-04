@@ -11,8 +11,9 @@ import siroino_strappy_knit_build as base
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-nocturne-angel-set"
 PRODUCT_NAME = "Nocturne Angel Modular Set for Siroino"
-REVISION = "v1-pattern-gsl-modular-cloth"
+REVISION = "v2-open-multiring-reference-silhouette"
 REFERENCE_SHA256 = "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67"
+V1_ARTIFACT_SHA256 = "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c0392551a"
 
 
 def _guid(label: str) -> str:
@@ -64,7 +65,7 @@ PrefabInstance:
                 f"guid: {_guid('integrated-prefab')}",
                 "PrefabImporter:",
                 "  externalObjects: {}",
-                "  userData: image2outfit declared integration; runtime validation OUT_OF_SCOPE",
+                "  userData: declared integration; runtime validation OUT_OF_SCOPE",
                 "  assetBundleName:",
                 "  assetBundleVariant:",
                 "",
@@ -75,23 +76,40 @@ PrefabInstance:
     return integrated
 
 
+def _panel(identifier, object_name, layer, cloth=False):
+    return {
+        "id": identifier,
+        "object": object_name,
+        "layer": layer,
+        "cloth": cloth,
+    }
+
+
 def _pattern(cloth: list[dict]) -> dict:
     panels = [
-        ("bodice", "Nocturne_Cropped_Bodice", "base", False),
-        ("collar-left", "Nocturne_Sailor_Collar_L", "overlay", False),
-        ("collar-right", "Nocturne_Sailor_Collar_R", "overlay", False),
-        ("collar-back", "Nocturne_Sailor_Collar_Back", "overlay", False),
-        ("skirt", "Nocturne_Cloth_Skirt", "outer", True),
-        ("hem-frill", "Nocturne_Cream_Hem_Frill", "outer-trim", False),
-        ("waist-band", "Nocturne_Waist_Band", "closure", False),
-        ("puff-sleeve-left", "Nocturne_Puff_Sleeve_L", "outer", False),
-        ("puff-sleeve-right", "Nocturne_Puff_Sleeve_R", "outer", False),
-        ("arm-warmer-left", "Nocturne_Detached_Arm_Warmer_L", "detached", False),
-        ("arm-warmer-right", "Nocturne_Detached_Arm_Warmer_R", "detached", False),
-        ("leg-warmer-left", "Nocturne_Leg_Warmer_L", "detached", False),
-        ("leg-warmer-right", "Nocturne_Leg_Warmer_R", "detached", False),
+        _panel("bodice", "Nocturne_Cropped_Bodice", "base"),
+        _panel("collar-left", "Nocturne_Sailor_Collar_L", "overlay"),
+        _panel("collar-right", "Nocturne_Sailor_Collar_R", "overlay"),
+        _panel("collar-back", "Nocturne_Sailor_Collar_Back", "overlay"),
+        _panel("skirt", "Nocturne_Cloth_Skirt", "outer", True),
+        _panel("hem-frill", "Nocturne_Cream_Hem_Frill", "outer-trim"),
+        _panel("waist-band", "Nocturne_Waist_Band", "closure"),
+        _panel("puff-sleeve-left", "Nocturne_Puff_Sleeve_L", "outer"),
+        _panel("puff-sleeve-right", "Nocturne_Puff_Sleeve_R", "outer"),
+        _panel(
+            "arm-warmer-left",
+            "Nocturne_Detached_Arm_Warmer_L",
+            "detached",
+        ),
+        _panel(
+            "arm-warmer-right",
+            "Nocturne_Detached_Arm_Warmer_R",
+            "detached",
+        ),
+        _panel("leg-warmer-left", "Nocturne_Leg_Warmer_L", "detached"),
+        _panel("leg-warmer-right", "Nocturne_Leg_Warmer_R", "detached"),
     ]
-    seams = [
+    seam_values = [
         ("bodice-side-left", "bodice.left", "bodice.back-left"),
         ("bodice-side-right", "bodice.right", "bodice.back-right"),
         ("collar-left", "collar-left.neck", "bodice.neck-left"),
@@ -105,23 +123,48 @@ def _pattern(cloth: list[dict]) -> dict:
     return {
         "schemaVersion": 2,
         "productId": PRODUCT_ID,
+        "designRevision": REVISION,
         "status": "GENERATED",
-        "representation": "explicit modular panels, semantic seams and layer map",
+        "representation": "explicit open multi-ring panels, seams and layer map",
         "bodyTopologyCopied": False,
-        "panels": [
-            {"id": item[0], "object": item[1], "layer": item[2], "cloth": item[3]}
-            for item in panels
+        "panels": panels,
+        "seams": [
+            {"id": identifier, "a": first, "b": second}
+            for identifier, first, second in seam_values
         ],
-        "seams": [{"id": item[0], "a": item[1], "b": item[2]} for item in seams],
         "modules": {
             "core": ["bodice", "skirt", "collar", "sleeves"],
             "head": ["beret", "animal ears"],
-            "back": ["angel wings", "tail"],
+            "back": ["planar feather wings", "tail"],
             "legs": ["leg warmers", "shoes"],
             "accessories": ["choker", "amber charm", "rabbit charm"],
         },
         "clothSimulation": cloth,
     }
+
+
+def _write_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _write_hashes(root: Path) -> None:
+    tracked = sorted(
+        path
+        for path in root.rglob("*")
+        if path.is_file() and path.name != "SOURCE_HASHES.txt"
+    )
+    (root / "SOURCE_HASHES.txt").write_text(
+        "\n".join(
+            f"{base.sha256(path)}  {path.relative_to(root).as_posix()}"
+            for path in tracked
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
 
 def write_records(
@@ -132,27 +175,35 @@ def write_records(
     cloth: list[dict],
 ) -> None:
     root = base.repo_path(job["productRoot"])
-    for name in ("Documentation", "Research", "Tests"):
-        (root / name).mkdir(parents=True, exist_ok=True)
     pattern = _pattern(cloth)
-    (root / "Documentation" / "pattern-spec.json").write_text(
-        json.dumps(pattern, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    _write_json(root / "Documentation" / "pattern-spec.json", pattern)
     research = {
         "schemaVersion": 1,
         "status": "EXECUTED",
         "result": "PASS",
         "executedAt": base.utc_now(),
-        "method": "PatternGSL-inspired explicit panel/seam/layer specification with Blender cloth",
+        "method": (
+            "PatternGSL-inspired explicit panel, seam and layer specification "
+            "with Blender cloth"
+        ),
         "sources": [
             {
-                "title": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
+                "title": (
+                    "PatternGSL: A Structured Specification Language for "
+                    "Template-Free and Simulation-Ready 3D Garments"
+                ),
                 "url": "https://arxiv.org/abs/2606.24564",
             },
             {
-                "title": "AutoSew: A Geometric Approach to Stitching Prediction with Graph Neural Networks",
+                "title": (
+                    "AutoSew: A Geometric Approach to Stitching Prediction "
+                    "with Graph Neural Networks"
+                ),
                 "url": "https://arxiv.org/abs/2602.22052",
+            },
+            {
+                "title": "Blender 4.4 Cloth Physics",
+                "url": "https://docs.blender.org/manual/en/4.4/physics/cloth/index.html",
             },
         ],
         "implementation": {
@@ -165,11 +216,14 @@ def write_records(
             "seamPairCount": len(pattern["seams"]),
         },
         "clothSimulation": cloth,
-        "acceptance": {"researchTrial": "PASS", "visualAppearanceReview": "PENDING"},
+        "acceptance": {
+            "researchTrial": "PASS",
+            "visualAppearanceReview": "PENDING",
+        },
     }
-    (root / "Research" / "patterngsl-autosew-cloth-trial.json").write_text(
-        json.dumps(research, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
+    _write_json(
+        root / "Research" / "patterngsl-autosew-cloth-trial.json",
+        research,
     )
     visual = {
         "schemaVersion": 2,
@@ -179,12 +233,11 @@ def write_records(
         "visualAppearanceReview": "PENDING",
         "reviewer": None,
         "blockingFindings": [],
-        "nextAction": "Open current five-view and required-pose images and record PASS or FAIL.",
+        "nextAction": (
+            "Open current five-view and required-pose images and record PASS or FAIL."
+        ),
     }
-    (root / "Tests" / "visual-review.json").write_text(
-        json.dumps(visual, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    _write_json(root / "Tests" / "visual-review.json", visual)
     manifest = {
         "schemaVersion": 1,
         "productId": PRODUCT_ID,
@@ -231,9 +284,14 @@ def write_records(
             "prefab": job["prefabAssetPath"],
             "integratedPrefab": job["integratedPrefabAssetPath"],
             "multiview": multiview.relative_to(ROOT).as_posix(),
-            "poseReview": f"{job['productRoot']}/Previews/{PRODUCT_ID}-pose-review.webp",
+            "poseReview": (
+                f"{job['productRoot']}/Previews/{PRODUCT_ID}-pose-review.webp"
+            ),
             "patternSpec": f"{job['productRoot']}/Documentation/pattern-spec.json",
-            "researchTrial": f"{job['productRoot']}/Research/patterngsl-autosew-cloth-trial.json",
+            "researchTrial": (
+                f"{job['productRoot']}/Research/"
+                "patterngsl-autosew-cloth-trial.json"
+            ),
             "fitAudit": f"{job['productRoot']}/Tests/fit-audit.json",
             "visualReview": f"{job['productRoot']}/Tests/visual-review.json",
         },
@@ -246,6 +304,16 @@ def write_records(
             }
             for name, path in previews.items()
         },
+        "rejectedHistory": [
+            {
+                "revision": "v1-pattern-gsl-modular-cloth",
+                "result": "VISUAL_REJECTED",
+                "hostedWorkflowRun": 30934884455,
+                "artifactId": 8903072226,
+                "artifactSha256": V1_ARTIFACT_SHA256,
+                "evidence": "Tests/visual-review-v1.json",
+            }
+        ],
         "handoff": {
             "resumable": True,
             "canonicalWorkspace": job["productRoot"],
@@ -257,35 +325,22 @@ def write_records(
             ],
         },
     }
-    base.repo_path(job["productManifestPath"]).write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    _write_json(base.repo_path(job["productManifestPath"]), manifest)
     cloth_frames = cloth[0]["frames"]
     (root / "README.md").write_text(
         f"""# {PRODUCT_NAME}
 
 `WORKING` — SiroinoSotai_PC向けの黒・ベージュ・白のモジュール式衣装です。
 
-- explicit panel / seam / layer specification
+- revision: `{REVISION}`
+- explicit open multi-ring panel / seam / layer specification
 - Blender cloth simulation: {cloth_frames} frames
-- modular beret, ears, wings, tail, leg warmers, shoes and charms
+- modular beret, ears, planar feather wings, tail, leg warmers and charms
 - reference image is hash-bound but not redistributed
+- v1 rejected visual evidence is retained in `Tests/visual-review-v1.json`
 
 5面レンダリングまで生成済みです。必須6ポーズと直接画像監査が完了するまで `COMPLETE` ではありません。Unity、Modular Avatar、NDMF、VRChat runtimeは `OUT_OF_SCOPE` です。
 """,
         encoding="utf-8",
     )
-    tracked = sorted(
-        path
-        for path in root.rglob("*")
-        if path.is_file() and path.name != "SOURCE_HASHES.txt"
-    )
-    (root / "SOURCE_HASHES.txt").write_text(
-        "\n".join(
-            f"{base.sha256(path)}  {path.relative_to(root).as_posix()}"
-            for path in tracked
-        )
-        + "\n",
-        encoding="utf-8",
-    )
+    _write_hashes(root)
