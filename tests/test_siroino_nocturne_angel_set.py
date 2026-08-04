@@ -1,0 +1,83 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+PRODUCT_ID = "siroino-nocturne-angel-set"
+CONFIG = ROOT / "config" / "products" / PRODUCT_ID
+SCRIPT = ROOT / "tools" / "siroino_nocturne_angel_set.py"
+POSE_SCRIPT = ROOT / "tools" / "siroino_nocturne_angel_pose.py"
+
+
+class NocturneAngelSetContractTest(unittest.TestCase):
+    def test_job_uses_stable_canonical_entrypoints(self) -> None:
+        job = json.loads((CONFIG / "job.json").read_text(encoding="utf-8"))
+        self.assertEqual(job["schemaVersion"], 2)
+        self.assertEqual(job["id"], PRODUCT_ID)
+        self.assertEqual(job["productRoot"], f"Assets/GenWorks/{PRODUCT_ID}")
+        self.assertEqual(job["buildScript"], "tools/siroino_nocturne_angel_set.py")
+        self.assertEqual(
+            job["hostedPoseScript"], "tools/siroino_nocturne_angel_pose.py"
+        )
+        self.assertEqual(
+            job["targetSourcePath"],
+            "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+        )
+        self.assertTrue(SCRIPT.is_file())
+        self.assertTrue(POSE_SCRIPT.is_file())
+
+    def test_construction_is_explicit_loose_layered(self) -> None:
+        construction = json.loads(
+            (CONFIG / "construction.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(construction["profile"], "loose-layered")
+        joined = " ".join(
+            construction["panels"] + construction["separateGeometry"]
+        )
+        for required in ("skirt", "sailor collar", "wings", "beret", "leg warmers"):
+            self.assertIn(required, joined)
+
+    def test_reference_is_hash_bound_but_not_redistributed(self) -> None:
+        reference = json.loads(
+            (CONFIG / "reference.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            reference["sha256"],
+            "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67",
+        )
+        self.assertEqual(reference["dimensions"], [2048, 1229])
+        self.assertFalse(reference["sourceImageRedistributed"])
+
+    def test_generator_uses_real_cloth_and_does_not_copy_body_topology(self) -> None:
+        source = SCRIPT.read_text(encoding="utf-8")
+        for required in (
+            '"CLOTH"',
+            "vertex_group_mass",
+            "use_self_collision",
+            "evaluated_get",
+            '"bodyTopologyCopied": False',
+            "transfer_weights",
+            "maxBoneInfluences",
+        ):
+            self.assertIn(required, source)
+        self.assertNotIn("base.extract_surface", source)
+        self.assertNotIn("body.data.polygons", source)
+
+    def test_modular_parts_are_authored_as_separate_objects(self) -> None:
+        source = SCRIPT.read_text(encoding="utf-8")
+        for object_name in (
+            "Nocturne_Cropped_Bodice",
+            "Nocturne_Cloth_Skirt",
+            "Nocturne_Beret",
+            "Nocturne_Wing_",
+            "Nocturne_Tail",
+            "Nocturne_Leg_Warmer_",
+            "Nocturne_Shoe_",
+        ):
+            self.assertIn(object_name, source)
+
+
+if __name__ == "__main__":
+    unittest.main()
