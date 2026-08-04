@@ -131,9 +131,7 @@ def validate_construction(
 
 
 def _normalize_gate_name(value: Any) -> str:
-    return "".join(
-        character for character in str(value).lower() if character.isalnum()
-    )
+    return "".join(character for character in str(value).lower() if character.isalnum())
 
 
 def _handoff_policy(root: Path) -> dict[str, Any]:

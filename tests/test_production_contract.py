@@ -65,7 +65,9 @@ class ProductionContractTest(unittest.TestCase):
                 "sourceArtifacts[0].sha256 mismatch: Assets/result.json", errors
             )
 
-    def test_known_fit_failure_blocks_candidate_promotion_without_scope_policy(self) -> None:
+    def test_known_fit_failure_blocks_candidate_promotion_without_scope_policy(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             manifest = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"

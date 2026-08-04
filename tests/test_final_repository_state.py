@@ -58,9 +58,7 @@ class FinalRepositoryStateTest(unittest.TestCase):
         self.assertFalse(set(completion_gates) & out_of_scope)
 
         for product_dir in sorted(path for path in products.iterdir() if path.is_dir()):
-            job = json.loads(
-                (product_dir / "job.json").read_text(encoding="utf-8-sig")
-            )
+            job = json.loads((product_dir / "job.json").read_text(encoding="utf-8-sig"))
             product_root = job["productRoot"]
             delivery_assets = set(job.get("deliveryAssets", []))
 
@@ -105,7 +103,9 @@ class FinalRepositoryStateTest(unittest.TestCase):
                 for gate in completion_gates:
                     self.assertEqual(gates.get(gate), "PASS", (manifest_path, gate))
 
-    def test_handoff_policy_blocks_artifact_only_and_zero_rebuild_workflows(self) -> None:
+    def test_handoff_policy_blocks_artifact_only_and_zero_rebuild_workflows(
+        self,
+    ) -> None:
         policy = json.loads(
             (ROOT / "config" / "genworks-handoff-policy.json").read_text(
                 encoding="utf-8-sig"
