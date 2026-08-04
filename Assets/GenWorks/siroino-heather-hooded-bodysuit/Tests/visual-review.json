@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "designRevision": "v20-semantic-five-opening-highcut-shell",
+  "designRevision": "v21-pose-clear-underbody-five-opening-shell",
   "checkedAt": null,
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
@@ -12,37 +12,38 @@
     "fitAudit": "Tests/fit-audit.json"
   },
   "previousRevisionReview": {
-    "designRevision": "v19-topology-healed-weighted-shell",
+    "designRevision": "v20-semantic-five-opening-highcut-shell",
     "result": "FAIL",
-    "hostedWorkflowRun": 30882502147,
+    "hostedWorkflowRun": 30896458304,
     "blockingFindings": [
       {
-        "zone": "lower-body silhouette",
-        "finding": "The five-view evidence showed a shirt-like lower hem instead of a connected crotch bridge and two high-cut leg openings."
+        "zone": "front and rear crotch",
+        "finding": "The center strip stopped above the underbody and produced rectangular hanging tabs in both front and rear views."
       },
       {
-        "zone": "hip and opening boundaries",
-        "finding": "The front, side and rear views retained hip fins and irregular scalloped boundaries; area-ranked complement retention did not preserve anatomical opening identity."
+        "zone": "leg openings and hip silhouette",
+        "finding": "The five anatomical openings were topologically correct, but the opening boundaries remained scalloped and side views retained pointed hip flaps."
       },
       {
         "zone": "upper-back hood roll",
-        "finding": "The rolled hood intersected the body and appeared as detached shoulder-side knobs; neutral fit audit reported 74 overlap pairs."
+        "finding": "The roll remained body-intersecting and appeared as three knot-like protrusions; neutral fit audit reported 86 overlap pairs."
       },
       {
         "zone": "six-pose fit",
-        "finding": "All six evaluated poses failed: shell overlaps were 0 neutral, 3066 arms-up, 1058 arm-cross, 0 crouch, 164 sit and 2155 prone; hood overlaps also remained in every pose."
+        "finding": "All six evaluated poses failed. Shell overlaps were 0 neutral, 3066 arms-up, 1058 arm-cross, 396 crouch, 636 sit and 2155 prone; the new lower strip introduced the crouch and sit failures."
       }
     ]
   },
   "currentRevisionRequirements": [
-    "Classify and retain the neck, left wrist, right wrist, left leg and right leg complement components by position rather than component area.",
-    "Restore every nonanatomical adjacent complement component from source topology.",
-    "Extend the high-cut center strip through the crotch so the lower complement is split into two leg openings.",
+    "Retain exactly the neck, left wrist, right wrist, left leg and right leg complement components and restore every nonanatomical component.",
+    "Extend the narrow lower-body strip to z=0.515 so it wraps under the body instead of ending as visible front and rear tabs.",
+    "Relax four boundary rings for 14 iterations and reproject them at 22 mm clearance to remove scalloped leg and neckline boundaries.",
     "Require one connected primary shell with exactly five boundary loops before rendering.",
-    "Move the compact folded hood roll outward from the upper back and require zero body intersections.",
-    "Inspect all five directional renders generated from v20.",
-    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v20.",
-    "Require no shirt-like lower hem, hip fins, scalloped opening boundaries, detached hood geometry or pose penetration.",
+    "Use a slim continuous folded-hood roll at 74-86 mm body clearance and require zero body intersections.",
+    "Inspect all five directional renders generated from v21.",
+    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v21.",
+    "Require zero evaluated garment/body triangle intersections in every required pose.",
+    "Require no rectangular crotch tabs, hip fins, scalloped opening boundaries, exposed inner arms, detached hood geometry or pose penetration.",
     "Require the current-revision fit audit and images to agree before PASS."
   ]
 }
