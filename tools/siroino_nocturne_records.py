@@ -1,4 +1,4 @@
-"""Generated contracts and Unity declaration for the Nocturne Angel set."""
+"""Generated contracts and Unity declarations for the Nocturne Angel set."""
 
 from __future__ import annotations
 
@@ -17,7 +17,8 @@ V1_ARTIFACT_SHA256 = "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c03
 
 
 def _guid(label: str) -> str:
-    return hashlib.md5(f"image2outfit:{PRODUCT_ID}:{label}".encode()).hexdigest()
+    value = f"image2outfit:{PRODUCT_ID}:{label}".encode()
+    return hashlib.md5(value).hexdigest()
 
 
 def _read_guid(path: Path) -> str:
@@ -27,11 +28,20 @@ def _read_guid(path: Path) -> str:
     raise RuntimeError(f"Unity meta file has no guid: {path}")
 
 
+def _write_json(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def write_integrated_prefab(job: dict) -> Path:
     outfit = base.repo_path(job["prefabAssetPath"])
     outfit_meta = outfit.with_suffix(outfit.suffix + ".meta")
     if not outfit.is_file() or not outfit_meta.is_file():
         raise RuntimeError("outfit Prefab declaration is missing")
+
     outfit_guid = _read_guid(outfit_meta)
     integrated = base.repo_path(job["integratedPrefabAssetPath"])
     integrated.parent.mkdir(parents=True, exist_ok=True)
@@ -58,7 +68,8 @@ PrefabInstance:
 """,
         encoding="utf-8",
     )
-    integrated.with_suffix(integrated.suffix + ".meta").write_text(
+    meta = integrated.with_suffix(integrated.suffix + ".meta")
+    meta.write_text(
         "\n".join(
             [
                 "fileFormatVersion: 2",
@@ -76,7 +87,7 @@ PrefabInstance:
     return integrated
 
 
-def _panel(identifier, object_name, layer, cloth=False):
+def _panel(identifier: str, object_name: str, layer: str, cloth: bool = False) -> dict:
     return {
         "id": identifier,
         "object": object_name,
@@ -109,7 +120,7 @@ def _pattern(cloth: list[dict]) -> dict:
         _panel("leg-warmer-left", "Nocturne_Leg_Warmer_L", "detached"),
         _panel("leg-warmer-right", "Nocturne_Leg_Warmer_R", "detached"),
     ]
-    seam_values = [
+    seams = [
         ("bodice-side-left", "bodice.left", "bodice.back-left"),
         ("bodice-side-right", "bodice.right", "bodice.back-right"),
         ("collar-left", "collar-left.neck", "bodice.neck-left"),
@@ -130,7 +141,7 @@ def _pattern(cloth: list[dict]) -> dict:
         "panels": panels,
         "seams": [
             {"id": identifier, "a": first, "b": second}
-            for identifier, first, second in seam_values
+            for identifier, first, second in seams
         ],
         "modules": {
             "core": ["bodice", "skirt", "collar", "sleeves"],
@@ -143,41 +154,8 @@ def _pattern(cloth: list[dict]) -> dict:
     }
 
 
-def _write_json(path: Path, payload: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-
-
-def _write_hashes(root: Path) -> None:
-    tracked = sorted(
-        path
-        for path in root.rglob("*")
-        if path.is_file() and path.name != "SOURCE_HASHES.txt"
-    )
-    (root / "SOURCE_HASHES.txt").write_text(
-        "\n".join(
-            f"{base.sha256(path)}  {path.relative_to(root).as_posix()}"
-            for path in tracked
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-
-def write_records(
-    job: dict,
-    previews: dict[str, Path],
-    multiview: Path,
-    metrics: dict,
-    cloth: list[dict],
-) -> None:
-    root = base.repo_path(job["productRoot"])
-    pattern = _pattern(cloth)
-    _write_json(root / "Documentation" / "pattern-spec.json", pattern)
-    research = {
+def _research(pattern: dict, cloth: list[dict]) -> dict:
+    return {
         "schemaVersion": 1,
         "status": "EXECUTED",
         "result": "PASS",
@@ -188,17 +166,11 @@ def write_records(
         ),
         "sources": [
             {
-                "title": (
-                    "PatternGSL: A Structured Specification Language for "
-                    "Template-Free and Simulation-Ready 3D Garments"
-                ),
+                "title": "PatternGSL structured garment specification",
                 "url": "https://arxiv.org/abs/2606.24564",
             },
             {
-                "title": (
-                    "AutoSew: A Geometric Approach to Stitching Prediction "
-                    "with Graph Neural Networks"
-                ),
+                "title": "AutoSew geometric stitching prediction",
                 "url": "https://arxiv.org/abs/2602.22052",
             },
             {
@@ -221,24 +193,39 @@ def write_records(
             "visualAppearanceReview": "PENDING",
         },
     }
-    _write_json(
-        root / "Research" / "patterngsl-autosew-cloth-trial.json",
-        research,
-    )
-    visual = {
-        "schemaVersion": 2,
-        "designRevision": REVISION,
-        "productId": PRODUCT_ID,
-        "result": "PENDING",
+
+
+def _technical_gates() -> dict:
+    return {
+        "blender": "PASS",
+        "editableSource": "PASS",
+        "fbx": "PASS",
+        "prefabDeclared": "PASS",
+        "fiveViewEvidence": "PASS",
+        "poseEvidence": "PENDING",
         "visualAppearanceReview": "PENDING",
-        "reviewer": None,
-        "blockingFindings": [],
-        "nextAction": (
-            "Open current five-view and required-pose images and record PASS or FAIL."
-        ),
+        "researchTrial": "PASS",
+        "fitPenetration": "PENDING",
+        "unityImport": "OUT_OF_SCOPE",
+        "unitySaveReload": "OUT_OF_SCOPE",
+        "prefabReload": "OUT_OF_SCOPE",
+        "modularAvatar": "OUT_OF_SCOPE",
+        "ndmf": "OUT_OF_SCOPE",
+        "vrchatBuildTest": "OUT_OF_SCOPE",
+        "vrchatRuntime": "OUT_OF_SCOPE",
+        "humanRuntimeReview": "OUT_OF_SCOPE",
     }
-    _write_json(root / "Tests" / "visual-review.json", visual)
-    manifest = {
+
+
+def _manifest(
+    job: dict,
+    previews: dict[str, Path],
+    multiview: Path,
+    metrics: dict,
+    cloth: list[dict],
+) -> dict:
+    root = job["productRoot"]
+    return {
         "schemaVersion": 1,
         "productId": PRODUCT_ID,
         "productName": PRODUCT_NAME,
@@ -246,11 +233,11 @@ def write_records(
         "state": "WORKING",
         "targetAdapterId": job["adapterId"],
         "target": "SiroinoSotai_PC neutral PC body",
-        "productRoot": job["productRoot"],
+        "productRoot": root,
         "outfitPrefabPath": job["prefabAssetPath"],
         "integratedPrefabPath": job["integratedPrefabAssetPath"],
         "previewPath": job["previewPaths"]["front"],
-        "documentationPath": f"{job['productRoot']}/README.md",
+        "documentationPath": f"{root}/README.md",
         "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json",
         "productBuildScript": job["buildScript"],
         "designRevision": REVISION,
@@ -259,41 +246,20 @@ def write_records(
             "sourceImageSha256": REFERENCE_SHA256,
             "sourceImageDimensions": [2048, 1229],
         },
-        "technicalGates": {
-            "blender": "PASS",
-            "editableSource": "PASS",
-            "fbx": "PASS",
-            "prefabDeclared": "PASS",
-            "fiveViewEvidence": "PASS",
-            "poseEvidence": "PENDING",
-            "visualAppearanceReview": "PENDING",
-            "researchTrial": "PASS",
-            "fitPenetration": "PENDING",
-            "unityImport": "OUT_OF_SCOPE",
-            "unitySaveReload": "OUT_OF_SCOPE",
-            "prefabReload": "OUT_OF_SCOPE",
-            "modularAvatar": "OUT_OF_SCOPE",
-            "ndmf": "OUT_OF_SCOPE",
-            "vrchatBuildTest": "OUT_OF_SCOPE",
-            "vrchatRuntime": "OUT_OF_SCOPE",
-            "humanRuntimeReview": "OUT_OF_SCOPE",
-        },
+        "technicalGates": _technical_gates(),
         "outputs": {
             "blend": job["blendPath"],
             "fbx": job["fbxAssetPath"],
             "prefab": job["prefabAssetPath"],
             "integratedPrefab": job["integratedPrefabAssetPath"],
             "multiview": multiview.relative_to(ROOT).as_posix(),
-            "poseReview": (
-                f"{job['productRoot']}/Previews/{PRODUCT_ID}-pose-review.webp"
-            ),
-            "patternSpec": f"{job['productRoot']}/Documentation/pattern-spec.json",
+            "poseReview": f"{root}/Previews/{PRODUCT_ID}-pose-review.webp",
+            "patternSpec": f"{root}/Documentation/pattern-spec.json",
             "researchTrial": (
-                f"{job['productRoot']}/Research/"
-                "patterngsl-autosew-cloth-trial.json"
+                f"{root}/Research/patterngsl-autosew-cloth-trial.json"
             ),
-            "fitAudit": f"{job['productRoot']}/Tests/fit-audit.json",
-            "visualReview": f"{job['productRoot']}/Tests/visual-review.json",
+            "fitAudit": f"{root}/Tests/fit-audit.json",
+            "visualReview": f"{root}/Tests/visual-review.json",
         },
         "metrics": metrics,
         "clothSimulation": cloth,
@@ -316,7 +282,7 @@ def write_records(
         ],
         "handoff": {
             "resumable": True,
-            "canonicalWorkspace": job["productRoot"],
+            "canonicalWorkspace": root,
             "doNotRebuildFromZero": True,
             "resumeFrom": job["buildScript"],
             "blockers": [
@@ -325,7 +291,58 @@ def write_records(
             ],
         },
     }
-    _write_json(base.repo_path(job["productManifestPath"]), manifest)
+
+
+def _write_hashes(root: Path) -> None:
+    tracked = sorted(
+        path
+        for path in root.rglob("*")
+        if path.is_file() and path.name != "SOURCE_HASHES.txt"
+    )
+    lines = [
+        f"{base.sha256(path)}  {path.relative_to(root).as_posix()}"
+        for path in tracked
+    ]
+    (root / "SOURCE_HASHES.txt").write_text(
+        "\n".join(lines) + "\n",
+        encoding="utf-8",
+    )
+
+
+def write_records(
+    job: dict,
+    previews: dict[str, Path],
+    multiview: Path,
+    metrics: dict,
+    cloth: list[dict],
+) -> None:
+    root = base.repo_path(job["productRoot"])
+    pattern = _pattern(cloth)
+    _write_json(root / "Documentation" / "pattern-spec.json", pattern)
+    _write_json(
+        root / "Research" / "patterngsl-autosew-cloth-trial.json",
+        _research(pattern, cloth),
+    )
+    _write_json(
+        root / "Tests" / "visual-review.json",
+        {
+            "schemaVersion": 2,
+            "designRevision": REVISION,
+            "productId": PRODUCT_ID,
+            "result": "PENDING",
+            "visualAppearanceReview": "PENDING",
+            "reviewer": None,
+            "blockingFindings": [],
+            "nextAction": (
+                "Open current five-view and required-pose images and record PASS or FAIL."
+            ),
+        },
+    )
+    _write_json(
+        base.repo_path(job["productManifestPath"]),
+        _manifest(job, previews, multiview, metrics, cloth),
+    )
+
     cloth_frames = cloth[0]["frames"]
     (root / "README.md").write_text(
         f"""# {PRODUCT_NAME}
