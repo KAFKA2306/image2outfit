@@ -1,0 +1,41 @@
+name: Format review console once
+
+on:
+  push:
+    branches:
+      - agent/uiux-2026-review-console-v2
+    paths:
+      - ".github/workflows/format-review-console-once.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out review branch
+        uses: actions/checkout@v6
+        with:
+          ref: agent/uiux-2026-review-console-v2
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: "0.11.32"
+
+      - name: Format, remove this workflow, and commit
+        run: |
+          uv run --locked --no-default-groups --group dev ruff format tools/review_console.py
+          rm .github/workflows/format-review-console-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/review_console.py .github/workflows/format-review-console-once.yml
+          git commit -m "Format review console"
+          git push origin HEAD:agent/uiux-2026-review-console-v2
