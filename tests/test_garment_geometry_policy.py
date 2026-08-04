@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "pyproject.toml"
 PATTERN_PATH = ROOT / "tools" / "siroino_heather_hooded_pattern_v13.py"
+BUILD_PATH = ROOT / "tools" / "siroino_heather_hooded_bodysuit_build.py"
 
 
 class GarmentGeometryPolicyTests(unittest.TestCase):
@@ -18,6 +19,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             "image2outfit"
         ]["garment-geometry"]
         cls.source = PATTERN_PATH.read_text(encoding="utf-8")
+        cls.build_source = BUILD_PATH.read_text(encoding="utf-8")
         cls.tree = ast.parse(cls.source, filename=str(PATTERN_PATH))
         cls.body_panel = next(
             node
@@ -53,7 +55,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertLessEqual(float(defaults["offset"]), limit)
         self.assertEqual(float(defaults["bevel_width"]), 0.0)
 
-    def test_pattern_builds_one_refined_primary_body_shell(self) -> None:
+    def test_pattern_builds_one_primary_body_shell(self) -> None:
         create_outfit = next(
             node
             for node in self.tree.body
@@ -70,7 +72,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertEqual(len(shell_calls), 1)
         self.assertIn("Heather_Body_Shell", create_source)
         self.assertIn("_refined_body_source", create_source)
-        self.assertIn("_body_shell_predicate", create_source)
+        self.assertIn("_body_shell_predicate(refined)", create_source)
         self.assertNotIn("Heather_Rib_Cuff", create_source)
         self.assertNotIn("Heather_Highcut_Front_Panel", create_source)
         self.assertNotIn("Heather_Highcut_Back_Panel", create_source)
@@ -79,7 +81,6 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
     def test_safe_shell_has_topology_and_boundary_gates(self) -> None:
         required_fragments = (
             "The fitted source shell must not use a bevel modifier",
-            "shoulder_bridge",
             "max_edge > 0.20",
             "disconnected source shell",
             "expected at most 5 garment openings",
@@ -87,6 +88,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         )
         for fragment in required_fragments:
             self.assertIn(fragment, self.source)
+        self.assertNotIn("shoulder_bridge", self.source)
         self.assertNotIn(
             'modifiers.new("Finished edge", "BEVEL")',
             self.body_panel_source,
@@ -96,7 +98,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             self.body_panel_source,
         )
 
-    def test_primary_shell_bakes_the_evaluated_target_shape(self) -> None:
+    def test_primary_shell_bakes_and_refines_the_evaluated_target(self) -> None:
         self.assertIn("body.data.polygons", self.selection_source)
         required_fragments = (
             "bpy.context.evaluated_depsgraph_get()",
@@ -105,7 +107,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             "preserve_all_data_layers=True",
             "len(mesh.vertices) != len(body.data.vertices)",
             "mesh.shape_keys is not None",
-            "subdivision.levels = 1",
+            "subdivision.levels = 2",
             "body.data.vertices[source_index].groups",
             "body.data.uv_layers.active",
             "modifier.use_deform_preserve_volume = preserve_volume",
@@ -115,17 +117,46 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertNotIn("source.shape_key_clear()", self.source)
         self.assertIn("_purge_orphan_shape_keys()", self.source)
 
-    def test_highcut_uses_a_short_smooth_transition(self) -> None:
-        self.assertIn("def _smoothstep", self.source)
-        self.assertIn("0.670 <= center.z <= 0.865", self.source)
-        self.assertIn("0.070 + 0.095 * _smoothstep(t)", self.source)
+    def test_openings_are_smoothed_and_reprojected(self) -> None:
+        required_fragments = (
+            "def _boundary_vertex_weights",
+            "Temporary_Boundary_Smoothing",
+            "Opening boundary smoothing",
+            "smooth.iterations = 7",
+            "Evaluated target reprojection",
+            'shrinkwrap.wrap_method = "NEAREST_SURFACEPOINT"',
+            "shrinkwrap.offset = offset",
+        )
+        for fragment in required_fragments:
+            self.assertIn(fragment, self.source)
 
-    def test_rejected_cowl_is_replaced_by_surface_following_drape(self) -> None:
-        self.assertIn("Heather_Hood_Folded_Back_Drape", self.source)
-        self.assertIn("sampler.point(x, sample_z, front=False", self.source)
+    def test_sleeves_use_interpolated_arm_weights(self) -> None:
+        required_fragments = (
+            "_polygon_average_weight(body, polygon, (upper,))",
+            "_polygon_average_weight(body, polygon, (lower,))",
+            "_polygon_average_weight(body, polygon, (hand,))",
+            "arm_weight >= 0.008",
+            "upper_weight >= 0.002",
+        )
+        for fragment in required_fragments:
+            self.assertIn(fragment, self.source)
+
+    def test_highcut_uses_a_short_broad_smooth_transition(self) -> None:
+        self.assertIn("def _smoothstep", self.source)
+        self.assertIn("0.695 <= center.z <= 0.885", self.source)
+        self.assertIn("0.090 + 0.085 * _smoothstep(t)", self.source)
+
+    def test_rejected_drape_is_replaced_by_a_surface_sampled_roll(self) -> None:
+        self.assertIn("Heather_Hood_Folded_Roll", self.source)
+        self.assertIn("sampler.point(x, z, front=False", self.source)
+        self.assertNotIn("Heather_Hood_Folded_Back_Drape", self.source)
         self.assertNotIn("Heather_Hood_Down_Cowl", self.source)
         self.assertNotIn("Heather_Hood_Shell", self.source)
-        self.assertNotIn("Heather_Hood_Neck_Band", self.source)
+
+    def test_build_gate_uses_required_objects_not_legacy_object_count(self) -> None:
+        self.assertIn('"Heather_Hood_Folded_Roll"', self.build_source)
+        self.assertIn("required_objects <= garment_names", self.build_source)
+        self.assertNotIn('measured["meshObjects"] >= 14', self.build_source)
 
 
 if __name__ == "__main__":
