@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 GENERATOR_PATH = ROOT / "tools" / "siroino_heather_fused_roll_v28.py"
 BASE_PATH = ROOT / "tools" / "siroino_heather_closed_components_v27.py"
-PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_fused_product.py"
+PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_product.py"
 POSE_PATH = ROOT / "tools" / "siroino_heather_hooded_fused_pose_probe.py"
 JOB_PATH = (
     ROOT
@@ -32,7 +32,7 @@ class GarmentGeometryFusedRollTests(unittest.TestCase):
     def test_stable_entrypoints_install_v28(self) -> None:
         self.assertEqual(
             self.job["buildScript"],
-            "tools/siroino_heather_hooded_fused_product.py",
+            "tools/siroino_heather_hooded_product.py",
         )
         self.assertEqual(
             self.job["hostedPoseScript"],
@@ -42,7 +42,9 @@ class GarmentGeometryFusedRollTests(unittest.TestCase):
             "import siroino_heather_fused_roll_v28 as fused_roll",
             self.product,
         )
-        self.assertIn("fused_roll.install(product.pattern)", self.product)
+        self.assertIn("fused_roll.install(pattern)", self.product)
+        self.assertIn("import siroino_heather_hooded_pattern as pattern", self.product)
+        self.assertNotIn("siroino_heather_hooded_pattern_v13", self.product)
 
     def test_v28_reuses_one_validated_geometry_base(self) -> None:
         imports = {
@@ -87,7 +89,10 @@ class GarmentGeometryFusedRollTests(unittest.TestCase):
             self.generator,
         )
         self.assertNotIn("columns = 40", self.generator)
-        self.assertNotIn("faces.append", self.generator.split("def _folded_back_hood(", 1)[1].split("def _validate(", 1)[0])
+        hood_section = self.generator.split("def _folded_back_hood(", 1)[1].split(
+            "def _validate(", 1
+        )[0]
+        self.assertNotIn("faces.append", hood_section)
 
     def test_pose_adapter_widens_every_required_view(self) -> None:
         self.assertIn("camera.data.ortho_scale *= 1.24", self.pose)
