@@ -3,7 +3,7 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
+  "designRevision": "v24-smooth-normal-highcut-repair",
   "panels": [
     "evaluated-shape-two-level-subdivided-connected-torso-underbody-weighted-sleeve-shell",
     "semantic-neck-wrist-leg-complement-classification",
@@ -12,7 +12,10 @@
     "four-ring-boundary-relaxation",
     "body-triangle-barycentric-anchors-with-positive-normal-offset-field",
     "four-bone-local-residual-smoothing-with-bounded-world-decoding",
-    "body-clear-slim-upper-back-folded-hood-roll"
+    "micro-boundary-hole-closure-with-existing-vertices",
+    "barycentric-smooth-body-normal-reprojection",
+    "bounded-high-cut-underbody-lift",
+    "laterally-compressed-upper-back-folded-hood-roll"
   ],
   "separateGeometry": [
     "Henley placket",
@@ -43,12 +46,13 @@
     "paperLicense": "CC BY-NC-ND 4.0",
     "officialCode": "https://github.com/MengZephyr/LoBoFit",
     "officialCodeLicense": "BSD-3-Clause",
-    "implementation": "independent deterministic four-bone local residual encoding, adjacency smoothing, clearance pull and bounded world-space decoding after the existing DAMA-inspired body-triangle anchor pass",
+    "implementation": "independent deterministic four-bone local residual encoding followed by micro-hole closure, barycentric smooth-normal body reprojection, bounded high-cut lift and folded-hood lateral compression",
     "authorsModelExecuted": false,
     "officialCodeLocated": true,
     "officialCodeExecuted": false,
     "preconditionerEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
-    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json"
+    "localBoneEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smooth-normal-highcut-repair-trial.json"
   },
   "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
