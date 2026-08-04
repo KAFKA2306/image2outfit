@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "designRevision": "v18-weighted-refined-shell-rolled-hood",
+  "designRevision": "v19-topology-healed-weighted-shell",
   "checkedAt": null,
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
@@ -12,46 +12,32 @@
     "fitAudit": "Tests/fit-audit.json"
   },
   "previousRevisionReview": {
-    "designRevision": "v17-evaluated-shape-surface-drape",
-    "result": "FAIL",
-    "hostedWorkflowRun": 30880779172,
-    "artifactId": 8881325774,
+    "designRevision": "v18-weighted-refined-shell-rolled-hood",
+    "result": "FAIL_BEFORE_RENDER",
+    "hostedWorkflowRun": 30881813485,
     "blockingFindings": [
       {
-        "zone": "opening boundaries",
-        "finding": "Actual five-view evidence showed jagged neckline, sleeve and leg-opening boundaries inherited from polygon-center selection."
+        "zone": "primary-shell topology",
+        "finding": "The weighted refined shell was one connected component but the executable gate detected eight boundary loops across 726 boundary edges."
       },
       {
-        "zone": "shoulder and underarm",
-        "finding": "The rectangular shoulder bridge produced broad wing-like underarm geometry."
-      },
-      {
-        "zone": "high-cut lower body",
-        "finding": "Front and back lower panels remained visibly pointed and uneven."
-      },
-      {
-        "zone": "hood",
-        "finding": "The sampled back drape still floated as detached side fins instead of reading as folded cloth."
-      },
-      {
-        "zone": "hosted build contract",
-        "finding": "Blender final save completed without orphan Shape Key errors, but the legacy gate rejected the truthful eight-object construction because it incorrectly required at least fourteen mesh objects."
+        "zone": "unintended openings",
+        "finding": "Three additional holes remained beyond the intended neck, two wrist and two leg openings."
       },
       {
         "zone": "pose evidence",
-        "finding": "The build exited before the pose stage, so tracked pose images and fit-audit data were stale and were not accepted as v17 evidence."
+        "finding": "The build stopped before rendering, so no v18 five-view or six-pose evidence was accepted."
       }
     ]
   },
   "currentRevisionRequirements": [
-    "Require the evaluated source to be subdivided twice with interpolated UVs and weights.",
-    "Require shoulders and sleeves to be selected from interpolated arm weights without a rectangular shoulder bridge.",
-    "Require neckline, wrist and leg openings to be locally smoothed and reprojected to the evaluated source at controlled clearance.",
-    "Inspect all five directional renders generated from v18.",
-    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v18.",
-    "Require one connected primary shell with no more than five boundary loops.",
+    "Require complement-component analysis to retain only five intended garment openings and restore smaller accidental holes from source topology.",
+    "Require the healing log to report retained, closed and restored-face counts.",
+    "Require one connected primary shell with no more than five boundary loops after healing, smoothing and reprojection.",
+    "Inspect all five directional renders generated from v19.",
+    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v19.",
     "Require no underarm wings, exposed inner-arm strips, waist fins or pointed crotch panels.",
-    "Require the folded hood roll to follow the upper back without detached fins.",
+    "Require the folded hood roll to follow the upper back without detached geometry.",
     "Require the current-revision fit audit and images to agree before PASS."
   ]
 }
