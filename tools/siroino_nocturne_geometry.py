@@ -117,7 +117,6 @@ def frustum_shell(name, center, rings, mat, *, segments=64, scallops=0):
     """Create an open multi-ring elliptical garment shell."""
     vertices = []
     for ring_index, (z, radius_x, radius_y, y_offset) in enumerate(rings):
-        blend = ring_index / max(1, len(rings) - 1)
         for segment in range(segments):
             angle = math.tau * segment / segments
             wave = 1.0
