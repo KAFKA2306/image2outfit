@@ -113,7 +113,9 @@ def _source_triangles(
     source: bpy.types.Object,
 ) -> tuple[list[Vector], list[tuple[int, int, int]], list[Vector]]:
     """Triangulate source polygons logically while preserving their outward normals."""
-    world_vertices = [source.matrix_world @ vertex.co for vertex in source.data.vertices]
+    world_vertices = [
+        source.matrix_world @ vertex.co for vertex in source.data.vertices
+    ]
     normal_matrix = source.matrix_world.to_3x3().inverted().transposed()
     triangles: list[tuple[int, int, int]] = []
     normals: list[Vector] = []
@@ -140,12 +142,7 @@ def _boundary_vertices(mesh: bpy.types.Mesh) -> set[int]:
         for index, first in enumerate(indices):
             second = indices[(index + 1) % len(indices)]
             edge_use[tuple(sorted((first, second)))] += 1
-    return {
-        vertex
-        for edge, count in edge_use.items()
-        if count == 1
-        for vertex in edge
-    }
+    return {vertex for edge, count in edge_use.items() if count == 1 for vertex in edge}
 
 
 def _smooth_offsets(
@@ -165,14 +162,12 @@ def _smooth_offsets(
             if index in fixed or not neighbours:
                 continue
             neighbour_mean = sum(values[item] for item in neighbours) / len(neighbours)
-            updated[index] = (
-                (1.0 - OFFSET_SMOOTH_FACTOR) * values[index]
-                + OFFSET_SMOOTH_FACTOR * neighbour_mean
-            )
+            updated[index] = (1.0 - OFFSET_SMOOTH_FACTOR) * values[
+                index
+            ] + OFFSET_SMOOTH_FACTOR * neighbour_mean
         values = updated
     return [
-        min(MAX_ANCHOR_OFFSET_M, max(MIN_ANCHOR_OFFSET_M, value))
-        for value in values
+        min(MAX_ANCHOR_OFFSET_M, max(MIN_ANCHOR_OFFSET_M, value)) for value in values
     ]
 
 
@@ -267,15 +262,21 @@ def _body_anchor_project(
         current = obj.matrix_world @ vertex.co
         nearest = tree.find_nearest(current)
         if nearest is None:
-            raise RuntimeError(f"body anchor not found for garment vertex {vertex.index}")
+            raise RuntimeError(
+                f"body anchor not found for garment vertex {vertex.index}"
+            )
         location, _tree_normal, triangle_index, _distance = nearest
         if triangle_index is None or triangle_index < 0:
-            raise RuntimeError(f"body triangle not found for garment vertex {vertex.index}")
+            raise RuntimeError(
+                f"body triangle not found for garment vertex {vertex.index}"
+            )
         a_index, b_index, c_index = triangles[triangle_index]
         normal = source_normals[triangle_index]
         signed_offset = (current - location).dot(normal)
         if not math.isfinite(signed_offset):
-            raise RuntimeError(f"non-finite body offset at garment vertex {vertex.index}")
+            raise RuntimeError(
+                f"non-finite body offset at garment vertex {vertex.index}"
+            )
         bounded_offset = min(
             MAX_ANCHOR_OFFSET_M,
             max(MIN_ANCHOR_OFFSET_M, signed_offset),
