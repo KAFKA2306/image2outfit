@@ -104,8 +104,8 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         )
         for fragment in required_body_panel_fragments:
             self.assertIn(fragment, self.body_panel_source)
-        self.assertIn('subdivision.levels = 1', self.source)
-        self.assertIn('source.shape_key_clear()', self.source)
+        self.assertIn("subdivision.levels = 1", self.source)
+        self.assertIn("source.shape_key_clear()", self.source)
 
     def test_rejected_inflated_hood_is_replaced_by_folded_cowl(self) -> None:
         self.assertIn("Heather_Hood_Down_Cowl", self.source)
