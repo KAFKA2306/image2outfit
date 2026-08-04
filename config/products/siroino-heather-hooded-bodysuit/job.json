@@ -51,11 +51,12 @@
     "paperUrl": "https://arxiv.org/abs/2605.07450",
     "paperLicense": "CC BY-NC-ND 4.0",
     "paperLicenseUrl": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
-    "officialCodeUrl": null,
-    "officialCodeStatus": "No official implementation located as of 2026-08-05",
+    "officialCodeUrl": "https://github.com/MengZephyr/LoBoFit",
+    "officialCodeLicense": "BSD-3-Clause",
+    "officialCodeStatus": "Official SIGGRAPH 2026 implementation located and reviewed on 2026-08-05; not executed in this trial",
     "authorsImplementationExecuted": false,
-    "executionRequirements": "Blender 4.4.3, Python 3.11, bpy and mathutils BVHTree; no GPU, model, checkpoint or training dataset",
-    "trialScope": "Independent deterministic four-bone local residual representation and bounded refinement, executed after the DAMA-inspired body-triangle anchor preconditioner; authors' implementation is not copied or executed"
+    "executionRequirements": "The official repository provides Coarse_to_Fine_GarmRefitting.py and downloadable sample data; this independent trial requires Blender 4.4.3, Python 3.11, bpy and mathutils BVHTree with no GPU, model, checkpoint or training dataset",
+    "trialScope": "Independent deterministic four-bone local residual representation and bounded refinement, executed after the DAMA-inspired body-triangle anchor preconditioner; the official implementation is not copied or executed"
   },
   "licenseEvidence": "config/products/siroino-heather-hooded-bodysuit/license.json",
   "privateSourceRoots": [
