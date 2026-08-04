@@ -58,6 +58,8 @@ Assets/GenWorks/<slug>/
 
 `Assets/GenWorks/<slug>/` が唯一の正規ワークスペースです。
 
+ローカルの監査ログ、候補コピー、任意の外部検証結果は `.image2outfit/products/<slug>/{reports,candidate,release}` に置き、Git管理しません。以前の `Artifacts/`、`Candidates/`、`Release/` は使用しません。
+
 ## 基本操作
 
 ```powershell
@@ -76,6 +78,17 @@ task check:python
 ```
 
 `task candidate` はBlender生成、成果物整合、必須画像、研究記録を検証します。UnityやVRChatの実行環境を要求してはいけません。
+
+## GitHub Actions境界
+
+検証workflowは原則として読み取り専用権限を使います。
+
+```yaml
+permissions:
+  contents: read
+```
+
+ブランチ整理など、明示された保守workflowだけが最小限の書き込み権限を持ちます。
 
 ## 状態
 
