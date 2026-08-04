@@ -3,7 +3,7 @@
   "id": "siroino-heather-hooded-bodysuit",
   "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
   "adapterId": "siroino-v1.0",
-  "buildRevision": "v25-cross-sectional-statistical-cage",
+  "buildRevision": "v26-angular-polar-yoke-hood",
   "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
   "productManifestPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
   "buildScript": "tools/siroino_heather_hooded_product.py",
@@ -46,7 +46,7 @@
     }
   },
   "researchMethod": {
-    "name": "Cross-Sectional Statistical Cage Reconstruction",
+    "name": "Angular Polar Body Envelope with Garment-Native Yoke and Hood",
     "primaryReference": {
       "title": "GarmentCode: Programming Parametric Sewing Patterns",
       "paperUrl": "https://arxiv.org/abs/2306.03642",
@@ -63,7 +63,7 @@
     "authorsImplementationExecuted": false,
     "authorsCodeCopied": false,
     "executionRequirements": "Blender 4.4.3, Python 3.11 and existing Siroino nearest-body weight transfer helpers; no model, checkpoint, GPU or external simulator",
-    "trialScope": "Independent smoothed height-indexed torso ellipse cage, shared-edge U-shaped gusset, reduced-radius arm tubes, cuffs and analytic attached cowl; body topology and binary front/back circumferential sampling are not used"
+    "trialScope": "Independent 50-height by 72-angle polar body envelope, integrated shoulder yoke and neck ring, short widened shared-edge gusset, reduced-radius sleeve caps and three-dimensional open-front hood; avatar faces are not copied"
   },
   "licenseEvidence": "config/products/siroino-heather-hooded-bodysuit/license.json",
   "privateSourceRoots": [
@@ -81,6 +81,7 @@
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/structured-template-cage-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/cross-sectional-cage-trial.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/angular-polar-yoke-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/geometry-diagnostics.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
