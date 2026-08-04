@@ -100,17 +100,21 @@ def sphere(name, location, scale, mat, rotation=(0.0, 0.0, 0.0)):
     return obj
 
 
-def cube(name, location, scale, mat, rotation=(0.0, 0.0, 0.0)):
-    bpy.ops.mesh.primitive_cube_add(location=location, rotation=rotation)
-    obj = finish(bpy.context.object, mat)
-    obj.name = name
-    obj.scale = scale
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-    bevel = obj.modifiers.new("Finished edges", "BEVEL")
-    bevel.width = min(scale) * 0.22
-    bevel.segments = 4
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.modifier_apply(modifier=bevel.name)
+def ellipsoid_between(name, root, tip, width, depth, mat):
+    axis = tip - root
+    length = axis.length
+    if length <= 1e-8:
+        raise ValueError("ellipsoid endpoints must be distinct")
+    obj = sphere(
+        name,
+        root.lerp(tip, 0.5),
+        (width, depth, length * 0.5),
+        mat,
+    )
+    obj.rotation_mode = "QUATERNION"
+    obj.rotation_quaternion = Vector((0.0, 0.0, 1.0)).rotation_difference(
+        axis.normalized()
+    )
     return obj
 
 
@@ -145,6 +149,51 @@ def frustum_shell(name, center, rings, mat, *, segments=64, scallops=0):
     _cylindrical_uv(mesh, segments, len(rings))
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
+    return finish(obj, mat)
+
+
+def pleated_shell(
+    name,
+    center,
+    rings,
+    mat,
+    *,
+    segments=96,
+    pleats=12,
+    fold=0.075,
+):
+    """Create a short A-line shell with radial pleats strongest at the hem."""
+    vertices = []
+    ring_count = len(rings)
+    for ring_index, (z, radius_x, radius_y, y_offset) in enumerate(rings):
+        hem_fraction = 1.0 - ring_index / max(1, ring_count - 1)
+        for segment in range(segments):
+            angle = math.tau * segment / segments
+            wave = 1.0 + fold * hem_fraction * math.cos(pleats * angle)
+            vertices.append(
+                (
+                    center.x + radius_x * wave * math.cos(angle),
+                    center.y + y_offset + radius_y * wave * math.sin(angle),
+                    z,
+                )
+            )
+    faces = []
+    for ring_index in range(ring_count - 1):
+        for segment in range(segments):
+            next_segment = (segment + 1) % segments
+            first = ring_index * segments + segment
+            second = ring_index * segments + next_segment
+            third = (ring_index + 1) * segments + next_segment
+            fourth = (ring_index + 1) * segments + segment
+            faces.append((first, second, third, fourth))
+    mesh = bpy.data.meshes.new(f"{name}_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    _cylindrical_uv(mesh, segments, ring_count)
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj["pleatCount"] = pleats
+    obj["pleatFold"] = fold
     return finish(obj, mat)
 
 
@@ -223,19 +272,6 @@ def panel(name, points, mat, thickness):
     return obj
 
 
-def feather(name, root, tip, width, mat):
-    axis = tip - root
-    normal = Vector((0.0, 1.0, 0.0))
-    side = normal.cross(axis).normalized() * width
-    middle = root.lerp(tip, 0.48)
-    return panel(
-        name,
-        [root, middle + side, tip, middle - side],
-        mat,
-        max(0.0012, width * 0.08),
-    )
-
-
 def _parent_with_armature(obj, armature):
     world = obj.matrix_world.copy()
     obj.parent = armature
@@ -252,75 +288,79 @@ def rigid_weight(obj, armature, semantic):
     _parent_with_armature(obj, armature)
 
 
-def semantic_weights(obj, armature, assignments):
-    """Apply normalized semantic weights supplied per vertex index."""
-    groups = {}
-    for vertex_index, weighted_semantics in assignments.items():
-        total = sum(weight for _, weight in weighted_semantics) or 1.0
-        for semantic, weight in weighted_semantics:
-            group_name = resolve_bone_name(armature, semantic)
-            group = groups.get(group_name)
-            if group is None:
-                group = obj.vertex_groups.new(name=group_name)
-                groups[group_name] = group
-            group.add([vertex_index], weight / total, "REPLACE")
-    _parent_with_armature(obj, armature)
-
-
 def transfer_weights(obj, body, armature):
-    tree = KDTree(len(body.data.vertices))
-    for vertex in body.data.vertices:
-        tree.insert(body.matrix_world @ vertex.co, vertex.index)
-    tree.balance()
-    groups = {
-        group.name: obj.vertex_groups.new(name=group.name)
-        for group in body.vertex_groups
-    }
-    for vertex in obj.data.vertices:
-        _, index, _ = tree.find(obj.matrix_world @ vertex.co)
-        source = body.data.vertices[index]
-        weights = sorted(
-            (
-                (body.vertex_groups[item.group].name, item.weight)
-                for item in source.groups
-                if item.weight > 1e-8
-            ),
-            key=lambda item: item[1],
-            reverse=True,
-        )[:4]
-        if not weights:
-            fallback = "Hips" if "Hips" in groups else next(iter(groups))
-            weights = [(fallback, 1.0)]
-        total = sum(value for _, value in weights) or 1.0
-        for group, value in weights:
-            groups[group].add([vertex.index], value / total, "REPLACE")
-    _parent_with_armature(obj, armature)
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    evaluated = body.evaluated_get(depsgraph)
+    evaluated_mesh = evaluated.to_mesh()
+    try:
+        tree = KDTree(len(evaluated_mesh.vertices))
+        for vertex in evaluated_mesh.vertices:
+            tree.insert(evaluated.matrix_world @ vertex.co, vertex.index)
+        tree.balance()
+        groups = {
+            group.name: obj.vertex_groups.new(name=group.name)
+            for group in body.vertex_groups
+        }
+        for vertex in obj.data.vertices:
+            _, index, _ = tree.find(obj.matrix_world @ vertex.co)
+            source = body.data.vertices[index]
+            weights = sorted(
+                (
+                    (body.vertex_groups[item.group].name, item.weight)
+                    for item in source.groups
+                    if item.weight > 1e-8
+                ),
+                key=lambda item: item[1],
+                reverse=True,
+            )[:4]
+            if not weights:
+                fallback = "Hips" if "Hips" in groups else next(iter(groups))
+                weights = [(fallback, 1.0)]
+            total = sum(value for _, value in weights) or 1.0
+            for group, value in weights:
+                groups[group].add([vertex.index], value / total, "REPLACE")
+        _parent_with_armature(obj, armature)
+    finally:
+        evaluated.to_mesh_clear()
 
 
-def enforce_body_clearance(obj, body, clearance):
-    """Project only penetrating or under-clearance vertices outward.
-
-    The garment topology remains independent. The target mesh is used only as
-    a nearest-surface collision constraint after explicit garment construction.
-    """
+def enforce_body_clearance(
+    obj,
+    body,
+    clearance,
+    *,
+    only_above=None,
+    maximum_search=None,
+):
+    """Project under-clearance vertices outward without copying body topology."""
     depsgraph = bpy.context.evaluated_depsgraph_get()
     evaluated = body.evaluated_get(depsgraph)
     body_mesh = evaluated.to_mesh()
     try:
-        vertices = [evaluated.matrix_world @ vertex.co for vertex in body_mesh.vertices]
+        body_vertices = [
+            evaluated.matrix_world @ vertex.co for vertex in body_mesh.vertices
+        ]
         polygons = [tuple(polygon.vertices) for polygon in body_mesh.polygons]
-        tree = BVHTree.FromPolygons(vertices, polygons, all_triangles=False)
+        tree = BVHTree.FromPolygons(body_vertices, polygons, all_triangles=False)
+        body_center = sum(body_vertices, Vector()) / max(1, len(body_vertices))
         inverse = obj.matrix_world.inverted()
         moved = 0
         maximum_move = 0.0
         for vertex in obj.data.vertices:
             world = obj.matrix_world @ vertex.co
+            if only_above is not None and world.z < only_above:
+                continue
             nearest = tree.find_nearest(world)
             if nearest is None:
                 continue
             location, normal, _, distance = nearest
+            outward = location - body_center
+            if normal.dot(outward) < 0.0:
+                normal = -normal
             signed = (world - location).dot(normal)
             if signed >= clearance:
+                continue
+            if maximum_search is not None and distance > maximum_search and signed >= 0.0:
                 continue
             corrected = location + normal * clearance
             move = (corrected - world).length
@@ -333,9 +373,15 @@ def enforce_body_clearance(obj, body, clearance):
             "movedVertices": moved,
             "maximumMove": maximum_move,
             "clearance": clearance,
+            "onlyAbove": only_above,
         }
     finally:
         evaluated.to_mesh_clear()
+
+
+def _set_if_available(settings, name, value):
+    if hasattr(settings, name):
+        setattr(settings, name, value)
 
 
 def bake_skirt(skirt, body):
@@ -350,13 +396,20 @@ def bake_skirt(skirt, body):
     except RuntimeError:
         pass
     cloth = skirt.modifiers.new("Nocturne cloth simulation", "CLOTH")
-    cloth.settings.quality = 7
-    cloth.settings.mass = 0.20
+    cloth.settings.quality = 8
+    cloth.settings.mass = 0.16
     cloth.settings.vertex_group_mass = group.name
+    _set_if_available(cloth.settings, "tension_stiffness", 28.0)
+    _set_if_available(cloth.settings, "compression_stiffness", 28.0)
+    _set_if_available(cloth.settings, "shear_stiffness", 18.0)
+    _set_if_available(cloth.settings, "bending_stiffness", 4.0)
+    _set_if_available(cloth.settings, "air_damping", 4.0)
+    if hasattr(cloth.settings, "effector_weights"):
+        cloth.settings.effector_weights.gravity = 0.18
     cloth.collision_settings.use_collision = True
-    cloth.collision_settings.distance_min = 0.005
+    cloth.collision_settings.distance_min = 0.004
     cloth.collision_settings.use_self_collision = True
-    cloth.collision_settings.self_distance_min = 0.005
+    cloth.collision_settings.self_distance_min = 0.004
     scene = bpy.context.scene
     scene.frame_end = 32
     for frame in range(1, 33):
@@ -384,5 +437,7 @@ def bake_skirt(skirt, body):
         "pinVertices": len(pinned),
         "bodyCollision": True,
         "selfCollision": True,
+        "gravityWeight": 0.18,
+        "shapePreservingStiffness": True,
         "baked": True,
     }
