@@ -49,7 +49,7 @@ class NocturneAngelSetContractTest(unittest.TestCase):
         self.assertEqual(construction["profile"], "loose-layered")
         self.assertEqual(construction["designRevision"], REVISION)
         joined = " ".join(construction["panels"] + construction["separateGeometry"])
-        for required in ("pleated skirt", "sailor collar", "wing", "beret"):
+        for required in ("twelve-pleat", "sailor collar", "wing", "beret"):
             self.assertIn(required, joined)
 
     def test_reference_is_hash_bound_but_not_redistributed(self) -> None:
