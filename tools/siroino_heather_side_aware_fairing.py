@@ -297,7 +297,9 @@ class _BodySampler:
         )
         self.root_matrix = armature.matrix_world.copy()
         self.inverse_root = self.root_matrix.inverted_safe()
-        self.local_vertices = [self.inverse_root @ point for point in self.world_vertices]
+        self.local_vertices = [
+            self.inverse_root @ point for point in self.world_vertices
+        ]
         self.section_bins: dict[int, list[float]] = {}
         for point in self.local_vertices:
             if abs(point.x) > 0.11:
@@ -325,9 +327,9 @@ class _BodySampler:
             + self.world_normals[third] * barycentric.z
         )
         if normal.length_squared <= 1e-16:
-            normal = (
-                self.world_vertices[second] - self.world_vertices[first]
-            ).cross(self.world_vertices[third] - self.world_vertices[first])
+            normal = (self.world_vertices[second] - self.world_vertices[first]).cross(
+                self.world_vertices[third] - self.world_vertices[first]
+            )
         if normal.length_squared <= 1e-16:
             raise RuntimeError("Body sampler received a degenerate normal")
         normal.normalize()
@@ -359,9 +361,7 @@ def _underbody_floor(x_value: float) -> float:
 
 
 def _underbody_weight(local: Vector) -> float:
-    x_weight = 1.0 - _smoothstep(
-        (abs(local.x) - 0.018) / (0.078 - 0.018)
-    )
+    x_weight = 1.0 - _smoothstep((abs(local.x) - 0.018) / (0.078 - 0.018))
     z_weight = 1.0 - _smoothstep((local.z - 0.660) / (0.760 - 0.660))
     return max(0.0, min(1.0, x_weight * z_weight))
 
@@ -379,18 +379,20 @@ def _taubin_fair(
         for index, neighbours in adjacency.items():
             if not neighbours:
                 continue
-            mean = sum((current[item] for item in neighbours), Vector()) / len(neighbours)
-            first[index] = current[index] + (
-                mean - current[index]
-            ) * FAIRING_LAMBDA * (1.0 - protection[index])
+            mean = sum((current[item] for item in neighbours), Vector()) / len(
+                neighbours
+            )
+            first[index] = current[index] + (mean - current[index]) * FAIRING_LAMBDA * (
+                1.0 - protection[index]
+            )
         second = [point.copy() for point in first]
         for index, neighbours in adjacency.items():
             if not neighbours:
                 continue
             mean = sum((first[item] for item in neighbours), Vector()) / len(neighbours)
-            second[index] = first[index] + (
-                mean - first[index]
-            ) * FAIRING_MU * (1.0 - protection[index])
+            second[index] = first[index] + (mean - first[index]) * FAIRING_MU * (
+                1.0 - protection[index]
+            )
         current = second
     return current
 
@@ -654,7 +656,9 @@ def _smooth_displacements(
             neighbours = adjacency[index]
             if not neighbours:
                 continue
-            mean = sum((current[item] for item in neighbours), Vector()) / len(neighbours)
+            mean = sum((current[item] for item in neighbours), Vector()) / len(
+                neighbours
+            )
             updated[index] = current[index] * 0.68 + mean * 0.32
         current = updated
     return current
@@ -699,7 +703,9 @@ def _apply_pose_correction(
                 sign = 1.0 if local.y >= center_y else -1.0
                 radial = sampler.root_matrix.to_3x3() @ Vector((0.0, sign, 0.0))
                 radial.normalize()
-                direction = (direction * (1.0 - underbody) + radial * underbody).normalized()
+                direction = (
+                    direction * (1.0 - underbody) + radial * underbody
+                ).normalized()
                 _ = minimum_y, maximum_y
             step = min(
                 POSE_MAX_STEP_PER_ROUND_M,
