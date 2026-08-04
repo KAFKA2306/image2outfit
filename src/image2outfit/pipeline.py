@@ -25,6 +25,9 @@ class PipelineStage(StrEnum):
 
 
 PIPELINE_STAGES = tuple(PipelineStage)
+PIPELINE_TRANSITIONS = tuple(
+    zip(PIPELINE_STAGES[:-1], PIPELINE_STAGES[1:], strict=True)
+)
 
 
 class PipelineState(TypedDict, total=False):
@@ -171,7 +174,7 @@ def build_langgraph(registry: ToolRegistry):
             ),
         )
     builder.add_edge(START, PIPELINE_STAGES[0].value)
-    for current, following in zip(PIPELINE_STAGES, PIPELINE_STAGES[1:], strict=True):
+    for current, following in PIPELINE_TRANSITIONS:
         builder.add_edge(current.value, following.value)
     builder.add_edge(PIPELINE_STAGES[-1].value, END)
     return builder.compile()

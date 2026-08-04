@@ -7,11 +7,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from image2outfit.pipeline import PIPELINE_STAGES, new_pipeline_state, run_pipeline
+from image2outfit.pipeline import (
+    PIPELINE_STAGES,
+    PIPELINE_TRANSITIONS,
+    new_pipeline_state,
+    run_pipeline,
+)
 from image2outfit.tooling import ToolDescriptor, ToolRegistry
 
 
 class PipelineCoreTests(unittest.TestCase):
+
+    def test_pipeline_transitions_cover_adjacent_stage_pairs(self) -> None:
+        self.assertEqual(len(PIPELINE_TRANSITIONS), len(PIPELINE_STAGES) - 1)
+        self.assertEqual(
+            PIPELINE_TRANSITIONS,
+            tuple(zip(PIPELINE_STAGES[:-1], PIPELINE_STAGES[1:], strict=True)),
+        )
+
     def test_pipeline_runs_in_canonical_order(self) -> None:
         registry = ToolRegistry()
         seen: list[str] = []
