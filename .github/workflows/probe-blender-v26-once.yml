@@ -1,0 +1,42 @@
+name: Probe Blender v26 API once
+
+on:
+  push:
+    branches:
+      - fix/v25-side-aware-taubin-shell
+    paths:
+      - .github/workflows/probe-blender-v26-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Blender 4.4.3
+        run: |
+          curl --fail --location --retry 3 \
+            https://download.blender.org/release/Blender4.4/blender-4.4.3-linux-x64.tar.xz \
+            --output /tmp/blender.tar.xz
+          mkdir -p /tmp/blender
+          tar -xJf /tmp/blender.tar.xz --strip-components=1 -C /tmp/blender
+      - name: Probe remesh and modifier RNA
+        run: |
+          /tmp/blender/blender --background --factory-startup --python-expr '
+          import bpy
+          op = bpy.ops.object.quadriflow_remesh.get_rna_type()
+          print("QUADRIFLOW_PROPERTIES=" + ",".join(p.identifier for p in op.properties))
+          bpy.ops.mesh.primitive_cube_add()
+          obj = bpy.context.object
+          mod = obj.modifiers.new("Probe Corrective Smooth", "CORRECTIVE_SMOOTH")
+          print("CORRECTIVE_SMOOTH_PROPERTIES=" + ",".join(p.identifier for p in mod.bl_rna.properties))
+          print("CORRECTIVE_SMOOTH_DEFAULTS=" + repr({
+              "factor": mod.factor,
+              "iterations": mod.iterations,
+              "smooth_type": mod.smooth_type,
+              "use_pin_boundary": mod.use_pin_boundary,
+              "rest_source": mod.rest_source,
+          }))
+          '
