@@ -1,49 +1,66 @@
 {
   "schemaVersion": 2,
-  "designRevision": "v21-pose-clear-underbody-five-opening-shell",
-  "checkedAt": null,
+  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
+  "checkedAt": "2026-08-05T01:17:26+09:00",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "result": "PENDING_CURRENT_REVISION_REVIEW",
+  "result": "FAIL",
+  "visualAppearanceReview": "FAIL",
   "releaseDecision": "WORKING_CHECKPOINT_ONLY",
+  "reviewer": "ChatGPT direct artifact image review",
   "evidence": {
+    "hostedWorkflowRun": 30927279567,
+    "artifactId": 8900069602,
+    "artifactSha256": "432fe8c6a5aa3eab8fa3d4148574488058a67086366371d089fd8c2eb29442db",
     "multiview": "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
     "poseReview": "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
-    "fitAudit": "Tests/fit-audit.json"
+    "fitAudit": "Tests/fit-audit.json",
+    "researchTrial": "Research/lobofit-local-bone-trial.json"
   },
-  "previousRevisionReview": {
-    "designRevision": "v20-semantic-five-opening-highcut-shell",
-    "result": "FAIL",
-    "hostedWorkflowRun": 30896458304,
-    "blockingFindings": [
-      {
-        "zone": "front and rear crotch",
-        "finding": "The center strip stopped above the underbody and produced rectangular hanging tabs in both front and rear views."
-      },
-      {
-        "zone": "leg openings and hip silhouette",
-        "finding": "The five anatomical openings were topologically correct, but the opening boundaries remained scalloped and side views retained pointed hip flaps."
-      },
-      {
-        "zone": "upper-back hood roll",
-        "finding": "The roll remained body-intersecting and appeared as three knot-like protrusions; neutral fit audit reported 86 overlap pairs."
-      },
-      {
-        "zone": "six-pose fit",
-        "finding": "All six evaluated poses failed. Shell overlaps were 0 neutral, 3066 arms-up, 1058 arm-cross, 396 crouch, 636 sit and 2155 prone; the new lower strip introduced the crouch and sit failures."
-      }
-    ]
+  "researchDecision": {
+    "method": "LoBoFit-inspired four-bone local residual fitting after DAMA-inspired body anchoring",
+    "execution": "SUCCESS",
+    "productAdoption": "REJECTED_FOR_CURRENT_REVISION",
+    "quantitativeResult": {
+      "localResidualEdgeRmsBeforeM": 0.0035477231084656544,
+      "localResidualEdgeRmsAfterM": 0.0029748159515982156,
+      "relativeReductionPercent": 16.145,
+      "meanWorldDisplacementM": 0.0009634059353793652,
+      "maximumWorldDisplacementM": 0.00400000083941411,
+      "meanSignedClearanceM": 0.021463756386198015,
+      "verticesBelow75PercentTargetClearance": 1392
+    },
+    "finding": "The local-bone residual representation measurably reduced local offset roughness without creating degenerate or unweighted geometry, but it did not repair the incorrect garment region selection, silhouette, opening design or pose deformation."
   },
-  "currentRevisionRequirements": [
-    "Retain exactly the neck, left wrist, right wrist, left leg and right leg complement components and restore every nonanatomical component.",
-    "Extend the narrow lower-body strip to z=0.515 so it wraps under the body instead of ending as visible front and rear tabs.",
-    "Relax four boundary rings for 14 iterations and reproject them at 22 mm clearance to remove scalloped leg and neckline boundaries.",
-    "Require one connected primary shell with exactly five boundary loops before rendering.",
-    "Use a slim continuous folded-hood roll at 74-86 mm body clearance and require zero body intersections.",
-    "Inspect all five directional renders generated from v21.",
-    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v21.",
-    "Require zero evaluated garment/body triangle intersections in every required pose.",
-    "Require no rectangular crotch tabs, hip fins, scalloped opening boundaries, exposed inner arms, detached hood geometry or pose penetration.",
-    "Require the current-revision fit audit and images to agree before PASS."
-  ]
+  "blockingFindings": [
+    {
+      "zone": "front and rear crotch",
+      "finding": "A long narrow hanging tab remains visible in both front and back views instead of a clean underbody high-cut bridge."
+    },
+    {
+      "zone": "shoulders, hood and drawcords",
+      "finding": "Horizontal floating protrusions remain at both shoulders, while the requested three-dimensional hood is not presented as a coherent wearable hood."
+    },
+    {
+      "zone": "body and sleeve silhouette",
+      "finding": "The shell reads as a loose tunic with wide cylindrical sleeves rather than a fitted long-sleeve high-cut bodysuit with defined rib cuffs."
+    },
+    {
+      "zone": "neckline and openings",
+      "finding": "The neckline and leg-opening boundaries remain irregular and visually unfinished."
+    },
+    {
+      "zone": "surface and material",
+      "finding": "Dark speckles, streaks and seam-like surface defects remain visible across the torso, sleeves and back."
+    },
+    {
+      "zone": "required poses",
+      "finding": "Neutral has zero BVH overlap pairs, but arms-up has 2782, arm-cross 1048, crouch 1035, sit 691 and prone 2398. The pose sheet also retains the incorrect crotch and shoulder silhouette."
+    },
+    {
+      "zone": "pose evidence framing",
+      "finding": "Several pose renders crop the head, arms or upper body, reducing their value for complete garment review."
+    }
+  ],
+  "nextAction": "Replace the primary body-region selection and underbody construction before further residual fitting. LoBoMap may remain as a bounded final refinement after the base pattern has the correct silhouette and anatomical openings."
 }
