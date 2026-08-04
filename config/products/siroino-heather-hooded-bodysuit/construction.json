@@ -3,19 +3,19 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v27-closed-saddle-sleevecap-folded-hood",
+  "designRevision": "v28-flat-saddle-contoured-cap-hood-roll",
   "panels": [
     "smoothed-height-by-angle-polar-torso-field",
-    "continuous-shoulder-yoke-and-neck-ring",
-    "eleven-column-pelvic-saddle",
-    "overlapping-sleeve-caps-extended-beneath-yoke",
+    "short-continuous-shoulder-yoke-and-neck-ring",
+    "fifteen-column-flat-pelvic-saddle",
+    "contoured-small-root-shoulder-cap-sleeves",
     "left-and-right-fitted-sleeve-tubes",
     "left-and-right-independent-rib-cuffs",
-    "low-folded-back-rear-neck-hood-shell",
+    "u-shaped-rear-neck-folded-hood-roll",
     "bounded-post-topology-body-clearance-projection",
     "body-used-for-polar-statistics-clearance-and-nearest-weight-transfer",
     "no-body-topology-copy-no-body-face-region-selection",
-    "supersedes-v25-side-aware-taubin-shell-and-v26-dome-hood"
+    "supersedes-v27-pointed-saddle-bulky-cap-and-sheet-hood"
   ],
   "separateGeometry": [
     "Henley placket",
@@ -23,8 +23,8 @@
     "hood drawcords"
   ],
   "priorityFitZones": [
-    "continuous shoulder yoke",
-    "sleeve cap overlap",
+    "short shoulder yoke",
+    "contoured sleeve cap",
     "underarm",
     "elbow",
     "wrist",
@@ -33,10 +33,10 @@
     "upper back",
     "abdomen",
     "hip crest",
-    "pelvic saddle",
+    "flat pelvic saddle",
     "inner thigh",
     "leg root",
-    "folded-back hood",
+    "folded hood roll",
     "drawcord"
   ],
   "researchTrial": {
@@ -47,10 +47,10 @@
     "currentPaper": "https://arxiv.org/abs/2606.24564",
     "currentPaperTitle": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
     "currentOfficialCode": "https://github.com/PatternGSL/PatternGSL",
-    "implementation": "independent Blender implementation retaining robust height-by-angle torso statistics while replacing blocking components with an eleven-column pelvic saddle, overlapping sleeve caps, fitted cuffs and a low folded-back hood; bounded nearest-body clearance is applied only after garment-native topology is constructed; body faces are not copied and author code or models are not executed or copied",
+    "implementation": "independent Blender override retaining the validated v27 polar profile and mesh helpers while replacing the pointed lower boundary with a fifteen-column flat saddle, the constant-radius shoulder root with a contoured small-root cap, the sheet hood with a U-shaped folded roll and cropped pose framing with a widened camera adapter; bounded nearest-body clearance remains post-topology; body faces and author code are not copied",
     "authorsImplementationExecuted": false,
     "authorsCodeCopied": false,
-    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/closed-components-clearance-trial.json"
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/flat-saddle-cap-hood-roll-trial.json"
   },
   "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
