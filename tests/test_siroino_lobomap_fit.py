@@ -14,7 +14,9 @@ class SiroinoStructuredTemplateCageTests(unittest.TestCase):
         product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
             encoding="utf-8"
         )
-        self.assertIn("import siroino_heather_template_cage_v24 as template_cage", product)
+        self.assertIn(
+            "import siroino_heather_template_cage_v24 as template_cage", product
+        )
         self.assertIn("template_cage.install(pattern)", product)
         self.assertNotIn("v21.install(pattern)", product)
         self.assertNotIn("lobomap.install(pattern)", product)
@@ -54,8 +56,7 @@ class SiroinoStructuredTemplateCageTests(unittest.TestCase):
             construction["researchTrial"]["implementation"],
         )
         evidence = (
-            f"Assets/GenWorks/{PRODUCT}/Research/"
-            "structured-template-cage-trial.json"
+            f"Assets/GenWorks/{PRODUCT}/Research/structured-template-cage-trial.json"
         )
         self.assertEqual(construction["researchTrial"]["generatedEvidence"], evidence)
         self.assertIn(evidence, job["deliveryAssets"])
