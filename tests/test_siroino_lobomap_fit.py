@@ -20,9 +20,9 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
         compatibility = (
             ROOT / "tools" / "siroino_heather_smooth_surface_repair.py"
         ).read_text(encoding="utf-8")
-        fairing = (
-            ROOT / "tools" / "siroino_heather_side_aware_fairing.py"
-        ).read_text(encoding="utf-8")
+        fairing = (ROOT / "tools" / "siroino_heather_side_aware_fairing.py").read_text(
+            encoding="utf-8"
+        )
         self.assertIn("import siroino_heather_lobomap_fit as lobomap", product)
         self.assertLess(
             product.index("v21.install(pattern)"),
@@ -57,9 +57,9 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
             self.assertIn(token, source)
 
     def test_side_aware_repair_executes_measured_mesh_operations(self) -> None:
-        source = (
-            ROOT / "tools" / "siroino_heather_side_aware_fairing.py"
-        ).read_text(encoding="utf-8")
+        source = (ROOT / "tools" / "siroino_heather_side_aware_fairing.py").read_text(
+            encoding="utf-8"
+        )
         for token in (
             "bmesh.ops.holes_fill",
             "FAIRING_LAMBDA = 0.24",
@@ -89,8 +89,7 @@ class SiroinoLoBoMapFitTests(unittest.TestCase):
             "https://arxiv.org/abs/2605.07450",
         )
         expected = (
-            f"Assets/GenWorks/{PRODUCT}/Research/"
-            "side-aware-taubin-shell-trial.json"
+            f"Assets/GenWorks/{PRODUCT}/Research/side-aware-taubin-shell-trial.json"
         )
         self.assertEqual(construction["researchTrial"]["generatedEvidence"], expected)
         self.assertIn(expected, job["deliveryAssets"])
