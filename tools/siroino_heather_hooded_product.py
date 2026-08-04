@@ -96,6 +96,14 @@ REJECTED_REVISIONS = [
             "pose failed, with 268 neutral and 1418 arms-up overlap pairs"
         ),
     },
+    {
+        "revision": "v15-refined-topology-folded-hood",
+        "reason": (
+            "the executable pre-export gate detected three disconnected primary "
+            "shell components and nine boundary loops across 572 edges; both sleeves "
+            "remained detached at the shoulder and rendering was correctly stopped"
+        ),
+    },
 ]
 
 
@@ -156,8 +164,8 @@ def preserve_authored_weights(
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
             "one-level subdivided SiroinoSotai_PC topology with interpolated UVs "
-            "and normalized source skin weights for the connected body shell; "
-            "nearest-body weights for the folded hood and trim geometry"
+            "and normalized source skin weights for the shoulder-bridged connected "
+            "body shell; nearest-body weights for the folded hood and trim geometry"
         ),
         "rebound": False,
     }
@@ -213,8 +221,10 @@ def enforce_manifest_contract(original):
             report["notes"] = [
                 "The fitted garment is extracted from a one-level subdivided "
                 "SiroinoSotai_PC source shell.",
-                "The torso, high-cut pelvis, shoulders and sleeves are one connected "
-                "mesh with at most five expected garment opening loops.",
+                "The torso and arm capsules overlap through an explicit shoulder "
+                "bridge so the high-cut body and both sleeves form one mesh.",
+                "The primary shell must have one component and at most five expected "
+                "garment opening loops.",
                 "The hood is represented as a compact folded cowl behind the neck.",
                 "Buttons, Henley placket and drawcords are separate geometry.",
                 "All exported vertices are limited to four normalized bone influences.",
