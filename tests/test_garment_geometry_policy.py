@@ -59,6 +59,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             for node in self.tree.body
             if isinstance(node, ast.FunctionDef) and node.name == "create_outfit"
         )
+        create_source = ast.get_source_segment(self.source, create_outfit) or ""
         shell_calls = [
             node
             for node in ast.walk(create_outfit)
@@ -67,18 +68,25 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             and node.func.id == "_body_panel"
         ]
         self.assertEqual(len(shell_calls), 1)
-        self.assertIn("Heather_Body_Shell", self.source)
-        self.assertIn("_body_shell_predicate", self.source)
+        self.assertIn("Heather_Body_Shell", create_source)
+        self.assertIn("_body_shell_predicate", create_source)
+        self.assertNotIn("Heather_Highcut_Front_Panel", create_source)
+        self.assertNotIn("Heather_Highcut_Back_Panel", create_source)
+        self.assertNotIn("Heather_Crotch_Bridge", create_source)
 
     def test_safe_shell_has_no_miter_generating_modifiers(self) -> None:
         required_fragments = (
             "The fitted source shell must not use a bevel modifier",
             "max_edge > 0.20",
+            "disconnected source shell",
             "Garment geometry sanity gate failed",
         )
         for fragment in required_fragments:
             self.assertIn(fragment, self.source)
-        self.assertNotIn('modifiers.new("Finished edge", "BEVEL")', self.body_panel_source)
+        self.assertNotIn(
+            'modifiers.new("Finished edge", "BEVEL")',
+            self.body_panel_source,
+        )
         self.assertNotIn(
             'modifiers.new("Fabric thickness", "SOLIDIFY")',
             self.body_panel_source,
