@@ -1,51 +1,32 @@
 # image2outfit
 
-Blenderで衣装を制作し、FBX、Unity Prefab、Modular Avatar／NDMF、実レンダリング、VRChat確認までを一つの再現可能な製品ワークスペースで管理するUnityプロジェクトです。
+SiroinoSotai_PC向け衣装をBlenderで制作し、編集可能ソース、FBX、宣言済みPrefab、実レンダリング、研究記録を一つの再現可能な製品ワークスペースで管理するプロジェクトです。
 
-## ロジックの正本
+## 完了の定義
 
-同じ判断を複数のファイルへ持たせません。
+正本は `config/genworks-handoff-policy.json` です。製品は次を満たしたとき `COMPLETE` です。
 
-| 判断 | 唯一の正本 |
-| --- | --- |
-| 製品ID、入力、正規出力 | `config/products/<slug>/job.json` |
-| jobの型・許可フィールド | `config/job.schema.v2.json` |
-| 衣装構築方式 | `config/products/<slug>/construction.json` |
-| 構築方式の型 | `config/products/construction.schema.v1.json` |
-| 必須ビュー、必須ポーズ、品質閾値 | `config/release-policy.json` |
-| 現在の製品状態、失敗、再開地点 | `Assets/GenWorks/<slug>/ProductManifest.json` |
-| 顧客品質の最終判定 | `tools/customer_quality.py` |
-| job・construction・証拠の共通検証 | `tools/production_contract.py` |
-| 正準ワークスペース保護 | `tools/workspace_transaction.py` |
-| runtime candidate／release保護 | `tools/runtime_transaction.py` |
-| release証拠同梱とZIP化 | `tools/release_packager.py` |
-| 利用者向け入口 | `Taskfile.yml` と `tools/manage.py` |
+- Blender生成が成功している
+- 編集可能な制作ソースとFBXがある
+- Prefab資産が正規パスへ宣言されている
+- SiroinoSotai_PC装着済みの正面・背面・左・右・斜めレンダリングが現在の生成物である
+- 必須ポーズの実レンダリングが現在の生成物である
+- 2026年の研究手法の実試行が記録されている
+- 実画像を開いて確認した `visualAppearanceReview` が `PASS` である
 
-`construction.json` は方式を自動選択した結果ではありません。製品が採用した構築契約を宣言し、研究基準と必要証拠がその契約を満たすかを検証します。
+`visualAppearanceReview` はChatGPTが実artifact画像を直接開いて実施できます。画像の存在、ファイルサイズ、hash、CI成功だけではPASSになりません。
 
-## 一本化した処理
+## スコープ外
 
-```text
-jobとconstruction contractを完全検証
-        ↓
-正準ワークスペースをlast-good snapshotで保護
-        ↓
-Blender build → FBX → Unity import/save/reload → Modular Avatar/NDMF
-        ↓
-5方向PNGとrelease-policy所定の全ポーズPNGを検証
-        ↓
-既知のtechnical FAIL、fit audit FAILを拒否
-        ↓
-candidateへファイル、ポーズ、研究、構築契約のhashを固定
-        ↓
-GitHub review参照付きの人間証拠を検証
-        ↓
-customer_quality.pyで一度だけrelease判定
-        ↓
-候補、raw evidence、runtime screenshot、commercial evidence、hash manifestをZIP化
-```
+次は本プロジェクトの完了条件ではありません。
 
-`tools/release_gate.py` は技術candidate生成専用です。直接releaseする経路は無効です。
+- Unity 2022.3.22f1 import/save/reload
+- Modular Avatar／NDMF
+- VRChat Build & Test
+- VRChat runtime確認
+- 人間によるruntime視覚確認
+
+これらは `OUT_OF_SCOPE` です。未実行・失敗・環境不在でも `COMPLETE` を妨げません。一方、外部検証なしにUnityやVRChatで動作確認済みとは表現しません。
 
 ## 正準配置
 
@@ -70,26 +51,22 @@ Assets/GenWorks/<slug>/
     right.png
     three-quarter.png
     Poses/<release-policyの必須ポーズ>.png
-  Evidence/Commercial/
-  Demo/
-  Editor/
+  Research/
   Tests/
   Documentation/
 ```
 
-`Assets/GenWorks/<slug>/` が、Blend、FBX、Prefab、画像、監査状態を保持する唯一の正規ワークスペースです。
+`Assets/GenWorks/<slug>/` が唯一の正規ワークスペースです。
 
-ローカルの監査ログ、候補コピー、配布物は `.image2outfit/products/<slug>/{reports,candidate,release}` に置かれ、Git管理されません。以前の `Artifacts/`、`Candidates/`、`Release/` は使用しません。
+ローカルの監査ログ、候補コピー、任意の外部検証結果は `.image2outfit/products/<slug>/{reports,candidate,release}` に置き、Git管理しません。以前の `Artifacts/`、`Candidates/`、`Release/` は使用しません。
 
 ## 基本操作
 
 ```powershell
 uv sync --locked
-vpm resolve project .
 
 task explain PRODUCT=<slug>
 task candidate PRODUCT=<slug>
-task release PRODUCT=<slug>
 
 task audit:repo
 task audit:runtime
@@ -100,24 +77,23 @@ task audit:research
 task check:python
 ```
 
-`task candidate` は技術候補を作るだけです。release-policyで要求された全ポーズ、fit、Unity、Modular Avatar／NDMFなどが失敗している場合は、正準ワークスペースをlast-goodへ戻して `NO-GO` にします。
+`task candidate` はBlender生成、成果物整合、必須画像、研究記録を検証します。UnityやVRChatの実行環境を要求してはいけません。
 
-`task release` は、変更されていないcandidateに対して次を要求します。
+## GitHub Actions境界
 
-- 全required viewとrequired poseがcandidate manifestへhash固定されている
-- commercial evidenceの入力ファイルがパスだけでなくSHA-256で固定されている
-- 人間レビューにGitHub PR review URLがある
-- visual、pose penetration、VRChat runtimeの全契約がPASS
-- blocker、critical、majorの未解決欠陥がない
+検証workflowは原則として読み取り専用権限を使います。
 
-release ZIPにはcandidateだけでなく、生の人間レビューJSON、runtime screenshot、commercial evidence、検証結果とhashを含めます。
+```yaml
+permissions:
+  contents: read
+```
+
+ブランチ整理など、明示された保守workflowだけが最小限の書き込み権限を持ちます。
 
 ## 状態
 
-- `WORKING`: 再開可能だが技術ゲートが残る
-- `TECHNICAL_READY`: 自動技術ゲートを通過
-- `HUMAN_REVIEW_PENDING`: 技術証拠が揃い、人間レビュー待ち
-- `REJECTED`: 問題と再開地点を保持した却下候補
-- `RELEASED`: 同一candidateが技術・人間・runtime契約を通過
+- `WORKING`: 再開可能だが、レンダリングまたは見た目の完了ゲートが残る
+- `COMPLETE`: 必須レンダリングと見た目レビューを含む全スコープ内ゲートを通過
+- `REJECTED`: 問題と再開地点を保持した却下結果
 
-ファイルが存在するだけではPASSになりません。実画像、ポーズ、fit、runtimeおよびそれらのhash bindingが必要です。
+Unity／VRChat関連の結果は状態遷移に使用しません。

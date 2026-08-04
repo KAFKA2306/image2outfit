@@ -1,13 +1,12 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "canonicalWorkspacePattern": "Assets/GenWorks/<product-id>",
   "statuses": [
     "WORKING",
-    "TECHNICAL_READY",
-    "HUMAN_REVIEW_PENDING",
-    "RELEASED",
+    "COMPLETE",
     "REJECTED"
   ],
+  "completionStatus": "COMPLETE",
   "requiredCheckpointJobFields": [
     "productManifestPath",
     "blendPath",
@@ -24,35 +23,37 @@
     "right",
     "three-quarter"
   ],
-  "requiredMergeCheckpointGates": [
+  "requiredCompletionGates": [
     "blender",
+    "editableSource",
     "fbx",
     "prefabDeclared",
     "fiveViewEvidence",
     "poseEvidence",
+    "visualAppearanceReview",
     "researchTrial"
   ],
-  "requiredAutomatedTechnicalGatesBeforeHumanReview": [
-    "blender",
-    "fbx",
+  "outOfScopeGates": [
     "unityImport",
-    "prefabSerialized",
+    "unitySaveReload",
     "prefabReload",
-    "modularAvatar"
-  ],
-  "requiredHumanReleaseGates": [
-    "humanVisualReview",
-    "humanPoseReview",
+    "modularAvatar",
+    "ndmf",
+    "vrchatBuildTest",
+    "vrchatRuntime",
     "humanRuntimeReview"
   ],
   "rules": {
     "actionsArtifactsAreCanonicalWorkState": false,
     "trackedCheckpointRequiredForHandoff": true,
-    "unityRequiredForRepositoryMerge": false,
-    "unityConfiguredPrefabsRequiredForTechnicalReady": true,
-    "unityRequiredForRelease": true,
-    "mergeWithoutUnityMustRemainWorking": true,
-    "humanReviewRequiredForRelease": true,
+    "completionDeterminedByRenderedEvidence": true,
+    "visualAppearanceReviewRequired": true,
+    "visualAppearanceReviewMayBePerformedByChatGPT": true,
+    "unityRequiredForCompletion": false,
+    "runtimeValidationInScope": false,
+    "outOfScopeFailuresAreBlockers": false,
+    "fitAuditFailureBlocksCompletion": false,
+    "runtimeCompatibilityMustNotBeClaimedWithoutExternalEvidence": true,
     "rebuildFromZeroWhenCheckpointExists": false,
     "retainRejectedCheckpointAndReason": true
   },

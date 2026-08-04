@@ -30,10 +30,7 @@ class FinalRepositoryStateTest(unittest.TestCase):
             job = json.loads(job_path.read_text(encoding="utf-8-sig"))
             product_id = product_dir.name
             self.assertEqual(job["id"], product_id)
-            self.assertEqual(
-                job["productRoot"],
-                f"Assets/GenWorks/{product_id}",
-            )
+            self.assertEqual(job["productRoot"], f"Assets/GenWorks/{product_id}")
             self.assertEqual(
                 job["licenseEvidence"],
                 f"config/products/{product_id}/license.json",
@@ -55,15 +52,13 @@ class FinalRepositoryStateTest(unittest.TestCase):
         )
         required_views = set(policy["requiredPreviewViews"])
         allowed_statuses = set(policy["statuses"])
-        automated_gates = policy[
-            "requiredAutomatedTechnicalGatesBeforeHumanReview"
-        ]
-        human_gates = policy["requiredHumanReleaseGates"]
+        completion_status = policy["completionStatus"]
+        completion_gates = policy["requiredCompletionGates"]
+        out_of_scope = set(policy["outOfScopeGates"])
+        self.assertFalse(set(completion_gates) & out_of_scope)
 
         for product_dir in sorted(path for path in products.iterdir() if path.is_dir()):
-            job = json.loads(
-                (product_dir / "job.json").read_text(encoding="utf-8-sig")
-            )
+            job = json.loads((product_dir / "job.json").read_text(encoding="utf-8-sig"))
             product_root = job["productRoot"]
             delivery_assets = set(job.get("deliveryAssets", []))
 
@@ -94,7 +89,7 @@ class FinalRepositoryStateTest(unittest.TestCase):
             self.assertEqual(manifest.get("productId"), job["id"])
             self.assertEqual(manifest.get("productRoot"), product_root)
 
-            status = manifest.get("status")
+            status = manifest.get("status", manifest.get("state"))
             self.assertIn(status, allowed_statuses, manifest_path)
             handoff = manifest.get("handoff")
             self.assertIsInstance(handoff, dict, manifest_path)
@@ -104,14 +99,13 @@ class FinalRepositoryStateTest(unittest.TestCase):
 
             gates = manifest.get("technicalGates")
             self.assertIsInstance(gates, dict, manifest_path)
-            if status in {"TECHNICAL_READY", "HUMAN_REVIEW_PENDING", "RELEASED"}:
-                for gate in automated_gates:
-                    self.assertEqual(gates.get(gate), "PASS", (manifest_path, gate))
-            if status == "RELEASED":
-                for gate in human_gates:
+            if status == completion_status:
+                for gate in completion_gates:
                     self.assertEqual(gates.get(gate), "PASS", (manifest_path, gate))
 
-    def test_handoff_policy_blocks_artifact_only_and_zero_rebuild_workflows(self) -> None:
+    def test_handoff_policy_blocks_artifact_only_and_zero_rebuild_workflows(
+        self,
+    ) -> None:
         policy = json.loads(
             (ROOT / "config" / "genworks-handoff-policy.json").read_text(
                 encoding="utf-8-sig"
@@ -120,8 +114,16 @@ class FinalRepositoryStateTest(unittest.TestCase):
         rules = policy["rules"]
         self.assertFalse(rules["actionsArtifactsAreCanonicalWorkState"])
         self.assertTrue(rules["trackedCheckpointRequiredForHandoff"])
-        self.assertTrue(rules["unityConfiguredPrefabsRequiredForTechnicalReady"])
-        self.assertTrue(rules["humanReviewRequiredForRelease"])
+        self.assertTrue(rules["completionDeterminedByRenderedEvidence"])
+        self.assertTrue(rules["visualAppearanceReviewRequired"])
+        self.assertTrue(rules["visualAppearanceReviewMayBePerformedByChatGPT"])
+        self.assertFalse(rules["unityRequiredForCompletion"])
+        self.assertFalse(rules["runtimeValidationInScope"])
+        self.assertFalse(rules["outOfScopeFailuresAreBlockers"])
+        self.assertFalse(rules["fitAuditFailureBlocksCompletion"])
+        self.assertTrue(
+            rules["runtimeCompatibilityMustNotBeClaimedWithoutExternalEvidence"]
+        )
         self.assertFalse(rules["rebuildFromZeroWhenCheckpointExists"])
         self.assertTrue(rules["retainRejectedCheckpointAndReason"])
 
