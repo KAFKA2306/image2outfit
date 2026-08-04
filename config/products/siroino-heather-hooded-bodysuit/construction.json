@@ -3,12 +3,13 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
+  "designRevision": "v24-pattern-coordinate-highcut-shell",
   "panels": [
     "evaluated-shape-two-level-subdivided-connected-torso-underbody-weighted-sleeve-shell",
+    "explicit-front-back-pattern-coordinate-highcut-boundary",
+    "short-sagittal-underbody-bridge",
     "semantic-neck-wrist-leg-complement-classification",
     "source-topology-restoration-of-all-nonanatomical-complement-components",
-    "underbody-reaching-high-cut-bridge-with-exact-five-opening-gate",
     "four-ring-boundary-relaxation",
     "body-triangle-barycentric-anchors-with-positive-normal-offset-field",
     "four-bone-local-residual-smoothing-with-bounded-world-decoding",
@@ -37,18 +38,18 @@
     "drawcord"
   ],
   "researchTrial": {
-    "paper": "https://arxiv.org/abs/2605.07450",
-    "paperTitle": "LoBoFit: Flexible Garment Refitting via Local Bone Mapping Blending",
-    "submitted": "2026-05-08T08:56:06Z",
-    "paperLicense": "CC BY-NC-ND 4.0",
-    "officialCode": "https://github.com/MengZephyr/LoBoFit",
-    "officialCodeLicense": "BSD-3-Clause",
-    "implementation": "independent deterministic four-bone local residual encoding, adjacency smoothing, clearance pull and bounded world-space decoding after the existing DAMA-inspired body-triangle anchor pass",
+    "paper": "https://arxiv.org/abs/2602.24043",
+    "paperTitle": "Spatio-Temporal Garment Reconstruction Using Diffusion Mapping via Pattern Coordinates",
+    "submitted": "2026-02-27T14:19:23Z",
+    "paperLicense": "arXiv distribution license; no paper or implementation content copied",
+    "officialCode": "https://github.com/yxw007/SGR-Diffusion",
+    "officialCodeLicense": "UNVERIFIED_NOT_USED",
+    "implementation": "independent deterministic pattern-coordinate lower-body selection with a bounded high-cut curve, short sagittal underbody bridge and stricter arm-weight threshold, followed by the existing DAMA and LoBoFit inspired fitting passes",
     "authorsModelExecuted": false,
     "officialCodeLocated": true,
     "officialCodeExecuted": false,
-    "preconditionerEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
-    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json"
+    "preconditionerEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/pattern-coordinate-trial.json"
   },
   "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
