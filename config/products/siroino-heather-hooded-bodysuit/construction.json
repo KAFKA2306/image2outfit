@@ -3,52 +3,58 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
+  "designRevision": "v24-structured-template-cage",
+  "representation": {
+    "canonical": "structured template cage",
+    "bodyTopologyCopied": false,
+    "bodyRole": "surface sampling and nearest-body skin-weight transfer only"
+  },
   "panels": [
-    "evaluated-shape-two-level-subdivided-connected-torso-underbody-weighted-sleeve-shell",
-    "semantic-neck-wrist-leg-complement-classification",
-    "source-topology-restoration-of-all-nonanatomical-complement-components",
-    "underbody-reaching-high-cut-bridge-with-exact-five-opening-gate",
-    "four-ring-boundary-relaxation",
-    "body-triangle-barycentric-anchors-with-positive-normal-offset-field",
-    "four-bone-local-residual-smoothing-with-bounded-world-decoding",
-    "body-clear-slim-upper-back-folded-hood-roll"
+    "periodic-regular-torso-cage-with-analytic-high-cut-boundary",
+    "shared-edge-u-shaped-underbody-gusset",
+    "left-and-right-regular-arm-tubes-along-bone-centerlines",
+    "left-and-right-independent-rib-cuffs",
+    "attached-three-ring-cowl-surface"
   ],
   "separateGeometry": [
     "Henley placket",
     "three buttons",
     "hood drawcords"
   ],
+  "removedActiveMechanisms": [
+    "body-face-selection-as-garment-topology",
+    "semantic-complement-healing",
+    "uniform-shrinkwrap-reprojection",
+    "DAMA-inspired-body-anchor-projection",
+    "LoBoFit-inspired-local-residual-smoothing"
+  ],
   "priorityFitZones": [
-    "shoulder",
+    "shoulder overlap",
     "underarm",
-    "inner arm",
     "elbow",
     "wrist",
     "neck opening",
     "chest",
     "abdomen",
     "hip crest",
-    "groin",
+    "shared-edge gusset",
     "inner thigh",
     "leg root",
-    "buttocks",
-    "upper-back hood roll",
+    "attached cowl",
     "drawcord"
   ],
   "researchTrial": {
-    "paper": "https://arxiv.org/abs/2605.07450",
-    "paperTitle": "LoBoFit: Flexible Garment Refitting via Local Bone Mapping Blending",
-    "submitted": "2026-05-08T08:56:06Z",
-    "paperLicense": "CC BY-NC-ND 4.0",
-    "officialCode": "https://github.com/MengZephyr/LoBoFit",
-    "officialCodeLicense": "BSD-3-Clause",
-    "implementation": "independent deterministic four-bone local residual encoding, adjacency smoothing, clearance pull and bounded world-space decoding after the existing DAMA-inspired body-triangle anchor pass",
-    "authorsModelExecuted": false,
-    "officialCodeLocated": true,
-    "officialCodeExecuted": false,
-    "preconditionerEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
-    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json"
+    "primaryPaper": "https://arxiv.org/abs/2306.03642",
+    "primaryPaperTitle": "GarmentCode: Programming Parametric Sewing Patterns",
+    "primaryOfficialCode": "https://github.com/maria-korosteleva/GarmentCode",
+    "primaryOfficialCodeLicense": "MIT",
+    "currentPaper": "https://arxiv.org/abs/2606.24564",
+    "currentPaperTitle": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
+    "currentOfficialCode": "https://github.com/PatternGSL/PatternGSL",
+    "implementation": "independent Blender implementation of explicit semantic template cages; no author code or models are executed or copied",
+    "authorsImplementationExecuted": false,
+    "authorsCodeCopied": false,
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/structured-template-cage-trial.json"
   },
   "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
