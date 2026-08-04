@@ -224,7 +224,9 @@ def _boundary_loops(obj: bpy.types.Object, armature: bpy.types.Object) -> list[d
             for left, right in boundary_edges
             if left in component and right in component
         )
-        center = sum(local_points, Vector()) / max(len(local_points), 1)
+        center = sum(local_points, Vector((0.0, 0.0, 0.0))) / max(
+            len(local_points), 1
+        )
         loops.append(
             {
                 "vertexCount": len(component),
@@ -257,7 +259,8 @@ def static_geometry_diagnostics(
 
     def object_bounds(obj: bpy.types.Object) -> dict[str, list[float]] | None:
         return _bounds(
-            inverse_root @ (obj.matrix_world @ vertex.co) for vertex in obj.data.vertices
+            inverse_root @ (obj.matrix_world @ vertex.co)
+            for vertex in obj.data.vertices
         )
 
     return {
