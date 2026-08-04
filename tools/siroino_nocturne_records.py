@@ -11,7 +11,7 @@ import siroino_strappy_knit_build as base
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-nocturne-angel-set"
 PRODUCT_NAME = "Nocturne Angel Modular Set for Siroino"
-REVISION = "v4-clearance-articulated-silhouette"
+REVISION = "v5-skinweighted-pleated-volume"
 REFERENCE_SHA256 = "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67"
 
 REJECTED_HISTORY = [
@@ -44,6 +44,16 @@ REJECTED_HISTORY = [
             "0921d4d449985ef757db808dc9b316421f1a70374f8cd5c4f75d562f254f3d2b"
         ),
         "evidence": "Tests/visual-review-v3.json",
+    },
+    {
+        "revision": "v4-clearance-articulated-silhouette",
+        "result": "VISUAL_REJECTED",
+        "hostedWorkflowRun": 30959394549,
+        "artifactId": 8912558603,
+        "artifactSha256": (
+            "086c1fa3ab50d37d6f44bd1af2605d45800a4973623434a405fc2224d15d94c1"
+        ),
+        "evidence": "Tests/visual-review-v4.json",
     },
 ]
 
@@ -155,8 +165,8 @@ def _pattern(cloth: list[dict]) -> dict:
         "designRevision": REVISION,
         "status": "GENERATED",
         "representation": (
-            "explicit sewn panels, semantic seams, independent topology, "
-            "body-surface clearance and articulated lower layers"
+            "five angular sewn bodice panels, transferred body weights, "
+            "shape-preserving pleated cloth and volumetric optional modules"
         ),
         "bodyTopologyCopied": False,
         "panels": [
@@ -173,10 +183,10 @@ def _pattern(cloth: list[dict]) -> dict:
             for identifier, first, second in seams
         ],
         "modules": {
-            "core": ["fitted sewn bodice", "cloth skirt", "collar", "sleeves"],
-            "head": ["beret", "animal ears"],
-            "back": ["three rounded feather layers per side", "tail"],
-            "legs": ["lower-leg warmers", "ellipsoidal shoes"],
+            "core": ["skin-weighted bodice", "pleated skirt", "collar", "sleeves"],
+            "head": ["lowered beret", "animal ears"],
+            "back": ["four volumetric feathers per side", "tail"],
+            "legs": ["skin-weighted leg warmers", "skin-weighted shoes"],
             "accessories": ["choker", "amber charm", "rabbit charm"],
         },
         "clothSimulation": cloth,
@@ -190,8 +200,8 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
         "result": "PASS",
         "executedAt": base.utc_now(),
         "method": (
-            "PatternGSL-inspired explicit sewn panel, seam and layer specification "
-            "with Blender cloth and independent nearest-surface clearance"
+            "PatternGSL-inspired explicit panel and seam representation with "
+            "Blender cloth, evaluated-body clearance and nearest-body weight transfer"
         ),
         "sources": [
             {
@@ -215,17 +225,14 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
             ),
             "panelCount": len(pattern["panels"]),
             "seamPairCount": len(pattern["seams"]),
-            "clearanceConstraint": "nearest evaluated body surface, outward only",
-            "articulation": {
-                "bodice": "chest-local",
-                "upperSleeves": "upper-arm-local",
-                "armWarmers": "lower-arm-local",
-                "legWarmers": "lower-leg-local",
-                "shoes": "foot-local",
-                "skirt": "hips with continuous left/right upper-leg blend",
-                "hemFrill": "hips with stronger left/right upper-leg blend",
+            "weightTransfer": "four strongest groups from nearest evaluated body vertex",
+            "clothShapeControl": {
+                "pleats": 12,
+                "gravityWeight": 0.18,
+                "shapePreservingStiffness": True,
             },
-            "exportTriangles": "explicit for all panel and feather n-gons",
+            "volumetricWings": True,
+            "explicitTriangleExport": True,
         },
         "clothSimulation": cloth,
         "acceptance": {
@@ -365,13 +372,13 @@ def write_records(job, previews, multiview, metrics, cloth) -> None:
 `WORKING` — SiroinoSotai_PC向けの黒・ベージュ・白のモジュール式衣装です。
 
 - revision: `{REVISION}`
-- narrowed five-panel V-neck bodice with body-surface clearance
-- Blender cloth simulation: {cloth_frames} frames
-- skirt and hem use continuous hips/upper-leg articulation weights
-- arm and leg modules follow their local anatomical bones
-- all panel and feather n-gons are triangulated before FBX export
+- angular five-panel V-neck bodice using evaluated nearest-body weight transfer
+- short twelve-pleat skirt with {cloth_frames}-frame shape-preserving Blender Cloth
+- transferred body weights for skirt, sleeves, warmers, cuffs and shoes
+- four volumetric ellipsoidal feathers per wing
+- corrected outward body-surface clearance and explicit triangle export
 - reference image is hash-bound but not redistributed
-- rejected v1, v2 and v3 evidence remains under `Tests/`
+- rejected v1 through v4 evidence remains under `Tests/`
 
 5面レンダリングまで生成済みです。必須6ポーズと直接画像監査が完了するまで `COMPLETE` ではありません。Unity、Modular Avatar、NDMF、VRChat runtimeは `OUT_OF_SCOPE` です。
 """,
