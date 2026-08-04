@@ -32,6 +32,21 @@
     "poseEvidence",
     "researchTrial"
   ],
+  "repositoryCompletionBoundary": {
+    "includedStages": [
+      "Blender generation and final save",
+      "primary-shell topology and opening audit",
+      "five-view rendered visual review",
+      "six-pose rendered fit and intersection audit",
+      "FBX generation and declared Prefab asset presence"
+    ],
+    "externalOutOfScopeStages": [
+      "Unity import/save/reload",
+      "Modular Avatar/NDMF validation",
+      "VRChat Build & Test",
+      "VRChat runtime human review"
+    ]
+  },
   "requiredAutomatedTechnicalGatesBeforeHumanReview": [
     "blender",
     "fbx",
@@ -54,7 +69,11 @@
     "mergeWithoutUnityMustRemainWorking": true,
     "humanReviewRequiredForRelease": true,
     "rebuildFromZeroWhenCheckpointExists": false,
-    "retainRejectedCheckpointAndReason": true
+    "retainRejectedCheckpointAndReason": true,
+    "externalRuntimeStagesAreRepositoryScope": false,
+    "externalRuntimeStagesBlockRepositoryCompletion": false,
+    "externalRuntimeStagesBlockBranchCleanup": false,
+    "repositoryCompletionIsIndependentOfExternalReleaseStatus": true
   },
   "canonicalPrefabPattern": "Assets/GenWorks/<product-id>/Prefab/*.prefab"
 }
