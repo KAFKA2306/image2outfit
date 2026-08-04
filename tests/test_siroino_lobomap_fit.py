@@ -33,9 +33,9 @@ class SiroinoFusedRollTests(unittest.TestCase):
             self.assertIn(token, generator)
 
     def test_v28_keeps_bounded_body_reference_operations(self) -> None:
-        base = (
-            ROOT / "tools" / "siroino_heather_closed_components_v27.py"
-        ).read_text(encoding="utf-8")
+        base = (ROOT / "tools" / "siroino_heather_closed_components_v27.py").read_text(
+            encoding="utf-8"
+        )
         for token in (
             "class PolarBodyProfile",
             "HEIGHT_SAMPLES = 50",
@@ -75,8 +75,7 @@ class SiroinoFusedRollTests(unittest.TestCase):
             construction["panels"],
         )
         evidence = (
-            f"Assets/GenWorks/{PRODUCT}/Research/"
-            "flat-saddle-cap-hood-roll-trial.json"
+            f"Assets/GenWorks/{PRODUCT}/Research/flat-saddle-cap-hood-roll-trial.json"
         )
         self.assertEqual(construction["researchTrial"]["generatedEvidence"], evidence)
         self.assertIn(evidence, job["deliveryAssets"])
