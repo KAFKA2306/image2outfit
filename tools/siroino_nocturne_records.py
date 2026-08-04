@@ -11,7 +11,7 @@ import siroino_strappy_knit_build as base
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-nocturne-angel-set"
 PRODUCT_NAME = "Nocturne Angel Modular Set for Siroino"
-REVISION = "v3-sewn-v-neck-stable-modules"
+REVISION = "v4-clearance-articulated-silhouette"
 REFERENCE_SHA256 = "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67"
 
 REJECTED_HISTORY = [
@@ -34,6 +34,16 @@ REJECTED_HISTORY = [
             "5f3465dc50486b627df520142a7a74fa2b5b98d22089a509d124a5d1936be3fc"
         ),
         "evidence": "Tests/visual-review-v2.json",
+    },
+    {
+        "revision": "v3-sewn-v-neck-stable-modules",
+        "result": "VISUAL_REJECTED",
+        "hostedWorkflowRun": 30957408404,
+        "artifactId": 8911782998,
+        "artifactSha256": (
+            "0921d4d449985ef757db808dc9b316421f1a70374f8cd5c4f75d562f254f3d2b"
+        ),
+        "evidence": "Tests/visual-review-v3.json",
     },
 ]
 
@@ -144,7 +154,10 @@ def _pattern(cloth: list[dict]) -> dict:
         "productId": PRODUCT_ID,
         "designRevision": REVISION,
         "status": "GENERATED",
-        "representation": "explicit sewn panels, seams, layers and rigid modules",
+        "representation": (
+            "explicit sewn panels, semantic seams, independent topology, "
+            "body-surface clearance and articulated lower layers"
+        ),
         "bodyTopologyCopied": False,
         "panels": [
             {
@@ -160,10 +173,10 @@ def _pattern(cloth: list[dict]) -> dict:
             for identifier, first, second in seams
         ],
         "modules": {
-            "core": ["sewn bodice", "skirt", "collar", "sleeves"],
+            "core": ["fitted sewn bodice", "cloth skirt", "collar", "sleeves"],
             "head": ["beret", "animal ears"],
-            "back": ["rounded layered feather wings", "tail"],
-            "legs": ["leg warmers", "shoes"],
+            "back": ["three rounded feather layers per side", "tail"],
+            "legs": ["lower-leg warmers", "ellipsoidal shoes"],
             "accessories": ["choker", "amber charm", "rabbit charm"],
         },
         "clothSimulation": cloth,
@@ -178,7 +191,7 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
         "executedAt": base.utc_now(),
         "method": (
             "PatternGSL-inspired explicit sewn panel, seam and layer specification "
-            "with Blender cloth"
+            "with Blender cloth and independent nearest-surface clearance"
         ),
         "sources": [
             {
@@ -202,15 +215,17 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
             ),
             "panelCount": len(pattern["panels"]),
             "seamPairCount": len(pattern["seams"]),
-            "stableRigidModules": [
-                "skirt after cloth bake",
-                "waist band",
-                "hem frill",
-                "leg warmers",
-                "shoes",
-                "wings",
-                "head accessories",
-            ],
+            "clearanceConstraint": "nearest evaluated body surface, outward only",
+            "articulation": {
+                "bodice": "chest-local",
+                "upperSleeves": "upper-arm-local",
+                "armWarmers": "lower-arm-local",
+                "legWarmers": "lower-leg-local",
+                "shoes": "foot-local",
+                "skirt": "hips with continuous left/right upper-leg blend",
+                "hemFrill": "hips with stronger left/right upper-leg blend",
+            },
+            "exportTriangles": "explicit for all panel and feather n-gons",
         },
         "clothSimulation": cloth,
         "acceptance": {
@@ -350,12 +365,13 @@ def write_records(job, previews, multiview, metrics, cloth) -> None:
 `WORKING` — SiroinoSotai_PC向けの黒・ベージュ・白のモジュール式衣装です。
 
 - revision: `{REVISION}`
-- five explicit sewn bodice panels with V neckline and armholes
+- narrowed five-panel V-neck bodice with body-surface clearance
 - Blender cloth simulation: {cloth_frames} frames
-- hip-stable skirt layers, lower-leg-stable warmers and foot-stable shoes
-- rounded layered feather wings and optional head modules
+- skirt and hem use continuous hips/upper-leg articulation weights
+- arm and leg modules follow their local anatomical bones
+- all panel and feather n-gons are triangulated before FBX export
 - reference image is hash-bound but not redistributed
-- rejected v1 and v2 evidence remains under `Tests/`
+- rejected v1, v2 and v3 evidence remains under `Tests/`
 
 5面レンダリングまで生成済みです。必須6ポーズと直接画像監査が完了するまで `COMPLETE` ではありません。Unity、Modular Avatar、NDMF、VRChat runtimeは `OUT_OF_SCOPE` です。
 """,
