@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-"""Weighted refined shell for the Siroino heather hooded bodysuit.
+"""Semantic five-opening weighted shell for the Siroino hooded bodysuit.
 
 The neutral SiroinoSotai_PC shape is baked from the evaluated dependency graph
-and subdivided twice. Torso and high-cut regions are selected geometrically,
-while shoulders and sleeves follow interpolated arm weights. Complement face
-components are analysed so only the five intended garment openings remain;
-smaller accidental holes are restored from source topology. Opening boundaries
-are then smoothed and shrink-wrapped back to the evaluated source. A compact
-rolled hood follows the upper back. The build stops on invalid, disconnected,
-or implausible geometry.
+and subdivided twice. Torso, crotch bridge and sleeves are extracted as one
+source-topology shell. Adjacent unselected face components are classified as
+the neck, two wrist and two leg openings by their world-space positions; every
+other component is restored from source topology. Rendering is blocked unless
+the shell is one connected component with exactly five boundary loops.
 """
 
 from __future__ import annotations
@@ -22,10 +20,9 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
-DESIGN_REVISION = "v19-topology-healed-weighted-shell"
+DESIGN_REVISION = "v20-semantic-five-opening-highcut-shell"
 clean_meshes = v9.clean_meshes
 bone_segment = v9.bone_segment
-
 
 PolygonPredicate = Callable[[bpy.types.MeshPolygon, Vector], bool]
 
@@ -109,16 +106,27 @@ def _polygon_adjacency(mesh: bpy.types.Mesh) -> dict[int, set[int]]:
     return adjacency
 
 
-def _close_unintended_openings(
+def _component_center(
     body: bpy.types.Object,
-    selected: list[bpy.types.MeshPolygon],
-    intended_openings: int = 5,
-) -> list[bpy.types.MeshPolygon]:
-    """Restore small enclosed complement components from the source topology."""
-    selected_indices = {polygon.index for polygon in selected}
+    component: set[int],
+) -> Vector:
+    weighted = Vector((0.0, 0.0, 0.0))
+    total_area = 0.0
+    for index in component:
+        polygon = body.data.polygons[index]
+        area = max(float(polygon.area), 1e-12)
+        weighted += (body.matrix_world @ polygon.center) * area
+        total_area += area
+    return weighted / max(total_area, 1e-12)
+
+
+def _opening_components(
+    body: bpy.types.Object,
+    selected_indices: set[int],
+) -> list[dict[str, object]]:
     adjacency = _polygon_adjacency(body.data)
     remaining = set(adjacency) - selected_indices
-    opening_components: list[tuple[float, int, set[int]]] = []
+    components: list[dict[str, object]] = []
 
     while remaining:
         component = {remaining.pop()}
@@ -135,23 +143,107 @@ def _close_unintended_openings(
         )
         if boundary_links == 0:
             continue
-        area = sum(body.data.polygons[index].area for index in component)
-        opening_components.append((area, boundary_links, component))
+        components.append(
+            {
+                "faces": component,
+                "area": sum(body.data.polygons[index].area for index in component),
+                "boundaryLinks": boundary_links,
+                "center": _component_center(body, component),
+            }
+        )
+    return components
 
-    if len(opening_components) <= intended_openings:
-        return selected
 
-    opening_components.sort(key=lambda item: (item[0], item[1]), reverse=True)
-    retained = opening_components[:intended_openings]
-    closed = opening_components[intended_openings:]
+def _pick_side_component(
+    components: list[dict[str, object]],
+    excluded: set[int],
+    *,
+    sign: float,
+    role: str,
+) -> int:
+    candidates: list[tuple[float, int]] = []
+    for index, component in enumerate(components):
+        if index in excluded:
+            continue
+        center = component["center"]
+        assert isinstance(center, Vector)
+        signed_x = sign * center.x
+        if role == "wrist" and signed_x >= 0.18:
+            candidates.append((signed_x, index))
+        elif role == "leg" and signed_x >= 0.015 and center.z <= 0.72:
+            candidates.append((-center.z, index))
+    if not candidates:
+        raise RuntimeError(
+            f"Semantic opening classification could not find {role} on x-sign {sign:+.0f}"
+        )
+    candidates.sort(reverse=True)
+    return candidates[0][1]
+
+
+def _close_unintended_openings(
+    body: bpy.types.Object,
+    selected: list[bpy.types.MeshPolygon],
+    intended_openings: int = 5,
+) -> list[bpy.types.MeshPolygon]:
+    """Retain neck, two wrists and two legs; restore every other complement."""
+    if intended_openings != 5:
+        raise ValueError("The bodysuit contract requires exactly five openings")
+
+    selected_indices = {polygon.index for polygon in selected}
+    components = _opening_components(body, selected_indices)
+    if len(components) < intended_openings:
+        raise RuntimeError(
+            "Semantic opening classification requires at least five adjacent "
+            f"complement components, found {len(components)}"
+        )
+
+    neck_candidates = [
+        (component["center"].z, index)
+        for index, component in enumerate(components)
+        if isinstance(component["center"], Vector)
+        and component["center"].z >= 0.95
+    ]
+    if not neck_candidates:
+        raise RuntimeError("Semantic opening classification could not find the neck")
+    neck_index = max(neck_candidates)[1]
+
+    retained = {neck_index}
+    retained.add(
+        _pick_side_component(components, retained, sign=-1.0, role="wrist")
+    )
+    retained.add(
+        _pick_side_component(components, retained, sign=1.0, role="wrist")
+    )
+    retained.add(_pick_side_component(components, retained, sign=-1.0, role="leg"))
+    retained.add(_pick_side_component(components, retained, sign=1.0, role="leg"))
+
+    if len(retained) != intended_openings:
+        raise RuntimeError(
+            "Semantic opening classification did not produce five unique components"
+        )
+
     restored_indices = {
-        index for _area, _links, component in closed for index in component
+        face
+        for index, component in enumerate(components)
+        if index not in retained
+        for face in component["faces"]
     }
     selected_indices.update(restored_indices)
+
+    summary = []
+    for index, component in enumerate(components):
+        center = component["center"]
+        assert isinstance(center, Vector)
+        summary.append(
+            f"{index}:x={center.x:.3f},z={center.z:.3f},"
+            f"area={float(component['area']):.4f},"
+            f"links={int(component['boundaryLinks'])},"
+            f"retained={index in retained}"
+        )
     print(
-        "Healed unintended garment openings: "
-        f"retained={len(retained)}, closed={len(closed)}, "
-        f"restoredFaces={len(restored_indices)}"
+        "Healed unintended garment openings semantically: "
+        f"retained={len(retained)}, closed={len(components) - len(retained)}, "
+        f"restoredFaces={len(restored_indices)}; " + " | ".join(summary)
     )
     return [body.data.polygons[index] for index in sorted(selected_indices)]
 
@@ -360,8 +452,9 @@ def _smoothstep(value: float) -> float:
 
 
 def _highcut_width(z: float) -> float:
-    t = (z - 0.700) / (0.880 - 0.700)
-    return 0.090 + 0.085 * _smoothstep(t)
+    """Join a narrow crotch bridge continuously into the lower torso shell."""
+    t = (z - 0.600) / (0.850 - 0.600)
+    return 0.032 + 0.133 * _smoothstep(t)
 
 
 def _body_shell_predicate(body: bpy.types.Object) -> PolygonPredicate:
@@ -379,10 +472,10 @@ def _body_shell_predicate(body: bpy.types.Object) -> PolygonPredicate:
         center: Vector,
     ) -> bool:
         x = abs(center.x)
-        torso = 0.835 <= center.z <= _torso_top(center.x) and x <= _torso_width(
+        torso = 0.815 <= center.z <= _torso_top(center.x) and x <= _torso_width(
             center.z
         )
-        highcut = 0.695 <= center.z <= 0.885 and x <= _highcut_width(center.z)
+        highcut = 0.600 <= center.z <= 0.850 and x <= _highcut_width(center.z)
         if torso or highcut:
             return True
 
@@ -406,23 +499,23 @@ def _hood_folded_roll(
     material: bpy.types.Material,
 ) -> bpy.types.Object:
     points: list[tuple[float, float, float]] = []
-    count = 29
+    count = 33
     for index in range(count):
         lateral = 2.0 * index / (count - 1) - 1.0
-        x = 0.112 * lateral
+        x = 0.095 * lateral
         center_weight = 1.0 - lateral * lateral
-        z = 1.024 - 0.046 * center_weight
-        offset = 0.018 + 0.010 * center_weight
+        z = 1.022 - 0.030 * center_weight
+        offset = 0.046 + 0.010 * center_weight
         point = sampler.point(x, z, front=False, offset=offset)
         points.append((point.x, point.y, point.z))
     roll = v9.base.curve_tube(
         "Heather_Hood_Folded_Roll",
         points,
-        0.0125,
+        0.0095,
         material,
         armature,
         "Chest",
-        resolution=4,
+        resolution=5,
     )
     v9.base.transfer_nearest_body_weights(roll, sampler.body)
     return roll
@@ -530,10 +623,10 @@ def _validate_geometry(objects: list[bpy.types.Object]) -> None:
                 failures.append(
                     f"{obj.name}: disconnected source shell has {components} components"
                 )
-            if boundary_loops > 5:
+            if boundary_loops != 5:
                 failures.append(
-                    f"{obj.name}: expected at most 5 garment openings, found "
-                    f"{boundary_loops} boundary loops ({boundary_edges} edges)"
+                    f"{obj.name}: expected exactly 5 anatomical garment openings, "
+                    f"found {boundary_loops} boundary loops ({boundary_edges} edges)"
                 )
     if failures:
         raise RuntimeError(
