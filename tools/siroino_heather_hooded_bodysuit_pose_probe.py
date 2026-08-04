@@ -8,6 +8,7 @@ import json
 import sys
 from pathlib import Path
 from types import ModuleType
+from typing import TYPE_CHECKING
 
 TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
@@ -15,6 +16,10 @@ if str(TOOLS) not in sys.path:
 
 import bpy
 from mathutils.bvhtree import BVHTree
+
+if TYPE_CHECKING:
+    import siroino_heather_geometry_probe
+    import siroino_heather_hooded_bodysuit_pose
 
 ROOT = Path(__file__).resolve().parents[1]
 
