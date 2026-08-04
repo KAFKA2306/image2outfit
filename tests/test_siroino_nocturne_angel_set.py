@@ -89,7 +89,7 @@ class NocturneAngelSetContractTest(unittest.TestCase):
             self.assertIn(object_name, source)
         self.assertIn("_rounded_feather", source)
         self.assertIn('(skirt, "hips")', source)
-        self.assertIn('(shoe, foot)', source)
+        self.assertIn("(shoe, foot)", source)
         self.assertNotIn("Nocturne_Cropped_Bodice", source)
 
 
