@@ -1,4 +1,5 @@
 """Geometry, skinning, and cloth primitives for the Nocturne Angel set."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -85,9 +86,7 @@ def sphere(name, location, scale, mat, rotation=(0.0, 0.0, 0.0)):
     return obj
 
 
-def cone(
-    name, location, radius1, radius2, depth, mat, *, end_fill_type="NGON"
-):
+def cone(name, location, radius1, radius2, depth, mat, *, end_fill_type="NGON"):
     bpy.ops.mesh.primitive_cone_add(
         vertices=64,
         radius1=radius1,
@@ -187,9 +186,7 @@ def transfer_weights(obj, body, armature):
 def bake_skirt(skirt, body):
     top = max(vertex.co.z for vertex in skirt.data.vertices)
     pinned = [
-        vertex.index
-        for vertex in skirt.data.vertices
-        if abs(vertex.co.z - top) < 1e-5
+        vertex.index for vertex in skirt.data.vertices if abs(vertex.co.z - top) < 1e-5
     ]
     group = skirt.vertex_groups.new(name="Cloth_Pin")
     group.add(pinned, 1.0, "REPLACE")
