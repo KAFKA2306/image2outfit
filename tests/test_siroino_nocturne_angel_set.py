@@ -71,10 +71,14 @@ class NocturneAngelSetContractTest(unittest.TestCase):
         self.assertNotIn("base.extract_surface", source)
         self.assertNotIn("body.data.polygons", source)
 
-    def test_modular_parts_are_authored_as_separate_objects(self) -> None:
+    def test_v3_uses_sewn_bodice_panels_and_stable_modules(self) -> None:
         source = generator_source()
         for object_name in (
-            "Nocturne_Cropped_Bodice",
+            "Nocturne_Bodice_Front_L",
+            "Nocturne_Bodice_Front_R",
+            "Nocturne_Bodice_Back",
+            "Nocturne_Bodice_Side_L",
+            "Nocturne_Bodice_Side_R",
             "Nocturne_Cloth_Skirt",
             "Nocturne_Beret",
             "Nocturne_Wing_",
@@ -83,6 +87,10 @@ class NocturneAngelSetContractTest(unittest.TestCase):
             "Nocturne_Shoe_",
         ):
             self.assertIn(object_name, source)
+        self.assertIn("_rounded_feather", source)
+        self.assertIn('(skirt, "hips")', source)
+        self.assertIn('(shoe, foot)', source)
+        self.assertNotIn("Nocturne_Cropped_Bodice", source)
 
 
 if __name__ == "__main__":
