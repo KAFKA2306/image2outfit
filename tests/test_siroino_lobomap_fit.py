@@ -45,7 +45,14 @@ class SiroinoStructuredTemplateCageTests(unittest.TestCase):
         )
         self.assertEqual(job["buildRevision"], REVISION)
         self.assertEqual(construction["designRevision"], REVISION)
-        self.assertFalse(construction["representation"]["bodyTopologyCopied"])
+        self.assertIn(
+            "no-body-topology-copy-no-body-face-selection",
+            construction["panels"],
+        )
+        self.assertIn(
+            "body topology is not copied",
+            construction["researchTrial"]["implementation"],
+        )
         evidence = (
             f"Assets/GenWorks/{PRODUCT}/Research/"
             "structured-template-cage-trial.json"
