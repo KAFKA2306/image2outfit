@@ -32,42 +32,52 @@ class ConfigContractTest(unittest.TestCase):
             policy["humanEvidenceContracts"]["commonRequiredFields"],
         )
 
-    def test_handoff_policy_separates_repository_completion_from_external_runtime(self) -> None:
+    def test_handoff_policy_defines_render_visual_completion_scope(self) -> None:
         policy = json.loads(
             (ROOT / "config" / "genworks-handoff-policy.json").read_text(
                 encoding="utf-8"
             )
         )
+        self.assertEqual(policy["schemaVersion"], 2)
+        self.assertEqual(policy["statuses"], ["WORKING", "COMPLETE", "REJECTED"])
+        self.assertEqual(policy["completionStatus"], "COMPLETE")
         self.assertEqual(
-            policy["requiredMergeCheckpointGates"],
+            policy["requiredCompletionGates"],
             [
                 "blender",
+                "editableSource",
                 "fbx",
                 "prefabDeclared",
                 "fiveViewEvidence",
                 "poseEvidence",
+                "visualAppearanceReview",
                 "researchTrial",
             ],
         )
-        boundary = policy["repositoryCompletionBoundary"]
-        self.assertIn("five-view rendered visual review", boundary["includedStages"])
-        self.assertIn("six-pose rendered fit and intersection audit", boundary["includedStages"])
         self.assertEqual(
-            boundary["externalOutOfScopeStages"],
-            [
-                "Unity import/save/reload",
-                "Modular Avatar/NDMF validation",
-                "VRChat Build & Test",
-                "VRChat runtime human review",
-            ],
+            set(policy["outOfScopeGates"]),
+            {
+                "unityImport",
+                "unitySaveReload",
+                "prefabReload",
+                "modularAvatar",
+                "ndmf",
+                "vrchatBuildTest",
+                "vrchatRuntime",
+                "humanRuntimeReview",
+            },
         )
         rules = policy["rules"]
-        self.assertIs(rules["unityRequiredForRepositoryMerge"], False)
-        self.assertIs(rules["externalRuntimeStagesAreRepositoryScope"], False)
-        self.assertIs(rules["externalRuntimeStagesBlockRepositoryCompletion"], False)
-        self.assertIs(rules["externalRuntimeStagesBlockBranchCleanup"], False)
+        self.assertIs(rules["completionDeterminedByRenderedEvidence"], True)
+        self.assertIs(rules["visualAppearanceReviewRequired"], True)
+        self.assertIs(rules["visualAppearanceReviewMayBePerformedByChatGPT"], True)
+        self.assertIs(rules["unityRequiredForCompletion"], False)
+        self.assertIs(rules["runtimeValidationInScope"], False)
+        self.assertIs(rules["outOfScopeFailuresAreBlockers"], False)
+        self.assertIs(rules["fitAuditFailureBlocksCompletion"], False)
         self.assertIs(
-            rules["repositoryCompletionIsIndependentOfExternalReleaseStatus"], True
+            rules["runtimeCompatibilityMustNotBeClaimedWithoutExternalEvidence"],
+            True,
         )
 
     def test_job_schema_is_the_required_field_source(self) -> None:
