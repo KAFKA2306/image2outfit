@@ -114,6 +114,14 @@ REJECTED_REVISIONS = [
             "incorrectly required 14 objects although the truthful construction had 8"
         ),
     },
+    {
+        "revision": "v18-weighted-refined-shell-rolled-hood",
+        "reason": (
+            "the refined weighted shell became one connected component, but the "
+            "pre-export gate measured eight boundary loops across 726 boundary edges; "
+            "three unintended holes remained and rendering was correctly stopped"
+        ),
+    },
 ]
 
 
@@ -175,7 +183,8 @@ def preserve_authored_weights(
         "weightSource": (
             "evaluated SiroinoSotai_PC topology refined twice with interpolated UVs "
             "and skin weights; shoulders and sleeves selected from interpolated arm "
-            "weights; nearest-body weights used for the folded hood roll and trim"
+            "weights; unintended complement components restored from source topology; "
+            "nearest-body weights used for the folded hood roll and trim"
         ),
         "rebound": False,
     }
@@ -235,6 +244,10 @@ def enforce_manifest_contract(original):
                 "do not follow coarse source polygons.",
                 "Torso and high-cut regions use geometric predicates; shoulders and "
                 "sleeves use interpolated upper-arm and lower-arm weights.",
+                "Unselected source polygons are split into connected complement "
+                "components; only the five largest intended openings are retained.",
+                "Smaller complement components adjacent to the shell are restored to "
+                "heal accidental holes before mesh extraction.",
                 "Two boundary rings are smoothed and shrink-wrapped to the evaluated "
                 "source at 12 mm clearance.",
                 "The high-cut lower body uses a short, broad smoothstep transition.",
