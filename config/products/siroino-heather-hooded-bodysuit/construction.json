@@ -4,29 +4,20 @@
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
   "designRevision": "v24-structured-template-cage",
-  "representation": {
-    "canonical": "structured template cage",
-    "bodyTopologyCopied": false,
-    "bodyRole": "surface sampling and nearest-body skin-weight transfer only"
-  },
   "panels": [
     "periodic-regular-torso-cage-with-analytic-high-cut-boundary",
     "shared-edge-u-shaped-underbody-gusset",
     "left-and-right-regular-arm-tubes-along-bone-centerlines",
     "left-and-right-independent-rib-cuffs",
-    "attached-three-ring-cowl-surface"
+    "attached-three-ring-cowl-surface",
+    "body-used-only-for-surface-sampling-and-nearest-weight-transfer",
+    "no-body-topology-copy-no-body-face-selection",
+    "supersedes-active-shrinkwrap-dama-anchor-and-lobofit-residual-paths"
   ],
   "separateGeometry": [
     "Henley placket",
     "three buttons",
     "hood drawcords"
-  ],
-  "removedActiveMechanisms": [
-    "body-face-selection-as-garment-topology",
-    "semantic-complement-healing",
-    "uniform-shrinkwrap-reprojection",
-    "DAMA-inspired-body-anchor-projection",
-    "LoBoFit-inspired-local-residual-smoothing"
   ],
   "priorityFitZones": [
     "shoulder overlap",
@@ -51,7 +42,7 @@
     "currentPaper": "https://arxiv.org/abs/2606.24564",
     "currentPaperTitle": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
     "currentOfficialCode": "https://github.com/PatternGSL/PatternGSL",
-    "implementation": "independent Blender implementation of explicit semantic template cages; no author code or models are executed or copied",
+    "implementation": "independent Blender implementation of explicit semantic template cages; body topology is not copied; the prior shrinkwrap, DAMA anchor and LoBoFit residual modules are superseded and removed; no author code or models are executed or copied",
     "authorsImplementationExecuted": false,
     "authorsCodeCopied": false,
     "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/structured-template-cage-trial.json"
