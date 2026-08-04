@@ -3,19 +3,19 @@
   "profile": "loose-layered",
   "productId": "siroino-nocturne-angel-set",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v3-sewn-v-neck-stable-modules",
+  "designRevision": "v4-clearance-articulated-silhouette",
   "panels": [
-    "left and right curved front bodice panels with V neckline",
-    "curved back bodice panel with high back neckline",
-    "left and right side bodice panels ending below the armholes",
-    "three-part narrow sailor collar",
-    "eight-ring simulated circular skirt",
-    "open scalloped cream hem frill",
-    "open waist band",
-    "left and right five-ring puff sleeves",
-    "left and right five-ring detached arm warmers",
-    "left and right four-ring lace cuffs",
-    "left and right five-ring leg warmers"
+    "narrowed left and right curved front bodice panels with V neckline",
+    "narrowed curved back bodice panel with independent topology",
+    "left and right nondegenerate side bodice panels ending below the armholes",
+    "three-part triangulated sailor collar",
+    "eight-ring simulated circular skirt with hip and upper-leg articulation",
+    "open scalloped cream hem frill with stronger upper-leg articulation",
+    "open hip-local waist band",
+    "left and right upper-arm-local five-ring puff sleeves",
+    "left and right lower-arm-local five-ring detached arm warmers",
+    "left and right lower-arm-local four-ring lace cuffs",
+    "left and right lower-leg-local five-ring leg warmers"
   ],
   "separateGeometry": [
     "beret",
@@ -23,9 +23,9 @@
     "choker",
     "amber charm",
     "rabbit charm",
-    "rounded layered feather angel wings",
+    "three triangulated rounded feather layers per wing",
     "tail",
-    "shoes"
+    "ellipsoidal foot-local shoes"
   ],
   "priorityFitZones": [
     "V neckline",
@@ -46,7 +46,7 @@
   "researchTrial": {
     "primaryPaper": "https://arxiv.org/abs/2606.24564",
     "secondaryPaper": "https://arxiv.org/abs/2602.22052",
-    "implementation": "independent explicit panel/seam/layer/module specification and actual Blender 4.4 cloth simulation",
+    "implementation": "independent explicit panel/seam/layer/module specification, Blender 4.4 cloth simulation, evaluated-body clearance and semantic articulation weights",
     "externalResearchCodeExecuted": false,
     "generatedEvidence": "Assets/GenWorks/siroino-nocturne-angel-set/Research/patterngsl-autosew-cloth-trial.json"
   },
