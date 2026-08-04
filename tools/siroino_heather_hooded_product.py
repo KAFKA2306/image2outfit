@@ -18,15 +18,15 @@ import siroino_heather_hooded_v11_support as support
 
 support.install()
 
+import siroino_heather_cross_section_cage_v25 as cross_section_cage
 import siroino_heather_hooded_pattern_v13 as pattern
-import siroino_heather_template_cage_v24 as template_cage
 
-template_cage.install(pattern)
+cross_section_cage.install(pattern)
 
 DESIGN_REVISION = pattern.DESIGN_REVISION
-STRUCTURED_TRIAL = (
+CROSS_SECTION_TRIAL = (
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/"
-    "structured-template-cage-trial.json"
+    "cross-sectional-cage-trial.json"
 )
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
@@ -58,6 +58,15 @@ REJECTED_REVISIONS = [
             "five-view and pose inspection still found floating hood parts, dark "
             "surface defects, a pointed crotch flap and collapsed crouch/sit/prone "
             "silhouettes"
+        ),
+    },
+    {
+        "revision": "v24-structured-template-cage",
+        "reason": (
+            "the primary shell no longer copied body topology, but its binary "
+            "front/back surface parameterization folded repeated x,z samples onto "
+            "the same body points, producing a collapsed front, large back openings, "
+            "a Y-shaped crotch flap and detached shoulder/cowl silhouettes"
         ),
     },
 ]
@@ -115,16 +124,17 @@ def preserve_authored_weights(
     garments: list[bpy.types.Object],
     _body: bpy.types.Object,
 ) -> dict[str, object]:
-    """Preserve template-cage weights transferred during component construction."""
+    """Preserve cage weights transferred during component construction."""
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "explicit regular garment cages are authored independently of body "
-            "topology; SiroinoSotai_PC is used only for surface sampling and "
-            "nearest-body skin-weight transfer; four normalized influences are "
-            "enforced after construction"
+            "garment topology is reconstructed from smoothed avatar cross-section "
+            "statistics rather than avatar faces; SiroinoSotai_PC is used as a "
+            "statistical shape and nearest-body skin-weight reference; four normalized "
+            "influences are enforced after construction"
         ),
         "bodyTopologyCopied": False,
+        "binaryFrontBackSamplingUsedForPrimarySurface": False,
         "rebound": False,
     }
 
@@ -136,18 +146,19 @@ def wrap_pattern_writer(original):
         contract["separateGeometry"] = ACTUAL_SEPARATE_GEOMETRY
         contract["designRevision"] = DESIGN_REVISION
         contract["representation"] = {
-            "canonical": "structured template cage",
+            "canonical": "cross-sectional statistical cage",
             "bodyTopologyCopied": False,
+            "binaryFrontBackSamplingUsedForPrimarySurface": False,
             "components": [
-                "periodic torso cage",
+                "smoothed height-indexed torso ellipse cage",
                 "shared-edge U-shaped gusset",
                 "left and right arm tubes",
                 "left and right cuffs",
-                "attached three-ring cowl",
+                "analytic attached cowl",
             ],
-            "bodyRole": "surface and skin-weight reference only",
+            "bodyRole": "cross-section statistics and skin-weight reference",
         }
-        contract["researchTrialEvidence"] = STRUCTURED_TRIAL
+        contract["researchTrialEvidence"] = CROSS_SECTION_TRIAL
         pattern_path.write_text(
             json.dumps(contract, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
@@ -164,7 +175,7 @@ def enforce_manifest_contract(original):
         result = original(*args, **kwargs)
         job = args[0]
         root = Path(__file__).resolve().parents[1]
-        trial_path = root / STRUCTURED_TRIAL
+        trial_path = root / CROSS_SECTION_TRIAL
         trial = (
             json.loads(trial_path.read_text(encoding="utf-8"))
             if trial_path.is_file()
@@ -190,11 +201,11 @@ def enforce_manifest_contract(original):
             "humanRuntimeReview",
         ):
             manifest["technicalGates"][key] = "OUT_OF_SCOPE"
-        manifest["outputs"]["researchTrial"] = STRUCTURED_TRIAL
+        manifest["outputs"]["researchTrial"] = CROSS_SECTION_TRIAL
         manifest["research"] = {
             "result": trial.get("result", "FAIL"),
-            "evidence": STRUCTURED_TRIAL,
-            "representation": "structured template cage",
+            "evidence": CROSS_SECTION_TRIAL,
+            "representation": "cross-sectional statistical cage",
             "authorsImplementationExecuted": False,
             "authorsCodeCopied": False,
         }
@@ -221,16 +232,16 @@ def enforce_manifest_contract(original):
                 item for item in REJECTED_REVISIONS if item["revision"] not in existing
             )
             report["notes"] = [
-                "Body-face selection, semantic complement healing, DAMA anchoring and "
-                "LoBoMap residual smoothing are no longer in the active build path.",
-                "The primary topology is an explicit periodic torso cage with a "
-                "shared-edge U-shaped gusset; it is not copied from Siroino polygons.",
-                "Sleeves and cuffs are regular tubes generated along upper/lower arm "
-                "bone centerlines and overlap the torso in controlled shoulder zones.",
-                "The hood is an attached three-ring cowl surface rather than a detached "
-                "curve tube or floating rear roll.",
-                "SiroinoSotai_PC is used only for surface sampling and nearest-body "
-                "weight transfer.",
+                "Body-face selection, DAMA anchoring, LoBoMap residual smoothing and "
+                "binary front/back circumferential sampling are not in the active path.",
+                "The primary topology is reconstructed from robust avatar vertex "
+                "cross-section quantiles and smoothed across height.",
+                "The lower torso boundary is analytic and is split into two leg "
+                "openings by a shared-edge U-shaped gusset.",
+                "Sleeves and cuffs are smaller regular tubes along arm bone centerlines, "
+                "with an inward shoulder extension for controlled torso overlap.",
+                "The cowl is analytic and attached; it does not use the failed body "
+                "front/back surface sampler.",
                 "Required five-view and pose renders plus direct visual review remain "
                 "completion gates; Unity and VRChat runtime validation are OUT_OF_SCOPE.",
             ]
