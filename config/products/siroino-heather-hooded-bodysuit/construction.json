@@ -3,19 +3,19 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v26-angular-polar-yoke-hood",
+  "designRevision": "v27-closed-saddle-sleevecap-folded-hood",
   "panels": [
     "smoothed-height-by-angle-polar-torso-field",
-    "integrated-shoulder-yoke-and-neck-ring",
-    "analytic-shorter-high-cut-lower-boundary",
-    "short-widened-shared-edge-underbody-gusset",
-    "reduced-radius-sleeve-caps-with-inward-yoke-overlap",
+    "continuous-shoulder-yoke-and-neck-ring",
+    "eleven-column-pelvic-saddle",
+    "overlapping-sleeve-caps-extended-beneath-yoke",
+    "left-and-right-fitted-sleeve-tubes",
     "left-and-right-independent-rib-cuffs",
-    "three-dimensional-open-front-hood-shell",
-    "body-used-for-angular-radial-statistics-and-nearest-weight-transfer",
-    "no-body-topology-copy-no-body-face-selection",
-    "no-binary-front-back-or-ellipse-only-primary-surface",
-    "supersedes-v25-cross-sectional-ellipse-cage"
+    "low-folded-back-rear-neck-hood-shell",
+    "bounded-post-topology-body-clearance-projection",
+    "body-used-for-polar-statistics-clearance-and-nearest-weight-transfer",
+    "no-body-topology-copy-no-body-face-region-selection",
+    "supersedes-v26-two-column-gusset-open-sleeve-root-and-dome-hood"
   ],
   "separateGeometry": [
     "Henley placket",
@@ -23,7 +23,7 @@
     "hood drawcords"
   ],
   "priorityFitZones": [
-    "shoulder yoke",
+    "continuous shoulder yoke",
     "sleeve cap overlap",
     "underarm",
     "elbow",
@@ -33,10 +33,10 @@
     "upper back",
     "abdomen",
     "hip crest",
-    "short widened gusset",
+    "pelvic saddle",
     "inner thigh",
     "leg root",
-    "open-front hood",
+    "folded-back hood",
     "drawcord"
   ],
   "researchTrial": {
@@ -47,10 +47,10 @@
     "currentPaper": "https://arxiv.org/abs/2606.24564",
     "currentPaperTitle": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
     "currentOfficialCode": "https://github.com/PatternGSL/PatternGSL",
-    "implementation": "independent Blender implementation of robust radial quantiles for each height and polar angle, circular and vertical smoothing, an integrated shoulder yoke and neck ring, a shorter widened gusset, reduced sleeve caps and an open-front three-dimensional hood; body topology, body-face selection, binary front/back sampling and ellipse-only primary sections are not used; no author code or models are executed or copied",
+    "implementation": "independent Blender implementation retaining robust height-by-angle torso statistics while replacing v26 blocking components with an eleven-column pelvic saddle, overlapping sleeve caps, fitted cuffs and a low folded-back hood; a bounded nearest-body clearance projection is applied only after garment-native topology is constructed; body faces are not copied and author code or models are not executed or copied",
     "authorsImplementationExecuted": false,
     "authorsCodeCopied": false,
-    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/angular-polar-yoke-trial.json"
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/closed-components-clearance-trial.json"
   },
   "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
