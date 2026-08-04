@@ -71,6 +71,18 @@ class NocturneAngelSetContractTest(unittest.TestCase):
         self.assertNotIn("base.extract_surface", source)
         self.assertNotIn("body.data.polygons", source)
 
+    def test_generator_cleans_exact_loop_triangle_degeneracy(self) -> None:
+        source = SCRIPT.read_text(encoding="utf-8")
+        for required in (
+            "_remove_degenerate_polygons",
+            "mesh.calc_loop_triangles()",
+            "triangle.polygon_index",
+            "removedDegeneratePolygons",
+            "degenerateCleanupByObject",
+        ):
+            self.assertIn(required, source)
+        self.assertIn("metrics.get(\"degenerateTriangles\", 0) == 0", source)
+
     def test_v3_uses_sewn_bodice_panels_and_stable_modules(self) -> None:
         source = generator_source()
         for object_name in (
