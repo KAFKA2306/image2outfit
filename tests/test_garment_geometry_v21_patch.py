@@ -93,7 +93,7 @@ class GarmentGeometryClosedComponentsTests(unittest.TestCase):
     def test_clearance_projection_occurs_after_topology_creation(self) -> None:
         self.assertLess(
             self.generator.index("mesh.from_pydata(vertices, [], faces)"),
-            self.generator.index("_enforce_clearance("),
+            self.generator.index('obj["clearanceProjection"] = _enforce_clearance('),
         )
         self.assertIn("maximum_step: float = 0.040", self.generator)
         self.assertIn("BVHTree.FromPolygons", self.generator)
