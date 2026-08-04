@@ -13,7 +13,7 @@
   "documentationPath": "Assets/GenWorks/siroino-nocturne-angel-set/README.md",
   "sourceJobPath": "config/products/siroino-nocturne-angel-set/job.json",
   "productBuildScript": "tools/siroino_nocturne_angel_set.py",
-  "designRevision": "v1-pattern-gsl-modular-cloth",
+  "designRevision": "v2-open-multiring-reference-silhouette",
   "reference": {
     "sourceImageRedistributed": false,
     "sourceImageSha256": "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67",
@@ -50,13 +50,23 @@
     "fitAudit": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/fit-audit.json",
     "visualReview": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review.json"
   },
+  "rejectedHistory": [
+    {
+      "revision": "v1-pattern-gsl-modular-cloth",
+      "result": "VISUAL_REJECTED",
+      "hostedWorkflowRun": 30934884455,
+      "artifactId": 8903072226,
+      "artifactSha256": "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c0392551a",
+      "evidence": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v1.json"
+    }
+  ],
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-nocturne-angel-set",
     "doNotRebuildFromZero": true,
     "resumeFrom": "tools/siroino_nocturne_angel_set.py",
     "blockers": [
-      "Run Blender 4.4.3 generation against SiroinoSotai_PC.",
+      "Run Blender 4.4.3 generation for revision v2.",
       "Generate five-view and required-pose evidence.",
       "Open all current images and complete direct visualAppearanceReview."
     ]
