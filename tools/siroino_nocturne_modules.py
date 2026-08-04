@@ -282,7 +282,11 @@ def build(body, armature, mats):
             angle = math.radians(38 - index * 13)
             length = height * (0.155 + index * 0.022)
             root = wing_origin + Vector(
-                (sign * height * (0.018 + index * 0.004), 0.0, -index * height * 0.008)
+                (
+                    sign * height * (0.018 + index * 0.004),
+                    0.0,
+                    -index * height * 0.008,
+                )
             )
             tip = root + Vector(
                 (
