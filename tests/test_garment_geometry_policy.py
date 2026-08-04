@@ -117,6 +117,20 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertNotIn("source.shape_key_clear()", self.source)
         self.assertIn("_purge_orphan_shape_keys()", self.source)
 
+    def test_unintended_openings_are_healed_from_source_topology(self) -> None:
+        required_fragments = (
+            "def _polygon_adjacency",
+            "def _close_unintended_openings",
+            "intended_openings: int = 5",
+            "opening_components[:intended_openings]",
+            "opening_components[intended_openings:]",
+            "selected_indices.update(restored_indices)",
+            "_close_unintended_openings(body, selected)",
+            "Healed unintended garment openings",
+        )
+        for fragment in required_fragments:
+            self.assertIn(fragment, self.source)
+
     def test_openings_are_smoothed_and_reprojected(self) -> None:
         required_fragments = (
             "def _boundary_vertex_weights",
