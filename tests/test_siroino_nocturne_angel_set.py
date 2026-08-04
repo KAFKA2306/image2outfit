@@ -93,7 +93,7 @@ class NocturneAngelSetContractTest(unittest.TestCase):
             "transfer_weights",
             "evaluated.to_mesh()",
             "pleated_shell",
-            'cloth.settings.effector_weights.gravity = 0.18',
+            "cloth.settings.effector_weights.gravity = 0.18",
             '"shapePreservingStiffness": True',
             "ellipsoid_between",
             "maximum_search=height * 0.060",
