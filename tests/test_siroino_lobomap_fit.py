@@ -6,44 +6,49 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT = "siroino-heather-hooded-bodysuit"
-REVISION = "v26-angular-polar-yoke-hood"
+REVISION = "v27-closed-saddle-sleevecap-folded-hood"
 
 
-class SiroinoAngularPolarYokeTests(unittest.TestCase):
+class SiroinoClosedComponentsTests(unittest.TestCase):
     def test_product_replaces_previous_active_fit_paths(self) -> None:
         product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
             encoding="utf-8"
         )
         self.assertIn(
-            "import siroino_heather_polar_yoke_v26 as polar_yoke",
+            "import siroino_heather_closed_components_v27 as closed_components",
             product,
         )
-        self.assertIn("polar_yoke.install(pattern)", product)
-        self.assertNotIn("cross_section_cage.install(pattern)", product)
-        self.assertNotIn("template_cage.install(pattern)", product)
-        self.assertNotIn("v21.install(pattern)", product)
-        self.assertNotIn("lobomap.install(pattern)", product)
-
-    def test_angular_polar_yoke_does_not_copy_body_topology(self) -> None:
-        source = (ROOT / "tools" / "siroino_heather_polar_yoke_v26.py").read_text(
-            encoding="utf-8"
-        )
+        self.assertIn("closed_components.install(pattern)", product)
         for token in (
-            'DESIGN_REVISION = "v26-angular-polar-yoke-hood"',
+            "polar_yoke.install(pattern)",
+            "cross_section_cage.install(pattern)",
+            "template_cage.install(pattern)",
+            "v21.install(pattern)",
+            "lobomap.install(pattern)",
+        ):
+            self.assertNotIn(token, product)
+
+    def test_closed_components_do_not_copy_body_topology(self) -> None:
+        source = (
+            ROOT / "tools" / "siroino_heather_closed_components_v27.py"
+        ).read_text(encoding="utf-8")
+        for token in (
+            'DESIGN_REVISION = "v27-closed-saddle-sleevecap-folded-hood"',
             "class PolarBodyProfile",
             "HEIGHT_SAMPLES = 50",
             "ANGLE_COUNT = 72",
-            'obj["bodyTopologyCopied"] = False',
-            'obj["ellipseOnlyProfileUsed"] = False',
+            '"bodyTopologyCopied": False',
+            '"pelvicSaddleColumns": 11',
             '"authorsImplementationExecuted": False',
             '"authorsCodeCopied": False',
             "pattern.create_outfit = lambda",
         ):
             self.assertIn(token, source)
-        self.assertNotIn("BVHTree.FromPolygons", source)
+        self.assertIn("BVHTree.FromPolygons", source)
+        self.assertIn("_enforce_clearance", source)
         self.assertNotIn("_selected_polygons", source)
 
-    def test_job_and_construction_track_angular_polar_trial(self) -> None:
+    def test_job_and_construction_track_closed_component_trial(self) -> None:
         config_root = ROOT / "config" / "products" / PRODUCT
         job = json.loads((config_root / "job.json").read_text(encoding="utf-8"))
         construction = json.loads(
@@ -51,15 +56,19 @@ class SiroinoAngularPolarYokeTests(unittest.TestCase):
         )
         self.assertEqual(job["buildRevision"], REVISION)
         self.assertEqual(construction["designRevision"], REVISION)
+        self.assertIn("eleven-column-pelvic-saddle", construction["panels"])
         self.assertIn(
-            "no-binary-front-back-or-ellipse-only-primary-surface",
+            "bounded-post-topology-body-clearance-projection",
             construction["panels"],
         )
         self.assertIn(
-            "body topology, body-face selection, binary front/back sampling and ellipse-only primary sections are not used",
+            "applied only after garment-native topology is constructed",
             construction["researchTrial"]["implementation"],
         )
-        evidence = f"Assets/GenWorks/{PRODUCT}/Research/angular-polar-yoke-trial.json"
+        evidence = (
+            f"Assets/GenWorks/{PRODUCT}/Research/"
+            "closed-components-clearance-trial.json"
+        )
         self.assertEqual(construction["researchTrial"]["generatedEvidence"], evidence)
         self.assertIn(evidence, job["deliveryAssets"])
         self.assertEqual(
