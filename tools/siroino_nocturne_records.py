@@ -1,4 +1,5 @@
 """Generated contracts and Unity declaration for the Nocturne Angel set."""
+
 from __future__ import annotations
 
 import hashlib
@@ -157,7 +158,9 @@ def write_records(
         "implementation": {
             "externalResearchCodeExecuted": False,
             "bodyTopologyCopied": False,
-            "actualBlenderClothExecuted": all(item.get("baked") is True for item in cloth),
+            "actualBlenderClothExecuted": all(
+                item.get("baked") is True for item in cloth
+            ),
             "panelCount": len(pattern["panels"]),
             "seamPairCount": len(pattern["seams"]),
         },
@@ -237,7 +240,10 @@ def write_records(
         "metrics": metrics,
         "clothSimulation": cloth,
         "fiveViewEvidence": {
-            name: {"path": path.relative_to(ROOT).as_posix(), "sha256": base.sha256(path)}
+            name: {
+                "path": path.relative_to(ROOT).as_posix(),
+                "sha256": base.sha256(path),
+            }
             for name, path in previews.items()
         },
         "handoff": {
@@ -255,13 +261,14 @@ def write_records(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+    cloth_frames = cloth[0]["frames"]
     (root / "README.md").write_text(
         f"""# {PRODUCT_NAME}
 
 `WORKING` — SiroinoSotai_PC向けの黒・ベージュ・白のモジュール式衣装です。
 
 - explicit panel / seam / layer specification
-- Blender cloth simulation: {cloth[0]['frames']} frames
+- Blender cloth simulation: {cloth_frames} frames
 - modular beret, ears, wings, tail, leg warmers, shoes and charms
 - reference image is hash-bound but not redistributed
 
