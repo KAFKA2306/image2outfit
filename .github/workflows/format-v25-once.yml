@@ -1,0 +1,41 @@
+name: Format v25 once
+
+on:
+  push:
+    branches:
+      - fix/v25-side-aware-taubin-shell
+    paths:
+      - .github/workflows/format-v25-once.yml
+      - tools/siroino_heather_side_aware_fairing.py
+      - tests/test_siroino_lobomap_fit.py
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/v25-side-aware-taubin-shell
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: "0.11.32"
+      - name: Format only v25 files
+        run: |
+          uv run --locked --no-default-groups --group dev ruff format \
+            tools/siroino_heather_side_aware_fairing.py \
+            tests/test_siroino_lobomap_fit.py
+          if git diff --quiet --exit-code; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/siroino_heather_side_aware_fairing.py tests/test_siroino_lobomap_fit.py
+          git commit -m "Format v25 side-aware Blender repair"
+          git push origin HEAD:fix/v25-side-aware-taubin-shell
