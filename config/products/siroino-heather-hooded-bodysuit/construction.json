@@ -3,7 +3,7 @@
   "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v22-dama-inspired-body-anchored-shell",
+  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
   "panels": [
     "evaluated-shape-two-level-subdivided-connected-torso-underbody-weighted-sleeve-shell",
     "semantic-neck-wrist-leg-complement-classification",
@@ -11,6 +11,7 @@
     "underbody-reaching-high-cut-bridge-with-exact-five-opening-gate",
     "four-ring-boundary-relaxation",
     "body-triangle-barycentric-anchors-with-positive-normal-offset-field",
+    "four-bone-local-residual-smoothing-with-bounded-world-decoding",
     "body-clear-slim-upper-back-folded-hood-roll"
   ],
   "separateGeometry": [
@@ -36,17 +37,18 @@
     "drawcord"
   ],
   "researchTrial": {
-    "paper": "https://arxiv.org/abs/2605.21001",
-    "paperTitle": "DAMA: Disentangled Body-Anchored Gaussians for Controllable Multi-Layered Avatars",
-    "submitted": "2026-05-20T10:39:44Z",
-    "publication": "CVPR 2026 PhysHuman Workshop",
-    "projectUrl": "https://danieleskandar.github.io/dama/",
-    "officialCodeUrl": "https://github.com/danieleskandar/DAMA-code",
-    "officialCodeLicense": "MIT",
-    "implementation": "independent Blender mesh adaptation using body-triangle barycentric coordinates, bounded strictly positive normal offsets and scalar offset-field smoothing",
+    "paper": "https://arxiv.org/abs/2605.07450",
+    "paperTitle": "LoBoFit: Flexible Garment Refitting via Local Bone Mapping Blending",
+    "submitted": "2026-05-08T08:56:06Z",
+    "paperLicense": "CC BY-NC-ND 4.0",
+    "officialCode": "https://github.com/MengZephyr/LoBoFit",
+    "officialCodeLicense": "BSD-3-Clause",
+    "implementation": "independent deterministic four-bone local residual encoding, adjacency smoothing, clearance pull and bounded world-space decoding after the existing DAMA-inspired body-triangle anchor pass",
     "authorsModelExecuted": false,
+    "officialCodeLocated": true,
     "officialCodeExecuted": false,
-    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json"
+    "preconditionerEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json"
   },
   "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
