@@ -23,13 +23,9 @@ import siroino_heather_hooded_pattern_v13 as pattern
 DESIGN_REVISION = pattern.DESIGN_REVISION
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
-    "Heather_Highcut_Front_Panel",
-    "Heather_Highcut_Back_Panel",
-    "Heather_Crotch_Bridge",
     "Heather_Rib_Cuff_L",
     "Heather_Rib_Cuff_R",
-    "Heather_Hood_Outer_L",
-    "Heather_Hood_Outer_R",
+    "Heather_Hood_Shell",
     "Heather_Hood_Neck_Band",
     "Heather_Henley_Placket",
     "Heather_Henley_Button_01",
@@ -37,8 +33,6 @@ ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Henley_Button_03",
     "Heather_Hood_Drawcord_L",
     "Heather_Hood_Drawcord_R",
-    "Heather_Side_Tie_L",
-    "Heather_Side_Tie_R",
     "Heather_Center_Front_Seam",
     "Heather_Center_Back_Seam",
     "Heather_Hood_Center_Seam",
@@ -92,6 +86,14 @@ REJECTED_REVISIONS = [
             "evaluated BVH audit reported 28593 overlap pairs"
         ),
     },
+    {
+        "revision": "v13-bevel-safe-continuous-shell",
+        "reason": (
+            "actual hosted inspection removed metre-scale spikes but still found "
+            "waist fins, a ruptured high-cut front, back and sleeve holes, detached "
+            "hood strips and 2506 neutral-pose triangle overlap pairs"
+        ),
+    },
 ]
 
 
@@ -114,7 +116,11 @@ def normalize_four_influences(
                 for item in list(vertex.groups)
                 if item.weight > 1e-10
             ]
-            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[:maximum]
+            ranked = sorted(
+                assignments,
+                key=lambda item: item[1],
+                reverse=True,
+            )[:maximum]
             if not ranked:
                 ranked = [(fallback.name, 1.0)]
             total = sum(weight for _, weight in ranked)
@@ -148,8 +154,8 @@ def preserve_authored_weights(
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
             "direct SiroinoSotai_PC topology, UVs and normalized source skin "
-            "weights for the connected torso-and-sleeve shell; nearest-body "
-            "weights for smooth high-cut, cuff, hood and trim geometry"
+            "weights for one connected torso, pelvis and sleeve shell; nearest-body "
+            "weights for cuffs, hood and trim geometry"
         ),
         "rebound": False,
     }
@@ -200,7 +206,9 @@ def enforce_manifest_contract(original):
             rejected = report.setdefault("rejectedHistory", [])
             existing = {item.get("revision") for item in rejected}
             rejected.extend(
-                item for item in REJECTED_REVISIONS if item["revision"] not in existing
+                item
+                for item in REJECTED_REVISIONS
+                if item["revision"] not in existing
             )
             report_path.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n",
@@ -215,10 +223,14 @@ def update_panel_object_contract() -> None:
     replacements = {
         "Heather_Front_Upper_Panel": "Heather_Body_Shell",
         "Heather_Back_Upper_Panel": "Heather_Body_Shell",
+        "Heather_Highcut_Front_Panel": "Heather_Body_Shell",
+        "Heather_Highcut_Back_Panel": "Heather_Body_Shell",
         "Heather_Long_Sleeve_L": "Heather_Body_Shell",
         "Heather_Long_Sleeve_R": "Heather_Body_Shell",
-        "Heather_Hood_Back_Drape_L": "Heather_Hood_Outer_L",
-        "Heather_Hood_Back_Drape_R": "Heather_Hood_Outer_R",
+        "Heather_Hood_Back_Drape_L": "Heather_Hood_Shell",
+        "Heather_Hood_Back_Drape_R": "Heather_Hood_Shell",
+        "Heather_Hood_Outer_L": "Heather_Hood_Shell",
+        "Heather_Hood_Outer_R": "Heather_Hood_Shell",
         "Heather_Hood_Cowl": "Heather_Hood_Neck_Band",
     }
     for panel in build.evidence.PANELS:
