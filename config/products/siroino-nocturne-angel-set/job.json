@@ -5,8 +5,8 @@
   "adapterId": "siroino-v1.0",
   "automaticBuild": true,
   "buildCapability": "blender-4.4.3-pattern-cloth-modular",
-  "buildRevision": "v2-open-multiring-reference-silhouette",
-  "renderLoopRevision": "nocturne-angel-loop-v2",
+  "buildRevision": "v3-sewn-v-neck-stable-modules",
+  "renderLoopRevision": "nocturne-angel-loop-v3",
   "productRoot": "Assets/GenWorks/siroino-nocturne-angel-set",
   "productManifestPath": "Assets/GenWorks/siroino-nocturne-angel-set/ProductManifest.json",
   "buildScript": "tools/siroino_nocturne_angel_set.py",
@@ -47,8 +47,8 @@
     "Breasts_L": 0.65
   },
   "garmentPipeline": {
-    "representation": "explicit open multi-ring pattern shells, semantic seams and rigid optional modules",
-    "clothSimulation": "Blender 4.4 cloth on an eight-ring outer skirt with pin group, body collision and self-collision",
+    "representation": "five explicit sewn bodice panels with V neckline and armholes, semantic seams, cloth skirt and rigid optional modules",
+    "clothSimulation": "Blender 4.4 cloth on an eight-ring outer skirt with pin group, body collision and self-collision; baked result follows Hips as a stable module",
     "bodyTopologyCopied": false,
     "moduleGroups": ["core", "head", "back", "legs", "accessories"]
   },
@@ -79,6 +79,7 @@
     "Assets/GenWorks/siroino-nocturne-angel-set/Tests/fit-audit.json",
     "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review.json",
     "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v1.json",
+    "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v2.json",
     "Assets/GenWorks/siroino-nocturne-angel-set/Previews/front.png",
     "Assets/GenWorks/siroino-nocturne-angel-set/Previews/back.png",
     "Assets/GenWorks/siroino-nocturne-angel-set/Previews/left.png",
