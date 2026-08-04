@@ -5,36 +5,41 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-GENERATOR_PATH = ROOT / "tools" / "siroino_heather_polar_yoke_v26.py"
+GENERATOR_PATH = ROOT / "tools" / "siroino_heather_closed_components_v27.py"
 PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_product.py"
 RETIRED_PATHS = (
     ROOT / "tools" / "siroino_heather_hooded_v21_patch.py",
     ROOT / "tools" / "siroino_heather_lobomap_fit.py",
     ROOT / "tools" / "siroino_heather_template_cage_v24.py",
     ROOT / "tools" / "siroino_heather_cross_section_cage_v25.py",
+    ROOT / "tools" / "siroino_heather_polar_yoke_v26.py",
 )
 
 
-class GarmentGeometryAngularPolarYokeTests(unittest.TestCase):
+class GarmentGeometryClosedComponentsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.generator = GENERATOR_PATH.read_text(encoding="utf-8")
         cls.product = PRODUCT_PATH.read_text(encoding="utf-8")
         cls.tree = ast.parse(cls.generator, filename=str(GENERATOR_PATH))
 
-    def test_active_product_installs_angular_polar_yoke(self) -> None:
+    def test_active_product_installs_closed_components(self) -> None:
         self.assertIn(
-            "import siroino_heather_polar_yoke_v26 as polar_yoke",
+            "import siroino_heather_closed_components_v27 as closed_components",
             self.product,
         )
         self.assertLess(
-            self.product.index("polar_yoke.install(pattern)"),
+            self.product.index("closed_components.install(pattern)"),
             self.product.index("DESIGN_REVISION = pattern.DESIGN_REVISION"),
         )
-        self.assertNotIn("cross_section_cage.install(pattern)", self.product)
-        self.assertNotIn("template_cage.install(pattern)", self.product)
-        self.assertNotIn("v21.install(pattern)", self.product)
-        self.assertNotIn("lobomap.install(pattern)", self.product)
+        for token in (
+            "polar_yoke.install(pattern)",
+            "cross_section_cage.install(pattern)",
+            "template_cage.install(pattern)",
+            "v21.install(pattern)",
+            "lobomap.install(pattern)",
+        ):
+            self.assertNotIn(token, self.product)
 
     def test_superseded_fit_modules_are_removed(self) -> None:
         for path in RETIRED_PATHS:
@@ -49,49 +54,54 @@ class GarmentGeometryAngularPolarYokeTests(unittest.TestCase):
         }
         self.assertFalse(
             any(name.startswith("siroino_") for name in imports),
-            "The polar-yoke module must not add another internal import level",
+            "The closed-components module must not add another internal import level",
         )
         self.assertIn("pattern: ModuleType", self.generator)
 
-    def test_primary_surface_uses_height_by_angle_radius_field(self) -> None:
-        self.assertIn("class PolarBodyProfile", self.generator)
-        self.assertIn("HEIGHT_SAMPLES = 50", self.generator)
-        self.assertIn("ANGLE_COUNT = 72", self.generator)
-        self.assertIn("_angle_distance(angle, theta)", self.generator)
-        self.assertIn("radii = _circular_average", self.generator)
-        self.assertIn("field[level][angle_index] = value", self.generator)
-        self.assertIn("point = profile.point(z, theta", self.generator)
+    def test_primary_surface_retains_height_by_angle_radius_field(self) -> None:
+        for token in (
+            "class PolarBodyProfile",
+            "HEIGHT_SAMPLES = 50",
+            "ANGLE_COUNT = 72",
+            "_angle_distance(angle, theta)",
+            "_circular_average(_circular_average(radii, 2), 2)",
+            "field[level][angle_index] = value",
+            "point = profile.point(z, theta",
+        ):
+            self.assertIn(token, self.generator)
 
-    def test_torso_integrates_yoke_and_neck_ring(self) -> None:
-        self.assertIn("def _side_strength(theta: float)", self.generator)
-        self.assertIn("shoulder_boost = 0.044", self.generator)
-        self.assertIn("neck_start = len(vertices)", self.generator)
-        self.assertIn("0.071 * math.cos(theta)", self.generator)
+    def test_underbody_is_an_eleven_column_surface_saddle(self) -> None:
+        self.assertIn("offsets = tuple(range(-10, 11, 2))", self.generator)
+        self.assertIn("longitudinal_steps = 16", self.generator)
+        self.assertIn("point.z -= 0.024 * math.sin(math.pi * t)", self.generator)
+        self.assertIn('obj["pelvicSaddleColumns"] = len(front_row)', self.generator)
+        self.assertIn('"pelvicSaddleColumns": 11', self.generator)
 
-    def test_underbody_is_shorter_wider_shared_edge_gusset(self) -> None:
-        self.assertIn("return 0.625 + 0.180 * (side**1.60)", self.generator)
-        self.assertIn("half_span = 4", self.generator)
-        self.assertIn("steps = 16", self.generator)
-        self.assertIn("point.z -= 0.018 * math.sin(math.pi * t)", self.generator)
-
-    def test_sleeves_are_reduced_and_extended_beneath_yoke(self) -> None:
+    def test_sleeve_caps_overlap_the_yoke(self) -> None:
         self.assertIn('f"UpperArm_{side}"', self.generator)
         self.assertIn('f"LowerArm_{side}"', self.generator)
+        self.assertIn("shoulder_inner = upper_head - direction * 0.055", self.generator)
+        self.assertIn("radius = 0.056 - 0.017", self.generator)
+        self.assertIn("minimum_clearance=0.010", self.generator)
+
+    def test_hood_is_a_low_folded_back_shell(self) -> None:
+        self.assertIn("def _folded_back_hood(", self.generator)
+        self.assertIn("columns = 40", self.generator)
+        self.assertIn("rows = 9", self.generator)
+        self.assertIn("theta = math.pi * column / (columns - 1)", self.generator)
         self.assertIn(
-            "shoulder_inner = upper_head - upper_direction * 0.030", self.generator
+            'obj["hoodConstruction"] = "low folded-back hood shell attached around rear neck"',
+            self.generator,
         )
-        self.assertIn("radius = 0.039 - 0.013 * _smoothstep(t)", self.generator)
 
-    def test_hood_is_a_three_dimensional_open_front_shell(self) -> None:
-        self.assertIn("def _open_front_hood(", self.generator)
-        self.assertIn("theta_start = -math.pi / 4.0", self.generator)
-        self.assertIn("theta_end = 5.0 * math.pi / 4.0", self.generator)
-        self.assertIn('"three-dimensional open-front polar hood shell"', self.generator)
-
-    def test_body_is_reference_not_topology_source(self) -> None:
-        self.assertIn('obj["bodyTopologyCopied"] = False', self.generator)
-        self.assertIn('obj["ellipseOnlyProfileUsed"] = False', self.generator)
-        self.assertNotIn("BVHTree.FromPolygons", self.generator)
+    def test_clearance_projection_occurs_after_topology_creation(self) -> None:
+        self.assertLess(
+            self.generator.index("mesh.from_pydata(vertices, [], faces)"),
+            self.generator.index("_enforce_clearance(obj, body_tree, minimum_clearance)"),
+        )
+        self.assertIn("maximum_step: float = 0.040", self.generator)
+        self.assertIn("BVHTree.FromPolygons", self.generator)
+        self.assertIn('"bodyTopologyCopied": False', self.generator)
         self.assertNotIn("_selected_polygons", self.generator)
 
 
