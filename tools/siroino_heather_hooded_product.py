@@ -206,9 +206,7 @@ def enforce_manifest_contract(original):
             rejected = report.setdefault("rejectedHistory", [])
             existing = {item.get("revision") for item in rejected}
             rejected.extend(
-                item
-                for item in REJECTED_REVISIONS
-                if item["revision"] not in existing
+                item for item in REJECTED_REVISIONS if item["revision"] not in existing
             )
             report_path.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n",
