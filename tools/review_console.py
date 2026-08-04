@@ -108,7 +108,9 @@ def policy_requirements(policy: dict[str, Any]) -> tuple[list[str], list[str]]:
         views = pick(views, "required", "names", default=list(DEFAULT_VIEWS))
     if isinstance(poses, dict):
         poses = pick(poses, "required", "names", default=[])
-    return [str(item) for item in as_list(views)], [str(item) for item in as_list(poses)]
+    return [str(item) for item in as_list(views)], [
+        str(item) for item in as_list(poses)
+    ]
 
 
 def locate_image(directory: Path, name: str) -> Path | None:
@@ -191,8 +193,12 @@ class Product:
     evidence: list[Evidence]
 
 
-def parse_gate_rows(manifest: dict[str, Any], workspace: Path, output_dir: Path) -> list[Gate]:
-    raw: Any = pick(manifest, "gates", "gate_results", "checks", "validation", default=[])
+def parse_gate_rows(
+    manifest: dict[str, Any], workspace: Path, output_dir: Path
+) -> list[Gate]:
+    raw: Any = pick(
+        manifest, "gates", "gate_results", "checks", "validation", default=[]
+    )
     if isinstance(raw, dict):
         raw = [
             {"name": name, **(value if isinstance(value, dict) else {"status": value})}
@@ -206,7 +212,12 @@ def parse_gate_rows(manifest: dict[str, Any], workspace: Path, output_dir: Path)
             detail = str(pick(item, "message", "reason", "detail", default=""))
             raw_path = pick(item, "path", "file", "log")
         else:
-            name, status, detail, raw_path = f"gate-{index}", status_text(item), "", None
+            name, status, detail, raw_path = (
+                f"gate-{index}",
+                status_text(item),
+                "",
+                None,
+            )
         href: str | None = None
         if raw_path:
             candidate = workspace / str(raw_path)
@@ -216,17 +227,30 @@ def parse_gate_rows(manifest: dict[str, Any], workspace: Path, output_dir: Path)
     return result
 
 
-def parse_evidence_rows(manifest: dict[str, Any], workspace: Path, output_dir: Path) -> list[Evidence]:
-    raw = as_list(pick(manifest, "evidence", "artifacts", "proof", "review_evidence", default=[]))
+def parse_evidence_rows(
+    manifest: dict[str, Any], workspace: Path, output_dir: Path
+) -> list[Evidence]:
+    raw = as_list(
+        pick(manifest, "evidence", "artifacts", "proof", "review_evidence", default=[])
+    )
     result: list[Evidence] = []
     for index, item in enumerate(raw, start=1):
         if isinstance(item, dict):
-            label = str(pick(item, "label", "title", "name", "type", default=f"evidence-{index}"))
+            label = str(
+                pick(
+                    item, "label", "title", "name", "type", default=f"evidence-{index}"
+                )
+            )
             status = status_text(pick(item, "status", "state", "result"))
             raw_target = pick(item, "url", "href", "path", "file")
             expected_hash = pick(item, "sha256", "hash")
         else:
-            label, status, raw_target, expected_hash = f"evidence-{index}", "UNKNOWN", item, None
+            label, status, raw_target, expected_hash = (
+                f"evidence-{index}",
+                "UNKNOWN",
+                item,
+                None,
+            )
         href: str | None = None
         actual_hash: str | None = None
         if raw_target:
@@ -240,7 +264,14 @@ def parse_evidence_rows(manifest: dict[str, Any], workspace: Path, output_dir: P
                     actual_hash = digest(candidate)
         if expected_hash and actual_hash and str(expected_hash) != actual_hash:
             status = "HASH_MISMATCH"
-        result.append(Evidence(label=label, status=status, href=href, sha256=actual_hash or str(expected_hash or "") or None))
+        result.append(
+            Evidence(
+                label=label,
+                status=status,
+                href=href,
+                sha256=actual_hash or str(expected_hash or "") or None,
+            )
+        )
     return result
 
 
@@ -254,7 +285,9 @@ def collect_product(
     manifest: dict[str, Any] = load_json(manifest_path, {})
     blockers = [
         {"severity": issue_severity(item), "message": issue_message(item)}
-        for item in as_list(pick(manifest, "blockers", "defects", "issues", "findings", default=[]))
+        for item in as_list(
+            pick(manifest, "blockers", "defects", "issues", "findings", default=[])
+        )
         if open_issue(item)
     ]
     assets: list[Asset] = []
@@ -287,7 +320,9 @@ def collect_product(
     review = pick(manifest, "human_review", "review", default={})
     updated_at = pick(manifest, "updated_at", "last_updated", "generated_at")
     if not updated_at and manifest_path.exists():
-        updated_at = datetime.fromtimestamp(manifest_path.stat().st_mtime, timezone.utc).isoformat()
+        updated_at = datetime.fromtimestamp(
+            manifest_path.stat().st_mtime, timezone.utc
+        ).isoformat()
     return Product(
         slug=workspace.name,
         state=safe_state(manifest),
@@ -354,7 +389,9 @@ def build(root: Path, output: Path) -> dict[str, Any]:
     if product_root.is_dir():
         for workspace in sorted(product_root.iterdir()):
             if workspace.is_dir() and (workspace / "ProductManifest.json").is_file():
-                products.append(collect_product(workspace, output, required_views, required_poses))
+                products.append(
+                    collect_product(workspace, output, required_views, required_poses)
+                )
     data = {
         "schema_version": "review-console.v2",
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -373,7 +410,9 @@ def build(root: Path, output: Path) -> dict[str, Any]:
 
 def serve(root: Path, port: int) -> None:
     os.chdir(root)
-    with socketserver.ThreadingTCPServer(("127.0.0.1", port), SimpleHTTPRequestHandler) as server:
+    with socketserver.ThreadingTCPServer(
+        ("127.0.0.1", port), SimpleHTTPRequestHandler
+    ) as server:
         print(f"Review console: http://127.0.0.1:{port}/.image2outfit/review-console/")
         server.serve_forever()
 
@@ -381,7 +420,9 @@ def serve(root: Path, port: int) -> None:
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
-    parser.add_argument("--output", type=Path, default=Path(".image2outfit/review-console"))
+    parser.add_argument(
+        "--output", type=Path, default=Path(".image2outfit/review-console")
+    )
     parser.add_argument("--serve", action="store_true")
     parser.add_argument("--port", type=int, default=8765)
     return parser.parse_args(argv)
