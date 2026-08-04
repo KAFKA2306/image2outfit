@@ -1,33 +1,48 @@
 from __future__ import annotations
 
 import ast
-import json
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
-PATCH_PATH = ROOT / "tools" / "siroino_heather_hooded_v21_patch.py"
+GENERATOR_PATH = ROOT / "tools" / "siroino_heather_closed_components_v27.py"
 PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_product.py"
-LOBOMAP_PATH = ROOT / "tools" / "siroino_heather_lobomap_fit.py"
-JOB_PATH = ROOT / "config" / "products" / "siroino-heather-hooded-bodysuit" / "job.json"
+RETIRED_PATHS = (
+    ROOT / "tools" / "siroino_heather_hooded_v21_patch.py",
+    ROOT / "tools" / "siroino_heather_lobomap_fit.py",
+    ROOT / "tools" / "siroino_heather_smooth_surface_repair.py",
+    ROOT / "tools" / "siroino_heather_side_aware_fairing.py",
+)
 
 
-class GarmentGeometryV22BodyAnchorTests(unittest.TestCase):
+class GarmentGeometryClosedComponentsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.patch = PATCH_PATH.read_text(encoding="utf-8")
+        cls.generator = GENERATOR_PATH.read_text(encoding="utf-8")
         cls.product = PRODUCT_PATH.read_text(encoding="utf-8")
-        cls.lobomap = LOBOMAP_PATH.read_text(encoding="utf-8")
-        cls.job = json.loads(JOB_PATH.read_text(encoding="utf-8"))
-        cls.tree = ast.parse(cls.patch, filename=str(PATCH_PATH))
+        cls.tree = ast.parse(cls.generator, filename=str(GENERATOR_PATH))
 
-    def test_active_product_installs_flat_patch(self) -> None:
-        self.assertIn("import siroino_heather_hooded_v21_patch as v21", self.product)
+    def test_active_product_installs_closed_components(self) -> None:
+        self.assertIn(
+            "import siroino_heather_closed_components_v27 as closed_components",
+            self.product,
+        )
         self.assertLess(
-            self.product.index("v21.install(pattern)"),
+            self.product.index("closed_components.install(pattern)"),
             self.product.index("DESIGN_REVISION = pattern.DESIGN_REVISION"),
         )
+        for token in (
+            "v21.install(pattern)",
+            "lobomap.install(pattern)",
+            "repair.install(pattern)",
+        ):
+            self.assertNotIn(token, self.product)
+
+    def test_superseded_fit_modules_are_removed(self) -> None:
+        for path in RETIRED_PATHS:
+            self.assertFalse(path.exists(), str(path))
+
+    def test_generator_has_one_internal_pattern_parameter(self) -> None:
         imports = {
             alias.name
             for node in self.tree.body
@@ -36,70 +51,54 @@ class GarmentGeometryV22BodyAnchorTests(unittest.TestCase):
         }
         self.assertFalse(
             any(name.startswith("siroino_") for name in imports),
-            "The flat patch must not add another internal import level",
+            "The closed-components module must not add another internal import level",
+        )
+        self.assertIn("pattern: ModuleType", self.generator)
+
+    def test_primary_surface_uses_height_by_angle_radius_field(self) -> None:
+        for token in (
+            "class PolarBodyProfile",
+            "HEIGHT_SAMPLES = 50",
+            "ANGLE_COUNT = 72",
+            "_angle_distance(angle, theta)",
+            "_circular_average(_circular_average(radii, 2), 2)",
+            "field[level][angle_index] = value",
+            "point = profile.point(z, theta",
+        ):
+            self.assertIn(token, self.generator)
+
+    def test_underbody_is_an_eleven_column_surface_saddle(self) -> None:
+        self.assertIn("offsets = tuple(range(-10, 11, 2))", self.generator)
+        self.assertIn("longitudinal_steps = 18", self.generator)
+        self.assertIn("point.z -= 0.035 * math.sin(math.pi * t)", self.generator)
+        self.assertIn('obj["pelvicSaddleColumns"] = len(front_row)', self.generator)
+        self.assertIn('"pelvicSaddleColumns": 11', self.generator)
+
+    def test_sleeve_caps_overlap_the_yoke(self) -> None:
+        self.assertIn('f"UpperArm_{side}"', self.generator)
+        self.assertIn('f"LowerArm_{side}"', self.generator)
+        self.assertIn("shoulder_inner = upper_head - direction * 0.058", self.generator)
+        self.assertIn("radius = 0.058 - 0.019", self.generator)
+
+    def test_hood_is_a_low_folded_back_shell(self) -> None:
+        self.assertIn("def _folded_back_hood(", self.generator)
+        self.assertIn("columns = 40", self.generator)
+        self.assertIn("rows = 9", self.generator)
+        self.assertIn("theta = math.pi * column / (columns - 1)", self.generator)
+        self.assertIn(
+            '"low folded-back hood shell attached around the rear neck"',
+            self.generator,
         )
 
-    def test_job_retains_dama_anchor_and_lobomap_as_v25_preconditioners(self) -> None:
-        self.assertEqual(
-            self.job["buildRevision"],
-            "v25-side-aware-taubin-shell",
-        )
-        self.assertEqual(
-            self.job["buildScript"],
-            "tools/siroino_heather_hooded_product.py",
-        )
-        self.assertIn("v21.install(pattern)", self.product)
-        self.assertIn("lobomap.install(pattern)", self.product)
+    def test_clearance_projection_occurs_after_topology_creation(self) -> None:
         self.assertLess(
-            self.product.index("v21.install(pattern)"),
-            self.product.index("lobomap.install(pattern)"),
+            self.generator.index("mesh.from_pydata(vertices, [], faces)"),
+            self.generator.index("_enforce_clearance("),
         )
-        self.assertIn("repair.install(pattern)", self.lobomap)
-        self.assertLess(
-            self.lobomap.index("pattern.create_outfit = create_outfit"),
-            self.lobomap.index("repair.install(pattern)"),
-        )
-
-    def test_underbody_strip_reaches_below_v20_cutoff(self) -> None:
-        self.assertIn("0.515 <= center.z <= 0.850", self.patch)
-        self.assertIn("(z - 0.515) / (0.850 - 0.515)", self.patch)
-        self.assertIn("0.024 + 0.141 * _smoothstep(t)", self.patch)
-
-    def test_body_anchor_clearance_is_positive_and_bounded(self) -> None:
-        self.assertIn("SHELL_CLEARANCE_M = 0.022", self.patch)
-        self.assertIn("MIN_ANCHOR_OFFSET_M = 0.018", self.patch)
-        self.assertIn("MAX_ANCHOR_OFFSET_M = 0.026", self.patch)
-        self.assertIn("allOffsetsStrictlyPositive", self.patch)
-
-    def test_body_anchor_representation_is_persisted(self) -> None:
-        self.assertIn('"body_anchor_triangle"', self.patch)
-        self.assertIn('"body_anchor_barycentric"', self.patch)
-        self.assertIn('"body_anchor_offset_m"', self.patch)
-        self.assertIn("BVHTree.FromPolygons", self.patch)
-        self.assertIn("_barycentric_coordinates", self.patch)
-
-    def test_offset_field_is_smoothed_without_raw_position_laplacian(self) -> None:
-        self.assertIn("OFFSET_SMOOTH_FACTOR = 0.35", self.patch)
-        self.assertIn("OFFSET_SMOOTH_ITERATIONS = 4", self.patch)
-        self.assertIn("_smooth_offsets", self.patch)
-        self.assertNotIn('shrinkwrap.wrap_method = "NEAREST_SURFACEPOINT"', self.patch)
-
-    def test_research_trial_is_written_truthfully(self) -> None:
-        self.assertIn('"status": "EXECUTED"', self.patch)
-        self.assertIn('"authorsImplementationExecuted": False', self.patch)
-        self.assertIn('"copiedFromOfficialCode": False', self.patch)
-        self.assertIn("https://arxiv.org/abs/2605.21001", self.patch)
-        self.assertIn("dama-body-anchor-trial.json", self.patch)
-
-    def test_hood_roll_is_slim_and_body_clear(self) -> None:
-        self.assertIn("0.074 + 0.012 * center_weight", self.patch)
-        self.assertIn("0.0065", self.patch)
-        self.assertIn("0.128 * lateral", self.patch)
-
-    def test_v20_failure_is_preserved_as_evidence(self) -> None:
-        self.assertIn('"v20-semantic-five-opening-highcut-shell"', self.product)
-        self.assertIn("396 shell overlaps in crouch", self.product)
-        self.assertIn("636 in sit", self.product)
+        self.assertIn("maximum_step: float = 0.040", self.generator)
+        self.assertIn("BVHTree.FromPolygons", self.generator)
+        self.assertIn('"bodyTopologyCopied": False', self.generator)
+        self.assertNotIn("_selected_polygons", self.generator)
 
 
 if __name__ == "__main__":
