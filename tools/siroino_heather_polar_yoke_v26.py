@@ -221,7 +221,10 @@ class PolarBodyProfile:
             "heightSamples": len(self.levels),
             "angleSamples": ANGLE_COUNT,
             "sourceVertexCount": len(self.points),
-            "centerYRangeM": [round(min(self.center_y), 6), round(max(self.center_y), 6)],
+            "centerYRangeM": [
+                round(min(self.center_y), 6),
+                round(max(self.center_y), 6),
+            ],
             "radiusRangeM": [round(min(flat), 6), round(max(flat), 6)],
         }
 
