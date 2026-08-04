@@ -22,7 +22,7 @@
   "panels": [
     {
       "id": "front-upper",
-      "object": "Heather_Front_Upper_Panel",
+      "object": "Heather_Body_Shell",
       "semantic": "torso-front",
       "uvDomain": [
         0,
@@ -33,7 +33,7 @@
     },
     {
       "id": "back-upper",
-      "object": "Heather_Back_Upper_Panel",
+      "object": "Heather_Body_Shell",
       "semantic": "torso-back",
       "uvDomain": [
         0,
@@ -44,7 +44,7 @@
     },
     {
       "id": "front-lower",
-      "object": "Heather_Highcut_Front_Panel",
+      "object": "Heather_Body_Shell",
       "semantic": "pelvis-front",
       "uvDomain": [
         0,
@@ -55,7 +55,7 @@
     },
     {
       "id": "back-lower",
-      "object": "Heather_Highcut_Back_Panel",
+      "object": "Heather_Body_Shell",
       "semantic": "pelvis-back",
       "uvDomain": [
         0,
@@ -66,7 +66,7 @@
     },
     {
       "id": "sleeve-l",
-      "object": "Heather_Long_Sleeve_L",
+      "object": "Heather_Body_Shell",
       "semantic": "sleeve-left",
       "uvDomain": [
         0,
@@ -77,7 +77,7 @@
     },
     {
       "id": "sleeve-r",
-      "object": "Heather_Long_Sleeve_R",
+      "object": "Heather_Body_Shell",
       "semantic": "sleeve-right",
       "uvDomain": [
         0,
@@ -88,7 +88,7 @@
     },
     {
       "id": "cuff-l",
-      "object": "Heather_Rib_Cuff_L",
+      "object": "Heather_Body_Shell",
       "semantic": "cuff-left",
       "uvDomain": [
         0,
@@ -99,7 +99,7 @@
     },
     {
       "id": "cuff-r",
-      "object": "Heather_Rib_Cuff_R",
+      "object": "Heather_Body_Shell",
       "semantic": "cuff-right",
       "uvDomain": [
         0,
@@ -110,7 +110,7 @@
     },
     {
       "id": "hood-l",
-      "object": "Heather_Hood_Back_Drape_L",
+      "object": "Heather_Hood_Folded_Roll",
       "semantic": "hood-left",
       "uvDomain": [
         0,
@@ -121,7 +121,7 @@
     },
     {
       "id": "hood-r",
-      "object": "Heather_Hood_Back_Drape_R",
+      "object": "Heather_Hood_Folded_Roll",
       "semantic": "hood-right",
       "uvDomain": [
         0,
@@ -132,7 +132,7 @@
     },
     {
       "id": "hood-edge",
-      "object": "Heather_Hood_Cowl",
+      "object": "Heather_Hood_Folded_Roll",
       "semantic": "collar",
       "uvDomain": [
         0,
@@ -217,10 +217,14 @@
     ]
   ],
   "separateGeometry": [
+    "Heather_Body_Shell",
+    "Heather_Hood_Folded_Roll",
     "Heather_Henley_Placket",
-    "Heather_Henley_Button_01..03",
-    "Heather_Drawcords_And_Side_Ties",
-    "Heather_Editable_Seams"
+    "Heather_Henley_Button_01",
+    "Heather_Henley_Button_02",
+    "Heather_Henley_Button_03",
+    "Heather_Hood_Drawcord_L",
+    "Heather_Hood_Drawcord_R"
   ],
   "acceptance": {
     "panelCountMinimum": 11,
@@ -229,5 +233,6 @@
     "leftRightHoodSeparated": true,
     "seamPairsMinimum": 18,
     "semanticTrialPass": true
-  }
+  },
+  "designRevision": "v23-dama-anchor-lobomap-residual-fit"
 }

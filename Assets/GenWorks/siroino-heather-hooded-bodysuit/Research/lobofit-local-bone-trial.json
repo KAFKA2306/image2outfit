@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "paper": {
+    "title": "LoBoFit: Flexible Garment Refitting via Local Bone Mapping Blending",
+    "url": "https://arxiv.org/abs/2605.07450",
+    "published": "2026-05-08",
+    "license": "CC BY-NC-ND 4.0",
+    "officialCode": "https://github.com/MengZephyr/LoBoFit",
+    "officialCodeLicense": "BSD-3-Clause"
+  },
+  "implementation": {
+    "kind": "independent LoBoFit-inspired deterministic prototype",
+    "authorsImplementationExecuted": false,
+    "authorsCodeCopied": false,
+    "target": "SiroinoSotai_PC",
+    "object": "Heather_Body_Shell",
+    "representation": "body-relative residuals encoded in the local frames of the four strongest garment bones, locally smoothed and blended back",
+    "clearanceM": 0.022,
+    "maximumWorldDisplacementM": 0.004,
+    "iterations": 6,
+    "boundaryStrength": 0.12,
+    "interiorStrength": 0.38,
+    "targetPull": 0.55,
+    "requirements": "Blender 4.4.3, Python 3.11, bpy, mathutils BVHTree",
+    "officialCodeLocated": true,
+    "officialCodeExecuted": false
+  },
+  "metrics": {
+    "vertexCount": 68729,
+    "boundaryVertexCount": 960,
+    "bodyDistanceBeforeM": {
+      "minimum": 0.0007392550469376147,
+      "mean": 0.02128389359607263,
+      "maximum": 0.022538073360919952
+    },
+    "bodyDistanceAfterM": {
+      "minimum": 0.004738472904194332,
+      "mean": 0.021504046273315987,
+      "maximum": 0.022031923752174172
+    },
+    "signedClearanceAfterM": {
+      "minimum": 0.004734241412819529,
+      "mean": 0.021463756386198015,
+      "maximum": 0.02203076658770442
+    },
+    "worldDisplacementM": {
+      "minimum": 9.434035656551001e-07,
+      "mean": 0.0009634059353793652,
+      "maximum": 0.00400000083941411
+    },
+    "localResidualEdgeRmsBeforeM": 0.0035477231084656544,
+    "localResidualEdgeRmsAfterM": 0.0029748159515982156,
+    "verticesBelow75PercentClearance": 1392,
+    "localResidualEdgeRmsReductionPercent": 16.148587117758858
+  },
+  "expectedEffect": "reduce locally incoherent shell offsets around shoulders, hips, crotch and openings without globally shrinking the garment",
+  "failureConditions": [
+    "topology or five anatomical openings change",
+    "maximum displacement exceeds the configured bound",
+    "signed body clearance falls below 75 percent of the target",
+    "actual five-view or pose renders show worse silhouette or penetration"
+  ],
+  "adoptionDecision": "METRIC_SUCCESS_VISUAL_REJECTION",
+  "visualReview": {
+    "result": "FAIL",
+    "hostedWorkflowRun": 30927279567,
+    "artifactId": 8900069602,
+    "evidence": [
+      "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+      "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+      "Tests/visual-review.json"
+    ],
+    "finding": "Local residual roughness improved, but the current base shell still has long crotch tabs, shoulder protrusions, a loose tunic silhouette, unfinished openings, surface defects and pose failures."
+  }
+}
