@@ -3,7 +3,7 @@
   "id": "siroino-heather-hooded-bodysuit",
   "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
   "adapterId": "siroino-v1.0",
-  "buildRevision": "v22-dama-inspired-body-anchored-shell",
+  "buildRevision": "v23-dama-anchor-lobomap-residual-fit",
   "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
   "productManifestPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
   "buildScript": "tools/siroino_heather_hooded_product.py",
@@ -19,17 +19,26 @@
     "strategy": "repository-search",
     "profile": "SiroinoSotai_PC neutral official body",
     "normalSizeFallbackAllowed": false,
-    "searchRoots": ["Assets"],
-    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"],
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ],
     "prefab": {
-      "extensions": [".prefab"],
+      "extensions": [
+        ".prefab"
+      ],
       "includeRegex": "(?i)(siroino|sotai)",
       "profileRegex": "(?i)SiroinoSotai_PC\\.prefab$",
       "contentRegex": null,
       "preferredRegex": "(?i)SiroinoSotai_PC\\.prefab$"
     },
     "source": {
-      "extensions": [".fbx"],
+      "extensions": [
+        ".fbx"
+      ],
       "includeRegex": "(?i)(siroino|sotai)",
       "profileRegex": "(?i)SiroinoSotai_PC\\.fbx$",
       "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
@@ -37,18 +46,23 @@
     }
   },
   "researchMethod": {
-    "name": "DAMA-inspired Body-Anchored Triangle Projection",
-    "submitted": "2026-05-20T10:39:44Z",
-    "paperUrl": "https://arxiv.org/abs/2605.21001",
-    "projectUrl": "https://danieleskandar.github.io/dama/",
-    "officialCodeUrl": "https://github.com/danieleskandar/DAMA-code",
-    "officialCodeLicense": "MIT",
+    "name": "LoBoFit-inspired Local Bone Mapping Residual Fitting",
+    "submitted": "2026-05-08T08:56:06Z",
+    "paperUrl": "https://arxiv.org/abs/2605.07450",
+    "paperLicense": "CC BY-NC-ND 4.0",
+    "paperLicenseUrl": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "officialCodeUrl": null,
+    "officialCodeStatus": "No official implementation located as of 2026-08-05",
     "authorsImplementationExecuted": false,
-    "executionRequirements": "Blender Python standard APIs; no model, checkpoint, dataset or GPU training",
-    "trialScope": "Independent mesh adaptation of body-triangle barycentric coordinates and strictly positive normal offsets; official Gaussian implementation is not copied or executed"
+    "executionRequirements": "Blender 4.4.3, Python 3.11, bpy and mathutils BVHTree; no GPU, model, checkpoint or training dataset",
+    "trialScope": "Independent deterministic four-bone local residual representation and bounded refinement, executed after the DAMA-inspired body-triangle anchor preconditioner; authors' implementation is not copied or executed"
   },
   "licenseEvidence": "config/products/siroino-heather-hooded-bodysuit/license.json",
-  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "privateSourceRoots": [
+    "Assets/_Local",
+    "Assets/_Vendor",
+    "Assets/SiroinoWorks"
+  ],
   "deliveryAssets": [
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/README.md",
@@ -56,6 +70,7 @@
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Documentation/pattern-spec.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/seam-correspondence-graph-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/geometry-diagnostics.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
