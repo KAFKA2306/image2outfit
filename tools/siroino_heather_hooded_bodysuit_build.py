@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Build the SiroinoSotai_PC heather hooded high-cut bodysuit."""
+
 from __future__ import annotations
 
 import json
@@ -61,15 +62,19 @@ def limit_bone_influences(
             ]
             if len(assignments) <= maximum:
                 continue
-            ranked = sorted(assignments, key=lambda item: item[1], reverse=True)[
-                :maximum
-            ]
+            ranked = sorted(
+                assignments,
+                key=lambda item: item[1],
+                reverse=True,
+            )[:maximum]
             total = sum(weight for _, weight in ranked) or 1.0
             for group_name, _ in assignments:
                 obj.vertex_groups[group_name].remove([vertex.index])
             for group_name, weight in ranked:
                 obj.vertex_groups[group_name].add(
-                    [vertex.index], weight / total, "REPLACE"
+                    [vertex.index],
+                    weight / total,
+                    "REPLACE",
                 )
             affected += 1
         pruned[obj.name] = affected
@@ -116,7 +121,10 @@ def write_report_and_manifest(
             "semanticGraphF1": research_trial["semanticGraph"]["metrics"]["f1"],
             "deltaF1": research_trial["deltaF1"],
             "evidence": str(research_path.relative_to(ROOT)).replace("\\", "/"),
-            "patternContract": str(pattern_path.relative_to(ROOT)).replace("\\", "/"),
+            "patternContract": str(pattern_path.relative_to(ROOT)).replace(
+                "\\",
+                "/",
+            ),
         },
         "views": {
             name: {
@@ -138,22 +146,21 @@ def write_report_and_manifest(
             },
             {
                 "revision": "v3-body-weighted-fitted-sleeves",
-                "reason": "elbow gaps, lateral hood wings and bifurcated lower panel",
+                "reason": ("elbow gaps, lateral hood wings and bifurcated lower panel"),
             },
             {
                 "revision": "v5-rounded-hood-pointed-highcut",
-                "reason": "visual inspection found inflated sleeves, short cuffs, a wide neckline and detached shield-like rear hood",
+                "reason": (
+                    "visual inspection found inflated sleeves, short cuffs, a wide "
+                    "neckline and detached shield-like rear hood"
+                ),
             },
         ],
         "notes": [
             "The garment is fitted to the tracked SiroinoSotai_PC FBX.",
-            "Sleeves are continuous shoulder-to-hand tubes with separate wrist cuffs.",
-            "The hood is split into left and right editable shell panels with a central seam and rolled neck edge.",
-            "The lower front and back are sharply tapered sampled body-surface panels.",
-            "Buttons, Henley placket, drawcords, side ties and visible seams are separate geometry.",
             "All exported vertices are limited to four normalized bone influences.",
             "Five views are actual Blender Cycles renders of generated geometry.",
-            "The 2026 paper's code, learned model, weights and dataset were not used; the trial is an independent deterministic ablation.",
+            "The 2026 paper trial is an independent deterministic ablation.",
             "Required pose, Unity and runtime review remain separate gates.",
         ],
     }
@@ -197,7 +204,9 @@ def write_report_and_manifest(
         "technicalGates": {
             "standardTargetResolved": "PASS",
             "blender": "PASS" if passed else "FAIL",
-            "fbx": "PASS" if base.repo_path(job["fbxAssetPath"]).is_file() else "FAIL",
+            "fbx": (
+                "PASS" if base.repo_path(job["fbxAssetPath"]).is_file() else "FAIL"
+            ),
             "fiveViewRender": (
                 "PASS" if all(path.is_file() for path in previews.values()) else "FAIL"
             ),
@@ -222,7 +231,9 @@ def write_report_and_manifest(
             "prefab": job["prefabAssetPath"],
             "integratedPrefab": job["integratedPrefabAssetPath"],
             "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"),
-            "poseReview": f"{job['productRoot']}/Previews/{job['id']}-pose-review.webp",
+            "poseReview": (
+                f"{job['productRoot']}/Previews/{job['id']}-pose-review.webp"
+            ),
             "fitAudit": f"{job['productRoot']}/Tests/fit-audit.json",
         },
         "research": report["researchTrial"],
@@ -253,9 +264,7 @@ def main() -> int:
         for obj in bpy.context.scene.objects
         if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
     )
-    armature = next(
-        obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"
-    )
+    armature = next(obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE")
     armature.name = "SiroinoSotai_Armature"
     if body.data.shape_keys:
         for key in body.data.shape_keys.key_blocks:
@@ -293,10 +302,24 @@ def main() -> int:
     sidecars = base.write_unity_sidecars(fbx_path, prefab_path, job["productName"])
     evidence.write_integrated_prefab(job, sidecars)
     measured = base.metrics(garments)
+
+    required_objects = {
+        "Heather_Body_Shell",
+        "Heather_Hood_Folded_Roll",
+        "Heather_Henley_Placket",
+        "Heather_Henley_Button_01",
+        "Heather_Henley_Button_02",
+        "Heather_Henley_Button_03",
+        "Heather_Hood_Drawcord_L",
+        "Heather_Hood_Drawcord_R",
+    }
+    garment_names = {obj.name for obj in garments if obj.type == "MESH"}
+    missing_objects = sorted(required_objects - garment_names)
     passed = (
-        measured["meshObjects"] >= 14
-        and measured["vertices"] > 3000
-        and measured["triangles"] > 4500
+        not missing_objects
+        and measured["meshObjects"] >= len(required_objects)
+        and measured["vertices"] > 6000
+        and measured["triangles"] > 12000
         and measured["unweightedVertices"] == 0
         and measured["weightSumErrors"] == 0
         and measured["degenerateTriangles"] == 0
@@ -336,6 +359,7 @@ def main() -> int:
             {
                 "passed": passed,
                 "designRevision": DESIGN_REVISION,
+                "missingRequiredObjects": missing_objects,
                 "metrics": measured,
                 "researchTrial": research_trial["result"],
             },

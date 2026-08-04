@@ -1,42 +1,49 @@
 {
-  "schemaVersion": 1,
-  "checkedAt": "2026-08-03T07:15:00+09:00",
+  "schemaVersion": 2,
+  "designRevision": "v21-pose-clear-underbody-five-opening-shell",
+  "checkedAt": null,
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "result": "FAIL",
+  "result": "PENDING_CURRENT_REVISION_REVIEW",
   "releaseDecision": "WORKING_CHECKPOINT_ONLY",
   "evidence": {
     "multiview": "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
     "poseReview": "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
     "fitAudit": "Tests/fit-audit.json"
   },
-  "blockingFindings": [
-    {
-      "zone": "shoulder/underarm",
-      "finding": "Visible gaps leave the sleeves disconnected from the upper body.",
-      "requiredFix": "Rebuild or bridge the armhole and transfer continuous body weights."
-    },
-    {
-      "zone": "waist/hip crest",
-      "finding": "Rigid triangular fins project from both sides.",
-      "requiredFix": "Replace the transition with a smooth high-cut edge and controlled side ties."
-    },
-    {
-      "zone": "hood/back",
-      "finding": "Back hood panels appear as detached wing-like strips.",
-      "requiredFix": "Build a continuous hood shell with a closed center seam and wearable volume."
-    },
-    {
-      "zone": "all required poses",
-      "finding": "The fit audit reports 8,490 garment/body triangle overlap pairs.",
-      "requiredFix": "Clear the BVH audit or replace it with a validated contact-distance metric."
-    }
-  ],
-  "nonBlockingPasses": [
-    "Five directional renders exist.",
-    "Six required pose renders exist.",
-    "FBX and Blender source were generated.",
-    "Maximum bone influences is four; no unweighted vertices or degenerate triangles were reported.",
-    "The 2026 seam-correspondence metadata trial passed."
+  "previousRevisionReview": {
+    "designRevision": "v20-semantic-five-opening-highcut-shell",
+    "result": "FAIL",
+    "hostedWorkflowRun": 30896458304,
+    "blockingFindings": [
+      {
+        "zone": "front and rear crotch",
+        "finding": "The center strip stopped above the underbody and produced rectangular hanging tabs in both front and rear views."
+      },
+      {
+        "zone": "leg openings and hip silhouette",
+        "finding": "The five anatomical openings were topologically correct, but the opening boundaries remained scalloped and side views retained pointed hip flaps."
+      },
+      {
+        "zone": "upper-back hood roll",
+        "finding": "The roll remained body-intersecting and appeared as three knot-like protrusions; neutral fit audit reported 86 overlap pairs."
+      },
+      {
+        "zone": "six-pose fit",
+        "finding": "All six evaluated poses failed. Shell overlaps were 0 neutral, 3066 arms-up, 1058 arm-cross, 396 crouch, 636 sit and 2155 prone; the new lower strip introduced the crouch and sit failures."
+      }
+    ]
+  },
+  "currentRevisionRequirements": [
+    "Retain exactly the neck, left wrist, right wrist, left leg and right leg complement components and restore every nonanatomical component.",
+    "Extend the narrow lower-body strip to z=0.515 so it wraps under the body instead of ending as visible front and rear tabs.",
+    "Relax four boundary rings for 14 iterations and reproject them at 22 mm clearance to remove scalloped leg and neckline boundaries.",
+    "Require one connected primary shell with exactly five boundary loops before rendering.",
+    "Use a slim continuous folded-hood roll at 74-86 mm body clearance and require zero body intersections.",
+    "Inspect all five directional renders generated from v21.",
+    "Inspect neutral, arms-up, arm-cross, crouch, sit and prone renders generated from v21.",
+    "Require zero evaluated garment/body triangle intersections in every required pose.",
+    "Require no rectangular crotch tabs, hip fins, scalloped opening boundaries, exposed inner arms, detached hood geometry or pose penetration.",
+    "Require the current-revision fit audit and images to agree before PASS."
   ]
 }

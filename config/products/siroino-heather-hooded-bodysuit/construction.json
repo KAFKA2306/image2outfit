@@ -1,34 +1,30 @@
 {
   "schemaVersion": 1,
-  "profile": "panel-sewn",
+  "profile": "fitted",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v6-fitted-sleeves-split-hood-seam-graph",
+  "designRevision": "v22-dama-inspired-body-anchored-shell",
   "panels": [
-    "front-upper",
-    "back-upper",
-    "front-lower",
-    "back-lower",
-    "sleeve-left",
-    "sleeve-right",
-    "cuff-left",
-    "cuff-right",
-    "hood-left",
-    "hood-right",
-    "hood-edge"
+    "evaluated-shape-two-level-subdivided-connected-torso-underbody-weighted-sleeve-shell",
+    "semantic-neck-wrist-leg-complement-classification",
+    "source-topology-restoration-of-all-nonanatomical-complement-components",
+    "underbody-reaching-high-cut-bridge-with-exact-five-opening-gate",
+    "four-ring-boundary-relaxation",
+    "body-triangle-barycentric-anchors-with-positive-normal-offset-field",
+    "body-clear-slim-upper-back-folded-hood-roll"
   ],
   "separateGeometry": [
     "Henley placket",
     "three buttons",
-    "hood drawcords",
-    "left and right hip ties",
-    "center-front, center-back and hood seam piping"
+    "hood drawcords"
   ],
   "priorityFitZones": [
     "shoulder",
     "underarm",
+    "inner arm",
     "elbow",
     "wrist",
+    "neck opening",
     "chest",
     "abdomen",
     "hip crest",
@@ -36,18 +32,21 @@
     "inner thigh",
     "leg root",
     "buttocks",
-    "neck and hood opening",
-    "drawcord",
-    "side tie"
+    "upper-back hood roll",
+    "drawcord"
   ],
   "researchTrial": {
-    "paper": "https://arxiv.org/abs/2607.21213",
-    "paperTitle": "Learning-based Seam Correspondence Reconstruction in Sewing Patterns",
-    "submitted": "2026-07-23T11:26:39Z",
-    "paperLicense": "CC BY-NC-ND 4.0",
-    "implementation": "independent deterministic comparison of length-only seam pairing and semantic panel-graph filtering",
+    "paper": "https://arxiv.org/abs/2605.21001",
+    "paperTitle": "DAMA: Disentangled Body-Anchored Gaussians for Controllable Multi-Layered Avatars",
+    "submitted": "2026-05-20T10:39:44Z",
+    "publication": "CVPR 2026 PhysHuman Workshop",
+    "projectUrl": "https://danieleskandar.github.io/dama/",
+    "officialCodeUrl": "https://github.com/danieleskandar/DAMA-code",
+    "officialCodeLicense": "MIT",
+    "implementation": "independent Blender mesh adaptation using body-triangle barycentric coordinates, bounded strictly positive normal offsets and scalar offset-field smoothing",
     "authorsModelExecuted": false,
-    "officialCodeLocated": false
+    "officialCodeExecuted": false,
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/dama-body-anchor-trial.json"
   },
-  "releaseBoundary": "WORKING until actual renders, evaluated fit audit, Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test and human runtime review pass"
+  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
 }
