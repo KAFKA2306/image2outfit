@@ -130,6 +130,20 @@ def validate_construction(
     return value, list(dict.fromkeys(errors)), warnings
 
 
+def _normalize_gate_name(value: Any) -> str:
+    return "".join(
+        character for character in str(value).lower() if character.isalnum()
+    )
+
+
+def _handoff_policy(root: Path) -> dict[str, Any]:
+    try:
+        value = read_json(root / "config" / "genworks-handoff-policy.json")
+    except (OSError, json.JSONDecodeError, ValueError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
 def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
     manifest_value = job.get("productManifestPath")
     if not isinstance(manifest_value, str):
@@ -138,6 +152,15 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
         manifest = read_json(repo_path(root, manifest_value))
     except (OSError, json.JSONDecodeError, ValueError) as exc:
         return [f"product manifest unreadable: {exc}"]
+
+    handoff = _handoff_policy(root)
+    rules = handoff.get("rules", {})
+    if not isinstance(rules, dict):
+        rules = {}
+    out_of_scope = {
+        _normalize_gate_name(name) for name in handoff.get("outOfScopeGates", [])
+    }
+
     errors: list[str] = []
     if manifest.get("schemaVersion") != 1:
         errors.append("product manifest schemaVersion must be 1")
@@ -145,18 +168,37 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
         errors.append("product manifest productId must match job.id")
     if manifest.get("productRoot") != job.get("productRoot"):
         errors.append("product manifest productRoot must match job.productRoot")
+
     gates = manifest.get("technicalGates")
     if isinstance(gates, dict):
         failed = sorted(
             name
             for name, value in gates.items()
-            if value == "FAIL" and not name.lower().startswith("human")
+            if value == "FAIL"
+            and _normalize_gate_name(name) not in out_of_scope
+            and not name.lower().startswith("human")
         )
         errors.extend(f"product technical gate failed: {name}" for name in failed)
+
     fit = manifest.get("fitAuditSummary")
-    if isinstance(fit, dict) and fit.get("pass") is False:
+    if (
+        isinstance(fit, dict)
+        and fit.get("pass") is False
+        and rules.get("fitAuditFailureBlocksCompletion", True)
+    ):
         errors.append("product fit audit is explicitly failing")
-    return errors
+
+    state = str(manifest.get("state", manifest.get("status", "WORKING"))).upper()
+    completion_status = str(handoff.get("completionStatus", "COMPLETE")).upper()
+    if state == completion_status:
+        if not isinstance(gates, dict):
+            errors.append("complete product requires technicalGates")
+        else:
+            for name in handoff.get("requiredCompletionGates", []):
+                if gates.get(name) != "PASS":
+                    errors.append(f"complete product gate is not PASS: {name}")
+
+    return list(dict.fromkeys(errors))
 
 
 def validate_hashed_artifacts(
