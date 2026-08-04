@@ -32,7 +32,7 @@ class ConfigContractTest(unittest.TestCase):
             policy["humanEvidenceContracts"]["commonRequiredFields"],
         )
 
-    def test_handoff_policy_separates_merge_from_unity_release_gates(self) -> None:
+    def test_handoff_policy_separates_repository_completion_from_external_runtime(self) -> None:
         policy = json.loads(
             (ROOT / "config" / "genworks-handoff-policy.json").read_text(
                 encoding="utf-8"
@@ -49,11 +49,26 @@ class ConfigContractTest(unittest.TestCase):
                 "researchTrial",
             ],
         )
+        boundary = policy["repositoryCompletionBoundary"]
+        self.assertIn("five-view rendered visual review", boundary["includedStages"])
+        self.assertIn("six-pose rendered fit and intersection audit", boundary["includedStages"])
+        self.assertEqual(
+            boundary["externalOutOfScopeStages"],
+            [
+                "Unity import/save/reload",
+                "Modular Avatar/NDMF validation",
+                "VRChat Build & Test",
+                "VRChat runtime human review",
+            ],
+        )
         rules = policy["rules"]
         self.assertIs(rules["unityRequiredForRepositoryMerge"], False)
-        self.assertIs(rules["mergeWithoutUnityMustRemainWorking"], True)
-        self.assertIs(rules["unityConfiguredPrefabsRequiredForTechnicalReady"], True)
-        self.assertIs(rules["unityRequiredForRelease"], True)
+        self.assertIs(rules["externalRuntimeStagesAreRepositoryScope"], False)
+        self.assertIs(rules["externalRuntimeStagesBlockRepositoryCompletion"], False)
+        self.assertIs(rules["externalRuntimeStagesBlockBranchCleanup"], False)
+        self.assertIs(
+            rules["repositoryCompletionIsIndependentOfExternalReleaseStatus"], True
+        )
 
     def test_job_schema_is_the_required_field_source(self) -> None:
         schema = json.loads(
