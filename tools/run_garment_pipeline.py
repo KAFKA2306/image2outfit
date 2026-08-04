@@ -42,17 +42,42 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _mapping(value: object, label: str) -> dict[str, object]:
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ValueError(f"request.{label} must be an object")
+    return value
+
+
 def main() -> int:
     args = parse_args()
     request = json.loads(args.request.read_text(encoding="utf-8"))
     profile = load_profile(args.profile)
+    product_id = request["productId"]
+    target_avatar = request["targetAvatar"]
+    source_reference = request["sourceReference"]
+    variables = {
+        "productId": str(product_id),
+        "targetAvatar": str(target_avatar),
+        "sourceReference": str(source_reference),
+        **{
+            str(key): str(value)
+            for key, value in _mapping(request.get("variables"), "variables").items()
+        },
+    }
     state = new_pipeline_state(
-        product_id=request["productId"],
-        target_avatar=request["targetAvatar"],
-        source_reference=request["sourceReference"],
+        product_id=product_id,
+        target_avatar=target_avatar,
+        source_reference=source_reference,
         profile_id=profile["profileId"],
     )
-    registry = build_registry(profile, execute=args.execute)
+    registry = build_registry(
+        profile,
+        execute=args.execute,
+        bindings=_mapping(request.get("stageBindings"), "stageBindings"),
+        variables=variables,
+    )
     if args.engine == "langgraph":
         result = run_langgraph(state, registry)
     elif args.engine == "langchain":

@@ -11,67 +11,80 @@
     {
       "stage": "ingest-reference",
       "toolName": "reference-ingest",
-      "purpose": "Bind the source image, hashes, provenance, and target avatar."
+      "purpose": "Bind the source image, hashes, provenance, and target avatar.",
+      "requiredInExecute": true
     },
     {
       "stage": "normalize-view",
       "toolName": "pose-view-normalizer",
-      "purpose": "Separate pose and viewpoint effects from garment evidence."
+      "purpose": "Separate pose and viewpoint effects from garment evidence.",
+      "requiredInExecute": true
     },
     {
       "stage": "decompose-garment",
       "toolName": "semantic-part-decomposer",
-      "purpose": "Name garment parts by construction role and body region."
+      "purpose": "Name garment parts by construction role and body region.",
+      "requiredInExecute": true
     },
     {
       "stage": "draft-patterns",
       "toolName": "pattern-piece-drafter",
-      "purpose": "Create explicit two-dimensional panel boundaries and correspondence identifiers."
+      "purpose": "Create explicit two-dimensional panel boundaries and correspondence identifiers.",
+      "requiredInExecute": true
     },
     {
       "stage": "infer-stitches",
       "toolName": "stitch-graph-builder",
-      "purpose": "Create explicit edge-to-edge and multi-edge sewing topology."
+      "purpose": "Create explicit edge-to-edge and multi-edge sewing topology.",
+      "requiredInExecute": true
     },
     {
       "stage": "initialize-3d",
       "toolName": "pattern-initializer",
-      "purpose": "Place pattern pieces around the avatar without folds or intersections."
+      "purpose": "Place pattern pieces around the avatar without folds or intersections.",
+      "requiredInExecute": true
     },
     {
       "stage": "build-blender",
       "toolName": "blender-python-runner",
-      "purpose": "Invoke the declared Blender Python build script through one reusable adapter."
+      "purpose": "Invoke the declared Blender Python build script through one reusable adapter.",
+      "requiredInExecute": true
     },
     {
       "stage": "simulate-cloth",
       "toolName": "blender-cloth-simulator",
-      "purpose": "Apply the declared cloth, collision, and cache contract."
+      "purpose": "Apply the declared cloth, collision, and cache contract.",
+      "requiredInExecute": true
     },
     {
       "stage": "skin-and-export",
       "toolName": "skinning-fbx-exporter",
-      "purpose": "Bind semantic body regions to bones and export the editable source and FBX."
+      "purpose": "Bind semantic body regions to bones and export the editable source and FBX.",
+      "requiredInExecute": true
     },
     {
       "stage": "render-evidence",
       "toolName": "evidence-renderer",
-      "purpose": "Render required five views and declared poses from the current artifact."
+      "purpose": "Render required five views and declared poses from the current artifact.",
+      "requiredInExecute": true
     },
     {
       "stage": "audit-geometry",
       "toolName": "geometry-fit-auditor",
-      "purpose": "Measure topology, weights, degeneracy, collisions, and evidence hashes."
+      "purpose": "Measure topology, weights, degeneracy, collisions, and evidence hashes.",
+      "requiredInExecute": true
     },
     {
       "stage": "visual-review",
       "toolName": "visual-appearance-gate",
-      "purpose": "Require direct inspection of current images before visualAppearanceReview can pass."
+      "purpose": "Require direct inspection of current images before visualAppearanceReview can pass.",
+      "requiredInExecute": true
     },
     {
       "stage": "finalize-candidate",
       "toolName": "candidate-finalizer",
-      "purpose": "Write the truthful WORKING, COMPLETE, or REJECTED candidate state."
+      "purpose": "Write the truthful WORKING, COMPLETE, or REJECTED candidate state.",
+      "requiredInExecute": true
     }
   ]
 }

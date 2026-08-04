@@ -13,6 +13,7 @@ from .domain import (
     Stitch,
     StitchEdge,
 )
+from .execution import StageExecutionBinding, expand_command_template
 from .pipeline import PIPELINE_STAGES, PipelineStage, new_pipeline_state, run_pipeline
 
 __all__ = [
@@ -28,7 +29,9 @@ __all__ = [
     "PIPELINE_STAGES",
     "PipelineStage",
     "Stitch",
+    "StageExecutionBinding",
     "StitchEdge",
+    "expand_command_template",
     "new_pipeline_state",
     "run_pipeline",
 ]

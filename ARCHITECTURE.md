@@ -79,7 +79,34 @@ uv run --with langchain-core==1.5.0 --with langgraph==1.2.9 `
   --request examples/pipeline-request.example.json
 ```
 
-既定では各工程の呼び出し計画だけを生成します。実処理へ接続する場合は、工程プロファイルへ明示的なコマンドを設定し、`--execute` を付けます。見た目レビューは、現在の実画像を直接開かない限り PASS にしません。
+既定では各工程の呼び出し計画だけを生成します。計画の完走は実処理の成功を意味しません。`--execute` を付けた場合、`requiredInExecute: true` の全工程に `stageBindings` の具体的な argv が必要です。未接続工程が一つでもあれば、その工程で `FAILED` になり、`COMPLETE` を返しません。コマンドはシェルを介さず引数配列として実行します。
+
+製品固有の Blender スクリプトは、共通ランチャー `tools/run_blender_stage.py` から呼び出せます。例えば `build-blender`、`simulate-cloth`、`render-evidence` を別々のスクリプトへ結び、`audit-geometry` は既存の `tools/pipeline.py --mode blender-gate`、`finalize-candidate` は既存の `tools/production_gate.py --mode candidate` へ結べます。見た目レビューは、現在の実画像を直接開かない限り PASS にしません。
+
+```json
+{
+  "variables": {
+    "blenderExecutable": "blender",
+    "jobPath": "jobs/<product>/job.json",
+    "buildScript": "tools/<product>_build.py"
+  },
+  "stageBindings": {
+    "build-blender": {
+      "command": [
+        "{blenderExecutable}",
+        "--background",
+        "--python",
+        "tools/run_blender_stage.py",
+        "--",
+        "--script",
+        "{buildScript}",
+        "--job",
+        "{jobPath}"
+      ]
+    }
+  }
+}
+```
 
 ## 研究原則
 

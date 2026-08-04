@@ -9,6 +9,7 @@ ENTRYPOINTS = (
     ROOT / "tools/run_garment_pipeline.py",
     ROOT / "tools/audit_src_architecture.py",
     ROOT / "tools/pipeline_stage_adapters.py",
+    ROOT / "tools/run_blender_stage.py",
 )
 
 
