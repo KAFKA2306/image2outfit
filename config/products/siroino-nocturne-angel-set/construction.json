@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "profile": "loose-layered",
+  "productId": "siroino-nocturne-angel-set",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-pattern-gsl-modular-cloth",
+  "panels": [
+    "cropped bodice shell",
+    "three-part sailor collar",
+    "simulated circular skirt",
+    "cream hem frill",
+    "waist band",
+    "left and right puff sleeves",
+    "left and right detached arm warmers",
+    "left and right lace cuffs",
+    "left and right leg warmers",
+    "left and right bow tails"
+  ],
+  "separateGeometry": [
+    "beret",
+    "animal ears",
+    "choker",
+    "amber charm",
+    "rabbit charm",
+    "white angel wings",
+    "tail",
+    "shoes"
+  ],
+  "priorityFitZones": [
+    "neck",
+    "shoulder",
+    "underarm",
+    "chest",
+    "waist",
+    "hip",
+    "skirt-body layer",
+    "elbow",
+    "wrist",
+    "thigh",
+    "knee",
+    "ankle",
+    "upper back wing mount"
+  ],
+  "researchTrial": {
+    "primaryPaper": "https://arxiv.org/abs/2606.24564",
+    "secondaryPaper": "https://arxiv.org/abs/2602.22052",
+    "implementation": "independent explicit pattern/seam/layer/module specification and actual Blender 4.4 cloth simulation",
+    "externalResearchCodeExecuted": false,
+    "generatedEvidence": "Assets/GenWorks/siroino-nocturne-angel-set/Research/patterngsl-autosew-cloth-trial.json"
+  },
+  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
+}
