@@ -19,15 +19,21 @@ import siroino_heather_hooded_v11_support as support
 support.install()
 
 import siroino_heather_hooded_pattern_v13 as pattern
-import siroino_heather_hooded_v21_patch as v21
-import siroino_heather_lobomap_fit as lobomap
+import siroino_heather_template_cage_v24 as template_cage
 
-v21.install(pattern)
-lobomap.install(pattern)
+template_cage.install(pattern)
 
 DESIGN_REVISION = pattern.DESIGN_REVISION
+STRUCTURED_TRIAL = (
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/"
+    "structured-template-cage-trial.json"
+)
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
+    "Heather_Long_Sleeve_L",
+    "Heather_Long_Sleeve_R",
+    "Heather_Rib_Cuff_L",
+    "Heather_Rib_Cuff_R",
     "Heather_Hood_Folded_Roll",
     "Heather_Henley_Placket",
     "Heather_Henley_Button_01",
@@ -39,117 +45,19 @@ ACTUAL_SEPARATE_GEOMETRY = [
 
 REJECTED_REVISIONS = [
     {
-        "revision": "v7.1-continuous-shell-fit",
+        "revision": "v22-dama-inspired-body-anchored-shell",
         "reason": (
-            "actual five-view inspection found sawtooth panel edges, elbow and cuff "
-            "holes, an over-wide neckline, a shield-like rear hood and 6660 "
-            "evaluated BVH overlap pairs"
+            "positive body-normal clearance did not repair incorrect garment region "
+            "selection, long crotch tabs, jagged boundaries or pose deformation"
         ),
     },
     {
-        "revision": "v8-smooth-sampled-panels-distance-field-sleeves",
+        "revision": "v23-dama-anchor-lobomap-residual-fit",
         "reason": (
-            "actual five-view inspection found sampled-panel spikes, oversized "
-            "rectangular cuffs, an inflated hood and 7133 overlap pairs"
-        ),
-    },
-    {
-        "revision": "v9-continuous-interpolation-fitted-cuffs",
-        "reason": (
-            "actual hosted inspection found detached torso plates, shoulder and "
-            "underarm gaps, waist fins, a broken crotch strip and a floating hood"
-        ),
-    },
-    {
-        "revision": "v10-body-topology-continuous-panels",
-        "reason": (
-            "actual hosted inspection found detached sleeves and cuffs, a floating "
-            "hood, jagged high-cut edges and 8490 overlap pairs"
-        ),
-    },
-    {
-        "revision": "v11-unified-source-topology-fit",
-        "reason": (
-            "actual hosted inspection found shoulder, elbow and cuff discontinuities, "
-            "sawtooth edges, a bag-like hood and 12845 overlap pairs"
-        ),
-    },
-    {
-        "revision": "v12-continuous-source-shell",
-        "reason": (
-            "actual hosted inspection found metre-scale bevel miter spikes, torso "
-            "collapse, a hanging crotch sheet and 28593 overlap pairs"
-        ),
-    },
-    {
-        "revision": "v13-bevel-safe-continuous-shell",
-        "reason": (
-            "metre-scale spikes were removed, but waist fins, ruptured high-cut "
-            "geometry, sleeve and back holes, and 2506 neutral overlaps remained"
-        ),
-    },
-    {
-        "revision": "v14-source-topology-highcut-shell",
-        "reason": (
-            "actual hosted inspection found elbow holes, jagged leg openings, "
-            "detached cuffs and an umbrella-like hood; all six poses failed"
-        ),
-    },
-    {
-        "revision": "v15-refined-topology-folded-hood",
-        "reason": (
-            "the executable gate detected three disconnected primary-shell "
-            "components and nine boundary loops across 572 edges"
-        ),
-    },
-    {
-        "revision": "v16-shoulder-bridged-refined-shell",
-        "reason": (
-            "topology gates passed, but five-view evidence showed exposed inner arms, "
-            "waist fins, pointed panels and a floating cowl; save also reported an "
-            "orphan Shape Key"
-        ),
-    },
-    {
-        "revision": "v17-evaluated-shape-surface-drape",
-        "reason": (
-            "final Blender save succeeded, but actual five-view evidence still showed "
-            "jagged neckline, sleeve and leg openings, broad underarm wings, pointed "
-            "lower panels and a floating back drape; the legacy build gate also "
-            "incorrectly required 14 objects although the truthful construction had 8"
-        ),
-    },
-    {
-        "revision": "v18-weighted-refined-shell-rolled-hood",
-        "reason": (
-            "the refined weighted shell became one connected component, but the "
-            "pre-export gate measured eight boundary loops across 726 boundary edges; "
-            "three unintended holes remained and rendering was correctly stopped"
-        ),
-    },
-    {
-        "revision": "v19-topology-healed-weighted-shell",
-        "reason": (
-            "hosted Blender restored three accidental complement components, but five-"
-            "view evidence showed a shirt-like lower hem, hip fins and a body-"
-            "intersecting hood; all six evaluated poses failed"
-        ),
-    },
-    {
-        "revision": "v20-semantic-five-opening-highcut-shell",
-        "reason": (
-            "semantic classification retained five anatomical openings and restored "
-            "four accidental components, but front and rear crotch tabs, scalloped leg "
-            "openings and a knot-like hood remained; all six poses failed, including "
-            "396 shell overlaps in crouch and 636 in sit"
-        ),
-    },
-    {
-        "revision": "v21-pose-clear-underbody-five-opening-shell",
-        "reason": (
-            "exact five-opening topology and a body-clear hood were achieved, but "
-            "actual renders retained long crotch tabs, hip flaps and an excessively "
-            "loose tunic silhouette; all required poses failed"
+            "the local residual RMS improved from 3.548 to 2.975 mm, but direct "
+            "five-view and pose inspection still found floating hood parts, dark "
+            "surface defects, a pointed crotch flap and collapsed crouch/sit/prone "
+            "silhouettes"
         ),
     },
 ]
@@ -207,17 +115,16 @@ def preserve_authored_weights(
     garments: list[bpy.types.Object],
     _body: bpy.types.Object,
 ) -> dict[str, object]:
-    """Preserve evaluated-source and nearest-body accessory weights."""
+    """Preserve template-cage weights transferred during component construction."""
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "evaluated SiroinoSotai_PC topology refined twice with interpolated UVs "
-            "and skin weights; shoulders and sleeves selected from interpolated arm "
-            "weights; semantic neck, wrist and leg openings retained; nonanatomical "
-            "complement components restored; DAMA-inspired body-triangle anchoring "
-            "followed by LoBoFit-inspired four-bone local residual smoothing; "
-            "nearest-body weights used for trim"
+            "explicit regular garment cages are authored independently of body "
+            "topology; SiroinoSotai_PC is used only for surface sampling and "
+            "nearest-body skin-weight transfer; four normalized influences are "
+            "enforced after construction"
         ),
+        "bodyTopologyCopied": False,
         "rebound": False,
     }
 
@@ -228,6 +135,19 @@ def wrap_pattern_writer(original):
         contract = json.loads(pattern_path.read_text(encoding="utf-8"))
         contract["separateGeometry"] = ACTUAL_SEPARATE_GEOMETRY
         contract["designRevision"] = DESIGN_REVISION
+        contract["representation"] = {
+            "canonical": "structured template cage",
+            "bodyTopologyCopied": False,
+            "components": [
+                "periodic torso cage",
+                "shared-edge U-shaped gusset",
+                "left and right arm tubes",
+                "left and right cuffs",
+                "attached three-ring cowl",
+            ],
+            "bodyRole": "surface and skin-weight reference only",
+        }
+        contract["researchTrialEvidence"] = STRUCTURED_TRIAL
         pattern_path.write_text(
             json.dumps(contract, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
@@ -244,10 +164,40 @@ def enforce_manifest_contract(original):
         result = original(*args, **kwargs)
         job = args[0]
         root = Path(__file__).resolve().parents[1]
+        trial_path = root / STRUCTURED_TRIAL
+        trial = (
+            json.loads(trial_path.read_text(encoding="utf-8"))
+            if trial_path.is_file()
+            else {"result": "FAIL", "status": "MISSING"}
+        )
+
         manifest_path = root / job["productManifestPath"]
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         manifest["schemaVersion"] = 1
         manifest["designRevision"] = DESIGN_REVISION
+        manifest["status"] = "WORKING"
+        manifest["technicalGates"]["researchTrial"] = trial.get("result", "FAIL")
+        manifest["technicalGates"]["visualAppearanceReview"] = "PENDING"
+        manifest["technicalGates"]["fitPenetration"] = "NON_BLOCKING_PENDING"
+        for key in (
+            "unityImport",
+            "unitySaveReload",
+            "prefabReload",
+            "modularAvatar",
+            "ndmf",
+            "vrchatBuildTest",
+            "vrchatRuntime",
+            "humanRuntimeReview",
+        ):
+            manifest["technicalGates"][key] = "OUT_OF_SCOPE"
+        manifest["outputs"]["researchTrial"] = STRUCTURED_TRIAL
+        manifest["research"] = {
+            "result": trial.get("result", "FAIL"),
+            "evidence": STRUCTURED_TRIAL,
+            "representation": "structured template cage",
+            "authorsImplementationExecuted": False,
+            "authorsCodeCopied": False,
+        }
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
@@ -264,36 +214,25 @@ def enforce_manifest_contract(original):
         if report_path.is_file():
             report = json.loads(report_path.read_text(encoding="utf-8"))
             report["designRevision"] = DESIGN_REVISION
+            report["researchTrial"] = manifest["research"]
             rejected = report.setdefault("rejectedHistory", [])
             existing = {item.get("revision") for item in rejected}
             rejected.extend(
                 item for item in REJECTED_REVISIONS if item["revision"] not in existing
             )
             report["notes"] = [
-                "The neutral SiroinoSotai_PC mesh is baked from Blender's evaluated "
-                "dependency graph without retaining Shape Keys.",
-                "The source is subdivided twice before selection so opening boundaries "
-                "do not follow coarse source polygons.",
-                "Torso and high-cut regions use geometric predicates; shoulders and "
-                "sleeves use interpolated upper-arm and lower-arm weights.",
-                "Adjacent complement components are classified by anatomical position "
-                "as neck, left and right wrist, and left and right leg openings.",
-                "Every nonanatomical adjacent complement component is restored before "
-                "mesh extraction.",
-                "Four boundary rings are relaxed for 14 iterations before body-relative "
-                "fitting.",
-                "The lower-body strip reaches the underbody at z=0.515 and blends "
-                "continuously into the torso by z=0.850.",
-                "The folded hood is a slim continuous upper-back roll sampled at "
-                "74-86 mm body clearance.",
-                "The primary shell must be one component with exactly five openings.",
-                "DAMA-inspired triangle anchoring establishes a positive body-normal "
-                "offset before the LoBoFit-inspired local-bone residual pass.",
-                "LoBoMap fitting uses the four strongest bone frames, six smoothing "
-                "iterations, a 22 mm target clearance and a 4 mm displacement cap.",
-                "Buttons, Henley placket and drawcords remain separate geometry.",
-                "Required pose renders and direct visual review remain completion gates; "
-                "Unity and VRChat runtime validation are OUT_OF_SCOPE.",
+                "Body-face selection, semantic complement healing, DAMA anchoring and "
+                "LoBoMap residual smoothing are no longer in the active build path.",
+                "The primary topology is an explicit periodic torso cage with a "
+                "shared-edge U-shaped gusset; it is not copied from Siroino polygons.",
+                "Sleeves and cuffs are regular tubes generated along upper/lower arm "
+                "bone centerlines and overlap the torso in controlled shoulder zones.",
+                "The hood is an attached three-ring cowl surface rather than a detached "
+                "curve tube or floating rear roll.",
+                "SiroinoSotai_PC is used only for surface sampling and nearest-body "
+                "weight transfer.",
+                "Required five-view and pose renders plus direct visual review remain "
+                "completion gates; Unity and VRChat runtime validation are OUT_OF_SCOPE.",
             ]
             report_path.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n",
@@ -310,10 +249,10 @@ def update_panel_object_contract() -> None:
         "Heather_Back_Upper_Panel": "Heather_Body_Shell",
         "Heather_Highcut_Front_Panel": "Heather_Body_Shell",
         "Heather_Highcut_Back_Panel": "Heather_Body_Shell",
-        "Heather_Long_Sleeve_L": "Heather_Body_Shell",
-        "Heather_Long_Sleeve_R": "Heather_Body_Shell",
-        "Heather_Rib_Cuff_L": "Heather_Body_Shell",
-        "Heather_Rib_Cuff_R": "Heather_Body_Shell",
+        "Heather_Long_Sleeve_L": "Heather_Long_Sleeve_L",
+        "Heather_Long_Sleeve_R": "Heather_Long_Sleeve_R",
+        "Heather_Rib_Cuff_L": "Heather_Rib_Cuff_L",
+        "Heather_Rib_Cuff_R": "Heather_Rib_Cuff_R",
         "Heather_Hood_Back_Drape_L": "Heather_Hood_Folded_Roll",
         "Heather_Hood_Back_Drape_R": "Heather_Hood_Folded_Roll",
         "Heather_Hood_Outer_L": "Heather_Hood_Folded_Roll",
