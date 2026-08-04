@@ -282,9 +282,9 @@ class _SmoothBodySampler:
             + self.normals[third] * barycentric.z
         )
         if normal.length_squared <= 1e-16:
-            normal = (
-                self.vertices[second] - self.vertices[first]
-            ).cross(self.vertices[third] - self.vertices[first])
+            normal = (self.vertices[second] - self.vertices[first]).cross(
+                self.vertices[third] - self.vertices[first]
+            )
         if normal.length_squared <= 1e-16:
             raise RuntimeError("Smooth-normal repair received a degenerate normal")
         normal.normalize()
@@ -376,10 +376,9 @@ def repair_shell_surface(
             if index in boundary or not repair_zone[index] or not neighbours:
                 continue
             neighbour_mean = sum(lifts[item] for item in neighbours) / len(neighbours)
-            updated[index] = (
-                (1.0 - HIGHCUT_SMOOTH_FACTOR) * raw_lifts[index]
-                + HIGHCUT_SMOOTH_FACTOR * neighbour_mean
-            )
+            updated[index] = (1.0 - HIGHCUT_SMOOTH_FACTOR) * raw_lifts[
+                index
+            ] + HIGHCUT_SMOOTH_FACTOR * neighbour_mean
         lifts = updated
 
     before_residuals: list[Vector] = []
