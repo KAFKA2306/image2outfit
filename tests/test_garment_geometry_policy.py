@@ -53,7 +53,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertLessEqual(float(defaults["offset"]), limit)
         self.assertEqual(float(defaults["bevel_width"]), 0.0)
 
-    def test_pattern_builds_one_primary_body_shell(self) -> None:
+    def test_pattern_builds_one_refined_primary_body_shell(self) -> None:
         create_outfit = next(
             node
             for node in self.tree.body
@@ -69,16 +69,19 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         ]
         self.assertEqual(len(shell_calls), 1)
         self.assertIn("Heather_Body_Shell", create_source)
+        self.assertIn("_refined_body_source", create_source)
         self.assertIn("_body_shell_predicate", create_source)
+        self.assertNotIn("Heather_Rib_Cuff", create_source)
         self.assertNotIn("Heather_Highcut_Front_Panel", create_source)
         self.assertNotIn("Heather_Highcut_Back_Panel", create_source)
         self.assertNotIn("Heather_Crotch_Bridge", create_source)
 
-    def test_safe_shell_has_no_miter_generating_modifiers(self) -> None:
+    def test_safe_shell_has_topology_and_boundary_gates(self) -> None:
         required_fragments = (
             "The fitted source shell must not use a bevel modifier",
             "max_edge > 0.20",
             "disconnected source shell",
+            "expected at most 5 garment openings",
             "Garment geometry sanity gate failed",
         )
         for fragment in required_fragments:
@@ -92,15 +95,22 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             self.body_panel_source,
         )
 
-    def test_primary_shell_copies_target_topology_and_weights(self) -> None:
+    def test_primary_shell_copies_refined_topology_uvs_and_weights(self) -> None:
         self.assertIn("body.data.polygons", self.selection_source)
         required_body_panel_fragments = (
             "body.data.vertices[source_index].groups",
             "body.data.uv_layers.active",
-            "modifier.use_deform_preserve_volume = True",
+            "modifier.use_deform_preserve_volume = preserve_volume",
         )
         for fragment in required_body_panel_fragments:
             self.assertIn(fragment, self.body_panel_source)
+        self.assertIn('subdivision.levels = 1', self.source)
+        self.assertIn('source.shape_key_clear()', self.source)
+
+    def test_rejected_inflated_hood_is_replaced_by_folded_cowl(self) -> None:
+        self.assertIn("Heather_Hood_Down_Cowl", self.source)
+        self.assertNotIn("Heather_Hood_Shell", self.source)
+        self.assertNotIn("Heather_Hood_Neck_Band", self.source)
 
 
 if __name__ == "__main__":
