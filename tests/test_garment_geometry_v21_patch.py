@@ -39,10 +39,10 @@ class GarmentGeometryV22BodyAnchorTests(unittest.TestCase):
             "The flat patch must not add another internal import level",
         )
 
-    def test_job_retains_dama_anchor_and_lobomap_as_v24_preconditioners(self) -> None:
+    def test_job_retains_dama_anchor_and_lobomap_as_v25_preconditioners(self) -> None:
         self.assertEqual(
             self.job["buildRevision"],
-            "v24-smooth-normal-highcut-repair",
+            "v25-side-aware-taubin-shell",
         )
         self.assertEqual(
             self.job["buildScript"],
