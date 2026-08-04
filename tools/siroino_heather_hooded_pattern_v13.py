@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """Weighted refined shell for the Siroino heather hooded bodysuit.
 
-The currently displayed SiroinoSotai_PC shape is baked from the evaluated
-dependency graph and subdivided twice. Torso and high-cut regions are selected
-geometrically, while shoulders and sleeves follow interpolated arm weights.
-Opening boundaries are locally smoothed and shrink-wrapped back to the evaluated
-source. A compact rolled hood follows the upper back. The build stops on
-invalid, disconnected, or implausible geometry.
+The neutral SiroinoSotai_PC shape is baked from the evaluated dependency graph
+and subdivided twice. Torso and high-cut regions are selected geometrically,
+while shoulders and sleeves follow interpolated arm weights. Complement face
+components are analysed so only the five intended garment openings remain;
+smaller accidental holes are restored from source topology. Opening boundaries
+are then smoothed and shrink-wrapped back to the evaluated source. A compact
+rolled hood follows the upper back. The build stops on invalid, disconnected,
+or implausible geometry.
 """
 
 from __future__ import annotations
 
 import math
-from collections import Counter
+from collections import Counter, defaultdict
 from collections.abc import Callable
 
 import bpy
@@ -20,7 +22,7 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
-DESIGN_REVISION = "v18-weighted-refined-shell-rolled-hood"
+DESIGN_REVISION = "v19-topology-healed-weighted-shell"
 clean_meshes = v9.clean_meshes
 bone_segment = v9.bone_segment
 
@@ -37,7 +39,7 @@ def _move_modifier_before_armature(
 
 
 def _refined_body_source(body: bpy.types.Object) -> bpy.types.Object:
-    """Bake the displayed target shape without retaining a Shape Key datablock."""
+    """Bake the neutral target shape without retaining a Shape Key datablock."""
     depsgraph = bpy.context.evaluated_depsgraph_get()
     evaluated = body.evaluated_get(depsgraph)
     mesh = bpy.data.meshes.new_from_object(
@@ -94,15 +96,76 @@ def _purge_orphan_shape_keys() -> None:
             bpy.data.shape_keys.remove(shape_keys)
 
 
+def _polygon_adjacency(mesh: bpy.types.Mesh) -> dict[int, set[int]]:
+    edge_faces: defaultdict[tuple[int, int], list[int]] = defaultdict(list)
+    for polygon in mesh.polygons:
+        for edge in polygon.edge_keys:
+            edge_faces[tuple(sorted(edge))].append(polygon.index)
+
+    adjacency = {polygon.index: set() for polygon in mesh.polygons}
+    for faces in edge_faces.values():
+        for left in faces:
+            adjacency[left].update(right for right in faces if right != left)
+    return adjacency
+
+
+def _close_unintended_openings(
+    body: bpy.types.Object,
+    selected: list[bpy.types.MeshPolygon],
+    intended_openings: int = 5,
+) -> list[bpy.types.MeshPolygon]:
+    """Restore small enclosed complement components from the source topology."""
+    selected_indices = {polygon.index for polygon in selected}
+    adjacency = _polygon_adjacency(body.data)
+    remaining = set(adjacency) - selected_indices
+    opening_components: list[tuple[float, int, set[int]]] = []
+
+    while remaining:
+        component = {remaining.pop()}
+        stack = list(component)
+        while stack:
+            current = stack.pop()
+            neighbours = adjacency[current] & remaining
+            remaining.difference_update(neighbours)
+            component.update(neighbours)
+            stack.extend(neighbours)
+
+        boundary_links = sum(
+            len(adjacency[index] & selected_indices) for index in component
+        )
+        if boundary_links == 0:
+            continue
+        area = sum(body.data.polygons[index].area for index in component)
+        opening_components.append((area, boundary_links, component))
+
+    if len(opening_components) <= intended_openings:
+        return selected
+
+    opening_components.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    retained = opening_components[:intended_openings]
+    closed = opening_components[intended_openings:]
+    restored_indices = {
+        index for _area, _links, component in closed for index in component
+    }
+    selected_indices.update(restored_indices)
+    print(
+        "Healed unintended garment openings: "
+        f"retained={len(retained)}, closed={len(closed)}, "
+        f"restoredFaces={len(restored_indices)}"
+    )
+    return [body.data.polygons[index] for index in sorted(selected_indices)]
+
+
 def _selected_polygons(
     body: bpy.types.Object,
     predicate: PolygonPredicate,
 ) -> list[bpy.types.MeshPolygon]:
-    return [
+    selected = [
         polygon
         for polygon in body.data.polygons
         if predicate(polygon, body.matrix_world @ polygon.center)
     ]
+    return _close_unintended_openings(body, selected)
 
 
 def _source_preserve_volume(body: bpy.types.Object) -> bool:
