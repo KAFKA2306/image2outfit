@@ -146,9 +146,7 @@ def write_report_and_manifest(
             },
             {
                 "revision": "v3-body-weighted-fitted-sleeves",
-                "reason": (
-                    "elbow gaps, lateral hood wings and bifurcated lower panel"
-                ),
+                "reason": ("elbow gaps, lateral hood wings and bifurcated lower panel"),
             },
             {
                 "revision": "v5-rounded-hood-pointed-highcut",
@@ -207,9 +205,7 @@ def write_report_and_manifest(
             "standardTargetResolved": "PASS",
             "blender": "PASS" if passed else "FAIL",
             "fbx": (
-                "PASS"
-                if base.repo_path(job["fbxAssetPath"]).is_file()
-                else "FAIL"
+                "PASS" if base.repo_path(job["fbxAssetPath"]).is_file() else "FAIL"
             ),
             "fiveViewRender": (
                 "PASS" if all(path.is_file() for path in previews.values()) else "FAIL"
@@ -268,9 +264,7 @@ def main() -> int:
         for obj in bpy.context.scene.objects
         if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
     )
-    armature = next(
-        obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"
-    )
+    armature = next(obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE")
     armature.name = "SiroinoSotai_Armature"
     if body.data.shape_keys:
         for key in body.data.shape_keys.key_blocks:
