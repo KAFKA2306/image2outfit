@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Evaluated-shape fitted shell for the Siroino heather hooded bodysuit.
+"""Weighted refined shell for the Siroino heather hooded bodysuit.
 
 The currently displayed SiroinoSotai_PC shape is baked from the evaluated
-dependency graph before one topology-refinement subdivision. Torso, high-cut
-pelvis, shoulders and sleeves are copied as one shell. A compact back-surface
-hood drape follows the target instead of floating as an analytic cowl. The build
-stops on disconnected primary geometry, unexpected boundary loops, non-finite
-coordinates, or implausibly long edges.
+dependency graph and subdivided twice. Torso and high-cut regions are selected
+geometrically, while shoulders and sleeves follow interpolated arm weights.
+Opening boundaries are locally smoothed and shrink-wrapped back to the evaluated
+source. A compact rolled hood follows the upper back. The build stops on
+invalid, disconnected, or implausible geometry.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
-DESIGN_REVISION = "v17-evaluated-shape-surface-drape"
+DESIGN_REVISION = "v18-weighted-refined-shell-rolled-hood"
 clean_meshes = v9.clean_meshes
 bone_segment = v9.bone_segment
 
@@ -73,8 +73,8 @@ def _refined_body_source(body: bpy.types.Object) -> bpy.types.Object:
     bpy.context.view_layer.objects.active = source
     subdivision = source.modifiers.new("Boundary refinement", "SUBSURF")
     subdivision.subdivision_type = "CATMULL_CLARK"
-    subdivision.levels = 1
-    subdivision.render_levels = 1
+    subdivision.levels = 2
+    subdivision.render_levels = 2
     bpy.ops.object.modifier_apply(modifier=subdivision.name)
     source.data.update(calc_edges=True)
     source.select_set(False)
@@ -112,6 +112,71 @@ def _source_preserve_volume(body: bpy.types.Object) -> bool:
     return False
 
 
+def _boundary_vertex_weights(mesh: bpy.types.Mesh) -> dict[int, float]:
+    edge_use: Counter[tuple[int, int]] = Counter()
+    adjacency: dict[int, set[int]] = {
+        vertex.index: set() for vertex in mesh.vertices
+    }
+    for polygon in mesh.polygons:
+        vertices = list(polygon.vertices)
+        for index, left in enumerate(vertices):
+            right = vertices[(index + 1) % len(vertices)]
+            edge = tuple(sorted((left, right)))
+            edge_use[edge] += 1
+            adjacency[left].add(right)
+            adjacency[right].add(left)
+
+    boundary = {
+        vertex
+        for edge, count in edge_use.items()
+        if count == 1
+        for vertex in edge
+    }
+    weights = {index: 1.0 for index in boundary}
+    frontier = set(boundary)
+    visited = set(boundary)
+    for ring_weight in (0.55, 0.25):
+        next_frontier = {
+            neighbour
+            for index in frontier
+            for neighbour in adjacency[index]
+            if neighbour not in visited
+        }
+        for index in next_frontier:
+            weights[index] = ring_weight
+        visited.update(next_frontier)
+        frontier = next_frontier
+    return weights
+
+
+def _smooth_and_project_boundaries(
+    obj: bpy.types.Object,
+    source: bpy.types.Object,
+    offset: float,
+) -> None:
+    weights = _boundary_vertex_weights(obj.data)
+    if not weights:
+        return
+    group = obj.vertex_groups.new(name="Temporary_Boundary_Smoothing")
+    for index, weight in weights.items():
+        group.add([index], weight, "REPLACE")
+
+    smooth = obj.modifiers.new("Opening boundary smoothing", "SMOOTH")
+    smooth.vertex_group = group.name
+    smooth.factor = 0.62
+    smooth.iterations = 7
+    _move_modifier_before_armature(obj, smooth)
+    bpy.ops.object.modifier_apply(modifier=smooth.name)
+
+    shrinkwrap = obj.modifiers.new("Evaluated target reprojection", "SHRINKWRAP")
+    shrinkwrap.target = source
+    shrinkwrap.wrap_method = "NEAREST_SURFACEPOINT"
+    shrinkwrap.offset = offset
+    _move_modifier_before_armature(obj, shrinkwrap)
+    bpy.ops.object.modifier_apply(modifier=shrinkwrap.name)
+    obj.vertex_groups.remove(group)
+
+
 def _body_panel(
     name: str,
     body: bpy.types.Object,
@@ -119,11 +184,11 @@ def _body_panel(
     material: bpy.types.Material,
     predicate: PolygonPredicate,
     *,
-    offset: float = 0.010,
+    offset: float = 0.012,
     bevel_width: float = 0.0,
     preserve_volume: bool = False,
 ) -> bpy.types.Object:
-    """Copy a fitted source shell without miter-generating modifiers."""
+    """Copy and surface-project one fitted shell without miter modifiers."""
     if bevel_width != 0.0:
         raise ValueError("The fitted source shell must not use a bevel modifier")
     selected = _selected_polygons(body, predicate)
@@ -205,6 +270,7 @@ def _body_panel(
     bpy.ops.object.select_all(action="DESELECT")
     obj.select_set(True)
     bpy.context.view_layer.objects.active = obj
+    _smooth_and_project_boundaries(obj, body, offset)
     triangulate = obj.modifiers.new("Export triangulation", "TRIANGULATE")
     _move_modifier_before_armature(obj, triangulate)
     bpy.ops.object.modifier_apply(modifier=triangulate.name)
@@ -215,17 +281,15 @@ def _body_panel(
 
 
 def _torso_width(z: float) -> float:
-    if z < 0.860:
-        return 0.142
-    if z < 0.920:
-        return 0.166
-    if z < 0.985:
-        return 0.194
-    return max(0.088, 0.194 - (z - 0.985) * 1.45)
+    if z < 0.880:
+        return 0.165
+    if z < 0.960:
+        return 0.195
+    return max(0.090, 0.195 - (z - 0.960) * 1.35)
 
 
 def _torso_top(x: float) -> float:
-    return 1.012 + min(abs(x), 0.145) * 0.27
+    return 1.018 + min(abs(x), 0.150) * 0.29
 
 
 def _smoothstep(value: float) -> float:
@@ -234,92 +298,72 @@ def _smoothstep(value: float) -> float:
 
 
 def _highcut_width(z: float) -> float:
-    t = (z - 0.675) / (0.860 - 0.675)
-    return 0.070 + 0.095 * _smoothstep(t)
+    t = (z - 0.700) / (0.880 - 0.700)
+    return 0.090 + 0.085 * _smoothstep(t)
 
 
-def _segment_coordinates(
-    point: Vector,
-    start: Vector,
-    end: Vector,
-) -> tuple[float, float]:
-    vector = end - start
-    length_squared = max(vector.length_squared, 1e-12)
-    t = (point - start).dot(vector) / length_squared
-    closest = start + vector * max(0.0, min(1.0, t))
-    return t, (point - closest).length
-
-
-def _body_shell_predicate(
-    armature: bpy.types.Object,
-) -> PolygonPredicate:
-    arm_segments = {
+def _body_shell_predicate(body: bpy.types.Object) -> PolygonPredicate:
+    arm_groups = {
         side: (
-            bone_segment(armature, f"UpperArm_{side}"),
-            bone_segment(armature, f"LowerArm_{side}"),
+            v9._group_index(body, f"UpperArm_{side}"),
+            v9._group_index(body, f"LowerArm_{side}"),
+            v9._group_index(body, f"Hand_{side}"),
         )
         for side in ("L", "R")
     }
 
     def selected(
-        _polygon: bpy.types.MeshPolygon,
+        polygon: bpy.types.MeshPolygon,
         center: Vector,
     ) -> bool:
         x = abs(center.x)
-        torso = 0.825 <= center.z <= _torso_top(center.x) and x <= _torso_width(
+        torso = 0.835 <= center.z <= _torso_top(center.x) and x <= _torso_width(
             center.z
         )
-        highcut = 0.670 <= center.z <= 0.865 and x <= _highcut_width(center.z)
-        shoulder_bridge = 0.105 <= x <= 0.360 and 0.925 <= center.z <= 1.090
-        if torso or highcut or shoulder_bridge:
+        highcut = 0.695 <= center.z <= 0.885 and x <= _highcut_width(center.z)
+        if torso or highcut:
             return True
 
-        for upper_segment, lower_segment in arm_segments.values():
-            upper_t, upper_distance = _segment_coordinates(center, *upper_segment)
-            lower_t, lower_distance = _segment_coordinates(center, *lower_segment)
-            if -0.25 <= upper_t <= 1.10 and upper_distance <= 0.110:
+        for upper, lower, hand in arm_groups.values():
+            upper_weight = v9._polygon_average_weight(body, polygon, (upper,))
+            lower_weight = v9._polygon_average_weight(body, polygon, (lower,))
+            hand_weight = v9._polygon_average_weight(body, polygon, (hand,))
+            arm_weight = upper_weight + lower_weight
+            if hand_weight <= 0.52 and arm_weight >= 0.008:
                 return True
-            if -0.10 <= lower_t <= 0.92 and lower_distance <= 0.080:
+            if center.z >= 0.900 and upper_weight >= 0.002:
                 return True
         return False
 
     return selected
 
 
-def _hood_back_drape(
+def _hood_folded_roll(
     sampler: v9.SurfaceSampler,
-    body: bpy.types.Object,
     armature: bpy.types.Object,
     material: bpy.types.Material,
 ) -> bpy.types.Object:
-    rows = 11
-    columns = 24
-    vertices: list[tuple[float, float, float]] = []
-    for row in range(rows):
-        t = row / (rows - 1)
-        arch = math.sin(math.pi * t)
-        z = 1.038 - 0.150 * t
-        half_width = 0.070 + 0.086 * arch**0.9 - 0.014 * t
-        for column in range(columns + 1):
-            lateral = 2.0 * column / columns - 1.0
-            center_drop = 0.010 * arch * (1.0 - lateral * lateral)
-            sample_z = z - center_drop
-            x = half_width * lateral
-            offset = 0.011 + 0.017 * arch * (1.0 - 0.42 * abs(lateral))
-            point = sampler.point(x, sample_z, front=False, offset=offset)
-            vertices.append((point.x, point.y, point.z))
-    return v9._grid_object(
-        "Heather_Hood_Folded_Back_Drape",
-        vertices,
-        rows,
-        columns,
+    points: list[tuple[float, float, float]] = []
+    count = 29
+    for index in range(count):
+        lateral = 2.0 * index / (count - 1) - 1.0
+        x = 0.112 * lateral
+        center_weight = 1.0 - lateral * lateral
+        z = 1.024 - 0.046 * center_weight
+        offset = 0.018 + 0.010 * center_weight
+        point = sampler.point(x, z, front=False, offset=offset)
+        points.append((point.x, point.y, point.z))
+    roll = v9.base.curve_tube(
+        "Heather_Hood_Folded_Roll",
+        points,
+        0.0125,
         material,
         armature,
-        body,
-        thickness=0.0008,
-        bevel=0.00012,
-        subdivision=1,
+        "Chest",
+        resolution=4,
     )
+    v9.base.transfer_nearest_body_weights(roll, sampler.body)
+    return roll
 
 
 def _cords(
@@ -450,7 +494,7 @@ def create_outfit(
             refined,
             armature,
             fabric,
-            _body_shell_predicate(armature),
+            _body_shell_predicate(refined),
             preserve_volume=_source_preserve_volume(body),
         )
     finally:
@@ -459,7 +503,7 @@ def create_outfit(
 
     garments: list[bpy.types.Object] = [
         shell,
-        _hood_back_drape(sampler, body, armature, fabric),
+        _hood_folded_roll(sampler, armature, fabric),
     ]
     garments.extend(
         v9._placket_and_buttons(
