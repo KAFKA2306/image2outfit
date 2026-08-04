@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PATCH_PATH = ROOT / "tools" / "siroino_heather_hooded_v21_patch.py"
 PRODUCT_PATH = ROOT / "tools" / "siroino_heather_hooded_product.py"
+LOBOMAP_PATH = ROOT / "tools" / "siroino_heather_lobomap_fit.py"
 JOB_PATH = ROOT / "config" / "products" / "siroino-heather-hooded-bodysuit" / "job.json"
 
 
@@ -17,6 +18,7 @@ class GarmentGeometryV22BodyAnchorTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.patch = PATCH_PATH.read_text(encoding="utf-8")
         cls.product = PRODUCT_PATH.read_text(encoding="utf-8")
+        cls.lobomap = LOBOMAP_PATH.read_text(encoding="utf-8")
         cls.job = json.loads(JOB_PATH.read_text(encoding="utf-8"))
         cls.tree = ast.parse(cls.patch, filename=str(PATCH_PATH))
 
@@ -37,10 +39,10 @@ class GarmentGeometryV22BodyAnchorTests(unittest.TestCase):
             "The flat patch must not add another internal import level",
         )
 
-    def test_job_retains_dama_anchor_as_the_v23_preconditioner(self) -> None:
+    def test_job_retains_dama_anchor_and_lobomap_as_v25_preconditioners(self) -> None:
         self.assertEqual(
             self.job["buildRevision"],
-            "v23-dama-anchor-lobomap-residual-fit",
+            "v25-side-aware-taubin-shell",
         )
         self.assertEqual(
             self.job["buildScript"],
@@ -51,6 +53,11 @@ class GarmentGeometryV22BodyAnchorTests(unittest.TestCase):
         self.assertLess(
             self.product.index("v21.install(pattern)"),
             self.product.index("lobomap.install(pattern)"),
+        )
+        self.assertIn("repair.install(pattern)", self.lobomap)
+        self.assertLess(
+            self.lobomap.index("pattern.create_outfit = create_outfit"),
+            self.lobomap.index("repair.install(pattern)"),
         )
 
     def test_underbody_strip_reaches_below_v20_cutoff(self) -> None:
