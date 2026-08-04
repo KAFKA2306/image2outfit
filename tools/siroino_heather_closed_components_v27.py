@@ -166,11 +166,7 @@ class PolarBodyProfile:
 
     def _height_interval(self, z: float) -> tuple[int, int, float]:
         z = max(self.Z_MIN, min(self.Z_MAX, z))
-        scaled = (
-            (z - self.Z_MIN)
-            / (self.Z_MAX - self.Z_MIN)
-            * (len(self.levels) - 1)
-        )
+        scaled = (z - self.Z_MIN) / (self.Z_MAX - self.Z_MIN) * (len(self.levels) - 1)
         lower = int(math.floor(scaled))
         upper = min(len(self.levels) - 1, lower + 1)
         return lower, upper, scaled - lower
@@ -639,9 +635,7 @@ def _folded_back_hood(
         subdivision_levels=1,
         minimum_clearance=0.008,
     )
-    obj["hoodConstruction"] = (
-        "low folded-back hood shell attached around the rear neck"
-    )
+    obj["hoodConstruction"] = "low folded-back hood shell attached around the rear neck"
     return obj
 
 
@@ -691,9 +685,7 @@ def _validate(
                 failures.append(f"{obj.name}: non-finite vertex {vertex.index}")
                 break
     if failures:
-        raise RuntimeError(
-            "Closed component validation failed: " + "; ".join(failures)
-        )
+        raise RuntimeError("Closed component validation failed: " + "; ".join(failures))
     return {
         "meshObjects": [obj.name for obj in mesh_objects],
         "meshObjectCount": len(mesh_objects),
