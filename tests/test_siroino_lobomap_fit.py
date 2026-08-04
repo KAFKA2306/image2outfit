@@ -11,9 +11,9 @@ REVISION = "v28-flat-saddle-contoured-cap-hood-roll"
 
 class SiroinoFusedRollTests(unittest.TestCase):
     def test_v28_entrypoint_overrides_v27_visual_mechanisms(self) -> None:
-        product = (
-            ROOT / "tools" / "siroino_heather_hooded_fused_product.py"
-        ).read_text(encoding="utf-8")
+        product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
+            encoding="utf-8"
+        )
         generator = (ROOT / "tools" / "siroino_heather_fused_roll_v28.py").read_text(
             encoding="utf-8"
         )
@@ -21,7 +21,8 @@ class SiroinoFusedRollTests(unittest.TestCase):
             "import siroino_heather_fused_roll_v28 as fused_roll",
             product,
         )
-        self.assertIn("fused_roll.install(product.pattern)", product)
+        self.assertIn("fused_roll.install(pattern)", product)
+        self.assertIn("import siroino_heather_hooded_pattern as pattern", product)
         for token in (
             'DESIGN_REVISION = "v28-flat-saddle-contoured-cap-hood-roll"',
             "base._torso_and_saddle = _torso_and_saddle",
@@ -58,7 +59,7 @@ class SiroinoFusedRollTests(unittest.TestCase):
         self.assertEqual(construction["designRevision"], REVISION)
         self.assertEqual(
             job["productBuildScript"],
-            "tools/siroino_heather_hooded_fused_product.py",
+            "tools/siroino_heather_hooded_product.py",
         )
         self.assertEqual(
             job["hostedPoseScript"],
