@@ -219,12 +219,9 @@ def build(body, armature, mats):
         ear = panel(
             f"Nocturne_Animal_Ear_{side}",
             [
-                head
-                + Vector((sign * height * 0.055, height * 0.010, height * 0.075)),
-                head
-                + Vector((sign * height * 0.090, height * 0.006, height * 0.145)),
-                head
-                + Vector((sign * height * 0.040, height * 0.004, height * 0.122)),
+                head + Vector((sign * height * 0.055, height * 0.010, height * 0.075)),
+                head + Vector((sign * height * 0.090, height * 0.006, height * 0.145)),
+                head + Vector((sign * height * 0.040, height * 0.004, height * 0.122)),
             ],
             mats["brown"],
             height * 0.004,
@@ -269,9 +266,7 @@ def build(body, armature, mats):
         (height * 0.021, height * 0.011, height * 0.028),
         mats["beige"],
     )
-    rigid.extend(
-        [(bow_left, "chest"), (bow_right, "chest"), (rabbit, "chest")]
-    )
+    rigid.extend([(bow_left, "chest"), (bow_right, "chest"), (rabbit, "chest")])
 
     chest_start, chest_end = bone_segment(armature, "chest")
     wing_origin = chest_start.lerp(chest_end, 0.60) + Vector(
