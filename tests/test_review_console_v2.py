@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -11,6 +12,7 @@ MODULE_PATH = ROOT / "tools" / "review_console.py"
 SPEC = importlib.util.spec_from_file_location("review_console_v2", MODULE_PATH)
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
 SPEC.loader.exec_module(MODULE)
 
 
@@ -35,7 +37,9 @@ class ReviewConsoleTest(unittest.TestCase):
         (product / "Logs").mkdir()
         (product / "Previews" / "front.png").write_bytes(b"front-image")
         (product / "Evidence" / "review.json").write_text("{}", encoding="utf-8")
-        (product / "Logs" / "runtime.txt").write_text("missing screenshot", encoding="utf-8")
+        (product / "Logs" / "runtime.txt").write_text(
+            "missing screenshot", encoding="utf-8"
+        )
         expected_review_hash = MODULE.digest(product / "Evidence" / "review.json")
         (product / "ProductManifest.json").write_text(
             json.dumps(
@@ -145,7 +149,9 @@ class ReviewConsoleTest(unittest.TestCase):
     def test_empty_repository_still_generates_valid_console(self) -> None:
         empty_root = Path(self.temp.name) / "empty"
         (empty_root / "config").mkdir(parents=True)
-        (empty_root / "config" / "release-policy.json").write_text("{}", encoding="utf-8")
+        (empty_root / "config" / "release-policy.json").write_text(
+            "{}", encoding="utf-8"
+        )
         output = empty_root / ".image2outfit" / "review-console"
         data = MODULE.build(empty_root, output)
         self.assertEqual(data["products"], [])
