@@ -81,7 +81,7 @@ class NocturneAngelSetContractTest(unittest.TestCase):
             "degenerateCleanupByObject",
         ):
             self.assertIn(required, source)
-        self.assertIn("metrics.get(\"degenerateTriangles\", 0) == 0", source)
+        self.assertIn('metrics.get("degenerateTriangles", 0) == 0', source)
 
     def test_v3_uses_sewn_bodice_panels_and_stable_modules(self) -> None:
         source = generator_source()
