@@ -3,9 +3,10 @@
 
 The source body is subdivided once before garment extraction so implicit cut
 boundaries no longer follow coarse source polygons. Torso, high-cut pelvis,
-shoulders and sleeves are copied as one shell. A compact hood-down cowl replaces
-the rejected inflated hood. The build stops on disconnected primary geometry,
-unexpected boundary loops, non-finite coordinates, or implausibly long edges.
+shoulders and sleeves are copied as one shell. An explicit shoulder bridge joins
+the torso and arm capsules. A compact hood-down cowl replaces the rejected
+inflated hood. The build stops on disconnected primary geometry, unexpected
+boundary loops, non-finite coordinates, or implausibly long edges.
 """
 
 from __future__ import annotations
@@ -19,7 +20,7 @@ from mathutils import Vector
 
 import siroino_heather_hooded_pattern as v9
 
-DESIGN_REVISION = "v15-refined-topology-folded-hood"
+DESIGN_REVISION = "v16-shoulder-bridged-refined-shell"
 clean_meshes = v9.clean_meshes
 bone_segment = v9.bone_segment
 
@@ -241,15 +242,16 @@ def _body_shell_predicate(
             center.z
         )
         highcut = 0.615 <= center.z <= 0.850 and x <= _highcut_width(center.z)
-        if torso or highcut:
+        shoulder_bridge = 0.105 <= x <= 0.360 and 0.925 <= center.z <= 1.090
+        if torso or highcut or shoulder_bridge:
             return True
 
         for upper_segment, lower_segment in arm_segments.values():
             upper_t, upper_distance = _segment_coordinates(center, *upper_segment)
             lower_t, lower_distance = _segment_coordinates(center, *lower_segment)
-            if -0.12 <= upper_t <= 1.10 and upper_distance <= 0.095:
+            if -0.25 <= upper_t <= 1.10 and upper_distance <= 0.110:
                 return True
-            if -0.10 <= lower_t <= 0.92 and lower_distance <= 0.078:
+            if -0.10 <= lower_t <= 0.92 and lower_distance <= 0.080:
                 return True
         return False
 
