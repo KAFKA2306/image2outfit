@@ -86,9 +86,7 @@ class GarmentGeometryAngularPolarYokeTests(unittest.TestCase):
         self.assertIn("def _open_front_hood(", self.generator)
         self.assertIn("theta_start = -math.pi / 4.0", self.generator)
         self.assertIn("theta_end = 5.0 * math.pi / 4.0", self.generator)
-        self.assertIn(
-            '"three-dimensional open-front polar hood shell"', self.generator
-        )
+        self.assertIn('"three-dimensional open-front polar hood shell"', self.generator)
 
     def test_body_is_reference_not_topology_source(self) -> None:
         self.assertIn('obj["bodyTopologyCopied"] = False', self.generator)
