@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "designRevision": "v3-sewn-v-neck-stable-modules",
+  "productId": "siroino-nocturne-angel-set",
+  "result": "VISUAL_REJECTED",
+  "visualAppearanceReview": "FAIL",
+  "reviewedAt": "2026-08-05T07:35:00+09:00",
+  "reviewer": "ChatGPT direct artifact image inspection",
+  "hostedWorkflowRun": 30957408404,
+  "artifactId": 8911782998,
+  "artifactSha256": "0921d4d449985ef757db808dc9b316421f1a70374f8cd5c4f75d562f254f3d2b",
+  "evidence": {
+    "multiview": {
+      "path": "Previews/siroino-nocturne-angel-set-multiview.webp",
+      "sha256": "ff86b86c2027ececfee3ca4750bd69b19309d1080b1273c21a615e8ca64bd2fc"
+    },
+    "poseReview": {
+      "path": "Previews/siroino-nocturne-angel-set-pose-review.webp",
+      "sha256": "4cccf241deebb8704116a80c76750698e358c5858931cab31cfaf9539f28ea8e"
+    }
+  },
+  "blockingFindings": [
+    "The bodice remains a broad box-like shell rather than a fitted sewn garment silhouette.",
+    "Puff sleeves, detached arm warmers and leg warmers remain visibly tubular and oversized.",
+    "The three-layer wing silhouette still reads as flat cutout geometry rather than rounded feather volume.",
+    "The rigid hip skirt does not follow seated, crouched or prone lower-body articulation and visibly intersects or floats around the legs.",
+    "The fit audit reports body-garment triangle intersections in every required pose, including 586 pairs in neutral and 2114 pairs in prone."
+  ],
+  "acceptedImprovements": [
+    "All five views and six required poses are framed and readable.",
+    "The V-neck and separate sewn bodice panels are visible.",
+    "The degenerate-triangle gate was repaired without weakening the zero-degeneracy requirement.",
+    "The v3 generated artifact has zero unweighted vertices, zero weight-sum errors and zero degenerate triangles."
+  ],
+  "nextAction": "Proceed to v4 with body-surface clearance, narrower fitted panels, bone-local arm and leg modules, lower-skirt thigh blending and explicitly triangulated feather panels."
+}
