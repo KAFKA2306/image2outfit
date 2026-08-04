@@ -1,4 +1,5 @@
 """Modular garment assembly for the Nocturne Angel set."""
+
 from __future__ import annotations
 
 import math
@@ -161,8 +162,7 @@ def build(body, armature, mats):
                 ),
                 cube(
                     f"Nocturne_Shoe_{side}",
-                    lower_end
-                    + Vector((0.0, -height * 0.04, -height * 0.015)),
+                    lower_end + Vector((0.0, -height * 0.04, -height * 0.015)),
                     (height * 0.055, height * 0.10, height * 0.04),
                     mats["brown"],
                 ),
@@ -233,9 +233,7 @@ def build(body, armature, mats):
         ]
     )
     chest_start, chest_end = bone_segment(armature, "chest")
-    origin = chest_start.lerp(chest_end, 0.62) + Vector(
-        (0.0, height * 0.09, 0.0)
-    )
+    origin = chest_start.lerp(chest_end, 0.62) + Vector((0.0, height * 0.09, 0.0))
     for side, sign in (("L", 1.0), ("R", -1.0)):
         for index in range(12):
             angle = math.radians(18 + index * 5)
