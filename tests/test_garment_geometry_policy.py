@@ -125,7 +125,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
             "intended_openings: int = 5",
             'role="wrist"',
             'role="leg"',
-            "center.z >= 0.95",
+            'component["center"].z >= 0.95',
             "center.z <= 0.72",
             "selected_indices.update(restored_indices)",
             "_close_unintended_openings(body, selected)",
