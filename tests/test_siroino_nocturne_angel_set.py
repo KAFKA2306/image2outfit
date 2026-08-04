@@ -9,6 +9,16 @@ PRODUCT_ID = "siroino-nocturne-angel-set"
 CONFIG = ROOT / "config" / "products" / PRODUCT_ID
 SCRIPT = ROOT / "tools" / "siroino_nocturne_angel_set.py"
 POSE_SCRIPT = ROOT / "tools" / "siroino_nocturne_angel_pose.py"
+GEOMETRY = ROOT / "tools" / "siroino_nocturne_geometry.py"
+MODULES = ROOT / "tools" / "siroino_nocturne_modules.py"
+RECORDS = ROOT / "tools" / "siroino_nocturne_records.py"
+
+
+def generator_source() -> str:
+    return "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in (SCRIPT, GEOMETRY, MODULES, RECORDS)
+    )
 
 
 class NocturneAngelSetContractTest(unittest.TestCase):
@@ -25,8 +35,8 @@ class NocturneAngelSetContractTest(unittest.TestCase):
             job["targetSourcePath"],
             "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
         )
-        self.assertTrue(SCRIPT.is_file())
-        self.assertTrue(POSE_SCRIPT.is_file())
+        for path in (SCRIPT, POSE_SCRIPT, GEOMETRY, MODULES, RECORDS):
+            self.assertTrue(path.is_file())
 
     def test_construction_is_explicit_loose_layered(self) -> None:
         construction = json.loads(
@@ -51,7 +61,7 @@ class NocturneAngelSetContractTest(unittest.TestCase):
         self.assertFalse(reference["sourceImageRedistributed"])
 
     def test_generator_uses_real_cloth_and_does_not_copy_body_topology(self) -> None:
-        source = SCRIPT.read_text(encoding="utf-8")
+        source = generator_source()
         for required in (
             '"CLOTH"',
             "vertex_group_mass",
@@ -66,7 +76,7 @@ class NocturneAngelSetContractTest(unittest.TestCase):
         self.assertNotIn("body.data.polygons", source)
 
     def test_modular_parts_are_authored_as_separate_objects(self) -> None:
-        source = SCRIPT.read_text(encoding="utf-8")
+        source = generator_source()
         for object_name in (
             "Nocturne_Cropped_Bodice",
             "Nocturne_Cloth_Skirt",
