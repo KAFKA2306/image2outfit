@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass
-from typing import Mapping
 
 from .construction import ConstructionSpec
 from .decomposition import GarmentDecomposition
@@ -165,7 +164,10 @@ class PatternHypothesis:
     parent_hypothesis_id: str | None = None
 
     def __post_init__(self) -> None:
-        if not self.hypothesis_id.strip() or not self.decomposition_hypothesis_id.strip():
+        if (
+            not self.hypothesis_id.strip()
+            or not self.decomposition_hypothesis_id.strip()
+        ):
             raise ValueError("pattern hypothesis identity fields are required")
         if self.parent_hypothesis_id == self.hypothesis_id:
             raise ValueError("pattern hypothesis cannot be its own parent")
@@ -267,9 +269,22 @@ class PatternHypothesis:
             self.construction.garment.pattern_pieces,
             key=lambda value: value.piece_id,
         ):
-            lines.extend(("0", "LWPOLYLINE", "8", piece.piece_id, "90", str(len(piece.boundary)), "70", "1"))
+            lines.extend(
+                (
+                    "0",
+                    "LWPOLYLINE",
+                    "8",
+                    piece.piece_id,
+                    "90",
+                    str(len(piece.boundary)),
+                    "70",
+                    "1",
+                )
+            )
             for x, y in piece.boundary:
-                lines.extend(("10", f"{x * 1000:.6f}", "20", f"{y * 1000:.6f}"))
+                lines.extend(
+                    ("10", f"{x * 1000:.6f}", "20", f"{y * 1000:.6f}")
+                )
         lines.extend(("0", "ENDSEC", "0", "EOF"))
         return "\n".join(lines) + "\n"
 
