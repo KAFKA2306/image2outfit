@@ -2,117 +2,103 @@
 
 ## 目的
 
-衣装ごとの巨大な Blender スクリプトへ知識を埋め込まず、画像から衣装を分解し、型紙・縫合・三次元初期配置・クロスシミュレーション・スキニング・レンダリング・監査へ進む手順を再利用可能な契約として管理します。
+衣装ごとの巨大なBlenderスクリプトへ知識を埋め込まず、参照画像から衣装要素、型紙、縫合、三次元初期配置、クロスシミュレーション、スキニング、レンダリング、監査へ進む手順を再利用可能な契約として管理します。
 
 ## 依存方向
 
 ```text
 config / product data
         ↓
-tools（実行、Blender、subprocess、個別アダプター）
+tools（実行、Blender、subprocess、製品固有アダプター）
         ↓
 src/image2outfit（製品非依存の安定ロジック）
 ```
 
-`src` から `tools`、`bpy`、`bmesh`、`mathutils` を import してはいけません。Blender が必要な処理は `src` で実行仕様を表現し、`tools` が実行します。依存方向は `tools → src` の一方向です。
+`src`から`tools`、`bpy`、`bmesh`、`mathutils`をimportしてはいけません。Blenderが必要な処理は`src`で実行仕様を表現し、`tools`が実行します。
 
-## src に置くもの
+## srcに置くもの
 
-- 身体部位、衣装パーツ、構造上の役割、積層位置、素材挙動、フィットの共通語彙
-- 二次元型紙、型紙辺、縫合グラフ、画像・型紙・三次元形状の対応識別子
-- 正規の工程順と工程状態
-- Blender Python 呼び出し仕様
-- クロスシミュレーション仕様
-- 五面・ポーズのレンダリング証拠仕様
-- 最新研究から結晶化した、製品非依存の実装原則
-- `src` と `tools` の境界監査
+- 身体部位と、左・右・中央・両側、前・後・内・外・上・下の位置語彙
+- 衣装パーツ、構造上の役割、積層位置、素材挙動、フィットの語彙
+- 二次元型紙境界、名前付き型紙辺、縫い代、ノッチ、ダーツ
+- 型紙辺を参照する縫合グラフ
+- 画像領域、型紙座標、三次元形状の対応識別子
+- 正規工程順と計画・実行状態
+- Blender Python、クロスシミュレーション、レンダリング証拠の仕様
+- 工程結果とSHA-256証拠の検証
+- 研究から結晶化した製品非依存原則
+- `src`と`tools`の境界監査
 
-## tools に置くもの
+## toolsに置くもの
 
 - コマンドライン入口
-- Blender 実行環境への接続
+- Blender実行環境への接続
 - subprocess、ファイルシステム、外部実行
-- 製品固有のビルドスクリプト
+- 製品固有のビルド、クロス、出力、レンダリングスクリプト
 - 実験中の個別ツール
 
-同じ製品非依存ロジックが複数の衣装で再実装された場合、または完成判定に必須の処理として安定した場合は、テストを付けて `src` へ昇格させます。
+複数製品で反復された製品非依存ロジック、または完成判定に必須の安定処理は、テストを付けて`src`へ昇格させます。
 
 ## 正規パイプライン
 
 1. 参照画像と来歴を固定
 2. 姿勢と視点を正規化
-3. 身体部位と構造上の役割で衣装を分解
+3. 身体位置と構造上の役割で衣装を分解
 4. 二次元型紙を作成
 5. 型紙辺の縫合グラフを作成
 6. 三次元初期配置を作成
-7. Blender Python を呼び出して形状を構築
+7. Blender Pythonで形状を構築
 8. クロスシミュレーションを実行
-9. スキニングと FBX 出力
+9. スキニングとFBXを出力
 10. 五面と必須ポーズをレンダリング
 11. 形状、ウェイト、貫通、証拠を監査
-12. 実画像を直接確認
-13. `WORKING`、`COMPLETE`、`REJECTED` を記録
+12. 現在の実画像を直接確認
+13. `WORKING`、`COMPLETE`、`REJECTED`を既存の候補ゲートへ記録
 
-正規の工程名と順序は `src/image2outfit/pipeline.py`、宣言プロファイルは `config/pipeline-profiles/garment-reconstruction-v1.json` にあります。
+正規工程は`src/image2outfit/pipeline.py`、工程別要件は`config/pipeline-profiles/garment-reconstruction-v1.json`にあります。
 
-## LangChain / LangGraph
+## 状態の境界
 
-同じ工程契約を3種類の実行器で動かします。
+- `PLANNED`: 13工程の呼び出し計画を構築した。実処理の成功ではない
+- `EXECUTED`: 工程別結果と証拠を検証し、13工程を実行した。製品完成の主張ではない
+- `FAILED`: 工程、結果契約、証拠、hashのいずれかが失敗した
+- `WORKING` / `COMPLETE` / `REJECTED`: 正準の製品状態。既存候補・完成ゲートだけが決定する
 
-- `deterministic`: 外部依存なし。CI、再現試験、計画生成用
-- `langchain`: `RunnableLambda` の直列チェーン
-- `langgraph`: `StateGraph` の状態付き工程グラフ
+LangChainとLangGraphは固定工程の実行器であり、製品完成状態の所有者ではありません。
 
-LangChain と LangGraph は固定された工程契約の実行器であり、衣装の意味や完成条件の所有者ではありません。工程、状態、語彙、検証規則は `src` が所有します。
+## 工程結果契約
 
-```powershell
-uv run --locked --no-default-groups python tools/run_garment_pipeline.py `
-  --request examples/pipeline-request.example.json
-
-uv run --with langchain-core==1.5.0 python tools/run_garment_pipeline.py `
-  --engine langchain `
-  --request examples/pipeline-request.example.json
-
-uv run --with langchain-core==1.5.0 --with langgraph==1.2.9 `
-  python tools/run_garment_pipeline.py `
-  --engine langgraph `
-  --request examples/pipeline-request.example.json
-```
-
-既定では各工程の呼び出し計画だけを生成します。計画の完走は実処理の成功を意味しません。`--execute` を付けた場合、`requiredInExecute: true` の全工程に `stageBindings` の具体的な argv が必要です。未接続工程が一つでもあれば、その工程で `FAILED` になり、`COMPLETE` を返しません。コマンドはシェルを介さず引数配列として実行します。
-
-製品固有の Blender スクリプトは、共通ランチャー `tools/run_blender_stage.py` から呼び出せます。例えば `build-blender`、`simulate-cloth`、`render-evidence` を別々のスクリプトへ結び、`audit-geometry` は既存の `tools/pipeline.py --mode blender-gate`、`finalize-candidate` は既存の `tools/production_gate.py --mode candidate` へ結べます。見た目レビューは、現在の実画像を直接開かない限り PASS にしません。
+実行バインディングはシェル文字列ではなくargv配列と、`.image2outfit/`以下の`resultPath`を宣言します。終了コード0だけでは工程は成功しません。
 
 ```json
 {
-  "variables": {
-    "blenderExecutable": "blender",
-    "jobPath": "jobs/<product>/job.json",
-    "buildScript": "tools/<product>_build.py"
-  },
   "stageBindings": {
-    "build-blender": {
-      "command": [
-        "{blenderExecutable}",
-        "--background",
-        "--python",
-        "tools/run_blender_stage.py",
-        "--",
-        "--script",
-        "{buildScript}",
-        "--job",
-        "{jobPath}"
-      ]
+    "render-evidence": {
+      "command": ["python", "tools/render_product.py", "--job", "{jobPath}"],
+      "resultPath": ".image2outfit/products/{productId}/reports/render-evidence.json"
     }
   }
 }
 ```
 
+工程コマンドは`schemaVersion`、正しい`stage`と`productId`、`status: PASS`、hash付き`evidence`を持つJSONを新規作成します。スキーマは`config/pipeline/stage-result.schema.v1.json`です。
+
+ランナーは古い結果ファイルを実行前に削除し、実行後に次を確認します。
+
+- 正しい工程名と製品ID
+- `status: PASS`
+- 工程プロファイルで要求された結果フィールド
+- 最低証拠件数
+- 証拠パスがリポジトリ内にあること
+- 証拠ファイルが存在すること
+- 実ファイルから再計算したSHA-256が宣言値と一致すること
+
+`visual-review`は少なくとも五面のhash付き証拠と`reviewMethod: direct-image-inspection`を要求します。ただし最終的な`visualAppearanceReview`判定は既存の製品完成契約が所有します。
+
+## 型紙中間表現
+
+型紙は単なる点列ではなく、パーツの身体部位・左右・前後内外位置、パネル境界、名前付き型紙辺、縫い代、ノッチ、ダーツ、画像・型紙・三次元形状の対応識別子、縫合が参照する正確な型紙辺を明示します。
+
 ## 研究原則
 
-- PatternGSL: パネル境界、縫合、ステッチ位相を第一級データにする
-- AutoSew: 縫合を型紙辺の幾何グラフとして扱う
-- DressWild: 姿勢・視点正規化と型紙推定を分離する
-- Diffusion Mapping via Pattern Coordinates: 画像、型紙座標、三次元形状の対応を保持する
-
-一次文献URL、日付、実装境界は `src/image2outfit/research.py` に固定します。著者コード、モデル、チェックポイント、データセットはコピーしません。
+一次文献の採用判断と本番要件の正本は`Assets/GenWorks/Shared/Research/2026-garment-methods.json`です。`src/image2outfit/research.py`は実装に直接利用する少数の安定原則を保持し、著者コード、モデル、チェックポイント、データセットはコピーしません。

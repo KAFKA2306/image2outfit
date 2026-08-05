@@ -16,6 +16,7 @@ if str(ROOT / "tools") not in sys.path:
     sys.path.insert(0, str(ROOT / "tools"))
 
 from image2outfit.pipeline import (
+    ExecutionMode,
     new_pipeline_state,
     run_langchain,
     run_langgraph,
@@ -66,11 +67,13 @@ def main() -> int:
             for key, value in _mapping(request.get("variables"), "variables").items()
         },
     }
+    mode = ExecutionMode.EXECUTE if args.execute else ExecutionMode.PLAN
     state = new_pipeline_state(
         product_id=product_id,
         target_avatar=target_avatar,
         source_reference=source_reference,
         profile_id=profile["profileId"],
+        execution_mode=mode,
     )
     registry = build_registry(
         profile,
@@ -89,7 +92,8 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(payload + "\n", encoding="utf-8")
     print(payload)
-    return 0 if result.get("status") == "COMPLETE" else 1
+    expected = "EXECUTED" if args.execute else "PLANNED"
+    return 0 if result.get("status") == expected else 1
 
 
 if __name__ == "__main__":
