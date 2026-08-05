@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-relative-v1",
+  "profileId": "blender-4.4.3-kes-relative-v2",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
   "mappingStatus": "render-calibration-required",
   "mappingMethod": "log-normalized relative projection across the six measured KES fabrics; not an SI-to-Blender unit conversion",
   "scalarProjectionRanges": {
-    "tensionStiffness": [8.0, 80.0],
-    "shearStiffness": [5.0, 50.0],
-    "bendingStiffness": [0.05, 20.0]
+    "tensionStiffness": [5.0, 35.0],
+    "shearStiffness": [3.0, 20.0],
+    "bendingStiffness": [0.05, 5.0]
   },
-  "bucklingCompressionRatio": 0.35,
+  "bucklingCompressionRatio": 0.5,
   "damping": {
-    "tension": 5.0,
-    "compression": 5.0,
-    "shear": 5.0,
-    "bending": 0.5
+    "tension": 1.0,
+    "compression": 1.0,
+    "shear": 1.0,
+    "bending": 0.2
   },
-  "airDamping": 1.0,
-  "quality": 10,
-  "collisionQuality": 6,
+  "airDamping": 0.5,
+  "quality": 12,
+  "collisionQuality": 8,
   "selfCollisionScale": 1.5,
   "contactHypothesis": {
     "hypothesisId": "shared-contact-prior-v1",
@@ -37,6 +37,14 @@
     "collisionObject.collision.cloth_friction": "static contact hypothesis on the collider",
     "collisionThickness": "physics contact offset",
     "renderThickness": "Solidify visual thickness"
+  },
+  "calibrationFixture": {
+    "type": "circular-drape-over-central-pedestal",
+    "specimenRadiusM": 0.82,
+    "supportRadiusM": 0.22,
+    "supportTopZM": 0.8,
+    "initialSpecimenZM": 0.82,
+    "purpose": "prevent unsupported flat-flight states and approximate a standard projected-area drape comparison"
   },
   "research": [
     {
