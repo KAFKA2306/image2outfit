@@ -26,12 +26,14 @@ def registry_for(
 ) -> ToolRegistry:
     registry = ToolRegistry()
     for stage in PIPELINE_STAGES:
+
         def handler(state, stage_name=stage.value):
             if called is not None:
                 called.append(stage_name)
             if stage_name == fail_at:
                 raise RuntimeError("expected failure")
             return {"mode": mode, "stage": stage_name}
+
         registry.register(
             stage,
             handler,
