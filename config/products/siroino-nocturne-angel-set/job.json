@@ -5,8 +5,8 @@
   "adapterId": "siroino-v1.0",
   "automaticBuild": true,
   "buildCapability": "blender-4.4.3-pattern-cloth-modular",
-  "buildRevision": "v5-skinweighted-pleated-volume",
-  "renderLoopRevision": "nocturne-angel-loop-v5",
+  "buildRevision": "v6-welded-projected-pleats",
+  "renderLoopRevision": "nocturne-angel-loop-v6",
   "productRoot": "Assets/GenWorks/siroino-nocturne-angel-set",
   "productManifestPath": "Assets/GenWorks/siroino-nocturne-angel-set/ProductManifest.json",
   "buildScript": "tools/siroino_nocturne_angel_set.py",
@@ -47,10 +47,10 @@
     "Breasts_L": 0.65
   },
   "garmentPipeline": {
-    "representation": "five angular sewn bodice panels, a twelve-pleat cloth skirt, transferred evaluated-body weights and volumetric optional modules",
-    "clothSimulation": "Blender 4.4 cloth on a seven-ring twelve-pleat skirt with pin group, body collision, self-collision, gravity weight 0.18, shape-preserving stiffness and evaluated-mesh baking",
+    "representation": "five logical bodice regions welded into one projected V-neck shell, a short twelve-pleat cloth skirt, four-influence evaluated-body weight transfer and supported volumetric modules",
+    "clothSimulation": "Blender 4.4 cloth on a six-ring twelve-pleat skirt with pin group, body collision, self-collision, zero gravity weight, shape-preserving stiffness and evaluated-mesh baking",
     "bodyTopologyCopied": false,
-    "moduleGroups": ["core", "head", "back", "legs", "accessories"]
+    "moduleGroups": ["core", "back", "legs", "accessories"]
   },
   "researchMethod": {
     "name": "PatternGSL-inspired structured garment specification with AutoSew-inspired seam validation and Blender cloth",
@@ -59,7 +59,7 @@
     "secondaryPaperUrl": "https://arxiv.org/abs/2602.22052",
     "officialCodeUrl": "https://github.com/PatternGSL/PatternGSL",
     "authorsImplementationExecuted": false,
-    "trialScope": "independent explicit panel, seam, layer and module contract; shape-preserving Blender cloth execution; outward nearest-surface clearance; four-influence evaluated-body weight transfer; no external model, checkpoint or dataset"
+    "trialScope": "independent logical panel and seam contract; one welded projected shell; zero-force shape-preserving Blender cloth checkpoint; outward nearest-surface clearance; four-influence evaluated-body weight transfer; no external model, checkpoint or dataset"
   },
   "licenseEvidence": "config/products/siroino-nocturne-angel-set/license.json",
   "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
@@ -82,6 +82,7 @@
     "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v2.json",
     "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v3.json",
     "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v4.json",
+    "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v5.json",
     "Assets/GenWorks/siroino-nocturne-angel-set/Previews/front.png",
     "Assets/GenWorks/siroino-nocturne-angel-set/Previews/back.png",
     "Assets/GenWorks/siroino-nocturne-angel-set/Previews/left.png",
