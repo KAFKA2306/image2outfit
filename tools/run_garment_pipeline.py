@@ -15,7 +15,9 @@ if str(SRC) not in sys.path:
 if str(ROOT / "tools") not in sys.path:
     sys.path.insert(0, str(ROOT / "tools"))
 
+from image2outfit.audit import write_audit_bundle
 from image2outfit.pipeline import (
+    PIPELINE_STAGES,
     ExecutionMode,
     new_pipeline_state,
     run_langchain,
@@ -40,6 +42,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--audit-root",
+        type=Path,
+        default=Path(".image2outfit/audit"),
+        help="Repository-relative root for immutable per-run audit bundles.",
+    )
     return parser.parse_args()
 
 
@@ -58,6 +66,9 @@ def main() -> int:
     product_id = request["productId"]
     target_avatar = request["targetAvatar"]
     source_reference = request["sourceReference"]
+    run_id = request.get("runId")
+    if run_id is not None and (not isinstance(run_id, str) or not run_id):
+        raise ValueError("request.runId must be a non-empty string when provided")
     variables = {
         "productId": str(product_id),
         "targetAvatar": str(target_avatar),
@@ -74,6 +85,7 @@ def main() -> int:
         source_reference=source_reference,
         profile_id=profile["profileId"],
         execution_mode=mode,
+        run_id=run_id,
     )
     registry = build_registry(
         profile,
@@ -87,6 +99,15 @@ def main() -> int:
         result = run_langchain(state, registry)
     else:
         result = run_pipeline(state, registry)
+
+    audit_root = (
+        args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
+    )
+    result["audit"] = write_audit_bundle(
+        result,
+        audit_root=audit_root,
+        canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+    )
     payload = json.dumps(result, ensure_ascii=False, indent=2)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)

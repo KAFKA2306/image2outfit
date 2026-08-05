@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/config/pipeline/stage-audit-record.schema.v1.json",
+  "title": "image2outfit pipeline stage audit record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "runId",
+    "productId",
+    "sequence",
+    "stage",
+    "requestedMode",
+    "outcomeMode",
+    "status",
+    "startedAt",
+    "finishedAt",
+    "tool",
+    "inputDigest",
+    "outputDigest",
+    "previousRecordDigest",
+    "resultPath",
+    "evidence",
+    "output",
+    "recordDigest"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "runId": {"type": "string", "minLength": 1},
+    "productId": {"type": "string", "minLength": 1},
+    "sequence": {"type": "integer", "minimum": 1},
+    "stage": {"type": "string", "minLength": 1},
+    "requestedMode": {"enum": ["plan", "execute"]},
+    "outcomeMode": {"enum": ["planned", "executed", "failed"]},
+    "status": {"enum": ["PLANNED", "PASS", "FAILED"]},
+    "startedAt": {"type": "string", "format": "date-time"},
+    "finishedAt": {"type": "string", "format": "date-time"},
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "purpose", "outputContract"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "purpose": {"type": "string", "minLength": 1},
+        "outputContract": {"type": "string", "minLength": 1}
+      }
+    },
+    "inputDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "outputDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "previousRecordDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "resultPath": {"type": "string"},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "output": {"type": "object"},
+    "recordDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

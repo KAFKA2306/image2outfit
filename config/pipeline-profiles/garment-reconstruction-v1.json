@@ -1,6 +1,13 @@
 {
   "schemaVersion": 1,
   "profileId": "garment-reconstruction-v1",
+  "auditContract": {
+    "recordSchema": "config/pipeline/stage-audit-record.schema.v1.json",
+    "manifestSchema": "config/pipeline/run-audit-manifest.schema.v1.json",
+    "storageRoot": ".image2outfit/audit/{productId}/{runId}",
+    "hashAlgorithm": "SHA-256",
+    "chain": "previousRecordDigest"
+  },
   "researchPrinciples": [
     "pattern-first-structured-garment",
     "geometry-first-stitch-graph",
@@ -8,18 +15,122 @@
     "pattern-coordinate-mapping"
   ],
   "stages": [
-    {"stage":"ingest-reference","toolName":"reference-ingest","purpose":"Bind the source image, hashes, provenance, and target avatar.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{}},
-    {"stage":"normalize-view","toolName":"pose-view-normalizer","purpose":"Separate pose and viewpoint effects from garment evidence.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{}},
-    {"stage":"decompose-garment","toolName":"semantic-part-decomposer","purpose":"Name garment parts by construction role and body region.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{}},
-    {"stage":"draft-patterns","toolName":"pattern-piece-drafter","purpose":"Create explicit two-dimensional panel boundaries and correspondence identifiers.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{}},
-    {"stage":"infer-stitches","toolName":"stitch-graph-builder","purpose":"Create explicit edge-to-edge and multi-edge sewing topology.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{}},
-    {"stage":"initialize-3d","toolName":"pattern-initializer","purpose":"Place pattern pieces around the avatar without folds or intersections.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{}},
-    {"stage":"build-blender","toolName":"blender-python-runner","purpose":"Invoke the declared Blender Python build script through one reusable adapter.","requiredInExecute":true,"minimumEvidenceCount":2,"requiredResultFields":{}},
-    {"stage":"simulate-cloth","toolName":"blender-cloth-simulator","purpose":"Apply the declared cloth, collision, and cache contract.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{}},
-    {"stage":"skin-and-export","toolName":"skinning-fbx-exporter","purpose":"Bind semantic body regions to bones and export the editable source and FBX.","requiredInExecute":true,"minimumEvidenceCount":2,"requiredResultFields":{}},
-    {"stage":"render-evidence","toolName":"evidence-renderer","purpose":"Render required five views and declared poses from the current artifact.","requiredInExecute":true,"minimumEvidenceCount":5,"requiredResultFields":{}},
-    {"stage":"audit-geometry","toolName":"geometry-fit-auditor","purpose":"Measure topology, weights, degeneracy, collisions, and evidence hashes.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{}},
-    {"stage":"visual-review","toolName":"visual-appearance-gate","purpose":"Require direct inspection of current images before visualAppearanceReview can pass.","requiredInExecute":true,"minimumEvidenceCount":5,"requiredResultFields":{"reviewMethod":"direct-image-inspection"}},
-    {"stage":"finalize-candidate","toolName":"candidate-finalizer","purpose":"Write the truthful WORKING, COMPLETE, or REJECTED candidate state.","requiredInExecute":true,"minimumEvidenceCount":1,"requiredResultFields":{"decisionRecorded":true}}
+    {
+      "stage": "ingest-reference",
+      "toolName": "reference-ingest",
+      "purpose": "Bind the source image, hashes, provenance, and target avatar.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["referenceManifest", "sourceSha256", "provenance", "targetAvatarBinding"]
+    },
+    {
+      "stage": "normalize-view",
+      "toolName": "pose-view-normalizer",
+      "purpose": "Separate pose and viewpoint effects from garment evidence.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["normalizedReference", "cameraPose", "bodyLandmarks", "normalizationMetrics"]
+    },
+    {
+      "stage": "decompose-garment",
+      "toolName": "semantic-part-decomposer",
+      "purpose": "Name garment parts by construction role and body region.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["garmentPartGraph", "spatialAssignments", "materialRegions", "ambiguityLog"]
+    },
+    {
+      "stage": "draft-patterns",
+      "toolName": "pattern-piece-drafter",
+      "purpose": "Create explicit two-dimensional panel boundaries and correspondence identifiers.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["patternSpecification", "patternEdges", "seamAllowances", "notchesAndDarts", "correspondenceMap"]
+    },
+    {
+      "stage": "infer-stitches",
+      "toolName": "stitch-graph-builder",
+      "purpose": "Create explicit edge-to-edge and multi-edge sewing topology.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["stitchGraph", "edgePairings", "stitchDirections", "topologyValidation"]
+    },
+    {
+      "stage": "initialize-3d",
+      "toolName": "pattern-initializer",
+      "purpose": "Place pattern pieces around the avatar without folds or intersections.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["initializedMesh", "panelTransforms", "initialClearanceAudit"]
+    },
+    {
+      "stage": "build-blender",
+      "toolName": "blender-python-runner",
+      "purpose": "Invoke the declared Blender Python build script through one reusable adapter.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 2,
+      "requiredResultFields": {},
+      "managedOutputs": ["editableBlend", "buildReport", "geometryMetrics"]
+    },
+    {
+      "stage": "simulate-cloth",
+      "toolName": "blender-cloth-simulator",
+      "purpose": "Apply the declared cloth, collision, and cache contract.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["clothCache", "simulationConfig", "collisionReport", "simulatedMesh"]
+    },
+    {
+      "stage": "skin-and-export",
+      "toolName": "skinning-fbx-exporter",
+      "purpose": "Bind semantic body regions to bones and export the editable source and FBX.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 2,
+      "requiredResultFields": {},
+      "managedOutputs": ["skinnedBlend", "fbx", "weightAudit", "prefabDeclaration"]
+    },
+    {
+      "stage": "render-evidence",
+      "toolName": "evidence-renderer",
+      "purpose": "Render required five views and declared poses from the current artifact.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 5,
+      "requiredResultFields": {},
+      "managedOutputs": ["fiveViewImages", "requiredPoseImages", "renderManifest"]
+    },
+    {
+      "stage": "audit-geometry",
+      "toolName": "geometry-fit-auditor",
+      "purpose": "Measure topology, weights, degeneracy, collisions, and evidence hashes.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["geometryAudit", "penetrationAudit", "evidenceHashAudit", "gateSummary"]
+    },
+    {
+      "stage": "visual-review",
+      "toolName": "visual-appearance-gate",
+      "purpose": "Require direct inspection of current images before visualAppearanceReview can pass.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 5,
+      "requiredResultFields": {"reviewMethod": "direct-image-inspection"},
+      "managedOutputs": ["visualReview", "inspectedImageHashes", "blockingFindings"]
+    },
+    {
+      "stage": "finalize-candidate",
+      "toolName": "candidate-finalizer",
+      "purpose": "Write the truthful WORKING, COMPLETE, or REJECTED candidate state.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {"decisionRecorded": true},
+      "managedOutputs": ["candidateState", "completionGateRecord", "releaseDecision"]
+    }
   ]
 }
