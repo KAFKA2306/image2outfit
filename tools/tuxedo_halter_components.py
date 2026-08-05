@@ -17,9 +17,9 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
     size = 512
     outputs: dict[str, Path] = {}
     specs = {
-        "wine_satin": ((162, 12, 43), 112, 14),
-        "black_satin": ((9, 9, 13), 126, 10),
-        "white_jacquard": ((240, 239, 236), 176, 8),
+        "wine_satin": ((132, 7, 34), 118, 11),
+        "black_satin": ((8, 8, 12), 132, 8),
+        "white_jacquard": ((238, 237, 233), 180, 7),
     }
     for name, (base_color, roughness, normal_amp) in specs.items():
         albedo = Image.new("RGB", (size, size))
@@ -35,9 +35,9 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
                     motif = math.sin(x * math.tau / 64.0) * math.sin(
                         y * math.tau / 64.0
                     )
-                    delta = int(4 * weave + 5 * motif)
+                    delta = int(3 * weave + 4 * motif)
                 else:
-                    delta = int(4 * weave + 7 * diagonal)
+                    delta = int(3 * weave + 5 * diagonal)
                 pixel = tuple(
                     max(0, min(255, channel + delta)) for channel in base_color
                 )
@@ -51,7 +51,7 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
                     ),
                 )
                 rough.putpixel(
-                    (x, y), max(0, min(255, roughness + int(8 * diagonal)))
+                    (x, y), max(0, min(255, roughness + int(7 * diagonal)))
                 )
         for suffix, image in (
             ("albedo", albedo),
@@ -93,13 +93,13 @@ def textured_material(
     rough = image_node(nodes, roughness, non_color=True)
     normal_image = image_node(nodes, normal, non_color=True)
     normal_map = nodes.new("ShaderNodeNormalMap")
-    normal_map.inputs["Strength"].default_value = 0.38
+    normal_map.inputs["Strength"].default_value = 0.30
     shader.inputs["Metallic"].default_value = 0.0
     shader.inputs["IOR"].default_value = 1.46
     shader.inputs["Alpha"].default_value = alpha
     if "Sheen Weight" in shader.inputs:
         shader.inputs["Sheen Weight"].default_value = sheen
-        shader.inputs["Sheen Roughness"].default_value = 0.42
+        shader.inputs["Sheen Roughness"].default_value = 0.48
     links.new(color.outputs["Color"], shader.inputs["Base Color"])
     links.new(rough.outputs["Color"], shader.inputs["Roughness"])
     links.new(normal_image.outputs["Color"], normal_map.inputs["Color"])
@@ -185,18 +185,17 @@ def bib_panel(
     material: bpy.types.Material,
 ) -> bpy.types.Object:
     rows = [
-        (1.030, 0.040),
-        (0.980, 0.075),
-        (0.915, 0.100),
-        (0.845, 0.092),
-        (0.785, 0.058),
-        (0.730, 0.000),
+        (1.020, 0.028),
+        (0.982, 0.050),
+        (0.930, 0.072),
+        (0.870, 0.074),
+        (0.810, 0.056),
+        (0.758, 0.002),
     ]
     vertices: list[tuple[float, float, float]] = []
     for z, width in rows:
-        xs = (-max(width, 0.002), max(width, 0.002))
-        for x in xs:
-            vertices.append((x, base.body_front_y(body, x, z) - 0.010, z))
+        for x in (-max(width, 0.002), max(width, 0.002)):
+            vertices.append((x, base.body_front_y(body, x, z) - 0.011, z))
     faces = [
         (index, index + 1, index + 3, index + 2)
         for index in range(0, (len(rows) - 1) * 2, 2)
@@ -208,7 +207,8 @@ def bib_panel(
         material,
         body,
         armature,
-        thickness=0.0012,
+        thickness=0.0011,
+        bevel=0.0005,
     )
 
 
@@ -219,35 +219,24 @@ def waistcoat_side(
     material: bpy.types.Material,
 ) -> bpy.types.Object:
     sign = -1.0 if side == "L" else 1.0
-    rows = [
-        (1.025, 0.045, 0.105),
-        (0.960, 0.065, 0.135),
-        (0.890, 0.082, 0.150),
-        (0.820, 0.072, 0.155),
-        (0.755, 0.040, 0.145),
-        (0.710, 0.025, 0.125),
-    ]
-    vertices: list[tuple[float, float, float]] = []
-    for z, inner, outer in rows:
-        for width in (inner, outer):
-            x = sign * width
-            vertices.append((x, base.body_front_y(body, x, z) - 0.012, z))
-    faces: list[tuple[int, int, int, int]] = []
-    for row in range(len(rows) - 1):
-        index = row * 2
-        if sign < 0:
-            faces.append((index, index + 2, index + 3, index + 1))
-        else:
-            faces.append((index, index + 1, index + 3, index + 2))
-    return mesh_object(
-        f"Wine_Waistcoat_Front_{side}",
-        vertices,
-        faces,
-        material,
+
+    def predicate(center) -> bool:
+        absolute_x = abs(center.x)
+        inner = 0.020 + max(0.0, center.z - 0.720) * 0.125
+        return (
+            0.715 <= center.z <= 1.015
+            and center.y < 0.012
+            and center.x * sign > 0.0
+            and inner <= absolute_x <= 0.160
+        )
+
+    return base.extract_surface(
         body,
         armature,
-        thickness=0.0017,
-        bevel=0.0008,
+        f"Wine_Waistcoat_Front_{side}",
+        predicate,
+        material,
+        0.0075,
     )
 
 
@@ -260,11 +249,11 @@ def waistcoat_back(
         body,
         armature,
         "Wine_Waistcoat_Back",
-        lambda center: 0.715 <= center.z <= 1.010
-        and center.y > 0.0
-        and abs(center.x) <= 0.155,
+        lambda center: 0.715 <= center.z <= 0.900
+        and center.y >= -0.004
+        and abs(center.x) <= 0.152,
         material,
-        0.0065,
+        0.0070,
     )
 
 
@@ -276,13 +265,13 @@ def tail_panel(
 ) -> bpy.types.Object:
     sign = -1.0 if side == "L" else 1.0
     coordinates = [
-        (sign * 0.025, 0.715),
-        (sign * 0.132, 0.715),
-        (sign * 0.145, 0.650),
-        (sign * 0.055, 0.505),
+        (sign * 0.020, 0.735),
+        (sign * 0.108, 0.735),
+        (sign * 0.112, 0.680),
+        (sign * 0.045, 0.590),
     ]
     vertices = [
-        (x, base.body_front_y(body, x, z) - 0.014, z) for x, z in coordinates
+        (x, base.body_front_y(body, x, z) - 0.012, z) for x, z in coordinates
     ]
     face = (0, 1, 2, 3) if side == "R" else (0, 3, 2, 1)
     return mesh_object(
@@ -292,8 +281,8 @@ def tail_panel(
         material,
         body,
         armature,
-        thickness=0.0018,
-        bevel=0.0006,
+        thickness=0.0016,
+        bevel=0.0005,
     )
 
 
@@ -312,22 +301,36 @@ def ring_skirt(
     pleats: int,
     thickness: float,
 ) -> tuple[bpy.types.Object, list[int]]:
-    segments = pleats * 6
+    del thickness
+    segments = pleats * 8
+    vertical_segments = 7
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, int, int, int]] = []
-    for z, rx, ry in (
-        (top_z, top_rx, top_ry),
-        (bottom_z, bottom_rx, bottom_ry),
-    ):
+    for row in range(vertical_segments):
+        ratio = row / (vertical_segments - 1)
+        z = top_z + (bottom_z - top_z) * ratio
+        rx = top_rx + (bottom_rx - top_rx) * ratio
+        ry = top_ry + (bottom_ry - top_ry) * ratio
+        fold_amplitude = 0.004 + 0.010 * ratio
         for index in range(segments):
             angle = math.tau * index / segments
-            fold = 1.0 + 0.060 * math.sin(angle * pleats * 2)
+            fold = 1.0 + fold_amplitude * math.sin(angle * pleats)
             vertices.append(
                 (rx * fold * math.cos(angle), ry * fold * math.sin(angle), z)
             )
-    for index in range(segments):
-        following = (index + 1) % segments
-        faces.append((index, following, segments + following, segments + index))
+    for row in range(vertical_segments - 1):
+        start = row * segments
+        following_row = (row + 1) * segments
+        for index in range(segments):
+            following = (index + 1) % segments
+            faces.append(
+                (
+                    start + index,
+                    start + following,
+                    following_row + following,
+                    following_row + index,
+                )
+            )
     obj = mesh_object(
         name,
         vertices,
@@ -347,18 +350,18 @@ def vertical_ruffle(
     armature: bpy.types.Object,
     material: bpy.types.Material,
 ) -> bpy.types.Object:
-    center_x = (index - 1) * 0.025
+    center_x = (index - 1) * 0.018
     steps = 24
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, int, int, int]] = []
     for step in range(steps):
         ratio = step / (steps - 1)
-        z = 0.975 - ratio * 0.205
-        wave = 0.007 * math.sin(ratio * math.tau * 5 + index * 0.8)
+        z = 0.965 - ratio * 0.165
+        wave = 0.004 * math.sin(ratio * math.tau * 4 + index * 0.8)
         center = center_x + wave
-        width = 0.012 + 0.004 * math.sin(ratio * math.pi)
+        width = 0.009 + 0.003 * math.sin(ratio * math.pi)
         for x in (center - width, center + width):
-            y = base.body_front_y(body, x, z) - 0.016 - abs(wave) * 0.5
+            y = base.body_front_y(body, x, z) - 0.015 - abs(wave) * 0.4
             vertices.append((x, y, z))
     for step in range(steps - 1):
         point = step * 2
@@ -370,8 +373,8 @@ def vertical_ruffle(
         material,
         body,
         armature,
-        thickness=0.0009,
-        bevel=0.0003,
+        thickness=0.0008,
+        bevel=0.00025,
     )
 
 
@@ -399,19 +402,19 @@ def bow_tie(
     armature: bpy.types.Object,
     material: bpy.types.Material,
 ) -> list[bpy.types.Object]:
-    y = base.body_front_y(body, 0.0, 0.990) - 0.022
+    y = base.body_front_y(body, 0.0, 0.990) - 0.020
     left = ellipsoid(
         "Black_Bow_Left",
-        (-0.030, y, 0.985),
-        (0.035, 0.012, 0.024),
+        (-0.026, y, 0.985),
+        (0.030, 0.010, 0.020),
         material,
         body,
         armature,
     )
     right = ellipsoid(
         "Black_Bow_Right",
-        (0.030, y, 0.985),
-        (0.035, 0.012, 0.024),
+        (0.026, y, 0.985),
+        (0.030, 0.010, 0.020),
         material,
         body,
         armature,
@@ -419,7 +422,7 @@ def bow_tie(
     knot = ellipsoid(
         "Black_Bow_Knot",
         (0.0, y - 0.003, 0.985),
-        (0.013, 0.014, 0.016),
+        (0.011, 0.012, 0.014),
         material,
         body,
         armature,
