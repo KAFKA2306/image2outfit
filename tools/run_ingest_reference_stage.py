@@ -74,9 +74,7 @@ def main() -> int:
     request = read_object(request_path, "request")
     identity_value = job.get("garmentPipeline", {}).get("identityManifestPath")
     if identity_value is None:
-        identity_value = (
-            f"config/products/{job.get('id', '')}/reference-identity.json"
-        )
+        identity_value = f"config/products/{job.get('id', '')}/reference-identity.json"
     if not isinstance(identity_value, str) or not identity_value:
         raise ValueError("identity manifest path must be a non-empty string")
     identity_path = repo_path(identity_value, label="identity manifest")
