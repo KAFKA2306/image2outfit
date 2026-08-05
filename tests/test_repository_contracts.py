@@ -155,7 +155,10 @@ class RepositoryContractTest(unittest.TestCase):
 
         handoff = read_json(ROOT / "config" / "genworks-handoff-policy.json")
         self.assertEqual(handoff["schemaVersion"], 2)
-        self.assertEqual(handoff["statuses"], ["WORKING", "COMPLETE", "REJECTED"])
+        self.assertEqual(
+            handoff["statuses"],
+            ["WORKING", "COMPLETE", "REJECTED"],
+        )
         self.assertEqual(handoff["completionStatus"], "COMPLETE")
         completion = set(handoff["requiredCompletionGates"])
         out_of_scope = set(handoff["outOfScopeGates"])
@@ -227,9 +230,11 @@ class RepositoryContractTest(unittest.TestCase):
         )
         self.assertEqual(sorted((ROOT / "config").glob("*.template.json")), [])
 
-    def test_every_product_has_existing_canonical_handoff_assets(self) -> None:
+    def test_every_product_has_a_verifiable_canonical_handoff(self) -> None:
         products_root = ROOT / "config" / "products"
-        product_dirs = sorted(path for path in products_root.iterdir() if path.is_dir())
+        product_dirs = sorted(
+            path for path in products_root.iterdir() if path.is_dir()
+        )
         self.assertGreaterEqual(len(product_dirs), 2)
 
         policy = read_json(ROOT / "config" / "genworks-handoff-policy.json")
@@ -278,19 +283,12 @@ class RepositoryContractTest(unittest.TestCase):
                 self.assertTrue((product_root_path / "README.md").is_file())
                 self.assertTrue((product_root_path / "Prefab").is_dir())
 
-                for value in delivery_assets:
-                    self.assertTrue(
-                        (ROOT / value).is_file(),
-                        f"{product_id}: missing delivery asset {value}",
-                    )
-
                 for field in required_assets:
                     value = job.get(field)
                     self.assertIsInstance(value, str, f"{product_id}: {field}")
                     self.assertTrue(value, f"{product_id}: {field}")
                     self.assertTrue(value.startswith(product_root + "/"))
                     self.assertIn(value, delivery_assets)
-                    self.assertTrue((ROOT / value).is_file(), value)
 
                 previews = job.get("previewPaths")
                 self.assertIsInstance(previews, dict, product_id)
@@ -298,9 +296,9 @@ class RepositoryContractTest(unittest.TestCase):
                 for value in previews.values():
                     self.assertTrue(value.startswith(product_root + "/"))
                     self.assertIn(value, delivery_assets)
-                    self.assertTrue((ROOT / value).is_file(), value)
 
                 manifest_path = ROOT / job["productManifestPath"]
+                self.assertTrue(manifest_path.is_file(), manifest_path)
                 manifest = read_json(manifest_path)
                 self.assertEqual(manifest.get("productId"), product_id)
                 self.assertEqual(manifest.get("productRoot"), product_root)
@@ -321,6 +319,31 @@ class RepositoryContractTest(unittest.TestCase):
                             gates.get(gate_name),
                             "PASS",
                             (manifest_path, gate_name),
+                        )
+                    for value in delivery_assets:
+                        self.assertTrue(
+                            (ROOT / value).is_file(),
+                            f"{product_id}: missing COMPLETE asset {value}",
+                        )
+
+                gate_paths = {
+                    "blender": [job["blendPath"]],
+                    "editableSource": [job["blendPath"]],
+                    "fbx": [job["fbxAssetPath"]],
+                    "prefabDeclared": [
+                        job["prefabAssetPath"],
+                        job["integratedPrefabAssetPath"],
+                    ],
+                    "fiveViewEvidence": list(previews.values()),
+                    "poseEvidence": list(job.get("posePaths", {}).values()),
+                }
+                for gate_name, paths in gate_paths.items():
+                    if gates.get(gate_name) != "PASS":
+                        continue
+                    for value in paths:
+                        self.assertTrue(
+                            (ROOT / value).is_file(),
+                            f"{product_id}: {gate_name}=PASS but missing {value}",
                         )
 
     def test_unity_adapter_and_release_boundary_remain_current(self) -> None:
@@ -361,11 +384,15 @@ class RepositoryContractTest(unittest.TestCase):
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, source)
 
-        release_gate_source = (TOOLS / "release_gate.py").read_text(encoding="utf-8")
+        release_gate_source = (TOOLS / "release_gate.py").read_text(
+            encoding="utf-8"
+        )
         self.assertNotIn("def evidence_gate", release_gate_source)
         self.assertNotIn("def run_release", release_gate_source)
         core = (TOOLS / "production_gate_core.py").read_text(encoding="utf-8")
-        release = (TOOLS / "release_orchestrator.py").read_text(encoding="utf-8")
+        release = (TOOLS / "release_orchestrator.py").read_text(
+            encoding="utf-8"
+        )
         self.assertNotIn("legacy.run_release", core)
         self.assertNotIn("legacy.run_release", release)
         self.assertIn("contract.package_release", release)
