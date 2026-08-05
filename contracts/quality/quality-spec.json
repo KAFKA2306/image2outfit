@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "specId": "garment-quality-2026-v1",
+  "completionGate": "visualAppearanceReview",
+  "hashAlgorithm": "sha256",
+  "directImageReview": {
+    "requiredMethod": "DIRECT_IMAGE_REVIEW",
+    "allowedReviewerPrefixes": [
+      "human:",
+      "chatgpt:"
+    ],
+    "requiredEvidenceKind": "direct-render-image",
+    "requiredViews": [
+      "front",
+      "back",
+      "left",
+      "right",
+      "three-quarter"
+    ],
+    "requiredPoses": [
+      "neutral",
+      "arms-up",
+      "arm-cross",
+      "crouch",
+      "sit",
+      "prone"
+    ],
+    "allowedExtensions": [
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".webp"
+    ]
+  },
+  "aspects": [
+    {
+      "id": "topology",
+      "metric": {
+        "name": "invalidTopologyFindingCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "AUTOMATED"
+      ],
+      "requiredEvidenceKinds": [
+        "geometry-audit"
+      ],
+      "targetViews": [],
+      "targetPoses": [
+        "neutral"
+      ],
+      "defectCode": "TOPOLOGY_INVALID",
+      "returnStage": "build-blender",
+      "completionGate": "blender",
+      "allowOutOfScope": false
+    },
+    {
+      "id": "seam",
+      "metric": {
+        "name": "unmatchedSeamCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "AUTOMATED"
+      ],
+      "requiredEvidenceKinds": [
+        "seam-audit"
+      ],
+      "targetViews": [],
+      "targetPoses": [
+        "neutral"
+      ],
+      "defectCode": "SEAM_CORRESPONDENCE_INVALID",
+      "returnStage": "infer-stitches",
+      "completionGate": "editableSource",
+      "allowOutOfScope": true
+    },
+    {
+      "id": "fit",
+      "metric": {
+        "name": "fitViolationCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "AUTOMATED",
+        "DIRECT_IMAGE_REVIEW"
+      ],
+      "requiredEvidenceKinds": [
+        "fit-audit"
+      ],
+      "targetViews": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "targetPoses": [
+        "neutral",
+        "arms-up",
+        "crouch",
+        "sit"
+      ],
+      "defectCode": "FIT_OUT_OF_TOLERANCE",
+      "returnStage": "draft-patterns",
+      "completionGate": "visualAppearanceReview",
+      "allowOutOfScope": false
+    },
+    {
+      "id": "material-response",
+      "metric": {
+        "name": "materialResponseViolationCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "AUTOMATED",
+        "DIRECT_IMAGE_REVIEW"
+      ],
+      "requiredEvidenceKinds": [
+        "material-response-audit"
+      ],
+      "targetViews": [
+        "front",
+        "back",
+        "three-quarter"
+      ],
+      "targetPoses": [
+        "neutral",
+        "arms-up",
+        "crouch"
+      ],
+      "defectCode": "MATERIAL_RESPONSE_INVALID",
+      "returnStage": "simulate-cloth",
+      "completionGate": "visualAppearanceReview",
+      "allowOutOfScope": false
+    },
+    {
+      "id": "layering",
+      "metric": {
+        "name": "undeclaredLayerInteractionCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "AUTOMATED",
+        "DIRECT_IMAGE_REVIEW"
+      ],
+      "requiredEvidenceKinds": [
+        "layering-audit"
+      ],
+      "targetViews": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "targetPoses": [
+        "neutral",
+        "arms-up",
+        "arm-cross",
+        "crouch",
+        "sit",
+        "prone"
+      ],
+      "defectCode": "LAYERING_ORDER_INVALID",
+      "returnStage": "decompose-garment",
+      "completionGate": "visualAppearanceReview",
+      "allowOutOfScope": true
+    },
+    {
+      "id": "skinning",
+      "metric": {
+        "name": "skinningDefectCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "AUTOMATED",
+        "DIRECT_IMAGE_REVIEW"
+      ],
+      "requiredEvidenceKinds": [
+        "skinning-audit"
+      ],
+      "targetViews": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "targetPoses": [
+        "neutral",
+        "arms-up",
+        "arm-cross",
+        "crouch",
+        "sit",
+        "prone"
+      ],
+      "defectCode": "SKINNING_DEFORMATION_INVALID",
+      "returnStage": "skin-and-export",
+      "completionGate": "poseEvidence",
+      "allowOutOfScope": false
+    },
+    {
+      "id": "collision",
+      "metric": {
+        "name": "blockingCollisionCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "AUTOMATED",
+        "DIRECT_IMAGE_REVIEW"
+      ],
+      "requiredEvidenceKinds": [
+        "collision-audit"
+      ],
+      "targetViews": [
+        "front",
+        "back",
+        "left",
+        "right"
+      ],
+      "targetPoses": [
+        "neutral",
+        "arms-up",
+        "arm-cross",
+        "crouch",
+        "sit",
+        "prone"
+      ],
+      "defectCode": "COLLISION_BLOCKING",
+      "returnStage": "simulate-cloth",
+      "completionGate": "poseEvidence",
+      "allowOutOfScope": false
+    },
+    {
+      "id": "silhouette",
+      "metric": {
+        "name": "silhouetteDefectCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "DIRECT_IMAGE_REVIEW"
+      ],
+      "requiredEvidenceKinds": [
+        "direct-render-image"
+      ],
+      "targetViews": [
+        "front",
+        "back",
+        "left",
+        "right",
+        "three-quarter"
+      ],
+      "targetPoses": [
+        "neutral"
+      ],
+      "defectCode": "SILHOUETTE_FIDELITY_INVALID",
+      "returnStage": "build-blender",
+      "completionGate": "visualAppearanceReview",
+      "allowOutOfScope": false
+    },
+    {
+      "id": "styling-fidelity",
+      "metric": {
+        "name": "stylingDeviationCount",
+        "operator": "lte",
+        "threshold": 0
+      },
+      "allowedReviewMethods": [
+        "DIRECT_IMAGE_REVIEW"
+      ],
+      "requiredEvidenceKinds": [
+        "direct-render-image"
+      ],
+      "targetViews": [
+        "front",
+        "back",
+        "three-quarter"
+      ],
+      "targetPoses": [
+        "neutral"
+      ],
+      "defectCode": "STYLING_FIDELITY_INVALID",
+      "returnStage": "decompose-garment",
+      "completionGate": "visualAppearanceReview",
+      "allowOutOfScope": false
+    },
+    {
+      "id": "evidence-completeness",
+      "metric": {
+        "name": "verifiedEvidenceRatio",
+        "operator": "gte",
+        "threshold": 1.0
+      },
+      "allowedReviewMethods": [
+        "AUTOMATED"
+      ],
+      "requiredEvidenceKinds": [],
+      "targetViews": [],
+      "targetPoses": [],
+      "defectCode": "EVIDENCE_INCOMPLETE_OR_TAMPERED",
+      "returnStage": "render-evidence",
+      "completionGate": "fiveViewEvidence",
+      "allowOutOfScope": false,
+      "computed": true
+    }
+  ]
+}
