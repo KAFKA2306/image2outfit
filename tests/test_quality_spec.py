@@ -164,9 +164,7 @@ class QualitySpecTest(unittest.TestCase):
         result, errors = self.validate()
         self.assertTrue(any("sha256Mismatch" in item for item in errors))
         self.assertEqual("FAIL", result["aspects"]["topology"]["status"])
-        self.assertEqual(
-            "FAIL", result["aspects"]["evidence-completeness"]["status"]
-        )
+        self.assertEqual("FAIL", result["aspects"]["evidence-completeness"]["status"])
         self.assertFalse(result["passed"])
 
     def test_visual_appearance_requires_direct_image_review(self) -> None:

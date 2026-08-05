@@ -32,9 +32,7 @@ def _quality_spec_audit(
     spec_data = legacy.read(legacy.ROOT / QUALITY_SPEC_PATH)
     visual_review = evidence_documents.get("visual-review", {})
     assessment = (
-        visual_review.get("qualitySpec")
-        if isinstance(visual_review, dict)
-        else None
+        visual_review.get("qualitySpec") if isinstance(visual_review, dict) else None
     )
     result, errors = validate_quality_assessment(
         spec_data=spec_data,

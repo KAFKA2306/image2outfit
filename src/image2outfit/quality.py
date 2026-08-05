@@ -160,8 +160,10 @@ class DirectImageReviewSpec:
 
         def strings(field: str) -> tuple[str, ...]:
             raw = value.get(field)
-            if not isinstance(raw, list) or not raw or not all(
-                isinstance(item, str) and item for item in raw
+            if (
+                not isinstance(raw, list)
+                or not raw
+                or not all(isinstance(item, str) and item for item in raw)
             ):
                 raise ValueError(f"directImageReview.{field} is required")
             return tuple(raw)
@@ -211,7 +213,9 @@ class QualitySpec:
         if set(ids) != _EXPECTED_ASPECTS:
             missing = sorted(_EXPECTED_ASPECTS - set(ids))
             extra = sorted(set(ids) - _EXPECTED_ASPECTS)
-            raise ValueError(f"quality spec axes mismatch: missing={missing}, extra={extra}")
+            raise ValueError(
+                f"quality spec axes mismatch: missing={missing}, extra={extra}"
+            )
         evidence_axis = next(
             item for item in aspects if item.aspect_id == "evidence-completeness"
         )
@@ -456,9 +460,7 @@ def validate_quality_assessment(
         results_value = {}
         errors.append("results")
     submitted_ids = set(results_value)
-    expected_submitted = {
-        item.aspect_id for item in spec.aspects if not item.computed
-    }
+    expected_submitted = {item.aspect_id for item in spec.aspects if not item.computed}
     for extra in sorted(submitted_ids - expected_submitted):
         errors.append(f"results.unknown:{extra}")
 
@@ -500,7 +502,9 @@ def validate_quality_assessment(
             local_errors.append(f"{prefix}.targetPoses")
 
         required_kinds = (
-            () if status is QualityStatus.OUT_OF_SCOPE else aspect.required_evidence_kinds
+            ()
+            if status is QualityStatus.OUT_OF_SCOPE
+            else aspect.required_evidence_kinds
         )
         evidence = _audit_evidence(
             value=raw.get("evidence"),
@@ -578,13 +582,9 @@ def validate_quality_assessment(
     evidence_axis = next(
         item for item in spec.aspects if item.aspect_id == "evidence-completeness"
     )
-    evidence_ratio = (
-        verified_evidence / declared_evidence if declared_evidence else 0.0
-    )
+    evidence_ratio = verified_evidence / declared_evidence if declared_evidence else 0.0
     evidence_passed = not evidence_errors and declared_evidence > 0
-    evidence_status = (
-        QualityStatus.PASS if evidence_passed else QualityStatus.FAIL
-    )
+    evidence_status = QualityStatus.PASS if evidence_passed else QualityStatus.FAIL
     evidence_reasons = sorted(set(evidence_errors))
     if not evidence_passed and not evidence_reasons:
         evidence_reasons = ["evidence-completeness: no evidence declared"]

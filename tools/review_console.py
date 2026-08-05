@@ -281,20 +281,19 @@ def parse_quality_projection(
     """Read the exact normalized QualitySpec projection used by release."""
 
     report_path = (
-        root
-        / ".image2outfit"
-        / "products"
-        / slug
-        / "reports"
-        / "customer-quality.json"
+        root / ".image2outfit" / "products" / slug / "reports" / "customer-quality.json"
     )
     document = load_json(report_path, {})
     evidence_root = document.get("evidence") if isinstance(document, dict) else None
-    quality = evidence_root.get("qualitySpec") if isinstance(evidence_root, dict) else None
+    quality = (
+        evidence_root.get("qualitySpec") if isinstance(evidence_root, dict) else None
+    )
     if not isinstance(quality, dict):
         return [], [], [], None
 
-    report_href = relative_href(report_path, output_dir) if report_path.is_file() else None
+    report_href = (
+        relative_href(report_path, output_dir) if report_path.is_file() else None
+    )
     blockers: list[dict[str, str]] = []
     for defect in as_list(quality.get("defects")):
         if not isinstance(defect, dict):
@@ -411,8 +410,11 @@ def parse_quality_projection(
         "candidateManifestSha256",
         default=quality.get("candidateManifestSha256"),
     )
-    return blockers, gates, projected_evidence, (
-        str(candidate_hash) if candidate_hash else None
+    return (
+        blockers,
+        gates,
+        projected_evidence,
+        (str(candidate_hash) if candidate_hash else None),
     )
 
 

@@ -88,11 +88,7 @@ class ReviewConsoleTest(unittest.TestCase):
             encoding="utf-8",
         )
         report_dir = (
-            self.root
-            / ".image2outfit"
-            / "products"
-            / "demo-outfit"
-            / "reports"
+            self.root / ".image2outfit" / "products" / "demo-outfit" / "reports"
         )
         report_dir.mkdir(parents=True)
         (report_dir / "customer-quality.json").write_text(
@@ -182,12 +178,8 @@ class ReviewConsoleTest(unittest.TestCase):
         evidence = {item["label"]: item for item in record["evidence"]}
         self.assertEqual(evidence["human review"]["status"], "PASS")
         self.assertEqual(evidence["tampered evidence"]["status"], "HASH_MISMATCH")
-        self.assertEqual(
-            evidence["topology:geometry-audit:neutral"]["status"], "PASS"
-        )
-        self.assertEqual(
-            evidence["QualitySpec release projection"]["status"], "FAIL"
-        )
+        self.assertEqual(evidence["topology:geometry-audit:neutral"]["status"], "PASS")
+        self.assertEqual(evidence["QualitySpec release projection"]["status"], "FAIL")
 
     def test_html_is_read_only_keyboard_operable_and_has_unique_landmarks(self) -> None:
         MODULE.build(self.root, self.output)
