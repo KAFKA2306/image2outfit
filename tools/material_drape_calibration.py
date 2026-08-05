@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a deterministic Blender 4.4 circular drape comparison."""
+"""Calibrate Blender 4.4 cloth against the published Cusick drape fixture."""
 
 from __future__ import annotations
 
@@ -10,9 +10,10 @@ import math
 import statistics
 import sys
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 import bpy
+import numpy as np
 from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,17 +21,19 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from image2outfit.material import load_material_library  # noqa: E402
+from image2outfit.material import MaterialSpec, load_material_library  # noqa: E402
 from image2outfit.material_blender import (  # noqa: E402
+    BlenderCalibrationProfile,
     BlenderMaterialProjection,
     load_blender_calibration_profile,
     project_material_library_to_blender,
 )
 
-SPECIMEN_RADIUS_M = 0.82
-SUPPORT_RADIUS_M = 0.22
-SUPPORT_TOP_Z_M = 0.8
-INITIAL_SPECIMEN_Z_M = 0.82
+SPECIMEN_RADIUS_M = 0.15
+SUPPORT_RADIUS_M = 0.09
+SUPPORT_TOP_Z_M = 0.12
+INITIAL_SPECIMEN_Z_M = 0.122
+RASTER_RESOLUTION = 512
 
 
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
@@ -48,9 +51,8 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--output", type=Path, default=Path(".image2outfit/material-calibration")
     )
-    parser.add_argument("--frame-end", type=int, default=120)
-    parser.add_argument("--rings", type=int, default=14)
-    parser.add_argument("--segments", type=int, default=64)
+    parser.add_argument("--frame-end", type=int, default=100)
+    parser.add_argument("--grid", type=int, default=41)
     return parser.parse_args(argv)
 
 
@@ -72,78 +74,52 @@ def clean_scene() -> None:
     for collection in tuple(bpy.data.collections):
         if collection.name != "Collection":
             bpy.data.collections.remove(collection)
+    for datablocks in (
+        bpy.data.meshes,
+        bpy.data.materials,
+        bpy.data.curves,
+        bpy.data.cameras,
+        bpy.data.lights,
+    ):
+        for datablock in tuple(datablocks):
+            if datablock.users == 0:
+                datablocks.remove(datablock)
 
 
-def circular_mesh(
-    name: str, radius: float, rings: int, segments: int
-) -> bpy.types.Mesh:
-    if rings < 4 or segments < 24:
-        raise ValueError(
-            "circular specimen requires at least four rings and 24 segments"
-        )
-    vertices: list[tuple[float, float, float]] = [(0.0, 0.0, 0.0)]
-    for ring in range(1, rings + 1):
-        radial = radius * ring / rings
-        for segment in range(segments):
-            angle = math.tau * segment / segments
-            vertices.append((radial * math.cos(angle), radial * math.sin(angle), 0.0))
+def specimen_positions() -> tuple[tuple[float, float], ...]:
+    return (
+        (-0.42, 0.25),
+        (0.0, 0.25),
+        (0.42, 0.25),
+        (-0.42, -0.25),
+        (0.0, -0.25),
+        (0.42, -0.25),
+    )
 
-    faces: list[tuple[int, ...]] = []
-    first_ring = 1
-    for segment in range(segments):
-        faces.append(
-            (
-                0,
-                first_ring + segment,
-                first_ring + (segment + 1) % segments,
-            )
-        )
-    for ring in range(2, rings + 1):
-        inner = 1 + (ring - 2) * segments
-        outer = 1 + (ring - 1) * segments
-        for segment in range(segments):
-            next_segment = (segment + 1) % segments
-            faces.append(
-                (
-                    inner + segment,
-                    outer + segment,
-                    outer + next_segment,
-                    inner + next_segment,
-                )
-            )
+
+def disk_mesh(name: str, radius: float, count: int) -> bpy.types.Mesh:
+    if count < 21 or count % 2 == 0:
+        raise ValueError("disk grid must be an odd integer of at least 21")
+    vertices: list[tuple[float, float, float]] = []
+    for row in range(count):
+        v = -1.0 + 2.0 * row / (count - 1)
+        for column in range(count):
+            u = -1.0 + 2.0 * column / (count - 1)
+            x = radius * u * math.sqrt(max(0.0, 1.0 - v * v / 2.0))
+            y = radius * v * math.sqrt(max(0.0, 1.0 - u * u / 2.0))
+            vertices.append((x, y, 0.0))
+    faces: list[tuple[int, int, int, int]] = []
+    for row in range(count - 1):
+        for column in range(count - 1):
+            first = row * count + column
+            faces.append((first, first + 1, first + count + 1, first + count))
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(vertices, [], faces)
     mesh.update(calc_edges=True)
     return mesh
 
 
-def create_material(name: str, index: int, total: int) -> bpy.types.Material:
-    hue = index / max(total, 1)
-    red = 0.35 + 0.45 * abs(math.sin(hue * math.tau))
-    green = 0.35 + 0.45 * abs(math.sin((hue + 1 / 3) * math.tau))
-    blue = 0.35 + 0.45 * abs(math.sin((hue + 2 / 3) * math.tau))
-    material = bpy.data.materials.new(name)
-    material.diffuse_color = (red, green, blue, 1.0)
-    material.use_nodes = True
-    principled = material.node_tree.nodes.get("Principled BSDF")
-    if principled is not None:
-        principled.inputs["Base Color"].default_value = (red, green, blue, 1.0)
-        principled.inputs["Roughness"].default_value = 0.72
-    return material
-
-
-def dark_material(name: str) -> bpy.types.Material:
-    material = bpy.data.materials.new(name)
-    material.diffuse_color = (0.1, 0.11, 0.14, 1.0)
-    material.use_nodes = True
-    principled = material.node_tree.nodes.get("Principled BSDF")
-    if principled is not None:
-        principled.inputs["Base Color"].default_value = (0.1, 0.11, 0.14, 1.0)
-        principled.inputs["Roughness"].default_value = 0.52
-    return material
-
-
-def set_properties(owner: Any, values: dict[str, Any], label: str) -> dict[str, Any]:
+def set_properties(owner: Any, values: Mapping[str, Any], label: str) -> dict[str, Any]:
     actual: dict[str, Any] = {}
     for name, value in values.items():
         if not hasattr(owner, name):
@@ -160,193 +136,216 @@ def set_properties(owner: Any, values: dict[str, Any], label: str) -> dict[str, 
     return actual
 
 
-def collision_object(
-    obj: bpy.types.Object,
-    settings: dict[str, float],
-) -> dict[str, Any]:
+def dark_material(name: str) -> bpy.types.Material:
+    material = bpy.data.materials.new(name)
+    material.diffuse_color = (0.08, 0.09, 0.12, 1.0)
+    material.use_nodes = True
+    principled = material.node_tree.nodes.get("Principled BSDF")
+    if principled is not None:
+        principled.inputs["Base Color"].default_value = (0.08, 0.09, 0.12, 1.0)
+        principled.inputs["Roughness"].default_value = 0.58
+    return material
+
+
+def cloth_material(name: str, index: int, total: int) -> bpy.types.Material:
+    hue = index / max(total, 1)
+    red = 0.35 + 0.45 * abs(math.sin(hue * math.tau))
+    green = 0.35 + 0.45 * abs(math.sin((hue + 1 / 3) * math.tau))
+    blue = 0.35 + 0.45 * abs(math.sin((hue + 2 / 3) * math.tau))
+    material = bpy.data.materials.new(name)
+    material.diffuse_color = (red, green, blue, 1.0)
+    material.use_nodes = True
+    principled = material.node_tree.nodes.get("Principled BSDF")
+    if principled is not None:
+        principled.inputs["Base Color"].default_value = (red, green, blue, 1.0)
+        principled.inputs["Roughness"].default_value = 0.72
+    return material
+
+
+def add_collision(obj: bpy.types.Object, settings: Mapping[str, float]) -> dict[str, Any]:
     obj.modifiers.new(name="Collision", type="COLLISION")
     if obj.collision is None:
         raise RuntimeError("Collision modifier did not expose Object.collision")
     return set_properties(obj.collision, settings, f"{obj.name}.collision")
 
 
-def create_floor(
-    scene: bpy.types.Scene, contact_static_friction: float
-) -> dict[str, Any]:
-    bpy.ops.mesh.primitive_plane_add(size=18.0, location=(0.0, 0.0, 0.0))
+def create_floor(profile: BlenderCalibrationProfile) -> dict[str, Any]:
+    bpy.ops.mesh.primitive_plane_add(size=4.0, location=(0.0, 0.0, 0.0))
     floor = bpy.context.object
     floor.name = "CalibrationFloor"
     floor.data.materials.append(dark_material("FloorMaterial"))
-    return collision_object(
+    return add_collision(
         floor,
         {
-            "cloth_friction": contact_static_friction,
-            "thickness_outer": 0.002,
+            "cloth_friction": profile.contact.static_friction,
+            "thickness_outer": 0.001,
         },
     )
 
 
 def create_support(
     projection: BlenderMaterialProjection,
-    location_x: float,
+    position: tuple[float, float],
     collection: bpy.types.Collection,
+    render_material: bool,
 ) -> tuple[bpy.types.Object, dict[str, Any]]:
     bpy.ops.mesh.primitive_cylinder_add(
         vertices=64,
         radius=SUPPORT_RADIUS_M,
         depth=SUPPORT_TOP_Z_M,
-        location=(location_x, 0.0, SUPPORT_TOP_Z_M / 2),
+        location=(position[0], position[1], SUPPORT_TOP_Z_M / 2.0),
     )
     support = bpy.context.object
     support.name = f"Support__{projection.material_id}"
     for source in tuple(support.users_collection):
         source.objects.unlink(support)
     collection.objects.link(support)
-    support.data.materials.append(
-        dark_material(f"SupportMaterial__{projection.material_id}")
+    if render_material:
+        support.data.materials.append(
+            dark_material(f"SupportMaterial__{projection.material_id}")
+        )
+    return support, add_collision(
+        support,
+        {
+            "cloth_friction": projection.contact_hypothesis.static_friction,
+            "thickness_outer": max(projection.collision_thickness_m, 0.001),
+        },
     )
-    actual = collision_object(support, dict(projection.collider_settings))
-    return support, actual
+
+
+def scaled_cloth_settings(
+    projection: BlenderMaterialProjection, elastic_scale: float
+) -> dict[str, float | int]:
+    values = dict(projection.cloth_settings)
+    for name in (
+        "tension_stiffness",
+        "compression_stiffness",
+        "shear_stiffness",
+        "bending_stiffness",
+    ):
+        values[name] = float(values[name]) * elastic_scale
+    return values
 
 
 def create_cloth(
     projection: BlenderMaterialProjection,
-    location_x: float,
+    position: tuple[float, float],
     collection: bpy.types.Collection,
-    rings: int,
-    segments: int,
+    grid_count: int,
     frame_end: int,
+    elastic_scale: float,
     index: int,
     total: int,
+    render_material: bool,
 ) -> tuple[bpy.types.Object, dict[str, Any]]:
-    mesh = circular_mesh(
-        f"Mesh__{projection.material_id}", SPECIMEN_RADIUS_M, rings, segments
-    )
+    mesh = disk_mesh(f"Mesh__{projection.material_id}", SPECIMEN_RADIUS_M, grid_count)
     cloth = bpy.data.objects.new(f"Cloth__{projection.material_id}", mesh)
-    cloth.location = (location_x, 0.0, INITIAL_SPECIMEN_Z_M)
+    cloth.location = (position[0], position[1], INITIAL_SPECIMEN_Z_M)
     collection.objects.link(cloth)
-    cloth.data.materials.append(create_material(cloth.name, index, total))
+    if render_material:
+        cloth.data.materials.append(cloth_material(cloth.name, index, total))
 
-    cloth_modifier = cloth.modifiers.new(name="Cloth", type="CLOTH")
+    modifier = cloth.modifiers.new(name="Cloth", type="CLOTH")
     surface_area = math.pi * SPECIMEN_RADIUS_M**2
-    vertex_mass = projection.vertex_mass_kg(surface_area, len(mesh.vertices))
-    cloth_values = dict(projection.cloth_settings)
-    cloth_values["mass"] = vertex_mass
-    actual_cloth = set_properties(
-        cloth_modifier.settings, cloth_values, f"{cloth.name}.settings"
+    cloth_values = scaled_cloth_settings(projection, elastic_scale)
+    cloth_values["mass"] = projection.vertex_mass_kg(surface_area, len(mesh.vertices))
+    actual_cloth = set_properties(modifier.settings, cloth_values, f"{cloth.name}.settings")
+    collision_values = dict(projection.cloth_collision_settings)
+    collision_values.update(
+        {
+            "distance_min": max(projection.collision_thickness_m, 0.001),
+            "use_self_collision": False,
+            "self_distance_min": max(projection.collision_thickness_m, 0.001),
+        }
     )
     actual_collision = set_properties(
-        cloth_modifier.collision_settings,
-        dict(projection.cloth_collision_settings),
+        modifier.collision_settings,
+        collision_values,
         f"{cloth.name}.collision_settings",
     )
-    cloth_modifier.point_cache.frame_start = 1
-    cloth_modifier.point_cache.frame_end = frame_end
-
-    solidify = cloth.modifiers.new(name="RenderThickness", type="SOLIDIFY")
-    solidify.thickness = projection.render_settings["solidify_thickness"]
-    solidify.offset = 0.0
-
+    modifier.point_cache.frame_start = 1
+    modifier.point_cache.frame_end = frame_end
+    if render_material:
+        solidify = cloth.modifiers.new(name="RenderThickness", type="SOLIDIFY")
+        solidify.thickness = projection.render_thickness_m
+        solidify.offset = 0.0
     return cloth, {
         "surfaceAreaM2": surface_area,
         "vertexCount": len(mesh.vertices),
-        "vertexMassKg": vertex_mass,
+        "elasticScale": elastic_scale,
         "clothSettings": actual_cloth,
         "clothCollisionSettings": actual_collision,
-        "solidifyThicknessM": float(solidify.thickness),
+        "selfCollisionDisabledReason": "fabric-fabric friction is not measured in the source library",
     }
 
 
-def look_at(camera: bpy.types.Object, target: Vector) -> None:
-    direction = target - camera.location
-    camera.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
-
-
-def configure_render(scene: bpy.types.Scene, output: Path) -> bpy.types.Object:
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
-    scene.render.resolution_x = 1440
-    scene.render.resolution_y = 720
-    scene.render.resolution_percentage = 100
-    scene.render.image_settings.file_format = "PNG"
-    scene.render.film_transparent = False
-    scene.render.filepath = str(output / "comparison.png")
-    scene.render.use_file_extension = True
-    scene.render.image_settings.color_mode = "RGBA"
-    scene.render.image_settings.color_depth = "8"
-    scene.world.color = (0.035, 0.04, 0.055)
-
-    bpy.ops.object.camera_add(location=(0.0, -10.0, 6.3))
-    camera = bpy.context.object
-    camera.name = "CalibrationCamera"
-    camera.data.type = "ORTHO"
-    camera.data.ortho_scale = 6.0
-    look_at(camera, Vector((0.0, 0.0, 0.42)))
-    scene.camera = camera
-
-    bpy.ops.object.light_add(type="AREA", location=(0.0, -1.5, 8.0))
-    key = bpy.context.object
-    key.name = "KeyLight"
-    key.data.energy = 1700
-    key.data.shape = "RECTANGLE"
-    key.data.size = 9.0
-    key.data.size_y = 5.0
-    look_at(key, Vector((0.0, 0.0, 0.4)))
-
-    bpy.ops.object.light_add(type="AREA", location=(0.0, 5.0, 4.5))
-    fill = bpy.context.object
-    fill.name = "FillLight"
-    fill.data.energy = 950
-    fill.data.size = 8.0
-    look_at(fill, Vector((0.0, 0.0, 0.4)))
-    return camera
-
-
-def convex_hull(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
-    ordered = sorted(set(points))
-    if len(ordered) <= 1:
-        return ordered
-
-    def cross(
-        origin: tuple[float, float],
-        first: tuple[float, float],
-        second: tuple[float, float],
-    ) -> float:
-        return (first[0] - origin[0]) * (second[1] - origin[1]) - (
-            first[1] - origin[1]
-        ) * (second[0] - origin[0])
-
-    lower: list[tuple[float, float]] = []
-    for point in ordered:
-        while len(lower) >= 2 and cross(lower[-2], lower[-1], point) <= 0:
-            lower.pop()
-        lower.append(point)
-    upper: list[tuple[float, float]] = []
-    for point in reversed(ordered):
-        while len(upper) >= 2 and cross(upper[-2], upper[-1], point) <= 0:
-            upper.pop()
-        upper.append(point)
-    return lower[:-1] + upper[:-1]
-
-
-def polygon_area(points: list[tuple[float, float]]) -> float:
-    if len(points) < 3:
-        return 0.0
-    return (
-        abs(
-            sum(
-                first[0] * second[1] - second[0] * first[1]
-                for first, second in zip(points, points[1:] + points[:1], strict=True)
-            )
-        )
-        / 2
+def triangle_mask(
+    mask: np.ndarray,
+    triangle: np.ndarray,
+    lower: float,
+    upper: float,
+) -> None:
+    resolution = mask.shape[0]
+    scale = (resolution - 1) / (upper - lower)
+    pixels = (triangle - lower) * scale
+    min_x = max(0, int(math.floor(float(np.min(pixels[:, 0])))))
+    max_x = min(resolution - 1, int(math.ceil(float(np.max(pixels[:, 0])))))
+    min_y = max(0, int(math.floor(float(np.min(pixels[:, 1])))))
+    max_y = min(resolution - 1, int(math.ceil(float(np.max(pixels[:, 1])))))
+    if min_x > max_x or min_y > max_y:
+        return
+    x_values = np.arange(min_x, max_x + 1, dtype=np.float64) + 0.5
+    y_values = np.arange(min_y, max_y + 1, dtype=np.float64) + 0.5
+    grid_x, grid_y = np.meshgrid(x_values, y_values)
+    first, second, third = pixels
+    denominator = (second[1] - third[1]) * (first[0] - third[0]) + (
+        third[0] - second[0]
+    ) * (first[1] - third[1])
+    if math.isclose(float(denominator), 0.0):
+        return
+    alpha = (
+        (second[1] - third[1]) * (grid_x - third[0])
+        + (third[0] - second[0]) * (grid_y - third[1])
+    ) / denominator
+    beta = (
+        (third[1] - first[1]) * (grid_x - third[0])
+        + (first[0] - third[0]) * (grid_y - third[1])
+    ) / denominator
+    gamma = 1.0 - alpha - beta
+    mask[min_y : max_y + 1, min_x : max_x + 1] |= (
+        (alpha >= -1e-9) & (beta >= -1e-9) & (gamma >= -1e-9)
     )
 
 
-def object_metrics(
-    cloth: bpy.types.Object, initial_area: float
-) -> dict[str, float | str]:
+def silhouette_area(
+    coordinates: list[Vector],
+    polygons: list[tuple[int, ...]],
+    location: Vector,
+) -> float:
+    lower = -SPECIMEN_RADIUS_M * 1.15
+    upper = SPECIMEN_RADIUS_M * 1.15
+    mask = np.zeros((RASTER_RESOLUTION, RASTER_RESOLUTION), dtype=bool)
+    points = np.array(
+        [[value.x - location.x, value.y - location.y] for value in coordinates],
+        dtype=np.float64,
+    )
+    for polygon in polygons:
+        for index in range(1, len(polygon) - 1):
+            triangle_mask(
+                mask,
+                points[[polygon[0], polygon[index], polygon[index + 1]]],
+                lower,
+                upper,
+            )
+    pixel_size = (upper - lower) / RASTER_RESOLUTION
+    return float(np.count_nonzero(mask)) * pixel_size**2
+
+
+def evaluated_geometry(
+    cloth: bpy.types.Object,
+) -> tuple[list[Vector], list[tuple[int, ...]]]:
     solidify = cloth.modifiers.get("RenderThickness")
-    original_show = solidify.show_viewport if solidify is not None else False
+    visible = solidify.show_viewport if solidify is not None else False
     if solidify is not None:
         solidify.show_viewport = False
     try:
@@ -354,51 +353,50 @@ def object_metrics(
         evaluated = cloth.evaluated_get(depsgraph)
         mesh = evaluated.to_mesh()
         try:
-            coordinates = [
-                evaluated.matrix_world @ vertex.co for vertex in mesh.vertices
-            ]
+            coordinates = [evaluated.matrix_world @ vertex.co for vertex in mesh.vertices]
+            polygons = [tuple(polygon.vertices) for polygon in mesh.polygons]
         finally:
             evaluated.to_mesh_clear()
     finally:
         if solidify is not None:
-            solidify.show_viewport = original_show
-    xs = [value.x for value in coordinates]
-    ys = [value.y for value in coordinates]
-    zs = [value.z for value in coordinates]
-    local_xy = [(x - cloth.location.x, y - cloth.location.y) for x, y in zip(xs, ys)]
-    footprint = polygon_area(convex_hull(local_xy))
+            solidify.show_viewport = visible
+    return coordinates, polygons
+
+
+def drape_metrics(cloth: bpy.types.Object) -> dict[str, float | str]:
+    coordinates, polygons = evaluated_geometry(cloth)
+    z_values = [value.z for value in coordinates]
+    footprint = silhouette_area(coordinates, polygons, cloth.location)
+    support_area = math.pi * SUPPORT_RADIUS_M**2
+    specimen_area = math.pi * SPECIMEN_RADIUS_M**2
+    coefficient = (footprint - support_area) / (specimen_area - support_area)
     rounded = "\n".join(
-        f"{value.x:.6f},{value.y:.6f},{value.z:.6f}" for value in coordinates
+        f"{value.x:.7f},{value.y:.7f},{value.z:.7f}" for value in coordinates
     ).encode("utf-8")
     return {
-        "minimumZ": min(zs),
-        "maximumZ": max(zs),
-        "verticalRange": max(zs) - min(zs),
-        "meanZ": statistics.fmean(zs),
-        "standardDeviationZ": statistics.pstdev(zs),
-        "spanX": max(xs) - min(xs),
-        "spanY": max(ys) - min(ys),
+        "minimumZ": min(z_values),
+        "maximumZ": max(z_values),
+        "verticalRange": max(z_values) - min(z_values),
+        "meanZ": statistics.fmean(z_values),
+        "standardDeviationZ": statistics.pstdev(z_values),
         "footprintAreaM2": footprint,
-        "footprintRatio": footprint / initial_area,
+        "cusickDrapeCoefficient": coefficient,
         "vertexSha256": hashlib.sha256(rounded).hexdigest(),
     }
 
 
-def average_ranks(values: list[float]) -> list[float]:
-    indexed = sorted(enumerate(values), key=lambda item: item[1])
-    ranks = [0.0] * len(values)
-    position = 0
-    while position < len(indexed):
-        end = position + 1
-        while end < len(indexed) and math.isclose(
-            indexed[end][1], indexed[position][1]
-        ):
-            end += 1
-        rank = (position + 1 + end) / 2
-        for index, _ in indexed[position:end]:
-            ranks[index] = rank
-        position = end
-    return ranks
+def plausibility_errors(metrics: Mapping[str, float | str]) -> list[str]:
+    errors: list[str] = []
+    coefficient = float(metrics["cusickDrapeCoefficient"])
+    if not -0.03 <= coefficient <= 1.03:
+        errors.append("drape-coefficient-out-of-range")
+    if float(metrics["minimumZ"]) < -0.005:
+        errors.append("below-floor")
+    if float(metrics["maximumZ"]) > INITIAL_SPECIMEN_Z_M + 0.015:
+        errors.append("upward-instability")
+    if float(metrics["verticalRange"]) < 0.003:
+        errors.append("no-gravity-response")
+    return errors
 
 
 def pearson(first: list[float], second: list[float]) -> float:
@@ -415,101 +413,195 @@ def pearson(first: list[float], second: list[float]) -> float:
     return numerator / (first_scale * second_scale)
 
 
-def spearman(first: list[float], second: list[float]) -> float:
-    return pearson(average_ranks(first), average_ranks(second))
-
-
-def maximum_signature_distance(records: list[dict[str, Any]]) -> float:
-    fields = ("verticalRange", "standardDeviationZ", "footprintRatio")
-    ranges: dict[str, float] = {}
-    for field in fields:
-        values = [float(item["metrics"][field]) for item in records]
-        ranges[field] = max(values) - min(values)
-    maximum = 0.0
-    for index, first in enumerate(records):
-        for second in records[index + 1 :]:
-            distance = math.sqrt(
-                sum(
-                    (
-                        (
-                            float(first["metrics"][field])
-                            - float(second["metrics"][field])
-                        )
-                        / ranges[field]
-                        if ranges[field] > 0
-                        else 0.0
-                    )
-                    ** 2
-                    for field in fields
-                )
-            )
-            maximum = max(maximum, distance)
-    return maximum
-
-
-def plausibility_errors(record: dict[str, Any]) -> list[str]:
-    metrics = record["metrics"]
-    errors: list[str] = []
-    if float(metrics["minimumZ"]) < -0.02:
-        errors.append("below-floor")
-    if float(metrics["maximumZ"]) > INITIAL_SPECIMEN_Z_M + 0.08:
-        errors.append("upward-explosion")
-    if float(metrics["verticalRange"]) < 0.12:
-        errors.append("insufficient-drape-range")
-    if float(metrics["verticalRange"]) > 1.0:
-        errors.append("excessive-drape-range")
-    if float(metrics["standardDeviationZ"]) < 0.02:
-        errors.append("flat-flight-state")
-    if not 0.07 <= float(metrics["footprintRatio"]) <= 1.05:
-        errors.append("invalid-footprint")
-    return errors
-
-
-def render_scene(
-    scene: bpy.types.Scene,
-    camera: bpy.types.Object,
-    output: Path,
+def comparison_metrics(
     records: list[dict[str, Any]],
-) -> list[dict[str, str]]:
-    images: list[dict[str, str]] = []
-    test_objects = [
-        obj for obj in bpy.data.objects if obj.name.startswith(("Cloth__", "Support__"))
+    targets: Mapping[str, float],
+) -> dict[str, Any]:
+    simulated = [float(item["metrics"]["cusickDrapeCoefficient"]) for item in records]
+    published = [float(targets[item["materialId"]]) for item in records]
+    real = [float(item["realDrapeCoefficient"]) for item in records]
+    errors = [left - right for left, right in zip(simulated, published, strict=True)]
+    failures = [
+        {"materialId": item["materialId"], "errors": item["plausibilityErrors"]}
+        for item in records
+        if item["plausibilityErrors"]
     ]
-    combined = output / "comparison.png"
-    scene.render.resolution_x = 1440
-    scene.render.resolution_y = 720
-    scene.render.filepath = str(combined)
-    for obj in test_objects:
-        obj.hide_render = False
-    camera.data.ortho_scale = 6.0
-    camera.location = (0.0, -10.0, 6.3)
-    look_at(camera, Vector((0.0, 0.0, 0.42)))
-    bpy.ops.render.render(write_still=True)
-    images.append(
-        {"kind": "comparison", "path": combined.name, "sha256": sha256(combined)}
+    return {
+        "rmseVsPublishedKes": math.sqrt(statistics.fmean(value * value for value in errors)),
+        "maximumAbsoluteErrorVsPublishedKes": max(abs(value) for value in errors),
+        "pearsonVsPublishedKes": pearson(published, simulated),
+        "pearsonVsReal": pearson(real, simulated),
+        "plausibilityFailures": failures,
+    }
+
+
+def objective(comparison: Mapping[str, Any]) -> float:
+    return (
+        float(comparison["rmseVsPublishedKes"])
+        + max(0.0, 0.7 - float(comparison["pearsonVsPublishedKes"]))
+        + max(0.0, 0.65 - float(comparison["pearsonVsReal"]))
+        + 5.0 * len(comparison["plausibilityFailures"])
     )
 
-    scene.render.resolution_x = 640
-    scene.render.resolution_y = 640
+
+def simulate(
+    materials: tuple[MaterialSpec, ...],
+    projections: tuple[BlenderMaterialProjection, ...],
+    profile: BlenderCalibrationProfile,
+    *,
+    elastic_scale: float,
+    grid_count: int,
+    frame_end: int,
+    render_materials: bool,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    clean_scene()
+    scene = bpy.context.scene
+    scene.frame_start = 1
+    scene.frame_end = frame_end
+    scene.render.fps = 30
+    floor_settings = create_floor(profile)
+    records: list[dict[str, Any]] = []
+    for index, (material, projection, position) in enumerate(
+        zip(materials, projections, specimen_positions(), strict=True)
+    ):
+        collection = bpy.data.collections.new(f"Test__{projection.material_id}")
+        scene.collection.children.link(collection)
+        support, support_settings = create_support(
+            projection, position, collection, render_materials
+        )
+        cloth, runtime = create_cloth(
+            projection,
+            position,
+            collection,
+            grid_count,
+            frame_end,
+            elastic_scale,
+            index,
+            len(projections),
+            render_materials,
+        )
+        records.append(
+            {
+                "materialId": material.material_id,
+                "position": list(position),
+                "realDrapeCoefficient": material.real_drape_coefficient,
+                "projection": projection.to_dict(),
+                "projectionSha256": projection.fingerprint(),
+                "runtime": {
+                    **runtime,
+                    "clothObject": cloth.name,
+                    "supportObject": support.name,
+                    "supportCollisionSettings": support_settings,
+                },
+            }
+        )
+    for frame in range(scene.frame_start, scene.frame_end + 1):
+        scene.frame_set(frame)
+        bpy.context.view_layer.update()
+    scene.frame_set(scene.frame_end)
+    bpy.context.view_layer.update()
+    for record in records:
+        metrics = drape_metrics(bpy.data.objects[record["runtime"]["clothObject"]])
+        record["metrics"] = metrics
+        record["plausibilityErrors"] = plausibility_errors(metrics)
+    return records, floor_settings
+
+
+def look_at(obj: bpy.types.Object, target: Vector) -> None:
+    obj.rotation_euler = (target - obj.location).to_track_quat("-Z", "Y").to_euler()
+
+
+def configure_render(scene: bpy.types.Scene) -> bpy.types.Object:
+    scene.render.engine = "BLENDER_EEVEE_NEXT"
+    scene.render.resolution_percentage = 100
+    scene.render.image_settings.file_format = "PNG"
+    scene.render.image_settings.color_mode = "RGBA"
+    scene.render.image_settings.color_depth = "8"
+    scene.render.film_transparent = False
+    scene.world.color = (0.035, 0.04, 0.055)
+    bpy.ops.object.camera_add(location=(0.0, -1.5, 0.8))
+    camera = bpy.context.object
+    camera.name = "CalibrationCamera"
+    camera.data.type = "ORTHO"
+    scene.camera = camera
+    bpy.ops.object.light_add(type="AREA", location=(0.0, -0.3, 1.3))
+    key = bpy.context.object
+    key.data.energy = 900
+    key.data.size = 1.8
+    look_at(key, Vector((0.0, 0.0, 0.08)))
+    bpy.ops.object.light_add(type="AREA", location=(0.0, 0.8, 0.7))
+    fill = bpy.context.object
+    fill.data.energy = 500
+    fill.data.size = 1.5
+    look_at(fill, Vector((0.0, 0.0, 0.08)))
+    return camera
+
+
+def render_image(
+    scene: bpy.types.Scene,
+    camera: bpy.types.Object,
+    path: Path,
+    *,
+    location: tuple[float, float, float],
+    target: tuple[float, float, float],
+    ortho_scale: float,
+    resolution: tuple[int, int],
+) -> dict[str, str]:
+    camera.location = location
+    camera.data.ortho_scale = ortho_scale
+    look_at(camera, Vector(target))
+    scene.render.resolution_x, scene.render.resolution_y = resolution
+    scene.render.filepath = str(path)
+    bpy.ops.render.render(write_still=True)
+    return {"path": path.name, "sha256": sha256(path)}
+
+
+def render_evidence(
+    output: Path, records: list[dict[str, Any]]
+) -> list[dict[str, str]]:
+    scene = bpy.context.scene
+    camera = configure_render(scene)
+    images: list[dict[str, str]] = []
+    top = render_image(
+        scene,
+        camera,
+        output / "comparison-top.png",
+        location=(0.0, 0.0, 2.0),
+        target=(0.0, 0.0, 0.0),
+        ortho_scale=0.95,
+        resolution=(1440, 720),
+    )
+    images.append({"kind": "comparison-top", **top})
+    oblique = render_image(
+        scene,
+        camera,
+        output / "comparison-oblique.png",
+        location=(0.0, -1.5, 0.75),
+        target=(0.0, 0.0, 0.08),
+        ortho_scale=0.9,
+        resolution=(1440, 720),
+    )
+    images.append({"kind": "comparison-oblique", **oblique})
+    test_objects = [
+        obj
+        for obj in bpy.data.objects
+        if obj.name.startswith(("Cloth__", "Support__"))
+    ]
     for record in records:
         material_id = record["materialId"]
         for obj in test_objects:
             obj.hide_render = not obj.name.endswith(material_id)
-        location_x = float(record["locationX"])
-        camera.data.ortho_scale = 2.25
-        camera.location = (location_x, -3.4, 2.45)
-        look_at(camera, Vector((location_x, 0.0, 0.42)))
-        path = output / f"{material_id}.png"
-        scene.render.filepath = str(path)
-        bpy.ops.render.render(write_still=True)
-        images.append(
-            {
-                "kind": "material",
-                "materialId": material_id,
-                "path": path.name,
-                "sha256": sha256(path),
-            }
+        x, y = record["position"]
+        individual = render_image(
+            scene,
+            camera,
+            output / f"{material_id}.png",
+            location=(x, y - 0.55, 0.32),
+            target=(x, y, 0.085),
+            ortho_scale=0.38,
+            resolution=(640, 640),
         )
+        images.append({"kind": "material-oblique", "materialId": material_id, **individual})
     for obj in test_objects:
         obj.hide_render = False
     return images
@@ -517,109 +609,85 @@ def render_scene(
 
 def main(argv: Iterable[str] | None = None) -> int:
     args = parse_args(argv)
-    output = args.output.resolve()
-    output.mkdir(parents=True, exist_ok=True)
     if args.frame_end < 60:
         raise SystemExit("frame-end must be at least 60")
-
+    output = args.output.resolve()
+    output.mkdir(parents=True, exist_ok=True)
     library_path = args.library.resolve()
     profile_path = args.profile.resolve()
+    raw_profile = json.loads(profile_path.read_text(encoding="utf-8"))
     materials = load_material_library(library_path)
     profile = load_blender_calibration_profile(profile_path)
+    projections = project_material_library_to_blender(materials, profile)
     actual_version = ".".join(str(value) for value in bpy.app.version)
     if actual_version != profile.blender_version:
         raise RuntimeError(
             f"Blender version mismatch: expected {profile.blender_version}, got {actual_version}"
         )
-    projections = project_material_library_to_blender(materials, profile)
-
-    clean_scene()
-    scene = bpy.context.scene
-    scene.frame_start = 1
-    scene.frame_end = args.frame_end
-    scene.render.fps = 30
-    camera = configure_render(scene, output)
-    floor_settings = create_floor(scene, profile.contact.static_friction)
-
-    records: list[dict[str, Any]] = []
-    spacing = 2.05
-    center = (len(projections) - 1) / 2
-    for index, (material, projection) in enumerate(
-        zip(materials, projections, strict=True)
-    ):
-        location_x = (index - center) * spacing
-        collection = bpy.data.collections.new(f"Test__{projection.material_id}")
-        scene.collection.children.link(collection)
-        support, support_actual = create_support(projection, location_x, collection)
-        cloth, cloth_actual = create_cloth(
-            projection,
-            location_x,
-            collection,
-            args.rings,
-            args.segments,
-            args.frame_end,
-            index,
-            len(projections),
+    targets = {
+        str(key): float(value)
+        for key, value in raw_profile["publishedKesSimulationDrapeCoefficients"].items()
+    }
+    if set(targets) != {material.material_id for material in materials}:
+        raise ValueError("published KES calibration targets must cover every material")
+    fixed_scale = raw_profile.get("calibratedElasticScale")
+    scales = (
+        [float(fixed_scale)]
+        if isinstance(fixed_scale, (int, float))
+        else [float(value) for value in raw_profile["elasticScaleSearch"]]
+    )
+    search: list[dict[str, Any]] = []
+    for scale in scales:
+        records, _ = simulate(
+            materials,
+            projections,
+            profile,
+            elastic_scale=scale,
+            grid_count=args.grid,
+            frame_end=args.frame_end,
+            render_materials=False,
         )
-        records.append(
+        comparison = comparison_metrics(records, targets)
+        search.append(
             {
-                "materialId": projection.material_id,
-                "locationX": location_x,
-                "realDrapeCoefficient": material.real_drape_coefficient,
-                "projection": projection.to_dict(),
-                "projectionSha256": projection.fingerprint(),
-                "runtime": {
-                    **cloth_actual,
-                    "supportSettings": support_actual,
-                    "clothObject": cloth.name,
-                    "supportObject": support.name,
+                "elasticScale": scale,
+                "comparison": comparison,
+                "objective": objective(comparison),
+                "coefficients": {
+                    item["materialId"]: item["metrics"]["cusickDrapeCoefficient"]
+                    for item in records
                 },
             }
         )
-
-    for frame in range(scene.frame_start, scene.frame_end + 1):
-        scene.frame_set(frame)
-        bpy.context.view_layer.update()
-    scene.frame_set(scene.frame_end)
-    bpy.context.view_layer.update()
-
-    initial_area = math.pi * SPECIMEN_RADIUS_M**2
-    for record in records:
-        cloth = bpy.data.objects[record["runtime"]["clothObject"]]
-        record["metrics"] = object_metrics(cloth, initial_area)
-        record["plausibilityErrors"] = plausibility_errors(record)
-
-    distance = maximum_signature_distance(records)
-    distinct = len(
-        {
-            (
-                round(float(item["metrics"]["verticalRange"]), 4),
-                round(float(item["metrics"]["standardDeviationZ"]), 4),
-                round(float(item["metrics"]["footprintRatio"]), 4),
-            )
-            for item in records
-        }
+    best = min(search, key=lambda item: item["objective"])
+    best_scale = float(best["elasticScale"])
+    records, floor_settings = simulate(
+        materials,
+        projections,
+        profile,
+        elastic_scale=best_scale,
+        grid_count=args.grid,
+        frame_end=args.frame_end,
+        render_materials=True,
     )
-    real_coefficients = [float(item["realDrapeCoefficient"]) for item in records]
-    simulated_footprints = [
-        float(item["metrics"]["footprintRatio"]) for item in records
-    ]
-    rank_correlation = spearman(real_coefficients, simulated_footprints)
-    failed_materials = [
-        {
-            "materialId": item["materialId"],
-            "errors": item["plausibilityErrors"],
-        }
-        for item in records
-        if item["plausibilityErrors"]
-    ]
-    evidence_passed = distinct >= 5 and distance >= 0.15 and not failed_materials
-    images = render_scene(scene, camera, output, records)
+    comparison = comparison_metrics(records, targets)
+    acceptance = raw_profile["acceptance"]
+    passed = (
+        not comparison["plausibilityFailures"]
+        and comparison["rmseVsPublishedKes"]
+        <= float(acceptance["maximumRmseVsPublishedKes"])
+        and comparison["pearsonVsPublishedKes"]
+        >= float(acceptance["minimumPearsonVsPublishedKes"])
+        and comparison["pearsonVsReal"]
+        >= float(acceptance["minimumPearsonVsReal"])
+        and comparison["maximumAbsoluteErrorVsPublishedKes"]
+        <= float(acceptance["maximumMaterialAbsoluteError"])
+    )
+    images = render_evidence(output, records)
     blend_path = output / "material-drape-calibration.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
-
     report = {
-        "schemaVersion": 2,
+        "schemaVersion": 3,
         "phase": "material-drape-calibration",
         "blenderVersion": actual_version,
         "library": {
@@ -632,37 +700,35 @@ def main(argv: Iterable[str] | None = None) -> int:
             "profileId": profile.profile_id,
         },
         "fixture": {
-            "type": "circular-drape-over-central-pedestal",
+            "type": "cusick-drape-meter",
             "specimenRadiusM": SPECIMEN_RADIUS_M,
             "supportRadiusM": SUPPORT_RADIUS_M,
             "supportTopZM": SUPPORT_TOP_Z_M,
             "initialSpecimenZM": INITIAL_SPECIMEN_Z_M,
-            "rings": args.rings,
-            "segments": args.segments,
+            "grid": args.grid,
+            "topology": "concentric-square-to-disk-quads",
+            "rasterResolution": RASTER_RESOLUTION,
             "floorCollisionSettings": floor_settings,
+            "source": "https://doi.org/10.3390/su17041388",
         },
         "frameEnd": args.frame_end,
         "sameGeometryForAllMaterials": True,
         "sequentialFrameEvaluation": True,
+        "calibrationSearch": search,
+        "selectedElasticScale": best_scale,
         "records": records,
-        "comparison": {
-            "distinctDrapeSignatureCount": distinct,
-            "maximumNormalizedSignatureDistance": distance,
-            "spearmanRealDrapeCoefficientVsFootprintRatio": rank_correlation,
-            "plausibilityFailures": failed_materials,
-            "passed": evidence_passed,
-            "meaning": "PASS proves plausible, materially distinct same-geometry Blender drapes. It does not prove absolute real-to-sim calibration or measured contact friction.",
-        },
+        "comparison": {**comparison, "acceptance": acceptance, "passed": passed},
         "images": images,
         "blend": {"path": blend_path.name, "sha256": sha256(blend_path)},
-        "passed": evidence_passed,
+        "passed": passed,
+        "boundary": "The selected global scale is calibrated on these six published samples. Contact friction and through-thickness compression remain unmeasured.",
     }
     report_path = output / "material-drape-report.json"
     report_path.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
-    return 0 if evidence_passed else 2
+    return 0 if passed else 2
 
 
 if __name__ == "__main__":
