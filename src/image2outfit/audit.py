@@ -16,11 +16,7 @@ _ZERO_HASH = "0" * 64
 
 
 def utc_now() -> str:
-    return (
-        datetime.now(UTC)
-        .isoformat(timespec="microseconds")
-        .replace("+00:00", "Z")
-    )
+    return datetime.now(UTC).isoformat(timespec="microseconds").replace("+00:00", "Z")
 
 
 def canonical_json_bytes(value: Any) -> bytes:
@@ -141,7 +137,9 @@ def validate_stage_records(
             if index > len(canonical_stages):
                 raise ValueError("stage audit records exceed the canonical stage count")
             if record.get("stage") != canonical_stages[index - 1]:
-                raise ValueError(f"stage audit record {index} is out of canonical order")
+                raise ValueError(
+                    f"stage audit record {index} is out of canonical order"
+                )
         if record.get("previousRecordDigest") != previous:
             raise ValueError(f"stage audit record {index} chain is broken")
         claimed = record.pop("recordDigest", None)
