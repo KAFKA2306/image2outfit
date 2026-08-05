@@ -34,7 +34,8 @@ matches the bytes that were reviewed.
 
 ## Contract
 
-The canonical definition is `config/quality-spec.json`. Every assessment stores:
+The canonical definition is `contracts/quality/quality-spec.json`. Every
+assessment stores:
 
 - metric name, operator, threshold, and observed value;
 - target views and poses;
