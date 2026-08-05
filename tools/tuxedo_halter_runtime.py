@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import math
 import uuid
+from collections.abc import Mapping
 from pathlib import Path
 
 import bmesh
@@ -34,17 +36,17 @@ def configure_cloth(
     while skirt.modifiers.find(cloth.name) > 0:
         bpy.ops.object.modifier_move_up(modifier=cloth.name)
     skirt.select_set(False)
-    cloth.settings.quality = 6
-    cloth.settings.mass = 0.22
-    cloth.settings.tension_stiffness = 18.0
-    cloth.settings.compression_stiffness = 18.0
-    cloth.settings.shear_stiffness = 7.0
-    cloth.settings.bending_stiffness = 0.55
-    cloth.settings.air_damping = 2.0
+    cloth.settings.quality = 8
+    cloth.settings.mass = 0.18
+    cloth.settings.tension_stiffness = 22.0
+    cloth.settings.compression_stiffness = 22.0
+    cloth.settings.shear_stiffness = 9.0
+    cloth.settings.bending_stiffness = 0.38
+    cloth.settings.air_damping = 3.0
     cloth.settings.vertex_group_mass = pin.name
-    cloth.settings.pin_stiffness = 0.95
+    cloth.settings.pin_stiffness = 1.0
     cloth.collision_settings.use_collision = True
-    cloth.collision_settings.collision_quality = 4
+    cloth.collision_settings.collision_quality = 5
     cloth.collision_settings.distance_min = 0.003
     cloth.point_cache.frame_start = 1
     cloth.point_cache.frame_end = frame_end
@@ -57,26 +59,100 @@ def configure_cloth(
     }
 
 
+def normalize_bone_weights(
+    objects: list[bpy.types.Object],
+    armature: bpy.types.Object,
+    *,
+    rigid_groups: Mapping[str, str] | None = None,
+) -> dict[str, object]:
+    """Remove helper groups, retain four deform bones, and normalize exactly."""
+    rigid_groups = dict(rigid_groups or {})
+    deform_bones = {bone.name for bone in armature.data.bones if bone.use_deform}
+    report: dict[str, object] = {
+        "objects": 0,
+        "vertices": 0,
+        "rigidObjects": [],
+        "fallbackVertices": 0,
+        "maximumInfluences": 0,
+    }
+    for obj in objects:
+        if obj.type != "MESH":
+            continue
+        report["objects"] += 1
+        report["vertices"] += len(obj.data.vertices)
+        rigid = rigid_groups.get(obj.name)
+        if rigid:
+            obj.vertex_groups.clear()
+            group = obj.vertex_groups.new(name=rigid)
+            group.add(range(len(obj.data.vertices)), 1.0, "REPLACE")
+            report["rigidObjects"].append({"object": obj.name, "bone": rigid})
+            report["maximumInfluences"] = max(report["maximumInfluences"], 1)
+            continue
+
+        names = {group.index: group.name for group in obj.vertex_groups}
+        assignments: list[list[tuple[str, float]]] = []
+        for vertex in obj.data.vertices:
+            weighted = [
+                (names[item.group], float(item.weight))
+                for item in vertex.groups
+                if names.get(item.group) in deform_bones and item.weight > 1e-8
+            ]
+            weighted.sort(key=lambda item: item[1], reverse=True)
+            assignments.append(weighted[:4])
+
+        obj.vertex_groups.clear()
+        groups: dict[str, bpy.types.VertexGroup] = {}
+        for vertex, weighted in zip(obj.data.vertices, assignments, strict=True):
+            if not weighted:
+                world_z = (obj.matrix_world @ vertex.co).z
+                fallback = "Chest" if world_z > 0.86 else "Hips"
+                weighted = [(fallback, 1.0)]
+                report["fallbackVertices"] += 1
+            total = sum(weight for _, weight in weighted)
+            normalized = [(name, weight / total) for name, weight in weighted]
+            report["maximumInfluences"] = max(
+                report["maximumInfluences"], len(normalized)
+            )
+            for name, weight in normalized:
+                group = groups.get(name)
+                if group is None:
+                    group = obj.vertex_groups.new(name=name)
+                    groups[name] = group
+                group.add([vertex.index], weight, "REPLACE")
+    return report
+
+
 def render_prone_pose(
     armature: bpy.types.Object,
     camera: bpy.types.Object,
     output: Path,
 ) -> Path:
+    """Render a truly horizontal body orientation, then restore object state."""
     g.configure_render(1024)
     g.reset_pose(armature)
-    g.rotate(armature, "Hips", (0, 88, 0))
-    g.rotate(armature, "UpperArm_L", (-18, 0, -32))
-    g.rotate(armature, "UpperArm_R", (-18, 0, 32))
-    g.rotate(armature, "LowerArm_L", (0, 0, -18))
-    g.rotate(armature, "LowerArm_R", (0, 0, 18))
-    g.rotate(armature, "UpperLeg_L", (-8, 0, -5))
-    g.rotate(armature, "UpperLeg_R", (8, 0, 5))
+    original_location = armature.location.copy()
+    original_rotation = armature.rotation_euler.copy()
+    original_mode = armature.rotation_mode
+    g.rotate(armature, "UpperArm_L", (-15, 0, -28))
+    g.rotate(armature, "UpperArm_R", (-15, 0, 28))
+    g.rotate(armature, "LowerArm_L", (0, 0, -12))
+    g.rotate(armature, "LowerArm_R", (0, 0, 12))
+    g.rotate(armature, "UpperLeg_L", (-5, 0, -3))
+    g.rotate(armature, "UpperLeg_R", (5, 0, 3))
+    armature.rotation_mode = "XYZ"
+    armature.rotation_euler = (0.0, math.radians(90.0), 0.0)
+    armature.location = (0.0, 0.0, 0.64)
+    bpy.context.view_layer.update()
     camera.data.ortho_scale = 1.55
-    g.point_camera(camera, (0.0, -2.75, 0.68), target=(0.0, 0.0, 0.64))
+    g.point_camera(camera, (0.0, -2.75, 0.64), target=(0.0, 0.0, 0.64))
     output.parent.mkdir(parents=True, exist_ok=True)
     bpy.context.scene.render.filepath = str(output)
     bpy.ops.render.render(write_still=True)
+    armature.location = original_location
+    armature.rotation_mode = original_mode
+    armature.rotation_euler = original_rotation
     g.reset_pose(armature)
+    bpy.context.view_layer.update()
     camera.data.ortho_scale = 1.30
     return output
 
