@@ -100,7 +100,9 @@ def main() -> int:
     else:
         result = run_pipeline(state, registry)
 
-    audit_root = args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
+    audit_root = (
+        args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
+    )
     result["audit"] = write_audit_bundle(
         result,
         audit_root=audit_root,
