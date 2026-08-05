@@ -52,8 +52,15 @@ HASH_A = "a" * 64
 
 
 class AvatarSpecTests(unittest.TestCase):
-    def test_same_mesh_and_definitions_are_deterministic_across_three_poses(self) -> None:
-        neutral = ((-10.0, 0.0, 100.0), (10.0, 0.0, 100.0), (-10.0, 0.0, 0.0), (10.0, 0.0, 0.0))
+    def test_same_mesh_and_definitions_are_deterministic_across_three_poses(
+        self,
+    ) -> None:
+        neutral = (
+            (-10.0, 0.0, 100.0),
+            (10.0, 0.0, 100.0),
+            (-10.0, 0.0, 0.0),
+            (10.0, 0.0, 0.0),
+        )
         landmarks = {
             "left-shoulder-front": (
                 BodyRegion.SHOULDER,
@@ -170,7 +177,12 @@ class ConstructionSpecTests(unittest.TestCase):
         right_piece = PatternPiece(
             piece_id="right-skirt",
             part_id="right-skirt-panel",
-            boundary=((1.0, 0.0), (2.0, 0.0), (2.0, second_height), (1.0, second_height)),
+            boundary=(
+                (1.0, 0.0),
+                (2.0, 0.0),
+                (2.0, second_height),
+                (1.0, second_height),
+            ),
             grain_angle_degrees=90.0,
             edges=(right_edge,),
             correspondence_ids={"image": "region-right", "mesh": "group-right"},
@@ -184,9 +196,7 @@ class ConstructionSpecTests(unittest.TestCase):
             stitches=(
                 Stitch(
                     stitch_id="side-seam",
-                    first=StitchEdge(
-                        "left-skirt", 1, 2, edge_id="left-side-seam"
-                    ),
+                    first=StitchEdge("left-skirt", 1, 2, edge_id="left-side-seam"),
                     second=StitchEdge(
                         "right-skirt", 3, 0, edge_id="right-side-seam"
                     ),
@@ -202,15 +212,37 @@ class ConstructionSpecTests(unittest.TestCase):
                 material_id=material,
             )
             for identifier, kind, layer, material in (
-                ("plaid-shell", ConstructionComponentKind.SHELL, LayerPosition.OUTER, "plaid"),
-                ("white-ruffle", ConstructionComponentKind.LINING, LayerPosition.MID, "white"),
-                ("pink-hem", ConstructionComponentKind.FACING, LayerPosition.ATTACHED, "pink"),
-                ("waistband", ConstructionComponentKind.INTERFACING, LayerPosition.ATTACHED, "black"),
+                (
+                    "plaid-shell",
+                    ConstructionComponentKind.SHELL,
+                    LayerPosition.OUTER,
+                    "plaid",
+                ),
+                (
+                    "white-ruffle",
+                    ConstructionComponentKind.LINING,
+                    LayerPosition.MID,
+                    "white",
+                ),
+                (
+                    "pink-hem",
+                    ConstructionComponentKind.FACING,
+                    LayerPosition.ATTACHED,
+                    "pink",
+                ),
+                (
+                    "waistband",
+                    ConstructionComponentKind.INTERFACING,
+                    LayerPosition.ATTACHED,
+                    "black",
+                ),
             )
         )
         return ConstructionSpec(garment=garment, components=components)
 
-    def test_multilayer_skirt_is_representable_and_preview_is_deterministic(self) -> None:
+    def test_multilayer_skirt_is_representable_and_preview_is_deterministic(
+        self,
+    ) -> None:
         spec = self.fixture()
         self.assertTrue(spec.audit().passed)
         self.assertEqual(4, len(spec.components))
@@ -274,7 +306,9 @@ class MaterialSpecTests(unittest.TestCase):
             )
         )
         self.assertTrue(all(item.mapping_for("clo3d") for item in materials))
-        self.assertTrue(all(item.drape_absolute_error is not None for item in materials))
+        self.assertTrue(
+            all(item.drape_absolute_error is not None for item in materials)
+        )
         self.assertTrue(all(not item.properties.simulation_ready for item in materials))
 
 
@@ -304,7 +338,12 @@ class StylingSpecTests(unittest.TestCase):
             tuple(item.operation_id for item in spec.application_order()),
         )
         self.assertEqual((), spec.conflicts())
-        self.assertEqual(("waist-anchor",), tuple(item.operation_id for item in spec.without("front-tuck").operations))
+        self.assertEqual(
+            ("waist-anchor",),
+            tuple(
+                item.operation_id for item in spec.without("front-tuck").operations
+            ),
+        )
 
     def test_dependency_cycle_is_rejected(self) -> None:
         first = StylingOperation(
