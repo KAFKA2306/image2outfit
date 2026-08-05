@@ -275,7 +275,149 @@ def parse_evidence_rows(
     return result
 
 
+def parse_quality_projection(
+    root: Path, slug: str, output_dir: Path
+) -> tuple[list[dict[str, str]], list[Gate], list[Evidence], str | None]:
+    """Read the exact normalized QualitySpec projection used by release."""
+
+    report_path = (
+        root
+        / ".image2outfit"
+        / "products"
+        / slug
+        / "reports"
+        / "customer-quality.json"
+    )
+    document = load_json(report_path, {})
+    evidence_root = document.get("evidence") if isinstance(document, dict) else None
+    quality = evidence_root.get("qualitySpec") if isinstance(evidence_root, dict) else None
+    if not isinstance(quality, dict):
+        return [], [], [], None
+
+    report_href = relative_href(report_path, output_dir) if report_path.is_file() else None
+    blockers: list[dict[str, str]] = []
+    for defect in as_list(quality.get("defects")):
+        if not isinstance(defect, dict):
+            continue
+        reasons = "; ".join(str(item) for item in as_list(defect.get("reasons")))
+        message = " · ".join(
+            item
+            for item in (
+                str(defect.get("code") or "QUALITY_DEFECT"),
+                str(defect.get("aspect") or "unknown-aspect"),
+                reasons,
+                f"return {defect.get('recommendedReturnStage')}"
+                if defect.get("recommendedReturnStage")
+                else "",
+            )
+            if item
+        )
+        blockers.append({"severity": "QUALITY", "message": message})
+
+    gates: list[Gate] = []
+    aspects = quality.get("aspects")
+    if isinstance(aspects, dict):
+        for aspect_id, result in aspects.items():
+            if not isinstance(result, dict):
+                continue
+            metric = result.get("metric")
+            detail_parts: list[str] = []
+            if isinstance(metric, dict):
+                detail_parts.append(
+                    f"{metric.get('name')}={metric.get('value')} "
+                    f"{metric.get('operator')} {metric.get('threshold')}"
+                )
+            if result.get("recommendedReturnStage"):
+                detail_parts.append(f"return {result['recommendedReturnStage']}")
+            gates.append(
+                Gate(
+                    name=f"quality:{aspect_id}",
+                    status=status_text(result.get("status")),
+                    detail="; ".join(detail_parts),
+                    href=report_href,
+                )
+            )
+    visual = quality.get("visualAppearanceReview")
+    if isinstance(visual, dict):
+        gates.append(
+            Gate(
+                name="quality:visualAppearanceReview",
+                status=status_text(visual.get("status")),
+                detail="; ".join(
+                    item
+                    for item in (
+                        str(visual.get("reviewMethod") or ""),
+                        str(visual.get("reviewer") or ""),
+                    )
+                    if item
+                ),
+                href=report_href,
+            )
+        )
+
+    projected_evidence: list[Evidence] = []
+    seen: set[tuple[str, str]] = set()
+    evidence_sources: list[tuple[str, dict[str, Any]]] = []
+    if isinstance(aspects, dict):
+        evidence_sources.extend(
+            (str(aspect_id), result)
+            for aspect_id, result in aspects.items()
+            if isinstance(result, dict)
+        )
+    if isinstance(visual, dict):
+        evidence_sources.append(("visualAppearanceReview", visual))
+    for aspect_id, result in evidence_sources:
+        for item in as_list(result.get("evidence")):
+            if not isinstance(item, dict):
+                continue
+            path_text = str(item.get("path") or "")
+            kind = str(item.get("kind") or "evidence")
+            key = (path_text, kind)
+            if key in seen:
+                continue
+            seen.add(key)
+            target = root / path_text if path_text else None
+            actual_hash = digest(target) if target is not None else None
+            expected_hash = str(item.get("sha256") or "") or None
+            verified = item.get("verified") is True and actual_hash == expected_hash
+            status = "PASS" if verified else "MISSING"
+            if actual_hash and expected_hash and actual_hash != expected_hash:
+                status = "HASH_MISMATCH"
+            qualifier = item.get("view") or item.get("pose") or Path(path_text).name
+            projected_evidence.append(
+                Evidence(
+                    label=f"{aspect_id}:{kind}:{qualifier}",
+                    status=status,
+                    href=(
+                        relative_href(target, output_dir)
+                        if target is not None and target.is_file()
+                        else None
+                    ),
+                    sha256=actual_hash or expected_hash,
+                )
+            )
+    if report_path.is_file():
+        projected_evidence.append(
+            Evidence(
+                label="QualitySpec release projection",
+                status="PASS" if quality.get("passed") is True else "FAIL",
+                href=report_href,
+                sha256=digest(report_path),
+            )
+        )
+
+    candidate_hash = pick(
+        document,
+        "candidateManifestSha256",
+        default=quality.get("candidateManifestSha256"),
+    )
+    return blockers, gates, projected_evidence, (
+        str(candidate_hash) if candidate_hash else None
+    )
+
+
 def collect_product(
+    root: Path,
     workspace: Path,
     output_dir: Path,
     required_views: list[str],
@@ -290,6 +432,10 @@ def collect_product(
         )
         if open_issue(item)
     ]
+    quality_blockers, quality_gates, quality_evidence, quality_candidate_hash = (
+        parse_quality_projection(root, workspace.name, output_dir)
+    )
+    blockers.extend(quality_blockers)
     assets: list[Asset] = []
     previews = workspace / "Previews"
     for name in required_views:
@@ -323,6 +469,15 @@ def collect_product(
         updated_at = datetime.fromtimestamp(
             manifest_path.stat().st_mtime, timezone.utc
         ).isoformat()
+    manifest_candidate_hash = str(
+        pick(
+            candidate,
+            "sha256",
+            "hash",
+            "candidate_hash",
+            default=pick(manifest, "candidate_hash", default="UNKNOWN"),
+        )
+    )
     return Product(
         slug=workspace.name,
         state=safe_state(manifest),
@@ -339,15 +494,7 @@ def collect_product(
                 default="未登録",
             )
         ),
-        candidate_hash=str(
-            pick(
-                candidate,
-                "sha256",
-                "hash",
-                "candidate_hash",
-                default=pick(manifest, "candidate_hash", default="UNKNOWN"),
-            )
-        ),
+        candidate_hash=quality_candidate_hash or manifest_candidate_hash,
         human_review_url=str(
             pick(
                 review,
@@ -359,8 +506,11 @@ def collect_product(
         ),
         manifest_href=relative_href(manifest_path, output_dir),
         assets=assets,
-        gates=parse_gate_rows(manifest, workspace, output_dir),
-        evidence=parse_evidence_rows(manifest, workspace, output_dir),
+        gates=[*parse_gate_rows(manifest, workspace, output_dir), *quality_gates],
+        evidence=[
+            *parse_evidence_rows(manifest, workspace, output_dir),
+            *quality_evidence,
+        ],
     )
 
 
@@ -369,13 +519,13 @@ STYLE = """
 """
 
 SCRIPT = """
-(()=>{'use strict';const DATA=window.REVIEW_CONSOLE_DATA;const state={q:'',status:'all',blockers:'all',slug:new URLSearchParams(location.search).get('product')||'',assetIndex:0};const $=s=>document.querySelector(s);const esc=(v='')=>String(v).replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',\"'\":'&#39;','\"':'&quot;'})[c]);const records=DATA.products||[];const bySlug=s=>records.find(r=>r.slug===s);function filtered(){const q=state.q.toLowerCase();return records.filter(r=>(!q||`${r.slug} ${r.state} ${r.resume_point} ${r.blockers.map(b=>b.message).join(' ')}`.toLowerCase().includes(q))&&(state.status==='all'||r.state===state.status)&&(state.blockers==='all'||(state.blockers==='yes'?r.blocker_count>0:r.blocker_count===0)))}function writeUrl(){const p=new URLSearchParams;if(state.slug)p.set('product',state.slug);history.replaceState(null,'',`${location.pathname}${p.size?`?${p}`:''}`)}function statusBadge(status,kind='gate'){return`<span class=\"${kind}-status ${kind}-status-${esc(status)}\">${esc(status)}</span>`}function renderList(){const list=filtered();$('#product-count').textContent=`${list.length}件 / 全${records.length}件`;$('#product-buttons').innerHTML=list.length?list.map(r=>`<button class=\"product-button\" type=\"button\" data-product=\"${esc(r.slug)}\" aria-current=\"${r.slug===state.slug}\"><strong>${esc(r.slug)}</strong><span class=\"state state-${r.state}\">${esc(r.state)}</span><small>blocker ${r.blocker_count} · ${esc(r.updated_at)}</small></button>`).join(''):'<div class=\"empty\">条件に一致する製品がありません。</div>';$('#product-buttons').querySelectorAll('[data-product]').forEach(b=>b.addEventListener('click',()=>{state.slug=b.dataset.product;writeUrl();renderList();renderDetail();$('#product-detail').focus()}))}function renderDetail(){const r=bySlug(state.slug);$('#detail-empty').hidden=Boolean(r);$('#detail-content').hidden=!r;if(!r)return;$('#product-title').textContent=r.slug;$('#product-state').className=`state state-${r.state}`;$('#product-state').textContent=r.state;$('#updated').textContent=`最終更新 ${r.updated_at}`;$('#manifest-link').href=r.manifest_href;const values={blockers:r.blocker_count,resume:r.resume_point,hash:r.candidate_hash,review:r.human_review_url||'未登録'};for(const[k,v]of Object.entries(values))$(`[data-summary=\"${k}\"]`).textContent=v;$('#blockers-list').innerHTML=r.blockers.length?r.blockers.map(b=>`<li><strong>${esc(b.severity)}</strong> ${esc(b.message)}</li>`).join(''):'<li>未解決blockerなし</li>';const assets=r.assets||[];$('#asset-count').textContent=`${assets.filter(a=>a.status==='PASS').length}/${assets.length} available`;$('#image-grid').innerHTML=assets.length?assets.map((a,i)=>`<article class=\"image-card\"><div>${a.href?`<img src=\"${esc(a.href)}\" alt=\"${esc(r.slug)} ${esc(a.kind)} ${esc(a.name)}\">`:'<div class=\"empty\">画像なし</div>'}<button type=\"button\" data-viewer=\"${i}\" aria-label=\"${esc(a.name)}を拡大\"></button></div><div class=\"image-meta\"><span>${esc(a.kind)} / ${esc(a.name)}</span>${statusBadge(a.status,'asset')}</div></article>`).join(''):'<div class=\"empty\">required assetなし</div>';$('#image-grid').querySelectorAll('[data-viewer]').forEach(b=>b.addEventListener('click',()=>openViewer(Number(b.dataset.viewer))));$('#gate-grid').innerHTML=r.gates.length?r.gates.map(g=>`<article class=\"gate-card\"><strong>${esc(g.name)}</strong>${statusBadge(g.status)}<span>${esc(g.detail)}</span>${g.href?`<a href=\"${esc(g.href)}\">ログを開く →</a>`:''}</article>`).join(''):'<div class=\"empty\">gate結果なし</div>';$('#evidence-grid').innerHTML=r.evidence.length?r.evidence.map(e=>`<article class=\"evidence-card\"><strong>${esc(e.label)}</strong>${statusBadge(e.status)}${e.sha256?`<small>SHA-256 ${esc(e.sha256)}</small>`:''}${e.href?`<a href=\"${esc(e.href)}\">証拠を開く →</a>`:'<span>リンクなし</span>'}</article>`).join(''):'<div class=\"empty\">証拠なし</div>'}function openViewer(index){const r=bySlug(state.slug),assets=(r?.assets||[]).filter(a=>a.href);if(!assets.length)return;state.assetIndex=Math.max(0,Math.min(index,assets.length-1));const a=assets[state.assetIndex];$('#viewer-image').src=a.href;$('#viewer-image').alt=`${r.slug} ${a.kind} ${a.name}`;$('#viewer-caption').textContent=`${a.kind} / ${a.name} / ${a.status}`;$('#viewer').hidden=false;$('#viewer-close').focus()}function moveViewer(delta){const r=bySlug(state.slug),assets=(r?.assets||[]).filter(a=>a.href);if(!assets.length)return;state.assetIndex=(state.assetIndex+delta+assets.length)%assets.length;openViewer(state.assetIndex)}function bind(){$('#q').addEventListener('input',e=>{state.q=e.target.value;renderList()});$('#status-filter').addEventListener('change',e=>{state.status=e.target.value;renderList()});$('#blocker-filter').addEventListener('change',e=>{state.blockers=e.target.value;renderList()});$('#clear').addEventListener('click',()=>{state.q='';state.status='all';state.blockers='all';$('#q').value='';$('#status-filter').value='all';$('#blocker-filter').value='all';renderList();$('#q').focus()});$('#viewer-close').addEventListener('click',()=>{$('#viewer').hidden=true});$('#viewer-prev').addEventListener('click',()=>moveViewer(-1));$('#viewer-next').addEventListener('click',()=>moveViewer(1));document.addEventListener('keydown',e=>{if($('#viewer').hidden)return;if(e.key==='Escape')$('#viewer-close').click();if(e.key==='ArrowLeft')moveViewer(-1);if(e.key==='ArrowRight')moveViewer(1)});window.addEventListener('popstate',()=>{state.slug=new URLSearchParams(location.search).get('product')||'';renderList();renderDetail()})}function init(){for(const s of DATA.states||[]){const o=document.createElement('option');o.value=s;o.textContent=s;$('#status-filter').append(o)}if(!state.slug||!bySlug(state.slug))state.slug=records[0]?.slug||'';$('#generated').textContent=`Generated ${DATA.generated_at}`;$('#policy').textContent=`Required views ${DATA.required_views.length} / poses ${DATA.required_poses.length}`;bind();renderList();renderDetail();writeUrl()}init()})();
+(()=>{'use strict';const DATA=window.REVIEW_CONSOLE_DATA;const state={q:'',status:'all',blockers:'all',slug:new URLSearchParams(location.search).get('product')||'',assetIndex:0};const $=s=>document.querySelector(s);const esc=(v='')=>String(v).replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c]);const records=DATA.products||[];const bySlug=s=>records.find(r=>r.slug===s);function filtered(){const q=state.q.toLowerCase();return records.filter(r=>(!q||`${r.slug} ${r.state} ${r.resume_point} ${r.blockers.map(b=>b.message).join(' ')}`.toLowerCase().includes(q))&&(state.status==='all'||r.state===state.status)&&(state.blockers==='all'||(state.blockers==='yes'?r.blocker_count>0:r.blocker_count===0)))}function writeUrl(){const p=new URLSearchParams;if(state.slug)p.set('product',state.slug);history.replaceState(null,'',`${location.pathname}${p.size?`?${p}`:''}`)}function statusBadge(status,kind='gate'){return`<span class="${kind}-status ${kind}-status-${esc(status)}">${esc(status)}</span>`}function renderList(){const list=filtered();$('#product-count').textContent=`${list.length}件 / 全${records.length}件`;$('#product-buttons').innerHTML=list.length?list.map(r=>`<button class="product-button" type="button" data-product="${esc(r.slug)}" aria-current="${r.slug===state.slug}"><strong>${esc(r.slug)}</strong><span class="state state-${r.state}">${esc(r.state)}</span><small>blocker ${r.blocker_count} · ${esc(r.updated_at)}</small></button>`).join(''):'<div class="empty">条件に一致する製品がありません。</div>';$('#product-buttons').querySelectorAll('[data-product]').forEach(b=>b.addEventListener('click',()=>{state.slug=b.dataset.product;writeUrl();renderList();renderDetail();$('#product-detail').focus()}))}function renderDetail(){const r=bySlug(state.slug);$('#detail-empty').hidden=Boolean(r);$('#detail-content').hidden=!r;if(!r)return;$('#product-title').textContent=r.slug;$('#product-state').className=`state state-${r.state}`;$('#product-state').textContent=r.state;$('#updated').textContent=`最終更新 ${r.updated_at}`;$('#manifest-link').href=r.manifest_href;const values={blockers:r.blocker_count,resume:r.resume_point,hash:r.candidate_hash,review:r.human_review_url||'未登録'};for(const[k,v]of Object.entries(values))$(`[data-summary="${k}"]`).textContent=v;$('#blockers-list').innerHTML=r.blockers.length?r.blockers.map(b=>`<li><strong>${esc(b.severity)}</strong> ${esc(b.message)}</li>`).join(''):'<li>未解決blockerなし</li>';const assets=r.assets||[];$('#asset-count').textContent=`${assets.filter(a=>a.status==='PASS').length}/${assets.length} available`;$('#image-grid').innerHTML=assets.length?assets.map((a,i)=>`<article class="image-card"><div>${a.href?`<img src="${esc(a.href)}" alt="${esc(r.slug)} ${esc(a.kind)} ${esc(a.name)}">`:'<div class="empty">画像なし</div>'}<button type="button" data-viewer="${i}" aria-label="${esc(a.name)}を拡大"></button></div><div class="image-meta"><span>${esc(a.kind)} / ${esc(a.name)}</span>${statusBadge(a.status,'asset')}</div></article>`).join(''):'<div class="empty">required assetなし</div>';$('#image-grid').querySelectorAll('[data-viewer]').forEach(b=>b.addEventListener('click',()=>openViewer(Number(b.dataset.viewer))));$('#gate-grid').innerHTML=r.gates.length?r.gates.map(g=>`<article class="gate-card"><strong>${esc(g.name)}</strong>${statusBadge(g.status)}<span>${esc(g.detail)}</span>${g.href?`<a href="${esc(g.href)}">ログを開く →</a>`:''}</article>`).join(''):'<div class="empty">gate結果なし</div>';$('#evidence-grid').innerHTML=r.evidence.length?r.evidence.map(e=>`<article class="evidence-card"><strong>${esc(e.label)}</strong>${statusBadge(e.status)}${e.sha256?`<small>SHA-256 ${esc(e.sha256)}</small>`:''}${e.href?`<a href="${esc(e.href)}">証拠を開く →</a>`:'<span>リンクなし</span>'}</article>`).join(''):'<div class="empty">証拠なし</div>'}function openViewer(index){const r=bySlug(state.slug),assets=(r?.assets||[]).filter(a=>a.href);if(!assets.length)return;state.assetIndex=Math.max(0,Math.min(index,assets.length-1));const a=assets[state.assetIndex];$('#viewer-image').src=a.href;$('#viewer-image').alt=`${r.slug} ${a.kind} ${a.name}`;$('#viewer-caption').textContent=`${a.kind} / ${a.name} / ${a.status}`;$('#viewer').hidden=false;$('#viewer-close').focus()}function moveViewer(delta){const r=bySlug(state.slug),assets=(r?.assets||[]).filter(a=>a.href);if(!assets.length)return;state.assetIndex=(state.assetIndex+delta+assets.length)%assets.length;openViewer(state.assetIndex)}function bind(){$('#q').addEventListener('input',e=>{state.q=e.target.value;renderList()});$('#status-filter').addEventListener('change',e=>{state.status=e.target.value;renderList()});$('#blocker-filter').addEventListener('change',e=>{state.blockers=e.target.value;renderList()});$('#clear').addEventListener('click',()=>{state.q='';state.status='all';state.blockers='all';$('#q').value='';$('#status-filter').value='all';$('#blocker-filter').value='all';renderList();$('#q').focus()});$('#viewer-close').addEventListener('click',()=>{$('#viewer').hidden=true});$('#viewer-prev').addEventListener('click',()=>moveViewer(-1));$('#viewer-next').addEventListener('click',()=>moveViewer(1));document.addEventListener('keydown',e=>{if($('#viewer').hidden)return;if(e.key==='Escape')$('#viewer-close').click();if(e.key==='ArrowLeft')moveViewer(-1);if(e.key==='ArrowRight')moveViewer(1)});window.addEventListener('popstate',()=>{state.slug=new URLSearchParams(location.search).get('product')||'';renderList();renderDetail()})}function init(){for(const s of DATA.states||[]){const o=document.createElement('option');o.value=s;o.textContent=s;$('#status-filter').append(o)}if(!state.slug||!bySlug(state.slug))state.slug=records[0]?.slug||'';$('#generated').textContent=`Generated ${DATA.generated_at}`;$('#policy').textContent=`Required views ${DATA.required_views.length} / poses ${DATA.required_poses.length}`;bind();renderList();renderDetail();writeUrl()}init()})();
 """
 
 
 def render_html(data: dict[str, Any]) -> str:
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
-    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="製品状態、blocker、必須画像、gate、証拠を一画面で確認するimage2outfit読み取り専用レビューコンソール。"><title>image2outfit Review Console</title><style>{STYLE}</style></head><body><a class="skip" href="#product-list">製品一覧へ移動</a><header><a class="brand" href="../../../README.md">image2outfit <span>REVIEW CONSOLE</span></a><nav><a href="#product-list">製品</a><a href="#assets">画像</a><a href="#gates-section">ゲート</a><a href="#evidence-section">証拠</a></nav></header><main><section class="hero"><div><p class="eyebrow">READ ONLY · RELEASE EVIDENCE</p><h1>候補、blocker、画像、証拠を同じ画面で見る。</h1><p>正準ProductManifestとrelease-policyを読み取り、破壊的操作を実行せずにrelease前の欠損を確認します。</p></div><aside><strong id="generated"></strong><span id="policy"></span></aside></section><section class="controls"><label><span>製品・blockerを検索</span><input id="q" type="search"></label><label><span>状態</span><select id="status-filter"><option value="all">すべて</option></select></label><label><span>blocker</span><select id="blocker-filter"><option value="all">すべて</option><option value="yes">あり</option><option value="no">なし</option></select></label><button id="clear" type="button">条件解除</button></section><div class="workspace"><section class="product-list" id="product-list"><div class="section-head"><h2>製品</h2><span id="product-count"></span></div><div class="product-buttons" id="product-buttons"></div></section><section class="product-detail" id="product-detail" tabindex="-1"><div class="empty" id="detail-empty">製品がありません。</div><div id="detail-content" hidden><div class="detail-head"><div><p class="eyebrow">PRODUCT REVIEW</p><h2 id="product-title"></h2><p id="updated"></p><a class="manifest-link" id="manifest-link">ProductManifestを開く →</a></div><span id="product-state" class="state"></span></div><dl class="summary-grid"><div><dt>blocker</dt><dd data-summary="blockers"></dd></div><div><dt>再開地点</dt><dd data-summary="resume"></dd></div><div><dt>candidate hash</dt><dd data-summary="hash"></dd></div><div><dt>human review</dt><dd data-summary="review"></dd></div></dl><section class="section"><div class="section-head"><h3>未解決blocker</h3></div><ul class="blocker-list" id="blockers-list"></ul></section><section class="section" id="assets"><div class="section-head"><h3>必須ビュー・ポーズ</h3><span id="asset-count"></span></div><div class="image-grid" id="image-grid"></div></section><section class="section" id="gates-section"><div class="section-head"><h3>release gate</h3></div><div class="gate-grid" id="gate-grid"></div></section><section class="section" id="evidence-section"><div class="section-head"><h3>証拠</h3></div><div class="evidence-grid" id="evidence-grid"></div></section></div></section></div></main><div class="viewer" id="viewer" hidden><img id="viewer-image" alt=""><div class="viewer-controls"><button id="viewer-prev" type="button">前</button><button id="viewer-next" type="button">次</button><button id="viewer-close" type="button">閉じる</button></div><span class="viewer-caption" id="viewer-caption"></span></div><footer>image2outfit Review Console · 読み取り専用。release操作は既存gateを使用してください。</footer><script>window.REVIEW_CONSOLE_DATA={payload};</script><script>{SCRIPT}</script></body></html>"""
+    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="製品状態、blocker、必須画像、gate、証拠を一画面で確認するimage2outfit読み取り専用レビューコンソール。"><title>image2outfit Review Console</title><style>{STYLE}</style></head><body><a class="skip" href="#product-list">製品一覧へ移動</a><header><a class="brand" href="../../../README.md">image2outfit <span>REVIEW CONSOLE</span></a><nav><a href="#product-list">製品</a><a href="#assets">画像</a><a href="#gates-section">ゲート</a><a href="#evidence-section">証拠</a></nav></header><main><section class="hero"><div><p class="eyebrow">READ ONLY · RELEASE EVIDENCE</p><h1>候補、blocker、画像、証拠を同じ画面で見る。</h1><p>正準ProductManifest、release-policy、QualitySpec release projectionを読み取り、破壊的操作を実行せずにrelease前の欠損を確認します。</p></div><aside><strong id="generated"></strong><span id="policy"></span></aside></section><section class="controls"><label><span>製品・blockerを検索</span><input id="q" type="search"></label><label><span>状態</span><select id="status-filter"><option value="all">すべて</option></select></label><label><span>blocker</span><select id="blocker-filter"><option value="all">すべて</option><option value="yes">あり</option><option value="no">なし</option></select></label><button id="clear" type="button">条件解除</button></section><div class="workspace"><section class="product-list" id="product-list"><div class="section-head"><h2>製品</h2><span id="product-count"></span></div><div class="product-buttons" id="product-buttons"></div></section><section class="product-detail" id="product-detail" tabindex="-1"><div class="empty" id="detail-empty">製品がありません。</div><div id="detail-content" hidden><div class="detail-head"><div><p class="eyebrow">PRODUCT REVIEW</p><h2 id="product-title"></h2><p id="updated"></p><a class="manifest-link" id="manifest-link">ProductManifestを開く →</a></div><span id="product-state" class="state"></span></div><dl class="summary-grid"><div><dt>blocker</dt><dd data-summary="blockers"></dd></div><div><dt>再開地点</dt><dd data-summary="resume"></dd></div><div><dt>candidate hash</dt><dd data-summary="hash"></dd></div><div><dt>human review</dt><dd data-summary="review"></dd></div></dl><section class="section"><div class="section-head"><h3>未解決blocker</h3></div><ul class="blocker-list" id="blockers-list"></ul></section><section class="section" id="assets"><div class="section-head"><h3>必須ビュー・ポーズ</h3><span id="asset-count"></span></div><div class="image-grid" id="image-grid"></div></section><section class="section" id="gates-section"><div class="section-head"><h3>release gate</h3></div><div class="gate-grid" id="gate-grid"></div></section><section class="section" id="evidence-section"><div class="section-head"><h3>証拠</h3></div><div class="evidence-grid" id="evidence-grid"></div></section></div></section></div></main><div class="viewer" id="viewer" hidden><img id="viewer-image" alt=""><div class="viewer-controls"><button id="viewer-prev" type="button">前</button><button id="viewer-next" type="button">次</button><button id="viewer-close" type="button">閉じる</button></div><span class="viewer-caption" id="viewer-caption"></span></div><footer>image2outfit Review Console · 読み取り専用。release操作は既存gateを使用してください。</footer><script>window.REVIEW_CONSOLE_DATA={payload};</script><script>{SCRIPT}</script></body></html>"""
 
 
 def build(root: Path, output: Path) -> dict[str, Any]:
@@ -390,7 +540,9 @@ def build(root: Path, output: Path) -> dict[str, Any]:
         for workspace in sorted(product_root.iterdir()):
             if workspace.is_dir() and (workspace / "ProductManifest.json").is_file():
                 products.append(
-                    collect_product(workspace, output, required_views, required_poses)
+                    collect_product(
+                        root, workspace, output, required_views, required_poses
+                    )
                 )
     data = {
         "schema_version": "review-console.v2",
