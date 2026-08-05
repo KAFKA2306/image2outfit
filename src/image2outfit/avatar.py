@@ -136,7 +136,10 @@ class AvatarSpec:
             ("measurement", [item.measurement_id for item in self.measurements]),
             ("landmark", [item.landmark_id for item in self.landmarks]),
             ("pose", [item.pose_id for item in self.poses]),
-            ("arrangement volume", [item.volume_id for item in self.arrangement_volumes]),
+            (
+                "arrangement volume",
+                [item.volume_id for item in self.arrangement_volumes],
+            ),
         ):
             if len(values) != len(set(values)):
                 raise ValueError(f"duplicate {label} identifiers are not allowed")
@@ -266,7 +269,9 @@ def derive_avatar_spec(
         positions = {
             item.landmark_id: vertices[item.vertex_index] for item in landmarks
         }
-        poses.append(PoseLandmarkState(pose_id=pose_id, landmark_positions_mm=positions))
+        poses.append(
+            PoseLandmarkState(pose_id=pose_id, landmark_positions_mm=positions)
+        )
     grouped: dict[tuple[BodyRegion, Laterality], list[AvatarLandmark]] = {}
     for landmark in landmarks:
         grouped.setdefault((landmark.body_region, landmark.laterality), []).append(
