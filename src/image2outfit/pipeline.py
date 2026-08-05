@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from enum import StrEnum
 from typing import Any, TypedDict
+from uuid import uuid4
 
+from .audit import make_stage_record, utc_now
 from .tooling import ToolRegistry
 
 
@@ -37,6 +39,7 @@ PIPELINE_TRANSITIONS = tuple(
 
 class PipelineState(TypedDict, total=False):
     schema_version: int
+    run_id: str
     product_id: str
     target_avatar: str
     source_reference: str
@@ -48,6 +51,7 @@ class PipelineState(TypedDict, total=False):
     events: list[dict[str, Any]]
     errors: list[str]
     outputs: dict[str, Any]
+    stage_records: list[dict[str, Any]]
 
 
 def new_pipeline_state(
@@ -57,12 +61,14 @@ def new_pipeline_state(
     source_reference: str,
     profile_id: str = "garment-reconstruction-v1",
     execution_mode: ExecutionMode | str = ExecutionMode.PLAN,
+    run_id: str | None = None,
 ) -> PipelineState:
     if not product_id or not target_avatar or not source_reference:
         raise ValueError("product_id, target_avatar, and source_reference are required")
     mode = ExecutionMode(execution_mode)
     return {
         "schema_version": 1,
+        "run_id": run_id or uuid4().hex,
         "product_id": product_id,
         "target_avatar": target_avatar,
         "source_reference": source_reference,
@@ -74,6 +80,27 @@ def new_pipeline_state(
         "events": [],
         "errors": [],
         "outputs": {},
+        "stage_records": [],
+    }
+
+
+def _stage_input_snapshot(
+    state: PipelineState,
+    stage: PipelineStage,
+) -> dict[str, Any]:
+    records = state.get("stage_records", [])
+    previous_digest = records[-1]["recordDigest"] if records else "0" * 64
+    return {
+        "schemaVersion": state.get("schema_version"),
+        "runId": state.get("run_id"),
+        "productId": state.get("product_id"),
+        "targetAvatar": state.get("target_avatar"),
+        "sourceReference": state.get("source_reference"),
+        "profileId": state.get("profile_id"),
+        "executionMode": state.get("execution_mode"),
+        "stage": stage.value,
+        "completedStages": list(state.get("completed_stages", [])),
+        "previousRecordDigest": previous_digest,
     }
 
 
@@ -84,9 +111,14 @@ def _execute_stage(
 ) -> PipelineState:
     if state.get("status") == "FAILED":
         return state
+    descriptor = registry.descriptor(stage)
+    mode = ExecutionMode(state.get("execution_mode", ExecutionMode.PLAN.value))
+    records = list(state.get("stage_records", []))
+    previous_digest = records[-1]["recordDigest"] if records else "0" * 64
+    input_snapshot = _stage_input_snapshot(state, stage)
+    started_at = utc_now()
     try:
         update = registry.invoke(stage, state)
-        mode = ExecutionMode(state.get("execution_mode", ExecutionMode.PLAN.value))
         actual_mode = update.get("mode")
         expected_mode = "planned" if mode is ExecutionMode.PLAN else "executed"
         if actual_mode != expected_mode:
@@ -96,10 +128,39 @@ def _execute_stage(
             )
     except Exception as exc:  # noqa: BLE001 - stage boundary records exact failure
         error = f"{stage.value}: {type(exc).__name__}: {exc}"
+        failed_output = {
+            "mode": "failed",
+            "requestedMode": mode.value,
+            "stage": stage.value,
+            "errorType": type(exc).__name__,
+            "error": str(exc),
+        }
+        record = make_stage_record(
+            run_id=str(state["run_id"]),
+            product_id=str(state["product_id"]),
+            sequence=len(records) + 1,
+            stage=stage.value,
+            requested_mode=mode.value,
+            outcome_mode="failed",
+            status="FAILED",
+            tool_name=descriptor.tool_name,
+            purpose=descriptor.purpose,
+            output_contract=descriptor.output_contract,
+            input_snapshot=input_snapshot,
+            output=failed_output,
+            previous_record_digest=previous_digest,
+            started_at=started_at,
+            finished_at=utc_now(),
+        )
         errors = [*state.get("errors", []), error]
         events = [
             *state.get("events", []),
-            {"stage": stage.value, "status": "FAILED", "error": str(exc)},
+            {
+                "stage": stage.value,
+                "status": "FAILED",
+                "error": str(exc),
+                "auditRecordDigest": record["recordDigest"],
+            },
         ]
         return {
             **state,
@@ -107,17 +168,37 @@ def _execute_stage(
             "current_stage": stage.value,
             "errors": errors,
             "events": events,
+            "outputs": {**state.get("outputs", {}), stage.value: failed_output},
+            "stage_records": [*records, record],
         }
 
+    event_status = "PLANNED" if actual_mode == "planned" else "PASS"
+    record = make_stage_record(
+        run_id=str(state["run_id"]),
+        product_id=str(state["product_id"]),
+        sequence=len(records) + 1,
+        stage=stage.value,
+        requested_mode=mode.value,
+        outcome_mode=str(actual_mode),
+        status=event_status,
+        tool_name=descriptor.tool_name,
+        purpose=descriptor.purpose,
+        output_contract=descriptor.output_contract,
+        input_snapshot=input_snapshot,
+        output=update,
+        previous_record_digest=previous_digest,
+        started_at=started_at,
+        finished_at=utc_now(),
+    )
     outputs = {**state.get("outputs", {}), stage.value: update}
     completed = [*state.get("completed_stages", []), stage.value]
-    event_status = "PLANNED" if actual_mode == "planned" else "PASS"
     events = [
         *state.get("events", []),
         {
             "stage": stage.value,
             "status": event_status,
-            "tool": registry.descriptor(stage).tool_name,
+            "tool": descriptor.tool_name,
+            "auditRecordDigest": record["recordDigest"],
         },
     ]
     if stage is PIPELINE_STAGES[-1]:
@@ -131,6 +212,7 @@ def _execute_stage(
         "completed_stages": completed,
         "events": events,
         "outputs": outputs,
+        "stage_records": [*records, record],
     }
 
 
