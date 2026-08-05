@@ -91,7 +91,7 @@ jobs:
             --output blender.tar.xz
           mkdir -p .image2outfit/blender
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
-      - name: Run collision-supported free-fall calibration sweep
+      - name: Run fixed-scale 250-frame long-settle diagnostic
         run: |
           set -uo pipefail
           mkdir -p "$OUTPUT_DIR"
@@ -107,7 +107,7 @@ jobs:
             --library config/materials/kes-woven-fabrics-2025.v1.json \
             --profile config/materials/blender-4.4-kes-calibration.v1.json \
             --output "$OUTPUT_DIR" \
-            --frame-end 100 \
+            --frame-end 250 \
             --grid 41 | tee "$OUTPUT_DIR/blender-calibration.log"
           calibration_status=${PIPESTATUS[0]}
           set -e
@@ -123,6 +123,7 @@ jobs:
           report = json.loads((output / "material-drape-report.json").read_text())
           assert report["schemaVersion"] == 5
           assert report["blenderVersion"] == os.environ["BLENDER_VERSION"]
+          assert report["frameEnd"] == 250
           assert len(report["records"]) == 6
           assert report["sameGeometryForAllMaterials"] is True
           assert report["fixture"]["type"] == "cusick-drape-meter"
