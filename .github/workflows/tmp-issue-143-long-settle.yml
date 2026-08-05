@@ -1,0 +1,69 @@
+name: Temporary issue 143 long-settle diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/tmp-issue-143-long-settle.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch-profile:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'feat/issue-143-material-blender-calibration-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Fix selected scales and declare the long-settle diagnostic
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("config/materials/blender-4.4-kes-calibration.v1.json")
+          profile = json.loads(path.read_text(encoding="utf-8"))
+          profile["profileId"] = "blender-4.4.3-kes-cusick-calibration-v8-long-settle"
+          profile["mappingStatus"] = "long-settle-diagnostic"
+          profile["calibratedElasticScales"] = {
+              "kes-2025-m1-polyester-twill": 0.015,
+              "kes-2025-m2-polyester-plain": 0.1,
+              "kes-2025-m3-wool-polyester-elastane-twill": 0.01,
+              "kes-2025-m4-polyester-viscose-elastane-twill": 0.015,
+              "kes-2025-m5-polyester-elastane-plain": 0.015,
+              "kes-2025-m6-cotton-polyester-elastane-twill": 0.015,
+          }
+          profile["searchPolicy"] = {
+              "spacing": "fixed-scales-long-settle-diagnostic",
+              "policy": (
+                  "reuse the six scales selected by the 100-frame candidate sweep and "
+                  "evaluate only the final mixed-material scene at 250 frames"
+              ),
+              "reason": (
+                  "the 100-frame evidence retained central rebound and only 13-37% "
+                  "support contact, so temporal non-convergence must be separated from "
+                  "friction or constitutive-model error before any further fitting"
+              ),
+          }
+          profile["calibrationFixture"]["purpose"] = (
+              "long-settle diagnostic at fixed material scales before friction or "
+              "constitutive re-identification; final validation still requires the "
+              "published approximately 4 mm mesh resolution"
+          )
+          path.write_text(
+              json.dumps(profile, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+      - name: Commit profile-only diagnostic
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add config/materials/blender-4.4-kes-calibration.v1.json
+          git commit -m "test(material): fix scales for long-settle diagnostic"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
