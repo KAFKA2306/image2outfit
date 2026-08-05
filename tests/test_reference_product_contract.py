@@ -48,8 +48,7 @@ class ReferenceProductContractTests(unittest.TestCase):
             audit["source"]["sourceRetention"]["repositoryContainsSourceImage"]
         )
         source_reference = (
-            "private-reference://sha256/"
-            + audit["source"]["originalSha256"]
+            "private-reference://sha256/" + audit["source"]["originalSha256"]
         )
         self.assertEqual(identity["sourceReference"], source_reference)
         self.assertEqual(len(audit["source"]["originalSha256"]), 64)
