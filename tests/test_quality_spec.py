@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-from image2outfit.quality import validate_quality_assessment
-
-
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from image2outfit.quality import validate_quality_assessment
 
 
 class QualitySpecTest(unittest.TestCase):
