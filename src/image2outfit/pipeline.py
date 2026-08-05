@@ -1,4 +1,4 @@
-"""Deterministic stage pipeline with an optional LangGraph execution adapter."""
+"""Deterministic stage pipeline with LangChain and LangGraph adapters."""
 
 from __future__ import annotations
 
@@ -24,6 +24,11 @@ class PipelineStage(StrEnum):
     FINALIZE_CANDIDATE = "finalize-candidate"
 
 
+class ExecutionMode(StrEnum):
+    PLAN = "plan"
+    EXECUTE = "execute"
+
+
 PIPELINE_STAGES = tuple(PipelineStage)
 PIPELINE_TRANSITIONS = tuple(
     zip(PIPELINE_STAGES[:-1], PIPELINE_STAGES[1:], strict=True)
@@ -36,6 +41,7 @@ class PipelineState(TypedDict, total=False):
     target_avatar: str
     source_reference: str
     profile_id: str
+    execution_mode: str
     status: str
     current_stage: str
     completed_stages: list[str]
@@ -50,15 +56,18 @@ def new_pipeline_state(
     target_avatar: str,
     source_reference: str,
     profile_id: str = "garment-reconstruction-v1",
+    execution_mode: ExecutionMode | str = ExecutionMode.PLAN,
 ) -> PipelineState:
     if not product_id or not target_avatar or not source_reference:
         raise ValueError("product_id, target_avatar, and source_reference are required")
+    mode = ExecutionMode(execution_mode)
     return {
         "schema_version": 1,
         "product_id": product_id,
         "target_avatar": target_avatar,
         "source_reference": source_reference,
         "profile_id": profile_id,
+        "execution_mode": mode.value,
         "status": "READY",
         "current_stage": "",
         "completed_stages": [],
@@ -77,6 +86,14 @@ def _execute_stage(
         return state
     try:
         update = registry.invoke(stage, state)
+        mode = ExecutionMode(state.get("execution_mode", ExecutionMode.PLAN.value))
+        actual_mode = update.get("mode")
+        expected_mode = "planned" if mode is ExecutionMode.PLAN else "executed"
+        if actual_mode != expected_mode:
+            raise ValueError(
+                f"stage {stage.value!r} returned mode {actual_mode!r}; "
+                f"expected {expected_mode!r}"
+            )
     except Exception as exc:  # noqa: BLE001 - stage boundary records exact failure
         error = f"{stage.value}: {type(exc).__name__}: {exc}"
         errors = [*state.get("errors", []), error]
@@ -94,15 +111,19 @@ def _execute_stage(
 
     outputs = {**state.get("outputs", {}), stage.value: update}
     completed = [*state.get("completed_stages", []), stage.value]
+    event_status = "PLANNED" if actual_mode == "planned" else "PASS"
     events = [
         *state.get("events", []),
         {
             "stage": stage.value,
-            "status": "PASS",
+            "status": event_status,
             "tool": registry.descriptor(stage).tool_name,
         },
     ]
-    status = "COMPLETE" if stage is PIPELINE_STAGES[-1] else "RUNNING"
+    if stage is PIPELINE_STAGES[-1]:
+        status = "PLANNED" if actual_mode == "planned" else "EXECUTED"
+    else:
+        status = "PLANNING" if actual_mode == "planned" else "RUNNING"
     return {
         **state,
         "status": status,
