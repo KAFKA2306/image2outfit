@@ -1,0 +1,66 @@
+name: Temporary Ruff formatter
+
+on:
+  push:
+    branches:
+      - feat/pre-blender-stage-contracts-v1
+    paths:
+      - '.github/workflows/temporary-ruff-format.yml'
+      - 'src/image2outfit/arrangement.py'
+      - 'src/image2outfit/decomposition.py'
+      - 'src/image2outfit/normalization.py'
+      - 'src/image2outfit/pattern_stage.py'
+      - 'src/image2outfit/reference.py'
+      - 'src/image2outfit/seam_stage.py'
+      - 'tests/test_pre_blender_pattern_stages.py'
+      - 'tests/test_pre_blender_reference_stages.py'
+      - 'tests/test_pre_blender_stage_schemas.py'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/pre-blender-stage-contracts-v1
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+          enable-cache: true
+      - name: Format reusable Python files
+        run: |
+          uv run --locked --no-default-groups --group dev ruff format \
+            src/image2outfit/arrangement.py \
+            src/image2outfit/decomposition.py \
+            src/image2outfit/normalization.py \
+            src/image2outfit/pattern_stage.py \
+            src/image2outfit/reference.py \
+            src/image2outfit/seam_stage.py \
+            tests/test_pre_blender_pattern_stages.py \
+            tests/test_pre_blender_reference_stages.py \
+            tests/test_pre_blender_stage_schemas.py
+      - name: Commit formatting
+        run: |
+          if git diff --quiet; then
+            echo 'No formatting changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            src/image2outfit/arrangement.py \
+            src/image2outfit/decomposition.py \
+            src/image2outfit/normalization.py \
+            src/image2outfit/pattern_stage.py \
+            src/image2outfit/reference.py \
+            src/image2outfit/seam_stage.py \
+            tests/test_pre_blender_pattern_stages.py \
+            tests/test_pre_blender_reference_stages.py \
+            tests/test_pre_blender_stage_schemas.py
+          git commit -m 'format pre-Blender stage contracts'
+          git push origin HEAD:feat/pre-blender-stage-contracts-v1
