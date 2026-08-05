@@ -28,6 +28,37 @@ SiroinoSotai_PC向け衣装をBlenderで制作し、編集可能ソース、FBX�
 
 実行工程は終了コード0だけでは成功になりません。各工程は `.image2outfit/` 以下へ工程結果JSONを書き、工程名、製品ID、`PASS`、必要な結果フィールド、証拠ファイルのSHA-256を宣言します。ランナーは実ファイルのSHA-256を再計算して一致を確認します。
 
+## QualitySpec
+
+品質診断の正本は `contracts/quality/quality-spec.json`、評価実装は `src/image2outfit/quality.py` です。既存の8完成ゲートは変更せず、`visualAppearanceReview` の内訳を次の10軸へ分離します。
+
+- topology
+- seam
+- fit
+- material-response
+- layering
+- skinning
+- collision
+- silhouette
+- styling-fidelity
+- evidence-completeness
+
+各軸は、指標名、比較演算子、閾値、観測値、対象view／pose、判定方法、判定者、証拠path、SHA-256、defect code、正規13工程への戻り先を保存します。証拠欠損、path逸脱、SHA-256不一致はPASSを禁止します。許可された `OUT_OF_SCOPE` は理由を必須とし、FAILへ数えません。
+
+`visualAppearanceReview` は `DIRECT_IMAGE_REVIEW` と、hash検証済みの5方向・必須ポーズ画像がある場合だけPASSになります。自動監査は個別軸を補助できますが、外観レビュー自体をPASSにできません。
+
+release gateは `visual-review.qualitySpec` を評価し、`.image2outfit/products/<slug>/reports/customer-quality.json` の `evidence.qualitySpec` に正規化結果を書きます。Review Consoleは同じprojectionから品質gate、defect、戻り先、証拠hash、candidate hashを表示し、独自閾値を持ちません。
+
+2026年の設計根拠は次の一次情報です。
+
+- ReWeaver: topology、geometry alignment、seam-panel consistency — <https://arxiv.org/abs/2601.16672>
+- AutoSew — <https://arxiv.org/abs/2602.22052>
+- Learning-based Seam Correspondence Reconstruction — <https://arxiv.org/abs/2607.21213>
+- EASE: local ease field — <https://arxiv.org/abs/2606.29419>
+- MV-Fashion: multilayer outfitとstyling detail — <https://arxiv.org/abs/2603.08147>
+- Image2Garment: material／physical parameter inference — <https://arxiv.org/abs/2601.09658>
+- C2PA 2.2 hard binding — <https://spec.c2pa.org/specifications/specifications/2.2/specs/C2PA_Specification.html>
+
 ## スコープ外
 
 次は本プロジェクトの完了条件ではありません。
