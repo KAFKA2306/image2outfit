@@ -29,12 +29,22 @@ class ContactHypothesis:
     measured: bool = False
 
     def __post_init__(self) -> None:
-        if not self.hypothesis_id.strip() or not self.method.strip() or not self.source.strip():
-            raise ValueError("contact hypothesis identity, method, and source are required")
+        if (
+            not self.hypothesis_id.strip()
+            or not self.method.strip()
+            or not self.source.strip()
+        ):
+            raise ValueError(
+                "contact hypothesis identity, method, and source are required"
+            )
         if not 0 <= self.dynamic_friction <= self.static_friction <= 1:
-            raise ValueError("contact friction must satisfy 0 <= dynamic <= static <= 1")
+            raise ValueError(
+                "contact friction must satisfy 0 <= dynamic <= static <= 1"
+            )
         if not 0 <= self.confidence <= 1:
-            raise ValueError("contact hypothesis confidence must be between zero and one")
+            raise ValueError(
+                "contact hypothesis confidence must be between zero and one"
+            )
 
 
 @dataclass(frozen=True, slots=True)

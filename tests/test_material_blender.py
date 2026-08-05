@@ -48,10 +48,16 @@ class BlenderMaterialProjectionTests(unittest.TestCase):
 
     def test_anisotropy_is_preserved_and_scalar_loss_is_explicit(self) -> None:
         self.assertTrue(
-            all(item.stretch_projection.anisotropy_ratio > 1 for item in self.projections)
+            all(
+                item.stretch_projection.anisotropy_ratio > 1
+                for item in self.projections
+            )
         )
         self.assertTrue(
-            all(item.bending_projection.anisotropy_ratio >= 1 for item in self.projections)
+            all(
+                item.bending_projection.anisotropy_ratio >= 1
+                for item in self.projections
+            )
         )
         self.assertTrue(
             any(
@@ -61,20 +67,17 @@ class BlenderMaterialProjectionTests(unittest.TestCase):
         )
         self.assertTrue(
             all(
-                "scalar" in " ".join(item.warnings).lower()
-                for item in self.projections
+                "scalar" in " ".join(item.warnings).lower() for item in self.projections
             )
         )
 
-    def test_through_thickness_compression_is_not_mapped_as_surface_compression(self) -> None:
-        for material, projection in zip(
-            self.materials, self.projections, strict=True
-        ):
+    def test_through_thickness_compression_is_not_mapped_as_surface_compression(
+        self,
+    ) -> None:
+        for material, projection in zip(self.materials, self.projections, strict=True):
             self.assertIsNone(material.properties.compression_kpa)
             self.assertIsNone(
-                projection.unmapped_source_properties[
-                    "throughThicknessCompressionKpa"
-                ]
+                projection.unmapped_source_properties["throughThicknessCompressionKpa"]
             )
             expected = (
                 projection.cloth_settings["tension_stiffness"]
@@ -84,10 +87,10 @@ class BlenderMaterialProjectionTests(unittest.TestCase):
                 expected, projection.cloth_settings["compression_stiffness"]
             )
 
-    def test_missing_measured_friction_remains_a_low_confidence_hypothesis(self) -> None:
-        for material, projection in zip(
-            self.materials, self.projections, strict=True
-        ):
+    def test_missing_measured_friction_remains_a_low_confidence_hypothesis(
+        self,
+    ) -> None:
+        for material, projection in zip(self.materials, self.projections, strict=True):
             self.assertIsNone(material.properties.static_friction)
             self.assertIsNone(material.properties.dynamic_friction)
             self.assertFalse(projection.contact_hypothesis.measured)
@@ -102,9 +105,7 @@ class BlenderMaterialProjectionTests(unittest.TestCase):
             )
 
     def test_collision_and_render_thickness_remain_separate_fields(self) -> None:
-        for material, projection in zip(
-            self.materials, self.projections, strict=True
-        ):
+        for material, projection in zip(self.materials, self.projections, strict=True):
             self.assertAlmostEqual(
                 material.properties.collision_thickness_mm / 1000,
                 projection.cloth_collision_settings["distance_min"],

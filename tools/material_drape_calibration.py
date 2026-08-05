@@ -272,12 +272,15 @@ def convex_hull(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
 def polygon_area(points: list[tuple[float, float]]) -> float:
     if len(points) < 3:
         return 0.0
-    return abs(
-        sum(
-            first[0] * second[1] - second[0] * first[1]
-            for first, second in zip(points, points[1:] + points[:1], strict=True)
+    return (
+        abs(
+            sum(
+                first[0] * second[1] - second[0] * first[1]
+                for first, second in zip(points, points[1:] + points[:1], strict=True)
+            )
         )
-    ) / 2
+        / 2
+    )
 
 
 def object_metrics(
@@ -361,7 +364,9 @@ def render_scene(
     camera.location = (0.0, -13.5, 7.2)
     look_at(camera, Vector((0.0, 0.0, 0.48)))
     bpy.ops.render.render(write_still=True)
-    images.append({"kind": "comparison", "path": combined.name, "sha256": sha256(combined)})
+    images.append(
+        {"kind": "comparison", "path": combined.name, "sha256": sha256(combined)}
+    )
 
     scene.render.resolution_x = 640
     scene.render.resolution_y = 640
@@ -422,9 +427,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         location_x = (index - center) * spacing
         collection = bpy.data.collections.new(f"Test__{projection.material_id}")
         scene.collection.children.link(collection)
-        collider, collider_actual = create_collider(
-            projection, location_x, collection
-        )
+        collider, collider_actual = create_collider(projection, location_x, collection)
         cloth, cloth_actual = create_cloth(
             projection,
             location_x,
