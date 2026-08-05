@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-cusick-calibration-v3",
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v4-free-fall",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
   "mappingStatus": "calibration-search",
-  "mappingMethod": "relative KES projection followed by one global elastic scale fitted to published KES-based Cusick drape coefficients; not an SI-to-Blender unit conversion",
+  "mappingMethod": "relative KES projection followed by one global elastic scale evaluated on a collision-supported Cusick free-fall fixture; not an SI-to-Blender unit conversion",
   "scalarProjectionRanges": {
     "tensionStiffness": [
       5.0,
@@ -52,12 +52,14 @@
     "specimenRadiusM": 0.15,
     "supportRadiusM": 0.09,
     "supportTopZM": 0.12,
-    "initialSpecimenZM": 0.122,
+    "initialSpecimenZM": 0.125,
+    "initialGapM": 0.005,
     "mesh": "41x41 concentric-square-to-disk quad mesh",
     "selfCollision": false,
     "source": "https://doi.org/10.3390/su17041388",
+    "simulationMethodSource": "https://doi.org/10.3390/ma14216259",
     "purpose": "match the published 300 mm circular sample and 90 mm support radius before comparing projected-area drape coefficients",
-    "supportConstraint": "vertices inside the 90 mm support radius are pinned with weight 1.0 to represent the fixed Cusick support plate"
+    "supportConstraint": "no pin group; the planar specimen starts 5 mm above the solid disk and falls freely onto its collision surface"
   },
   "publishedKesSimulationDrapeCoefficients": {
     "kes-2025-m1-polyester-twill": 0.349,
@@ -73,9 +75,9 @@
     0.01
   ],
   "searchPolicy": {
-    "spacing": "logarithmic-local-refinement",
-    "policy": "refine around the coefficient-fit endpoint selected by the first exact Cusick sweep",
-    "reason": "the first exact sweep showed scale 0.003 minimized coefficient error; the previous objective incorrectly preferred 0.3 because minor support-surface rise was treated as a hard failure"
+    "spacing": "logarithmic-diagnostic-sweep",
+    "policy": "repeat the existing three-point global sweep only after replacing the invalid full-disk pin constraint with collision-supported free fall",
+    "reason": "scales selected with pinned support vertices are not transferable to the corrected Cusick boundary condition"
   },
   "calibratedElasticScale": null,
   "acceptance": {
@@ -89,6 +91,11 @@
       "title": "Assessment of Textile Material Properties and the Impact of Digital Ink-Jet Fabric Printing on 3D Simulation as a Sustainable Method for Garment Prototyping",
       "url": "https://doi.org/10.3390/su17041388",
       "role": "exact Cusick geometry, real coefficients, KES-to-Clo3D mechanical values, and published KES simulation coefficients"
+    },
+    {
+      "title": "Analysis of Polygonal Computer Model Parameters and Influence on Fabric Drape Simulation",
+      "url": "https://doi.org/10.3390/ma14216259",
+      "role": "primary simulation procedure: position the planar sample just above the solid disk and perform free fall rather than clamping the support region"
     },
     {
       "title": "Blender 4.4 Cloth Introduction",
