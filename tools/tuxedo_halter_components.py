@@ -17,7 +17,7 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
     size = 512
     outputs: dict[str, Path] = {}
     specs = {
-        "wine_satin": ((132, 7, 34), 118, 11),
+        "wine_satin": ((82, 2, 19), 124, 9),
         "black_satin": ((8, 8, 12), 132, 8),
         "white_jacquard": ((238, 237, 233), 180, 7),
     }
@@ -195,7 +195,7 @@ def bib_panel(
     vertices: list[tuple[float, float, float]] = []
     for z, width in rows:
         for x in (-max(width, 0.002), max(width, 0.002)):
-            vertices.append((x, base.body_front_y(body, x, z) - 0.011, z))
+            vertices.append((x, base.body_front_y(body, x, z) - 0.020, z))
     faces = [
         (index, index + 1, index + 3, index + 2)
         for index in range(0, (len(rows) - 1) * 2, 2)
@@ -361,7 +361,7 @@ def vertical_ruffle(
         center = center_x + wave
         width = 0.009 + 0.003 * math.sin(ratio * math.pi)
         for x in (center - width, center + width):
-            y = base.body_front_y(body, x, z) - 0.015 - abs(wave) * 0.4
+            y = base.body_front_y(body, x, z) - 0.024 - abs(wave) * 0.4
             vertices.append((x, y, z))
     for step in range(steps - 1):
         point = step * 2
