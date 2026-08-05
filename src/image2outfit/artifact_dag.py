@@ -221,10 +221,14 @@ CANONICAL_STAGE_CONTRACTS = (
 
 
 class PipelineArtifactDAG:
-    def __init__(self, contracts: tuple[StageContract, ...] = CANONICAL_STAGE_CONTRACTS):
+    def __init__(
+        self, contracts: tuple[StageContract, ...] = CANONICAL_STAGE_CONTRACTS
+    ):
         self.contracts = contracts
         self._validate()
-        self._index = {contract.stage: index for index, contract in enumerate(contracts)}
+        self._index = {
+            contract.stage: index for index, contract in enumerate(contracts)
+        }
         self._producer = {contract.produces: contract.stage for contract in contracts}
 
     def _validate(self) -> None:
