@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Calibrate Blender 4.4 cloth against the published Cusick drape fixture."""
+"""Calibrate Blender 4.4 cloth against a collision-supported Cusick fixture."""
 
 from __future__ import annotations
 
@@ -32,8 +32,10 @@ from image2outfit.material_blender import (  # noqa: E402
 SPECIMEN_RADIUS_M = 0.15
 SUPPORT_RADIUS_M = 0.09
 SUPPORT_TOP_Z_M = 0.12
-INITIAL_SPECIMEN_Z_M = 0.122
+INITIAL_SPECIMEN_Z_M = 0.125
+MIN_COLLISION_DISTANCE_M = 0.001
 RASTER_RESOLUTION = 512
+RENDER_SUBDIVISION_LEVELS = 2
 
 
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
@@ -182,7 +184,7 @@ def create_floor(profile: BlenderCalibrationProfile) -> dict[str, Any]:
         floor,
         {
             "cloth_friction": profile.contact.static_friction,
-            "thickness_outer": 0.001,
+            "thickness_outer": MIN_COLLISION_DISTANCE_M,
         },
     )
 
@@ -212,7 +214,9 @@ def create_support(
         support,
         {
             "cloth_friction": projection.contact_hypothesis.static_friction,
-            "thickness_outer": max(projection.collision_thickness_m, 0.001),
+            "thickness_outer": max(
+                projection.collision_thickness_m, MIN_COLLISION_DISTANCE_M
+            ),
         },
     )
 
@@ -249,31 +253,23 @@ def create_cloth(
     if render_material:
         cloth.data.materials.append(cloth_material(cloth.name, index, total))
 
-    pin_group = cloth.vertex_groups.new(name="CusickSupportPin")
-    pinned_indices = [
-        vertex.index
-        for vertex in mesh.vertices
-        if math.hypot(vertex.co.x, vertex.co.y) <= SUPPORT_RADIUS_M
-    ]
-    if not pinned_indices:
-        raise RuntimeError("Cusick support pin group is empty")
-    pin_group.add(pinned_indices, 1.0, "REPLACE")
-
     modifier = cloth.modifiers.new(name="Cloth", type="CLOTH")
     surface_area = math.pi * SPECIMEN_RADIUS_M**2
     cloth_values = scaled_cloth_settings(projection, elastic_scale)
     cloth_values["mass"] = projection.vertex_mass_kg(surface_area, len(mesh.vertices))
-    cloth_values["vertex_group_mass"] = pin_group.name
-    cloth_values["pin_stiffness"] = 1.0
     actual_cloth = set_properties(
         modifier.settings, cloth_values, f"{cloth.name}.settings"
     )
     collision_values = dict(projection.cloth_collision_settings)
     collision_values.update(
         {
-            "distance_min": max(projection.collision_thickness_m, 0.001),
+            "distance_min": max(
+                projection.collision_thickness_m, MIN_COLLISION_DISTANCE_M
+            ),
             "use_self_collision": False,
-            "self_distance_min": max(projection.collision_thickness_m, 0.001),
+            "self_distance_min": max(
+                projection.collision_thickness_m, MIN_COLLISION_DISTANCE_M
+            ),
         }
     )
     actual_collision = set_properties(
@@ -283,19 +279,32 @@ def create_cloth(
     )
     modifier.point_cache.frame_start = 1
     modifier.point_cache.frame_end = frame_end
+
     if render_material:
+        subdivision = cloth.modifiers.new(name="RenderSubdivision", type="SUBSURF")
+        subdivision.subdivision_type = "CATMULL_CLARK"
+        subdivision.levels = RENDER_SUBDIVISION_LEVELS
+        subdivision.render_levels = RENDER_SUBDIVISION_LEVELS
         solidify = cloth.modifiers.new(name="RenderThickness", type="SOLIDIFY")
         solidify.thickness = projection.render_thickness_m
         solidify.offset = 0.0
+
     return cloth, {
         "surfaceAreaM2": surface_area,
         "vertexCount": len(mesh.vertices),
-        "pinnedVertexCount": len(pinned_indices),
-        "pinGroup": pin_group.name,
+        "pinnedVertexCount": 0,
+        "pinGroup": None,
+        "supportBoundaryCondition": "collision-supported-free-fall",
+        "initialGapM": INITIAL_SPECIMEN_Z_M - SUPPORT_TOP_Z_M,
         "elasticScale": elastic_scale,
         "clothSettings": actual_cloth,
         "clothCollisionSettings": actual_collision,
-        "selfCollisionDisabledReason": "fabric-fabric friction is not measured in the source library",
+        "renderSubdivisionLevels": (
+            RENDER_SUBDIVISION_LEVELS if render_material else 0
+        ),
+        "selfCollisionDisabledReason": (
+            "fabric-fabric friction is not measured in the source library"
+        ),
     }
 
 
@@ -364,10 +373,14 @@ def silhouette_area(
 def evaluated_geometry(
     cloth: bpy.types.Object,
 ) -> tuple[list[Vector], list[tuple[int, ...]]]:
-    solidify = cloth.modifiers.get("RenderThickness")
-    visible = solidify.show_viewport if solidify is not None else False
-    if solidify is not None:
-        solidify.show_viewport = False
+    render_only = [
+        modifier
+        for modifier in cloth.modifiers
+        if modifier.name in {"RenderSubdivision", "RenderThickness"}
+    ]
+    visible = [(modifier, modifier.show_viewport) for modifier in render_only]
+    for modifier, _ in visible:
+        modifier.show_viewport = False
     try:
         depsgraph = bpy.context.evaluated_depsgraph_get()
         evaluated = cloth.evaluated_get(depsgraph)
@@ -380,8 +393,8 @@ def evaluated_geometry(
         finally:
             evaluated.to_mesh_clear()
     finally:
-        if solidify is not None:
-            solidify.show_viewport = visible
+        for modifier, was_visible in visible:
+            modifier.show_viewport = was_visible
     return coordinates, polygons
 
 
@@ -392,6 +405,30 @@ def drape_metrics(cloth: bpy.types.Object) -> dict[str, float | str]:
     support_area = math.pi * SUPPORT_RADIUS_M**2
     specimen_area = math.pi * SPECIMEN_RADIUS_M**2
     coefficient = (footprint - support_area) / (specimen_area - support_area)
+    local_xy = [
+        (value.x - cloth.location.x, value.y - cloth.location.y)
+        for value in coordinates
+    ]
+    center_offset = math.hypot(
+        statistics.fmean(value[0] for value in local_xy),
+        statistics.fmean(value[1] for value in local_xy),
+    )
+    support_z = [
+        coordinate.z
+        for coordinate, (x_value, y_value) in zip(
+            coordinates, local_xy, strict=True
+        )
+        if math.hypot(x_value, y_value) <= SUPPORT_RADIUS_M * 0.9
+    ]
+    expected_contact_z = SUPPORT_TOP_Z_M + 2 * MIN_COLLISION_DISTANCE_M
+    contact_fraction = (
+        statistics.fmean(
+            1.0 if abs(value - expected_contact_z) <= 0.006 else 0.0
+            for value in support_z
+        )
+        if support_z
+        else 0.0
+    )
     rounded = "\n".join(
         f"{value.x:.7f},{value.y:.7f},{value.z:.7f}" for value in coordinates
     ).encode("utf-8")
@@ -403,6 +440,10 @@ def drape_metrics(cloth: bpy.types.Object) -> dict[str, float | str]:
         "standardDeviationZ": statistics.pstdev(z_values),
         "footprintAreaM2": footprint,
         "cusickDrapeCoefficient": coefficient,
+        "centerOffsetM": center_offset,
+        "supportContactFraction": contact_fraction,
+        "supportRegionMinimumZ": min(support_z) if support_z else math.nan,
+        "supportRegionMaximumZ": max(support_z) if support_z else math.nan,
         "vertexSha256": hashlib.sha256(rounded).hexdigest(),
     }
 
@@ -418,13 +459,19 @@ def plausibility_errors(metrics: Mapping[str, float | str]) -> list[str]:
         errors.append("gross-upward-instability")
     if float(metrics["verticalRange"]) < 0.01:
         errors.append("no-gravity-response")
+    if float(metrics["centerOffsetM"]) > 0.03:
+        errors.append("excessive-horizontal-drift")
+    if float(metrics["supportContactFraction"]) < 0.1:
+        errors.append("no-support-contact")
     return errors
 
 
 def plausibility_warnings(metrics: Mapping[str, float | str]) -> list[str]:
     warnings: list[str] = []
-    if float(metrics["maximumZ"]) > INITIAL_SPECIMEN_Z_M + 0.015:
-        warnings.append("minor-support-surface-rise")
+    if float(metrics["supportContactFraction"]) < 0.5:
+        warnings.append("limited-support-contact")
+    if float(metrics["centerOffsetM"]) > 0.01:
+        warnings.append("minor-horizontal-drift")
     return warnings
 
 
@@ -600,7 +647,7 @@ def render_evidence(
         output / "comparison-top.png",
         location=(0.0, 0.0, 2.0),
         target=(0.0, 0.0, 0.0),
-        ortho_scale=0.95,
+        ortho_scale=1.35,
         resolution=(1440, 720),
     )
     images.append({"kind": "comparison-top", **top})
@@ -610,7 +657,7 @@ def render_evidence(
         output / "comparison-oblique.png",
         location=(0.0, -1.5, 0.75),
         target=(0.0, 0.0, 0.08),
-        ortho_scale=0.9,
+        ortho_scale=1.35,
         resolution=(1440, 720),
     )
     images.append({"kind": "comparison-oblique", **oblique})
@@ -621,14 +668,14 @@ def render_evidence(
         material_id = record["materialId"]
         for obj in test_objects:
             obj.hide_render = not obj.name.endswith(material_id)
-        x, y = record["position"]
+        x_value, y_value = record["position"]
         individual = render_image(
             scene,
             camera,
             output / f"{material_id}.png",
-            location=(x, y - 0.55, 0.32),
-            target=(x, y, 0.085),
-            ortho_scale=0.38,
+            location=(x_value, y_value - 0.55, 0.32),
+            target=(x_value, y_value, 0.085),
+            ortho_scale=0.42,
             resolution=(640, 640),
         )
         images.append(
@@ -718,7 +765,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     blend_path = output / "material-drape-calibration.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
     report = {
-        "schemaVersion": 3,
+        "schemaVersion": 4,
         "phase": "material-drape-calibration",
         "blenderVersion": actual_version,
         "library": {
@@ -736,11 +783,19 @@ def main(argv: Iterable[str] | None = None) -> int:
             "supportRadiusM": SUPPORT_RADIUS_M,
             "supportTopZM": SUPPORT_TOP_Z_M,
             "initialSpecimenZM": INITIAL_SPECIMEN_Z_M,
+            "initialGapM": INITIAL_SPECIMEN_Z_M - SUPPORT_TOP_Z_M,
+            "supportBoundaryCondition": "collision-supported-free-fall",
+            "pinnedVertexCount": 0,
             "grid": args.grid,
             "topology": "concentric-square-to-disk-quads",
             "rasterResolution": RASTER_RESOLUTION,
             "floorCollisionSettings": floor_settings,
-            "source": "https://doi.org/10.3390/su17041388",
+            "renderSubdivisionLevels": RENDER_SUBDIVISION_LEVELS,
+            "metricGeometry": "simulation mesh excluding render-only modifiers",
+            "sources": [
+                "https://doi.org/10.3390/su17041388",
+                "https://doi.org/10.3390/ma14216259",
+            ],
         },
         "frameEnd": args.frame_end,
         "sameGeometryForAllMaterials": True,
@@ -752,7 +807,12 @@ def main(argv: Iterable[str] | None = None) -> int:
         "images": images,
         "blend": {"path": blend_path.name, "sha256": sha256(blend_path)},
         "passed": passed,
-        "boundary": "The selected global scale is calibrated on these six published samples. Contact friction and through-thickness compression remain unmeasured.",
+        "boundary": (
+            "The specimen is released above a collision support without pinned "
+            "vertices. The selected global scale remains a calibration candidate "
+            "until numerical gates and direct image review pass. Contact friction "
+            "and through-thickness compression remain unmeasured."
+        ),
     }
     report_path = output / "material-drape-report.json"
     report_path.write_text(
