@@ -113,7 +113,10 @@ from .pipeline import (
     ExecutionMode,
     PipelineStage,
     new_pipeline_state,
+    next_pipeline_stage,
+    resume_pipeline_state,
     run_pipeline,
+    validate_pipeline_state,
 )
 from .reference import (
     ImageTransform,
@@ -244,6 +247,9 @@ __all__ = [
     "expand_command_template",
     "load_material_library",
     "new_pipeline_state",
+    "next_pipeline_stage",
+    "resume_pipeline_state",
     "run_pipeline",
+    "validate_pipeline_state",
     "validate_stage_result",
 ]

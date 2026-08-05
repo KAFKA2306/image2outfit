@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "productName": "Tuxedo Halter Layered Dress for Siroino _Large",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0-large",
+  "target": "Siroino _Large via official shape keys",
+  "productRoot": "Assets/GenWorks/siroino-tuxedo-halter-dress-large",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Prefab/SiroinoTuxedoHalterDressLarge.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Prefab/Siroino_Large_TuxedoHalterDress.prefab",
+  "previewPath": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/README.md",
+  "sourceJobPath": "config/products/siroino-tuxedo-halter-dress-large/job.json",
+  "productBuildScript": "tools/siroino_tuxedo_halter_dress_large_build.py",
+  "designRevision": "v1-reference-audited-pattern-first",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-tuxedo-halter-dress-large",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-tuxedo-halter-dress-large/pipeline-state.json",
+    "lastAttempt": {
+      "result": "INITIALIZED",
+      "completedStages": 0,
+      "currentStage": "ingest-reference"
+    },
+    "blockers": [
+      "Execute Blender build and cloth simulation",
+      "Inspect current five-view and pose evidence directly",
+      "Record final candidate decision"
+    ]
+  },
+  "technicalGates": {
+    "blender": "PENDING",
+    "editableSource": "PENDING",
+    "fbx": "PENDING",
+    "prefabDeclared": "PENDING",
+    "fiveViewEvidence": "PENDING",
+    "poseEvidence": "PENDING",
+    "visualAppearanceReview": "PENDING",
+    "researchTrial": "PASS",
+    "unityImport": "OUT_OF_SCOPE",
+    "unitySaveReload": "OUT_OF_SCOPE",
+    "prefabReload": "OUT_OF_SCOPE",
+    "modularAvatar": "OUT_OF_SCOPE",
+    "ndmf": "OUT_OF_SCOPE",
+    "vrchatBuildTest": "OUT_OF_SCOPE",
+    "vrchatRuntime": "OUT_OF_SCOPE",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Source/Blender/SiroinoTuxedoHalterDressLarge.blend",
+    "fbx": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Models/SiroinoTuxedoHalterDressLarge.fbx",
+    "prefab": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Prefab/SiroinoTuxedoHalterDressLarge.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Prefab/Siroino_Large_TuxedoHalterDress.prefab",
+    "multiview": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/siroino-tuxedo-halter-dress-large-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/siroino-tuxedo-halter-dress-large-pose-review.webp"
+  }
+}
