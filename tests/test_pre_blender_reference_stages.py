@@ -211,20 +211,21 @@ class GarmentDecompositionTests(unittest.TestCase):
     def test_structural_parts_preserve_asymmetry_and_multiple_hypotheses(self) -> None:
         left_pocket = PartObservation(
             part_id="left-cargo-pocket",
-            kind=GarmentPartKind.POCKET,
+            kind=GarmentPartKind.TRIM,
             locations=(
                 GarmentLocation(
-                    BodyRegion.THIGH,
+                    BodyRegion.UPPER_LEG,
                     Laterality.LEFT,
                     SurfaceOrientation.OUTER,
                 ),
             ),
-            construction_role=ConstructionRole.ATTACHED_COMPONENT,
+            construction_role=ConstructionRole.ACCESSORY,
             layer=LayerPosition.ATTACHED,
             state=ObservationState.VISIBLE,
             confidence=0.95,
             source_view_ids=("normalized-front",),
             mask_references=("masks/left-pocket.png",),
+            extension_kind="image2outfit.pocket",
         )
         waistband = PartObservation(
             part_id="waistband",
@@ -266,19 +267,20 @@ class GarmentDecompositionTests(unittest.TestCase):
                 waistband,
                 PartObservation(
                     part_id="right-cargo-pocket",
-                    kind=GarmentPartKind.POCKET,
+                    kind=GarmentPartKind.TRIM,
                     locations=(
                         GarmentLocation(
-                            BodyRegion.THIGH,
+                            BodyRegion.UPPER_LEG,
                             Laterality.RIGHT,
                             SurfaceOrientation.OUTER,
                         ),
                     ),
-                    construction_role=ConstructionRole.ATTACHED_COMPONENT,
+                    construction_role=ConstructionRole.ACCESSORY,
                     layer=LayerPosition.ATTACHED,
                     state=ObservationState.OCCLUDED,
                     confidence=0.35,
                     source_view_ids=("normalized-front",),
+                    extension_kind="image2outfit.pocket",
                 ),
             ),
             relations=base.relations,
@@ -292,7 +294,10 @@ class GarmentDecompositionTests(unittest.TestCase):
         )
         decomposition.validate_sources(normalized_fixture())
         self.assertEqual(("left-cargo-pocket",), base.asymmetric_part_ids)
-        self.assertEqual("visible-structure", decomposition.ranked_hypotheses()[0].hypothesis_id)
+        self.assertEqual(
+            "visible-structure",
+            decomposition.ranked_hypotheses()[0].hypothesis_id,
+        )
 
     def test_non_namespaced_extension_is_rejected(self) -> None:
         part = PartObservation(
@@ -300,12 +305,12 @@ class GarmentDecompositionTests(unittest.TestCase):
             kind=GarmentPartKind.TRIM,
             locations=(
                 GarmentLocation(
-                    BodyRegion.TORSO,
+                    BodyRegion.CHEST,
                     Laterality.CENTER,
                     SurfaceOrientation.FRONT,
                 ),
             ),
-            construction_role=ConstructionRole.DECORATIVE,
+            construction_role=ConstructionRole.TRIM,
             layer=LayerPosition.ATTACHED,
             state=ObservationState.INFERRED,
             confidence=0.2,
