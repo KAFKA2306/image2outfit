@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "auditStatus": "PASS_WITH_UNVERIFIED_MODEL",
+  "source": {
+    "kind": "user-uploaded-reference-image",
+    "originalFileName": "image(20260805-092455).png",
+    "originalSha256": "66cd898014d3f503da8015207a0240d946aac72b596f28bef8d6574a0afb678b",
+    "widthPx": 854,
+    "heightPx": 854,
+    "colorMode": "RGB",
+    "sourceRetention": {
+      "repositoryContainsSourceImage": false,
+      "reason": "The uploaded image is treated as private reference input; the public repository stores only its hash and audited design observations.",
+      "reconstructionInput": "structured observations, explicit pattern data, and stitch graph"
+    }
+  },
+  "visibleText": [
+    "winered × black",
+    "black × black"
+  ],
+  "variants": [
+    {
+      "variantId": "wine-red-black",
+      "label": "winered × black",
+      "boundingBoxPx": [134, 217, 429, 703],
+      "dominantColors": [
+        {"name": "near-black", "rgb": [10, 9, 8]},
+        {"name": "wine-red", "rgb": [191, 31, 61]},
+        {"name": "white", "rgb": [241, 241, 241]}
+      ]
+    },
+    {
+      "variantId": "black-black",
+      "label": "black × black",
+      "boundingBoxPx": [433, 217, 722, 688],
+      "dominantColors": [
+        {"name": "near-black", "rgb": [23, 23, 23]},
+        {"name": "white", "rgb": [242, 242, 242]}
+      ]
+    }
+  ],
+  "modelIdentification": {
+    "status": "UNVERIFIED",
+    "manufacturer": null,
+    "brand": null,
+    "modelName": null,
+    "modelNumber": null,
+    "jan": null,
+    "sku": null,
+    "reason": "The supplied image contains color labels but no brand, seller, catalog number, barcode, or uniquely verifiable product identifier. Web candidates were not exact visual matches and are rejected rather than promoted to canonical metadata."
+  },
+  "rejectedCandidates": [
+    {
+      "candidate": "Osyarevo タキシードガール バニー ハロウィン（レッド）",
+      "reason": "Different set composition and silhouette; not an exact match."
+    },
+    {
+      "candidate": "Music Legs Mrs. Tux Bunny",
+      "reason": "Different bodice and accessory composition; not an exact match."
+    },
+    {
+      "candidate": "Tika バニー ガールコスプレ衣装フィッシュテールタキシードワンピース4点セット",
+      "reason": "Different color options and set construction; not an exact match."
+    }
+  ],
+  "designUsePolicy": {
+    "interpretation": "Use the visible construction grammar as a reference, not a claim of reproducing a named commercial product.",
+    "logosObserved": false,
+    "textilePrintObserved": false,
+    "primaryVariant": "wine-red-black",
+    "secondaryVariant": "black-black"
+  },
+  "webAudit": {
+    "checkedAt": "2026-08-05T09:25:00Z",
+    "result": "NO_EXACT_MATCH",
+    "evidenceUrls": ["https://wear.jp/item/56392674/"],
+    "note": "The cited page is a rejected comparison candidate, not the identified source product."
+  }
+}
