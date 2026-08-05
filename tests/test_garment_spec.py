@@ -67,9 +67,7 @@ class GarmentSpecTests(unittest.TestCase):
         self.assertEqual(restored.to_json(), encoded)
 
     def test_section_hypothesis_cannot_drift(self) -> None:
-        invalid = replace(
-            section("avatar", "avatar"), hypothesis_id="other-hypothesis"
-        )
+        invalid = replace(section("avatar", "avatar"), hypothesis_id="other-hypothesis")
         with self.assertRaisesRegex(ValueError, "another hypothesis"):
             replace(fixture(), avatar=invalid)
 
@@ -102,12 +100,7 @@ class MigratedProductFixtureTests(unittest.TestCase):
             "siroino-wide-cargo",
         )
         for product in products:
-            path = (
-                ROOT
-                / "config/products"
-                / product
-                / "spec/garment-spec.v1.json"
-            )
+            path = ROOT / "config/products" / product / "spec/garment-spec.v1.json"
             original = path.read_text(encoding="utf-8")
             restored = GarmentSpec.from_json(original)
             self.assertEqual(restored.garment_id, product)
