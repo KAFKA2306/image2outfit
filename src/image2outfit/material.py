@@ -81,13 +81,22 @@ class SolverMapping:
     conversion_error: Mapping[str, float]
 
     def __post_init__(self) -> None:
-        if not self.solver_id or not self.solver_version or not self.source_parameterization:
+        if (
+            not self.solver_id
+            or not self.solver_version
+            or not self.source_parameterization
+        ):
             raise ValueError("solver mapping identity fields are required")
         if not self.parameters:
             raise ValueError("solver mapping parameters are required")
         for collection in (self.parameters, self.conversion_error):
-            if any(not math.isfinite(value) or value < 0 for value in collection.values()):
-                raise ValueError("solver mapping values must be finite and non-negative")
+            if any(
+                not math.isfinite(value) or value < 0
+                for value in collection.values()
+            ):
+                raise ValueError(
+                    "solver mapping values must be finite and non-negative"
+                )
 
 
 @dataclass(frozen=True, slots=True)
@@ -126,9 +135,7 @@ class MaterialSpec:
             ("real_drape_coefficient", self.real_drape_coefficient),
             ("simulated_drape_coefficient", self.simulated_drape_coefficient),
         ):
-            if value is not None and (
-                not math.isfinite(value) or not 0 <= value <= 1
-            ):
+            if value is not None and (not math.isfinite(value) or not 0 <= value <= 1):
                 raise ValueError(f"{label} must be between zero and one")
 
     def mapping_for(self, solver_id: str) -> SolverMapping:
@@ -142,7 +149,10 @@ class MaterialSpec:
 
     @property
     def drape_absolute_error(self) -> float | None:
-        if self.real_drape_coefficient is None or self.simulated_drape_coefficient is None:
+        if (
+            self.real_drape_coefficient is None
+            or self.simulated_drape_coefficient is None
+        ):
             return None
         return abs(self.real_drape_coefficient - self.simulated_drape_coefficient)
 
