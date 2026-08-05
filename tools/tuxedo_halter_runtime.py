@@ -91,6 +91,7 @@ def normalize_bone_weights(
 
         names = {group.index: group.name for group in obj.vertex_groups}
         assignments: list[list[tuple[str, float]]] = []
+        used_names: set[str] = set()
         for vertex in obj.data.vertices:
             weighted = [
                 (names[item.group], float(item.weight))
@@ -98,11 +99,7 @@ def normalize_bone_weights(
                 if names.get(item.group) in deform_bones and item.weight > 1e-8
             ]
             weighted.sort(key=lambda item: item[1], reverse=True)
-            assignments.append(weighted[:4])
-
-        obj.vertex_groups.clear()
-        groups: dict[str, bpy.types.VertexGroup] = {}
-        for vertex, weighted in zip(obj.data.vertices, assignments, strict=True):
+            weighted = weighted[:4]
             if not weighted:
                 world_z = (obj.matrix_world @ vertex.co).z
                 fallback = "Chest" if world_z > 0.86 else "Hips"
@@ -110,15 +107,29 @@ def normalize_bone_weights(
                 report["fallbackVertices"] += 1
             total = sum(weight for _, weight in weighted)
             normalized = [(name, weight / total) for name, weight in weighted]
+            assignments.append(normalized)
+            used_names.update(name for name, _ in normalized)
             report["maximumInfluences"] = max(
                 report["maximumInfluences"], len(normalized)
             )
-            for name, weight in normalized:
-                group = groups.get(name)
-                if group is None:
-                    group = obj.vertex_groups.new(name=name)
-                    groups[name] = group
-                group.add([vertex.index], weight, "REPLACE")
+
+        obj.vertex_groups.clear()
+        new_indices = {
+            name: obj.vertex_groups.new(name=name).index for name in sorted(used_names)
+        }
+        mesh = obj.data
+        bm = bmesh.new()
+        bm.from_mesh(mesh)
+        bm.verts.ensure_lookup_table()
+        deform_layer = bm.verts.layers.deform.verify()
+        for vertex in bm.verts:
+            deform = vertex[deform_layer]
+            deform.clear()
+            for name, weight in assignments[vertex.index]:
+                deform[new_indices[name]] = weight
+        bm.to_mesh(mesh)
+        bm.free()
+        mesh.update(calc_edges=True)
     return report
 
 
