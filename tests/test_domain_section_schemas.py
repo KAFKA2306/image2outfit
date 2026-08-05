@@ -36,9 +36,7 @@ class DomainSectionSchemaTests(unittest.TestCase):
                     {item.name for item in fields(cls)},
                     set(schema["$defs"][name]["required"]),
                 )
-                self.assertFalse(
-                    schema["$defs"][name]["additionalProperties"]
-                )
+                self.assertFalse(schema["$defs"][name]["additionalProperties"])
 
 
 if __name__ == "__main__":
