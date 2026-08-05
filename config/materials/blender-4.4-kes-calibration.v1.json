@@ -57,7 +57,12 @@
     "kes-2025-m5-polyester-elastane-plain": 0.438,
     "kes-2025-m6-cotton-polyester-elastane-twill": 0.613
   },
-  "elasticScaleSearch": [0.001, 0.003, 0.01, 0.03, 0.1, 0.3],
+  "elasticScaleSearch": [0.003, 0.03, 0.3],
+  "searchPolicy": {
+    "spacing": "logarithmic",
+    "policy": "coarse three-point search; refine only when the best objective is at an endpoint, otherwise persist the middle scale and rerun once",
+    "reason": "the full six-point hosted Blender sweep repeats the same six-sample simulation seven times and does not add information before the monotonic scale response is established"
+  },
   "calibratedElasticScale": null,
   "acceptance": {
     "maximumRmseVsPublishedKes": 0.18,
