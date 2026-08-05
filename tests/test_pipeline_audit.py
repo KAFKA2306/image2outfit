@@ -17,6 +17,8 @@ from image2outfit.audit import (
 from image2outfit.pipeline import PIPELINE_STAGES, new_pipeline_state, run_pipeline
 from image2outfit.tooling import ToolDescriptor, ToolRegistry
 
+CANONICAL_STAGES = [stage.value for stage in PIPELINE_STAGES]
+
 
 class PipelineAuditTests(unittest.TestCase):
     @staticmethod
@@ -44,15 +46,22 @@ class PipelineAuditTests(unittest.TestCase):
             )
         return registry
 
-    def test_every_stage_is_recorded_and_persisted(self) -> None:
-        result = run_pipeline(
+    @classmethod
+    def _result(cls, *, product_id: str, run_id: str):
+        return run_pipeline(
             new_pipeline_state(
-                product_id="audit-garment",
+                product_id=product_id,
                 target_avatar="SiroinoSotai_PC",
-                source_reference="private-reference://sha256/audit",
-                run_id="audit-run-001",
+                source_reference=f"private-reference://sha256/{product_id}",
+                run_id=run_id,
             ),
-            self._registry(),
+            cls._registry(),
+        )
+
+    def test_every_stage_is_recorded_and_persisted(self) -> None:
+        result = self._result(
+            product_id="audit-garment",
+            run_id="audit-run-001",
         )
         records = result["stage_records"]
         self.assertEqual(len(records), len(PIPELINE_STAGES))
@@ -61,10 +70,11 @@ class PipelineAuditTests(unittest.TestCase):
             records,
             expected_run_id="audit-run-001",
             expected_product_id="audit-garment",
+            canonical_stages=CANONICAL_STAGES,
         )
         self.assertEqual(
             [record["stage"] for record in records],
-            [stage.value for stage in PIPELINE_STAGES],
+            CANONICAL_STAGES,
         )
 
         with TemporaryDirectory() as temporary:
@@ -72,7 +82,7 @@ class PipelineAuditTests(unittest.TestCase):
             bundle = write_audit_bundle(
                 result,
                 audit_root=audit_root,
-                canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+                canonical_stages=CANONICAL_STAGES,
             )
             run_root = Path(bundle["root"])
             manifest = verify_audit_bundle(run_root)
@@ -97,23 +107,21 @@ class PipelineAuditTests(unittest.TestCase):
         self.assertEqual(result["stage_records"][-1]["stage"], failing.value)
         self.assertEqual(result["stage_records"][-1]["status"], "FAILED")
         self.assertEqual(result["outputs"][failing.value]["mode"], "failed")
-        validate_stage_records(result["stage_records"])
+        validate_stage_records(
+            result["stage_records"],
+            canonical_stages=CANONICAL_STAGES,
+        )
 
     def test_modified_stage_file_is_rejected(self) -> None:
-        result = run_pipeline(
-            new_pipeline_state(
-                product_id="audit-tamper",
-                target_avatar="SiroinoSotai_PC",
-                source_reference="private-reference://sha256/tamper",
-                run_id="audit-run-tamper",
-            ),
-            self._registry(),
+        result = self._result(
+            product_id="audit-tamper",
+            run_id="audit-run-tamper",
         )
         with TemporaryDirectory() as temporary:
             bundle = write_audit_bundle(
                 result,
                 audit_root=Path(temporary) / "audit",
-                canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+                canonical_stages=CANONICAL_STAGES,
             )
             run_root = Path(bundle["root"])
             first = run_root / "stages" / "01-ingest-reference.json"
@@ -121,6 +129,44 @@ class PipelineAuditTests(unittest.TestCase):
             payload["status"] = "PASS"
             first.write_text(json.dumps(payload), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "hash mismatch"):
+                verify_audit_bundle(run_root)
+
+    def test_existing_run_cannot_be_overwritten(self) -> None:
+        result = self._result(
+            product_id="audit-immutable",
+            run_id="audit-run-immutable",
+        )
+        with TemporaryDirectory() as temporary:
+            audit_root = Path(temporary) / "audit"
+            write_audit_bundle(
+                result,
+                audit_root=audit_root,
+                canonical_stages=CANONICAL_STAGES,
+            )
+            with self.assertRaisesRegex(FileExistsError, "immutable"):
+                write_audit_bundle(
+                    result,
+                    audit_root=audit_root,
+                    canonical_stages=CANONICAL_STAGES,
+                )
+
+    def test_manifest_path_escape_is_rejected(self) -> None:
+        result = self._result(
+            product_id="audit-path",
+            run_id="audit-run-path",
+        )
+        with TemporaryDirectory() as temporary:
+            bundle = write_audit_bundle(
+                result,
+                audit_root=Path(temporary) / "audit",
+                canonical_stages=CANONICAL_STAGES,
+            )
+            run_root = Path(bundle["root"])
+            manifest_path = run_root / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["stages"][0]["path"] = "../../outside.json"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "escapes"):
                 verify_audit_bundle(run_root)
 
 
