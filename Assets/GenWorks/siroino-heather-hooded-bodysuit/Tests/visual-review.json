@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
-  "checkedAt": "2026-08-05T01:17:26+09:00",
+  "designRevision": "v29-smoothed-clearance-tapered-yoke-fitted-sleeve",
+  "checkedAt": "2026-08-05T11:51:00+09:00",
   "productId": "siroino-heather-hooded-bodysuit",
   "target": "SiroinoSotai_PC",
   "result": "FAIL",
@@ -9,58 +9,65 @@
   "releaseDecision": "WORKING_CHECKPOINT_ONLY",
   "reviewer": "ChatGPT direct artifact image review",
   "evidence": {
-    "hostedWorkflowRun": 30927279567,
-    "artifactId": 8900069602,
-    "artifactSha256": "432fe8c6a5aa3eab8fa3d4148574488058a67086366371d089fd8c2eb29442db",
+    "headSha": "4de36b59a0114d7cf162440ba7ecb9e9e424e422",
+    "hostedWorkflowRun": 30962748164,
+    "artifactId": 8913817411,
+    "artifactSha256": "ff4a21413de725a6b11205069a574760d7abec9cf8038b3f44e7e655509a201f",
     "multiview": "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
     "poseReview": "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
     "fitAudit": "Tests/fit-audit.json",
-    "researchTrial": "Research/lobofit-local-bone-trial.json"
+    "researchTrial": "Research/smoothed-clearance-yoke-trial.json"
   },
   "researchDecision": {
-    "method": "LoBoFit-inspired four-bone local residual fitting after DAMA-inspired body anchoring",
+    "method": "Smoothed bounded clearance with a five-ring tapered yoke, fitted sleeves, shallow saddle and compact rear-neck hood surface",
     "execution": "SUCCESS",
     "productAdoption": "REJECTED_FOR_CURRENT_REVISION",
     "quantitativeResult": {
-      "localResidualEdgeRmsBeforeM": 0.0035477231084656544,
-      "localResidualEdgeRmsAfterM": 0.0029748159515982156,
-      "relativeReductionPercent": 16.145,
-      "meanWorldDisplacementM": 0.0009634059353793652,
-      "maximumWorldDisplacementM": 0.00400000083941411,
-      "meanSignedClearanceM": 0.021463756386198015,
-      "verticesBelow75PercentTargetClearance": 1392
+      "requiredPoseOverlapPairs": {
+        "neutral": 681,
+        "arms-up": 3676,
+        "arm-cross": 1519,
+        "crouch": 681,
+        "sit": 682,
+        "prone": 3120
+      },
+      "totalRequiredPoseOverlapPairs": 10359,
+      "v28TotalRequiredPoseOverlapPairs": 12494,
+      "relativeReductionFromV28Percent": 17.09,
+      "v27TotalRequiredPoseOverlapPairs": 15753,
+      "relativeReductionFromV27Percent": 34.24,
+      "hoodOverlapPairs": 0,
+      "bodyShellOverlapPairs": 4942,
+      "leftSleeveOverlapPairs": 2651,
+      "rightSleeveOverlapPairs": 2642
     },
-    "finding": "The local-bone residual representation measurably reduced local offset roughness without creating degenerate or unweighted geometry, but it did not repair the incorrect garment region selection, silhouette, opening design or pose deformation."
+    "finding": "The v29 representation reduced total intersections and eliminated measured hood intersections, but it removed the visible high-cut underbody connection and still fails the product silhouette and dynamic sleeve fit."
   },
   "blockingFindings": [
     {
-      "zone": "front and rear crotch",
-      "finding": "A long narrow hanging tab remains visible in both front and back views instead of a clean underbody high-cut bridge."
+      "zone": "high-cut underbody and leg openings",
+      "finding": "The front, rear and three-quarter views show a long top ending over the hips; the garment no longer presents a connected high-cut bodysuit bridge or leg openings."
     },
     {
-      "zone": "shoulders, hood and drawcords",
-      "finding": "Horizontal floating protrusions remain at both shoulders, while the requested three-dimensional hood is not presented as a coherent wearable hood."
+      "zone": "shoulder yoke and neckline",
+      "finding": "The five-ring yoke reads as a broad flat plate around the neck and upper back instead of a fitted neckline integrated into the garment."
     },
     {
-      "zone": "body and sleeve silhouette",
-      "finding": "The shell reads as a loose tunic with wide cylindrical sleeves rather than a fitted long-sleeve high-cut bodysuit with defined rib cuffs."
+      "zone": "underarm and side seams",
+      "finding": "Side views retain abrupt folds and protrusions where the sleeves meet the torso."
     },
     {
-      "zone": "neckline and openings",
-      "finding": "The neckline and leg-opening boundaries remain irregular and visually unfinished."
+      "zone": "required pose penetration",
+      "finding": "All six required poses still fail the evaluated-mesh BVH audit, with the largest counts in arms-up (3676) and prone (3120)."
     },
     {
-      "zone": "surface and material",
-      "finding": "Dark speckles, streaks and seam-like surface defects remain visible across the torso, sleeves and back."
+      "zone": "sleeves",
+      "finding": "The sleeve profile is visually slimmer than v28, but the left and right sleeves still contribute 5293 overlap pairs across the required poses."
     },
     {
-      "zone": "required poses",
-      "finding": "Neutral has zero BVH overlap pairs, but arms-up has 2782, arm-cross 1048, crouch 1035, sit 691 and prone 2398. The pose sheet also retains the incorrect crotch and shoulder silhouette."
-    },
-    {
-      "zone": "pose evidence framing",
-      "finding": "Several pose renders crop the head, arms or upper body, reducing their value for complete garment review."
+      "zone": "hood",
+      "finding": "Measured hood intersections are zero, but the rear-neck surface reads primarily as a wide collar flap rather than a coherent wearable hood."
     }
   ],
-  "nextAction": "Replace the primary body-region selection and underbody construction before further residual fitting. LoBoMap may remain as a bounded final refinement after the base pattern has the correct silhouette and anatomical openings."
+  "nextAction": "Restore an explicit continuous high-cut underbody and leg-opening topology, then rebuild the neck/hood transition without a plate-like yoke. Reduce dynamic sleeve intersections before another visual review."
 }
