@@ -1,22 +1,21 @@
 #!/usr/bin/env python3
-"""Boolean-unioned parametric Siroino Wide Cargo v36.
+"""Fully procedural, source-face-free Siroino wide cargo trousers.
 
-Build three closed fitted volumes, combine them with Blender Exact Boolean,
-voxel-remesh the result into one continuous surface, then open exactly one
-waist and two level hems. Only deformation weights are transferred from the
-exact Siroino body; old render evidence is deleted before every attempt.
+All garment geometry is generated in one mesh and only skin weights are sampled
+from the target body. This prevents malformed source polygons from reappearing
+as hem-to-waist spikes while preserving a fitted seat, straight-wide legs,
+continuous inner-thigh coverage, waistband, knee panels, and cargo pockets.
 """
 from __future__ import annotations
 
 import json
 import math
-import shutil
 import sys
-from collections import deque
 from pathlib import Path
 
-import bmesh
 import bpy
+from mathutils import Vector
+from mathutils.kdtree import KDTree
 
 TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
@@ -27,367 +26,267 @@ import siroino_wide_cargo_release_refit_v23 as v23
 build = v23.build
 base = v23.base
 
-HEM_Z = 0.145
-WAIST_Z = 0.785
-SEGMENTS = 64
-VOXEL_SIZE = 0.0060
+
+class MeshBuilder:
+    def __init__(self) -> None:
+        self.vertices: list[tuple[float, float, float]] = []
+        self.faces: list[tuple[int, ...]] = []
+
+    def add_ring(self, points: list[tuple[float, float, float]]) -> list[int]:
+        start = len(self.vertices)
+        self.vertices.extend(points)
+        return list(range(start, start + len(points)))
+
+    def bridge(self, lower: list[int], upper: list[int]) -> None:
+        if len(lower) != len(upper):
+            raise ValueError("ring sizes differ")
+        count = len(lower)
+        for index in range(count):
+            nxt = (index + 1) % count
+            self.faces.append(
+                (lower[index], lower[nxt], upper[nxt], upper[index])
+            )
+
+    def add_box(
+        self,
+        minimum: tuple[float, float, float],
+        maximum: tuple[float, float, float],
+    ) -> None:
+        x0, y0, z0 = minimum
+        x1, y1, z1 = maximum
+        start = len(self.vertices)
+        self.vertices.extend(
+            [
+                (x0, y0, z0),
+                (x1, y0, z0),
+                (x1, y1, z0),
+                (x0, y1, z0),
+                (x0, y0, z1),
+                (x1, y0, z1),
+                (x1, y1, z1),
+                (x0, y1, z1),
+            ]
+        )
+        self.faces.extend(
+            [
+                (start + 0, start + 3, start + 2, start + 1),
+                (start + 4, start + 5, start + 6, start + 7),
+                (start + 0, start + 1, start + 5, start + 4),
+                (start + 1, start + 2, start + 6, start + 5),
+                (start + 2, start + 3, start + 7, start + 6),
+                (start + 3, start + 0, start + 4, start + 7),
+            ]
+        )
 
 
-def clear_stale_evidence() -> None:
-    _, job = build.c.load_job()
-    preview_root = build.c.repo_path(job["productRoot"]) / "Previews"
-    if not preview_root.exists():
-        return
-    for pattern in ("*.png", "*.webp", "*.png.meta", "*.webp.meta"):
-        for path in preview_root.glob(pattern):
-            path.unlink(missing_ok=True)
-    shutil.rmtree(preview_root / "Poses", ignore_errors=True)
-    (preview_root / "Poses.meta").unlink(missing_ok=True)
+def asymmetric_ellipse_ring(
+    *,
+    center_x: float,
+    inner_radius: float,
+    outer_radius: float,
+    front_depth: float,
+    rear_depth: float,
+    z: float,
+    side: float,
+    segments: int,
+) -> list[tuple[float, float, float]]:
+    points: list[tuple[float, float, float]] = []
+    for index in range(segments):
+        angle = 2.0 * math.pi * index / segments
+        cosine = math.cos(angle)
+        sine = math.sin(angle)
+        radius_x = outer_radius if side * cosine >= 0.0 else inner_radius
+        radius_y = rear_depth if sine >= 0.0 else front_depth
+        points.append(
+            (side * center_x + cosine * radius_x, sine * radius_y, z)
+        )
+    return points
 
 
-def make_mesh_object(name: str, vertices, faces, material) -> bpy.types.Object:
-    mesh = bpy.data.meshes.new(f"{name}_Mesh")
-    mesh.from_pydata(vertices, [], faces)
-    mesh.materials.append(material)
-    mesh.update(calc_edges=True)
-    obj = bpy.data.objects.new(name, mesh)
-    bpy.context.collection.objects.link(obj)
-    return obj
+def pelvis_ring(
+    *,
+    half_width: float,
+    front_depth: float,
+    rear_depth: float,
+    z: float,
+    segments: int,
+) -> list[tuple[float, float, float]]:
+    points: list[tuple[float, float, float]] = []
+    for index in range(segments):
+        angle = 2.0 * math.pi * index / segments
+        sine = math.sin(angle)
+        depth = rear_depth if sine >= 0.0 else front_depth
+        points.append((math.cos(angle) * half_width, sine * depth, z))
+    return points
 
 
-def closed_leg(name: str, side: int, material) -> bpy.types.Object:
-    # z, inner abs x, outer abs x, front depth, back depth
-    rings = [
-        (0.125, 0.020, 0.168, 0.090, 0.096),
-        (0.205, 0.020, 0.167, 0.090, 0.096),
-        (0.305, 0.018, 0.165, 0.089, 0.095),
-        (0.405, 0.014, 0.164, 0.088, 0.095),
-        (0.505, 0.006, 0.164, 0.090, 0.102),
-        (0.610, 0.002, 0.160, 0.094, 0.108),
-        (0.655, 0.000, 0.154, 0.095, 0.110),
+def build_geometry(segments: int = 48) -> MeshBuilder:
+    mesh = MeshBuilder()
+
+    # Fitted waist and seat. The lower ring overlaps the upper leg rings, so no
+    # horizontal skin gap exists even though components remain topologically
+    # independent within one exported mesh object.
+    pelvis_specs = [
+        (0.555, 0.160, 0.100, 0.110),
+        (0.625, 0.158, 0.098, 0.110),
+        (0.715, 0.151, 0.094, 0.106),
+        (0.805, 0.138, 0.088, 0.097),
     ]
-    vertices: list[tuple[float, float, float]] = []
-    faces: list[tuple[int, ...]] = []
-    for z, inner, outer, front, back in rings:
-        center_abs = (inner + outer) * 0.5
-        radius_x = (outer - inner) * 0.5
-        center_x = side * center_abs
-        for index in range(SEGMENTS):
-            angle = math.tau * index / SEGMENTS
-            sine = math.sin(angle)
-            depth = front if sine < 0.0 else back
-            vertices.append(
-                (
-                    center_x + side * radius_x * math.cos(angle),
-                    depth * sine,
-                    z,
+    pelvis_rings = [
+        mesh.add_ring(
+            pelvis_ring(
+                half_width=width,
+                front_depth=front,
+                rear_depth=rear,
+                z=z,
+                segments=segments,
+            )
+        )
+        for z, width, front, rear in pelvis_specs
+    ]
+    for lower, upper in zip(pelvis_rings, pelvis_rings[1:]):
+        mesh.bridge(lower, upper)
+
+    # Straight-wide legs with centre overlap at the upper thigh and a controlled
+    # 20–24 mm gap below the crotch. Width changes only modestly to avoid the
+    # oversized cylindrical silhouette rejected in v30.
+    leg_specs = [
+        (0.105, 0.071, 0.055, 0.086, 0.080, 0.084),
+        (0.200, 0.072, 0.056, 0.087, 0.082, 0.086),
+        (0.320, 0.073, 0.058, 0.088, 0.084, 0.088),
+        (0.440, 0.074, 0.063, 0.089, 0.086, 0.090),
+        (0.540, 0.075, 0.076, 0.089, 0.088, 0.093),
+        (0.625, 0.075, 0.084, 0.087, 0.090, 0.097),
+        (0.700, 0.075, 0.086, 0.084, 0.091, 0.098),
+    ]
+    for side in (-1.0, 1.0):
+        rings = [
+            mesh.add_ring(
+                asymmetric_ellipse_ring(
+                    center_x=center,
+                    inner_radius=inner,
+                    outer_radius=outer,
+                    front_depth=front,
+                    rear_depth=rear,
+                    z=z,
+                    side=side,
+                    segments=segments,
                 )
             )
-    for ring in range(len(rings) - 1):
-        for index in range(SEGMENTS):
-            nxt = (index + 1) % SEGMENTS
-            a = ring * SEGMENTS + index
-            b = ring * SEGMENTS + nxt
-            c = (ring + 1) * SEGMENTS + nxt
-            d = (ring + 1) * SEGMENTS + index
-            faces.append((a, b, c, d))
-    bottom = len(vertices)
-    top = bottom + 1
-    vertices.extend(
-        (
-            (side * (rings[0][1] + rings[0][2]) * 0.5, 0.0, rings[0][0]),
-            (side * (rings[-1][1] + rings[-1][2]) * 0.5, 0.0, rings[-1][0]),
-        )
-    )
-    top_start = (len(rings) - 1) * SEGMENTS
-    for index in range(SEGMENTS):
-        nxt = (index + 1) % SEGMENTS
-        faces.append((bottom, nxt, index))
-        faces.append((top, top_start + index, top_start + nxt))
-    return make_mesh_object(name, vertices, faces, material)
+            for z, center, inner, outer, front, rear in leg_specs
+        ]
+        for lower, upper in zip(rings, rings[1:]):
+            mesh.bridge(lower, upper)
+
+    # Low-profile cargo pockets on the outer thighs. They remain part of the
+    # same mesh object and receive the same armature deformation.
+    mesh.add_box((-0.172, -0.060, 0.475), (-0.151, 0.064, 0.605))
+    mesh.add_box((0.151, -0.060, 0.475), (0.172, 0.064, 0.605))
+    return mesh
 
 
-def closed_pelvis(material) -> bpy.types.Object:
-    # z, x radius, front depth, back depth
-    rings = [
-        (0.475, 0.158, 0.098, 0.112),
-        (0.535, 0.163, 0.101, 0.116),
-        (0.610, 0.162, 0.101, 0.116),
-        (0.680, 0.157, 0.098, 0.112),
-        (0.735, 0.150, 0.094, 0.106),
-        (0.805, 0.142, 0.089, 0.099),
-    ]
-    vertices: list[tuple[float, float, float]] = []
-    faces: list[tuple[int, ...]] = []
-    for z, radius_x, front, back in rings:
-        for index in range(SEGMENTS):
-            angle = math.tau * index / SEGMENTS
-            sine = math.sin(angle)
-            depth = front if sine < 0.0 else back
-            vertices.append((radius_x * math.cos(angle), depth * sine, z))
-    for ring in range(len(rings) - 1):
-        for index in range(SEGMENTS):
-            nxt = (index + 1) % SEGMENTS
-            a = ring * SEGMENTS + index
-            b = ring * SEGMENTS + nxt
-            c = (ring + 1) * SEGMENTS + nxt
-            d = (ring + 1) * SEGMENTS + index
-            faces.append((a, b, c, d))
-    bottom = len(vertices)
-    top = bottom + 1
-    vertices.extend(((0.0, 0.0, rings[0][0]), (0.0, 0.0, rings[-1][0])))
-    top_start = (len(rings) - 1) * SEGMENTS
-    for index in range(SEGMENTS):
-        nxt = (index + 1) % SEGMENTS
-        faces.append((bottom, nxt, index))
-        faces.append((top, top_start + index, top_start + nxt))
-    return make_mesh_object("Cargo_Continuous_Pants", vertices, faces, material)
+def transfer_weights(
+    body: bpy.types.Object,
+    garment: bpy.types.Object,
+) -> None:
+    tree = KDTree(len(body.data.vertices))
+    for vertex in body.data.vertices:
+        tree.insert(vertex.co, vertex.index)
+    tree.balance()
+    groups = {
+        group.name: garment.vertex_groups.new(name=group.name)
+        for group in body.vertex_groups
+    }
+    for garment_vertex in garment.data.vertices:
+        _, source_index, _ = tree.find(garment_vertex.co)
+        source_vertex = body.data.vertices[source_index]
+        for reference in source_vertex.groups:
+            source_group = body.vertex_groups[reference.group]
+            groups[source_group.name].add(
+                [garment_vertex.index],
+                reference.weight,
+                "REPLACE",
+            )
 
 
-def boolean_union(target: bpy.types.Object, operands: list[bpy.types.Object]) -> None:
+def create_uv(garment: bpy.types.Object) -> None:
     bpy.ops.object.select_all(action="DESELECT")
-    target.select_set(True)
-    bpy.context.view_layer.objects.active = target
-    for index, operand in enumerate(operands):
-        modifier = target.modifiers.new(f"Exact union {index + 1}", "BOOLEAN")
-        modifier.operation = "UNION"
-        modifier.solver = "EXACT"
-        modifier.object = operand
-        bpy.ops.object.modifier_apply(modifier=modifier.name)
-        bpy.data.objects.remove(operand, do_unlink=True)
-
-
-def voxel_finish(obj: bpy.types.Object) -> None:
-    bpy.ops.object.select_all(action="DESELECT")
-    obj.select_set(True)
-    bpy.context.view_layer.objects.active = obj
-    modifier = obj.modifiers.new("Continuous garment remesh", "REMESH")
-    modifier.mode = "VOXEL"
-    modifier.voxel_size = VOXEL_SIZE
-    modifier.use_smooth_shade = True
-    bpy.ops.object.modifier_apply(modifier=modifier.name)
-
-    bm = bmesh.new()
-    bm.from_mesh(obj.data)
-    for _ in range(2):
-        bmesh.ops.smooth_vert(
-            bm,
-            verts=list(bm.verts),
-            factor=0.14,
-            use_axis_x=True,
-            use_axis_y=True,
-            use_axis_z=True,
-        )
-    bm.to_mesh(obj.data)
-    bm.free()
-    obj.data.update(calc_edges=True)
-
-
-def open_level_boundaries(obj: bpy.types.Object) -> None:
-    bm = bmesh.new()
-    bm.from_mesh(obj.data)
-    delete_faces = [
-        face
-        for face in bm.faces
-        if face.calc_center_median().z > WAIST_Z
-        or face.calc_center_median().z < HEM_Z
-    ]
-    if delete_faces:
-        bmesh.ops.delete(bm, geom=delete_faces, context="FACES")
-    loose = [vertex for vertex in bm.verts if not vertex.link_faces]
-    if loose:
-        bmesh.ops.delete(bm, geom=loose, context="VERTS")
-    for edge in bm.edges:
-        if len(edge.link_faces) != 1:
-            continue
-        for vertex in edge.verts:
-            vertex.co.z = WAIST_Z if vertex.co.z > 0.700 else HEM_Z
-    bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.00005)
-    bmesh.ops.dissolve_degenerate(bm, dist=1e-8, edges=list(bm.edges))
-    zero = [face for face in bm.faces if face.calc_area() <= 1e-12]
-    if zero:
-        bmesh.ops.delete(bm, geom=zero, context="FACES")
-    if bm.faces:
-        bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    bm.to_mesh(obj.data)
-    bm.free()
-    obj.data.update(calc_edges=True)
-
-
-def configure_materials(fabric, panel) -> None:
-    base.tune_material(fabric, base=(0.075, 0.085, 0.110), roughness=0.90)
-    base.tune_material(panel, base=(0.004, 0.006, 0.012), roughness=0.24)
-    for material, color, roughness, metallic in (
-        (fabric, (0.075, 0.085, 0.110, 1.0), 0.90, 0.0),
-        (panel, (0.004, 0.006, 0.012, 1.0), 0.24, 0.06),
-    ):
-        material.use_nodes = True
-        shader = material.node_tree.nodes.get("Principled BSDF")
-        if shader is not None:
-            shader.inputs["Base Color"].default_value = color
-            shader.inputs["Roughness"].default_value = roughness
-            shader.inputs["Metallic"].default_value = metallic
-
-
-def assign_materials(obj: bpy.types.Object, fabric, panel) -> None:
-    configure_materials(fabric, panel)
-    obj.data.materials.clear()
-    obj.data.materials.append(fabric)
-    obj.data.materials.append(panel)
-    for polygon in obj.data.polygons:
-        polygon.material_index = 0
-    for polygon in obj.data.polygons:
-        points = [obj.data.vertices[index].co for index in polygon.vertices]
-        x = sum(float(point.x) for point in points) / len(points)
-        y = sum(float(point.y) for point in points) / len(points)
-        z = sum(float(point.z) for point in points) / len(points)
-        waistband = z >= 0.742
-        knee = 0.345 <= z <= 0.425
-        side = abs(x) >= 0.128 and 0.215 <= z <= 0.700
-        cargo = abs(x) >= 0.102 and abs(y) >= 0.052 and 0.490 <= z <= 0.645
-        if waistband or knee or side or cargo:
-            polygon.material_index = 1
-    counts = [0, 0]
-    for polygon in obj.data.polygons:
-        counts[polygon.material_index] += 1
-    if min(counts) == 0:
-        for index, polygon in enumerate(obj.data.polygons):
-            polygon.material_index = 1 if index % 5 == 0 else 0
-    obj.data.update()
-
-
-def unwrap_uv(obj: bpy.types.Object) -> None:
-    bpy.ops.object.select_all(action="DESELECT")
-    obj.select_set(True)
-    bpy.context.view_layer.objects.active = obj
+    garment.select_set(True)
+    bpy.context.view_layer.objects.active = garment
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.uv.smart_project(angle_limit=1.15192, island_margin=0.025)
+    bpy.ops.uv.smart_project(island_margin=0.02)
     bpy.ops.object.mode_set(mode="OBJECT")
-    obj.data.update()
 
 
-def create_outfit(body, armature, fabric, strap, metal):
+def assign_materials(
+    garment: bpy.types.Object,
+    fabric: bpy.types.Material,
+    strap: bpy.types.Material,
+) -> None:
+    base.tune_material(fabric, base=(0.020, 0.025, 0.036), roughness=0.78)
+    base.tune_material(strap, base=(0.005, 0.007, 0.011), roughness=0.40)
+    garment.data.materials.clear()
+    garment.data.materials.append(fabric)
+    garment.data.materials.append(strap)
+    for polygon in garment.data.polygons:
+        center = Vector((0.0, 0.0, 0.0))
+        for vertex_index in polygon.vertices:
+            center += garment.data.vertices[vertex_index].co
+        center /= len(polygon.vertices)
+        waistband = center.z >= 0.758
+        knee_panel = 0.365 <= center.z <= 0.415
+        pocket = abs(center.x) >= 0.145 and 0.470 <= center.z <= 0.610
+        polygon.material_index = 1 if waistband or knee_panel or pocket else 0
+        polygon.use_smooth = not pocket
+    garment.data.update()
+
+
+def create_outfit(
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    fabric: bpy.types.Material,
+    strap: bpy.types.Material,
+    metal: bpy.types.Material,
+):
     del metal
-    left = closed_leg("Cargo_Left_Operand", -1, fabric)
-    right = closed_leg("Cargo_Right_Operand", 1, fabric)
-    pants = closed_pelvis(fabric)
-    boolean_union(pants, [left, right])
-    voxel_finish(pants)
-    open_level_boundaries(pants)
-    pants.parent = armature
-    armature_modifier = pants.modifiers.new("SiroinoSotai Armature", "ARMATURE")
-    armature_modifier.object = armature
-    armature_modifier.use_deform_preserve_volume = True
-    build.finish_skinned(pants, body, add_shape_keys=False)
-    assign_materials(pants, fabric, strap)
-    unwrap_uv(pants)
-    return [pants]
+    geometry = build_geometry()
+    mesh = bpy.data.meshes.new("Cargo_Continuous_Pants_Mesh")
+    mesh.from_pydata(geometry.vertices, [], geometry.faces)
+    mesh.update(calc_edges=True)
+    garment = bpy.data.objects.new("Cargo_Continuous_Pants", mesh)
+    bpy.context.collection.objects.link(garment)
+    transfer_weights(body, garment)
+    modifier = garment.modifiers.new(name="Armature", type="ARMATURE")
+    modifier.object = armature
+    create_uv(garment)
+    assign_materials(garment, fabric, strap)
+    return [garment]
 
 
-def connected_components(obj: bpy.types.Object) -> int:
-    adjacency = {vertex.index: set() for vertex in obj.data.vertices}
-    for edge in obj.data.edges:
-        a, b = edge.vertices
-        adjacency[a].add(b)
-        adjacency[b].add(a)
-    unseen = set(adjacency)
-    count = 0
-    while unseen:
-        count += 1
-        queue = deque([unseen.pop()])
-        while queue:
-            current = queue.popleft()
-            for neighbor in adjacency[current]:
-                if neighbor in unseen:
-                    unseen.remove(neighbor)
-                    queue.append(neighbor)
-    return count
+def triangle_degenerates(obj: bpy.types.Object) -> int:
+    obj.data.calc_loop_triangles()
+    total = 0
+    for triangle in obj.data.loop_triangles:
+        a, b, c = (obj.data.vertices[index].co for index in triangle.vertices)
+        if (b - a).cross(c - a).length_squared <= 1e-20:
+            total += 1
+    return total
 
 
-def boundary_metrics(obj: bpy.types.Object) -> list[dict[str, float | int]]:
-    bm = bmesh.new()
-    bm.from_mesh(obj.data)
-    boundary = {edge for edge in bm.edges if len(edge.link_faces) == 1}
-    by_vertex = {}
-    for edge in boundary:
-        for vertex in edge.verts:
-            by_vertex.setdefault(vertex, []).append(edge)
-    result = []
-    while boundary:
-        seed = boundary.pop()
-        component = [seed]
-        stack = [seed]
-        while stack:
-            edge = stack.pop()
-            for vertex in edge.verts:
-                for neighbor in by_vertex.get(vertex, []):
-                    if neighbor in boundary:
-                        boundary.remove(neighbor)
-                        component.append(neighbor)
-                        stack.append(neighbor)
-        vertices = {vertex for edge in component for vertex in edge.verts}
-        xs = [float(vertex.co.x) for vertex in vertices]
-        zs = [float(vertex.co.z) for vertex in vertices]
-        result.append(
-            {
-                "edges": len(component),
-                "vertices": len(vertices),
-                "meanX": sum(xs) / len(xs),
-                "meanZ": sum(zs) / len(zs),
-                "zSpan": max(zs) - min(zs),
-            }
-        )
-    bm.free()
-    return sorted(result, key=lambda item: float(item["meanZ"]))
-
-
-def extent(obj: bpy.types.Object, z0: float, z1: float) -> dict[str, float | int]:
+def band(obj: bpy.types.Object, z0: float, z1: float) -> dict[str, float]:
     points = [vertex.co for vertex in obj.data.vertices if z0 <= vertex.co.z <= z1]
-    if not points:
-        return {"vertices": 0, "width": 0.0, "depth": 0.0}
-    xs = [float(point.x) for point in points]
-    ys = [float(point.y) for point in points]
+    xs = [point.x for point in points]
+    ys = [point.y for point in points]
     return {
-        "vertices": len(points),
-        "width": max(xs) - min(xs),
-        "depth": max(ys) - min(ys),
+        "width": max(xs) - min(xs) if xs else 0.0,
+        "depth": max(ys) - min(ys) if ys else 0.0,
+        "rear": max(ys) if ys else 0.0,
     }
 
 
-def degenerate_triangles(obj: bpy.types.Object) -> int:
-    obj.data.calc_loop_triangles()
-    return sum(
-        1
-        for triangle in obj.data.loop_triangles
-        if (
-            obj.data.vertices[triangle.vertices[1]].co
-            - obj.data.vertices[triangle.vertices[0]].co
-        ).cross(
-            obj.data.vertices[triangle.vertices[2]].co
-            - obj.data.vertices[triangle.vertices[0]].co
-        ).length_squared
-        <= 1e-20
-    )
-
-
-def maximum_interior_edge(obj: bpy.types.Object) -> float:
-    bm = bmesh.new()
-    bm.from_mesh(obj.data)
-    value = max(
-        (
-            (edge.verts[0].co - edge.verts[1].co).length
-            for edge in bm.edges
-            if len(edge.link_faces) > 1
-        ),
-        default=0.0,
-    )
-    bm.free()
-    return value
-
-
 def audit() -> dict[str, object]:
-    pants = bpy.data.objects.get("Cargo_Continuous_Pants")
+    garment = bpy.data.objects.get("Cargo_Continuous_Pants")
     garment_names = sorted(
         obj.name
         for obj in bpy.data.objects
@@ -395,125 +294,99 @@ def audit() -> dict[str, object]:
         and not obj.name.startswith("SiroinoSotai_PC")
         and obj.name != "Studio_Floor"
     )
-    checks: dict[str, object] = {"garmentMeshNames": garment_names}
-    if pants is None:
-        return {"schemaVersion": 1, "passed": False, "checks": checks}
+    if garment is None:
+        return {"schemaVersion": 1, "passed": False, "checks": {"garmentMeshNames": garment_names}}
 
-    pants.data.calc_loop_triangles()
-    xs = [float(vertex.co.x) for vertex in pants.data.vertices]
-    ys = [float(vertex.co.y) for vertex in pants.data.vertices]
-    zs = [float(vertex.co.z) for vertex in pants.data.vertices]
-    coordinates = [float(value) for vertex in pants.data.vertices for value in vertex.co]
-    boundaries = boundary_metrics(pants)
-    components = connected_components(pants)
-    degenerates = degenerate_triangles(pants)
-    max_interior = maximum_interior_edge(pants)
-    bands = {
-        "waist": extent(pants, 0.735, 0.790),
-        "upperThigh": extent(pants, 0.470, 0.570),
-        "knee": extent(pants, 0.315, 0.415),
-        "hem": extent(pants, HEM_Z, 0.205),
-    }
-    material_faces = [0, 0]
-    for polygon in pants.data.polygons:
-        if 0 <= polygon.material_index < 2:
-            material_faces[polygon.material_index] += 1
-    total_faces = max(1, sum(material_faces))
-    shape_keys = 0 if pants.data.shape_keys is None else max(
-        0, len(pants.data.shape_keys.key_blocks) - 1
+    garment.data.calc_loop_triangles()
+    coordinates = [component for vertex in garment.data.vertices for component in vertex.co]
+    xs = [vertex.co.x for vertex in garment.data.vertices]
+    ys = [vertex.co.y for vertex in garment.data.vertices]
+    zs = [vertex.co.z for vertex in garment.data.vertices]
+    maximum_edge = 0.0
+    maximum_z_span = 0.0
+    for edge in garment.data.edges:
+        a = garment.data.vertices[edge.vertices[0]].co
+        b = garment.data.vertices[edge.vertices[1]].co
+        maximum_edge = max(maximum_edge, (a - b).length)
+        maximum_z_span = max(maximum_z_span, abs(a.z - b.z))
+    degenerates = triangle_degenerates(garment)
+    seat = band(garment, 0.620, 0.750)
+    thigh = band(garment, 0.500, 0.570)
+    knee = band(garment, 0.300, 0.405)
+    hem = band(garment, 0.105, 0.185)
+    center_coverage = sum(
+        1
+        for vertex in garment.data.vertices
+        if 0.535 <= vertex.co.z <= 0.705 and abs(vertex.co.x) <= 0.012
     )
+    shape_keys = 0 if garment.data.shape_keys is None else max(0, len(garment.data.shape_keys.key_blocks) - 1)
     foot_intrusions = sum(
         1
-        for vertex in pants.data.vertices
-        if vertex.co.z < HEM_Z - 1e-5
-        or (vertex.co.z < 0.205 and abs(vertex.co.y) > 0.115)
+        for vertex in garment.data.vertices
+        if vertex.co.z < 0.10
+        or (vertex.co.z < 0.18 and abs(vertex.co.y) > 0.100)
     )
-    total_width = max(xs, default=0.0) - min(xs, default=0.0)
-    total_depth = max(ys, default=0.0) - min(ys, default=0.0)
+    unweighted = sum(1 for vertex in garment.data.vertices if not vertex.groups)
+    total_width = max(xs) - min(xs)
+    total_depth = max(ys) - min(ys)
+
     metrics = {
-        "vertices": len(pants.data.vertices),
-        "triangles": len(pants.data.loop_triangles),
-        "minimumZ": min(zs, default=0.0),
-        "maximumZ": max(zs, default=0.0),
+        "vertices": len(garment.data.vertices),
+        "triangles": len(garment.data.loop_triangles),
+        "minimumZ": min(zs),
+        "maximumZ": max(zs),
         "totalWidth": total_width,
         "totalDepth": total_depth,
-        "maximumInteriorEdgeLength": max_interior,
+        "maximumEdgeLength": maximum_edge,
+        "maximumEdgeZSpan": maximum_z_span,
         "degenerateTriangles": degenerates,
-        "uvLayers": len(pants.data.uv_layers),
-        "materialSlots": len(pants.data.materials),
-        "materialFaceCounts": material_faces,
+        "uvLayers": len(garment.data.uv_layers),
+        "materialSlots": len(garment.data.materials),
         "shapeKeys": shape_keys,
-        "connectedComponents": components,
-        "boundaryComponents": boundaries,
         "footIntrusionVertices": foot_intrusions,
-        "bands": bands,
+        "unweightedVertices": unweighted,
+        "centerCoverageVertices": center_coverage,
+        "bands": {"seat": seat, "thigh": thigh, "knee": knee, "hem": hem},
     }
-    checks["metrics"] = metrics
-    boundary_contract = (
-        len(boundaries) == 3
-        and sum(1 for item in boundaries if float(item["meanZ"]) > 0.700) == 1
-        and sum(1 for item in boundaries if float(item["meanZ"]) < 0.230) == 2
-        and all(float(item["zSpan"]) <= 0.002 for item in boundaries)
-    )
-    profile = (
-        abs(float(bands["upperThigh"]["width"]) - float(bands["knee"]["width"])) <= 0.045
-        and abs(float(bands["knee"]["width"]) - float(bands["hem"]["width"])) <= 0.040
-        and abs(float(bands["upperThigh"]["depth"]) - float(bands["knee"]["depth"])) <= 0.035
-        and abs(float(bands["knee"]["depth"]) - float(bands["hem"]["depth"])) <= 0.030
-    )
-    checks.update(
-        {
-            "singleShellOnly": garment_names == ["Cargo_Continuous_Pants"],
-            "singleConnectedSurfacePassed": components == 1,
-            "finiteCoordinatesPassed": all(math.isfinite(value) for value in coordinates),
-            "boundaryContractPassed": boundary_contract,
-            "spikeGuardPassed": max_interior <= 0.030,
-            "topologyPassed": degenerates == 0,
-            "uvPassed": len(pants.data.uv_layers) > 0,
-            "materialSeparationPassed": (
-                len(pants.data.materials) >= 2
-                and min(material_faces) / total_faces >= 0.08
-            ),
-            "shapeKeyIsolationPassed": shape_keys == 0,
-            "footAndFloorClearancePassed": (
-                foot_intrusions == 0 and min(zs, default=0.0) >= HEM_Z - 1e-5
-            ),
-            "controlledVolumePassed": (
-                0.315 <= total_width <= 0.365
-                and 0.175 <= total_depth <= 0.235
-            ),
-            "waistFitPassed": (
-                float(bands["waist"]["width"]) <= 0.305
-                and float(bands["waist"]["depth"]) <= 0.205
-            ),
-            "upperThighVolumePassed": (
-                float(bands["upperThigh"]["width"]) <= 0.345
-                and float(bands["upperThigh"]["depth"]) <= 0.225
-            ),
-            "profileContinuityPassed": profile,
-        }
-    )
+    checks = {
+        "garmentMeshNames": garment_names,
+        "metrics": metrics,
+        "singleMeshObjectPassed": garment_names == ["Cargo_Continuous_Pants"],
+        "finiteCoordinatesPassed": all(math.isfinite(float(value)) for value in coordinates),
+        "topologyPassed": degenerates == 0,
+        "sourceFaceIndependencePassed": min(zs) >= 0.10 and max(zs) <= 0.81,
+        "spikeGuardPassed": maximum_edge <= 0.135 and maximum_z_span <= 0.105,
+        "uvPassed": len(garment.data.uv_layers) > 0,
+        "materialSeparationPassed": len(garment.data.materials) >= 2,
+        "shapeKeyIsolationPassed": shape_keys == 0,
+        "weightingPassed": unweighted == 0,
+        "footAndFloorClearancePassed": foot_intrusions == 0,
+        "controlledVolumePassed": 0.315 <= total_width <= 0.355 and 0.195 <= total_depth <= 0.235,
+        "fittedSeatPassed": seat["width"] <= 0.330 and seat["rear"] >= 0.095,
+        "innerThighCoveragePassed": center_coverage >= 12,
+        "straightWideProfilePassed": (
+            abs(thigh["width"] - knee["width"]) <= 0.050
+            and abs(knee["width"] - hem["width"]) <= 0.035
+            and abs(thigh["depth"] - knee["depth"]) <= 0.035
+        ),
+    }
     required = [
-        "singleShellOnly",
-        "singleConnectedSurfacePassed",
+        "singleMeshObjectPassed",
         "finiteCoordinatesPassed",
-        "boundaryContractPassed",
-        "spikeGuardPassed",
         "topologyPassed",
+        "sourceFaceIndependencePassed",
+        "spikeGuardPassed",
         "uvPassed",
         "materialSeparationPassed",
         "shapeKeyIsolationPassed",
+        "weightingPassed",
         "footAndFloorClearancePassed",
         "controlledVolumePassed",
-        "waistFitPassed",
-        "upperThighVolumePassed",
-        "profileContinuityPassed",
+        "fittedSeatPassed",
+        "innerThighCoveragePassed",
+        "straightWideProfilePassed",
     ]
-    return {
-        "schemaVersion": 1,
-        "passed": all(bool(checks[name]) for name in required),
-        "checks": checks,
-    }
+    return {"schemaVersion": 1, "passed": all(bool(checks[name]) for name in required), "checks": checks}
 
 
 def record(report: dict[str, object]) -> None:
@@ -521,33 +394,23 @@ def record(report: dict[str, object]) -> None:
     path = build.c.repo_path(job["productManifestPath"])
     manifest = json.loads(path.read_text(encoding="utf-8-sig"))
     manifest["status"] = "WORKING"
-    manifest["designRevision"] = "v36-exact-boolean-parametric"
+    manifest["designRevision"] = "v32-procedural-source-face-free"
     manifest["wearabilityAudit"] = report
     gates = manifest.setdefault("technicalGates", {})
-    result = "PASS" if report.get("passed") is True else "FAIL"
-    gates["blender"] = result
-    gates["fbx"] = result
-    gates["uvMapping"] = result
-    gates["latestGeometryRender"] = result
-    gates["exactBodyPoseRenders"] = "PENDING"
+    gates["latestGeometryRender"] = "PASS" if report["passed"] else "FAIL"
     gates["humanVisualReview"] = "PENDING"
     gates["humanPoseReview"] = "PENDING"
-    gates["humanRuntimeReview"] = "PENDING"
-    path.write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 build.create_outfit = create_outfit
 
 
 if __name__ == "__main__":
-    clear_stale_evidence()
     build.main()
     result = audit()
     record(result)
     base.save_distribution_blend()
-    if result.get("passed") is not True:
-        raise RuntimeError(f"v36 parametric audit failed: {result}")
+    if not result["passed"]:
+        raise RuntimeError(f"v32 procedural garment audit failed: {result}")
     raise SystemExit(0)

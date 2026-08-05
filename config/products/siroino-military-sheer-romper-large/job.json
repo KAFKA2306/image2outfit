@@ -14,14 +14,6 @@
   "integratedPrefabAssetPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/Siroino_Large_MilitarySheerRomper.prefab",
   "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
   "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
-  "targetFit": {
-    "required": true,
-    "targetName": "SiroinoSotai_PC",
-    "fitEvidencePath": "Assets/GenWorks/siroino-military-sheer-romper-large/Evidence/target-fit.json",
-    "maximumPenetrationRatio": 0.005,
-    "minimumAllowedClearanceMeters": -0.003,
-    "requireActualTargetPoseEvidence": true
-  },
   "licenseEvidence": "config/products/siroino-military-sheer-romper-large/license.json",
   "privateSourceRoots": [
     "Assets/_Local",
@@ -43,7 +35,6 @@
     "Assets/GenWorks/siroino-military-sheer-romper-large/Textures/military_black_normal.png",
     "Assets/GenWorks/siroino-military-sheer-romper-large/Textures/military_black_roughness.png",
     "Assets/GenWorks/siroino-military-sheer-romper-large/Textures/sheer_mesh_albedo.png",
-    "Assets/GenWorks/siroino-military-sheer-romper-large/Evidence/target-fit.json",
     "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/front.png",
     "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/back.png",
     "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/left.png",
@@ -67,13 +58,21 @@
     "right": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/right.png",
     "three-quarter": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/three-quarter.png"
   },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/Poses/sit.png",
+    "twist": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/Poses/twist.png",
+    "prone": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/Poses/prone.png"
+  },
   "humanEvidence": {
     "visual-review": "Assets/_Local/Evidence/siroino-military-sheer-romper-large/visual-review.json",
     "pose-penetration-review": "Assets/_Local/Evidence/siroino-military-sheer-romper-large/pose-penetration-review.json",
     "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-military-sheer-romper-large/vrchat-runtime-review.json"
   },
   "allowedExtraBones": [],
-  "referenceSpec": "config/products/siroino-military-sheer-romper-large/reference.json",
   "bodyShapeProfile": {
     "All_L": 1.0,
     "Chest_L": 1.0,

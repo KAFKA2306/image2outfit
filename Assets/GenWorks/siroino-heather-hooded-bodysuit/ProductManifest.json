@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-heather-hooded-bodysuit",
+  "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab",
+  "previewPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/README.md",
+  "sourceJobPath": "config/products/siroino-heather-hooded-bodysuit/job.json",
+  "productBuildScript": "tools/siroino_heather_hooded_product.py",
+  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "tools/siroino_heather_hooded_product.py",
+    "lastAttempt": {
+      "result": "HOSTED_RENDERED_VISUAL_REJECTED",
+      "visualRevision": "v23-dama-anchor-lobomap-residual-fit",
+      "hostedWorkflowRun": 30927279567,
+      "artifactId": 8900069602,
+      "artifactSha256": "432fe8c6a5aa3eab8fa3d4148574488058a67086366371d089fd8c2eb29442db"
+    },
+    "blockers": [
+      "Replace the incorrect primary body-region selection and underbody construction.",
+      "Remove long front and rear crotch tabs and both shoulder protrusions.",
+      "Restore a fitted bodysuit and slim-sleeve silhouette with finished cuffs and hood.",
+      "Remove visible dark surface defects and irregular opening boundaries.",
+      "Resolve visible pose deformation failures and reframe complete pose evidence.",
+      "Pass direct visualAppearanceReview on current five-view and pose images."
+    ]
+  },
+  "technicalGates": {
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "FAIL",
+    "researchTrial": "PASS",
+    "fitPenetration": "NON_BLOCKING_FAIL",
+    "unityImport": "OUT_OF_SCOPE",
+    "unitySaveReload": "OUT_OF_SCOPE",
+    "prefabReload": "OUT_OF_SCOPE",
+    "modularAvatar": "OUT_OF_SCOPE",
+    "ndmf": "OUT_OF_SCOPE",
+    "vrchatBuildTest": "OUT_OF_SCOPE",
+    "vrchatRuntime": "OUT_OF_SCOPE",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
+    "fbx": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Models/SiroinoHeatherHoodedBodysuit.fbx",
+    "prefab": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoSotai_HeatherHoodedBodysuit.prefab",
+    "multiview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+    "fitAudit": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
+    "visualReview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/visual-review.json",
+    "geometryDiagnostics": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/geometry-diagnostics.json",
+    "researchTrial": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json"
+  },
+  "research": {
+    "source": {
+      "title": "LoBoFit: Flexible Garment Refitting via Local Bone Mapping Blending",
+      "submitted": "2026-05-08T08:56:06Z",
+      "arxiv": "https://arxiv.org/abs/2605.07450",
+      "paperLicense": "CC BY-NC-ND 4.0",
+      "officialCode": "https://github.com/MengZephyr/LoBoFit",
+      "officialCodeLicense": "BSD-3-Clause",
+      "officialCodeExecuted": false
+    },
+    "result": "PASS",
+    "execution": "SUCCESS",
+    "decision": "METRIC_SUCCESS_VISUAL_REJECTION",
+    "evidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
+    "localResidualEdgeRmsBeforeM": 0.0035477231084656544,
+    "localResidualEdgeRmsAfterM": 0.0029748159515982156,
+    "localResidualEdgeRmsReductionPercent": 16.148587117758858
+  },
+  "metrics": {
+    "meshObjects": 8,
+    "vertices": 70245,
+    "triangles": 139506,
+    "materialSlots": 8,
+    "shapeKeys": 120,
+    "maxBoneInfluences": 4,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "boundaryEdges": 966
+  },
+  "dynamicRebind": {
+    "objects": [
+      "Heather_Body_Shell",
+      "Heather_Hood_Folded_Roll",
+      "Heather_Henley_Placket",
+      "Heather_Henley_Button_01",
+      "Heather_Henley_Button_02",
+      "Heather_Henley_Button_03",
+      "Heather_Hood_Drawcord_L",
+      "Heather_Hood_Drawcord_R"
+    ],
+    "weightSource": "evaluated SiroinoSotai_PC topology refined twice with interpolated UVs and skin weights; shoulders and sleeves selected from interpolated arm weights; semantic neck, wrist and leg openings retained; nonanatomical complement components restored; DAMA-inspired body-triangle anchoring followed by LoBoFit-inspired four-bone local residual smoothing; nearest-body weights used for trim",
+    "rebound": false
+  },
+  "influencePruning": {
+    "Heather_Body_Shell": 0,
+    "Heather_Hood_Folded_Roll": 0,
+    "Heather_Henley_Placket": 0,
+    "Heather_Henley_Button_01": 0,
+    "Heather_Henley_Button_02": 0,
+    "Heather_Henley_Button_03": 0,
+    "Heather_Hood_Drawcord_L": 0,
+    "Heather_Hood_Drawcord_R": 0
+  },
+  "meshCleanup": {
+    "Heather_Body_Shell": 2,
+    "Heather_Hood_Folded_Roll": 0,
+    "Heather_Henley_Placket": 0,
+    "Heather_Henley_Button_01": 0,
+    "Heather_Henley_Button_02": 0,
+    "Heather_Henley_Button_03": 0,
+    "Heather_Hood_Drawcord_L": 0,
+    "Heather_Hood_Drawcord_R": 0
+  },
+  "poseEvidence": {
+    "neutral": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/neutral.png",
+      "sha256": "8600065b57ec70dbab23154f313e44e69736529f9c87a1b76cd7d7447f7f6cbe"
+    },
+    "arms-up": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/arms-up.png",
+      "sha256": "b82af5d012394d6c36e7f02d517f084f33457153177eebe17970f87dd2b38d6c"
+    },
+    "arm-cross": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/arm-cross.png",
+      "sha256": "d9be1b43fe4dad1f82fa6f86bcc28635ad84c06035dfc93c8d1a8989920e2560"
+    },
+    "crouch": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/crouch.png",
+      "sha256": "a72cc6a192c7feaf55c98a51fff84d8026b6ad246c2aff71f5bf24189ef9cbf5"
+    },
+    "sit": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/sit.png",
+      "sha256": "897dfc6b59212e3ed54e6ae88990431f27f8f421e7577c84287f8efb8360e818"
+    },
+    "prone": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/prone.png",
+      "sha256": "e87570a0d77374820b6e494079dcaed3d1af4423f7a7891856a1ca24c680e4e0"
+    },
+    "sheet": {
+      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+      "sha256": "cfc708b2878d620efb88eef849cf9735fe86e571970c2af85890b733d810804e"
+    }
+  },
+  "fitAuditSummary": {
+    "pass": false,
+    "posesWithIntersections": [
+      "arms-up",
+      "arm-cross",
+      "crouch",
+      "sit",
+      "prone"
+    ],
+    "triangleOverlapPairsByPose": {
+      "neutral": 0,
+      "arms-up": 2782,
+      "arm-cross": 1048,
+      "crouch": 1035,
+      "sit": 691,
+      "prone": 2398
+    },
+    "totalTriangleOverlapPairs": 7954,
+    "completionBlockingByItself": false
+  },
+  "state": "WORKING",
+  "visualAppearanceReview": {
+    "result": "FAIL",
+    "reviewer": "ChatGPT direct artifact image review",
+    "checkedAt": "2026-08-05T01:17:26+09:00",
+    "blockingFindings": [
+      {
+        "zone": "front and rear crotch",
+        "finding": "A long narrow hanging tab remains visible in both front and back views instead of a clean underbody high-cut bridge."
+      },
+      {
+        "zone": "shoulders, hood and drawcords",
+        "finding": "Horizontal floating protrusions remain at both shoulders, while the requested three-dimensional hood is not presented as a coherent wearable hood."
+      },
+      {
+        "zone": "body and sleeve silhouette",
+        "finding": "The shell reads as a loose tunic with wide cylindrical sleeves rather than a fitted long-sleeve high-cut bodysuit with defined rib cuffs."
+      },
+      {
+        "zone": "neckline and openings",
+        "finding": "The neckline and leg-opening boundaries remain irregular and visually unfinished."
+      },
+      {
+        "zone": "surface and material",
+        "finding": "Dark speckles, streaks and seam-like surface defects remain visible across the torso, sleeves and back."
+      },
+      {
+        "zone": "required poses",
+        "finding": "Neutral has zero BVH overlap pairs, but arms-up has 2782, arm-cross 1048, crouch 1035, sit 691 and prone 2398. The pose sheet also retains the incorrect crotch and shoulder silhouette."
+      },
+      {
+        "zone": "pose evidence framing",
+        "finding": "Several pose renders crop the head, arms or upper body, reducing their value for complete garment review."
+      }
+    ],
+    "evidence": {
+      "hostedWorkflowRun": 30927279567,
+      "artifactId": 8900069602,
+      "artifactSha256": "432fe8c6a5aa3eab8fa3d4148574488058a67086366371d089fd8c2eb29442db",
+      "multiview": "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+      "poseReview": "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+      "fitAudit": "Tests/fit-audit.json",
+      "researchTrial": "Research/lobofit-local-bone-trial.json"
+    }
+  }
+}

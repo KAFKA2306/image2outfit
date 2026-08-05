@@ -1,0 +1,134 @@
+name: Garment pipeline architecture
+
+on:
+  pull_request:
+    paths:
+      - ARCHITECTURE.md
+      - src/**
+      - tools/run_garment_pipeline.py
+      - tools/pipeline_stage_adapters.py
+      - tools/run_blender_stage.py
+      - tools/audit_src_architecture.py
+      - tests/test_architecture_policy.py
+      - tests/test_execution_bindings.py
+      - tests/test_garment_domain.py
+      - tests/test_pipeline_core.py
+      - tests/test_pipeline_entrypoints.py
+      - tests/test_pipeline_profile.py
+      - tests/test_research_and_specs.py
+      - tests/test_src_architecture.py
+      - config/pipeline/architecture-policy.json
+      - config/pipeline-profiles/**
+      - examples/pipeline-request.example.json
+      - .github/workflows/pipeline-architecture.yml
+  push:
+    branches: [main]
+    paths:
+      - ARCHITECTURE.md
+      - src/**
+      - tools/run_garment_pipeline.py
+      - tools/pipeline_stage_adapters.py
+      - tools/run_blender_stage.py
+      - tools/audit_src_architecture.py
+      - tests/test_architecture_policy.py
+      - tests/test_execution_bindings.py
+      - tests/test_garment_domain.py
+      - tests/test_pipeline_core.py
+      - tests/test_pipeline_entrypoints.py
+      - tests/test_pipeline_profile.py
+      - tests/test_research_and_specs.py
+      - tests/test_src_architecture.py
+      - config/pipeline/architecture-policy.json
+      - config/pipeline-profiles/**
+      - examples/pipeline-request.example.json
+      - .github/workflows/pipeline-architecture.yml
+
+permissions:
+  contents: read
+
+jobs:
+  architecture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: '0.11.32'
+          enable-cache: true
+
+      - name: Compile reusable core and adapters
+        run: uv run --locked --no-default-groups python -m compileall -q src tools tests
+
+      - name: Audit src and tools dependency direction
+        run: uv run --locked --no-default-groups python tools/audit_src_architecture.py
+
+      - name: Run pipeline architecture tests
+        run: >-
+          uv run --locked --no-default-groups
+          python -m unittest discover -s tests -v
+
+      - name: Ruff reusable core and adapters
+        run: >-
+          uv run --locked --no-default-groups --group dev
+          ruff check
+          src/image2outfit
+          tools/audit_src_architecture.py
+          tools/pipeline_stage_adapters.py
+          tools/run_blender_stage.py
+          tools/run_garment_pipeline.py
+          tests/test_architecture_policy.py
+          tests/test_execution_bindings.py
+          tests/test_garment_domain.py
+          tests/test_pipeline_core.py
+          tests/test_pipeline_entrypoints.py
+          tests/test_pipeline_profile.py
+          tests/test_research_and_specs.py
+          tests/test_src_architecture.py
+
+      - name: Reject unresolved production execution
+        run: |
+          if uv run --locked --no-default-groups python tools/run_garment_pipeline.py \
+            --execute --request examples/pipeline-request.example.json; then
+            echo "unbound production execution unexpectedly completed" >&2
+            exit 1
+          fi
+
+      - name: Smoke-test LangChain and LangGraph engines
+        run: |
+          uv run \
+            --with langchain-core==1.5.0 \
+            --with langgraph==1.2.9 \
+            python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          root = Path.cwd()
+          sys.path.insert(0, str(root / 'src'))
+          sys.path.insert(0, str(root / 'tools'))
+
+          from image2outfit.pipeline import (
+              new_pipeline_state,
+              run_langchain,
+              run_langgraph,
+          )
+          from pipeline_stage_adapters import build_registry, load_profile
+
+          profile = load_profile(
+              root / 'config/pipeline-profiles/garment-reconstruction-v1.json'
+          )
+          state = new_pipeline_state(
+              product_id='ci-garment',
+              target_avatar='SiroinoSotai_PC',
+              source_reference='private-reference://sha256/ci',
+          )
+          for runner in (run_langchain, run_langgraph):
+              result = runner(state, build_registry(profile))
+              if result['status'] != 'COMPLETE':
+                  raise SystemExit(result)
+          PY

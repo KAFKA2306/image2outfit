@@ -1,0 +1,75 @@
+name: Production contract quality
+
+on:
+  pull_request:
+    paths:
+      - 'tools/**'
+      - 'tests/**'
+      - 'config/**'
+      - 'Taskfile.yml'
+      - 'README.md'
+      - 'AGENTS.md'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/production-contract-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+          enable-cache: true
+
+      - name: Verify lock and compile
+        run: |
+          uv lock --check
+          uv run --locked --no-default-groups python -m compileall -q tools tests
+
+      - name: Run all repository audits
+        run: uv run --locked --no-default-groups python tools/manage.py audit all
+
+      - name: Run all unit tests
+        run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
+
+      - name: Resolve changed Python files
+        id: changed-python
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_ref="${{ github.base_ref }}"
+          if [ -z "$base_ref" ]; then base_ref=main; fi
+          git diff --diff-filter=ACMRT --name-only \
+            "origin/$base_ref...HEAD" -- '*.py' > /tmp/changed-python.txt
+          cat /tmp/changed-python.txt
+          {
+            echo 'files<<EOF'
+            cat /tmp/changed-python.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run stable Ruff lint on this change
+        if: steps.changed-python.outputs.files != ''
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/changed-python.txt
+          uv run --locked --no-default-groups --group dev ruff check \
+            --select E4,E7,E9,F --ignore E402 "${files[@]}"
+
+      - name: Verify Ruff formatting
+        if: steps.changed-python.outputs.files != ''
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/changed-python.txt
+          uv run --locked --no-default-groups --group dev ruff format --check "${files[@]}"

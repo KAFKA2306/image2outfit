@@ -1,0 +1,4732 @@
+{
+  "schemaVersion": 1,
+  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
+  "target": "SiroinoSotai_PC",
+  "static": {
+    "body": {
+      "object": "SiroinoSotai_PC",
+      "vertices": 8421,
+      "polygons": 16704,
+      "rootLocalBounds": {
+        "min": [
+          -0.588382,
+          -0.127837,
+          0.035296
+        ],
+        "max": [
+          0.588382,
+          0.059989,
+          1.142595
+        ]
+      },
+      "vertexGroups": [
+        "Hips",
+        "UpperLeg_L",
+        "LowerLeg_L",
+        "Foot_L",
+        "Toe_L",
+        "UpperLeg_R",
+        "LowerLeg_R",
+        "Foot_R",
+        "Toe_R",
+        "Spine",
+        "Chest",
+        "Neck",
+        "Head",
+        "Shoulder_L",
+        "UpperArm_L",
+        "LowerArm_L",
+        "Hand_L",
+        "IndexProximal_L",
+        "IndexIntermediate_L",
+        "IndexDistal_L",
+        "MiddleProximal_L",
+        "MiddleIntermediate_L",
+        "MiddleDistal_L",
+        "RingProximal_L",
+        "RingIntermediate_L",
+        "RingDistal_L",
+        "LittleProximal_L",
+        "LittleIntermediate_L",
+        "LittleDistal_L",
+        "ThumbProximal_L",
+        "ThumbIntermediate_L",
+        "ThumbDistal_L",
+        "LowerArm_Twist_L",
+        "UpperArm_Twist_L",
+        "Shoulder_R",
+        "UpperArm_R",
+        "LowerArm_R",
+        "LowerArm_Twist_R",
+        "Hand_R",
+        "IndexProximal_R",
+        "IndexIntermediate_R",
+        "IndexDistal_R",
+        "MiddleProximal_R",
+        "MiddleIntermediate_R",
+        "MiddleDistal_R",
+        "RingProximal_R",
+        "RingIntermediate_R",
+        "RingDistal_R",
+        "LittleProximal_R",
+        "LittleIntermediate_R",
+        "LittleDistal_R",
+        "ThumbProximal_R",
+        "ThumbIntermediate_R",
+        "ThumbDistal_R",
+        "UpperArm_Twist_R",
+        "Breast_L",
+        "Breast_R"
+      ]
+    },
+    "shell": {
+      "object": "Heather_Body_Shell",
+      "vertices": 68729,
+      "polygons": 136502,
+      "rootLocalBounds": {
+        "min": [
+          -0.461047,
+          -0.114775,
+          0.516455
+        ],
+        "max": [
+          0.460093,
+          0.081868,
+          1.072843
+        ]
+      },
+      "boundaryLoops": [
+        {
+          "vertexCount": 188,
+          "edgeCount": 188,
+          "lengthM": 0.520189,
+          "rootLocalCenter": [
+            1e-06,
+            -0.006901,
+            1.04397
+          ],
+          "rootLocalBounds": {
+            "min": [
+              -0.063539,
+              -0.064493,
+              1.017179
+            ],
+            "max": [
+              0.063426,
+              0.056287,
+              1.072772
+            ]
+          },
+          "topWeights": [
+            {
+              "group": "Chest",
+              "meanWeight": 0.724086
+            },
+            {
+              "group": "Shoulder_R",
+              "meanWeight": 0.133314
+            },
+            {
+              "group": "Shoulder_L",
+              "meanWeight": 0.133314
+            },
+            {
+              "group": "Neck",
+              "meanWeight": 0.008935
+            },
+            {
+              "group": "UpperArm_L",
+              "meanWeight": 0.000175
+            },
+            {
+              "group": "UpperArm_R",
+              "meanWeight": 0.000175
+            }
+          ]
+        },
+        {
+          "vertexCount": 72,
+          "edgeCount": 72,
+          "lengthM": 0.239316,
+          "rootLocalCenter": [
+            -0.454888,
+            0.010465,
+            1.012353
+          ],
+          "rootLocalBounds": {
+            "min": [
+              -0.460099,
+              -0.030309,
+              0.983763
+            ],
+            "max": [
+              -0.446443,
+              0.046281,
+              1.050675
+            ]
+          },
+          "topWeights": [
+            {
+              "group": "LowerArm_Twist_R",
+              "meanWeight": 0.808367
+            },
+            {
+              "group": "Hand_R",
+              "meanWeight": 0.190232
+            },
+            {
+              "group": "LowerArm_R",
+              "meanWeight": 0.0014
+            }
+          ]
+        },
+        {
+          "vertexCount": 72,
+          "edgeCount": 72,
+          "lengthM": 0.241384,
+          "rootLocalCenter": [
+            0.455087,
+            0.01059,
+            1.011891
+          ],
+          "rootLocalBounds": {
+            "min": [
+              0.446859,
+              -0.030563,
+              0.98235
+            ],
+            "max": [
+              0.460093,
+              0.04624,
+              1.05068
+            ]
+          },
+          "topWeights": [
+            {
+              "group": "LowerArm_Twist_L",
+              "meanWeight": 0.808367
+            },
+            {
+              "group": "Hand_L",
+              "meanWeight": 0.190232
+            },
+            {
+              "group": "LowerArm_L",
+              "meanWeight": 0.0014
+            }
+          ]
+        },
+        {
+          "vertexCount": 3,
+          "edgeCount": 3,
+          "lengthM": 0.001444,
+          "rootLocalCenter": [
+            0.038381,
+            -0.106879,
+            0.926224
+          ],
+          "rootLocalBounds": {
+            "min": [
+              0.037974,
+              -0.106958,
+              0.926154
+            ],
+            "max": [
+              0.038662,
+              -0.106824,
+              0.926324
+            ]
+          },
+          "topWeights": [
+            {
+              "group": "Chest",
+              "meanWeight": 0.649237
+            },
+            {
+              "group": "Breast_L",
+              "meanWeight": 0.350574
+            },
+            {
+              "group": "Spine",
+              "meanWeight": 0.000189
+            }
+          ]
+        },
+        {
+          "vertexCount": 3,
+          "edgeCount": 3,
+          "lengthM": 0.004217,
+          "rootLocalCenter": [
+            -0.003851,
+            -0.012667,
+            0.628798
+          ],
+          "rootLocalBounds": {
+            "min": [
+              -0.003852,
+              -0.013365,
+              0.6287
+            ],
+            "max": [
+              -0.00385,
+              -0.011277,
+              0.628992
+            ]
+          },
+          "topWeights": [
+            {
+              "group": "Hips",
+              "meanWeight": 0.931556
+            },
+            {
+              "group": "UpperLeg_R",
+              "meanWeight": 0.052556
+            },
+            {
+              "group": "UpperLeg_L",
+              "meanWeight": 0.015889
+            }
+          ]
+        },
+        {
+          "vertexCount": 314,
+          "edgeCount": 314,
+          "lengthM": 0.759841,
+          "rootLocalCenter": [
+            -0.057222,
+            -0.00677,
+            0.619505
+          ],
+          "rootLocalBounds": {
+            "min": [
+              -0.133518,
+              -0.098131,
+              0.516455
+            ],
+            "max": [
+              0.003628,
+              0.068541,
+              0.725872
+            ]
+          },
+          "topWeights": [
+            {
+              "group": "UpperLeg_R",
+              "meanWeight": 0.754462
+            },
+            {
+              "group": "Hips",
+              "meanWeight": 0.245538
+            }
+          ]
+        },
+        {
+          "vertexCount": 314,
+          "edgeCount": 314,
+          "lengthM": 0.768775,
+          "rootLocalCenter": [
+            0.05737,
+            -0.006727,
+            0.619493
+          ],
+          "rootLocalBounds": {
+            "min": [
+              -0.003467,
+              -0.098131,
+              0.516457
+            ],
+            "max": [
+              0.133516,
+              0.068552,
+              0.72578
+            ]
+          },
+          "topWeights": [
+            {
+              "group": "UpperLeg_L",
+              "meanWeight": 0.754462
+            },
+            {
+              "group": "Hips",
+              "meanWeight": 0.245538
+            }
+          ]
+        }
+      ],
+      "allVertexTopWeights": [
+        {
+          "group": "Chest",
+          "meanWeight": 0.221694
+        },
+        {
+          "group": "Hips",
+          "meanWeight": 0.177955
+        },
+        {
+          "group": "Breast_R",
+          "meanWeight": 0.099911
+        },
+        {
+          "group": "Breast_L",
+          "meanWeight": 0.099911
+        },
+        {
+          "group": "Spine",
+          "meanWeight": 0.083973
+        },
+        {
+          "group": "UpperLeg_L",
+          "meanWeight": 0.042058
+        },
+        {
+          "group": "UpperLeg_R",
+          "meanWeight": 0.042058
+        },
+        {
+          "group": "UpperArm_Twist_L",
+          "meanWeight": 0.030001
+        },
+        {
+          "group": "UpperArm_Twist_R",
+          "meanWeight": 0.030001
+        },
+        {
+          "group": "UpperArm_R",
+          "meanWeight": 0.02776
+        },
+        {
+          "group": "UpperArm_L",
+          "meanWeight": 0.02776
+        },
+        {
+          "group": "LowerArm_R",
+          "meanWeight": 0.024852
+        },
+        {
+          "group": "LowerArm_L",
+          "meanWeight": 0.024852
+        },
+        {
+          "group": "Shoulder_L",
+          "meanWeight": 0.018508
+        },
+        {
+          "group": "Shoulder_R",
+          "meanWeight": 0.018508
+        },
+        {
+          "group": "LowerArm_Twist_L",
+          "meanWeight": 0.014326
+        },
+        {
+          "group": "LowerArm_Twist_R",
+          "meanWeight": 0.014326
+        },
+        {
+          "group": "Hand_L",
+          "meanWeight": 0.000738
+        },
+        {
+          "group": "Hand_R",
+          "meanWeight": 0.000738
+        },
+        {
+          "group": "Neck",
+          "meanWeight": 6.9e-05
+        }
+      ]
+    }
+  },
+  "poses": {
+    "neutral": {
+      "Heather_Body_Shell": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Folded_Roll": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Placket": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_01": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_02": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_03": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_L": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_R": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      }
+    },
+    "arms-up": {
+      "Heather_Body_Shell": {
+        "overlapPairs": 2782,
+        "mappedPairs": 2782,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 2071,
+        "rootLocalBounds": {
+          "min": [
+            -0.101711,
+            -0.04402,
+            0.682409
+          ],
+          "max": [
+            0.103905,
+            0.060562,
+            1.003297
+          ]
+        },
+        "rootLocalQuantiles": {
+          "x": {
+            "min": -0.101711,
+            "p10": -0.073071,
+            "median": 0.000472,
+            "p90": 0.074149,
+            "max": 0.103905
+          },
+          "y": {
+            "min": -0.04402,
+            "p10": -0.020147,
+            "median": 0.019021,
+            "p90": 0.035211,
+            "max": 0.060562
+          },
+          "z": {
+            "min": 0.682409,
+            "p10": 0.763397,
+            "median": 0.864721,
+            "p90": 0.994219,
+            "max": 1.003297
+          }
+        },
+        "dominantGroupPairs": [
+          {
+            "group": "Spine",
+            "overlapPairs": 387
+          },
+          {
+            "group": "LowerArm_R",
+            "overlapPairs": 307
+          },
+          {
+            "group": "LowerArm_L",
+            "overlapPairs": 300
+          },
+          {
+            "group": "Chest",
+            "overlapPairs": 267
+          },
+          {
+            "group": "UpperArm_L",
+            "overlapPairs": 264
+          },
+          {
+            "group": "UpperArm_Twist_L",
+            "overlapPairs": 254
+          },
+          {
+            "group": "UpperArm_R",
+            "overlapPairs": 250
+          },
+          {
+            "group": "UpperArm_Twist_R",
+            "overlapPairs": 246
+          },
+          {
+            "group": "Shoulder_R",
+            "overlapPairs": 108
+          },
+          {
+            "group": "LowerArm_Twist_R",
+            "overlapPairs": 106
+          },
+          {
+            "group": "Shoulder_L",
+            "overlapPairs": 106
+          },
+          {
+            "group": "LowerArm_Twist_L",
+            "overlapPairs": 102
+          },
+          {
+            "group": "Hips",
+            "overlapPairs": 85
+          }
+        ],
+        "topVoxels": [
+          {
+            "voxelCenter": [
+              0.05,
+              0.0,
+              0.85
+            ],
+            "overlapPairs": 219,
+            "uniqueGarmentPolygons": 178,
+            "bounds": {
+              "min": [
+                0.025723,
+                -0.018156,
+                0.825455
+              ],
+              "max": [
+                0.059773,
+                0.024778,
+                0.874549
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.310899
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.231427
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.195132
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.16327
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.05186
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.01552
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.015337
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.010859
+              },
+              {
+                "group": "LowerArm_Twist_R",
+                "meanWeight": 0.003754
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.001942
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.0,
+              0.85
+            ],
+            "overlapPairs": 209,
+            "uniqueGarmentPolygons": 170,
+            "bounds": {
+              "min": [
+                -0.060478,
+                -0.018638,
+                0.825382
+              ],
+              "max": [
+                -0.025174,
+                0.024842,
+                0.874499
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.310476
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.251823
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.192814
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.148255
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.049007
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.016391
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.014933
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.009635
+              },
+              {
+                "group": "LowerArm_Twist_L",
+                "meanWeight": 0.004056
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.00261
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.0,
+              0.85
+            ],
+            "overlapPairs": 204,
+            "uniqueGarmentPolygons": 132,
+            "bounds": {
+              "min": [
+                -0.024882,
+                -0.012778,
+                0.842991
+              ],
+              "max": [
+                0.024956,
+                0.024942,
+                0.874896
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Spine",
+                "meanWeight": 0.603825
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.124081
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.090234
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.083248
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.070481
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.01027
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.00988
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.004335
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.003646
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.1,
+              0.0,
+              1.0
+            ],
+            "overlapPairs": 147,
+            "uniqueGarmentPolygons": 107,
+            "bounds": {
+              "min": [
+                -0.091479,
+                -0.024344,
+                0.975259
+              ],
+              "max": [
+                -0.075675,
+                0.024775,
+                0.992206
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.366114
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.34464
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.289246
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.0,
+              0.9
+            ],
+            "overlapPairs": 139,
+            "uniqueGarmentPolygons": 99,
+            "bounds": {
+              "min": [
+                -0.02441,
+                -0.012911,
+                0.875133
+              ],
+              "max": [
+                0.024318,
+                0.024949,
+                0.922506
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.374076
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.357929
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.129616
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.126144
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.006123
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.006112
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.05,
+              0.85
+            ],
+            "overlapPairs": 135,
+            "uniqueGarmentPolygons": 115,
+            "bounds": {
+              "min": [
+                -0.024927,
+                0.025043,
+                0.825041
+              ],
+              "max": [
+                0.024652,
+                0.036191,
+                0.874825
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Spine",
+                "meanWeight": 0.368265
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.167356
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.163337
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.139268
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.072619
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.043776
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.040162
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.002608
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.002608
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              0.0,
+              1.0
+            ],
+            "overlapPairs": 126,
+            "uniqueGarmentPolygons": 88,
+            "bounds": {
+              "min": [
+                0.075675,
+                -0.024843,
+                0.975432
+              ],
+              "max": [
+                0.091254,
+                0.024489,
+                0.990882
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.368831
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.350709
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.28046
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.0,
+              0.8
+            ],
+            "overlapPairs": 113,
+            "uniqueGarmentPolygons": 83,
+            "bounds": {
+              "min": [
+                -0.069198,
+                -0.003586,
+                0.776297
+              ],
+              "max": [
+                -0.025156,
+                0.024902,
+                0.824898
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.519274
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.207639
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.180519
+              },
+              {
+                "group": "LowerArm_Twist_L",
+                "meanWeight": 0.064676
+              },
+              {
+                "group": "LowerArm_Twist_R",
+                "meanWeight": 0.027481
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.000412
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.0,
+              0.8
+            ],
+            "overlapPairs": 112,
+            "uniqueGarmentPolygons": 84,
+            "bounds": {
+              "min": [
+                0.025547,
+                -0.001158,
+                0.776233
+              ],
+              "max": [
+                0.069332,
+                0.023908,
+                0.824535
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.489837
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.223988
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.200781
+              },
+              {
+                "group": "LowerArm_Twist_R",
+                "meanWeight": 0.062876
+              },
+              {
+                "group": "LowerArm_Twist_L",
+                "meanWeight": 0.022026
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.000492
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.05,
+              0.8
+            ],
+            "overlapPairs": 101,
+            "uniqueGarmentPolygons": 64,
+            "bounds": {
+              "min": [
+                -0.024719,
+                0.027584,
+                0.775195
+              ],
+              "max": [
+                0.024556,
+                0.039302,
+                0.824426
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.443254
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.279803
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.116729
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.116729
+              },
+              {
+                "group": "LowerArm_Twist_L",
+                "meanWeight": 0.021447
+              },
+              {
+                "group": "LowerArm_Twist_R",
+                "meanWeight": 0.021447
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.000285
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.000285
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 2e-05
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.05,
+              0.75
+            ],
+            "overlapPairs": 100,
+            "uniqueGarmentPolygons": 61,
+            "bounds": {
+              "min": [
+                -0.024251,
+                0.02508,
+                0.72523
+              ],
+              "max": [
+                0.024675,
+                0.052596,
+                0.774312
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.35218
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.309282
+              },
+              {
+                "group": "LowerArm_Twist_L",
+                "meanWeight": 0.17876
+              },
+              {
+                "group": "LowerArm_Twist_R",
+                "meanWeight": 0.159226
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.00031
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.000242
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.0,
+              1.0
+            ],
+            "overlapPairs": 80,
+            "uniqueGarmentPolygons": 63,
+            "bounds": {
+              "min": [
+                0.052181,
+                -0.023413,
+                0.990132
+              ],
+              "max": [
+                0.073676,
+                0.024466,
+                1.002728
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.571293
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.216491
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.211815
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.000402
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.0,
+              1.0
+            ],
+            "overlapPairs": 78,
+            "uniqueGarmentPolygons": 64,
+            "bounds": {
+              "min": [
+                -0.0741,
+                -0.022721,
+                0.989862
+              ],
+              "max": [
+                -0.052624,
+                0.024824,
+                1.002506
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.568419
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.218241
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.212966
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.000374
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.05,
+              0.9
+            ],
+            "overlapPairs": 77,
+            "uniqueGarmentPolygons": 61,
+            "bounds": {
+              "min": [
+                -0.02472,
+                0.025778,
+                0.875016
+              ],
+              "max": [
+                0.023874,
+                0.035318,
+                0.896082
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.422783
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.205663
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.158459
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.15728
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.026905
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.025714
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.001541
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.001529
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.000125
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.05,
+              1.0
+            ],
+            "overlapPairs": 48,
+            "uniqueGarmentPolygons": 36,
+            "bounds": {
+              "min": [
+                0.026026,
+                0.025241,
+                0.975361
+              ],
+              "max": [
+                0.074555,
+                0.037746,
+                1.003253
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.713853
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.128003
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.112949
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.045195
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.05,
+              0.7
+            ],
+            "overlapPairs": 45,
+            "uniqueGarmentPolygons": 35,
+            "bounds": {
+              "min": [
+                0.025524,
+                0.0517,
+                0.682409
+              ],
+              "max": [
+                0.054226,
+                0.060076,
+                0.724687
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_Twist_R",
+                "meanWeight": 0.782526
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.201843
+              },
+              {
+                "group": "Hand_R",
+                "meanWeight": 0.015631
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.05,
+              0.7
+            ],
+            "overlapPairs": 44,
+            "uniqueGarmentPolygons": 33,
+            "bounds": {
+              "min": [
+                -0.055414,
+                0.052923,
+                0.683125
+              ],
+              "max": [
+                -0.029533,
+                0.060562,
+                0.724395
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_Twist_L",
+                "meanWeight": 0.795053
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.188855
+              },
+              {
+                "group": "Hand_L",
+                "meanWeight": 0.016092
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.05,
+              1.0
+            ],
+            "overlapPairs": 44,
+            "uniqueGarmentPolygons": 32,
+            "bounds": {
+              "min": [
+                -0.074948,
+                0.025153,
+                0.976489
+              ],
+              "max": [
+                -0.026166,
+                0.035894,
+                1.00322
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.70345
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.139367
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.119953
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.03723
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.05,
+              0.9
+            ],
+            "overlapPairs": 44,
+            "uniqueGarmentPolygons": 37,
+            "bounds": {
+              "min": [
+                0.025447,
+                0.025279,
+                0.88548
+              ],
+              "max": [
+                0.051952,
+                0.033773,
+                0.900374
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.89891
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.101088
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 2e-06
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 43,
+            "uniqueGarmentPolygons": 33,
+            "bounds": {
+              "min": [
+                0.075019,
+                -0.042061,
+                0.975555
+              ],
+              "max": [
+                0.081983,
+                -0.025674,
+                0.997408
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.468294
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.277774
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.23597
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.017962
+              }
+            ]
+          }
+        ]
+      },
+      "Heather_Hood_Folded_Roll": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Placket": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_01": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_02": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_03": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_L": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_R": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      }
+    },
+    "arm-cross": {
+      "Heather_Body_Shell": {
+        "overlapPairs": 1048,
+        "mappedPairs": 1048,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 857,
+        "rootLocalBounds": {
+          "min": [
+            -0.198541,
+            -0.06606,
+            0.868012
+          ],
+          "max": [
+            0.199758,
+            0.004383,
+            0.998475
+          ]
+        },
+        "rootLocalQuantiles": {
+          "x": {
+            "min": -0.198541,
+            "p10": -0.171805,
+            "median": -0.073412,
+            "p90": 0.173418,
+            "max": 0.199758
+          },
+          "y": {
+            "min": -0.06606,
+            "p10": -0.058074,
+            "median": -0.035938,
+            "p90": -0.006724,
+            "max": 0.004383
+          },
+          "z": {
+            "min": 0.868012,
+            "p10": 0.879168,
+            "median": 0.96927,
+            "p90": 0.978933,
+            "max": 0.998475
+          }
+        },
+        "dominantGroupPairs": [
+          {
+            "group": "Chest",
+            "overlapPairs": 314
+          },
+          {
+            "group": "UpperArm_R",
+            "overlapPairs": 158
+          },
+          {
+            "group": "UpperArm_L",
+            "overlapPairs": 156
+          },
+          {
+            "group": "UpperArm_Twist_L",
+            "overlapPairs": 99
+          },
+          {
+            "group": "UpperArm_Twist_R",
+            "overlapPairs": 95
+          },
+          {
+            "group": "LowerArm_L",
+            "overlapPairs": 70
+          },
+          {
+            "group": "LowerArm_R",
+            "overlapPairs": 65
+          },
+          {
+            "group": "Shoulder_R",
+            "overlapPairs": 50
+          },
+          {
+            "group": "Shoulder_L",
+            "overlapPairs": 41
+          }
+        ],
+        "topVoxels": [
+          {
+            "voxelCenter": [
+              -0.1,
+              0.0,
+              0.95
+            ],
+            "overlapPairs": 191,
+            "uniqueGarmentPolygons": 161,
+            "bounds": {
+              "min": [
+                -0.103955,
+                -0.024747,
+                0.95668
+              ],
+              "max": [
+                -0.076067,
+                0.004383,
+                0.97499
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.374926
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.344159
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.276494
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.00442
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              0.0,
+              0.95
+            ],
+            "overlapPairs": 173,
+            "uniqueGarmentPolygons": 147,
+            "bounds": {
+              "min": [
+                0.075098,
+                -0.02486,
+                0.954076
+              ],
+              "max": [
+                0.10546,
+                0.004035,
+                0.974829
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.393634
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.338048
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.262682
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.005636
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.2,
+              -0.05,
+              0.9
+            ],
+            "overlapPairs": 88,
+            "uniqueGarmentPolygons": 71,
+            "bounds": {
+              "min": [
+                0.175206,
+                -0.060788,
+                0.87514
+              ],
+              "max": [
+                0.199758,
+                -0.041017,
+                0.898277
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.603945
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.388466
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.007589
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.2,
+              -0.05,
+              0.9
+            ],
+            "overlapPairs": 82,
+            "uniqueGarmentPolygons": 66,
+            "bounds": {
+              "min": [
+                -0.198541,
+                -0.060737,
+                0.875019
+              ],
+              "max": [
+                -0.17554,
+                -0.04182,
+                0.898444
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.591043
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.402707
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.00625
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.1,
+              -0.05,
+              0.95
+            ],
+            "overlapPairs": 80,
+            "uniqueGarmentPolygons": 62,
+            "bounds": {
+              "min": [
+                -0.099932,
+                -0.047993,
+                0.958054
+              ],
+              "max": [
+                -0.0751,
+                -0.02539,
+                0.97489
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.580685
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.232215
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.168375
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.017467
+              },
+              {
+                "group": "Breast_R",
+                "meanWeight": 0.001259
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 79,
+            "uniqueGarmentPolygons": 62,
+            "bounds": {
+              "min": [
+                0.075092,
+                -0.04729,
+                0.975337
+              ],
+              "max": [
+                0.097803,
+                -0.025032,
+                0.994307
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.34704
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.331941
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.315724
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.005225
+              },
+              {
+                "group": "Breast_L",
+                "meanWeight": 7e-05
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              -0.05,
+              0.95
+            ],
+            "overlapPairs": 72,
+            "uniqueGarmentPolygons": 60,
+            "bounds": {
+              "min": [
+                0.075132,
+                -0.048012,
+                0.958617
+              ],
+              "max": [
+                0.099633,
+                -0.02593,
+                0.974319
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.596777
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.226195
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.157999
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.017794
+              },
+              {
+                "group": "Breast_L",
+                "meanWeight": 0.001236
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.1,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 66,
+            "uniqueGarmentPolygons": 46,
+            "bounds": {
+              "min": [
+                -0.097563,
+                -0.047577,
+                0.97525
+              ],
+              "max": [
+                -0.075058,
+                -0.025199,
+                0.994342
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.354402
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.326262
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.312585
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.006434
+              },
+              {
+                "group": "Breast_R",
+                "meanWeight": 0.000317
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.15,
+              -0.05,
+              0.9
+            ],
+            "overlapPairs": 48,
+            "uniqueGarmentPolygons": 40,
+            "bounds": {
+              "min": [
+                0.165035,
+                -0.064165,
+                0.875631
+              ],
+              "max": [
+                0.17493,
+                -0.050067,
+                0.897535
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.671746
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.326763
+              },
+              {
+                "group": "LowerArm_Twist_L",
+                "meanWeight": 0.001491
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.15,
+              -0.05,
+              0.9
+            ],
+            "overlapPairs": 46,
+            "uniqueGarmentPolygons": 38,
+            "bounds": {
+              "min": [
+                -0.174344,
+                -0.06606,
+                0.875034
+              ],
+              "max": [
+                -0.162879,
+                -0.048183,
+                0.897995
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.675453
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.322985
+              },
+              {
+                "group": "LowerArm_Twist_R",
+                "meanWeight": 0.001562
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.15,
+              -0.05,
+              0.85
+            ],
+            "overlapPairs": 26,
+            "uniqueGarmentPolygons": 22,
+            "bounds": {
+              "min": [
+                0.166868,
+                -0.065777,
+                0.868012
+              ],
+              "max": [
+                0.174337,
+                -0.048825,
+                0.872505
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.852016
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.122724
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.02526
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.15,
+              -0.05,
+              0.85
+            ],
+            "overlapPairs": 26,
+            "uniqueGarmentPolygons": 22,
+            "bounds": {
+              "min": [
+                -0.173796,
+                -0.065688,
+                0.868092
+              ],
+              "max": [
+                -0.167146,
+                -0.049194,
+                0.872925
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.843297
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.136391
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.020313
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 21,
+            "uniqueGarmentPolygons": 18,
+            "bounds": {
+              "min": [
+                0.073203,
+                -0.047914,
+                0.977076
+              ],
+              "max": [
+                0.074979,
+                -0.02872,
+                0.998475
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.626477
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.219572
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.143687
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.010264
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 18,
+            "uniqueGarmentPolygons": 15,
+            "bounds": {
+              "min": [
+                -0.074957,
+                -0.046836,
+                0.977052
+              ],
+              "max": [
+                -0.072971,
+                -0.032741,
+                0.998098
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.617577
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.22476
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.144076
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.013587
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.1,
+              0.0,
+              1.0
+            ],
+            "overlapPairs": 10,
+            "uniqueGarmentPolygons": 10,
+            "bounds": {
+              "min": [
+                -0.091317,
+                -0.024902,
+                0.975018
+              ],
+              "max": [
+                -0.087403,
+                -0.021499,
+                0.975779
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.357776
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.339711
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.302512
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              0.0,
+              1.0
+            ],
+            "overlapPairs": 8,
+            "uniqueGarmentPolygons": 7,
+            "bounds": {
+              "min": [
+                0.079552,
+                -0.023723,
+                0.975018
+              ],
+              "max": [
+                0.088571,
+                -0.018681,
+                0.975754
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.417475
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.296262
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.286263
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.2,
+              -0.05,
+              0.85
+            ],
+            "overlapPairs": 7,
+            "uniqueGarmentPolygons": 5,
+            "bounds": {
+              "min": [
+                0.176516,
+                -0.047959,
+                0.872607
+              ],
+              "max": [
+                0.180861,
+                -0.044067,
+                0.874667
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.902339
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.053613
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.044048
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.2,
+              -0.05,
+              0.85
+            ],
+            "overlapPairs": 6,
+            "uniqueGarmentPolygons": 4,
+            "bounds": {
+              "min": [
+                -0.178998,
+                -0.048132,
+                0.872492
+              ],
+              "max": [
+                -0.176248,
+                -0.044272,
+                0.874193
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.902063
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.053146
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.044792
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.0,
+              0.95
+            ],
+            "overlapPairs": 1,
+            "uniqueGarmentPolygons": 1,
+            "bounds": {
+              "min": [
+                -0.074901,
+                -0.023042,
+                0.974565
+              ],
+              "max": [
+                -0.074901,
+                -0.023042,
+                0.974565
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.504281
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.276776
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.218926
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 1.7e-05
+              }
+            ]
+          }
+        ]
+      },
+      "Heather_Hood_Folded_Roll": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Placket": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_01": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_02": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_03": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_L": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_R": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      }
+    },
+    "crouch": {
+      "Heather_Body_Shell": {
+        "overlapPairs": 1035,
+        "mappedPairs": 1035,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 797,
+        "rootLocalBounds": {
+          "min": [
+            -0.043186,
+            0.083369,
+            0.569977
+          ],
+          "max": [
+            0.043206,
+            0.235749,
+            0.677706
+          ]
+        },
+        "rootLocalQuantiles": {
+          "x": {
+            "min": -0.043186,
+            "p10": -0.016351,
+            "median": 0.000183,
+            "p90": 0.015364,
+            "max": 0.043206
+          },
+          "y": {
+            "min": 0.083369,
+            "p10": 0.115983,
+            "median": 0.15849,
+            "p90": 0.213467,
+            "max": 0.235749
+          },
+          "z": {
+            "min": 0.569977,
+            "p10": 0.594583,
+            "median": 0.637649,
+            "p90": 0.672843,
+            "max": 0.677706
+          }
+        },
+        "dominantGroupPairs": [
+          {
+            "group": "UpperLeg_R",
+            "overlapPairs": 387
+          },
+          {
+            "group": "UpperLeg_L",
+            "overlapPairs": 373
+          },
+          {
+            "group": "Hips",
+            "overlapPairs": 275
+          }
+        ],
+        "topVoxels": [
+          {
+            "voxelCenter": [
+              0.0,
+              0.15,
+              0.65
+            ],
+            "overlapPairs": 359,
+            "uniqueGarmentPolygons": 285,
+            "bounds": {
+              "min": [
+                -0.024855,
+                0.12521,
+                0.633381
+              ],
+              "max": [
+                0.024846,
+                0.174421,
+                0.670808
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.475996
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.263802
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.260202
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.15,
+              0.6
+            ],
+            "overlapPairs": 132,
+            "uniqueGarmentPolygons": 89,
+            "bounds": {
+              "min": [
+                -0.015504,
+                0.12518,
+                0.576741
+              ],
+              "max": [
+                0.015793,
+                0.173121,
+                0.618938
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.506643
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.473545
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.019813
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.1,
+              0.65
+            ],
+            "overlapPairs": 119,
+            "uniqueGarmentPolygons": 75,
+            "bounds": {
+              "min": [
+                -0.007189,
+                0.083369,
+                0.625752
+              ],
+              "max": [
+                0.007014,
+                0.124528,
+                0.65749
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.354709
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.334068
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.311223
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.1,
+              0.6
+            ],
+            "overlapPairs": 75,
+            "uniqueGarmentPolygons": 56,
+            "bounds": {
+              "min": [
+                -0.013924,
+                0.112192,
+                0.605459
+              ],
+              "max": [
+                0.013841,
+                0.124962,
+                0.624794
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.480568
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.46088
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.058552
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.2,
+              0.6
+            ],
+            "overlapPairs": 74,
+            "uniqueGarmentPolygons": 54,
+            "bounds": {
+              "min": [
+                -0.01176,
+                0.205315,
+                0.60552
+              ],
+              "max": [
+                0.011761,
+                0.224923,
+                0.624448
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.495109
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.495109
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.009782
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.2,
+              0.65
+            ],
+            "overlapPairs": 72,
+            "uniqueGarmentPolygons": 58,
+            "bounds": {
+              "min": [
+                -0.010671,
+                0.175607,
+                0.625705
+              ],
+              "max": [
+                0.010664,
+                0.206484,
+                0.63818
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.507939
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.476254
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.015807
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.25,
+              0.6
+            ],
+            "overlapPairs": 62,
+            "uniqueGarmentPolygons": 54,
+            "bounds": {
+              "min": [
+                -0.014783,
+                0.225772,
+                0.601895
+              ],
+              "max": [
+                0.014554,
+                0.235749,
+                0.611248
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.496652
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.496652
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.006696
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.15,
+              0.65
+            ],
+            "overlapPairs": 40,
+            "uniqueGarmentPolygons": 36,
+            "bounds": {
+              "min": [
+                -0.034217,
+                0.166424,
+                0.669685
+              ],
+              "max": [
+                -0.025076,
+                0.172104,
+                0.674818
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.548039
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.451961
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.15,
+              0.65
+            ],
+            "overlapPairs": 38,
+            "uniqueGarmentPolygons": 34,
+            "bounds": {
+              "min": [
+                0.025073,
+                0.166509,
+                0.669608
+              ],
+              "max": [
+                0.035874,
+                0.172798,
+                0.674817
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.541925
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.458075
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.15,
+              0.7
+            ],
+            "overlapPairs": 27,
+            "uniqueGarmentPolygons": 23,
+            "bounds": {
+              "min": [
+                -0.043186,
+                0.170414,
+                0.675042
+              ],
+              "max": [
+                -0.032586,
+                0.173012,
+                0.677624
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.519131
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.480869
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.15,
+              0.7
+            ],
+            "overlapPairs": 25,
+            "uniqueGarmentPolygons": 21,
+            "bounds": {
+              "min": [
+                0.033131,
+                0.170667,
+                0.675049
+              ],
+              "max": [
+                0.043206,
+                0.173832,
+                0.677706
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.522748
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.477252
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.15,
+              0.55
+            ],
+            "overlapPairs": 12,
+            "uniqueGarmentPolygons": 12,
+            "bounds": {
+              "min": [
+                -0.012097,
+                0.168959,
+                0.569977
+              ],
+              "max": [
+                0.012139,
+                0.174963,
+                0.574832
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.494824
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.494824
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.010352
+              }
+            ]
+          }
+        ]
+      },
+      "Heather_Hood_Folded_Roll": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Placket": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_01": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_02": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_03": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_L": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_R": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      }
+    },
+    "sit": {
+      "Heather_Body_Shell": {
+        "overlapPairs": 691,
+        "mappedPairs": 691,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 550,
+        "rootLocalBounds": {
+          "min": [
+            -0.107996,
+            0.156985,
+            0.651938
+          ],
+          "max": [
+            0.107812,
+            0.241925,
+            0.722541
+          ]
+        },
+        "rootLocalQuantiles": {
+          "x": {
+            "min": -0.107996,
+            "p10": -0.066457,
+            "median": 0.000281,
+            "p90": 0.065573,
+            "max": 0.107812
+          },
+          "y": {
+            "min": 0.156985,
+            "p10": 0.18211,
+            "median": 0.228661,
+            "p90": 0.239548,
+            "max": 0.241925
+          },
+          "z": {
+            "min": 0.651938,
+            "p10": 0.659085,
+            "median": 0.704287,
+            "p90": 0.720221,
+            "max": 0.722541
+          }
+        },
+        "dominantGroupPairs": [
+          {
+            "group": "Hips",
+            "overlapPairs": 422
+          },
+          {
+            "group": "UpperLeg_R",
+            "overlapPairs": 138
+          },
+          {
+            "group": "UpperLeg_L",
+            "overlapPairs": 131
+          }
+        ],
+        "topVoxels": [
+          {
+            "voxelCenter": [
+              0.0,
+              0.25,
+              0.7
+            ],
+            "overlapPairs": 129,
+            "uniqueGarmentPolygons": 108,
+            "bounds": {
+              "min": [
+                -0.024949,
+                0.225002,
+                0.683592
+              ],
+              "max": [
+                0.024427,
+                0.238391,
+                0.70984
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.671146
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.168651
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.160204
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.25,
+              0.7
+            ],
+            "overlapPairs": 111,
+            "uniqueGarmentPolygons": 90,
+            "bounds": {
+              "min": [
+                -0.074313,
+                0.231503,
+                0.70859
+              ],
+              "max": [
+                -0.025456,
+                0.241925,
+                0.722541
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.584596
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.415404
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.25,
+              0.7
+            ],
+            "overlapPairs": 108,
+            "uniqueGarmentPolygons": 86,
+            "bounds": {
+              "min": [
+                0.025041,
+                0.23151,
+                0.708759
+              ],
+              "max": [
+                0.074293,
+                0.241917,
+                0.722409
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.577069
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.422931
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.2,
+              0.65
+            ],
+            "overlapPairs": 103,
+            "uniqueGarmentPolygons": 79,
+            "bounds": {
+              "min": [
+                -0.009438,
+                0.175229,
+                0.655166
+              ],
+              "max": [
+                0.009216,
+                0.217833,
+                0.6747
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.456155
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.275233
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.268612
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.2,
+              0.7
+            ],
+            "overlapPairs": 92,
+            "uniqueGarmentPolygons": 73,
+            "bounds": {
+              "min": [
+                -0.012318,
+                0.197822,
+                0.675101
+              ],
+              "max": [
+                0.011684,
+                0.224738,
+                0.689426
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.490479
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.262149
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.247372
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.15,
+              0.65
+            ],
+            "overlapPairs": 52,
+            "uniqueGarmentPolygons": 37,
+            "bounds": {
+              "min": [
+                -0.003157,
+                0.156985,
+                0.651938
+              ],
+              "max": [
+                0.003157,
+                0.174375,
+                0.657264
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.561913
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.226053
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.212035
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.1,
+              0.25,
+              0.7
+            ],
+            "overlapPairs": 25,
+            "uniqueGarmentPolygons": 19,
+            "bounds": {
+              "min": [
+                -0.096036,
+                0.225286,
+                0.715625
+              ],
+              "max": [
+                -0.075789,
+                0.235665,
+                0.72102
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.86522
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.13478
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              0.25,
+              0.7
+            ],
+            "overlapPairs": 25,
+            "uniqueGarmentPolygons": 19,
+            "bounds": {
+              "min": [
+                0.075207,
+                0.225328,
+                0.715711
+              ],
+              "max": [
+                0.096001,
+                0.235953,
+                0.719304
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.862839
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.137161
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              0.2,
+              0.7
+            ],
+            "overlapPairs": 24,
+            "uniqueGarmentPolygons": 20,
+            "bounds": {
+              "min": [
+                0.097404,
+                0.214913,
+                0.71148
+              ],
+              "max": [
+                0.107812,
+                0.224493,
+                0.715269
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.754396
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.245604
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.1,
+              0.2,
+              0.7
+            ],
+            "overlapPairs": 22,
+            "uniqueGarmentPolygons": 19,
+            "bounds": {
+              "min": [
+                -0.107996,
+                0.21481,
+                0.711587
+              ],
+              "max": [
+                -0.097121,
+                0.224555,
+                0.715584
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Hips",
+                "meanWeight": 0.751665
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.248335
+              }
+            ]
+          }
+        ]
+      },
+      "Heather_Hood_Folded_Roll": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Placket": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_01": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_02": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_03": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_L": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_R": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      }
+    },
+    "prone": {
+      "Heather_Body_Shell": {
+        "overlapPairs": 2398,
+        "mappedPairs": 2398,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 1734,
+        "rootLocalBounds": {
+          "min": [
+            -0.088799,
+            -0.115169,
+            0.52101
+          ],
+          "max": [
+            0.088789,
+            0.03941,
+            1.031363
+          ]
+        },
+        "rootLocalQuantiles": {
+          "x": {
+            "min": -0.088799,
+            "p10": -0.072626,
+            "median": -0.000577,
+            "p90": 0.071645,
+            "max": 0.088789
+          },
+          "y": {
+            "min": -0.115169,
+            "p10": -0.089769,
+            "median": -0.026126,
+            "p90": 0.008103,
+            "max": 0.03941
+          },
+          "z": {
+            "min": 0.52101,
+            "p10": 0.557761,
+            "median": 0.943145,
+            "p90": 1.007461,
+            "max": 1.031363
+          }
+        },
+        "dominantGroupPairs": [
+          {
+            "group": "Chest",
+            "overlapPairs": 436
+          },
+          {
+            "group": "UpperArm_Twist_R",
+            "overlapPairs": 331
+          },
+          {
+            "group": "UpperArm_R",
+            "overlapPairs": 330
+          },
+          {
+            "group": "UpperArm_Twist_L",
+            "overlapPairs": 326
+          },
+          {
+            "group": "UpperArm_L",
+            "overlapPairs": 319
+          },
+          {
+            "group": "UpperLeg_L",
+            "overlapPairs": 153
+          },
+          {
+            "group": "UpperLeg_R",
+            "overlapPairs": 147
+          },
+          {
+            "group": "Shoulder_R",
+            "overlapPairs": 115
+          },
+          {
+            "group": "Shoulder_L",
+            "overlapPairs": 113
+          },
+          {
+            "group": "Spine",
+            "overlapPairs": 106
+          },
+          {
+            "group": "LowerArm_R",
+            "overlapPairs": 11
+          },
+          {
+            "group": "LowerArm_L",
+            "overlapPairs": 11
+          }
+        ],
+        "topVoxels": [
+          {
+            "voxelCenter": [
+              0.0,
+              0.0,
+              0.9
+            ],
+            "overlapPairs": 235,
+            "uniqueGarmentPolygons": 184,
+            "bounds": {
+              "min": [
+                -0.024312,
+                -0.016076,
+                0.875669
+              ],
+              "max": [
+                0.024388,
+                0.024428,
+                0.923852
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.293595
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.232998
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.215297
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.201556
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.019614
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.018199
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.008613
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.008224
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.001904
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              -0.05,
+              0.55
+            ],
+            "overlapPairs": 165,
+            "uniqueGarmentPolygons": 123,
+            "bounds": {
+              "min": [
+                -0.010638,
+                -0.058811,
+                0.525367
+              ],
+              "max": [
+                0.01082,
+                -0.025201,
+                0.565633
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.510854
+              },
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.479425
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.009722
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.0,
+              0.9
+            ],
+            "overlapPairs": 162,
+            "uniqueGarmentPolygons": 111,
+            "bounds": {
+              "min": [
+                0.025005,
+                -0.024979,
+                0.875147
+              ],
+              "max": [
+                0.050064,
+                0.024109,
+                0.924394
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.241606
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.220792
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.204449
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.121943
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.113053
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.091896
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.005138
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.000857
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.000265
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.0,
+              0.9
+            ],
+            "overlapPairs": 157,
+            "uniqueGarmentPolygons": 108,
+            "bounds": {
+              "min": [
+                -0.052093,
+                -0.024797,
+                0.875261
+              ],
+              "max": [
+                -0.025181,
+                0.024502,
+                0.924346
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.245643
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.224477
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.202801
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.123296
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.113863
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.08237
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.006197
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.000809
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.000543
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.0,
+              0.95
+            ],
+            "overlapPairs": 145,
+            "uniqueGarmentPolygons": 112,
+            "bounds": {
+              "min": [
+                -0.024963,
+                -0.017262,
+                0.925031
+              ],
+              "max": [
+                0.024463,
+                0.003904,
+                0.974731
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.914053
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.025996
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.017482
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.016348
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.014946
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.011141
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 1.7e-05
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 1.7e-05
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              -0.1,
+              1.0
+            ],
+            "overlapPairs": 110,
+            "uniqueGarmentPolygons": 90,
+            "bounds": {
+              "min": [
+                -0.074973,
+                -0.115169,
+                0.982902
+              ],
+              "max": [
+                -0.053921,
+                -0.076036,
+                1.015353
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.597055
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.209181
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.191847
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.001918
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.05,
+              0.9
+            ],
+            "overlapPairs": 108,
+            "uniqueGarmentPolygons": 77,
+            "bounds": {
+              "min": [
+                -0.02389,
+                0.026694,
+                0.87681
+              ],
+              "max": [
+                0.024943,
+                0.03941,
+                0.915776
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.474397
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.448932
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.022009
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.019766
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.018802
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.016094
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 105,
+            "uniqueGarmentPolygons": 63,
+            "bounds": {
+              "min": [
+                -0.024692,
+                -0.056304,
+                0.975437
+              ],
+              "max": [
+                0.023036,
+                -0.025882,
+                1.021563
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.355053
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.335593
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.152363
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.147201
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.005006
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.002534
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.002249
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              -0.1,
+              1.0
+            ],
+            "overlapPairs": 101,
+            "uniqueGarmentPolygons": 80,
+            "bounds": {
+              "min": [
+                0.055012,
+                -0.115041,
+                0.982976
+              ],
+              "max": [
+                0.074879,
+                -0.076827,
+                1.015176
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.602976
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.205907
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.188989
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.002128
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.1,
+              -0.1,
+              1.0
+            ],
+            "overlapPairs": 100,
+            "uniqueGarmentPolygons": 67,
+            "bounds": {
+              "min": [
+                -0.083125,
+                -0.109683,
+                0.975057
+              ],
+              "max": [
+                -0.075106,
+                -0.076056,
+                0.99202
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.40502
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.304103
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.286578
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.004299
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              -0.1,
+              1.0
+            ],
+            "overlapPairs": 97,
+            "uniqueGarmentPolygons": 66,
+            "bounds": {
+              "min": [
+                0.075235,
+                -0.108801,
+                0.975209
+              ],
+              "max": [
+                0.083223,
+                -0.076006,
+                0.99202
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.398551
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.30701
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.290451
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.003988
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.0,
+              0.55
+            ],
+            "overlapPairs": 94,
+            "uniqueGarmentPolygons": 74,
+            "bounds": {
+              "min": [
+                -0.010414,
+                -0.024946,
+                0.526197
+              ],
+              "max": [
+                0.010415,
+                -0.016061,
+                0.565515
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperLeg_R",
+                "meanWeight": 0.494898
+              },
+              {
+                "group": "UpperLeg_L",
+                "meanWeight": 0.494898
+              },
+              {
+                "group": "Hips",
+                "meanWeight": 0.010204
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.1,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 91,
+            "uniqueGarmentPolygons": 59,
+            "bounds": {
+              "min": [
+                -0.088799,
+                -0.073721,
+                0.987802
+              ],
+              "max": [
+                -0.075344,
+                -0.040801,
+                1.020453
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.375226
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.312703
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.312062
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 8e-06
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.1,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 89,
+            "uniqueGarmentPolygons": 56,
+            "bounds": {
+              "min": [
+                0.075024,
+                -0.074119,
+                0.987744
+              ],
+              "max": [
+                0.088789,
+                -0.041418,
+                1.020391
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.374353
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.313888
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.31175
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 9e-06
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              0.0,
+              0.95
+            ],
+            "overlapPairs": 77,
+            "uniqueGarmentPolygons": 59,
+            "bounds": {
+              "min": [
+                0.025176,
+                -0.024801,
+                0.925038
+              ],
+              "max": [
+                0.056711,
+                0.003104,
+                0.972222
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.448718
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.357312
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.13131
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.023471
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.019928
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.015029
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.004131
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.000101
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              0.0,
+              0.95
+            ],
+            "overlapPairs": 70,
+            "uniqueGarmentPolygons": 52,
+            "bounds": {
+              "min": [
+                -0.047962,
+                -0.024953,
+                0.925819
+              ],
+              "max": [
+                -0.025714,
+                0.002634,
+                0.972132
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "Chest",
+                "meanWeight": 0.445346
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.390525
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.146516
+              },
+              {
+                "group": "Spine",
+                "meanWeight": 0.01365
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.003943
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 2e-05
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              -0.05,
+              0.95
+            ],
+            "overlapPairs": 55,
+            "uniqueGarmentPolygons": 34,
+            "bounds": {
+              "min": [
+                -0.074459,
+                -0.05202,
+                0.925329
+              ],
+              "max": [
+                -0.025023,
+                -0.025201,
+                0.971478
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.453199
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.225061
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.201326
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.1125
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.004566
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.003022
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.000327
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.05,
+              -0.05,
+              0.95
+            ],
+            "overlapPairs": 54,
+            "uniqueGarmentPolygons": 35,
+            "bounds": {
+              "min": [
+                0.025018,
+                -0.055222,
+                0.930008
+              ],
+              "max": [
+                0.074358,
+                -0.0252,
+                0.97368
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.441889
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.238012
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.206492
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.106395
+              },
+              {
+                "group": "Shoulder_L",
+                "meanWeight": 0.003951
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.002782
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.00048
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              -0.05,
+              -0.05,
+              1.0
+            ],
+            "overlapPairs": 50,
+            "uniqueGarmentPolygons": 36,
+            "bounds": {
+              "min": [
+                -0.072897,
+                -0.074952,
+                1.010474
+              ],
+              "max": [
+                -0.025556,
+                -0.038521,
+                1.023841
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.640003
+              },
+              {
+                "group": "Shoulder_R",
+                "meanWeight": 0.183611
+              },
+              {
+                "group": "Chest",
+                "meanWeight": 0.162317
+              },
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.01407
+              }
+            ]
+          },
+          {
+            "voxelCenter": [
+              0.0,
+              0.0,
+              0.85
+            ],
+            "overlapPairs": 49,
+            "uniqueGarmentPolygons": 45,
+            "bounds": {
+              "min": [
+                -0.024522,
+                -0.011634,
+                0.871631
+              ],
+              "max": [
+                0.024468,
+                -0.009181,
+                0.874979
+              ]
+            },
+            "topWeights": [
+              {
+                "group": "UpperArm_Twist_R",
+                "meanWeight": 0.42339
+              },
+              {
+                "group": "UpperArm_Twist_L",
+                "meanWeight": 0.405962
+              },
+              {
+                "group": "LowerArm_R",
+                "meanWeight": 0.083795
+              },
+              {
+                "group": "LowerArm_L",
+                "meanWeight": 0.081326
+              },
+              {
+                "group": "UpperArm_R",
+                "meanWeight": 0.003019
+              },
+              {
+                "group": "UpperArm_L",
+                "meanWeight": 0.002509
+              }
+            ]
+          }
+        ]
+      },
+      "Heather_Hood_Folded_Roll": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Placket": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_01": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_02": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Henley_Button_03": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_L": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      },
+      "Heather_Hood_Drawcord_R": {
+        "overlapPairs": 0,
+        "mappedPairs": 0,
+        "invalidPolygonIndices": 0,
+        "uniqueGarmentPolygons": 0,
+        "rootLocalBounds": null,
+        "rootLocalQuantiles": {
+          "x": null,
+          "y": null,
+          "z": null
+        },
+        "dominantGroupPairs": [],
+        "topVoxels": []
+      }
+    }
+  }
+}

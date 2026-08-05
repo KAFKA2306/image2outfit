@@ -1,0 +1,238 @@
+{
+  "schemaVersion": 2,
+  "method": "semantic panel graph with explicit fine seam correspondence",
+  "source": {
+    "title": "Learning-based Seam Correspondence Reconstruction in Sewing Patterns",
+    "authors": [
+      "Zhendong Wang",
+      "Jintong Wang",
+      "Chen Liu",
+      "Yao Jin",
+      "Ligang Liu",
+      "Huamin Wang"
+    ],
+    "submitted": "2026-07-23T11:26:39Z",
+    "arxiv": "https://arxiv.org/abs/2607.21213",
+    "doi": "https://doi.org/10.48550/arXiv.2607.21213",
+    "paperLicense": "CC BY-NC-ND 4.0",
+    "paperLicenseUrl": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "officialCode": null,
+    "officialCodeStatus": "No official implementation located as of 2026-08-03"
+  },
+  "panels": [
+    {
+      "id": "front-upper",
+      "object": "Heather_Body_Shell",
+      "semantic": "torso-front",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "back-upper",
+      "object": "Heather_Body_Shell",
+      "semantic": "torso-back",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "front-lower",
+      "object": "Heather_Body_Shell",
+      "semantic": "pelvis-front",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "back-lower",
+      "object": "Heather_Body_Shell",
+      "semantic": "pelvis-back",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "sleeve-l",
+      "object": "Heather_Body_Shell",
+      "semantic": "sleeve-left",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "sleeve-r",
+      "object": "Heather_Body_Shell",
+      "semantic": "sleeve-right",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "cuff-l",
+      "object": "Heather_Body_Shell",
+      "semantic": "cuff-left",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "cuff-r",
+      "object": "Heather_Body_Shell",
+      "semantic": "cuff-right",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "hood-l",
+      "object": "Heather_Hood_Folded_Roll",
+      "semantic": "hood-left",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "hood-r",
+      "object": "Heather_Hood_Folded_Roll",
+      "semantic": "hood-right",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "hood-edge",
+      "object": "Heather_Hood_Folded_Roll",
+      "semantic": "collar",
+      "uvDomain": [
+        0,
+        0,
+        1,
+        1
+      ]
+    }
+  ],
+  "seamPairs": [
+    [
+      "back-lower:crotch",
+      "front-lower:crotch"
+    ],
+    [
+      "back-lower:side-l",
+      "front-lower:side-r"
+    ],
+    [
+      "back-lower:side-r",
+      "front-lower:side-l"
+    ],
+    [
+      "back-lower:upper",
+      "back-upper:lower"
+    ],
+    [
+      "back-upper:armhole-l",
+      "sleeve-l:crown-back"
+    ],
+    [
+      "back-upper:armhole-r",
+      "sleeve-r:crown-back"
+    ],
+    [
+      "back-upper:neck-l",
+      "hood-l:neck-back"
+    ],
+    [
+      "back-upper:neck-r",
+      "hood-r:neck-back"
+    ],
+    [
+      "back-upper:side-l",
+      "front-upper:side-r"
+    ],
+    [
+      "back-upper:side-r",
+      "front-upper:side-l"
+    ],
+    [
+      "cuff-l:upper",
+      "sleeve-l:wrist"
+    ],
+    [
+      "cuff-r:upper",
+      "sleeve-r:wrist"
+    ],
+    [
+      "front-lower:upper",
+      "front-upper:lower"
+    ],
+    [
+      "front-upper:armhole-l",
+      "sleeve-l:crown-front"
+    ],
+    [
+      "front-upper:armhole-r",
+      "sleeve-r:crown-front"
+    ],
+    [
+      "front-upper:neck-l",
+      "hood-l:neck-front"
+    ],
+    [
+      "front-upper:neck-r",
+      "hood-r:neck-front"
+    ],
+    [
+      "hood-l:center",
+      "hood-r:center"
+    ]
+  ],
+  "separateGeometry": [
+    "Heather_Body_Shell",
+    "Heather_Hood_Folded_Roll",
+    "Heather_Henley_Placket",
+    "Heather_Henley_Button_01",
+    "Heather_Henley_Button_02",
+    "Heather_Henley_Button_03",
+    "Heather_Hood_Drawcord_L",
+    "Heather_Hood_Drawcord_R"
+  ],
+  "acceptance": {
+    "panelCountMinimum": 11,
+    "allPanelsHaveUV": true,
+    "frontBackSeparated": true,
+    "leftRightHoodSeparated": true,
+    "seamPairsMinimum": 18,
+    "semanticTrialPass": true
+  },
+  "designRevision": "v23-dama-anchor-lobomap-residual-fit"
+}

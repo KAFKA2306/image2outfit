@@ -1,106 +1,159 @@
-# image2outfit execution contract
+# AGENTS.md — execution instructions for AI agents
 
-This repository is both a working Unity project and an auditable, resumable garment-production pipeline. Agents must leave the repository in a state that another agent or developer can continue without reconstructing the product from scratch. Documentation, workflow success, or artifact existence alone is never a deliverable.
+This file is the operating contract for LLM-based coding agents. Read `README.md` for the human-facing explanation.
 
-## Authority and scope
+## Objective
 
-- The user request defines the product goal, target avatar, visual intent, and required deliverables.
-- `config/job.schema.v2.json` defines the job contract.
-- `config/genworks-handoff-policy.json` defines lifecycle and handoff requirements.
-- `config/genworks-layout.json` defines the canonical Unity-visible layout.
-- `config/toolchain-lock.json` defines exact supported tool versions and their official sources.
-- `config/products/<slug>/job.json` and `license.json` define each tracked product.
-- `Assets/GenWorks/OutfitCatalog.json` must reconcile configured products with their canonical workspaces.
-- Common automation must remain product-neutral. Product-specific implementation needed to reproduce or continue a checkpoint is valid repository state when it is referenced by the job or manifest; do not delete it merely because it is product-specific.
-- The repository root is reserved for repository-wide entry points and contracts. Product-specific Python modules must live under `tools/` or the canonical `Assets/GenWorks/<slug>/` workspace; never add product shims to the root.
-- `pyproject.toml` is the sole Python dependency and environment-group declaration. Do not add requirements files or ad-hoc `uv --with` dependency lists elsewhere.
+Leave verified `main` in a more correct, reproducible, inspectable, and resumable state than you found it.
 
-## Documentation ownership
+A generated file, plausible explanation, CI success, or image inventory is not a garment result. Product completion requires current editable assets, current SiroinoSotai_PC renders, direct visual inspection, and a truthful lifecycle state.
 
-Repository-wide prose has exactly two owners:
+## Instruction precedence
 
-- `README.md` contains user and developer orientation, commands, layout, toolchain summary, and release requirements.
-- this root `AGENTS.md` contains agent execution, quality, handoff, Git, and automation rules.
+1. current user request and explicit acceptance criteria;
+2. executable schemas, policies, tests, and gates;
+3. current product job, construction contract, and `ProductManifest.json`;
+4. this file;
+5. README and product prose.
 
-Do not create a repository-level `docs/` tree, `Assets/GenWorks/README.md`, nested `AGENTS.md`, `.github/AGENTS.md`, workflow operating manuals, or another general policy document. Product-specific instructions and current state belong beside the product in `Assets/GenWorks/<slug>/README.md` and `ProductManifest.json`. Machine-readable configuration and executable checks remain authoritative; prose must summarize them rather than fork their values. When guidance changes, update the owning root document, repair references and tests, and delete the superseded document in the same change.
+Repair stale lower-authority documents in the same coherent change.
 
-## Canonical product workspace
+## Contract ownership
 
-Every active tracked outfit—including incomplete and rejected checkpoints—uses exactly one slug and one canonical root:
+- `config/products/<slug>/job.json` — identity, inputs, canonical outputs, delivery files, evidence paths.
+- `config/job.schema.v2.json` — allowed job fields and types.
+- `config/products/<slug>/construction.json` — adopted construction profile.
+- `config/products/construction.schema.v1.json` — construction-contract schema.
+- `config/genworks-handoff-policy.json` — project scope and completion boundary.
+- `config/release-policy.json` — required views, poses, and visual evidence definitions.
+- `Assets/GenWorks/<slug>/ProductManifest.json` — current state, gates, defects, hashes, and continuation point.
+- `tools/production_contract.py` — shared contract validation.
+- `tools/workspace_transaction.py` — last-good workspace protection.
+- `Taskfile.yml` and `tools/manage.py` — supported operator entry points.
+
+Do not create duplicate pose lists, product roots, lifecycle validators, or prose-owned thresholds.
+
+## Canonical product layout
 
 ```text
 config/products/<slug>/
   job.json
+  construction.json
   license.json
 
 Assets/GenWorks/<slug>/
   ProductManifest.json
   README.md
-  Source/Blender/*.blend
-  Models/*.fbx
-  Prefab/*.prefab
-  Materials/*
-  Textures/*
-  Previews/*
-  Documentation/*
+  Source/
+  Models/
+  Textures/
+  Materials/
+  Prefab/
+  Previews/
+    front.png
+    back.png
+    left.png
+    right.png
+    three-quarter.png
+    Poses/
+  Research/
+  Tests/
+  Documentation/
 ```
 
-Rules:
+Mandatory constraints:
 
-- Do not introduce `Assets/GenWorks/Products/`, avatar-name grouping folders, or another intermediate product directory.
-- Product Prefabs must be direct children of `Assets/GenWorks/<slug>/Prefab/`.
-- `REJECTED` does not mean legacy. If a garment has a useful FBX, Prefab, source, render, audit, or explicit continuation path, keep it as a canonical product workspace and preserve the diagnosis.
-- `Assets/GenWorks/Legacy/` is forbidden. Historical context belongs in Git history. Evidence required to continue or audit a product belongs under that product's `Documentation/`; material with neither continuation nor compliance value must be deleted rather than placed in a repository archive tree.
-- `job.id`, the config directory name, `job.productRoot`, `job.productManifestPath`, `job.licenseEvidence`, delivery assets, and manifest product identity must agree.
-- Preserve Unity `.meta` files and GUIDs when moving or replacing tracked assets.
-- Keep private or licensed avatar sources under ignored roots such as `Assets/_Local/`, `Assets/_Vendor/`, `Assets/_Reference/`, or the job-declared private source roots.
-- Never commit credentials, private avatar packages, caches, temporary trigger files, machine-local runtime state, or unreviewed customer release packages.
-- Actions artifacts, `Artifacts/`, `Candidates/`, and `Release/` are transport or packaging outputs. They are not the canonical resumable work state.
+- no `Assets/GenWorks/Products/`, `Legacy/`, or alternate product roots;
+- Prefabs are direct children of `Assets/GenWorks/<slug>/Prefab/`;
+- required poses come only from `config/release-policy.json`;
+- private avatar assets remain under ignored, job-approved roots;
+- preserve Unity `.meta` files and GUIDs for tracked assets;
+- do not commit credentials, caches, private packages, or machine state.
 
-## Resumable handoff is mandatory
+Local reports, candidate copies, and optional external results use the single untracked layout `.image2outfit/products/<slug>/{reports,candidate,release}`.
 
-The canonical workspace must always contain the latest useful, reproducible checkpoint, including work that is incomplete or rejected. A checkpoint normally includes:
+## Start-of-task protocol
 
-- the editable Blender source;
-- the exported FBX;
-- materials and textures;
-- the outfit Prefab;
-- the avatar-integrated Prefab when required;
-- the latest actual five-view and pose-review renders;
-- `ProductManifest.json` with current status, exact gates, hashes, known defects, rejection reason, and next continuation step;
-- every product-specific script or parameter required to reproduce the current state, referenced from the job or manifest.
+Before editing:
 
-Do not restart from zero when a checkpoint exists. Continue from the canonical workspace and the recorded diagnosis. Do not replace a usable checkpoint with a worse or incomplete one. When an iteration fails, retain the latest useful assets and record what failed, why it failed, and what must be tried next.
+1. classify the task;
+2. inspect current `main`, open PRs, branches, exact files, and overlapping work;
+3. resolve the product slug, target avatar, manifest, last-good checkpoint, latest renders, defects, and in-scope gates;
+4. define the smallest coherent diff and checks;
+5. continue an existing workstream rather than creating a competing one.
 
-## Required production flow
+Do not restart from zero when a useful canonical checkpoint exists.
 
-1. Resolve the exact target avatar/profile, outfit specification, source references, slug, deliverables, and acceptance criteria.
-2. Verify licensing and environment requirements from authoritative sources.
-3. Inspect the existing canonical checkpoint and prior rejection history before generating anything.
-4. Build or improve the garment in the canonical workspace rather than in an ephemeral branch-only or artifact-only location.
-5. Export the FBX and create the required Unity Prefabs with materials, hierarchy, armature, constraints, and Modular Avatar or NDMF configuration where applicable.
-6. Import the assets in the intended Unity version, save them, reload them, and verify serialized Prefab integrity.
-7. Run the automated Blender, FBX, Unity import, Prefab serialization/reload, Modular Avatar, layout, and repository gates.
-8. Render and inspect the actual product. Iterate on visible defects instead of treating render generation as success.
-9. Update the manifest and commit the complete resumable checkpoint.
-10. Stop at `HUMAN_REVIEW_PENDING` until the human visual, pose, and runtime review gates pass.
-11. Promote the unchanged reviewed candidate with `task release JOB=<same-job-path>` only after every release gate passes.
+## Change discipline
+
+- Fix generic defects generically.
+- Prefer one owner over synchronized duplicates.
+- Remove superseded code and references.
+- Keep jobs, contracts, manifests, assets, tests, policy, and docs consistent.
+- Do not weaken rendered quality because current data fails it.
+- Do not replace a useful checkpoint with a worse result.
+- Do not claim a tool ran or an image improved without direct verification.
+
+## In-scope build workflow
 
 Use:
 
 ```powershell
-task candidate JOB=config/products/<slug>/job.json
-task release JOB=config/products/<slug>/job.json
-task audit:repo
-task audit:genworks
-task check:python
+task explain PRODUCT=<slug>
+task candidate PRODUCT=<slug>
 ```
 
-## Visual evidence and quality loop
+The build workflow must:
 
-Garment work is not complete without current visual evidence bound to the exact candidate or manifest hash.
+1. validate the closed job and construction schemas;
+2. protect the last-good canonical workspace;
+3. run Blender with SiroinoSotai_PC as the target body;
+4. produce editable source and FBX;
+5. preserve declared Prefab assets and metadata without claiming Unity validation;
+6. generate current front, back, left, right, three-quarter, multiview, and required-pose renders;
+7. record the 2026 research trial and comparison evidence;
+8. bind generated files and evidence by SHA-256 where the current contract requires it;
+9. open and inspect the actual images;
+10. restore last-good state when generation or visible quality fails.
 
-Required evidence:
+## Completion boundary
+
+The project completion state is `COMPLETE`. The sole machine-readable definition is `requiredCompletionGates` in `config/genworks-handoff-policy.json`.
+
+Completion requires:
+
+- `blender: PASS`;
+- `editableSource: PASS`;
+- `fbx: PASS`;
+- `prefabDeclared: PASS`;
+- `fiveViewEvidence: PASS`;
+- `poseEvidence: PASS`;
+- `visualAppearanceReview: PASS`;
+- `researchTrial: PASS`.
+
+`visualAppearanceReview` may be performed by ChatGPT only when it directly opens the current artifact images. It must reject body penetration, clipping, detached geometry, wrong scale, broken silhouette, extreme vertices, floating parts, asymmetric failures, UV or normal defects, material failures, and pose breakage.
+
+A product may remain `WORKING` when useful progress is mergeable but any completion gate is missing or failing. A visibly rejected garment cannot be `COMPLETE`.
+
+## Permanently out of scope
+
+The following are not requested, awaited, or used as completion blockers:
+
+- Unity 2022.3.22f1 import/save/reload;
+- Modular Avatar／NDMF execution;
+- VRChat Build & Test;
+- VRChat runtime validation;
+- human runtime visual review.
+
+Their `FAIL`, `NOT_RUN`, missing environment, or missing screenshot states are `OUT_OF_SCOPE`. They must not create completion blockers.
+
+Never convert an out-of-scope result into a false PASS. Without external evidence, do not claim that the Prefab was imported successfully, that Modular Avatar／NDMF ran, or that the garment works in VRChat. `COMPLETE` means the repository's rendered garment deliverable is complete, not externally verified runtime compatibility.
+
+Legacy runtime, customer-quality, and release-packaging utilities may remain for an external operator, but they are optional extensions outside the ChatGPT garment-production scope.
+
+## Visual inspection
+
+Completion requires opening:
 
 - front;
 - back;
@@ -108,49 +161,71 @@ Required evidence:
 - right;
 - three-quarter;
 - combined multiview;
-- pose-review views covering the required motions;
-- Unity or VRChat runtime screenshots when the applicable gate requires them.
+- every required pose.
 
-Agents must inspect the images themselves. File existence, image dimensions, CI success, or another agent's textual claim is insufficient. Reject and iterate when evidence shows clipping, body penetration, extreme vertices, broken silhouette, incorrect scale, poor fit, detached parts, UV stretching, visible seams, normal defects, material errors, floating hardware, broken weights, or pose failures.
+File existence, dimensions, hashes, CI success, or another agent's text is not visual inspection. Record `visualAppearanceReview` as PASS or FAIL with inspected paths and concise findings.
 
-The final chat report for garment production or audit must show or directly link the latest actual renders. Do not claim that appearance improved unless the new evidence visibly demonstrates the improvement.
+## Validation
 
-## Lifecycle and completion language
+Run checks proportional to the diff and repository contract checks:
 
-Allowed product statuses are defined by `config/genworks-handoff-policy.json`.
+```powershell
+task audit:repo
+task audit:runtime
+task audit:genworks
+task audit:tools
+task audit:methods
+task audit:research
+task check:python
+```
 
-- `WORKING`: a resumable tracked checkpoint exists, but technical gates are incomplete.
-- `TECHNICAL_READY`: all required automated technical gates pass.
-- `HUMAN_REVIEW_PENDING`: technical work, Unity configuration, and required evidence are ready for final human inspection.
-- `REJECTED`: evidence or validation failed; preserve the checkpoint and diagnosis.
-- `RELEASED`: all automated and human release gates pass for the unchanged candidate.
+`audit:runtime` may inspect stored metadata, but must not require Unity or VRChat executables and must treat policy-listed runtime gates as out of scope.
 
-Report `NO-GO` for missing evidence, changed hashes, unresolved licensing, invalid imports, incomplete Prefab configuration, critical penetration, failed runtime validation, or visible unacceptable defects. Report `GO` or `RELEASED` only when the corresponding gate actually succeeds.
+If Blender or the private target avatar is unavailable, report the exact boundary and do not claim completion. Unity or VRChat unavailability is expected and is not a blocker.
 
-Do not use "complete", "finished", "production-ready", or equivalent language unless the work has been built, visually inspected, validated, committed, pushed, merged into `main`, verified on the resulting `main`, and accompanied by the latest renders. `HUMAN_REVIEW_PENDING` is not `RELEASED`.
+## GitHub Actions permissions
+
+Validation workflows default to:
+
+```yaml
+permissions:
+  contents: read
+```
+
+Grant write permission only to an explicitly scoped maintenance workflow. Do not use a general validation workflow to mutate repository contents.
+
+## Failure recovery
+
+On failure:
+
+1. restore the last-good canonical workspace;
+2. retain useful diagnostics separately;
+3. record the failing stage, hashes, visible defects, and next action;
+4. keep the lifecycle state truthful;
+5. preserve rejected work needed for continuation or audit.
 
 ## Git and pull-request lifecycle
 
-- Continue an existing product checkpoint instead of opening unrelated rebuild branches.
-- Use one short-lived branch per coherent change when a branch is needed.
-- Keep commits scoped and include the assets, manifest, configuration, tests, and evidence required for the same checkpoint.
-- A PR may be automatically merged only after its required checks and evidence gates pass and the diff contains the intended canonical state.
-- Close superseded PRs with an explicit continuation pointer.
-- Delete every non-`main` branch immediately after merge, closure, or supersession. Stale work branches are repository residue.
-- Before reporting completion, verify that `main` contains the intended commit and that no unnecessary branch remains.
+- Do not push directly to `main`.
+- Use one short-lived branch per coherent change.
+- Commit only intended files.
+- Open a PR describing root cause, behavior change, impact, and validation.
+- Merge a `COMPLETE` product only after all required completion gates pass.
+- A truthful `WORKING` checkpoint may merge when explicitly intended and non-regressive.
+- Verify resulting `main`.
+- Delete merged, closed, or superseded branches.
+- Close superseded PRs with an explicit successor link.
 
-## GitHub Actions and automation
+Completion means the rendered product is `COMPLETE`, merged into verified `main`, and the work branch is removed.
 
-- `.github/` contains reusable workflows and GitHub metadata, not a second policy hierarchy.
-- Build and validation workflows should use the minimum required permissions; read-only workflows use `contents: read`.
-- CI may upload generated products and evidence as artifacts, but artifacts must never be the only copy of resumable work.
-- CI must not commit telemetry, run status, trigger markers, or mutable workflow state to `main`.
-- Do not retain self-mutating or one-shot migration machinery after its validated purpose is complete.
-- Hosted Blender workflows are suitable only when they can reproduce the declared job. Use self-hosted execution when Unity, private avatar sources, VRChat, or local runtime validation is required.
-- Fix generic tooling and policy defects generically. Do not add one-product exceptions to bypass repository or quality gates.
+## Final response contract
 
-## Repository hygiene
+Report only verified facts:
 
-`tools/audit_repository_hygiene.py` is authoritative for operational residue, and `tools/audit_genworks_layout.py` is authoritative for the canonical product layout. Unit tests enforce the two-document repository policy and other contracts. Fix findings rather than weakening the checks.
-
-The repository must remain understandable from `main`: canonical product work under `Assets/GenWorks/<slug>/`, declared jobs under `config/products/<slug>/`, no `Assets/GenWorks/Legacy/` archive, no hidden artifact-only handoff, no lost intermediate work, no duplicate policy tree, no false completion claim, and no abandoned branch.
+- effective product state;
+- changed behavior and principal files;
+- exact checks and outcomes;
+- current visual evidence links;
+- commit, PR, merge, and branch-deletion state;
+- remaining in-scope blockers;
+- out-of-scope runtime items only as `OUT_OF_SCOPE`, never as unfinished work.

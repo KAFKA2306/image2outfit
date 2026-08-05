@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "coreRoot": "src/image2outfit",
+  "toolRoot": "tools",
+  "dependencyDirection": "tools-to-src-only",
+  "forbiddenCoreImports": [
+    "tools",
+    "bpy",
+    "bmesh",
+    "mathutils"
+  ],
+  "coreResponsibilities": [
+    "garment vocabulary",
+    "pattern and stitch intermediate representation",
+    "pipeline stage order",
+    "Blender invocation contracts",
+    "cloth simulation contracts",
+    "render evidence contracts",
+    "research-derived implementation principles",
+    "architecture validation"
+  ],
+  "toolResponsibilities": [
+    "command-line entry points",
+    "subprocess execution",
+    "Blender Python environment access",
+    "product-specific adapters",
+    "filesystem and external program integration"
+  ],
+  "promotionRule": "Move repeated, completion-critical, product-neutral logic from tools into src with tests; keep product identity and executable environment details in tools or config.",
+  "canonicalPipelineProfile": "config/pipeline-profiles/garment-reconstruction-v1.json"
+}

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Mandatory construction-method and customer-quality production gate.
 
-The historical transactional implementation lives in ``production_gate_core``.
-This module is the only supported executable and makes the commercial method
-contract intrinsic to both candidate creation and release promotion.
+Tracked product jobs contain only canonical product inputs and outputs. Local
+reports, review snapshots, and release packages are derived from ``job.id`` and
+stored under ``.image2outfit/products/<product-id>/``.
 """
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ from typing import Any
 
 import method_selection
 import production_gate_core as core
+import runtime_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -26,12 +27,46 @@ def _repo_path(root: Path, value: str) -> Path:
     return path
 
 
+def _runtime_job(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
+    paths = runtime_paths.for_job(root, job)
+    enriched = dict(job)
+    enriched.update(
+        artifactDir=runtime_paths.relative(root, paths.reports),
+        candidateDir=runtime_paths.relative(root, paths.candidate),
+        releaseDir=runtime_paths.relative(root, paths.release),
+    )
+    return enriched
+
+
+def _materialize_runtime_job(job: dict[str, Any], root: Path = ROOT) -> Path:
+    paths = runtime_paths.for_job(root, job)
+    runtime_job_path = paths.root / "job.json"
+    core.legacy.write(runtime_job_path, job)
+    return runtime_job_path
+
+
+def _load(job_path: Path, root: Path = ROOT) -> tuple[dict[str, Any], dict[str, Any]]:
+    policy_path = root / "config" / "release-policy.json"
+    policy = core.legacy.read(policy_path)
+    job = core.legacy.read(job_path)
+    if policy.get("schemaVersion") != 1:
+        raise ValueError("release-policy.json must use schemaVersion 1")
+    if job.get("schemaVersion") != 2:
+        raise ValueError("legacy jobs are disabled; schemaVersion must be 2")
+    required = core.legacy.required_job_fields()
+    missing = [key for key in required if key not in job or job[key] in (None, "")]
+    if missing:
+        raise ValueError(f"job v2 missing: {', '.join(missing)}")
+    runtime_paths.for_job(root, job)
+    return _runtime_job(job, root), policy
+
+
 def _candidate_manifest_path(job: dict[str, Any], root: Path = ROOT) -> Path:
-    return _repo_path(root, str(job["candidateDir"])) / "candidate-manifest.json"
+    return runtime_paths.for_job(root, job).candidate / "candidate-manifest.json"
 
 
 def _artifact_path(job: dict[str, Any], root: Path = ROOT) -> Path:
-    return _repo_path(root, str(job["artifactDir"]))
+    return runtime_paths.for_job(root, job).reports
 
 
 def _binding_snapshot(
@@ -72,8 +107,7 @@ def _write_no_go(
     root: Path = ROOT,
     **details: Any,
 ) -> None:
-    artifact = _artifact_path(job, root)
-    release = _repo_path(root, str(job["releaseDir"]))
+    paths = runtime_paths.for_job(root, job)
     value: dict[str, Any] = {
         "schemaVersion": 2,
         "phase": phase,
@@ -85,11 +119,11 @@ def _write_no_go(
         "errors": errors,
         "stateProtection": {
             "customerReleaseProtected": True,
-            "previousReleasePreserved": release.exists(),
+            "previousReleasePreserved": paths.release.exists(),
         },
     }
     value.update(details)
-    core.legacy.write(artifact / "audit.json", value)
+    core.legacy.write(paths.reports / "audit.json", value)
 
 
 def _bind_method_to_candidate(
@@ -126,7 +160,7 @@ def _bound_method_errors(
     try:
         expected = _binding_snapshot(job, selection, root)
     except (OSError, ValueError, KeyError) as exc:
-        return [f"construction method binding cannot be resolved: {exc}"]
+        return [f"candidate construction method binding cannot be resolved: {exc}"]
     actual = candidate_manifest.get("constructionMethod")
     if not isinstance(actual, dict):
         return ["candidate construction method binding is missing"]
@@ -229,11 +263,13 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     options = build_parser().parse_args()
     try:
-        job_path = Path(options.job).resolve()
-        job, policy = core.legacy.load(job_path)
+        source_job_path = Path(options.job).resolve()
+        job, policy = _load(source_job_path)
+        runtime_paths.remove_legacy_product_outputs(ROOT, str(job["id"]))
+        runtime_job_path = _materialize_runtime_job(job)
         if options.mode == "release":
-            return _run_release(job_path, job, policy)
-        return _run_candidate(job_path, job, policy)
+            return _run_release(runtime_job_path, job, policy)
+        return _run_candidate(runtime_job_path, job, policy)
     except Exception as exc:
         print(f"image2outfit production gate: {exc}", file=sys.stderr)
         return 1

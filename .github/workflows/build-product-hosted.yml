@@ -19,6 +19,7 @@ on:
       - pyproject.toml
       - uv.lock
       - tools/blender_python_env.py
+      - tools/runtime_paths.py
 
 env:
   STATUS_CONTEXT: image2outfit-hosted
@@ -126,7 +127,7 @@ jobs:
           job = json.loads(job_path.read_text(encoding='utf-8-sig'))
           if job.get('schemaVersion') != 2:
               raise SystemExit('Only schemaVersion 2 jobs are accepted')
-          required = ('id', 'productRoot', 'artifactDir', 'buildScript', 'blendPath')
+          required = ('id', 'productRoot', 'buildScript', 'blendPath')
           missing = [name for name in required if not job.get(name)]
           if missing:
               raise SystemExit('job is missing: ' + ', '.join(missing))
@@ -155,12 +156,13 @@ jobs:
               )
               raise SystemExit(0)
 
+          runtime_root = f'.image2outfit/products/{product_id}'
           paths = {
               'SKIP_PRODUCT_BUILD': 'false',
               'JOB_PATH': job_path_text,
               'JOB_ID': job['id'],
               'PRODUCT_ROOT': job['productRoot'],
-              'ARTIFACT_DIR': job['artifactDir'],
+              'REPORT_DIR': f'{runtime_root}/reports',
               'BUILD_SCRIPT': job['buildScript'],
               'BLEND_PATH': job['blendPath'],
               'HOSTED_POSE_SCRIPT': job.get('hostedPoseScript', ''),
@@ -210,14 +212,14 @@ jobs:
         if: env.SKIP_PRODUCT_BUILD != 'true'
         run: |
           set -euo pipefail
-          mkdir -p "$ARTIFACT_DIR"
-          .image2outfit/blender/blender --python-use-system-env --background --factory-startup --python-exit-code 1 --python "$BUILD_SCRIPT" -- --job "$JOB_PATH" | tee "$ARTIFACT_DIR/hosted-blender.log"
+          mkdir -p "$REPORT_DIR"
+          .image2outfit/blender/blender --python-use-system-env --background --factory-startup --python-exit-code 1 --python "$BUILD_SCRIPT" -- --job "$JOB_PATH" | tee "$REPORT_DIR/hosted-blender.log"
 
       - name: Render configured verification poses
         if: env.SKIP_PRODUCT_BUILD != 'true' && env.HOSTED_POSE_SCRIPT != ''
         run: |
           set -euo pipefail
-          .image2outfit/blender/blender --python-use-system-env --background "$BLEND_PATH" --python-exit-code 1 --python "$HOSTED_POSE_SCRIPT" -- --job "$JOB_PATH" | tee "$ARTIFACT_DIR/hosted-poses.log"
+          .image2outfit/blender/blender --python-use-system-env --background "$BLEND_PATH" --python-exit-code 1 --python "$HOSTED_POSE_SCRIPT" -- --job "$JOB_PATH" | tee "$REPORT_DIR/hosted-poses.log"
 
       - name: Update generated product hashes
         if: env.SKIP_PRODUCT_BUILD != 'true'
@@ -234,7 +236,7 @@ jobs:
         with:
           name: image2outfit-hosted-${{ env.JOB_ID }}-${{ github.run_id }}
           path: |
-            ${{ env.ARTIFACT_DIR }}
+            ${{ env.REPORT_DIR }}
             ${{ env.PRODUCT_ROOT }}
           if-no-files-found: error
           retention-days: 30

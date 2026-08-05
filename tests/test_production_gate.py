@@ -12,6 +12,7 @@ TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
 import production_gate  # noqa: E402
+import runtime_paths  # noqa: E402
 from production_gate_core import DirectoryTransaction  # noqa: E402
 
 
@@ -19,7 +20,13 @@ class DirectoryTransactionTest(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
-        self.target = self.root / "Candidates" / "test-product"
+        self.target = (
+            self.root
+            / ".image2outfit"
+            / "products"
+            / "test-product"
+            / "candidate"
+        )
         self.target.mkdir(parents=True)
         (self.target / "marker.txt").write_text("last-good", encoding="utf-8")
 
@@ -71,14 +78,20 @@ class DirectoryTransactionTest(unittest.TestCase):
         )
         self.assertFalse(recovered.journal.exists())
 
-    def test_rollback_removes_new_directory_when_no_previous_state_exists(self) -> None:
-        empty_target = self.root / "Release" / "new-product"
-        transaction = DirectoryTransaction(empty_target)
+    def test_rollback_removes_new_directory_without_previous_state(self) -> None:
+        target = (
+            self.root
+            / ".image2outfit"
+            / "products"
+            / "new-product"
+            / "release"
+        )
+        transaction = DirectoryTransaction(target)
         had_original = transaction.begin()
-        empty_target.mkdir(parents=True)
-        (empty_target / "package.zip").write_text("invalid", encoding="utf-8")
+        target.mkdir(parents=True)
+        (target / "package.zip").write_text("invalid", encoding="utf-8")
         transaction.rollback(had_original)
-        self.assertFalse(empty_target.exists())
+        self.assertFalse(target.exists())
         self.assertFalse(transaction.backup.exists())
         self.assertFalse(transaction.journal.exists())
 
@@ -87,22 +100,23 @@ class ProductionGateCommercialTest(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
-        product_config = self.root / "config" / "products" / "demo"
-        product_config.mkdir(parents=True)
+        product = self.root / "config" / "products" / "demo"
+        product.mkdir(parents=True)
         self.write_json(
             self.root / "config" / "release-policy.json",
             {"schemaVersion": 1, "commercialMethodPolicy": {}},
         )
         self.write_json(
-            product_config / "construction.json",
-            {"schemaVersion": 1, "profile": "loose-layered"},
+            product / "construction.json",
+            {
+                "schemaVersion": 1,
+                "productId": "demo",
+                "profile": "loose-layered",
+            },
         )
         self.job = {
             "id": "demo",
             "adapterId": "demo-v1",
-            "artifactDir": "Artifacts/demo",
-            "candidateDir": "Candidates/demo",
-            "releaseDir": "Release/demo",
             "buildScript": "tools/demo_product.py",
         }
         self.selection = {
@@ -133,20 +147,21 @@ class ProductionGateCommercialTest(unittest.TestCase):
         path.write_text(json.dumps(value) + "\n", encoding="utf-8")
 
     def candidate_manifest(self, value: dict | None = None) -> Path:
-        path = self.root / self.job["candidateDir"] / "candidate-manifest.json"
+        path = (
+            runtime_paths.for_job(self.root, self.job).candidate
+            / "candidate-manifest.json"
+        )
         self.write_json(path, value or {"schemaVersion": 2, "jobId": "demo"})
         return path
 
     def test_candidate_manifest_binds_method_and_policy_hashes(self) -> None:
         manifest = self.candidate_manifest()
-
         binding = production_gate._bind_method_to_candidate(
             self.job,
             self.selection,
             self.root,
         )
         saved = json.loads(manifest.read_text(encoding="utf-8"))
-
         self.assertEqual(saved["constructionMethod"], binding)
         self.assertEqual(binding["constructionProfile"], "loose-layered")
         self.assertEqual(len(binding["constructionSha256"]), 64)
@@ -159,11 +174,14 @@ class ProductionGateCommercialTest(unittest.TestCase):
             self.root,
         )
         manifest = {"schemaVersion": 2, "constructionMethod": binding}
-
         construction = self.root / self.selection["constructionPath"]
         self.write_json(
             construction,
-            {"schemaVersion": 1, "profile": "panel-sewn"},
+            {
+                "schemaVersion": 1,
+                "productId": "demo",
+                "profile": "panel-sewn",
+            },
         )
         errors = production_gate._bound_method_errors(
             self.job,
@@ -171,7 +189,6 @@ class ProductionGateCommercialTest(unittest.TestCase):
             manifest,
             self.root,
         )
-
         self.assertTrue(
             any("constructionSha256" in value for value in errors),
             errors,
@@ -194,7 +211,6 @@ class ProductionGateCommercialTest(unittest.TestCase):
             "candidateManifestSha256": "0" * 64,
             "errors": ["runtime-performance: evidence unreadable"],
         }
-
         with (
             mock.patch.object(
                 production_gate.method_selection,
@@ -219,8 +235,7 @@ class ProductionGateCommercialTest(unittest.TestCase):
         runner.assert_not_called()
         report = json.loads(
             (
-                self.root
-                / self.job["artifactDir"]
+                runtime_paths.for_job(self.root, self.job).reports
                 / "commercial-method-quality.json"
             ).read_text(encoding="utf-8")
         )

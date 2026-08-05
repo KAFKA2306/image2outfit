@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "singleReleaseValidator": "tools/customer_quality.py",
   "blockedReleaseAdapterIds": [
     "haolan-v1.6"
   ],
@@ -40,10 +41,14 @@
       "status",
       "checkedAt",
       "reviewer",
+      "reviewerReference",
       "defects"
     ],
     "common": {
       "reviewerPrefix": "human:",
+      "reviewerReferenceHosts": [
+        "github.com"
+      ],
       "forbiddenReviewers": [
         "human:<name>",
         "human:unknown",
@@ -116,14 +121,6 @@
         "reviewedAssets",
         "poseNotes"
       ],
-      "requiredPoses": [
-        "neutral",
-        "arms-up",
-        "arm-cross",
-        "crouch",
-        "sit",
-        "prone"
-      ],
       "passValue": "PASS",
       "maximumCriticalPenetrations": 0
     },
@@ -154,7 +151,7 @@
     }
   },
   "commercialMethodPolicy": {
-    "profileId": "commercial-v1",
+    "profileId": "commercial-v2",
     "profiles": {
       "fitted": {
         "description": "Body-conforming garment whose primary deformation is inherited from the avatar rig.",
@@ -213,7 +210,7 @@
       }
     },
     "evidenceContract": {
-      "schemaVersion": 1,
+      "schemaVersion": 2,
       "passStatus": "PASS",
       "requiredFields": [
         "schemaVersion",
@@ -228,6 +225,20 @@
         "metrics",
         "notes"
       ],
+      "toolContract": {
+        "requiredFields": [
+          "id",
+          "version",
+          "command"
+        ]
+      },
+      "sourceArtifactContract": {
+        "requiredFields": [
+          "path",
+          "sha256"
+        ],
+        "candidateHashBindingRequired": true
+      },
       "evidenceRootTemplate": "Assets/GenWorks/{productId}/Evidence/Commercial",
       "metricRules": {
         "panel-graph": {

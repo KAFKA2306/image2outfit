@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 2,
+  "designRevision": "v23-dama-anchor-lobomap-residual-fit",
+  "checkedAt": "2026-08-05T01:17:26+09:00",
+  "productId": "siroino-heather-hooded-bodysuit",
+  "target": "SiroinoSotai_PC",
+  "result": "FAIL",
+  "visualAppearanceReview": "FAIL",
+  "releaseDecision": "WORKING_CHECKPOINT_ONLY",
+  "reviewer": "ChatGPT direct artifact image review",
+  "evidence": {
+    "hostedWorkflowRun": 30927279567,
+    "artifactId": 8900069602,
+    "artifactSha256": "432fe8c6a5aa3eab8fa3d4148574488058a67086366371d089fd8c2eb29442db",
+    "multiview": "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+    "poseReview": "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+    "fitAudit": "Tests/fit-audit.json",
+    "researchTrial": "Research/lobofit-local-bone-trial.json"
+  },
+  "researchDecision": {
+    "method": "LoBoFit-inspired four-bone local residual fitting after DAMA-inspired body anchoring",
+    "execution": "SUCCESS",
+    "productAdoption": "REJECTED_FOR_CURRENT_REVISION",
+    "quantitativeResult": {
+      "localResidualEdgeRmsBeforeM": 0.0035477231084656544,
+      "localResidualEdgeRmsAfterM": 0.0029748159515982156,
+      "relativeReductionPercent": 16.145,
+      "meanWorldDisplacementM": 0.0009634059353793652,
+      "maximumWorldDisplacementM": 0.00400000083941411,
+      "meanSignedClearanceM": 0.021463756386198015,
+      "verticesBelow75PercentTargetClearance": 1392
+    },
+    "finding": "The local-bone residual representation measurably reduced local offset roughness without creating degenerate or unweighted geometry, but it did not repair the incorrect garment region selection, silhouette, opening design or pose deformation."
+  },
+  "blockingFindings": [
+    {
+      "zone": "front and rear crotch",
+      "finding": "A long narrow hanging tab remains visible in both front and back views instead of a clean underbody high-cut bridge."
+    },
+    {
+      "zone": "shoulders, hood and drawcords",
+      "finding": "Horizontal floating protrusions remain at both shoulders, while the requested three-dimensional hood is not presented as a coherent wearable hood."
+    },
+    {
+      "zone": "body and sleeve silhouette",
+      "finding": "The shell reads as a loose tunic with wide cylindrical sleeves rather than a fitted long-sleeve high-cut bodysuit with defined rib cuffs."
+    },
+    {
+      "zone": "neckline and openings",
+      "finding": "The neckline and leg-opening boundaries remain irregular and visually unfinished."
+    },
+    {
+      "zone": "surface and material",
+      "finding": "Dark speckles, streaks and seam-like surface defects remain visible across the torso, sleeves and back."
+    },
+    {
+      "zone": "required poses",
+      "finding": "Neutral has zero BVH overlap pairs, but arms-up has 2782, arm-cross 1048, crouch 1035, sit 691 and prone 2398. The pose sheet also retains the incorrect crotch and shoulder silhouette."
+    },
+    {
+      "zone": "pose evidence framing",
+      "finding": "Several pose renders crop the head, arms or upper body, reducing their value for complete garment review."
+    }
+  ],
+  "nextAction": "Replace the primary body-region selection and underbody construction before further residual fitting. LoBoMap may remain as a bounded final refinement after the base pattern has the correct silhouette and anatomical openings."
+}
