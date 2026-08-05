@@ -63,6 +63,7 @@ class BlenderCalibrationProfile:
     air_damping: float
     quality: int
     collision_quality: int
+    collision_impulse_clamp: float
     self_collision_scale: float
     contact: ContactHypothesis
 
@@ -87,6 +88,8 @@ class BlenderCalibrationProfile:
                 raise ValueError(f"{label} must be finite and non-negative")
         if self.quality < 1 or self.collision_quality < 1:
             raise ValueError("solver quality values must be positive")
+        if not 0 <= self.collision_impulse_clamp <= 100:
+            raise ValueError("collision_impulse_clamp must be in [0, 100]")
         if not 0 < self.self_collision_scale:
             raise ValueError("self_collision_scale must be positive")
 
@@ -178,6 +181,7 @@ def load_blender_calibration_profile(path: str | Path) -> BlenderCalibrationProf
         air_damping=float(payload["airDamping"]),
         quality=int(payload["quality"]),
         collision_quality=int(payload["collisionQuality"]),
+        collision_impulse_clamp=float(payload.get("collisionImpulseClamp", 0.0)),
         self_collision_scale=float(payload["selfCollisionScale"]),
         contact=ContactHypothesis(
             hypothesis_id=str(contact["hypothesisId"]),
@@ -330,6 +334,8 @@ def project_material_library_to_blender(
                     "use_collision": True,
                     "collision_quality": profile.collision_quality,
                     "distance_min": collision_distance,
+                    "impulse_clamp": profile.collision_impulse_clamp,
+                    "self_impulse_clamp": 0.0,
                     "use_self_collision": True,
                     "self_distance_min": collision_distance
                     * profile.self_collision_scale,

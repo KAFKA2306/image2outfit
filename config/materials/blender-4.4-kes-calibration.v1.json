@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-cusick-calibration-v9-temporal-audit",
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v11-impulse-clamp-diagnostic",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
-  "mappingStatus": "temporal-convergence-diagnostic",
+  "mappingStatus": "temporal-convergence-diagnostic-impulse-clamp",
   "mappingMethod": "explicit geometric-mean scalar projection with recorded axis loss, followed by material-specific Blender 4.4.3 correction factors identified on a collision-supported Cusick fixture; not a universal SI-to-Blender conversion",
   "scalarProjectionRanges": {
     "tensionStiffness": [
@@ -45,7 +45,8 @@
     "clothSettings.collider_friction": "dynamic contact hypothesis on the cloth",
     "collisionObject.collision.cloth_friction": "static Coulomb coefficient mapped to Blender's 0-80 percentage scale as 100 * coefficient, verified against Blender 4.4.3 source",
     "collisionThickness": "physics contact offset",
-    "renderThickness": "Solidify visual thickness"
+    "renderThickness": "Solidify visual thickness",
+    "clothCollisionSettings.impulse_clamp": "diagnostic object-collision impulse limit; 10 is the smallest Blender 4.4.3 runtime RNA UI step above the disabled value 0"
   },
   "calibrationFixture": {
     "type": "cusick-drape-meter",
@@ -77,8 +78,8 @@
   ],
   "searchPolicy": {
     "spacing": "fixed-scales-temporal-convergence-diagnostic",
-    "policy": "evaluate fixed diagnostic material scales at frames 100, 150, 200, and 250; reject coefficient fit unless the final interval is temporally converged",
-    "reason": "the 250-frame run changed the 100-frame material ordering and retained rebound or missing support contact, so time stability must be demonstrated before any further fitting"
+    "policy": "run one fixed-scale object-collision impulse-clamp diagnostic at 10; do not change damping, quality, collision quality, self collision, contact, mesh, fixture, or elastic factors",
+    "reason": "Run 31057250945 rejected global default damping because it suppressed motion and destroyed coefficient plausibility; Blender 4.4.3 runtime RNA explicitly defines impulse_clamp as limiting collision impulses to avoid instability"
   },
   "acceptance": {
     "maximumRmseVsPublishedKes": 0.18,
@@ -121,6 +122,11 @@
       "title": "Unified nonlinear dynamic model for dress dynamic drape and optimization of template structure design",
       "url": "https://doi.org/10.1016/j.cad.2026.104074",
       "role": "warp-weft anisotropy must remain explicit in dynamic drape models"
+    },
+    {
+      "title": "Blender 4.4.3 hosted RNA property contract",
+      "url": "https://github.com/KAFKA2306/image2outfit/actions/runs/31056987078",
+      "role": "exact runtime semantics, disabled default, range, and UI step for object and self collision impulse clamping"
     }
   ],
   "calibrationScope": {
@@ -143,5 +149,32 @@
     "maximumMaximumZDeltaM": 0.005,
     "maximumMeanVertexDisplacementM": 0.003,
     "maximumVertexDisplacementM": 0.015
+  },
+  "collisionImpulseClamp": 10.0,
+  "solverStabilityDiagnostic": {
+    "diagnosticId": "blender-4.4.3-object-impulse-clamp-10-v1",
+    "changedFactor": "clothCollisionSettings.impulse_clamp",
+    "baseline": 0.0,
+    "candidate": 10.0,
+    "selfImpulseClamp": 0.0,
+    "selfCollisionEnabledInFixture": false,
+    "unchanged": [
+      "diagnosticElasticScales",
+      "springDamping",
+      "airDamping",
+      "quality",
+      "collisionQuality",
+      "contactHypothesis",
+      "collisionThickness",
+      "fixtureGeometry",
+      "meshTopology",
+      "frameCheckpoints"
+    ],
+    "basis": {
+      "type": "Blender-4.4.3-runtime-RNA-metadata",
+      "run": "https://github.com/KAFKA2306/image2outfit/actions/runs/31056987078",
+      "description": "Clamp collision impulses to avoid instability; 0 disables clamping; hard range 0-100; UI step 10"
+    },
+    "decisionRule": "retain only if hard upward/contact failures and temporal drift improve without degrading coefficient-fit acceptance or direct visual plausibility"
   }
 }

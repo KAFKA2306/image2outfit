@@ -105,6 +105,23 @@ class BlenderMaterialProjectionTests(unittest.TestCase):
             )
             self.assertLessEqual(projection.collider_settings["cloth_friction"], 80.0)
 
+    def test_collision_impulse_clamp_is_explicit_and_bounded(self) -> None:
+        for projection in self.projections:
+            self.assertEqual(10.0, projection.cloth_collision_settings["impulse_clamp"])
+            self.assertEqual(
+                0.0, projection.cloth_collision_settings["self_impulse_clamp"]
+            )
+
+        payload = json.loads(self.profile_path.read_text(encoding="utf-8"))
+        payload["collisionImpulseClamp"] = 100.1
+        invalid_path = ROOT / ".image2outfit-test-invalid-impulse-clamp.json"
+        try:
+            invalid_path.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "impulse"):
+                load_blender_calibration_profile(invalid_path)
+        finally:
+            invalid_path.unlink(missing_ok=True)
+
     def test_collision_and_render_thickness_remain_separate_fields(self) -> None:
         for material, projection in zip(self.materials, self.projections, strict=True):
             self.assertAlmostEqual(
