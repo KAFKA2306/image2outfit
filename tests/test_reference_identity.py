@@ -51,9 +51,7 @@ def identity_fixture(
                 "No primary-source identity evidence is available.",
             ),
         )
-        claims.append(
-            IdentityClaim(field, status, value, reason, evidence_ids)
-        )
+        claims.append(IdentityClaim(field, status, value, reason, evidence_ids))
         event = make_identity_history_event(
             sequence=sequence,
             field=field,
@@ -119,8 +117,9 @@ class ReferenceIdentityTests(unittest.TestCase):
 
     def test_internal_product_id_cannot_be_promoted_as_model_or_sku(self) -> None:
         for field in (IdentityField.MODEL_NUMBER, IdentityField.SELLER_SKU):
-            with self.subTest(field=field), self.assertRaisesRegex(
-                ValueError, "internal product_id"
+            with (
+                self.subTest(field=field),
+                self.assertRaisesRegex(ValueError, "internal product_id"),
             ):
                 identity_fixture(
                     {
