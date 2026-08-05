@@ -25,8 +25,6 @@ BONES = {
     "upper_arm_r": ("UpperArm_R", "RightUpperArm"),
     "lower_arm_l": ("LowerArm_L", "LeftLowerArm"),
     "lower_arm_r": ("LowerArm_R", "RightLowerArm"),
-    "upper_leg_l": ("UpperLeg_L", "LeftUpperLeg"),
-    "upper_leg_r": ("UpperLeg_R", "RightUpperLeg"),
     "lower_leg_l": ("LowerLeg_L", "LeftLowerLeg"),
     "lower_leg_r": ("LowerLeg_R", "RightLowerLeg"),
     "foot_l": ("Foot_L", "LeftFoot"),
@@ -118,15 +116,15 @@ def ellipsoid_between(name, root, tip, width, depth, mat):
     return obj
 
 
-def frustum_shell(name, center, rings, mat, *, segments=64, scallops=0):
-    """Create an open multi-ring elliptical garment shell."""
+def _ring_shell(name, center, rings, mat, segments, radial_wave=None):
     vertices = []
     for ring_index, (z, radius_x, radius_y, y_offset) in enumerate(rings):
+        ring_fraction = 1.0 - ring_index / max(1, len(rings) - 1)
         for segment in range(segments):
             angle = math.tau * segment / segments
             wave = 1.0
-            if scallops and ring_index == 0:
-                wave += 0.035 * math.sin(scallops * angle)
+            if radial_wave is not None:
+                wave += radial_wave(angle, ring_fraction)
             vertices.append(
                 (
                     center.x + radius_x * wave * math.cos(angle),
@@ -152,6 +150,15 @@ def frustum_shell(name, center, rings, mat, *, segments=64, scallops=0):
     return finish(obj, mat)
 
 
+def frustum_shell(name, center, rings, mat, *, segments=64, scallops=0):
+    def wave(angle, ring_fraction):
+        if scallops and ring_fraction > 0.99:
+            return 0.035 * math.sin(scallops * angle)
+        return 0.0
+
+    return _ring_shell(name, center, rings, mat, segments, wave)
+
+
 def pleated_shell(
     name,
     center,
@@ -162,24 +169,39 @@ def pleated_shell(
     pleats=12,
     fold=0.075,
 ):
-    """Create a short A-line shell with radial pleats strongest at the hem."""
+    def wave(angle, ring_fraction):
+        return fold * ring_fraction * math.cos(pleats * angle)
+
+    obj = _ring_shell(name, center, rings, mat, segments, wave)
+    obj["pleatCount"] = pleats
+    obj["pleatFold"] = fold
+    return obj
+
+
+def sewn_bodice_shell(name, center, rings, mat, *, segments=72):
+    """Build one welded vest shell from five logical pattern regions.
+
+    The lower four rings are continuous. The upper interval omits the central
+    front wedge while retaining the back and both shoulder straps, producing a
+    sewn V-neck vest without disconnected panel objects.
+    """
     vertices = []
-    ring_count = len(rings)
-    for ring_index, (z, radius_x, radius_y, y_offset) in enumerate(rings):
-        hem_fraction = 1.0 - ring_index / max(1, ring_count - 1)
+    for z, radius_x, radius_y, y_offset in rings:
         for segment in range(segments):
             angle = math.tau * segment / segments
-            wave = 1.0 + fold * hem_fraction * math.cos(pleats * angle)
             vertices.append(
                 (
-                    center.x + radius_x * wave * math.cos(angle),
-                    center.y + y_offset + radius_y * wave * math.sin(angle),
+                    center.x + radius_x * math.cos(angle),
+                    center.y + y_offset + radius_y * math.sin(angle),
                     z,
                 )
             )
     faces = []
-    for ring_index in range(ring_count - 1):
+    for ring_index in range(len(rings) - 1):
         for segment in range(segments):
+            angle = math.degrees(math.tau * (segment + 0.5) / segments)
+            if ring_index == len(rings) - 2 and 215.0 < angle < 325.0:
+                continue
             next_segment = (segment + 1) % segments
             first = ring_index * segments + segment
             second = ring_index * segments + next_segment
@@ -189,16 +211,16 @@ def pleated_shell(
     mesh = bpy.data.meshes.new(f"{name}_Mesh")
     mesh.from_pydata(vertices, [], faces)
     mesh.update(calc_edges=True)
-    _cylindrical_uv(mesh, segments, ring_count)
+    _cylindrical_uv(mesh, segments, len(rings))
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
-    obj["pleatCount"] = pleats
-    obj["pleatFold"] = fold
-    return finish(obj, mat)
+    finish(obj, mat)
+    obj["logicalPatternPanels"] = 5
+    obj["sewnContinuousShell"] = True
+    return obj
 
 
 def axis_shell(name, start, end, radii, mat, *, segments=40):
-    """Create an open sleeve-like shell around an arbitrary bone segment."""
     axis = end - start
     direction = axis.normalized()
     reference = Vector((0.0, 0.0, 1.0))
@@ -242,6 +264,29 @@ def _apply_modifier(obj, name):
     obj.select_set(False)
 
 
+def project_to_body(obj, body, offset):
+    modifier = obj.modifiers.new("Body-guided sewn fit", "SHRINKWRAP")
+    modifier.target = body
+    modifier.wrap_method = "NEAREST_SURFACEPOINT"
+    if hasattr(modifier, "wrap_mode"):
+        modifier.wrap_mode = "OUTSIDE_SURFACE"
+    modifier.offset = offset
+    _apply_modifier(obj, modifier.name)
+    smooth = obj.modifiers.new("Sewn shell smoothing", "SMOOTH")
+    smooth.factor = 0.22
+    smooth.iterations = 3
+    _apply_modifier(obj, smooth.name)
+    return obj
+
+
+def add_outward_thickness(obj, thickness):
+    modifier = obj.modifiers.new("Outward garment thickness", "SOLIDIFY")
+    modifier.thickness = thickness
+    modifier.offset = 1.0
+    _apply_modifier(obj, modifier.name)
+    return obj
+
+
 def triangulate(obj):
     modifier = obj.modifiers.new("Explicit triangle export", "TRIANGULATE")
     modifier.quad_method = "BEAUTY"
@@ -263,10 +308,7 @@ def panel(name, points, mat, thickness):
             )
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
-    modifier = obj.modifiers.new("Panel thickness", "SOLIDIFY")
-    modifier.thickness = thickness
-    modifier.offset = 0.0
-    _apply_modifier(obj, modifier.name)
+    add_outward_thickness(obj, thickness)
     triangulate(obj)
     obj["image2outfit_role"] = "garment"
     return obj
@@ -331,8 +373,8 @@ def enforce_body_clearance(
     *,
     only_above=None,
     maximum_search=None,
+    iterations=2,
 ):
-    """Project under-clearance vertices outward without copying body topology."""
     depsgraph = bpy.context.evaluated_depsgraph_get()
     evaluated = body.evaluated_get(depsgraph)
     body_mesh = evaluated.to_mesh()
@@ -346,38 +388,40 @@ def enforce_body_clearance(
         inverse = obj.matrix_world.inverted()
         moved = 0
         maximum_move = 0.0
-        for vertex in obj.data.vertices:
-            world = obj.matrix_world @ vertex.co
-            if only_above is not None and world.z < only_above:
-                continue
-            nearest = tree.find_nearest(world)
-            if nearest is None:
-                continue
-            location, normal, _, distance = nearest
-            outward = location - body_center
-            if normal.dot(outward) < 0.0:
-                normal = -normal
-            signed = (world - location).dot(normal)
-            if signed >= clearance:
-                continue
-            if (
-                maximum_search is not None
-                and distance > maximum_search
-                and signed >= 0.0
-            ):
-                continue
-            corrected = location + normal * clearance
-            move = (corrected - world).length
-            vertex.co = inverse @ corrected
-            moved += 1
-            maximum_move = max(maximum_move, move)
-        obj.data.update(calc_edges=True)
+        for _ in range(iterations):
+            for vertex in obj.data.vertices:
+                world = obj.matrix_world @ vertex.co
+                if only_above is not None and world.z < only_above:
+                    continue
+                nearest = tree.find_nearest(world)
+                if nearest is None:
+                    continue
+                location, normal, _, distance = nearest
+                outward = location - body_center
+                if normal.dot(outward) < 0.0:
+                    normal = -normal
+                signed = (world - location).dot(normal)
+                if signed >= clearance:
+                    continue
+                if (
+                    maximum_search is not None
+                    and distance > maximum_search
+                    and signed >= 0.0
+                ):
+                    continue
+                corrected = location + normal * clearance
+                move = (corrected - world).length
+                vertex.co = inverse @ corrected
+                moved += 1
+                maximum_move = max(maximum_move, move)
+            obj.data.update(calc_edges=True)
         return {
             "object": obj.name,
             "movedVertices": moved,
             "maximumMove": maximum_move,
             "clearance": clearance,
             "onlyAbove": only_above,
+            "iterations": iterations,
         }
     finally:
         evaluated.to_mesh_clear()
@@ -401,19 +445,19 @@ def bake_skirt(skirt, body):
         pass
     cloth = skirt.modifiers.new("Nocturne cloth simulation", "CLOTH")
     cloth.settings.quality = 8
-    cloth.settings.mass = 0.16
+    cloth.settings.mass = 0.14
     cloth.settings.vertex_group_mass = group.name
-    _set_if_available(cloth.settings, "tension_stiffness", 28.0)
-    _set_if_available(cloth.settings, "compression_stiffness", 28.0)
-    _set_if_available(cloth.settings, "shear_stiffness", 18.0)
-    _set_if_available(cloth.settings, "bending_stiffness", 4.0)
-    _set_if_available(cloth.settings, "air_damping", 4.0)
+    _set_if_available(cloth.settings, "tension_stiffness", 40.0)
+    _set_if_available(cloth.settings, "compression_stiffness", 40.0)
+    _set_if_available(cloth.settings, "shear_stiffness", 30.0)
+    _set_if_available(cloth.settings, "bending_stiffness", 8.0)
+    _set_if_available(cloth.settings, "air_damping", 6.0)
     if hasattr(cloth.settings, "effector_weights"):
-        cloth.settings.effector_weights.gravity = 0.18
+        cloth.settings.effector_weights.gravity = 0.0
     cloth.collision_settings.use_collision = True
-    cloth.collision_settings.distance_min = 0.004
+    cloth.collision_settings.distance_min = 0.006
     cloth.collision_settings.use_self_collision = True
-    cloth.collision_settings.self_distance_min = 0.004
+    cloth.collision_settings.self_distance_min = 0.006
     scene = bpy.context.scene
     scene.frame_end = 32
     for frame in range(1, 33):
@@ -441,7 +485,7 @@ def bake_skirt(skirt, body):
         "pinVertices": len(pinned),
         "bodyCollision": True,
         "selfCollision": True,
-        "gravityWeight": 0.18,
+        "gravityWeight": 0.0,
         "shapePreservingStiffness": True,
         "baked": True,
     }
