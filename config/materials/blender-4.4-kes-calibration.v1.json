@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-cusick-calibration-v7-per-material",
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v8-long-settle",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
-  "mappingStatus": "fixture-calibrated-per-material-search",
+  "mappingStatus": "long-settle-diagnostic",
   "mappingMethod": "explicit geometric-mean scalar projection with recorded axis loss, followed by material-specific Blender 4.4.3 correction factors identified on a collision-supported Cusick fixture; not a universal SI-to-Blender conversion",
   "scalarProjectionRanges": {
     "tensionStiffness": [
@@ -58,7 +58,7 @@
     "selfCollision": false,
     "source": "https://doi.org/10.3390/su17041388",
     "simulationMethodSource": "https://doi.org/10.3390/ma14216259",
-    "purpose": "diagnostic search before final validation on the published approximately 4 mm mesh resolution",
+    "purpose": "long-settle diagnostic at fixed material scales before friction or constitutive re-identification; final validation still requires the published approximately 4 mm mesh resolution",
     "supportConstraint": "no pin group; the planar specimen starts 5 mm above the solid disk and falls freely onto its collision surface"
   },
   "publishedKesSimulationDrapeCoefficients": {
@@ -76,9 +76,9 @@
     0.1
   ],
   "searchPolicy": {
-    "spacing": "targeted-per-material-candidate-search",
-    "policy": "select one explicit Blender-only scale per material by minimizing absolute Cusick coefficient error plus a fixed penalty for each plausibility failure; thresholds and source targets are unchanged",
-    "reason": "Blender 4.4.3 exposes scalar structural and bending springs; the six KES fabrics, especially anisotropic M2, cannot be represented by one shared scalar correction"
+    "spacing": "fixed-scales-long-settle-diagnostic",
+    "policy": "reuse the six scales selected by the 100-frame candidate sweep and evaluate only the final mixed-material scene at 250 frames",
+    "reason": "the 100-frame evidence retained central rebound and only 13-37% support contact, so temporal non-convergence must be separated from friction or constitutive-model error before any further fitting"
   },
   "acceptance": {
     "maximumRmseVsPublishedKes": 0.18,
@@ -123,7 +123,14 @@
       "role": "warp-weft anisotropy must remain explicit in dynamic drape models"
     }
   ],
-  "calibratedElasticScales": null,
+  "calibratedElasticScales": {
+    "kes-2025-m1-polyester-twill": 0.015,
+    "kes-2025-m2-polyester-plain": 0.1,
+    "kes-2025-m3-wool-polyester-elastane-twill": 0.01,
+    "kes-2025-m4-polyester-viscose-elastane-twill": 0.015,
+    "kes-2025-m5-polyester-elastane-plain": 0.015,
+    "kes-2025-m6-cotton-polyester-elastane-twill": 0.015
+  },
   "calibrationScope": {
     "solver": "Blender 4.4.3 cloth",
     "fixture": "300 mm Cusick specimen on 90 mm support radius",
