@@ -47,6 +47,7 @@ from .artifact_dag import (
     PipelineArtifactDAG,
     StageContract,
 )
+from .artifact_bridge import artifact_ref_from_stage_result
 
 __all__ = [
     "ArtifactKind",
@@ -82,6 +83,7 @@ __all__ = [
     "StitchEdge",
     "SurfaceOrientation",
     "UnitSystem",
+    "artifact_ref_from_stage_result",
     "expand_command_template",
     "new_pipeline_state",
     "run_pipeline",
