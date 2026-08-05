@@ -126,10 +126,15 @@ def stage_ingest(
     audit = read_object(audit_path, "reference audit")
     if audit.get("productId") != product_id:
         raise ValueError("reference audit product identity mismatch")
-    expected_reference = f"private-reference://sha256/{audit['source']['originalSha256']}"
+    expected_reference = (
+        f"private-reference://sha256/{audit['source']['originalSha256']}"
+    )
     if request.get("sourceReference") != expected_reference:
         raise ValueError("request sourceReference does not match reference audit")
-    if audit["source"]["sourceRetention"].get("repositoryContainsSourceImage") is not False:
+    if (
+        audit["source"]["sourceRetention"].get("repositoryContainsSourceImage")
+        is not False
+    ):
         raise ValueError("public repository must not retain the private source image")
     binding = write_json(
         runtime_root(product_id) / "reference" / "source-binding.json",
@@ -187,9 +192,7 @@ def stage_normalize(job: Mapping[str, Any], result: Path) -> None:
             [(330, 120), (438, 120), (408, 355), (384, 390), (360, 355)],
             fill=white,
         )
-        draw.polygon(
-            [(286, 390), (482, 390), (590, 650), (178, 650)], fill=black
-        )
+        draw.polygon([(286, 390), (482, 390), (590, 650), (178, 650)], fill=black)
         draw.polygon(
             [(205, 620), (563, 620), (610, 700), (158, 700)],
             fill=(30, 30, 34),
@@ -405,10 +408,11 @@ def stage_export(job: Mapping[str, Any], result: Path) -> None:
 
 def stage_render(job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
-    views = [repo_path(value, label="preview") for value in job["previewPaths"].values()]
+    views = [
+        repo_path(value, label="preview") for value in job["previewPaths"].values()
+    ]
     pose_paths = [
-        repo_path(value, label="pose")
-        for value in job.get("posePaths", {}).values()
+        repo_path(value, label="pose") for value in job.get("posePaths", {}).values()
     ]
     emit(
         result,
@@ -431,7 +435,10 @@ def stage_audit(job: Mapping[str, Any], result: Path) -> None:
     metrics = payload.get("metrics")
     if not isinstance(metrics, dict):
         raise ValueError("geometry report metrics are missing")
-    if metrics.get("unweightedVertices") != 0 or metrics.get("degenerateTriangles") != 0:
+    if (
+        metrics.get("unweightedVertices") != 0
+        or metrics.get("degenerateTriangles") != 0
+    ):
         raise ValueError("geometry report contains unweighted or degenerate geometry")
     emit(
         result,
@@ -446,7 +453,9 @@ def stage_visual_review(
     job: Mapping[str, Any], request: Mapping[str, Any], result: Path
 ) -> None:
     product_id = str(job["id"])
-    review = repo_path(job["garmentPipeline"]["visualReviewPath"], label="visual review")
+    review = repo_path(
+        job["garmentPipeline"]["visualReviewPath"], label="visual review"
+    )
     if not review.is_file():
         raise FileNotFoundError(
             "direct visual review is not recorded yet; inspect current render artifacts "
@@ -467,7 +476,9 @@ def stage_visual_review(
     }
     if mismatches:
         raise ValueError(f"visual review contract mismatch: {mismatches}")
-    views = [repo_path(value, label="preview") for value in job["previewPaths"].values()]
+    views = [
+        repo_path(value, label="preview") for value in job["previewPaths"].values()
+    ]
     emit(
         result,
         stage="visual-review",
@@ -492,24 +503,20 @@ def stage_finalize(
     )
     build_report = read_object(build_report_path, "build report")
     pose_paths = [
-        repo_path(value, label="pose")
-        for value in job.get("posePaths", {}).values()
+        repo_path(value, label="pose") for value in job.get("posePaths", {}).values()
     ]
     gates = {
         "blender": build_report.get("passed") is True,
         "editableSource": repo_path(job["blendPath"], label="blend").is_file(),
         "fbx": repo_path(job["fbxAssetPath"], label="fbx").is_file(),
-        "prefabDeclared": repo_path(
-            job["prefabAssetPath"], label="prefab"
-        ).is_file(),
+        "prefabDeclared": repo_path(job["prefabAssetPath"], label="prefab").is_file(),
         "fiveViewEvidence": all(
             repo_path(value, label="preview").is_file()
             for value in job["previewPaths"].values()
         ),
         "poseEvidence": bool(pose_paths) and all(path.is_file() for path in pose_paths),
         "visualAppearanceReview": review.get("status") == "PASS",
-        "researchTrial": job.get("researchMethod", {}).get("trialStatus")
-        == "DECLARED",
+        "researchTrial": job.get("researchMethod", {}).get("trialStatus") == "DECLARED",
     }
     status = "COMPLETE" if all(gates.values()) else "WORKING"
     candidate_path = repo_path(
