@@ -3,14 +3,52 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Any
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from image2outfit.quality import validate_quality_assessment
 
 import customer_quality
 import production_contract as contract
 import release_gate as legacy
 from candidate_orchestrator import _research_state
 from runtime_transaction import DirectoryTransaction
+
+QUALITY_SPEC_PATH = Path("contracts/quality/quality-spec.json")
+
+
+def _quality_spec_audit(
+    *,
+    job: dict[str, Any],
+    candidate_hash: str,
+    evidence_documents: dict[str, dict[str, Any]],
+) -> tuple[dict[str, Any], list[str]]:
+    spec_data = legacy.read(legacy.ROOT / QUALITY_SPEC_PATH)
+    visual_review = evidence_documents.get("visual-review", {})
+    assessment = (
+        visual_review.get("qualitySpec") if isinstance(visual_review, dict) else None
+    )
+    result, errors = validate_quality_assessment(
+        spec_data=spec_data,
+        assessment=assessment,
+        job_id=str(job.get("id", "")),
+        adapter_id=str(job.get("adapterId", "")),
+        candidate_manifest_sha256=candidate_hash,
+        resolve_repo_path=legacy.path,
+        digest=legacy.digest,
+    )
+    result["specPath"] = QUALITY_SPEC_PATH.as_posix()
+    if errors:
+        result["passed"] = False
+        result["releaseReady"] = False
+        result["errors"] = sorted(set([*result.get("errors", []), *errors]))
+    return result, [f"qualitySpec: {error}" for error in sorted(set(errors))]
 
 
 def _strict_release_audit(
@@ -71,6 +109,14 @@ def _strict_release_audit(
         digest=legacy.digest,
     )
     errors.extend(quality_errors)
+
+    quality_spec, quality_spec_errors = _quality_spec_audit(
+        job=job,
+        candidate_hash=candidate_hash,
+        evidence_documents=evidence_documents,
+    )
+    quality["qualitySpec"] = quality_spec
+    errors.extend(quality_spec_errors)
     return quality, research, list(dict.fromkeys(errors)), candidate_hash
 
 
@@ -159,8 +205,11 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
                     "previousReleaseExisted": release_had_original,
                     "previousReleaseRestored": False,
                     "strictCustomerQualityPassed": True,
+                    "qualitySpecPassed": True,
                     "researchBaselinePassed": True,
                     "singleReleaseValidator": "tools/customer_quality.py",
+                    "qualitySpecValidator": "src/image2outfit/quality.py",
+                    "qualitySpecPath": QUALITY_SPEC_PATH.as_posix(),
                     "rawEvidencePackaged": True,
                 },
             },

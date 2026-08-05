@@ -87,6 +87,62 @@ class ReviewConsoleTest(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        report_dir = (
+            self.root / ".image2outfit" / "products" / "demo-outfit" / "reports"
+        )
+        report_dir.mkdir(parents=True)
+        (report_dir / "customer-quality.json").write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 2,
+                    "candidateManifestSha256": "candidate-quality-sha",
+                    "evidence": {
+                        "qualitySpec": {
+                            "specPath": "contracts/quality/quality-spec.json",
+                            "passed": False,
+                            "candidateManifestSha256": "candidate-quality-sha",
+                            "aspects": {
+                                "topology": {
+                                    "status": "FAIL",
+                                    "metric": {
+                                        "name": "invalidTopologyFindingCount",
+                                        "value": 2,
+                                        "operator": "lte",
+                                        "threshold": 0,
+                                    },
+                                    "recommendedReturnStage": "build-blender",
+                                    "evidence": [
+                                        {
+                                            "kind": "geometry-audit",
+                                            "path": "Assets/GenWorks/demo-outfit/Evidence/review.json",
+                                            "sha256": expected_review_hash,
+                                            "verified": True,
+                                            "view": None,
+                                            "pose": "neutral",
+                                        }
+                                    ],
+                                }
+                            },
+                            "visualAppearanceReview": {
+                                "status": "PASS",
+                                "reviewMethod": "DIRECT_IMAGE_REVIEW",
+                                "reviewer": "human:reviewer",
+                                "evidence": [],
+                            },
+                            "defects": [
+                                {
+                                    "code": "TOPOLOGY_INVALID",
+                                    "aspect": "topology",
+                                    "recommendedReturnStage": "build-blender",
+                                    "reasons": ["non-manifold edge"],
+                                }
+                            ],
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
 
     def tearDown(self) -> None:
         self.temp.cleanup()
@@ -101,19 +157,29 @@ class ReviewConsoleTest(unittest.TestCase):
         record = data["products"][0]
         self.assertEqual(record["slug"], "demo-outfit")
         self.assertEqual(record["state"], "HUMAN_REVIEW_PENDING")
-        self.assertEqual(record["blocker_count"], 1)
+        self.assertEqual(record["blocker_count"], 2)
         self.assertEqual(record["blockers"][0]["severity"], "MAJOR")
+        self.assertIn("TOPOLOGY_INVALID", record["blockers"][1]["message"])
+        self.assertIn("return build-blender", record["blockers"][1]["message"])
         self.assertEqual(record["resume_point"], "human review")
-        self.assertEqual(record["candidate_hash"], "candidate-abc")
+        self.assertEqual(record["candidate_hash"], "candidate-quality-sha")
         self.assertEqual(
             [asset["status"] for asset in record["assets"]],
             ["PASS", "MISSING", "MISSING"],
         )
         self.assertIsNotNone(record["assets"][0]["sha256"])
-        self.assertEqual([gate["status"] for gate in record["gates"]], ["PASS", "FAIL"])
-        self.assertTrue(record["gates"][1]["href"].endswith("Logs/runtime.txt"))
-        self.assertEqual(record["evidence"][0]["status"], "PASS")
-        self.assertEqual(record["evidence"][1]["status"], "HASH_MISMATCH")
+        gates = {gate["name"]: gate for gate in record["gates"]}
+        self.assertEqual(gates["fit"]["status"], "PASS")
+        self.assertEqual(gates["runtime"]["status"], "FAIL")
+        self.assertTrue(gates["runtime"]["href"].endswith("Logs/runtime.txt"))
+        self.assertEqual(gates["quality:topology"]["status"], "FAIL")
+        self.assertIn("build-blender", gates["quality:topology"]["detail"])
+        self.assertEqual(gates["quality:visualAppearanceReview"]["status"], "PASS")
+        evidence = {item["label"]: item for item in record["evidence"]}
+        self.assertEqual(evidence["human review"]["status"], "PASS")
+        self.assertEqual(evidence["tampered evidence"]["status"], "HASH_MISMATCH")
+        self.assertEqual(evidence["topology:geometry-audit:neutral"]["status"], "PASS")
+        self.assertEqual(evidence["QualitySpec release projection"]["status"], "FAIL")
 
     def test_html_is_read_only_keyboard_operable_and_has_unique_landmarks(self) -> None:
         MODULE.build(self.root, self.output)
@@ -127,6 +193,7 @@ class ReviewConsoleTest(unittest.TestCase):
             "未解決blocker",
             "必須ビュー・ポーズ",
             "release gate",
+            "QualitySpec release projection",
             "window.REVIEW_CONSOLE_DATA",
             "new URLSearchParams(location.search)",
             "history.replaceState",
