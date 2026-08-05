@@ -11,18 +11,15 @@ import siroino_strappy_knit_build as base
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-nocturne-angel-set"
 PRODUCT_NAME = "Nocturne Angel Modular Set for Siroino"
-REVISION = "v5-skinweighted-pleated-volume"
+REVISION = "v6-welded-projected-pleats"
 REFERENCE_SHA256 = "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67"
-
 REJECTED_HISTORY = [
     {
         "revision": "v1-pattern-gsl-modular-cloth",
         "result": "VISUAL_REJECTED",
         "hostedWorkflowRun": 30934884455,
         "artifactId": 8903072226,
-        "artifactSha256": (
-            "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c0392551a"
-        ),
+        "artifactSha256": "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c0392551a",
         "evidence": "Tests/visual-review-v1.json",
     },
     {
@@ -30,9 +27,7 @@ REJECTED_HISTORY = [
         "result": "VISUAL_REJECTED",
         "hostedWorkflowRun": 30937377321,
         "artifactId": 8904078622,
-        "artifactSha256": (
-            "5f3465dc50486b627df520142a7a74fa2b5b98d22089a509d124a5d1936be3fc"
-        ),
+        "artifactSha256": "5f3465dc50486b627df520142a7a74fa2b5b98d22089a509d124a5d1936be3fc",
         "evidence": "Tests/visual-review-v2.json",
     },
     {
@@ -40,9 +35,7 @@ REJECTED_HISTORY = [
         "result": "VISUAL_REJECTED",
         "hostedWorkflowRun": 30957408404,
         "artifactId": 8911782998,
-        "artifactSha256": (
-            "0921d4d449985ef757db808dc9b316421f1a70374f8cd5c4f75d562f254f3d2b"
-        ),
+        "artifactSha256": "0921d4d449985ef757db808dc9b316421f1a70374f8cd5c4f75d562f254f3d2b",
         "evidence": "Tests/visual-review-v3.json",
     },
     {
@@ -50,17 +43,22 @@ REJECTED_HISTORY = [
         "result": "VISUAL_REJECTED",
         "hostedWorkflowRun": 30959394549,
         "artifactId": 8912558603,
-        "artifactSha256": (
-            "086c1fa3ab50d37d6f44bd1af2605d45800a4973623434a405fc2224d15d94c1"
-        ),
+        "artifactSha256": "086c1fa3ab50d37d6f44bd1af2605d45800a4973623434a405fc2224d15d94c1",
         "evidence": "Tests/visual-review-v4.json",
+    },
+    {
+        "revision": "v5-skinweighted-pleated-volume",
+        "result": "VISUAL_REJECTED",
+        "hostedWorkflowRun": 30961445364,
+        "artifactId": 8913291340,
+        "artifactSha256": "316592e0023e924a3b4028c923764047f202c6984d99a88c2f16fa36933fe852",
+        "evidence": "Tests/visual-review-v5.json",
     },
 ]
 
 
 def _guid(label: str) -> str:
-    value = f"image2outfit:{PRODUCT_ID}:{label}".encode()
-    return hashlib.md5(value).hexdigest()
+    return hashlib.md5(f"image2outfit:{PRODUCT_ID}:{label}".encode()).hexdigest()
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -80,10 +78,9 @@ def _read_guid(path: Path) -> str:
 
 def write_integrated_prefab(job: dict) -> Path:
     outfit = base.repo_path(job["prefabAssetPath"])
-    outfit_meta = outfit.with_suffix(outfit.suffix + ".meta")
-    if not outfit.is_file() or not outfit_meta.is_file():
+    meta = outfit.with_suffix(outfit.suffix + ".meta")
+    if not outfit.is_file() or not meta.is_file():
         raise RuntimeError("outfit Prefab declaration is missing")
-    outfit_guid = _read_guid(outfit_meta)
     integrated = base.repo_path(job["integratedPrefabAssetPath"])
     integrated.parent.mkdir(parents=True, exist_ok=True)
     integrated.write_text(
@@ -97,7 +94,7 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {{fileID: 0}}
     m_Modifications:
-    - target: {{fileID: 100000, guid: {outfit_guid}, type: 3}}
+    - target: {{fileID: 100000, guid: {_read_guid(meta)}, type: 3}}
       propertyPath: m_Name
       value: SiroinoSotai_NocturneAngelSet
       objectReference: {{fileID: 0}}
@@ -105,7 +102,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {{fileID: 100100000, guid: {outfit_guid}, type: 3}}
+  m_SourcePrefab: {{fileID: 100100000, guid: {_read_guid(meta)}, type: 3}}
 """,
         encoding="utf-8",
     )
@@ -128,36 +125,19 @@ PrefabInstance:
 
 
 def _pattern(cloth: list[dict]) -> dict:
-    panels = [
-        ("bodice-front-left", "Nocturne_Bodice_Front_L", "base"),
-        ("bodice-front-right", "Nocturne_Bodice_Front_R", "base"),
-        ("bodice-back", "Nocturne_Bodice_Back", "base"),
-        ("bodice-side-left", "Nocturne_Bodice_Side_L", "base"),
-        ("bodice-side-right", "Nocturne_Bodice_Side_R", "base"),
-        ("collar-left", "Nocturne_Sailor_Collar_L", "overlay"),
-        ("collar-right", "Nocturne_Sailor_Collar_R", "overlay"),
-        ("collar-back", "Nocturne_Sailor_Collar_Back", "overlay"),
-        ("skirt", "Nocturne_Cloth_Skirt", "outer"),
-        ("hem-frill", "Nocturne_Cream_Hem_Frill", "outer-trim"),
-        ("waist-band", "Nocturne_Waist_Band", "closure"),
-        ("puff-sleeve-left", "Nocturne_Puff_Sleeve_L", "outer"),
-        ("puff-sleeve-right", "Nocturne_Puff_Sleeve_R", "outer"),
-        ("arm-warmer-left", "Nocturne_Detached_Arm_Warmer_L", "detached"),
-        ("arm-warmer-right", "Nocturne_Detached_Arm_Warmer_R", "detached"),
-        ("leg-warmer-left", "Nocturne_Leg_Warmer_L", "detached"),
-        ("leg-warmer-right", "Nocturne_Leg_Warmer_R", "detached"),
+    logical_panels = [
+        "front-left",
+        "front-right",
+        "back",
+        "side-left",
+        "side-right",
     ]
     seams = [
         ("front-center", "front-left.center", "front-right.center"),
-        ("front-side-left", "front-left.side", "side-left.front"),
-        ("front-side-right", "front-right.side", "side-right.front"),
-        ("back-side-left", "back.left", "side-left.back"),
-        ("back-side-right", "back.right", "side-right.back"),
-        ("collar-left", "collar-left.inner", "front-left.neckline"),
-        ("collar-right", "collar-right.inner", "front-right.neckline"),
-        ("collar-back", "collar-back.inner", "back.neckline"),
-        ("skirt-waist", "skirt.waist", "waist-band.lower"),
-        ("hem-frill", "hem-frill.upper", "skirt.hem"),
+        ("left-side-front", "front-left.side", "side-left.front"),
+        ("left-side-back", "side-left.back", "back.left"),
+        ("right-side-front", "front-right.side", "side-right.front"),
+        ("right-side-back", "side-right.back", "back.right"),
     ]
     return {
         "schemaVersion": 2,
@@ -165,29 +145,25 @@ def _pattern(cloth: list[dict]) -> dict:
         "designRevision": REVISION,
         "status": "GENERATED",
         "representation": (
-            "five angular sewn bodice panels, transferred body weights, "
-            "shape-preserving pleated cloth and volumetric optional modules"
+            "five logical pattern regions welded into one projected V-neck shell, "
+            "zero-force pleated cloth and simplified body-following modules"
         ),
         "bodyTopologyCopied": False,
-        "panels": [
-            {
-                "id": identifier,
-                "object": object_name,
-                "layer": layer,
-                "cloth": identifier == "skirt",
-            }
-            for identifier, object_name, layer in panels
-        ],
+        "logicalBodicePanels": logical_panels,
+        "generatedBodiceObject": "Nocturne_Sewn_Bodice",
+        "sewnContinuousShell": True,
         "seams": [
             {"id": identifier, "a": first, "b": second}
             for identifier, first, second in seams
         ],
         "modules": {
-            "core": ["skin-weighted bodice", "pleated skirt", "collar", "sleeves"],
-            "head": ["lowered beret", "animal ears"],
-            "back": ["four volumetric feathers per side", "tail"],
-            "legs": ["skin-weighted leg warmers", "skin-weighted shoes"],
+            "core": ["sewn bodice", "pleated skirt", "collar", "sleeves"],
+            "back": ["three volumetric feathers per side", "tail"],
+            "legs": ["body-following warmers", "body-following shoes"],
             "accessories": ["choker", "amber charm", "rabbit charm"],
+            "omittedFromReview": [
+                "beret and animal ears because the target evidence has no visible head mesh"
+            ],
         },
         "clothSimulation": cloth,
     }
@@ -200,8 +176,8 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
         "result": "PASS",
         "executedAt": base.utc_now(),
         "method": (
-            "PatternGSL-inspired explicit panel and seam representation with "
-            "Blender cloth, evaluated-body clearance and nearest-body weight transfer"
+            "PatternGSL-inspired logical panels and seams, welded independent shell, "
+            "Blender cloth checkpoint and evaluated-body projection"
         ),
         "sources": [
             {
@@ -220,19 +196,15 @@ def _research(pattern: dict, cloth: list[dict]) -> dict:
         "implementation": {
             "externalResearchCodeExecuted": False,
             "bodyTopologyCopied": False,
+            "logicalPanelCount": len(pattern["logicalBodicePanels"]),
+            "generatedBodiceObjects": 1,
+            "nearestSurfaceProjection": True,
+            "outwardSolidify": True,
             "actualBlenderClothExecuted": all(
                 item.get("baked") is True for item in cloth
             ),
-            "panelCount": len(pattern["panels"]),
-            "seamPairCount": len(pattern["seams"]),
+            "clothGravityWeight": 0.0,
             "weightTransfer": "four strongest groups from nearest evaluated body vertex",
-            "clothShapeControl": {
-                "pleats": 12,
-                "gravityWeight": 0.18,
-                "shapePreservingStiffness": True,
-            },
-            "volumetricWings": True,
-            "explicitTriangleExport": True,
         },
         "clothSimulation": cloth,
         "acceptance": {
@@ -365,20 +337,19 @@ def write_records(job, previews, multiview, metrics, cloth) -> None:
         base.repo_path(job["productManifestPath"]),
         _manifest(job, previews, multiview, metrics, cloth),
     )
-    cloth_frames = cloth[0]["frames"]
     (root / "README.md").write_text(
         f"""# {PRODUCT_NAME}
 
 `WORKING` — SiroinoSotai_PC向けの黒・ベージュ・白のモジュール式衣装です。
 
 - revision: `{REVISION}`
-- angular five-panel V-neck bodice using evaluated nearest-body weight transfer
-- short twelve-pleat skirt with {cloth_frames}-frame shape-preserving Blender Cloth
-- transferred body weights for skirt, sleeves, warmers, cuffs and shoes
-- four volumetric ellipsoidal feathers per wing
-- corrected outward body-surface clearance and explicit triangle export
+- five logical bodice panels welded into one continuous projected V-neck shell
+- outward-only thickness and nearest-body four-influence weight transfer
+- short twelve-pleat skirt with a 32-frame zero-force Blender Cloth checkpoint
+- unsupported head modules omitted from review because the target has no visible head mesh
+- three compact volumetric feathers per wing
 - reference image is hash-bound but not redistributed
-- rejected v1 through v4 evidence remains under `Tests/`
+- rejected v1 through v5 evidence remains under `Tests/`
 
 5面レンダリングまで生成済みです。必須6ポーズと直接画像監査が完了するまで `COMPLETE` ではありません。Unity、Modular Avatar、NDMF、VRChat runtimeは `OUT_OF_SCOPE` です。
 """,
