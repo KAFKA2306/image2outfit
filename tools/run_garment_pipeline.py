@@ -96,7 +96,8 @@ def _assert_identity(state: dict[str, Any], expected: dict[str, str]) -> None:
     ]
     if mismatches:
         raise ValueError(
-            "resume checkpoint identity does not match request: " + ", ".join(mismatches)
+            "resume checkpoint identity does not match request: "
+            + ", ".join(mismatches)
         )
 
 
