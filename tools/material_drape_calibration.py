@@ -162,7 +162,9 @@ def cloth_material(name: str, index: int, total: int) -> bpy.types.Material:
     return material
 
 
-def add_collision(obj: bpy.types.Object, settings: Mapping[str, float]) -> dict[str, Any]:
+def add_collision(
+    obj: bpy.types.Object, settings: Mapping[str, float]
+) -> dict[str, Any]:
     obj.modifiers.new(name="Collision", type="COLLISION")
     if obj.collision is None:
         raise RuntimeError("Collision modifier did not expose Object.collision")
@@ -249,7 +251,9 @@ def create_cloth(
     surface_area = math.pi * SPECIMEN_RADIUS_M**2
     cloth_values = scaled_cloth_settings(projection, elastic_scale)
     cloth_values["mass"] = projection.vertex_mass_kg(surface_area, len(mesh.vertices))
-    actual_cloth = set_properties(modifier.settings, cloth_values, f"{cloth.name}.settings")
+    actual_cloth = set_properties(
+        modifier.settings, cloth_values, f"{cloth.name}.settings"
+    )
     collision_values = dict(projection.cloth_collision_settings)
     collision_values.update(
         {
@@ -353,7 +357,9 @@ def evaluated_geometry(
         evaluated = cloth.evaluated_get(depsgraph)
         mesh = evaluated.to_mesh()
         try:
-            coordinates = [evaluated.matrix_world @ vertex.co for vertex in mesh.vertices]
+            coordinates = [
+                evaluated.matrix_world @ vertex.co for vertex in mesh.vertices
+            ]
             polygons = [tuple(polygon.vertices) for polygon in mesh.polygons]
         finally:
             evaluated.to_mesh_clear()
@@ -427,7 +433,9 @@ def comparison_metrics(
         if item["plausibilityErrors"]
     ]
     return {
-        "rmseVsPublishedKes": math.sqrt(statistics.fmean(value * value for value in errors)),
+        "rmseVsPublishedKes": math.sqrt(
+            statistics.fmean(value * value for value in errors)
+        ),
         "maximumAbsoluteErrorVsPublishedKes": max(abs(value) for value in errors),
         "pearsonVsPublishedKes": pearson(published, simulated),
         "pearsonVsReal": pearson(real, simulated),
@@ -583,9 +591,7 @@ def render_evidence(
     )
     images.append({"kind": "comparison-oblique", **oblique})
     test_objects = [
-        obj
-        for obj in bpy.data.objects
-        if obj.name.startswith(("Cloth__", "Support__"))
+        obj for obj in bpy.data.objects if obj.name.startswith(("Cloth__", "Support__"))
     ]
     for record in records:
         material_id = record["materialId"]
@@ -601,7 +607,9 @@ def render_evidence(
             ortho_scale=0.38,
             resolution=(640, 640),
         )
-        images.append({"kind": "material-oblique", "materialId": material_id, **individual})
+        images.append(
+            {"kind": "material-oblique", "materialId": material_id, **individual}
+        )
     for obj in test_objects:
         obj.hide_render = False
     return images
@@ -678,8 +686,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         <= float(acceptance["maximumRmseVsPublishedKes"])
         and comparison["pearsonVsPublishedKes"]
         >= float(acceptance["minimumPearsonVsPublishedKes"])
-        and comparison["pearsonVsReal"]
-        >= float(acceptance["minimumPearsonVsReal"])
+        and comparison["pearsonVsReal"] >= float(acceptance["minimumPearsonVsReal"])
         and comparison["maximumAbsoluteErrorVsPublishedKes"]
         <= float(acceptance["maximumMaterialAbsoluteError"])
     )
