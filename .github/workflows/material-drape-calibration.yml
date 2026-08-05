@@ -68,7 +68,7 @@ jobs:
             tests/test_material_blender.py
 
   blender:
-    name: Blender 4.4.3 render evidence
+    name: Blender 4.4.3 Cusick calibration evidence
     needs: contract
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -91,7 +91,7 @@ jobs:
             --output blender.tar.xz
           mkdir -p .image2outfit/blender
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
-      - name: Run same-geometry six-material calibration
+      - name: Search one global elastic scale on the exact Cusick fixture
         run: |
           set -euo pipefail
           mkdir -p "$OUTPUT_DIR"
@@ -106,10 +106,9 @@ jobs:
             --library config/materials/kes-woven-fabrics-2025.v1.json \
             --profile config/materials/blender-4.4-kes-calibration.v1.json \
             --output "$OUTPUT_DIR" \
-            --frame-end 120 \
-            --rings 14 \
-            --segments 64 | tee "$OUTPUT_DIR/blender-calibration.log"
-      - name: Verify report and image hashes
+            --frame-end 100 \
+            --grid 41 | tee "$OUTPUT_DIR/blender-calibration.log"
+      - name: Verify calibrated report and image hashes
         run: |
           python - <<'PY'
           import hashlib, json, os
@@ -117,12 +116,14 @@ jobs:
 
           output = Path(os.environ["OUTPUT_DIR"])
           report = json.loads((output / "material-drape-report.json").read_text())
-          assert report["schemaVersion"] == 2
+          assert report["schemaVersion"] == 3
           assert report["passed"] is True, report["comparison"]
           assert report["blenderVersion"] == os.environ["BLENDER_VERSION"]
           assert len(report["records"]) == 6
           assert report["sameGeometryForAllMaterials"] is True
-          assert report["fixture"]["type"] == "circular-drape-over-central-pedestal"
+          assert report["fixture"]["type"] == "cusick-drape-meter"
+          assert report["fixture"]["specimenRadiusM"] == 0.15
+          assert report["fixture"]["supportRadiusM"] == 0.09
           assert report["comparison"]["plausibilityFailures"] == []
           for image in report["images"]:
               path = output / image["path"]
