@@ -2,7 +2,6 @@
 """Generate a measured SiroinoSotai_PC fit for the military romper."""
 from __future__ import annotations
 
-import json
 import statistics
 import sys
 from pathlib import Path
@@ -329,7 +328,9 @@ def hardware(
 ) -> list[bpy.types.Object]:
     objects: list[bpy.types.Object] = []
     minimum, _ = bounds(body)
-    z = lambda ratio: minimum.z + height * ratio
+
+    def z(ratio: float) -> float:
+        return minimum.z + height * ratio
 
     objects.append(
         rigid_box(
@@ -414,7 +415,9 @@ def build(
     minimum, maximum = bounds(body)
     height = maximum.z - minimum.z
     center = (minimum + maximum) * 0.5
-    z = lambda ratio: minimum.z + height * ratio
+
+    def z(ratio: float) -> float:
+        return minimum.z + height * ratio
 
     shoulders = [
         item[0]
