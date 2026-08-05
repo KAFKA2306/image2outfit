@@ -30,7 +30,10 @@ from .pipeline import (
     ExecutionMode,
     PipelineStage,
     new_pipeline_state,
+    next_pipeline_stage,
+    resume_pipeline_state,
     run_pipeline,
+    validate_pipeline_state,
 )
 
 __all__ = [
@@ -58,6 +61,9 @@ __all__ = [
     "SurfaceOrientation",
     "expand_command_template",
     "new_pipeline_state",
+    "next_pipeline_stage",
+    "resume_pipeline_state",
     "run_pipeline",
+    "validate_pipeline_state",
     "validate_stage_result",
 ]
