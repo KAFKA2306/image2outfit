@@ -197,9 +197,7 @@ class ConstructionSpecTests(unittest.TestCase):
                 Stitch(
                     stitch_id="side-seam",
                     first=StitchEdge("left-skirt", 1, 2, edge_id="left-side-seam"),
-                    second=StitchEdge(
-                        "right-skirt", 3, 0, edge_id="right-side-seam"
-                    ),
+                    second=StitchEdge("right-skirt", 3, 0, edge_id="right-side-seam"),
                 ),
             ),
         )
@@ -300,8 +298,7 @@ class MaterialSpecTests(unittest.TestCase):
         )
         self.assertTrue(
             all(
-                item.properties.stretch_warp_g_s2
-                != item.properties.stretch_weft_g_s2
+                item.properties.stretch_warp_g_s2 != item.properties.stretch_weft_g_s2
                 for item in materials
             )
         )
@@ -340,9 +337,7 @@ class StylingSpecTests(unittest.TestCase):
         self.assertEqual((), spec.conflicts())
         self.assertEqual(
             ("waist-anchor",),
-            tuple(
-                item.operation_id for item in spec.without("front-tuck").operations
-            ),
+            tuple(item.operation_id for item in spec.without("front-tuck").operations),
         )
 
     def test_dependency_cycle_is_rejected(self) -> None:
