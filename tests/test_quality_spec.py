@@ -18,7 +18,9 @@ class QualitySpecTest(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
         self.spec = json.loads(
-            (ROOT / "config" / "quality-spec.json").read_text(encoding="utf-8")
+            (ROOT / "contracts" / "quality" / "quality-spec.json").read_text(
+                encoding="utf-8"
+            )
         )
         self.candidate_hash = "a" * 64
         self.assessment = self._passing_assessment()
