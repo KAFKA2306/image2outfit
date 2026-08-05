@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/config/pipeline/stage-result.schema.v1.json",
+  "title": "image2outfit pipeline stage result",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schemaVersion", "stage", "productId", "status", "evidence"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "stage": {"type": "string", "minLength": 1},
+    "productId": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "status": {"const": "PASS"},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

@@ -16,6 +16,18 @@ SiroinoSotai_PC向け衣装をBlenderで制作し、編集可能ソース、FBX�
 
 `visualAppearanceReview` はChatGPTが実artifact画像を直接開いて実施できます。画像の存在、ファイルサイズ、hash、CI成功だけではPASSになりません。
 
+## 再利用可能な衣装パイプライン
+
+共通アーキテクチャは [`ARCHITECTURE.md`](ARCHITECTURE.md) に記載しています。
+
+- `src/image2outfit/`: 製品非依存の語彙、型紙・縫合中間表現、工程順、実行・証拠契約
+- `tools/`: Blender、subprocess、ファイルシステム、製品固有スクリプトへの接続
+- `config/pipeline-profiles/`: 正規工程と工程別証拠要件
+
+計画モードの最終状態は `PLANNED` です。計画の作成を製品完成とは扱いません。`--execute` の最終状態も製品状態の `COMPLETE` ではなく `EXECUTED` です。製品の `WORKING`、`COMPLETE`、`REJECTED` は既存の候補・完成ゲートだけが決定します。
+
+実行工程は終了コード0だけでは成功になりません。各工程は `.image2outfit/` 以下へ工程結果JSONを書き、工程名、製品ID、`PASS`、必要な結果フィールド、証拠ファイルのSHA-256を宣言します。ランナーは実ファイルのSHA-256を再計算して一致を確認します。
+
 ## スコープ外
 
 次は本プロジェクトの完了条件ではありません。
