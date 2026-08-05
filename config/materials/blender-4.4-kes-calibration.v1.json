@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-cusick-calibration-v4-free-fall",
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v5-high-scale-search",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
-  "mappingStatus": "free-fall-calibration-search",
+  "mappingStatus": "free-fall-high-scale-diagnostic",
   "mappingMethod": "relative KES projection followed by one global elastic scale evaluated on a collision-supported Cusick free-fall fixture; not an SI-to-Blender unit conversion",
   "scalarProjectionRanges": {
     "tensionStiffness": [
@@ -58,7 +58,7 @@
     "selfCollision": false,
     "source": "https://doi.org/10.3390/su17041388",
     "simulationMethodSource": "https://doi.org/10.3390/ma14216259",
-    "purpose": "match the published 300 mm circular sample and 90 mm support radius before comparing projected-area drape coefficients",
+    "purpose": "diagnostic search before final validation on the published approximately 4 mm mesh resolution",
     "supportConstraint": "no pin group; the planar specimen starts 5 mm above the solid disk and falls freely onto its collision surface"
   },
   "publishedKesSimulationDrapeCoefficients": {
@@ -70,14 +70,14 @@
     "kes-2025-m6-cotton-polyester-elastane-twill": 0.613
   },
   "elasticScaleSearch": [
-    0.001,
-    0.003,
-    0.01
+    0.03,
+    0.1,
+    0.3
   ],
   "searchPolicy": {
-    "spacing": "logarithmic-diagnostic-sweep",
-    "policy": "repeat the existing three-point global sweep only after replacing the invalid full-disk pin constraint with collision-supported free fall",
-    "reason": "scales selected with pinned support vertices are not transferable to the corrected Cusick boundary condition"
+    "spacing": "logarithmic-endpoint-extension",
+    "policy": "extend the corrected free-fall search above the former 0.01 upper endpoint without changing geometry, friction, targets, metrics, or acceptance thresholds",
+    "reason": "the 0.01 endpoint minimized the objective and increased projected area for five of six materials, while direct images still showed unsupported annular collapse"
   },
   "calibratedElasticScale": null,
   "acceptance": {
@@ -103,9 +103,14 @@
       "role": "independent tension, compression, shear, and angular bending springs; sequential simulation"
     },
     {
-      "title": "Blender Python API current index",
-      "url": "https://docs.blender.org/api/current/genindex-C.html",
-      "role": "runtime property paths for ClothSettings, ClothCollisionSettings, and CollisionSettings"
+      "title": "Blender 4.4.3 official cloth presets",
+      "url": "https://github.com/blender/blender/tree/v4.4.3/scripts/presets/cloth",
+      "role": "reference scale for Blender vertex mass and independent cloth stiffness settings; not treated as measured textile data"
+    },
+    {
+      "title": "Blender 4.4.3 cloth solver source",
+      "url": "https://github.com/blender/blender/blob/v4.4.3/source/blender/blenkernel/intern/cloth.cc",
+      "role": "verifies that ClothSettings.mass is assigned directly to each solver vertex"
     },
     {
       "title": "Image2Garment: Simulation-ready Garment Generation from a Single Image",
