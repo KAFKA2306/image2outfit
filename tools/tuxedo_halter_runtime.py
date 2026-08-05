@@ -152,7 +152,7 @@ def render_prone_pose(
     g.rotate(armature, "UpperLeg_R", (5, 0, 3))
     armature.rotation_mode = "XYZ"
     armature.rotation_euler = (0.0, math.radians(90.0), 0.0)
-    armature.location = (0.0, 0.0, 0.64)
+    armature.location = (-0.52, 0.0, 0.64)
     bpy.context.view_layer.update()
     camera.data.ortho_scale = 1.55
     g.point_camera(camera, (0.0, -2.75, 0.64), target=(0.0, 0.0, 0.64))
