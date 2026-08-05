@@ -146,13 +146,19 @@ def validate_pipeline_state(state: Mapping[str, Any]) -> tuple[PipelineStage, ..
         if state.get("status") == "FAILED" and len(records) == len(completed_names) + 1:
             allowed = [*completed_names, canonical_names[len(completed_names)]]
         if record_stages != allowed:
-            raise ValueError("stage_records do not match the completed canonical prefix")
+            raise ValueError(
+                "stage_records do not match the completed canonical prefix"
+            )
     return tuple(PipelineStage(name) for name in completed_names)
 
 
 def next_pipeline_stage(state: Mapping[str, Any]) -> PipelineStage | None:
     completed = validate_pipeline_state(state)
-    return PIPELINE_STAGES[len(completed)] if len(completed) < len(PIPELINE_STAGES) else None
+    return (
+        PIPELINE_STAGES[len(completed)]
+        if len(completed) < len(PIPELINE_STAGES)
+        else None
+    )
 
 
 def resume_pipeline_state(
@@ -167,12 +173,16 @@ def resume_pipeline_state(
     previous_mode = ExecutionMode(
         current.get("execution_mode", ExecutionMode.PLAN.value)
     )
-    requested_mode = previous_mode if execution_mode is None else ExecutionMode(execution_mode)
+    requested_mode = (
+        previous_mode if execution_mode is None else ExecutionMode(execution_mode)
+    )
     if completed and requested_mode is not previous_mode:
         raise ValueError("execution_mode cannot change after a stage has completed")
 
     following = (
-        PIPELINE_STAGES[len(completed)] if len(completed) < len(PIPELINE_STAGES) else None
+        PIPELINE_STAGES[len(completed)]
+        if len(completed) < len(PIPELINE_STAGES)
+        else None
     )
     if following is None:
         return current
@@ -293,7 +303,10 @@ def _execute_stage(
     input_snapshot = _stage_input_snapshot(state, stage)
     started_at = utc_now()
     try:
-        if expected_index >= len(PIPELINE_STAGES) or PIPELINE_STAGES[expected_index] is not stage:
+        if (
+            expected_index >= len(PIPELINE_STAGES)
+            or PIPELINE_STAGES[expected_index] is not stage
+        ):
             expected = (
                 PIPELINE_STAGES[expected_index].value
                 if expected_index < len(PIPELINE_STAGES)
