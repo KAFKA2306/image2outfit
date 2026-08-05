@@ -35,9 +35,7 @@ class RepositoryContractTest(unittest.TestCase):
         )
         self.assertEqual([], nested_agents)
 
-        text_by_path = {
-            path: path.read_text(encoding="utf-8") for path in documents
-        }
+        text_by_path = {path: path.read_text(encoding="utf-8") for path in documents}
         combined = "\n".join(text_by_path.values())
         for required in (
             "config/products/<slug>/",
@@ -61,10 +59,7 @@ class RepositoryContractTest(unittest.TestCase):
         ):
             with self.subTest(forbidden=forbidden):
                 self.assertFalse(
-                    any(
-                        f"]({forbidden})" in text
-                        for text in text_by_path.values()
-                    )
+                    any(f"]({forbidden})" in text for text in text_by_path.values())
                 )
 
     def test_deprecated_paths_and_workflows_are_absent(self) -> None:
@@ -232,9 +227,7 @@ class RepositoryContractTest(unittest.TestCase):
 
     def test_every_product_has_a_verifiable_canonical_handoff(self) -> None:
         products_root = ROOT / "config" / "products"
-        product_dirs = sorted(
-            path for path in products_root.iterdir() if path.is_dir()
-        )
+        product_dirs = sorted(path for path in products_root.iterdir() if path.is_dir())
         self.assertGreaterEqual(len(product_dirs), 2)
 
         policy = read_json(ROOT / "config" / "genworks-handoff-policy.json")
@@ -384,15 +377,11 @@ class RepositoryContractTest(unittest.TestCase):
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, source)
 
-        release_gate_source = (TOOLS / "release_gate.py").read_text(
-            encoding="utf-8"
-        )
+        release_gate_source = (TOOLS / "release_gate.py").read_text(encoding="utf-8")
         self.assertNotIn("def evidence_gate", release_gate_source)
         self.assertNotIn("def run_release", release_gate_source)
         core = (TOOLS / "production_gate_core.py").read_text(encoding="utf-8")
-        release = (TOOLS / "release_orchestrator.py").read_text(
-            encoding="utf-8"
-        )
+        release = (TOOLS / "release_orchestrator.py").read_text(encoding="utf-8")
         self.assertNotIn("legacy.run_release", core)
         self.assertNotIn("legacy.run_release", release)
         self.assertIn("contract.package_release", release)
