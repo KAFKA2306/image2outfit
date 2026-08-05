@@ -1,0 +1,371 @@
+name: Execute resumable product pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_path:
+        description: Tracked product job at config/products/<product-id>/job.json
+        required: true
+        type: string
+  pull_request:
+    branches: [main]
+    paths:
+      - src/image2outfit/**
+      - tools/run_garment_pipeline.py
+      - tools/run_reference_product_stage.py
+      - tools/*_build.py
+      - tools/*_components.py
+      - tools/*_runtime.py
+      - tests/test_pipeline_*.py
+      - tests/test_reference_product_contract.py
+      - config/pipeline/requests/**
+      - config/products/**
+      - .github/workflows/pipeline-product-hosted.yml
+      - pyproject.toml
+      - uv.lock
+
+permissions:
+  contents: read
+
+concurrency:
+  group: resumable-product-pipeline-${{ inputs.job_path || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+          enable-cache: true
+
+      - name: Resolve one product pipeline
+        env:
+          JOB_PATH_INPUT: ${{ inputs.job_path }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          root = Path.cwd().resolve()
+          selected = (os.environ.get('JOB_PATH_INPUT') or '').strip()
+          if not selected:
+              if os.environ.get('EVENT_NAME') != 'pull_request':
+                  raise SystemExit('workflow_dispatch requires job_path')
+              changed = subprocess.check_output(
+                  [
+                      'git', 'diff', '--name-only',
+                      os.environ['PR_BASE_SHA'], os.environ['PR_HEAD_SHA'],
+                  ],
+                  text=True,
+              ).splitlines()
+              jobs = {
+                  value.strip()
+                  for value in changed
+                  if re.fullmatch(
+                      r'config/products/[a-z0-9][a-z0-9._-]*/job\.json',
+                      value.strip(),
+                  )
+              }
+              request_products = {
+                  Path(value.strip()).stem
+                  for value in changed
+                  if re.fullmatch(
+                      r'config/pipeline/requests/[a-z0-9][a-z0-9._-]*\.json',
+                      value.strip(),
+                  )
+              }
+              for product_id in request_products:
+                  candidate = f'config/products/{product_id}/job.json'
+                  if (root / candidate).is_file():
+                      jobs.add(candidate)
+              if len(jobs) != 1:
+                  with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+                      stream.write('SKIP_PIPELINE=true\n')
+                      stream.write(f'PIPELINE_SCOPE_REASON=selected-jobs-{len(jobs)}\n')
+                  print(f'Skipping: expected one product job, found {sorted(jobs)}')
+                  raise SystemExit(0)
+              selected = next(iter(jobs))
+
+          if not re.fullmatch(
+              r'config/products/[a-z0-9][a-z0-9._-]*/job\.json', selected
+          ):
+              raise SystemExit('job_path must match config/products/<product-id>/job.json')
+          job_path = (root / selected).resolve()
+          if root not in job_path.parents or not job_path.is_file():
+              raise SystemExit(f'product job not found: {selected}')
+          job = json.loads(job_path.read_text(encoding='utf-8-sig'))
+          product_id = job_path.parent.name
+          if job.get('schemaVersion') != 2 or job.get('id') != product_id:
+              raise SystemExit('product job identity or schema is invalid')
+          expected_root = f'Assets/GenWorks/{product_id}'
+          if job.get('productRoot') != expected_root:
+              raise SystemExit('productRoot does not match product namespace')
+          request_path = root / 'config' / 'pipeline' / 'requests' / f'{product_id}.json'
+          if not request_path.is_file():
+              with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+                  stream.write('SKIP_PIPELINE=true\n')
+                  stream.write('PIPELINE_SCOPE_REASON=no-canonical-request\n')
+              print(f'Skipping: no canonical request for {product_id}')
+              raise SystemExit(0)
+          request = json.loads(request_path.read_text(encoding='utf-8'))
+          if request.get('productId') != product_id:
+              raise SystemExit('pipeline request product identity mismatch')
+
+          lock = json.loads(Path('config/toolchain-lock.json').read_text(encoding='utf-8'))
+          version = lock['blender']['version']
+          values = {
+              'SKIP_PIPELINE': 'false',
+              'JOB_PATH': selected,
+              'PRODUCT_ID': product_id,
+              'PRODUCT_ROOT': expected_root,
+              'REQUEST_PATH': request_path.relative_to(root).as_posix(),
+              'CHECKPOINT_PATH': f'.image2outfit/products/{product_id}/pipeline-state.json',
+              'PRODUCT_RUNTIME': f'.image2outfit/products/{product_id}',
+              'PRODUCT_AUDIT': f'.image2outfit/audit/{product_id}',
+              'BLENDER_VERSION': version,
+              'BLENDER_SERIES': '.'.join(version.split('.')[:2]),
+          }
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+              for name, value in values.items():
+                  stream.write(f'{name}={value}\n')
+          print(json.dumps(values, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Compile and test pipeline contracts
+        if: env.SKIP_PIPELINE != 'true'
+        run: |
+          uv run --locked --no-default-groups python -m compileall -q src tools tests
+          uv run --locked --no-default-groups python -m unittest \
+            tests.test_pipeline_core \
+            tests.test_pipeline_audit \
+            tests.test_pipeline_resume \
+            tests.test_reference_product_contract -v
+
+      - name: Install Blender runtime libraries
+        if: env.SKIP_PIPELINE != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 \
+            libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
+
+      - name: Download pinned Blender
+        if: env.SKIP_PIPELINE != 'true'
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+            --output blender.tar.xz
+          mkdir -p .image2outfit/blender
+          tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
+          echo "IMAGE2OUTFIT_BLENDER=$PWD/.image2outfit/blender/blender" >> "$GITHUB_ENV"
+
+      - name: Restore pinned Blender Python environment
+        if: env.SKIP_PIPELINE != 'true'
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from tools.blender_python_env import prepare
+
+          prepared = prepare('.image2outfit/blender/blender')
+          paths = [
+              str((Path.cwd() / 'tools').resolve()),
+              str((Path.cwd() / 'src').resolve()),
+              prepared.environment['PYTHONPATH'],
+          ]
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+              stream.write(f"PYTHONPATH={os.pathsep.join(paths)}\n")
+          print(json.dumps(prepared.report, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Restore latest resumable state
+        if: env.SKIP_PIPELINE != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ${{ env.PRODUCT_RUNTIME }}
+            ${{ env.PRODUCT_AUDIT }}
+            ${{ env.PRODUCT_ROOT }}
+          key: resumable-pipeline-${{ github.event.pull_request.number || github.ref_name }}-${{ env.PRODUCT_ID }}-${{ github.run_id }}
+          restore-keys: |
+            resumable-pipeline-${{ github.event.pull_request.number || github.ref_name }}-${{ env.PRODUCT_ID }}-
+
+      - name: Reject stale checkpoint identity
+        if: env.SKIP_PIPELINE != 'true'
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import shutil
+          import subprocess
+          from pathlib import Path
+
+          checkpoint = Path(os.environ['CHECKPOINT_PATH'])
+          if not checkpoint.is_file():
+              print('No prior checkpoint restored.')
+              raise SystemExit(0)
+          request = json.loads(Path(os.environ['REQUEST_PATH']).read_text(encoding='utf-8'))
+          state = json.loads(checkpoint.read_text(encoding='utf-8'))
+          expected = {
+              'product_id': request['productId'],
+              'target_avatar': request['targetAvatar'],
+              'source_reference': request['sourceReference'],
+              'revision_id': request.get('revisionId', ''),
+          }
+          mismatches = {
+              key: {'checkpoint': state.get(key), 'request': value}
+              for key, value in expected.items()
+              if state.get(key) != value
+          }
+          if not mismatches:
+              print(
+                  f"Restored {len(state.get('completed_stages', []))}/13 stages "
+                  f"at {state.get('current_stage')} ({state.get('status')})."
+              )
+              raise SystemExit(0)
+          print(f'Removing stale checkpoint and generated workspace: {mismatches}')
+          shutil.rmtree(Path(os.environ['PRODUCT_RUNTIME']), ignore_errors=True)
+          shutil.rmtree(Path(os.environ['PRODUCT_AUDIT']), ignore_errors=True)
+          shutil.rmtree(Path(os.environ['PRODUCT_ROOT']), ignore_errors=True)
+          subprocess.run(
+              ['git', 'checkout', '--', os.environ['PRODUCT_ROOT']],
+              check=True,
+          )
+          PY
+
+      - name: Execute or resume canonical stages
+        if: env.SKIP_PIPELINE != 'true'
+        id: pipeline
+        run: |
+          set +e
+          mkdir -p "$PRODUCT_RUNTIME"
+          args=(
+            --execute
+            --engine deterministic
+            --request "$REQUEST_PATH"
+            --checkpoint-output "$CHECKPOINT_PATH"
+            --output "$CHECKPOINT_PATH"
+          )
+          if [[ -f "$CHECKPOINT_PATH" ]]; then
+            cp "$CHECKPOINT_PATH" "${CHECKPOINT_PATH}.resume-input"
+            args+=(--resume-state "${CHECKPOINT_PATH}.resume-input")
+          fi
+          uv run --locked --no-default-groups \
+            python tools/run_garment_pipeline.py "${args[@]}" \
+            | tee "$PRODUCT_RUNTIME/pipeline-console.log"
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Refresh generated product hashes
+        if: env.SKIP_PIPELINE != 'true' && always()
+        run: |
+          if [[ -d "$PRODUCT_ROOT" ]]; then
+            python tools/update_product_hashes.py --root "$PRODUCT_ROOT"
+          fi
+
+      - name: Summarize current checkpoint
+        if: env.SKIP_PIPELINE != 'true' && always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ['CHECKPOINT_PATH'])
+          if not path.is_file():
+              print('Pipeline did not create a checkpoint.')
+              raise SystemExit(0)
+          state = json.loads(path.read_text(encoding='utf-8'))
+          completed = state.get('completed_stages', [])
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a', encoding='utf-8') as stream:
+              stream.write('## Canonical garment pipeline\n\n')
+              stream.write(f"- Product: `{state.get('product_id')}`\n")
+              stream.write(f"- Status: `{state.get('status')}`\n")
+              stream.write(f"- Current stage: `{state.get('current_stage')}`\n")
+              stream.write(f"- Completed: `{len(completed)}/13`\n")
+              stream.write(f"- Resume count: `{state.get('resume_count', 0)}`\n")
+              if state.get('errors'):
+                  stream.write(f"- Last error: `{state['errors'][-1]}`\n")
+          print(json.dumps(state, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Save resumable state
+        if: env.SKIP_PIPELINE != 'true' && always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ env.PRODUCT_RUNTIME }}
+            ${{ env.PRODUCT_AUDIT }}
+            ${{ env.PRODUCT_ROOT }}
+          key: resumable-pipeline-${{ github.event.pull_request.number || github.ref_name }}-${{ env.PRODUCT_ID }}-${{ github.run_id }}
+
+      - name: Upload current product and audit evidence
+        if: env.SKIP_PIPELINE != 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resumable-pipeline-${{ env.PRODUCT_ID }}-${{ github.run_id }}
+          path: |
+            ${{ env.PRODUCT_RUNTIME }}
+            ${{ env.PRODUCT_AUDIT }}
+            ${{ env.PRODUCT_ROOT }}
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 6
+
+      - name: Enforce valid completion or review boundary
+        if: env.SKIP_PIPELINE != 'true' && always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path(os.environ['CHECKPOINT_PATH'])
+          if not path.is_file():
+              raise SystemExit('Pipeline checkpoint is missing')
+          state = json.loads(path.read_text(encoding='utf-8'))
+          if state.get('status') == 'EXECUTED':
+              print('All thirteen stages executed.')
+              raise SystemExit(0)
+          completed = state.get('completed_stages', [])
+          expected_boundary = (
+              state.get('status') == 'FAILED'
+              and state.get('current_stage') == 'visual-review'
+              and len(completed) == 11
+              and completed[-1:] == ['audit-geometry']
+              and 'direct visual review' in state.get('errors', [''])[-1]
+          )
+          if expected_boundary:
+              print(
+                  'Technical generation reached the direct-image review boundary. '
+                  'Artifacts are preserved for exact visual inspection and resume.'
+              )
+              raise SystemExit(0)
+          raise SystemExit(
+              f"Pipeline stopped unexpectedly at {state.get('current_stage')}: "
+              f"{state.get('errors', ['unknown error'])[-1]}"
+          )
+          PY
