@@ -37,6 +37,7 @@ INITIAL_SPECIMEN_Z_M = 0.125
 MIN_COLLISION_DISTANCE_M = 0.001
 RASTER_RESOLUTION = 512
 RENDER_SUBDIVISION_LEVELS = 2
+CONVERGENCE_CHECKPOINTS = (100, 150, 200, 250)
 
 
 def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
@@ -449,6 +450,121 @@ def drape_metrics(cloth: bpy.types.Object) -> dict[str, float | str]:
     }
 
 
+def temporal_convergence_report(
+    snapshots: Mapping[str, list[dict[str, Any]]],
+    thresholds: Mapping[str, float],
+) -> dict[str, Any]:
+    required = {
+        "maximumCoefficientDelta",
+        "maximumSupportContactDelta",
+        "maximumMaximumZDeltaM",
+        "maximumMeanVertexDisplacementM",
+        "maximumVertexDisplacementM",
+    }
+    if set(thresholds) != required:
+        raise ValueError("temporalConvergence must define the exact threshold set")
+    parsed = {name: float(thresholds[name]) for name in sorted(required)}
+    if any(not math.isfinite(value) or value < 0 for value in parsed.values()):
+        raise ValueError(
+            "temporal convergence thresholds must be finite and non-negative"
+        )
+
+    records: list[dict[str, Any]] = []
+    failures: list[dict[str, Any]] = []
+    for material_id, states in snapshots.items():
+        if len(states) < 2:
+            raise ValueError(f"at least two checkpoints are required for {material_id}")
+        previous = states[-2]
+        current = states[-1]
+        previous_coordinates = previous["coordinates"]
+        current_coordinates = current["coordinates"]
+        if len(previous_coordinates) != len(current_coordinates):
+            raise RuntimeError(f"checkpoint topology changed for {material_id}")
+        displacements = [
+            float((right - left).length)
+            for left, right in zip(
+                previous_coordinates, current_coordinates, strict=True
+            )
+        ]
+        deltas = {
+            "coefficientDelta": abs(
+                float(current["metrics"]["cusickDrapeCoefficient"])
+                - float(previous["metrics"]["cusickDrapeCoefficient"])
+            ),
+            "supportContactDelta": abs(
+                float(current["metrics"]["supportContactFraction"])
+                - float(previous["metrics"]["supportContactFraction"])
+            ),
+            "maximumZDeltaM": abs(
+                float(current["metrics"]["maximumZ"])
+                - float(previous["metrics"]["maximumZ"])
+            ),
+            "meanVertexDisplacementM": statistics.fmean(displacements),
+            "maximumVertexDisplacementM": max(displacements),
+        }
+        errors: list[str] = []
+        checks = (
+            (
+                "coefficient-drift",
+                deltas["coefficientDelta"],
+                parsed["maximumCoefficientDelta"],
+            ),
+            (
+                "support-contact-drift",
+                deltas["supportContactDelta"],
+                parsed["maximumSupportContactDelta"],
+            ),
+            (
+                "maximum-z-drift",
+                deltas["maximumZDeltaM"],
+                parsed["maximumMaximumZDeltaM"],
+            ),
+            (
+                "mean-geometry-drift",
+                deltas["meanVertexDisplacementM"],
+                parsed["maximumMeanVertexDisplacementM"],
+            ),
+            (
+                "maximum-geometry-drift",
+                deltas["maximumVertexDisplacementM"],
+                parsed["maximumVertexDisplacementM"],
+            ),
+        )
+        for name, value, limit in checks:
+            if value > limit:
+                errors.append(name)
+        public_states = [
+            {
+                "frame": int(state["frame"]),
+                "metrics": state["metrics"],
+            }
+            for state in states
+        ]
+        record = {
+            "materialId": material_id,
+            "checkpoints": public_states,
+            "finalInterval": {
+                "fromFrame": int(previous["frame"]),
+                "toFrame": int(current["frame"]),
+                **deltas,
+                "errors": errors,
+                "passed": not errors,
+            },
+        }
+        records.append(record)
+        if errors:
+            failures.append({"materialId": material_id, "errors": errors})
+    return {
+        "checkpointFrames": [
+            int(item["frame"]) for item in next(iter(snapshots.values()))
+        ],
+        "thresholds": parsed,
+        "records": records,
+        "failures": failures,
+        "passed": not failures,
+    }
+
+
 def plausibility_errors(metrics: Mapping[str, float | str]) -> list[str]:
     errors: list[str] = []
     coefficient = float(metrics["cusickDrapeCoefficient"])
@@ -532,7 +648,8 @@ def simulate(
     grid_count: int,
     frame_end: int,
     render_materials: bool,
-) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    convergence_thresholds: Mapping[str, float],
+) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
     clean_scene()
     scene = bpy.context.scene
     scene.frame_start = 1
@@ -582,17 +699,39 @@ def simulate(
                 },
             }
         )
+    checkpoint_frames = tuple(
+        frame for frame in CONVERGENCE_CHECKPOINTS if frame <= frame_end
+    )
+    if len(checkpoint_frames) < 2 or checkpoint_frames[-1] != frame_end:
+        raise ValueError(
+            "frame-end must equal a convergence checkpoint and include at least two checkpoints"
+        )
+    snapshots: dict[str, list[dict[str, Any]]] = {
+        record["materialId"]: [] for record in records
+    }
     for frame in range(scene.frame_start, scene.frame_end + 1):
         scene.frame_set(frame)
         bpy.context.view_layer.update()
+        if frame in checkpoint_frames:
+            for record in records:
+                cloth = bpy.data.objects[record["runtime"]["clothObject"]]
+                coordinates, _ = evaluated_geometry(cloth)
+                snapshots[record["materialId"]].append(
+                    {
+                        "frame": frame,
+                        "metrics": drape_metrics(cloth),
+                        "coordinates": coordinates,
+                    }
+                )
     scene.frame_set(scene.frame_end)
     bpy.context.view_layer.update()
     for record in records:
-        metrics = drape_metrics(bpy.data.objects[record["runtime"]["clothObject"]])
+        metrics = snapshots[record["materialId"]][-1]["metrics"]
         record["metrics"] = metrics
         record["plausibilityErrors"] = plausibility_errors(metrics)
         record["plausibilityWarnings"] = plausibility_warnings(metrics)
-    return records, floor_settings
+    convergence = temporal_convergence_report(snapshots, convergence_thresholds)
+    return records, floor_settings, convergence
 
 
 def look_at(obj: bpy.types.Object, target: Vector) -> None:
@@ -718,7 +857,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     }
     if set(targets) != {material.material_id for material in materials}:
         raise ValueError("published KES calibration targets must cover every material")
-    fixed_scales = raw_profile.get("calibratedElasticScales")
+    fixed_scales = raw_profile.get("diagnosticElasticScales")
     search: list[dict[str, Any]] = []
     material_selection: list[dict[str, Any]] = []
     if isinstance(fixed_scales, Mapping):
@@ -735,7 +874,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         evaluations: list[tuple[float, list[dict[str, Any]]]] = []
         for scale in scales:
             common_scales = {material.material_id: scale for material in materials}
-            candidate_records, _ = simulate(
+            candidate_records, _, _ = simulate(
                 materials,
                 projections,
                 profile,
@@ -743,6 +882,7 @@ def main(argv: Iterable[str] | None = None) -> int:
                 grid_count=args.grid,
                 frame_end=args.frame_end,
                 render_materials=False,
+                convergence_thresholds=raw_profile["temporalConvergence"],
             )
             candidate_comparison = comparison_metrics(candidate_records, targets)
             material_results = {
@@ -804,7 +944,7 @@ def main(argv: Iterable[str] | None = None) -> int:
                 }
             )
 
-    records, floor_settings = simulate(
+    records, floor_settings, temporal_convergence = simulate(
         materials,
         projections,
         profile,
@@ -812,11 +952,13 @@ def main(argv: Iterable[str] | None = None) -> int:
         grid_count=args.grid,
         frame_end=args.frame_end,
         render_materials=True,
+        convergence_thresholds=raw_profile["temporalConvergence"],
     )
     comparison = comparison_metrics(records, targets)
     acceptance = raw_profile["acceptance"]
     passed = (
-        not comparison["plausibilityFailures"]
+        temporal_convergence["passed"]
+        and not comparison["plausibilityFailures"]
         and comparison["rmseVsPublishedKes"]
         <= float(acceptance["maximumRmseVsPublishedKes"])
         and comparison["pearsonVsPublishedKes"]
@@ -829,7 +971,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     blend_path = output / "material-drape-calibration.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
     report = {
-        "schemaVersion": 5,
+        "schemaVersion": 6,
         "phase": "material-drape-calibration",
         "blenderVersion": actual_version,
         "library": {
@@ -865,7 +1007,9 @@ def main(argv: Iterable[str] | None = None) -> int:
         "sameGeometryForAllMaterials": True,
         "sequentialFrameEvaluation": True,
         "calibrationSearch": search,
-        "selectedElasticScales": selected_scales,
+        "selectedDiagnosticElasticScales": selected_scales,
+        "elasticScaleStatus": "diagnostic-until-temporal-convergence-passes",
+        "temporalConvergence": temporal_convergence,
         "materialCalibrationSelection": material_selection,
         "records": records,
         "comparison": {**comparison, "acceptance": acceptance, "passed": passed},
@@ -876,7 +1020,9 @@ def main(argv: Iterable[str] | None = None) -> int:
             "The specimen is released above a collision support without pinned "
             "vertices. Blender scalar springs cannot represent warp and weft "
             "independently, so each material uses an explicit fixture-derived "
-            "solver correction rather than a universal physical-unit conversion. "
+            "diagnostic solver correction rather than a calibrated or universal "
+            "physical-unit conversion. Temporal convergence is required before "
+            "coefficient-fit acceptance. "
             "Contact friction and through-thickness compression remain unmeasured."
         ),
     }
