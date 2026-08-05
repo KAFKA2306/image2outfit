@@ -355,7 +355,9 @@ def avatar_fixture():
 
 
 class PatternHypothesisTests(unittest.TestCase):
-    def test_multiple_hypotheses_preserve_provenance_and_export_cad_previews(self) -> None:
+    def test_multiple_hypotheses_preserve_provenance_and_export_cad_previews(
+        self,
+    ) -> None:
         first = pattern_fixture()
         second = pattern_fixture(
             hypothesis_id="hidden-back-pattern",
@@ -372,7 +374,9 @@ class PatternHypothesisTests(unittest.TestCase):
         self.assertIn("<svg", first.preview_svg())
         self.assertIn("LWPOLYLINE", first.preview_dxf())
         self.assertIn("waist-to-hem", first.preview_json())
-        self.assertEqual("front-back-pattern", patterns.ranked_hypotheses()[0].hypothesis_id)
+        self.assertEqual(
+            "front-back-pattern", patterns.ranked_hypotheses()[0].hypothesis_id
+        )
 
     def test_self_intersection_is_detected_before_blender(self) -> None:
         invalid = pattern_fixture(self_crossing=True)
@@ -383,7 +387,9 @@ class PatternHypothesisTests(unittest.TestCase):
 
 
 class SeamHypothesisTests(unittest.TestCase):
-    def test_edge_addressed_graph_supports_hidden_alternatives_and_four_layers(self) -> None:
+    def test_edge_addressed_graph_supports_hidden_alternatives_and_four_layers(
+        self,
+    ) -> None:
         pattern = pattern_fixture()
         base = seam_fixture(pattern)
         hidden = seam_fixture(
@@ -480,7 +486,9 @@ class ArrangementPlanTests(unittest.TestCase):
         first.validate_ready_for_solver()
         self.assertEqual(first.fingerprint(), second.fingerprint())
         self.assertEqual((0, 0), tuple(item.layer_order for item in first.placements))
-        self.assertEqual((), first.without_styling("front-waist-anchor").styling_constraints)
+        self.assertEqual(
+            (), first.without_styling("front-waist-anchor").styling_constraints
+        )
 
     def test_intersection_wrong_face_and_unknown_landmark_are_rejected(self) -> None:
         pattern = pattern_fixture()

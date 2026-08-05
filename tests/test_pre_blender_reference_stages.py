@@ -195,7 +195,9 @@ class ReferenceSetTests(unittest.TestCase):
 
 
 class NormalizedReferenceSetTests(unittest.TestCase):
-    def test_reprojection_uncertainty_and_source_identity_are_deterministic(self) -> None:
+    def test_reprojection_uncertainty_and_source_identity_are_deterministic(
+        self,
+    ) -> None:
         references = reference_fixture()
         normalized = normalized_fixture()
         normalized.validate_sources(references)

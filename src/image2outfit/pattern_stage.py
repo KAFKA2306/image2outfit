@@ -14,9 +14,9 @@ Point2 = tuple[float, float]
 
 
 def _orientation(first: Point2, second: Point2, third: Point2) -> float:
-    return (second[0] - first[0]) * (third[1] - first[1]) - (
-        second[1] - first[1]
-    ) * (third[0] - first[0])
+    return (second[0] - first[0]) * (third[1] - first[1]) - (second[1] - first[1]) * (
+        third[0] - first[0]
+    )
 
 
 def _segments_intersect(
@@ -35,12 +35,15 @@ def _segments_intersect(
 
 
 def _polygon_area(boundary: tuple[Point2, ...]) -> float:
-    return abs(
-        sum(
-            first[0] * second[1] - second[0] * first[1]
-            for first, second in zip(boundary, boundary[1:] + boundary[:1])
+    return (
+        abs(
+            sum(
+                first[0] * second[1] - second[0] * first[1]
+                for first, second in zip(boundary, boundary[1:] + boundary[:1])
+            )
         )
-    ) / 2
+        / 2
+    )
 
 
 def _edge_lengths(boundary: tuple[Point2, ...]) -> tuple[float, ...]:
@@ -172,7 +175,9 @@ class PatternHypothesis:
         if self.parent_hypothesis_id == self.hypothesis_id:
             raise ValueError("pattern hypothesis cannot be its own parent")
         if not math.isfinite(self.confidence) or not 0 <= self.confidence <= 1:
-            raise ValueError("pattern hypothesis confidence must be between zero and one")
+            raise ValueError(
+                "pattern hypothesis confidence must be between zero and one"
+            )
         if not self.dimensions:
             raise ValueError("pattern hypothesis requires dimension provenance")
         piece_ids = {item.piece_id for item in self.construction.garment.pattern_pieces}
@@ -256,7 +261,9 @@ class PatternHypothesis:
                     "avatarMeasurementId": item.avatar_measurement_id,
                     "easeTargetId": item.ease_target_id,
                 }
-                for item in sorted(self.dimensions, key=lambda value: value.dimension_id)
+                for item in sorted(
+                    self.dimensions, key=lambda value: value.dimension_id
+                )
             ],
             "construction": json.loads(self.construction.preview_json()),
         }
@@ -282,9 +289,7 @@ class PatternHypothesis:
                 )
             )
             for x, y in piece.boundary:
-                lines.extend(
-                    ("10", f"{x * 1000:.6f}", "20", f"{y * 1000:.6f}")
-                )
+                lines.extend(("10", f"{x * 1000:.6f}", "20", f"{y * 1000:.6f}"))
         lines.extend(("0", "ENDSEC", "0", "EOF"))
         return "\n".join(lines) + "\n"
 
@@ -327,9 +332,9 @@ class PatternHypothesisSet:
             raise ValueError("pattern set references another garment")
         available = {item.hypothesis_id for item in decomposition.hypotheses}
         unknown = sorted(
-            {
-                item.decomposition_hypothesis_id for item in self.hypotheses
-            }.difference(available)
+            {item.decomposition_hypothesis_id for item in self.hypotheses}.difference(
+                available
+            )
         )
         if unknown:
             raise ValueError(

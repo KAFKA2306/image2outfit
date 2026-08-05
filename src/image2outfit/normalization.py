@@ -74,8 +74,7 @@ class CameraExtrinsics:
         for first in range(3):
             for second in range(first + 1, 3):
                 dot = sum(
-                    self.rotation_rows[first][index]
-                    * self.rotation_rows[second][index]
+                    self.rotation_rows[first][index] * self.rotation_rows[second][index]
                     for index in range(3)
                 )
                 if abs(dot) > 1e-5:
@@ -97,7 +96,9 @@ class CameraUncertainty:
             self.pixel_sigma_px,
         )
         if any(not math.isfinite(value) or value < 0 for value in values):
-            raise ValueError("camera uncertainty values must be finite and non-negative")
+            raise ValueError(
+                "camera uncertainty values must be finite and non-negative"
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -106,7 +107,12 @@ class Transform2D:
     inverse: Matrix3
 
     def __post_init__(self) -> None:
-        values = tuple(value for matrix in (self.forward, self.inverse) for row in matrix for value in row)
+        values = tuple(
+            value
+            for matrix in (self.forward, self.inverse)
+            for row in matrix
+            for value in row
+        )
         _finite(values, "2D transform")
         product = _multiply(self.forward, self.inverse)
         identity: Matrix3 = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
@@ -151,7 +157,10 @@ class OcclusionMask:
     occluder: str
 
     def __post_init__(self) -> None:
-        if not all(value.strip() for value in (self.mask_id, self.path, self.sha256, self.occluder)):
+        if not all(
+            value.strip()
+            for value in (self.mask_id, self.path, self.sha256, self.occluder)
+        ):
             raise ValueError("occlusion mask fields are required")
 
 
@@ -199,13 +208,9 @@ class NormalizedView:
             raise ValueError("depth_mm must be finite and positive")
         focal = min(self.intrinsics.focal_x_px, self.intrinsics.focal_y_px)
         pixel_component = depth_mm * self.uncertainty.pixel_sigma_px / focal
-        focal_component = (
-            depth_mm * self.uncertainty.focal_sigma_px / max(focal, 1e-12)
-        )
+        focal_component = depth_mm * self.uncertainty.focal_sigma_px / max(focal, 1e-12)
         return math.sqrt(
-            pixel_component**2
-            + focal_component**2
-            + self.uncertainty.pose_sigma_mm**2
+            pixel_component**2 + focal_component**2 + self.uncertainty.pose_sigma_mm**2
         )
 
 
@@ -220,7 +225,11 @@ class NormalizedReferenceSet:
     def __post_init__(self) -> None:
         if not all(
             value.strip()
-            for value in (self.normalized_set_id, self.reference_set_id, self.garment_id)
+            for value in (
+                self.normalized_set_id,
+                self.reference_set_id,
+                self.garment_id,
+            )
         ):
             raise ValueError("normalized reference identity fields are required")
         if self.schema_version != 1:
@@ -251,6 +260,4 @@ class NormalizedReferenceSet:
                     f"mirror expectation missing for {view.source_asset_id!r}"
                 )
             if expected != view.mirrored:
-                raise ValueError(
-                    f"mirror state mismatch for {view.source_asset_id!r}"
-                )
+                raise ValueError(f"mirror state mismatch for {view.source_asset_id!r}")

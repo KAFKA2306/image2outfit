@@ -146,9 +146,7 @@ class ReferenceSet:
             if asset.parent_asset_id is not None:
                 parent = by_id.get(asset.parent_asset_id)
                 if parent is None:
-                    raise ValueError(
-                        f"asset {asset.asset_id!r} has an unknown parent"
-                    )
+                    raise ValueError(f"asset {asset.asset_id!r} has an unknown parent")
                 if parent.kind is ReferenceAssetKind.GENERATED:
                     raise ValueError("generated assets cannot be provenance parents")
         for namespace in self.extensions:

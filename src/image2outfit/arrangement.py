@@ -169,8 +169,7 @@ class ArrangementPlan:
                 if first.layer_order != second.layer_order:
                     continue
                 intersects = all(
-                    first_minimum < second_maximum
-                    and second_minimum < first_maximum
+                    first_minimum < second_maximum and second_minimum < first_maximum
                     for first_minimum, first_maximum, second_minimum, second_maximum in zip(
                         first.bounds_minimum_mm,
                         first.bounds_maximum_mm,
@@ -293,7 +292,9 @@ def build_arrangement_plan(
         }.difference(landmark_ids)
     )
     if unknown_anchors:
-        raise ValueError(f"placements reference unknown avatar landmarks: {unknown_anchors}")
+        raise ValueError(
+            f"placements reference unknown avatar landmarks: {unknown_anchors}"
+        )
     if styling.conflicts():
         raise ValueError("styling graph contains conflicting operations")
     constraints = tuple(

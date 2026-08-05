@@ -145,9 +145,7 @@ class SeamHypothesis:
                 )
             first_vector = pattern.construction._edge_vector(first_piece, first_edge)
             second_vector = pattern.construction._edge_vector(second_piece, second_edge)
-            dot = sum(
-                left * right for left, right in zip(first_vector, second_vector)
-            )
+            dot = sum(left * right for left, right in zip(first_vector, second_vector))
             should_share_direction = connection.first_start_matches_second_start
             if should_share_direction == (dot < 0):
                 defects.append(
