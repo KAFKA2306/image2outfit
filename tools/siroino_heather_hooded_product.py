@@ -18,13 +18,13 @@ import siroino_heather_hooded_v11_support as support
 
 support.install()
 
-import siroino_heather_fused_roll_v28 as fused_roll
 import siroino_heather_hooded_pattern as pattern
+import siroino_heather_manifold_yoke_v29 as manifold_yoke
 
 
-# v27/v28 mesh helpers require the stable base-pattern aliases that the former
-# v13 compatibility layer exposed.  Install them directly without another
-# production import layer.
+# The v27-v29 geometry helpers need the stable base-pattern aliases formerly
+# exposed by a compatibility layer. Install them directly without another
+# production import level.
 pattern.v9 = pattern
 
 
@@ -37,10 +37,10 @@ def _move_modifier_before_armature(
 
 
 pattern._move_modifier_before_armature = _move_modifier_before_armature
-fused_roll.install(pattern)
+manifold_yoke.install(pattern)
 
-DESIGN_REVISION = fused_roll.DESIGN_REVISION
-RESEARCH_TRIAL = str(fused_roll.RESEARCH_OUTPUT).replace("\\", "/")
+DESIGN_REVISION = manifold_yoke.DESIGN_REVISION
+RESEARCH_TRIAL = str(manifold_yoke.RESEARCH_OUTPUT).replace("\\", "/")
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
     "Heather_Long_Sleeve_L",
@@ -70,6 +70,14 @@ REJECTED_REVISIONS = [
             "direct review found a rectangular neckline, bulky folded sleeve roots, "
             "a broad shoulder flap instead of a hood, pointed lower panels and "
             "15,753 overlaps across six required poses"
+        ),
+    },
+    {
+        "revision": "v28-flat-saddle-contoured-cap-hood-roll",
+        "reason": (
+            "pose framing and intersections improved, but direct review still found "
+            "a low rectangular neckline, rounded shoulder bulbs, jagged underarm "
+            "seams, a padded-tube hood, pointed lower wedges and 12,494 overlaps"
         ),
     },
 ]
@@ -131,14 +139,17 @@ def preserve_authored_weights(
     return {
         "objects": [obj.name for obj in garments if obj.type == "MESH"],
         "weightSource": (
-            "the validated polar profile and bounded post-topology clearance are "
-            "retained; v28 uses a fifteen-column flat saddle, contoured sleeve-cap "
-            "radii, fitted cuffs and a U-shaped rear-neck hood roll; four normalized "
-            "skin-weight influences are enforced after construction"
+            "the validated polar profile remains the shape reference; v29 uses a "
+            "four-iteration smoothed clearance displacement capped at 12 mm, a "
+            "five-ring tapered yoke, a seventeen-column shallow saddle, fitted "
+            "sleeves and a compact rear-neck hood; four normalized influences are "
+            "enforced after construction"
         ),
         "bodyTopologyCopied": False,
         "boundedClearanceProjection": True,
-        "pelvicSaddleColumns": 15,
+        "clearanceDisplacementSmoothing": 4,
+        "pelvicSaddleColumns": 17,
+        "taperedYokeRings": 5,
         "visualMechanismRevision": DESIGN_REVISION,
         "rebound": False,
     }
@@ -152,20 +163,21 @@ def wrap_pattern_writer(original):
         contract["designRevision"] = DESIGN_REVISION
         contract["representation"] = {
             "canonical": (
-                "polar torso with flat saddle, contoured sleeve caps and hood roll"
+                "polar torso with tapered yoke, shallow saddle, fitted sleeves and compact hood"
             ),
             "bodyTopologyCopied": False,
             "boundedClearanceProjection": True,
+            "clearanceDisplacementSmoothing": 4,
             "components": [
                 "smoothed height-by-angle torso field",
-                "short continuous shoulder yoke and neck ring",
-                "fifteen-column flat pelvic saddle",
-                "contoured small-root shoulder-cap sleeve tubes",
+                "five-ring tapered shoulder yoke and fitted neck",
+                "seventeen-column shallow pelvic saddle",
+                "small-root fitted sleeve tubes",
                 "left and right fitted cuffs",
-                "U-shaped folded hood roll around rear neck",
+                "compact six-row folded hood shell at rear neck",
             ],
             "bodyRole": (
-                "polar statistics, bounded clearance and skin-weight reference"
+                "polar statistics, smoothed bounded clearance and skin-weight reference"
             ),
         }
         contract["researchTrialEvidence"] = RESEARCH_TRIAL
@@ -216,7 +228,7 @@ def enforce_manifest_contract(original):
             "result": trial.get("result", "FAIL"),
             "evidence": RESEARCH_TRIAL,
             "representation": (
-                "polar torso with flat saddle, contoured sleeve caps and hood roll"
+                "polar torso with tapered yoke, shallow saddle, fitted sleeves and compact hood"
             ),
             "authorsImplementationExecuted": False,
             "authorsCodeCopied": False,
@@ -244,15 +256,17 @@ def enforce_manifest_contract(original):
                 item for item in REJECTED_REVISIONS if item["revision"] not in existing
             )
             report["notes"] = [
-                "The validated v27 polar profile and clearance helpers are reused.",
-                "The lower front/back boundary is flattened and widened before a "
-                "fifteen-column saddle is bridged with only 12 mm central sag.",
-                "Torso subdivision is disabled to prevent open-boundary wing curl.",
-                "Sleeves start with a small inner ring, expand at the shoulder and "
-                "then taper down the arm instead of using a bulky constant cap.",
-                "The rejected sheet hood is replaced by a U-shaped rear-neck roll.",
-                "Pose cameras are widened independently so every required image "
-                "contains the full review subject.",
+                "The validated height-by-angle torso field is retained.",
+                "Clearance displacements are capped at 12 mm and smoothed through "
+                "four adjacency iterations before application.",
+                "A five-ring yoke closes continuously from the torso shoulder line "
+                "to a fitted 57 by 45 mm neck ellipse.",
+                "The lower front/back difference is reduced to 55 mm and a "
+                "seventeen-column saddle uses only 4 mm central sag.",
+                "Sleeve roots begin at 27 mm radius and never exceed 33 mm.",
+                "The hood is a compact six-row rear-neck fold rather than a tube or "
+                "a shoulder-wide sheet.",
+                "Full-subject pose framing remains active.",
                 "Visual review remains blocking; runtime systems are OUT_OF_SCOPE.",
             ]
             report_path.write_text(
