@@ -21,11 +21,7 @@ class DirectoryTransactionTest(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
         self.target = (
-            self.root
-            / ".image2outfit"
-            / "products"
-            / "test-product"
-            / "candidate"
+            self.root / ".image2outfit" / "products" / "test-product" / "candidate"
         )
         self.target.mkdir(parents=True)
         (self.target / "marker.txt").write_text("last-good", encoding="utf-8")
@@ -79,13 +75,7 @@ class DirectoryTransactionTest(unittest.TestCase):
         self.assertFalse(recovered.journal.exists())
 
     def test_rollback_removes_new_directory_without_previous_state(self) -> None:
-        target = (
-            self.root
-            / ".image2outfit"
-            / "products"
-            / "new-product"
-            / "release"
-        )
+        target = self.root / ".image2outfit" / "products" / "new-product" / "release"
         transaction = DirectoryTransaction(target)
         had_original = transaction.begin()
         target.mkdir(parents=True)
