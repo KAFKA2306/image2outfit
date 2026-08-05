@@ -528,7 +528,7 @@ def simulate(
     projections: tuple[BlenderMaterialProjection, ...],
     profile: BlenderCalibrationProfile,
     *,
-    elastic_scale: float,
+    elastic_scales: Mapping[str, float],
     grid_count: int,
     frame_end: int,
     render_materials: bool,
@@ -540,9 +540,17 @@ def simulate(
     scene.render.fps = 30
     floor_settings = create_floor(profile)
     records: list[dict[str, Any]] = []
+    expected_material_ids = {material.material_id for material in materials}
+    if set(elastic_scales) != expected_material_ids:
+        raise ValueError("elastic scales must cover every material exactly")
     for index, (material, projection, position) in enumerate(
         zip(materials, projections, specimen_positions(), strict=True)
     ):
+        elastic_scale = float(elastic_scales[material.material_id])
+        if not math.isfinite(elastic_scale) or elastic_scale <= 0:
+            raise ValueError(
+                f"invalid elastic scale for {material.material_id}: {elastic_scale}"
+            )
         collection = bpy.data.collections.new(f"Test__{projection.material_id}")
         scene.collection.children.link(collection)
         support, support_settings = create_support(
@@ -710,42 +718,97 @@ def main(argv: Iterable[str] | None = None) -> int:
     }
     if set(targets) != {material.material_id for material in materials}:
         raise ValueError("published KES calibration targets must cover every material")
-    fixed_scale = raw_profile.get("calibratedElasticScale")
-    scales = (
-        [float(fixed_scale)]
-        if isinstance(fixed_scale, (int, float))
-        else [float(value) for value in raw_profile["elasticScaleSearch"]]
-    )
+    fixed_scales = raw_profile.get("calibratedElasticScales")
     search: list[dict[str, Any]] = []
-    for scale in scales:
-        records, _ = simulate(
-            materials,
-            projections,
-            profile,
-            elastic_scale=scale,
-            grid_count=args.grid,
-            frame_end=args.frame_end,
-            render_materials=False,
-        )
-        comparison = comparison_metrics(records, targets)
-        search.append(
-            {
-                "elasticScale": scale,
-                "comparison": comparison,
-                "objective": objective(comparison),
-                "coefficients": {
-                    item["materialId"]: item["metrics"]["cusickDrapeCoefficient"]
-                    for item in records
-                },
+    material_selection: list[dict[str, Any]] = []
+    if isinstance(fixed_scales, Mapping):
+        selected_scales = {
+            material.material_id: float(fixed_scales[material.material_id])
+            for material in materials
+        }
+    else:
+        scales = [float(value) for value in raw_profile["elasticScaleSearch"]]
+        if not scales or any(
+            not math.isfinite(value) or value <= 0 for value in scales
+        ):
+            raise ValueError("elasticScaleSearch must contain positive finite values")
+        evaluations: list[tuple[float, list[dict[str, Any]]]] = []
+        for scale in scales:
+            common_scales = {material.material_id: scale for material in materials}
+            candidate_records, _ = simulate(
+                materials,
+                projections,
+                profile,
+                elastic_scales=common_scales,
+                grid_count=args.grid,
+                frame_end=args.frame_end,
+                render_materials=False,
+            )
+            candidate_comparison = comparison_metrics(candidate_records, targets)
+            material_results = {
+                item["materialId"]: {
+                    "coefficient": item["metrics"]["cusickDrapeCoefficient"],
+                    "absoluteError": abs(
+                        float(item["metrics"]["cusickDrapeCoefficient"])
+                        - targets[item["materialId"]]
+                    ),
+                    "plausibilityErrors": item["plausibilityErrors"],
+                    "plausibilityWarnings": item["plausibilityWarnings"],
+                }
+                for item in candidate_records
             }
-        )
-    best = min(search, key=lambda item: item["objective"])
-    best_scale = float(best["elasticScale"])
+            search.append(
+                {
+                    "elasticScale": scale,
+                    "comparison": candidate_comparison,
+                    "materialResults": material_results,
+                }
+            )
+            evaluations.append((scale, candidate_records))
+
+        selected_scales: dict[str, float] = {}
+        for material in materials:
+            candidates: list[dict[str, Any]] = []
+            for scale, candidate_records in evaluations:
+                record = next(
+                    item
+                    for item in candidate_records
+                    if item["materialId"] == material.material_id
+                )
+                coefficient = float(record["metrics"]["cusickDrapeCoefficient"])
+                absolute_error = abs(coefficient - targets[material.material_id])
+                candidates.append(
+                    {
+                        "elasticScale": scale,
+                        "coefficient": coefficient,
+                        "absoluteError": absolute_error,
+                        "plausibilityErrors": record["plausibilityErrors"],
+                        "score": absolute_error
+                        + 10.0 * len(record["plausibilityErrors"]),
+                    }
+                )
+            selected = min(
+                candidates,
+                key=lambda item: (
+                    item["score"],
+                    item["absoluteError"],
+                    item["elasticScale"],
+                ),
+            )
+            selected_scales[material.material_id] = float(selected["elasticScale"])
+            material_selection.append(
+                {
+                    "materialId": material.material_id,
+                    "targetCoefficient": targets[material.material_id],
+                    **selected,
+                }
+            )
+
     records, floor_settings = simulate(
         materials,
         projections,
         profile,
-        elastic_scale=best_scale,
+        elastic_scales=selected_scales,
         grid_count=args.grid,
         frame_end=args.frame_end,
         render_materials=True,
@@ -766,7 +829,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     blend_path = output / "material-drape-calibration.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
     report = {
-        "schemaVersion": 4,
+        "schemaVersion": 5,
         "phase": "material-drape-calibration",
         "blenderVersion": actual_version,
         "library": {
@@ -802,7 +865,8 @@ def main(argv: Iterable[str] | None = None) -> int:
         "sameGeometryForAllMaterials": True,
         "sequentialFrameEvaluation": True,
         "calibrationSearch": search,
-        "selectedElasticScale": best_scale,
+        "selectedElasticScales": selected_scales,
+        "materialCalibrationSelection": material_selection,
         "records": records,
         "comparison": {**comparison, "acceptance": acceptance, "passed": passed},
         "images": images,
@@ -810,9 +874,10 @@ def main(argv: Iterable[str] | None = None) -> int:
         "passed": passed,
         "boundary": (
             "The specimen is released above a collision support without pinned "
-            "vertices. The selected global scale remains a calibration candidate "
-            "until numerical gates and direct image review pass. Contact friction "
-            "and through-thickness compression remain unmeasured."
+            "vertices. Blender scalar springs cannot represent warp and weft "
+            "independently, so each material uses an explicit fixture-derived "
+            "solver correction rather than a universal physical-unit conversion. "
+            "Contact friction and through-thickness compression remain unmeasured."
         ),
     }
     report_path = output / "material-drape-report.json"
