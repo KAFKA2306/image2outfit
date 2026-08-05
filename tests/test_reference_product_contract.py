@@ -36,11 +36,22 @@ def read(path: Path) -> dict:
 class ReferenceProductContractTests(unittest.TestCase):
     def test_private_reference_is_bound_by_hash_without_redistribution(self) -> None:
         audit = read(PRODUCT_CONFIG / "reference-audit.json")
+        identity = read(PRODUCT_CONFIG / "reference-identity.json")
         self.assertEqual(audit["productId"], PRODUCT_ID)
+        self.assertEqual(identity["productId"], PRODUCT_ID)
         self.assertEqual(audit["modelIdentification"]["status"], "UNVERIFIED")
+        self.assertTrue(
+            all(claim["status"] == "UNVERIFIED" for claim in identity["claims"])
+        )
+        self.assertTrue(all(claim["value"] is None for claim in identity["claims"]))
         self.assertFalse(
             audit["source"]["sourceRetention"]["repositoryContainsSourceImage"]
         )
+        source_reference = (
+            "private-reference://sha256/"
+            + audit["source"]["originalSha256"]
+        )
+        self.assertEqual(identity["sourceReference"], source_reference)
         self.assertEqual(len(audit["source"]["originalSha256"]), 64)
         int(audit["source"]["originalSha256"], 16)
         self.assertFalse(any(PRODUCT_CONFIG.glob("*.png")))
@@ -55,6 +66,10 @@ class ReferenceProductContractTests(unittest.TestCase):
         for stage, binding in request["stageBindings"].items():
             self.assertEqual(binding["command"][2:4], ["--stage", stage])
             self.assertTrue(binding["resultPath"].startswith(".image2outfit/"))
+        self.assertEqual(
+            request["stageBindings"]["ingest-reference"]["command"][1],
+            "tools/run_ingest_reference_stage.py",
+        )
 
     def test_observation_pattern_and_stitch_contracts_are_nonempty(self) -> None:
         decomposition = read(PRODUCT_CONFIG / "garment-decomposition.json")
@@ -82,6 +97,7 @@ class ReferenceProductContractTests(unittest.TestCase):
         for script in (
             ROOT / job["buildScript"],
             ROOT / "tools" / "run_reference_product_stage.py",
+            ROOT / "tools" / "run_ingest_reference_stage.py",
         ):
             self.assertTrue(script.is_file(), str(script))
             hashlib.sha256(script.read_bytes()).hexdigest()
