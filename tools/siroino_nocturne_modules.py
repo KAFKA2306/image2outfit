@@ -8,6 +8,7 @@ import bpy
 from mathutils import Vector
 
 from siroino_nocturne_geometry import (
+    add_outward_thickness,
     axis_shell,
     bake_skirt,
     bone_segment,
@@ -18,163 +19,169 @@ from siroino_nocturne_geometry import (
     frustum_shell,
     panel,
     pleated_shell,
+    project_to_body,
     rigid_weight,
+    sewn_bodice_shell,
     sphere,
     transfer_weights,
     triangulate,
 )
 
 
-def _grid_panel(name, rows, mat, thickness):
-    columns = len(rows[0])
-    if columns < 2 or any(len(row) != columns for row in rows):
-        raise ValueError("grid panel rows must have one consistent width")
-    vertices = [tuple(point) for row in rows for point in row]
-    faces = []
-    for row_index in range(len(rows) - 1):
-        for column in range(columns - 1):
-            first = row_index * columns + column
-            faces.append((first, first + 1, first + 1 + columns, first + columns))
-    mesh = bpy.data.meshes.new(f"{name}_Mesh")
-    mesh.from_pydata(vertices, [], faces)
-    mesh.update(calc_edges=True)
-    uv = mesh.uv_layers.new(name="UVMap")
-    for polygon in mesh.polygons:
-        for loop_index in polygon.loop_indices:
-            vertex_index = mesh.loops[loop_index].vertex_index
-            row_index, column = divmod(vertex_index, columns)
-            uv.data[loop_index].uv = (
-                column / (columns - 1),
-                row_index / (len(rows) - 1),
-            )
-    obj = bpy.data.objects.new(name, mesh)
-    bpy.context.collection.objects.link(obj)
-    finish(obj, mat)
-    solidify = obj.modifiers.new("Pattern panel thickness", "SOLIDIFY")
-    solidify.thickness = thickness
-    solidify.offset = 0.0
-    bpy.context.view_layer.objects.active = obj
-    obj.select_set(True)
-    bpy.ops.object.modifier_apply(modifier=solidify.name)
-    obj.select_set(False)
-    triangulate(obj)
-    return obj
-
-
-def _angular_row(center, angles, z_value, radius_x, radius_y):
-    return [
-        Vector(
-            (
-                center.x + radius_x * math.cos(math.radians(angle)),
-                center.y + radius_y * math.sin(math.radians(angle)),
-                z_value,
-            )
-        )
-        for angle in angles
-    ]
-
-
-def _build_bodice(center, height, z, mats):
-    radius_x = height * 0.125
-    radius_y = height * 0.082
-    levels = (0.525, 0.585, 0.645, 0.705, 0.780)
-    left_angles = (
-        (-170, -150, -130, -110, -90),
-        (-170, -150, -130, -110, -90),
-        (-168, -148, -128, -108, -92),
-        (-165, -148, -132, -118, -104),
-        (-158, -146, -136, -126, -116),
+def _build_sewn_bodice(body, center, height, z, mats):
+    bodice = sewn_bodice_shell(
+        "Nocturne_Sewn_Bodice",
+        center,
+        [
+            (z(0.520), height * 0.128, height * 0.086, 0.0),
+            (z(0.570), height * 0.130, height * 0.088, 0.0),
+            (z(0.620), height * 0.134, height * 0.091, 0.0),
+            (z(0.680), height * 0.139, height * 0.095, 0.0),
+            (z(0.765), height * 0.144, height * 0.099, 0.0),
+        ],
+        mats["black"],
+        segments=72,
     )
-    right_angles = tuple(
-        tuple(-angle - 180 for angle in reversed(row)) for row in left_angles
-    )
-    back_angles = (
-        (20, 55, 90, 125, 160),
-        (20, 55, 90, 125, 160),
-        (22, 56, 90, 124, 158),
-        (28, 60, 90, 120, 152),
-        (36, 64, 90, 116, 144),
-    )
-    side_levels = levels[:-1]
-    left_side_angles = ((160, 180, 200),) * len(side_levels)
-    right_side_angles = ((-20, 0, 20),) * len(side_levels)
+    project_to_body(bodice, body, height * 0.0090)
+    add_outward_thickness(bodice, height * 0.0022)
+    triangulate(bodice)
 
-    def rows(angle_rows, ratios):
-        return [
-            _angular_row(center, angle_row, z(ratio), radius_x, radius_y)
-            for angle_row, ratio in zip(angle_rows, ratios, strict=True)
-        ]
-
-    thickness = height * 0.0020
-    panels = [
-        _grid_panel(
-            "Nocturne_Bodice_Front_L",
-            rows(left_angles, levels),
-            mats["black"],
-            thickness,
-        ),
-        _grid_panel(
-            "Nocturne_Bodice_Front_R",
-            rows(right_angles, levels),
-            mats["black"],
-            thickness,
-        ),
-        _grid_panel(
-            "Nocturne_Bodice_Back",
-            rows(back_angles, levels),
-            mats["black"],
-            thickness,
-        ),
-        _grid_panel(
-            "Nocturne_Bodice_Side_L",
-            rows(left_side_angles, side_levels),
-            mats["black"],
-            thickness,
-        ),
-        _grid_panel(
-            "Nocturne_Bodice_Side_R",
-            rows(right_side_angles, side_levels),
-            mats["black"],
-            thickness,
-        ),
-    ]
-    front_y = center.y - radius_y * 1.08
-    left_collar = panel(
+    front_y = center.y - height * 0.090
+    collar_left = panel(
         "Nocturne_Sailor_Collar_L",
         [
-            (center.x - radius_x * 0.12, front_y, z(0.690)),
-            (center.x - radius_x * 0.50, front_y, z(0.785)),
-            (center.x - radius_x * 0.67, front_y, z(0.770)),
-            (center.x - radius_x * 0.20, front_y, z(0.665)),
+            (center.x - height * 0.010, front_y, z(0.690)),
+            (center.x - height * 0.050, front_y, z(0.770)),
+            (center.x - height * 0.078, front_y, z(0.756)),
+            (center.x - height * 0.020, front_y, z(0.668)),
         ],
         mats["beige"],
-        thickness,
+        height * 0.0018,
     )
-    right_collar = panel(
+    collar_right = panel(
         "Nocturne_Sailor_Collar_R",
         [
-            (center.x + radius_x * 0.20, front_y, z(0.665)),
-            (center.x + radius_x * 0.67, front_y, z(0.770)),
-            (center.x + radius_x * 0.50, front_y, z(0.785)),
-            (center.x + radius_x * 0.12, front_y, z(0.690)),
+            (center.x + height * 0.020, front_y, z(0.668)),
+            (center.x + height * 0.078, front_y, z(0.756)),
+            (center.x + height * 0.050, front_y, z(0.770)),
+            (center.x + height * 0.010, front_y, z(0.690)),
         ],
         mats["beige"],
-        thickness,
+        height * 0.0018,
     )
-    back_y = center.y + radius_y * 1.08
-    back_collar = panel(
-        "Nocturne_Sailor_Collar_Back",
-        [
-            (center.x - radius_x * 0.62, back_y, z(0.785)),
-            (center.x + radius_x * 0.62, back_y, z(0.785)),
-            (center.x + radius_x * 0.46, back_y, z(0.735)),
-            (center.x, back_y, z(0.705)),
-            (center.x - radius_x * 0.46, back_y, z(0.735)),
-        ],
-        mats["beige"],
-        thickness,
+    for collar in (collar_left, collar_right):
+        project_to_body(collar, body, height * 0.012)
+    return bodice, [collar_left, collar_right], front_y
+
+
+def _build_limb_accessories(armature, height, mats):
+    garments = []
+    weighted = []
+    clearance = []
+    for side, upper, lower in (
+        ("L", "upper_arm_l", "lower_arm_l"),
+        ("R", "upper_arm_r", "lower_arm_r"),
+    ):
+        upper_start, upper_end = bone_segment(armature, upper)
+        lower_start, lower_end = bone_segment(armature, lower)
+        upper_axis = upper_end - upper_start
+        puff = axis_shell(
+            f"Nocturne_Puff_Sleeve_{side}",
+            upper_start + upper_axis * 0.10,
+            upper_start + upper_axis * 0.28,
+            [height * 0.014, height * 0.018, height * 0.020, height * 0.017],
+            mats["black"],
+            segments=36,
+        )
+        warmer = axis_shell(
+            f"Nocturne_Detached_Arm_Warmer_{side}",
+            lower_start.lerp(lower_end, 0.16),
+            lower_start.lerp(lower_end, 0.76),
+            [height * 0.014, height * 0.017, height * 0.017, height * 0.014],
+            mats["black"],
+            segments=36,
+        )
+        cuff = axis_shell(
+            f"Nocturne_Lace_Cuff_{side}",
+            lower_start.lerp(lower_end, 0.72),
+            lower_start.lerp(lower_end, 0.88),
+            [height * 0.017, height * 0.019, height * 0.016],
+            mats["cream"],
+            segments=36,
+        )
+        garments.extend([puff, warmer, cuff])
+        weighted.extend([puff, warmer, cuff])
+        clearance.extend([puff, warmer, cuff])
+
+    for side, lower, foot in (
+        ("L", "lower_leg_l", "foot_l"),
+        ("R", "lower_leg_r", "foot_r"),
+    ):
+        lower_start, lower_end = bone_segment(armature, lower)
+        foot_start, foot_end = bone_segment(armature, foot)
+        warmer = axis_shell(
+            f"Nocturne_Leg_Warmer_{side}",
+            lower_start.lerp(lower_end, 0.22),
+            lower_start.lerp(lower_end, 0.70),
+            [height * 0.020, height * 0.024, height * 0.024, height * 0.020],
+            mats["beige"],
+            segments=36,
+        )
+        shoe = sphere(
+            f"Nocturne_Shoe_{side}",
+            foot_start.lerp(foot_end, 0.56)
+            + Vector((0.0, -height * 0.010, -height * 0.005)),
+            (height * 0.026, height * 0.041, height * 0.016),
+            mats["brown"],
+        )
+        garments.extend([warmer, shoe])
+        weighted.extend([warmer, shoe])
+        clearance.extend([warmer, shoe])
+    return garments, weighted, clearance
+
+
+def _build_wings(armature, height, mats):
+    chest_start, chest_end = bone_segment(armature, "chest")
+    origin = chest_start.lerp(chest_end, 0.58) + Vector(
+        (0.0, height * 0.098, height * 0.004)
     )
-    return panels, [left_collar, right_collar, back_collar], front_y
+    specs = (
+        (54.0, 0.105, 0.012, 0.006, 0.012),
+        (24.0, 0.125, 0.014, 0.006, -0.005),
+        (-12.0, 0.115, 0.013, 0.006, -0.024),
+    )
+    wings = []
+    for side, sign in (("L", 1.0), ("R", -1.0)):
+        for index, (
+            angle_degrees,
+            length_ratio,
+            width_ratio,
+            depth_ratio,
+            drop,
+        ) in enumerate(specs):
+            angle = math.radians(angle_degrees)
+            root = origin + Vector(
+                (sign * height * (0.008 + index * 0.002), 0.0, height * drop)
+            )
+            length = height * length_ratio
+            tip = root + Vector(
+                (
+                    sign * length * math.cos(angle),
+                    height * 0.010,
+                    length * math.sin(angle),
+                )
+            )
+            wings.append(
+                ellipsoid_between(
+                    f"Nocturne_Wing_{side}_{index:02d}",
+                    root,
+                    tip,
+                    height * width_ratio,
+                    height * depth_ratio,
+                    mats["white"],
+                )
+            )
+    return wings
 
 
 def build(body, armature, mats):
@@ -186,171 +193,72 @@ def build(body, armature, mats):
         return minimum.z + height * ratio
 
     garments = []
-    skinweighted = []
+    weighted = []
     rigid = []
-    clearance_specs = []
+    clearance_objects = []
 
-    bodice_panels, collar_panels, front_y = _build_bodice(center, height, z, mats)
-    garments.extend(bodice_panels)
-    garments.extend(collar_panels)
-    skinweighted.extend(bodice_panels)
-    skinweighted.extend(collar_panels)
-    clearance_specs.extend((obj, {}) for obj in bodice_panels + collar_panels)
+    bodice, collars, front_y = _build_sewn_bodice(body, center, height, z, mats)
+    garments.extend([bodice, *collars])
+    weighted.extend([bodice, *collars])
+    clearance_objects.extend([bodice, *collars])
 
     skirt = pleated_shell(
         "Nocturne_Cloth_Skirt",
         center,
         [
-            (z(0.418), height * 0.158, height * 0.112, 0.0),
-            (z(0.442), height * 0.154, height * 0.109, 0.0),
-            (z(0.466), height * 0.148, height * 0.104, 0.0),
-            (z(0.490), height * 0.140, height * 0.098, 0.0),
-            (z(0.514), height * 0.131, height * 0.091, 0.0),
-            (z(0.538), height * 0.122, height * 0.085, 0.0),
-            (z(0.562), height * 0.115, height * 0.079, 0.0),
+            (z(0.445), height * 0.148, height * 0.103, 0.0),
+            (z(0.466), height * 0.143, height * 0.099, 0.0),
+            (z(0.487), height * 0.137, height * 0.095, 0.0),
+            (z(0.508), height * 0.129, height * 0.089, 0.0),
+            (z(0.529), height * 0.121, height * 0.083, 0.0),
+            (z(0.550), height * 0.114, height * 0.078, 0.0),
         ],
         mats["black"],
         segments=96,
         pleats=12,
-        fold=0.085,
+        fold=0.080,
     )
     cloth = [bake_skirt(skirt, body)]
     frill = pleated_shell(
         "Nocturne_Cream_Hem_Frill",
         center,
         [
-            (z(0.402), height * 0.166, height * 0.118, 0.0),
-            (z(0.420), height * 0.162, height * 0.115, 0.0),
-            (z(0.438), height * 0.157, height * 0.111, 0.0),
+            (z(0.432), height * 0.154, height * 0.108, 0.0),
+            (z(0.446), height * 0.151, height * 0.105, 0.0),
+            (z(0.460), height * 0.147, height * 0.102, 0.0),
         ],
         mats["cream"],
         segments=96,
         pleats=12,
-        fold=0.105,
+        fold=0.095,
     )
     waist = frustum_shell(
         "Nocturne_Waist_Band",
         center,
         [
-            (z(0.548), height * 0.120, height * 0.083, 0.0),
-            (z(0.560), height * 0.117, height * 0.081, 0.0),
-            (z(0.572), height * 0.114, height * 0.079, 0.0),
+            (z(0.540), height * 0.118, height * 0.081, 0.0),
+            (z(0.552), height * 0.115, height * 0.079, 0.0),
+            (z(0.564), height * 0.112, height * 0.077, 0.0),
         ],
         mats["beige"],
         segments=64,
     )
     garments.extend([skirt, frill, waist])
-    skinweighted.extend([skirt, frill, waist])
-    clearance_specs.extend(
-        [
-            (skirt, {"only_above": z(0.525)}),
-            (waist, {}),
-        ]
+    weighted.extend([skirt, frill, waist])
+    clearance_objects.extend([skirt, waist])
+
+    limb_garments, limb_weighted, limb_clearance = _build_limb_accessories(
+        armature, height, mats
     )
-
-    for side, upper, lower in (
-        ("L", "upper_arm_l", "lower_arm_l"),
-        ("R", "upper_arm_r", "lower_arm_r"),
-    ):
-        upper_start, upper_end = bone_segment(armature, upper)
-        lower_start, lower_end = bone_segment(armature, lower)
-        upper_axis = upper_end - upper_start
-        puff = axis_shell(
-            f"Nocturne_Puff_Sleeve_{side}",
-            upper_start + upper_axis * 0.08,
-            upper_start + upper_axis * 0.31,
-            [
-                height * 0.017,
-                height * 0.022,
-                height * 0.025,
-                height * 0.022,
-                height * 0.017,
-            ],
-            mats["black"],
-        )
-        warmer = axis_shell(
-            f"Nocturne_Detached_Arm_Warmer_{side}",
-            lower_start.lerp(lower_end, 0.10),
-            lower_start.lerp(lower_end, 0.82),
-            [
-                height * 0.017,
-                height * 0.021,
-                height * 0.022,
-                height * 0.020,
-                height * 0.017,
-            ],
-            mats["black"],
-        )
-        cuff = axis_shell(
-            f"Nocturne_Lace_Cuff_{side}",
-            lower_start.lerp(lower_end, 0.76),
-            lower_start.lerp(lower_end, 0.93),
-            [height * 0.020, height * 0.023, height * 0.021, height * 0.018],
-            mats["cream"],
-        )
-        garments.extend([puff, warmer, cuff])
-        skinweighted.extend([puff, warmer, cuff])
-        clearance_specs.extend((obj, {}) for obj in (puff, warmer, cuff))
-
-    for side, lower, foot in (
-        ("L", "lower_leg_l", "foot_l"),
-        ("R", "lower_leg_r", "foot_r"),
-    ):
-        lower_start, lower_end = bone_segment(armature, lower)
-        foot_start, foot_end = bone_segment(armature, foot)
-        warmer = axis_shell(
-            f"Nocturne_Leg_Warmer_{side}",
-            lower_start.lerp(lower_end, 0.17),
-            lower_start.lerp(lower_end, 0.76),
-            [
-                height * 0.024,
-                height * 0.029,
-                height * 0.031,
-                height * 0.029,
-                height * 0.024,
-            ],
-            mats["beige"],
-        )
-        shoe = sphere(
-            f"Nocturne_Shoe_{side}",
-            foot_start.lerp(foot_end, 0.58)
-            + Vector((0.0, -height * 0.012, -height * 0.007)),
-            (height * 0.030, height * 0.047, height * 0.019),
-            mats["brown"],
-        )
-        garments.extend([warmer, shoe])
-        skinweighted.extend([warmer, shoe])
-        clearance_specs.extend((obj, {}) for obj in (warmer, shoe))
-
-    head_start, head_end = bone_segment(armature, "head")
-    head = head_start.lerp(head_end, 0.25)
-    beret = sphere(
-        "Nocturne_Beret",
-        head + Vector((0.0, 0.0, height * 0.020)),
-        (height * 0.063, height * 0.056, height * 0.018),
-        mats["beige"],
-    )
-    garments.append(beret)
-    rigid.append((beret, "head"))
-    for side, sign in (("L", 1.0), ("R", -1.0)):
-        ear = panel(
-            f"Nocturne_Animal_Ear_{side}",
-            [
-                head + Vector((sign * height * 0.030, 0.0, height * 0.028)),
-                head + Vector((sign * height * 0.051, 0.0, height * 0.071)),
-                head + Vector((sign * height * 0.018, 0.0, height * 0.058)),
-            ],
-            mats["brown"],
-            height * 0.0025,
-        )
-        garments.append(ear)
-        rigid.append((ear, "head"))
+    garments.extend(limb_garments)
+    weighted.extend(limb_weighted)
+    clearance_objects.extend(limb_clearance)
 
     neck_start, neck_end = bone_segment(armature, "neck")
-    neck = neck_start.lerp(neck_end, 0.40)
+    neck = neck_start.lerp(neck_end, 0.36)
     bpy.ops.mesh.primitive_torus_add(
-        major_radius=height * 0.040,
-        minor_radius=height * 0.0035,
+        major_radius=height * 0.038,
+        minor_radius=height * 0.003,
         location=neck,
     )
     choker = bpy.context.object
@@ -358,101 +266,64 @@ def build(body, armature, mats):
     finish(choker, mats["beige"])
     amber = sphere(
         "Nocturne_Amber_Charm",
-        neck + Vector((0.0, -height * 0.043, -height * 0.014)),
-        (height * 0.011, height * 0.007, height * 0.015),
+        neck + Vector((0.0, -height * 0.041, -height * 0.012)),
+        (height * 0.009, height * 0.006, height * 0.013),
         mats["gold"],
     )
     garments.extend([choker, amber])
-    skinweighted.append(choker)
-    clearance_specs.append((choker, {}))
+    weighted.append(choker)
+    clearance_objects.append(choker)
     rigid.append((amber, "chest"))
 
-    bow = Vector((center.x, front_y - height * 0.006, z(0.655)))
+    bow = Vector((center.x, front_y - height * 0.005, z(0.650)))
     bow_left = sphere(
         "Nocturne_Bow_Loop_L",
-        bow + Vector((-height * 0.021, 0.0, 0.0)),
-        (height * 0.023, height * 0.006, height * 0.014),
+        bow + Vector((-height * 0.019, 0.0, 0.0)),
+        (height * 0.020, height * 0.005, height * 0.012),
         mats["black"],
     )
     bow_right = sphere(
         "Nocturne_Bow_Loop_R",
-        bow + Vector((height * 0.021, 0.0, 0.0)),
-        (height * 0.023, height * 0.006, height * 0.014),
+        bow + Vector((height * 0.019, 0.0, 0.0)),
+        (height * 0.020, height * 0.005, height * 0.012),
         mats["black"],
     )
     rabbit = sphere(
         "Nocturne_Rabbit_Charm",
-        bow + Vector((0.0, -height * 0.006, -height * 0.003)),
-        (height * 0.012, height * 0.007, height * 0.016),
+        bow + Vector((0.0, -height * 0.005, -height * 0.002)),
+        (height * 0.010, height * 0.006, height * 0.014),
         mats["beige"],
     )
     garments.extend([bow_left, bow_right, rabbit])
     rigid.extend([(bow_left, "chest"), (bow_right, "chest"), (rabbit, "chest")])
 
-    chest_start, chest_end = bone_segment(armature, "chest")
-    wing_origin = chest_start.lerp(chest_end, 0.58) + Vector(
-        (0.0, height * 0.110, height * 0.005)
-    )
-    wing_specs = (
-        (48.0, 0.125, 0.020, 0.009, 0.012),
-        (20.0, 0.145, 0.023, 0.010, -0.006),
-        (-8.0, 0.138, 0.022, 0.010, -0.024),
-        (-34.0, 0.112, 0.019, 0.009, -0.040),
-    )
-    for side, sign in (("L", 1.0), ("R", -1.0)):
-        for index, (
-            angle_degrees,
-            length_ratio,
-            width_ratio,
-            depth_ratio,
-            drop,
-        ) in enumerate(wing_specs):
-            angle = math.radians(angle_degrees)
-            root = wing_origin + Vector(
-                (sign * height * (0.010 + index * 0.003), 0.0, height * drop)
-            )
-            length = height * length_ratio
-            tip = root + Vector(
-                (
-                    sign * length * math.cos(angle),
-                    height * 0.008,
-                    length * math.sin(angle),
-                )
-            )
-            wing = ellipsoid_between(
-                f"Nocturne_Wing_{side}_{index:02d}",
-                root,
-                tip,
-                height * width_ratio,
-                height * depth_ratio,
-                mats["white"],
-            )
-            garments.append(wing)
-            rigid.append((wing, "chest"))
+    wings = _build_wings(armature, height, mats)
+    garments.extend(wings)
+    rigid.extend((wing, "chest") for wing in wings)
 
     tail = sphere(
         "Nocturne_Tail",
-        Vector((center.x, center.y + height * 0.155, z(0.500))),
-        (height * 0.030,) * 3,
+        Vector((center.x, center.y + height * 0.145, z(0.500))),
+        (height * 0.024,) * 3,
         mats["brown"],
     )
     garments.append(tail)
     rigid.append((tail, "hips"))
 
-    clearance = height * 0.0065
+    clearance = height * 0.011
     clearance_records = [
         enforce_body_clearance(
             obj,
             body,
             clearance,
-            maximum_search=height * 0.060,
-            **options,
+            maximum_search=height * 0.075,
+            iterations=3,
         )
-        for obj, options in clearance_specs
+        for obj in clearance_objects
     ]
     cloth[0]["clearanceAdjustments"] = clearance_records
 
-    for obj in skinweighted:
+    for obj in weighted:
         transfer_weights(obj, body, armature)
     for obj, semantic in rigid:
         rigid_weight(obj, armature, semantic)
