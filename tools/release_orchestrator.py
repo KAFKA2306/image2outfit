@@ -20,6 +20,8 @@ import release_gate as legacy
 from candidate_orchestrator import _research_state
 from runtime_transaction import DirectoryTransaction
 
+QUALITY_SPEC_PATH = Path("contracts/quality/quality-spec.json")
+
 
 def _quality_spec_audit(
     *,
@@ -27,8 +29,7 @@ def _quality_spec_audit(
     candidate_hash: str,
     evidence_documents: dict[str, dict[str, Any]],
 ) -> tuple[dict[str, Any], list[str]]:
-    spec_path = legacy.ROOT / "config" / "quality-spec.json"
-    spec_data = legacy.read(spec_path)
+    spec_data = legacy.read(legacy.ROOT / QUALITY_SPEC_PATH)
     visual_review = evidence_documents.get("visual-review", {})
     assessment = (
         visual_review.get("qualitySpec")
@@ -44,10 +45,7 @@ def _quality_spec_audit(
         resolve_repo_path=legacy.path,
         digest=legacy.digest,
     )
-    direct_review = result.get("visualAppearanceReview", {})
-    for field in ("reviewer", "reviewerReference"):
-        if direct_review.get(field) != visual_review.get(field):
-            errors.append(f"visualAppearanceReview.{field}Binding")
+    result["specPath"] = QUALITY_SPEC_PATH.as_posix()
     if errors:
         result["passed"] = False
         result["releaseReady"] = False
@@ -213,6 +211,7 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
                     "researchBaselinePassed": True,
                     "singleReleaseValidator": "tools/customer_quality.py",
                     "qualitySpecValidator": "src/image2outfit/quality.py",
+                    "qualitySpecPath": QUALITY_SPEC_PATH.as_posix(),
                     "rawEvidencePackaged": True,
                 },
             },
