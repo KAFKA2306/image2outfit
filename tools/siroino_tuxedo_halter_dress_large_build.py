@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a tuxedo-halter layered dress from the audited user reference."""
+"""Build a fitted tuxedo-halter layered dress from the audited reference."""
 
 from __future__ import annotations
 
@@ -29,6 +29,7 @@ from tuxedo_halter_components import (
 from tuxedo_halter_runtime import (
     clean_meshes,
     configure_cloth,
+    normalize_bone_weights,
     render_prone_pose,
     write_prefabs,
 )
@@ -66,6 +67,241 @@ def write_json(path: Path, payload: dict) -> Path:
         encoding="utf-8",
     )
     return path
+
+
+def create_materials(texture_dir: Path) -> tuple[dict[str, Path], dict[str, object]]:
+    maps = make_image_maps(texture_dir)
+    materials = {
+        "wine": textured_material(
+            "MAT_Wine_Satin",
+            maps["wine_satin_albedo"],
+            maps["wine_satin_normal"],
+            maps["wine_satin_roughness"],
+            sheen=0.26,
+        ),
+        "black": textured_material(
+            "MAT_Black_Satin",
+            maps["black_satin_albedo"],
+            maps["black_satin_normal"],
+            maps["black_satin_roughness"],
+            sheen=0.18,
+        ),
+        "sheer": textured_material(
+            "MAT_Black_Sheer",
+            maps["black_satin_albedo"],
+            maps["black_satin_normal"],
+            maps["black_satin_roughness"],
+            sheen=0.08,
+            alpha=0.52,
+        ),
+        "white": textured_material(
+            "MAT_White_Jacquard",
+            maps["white_jacquard_albedo"],
+            maps["white_jacquard_normal"],
+            maps["white_jacquard_roughness"],
+            sheen=0.10,
+        ),
+        "silver": base.plain_material(
+            "MAT_Silver_Hardware",
+            (0.64, 0.69, 0.76, 1.0),
+            roughness=0.18,
+            metallic=0.92,
+        ),
+    }
+    return maps, materials
+
+
+def add_bodice(
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    materials: dict[str, object],
+) -> list[bpy.types.Object]:
+    garments: list[bpy.types.Object] = [
+        bib_panel(body, armature, materials["white"]),
+        waistcoat_side("L", body, armature, materials["wine"]),
+        waistcoat_side("R", body, armature, materials["wine"]),
+        waistcoat_back(body, armature, materials["wine"]),
+        tail_panel("L", body, armature, materials["wine"]),
+        tail_panel("R", body, armature, materials["wine"]),
+    ]
+    garments.extend(
+        vertical_ruffle(index, body, armature, materials["white"])
+        for index in range(3)
+    )
+    garments.extend(bow_tie(body, armature, materials["black"]))
+
+    neck_loop = base.ellipse_points((0.0, 0.010, 1.045), (0.050, 0.041), 48)
+    garments.append(
+        base.curve_tube(
+            "Black_Halter_Neck_Band",
+            neck_loop,
+            0.0044,
+            materials["black"],
+            armature,
+            "Neck",
+            cyclic=True,
+        )
+    )
+    for index, z in enumerate((0.910, 0.865, 0.820, 0.780), start=1):
+        y = base.body_front_y(body, 0.0, z) - 0.020
+        garments.append(
+            ellipsoid(
+                f"Black_Bib_Button_{index}",
+                (0.0, y, z),
+                (0.0053, 0.0035, 0.0053),
+                materials["black"],
+                body,
+                armature,
+            )
+        )
+    return garments
+
+
+def add_skirts(
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    materials: dict[str, object],
+) -> tuple[list[bpy.types.Object], bpy.types.Object, bpy.types.Object, list[int], list[int]]:
+    upper_skirt, upper_pin = ring_skirt(
+        "Black_Upper_Pleated_Skirt",
+        body,
+        armature,
+        materials["black"],
+        top_z=0.705,
+        bottom_z=0.550,
+        top_rx=0.145,
+        top_ry=0.105,
+        bottom_rx=0.245,
+        bottom_ry=0.177,
+        pleats=12,
+        thickness=0.0014,
+    )
+    lower_skirt, lower_pin = ring_skirt(
+        "Black_Sheer_Lower_Skirt",
+        body,
+        armature,
+        materials["sheer"],
+        top_z=0.694,
+        bottom_z=0.465,
+        top_rx=0.150,
+        top_ry=0.110,
+        bottom_rx=0.275,
+        bottom_ry=0.204,
+        pleats=14,
+        thickness=0.0008,
+    )
+    garments = [upper_skirt, lower_skirt]
+
+    hem_points = []
+    for index in range(168):
+        angle = math.tau * index / 168
+        scallop = 0.0045 * (0.5 + 0.5 * math.cos(angle * 20))
+        hem_points.append(
+            (
+                0.276 * math.cos(angle),
+                0.205 * math.sin(angle),
+                0.465 + scallop,
+            )
+        )
+    garments.append(
+        base.curve_tube(
+            "Black_Lace_Scallop_Hem",
+            hem_points,
+            0.0017,
+            materials["black"],
+            armature,
+            "Hips",
+            cyclic=True,
+        )
+    )
+    return garments, upper_skirt, lower_skirt, upper_pin, lower_pin
+
+
+def add_hardware(
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    materials: dict[str, object],
+) -> list[bpy.types.Object]:
+    garments: list[bpy.types.Object] = []
+    waist_y = base.body_front_y(body, 0.0, 0.730) - 0.022
+    for side, x in (("L", -0.078), ("R", 0.078)):
+        garments.append(
+            ellipsoid(
+                f"Silver_Waist_Anchor_{side}",
+                (x, waist_y, 0.733),
+                (0.0065, 0.0045, 0.0065),
+                materials["silver"],
+                body,
+                armature,
+            )
+        )
+    chain_points = [
+        (-0.076, waist_y - 0.003, 0.731),
+        (-0.040, waist_y - 0.006, 0.708),
+        (0.0, waist_y - 0.008, 0.700),
+        (0.040, waist_y - 0.006, 0.708),
+        (0.076, waist_y - 0.003, 0.731),
+    ]
+    garments.append(
+        base.curve_tube(
+            "Silver_Waist_Chain_Upper",
+            chain_points,
+            0.00125,
+            materials["silver"],
+            armature,
+            "Hips",
+        )
+    )
+    lower_chain = [(x, y - 0.001, z - 0.013) for x, y, z in chain_points]
+    garments.append(
+        base.curve_tube(
+            "Silver_Waist_Chain_Lower",
+            lower_chain,
+            0.0010,
+            materials["silver"],
+            armature,
+            "Hips",
+        )
+    )
+    return garments
+
+
+def bake_skirts(
+    body: bpy.types.Object,
+    upper_skirt: bpy.types.Object,
+    lower_skirt: bpy.types.Object,
+    upper_pin: list[int],
+    lower_pin: list[int],
+) -> tuple[list[dict[str, object]], int]:
+    frame_end = 24
+    contracts = [
+        configure_cloth(upper_skirt, body, upper_pin, frame_end=frame_end),
+        configure_cloth(lower_skirt, body, lower_pin, frame_end=frame_end),
+    ]
+    scene = bpy.context.scene
+    scene.frame_start = 1
+    scene.frame_end = frame_end
+    scene.gravity = (0.0, 0.0, -4.8)
+    bpy.context.view_layer.objects.active = upper_skirt
+    bpy.ops.ptcache.bake_all(bake=True)
+    scene.frame_set(frame_end)
+    bpy.context.view_layer.update()
+    for skirt in (upper_skirt, lower_skirt):
+        bpy.ops.object.select_all(action="DESELECT")
+        skirt.select_set(True)
+        bpy.context.view_layer.objects.active = skirt
+        bpy.ops.object.modifier_apply(modifier="Reference Cloth")
+        solidify = skirt.modifiers.new("Fabric thickness", "SOLIDIFY")
+        solidify.thickness = 0.0012 if skirt is upper_skirt else 0.0007
+        solidify.offset = 0.0
+        solidify.use_even_offset = True
+        bpy.ops.object.modifier_apply(modifier=solidify.name)
+        soft = skirt.modifiers.new("Soft skirt edge", "BEVEL")
+        soft.width = 0.0004
+        soft.segments = 2
+        bpy.ops.object.modifier_apply(modifier=soft.name)
+        skirt.select_set(False)
+    return contracts, frame_end
 
 
 def main() -> int:
@@ -106,177 +342,13 @@ def main() -> int:
     profile = g.apply_large_profile(body, job.get("bodyShapeProfile"))
     base.set_skin_material(body)
 
-    maps = make_image_maps(texture_dir)
-    materials = {
-        "wine": textured_material(
-            "MAT_Wine_Satin",
-            maps["wine_satin_albedo"],
-            maps["wine_satin_normal"],
-            maps["wine_satin_roughness"],
-            sheen=0.30,
-        ),
-        "black": textured_material(
-            "MAT_Black_Satin",
-            maps["black_satin_albedo"],
-            maps["black_satin_normal"],
-            maps["black_satin_roughness"],
-            sheen=0.22,
-        ),
-        "sheer": textured_material(
-            "MAT_Black_Sheer",
-            maps["black_satin_albedo"],
-            maps["black_satin_normal"],
-            maps["black_satin_roughness"],
-            sheen=0.10,
-            alpha=0.58,
-        ),
-        "white": textured_material(
-            "MAT_White_Jacquard",
-            maps["white_jacquard_albedo"],
-            maps["white_jacquard_normal"],
-            maps["white_jacquard_roughness"],
-            sheen=0.12,
-        ),
-        "silver": base.plain_material(
-            "MAT_Silver_Hardware",
-            (0.64, 0.69, 0.76, 1.0),
-            roughness=0.18,
-            metallic=0.92,
-        ),
-    }
-
-    garments: list[bpy.types.Object] = []
-    garments.append(bib_panel(body, armature, materials["white"]))
-    garments.append(waistcoat_side("L", body, armature, materials["wine"]))
-    garments.append(waistcoat_side("R", body, armature, materials["wine"]))
-    garments.append(waistcoat_back(body, armature, materials["wine"]))
-    garments.append(tail_panel("L", body, armature, materials["wine"]))
-    garments.append(tail_panel("R", body, armature, materials["wine"]))
-    garments.extend(
-        vertical_ruffle(index, body, armature, materials["white"])
-        for index in range(3)
+    maps, materials = create_materials(texture_dir)
+    garments = add_bodice(body, armature, materials)
+    skirt_parts, upper_skirt, lower_skirt, upper_pin, lower_pin = add_skirts(
+        body, armature, materials
     )
-    garments.extend(bow_tie(body, armature, materials["black"]))
-
-    neck_loop = base.ellipse_points((0.0, 0.010, 1.045), (0.052, 0.043), 48)
-    garments.append(
-        base.curve_tube(
-            "Black_Halter_Neck_Band",
-            neck_loop,
-            0.0050,
-            materials["black"],
-            armature,
-            "Neck",
-            cyclic=True,
-        )
-    )
-
-    for index, z in enumerate((0.920, 0.875, 0.830, 0.785), start=1):
-        y = base.body_front_y(body, 0.0, z) - 0.023
-        garments.append(
-            ellipsoid(
-                f"Black_Bib_Button_{index}",
-                (0.0, y, z),
-                (0.006, 0.004, 0.006),
-                materials["black"],
-                body,
-                armature,
-            )
-        )
-
-    upper_skirt, upper_pin = ring_skirt(
-        "Black_Upper_Pleated_Skirt",
-        body,
-        armature,
-        materials["black"],
-        top_z=0.708,
-        bottom_z=0.535,
-        top_rx=0.148,
-        top_ry=0.108,
-        bottom_rx=0.245,
-        bottom_ry=0.185,
-        pleats=16,
-        thickness=0.0015,
-    )
-    lower_skirt, lower_pin = ring_skirt(
-        "Black_Sheer_Lower_Skirt",
-        body,
-        armature,
-        materials["sheer"],
-        top_z=0.692,
-        bottom_z=0.440,
-        top_rx=0.152,
-        top_ry=0.112,
-        bottom_rx=0.285,
-        bottom_ry=0.215,
-        pleats=20,
-        thickness=0.0008,
-    )
-    garments.extend([upper_skirt, lower_skirt])
-
-    hem_points = []
-    for index in range(144):
-        angle = math.tau * index / 144
-        scallop = 0.007 * (0.5 + 0.5 * math.cos(angle * 20))
-        hem_points.append(
-            (
-                0.286 * math.cos(angle),
-                0.216 * math.sin(angle),
-                0.440 + scallop,
-            )
-        )
-    garments.append(
-        base.curve_tube(
-            "Black_Lace_Scallop_Hem",
-            hem_points,
-            0.0021,
-            materials["black"],
-            armature,
-            "Hips",
-            cyclic=True,
-        )
-    )
-
-    waist_y = base.body_front_y(body, 0.0, 0.730) - 0.026
-    for side, x in (("L", -0.085), ("R", 0.085)):
-        garments.append(
-            ellipsoid(
-                f"Silver_Waist_Anchor_{side}",
-                (x, waist_y, 0.735),
-                (0.008, 0.005, 0.008),
-                materials["silver"],
-                body,
-                armature,
-            )
-        )
-    chain_points = [
-        (-0.082, waist_y - 0.004, 0.733),
-        (-0.045, waist_y - 0.008, 0.700),
-        (0.0, waist_y - 0.010, 0.688),
-        (0.045, waist_y - 0.008, 0.700),
-        (0.082, waist_y - 0.004, 0.733),
-    ]
-    garments.append(
-        base.curve_tube(
-            "Silver_Waist_Chain_Upper",
-            chain_points,
-            0.0015,
-            materials["silver"],
-            armature,
-            "Hips",
-        )
-    )
-    lower_chain = [(x, y - 0.002, z - 0.017) for x, y, z in chain_points]
-    garments.append(
-        base.curve_tube(
-            "Silver_Waist_Chain_Lower",
-            lower_chain,
-            0.0012,
-            materials["silver"],
-            armature,
-            "Hips",
-        )
-    )
+    garments.extend(skirt_parts)
+    garments.extend(add_hardware(body, armature, materials))
 
     clean_meshes(garments)
     clearance_history = g.improve_clearance(
@@ -286,36 +358,23 @@ def main() -> int:
         movable=lambda obj: not obj.name.startswith("Silver_"),
     )
     clean_meshes(garments)
-
-    frame_end = 30
-    cloth_contracts = [
-        configure_cloth(upper_skirt, body, upper_pin, frame_end=frame_end),
-        configure_cloth(lower_skirt, body, lower_pin, frame_end=frame_end),
-    ]
-    scene = bpy.context.scene
-    scene.frame_start = 1
-    scene.frame_end = frame_end
-    scene.gravity = (0.0, 0.0, -5.5)
-    bpy.context.view_layer.objects.active = upper_skirt
-    bpy.ops.ptcache.bake_all(bake=True)
-    scene.frame_set(frame_end)
-    bpy.context.view_layer.update()
-    for skirt in (upper_skirt, lower_skirt):
-        bpy.ops.object.select_all(action="DESELECT")
-        skirt.select_set(True)
-        bpy.context.view_layer.objects.active = skirt
-        bpy.ops.object.modifier_apply(modifier="Reference Cloth")
-        solidify = skirt.modifiers.new("Fabric thickness", "SOLIDIFY")
-        solidify.thickness = 0.0013 if skirt is upper_skirt else 0.0008
-        solidify.offset = 0.0
-        solidify.use_even_offset = True
-        bpy.ops.object.modifier_apply(modifier=solidify.name)
-        soft = skirt.modifiers.new("Soft skirt edge", "BEVEL")
-        soft.width = 0.0005
-        soft.segments = 2
-        bpy.ops.object.modifier_apply(modifier=soft.name)
-        skirt.select_set(False)
-
+    cloth_contracts, frame_end = bake_skirts(
+        body, upper_skirt, lower_skirt, upper_pin, lower_pin
+    )
+    clean_meshes(garments)
+    weight_report = normalize_bone_weights(
+        garments,
+        armature,
+        rigid_groups={
+            upper_skirt.name: "Hips",
+            lower_skirt.name: "Hips",
+            "Black_Lace_Scallop_Hem": "Hips",
+            "Silver_Waist_Anchor_L": "Hips",
+            "Silver_Waist_Anchor_R": "Hips",
+            "Silver_Waist_Chain_Upper": "Hips",
+            "Silver_Waist_Chain_Lower": "Hips",
+        },
+    )
     measured = base.metrics(garments)
     passed = (
         measured["meshObjects"] >= 18
@@ -331,6 +390,7 @@ def main() -> int:
     blend_path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
 
+    scene = bpy.context.scene
     _, camera = g.pastel_studio()
     g.set_pose(armature, "neutral")
     scene.frame_set(frame_end)
@@ -388,11 +448,13 @@ def main() -> int:
         "passed": passed,
         "productId": PRODUCT_ID,
         "productName": job["productName"],
+        "buildRevision": job["buildRevision"],
         "targetProfile": profile,
         "targetAvatarAssetPath": job["targetAvatarAssetPath"],
         "targetSourcePath": job["targetSourcePath"],
         "blenderVersion": bpy.app.version_string,
         "metrics": measured,
+        "weightNormalization": weight_report,
         "clearanceRefinement": clearance_history,
         "clothSimulation": str(cloth_report.relative_to(ROOT)).replace("\\", "/"),
         "views": {
@@ -405,18 +467,10 @@ def main() -> int:
         },
         "referenceModelIdentification": "UNVERIFIED",
         "notes": [
-            (
-                "The design is an original, logo-free reconstruction of the visible "
-                "reference grammar."
-            ),
-            (
-                "No manufacturer, SKU, JAN, or model number is asserted because no "
-                "exact primary-source match was verified."
-            ),
-            (
-                "Wine-red/black is generated as the primary material variant; "
-                "black/black is declared as a secondary variant."
-            ),
+            "The waistcoat is recovered as fitted body-surface panels, not detached planes.",
+            "The skirt layers use subdivided low-amplitude panels and baked cloth settling.",
+            "All exported deform weights are reduced to at most four bones and normalized.",
+            "No manufacturer, SKU, JAN, or model number is asserted without exact evidence.",
         ],
     }
     report_path = write_json(evidence_dir / "product-build-report.json", report)
@@ -520,13 +574,11 @@ The reference image visibly declares `winered × black` and `black × black`. No
 ## Construction
 
 - white jacquard halter bib with three vertical ruffles
-- black neck band and bow tie
-- fitted wine-red tuxedo waistcoat with pointed tails
-- four black bib buttons
-- silver double-drape waist chain
-- opaque pleated upper skirt
-- longer sheer black skirt with scalloped hem trim
-- Blender cloth simulation on both skirt layers
+- fitted body-surface wine-red tuxedo waistcoat and pointed fronts
+- black neck band, bow, four bib buttons, and double silver chain
+- opaque flared upper skirt and longer sheer skirt
+- Blender Cloth settling on both subdivided skirt layers
+- deform weights normalized to four bones or fewer
 
 ## Outputs
 
