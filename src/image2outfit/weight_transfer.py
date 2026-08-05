@@ -89,17 +89,13 @@ class WeightTransferAudit:
     @property
     def passed(self) -> bool:
         """Whether constrained weights satisfy release-blocking postconditions."""
-        return not (
-            self.zero_weight_vertices or self.laterality_contamination_vertices
-        )
+        return not (self.zero_weight_vertices or self.laterality_contamination_vertices)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "vertexCount": self.vertex_count,
             "zeroWeightVertices": list(self.zero_weight_vertices),
-            "inputNonNormalizedVertices": list(
-                self.input_non_normalized_vertices
-            ),
+            "inputNonNormalizedVertices": list(self.input_non_normalized_vertices),
             "overLimitVertices": list(self.over_limit_vertices),
             "lateralityContaminationVertices": list(
                 self.laterality_contamination_vertices
@@ -201,11 +197,7 @@ def canonical_digest(payload: Mapping[str, Any]) -> str:
 def _coerce_influence(value: InfluenceInput) -> BoneInfluence:
     if isinstance(value, BoneInfluence):
         return value
-    if (
-        not isinstance(value, tuple)
-        or len(value) != 2
-        or not isinstance(value[0], str)
-    ):
+    if not isinstance(value, tuple) or len(value) != 2 or not isinstance(value[0], str):
         raise TypeError("influences must be BoneInfluence or (bone, weight) tuples")
     return BoneInfluence(value[0], float(value[1]))
 
@@ -249,9 +241,7 @@ def constrain_vertex_weights(
     laterality = dict(expected_laterality or {})
     invalid_laterality = set(laterality.values()) - {"left", "right", "center"}
     if invalid_laterality:
-        raise ValueError(
-            "expected_laterality values must be left, right or center"
-        )
+        raise ValueError("expected_laterality values must be left, right or center")
 
     constrained: dict[int, tuple[BoneInfluence, ...]] = {}
     zero: list[int] = []
@@ -276,15 +266,10 @@ def constrain_vertex_weights(
                 continue
             by_bone.setdefault(influence.bone, []).append(influence.weight)
 
-        merged = {
-            bone: math.fsum(weights) for bone, weights in by_bone.items()
-        }
+        merged = {bone: math.fsum(weights) for bone, weights in by_bone.items()}
 
         valid_total = math.fsum(merged.values())
-        if (
-            merged
-            and abs(valid_total - 1.0) > policy.normalization_tolerance
-        ):
+        if merged and abs(valid_total - 1.0) > policy.normalization_tolerance:
             input_non_normalized.append(vertex_index)
 
         ordered = sorted(
@@ -302,24 +287,18 @@ def constrain_vertex_weights(
             zero.append(vertex_index)
             continue
 
-        normalized = tuple(
-            BoneInfluence(bone, weight / total) for bone, weight in kept
-        )
+        normalized = tuple(BoneInfluence(bone, weight / total) for bone, weight in kept)
         constrained[vertex_index] = normalized
 
         side = laterality.get(vertex_index, "center")
         opposite_weight = 0.0
         if side == "left":
             opposite_weight = math.fsum(
-                influence.weight
-                for influence in normalized
-                if influence.bone in right
+                influence.weight for influence in normalized if influence.bone in right
             )
         elif side == "right":
             opposite_weight = math.fsum(
-                influence.weight
-                for influence in normalized
-                if influence.bone in left
+                influence.weight for influence in normalized if influence.bone in left
             )
         if opposite_weight > policy.laterality_contamination_limit:
             contamination.append(vertex_index)

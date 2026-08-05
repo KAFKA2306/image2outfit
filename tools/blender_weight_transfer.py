@@ -288,8 +288,7 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
         ]
         if pending:
             raise ValueError(
-                "apply scale and rotation before weight transfer: "
-                + ", ".join(pending)
+                "apply scale and rotation before weight transfer: " + ", ".join(pending)
             )
 
     policy = WeightTransferPolicy(
@@ -298,15 +297,9 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
         normalization_tolerance=args.normalization_tolerance,
         laterality_contamination_limit=args.laterality_contamination_limit,
     )
-    deform_bones = {
-        bone.name for bone in armature.data.bones if bone.use_deform
-    }
-    left_bones = {
-        name for name in deform_bones if _bone_laterality(name) == "left"
-    }
-    right_bones = {
-        name for name in deform_bones if _bone_laterality(name) == "right"
-    }
+    deform_bones = {bone.name for bone in armature.data.bones if bone.use_deform}
+    left_bones = {name for name in deform_bones if _bone_laterality(name) == "left"}
+    right_bones = {name for name in deform_bones if _bone_laterality(name) == "right"}
     armature_hash = _armature_hash(armature, include_bind_pose=False)
     bind_pose_hash = _armature_hash(armature, include_bind_pose=True)
     source_hash = _mesh_hash(source)
@@ -349,9 +342,7 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
                 "maxInfluences": args.max_influences,
                 "minimumWeight": args.minimum_weight,
                 "normalizationTolerance": args.normalization_tolerance,
-                "lateralityContaminationLimit": (
-                    args.laterality_contamination_limit
-                ),
+                "lateralityContaminationLimit": (args.laterality_contamination_limit),
                 "lateralityAxis": args.laterality_axis,
                 "lateralityCenterTolerance": args.laterality_center_tolerance,
                 "leftPositive": args.left_positive,
@@ -366,9 +357,9 @@ def execute(args: argparse.Namespace) -> dict[str, Any]:
             }
         )
 
-    status = "PASS" if all(
-        artifact["audit"]["passed"] for artifact in artifacts
-    ) else "FAIL"
+    status = (
+        "PASS" if all(artifact["audit"]["passed"] for artifact in artifacts) else "FAIL"
+    )
     payload = {
         "schemaVersion": 1,
         "kind": "weight-transfer-batch",
