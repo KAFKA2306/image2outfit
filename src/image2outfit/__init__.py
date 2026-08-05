@@ -25,6 +25,14 @@ from .execution import (
     expand_command_template,
     validate_stage_result,
 )
+from .garment_spec import (
+    CoordinateSystem,
+    EvidenceRef,
+    GarmentSpec,
+    ProvenanceSpec,
+    SpecSection,
+    UnitSystem,
+)
 from .pipeline import (
     PIPELINE_STAGES,
     ExecutionMode,
@@ -32,15 +40,28 @@ from .pipeline import (
     new_pipeline_state,
     run_pipeline,
 )
+from .artifact_dag import (
+    ArtifactKind,
+    ArtifactRef,
+    GarmentSectionName,
+    PipelineArtifactDAG,
+    StageContract,
+)
 
 __all__ = [
+    "ArtifactKind",
+    "ArtifactRef",
     "BodyRegion",
     "ConstructionRole",
+    "CoordinateSystem",
+    "EvidenceRef",
     "ExecutionMode",
     "FitProfile",
     "GarmentLocation",
     "GarmentPart",
     "GarmentPartKind",
+    "GarmentSectionName",
+    "GarmentSpec",
     "GarmentSpecification",
     "Laterality",
     "LayerPosition",
@@ -50,12 +71,17 @@ __all__ = [
     "PatternEdgeRole",
     "PatternPiece",
     "PIPELINE_STAGES",
+    "PipelineArtifactDAG",
     "PipelineStage",
+    "ProvenanceSpec",
+    "SpecSection",
+    "StageContract",
     "StageExecutionBinding",
     "StageResultRequirement",
     "Stitch",
     "StitchEdge",
     "SurfaceOrientation",
+    "UnitSystem",
     "expand_command_template",
     "new_pipeline_state",
     "run_pipeline",
