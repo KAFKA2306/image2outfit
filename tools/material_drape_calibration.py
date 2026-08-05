@@ -415,9 +415,7 @@ def drape_metrics(cloth: bpy.types.Object) -> dict[str, float | str]:
     )
     support_z = [
         coordinate.z
-        for coordinate, (x_value, y_value) in zip(
-            coordinates, local_xy, strict=True
-        )
+        for coordinate, (x_value, y_value) in zip(coordinates, local_xy, strict=True)
         if math.hypot(x_value, y_value) <= SUPPORT_RADIUS_M * 0.9
     ]
     expected_contact_z = SUPPORT_TOP_Z_M + 2 * MIN_COLLISION_DISTANCE_M
