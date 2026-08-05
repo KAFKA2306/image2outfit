@@ -14,9 +14,7 @@ class SiroinoManifoldYokeTests(unittest.TestCase):
         product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
             encoding="utf-8"
         )
-        generator = (
-            ROOT / "tools" / "siroino_heather_manifold_yoke_v29.py"
-        ).read_text(
+        generator = (ROOT / "tools" / "siroino_heather_manifold_yoke_v29.py").read_text(
             encoding="utf-8"
         )
         self.assertIn(
