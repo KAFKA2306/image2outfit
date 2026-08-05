@@ -122,4 +122,4 @@ jobs:
         shell: bash
         run: |
           mapfile -t files < /tmp/format-python.txt
-          uv run --locked --no-default-groups --group dev ruff format --check "${files[@]}"
+          uv run --locked --no-default-groups --group dev ruff format --diff "${files[@]}"
