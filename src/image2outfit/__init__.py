@@ -1,5 +1,30 @@
 """Reusable domain and orchestration core for image2outfit."""
 
+from .artifact_bridge import artifact_ref_from_stage_result
+from .artifact_dag import (
+    ArtifactKind,
+    ArtifactRef,
+    GarmentSectionName,
+    PipelineArtifactDAG,
+    StageContract,
+)
+from .avatar import (
+    ArrangementVolume,
+    AvatarLandmark,
+    AvatarMeasurement,
+    AvatarSpec,
+    PoseLandmarkState,
+    ShapeKeyState,
+    derive_avatar_spec,
+)
+from .construction import (
+    ConstructionAudit,
+    ConstructionComponent,
+    ConstructionComponentKind,
+    ConstructionSpec,
+    Gather,
+    Pleat,
+)
 from .domain import (
     BodyRegion,
     ConstructionRole,
@@ -25,6 +50,15 @@ from .execution import (
     expand_command_template,
     validate_stage_result,
 )
+from .fit import (
+    ContactMetrics,
+    DirectionalStrain,
+    EaseTarget,
+    FitCause,
+    FitDefect,
+    FitSpec,
+    PoseFitReport,
+)
 from .garment_spec import (
     CoordinateSystem,
     EvidenceRef,
@@ -33,6 +67,13 @@ from .garment_spec import (
     SpecSection,
     UnitSystem,
 )
+from .material import (
+    AnisotropicFabricProperties,
+    CalibrationStatus,
+    MaterialSpec,
+    SolverMapping,
+    load_material_library,
+)
 from .pipeline import (
     PIPELINE_STAGES,
     ExecutionMode,
@@ -40,33 +81,52 @@ from .pipeline import (
     new_pipeline_state,
     run_pipeline,
 )
-from .artifact_dag import (
-    ArtifactKind,
-    ArtifactRef,
-    GarmentSectionName,
-    PipelineArtifactDAG,
-    StageContract,
+from .styling import (
+    ConstraintTargetKind,
+    StylingConflict,
+    StylingOperation,
+    StylingOperationKind,
+    StylingPhase,
+    StylingSpec,
 )
-from .artifact_bridge import artifact_ref_from_stage_result
 
 __all__ = [
+    "AnisotropicFabricProperties",
+    "ArrangementVolume",
     "ArtifactKind",
     "ArtifactRef",
+    "AvatarLandmark",
+    "AvatarMeasurement",
+    "AvatarSpec",
     "BodyRegion",
+    "CalibrationStatus",
+    "ConstraintTargetKind",
+    "ConstructionAudit",
+    "ConstructionComponent",
+    "ConstructionComponentKind",
     "ConstructionRole",
+    "ConstructionSpec",
+    "ContactMetrics",
     "CoordinateSystem",
+    "DirectionalStrain",
+    "EaseTarget",
     "EvidenceRef",
     "ExecutionMode",
+    "FitCause",
+    "FitDefect",
     "FitProfile",
+    "FitSpec",
     "GarmentLocation",
     "GarmentPart",
     "GarmentPartKind",
     "GarmentSectionName",
     "GarmentSpec",
     "GarmentSpecification",
+    "Gather",
     "Laterality",
     "LayerPosition",
     "MaterialBehavior",
+    "MaterialSpec",
     "PatternDart",
     "PatternEdge",
     "PatternEdgeRole",
@@ -74,17 +134,29 @@ __all__ = [
     "PIPELINE_STAGES",
     "PipelineArtifactDAG",
     "PipelineStage",
+    "Pleat",
+    "PoseFitReport",
+    "PoseLandmarkState",
     "ProvenanceSpec",
+    "ShapeKeyState",
+    "SolverMapping",
     "SpecSection",
     "StageContract",
     "StageExecutionBinding",
     "StageResultRequirement",
     "Stitch",
     "StitchEdge",
+    "StylingConflict",
+    "StylingOperation",
+    "StylingOperationKind",
+    "StylingPhase",
+    "StylingSpec",
     "SurfaceOrientation",
     "UnitSystem",
     "artifact_ref_from_stage_result",
+    "derive_avatar_spec",
     "expand_command_template",
+    "load_material_library",
     "new_pipeline_state",
     "run_pipeline",
     "validate_stage_result",
