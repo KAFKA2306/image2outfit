@@ -91,7 +91,7 @@ jobs:
             --output blender.tar.xz
           mkdir -p .image2outfit/blender
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
-      - name: Run fixed-scale 250-frame long-settle diagnostic
+      - name: Run fixed-scale temporal convergence diagnostic
         run: |
           set -uo pipefail
           mkdir -p "$OUTPUT_DIR"
@@ -121,7 +121,7 @@ jobs:
 
           output = Path(os.environ["OUTPUT_DIR"])
           report = json.loads((output / "material-drape-report.json").read_text())
-          assert report["schemaVersion"] == 5
+          assert report["schemaVersion"] == 6
           assert report["blenderVersion"] == os.environ["BLENDER_VERSION"]
           assert report["frameEnd"] == 250
           assert len(report["records"]) == 6
@@ -133,12 +133,19 @@ jobs:
           assert report["fixture"]["pinnedVertexCount"] == 0
           assert all(record["runtime"]["pinnedVertexCount"] == 0 for record in report["records"])
           assert all(record["runtime"]["pinGroup"] is None for record in report["records"])
-          assert set(report["selectedElasticScales"]) == {
+          assert set(report["selectedDiagnosticElasticScales"]) == {
               record["materialId"] for record in report["records"]
           }
+          assert report["elasticScaleStatus"] == (
+              "diagnostic-until-temporal-convergence-passes"
+          )
+          assert report["temporalConvergence"]["checkpointFrames"] == [
+              100, 150, 200, 250
+          ]
+          assert len(report["temporalConvergence"]["records"]) == 6
           assert all(
               record["runtime"]["elasticScale"]
-              == report["selectedElasticScales"][record["materialId"]]
+              == report["selectedDiagnosticElasticScales"][record["materialId"]]
               for record in report["records"]
           )
           for image in report["images"]:
@@ -149,6 +156,7 @@ jobs:
           assert blend.is_file(), blend
           assert hashlib.sha256(blend.read_bytes()).hexdigest() == report["blend"]["sha256"]
           print(json.dumps(report["comparison"], indent=2))
+          print(json.dumps(report["temporalConvergence"], indent=2))
           PY
       - name: Upload Blender evidence
         if: always()
@@ -168,6 +176,9 @@ jobs:
 
           output = Path(os.environ["OUTPUT_DIR"])
           report = json.loads((output / "material-drape-report.json").read_text())
-          assert report["passed"] is True, report["comparison"]
+          assert report["passed"] is True, {
+              "comparison": report["comparison"],
+              "temporalConvergence": report["temporalConvergence"],
+          }
           assert (output / "calibration-exit-code.txt").read_text().strip() == "0"
           PY
