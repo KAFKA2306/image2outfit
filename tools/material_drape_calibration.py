@@ -263,7 +263,6 @@ def create_cloth(
     surface_area = math.pi * SPECIMEN_RADIUS_M**2
     cloth_values = scaled_cloth_settings(projection, elastic_scale)
     cloth_values["mass"] = projection.vertex_mass_kg(surface_area, len(mesh.vertices))
-    cloth_values["use_pin_cloth"] = True
     cloth_values["vertex_group_mass"] = pin_group.name
     cloth_values["pin_stiffness"] = 1.0
     actual_cloth = set_properties(
