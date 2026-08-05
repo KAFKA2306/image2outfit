@@ -1,0 +1,77 @@
+name: Fix PR 178 lint
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/fix-pr-178-lint.yml"
+      - "src/image2outfit/**"
+      - "tests/test_pre_blender_*.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fix-pr-178-lint-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  fix:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'feat/pre-blender-stage-contracts-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: "0.11.32"
+
+      - name: Apply safe Ruff fixes to PR 178 files
+        run: |
+          files=(
+            src/image2outfit/__init__.py
+            src/image2outfit/arrangement.py
+            src/image2outfit/decomposition.py
+            src/image2outfit/normalization.py
+            src/image2outfit/pattern_stage.py
+            src/image2outfit/reference.py
+            src/image2outfit/seam_stage.py
+            tests/test_pre_blender_pattern_stages.py
+            tests/test_pre_blender_reference_stages.py
+            tests/test_pre_blender_stage_schemas.py
+          )
+          uv run --locked --no-default-groups --group dev ruff check \
+            --select E4,E7,E9,F --ignore E402 --fix "${files[@]}"
+          uv run --locked --no-default-groups --group dev ruff format "${files[@]}"
+          uv run --locked --no-default-groups --group dev ruff check \
+            --select E4,E7,E9,F --ignore E402 "${files[@]}"
+
+      - name: Commit lint-only changes when needed
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/image2outfit/__init__.py \
+            src/image2outfit/arrangement.py \
+            src/image2outfit/decomposition.py \
+            src/image2outfit/normalization.py \
+            src/image2outfit/pattern_stage.py \
+            src/image2outfit/reference.py \
+            src/image2outfit/seam_stage.py \
+            tests/test_pre_blender_pattern_stages.py \
+            tests/test_pre_blender_reference_stages.py \
+            tests/test_pre_blender_stage_schemas.py
+          git commit -m "style: fix final Ruff findings for pre-Blender contracts"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
