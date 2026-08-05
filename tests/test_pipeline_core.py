@@ -32,8 +32,7 @@ class PipelineCoreTests(unittest.TestCase):
             registry.register(
                 stage,
                 lambda state, stage_name=stage.value: (
-                    seen.append(stage_name)
-                    or {"mode": "planned", "stage": stage_name}
+                    seen.append(stage_name) or {"mode": "planned", "stage": stage_name}
                 ),
                 ToolDescriptor(stage.value, stage.value, f"{stage.value}.json"),
             )

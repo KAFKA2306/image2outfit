@@ -68,7 +68,7 @@ def expand_template(value: str, variables: Mapping[str, str]) -> str:
     for field_name in _field_names(value):
         if any(token in field_name for token in (".", "[", "]")):
             raise ValueError(
-                "template fields must be simple identifiers: " f"{field_name!r}"
+                f"template fields must be simple identifiers: {field_name!r}"
             )
         if field_name not in normalized:
             raise MissingTemplateVariableError(

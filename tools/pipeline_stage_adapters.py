@@ -218,8 +218,10 @@ def _normalized_bindings(
             raise ValueError(f"stage binding {stage_name!r} must be an object")
         command = raw_binding.get("command")
         result_path = raw_binding.get("resultPath")
-        if not isinstance(command, list) or not command or not all(
-            isinstance(argument, str) and argument for argument in command
+        if (
+            not isinstance(command, list)
+            or not command
+            or not all(isinstance(argument, str) and argument for argument in command)
         ):
             raise ValueError(
                 f"stage binding {stage_name!r} command must be a non-empty string list"
