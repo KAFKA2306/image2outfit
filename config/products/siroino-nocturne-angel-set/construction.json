@@ -3,29 +3,25 @@
   "profile": "loose-layered",
   "productId": "siroino-nocturne-angel-set",
   "target": "SiroinoSotai_PC",
-  "designRevision": "v5-skinweighted-pleated-volume",
+  "designRevision": "v6-welded-projected-pleats",
   "panels": [
-    "left and right angular front bodice panels with a V neckline and transferred body weights",
-    "angular back bodice panel with transferred body weights",
-    "left and right side bodice panels with transferred body weights",
-    "three-part triangulated sailor collar with transferred body weights",
-    "short twelve-pleat skirt using low-gravity high-stiffness Blender Cloth and transferred body weights",
-    "matching twelve-pleat cream hem frill with transferred body weights",
-    "open waist band with transferred body weights",
-    "left and right reduced-radius puff sleeves with transferred body weights",
-    "left and right reduced-radius detached arm warmers with transferred body weights",
-    "left and right reduced-radius lace cuffs with transferred body weights",
-    "left and right reduced-radius leg warmers with transferred body weights"
+    "five logical bodice regions welded into one continuous projected V-neck shell",
+    "left and right projected sailor collar pieces",
+    "short twelve-pleat skirt with a zero-force Blender Cloth checkpoint",
+    "matching twelve-pleat cream hem frill",
+    "projected waist band",
+    "left and right body-following puff sleeves",
+    "left and right body-following detached arm warmers",
+    "left and right body-following lace cuffs",
+    "left and right body-following leg warmers"
   ],
   "separateGeometry": [
-    "lowered beret",
-    "lowered animal ears",
     "skin-weighted choker",
     "amber charm",
     "rabbit charm",
-    "four volumetric ellipsoidal feather layers per wing",
+    "three compact volumetric feathers per wing",
     "reduced tail",
-    "reduced skin-weighted ellipsoidal shoes"
+    "reduced skin-weighted shoes"
   ],
   "priorityFitZones": [
     "V neckline",
@@ -47,7 +43,7 @@
   "researchTrial": {
     "primaryPaper": "https://arxiv.org/abs/2606.24564",
     "secondaryPaper": "https://arxiv.org/abs/2602.22052",
-    "implementation": "independent explicit panel/seam/layer/module specification, shape-preserving Blender 4.4 cloth simulation, outward evaluated-body clearance and four-influence nearest-body weight transfer",
+    "implementation": "independent logical panel and seam specification, one welded projected shell, zero-force Blender 4.4 cloth checkpoint, outward clearance and four-influence nearest-body weight transfer",
     "externalResearchCodeExecuted": false,
     "generatedEvidence": "Assets/GenWorks/siroino-nocturne-angel-set/Research/patterngsl-autosew-cloth-trial.json"
   },
