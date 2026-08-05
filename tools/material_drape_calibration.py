@@ -55,7 +55,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--output", type=Path, default=Path(".image2outfit/material-calibration")
     )
-    parser.add_argument("--frame-end", type=int, default=100)
+    parser.add_argument("--frame-end", type=int, default=250)
     parser.add_argument("--grid", type=int, default=41)
     return parser.parse_args(argv)
 

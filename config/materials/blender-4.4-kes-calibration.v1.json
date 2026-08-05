@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-cusick-calibration-v9-temporal-audit",
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v10-default-damping-diagnostic",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
-  "mappingStatus": "temporal-convergence-diagnostic",
+  "mappingStatus": "temporal-convergence-diagnostic-default-damping",
   "mappingMethod": "explicit geometric-mean scalar projection with recorded axis loss, followed by material-specific Blender 4.4.3 correction factors identified on a collision-supported Cusick fixture; not a universal SI-to-Blender conversion",
   "scalarProjectionRanges": {
     "tensionStiffness": [
@@ -21,12 +21,12 @@
   },
   "bucklingCompressionRatio": 0.5,
   "damping": {
-    "tension": 0.5,
-    "compression": 0.5,
-    "shear": 0.5,
-    "bending": 0.1
+    "tension": 5.0,
+    "compression": 5.0,
+    "shear": 5.0,
+    "bending": 0.5
   },
-  "airDamping": 0.25,
+  "airDamping": 1.0,
   "quality": 12,
   "collisionQuality": 8,
   "selfCollisionScale": 1.5,
@@ -77,8 +77,8 @@
   ],
   "searchPolicy": {
     "spacing": "fixed-scales-temporal-convergence-diagnostic",
-    "policy": "evaluate fixed diagnostic material scales at frames 100, 150, 200, and 250; reject coefficient fit unless the final interval is temporally converged",
-    "reason": "the 250-frame run changed the 100-frame material ordering and retained rebound or missing support contact, so time stability must be demonstrated before any further fitting"
+    "policy": "run one fixed-scale damping-only ablation using Blender 4.4.3 runtime defaults; do not change quality, collision quality, contact, mesh, fixture, or elastic factors",
+    "reason": "Run 31056097365 showed all six materials still moving at frames 200-250, while runtime RNA inspection showed the configured spring and air damping values were well below Blender 4.4.3 defaults"
   },
   "acceptance": {
     "maximumRmseVsPublishedKes": 0.18,
@@ -121,6 +121,11 @@
       "title": "Unified nonlinear dynamic model for dress dynamic drape and optimization of template structure design",
       "url": "https://doi.org/10.1016/j.cad.2026.104074",
       "role": "warp-weft anisotropy must remain explicit in dynamic drape models"
+    },
+    {
+      "title": "Blender 4.4.3 hosted RNA property contract",
+      "url": "https://github.com/KAFKA2306/image2outfit/actions/runs/31056987078",
+      "role": "exact runtime defaults and ranges for ClothSettings damping, solver quality, collision quality, and collision impulse clamping"
     }
   ],
   "calibrationScope": {
@@ -143,5 +148,57 @@
     "maximumMaximumZDeltaM": 0.005,
     "maximumMeanVertexDisplacementM": 0.003,
     "maximumVertexDisplacementM": 0.015
+  },
+  "solverStabilityDiagnostic": {
+    "diagnosticId": "blender-4.4.3-default-damping-ablation-v1",
+    "changedFactorFamily": "damping-only",
+    "unchanged": [
+      "diagnosticElasticScales",
+      "quality",
+      "collisionQuality",
+      "contactHypothesis",
+      "collisionThickness",
+      "fixtureGeometry",
+      "meshTopology",
+      "frameCheckpoints"
+    ],
+    "previous": {
+      "damping": {
+        "tension": 0.5,
+        "compression": 0.5,
+        "shear": 0.5,
+        "bending": 0.1
+      },
+      "airDamping": 0.25,
+      "quality": 12,
+      "collisionQuality": 8
+    },
+    "candidate": {
+      "damping": {
+        "tension": 5.0,
+        "compression": 5.0,
+        "shear": 5.0,
+        "bending": 0.5
+      },
+      "airDamping": 1.0,
+      "quality": 12,
+      "collisionQuality": 8
+    },
+    "basis": {
+      "type": "Blender-4.4.3-runtime-RNA-metadata",
+      "run": "https://github.com/KAFKA2306/image2outfit/actions/runs/31056987078",
+      "observedDefaults": {
+        "tensionDamping": 5.0,
+        "compressionDamping": 5.0,
+        "shearDamping": 5.0,
+        "bendingDamping": 0.5,
+        "airDamping": 1.0,
+        "quality": 5,
+        "collisionQuality": 2,
+        "impulseClamp": 0.0,
+        "selfImpulseClamp": 0.0
+      }
+    },
+    "decisionRule": "retain only if temporal convergence and hard physical plausibility improve without degrading coefficient-fit acceptance"
   }
 }
