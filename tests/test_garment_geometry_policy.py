@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "pyproject.toml"
-GENERATOR_PATH = ROOT / "tools" / "siroino_heather_fused_roll_v28.py"
+GENERATOR_PATH = ROOT / "tools" / "siroino_heather_manifold_yoke_v29.py"
 BASE_PATH = ROOT / "tools" / "siroino_heather_closed_components_v27.py"
 BUILD_PATH = ROOT / "tools" / "siroino_heather_hooded_bodysuit_build.py"
 
@@ -32,7 +32,6 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
     def test_avatar_is_reference_not_garment_topology(self) -> None:
         self.assertIn('"bodyTopologyCopied": False', self.base_source)
         self.assertIn("BVHTree.FromPolygons", self.base_source)
-        self.assertIn("_enforce_clearance", self.base_source)
         self.assertIn("mesh.from_pydata(vertices, [], faces)", self.base_source)
         self.assertNotIn("_selected_polygons", self.base_source)
 
@@ -44,43 +43,52 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         )
         function_source = ast.get_source_segment(self.source, function) or ""
         self.assertEqual(function_source.count('"Heather_Body_Shell"'), 1)
-        self.assertIn("fifteen-column flat pelvic saddle", function_source)
+        self.assertIn("seventeen-column shallow saddle", function_source)
+        self.assertIn("yoke_rings = 5", function_source)
         self.assertNotIn("Heather_Highcut_Front_Panel", function_source)
         self.assertNotIn("Heather_Highcut_Back_Panel", function_source)
         self.assertNotIn("Heather_Crotch_Bridge", function_source)
 
-    def test_flat_saddle_does_not_converge_to_a_long_tip(self) -> None:
+    def test_clearance_projection_is_smoothed_and_bounded(self) -> None:
         required = (
-            "return 0.665 + 0.105 * (side**1.80)",
-            "offsets = tuple(range(-14, 15, 2))",
-            "longitudinal_steps = 16",
-            "point.z -= 0.012 * math.sin(math.pi * t)",
-            "subdivision_levels=0",
-            'result["pelvicSaddleColumns"] = 15',
+            "maximum_step: float = 0.012",
+            "for _ in range(4)",
+            "0.55 * value + 0.45 * average",
+            '"smoothingIterations": 4',
         )
         for fragment in required:
             self.assertIn(fragment, self.source)
 
-    def test_sleeves_use_a_contoured_cap_profile(self) -> None:
+    def test_shallow_saddle_does_not_converge_to_a_long_tip(self) -> None:
         required = (
-            "shoulder_inner = upper_head - direction * 0.038",
-            "radius = 0.034 + 0.014",
-            "radius = 0.048 - 0.010",
-            "radius = 0.038 - 0.012",
+            "return 0.710 + 0.055 * (side**2.0)",
+            "offsets = tuple(range(-16, 17, 2))",
+            "longitudinal_steps = 14",
+            "point.z -= 0.004 * math.sin(math.pi * t)",
+            'result["pelvicSaddleColumns"] = 17',
         )
         for fragment in required:
             self.assertIn(fragment, self.source)
-        self.assertNotIn("radius = 0.058 - 0.019", self.source)
 
-    def test_rejected_hood_sheet_is_replaced_by_a_roll(self) -> None:
+    def test_sleeves_use_a_fitted_cap_profile(self) -> None:
+        required = (
+            "shoulder_inner = upper_head - direction * 0.018",
+            "radius = 0.027 + 0.006",
+            "radius = 0.033 - 0.001",
+            "radius = 0.032 - 0.007",
+        )
+        for fragment in required:
+            self.assertIn(fragment, self.source)
+        self.assertNotIn("radius = 0.048 - 0.010", self.source)
+
+    def test_compact_hood_is_a_surface_not_a_padded_tube(self) -> None:
         hood = self.source.split("def _folded_back_hood(", 1)[1].split(
             "def _validate(", 1
         )[0]
-        self.assertIn("pattern.v9.base.curve_tube", hood)
-        self.assertIn("samples = 33", hood)
-        self.assertIn("0.019,", hood)
-        self.assertNotIn("faces.append", hood)
-        self.assertNotIn("columns = 40", hood)
+        self.assertIn("columns = 33", hood)
+        self.assertIn("rows = 6", hood)
+        self.assertIn("faces.append", hood)
+        self.assertNotIn("curve_tube", hood)
 
     def test_build_gate_uses_required_objects_not_legacy_count(self) -> None:
         self.assertIn('"Heather_Hood_Folded_Roll"', self.build_source)
