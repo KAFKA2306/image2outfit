@@ -126,9 +126,13 @@ class ConstructionSpec:
                 raise ValueError(f"pleat {pleat.pleat_id!r} references unknown edges")
         for gather in self.gathers:
             if {gather.source_edge_id, gather.target_edge_id}.difference(edge_ids):
-                raise ValueError(f"gather {gather.gather_id!r} references unknown edges")
+                raise ValueError(
+                    f"gather {gather.gather_id!r} references unknown edges"
+                )
         if set(self.intentional_open_edge_ids).difference(edge_ids):
-            raise ValueError("intentional open edges must reference declared pattern edges")
+            raise ValueError(
+                "intentional open edges must reference declared pattern edges"
+            )
 
     @property
     def edge_by_id(self) -> dict[str, tuple[PatternPiece, PatternEdge]]:
@@ -166,7 +170,10 @@ class ConstructionSpec:
             second_length = self._edge_length(second_piece, second_edge)
             expected_second = second_length * stitch.easing_ratio
             denominator = max(first_length, expected_second, 1e-12)
-            if abs(first_length - expected_second) / denominator > relative_length_tolerance:
+            if (
+                abs(first_length - expected_second) / denominator
+                > relative_length_tolerance
+            ):
                 length_mismatches.append(stitch.stitch_id)
             first_vector = self._edge_vector(first_piece, first_edge)
             second_vector = self._edge_vector(second_piece, second_edge)
