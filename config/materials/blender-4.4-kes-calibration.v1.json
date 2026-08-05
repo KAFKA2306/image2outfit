@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-relative-v2",
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v3",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
-  "mappingStatus": "render-calibration-required",
-  "mappingMethod": "log-normalized relative projection across the six measured KES fabrics; not an SI-to-Blender unit conversion",
+  "mappingStatus": "calibration-search",
+  "mappingMethod": "relative KES projection followed by one global elastic scale fitted to published KES-based Cusick drape coefficients; not an SI-to-Blender unit conversion",
   "scalarProjectionRanges": {
     "tensionStiffness": [5.0, 35.0],
     "shearStiffness": [3.0, 20.0],
@@ -12,12 +12,12 @@
   },
   "bucklingCompressionRatio": 0.5,
   "damping": {
-    "tension": 1.0,
-    "compression": 1.0,
-    "shear": 1.0,
-    "bending": 0.2
+    "tension": 0.5,
+    "compression": 0.5,
+    "shear": 0.5,
+    "bending": 0.1
   },
-  "airDamping": 0.5,
+  "airDamping": 0.25,
   "quality": 12,
   "collisionQuality": 8,
   "selfCollisionScale": 1.5,
@@ -39,14 +39,38 @@
     "renderThickness": "Solidify visual thickness"
   },
   "calibrationFixture": {
-    "type": "circular-drape-over-central-pedestal",
-    "specimenRadiusM": 0.82,
-    "supportRadiusM": 0.22,
-    "supportTopZM": 0.8,
-    "initialSpecimenZM": 0.82,
-    "purpose": "prevent unsupported flat-flight states and approximate a standard projected-area drape comparison"
+    "type": "cusick-drape-meter",
+    "specimenRadiusM": 0.15,
+    "supportRadiusM": 0.09,
+    "supportTopZM": 0.12,
+    "initialSpecimenZM": 0.122,
+    "mesh": "41x41 concentric-square-to-disk quad mesh",
+    "selfCollision": false,
+    "source": "https://doi.org/10.3390/su17041388",
+    "purpose": "match the published 300 mm circular sample and 90 mm support radius before comparing projected-area drape coefficients"
+  },
+  "publishedKesSimulationDrapeCoefficients": {
+    "kes-2025-m1-polyester-twill": 0.349,
+    "kes-2025-m2-polyester-plain": 0.313,
+    "kes-2025-m3-wool-polyester-elastane-twill": 0.404,
+    "kes-2025-m4-polyester-viscose-elastane-twill": 0.323,
+    "kes-2025-m5-polyester-elastane-plain": 0.438,
+    "kes-2025-m6-cotton-polyester-elastane-twill": 0.613
+  },
+  "elasticScaleSearch": [0.001, 0.003, 0.01, 0.03, 0.1, 0.3],
+  "calibratedElasticScale": null,
+  "acceptance": {
+    "maximumRmseVsPublishedKes": 0.18,
+    "minimumPearsonVsPublishedKes": 0.7,
+    "minimumPearsonVsReal": 0.65,
+    "maximumMaterialAbsoluteError": 0.3
   },
   "research": [
+    {
+      "title": "Assessment of Textile Material Properties and the Impact of Digital Ink-Jet Fabric Printing on 3D Simulation as a Sustainable Method for Garment Prototyping",
+      "url": "https://doi.org/10.3390/su17041388",
+      "role": "exact Cusick geometry, real coefficients, KES-to-Clo3D mechanical values, and published KES simulation coefficients"
+    },
     {
       "title": "Blender 4.4 Cloth Introduction",
       "url": "https://docs.blender.org/manual/en/4.4/physics/cloth/introduction.html",
