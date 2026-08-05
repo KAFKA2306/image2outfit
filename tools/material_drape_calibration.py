@@ -78,7 +78,9 @@ def circular_mesh(
     name: str, radius: float, rings: int, segments: int
 ) -> bpy.types.Mesh:
     if rings < 4 or segments < 24:
-        raise ValueError("circular specimen requires at least four rings and 24 segments")
+        raise ValueError(
+            "circular specimen requires at least four rings and 24 segments"
+        )
     vertices: list[tuple[float, float, float]] = [(0.0, 0.0, 0.0)]
     for ring in range(1, rings + 1):
         radial = radius * ring / rings
@@ -200,7 +202,9 @@ def create_support(
     for source in tuple(support.users_collection):
         source.objects.unlink(support)
     collection.objects.link(support)
-    support.data.materials.append(dark_material(f"SupportMaterial__{projection.material_id}"))
+    support.data.materials.append(
+        dark_material(f"SupportMaterial__{projection.material_id}")
+    )
     actual = collision_object(support, dict(projection.collider_settings))
     return support, actual
 
@@ -350,7 +354,9 @@ def object_metrics(
         evaluated = cloth.evaluated_get(depsgraph)
         mesh = evaluated.to_mesh()
         try:
-            coordinates = [evaluated.matrix_world @ vertex.co for vertex in mesh.vertices]
+            coordinates = [
+                evaluated.matrix_world @ vertex.co for vertex in mesh.vertices
+            ]
         finally:
             evaluated.to_mesh_clear()
     finally:
@@ -467,9 +473,7 @@ def render_scene(
 ) -> list[dict[str, str]]:
     images: list[dict[str, str]] = []
     test_objects = [
-        obj
-        for obj in bpy.data.objects
-        if obj.name.startswith(("Cloth__", "Support__"))
+        obj for obj in bpy.data.objects if obj.name.startswith(("Cloth__", "Support__"))
     ]
     combined = output / "comparison.png"
     scene.render.resolution_x = 1440
@@ -609,9 +613,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         for item in records
         if item["plausibilityErrors"]
     ]
-    evidence_passed = (
-        distinct >= 5 and distance >= 0.15 and not failed_materials
-    )
+    evidence_passed = distinct >= 5 and distance >= 0.15 and not failed_materials
     images = render_scene(scene, camera, output, records)
     blend_path = output / "material-drape-calibration.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
