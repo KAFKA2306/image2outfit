@@ -106,8 +106,9 @@ jobs:
             --library config/materials/kes-woven-fabrics-2025.v1.json \
             --profile config/materials/blender-4.4-kes-calibration.v1.json \
             --output "$OUTPUT_DIR" \
-            --frame-end 80 \
-            --grid 25 | tee "$OUTPUT_DIR/blender-calibration.log"
+            --frame-end 120 \
+            --rings 14 \
+            --segments 64 | tee "$OUTPUT_DIR/blender-calibration.log"
       - name: Verify report and image hashes
         run: |
           python - <<'PY'
@@ -116,10 +117,13 @@ jobs:
 
           output = Path(os.environ["OUTPUT_DIR"])
           report = json.loads((output / "material-drape-report.json").read_text())
+          assert report["schemaVersion"] == 2
           assert report["passed"] is True, report["comparison"]
           assert report["blenderVersion"] == os.environ["BLENDER_VERSION"]
           assert len(report["records"]) == 6
           assert report["sameGeometryForAllMaterials"] is True
+          assert report["fixture"]["type"] == "circular-drape-over-central-pedestal"
+          assert report["comparison"]["plausibilityFailures"] == []
           for image in report["images"]:
               path = output / image["path"]
               assert path.is_file(), path
