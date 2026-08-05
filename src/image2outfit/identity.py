@@ -117,7 +117,9 @@ class IdentityEvidence:
             "capturedAt": self.captured_at,
             "extractionMethod": self.extraction_method,
             "reviewerRole": self.reviewer_role,
-            "imageRegionPx": list(self.image_region_px) if self.image_region_px else None,
+            "imageRegionPx": list(self.image_region_px)
+            if self.image_region_px
+            else None,
             "note": self.note,
         }
 
