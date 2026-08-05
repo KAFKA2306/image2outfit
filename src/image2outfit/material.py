@@ -91,8 +91,7 @@ class SolverMapping:
             raise ValueError("solver mapping parameters are required")
         for collection in (self.parameters, self.conversion_error):
             if any(
-                not math.isfinite(value) or value < 0
-                for value in collection.values()
+                not math.isfinite(value) or value < 0 for value in collection.values()
             ):
                 raise ValueError(
                     "solver mapping values must be finite and non-negative"
