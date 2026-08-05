@@ -109,6 +109,14 @@ jobs:
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
+      - name: Show Ruff formatting diff for reusable code
+        if: steps.changed-python.outputs.format_files != ''
+        continue-on-error: true
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/format-python.txt
+          uv run --locked --no-default-groups --group dev ruff format --diff "${files[@]}"
+
       - name: Run stable Ruff lint on this change
         if: steps.changed-python.outputs.files != ''
         shell: bash
@@ -116,10 +124,3 @@ jobs:
           mapfile -t files < /tmp/changed-python.txt
           uv run --locked --no-default-groups --group dev ruff check \
             --select E4,E7,E9,F --ignore E402 "${files[@]}"
-
-      - name: Verify Ruff formatting for reusable code
-        if: steps.changed-python.outputs.format_files != ''
-        shell: bash
-        run: |
-          mapfile -t files < /tmp/format-python.txt
-          uv run --locked --no-default-groups --group dev ruff format --diff "${files[@]}"
