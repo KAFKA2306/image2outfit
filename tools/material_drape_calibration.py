@@ -25,6 +25,7 @@ from image2outfit.material import MaterialSpec, load_material_library  # noqa: E
 from image2outfit.material_blender import (  # noqa: E402
     BlenderCalibrationProfile,
     BlenderMaterialProjection,
+    blender_collider_friction_percent,
     load_blender_calibration_profile,
     project_material_library_to_blender,
 )
@@ -183,7 +184,9 @@ def create_floor(profile: BlenderCalibrationProfile) -> dict[str, Any]:
     return add_collision(
         floor,
         {
-            "cloth_friction": profile.contact.static_friction,
+            "cloth_friction": blender_collider_friction_percent(
+                profile.contact.static_friction
+            ),
             "thickness_outer": MIN_COLLISION_DISTANCE_M,
         },
     )
@@ -213,7 +216,7 @@ def create_support(
     return support, add_collision(
         support,
         {
-            "cloth_friction": projection.contact_hypothesis.static_friction,
+            "cloth_friction": float(projection.collider_settings["cloth_friction"]),
             "thickness_outer": max(
                 projection.collision_thickness_m, MIN_COLLISION_DISTANCE_M
             ),

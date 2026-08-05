@@ -100,9 +100,10 @@ class BlenderMaterialProjectionTests(unittest.TestCase):
                 projection.cloth_settings["collider_friction"],
             )
             self.assertEqual(
-                projection.contact_hypothesis.static_friction,
+                projection.contact_hypothesis.static_friction * 100.0,
                 projection.collider_settings["cloth_friction"],
             )
+            self.assertLessEqual(projection.collider_settings["cloth_friction"], 80.0)
 
     def test_collision_and_render_thickness_remain_separate_fields(self) -> None:
         for material, projection in zip(self.materials, self.projections, strict=True):

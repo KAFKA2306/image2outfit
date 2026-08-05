@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-cusick-calibration-v5-high-scale-search",
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v6-friction-scale",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
-  "mappingStatus": "free-fall-high-scale-diagnostic",
+  "mappingStatus": "free-fall-friction-scale-corrected-search",
   "mappingMethod": "relative KES projection followed by one global elastic scale evaluated on a collision-supported Cusick free-fall fixture; not an SI-to-Blender unit conversion",
   "scalarProjectionRanges": {
     "tensionStiffness": [
@@ -43,7 +43,7 @@
     "clothSettings.compression_stiffness": "in-plane compression and buckling spring proxy derived from projected stretch stiffness",
     "properties.compressionKpa": "through-thickness compression; deliberately unmapped because Blender surface compression stiffness is not the same physical quantity",
     "clothSettings.collider_friction": "dynamic contact hypothesis on the cloth",
-    "collisionObject.collision.cloth_friction": "static contact hypothesis on the collider",
+    "collisionObject.collision.cloth_friction": "static Coulomb coefficient mapped to Blender's 0-80 percentage scale as 100 * coefficient, verified against Blender 4.4.3 source",
     "collisionThickness": "physics contact offset",
     "renderThickness": "Solidify visual thickness"
   },
@@ -70,14 +70,14 @@
     "kes-2025-m6-cotton-polyester-elastane-twill": 0.613
   },
   "elasticScaleSearch": [
-    0.03,
-    0.1,
-    0.3
+    0.001,
+    0.01,
+    0.1
   ],
   "searchPolicy": {
-    "spacing": "logarithmic-endpoint-extension",
-    "policy": "extend the corrected free-fall search above the former 0.01 upper endpoint without changing geometry, friction, targets, metrics, or acceptance thresholds",
-    "reason": "the 0.01 endpoint minimized the objective and increased projected area for five of six materials, while direct images still showed unsupported annular collapse"
+    "spacing": "logarithmic-after-friction-unit-fix",
+    "policy": "restart a broad three-point elastic sweep after correcting the collider friction unit conversion; geometry, targets, metrics, and acceptance thresholds remain unchanged",
+    "reason": "previous runs used an effective collision coefficient of 0.0035 instead of the declared 0.35 and are invalid for calibration"
   },
   "calibratedElasticScale": null,
   "acceptance": {

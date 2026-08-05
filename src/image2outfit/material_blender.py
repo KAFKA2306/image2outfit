@@ -224,6 +224,14 @@ def _range_map(normalized: float, limits: tuple[float, float]) -> float:
     return limits[0] + normalized * (limits[1] - limits[0])
 
 
+def blender_collider_friction_percent(coefficient: float) -> float:
+    """Map a Coulomb coefficient to Blender's collider percentage scale."""
+
+    if not math.isfinite(coefficient) or not 0 <= coefficient <= 0.8:
+        raise ValueError("Blender collider friction requires a coefficient in [0, 0.8]")
+    return coefficient * 100.0
+
+
 def project_material_library_to_blender(
     materials: Sequence[MaterialSpec],
     profile: BlenderCalibrationProfile,
@@ -282,6 +290,7 @@ def project_material_library_to_blender(
         warnings = [
             "Blender 4.4 surface spring stiffness is scalar; warp/weft axes are retained but projected with a geometric-mean proxy.",
             "compression_stiffness is an in-plane buckling proxy derived from stretch stiffness; through-thickness compressionKpa is not mapped.",
+            "CollisionSettings.cloth_friction uses Blender's 0-80 percentage scale, so the stored Coulomb coefficient is multiplied by 100 explicitly.",
         ]
         if not properties.simulation_ready:
             warnings.append(
@@ -326,7 +335,9 @@ def project_material_library_to_blender(
                     * profile.self_collision_scale,
                 },
                 collider_settings={
-                    "cloth_friction": profile.contact.static_friction,
+                    "cloth_friction": blender_collider_friction_percent(
+                        profile.contact.static_friction
+                    ),
                     "thickness_outer": collision_distance,
                 },
                 render_settings={"solidify_thickness": render_thickness},
