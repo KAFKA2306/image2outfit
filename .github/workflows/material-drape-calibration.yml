@@ -91,10 +91,11 @@ jobs:
             --output blender.tar.xz
           mkdir -p .image2outfit/blender
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
-      - name: Search one global elastic scale on the exact Cusick fixture
+      - name: Run collision-supported free-fall calibration sweep
         run: |
-          set -euo pipefail
+          set -uo pipefail
           mkdir -p "$OUTPUT_DIR"
+          set +e
           PYTHONPATH="$GITHUB_WORKSPACE/src" \
           .image2outfit/blender/blender \
             --python-use-system-env \
@@ -108,7 +109,11 @@ jobs:
             --output "$OUTPUT_DIR" \
             --frame-end 100 \
             --grid 41 | tee "$OUTPUT_DIR/blender-calibration.log"
-      - name: Verify calibrated report and image hashes
+          calibration_status=${PIPESTATUS[0]}
+          set -e
+          printf '%s\n' "$calibration_status" > "$OUTPUT_DIR/calibration-exit-code.txt"
+          echo "Calibration process exit code: $calibration_status"
+      - name: Verify report structure and evidence hashes
         run: |
           python - <<'PY'
           import hashlib, json, os
@@ -116,19 +121,24 @@ jobs:
 
           output = Path(os.environ["OUTPUT_DIR"])
           report = json.loads((output / "material-drape-report.json").read_text())
-          assert report["schemaVersion"] == 3
-          assert report["passed"] is True, report["comparison"]
+          assert report["schemaVersion"] == 4
           assert report["blenderVersion"] == os.environ["BLENDER_VERSION"]
           assert len(report["records"]) == 6
           assert report["sameGeometryForAllMaterials"] is True
           assert report["fixture"]["type"] == "cusick-drape-meter"
           assert report["fixture"]["specimenRadiusM"] == 0.15
           assert report["fixture"]["supportRadiusM"] == 0.09
-          assert report["comparison"]["plausibilityFailures"] == []
+          assert report["fixture"]["supportBoundaryCondition"] == "collision-supported-free-fall"
+          assert report["fixture"]["pinnedVertexCount"] == 0
+          assert all(record["runtime"]["pinnedVertexCount"] == 0 for record in report["records"])
+          assert all(record["runtime"]["pinGroup"] is None for record in report["records"])
           for image in report["images"]:
               path = output / image["path"]
               assert path.is_file(), path
               assert hashlib.sha256(path.read_bytes()).hexdigest() == image["sha256"]
+          blend = output / report["blend"]["path"]
+          assert blend.is_file(), blend
+          assert hashlib.sha256(blend.read_bytes()).hexdigest() == report["blend"]["sha256"]
           print(json.dumps(report["comparison"], indent=2))
           PY
       - name: Upload Blender evidence
@@ -140,3 +150,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
           compression-level: 6
+      - name: Enforce calibration acceptance
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          output = Path(os.environ["OUTPUT_DIR"])
+          report = json.loads((output / "material-drape-report.json").read_text())
+          assert report["passed"] is True, report["comparison"]
+          assert (output / "calibration-exit-code.txt").read_text().strip() == "0"
+          PY
