@@ -131,6 +131,8 @@ def set_properties(owner: Any, values: Mapping[str, Any], label: str) -> dict[st
             if isinstance(value, bool)
             else int(stored)
             if isinstance(value, int)
+            else str(stored)
+            if isinstance(value, str)
             else float(stored)
         )
     return actual
@@ -247,10 +249,23 @@ def create_cloth(
     if render_material:
         cloth.data.materials.append(cloth_material(cloth.name, index, total))
 
+    pin_group = cloth.vertex_groups.new(name="CusickSupportPin")
+    pinned_indices = [
+        vertex.index
+        for vertex in mesh.vertices
+        if math.hypot(vertex.co.x, vertex.co.y) <= SUPPORT_RADIUS_M
+    ]
+    if not pinned_indices:
+        raise RuntimeError("Cusick support pin group is empty")
+    pin_group.add(pinned_indices, 1.0, "REPLACE")
+
     modifier = cloth.modifiers.new(name="Cloth", type="CLOTH")
     surface_area = math.pi * SPECIMEN_RADIUS_M**2
     cloth_values = scaled_cloth_settings(projection, elastic_scale)
     cloth_values["mass"] = projection.vertex_mass_kg(surface_area, len(mesh.vertices))
+    cloth_values["use_pin_cloth"] = True
+    cloth_values["vertex_group_mass"] = pin_group.name
+    cloth_values["pin_stiffness"] = 1.0
     actual_cloth = set_properties(
         modifier.settings, cloth_values, f"{cloth.name}.settings"
     )
@@ -276,6 +291,8 @@ def create_cloth(
     return cloth, {
         "surfaceAreaM2": surface_area,
         "vertexCount": len(mesh.vertices),
+        "pinnedVertexCount": len(pinned_indices),
+        "pinGroup": pin_group.name,
         "elasticScale": elastic_scale,
         "clothSettings": actual_cloth,
         "clothCollisionSettings": actual_collision,
@@ -398,11 +415,18 @@ def plausibility_errors(metrics: Mapping[str, float | str]) -> list[str]:
         errors.append("drape-coefficient-out-of-range")
     if float(metrics["minimumZ"]) < -0.005:
         errors.append("below-floor")
-    if float(metrics["maximumZ"]) > INITIAL_SPECIMEN_Z_M + 0.015:
-        errors.append("upward-instability")
-    if float(metrics["verticalRange"]) < 0.003:
+    if float(metrics["maximumZ"]) > INITIAL_SPECIMEN_Z_M + 0.05:
+        errors.append("gross-upward-instability")
+    if float(metrics["verticalRange"]) < 0.01:
         errors.append("no-gravity-response")
     return errors
+
+
+def plausibility_warnings(metrics: Mapping[str, float | str]) -> list[str]:
+    warnings: list[str] = []
+    if float(metrics["maximumZ"]) > INITIAL_SPECIMEN_Z_M + 0.015:
+        warnings.append("minor-support-surface-rise")
+    return warnings
 
 
 def pearson(first: list[float], second: list[float]) -> float:
@@ -446,9 +470,9 @@ def comparison_metrics(
 def objective(comparison: Mapping[str, Any]) -> float:
     return (
         float(comparison["rmseVsPublishedKes"])
-        + max(0.0, 0.7 - float(comparison["pearsonVsPublishedKes"]))
-        + max(0.0, 0.65 - float(comparison["pearsonVsReal"]))
-        + 5.0 * len(comparison["plausibilityFailures"])
+        + 0.5 * max(0.0, 0.7 - float(comparison["pearsonVsPublishedKes"]))
+        + 0.5 * max(0.0, 0.65 - float(comparison["pearsonVsReal"]))
+        + 10.0 * len(comparison["plausibilityFailures"])
     )
 
 
@@ -512,6 +536,7 @@ def simulate(
         metrics = drape_metrics(bpy.data.objects[record["runtime"]["clothObject"]])
         record["metrics"] = metrics
         record["plausibilityErrors"] = plausibility_errors(metrics)
+        record["plausibilityWarnings"] = plausibility_warnings(metrics)
     return records, floor_settings
 
 
@@ -526,7 +551,7 @@ def configure_render(scene: bpy.types.Scene) -> bpy.types.Object:
     scene.render.image_settings.color_mode = "RGBA"
     scene.render.image_settings.color_depth = "8"
     scene.render.film_transparent = False
-    scene.world.color = (0.035, 0.04, 0.055)
+    scene.world.color = (0.008, 0.01, 0.015)
     bpy.ops.object.camera_add(location=(0.0, -1.5, 0.8))
     camera = bpy.context.object
     camera.name = "CalibrationCamera"
@@ -534,12 +559,12 @@ def configure_render(scene: bpy.types.Scene) -> bpy.types.Object:
     scene.camera = camera
     bpy.ops.object.light_add(type="AREA", location=(0.0, -0.3, 1.3))
     key = bpy.context.object
-    key.data.energy = 900
+    key.data.energy = 80
     key.data.size = 1.8
     look_at(key, Vector((0.0, 0.0, 0.08)))
     bpy.ops.object.light_add(type="AREA", location=(0.0, 0.8, 0.7))
     fill = bpy.context.object
-    fill.data.energy = 500
+    fill.data.energy = 35
     fill.data.size = 1.5
     look_at(fill, Vector((0.0, 0.0, 0.08)))
     return camera

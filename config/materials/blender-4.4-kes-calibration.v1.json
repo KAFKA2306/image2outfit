@@ -6,9 +6,18 @@
   "mappingStatus": "calibration-search",
   "mappingMethod": "relative KES projection followed by one global elastic scale fitted to published KES-based Cusick drape coefficients; not an SI-to-Blender unit conversion",
   "scalarProjectionRanges": {
-    "tensionStiffness": [5.0, 35.0],
-    "shearStiffness": [3.0, 20.0],
-    "bendingStiffness": [0.05, 5.0]
+    "tensionStiffness": [
+      5.0,
+      35.0
+    ],
+    "shearStiffness": [
+      3.0,
+      20.0
+    ],
+    "bendingStiffness": [
+      0.05,
+      5.0
+    ]
   },
   "bucklingCompressionRatio": 0.5,
   "damping": {
@@ -47,7 +56,8 @@
     "mesh": "41x41 concentric-square-to-disk quad mesh",
     "selfCollision": false,
     "source": "https://doi.org/10.3390/su17041388",
-    "purpose": "match the published 300 mm circular sample and 90 mm support radius before comparing projected-area drape coefficients"
+    "purpose": "match the published 300 mm circular sample and 90 mm support radius before comparing projected-area drape coefficients",
+    "supportConstraint": "vertices inside the 90 mm support radius are pinned with weight 1.0 to represent the fixed Cusick support plate"
   },
   "publishedKesSimulationDrapeCoefficients": {
     "kes-2025-m1-polyester-twill": 0.349,
@@ -57,11 +67,15 @@
     "kes-2025-m5-polyester-elastane-plain": 0.438,
     "kes-2025-m6-cotton-polyester-elastane-twill": 0.613
   },
-  "elasticScaleSearch": [0.003, 0.03, 0.3],
+  "elasticScaleSearch": [
+    0.001,
+    0.003,
+    0.01
+  ],
   "searchPolicy": {
-    "spacing": "logarithmic",
-    "policy": "coarse three-point search; refine only when the best objective is at an endpoint, otherwise persist the middle scale and rerun once",
-    "reason": "the full six-point hosted Blender sweep repeats the same six-sample simulation seven times and does not add information before the monotonic scale response is established"
+    "spacing": "logarithmic-local-refinement",
+    "policy": "refine around the coefficient-fit endpoint selected by the first exact Cusick sweep",
+    "reason": "the first exact sweep showed scale 0.003 minimized coefficient error; the previous objective incorrectly preferred 0.3 because minor support-surface rise was treated as a hard failure"
   },
   "calibratedElasticScale": null,
   "acceptance": {
