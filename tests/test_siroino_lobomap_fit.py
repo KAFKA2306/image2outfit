@@ -16,7 +16,9 @@ class SiroinoManifoldYokeTests(unittest.TestCase):
         )
         generator = (
             ROOT / "tools" / "siroino_heather_manifold_yoke_v29.py"
-        ).read_text(encoding="utf-8")
+        ).read_text(
+            encoding="utf-8"
+        )
         self.assertIn(
             "import siroino_heather_manifold_yoke_v29 as manifold_yoke",
             product,
