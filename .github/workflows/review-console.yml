@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - "contracts/quality/quality-spec.json"
+      - "src/image2outfit/quality.py"
+      - "tools/release_orchestrator.py"
       - "tools/review_console.py"
+      - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
@@ -12,7 +16,11 @@ on:
     branches:
       - main
     paths:
+      - "contracts/quality/quality-spec.json"
+      - "src/image2outfit/quality.py"
+      - "tools/release_orchestrator.py"
       - "tools/review_console.py"
+      - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
