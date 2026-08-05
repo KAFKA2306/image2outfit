@@ -1,0 +1,330 @@
+name: Temporary issue 143 per-material calibration patch
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "tools/material_drape_calibration.py"
+      - "config/materials/blender-4.4-kes-calibration.v1.json"
+      - ".github/workflows/material-drape-calibration.yml"
+      - ".github/workflows/tmp-issue-143-per-material-calibration.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'feat/issue-143-material-blender-calibration-v1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: "0.11.32"
+      - name: Apply per-material solver calibration patch
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("tools/material_drape_calibration.py")
+          text = path.read_text(encoding="utf-8")
+
+          new_simulate = '''def simulate(
+              materials: tuple[MaterialSpec, ...],
+              projections: tuple[BlenderMaterialProjection, ...],
+              profile: BlenderCalibrationProfile,
+              *,
+              elastic_scales: Mapping[str, float],
+              grid_count: int,
+              frame_end: int,
+              render_materials: bool,
+          ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+              clean_scene()
+              scene = bpy.context.scene
+              scene.frame_start = 1
+              scene.frame_end = frame_end
+              scene.render.fps = 30
+              floor_settings = create_floor(profile)
+              records: list[dict[str, Any]] = []
+              expected_material_ids = {material.material_id for material in materials}
+              if set(elastic_scales) != expected_material_ids:
+                  raise ValueError("elastic scales must cover every material exactly")
+              for index, (material, projection, position) in enumerate(
+                  zip(materials, projections, specimen_positions(), strict=True)
+              ):
+                  elastic_scale = float(elastic_scales[material.material_id])
+                  if not math.isfinite(elastic_scale) or elastic_scale <= 0:
+                      raise ValueError(
+                          f"invalid elastic scale for {material.material_id}: {elastic_scale}"
+                      )
+                  collection = bpy.data.collections.new(f"Test__{projection.material_id}")
+                  scene.collection.children.link(collection)
+                  support, support_settings = create_support(
+                      projection, position, collection, render_materials
+                  )
+                  cloth, runtime = create_cloth(
+                      projection,
+                      position,
+                      collection,
+                      grid_count,
+                      frame_end,
+                      elastic_scale,
+                      index,
+                      len(projections),
+                      render_materials,
+                  )
+                  records.append(
+                      {
+                          "materialId": material.material_id,
+                          "position": list(position),
+                          "realDrapeCoefficient": material.real_drape_coefficient,
+                          "projection": projection.to_dict(),
+                          "projectionSha256": projection.fingerprint(),
+                          "runtime": {
+                              **runtime,
+                              "clothObject": cloth.name,
+                              "supportObject": support.name,
+                              "supportCollisionSettings": support_settings,
+                          },
+                      }
+                  )
+              for frame in range(scene.frame_start, scene.frame_end + 1):
+                  scene.frame_set(frame)
+                  bpy.context.view_layer.update()
+              scene.frame_set(scene.frame_end)
+              bpy.context.view_layer.update()
+              for record in records:
+                  metrics = drape_metrics(
+                      bpy.data.objects[record["runtime"]["clothObject"]]
+                  )
+                  record["metrics"] = metrics
+                  record["plausibilityErrors"] = plausibility_errors(metrics)
+                  record["plausibilityWarnings"] = plausibility_warnings(metrics)
+              return records, floor_settings
+          '''
+          new_simulate = "\n".join(line[10:] if line.startswith("          ") else line for line in new_simulate.splitlines())
+          start = text.index("def simulate(\n")
+          end = text.index("\n\ndef look_at", start)
+          current = text[start:end]
+          if "elastic_scales: Mapping[str, float]" not in current:
+              text = text[:start] + new_simulate.rstrip() + text[end:]
+
+          new_search = '''    fixed_scales = raw_profile.get("calibratedElasticScales")
+              search: list[dict[str, Any]] = []
+              material_selection: list[dict[str, Any]] = []
+              if isinstance(fixed_scales, Mapping):
+                  selected_scales = {
+                      material.material_id: float(fixed_scales[material.material_id])
+                      for material in materials
+                  }
+              else:
+                  scales = [float(value) for value in raw_profile["elasticScaleSearch"]]
+                  if not scales or any(not math.isfinite(value) or value <= 0 for value in scales):
+                      raise ValueError("elasticScaleSearch must contain positive finite values")
+                  evaluations: list[tuple[float, list[dict[str, Any]]]] = []
+                  for scale in scales:
+                      common_scales = {
+                          material.material_id: scale for material in materials
+                      }
+                      candidate_records, _ = simulate(
+                          materials,
+                          projections,
+                          profile,
+                          elastic_scales=common_scales,
+                          grid_count=args.grid,
+                          frame_end=args.frame_end,
+                          render_materials=False,
+                      )
+                      candidate_comparison = comparison_metrics(candidate_records, targets)
+                      material_results = {
+                          item["materialId"]: {
+                              "coefficient": item["metrics"]["cusickDrapeCoefficient"],
+                              "absoluteError": abs(
+                                  float(item["metrics"]["cusickDrapeCoefficient"])
+                                  - targets[item["materialId"]]
+                              ),
+                              "plausibilityErrors": item["plausibilityErrors"],
+                              "plausibilityWarnings": item["plausibilityWarnings"],
+                          }
+                          for item in candidate_records
+                      }
+                      search.append(
+                          {
+                              "elasticScale": scale,
+                              "comparison": candidate_comparison,
+                              "materialResults": material_results,
+                          }
+                      )
+                      evaluations.append((scale, candidate_records))
+
+                  selected_scales: dict[str, float] = {}
+                  for material in materials:
+                      candidates: list[dict[str, Any]] = []
+                      for scale, candidate_records in evaluations:
+                          record = next(
+                              item
+                              for item in candidate_records
+                              if item["materialId"] == material.material_id
+                          )
+                          coefficient = float(
+                              record["metrics"]["cusickDrapeCoefficient"]
+                          )
+                          absolute_error = abs(
+                              coefficient - targets[material.material_id]
+                          )
+                          candidates.append(
+                              {
+                                  "elasticScale": scale,
+                                  "coefficient": coefficient,
+                                  "absoluteError": absolute_error,
+                                  "plausibilityErrors": record["plausibilityErrors"],
+                                  "score": absolute_error
+                                  + 10.0 * len(record["plausibilityErrors"]),
+                              }
+                          )
+                      selected = min(
+                          candidates,
+                          key=lambda item: (
+                              item["score"],
+                              item["absoluteError"],
+                              item["elasticScale"],
+                          ),
+                      )
+                      selected_scales[material.material_id] = float(
+                          selected["elasticScale"]
+                      )
+                      material_selection.append(
+                          {
+                              "materialId": material.material_id,
+                              "targetCoefficient": targets[material.material_id],
+                              **selected,
+                          }
+                      )
+
+              records, floor_settings = simulate(
+                  materials,
+                  projections,
+                  profile,
+                  elastic_scales=selected_scales,
+                  grid_count=args.grid,
+                  frame_end=args.frame_end,
+                  render_materials=True,
+              )
+          '''
+          new_search = "\n".join(line[10:] if line.startswith("          ") else line for line in new_search.splitlines())
+          search_start = text.index('    fixed_scale = raw_profile.get("calibratedElasticScale")')
+          search_end = text.index("    comparison = comparison_metrics(records, targets)", search_start)
+          if 'fixed_scales = raw_profile.get("calibratedElasticScales")' not in text[search_start:search_end]:
+              text = text[:search_start] + new_search.rstrip() + "\n" + text[search_end:]
+
+          text = text.replace('"schemaVersion": 4,', '"schemaVersion": 5,', 1)
+          text = text.replace(
+              '        "selectedElasticScale": best_scale,',
+              '        "selectedElasticScales": selected_scales,\n'
+              '        "materialCalibrationSelection": material_selection,',
+              1,
+          )
+          text = text.replace(
+              '            "vertices. The selected global scale remains a calibration candidate "\n'
+              '            "until numerical gates and direct image review pass. Contact friction "\n'
+              '            "and through-thickness compression remain unmeasured."',
+              '            "vertices. Blender scalar springs cannot represent warp and weft "\n'
+              '            "independently, so each material uses an explicit fixture-derived "\n'
+              '            "solver correction rather than a universal physical-unit conversion. "\n'
+              '            "Contact friction and through-thickness compression remain unmeasured."',
+              1,
+          )
+          path.write_text(text, encoding="utf-8")
+
+          workflow_path = Path(".github/workflows/material-drape-calibration.yml")
+          workflow = workflow_path.read_text(encoding="utf-8")
+          workflow = workflow.replace(
+              'assert report["schemaVersion"] == 4',
+              'assert report["schemaVersion"] == 5',
+          )
+          marker = 'assert all(record["runtime"]["pinGroup"] is None for record in report["records"])'
+          insertion = marker + '\n          assert set(report["selectedElasticScales"]) == {record["materialId"] for record in report["records"]}\n          assert all(record["runtime"]["elasticScale"] == report["selectedElasticScales"][record["materialId"]] for record in report["records"])'
+          if 'assert set(report["selectedElasticScales"])' not in workflow:
+              workflow = workflow.replace(marker, insertion)
+          workflow_path.write_text(workflow, encoding="utf-8")
+
+          profile_path = Path("config/materials/blender-4.4-kes-calibration.v1.json")
+          profile = json.loads(profile_path.read_text(encoding="utf-8"))
+          profile["profileId"] = "blender-4.4.3-kes-cusick-calibration-v7-per-material"
+          profile["mappingStatus"] = "fixture-calibrated-per-material-search"
+          profile["mappingMethod"] = (
+              "explicit geometric-mean scalar projection with recorded axis loss, "
+              "followed by material-specific Blender 4.4.3 correction factors "
+              "identified on a collision-supported Cusick fixture; not a universal "
+              "SI-to-Blender conversion"
+          )
+          profile["elasticScaleSearch"] = [0.01, 0.015, 0.02, 0.1]
+          profile.pop("calibratedElasticScale", None)
+          profile["calibratedElasticScales"] = None
+          profile["searchPolicy"] = {
+              "spacing": "targeted-per-material-candidate-search",
+              "policy": (
+                  "select one explicit Blender-only scale per material by minimizing "
+                  "absolute Cusick coefficient error plus a fixed penalty for each "
+                  "plausibility failure; thresholds and source targets are unchanged"
+              ),
+              "reason": (
+                  "Blender 4.4.3 exposes scalar structural and bending springs; the "
+                  "six KES fabrics, especially anisotropic M2, cannot be represented "
+                  "by one shared scalar correction"
+              ),
+          }
+          profile["calibrationScope"] = {
+              "solver": "Blender 4.4.3 cloth",
+              "fixture": "300 mm Cusick specimen on 90 mm support radius",
+              "transferability": (
+                  "fixture-derived factors are solver- and discretization-specific; "
+                  "they are not measured textile constants"
+              ),
+              "anisotropyBoundary": (
+                  "warp and weft source axes remain in the projection artifact, but "
+                  "Blender's public scalar cloth settings apply an explicit lossy proxy"
+              ),
+          }
+          profile_path.write_text(
+              json.dumps(profile, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+      - name: Format and verify patch
+        run: |
+          uv run --locked --no-default-groups --group dev ruff format \
+            tools/material_drape_calibration.py
+          uv run --locked --no-default-groups --group dev ruff check \
+            --select E4,E7,E9,F --ignore E402 \
+            tools/material_drape_calibration.py
+          uv run --locked --no-default-groups python -m py_compile \
+            tools/material_drape_calibration.py
+          uv run --locked --no-default-groups python -m unittest \
+            tests/test_material_blender.py -v
+      - name: Commit only calibration changes
+        run: |
+          if git diff --quiet -- \
+            tools/material_drape_calibration.py \
+            config/materials/blender-4.4-kes-calibration.v1.json \
+            .github/workflows/material-drape-calibration.yml; then
+            echo "Patch is already applied"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            tools/material_drape_calibration.py \
+            config/materials/blender-4.4-kes-calibration.v1.json \
+            .github/workflows/material-drape-calibration.yml
+          git commit -m "feat(material): calibrate Blender scale per material"
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
