@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "profileId": "blender-4.4.3-kes-relative-v1",
+  "blenderVersion": "4.4.3",
+  "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
+  "mappingStatus": "render-calibration-required",
+  "mappingMethod": "log-normalized relative projection across the six measured KES fabrics; not an SI-to-Blender unit conversion",
+  "scalarProjectionRanges": {
+    "tensionStiffness": [8.0, 80.0],
+    "shearStiffness": [5.0, 50.0],
+    "bendingStiffness": [0.05, 20.0]
+  },
+  "bucklingCompressionRatio": 0.35,
+  "damping": {
+    "tension": 5.0,
+    "compression": 5.0,
+    "shear": 5.0,
+    "bending": 0.5
+  },
+  "airDamping": 1.0,
+  "quality": 10,
+  "collisionQuality": 6,
+  "selfCollisionScale": 1.5,
+  "contactHypothesis": {
+    "hypothesisId": "shared-contact-prior-v1",
+    "staticFriction": 0.35,
+    "dynamicFriction": 0.25,
+    "method": "shared bounded engineering prior used to isolate density and elastic-property differences in the first Blender calibration render",
+    "source": "not measured; must be replaced by fabric-body and fabric-fabric calibration evidence",
+    "confidence": 0.2,
+    "measured": false
+  },
+  "propertySemantics": {
+    "clothSettings.compression_stiffness": "in-plane compression and buckling spring proxy derived from projected stretch stiffness",
+    "properties.compressionKpa": "through-thickness compression; deliberately unmapped because Blender surface compression stiffness is not the same physical quantity",
+    "clothSettings.collider_friction": "dynamic contact hypothesis on the cloth",
+    "collisionObject.collision.cloth_friction": "static contact hypothesis on the collider",
+    "collisionThickness": "physics contact offset",
+    "renderThickness": "Solidify visual thickness"
+  },
+  "research": [
+    {
+      "title": "Blender 4.4 Cloth Introduction",
+      "url": "https://docs.blender.org/manual/en/4.4/physics/cloth/introduction.html",
+      "role": "independent tension, compression, shear, and angular bending springs; sequential simulation"
+    },
+    {
+      "title": "Blender Python API current index",
+      "url": "https://docs.blender.org/api/current/genindex-C.html",
+      "role": "runtime property paths for ClothSettings, ClothCollisionSettings, and CollisionSettings"
+    },
+    {
+      "title": "Image2Garment: Simulation-ready Garment Generation from a Single Image",
+      "url": "https://arxiv.org/abs/2601.09658",
+      "role": "material attributes must be mapped to physical parameters rather than inferred as appearance labels only"
+    },
+    {
+      "title": "Unified nonlinear dynamic model for dress dynamic drape and optimization of template structure design",
+      "url": "https://doi.org/10.1016/j.cad.2026.104074",
+      "role": "warp-weft anisotropy must remain explicit in dynamic drape models"
+    }
+  ]
+}
