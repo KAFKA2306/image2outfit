@@ -4,6 +4,7 @@ import sys
 import unittest
 from pathlib import Path
 
+
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
@@ -12,10 +13,13 @@ import audit_tool_ownership  # noqa: E402
 
 
 class ToolOwnershipTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.result = audit_tool_ownership.audit(ROOT)
+
     def test_all_tools_and_payloads_are_owned(self) -> None:
-        result = audit_tool_ownership.audit(ROOT)
         failures = {
-            name: result[name]
+            name: self.result[name]
             for name in (
                 "unreferenced",
                 "duplicateGroups",
@@ -26,14 +30,15 @@ class ToolOwnershipTest(unittest.TestCase):
                 "excessiveProductImportChains",
                 "productImportCycles",
             )
-            if result[name]
+            if self.result[name]
         }
-        self.assertTrue(result["passed"], failures)
+        self.assertTrue(self.result["passed"], failures)
 
     def test_manage_is_the_taskfile_entrypoint(self) -> None:
-        result = audit_tool_ownership.audit(ROOT)
         manage = next(
-            item for item in result["inventory"] if item["path"] == "tools/manage.py"
+            item
+            for item in self.result["inventory"]
+            if item["path"] == "tools/manage.py"
         )
         self.assertIn("Taskfile.yml", manage["references"])
         self.assertFalse(manage["unreferenced"])

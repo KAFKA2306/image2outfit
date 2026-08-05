@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-military-sheer-romper-large",
+  "constructionProfile": "panel-sewn",
+  "units": "m",
+  "status": "GENERATED",
+  "panels": [
+    {
+      "id": "bodice-opaque",
+      "role": "opaque front and side shell"
+    },
+    {
+      "id": "back-sheer",
+      "role": "translucent upper-back inset"
+    },
+    {
+      "id": "romper-lower",
+      "role": "short lower-body coverage"
+    },
+    {
+      "id": "front-flap",
+      "role": "asymmetric front overlay"
+    },
+    {
+      "id": "collar",
+      "role": "standing collar"
+    },
+    {
+      "id": "sleeve-left",
+      "role": "short sleeve"
+    },
+    {
+      "id": "sleeve-right",
+      "role": "short sleeve"
+    },
+    {
+      "id": "belt",
+      "role": "waist belt"
+    }
+  ],
+  "seams": [
+    {
+      "id": "back-left",
+      "a": "bodice-opaque.back-left",
+      "b": "back-sheer.left"
+    },
+    {
+      "id": "back-right",
+      "a": "bodice-opaque.back-right",
+      "b": "back-sheer.right"
+    },
+    {
+      "id": "waist",
+      "a": "bodice-opaque.waist",
+      "b": "romper-lower.waist"
+    },
+    {
+      "id": "neckline",
+      "a": "bodice-opaque.neckline",
+      "b": "collar.lower"
+    },
+    {
+      "id": "left-armhole",
+      "a": "bodice-opaque.armhole-left",
+      "b": "sleeve-left.cap"
+    },
+    {
+      "id": "right-armhole",
+      "a": "bodice-opaque.armhole-right",
+      "b": "sleeve-right.cap"
+    }
+  ]
+}
