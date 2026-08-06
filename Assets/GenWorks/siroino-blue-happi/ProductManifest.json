@@ -11,8 +11,8 @@
   "previewPath": "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-blue-happi/README.md",
   "sourceJobPath": "config/products/siroino-blue-happi/job.json",
-  "productBuildScript": "tools/siroino_blue_happi_build.py",
-  "designRevision": "v1-blue-happi-panel-first",
+  "productBuildScript": "tools/siroino_blue_happi_v2_build.py",
+  "designRevision": "v2-blue-happi-shaped-shell",
   "sourceReference": "private-reference://sha256/9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423",
   "modelIdentification": "UNVERIFIED",
   "handoff": {
@@ -21,13 +21,14 @@
     "doNotRebuildFromZero": true,
     "resumeFrom": ".image2outfit/products/siroino-blue-happi/pipeline-state.json",
     "lastAttempt": {
-      "result": "NOT_EXECUTED",
-      "visualRevision": "v1-blue-happi-panel-first"
+      "result": "V1_DIRECT_VISUAL_REVIEW_FAIL",
+      "visualRevision": "v1-blue-happi-panel-first",
+      "review": "config/products/siroino-blue-happi/reviews/v1-shaped-box-fail.json"
     },
     "blockers": [
-      "Run the hosted Blender build through the canonical pipeline.",
-      "Open current five-view and six-pose images and record visual-review.json.",
-      "Keep status WORKING until direct-image-inspection passes."
+      "Run v2-blue-happi-shaped-shell through hosted Blender.",
+      "Open the current v2 five-view and six-pose images directly.",
+      "Create visual-review.json only when the current revision passes."
     ]
   },
   "technicalGates": {
