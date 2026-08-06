@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "axes": [
+    {
+      "id": "topology",
+      "gate": "degenerateTriangles == 0 and meshObjects >= 8"
+    },
+    {
+      "id": "seam",
+      "gate": "all declared panel and collar connections are represented"
+    },
+    {
+      "id": "fit",
+      "gate": "neutral p01 body clearance >= 0.002 m and front opening >= 0.025 m"
+    },
+    {
+      "id": "material-response",
+      "gate": "albedo, normal, and roughness maps exist and are assigned"
+    },
+    {
+      "id": "layering",
+      "gate": "collar and edge bindings are separate structural objects above body panels"
+    },
+    {
+      "id": "skinning",
+      "gate": "unweightedVertices == 0 and maximum bone influences <= 4"
+    },
+    {
+      "id": "collision",
+      "gate": "Blender Cloth cache is baked against avatar collision geometry"
+    },
+    {
+      "id": "silhouette",
+      "gate": "separate straight body panels and loose sleeves are identifiable in five views"
+    },
+    {
+      "id": "styling-fidelity",
+      "gate": "direct image inspection confirms the plain saturated-blue happi reference"
+    },
+    {
+      "id": "evidence-completeness",
+      "gate": "five views, six poses, build report, cloth report, and candidate state are present"
+    }
+  ],
+  "completionRule": "All technical axes must pass; styling-fidelity remains PENDING until direct-image-inspection."
+}

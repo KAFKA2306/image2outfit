@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "source": {
+    "reference": "private-reference://sha256/9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423",
+    "originalSha256": "9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423",
+    "dimensionsPx": {
+      "width": 1536,
+      "height": 1071
+    },
+    "sourceRetention": {
+      "repositoryContainsSourceImage": false,
+      "retainedData": [
+        "SHA-256",
+        "pixel dimensions",
+        "audited observations"
+      ],
+      "reason": "The user-provided reference image is private and is not redistributed."
+    }
+  },
+  "modelIdentification": {
+    "status": "UNVERIFIED",
+    "assertedManufacturer": null,
+    "assertedProductCode": null,
+    "reason": "No manufacturer, stock keeping unit, model number, or crest is visible."
+  },
+  "variants": [
+    {
+      "variantId": "saturated-blue",
+      "boundingBoxPx": [
+        244,
+        70,
+        1292,
+        1024
+      ],
+      "dominantColors": [
+        {
+          "role": "body",
+          "rgb": [
+            22,
+            83,
+            222
+          ]
+        },
+        {
+          "role": "edge-shadow",
+          "rgb": [
+            9,
+            35,
+            119
+          ]
+        }
+      ]
+    }
+  ],
+  "observations": [
+    {
+      "id": "open-front",
+      "confidence": "HIGH",
+      "value": "No front fastener; parallel open front edges."
+    },
+    {
+      "id": "straight-body",
+      "confidence": "HIGH",
+      "value": "Straight body panels ending near the upper thigh."
+    },
+    {
+      "id": "separate-panels",
+      "confidence": "HIGH",
+      "value": "Left front, right front, back, sleeves, and collar band are distinguishable construction regions."
+    },
+    {
+      "id": "collar-band",
+      "confidence": "HIGH",
+      "value": "A narrow continuous collar band runs from the back neck to both front hems."
+    },
+    {
+      "id": "wide-sleeves",
+      "confidence": "HIGH",
+      "value": "Loose straight sleeves end before the wrists."
+    },
+    {
+      "id": "low-armhole",
+      "confidence": "MEDIUM",
+      "value": "The sleeve attachment is low and permits underarm ease."
+    },
+    {
+      "id": "plain-blue",
+      "confidence": "HIGH",
+      "value": "The visible garment is saturated blue without verified text, crest, or emblem."
+    },
+    {
+      "id": "finished-edges",
+      "confidence": "HIGH",
+      "value": "Front edges, collar, cuffs, and hem have visible thickness and edge finishing."
+    }
+  ],
+  "limitations": [
+    "Only the supplied view is authoritative.",
+    "Back construction and hidden seam allowance are pattern hypotheses until rendered and inspected.",
+    "No commercial product identity is asserted."
+  ]
+}
