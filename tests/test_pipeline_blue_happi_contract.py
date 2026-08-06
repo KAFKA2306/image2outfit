@@ -85,9 +85,7 @@ class BlueHappiContractTests(unittest.TestCase):
 
     def test_quality_contract_has_exact_ten_axes(self) -> None:
         contract = read_json(PRODUCT_CONFIG / "quality-audit-contract.json")
-        self.assertEqual(
-            {axis["id"] for axis in contract["axes"]}, EXPECTED_AXES
-        )
+        self.assertEqual({axis["id"] for axis in contract["axes"]}, EXPECTED_AXES)
         self.assertEqual(len(contract["axes"]), 10)
 
     def test_manifest_stays_working_before_direct_review(self) -> None:
