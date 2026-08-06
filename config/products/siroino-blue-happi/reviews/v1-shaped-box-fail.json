@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "reviewMethod": "direct-image-inspection",
+  "decision": "FAIL",
+  "reviewedRevision": "v1-blue-happi-panel-first",
+  "reviewedHeadSha": "3bc2eee47e6e3fed53b015dd73fe8624697d1f29",
+  "workflowRun": 31091148209,
+  "artifact": {
+    "id": 8963749310,
+    "name": "image2outfit-hosted-siroino-blue-happi-31091148209",
+    "sha256": "b7f096892bdb0914b9a557cb44c750f55ec44525b191223dda5d7cac19e736e2"
+  },
+  "measuredEvidence": {
+    "frontOpeningM": 0.03400000184774399,
+    "clearanceP01M": 0.06081603094935417,
+    "meanClearanceM": 0.0900124215735839,
+    "degenerateTriangles": 0,
+    "unweightedVertices": 0,
+    "maximumBoneInfluences": 2
+  },
+  "imageEvidence": {
+    "multiviewSha256": "983a9ccd556be2eb59859616cf25b0832be482edf3bb10f8bae5e767f26c6432",
+    "poseReviewIncludes": [
+      "neutral",
+      "arms-up",
+      "arm-cross",
+      "crouch",
+      "sit",
+      "prone"
+    ]
+  },
+  "findings": [
+    {
+      "axis": "fit",
+      "status": "FAIL",
+      "reason": "The p01 clearance is 60.8 mm and mean clearance is 90.0 mm, producing an oversized rigid box."
+    },
+    {
+      "axis": "silhouette",
+      "status": "FAIL",
+      "reason": "Horizontal shoulder slabs and a cubic torso obscure the intended shoulder, sleeve-attachment, and side-seam reading."
+    },
+    {
+      "axis": "seam",
+      "status": "FAIL",
+      "reason": "The sleeve heads fold into fins and the neck bridge appears to float above the shoulder line."
+    },
+    {
+      "axis": "pose",
+      "status": "FAIL",
+      "reason": "The rigid upper-arm sleeves do not represent the required loose straight sleeves extending before the wrist."
+    }
+  ],
+  "nextRevision": "v2-blue-happi-shaped-shell",
+  "activeVisualReview": false
+}
