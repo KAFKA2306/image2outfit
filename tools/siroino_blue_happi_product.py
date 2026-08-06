@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stable product entrypoint for the SiroinoSotai_PC blue happi."""
+"""Canonical stable entrypoint for the SiroinoSotai_PC blue happi build."""
 
 from __future__ import annotations
 
