@@ -117,9 +117,7 @@ def stage_initialize(job: dict[str, Any], result: Path) -> None:
         job, "initialPlacementPath", "initial placement"
     )
     report = common.write_json(
-        common.runtime_root(product_id)
-        / "initialization"
-        / "initialization-3d.json",
+        common.runtime_root(product_id) / "initialization" / "initialization-3d.json",
         {
             "schemaVersion": 1,
             "productId": product_id,
