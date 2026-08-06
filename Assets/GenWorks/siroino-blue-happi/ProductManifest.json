@@ -21,16 +21,16 @@
     "doNotRebuildFromZero": true,
     "resumeFrom": ".image2outfit/products/siroino-blue-happi/pipeline-state.json",
     "lastAttempt": {
-      "result": "V2_EXECUTION_NOT_EVIDENCED_DIRECT_VISUAL_REVIEW_FAIL",
-      "visualRevision": "v2-blue-happi-shaped-shell-attempt",
-      "workflowRun": 31092626753,
-      "review": "config/products/siroino-blue-happi/reviews/v2-execution-not-evidenced-fail.json"
+      "result": "DIRECT_VISUAL_REVIEW_FAIL",
+      "visualRevision": "v2-blue-happi-shaped-shell",
+      "workflowRun": 31113251116,
+      "review": "config/products/siroino-blue-happi/reviews/v2-direct-review-fail-run-31113251116.json"
     },
     "blockers": [
-      "Run the stable product entrypoint and require a matching execution revision marker.",
-      "Delete or quarantine stale render outputs before each Blender execution.",
-      "Rebuild the shoulder, sleeve-cap, and collar geometry before direct review.",
-      "Create visual-review.json only when the current revision passes."
+      "Join each sleeve head to the shoulder/armscye construction without visible gaps.",
+      "Replace the floating collar bridge with a sewn collar path continuous with the front bands.",
+      "Rebuild pose deformation and rerun all five views and six required poses.",
+      "Create visual-review.json only after direct review passes the current revision."
     ]
   },
   "technicalGates": {
@@ -44,7 +44,7 @@
     "clothSimulation": "PENDING_REEXECUTION",
     "fiveViewEvidence": "FAIL_REJECTED_EVIDENCE_SAVED",
     "poseEvidence": "FAIL_REJECTED_EVIDENCE_SAVED",
-    "tenAxisAudit": "PENDING_REEXECUTION",
+    "tenAxisAudit": "WORKING",
     "visualAppearanceReview": "PENDING",
     "researchTrial": "DECLARED",
     "unityImport": "OUT_OF_SCOPE",
@@ -66,6 +66,6 @@
     "buildReport": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/product-build-report.json",
     "clothReport": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/cloth-simulation.json",
     "qualityAudit": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/quality-audit.json",
-    "rejectedV2Evidence": "Assets/GenWorks/siroino-blue-happi/Evidence/Rejected/v2-attempt-31092626753"
+    "rejectedV2Evidence": "Assets/GenWorks/siroino-blue-happi/Evidence/Rejected/run-31113251116"
   }
 }
