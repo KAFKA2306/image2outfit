@@ -9,6 +9,7 @@ _ORIGINAL = v2.apply_shape_corrections
 
 
 def corrected_shape(objects):
+    """Apply the v2 fit and align each decorative strap to the forearm axis."""
     _ORIGINAL(objects)
     strap_x = (0.375, 0.435, 0.495, 0.555)
     for obj in objects:
@@ -22,5 +23,10 @@ def corrected_shape(objects):
 v2.apply_shape_corrections = corrected_shape
 
 
+def main() -> int:
+    """Run the corrected v2 production build."""
+    return v2.main()
+
+
 if __name__ == "__main__":
-    raise SystemExit(v2.main())
+    raise SystemExit(main())
