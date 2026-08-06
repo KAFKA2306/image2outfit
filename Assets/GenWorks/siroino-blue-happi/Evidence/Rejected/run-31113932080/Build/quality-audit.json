@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "status": "WORKING",
+  "axes": [
+    {
+      "axis": "topology",
+      "status": "PASS",
+      "evidence": {
+        "meshObjects": 8,
+        "vertices": 957,
+        "triangles": 1612,
+        "materialSlots": 8,
+        "shapeKeys": 0,
+        "maxBoneInfluences": 2,
+        "unweightedVertices": 0,
+        "weightSumErrors": 0,
+        "degenerateTriangles": 0,
+        "boundaryEdges": 290
+      }
+    },
+    {
+      "axis": "seam",
+      "status": "PASS",
+      "evidence": {
+        "bodyPanels": [
+          "Happi_Back_Body",
+          "Happi_Front_Left",
+          "Happi_Front_Right"
+        ],
+        "sleeves": [
+          "Happi_Sleeve_Left",
+          "Happi_Sleeve_Right"
+        ],
+        "collarObjects": [
+          "Happi_Collar_Front_Left",
+          "Happi_Collar_Front_Right",
+          "Happi_Collar_Back"
+        ],
+        "stitchGraph": "config/products/siroino-blue-happi/stitch-graph.json"
+      }
+    },
+    {
+      "axis": "fit",
+      "status": "PASS",
+      "evidence": {
+        "clearanceP01M": 0.013529938645660877,
+        "meanClearanceM": 0.04344907842257193,
+        "frontOpeningM": 0.05000000074505806,
+        "required": {
+          "clearanceP01M": [
+            0.006,
+            0.035
+          ],
+          "maximumMeanClearanceM": 0.05,
+          "frontOpeningM": [
+            0.025,
+            0.09
+          ]
+        },
+        "status": "PASS"
+      }
+    },
+    {
+      "axis": "material-response",
+      "status": "PASS",
+      "evidence": {
+        "albedo": "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_albedo.png",
+        "normal": "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_normal.png",
+        "roughness": "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_roughness.png"
+      }
+    },
+    {
+      "axis": "layering",
+      "status": "PASS",
+      "evidence": {
+        "bodyPanels": 3,
+        "sleeves": 2,
+        "structuralCollarObjects": 3
+      }
+    },
+    {
+      "axis": "skinning",
+      "status": "PASS",
+      "evidence": {
+        "objects": 8,
+        "vertices": 957,
+        "rigidObjects": [
+          {
+            "object": "Happi_Collar_Front_Left",
+            "bone": "Chest"
+          },
+          {
+            "object": "Happi_Collar_Front_Right",
+            "bone": "Chest"
+          },
+          {
+            "object": "Happi_Collar_Back",
+            "bone": "Neck"
+          }
+        ],
+        "fallbackVertices": 0,
+        "maximumInfluences": 2
+      }
+    },
+    {
+      "axis": "collision",
+      "status": "PASS",
+      "evidence": {
+        "cacheBaked": true,
+        "bodyCollisionThicknessM": 0.004,
+        "clearanceRefinement": [
+          {
+            "pass": 1,
+            "target": 0.008,
+            "movedVertices": 10,
+            "maximumMove": 0.0060209313798695804,
+            "clearance": {
+              "vertices": 875,
+              "minimum": 0.007128194905817509,
+              "p01": 0.008000001311302185,
+              "mean": 0.04285108827373811
+            }
+          },
+          {
+            "pass": 2,
+            "target": 0.012,
+            "movedVertices": 88,
+            "maximumMove": 0.0048718050941824916,
+            "clearance": {
+              "vertices": 875,
+              "minimum": 0.008914848789572716,
+              "p01": 0.011764883995056152,
+              "mean": 0.04301826490142516
+            }
+          },
+          {
+            "pass": 3,
+            "target": 0.015,
+            "movedVertices": 181,
+            "maximumMove": 0.006085151210427284,
+            "clearance": {
+              "vertices": 875,
+              "minimum": 0.008174479007720947,
+              "p01": 0.013529938645660877,
+              "mean": 0.04344907842257193
+            }
+          }
+        ]
+      }
+    },
+    {
+      "axis": "silhouette",
+      "status": "PENDING_DIRECT_REVIEW",
+      "evidence": {
+        "evidence": [
+          "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
+          "Assets/GenWorks/siroino-blue-happi/Previews/back.png",
+          "Assets/GenWorks/siroino-blue-happi/Previews/left.png",
+          "Assets/GenWorks/siroino-blue-happi/Previews/right.png",
+          "Assets/GenWorks/siroino-blue-happi/Previews/three-quarter.png"
+        ]
+      }
+    },
+    {
+      "axis": "styling-fidelity",
+      "status": "PENDING_DIRECT_REVIEW",
+      "evidence": {
+        "reference": "private-reference://sha256/9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423"
+      }
+    },
+    {
+      "axis": "evidence-completeness",
+      "status": "PASS",
+      "evidence": {
+        "fiveViews": 5,
+        "sixPoses": 6
+      }
+    }
+  ],
+  "technicalAxesPassed": true,
+  "directReviewPending": true
+}
