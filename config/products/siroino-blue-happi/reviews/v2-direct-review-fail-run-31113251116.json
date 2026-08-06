@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "reviewMethod": "direct-image-inspection",
+  "decision": "FAIL",
+  "reviewedRevision": "v2-blue-happi-shaped-shell",
+  "reviewedHeadSha": "895fc3efd8ec74a89c5fadaba2643ac26a3a5dbf",
+  "workflowRun": 31113251116,
+  "artifact": {
+    "id": 8972668547,
+    "name": "image2outfit-hosted-siroino-blue-happi-31113251116",
+    "sha256": "f5b8643c88cd997f059187ea4243fc4ef84f6f36232801bec7d821de5a846e41"
+  },
+  "measuredEvidence": {
+    "frontOpeningM": 0.05000000074505806,
+    "clearanceP01M": 0.013529938645660877,
+    "meanClearanceM": 0.04344907842257193,
+    "degenerateTriangles": 0,
+    "unweightedVertices": 0,
+    "maximumBoneInfluences": 2
+  },
+  "imageEvidence": {
+    "multiviewSha256": "31bc5461e3bfc8259a3b9115eb097b7a6f27a8422b4b4da0b23744337b927613",
+    "poseReviewSha256": "01beca5ca7a6be1c3d2b18b55f4469228fc8775c414bd534a27fc795c8a021c0",
+    "fiveViews": [
+      "front",
+      "back",
+      "left",
+      "right",
+      "three-quarter"
+    ],
+    "sixPoses": [
+      "neutral",
+      "arms-up",
+      "arm-cross",
+      "crouch",
+      "sit",
+      "prone"
+    ]
+  },
+  "findings": [
+    {
+      "axis": "seam",
+      "status": "FAIL",
+      "reason": "Both sleeve heads remain visibly detached from the shoulder panels in the five-view evidence."
+    },
+    {
+      "axis": "silhouette",
+      "status": "FAIL",
+      "reason": "The shoulder line forms pointed fins and the collar bridge floats instead of reading as a sewn happi collar."
+    },
+    {
+      "axis": "pose",
+      "status": "FAIL",
+      "reason": "The arms-up pose collapses the sleeve and collar structures around the neck; arm-cross also exposes disconnected sleeve deformation."
+    },
+    {
+      "axis": "fit",
+      "status": "PASS_NUMERIC_ONLY",
+      "reason": "The clearance and front-opening measurements pass, but those metrics do not prove sewn continuity or acceptable pose deformation."
+    }
+  ],
+  "nextRevision": "v3-connected-shoulder-sleeve-collar",
+  "activeVisualReview": false
+}

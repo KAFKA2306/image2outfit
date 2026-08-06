@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-blue-happi",
+  "productName": "Blue Happi for SiroinoSotai_PC",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": true,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v2-blue-happi-shaped-shell",
+  "renderLoopRevision": "v2-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-blue-happi",
+  "productManifestPath": "Assets/GenWorks/siroino-blue-happi/ProductManifest.json",
+  "buildScript": "tools/siroino_blue_happi_product.py",
+  "blendPath": "Assets/GenWorks/siroino-blue-happi/Source/Blender/SiroinoBlueHappi.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-blue-happi/Models/SiroinoBlueHappi.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoBlueHappi.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoSotai_BlueHappi.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "SiroinoSotai_PC neutral official body",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ],
+    "prefab": {
+      "extensions": [
+        ".prefab"
+      ],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.prefab$",
+      "contentRegex": null,
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.prefab$"
+    },
+    "source": {
+      "extensions": [
+        ".fbx"
+      ],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.fbx$",
+      "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.fbx$"
+    }
+  },
+  "garmentPipeline": {
+    "referenceAuditPath": "config/products/siroino-blue-happi/reference-audit.json",
+    "normalizationSchematicPath": "config/products/siroino-blue-happi/normalization-schematic.json",
+    "decompositionPath": "config/products/siroino-blue-happi/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-blue-happi/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-blue-happi/stitch-graph.json",
+    "initialPlacementPath": "config/products/siroino-blue-happi/initial-placement.json",
+    "constructionPath": "config/products/siroino-blue-happi/construction.json",
+    "qualityAuditContractPath": "config/products/siroino-blue-happi/quality-audit-contract.json",
+    "visualReviewPath": "config/products/siroino-blue-happi/visual-review.json",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "researchTrial": "shaped panel shell with sloped shoulders, upper/lower-arm sleeve weights, and bounded clearance",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true
+  },
+  "researchMethod": {
+    "name": "panel-first structured happi reconstruction",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-blue-happi/pattern-draft.json",
+    "secondaryEvidence": "config/products/siroino-blue-happi/stitch-graph.json",
+    "authorsImplementationExecuted": false,
+    "authorsCodeCopied": false
+  },
+  "licenseEvidence": "config/products/siroino-blue-happi/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local",
+    "Assets/_Vendor",
+    "Assets/SiroinoWorks"
+  ],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-blue-happi/ProductManifest.json",
+    "Assets/GenWorks/siroino-blue-happi/README.md",
+    "Assets/GenWorks/siroino-blue-happi/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-blue-happi/Source/Patterns/blue-happi.pattern.json",
+    "Assets/GenWorks/siroino-blue-happi/Source/Blender/SiroinoBlueHappi.blend",
+    "Assets/GenWorks/siroino-blue-happi/Models/SiroinoBlueHappi.fbx",
+    "Assets/GenWorks/siroino-blue-happi/Models/SiroinoBlueHappi.fbx.meta",
+    "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoBlueHappi.prefab",
+    "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoBlueHappi.prefab.meta",
+    "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoSotai_BlueHappi.prefab",
+    "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoSotai_BlueHappi.prefab.meta",
+    "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_albedo.png",
+    "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_normal.png",
+    "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_roughness.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/back.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/left.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/right.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/Poses/prone.png",
+    "Assets/GenWorks/siroino-blue-happi/Previews/siroino-blue-happi-multiview.webp",
+    "Assets/GenWorks/siroino-blue-happi/Previews/siroino-blue-happi-pose-review.webp",
+    "Assets/GenWorks/siroino-blue-happi/Evidence/Build/product-build-report.json",
+    "Assets/GenWorks/siroino-blue-happi/Evidence/Build/cloth-simulation.json",
+    "Assets/GenWorks/siroino-blue-happi/Evidence/Build/quality-audit.json",
+    "Assets/GenWorks/siroino-blue-happi/Evidence/Candidate/candidate-state.json"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-blue-happi/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-blue-happi/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-blue-happi/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-blue-happi/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-blue-happi/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-blue-happi/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-blue-happi/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": []
+}

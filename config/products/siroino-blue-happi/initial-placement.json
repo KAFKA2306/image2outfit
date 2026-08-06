@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "placements": {
+    "back-body": {
+      "anchor": "Chest",
+      "offsetM": [
+        0.0,
+        0.02,
+        0.805
+      ],
+      "orientation": "back-facing"
+    },
+    "front-left": {
+      "anchor": "Chest",
+      "offsetM": [
+        -0.072,
+        -0.022,
+        0.805
+      ],
+      "orientation": "front-facing"
+    },
+    "front-right": {
+      "anchor": "Chest",
+      "offsetM": [
+        0.072,
+        -0.022,
+        0.805
+      ],
+      "orientation": "front-facing"
+    },
+    "sleeve-left": {
+      "anchor": "UpperArm_L",
+      "offsetM": [
+        -0.185,
+        0.0,
+        0.86
+      ],
+      "orientation": "arm-aligned"
+    },
+    "sleeve-right": {
+      "anchor": "UpperArm_R",
+      "offsetM": [
+        0.185,
+        0.0,
+        0.86
+      ],
+      "orientation": "arm-aligned"
+    },
+    "collar-left": {
+      "anchor": "Chest",
+      "offsetM": [
+        -0.024,
+        -0.035,
+        0.805
+      ],
+      "orientation": "vertical"
+    },
+    "collar-right": {
+      "anchor": "Chest",
+      "offsetM": [
+        0.024,
+        -0.035,
+        0.805
+      ],
+      "orientation": "vertical"
+    },
+    "collar-back": {
+      "anchor": "Neck",
+      "offsetM": [
+        0.0,
+        0.035,
+        1.015
+      ],
+      "orientation": "neck-arc"
+    }
+  },
+  "constraints": {
+    "minimumBodyOffsetM": 0.006,
+    "minimumFrontOpeningM": 0.025,
+    "bilateralSymmetry": true
+  }
+}
