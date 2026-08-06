@@ -75,9 +75,7 @@ class BlueHappiContractTests(unittest.TestCase):
     def test_pattern_and_stitch_graph_are_referentially_valid(self) -> None:
         pattern = read_json(PRODUCT_CONFIG / "pattern-draft.json")
         stitches = read_json(PRODUCT_CONFIG / "stitch-graph.json")
-        piece_edges = {
-            piece["id"]: set(piece["edges"]) for piece in pattern["pieces"]
-        }
+        piece_edges = {piece["id"]: set(piece["edges"]) for piece in pattern["pieces"]}
         self.assertGreaterEqual(len(piece_edges), 8)
         for stitch in stitches["stitches"]:
             for endpoint in (stitch["a"], stitch["b"]):
