@@ -11,7 +11,7 @@
   "previewPath": "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-blue-happi/README.md",
   "sourceJobPath": "config/products/siroino-blue-happi/job.json",
-  "productBuildScript": "tools/siroino_blue_happi_v2_build.py",
+  "productBuildScript": "tools/siroino_blue_happi_product.py",
   "designRevision": "v2-blue-happi-shaped-shell",
   "sourceReference": "private-reference://sha256/9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423",
   "modelIdentification": "UNVERIFIED",
@@ -21,13 +21,15 @@
     "doNotRebuildFromZero": true,
     "resumeFrom": ".image2outfit/products/siroino-blue-happi/pipeline-state.json",
     "lastAttempt": {
-      "result": "V1_DIRECT_VISUAL_REVIEW_FAIL",
-      "visualRevision": "v1-blue-happi-panel-first",
-      "review": "config/products/siroino-blue-happi/reviews/v1-shaped-box-fail.json"
+      "result": "V2_EXECUTION_NOT_EVIDENCED_DIRECT_VISUAL_REVIEW_FAIL",
+      "visualRevision": "v2-blue-happi-shaped-shell-attempt",
+      "workflowRun": 31092626753,
+      "review": "config/products/siroino-blue-happi/reviews/v2-execution-not-evidenced-fail.json"
     },
     "blockers": [
-      "Run v2-blue-happi-shaped-shell through hosted Blender.",
-      "Open the current v2 five-view and six-pose images directly.",
+      "Run the stable product entrypoint and require a matching execution revision marker.",
+      "Delete or quarantine stale render outputs before each Blender execution.",
+      "Rebuild the shoulder, sleeve-cap, and collar geometry before direct review.",
       "Create visual-review.json only when the current revision passes."
     ]
   },
@@ -35,15 +37,15 @@
     "referenceAudit": "PASS",
     "patternContract": "PASS",
     "stitchGraph": "PASS",
-    "blender": "PENDING",
-    "editableSource": "PENDING",
-    "fbx": "PENDING",
-    "prefabDeclared": "PENDING",
-    "clothSimulation": "PENDING",
-    "fiveViewEvidence": "PENDING",
-    "poseEvidence": "PENDING",
-    "tenAxisAudit": "PENDING",
-    "visualAppearanceReview": "PENDING",
+    "blender": "PENDING_REEXECUTION",
+    "editableSource": "PENDING_REEXECUTION",
+    "fbx": "PENDING_REEXECUTION",
+    "prefabDeclared": "PENDING_REEXECUTION",
+    "clothSimulation": "PENDING_REEXECUTION",
+    "fiveViewEvidence": "FAIL_REJECTED_EVIDENCE_SAVED",
+    "poseEvidence": "FAIL_REJECTED_EVIDENCE_SAVED",
+    "tenAxisAudit": "PENDING_REEXECUTION",
+    "visualAppearanceReview": "FAIL",
     "researchTrial": "DECLARED",
     "unityImport": "OUT_OF_SCOPE",
     "unitySaveReload": "OUT_OF_SCOPE",
@@ -63,6 +65,7 @@
     "poseReview": "Assets/GenWorks/siroino-blue-happi/Previews/siroino-blue-happi-pose-review.webp",
     "buildReport": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/product-build-report.json",
     "clothReport": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/cloth-simulation.json",
-    "qualityAudit": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/quality-audit.json"
+    "qualityAudit": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/quality-audit.json",
+    "rejectedV2Evidence": "Assets/GenWorks/siroino-blue-happi/Evidence/Rejected/v2-attempt-31092626753"
   }
 }
