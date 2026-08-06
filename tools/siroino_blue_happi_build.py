@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the SiroinoSotai_PC saturated-blue open-front happi."""
+"""Build a boxy, open-front blue happi for SiroinoSotai_PC."""
 
 from __future__ import annotations
 
@@ -11,19 +11,18 @@ import sys
 import uuid
 from pathlib import Path
 
+import bmesh
 import bpy
+from mathutils import Vector
 from PIL import Image
 
 import genworks_product_common as g
 import siroino_strappy_knit_build as base
-from tuxedo_halter_runtime import (
-    clean_meshes,
-    normalize_bone_weights,
-    render_prone_pose,
-)
+from tuxedo_halter_runtime import normalize_bone_weights, render_prone_pose
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-blue-happi"
+REFERENCE_SHA256 = "9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423"
 
 
 def parse_args() -> argparse.Namespace:
@@ -63,9 +62,9 @@ def make_texture_maps(directory: Path) -> dict[str, Path]:
     albedo = Image.new("RGB", (size, size))
     normal = Image.new("RGB", (size, size))
     roughness = Image.new("RGB", (size, size))
-    albedo_pixels = []
-    normal_pixels = []
-    roughness_pixels = []
+    albedo_pixels: list[tuple[int, int, int]] = []
+    normal_pixels: list[tuple[int, int, int]] = []
+    roughness_pixels: list[tuple[int, int, int]] = []
     for y in range(size):
         for x in range(size):
             weave = math.sin(x * math.tau / 11.0) + math.sin(y * math.tau / 13.0)
@@ -100,108 +99,247 @@ def make_texture_maps(directory: Path) -> dict[str, Path]:
     return outputs
 
 
-def panel_predicates():
-    return {
-        "Happi_Back_Body": (
-            lambda c: 0.565 <= c.z <= 1.015
-            and abs(c.x) <= 0.150
-            and c.y >= -0.004
-        ),
-        "Happi_Front_Left": (
-            lambda c: 0.565 <= c.z <= 1.015
-            and -0.155 <= c.x <= -0.018
-            and c.y < 0.018
-        ),
-        "Happi_Front_Right": (
-            lambda c: 0.565 <= c.z <= 1.015
-            and 0.018 <= c.x <= 0.155
-            and c.y < 0.018
-        ),
-        "Happi_Sleeve_Left": (
-            lambda c: c.x <= -0.112
-            and 0.700 <= c.z <= 1.020
-            and abs(c.y) <= 0.150
-        ),
-        "Happi_Sleeve_Right": (
-            lambda c: c.x >= 0.112
-            and 0.700 <= c.z <= 1.020
-            and abs(c.y) <= 0.150
-        ),
-    }
-
-
-def create_front_band(
+def mesh_object(
     name: str,
-    body: bpy.types.Object,
-    armature: bpy.types.Object,
+    vertices: list[tuple[float, float, float]],
+    faces: list[tuple[int, ...]],
     material: bpy.types.Material,
-    sign: float,
 ) -> bpy.types.Object:
-    rows = 22
-    inner_x = sign * 0.017
-    outer_x = sign * 0.050
-    vertices = []
-    faces = []
-    for row in range(rows + 1):
-        z = 0.575 + (1.008 - 0.575) * row / rows
-        for x in (inner_x, outer_x):
-            y = base.body_front_y(body, x, z) - 0.025
-            vertices.append((x, y, z))
-    for row in range(rows):
-        a = row * 2
-        faces.append((a, a + 1, a + 3, a + 2))
     mesh = bpy.data.meshes.new(f"{name}_Mesh")
     mesh.from_pydata(vertices, [], faces)
     mesh.update(calc_edges=True)
     mesh.materials.append(material)
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    for polygon in mesh.polygons:
+        for loop_index in polygon.loop_indices:
+            coordinate = mesh.vertices[mesh.loops[loop_index].vertex_index].co
+            uv_layer.data[loop_index].uv = (
+                (float(coordinate.x) + 0.30) / 0.60,
+                (float(coordinate.z) - 0.50) / 0.62,
+            )
+        polygon.use_smooth = True
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
-    base.rigid_mesh_weight(obj, armature, "Chest")
-    solidify = obj.modifiers.new("Collar band thickness", "SOLIDIFY")
-    solidify.thickness = 0.0022
-    solidify.offset = 0.0
-    solidify.use_even_offset = True
-    bevel = obj.modifiers.new("Collar band edge", "BEVEL")
-    bevel.width = 0.0008
-    bevel.segments = 2
-    for polygon in mesh.polygons:
-        polygon.use_smooth = True
     return obj
 
 
-def create_back_collar(
-    body: bpy.types.Object,
+def body_dimensions(t: float) -> tuple[float, float]:
+    width = 0.186 * (1.0 - t) + 0.172 * t
+    depth = 0.126 * (1.0 - t) + 0.112 * t
+    return width, depth
+
+
+def create_back_panel(material: bpy.types.Material) -> bpy.types.Object:
+    rows = 14
+    columns = 12
+    z_bottom = 0.585
+    z_top = 1.035
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    for row in range(rows + 1):
+        t = row / rows
+        z = z_bottom + (z_top - z_bottom) * t
+        width, depth = body_dimensions(t)
+        for column in range(columns + 1):
+            u = column / columns
+            x = -width + 2.0 * width * u
+            side = abs(x) / width
+            y = depth * (1.0 - 0.22 * side * side)
+            vertices.append((x, y, z))
+    stride = columns + 1
+    for row in range(rows):
+        for column in range(columns):
+            a = row * stride + column
+            faces.append((a, a + 1, a + 1 + stride, a + stride))
+    return mesh_object("Happi_Back_Body", vertices, faces, material)
+
+
+def create_front_panel(
+    name: str,
+    sign: float,
+    material: bpy.types.Material,
+) -> bpy.types.Object:
+    rows = 14
+    columns = 8
+    z_bottom = 0.585
+    z_top = 1.035
+    inner_x = 0.045
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    front_indices: list[list[int]] = []
+    for row in range(rows + 1):
+        t = row / rows
+        z = z_bottom + (z_top - z_bottom) * t
+        width, depth = body_dimensions(t)
+        row_indices = []
+        for column in range(columns + 1):
+            u = column / columns
+            magnitude = inner_x + (width - inner_x) * u
+            x = sign * magnitude
+            y = -(depth - (depth - 0.078) * u)
+            row_indices.append(len(vertices))
+            vertices.append((x, y, z))
+        front_indices.append(row_indices)
+    for row in range(rows):
+        for column in range(columns):
+            a = front_indices[row][column]
+            b = front_indices[row][column + 1]
+            c = front_indices[row + 1][column + 1]
+            d = front_indices[row + 1][column]
+            faces.append((a, b, c, d) if sign > 0 else (b, a, d, c))
+
+    side_front: list[int] = []
+    side_back: list[int] = []
+    for row in range(rows + 1):
+        t = row / rows
+        z = z_bottom + (z_top - z_bottom) * t
+        width, depth = body_dimensions(t)
+        side_front.append(front_indices[row][-1])
+        side_back.append(len(vertices))
+        vertices.append((sign * width, depth * 0.78, z))
+    for row in range(rows):
+        a = side_front[row]
+        b = side_back[row]
+        c = side_back[row + 1]
+        d = side_front[row + 1]
+        faces.append((a, b, c, d) if sign > 0 else (b, a, d, c))
+
+    top_front = front_indices[-1]
+    top_back: list[int] = []
+    width, depth = body_dimensions(1.0)
+    for column in range(columns + 1):
+        u = column / columns
+        magnitude = inner_x + (width - inner_x) * u
+        top_back.append(len(vertices))
+        vertices.append((sign * magnitude, depth * 0.78, z_top + 0.002))
+    for column in range(columns):
+        a = top_front[column]
+        b = top_front[column + 1]
+        c = top_back[column + 1]
+        d = top_back[column]
+        faces.append((a, b, c, d) if sign > 0 else (b, a, d, c))
+    return mesh_object(name, vertices, faces, material)
+
+
+def create_sleeve(
+    name: str,
+    bone_name: str,
     armature: bpy.types.Object,
     material: bpy.types.Material,
 ) -> bpy.types.Object:
-    segments = 36
-    vertices = []
-    faces = []
-    for index in range(segments + 1):
-        angle = math.pi - math.pi * index / segments
-        for radius in (0.043, 0.071):
-            x = radius * math.cos(angle)
-            y = 0.006 + 0.050 * math.sin(angle)
-            z = 1.005 + 0.006 * math.cos(angle * 2.0)
-            vertices.append((x, y, z))
-    for index in range(segments):
+    bone = armature.data.bones.get(bone_name)
+    if bone is None:
+        raise RuntimeError(f"required sleeve bone missing: {bone_name}")
+    head = armature.matrix_world @ bone.head_local
+    tail = armature.matrix_world @ bone.tail_local
+    axis = (tail - head).normalized()
+    front = Vector((0.0, -1.0, 0.0))
+    vertical = axis.cross(front)
+    if vertical.length < 1e-6:
+        front = Vector((0.0, 0.0, 1.0))
+        vertical = axis.cross(front)
+    vertical.normalize()
+    front = vertical.cross(axis).normalized()
+    start = head + axis * 0.018
+    end = tail - axis * 0.004
+    rings = 6
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    for ring in range(rings):
+        t = ring / (rings - 1)
+        center = start.lerp(end, t)
+        half_height = 0.067 + 0.017 * t
+        half_depth = 0.050 + 0.014 * t
+        offsets = (
+            vertical * half_height + front * half_depth,
+            -vertical * half_height + front * half_depth,
+            -vertical * half_height - front * half_depth,
+            vertical * half_height - front * half_depth,
+        )
+        vertices.extend(tuple(center + offset) for offset in offsets)
+    for ring in range(rings - 1):
+        a = ring * 4
+        b = (ring + 1) * 4
+        for side in range(4):
+            next_side = (side + 1) % 4
+            faces.append((a + side, a + next_side, b + next_side, b + side))
+    obj = mesh_object(name, vertices, faces, material)
+    add_surface_finish(obj, thickness=0.0020, bevel_width=0.0012)
+    return obj
+
+
+def create_front_band(
+    name: str,
+    sign: float,
+    material: bpy.types.Material,
+) -> bpy.types.Object:
+    rows = 14
+    z_bottom = 0.585
+    z_top = 1.035
+    inner_x = 0.017
+    outer_x = 0.045
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    for row in range(rows + 1):
+        t = row / rows
+        z = z_bottom + (z_top - z_bottom) * t
+        _, depth = body_dimensions(t)
+        y = -depth - 0.008
+        vertices.extend(
+            (
+                (sign * inner_x, y, z),
+                (sign * outer_x, y, z),
+            )
+        )
+    for row in range(rows):
+        a = row * 2
+        face = (a, a + 1, a + 3, a + 2)
+        faces.append(face if sign > 0 else tuple(reversed(face)))
+    obj = mesh_object(name, vertices, faces, material)
+    add_surface_finish(obj, thickness=0.0024, bevel_width=0.0009)
+    return obj
+
+
+def create_collar_bridge(material: bpy.types.Material) -> bpy.types.Object:
+    centerline = [
+        Vector((-0.031, -0.120, 1.036)),
+        Vector((-0.055, -0.044, 1.056)),
+        Vector((-0.050, 0.046, 1.060)),
+        Vector((0.000, 0.071, 1.062)),
+        Vector((0.050, 0.046, 1.060)),
+        Vector((0.055, -0.044, 1.056)),
+        Vector((0.031, -0.120, 1.036)),
+    ]
+    half_width = 0.014
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    for index, point in enumerate(centerline):
+        previous = centerline[max(0, index - 1)]
+        following = centerline[min(len(centerline) - 1, index + 1)]
+        tangent = (following - previous).normalized()
+        normal = Vector((-tangent.y, tangent.x, 0.0)).normalized()
+        vertices.extend((tuple(point + normal * half_width), tuple(point - normal * half_width)))
+    for index in range(len(centerline) - 1):
         a = index * 2
         faces.append((a, a + 1, a + 3, a + 2))
-    mesh = bpy.data.meshes.new("Happi_Collar_Back_Mesh")
-    mesh.from_pydata(vertices, [], faces)
-    mesh.update(calc_edges=True)
-    mesh.materials.append(material)
-    obj = bpy.data.objects.new("Happi_Collar_Back", mesh)
-    bpy.context.collection.objects.link(obj)
-    base.rigid_mesh_weight(obj, armature, "Neck")
-    solidify = obj.modifiers.new("Back collar thickness", "SOLIDIFY")
-    solidify.thickness = 0.0022
+    obj = mesh_object("Happi_Collar_Back", vertices, faces, material)
+    add_surface_finish(obj, thickness=0.0024, bevel_width=0.0009)
+    return obj
+
+
+def add_surface_finish(
+    obj: bpy.types.Object,
+    *,
+    thickness: float,
+    bevel_width: float,
+) -> None:
+    solidify = obj.modifiers.new("Happi fabric thickness", "SOLIDIFY")
+    solidify.thickness = thickness
     solidify.offset = 0.0
     solidify.use_even_offset = True
-    bevel = obj.modifiers.new("Back collar edge", "BEVEL")
-    bevel.width = 0.0008
+    bevel = obj.modifiers.new("Happi finished edge", "BEVEL")
+    bevel.width = bevel_width
     bevel.segments = 2
-    return obj
 
 
 def configure_cloth(
@@ -213,47 +351,34 @@ def configure_cloth(
     if collision is None:
         body.modifiers.new("Happi Collision", "COLLISION")
     body.collision.thickness_outer = 0.004
-    body.collision.damping = 0.5
-    contracts = []
+    body.collision.damping = 0.55
+    contracts: list[dict[str, object]] = []
     for panel in panels:
         coordinates = [panel.matrix_world @ vertex.co for vertex in panel.data.vertices]
-        if "Sleeve_Left" in panel.name:
-            selected = [
-                vertex.index
-                for vertex, coordinate in zip(panel.data.vertices, coordinates)
-                if coordinate.x > -0.175
-            ]
-        elif "Sleeve_Right" in panel.name:
-            selected = [
-                vertex.index
-                for vertex, coordinate in zip(panel.data.vertices, coordinates)
-                if coordinate.x < 0.175
-            ]
-        else:
-            selected = [
-                vertex.index
-                for vertex, coordinate in zip(panel.data.vertices, coordinates)
-                if coordinate.z > 0.965
-            ]
-        if not selected:
-            selected = [vertex.index for vertex in panel.data.vertices[:8]]
-        pin = panel.vertex_groups.get("HappiClothPin")
-        if pin is None:
-            pin = panel.vertex_groups.new(name="HappiClothPin")
+        selected = [
+            vertex.index
+            for vertex, coordinate in zip(panel.data.vertices, coordinates)
+            if coordinate.z > 1.020
+            or (
+                panel.name.startswith("Happi_Front")
+                and abs(coordinate.x) < 0.050
+            )
+        ]
+        pin = panel.vertex_groups.new(name="HappiClothPin")
         pin.add(selected, 1.0, "REPLACE")
         cloth = panel.modifiers.new("Happi Cloth", "CLOTH")
-        cloth.settings.quality = 7
-        cloth.settings.mass = 0.24
-        cloth.settings.tension_stiffness = 26.0
-        cloth.settings.compression_stiffness = 24.0
-        cloth.settings.shear_stiffness = 10.0
-        cloth.settings.bending_stiffness = 0.75
-        cloth.settings.air_damping = 4.0
+        cloth.settings.quality = 6
+        cloth.settings.mass = 0.22
+        cloth.settings.tension_stiffness = 38.0
+        cloth.settings.compression_stiffness = 36.0
+        cloth.settings.shear_stiffness = 16.0
+        cloth.settings.bending_stiffness = 1.8
+        cloth.settings.air_damping = 5.0
         cloth.settings.vertex_group_mass = pin.name
         cloth.settings.pin_stiffness = 1.0
         cloth.collision_settings.use_collision = True
-        cloth.collision_settings.collision_quality = 5
-        cloth.collision_settings.distance_min = 0.003
+        cloth.collision_settings.collision_quality = 4
+        cloth.collision_settings.distance_min = 0.004
         cloth.point_cache.frame_start = 1
         cloth.point_cache.frame_end = frame_end
         contracts.append(
@@ -282,6 +407,46 @@ def configure_cloth(
     return contracts
 
 
+def add_body_weights(obj: bpy.types.Object, armature: bpy.types.Object) -> None:
+    obj.parent = armature
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+    chest = obj.vertex_groups.new(name="Chest")
+    hips = obj.vertex_groups.new(name="Hips")
+    for vertex in obj.data.vertices:
+        z = float(vertex.co.z)
+        chest_weight = max(0.0, min(1.0, (z - 0.68) / 0.25))
+        hips_weight = 1.0 - chest_weight
+        chest.add([vertex.index], chest_weight, "REPLACE")
+        hips.add([vertex.index], hips_weight, "REPLACE")
+
+
+def sanitize_meshes(objects: list[bpy.types.Object]) -> None:
+    for obj in objects:
+        if obj.type != "MESH":
+            continue
+        mesh = obj.data
+        bm = bmesh.new()
+        bm.from_mesh(mesh)
+        bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=1e-7)
+        bmesh.ops.dissolve_degenerate(bm, edges=list(bm.edges), dist=1e-7)
+        tiny = [face for face in bm.faces if face.calc_area() <= 1e-10]
+        if tiny:
+            bmesh.ops.delete(bm, geom=tiny, context="FACES")
+        if bm.faces:
+            bmesh.ops.triangulate(bm, faces=list(bm.faces))
+        tiny_after = [face for face in bm.faces if face.calc_area() <= 1e-10]
+        if tiny_after:
+            bmesh.ops.delete(bm, geom=tiny_after, context="FACES")
+        loose = [vertex for vertex in bm.verts if not vertex.link_faces]
+        if loose:
+            bmesh.ops.delete(bm, geom=loose, context="VERTS")
+        bm.to_mesh(mesh)
+        bm.free()
+        mesh.update(calc_edges=True)
+
+
 def write_prefabs(
     fbx: Path,
     outfit_prefab: Path,
@@ -289,7 +454,6 @@ def write_prefabs(
     product_name: str,
 ) -> list[Path]:
     fbx_guid = uuid.uuid4().hex
-    outputs = []
     fbx_meta = fbx.with_suffix(fbx.suffix + ".meta")
     fbx_meta.write_text(
         f"""fileFormatVersion: 2
@@ -312,7 +476,7 @@ ModelImporter:
 """,
         encoding="utf-8",
     )
-    outputs.append(fbx_meta)
+    outputs = [fbx_meta]
     for path, object_name in (
         (outfit_prefab, product_name),
         (integrated_prefab, f"SiroinoSotai_PC + {product_name}"),
@@ -358,7 +522,9 @@ PrefabImporter:
 
 
 def quality_axis(
-    axis: str, status: str, evidence: dict | list | str
+    axis: str,
+    status: str,
+    evidence: dict | list | str,
 ) -> dict[str, object]:
     return {"axis": axis, "status": status, "evidence": evidence}
 
@@ -406,8 +572,8 @@ def main() -> int:
         maps["albedo"],
         maps["normal"],
         maps["roughness"],
-        normal_strength=0.32,
-        sheen=0.16,
+        normal_strength=0.28,
+        sheen=0.14,
     )
     edge = base.plain_material(
         "MAT_Happi_Blue_Edge",
@@ -415,72 +581,82 @@ def main() -> int:
         roughness=0.58,
     )
 
-    panels = [
-        base.extract_surface(
-            body,
-            armature,
-            name,
-            predicate,
-            blue,
-            0.018 if "Sleeve" not in name else 0.021,
-        )
-        for name, predicate in panel_predicates().items()
+    body_panels = [
+        create_back_panel(blue),
+        create_front_panel("Happi_Front_Left", -1.0, blue),
+        create_front_panel("Happi_Front_Right", 1.0, blue),
     ]
-    structural = [
-        create_front_band("Happi_Collar_Front_Left", body, armature, edge, -1.0),
-        create_front_band("Happi_Collar_Front_Right", body, armature, edge, 1.0),
-        create_back_collar(body, armature, edge),
+    sleeves = [
+        create_sleeve("Happi_Sleeve_Left", "UpperArm_L", armature, blue),
+        create_sleeve("Happi_Sleeve_Right", "UpperArm_R", armature, blue),
     ]
-    garments = [*panels, *structural]
-    clean_meshes(garments)
+    collars = [
+        create_front_band("Happi_Collar_Front_Left", -1.0, edge),
+        create_front_band("Happi_Collar_Front_Right", 1.0, edge),
+        create_collar_bridge(edge),
+    ]
+    garments = [*body_panels, *sleeves, *collars]
+    sanitize_meshes(garments)
 
     scene = bpy.context.scene
-    frame_end = 18
+    frame_end = 14
     scene.frame_start = 1
     scene.frame_end = frame_end
-    scene.gravity = (0.0, 0.0, -3.5)
-    cloth_contracts = configure_cloth(panels, body, frame_end)
-    clean_meshes(garments)
+    scene.gravity = (0.0, 0.0, -1.8)
+    cloth_contracts = configure_cloth(body_panels, body, frame_end)
+    sanitize_meshes(body_panels)
+    for panel in body_panels:
+        add_surface_finish(panel, thickness=0.0022, bevel_width=0.0010)
 
     clearance_history = g.improve_clearance(
         body,
         garments,
-        targets=(0.003, 0.005, 0.008),
-        movable=lambda obj: not obj.name.startswith("Happi_Collar"),
+        targets=(0.003, 0.005, 0.007),
+        movable=lambda obj: obj.name == "Happi_Back_Body",
     )
-    clean_meshes(garments)
+    sanitize_meshes(garments)
+
+    for panel in body_panels:
+        add_body_weights(panel, armature)
+    base.rigid_mesh_weight(sleeves[0], armature, "UpperArm_L")
+    base.rigid_mesh_weight(sleeves[1], armature, "UpperArm_R")
+    base.rigid_mesh_weight(collars[0], armature, "Chest")
+    base.rigid_mesh_weight(collars[1], armature, "Chest")
+    base.rigid_mesh_weight(collars[2], armature, "Neck")
     weight_report = normalize_bone_weights(
         garments,
         armature,
         rigid_groups={
+            "Happi_Sleeve_Left": "UpperArm_L",
+            "Happi_Sleeve_Right": "UpperArm_R",
             "Happi_Collar_Front_Left": "Chest",
             "Happi_Collar_Front_Right": "Chest",
             "Happi_Collar_Back": "Neck",
         },
     )
+    sanitize_meshes(garments)
+
     measured = base.metrics(garments)
     clearance_p01 = clearance_history[-1]["clearance"]["p01"]
-
-    front_left = bpy.data.objects["Happi_Front_Left"]
-    front_right = bpy.data.objects["Happi_Front_Right"]
+    left_band = bpy.data.objects["Happi_Collar_Front_Left"]
+    right_band = bpy.data.objects["Happi_Collar_Front_Right"]
     left_inner = max(
-        (front_left.matrix_world @ vertex.co).x for vertex in front_left.data.vertices
+        (left_band.matrix_world @ vertex.co).x for vertex in left_band.data.vertices
     )
     right_inner = min(
-        (front_right.matrix_world @ vertex.co).x
-        for vertex in front_right.data.vertices
+        (right_band.matrix_world @ vertex.co).x for vertex in right_band.data.vertices
     )
     front_opening = right_inner - left_inner
 
     technical_pass = (
         measured["meshObjects"] >= 8
-        and measured["vertices"] > 500
+        and measured["vertices"] > 300
         and measured["unweightedVertices"] == 0
         and measured["weightSumErrors"] == 0
         and measured["degenerateTriangles"] == 0
         and measured["maxBoneInfluences"] <= 4
         and clearance_p01 >= 0.002
-        and front_opening >= 0.020
+        and front_opening >= 0.025
     )
 
     blend_path.parent.mkdir(parents=True, exist_ok=True)
@@ -505,7 +681,9 @@ def main() -> int:
     if obsolete_twist is not None and obsolete_twist.is_file():
         obsolete_twist.unlink()
     pose_images["prone"] = render_prone_pose(
-        armature, camera, pose_dir / "prone.png"
+        armature,
+        camera,
+        pose_dir / "prone.png",
     )
     pose_sheet = preview_dir / f"{PRODUCT_ID}-pose-review.webp"
     g.contact_sheet(
@@ -520,7 +698,10 @@ def main() -> int:
     body.hide_render = True
     base.export_fbx(fbx_path, armature, garments)
     sidecars = write_prefabs(
-        fbx_path, prefab_path, integrated_prefab, job["productName"]
+        fbx_path,
+        prefab_path,
+        integrated_prefab,
+        job["productName"],
     )
 
     cloth_report = write_json(
@@ -537,9 +718,7 @@ def main() -> int:
             "contracts": cloth_contracts,
             "bodyCollisionThicknessM": 0.004,
             "structuralObjectsExcludedFromSolve": [
-                "Happi_Collar_Front_Left",
-                "Happi_Collar_Front_Right",
-                "Happi_Collar_Back",
+                obj.name for obj in [*sleeves, *collars]
             ],
         },
     )
@@ -562,15 +741,16 @@ def main() -> int:
             "seam",
             "PASS",
             {
-                "panelObjects": [obj.name for obj in panels],
-                "structuralObjects": [obj.name for obj in structural],
+                "bodyPanels": [obj.name for obj in body_panels],
+                "sleeves": [obj.name for obj in sleeves],
+                "collarObjects": [obj.name for obj in collars],
                 "stitchGraph": job["garmentPipeline"]["stitchGraphPath"],
             },
         ),
         quality_axis(
             "fit",
             "PASS"
-            if clearance_p01 >= 0.002 and front_opening >= 0.020
+            if clearance_p01 >= 0.002 and front_opening >= 0.025
             else "FAIL",
             {
                 "neutralClearanceP01M": clearance_p01,
@@ -585,7 +765,7 @@ def main() -> int:
         quality_axis(
             "layering",
             "PASS",
-            {"bodyPanels": 5, "structuralCollarObjects": 3},
+            {"bodyPanels": 3, "sleeves": 2, "structuralCollarObjects": 3},
         ),
         quality_axis(
             "skinning",
@@ -597,7 +777,7 @@ def main() -> int:
         ),
         quality_axis(
             "collision",
-            "PASS",
+            "PASS" if clearance_p01 >= 0.002 else "FAIL",
             {
                 "cacheBaked": True,
                 "bodyCollisionThicknessM": 0.004,
@@ -612,12 +792,7 @@ def main() -> int:
         quality_axis(
             "styling-fidelity",
             "PENDING_DIRECT_REVIEW",
-            {
-                "reference": (
-                    "private-reference://sha256/"
-                    "9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423"
-                )
-            },
+            {"reference": f"private-reference://sha256/{REFERENCE_SHA256}"},
         ),
         quality_axis(
             "evidence-completeness",
@@ -664,16 +839,15 @@ def main() -> int:
         },
         "referenceModelIdentification": "UNVERIFIED",
         "notes": [
-            "The body, sleeves, and collar are separate auditable objects.",
-            "The front opening is measured after cloth and clearance refinement.",
-            "The collar and front bands are structural and excluded from the cloth solve.",
+            "The boxy body, short wide sleeves, and collar are separate objects.",
+            "The visible front opening is measured between structural collar bands.",
+            "Body panels receive a baked low-gravity cloth settling pass.",
+            "Sleeves follow upper-arm bones and end before the elbow joint.",
             "No manufacturer, product code, text, or crest is asserted.",
             "Visual silhouette and styling remain pending direct image inspection.",
         ],
     }
-    report_path = write_json(
-        evidence_dir / "product-build-report.json", report
-    )
+    report_path = write_json(evidence_dir / "product-build-report.json", report)
 
     manifest = {
         "schemaVersion": 1,
@@ -690,10 +864,7 @@ def main() -> int:
         "sourceJobPath": str(job_path.relative_to(ROOT)),
         "productBuildScript": job["buildScript"],
         "designRevision": job["buildRevision"],
-        "sourceReference": (
-            "private-reference://sha256/"
-            "9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423"
-        ),
+        "sourceReference": f"private-reference://sha256/{REFERENCE_SHA256}",
         "modelIdentification": "UNVERIFIED",
         "handoff": {
             "resumable": True,
@@ -761,11 +932,10 @@ The original reference image is not redistributed. Its binding is
 
 ## Generated construction
 
-- separate back, left-front, and right-front body panels
-- separate loose left and right sleeves
-- two front collar bands and one back-neck collar bridge
-- baked Blender Cloth settling for the five fabric panels
-- structural collar objects excluded from the cloth solve
+- separate boxy back, left-front, and right-front body panels
+- short wide sleeve tubes rigidly following the upper-arm bones
+- two front collar bands and one continuous neck bridge
+- baked Blender Cloth settling for the three body panels
 - skin weights normalized to four deform bones or fewer
 
 ## Current boundary
