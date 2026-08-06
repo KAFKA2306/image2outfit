@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "passed": false,
+  "productId": "siroino-blue-happi",
+  "productName": "Blue Happi for SiroinoSotai_PC",
+  "buildRevision": "v1-blue-happi-panel-first",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "blenderVersion": "4.4.3",
+  "metrics": {
+    "meshObjects": 8,
+    "vertices": 33922,
+    "triangles": 65996,
+    "materialSlots": 8,
+    "shapeKeys": 0,
+    "maxBoneInfluences": 4,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 39,
+    "boundaryEdges": 2808
+  },
+  "weightNormalization": {
+    "objects": 8,
+    "vertices": 33922,
+    "rigidObjects": [
+      {
+        "object": "Happi_Collar_Front_Left",
+        "bone": "Chest"
+      },
+      {
+        "object": "Happi_Collar_Front_Right",
+        "bone": "Chest"
+      },
+      {
+        "object": "Happi_Collar_Back",
+        "bone": "Neck"
+      }
+    ],
+    "fallbackVertices": 0,
+    "maximumInfluences": 4
+  },
+  "frontOpeningM": 0.0015993929946489516,
+  "clearanceRefinement": [
+    {
+      "pass": 1,
+      "target": 0.003,
+      "movedVertices": 54,
+      "maximumMove": 0.002662332207662985,
+      "clearance": {
+        "vertices": 33757,
+        "minimum": 0.001325643970631063,
+        "p01": 0.006871190387755632,
+        "mean": 0.017538101654911674
+      }
+    },
+    {
+      "pass": 2,
+      "target": 0.005,
+      "movedVertices": 127,
+      "maximumMove": 0.003674356029368937,
+      "clearance": {
+        "vertices": 33757,
+        "minimum": 0.0014434974873438478,
+        "p01": 0.006871190387755632,
+        "mean": 0.017541843358811794
+      }
+    },
+    {
+      "pass": 3,
+      "target": 0.008,
+      "movedVertices": 1569,
+      "maximumMove": 0.006556502512656152,
+      "clearance": {
+        "vertices": 33757,
+        "minimum": 0.0002796617045532912,
+        "p01": 0.007999957539141178,
+        "mean": 0.017577162130474194
+      }
+    }
+  ],
+  "clothSimulation": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/cloth-simulation.json",
+  "qualityAudit": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/quality-audit.json",
+  "views": {
+    "front": "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-blue-happi/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-blue-happi/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-blue-happi/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-blue-happi/Previews/three-quarter.png"
+  },
+  "poseViews": {
+    "neutral": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/prone.png"
+  },
+  "referenceModelIdentification": "UNVERIFIED",
+  "notes": [
+    "The body, sleeves, and collar are separate auditable objects.",
+    "The front opening is measured after cloth and clearance refinement.",
+    "The collar and front bands are structural and excluded from the cloth solve.",
+    "No manufacturer, product code, text, or crest is asserted.",
+    "Visual silhouette and styling remain pending direct image inspection."
+  ]
+}

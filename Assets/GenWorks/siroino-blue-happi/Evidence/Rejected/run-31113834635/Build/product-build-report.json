@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "productId": "siroino-blue-happi",
+  "productName": "Blue Happi for SiroinoSotai_PC",
+  "buildRevision": "v2-blue-happi-shaped-shell",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "blenderVersion": "4.4.3",
+  "metrics": {
+    "meshObjects": 8,
+    "vertices": 957,
+    "triangles": 1612,
+    "materialSlots": 8,
+    "shapeKeys": 0,
+    "maxBoneInfluences": 2,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "boundaryEdges": 290
+  },
+  "weightNormalization": {
+    "objects": 8,
+    "vertices": 957,
+    "rigidObjects": [
+      {
+        "object": "Happi_Collar_Front_Left",
+        "bone": "Chest"
+      },
+      {
+        "object": "Happi_Collar_Front_Right",
+        "bone": "Chest"
+      },
+      {
+        "object": "Happi_Collar_Back",
+        "bone": "Neck"
+      }
+    ],
+    "fallbackVertices": 0,
+    "maximumInfluences": 2
+  },
+  "frontOpeningM": 0.05000000074505806,
+  "clearanceRefinement": [
+    {
+      "pass": 1,
+      "target": 0.008,
+      "movedVertices": 10,
+      "maximumMove": 0.0060209313798695804,
+      "clearance": {
+        "vertices": 875,
+        "minimum": 0.007128194905817509,
+        "p01": 0.008000001311302185,
+        "mean": 0.04285108827373811
+      }
+    },
+    {
+      "pass": 2,
+      "target": 0.012,
+      "movedVertices": 88,
+      "maximumMove": 0.0048718050941824916,
+      "clearance": {
+        "vertices": 875,
+        "minimum": 0.008914848789572716,
+        "p01": 0.011764883995056152,
+        "mean": 0.04301826490142516
+      }
+    },
+    {
+      "pass": 3,
+      "target": 0.015,
+      "movedVertices": 181,
+      "maximumMove": 0.006085151210427284,
+      "clearance": {
+        "vertices": 875,
+        "minimum": 0.008174479007720947,
+        "p01": 0.013529938645660877,
+        "mean": 0.04344907842257193
+      }
+    }
+  ],
+  "clothSimulation": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/cloth-simulation.json",
+  "qualityAudit": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/quality-audit.json",
+  "views": {
+    "front": "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-blue-happi/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-blue-happi/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-blue-happi/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-blue-happi/Previews/three-quarter.png"
+  },
+  "poseViews": {
+    "neutral": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/prone.png"
+  },
+  "referenceModelIdentification": "UNVERIFIED",
+  "notes": [
+    "The body uses curved front and back panels with sloped shoulder seams.",
+    "Sleeves run from the upper arm to before the wrist and blend across the elbow.",
+    "The collar bridge shares the chest frame with the front bands to stay connected.",
+    "The fit gate rejects both body penetration and an oversized rigid box.",
+    "No manufacturer, product code, text, or crest is asserted.",
+    "Silhouette and styling remain pending direct inspection of current images."
+  ],
+  "silhouetteRevision": "v2-shaped-shell-long-sleeve",
+  "fitEnvelope": {
+    "clearanceP01M": 0.013529938645660877,
+    "meanClearanceM": 0.04344907842257193,
+    "frontOpeningM": 0.05000000074505806,
+    "required": {
+      "clearanceP01M": [
+        0.006,
+        0.035
+      ],
+      "maximumMeanClearanceM": 0.05,
+      "frontOpeningM": [
+        0.025,
+        0.09
+      ]
+    },
+    "status": "PASS"
+  }
+}
