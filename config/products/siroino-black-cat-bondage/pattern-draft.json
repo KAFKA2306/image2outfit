@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-black-cat-bondage",
+  "units": "metres",
+  "coordinateSystem": {
+    "x": "avatar-left-to-right",
+    "y": "back-to-front-negative-front",
+    "z": "up"
+  },
+  "status": "DECLARED",
+  "patterns": [
+    {
+      "id": "corset-front-panels",
+      "count": 5,
+      "method": "quadrilateral-shell",
+      "zRange": [0.76, 1.005],
+      "xRange": [-0.165, 0.165]
+    },
+    {
+      "id": "bust-upper-panels",
+      "count": 2,
+      "method": "shallow-quadrilateral-cups",
+      "zRange": [0.93, 1.06]
+    },
+    {
+      "id": "skirt-pleats",
+      "count": 24,
+      "method": "radial-trapezoids",
+      "topRadius": 0.166,
+      "bottomRadius": 0.235,
+      "zTop": 0.71,
+      "zBottom": 0.555
+    },
+    {
+      "id": "cat-ears",
+      "count": 4,
+      "method": "triangles",
+      "zRange": [1.455, 1.575]
+    }
+  ],
+  "fitAllowance": {
+    "bodyClearanceTargetM": 0.008,
+    "rigidAccessoryClearanceTargetM": 0.012
+  }
+}

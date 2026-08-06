@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-black-cat-bondage",
+  "status": "DECLARED",
+  "structuralEdges": [
+    {"from": "corset-front-panels", "to": "corset-back", "operation": "side-seam-or-rigid-join", "verification": "no-visible-gap"},
+    {"from": "bust-upper-panels", "to": "corset-front-panels", "operation": "upper-cup-seam", "verification": "continuous-surface"},
+    {"from": "skirt-pleats", "to": "waist-belt", "operation": "radial-top-edge-attachment", "verification": "24-of-24-connected"},
+    {"from": "shoulder-straps", "to": "corset-shell", "operation": "strap-anchor", "verification": "paired-and-symmetric"},
+    {"from": "cat-ears", "to": "headband", "operation": "ear-base-anchor", "verification": "paired-and-symmetric"}
+  ],
+  "decorativeEdges": [
+    {"from": "eyelets-left", "to": "eyelets-right", "operation": "cross-lacing"},
+    {"from": "waist-rings", "to": "waist-rings", "operation": "sagging-chain"},
+    {"from": "skirt-or-waist", "to": "thigh-garters", "operation": "decorative-chain"}
+  ]
+}
