@@ -14,7 +14,7 @@ import bpy
 from mathutils import Vector
 from PIL import Image, ImageDraw, ImageFont
 
-import siroino_black_cat_bondage_product as v1
+import siroino_black_cat_bondage_geometry as v1
 
 PRODUCT_ID = "siroino-black-cat-bondage"
 ROOT = Path.cwd().resolve()
