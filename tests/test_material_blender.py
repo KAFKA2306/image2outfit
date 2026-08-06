@@ -107,7 +107,7 @@ class BlenderMaterialProjectionTests(unittest.TestCase):
 
     def test_collision_impulse_clamp_is_explicit_and_bounded(self) -> None:
         for projection in self.projections:
-            self.assertEqual(10.0, projection.cloth_collision_settings["impulse_clamp"])
+            self.assertEqual(1.0, projection.cloth_collision_settings["impulse_clamp"])
             self.assertEqual(
                 0.0, projection.cloth_collision_settings["self_impulse_clamp"]
             )

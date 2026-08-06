@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "profileId": "blender-4.4.3-kes-cusick-calibration-v11-impulse-clamp-diagnostic",
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v12-impulse-clamp-1-diagnostic",
   "blenderVersion": "4.4.3",
   "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
   "mappingStatus": "temporal-convergence-diagnostic-impulse-clamp",
@@ -46,7 +46,7 @@
     "collisionObject.collision.cloth_friction": "static Coulomb coefficient mapped to Blender's 0-80 percentage scale as 100 * coefficient, verified against Blender 4.4.3 source",
     "collisionThickness": "physics contact offset",
     "renderThickness": "Solidify visual thickness",
-    "clothCollisionSettings.impulse_clamp": "diagnostic object-collision impulse limit; 10 is the smallest Blender 4.4.3 runtime RNA UI step above the disabled value 0"
+    "clothCollisionSettings.impulse_clamp": "diagnostic object-collision impulse rejection threshold; Blender 4.4.3 discards impulses whose magnitude exceeds impulse_clamp multiplied by dt"
   },
   "calibrationFixture": {
     "type": "cusick-drape-meter",
@@ -78,8 +78,8 @@
   ],
   "searchPolicy": {
     "spacing": "fixed-scales-temporal-convergence-diagnostic",
-    "policy": "run one fixed-scale object-collision impulse-clamp diagnostic at 10; do not change damping, quality, collision quality, self collision, contact, mesh, fixture, or elastic factors",
-    "reason": "Run 31057250945 rejected global default damping because it suppressed motion and destroyed coefficient plausibility; Blender 4.4.3 runtime RNA explicitly defines impulse_clamp as limiting collision impulses to avoid instability"
+    "policy": "run one fixed-scale object-collision impulse-clamp diagnostic at 1.0 after 10.0 was proven pixel- and vertex-identical to the disabled baseline",
+    "reason": "Blender 4.4.3 source uses square(impulse_clamp * dt) as a rejection threshold; the exact no-op at 10 proves no fixture impulse crossed that threshold"
   },
   "acceptance": {
     "maximumRmseVsPublishedKes": 0.18,
@@ -150,12 +150,12 @@
     "maximumMeanVertexDisplacementM": 0.003,
     "maximumVertexDisplacementM": 0.015
   },
-  "collisionImpulseClamp": 10.0,
+  "collisionImpulseClamp": 1.0,
   "solverStabilityDiagnostic": {
-    "diagnosticId": "blender-4.4.3-object-impulse-clamp-10-v1",
+    "diagnosticId": "blender-4.4.3-object-impulse-clamp-1-v1",
     "changedFactor": "clothCollisionSettings.impulse_clamp",
     "baseline": 0.0,
-    "candidate": 10.0,
+    "candidate": 1.0,
     "selfImpulseClamp": 0.0,
     "selfCollisionEnabledInFixture": false,
     "unchanged": [
@@ -173,7 +173,7 @@
     "basis": {
       "type": "Blender-4.4.3-runtime-RNA-metadata",
       "run": "https://github.com/KAFKA2306/image2outfit/actions/runs/31056987078",
-      "description": "Clamp collision impulses to avoid instability; 0 disables clamping; hard range 0-100; UI step 10"
+      "description": "Blender 4.4.3 collision.cc rejects object-collision impulses whose squared magnitude exceeds square(impulse_clamp * dt); 10.0 was a verified no-op, so 1.0 is the next logarithmic activation diagnostic"
     },
     "decisionRule": "retain only if hard upward/contact failures and temporal drift improve without degrading coefficient-fit acceptance or direct visual plausibility"
   }
