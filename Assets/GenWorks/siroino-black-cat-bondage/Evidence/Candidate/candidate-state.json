@@ -2,22 +2,29 @@
   "schemaVersion": 1,
   "productId": "siroino-black-cat-bondage",
   "status": "WORKING",
-  "revision": "v1-parametric-black-cat-bondage",
+  "revision": "v2-fitted-rigged-five-view",
   "completed": [
     "reference-audit",
     "garment-decomposition",
     "pattern-declaration",
-    "deterministic-build-script"
+    "stitch-graph",
+    "deterministic-build-script-v2",
+    "unity-prefab-declaration"
+  ],
+  "rejected": [
+    {
+      "revision": "v1-parametric-black-cat-bondage",
+      "workflowRun": 31129531413,
+      "reason": "direct visual review found floating cat ears, vertical detached gauntlets, and an overly rigid box-like torso"
+    }
   ],
   "pending": [
-    "hosted Blender execution",
-    "editable blend",
-    "FBX",
-    "Unity prefabs",
-    "five-view renders",
-    "six-pose renders",
+    "v2 hosted Blender execution",
+    "five-view direct review",
+    "six-pose penetration review",
+    "render evidence commit",
     "quality audit",
-    "direct visual review"
+    "release decision"
   ],
   "rejectedEvidencePolicy": "preserve every generated comparison and failed render under Evidence/Rejected"
 }
