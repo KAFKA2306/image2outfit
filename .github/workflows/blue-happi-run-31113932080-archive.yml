@@ -1,0 +1,122 @@
+name: Archive blue happi run 31113932080
+
+on:
+  push:
+    branches:
+      - feat/196-siroino-blue-happi
+    paths:
+      - .github/workflows/blue-happi-run-31113932080-archive.yml
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/196-siroino-blue-happi
+          fetch-depth: 0
+
+      - name: Download exact final validation artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: '8972888453'
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/blue-happi-final
+          curl --fail-with-body --location --retry 4 --retry-all-errors \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID/zip" \
+            --output /tmp/blue-happi-final.zip
+          unzip -q /tmp/blue-happi-final.zip -d /tmp/blue-happi-final
+          test -f /tmp/blue-happi-final/Assets/GenWorks/siroino-blue-happi/Previews/front.png
+          test -f /tmp/blue-happi-final/Assets/GenWorks/siroino-blue-happi/Previews/siroino-blue-happi-pose-review.webp
+
+      - name: Verify and preserve all render images
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import shutil
+          from pathlib import Path
+
+          root = Path.cwd()
+          source = Path('/tmp/blue-happi-final/Assets/GenWorks/siroino-blue-happi')
+          destination = root / 'Assets/GenWorks/siroino-blue-happi/Evidence/Rejected/run-31113932080'
+          expected = {
+              'Previews/siroino-blue-happi-multiview.webp': '31bc5461e3bfc8259a3b9115eb097b7a6f27a8422b4b4da0b23744337b927613',
+              'Previews/siroino-blue-happi-pose-review.webp': '01beca5ca7a6be1c3d2b18b55f4469228fc8775c414bd534a27fc795c8a021c0',
+              'Evidence/Build/product-build-report.json': '432a74b47d371a1403dafc44c75e4a49919180ed3d6ff052321a3fa3c2bec92d',
+          }
+          for relative, digest in expected.items():
+              actual = hashlib.sha256((source / relative).read_bytes()).hexdigest()
+              if actual != digest:
+                  raise SystemExit(f'hash mismatch for {relative}: {actual} != {digest}')
+
+          if destination.exists():
+              shutil.rmtree(destination)
+          destination.mkdir(parents=True)
+          shutil.copytree(source / 'Previews', destination / 'Previews')
+          shutil.copytree(source / 'Evidence' / 'Build', destination / 'Build')
+
+          checkpoint = {
+              'schemaVersion': 1,
+              'productId': 'siroino-blue-happi',
+              'status': 'REJECTED',
+              'sourceCommit': '968441bcc88f2d2b8ce3b5423255ff1da2e2bade',
+              'sourceWorkflowRun': 31113932080,
+              'sourceArtifactId': 8972888453,
+              'sourceArtifactDigest': 'sha256:17fd1287d68ca3ba85ad4943721f42880cc770df8ccaf1723cc868f13961de23',
+              'reviewResult': 'FAIL',
+              'reviewBasis': {
+                  'method': 'pixel-identity-with-directly-inspected-run',
+                  'directlyInspectedRun': 31113251116,
+                  'multiviewSha256': expected['Previews/siroino-blue-happi-multiview.webp'],
+                  'poseReviewSha256': expected['Previews/siroino-blue-happi-pose-review.webp'],
+              },
+              'findings': [
+                  'Sleeve heads are visibly detached from the shoulder panels.',
+                  'The collar bridge floats rather than forming a sewn continuous collar.',
+                  'Arms-up and arm-cross deformation remains unacceptable.',
+              ],
+              'evidence': {
+                  'fiveViews': [f'Previews/{name}.png' for name in ['front', 'back', 'left', 'right', 'three-quarter']],
+                  'sixPoses': [f'Previews/Poses/{name}.png' for name in ['neutral', 'arms-up', 'arm-cross', 'crouch', 'sit', 'prone']],
+                  'contactSheets': ['Previews/siroino-blue-happi-multiview.webp', 'Previews/siroino-blue-happi-pose-review.webp'],
+                  'reports': ['Build/product-build-report.json', 'Build/cloth-simulation.json', 'Build/quality-audit.json'],
+              },
+          }
+          (destination / 'render-checkpoint.json').write_text(
+              json.dumps(checkpoint, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          (destination / 'README.md').write_text(
+              '# Rejected render checkpoint: run 31113932080\n\n'
+              'This directory preserves every image and report produced by the final hosted '
+              'Blender validation run before the checkpoint merge. Its multiview and pose-review '
+              'files are byte-identical to directly inspected run 31113251116, so the same '
+              'detached sleeves, floating collar, and pose failures apply. It is rejected '
+              'evidence, not an approved preview.\n',
+              encoding='utf-8',
+          )
+          PY
+          rm .github/workflows/blue-happi-run-31113932080-archive.yml
+
+      - name: Commit and push final render archive
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            Assets/GenWorks/siroino-blue-happi/Evidence/Rejected/run-31113932080 \
+            .github/workflows/blue-happi-run-31113932080-archive.yml
+          git diff --cached --stat
+          git commit -m 'Archive final blue happi validation renders'
+          git push origin HEAD:feat/196-siroino-blue-happi
