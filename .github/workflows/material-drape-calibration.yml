@@ -1,0 +1,184 @@
+name: Material drape calibration
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "config/materials/**"
+      - "src/image2outfit/material.py"
+      - "src/image2outfit/material_blender.py"
+      - "tools/material_drape_calibration.py"
+      - "tests/test_material_blender.py"
+      - ".github/workflows/material-drape-calibration.yml"
+  push:
+    branches: [main]
+    paths:
+      - "config/materials/**"
+      - "src/image2outfit/material.py"
+      - "src/image2outfit/material_blender.py"
+      - "tools/material_drape_calibration.py"
+      - "tests/test_material_blender.py"
+      - ".github/workflows/material-drape-calibration.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: material-drape-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  BLENDER_VERSION: "4.4.3"
+  BLENDER_SERIES: "4.4"
+  OUTPUT_DIR: ".image2outfit/material-calibration/${{ github.run_id }}"
+
+jobs:
+  contract:
+    name: Material mapping contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: "0.11.32"
+      - name: Compile and test material contract
+        run: |
+          uv lock --check
+          uv run --locked --no-default-groups python -m py_compile \
+            src/image2outfit/material.py \
+            src/image2outfit/material_blender.py \
+            tests/test_material_blender.py
+          uv run --locked --no-default-groups python -m unittest \
+            tests/test_material_blender.py -v
+      - name: Ruff changed material code
+        run: |
+          uv run --locked --no-default-groups --group dev ruff check \
+            --select E4,E7,E9,F --ignore E402 \
+            src/image2outfit/material_blender.py \
+            tools/material_drape_calibration.py \
+            tests/test_material_blender.py
+          uv run --locked --no-default-groups --group dev ruff format --check \
+            src/image2outfit/material_blender.py \
+            tools/material_drape_calibration.py \
+            tests/test_material_blender.py
+
+  blender:
+    name: Blender 4.4.3 Cusick calibration evidence
+    needs: contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install Blender runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 \
+            libgl1 libegl1 libx11-6 libxxf86vm1
+      - name: Download pinned Blender
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+            --output blender.tar.xz
+          mkdir -p .image2outfit/blender
+          tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
+      - name: Run fixed-scale temporal convergence diagnostic
+        run: |
+          set -uo pipefail
+          mkdir -p "$OUTPUT_DIR"
+          set +e
+          PYTHONPATH="$GITHUB_WORKSPACE/src" \
+          .image2outfit/blender/blender \
+            --python-use-system-env \
+            --background \
+            --factory-startup \
+            --python-exit-code 1 \
+            --python tools/material_drape_calibration.py \
+            -- \
+            --library config/materials/kes-woven-fabrics-2025.v1.json \
+            --profile config/materials/blender-4.4-kes-calibration.v1.json \
+            --output "$OUTPUT_DIR" \
+            --frame-end 250 \
+            --grid 41 | tee "$OUTPUT_DIR/blender-calibration.log"
+          calibration_status=${PIPESTATUS[0]}
+          set -e
+          printf '%s\n' "$calibration_status" > "$OUTPUT_DIR/calibration-exit-code.txt"
+          echo "Calibration process exit code: $calibration_status"
+      - name: Verify report structure and evidence hashes
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          output = Path(os.environ["OUTPUT_DIR"])
+          report = json.loads((output / "material-drape-report.json").read_text())
+          assert report["schemaVersion"] == 6
+          assert report["blenderVersion"] == os.environ["BLENDER_VERSION"]
+          assert report["frameEnd"] == 250
+          assert len(report["records"]) == 6
+          assert report["sameGeometryForAllMaterials"] is True
+          assert report["fixture"]["type"] == "cusick-drape-meter"
+          assert report["fixture"]["specimenRadiusM"] == 0.15
+          assert report["fixture"]["supportRadiusM"] == 0.09
+          assert report["fixture"]["supportBoundaryCondition"] == "collision-supported-free-fall"
+          assert report["fixture"]["pinnedVertexCount"] == 0
+          assert all(record["runtime"]["pinnedVertexCount"] == 0 for record in report["records"])
+          assert all(record["runtime"]["pinGroup"] is None for record in report["records"])
+          assert set(report["selectedDiagnosticElasticScales"]) == {
+              record["materialId"] for record in report["records"]
+          }
+          assert report["elasticScaleStatus"] == (
+              "diagnostic-until-temporal-convergence-passes"
+          )
+          assert report["temporalConvergence"]["checkpointFrames"] == [
+              100, 150, 200, 250
+          ]
+          assert len(report["temporalConvergence"]["records"]) == 6
+          assert all(
+              record["runtime"]["elasticScale"]
+              == report["selectedDiagnosticElasticScales"][record["materialId"]]
+              for record in report["records"]
+          )
+          for image in report["images"]:
+              path = output / image["path"]
+              assert path.is_file(), path
+              assert hashlib.sha256(path.read_bytes()).hexdigest() == image["sha256"]
+          blend = output / report["blend"]["path"]
+          assert blend.is_file(), blend
+          assert hashlib.sha256(blend.read_bytes()).hexdigest() == report["blend"]["sha256"]
+          print(json.dumps(report["comparison"], indent=2))
+          print(json.dumps(report["temporalConvergence"], indent=2))
+          PY
+      - name: Upload Blender evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: material-drape-calibration-${{ github.run_id }}
+          path: ${{ env.OUTPUT_DIR }}
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 6
+      - name: Enforce calibration acceptance
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          output = Path(os.environ["OUTPUT_DIR"])
+          report = json.loads((output / "material-drape-report.json").read_text())
+          assert report["passed"] is True, {
+              "comparison": report["comparison"],
+              "temporalConvergence": report["temporalConvergence"],
+          }
+          assert (output / "calibration-exit-code.txt").read_text().strip() == "0"
+          PY

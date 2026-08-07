@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "profileId": "blender-4.4.3-kes-cusick-calibration-v12-impulse-clamp-1-diagnostic",
+  "blenderVersion": "4.4.3",
+  "sourceLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
+  "mappingStatus": "temporal-convergence-diagnostic-impulse-clamp",
+  "mappingMethod": "explicit geometric-mean scalar projection with recorded axis loss, followed by material-specific Blender 4.4.3 correction factors identified on a collision-supported Cusick fixture; not a universal SI-to-Blender conversion",
+  "scalarProjectionRanges": {
+    "tensionStiffness": [
+      5.0,
+      35.0
+    ],
+    "shearStiffness": [
+      3.0,
+      20.0
+    ],
+    "bendingStiffness": [
+      0.05,
+      5.0
+    ]
+  },
+  "bucklingCompressionRatio": 0.5,
+  "damping": {
+    "tension": 0.5,
+    "compression": 0.5,
+    "shear": 0.5,
+    "bending": 0.1
+  },
+  "airDamping": 0.25,
+  "quality": 12,
+  "collisionQuality": 8,
+  "selfCollisionScale": 1.5,
+  "contactHypothesis": {
+    "hypothesisId": "shared-contact-prior-v1",
+    "staticFriction": 0.35,
+    "dynamicFriction": 0.25,
+    "method": "shared bounded engineering prior used to isolate density and elastic-property differences in the first Blender calibration render",
+    "source": "not measured; must be replaced by fabric-body and fabric-fabric calibration evidence",
+    "confidence": 0.2,
+    "measured": false
+  },
+  "propertySemantics": {
+    "clothSettings.compression_stiffness": "in-plane compression and buckling spring proxy derived from projected stretch stiffness",
+    "properties.compressionKpa": "through-thickness compression; deliberately unmapped because Blender surface compression stiffness is not the same physical quantity",
+    "clothSettings.collider_friction": "dynamic contact hypothesis on the cloth",
+    "collisionObject.collision.cloth_friction": "static Coulomb coefficient mapped to Blender's 0-80 percentage scale as 100 * coefficient, verified against Blender 4.4.3 source",
+    "collisionThickness": "physics contact offset",
+    "renderThickness": "Solidify visual thickness",
+    "clothCollisionSettings.impulse_clamp": "diagnostic object-collision impulse rejection threshold; Blender 4.4.3 discards impulses whose magnitude exceeds impulse_clamp multiplied by dt"
+  },
+  "calibrationFixture": {
+    "type": "cusick-drape-meter",
+    "specimenRadiusM": 0.15,
+    "supportRadiusM": 0.09,
+    "supportTopZM": 0.12,
+    "initialSpecimenZM": 0.125,
+    "initialGapM": 0.005,
+    "mesh": "41x41 concentric-square-to-disk quad mesh",
+    "selfCollision": false,
+    "source": "https://doi.org/10.3390/su17041388",
+    "simulationMethodSource": "https://doi.org/10.3390/ma14216259",
+    "purpose": "temporal convergence audit at fixed diagnostic material scales before friction or constitutive re-identification; final validation still requires the published approximately 4 mm mesh resolution",
+    "supportConstraint": "no pin group; the planar specimen starts 5 mm above the solid disk and falls freely onto its collision surface"
+  },
+  "publishedKesSimulationDrapeCoefficients": {
+    "kes-2025-m1-polyester-twill": 0.349,
+    "kes-2025-m2-polyester-plain": 0.313,
+    "kes-2025-m3-wool-polyester-elastane-twill": 0.404,
+    "kes-2025-m4-polyester-viscose-elastane-twill": 0.323,
+    "kes-2025-m5-polyester-elastane-plain": 0.438,
+    "kes-2025-m6-cotton-polyester-elastane-twill": 0.613
+  },
+  "elasticScaleSearch": [
+    0.01,
+    0.015,
+    0.02,
+    0.1
+  ],
+  "searchPolicy": {
+    "spacing": "fixed-scales-temporal-convergence-diagnostic",
+    "policy": "run one fixed-scale object-collision impulse-clamp diagnostic at 1.0 after 10.0 was proven pixel- and vertex-identical to the disabled baseline",
+    "reason": "Blender 4.4.3 source uses square(impulse_clamp * dt) as a rejection threshold; the exact no-op at 10 proves no fixture impulse crossed that threshold"
+  },
+  "acceptance": {
+    "maximumRmseVsPublishedKes": 0.18,
+    "minimumPearsonVsPublishedKes": 0.7,
+    "minimumPearsonVsReal": 0.65,
+    "maximumMaterialAbsoluteError": 0.3
+  },
+  "research": [
+    {
+      "title": "Assessment of Textile Material Properties and the Impact of Digital Ink-Jet Fabric Printing on 3D Simulation as a Sustainable Method for Garment Prototyping",
+      "url": "https://doi.org/10.3390/su17041388",
+      "role": "exact Cusick geometry, real coefficients, KES-to-Clo3D mechanical values, and published KES simulation coefficients"
+    },
+    {
+      "title": "Analysis of Polygonal Computer Model Parameters and Influence on Fabric Drape Simulation",
+      "url": "https://doi.org/10.3390/ma14216259",
+      "role": "primary simulation procedure: position the planar sample just above the solid disk and perform free fall rather than clamping the support region"
+    },
+    {
+      "title": "Blender 4.4 Cloth Introduction",
+      "url": "https://docs.blender.org/manual/en/4.4/physics/cloth/introduction.html",
+      "role": "independent tension, compression, shear, and angular bending springs; sequential simulation"
+    },
+    {
+      "title": "Blender 4.4.3 official cloth presets",
+      "url": "https://github.com/blender/blender/tree/v4.4.3/scripts/presets/cloth",
+      "role": "reference scale for Blender vertex mass and independent cloth stiffness settings; not treated as measured textile data"
+    },
+    {
+      "title": "Blender 4.4.3 cloth solver source",
+      "url": "https://github.com/blender/blender/blob/v4.4.3/source/blender/blenkernel/intern/cloth.cc",
+      "role": "verifies that ClothSettings.mass is assigned directly to each solver vertex"
+    },
+    {
+      "title": "Image2Garment: Simulation-ready Garment Generation from a Single Image",
+      "url": "https://arxiv.org/abs/2601.09658",
+      "role": "material attributes must be mapped to physical parameters rather than inferred as appearance labels only"
+    },
+    {
+      "title": "Unified nonlinear dynamic model for dress dynamic drape and optimization of template structure design",
+      "url": "https://doi.org/10.1016/j.cad.2026.104074",
+      "role": "warp-weft anisotropy must remain explicit in dynamic drape models"
+    },
+    {
+      "title": "Blender 4.4.3 hosted RNA property contract",
+      "url": "https://github.com/KAFKA2306/image2outfit/actions/runs/31056987078",
+      "role": "exact runtime semantics, disabled default, range, and UI step for object and self collision impulse clamping"
+    }
+  ],
+  "calibrationScope": {
+    "solver": "Blender 4.4.3 cloth",
+    "fixture": "300 mm Cusick specimen on 90 mm support radius",
+    "transferability": "diagnostic factors are solver- and discretization-specific and remain uncalibrated until temporal convergence and direct visual review both pass",
+    "anisotropyBoundary": "warp and weft source axes remain in the projection artifact, but Blender's public scalar cloth settings apply an explicit lossy proxy"
+  },
+  "diagnosticElasticScales": {
+    "kes-2025-m1-polyester-twill": 0.015,
+    "kes-2025-m2-polyester-plain": 0.1,
+    "kes-2025-m3-wool-polyester-elastane-twill": 0.01,
+    "kes-2025-m4-polyester-viscose-elastane-twill": 0.015,
+    "kes-2025-m5-polyester-elastane-plain": 0.015,
+    "kes-2025-m6-cotton-polyester-elastane-twill": 0.015
+  },
+  "temporalConvergence": {
+    "maximumCoefficientDelta": 0.02,
+    "maximumSupportContactDelta": 0.05,
+    "maximumMaximumZDeltaM": 0.005,
+    "maximumMeanVertexDisplacementM": 0.003,
+    "maximumVertexDisplacementM": 0.015
+  },
+  "collisionImpulseClamp": 1.0,
+  "solverStabilityDiagnostic": {
+    "diagnosticId": "blender-4.4.3-object-impulse-clamp-1-v1",
+    "changedFactor": "clothCollisionSettings.impulse_clamp",
+    "baseline": 0.0,
+    "candidate": 1.0,
+    "selfImpulseClamp": 0.0,
+    "selfCollisionEnabledInFixture": false,
+    "unchanged": [
+      "diagnosticElasticScales",
+      "springDamping",
+      "airDamping",
+      "quality",
+      "collisionQuality",
+      "contactHypothesis",
+      "collisionThickness",
+      "fixtureGeometry",
+      "meshTopology",
+      "frameCheckpoints"
+    ],
+    "basis": {
+      "type": "Blender-4.4.3-runtime-RNA-metadata",
+      "run": "https://github.com/KAFKA2306/image2outfit/actions/runs/31056987078",
+      "description": "Blender 4.4.3 collision.cc rejects object-collision impulses whose squared magnitude exceeds square(impulse_clamp * dt); 10.0 was a verified no-op, so 1.0 is the next logarithmic activation diagnostic"
+    },
+    "decisionRule": "retain only if hard upward/contact failures and temporal drift improve without degrading coefficient-fit acceptance or direct visual plausibility"
+  }
+}
