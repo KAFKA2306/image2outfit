@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "profile": "loose-layered",
+  "productId": "siroino-nocturne-angel-set",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v6-welded-projected-pleats",
+  "panels": [
+    "five logical bodice regions welded into one continuous projected V-neck shell",
+    "left and right projected sailor collar pieces",
+    "short twelve-pleat skirt with a zero-force Blender Cloth checkpoint",
+    "matching twelve-pleat cream hem frill",
+    "projected waist band",
+    "left and right body-following puff sleeves",
+    "left and right body-following detached arm warmers",
+    "left and right body-following lace cuffs",
+    "left and right body-following leg warmers"
+  ],
+  "separateGeometry": [
+    "skin-weighted choker",
+    "amber charm",
+    "rabbit charm",
+    "three compact volumetric feathers per wing",
+    "reduced tail",
+    "reduced skin-weighted shoes"
+  ],
+  "priorityFitZones": [
+    "V neckline",
+    "shoulder strap",
+    "armhole",
+    "underarm",
+    "chest",
+    "back",
+    "waist",
+    "hip",
+    "skirt-body layer",
+    "elbow",
+    "wrist",
+    "thigh",
+    "knee",
+    "ankle",
+    "upper back wing mount"
+  ],
+  "researchTrial": {
+    "primaryPaper": "https://arxiv.org/abs/2606.24564",
+    "secondaryPaper": "https://arxiv.org/abs/2602.22052",
+    "implementation": "independent logical panel and seam specification, one welded projected shell, zero-force Blender 4.4 cloth checkpoint, outward clearance and four-influence nearest-body weight transfer",
+    "externalResearchCodeExecuted": false,
+    "generatedEvidence": "Assets/GenWorks/siroino-nocturne-angel-set/Research/patterngsl-autosew-cloth-trial.json"
+  },
+  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
+}

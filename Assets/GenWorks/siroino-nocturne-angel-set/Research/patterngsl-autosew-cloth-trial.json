@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "status": "PENDING_EXECUTION",
+  "result": "PENDING",
+  "designRevision": "v5-skinweighted-pleated-volume",
+  "method": "PatternGSL-inspired explicit panel and seam specification with Blender cloth, outward evaluated-body clearance and four-influence nearest-body weight transfer",
+  "sources": [
+    {
+      "title": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
+      "url": "https://arxiv.org/abs/2606.24564"
+    },
+    {
+      "title": "AutoSew: A Geometric Approach to Stitching Prediction with Graph Neural Networks",
+      "url": "https://arxiv.org/abs/2602.22052"
+    },
+    {
+      "title": "Blender 4.4 Cloth Physics",
+      "url": "https://docs.blender.org/manual/en/4.4/physics/cloth/index.html"
+    }
+  ],
+  "implementation": {
+    "bodyTopologyCopied": false,
+    "externalResearchCodeExecuted": false,
+    "bodicePanels": 5,
+    "bodySurfaceConstraint": "evaluated-body nearest surface with outward-normal correction",
+    "weightTransfer": "four strongest groups from the nearest evaluated body vertex",
+    "cloth": {
+      "pleats": 12,
+      "frames": 32,
+      "gravityWeight": 0.18,
+      "shapePreservingStiffness": true
+    },
+    "volumetricWings": true,
+    "explicitTriangleExport": true
+  },
+  "acceptance": {
+    "researchTrial": "PENDING",
+    "visualAppearanceReview": "PENDING"
+  }
+}
