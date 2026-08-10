@@ -77,6 +77,8 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                 "--python-exit-code",
                 "1",
                 "--python",
+                str(ROOT / "tools" / "render_evidence_bootstrap.py"),
+                "--python",
                 str(path(job["buildScript"])),
                 "--",
                 "--job",
