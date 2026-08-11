@@ -16,7 +16,10 @@ def _numeric_vector(value: object, size: int) -> bool:
     return (
         isinstance(value, list)
         and len(value) == size
-        and all(isinstance(item, (int, float)) and not isinstance(item, bool) for item in value)
+        and all(
+            isinstance(item, (int, float)) and not isinstance(item, bool)
+            for item in value
+        )
     )
 
 
@@ -39,9 +42,10 @@ def validate_sidecar(artifact: Path, root: Path) -> list[str]:
         errors.append(f"kind must be {KIND}: {relative_artifact}")
     if payload.get("artifactPath") != relative_artifact:
         errors.append(f"artifactPath mismatch: {relative_artifact}")
-    if not isinstance(payload.get("generatorRevision"), str) or not payload[
-        "generatorRevision"
-    ].strip():
+    if (
+        not isinstance(payload.get("generatorRevision"), str)
+        or not payload["generatorRevision"].strip()
+    ):
         errors.append(f"generatorRevision is required: {relative_artifact}")
 
     camera = payload.get("camera")
@@ -53,7 +57,9 @@ def validate_sidecar(artifact: Path, root: Path) -> list[str]:
         if camera.get("type") not in {"PERSP", "ORTHO", "PANO"}:
             errors.append(f"camera.type is invalid: {relative_artifact}")
         if not _numeric_vector(camera.get("location"), 3):
-            errors.append(f"camera.location must contain 3 numbers: {relative_artifact}")
+            errors.append(
+                f"camera.location must contain 3 numbers: {relative_artifact}"
+            )
         if not _numeric_vector(camera.get("rotationEulerRadians"), 3):
             errors.append(
                 f"camera.rotationEulerRadians must contain 3 numbers: {relative_artifact}"
@@ -72,7 +78,9 @@ def validate_sidecar(artifact: Path, root: Path) -> list[str]:
         for field in ("resolutionX", "resolutionY", "resolutionPercentage"):
             value = render.get(field)
             if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
-                errors.append(f"render.{field} must be a positive integer: {relative_artifact}")
+                errors.append(
+                    f"render.{field} must be a positive integer: {relative_artifact}"
+                )
     return errors
 
 
@@ -82,9 +90,7 @@ def audit(root: Path = ROOT) -> list[str]:
     if not genworks.is_dir():
         return ["Assets/GenWorks is missing"]
     artifacts = sorted(
-        path
-        for path in genworks.glob("*/Previews/**/*.png")
-        if path.is_file()
+        path for path in genworks.glob("*/Previews/**/*.png") if path.is_file()
     )
     for artifact in artifacts:
         errors.extend(validate_sidecar(artifact, root))
