@@ -116,6 +116,20 @@ The build workflow must:
 9. open and inspect the actual images;
 10. restore last-good state when generation or visible quality fails.
 
+## Render evidence metadata
+
+Every direct Blender PNG render under `Assets/GenWorks/<slug>/Previews/` must have an adjacent `<artifact>.render.json` sidecar. `tools/render_evidence_bootstrap.py` writes the sidecar from Blender's `render_post` handler so the metadata describes the scene that actually produced the image instead of reconstructing camera state later.
+
+Schema v1 records `artifactPath`, `generatorRevision`, `sourceCommit`, camera name/type/location/rotation, lens and orthographic scale, plus render engine and output resolution. `generatorRevision` comes from the product job's `renderLoopRevision`, falling back to `buildRevision`; a missing revision blocks generation. `sourceCommit` uses `GITHUB_SHA` when available, otherwise `git rev-parse HEAD`, and may be null only when neither can be resolved.
+
+Audit with:
+
+```powershell
+python tools/audit_render_evidence_metadata.py
+```
+
+The audit is fail-closed for missing or malformed sidecars, artifact mismatches, absent generator revision, and missing camera/render parameters. Historical PNGs without trustworthy sidecars must be regenerated through the canonical Blender pipeline. Never infer historical camera values from filenames or current source code.
+
 ## Completion boundary
 
 The project completion state is `COMPLETE`. The sole machine-readable definition is `requiredCompletionGates` in `config/genworks-handoff-policy.json`.
