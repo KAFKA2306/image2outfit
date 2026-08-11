@@ -23,7 +23,7 @@ namespace GenWorks.Editor
         public Vector2 cameraOrbit = new Vector2(12f, 180f);
         public float cameraDistance = 2.2f;
         public float fieldOfView = 30f;
-        public Vector3 pivotOffset = new Vector3(0f, 1f, 0f);
+        public Vector3 pivotOffset = Vector3.zero;
         public List<TransformPose> pose = new List<TransformPose>();
     }
 }
