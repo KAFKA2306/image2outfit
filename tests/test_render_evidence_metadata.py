@@ -71,9 +71,13 @@ class RenderEvidenceMetadataTests(unittest.TestCase):
             sidecar = artifact.with_name(artifact.name + ".render.json")
             sidecar.write_text(json.dumps(metadata), encoding="utf-8")
             errors = metadata_audit.validate_sidecar(artifact, root)
-            self.assertTrue(any("generatorRevision is required" in item for item in errors))
+            self.assertTrue(
+                any("generatorRevision is required" in item for item in errors)
+            )
             self.assertTrue(any("camera.location" in item for item in errors))
-            self.assertTrue(any("camera.rotationEulerRadians" in item for item in errors))
+            self.assertTrue(
+                any("camera.rotationEulerRadians" in item for item in errors)
+            )
 
 
 if __name__ == "__main__":
