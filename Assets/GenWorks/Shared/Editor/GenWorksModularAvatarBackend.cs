@@ -70,12 +70,47 @@ namespace GenWorks.Editor
                     candidate != null && mergeType.IsInstanceOfType(candidate)
                 );
             if (component == null)
-                component = Undo.AddComponent(instance, mergeType);
+            {
+                var mergeHost = FindSourceArmature(instance);
+                component = Undo.AddComponent(mergeHost, mergeType);
+            }
 
             ConfigureMergeTarget(component, mergeType, mergeTarget);
             Selection.activeGameObject = instance;
             EditorGUIUtility.PingObject(instance);
             return instance;
+        }
+
+        private static GameObject FindSourceArmature(GameObject outfit)
+        {
+            var renderer = outfit
+                .GetComponentsInChildren<SkinnedMeshRenderer>(true)
+                .FirstOrDefault(candidate => candidate != null && candidate.rootBone != null);
+            if (renderer != null)
+            {
+                var rootBone = renderer.rootBone;
+                var parent = rootBone.parent;
+                if (
+                    parent != null
+                    && parent != outfit.transform
+                    && parent.IsChildOf(outfit.transform)
+                )
+                    return parent.gameObject;
+                if (rootBone.IsChildOf(outfit.transform))
+                    return rootBone.gameObject;
+            }
+
+            var namedArmature = outfit
+                .GetComponentsInChildren<Transform>(true)
+                .FirstOrDefault(transform =>
+                    transform != outfit.transform
+                    && string.Equals(
+                        transform.name,
+                        "Armature",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                );
+            return namedArmature != null ? namedArmature.gameObject : outfit;
         }
 
         private static void ConfigureMergeTarget(
