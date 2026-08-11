@@ -101,7 +101,10 @@ def install() -> None:
         )
 
     handlers = bpy.app.handlers.render_post
-    if not any(getattr(handler, "__name__", "") == "record_render_evidence" for handler in handlers):
+    if not any(
+        getattr(handler, "__name__", "") == "record_render_evidence"
+        for handler in handlers
+    ):
         record.__name__ = "record_render_evidence"
         handlers.append(record)
 
