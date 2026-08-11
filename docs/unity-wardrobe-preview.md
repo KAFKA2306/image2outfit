@@ -4,16 +4,23 @@ This workflow makes the Unity-side outfit collection easier to browse without ch
 
 ## 1. Assets visibility: Rainbow Folders 2
 
-`Packages/manifest.json` installs the publisher's official Git UPM package:
+Rainbow Folders 2 is intentionally **not** added to `Packages/manifest.json` in this change.
 
-```json
-"com.borodar.rainbow-folders": "https://github.com/Borod4r/Rainbow-Folders-2.git?path=Assets/Plugins/Borodar/RainbowFolders"
+The publisher's current Git UPM instructions use:
+
+```text
+https://github.com/Borod4r/Rainbow-Folders-2.git?path=Assets/Plugins/Borodar/RainbowFolders
 ```
 
-Official source and installation instructions:
-- https://github.com/Borod4r/Rainbow-Folders-2
+However, the current upstream package metadata is `com.borodar.rainbow-folders` version `2.4.5` and declares `"unity": "6000.3"`, while this repository is pinned to Unity `2022.3.22f1`. Committing that UPM dependency would therefore create an unverified/incompatible package boundary for this project.
 
-The publisher documents Alt-click on a folder to configure its icon/background. Code is Apache-2.0; bundled artwork is CC BY-NC 4.0 according to the repository README.
+Use the publisher's Unity Asset Store distribution only after its Unity 2022.3 compatibility is confirmed in the actual Editor environment. Do not copy Asset Store package contents into this public repository.
+
+Official sources:
+- https://github.com/Borod4r/Rainbow-Folders-2
+- https://assetstore.unity.com/packages/tools/utilities/rainbow-folders-2-143526
+
+The publisher documents Alt-click on a folder to configure its icon/background. The GitHub repository states that code is Apache-2.0 and bundled artwork is CC BY-NC 4.0.
 
 ## 2. Preview camera, pose presets, and isolation
 
