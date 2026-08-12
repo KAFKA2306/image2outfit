@@ -4,6 +4,7 @@ const CATALOG_URL = `${RAW_ROOT}Assets/GenWorks/OutfitCatalog.json`;
 
 const grid = document.querySelector("#catalog-grid");
 const coverageGrid = document.querySelector("#coverage-grid");
+const exampleGallery = document.querySelector("#example-gallery");
 const statusNode = document.querySelector("#catalog-status");
 const productCountNode = document.querySelector("#product-count");
 
@@ -15,6 +16,12 @@ const hero = {
   secondaryName: document.querySelector("#hero-secondary-name"),
   secondaryStatus: document.querySelector("#hero-secondary-status"),
 };
+
+const EXAMPLE_VIEWS = [
+  { file: "front.png", label: "front" },
+  { file: "three-quarter.png", label: "three-quarter" },
+  { file: "back.png", label: "back" },
+];
 
 function githubTreeUrl(path) {
   return `${REPO_URL}/tree/main/${path}`;
@@ -37,8 +44,12 @@ function readableClassification(value = "") {
     .join(" ");
 }
 
+function previewUrl(product, filename = "front.png") {
+  return rawAssetUrl(`${product.productRoot}/Previews/${filename}`);
+}
+
 function frontPreviewUrl(product) {
-  return rawAssetUrl(`${product.productRoot}/Previews/front.png`);
+  return previewUrl(product, "front.png");
 }
 
 function markMissingImage(image) {
@@ -46,10 +57,10 @@ function markMissingImage(image) {
   image.removeAttribute("src");
 }
 
-function bindImage(image, product, eager = false) {
+function bindImage(image, product, eager = false, filename = "front.png", viewLabel = "front") {
   image.loading = eager ? "eager" : "lazy";
-  image.alt = `${product.productName} の正準frontプレビュー`;
-  image.src = frontPreviewUrl(product);
+  image.alt = `${product.productName} の正準${viewLabel}プレビュー`;
+  image.src = previewUrl(product, filename);
   image.addEventListener("error", () => markMissingImage(image), { once: true });
 }
 
@@ -80,6 +91,97 @@ function createCoverageFigure(product) {
 function renderCoverage(products) {
   const examples = products.slice(0, 4);
   coverageGrid.replaceChildren(...examples.map(createCoverageFigure));
+}
+
+function createExampleView(product, view) {
+  const frame = document.createElement("div");
+  frame.className = "example-view";
+
+  const fallback = document.createElement("div");
+  fallback.className = "example-view-fallback";
+  fallback.textContent = `${view.label} preview unavailable`;
+
+  const image = document.createElement("img");
+  bindImage(image, product, false, view.file, view.label);
+
+  const label = document.createElement("span");
+  label.className = "example-view-label";
+  label.textContent = view.label;
+
+  frame.append(fallback, image, label);
+  return frame;
+}
+
+function createExampleCard(product) {
+  const article = document.createElement("article");
+  article.className = "example-card";
+
+  const header = document.createElement("div");
+  header.className = "example-card-header";
+
+  const titleWrap = document.createElement("div");
+  titleWrap.className = "example-card-title";
+
+  const id = document.createElement("p");
+  id.textContent = product.productId;
+
+  const title = document.createElement("h3");
+  title.textContent = product.productName;
+
+  titleWrap.append(id, title);
+
+  const badge = document.createElement("span");
+  badge.className = `example-card-status ${statusClass(product.status)}`;
+  badge.textContent = product.status;
+
+  header.append(titleWrap, badge);
+
+  const views = document.createElement("div");
+  views.className = "example-views";
+  views.replaceChildren(...EXAMPLE_VIEWS.map((view) => createExampleView(product, view)));
+
+  const footer = document.createElement("div");
+  footer.className = "example-card-footer";
+
+  const note = document.createElement("p");
+  note.textContent = `${readableClassification(product.classification)} · canonical render evidence`;
+
+  const link = document.createElement("a");
+  link.className = "example-card-link";
+  link.href = githubTreeUrl(product.productRoot);
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  link.textContent = "この実例の証拠を見る ↗";
+  link.setAttribute("aria-label", `${product.productName} の製品ワークスペースをGitHubで開く`);
+
+  footer.append(note, link);
+  article.append(header, views, footer);
+  return article;
+}
+
+function examplePriority(product) {
+  if (product.status === "COMPLETE") return 0;
+  if (product.status === "WORKING") return 1;
+  if (product.status === "REJECTED") return 2;
+  return 3;
+}
+
+function renderExamples(products) {
+  if (!exampleGallery) return;
+
+  const examples = [...products]
+    .sort((a, b) => examplePriority(a) - examplePriority(b))
+    .slice(0, 4);
+
+  if (!examples.length) {
+    const empty = document.createElement("div");
+    empty.className = "example-gallery-empty";
+    empty.textContent = "表示できる正準製品がありません。";
+    exampleGallery.replaceChildren(empty);
+    return;
+  }
+
+  exampleGallery.replaceChildren(...examples.map(createExampleCard));
 }
 
 function createProductCard(product) {
@@ -134,6 +236,7 @@ function renderCatalog(catalog) {
   const products = Array.isArray(catalog.activeProducts) ? catalog.activeProducts : [];
   grid.replaceChildren(...products.map(createProductCard));
   renderHero(products);
+  renderExamples(products);
   renderCoverage(products);
 
   const count = Number.isFinite(catalog.configuredProductCount)
@@ -141,7 +244,7 @@ function renderCatalog(catalog) {
     : products.length;
 
   productCountNode.textContent = new Intl.NumberFormat("ja-JP").format(count);
-  statusNode.textContent = `${products.length}件を main の正準カタログから表示しています。Hero・Coverage・Catalogは同じデータを参照しています。`;
+  statusNode.textContent = `${products.length}件を main の正準カタログから表示しています。Examples・Hero・Coverage・Catalogは同じデータを参照しています。`;
 }
 
 function renderCatalogError() {
@@ -153,6 +256,12 @@ function renderCatalogError() {
   message.textContent = "表示用JSONの取得に失敗しました。製品状態はGitHubの OutfitCatalog.json で確認できます。";
   grid.replaceChildren(message);
   coverageGrid.replaceChildren();
+  if (exampleGallery) {
+    const exampleError = document.createElement("div");
+    exampleError.className = "example-gallery-empty";
+    exampleError.textContent = "実例を取得できませんでした。正準カタログを確認してください。";
+    exampleGallery.replaceChildren(exampleError);
+  }
 }
 
 async function loadCatalog() {
