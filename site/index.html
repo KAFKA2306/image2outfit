@@ -10,6 +10,7 @@
   <meta property="og:type" content="website" />
   <title>image2outfit — Reproducible Garment Pipeline</title>
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./examples.css" />
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -21,8 +22,8 @@
       <span class="brand-name">image2outfit</span>
     </a>
     <nav class="nav" aria-label="主要ナビゲーション">
+      <a href="#examples">Examples</a>
       <a href="#pipeline">Pipeline</a>
-      <a href="#coverage">Coverage</a>
       <a href="#quality">Quality</a>
       <a href="#catalog">Catalog</a>
       <a class="nav-github" href="https://github.com/KAFKA2306/image2outfit" target="_blank" rel="noreferrer">GitHub ↗</a>
@@ -38,7 +39,7 @@
           image2outfit は特定の一着を作るためのデモではありません。参照の同定、構築、編集可能ソース、FBX・Prefab、5方向・必須ポーズの実レンダリング、10軸品質診断、状態判定までを、製品ごとに同じ契約で繰り返せる衣装制作基盤です。
         </p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#pipeline">仕組みを見る</a>
+          <a class="button button-primary" href="#examples">実際の衣装を見る</a>
           <a class="button button-secondary" href="#catalog">製品一覧を見る</a>
         </div>
         <dl class="hero-stats" aria-label="プロジェクト概要">
@@ -75,6 +76,20 @@
 
     <section class="statement-band" aria-label="プロジェクト原則">
       <p><strong>Product-neutral by design.</strong> 製品固有の見た目と、共通の工程・証拠・品質判定を分離します。</p>
+    </section>
+
+    <section class="examples-section section-shell" id="examples">
+      <div class="examples-header">
+        <div class="section-heading">
+          <p class="eyebrow">REAL OUTFIT EXAMPLES</p>
+          <h2>販売ページなら、まず<br />実際の見た目が分かること。</h2>
+          <p>正準カタログの実製品から、front・three-quarter・back のレンダリングを直接表示します。単一の代表作ではなく、異なる衣装を同じビュー契約で比較できます。</p>
+        </div>
+        <p class="examples-note">
+          表示する画像はサイト用のモックではなく、各 <code>Assets/GenWorks/{product}/Previews/</code> に保存された成果物です。存在しないビューは補完せず unavailable と表示します。
+        </p>
+      </div>
+      <div class="example-gallery" id="example-gallery" aria-live="polite"></div>
     </section>
 
     <section class="section-shell section-block" id="pipeline">
@@ -149,7 +164,7 @@
       <div class="catalog-header">
         <div class="section-heading">
           <p class="eyebrow">LIVE CANONICAL CATALOG</p>
-          <h2>個別デモを並べず、<br />正準データをそのまま見せる。</h2>
+          <h2>実例から、その製品の<br />正準データへ進める。</h2>
           <p>製品名・状態・分類は <code>Assets/GenWorks/OutfitCatalog.json</code> から読み込みます。サイト専用の製品台帳は作りません。</p>
         </div>
         <a class="text-link catalog-source" href="https://github.com/KAFKA2306/image2outfit/blob/main/Assets/GenWorks/OutfitCatalog.json" target="_blank" rel="noreferrer">canonical JSON ↗</a>
