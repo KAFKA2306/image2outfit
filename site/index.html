@@ -4,12 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#f8f9ff" />
-  <meta name="description" content="image2outfit — Blender制作、FBX・Prefab、5方向・ポーズの実レンダリング、品質証拠を一つの再現可能なワークスペースで管理する衣装制作プロジェクト。" />
-  <meta property="og:title" content="image2outfit — Image to Outfit, with Evidence" />
-  <meta property="og:description" content="画像から衣装へ。完成は、見た目の証拠まで。" />
+  <meta name="description" content="image2outfit — 任意の衣装を、参照同定、Blender制作、FBX・Prefab、5方向・ポーズの実レンダリング、品質証拠まで一つの再現可能なパイプラインで扱うプロジェクト。" />
+  <meta property="og:title" content="image2outfit — Reproducible Garment Pipeline" />
+  <meta property="og:description" content="衣装が変わっても、同じ工程・同じ証拠・同じ品質契約で扱う。" />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://raw.githubusercontent.com/KAFKA2306/image2outfit/main/Assets/GenWorks/siroino-wide-cargo/Previews/front.png" />
-  <title>image2outfit — Image to Outfit, with Evidence</title>
+  <title>image2outfit — Reproducible Garment Pipeline</title>
   <link rel="stylesheet" href="./styles.css" />
   <script src="./app.js" defer></script>
 </head>
@@ -23,6 +22,7 @@
     </a>
     <nav class="nav" aria-label="主要ナビゲーション">
       <a href="#pipeline">Pipeline</a>
+      <a href="#coverage">Coverage</a>
       <a href="#quality">Quality</a>
       <a href="#catalog">Catalog</a>
       <a class="nav-github" href="https://github.com/KAFKA2306/image2outfit" target="_blank" rel="noreferrer">GitHub ↗</a>
@@ -32,14 +32,14 @@
   <main id="main">
     <section class="hero section-shell" id="top">
       <div class="hero-copy">
-        <p class="eyebrow">REPRODUCIBLE GARMENT WORKSPACE</p>
-        <h1>画像から衣装へ。<br /><span>完成は、見た目の証拠まで。</span></h1>
+        <p class="eyebrow">REPRODUCIBLE GARMENT PIPELINE</p>
+        <h1>衣装が変わっても、<br /><span>完成の定義は変えない。</span></h1>
         <p class="hero-lead">
-          image2outfit は、衣装制作を Blender の生成だけで終わらせません。編集可能ソース、FBX、宣言済み Prefab、5方向・必須ポーズの実レンダリング、品質レビューまでを、一つの再現可能なワークスペースで扱います。
+          image2outfit は特定の一着を作るためのデモではありません。参照の同定、構築、編集可能ソース、FBX・Prefab、5方向・必須ポーズの実レンダリング、10軸品質診断、状態判定までを、製品ごとに同じ契約で繰り返せる衣装制作基盤です。
         </p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#catalog">衣装を見る</a>
-          <a class="button button-secondary" href="https://github.com/KAFKA2306/image2outfit" target="_blank" rel="noreferrer">Repository ↗</a>
+          <a class="button button-primary" href="#pipeline">仕組みを見る</a>
+          <a class="button button-secondary" href="#catalog">製品一覧を見る</a>
         </div>
         <dl class="hero-stats" aria-label="プロジェクト概要">
           <div>
@@ -57,95 +57,78 @@
         </dl>
       </div>
 
-      <div class="hero-visual" aria-label="Siroino Wide Cargo のレンダリング例">
+      <div class="hero-visual" aria-label="異なる正準製品のレンダリング例">
         <div class="visual-orbit orbit-a" aria-hidden="true"></div>
         <div class="visual-orbit orbit-b" aria-hidden="true"></div>
         <figure class="render-card render-card-front">
-          <img src="https://raw.githubusercontent.com/KAFKA2306/image2outfit/main/Assets/GenWorks/siroino-wide-cargo/Previews/front.png" alt="Siroino Wide Cargo の正面レンダリング" />
-          <figcaption><span>FRONT</span><span>canonical preview</span></figcaption>
+          <img id="hero-primary-image" alt="正準製品のレンダリング" />
+          <figcaption><span id="hero-primary-name">CANONICAL PRODUCT</span><span id="hero-primary-status">catalog</span></figcaption>
         </figure>
         <figure class="render-card render-card-back">
-          <img src="https://raw.githubusercontent.com/KAFKA2306/image2outfit/main/Assets/GenWorks/siroino-wide-cargo/Previews/back.png" alt="Siroino Wide Cargo の背面レンダリング" />
-          <figcaption><span>BACK</span><span>canonical preview</span></figcaption>
+          <img id="hero-secondary-image" alt="別の正準製品のレンダリング" />
+          <figcaption><span id="hero-secondary-name">ANOTHER PRODUCT</span><span id="hero-secondary-status">same contract</span></figcaption>
         </figure>
-        <div class="evidence-chip evidence-chip-a">SHA-256 bound</div>
-        <div class="evidence-chip evidence-chip-b">direct image review</div>
+        <div class="evidence-chip evidence-chip-a">multi-product</div>
+        <div class="evidence-chip evidence-chip-b">one quality contract</div>
       </div>
     </section>
 
     <section class="statement-band" aria-label="プロジェクト原則">
-      <p><strong>Evidence over assumption.</strong> 終了コード0、ファイルの存在、CI成功だけでは「見た目が完成した」と判定しません。</p>
+      <p><strong>Product-neutral by design.</strong> 製品固有の見た目と、共通の工程・証拠・品質判定を分離します。</p>
     </section>
 
     <section class="section-shell section-block" id="pipeline">
       <div class="section-heading">
-        <p class="eyebrow">PIPELINE</p>
-        <h2>制作物ではなく、<br />再現できる工程を残す。</h2>
-        <p>正準ワークスペースの中で、制作と証拠を同じ製品IDへ束ねます。</p>
+        <p class="eyebrow">END-TO-END PIPELINE</p>
+        <h2>一着の成功例ではなく、<br />次の一着にも使える工程。</h2>
+        <p>正準ワークスペースに、入力の由来から最終判定までを同じ製品IDで束ねます。</p>
       </div>
       <ol class="pipeline-grid">
         <li class="pipeline-card">
           <span class="step-number">01</span>
-          <h3>Construct</h3>
-          <p>Blender で衣装を構築し、編集可能な制作ソースを保持します。</p>
-          <span class="mono-tag">Source/</span>
+          <h3>Identify</h3>
+          <p>参照画像と製品同定を分離し、確認できないメーカー名・SKU・商品名を推測で確定しません。</p>
+          <span class="mono-tag">identity · license</span>
         </li>
         <li class="pipeline-card">
           <span class="step-number">02</span>
-          <h3>Export</h3>
-          <p>FBX と宣言済み Prefab を正規パスへ配置し、製品ワークスペースへ固定します。</p>
-          <span class="mono-tag">Models/ · Prefab/</span>
+          <h3>Construct</h3>
+          <p>型紙・縫合・形状・マテリアルを構築し、編集可能なBlenderソースとFBX・Prefabを正準配置へ残します。</p>
+          <span class="mono-tag">Source/ · Models/ · Prefab/</span>
         </li>
         <li class="pipeline-card">
           <span class="step-number">03</span>
-          <h3>Render</h3>
-          <p>正面・背面・左・右・斜めと、必須ポーズを実レンダリングして残します。</p>
-          <span class="mono-tag">Previews/</span>
+          <h3>Evidence</h3>
+          <p>正面・背面・左右・斜めと必須ポーズを実レンダリングし、成果物と証拠をhashで結びます。</p>
+          <span class="mono-tag">Previews/ · SHA-256</span>
         </li>
         <li class="pipeline-card">
           <span class="step-number">04</span>
-          <h3>Review</h3>
-          <p>証拠の hash を照合し、実画像を直接確認したレビューだけを外観判定に使います。</p>
-          <span class="mono-tag">QualitySpec</span>
+          <h3>Decide</h3>
+          <p>10軸のQualitySpecと直接画像レビューから、WORKING・COMPLETE・REJECTEDを証拠付きで決定します。</p>
+          <span class="mono-tag">QualitySpec · lifecycle</span>
         </li>
       </ol>
     </section>
 
-    <section class="proof-section section-shell">
+    <section class="proof-section section-shell" id="coverage">
       <div class="proof-copy">
-        <p class="eyebrow">CANONICAL EVIDENCE</p>
-        <h2>同じ衣装を、<br />一方向だけで判断しない。</h2>
+        <p class="eyebrow">MULTI-PRODUCT COVERAGE</p>
+        <h2>衣装が変わっても、<br />同じ証拠契約で見る。</h2>
         <p>
-          5方向レンダリングとポーズ証拠は、衣装のシルエット、フィット、重なり、変形を別々の視点から確認するための正準成果物です。
+          Heroも検証例も単一製品へ固定しません。正準カタログから異なる製品を選び、同じfront preview・状態・製品ワークスペースという共通インターフェースで表示します。
         </p>
-        <a class="text-link" href="https://github.com/KAFKA2306/image2outfit/tree/main/Assets/GenWorks/siroino-wide-cargo/Previews" target="_blank" rel="noreferrer">実際の Previews を見る ↗</a>
+        <a class="text-link" href="https://github.com/KAFKA2306/image2outfit/tree/main/Assets/GenWorks" target="_blank" rel="noreferrer">すべての GenWorks を見る ↗</a>
       </div>
-      <div class="proof-grid">
-        <figure>
-          <img loading="lazy" src="https://raw.githubusercontent.com/KAFKA2306/image2outfit/main/Assets/GenWorks/siroino-wide-cargo/Previews/front.png" alt="Siroino Wide Cargo 正面" />
-          <figcaption>front</figcaption>
-        </figure>
-        <figure>
-          <img loading="lazy" src="https://raw.githubusercontent.com/KAFKA2306/image2outfit/main/Assets/GenWorks/siroino-wide-cargo/Previews/left.png" alt="Siroino Wide Cargo 左側面" />
-          <figcaption>left</figcaption>
-        </figure>
-        <figure>
-          <img loading="lazy" src="https://raw.githubusercontent.com/KAFKA2306/image2outfit/main/Assets/GenWorks/siroino-wide-cargo/Previews/right.png" alt="Siroino Wide Cargo 右側面" />
-          <figcaption>right</figcaption>
-        </figure>
-        <figure>
-          <img loading="lazy" src="https://raw.githubusercontent.com/KAFKA2306/image2outfit/main/Assets/GenWorks/siroino-wide-cargo/Previews/back.png" alt="Siroino Wide Cargo 背面" />
-          <figcaption>back</figcaption>
-        </figure>
-      </div>
+      <div class="proof-grid" id="coverage-grid" aria-label="複数製品の正準プレビュー"></div>
     </section>
 
     <section class="quality-section" id="quality">
       <div class="section-shell quality-layout">
         <div class="section-heading quality-heading">
           <p class="eyebrow">QUALITY SPEC</p>
-          <h2>「なんとなく良い」を、<br />10軸に分解する。</h2>
-          <p>外観レビューを単一の感想にせず、欠陥と戻り先を追跡できる品質診断へ分解します。</p>
+          <h2>衣装の種類ではなく、<br />品質の観点を固定する。</h2>
+          <p>外観レビューを単一の感想にせず、異なる衣装でも比較可能な10軸へ分解し、欠陥・証拠・戻り先を追跡します。</p>
         </div>
         <div class="axis-cloud" aria-label="QualitySpec 10軸">
           <span>topology</span>
@@ -165,9 +148,9 @@
     <section class="section-shell section-block catalog-section" id="catalog">
       <div class="catalog-header">
         <div class="section-heading">
-          <p class="eyebrow">LIVE CATALOG</p>
-          <h2>正準カタログを、そのまま公開する。</h2>
-          <p>カードの状態は <code>Assets/GenWorks/OutfitCatalog.json</code> を読み込み、main の状態と同期します。</p>
+          <p class="eyebrow">LIVE CANONICAL CATALOG</p>
+          <h2>個別デモを並べず、<br />正準データをそのまま見せる。</h2>
+          <p>製品名・状態・分類は <code>Assets/GenWorks/OutfitCatalog.json</code> から読み込みます。サイト専用の製品台帳は作りません。</p>
         </div>
         <a class="text-link catalog-source" href="https://github.com/KAFKA2306/image2outfit/blob/main/Assets/GenWorks/OutfitCatalog.json" target="_blank" rel="noreferrer">canonical JSON ↗</a>
       </div>
@@ -180,10 +163,10 @@
       <div class="boundary-card">
         <div>
           <p class="eyebrow">TRUTH BOUNDARY</p>
-          <h2>検証していないことは、<br />検証済みと書かない。</h2>
+          <h2>汎用性は、<br />未検証の互換性を意味しない。</h2>
         </div>
         <p>
-          現在の完了条件では、Unity import/save/reload、Modular Avatar／NDMF、VRChat Build & Test、VRChat runtime、人間による runtime 視覚確認はスコープ外です。サイトもこの境界を越える互換性を主張しません。
+          現在の完了条件では、Unity import/save/reload、Modular Avatar／NDMF、VRChat Build & Test、VRChat runtime、人間によるruntime視覚確認はスコープ外です。パイプラインが複数製品を扱えることと、これらのruntime互換性は別の主張として分離します。
         </p>
       </div>
     </section>
@@ -195,7 +178,7 @@
         <span class="brand-mark" aria-hidden="true">i2o</span>
         <span class="brand-name">image2outfit</span>
       </a>
-      <p>Image to outfit, with evidence.</p>
+      <p>One garment pipeline. Many products. Evidence first.</p>
     </div>
     <div class="footer-links">
       <a href="https://github.com/KAFKA2306/image2outfit" target="_blank" rel="noreferrer">GitHub</a>
