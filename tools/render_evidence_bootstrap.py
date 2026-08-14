@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import bpy
+from bpy.app.handlers import persistent
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_VERSION = 1
@@ -61,6 +62,7 @@ def install() -> None:
         )
     source_commit = _source_commit()
 
+    @persistent
     def record(scene: bpy.types.Scene, _depsgraph: object | None = None) -> None:
         output = Path(bpy.path.abspath(scene.render.filepath)).resolve()
         try:
