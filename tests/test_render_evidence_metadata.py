@@ -13,7 +13,9 @@ import audit_render_evidence_metadata as metadata_audit
 
 
 class RenderEvidenceMetadataTests(unittest.TestCase):
-    def _artifact(self, root: Path, product: str = "example", name: str = "front.png") -> Path:
+    def _artifact(
+        self, root: Path, product: str = "example", name: str = "front.png"
+    ) -> Path:
         artifact = root / f"Assets/GenWorks/{product}/Previews/{name}"
         artifact.parent.mkdir(parents=True, exist_ok=True)
         artifact.write_bytes(b"png-placeholder")
