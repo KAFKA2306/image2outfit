@@ -13,9 +13,9 @@ import audit_render_evidence_metadata as metadata_audit
 
 
 class RenderEvidenceMetadataTests(unittest.TestCase):
-    def _artifact(self, root: Path) -> Path:
-        artifact = root / "Assets/GenWorks/example/Previews/front.png"
-        artifact.parent.mkdir(parents=True)
+    def _artifact(self, root: Path, product: str = "example", name: str = "front.png") -> Path:
+        artifact = root / f"Assets/GenWorks/{product}/Previews/{name}"
+        artifact.parent.mkdir(parents=True, exist_ok=True)
         artifact.write_bytes(b"png-placeholder")
         return artifact
 
@@ -42,6 +42,11 @@ class RenderEvidenceMetadataTests(unittest.TestCase):
             },
         }
 
+    def _write_sidecar(self, artifact: Path, root: Path) -> None:
+        artifact.with_name(artifact.name + ".render.json").write_text(
+            json.dumps(self._metadata(artifact, root)), encoding="utf-8"
+        )
+
     def test_missing_sidecar_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -55,10 +60,7 @@ class RenderEvidenceMetadataTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             artifact = self._artifact(root)
-            sidecar = artifact.with_name(artifact.name + ".render.json")
-            sidecar.write_text(
-                json.dumps(self._metadata(artifact, root)), encoding="utf-8"
-            )
+            self._write_sidecar(artifact, root)
             self.assertEqual(metadata_audit.validate_sidecar(artifact, root), [])
 
     def test_camera_pose_and_generator_revision_are_required(self) -> None:
@@ -77,6 +79,23 @@ class RenderEvidenceMetadataTests(unittest.TestCase):
             self.assertTrue(any("camera.location" in item for item in errors))
             self.assertTrue(
                 any("camera.rotationEulerRadians" in item for item in errors)
+            )
+
+    def test_legacy_product_without_sidecars_is_not_backfilled(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._artifact(root, product="legacy")
+            self.assertEqual(metadata_audit.audit(root), [])
+
+    def test_migrated_product_requires_sidecars_for_every_png(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            front = self._artifact(root, product="migrated", name="front.png")
+            self._write_sidecar(front, root)
+            self._artifact(root, product="migrated", name="back.png")
+            self.assertEqual(
+                metadata_audit.audit(root),
+                ["missing render metadata: Assets/GenWorks/migrated/Previews/back.png"],
             )
 
 
