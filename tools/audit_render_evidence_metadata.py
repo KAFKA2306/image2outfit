@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail when tracked Blender render evidence lacks reproducibility metadata."""
+"""Fail when migrated Blender render evidence lacks reproducibility metadata."""
 
 from __future__ import annotations
 
@@ -84,16 +84,27 @@ def validate_sidecar(artifact: Path, root: Path) -> list[str]:
     return errors
 
 
+def migrated_preview_roots(root: Path) -> list[Path]:
+    genworks = root / "Assets" / "GenWorks"
+    if not genworks.is_dir():
+        return []
+    migrated: list[Path] = []
+    for preview_root in sorted(genworks.glob("*/Previews")):
+        if preview_root.is_dir() and any(preview_root.rglob("*.png.render.json")):
+            migrated.append(preview_root)
+    return migrated
+
+
 def audit(root: Path = ROOT) -> list[str]:
-    errors: list[str] = []
     genworks = root / "Assets" / "GenWorks"
     if not genworks.is_dir():
         return ["Assets/GenWorks is missing"]
-    artifacts = sorted(
-        path for path in genworks.glob("*/Previews/**/*.png") if path.is_file()
-    )
-    for artifact in artifacts:
-        errors.extend(validate_sidecar(artifact, root))
+
+    errors: list[str] = []
+    for preview_root in migrated_preview_roots(root):
+        artifacts = sorted(path for path in preview_root.rglob("*.png") if path.is_file())
+        for artifact in artifacts:
+            errors.extend(validate_sidecar(artifact, root))
     return errors
 
 
