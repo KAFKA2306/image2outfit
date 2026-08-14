@@ -1,0 +1,46 @@
+name: Import Issue 199 render evidence
+
+on:
+  push:
+    branches: [fix/issue-199-render-evidence-metadata]
+    paths:
+      - '.github/workflows/issue-199-import-render-evidence.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Download verified Hosted Blender artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/render-evidence
+          gh run download 31775560569 \
+            --repo "$GITHUB_REPOSITORY" \
+            --name image2outfit-hosted-siroino-wide-cargo-31775560569 \
+            --dir /tmp/render-evidence
+          test -d /tmp/render-evidence/Assets/GenWorks/siroino-wide-cargo/Previews
+      - name: Import exact rendered previews and sidecars
+        run: |
+          set -euo pipefail
+          rm -rf Assets/GenWorks/siroino-wide-cargo/Previews
+          cp -a /tmp/render-evidence/Assets/GenWorks/siroino-wide-cargo/Previews \
+            Assets/GenWorks/siroino-wide-cargo/Previews
+          test "$(find Assets/GenWorks/siroino-wide-cargo/Previews -name '*.png.render.json' -type f | wc -l)" -eq 11
+      - name: Commit imported evidence to the canonical branch
+        run: |
+          set -euo pipefail
+          git add Assets/GenWorks/siroino-wide-cargo/Previews
+          git diff --cached --quiet && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "evidence: import hosted render metadata for issue 199"
+          git push origin HEAD:fix/issue-199-render-evidence-metadata
