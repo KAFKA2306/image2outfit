@@ -13,6 +13,7 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
+import render_evidence_bootstrap  # noqa: F401,E402
 import siroino_wide_cargo_current as current
 
 
