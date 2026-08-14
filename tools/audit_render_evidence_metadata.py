@@ -102,7 +102,9 @@ def audit(root: Path = ROOT) -> list[str]:
 
     errors: list[str] = []
     for preview_root in migrated_preview_roots(root):
-        artifacts = sorted(path for path in preview_root.rglob("*.png") if path.is_file())
+        artifacts = sorted(
+            path for path in preview_root.rglob("*.png") if path.is_file()
+        )
         for artifact in artifacts:
             errors.extend(validate_sidecar(artifact, root))
     return errors
