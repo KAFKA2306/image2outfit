@@ -13,7 +13,23 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
+import render_evidence_bootstrap  # noqa: F401,E402
+import runtime_paths  # noqa: E402
 import siroino_wide_cargo_current as current
+
+
+def install_runtime_path_compat(implementation: ModuleType) -> None:
+    """Bridge the legacy builder to the centralized Git-ignored runtime layout."""
+    original_load_job = implementation.build.c.load_job
+
+    def load_job_with_runtime_paths():
+        path, job = original_load_job()
+        runtime = runtime_paths.for_job(ROOT, job)
+        resolved = dict(job)
+        resolved["artifactDir"] = runtime_paths.relative(ROOT, runtime.reports)
+        return path, resolved
+
+    implementation.build.c.load_job = load_job_with_runtime_paths
 
 
 def clear_stale_evidence(implementation: ModuleType) -> None:
@@ -216,6 +232,7 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
 
 def main() -> int:
     implementation = current
+    install_runtime_path_compat(implementation)
     clear_stale_evidence(implementation)
     baseline_audit = implementation.audit
     implementation.build_geometry = lambda segments=48: reviewed_geometry(
