@@ -9,7 +9,9 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: read
+  pull-requests: read
 
 concurrency:
   group: image2outfit-release-${{ github.repository }}
@@ -29,6 +31,18 @@ jobs:
           fetch-depth: 1
 
       - uses: arduino/setup-task@v2
+
+      - name: Verify release revision provenance
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          uv run --no-cache --locked --no-default-groups --python 3.11 python tools/release_provenance_gate.py `
+            --repository "${{ github.repository }}" `
+            --ref "${{ github.ref }}" `
+            --sha "${{ github.sha }}" `
+            --default-branch main `
+            --output .image2outfit/release-provenance.json
 
       - name: Validate release request
         shell: pwsh
@@ -67,6 +81,7 @@ jobs:
         with:
           name: image2outfit-release-${{ env.JOB_ID }}-${{ github.run_id }}
           path: |
+            .image2outfit/release-provenance.json
             ${{ env.REPORT_DIR }}/audit.json
             ${{ env.RELEASE_DIR }}
           if-no-files-found: error
