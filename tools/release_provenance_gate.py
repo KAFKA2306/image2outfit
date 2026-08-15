@@ -111,7 +111,9 @@ def github_json(url: str, token: str) -> Any:
         return json.load(response)
 
 
-def collect_receipt(repository: str, release_ref: str, release_sha: str, default_branch: str, token: str) -> dict[str, Any]:
+def collect_receipt(
+    repository: str, release_ref: str, release_sha: str, default_branch: str, token: str
+) -> dict[str, Any]:
     base = f"https://api.github.com/repos/{repository}"
     pulls = github_json(f"{base}/commits/{release_sha}/pulls?per_page=100", token)
 
@@ -125,8 +127,12 @@ def collect_receipt(repository: str, release_ref: str, release_sha: str, default
     ]
     runs: list[dict[str, Any]] = []
     for head_sha in sorted(set(head_shas)):
-        query = urllib.parse.urlencode({"event": "pull_request", "head_sha": head_sha, "per_page": 100})
-        payload = github_json(f"{base}/actions/workflows/{POLICY_WORKFLOW}/runs?{query}", token)
+        query = urllib.parse.urlencode(
+            {"event": "pull_request", "head_sha": head_sha, "per_page": 100}
+        )
+        payload = github_json(
+            f"{base}/actions/workflows/{POLICY_WORKFLOW}/runs?{query}", token
+        )
         runs.extend(payload.get("workflow_runs", []))
 
     return evaluate_release_provenance(
@@ -139,7 +145,9 @@ def collect_receipt(repository: str, release_ref: str, release_sha: str, default
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Fail closed unless a release revision came through a reviewed PR with successful policy CI.")
+    parser = argparse.ArgumentParser(
+        description="Fail closed unless a release revision came through a reviewed PR with successful policy CI."
+    )
     parser.add_argument("--repository", required=True)
     parser.add_argument("--ref", required=True, dest="release_ref")
     parser.add_argument("--sha", required=True, dest="release_sha")
@@ -159,7 +167,9 @@ def main() -> int:
         token=token,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.write_text(
+        json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(json.dumps(receipt, ensure_ascii=False, sort_keys=True))
     if receipt["state"] != "VERIFIED":
         raise SystemExit(f"release provenance blocked: {receipt['failure_class']}")
