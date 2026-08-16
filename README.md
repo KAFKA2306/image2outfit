@@ -121,22 +121,3 @@ task check:python
 ```
 
 `task candidate` はBlender生成、成果物整合、必須画像、研究記録を検証します。UnityやVRChatの実行環境を要求してはいけません。
-
-## GitHub Actions境界
-
-検証workflowは原則として読み取り専用権限を使います。
-
-```yaml
-permissions:
-  contents: read
-```
-
-ブランチ整理など、明示された保守workflowだけが最小限の書き込み権限を持ちます。
-
-## 状態
-
-- `WORKING`: 再開可能だが、レンダリングまたは見た目の完了ゲートが残る
-- `COMPLETE`: 必須レンダリングと見た目レビューを含む全スコープ内ゲートを通過
-- `REJECTED`: 問題と再開地点を保持した却下結果
-
-Unity／VRChat関連の結果は状態遷移に使用しません。
