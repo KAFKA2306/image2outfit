@@ -31,12 +31,14 @@ def is_previous(name: str, stable_name: str) -> bool:
     if name == stable_name:
         return True
     prefix = stable_name + "-"
-    return name.startswith(prefix) and bool(LEGACY_RUN_SUFFIX.fullmatch(name[len(prefix) :]))
+    return name.startswith(prefix) and bool(
+        LEGACY_RUN_SUFFIX.fullmatch(name[len(prefix) :])
+    )
 
 
-def delete_previous(stable_name: str, repository: str, token: str) -> int:
+def list_artifacts(repository: str, token: str) -> list[dict[str, object]]:
     owner, repo = repository.split("/", 1)
-    deleted = 0
+    artifacts: list[dict[str, object]] = []
     page = 1
     while True:
         payload = request(
@@ -45,19 +47,28 @@ def delete_previous(stable_name: str, repository: str, token: str) -> int:
             token,
         )
         assert isinstance(payload, dict)
-        artifacts = payload.get("artifacts", [])
-        for artifact in artifacts:
-            if is_previous(str(artifact.get("name", "")), stable_name):
-                request(
-                    "DELETE",
-                    f"{API}/repos/{owner}/{repo}/actions/artifacts/{artifact['id']}",
-                    token,
-                )
-                deleted += 1
-        if len(artifacts) < 100:
-            break
+        batch = payload.get("artifacts", [])
+        assert isinstance(batch, list)
+        artifacts.extend(item for item in batch if isinstance(item, dict))
+        if len(batch) < 100:
+            return artifacts
         page += 1
-    return deleted
+
+
+def delete_previous(stable_name: str, repository: str, token: str) -> int:
+    owner, repo = repository.split("/", 1)
+    previous = [
+        artifact
+        for artifact in list_artifacts(repository, token)
+        if is_previous(str(artifact.get("name", "")), stable_name)
+    ]
+    for artifact in previous:
+        request(
+            "DELETE",
+            f"{API}/repos/{owner}/{repo}/actions/artifacts/{artifact['id']}",
+            token,
+        )
+    return len(previous)
 
 
 def main() -> int:
