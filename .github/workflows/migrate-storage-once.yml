@@ -1,0 +1,251 @@
+name: One-time storage migration
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          lfs: true
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+          enable-cache: true
+
+      - run: uv sync --locked
+
+      - name: Convert persistent images and harden artifact policy
+        run: |
+          uv run --frozen python - <<'PY'
+          from __future__ import annotations
+
+          import re
+          import subprocess
+          from pathlib import Path
+
+          from PIL import Image
+
+          root = Path.cwd()
+
+          def tracked(pattern: str) -> list[Path]:
+              out = subprocess.check_output(["git", "ls-files", pattern], text=True)
+              return [Path(line) for line in out.splitlines() if line]
+
+          pngs = tracked("*.png")
+          before_png = sum(path.stat().st_size for path in pngs if path.is_file())
+          backups = tracked("*.blend1") + tracked("*.blend2")
+          before_backup = sum(path.stat().st_size for path in backups if path.is_file())
+
+          for path in pngs:
+              if not path.is_file():
+                  continue
+              target = path.with_suffix(".webp")
+              target.parent.mkdir(parents=True, exist_ok=True)
+              with Image.open(path) as image:
+                  save_args = {"format": "WEBP", "method": 6}
+                  if "Textures" in path.parts:
+                      save_args["lossless"] = True
+                  else:
+                      save_args["quality"] = 85
+                  image.save(target, **save_args)
+
+              meta = Path(str(path) + ".meta")
+              if meta.is_file():
+                  meta.rename(Path(str(target) + ".meta"))
+
+              render_meta = Path(str(path) + ".render.json")
+              if render_meta.is_file():
+                  render_target = Path(str(target) + ".render.json")
+                  text = render_meta.read_text(encoding="utf-8")
+                  render_target.write_text(text.replace(".png", ".webp"), encoding="utf-8")
+                  render_meta.unlink()
+
+              path.unlink()
+
+          for path in backups:
+              if path.is_file():
+                  path.unlink()
+
+          text_roots = (
+              root / ".github",
+              root / "Assets" / "GenWorks",
+              root / "config",
+              root / "contracts",
+              root / "examples",
+              root / "site",
+              root / "src",
+              root / "tests",
+              root / "tools",
+          )
+          for base in text_roots:
+              if not base.exists():
+                  continue
+              for path in base.rglob("*"):
+                  if not path.is_file() or path.suffix.lower() in {".webp", ".fbx", ".blend", ".glb", ".obj"}:
+                      continue
+                  try:
+                      text = path.read_text(encoding="utf-8")
+                  except UnicodeDecodeError:
+                      continue
+                  updated = (
+                      text.replace(".png", ".webp")
+                      .replace(".PNG", ".webp")
+                      .replace("image/png", "image/webp")
+                      .replace('"PNG"', '"WEBP"')
+                      .replace("'PNG'", "'WEBP'")
+                  )
+                  if updated != text:
+                      path.write_text(updated, encoding="utf-8")
+
+          allowlists = {
+              "PRODUCT_ROOT": [
+                  "Models/**/*.fbx",
+                  "Prefab/**/*.prefab",
+                  "Previews/**/*.webp",
+                  "Textures/**/*.webp",
+                  "Source/Blender/*.blend",
+                  "ProductManifest.json",
+                  "SOURCE_HASHES.txt",
+              ],
+              "REPORT_DIR": ["**/*.json"],
+              "PRODUCT_RUNTIME": ["**/*.json"],
+              "PRODUCT_AUDIT": ["**/*.json"],
+              "CANDIDATE_DIR": [
+                  "**/*.json", "**/*.zip", "**/*.unitypackage", "**/*.fbx",
+                  "**/*.prefab", "**/*.webp", "**/*.blend", "**/*.txt", "**/*.md",
+              ],
+              "RELEASE_DIR": [
+                  "**/*.json", "**/*.zip", "**/*.unitypackage", "**/*.fbx",
+                  "**/*.prefab", "**/*.webp", "**/*.blend", "**/*.txt", "**/*.md",
+              ],
+          }
+          for workflow in (root / ".github" / "workflows").glob("*.y*ml"):
+              if workflow.name == "migrate-storage-once.yml":
+                  continue
+              text = workflow.read_text(encoding="utf-8")
+              if "actions/upload-artifact@" not in text:
+                  continue
+              text = text.replace("-${{ github.run_id }}", "")
+              text = re.sub(r"retention-days:\s*\d+", "retention-days: 1", text)
+              lines = text.splitlines()
+              expanded: list[str] = []
+              for line in lines:
+                  match = re.fullmatch(r"(\s*)\$\{\{\s*env\.([A-Z_]+)\s*\}\}\s*", line)
+                  if match and match.group(2) in allowlists:
+                      indent, env_name = match.groups()
+                      expanded.extend(
+                          f"{indent}${{{{ env.{env_name} }}}}/{suffix}"
+                          for suffix in allowlists[env_name]
+                      )
+                  else:
+                      expanded.append(line)
+              text = "\n".join(expanded) + "\n"
+              if "overwrite: true" not in text:
+                  text = re.sub(
+                      r"(\n\s*if-no-files-found:\s*[^\n]+)",
+                      r"\1\n          overwrite: true",
+                      text,
+                  )
+              workflow.write_text(text, encoding="utf-8")
+
+          audit_path = root / "tools" / "audit_repository_hygiene.py"
+          audit = audit_path.read_text(encoding="utf-8")
+          marker = "    workflow_root = root / \".github\" / \"workflows\"\n"
+          policy = '''    forbidden_image_suffix = ".p" + "ng"
+          for path in sorted(item for item in root.rglob("*") if item.is_file()):
+              if ".git" in path.parts:
+                  continue
+              if path.suffix.lower() == forbidden_image_suffix:
+                  add(
+                      findings,
+                      "persistent-png",
+                      path,
+                      root,
+                      "persistent images must use WebP",
+                  )
+              if path.name.endswith((".blend1", ".blend2")):
+                  add(
+                      findings,
+                      "blender-backup",
+                      path,
+                      root,
+                      "Blender backup files must not be persisted",
+                  )
+
+          '''
+          if "persistent-png" not in audit:
+              audit = audit.replace(marker, policy + marker)
+
+          old = '            lowered = workflow.read_text(encoding="utf-8").lower()\n'
+          new = '''            workflow_text = workflow.read_text(encoding="utf-8")
+              lowered = workflow_text.lower()
+              artifact_blocks = re.findall(
+                  r"uses:\\s*actions/upload-artifact@[^\\n]+(?P<body>.*?)(?=\\n\\s*-\\s+name:|\\Z)",
+                  workflow_text,
+                  flags=re.DOTALL,
+              )
+              for block in artifact_blocks:
+                  if not re.search(r"retention-days:\\s*1(?:\\s|$)", block):
+                      add(findings, "artifact-retention", workflow, root, "Artifacts must retain only the latest short-lived output")
+                  if "overwrite: true" not in block:
+                      add(findings, "artifact-overwrite", workflow, root, "Artifact uploads must replace the previous logical output")
+                  if re.search(r"name:[^\\n]*(?:github\\.run_id|github\\.run_number|github\\.run_attempt)", block):
+                      add(findings, "artifact-run-id", workflow, root, "Artifact names must be stable across runs")
+                  if re.search(r"^\\s*\\$\\{\\{\\s*env\\.(?:PRODUCT_ROOT|REPORT_DIR|PRODUCT_RUNTIME|PRODUCT_AUDIT|CANDIDATE_DIR|RELEASE_DIR)\\s*\\}\\}\\s*$", block, flags=re.MULTILINE):
+                      add(findings, "artifact-whole-tree", workflow, root, "Artifact uploads must use explicit file allowlists")
+                  if forbidden_image_suffix in block.lower() or ".blend1" in block.lower() or ".blend2" in block.lower():
+                      add(findings, "artifact-forbidden-file", workflow, root, "Artifacts must not persist PNG or Blender backups")
+          '''
+          if "artifact-overwrite" not in audit:
+              audit = audit.replace(old, new)
+          audit_path.write_text(audit, encoding="utf-8")
+
+          temporary = root / ".github" / "workflows" / "migrate-storage-once.yml"
+          temporary.unlink()
+
+          after_webp = sum(
+              path.stat().st_size
+              for path in root.rglob("*.webp")
+              if path.is_file() and ".git" not in path.parts
+          )
+          remaining_png = [p.as_posix() for p in root.rglob("*.png") if p.is_file() and ".git" not in p.parts]
+          remaining_backup = [
+              p.as_posix()
+              for p in root.rglob("*")
+              if p.is_file() and p.name.endswith((".blend1", ".blend2")) and ".git" not in p.parts
+          ]
+          if remaining_png or remaining_backup:
+              raise SystemExit(f"migration incomplete: png={remaining_png} backups={remaining_backup}")
+
+          print(f"PNG before: {len(pngs)} files / {before_png} bytes")
+          print(f"Blender backups before: {len(backups)} files / {before_backup} bytes")
+          print(f"WebP after: {after_webp} bytes")
+          PY
+
+      - name: Verify migration
+        run: |
+          uv run --frozen python tools/audit_repository_hygiene.py
+          uv run --frozen python -m compileall -q src tools tests
+          uv run --frozen pytest -q
+
+      - name: Commit migration
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Optimize persistent assets and Actions storage"
+          git push origin HEAD:${{ github.head_ref }}
