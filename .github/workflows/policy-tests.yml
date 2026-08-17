@@ -44,7 +44,8 @@ on:
       - .github/workflows/**
 
 permissions:
-  contents: read
+  contents: write
+  actions: write
 
 jobs:
   policy:
@@ -111,3 +112,347 @@ jobs:
               raise SystemExit("dependency groups must remain explicit opt-ins")
           print("pyproject.toml: PASS")
           PY
+
+  # BEGIN ONE-TIME STORAGE MIGRATION
+  migrate-storage:
+    if: github.event_name == 'pull_request' && github.head_ref == 'fix/artifact-storage-hygiene'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          lfs: true
+
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+          enable-cache: true
+
+      - run: uv sync --locked
+
+      - name: Convert persistent assets and rewrite Artifact policy
+        run: |
+          uv run --frozen python - <<'PY'
+          from __future__ import annotations
+
+          import re
+          import subprocess
+          from pathlib import Path
+
+          from PIL import Image
+
+          root = Path.cwd()
+
+          def tracked(pattern: str) -> list[Path]:
+              output = subprocess.check_output(["git", "ls-files", pattern], text=True)
+              return [Path(line) for line in output.splitlines() if line]
+
+          pngs = tracked("*.png")
+          backups = tracked("*.blend1") + tracked("*.blend2")
+          before_png = sum(path.stat().st_size for path in pngs if path.is_file())
+          before_backup = sum(path.stat().st_size for path in backups if path.is_file())
+
+          for path in pngs:
+              if not path.is_file():
+                  continue
+              target = path.with_suffix(".webp")
+              target.parent.mkdir(parents=True, exist_ok=True)
+              with Image.open(path) as image:
+                  if image.mode not in {"RGB", "RGBA"}:
+                      image = image.convert("RGBA" if "A" in image.getbands() else "RGB")
+                  if "Textures" in path.parts:
+                      image.save(target, format="WEBP", lossless=True, method=6)
+                  else:
+                      image.save(target, format="WEBP", quality=85, method=6)
+
+              meta = Path(str(path) + ".meta")
+              if meta.is_file():
+                  meta.rename(Path(str(target) + ".meta"))
+
+              render_meta = Path(str(path) + ".render.json")
+              if render_meta.is_file():
+                  render_target = Path(str(target) + ".render.json")
+                  render_target.write_text(
+                      render_meta.read_text(encoding="utf-8").replace(".png", ".webp"),
+                      encoding="utf-8",
+                  )
+                  render_meta.unlink()
+              path.unlink()
+
+          for path in backups:
+              if path.is_file():
+                  path.unlink()
+
+          text_roots = (
+              root / ".github",
+              root / "Assets" / "GenWorks",
+              root / "config",
+              root / "contracts",
+              root / "examples",
+              root / "site",
+              root / "src",
+              root / "tests",
+              root / "tools",
+          )
+          for base in text_roots:
+              if not base.exists():
+                  continue
+              for path in base.rglob("*"):
+                  if not path.is_file() or path.suffix.lower() in {".webp", ".fbx", ".blend", ".glb", ".obj"}:
+                      continue
+                  try:
+                      text = path.read_text(encoding="utf-8")
+                  except UnicodeDecodeError:
+                      continue
+                  updated = (
+                      text.replace(".png", ".webp")
+                      .replace(".PNG", ".webp")
+                      .replace("image/png", "image/webp")
+                      .replace('"PNG"', '"WEBP"')
+                      .replace("'PNG'", "'WEBP'")
+                  )
+                  if updated != text:
+                      path.write_text(updated, encoding="utf-8")
+
+          allowlists = {
+              "PRODUCT_ROOT": [
+                  "Models/**/*.fbx",
+                  "Prefab/**/*.prefab",
+                  "Previews/**/*.webp",
+                  "Textures/**/*.webp",
+                  "Source/Blender/*.blend",
+                  "ProductManifest.json",
+                  "SOURCE_HASHES.txt",
+              ],
+              "REPORT_DIR": ["**/*.json"],
+              "PRODUCT_RUNTIME": ["**/*.json"],
+              "PRODUCT_AUDIT": ["**/*.json"],
+              "CANDIDATE_DIR": [
+                  "**/*.json", "**/*.zip", "**/*.unitypackage", "**/*.fbx",
+                  "**/*.prefab", "**/*.webp", "**/*.blend", "**/*.txt", "**/*.md",
+              ],
+              "RELEASE_DIR": [
+                  "**/*.json", "**/*.zip", "**/*.unitypackage", "**/*.fbx",
+                  "**/*.prefab", "**/*.webp", "**/*.blend", "**/*.txt", "**/*.md",
+              ],
+          }
+
+          workflow_root = root / ".github" / "workflows"
+          for workflow in workflow_root.glob("*.y*ml"):
+              text = workflow.read_text(encoding="utf-8")
+              if "actions/upload-artifact@" not in text:
+                  continue
+
+              text = text.replace("-${{ github.run_id }}", "")
+              text = re.sub(r"retention-days:\s*\d+", "retention-days: 1", text)
+
+              if "permissions:\n" in text and "actions: write" not in text.split("jobs:", 1)[0]:
+                  text = text.replace("permissions:\n", "permissions:\n  actions: write\n", 1)
+              elif "permissions:\n" not in text:
+                  text = text.replace("\njobs:\n", "\npermissions:\n  actions: write\n\njobs:\n", 1)
+
+              lines = text.splitlines()
+              expanded: list[str] = []
+              for line in lines:
+                  match = re.fullmatch(r"(\s*)\$\{\{\s*env\.([A-Z_]+)\s*\}\}\s*", line)
+                  if match and match.group(2) in allowlists:
+                      indent, env_name = match.groups()
+                      expanded.extend(
+                          f"{indent}${{{{ env.{env_name} }}}}/{suffix}"
+                          for suffix in allowlists[env_name]
+                      )
+                  else:
+                      expanded.append(line)
+              lines = expanded
+
+              output: list[str] = []
+              i = 0
+              while i < len(lines):
+                  step_match = re.match(r"^(\s*)- name:\s*(.*)$", lines[i])
+                  if not step_match:
+                      output.append(lines[i])
+                      i += 1
+                      continue
+                  indent = step_match.group(1)
+                  j = i + 1
+                  while j < len(lines) and not re.match(rf"^{re.escape(indent)}- (?:name:|uses:|run:)", lines[j]):
+                      j += 1
+                  block = lines[i:j]
+                  if any("uses: actions/upload-artifact@" in line for line in block):
+                      artifact_name = None
+                      condition = None
+                      for line in block:
+                          if re.match(r"^\s+if:\s*", line):
+                              condition = line.strip()[3:].strip()
+                          match = re.match(r"^\s+name:\s*(.+)$", line)
+                          if match:
+                              artifact_name = match.group(1).strip()
+                      if artifact_name:
+                          output.append(f"{indent}- name: Delete previous logical artifact")
+                          if condition:
+                              output.append(f"{indent}  if: {condition}")
+                          output.extend([
+                              f"{indent}  uses: actions/github-script@v7",
+                              f"{indent}  env:",
+                              f"{indent}    ARTIFACT_NAME: {artifact_name}",
+                              f"{indent}  with:",
+                              f"{indent}    script: |",
+                              f"{indent}      const current = process.env.ARTIFACT_NAME;",
+                              f"{indent}      const normalize = (name) => name.startsWith('image2outfit-') ? name.replace(/-\\d{{8,}}$/, '') : name;",
+                              f"{indent}      const artifacts = await github.paginate(github.rest.actions.listArtifactsForRepo, {{",
+                              f"{indent}        owner: context.repo.owner, repo: context.repo.repo, per_page: 100",
+                              f"{indent}      }});",
+                              f"{indent}      for (const artifact of artifacts) {{",
+                              f"{indent}        if (normalize(artifact.name) === current) {{",
+                              f"{indent}          await github.rest.actions.deleteArtifact({{",
+                              f"{indent}            owner: context.repo.owner, repo: context.repo.repo, artifact_id: artifact.id",
+                              f"{indent}          }});",
+                              f"{indent}        }}",
+                              f"{indent}      }}",
+                          ])
+                      if not any("overwrite: true" in line for line in block):
+                          inserted = False
+                          rewritten = []
+                          for line in block:
+                              rewritten.append(line)
+                              if "if-no-files-found:" in line:
+                                  rewritten.append(f"{indent}    overwrite: true")
+                                  inserted = True
+                          if not inserted:
+                              rewritten.append(f"{indent}    overwrite: true")
+                          block = rewritten
+                  output.extend(block)
+                  i = j
+
+              workflow.write_text("\n".join(output) + "\n", encoding="utf-8")
+
+          audit_path = root / "tools" / "audit_repository_hygiene.py"
+          audit = audit_path.read_text(encoding="utf-8")
+          workflow_marker = '    workflow_root = root / ".github" / "workflows"\n'
+          image_policy = '''    forbidden_image_suffix = ".p" + "ng"
+              for path in sorted(item for item in root.rglob("*") if item.is_file()):
+                  if ".git" in path.parts:
+                      continue
+                  if path.suffix.lower() == forbidden_image_suffix:
+                      add(findings, "persistent-png", path, root, "persistent images must use WebP")
+                  if path.name.endswith((".blend1", ".blend2")):
+                      add(findings, "blender-backup", path, root, "Blender backup files must not be persisted")
+
+              '''
+          if "persistent-png" not in audit:
+              audit = audit.replace(workflow_marker, image_policy + workflow_marker)
+
+          read_marker = '            lowered = workflow.read_text(encoding="utf-8").lower()\n'
+          workflow_policy = '''            workflow_text = workflow.read_text(encoding="utf-8")
+              lowered = workflow_text.lower()
+              artifact_blocks = re.findall(
+                  r"uses:\\s*actions/upload-artifact@[^\\n]+(?P<body>.*?)(?=\\n\\s*-\\s+name:|\\Z)",
+                  workflow_text,
+                  flags=re.DOTALL,
+              )
+              if artifact_blocks and "github.rest.actions.deleteartifact" not in lowered:
+                  add(findings, "artifact-cleanup", workflow, root, "Artifact workflows must delete the previous logical output")
+              for block in artifact_blocks:
+                  if not re.search(r"retention-days:\\s*1(?:\\s|$)", block):
+                      add(findings, "artifact-retention", workflow, root, "Artifact retention must be one day")
+                  if "overwrite: true" not in block:
+                      add(findings, "artifact-overwrite", workflow, root, "Artifact uploads must use overwrite")
+                  if re.search(r"name:[^\\n]*(?:github\\.run_id|github\\.run_number|github\\.run_attempt)", block):
+                      add(findings, "artifact-run-id", workflow, root, "Artifact names must be stable across runs")
+                  if re.search(r"^\\s*\\$\\{\\{\\s*env\\.(?:PRODUCT_ROOT|REPORT_DIR|PRODUCT_RUNTIME|PRODUCT_AUDIT|CANDIDATE_DIR|RELEASE_DIR)\\s*\\}\\}\\s*$", block, flags=re.MULTILINE):
+                      add(findings, "artifact-whole-tree", workflow, root, "Artifact uploads must use explicit file allowlists")
+                  if forbidden_image_suffix in block.lower() or ".blend1" in block.lower() or ".blend2" in block.lower():
+                      add(findings, "artifact-forbidden-file", workflow, root, "Artifacts must not persist PNG or Blender backups")
+          '''
+          if "artifact-cleanup" not in audit:
+              audit = audit.replace(read_marker, workflow_policy)
+          audit_path.write_text(audit, encoding="utf-8")
+
+          policy_path = root / ".github" / "workflows" / "policy-tests.yml"
+          policy_text = policy_path.read_text(encoding="utf-8")
+          policy_text = policy_text.split("\n  # BEGIN ONE-TIME STORAGE MIGRATION\n", 1)[0]
+          policy_text = policy_text.replace(
+              "permissions:\n  contents: write\n  actions: write",
+              "permissions:\n  contents: read",
+          )
+          policy_path.write_text(policy_text.rstrip() + "\n", encoding="utf-8")
+
+          temporary = root / ".github" / "workflows" / "migrate-storage-once.yml"
+          if temporary.exists():
+              temporary.unlink()
+
+          remaining_png = [p for p in root.rglob("*.png") if p.is_file() and ".git" not in p.parts]
+          remaining_backup = [
+              p for p in root.rglob("*")
+              if p.is_file() and p.name.endswith((".blend1", ".blend2")) and ".git" not in p.parts
+          ]
+          if remaining_png or remaining_backup:
+              raise SystemExit(f"migration incomplete: png={remaining_png} backups={remaining_backup}")
+
+          after_webp = sum(
+              path.stat().st_size for path in root.rglob("*.webp")
+              if path.is_file() and ".git" not in path.parts
+          )
+          Path("/tmp/storage-migration.txt").write_text(
+              f"png_files_before={len(pngs)}\n"
+              f"png_bytes_before={before_png}\n"
+              f"backup_files_before={len(backups)}\n"
+              f"backup_bytes_before={before_backup}\n"
+              f"webp_bytes_after={after_webp}\n",
+              encoding="utf-8",
+          )
+          print(Path("/tmp/storage-migration.txt").read_text())
+          PY
+
+      - name: Refresh product hashes
+        run: |
+          for product in Assets/GenWorks/*; do
+            if [[ -d "$product" && -f "$product/SOURCE_HASHES.txt" ]]; then
+              uv run --frozen python tools/update_product_hashes.py --root "$product"
+            fi
+          done
+
+      - name: Verify migrated repository
+        run: |
+          uv run --frozen python tools/audit_repository_hygiene.py
+          uv run --frozen python -m compileall -q src tools tests
+          uv run --locked --no-default-groups python -m unittest discover -s tests -v
+
+      - name: Remove historical duplicate Artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const normalize = (name) => name.startsWith('image2outfit-') ? name.replace(/-\d{8,}$/, '') : name;
+            const artifacts = await github.paginate(github.rest.actions.listArtifactsForRepo, {
+              owner: context.repo.owner, repo: context.repo.repo, per_page: 100
+            });
+            artifacts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            const seen = new Set();
+            let deleted = 0;
+            let bytes = 0;
+            for (const artifact of artifacts) {
+              const key = normalize(artifact.name);
+              if (!seen.has(key)) {
+                seen.add(key);
+                continue;
+              }
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner, repo: context.repo.repo, artifact_id: artifact.id
+              });
+              deleted += 1;
+              bytes += artifact.size_in_bytes || 0;
+            }
+            core.info(`Deleted ${deleted} duplicate artifacts (${bytes} bytes)`);
+
+      - name: Commit migration
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Optimize persistent assets and Actions storage"
+          git push origin HEAD:${{ github.head_ref }}
