@@ -12,6 +12,8 @@ on:
       - "tests/test_review_console_v2.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
+      - "Assets/GenWorks/**/ProductManifest.json"
+      - "Assets/GenWorks/**/Previews/**"
   push:
     branches:
       - main
@@ -24,6 +26,8 @@ on:
       - "tests/test_review_console_v2.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
+      - "Assets/GenWorks/**/ProductManifest.json"
+      - "Assets/GenWorks/**/Previews/**"
 
 permissions:
   contents: read
@@ -51,3 +55,68 @@ jobs:
 
       - name: Run focused fixture tests
         run: python -m unittest discover -s tests -p "test_review_console_v2.py" -v
+
+      - name: Build public review console
+        run: |
+          python tools/review_console.py --output .
+          python - <<'PY'
+          import json
+          import shutil
+          from pathlib import Path
+
+          root = Path.cwd().resolve()
+          site = root / "_site"
+          site.mkdir(exist_ok=True)
+          for name in ("index.html", "review-console.json"):
+              shutil.copy2(root / name, site / name)
+
+          data = json.loads((root / "review-console.json").read_text(encoding="utf-8"))
+          products = data.get("products", [])
+          if not products:
+              raise SystemExit("review console contains no products")
+
+          hrefs = set()
+          for product in products:
+              hrefs.add(product["manifest_href"])
+              for key in ("assets", "gates", "evidence"):
+                  for item in product.get(key, []):
+                      href = item.get("href")
+                      if href and not href.startswith(("https://", "http://")):
+                          hrefs.add(href)
+
+          copied = 0
+          for href in sorted(hrefs):
+              source = (root / href).resolve()
+              if source != root and root not in source.parents:
+                  raise SystemExit(f"local review link escapes repository: {href}")
+              if not source.is_file():
+                  raise SystemExit(f"local review link is missing: {href}")
+              destination = site / href
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(source, destination)
+              copied += 1
+
+          print(f"pages_products={len(products)} linked_files={copied}")
+          PY
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
