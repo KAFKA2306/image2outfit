@@ -30,7 +30,11 @@ class ArtifactStoragePolicyTests(unittest.TestCase):
                 continue
             checked += len(blocks)
             self.assertIn("actions: write", text, workflow)
-            self.assertIn("tools/delete_previous_artifacts.py", text, workflow)
+            self.assertTrue(
+                "tools/delete_previous_artifacts.py" in text
+                or "github.rest.actions.deleteArtifact" in text,
+                workflow,
+            )
             for block in blocks:
                 self.assertRegex(block, r"retention-days:\s*1(?:\s|$)", workflow)
                 self.assertIn("overwrite: true", block, workflow)
