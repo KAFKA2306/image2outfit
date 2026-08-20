@@ -5,7 +5,9 @@ from tools.delete_previous_artifacts import is_previous
 
 class ArtifactReplacementTests(unittest.TestCase):
     def test_current_name_matches(self) -> None:
-        self.assertTrue(is_previous("image2outfit-hosted-demo", "image2outfit-hosted-demo"))
+        self.assertTrue(
+            is_previous("image2outfit-hosted-demo", "image2outfit-hosted-demo")
+        )
 
     def test_legacy_run_suffix_matches(self) -> None:
         self.assertTrue(
