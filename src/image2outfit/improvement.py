@@ -5,6 +5,7 @@ controlled method experiments, measured adoption decisions, and append-only
 product history. It does not own product completion state or a second quality
 score.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
@@ -202,8 +203,7 @@ def load_research_index(root: Path) -> dict[str, Any]:
             "license": license_info.get("declaredLicense"),
             "licenseStatus": (
                 "VERIFIED"
-                if license_info.get("declaredLicense")
-                not in {None, "", "UNVERIFIED"}
+                if license_info.get("declaredLicense") not in {None, "", "UNVERIFIED"}
                 else "UNVERIFIED"
             ),
             "implementationImplications": assessment.get(
@@ -353,8 +353,12 @@ def validate_research_result(value: Mapping[str, Any]) -> dict[str, Any]:
         if not isinstance(name, str) or not name:
             errors.append(f"candidates[{index}].canonicalName")
             continue
-        if not isinstance(urls, list) or not urls or not all(
-            isinstance(url, str) and url.startswith("https://") for url in urls
+        if (
+            not isinstance(urls, list)
+            or not urls
+            or not all(
+                isinstance(url, str) and url.startswith("https://") for url in urls
+            )
         ):
             errors.append(f"candidates[{index}].primaryUrls")
         if not isinstance(checked, str) or not checked:
@@ -371,9 +375,7 @@ def validate_research_result(value: Mapping[str, Any]) -> dict[str, Any]:
                 **item,
                 "licenseStatus": license_status,
                 "verified": (
-                    bool(urls)
-                    and bool(checked)
-                    and license_status != "UNVERIFIED"
+                    bool(urls) and bool(checked) and license_status != "UNVERIFIED"
                 ),
             }
         )
@@ -530,9 +532,7 @@ def run_experiment_method(
             result_error = str(exc)
     status = (
         "PASS"
-        if return_code == 0
-        and not timed_out
-        and result.get("status") == "PASS"
+        if return_code == 0 and not timed_out and result.get("status") == "PASS"
         else "FAIL"
     )
     record = {
@@ -585,11 +585,7 @@ def aggregate_experiment_results(
         "productId": manifest.get("productId"),
         "capability": manifest.get("capability"),
         "baseline": next(
-            (
-                row
-                for row in rows
-                if roles.get(str(row.get("methodId"))) == "baseline"
-            ),
+            (row for row in rows if roles.get(str(row.get("methodId"))) == "baseline"),
             None,
         ),
         "methods": rows,
@@ -684,9 +680,7 @@ def prior_method_evidence(
         if record.get("missingCapability") != capability_id:
             continue
         context = (
-            record.get("context")
-            if isinstance(record.get("context"), dict)
-            else {}
+            record.get("context") if isinstance(record.get("context"), dict) else {}
         )
         if defect_class and context.get("defectClass") not in {None, defect_class}:
             continue
@@ -799,9 +793,7 @@ def plan_improvement(
         action = "REUSE_MEASURED_METHOD"
         request = None
     else:
-        rejected = {
-            candidate_method_key(item) for item in prior["rejected"]
-        }
+        rejected = {candidate_method_key(item) for item in prior["rejected"]}
         candidates = existing_candidates(
             load_research_index(root),
             capability_id,
