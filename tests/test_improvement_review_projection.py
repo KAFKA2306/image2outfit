@@ -53,16 +53,10 @@ class ImprovementReviewProjectionTests(unittest.TestCase):
                 "IMPLEMENT_EXPERIMENT_BINDING",
             )
             self.assertTrue(
-                any(
-                    row["severity"] == "IMPROVEMENT"
-                    for row in projected.blockers
-                )
+                any(row["severity"] == "IMPROVEMENT" for row in projected.blockers)
             )
             self.assertTrue(
-                any(
-                    gate.name == "improvement:next-action"
-                    for gate in projected.gates
-                )
+                any(gate.name == "improvement:next-action" for gate in projected.gates)
             )
             self.assertTrue(
                 any(
