@@ -6,28 +6,38 @@ on:
     paths:
       - "contracts/quality/quality-spec.json"
       - "src/image2outfit/quality.py"
+      - "src/image2outfit/improvement.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
+      - "tools/review_console_with_improvement.py"
       - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
+      - "tests/test_improvement_loop.py"
+      - "tests/test_improvement_review_projection.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
       - "Assets/GenWorks/**/ProductManifest.json"
       - "Assets/GenWorks/**/Previews/**"
+      - "Assets/GenWorks/**/Research/Improvement/**"
   push:
     branches:
       - main
     paths:
       - "contracts/quality/quality-spec.json"
       - "src/image2outfit/quality.py"
+      - "src/image2outfit/improvement.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
+      - "tools/review_console_with_improvement.py"
       - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
+      - "tests/test_improvement_loop.py"
+      - "tests/test_improvement_review_projection.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
       - "Assets/GenWorks/**/ProductManifest.json"
       - "Assets/GenWorks/**/Previews/**"
+      - "Assets/GenWorks/**/Research/Improvement/**"
 
 permissions:
   contents: read
@@ -51,14 +61,24 @@ jobs:
           python-version: "3.11"
 
       - name: Compile review console
-        run: python -m py_compile tools/review_console.py tests/test_review_console_v2.py
+        run: >-
+          python -m py_compile
+          src/image2outfit/improvement.py
+          tools/review_console.py
+          tools/review_console_with_improvement.py
+          tests/test_review_console_v2.py
+          tests/test_improvement_loop.py
+          tests/test_improvement_review_projection.py
 
       - name: Run focused fixture tests
-        run: python -m unittest discover -s tests -p "test_review_console_v2.py" -v
+        run: |
+          python -m unittest discover -s tests -p "test_review_console_v2.py" -v
+          python -m unittest discover -s tests -p "test_improvement_loop.py" -v
+          python -m unittest discover -s tests -p "test_improvement_review_projection.py" -v
 
       - name: Build public review console
         run: |
-          python tools/review_console.py --output .
+          python tools/review_console_with_improvement.py --output .
           python - <<'PY'
           import json
           import shutil
