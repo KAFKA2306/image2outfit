@@ -36,6 +36,15 @@ tasks:
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py explain --product "{{.PRODUCT}}"
 
+  improve:
+    desc: Diagnose the current candidate and choose the next measured improvement action.
+    requires:
+      vars: [PRODUCT]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py improve --product "{{.PRODUCT}}"
+
   audit:all:
     desc: Run every repository, runtime, toolchain, research, and method audit.
     cmds:
