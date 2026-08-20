@@ -94,9 +94,7 @@ class ImprovementLoopTests(unittest.TestCase):
                 "evidence": [{"sha256": "b" * 64}],
             }
         )
-        self.assertEqual(
-            result["candidates"][0]["capabilityId"], "structured-patterns"
-        )
+        self.assertEqual(result["candidates"][0]["capabilityId"], "structured-patterns")
         self.assertEqual(result["returnStage"], "build-blender")
         self.assertEqual(result["evidenceHashes"], ["b" * 64])
 
@@ -175,12 +173,8 @@ class ImprovementLoopTests(unittest.TestCase):
         self.assertEqual(
             improvement.experiment_matrix(manifest), ["baseline", "candidate"]
         )
-        baseline = improvement.run_experiment_method(
-            self.root, manifest, "baseline"
-        )
-        candidate = improvement.run_experiment_method(
-            self.root, manifest, "candidate"
-        )
+        baseline = improvement.run_experiment_method(self.root, manifest, "baseline")
+        candidate = improvement.run_experiment_method(self.root, manifest, "candidate")
         self.assertEqual(baseline["status"], "PASS")
         self.assertEqual(candidate["status"], "PASS")
         summary = improvement.aggregate_experiment_results(self.root, manifest)
@@ -199,9 +193,7 @@ class ImprovementLoopTests(unittest.TestCase):
                 {"id": "candidate", "role": "candidate"},
             ],
         }
-        result = improvement.run_experiment_method(
-            self.root, manifest, "candidate"
-        )
+        result = improvement.run_experiment_method(self.root, manifest, "candidate")
         self.assertEqual(result["status"], "UNBOUND")
 
     def test_adoption_requires_measured_eligibility_and_license(self) -> None:
@@ -241,9 +233,7 @@ class ImprovementLoopTests(unittest.TestCase):
         self.assertEqual(rejected["decision"], "REJECT")
 
     def test_history_reuse_precedes_registry_search(self) -> None:
-        self.quality_report(
-            "dress", [{"aspect": "silhouette", "code": "BAD"}]
-        )
+        self.quality_report("dress", [{"aspect": "silhouette", "code": "BAD"}])
         improvement.append_iteration_record(
             self.root,
             "dress",
@@ -258,10 +248,10 @@ class ImprovementLoopTests(unittest.TestCase):
         self.assertEqual(plan["nextAction"], "REUSE_MEASURED_METHOD")
         self.assertEqual(plan["selectedMethod"]["candidateId"], "measured-method")
 
-    def test_plan_generates_research_request_only_when_registry_has_no_candidate(self) -> None:
-        self.quality_report(
-            "dress", [{"aspect": "skinning", "code": "POSE_FAIL"}]
-        )
+    def test_plan_generates_research_request_only_when_registry_has_no_candidate(
+        self,
+    ) -> None:
+        self.quality_report("dress", [{"aspect": "skinning", "code": "POSE_FAIL"}])
         plan = improvement.plan_improvement(self.root, "dress")
         self.assertEqual(plan["nextAction"], "RESEARCH_REQUIRED")
         self.assertEqual(
