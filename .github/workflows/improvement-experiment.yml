@@ -1,0 +1,110 @@
+name: Improvement experiment
+
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: Repository-relative ExperimentManifest JSON path
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: '0.11.32'
+          enable-cache: true
+      - id: matrix
+        env:
+          MANIFEST: ${{ inputs.manifest }}
+        run: |
+          value="$(uv run --locked --no-default-groups python tools/manage.py experiment-matrix --manifest "$MANIFEST")"
+          echo "matrix=$value" >> "$GITHUB_OUTPUT"
+
+  experiment:
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: '0.11.32'
+          enable-cache: true
+      - name: Run method
+        env:
+          MANIFEST: ${{ inputs.manifest }}
+          METHOD: ${{ matrix.method }}
+        run: >-
+          uv run --locked --no-default-groups
+          python tools/manage.py experiment-method
+          --manifest "$MANIFEST"
+          --method "$METHOD"
+      - name: Preserve structured method result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: improvement-method-${{ matrix.method }}
+          path: .image2outfit/experiments/**/*.json
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 1
+
+  aggregate:
+    if: always() && needs.plan.result == 'success'
+    needs: [plan, experiment]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: '0.11.32'
+          enable-cache: true
+      - name: Download method results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: improvement-method-*
+          path: .image2outfit/downloaded
+      - name: Aggregate
+        env:
+          MANIFEST: ${{ inputs.manifest }}
+        run: >-
+          uv run --locked --no-default-groups
+          python tools/manage.py experiment-aggregate
+          --manifest "$MANIFEST"
+          --results-dir .image2outfit/downloaded
+          --output .image2outfit/improvement-summary.json
+      - name: Preserve comparison summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: improvement-summary
+          path: .image2outfit/improvement-summary.json
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 1
