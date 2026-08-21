@@ -29,6 +29,8 @@ from image2outfit.pipeline import (
 )
 from pipeline_stage_adapters import build_registry, load_profile
 
+DEFAULT_PROFILE = Path("config/pipeline-profiles/garment-reconstruction-v1.json")
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -36,7 +38,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--profile",
         type=Path,
-        default=ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json",
+        help="Override request.profilePath. Otherwise the request or default profile is used.",
     )
     parser.add_argument(
         "--engine",
@@ -71,6 +73,24 @@ def _read_object(path: Path, *, label: str) -> dict[str, Any]:
     return value
 
 
+def _repo_path(path: Path, *, label: str) -> Path:
+    resolved = path.resolve() if path.is_absolute() else (ROOT / path).resolve()
+    if resolved != ROOT and ROOT not in resolved.parents:
+        raise ValueError(f"{label} escapes repository: {path}")
+    return resolved
+
+
+def _profile_path(args: argparse.Namespace, request: dict[str, Any]) -> Path:
+    if args.profile is not None:
+        return _repo_path(args.profile, label="profile")
+    configured = request.get("profilePath")
+    if configured is None:
+        return _repo_path(DEFAULT_PROFILE, label="default profile")
+    if not isinstance(configured, str) or not configured:
+        raise ValueError("request.profilePath must be a non-empty string")
+    return _repo_path(Path(configured), label="request.profilePath")
+
+
 def _write_json_atomic(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
@@ -103,10 +123,11 @@ def _assert_identity(state: dict[str, Any], expected: dict[str, str]) -> None:
 
 def main() -> int:
     args = parse_args()
-    request = _read_object(args.request, label="request")
+    request_path = _repo_path(args.request, label="request")
+    request = _read_object(request_path, label="request")
     if request.get("schemaVersion") != 1:
         raise ValueError("request.schemaVersion must be 1")
-    profile = load_profile(args.profile)
+    profile = load_profile(_profile_path(args, request))
     expected = {
         "productId": str(request["productId"]),
         "targetAvatar": str(request["targetAvatar"]),
@@ -145,6 +166,10 @@ def main() -> int:
         execute=args.execute,
         bindings=_mapping(request.get("stageBindings"), "stageBindings"),
         variables=variables,
+        tool_requirements=_mapping(
+            request.get("toolRequirements"), "toolRequirements"
+        ),
+        tool_pins=_mapping(request.get("toolPins"), "toolPins"),
     )
     checkpoint = (
         (lambda current: _write_json_atomic(args.checkpoint_output, current))
@@ -158,6 +183,7 @@ def main() -> int:
     else:
         result = run_pipeline(state, registry, checkpoint=checkpoint)
 
+    result["toolPlan"] = registry.selection_plan()
     audit_root = (
         args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
     )
