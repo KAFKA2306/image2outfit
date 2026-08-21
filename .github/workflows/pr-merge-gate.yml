@@ -44,6 +44,44 @@ jobs:
       - name: Verify PR merge and product release separation
         run: uv run --locked --no-default-groups python tools/pr_merge_gate.py
 
+      - name: Parse tracked contracts
+        run: |
+          uv run --locked --no-default-groups python - <<'PY'
+          import json
+          import tomllib
+          from pathlib import Path
+
+          roots = (
+              Path("config"),
+              Path("examples"),
+              Path("Packages"),
+              Path("Assets/GenWorks"),
+          )
+          paths = sorted(
+              path
+              for root in roots
+              if root.exists()
+              for path in root.rglob("*.json")
+          )
+          if not paths:
+              raise SystemExit("No JSON contracts found")
+          for path in paths:
+              json.loads(path.read_text(encoding="utf-8-sig"))
+              print(f"{path}: PASS")
+
+          with Path("pyproject.toml").open("rb") as stream:
+              project = tomllib.load(stream)
+          dependencies = project.get("project", {}).get("dependencies", [])
+          if "Pillow==12.3.0" not in dependencies:
+              raise SystemExit("Pillow==12.3.0 must be declared")
+          uv = project.get("tool", {}).get("uv", {})
+          if uv.get("package") is not False:
+              raise SystemExit("image2outfit must remain a non-package uv project")
+          if uv.get("default-groups") != []:
+              raise SystemExit("dependency groups must remain explicit opt-ins")
+          print("pyproject.toml: PASS")
+          PY
+
       - name: Ruff lint
         run: uv run --locked --no-default-groups --group dev ruff check --ignore S102 src tools tests
 
