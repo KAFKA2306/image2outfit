@@ -38,8 +38,11 @@ PR merge は repository integration の判定です。製品の `COMPLETE`、vis
 - [ ] `config/pr-merge-policy.json` の merge 条件を満たした
 - [ ] 影響製品がある場合、pipeline / build は有効な checkpoint boundary まで到達した
 - [ ] product failure / `REJECTED` がある場合、隠さず state / evidence / blocker を記録した
-- [ ] merge / close 後に不要 branch を削除する
+- [ ] non-default branch はこの open PR の head としてのみ存在している
+- [ ] merge / close 後に head branch が削除される
 - [ ] merge 後の `main` を readback する
+
+`main` 以外の branch は same-repository open PR の head である間だけ許可します。PR が merge / close された時点で head branch は削除し、open PR に紐づかない orphan branch は unique commit の有無に関係なく残しません。
 
 ## Product state / release
 
