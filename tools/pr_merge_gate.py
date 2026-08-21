@@ -13,7 +13,6 @@ MERGE_POLICY = ROOT / "config" / "pr-merge-policy.json"
 COMPLETION_POLICY = ROOT / "config" / "genworks-handoff-policy.json"
 RELEASE_POLICY = ROOT / "config" / "release-policy.json"
 WORKFLOWS = ROOT / ".github" / "workflows"
-PR_TEMPLATE = ROOT / ".github" / "pull_request_template.md"
 LEGACY_POLICY_WORKFLOW = WORKFLOWS / "policy-tests.yml"
 
 
@@ -71,6 +70,10 @@ def _trigger_has_path_filter(workflow: str, trigger: str = "pull_request") -> bo
     return False
 
 
+def _contains_command(workflow: str, command: str) -> bool:
+    return " ".join(command.split()) in " ".join(workflow.split())
+
+
 def validate() -> dict[str, Any]:
     merge = _read_json(MERGE_POLICY)
     completion = _read_json(COMPLETION_POLICY)
@@ -85,7 +88,6 @@ def validate() -> dict[str, Any]:
     release_workflow_path = _workflow_path(release_gate, "workflowFile")
     merge_workflow = merge_workflow_path.read_text(encoding="utf-8")
     release_workflow = release_workflow_path.read_text(encoding="utf-8")
-    template = PR_TEMPLATE.read_text(encoding="utf-8")
 
     errors: list[str] = []
     rules = merge.get("rules") if isinstance(merge.get("rules"), dict) else {}
@@ -101,6 +103,7 @@ def validate() -> dict[str, Any]:
         "productReleaseEligibilityRequiredForMerge",
         "productVisualPassRequiredForMerge",
         "productRuntimePassRequiredForMerge",
+        "unrelatedExistingProductFailuresBlockMerge",
     )
     for name in expected_true:
         if rules.get(name) is not True:
@@ -121,6 +124,12 @@ def validate() -> dict[str, Any]:
         errors.append("merge-policy mergeGate.workflowName")
     elif f"name: {merge_name}" not in merge_workflow:
         errors.append("canonical merge workflow name does not match merge policy")
+
+    merge_validation = merge_gate.get("validationCommand")
+    if not isinstance(merge_validation, str) or not merge_validation:
+        errors.append("merge-policy mergeGate.validationCommand")
+    elif not _contains_command(merge_workflow, merge_validation):
+        errors.append("canonical merge workflow must invoke configured validation command")
 
     if release_gate.get("manualDispatchRequired") is not True:
         errors.append("merge-policy productReleaseGate.manualDispatchRequired=true")
@@ -162,14 +171,6 @@ def validate() -> dict[str, Any]:
         errors.append("product release workflow must invoke configured release validator")
     if LEGACY_POLICY_WORKFLOW.exists():
         errors.append("legacy policy-tests.yml must be removed")
-
-    required_template_sections = (
-        "## Merge readiness",
-        "## Product state / release",
-    )
-    for section in required_template_sections:
-        if section not in template:
-            errors.append(f"PR template missing {section}")
 
     return {
         "schemaVersion": 1,
