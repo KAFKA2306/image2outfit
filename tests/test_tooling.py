@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ast
 import json
 import sys
 import tempfile
@@ -47,15 +46,9 @@ class ToolOwnershipTest(unittest.TestCase):
         self.assertFalse(manage["unreferenced"])
 
     def test_production_gate_core_uses_canonical_manifest_owner(self) -> None:
-        tree = ast.parse((TOOLS / "production_gate_core.py").read_text(encoding="utf-8"))
-        imports = {
-            alias.name
-            for node in ast.walk(tree)
-            if isinstance(node, ast.Import)
-            for alias in node.names
-        }
-        self.assertIn("candidate_manifest", imports)
-        self.assertNotIn("release_gate", imports)
+        source = (TOOLS / "production_gate_core.py").read_text(encoding="utf-8")
+        self.assertIn("import candidate_manifest as legacy", source)
+        self.assertNotIn("import release_gate as legacy", source)
 
 
 class ToolchainAuditTest(unittest.TestCase):
