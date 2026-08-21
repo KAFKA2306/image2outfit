@@ -7,12 +7,14 @@ on:
       - "contracts/quality/quality-spec.json"
       - "src/image2outfit/quality.py"
       - "src/image2outfit/improvement.py"
+      - "tools/improvement_loop.py"
+      - "tools/manage.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
-      - "tools/review_console_with_improvement.py"
       - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
       - "tests/test_improvement_loop.py"
+      - "tests/test_improvement_orchestrator.py"
       - "tests/test_improvement_review_projection.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
@@ -26,12 +28,14 @@ on:
       - "contracts/quality/quality-spec.json"
       - "src/image2outfit/quality.py"
       - "src/image2outfit/improvement.py"
+      - "tools/improvement_loop.py"
+      - "tools/manage.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
-      - "tools/review_console_with_improvement.py"
       - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
       - "tests/test_improvement_loop.py"
+      - "tests/test_improvement_orchestrator.py"
       - "tests/test_improvement_review_projection.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
@@ -60,25 +64,28 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Compile review console
+      - name: Compile review console and improvement loop
         run: >-
           python -m py_compile
           src/image2outfit/improvement.py
+          tools/improvement_loop.py
+          tools/manage.py
           tools/review_console.py
-          tools/review_console_with_improvement.py
           tests/test_review_console_v2.py
           tests/test_improvement_loop.py
+          tests/test_improvement_orchestrator.py
           tests/test_improvement_review_projection.py
 
       - name: Run focused fixture tests
         run: |
           python -m unittest discover -s tests -p "test_review_console_v2.py" -v
           python -m unittest discover -s tests -p "test_improvement_loop.py" -v
+          python -m unittest discover -s tests -p "test_improvement_orchestrator.py" -v
           python -m unittest discover -s tests -p "test_improvement_review_projection.py" -v
 
       - name: Build public review console
         run: |
-          python tools/review_console_with_improvement.py --output .
+          python tools/review_console.py --output .
           python - <<'PY'
           import json
           import shutil
