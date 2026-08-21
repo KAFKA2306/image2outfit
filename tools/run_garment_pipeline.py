@@ -131,6 +131,33 @@ def _new_state(
     return state
 
 
+def _resume_or_reset(
+    previous: dict[str, Any],
+    *,
+    request: dict[str, Any],
+    expected: dict[str, str],
+    mode: ExecutionMode,
+) -> dict[str, Any]:
+    """Resume matching state or reset when executable sources have changed."""
+    mismatches = _identity_mismatches(previous, expected)
+    non_source_mismatches = [
+        value for value in mismatches if value != "sourceFingerprint"
+    ]
+    if non_source_mismatches:
+        _assert_identity(previous, expected)
+    if "sourceFingerprint" not in mismatches:
+        return resume_pipeline_state(previous, execution_mode=mode)
+
+    state = _new_state(request, expected, mode)
+    state["checkpoint_reset"] = {
+        "reason": "source-fingerprint-changed",
+        "previousRunId": str(previous.get("run_id", "")),
+        "previousSourceFingerprint": str(previous.get("source_fingerprint", "")),
+        "sourceFingerprint": expected["sourceFingerprint"],
+    }
+    return state
+
+
 def main() -> int:
     args = parse_args()
     request_path = _repo_path(args.request)
@@ -164,28 +191,17 @@ def main() -> int:
     if args.resume_state:
         previous = _read_object(_repo_path(args.resume_state), label="resume state")
         validate_pipeline_state(previous)
-        mismatches = _identity_mismatches(previous, expected)
-        non_source_mismatches = [
-            value for value in mismatches if value != "sourceFingerprint"
-        ]
-        if non_source_mismatches:
-            _assert_identity(previous, expected)
-        if "sourceFingerprint" in mismatches:
-            state = _new_state(request, expected, mode)
-            state["checkpoint_reset"] = {
-                "reason": "source-fingerprint-changed",
-                "previousRunId": str(previous.get("run_id", "")),
-                "previousSourceFingerprint": str(
-                    previous.get("source_fingerprint", "")
-                ),
-                "sourceFingerprint": expected["sourceFingerprint"],
-            }
+        state = _resume_or_reset(
+            previous,
+            request=request,
+            expected=expected,
+            mode=mode,
+        )
+        if state.get("checkpoint_reset"):
             print(
                 "Ignoring stale resume checkpoint because pipeline sources changed.",
                 file=sys.stderr,
             )
-        else:
-            state = resume_pipeline_state(previous, execution_mode=mode)
     else:
         state = _new_state(request, expected, mode)
 
