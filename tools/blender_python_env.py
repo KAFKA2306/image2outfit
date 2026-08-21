@@ -19,7 +19,7 @@ for _name in dir(_core):
 def probe_runtime(blender: str) -> dict[str, str]:
     expression = (
         "import bpy,json,platform,sys;"
-        f"print('{PROBE_MARKER}'+json.dumps({{"
+        f"print('{_core.PROBE_MARKER}'+json.dumps({{"
         "'blenderVersion':bpy.app.version_string.split()[0],"
         "'pythonVersion':platform.python_version(),"
         "'pythonPrefix':sys.prefix}))"
@@ -35,7 +35,7 @@ def probe_runtime(blender: str) -> dict[str, str]:
             expression,
         ]
     )
-    return _core._marked_json(output, PROBE_MARKER)
+    return _core._marked_json(output, _core.PROBE_MARKER)
 
 
 _core.probe_runtime = probe_runtime
