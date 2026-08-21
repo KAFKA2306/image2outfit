@@ -148,7 +148,7 @@ def validate() -> dict[str, Any]:
     required_evidence = set(merge.get("requiredRepositoryEvidence", []))
     for required in (
         "changed-python-ruff-lint-pass",
-        "changed-reusable-python-ruff-format-pass",
+        "changed-python-ruff-format-pass",
     ):
         if required not in required_evidence:
             errors.append(f"merge-policy requiredRepositoryEvidence missing {required}")
@@ -176,6 +176,8 @@ def validate() -> dict[str, Any]:
         errors.append("canonical PR merge workflow must resolve changed Python files")
     if "ruff check --ignore S102 src tools tests" in merge_workflow:
         errors.append("canonical PR merge workflow must not lint unrelated whole-tree Python")
+    if "Ruff format changed Python" not in merge_workflow:
+        errors.append("canonical PR merge workflow must format-check changed Python only")
     if "workflow_dispatch:" not in release_workflow:
         errors.append("product release workflow must remain manual")
     if "pull_request:" in release_workflow or "\n  push:" in release_workflow:
