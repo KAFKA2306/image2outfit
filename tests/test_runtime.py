@@ -69,9 +69,7 @@ class RuntimePathsTest(unittest.TestCase):
             target = runtime_paths.for_product(root, "sample-outfit").candidate
             target.mkdir(parents=True)
             with self.assertRaises(RuntimeError):
-                runtime_paths.migrate_legacy_product_outputs(
-                    root, "sample-outfit"
-                )
+                runtime_paths.migrate_legacy_product_outputs(root, "sample-outfit")
 
 
 class WorkspaceSnapshotTest(unittest.TestCase):
