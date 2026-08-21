@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-black-cat-bondage",
+  "status": "WORKING",
+  "revision": "v8-cs-25-10300-pose-conditioned-cloth",
+  "completed": [
+    "reference-audit",
+    "garment-decomposition",
+    "pattern-declaration",
+    "stitch-graph",
+    "deterministic-build-script-v8",
+    "unity-prefab-declaration",
+    "v7-hosted-blender-execution",
+    "v7-cloth-simulation",
+    "v7-five-view-and-six-pose-rendering"
+  ],
+  "rejected": [
+    {
+      "revision": "v1-parametric-black-cat-bondage",
+      "workflowRun": 31129531413,
+      "reason": "direct visual review found floating cat ears, vertical detached gauntlets, and an overly rigid box-like torso"
+    },
+    {
+      "revision": "v7-cs-25-10300-cloth-pose-stable-skinning",
+      "workflowRun": 31304423316,
+      "reason": "direct review found that the prone skirt remained rigidly attached to Hips and did not re-settle under world gravity"
+    }
+  ],
+  "pending": [
+    "execute v8 pose-conditioned cloth on hosted Blender",
+    "directly inspect all five current views",
+    "directly inspect all six v8 poses for penetration and detached geometry",
+    "record the final visual review",
+    "merge only if the repository completion gates pass"
+  ],
+  "rejectedEvidencePolicy": "preserve generated comparison and rejected evidence needed to continue or audit the product"
+}
