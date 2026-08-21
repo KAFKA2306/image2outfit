@@ -27,7 +27,17 @@ from image2outfit.pipeline import (
     run_pipeline,
     validate_pipeline_state,
 )
+from pipeline_source_fingerprint import pipeline_source_fingerprint
 from pipeline_stage_adapters import build_registry, load_profile
+
+IDENTITY_FIELDS = {
+    "product_id": "productId",
+    "target_avatar": "targetAvatar",
+    "source_reference": "sourceReference",
+    "profile_id": "profileId",
+    "revision_id": "revisionId",
+    "source_fingerprint": "sourceFingerprint",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -64,6 +74,10 @@ def _mapping(value: object, label: str) -> dict[str, object]:
     return value
 
 
+def _repo_path(path: Path) -> Path:
+    return path if path.is_absolute() else ROOT / path
+
+
 def _read_object(path: Path, *, label: str) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
@@ -81,19 +95,16 @@ def _write_json_atomic(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def _assert_identity(state: dict[str, Any], expected: dict[str, str]) -> None:
-    fields = {
-        "product_id": "productId",
-        "target_avatar": "targetAvatar",
-        "source_reference": "sourceReference",
-        "profile_id": "profileId",
-        "revision_id": "revisionId",
-    }
-    mismatches = [
+def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
+    return [
         request_name
-        for state_name, request_name in fields.items()
+        for state_name, request_name in IDENTITY_FIELDS.items()
         if str(state.get(state_name, "")) != expected[request_name]
     ]
+
+
+def _assert_identity(state: dict[str, Any], expected: dict[str, str]) -> None:
+    mismatches = _identity_mismatches(state, expected)
     if mismatches:
         raise ValueError(
             "resume checkpoint identity does not match request: "
@@ -101,18 +112,73 @@ def _assert_identity(state: dict[str, Any], expected: dict[str, str]) -> None:
         )
 
 
+def _new_state(
+    request: dict[str, Any], expected: dict[str, str], mode: ExecutionMode
+) -> dict[str, Any]:
+    run_id = request.get("runId")
+    if run_id is not None and (not isinstance(run_id, str) or not run_id):
+        raise ValueError("request.runId must be a non-empty string when provided")
+    state = new_pipeline_state(
+        product_id=expected["productId"],
+        target_avatar=expected["targetAvatar"],
+        source_reference=expected["sourceReference"],
+        profile_id=expected["profileId"],
+        revision_id=expected["revisionId"],
+        execution_mode=mode,
+        run_id=run_id,
+    )
+    state["source_fingerprint"] = expected["sourceFingerprint"]
+    return state
+
+
+def _resume_or_reset(
+    previous: dict[str, Any],
+    *,
+    request: dict[str, Any],
+    expected: dict[str, str],
+    mode: ExecutionMode,
+) -> dict[str, Any]:
+    """Resume matching state or reset when executable sources have changed."""
+    mismatches = _identity_mismatches(previous, expected)
+    non_source_mismatches = [
+        value for value in mismatches if value != "sourceFingerprint"
+    ]
+    if non_source_mismatches:
+        _assert_identity(previous, expected)
+    if "sourceFingerprint" not in mismatches:
+        return resume_pipeline_state(previous, execution_mode=mode)
+
+    state = _new_state(request, expected, mode)
+    state["checkpoint_reset"] = {
+        "reason": "source-fingerprint-changed",
+        "previousRunId": str(previous.get("run_id", "")),
+        "previousSourceFingerprint": str(previous.get("source_fingerprint", "")),
+        "sourceFingerprint": expected["sourceFingerprint"],
+    }
+    return state
+
+
 def main() -> int:
     args = parse_args()
-    request = _read_object(args.request, label="request")
+    request_path = _repo_path(args.request)
+    profile_path = _repo_path(args.profile)
+    request = _read_object(request_path, label="request")
     if request.get("schemaVersion") != 1:
         raise ValueError("request.schemaVersion must be 1")
-    profile = load_profile(args.profile)
+    profile = load_profile(profile_path)
+    product_id = str(request["productId"])
     expected = {
-        "productId": str(request["productId"]),
+        "productId": product_id,
         "targetAvatar": str(request["targetAvatar"]),
         "sourceReference": str(request["sourceReference"]),
         "profileId": str(profile["profileId"]),
         "revisionId": str(request.get("revisionId", "")),
+        "sourceFingerprint": pipeline_source_fingerprint(
+            ROOT,
+            product_id=product_id,
+            request_path=request_path,
+            profile_path=profile_path,
+        ),
     }
     variables = {
         **expected,
@@ -123,23 +189,22 @@ def main() -> int:
     }
     mode = ExecutionMode.EXECUTE if args.execute else ExecutionMode.PLAN
     if args.resume_state:
-        state = _read_object(args.resume_state, label="resume state")
-        validate_pipeline_state(state)
-        _assert_identity(state, expected)
-        state = resume_pipeline_state(state, execution_mode=mode)
-    else:
-        run_id = request.get("runId")
-        if run_id is not None and (not isinstance(run_id, str) or not run_id):
-            raise ValueError("request.runId must be a non-empty string when provided")
-        state = new_pipeline_state(
-            product_id=expected["productId"],
-            target_avatar=expected["targetAvatar"],
-            source_reference=expected["sourceReference"],
-            profile_id=expected["profileId"],
-            revision_id=expected["revisionId"],
-            execution_mode=mode,
-            run_id=run_id,
+        previous = _read_object(_repo_path(args.resume_state), label="resume state")
+        validate_pipeline_state(previous)
+        state = _resume_or_reset(
+            previous,
+            request=request,
+            expected=expected,
+            mode=mode,
         )
+        if state.get("checkpoint_reset"):
+            print(
+                "Ignoring stale resume checkpoint because pipeline sources changed.",
+                file=sys.stderr,
+            )
+    else:
+        state = _new_state(request, expected, mode)
+
     registry = build_registry(
         profile,
         execute=args.execute,
