@@ -4,6 +4,25 @@
   "targetAvatar": "SiroinoSotai_PC",
   "sourceReference": "private-reference://sha256/d7c91d92c45598c13ff2b7673c71672cefe5f41a16361ca1b4267fcf6b927ef3",
   "revisionId": "v1-two-view-pattern-and-sewing",
+  "profilePath": "config/pipeline-profiles/garment-reconstruction-modular-v1.json",
+  "toolRequirements": {
+    "draft-patterns": ["pattern.explicit-2d", "garment.panel-sewn"],
+    "infer-stitches": ["stitch.explicit-graph", "assembly.sewing-springs"],
+    "build-blender": ["build.blender", "garment.panel-sewn"],
+    "simulate-cloth": ["simulate.sewing-springs", "assembly.sewing-springs"],
+    "render-evidence": ["render.bpy", "render.pattern", "render.five-view", "render.required-poses"],
+    "audit-geometry": ["verify.geometry"],
+    "visual-review": ["review.direct-image-inspection"]
+  },
+  "toolPins": {
+    "draft-patterns": "pattern.explicit-2d",
+    "infer-stitches": "stitch.explicit-graph",
+    "build-blender": "build.blender.pattern-sewn",
+    "simulate-cloth": "simulate.blender.sewing-springs",
+    "render-evidence": "render.bpy-review",
+    "audit-geometry": "verify.geometry-fit",
+    "visual-review": "review.direct-image-inspection"
+  },
   "variables": {},
   "stageBindings": {
     "ingest-reference": {"command":["python","tools/run_ingest_reference_stage.py","--stage","ingest-reference","--job","config/products/siroino-white-ghost-gown/job.json","--request","config/pipeline/requests/siroino-white-ghost-gown.json","--result",".image2outfit/products/{productId}/stages/ingest-reference.json"],"resultPath":".image2outfit/products/{productId}/stages/ingest-reference.json"},
