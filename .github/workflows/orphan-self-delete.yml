@@ -1,0 +1,39 @@
+name: Delete orphan branch
+
+on:
+  push:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  delete-orphan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete this branch only when it is not an open PR head
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const ref = context.ref.replace(/^refs\/heads\//, "");
+            const repository = (await github.rest.repos.get({ owner, repo })).data;
+            if (ref === repository.default_branch) {
+              core.setFailed(`Refusing to delete default branch ${ref}`);
+              return;
+            }
+            const openPulls = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: "open",
+              head: `${owner}:${ref}`,
+              per_page: 100,
+            });
+            if (openPulls.length > 0) {
+              core.setFailed(`Refusing to delete open PR head ${ref}: ${openPulls.map(pr => `#${pr.number}`).join(", ")}`);
+              return;
+            }
+            await github.rest.git.deleteRef({ owner, repo, ref: `heads/${ref}` });
+            core.info(`Deleted orphan branch ${ref}`);
