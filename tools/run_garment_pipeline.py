@@ -110,9 +110,7 @@ def _write_json_atomic(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def _identity_mismatches(
-    state: dict[str, Any], expected: dict[str, str]
-) -> list[str]:
+def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
     return [
         request_name
         for state_name, request_name in IDENTITY_FIELDS.items()
@@ -258,9 +256,7 @@ def main() -> int:
     result["toolPlan"] = registry.selection_plan()
     if existing_audit is None:
         audit_root = (
-            args.audit_root
-            if args.audit_root.is_absolute()
-            else ROOT / args.audit_root
+            args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
         )
         result["audit"] = write_audit_bundle(
             result,
