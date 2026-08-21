@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+WORKFLOWS = ROOT / ".github" / "workflows"
 sys.path.insert(0, str(ROOT / "src"))
 
 from image2outfit.artifact_bridge import artifact_ref_from_stage_result
@@ -17,9 +19,23 @@ from image2outfit.artifact_dag import (
     PipelineArtifactDAG,
 )
 from image2outfit.pipeline import PipelineStage
+from tools.delete_previous_artifacts import is_previous
 
 HASH_A = "a" * 64
 HASH_B = "b" * 64
+WHOLE_TREE = re.compile(
+    r"^\s*\$\{\{\s*env\.(?:PRODUCT_ROOT|REPORT_DIR|PRODUCT_RUNTIME|"
+    r"PRODUCT_AUDIT|CANDIDATE_DIR|RELEASE_DIR)\s*\}\}\s*$",
+    re.MULTILINE,
+)
+
+
+def upload_blocks(text: str) -> list[str]:
+    return re.findall(
+        r"uses:\s*actions/upload-artifact@[^\n]+(?P<body>.*?)(?=\n\s*-\s+(?:name:|uses:|run:)|\Z)",
+        text,
+        flags=re.DOTALL,
+    )
 
 
 class StageResultCompatibilityTests(unittest.TestCase):
@@ -114,3 +130,64 @@ class ArtifactDAGTests(unittest.TestCase):
             artifact_path.write_text("changed\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "hash mismatch"):
                 artifact.verify_content(root)
+
+
+class ArtifactStoragePolicyTests(unittest.TestCase):
+    def test_artifact_workflows_keep_only_latest_minimal_output(self) -> None:
+        checked = 0
+        for workflow in sorted(WORKFLOWS.glob("*.y*ml")):
+            text = workflow.read_text(encoding="utf-8")
+            blocks = upload_blocks(text)
+            if not blocks:
+                continue
+            checked += len(blocks)
+            self.assertIn("actions: write", text, workflow)
+            self.assertTrue(
+                "tools/delete_previous_artifacts.py" in text
+                or "github.rest.actions.deleteArtifact" in text,
+                workflow,
+            )
+            for block in blocks:
+                self.assertRegex(block, r"retention-days:\s*1(?:\s|$)", workflow)
+                self.assertIn("overwrite: true", block, workflow)
+                self.assertNotRegex(
+                    block,
+                    r"name:[^\n]*(?:github\.run_id|github\.run_number|github\.run_attempt)",
+                    workflow,
+                )
+                self.assertIsNone(WHOLE_TREE.search(block), workflow)
+                self.assertNotIn(".png", block.lower(), workflow)
+                self.assertNotIn(".blend1", block.lower(), workflow)
+                self.assertNotIn(".blend2", block.lower(), workflow)
+        self.assertGreater(checked, 0)
+
+
+class ArtifactReplacementTests(unittest.TestCase):
+    def test_current_name_matches(self) -> None:
+        self.assertTrue(
+            is_previous("image2outfit-hosted-demo", "image2outfit-hosted-demo")
+        )
+
+    def test_legacy_run_suffix_matches(self) -> None:
+        self.assertTrue(
+            is_previous(
+                "image2outfit-hosted-demo-31778430459",
+                "image2outfit-hosted-demo",
+            )
+        )
+
+    def test_other_logical_output_does_not_match(self) -> None:
+        self.assertFalse(
+            is_previous(
+                "image2outfit-hosted-other-31778430459",
+                "image2outfit-hosted-demo",
+            )
+        )
+
+    def test_non_run_suffix_does_not_match(self) -> None:
+        self.assertFalse(
+            is_previous(
+                "image2outfit-hosted-demo-preview",
+                "image2outfit-hosted-demo",
+            )
+        )
