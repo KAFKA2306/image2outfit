@@ -33,16 +33,17 @@
       "Correct the upper-body silhouette and sleeve coverage to the reference",
       "Replace rigid undersized wrist drapes with large hanging drapes",
       "Stabilize the sewn center-back skirt seam",
-      "Regenerate and directly inspect the same pattern/five-view/pose evidence"
+      "Regenerate and directly inspect the same pattern/five-view/pose evidence",
+      "Promote generated blend/fbx/prefab and declared PNG/pose outputs only after they are actually tracked"
     ]
   },
   "technicalGates": {
     "blender": "FAIL",
-    "editableSource": "PASS",
-    "fbx": "PASS",
-    "prefabDeclared": "PASS",
-    "fiveViewEvidence": "PASS",
-    "poseEvidence": "PASS",
+    "editableSource": "FAIL",
+    "fbx": "FAIL",
+    "prefabDeclared": "FAIL",
+    "fiveViewEvidence": "FAIL",
+    "poseEvidence": "FAIL",
     "visualAppearanceReview": "FAIL",
     "researchTrial": "PASS",
     "unityImport": "OUT_OF_SCOPE",
