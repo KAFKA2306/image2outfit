@@ -21,6 +21,7 @@
     "productRuntimePassRequiredForMerge": false,
     "affectedProductExecutionMustReachValidBoundary": true,
     "unrelatedExistingProductFailuresBlockMerge": false,
+    "unrelatedExistingLintDebtBlocksMerge": false,
     "releaseCommandForbiddenInMergeGate": true,
     "releaseWorkflowMustBeManual": true
   },
@@ -34,8 +35,8 @@
     "python-compiles",
     "repository-audits-pass",
     "merge-release-contract-tests-pass",
-    "ruff-lint-pass",
-    "ruff-format-pass",
+    "changed-python-ruff-lint-pass",
+    "changed-reusable-python-ruff-format-pass",
     "tracked-contracts-parse"
   ],
   "productEvidenceSemantics": {
@@ -45,7 +46,7 @@
     "humanRuntimeReview": "product-release-evidence"
   },
   "decisionModel": {
-    "mergeEligible": "repository evidence passes and any affected product execution reaches a valid checkpoint boundary; unrelated pre-existing product quality failures do not decide this PR",
+    "mergeEligible": "repository contracts and the PR's own integration evidence pass, and any affected product execution reaches a valid checkpoint boundary; unrelated pre-existing product quality or lint debt does not decide this PR",
     "releaseEligible": "evaluated only by the separate product release policy and release validator"
   }
 }
