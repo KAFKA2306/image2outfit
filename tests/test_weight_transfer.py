@@ -7,6 +7,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from image2outfit.skinning import (
+    VertexWeight,
+    WeightTransferArtifact as SkinningArtifact,
+    WeightTransferMethod as SkinningMethod,
+    detect_left_right_contamination,
+    influence_histogram,
+    repair_vertex_weights,
+    vertex_group_digest,
+)
 from image2outfit.weight_transfer import (
     BoneInfluence,
     WeightTransferArtifact,
@@ -67,10 +76,7 @@ class WeightTransferTests(unittest.TestCase):
             right_bones={"UpperLeg.R"},
         )
 
-        self.assertEqual(
-            result.audit.laterality_contamination_vertices,
-            (0,),
-        )
+        self.assertEqual(result.audit.laterality_contamination_vertices, (0,))
         self.assertFalse(result.audit.passed)
 
     def test_artifact_digest_is_stable(self) -> None:
@@ -103,6 +109,94 @@ class WeightTransferTests(unittest.TestCase):
                 {0: [("Hips", -0.1)]},
                 deform_bones={"Hips"},
             )
+
+
+class SkinningTests(unittest.TestCase):
+    def test_repair_vertex_weights_prunes_normalizes_and_rejects_non_deform_bones(
+        self,
+    ) -> None:
+        result = repair_vertex_weights(
+            [
+                [
+                    VertexWeight("Arm.L", 0.4),
+                    VertexWeight("Chest", 0.3),
+                    VertexWeight("Spine", 0.2),
+                    VertexWeight("Hips", 0.1),
+                    VertexWeight("Neck", 0.05),
+                    VertexWeight("Helper", 0.7),
+                ],
+                [VertexWeight("Helper", 1.0)],
+            ],
+            deform_bones={"Arm.L", "Chest", "Spine", "Hips", "Neck"},
+        )
+
+        self.assertEqual(len(result.weights[0]), 4)
+        self.assertAlmostEqual(sum(item.weight for item in result.weights[0]), 1.0)
+        self.assertEqual(result.zero_weight_vertices, (1,))
+        self.assertEqual(result.non_normalized_vertices, ())
+        self.assertEqual(result.rejected_bone_groups, ("Helper",))
+
+    def test_left_right_contamination_is_reported_per_vertex(self) -> None:
+        vertices = [
+            (VertexWeight("Arm.R", 1.0),),
+            (VertexWeight("Arm.R", 1.0),),
+            (VertexWeight("Spine", 1.0),),
+        ]
+        self.assertEqual(
+            detect_left_right_contamination(
+                vertices,
+                vertex_sides=("left", "right", "center"),
+                center_bones={"Spine"},
+            ),
+            (0,),
+        )
+
+    def test_digest_and_histogram_are_deterministic(self) -> None:
+        vertices = (
+            (VertexWeight("Chest", 0.75), VertexWeight("Spine", 0.25)),
+            (VertexWeight("Hips", 1.0),),
+        )
+        self.assertEqual(vertex_group_digest(vertices), vertex_group_digest(vertices))
+        self.assertEqual(influence_histogram(vertices), {2: 1, 1: 1})
+
+    def test_artifact_release_gate_rejects_weight_defects(self) -> None:
+        artifact = SkinningArtifact(
+            source_mesh_hash="source",
+            target_mesh_hash="target",
+            armature_hash="armature",
+            bind_pose_hash="bind",
+            method=SkinningMethod.BLENDER_DATA_TRANSFER,
+            method_version="4.4.3",
+            parameters={"mapping": "nearest-face-interpolated"},
+            vertex_group_hash="weights",
+            influence_histogram={1: 10, 4: 20},
+            zero_weight_vertices=(),
+            non_normalized_vertices=(),
+            left_right_contamination=(),
+            rejected_bone_groups=(),
+            pose_evidence={"neutral": "neutral.webp"},
+            metrics={"weightLaplacianEnergy": 0.1},
+        )
+        self.assertTrue(artifact.release_ready)
+
+        contaminated = SkinningArtifact(
+            source_mesh_hash="source",
+            target_mesh_hash="target",
+            armature_hash="armature",
+            bind_pose_hash="bind",
+            method=SkinningMethod.BLENDER_DATA_TRANSFER,
+            method_version="4.4.3",
+            parameters={},
+            vertex_group_hash="weights",
+            influence_histogram={4: 1},
+            zero_weight_vertices=(),
+            non_normalized_vertices=(),
+            left_right_contamination=(4,),
+            rejected_bone_groups=(),
+            pose_evidence={},
+            metrics={},
+        )
+        self.assertFalse(contaminated.release_ready)
 
 
 if __name__ == "__main__":
