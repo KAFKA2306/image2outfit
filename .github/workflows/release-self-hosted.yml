@@ -32,7 +32,7 @@ jobs:
 
       - uses: arduino/setup-task@v2
 
-      - name: Verify release revision provenance
+      - name: Verify merged revision provenance
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -66,11 +66,11 @@ jobs:
           "REPORT_DIR=$runtimeRoot/reports" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "RELEASE_DIR=$runtimeRoot/release" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Promote unchanged reviewed candidate
+      - name: Evaluate product release gate
         shell: pwsh
         run: uv run --no-cache --locked --no-default-groups --python 3.11 python tools/production_gate.py --mode release --job "$env:JOB_PATH"
 
-      - name: Assert GO decision
+      - name: Assert product release GO decision
         shell: pwsh
         run: |
           $audit = Get-Content -LiteralPath (Join-Path $env:REPORT_DIR 'audit.json') -Raw | ConvertFrom-Json

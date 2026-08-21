@@ -51,6 +51,7 @@ src/image2outfit
 
 | 責務 | 正本 |
 |---|---|
+| PR merge | `config/pr-merge-policy.json` |
 | 完了境界 | `config/genworks-handoff-policy.json` |
 | 必須 view / pose | `config/release-policy.json` |
 | 製品 job | `config/products/<slug>/job.json` |
@@ -91,6 +92,30 @@ pipeline の実行状態と製品 lifecycle を分離します。
 - `WORKING` / `COMPLETE` / `REJECTED`: 製品 lifecycle
 
 `PLANNED` や `EXECUTED` を `COMPLETE` の代替にしません。製品 lifecycle と必須 completion gate は `config/genworks-handoff-policy.json` と `ProductManifest.json` が所有します。
+
+## PR merge と product release
+
+repository integration と製品 release は独立した判定です。
+
+```text
+PR diff
+  ↓
+PR merge gate
+  ↓
+main
+  ↓
+release revision provenance
+  ↓
+product release gate
+  ↓
+release artifact
+```
+
+`PR merge gate` は repository / contract / integration evidence だけを判定します。製品が `WORKING` または `REJECTED` であること、`visualAppearanceReview` が FAIL であること、release 用 evidence が未完了であること自体は incremental PR の merge blocker ではありません。正本は `config/pr-merge-policy.json` です。
+
+`tools/release_provenance_gate.py` は release revision が default branch 上の merged PR に由来し、その PR の exact-head `PR merge gate` が成功したことだけを検証します。製品品質は判定しません。
+
+製品 release は `tools/production_gate.py --mode release` と既存 completion / release / quality contract が所有します。したがって `PR merged + product WORKING`、`PR merged + product REJECTED` は正常です。release artifact は product gate が `GO` を返した場合にだけ生成します。
 
 ## Stage result contract
 
