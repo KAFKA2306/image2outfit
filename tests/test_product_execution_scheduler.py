@@ -41,9 +41,7 @@ class ProductExecutionSchedulerTests(unittest.TestCase):
                 self.assertNotIn(forbidden, workflow)
 
     def test_product_queue_is_explicitly_serialized_in_example_config(self) -> None:
-        config = (ROOT / "ops/dagu/config.example.yaml").read_text(
-            encoding="utf-8"
-        )
+        config = (ROOT / "ops/dagu/config.example.yaml").read_text(encoding="utf-8")
         self.assertIn("name: product-execution", config)
         self.assertIn("max_concurrency: 1", config)
 
@@ -78,7 +76,9 @@ class ProductExecutionSchedulerTests(unittest.TestCase):
             self.assertIn("--resume-state", resumed)
             self.assertEqual(resumed[-1], str(checkpoint))
 
-    def test_terminal_resume_reuses_immutable_audit_only_for_matching_mode(self) -> None:
+    def test_terminal_resume_reuses_immutable_audit_only_for_matching_mode(
+        self,
+    ) -> None:
         audit = {"manifestPath": ".image2outfit/audit/example/manifest.json"}
         executed = {"status": "EXECUTED", "audit": audit}
         planned = {"status": "PLANNED", "audit": audit}
@@ -116,10 +116,7 @@ class ProductExecutionSchedulerTests(unittest.TestCase):
             for fixture in fixture_config["fixtures"]
         }
         plan = fixture_preflight.build_preflight()
-        actual = {
-            (entry["fixtureId"], entry["productId"])
-            for entry in plan["entries"]
-        }
+        actual = {(entry["fixtureId"], entry["productId"]) for entry in plan["entries"]}
         self.assertEqual(actual, expected)
         self.assertEqual(plan["queue"], "product-execution")
         self.assertFalse(plan["schedulerOwnsCompletion"])
@@ -130,9 +127,7 @@ class ProductExecutionSchedulerTests(unittest.TestCase):
 
     def test_fixture_preflight_never_queues_unbound_or_invented_requests(self) -> None:
         plan = fixture_preflight.build_preflight()
-        candidates = {
-            entry["productId"]: entry for entry in plan["queueCandidates"]
-        }
+        candidates = {entry["productId"]: entry for entry in plan["queueCandidates"]}
         for entry in plan["entries"]:
             product_id = entry["productId"]
             request_path = entry["requestPath"]
