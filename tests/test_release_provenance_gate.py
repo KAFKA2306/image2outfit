@@ -8,15 +8,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
 from release_provenance_gate import (  # noqa: E402
-    MERGE_GATE_NAME,
-    MERGE_GATE_WORKFLOW,
     evaluate_release_provenance,
+    load_merge_gate_contract,
 )
 
 
 class ReleaseProvenanceGateTests(unittest.TestCase):
     SHA = "a" * 40
     HEAD = "b" * 40
+    MERGE_GATE_NAME = "PR merge gates"
 
     def merged_pr(self) -> dict:
         return {
@@ -30,7 +30,7 @@ class ReleaseProvenanceGateTests(unittest.TestCase):
     def successful_merge_gate_run(self) -> dict:
         return {
             "id": 123,
-            "name": MERGE_GATE_NAME,
+            "name": self.MERGE_GATE_NAME,
             "head_sha": self.HEAD,
             "status": "completed",
             "conclusion": "success",
@@ -47,7 +47,13 @@ class ReleaseProvenanceGateTests(unittest.TestCase):
             workflow_runs=(
                 runs if runs is not None else [self.successful_merge_gate_run()]
             ),
+            merge_gate_name=self.MERGE_GATE_NAME,
         )
+
+    def test_merge_gate_identity_comes_from_merge_policy(self) -> None:
+        workflow_file, workflow_name = load_merge_gate_contract()
+        self.assertEqual(workflow_file, "policy-tests.yml")
+        self.assertEqual(workflow_name, self.MERGE_GATE_NAME)
 
     def test_verified_requires_merged_pr_and_exact_head_merge_gate_success(self) -> None:
         result = self.evaluate()
@@ -87,19 +93,17 @@ class ReleaseProvenanceGateTests(unittest.TestCase):
         result = self.evaluate(runs=[other])
         self.assertEqual(result["failure_class"], "MERGE_GATE_RUN_MISSING")
 
-    def test_release_provenance_uses_dedicated_pr_merge_gate(self) -> None:
-        self.assertEqual(MERGE_GATE_WORKFLOW, "pr-merge-gate.yml")
-        self.assertEqual(MERGE_GATE_NAME, "PR merge gate")
-
-        merge_workflow = (
-            ROOT / ".github" / "workflows" / MERGE_GATE_WORKFLOW
-        ).read_text(encoding="utf-8")
-        release_workflow = (
-            ROOT / ".github" / "workflows" / "release-self-hosted.yml"
-        ).read_text(encoding="utf-8")
-        self.assertIn("name: PR merge gate", merge_workflow)
+    def test_merge_workflow_does_not_execute_product_release_gate(self) -> None:
+        merge_workflow = (ROOT / ".github/workflows/policy-tests.yml").read_text(
+            encoding="utf-8"
+        )
+        release_workflow = (ROOT / ".github/workflows/release-self-hosted.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("name: PR merge gates", merge_workflow)
         self.assertNotIn("production_gate.py --mode release", merge_workflow)
         self.assertIn("production_gate.py --mode release", release_workflow)
+        self.assertFalse((ROOT / ".github/workflows/pr-merge-gate.yml").exists())
 
 
 if __name__ == "__main__":
