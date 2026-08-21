@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-black-cat-bondage",
+  "revision": "v4-cs-25-10300-reference-corrected",
+  "workflowRun": 31301290316,
+  "artifactId": 9034687933,
+  "artifactSha256": "b30dae2fed1969ceede4f4b52b3b8eba87279c3f04effac69b0398fe27114048",
+  "reviewedAt": "2026-08-09T16:40:00+09:00",
+  "reviewedEvidence": [
+    "Previews/front.png",
+    "Previews/back.png",
+    "Previews/left.png",
+    "Previews/right.png",
+    "Previews/three-quarter.png",
+    "Previews/siroino-black-cat-bondage-multiview.webp",
+    "Previews/Poses/neutral.png",
+    "Previews/Poses/arms-up.png",
+    "Previews/Poses/arm-cross.png",
+    "Previews/Poses/crouch.png",
+    "Previews/Poses/sit.png",
+    "Previews/Poses/prone.png",
+    "Previews/siroino-black-cat-bondage-pose-review.webp"
+  ],
+  "result": "FAIL",
+  "findings": [
+    {
+      "severity": "blocking",
+      "code": "reference-silhouette",
+      "finding": "The torso remains a long barrel-like shell instead of the short cropped bustier/corset silhouette visible in CS-25-10300."
+    },
+    {
+      "severity": "blocking",
+      "code": "arms-up-detachment",
+      "finding": "Both forearm accessory groups visibly detach and float above the avatar in the arms-up render."
+    },
+    {
+      "severity": "blocking",
+      "code": "arm-cross-detachment",
+      "finding": "Forearm accessories and loose belt/ring pieces visibly separate from the arms in the arm-cross render."
+    },
+    {
+      "severity": "blocking",
+      "code": "rigid-lower-leg-silhouette",
+      "finding": "The knee-high sock geometry reads as rigid cylindrical leg armor rather than body-following fabric."
+    },
+    {
+      "severity": "major",
+      "code": "angular-tail",
+      "finding": "The tail is visibly faceted/angular and does not read as a smooth cat tail."
+    },
+    {
+      "severity": "major",
+      "code": "bent-pose-layering",
+      "finding": "Crouch, sit and prone evidence shows rigid garment layering and visible overlap/penetration around skirt, limbs and accessories."
+    }
+  ],
+  "nextRevision": "v5-cs-25-10300-anatomy-weight-transfer",
+  "requiredCorrections": [
+    "shorten and reshape the torso into a sweetheart cropped bustier",
+    "author arm and leg accessories from actual Siroino rest-bone axes",
+    "replace one-bone-per-object deformation with nearest-body top-4 skin-weight transfer",
+    "replace the faceted tail with a smooth Bezier-derived mesh",
+    "rerender and directly inspect all five views and all six required poses"
+  ]
+}

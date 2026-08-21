@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-black-cat-bondage",
+  "productName": "Black Cat Bondage Outfit for SiroinoSotai_PC",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-black-cat-bondage",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-black-cat-bondage/Prefab/SiroinoBlackCatBondage.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-black-cat-bondage/Prefab/SiroinoSotai_BlackCatBondage.prefab",
+  "previewPath": "Assets/GenWorks/siroino-black-cat-bondage/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-black-cat-bondage/README.md",
+  "sourceJobPath": "config/products/siroino-black-cat-bondage/job.json",
+  "productBuildScript": "tools/siroino_black_cat_bondage_product.py",
+  "designRevision": "v8-cs-25-10300-pose-conditioned-cloth",
+  "sourceReference": "private-reference://sha256/4bf25fce6fb5a97d219ea024bf6c73d01d830f448c0d55a4a94f2dc6197e249b",
+  "sourceReferenceUrl": "https://www.malymoon-costume.com/view/item/000000004757",
+  "sourceRedistributed": false,
+  "sourceUrlVerification": "VERIFIED_OFFICIAL_MALYMOON_2026-08-09",
+  "modelIdentification": "VERIFIED_MALYMOON_CS-25-10300",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-black-cat-bondage",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "config/products/siroino-black-cat-bondage/job.json",
+    "lastAttempt": {
+      "result": "DIRECT_VISUAL_REVIEW_FAIL",
+      "visualRevision": "v7-cs-25-10300-cloth-pose-stable-skinning",
+      "workflowRun": 31304423316,
+      "findings": [
+        "v6 crouch and sit skirt fan-out was resolved",
+        "prone remained visually invalid because the Hips-bound skirt rotated with the body instead of re-settling under world gravity"
+      ]
+    },
+    "blockers": [
+      "Execute the configured v8 pose-conditioned cloth pass on hosted Blender.",
+      "Inspect all five current views directly.",
+      "Inspect all six v8 required poses for penetration, detached geometry, silhouette defects, and pose-specific cloth failure.",
+      "Record a truthful visualAppearanceReview result before merge."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS_OFFICIAL_MODEL_VERIFIED",
+    "patternContract": "PASS_DECLARED",
+    "stitchGraph": "PASS_DECLARED",
+    "blender": "PASS_V7_HOSTED",
+    "editableSource": "PASS_V7_HOSTED",
+    "fbx": "PASS_V7_HOSTED",
+    "prefabDeclared": "PASS_DECLARED_NOT_RUNTIME_VERIFIED",
+    "clothSimulation": "PASS_V7_HOSTED_PENDING_V8_POSE_CONDITIONED_EXECUTION",
+    "weightTransfer": "PASS_V7_HOSTED",
+    "fiveViewEvidence": "PENDING_V8_DIRECT_REVIEW",
+    "poseEvidence": "FAIL_V7_PRONE_PENDING_V8_EXECUTION",
+    "tenAxisAudit": "PENDING_V8_EXECUTION",
+    "visualAppearanceReview": "FAIL_V7_PRONE_PENDING_V8_REVIEW",
+    "researchTrial": "DECLARED",
+    "unityImport": "OUT_OF_SCOPE",
+    "unitySaveReload": "OUT_OF_SCOPE",
+    "prefabReload": "OUT_OF_SCOPE",
+    "modularAvatar": "DECLARED_NOT_RUNTIME_VERIFIED",
+    "ndmf": "OUT_OF_SCOPE",
+    "vrchatBuildTest": "OUT_OF_SCOPE",
+    "vrchatRuntime": "OUT_OF_SCOPE",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-black-cat-bondage/Source/Blender/SiroinoBlackCatBondage.blend",
+    "fbx": "Assets/GenWorks/siroino-black-cat-bondage/Models/SiroinoBlackCatBondage.fbx",
+    "prefab": "Assets/GenWorks/siroino-black-cat-bondage/Prefab/SiroinoBlackCatBondage.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-black-cat-bondage/Prefab/SiroinoSotai_BlackCatBondage.prefab",
+    "multiview": "Assets/GenWorks/siroino-black-cat-bondage/Previews/siroino-black-cat-bondage-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-black-cat-bondage/Previews/siroino-black-cat-bondage-pose-review.webp",
+    "buildReport": "Assets/GenWorks/siroino-black-cat-bondage/Evidence/Build/product-build-report.json",
+    "qualityAudit": "Assets/GenWorks/siroino-black-cat-bondage/Evidence/Build/quality-audit.json",
+    "poseAudit": "Assets/GenWorks/siroino-black-cat-bondage/Evidence/Build/pose-audit.json",
+    "rejectedV1Evidence": "Assets/GenWorks/siroino-black-cat-bondage/Evidence/Rejected/run-31129531413"
+  }
+}
