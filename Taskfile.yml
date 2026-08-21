@@ -101,9 +101,43 @@ tasks:
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py audit research
 
-  migrate:genworks:
-    desc: Move legacy root product workspaces into Assets/GenWorks and rewrite job roots.
+  maintenance:migrate:genworks:
+    desc: Show the migration plan for jobs outside canonical product roots.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py migrate-genworks
+
+  maintenance:migrate:genworks:apply:
+    desc: Move job outputs and Unity meta files into canonical product roots.
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py migrate-genworks --apply
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit all
+
+  check:python:
+    desc: Run the complete reusable Python verification suite.
+    cmds:
+      - uv lock --check
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python -m compileall -q src tools tests
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit all
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python -m unittest discover -s tests -v
+      - >-
+        uv run --no-cache --locked --no-default-groups --group dev
+        ruff check --ignore S102 src tools tests
+
+  format:python:
+    desc: Format reusable source, tools, and tests discovered in the repository.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --group dev
+        ruff format src tools tests
