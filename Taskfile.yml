@@ -1,6 +1,32 @@
 version: '3'
 
 tasks:
+  plan:
+    desc: Resolve and print the selected modular toolchain without executing stages.
+    requires:
+      vars: [PRODUCT]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/run_garment_pipeline.py
+        --request "config/pipeline/requests/{{.PRODUCT}}.json"
+
+  workflow:
+    desc: Execute the selected modular toolchain with a resumable checkpoint.
+    requires:
+      vars: [PRODUCT]
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/run_garment_pipeline.py
+        --request "config/pipeline/requests/{{.PRODUCT}}.json"
+        --execute
+        --checkpoint-output ".image2outfit/products/{{.PRODUCT}}/pipeline-state.json"
+
   candidate:
     desc: Build a candidate after validating its construction contract.
     requires:
