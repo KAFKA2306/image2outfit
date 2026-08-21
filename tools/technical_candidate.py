@@ -104,7 +104,9 @@ def run_blender_structure_gate(job_path: Path) -> int:
             if not all(math.isfinite(value) for value in vertex.co):
                 metrics["nonFiniteValues"] += 1
             groups = [group for group in vertex.groups if group.weight > 1e-8]
-            metrics["maxBoneInfluences"] = max(metrics["maxBoneInfluences"], len(groups))
+            metrics["maxBoneInfluences"] = max(
+                metrics["maxBoneInfluences"], len(groups)
+            )
             if obj.vertex_groups:
                 if not groups:
                     metrics["unweightedVertices"] += 1
@@ -123,7 +125,9 @@ def run_blender_structure_gate(job_path: Path) -> int:
 
         bm = bmesh.new()
         bm.from_mesh(mesh)
-        metrics["nonManifoldEdges"] += sum(1 for edge in bm.edges if not edge.is_manifold)
+        metrics["nonManifoldEdges"] += sum(
+            1 for edge in bm.edges if not edge.is_manifold
+        )
         bm.free()
 
     if metrics["meshObjects"] == 0:
@@ -295,7 +299,9 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
 
     if stages["unityStatic"]["passed"]:
         resolved_toolchain = audit_toolchain.audit(ROOT, require_unity_lock=True)
-        candidate_contract.write(artifact / "toolchain-resolved.json", resolved_toolchain)
+        candidate_contract.write(
+            artifact / "toolchain-resolved.json", resolved_toolchain
+        )
         stages["toolchainResolved"] = {
             "passed": resolved_toolchain.get("passed") is True,
             "unityPackageLockPresent": resolved_toolchain.get("unityPackageLockPresent")
