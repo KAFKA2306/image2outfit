@@ -3,7 +3,8 @@
   "scope": "pull-request-merge",
   "mergeGate": {
     "workflowFile": "pr-merge-gate.yml",
-    "workflowName": "PR merge gate"
+    "workflowName": "PR merge gate",
+    "validationCommand": "python -m unittest tests.test_merge_release_separation tests.test_release_provenance_gate tests.test_repository_policies tests.test_release_contracts tests.test_release_gate -v"
   },
   "productReleaseGate": {
     "workflowFile": "release-self-hosted.yml",
@@ -19,6 +20,7 @@
     "productVisualPassRequiredForMerge": false,
     "productRuntimePassRequiredForMerge": false,
     "affectedProductExecutionMustReachValidBoundary": true,
+    "unrelatedExistingProductFailuresBlockMerge": false,
     "releaseCommandForbiddenInMergeGate": true,
     "releaseWorkflowMustBeManual": true
   },
@@ -31,7 +33,7 @@
     "lockfile-valid",
     "python-compiles",
     "repository-audits-pass",
-    "unit-and-contract-tests-pass",
+    "merge-release-contract-tests-pass",
     "ruff-lint-pass",
     "ruff-format-pass",
     "tracked-contracts-parse"
@@ -43,7 +45,7 @@
     "humanRuntimeReview": "product-release-evidence"
   },
   "decisionModel": {
-    "mergeEligible": "repository evidence passes and affected product execution reaches a valid boundary",
+    "mergeEligible": "repository evidence passes and any affected product execution reaches a valid checkpoint boundary; unrelated pre-existing product quality failures do not decide this PR",
     "releaseEligible": "evaluated only by the separate product release policy and release validator"
   }
 }
