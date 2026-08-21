@@ -11,11 +11,9 @@ on:
       - "tools/manage.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
-      - "tests/test_quality_spec.py"
+      - "tests/test_quality.py"
       - "tests/test_review_console_v2.py"
-      - "tests/test_improvement_loop.py"
-      - "tests/test_improvement_orchestrator.py"
-      - "tests/test_improvement_review_projection.py"
+      - "tests/test_improvement.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
       - "Assets/GenWorks/**/ProductManifest.json"
@@ -32,11 +30,9 @@ on:
       - "tools/manage.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
-      - "tests/test_quality_spec.py"
+      - "tests/test_quality.py"
       - "tests/test_review_console_v2.py"
-      - "tests/test_improvement_loop.py"
-      - "tests/test_improvement_orchestrator.py"
-      - "tests/test_improvement_review_projection.py"
+      - "tests/test_improvement.py"
       - ".github/workflows/review-console.yml"
       - "config/release-policy.json"
       - "Assets/GenWorks/**/ProductManifest.json"
@@ -72,16 +68,12 @@ jobs:
           tools/manage.py
           tools/review_console.py
           tests/test_review_console_v2.py
-          tests/test_improvement_loop.py
-          tests/test_improvement_orchestrator.py
-          tests/test_improvement_review_projection.py
+          tests/test_improvement.py
 
       - name: Run focused fixture tests
         run: |
           python -m unittest discover -s tests -p "test_review_console_v2.py" -v
-          python -m unittest discover -s tests -p "test_improvement_loop.py" -v
-          python -m unittest discover -s tests -p "test_improvement_orchestrator.py" -v
-          python -m unittest discover -s tests -p "test_improvement_review_projection.py" -v
+          python -m unittest discover -s tests -p "test_improvement.py" -v
 
       - name: Build public review console
         run: |
