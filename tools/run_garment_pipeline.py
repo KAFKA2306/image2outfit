@@ -166,9 +166,7 @@ def main() -> int:
         execute=args.execute,
         bindings=_mapping(request.get("stageBindings"), "stageBindings"),
         variables=variables,
-        tool_requirements=_mapping(
-            request.get("toolRequirements"), "toolRequirements"
-        ),
+        tool_requirements=_mapping(request.get("toolRequirements"), "toolRequirements"),
         tool_pins=_mapping(request.get("toolPins"), "toolPins"),
     )
     checkpoint = (
