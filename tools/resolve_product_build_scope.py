@@ -48,7 +48,9 @@ def select_job(
         if job_match:
             jobs.add(value)
             continue
-        request_match = REQUEST_PATH.fullmatch(value) if include_pipeline_request else None
+        request_match = (
+            REQUEST_PATH.fullmatch(value) if include_pipeline_request else None
+        )
         if request_match:
             candidate = f"config/products/{request_match.group(1)}/job.json"
             if (root / candidate).is_file():
