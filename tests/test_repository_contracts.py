@@ -40,18 +40,20 @@ class RepositoryContractTest(unittest.TestCase):
         for required in (
             "config/products/<slug>/",
             "Assets/GenWorks/<slug>/",
-            "contents: read",
-            "task audit:repo",
+            "task audit:all",
+            "task check:python",
             ".image2outfit/products/<slug>/{reports,candidate,release}",
         ):
             with self.subTest(required=required):
                 self.assertIn(required, combined)
 
-        readme = text_by_path[ROOT / "README.md"]
-        self.assertIn(
-            "以前の `Artifacts/`、`Candidates/`、`Release/` は使用しません",
-            readme,
-        )
+        for obsolete_root in ("Artifacts", "Candidates", "Release"):
+            with self.subTest(obsolete_root=obsolete_root):
+                self.assertFalse(
+                    (ROOT / obsolete_root).exists(),
+                    f"Deprecated root workspace must stay absent: {obsolete_root}/",
+                )
+
         for forbidden in (
             "docs/GENWORKS_LAYOUT.md",
             "docs/TOOLCHAIN.md",
