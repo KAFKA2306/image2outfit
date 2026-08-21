@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
 
-import release_gate as gate  # noqa: E402
+import candidate_manifest as candidate_contract  # noqa: E402
 
 
 def read_json(path: Path) -> dict:
@@ -207,7 +207,9 @@ class RepositoryContractTest(unittest.TestCase):
 
     def test_schemas_are_closed_and_authoritative(self) -> None:
         job_schema = read_json(ROOT / "config" / "job.schema.v2.json")
-        self.assertEqual(tuple(job_schema["required"]), gate.required_job_fields())
+        self.assertEqual(
+            tuple(job_schema["required"]), candidate_contract.required_job_fields()
+        )
         self.assertEqual(job_schema["properties"]["schemaVersion"]["const"], 2)
         self.assertIs(job_schema["additionalProperties"], False)
         self.assertIn("hostedPoseScript", job_schema["properties"])
@@ -350,7 +352,7 @@ class RepositoryContractTest(unittest.TestCase):
             / "Editor"
             / "Image2OutfitPipeline.cs"
         )
-        self.assertEqual(gate.UNITY_PIPELINE_PATH, pipeline)
+        self.assertEqual(candidate_contract.UNITY_PIPELINE_PATH, pipeline)
         self.assertTrue(pipeline.is_file())
         self.assertFalse((ROOT / "Assets" / "Editor").exists())
 
@@ -379,12 +381,13 @@ class RepositoryContractTest(unittest.TestCase):
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, source)
 
-        release_gate_source = (TOOLS / "release_gate.py").read_text(encoding="utf-8")
-        self.assertNotIn("def evidence_gate", release_gate_source)
-        self.assertNotIn("def run_release", release_gate_source)
-        core = (TOOLS / "production_gate_core.py").read_text(encoding="utf-8")
+        for removed in ("production_gate_core.py", "release_gate.py", "pipeline.py"):
+            self.assertFalse((TOOLS / removed).exists(), removed)
+
+        production = (TOOLS / "production_gate.py").read_text(encoding="utf-8")
         release = (TOOLS / "release_orchestrator.py").read_text(encoding="utf-8")
-        self.assertNotIn("legacy.run_release", core)
+        self.assertIn("from candidate_orchestrator import", production)
+        self.assertIn("from release_orchestrator import", production)
         self.assertNotIn("legacy.run_release", release)
         self.assertIn("contract.package_release", release)
 
