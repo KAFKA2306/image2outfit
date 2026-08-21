@@ -140,12 +140,18 @@ task check:python
 
 ## Git / PR
 
+PR は integration vehicle であり、未完了製品や将来作業を保持する backlog ではありません。workstream の終了時は open PR を原則 0 件にします。
+
 - `main` へ直接 push しない
 - coherent change ごとに短命 branch を使う
 - intended file だけ commit する
 - overlap する workstream がある場合は競合 branch を増やさず、既存 workstream を継続または supersede relationship を明示する
 - PR には scope、contract impact、verification、残る blocker を書く
-- merge 前に exact head の required CI / gate を確認する
+- `requiredCompletionGates`、`visualAppearanceReview`、製品の `COMPLETE` / release 条件は、通常の incremental implementation PR の merge 条件にしない。PR 自身が製品 release / completion を主張する場合だけ、その主張に対応する gate を要求する
+- merge blocker は、未解消の merge conflict、当該 diff が原因の required repository CI failure、契約上の不整合、または現在利用可能な環境で直接実行できる必須検証の未実行に限定する
+- Unity / VRChat / 外部 runtime など現在利用できない検証は `NOT_RUN` / `OUT_OF_SCOPE` として正確に記録し、それだけを理由に PR を Draft のまま保持しない
+- agent / ChatGPT は open PR の blocker を同じ作業線で確認し、実行可能なら head を修正して再検証し merge する。main に既に吸収済み・代替済みなら理由を残して close する
+- stale PR を放置しない。有用差分は current `main` へ rebase / port して merge し、不要差分は superseded として close する
 - merge / close 後は不要 branch を削除する
 - merge 後は `main` を readback して結果を確認する
 
