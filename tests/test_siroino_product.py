@@ -91,7 +91,9 @@ class SiroinoV29GeometryTests(unittest.TestCase):
         self.assertIn("manifold_yoke.install(pattern)", self.product)
         self.assertIn("DESIGN_REVISION = manifold_yoke.DESIGN_REVISION", self.product)
 
-    def test_v29_uses_bounded_smoothed_clearance_and_parametric_components(self) -> None:
+    def test_v29_uses_bounded_smoothed_clearance_and_parametric_components(
+        self,
+    ) -> None:
         for fragment in (
             f'DESIGN_REVISION = "{REVISION}"',
             "maximum_step: float = 0.012",
@@ -119,7 +121,9 @@ class SiroinoV29GeometryTests(unittest.TestCase):
         ):
             self.assertIn(panel, panels)
 
-        evidence = f"Assets/GenWorks/{PRODUCT}/Research/smoothed-clearance-yoke-trial.json"
+        evidence = (
+            f"Assets/GenWorks/{PRODUCT}/Research/smoothed-clearance-yoke-trial.json"
+        )
         self.assertEqual(
             self.construction["researchTrial"]["generatedEvidence"], evidence
         )
