@@ -125,7 +125,9 @@ def choose_tool(
             if missing_capabilities:
                 reasons.append("missing capabilities=" + ",".join(missing_capabilities))
             if missing_prerequisites:
-                reasons.append("missing prerequisites=" + ",".join(missing_prerequisites))
+                reasons.append(
+                    "missing prerequisites=" + ",".join(missing_prerequisites)
+                )
             rejected.append(f"{descriptor.tool_name} ({'; '.join(reasons)})")
             continue
         eligible.append(descriptor)
