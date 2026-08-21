@@ -5,6 +5,7 @@ Tracked product jobs contain only canonical product inputs and outputs. Local
 reports, review snapshots, and release packages are derived from ``job.id`` and
 stored under ``.image2outfit/products/<product-id>/``.
 """
+
 from __future__ import annotations
 
 import argparse
