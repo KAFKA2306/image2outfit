@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-white-ghost-gown",
+  "productName": "White Ghost Gown for Siroino _Large",
+  "adapterId": "siroino-v1.0-large",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-two-view-pattern-and-sewing",
+  "renderLoopRevision": "v1-pattern-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-white-ghost-gown",
+  "productManifestPath": "Assets/GenWorks/siroino-white-ghost-gown/ProductManifest.json",
+  "buildScript": "tools/siroino_white_ghost_gown_build.py",
+  "blendPath": "Assets/GenWorks/siroino-white-ghost-gown/Source/Blender/SiroinoWhiteGhostGown.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-white-ghost-gown/Models/SiroinoWhiteGhostGown.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-white-ghost-gown/Prefab/SiroinoWhiteGhostGown.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-white-ghost-gown/Prefab/Siroino_Large_WhiteGhostGown.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
+    "normalSizeFallbackAllowed": true,
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"],
+    "prefab": {
+      "extensions": [".prefab"],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.prefab$",
+      "contentRegex": null,
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.prefab$"
+    },
+    "source": {
+      "extensions": [".fbx"],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.fbx$",
+      "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.fbx$"
+    }
+  },
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
+  "garmentPipeline": {
+    "referenceAuditPath": "config/products/siroino-white-ghost-gown/reference-audit.json",
+    "decompositionPath": "config/products/siroino-white-ghost-gown/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-white-ghost-gown/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-white-ghost-gown/stitch-graph.json",
+    "visualReviewPath": "config/products/siroino-white-ghost-gown/visual-review.json",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "researchTrial": "explicit pattern layout + Blender Cloth sewing springs + deterministic body-clearance refinement",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true
+  },
+  "researchMethod": {
+    "name": "pattern-first structured reconstruction with Blender sewing springs",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-white-ghost-gown/pattern-draft.json",
+    "secondaryEvidence": "config/products/siroino-white-ghost-gown/stitch-graph.json"
+  },
+  "licenseEvidence": "config/products/siroino-white-ghost-gown/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-white-ghost-gown/ProductManifest.json",
+    "Assets/GenWorks/siroino-white-ghost-gown/README.md",
+    "Assets/GenWorks/siroino-white-ghost-gown/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-white-ghost-gown/Source/Patterns/white-ghost-gown.pattern.json",
+    "Assets/GenWorks/siroino-white-ghost-gown/Source/Patterns/white-ghost-gown.stitches.json",
+    "Assets/GenWorks/siroino-white-ghost-gown/Source/Blender/SiroinoWhiteGhostGown.blend",
+    "Assets/GenWorks/siroino-white-ghost-gown/Models/SiroinoWhiteGhostGown.fbx",
+    "Assets/GenWorks/siroino-white-ghost-gown/Models/SiroinoWhiteGhostGown.fbx.meta",
+    "Assets/GenWorks/siroino-white-ghost-gown/Prefab/SiroinoWhiteGhostGown.prefab",
+    "Assets/GenWorks/siroino-white-ghost-gown/Prefab/SiroinoWhiteGhostGown.prefab.meta",
+    "Assets/GenWorks/siroino-white-ghost-gown/Prefab/Siroino_Large_WhiteGhostGown.prefab",
+    "Assets/GenWorks/siroino-white-ghost-gown/Prefab/Siroino_Large_WhiteGhostGown.prefab.meta",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/front.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/back.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/left.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/right.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/prone.png",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/siroino-white-ghost-gown-multiview.webp",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/siroino-white-ghost-gown-pose-review.webp",
+    "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Build/product-build-report.json",
+    "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Build/cloth-simulation.json",
+    "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Build/stitch-execution.json",
+    "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Candidate/candidate-state.json"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-white-ghost-gown/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-white-ghost-gown/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-white-ghost-gown/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-white-ghost-gown/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-white-ghost-gown/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/prone.png"
+  },
+  "patternLayoutPath": "Assets/GenWorks/siroino-white-ghost-gown/Previews/pattern-layout.png",
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-white-ghost-gown/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-white-ghost-gown/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-white-ghost-gown/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": []
+}
