@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -61,11 +62,10 @@ class ModularProfileTests(unittest.TestCase):
         self.profile = load_profile(
             ROOT / "config/pipeline-profiles/garment-reconstruction-modular-v1.json"
         )
-        self.request = json.loads(
-            (ROOT / "config/pipeline/requests/siroino-white-ghost-gown.json").read_text(
-                encoding="utf-8"
-            )
+        self.request_path = (
+            ROOT / "config/pipeline/requests/siroino-white-ghost-gown.json"
         )
+        self.request = json.loads(self.request_path.read_text(encoding="utf-8"))
 
     def test_ghost_gown_resolves_required_panel_sewn_toolchain(self) -> None:
         registry = build_registry(
@@ -136,6 +136,36 @@ class ModularProfileTests(unittest.TestCase):
                 tool_requirements=self.request["toolRequirements"],
                 tool_pins=pins,
             )
+
+    def test_request_profile_path_produces_auditable_tool_plan(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "tools/run_garment_pipeline.py"),
+                "--request",
+                str(self.request_path),
+                "--audit-root",
+                ".image2outfit/test-tool-selection-audit",
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["profile_id"], "garment-reconstruction-modular-v1")
+        self.assertEqual(payload["status"], "PLANNED")
+        plan = {item["stage"]: item for item in payload["toolPlan"]}
+        self.assertEqual(plan["draft-patterns"]["toolName"], "pattern.explicit-2d")
+        self.assertEqual(
+            plan["simulate-cloth"]["toolName"],
+            "simulate.blender.sewing-springs",
+        )
+        self.assertEqual(
+            plan["visual-review"]["toolName"],
+            "review.direct-image-inspection",
+        )
 
 
 if __name__ == "__main__":
