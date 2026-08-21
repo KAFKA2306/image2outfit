@@ -147,7 +147,9 @@ class GarmentCodeAdapterTests(unittest.TestCase):
         first = garmentcode_json(pattern_fixture())
         second = garmentcode_json(pattern_fixture())
         self.assertEqual(first, second)
-        self.assertEqual(json.loads(first)["pattern"]["panel_order"], ["left-panel", "right-panel"])
+        self.assertEqual(
+            json.loads(first)["pattern"]["panel_order"], ["left-panel", "right-panel"]
+        )
 
     def test_rejects_named_edge_that_is_not_boundary_loop(self) -> None:
         with self.assertRaisesRegex(ValueError, "not a boundary-loop edge"):
