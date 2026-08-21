@@ -13,7 +13,7 @@ sys.path.insert(0, str(TOOLS))
 
 import production_gate  # noqa: E402
 import runtime_paths  # noqa: E402
-from production_gate_core import DirectoryTransaction  # noqa: E402
+from runtime_transaction import DirectoryTransaction  # noqa: E402
 
 
 class DirectoryTransactionTest(unittest.TestCase):
@@ -184,7 +184,7 @@ class ProductionGateCommercialTest(unittest.TestCase):
             errors,
         )
 
-    def test_failed_commercial_evidence_never_calls_release_core(self) -> None:
+    def test_failed_commercial_evidence_never_calls_release_orchestrator(self) -> None:
         self.candidate_manifest(
             {
                 "schemaVersion": 2,
@@ -212,7 +212,7 @@ class ProductionGateCommercialTest(unittest.TestCase):
                 "validate_commercial_evidence",
                 return_value=commercial,
             ),
-            mock.patch.object(production_gate.core, "_run_release") as runner,
+            mock.patch.object(production_gate, "run_release") as runner,
         ):
             result = production_gate._run_release(
                 Path("config/products/demo/job.json"),
