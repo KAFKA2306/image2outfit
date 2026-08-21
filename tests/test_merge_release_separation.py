@@ -25,6 +25,8 @@ class MergeReleaseSeparationTests(unittest.TestCase):
         self.assertFalse(rules["productReleaseEligibilityRequiredForMerge"])
         self.assertFalse(rules["productVisualPassRequiredForMerge"])
         self.assertFalse(rules["productRuntimePassRequiredForMerge"])
+        self.assertFalse(rules["unrelatedExistingProductFailuresBlockMerge"])
+        self.assertFalse(rules["unrelatedExistingLintDebtBlocksMerge"])
         self.assertTrue(rules["mergeDoesNotReleaseProduct"])
         self.assertTrue(rules["affectedProductExecutionMustReachValidBoundary"])
         self.assertIn("WORKING", policy["allowedTrackedProductStatesAtMerge"])
@@ -62,6 +64,24 @@ class MergeReleaseSeparationTests(unittest.TestCase):
             ROOT / ".github" / "workflows" / policy["mergeGate"]["workflowFile"]
         ).read_text(encoding="utf-8")
         self.assertFalse(pr_merge_gate._trigger_has_path_filter(merge))
+
+    def test_merge_lint_is_change_scoped(self) -> None:
+        policy = self.policy()
+        merge = (
+            ROOT / ".github" / "workflows" / policy["mergeGate"]["workflowFile"]
+        ).read_text(encoding="utf-8")
+        self.assertIn("Resolve changed Python files", merge)
+        self.assertIn("/tmp/changed-python.txt", merge)
+        self.assertIn("Ruff lint changed Python", merge)
+        self.assertNotIn("ruff check --ignore S102 src tools tests", merge)
+        self.assertIn(
+            "changed-python-ruff-lint-pass",
+            policy["requiredRepositoryEvidence"],
+        )
+        self.assertIn(
+            "changed-reusable-python-ruff-format-pass",
+            policy["requiredRepositoryEvidence"],
+        )
 
     def test_path_text_outside_pr_trigger_does_not_count_as_filter(self) -> None:
         workflow = """name: example
