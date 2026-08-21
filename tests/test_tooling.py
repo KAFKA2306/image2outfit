@@ -113,7 +113,7 @@ class ToolchainAuditTest(unittest.TestCase):
             "dependencies"
         ]
         dependencies["com.vrchat.avatars"] = ">=3.7.0 <4.0.0"
-        self.write_json(self.root / "config" / "toolchain-lock.json", self.lock)
+        self.write_json(self.root / "Packages" / "vpm-manifest.json", self.manifest)
         result = audit_toolchain.audit(self.root)
         self.assertFalse(result["passed"])
         self.assertTrue(
