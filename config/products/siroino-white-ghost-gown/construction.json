@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "profile": "panel-sewn",
+  "target": "Siroino _Large via official shape keys",
+  "designRevision": "v1-two-view-pattern-and-sewing",
+  "panels": [
+    "dress-front",
+    "dress-back-left",
+    "dress-back-right",
+    "sleeve",
+    "wrist-drape",
+    "hood-front",
+    "hood-back",
+    "back-tie"
+  ],
+  "separateGeometry": [
+    "eye-appliques",
+    "cheek-appliques"
+  ],
+  "priorityFitZones": [
+    "chest",
+    "waist",
+    "hips",
+    "upper-back cutout",
+    "wrists",
+    "hood hem"
+  ],
+  "requiredPoses": [
+    "neutral",
+    "arms-up",
+    "arm-cross",
+    "crouch",
+    "sit",
+    "prone"
+  ],
+  "researchTrial": {
+    "method": "explicit 2D pattern layout plus Blender Cloth sewing springs",
+    "physicalSewingStitch": "center-back-lower",
+    "review": "render pattern layout before assembly and five-view/pose evidence after sewing"
+  },
+  "releaseBoundary": "Keep WORKING until direct inspection of the current bpy pattern render and assembled garment render passes visual review."
+}
