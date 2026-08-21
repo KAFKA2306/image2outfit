@@ -128,11 +128,12 @@ class ProductBuildScopeTest(unittest.TestCase):
         ]
         for path in workflows:
             text = path.read_text(encoding="utf-8")
-            invocation_count = sum(
-                text.count(prefix + " tools/resolve_product_build_scope.py")
-                for prefix in ("python", "uv run --no-cache --no-project python")
-            )
-            self.assertEqual(invocation_count, 1, path.name)
+            invocation_lines = [
+                line
+                for line in text.splitlines()
+                if "python tools/resolve_product_build_scope.py" in line
+            ]
+            self.assertEqual(len(invocation_lines), 1, path.name)
             self.assertNotIn("Only schemaVersion 2 jobs are accepted", text)
             self.assertNotIn("selected-product-jobs-", text)
 
