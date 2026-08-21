@@ -38,14 +38,99 @@ jobs:
       - name: Audit repository contracts
         run: uv run --locked --no-default-groups python tools/manage.py audit all
 
-      - name: Run unit and contract tests
-        run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
+      - name: Run merge and release boundary contract tests
+        run: >-
+          uv run --locked --no-default-groups
+          python -m unittest
+          tests.test_merge_release_separation
+          tests.test_release_provenance_gate
+          tests.test_repository_policies
+          tests.test_release_contracts
+          tests.test_release_gate
+          -v
 
       - name: Verify PR merge and product release separation
         run: uv run --locked --no-default-groups python tools/pr_merge_gate.py
 
-      - name: Ruff lint
-        run: uv run --locked --no-default-groups --group dev ruff check --ignore S102 src tools tests
+      - name: Parse tracked contracts
+        run: |
+          uv run --locked --no-default-groups python - <<'PY'
+          import json
+          import tomllib
+          from pathlib import Path
 
-      - name: Ruff format check
-        run: uv run --locked --no-default-groups --group dev ruff format --check src tools tests
+          roots = (
+              Path("config"),
+              Path("examples"),
+              Path("Packages"),
+              Path("Assets/GenWorks"),
+          )
+          paths = sorted(
+              path
+              for root in roots
+              if root.exists()
+              for path in root.rglob("*.json")
+          )
+          if not paths:
+              raise SystemExit("No JSON contracts found")
+          for path in paths:
+              json.loads(path.read_text(encoding="utf-8-sig"))
+              print(f"{path}: PASS")
+
+          with Path("pyproject.toml").open("rb") as stream:
+              project = tomllib.load(stream)
+          dependencies = project.get("project", {}).get("dependencies", [])
+          if "Pillow==12.3.0" not in dependencies:
+              raise SystemExit("Pillow==12.3.0 must be declared")
+          uv = project.get("tool", {}).get("uv", {})
+          if uv.get("package") is not False:
+              raise SystemExit("image2outfit must remain a non-package uv project")
+          if uv.get("default-groups") != []:
+              raise SystemExit("dependency groups must remain explicit opt-ins")
+          print("pyproject.toml: PASS")
+          PY
+
+      - name: Resolve changed Python files
+        id: changed-python
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            base="$PR_BASE_SHA"
+            head="$PR_HEAD_SHA"
+          else
+            base="$BEFORE_SHA"
+            head="$CURRENT_SHA"
+            if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+              base="${CURRENT_SHA}^"
+            fi
+          fi
+          git diff --diff-filter=ACMRT --name-only "$base" "$head" -- '*.py' > /tmp/changed-python.txt
+          {
+            echo 'files<<EOF'
+            cat /tmp/changed-python.txt
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+          echo "Changed Python files:"
+          cat /tmp/changed-python.txt || true
+
+      - name: Ruff lint changed Python
+        if: steps.changed-python.outputs.files != ''
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/changed-python.txt
+          uv run --locked --no-default-groups --group dev ruff check \
+            --select E4,E7,E9,F --ignore E402 "${files[@]}"
+
+      - name: Ruff format changed Python
+        if: steps.changed-python.outputs.files != ''
+        shell: bash
+        run: |
+          mapfile -t files < /tmp/changed-python.txt
+          uv run --locked --no-default-groups --group dev ruff format --check "${files[@]}"

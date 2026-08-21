@@ -9,8 +9,26 @@ from pathlib import Path
 from typing import Any
 
 API_VERSION = "2026-03-10"
-POLICY_WORKFLOW = "policy-tests.yml"
-POLICY_NAME = "Release policy tests"
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def load_merge_gate_contract(root: Path = ROOT) -> tuple[str, str]:
+    policy_path = root / "config" / "pr-merge-policy.json"
+    policy = json.loads(policy_path.read_text(encoding="utf-8-sig"))
+    gate = policy.get("mergeGate") if isinstance(policy, dict) else None
+    if not isinstance(gate, dict):
+        raise ValueError("pr-merge-policy.json mergeGate is required")
+    workflow_file = gate.get("workflowFile")
+    workflow_name = gate.get("workflowName")
+    if (
+        not isinstance(workflow_file, str)
+        or not workflow_file
+        or Path(workflow_file).name != workflow_file
+    ):
+        raise ValueError("mergeGate.workflowFile must be a workflow file name")
+    if not isinstance(workflow_name, str) or not workflow_name:
+        raise ValueError("mergeGate.workflowName is required")
+    return workflow_file, workflow_name
 
 
 def evaluate_release_provenance(
@@ -20,7 +38,11 @@ def evaluate_release_provenance(
     default_branch: str,
     associated_pulls: list[dict[str, Any]],
     workflow_runs: list[dict[str, Any]],
+    merge_gate_name: str | None = None,
 ) -> dict[str, Any]:
+    if merge_gate_name is None:
+        _, merge_gate_name = load_merge_gate_contract()
+
     expected_ref = f"refs/heads/{default_branch}"
     if release_ref != expected_ref:
         return {
@@ -60,14 +82,14 @@ def evaluate_release_provenance(
     matching_runs = [
         run
         for run in workflow_runs
-        if run.get("name") == POLICY_NAME and run.get("head_sha") == head_sha
+        if run.get("name") == merge_gate_name and run.get("head_sha") == head_sha
     ]
     matching_runs.sort(key=lambda run: run.get("created_at") or "", reverse=True)
     latest = matching_runs[0] if matching_runs else None
     if latest is None:
         return {
             "state": "BLOCKED",
-            "failure_class": "RELEASE_POLICY_RUN_MISSING",
+            "failure_class": "MERGE_GATE_RUN_MISSING",
             "release_sha": release_sha,
             "pr_number": pr.get("number"),
             "pr_head_sha": head_sha,
@@ -75,13 +97,13 @@ def evaluate_release_provenance(
     if latest.get("status") != "completed" or latest.get("conclusion") != "success":
         return {
             "state": "BLOCKED",
-            "failure_class": "RELEASE_POLICY_NOT_SUCCESSFUL",
+            "failure_class": "MERGE_GATE_NOT_SUCCESSFUL",
             "release_sha": release_sha,
             "pr_number": pr.get("number"),
             "pr_head_sha": head_sha,
-            "policy_run_id": latest.get("id"),
-            "policy_status": latest.get("status"),
-            "policy_conclusion": latest.get("conclusion"),
+            "merge_gate_run_id": latest.get("id"),
+            "merge_gate_status": latest.get("status"),
+            "merge_gate_conclusion": latest.get("conclusion"),
         }
 
     return {
@@ -91,9 +113,9 @@ def evaluate_release_provenance(
         "release_ref": release_ref,
         "pr_number": pr.get("number"),
         "pr_head_sha": head_sha,
-        "policy_run_id": latest.get("id"),
-        "policy_run_url": latest.get("html_url"),
-        "policy_conclusion": latest.get("conclusion"),
+        "merge_gate_run_id": latest.get("id"),
+        "merge_gate_run_url": latest.get("html_url"),
+        "merge_gate_conclusion": latest.get("conclusion"),
     }
 
 
@@ -114,6 +136,7 @@ def github_json(url: str, token: str) -> Any:
 def collect_receipt(
     repository: str, release_ref: str, release_sha: str, default_branch: str, token: str
 ) -> dict[str, Any]:
+    workflow_file, merge_gate_name = load_merge_gate_contract()
     base = f"https://api.github.com/repos/{repository}"
     pulls = github_json(f"{base}/commits/{release_sha}/pulls?per_page=100", token)
 
@@ -131,7 +154,7 @@ def collect_receipt(
             {"event": "pull_request", "head_sha": head_sha, "per_page": 100}
         )
         payload = github_json(
-            f"{base}/actions/workflows/{POLICY_WORKFLOW}/runs?{query}", token
+            f"{base}/actions/workflows/{workflow_file}/runs?{query}", token
         )
         runs.extend(payload.get("workflow_runs", []))
 
@@ -141,12 +164,17 @@ def collect_receipt(
         default_branch=default_branch,
         associated_pulls=pulls,
         workflow_runs=runs,
+        merge_gate_name=merge_gate_name,
     )
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Fail closed unless a release revision came through a reviewed PR with successful policy CI."
+        description=(
+            "Fail closed unless a release revision is current main, came through a merged PR, "
+            "and that PR's exact-head merge gate succeeded. Product release quality is checked "
+            "separately by production_gate.py --mode release."
+        )
     )
     parser.add_argument("--repository", required=True)
     parser.add_argument("--ref", required=True, dest="release_ref")

@@ -12,6 +12,7 @@ GLOBAL_CONFIG_FILES = {
     "genworks-handoff-policy.json",
     "genworks-layout.json",
     "job.schema.v2.json",
+    "pr-merge-policy.json",
     "release-policy.json",
     "toolchain-lock.json",
 }
@@ -41,7 +42,9 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
-def add(findings: list[Finding], code: str, path: Path, root: Path, message: str) -> None:
+def add(
+    findings: list[Finding], code: str, path: Path, root: Path, message: str
+) -> None:
     findings.append(Finding(code, relative(path, root), message))
 
 
@@ -148,11 +151,19 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
     product_ids: set[str] = set()
     products_root = config_root / "products"
     if products_root.is_dir():
-        for product_dir in sorted(path for path in products_root.iterdir() if path.is_dir()):
+        for product_dir in sorted(
+            path for path in products_root.iterdir() if path.is_dir()
+        ):
             product_id = product_dir.name
             product_ids.add(product_id)
             if not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", product_id):
-                add(findings, "invalid-product-id", product_dir, root, "invalid product directory name")
+                add(
+                    findings,
+                    "invalid-product-id",
+                    product_dir,
+                    root,
+                    "invalid product directory name",
+                )
                 continue
             job_path = product_dir / "job.json"
             license_path = product_dir / "license.json"
@@ -243,7 +254,10 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                     )
 
             previews = job.get("previewPaths")
-            if not isinstance(previews, dict) or set(previews) != REQUIRED_PREVIEW_VIEWS:
+            if (
+                not isinstance(previews, dict)
+                or set(previews) != REQUIRED_PREVIEW_VIEWS
+            ):
                 add(
                     findings,
                     "invalid-preview-contract",
@@ -253,7 +267,9 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                 )
             else:
                 for name, value in previews.items():
-                    if not isinstance(value, str) or not value.startswith(expected_root + "/"):
+                    if not isinstance(value, str) or not value.startswith(
+                        expected_root + "/"
+                    ):
                         add(
                             findings,
                             "preview-outside-product",

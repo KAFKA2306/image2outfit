@@ -4,7 +4,7 @@ on:
   pull_request_target:
     types: [opened, reopened, synchronize, ready_for_review, edited, closed]
   push:
-    branches: [main]
+    branches: ["main"]
   schedule:
     - cron: "17 * * * *"
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Detect direct main pushes, converge workstreams, and remove stale branches
+      - name: Converge PRs and enforce open-head-only branch lifecycle
         uses: actions/github-script@v9
         with:
           script: |
@@ -49,14 +49,13 @@ jobs:
               "ci/",
               "dependabot/",
             ];
-            const protectedBranches = new Set(["main", "master", "gh-pages"]);
             const supersededMarker = "<!-- pr-convergence:superseded -->";
             const invalidBranchMarker = "<!-- pr-convergence:invalid-branch -->";
             const workstreamPlaceholder = "replace-with-product-slug-or-repository-scope";
 
             const repository = (await github.rest.repos.get({ owner, repo })).data;
             const defaultBranch = repository.default_branch;
-            protectedBranches.add(defaultBranch);
+            const protectedBranches = new Set([defaultBranch]);
 
             function isAllowedBranch(ref) {
               return allowedPrefixes.some(prefix => String(ref || "").startsWith(prefix));
@@ -90,9 +89,7 @@ jobs:
             function supersededPullNumbers(body) {
               const values = new Set();
               const pattern = /<!--\s*supersedes:\s*#?(\d+)\s*-->/gi;
-              for (const match of String(body || "").matchAll(pattern)) {
-                values.add(Number(match[1]));
-              }
+              for (const match of String(body || "").matchAll(pattern)) values.add(Number(match[1]));
               return values;
             }
 
@@ -122,16 +119,13 @@ jobs:
                   products.add(match[1].toLowerCase());
                 }
               }
-
-              // Product ownership is authoritative. A PR cannot evade convergence by choosing another marker.
               if (products.size === 1) return `product:${[...products][0]}`;
-
               const explicit = explicitWorkstream(pr.body);
               if (explicit) return `explicit:${explicit}`;
               return `branch:${normalizeBranch(pr.head.ref)}`;
             }
 
-            async function releasePolicyState(pr) {
+            async function mergeGateState(pr) {
               const response = await github.rest.actions.listWorkflowRunsForRepo({
                 owner,
                 repo,
@@ -140,7 +134,7 @@ jobs:
                 per_page: 100,
               });
               const runs = response.data.workflow_runs
-                .filter(run => run.name === "Release policy tests")
+                .filter(run => run.name === "PR merge gate")
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
               const latest = runs[0];
               if (!latest) return { state: "missing", url: null };
@@ -148,22 +142,31 @@ jobs:
               return { state: latest.conclusion === "success" ? "success" : "failure", url: latest.html_url };
             }
 
+            function isOpenHead(ref, openPulls) {
+              return openPulls.some(pr =>
+                pr.head.repo?.full_name === `${owner}/${repo}` && pr.head.ref === ref,
+              );
+            }
+
             async function deleteBranch(ref, reason, openPulls) {
-              if (!ref || protectedBranches.has(ref)) return;
-              if (openPulls.some(pr => pr.head.repo?.full_name === `${owner}/${repo}` && pr.head.ref === ref)) return;
+              if (!ref || protectedBranches.has(ref) || isOpenHead(ref, openPulls)) return false;
               if (dryRun) {
                 core.info(`[dry-run] delete branch ${ref}: ${reason}`);
-                return;
+                return true;
               }
               try {
                 await github.rest.git.deleteRef({ owner, repo, ref: `heads/${ref}` });
                 core.info(`Deleted branch ${ref}: ${reason}`);
+                return true;
               } catch (error) {
-                if (error.status === 404 || error.status === 422) {
-                  core.info(`Branch ${ref} already absent or protected`);
-                } else {
-                  throw error;
+                if (error.status === 404) {
+                  core.info(`Branch ${ref} already absent`);
+                  return true;
                 }
+                if (error.status === 422) {
+                  core.setFailed(`Orphan branch ${ref} could not be deleted. Remove branch protection; only the default branch and open PR heads may exist.`);
+                }
+                throw error;
               }
             }
 
@@ -223,7 +226,7 @@ jobs:
                   message,
                   `Previous SHA: \`${before}\``,
                   `Actor: \`${context.actor}\``,
-                  "Enable a GitHub branch ruleset requiring pull requests and the Release policy tests check to block this before the ref moves.",
+                  "Enable a GitHub branch ruleset requiring pull requests and the PR merge gate check to block this before the ref moves.",
                 ].join("\n\n"),
               });
               core.setFailed(message);
@@ -234,7 +237,6 @@ jobs:
 
             let openPulls = await allOpenPulls();
 
-            // Same-repository pull requests must use a managed branch namespace.
             for (const pr of [...openPulls]) {
               if (pr.head.repo?.full_name !== `${owner}/${repo}` || isAllowedBranch(pr.head.ref)) continue;
               const reason = `Branch \`${pr.head.ref}\` is not allowed. Use one of: ${allowedPrefixes.map(prefix => `\`${prefix}\``).join(", ")}.`;
@@ -246,7 +248,7 @@ jobs:
               keyed.push({
                 pr,
                 key: await workstreamKey(pr),
-                policy: await releasePolicyState(pr),
+                policy: await mergeGateState(pr),
                 supersedes: supersededPullNumbers(pr.body),
               });
             }
@@ -282,12 +284,12 @@ jobs:
               }
 
               if (!winner || losers.length === 0) {
-                core.warning(`Keeping ${entries.length} PRs for ${key}: no successful policy run or explicit supersedes marker.`);
+                core.warning(`Keeping ${entries.length} PRs for ${key}: no successful merge-gate run or explicit supersedes marker.`);
                 continue;
               }
 
               for (const loser of losers) {
-                const reason = `${supersededMarker}\nSuperseded by #${winner.pr.number}. Product paths take precedence over free-form workstream names. Winner policy state: \`${winner.policy.state}\`.`;
+                const reason = `${supersededMarker}\nSuperseded by #${winner.pr.number}. Product paths take precedence over free-form workstream names. Winner merge-gate state: \`${winner.policy.state}\`.`;
                 openPulls = await closePull(loser.pr, reason, supersededMarker, openPulls);
               }
             }
@@ -296,7 +298,7 @@ jobs:
               const closed = context.payload.pull_request;
               if (closed.head.repo?.full_name === `${owner}/${repo}`) {
                 openPulls = await allOpenPulls();
-                await deleteBranch(closed.head.ref, `pull request #${closed.number} closed`, openPulls);
+                await deleteBranch(closed.head.ref, `pull request #${closed.number} closed or merged`, openPulls);
               }
             }
 
@@ -307,47 +309,41 @@ jobs:
                 .map(pr => pr.head.ref),
             );
             const branches = await github.paginate(github.rest.repos.listBranches, { owner, repo, per_page: 100 });
+            let deletedOrphans = 0;
 
             for (const branch of branches) {
               const ref = branch.name;
-              if (branch.protected || protectedBranches.has(ref) || openHeads.has(ref)) continue;
+              if (protectedBranches.has(ref) || openHeads.has(ref)) continue;
+              const deleted = await deleteBranch(
+                ref,
+                "branch is not the default branch and is not the head of an open pull request",
+                openPulls,
+              );
+              if (deleted) deletedOrphans += 1;
+            }
 
-              // Any branch whose latest PR is closed is disposable, even if an older process used no prefix.
-              const related = await github.paginate(github.rest.pulls.list, {
-                owner,
-                repo,
-                state: "closed",
-                head: `${owner}:${ref}`,
-                per_page: 100,
-              });
-              if (related.length > 0) {
-                related.sort((a, b) => b.number - a.number);
-                await deleteBranch(ref, `latest related PR #${related[0].number} is closed`, openPulls);
-                continue;
-              }
-
-              if (!isAllowedBranch(ref)) {
-                core.warning(`Keeping invalid orphan branch for manual recovery: ${ref}`);
-                continue;
-              }
-
-              const comparison = await github.rest.repos.compareCommitsWithBasehead({
-                owner,
-                repo,
-                basehead: `${defaultBranch}...${ref}`,
-              });
-              if (comparison.data.ahead_by === 0 && comparison.data.behind_by > 0) {
-                await deleteBranch(ref, "contains no unique commits and is behind the default branch", openPulls);
-              } else if (comparison.data.ahead_by === 0 && comparison.data.behind_by === 0) {
-                core.info(`Keeping branch identical to current ${defaultBranch}; it may have just been created: ${ref}`);
-              } else {
-                core.warning(`Keeping orphan branch with ${comparison.data.ahead_by} unique commit(s): ${ref}`);
+            if (!dryRun) {
+              const finalOpen = await allOpenPulls();
+              const finalOpenHeads = new Set(
+                finalOpen
+                  .filter(pr => pr.head.repo?.full_name === `${owner}/${repo}`)
+                  .map(pr => pr.head.ref),
+              );
+              const finalBranches = await github.paginate(github.rest.repos.listBranches, { owner, repo, per_page: 100 });
+              const orphanBranches = finalBranches
+                .map(branch => branch.name)
+                .filter(ref => !protectedBranches.has(ref) && !finalOpenHeads.has(ref));
+              if (orphanBranches.length > 0) {
+                core.setFailed(`Orphan branches remain: ${orphanBranches.join(", ")}`);
               }
             }
 
             const finalOpen = await allOpenPulls();
             core.summary
-              .addHeading("PR convergence")
+              .addHeading("PR convergence and branch lifecycle")
               .addRaw(`Open PRs after convergence: ${finalOpen.length}\n`)
+              .addRaw(`Deleted orphan branches: ${deletedOrphans}\n`)
+              .addRaw(`Allowed persistent branch: ${defaultBranch}\n`)
+              .addRaw(`Allowed non-default branches: same-repository open PR heads only\n`)
               .addRaw(`Mode: ${dryRun ? "dry-run" : "apply"}\n`)
               .write();
