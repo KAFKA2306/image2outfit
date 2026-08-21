@@ -18,7 +18,7 @@
 
 - 
 
-## Validation
+## Merge readiness
 
 実際に実行・確認したものだけ記載します。
 
@@ -31,7 +31,7 @@
 
 - 
 
-## State
+## Product state / release
 
 - product state: `N/A` / `WORKING` / `COMPLETE` / `REJECTED`
 - remaining in-scope blockers:
