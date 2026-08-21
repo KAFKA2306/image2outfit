@@ -62,6 +62,58 @@ class ImprovementOrchestratorTests(unittest.TestCase):
             },
         )
 
+    def executable_pattern_candidate(
+        self,
+        *,
+        comparison: dict | None,
+    ) -> dict:
+        baseline_code = (
+            "import json,pathlib; "
+            "pathlib.Path('baseline.json').write_text(json.dumps({'status':'PASS'}))"
+        )
+        result = {"status": "PASS"}
+        if comparison is not None:
+            result["comparison"] = comparison
+        candidate_code = (
+            "import json,pathlib; "
+            f"pathlib.Path('candidate.json').write_text(json.dumps({result!r}))"
+        )
+        return {
+            "id": "pattern-tool",
+            "name": "Pattern Tool",
+            "category": "PARAMETRIC_SEWING_PATTERN",
+            "officialUrl": "https://example.test/pattern-tool",
+            "codeLicense": "MIT",
+            "decision": "ADOPT_NOW",
+            "integrationBoundary": "draft-patterns",
+            "experimentBinding": {
+                "baseline": {
+                    "id": "baseline",
+                    "command": [sys.executable, "-c", baseline_code],
+                    "resultPath": "baseline.json",
+                },
+                "candidate": {
+                    "id": "candidate",
+                    "command": [sys.executable, "-c", candidate_code],
+                    "resultPath": "candidate.json",
+                },
+                "evaluation": {
+                    "views": ["front"],
+                    "poses": [],
+                    "qualitySpec": "quality-spec.v1",
+                },
+                "productionIntegrationPoint": "draft-patterns",
+            },
+        }
+
+    def use_pattern_candidate(self, *, comparison: dict | None) -> None:
+        self.oss = {
+            "implementationCandidates": [
+                self.executable_pattern_candidate(comparison=comparison)
+            ]
+        }
+        self.write_registries()
+
     def test_missing_candidate_waits_for_external_research_with_request(self) -> None:
         self.quality("skinning")
         result = improvement_loop.advance(self.root, self.product)
@@ -128,48 +180,13 @@ class ImprovementOrchestratorTests(unittest.TestCase):
 
     def test_bound_experiment_records_measured_rejection_and_history(self) -> None:
         self.quality("silhouette")
-        baseline_code = (
-            "import json,pathlib; "
-            "pathlib.Path('baseline.json').write_text(json.dumps({'status':'PASS'}))"
+        self.use_pattern_candidate(
+            comparison={
+                "eligibleForAdoption": False,
+                "reproducible": True,
+                "regressions": [],
+            }
         )
-        candidate_code = (
-            "import json,pathlib; "
-            "pathlib.Path('candidate.json').write_text(json.dumps({"
-            "'status':'PASS','comparison':{'eligibleForAdoption':False,"
-            "'reproducible':True,'regressions':[]}}))"
-        )
-        self.oss = {
-            "implementationCandidates": [
-                {
-                    "id": "pattern-tool",
-                    "name": "Pattern Tool",
-                    "category": "PARAMETRIC_SEWING_PATTERN",
-                    "officialUrl": "https://example.test/pattern-tool",
-                    "codeLicense": "MIT",
-                    "decision": "ADOPT_NOW",
-                    "integrationBoundary": "draft-patterns",
-                    "experimentBinding": {
-                        "baseline": {
-                            "id": "baseline",
-                            "command": [sys.executable, "-c", baseline_code],
-                            "resultPath": "baseline.json",
-                        },
-                        "candidate": {
-                            "id": "candidate",
-                            "command": [sys.executable, "-c", candidate_code],
-                            "resultPath": "candidate.json",
-                        },
-                        "evaluation": {
-                            "views": ["front"],
-                            "poses": [],
-                            "qualitySpec": "quality-spec.v1",
-                        },
-                        "productionIntegrationPoint": "draft-patterns",
-                    },
-                }
-            ]
-        }
-        self.write_registries()
 
         result = improvement_loop.advance(self.root, self.product)
 
@@ -182,6 +199,113 @@ class ImprovementOrchestratorTests(unittest.TestCase):
             history[0]["methodsTried"][0]["candidateId"],
             "pattern-tool",
         )
+
+    def test_waiting_comparison_resumes_from_digest_bound_artifact(self) -> None:
+        self.quality("silhouette")
+        self.use_pattern_candidate(comparison=None)
+
+        first = improvement_loop.advance(self.root, self.product)
+        self.assertEqual(first["status"], "WAITING_FOR_COMPARISON")
+        summary_path = (
+            improvement_loop.reports_dir(self.root, self.product)
+            / improvement_loop.EXPERIMENT_SUMMARY
+        )
+        summary = improvement.read_json(summary_path)
+        comparison_path = (
+            improvement_loop.reports_dir(self.root, self.product)
+            / improvement_loop.EXPERIMENT_COMPARISON
+        )
+        write(
+            comparison_path,
+            {
+                "schemaVersion": 1,
+                "summaryDigest": summary["summaryDigest"],
+                "candidateMethod": "candidate",
+                "comparison": {
+                    "eligibleForAdoption": False,
+                    "reproducible": True,
+                    "regressions": [],
+                },
+            },
+        )
+
+        second = improvement_loop.advance(self.root, self.product)
+
+        self.assertEqual(second["status"], "ITERATION_RECORDED")
+        self.assertEqual(second["decision"], "KEEP_BENCHMARK")
+        self.assertEqual(
+            len(improvement.load_iteration_records(self.root, self.product)),
+            1,
+        )
+
+    def test_stale_comparison_digest_is_rejected(self) -> None:
+        self.quality("silhouette")
+        self.use_pattern_candidate(comparison=None)
+        first = improvement_loop.advance(self.root, self.product)
+        self.assertEqual(first["status"], "WAITING_FOR_COMPARISON")
+        comparison_path = (
+            improvement_loop.reports_dir(self.root, self.product)
+            / improvement_loop.EXPERIMENT_COMPARISON
+        )
+        write(
+            comparison_path,
+            {
+                "schemaVersion": 1,
+                "summaryDigest": "stale",
+                "candidateMethod": "candidate",
+                "comparison": {
+                    "eligibleForAdoption": False,
+                    "reproducible": True,
+                    "regressions": [],
+                },
+            },
+        )
+
+        with self.assertRaisesRegex(improvement_loop.LoopError, "summaryDigest"):
+            improvement_loop.advance(self.root, self.product)
+
+    def test_adoption_resumes_after_apply_binding_and_does_not_reapply(self) -> None:
+        self.quality("silhouette")
+        self.use_pattern_candidate(
+            comparison={
+                "eligibleForAdoption": True,
+                "reproducible": True,
+                "regressions": [],
+            }
+        )
+
+        first = improvement_loop.advance(self.root, self.product, regenerate=lambda: 0)
+        self.assertEqual(first["status"], "WAITING_FOR_PRODUCTION_INTEGRATION")
+
+        marker = self.root / "applied.txt"
+        apply_code = (
+            "from pathlib import Path; "
+            "p=Path('applied.txt'); "
+            "p.write_text((p.read_text() if p.exists() else '')+'applied\\n')"
+        )
+        binding_path = (
+            improvement_loop.reports_dir(self.root, self.product)
+            / improvement_loop.EXPERIMENT_BINDING
+        )
+        write(
+            binding_path,
+            {
+                "candidateId": "pattern-tool",
+                "capability": "structured-patterns",
+                "applyCommand": [sys.executable, "-c", apply_code],
+            },
+        )
+
+        second = improvement_loop.advance(self.root, self.product, regenerate=lambda: 0)
+        self.assertEqual(second["status"], "WAITING_FOR_REEVALUATION")
+        self.assertEqual(marker.read_text(), "applied\n")
+        history = improvement.load_iteration_records(self.root, self.product)
+        self.assertEqual(len(history), 1)
+        self.assertEqual(history[0]["decision"], "ADOPT")
+
+        third = improvement_loop.advance(self.root, self.product, regenerate=lambda: 0)
+        self.assertEqual(third["status"], "WAITING_FOR_REEVALUATION")
+        self.assertEqual(marker.read_text(), "applied\n")
 
 
 if __name__ == "__main__":
