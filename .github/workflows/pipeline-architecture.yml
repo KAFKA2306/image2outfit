@@ -10,15 +10,7 @@ on:
       - tools/pipeline_stage_adapters.py
       - tools/run_blender_stage.py
       - tools/audit_src_architecture.py
-      - tests/test_architecture_policy.py
-      - tests/test_execution_bindings.py
-      - tests/test_garment_domain.py
-      - tests/test_pattern_ir.py
-      - tests/test_pipeline_core.py
-      - tests/test_pipeline_entrypoints.py
-      - tests/test_pipeline_profile.py
-      - tests/test_research_and_specs.py
-      - tests/test_src_architecture.py
+      - tests/**
       - config/pipeline/**
       - config/pipeline-profiles/**
       - examples/pipeline-request.example.json
@@ -33,15 +25,7 @@ on:
       - tools/pipeline_stage_adapters.py
       - tools/run_blender_stage.py
       - tools/audit_src_architecture.py
-      - tests/test_architecture_policy.py
-      - tests/test_execution_bindings.py
-      - tests/test_garment_domain.py
-      - tests/test_pattern_ir.py
-      - tests/test_pipeline_core.py
-      - tests/test_pipeline_entrypoints.py
-      - tests/test_pipeline_profile.py
-      - tests/test_research_and_specs.py
-      - tests/test_src_architecture.py
+      - tests/**
       - config/pipeline/**
       - config/pipeline-profiles/**
       - examples/pipeline-request.example.json
@@ -86,15 +70,13 @@ jobs:
           tools/pipeline_stage_adapters.py
           tools/run_blender_stage.py
           tools/run_garment_pipeline.py
-          tests/test_architecture_policy.py
+          tests/test_repository_policies.py
           tests/test_execution_bindings.py
           tests/test_garment_domain.py
           tests/test_pattern_ir.py
           tests/test_pipeline_core.py
-          tests/test_pipeline_entrypoints.py
           tests/test_pipeline_profile.py
           tests/test_research_and_specs.py
-          tests/test_src_architecture.py
 
       - name: Reject unresolved production execution
         run: |
