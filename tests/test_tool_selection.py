@@ -98,7 +98,9 @@ class ModularProfileTests(unittest.TestCase):
             next(item for item in plan if item["stage"] == "draft-patterns")["pinned"]
         )
 
-    def test_closed_component_alternative_can_be_selected_without_code_changes(self) -> None:
+    def test_closed_component_alternative_can_be_selected_without_code_changes(
+        self,
+    ) -> None:
         registry = build_registry(
             self.profile,
             bindings=self.request["stageBindings"],
