@@ -104,6 +104,7 @@ def validate() -> dict[str, Any]:
         "productVisualPassRequiredForMerge",
         "productRuntimePassRequiredForMerge",
         "unrelatedExistingProductFailuresBlockMerge",
+        "unrelatedExistingLintDebtBlocksMerge",
     )
     for name in expected_true:
         if rules.get(name) is not True:
@@ -144,6 +145,14 @@ def validate() -> dict[str, Any]:
     if not allowed_states.issubset(tracked_states):
         errors.append("merge-policy contains unknown product state")
 
+    required_evidence = set(merge.get("requiredRepositoryEvidence", []))
+    for required in (
+        "changed-python-ruff-lint-pass",
+        "changed-reusable-python-ruff-format-pass",
+    ):
+        if required not in required_evidence:
+            errors.append(f"merge-policy requiredRepositoryEvidence missing {required}")
+
     if not release.get("requiredHumanEvidenceKinds"):
         errors.append("release policy must retain human evidence requirements")
     if release.get("singleReleaseValidator") != "tools/customer_quality.py":
@@ -163,6 +172,10 @@ def validate() -> dict[str, Any]:
         errors.append("PR merge workflow must run on pull_request")
     if _trigger_has_path_filter(merge_workflow):
         errors.append("canonical PR merge workflow must run for every PR")
+    if "Resolve changed Python files" not in merge_workflow:
+        errors.append("canonical PR merge workflow must resolve changed Python files")
+    if "ruff check --ignore S102 src tools tests" in merge_workflow:
+        errors.append("canonical PR merge workflow must not lint unrelated whole-tree Python")
     if "workflow_dispatch:" not in release_workflow:
         errors.append("product release workflow must remain manual")
     if "pull_request:" in release_workflow or "\n  push:" in release_workflow:
