@@ -1,6 +1,7 @@
 const REPO_URL = "https://github.com/KAFKA2306/image2outfit";
 const RAW_ROOT = "https://raw.githubusercontent.com/KAFKA2306/image2outfit/main/";
 const CATALOG_URL = `${RAW_ROOT}Assets/GenWorks/OutfitCatalog.json`;
+const requestedProductId = new URLSearchParams(window.location.search).get("product");
 
 const grid = document.querySelector("#catalog-grid");
 const coverageGrid = document.querySelector("#coverage-grid");
@@ -64,6 +65,23 @@ function bindImage(image, product, eager = false, filename = "front.png", viewLa
   image.addEventListener("error", () => markMissingImage(image), { once: true });
 }
 
+function isRequestedProduct(product) {
+  return Boolean(requestedProductId) && product.productId === requestedProductId;
+}
+
+function prioritizeRequestedProduct(products) {
+  if (!requestedProductId) return products;
+  const selectedIndex = products.findIndex(isRequestedProduct);
+  if (selectedIndex < 0) return products;
+  return [products[selectedIndex], ...products.filter((_, index) => index !== selectedIndex)];
+}
+
+function markSelected(node, product) {
+  if (!isRequestedProduct(product)) return;
+  node.classList.add("is-selected");
+  node.setAttribute("aria-current", "true");
+}
+
 function setHeroProduct(product, image, nameNode, statusNodeForHero) {
   if (!product) return;
   bindImage(image, product, true);
@@ -115,6 +133,7 @@ function createExampleView(product, view) {
 function createExampleCard(product) {
   const article = document.createElement("article");
   article.className = "example-card";
+  markSelected(article, product);
 
   const header = document.createElement("div");
   header.className = "example-card-header";
@@ -170,7 +189,11 @@ function renderExamples(products) {
   if (!exampleGallery) return;
 
   const examples = [...products]
-    .sort((a, b) => examplePriority(a) - examplePriority(b))
+    .sort((a, b) => {
+      if (isRequestedProduct(a)) return -1;
+      if (isRequestedProduct(b)) return 1;
+      return examplePriority(a) - examplePriority(b);
+    })
     .slice(0, 4);
 
   if (!examples.length) {
@@ -188,6 +211,7 @@ function createProductCard(product) {
   const article = document.createElement("article");
   article.className = "product-card";
   article.dataset.productId = product.productId;
+  markSelected(article, product);
 
   const media = document.createElement("div");
   media.className = "product-media";
@@ -233,7 +257,10 @@ function createProductCard(product) {
 }
 
 function renderCatalog(catalog) {
-  const products = Array.isArray(catalog.activeProducts) ? catalog.activeProducts : [];
+  const sourceProducts = Array.isArray(catalog.activeProducts) ? catalog.activeProducts : [];
+  const products = prioritizeRequestedProduct(sourceProducts);
+  const selected = products.find(isRequestedProduct);
+
   grid.replaceChildren(...products.map(createProductCard));
   renderHero(products);
   renderExamples(products);
@@ -244,7 +271,12 @@ function renderCatalog(catalog) {
     : products.length;
 
   productCountNode.textContent = new Intl.NumberFormat("ja-JP").format(count);
-  statusNode.textContent = `${products.length}件を main の正準カタログから表示しています。Examples・Hero・Coverage・Catalogは同じデータを参照しています。`;
+  if (selected) {
+    document.title = `${selected.productName} — image2outfit`;
+    statusNode.textContent = `${selected.productName} を選択中。${products.length}件を main の正準カタログから表示しています。`;
+  } else {
+    statusNode.textContent = `${products.length}件を main の正準カタログから表示しています。Examples・Hero・Coverage・Catalogは同じデータを参照しています。`;
+  }
 }
 
 function renderCatalogError() {
