@@ -49,7 +49,7 @@ pose list、product root、lifecycle validator、quality threshold を prose や
 ## 変更原則
 
 - generic defect は generic layer で直す
--一つの rule には一つの owner を持たせる
+- 一つの rule には一つの owner を持たせる
 - superseded code / doc / reference は残さない
 - job / schema / manifest / assets / tests / policy / docs を整合させる
 - failing data に合わせて gate を弱めない
