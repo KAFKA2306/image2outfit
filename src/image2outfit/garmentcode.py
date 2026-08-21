@@ -128,8 +128,11 @@ def pattern_hypothesis_to_garmentcode(
 def garmentcode_json(hypothesis: PatternHypothesis) -> str:
     """Serialize a Stage 04 exchange document deterministically."""
 
-    return json.dumps(
-        pattern_hypothesis_to_garmentcode(hypothesis),
-        sort_keys=True,
-        separators=(",", ":"),
-    ) + "\n"
+    return (
+        json.dumps(
+            pattern_hypothesis_to_garmentcode(hypothesis),
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    )
