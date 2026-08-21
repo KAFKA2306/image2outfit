@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "profileId": "garment-reconstruction-modular-v1",
+  "auditContract": {
+    "recordSchema": "config/pipeline/stage-audit-record.schema.v1.json",
+    "manifestSchema": "config/pipeline/run-audit-manifest.schema.v1.json",
+    "storageRoot": ".image2outfit/audit/{productId}/{runId}",
+    "hashAlgorithm": "SHA-256",
+    "chain": "previousRecordDigest"
+  },
+  "selectionPolicy": {
+    "mode": "capability-contract-then-stable-priority",
+    "agentCanProposeRequirements": true,
+    "agentCanBypassContracts": false,
+    "tieBreaker": ["priority", "toolName"]
+  },
+  "researchPrinciples": [
+    "pattern-first-structured-garment",
+    "geometry-first-stitch-graph",
+    "pose-normalized-pattern-recovery",
+    "pattern-coordinate-mapping"
+  ],
+  "stages": [
+    {
+      "stage": "ingest-reference",
+      "toolName": "reference.ingest.bound-source",
+      "purpose": "Bind source images, hashes, provenance, and target avatar.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "capabilities": ["reference.ingest"],
+      "requires": [],
+      "provides": ["reference.bound"],
+      "runtime": "python",
+      "managedOutputs": ["referenceManifest", "sourceSha256", "provenance", "targetAvatarBinding"]
+    },
+    {
+      "stage": "normalize-view",
+      "toolName": "reference.normalize.pose-view",
+      "purpose": "Separate pose and viewpoint effects from garment evidence.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "capabilities": ["reference.normalize"],
+      "requires": ["reference.bound"],
+      "provides": ["reference.normalized"],
+      "runtime": "python",
+      "managedOutputs": ["normalizedReference", "cameraPose", "bodyLandmarks", "normalizationMetrics"]
+    },
+    {
+      "stage": "decompose-garment",
+      "toolName": "garment.decompose.semantic-parts",
+      "purpose": "Name garment parts by construction role and body region.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "capabilities": ["garment.decompose"],
+      "requires": ["reference.normalized"],
+      "provides": ["garment.decomposed"],
+      "runtime": "python",
+      "managedOutputs": ["garmentPartGraph", "spatialAssignments", "materialRegions", "ambiguityLog"]
+    },
+    {
+      "stage": "draft-patterns",
+      "purpose": "Select a construction-compatible pattern representation.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["patternSpecification", "patternEdges", "seamAllowances", "notchesAndDarts", "correspondenceMap"],
+      "tools": [
+        {
+          "toolName": "pattern.explicit-2d",
+          "purpose": "Draft explicit two-dimensional panels for physically sewn garments.",
+          "capabilities": ["pattern.explicit-2d", "garment.panel-sewn"],
+          "requires": ["garment.decomposed"],
+          "provides": ["pattern.drafted", "pattern.explicit-2d", "garment.panel-sewn"],
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "pattern.closed-components",
+          "purpose": "Generate a parametric closed-component representation for garments that do not require physical panel sewing.",
+          "capabilities": ["pattern.closed-components", "garment.closed-components"],
+          "requires": ["garment.decomposed"],
+          "provides": ["pattern.drafted", "pattern.closed-components", "garment.closed-components"],
+          "runtime": "python",
+          "priority": 20,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "infer-stitches",
+      "purpose": "Select the topology contract that joins the chosen garment representation.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["stitchGraph", "edgePairings", "stitchDirections", "topologyValidation"],
+      "tools": [
+        {
+          "toolName": "stitch.explicit-graph",
+          "purpose": "Create explicit edge-to-edge and multi-edge sewing topology.",
+          "capabilities": ["stitch.explicit-graph", "assembly.sewing-springs"],
+          "requires": ["pattern.explicit-2d"],
+          "provides": ["stitch.graph"],
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "stitch.closed-components",
+          "purpose": "Describe deterministic joins for already-closed garment-native components.",
+          "capabilities": ["stitch.closed-components"],
+          "requires": ["pattern.closed-components"],
+          "provides": ["stitch.graph"],
+          "runtime": "python",
+          "priority": 20,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "initialize-3d",
+      "toolName": "initialize.pattern-around-avatar",
+      "purpose": "Place selected garment representation around the avatar without initial intersections.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "capabilities": ["initialize.3d"],
+      "requires": ["pattern.drafted", "stitch.graph"],
+      "provides": ["geometry.initialized"],
+      "runtime": "python",
+      "managedOutputs": ["initializedMesh", "panelTransforms", "initialClearanceAudit"]
+    },
+    {
+      "stage": "build-blender",
+      "purpose": "Select a Blender construction implementation compatible with the chosen representation.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 2,
+      "requiredResultFields": {},
+      "managedOutputs": ["editableBlend", "buildReport", "geometryMetrics"],
+      "tools": [
+        {
+          "toolName": "build.blender.pattern-sewn",
+          "purpose": "Build explicit panels and sewing-ready geometry in Blender.",
+          "capabilities": ["build.blender", "garment.panel-sewn"],
+          "requires": ["geometry.initialized", "pattern.explicit-2d"],
+          "provides": ["garment.blend"],
+          "runtime": "blender",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "build.blender.closed-components",
+          "purpose": "Build garment-native closed components in Blender.",
+          "capabilities": ["build.blender", "garment.closed-components"],
+          "requires": ["geometry.initialized", "pattern.closed-components"],
+          "provides": ["garment.blend"],
+          "runtime": "blender",
+          "priority": 20,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "simulate-cloth",
+      "purpose": "Select an assembly/settling method compatible with the constructed garment.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["clothCache", "simulationConfig", "collisionReport", "simulatedMesh"],
+      "tools": [
+        {
+          "toolName": "simulate.blender.sewing-springs",
+          "purpose": "Physically close declared seams using Blender Cloth sewing springs and collision.",
+          "capabilities": ["simulate.sewing-springs", "assembly.sewing-springs"],
+          "requires": ["garment.blend", "pattern.explicit-2d", "stitch.graph"],
+          "provides": ["garment.simulated"],
+          "runtime": "blender",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "simulate.closed-components-clearance",
+          "purpose": "Settle closed components with bounded deterministic body-clearance refinement.",
+          "capabilities": ["simulate.bounded-clearance"],
+          "requires": ["garment.blend", "pattern.closed-components"],
+          "provides": ["garment.simulated"],
+          "runtime": "blender",
+          "priority": 20,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "skin-and-export",
+      "toolName": "export.skin-fbx",
+      "purpose": "Bind semantic body regions to bones and export editable source and FBX.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 2,
+      "requiredResultFields": {},
+      "capabilities": ["skin.weights", "export.fbx"],
+      "requires": ["garment.simulated"],
+      "provides": ["garment.exported"],
+      "runtime": "blender",
+      "managedOutputs": ["skinnedBlend", "fbx", "weightAudit", "prefabDeclaration"]
+    },
+    {
+      "stage": "render-evidence",
+      "toolName": "render.bpy-review",
+      "purpose": "Render pattern appearance, five views, required poses, and review contact sheets from the current artifact.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 5,
+      "requiredResultFields": {},
+      "capabilities": ["render.bpy", "render.pattern", "render.five-view", "render.required-poses"],
+      "requires": ["garment.exported"],
+      "provides": ["review.images"],
+      "runtime": "blender",
+      "managedOutputs": ["fiveViewImages", "requiredPoseImages", "renderManifest"]
+    },
+    {
+      "stage": "audit-geometry",
+      "toolName": "verify.geometry-fit",
+      "purpose": "Measure topology, weights, degeneracy, collisions, and evidence hashes.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "capabilities": ["verify.geometry", "verify.fit"],
+      "requires": ["review.images"],
+      "provides": ["geometry.audited"],
+      "runtime": "python",
+      "managedOutputs": ["geometryAudit", "penetrationAudit", "evidenceHashAudit", "gateSummary"]
+    },
+    {
+      "stage": "visual-review",
+      "toolName": "review.direct-image-inspection",
+      "purpose": "Require direct inspection of current pattern and assembled images before appearance can pass.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 5,
+      "requiredResultFields": {"reviewMethod": "direct-image-inspection"},
+      "capabilities": ["review.direct-image-inspection"],
+      "requires": ["review.images", "geometry.audited"],
+      "provides": ["visual.reviewed"],
+      "runtime": "human",
+      "managedOutputs": ["visualReview", "inspectedImageHashes", "blockingFindings"]
+    },
+    {
+      "stage": "finalize-candidate",
+      "toolName": "candidate.finalize-truthful-state",
+      "purpose": "Write the truthful WORKING, COMPLETE, or REJECTED candidate state.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {"decisionRecorded": true},
+      "capabilities": ["candidate.finalize"],
+      "requires": ["visual.reviewed"],
+      "provides": ["candidate.finalized"],
+      "runtime": "python",
+      "managedOutputs": ["candidateState", "completionGateRecord", "releaseDecision"]
+    }
+  ]
+}
