@@ -117,7 +117,10 @@ class ToolchainAuditTest(unittest.TestCase):
         result = audit_toolchain.audit(self.root)
         self.assertFalse(result["passed"])
         self.assertTrue(
-            any("Blender Python dependency mismatch" in error for error in result["errors"])
+            any(
+                "Blender Python dependency mismatch" in error
+                for error in result["errors"]
+            )
         )
 
     def test_blender_python_version_drift_is_rejected(self) -> None:
@@ -125,6 +128,4 @@ class ToolchainAuditTest(unittest.TestCase):
         self.write_json(self.root / "config" / "toolchain-lock.json", self.lock)
         result = audit_toolchain.audit(self.root)
         self.assertFalse(result["passed"])
-        self.assertTrue(
-            any("exact 3.11 patch" in error for error in result["errors"])
-        )
+        self.assertTrue(any("exact 3.11 patch" in error for error in result["errors"]))
