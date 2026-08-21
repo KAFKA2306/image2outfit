@@ -51,6 +51,8 @@ class PipelineState(TypedDict, total=False):
     status: str
     current_stage: str
     completed_stages: list[str]
+    stage_methods: dict[str, str]
+    selected_methods: dict[str, str]
     events: list[dict[str, Any]]
     errors: list[str]
     outputs: dict[str, Any]
@@ -62,6 +64,24 @@ class PipelineState(TypedDict, total=False):
 CheckpointCallback = Callable[[PipelineState], None]
 
 
+def _method_map(value: object, *, label: str) -> dict[str, str]:
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        raise ValueError(f"pipeline state {label} must be an object")
+    canonical = {stage.value for stage in PIPELINE_STAGES}
+    result: dict[str, str] = {}
+    for raw_stage, raw_method in value.items():
+        if not isinstance(raw_stage, str) or raw_stage not in canonical:
+            raise ValueError(f"pipeline state {label} contains an unknown stage")
+        if not isinstance(raw_method, str) or not raw_method.strip():
+            raise ValueError(
+                f"pipeline state {label}.{raw_stage} must be a non-empty string"
+            )
+        result[raw_stage] = raw_method.strip()
+    return result
+
+
 def new_pipeline_state(
     *,
     product_id: str,
@@ -71,6 +91,7 @@ def new_pipeline_state(
     revision_id: str = "",
     execution_mode: ExecutionMode | str = ExecutionMode.PLAN,
     run_id: str | None = None,
+    stage_methods: Mapping[str, str] | None = None,
 ) -> PipelineState:
     if not product_id or not target_avatar or not source_reference:
         raise ValueError("product_id, target_avatar, and source_reference are required")
@@ -88,6 +109,8 @@ def new_pipeline_state(
         "status": "READY",
         "current_stage": "",
         "completed_stages": [],
+        "stage_methods": _method_map(stage_methods, label="stage_methods"),
+        "selected_methods": {},
         "events": [],
         "errors": [],
         "outputs": {},
@@ -126,6 +149,17 @@ def validate_pipeline_state(state: Mapping[str, Any]) -> tuple[PipelineStage, ..
     canonical_names = [stage.value for stage in PIPELINE_STAGES]
     if completed_names != canonical_names[: len(completed_names)]:
         raise ValueError("completed_stages must be a canonical pipeline prefix")
+
+    _method_map(state.get("stage_methods", {}), label="stage_methods")
+    selected_methods = _method_map(
+        state.get("selected_methods", {}), label="selected_methods"
+    )
+    invalid_selected = sorted(set(selected_methods) - set(completed_names))
+    if invalid_selected:
+        raise ValueError(
+            "selected_methods may only describe completed stages: "
+            + ", ".join(invalid_selected)
+        )
 
     outputs = state.get("outputs", {})
     if not isinstance(outputs, Mapping):
@@ -217,9 +251,34 @@ def resume_pipeline_state(
     }
 
 
+def _selected_method(
+    state: Mapping[str, Any],
+    registry: ToolRegistry,
+    stage: PipelineStage,
+) -> str:
+    completed_selection = state.get("selected_methods", {})
+    if isinstance(completed_selection, Mapping):
+        prior = completed_selection.get(stage.value)
+        if isinstance(prior, str) and prior:
+            return registry.resolve_method(stage, prior)
+    requested = state.get("stage_methods", {})
+    method_id = requested.get(stage.value) if isinstance(requested, Mapping) else None
+    return registry.resolve_method(stage, method_id if isinstance(method_id, str) else None)
+
+
+def _validate_registry_methods(
+    state: Mapping[str, Any],
+    registry: ToolRegistry,
+) -> None:
+    for stage in PIPELINE_STAGES:
+        _selected_method(state, registry, stage)
+
+
 def _stage_input_snapshot(
     state: PipelineState,
     stage: PipelineStage,
+    *,
+    selected_method: str,
 ) -> dict[str, Any]:
     records = state.get("stage_records", [])
     previous_digest = records[-1]["recordDigest"] if records else "0" * 64
@@ -234,6 +293,7 @@ def _stage_input_snapshot(
         "revisionId": state.get("revision_id", ""),
         "executionMode": state.get("execution_mode"),
         "stage": stage.value,
+        "selectedMethod": selected_method,
         "completedStages": list(state.get("completed_stages", [])),
         "previousRecordDigest": previous_digest,
     }
@@ -254,11 +314,16 @@ def _rebuild_reused_prefix(
     records: list[dict[str, Any]] = []
     for stage_name in completed:
         stage = PipelineStage(stage_name)
-        descriptor = registry.descriptor(stage)
+        method_id = _selected_method(state, registry, stage)
+        descriptor = registry.descriptor(stage, method_id)
         output = dict(state["outputs"][stage_name])
         started = utc_now()
         previous = records[-1]["recordDigest"] if records else "0" * 64
-        snapshot = _stage_input_snapshot({**current, "stage_records": records}, stage)
+        snapshot = _stage_input_snapshot(
+            {**current, "stage_records": records},
+            stage,
+            selected_method=method_id,
+        )
         record = make_stage_record(
             run_id=str(state["run_id"]),
             product_id=str(state["product_id"]),
@@ -296,11 +361,16 @@ def _execute_stage(
         return state
 
     expected_index = len(completed_names)
-    descriptor = registry.descriptor(stage)
+    method_id = _selected_method(state, registry, stage)
+    descriptor = registry.descriptor(stage, method_id)
     mode = ExecutionMode(state.get("execution_mode", ExecutionMode.PLAN.value))
     records = list(state.get("stage_records", []))
     previous_digest = records[-1]["recordDigest"] if records else "0" * 64
-    input_snapshot = _stage_input_snapshot(state, stage)
+    input_snapshot = _stage_input_snapshot(
+        state,
+        stage,
+        selected_method=method_id,
+    )
     started_at = utc_now()
     try:
         if (
@@ -315,7 +385,7 @@ def _execute_stage(
             raise ValueError(
                 f"stage {stage.value!r} is out of order; expected {expected!r}"
             )
-        update = registry.invoke(stage, state)
+        update = registry.invoke(stage, state, method_id=method_id)
         actual_mode = update.get("mode")
         expected_mode = "planned" if mode is ExecutionMode.PLAN else "executed"
         if actual_mode != expected_mode:
@@ -329,6 +399,7 @@ def _execute_stage(
             "mode": "failed",
             "requestedMode": mode.value,
             "stage": stage.value,
+            "method": method_id,
             "errorType": type(exc).__name__,
             "error": str(exc),
         }
@@ -354,6 +425,7 @@ def _execute_stage(
             *state.get("events", []),
             {
                 "stage": stage.value,
+                "method": method_id,
                 "status": "FAILED",
                 "error": str(exc),
                 "auditRecordDigest": record["recordDigest"],
@@ -389,10 +461,15 @@ def _execute_stage(
     )
     outputs = {**state.get("outputs", {}), stage.value: update}
     completed = [*completed_names, stage.value]
+    selected_methods = {
+        **state.get("selected_methods", {}),
+        stage.value: method_id,
+    }
     events = [
         *state.get("events", []),
         {
             "stage": stage.value,
+            "method": method_id,
             "status": event_status,
             "tool": descriptor.tool_name,
             "auditRecordDigest": record["recordDigest"],
@@ -407,6 +484,7 @@ def _execute_stage(
         "status": status,
         "current_stage": stage.value,
         "completed_stages": completed,
+        "selected_methods": selected_methods,
         "events": events,
         "outputs": outputs,
         "stage_records": [*records, record],
@@ -424,6 +502,7 @@ def run_pipeline(
         raise ValueError(f"pipeline registry is incomplete: {missing}")
     current = dict(state)
     completed = validate_pipeline_state(current)
+    _validate_registry_methods(current, registry)
     current = _rebuild_reused_prefix(current, registry)
     for stage in PIPELINE_STAGES[len(completed) :]:
         current = _execute_stage(current, stage, registry)
@@ -459,6 +538,7 @@ def build_langchain(registry: ToolRegistry):
 
 def run_langchain(state: PipelineState, registry: ToolRegistry) -> PipelineState:
     validate_pipeline_state(state)
+    _validate_registry_methods(state, registry)
     return build_langchain(registry).invoke(state)
 
 
@@ -497,4 +577,5 @@ def build_langgraph(registry: ToolRegistry):
 
 def run_langgraph(state: PipelineState, registry: ToolRegistry) -> PipelineState:
     validate_pipeline_state(state)
+    _validate_registry_methods(state, registry)
     return build_langgraph(registry).invoke(state)
