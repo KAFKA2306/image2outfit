@@ -50,6 +50,85 @@ class PipelineCoreTests(unittest.TestCase):
         self.assertEqual(result["completed_stages"], seen)
         self.assertTrue(all(event["status"] == "PLANNED" for event in result["events"]))
 
+    def test_explicit_stage_method_replaces_default_and_is_audited(self) -> None:
+        registry = ToolRegistry()
+        target = PIPELINE_STAGES[3]
+        for stage in PIPELINE_STAGES:
+            registry.register(
+                stage,
+                lambda state, stage_name=stage.value: {
+                    "mode": "planned",
+                    "stage": stage_name,
+                    "implementation": "baseline",
+                },
+                ToolDescriptor(
+                    f"baseline-{stage.value}",
+                    f"baseline {stage.value}",
+                    f"{stage.value}.json",
+                ),
+                method_id="baseline",
+                default=True,
+            )
+        registry.register(
+            target,
+            lambda state: {
+                "mode": "planned",
+                "stage": target.value,
+                "implementation": "research",
+            },
+            ToolDescriptor(
+                "research-pattern-candidate",
+                "research-backed pattern candidate",
+                f"{target.value}.json",
+            ),
+            method_id="research-candidate",
+        )
+
+        result = run_pipeline(
+            new_pipeline_state(
+                product_id="method-garment",
+                target_avatar="SiroinoSotai_PC",
+                source_reference="private-reference://sha256/method",
+                stage_methods={target.value: "research-candidate"},
+            ),
+            registry,
+        )
+
+        self.assertEqual(
+            result["outputs"][target.value]["implementation"], "research"
+        )
+        self.assertEqual(result["selected_methods"][target.value], "research-candidate")
+        event = next(item for item in result["events"] if item["stage"] == target.value)
+        self.assertEqual(event["method"], "research-candidate")
+        self.assertEqual(event["tool"], "research-pattern-candidate")
+        self.assertTrue(
+            all(
+                method == "baseline"
+                for stage, method in result["selected_methods"].items()
+                if stage != target.value
+            )
+        )
+
+    def test_unknown_stage_method_fails_before_execution(self) -> None:
+        registry = ToolRegistry()
+        for stage in PIPELINE_STAGES:
+            registry.register(
+                stage,
+                lambda state, stage_name=stage.value: {
+                    "mode": "planned",
+                    "stage": stage_name,
+                },
+                ToolDescriptor(stage.value, stage.value, f"{stage.value}.json"),
+            )
+        state = new_pipeline_state(
+            product_id="method-garment",
+            target_avatar="SiroinoSotai_PC",
+            source_reference="private-reference://sha256/method",
+            stage_methods={PIPELINE_STAGES[4].value: "missing-research-method"},
+        )
+        with self.assertRaisesRegex(KeyError, "missing-research-method"):
+            run_pipeline(state, registry)
+
     def test_execute_finishes_as_executed_not_product_complete(self) -> None:
         registry = ToolRegistry()
         for stage in PIPELINE_STAGES:
