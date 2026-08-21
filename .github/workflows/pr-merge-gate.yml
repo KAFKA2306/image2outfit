@@ -46,7 +46,7 @@ jobs:
           tests.test_release_provenance_gate
           tests.test_repository_policies
           tests.test_release_contracts
-          tests.test_release_gate
+          tests.test_candidate_manifest
           -v
 
       - name: Verify PR merge and product release separation

@@ -45,10 +45,28 @@ class ToolOwnershipTest(unittest.TestCase):
         self.assertIn("Taskfile.yml", manage["references"])
         self.assertFalse(manage["unreferenced"])
 
-    def test_production_gate_core_uses_canonical_manifest_owner(self) -> None:
-        source = (TOOLS / "production_gate_core.py").read_text(encoding="utf-8")
-        self.assertIn("import candidate_manifest as legacy", source)
-        self.assertNotIn("import release_gate as legacy", source)
+    def test_production_has_one_canonical_entrypoint_without_legacy_facades(
+        self,
+    ) -> None:
+        for removed in ("production_gate_core.py", "release_gate.py", "pipeline.py"):
+            self.assertFalse((TOOLS / removed).exists(), removed)
+
+        production = (TOOLS / "production_gate.py").read_text(encoding="utf-8")
+        self.assertIn("from candidate_orchestrator import", production)
+        self.assertIn("from release_orchestrator import", production)
+
+        for name in (
+            "production_gate.py",
+            "candidate_orchestrator.py",
+            "release_orchestrator.py",
+            "candidate_manifest.py",
+            "technical_candidate.py",
+        ):
+            source = (TOOLS / name).read_text(encoding="utf-8")
+            self.assertNotIn("production_gate_core", source, name)
+            self.assertNotIn("release_gate", source, name)
+            self.assertNotIn("import pipeline", source, name)
+            self.assertNotIn("legacy-blender-gate-job", source, name)
 
 
 class ToolchainAuditTest(unittest.TestCase):

@@ -8,28 +8,31 @@ from pathlib import Path
 from typing import Any
 
 import audit_research_baseline
+import candidate_manifest as candidate_contract
 import production_contract as contract
-import release_gate as legacy
 from runtime_transaction import DirectoryTransaction
+from technical_candidate import run_candidate
 
 
 def _augment_audit(artifact: Path, values: dict[str, Any]) -> None:
     audit_path = artifact / "audit.json"
-    audit = legacy.read(audit_path)
+    audit = candidate_contract.read(audit_path)
     audit.setdefault("schemaVersion", 2)
     state = audit.setdefault("stateProtection", {})
     if not isinstance(state, dict):
         state = {}
         audit["stateProtection"] = state
     state.update(values)
-    legacy.write(audit_path, audit)
+    candidate_contract.write(audit_path, audit)
 
 
 def _research_state() -> tuple[dict[str, Any], dict[str, Any], str]:
-    report = audit_research_baseline.audit(legacy.ROOT)
+    report = audit_research_baseline.audit(candidate_contract.ROOT)
     baseline_path = audit_research_baseline.BASELINE_PATH
-    baseline = legacy.read(baseline_path)
-    baseline_hash = legacy.digest(baseline_path) if baseline_path.is_file() else ""
+    baseline = candidate_contract.read(baseline_path)
+    baseline_hash = (
+        candidate_contract.digest(baseline_path) if baseline_path.is_file() else ""
+    )
     return report, baseline, baseline_hash
 
 
@@ -39,15 +42,15 @@ def _write_research_failure(
     report: dict[str, Any],
 ) -> None:
     artifact.mkdir(parents=True, exist_ok=True)
-    legacy.write(artifact / "research-baseline.json", report)
-    legacy.write(
+    candidate_contract.write(artifact / "research-baseline.json", report)
+    candidate_contract.write(
         artifact / "audit.json",
         {
             "schemaVersion": 2,
             "phase": "candidate",
             "jobId": job["id"],
             "adapterId": job["adapterId"],
-            "checkedAt": legacy.now(),
+            "checkedAt": candidate_contract.now(),
             "decision": "NO-GO",
             "releaseEligible": False,
             "stages": {
@@ -73,7 +76,7 @@ def _bind_research_to_candidate(
     baseline_hash: str,
 ) -> None:
     manifest_path = candidate / "candidate-manifest.json"
-    manifest = legacy.read(manifest_path)
+    manifest = candidate_contract.read(manifest_path)
     if not manifest_path.is_file() or not manifest:
         raise RuntimeError(
             "candidate manifest is missing after a successful candidate run"
@@ -86,10 +89,10 @@ def _bind_research_to_candidate(
         "sha256": baseline_hash,
         "requiredCapabilities": baseline["requiredCapabilities"],
     }
-    legacy.write(manifest_path, manifest)
+    candidate_contract.write(manifest_path, manifest)
 
     audit_path = artifact / "audit.json"
-    audit = legacy.read(audit_path)
+    audit = candidate_contract.read(audit_path)
     stages = audit.setdefault("stages", {})
     stages["researchBaseline"] = {
         "passed": True,
@@ -101,8 +104,8 @@ def _bind_research_to_candidate(
         "productionCoverage": report.get("productionCoverage", []),
         "warnings": report.get("warnings", []),
     }
-    audit["candidateManifestSha256"] = legacy.digest(manifest_path)
-    legacy.write(audit_path, audit)
+    audit["candidateManifestSha256"] = candidate_contract.digest(manifest_path)
+    candidate_contract.write(audit_path, audit)
 
 
 def _bind_pose_contract_to_candidate(
@@ -112,7 +115,7 @@ def _bind_pose_contract_to_candidate(
     policy: dict[str, Any],
 ) -> list[str]:
     manifest_path = candidate / "candidate-manifest.json"
-    manifest = legacy.read(manifest_path)
+    manifest = candidate_contract.read(manifest_path)
     if not manifest_path.is_file() or not manifest:
         return ["candidate manifest is missing before pose binding"]
 
@@ -124,17 +127,17 @@ def _bind_pose_contract_to_candidate(
         return ["candidate manifest files are invalid"]
 
     for pose, source_value in contract.required_pose_paths(job, policy).items():
-        source = legacy.path(source_value)
+        source = candidate_contract.path(source_value)
         destination = candidate / "Pose" / f"{pose}.png"
         if not source.is_file():
             errors.append(f"required pose image missing: {source_value}")
             continue
         try:
-            width, height = legacy.png_size(source)
+            width, height = candidate_contract.png_size(source)
         except (OSError, ValueError) as exc:
             errors.append(f"required pose image invalid: {source_value}: {exc}")
             continue
-        source_hash = legacy.digest(source)
+        source_hash = candidate_contract.digest(source)
         if source_hash in seen_hashes:
             errors.append(f"required pose image is duplicated by content: {pose}")
             continue
@@ -161,17 +164,17 @@ def _bind_pose_contract_to_candidate(
         "requiredPoses": list(policy.get("requiredPoses", [])),
         "poses": pose_records,
     }
-    legacy.write(manifest_path, manifest)
+    candidate_contract.write(manifest_path, manifest)
 
-    audit = legacy.read(artifact / "audit.json")
+    audit = candidate_contract.read(artifact / "audit.json")
     stages = audit.setdefault("stages", {})
     stages["poseContract"] = {
         "passed": True,
         "requiredPoses": list(policy.get("requiredPoses", [])),
         "poses": pose_records,
     }
-    audit["candidateManifestSha256"] = legacy.digest(manifest_path)
-    legacy.write(artifact / "audit.json", audit)
+    audit["candidateManifestSha256"] = candidate_contract.digest(manifest_path)
+    candidate_contract.write(artifact / "audit.json", audit)
     return []
 
 
@@ -181,21 +184,21 @@ def _record_candidate_failure(
     stage: str,
 ) -> None:
     audit_path = artifact / "audit.json"
-    audit = legacy.read(audit_path)
+    audit = candidate_contract.read(audit_path)
     audit.setdefault("schemaVersion", 2)
     audit["decision"] = "NO-GO"
     audit["releaseEligible"] = False
     stages = audit.setdefault("stages", {})
     stages[stage] = {"passed": False, "errors": errors}
     audit["errors"] = list(dict.fromkeys([*audit.get("errors", []), *errors]))
-    legacy.write(audit_path, audit)
+    candidate_contract.write(audit_path, audit)
 
 
 def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
-    candidate = legacy.path(job["candidateDir"])
-    release = legacy.path(job["releaseDir"])
-    artifact = legacy.path(job["artifactDir"])
-    product_root = legacy.path(job["productRoot"])
+    candidate = candidate_contract.path(job["candidateDir"])
+    release = candidate_contract.path(job["releaseDir"])
+    artifact = candidate_contract.path(job["artifactDir"])
+    product_root = candidate_contract.path(job["productRoot"])
     research, baseline, baseline_hash = _research_state()
     if research.get("passed") is not True:
         _write_research_failure(artifact, job, research)
@@ -215,13 +218,13 @@ def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) 
         release_started = True
         workspace_had_original = workspace_tx.begin()
         workspace_started = True
-        result = legacy.run_candidate(job_path, job, policy)
-        legacy.write(artifact / "research-baseline.json", research)
+        result = run_candidate(job_path, job, policy)
+        candidate_contract.write(artifact / "research-baseline.json", research)
         release_tx.rollback(release_had_original)
         release_started = False
 
         if result == 0:
-            state_errors = contract.product_state_errors(job, legacy.ROOT)
+            state_errors = contract.product_state_errors(job, candidate_contract.ROOT)
             if state_errors:
                 _record_candidate_failure(
                     artifact, state_errors, "canonicalProductState"

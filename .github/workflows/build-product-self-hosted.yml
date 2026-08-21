@@ -15,10 +15,15 @@ on:
       - tools/genworks_product_common.py
       - tools/**/*_build.py
       - tools/production_gate.py
-      - tools/production_gate_core.py
-      - tools/release_gate.py
+      - tools/candidate_orchestrator.py
+      - tools/release_orchestrator.py
+      - tools/candidate_manifest.py
+      - tools/technical_candidate.py
+      - tools/production_contract.py
+      - tools/customer_quality.py
+      - tools/contract_io.py
+      - tools/runtime_transaction.py
       - tools/runtime_paths.py
-      - tools/pipeline.py
       - tools/resolve_product_build_scope.py
       - Assets/GenWorks/Shared/**
       - config/job.schema.v2.json

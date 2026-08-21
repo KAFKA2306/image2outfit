@@ -81,6 +81,28 @@ src/image2outfit
 
 Markdown の番号や名称が実装と食い違う場合は、実装と profile を確認してこの文書を更新します。
 
+## Production lifecycle
+
+operator から見た production の正準入口は `tools/manage.py`、candidate / release gate の実行入口は `tools/production_gate.py` の一つに限定します。production 内部で互換 facade や旧 all-in-one pipeline を経由しません。
+
+```text
+manage.py
+  ↓
+production_gate.py
+  ├─ candidate_orchestrator.py
+  │    ├─ technical_candidate.py
+  │    ├─ candidate_manifest.py
+  │    └─ runtime_transaction.py
+  └─ release_orchestrator.py
+       ├─ customer_quality.py
+       ├─ production_contract.py
+       └─ runtime_transaction.py
+```
+
+`candidate_orchestrator.py` と `release_orchestrator.py` は統合しません。candidate は canonical workspace と last-good candidate を保護しながら新しい技術候補を構築し、release は review 済み candidate を変更せず customer release を transactionally package するため、rollback 境界が異なります。
+
+candidate identity、input hash、delivery manifest の正本は `tools/candidate_manifest.py`、JSON / path / digest の低レベル primitive は `tools/contract_io.py` が所有します。Blender の構造検証は `tools/technical_candidate.py` が schemaVersion 2 job を直接受け取り、互換 job への変換を行いません。
+
 ## 状態の所有権
 
 pipeline の実行状態と製品 lifecycle を分離します。

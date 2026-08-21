@@ -11,19 +11,14 @@ TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
 import candidate_manifest  # noqa: E402
-import pipeline as legacy  # noqa: E402
-import release_gate as gate  # noqa: E402
-
 
 POLICY = {
     "schemaVersion": 1,
-    "blockedReleaseAdapterIds": [],
     "minimumPreview": {
         "width": 1024,
         "height": 1024,
         "requiredViews": ["front", "back", "left", "right", "three-quarter"],
     },
-    "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
     "requiredHumanEvidenceKinds": [
         "visual-review",
         "pose-penetration-review",
@@ -51,7 +46,7 @@ REQUIRED_JOB_FIELDS = [
 ]
 
 
-class ReleaseGateTest(unittest.TestCase):
+class CandidateManifestTest(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
@@ -84,9 +79,7 @@ class ReleaseGateTest(unittest.TestCase):
         )
         self.write_json(self.root / "config/toolchain-lock.json", {"schemaVersion": 1})
         (self.root / "pyproject.toml").write_text(
-            '[project]\nname = "test"\nversion = "0.0.0"\n'
-            'dependencies = ["Pillow==12.3.0"]\n',
-            encoding="utf-8",
+            '[project]\nname = "test"\nversion = "0.0.0"\n', encoding="utf-8"
         )
         self.write_json(self.root / "Packages/vpm-manifest.json", {})
         self.write_json(self.root / "Packages/manifest.json", {})
@@ -95,17 +88,17 @@ class ReleaseGateTest(unittest.TestCase):
         )
         self.unity_pipeline_path.write_text("// test pipeline\n", encoding="utf-8")
 
-        self.build_script = self.root / "tools/build.py"
-        self.build_script.write_text("print('build')\n", encoding="utf-8")
-        self.avatar = self.root / "Assets/_Vendor/TestAvatar/Avatar.prefab"
-        self.avatar.write_text("private avatar", encoding="utf-8")
-        self.avatar_source = self.root / "Assets/_Vendor/TestAvatar/Avatar.fbx"
-        self.avatar_source.write_text("private source", encoding="utf-8")
-        self.outfit_fbx = self.root / "Assets/GenWorks/test-product/Models/Outfit.fbx"
-        self.outfit_fbx.write_text("outfit", encoding="utf-8")
-        self.license = self.root / "Assets/_Local/Evidence/test-product/license.json"
+        build_script = self.root / "tools/build.py"
+        build_script.write_text("print('build')\n", encoding="utf-8")
+        avatar = self.root / "Assets/_Vendor/TestAvatar/Avatar.prefab"
+        avatar.write_text("private avatar", encoding="utf-8")
+        avatar_source = self.root / "Assets/_Vendor/TestAvatar/Avatar.fbx"
+        avatar_source.write_text("private source", encoding="utf-8")
+        outfit_fbx = self.root / "Assets/GenWorks/test-product/Models/Outfit.fbx"
+        outfit_fbx.write_text("outfit", encoding="utf-8")
+        license_path = self.root / "Assets/_Local/Evidence/test-product/license.json"
         self.write_json(
-            self.license,
+            license_path,
             {
                 "adapterId": "test-adapter-v1",
                 "sourceUrl": "https://example.invalid/avatar",
@@ -124,9 +117,7 @@ class ReleaseGateTest(unittest.TestCase):
             "blendPath": "Assets/GenWorks/test-product/Source/Outfit.blend",
             "fbxAssetPath": "Assets/GenWorks/test-product/Models/Outfit.fbx",
             "prefabAssetPath": "Assets/GenWorks/test-product/Prefab/Outfit.prefab",
-            "integratedPrefabAssetPath": (
-                "Assets/GenWorks/test-product/Prefab/Outfit_avatar.prefab"
-            ),
+            "integratedPrefabAssetPath": "Assets/GenWorks/test-product/Prefab/Outfit_avatar.prefab",
             "targetAvatarAssetPath": "Assets/_Vendor/TestAvatar/Avatar.prefab",
             "targetSourcePath": "Assets/_Vendor/TestAvatar/Avatar.fbx",
             "artifactDir": ".image2outfit/products/test-product/reports",
@@ -146,14 +137,13 @@ class ReleaseGateTest(unittest.TestCase):
         }
         self.job_path = self.root / ".image2outfit/products/test-product/job.json"
         self.write_json(self.job_path, self.job)
-
         self.patches = (
             patch.object(candidate_manifest, "ROOT", self.root),
-            patch.object(gate, "ROOT", self.root),
-            patch.object(gate, "POLICY_PATH", self.policy_path),
-            patch.object(gate, "JOB_SCHEMA_PATH", self.schema_path),
-            patch.object(gate, "UNITY_PIPELINE_PATH", self.unity_pipeline_path),
-            patch.object(legacy, "ROOT", self.root),
+            patch.object(candidate_manifest, "POLICY_PATH", self.policy_path),
+            patch.object(candidate_manifest, "JOB_SCHEMA_PATH", self.schema_path),
+            patch.object(
+                candidate_manifest, "UNITY_PIPELINE_PATH", self.unity_pipeline_path
+            ),
         )
         for item in self.patches:
             item.start()
@@ -173,12 +163,12 @@ class ReleaseGateTest(unittest.TestCase):
         legacy_job["schemaVersion"] = 1
         self.write_json(self.job_path, legacy_job)
         with self.assertRaisesRegex(ValueError, "schemaVersion must be 2"):
-            gate.load(self.job_path)
+            candidate_manifest.load(self.job_path)
 
     def test_private_avatar_cannot_be_selected_for_delivery(self) -> None:
         self.job["deliveryAssets"] = ["Assets/_Vendor/TestAvatar/Avatar.fbx"]
         with self.assertRaisesRegex(ValueError, "private avatar source"):
-            gate.candidate_files(self.job, POLICY)
+            candidate_manifest.candidate_files(self.job, POLICY)
 
     def test_tampered_candidate_file_is_rejected(self) -> None:
         candidate = self.root / self.job["candidateDir"]
@@ -192,21 +182,15 @@ class ReleaseGateTest(unittest.TestCase):
             "adapterId": self.job["adapterId"],
             "sourceCommit": "local",
             "inputHashes": {},
-            "files": gate.manifest([file], candidate),
+            "files": candidate_manifest.manifest([file], candidate),
         }
         file.write_text("tampered", encoding="utf-8")
-        errors = gate.verify_candidate(self.job_path, self.job, candidate, manifest)
+        errors = candidate_manifest.verify_candidate(
+            self.job_path, self.job, candidate, manifest
+        )
         self.assertTrue(
             any("candidate file changed" in error for error in errors), errors
         )
-
-    def test_direct_release_mode_is_disabled(self) -> None:
-        with patch.object(
-            sys,
-            "argv",
-            ["release_gate.py", "--mode", "release", "--job", str(self.job_path)],
-        ):
-            self.assertEqual(gate.main(), 2)
 
 
 if __name__ == "__main__":

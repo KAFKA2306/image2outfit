@@ -14,9 +14,9 @@ if str(SRC) not in sys.path:
 
 from image2outfit.quality import validate_quality_assessment
 
+import candidate_manifest as candidate_contract
 import customer_quality
 import production_contract as contract
-import release_gate as legacy
 from candidate_orchestrator import _research_state
 from runtime_transaction import DirectoryTransaction
 
@@ -29,7 +29,7 @@ def _quality_spec_audit(
     candidate_hash: str,
     evidence_documents: dict[str, dict[str, Any]],
 ) -> tuple[dict[str, Any], list[str]]:
-    spec_data = legacy.read(legacy.ROOT / QUALITY_SPEC_PATH)
+    spec_data = candidate_contract.read(candidate_contract.ROOT / QUALITY_SPEC_PATH)
     visual_review = evidence_documents.get("visual-review", {})
     assessment = (
         visual_review.get("qualitySpec") if isinstance(visual_review, dict) else None
@@ -40,8 +40,8 @@ def _quality_spec_audit(
         job_id=str(job.get("id", "")),
         adapter_id=str(job.get("adapterId", "")),
         candidate_manifest_sha256=candidate_hash,
-        resolve_repo_path=legacy.path,
-        digest=legacy.digest,
+        resolve_repo_path=candidate_contract.path,
+        digest=candidate_contract.digest,
     )
     result["specPath"] = QUALITY_SPEC_PATH.as_posix()
     if errors:
@@ -56,15 +56,17 @@ def _strict_release_audit(
     job: dict[str, Any],
     policy: dict[str, Any],
 ) -> tuple[dict[str, Any], dict[str, Any], list[str], str]:
-    candidate = legacy.path(job["candidateDir"])
+    candidate = candidate_contract.path(job["candidateDir"])
     candidate_manifest_path = candidate / "candidate-manifest.json"
-    candidate_manifest = legacy.read(candidate_manifest_path)
+    candidate_manifest = candidate_contract.read(candidate_manifest_path)
     candidate_hash = (
-        legacy.digest(candidate_manifest_path)
+        candidate_contract.digest(candidate_manifest_path)
         if candidate_manifest_path.is_file()
         else ""
     )
-    errors = legacy.verify_candidate(job_path, job, candidate, candidate_manifest)
+    errors = candidate_contract.verify_candidate(
+        job_path, job, candidate, candidate_manifest
+    )
     if job["adapterId"] in policy.get("blockedReleaseAdapterIds", []):
         errors.append(f"adapter blocked from release: {job['adapterId']}")
 
@@ -96,7 +98,9 @@ def _strict_release_audit(
         errors.append("candidate pose contract changed")
 
     evidence_documents = {
-        kind: legacy.read(legacy.path(job["humanEvidence"][kind]))
+        kind: candidate_contract.read(
+            candidate_contract.path(job["humanEvidence"][kind])
+        )
         for kind in policy.get("requiredHumanEvidenceKinds", [])
     }
     quality, quality_errors = customer_quality.validate(
@@ -105,8 +109,8 @@ def _strict_release_audit(
         candidate_manifest=candidate_manifest,
         candidate_hash=candidate_hash,
         evidence=evidence_documents,
-        resolve_repo_path=legacy.path,
-        digest=legacy.digest,
+        resolve_repo_path=candidate_contract.path,
+        digest=candidate_contract.digest,
     )
     errors.extend(quality_errors)
 
@@ -121,15 +125,15 @@ def _strict_release_audit(
 
 
 def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
-    artifact = legacy.path(job["artifactDir"])
-    candidate = legacy.path(job["candidateDir"])
-    release = legacy.path(job["releaseDir"])
+    artifact = candidate_contract.path(job["artifactDir"])
+    candidate = candidate_contract.path(job["candidateDir"])
+    release = candidate_contract.path(job["releaseDir"])
     artifact.mkdir(parents=True, exist_ok=True)
     quality, research, errors, candidate_hash = _strict_release_audit(
         job_path, job, policy
     )
-    legacy.write(artifact / "research-baseline.json", research)
-    legacy.write(
+    candidate_contract.write(artifact / "research-baseline.json", research)
+    candidate_contract.write(
         artifact / "customer-quality.json",
         {
             "schemaVersion": 2,
@@ -148,14 +152,14 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
         },
     )
     if errors:
-        legacy.write(
+        candidate_contract.write(
             artifact / "audit.json",
             {
                 "schemaVersion": 2,
                 "phase": "release",
                 "jobId": job["id"],
                 "adapterId": job["adapterId"],
-                "checkedAt": legacy.now(),
+                "checkedAt": candidate_contract.now(),
                 "decision": "NO-GO",
                 "releaseEligible": False,
                 "errors": errors,
@@ -173,9 +177,11 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
     release_tx = DirectoryTransaction(release)
     release_had_original = release_tx.begin()
     try:
-        candidate_manifest = legacy.read(candidate / "candidate-manifest.json")
+        candidate_manifest = candidate_contract.read(
+            candidate / "candidate-manifest.json"
+        )
         package = contract.package_release(
-            root=legacy.ROOT,
+            root=candidate_contract.ROOT,
             job_path=job_path,
             job=job,
             policy=policy,
@@ -184,18 +190,18 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
             candidate_manifest=candidate_manifest,
             candidate_hash=candidate_hash,
             human_evidence=quality,
-            verify_candidate=legacy.verify_candidate,
-            now=legacy.now,
+            verify_candidate=candidate_contract.verify_candidate,
+            now=candidate_contract.now,
         )
         release_tx.commit(release_had_original)
-        legacy.write(
+        candidate_contract.write(
             artifact / "audit.json",
             {
                 "schemaVersion": 2,
                 "phase": "release",
                 "jobId": job["id"],
                 "adapterId": job["adapterId"],
-                "checkedAt": legacy.now(),
+                "checkedAt": candidate_contract.now(),
                 "decision": "GO",
                 "releaseEligible": True,
                 "candidateManifestSha256": candidate_hash,

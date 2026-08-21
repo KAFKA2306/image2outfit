@@ -4,7 +4,7 @@
   "mergeGate": {
     "workflowFile": "pr-merge-gate.yml",
     "workflowName": "PR merge gate",
-    "validationCommand": "python -m unittest tests.test_merge_release_separation tests.test_release_provenance_gate tests.test_repository_policies tests.test_release_contracts tests.test_release_gate -v"
+    "validationCommand": "python -m unittest tests.test_merge_release_separation tests.test_release_provenance_gate tests.test_repository_policies tests.test_release_contracts tests.test_candidate_manifest -v"
   },
   "productReleaseGate": {
     "workflowFile": "release-self-hosted.yml",
