@@ -45,7 +45,9 @@ class ToolOwnershipTest(unittest.TestCase):
         self.assertIn("Taskfile.yml", manage["references"])
         self.assertFalse(manage["unreferenced"])
 
-    def test_production_has_one_canonical_entrypoint_without_legacy_facades(self) -> None:
+    def test_production_has_one_canonical_entrypoint_without_legacy_facades(
+        self,
+    ) -> None:
         for removed in ("production_gate_core.py", "release_gate.py", "pipeline.py"):
             self.assertFalse((TOOLS / removed).exists(), removed)
 
