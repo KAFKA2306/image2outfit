@@ -39,7 +39,9 @@ class BenchmarkMetric:
         if not math.isfinite(self.value):
             raise ValueError("benchmark metric value must be finite")
         if not math.isfinite(self.tolerance) or self.tolerance < 0:
-            raise ValueError("benchmark metric tolerance must be finite and non-negative")
+            raise ValueError(
+                "benchmark metric tolerance must be finite and non-negative"
+            )
 
 
 @dataclass(frozen=True, slots=True)
