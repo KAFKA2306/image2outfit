@@ -127,7 +127,9 @@ def _project_dependencies(root: Path, group: str) -> list[str]:
     if not isinstance(requirements, list) or not requirements:
         raise ValueError(f"pyproject dependency group is empty or missing: {group}")
     if not all(isinstance(value, str) and value for value in requirements):
-        raise ValueError(f"pyproject dependency group contains invalid entries: {group}")
+        raise ValueError(
+            f"pyproject dependency group contains invalid entries: {group}"
+        )
     return requirements
 
 
@@ -196,7 +198,9 @@ def prepare(
     dependency_target = target or root / ".image2outfit" / "blender-python"
     stamp_path = dependency_target / "image2outfit-environment.json"
     requirements_sha = hashlib.sha256(
-        json.dumps(requirements, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        json.dumps(requirements, ensure_ascii=False, separators=(",", ":")).encode(
+            "utf-8"
+        )
     ).hexdigest()
     expected_stamp = {
         "schemaVersion": 1,
