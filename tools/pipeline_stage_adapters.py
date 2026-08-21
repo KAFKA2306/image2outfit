@@ -205,7 +205,9 @@ def _tool_options(stage: Mapping[str, Any]) -> list[dict[str, Any]]:
     options: list[dict[str, Any]] = []
     for raw in declared:
         if not isinstance(raw, Mapping):
-            raise ValueError(f"stage {stage.get('stage')!r} tool entries must be objects")
+            raise ValueError(
+                f"stage {stage.get('stage')!r} tool entries must be objects"
+            )
         options.append(
             {
                 "toolName": raw.get("toolName"),
