@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "status": "REJECTED",
+  "decision": "REJECT",
+  "reviewMethod": "direct-image-inspection",
+  "reviewedRevision": "v1-two-view-pattern-and-sewing",
+  "reviewedHostedRunId": "32479509621",
+  "reviewedSourceCommit": "b30b4d519c6158bec8ffb4b94495b321b8f25041",
+  "buildReportSha256": "bcfd7954bd1d4451620afecfb3e5a07fff29674e528a191ac72c12409e8478f9",
+  "inspectedImages": {
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/front.png": "2e00d0ca2afd24903909be5328b55d7eab816f5327d111bd738db96578ef823a",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/back.png": "68d136f54d87d7612d28e78c332d1962f5ee0f67707625cad26042da41eb9a28",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/left.png": "09c8b12be8040a52e6a1d563fdd34a7e3ff72230bb286b5bec450188bb019d50",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/right.png": "ffb539aaada9c9ec7e8013d1605aeb9627977c578e60ced77c279ef36c571b1b",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/three-quarter.png": "e764703231e25c9aae95d114a995f69e552e4e49053a425905d3391f3bbae31a",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/neutral.png": "bcea1ff392922b0e6dd3d3aa5fd2d1898d62e3ccfb2d4d861856775d66541b9b",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arms-up.png": "e909da45c5e86dc4f199b1376d7c9e530c89195d26907d4c98389aa552ef5575",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arm-cross.png": "6814d6f6ea1e2deea4bdcddd9adf3c162fb9b3ace6b2a5e5ec0aa6eda389422a",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/crouch.png": "dc06d7755dc53f3dd30ee8448d68c197231ca20e5c9ecb3b18336f295f764045",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/sit.png": "710fbd145f97f6e5929b2370fe19d5895ed099dccf2b3b75d4aedb27d13bfb22",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/prone.png": "3e031c8846b5e33e76cfc0e2e5ce7285358c465418b4e390dc0327fc6cc899a6"
+  },
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "code": "degenerate-triangles",
+      "detail": "The Blender build report records 116 degenerate triangles."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "upper-body-angular-panels",
+      "detail": "The upper-body side panels form triangular/angular gaps and distort the intended continuous silhouette."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "forearm-coverage",
+      "detail": "Forearms remain visibly exposed instead of being covered by long fitted sleeves."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "wrist-drape-scale",
+      "detail": "Wrist drapes are too small and rigid relative to the large hanging sheet-like reference drapes."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "back-skirt-seam-spike",
+      "detail": "The sewn center-back skirt region contains folded/spiky geometry."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "pose-deformation",
+      "detail": "Arms-up and arm-cross evidence show severe triangular deformation and exposed skin."
+    }
+  ]
+}
