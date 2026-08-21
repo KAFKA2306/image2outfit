@@ -5,6 +5,7 @@ This wrapper owns no pipeline stages, quality gates, or product-completion state
 It only derives the canonical runtime checkpoint path and delegates execution to
 ``tools/run_garment_pipeline.py`` so external schedulers can safely queue runs.
 """
+
 from __future__ import annotations
 
 import argparse
