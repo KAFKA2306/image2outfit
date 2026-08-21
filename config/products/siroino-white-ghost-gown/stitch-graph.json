@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "stitches": [
+    {"stitchId":"left-side","first":{"pieceId":"dress-front","edge":"left-side"},"second":{"pieceId":"dress-back-left","edge":"outer-side"},"type":"plain","easingRatio":1.0},
+    {"stitchId":"right-side","first":{"pieceId":"dress-front","edge":"right-side"},"second":{"pieceId":"dress-back-right","edge":"outer-side"},"type":"plain","easingRatio":1.0},
+    {"stitchId":"center-back-lower","first":{"pieceId":"dress-back-left","edge":"center-back-lower"},"second":{"pieceId":"dress-back-right","edge":"center-back-lower"},"type":"plain","easingRatio":1.0,"realization":"Blender Cloth sewing springs on the long skirt wrap seam"},
+    {"stitchId":"left-sleeve-underarm","first":{"pieceId":"sleeve","edge":"underarm-a"},"second":{"pieceId":"sleeve","edge":"underarm-b"},"type":"plain","easingRatio":1.0},
+    {"stitchId":"right-sleeve-underarm","first":{"pieceId":"sleeve","edge":"underarm-a"},"second":{"pieceId":"sleeve","edge":"underarm-b"},"type":"plain","easingRatio":1.0},
+    {"stitchId":"left-drape-to-wrist","first":{"pieceId":"wrist-drape","edge":"top"},"second":{"pieceId":"sleeve","edge":"wrist"},"type":"attachment","easingRatio":1.5},
+    {"stitchId":"right-drape-to-wrist","first":{"pieceId":"wrist-drape","edge":"top"},"second":{"pieceId":"sleeve","edge":"wrist"},"type":"attachment","easingRatio":1.5},
+    {"stitchId":"hood-crown","first":{"pieceId":"hood-front","edge":"crown"},"second":{"pieceId":"hood-back","edge":"crown"},"type":"plain","easingRatio":1.0},
+    {"stitchId":"hood-left-side","first":{"pieceId":"hood-front","edge":"left-side"},"second":{"pieceId":"hood-back","edge":"left-side"},"type":"plain","easingRatio":1.0},
+    {"stitchId":"hood-right-side","first":{"pieceId":"hood-front","edge":"right-side"},"second":{"pieceId":"hood-back","edge":"right-side"},"type":"plain","easingRatio":1.0},
+    {"stitchId":"back-lace-attachments","first":{"pieceId":"back-tie","edge":"end-a"},"second":{"pieceId":"dress-back-left","edge":"cutout-edge"},"type":"attachment","easingRatio":1.0}
+  ],
+  "unresolved": [
+    {"item":"exact factory seam allowance","status":"not-observable","decision":"use 4–10 mm allowances by function"},
+    {"item":"hood opening finish","status":"not-observable","decision":"use a clean hem without visible trim"}
+  ]
+}

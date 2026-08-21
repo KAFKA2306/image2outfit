@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "passed": false,
+  "productId": "siroino-white-ghost-gown",
+  "productName": "White Ghost Gown for Siroino _Large",
+  "buildRevision": "v1-two-view-pattern-and-sewing",
+  "targetProfile": {
+    "profile": "Siroino _Large",
+    "appliedShapeKeys": {
+      "All_L": 1.0,
+      "Chest_L": 1.0,
+      "Hips_01_L": 1.0,
+      "UpperLeg_L": 1.0,
+      "Breasts_L": 0.65
+    },
+    "vertices": 8421
+  },
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "blenderVersion": "4.4.3",
+  "patternEvidence": {
+    "path": "Assets/GenWorks/siroino-white-ghost-gown/Previews/pattern-layout.png",
+    "pieceCount": 8,
+    "renderer": "bpy",
+    "camera": "Pattern_Review_Camera"
+  },
+  "metrics": {
+    "meshObjects": 15,
+    "vertices": 30894,
+    "triangles": 61237,
+    "materialSlots": 15,
+    "shapeKeys": 0,
+    "maxBoneInfluences": 4,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 116,
+    "boundaryEdges": 1280
+  },
+  "weightNormalization": {
+    "objects": 15,
+    "vertices": 30894,
+    "rigidObjects": [
+      {"object": "Ghost_Wrist_Drape_L", "bone": "Hand_L"},
+      {"object": "Ghost_Wrist_Drape_R", "bone": "Hand_R"}
+    ],
+    "fallbackVertices": 0,
+    "maximumInfluences": 4
+  },
+  "clearanceRefinement": [
+    {"pass": 1, "target": 0.0018, "movedVertices": 594, "maximumMove": 0.001449573175702244, "clearance": {"vertices": 29270, "minimum": 0.0008427355787716806, "p01": 0.0017999950796365738, "mean": 0.015440625351632372}},
+    {"pass": 2, "target": 0.0026, "movedVertices": 1149, "maximumMove": 0.0017572644212283193, "clearance": {"vertices": 29270, "minimum": 0.000980377895757556, "p01": 0.002495420863851905, "mean": 0.01546116323648358}},
+    {"pass": 3, "target": 0.0032, "movedVertices": 1517, "maximumMove": 0.002219622104242444, "clearance": {"vertices": 29270, "minimum": 0.0006572665297426283, "p01": 0.002858860418200493, "mean": 0.015483877203790542}}
+  ],
+  "views": {
+    "front": "Assets/GenWorks/siroino-white-ghost-gown/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-white-ghost-gown/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-white-ghost-gown/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-white-ghost-gown/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-white-ghost-gown/Previews/three-quarter.png"
+  },
+  "poseViews": {
+    "neutral": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/prone.png"
+  },
+  "referenceModelIdentification": "UNVERIFIED",
+  "reviewDecision": "REJECT",
+  "reviewDefects": [
+    "116 degenerate triangles remain in generated geometry",
+    "upper-body side panels are angular and do not match the reference silhouette",
+    "forearms are exposed where the reference has long fitted sleeves",
+    "wrist drapes are too small and rigid compared with the hanging sheet-like reference",
+    "center-back skirt sewing produces folded/spiky artifacts",
+    "arms-up and arm-cross poses show severe triangular deformation"
+  ]
+}

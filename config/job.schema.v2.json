@@ -66,6 +66,10 @@
       "uniqueItems": true,
       "items": {"type": "string", "pattern": "^Assets/"}
     },
+    "patternLayoutPath": {
+      "type": "string",
+      "pattern": "^Assets/GenWorks/.+/Previews/pattern-layout\\.png$"
+    },
     "previewPaths": {
       "type": "object",
       "additionalProperties": false,
