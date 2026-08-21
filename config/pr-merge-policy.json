@@ -1,6 +1,15 @@
 {
   "schemaVersion": 1,
   "scope": "pull-request-merge",
+  "mergeGate": {
+    "workflowFile": "policy-tests.yml",
+    "workflowName": "PR merge gates"
+  },
+  "productReleaseGate": {
+    "workflowFile": "release-self-hosted.yml",
+    "manualDispatchRequired": true,
+    "validatorCommand": "tools/production_gate.py --mode release"
+  },
   "productCompletionPolicy": "config/genworks-handoff-policy.json",
   "productReleasePolicy": "config/release-policy.json",
   "rules": {
