@@ -65,7 +65,7 @@ class MergeReleaseSeparationTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertFalse(pr_merge_gate._trigger_has_path_filter(merge))
 
-    def test_merge_lint_is_change_scoped(self) -> None:
+    def test_merge_lint_and_format_are_change_scoped(self) -> None:
         policy = self.policy()
         merge = (
             ROOT / ".github" / "workflows" / policy["mergeGate"]["workflowFile"]
@@ -73,13 +73,14 @@ class MergeReleaseSeparationTests(unittest.TestCase):
         self.assertIn("Resolve changed Python files", merge)
         self.assertIn("/tmp/changed-python.txt", merge)
         self.assertIn("Ruff lint changed Python", merge)
+        self.assertIn("Ruff format changed Python", merge)
         self.assertNotIn("ruff check --ignore S102 src tools tests", merge)
         self.assertIn(
             "changed-python-ruff-lint-pass",
             policy["requiredRepositoryEvidence"],
         )
         self.assertIn(
-            "changed-reusable-python-ruff-format-pass",
+            "changed-python-ruff-format-pass",
             policy["requiredRepositoryEvidence"],
         )
 
