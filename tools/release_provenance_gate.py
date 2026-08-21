@@ -9,8 +9,27 @@ from pathlib import Path
 from typing import Any
 
 API_VERSION = "2026-03-10"
-MERGE_GATE_WORKFLOW = "pr-merge-gate.yml"
-MERGE_GATE_NAME = "PR merge gate"
+ROOT = Path(__file__).resolve().parents[1]
+MERGE_POLICY = ROOT / "config" / "pr-merge-policy.json"
+
+
+def load_merge_gate_contract(root: Path = ROOT) -> tuple[str, str]:
+    policy_path = root / "config" / "pr-merge-policy.json"
+    policy = json.loads(policy_path.read_text(encoding="utf-8-sig"))
+    gate = policy.get("mergeGate") if isinstance(policy, dict) else None
+    if not isinstance(gate, dict):
+        raise ValueError("pr-merge-policy.json mergeGate is required")
+    workflow_file = gate.get("workflowFile")
+    workflow_name = gate.get("workflowName")
+    if (
+        not isinstance(workflow_file, str)
+        or not workflow_file
+        or Path(workflow_file).name != workflow_file
+    ):
+        raise ValueError("mergeGate.workflowFile must be a workflow file name")
+    if not isinstance(workflow_name, str) or not workflow_name:
+        raise ValueError("mergeGate.workflowName is required")
+    return workflow_file, workflow_name
 
 
 def evaluate_release_provenance(
@@ -20,7 +39,11 @@ def evaluate_release_provenance(
     default_branch: str,
     associated_pulls: list[dict[str, Any]],
     workflow_runs: list[dict[str, Any]],
+    merge_gate_name: str | None = None,
 ) -> dict[str, Any]:
+    if merge_gate_name is None:
+        _, merge_gate_name = load_merge_gate_contract()
+
     expected_ref = f"refs/heads/{default_branch}"
     if release_ref != expected_ref:
         return {
@@ -60,7 +83,7 @@ def evaluate_release_provenance(
     matching_runs = [
         run
         for run in workflow_runs
-        if run.get("name") == MERGE_GATE_NAME and run.get("head_sha") == head_sha
+        if run.get("name") == merge_gate_name and run.get("head_sha") == head_sha
     ]
     matching_runs.sort(key=lambda run: run.get("created_at") or "", reverse=True)
     latest = matching_runs[0] if matching_runs else None
@@ -114,6 +137,7 @@ def github_json(url: str, token: str) -> Any:
 def collect_receipt(
     repository: str, release_ref: str, release_sha: str, default_branch: str, token: str
 ) -> dict[str, Any]:
+    workflow_file, merge_gate_name = load_merge_gate_contract()
     base = f"https://api.github.com/repos/{repository}"
     pulls = github_json(f"{base}/commits/{release_sha}/pulls?per_page=100", token)
 
@@ -131,7 +155,7 @@ def collect_receipt(
             {"event": "pull_request", "head_sha": head_sha, "per_page": 100}
         )
         payload = github_json(
-            f"{base}/actions/workflows/{MERGE_GATE_WORKFLOW}/runs?{query}", token
+            f"{base}/actions/workflows/{workflow_file}/runs?{query}", token
         )
         runs.extend(payload.get("workflow_runs", []))
 
@@ -141,6 +165,7 @@ def collect_receipt(
         default_branch=default_branch,
         associated_pulls=pulls,
         workflow_runs=runs,
+        merge_gate_name=merge_gate_name,
     )
 
 
