@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "profile": "loose-layered",
+  "productId": "siroino-nocturne-angel-set",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v7-closed-bodice-flared-skirt-fanned-wings",
+  "panels": [
+    "five logical bodice regions welded into one continuous projected V-neck shell",
+    "projected black front closure and left/right V overlays to restore a readable cropped sailor bodice",
+    "left and right projected sailor collar pieces",
+    "low-depth flared twelve-pleat skirt with a zero-force Blender Cloth checkpoint",
+    "matching low-depth twelve-pleat cream hem frill",
+    "projected waist band",
+    "left and right body-following puff sleeves with increased radial clearance",
+    "left and right body-following detached arm warmers with increased radial clearance",
+    "left and right body-following lace cuffs",
+    "left and right body-following leg warmers with increased radial clearance"
+  ],
+  "separateGeometry": [
+    "skin-weighted choker",
+    "amber charm",
+    "rabbit charm",
+    "four laterally fanned volumetric feathers per wing",
+    "reduced tail",
+    "body-following shoes"
+  ],
+  "priorityFitZones": [
+    "V neckline",
+    "front bodice closure",
+    "shoulder strap",
+    "armhole",
+    "underarm",
+    "chest",
+    "back",
+    "waist",
+    "hip",
+    "skirt-body layer",
+    "elbow",
+    "wrist",
+    "thigh",
+    "knee",
+    "ankle",
+    "upper back wing mount"
+  ],
+  "researchTrial": {
+    "primaryPaper": "https://arxiv.org/abs/2606.24564",
+    "secondaryPaper": "https://arxiv.org/abs/2602.22052",
+    "implementation": "independent logical panel and seam specification, welded projected shell plus projected front closure, zero-force Blender 4.4 cloth checkpoint, outward clearance and four-influence nearest-body weight transfer",
+    "externalResearchCodeExecuted": false,
+    "generatedEvidence": "Assets/GenWorks/siroino-nocturne-angel-set/Research/patterngsl-autosew-cloth-trial.json"
+  },
+  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
+}

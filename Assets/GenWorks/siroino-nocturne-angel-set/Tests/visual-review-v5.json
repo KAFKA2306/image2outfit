@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "designRevision": "v5-skinweighted-pleated-volume",
+  "productId": "siroino-nocturne-angel-set",
+  "result": "VISUAL_REJECTED",
+  "visualAppearanceReview": "FAIL",
+  "reviewedAt": "2026-08-05T09:05:00+09:00",
+  "reviewer": "ChatGPT direct artifact image inspection",
+  "hostedWorkflowRun": 30961445364,
+  "artifactId": 8913291340,
+  "artifactSha256": "316592e0023e924a3b4028c923764047f202c6984d99a88c2f16fa36933fe852",
+  "evidence": {
+    "multiview": {
+      "path": "Previews/siroino-nocturne-angel-set-multiview.webp",
+      "sha256": "8f5137b1cdc34ea8882aeb3b5291598a9592893d0e5baec5caab4e0222d7fadb"
+    },
+    "poseReview": {
+      "path": "Previews/siroino-nocturne-angel-set-pose-review.webp",
+      "sha256": "9facf09fca844a58f2a7cae1d15e9d7b74b4bc4e7b6b982beda0c46acd21dc40"
+    }
+  },
+  "generatedMetrics": {
+    "meshObjects": 38,
+    "vertices": 11189,
+    "triangles": 21088,
+    "maxBoneInfluences": 4,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "removedDegeneratePolygons": 27
+  },
+  "fitAudit": {
+    "neutral": 981,
+    "arms-up": 1829,
+    "arm-cross": 1071,
+    "crouch": 1416,
+    "sit": 1397,
+    "prone": 1838
+  },
+  "blockingFindings": [
+    "The front bodice is excessively open from the chest to the waist and does not read as one sewn fitted garment.",
+    "The back bodice remains the dominant intersection source in every pose, including 477 pairs in neutral and 783 pairs in arms-up.",
+    "The twelve-pleat skirt still renders as a thick rigid barrel rather than a soft short A-line skirt.",
+    "Crouch, sit and prone visibly deform the skirt and hem into irregular detached masses around the thighs.",
+    "Arm and leg warmers remain plain tubes and contribute repeated body intersections.",
+    "Volumetric wing ellipsoids read as a radial flower rather than layered feathers.",
+    "The target body has no visible head mesh in the evidence, so the beret and ears remain visually unsupported above the neck."
+  ],
+  "acceptedImprovements": [
+    "Static quality, release policy, Blender generation, editable blend, FBX, prefab declarations, five views and all six poses succeeded.",
+    "The artifact has zero unweighted vertices, zero weight-sum errors and zero degenerate triangles.",
+    "The skirt has zero neutral triangle intersections and transferred weights prevent the earlier rigid hip-only separation.",
+    "The latest pull-request Blender run no longer waits behind obsolete intermediate runs."
+  ],
+  "nextAction": "Proceed to v6 with one welded shrinkwrapped bodice shell, a shorter force-free pleated cloth checkpoint, no unsupported head modules in review evidence, and simplified body-following limb accessories."
+}
