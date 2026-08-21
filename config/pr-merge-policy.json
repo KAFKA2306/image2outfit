@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "scope": "pull-request-merge",
+  "productCompletionPolicy": "config/genworks-handoff-policy.json",
+  "productReleasePolicy": "config/release-policy.json",
+  "rules": {
+    "mergeDoesNotReleaseProduct": true,
+    "productCompletionRequiredForMerge": false,
+    "productReleaseEligibilityRequiredForMerge": false,
+    "productVisualPassRequiredForMerge": false,
+    "productRuntimePassRequiredForMerge": false,
+    "affectedProductExecutionMustReachValidBoundary": true,
+    "releaseCommandForbiddenInMergeGate": true,
+    "releaseWorkflowMustBeManual": true
+  },
+  "allowedTrackedProductStatesAtMerge": [
+    "WORKING",
+    "COMPLETE",
+    "REJECTED"
+  ],
+  "requiredRepositoryEvidence": [
+    "lockfile-valid",
+    "python-compiles",
+    "repository-audits-pass",
+    "unit-and-contract-tests-pass",
+    "ruff-lint-pass",
+    "ruff-format-pass",
+    "tracked-contracts-parse"
+  ],
+  "productEvidenceSemantics": {
+    "candidateBuild": "integration-evidence",
+    "geometryAudit": "integration-evidence",
+    "visualReview": "product-state-and-release-evidence",
+    "humanRuntimeReview": "product-release-evidence"
+  },
+  "decisionModel": {
+    "mergeEligible": "repository evidence passes and affected product execution reaches a valid boundary",
+    "releaseEligible": "evaluated only by the separate product release policy and release validator"
+  }
+}
