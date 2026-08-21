@@ -1,61 +1,28 @@
-name: Repository policy tests
+name: PR merge gates
 
 on:
   pull_request:
-    paths:
-      - README.md
-      - AGENTS.md
-      - ARCHITECTURE.md
-      - docs/**
-      - .github/AGENTS.md
-      - src/**
-      - tools/**
-      - tests/**
-      - config/**
-      - examples/**
-      - Packages/*.json
-      - ProjectSettings/ProjectVersion.txt
-      - Assets/GenWorks/**
-      - Taskfile.yml
-      - pyproject.toml
-      - uv.lock
-      - .gitignore
-      - .github/workflows/**
+    branches: [main]
   push:
     branches: [main]
-    paths:
-      - README.md
-      - AGENTS.md
-      - ARCHITECTURE.md
-      - docs/**
-      - .github/AGENTS.md
-      - src/**
-      - tools/**
-      - tests/**
-      - config/**
-      - examples/**
-      - Packages/*.json
-      - ProjectSettings/ProjectVersion.txt
-      - Assets/GenWorks/**
-      - Taskfile.yml
-      - pyproject.toml
-      - uv.lock
-      - .gitignore
-      - .github/workflows/**
 
 permissions:
   contents: read
 
 jobs:
-  policy:
+  merge:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Install uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
@@ -111,3 +78,12 @@ jobs:
               raise SystemExit("dependency groups must remain explicit opt-ins")
           print("pyproject.toml: PASS")
           PY
+
+      - name: Verify merge and product release separation
+        run: uv run --locked --no-default-groups python tools/pr_merge_gate.py
+
+      - name: Ruff lint
+        run: uv run --locked --no-default-groups --group dev ruff check --ignore S102 src tools tests
+
+      - name: Ruff format check
+        run: uv run --locked --no-default-groups --group dev ruff format --check src tools tests
