@@ -184,7 +184,7 @@ class CandidateOrchestratorPolicyTests(unittest.TestCase):
 
     def test_workspace_snapshot_wraps_generation(self) -> None:
         begin = self.source.index("workspace_tx.begin")
-        build = self.source.index("legacy.run_candidate")
+        build = self.source.index("result = run_candidate(job_path, job, policy)")
         rollback = self.source.index("workspace_tx.rollback")
         self.assertLess(begin, build)
         self.assertLess(build, rollback)
