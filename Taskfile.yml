@@ -36,6 +36,18 @@ tasks:
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py explain --product "{{.PRODUCT}}"
 
+  mcp:setup:
+    desc: Prepare pinned Blender MCP and register Blender + Unity MCP with Codex on Windows.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_mcp.ps1
+
+  mcp:doctor:
+    desc: Read-only report for Codex, Blender MCP, and Unity MCP local connectivity.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_mcp.ps1 -DoctorOnly
+
   improve:
     desc: Advance defect diagnosis, targeted learning, measured experiments, adoption, regeneration, and re-evaluation until a real external boundary or no defect remains.
     requires:

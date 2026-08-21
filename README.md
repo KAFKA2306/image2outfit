@@ -34,7 +34,7 @@ Markdown は入口と設計説明に限定します。変更され得る要件�
 
 画像の存在、ファイルサイズ、hash、CI 成功だけでは visual appearance review の PASS にはなりません。
 
-Unity import/save/reload、Modular Avatar / NDMF、VRChat Build & Test、VRChat runtime、人間による runtime visual review は現在 `OUT_OF_SCOPE` です。外部検証なしに、それらが動作確認済みとは表現しません。
+Unity 2022.3.22f1 import/save/reload、Modular Avatar / NDMF、VRChat Build & Test、VRChat runtime、人間による runtime visual review は現在 `OUT_OF_SCOPE` です。外部検証なしに、それらが動作確認済みとは表現しません。
 
 ## ワークスペース
 
@@ -106,6 +106,34 @@ task check:python
 ```
 
 個別監査は `task --list` または `Taskfile.yml` を正本として確認してください。Markdown にコマンド一覧を複製しません。
+
+## Blender / Unity MCP
+
+OpenAI CodexからローカルのBlenderとUnityをMCP経由で操作する開発支援を用意しています。これは任意のauthoring adapterであり、製品の`COMPLETE`条件は変更しません。
+
+Windowsでは次を使用します。
+
+```powershell
+task mcp:setup
+task mcp:doctor
+```
+
+`task mcp:setup` は Codex 用に Blender MCP `1.8.0` と Unity MCP `10.1.2` のlocalhost接続を登録します。Blenderは `localhost:9876`、Unityは `http://127.0.0.1:8080/mcp` を使い、MCP状態そのものを製品証拠や `requiredCompletionGates` にはしません。
+
+Unity側のpackage導入はローカルUnity projectを変更するためsetup scriptでは自動実行しません。確認済みpinを明示的に導入します。
+
+```text
+Window > Package Manager > + > Add package from git URL
+https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v10.1.2
+```
+
+Blender側には `View3D > Sidebar > Image2Outfit > OpenAI Assistant` の薄いprompt UIを用意します。bridgeはlocalhost限定とし、OpenAI/API/provider secrets、`.codex`、`.image2outfit/` のローカル状態をcommitしません。外部Blender連携は明示的に有効化した場合だけ使用します。
+
+確認済みupstream:
+
+- Blender MCP `1.8.0`: <https://github.com/ahujasid/blender-mcp/commit/3ab892510cc0e5435ba5e611c01fb1021fbde8de>
+- Unity MCP `v10.1.2`: <https://github.com/CoplayDev/unity-mcp/releases/tag/v10.1.2>
+- Codex MCP CLI: <https://github.com/openai/codex/blob/main/codex-rs/cli/src/mcp_cmd.rs>
 
 ## 実行結果と証拠
 
