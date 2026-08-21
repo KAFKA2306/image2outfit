@@ -25,6 +25,15 @@
     "releaseCommandForbiddenInMergeGate": true,
     "releaseWorkflowMustBeManual": true
   },
+  "branchLifecycle": {
+    "persistentBranch": "default-branch",
+    "allowedNonDefaultBranchState": "same-repository-open-pull-request-head",
+    "deleteHeadOnPullRequestClose": true,
+    "deleteHeadOnPullRequestMerge": true,
+    "deleteOrphanBranches": true,
+    "preserveUniqueCommitsOnOrphanBranch": false,
+    "protectedOrphanBranchIsPolicyViolation": true
+  },
   "allowedTrackedProductStatesAtMerge": [
     "WORKING",
     "COMPLETE",
