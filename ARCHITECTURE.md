@@ -51,8 +51,9 @@ src/image2outfit
 
 | 責務 | 正本 |
 |---|---|
-| 完了境界 | `config/genworks-handoff-policy.json` |
-| 必須 view / pose | `config/release-policy.json` |
+| PR merge 境界 | `config/pr-merge-policy.json` |
+| 製品 completion 境界 | `config/genworks-handoff-policy.json` |
+| 製品 release 境界 | `config/release-policy.json` |
 | 製品 job | `config/products/<slug>/job.json` |
 | construction | `config/products/<slug>/construction.json` |
 | stage profile | `config/pipeline-profiles/garment-reconstruction-v1.json` |
@@ -91,6 +92,31 @@ pipeline の実行状態と製品 lifecycle を分離します。
 - `WORKING` / `COMPLETE` / `REJECTED`: 製品 lifecycle
 
 `PLANNED` や `EXECUTED` を `COMPLETE` の代替にしません。製品 lifecycle と必須 completion gate は `config/genworks-handoff-policy.json` と `ProductManifest.json` が所有します。
+
+## PR merge と製品 release
+
+Repository integration と customer-facing product release は別の state machine です。
+
+```text
+PR:      DRAFT → MERGE-ELIGIBLE → MERGED
+Product: WORKING / REJECTED → COMPLETE → RELEASE-ELIGIBLE → RELEASED ARTIFACT
+```
+
+PR merge は repository へ変更を統合してよいかだけを判定します。lockfile、compile、repository audits、unit / contract tests、tracked contract、lint / format と、影響製品の実行が merge policy の有効 boundary まで到達したことを evidence とします。
+
+製品が `WORKING` または `REJECTED` であること、visual appearance review が FAIL / pending であること、runtime evidence が未実施であること、release eligibility が `NOT_READY` であること自体は PR merge failure にしません。failure や blocker は隠さず、製品 state と evidence に残します。
+
+Product release は別に明示実行します。merged revision provenance を確認した後、`config/release-policy.json` と dedicated release validator が completion / visual / runtime / customer-quality evidence を評価します。merge は release を起動せず、製品 status を `COMPLETE` に昇格させず、release `GO` を暗黙に主張しません。
+
+したがって次は有効な状態です。
+
+```text
+PR MERGED + product WORKING
+PR MERGED + product REJECTED
+PR MERGED + product release BLOCKED
+```
+
+PR merge の machine-readable rule は `config/pr-merge-policy.json`、製品 release の rule は `config/release-policy.json` が所有します。
 
 ## Stage result contract
 
@@ -168,6 +194,7 @@ completion gate と `OUT_OF_SCOPE` 項目は `config/genworks-handoff-policy.jso
 
 - contract は一つの owner に集約する
 - machine-readable rule を prose に複製しない
+- PR merge と product release を同じ gate に戻さない
 - generic defect は generic layer で修正する
 - Blender 依存を `src` に逆流させない
 - 派生 view に独自 threshold を持たせない
