@@ -92,6 +92,32 @@ pipeline の実行状態と製品 lifecycle を分離します。
 
 `PLANNED` や `EXECUTED` を `COMPLETE` の代替にしません。製品 lifecycle と必須 completion gate は `config/genworks-handoff-policy.json` と `ProductManifest.json` が所有します。
 
+## PR merge boundary と product release boundary
+
+PR の integration と製品 release は別の判定です。
+
+```text
+PR diff
+  ↓
+PR merge gates
+  ↓
+main
+  ↓
+release revision provenance
+  ↓
+product release gate
+  ↓
+release artifact
+```
+
+`PR merge gates` は「その diff を main に統合してよいか」だけを判定します。対象は repository CI、schema / policy / implementation の整合、実行可能な contract test です。製品が `WORKING` / `REJECTED` であること、`visualAppearanceReview` が FAIL であること、completion gate が未達であること自体は、incremental implementation PR の merge blocker ではありません。
+
+release は merge 後に別途判定します。`tools/release_provenance_gate.py` は release 対象 revision が current default branch 上の merged PR 由来で、その PR の exact-head merge gate が成功したことだけを検証します。製品品質は判定しません。
+
+製品を実際に release できるかは `tools/production_gate.py --mode release` と既存の completion / release / quality contract が所有します。したがって、`PR merged + product WORKING` と `PR merged + product REJECTED` は正常な状態です。製品 release は product gate が `GO` を返すまで BLOCKED のままです。
+
+この分離により repository の改善を main へ取り込みながら、製品完成や release の主張だけは artifact evidence に対して fail-closed に維持します。
+
 ## Stage result contract
 
 実行 binding は shell 文字列ではなく argv と `resultPath` を宣言します。終了コード 0 だけでは stage 成功にはなりません。
