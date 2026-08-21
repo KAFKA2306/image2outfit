@@ -175,6 +175,16 @@ def _resume_or_reset(
     return state
 
 
+def _terminal_audit(
+    state: dict[str, Any], mode: ExecutionMode
+) -> dict[str, Any] | None:
+    expected_status = "EXECUTED" if mode == ExecutionMode.EXECUTE else "PLANNED"
+    audit = state.get("audit")
+    if state.get("status") == expected_status and isinstance(audit, dict):
+        return dict(audit)
+    return None
+
+
 def main() -> int:
     args = parse_args()
     request_path = _repo_path(args.request, label="request")
@@ -224,6 +234,7 @@ def main() -> int:
     else:
         state = _new_state(request, expected, mode)
 
+    existing_audit = _terminal_audit(state, mode)
     registry = build_registry(
         profile,
         execute=args.execute,
@@ -245,14 +256,19 @@ def main() -> int:
         result = run_pipeline(state, registry, checkpoint=checkpoint)
 
     result["toolPlan"] = registry.selection_plan()
-    audit_root = (
-        args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
-    )
-    result["audit"] = write_audit_bundle(
-        result,
-        audit_root=audit_root,
-        canonical_stages=[stage.value for stage in PIPELINE_STAGES],
-    )
+    if existing_audit is None:
+        audit_root = (
+            args.audit_root
+            if args.audit_root.is_absolute()
+            else ROOT / args.audit_root
+        )
+        result["audit"] = write_audit_bundle(
+            result,
+            audit_root=audit_root,
+            canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+        )
+    else:
+        result["audit"] = existing_audit
     if args.checkpoint_output:
         _write_json_atomic(args.checkpoint_output, result)
     payload = json.dumps(result, ensure_ascii=False, indent=2)
