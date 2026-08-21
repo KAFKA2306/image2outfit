@@ -98,7 +98,9 @@ def _strict_release_audit(
         errors.append("candidate pose contract changed")
 
     evidence_documents = {
-        kind: candidate_contract.read(candidate_contract.path(job["humanEvidence"][kind]))
+        kind: candidate_contract.read(
+            candidate_contract.path(job["humanEvidence"][kind])
+        )
         for kind in policy.get("requiredHumanEvidenceKinds", [])
     }
     quality, quality_errors = customer_quality.validate(
