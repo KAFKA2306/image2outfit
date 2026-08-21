@@ -14,6 +14,7 @@ COMPLETION_POLICY = ROOT / "config" / "genworks-handoff-policy.json"
 RELEASE_POLICY = ROOT / "config" / "release-policy.json"
 WORKFLOWS = ROOT / ".github" / "workflows"
 LEGACY_POLICY_WORKFLOW = WORKFLOWS / "policy-tests.yml"
+BRANCH_HYGIENE_WORKFLOW = WORKFLOWS / "branch-hygiene.yml"
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -84,10 +85,16 @@ def validate() -> dict[str, Any]:
         if isinstance(merge.get("productReleaseGate"), dict)
         else {}
     )
+    branch_lifecycle = (
+        merge.get("branchLifecycle")
+        if isinstance(merge.get("branchLifecycle"), dict)
+        else {}
+    )
     merge_workflow_path = _workflow_path(merge_gate, "workflowFile")
     release_workflow_path = _workflow_path(release_gate, "workflowFile")
     merge_workflow = merge_workflow_path.read_text(encoding="utf-8")
     release_workflow = release_workflow_path.read_text(encoding="utf-8")
+    branch_hygiene_workflow = BRANCH_HYGIENE_WORKFLOW.read_text(encoding="utf-8")
 
     errors: list[str] = []
     rules = merge.get("rules") if isinstance(merge.get("rules"), dict) else {}
@@ -119,6 +126,38 @@ def validate() -> dict[str, Any]:
         errors.append("merge-policy productCompletionPolicy")
     if merge.get("productReleasePolicy") != "config/release-policy.json":
         errors.append("merge-policy productReleasePolicy")
+
+    expected_branch_lifecycle: dict[str, object] = {
+        "persistentBranch": "default-branch",
+        "allowedNonDefaultBranchState": "same-repository-open-pull-request-head",
+        "deleteHeadOnPullRequestClose": True,
+        "deleteHeadOnPullRequestMerge": True,
+        "deleteOrphanBranches": True,
+        "preserveUniqueCommitsOnOrphanBranch": False,
+        "protectedOrphanBranchIsPolicyViolation": True,
+    }
+    for name, expected in expected_branch_lifecycle.items():
+        if branch_lifecycle.get(name) != expected:
+            errors.append(f"merge-policy branchLifecycle.{name}={expected!r}")
+
+    required_branch_workflow_tokens = (
+        "pull_request_target:",
+        "closed",
+        "github.rest.git.deleteRef",
+        "openHeads.has(ref)",
+        "Orphan branches remain",
+        "same-repository open PR heads only",
+    )
+    for token in required_branch_workflow_tokens:
+        if token not in branch_hygiene_workflow:
+            errors.append(f"branch hygiene workflow missing lifecycle contract: {token}")
+    for token in (
+        "Keeping invalid orphan branch",
+        "Keeping orphan branch with",
+        "compareCommitsWithBasehead",
+    ):
+        if token in branch_hygiene_workflow:
+            errors.append(f"branch hygiene workflow preserves orphan branches: {token}")
 
     merge_name = merge_gate.get("workflowName")
     if not isinstance(merge_name, str) or not merge_name:
@@ -191,6 +230,7 @@ def validate() -> dict[str, Any]:
         "schemaVersion": 1,
         "mergePolicy": str(MERGE_POLICY.relative_to(ROOT)),
         "mergeGateWorkflow": str(merge_workflow_path.relative_to(ROOT)),
+        "branchHygieneWorkflow": str(BRANCH_HYGIENE_WORKFLOW.relative_to(ROOT)),
         "productReleasePolicy": str(RELEASE_POLICY.relative_to(ROOT)),
         "productReleaseWorkflow": str(release_workflow_path.relative_to(ROOT)),
         "mergeEligible": not errors,
