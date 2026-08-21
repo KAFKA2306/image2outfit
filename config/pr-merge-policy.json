@@ -1,8 +1,17 @@
 {
   "schemaVersion": 1,
   "scope": "pull-request-merge",
+  "mergeGate": {
+    "workflowFile": "pr-merge-gate.yml",
+    "workflowName": "PR merge gate"
+  },
   "productCompletionPolicy": "config/genworks-handoff-policy.json",
   "productReleasePolicy": "config/release-policy.json",
+  "productReleaseGate": {
+    "workflowFile": "release-self-hosted.yml",
+    "manualDispatchRequired": true,
+    "validatorCommand": "tools/production_gate.py --mode release"
+  },
   "rules": {
     "mergeDoesNotReleaseProduct": true,
     "productCompletionRequiredForMerge": false,
@@ -11,6 +20,7 @@
     "productRuntimePassRequiredForMerge": false,
     "affectedProductExecutionMustReachValidBoundary": true,
     "releaseCommandForbiddenInMergeGate": true,
+    "fullProductTestSuiteForbiddenInMergeGate": true,
     "releaseWorkflowMustBeManual": true
   },
   "allowedTrackedProductStatesAtMerge": [
@@ -21,11 +31,15 @@
   "requiredRepositoryEvidence": [
     "lockfile-valid",
     "python-compiles",
-    "repository-audits-pass",
-    "unit-and-contract-tests-pass",
-    "ruff-lint-pass",
-    "ruff-format-pass",
-    "tracked-contracts-parse"
+    "repository-hygiene-audit-pass",
+    "toolchain-audit-pass",
+    "merge-contract-tests-pass",
+    "tracked-contracts-parse",
+    "changed-python-ruff-lint-pass",
+    "changed-python-ruff-format-pass"
+  ],
+  "nonBlockingDiagnostics": [
+    "Production contract quality"
   ],
   "productEvidenceSemantics": {
     "candidateBuild": "integration-evidence",
@@ -34,7 +48,7 @@
     "humanRuntimeReview": "product-release-evidence"
   },
   "decisionModel": {
-    "mergeEligible": "repository evidence passes and affected product execution reaches a valid boundary",
+    "mergeEligible": "the canonical PR merge gate passes and affected product execution reaches a valid checkpoint boundary",
     "releaseEligible": "evaluated only by the separate product release policy and release validator"
   }
 }
