@@ -8,14 +8,15 @@ stored under ``.image2outfit/products/<product-id>/``.
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 from typing import Any
 
+import candidate_manifest as candidate_contract
 import method_selection
-import production_gate_core as core
 import runtime_paths
+from candidate_orchestrator import _augment_audit, _run_candidate as run_candidate
+from release_orchestrator import _run_release as run_release
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -41,19 +42,19 @@ def _runtime_job(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
 def _materialize_runtime_job(job: dict[str, Any], root: Path = ROOT) -> Path:
     paths = runtime_paths.for_job(root, job)
     runtime_job_path = paths.root / "job.json"
-    core.legacy.write(runtime_job_path, job)
+    candidate_contract.write(runtime_job_path, job)
     return runtime_job_path
 
 
 def _load(job_path: Path, root: Path = ROOT) -> tuple[dict[str, Any], dict[str, Any]]:
     policy_path = root / "config" / "release-policy.json"
-    policy = core.legacy.read(policy_path)
-    job = core.legacy.read(job_path)
+    policy = candidate_contract.read(policy_path)
+    job = candidate_contract.read(job_path)
     if policy.get("schemaVersion") != 1:
         raise ValueError("release-policy.json must use schemaVersion 1")
     if job.get("schemaVersion") != 2:
         raise ValueError("legacy jobs are disabled; schemaVersion must be 2")
-    required = core.legacy.required_job_fields()
+    required = candidate_contract.required_job_fields()
     missing = [key for key in required if key not in job or job[key] in (None, "")]
     if missing:
         raise ValueError(f"job v2 missing: {', '.join(missing)}")
@@ -97,7 +98,7 @@ def _write_selection(
     job: dict[str, Any], selection: dict[str, Any], root: Path = ROOT
 ) -> None:
     artifact = _artifact_path(job, root)
-    core.legacy.write(artifact / "method-selection.json", selection)
+    candidate_contract.write(artifact / "method-selection.json", selection)
 
 
 def _write_no_go(
@@ -113,7 +114,7 @@ def _write_no_go(
         "phase": phase,
         "jobId": job.get("id"),
         "adapterId": job.get("adapterId"),
-        "checkedAt": core.legacy.now(),
+        "checkedAt": candidate_contract.now(),
         "decision": "NO-GO",
         "releaseEligible": False,
         "errors": errors,
@@ -123,30 +124,30 @@ def _write_no_go(
         },
     }
     value.update(details)
-    core.legacy.write(paths.reports / "audit.json", value)
+    candidate_contract.write(paths.reports / "audit.json", value)
 
 
 def _bind_method_to_candidate(
     job: dict[str, Any], selection: dict[str, Any], root: Path = ROOT
 ) -> dict[str, Any]:
     manifest_path = _candidate_manifest_path(job, root)
-    manifest = core.legacy.read(manifest_path)
+    manifest = candidate_contract.read(manifest_path)
     if not manifest_path.is_file() or not manifest:
         raise RuntimeError("candidate manifest is missing after candidate generation")
     binding = _binding_snapshot(job, selection, root)
     manifest["constructionMethod"] = binding
-    core.legacy.write(manifest_path, manifest)
+    candidate_contract.write(manifest_path, manifest)
 
     artifact = _artifact_path(job, root)
     audit_path = artifact / "audit.json"
-    audit = core.legacy.read(audit_path)
+    audit = candidate_contract.read(audit_path)
     stages = audit.setdefault("stages", {})
     stages["constructionMethod"] = {
         "passed": True,
         **binding,
     }
     audit["candidateManifestSha256"] = method_selection.digest(manifest_path)
-    core.legacy.write(audit_path, audit)
+    candidate_contract.write(audit_path, audit)
     _write_selection(job, selection, root)
     return binding
 
@@ -176,7 +177,7 @@ def _evaluate_release(
 ) -> tuple[dict[str, Any], dict[str, Any], list[str]]:
     selection = method_selection.select(job, root)
     manifest_path = _candidate_manifest_path(job, root)
-    manifest = core.legacy.read(manifest_path)
+    manifest = candidate_contract.read(manifest_path)
     binding_errors = _bound_method_errors(job, selection, manifest, root)
     commercial = method_selection.validate_commercial_evidence(job, manifest_path, root)
     errors = list(selection.get("errors", []))
@@ -202,7 +203,7 @@ def _run_candidate(
         _write_no_go(job, "candidate", errors, root, methodSelection=selection)
         return 2
 
-    result = core._run_candidate(job_path, job, policy)
+    result = run_candidate(job_path, job, policy)
     if result != 0:
         _write_selection(job, selection, root)
         return result
@@ -225,7 +226,7 @@ def _run_release(
     selection, commercial, errors = _evaluate_release(job, root)
     artifact = _artifact_path(job, root)
     _write_selection(job, selection, root)
-    core.legacy.write(artifact / "commercial-method-quality.json", commercial)
+    candidate_contract.write(artifact / "commercial-method-quality.json", commercial)
     if errors:
         _write_no_go(
             job,
@@ -238,9 +239,9 @@ def _run_release(
         )
         return 2
 
-    result = core._run_release(job_path, job, policy)
+    result = run_release(job_path, job, policy)
     if result == 0:
-        core._augment_audit(
+        _augment_audit(
             artifact,
             {
                 "commercialMethodPassed": True,
