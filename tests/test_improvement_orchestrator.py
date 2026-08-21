@@ -118,9 +118,8 @@ class ImprovementOrchestratorTests(unittest.TestCase):
         self.quality("skinning")
         result = improvement_loop.advance(self.root, self.product)
         self.assertEqual(result["status"], "WAITING_FOR_EXTERNAL_RESEARCH")
-        request = (
-            self.root
-            / improvement.RESEARCH_REQUEST_PATH.format(product=self.product)
+        request = self.root / improvement.RESEARCH_REQUEST_PATH.format(
+            product=self.product
         )
         self.assertTrue(request.is_file())
         self.assertEqual(
