@@ -78,10 +78,9 @@ def _finding_digest(plan: Mapping[str, Any]) -> str | None:
 
 
 def _same_context(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
-    return (
-        left.get("candidateHash") == right.get("candidateHash")
-        and _finding_digest(left) == _finding_digest(right)
-    )
+    return left.get("candidateHash") == right.get("candidateHash") and _finding_digest(
+        left
+    ) == _finding_digest(right)
 
 
 def _base_plan(root: Path, product_id: str) -> dict[str, Any]:
@@ -313,8 +312,7 @@ def build_experiment_manifest(
             "schemaVersion": 1,
             "productId": product_id,
             "fixtureId": str(
-                binding.get("fixtureId")
-                or f"{product_id}:{plan.get('candidateHash')}"
+                binding.get("fixtureId") or f"{product_id}:{plan.get('candidateHash')}"
             ),
             "capability": str(plan.get("missingCapability") or "unresolved"),
             "inputCandidateHash": str(plan.get("candidateHash") or ""),
@@ -336,8 +334,7 @@ def build_experiment_manifest(
     validation = improvement.validate_experiment_manifest(manifest)
     if validation.get("passed") is not True:
         raise LoopError(
-            "invalid experiment manifest: "
-            + "; ".join(validation.get("errors", []))
+            "invalid experiment manifest: " + "; ".join(validation.get("errors", []))
         )
     manifest["manifestDigest"] = improvement.digest_value(
         {key: value for key, value in manifest.items() if key != "manifestDigest"}
@@ -594,7 +591,9 @@ def _resume_adoption(
     decision_path = reports_dir(root, product_id) / ADOPTION_DECISION
     decision = _optional_json(decision_path)
     if decision is None or decision.get("decision") != "ADOPT":
-        raise LoopError("no measured ADOPT decision is available for production integration")
+        raise LoopError(
+            "no measured ADOPT decision is available for production integration"
+        )
     command = binding.get("applyCommand")
     if not isinstance(command, list) or not command:
         return _waiting(
