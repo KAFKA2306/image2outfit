@@ -31,6 +31,46 @@ def _workflow_path(spec: dict[str, Any], key: str) -> Path:
     return WORKFLOWS / value
 
 
+def _trigger_has_path_filter(workflow: str, trigger: str = "pull_request") -> bool:
+    """Inspect only one top-level GitHub Actions trigger block for path filters."""
+    lines = workflow.splitlines()
+    on_index: int | None = None
+    for index, line in enumerate(lines):
+        if line == "on:":
+            on_index = index
+            break
+    if on_index is None:
+        return False
+
+    trigger_indent: int | None = None
+    trigger_index: int | None = None
+    for index in range(on_index + 1, len(lines)):
+        raw = lines[index]
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        indent = len(raw) - len(raw.lstrip(" "))
+        if indent == 0:
+            break
+        if indent == 2 and stripped == f"{trigger}:":
+            trigger_indent = indent
+            trigger_index = index
+            break
+    if trigger_index is None or trigger_indent is None:
+        return False
+
+    for raw in lines[trigger_index + 1 :]:
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        indent = len(raw) - len(raw.lstrip(" "))
+        if indent <= trigger_indent:
+            break
+        if stripped.startswith("paths:") or stripped.startswith("paths-ignore:"):
+            return True
+    return False
+
+
 def validate() -> dict[str, Any]:
     merge = _read_json(MERGE_POLICY)
     completion = _read_json(COMPLETION_POLICY)
@@ -112,7 +152,7 @@ def validate() -> dict[str, Any]:
 
     if "pull_request:" not in merge_workflow:
         errors.append("PR merge workflow must run on pull_request")
-    if "paths:" in merge_workflow or "paths-ignore:" in merge_workflow:
+    if _trigger_has_path_filter(merge_workflow):
         errors.append("canonical PR merge workflow must run for every PR")
     if "workflow_dispatch:" not in release_workflow:
         errors.append("product release workflow must remain manual")
