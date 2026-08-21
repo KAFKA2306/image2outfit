@@ -3,12 +3,12 @@
   "id": "siroino-heather-hooded-bodysuit",
   "productName": "Heather Hooded High-Cut Bodysuit for Siroino",
   "adapterId": "siroino-v1.0",
-  "buildRevision": "v27-closed-saddle-sleevecap-folded-hood",
+  "buildRevision": "v29-smoothed-clearance-tapered-yoke-fitted-sleeve",
   "productRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit",
   "productManifestPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json",
   "buildScript": "tools/siroino_heather_hooded_product.py",
   "productBuildScript": "tools/siroino_heather_hooded_product.py",
-  "hostedPoseScript": "tools/siroino_heather_hooded_bodysuit_pose_probe.py",
+  "hostedPoseScript": "tools/siroino_heather_hooded_fused_pose_probe.py",
   "blendPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
   "fbxAssetPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Models/SiroinoHeatherHoodedBodysuit.fbx",
   "prefabAssetPath": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Prefab/SiroinoHeatherHoodedBodysuit.prefab",
@@ -46,7 +46,7 @@
     }
   },
   "researchMethod": {
-    "name": "Closed Garment Components with Bounded Clearance Projection",
+    "name": "Smoothed Clearance, Tapered Yoke, Fitted Sleeves and Compact Hood",
     "primaryReference": {
       "title": "GarmentCode: Programming Parametric Sewing Patterns",
       "paperUrl": "https://arxiv.org/abs/2306.03642",
@@ -62,8 +62,8 @@
     },
     "authorsImplementationExecuted": false,
     "authorsCodeCopied": false,
-    "executionRequirements": "Blender 4.4.3, Python 3.11 and existing Siroino nearest-body skin-weight helpers; no model, checkpoint, GPU or external simulator",
-    "trialScope": "Independent 50-height by 72-angle torso envelope with a continuous yoke, eleven-column pelvic saddle, overlapping sleeve caps, fitted cuffs, a low folded-back hood and bounded post-topology body-clearance projection; avatar faces are not copied"
+    "executionRequirements": "Blender 4.4.3, Python 3.11 and existing Siroino polar-profile, mesh and nearest-body skin-weight helpers; no model, checkpoint, GPU or external simulator",
+    "trialScope": "Retain the validated 50-height by 72-angle polar profile while replacing abrupt clearance with a four-iteration displacement field capped at 12 mm, closing the neckline through a five-ring tapered yoke, shortening and widening the underbody to a seventeen-column 4 mm-sag saddle, reducing sleeve radii to 27-33 mm and replacing the padded hood roll with a compact six-row rear-neck fold"
   },
   "licenseEvidence": "config/products/siroino-heather-hooded-bodysuit/license.json",
   "privateSourceRoots": [
@@ -81,6 +81,8 @@
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/lobofit-local-bone-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/side-aware-taubin-shell-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/closed-components-clearance-trial.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/flat-saddle-cap-hood-roll-trial.json",
+    "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smoothed-clearance-yoke-trial.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/geometry-diagnostics.json",
     "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
