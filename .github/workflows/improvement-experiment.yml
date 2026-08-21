@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   plan:
@@ -60,6 +61,14 @@ jobs:
           python tools/manage.py experiment-method
           --manifest "$MANIFEST"
           --method "$METHOD"
+      - name: Delete previous method artifact
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_NAME: improvement-method-${{ matrix.method }}
+        run: >-
+          uv run --locked --no-default-groups
+          python tools/delete_previous_artifacts.py "$ARTIFACT_NAME"
       - name: Preserve structured method result
         if: always()
         uses: actions/upload-artifact@v4
@@ -99,6 +108,13 @@ jobs:
           --manifest "$MANIFEST"
           --results-dir .image2outfit/downloaded
           --output .image2outfit/improvement-summary.json
+      - name: Delete previous summary artifact
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          uv run --locked --no-default-groups
+          python tools/delete_previous_artifacts.py "improvement-summary"
       - name: Preserve comparison summary
         if: always()
         uses: actions/upload-artifact@v4
