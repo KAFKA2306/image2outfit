@@ -5,6 +5,7 @@ The fingerprint intentionally covers source/config inputs, not generated product
 artifacts. A changed fingerprint means a cached pipeline checkpoint may no longer
 represent the code that will execute now.
 """
+
 from __future__ import annotations
 
 import hashlib
