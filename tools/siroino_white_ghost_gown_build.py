@@ -154,6 +154,8 @@ def render_pattern_layout(pattern: dict, output: Path) -> dict[str, object]:
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
     scene.render.film_transparent = False
+    if scene.world is None:
+        scene.world = bpy.data.worlds.new("Pattern_Review_World")
     scene.world.color = (0.96, 0.96, 0.96)
 
     bpy.ops.object.camera_add(location=(0.0, -0.25, 8.0))
