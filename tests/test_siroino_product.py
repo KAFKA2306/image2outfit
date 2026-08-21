@@ -7,10 +7,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT = "siroino-heather-hooded-bodysuit"
-REVISION = "v27-closed-saddle-sleevecap-folded-hood"
+REVISION = "v29-smoothed-clearance-tapered-yoke-fitted-sleeve"
+PRODUCT_SCRIPT = ROOT / "tools" / "siroino_heather_hooded_product.py"
+V29_PATH = ROOT / "tools" / "siroino_heather_manifold_yoke_v29.py"
 PROBE_PATH = ROOT / "tools" / "siroino_heather_geometry_probe.py"
 POSE_PROBE_PATH = ROOT / "tools" / "siroino_heather_hooded_bodysuit_pose_probe.py"
-JOB_PATH = ROOT / "config" / "products" / PRODUCT / "job.json"
+FUSED_POSE_PATH = ROOT / "tools" / "siroino_heather_hooded_fused_pose_probe.py"
+CONFIG_ROOT = ROOT / "config" / "products" / PRODUCT
+JOB_PATH = CONFIG_ROOT / "job.json"
+CONSTRUCTION_PATH = CONFIG_ROOT / "construction.json"
 
 
 class SiroinoGeometryProbeTests(unittest.TestCase):
@@ -18,18 +23,27 @@ class SiroinoGeometryProbeTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.probe = PROBE_PATH.read_text(encoding="utf-8")
         cls.pose_probe = POSE_PROBE_PATH.read_text(encoding="utf-8")
+        cls.fused_pose = FUSED_POSE_PATH.read_text(encoding="utf-8")
         cls.job = json.loads(JOB_PATH.read_text(encoding="utf-8"))
         cls.tree = ast.parse(cls.probe, filename=str(PROBE_PATH))
 
-    def test_job_runs_probe_and_delivers_diagnostics(self) -> None:
+    def test_job_uses_fused_probe_and_delivers_diagnostics(self) -> None:
         self.assertEqual(
             self.job["hostedPoseScript"],
-            "tools/siroino_heather_hooded_bodysuit_pose_probe.py",
+            "tools/siroino_heather_hooded_fused_pose_probe.py",
         )
         self.assertIn(
-            "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/geometry-diagnostics.json",
+            f"Assets/GenWorks/{PRODUCT}/Tests/geometry-diagnostics.json",
             self.job["deliveryAssets"],
         )
+
+    def test_fused_probe_delegates_to_audited_probe_with_wider_frame(self) -> None:
+        for fragment in (
+            "import siroino_heather_hooded_bodysuit_pose_probe as probe",
+            "camera.data.ortho_scale *= 1.24",
+            "return probe.main()",
+        ):
+            self.assertIn(fragment, self.fused_pose)
 
     def test_probe_reuses_exact_bvh_overlap_pairs(self) -> None:
         self.assertIn("body_tree.overlap(tree)", self.pose_probe)
@@ -61,70 +75,83 @@ class SiroinoGeometryProbeTests(unittest.TestCase):
         self.assertFalse(any(name.startswith("siroino_") for name in imported))
 
 
-class SiroinoClosedComponentsTests(unittest.TestCase):
-    def test_product_replaces_previous_active_fit_paths(self) -> None:
-        product = (ROOT / "tools" / "siroino_heather_hooded_product.py").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn(
-            "import siroino_heather_closed_components_v27 as closed_components",
-            product,
-        )
-        self.assertIn("closed_components.install(pattern)", product)
-        for token in (
-            "v21.install(pattern)",
-            "lobomap.install(pattern)",
-            "repair.install(pattern)",
-        ):
-            self.assertNotIn(token, product)
+class SiroinoV29GeometryTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.product = PRODUCT_SCRIPT.read_text(encoding="utf-8")
+        cls.source = V29_PATH.read_text(encoding="utf-8")
+        cls.job = json.loads(JOB_PATH.read_text(encoding="utf-8"))
+        cls.construction = json.loads(CONSTRUCTION_PATH.read_text(encoding="utf-8"))
 
-    def test_closed_components_execute_bounded_geometry_operations(self) -> None:
-        source = (
-            ROOT / "tools" / "siroino_heather_closed_components_v27.py"
-        ).read_text(encoding="utf-8")
-        for token in (
-            'DESIGN_REVISION = "v27-closed-saddle-sleevecap-folded-hood"',
-            "class PolarBodyProfile",
-            "HEIGHT_SAMPLES = 50",
-            "ANGLE_COUNT = 72",
-            "BVHTree.FromPolygons",
-            "_enforce_clearance",
-            '"bodyTopologyCopied": False',
-            '"pelvicSaddleColumns": 11',
-            '"authorsImplementationExecuted": False',
-            '"authorsCodeCopied": False',
+    def test_product_installs_current_v29_geometry(self) -> None:
+        self.assertIn(
+            "import siroino_heather_manifold_yoke_v29 as manifold_yoke",
+            self.product,
+        )
+        self.assertIn("manifold_yoke.install(pattern)", self.product)
+        self.assertIn("DESIGN_REVISION = manifold_yoke.DESIGN_REVISION", self.product)
+
+    def test_v29_uses_bounded_smoothed_clearance_and_parametric_components(
+        self,
+    ) -> None:
+        for fragment in (
+            f'DESIGN_REVISION = "{REVISION}"',
+            "maximum_step: float = 0.012",
+            "for _ in range(4):",
+            "yoke_rings = 5",
+            "offsets = tuple(range(-16, 17, 2))",
+            "radius = 0.027 + 0.006",
+            "rows = 6",
+            'obj["bodyTopologyCopied"] = False',
             "pattern.create_outfit = lambda",
         ):
-            self.assertIn(token, source)
-        self.assertNotIn("_selected_polygons", source)
+            self.assertIn(fragment, self.source)
 
-    def test_job_and_construction_track_closed_component_trial(self) -> None:
-        config_root = ROOT / "config" / "products" / PRODUCT
-        job = json.loads((config_root / "job.json").read_text(encoding="utf-8"))
-        construction = json.loads(
-            (config_root / "construction.json").read_text(encoding="utf-8")
-        )
-        self.assertEqual(job["buildRevision"], REVISION)
-        self.assertEqual(construction["designRevision"], REVISION)
-        self.assertIn("eleven-column-pelvic-saddle", construction["panels"])
-        self.assertIn(
-            "bounded-post-topology-body-clearance-projection",
-            construction["panels"],
-        )
-        self.assertIn(
-            "applied only after garment-native topology is constructed",
-            construction["researchTrial"]["implementation"],
-        )
+    def test_job_and_construction_track_current_revision(self) -> None:
+        self.assertEqual(self.job["buildRevision"], REVISION)
+        self.assertEqual(self.construction["designRevision"], REVISION)
+        panels = set(self.construction["panels"])
+        for panel in (
+            "five-ring-tapered-shoulder-yoke-and-fitted-neck",
+            "seventeen-column-four-millimetre-sag-pelvic-saddle",
+            "small-root-fitted-sleeve-caps",
+            "compact-six-row-rear-neck-folded-hood",
+            "four-iteration-smoothed-bounded-clearance-projection",
+            "no-body-topology-copy-no-body-face-region-selection",
+        ):
+            self.assertIn(panel, panels)
+
         evidence = (
-            f"Assets/GenWorks/{PRODUCT}/Research/closed-components-clearance-trial.json"
-        )
-        self.assertEqual(construction["researchTrial"]["generatedEvidence"], evidence)
-        self.assertIn(evidence, job["deliveryAssets"])
-        self.assertIn(
-            f"Assets/GenWorks/{PRODUCT}/Research/side-aware-taubin-shell-trial.json",
-            job["deliveryAssets"],
+            f"Assets/GenWorks/{PRODUCT}/Research/smoothed-clearance-yoke-trial.json"
         )
         self.assertEqual(
-            job["researchMethod"]["currentReference"]["paperUrl"],
+            self.construction["researchTrial"]["generatedEvidence"], evidence
+        )
+        self.assertIn(evidence, self.job["deliveryAssets"])
+        self.assertEqual(
+            self.job["researchMethod"]["currentReference"]["paperUrl"],
             "https://arxiv.org/abs/2606.24564",
         )
+        self.assertFalse(self.job["researchMethod"]["authorsImplementationExecuted"])
+        self.assertFalse(self.job["researchMethod"]["authorsCodeCopied"])
+
+    def test_superseded_visual_revisions_remain_rejection_history(self) -> None:
+        for revision in (
+            "v27-closed-saddle-sleevecap-folded-hood",
+            "v28-flat-saddle-contoured-cap-hood-roll",
+        ):
+            self.assertIn(revision, self.product)
+        self.assertIn("VISUAL", self.product.upper())
+
+    def test_v29_primary_representation_is_reported_by_validation(self) -> None:
+        for fragment in (
+            'result["pelvicSaddleColumns"] = 17',
+            'result["taperedYokeRings"] = 5',
+            'result["clearanceDisplacementSmoothing"] = 4',
+            "polar torso with tapered yoke, shallow saddle, fitted sleeves and compact hood",
+        ):
+            self.assertIn(fragment, self.source)
+
+
+if __name__ == "__main__":
+    unittest.main()

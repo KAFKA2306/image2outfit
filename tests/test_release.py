@@ -1,18 +1,25 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import tempfile
 import unittest
+import zipfile
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-TOOLS = Path(__file__).resolve().parents[1] / "tools"
+ROOT = Path(__file__).resolve().parents[1]
+TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
 
-import candidate_manifest  # noqa: E402
-import pipeline as legacy  # noqa: E402
-import release_gate as gate  # noqa: E402
+import candidate_manifest
+import pipeline as legacy
+import production_gate_core
+import release_gate
+import release_orchestrator
+import release_packager
 
 
 POLICY = {
@@ -49,6 +56,63 @@ REQUIRED_JOB_FIELDS = [
     "previewPaths",
     "humanEvidence",
 ]
+
+
+class CommercialEvidenceContractTest(unittest.TestCase):
+    def test_evidence_requires_tool_identity_and_hashed_artifacts(self) -> None:
+        policy = json.loads(
+            (ROOT / "config/release-policy.json").read_text(encoding="utf-8")
+        )
+        evidence = policy["commercialMethodPolicy"]["evidenceContract"]
+        self.assertEqual(evidence["schemaVersion"], 2)
+        self.assertEqual(
+            evidence["toolContract"]["requiredFields"], ["id", "version", "command"]
+        )
+        self.assertEqual(
+            evidence["sourceArtifactContract"]["requiredFields"], ["path", "sha256"]
+        )
+        self.assertIs(
+            evidence["sourceArtifactContract"]["candidateHashBindingRequired"], True
+        )
+
+
+class PoseContractTest(unittest.TestCase):
+    def test_release_policy_is_the_only_product_pose_contract(self) -> None:
+        policy = json.loads(
+            (ROOT / "config/release-policy.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            policy["requiredPoses"],
+            ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+        )
+        conflicts = []
+        for path in (ROOT / "config/products").glob("*/construction.json"):
+            construction = json.loads(path.read_text(encoding="utf-8"))
+            if "requiredPoses" in construction:
+                conflicts.append(path.relative_to(ROOT).as_posix())
+        self.assertEqual([], conflicts)
+
+
+class ReleaseIntegrationTest(unittest.TestCase):
+    def test_imported_release_route_has_one_validator(self) -> None:
+        self.assertIs(production_gate_core._run_release, release_orchestrator._run_release)
+        self.assertFalse(hasattr(release_gate, "evidence_gate"))
+        self.assertFalse(hasattr(release_gate, "run_release"))
+
+    def test_direct_legacy_release_is_disabled(self) -> None:
+        source = (TOOLS / "release_gate.py").read_text(encoding="utf-8")
+        self.assertIn("direct release_gate release is disabled", source)
+        self.assertIn("tools/production_gate.py", source)
+
+
+class ReleaseRawEvidenceContractTest(unittest.TestCase):
+    def test_packager_copies_raw_evidence_before_manifesting_release(self) -> None:
+        source = (TOOLS / "release_packager.py").read_text(encoding="utf-8")
+        human = source.index('package / "Evidence" / "Human"')
+        commercial = source.index('package / "Evidence" / "Commercial"')
+        release_manifest = source.index('release / "release-manifest.json"')
+        self.assertLess(human, release_manifest)
+        self.assertLess(commercial, release_manifest)
 
 
 class ReleaseGateTest(unittest.TestCase):
@@ -149,10 +213,10 @@ class ReleaseGateTest(unittest.TestCase):
 
         self.patches = (
             patch.object(candidate_manifest, "ROOT", self.root),
-            patch.object(gate, "ROOT", self.root),
-            patch.object(gate, "POLICY_PATH", self.policy_path),
-            patch.object(gate, "JOB_SCHEMA_PATH", self.schema_path),
-            patch.object(gate, "UNITY_PIPELINE_PATH", self.unity_pipeline_path),
+            patch.object(release_gate, "ROOT", self.root),
+            patch.object(release_gate, "POLICY_PATH", self.policy_path),
+            patch.object(release_gate, "JOB_SCHEMA_PATH", self.schema_path),
+            patch.object(release_gate, "UNITY_PIPELINE_PATH", self.unity_pipeline_path),
             patch.object(legacy, "ROOT", self.root),
         )
         for item in self.patches:
@@ -173,12 +237,12 @@ class ReleaseGateTest(unittest.TestCase):
         legacy_job["schemaVersion"] = 1
         self.write_json(self.job_path, legacy_job)
         with self.assertRaisesRegex(ValueError, "schemaVersion must be 2"):
-            gate.load(self.job_path)
+            release_gate.load(self.job_path)
 
     def test_private_avatar_cannot_be_selected_for_delivery(self) -> None:
         self.job["deliveryAssets"] = ["Assets/_Vendor/TestAvatar/Avatar.fbx"]
         with self.assertRaisesRegex(ValueError, "private avatar source"):
-            gate.candidate_files(self.job, POLICY)
+            release_gate.candidate_files(self.job, POLICY)
 
     def test_tampered_candidate_file_is_rejected(self) -> None:
         candidate = self.root / self.job["candidateDir"]
@@ -192,13 +256,11 @@ class ReleaseGateTest(unittest.TestCase):
             "adapterId": self.job["adapterId"],
             "sourceCommit": "local",
             "inputHashes": {},
-            "files": gate.manifest([file], candidate),
+            "files": release_gate.manifest([file], candidate),
         }
         file.write_text("tampered", encoding="utf-8")
-        errors = gate.verify_candidate(self.job_path, self.job, candidate, manifest)
-        self.assertTrue(
-            any("candidate file changed" in error for error in errors), errors
-        )
+        errors = release_gate.verify_candidate(self.job_path, self.job, candidate, manifest)
+        self.assertTrue(any("candidate file changed" in error for error in errors), errors)
 
     def test_direct_release_mode_is_disabled(self) -> None:
         with patch.object(
@@ -206,7 +268,79 @@ class ReleaseGateTest(unittest.TestCase):
             "argv",
             ["release_gate.py", "--mode", "release", "--job", str(self.job_path)],
         ):
-            self.assertEqual(gate.main(), 2)
+            self.assertEqual(release_gate.main(), 2)
+
+
+class ReleasePackagerTest(unittest.TestCase):
+    def test_raw_human_and_runtime_evidence_are_packaged(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            candidate = root / ".image2outfit/products/demo/candidate"
+            release = root / ".image2outfit/products/demo/release"
+            candidate.mkdir(parents=True)
+            payload = candidate / "UnityAssets/demo.prefab"
+            payload.parent.mkdir(parents=True)
+            payload.write_text("prefab", encoding="utf-8")
+            manifest = {
+                "schemaVersion": 2,
+                "kind": "image2outfit-candidate",
+                "sourceCommit": "abc",
+            }
+            manifest_path = candidate / "candidate-manifest.json"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            candidate_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+
+            screenshot = root / "Assets/_Local/Evidence/demo/runtime.png"
+            screenshot.parent.mkdir(parents=True)
+            screenshot.write_bytes(b"runtime")
+            evidence_path = root / "Assets/_Local/Evidence/demo/vrchat-runtime-review.json"
+            evidence_path.write_text(
+                json.dumps({"runtimeScreenshot": "Assets/_Local/Evidence/demo/runtime.png"}),
+                encoding="utf-8",
+            )
+            commercial = root / "Assets/GenWorks/demo/Evidence/Commercial"
+            commercial.mkdir(parents=True)
+            (commercial / "topology-audit.json").write_text("{}\n", encoding="utf-8")
+            job_path = root / "config/products/demo/job.json"
+            job_path.parent.mkdir(parents=True)
+            job_path.write_text("{}\n", encoding="utf-8")
+            job = {
+                "id": "demo",
+                "productName": "Demo",
+                "adapterId": "demo-v1",
+                "productRoot": "Assets/GenWorks/demo",
+                "humanEvidence": {
+                    "vrchat-runtime-review": "Assets/_Local/Evidence/demo/vrchat-runtime-review.json"
+                },
+            }
+            result = release_packager.package_release(
+                root=root,
+                job_path=job_path,
+                job=job,
+                policy={"blockedReleaseAdapterIds": []},
+                candidate=candidate,
+                release=release,
+                candidate_manifest=manifest,
+                candidate_hash=candidate_hash,
+                human_evidence={"vrchat-runtime-review": {"passed": True}},
+                verify_candidate=lambda *_: [],
+                now=lambda: datetime.now(timezone.utc).isoformat(),
+            )
+            self.assertTrue(
+                (release / "Package/Evidence/Human/vrchat-runtime-review.json").is_file()
+            )
+            self.assertTrue(
+                (release / "Package/Evidence/Human/runtime/runtime.png").is_file()
+            )
+            self.assertTrue(
+                (release / "Package/Evidence/Commercial/topology-audit.json").is_file()
+            )
+            archive = root / result["zip"]["path"]
+            self.assertTrue(archive.is_file())
+            with zipfile.ZipFile(archive) as bundle:
+                names = set(bundle.namelist())
+            self.assertIn("Package/Evidence/Human/vrchat-runtime-review.json", names)
+            self.assertIn("Package/Evidence/Human/runtime/runtime.png", names)
 
 
 if __name__ == "__main__":

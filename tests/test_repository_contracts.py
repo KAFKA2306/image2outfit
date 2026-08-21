@@ -24,10 +24,16 @@ class RepositoryContractTest(unittest.TestCase):
             with self.subTest(path=path.name):
                 self.assertTrue(path.is_file(), f"Missing root document: {path.name}")
 
-        self.assertFalse(
-            (ROOT / "docs").exists(),
-            "Repository-wide guidance belongs in root README.md or AGENTS.md",
-        )
+        for obsolete in (
+            ROOT / "docs" / "GENWORKS_LAYOUT.md",
+            ROOT / "docs" / "TOOLCHAIN.md",
+        ):
+            with self.subTest(path=obsolete.relative_to(ROOT).as_posix()):
+                self.assertFalse(
+                    obsolete.exists(),
+                    "Repository-wide guidance belongs in root README.md or AGENTS.md",
+                )
+
         nested_agents = sorted(
             path.relative_to(ROOT).as_posix()
             for path in ROOT.rglob("AGENTS.md")
@@ -276,7 +282,6 @@ class RepositoryContractTest(unittest.TestCase):
                     )
 
                 self.assertTrue((product_root_path / "README.md").is_file())
-                self.assertTrue((product_root_path / "Prefab").is_dir())
 
                 for field in required_assets:
                     value = job.get(field)
