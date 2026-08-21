@@ -30,6 +30,7 @@ from image2outfit.pipeline import (
 from pipeline_source_fingerprint import pipeline_source_fingerprint
 from pipeline_stage_adapters import build_registry, load_profile
 
+DEFAULT_PROFILE = Path("config/pipeline-profiles/garment-reconstruction-v1.json")
 IDENTITY_FIELDS = {
     "product_id": "productId",
     "target_avatar": "targetAvatar",
@@ -46,7 +47,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--profile",
         type=Path,
-        default=ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json",
+        help="Override request.profilePath. Otherwise the request or default profile is used.",
     )
     parser.add_argument(
         "--engine",
@@ -74,15 +75,29 @@ def _mapping(value: object, label: str) -> dict[str, object]:
     return value
 
 
-def _repo_path(path: Path) -> Path:
-    return path if path.is_absolute() else ROOT / path
-
-
 def _read_object(path: Path, *, label: str) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict):
         raise ValueError(f"{label} must contain a JSON object")
     return value
+
+
+def _repo_path(path: Path, *, label: str) -> Path:
+    resolved = path.resolve() if path.is_absolute() else (ROOT / path).resolve()
+    if resolved != ROOT and ROOT not in resolved.parents:
+        raise ValueError(f"{label} escapes repository: {path}")
+    return resolved
+
+
+def _profile_path(args: argparse.Namespace, request: dict[str, Any]) -> Path:
+    if args.profile is not None:
+        return _repo_path(args.profile, label="profile")
+    configured = request.get("profilePath")
+    if configured is None:
+        return _repo_path(DEFAULT_PROFILE, label="default profile")
+    if not isinstance(configured, str) or not configured:
+        raise ValueError("request.profilePath must be a non-empty string")
+    return _repo_path(Path(configured), label="request.profilePath")
 
 
 def _write_json_atomic(path: Path, value: Any) -> None:
@@ -95,7 +110,9 @@ def _write_json_atomic(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
+def _identity_mismatches(
+    state: dict[str, Any], expected: dict[str, str]
+) -> list[str]:
     return [
         request_name
         for state_name, request_name in IDENTITY_FIELDS.items()
@@ -138,7 +155,7 @@ def _resume_or_reset(
     expected: dict[str, str],
     mode: ExecutionMode,
 ) -> dict[str, Any]:
-    """Resume matching state or reset when executable sources have changed."""
+    validate_pipeline_state(previous)
     mismatches = _identity_mismatches(previous, expected)
     non_source_mismatches = [
         value for value in mismatches if value != "sourceFingerprint"
@@ -160,11 +177,11 @@ def _resume_or_reset(
 
 def main() -> int:
     args = parse_args()
-    request_path = _repo_path(args.request)
-    profile_path = _repo_path(args.profile)
+    request_path = _repo_path(args.request, label="request")
     request = _read_object(request_path, label="request")
     if request.get("schemaVersion") != 1:
         raise ValueError("request.schemaVersion must be 1")
+    profile_path = _profile_path(args, request)
     profile = load_profile(profile_path)
     product_id = str(request["productId"])
     expected = {
@@ -189,8 +206,10 @@ def main() -> int:
     }
     mode = ExecutionMode.EXECUTE if args.execute else ExecutionMode.PLAN
     if args.resume_state:
-        previous = _read_object(_repo_path(args.resume_state), label="resume state")
-        validate_pipeline_state(previous)
+        previous = _read_object(
+            _repo_path(args.resume_state, label="resume state"),
+            label="resume state",
+        )
         state = _resume_or_reset(
             previous,
             request=request,
@@ -210,6 +229,8 @@ def main() -> int:
         execute=args.execute,
         bindings=_mapping(request.get("stageBindings"), "stageBindings"),
         variables=variables,
+        tool_requirements=_mapping(request.get("toolRequirements"), "toolRequirements"),
+        tool_pins=_mapping(request.get("toolPins"), "toolPins"),
     )
     checkpoint = (
         (lambda current: _write_json_atomic(args.checkpoint_output, current))
@@ -223,6 +244,7 @@ def main() -> int:
     else:
         result = run_pipeline(state, registry, checkpoint=checkpoint)
 
+    result["toolPlan"] = registry.selection_plan()
     audit_root = (
         args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
     )

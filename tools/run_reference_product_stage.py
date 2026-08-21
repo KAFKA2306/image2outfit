@@ -15,6 +15,14 @@ from typing import Any
 
 from PIL import Image
 
+from candidate_quality import (
+    QUALITY_REJECT,
+    candidate_status,
+    geometry_quality,
+    validate_visual_review,
+    verify_inspected_images,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 STAGES = (
     "ingest-reference",
@@ -116,6 +124,16 @@ def emit(
 
 def runtime_root(product_id: str) -> Path:
     return ROOT / ".image2outfit" / "products" / product_id
+
+
+def review_image_paths(job: Mapping[str, Any]) -> list[Path]:
+    views = [
+        repo_path(value, label="preview") for value in job["previewPaths"].values()
+    ]
+    poses = [
+        repo_path(value, label="pose") for value in job.get("posePaths", {}).values()
+    ]
+    return [*views, *poses]
 
 
 def stage_ingest(
@@ -328,6 +346,10 @@ def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
     script = repo_path(job["buildScript"], label="build script")
     log = runtime_root(product_id) / "reports" / "blender-build.log"
     log.parent.mkdir(parents=True, exist_ok=True)
+    report = repo_path(
+        f"{job['productRoot']}/Evidence/Build/product-build-report.json",
+        label="build report",
+    )
     command = [
         blender_executable(),
         "--python-use-system-env",
@@ -352,22 +374,40 @@ def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
         completed.stdout + "\n--- STDERR ---\n" + completed.stderr,
         encoding="utf-8",
     )
-    if completed.returncode != 0:
+
+    quality: dict[str, Any] | None = None
+    if report.is_file():
+        quality = geometry_quality(read_object(report, "build report"))
+    accepted_quality_reject = (
+        completed.returncode == 2
+        and quality is not None
+        and quality["decision"] == QUALITY_REJECT
+    )
+    if completed.returncode != 0 and not accepted_quality_reject:
         raise RuntimeError(
             f"Blender build failed with exit code {completed.returncode}; "
             f"see {relative(log)}"
         )
+    if quality is None:
+        raise FileNotFoundError(f"build report was not created: {relative(report)}")
+
     blend = repo_path(job["blendPath"], label="blend")
-    report = repo_path(
-        f"{job['productRoot']}/Evidence/Build/product-build-report.json",
-        label="build report",
-    )
     emit(
         result,
         stage="build-blender",
         product_id=product_id,
         paths=[blend, report, log],
-        extra={"blenderReturnCode": completed.returncode},
+        extra={
+            "blenderReturnCode": completed.returncode,
+            "executionDisposition": (
+                "COMPLETED_WITH_QUALITY_REJECT"
+                if accepted_quality_reject
+                else "COMPLETED"
+            ),
+            "qualityDecision": quality["decision"],
+            "geometryPassed": quality["passed"],
+            "failedGeometryChecks": quality["failedChecks"],
+        },
     )
 
 
@@ -408,18 +448,17 @@ def stage_export(job: Mapping[str, Any], result: Path) -> None:
 
 def stage_render(job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
-    views = [
-        repo_path(value, label="preview") for value in job["previewPaths"].values()
-    ]
-    pose_paths = [
-        repo_path(value, label="pose") for value in job.get("posePaths", {}).values()
-    ]
+    images = review_image_paths(job)
+    view_count = len(job["previewPaths"])
     emit(
         result,
         stage="render-evidence",
         product_id=product_id,
-        paths=[*views, *pose_paths],
-        extra={"fiveViewCount": len(views), "poseEvidenceCount": len(pose_paths)},
+        paths=images,
+        extra={
+            "fiveViewCount": view_count,
+            "poseEvidenceCount": len(images) - view_count,
+        },
     )
 
 
@@ -429,23 +468,18 @@ def stage_audit(job: Mapping[str, Any], result: Path) -> None:
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
         label="build report",
     )
-    payload = read_object(report, "build report")
-    if payload.get("passed") is not True:
-        raise ValueError("geometry build report did not pass")
-    metrics = payload.get("metrics")
-    if not isinstance(metrics, dict):
-        raise ValueError("geometry report metrics are missing")
-    if (
-        metrics.get("unweightedVertices") != 0
-        or metrics.get("degenerateTriangles") != 0
-    ):
-        raise ValueError("geometry report contains unweighted or degenerate geometry")
+    quality = geometry_quality(read_object(report, "build report"))
     emit(
         result,
         stage="audit-geometry",
         product_id=product_id,
         paths=[report],
-        extra={"metrics": metrics},
+        extra={
+            "qualityDecision": quality["decision"],
+            "geometryPassed": quality["passed"],
+            "failedChecks": quality["failedChecks"],
+            "metrics": quality["metrics"],
+        },
     )
 
 
@@ -461,32 +495,24 @@ def stage_visual_review(
             "direct visual review is not recorded yet; inspect current render artifacts "
             f"and add {relative(review)}"
         )
-    payload = read_object(review, "visual review")
-    required = {
-        "schemaVersion": 1,
-        "productId": product_id,
-        "status": "PASS",
-        "reviewMethod": "direct-image-inspection",
-        "reviewedRevision": request.get("revisionId", ""),
-    }
-    mismatches = {
-        key: {"found": payload.get(key), "expected": expected}
-        for key, expected in required.items()
-        if payload.get(key) != expected
-    }
-    if mismatches:
-        raise ValueError(f"visual review contract mismatch: {mismatches}")
-    views = [
-        repo_path(value, label="preview") for value in job["previewPaths"].values()
-    ]
+    decision = validate_visual_review(
+        read_object(review, "visual review"),
+        product_id=product_id,
+        revision_id=str(request.get("revisionId", "")),
+    )
+    images = review_image_paths(job)
+    current_hashes = {relative(path): sha256(path) for path in images}
+    verify_inspected_images(decision["inspectedImages"], current_hashes)
     emit(
         result,
         stage="visual-review",
         product_id=product_id,
-        paths=[review, *views],
+        paths=[review, *images],
         extra={
             "reviewMethod": "direct-image-inspection",
-            "reviewDecision": payload.get("decision"),
+            "reviewStatus": decision["status"],
+            "reviewDecision": decision["decision"],
+            "blockingFindingCount": len(decision["findings"]),
         },
     )
 
@@ -495,18 +521,29 @@ def stage_finalize(
     job: Mapping[str, Any], request: Mapping[str, Any], result: Path
 ) -> None:
     product_id = str(job["id"])
+    revision_id = str(request.get("revisionId", ""))
     review_path = repo_path(job["garmentPipeline"]["visualReviewPath"], label="review")
-    review = read_object(review_path, "visual review")
+    visual = validate_visual_review(
+        read_object(review_path, "visual review"),
+        product_id=product_id,
+        revision_id=revision_id,
+    )
+    images = review_image_paths(job)
+    verify_inspected_images(
+        visual["inspectedImages"],
+        {relative(path): sha256(path) for path in images},
+    )
+
     build_report_path = repo_path(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
         label="build report",
     )
-    build_report = read_object(build_report_path, "build report")
+    geometry = geometry_quality(read_object(build_report_path, "build report"))
     pose_paths = [
         repo_path(value, label="pose") for value in job.get("posePaths", {}).values()
     ]
     gates = {
-        "blender": build_report.get("passed") is True,
+        "blender": geometry["passed"],
         "editableSource": repo_path(job["blendPath"], label="blend").is_file(),
         "fbx": repo_path(job["fbxAssetPath"], label="fbx").is_file(),
         "prefabDeclared": repo_path(job["prefabAssetPath"], label="prefab").is_file(),
@@ -515,10 +552,14 @@ def stage_finalize(
             for value in job["previewPaths"].values()
         ),
         "poseEvidence": bool(pose_paths) and all(path.is_file() for path in pose_paths),
-        "visualAppearanceReview": review.get("status") == "PASS",
+        "visualAppearanceReview": visual["decision"] == "PASS",
         "researchTrial": job.get("researchMethod", {}).get("trialStatus") == "DECLARED",
     }
-    status = "COMPLETE" if all(gates.values()) else "WORKING"
+    status = candidate_status(
+        gates,
+        geometry_decision=geometry["decision"],
+        visual_decision=visual["decision"],
+    )
     candidate_path = repo_path(
         f"{job['productRoot']}/Evidence/Candidate/candidate-state.json",
         label="candidate state",
@@ -527,8 +568,14 @@ def stage_finalize(
         "schemaVersion": 1,
         "productId": product_id,
         "status": status,
-        "revision": request.get("revisionId", ""),
+        "revision": revision_id,
         "gates": {name: "PASS" if passed else "FAIL" for name, passed in gates.items()},
+        "qualityDecisions": {
+            "geometry": geometry["decision"],
+            "visual": visual["decision"],
+        },
+        "blockingFindings": visual["findings"],
+        "failedGeometryChecks": geometry["failedChecks"],
         "outOfScope": [
             "Unity import/save/reload",
             "Modular Avatar and NDMF execution",
@@ -548,7 +595,12 @@ def stage_finalize(
         stage="finalize-candidate",
         product_id=product_id,
         paths=[candidate_path, manifest_path, review_path],
-        extra={"decisionRecorded": True, "candidateStatus": status},
+        extra={
+            "decisionRecorded": True,
+            "candidateStatus": status,
+            "geometryDecision": geometry["decision"],
+            "visualDecision": visual["decision"],
+        },
     )
 
 
