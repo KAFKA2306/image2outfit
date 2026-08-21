@@ -1,0 +1,15 @@
+# Example only. `tools/setup_mcp.ps1` can create equivalent global entries with
+# `codex mcp add`. Project-local Codex config is loaded only in trusted workspaces.
+
+[mcp_servers.image2outfit-blender]
+command = "cmd"
+args = ["/c", "uvx", "--python", "3.11", "blender-mcp==1.8.0"]
+
+[mcp_servers.image2outfit-blender.env]
+BLENDER_HOST = "localhost"
+BLENDER_PORT = "9876"
+UV_PYTHON_PREFERENCE = "only-managed"
+DISABLE_TELEMETRY = "true"
+
+[mcp_servers.image2outfit-unity]
+url = "http://127.0.0.1:8080/mcp"

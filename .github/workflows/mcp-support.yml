@@ -1,0 +1,56 @@
+name: MCP support static checks
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/mcp-support.yml"
+      - "tools/setup_mcp.ps1"
+      - "tools/blender_addons/**"
+      - "examples/mcp/**"
+      - "tests/test_mcp_support.py"
+      - "Taskfile.yml"
+      - "README.md"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/mcp-support.yml"
+      - "tools/setup_mcp.ps1"
+      - "tools/blender_addons/**"
+      - "examples/mcp/**"
+      - "tests/test_mcp_support.py"
+      - "Taskfile.yml"
+      - "README.md"
+
+permissions:
+  contents: read
+
+jobs:
+  python-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate MCP support files
+        run: python -m unittest tests.test_mcp_support -v
+
+  powershell-syntax:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse setup_mcp.ps1 without executing it
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Join-Path $PWD "tools/setup_mcp.ps1"),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_.Message }
+            exit 1
+          }
