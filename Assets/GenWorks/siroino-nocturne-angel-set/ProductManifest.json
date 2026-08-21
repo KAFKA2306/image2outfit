@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-nocturne-angel-set",
+  "productName": "Nocturne Angel Modular Set for Siroino",
+  "status": "WORKING",
+  "state": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-nocturne-angel-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-nocturne-angel-set/Prefab/SiroinoNocturneAngelSet.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-nocturne-angel-set/Prefab/SiroinoSotai_NocturneAngelSet.prefab",
+  "previewPath": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-nocturne-angel-set/README.md",
+  "sourceJobPath": "config/products/siroino-nocturne-angel-set/job.json",
+  "productBuildScript": "tools/siroino_nocturne_angel_set.py",
+  "designRevision": "v5-skinweighted-pleated-volume",
+  "reference": {
+    "sourceImageRedistributed": false,
+    "sourceImageSha256": "a4a15a6fc6b7290af41dbc82b5fc55e7ab74370c33018816fd829d8307629f67",
+    "sourceImageDimensions": [2048, 1229]
+  },
+  "technicalGates": {
+    "blender": "PENDING",
+    "editableSource": "PENDING",
+    "fbx": "PENDING",
+    "prefabDeclared": "PENDING",
+    "fiveViewEvidence": "PENDING",
+    "poseEvidence": "PENDING",
+    "visualAppearanceReview": "PENDING",
+    "researchTrial": "PENDING",
+    "fitPenetration": "PENDING",
+    "unityImport": "OUT_OF_SCOPE",
+    "unitySaveReload": "OUT_OF_SCOPE",
+    "prefabReload": "OUT_OF_SCOPE",
+    "modularAvatar": "OUT_OF_SCOPE",
+    "ndmf": "OUT_OF_SCOPE",
+    "vrchatBuildTest": "OUT_OF_SCOPE",
+    "vrchatRuntime": "OUT_OF_SCOPE",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-nocturne-angel-set/Source/Blender/SiroinoNocturneAngelSet.blend",
+    "fbx": "Assets/GenWorks/siroino-nocturne-angel-set/Models/SiroinoNocturneAngelSet.fbx",
+    "prefab": "Assets/GenWorks/siroino-nocturne-angel-set/Prefab/SiroinoNocturneAngelSet.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-nocturne-angel-set/Prefab/SiroinoSotai_NocturneAngelSet.prefab",
+    "multiview": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/siroino-nocturne-angel-set-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/siroino-nocturne-angel-set-pose-review.webp",
+    "patternSpec": "Assets/GenWorks/siroino-nocturne-angel-set/Documentation/pattern-spec.json",
+    "researchTrial": "Assets/GenWorks/siroino-nocturne-angel-set/Research/patterngsl-autosew-cloth-trial.json",
+    "fitAudit": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/fit-audit.json",
+    "visualReview": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review.json"
+  },
+  "rejectedHistory": [
+    {
+      "revision": "v1-pattern-gsl-modular-cloth",
+      "result": "VISUAL_REJECTED",
+      "hostedWorkflowRun": 30934884455,
+      "artifactId": 8903072226,
+      "artifactSha256": "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c0392551a",
+      "evidence": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v1.json"
+    },
+    {
+      "revision": "v2-open-multiring-reference-silhouette",
+      "result": "VISUAL_REJECTED",
+      "hostedWorkflowRun": 30937377321,
+      "artifactId": 8904078622,
+      "artifactSha256": "5f3465dc50486b627df520142a7a74fa2b5b98d22089a509d124a5d1936be3fc",
+      "evidence": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v2.json"
+    },
+    {
+      "revision": "v3-sewn-v-neck-stable-modules",
+      "result": "VISUAL_REJECTED",
+      "hostedWorkflowRun": 30957408404,
+      "artifactId": 8911782998,
+      "artifactSha256": "0921d4d449985ef757db808dc9b316421f1a70374f8cd5c4f75d562f254f3d2b",
+      "evidence": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v3.json"
+    },
+    {
+      "revision": "v4-clearance-articulated-silhouette",
+      "result": "VISUAL_REJECTED",
+      "hostedWorkflowRun": 30959394549,
+      "artifactId": 8912558603,
+      "artifactSha256": "086c1fa3ab50d37d6f44bd1af2605d45800a4973623434a405fc2224d15d94c1",
+      "evidence": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review-v4.json"
+    }
+  ],
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-nocturne-angel-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "tools/siroino_nocturne_angel_set.py",
+    "blockers": [
+      "Run Blender 4.4.3 generation for revision v5.",
+      "Generate five-view and required-pose evidence.",
+      "Open all current images and complete direct visualAppearanceReview."
+    ]
+  }
+}
