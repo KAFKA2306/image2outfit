@@ -19,6 +19,7 @@ on:
       - tools/release_gate.py
       - tools/runtime_paths.py
       - tools/pipeline.py
+      - tools/resolve_product_build_scope.py
       - Assets/GenWorks/Shared/**
       - config/job.schema.v2.json
       - config/release-policy.json
@@ -52,64 +53,19 @@ jobs:
         shell: pwsh
         env:
           DISPATCH_JOB_PATH: ${{ inputs.job_path }}
-          BASE_REF: ${{ github.base_ref }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $jobPath = [string]$env:DISPATCH_JOB_PATH
-          if ([string]::IsNullOrWhiteSpace($jobPath)) {
-            if ([string]::IsNullOrWhiteSpace($env:BASE_REF)) {
-              throw 'job_path is required outside a pull request'
-            }
-            git fetch origin $env:BASE_REF --depth=1
-            $changed = @(git diff --name-only "origin/$env:BASE_REF...HEAD" -- 'config/products/*/job.json')
-            if ($LASTEXITCODE -ne 0) { throw 'Could not inspect changed product jobs' }
-            $changed = @($changed | Where-Object { $_ -match '^config/products/[A-Za-z0-9._-]+/job\.json$' } | Sort-Object -Unique)
-            if ($changed.Count -ne 1) {
-              "SKIP_PRODUCT_BUILD=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-              "BUILD_SCOPE_REASON=changed-product-jobs-$($changed.Count)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-              Write-Host "Skipping product generation because the PR changed $($changed.Count) jobs: $($changed -join ', '). Repository contracts will still be audited."
-              exit 0
-            }
-            $jobPath = $changed[0]
-          }
-          if ($jobPath -notmatch '^config/products/[A-Za-z0-9._-]+/job\.json$') {
-            throw 'job_path must match config/products/<product-id>/job.json'
-          }
-          if (-not (Test-Path -LiteralPath $jobPath -PathType Leaf)) {
-            throw "Tracked product job not found: $jobPath"
-          }
-          $job = Get-Content -LiteralPath $jobPath -Raw | ConvertFrom-Json
-          if ([int]$job.schemaVersion -ne 2) { throw 'Only schemaVersion 2 jobs are accepted' }
-          $productId = Split-Path -Leaf (Split-Path -Parent $jobPath)
-          if ([string]$job.id -ne $productId) { throw 'Product job id does not match its namespace' }
-          $expectedRoot = "Assets/GenWorks/$productId"
-          if ([string]$job.productRoot -ne $expectedRoot) {
-            throw 'Product root does not match its namespace'
-          }
-          foreach ($field in @('prefabAssetPath', 'integratedPrefabAssetPath')) {
-            $value = [string]$job.$field
-            if (-not [string]::IsNullOrWhiteSpace($value) -and $value -notmatch "^Assets/GenWorks/$([regex]::Escape($productId))/Prefab/[^/]+\.prefab$") {
-              throw "$field must match Assets/GenWorks/$productId/Prefab/*.prefab"
-            }
-          }
-          if ($null -ne $job.automaticBuild -and -not [bool]$job.automaticBuild) {
-            "SKIP_PRODUCT_BUILD=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-            "BUILD_SCOPE_REASON=$productId-manual-recovery" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-            Write-Host "Skipping automatic generation for $productId because automaticBuild=false. Repository contracts will still be audited."
-            exit 0
-          }
-          $localJob = "Assets/_Local/Jobs/$productId/job.json"
-          $runtimeRoot = ".image2outfit/products/$productId"
-          $reportDir = "$runtimeRoot/reports"
-          New-Item -ItemType Directory -Force -Path (Split-Path -Parent $localJob), $reportDir | Out-Null
-          "SKIP_PRODUCT_BUILD=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "TRACKED_JOB_PATH=$jobPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "JOB_PATH=$localJob" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "JOB_ID=$productId" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "PRODUCT_ROOT=$($job.productRoot)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "REPORT_DIR=$reportDir" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "CANDIDATE_DIR=$runtimeRoot/candidate" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "RELEASE_DIR=$runtimeRoot/release" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          uv run --no-cache --no-project python tools/resolve_product_build_scope.py `
+            --job-path "$env:DISPATCH_JOB_PATH" `
+            --event-name "$env:EVENT_NAME" `
+            --base-sha "$env:BASE_SHA" `
+            --head-sha "$env:HEAD_SHA" `
+            --github-env "$env:GITHUB_ENV" `
+            --materialize-job
+          if ($LASTEXITCODE -ne 0) { throw 'Product build scope resolution failed' }
           "IMAGE2OUTFIT_RUN_ID=$env:GITHUB_RUN_ID" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Audit repository contracts
@@ -126,6 +82,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path $env:REPORT_DIR | Out-Null
           uv run --no-cache --no-project python tools/materialize_private_target.py --job $env:TRACKED_JOB_PATH --output $env:JOB_PATH |
             Tee-Object -FilePath "$env:REPORT_DIR/resolved-target.json"
           if ($LASTEXITCODE -ne 0) { throw 'Private target materialization failed' }
