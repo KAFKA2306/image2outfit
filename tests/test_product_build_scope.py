@@ -19,8 +19,12 @@ class ProductBuildScopeTest(unittest.TestCase):
         root = Path(directory)
         (root / "config/products/demo").mkdir(parents=True)
         (root / "config/pipeline/requests").mkdir(parents=True)
-        shutil.copy(PROJECT / "config/job.schema.v2.json", root / "config/job.schema.v2.json")
-        shutil.copy(PROJECT / "config/toolchain-lock.json", root / "config/toolchain-lock.json")
+        shutil.copy(
+            PROJECT / "config/job.schema.v2.json", root / "config/job.schema.v2.json"
+        )
+        shutil.copy(
+            PROJECT / "config/toolchain-lock.json", root / "config/toolchain-lock.json"
+        )
         job = {
             "schemaVersion": 2,
             "id": "demo",
@@ -99,7 +103,9 @@ class ProductBuildScopeTest(unittest.TestCase):
                 include_pipeline_request=False,
             )
         self.assertEqual(hosted.environment["JOB_ID"], "demo")
-        self.assertEqual(hosted.environment["JOB_PATH"], "config/products/demo/job.json")
+        self.assertEqual(
+            hosted.environment["JOB_PATH"], "config/products/demo/job.json"
+        )
         self.assertEqual(
             self_hosted.environment["JOB_PATH"], "Assets/_Local/Jobs/demo/job.json"
         )
