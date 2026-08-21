@@ -12,6 +12,7 @@ GLOBAL_CONFIG_FILES = {
     "genworks-handoff-policy.json",
     "genworks-layout.json",
     "job.schema.v2.json",
+    "pr-merge-policy.json",
     "release-policy.json",
     "toolchain-lock.json",
 }
