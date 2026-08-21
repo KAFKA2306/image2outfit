@@ -27,6 +27,13 @@ tasks:
         --execute
         --checkpoint-output ".image2outfit/products/{{.PRODUCT}}/pipeline-state.json"
 
+  merge:check:
+    desc: Validate repository PR merge policy without evaluating product release eligibility.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/pr_merge_gate.py
+
   candidate:
     desc: Build a candidate after validating its construction contract.
     requires:
@@ -41,7 +48,7 @@ tasks:
         python tools/manage.py candidate --product "{{.PRODUCT}}"
 
   release:
-    desc: Package the unchanged reviewed candidate through the release validator.
+    desc: Package the unchanged reviewed candidate through the product release validator.
     requires:
       vars: [PRODUCT]
     env:
