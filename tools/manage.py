@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(TOOLS))
 
 from image2outfit import improvement  # noqa: E402
+import improvement_loop  # noqa: E402
 import method_selection  # noqa: E402
 import runtime_paths  # noqa: E402
 
@@ -101,24 +102,61 @@ def _load_manifest(path_text: str) -> dict[str, Any]:
     return improvement.read_json(path)
 
 
-def _improve(product_id: str) -> int:
+def _improve(product_id: str, max_steps: int) -> int:
+    trace: list[dict[str, Any]] = []
     try:
-        plan = improvement.plan_improvement(ROOT, product_id)
-        path = improvement.persist_plan(ROOT, product_id, plan)
+        for _ in range(max_steps):
+            result = improvement_loop.advance(
+                ROOT,
+                product_id,
+                regenerate=lambda: _product("candidate", product_id),
+            )
+            trace.append(result)
+            status = str(result.get("status") or "UNKNOWN")
+            if status in {"ITERATION_RECORDED", "REEVALUATED"}:
+                continue
+            output = {**result, "trace": trace}
+            print(json.dumps(output, ensure_ascii=False, indent=2))
+            if status == "NO_DEFECT":
+                return 0
+            if status in improvement_loop.WAITING:
+                return 2
+            return 0 if status == "ADOPTED" else 1
     except (
         OSError,
         ValueError,
         json.JSONDecodeError,
         improvement.ImprovementError,
+        improvement_loop.LoopError,
     ) as exc:
-        print(f"image2outfit improve: {exc}", file=sys.stderr)
+        print(
+            json.dumps(
+                {
+                    "status": "ERROR",
+                    "productId": product_id,
+                    "error": str(exc),
+                    "trace": trace,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            file=sys.stderr,
+        )
         return 1
-    output = {
-        **plan,
-        "planPath": path.relative_to(ROOT).as_posix(),
-    }
-    print(json.dumps(output, ensure_ascii=False, indent=2))
-    return 0
+
+    print(
+        json.dumps(
+            {
+                "status": "MAX_STEPS_REACHED",
+                "productId": product_id,
+                "maxSteps": max_steps,
+                "trace": trace,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+    return 2
 
 
 def _experiment_matrix(path_text: str) -> int:
@@ -195,6 +233,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     improve = commands.add_parser("improve")
     improve.add_argument("--product", required=True)
+    improve.add_argument("--max-steps", type=int, default=8)
 
     matrix = commands.add_parser("experiment-matrix")
     matrix.add_argument("--manifest", required=True)
@@ -220,7 +259,10 @@ def main() -> int:
     if options.command in {"candidate", "release", "explain"}:
         return _product(options.command, options.product)
     if options.command == "improve":
-        return _improve(options.product)
+        if options.max_steps < 1:
+            print("--max-steps must be >= 1", file=sys.stderr)
+            return 2
+        return _improve(options.product, options.max_steps)
     if options.command == "experiment-matrix":
         return _experiment_matrix(options.manifest)
     if options.command == "experiment-method":

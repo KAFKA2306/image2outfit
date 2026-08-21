@@ -37,7 +37,7 @@ tasks:
         python tools/manage.py explain --product "{{.PRODUCT}}"
 
   improve:
-    desc: Diagnose the current candidate and choose the next measured improvement action.
+    desc: Advance defect diagnosis, targeted learning, measured experiments, adoption, regeneration, and re-evaluation until a real external boundary or no defect remains.
     requires:
       vars: [PRODUCT]
     cmds:
