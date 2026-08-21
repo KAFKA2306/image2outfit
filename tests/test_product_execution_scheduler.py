@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import unittest
@@ -11,6 +12,7 @@ TOOLS = ROOT / "tools"
 sys.path.insert(0, str(SRC))
 sys.path.insert(0, str(TOOLS))
 
+import dagu_fixture_preflight as fixture_preflight  # noqa: E402
 import run_garment_pipeline as pipeline_runner  # noqa: E402
 import run_product_execution as execution  # noqa: E402
 from image2outfit.pipeline import PIPELINE_STAGES  # noqa: E402
@@ -104,6 +106,50 @@ class ProductExecutionSchedulerTests(unittest.TestCase):
                 failed, pipeline_runner.ExecutionMode.EXECUTE
             )
         )
+
+    def test_fixture_preflight_covers_exact_canonical_benchmark_set(self) -> None:
+        fixture_config = json.loads(
+            (ROOT / fixture_preflight.FIXTURE_CONFIG).read_text(encoding="utf-8")
+        )
+        expected = {
+            (fixture["fixtureId"], fixture["productId"])
+            for fixture in fixture_config["fixtures"]
+        }
+        plan = fixture_preflight.build_preflight()
+        actual = {
+            (entry["fixtureId"], entry["productId"])
+            for entry in plan["entries"]
+        }
+        self.assertEqual(actual, expected)
+        self.assertEqual(plan["queue"], "product-execution")
+        self.assertFalse(plan["schedulerOwnsCompletion"])
+        self.assertEqual(
+            plan["readyCount"] + plan["blockedCount"],
+            len(expected),
+        )
+
+    def test_fixture_preflight_never_queues_unbound_or_invented_requests(self) -> None:
+        plan = fixture_preflight.build_preflight()
+        candidates = {
+            entry["productId"]: entry for entry in plan["queueCandidates"]
+        }
+        for entry in plan["entries"]:
+            product_id = entry["productId"]
+            request_path = entry["requestPath"]
+            identity_path = entry["referenceIdentityPath"]
+            if entry["status"] == "READY":
+                self.assertIsNotNone(request_path)
+                self.assertIsNotNone(identity_path)
+                self.assertIn(product_id, candidates)
+                self.assertEqual(candidates[product_id]["request"], request_path)
+                self.assertTrue((ROOT / request_path).is_file())
+                self.assertTrue((ROOT / identity_path).is_file())
+            else:
+                self.assertNotIn(product_id, candidates)
+                if request_path is None:
+                    self.assertIn("missing-canonical-request", entry["blockers"])
+                if identity_path is None:
+                    self.assertIn("missing-reference-identity", entry["blockers"])
 
 
 if __name__ == "__main__":
