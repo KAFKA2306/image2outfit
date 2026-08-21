@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 import sys
 import tempfile
@@ -44,6 +45,17 @@ class ToolOwnershipTest(unittest.TestCase):
         )
         self.assertIn("Taskfile.yml", manage["references"])
         self.assertFalse(manage["unreferenced"])
+
+    def test_production_gate_core_uses_canonical_manifest_owner(self) -> None:
+        tree = ast.parse((TOOLS / "production_gate_core.py").read_text(encoding="utf-8"))
+        imports = {
+            alias.name
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Import)
+            for alias in node.names
+        }
+        self.assertIn("candidate_manifest", imports)
+        self.assertNotIn("release_gate", imports)
 
 
 class ToolchainAuditTest(unittest.TestCase):
@@ -101,7 +113,7 @@ class ToolchainAuditTest(unittest.TestCase):
             "dependencies"
         ]
         dependencies["com.vrchat.avatars"] = ">=3.7.0 <4.0.0"
-        self.write_json(self.root / "Packages" / "vpm-manifest.json", self.manifest)
+        self.write_json(self.root / "config" / "toolchain-lock.json", self.lock)
         result = audit_toolchain.audit(self.root)
         self.assertFalse(result["passed"])
         self.assertTrue(
