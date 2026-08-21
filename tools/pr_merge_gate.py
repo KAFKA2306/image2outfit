@@ -79,7 +79,9 @@ def validate() -> dict[str, Any]:
     merge = _read_json(MERGE_POLICY)
     completion = _read_json(COMPLETION_POLICY)
     release = _read_json(RELEASE_POLICY)
-    merge_gate = merge.get("mergeGate") if isinstance(merge.get("mergeGate"), dict) else {}
+    merge_gate = (
+        merge.get("mergeGate") if isinstance(merge.get("mergeGate"), dict) else {}
+    )
     release_gate = (
         merge.get("productReleaseGate")
         if isinstance(merge.get("productReleaseGate"), dict)
@@ -150,7 +152,9 @@ def validate() -> dict[str, Any]:
     )
     for token in required_branch_workflow_tokens:
         if token not in branch_hygiene_workflow:
-            errors.append(f"branch hygiene workflow missing lifecycle contract: {token}")
+            errors.append(
+                f"branch hygiene workflow missing lifecycle contract: {token}"
+            )
     for token in (
         "Keeping invalid orphan branch",
         "Keeping orphan branch with",
@@ -169,7 +173,9 @@ def validate() -> dict[str, Any]:
     if not isinstance(merge_validation, str) or not merge_validation:
         errors.append("merge-policy mergeGate.validationCommand")
     elif not _contains_command(merge_workflow, merge_validation):
-        errors.append("canonical merge workflow must invoke configured validation command")
+        errors.append(
+            "canonical merge workflow must invoke configured validation command"
+        )
 
     if release_gate.get("manualDispatchRequired") is not True:
         errors.append("merge-policy productReleaseGate.manualDispatchRequired=true")
@@ -214,15 +220,21 @@ def validate() -> dict[str, Any]:
     if "Resolve changed Python files" not in merge_workflow:
         errors.append("canonical PR merge workflow must resolve changed Python files")
     if "ruff check --ignore S102 src tools tests" in merge_workflow:
-        errors.append("canonical PR merge workflow must not lint unrelated whole-tree Python")
+        errors.append(
+            "canonical PR merge workflow must not lint unrelated whole-tree Python"
+        )
     if "Ruff format changed Python" not in merge_workflow:
-        errors.append("canonical PR merge workflow must format-check changed Python only")
+        errors.append(
+            "canonical PR merge workflow must format-check changed Python only"
+        )
     if "workflow_dispatch:" not in release_workflow:
         errors.append("product release workflow must remain manual")
     if "pull_request:" in release_workflow or "\n  push:" in release_workflow:
         errors.append("product release workflow must not run on PR or push")
     if isinstance(validator, str) and validator not in release_workflow:
-        errors.append("product release workflow must invoke configured release validator")
+        errors.append(
+            "product release workflow must invoke configured release validator"
+        )
     if LEGACY_POLICY_WORKFLOW.exists():
         errors.append("legacy policy-tests.yml must be removed")
 
