@@ -38,8 +38,16 @@ jobs:
       - name: Audit repository contracts
         run: uv run --locked --no-default-groups python tools/manage.py audit all
 
-      - name: Run unit and contract tests
-        run: uv run --locked --no-default-groups python -m unittest discover -s tests -v
+      - name: Run merge and release boundary contract tests
+        run: >-
+          uv run --locked --no-default-groups
+          python -m unittest
+          tests.test_merge_release_separation
+          tests.test_release_provenance_gate
+          tests.test_repository_policies
+          tests.test_release_contracts
+          tests.test_release_gate
+          -v
 
       - name: Verify PR merge and product release separation
         run: uv run --locked --no-default-groups python tools/pr_merge_gate.py
