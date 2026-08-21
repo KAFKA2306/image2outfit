@@ -30,6 +30,7 @@ env:
   STATUS_CONTEXT: image2outfit-hosted
 
 permissions:
+  actions: write
   contents: read
   statuses: write
 
@@ -280,18 +281,51 @@ jobs:
             ${{ env.PRODUCT_ROOT }}
           key: image2outfit-pipeline-${{ github.event.pull_request.number || github.ref_name }}-${{ env.JOB_ID }}-${{ github.run_id }}
 
+      - name: Delete previous hosted artifact
+        if: always() && env.SKIP_PRODUCT_BUILD != 'true' && env.JOB_ID != ''
+        uses: actions/github-script@v7
+        env:
+          ARTIFACT_NAME: image2outfit-hosted-${{ env.JOB_ID }}
+        with:
+          script: |
+            const current = process.env.ARTIFACT_NAME;
+            const artifacts = await github.paginate(github.rest.actions.listArtifactsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            for (const artifact of artifacts) {
+              const suffix = artifact.name.startsWith(`${current}-`)
+                ? artifact.name.slice(current.length + 1)
+                : '';
+              if (artifact.name === current || /^\d+$/.test(suffix)) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+              }
+            }
+
       - name: Upload generated product and evidence
-        if: always() && env.SKIP_PRODUCT_BUILD != 'true'
+        if: always() && env.SKIP_PRODUCT_BUILD != 'true' && env.JOB_ID != ''
         uses: actions/upload-artifact@v4
         with:
-          name: image2outfit-hosted-${{ env.JOB_ID }}-${{ github.run_id }}
+          name: image2outfit-hosted-${{ env.JOB_ID }}
           path: |
-            ${{ env.REPORT_DIR }}
-            ${{ env.PRODUCT_RUNTIME }}
-            ${{ env.PRODUCT_AUDIT }}
-            ${{ env.PRODUCT_ROOT }}
+            ${{ env.REPORT_DIR }}/**/*.json
+            ${{ env.PRODUCT_RUNTIME }}/**/*.json
+            ${{ env.PRODUCT_AUDIT }}/**/*.json
+            ${{ env.PRODUCT_ROOT }}/Models/**/*.fbx
+            ${{ env.PRODUCT_ROOT }}/Prefab/**/*.prefab
+            ${{ env.PRODUCT_ROOT }}/Previews/**/*.webp
+            ${{ env.PRODUCT_ROOT }}/Textures/**/*.webp
+            ${{ env.PRODUCT_ROOT }}/Source/Blender/*.blend
+            ${{ env.PRODUCT_ROOT }}/ProductManifest.json
+            ${{ env.PRODUCT_ROOT }}/SOURCE_HASHES.txt
           if-no-files-found: error
-          retention-days: 30
+          overwrite: true
+          retention-days: 1
           compression-level: 6
 
       - name: Enforce valid pipeline boundary

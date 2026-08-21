@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: image2outfit-candidate-${{ github.repository }}
@@ -81,14 +82,30 @@ jobs:
           $audit = Get-Content -LiteralPath (Join-Path $env:REPORT_DIR 'audit.json') -Raw | ConvertFrom-Json
           if ([string]$audit.decision -ne 'REVIEW_REQUIRED') { throw "Expected REVIEW_REQUIRED after technical build, got $($audit.decision)" }
 
+      - name: Delete previous candidate artifact
+        if: always() && env.JOB_ID != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --no-cache --locked --no-default-groups --python 3.11 python tools/delete_previous_artifacts.py "image2outfit-candidate-$env:JOB_ID"
+
       - name: Upload candidate and evidence
-        if: always()
+        if: always() && env.JOB_ID != ''
         uses: actions/upload-artifact@v4
         with:
-          name: image2outfit-candidate-${{ env.JOB_ID }}-${{ github.run_id }}
+          name: image2outfit-candidate-${{ env.JOB_ID }}
           path: |
-            ${{ env.REPORT_DIR }}
-            ${{ env.CANDIDATE_DIR }}
+            ${{ env.REPORT_DIR }}/**/*.json
+            ${{ env.CANDIDATE_DIR }}/**/*.json
+            ${{ env.CANDIDATE_DIR }}/**/*.zip
+            ${{ env.CANDIDATE_DIR }}/**/*.unitypackage
+            ${{ env.CANDIDATE_DIR }}/**/*.fbx
+            ${{ env.CANDIDATE_DIR }}/**/*.prefab
+            ${{ env.CANDIDATE_DIR }}/**/*.webp
+            ${{ env.CANDIDATE_DIR }}/**/*.blend
+            ${{ env.CANDIDATE_DIR }}/**/*.txt
+            ${{ env.CANDIDATE_DIR }}/**/*.md
           if-no-files-found: error
-          retention-days: 14
+          overwrite: true
+          retention-days: 1
           compression-level: 6

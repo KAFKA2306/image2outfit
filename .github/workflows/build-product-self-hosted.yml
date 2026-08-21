@@ -29,6 +29,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: image2outfit-self-hosted-${{ github.event.pull_request.number || inputs.job_path }}
@@ -127,15 +128,37 @@ jobs:
             throw "Expected REVIEW_REQUIRED, got $($audit.decision)"
           }
 
+      - name: Delete previous self-hosted artifact
+        if: always() && env.SKIP_PRODUCT_BUILD != 'true' && env.JOB_ID != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --no-cache --locked --no-default-groups --python 3.11 python tools/delete_previous_artifacts.py "image2outfit-self-hosted-$env:JOB_ID"
+
       - name: Upload product, candidate, and evidence
-        if: always() && env.SKIP_PRODUCT_BUILD != 'true'
+        if: always() && env.SKIP_PRODUCT_BUILD != 'true' && env.JOB_ID != ''
         uses: actions/upload-artifact@v4
         with:
-          name: image2outfit-self-hosted-${{ env.JOB_ID }}-${{ github.run_id }}
+          name: image2outfit-self-hosted-${{ env.JOB_ID }}
           path: |
-            ${{ env.PRODUCT_ROOT }}
-            ${{ env.REPORT_DIR }}
-            ${{ env.CANDIDATE_DIR }}
+            ${{ env.PRODUCT_ROOT }}/Models/**/*.fbx
+            ${{ env.PRODUCT_ROOT }}/Prefab/**/*.prefab
+            ${{ env.PRODUCT_ROOT }}/Previews/**/*.webp
+            ${{ env.PRODUCT_ROOT }}/Textures/**/*.webp
+            ${{ env.PRODUCT_ROOT }}/Source/Blender/*.blend
+            ${{ env.PRODUCT_ROOT }}/ProductManifest.json
+            ${{ env.PRODUCT_ROOT }}/SOURCE_HASHES.txt
+            ${{ env.REPORT_DIR }}/**/*.json
+            ${{ env.CANDIDATE_DIR }}/**/*.json
+            ${{ env.CANDIDATE_DIR }}/**/*.zip
+            ${{ env.CANDIDATE_DIR }}/**/*.unitypackage
+            ${{ env.CANDIDATE_DIR }}/**/*.fbx
+            ${{ env.CANDIDATE_DIR }}/**/*.prefab
+            ${{ env.CANDIDATE_DIR }}/**/*.webp
+            ${{ env.CANDIDATE_DIR }}/**/*.blend
+            ${{ env.CANDIDATE_DIR }}/**/*.txt
+            ${{ env.CANDIDATE_DIR }}/**/*.md
           if-no-files-found: error
-          retention-days: 30
+          overwrite: true
+          retention-days: 1
           compression-level: 6

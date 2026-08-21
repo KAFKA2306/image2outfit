@@ -9,7 +9,7 @@ on:
         type: string
 
 permissions:
-  actions: read
+  actions: write
   contents: read
   pull-requests: read
 
@@ -76,14 +76,29 @@ jobs:
           $audit = Get-Content -LiteralPath (Join-Path $env:REPORT_DIR 'audit.json') -Raw | ConvertFrom-Json
           if ([string]$audit.decision -ne 'GO') { throw "Release gate did not return GO: $($audit.decision)" }
 
+      - name: Delete previous release artifact
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --no-cache --locked --no-default-groups --python 3.11 python tools/delete_previous_artifacts.py "image2outfit-release-$env:JOB_ID"
+
       - name: Upload customer release
         uses: actions/upload-artifact@v4
         with:
-          name: image2outfit-release-${{ env.JOB_ID }}-${{ github.run_id }}
+          name: image2outfit-release-${{ env.JOB_ID }}
           path: |
             .image2outfit/release-provenance.json
             ${{ env.REPORT_DIR }}/audit.json
-            ${{ env.RELEASE_DIR }}
+            ${{ env.RELEASE_DIR }}/**/*.json
+            ${{ env.RELEASE_DIR }}/**/*.zip
+            ${{ env.RELEASE_DIR }}/**/*.unitypackage
+            ${{ env.RELEASE_DIR }}/**/*.fbx
+            ${{ env.RELEASE_DIR }}/**/*.prefab
+            ${{ env.RELEASE_DIR }}/**/*.webp
+            ${{ env.RELEASE_DIR }}/**/*.blend
+            ${{ env.RELEASE_DIR }}/**/*.txt
+            ${{ env.RELEASE_DIR }}/**/*.md
           if-no-files-found: error
-          retention-days: 30
+          overwrite: true
+          retention-days: 1
           compression-level: 0
