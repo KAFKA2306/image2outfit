@@ -55,7 +55,9 @@ class ReleaseProvenanceGateTests(unittest.TestCase):
         self.assertEqual(workflow_file, "pr-merge-gate.yml")
         self.assertEqual(workflow_name, self.MERGE_GATE_NAME)
 
-    def test_verified_requires_merged_pr_and_exact_head_merge_gate_success(self) -> None:
+    def test_verified_requires_merged_pr_and_exact_head_merge_gate_success(
+        self,
+    ) -> None:
         result = self.evaluate()
         self.assertEqual(result["state"], "VERIFIED")
         self.assertEqual(result["pr_number"], 42)
@@ -97,9 +99,9 @@ class ReleaseProvenanceGateTests(unittest.TestCase):
         merge_workflow = (ROOT / ".github/workflows/pr-merge-gate.yml").read_text(
             encoding="utf-8"
         )
-        release_workflow = (ROOT / ".github/workflows/release-self-hosted.yml").read_text(
-            encoding="utf-8"
-        )
+        release_workflow = (
+            ROOT / ".github/workflows/release-self-hosted.yml"
+        ).read_text(encoding="utf-8")
         self.assertIn("name: PR merge gate", merge_workflow)
         self.assertNotIn("production_gate.py --mode release", merge_workflow)
         self.assertIn("production_gate.py --mode release", release_workflow)
