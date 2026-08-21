@@ -6,8 +6,9 @@ SiroinoSotai_PC 向け衣装を Blender で制作し、編集可能ソース、F
 
 Markdown は入口と設計説明に限定します。変更され得る要件は、次の機械可読ファイルと実装を正本とします。
 
-- 完了境界: `config/genworks-handoff-policy.json`
-- 必須 view / pose: `config/release-policy.json`
+- PR merge 境界: `config/pr-merge-policy.json`
+- 製品 completion 境界: `config/genworks-handoff-policy.json`
+- 製品 release 境界: `config/release-policy.json`
 - 製品入力・出力: `config/products/<slug>/job.json`
 - 製品状態・gate・hash: `Assets/GenWorks/<slug>/ProductManifest.json`
 - 品質仕様: `contracts/quality/quality-spec.json`
@@ -35,6 +36,25 @@ Markdown は入口と設計説明に限定します。変更され得る要件�
 画像の存在、ファイルサイズ、hash、CI 成功だけでは visual appearance review の PASS にはなりません。
 
 Unity 2022.3.22f1 import/save/reload、Modular Avatar / NDMF、VRChat Build & Test、VRChat runtime、人間による runtime visual review は現在 `OUT_OF_SCOPE` です。外部検証なしに、それらが動作確認済みとは表現しません。
+
+## PR merge と製品 release
+
+PR merge と customer-facing product release は別の判定です。
+
+```text
+repository change
+  → task merge:check
+  → PR merge
+
+product candidate
+  → product completion / review
+  → task release PRODUCT=<slug>
+  → customer release artifact
+```
+
+`task merge:check` は repository integration の contract だけを検証します。製品が `WORKING` / `REJECTED` のまま、visual/runtime/release eligibility が未完了でも、それ自体は PR merge failure ではありません。影響製品の実行結果や blocker は正直に残し、merge policy が要求する有効な boundary までは到達させます。
+
+`task release` は別の product release validator を通します。PR merge は release を実行せず、製品を `COMPLETE` に昇格させず、visual/runtime/customer-quality PASS を暗黙に主張しません。
 
 ## ワークスペース
 
@@ -92,7 +112,13 @@ task candidate PRODUCT=<slug>
 task improve PRODUCT=<slug>
 ```
 
-レビュー済み candidate を release validator に通す場合は次を使用します。
+PR の repository-level merge contract は次で確認します。
+
+```powershell
+task merge:check
+```
+
+レビュー済み candidate を product release validator に通す場合だけ次を使用します。
 
 ```powershell
 task release PRODUCT=<slug>
