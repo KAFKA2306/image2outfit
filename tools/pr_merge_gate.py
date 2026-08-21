@@ -12,9 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 MERGE_POLICY = ROOT / "config" / "pr-merge-policy.json"
 COMPLETION_POLICY = ROOT / "config" / "genworks-handoff-policy.json"
 RELEASE_POLICY = ROOT / "config" / "release-policy.json"
-MERGE_WORKFLOW = ROOT / ".github" / "workflows" / "pr-merge-gate.yml"
-RELEASE_WORKFLOW = ROOT / ".github" / "workflows" / "release-self-hosted.yml"
+WORKFLOWS = ROOT / ".github" / "workflows"
 PR_TEMPLATE = ROOT / ".github" / "pull_request_template.md"
+DEPRECATED_MERGE_WORKFLOW = WORKFLOWS / "pr-merge-gate.yml"
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -24,12 +24,27 @@ def _read_json(path: Path) -> dict[str, Any]:
     return value
 
 
+def _workflow_path(spec: dict[str, Any], key: str) -> Path:
+    value = spec.get(key)
+    if not isinstance(value, str) or not value or Path(value).name != value:
+        raise ValueError(f"workflow {key} must be a file name")
+    return WORKFLOWS / value
+
+
 def validate() -> dict[str, Any]:
     merge = _read_json(MERGE_POLICY)
     completion = _read_json(COMPLETION_POLICY)
     release = _read_json(RELEASE_POLICY)
-    merge_workflow = MERGE_WORKFLOW.read_text(encoding="utf-8")
-    release_workflow = RELEASE_WORKFLOW.read_text(encoding="utf-8")
+    merge_gate = merge.get("mergeGate") if isinstance(merge.get("mergeGate"), dict) else {}
+    release_gate = (
+        merge.get("productReleaseGate")
+        if isinstance(merge.get("productReleaseGate"), dict)
+        else {}
+    )
+    merge_workflow_path = _workflow_path(merge_gate, "workflowFile")
+    release_workflow_path = _workflow_path(release_gate, "workflowFile")
+    merge_workflow = merge_workflow_path.read_text(encoding="utf-8")
+    release_workflow = release_workflow_path.read_text(encoding="utf-8")
     template = PR_TEMPLATE.read_text(encoding="utf-8")
 
     errors: list[str] = []
@@ -61,6 +76,18 @@ def validate() -> dict[str, Any]:
     if merge.get("productReleasePolicy") != "config/release-policy.json":
         errors.append("merge-policy productReleasePolicy")
 
+    merge_name = merge_gate.get("workflowName")
+    if not isinstance(merge_name, str) or not merge_name:
+        errors.append("merge-policy mergeGate.workflowName")
+    elif f"name: {merge_name}" not in merge_workflow:
+        errors.append("canonical merge workflow name does not match merge policy")
+
+    if release_gate.get("manualDispatchRequired") is not True:
+        errors.append("merge-policy productReleaseGate.manualDispatchRequired=true")
+    validator = release_gate.get("validatorCommand")
+    if not isinstance(validator, str) or not validator:
+        errors.append("merge-policy productReleaseGate.validatorCommand")
+
     allowed_states = set(merge.get("allowedTrackedProductStatesAtMerge", []))
     tracked_states = set(completion.get("statuses", []))
     if not {"WORKING", "REJECTED"}.issubset(allowed_states):
@@ -77,7 +104,7 @@ def validate() -> dict[str, Any]:
         "manage.py release",
         "production_gate.py --mode release",
         "customer_quality.py",
-        "release-self-hosted.yml",
+        release_workflow_path.name,
     )
     for token in forbidden_merge_tokens:
         if token in merge_workflow:
@@ -85,12 +112,16 @@ def validate() -> dict[str, Any]:
 
     if "pull_request:" not in merge_workflow:
         errors.append("PR merge workflow must run on pull_request")
+    if "paths:" in merge_workflow or "paths-ignore:" in merge_workflow:
+        errors.append("canonical PR merge workflow must run for every PR")
     if "workflow_dispatch:" not in release_workflow:
         errors.append("product release workflow must remain manual")
     if "pull_request:" in release_workflow or "\n  push:" in release_workflow:
         errors.append("product release workflow must not run on PR or push")
-    if "production_gate.py --mode release" not in release_workflow:
-        errors.append("product release workflow must invoke release mode")
+    if isinstance(validator, str) and validator not in release_workflow:
+        errors.append("product release workflow must invoke configured release validator")
+    if DEPRECATED_MERGE_WORKFLOW.exists():
+        errors.append("deprecated duplicate pr-merge-gate.yml must be removed")
 
     required_template_sections = (
         "## Merge readiness",
@@ -103,7 +134,9 @@ def validate() -> dict[str, Any]:
     result = {
         "schemaVersion": 1,
         "mergePolicy": str(MERGE_POLICY.relative_to(ROOT)),
+        "mergeGateWorkflow": str(merge_workflow_path.relative_to(ROOT)),
         "productReleasePolicy": str(RELEASE_POLICY.relative_to(ROOT)),
+        "productReleaseWorkflow": str(release_workflow_path.relative_to(ROOT)),
         "mergeEligible": not errors,
         "productReleaseEvaluated": False,
         "errors": errors,
