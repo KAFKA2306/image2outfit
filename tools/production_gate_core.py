@@ -7,7 +7,7 @@ import argparse
 import sys
 from pathlib import Path
 
-import release_gate as legacy
+import candidate_manifest as legacy
 from candidate_orchestrator import _augment_audit, _run_candidate
 from release_orchestrator import _run_release
 from runtime_transaction import DirectoryTransaction

@@ -45,6 +45,11 @@ class ToolOwnershipTest(unittest.TestCase):
         self.assertIn("Taskfile.yml", manage["references"])
         self.assertFalse(manage["unreferenced"])
 
+    def test_production_gate_core_uses_canonical_manifest_owner(self) -> None:
+        source = (TOOLS / "production_gate_core.py").read_text(encoding="utf-8")
+        self.assertIn("import candidate_manifest as legacy", source)
+        self.assertNotIn("import release_gate as legacy", source)
+
 
 class ToolchainAuditTest(unittest.TestCase):
     def setUp(self) -> None:
