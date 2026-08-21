@@ -112,55 +112,13 @@ jobs:
             fi
           fi
           git diff --diff-filter=ACMRT --name-only "$base" "$head" -- '*.py' > /tmp/changed-python.txt
-          uv run --locked --no-default-groups python - <<'PY'
-          import sys
-          from pathlib import Path
-
-          sys.path.insert(0, str(Path("tools").resolve()))
-          import audit_tool_ownership
-
-          report = audit_tool_ownership.audit(Path.cwd())
-          graph = {
-              item["path"]: set(item["imports"])
-              for item in report["inventory"]
-          }
-          product_tools = set()
-          stack = [chain["entrypoint"] for chain in report["productImportChains"]]
-          while stack:
-              path = stack.pop()
-              if path in product_tools:
-                  continue
-              product_tools.add(path)
-              stack.extend(graph.get(path, ()))
-
-          changed = [
-              line.strip()
-              for line in Path("/tmp/changed-python.txt").read_text(encoding="utf-8").splitlines()
-              if line.strip()
-          ]
-          reusable = [
-              path
-              for path in changed
-              if path.startswith(("src/", "tests/"))
-              or (path.startswith("tools/") and path not in product_tools)
-          ]
-          Path("/tmp/format-python.txt").write_text(
-              "".join(f"{path}\n" for path in reusable),
-              encoding="utf-8",
-          )
-          print("Changed Python files:")
-          print("\n".join(changed) or "(none)")
-          print("Reusable files requiring Ruff format:")
-          print("\n".join(reusable) or "(none)")
-          PY
           {
             echo 'files<<EOF'
             cat /tmp/changed-python.txt
             echo EOF
-            echo 'format_files<<EOF'
-            cat /tmp/format-python.txt
-            echo EOF
           } >> "$GITHUB_OUTPUT"
+          echo "Changed Python files:"
+          cat /tmp/changed-python.txt || true
 
       - name: Ruff lint changed Python
         if: steps.changed-python.outputs.files != ''
@@ -170,9 +128,9 @@ jobs:
           uv run --locked --no-default-groups --group dev ruff check \
             --select E4,E7,E9,F --ignore E402 "${files[@]}"
 
-      - name: Ruff format changed reusable Python
-        if: steps.changed-python.outputs.format_files != ''
+      - name: Ruff format changed Python
+        if: steps.changed-python.outputs.files != ''
         shell: bash
         run: |
-          mapfile -t files < /tmp/format-python.txt
+          mapfile -t files < /tmp/changed-python.txt
           uv run --locked --no-default-groups --group dev ruff format --check "${files[@]}"
