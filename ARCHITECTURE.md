@@ -51,8 +51,9 @@ src/image2outfit
 
 | 責務 | 正本 |
 |---|---|
-| 完了境界 | `config/genworks-handoff-policy.json` |
-| 必須 view / pose | `config/release-policy.json` |
+| PR merge 境界 | `config/pr-merge-policy.json` |
+| 製品 completion 境界 | `config/genworks-handoff-policy.json` |
+| 製品 release 境界 | `config/release-policy.json` |
 | 製品 job | `config/products/<slug>/job.json` |
 | construction | `config/products/<slug>/construction.json` |
 | stage profile | `config/pipeline-profiles/garment-reconstruction-v1.json` |
@@ -91,6 +92,21 @@ pipeline の実行状態と製品 lifecycle を分離します。
 - `WORKING` / `COMPLETE` / `REJECTED`: 製品 lifecycle
 
 `PLANNED` や `EXECUTED` を `COMPLETE` の代替にしません。製品 lifecycle と必須 completion gate は `config/genworks-handoff-policy.json` と `ProductManifest.json` が所有します。
+
+## PR merge と製品 release
+
+Repository integration と customer-facing product release は別の state machine として扱います。
+
+```text
+PR:      DRAFT → MERGE-ELIGIBLE → MERGED
+Product: WORKING / REJECTED → COMPLETE → RELEASE-ELIGIBLE → RELEASED ARTIFACT
+```
+
+PR merge はコード、schema、policy、workflow、audit、test と、影響製品の pipeline が有効な境界まで実行できることを検証します。製品が `WORKING` または `REJECTED` であること、visual review が未合格であること、runtime review が未実施であること自体は merge failure にしません。
+
+製品 release は merge 後の revision から明示的に実行し、`config/release-policy.json` と release validator が customer-quality evidence を評価します。merge は release を実行せず、製品 status を `COMPLETE` に昇格させず、release eligibility を暗黙に主張しません。
+
+PR merge の machine-readable rule は `config/pr-merge-policy.json`、製品 release の rule は `config/release-policy.json` がそれぞれ所有します。両者の条件一覧を Markdown 側へ複製しません。
 
 ## Stage result contract
 
