@@ -95,9 +95,7 @@ def _write_json_atomic(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def _identity_mismatches(
-    state: dict[str, Any], expected: dict[str, str]
-) -> list[str]:
+def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
     return [
         request_name
         for state_name, request_name in IDENTITY_FIELDS.items()
