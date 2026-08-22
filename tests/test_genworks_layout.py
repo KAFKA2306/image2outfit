@@ -104,10 +104,7 @@ class GenWorksLayoutTest(unittest.TestCase):
         )
         self.assertFalse(result["passed"])
         self.assertTrue(
-            any(
-                item["code"] == "asset-outside-product"
-                for item in result["findings"]
-            )
+            any(item["code"] == "asset-outside-product" for item in result["findings"])
         )
 
     def test_root_editor_folder_is_forbidden(self) -> None:
