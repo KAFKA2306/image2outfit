@@ -138,7 +138,9 @@ def _assert_private_source_location(source: Path, job: dict[str, Any]) -> None:
         for value in configured
         if isinstance(value, str) and value
     ]
-    if not any(source == candidate or candidate in source.parents for candidate in allowed):
+    if not any(
+        source == candidate or candidate in source.parents for candidate in allowed
+    ):
         raise ValueError(
             "repository-local private reference must be under job.privateSourceRoots"
         )
