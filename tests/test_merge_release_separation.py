@@ -19,9 +19,7 @@ class MergeReleaseSeparationTests(unittest.TestCase):
         )
 
     def workflow(self, file_name: str) -> str:
-        return (ROOT / ".github" / "workflows" / file_name).read_text(
-            encoding="utf-8"
-        )
+        return (ROOT / ".github" / "workflows" / file_name).read_text(encoding="utf-8")
 
     def test_policy_is_minimal(self) -> None:
         policy = self.policy()
