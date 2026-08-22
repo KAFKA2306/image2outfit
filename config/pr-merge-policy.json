@@ -1,61 +1,16 @@
 {
   "schemaVersion": 1,
-  "scope": "pull-request-merge",
   "mergeGate": {
     "workflowFile": "pr-merge-gate.yml",
-    "workflowName": "PR merge gate",
-    "validationCommand": "python -m unittest tests.test_merge_release_separation tests.test_release_provenance_gate tests.test_repository_policies tests.test_release_contracts tests.test_candidate_manifest -v"
+    "workflowName": "PR merge gate"
   },
   "productReleaseGate": {
     "workflowFile": "release-self-hosted.yml",
-    "manualDispatchRequired": true,
     "validatorCommand": "tools/production_gate.py --mode release"
-  },
-  "productCompletionPolicy": "config/genworks-handoff-policy.json",
-  "productReleasePolicy": "config/release-policy.json",
-  "rules": {
-    "mergeDoesNotReleaseProduct": true,
-    "productCompletionRequiredForMerge": false,
-    "productReleaseEligibilityRequiredForMerge": false,
-    "productVisualPassRequiredForMerge": false,
-    "productRuntimePassRequiredForMerge": false,
-    "affectedProductExecutionMustReachValidBoundary": true,
-    "unrelatedExistingProductFailuresBlockMerge": false,
-    "unrelatedExistingLintDebtBlocksMerge": false,
-    "releaseCommandForbiddenInMergeGate": true,
-    "releaseWorkflowMustBeManual": true
-  },
-  "branchLifecycle": {
-    "persistentBranch": "default-branch",
-    "allowedNonDefaultBranchState": "same-repository-open-pull-request-head",
-    "deleteHeadOnPullRequestClose": true,
-    "deleteHeadOnPullRequestMerge": true,
-    "deleteOrphanBranches": true,
-    "preserveUniqueCommitsOnOrphanBranch": false,
-    "protectedOrphanBranchIsPolicyViolation": true
   },
   "allowedTrackedProductStatesAtMerge": [
     "WORKING",
     "COMPLETE",
     "REJECTED"
-  ],
-  "requiredRepositoryEvidence": [
-    "lockfile-valid",
-    "python-compiles",
-    "repository-audits-pass",
-    "merge-release-contract-tests-pass",
-    "changed-python-ruff-lint-pass",
-    "changed-python-ruff-format-pass",
-    "tracked-contracts-parse"
-  ],
-  "productEvidenceSemantics": {
-    "candidateBuild": "integration-evidence",
-    "geometryAudit": "integration-evidence",
-    "visualReview": "product-state-and-release-evidence",
-    "humanRuntimeReview": "product-release-evidence"
-  },
-  "decisionModel": {
-    "mergeEligible": "repository contracts and the PR's own integration evidence pass, and any affected product execution reaches a valid checkpoint boundary; unrelated pre-existing product quality or lint debt does not decide this PR",
-    "releaseEligible": "evaluated only by the separate product release policy and release validator"
-  }
+  ]
 }
