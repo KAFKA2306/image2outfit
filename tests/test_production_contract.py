@@ -11,6 +11,7 @@ TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
 import production_contract as contract  # noqa: E402
+from runtime_transaction import WorkspaceSnapshot  # noqa: E402
 
 
 class ProductionContractTest(unittest.TestCase):
@@ -36,7 +37,7 @@ class ProductionContractTest(unittest.TestCase):
             target.mkdir(parents=True)
             marker = target / "marker.txt"
             marker.write_text("last-good", encoding="utf-8")
-            transaction = contract.WorkspaceSnapshot(target)
+            transaction = WorkspaceSnapshot(target)
             had_original = transaction.begin()
             marker.write_text("broken", encoding="utf-8")
             (target / "partial.fbx").write_text("partial", encoding="utf-8")
