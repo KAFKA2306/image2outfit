@@ -9,9 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCT = "siroino-heather-hooded-bodysuit"
 PROBE_PATH = ROOT / "tools" / "siroino_heather_geometry_probe.py"
 POSE_PROBE_PATH = ROOT / "tools" / "siroino_heather_hooded_fused_pose_probe.py"
-POSE_PROBE_IMPL_PATH = (
-    ROOT / "tools" / "siroino_heather_hooded_bodysuit_pose_probe.py"
-)
+POSE_PROBE_IMPL_PATH = ROOT / "tools" / "siroino_heather_hooded_bodysuit_pose_probe.py"
 JOB_PATH = ROOT / "config" / "products" / PRODUCT / "job.json"
 
 
