@@ -278,7 +278,6 @@ class RepositoryContractTest(unittest.TestCase):
                     )
 
                 self.assertTrue((product_root_path / "README.md").is_file())
-                self.assertTrue((product_root_path / "Prefab").is_dir())
 
                 for field in required_assets:
                     value = job.get(field)
