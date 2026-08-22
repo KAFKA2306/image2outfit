@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Audit the single internal runtime layout and reject legacy output contracts."""
+"""Audit the single internal runtime layout and reject obsolete output contracts."""
+
 from __future__ import annotations
 
 import json
@@ -38,7 +39,9 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
             try:
                 job = _read_json(job_path)
             except (OSError, json.JSONDecodeError) as exc:
-                errors.append(f"invalid product job {job_path.relative_to(root)}: {exc}")
+                errors.append(
+                    f"invalid product job {job_path.relative_to(root)}: {exc}"
+                )
                 continue
             for field in FORBIDDEN_JOB_FIELDS:
                 if field in job:
@@ -55,9 +58,11 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
     ).stdout.splitlines()
     for directory in FORBIDDEN_ROOTS:
         prefix = f"{directory}/"
-        residue = sorted(path for path in tracked if path == directory or path.startswith(prefix))
+        residue = sorted(
+            path for path in tracked if path == directory or path.startswith(prefix)
+        )
         if residue:
-            errors.append(f"tracked legacy runtime root {directory}: {residue}")
+            errors.append(f"tracked obsolete runtime root {directory}: {residue}")
 
     gitignore = (root / ".gitignore").read_text(encoding="utf-8")
     for directory in FORBIDDEN_ROOTS:

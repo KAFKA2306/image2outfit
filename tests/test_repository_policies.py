@@ -91,6 +91,31 @@ class RepositoryHygieneTest(unittest.TestCase):
             ),
         )
 
+    def test_removed_compatibility_surfaces_stay_absent(self) -> None:
+        removed_paths = (
+            ROOT / "Assets" / "GenWorks" / "Legacy",
+            TOOLS / "migrate_jobs_to_genworks.py",
+            TOOLS / "siroino_heather_hooded_pattern_v13.py",
+            TOOLS / "siroino_heather_closed_components_v27.py",
+        )
+        for path in removed_paths:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertFalse(path.exists())
+
+        for product in (
+            "siroino-cyber-kawaii-large",
+            "siroino-heather-hooded-bodysuit",
+            "siroino-wide-cargo",
+        ):
+            spec_root = ROOT / "config" / "products" / product / "spec"
+            self.assertFalse((spec_root / "legacy-source-index.v1.json").exists())
+            self.assertFalse((spec_root / "garment-spec.v1.json").exists())
+
+        taskfile = (ROOT / "Taskfile.yml").read_text(encoding="utf-8")
+        self.assertNotIn("maintenance:migrate:genworks", taskfile)
+        manage = (TOOLS / "manage.py").read_text(encoding="utf-8")
+        self.assertNotIn('"migrate-genworks"', manage)
+
     def test_ref_only_branch_cleanup_is_allowed(self) -> None:
         workflow = Path("branch-hygiene.yml")
         source = """
@@ -188,3 +213,7 @@ class CandidateOrchestratorPolicyTests(unittest.TestCase):
         rollback = self.source.index("workspace_tx.rollback")
         self.assertLess(begin, build)
         self.assertLess(build, rollback)
+
+
+if __name__ == "__main__":
+    unittest.main()

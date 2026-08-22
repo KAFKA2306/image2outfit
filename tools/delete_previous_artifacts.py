@@ -4,11 +4,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import urllib.request
 
 API = "https://api.github.com"
-LEGACY_RUN_SUFFIX = re.compile(r"^\d+$")
 
 
 def request(method: str, url: str, token: str) -> object | None:
@@ -28,12 +26,7 @@ def request(method: str, url: str, token: str) -> object | None:
 
 
 def is_previous(name: str, stable_name: str) -> bool:
-    if name == stable_name:
-        return True
-    prefix = stable_name + "-"
-    return name.startswith(prefix) and bool(
-        LEGACY_RUN_SUFFIX.fullmatch(name[len(prefix) :])
-    )
+    return name == stable_name
 
 
 def list_artifacts(repository: str, token: str) -> list[dict[str, object]]:

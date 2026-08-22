@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Audit the canonical Assets/GenWorks product layout."""
+
 from __future__ import annotations
 
 import argparse
@@ -169,9 +170,7 @@ def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, An
 
     allowed_external = tuple(config["allowedExternalAssetRoots"])
     forbidden_roots = tuple(config.get("forbiddenAssetRoots", []))
-    production_extensions = {
-        value.lower() for value in config["productionExtensions"]
-    }
+    production_extensions = {value.lower() for value in config["productionExtensions"]}
     for file in tracked_files(root):
         try:
             rel = relative(file, root)
@@ -187,7 +186,10 @@ def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, An
                 )
             )
             continue
-        if not rel.startswith("Assets/") or file.suffix.lower() not in production_extensions:
+        if (
+            not rel.startswith("Assets/")
+            or file.suffix.lower() not in production_extensions
+        ):
             continue
         if rel.startswith(config["canonicalRoot"] + "/"):
             continue
@@ -196,9 +198,9 @@ def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, An
         findings.append(
             Finding(
                 "warning",
-                "legacy-production-asset",
+                "external-production-asset",
                 rel,
-                "production-like asset remains outside Assets/GenWorks; migrate it or classify it as vendor/local",
+                "production-like asset is outside Assets/GenWorks and is not classified as an allowed external asset root",
             )
         )
 
@@ -229,9 +231,11 @@ def main() -> int:
             json.dumps(result, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
-    return 2 if (
-        not result["passed"] or (args.warnings_as_errors and result["warnings"])
-    ) else 0
+    return (
+        2
+        if (not result["passed"] or (args.warnings_as_errors and result["warnings"]))
+        else 0
+    )
 
 
 if __name__ == "__main__":

@@ -51,7 +51,6 @@ def _product(command: str, product_id: str) -> int:
     try:
         job_path = method_selection.resolve_job(product_id, ROOT)
         job = method_selection.read_json(job_path)
-        runtime_paths.migrate_legacy_product_outputs(ROOT, product_id)
         runtime = runtime_paths.for_job(ROOT, job)
     except (OSError, ValueError, json.JSONDecodeError, RuntimeError) as exc:
         print(f"image2outfit: {exc}", file=sys.stderr)
@@ -249,8 +248,6 @@ def build_parser() -> argparse.ArgumentParser:
 
     audit = commands.add_parser("audit")
     audit.add_argument("target", choices=(*AUDIT_TARGETS, "all"))
-    migrate = commands.add_parser("migrate-genworks")
-    migrate.add_argument("--apply", action="store_true")
     return parser
 
 
@@ -275,9 +272,6 @@ def main() -> int:
         )
     if options.command == "audit":
         return _audit_all() if options.target == "all" else _audit(options.target)
-    if options.command == "migrate-genworks":
-        arguments = ["--apply"] if options.apply else []
-        return _run("migrate_jobs_to_genworks.py", *arguments)
     raise AssertionError(options.command)
 
 
