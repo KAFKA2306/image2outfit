@@ -56,14 +56,19 @@ class ReleaseIntegrationTest(unittest.TestCase):
         self.assertIs(production_gate.run_release, release_orchestrator._run_release)
 
     def test_legacy_release_facades_are_absent(self) -> None:
-        self.assertFalse((TOOLS / "production_gate_core.py").exists())
-        self.assertFalse((TOOLS / "release_gate.py").exists())
-        self.assertFalse((TOOLS / "pipeline.py").exists())
+        for removed in (
+            "production_gate_core.py",
+            "release_gate.py",
+            "pipeline.py",
+            "release_packager.py",
+            "workspace_transaction.py",
+        ):
+            self.assertFalse((TOOLS / removed).exists(), removed)
 
 
 class ReleaseRawEvidenceContractTest(unittest.TestCase):
     def test_packager_copies_raw_evidence_before_manifesting_release(self) -> None:
-        source = (TOOLS / "release_packager.py").read_text(encoding="utf-8")
+        source = (TOOLS / "production_contract.py").read_text(encoding="utf-8")
         human = source.index('package / "Evidence" / "Human"')
         commercial = source.index('package / "Evidence" / "Commercial"')
         release_manifest = source.index('release / "release-manifest.json"')

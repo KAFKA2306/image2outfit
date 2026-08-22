@@ -10,7 +10,7 @@ from typing import Any
 import audit_research_baseline
 import candidate_manifest as candidate_contract
 import production_contract as contract
-from runtime_transaction import DirectoryTransaction
+from runtime_transaction import DirectoryTransaction, WorkspaceSnapshot
 from technical_candidate import run_candidate
 
 
@@ -206,7 +206,7 @@ def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) 
 
     candidate_tx = DirectoryTransaction(candidate)
     release_tx = DirectoryTransaction(release)
-    workspace_tx = contract.WorkspaceSnapshot(product_root)
+    workspace_tx = WorkspaceSnapshot(product_root)
     candidate_had_original = candidate_tx.begin()
     release_started = False
     release_had_original = False
