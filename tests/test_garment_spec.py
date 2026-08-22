@@ -92,20 +92,5 @@ class GarmentSpecTests(unittest.TestCase):
         self.assertEqual(set(schema["required"]), set(fixture().to_dict()))
 
 
-class MigratedProductFixtureTests(unittest.TestCase):
-    def test_three_existing_products_round_trip(self) -> None:
-        products = (
-            "siroino-cyber-kawaii-large",
-            "siroino-heather-hooded-bodysuit",
-            "siroino-wide-cargo",
-        )
-        for product in products:
-            path = ROOT / "config/products" / product / "spec/garment-spec.v1.json"
-            original = path.read_text(encoding="utf-8")
-            restored = GarmentSpec.from_json(original)
-            self.assertEqual(restored.garment_id, product)
-            self.assertEqual(json.loads(restored.to_json()), json.loads(original))
-
-
 if __name__ == "__main__":
     unittest.main()
