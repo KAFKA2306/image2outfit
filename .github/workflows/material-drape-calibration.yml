@@ -22,6 +22,7 @@ on:
       - ".github/workflows/material-drape-calibration.yml"
 
 permissions:
+  actions: write
   contents: read
 
 concurrency:
@@ -158,15 +159,21 @@ jobs:
           print(json.dumps(report["comparison"], indent=2))
           print(json.dumps(report["temporalConvergence"], indent=2))
           PY
+      - name: Delete previous Blender evidence
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/delete_previous_artifacts.py material-drape-calibration
       - name: Upload Blender evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: material-drape-calibration-${{ github.run_id }}
+          name: material-drape-calibration
           path: ${{ env.OUTPUT_DIR }}
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 1
           compression-level: 6
+          overwrite: true
       - name: Enforce calibration acceptance
         if: always()
         run: |
