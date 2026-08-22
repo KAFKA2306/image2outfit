@@ -65,7 +65,9 @@ def _trigger_has_path_filter(workflow: str, trigger: str = "pull_request") -> bo
 
 def validate() -> dict[str, Any]:
     policy = _read_json(POLICY)
-    merge_gate = policy.get("mergeGate") if isinstance(policy.get("mergeGate"), dict) else {}
+    merge_gate = (
+        policy.get("mergeGate") if isinstance(policy.get("mergeGate"), dict) else {}
+    )
     release_gate = (
         policy.get("productReleaseGate")
         if isinstance(policy.get("productReleaseGate"), dict)
