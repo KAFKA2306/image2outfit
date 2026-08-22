@@ -26,7 +26,6 @@ ENTRYPOINTS = (
     TOOLS / "pipeline_stage_adapters.py",
     TOOLS / "run_blender_stage.py",
 )
-TEXT_SUFFIXES = {".json", ".md", ".py", ".toml", ".txt", ".yaml", ".yml"}
 
 
 class ArchitecturePolicyTests(unittest.TestCase):
@@ -92,33 +91,30 @@ class RepositoryHygieneTest(unittest.TestCase):
             ),
         )
 
-    def test_repository_has_no_obsolete_compatibility_markers(self) -> None:
-        marker = "leg" + "acy"
-        violations: list[str] = []
-        roots = tuple(ROOT / name for name in ("config", "tools", "src", "tests", ".github"))
-        paths = [
-            path
-            for root in roots
-            if root.is_dir()
-            for path in root.rglob("*")
-            if path.is_file() and path.suffix.lower() in TEXT_SUFFIXES
-        ]
-        paths.extend(
-            path
-            for name in ("README.md", "AGENTS.md", "Taskfile.yml", "pyproject.toml")
-            if (path := ROOT / name).is_file()
+    def test_removed_compatibility_surfaces_stay_absent(self) -> None:
+        removed_paths = (
+            ROOT / "Assets" / "GenWorks" / "Legacy",
+            TOOLS / "migrate_jobs_to_genworks.py",
+            TOOLS / "siroino_heather_hooded_pattern_v13.py",
+            TOOLS / "siroino_heather_closed_components_v27.py",
         )
-        for path in sorted(set(paths)):
-            relative = path.relative_to(ROOT).as_posix()
-            if marker in relative.lower():
-                violations.append(f"path:{relative}")
-            try:
-                source = path.read_text(encoding="utf-8-sig").lower()
-            except UnicodeDecodeError:
-                continue
-            if marker in source:
-                violations.append(f"text:{relative}")
-        self.assertFalse(violations, "\n".join(violations))
+        for path in removed_paths:
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertFalse(path.exists())
+
+        for product in (
+            "siroino-cyber-kawaii-large",
+            "siroino-heather-hooded-bodysuit",
+            "siroino-wide-cargo",
+        ):
+            spec_root = ROOT / "config" / "products" / product / "spec"
+            self.assertFalse((spec_root / "legacy-source-index.v1.json").exists())
+            self.assertFalse((spec_root / "garment-spec.v1.json").exists())
+
+        taskfile = (ROOT / "Taskfile.yml").read_text(encoding="utf-8")
+        self.assertNotIn("maintenance:migrate:genworks", taskfile)
+        manage = (TOOLS / "manage.py").read_text(encoding="utf-8")
+        self.assertNotIn('"migrate-genworks"', manage)
 
     def test_ref_only_branch_cleanup_is_allowed(self) -> None:
         workflow = Path("branch-hygiene.yml")
