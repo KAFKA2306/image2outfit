@@ -88,7 +88,11 @@ def _reference_driver_blockers(job: Mapping[str, Any]) -> list[str]:
         if not isinstance(job.get(key), str) or not job[key]:
             blockers.append(f"missing-job-execution-field:{key}")
     build_script = job.get("buildScript")
-    if isinstance(build_script, str) and build_script and not (ROOT / build_script).is_file():
+    if (
+        isinstance(build_script, str)
+        and build_script
+        and not (ROOT / build_script).is_file()
+    ):
         blockers.append("missing-build-script")
     preview_paths = job.get("previewPaths")
     if not isinstance(preview_paths, Mapping) or not preview_paths:
