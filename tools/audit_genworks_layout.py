@@ -187,7 +187,10 @@ def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, An
                 )
             )
             continue
-        if not rel.startswith("Assets/") or file.suffix.lower() not in production_extensions:
+        if (
+            not rel.startswith("Assets/")
+            or file.suffix.lower() not in production_extensions
+        ):
             continue
         if rel.startswith(config["canonicalRoot"] + "/"):
             continue
@@ -196,9 +199,9 @@ def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, An
         findings.append(
             Finding(
                 "warning",
-                "legacy-production-asset",
+                "external-production-asset",
                 rel,
-                "production-like asset remains outside Assets/GenWorks; migrate it or classify it as vendor/local",
+                "production-like asset is outside Assets/GenWorks and is not classified as an allowed external asset root",
             )
         )
 
