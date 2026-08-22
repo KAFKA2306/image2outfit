@@ -118,7 +118,7 @@ class RepositoryHygieneTest(unittest.TestCase):
                 continue
             if marker in source:
                 violations.append(f"text:{relative}")
-        self.assertEqual([], violations)
+        self.assertFalse(violations, "\n".join(violations))
 
     def test_ref_only_branch_cleanup_is_allowed(self) -> None:
         workflow = Path("branch-hygiene.yml")
