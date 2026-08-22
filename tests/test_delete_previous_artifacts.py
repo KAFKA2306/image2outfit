@@ -9,8 +9,8 @@ class ArtifactReplacementTests(unittest.TestCase):
             is_previous("image2outfit-hosted-demo", "image2outfit-hosted-demo")
         )
 
-    def test_legacy_run_suffix_matches(self) -> None:
-        self.assertTrue(
+    def test_run_suffixed_name_does_not_match(self) -> None:
+        self.assertFalse(
             is_previous(
                 "image2outfit-hosted-demo-31778430459",
                 "image2outfit-hosted-demo",
