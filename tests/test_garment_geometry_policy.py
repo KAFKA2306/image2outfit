@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "pyproject.toml"
-PATTERN_PATH = ROOT / "tools" / "siroino_heather_hooded_pattern_v13.py"
+PATTERN_PATH = ROOT / "tools" / "siroino_heather_hooded_pattern.py"
 BUILD_PATH = ROOT / "tools" / "siroino_heather_hooded_bodysuit_build.py"
 
 
@@ -174,7 +174,7 @@ class GarmentGeometryPolicyTests(unittest.TestCase):
         self.assertNotIn("Heather_Hood_Down_Cowl", self.source)
         self.assertNotIn("Heather_Hood_Shell", self.source)
 
-    def test_build_gate_uses_required_objects_not_legacy_object_count(self) -> None:
+    def test_build_gate_uses_required_objects_not_removed_object_count(self) -> None:
         self.assertIn('"Heather_Hood_Folded_Roll"', self.build_source)
         self.assertIn("required_objects - garment_names", self.build_source)
         self.assertIn("not missing_objects", self.build_source)
