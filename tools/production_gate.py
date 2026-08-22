@@ -54,7 +54,7 @@ def _load(job_path: Path, root: Path = ROOT) -> tuple[dict[str, Any], dict[str, 
     if policy.get("schemaVersion") != 1:
         raise ValueError("release-policy.json must use schemaVersion 1")
     if job.get("schemaVersion") != 2:
-        raise ValueError("legacy jobs are disabled; schemaVersion must be 2")
+        raise ValueError("unsupported job schema; schemaVersion must be 2")
     required = candidate_contract.required_job_fields()
     missing = [key for key in required if key not in job or job[key] in (None, "")]
     if missing:
@@ -267,7 +267,6 @@ def main() -> int:
     try:
         source_job_path = Path(options.job).resolve()
         job, policy = _load(source_job_path)
-        runtime_paths.remove_legacy_product_outputs(ROOT, str(job["id"]))
         runtime_job_path = _materialize_runtime_job(job)
         if options.mode == "release":
             return _run_release(runtime_job_path, job, policy)
