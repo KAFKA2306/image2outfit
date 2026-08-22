@@ -26,6 +26,7 @@ ENTRYPOINTS = (
     TOOLS / "pipeline_stage_adapters.py",
     TOOLS / "run_blender_stage.py",
 )
+TEXT_SUFFIXES = {".json", ".md", ".py", ".toml", ".txt", ".yaml", ".yml"}
 
 
 class ArchitecturePolicyTests(unittest.TestCase):
@@ -90,6 +91,34 @@ class RepositoryHygieneTest(unittest.TestCase):
                 for item in result["findings"]
             ),
         )
+
+    def test_repository_has_no_obsolete_compatibility_markers(self) -> None:
+        marker = "leg" + "acy"
+        violations: list[str] = []
+        roots = tuple(ROOT / name for name in ("config", "tools", "src", "tests", ".github"))
+        paths = [
+            path
+            for root in roots
+            if root.is_dir()
+            for path in root.rglob("*")
+            if path.is_file() and path.suffix.lower() in TEXT_SUFFIXES
+        ]
+        paths.extend(
+            path
+            for name in ("README.md", "AGENTS.md", "Taskfile.yml", "pyproject.toml")
+            if (path := ROOT / name).is_file()
+        )
+        for path in sorted(set(paths)):
+            relative = path.relative_to(ROOT).as_posix()
+            if marker in relative.lower():
+                violations.append(f"path:{relative}")
+            try:
+                source = path.read_text(encoding="utf-8-sig").lower()
+            except UnicodeDecodeError:
+                continue
+            if marker in source:
+                violations.append(f"text:{relative}")
+        self.assertEqual([], violations)
 
     def test_ref_only_branch_cleanup_is_allowed(self) -> None:
         workflow = Path("branch-hygiene.yml")
@@ -188,3 +217,7 @@ class CandidateOrchestratorPolicyTests(unittest.TestCase):
         rollback = self.source.index("workspace_tx.rollback")
         self.assertLess(begin, build)
         self.assertLess(build, rollback)
+
+
+if __name__ == "__main__":
+    unittest.main()
