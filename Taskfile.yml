@@ -105,7 +105,7 @@ tasks:
         python tools/manage.py audit repository
 
   audit:runtime:
-    desc: Reject legacy output roots and product-configured runtime paths.
+    desc: Reject obsolete output roots and product-configured runtime paths.
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
@@ -138,23 +138,6 @@ tasks:
       - >-
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py audit research
-
-  maintenance:migrate:genworks:
-    desc: Show the migration plan for jobs outside canonical product roots.
-    cmds:
-      - >-
-        uv run --no-cache --locked --no-default-groups
-        python tools/manage.py migrate-genworks
-
-  maintenance:migrate:genworks:apply:
-    desc: Move job outputs and Unity meta files into canonical product roots.
-    cmds:
-      - >-
-        uv run --no-cache --locked --no-default-groups
-        python tools/manage.py migrate-genworks --apply
-      - >-
-        uv run --no-cache --locked --no-default-groups
-        python tools/manage.py audit all
 
   check:python:
     desc: Run the complete reusable Python verification suite.
