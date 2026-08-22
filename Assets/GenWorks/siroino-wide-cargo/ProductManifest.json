@@ -10,13 +10,13 @@
   "previewPath": "Assets/GenWorks/siroino-wide-cargo/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-wide-cargo/README.md",
   "demoScenePath": "Assets/GenWorks/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
-  "sourceJobPath": "Assets/_Local/Jobs/siroino-wide-cargo/job.json",
+  "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
   "generatedAt": "2026-08-02T08:31:52.893383Z",
   "blenderVersion": "4.4.3",
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-wide-cargo",
-    "resumeFrom": "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab",
+    "resumeFrom": "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
     "doNotRebuildFromZero": true,
     "lastRejectedAttempt": {
       "pullRequest": 22,
@@ -26,11 +26,10 @@
       "reason": "The rendered candidate contained extreme spike vertices and failed finite-bounds and foot-exclusion auditing. It also had no completed Unity import/save/reload or Modular Avatar checkpoint."
     },
     "blockers": [
-      "Continue from the tracked integrated Prefab and diagnosed PR #22 source; do not create another unrelated wide-cargo branch",
-      "Regenerate a spike-free five-view and pose checkpoint",
-      "Reimport the accepted FBX into Unity and save/reload both Prefabs",
-      "Complete Modular Avatar/NDMF integration and applicable Unity component setup",
-      "Complete final human visual, pose, and VRChat runtime reviews"
+      "Create and serialize integratedPrefabPath in Unity 2022.3.22f1 from the existing outfit Prefab and SiroinoSotai target using Modular Avatar 1.17.1 Setup Outfit / Merge Armature; do not fabricate serialized integration without Unity Editor evidence",
+      "Save and reload the outfit and integrated Prefabs in Unity and record import/serialization evidence",
+      "Run VRChat SDK Build & Test and VRChat client review; keep the corresponding runtime gates PENDING until they are actually executed",
+      "Generate the release candidate only after every declared delivery asset exists and license/provenance validation passes"
     ]
   },
   "metrics": {
