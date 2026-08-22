@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import pytest
+import math
 
 from image2outfit.skinning import (
     VertexWeight,
@@ -30,7 +30,12 @@ def test_repair_vertex_weights_prunes_normalizes_and_rejects_non_deform_bones() 
     )
 
     assert len(result.weights[0]) == 4
-    assert sum(item.weight for item in result.weights[0]) == pytest.approx(1.0)
+    assert math.isclose(
+        sum(item.weight for item in result.weights[0]),
+        1.0,
+        rel_tol=1e-9,
+        abs_tol=1e-12,
+    )
     assert result.zero_weight_vertices == (1,)
     assert result.non_normalized_vertices == ()
     assert result.rejected_bone_groups == ("Helper",)
