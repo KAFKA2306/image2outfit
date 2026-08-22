@@ -38,7 +38,9 @@ class ProductExecutionQueueTests(unittest.TestCase):
         self.assertIn("name: product-execution", config)
         self.assertIn("max_concurrency: 1", config)
 
-    def test_preflight_covers_three_fixtures_and_only_emits_ready_candidates(self) -> None:
+    def test_preflight_covers_three_fixtures_and_only_emits_ready_candidates(
+        self,
+    ) -> None:
         plan = fixture_preflight.build_preflight()
         fixture_config = json.loads(
             (ROOT / fixture_preflight.FIXTURE_CONFIG).read_text(encoding="utf-8")
@@ -47,9 +49,7 @@ class ProductExecutionQueueTests(unittest.TestCase):
             (fixture["fixtureId"], fixture["productId"])
             for fixture in fixture_config["fixtures"]
         }
-        actual = {
-            (entry["fixtureId"], entry["productId"]) for entry in plan["entries"]
-        }
+        actual = {(entry["fixtureId"], entry["productId"]) for entry in plan["entries"]}
         self.assertEqual(actual, expected)
         self.assertEqual(plan["schemaVersion"], 2)
         self.assertFalse(plan["schedulerOwnsCompletion"])
@@ -57,27 +57,37 @@ class ProductExecutionQueueTests(unittest.TestCase):
         for entry in plan["entries"]:
             with self.subTest(product=entry["productId"]):
                 self.assertEqual(entry["status"] == "READY", not entry["blockers"])
-                self.assertEqual(entry["productId"] in candidates, not entry["blockers"])
+                self.assertEqual(
+                    entry["productId"] in candidates, not entry["blockers"]
+                )
 
     def test_tuxedo_is_ready_but_unbound_private_fixtures_remain_blocked(self) -> None:
         entries = {
             entry["productId"]: entry
             for entry in fixture_preflight.build_preflight()["entries"]
         }
-        self.assertEqual(entries["siroino-tuxedo-halter-dress-large"]["status"], "READY")
+        self.assertEqual(
+            entries["siroino-tuxedo-halter-dress-large"]["status"], "READY"
+        )
         for product_id in (
             "siroino-heather-hooded-bodysuit",
             "siroino-cyber-kawaii-large",
         ):
             with self.subTest(product=product_id):
                 self.assertEqual(entries[product_id]["status"], "BLOCKED")
-                self.assertIn("missing-canonical-request", entries[product_id]["blockers"])
-                self.assertIn("missing-reference-identity", entries[product_id]["blockers"])
+                self.assertIn(
+                    "missing-canonical-request", entries[product_id]["blockers"]
+                )
+                self.assertIn(
+                    "missing-reference-identity", entries[product_id]["blockers"]
+                )
 
     def test_request_preflight_rejects_missing_canonical_stage_binding(self) -> None:
         product_id = "siroino-tuxedo-halter-dress-large"
         job = json.loads(
-            (ROOT / f"config/products/{product_id}/job.json").read_text(encoding="utf-8")
+            (ROOT / f"config/products/{product_id}/job.json").read_text(
+                encoding="utf-8"
+            )
         )
         request = json.loads(
             (ROOT / f"config/pipeline/requests/{product_id}.json").read_text(
@@ -103,7 +113,9 @@ class ProductExecutionQueueTests(unittest.TestCase):
             ],
         }
         self.assertEqual(execution.classify_checkpoint(checkpoint), "REVIEW_REQUIRED")
-        self.assertEqual(execution.classify_checkpoint({"status": "EXECUTED"}), "SUCCEEDED")
+        self.assertEqual(
+            execution.classify_checkpoint({"status": "EXECUTED"}), "SUCCEEDED"
+        )
         self.assertEqual(
             execution.classify_checkpoint(
                 {"status": "FAILED", "current_stage": "build-blender", "errors": []}
