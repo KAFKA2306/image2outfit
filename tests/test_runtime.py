@@ -11,7 +11,7 @@ TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
 
 import runtime_paths  # noqa: E402
-from workspace_transaction import WorkspaceSnapshot  # noqa: E402
+from runtime_transaction import WorkspaceSnapshot  # noqa: E402
 
 
 class RuntimePathsTest(unittest.TestCase):
