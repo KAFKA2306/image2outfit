@@ -5,6 +5,7 @@ Tracked product jobs describe product inputs and canonical outputs only. Reports
 review snapshots, and release packages are local runtime state under
 ``.image2outfit/products/<product-id>/`` and are never configured per product.
 """
+
 from __future__ import annotations
 
 import re
