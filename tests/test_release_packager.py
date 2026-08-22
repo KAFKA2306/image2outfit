@@ -12,10 +12,10 @@ from pathlib import Path
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
-import release_packager  # noqa: E402
+import production_contract  # noqa: E402
 
 
-class ReleasePackagerTest(unittest.TestCase):
+class ReleasePackagingTest(unittest.TestCase):
     def test_raw_human_and_runtime_evidence_are_packaged(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -42,7 +42,7 @@ class ReleasePackagerTest(unittest.TestCase):
             )
             evidence_path.write_text(
                 json.dumps(
-                    {"runtimeScreenshot": ("Assets/_Local/Evidence/demo/runtime.png")}
+                    {"runtimeScreenshot": "Assets/_Local/Evidence/demo/runtime.png"}
                 ),
                 encoding="utf-8",
             )
@@ -63,7 +63,7 @@ class ReleasePackagerTest(unittest.TestCase):
                     )
                 },
             }
-            result = release_packager.package_release(
+            result = production_contract.package_release(
                 root=root,
                 job_path=job_path,
                 job=job,
