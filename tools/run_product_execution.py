@@ -212,9 +212,8 @@ def main() -> int:
             and checkpoint.get("execution_mode") != "execute"
         ):
             raise ValueError("product execution cannot resume a plan-mode checkpoint")
-        if (
-            checkpoint.get("status") == "EXECUTED"
-            and checkpoint_matches_request(checkpoint, request, source_fingerprint)
+        if checkpoint.get("status") == "EXECUTED" and checkpoint_matches_request(
+            checkpoint, request, source_fingerprint
         ):
             _record_state(
                 product_id=product_id,
