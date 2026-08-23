@@ -11,6 +11,8 @@ on:
       - "tools/manage.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
+      - "site/review-showcase.css"
+      - "site/review-showcase.js"
       - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
       - "tests/test_improvement_loop.py"
@@ -32,6 +34,8 @@ on:
       - "tools/manage.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
+      - "site/review-showcase.css"
+      - "site/review-showcase.js"
       - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
       - "tests/test_improvement_loop.py"
@@ -97,6 +101,23 @@ jobs:
           for name in ("index.html", "review-console.json"):
               shutil.copy2(root / name, site / name)
 
+          for name in ("review-showcase.css", "review-showcase.js"):
+              shutil.copy2(root / "site" / name, site / name)
+
+          index_path = site / "index.html"
+          html = index_path.read_text(encoding="utf-8")
+          html = html.replace(
+              "</head>",
+              '<link rel="stylesheet" href="./review-showcase.css"></head>',
+              1,
+          )
+          html = html.replace(
+              "</body>",
+              '<script src="./review-showcase.js"></script></body>',
+              1,
+          )
+          index_path.write_text(html, encoding="utf-8")
+
           data = json.loads((root / "review-console.json").read_text(encoding="utf-8"))
           products = data.get("products", [])
           if not products:
@@ -123,7 +144,11 @@ jobs:
               shutil.copy2(source, destination)
               copied += 1
 
-          print(f"pages_products={len(products)} linked_files={copied}")
+          built_html = index_path.read_text(encoding="utf-8")
+          if "review-showcase.css" not in built_html or "review-showcase.js" not in built_html:
+              raise SystemExit("render showcase assets were not injected")
+
+          print(f"pages_products={len(products)} linked_files={copied} showcase=PASS")
           PY
 
       - name: Upload GitHub Pages artifact
