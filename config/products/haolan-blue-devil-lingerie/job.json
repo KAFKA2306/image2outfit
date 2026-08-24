@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 2,
+  "id": "haolan-blue-devil-lingerie",
+  "productName": "HAOLAN Powder Blue Devil Lingerie Set v1.0",
+  "adapterId": "haolan-v1.6",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4-modular-reference-reconstruction",
+  "buildRevision": "v1-reference-silhouette-and-modules",
+  "renderLoopRevision": "v1-white-studio-five-view",
+  "productRoot": "Assets/GenWorks/haolan-blue-devil-lingerie",
+  "productManifestPath": "Assets/GenWorks/haolan-blue-devil-lingerie/ProductManifest.json",
+  "buildScript": "tools/haolan_blue_devil_lingerie_build.py",
+  "productBuildScript": "tools/haolan_blue_devil_lingerie_build.py",
+  "blendPath": "Assets/GenWorks/haolan-blue-devil-lingerie/Source/Blender/HAOLAN_BlueDevilLingerie.blend",
+  "fbxAssetPath": "Assets/GenWorks/haolan-blue-devil-lingerie/Models/HAOLAN_BlueDevilLingerie.fbx",
+  "prefabAssetPath": "Assets/GenWorks/haolan-blue-devil-lingerie/Prefab/HAOLAN_BlueDevilLingerie.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/haolan-blue-devil-lingerie/Prefab/HAOLAN_BlueDevilLingerie_Integrated.prefab",
+  "targetAvatarAssetPath": "Assets/_Local/Resolved/HAOLAN_Lowpoly Variant.prefab",
+  "targetSourcePath": "Assets/_Local/Resolved/HAOLAN_Lowpoly.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "HAOLAN v1.6 lowpoly",
+    "searchRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/HAOLAN_Quest"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"],
+    "normalSizeFallbackAllowed": false,
+    "prefab": {
+      "extensions": [".prefab"],
+      "includeRegex": "(?i)HAOLAN.*\\.prefab$",
+      "profileRegex": "(?i)(Lowpoly|Quest)",
+      "preferredRegex": "(?i)HAOLAN_Lowpoly Variant\\.prefab$"
+    },
+    "source": {
+      "extensions": [".fbx"],
+      "includeRegex": "(?i)HAOLAN.*\\.fbx$",
+      "profileRegex": "(?i)(Lowpoly|Quest)",
+      "fallbackNameRegex": "(?i)^HAOLAN.*\\.fbx$",
+      "preferredRegex": "(?i)HAOLAN_Lowpoly\\.fbx$"
+    }
+  },
+  "licenseEvidence": "config/products/haolan-blue-devil-lingerie/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/HAOLAN_Quest"],
+  "deliveryAssets": [
+    "Assets/GenWorks/haolan-blue-devil-lingerie/ProductManifest.json",
+    "Assets/GenWorks/haolan-blue-devil-lingerie/Models/HAOLAN_BlueDevilLingerie.fbx",
+    "Assets/GenWorks/haolan-blue-devil-lingerie/Prefab/HAOLAN_BlueDevilLingerie.prefab",
+    "Assets/GenWorks/haolan-blue-devil-lingerie/Prefab/HAOLAN_BlueDevilLingerie_Integrated.prefab",
+    "Assets/GenWorks/haolan-blue-devil-lingerie/Previews/HAOLAN_BlueDevilLingerie_multiview.webp"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/haolan-blue-devil-lingerie/Previews/front.png",
+    "back": "Assets/GenWorks/haolan-blue-devil-lingerie/Previews/back.png",
+    "left": "Assets/GenWorks/haolan-blue-devil-lingerie/Previews/left.png",
+    "right": "Assets/GenWorks/haolan-blue-devil-lingerie/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/haolan-blue-devil-lingerie/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/haolan-blue-devil-lingerie/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/haolan-blue-devil-lingerie/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/haolan-blue-devil-lingerie/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": []
+}
