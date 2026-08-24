@@ -26,8 +26,23 @@ uv run --group snapshot python examples/reference-props/zero-gravity-sofa/genera
 
 The generator uses only `numpy` and `trimesh`, both already owned by the repository snapshot dependency group. It creates one watertight static shell scaled to the nominal product dimensions.
 
+## Shape model
+
+The reconstruction now models the visually important upholstery structure explicitly instead of relying on a generic inflated beanbag volume:
+
+- broad, flattened seat depression
+- low front rail and side walls
+- asymmetric rear ridge with the left-rear peak dominant and the right side lower
+- seat/back transition trough
+- fan-shaped backrest folds
+- front-panel seam cue and side-panel pinches
+- restrained compression wrinkles around the front corners
+- black PU/PVC-like PBR material with moderate roughness
+
+The surface details are deterministic vertex displacements applied after SDF polygonization, so the same input resolution reproduces the same mesh.
+
 ## Current review state
 
-Status is **WORKING**. The current geometry reproduces the main inflated volume and asymmetric raised back, but the source image is more slouched: its front cushion is flatter, the left-rear wedge is sharper, and upholstery seam/fold cues are stronger. Sitting-state bead and cover deformation is not simulated yet.
+Status is **WORKING**. The main silhouette, asymmetric back, flatter seat, seam cues, and broad folds are now represented. Remaining fidelity work is concentrated in fine upholstery behavior: exact seam routing, softer high-frequency creasing, and sitting-state bead/cover deformation.
 
 `evidence/reference.json` is the machine-readable source/target record. This example does not claim garment lifecycle `COMPLETE` or `visualAppearanceReview: PASS`.
