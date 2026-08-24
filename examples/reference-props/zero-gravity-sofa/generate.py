@@ -46,44 +46,48 @@ def sofa_sdf(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
         px, py, pz = (x - cx) / rx, (y - cy) / ry, (z - cz) / rz
         return (np.sqrt(px * px + py * py + pz * pz) - 1.0) * min(rx, ry, rz)
 
-    field = rounded_box(0.0, 0.0, 0.145, 0.56, 0.57, 0.16, 0.12)
+    def superellipsoid(cx, cy, cz, rx, ry, rz, power=1.65):
+        px = np.abs((x - cx) / rx)
+        py = np.abs((y - cy) / ry)
+        pz = np.abs((z - cz) / rz)
+        norm = (px**power + py**power + pz**power) ** (1.0 / power)
+        return (norm - 1.0) * min(rx, ry, rz)
+
+    field = rounded_box(0.0, -0.015, 0.135, 0.56, 0.57, 0.145, 0.105)
     field = smin(
         field,
-        ellipsoid(0.0, -0.07, 0.205, 0.43, 0.39, 0.135),
-        0.055,
+        ellipsoid(0.0, -0.08, 0.205, 0.46, 0.42, 0.125),
+        0.050,
     )
     field = smin(
         field,
-        ellipsoid(0.0, -0.455, 0.285, 0.575, 0.19, 0.18),
-        0.055,
+        ellipsoid(0.0, -0.455, 0.215, 0.575, 0.165, 0.130),
+        0.045,
     )
+
     for side in (-1.0, 1.0):
         field = smin(
             field,
-            rounded_box(0.47 * side, -0.12, 0.305, 0.14, 0.42, 0.18, 0.105),
-            0.055,
+            rounded_box(0.49 * side, -0.115, 0.245, 0.12, 0.42, 0.130, 0.090),
+            0.050,
         )
-        rear_z = 0.405 if side < 0 else 0.365
-        rear_rz = 0.24 if side < 0 else 0.20
-        field = smin(
-            field,
-            ellipsoid(0.46 * side, 0.23, rear_z, 0.20, 0.31, rear_rz),
-            0.070,
+
+    ridge_x = (-0.46, -0.34, -0.20, -0.04, 0.14, 0.31, 0.46)
+    ridge_z = (0.610, 0.575, 0.525, 0.485, 0.450, 0.420, 0.400)
+    ridge_rz = (0.280, 0.255, 0.225, 0.200, 0.180, 0.160, 0.145)
+    ridge_rx = (0.16, 0.18, 0.20, 0.22, 0.21, 0.19, 0.16)
+    for cx, cz, rz, rx in zip(ridge_x, ridge_z, ridge_rz, ridge_rx):
+        primitive = (
+            superellipsoid(cx, 0.395, cz, rx, 0.22, rz, power=1.55)
+            if cx <= -0.20
+            else ellipsoid(cx, 0.395, cz, rx, 0.22, rz)
         )
+        field = smin(field, primitive, 0.045)
+
     field = smin(
         field,
-        rounded_box(0.0, 0.405, 0.395, 0.51, 0.22, 0.27, 0.14, rx_deg=-8.0),
-        0.065,
-    )
-    field = smin(
-        field,
-        ellipsoid(-0.23, 0.40, 0.590, 0.30, 0.22, 0.265),
-        0.065,
-    )
-    field = smin(
-        field,
-        ellipsoid(0.30, 0.39, 0.495, 0.28, 0.23, 0.175),
-        0.065,
+        rounded_box(0.0, 0.300, 0.335, 0.50, 0.20, 0.16, 0.11, rx_deg=-10.0),
+        0.050,
     )
     return field
 
@@ -189,23 +193,62 @@ def marching_tetrahedra(
 def sculpt(mesh: trimesh.Trimesh) -> None:
     points = mesh.vertices
     x, y, z = points[:, 0], points[:, 1], points[:, 2]
-    seat = np.exp(-((x / 0.355) ** 4 + ((y + 0.085) / 0.31) ** 4))
-    height_mask = np.clip((z - 0.15) / 0.17, 0.0, 1.0)
-    rear_guard = 1.0 - np.clip((y - 0.13) / 0.19, 0.0, 1.0)
-    z -= 0.115 * seat * height_mask * rear_guard
 
-    crest = np.exp(-((x / 0.21) ** 2 + ((y - 0.41) / 0.17) ** 2)) * np.clip(
-        (z - 0.43) / 0.16, 0.0, 1.0
+    seat = np.exp(-((x / 0.445) ** 6 + ((y + 0.045) / 0.35) ** 6))
+    height_mask = np.clip((z - 0.13) / 0.18, 0.0, 1.0)
+    rear_guard = 1.0 - np.clip((y - 0.16) / 0.19, 0.0, 1.0)
+    z -= 0.145 * seat * height_mask * rear_guard
+
+    seat_back = np.exp(-((y - 0.145) / 0.055) ** 2) * np.exp(-(x / 0.44) ** 8)
+    z -= 0.030 * seat_back * np.clip((z - 0.21) / 0.18, 0.0, 1.0)
+
+    center_slouch = np.exp(-((x / 0.24) ** 2 + ((y - 0.375) / 0.18) ** 2))
+    z -= 0.052 * center_slouch * np.clip((z - 0.31) / 0.26, 0.0, 1.0)
+
+    left_peak = np.exp(
+        -(((x + 0.46) / 0.15) ** 2 + ((y - 0.395) / 0.16) ** 2)
     )
-    z -= 0.045 * crest
+    z += 0.022 * left_peak * np.clip((z - 0.36) / 0.22, 0.0, 1.0)
 
-    asym = np.exp(-(((x + 0.20) / 0.30) ** 2 + ((y - 0.35) / 0.28) ** 2)) * np.clip(
-        (z - 0.35) / 0.25, 0.0, 1.0
+    right_drop = np.exp(
+        -(((x - 0.30) / 0.23) ** 2 + ((y - 0.39) / 0.20) ** 2)
     )
-    z += 0.010 * asym
+    z -= 0.030 * right_drop * np.clip((z - 0.33) / 0.20, 0.0, 1.0)
 
-    ripple = 0.0032 * np.sin(13.0 * x + 2.7 * y) + 0.0020 * np.sin(9.0 * y - 2.4 * x)
-    z += ripple * np.clip((z - 0.19) / 0.28, 0.0, 1.0)
+    back_mask = np.clip((y - 0.07) / 0.20, 0.0, 1.0) * np.clip(
+        (z - 0.24) / 0.25, 0.0, 1.0
+    )
+    for slope, offset, amplitude, width in (
+        (-1.50, -0.13, 0.011, 0.027),
+        (-0.95, -0.08, 0.009, 0.024),
+        (-0.45, -0.03, 0.012, 0.026),
+        (0.10, 0.01, 0.010, 0.024),
+        (0.72, 0.06, 0.010, 0.026),
+        (1.32, 0.12, 0.008, 0.028),
+    ):
+        line = x - slope * (y - 0.15) - offset
+        z -= amplitude * np.exp(-(line / width) ** 2) * back_mask
+
+    front_curve = -0.405 + 0.040 * (x / 0.50) ** 2
+    front_seam = np.exp(-((y - front_curve) / 0.012) ** 2)
+    front_seam *= np.exp(-(x / 0.53) ** 10)
+    z -= 0.0065 * front_seam * np.clip((z - 0.15) / 0.12, 0.0, 1.0)
+
+    side_mask = np.exp(-((np.abs(x) - 0.49) / 0.018) ** 2)
+    side_mask *= np.clip((0.34 - y) / 0.32, 0.0, 1.0)
+    x -= np.sign(x) * 0.0045 * side_mask * np.clip((z - 0.12) / 0.20, 0.0, 1.0)
+
+    corner = np.exp(-((np.abs(x) - 0.43) / 0.11) ** 2)
+    corner *= np.exp(-((y + 0.34) / 0.17) ** 2)
+    wrinkle = 0.0038 * np.sin(28.0 * y + 8.0 * np.abs(x)) + 0.0022 * np.sin(
+        21.0 * x - 5.0 * y
+    )
+    z += wrinkle * corner * np.clip((z - 0.15) / 0.18, 0.0, 1.0)
+
+    broad = 0.0018 * np.sin(11.0 * x + 2.3 * y) + 0.0012 * np.sin(
+        8.0 * y - 1.8 * x
+    )
+    z += broad * np.clip((z - 0.20) / 0.30, 0.0, 1.0)
 
 
 def build(resolution: int) -> trimesh.Trimesh:
@@ -225,9 +268,9 @@ def build(resolution: int) -> trimesh.Trimesh:
     trimesh.repair.fix_normals(mesh)
     material = trimesh.visual.material.PBRMaterial(
         name="Black_PU_PVC",
-        baseColorFactor=[30, 29, 28, 255],
+        baseColorFactor=[27, 27, 26, 255],
         metallicFactor=0.0,
-        roughnessFactor=0.34,
+        roughnessFactor=0.38,
     )
     mesh.visual = trimesh.visual.TextureVisuals(material=material)
     return mesh
@@ -255,6 +298,7 @@ def main() -> int:
         "faces": int(len(mesh.faces)),
         "watertight": bool(mesh.is_watertight),
         "windingConsistent": bool(mesh.is_winding_consistent),
+        "components": int(len(mesh.split(only_watertight=False))),
         "sha256": hashlib.sha256(payload).hexdigest(),
     }
     print(json.dumps(report, indent=2))
