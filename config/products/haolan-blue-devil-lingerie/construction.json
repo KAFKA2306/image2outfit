@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "productId": "haolan-blue-devil-lingerie",
+  "referenceIntent": "Reconstruct the uploaded white and powder-blue devil/maid lingerie silhouette as a modular HAOLAN outfit without copying any source mesh.",
+  "palette": {
+    "pearlWhite": "#F7F9FF",
+    "powderBlue": "#78AEE0",
+    "batWingNavy": "#1A385F",
+    "silver": "#B8C6DB"
+  },
+  "modules": [
+    {"id": "crop-top", "cues": ["white cropped bib", "large shoulder ruffles", "open under-bust"]},
+    {"id": "neck-bow", "cues": ["white collar", "powder-blue bow"]},
+    {"id": "underbust-belt", "cues": ["white belt", "silver rectangular buckle"]},
+    {"id": "waist-cincher", "cues": ["broad powder-blue band", "front criss-cross lacing"]},
+    {"id": "panty-apron", "cues": ["white panty", "short ruffled front apron", "small blue bows"]},
+    {"id": "garters", "cues": ["white suspension straps", "white thigh bands", "silver clips"]},
+    {"id": "arms", "cues": ["powder-blue cuffs", "white glove cuffs"]},
+    {"id": "wings", "cues": ["large symmetric navy bat wings", "powder-blue rib accents"]},
+    {"id": "tail", "cues": ["powder-blue curved tail", "heart-shaped tip"]}
+  ],
+  "visualAcceptance": {
+    "requiredSilhouette": ["large bat wings visible from front", "cropped ruffled top", "broad blue waist cincher", "garter lines readable"],
+    "requiredPalette": ["white dominant", "powder-blue secondary", "navy wings", "silver hardware"],
+    "rejectIf": ["wings hidden behind torso", "corset lacing unreadable", "garter straps merge into body", "major clipping at waist or thighs"]
+  }
+}
