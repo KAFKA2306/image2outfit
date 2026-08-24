@@ -39,6 +39,10 @@ def main() -> int:
         raise RuntimeError("stage script cannot point to the launcher")
     if not script.is_file() or script.suffix != ".py":
         raise FileNotFoundError(f"stage script not found: {args.script}")
+
+    from visual_quality import install_render_quality_guard
+
+    install_render_quality_guard()
     sys.argv = [str(script), "--", "--job", str(job_path), *forwarded]
     try:
         runpy.run_path(str(script), run_name="__main__")
