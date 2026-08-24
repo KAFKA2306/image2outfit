@@ -199,20 +199,16 @@ def sculpt(mesh: trimesh.Trimesh) -> None:
     rear_guard = 1.0 - np.clip((y - 0.16) / 0.19, 0.0, 1.0)
     z -= 0.145 * seat * height_mask * rear_guard
 
-    seat_back = np.exp(-((y - 0.145) / 0.055) ** 2) * np.exp(-(x / 0.44) ** 8)
+    seat_back = np.exp(-(((y - 0.145) / 0.055) ** 2)) * np.exp(-((x / 0.44) ** 8))
     z -= 0.030 * seat_back * np.clip((z - 0.21) / 0.18, 0.0, 1.0)
 
     center_slouch = np.exp(-((x / 0.24) ** 2 + ((y - 0.375) / 0.18) ** 2))
     z -= 0.052 * center_slouch * np.clip((z - 0.31) / 0.26, 0.0, 1.0)
 
-    left_peak = np.exp(
-        -(((x + 0.46) / 0.15) ** 2 + ((y - 0.395) / 0.16) ** 2)
-    )
+    left_peak = np.exp(-(((x + 0.46) / 0.15) ** 2 + ((y - 0.395) / 0.16) ** 2))
     z += 0.022 * left_peak * np.clip((z - 0.36) / 0.22, 0.0, 1.0)
 
-    right_drop = np.exp(
-        -(((x - 0.30) / 0.23) ** 2 + ((y - 0.39) / 0.20) ** 2)
-    )
+    right_drop = np.exp(-(((x - 0.30) / 0.23) ** 2 + ((y - 0.39) / 0.20) ** 2))
     z -= 0.030 * right_drop * np.clip((z - 0.33) / 0.20, 0.0, 1.0)
 
     back_mask = np.clip((y - 0.07) / 0.20, 0.0, 1.0) * np.clip(
@@ -227,27 +223,25 @@ def sculpt(mesh: trimesh.Trimesh) -> None:
         (1.32, 0.12, 0.008, 0.028),
     ):
         line = x - slope * (y - 0.15) - offset
-        z -= amplitude * np.exp(-(line / width) ** 2) * back_mask
+        z -= amplitude * np.exp(-((line / width) ** 2)) * back_mask
 
     front_curve = -0.405 + 0.040 * (x / 0.50) ** 2
-    front_seam = np.exp(-((y - front_curve) / 0.012) ** 2)
-    front_seam *= np.exp(-(x / 0.53) ** 10)
+    front_seam = np.exp(-(((y - front_curve) / 0.012) ** 2))
+    front_seam *= np.exp(-((x / 0.53) ** 10))
     z -= 0.0065 * front_seam * np.clip((z - 0.15) / 0.12, 0.0, 1.0)
 
-    side_mask = np.exp(-((np.abs(x) - 0.49) / 0.018) ** 2)
+    side_mask = np.exp(-(((np.abs(x) - 0.49) / 0.018) ** 2))
     side_mask *= np.clip((0.34 - y) / 0.32, 0.0, 1.0)
     x -= np.sign(x) * 0.0045 * side_mask * np.clip((z - 0.12) / 0.20, 0.0, 1.0)
 
-    corner = np.exp(-((np.abs(x) - 0.43) / 0.11) ** 2)
-    corner *= np.exp(-((y + 0.34) / 0.17) ** 2)
+    corner = np.exp(-(((np.abs(x) - 0.43) / 0.11) ** 2))
+    corner *= np.exp(-(((y + 0.34) / 0.17) ** 2))
     wrinkle = 0.0038 * np.sin(28.0 * y + 8.0 * np.abs(x)) + 0.0022 * np.sin(
         21.0 * x - 5.0 * y
     )
     z += wrinkle * corner * np.clip((z - 0.15) / 0.18, 0.0, 1.0)
 
-    broad = 0.0018 * np.sin(11.0 * x + 2.3 * y) + 0.0012 * np.sin(
-        8.0 * y - 1.8 * x
-    )
+    broad = 0.0018 * np.sin(11.0 * x + 2.3 * y) + 0.0012 * np.sin(8.0 * y - 1.8 * x)
     z += broad * np.clip((z - 0.20) / 0.30, 0.0, 1.0)
 
 
