@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Generate a static 0-Gravity XXXL sofa reference mesh."""
+
 from __future__ import annotations
 
 import argparse
@@ -168,9 +169,7 @@ def marching_tetrahedra(
                 zs[cube_idx[:, 2]],
             )
         )
-        cube_values = field[
-            cube_idx[:, 0], cube_idx[:, 1], cube_idx[:, 2]
-        ]
+        cube_values = field[cube_idx[:, 0], cube_idx[:, 1], cube_idx[:, 2]]
         for tet in TETS:
             for tri in polygonize_tet(cube_points[tet], cube_values[tet]):
                 base = len(vertices)
@@ -195,19 +194,17 @@ def sculpt(mesh: trimesh.Trimesh) -> None:
     rear_guard = 1.0 - np.clip((y - 0.13) / 0.19, 0.0, 1.0)
     z -= 0.115 * seat * height_mask * rear_guard
 
-    crest = np.exp(
-        -((x / 0.21) ** 2 + ((y - 0.41) / 0.17) ** 2)
-    ) * np.clip((z - 0.43) / 0.16, 0.0, 1.0)
+    crest = np.exp(-((x / 0.21) ** 2 + ((y - 0.41) / 0.17) ** 2)) * np.clip(
+        (z - 0.43) / 0.16, 0.0, 1.0
+    )
     z -= 0.045 * crest
 
-    asym = np.exp(
-        -(((x + 0.20) / 0.30) ** 2 + ((y - 0.35) / 0.28) ** 2)
-    ) * np.clip((z - 0.35) / 0.25, 0.0, 1.0)
+    asym = np.exp(-(((x + 0.20) / 0.30) ** 2 + ((y - 0.35) / 0.28) ** 2)) * np.clip(
+        (z - 0.35) / 0.25, 0.0, 1.0
+    )
     z += 0.010 * asym
 
-    ripple = 0.0032 * np.sin(13.0 * x + 2.7 * y) + 0.0020 * np.sin(
-        9.0 * y - 2.4 * x
-    )
+    ripple = 0.0032 * np.sin(13.0 * x + 2.7 * y) + 0.0020 * np.sin(9.0 * y - 2.4 * x)
     z += ripple * np.clip((z - 0.19) / 0.28, 0.0, 1.0)
 
 
