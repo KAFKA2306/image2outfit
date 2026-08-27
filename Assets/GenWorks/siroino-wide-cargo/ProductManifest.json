@@ -13,6 +13,18 @@
   "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
   "generatedAt": "2026-08-02T08:31:52.893383Z",
   "blenderVersion": "4.4.3",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "FAIL",
+    "researchTrial": "FAIL"
+  },
   "handoff": {
     "resumable": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-wide-cargo",
@@ -26,10 +38,8 @@
       "reason": "The rendered candidate contained extreme spike vertices and failed finite-bounds and foot-exclusion auditing. It also had no completed Unity import/save/reload or Modular Avatar checkpoint."
     },
     "blockers": [
-      "Create and serialize integratedPrefabPath in Unity 2022.3.22f1 from the existing outfit Prefab and SiroinoSotai target using Modular Avatar 1.17.1 Setup Outfit / Merge Armature; do not fabricate serialized integration without Unity Editor evidence",
-      "Save and reload the outfit and integrated Prefabs in Unity and record import/serialization evidence",
-      "Run VRChat SDK Build & Test and VRChat client review; keep the corresponding runtime gates PENDING until they are actually executed",
-      "Generate the release candidate only after every declared delivery asset exists and license/provenance validation passes"
+      "Persist direct visual appearance review evidence for the current revision in repository-authoritative evidence; the legacy humanVisualReview PASS flag is not independently readable from merged main.",
+      "Declare and persist the research trial required by config/genworks-handoff-policy.json; the current legacy job has no researchMethod.trialStatus evidence."
     ]
   },
   "metrics": {
