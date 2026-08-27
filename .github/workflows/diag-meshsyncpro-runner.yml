@@ -1,0 +1,59 @@
+name: Diagnose MeshSyncPro runner bridge
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/diag-meshsyncpro-runner.yml
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: [self-hosted, windows, x64, image2outfit]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Inspect runner and Unity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "runner=$env:RUNNER_NAME"
+          Write-Host "workspace=$env:GITHUB_WORKSPACE"
+          $version = '2022.3.22f1'
+          $candidates = @(
+            $env:UNITY_EXE,
+            "C:\Program Files\Unity\Hub\Editor\$version\Editor\Unity.exe",
+            "C:\Program Files\Unity Hub\Editor\$version\Editor\Unity.exe"
+          ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+          $unity = $candidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+          if ($unity) { Write-Host "unity=$unity" } else { Write-Host 'unity=NOT_FOUND' }
+      - name: Check private MeshSyncPro access without exposing credentials
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+            Write-Host 'gh=NOT_FOUND'
+            exit 0
+          }
+          gh auth status 2>&1 | ForEach-Object {
+            $_ -replace '(?i)(token:).*','$1 [REDACTED]'
+          }
+          gh repo view KAFKA2306/meshsyncpro --json nameWithOwner,isPrivate 2>&1
+          Write-Host "gh_repo_view_exit=$LASTEXITCODE"
+      - name: Check existing local MeshSyncPro workspace only
+        shell: pwsh
+        run: |
+          $roots = @(
+            (Split-Path -Parent $env:GITHUB_WORKSPACE),
+            'C:\actions-runner\_work',
+            'D:\actions-runner\_work'
+          ) | Select-Object -Unique
+          foreach ($root in $roots) {
+            if (-not (Test-Path -LiteralPath $root -PathType Container)) { continue }
+            Get-ChildItem -LiteralPath $root -Directory -ErrorAction SilentlyContinue |
+              Where-Object { $_.Name -ieq 'meshsyncpro' } |
+              ForEach-Object { Write-Host "local_meshsyncpro=$($_.FullName)" }
+          }
