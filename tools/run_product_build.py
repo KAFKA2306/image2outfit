@@ -3,9 +3,11 @@
 
 Blender does not consistently add the repository ``tools`` directory to
 ``sys.path`` when a script is invoked by path. This launcher establishes the
-shared module path, validates the delegated script, and forwards the original
-tracked or materialized job without introducing seed/body substitution.
+shared module path, validates the delegated script, applies canonical visual
+quality defaults, and forwards the original tracked or materialized job without
+introducing seed/body substitution.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -48,6 +50,10 @@ def main() -> int:
         raise RuntimeError("productBuildScript cannot point to the launcher")
     if not script.is_file():
         raise FileNotFoundError(f"product build script not found: {script_value}")
+
+    from visual_quality import install_render_quality_guard
+
+    install_render_quality_guard()
     sys.argv = [str(script), "--", "--job", str(job_path)]
     try:
         runpy.run_path(str(script), run_name="__main__")
