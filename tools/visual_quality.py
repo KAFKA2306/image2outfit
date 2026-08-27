@@ -96,7 +96,9 @@ def apply_scene_defaults(
         target = float(quality["adaptiveThreshold"])
         cycles.adaptive_threshold = min(current, target) if current > 0 else target
 
-    scene.view_settings.view_transform = str(settings["colorManagement"]["viewTransform"])
+    scene.view_settings.view_transform = str(
+        settings["colorManagement"]["viewTransform"]
+    )
     scene.view_settings.look = str(settings["colorManagement"]["look"])
     return {
         "applied": True,
@@ -124,7 +126,9 @@ def ensure_fallback_studio(
         background = world.node_tree.nodes.get("Background")
         if background is not None:
             background.inputs["Color"].default_value = (*studio["world"]["color"], 1.0)
-            background.inputs["Strength"].default_value = float(studio["world"]["strength"])
+            background.inputs["Strength"].default_value = float(
+                studio["world"]["strength"]
+            )
         scene.world = world
         world_created = True
 
@@ -141,7 +145,9 @@ def ensure_fallback_studio(
             obj = bpy.data.objects.new(name, data)
             scene.collection.objects.link(obj)
             obj.location = spec["location"]
-            obj.rotation_euler = (target - obj.location).to_track_quat("-Z", "Y").to_euler()
+            obj.rotation_euler = (
+                (target - obj.location).to_track_quat("-Z", "Y").to_euler()
+            )
             lights_created += 1
     return {
         "applied": world_created or lights_created > 0,
@@ -150,7 +156,9 @@ def ensure_fallback_studio(
     }
 
 
-def install_render_quality_guard(profile_path: Path = DEFAULT_PROFILE) -> dict[str, Any]:
+def install_render_quality_guard(
+    profile_path: Path = DEFAULT_PROFILE,
+) -> dict[str, Any]:
     """Install an idempotent persistent pre-render guard when running in Blender."""
     try:
         import bpy
