@@ -44,6 +44,23 @@ def clear_stale_evidence(implementation: ModuleType) -> None:
     (preview_root / "Poses.meta").unlink(missing_ok=True)
 
 
+def reviewed_create_outfit(
+    implementation: ModuleType,
+    body,
+    armature,
+    fabric,
+    strap,
+    metal,
+):
+    """Create the garment with the standard object-parent + Armature modifier relation."""
+    garments = implementation.create_outfit(body, armature, fabric, strap, metal)
+    for garment in garments:
+        world_matrix = garment.matrix_world.copy()
+        garment.parent = armature
+        garment.matrix_world = world_matrix
+    return garments
+
+
 def reviewed_geometry(
     implementation: ModuleType,
     segments: int = 48,
@@ -158,6 +175,7 @@ def reviewed_audit(
     metrics["rearCentreCoverageVertices"] = rear_centre
     metrics["centreCoverageLevels"] = sorted(centre_levels)
 
+    armature_parent = garment.parent
     checks.update(
         {
             "sourceFaceIndependencePassed": min(zs) >= 0.10 and max(zs) <= 0.85,
@@ -186,6 +204,14 @@ def reviewed_audit(
                 float(seat["depth"]) >= 0.250
                 and float(thigh["depth"]) <= 0.195
             ),
+            "armatureObjectParentPassed": (
+                armature_parent is not None
+                and armature_parent.type == "ARMATURE"
+                and any(
+                    modifier.type == "ARMATURE" and modifier.object is armature_parent
+                    for modifier in garment.modifiers
+                )
+            ),
         }
     )
     required = [
@@ -208,6 +234,7 @@ def reviewed_audit(
         "rearCentreCoveragePassed",
         "continuousCentreLevelsPassed",
         "panelFreeTransitionPassed",
+        "armatureObjectParentPassed",
     ]
     report["passed"] = all(bool(checks[name]) for name in required)
     return report
@@ -239,7 +266,14 @@ def main() -> int:
         implementation,
         segments,
     )
-    implementation.build.create_outfit = implementation.create_outfit
+    implementation.build.create_outfit = lambda body, armature, fabric, strap, metal: reviewed_create_outfit(
+        implementation,
+        body,
+        armature,
+        fabric,
+        strap,
+        metal,
+    )
     implementation.build.main()
     result = reviewed_audit(implementation, baseline_audit)
     record(implementation, result)
