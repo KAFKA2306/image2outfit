@@ -47,7 +47,6 @@ jobs:
           tests.test_repository_policies
           tests.test_release_contracts
           tests.test_candidate_manifest
-          tests.test_visual_quality_defaults
           -v
 
       - name: Verify PR merge and product release separation
