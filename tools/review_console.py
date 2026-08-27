@@ -98,8 +98,25 @@ def safe_state(manifest: dict[str, Any]) -> str:
 
 
 def policy_requirements(policy: dict[str, Any]) -> tuple[list[str], list[str]]:
-    views: Any = pick(policy, "required_views", "views", default=list(DEFAULT_VIEWS))
-    poses: Any = pick(policy, "required_poses", "poses", default=[])
+    minimum_preview = pick(policy, "minimumPreview", "minimum_preview", default={})
+    views: Any = pick(
+        policy,
+        "required_views",
+        "views",
+        default=pick(
+            minimum_preview,
+            "requiredViews",
+            "required_views",
+            default=list(DEFAULT_VIEWS),
+        ),
+    )
+    poses: Any = pick(
+        policy,
+        "requiredPoses",
+        "required_poses",
+        "poses",
+        default=[],
+    )
     if isinstance(views, dict):
         views = pick(views, "required", "names", default=list(DEFAULT_VIEWS))
     if isinstance(poses, dict):
