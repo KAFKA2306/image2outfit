@@ -7,6 +7,7 @@ shared module path, validates the delegated script, applies canonical visual
 quality defaults, and forwards the original tracked or materialized job without
 introducing seed/body substitution.
 """
+
 from __future__ import annotations
 
 import argparse
