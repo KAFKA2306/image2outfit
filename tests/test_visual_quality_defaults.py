@@ -66,7 +66,9 @@ class VisualQualityDefaultsTest(unittest.TestCase):
 
         self.assertTrue(report["applied"])
         self.assertEqual(scene.render.engine, "CYCLES")
-        self.assertEqual((scene.render.resolution_x, scene.render.resolution_y), (1024, 768))
+        self.assertEqual(
+            (scene.render.resolution_x, scene.render.resolution_y), (1024, 768)
+        )
         self.assertEqual(scene.render.resolution_percentage, 100)
         self.assertEqual(scene.cycles.samples, 64)
         self.assertEqual(scene.cycles.adaptive_threshold, 0.02)
@@ -79,7 +81,9 @@ class VisualQualityDefaultsTest(unittest.TestCase):
         scene = fake_scene(width=2048, height=1024, samples=192, threshold=0.008)
         visual_quality.apply_scene_defaults(scene)
 
-        self.assertEqual((scene.render.resolution_x, scene.render.resolution_y), (2048, 1024))
+        self.assertEqual(
+            (scene.render.resolution_x, scene.render.resolution_y), (2048, 1024)
+        )
         self.assertEqual(scene.cycles.samples, 192)
         self.assertEqual(scene.cycles.adaptive_threshold, 0.008)
 
@@ -90,7 +94,9 @@ class VisualQualityDefaultsTest(unittest.TestCase):
 
         self.assertFalse(report["applied"])
         self.assertEqual(scene.render.engine, "BLENDER_EEVEE_NEXT")
-        self.assertEqual((scene.render.resolution_x, scene.render.resolution_y), (640, 480))
+        self.assertEqual(
+            (scene.render.resolution_x, scene.render.resolution_y), (640, 480)
+        )
 
     def test_invalid_profile_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
