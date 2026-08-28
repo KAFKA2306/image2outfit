@@ -41,30 +41,7 @@ class MergeReleaseSeparationTests(unittest.TestCase):
             policy["productReleaseGate"]["validatorCommand"],
             "tools/production_gate.py --mode release",
         )
-
-    def test_branch_lifecycle_allows_only_default_and_open_pr_heads(self) -> None:
-        lifecycle = self.policy()["branchLifecycle"]
-        self.assertEqual(lifecycle["persistentBranch"], "default-branch")
-        self.assertEqual(
-            lifecycle["allowedNonDefaultBranchState"],
-            "same-repository-open-pull-request-head",
-        )
-        self.assertTrue(lifecycle["deleteHeadOnPullRequestClose"])
-        self.assertTrue(lifecycle["deleteHeadOnPullRequestMerge"])
-        self.assertTrue(lifecycle["deleteOrphanBranches"])
-        self.assertFalse(lifecycle["preserveUniqueCommitsOnOrphanBranch"])
-        self.assertTrue(lifecycle["protectedOrphanBranchIsPolicyViolation"])
-
-        workflow = (ROOT / ".github/workflows/branch-hygiene.yml").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("openHeads.has(ref)", workflow)
-        self.assertIn("isOpenHead(ref, openPulls)", workflow)
-        self.assertIn("closed or merged", workflow)
-        self.assertIn("Orphan branches remain", workflow)
-        self.assertNotIn("Keeping invalid orphan branch", workflow)
-        self.assertNotIn("Keeping orphan branch with", workflow)
-        self.assertNotIn("compareCommitsWithBasehead", workflow)
+        self.assertNotIn("branchLifecycle", policy)
 
     def test_release_workflow_is_manual_and_not_a_merge_gate(self) -> None:
         policy = self.policy()
