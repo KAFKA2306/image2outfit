@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Stable entrypoint for the reviewed Siroino Wide Cargo v38 product."""
+
 from __future__ import annotations
 
 import json
@@ -188,8 +189,7 @@ def reviewed_audit(
                 and float(metrics["totalDepth"]) <= 0.275
             ),
             "fittedSeatPassed": (
-                float(seat["width"]) <= 0.370
-                and 0.110 <= float(seat["rear"]) <= 0.138
+                float(seat["width"]) <= 0.370 and 0.110 <= float(seat["rear"]) <= 0.138
             ),
             "straightWideProfilePassed": (
                 abs(float(thigh["width"]) - float(knee["width"])) <= 0.045
@@ -201,8 +201,7 @@ def reviewed_audit(
             "rearCentreCoveragePassed": rear_centre >= 8,
             "continuousCentreLevelsPassed": len(centre_levels) >= 5,
             "panelFreeTransitionPassed": (
-                float(seat["depth"]) >= 0.250
-                and float(thigh["depth"]) <= 0.195
+                float(seat["depth"]) >= 0.250 and float(thigh["depth"]) <= 0.195
             ),
             "armatureObjectParentPassed": (
                 armature_parent is not None
@@ -266,13 +265,15 @@ def main() -> int:
         implementation,
         segments,
     )
-    implementation.build.create_outfit = lambda body, armature, fabric, strap, metal: reviewed_create_outfit(
-        implementation,
-        body,
-        armature,
-        fabric,
-        strap,
-        metal,
+    implementation.build.create_outfit = lambda body, armature, fabric, strap, metal: (
+        reviewed_create_outfit(
+            implementation,
+            body,
+            armature,
+            fabric,
+            strap,
+            metal,
+        )
     )
     implementation.build.main()
     result = reviewed_audit(implementation, baseline_audit)
