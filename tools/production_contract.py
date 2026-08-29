@@ -169,11 +169,11 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
     if manifest.get("productRoot") != job.get("productRoot"):
         errors.append("product manifest productRoot must match job.productRoot")
 
-    gates = manifest.get("technicalGates")
-    if isinstance(gates, dict):
+    technical_gates = manifest.get("technicalGates")
+    if isinstance(technical_gates, dict):
         failed = sorted(
             name
-            for name, value in gates.items()
+            for name, value in technical_gates.items()
             if value == "FAIL"
             and _normalize_gate_name(name) not in out_of_scope
             and not name.lower().startswith("human")
@@ -191,11 +191,12 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
     state = str(manifest.get("state", manifest.get("status", "WORKING"))).upper()
     completion_status = str(handoff.get("completionStatus", "COMPLETE")).upper()
     if state == completion_status:
-        if not isinstance(gates, dict):
-            errors.append("complete product requires technicalGates")
+        completion_gates = manifest.get("completionGates")
+        if not isinstance(completion_gates, dict):
+            errors.append("complete product requires completionGates")
         else:
             for name in handoff.get("requiredCompletionGates", []):
-                if gates.get(name) != "PASS":
+                if completion_gates.get(name) != "PASS":
                     errors.append(f"complete product gate is not PASS: {name}")
 
     return list(dict.fromkeys(errors))
