@@ -4,36 +4,37 @@
 
 `config/genworks-handoff-policy.json`
 
-Original, logo-free wide cargo outfit for SiroinoSotai v1.0. The tracked garment has 1,168 vertices, 2,040 triangles, and up to 3 bone influences per vertex.
+SiroinoSotai v1.0向けのロゴなしWide Cargo衣装です。現在の衣装メッシュは1,168頂点、2,040三角形、1頂点あたり最大3ボーン影響です。
 
-## Current repository state
+## 現在の状態
 
-The product remains `WORKING` under the current eight-gate completion policy.
+製品は7件のrepository完了条件のうち6件を満たし、`WORKING`です。
 
-Tracked evidence currently satisfies:
+現在PASSしているもの:
 
-- Blender geometry/build state
-- editable `.blend` source
-- FBX export
-- declared outfit Prefab
-- five-view render evidence
-- pose render evidence
+- Blenderでの形状生成
+- 編集可能な`.blend`
+- FBX書き出し
+- 衣装Prefabの宣言
+- 5方向レンダリング証拠
+- ポーズレンダリング証拠
 
-The remaining repository-completion blockers are:
+残る完了条件は `visualAppearanceReview` だけです。
 
-- direct visual appearance review evidence for the current revision is not independently readable from merged `main`;
-- the required research trial is not declared/persisted by the legacy product job.
+2026-08-29に、main commit `a2691970b22cf7d2b135d6c9582b985e4a22a1c8` からReview Console workflow run `33257472164` が生成したGitHub Pages artifactを直接確認しました。5方向レンダリングでは、腰回りが別部品の筒のように見えること、脚部が円筒に近く衣服らしい形状変化が乏しいこと、カーゴポケットが硬い直方体に見えることを確認しています。このため現在revisionの `visualAppearanceReview` は `FAIL` のままです。
 
-Unity import/save/reload, Modular Avatar/NDMF processing, VRChat Build & Test, and VRChat runtime are explicitly outside repository `COMPLETE` in `config/genworks-handoff-policy.json`. They remain unverified and must not be claimed as supported without external Unity/VRChat evidence.
+ファイルが存在することや自動の形状監査PASSだけでは、この外観判定をPASSにしません。
+
+Unity import/save/reload、Modular Avatar/NDMF processing、VRChat Build & Test、VRChat runtimeは `config/genworks-handoff-policy.json` ではrepository `COMPLETE` の対象外です。これらは引き続き未検証であり、UnityまたはVRChatで実行した証拠なしに対応済みとは扱いません。
 
 ## Tracked asset
 
-The canonical outfit Prefab is:
+正本の衣装Prefab:
 
 `Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab`
 
-The repository does not currently track the declared integrated Prefab `Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab`, so do not describe the current artifact as verified drag-and-drop avatar integration.
+宣言されている統合Prefab `Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab` は現在repositoryに存在しません。そのため、現行成果物をドラッグ&ドロップでアバター統合済みとは扱いません。
 
-For Modular Avatar clothing setup, use the upstream `Setup Outfit` / `Merge Armature` workflow rather than repository-specific setup logic:
+Modular Avatarで衣装を設定する場合は、repository独自処理ではなく公式の `Setup Outfit` / `Merge Armature` を使用します。
 
 https://modular-avatar.nadena.dev/docs/tutorials/clothing

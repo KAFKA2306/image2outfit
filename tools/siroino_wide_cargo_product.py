@@ -248,8 +248,6 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
     manifest["wearabilityAudit"] = report
     gates = manifest.setdefault("technicalGates", {})
     gates["latestGeometryRender"] = "PASS" if report["passed"] else "FAIL"
-    gates["humanVisualReview"] = "PENDING"
-    gates["humanPoseReview"] = "PENDING"
     path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
