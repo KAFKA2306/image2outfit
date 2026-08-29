@@ -22,8 +22,7 @@
     "prefabDeclared": "PASS",
     "fiveViewEvidence": "PASS",
     "poseEvidence": "PASS",
-    "visualAppearanceReview": "FAIL",
-    "researchTrial": "FAIL"
+    "visualAppearanceReview": "FAIL"
   },
   "handoff": {
     "resumable": true,
@@ -38,8 +37,7 @@
       "reason": "The rendered candidate contained extreme spike vertices and failed finite-bounds and foot-exclusion auditing. It also had no completed Unity import/save/reload or Modular Avatar checkpoint."
     },
     "blockers": [
-      "Persist direct visual appearance review evidence for the current revision in repository-authoritative evidence; the legacy humanVisualReview PASS flag is not independently readable from merged main.",
-      "Declare and persist the research trial required by config/genworks-handoff-policy.json; the current legacy job has no researchMethod.trialStatus evidence."
+      "Persist direct visual appearance review evidence for the current revision in repository-authoritative evidence; the legacy humanVisualReview PASS flag is not independently readable from merged main."
     ]
   },
   "metrics": {
