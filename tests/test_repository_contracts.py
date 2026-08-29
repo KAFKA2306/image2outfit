@@ -168,7 +168,6 @@ class RepositoryContractTest(unittest.TestCase):
                 "fiveViewEvidence",
                 "poseEvidence",
                 "visualAppearanceReview",
-                "researchTrial",
             },
         )
         self.assertEqual(
