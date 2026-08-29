@@ -1,6 +1,10 @@
+https://kafka2306.github.io/image2outfit/
+
 # image2outfit
 
 SiroinoSotai_PC 向け衣装を Blender で制作し、編集可能ソース、FBX、Prefab 宣言、実レンダリング、研究記録を再現可能な製品ワークスペースとして管理するプロジェクトです。
+
+GitHub Pages は `tools/review_console.py` が各製品の `ProductManifest.json` と現在の証拠から生成します。別の手書き製品台帳は使いません。
 
 ## 正本
 
