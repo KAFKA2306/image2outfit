@@ -59,6 +59,8 @@ Do not add a second command path when an existing Taskfile/manage entry point ca
 - do not weaken gates to fit failing data or overwrite last-good state with a worse candidate.
 - do not commit credentials, private assets, caches, machine state, or unintended Unity `.meta`/GUID changes.
 - comments should explain non-obvious rationale/external constraints, not narrate code.
+- GitHub Pages が有効な間は、`README.md` の先頭行に `https://...` の正準公開URLを平文で置く。
+- 公開製品状態は各 `ProductManifest.json` または既存の正準投影から読み、手書きの製品状態カタログを追加・復活させない。
 
 ## Evidence and completion
 

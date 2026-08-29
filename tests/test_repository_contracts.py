@@ -104,7 +104,6 @@ class RepositoryContractTest(unittest.TestCase):
             ROOT / "README.md",
             ROOT / "AGENTS.md",
             ROOT / "Taskfile.yml",
-            ROOT / "Assets" / "GenWorks" / "OutfitCatalog.json",
             ROOT
             / "Assets"
             / "GenWorks"
