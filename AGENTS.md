@@ -25,7 +25,7 @@ Use existing owners; do not duplicate their rules in prose or new files.
 - current state/gates/defects/hashes: `Assets/GenWorks/<slug>/ProductManifest.json`
 - quality: `contracts/quality/quality-spec.json`
 - shared validation: `tools/production_contract.py`
-- workspace protection: `tools/workspace_transaction.py`
+- runtime directory transaction and canonical workspace last-good protection: `tools/runtime_transaction.py`
 - commands: `Taskfile.yml` / `tools/manage.py`
 
 `README.md` is the user entry point and `ARCHITECTURE.md` describes stable design relationships. Machine-readable owners outrank prose.
