@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import json
 import sys
 import tempfile
@@ -14,12 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
-SPEC = importlib.util.spec_from_file_location(
-    "run_private_reference_normalizer", TOOLS / "run_private_reference_normalizer.py"
-)
-assert SPEC is not None and SPEC.loader is not None
-MODULE = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(MODULE)
+
+import run_private_reference_normalizer as MODULE
 
 
 def digest(path: Path) -> str:
@@ -69,7 +64,7 @@ class PrivateReferenceNormalizerTests(unittest.TestCase):
         }
         self.request = {
             "sourceReference": f"private-reference://sha256/{self.sha}",
-            "variables": {"privateReferencePath": str(self.source)},
+            "variables": {},
         }
         self.result = self.root / ".image2outfit/result.json"
 
@@ -77,7 +72,7 @@ class PrivateReferenceNormalizerTests(unittest.TestCase):
         MODULE.ROOT = self.previous_root
         self.temp.cleanup()
 
-    def test_normalize_uses_actual_source_pixels_and_records_verification(self) -> None:
+    def test_normalize_discovers_actual_source_pixels_by_hash(self) -> None:
         payload = MODULE.normalize(self.job, self.request, self.result)
         self.assertTrue(payload["sourceBytesVerified"])
         self.assertEqual(payload["normalizationMethod"], "crop-from-private-source")
@@ -90,12 +85,12 @@ class PrivateReferenceNormalizerTests(unittest.TestCase):
             self.assertEqual(left.getpixel((1, 1)), (10, 20, 30))
             self.assertEqual(right.getpixel((1, 1)), (200, 40, 60))
 
-    def test_missing_private_source_binding_fails_loudly(self) -> None:
-        request = {"sourceReference": f"private-reference://sha256/{self.sha}"}
-        with self.assertRaisesRegex(ValueError, "privateReferencePath"):
-            MODULE.normalize(self.job, request, self.result)
+    def test_missing_matching_private_source_fails_loudly(self) -> None:
+        self.source.unlink()
+        with self.assertRaisesRegex(FileNotFoundError, "no private reference image"):
+            MODULE.normalize(self.job, self.request, self.result)
 
-    def test_hash_mismatch_is_rejected(self) -> None:
+    def test_explicit_hash_mismatch_is_rejected(self) -> None:
         request = {
             "sourceReference": "private-reference://sha256/" + "0" * 64,
             "variables": {"privateReferencePath": str(self.source)},
@@ -116,6 +111,12 @@ class PrivateReferenceNormalizerTests(unittest.TestCase):
         }
         with self.assertRaisesRegex(ValueError, "privateSourceRoots"):
             MODULE.normalize(self.job, request, self.result)
+
+    def test_duplicate_hash_matches_require_explicit_binding(self) -> None:
+        duplicate = self.root / "Assets/_Local/duplicate.png"
+        duplicate.write_bytes(self.source.read_bytes())
+        with self.assertRaisesRegex(ValueError, "multiple private reference images"):
+            MODULE.normalize(self.job, self.request, self.result)
 
 
 if __name__ == "__main__":
