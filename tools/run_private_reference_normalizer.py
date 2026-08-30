@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Normalize real private reference bytes without fabricating garment pixels."""
+"""Normalize hash-verified private reference bytes without fabricating garment pixels."""
 
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 NORMALIZATION_METHOD = "crop-from-private-source"
 PRIVATE_REFERENCE_VARIABLE = "privateReferencePath"
+IMAGE_SUFFIXES = {".bmp", ".jpeg", ".jpg", ".png", ".tif", ".tiff", ".webp"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -63,41 +64,44 @@ def write_json(path: Path, payload: Mapping[str, Any]) -> Path:
     return path
 
 
-def _assert_private_source_location(source: Path, job: Mapping[str, Any]) -> None:
+def _private_roots(job: Mapping[str, Any]) -> list[Path]:
+    configured = job.get("privateSourceRoots", [])
+    if not isinstance(configured, list) or not configured or not all(
+        isinstance(value, str) and value for value in configured
+    ):
+        raise ValueError("job.privateSourceRoots must be a non-empty string list")
+    return [repo_path(value, label="private source root") for value in configured]
+
+
+def _assert_private_source_location(source: Path, roots: list[Path]) -> None:
     source = source.resolve()
     if source != ROOT and ROOT not in source.parents:
         return
-    configured = job.get("privateSourceRoots", [])
-    if not isinstance(configured, list) or not all(
-        isinstance(value, str) and value for value in configured
-    ):
-        raise ValueError("job.privateSourceRoots must be a list of non-empty strings")
-    allowed = [repo_path(value, label="private source root") for value in configured]
-    if not any(source == root or root in source.parents for root in allowed):
+    if not any(source == root or root in source.parents for root in roots):
         raise ValueError(
             "repository-local private reference must be under job.privateSourceRoots"
         )
 
 
-def _private_source(
-    request: Mapping[str, Any], job: Mapping[str, Any], expected_sha256: str
-) -> Path:
+def _explicit_private_source(
+    request: Mapping[str, Any], roots: list[Path], expected_sha256: str
+) -> Path | None:
     variables = request.get("variables")
+    if variables is None:
+        return None
     if not isinstance(variables, Mapping):
-        raise ValueError(
-            f"normalize-view requires request.variables.{PRIVATE_REFERENCE_VARIABLE} "
-            "with actual private source bytes"
-        )
+        raise ValueError("request.variables must be an object")
     value = variables.get(PRIVATE_REFERENCE_VARIABLE)
+    if value is None:
+        return None
     if not isinstance(value, str) or not value:
         raise ValueError(
-            f"normalize-view requires request.variables.{PRIVATE_REFERENCE_VARIABLE} "
-            "with actual private source bytes"
+            f"request.variables.{PRIVATE_REFERENCE_VARIABLE} must be a non-empty path"
         )
     source = Path(value).expanduser().resolve()
     if not source.is_file():
         raise FileNotFoundError(f"private reference file is missing: {source}")
-    _assert_private_source_location(source, job)
+    _assert_private_source_location(source, roots)
     actual_sha256 = sha256(source)
     if actual_sha256 != expected_sha256:
         raise ValueError(
@@ -105,6 +109,42 @@ def _private_source(
             f"expected {expected_sha256}, found {actual_sha256}"
         )
     return source
+
+
+def _discover_private_source(roots: list[Path], expected_sha256: str) -> Path:
+    matches: list[Path] = []
+    for root in roots:
+        if not root.is_dir():
+            continue
+        for candidate in sorted(root.rglob("*")):
+            if (
+                candidate.is_file()
+                and candidate.suffix.lower() in IMAGE_SUFFIXES
+                and sha256(candidate) == expected_sha256
+            ):
+                matches.append(candidate.resolve())
+    if not matches:
+        raise FileNotFoundError(
+            "no private reference image under job.privateSourceRoots matches "
+            f"SHA-256 {expected_sha256}"
+        )
+    unique = sorted(set(matches))
+    if len(unique) != 1:
+        raise ValueError(
+            "multiple private reference images match the audited SHA-256; "
+            "remove duplicate private copies or bind privateReferencePath explicitly"
+        )
+    return unique[0]
+
+
+def _private_source(
+    request: Mapping[str, Any], job: Mapping[str, Any], expected_sha256: str
+) -> Path:
+    roots = _private_roots(job)
+    explicit = _explicit_private_source(request, roots, expected_sha256)
+    if explicit is not None:
+        return explicit
+    return _discover_private_source(roots, expected_sha256)
 
 
 def _bounding_box(
