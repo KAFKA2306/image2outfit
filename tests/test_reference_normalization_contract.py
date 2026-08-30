@@ -16,9 +16,9 @@ from image2outfit.execution import StageResultRequirement, validate_stage_result
 class ReferenceNormalizationContractTests(unittest.TestCase):
     def requirement(self) -> StageResultRequirement:
         profile = json.loads(
-            (ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json").read_text(
-                encoding="utf-8"
-            )
+            (
+                ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json"
+            ).read_text(encoding="utf-8")
         )
         stage = next(
             item for item in profile["stages"] if item["stage"] == "normalize-view"
@@ -37,7 +37,9 @@ class ReferenceNormalizationContractTests(unittest.TestCase):
             "evidence": [{"path": "normalized.png", "sha256": "a" * 64}],
         }
 
-    def test_synthetic_style_result_without_source_verification_is_rejected(self) -> None:
+    def test_synthetic_style_result_without_source_verification_is_rejected(
+        self,
+    ) -> None:
         with self.assertRaisesRegex(ValueError, "sourceBytesVerified"):
             validate_stage_result(
                 self.base_result(),
