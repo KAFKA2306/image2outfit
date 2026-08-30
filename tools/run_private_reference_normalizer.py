@@ -67,8 +67,10 @@ def write_json(path: Path, payload: Mapping[str, Any]) -> Path:
 
 def _private_roots(job: Mapping[str, Any]) -> list[Path]:
     configured = job.get("privateSourceRoots", [])
-    if not isinstance(configured, list) or not configured or not all(
-        isinstance(value, str) and value for value in configured
+    if (
+        not isinstance(configured, list)
+        or not configured
+        or not all(isinstance(value, str) and value for value in configured)
     ):
         raise ValueError("job.privateSourceRoots must be a non-empty string list")
     return [repo_path(value, label="private source root") for value in configured]
@@ -185,9 +187,7 @@ def normalize(
     job: Mapping[str, Any], request: Mapping[str, Any], result_path: Path
 ) -> dict[str, Any]:
     product_id = str(job["id"])
-    audit_path = repo_path(
-        job["garmentPipeline"]["referenceAuditPath"], label="audit"
-    )
+    audit_path = repo_path(job["garmentPipeline"]["referenceAuditPath"], label="audit")
     audit = read_object(audit_path, "reference audit")
     if audit.get("schemaVersion") != 1 or audit.get("productId") != product_id:
         raise ValueError("reference audit schema or product identity mismatch")
