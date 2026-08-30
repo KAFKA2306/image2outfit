@@ -26,11 +26,14 @@
     },
     {
       "stage": "normalize-view",
-      "toolName": "pose-view-normalizer",
-      "purpose": "Separate pose and viewpoint effects from garment evidence.",
+      "toolName": "private-reference-normalizer",
+      "purpose": "Crop normalized garment views from hash-verified actual private source bytes; never synthesize garment pixels.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
-      "requiredResultFields": {},
+      "requiredResultFields": {
+        "sourceBytesVerified": true,
+        "normalizationMethod": "crop-from-private-source"
+      },
       "managedOutputs": ["normalizedReference", "cameraPose", "bodyLandmarks", "normalizationMetrics"]
     },
     {
