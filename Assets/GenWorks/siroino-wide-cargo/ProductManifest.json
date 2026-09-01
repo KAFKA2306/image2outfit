@@ -37,7 +37,7 @@
       "reason": "The rendered candidate contained extreme spike vertices and failed finite-bounds and foot-exclusion auditing. It also had no completed Unity import/save/reload or Modular Avatar checkpoint."
     },
     "blockers": [
-      "Hosted Blender #1276の実artifactを直接確認した。FBX / Blend、5方向render、neutral / arms-up / arm-cross / crouch / sit / proneの6姿勢renderは生成できている。一方、FRONT / BACKの股下中央線、腰から左右脚へ切り替わる棚状の段差、側面の直線的な形状、crouch / sit時の腰から大腿への急な変形が残るためvisualAppearanceReviewはFAIL。"
+      "Hosted Blender #1281の実artifactを直接確認した。現行headでFBX / Blend、5方向render、neutral / arms-up / arm-cross / crouch / sit / proneの6姿勢renderを生成でき、995 vertices / 1,876 triangles、degenerate triangles 0、unweighted vertices 0、boundary edges 112を維持している。一方、FRONT / BACKの股下中央線、腰から左右脚へ切り替わる棚状の段差、側面の直線的な形状、crouch / sit時の腰から大腿への急な変形が残るためvisualAppearanceReviewはFAIL。"
     ]
   },
   "metrics": {
