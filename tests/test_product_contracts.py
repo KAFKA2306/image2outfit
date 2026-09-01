@@ -95,6 +95,22 @@ class MethodSelectionTest(unittest.TestCase):
         self.assertGreaterEqual(len(baseline["legRows"]), 2)
         self.assertGreaterEqual(len(baseline["upperRows"]), 2)
         self.assertGreater(baseline["crotchRise"]["endRise"], 0.0)
+
+        back_rise = baseline["backRise"]
+        front_rise = baseline["frontRise"]
+        self.assertGreaterEqual(len(back_rise), 2)
+        self.assertEqual(len(front_rise), len(back_rise))
+        self.assertEqual(back_rise[-1], front_rise[0])
+        self.assertEqual(back_rise[-1][0], 0.0)
+        self.assertTrue(all(point[0] >= 0.0 for point in back_rise))
+        self.assertTrue(all(point[0] <= 0.0 for point in front_rise))
+        self.assertTrue(
+            all(back_rise[index][1] >= back_rise[index + 1][1] for index in range(len(back_rise) - 1))
+        )
+        self.assertTrue(
+            all(front_rise[index][1] <= front_rise[index + 1][1] for index in range(len(front_rise) - 1))
+        )
+
         self.assertIs(
             pattern["acceptance"]["productionGeometryConsumerRequiredBeforeRelease"],
             True,
