@@ -184,6 +184,19 @@ def _load_pattern_baseline() -> dict[str, object]:
         raise ValueError("Wide Cargo frontRise and backRise point counts differ")
     if back_rise[-1] != front_rise[0]:
         raise ValueError("Wide Cargo frontRise and backRise do not share centre point")
+    outseam = _numeric_rows(baseline.get("outseam"), 2, "outseam")
+    inseam = _numeric_rows(baseline.get("inseam"), 2, "inseam")
+    if len(outseam) != len(inseam):
+        raise ValueError("Wide Cargo outseam and inseam point counts differ")
+    leg_boundary_rows = []
+    for outside, inside in zip(outseam, inseam):
+        outer, outer_z = outside
+        inner, inner_z = inside
+        if outer_z != inner_z:
+            raise ValueError("Wide Cargo outseam and inseam levels differ")
+        if outer <= inner:
+            raise ValueError("Wide Cargo outseam must stay outside inseam")
+        leg_boundary_rows.append((outer_z, outer, inner))
     return {
         "frontDepthProfile": _numeric_rows(
             baseline.get("frontDepthProfile"), 2, "frontDepthProfile"
@@ -191,7 +204,7 @@ def _load_pattern_baseline() -> dict[str, object]:
         "rearDepthProfile": _numeric_rows(
             baseline.get("rearDepthProfile"), 2, "rearDepthProfile"
         ),
-        "legRows": _numeric_rows(baseline.get("legRows"), 3, "legRows"),
+        "legBoundaryRows": tuple(leg_boundary_rows),
         "upperRows": _numeric_rows(baseline.get("upperRows"), 2, "upperRows"),
         "crotchCentre": back_rise + front_rise[1:],
     }
@@ -200,7 +213,7 @@ def _load_pattern_baseline() -> dict[str, object]:
 PATTERN_BASELINE = _load_pattern_baseline()
 FRONT_DEPTH = PATTERN_BASELINE["frontDepthProfile"]
 REAR_DEPTH = PATTERN_BASELINE["rearDepthProfile"]
-LEG_SPECS = PATTERN_BASELINE["legRows"]
+LEG_BOUNDARY_ROWS = PATTERN_BASELINE["legBoundaryRows"]
 UPPER_SPECS = PATTERN_BASELINE["upperRows"]
 CROTCH_CENTRE = PATTERN_BASELINE["crotchCentre"]
 
@@ -341,7 +354,7 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
     ring_count = 32
     quarter = ring_count // 4
     leg_rows: dict[float, list[list[int]]] = {-1.0: [], 1.0: []}
-    for z, outer, inner in LEG_SPECS:
+    for z, outer, inner in LEG_BOUNDARY_ROWS:
         centre = (outer + inner) * 0.5
         half_width = (outer - inner) * 0.5
         for side in (-1.0, 1.0):
