@@ -105,10 +105,16 @@ class MethodSelectionTest(unittest.TestCase):
         self.assertTrue(all(point[0] >= 0.0 for point in back_rise))
         self.assertTrue(all(point[0] <= 0.0 for point in front_rise))
         self.assertTrue(
-            all(back_rise[index][1] >= back_rise[index + 1][1] for index in range(len(back_rise) - 1))
+            all(
+                back_rise[index][1] >= back_rise[index + 1][1]
+                for index in range(len(back_rise) - 1)
+            )
         )
         self.assertTrue(
-            all(front_rise[index][1] <= front_rise[index + 1][1] for index in range(len(front_rise) - 1))
+            all(
+                front_rise[index][1] <= front_rise[index + 1][1]
+                for index in range(len(front_rise) - 1)
+            )
         )
 
         self.assertIs(
