@@ -92,9 +92,27 @@ class MethodSelectionTest(unittest.TestCase):
         baseline = pattern["baselineGeometry"]
         self.assertGreaterEqual(len(baseline["frontDepthProfile"]), 2)
         self.assertGreaterEqual(len(baseline["rearDepthProfile"]), 2)
-        self.assertGreaterEqual(len(baseline["legRows"]), 2)
+        self.assertGreaterEqual(len(baseline["outseam"]), 2)
+        self.assertGreaterEqual(len(baseline["inseam"]), 2)
+        self.assertEqual(len(baseline["outseam"]), len(baseline["inseam"]))
+        self.assertNotIn("legRows", baseline)
         self.assertGreaterEqual(len(baseline["upperRows"]), 2)
         self.assertNotIn("crotchRise", baseline)
+
+        outseam = baseline["outseam"]
+        inseam = baseline["inseam"]
+        self.assertTrue(
+            all(outside[1] == inside[1] for outside, inside in zip(outseam, inseam))
+        )
+        self.assertTrue(
+            all(outside[0] > inside[0] for outside, inside in zip(outseam, inseam))
+        )
+        self.assertTrue(
+            all(
+                outseam[index][1] < outseam[index + 1][1]
+                for index in range(len(outseam) - 1)
+            )
+        )
 
         back_rise = baseline["backRise"]
         front_rise = baseline["frontRise"]
