@@ -94,7 +94,7 @@ class MethodSelectionTest(unittest.TestCase):
         self.assertGreaterEqual(len(baseline["rearDepthProfile"]), 2)
         self.assertGreaterEqual(len(baseline["legRows"]), 2)
         self.assertGreaterEqual(len(baseline["upperRows"]), 2)
-        self.assertGreater(baseline["crotchRise"]["endRise"], 0.0)
+        self.assertNotIn("crotchRise", baseline)
 
         back_rise = baseline["backRise"]
         front_rise = baseline["frontRise"]
@@ -102,6 +102,7 @@ class MethodSelectionTest(unittest.TestCase):
         self.assertEqual(len(front_rise), len(back_rise))
         self.assertEqual(back_rise[-1], front_rise[0])
         self.assertEqual(back_rise[-1][0], 0.0)
+        self.assertEqual(len(back_rise) + len(front_rise) - 1, 17)
         self.assertTrue(all(point[0] >= 0.0 for point in back_rise))
         self.assertTrue(all(point[0] <= 0.0 for point in front_rise))
         self.assertTrue(

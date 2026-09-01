@@ -178,15 +178,12 @@ def _load_pattern_baseline() -> dict[str, object]:
     baseline = document.get("baselineGeometry")
     if not isinstance(baseline, dict):
         raise ValueError("Wide Cargo pattern source has no baselineGeometry")
-    crotch = baseline.get("crotchRise")
-    if not isinstance(crotch, dict):
-        raise ValueError("Wide Cargo pattern source has no crotchRise")
-    centre_z = crotch.get("centreZ")
-    end_rise = crotch.get("endRise")
-    if not isinstance(centre_z, (int, float)) or not isinstance(end_rise, (int, float)):
-        raise ValueError(
-            "Wide Cargo crotchRise must contain numeric centreZ and endRise"
-        )
+    back_rise = _numeric_rows(baseline.get("backRise"), 2, "backRise")
+    front_rise = _numeric_rows(baseline.get("frontRise"), 2, "frontRise")
+    if len(back_rise) != len(front_rise):
+        raise ValueError("Wide Cargo frontRise and backRise point counts differ")
+    if back_rise[-1] != front_rise[0]:
+        raise ValueError("Wide Cargo frontRise and backRise do not share centre point")
     return {
         "frontDepthProfile": _numeric_rows(
             baseline.get("frontDepthProfile"), 2, "frontDepthProfile"
@@ -196,8 +193,7 @@ def _load_pattern_baseline() -> dict[str, object]:
         ),
         "legRows": _numeric_rows(baseline.get("legRows"), 3, "legRows"),
         "upperRows": _numeric_rows(baseline.get("upperRows"), 2, "upperRows"),
-        "crotchCentreZ": float(centre_z),
-        "crotchEndRise": float(end_rise),
+        "crotchCentre": back_rise + front_rise[1:],
     }
 
 
@@ -206,8 +202,7 @@ FRONT_DEPTH = PATTERN_BASELINE["frontDepthProfile"]
 REAR_DEPTH = PATTERN_BASELINE["rearDepthProfile"]
 LEG_SPECS = PATTERN_BASELINE["legRows"]
 UPPER_SPECS = PATTERN_BASELINE["upperRows"]
-CROTCH_CENTRE_Z = PATTERN_BASELINE["crotchCentreZ"]
-CROTCH_END_RISE = PATTERN_BASELINE["crotchEndRise"]
+CROTCH_CENTRE = PATTERN_BASELINE["crotchCentre"]
 
 
 def install_runtime_path_compat(implementation: ModuleType) -> None:
@@ -400,15 +395,11 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
 
     right_inner = _ring_chain(right_leg, right_inner_indices)
     left_inner = _ring_chain(left_leg, left_inner_indices)
-    centre_crotch_points = []
-    for index, (right_index, left_index) in enumerate(zip(right_inner, left_inner)):
-        right_vertex = mesh.vertices[right_index]
-        left_vertex = mesh.vertices[left_index]
-        t = index / (len(right_inner) - 1)
-        end_factor = abs(2.0 * t - 1.0)
-        y = (right_vertex[1] + left_vertex[1]) * 0.5
-        z = CROTCH_CENTRE_Z + CROTCH_END_RISE * end_factor**2
-        centre_crotch_points.append((0.0, y, z))
+    if len(CROTCH_CENTRE) != len(right_inner) or len(CROTCH_CENTRE) != len(left_inner):
+        raise ValueError(
+            "Wide Cargo crotch pattern point count does not match inner-leg chains"
+        )
+    centre_crotch_points = [(0.0, y, z) for y, z in CROTCH_CENTRE]
     centre_crotch = mesh.add_ring(centre_crotch_points)
     _bridge_chains(mesh, right_inner, centre_crotch)
     _bridge_chains(mesh, centre_crotch, left_inner)
