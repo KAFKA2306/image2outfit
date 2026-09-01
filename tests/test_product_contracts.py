@@ -43,20 +43,62 @@ class MethodSelectionTest(unittest.TestCase):
             )
         )
 
-    def test_loose_layered_requires_runtime_and_motion_evidence(self) -> None:
+    def test_panel_sewn_requires_pattern_and_motion_evidence(self) -> None:
         job = method_selection.read_json(
             ROOT / "config" / "products" / "siroino-wide-cargo" / "job.json"
         )
         report = method_selection.select(job, ROOT)
         self.assertTrue(report["passed"], report["errors"])
-        self.assertEqual(report["constructionProfile"], "loose-layered")
+        self.assertEqual(report["constructionProfile"], "panel-sewn")
         for value in (
-            "penetration-report",
-            "deformation-benchmark",
-            "runtime-performance",
+            "panel-graph",
+            "seam-graph",
+            "connectivity-audit",
+            "topology-audit",
+            "pbr-audit",
             "motion-review",
         ):
             self.assertIn(value, report["requiredCommercialEvidence"])
+
+    def test_wide_cargo_pattern_seams_reference_declared_boundaries(self) -> None:
+        path = (
+            ROOT
+            / "Assets"
+            / "GenWorks"
+            / "siroino-wide-cargo"
+            / "Source"
+            / "Patterns"
+            / "pattern-spec.json"
+        )
+        pattern = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(pattern["productId"], "siroino-wide-cargo")
+        self.assertEqual(pattern["status"], "WORKING")
+        self.assertEqual(pattern["units"], "m")
+        self.assertEqual(len(pattern["panels"]), pattern["acceptance"]["panelCount"])
+        self.assertEqual(
+            len(pattern["seamPairs"]), pattern["acceptance"]["seamPairCount"]
+        )
+
+        declared = {
+            f"{panel['id']}:{boundary}"
+            for panel in pattern["panels"]
+            for boundary in panel["boundaries"]
+        }
+        referenced = {boundary for pair in pattern["seamPairs"] for boundary in pair}
+        self.assertTrue(referenced <= declared)
+        self.assertTrue(set(pattern["openBoundaries"]) <= declared)
+        self.assertTrue(referenced.isdisjoint(pattern["openBoundaries"]))
+
+        baseline = pattern["baselineGeometry"]
+        self.assertGreaterEqual(len(baseline["frontDepthProfile"]), 2)
+        self.assertGreaterEqual(len(baseline["rearDepthProfile"]), 2)
+        self.assertGreaterEqual(len(baseline["legRows"]), 2)
+        self.assertGreaterEqual(len(baseline["upperRows"]), 2)
+        self.assertGreater(baseline["crotchRise"]["endRise"], 0.0)
+        self.assertIs(
+            pattern["acceptance"]["productionGeometryConsumerRequiredBeforeRelease"],
+            True,
+        )
 
     def test_versioned_build_entrypoint_is_rejected(self) -> None:
         job = method_selection.read_json(
@@ -81,8 +123,13 @@ class MethodSelectionTest(unittest.TestCase):
             )
             report = method_selection.validate_commercial_evidence(job, candidate, ROOT)
         self.assertFalse(report["passed"])
-        self.assertIn("runtime-performance", report["evidence"])
-        self.assertIn("motion-review", report["evidence"])
+        for value in (
+            "panel-graph",
+            "seam-graph",
+            "connectivity-audit",
+            "motion-review",
+        ):
+            self.assertIn(value, report["evidence"])
 
     def test_construction_contract_must_bind_its_product(self) -> None:
         job = method_selection.read_json(
