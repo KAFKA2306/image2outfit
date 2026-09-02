@@ -572,8 +572,10 @@ def reviewed_audit(implementation: ModuleType, baseline_audit) -> dict[str, obje
     front_curvature = front_centre_depth - front_side_depth
     rear_curvature = rear_centre_depth - rear_side_depth
 
+    if len(LEG_BOUNDARY_ROWS) < 4:
+        raise RuntimeError("Wide Cargo audit needs at least four leg boundary levels")
     upper_inner_thigh_gaps: dict[str, float] = {}
-    for level in (0.440, 0.520, 0.565):
+    for level, _, _ in LEG_BOUNDARY_ROWS[-4:]:
         row = [
             vertex for vertex in vertices if abs(float(vertex.co.z) - level) <= 0.001
         ]
