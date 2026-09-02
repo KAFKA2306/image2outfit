@@ -23,18 +23,7 @@ Markdown は入口と設計説明に限定します。変更され得る要件�
 
 ## 完了境界
 
-製品状態は `WORKING` / `COMPLETE` / `REJECTED` です。`COMPLETE` の判定は `config/genworks-handoff-policy.json` の `requiredCompletionGates` のみを基準にします。
-
-現在の必須 gate は次の8件です。
-
-- Blender 生成
-- 編集可能ソース
-- FBX
-- Prefab 宣言
-- 5方向 render evidence
-- 必須 pose evidence
-- 実画像を直接確認した visual appearance review
-- research trial
+製品状態は `WORKING` / `COMPLETE` / `REJECTED` です。`COMPLETE` の判定は `config/genworks-handoff-policy.json` の `requiredCompletionGates` のみを基準にします。必須 gate の一覧は README に複製せず、この policy を直接確認してください。
 
 画像の存在、ファイルサイズ、hash、CI 成功だけでは visual appearance review の PASS にはなりません。
 
