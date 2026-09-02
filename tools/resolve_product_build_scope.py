@@ -39,11 +39,25 @@ def changed_paths(
     return [line.strip() for line in output.splitlines() if line.strip()]
 
 
+def _jobs_for_build_scripts(root: Path) -> dict[str, set[str]]:
+    """Map each declared build script to the product jobs that own it."""
+    owners: dict[str, set[str]] = {}
+    for path in sorted((root / "config/products").glob("*/job.json")):
+        relative = path.relative_to(root).as_posix()
+        job = read_json(path)
+        build_script = job.get("buildScript")
+        if isinstance(build_script, str) and build_script:
+            owners.setdefault(build_script, set()).add(relative)
+    return owners
+
+
 def select_job(
     changed: Iterable[str], root: Path, *, include_pipeline_request: bool
 ) -> tuple[str | None, str]:
+    changed_paths = list(changed)
     jobs: set[str] = set()
-    for value in changed:
+    build_script_owners = _jobs_for_build_scripts(root)
+    for value in changed_paths:
         job_match = JOB_PATH.fullmatch(value)
         if job_match:
             jobs.add(value)
@@ -55,6 +69,8 @@ def select_job(
             candidate = f"config/products/{request_match.group(1)}/job.json"
             if (root / candidate).is_file():
                 jobs.add(candidate)
+            continue
+        jobs.update(build_script_owners.get(value, set()))
     if len(jobs) != 1:
         return None, f"selected-product-jobs-{len(jobs)}"
     return next(iter(jobs)), "selected"

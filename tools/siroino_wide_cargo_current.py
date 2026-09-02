@@ -6,6 +6,7 @@ from the target body. This prevents malformed source polygons from reappearing
 as hem-to-waist spikes while preserving a fitted seat, straight-wide legs,
 continuous inner-thigh coverage, waistband, knee panels, and cargo pockets.
 """
+
 from __future__ import annotations
 
 import json
@@ -15,7 +16,6 @@ from pathlib import Path
 
 import bpy
 from mathutils import Vector
-from mathutils.kdtree import KDTree
 
 TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
@@ -43,9 +43,7 @@ class MeshBuilder:
         count = len(lower)
         for index in range(count):
             nxt = (index + 1) % count
-            self.faces.append(
-                (lower[index], lower[nxt], upper[nxt], upper[index])
-            )
+            self.faces.append((lower[index], lower[nxt], upper[nxt], upper[index]))
 
     def add_box(
         self,
@@ -97,9 +95,7 @@ def asymmetric_ellipse_ring(
         sine = math.sin(angle)
         radius_x = outer_radius if side * cosine >= 0.0 else inner_radius
         radius_y = rear_depth if sine >= 0.0 else front_depth
-        points.append(
-            (side * center_x + cosine * radius_x, sine * radius_y, z)
-        )
+        points.append((side * center_x + cosine * radius_x, sine * radius_y, z))
     return points
 
 
@@ -189,24 +185,28 @@ def transfer_weights(
     body: bpy.types.Object,
     garment: bpy.types.Object,
 ) -> None:
-    tree = KDTree(len(body.data.vertices))
-    for vertex in body.data.vertices:
-        tree.insert(vertex.co, vertex.index)
-    tree.balance()
-    groups = {
-        group.name: garment.vertex_groups.new(name=group.name)
-        for group in body.vertex_groups
-    }
-    for garment_vertex in garment.data.vertices:
-        _, source_index, _ = tree.find(garment_vertex.co)
-        source_vertex = body.data.vertices[source_index]
-        for reference in source_vertex.groups:
-            source_group = body.vertex_groups[reference.group]
-            groups[source_group.name].add(
-                [garment_vertex.index],
-                reference.weight,
-                "REPLACE",
-            )
+    for group in body.vertex_groups:
+        garment.vertex_groups.new(name=group.name)
+
+    bpy.ops.object.select_all(action="DESELECT")
+    garment.select_set(True)
+    bpy.context.view_layer.objects.active = garment
+    modifier = garment.modifiers.new(name="Body Weight Transfer", type="DATA_TRANSFER")
+    modifier.object = body
+    modifier.use_vert_data = True
+    modifier.data_types_verts = {"VGROUP_WEIGHTS"}
+    modifier.vert_mapping = "POLYINTERP_NEAREST"
+    modifier.layers_vgroup_select_src = "ALL"
+    modifier.layers_vgroup_select_dst = "NAME"
+    modifier.mix_mode = "REPLACE"
+    modifier.mix_factor = 1.0
+    bpy.ops.object.modifier_apply(modifier=modifier.name)
+
+    unweighted = [vertex.index for vertex in garment.data.vertices if not vertex.groups]
+    if unweighted:
+        raise RuntimeError(
+            f"Interpolated body weight transfer left {len(unweighted)} vertices unweighted"
+        )
 
 
 def create_uv(garment: bpy.types.Object) -> None:
@@ -295,10 +295,16 @@ def audit() -> dict[str, object]:
         and obj.name != "Studio_Floor"
     )
     if garment is None:
-        return {"schemaVersion": 1, "passed": False, "checks": {"garmentMeshNames": garment_names}}
+        return {
+            "schemaVersion": 1,
+            "passed": False,
+            "checks": {"garmentMeshNames": garment_names},
+        }
 
     garment.data.calc_loop_triangles()
-    coordinates = [component for vertex in garment.data.vertices for component in vertex.co]
+    coordinates = [
+        component for vertex in garment.data.vertices for component in vertex.co
+    ]
     xs = [vertex.co.x for vertex in garment.data.vertices]
     ys = [vertex.co.y for vertex in garment.data.vertices]
     zs = [vertex.co.z for vertex in garment.data.vertices]
@@ -319,12 +325,15 @@ def audit() -> dict[str, object]:
         for vertex in garment.data.vertices
         if 0.535 <= vertex.co.z <= 0.705 and abs(vertex.co.x) <= 0.012
     )
-    shape_keys = 0 if garment.data.shape_keys is None else max(0, len(garment.data.shape_keys.key_blocks) - 1)
+    shape_keys = (
+        0
+        if garment.data.shape_keys is None
+        else max(0, len(garment.data.shape_keys.key_blocks) - 1)
+    )
     foot_intrusions = sum(
         1
         for vertex in garment.data.vertices
-        if vertex.co.z < 0.10
-        or (vertex.co.z < 0.18 and abs(vertex.co.y) > 0.100)
+        if vertex.co.z < 0.10 or (vertex.co.z < 0.18 and abs(vertex.co.y) > 0.100)
     )
     unweighted = sum(1 for vertex in garment.data.vertices if not vertex.groups)
     total_width = max(xs) - min(xs)
@@ -352,7 +361,9 @@ def audit() -> dict[str, object]:
         "garmentMeshNames": garment_names,
         "metrics": metrics,
         "singleMeshObjectPassed": garment_names == ["Cargo_Continuous_Pants"],
-        "finiteCoordinatesPassed": all(math.isfinite(float(value)) for value in coordinates),
+        "finiteCoordinatesPassed": all(
+            math.isfinite(float(value)) for value in coordinates
+        ),
         "topologyPassed": degenerates == 0,
         "sourceFaceIndependencePassed": min(zs) >= 0.10 and max(zs) <= 0.81,
         "spikeGuardPassed": maximum_edge <= 0.135 and maximum_z_span <= 0.105,
@@ -361,7 +372,8 @@ def audit() -> dict[str, object]:
         "shapeKeyIsolationPassed": shape_keys == 0,
         "weightingPassed": unweighted == 0,
         "footAndFloorClearancePassed": foot_intrusions == 0,
-        "controlledVolumePassed": 0.315 <= total_width <= 0.355 and 0.195 <= total_depth <= 0.235,
+        "controlledVolumePassed": 0.315 <= total_width <= 0.355
+        and 0.195 <= total_depth <= 0.235,
         "fittedSeatPassed": seat["width"] <= 0.330 and seat["rear"] >= 0.095,
         "innerThighCoveragePassed": center_coverage >= 12,
         "straightWideProfilePassed": (
@@ -386,7 +398,11 @@ def audit() -> dict[str, object]:
         "innerThighCoveragePassed",
         "straightWideProfilePassed",
     ]
-    return {"schemaVersion": 1, "passed": all(bool(checks[name]) for name in required), "checks": checks}
+    return {
+        "schemaVersion": 1,
+        "passed": all(bool(checks[name]) for name in required),
+        "checks": checks,
+    }
 
 
 def record(report: dict[str, object]) -> None:
@@ -400,7 +416,9 @@ def record(report: dict[str, object]) -> None:
     gates["latestGeometryRender"] = "PASS" if report["passed"] else "FAIL"
     gates["humanVisualReview"] = "PENDING"
     gates["humanPoseReview"] = "PENDING"
-    path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 build.create_outfit = create_outfit

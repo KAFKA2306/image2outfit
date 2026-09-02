@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-wide-cargo",
+  "status": "WORKING",
+  "units": "m",
+  "source": {
+    "kind": "verified-baseline-derived",
+    "baselineDesignRevision": "v74-centre-crotch-seam",
+    "note": "現行の実Blender基線で使っている寸法を、次の2D pattern / seam実装で検証可能な入力へ移すための正本データ。販売品質PASSを意味しない。"
+  },
+  "panels": [
+    {
+      "id": "front-left",
+      "semantic": "left-front-trouser",
+      "boundaries": ["waist", "outseam", "hem", "inseam", "centre-front"]
+    },
+    {
+      "id": "front-right",
+      "semantic": "right-front-trouser",
+      "boundaries": ["waist", "outseam", "hem", "inseam", "centre-front"]
+    },
+    {
+      "id": "back-left",
+      "semantic": "left-back-trouser",
+      "boundaries": ["waist", "outseam", "hem", "inseam", "centre-back"]
+    },
+    {
+      "id": "back-right",
+      "semantic": "right-back-trouser",
+      "boundaries": ["waist", "outseam", "hem", "inseam", "centre-back"]
+    }
+  ],
+  "seamPairs": [
+    ["front-left:centre-front", "front-right:centre-front"],
+    ["back-left:centre-back", "back-right:centre-back"],
+    ["front-left:outseam", "back-left:outseam"],
+    ["front-right:outseam", "back-right:outseam"],
+    ["front-left:inseam", "back-left:inseam"],
+    ["front-right:inseam", "back-right:inseam"]
+  ],
+  "openBoundaries": [
+    "front-left:waist",
+    "front-right:waist",
+    "back-left:waist",
+    "back-right:waist",
+    "front-left:hem",
+    "front-right:hem",
+    "back-left:hem",
+    "back-right:hem"
+  ],
+  "baselineGeometry": {
+    "frontDepthProfile": [
+      [0.105, 0.084],
+      [0.300, 0.087],
+      [0.500, 0.091],
+      [0.570, 0.095],
+      [0.620, 0.110],
+      [0.700, 0.120],
+      [0.840, 0.096]
+    ],
+    "rearDepthProfile": [
+      [0.105, 0.090],
+      [0.300, 0.094],
+      [0.500, 0.100],
+      [0.570, 0.106],
+      [0.620, 0.122],
+      [0.700, 0.136],
+      [0.840, 0.108]
+    ],
+    "outseam": [
+      [0.170, 0.105],
+      [0.171, 0.150],
+      [0.173, 0.200],
+      [0.175, 0.260],
+      [0.177, 0.320],
+      [0.179, 0.380],
+      [0.181, 0.440],
+      [0.182, 0.480],
+      [0.183, 0.520],
+      [0.183, 0.574]
+    ],
+    "inseam": [
+      [0.020, 0.105],
+      [0.020, 0.150],
+      [0.019, 0.200],
+      [0.018, 0.260],
+      [0.016, 0.320],
+      [0.012, 0.380],
+      [0.008, 0.440],
+      [0.007, 0.480],
+      [0.006, 0.520],
+      [0.004, 0.574]
+    ],
+    "upperRows": [
+      [0.595, 0.176],
+      [0.610, 0.178],
+      [0.640, 0.182],
+      [0.670, 0.184],
+      [0.700, 0.184],
+      [0.735, 0.179],
+      [0.765, 0.172],
+      [0.790, 0.163],
+      [0.815, 0.153],
+      [0.840, 0.145]
+    ],
+    "backRise": [
+      [0.10591253644314869, 0.6000000000000000],
+      [0.10387745675361094, 0.59390625],
+      [0.09785042465618082, 0.588625],
+      [0.08806305561436406, 0.5841562499999999],
+      [0.07489147273161778, 0.5804999999999999],
+      [0.058841852551417224, 0.57765625],
+      [0.040530972976556806, 0.5756249999999999],
+      [0.020662510840238835, 0.57440625],
+      [0.0, 0.574]
+    ],
+    "frontRise": [
+      [0.0, 0.574],
+      [-0.01852220506255166, 0.57440625],
+      [-0.036332612171921706, 0.5756249999999999],
+      [-0.05274677737108845, 0.57765625],
+      [-0.06713391349661785, 0.5804999999999999],
+      [-0.07894113097560462, 0.5841562499999999],
+      [-0.08771468506189518, 0.588625],
+      [-0.09311741299221923, 0.59390625],
+      [-0.09494169096209913, 0.6000000000000000]
+    ]
+  },
+  "acceptance": {
+    "panelCount": 4,
+    "seamPairCount": 6,
+    "allSeamReferencesMustExist": true,
+    "waistAndHemRemainOpen": true,
+    "productionGeometryConsumerRequiredBeforeRelease": true
+  }
+}

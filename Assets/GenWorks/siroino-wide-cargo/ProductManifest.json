@@ -11,7 +11,7 @@
   "documentationPath": "Assets/GenWorks/siroino-wide-cargo/README.md",
   "demoScenePath": "Assets/GenWorks/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
   "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
-  "generatedAt": "2026-08-02T08:31:52.893383Z",
+  "generatedAt": "2026-09-01T16:26:04.913665Z",
   "blenderVersion": "4.4.3",
   "completionPolicyPath": "config/genworks-handoff-policy.json",
   "completionPolicySchemaVersion": 2,
@@ -37,20 +37,20 @@
       "reason": "The rendered candidate contained extreme spike vertices and failed finite-bounds and foot-exclusion auditing. It also had no completed Unity import/save/reload or Modular Avatar checkpoint."
     },
     "blockers": [
-      "現行mainの5方向レンダリングでは、腰回りが別部品の筒のように見え、脚部が円筒に近く、カーゴポケットも硬い直方体に見えるため、visualAppearanceReviewはFAIL。"
+      "現行exact-headのHosted Blender実artifactでFBX / Blend、5方向render、neutral / arms-up / arm-cross / crouch / sit / proneの6姿勢renderを生成でき、995 vertices / 1,876 triangles、degenerate triangles 0、unweighted vertices 0、boundary edges 112を維持している。一方、FRONT / BACKの股下中央線、腰から左右脚へ切り替わる棚状の段差、側面の直線的な形状、crouch / sit時の腰から大腿への急な変形が残るためvisualAppearanceReviewはFAIL。run番号とartifact IDはPRのexact-head証拠を参照する。"
     ]
   },
   "metrics": {
     "meshObjects": 1,
-    "vertices": 1168,
-    "triangles": 2040,
+    "vertices": 995,
+    "triangles": 1876,
     "materialSlots": 2,
     "shapeKeys": 0,
     "maxBoneInfluences": 3,
     "unweightedVertices": 0,
     "weightSumErrors": 0,
     "degenerateTriangles": 0,
-    "boundaryEdges": 288
+    "boundaryEdges": 112
   },
   "technicalGates": {
     "blender": "PASS",
@@ -64,7 +64,7 @@
     "vrchatBuildAndTest": "PENDING",
     "humanRuntimeReview": "PENDING"
   },
-  "designRevision": "v38-reviewed-converged-crotch",
+  "designRevision": "v74-centre-crotch-seam",
   "wearabilityAudit": {
     "schemaVersion": 1,
     "passed": true,
@@ -73,53 +73,94 @@
         "Cargo_Continuous_Pants"
       ],
       "metrics": {
-        "vertices": 1168,
-        "triangles": 2040,
+        "vertices": 995,
+        "triangles": 1876,
         "minimumZ": 0.10499999672174454,
         "maximumZ": 0.8399999737739563,
-        "totalWidth": 0.35199999809265137,
-        "totalDepth": 0.26600000262260437,
-        "maximumEdgeLength": 0.12001666848481464,
-        "maximumEdgeZSpan": 0.12000000476837158,
+        "totalWidth": 0.36899998784065247,
+        "totalDepth": 0.25600000470876694,
+        "maximumEdgeLength": 0.09983612762564116,
+        "maximumEdgeZSpan": 0.06000000238418579,
         "degenerateTriangles": 0,
         "uvLayers": 1,
         "materialSlots": 2,
         "shapeKeys": 0,
         "footIntrusionVertices": 0,
         "unweightedVertices": 0,
-        "centerCoverageVertices": 160,
+        "centerCoverageVertices": 37,
         "bands": {
           "seat": {
-            "width": 0.35199999809265137,
-            "depth": 0.26600000262260437,
+            "width": 0.36800000071525574,
+            "depth": 0.25600000470876694,
             "rear": 0.13600000739097595
           },
           "thigh": {
-            "width": 0.328000009059906,
-            "depth": 0.18900000303983688,
-            "rear": 0.09700000286102295
+            "width": 0.36899998784065247,
+            "depth": 0.20085422694683075,
+            "rear": 0.10591253638267517
           },
           "knee": {
-            "width": 0.3199999928474426,
-            "depth": 0.1719999983906746,
-            "rear": 0.08799999952316284
+            "width": 0.3580000102519989,
+            "depth": 0.18451999872922897,
+            "rear": 0.09611199796199799
           },
           "hem": {
-            "width": 0.3140000104904175,
-            "depth": 0.1639999970793724,
-            "rear": 0.08399999886751175
+            "width": 0.34200000762939453,
+            "depth": 0.17494629323482513,
+            "rear": 0.09054073691368103
           }
         },
-        "frontCentreCoverageVertices": 41,
-        "rearCentreCoverageVertices": 41,
+        "frontCentreCoverageVertices": 11,
+        "rearCentreCoverageVertices": 11,
         "centreCoverageLevels": [
+          0.565,
+          0.574,
+          0.576,
+          0.578,
+          0.581,
+          0.584,
+          0.589,
+          0.594,
+          0.595,
+          0.6,
+          0.61,
           0.64,
+          0.67,
           0.7,
           0.735,
-          0.75,
-          0.775,
-          0.79
-        ]
+          0.765,
+          0.79,
+          0.815
+        ],
+        "crotchPanelVertices": 27,
+        "crossSectionCurvature": {
+          "frontDepthDifference": 0.03713922910392284,
+          "rearDepthDifference": 0.04746828501423199
+        },
+        "upperInnerThighGapByLevel": {
+          "0.440": 0.01600000075995922,
+          "0.520": 0.012000000104308128,
+          "0.565": 0.00800000037997961
+        },
+        "maximumUpperInnerThighGap": 0.01600000075995922,
+        "silhouetteByLevel": {
+          "hip": {
+            "width": 0.36800000071525574,
+            "depth": 0.25600000470876694
+          },
+          "waist": {
+            "width": 0.28999999165534973,
+            "depth": 0.20400000363588333
+          },
+          "upperThigh": {
+            "width": 0.3659999966621399,
+            "depth": 0.1929825022816658
+          },
+          "hem": {
+            "width": 0.3400000035762787,
+            "depth": 0.17400000244379044
+          }
+        }
       },
       "singleMeshObjectPassed": true,
       "finiteCoordinatesPassed": true,
@@ -135,11 +176,17 @@
       "fittedSeatPassed": true,
       "innerThighCoveragePassed": true,
       "straightWideProfilePassed": true,
+      "crossSectionCurvaturePassed": true,
+      "upperInnerThighClearancePassed": true,
+      "waistTaperPassed": true,
+      "legTaperPassed": true,
       "waistCoveragePassed": true,
       "frontCentreCoveragePassed": true,
       "rearCentreCoveragePassed": true,
       "continuousCentreLevelsPassed": true,
-      "panelFreeTransitionPassed": true
+      "crotchPanelCoveragePassed": true,
+      "panelFreeTransitionPassed": true,
+      "armatureObjectParentPassed": true
     }
   }
 }

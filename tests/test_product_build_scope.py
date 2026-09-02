@@ -74,6 +74,60 @@ class ProductBuildScopeTest(unittest.TestCase):
         self.assertEqual(selected, "config/products/demo/job.json")
         self.assertEqual(reason, "selected")
 
+    def test_declared_build_script_selects_its_product(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self._root(directory)
+            selected, reason = scope.select_job(
+                ["tools/demo_build.py"],
+                root,
+                include_pipeline_request=True,
+            )
+        self.assertEqual(selected, "config/products/demo/job.json")
+        self.assertEqual(reason, "selected")
+
+    def test_shared_build_script_does_not_choose_arbitrarily(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self._root(directory)
+            source = json.loads(
+                (root / "config/products/demo/job.json").read_text(encoding="utf-8")
+            )
+            other = dict(source)
+            other["id"] = "other"
+            other["productName"] = "Other"
+            other["productRoot"] = "Assets/GenWorks/other"
+            other["productManifestPath"] = "Assets/GenWorks/other/ProductManifest.json"
+            for field in (
+                "blendPath",
+                "fbxAssetPath",
+                "prefabAssetPath",
+                "integratedPrefabAssetPath",
+            ):
+                other[field] = str(other[field]).replace(
+                    "Assets/GenWorks/demo/", "Assets/GenWorks/other/"
+                )
+            (root / "config/products/other").mkdir(parents=True)
+            (root / "config/products/other/job.json").write_text(
+                json.dumps(other), encoding="utf-8"
+            )
+            selected, reason = scope.select_job(
+                ["tools/demo_build.py"],
+                root,
+                include_pipeline_request=True,
+            )
+        self.assertIsNone(selected)
+        self.assertEqual(reason, "selected-product-jobs-2")
+
+    def test_unrelated_tool_does_not_select_a_product(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self._root(directory)
+            selected, reason = scope.select_job(
+                ["tools/unrelated.py"],
+                root,
+                include_pipeline_request=True,
+            )
+        self.assertIsNone(selected)
+        self.assertEqual(reason, "selected-product-jobs-0")
+
     def test_self_hosted_scope_does_not_infer_pipeline_request(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self._root(directory)
