@@ -85,6 +85,17 @@ class ProductBuildScopeTest(unittest.TestCase):
         self.assertEqual(selected, "config/products/demo/job.json")
         self.assertEqual(reason, "selected")
 
+    def test_product_pattern_selects_its_product(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = self._root(directory)
+            selected, reason = scope.select_job(
+                ["Assets/GenWorks/demo/Source/Patterns/pattern-spec.json"],
+                root,
+                include_pipeline_request=True,
+            )
+        self.assertEqual(selected, "config/products/demo/job.json")
+        self.assertEqual(reason, "selected")
+
     def test_shared_build_script_does_not_choose_arbitrarily(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = self._root(directory)
@@ -196,6 +207,8 @@ class ProductBuildScopeTest(unittest.TestCase):
             self.assertEqual(len(invocation_lines), 1, path.name)
             self.assertNotIn("Only schemaVersion 2 jobs are accepted", text)
             self.assertNotIn("selected-product-jobs-", text)
+        hosted = workflows[0].read_text(encoding="utf-8")
+        self.assertEqual(hosted.count("Assets/GenWorks/**/Source/Patterns/**"), 2)
 
 
 if __name__ == "__main__":
