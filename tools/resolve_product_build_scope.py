@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import subprocess
@@ -42,15 +43,42 @@ def changed_paths(
     return [line.strip() for line in output.splitlines() if line.strip()]
 
 
+def _local_tool_dependencies(root: Path, build_script: str) -> set[str]:
+    """Return local tools/*.py files imported by a product build script."""
+    discovered = {build_script}
+    pending = [build_script]
+    while pending:
+        relative = pending.pop()
+        path = root / relative
+        if not path.is_file() or path.suffix != ".py":
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8-sig"), filename=relative)
+        module_names: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                module_names.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                module_names.add(node.module)
+        for module_name in module_names:
+            candidate = f"tools/{module_name.replace('.', '/')}.py"
+            if candidate in discovered or not (root / candidate).is_file():
+                continue
+            discovered.add(candidate)
+            pending.append(candidate)
+    return discovered
+
+
 def _jobs_for_build_scripts(root: Path) -> dict[str, set[str]]:
-    """Map each declared build script to the product jobs that own it."""
+    """Map each build script and its local Python dependencies to product jobs."""
     owners: dict[str, set[str]] = {}
     for path in sorted((root / "config/products").glob("*/job.json")):
         relative = path.relative_to(root).as_posix()
         job = read_json(path)
         build_script = job.get("buildScript")
-        if isinstance(build_script, str) and build_script:
-            owners.setdefault(build_script, set()).add(relative)
+        if not isinstance(build_script, str) or not build_script:
+            continue
+        for dependency in _local_tool_dependencies(root, build_script):
+            owners.setdefault(dependency, set()).add(relative)
     return owners
 
 
