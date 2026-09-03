@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
-"""Fully procedural, source-face-free Siroino wide cargo trousers.
-
-All garment geometry is generated in one mesh and only skin weights are sampled
-from the target body. This prevents malformed source polygons from reappearing
-as hem-to-waist spikes while preserving a fitted seat, straight-wide legs,
-continuous inner-thigh coverage, waistband, knee panels, and cargo pockets.
-"""
+"""Shared Blender runtime helpers for the canonical Wide Cargo product builder."""
 
 from __future__ import annotations
 
-import json
 import math
 import sys
 from pathlib import Path
@@ -21,10 +14,7 @@ TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import siroino_wide_cargo_release_refit_v23 as v23
-
-build = v23.build
-base = v23.base
+import siroino_wide_cargo_build as build
 
 
 class MeshBuilder:
@@ -37,148 +27,12 @@ class MeshBuilder:
         self.vertices.extend(points)
         return list(range(start, start + len(points)))
 
-    def bridge(self, lower: list[int], upper: list[int]) -> None:
-        if len(lower) != len(upper):
-            raise ValueError("ring sizes differ")
-        count = len(lower)
-        for index in range(count):
-            nxt = (index + 1) % count
-            self.faces.append((lower[index], lower[nxt], upper[nxt], upper[index]))
-
-    def add_box(
-        self,
-        minimum: tuple[float, float, float],
-        maximum: tuple[float, float, float],
-    ) -> None:
-        x0, y0, z0 = minimum
-        x1, y1, z1 = maximum
-        start = len(self.vertices)
-        self.vertices.extend(
-            [
-                (x0, y0, z0),
-                (x1, y0, z0),
-                (x1, y1, z0),
-                (x0, y1, z0),
-                (x0, y0, z1),
-                (x1, y0, z1),
-                (x1, y1, z1),
-                (x0, y1, z1),
-            ]
-        )
-        self.faces.extend(
-            [
-                (start + 0, start + 3, start + 2, start + 1),
-                (start + 4, start + 5, start + 6, start + 7),
-                (start + 0, start + 1, start + 5, start + 4),
-                (start + 1, start + 2, start + 6, start + 5),
-                (start + 2, start + 3, start + 7, start + 6),
-                (start + 3, start + 0, start + 4, start + 7),
-            ]
-        )
-
-
-def asymmetric_ellipse_ring(
-    *,
-    center_x: float,
-    inner_radius: float,
-    outer_radius: float,
-    front_depth: float,
-    rear_depth: float,
-    z: float,
-    side: float,
-    segments: int,
-) -> list[tuple[float, float, float]]:
-    points: list[tuple[float, float, float]] = []
-    for index in range(segments):
-        angle = 2.0 * math.pi * index / segments
-        cosine = math.cos(angle)
-        sine = math.sin(angle)
-        radius_x = outer_radius if side * cosine >= 0.0 else inner_radius
-        radius_y = rear_depth if sine >= 0.0 else front_depth
-        points.append((side * center_x + cosine * radius_x, sine * radius_y, z))
-    return points
-
-
-def pelvis_ring(
-    *,
-    half_width: float,
-    front_depth: float,
-    rear_depth: float,
-    z: float,
-    segments: int,
-) -> list[tuple[float, float, float]]:
-    points: list[tuple[float, float, float]] = []
-    for index in range(segments):
-        angle = 2.0 * math.pi * index / segments
-        sine = math.sin(angle)
-        depth = rear_depth if sine >= 0.0 else front_depth
-        points.append((math.cos(angle) * half_width, sine * depth, z))
-    return points
-
 
 def build_geometry(segments: int = 48) -> MeshBuilder:
-    mesh = MeshBuilder()
-
-    # Fitted waist and seat. The lower ring overlaps the upper leg rings, so no
-    # horizontal skin gap exists even though components remain topologically
-    # independent within one exported mesh object.
-    pelvis_specs = [
-        (0.555, 0.160, 0.100, 0.110),
-        (0.625, 0.158, 0.098, 0.110),
-        (0.715, 0.151, 0.094, 0.106),
-        (0.805, 0.138, 0.088, 0.097),
-    ]
-    pelvis_rings = [
-        mesh.add_ring(
-            pelvis_ring(
-                half_width=width,
-                front_depth=front,
-                rear_depth=rear,
-                z=z,
-                segments=segments,
-            )
-        )
-        for z, width, front, rear in pelvis_specs
-    ]
-    for lower, upper in zip(pelvis_rings, pelvis_rings[1:]):
-        mesh.bridge(lower, upper)
-
-    # Straight-wide legs with centre overlap at the upper thigh and a controlled
-    # 20–24 mm gap below the crotch. Width changes only modestly to avoid the
-    # oversized cylindrical silhouette rejected in v30.
-    leg_specs = [
-        (0.105, 0.071, 0.055, 0.086, 0.080, 0.084),
-        (0.200, 0.072, 0.056, 0.087, 0.082, 0.086),
-        (0.320, 0.073, 0.058, 0.088, 0.084, 0.088),
-        (0.440, 0.074, 0.063, 0.089, 0.086, 0.090),
-        (0.540, 0.075, 0.076, 0.089, 0.088, 0.093),
-        (0.625, 0.075, 0.084, 0.087, 0.090, 0.097),
-        (0.700, 0.075, 0.086, 0.084, 0.091, 0.098),
-    ]
-    for side in (-1.0, 1.0):
-        rings = [
-            mesh.add_ring(
-                asymmetric_ellipse_ring(
-                    center_x=center,
-                    inner_radius=inner,
-                    outer_radius=outer,
-                    front_depth=front,
-                    rear_depth=rear,
-                    z=z,
-                    side=side,
-                    segments=segments,
-                )
-            )
-            for z, center, inner, outer, front, rear in leg_specs
-        ]
-        for lower, upper in zip(rings, rings[1:]):
-            mesh.bridge(lower, upper)
-
-    # Low-profile cargo pockets on the outer thighs. They remain part of the
-    # same mesh object and receive the same armature deformation.
-    mesh.add_box((-0.172, -0.060, 0.475), (-0.151, 0.064, 0.605))
-    mesh.add_box((0.151, -0.060, 0.475), (0.172, 0.064, 0.605))
-    return mesh
+    del segments
+    raise RuntimeError(
+        "Wide Cargo geometry must be supplied by tools/siroino_wide_cargo_product.py"
+    )
 
 
 def transfer_weights(
@@ -219,13 +73,37 @@ def create_uv(garment: bpy.types.Object) -> None:
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
+def tune_material(
+    material: bpy.types.Material,
+    *,
+    base: tuple[float, float, float],
+    roughness: float,
+    metallic: float = 0.0,
+) -> None:
+    material.diffuse_color = (*base, 1.0)
+    material.use_nodes = True
+    shader = (
+        material.node_tree.nodes.get("Principled BSDF")
+        if material.node_tree is not None
+        else None
+    )
+    if shader is None:
+        return
+    if "Base Color" in shader.inputs:
+        shader.inputs["Base Color"].default_value = (*base, 1.0)
+    if "Roughness" in shader.inputs:
+        shader.inputs["Roughness"].default_value = roughness
+    if "Metallic" in shader.inputs:
+        shader.inputs["Metallic"].default_value = metallic
+
+
 def assign_materials(
     garment: bpy.types.Object,
     fabric: bpy.types.Material,
     strap: bpy.types.Material,
 ) -> None:
-    base.tune_material(fabric, base=(0.020, 0.025, 0.036), roughness=0.78)
-    base.tune_material(strap, base=(0.005, 0.007, 0.011), roughness=0.40)
+    tune_material(fabric, base=(0.020, 0.025, 0.036), roughness=0.78)
+    tune_material(strap, base=(0.005, 0.007, 0.011), roughness=0.40)
     garment.data.materials.clear()
     garment.data.materials.append(fabric)
     garment.data.materials.append(strap)
@@ -405,30 +283,24 @@ def audit() -> dict[str, object]:
     }
 
 
-def record(report: dict[str, object]) -> None:
+def save_distribution_blend() -> None:
     _, job = build.c.load_job()
-    path = build.c.repo_path(job["productManifestPath"])
-    manifest = json.loads(path.read_text(encoding="utf-8-sig"))
-    manifest["status"] = "WORKING"
-    manifest["designRevision"] = "v32-procedural-source-face-free"
-    manifest["wearabilityAudit"] = report
-    gates = manifest.setdefault("technicalGates", {})
-    gates["latestGeometryRender"] = "PASS" if report["passed"] else "FAIL"
-    gates["humanVisualReview"] = "PENDING"
-    gates["humanPoseReview"] = "PENDING"
-    path.write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    blend_path = build.c.repo_path(job["blendPath"])
+    for obj in list(bpy.data.objects):
+        preview_only = (
+            obj.name.startswith("SiroinoSotai_PC")
+            or obj.name == "Studio_Floor"
+            or obj.name == "Product_Camera"
+            or obj.type in {"LIGHT", "CAMERA"}
+        )
+        if preview_only:
+            bpy.data.objects.remove(obj, do_unlink=True)
+    for collection in (bpy.data.meshes, bpy.data.materials, bpy.data.images):
+        for datablock in list(collection):
+            if datablock.users == 0:
+                collection.remove(datablock)
+    blend_path.parent.mkdir(parents=True, exist_ok=True)
+    bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
 
 
-build.create_outfit = create_outfit
-
-
-if __name__ == "__main__":
-    build.main()
-    result = audit()
-    record(result)
-    base.save_distribution_blend()
-    if not result["passed"]:
-        raise RuntimeError(f"v32 procedural garment audit failed: {result}")
-    raise SystemExit(0)
+base = sys.modules[__name__]
