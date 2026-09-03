@@ -15,6 +15,9 @@ from contract_io import canonical_product_root, read_json, validate_schema_file
 
 JOB_PATH = re.compile(r"^config/products/([a-z0-9][a-z0-9._-]*)/job\.json$")
 REQUEST_PATH = re.compile(r"^config/pipeline/requests/([a-z0-9][a-z0-9._-]*)\.json$")
+PATTERN_PATH = re.compile(
+    r"^Assets/GenWorks/([a-z0-9][a-z0-9._-]*)/Source/Patterns/.+$"
+)
 ZERO_SHA = "0" * 40
 
 
@@ -67,6 +70,12 @@ def select_job(
         )
         if request_match:
             candidate = f"config/products/{request_match.group(1)}/job.json"
+            if (root / candidate).is_file():
+                jobs.add(candidate)
+            continue
+        pattern_match = PATTERN_PATH.fullmatch(value)
+        if pattern_match:
+            candidate = f"config/products/{pattern_match.group(1)}/job.json"
             if (root / candidate).is_file():
                 jobs.add(candidate)
             continue
