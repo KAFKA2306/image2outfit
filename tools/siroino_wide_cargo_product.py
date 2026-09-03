@@ -279,6 +279,31 @@ def _circumferential_points(
     return points
 
 
+def _rise_transition_points(
+    *,
+    half_width: float,
+    count: int,
+) -> list[tuple[float, float, float]]:
+    """Shape the first upper boundary from the canonical outseam and rise heights."""
+    leg_top_z = LEG_BOUNDARY_ROWS[-1][0]
+    rear_rise_z = CROTCH_CENTRE[0][1]
+    front_rise_z = CROTCH_CENTRE[-1][1]
+    if rear_rise_z <= leg_top_z or front_rise_z <= leg_top_z:
+        raise ValueError("Wide Cargo rise must finish above the top leg boundary")
+
+    points = []
+    for index in range(count):
+        angle = 2.0 * math.pi * index / count
+        sine = math.sin(angle)
+        rise_z = rear_rise_z if sine >= 0.0 else front_rise_z
+        z = leg_top_z + (rise_z - leg_top_z) * abs(sine) ** 1.5
+        x = half_width * math.cos(angle)
+        depth = _profile_value(z, REAR_DEPTH if sine >= 0.0 else FRONT_DEPTH)
+        y = depth * sine
+        points.append((x, y, z))
+    return points
+
+
 def _bridge_closed_rings(mesh, lower: list[int], upper: list[int]) -> None:
     if len(lower) != len(upper):
         raise ValueError("Wide Cargo ring sizes differ")
@@ -372,7 +397,21 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
         for lower, upper in zip(leg_rows[side], leg_rows[side][1:]):
             _bridge_closed_rings(mesh, lower, upper)
 
+    first_upper_z, first_upper_half_width = UPPER_SPECS[0]
+    leg_top_z = LEG_BOUNDARY_ROWS[-1][0]
+    rear_rise_z = CROTCH_CENTRE[0][1]
+    front_rise_z = CROTCH_CENTRE[-1][1]
+    if not leg_top_z < first_upper_z <= min(rear_rise_z, front_rise_z):
+        raise ValueError("Wide Cargo first upper row is outside the rise transition")
     upper_rows = [
+        mesh.add_ring(
+            _rise_transition_points(
+                half_width=first_upper_half_width,
+                count=ring_count,
+            )
+        )
+    ]
+    upper_rows.extend(
         mesh.add_ring(
             _circumferential_points(
                 centre_x=0.0,
@@ -381,8 +420,8 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
                 count=ring_count,
             )
         )
-        for z, half_width in UPPER_SPECS
-    ]
+        for z, half_width in UPPER_SPECS[1:]
+    )
     for lower, upper in zip(upper_rows, upper_rows[1:]):
         _bridge_closed_rings(mesh, lower, upper)
 
