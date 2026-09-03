@@ -12,12 +12,14 @@ on:
     paths:
       - config/products/**/job.json
       - config/pipeline/requests/**
+      - Assets/GenWorks/**/Source/Patterns/**
       - .github/workflows/build-product-hosted.yml
   pull_request:
     branches: [main]
     paths:
       - config/products/**
       - config/pipeline/requests/**
+      - Assets/GenWorks/**/Source/Patterns/**
       - src/image2outfit/**
       - tools/**
       - tests/test_pipeline_*.py
