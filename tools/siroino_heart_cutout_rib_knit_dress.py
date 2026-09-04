@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Build the Siroino heart-cutout rib-knit long dress and review renders."""
+
 from __future__ import annotations
 
 import json
@@ -174,8 +175,10 @@ def arm_warmer(
         radius = 0.031 - 0.008 * t + 0.004 * max(0.0, (t - 0.78) / 0.22)
         for segment in range(segments):
             angle = math.tau * segment / segments
-            point = center + axis_a * (radius * math.cos(angle)) + axis_b * (
-                radius * math.sin(angle)
+            point = (
+                center
+                + axis_a * (radius * math.cos(angle))
+                + axis_b * (radius * math.sin(angle))
             )
             vertices.append(tuple(point))
             uvs.append((segment / segments, t))
@@ -244,7 +247,11 @@ def side_ties(
         cords.append(
             common.curve_tube(
                 f"Side_Tail_{side}_A",
-                [(x, y - 0.003, z), (x + sign * 0.015, y - 0.010, 0.635), (x + sign * 0.012, y - 0.008, 0.585)],
+                [
+                    (x, y - 0.003, z),
+                    (x + sign * 0.015, y - 0.010, 0.635),
+                    (x + sign * 0.012, y - 0.008, 0.585),
+                ],
                 0.00135,
                 material,
                 armature,
@@ -254,7 +261,11 @@ def side_ties(
         cords.append(
             common.curve_tube(
                 f"Side_Tail_{side}_B",
-                [(x, y - 0.003, z), (x + sign * 0.026, y - 0.006, 0.640), (x + sign * 0.030, y - 0.004, 0.600)],
+                [
+                    (x, y - 0.003, z),
+                    (x + sign * 0.026, y - 0.006, 0.640),
+                    (x + sign * 0.030, y - 0.004, 0.600),
+                ],
                 0.00135,
                 material,
                 armature,
@@ -335,7 +346,7 @@ def write_manifest(
         "prefab": job["prefabAssetPath"],
         "integratedPrefab": job["integratedPrefabAssetPath"],
         "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"),
-        "poseReview": f'{job["productRoot"]}/Previews/{job["id"]}-pose-review.webp',
+        "poseReview": f"{job['productRoot']}/Previews/{job['id']}-pose-review.webp",
     }
     manifest["metrics"] = measured
     manifest["fiveViewEvidence"] = {
@@ -350,7 +361,9 @@ def write_manifest(
         "Render and inspect all six required poses.",
         "Pass direct visualAppearanceReview against the supplied reference before COMPLETE.",
     ]
-    path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     return path
 
 
@@ -446,11 +459,10 @@ def main() -> int:
     camera.data.ortho_scale = 1.16
     common.preview_pose(armature)
     previews = {
-        name: common.repo_path(value)
-        for name, value in job["previewPaths"].items()
+        name: common.repo_path(value) for name, value in job["previewPaths"].items()
     }
     common.render_views(camera, previews)
-    multiview = product_root / "Previews" / f'{job["id"]}-multiview.webp'
+    multiview = product_root / "Previews" / f"{job['id']}-multiview.webp"
     common.contact_sheet(previews, multiview)
 
     common.reset_pose(armature)
