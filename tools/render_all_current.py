@@ -331,7 +331,7 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
         images = "".join(
             f'<figure><img loading="lazy" src="../{asset["href"]}" '
             f'alt="{product["productId"]} {asset["name"]}">'
-            f'<figcaption>{asset["name"]}</figcaption></figure>'
+            f"<figcaption>{asset['name']}</figcaption></figure>"
             for asset in product["assets"]
         )
         if not images:
@@ -339,16 +339,16 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
         cards.append(
             "<section>"
             f'<h2 id="{product["productId"]}">{product["productId"]}</h2>'
-            f'<p>state={product["state"]} · '
-            f'visualAppearanceReview={product["visualAppearanceReview"]} · '
-            f'source={product["sourceKind"]} · WebP={product["webpCount"]}</p>'
+            f"<p>state={product['state']} · "
+            f"visualAppearanceReview={product['visualAppearanceReview']} · "
+            f"source={product['sourceKind']} · WebP={product['webpCount']}</p>"
             f'<div class="grid">{images}</div>'
             "</section>"
         )
 
     (io_root / "index.html").write_text(
-        "<!doctype html><html lang=\"ja\"><head><meta charset=\"utf-8\">"
-        "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+        '<!doctype html><html lang="ja"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
         "<title>image2outfit io WebP previews</title>"
         "<style>body{font-family:system-ui,sans-serif;margin:24px;background:#0f1117;color:#f5f7fb}"
         "a{color:#8bdcff}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}"
