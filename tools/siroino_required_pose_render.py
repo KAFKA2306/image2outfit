@@ -195,7 +195,28 @@ def main() -> int:
         bpy.ops.render.render(write_still=True)
         paths[name] = path
     apply_pose(armatures, base_transforms, "neutral")
-    sheet(paths, root / "Previews" / "siroino-wide-cargo-pose-review.webp")
+    sheet_path = root / "Previews" / f"{job['id']}-pose-review.webp"
+    sheet(paths, sheet_path)
+
+    manifest_path = root / "ProductManifest.json"
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest.setdefault("technicalGates", {})["poseEvidence"] = "PASS"
+        manifest["poseEvidence"] = {
+            name: {
+                "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": common.sha256(path),
+            }
+            for name, path in paths.items()
+        }
+        manifest["poseEvidence"]["sheet"] = {
+            "path": str(sheet_path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": common.sha256(sheet_path),
+        }
+        manifest_path.write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     print(
         json.dumps(
             {
