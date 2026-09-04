@@ -49,7 +49,9 @@ def clear(
         bone.scale = (1.0, 1.0, 1.0)
 
 
-def rotate(armature: bpy.types.Object, name: str, degrees: tuple[float, float, float]) -> None:
+def rotate(
+    armature: bpy.types.Object, name: str, degrees: tuple[float, float, float]
+) -> None:
     bone = armature.pose.bones.get(name)
     if bone is not None:
         bone.rotation_mode = "XYZ"
