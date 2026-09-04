@@ -224,7 +224,9 @@ class ReviewConsoleTest(unittest.TestCase):
         rejected.mkdir(parents=True)
         (rejected / "front.webp").write_bytes(b"rejected-front")
         (rejected / "back.webp").write_bytes(b"rejected-back")
-        manifest = json.loads((product / "ProductManifest.json").read_text(encoding="utf-8"))
+        manifest = json.loads(
+            (product / "ProductManifest.json").read_text(encoding="utf-8")
+        )
         manifest["technicalGates"] = {"visualAppearanceReview": "FAIL"}
         (product / "ProductManifest.json").write_text(
             json.dumps(manifest), encoding="utf-8"
