@@ -43,7 +43,7 @@ class HeartCutoutRibKnitContractTests(unittest.TestCase):
         source = (ROOT / "tools" / "siroino_required_pose_render.py").read_text(
             encoding="utf-8"
         )
-        self.assertIn('f"{job[\'id\']}-pose-review.webp"', source)
+        self.assertIn("f\"{job['id']}-pose-review.webp\"", source)
         self.assertNotIn("siroino-wide-cargo-pose-review.webp", source)
 
     def test_manifest_starts_working_without_false_visual_pass(self) -> None:
