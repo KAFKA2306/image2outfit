@@ -21,7 +21,9 @@ SPEC.loader.exec_module(MODULE)
 
 
 class IoPagesGalleryTests(unittest.TestCase):
-    def test_visual_fail_and_rejected_evidence_are_still_published_as_webp(self) -> None:
+    def test_visual_fail_and_rejected_evidence_are_still_published_as_webp(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir) / "repo"
             site = root / "_site"
@@ -59,12 +61,7 @@ class IoPagesGalleryTests(unittest.TestCase):
                 encoding="utf-8",
             )
             Image.new("RGB", (8, 8)).save(
-                rejected
-                / "Evidence"
-                / "Rejected"
-                / "run-2"
-                / "Previews"
-                / "front.png"
+                rejected / "Evidence" / "Rejected" / "run-2" / "Previews" / "front.png"
             )
 
             previous_root = MODULE.ROOT
