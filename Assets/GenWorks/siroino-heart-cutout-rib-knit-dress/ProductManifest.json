@@ -12,7 +12,7 @@
   "documentationPath": "Assets/GenWorks/siroino-heart-cutout-rib-knit-dress/README.md",
   "sourceJobPath": "config/products/siroino-heart-cutout-rib-knit-dress/job.json",
   "productBuildScript": "tools/siroino_heart_cutout_rib_knit_dress.py",
-  "designRevision": "v1-parametric-heart-cutout-rib-panel",
+  "designRevision": "v2-connected-yoke-draped-hem-long-warmers",
   "sourceReference": "private-reference://sha256/e7b267d6aa9b9143fb645f85266cb81beb02f09eb4443c1f9c81bfee4daf88d3",
   "modelIdentification": "UNVERIFIED",
   "handoff": {
@@ -21,10 +21,17 @@
     "doNotRebuildFromZero": true,
     "resumeFrom": "tools/siroino_heart_cutout_rib_knit_dress.py",
     "blockers": [
-      "Run Hosted Blender against the tracked Siroino target.",
-      "Inspect five current views and six required poses.",
-      "Pass direct visualAppearanceReview before COMPLETE."
-    ]
+      "Build v2 with a connected upper yoke around the real heart opening.",
+      "Lower and flare the front hem slit while moving the hanging skirt panels away from the legs.",
+      "Extend detached arm warmers and darken the black knit material.",
+      "Rerender five views and six required poses, then directly review the current v2 evidence."
+    ],
+    "lastAttempt": {
+      "result": "DIRECT_VISUAL_REVIEW_FAIL",
+      "visualRevision": "v1-parametric-heart-cutout-rib-panel",
+      "hostedWorkflowRun": 33929507356,
+      "artifactId": 9958230033
+    }
   },
   "technicalGates": {
     "blender": "PENDING",
@@ -46,5 +53,22 @@
   "referenceAssumptions": [
     "Back-panel construction is not visible in the supplied reference and is not claimed as a literal reconstruction.",
     "Side ties are authored symmetrically because their exact rear attachment is not visible."
+  ],
+  "rejectedHistory": [
+    {
+      "revision": "v1-parametric-heart-cutout-rib-panel",
+      "result": "DIRECT_VISUAL_REVIEW_FAIL",
+      "workflowRun": 33929507356,
+      "artifactId": 9958230033,
+      "artifactDigest": "sha256:c707fa785bfb9fa901312ee149c3f8145bea2d6d6d946266ed1290d364c98ee1",
+      "visibleDefects": [
+        "Heart opening erased most of the upper yoke, leaving the collar visually detached.",
+        "Lower front slit started too high and read as two rigid trouser-like panels rather than a dress.",
+        "Back and lower panels intersected the body and legs in static and pose views.",
+        "Detached arm warmers were too short and read as cuffs.",
+        "Black knit rendered too light relative to the supplied reference.",
+        "Crouch, sit, and prone deformation did not preserve a convincing long-dress silhouette."
+      ]
+    }
   ]
 }
