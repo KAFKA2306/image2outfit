@@ -319,7 +319,9 @@ def main() -> int:
             results.append(render_one(args.blender, job_path))
         except Exception as exc:
             job = json.loads(job_path.read_text(encoding="utf-8"))
-            detail = f"{product_id}: unhandled render exception: {type(exc).__name__}: {exc}"
+            detail = (
+                f"{product_id}: unhandled render exception: {type(exc).__name__}: {exc}"
+            )
             mark_attempt(
                 job,
                 job_path,
