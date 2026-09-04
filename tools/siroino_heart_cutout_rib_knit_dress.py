@@ -20,27 +20,29 @@ if str(TOOLS) not in sys.path:
 import siroino_strappy_knit_build as common
 
 ROOT = Path(__file__).resolve().parents[1]
-DESIGN_REVISION = "v1-parametric-heart-cutout-rib-panel"
+DESIGN_REVISION = "v2-connected-yoke-draped-hem-long-warmers"
 REFERENCE_SHA256 = "e7b267d6aa9b9143fb645f85266cb81beb02f09eb4443c1f9c81bfee4daf88d3"
 
 
 def width_at(z: float) -> float:
+    if z >= 1.045:
+        return 0.048
     if z >= 1.005:
-        return 0.046
-    if z >= 0.935:
-        return 0.046 + 0.060 * ((1.005 - z) / 0.070)
-    if z >= 0.775:
-        return 0.108
-    if z >= 0.600:
-        return 0.108 + 0.020 * ((0.775 - z) / 0.175)
+        return 0.048 + 0.070 * ((1.045 - z) / 0.040)
+    if z >= 0.835:
+        return 0.118
+    if z >= 0.720:
+        return 0.118 - 0.008 * ((0.835 - z) / 0.115)
+    if z >= 0.550:
+        return 0.110 + 0.012 * ((0.720 - z) / 0.170)
     if z >= 0.360:
-        return 0.128 + 0.020 * ((0.600 - z) / 0.240)
-    return 0.148 + 0.030 * min(1.0, max(0.0, (0.360 - z) / 0.180))
+        return 0.122 + 0.015 * ((0.550 - z) / 0.190)
+    return 0.137 + 0.045 * min(1.0, max(0.0, (0.360 - z) / 0.180))
 
 
 def heart_inside(x: float, z: float) -> bool:
-    xn = x / 0.061
-    zn = (z - 0.925) / 0.078
+    xn = x / 0.052
+    zn = (z - 0.930) / 0.063
     return (xn * xn + zn * zn - 1.0) ** 3 - xn * xn * zn**3 <= 0.0
 
 
@@ -99,7 +101,9 @@ def build_panel(
             y = surface_y(body, x, z, front=front)
             if z < 0.54:
                 anchor = surface_y(body, x * 0.65, 0.54, front=front)
-                y = anchor + ((-0.006 if front else 0.006) * ((0.54 - z) / 0.36))
+                hang = min(1.0, max(0.0, (0.54 - z) / 0.36))
+                outward = 0.010 + 0.026 * hang
+                y = anchor + (-outward if front else outward)
             vertices.append((x, y, z))
             uvs.append((u, (z - z_bottom) / (z_top - z_bottom)))
 
@@ -114,7 +118,7 @@ def build_panel(
             xc = ((-w0 + 2.0 * w0 * uc) + (-w1 + 2.0 * w1 * uc)) * 0.5
             if front and heart_inside(xc, zc):
                 continue
-            if front and zc < 0.405 and abs(xc) < 0.0085:
+            if front and zc < 0.275 and abs(xc) < 0.0085:
                 continue
             a = row * (columns + 1) + column
             b = a + 1
@@ -152,27 +156,38 @@ def arm_warmer(
     side: str,
 ) -> bpy.types.Object:
     """Author a detached lower-arm knit tube from the target rig, not body-region guessing."""
-    bone = armature.data.bones.get(f"LowerArm_{side}")
-    if bone is None:
-        raise RuntimeError(f"target armature is missing LowerArm_{side}")
-    head = armature.matrix_world @ bone.head_local
-    tail = armature.matrix_world @ bone.tail_local
-    direction = (tail - head).normalized()
+    upper_bone = armature.data.bones.get(f"UpperArm_{side}")
+    lower_bone = armature.data.bones.get(f"LowerArm_{side}")
+    if upper_bone is None or lower_bone is None:
+        raise RuntimeError(f"target armature is missing arm bones for {side}")
+    upper_head = armature.matrix_world @ upper_bone.head_local
+    upper_tail = armature.matrix_world @ upper_bone.tail_local
+    lower_head = armature.matrix_world @ lower_bone.head_local
+    lower_tail = armature.matrix_world @ lower_bone.tail_local
+    start = upper_head.lerp(upper_tail, 0.72)
+    wrist_direction = (lower_tail - lower_head).normalized()
+    end = lower_tail + wrist_direction * 0.065
+    direction = (end - start).normalized()
     reference = Vector((0.0, 0.0, 1.0))
     if abs(direction.dot(reference)) > 0.92:
         reference = Vector((0.0, 1.0, 0.0))
     axis_a = direction.cross(reference).normalized()
     axis_b = direction.cross(axis_a).normalized()
 
-    rings = 15
+    rings = 19
     segments = 28
     vertices = []
     uvs = []
     for ring in range(rings):
         t = ring / (rings - 1)
-        along = 0.06 + 0.96 * t
-        center = head.lerp(tail, along)
-        radius = 0.031 - 0.008 * t + 0.004 * max(0.0, (t - 0.78) / 0.22)
+        if t <= 0.30:
+            center = start.lerp(lower_head, t / 0.30)
+        else:
+            center = lower_head.lerp(end, (t - 0.30) / 0.70)
+        if t < 0.78:
+            radius = 0.033 - 0.010 * (t / 0.78)
+        else:
+            radius = 0.023 + 0.006 * ((t - 0.78) / 0.22)
         for segment in range(segments):
             angle = math.tau * segment / segments
             point = (
@@ -423,9 +438,14 @@ def main() -> int:
     common.set_skin_material(body)
 
     textures = common.make_texture_maps(texture_dir)
+    deep_black = texture_dir / "deep_black_knit_albedo.png"
+    Image.open(textures["black_satin_albedo.png"]).point(
+        lambda value: max(2, int(value * 0.45))
+    ).save(deep_black, optimize=True)
+    textures["deep_black_knit_albedo.png"] = deep_black
     black = common.textured_material(
         "MAT_Black_Ribbed_Knit",
-        textures["black_satin_albedo.png"],
+        deep_black,
         textures["ivory_knit_normal.png"],
         textures["ivory_knit_roughness.png"],
         normal_strength=0.78,
