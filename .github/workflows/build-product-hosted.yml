@@ -484,6 +484,7 @@ jobs:
             Assets/GenWorks/**/ProductManifest.json
             Assets/GenWorks/**/Previews/**
           if-no-files-found: warn
+          overwrite: true
           retention-days: 1
           compression-level: 6
 
