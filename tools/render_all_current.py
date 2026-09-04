@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render every canonical product at its current completion and build Pages."""
+"""Render canonical products independently, then aggregate their real evidence."""
 
 from __future__ import annotations
 
@@ -39,14 +39,7 @@ def run_logged(command: list[str], log_path: Path, env: dict[str, str]) -> int:
     return proc.returncode
 
 
-def mark_attempt(
-    job: dict[str, Any],
-    job_path: Path,
-    *,
-    status: str,
-    stage: str,
-    detail: str,
-) -> None:
+def mark_attempt(job: dict[str, Any], job_path: Path, *, status: str, stage: str, detail: str) -> None:
     product_root = ROOT / str(job["productRoot"])
     manifest_path = product_root / "ProductManifest.json"
     try:
@@ -60,7 +53,6 @@ def mark_attempt(
             "productRoot": job["productRoot"],
             "sourceJobPath": job_path.relative_to(ROOT).as_posix(),
         }
-
     manifest["status"] = manifest.get("status") or "WORKING"
     manifest["currentRenderAttempt"] = {
         "status": status,
@@ -68,30 +60,15 @@ def mark_attempt(
         "detail": detail,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
     }
-
     blockers = manifest.get("blockers")
     if not isinstance(blockers, list):
         blockers = []
-    blockers = [
-        item
-        for item in blockers
-        if not (isinstance(item, dict) and item.get("code") == "CURRENT_HOSTED_RENDER")
-    ]
+    blockers = [item for item in blockers if not (isinstance(item, dict) and item.get("code") == "CURRENT_HOSTED_RENDER")]
     if status != "PASS":
-        blockers.append(
-            {
-                "code": "CURRENT_HOSTED_RENDER",
-                "severity": "CURRENT_RENDER",
-                "message": detail,
-                "state": "open",
-            }
-        )
+        blockers.append({"code": "CURRENT_HOSTED_RENDER", "severity": "CURRENT_RENDER", "message": detail, "state": "open"})
     manifest["blockers"] = blockers
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest_path.write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def clear_stale_previews(job: dict[str, Any]) -> None:
@@ -104,174 +81,91 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     product_id = str(job["id"])
     clear_stale_previews(job)
-
-    resolution = resolve(
-        root=ROOT,
-        explicit_job=job_path.relative_to(ROOT).as_posix(),
-        changed=[],
-        materialize_job=False,
-        include_pipeline_request=True,
-    )
+    resolution = resolve(root=ROOT, explicit_job=job_path.relative_to(ROOT).as_posix(), changed=[], materialize_job=False, include_pipeline_request=True)
     env_map = resolution.environment
     if env_map.get("SKIP_PRODUCT_BUILD") == "true":
         detail = f"{product_id}: build skipped ({resolution.reason})"
         mark_attempt(job, job_path, status="FAIL", stage="scope", detail=detail)
-        return {
-            "productId": product_id,
-            "status": "FAIL",
-            "stage": "scope",
-            "detail": detail,
-        }
+        return {"productId": product_id, "status": "FAIL", "stage": "scope", "detail": detail}
 
     process_env = os.environ.copy()
     process_env.update(env_map)
     reports = ROOT / env_map["REPORT_DIR"]
     reports.mkdir(parents=True, exist_ok=True)
-
     if env_map["PIPELINE_MODE"] == "true":
-        command = [
-            "uv",
-            "run",
-            "--locked",
-            "--no-default-groups",
-            "python",
-            "tools/run_garment_pipeline.py",
-            "--execute",
-            "--engine",
-            "deterministic",
-            "--request",
-            env_map["REQUEST_PATH"],
-            "--checkpoint-output",
-            env_map["CHECKPOINT_PATH"],
-            "--output",
-            env_map["CHECKPOINT_PATH"],
-        ]
+        command = ["uv", "run", "--locked", "--no-default-groups", "python", "tools/run_garment_pipeline.py", "--execute", "--engine", "deterministic", "--request", env_map["REQUEST_PATH"], "--checkpoint-output", env_map["CHECKPOINT_PATH"], "--output", env_map["CHECKPOINT_PATH"]]
         code = run_logged(command, reports / "render-current-pipeline.log", process_env)
         if code != 0:
             detail = f"{product_id}: canonical pipeline exited {code}"
             mark_attempt(job, job_path, status="FAIL", stage="pipeline", detail=detail)
-            return {
-                "productId": product_id,
-                "status": "FAIL",
-                "stage": "pipeline",
-                "detail": detail,
-            }
+            return {"productId": product_id, "status": "FAIL", "stage": "pipeline", "detail": detail}
     else:
-        build_command = [
-            blender,
-            "--python-use-system-env",
-            "--background",
-            "--factory-startup",
-            "--python-exit-code",
-            "1",
-            "--python",
-            env_map["BUILD_SCRIPT"],
-            "--",
-            "--job",
-            env_map["JOB_PATH"],
-        ]
-        code = run_logged(
-            build_command,
-            reports / "render-current-build.log",
-            process_env,
-        )
+        build_command = [blender, "--python-use-system-env", "--background", "--factory-startup", "--python-exit-code", "1", "--python", env_map["BUILD_SCRIPT"], "--", "--job", env_map["JOB_PATH"]]
+        code = run_logged(build_command, reports / "render-current-build.log", process_env)
         if code != 0:
             detail = f"{product_id}: Blender build exited {code}"
             mark_attempt(job, job_path, status="FAIL", stage="build", detail=detail)
-            return {
-                "productId": product_id,
-                "status": "FAIL",
-                "stage": "build",
-                "detail": detail,
-            }
-
+            return {"productId": product_id, "status": "FAIL", "stage": "build", "detail": detail}
         pose_script = env_map.get("HOSTED_POSE_SCRIPT", "")
         if pose_script:
-            pose_command = [
-                blender,
-                "--python-use-system-env",
-                "--background",
-                env_map["BLEND_PATH"],
-                "--python-exit-code",
-                "1",
-                "--python",
-                pose_script,
-                "--",
-                "--job",
-                env_map["JOB_PATH"],
-            ]
-            code = run_logged(
-                pose_command,
-                reports / "render-current-poses.log",
-                process_env,
-            )
+            pose_command = [blender, "--python-use-system-env", "--background", env_map["BLEND_PATH"], "--python-exit-code", "1", "--python", pose_script, "--", "--job", env_map["JOB_PATH"]]
+            code = run_logged(pose_command, reports / "render-current-poses.log", process_env)
             if code != 0:
                 detail = f"{product_id}: hosted pose render exited {code}"
                 mark_attempt(job, job_path, status="FAIL", stage="poses", detail=detail)
-                return {
-                    "productId": product_id,
-                    "status": "FAIL",
-                    "stage": "poses",
-                    "detail": detail,
-                }
+                return {"productId": product_id, "status": "FAIL", "stage": "poses", "detail": detail}
 
-    subprocess.run(
-        [
-            sys.executable,
-            "tools/update_product_hashes.py",
-            "--root",
-            env_map["PRODUCT_ROOT"],
-        ],
-        cwd=ROOT,
-        env=process_env,
-        check=False,
-    )
-
+    subprocess.run([sys.executable, "tools/update_product_hashes.py", "--root", env_map["PRODUCT_ROOT"]], cwd=ROOT, env=process_env, check=False)
     preview_root = ROOT / env_map["PRODUCT_ROOT"] / "Previews"
-    preview_files = sorted(
-        path.relative_to(ROOT).as_posix()
-        for path in preview_root.rglob("*")
-        if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
-    )
+    preview_files = sorted(path.relative_to(ROOT).as_posix() for path in preview_root.rglob("*") if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES)
     status = "PASS" if preview_files else "FAIL"
-    detail = (
-        f"{product_id}: current render captured {len(preview_files)} images"
-        if preview_files
-        else f"{product_id}: build completed but produced no review images"
-    )
+    detail = f"{product_id}: current render captured {len(preview_files)} images" if preview_files else f"{product_id}: build completed but produced no review images"
     mark_attempt(job, job_path, status=status, stage="capture", detail=detail)
-    return {
-        "productId": product_id,
-        "status": status,
-        "stage": "capture",
-        "detail": detail,
-        "previewFiles": preview_files,
-    }
+    return {"productId": product_id, "status": status, "stage": "capture", "detail": detail, "previewFiles": preview_files}
+
+
+def write_payload(job_path: Path, result: dict[str, Any], output: Path, summary_path: Path) -> None:
+    job = json.loads(job_path.read_text(encoding="utf-8"))
+    product_root = ROOT / str(job["productRoot"])
+    output.mkdir(parents=True, exist_ok=True)
+    destination = output / job["productRoot"]
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if product_root.exists():
+        shutil.copytree(product_root, destination, dirs_exist_ok=True)
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    summary_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    shutil.copy2(summary_path, output / "render-result.json")
+
+
+def collect_payloads(collected: Path) -> list[dict[str, Any]]:
+    results: list[dict[str, Any]] = []
+    for result_path in sorted(collected.rglob("render-result.json")):
+        result = json.loads(result_path.read_text(encoding="utf-8"))
+        results.append(result)
+        product_id = result["productId"]
+        job_path = ROOT / "config" / "products" / product_id / "job.json"
+        if not job_path.is_file():
+            continue
+        job = json.loads(job_path.read_text(encoding="utf-8"))
+        source = result_path.parent / job["productRoot"]
+        destination = ROOT / job["productRoot"]
+        if source.exists():
+            shutil.copytree(source, destination, dirs_exist_ok=True)
+    return results
 
 
 def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
     data = review_console.build(ROOT, ROOT)
     site.mkdir(parents=True, exist_ok=True)
-
     for name in ("index.html", "review-console.json"):
         shutil.copy2(ROOT / name, site / name)
     for name in ("review-showcase.css", "review-showcase.js"):
         shutil.copy2(ROOT / "site" / name, site / name)
-
     index_path = site / "index.html"
     html = index_path.read_text(encoding="utf-8")
-    html = html.replace(
-        "</head>",
-        '<link rel="stylesheet" href="./review-showcase.css"></head>',
-        1,
-    )
-    html = html.replace(
-        "</body>",
-        '<script src="./review-showcase.js"></script></body>',
-        1,
-    )
+    html = html.replace("</head>", '<link rel="stylesheet" href="./review-showcase.css"></head>', 1)
+    html = html.replace("</body>", '<script src="./review-showcase.js"></script></body>', 1)
     index_path.write_text(html, encoding="utf-8")
-
     hrefs: set[str] = set()
     for product in data.get("products", []):
         hrefs.add(product["manifest_href"])
@@ -280,7 +174,6 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
                 href = item.get("href")
                 if href and not href.startswith(("https://", "http://")):
                     hrefs.add(href)
-
     for href in sorted(hrefs):
         source = (ROOT / href).resolve()
         if source != ROOT and ROOT not in source.parents:
@@ -290,82 +183,65 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
         destination = site / href
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
-
     if summary_path.is_file():
         destination = site / ".image2outfit" / "render-current-summary.json"
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(summary_path, destination)
-
     return data
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--blender", required=True)
+    parser.add_argument("--blender")
+    parser.add_argument("--product")
+    parser.add_argument("--collect", type=Path)
     parser.add_argument("--summary", type=Path, required=True)
-    parser.add_argument("--site", type=Path, required=True)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--site", type=Path)
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    jobs = sorted((ROOT / "config" / "products").glob("*/job.json"))
-    results: list[dict[str, Any]] = []
-
-    for job_path in jobs:
-        product_id = job_path.parent.name
-        print(f"=== render-current {product_id} ===", flush=True)
-        try:
-            results.append(render_one(args.blender, job_path))
-        except Exception as exc:
-            job = json.loads(job_path.read_text(encoding="utf-8"))
-            detail = (
-                f"{product_id}: unhandled render exception: {type(exc).__name__}: {exc}"
-            )
-            mark_attempt(
-                job,
-                job_path,
-                status="FAIL",
-                stage="exception",
-                detail=detail,
-            )
-            results.append(
-                {
-                    "productId": product_id,
-                    "status": "FAIL",
-                    "stage": "exception",
-                    "detail": detail,
-                }
-            )
-
     summary_path = args.summary if args.summary.is_absolute() else ROOT / args.summary
-    summary_path.parent.mkdir(parents=True, exist_ok=True)
-    summary = {
-        "schemaVersion": 1,
-        "generatedAt": datetime.now(timezone.utc).isoformat(),
-        "productCount": len(results),
-        "passCount": sum(row["status"] == "PASS" for row in results),
-        "failCount": sum(row["status"] != "PASS" for row in results),
-        "products": results,
-    }
-    summary_path.write_text(
-        json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    if args.collect:
+        collected = args.collect if args.collect.is_absolute() else ROOT / args.collect
+        results = collect_payloads(collected)
+        expected = sorted(p.parent.name for p in (ROOT / "config" / "products").glob("*/job.json"))
+        seen = {row["productId"] for row in results}
+        for product_id in expected:
+            if product_id not in seen:
+                job_path = ROOT / "config" / "products" / product_id / "job.json"
+                job = json.loads(job_path.read_text(encoding="utf-8"))
+                detail = f"{product_id}: no render artifact was collected"
+                mark_attempt(job, job_path, status="FAIL", stage="artifact", detail=detail)
+                results.append({"productId": product_id, "status": "FAIL", "stage": "artifact", "detail": detail})
+        results.sort(key=lambda row: row["productId"])
+        summary = {"schemaVersion": 1, "generatedAt": datetime.now(timezone.utc).isoformat(), "productCount": len(results), "passCount": sum(row["status"] == "PASS" for row in results), "failCount": sum(row["status"] != "PASS" for row in results), "products": results}
+        summary_path.parent.mkdir(parents=True, exist_ok=True)
+        summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        if not args.site:
+            raise SystemExit("--site is required with --collect")
+        site = args.site if args.site.is_absolute() else ROOT / args.site
+        build_site(site, summary_path)
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
+        return 0
 
-    site = args.site if args.site.is_absolute() else ROOT / args.site
-    data = build_site(site, summary_path)
-    print(
-        json.dumps(
-            {
-                "renderSummary": summary,
-                "pagesProducts": len(data.get("products", [])),
-                "site": site.relative_to(ROOT).as_posix(),
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
+    if not args.product or not args.blender or not args.output:
+        raise SystemExit("render mode requires --product, --blender, and --output")
+    job_path = ROOT / "config" / "products" / args.product / "job.json"
+    if not job_path.is_file():
+        raise SystemExit(f"unknown canonical product: {args.product}")
+    try:
+        result = render_one(args.blender, job_path)
+    except Exception as exc:
+        job = json.loads(job_path.read_text(encoding="utf-8"))
+        detail = f"{args.product}: unhandled render exception: {type(exc).__name__}: {exc}"
+        mark_attempt(job, job_path, status="FAIL", stage="exception", detail=detail)
+        result = {"productId": args.product, "status": "FAIL", "stage": "exception", "detail": detail}
+    output = args.output if args.output.is_absolute() else ROOT / args.output
+    write_payload(job_path, result, output, summary_path)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 
 
