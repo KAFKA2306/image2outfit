@@ -33,7 +33,7 @@ env:
 
 permissions:
   actions: write
-  contents: read
+  contents: write
   statuses: write
 
 concurrency:
@@ -48,6 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           lfs: true
 
@@ -329,6 +330,22 @@ jobs:
           overwrite: true
           retention-days: 1
           compression-level: 6
+
+      - name: Promote generated review evidence to pull request branch
+        if: success() && github.event_name == 'pull_request' && env.SKIP_PRODUCT_BUILD != 'true' && env.JOB_ID != '' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          git add -- "$PRODUCT_ROOT/ProductManifest.json" "$PRODUCT_ROOT/Previews"
+          if git diff --cached --quiet; then
+            echo "No generated review evidence changed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(evidence): refresh ${JOB_ID} hosted renders"
+          git push origin "HEAD:${HEAD_REF}"
 
       - name: Enforce valid pipeline boundary
         if: env.SKIP_PRODUCT_BUILD != 'true' && env.PIPELINE_MODE == 'true' && always()
