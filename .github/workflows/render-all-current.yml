@@ -18,6 +18,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: read
   pages: write
   id-token: write
@@ -68,6 +69,26 @@ jobs:
         run: |
           python tools/audit_genworks_layout.py
           python tools/audit_repository_hygiene.py
+      - name: Delete previous render evidence artifact
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const name = 'image2outfit-current-all-products';
+            const artifacts = await github.paginate(github.rest.actions.listArtifactsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            for (const artifact of artifacts) {
+              if (artifact.name === name) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+              }
+            }
+
       - name: Upload render evidence
         uses: actions/upload-artifact@v4
         with:
@@ -77,6 +98,7 @@ jobs:
             Assets/GenWorks/**/ProductManifest.json
             Assets/GenWorks/**/Previews/**
           if-no-files-found: error
+          overwrite: true
           retention-days: 1
       - name: Report io WebP coverage
         run: |
