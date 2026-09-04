@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "profile": "fitted",
+  "productId": "siroino-heart-cutout-rib-knit-dress",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-parametric-heart-cutout-rib-panel",
+  "panels": [
+    "parametric-front-rib-panel",
+    "parametric-back-rib-panel",
+    "real-heart-cutout-boundary",
+    "centre-front-lower-hem-slit",
+    "high-rib-collar",
+    "left-detached-arm-warmer",
+    "right-detached-arm-warmer",
+    "three-side-ties-per-side-with-free-tails"
+  ],
+  "separateGeometry": [
+    "heart-cutout binding",
+    "left side ties",
+    "right side ties",
+    "left arm warmer",
+    "right arm warmer"
+  ],
+  "priorityFitZones": [
+    "high neck",
+    "chest heart opening",
+    "underarm",
+    "waist",
+    "hip side opening",
+    "front hem slit",
+    "forearms",
+    "crouch deformation",
+    "sit deformation"
+  ],
+  "referenceLimits": [
+    "rear panel construction is not visible in the supplied reference",
+    "rear tie attachment is not visible in the supplied reference"
+  ],
+  "releaseBoundary": "WORKING until every requiredCompletionGate in config/genworks-handoff-policy.json passes"
+}
