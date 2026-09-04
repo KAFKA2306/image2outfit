@@ -13,6 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from PIL import Image
+
 TOOLS = Path(__file__).resolve().parent
 ROOT = TOOLS.parent
 if str(TOOLS) not in sys.path:
@@ -249,6 +251,120 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     }
 
 
+def write_webp(source: Path, destination: Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if source.suffix.lower() == ".webp":
+        shutil.copy2(source, destination)
+        return
+    with Image.open(source) as image:
+        if image.mode not in {"RGB", "RGBA"}:
+            image = image.convert("RGBA")
+        image.save(destination, format="WEBP", quality=90, method=6)
+
+
+def build_io_gallery(site: Path) -> dict[str, Any]:
+    io_root = site / "io"
+    io_root.mkdir(parents=True, exist_ok=True)
+    products: list[dict[str, Any]] = []
+    total_webp = 0
+
+    product_root = ROOT / "Assets" / "GenWorks"
+    for workspace in sorted(product_root.iterdir()):
+        manifest_path = workspace / "ProductManifest.json"
+        if not workspace.is_dir() or not manifest_path.is_file():
+            continue
+        manifest = review_console.load_json(manifest_path, {})
+        preview_root, origin = review_console.preview_directory(workspace)
+        sources = review_console.image_files(preview_root)
+        selected: dict[Path, Path] = {}
+        for source in sources:
+            relative = source.relative_to(preview_root)
+            target_relative = relative.with_suffix(".webp")
+            existing = selected.get(target_relative)
+            if existing is None or source.suffix.lower() == ".webp":
+                selected[target_relative] = source
+
+        assets: list[dict[str, str]] = []
+        for target_relative, source in sorted(selected.items()):
+            destination = io_root / workspace.name / target_relative
+            write_webp(source, destination)
+            assets.append(
+                {
+                    "name": target_relative.as_posix(),
+                    "href": destination.relative_to(site).as_posix(),
+                    "source": source.relative_to(ROOT).as_posix(),
+                    "sourceKind": origin,
+                }
+            )
+        total_webp += len(assets)
+        gates = manifest.get("technicalGates")
+        visual_status = (
+            str(gates.get("visualAppearanceReview", "UNKNOWN"))
+            if isinstance(gates, dict)
+            else "UNKNOWN"
+        )
+        products.append(
+            {
+                "productId": workspace.name,
+                "state": review_console.safe_state(manifest),
+                "visualAppearanceReview": visual_status,
+                "sourceKind": origin,
+                "webpCount": len(assets),
+                "assets": assets,
+            }
+        )
+
+    catalog = {
+        "schemaVersion": 1,
+        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "productCount": len(products),
+        "webpCount": total_webp,
+        "products": products,
+    }
+    (io_root / "catalog.json").write_text(
+        json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    cards: list[str] = []
+    for product in products:
+        images = "".join(
+            f'<figure><img loading="lazy" src="../{asset["href"]}" '
+            f'alt="{product["productId"]} {asset["name"]}">'
+            f"<figcaption>{asset['name']}</figcaption></figure>"
+            for asset in product["assets"]
+        )
+        if not images:
+            images = "<p>現時点で追跡済みレンダーなし</p>"
+        cards.append(
+            "<section>"
+            f'<h2 id="{product["productId"]}">{product["productId"]}</h2>'
+            f"<p>state={product['state']} · "
+            f"visualAppearanceReview={product['visualAppearanceReview']} · "
+            f"source={product['sourceKind']} · WebP={product['webpCount']}</p>"
+            f'<div class="grid">{images}</div>'
+            "</section>"
+        )
+
+    (io_root / "index.html").write_text(
+        '<!doctype html><html lang="ja"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        "<title>image2outfit io WebP previews</title>"
+        "<style>body{font-family:system-ui,sans-serif;margin:24px;background:#0f1117;color:#f5f7fb}"
+        "a{color:#8bdcff}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}"
+        "figure{margin:0;padding:8px;border:1px solid #465064;border-radius:10px;background:#1b1e28}"
+        "img{width:100%;aspect-ratio:1;object-fit:contain;background:#090b10}figcaption{overflow-wrap:anywhere}"
+        "section{margin:36px 0}</style></head><body>"
+        '<p><a href="../">Review Console</a> · <a href="./catalog.json">catalog.json</a></p>'
+        "<h1>io WebP previews</h1>"
+        "<p>品質判定と公開を分離し、WORKING / REJECTED / visualAppearanceReview FAIL も現在の証拠として表示します。</p>"
+        + "".join(cards)
+        + "</body></html>",
+        encoding="utf-8",
+    )
+    return catalog
+
+
 def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
     data = review_console.build(ROOT, ROOT)
     site.mkdir(parents=True, exist_ok=True)
@@ -296,6 +412,19 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(summary_path, destination)
 
+    gallery = build_io_gallery(site)
+    index_path = site / "index.html"
+    html = index_path.read_text(encoding="utf-8")
+    html = html.replace(
+        "</nav>",
+        '<a href="./io/">io WebP</a></nav>',
+        1,
+    )
+    index_path.write_text(html, encoding="utf-8")
+    data["io"] = {
+        "productCount": gallery["productCount"],
+        "webpCount": gallery["webpCount"],
+    }
     return data
 
 
@@ -360,6 +489,8 @@ def main() -> int:
             {
                 "renderSummary": summary,
                 "pagesProducts": len(data.get("products", [])),
+                "ioProducts": data.get("io", {}).get("productCount", 0),
+                "ioWebpCount": data.get("io", {}).get("webpCount", 0),
                 "site": site.relative_to(ROOT).as_posix(),
             },
             ensure_ascii=False,

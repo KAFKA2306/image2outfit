@@ -1,31 +1,7 @@
 name: Review console
 
 on:
-  workflow_dispatch:
   pull_request:
-    paths:
-      - "contracts/quality/quality-spec.json"
-      - "src/image2outfit/quality.py"
-      - "src/image2outfit/improvement.py"
-      - "tools/improvement_loop.py"
-      - "tools/manage.py"
-      - "tools/release_orchestrator.py"
-      - "tools/review_console.py"
-      - "site/review-showcase.css"
-      - "site/review-showcase.js"
-      - "tests/test_quality_spec.py"
-      - "tests/test_review_console_v2.py"
-      - "tests/test_improvement_loop.py"
-      - "tests/test_improvement_orchestrator.py"
-      - "tests/test_improvement_review_projection.py"
-      - ".github/workflows/review-console.yml"
-      - "config/release-policy.json"
-      - "Assets/GenWorks/**/ProductManifest.json"
-      - "Assets/GenWorks/**/Previews/**"
-      - "Assets/GenWorks/**/Research/Improvement/**"
-  push:
-    branches:
-      - main
     paths:
       - "contracts/quality/quality-spec.json"
       - "src/image2outfit/quality.py"
@@ -151,24 +127,3 @@ jobs:
           print(f"pages_products={len(products)} linked_files={copied} showcase=PASS")
           PY
 
-      - name: Upload GitHub Pages artifact
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: _site
-
-  deploy:
-    if: github.event_name != 'pull_request'
-    needs: test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

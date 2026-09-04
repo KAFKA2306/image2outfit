@@ -5,9 +5,20 @@ on:
     branches: [main]
     paths:
       - .github/workflows/render-all-current.yml
+      - config/products/**
+      - config/pipeline/**
+      - config/toolchain-lock.json
+      - Assets/GenWorks/**/ProductManifest.json
+      - Assets/GenWorks/**/Source/**
+      - Assets/GenWorks/**/Previews/**
+      - src/image2outfit/**
+      - tools/**
+      - pyproject.toml
+      - uv.lock
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: read
   pages: write
   id-token: write
@@ -58,6 +69,26 @@ jobs:
         run: |
           python tools/audit_genworks_layout.py
           python tools/audit_repository_hygiene.py
+      - name: Delete previous render evidence artifact
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const name = 'image2outfit-current-all-products';
+            const artifacts = await github.paginate(github.rest.actions.listArtifactsForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100,
+            });
+            for (const artifact of artifacts) {
+              if (artifact.name === name) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+              }
+            }
+
       - name: Upload render evidence
         uses: actions/upload-artifact@v4
         with:
@@ -67,7 +98,25 @@ jobs:
             Assets/GenWorks/**/ProductManifest.json
             Assets/GenWorks/**/Previews/**
           if-no-files-found: error
+          overwrite: true
           retention-days: 1
+      - name: Report io WebP coverage
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          catalog = json.loads(Path('_site/io/catalog.json').read_text(encoding='utf-8'))
+          missing = [p['productId'] for p in catalog['products'] if p['webpCount'] == 0]
+          print(f"io_products={catalog['productCount']} io_webp={catalog['webpCount']} missing={missing}")
+          for product in catalog['products']:
+              for asset in product['assets']:
+                  if not asset['href'].endswith('.webp'):
+                      raise SystemExit(f"non-WebP io asset: {asset}")
+                  if not (Path('_site') / asset['href']).is_file():
+                      raise SystemExit(f"missing io asset: {asset['href']}")
+          PY
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
