@@ -150,16 +150,66 @@ def arm_warmer(
     material: bpy.types.Material,
     side: str,
 ) -> bpy.types.Object:
-    sign = 1.0 if side == "L" else -1.0
-    obj = common.extract_surface(
-        body,
-        armature,
-        f"Rib_Arm_Warmer_{side}",
-        lambda c: sign * c.x >= 0.145 and 0.50 <= c.z <= 0.86,
-        material,
-        0.0055,
-    )
+    """Author a detached lower-arm knit tube from the target rig, not body-region guessing."""
+    bone = armature.data.bones.get(f"LowerArm_{side}")
+    if bone is None:
+        raise RuntimeError(f"target armature is missing LowerArm_{side}")
+    head = armature.matrix_world @ bone.head_local
+    tail = armature.matrix_world @ bone.tail_local
+    direction = (tail - head).normalized()
+    reference = Vector((0.0, 0.0, 1.0))
+    if abs(direction.dot(reference)) > 0.92:
+        reference = Vector((0.0, 1.0, 0.0))
+    axis_a = direction.cross(reference).normalized()
+    axis_b = direction.cross(axis_a).normalized()
+
+    rings = 15
+    segments = 28
+    vertices = []
+    uvs = []
+    for ring in range(rings):
+        t = ring / (rings - 1)
+        along = 0.06 + 0.96 * t
+        center = head.lerp(tail, along)
+        radius = 0.031 - 0.008 * t + 0.004 * max(0.0, (t - 0.78) / 0.22)
+        for segment in range(segments):
+            angle = math.tau * segment / segments
+            point = center + axis_a * (radius * math.cos(angle)) + axis_b * (
+                radius * math.sin(angle)
+            )
+            vertices.append(tuple(point))
+            uvs.append((segment / segments, t))
+
+    faces = []
+    for ring in range(rings - 1):
+        for segment in range(segments):
+            next_segment = (segment + 1) % segments
+            a = ring * segments + segment
+            b = ring * segments + next_segment
+            d = (ring + 1) * segments + segment
+            e = (ring + 1) * segments + next_segment
+            faces.append((a, d, e, b))
+
+    mesh = bpy.data.meshes.new(f"Rib_Arm_Warmer_{side}_Mesh")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update(calc_edges=True)
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    for polygon in mesh.polygons:
+        for loop_index in polygon.loop_indices:
+            vertex_index = mesh.loops[loop_index].vertex_index
+            uv_layer.data[loop_index].uv = uvs[vertex_index]
+    mesh.materials.append(material)
+    obj = bpy.data.objects.new(f"Rib_Arm_Warmer_{side}", mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.parent = armature
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+    finish_panel(obj)
+    common.transfer_nearest_body_weights(obj, body)
     common.add_nearest_shape_keys(obj, body)
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = True
     return obj
 
 
