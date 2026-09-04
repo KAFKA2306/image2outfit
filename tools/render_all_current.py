@@ -75,10 +75,7 @@ def mark_attempt(
     blockers = [
         item
         for item in blockers
-        if not (
-            isinstance(item, dict)
-            and item.get("code") == "CURRENT_HOSTED_RENDER"
-        )
+        if not (isinstance(item, dict) and item.get("code") == "CURRENT_HOSTED_RENDER")
     ]
     if status != "PASS":
         blockers.append(
@@ -322,10 +319,7 @@ def main() -> int:
             results.append(render_one(args.blender, job_path))
         except Exception as exc:
             job = json.loads(job_path.read_text(encoding="utf-8"))
-            detail = (
-                f"{product_id}: unhandled render exception: "
-                f"{type(exc).__name__}: {exc}"
-            )
+            detail = f"{product_id}: unhandled render exception: {type(exc).__name__}: {exc}"
             mark_attempt(
                 job,
                 job_path,
@@ -342,9 +336,7 @@ def main() -> int:
                 }
             )
 
-    summary_path = (
-        args.summary if args.summary.is_absolute() else ROOT / args.summary
-    )
+    summary_path = args.summary if args.summary.is_absolute() else ROOT / args.summary
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     summary = {
         "schemaVersion": 1,
