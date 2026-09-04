@@ -44,7 +44,7 @@ class ReviewConsoleTest(unittest.TestCase):
         (product / "ProductManifest.json").write_text(
             json.dumps(
                 {
-                    "state": "HUMAN_REVIEW_PENDING",
+                    "state": "WORKING",
                     "updated_at": "2026-08-04T00:00:00Z",
                     "resume_point": "human review",
                     "candidate_hash": "candidate-abc",
@@ -156,7 +156,7 @@ class ReviewConsoleTest(unittest.TestCase):
 
         record = data["products"][0]
         self.assertEqual(record["slug"], "demo-outfit")
-        self.assertEqual(record["state"], "HUMAN_REVIEW_PENDING")
+        self.assertEqual(record["state"], "WORKING")
         self.assertEqual(record["blocker_count"], 2)
         self.assertEqual(record["blockers"][0]["severity"], "MAJOR")
         self.assertIn("TOPOLOGY_INVALID", record["blockers"][1]["message"])
@@ -212,6 +212,28 @@ class ReviewConsoleTest(unittest.TestCase):
             "task candidate",
         ):
             self.assertNotIn(forbidden, document)
+
+    def test_falls_back_to_latest_rejected_render_without_changing_product_state(self) -> None:
+        product = self.root / "Assets" / "GenWorks" / "demo-outfit"
+        for path in (product / "Previews").rglob("*"):
+            if path.is_file():
+                path.unlink()
+        rejected = product / "Evidence" / "Rejected" / "run-2" / "Previews"
+        rejected.mkdir(parents=True)
+        (rejected / "front.webp").write_bytes(b"rejected-front")
+        (rejected / "back.webp").write_bytes(b"rejected-back")
+        manifest = json.loads((product / "ProductManifest.json").read_text(encoding="utf-8"))
+        manifest["technicalGates"] = {"visualAppearanceReview": "FAIL"}
+        (product / "ProductManifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+        data = MODULE.build(self.root, self.output)
+        record = data["products"][0]
+        self.assertEqual(record["state"], "WORKING")
+        assets = {(item["kind"], item["name"]): item for item in record["assets"]}
+        self.assertEqual(assets[("view", "front")]["status"], "PASS")
+        self.assertTrue(assets[("view", "front")]["href"].endswith("front.webp"))
+        gates = {gate["name"]: gate for gate in record["gates"]}
+        self.assertEqual(gates["visualAppearanceReview"]["status"], "FAIL")
 
     def test_empty_repository_still_generates_valid_console(self) -> None:
         empty_root = Path(self.temp.name) / "empty"
