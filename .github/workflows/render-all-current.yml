@@ -1,0 +1,77 @@
+name: Render all current products to Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/render-all-current.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  render-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+          enable-cache: true
+      - name: Install Blender runtime libraries
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
+      - name: Download pinned Blender
+        run: |
+          BLENDER_VERSION="$(python -c "import json; print(json.load(open('config/toolchain-lock.json'))['blender']['version'])")"
+          BLENDER_SERIES="${BLENDER_VERSION%.*}"
+          curl --fail --location --retry 4 --retry-all-errors "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" -o blender.tar.xz
+          mkdir -p .image2outfit/blender
+          tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
+          echo "IMAGE2OUTFIT_BLENDER=$PWD/.image2outfit/blender/blender" >> "$GITHUB_ENV"
+      - name: Prepare Blender Python environment
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from tools.blender_python_env import prepare
+          p = prepare('.image2outfit/blender/blender')
+          paths = [str((Path.cwd()/'tools').resolve()), str((Path.cwd()/'src').resolve()), p.environment['PYTHONPATH']]
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write(f"PYTHONPATH={os.pathsep.join(paths)}\n")
+          PY
+      - name: Render and capture every canonical product
+        run: python tools/render_all_current.py --blender "$IMAGE2OUTFIT_BLENDER" --summary .image2outfit/render-current-summary.json --site _site
+      - name: Audit repository contracts
+        run: |
+          python tools/audit_genworks_layout.py
+          python tools/audit_repository_hygiene.py
+      - name: Upload render evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: image2outfit-current-all-products
+          path: |
+            .image2outfit/render-current-summary.json
+            Assets/GenWorks/**/ProductManifest.json
+            Assets/GenWorks/**/Previews/**
+          if-no-files-found: error
+          retention-days: 1
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
