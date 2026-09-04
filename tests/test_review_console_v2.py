@@ -213,7 +213,9 @@ class ReviewConsoleTest(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, document)
 
-    def test_falls_back_to_latest_rejected_render_without_changing_product_state(self) -> None:
+    def test_falls_back_to_latest_rejected_render_without_changing_product_state(
+        self,
+    ) -> None:
         product = self.root / "Assets" / "GenWorks" / "demo-outfit"
         for path in (product / "Previews").rglob("*"):
             if path.is_file():
@@ -224,7 +226,9 @@ class ReviewConsoleTest(unittest.TestCase):
         (rejected / "back.webp").write_bytes(b"rejected-back")
         manifest = json.loads((product / "ProductManifest.json").read_text(encoding="utf-8"))
         manifest["technicalGates"] = {"visualAppearanceReview": "FAIL"}
-        (product / "ProductManifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+        (product / "ProductManifest.json").write_text(
+            json.dumps(manifest), encoding="utf-8"
+        )
 
         data = MODULE.build(self.root, self.output)
         record = data["products"][0]
