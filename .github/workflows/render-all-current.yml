@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/render-all-current.yml
+      - tools/render_all_current.py
   workflow_dispatch:
 
 permissions:
@@ -13,12 +14,31 @@ permissions:
   id-token: write
 
 jobs:
-  render-and-deploy:
+  inventory:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      products: ${{ steps.inventory.outputs.products }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: inventory
+        name: Read canonical product inventory
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          products = [p.parent.name for p in sorted(Path('config/products').glob('*/job.json'))]
+          print('products=' + json.dumps(products, separators=(',', ':')))
+          PY
+
+  render:
+    needs: inventory
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        product: ${{ fromJSON(needs.inventory.outputs.products) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,13 +72,55 @@ jobs:
           with open(os.environ['GITHUB_ENV'], 'a') as f:
               f.write(f"PYTHONPATH={os.pathsep.join(paths)}\n")
           PY
-      - name: Render and capture every canonical product
-        run: python tools/render_all_current.py --blender "$IMAGE2OUTFIT_BLENDER" --summary .image2outfit/render-current-summary.json --site _site
+      - name: Render and capture current product
+        run: |
+          python tools/render_all_current.py \
+            --blender "$IMAGE2OUTFIT_BLENDER" \
+            --product "${{ matrix.product }}" \
+            --summary ".image2outfit/${{ matrix.product }}/summary.json" \
+            --output ".image2outfit/${{ matrix.product }}/payload"
+      - name: Upload product evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-current-${{ matrix.product }}
+          path: .image2outfit/${{ matrix.product }}/payload
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 1
+
+  aggregate-and-deploy:
+    if: always()
+    needs: [inventory, render]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download product evidence
+        uses: actions/download-artifact@v4
+        with:
+          pattern: render-current-*
+          path: .image2outfit/collected
+          merge-multiple: true
+      - name: Merge evidence and build Review Console
+        run: |
+          python tools/render_all_current.py \
+            --collect .image2outfit/collected \
+            --summary .image2outfit/render-current-summary.json \
+            --site _site
       - name: Audit repository contracts
         run: |
           python tools/audit_genworks_layout.py
           python tools/audit_repository_hygiene.py
-      - name: Upload render evidence
+      - name: Upload combined evidence
         uses: actions/upload-artifact@v4
         with:
           name: image2outfit-current-all-products
@@ -67,6 +129,7 @@ jobs:
             Assets/GenWorks/**/ProductManifest.json
             Assets/GenWorks/**/Previews/**
           if-no-files-found: error
+          overwrite: true
           retention-days: 1
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
