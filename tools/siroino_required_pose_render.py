@@ -5,6 +5,7 @@ Every frame uses the same generated garment and exact target body. The prone
 case rotates both armatures into an actual horizontal body orientation rather
 than merely bending the legs of an upright avatar.
 """
+
 from __future__ import annotations
 
 import argparse
