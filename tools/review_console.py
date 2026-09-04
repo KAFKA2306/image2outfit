@@ -22,10 +22,8 @@ from image2outfit import improvement  # noqa: E402
 
 STATES = (
     "WORKING",
-    "TECHNICAL_READY",
-    "HUMAN_REVIEW_PENDING",
+    "COMPLETE",
     "REJECTED",
-    "RELEASED",
 )
 DEFAULT_VIEWS = ("front", "back", "left", "right", "three-quarter")
 IMAGE_SUFFIXES = (".png", ".webp", ".jpg", ".jpeg")
@@ -136,6 +134,32 @@ def locate_image(directory: Path, name: str) -> Path | None:
     return None
 
 
+def image_files(directory: Path) -> list[Path]:
+    if not directory.is_dir():
+        return []
+    return sorted(
+        path
+        for path in directory.rglob("*")
+        if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
+    )
+
+
+def preview_directory(workspace: Path) -> tuple[Path, str]:
+    current = workspace / "Previews"
+    if image_files(current):
+        return current, "current-preview"
+
+    rejected = workspace / "Evidence" / "Rejected"
+    candidates: list[Path] = []
+    if rejected.is_dir():
+        for preview_root in rejected.glob("*/Previews"):
+            if image_files(preview_root):
+                candidates.append(preview_root)
+    if candidates:
+        return sorted(candidates)[-1], "rejected-preview"
+    return current, "current-preview"
+
+
 def open_issue(item: Any) -> bool:
     if not isinstance(item, dict):
         return True
@@ -210,7 +234,13 @@ def parse_gate_rows(
     manifest: dict[str, Any], workspace: Path, output_dir: Path
 ) -> list[Gate]:
     raw: Any = pick(
-        manifest, "gates", "gate_results", "checks", "validation", default=[]
+        manifest,
+        "technicalGates",
+        "gates",
+        "gate_results",
+        "checks",
+        "validation",
+        default=[],
     )
     if isinstance(raw, dict):
         raw = [
@@ -508,13 +538,16 @@ def collect_product(
     blockers.extend(improvement_blockers)
 
     assets: list[Asset] = []
-    previews = workspace / "Previews"
+    previews, preview_origin = preview_directory(workspace)
+    selected: set[Path] = set()
     for kind, directory, names in (
         ("view", previews, required_views),
         ("pose", previews / "Poses", required_poses),
     ):
         for name in names:
             target = locate_image(directory, name)
+            if target:
+                selected.add(target.resolve())
             assets.append(
                 Asset(
                     kind=kind,
@@ -524,6 +557,19 @@ def collect_product(
                     sha256=digest(target) if target else None,
                 )
             )
+
+    for target in image_files(previews):
+        if target.resolve() in selected:
+            continue
+        assets.append(
+            Asset(
+                kind=preview_origin,
+                name=target.relative_to(previews).as_posix(),
+                status="PASS",
+                href=relative_href(target, output_dir),
+                sha256=digest(target),
+            )
+        )
 
     candidate = pick(manifest, "candidate", "candidate_manifest", default={})
     review = pick(manifest, "human_review", "review", default={})
