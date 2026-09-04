@@ -5,9 +5,12 @@ on:
     branches: [main]
     paths:
       - .github/workflows/render-all-current.yml
+      - config/products/**/job.json
+      - Assets/GenWorks/**/ProductManifest.json
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: read
   pages: write
   id-token: write
@@ -58,6 +61,10 @@ jobs:
         run: |
           python tools/audit_genworks_layout.py
           python tools/audit_repository_hygiene.py
+      - name: Delete previous render evidence artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/delete_previous_artifacts.py image2outfit-current-all-products
       - name: Upload render evidence
         uses: actions/upload-artifact@v4
         with:
@@ -68,6 +75,7 @@ jobs:
             Assets/GenWorks/**/Previews/**
           if-no-files-found: error
           retention-days: 1
+          overwrite: true
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
