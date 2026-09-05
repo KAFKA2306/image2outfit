@@ -365,6 +365,24 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
     return catalog
 
 
+def validate_io_gallery(catalog: dict[str, Any], site: Path) -> None:
+    missing = [
+        str(product["productId"])
+        for product in catalog.get("products", [])
+        if int(product.get("webpCount", 0)) == 0
+    ]
+    if missing:
+        raise RuntimeError(f"io WebP coverage incomplete: {missing}")
+
+    for product in catalog.get("products", []):
+        for asset in product.get("assets", []):
+            href = str(asset.get("href", ""))
+            if not href.endswith(".webp"):
+                raise RuntimeError(f"non-WebP io asset: {asset}")
+            if not (site / href).is_file():
+                raise RuntimeError(f"missing io asset: {href}")
+
+
 def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
     data = review_console.build(ROOT, ROOT)
     site.mkdir(parents=True, exist_ok=True)
@@ -413,6 +431,7 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
         shutil.copy2(summary_path, destination)
 
     gallery = build_io_gallery(site)
+    validate_io_gallery(gallery, site)
     index_path = site / "index.html"
     html = index_path.read_text(encoding="utf-8")
     html = html.replace(
