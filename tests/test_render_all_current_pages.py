@@ -6,6 +6,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
 from PIL import Image
 
@@ -88,6 +90,54 @@ class IoPagesGalleryTests(unittest.TestCase):
             self.assertIn("visualAppearanceReview=FAIL", html)
             self.assertIn("working/front.webp", html)
             self.assertIn("rejected/front.webp", html)
+
+
+    def test_skipped_product_preserves_existing_preview_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir) / "repo"
+            product = root / "Assets" / "GenWorks" / "manual"
+            previews = product / "Previews"
+            job_path = root / "config" / "products" / "manual" / "job.json"
+            previews.mkdir(parents=True)
+            job_path.parent.mkdir(parents=True)
+            (product / "ProductManifest.json").write_text(
+                json.dumps(
+                    {
+                        "schemaVersion": 1,
+                        "productId": "manual",
+                        "status": "REJECTED",
+                        "productRoot": "Assets/GenWorks/manual",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            job_path.write_text(
+                json.dumps(
+                    {
+                        "id": "manual",
+                        "productRoot": "Assets/GenWorks/manual",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            Image.new("RGB", (8, 8)).save(previews / "front.png")
+
+            previous_root = MODULE.ROOT
+            try:
+                MODULE.ROOT = root
+                resolution = SimpleNamespace(
+                    environment={"SKIP_PRODUCT_BUILD": "true"},
+                    reason="manual-recovery",
+                )
+                with mock.patch.object(MODULE, "resolve", return_value=resolution):
+                    result = MODULE.render_one("unused-blender", job_path)
+            finally:
+                MODULE.ROOT = previous_root
+
+            self.assertEqual(result["status"], "PASS")
+            self.assertEqual(result["stage"], "preserve")
+            self.assertTrue((previews / "front.png").is_file())
+            self.assertIn("preserved 1 current-preview images", result["detail"])
 
 
 if __name__ == "__main__":
