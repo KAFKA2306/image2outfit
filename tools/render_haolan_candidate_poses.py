@@ -170,7 +170,7 @@ def evaluated_bounds(objects: list[bpy.types.Object]) -> tuple[Vector, Vector]:
         evaluated = obj.evaluated_get(depsgraph)
         mesh = evaluated.to_mesh()
         try:
-            points.extend(evaluated.matrix_world @ vertex.co for vertex in mesh.vertices)
+            points.extend(\n                evaluated.matrix_world @ vertex.co for vertex in mesh.vertices\n            )
         finally:
             evaluated.to_mesh_clear()
     if not points:
@@ -197,7 +197,7 @@ def main() -> int:
     render_objects = avatar_objects + outfit_objects
     armatures = [obj for obj in render_objects if obj.type == "ARMATURE"]
     if len(armatures) < 2:
-        raise RuntimeError(f"Expected target and outfit armatures, found {len(armatures)}")
+        raise RuntimeError(\n            f"Expected target and outfit armatures, found {len(armatures)}"\n        )
 
     ensure_materials(
         avatar_objects,
@@ -261,14 +261,14 @@ def main() -> int:
             direction = Vector((0.58, -0.58, 0.58))
         direction.normalize()
         camera.location = target + direction * max(scale * 3.0, 2.0)
-        camera.data.ortho_scale = max(dimensions.z * 1.18, dimensions.x * 1.45, dimensions.y * 1.45)
+        camera.data.ortho_scale = max(\n            dimensions.z * 1.18, dimensions.x * 1.45, dimensions.y * 1.45\n        )
         look_at(camera, target)
 
         output = outdir / f"{pose_name}.png"
         scene.render.filepath = str(output)
         bpy.ops.render.render(write_still=True)
         if not output.is_file() or output.stat().st_size < 10_000:
-            raise RuntimeError(f"Pose render is missing or unexpectedly small: {output}")
+            raise RuntimeError(\n                f"Pose render is missing or unexpectedly small: {output}"\n            )
         rendered[pose_name] = output.name
 
     manifest = {
