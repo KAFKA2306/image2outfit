@@ -304,12 +304,29 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         for path in preview_root.rglob("*")
         if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
     )
-    discard_preview_snapshot(preview_backup)
+    restored = False
+    if preview_files:
+        discard_preview_snapshot(preview_backup)
+    else:
+        restored = restore_previews_if_generation_produced_none(
+            job, preview_backup
+        )
+        if restored:
+            preview_files = sorted(
+                path.relative_to(ROOT).as_posix()
+                for path in preview_root.rglob("*")
+                if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
+            )
     status = "PASS" if preview_files else "FAIL"
     detail = (
         f"{product_id}: current render captured {len(preview_files)} images"
-        if preview_files
-        else f"{product_id}: build completed but produced no review images"
+        if preview_files and not restored
+        else (
+            f"{product_id}: build produced no new images; "
+            f"restored {len(preview_files)} previous images"
+            if restored
+            else f"{product_id}: build completed but produced no review images"
+        )
     )
     mark_attempt(job, job_path, status=status, stage="capture", detail=detail)
     return {
