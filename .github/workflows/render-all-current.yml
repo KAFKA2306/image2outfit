@@ -107,8 +107,15 @@ jobs:
           from pathlib import Path
 
           catalog = json.loads(Path('_site/io/catalog.json').read_text(encoding='utf-8'))
+          expected = len(list(Path('config/products').glob('*/job.json')))
           missing = [p['productId'] for p in catalog['products'] if p['webpCount'] == 0]
-          print(f"io_products={catalog['productCount']} io_webp={catalog['webpCount']} missing={missing}")
+          print(f"io_products={catalog['productCount']} expected={expected} io_webp={catalog['webpCount']} missing={missing}")
+          if catalog['productCount'] != expected:
+              raise SystemExit(
+                  f"io catalog product count mismatch: {catalog['productCount']} != {expected}"
+              )
+          if missing:
+              raise SystemExit(f"io products without WebP previews: {missing}")
           for product in catalog['products']:
               for asset in product['assets']:
                   if not asset['href'].endswith('.webp'):
