@@ -140,5 +140,39 @@ class IoPagesGalleryTests(unittest.TestCase):
             self.assertIn("preserved 1 current-preview images", result["detail"])
 
 
+    def test_pages_workflow_requires_webp_for_every_canonical_product(self) -> None:
+        workflow = (
+            ROOT / ".github" / "workflows" / "render-all-current.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("io products without WebP previews", workflow)
+        self.assertIn("io catalog product count mismatch", workflow)
+        self.assertIn("Path('config/products').glob('*/job.json')", workflow)
+
+    def test_bordeaux_has_reproducible_hosted_render_entrypoint(self) -> None:
+        job = json.loads(
+            (
+                ROOT
+                / "config"
+                / "products"
+                / "haolan-bordeaux-knit-set"
+                / "job.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertTrue(job["automaticBuild"])
+        self.assertEqual(
+            job["buildScript"],
+            "tools/build_haolan_bordeaux_knit_set.py",
+        )
+        self.assertNotIn("hostedPoseScript", job)
+        for relative in (
+            "config/products/haolan-bordeaux-knit-set/skeleton.json",
+            "tools/build_haolan_bordeaux_knit_set.py",
+            "tools/haolan_knit_build.py",
+            "tools/render_haolan_candidate_poses.py",
+            "tools/render_haolan_candidate_turnaround.py",
+        ):
+            self.assertTrue((ROOT / relative).is_file(), relative)
+
+
 if __name__ == "__main__":
     unittest.main()
