@@ -91,7 +91,6 @@ class IoPagesGalleryTests(unittest.TestCase):
             self.assertIn("working/front.webp", html)
             self.assertIn("rejected/front.webp", html)
 
-
     def test_skipped_product_preserves_existing_preview_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir) / "repo"
@@ -138,8 +137,6 @@ class IoPagesGalleryTests(unittest.TestCase):
             self.assertEqual(result["stage"], "preserve")
             self.assertTrue((previews / "front.png").is_file())
             self.assertIn("preserved 1 current-preview images", result["detail"])
-
-
 
     def test_failed_regeneration_restores_previous_preview_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -211,11 +208,7 @@ class IoPagesGalleryTests(unittest.TestCase):
     def test_bordeaux_has_reproducible_hosted_render_entrypoint(self) -> None:
         job = json.loads(
             (
-                ROOT
-                / "config"
-                / "products"
-                / "haolan-bordeaux-knit-set"
-                / "job.json"
+                ROOT / "config" / "products" / "haolan-bordeaux-knit-set" / "job.json"
             ).read_text(encoding="utf-8")
         )
         self.assertTrue(job["automaticBuild"])
