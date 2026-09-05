@@ -1,0 +1,208 @@
+name: Recover manual product render evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_path:
+        description: Tracked product job with manualRecovery contract
+        required: true
+        type: string
+  pull_request:
+    paths:
+      - .github/workflows/recover-manual-product-evidence.yml
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: image2outfit-manual-recovery-\${{ github.event.pull_request.number || inputs.job_path }}
+  cancel-in-progress: true
+
+jobs:
+  recover:
+    runs-on: self-hosted
+    timeout-minutes: 120
+    steps:
+      - name: Checkout without deleting private target sources
+        uses: actions/checkout@v4
+        with:
+          clean: false
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Resolve provenance-bound recovery contract
+        shell: pwsh
+        env:
+          DISPATCH_JOB_PATH: \${{ inputs.job_path }}
+          BASE_SHA: \${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: \${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @'
+          import json, os, subprocess
+          from pathlib import Path
+
+          explicit = os.environ.get("DISPATCH_JOB_PATH", "").strip()
+          if explicit:
+              candidates = [explicit]
+          else:
+              changed = subprocess.check_output(
+                  ["git", "diff", "--name-only", f"{os.environ['BASE_SHA']}...{os.environ['HEAD_SHA']}"],
+                  text=True,
+              ).splitlines()
+              candidates = [
+                  path for path in changed
+                  if path.startswith("config/products/") and path.endswith("/job.json")
+              ]
+
+          selected = []
+          for path in candidates:
+              candidate = Path(path)
+              if not candidate.is_file():
+                  continue
+              job = json.loads(candidate.read_text(encoding="utf-8"))
+              recovery = job.get("manualRecovery")
+              if isinstance(recovery, dict):
+                  selected.append((path, job, recovery))
+
+          if len(selected) != 1:
+              raise SystemExit(
+                  f"manual recovery requires exactly one declared job; found {[x[0] for x in selected]}"
+              )
+
+          path, job, recovery = selected[0]
+          values = {
+              "TRACKED_JOB_PATH": path,
+              "JOB_ID": job["id"],
+              "TARGET_SOURCE_BASENAME": Path(job["targetSourcePath"]).name,
+              "SOURCE_COMMIT": recovery["sourceCommit"],
+              "BUILD_SCRIPT_PATH": recovery["buildScriptPath"],
+              "RENDER_SCRIPT": recovery["renderScript"],
+              "EXPECTED_FBX_SHA256": recovery["expectedFbxSha256"],
+              "CANDIDATE_STEM": recovery["candidateStem"],
+              "RECOVERY_DIR": f".image2outfit/manual-recovery/{job['id']}",
+              "ARTIFACT_NAME": f"image2outfit-manual-recovery-{job['id']}",
+          }
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
+              for key, value in values.items():
+                  stream.write(f"{key}={value}\\n")
+          print(json.dumps({"job": path, "recovery": recovery}, indent=2))
+          '@ | uv run --no-cache --no-project python -
+
+      - name: Audit repository contracts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          uv run --no-cache --no-project python tools/audit_genworks_layout.py
+          if ($LASTEXITCODE -ne 0) { throw 'GenWorks layout audit failed' }
+          uv run --no-cache --no-project python tools/audit_repository_hygiene.py
+          if ($LASTEXITCODE -ne 0) { throw 'Repository hygiene audit failed' }
+
+      - name: Locate Blender and private target
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $blenderCandidates = @()
+          if ($env:BLENDER_EXE) { $blenderCandidates += $env:BLENDER_EXE }
+          $command = Get-Command blender -ErrorAction SilentlyContinue
+          if ($command) { $blenderCandidates += $command.Source }
+          $blenderCandidates += @(
+            'C:/Program Files/Blender Foundation/Blender 4.4/blender.exe',
+            'C:/Program Files/Blender Foundation/Blender 4.3/blender.exe',
+            'C:/Program Files/Blender Foundation/Blender 4.2/blender.exe'
+          )
+          $blender = $blenderCandidates |
+            Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Leaf) } |
+            Select-Object -First 1
+          if (-not $blender) { throw 'Blender executable was not found on the self-hosted runner' }
+
+          $target = Get-ChildItem -Path . -Filter $env:TARGET_SOURCE_BASENAME -Recurse -File -ErrorAction SilentlyContinue |
+            Where-Object {
+              $_.FullName -notmatch '\\Assets\\GenWorks\\' -and
+              $_.FullName -notmatch '\\.git\\'
+            } |
+            Select-Object -First 1
+          if (-not $target) { throw "Private target was not found: $env:TARGET_SOURCE_BASENAME" }
+
+          "IMAGE2OUTFIT_BLENDER=$blender" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "PRIVATE_TARGET=$($target.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Restore historical recovery builder without reviving legacy source
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path $env:RECOVERY_DIR | Out-Null
+          $script = Join-Path $env:RECOVERY_DIR 'recovery-build.py'
+          $sourceSpec = "$($env:SOURCE_COMMIT):$($env:BUILD_SCRIPT_PATH)"
+          $content = & git show $sourceSpec
+          if ($LASTEXITCODE -ne 0) { throw 'Could not recover the provenance-bound build script' }
+          $content | Set-Content -LiteralPath $script -Encoding utf8
+          "RECOVERY_SCRIPT=$script" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Rebuild and hash-check candidate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $jobDir = "Assets/_Local/Jobs/$env:JOB_ID"
+          New-Item -ItemType Directory -Force -Path $jobDir, $env:RECOVERY_DIR | Out-Null
+          $jobPath = Join-Path $jobDir 'job.json'
+          $blend = "$env:RECOVERY_DIR/$env:CANDIDATE_STEM.blend"
+          $fbx = "$env:RECOVERY_DIR/$env:CANDIDATE_STEM.fbx"
+          $localJob = [ordered]@{
+            targetSourcePath = $env:PRIVATE_TARGET
+            blendPath = $blend
+            fbxAssetPath = $fbx
+          }
+          $localJob | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $jobPath -Encoding utf8
+          & $env:IMAGE2OUTFIT_BLENDER --background --factory-startup --python-exit-code 1 --python $env:RECOVERY_SCRIPT -- --job $jobPath
+          if ($LASTEXITCODE -ne 0) { throw "Manual recovery build failed with exit code $LASTEXITCODE" }
+          if (-not (Test-Path -LiteralPath $fbx -PathType Leaf)) { throw "Recovered FBX is missing: $fbx" }
+          $hash = (Get-FileHash -LiteralPath $fbx -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne $env:EXPECTED_FBX_SHA256) {
+            throw "Recovered FBX hash mismatch: expected $env:EXPECTED_FBX_SHA256 got $hash"
+          }
+          "RECOVERED_FBX=$fbx" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Render actual five-view evidence
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $out = "$env:RECOVERY_DIR/Previews"
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          & $env:IMAGE2OUTFIT_BLENDER --background --factory-startup --python-exit-code 1 --python $env:RENDER_SCRIPT -- --avatar $env:PRIVATE_TARGET --outfit $env:RECOVERED_FBX --outdir $out --resolution 1024
+          if ($LASTEXITCODE -ne 0) { throw "Five-view render failed with exit code $LASTEXITCODE" }
+          uv run --no-cache --no-project --with pillow python tools/compose_turnaround.py --input-dir $out --output "$out/$env:CANDIDATE_STEM-multiview.webp"
+          if ($LASTEXITCODE -ne 0) { throw 'Five-view WebP composition failed' }
+
+          $record = [ordered]@{
+            schemaVersion = 1
+            productId = $env:JOB_ID
+            classification = 'provenance-bound-manual-recovery'
+            sourceCommit = $env:SOURCE_COMMIT
+            buildScriptPath = $env:BUILD_SCRIPT_PATH
+            expectedFbxSha256 = $env:EXPECTED_FBX_SHA256
+            privateTargetRedistributed = $false
+            productStateUnaffected = $true
+            visualGateUnaffected = $true
+            generatedAt = (Get-Date).ToUniversalTime().ToString('o')
+          }
+          $record | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath "$env:RECOVERY_DIR/publication-evidence.json" -Encoding utf8
+
+      - name: Delete previous manual recovery artifact
+        shell: pwsh
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: uv run --no-cache --no-project python tools/delete_previous_artifacts.py "$env:ARTIFACT_NAME"
+
+      - name: Upload real recovered WebP evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: \${{ env.ARTIFACT_NAME }}
+          path: |
+            .image2outfit/manual-recovery/**/*.webp
+            .image2outfit/manual-recovery/**/*.json
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 1
+          compression-level: 6
