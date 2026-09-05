@@ -21,16 +21,16 @@
     "doNotRebuildFromZero": true,
     "resumeFrom": "tools/siroino_heart_cutout_rib_knit_dress.py",
     "blockers": [
-      "Build v2 with a connected upper yoke around the real heart opening.",
-      "Lower and flare the front hem slit while moving the hanging skirt panels away from the legs.",
-      "Extend detached arm warmers and darken the black knit material.",
-      "Rerender five views and six required poses, then directly review the current v2 evidence."
+      "Replace nearest-body lower-skirt weighting with a deformation design that preserves a convincing long-dress silhouette in crouch and sit.",
+      "Prevent the long skirt from separating from the body in prone.",
+      "Rerender five views and six required poses, then directly review the new evidence before COMPLETE."
     ],
     "lastAttempt": {
       "result": "DIRECT_VISUAL_REVIEW_FAIL",
-      "visualRevision": "v1-parametric-heart-cutout-rib-panel",
-      "hostedWorkflowRun": 33929507356,
-      "artifactId": 9958230033
+      "visualRevision": "v2-connected-yoke-draped-hem-long-warmers",
+      "hostedWorkflowRun": 33931757807,
+      "artifactId": 9959008939,
+      "artifactDigest": "sha256:14be59bbad0ca3ef9aa3b37b0de88f518f10c5ee12fad5ef4bd8297da9ce8e86"
     }
   },
   "technicalGates": {
@@ -68,6 +68,18 @@
         "Detached arm warmers were too short and read as cuffs.",
         "Black knit rendered too light relative to the supplied reference.",
         "Crouch, sit, and prone deformation did not preserve a convincing long-dress silhouette."
+      ]
+    },
+    {
+      "revision": "v2-connected-yoke-draped-hem-long-warmers",
+      "result": "DIRECT_VISUAL_REVIEW_FAIL",
+      "workflowRun": 33931757807,
+      "artifactId": 9959008939,
+      "artifactDigest": "sha256:14be59bbad0ca3ef9aa3b37b0de88f518f10c5ee12fad5ef4bd8297da9ce8e86",
+      "visibleDefects": [
+        "Crouch deformation folds the lower dress into rigid overlapping panels instead of preserving a skirt silhouette.",
+        "Sit deformation collapses the lower dress around the thighs and chair-height region.",
+        "Prone deformation separates large skirt sections from the body, so the asset is not release-ready."
       ]
     }
   ]
