@@ -185,18 +185,24 @@ class ReviewConsoleTest(unittest.TestCase):
         MODULE.build(self.root, self.output)
         document = (self.output / "index.html").read_text(encoding="utf-8")
 
-        self.assertEqual(document.count('id="product-list"'), 1)
-        self.assertEqual(document.count('id="product-buttons"'), 1)
+        self.assertEqual(document.count('id="catalog"'), 1)
+        self.assertEqual(document.count('id="catalog-grid"'), 1)
         self.assertEqual(document.count('id="product-detail"'), 1)
+        self.assertLess(document.index('id="catalog-grid"'), document.index('id="product-detail"'))
         for marker in (
-            "READ ONLY · RELEASE EVIDENCE",
+            "READ ONLY · 3D OUTFIT CATALOG",
+            "作品から選ぶ。状態と証拠はあとから確認する。",
+            "catalog-card",
+            "catalog-image",
+            "heroAsset(r)",
+            "レンダリング",
             "未解決blocker",
-            "必須ビュー・ポーズ",
             "release gate",
             "QualitySpec release projection",
             "window.REVIEW_CONSOLE_DATA",
             "new URLSearchParams(location.search)",
             "history.replaceState",
+            "scrollIntoView",
             "ArrowLeft",
             "ArrowRight",
             "Escape",
