@@ -140,6 +140,66 @@ class IoPagesGalleryTests(unittest.TestCase):
             self.assertIn("preserved 1 current-preview images", result["detail"])
 
 
+
+    def test_failed_regeneration_restores_previous_preview_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir) / "repo"
+            product = root / "Assets" / "GenWorks" / "working"
+            previews = product / "Previews"
+            job_path = root / "config" / "products" / "working" / "job.json"
+            previews.mkdir(parents=True)
+            job_path.parent.mkdir(parents=True)
+            (product / "ProductManifest.json").write_text(
+                json.dumps(
+                    {
+                        "schemaVersion": 1,
+                        "productId": "working",
+                        "status": "WORKING",
+                        "productRoot": "Assets/GenWorks/working",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            job_path.write_text(
+                json.dumps(
+                    {
+                        "id": "working",
+                        "productRoot": "Assets/GenWorks/working",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            Image.new("RGB", (8, 8)).save(previews / "front.png")
+
+            previous_root = MODULE.ROOT
+            try:
+                MODULE.ROOT = root
+                resolution = SimpleNamespace(
+                    environment={
+                        "SKIP_PRODUCT_BUILD": "false",
+                        "PIPELINE_MODE": "false",
+                        "REPORT_DIR": ".image2outfit/products/working/reports",
+                        "BUILD_SCRIPT": "tools/fake_build.py",
+                        "JOB_PATH": "config/products/working/job.json",
+                        "HOSTED_POSE_SCRIPT": "",
+                        "BLEND_PATH": "Assets/GenWorks/working/source.blend",
+                        "PRODUCT_ROOT": "Assets/GenWorks/working",
+                    },
+                    reason="selected",
+                )
+                with (
+                    mock.patch.object(MODULE, "resolve", return_value=resolution),
+                    mock.patch.object(MODULE, "run_logged", return_value=1),
+                ):
+                    result = MODULE.render_one("unused-blender", job_path)
+            finally:
+                MODULE.ROOT = previous_root
+
+            self.assertEqual(result["status"], "FAIL")
+            self.assertEqual(result["stage"], "build")
+            self.assertIn("restored previous render evidence", result["detail"])
+            self.assertTrue((previews / "front.png").is_file())
+
     def test_pages_workflow_requires_webp_for_every_canonical_product(self) -> None:
         workflow = (
             ROOT / ".github" / "workflows" / "render-all-current.yml"
