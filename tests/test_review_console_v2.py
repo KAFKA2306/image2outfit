@@ -188,7 +188,9 @@ class ReviewConsoleTest(unittest.TestCase):
         self.assertEqual(document.count('id="catalog"'), 1)
         self.assertEqual(document.count('id="catalog-grid"'), 1)
         self.assertEqual(document.count('id="product-detail"'), 1)
-        self.assertLess(document.index('id="catalog-grid"'), document.index('id="product-detail"'))
+        self.assertLess(
+            document.index('id="catalog-grid"'), document.index('id="product-detail"')
+        )
         for marker in (
             "READ ONLY · 3D OUTFIT CATALOG",
             "作品から選ぶ。状態と証拠はあとから確認する。",
