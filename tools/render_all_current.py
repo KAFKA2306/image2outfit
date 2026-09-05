@@ -102,10 +102,41 @@ def clear_stale_previews(job: dict[str, Any]) -> None:
     previews.mkdir(parents=True, exist_ok=True)
 
 
+def snapshot_previews(job: dict[str, Any]) -> Path:
+    previews = ROOT / str(job["productRoot"]) / "Previews"
+    backup = (
+        ROOT / ".image2outfit" / "render-current-backups" / str(job["id"]) / "Previews"
+    )
+    shutil.rmtree(backup.parent, ignore_errors=True)
+    if review_console.image_files(previews):
+        backup.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(previews, backup)
+    return backup
+
+
+def restore_previews_if_generation_produced_none(
+    job: dict[str, Any], backup: Path
+) -> bool:
+    previews = ROOT / str(job["productRoot"]) / "Previews"
+    if review_console.image_files(previews):
+        shutil.rmtree(backup.parent, ignore_errors=True)
+        return False
+    if not review_console.image_files(backup):
+        shutil.rmtree(backup.parent, ignore_errors=True)
+        return False
+    shutil.rmtree(previews, ignore_errors=True)
+    shutil.copytree(backup, previews)
+    shutil.rmtree(backup.parent, ignore_errors=True)
+    return True
+
+
+def discard_preview_snapshot(backup: Path) -> None:
+    shutil.rmtree(backup.parent, ignore_errors=True)
+
+
 def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     product_id = str(job["id"])
-    clear_stale_previews(job)
 
     resolution = resolve(
         root=ROOT,
@@ -116,7 +147,26 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     )
     env_map = resolution.environment
     if env_map.get("SKIP_PRODUCT_BUILD") == "true":
-        detail = f"{product_id}: build skipped ({resolution.reason})"
+        workspace = ROOT / str(job["productRoot"])
+        preview_root, source_kind = review_console.preview_directory(workspace)
+        preserved = review_console.image_files(preview_root)
+        if preserved:
+            preview_files = [path.relative_to(ROOT).as_posix() for path in preserved]
+            detail = (
+                f"{product_id}: build skipped ({resolution.reason}); "
+                f"preserved {len(preview_files)} {source_kind} images"
+            )
+            mark_attempt(job, job_path, status="PASS", stage="preserve", detail=detail)
+            return {
+                "productId": product_id,
+                "status": "PASS",
+                "stage": "preserve",
+                "detail": detail,
+                "previewFiles": preview_files,
+            }
+        detail = (
+            f"{product_id}: build skipped ({resolution.reason}) with no render evidence"
+        )
         mark_attempt(job, job_path, status="FAIL", stage="scope", detail=detail)
         return {
             "productId": product_id,
@@ -125,6 +175,8 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
             "detail": detail,
         }
 
+    preview_backup = snapshot_previews(job)
+    clear_stale_previews(job)
     process_env = os.environ.copy()
     process_env.update(env_map)
     reports = ROOT / env_map["REPORT_DIR"]
@@ -150,7 +202,9 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         ]
         code = run_logged(command, reports / "render-current-pipeline.log", process_env)
         if code != 0:
-            detail = f"{product_id}: canonical pipeline exited {code}"
+            restored = restore_previews_if_generation_produced_none(job, preview_backup)
+            suffix = "; restored previous render evidence" if restored else ""
+            detail = f"{product_id}: canonical pipeline exited {code}{suffix}"
             mark_attempt(job, job_path, status="FAIL", stage="pipeline", detail=detail)
             return {
                 "productId": product_id,
@@ -178,7 +232,11 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
             process_env,
         )
         if code != 0:
-            detail = f"{product_id}: Blender build exited {code}"
+            restored = restore_previews_if_generation_produced_none(
+                job, preview_backup
+            )
+            suffix = "; restored previous render evidence" if restored else ""
+            detail = f"{product_id}: Blender build exited {code}{suffix}"
             mark_attempt(job, job_path, status="FAIL", stage="build", detail=detail)
             return {
                 "productId": product_id,
@@ -208,7 +266,11 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
                 process_env,
             )
             if code != 0:
-                detail = f"{product_id}: hosted pose render exited {code}"
+                restored = restore_previews_if_generation_produced_none(
+                    job, preview_backup
+                )
+                suffix = "; restored previous render evidence" if restored else ""
+                detail = f"{product_id}: hosted pose render exited {code}{suffix}"
                 mark_attempt(job, job_path, status="FAIL", stage="poses", detail=detail)
                 return {
                     "productId": product_id,
@@ -235,11 +297,27 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         for path in preview_root.rglob("*")
         if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
     )
+    restored = False
+    if preview_files:
+        discard_preview_snapshot(preview_backup)
+    else:
+        restored = restore_previews_if_generation_produced_none(job, preview_backup)
+        if restored:
+            preview_files = sorted(
+                path.relative_to(ROOT).as_posix()
+                for path in preview_root.rglob("*")
+                if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
+            )
     status = "PASS" if preview_files else "FAIL"
     detail = (
         f"{product_id}: current render captured {len(preview_files)} images"
-        if preview_files
-        else f"{product_id}: build completed but produced no review images"
+        if preview_files and not restored
+        else (
+            f"{product_id}: build produced no new images; "
+            f"restored {len(preview_files)} previous images"
+            if restored
+            else f"{product_id}: build completed but produced no review images"
+        )
     )
     mark_attempt(job, job_path, status=status, stage="capture", detail=detail)
     return {

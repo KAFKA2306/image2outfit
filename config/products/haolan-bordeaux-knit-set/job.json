@@ -3,12 +3,11 @@
   "id": "haolan-bordeaux-knit-set",
   "productName": "Bordeaux Rib Knit Set for HAOLAN v1.6",
   "adapterId": "haolan-v1.6",
-  "automaticBuild": false,
+  "automaticBuild": true,
   "productRoot": "Assets/GenWorks/haolan-bordeaux-knit-set",
   "productManifestPath": "Assets/GenWorks/haolan-bordeaux-knit-set/ProductManifest.json",
-  "buildScript": "tools/render_haolan_candidate_turnaround.py",
-  "hostedPoseScript": "tools/render_haolan_candidate_turnaround.py",
-  "buildCapability": "recovery-and-preview-only-until-fbx-is-restored",
+  "buildScript": "tools/build_haolan_bordeaux_knit_set.py",
+  "buildCapability": "geometry-free-skeleton-seed-hosted-build-and-render",
   "blendPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Source/Blender/HAOLAN_BordeauxKnitSet.blend",
   "fbxAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Models/HAOLAN_BordeauxKnitSet.fbx",
   "prefabAssetPath": "Assets/GenWorks/haolan-bordeaux-knit-set/Prefab/HAOLAN_BordeauxKnitSet.prefab",
@@ -50,5 +49,6 @@
     "pose-penetration-review": "Assets/_Local/Evidence/haolan-bordeaux-knit-set/pose-penetration-review.json",
     "vrchat-runtime-review": "Assets/_Local/Evidence/haolan-bordeaux-knit-set/vrchat-runtime-review.json"
   },
-  "allowedExtraBones": []
+  "allowedExtraBones": [],
+  "buildRevision": "v3-hosted-geometry-free-preview"
 }
