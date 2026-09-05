@@ -89,6 +89,38 @@ class IoPagesGalleryTests(unittest.TestCase):
             self.assertIn("working/front.webp", html)
             self.assertIn("rejected/front.webp", html)
 
+    def test_missing_product_webp_fails_production_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            site = Path(temp_dir)
+            catalog = {
+                "products": [
+                    {
+                        "productId": "missing",
+                        "webpCount": 0,
+                        "assets": [],
+                    }
+                ]
+            }
+            with self.assertRaisesRegex(RuntimeError, "io WebP coverage incomplete"):
+                MODULE.validate_io_gallery(catalog, site)
+
+    def test_complete_webp_catalog_passes_production_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            site = Path(temp_dir)
+            asset = site / "io" / "working" / "front.webp"
+            asset.parent.mkdir(parents=True)
+            asset.write_bytes(b"webp")
+            catalog = {
+                "products": [
+                    {
+                        "productId": "working",
+                        "webpCount": 1,
+                        "assets": [{"href": "io/working/front.webp"}],
+                    }
+                ]
+            }
+            MODULE.validate_io_gallery(catalog, site)
+
 
 if __name__ == "__main__":
     unittest.main()

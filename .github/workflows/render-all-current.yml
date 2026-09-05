@@ -11,6 +11,7 @@ on:
       - Assets/GenWorks/**/ProductManifest.json
       - Assets/GenWorks/**/Source/**
       - Assets/GenWorks/**/Previews/**
+      - Assets/GenWorks/**/Evidence/Rejected/**/Previews/**
       - src/image2outfit/**
       - tools/**
       - pyproject.toml
@@ -97,6 +98,7 @@ jobs:
             .image2outfit/render-current-summary.json
             Assets/GenWorks/**/ProductManifest.json
             Assets/GenWorks/**/Previews/**
+            Assets/GenWorks/**/Evidence/Rejected/**/Previews/**
           if-no-files-found: error
           overwrite: true
           retention-days: 1
@@ -109,6 +111,8 @@ jobs:
           catalog = json.loads(Path('_site/io/catalog.json').read_text(encoding='utf-8'))
           missing = [p['productId'] for p in catalog['products'] if p['webpCount'] == 0]
           print(f"io_products={catalog['productCount']} io_webp={catalog['webpCount']} missing={missing}")
+          if missing:
+              raise SystemExit(f"io WebP coverage incomplete: {missing}")
           for product in catalog['products']:
               for asset in product['assets']:
                   if not asset['href'].endswith('.webp'):
