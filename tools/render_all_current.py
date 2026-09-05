@@ -105,11 +105,7 @@ def clear_stale_previews(job: dict[str, Any]) -> None:
 def snapshot_previews(job: dict[str, Any]) -> Path:
     previews = ROOT / str(job["productRoot"]) / "Previews"
     backup = (
-        ROOT
-        / ".image2outfit"
-        / "render-current-backups"
-        / str(job["id"])
-        / "Previews"
+        ROOT / ".image2outfit" / "render-current-backups" / str(job["id"]) / "Previews"
     )
     shutil.rmtree(backup.parent, ignore_errors=True)
     if review_console.image_files(previews):
@@ -155,10 +151,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         preview_root, source_kind = review_console.preview_directory(workspace)
         preserved = review_console.image_files(preview_root)
         if preserved:
-            preview_files = [
-                path.relative_to(ROOT).as_posix()
-                for path in preserved
-            ]
+            preview_files = [path.relative_to(ROOT).as_posix() for path in preserved]
             detail = (
                 f"{product_id}: build skipped ({resolution.reason}); "
                 f"preserved {len(preview_files)} {source_kind} images"
@@ -171,7 +164,9 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
                 "detail": detail,
                 "previewFiles": preview_files,
             }
-        detail = f"{product_id}: build skipped ({resolution.reason}) with no render evidence"
+        detail = (
+            f"{product_id}: build skipped ({resolution.reason}) with no render evidence"
+        )
         mark_attempt(job, job_path, status="FAIL", stage="scope", detail=detail)
         return {
             "productId": product_id,
@@ -207,9 +202,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         ]
         code = run_logged(command, reports / "render-current-pipeline.log", process_env)
         if code != 0:
-            restored = restore_previews_if_generation_produced_none(
-                job, preview_backup
-            )
+            restored = restore_previews_if_generation_produced_none(job, preview_backup)
             suffix = "; restored previous render evidence" if restored else ""
             detail = f"{product_id}: canonical pipeline exited {code}{suffix}"
             mark_attempt(job, job_path, status="FAIL", stage="pipeline", detail=detail)
@@ -308,9 +301,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     if preview_files:
         discard_preview_snapshot(preview_backup)
     else:
-        restored = restore_previews_if_generation_produced_none(
-            job, preview_backup
-        )
+        restored = restore_previews_if_generation_produced_none(job, preview_backup)
         if restored:
             preview_files = sorted(
                 path.relative_to(ROOT).as_posix()
