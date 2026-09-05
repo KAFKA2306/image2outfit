@@ -15,7 +15,9 @@ from pathlib import Path
 import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
-LEGACY_BUILDER = ROOT / "tools" / "haolan_knit_build.py"
+LEGACY_BUILDER = ROOT / "tools/haolan_knit_build.py"
+TURNAROUND_RENDERER = ROOT / "tools/render_haolan_candidate_turnaround.py"
+POSE_RENDERER = ROOT / "tools/render_haolan_candidate_poses.py"
 LOCAL_JOB = ROOT / "Assets" / "_Local" / "Jobs" / "haolan-bordeaux-knit-set" / "job.json"
 SEED_FBX = ROOT / "Assets" / "_Local" / "GeneratedSeeds" / "haolan-v1.6-skeleton.fbx"
 
@@ -131,7 +133,7 @@ def main() -> int:
             sys.argv = previous
 
     run_renderer(
-        ROOT / "tools" / "render_haolan_candidate_turnaround.py",
+        TURNAROUND_RENDERER,
         [
             "--avatar",
             str(target),
@@ -144,7 +146,7 @@ def main() -> int:
         ],
     )
     run_renderer(
-        ROOT / "tools" / "render_haolan_candidate_poses.py",
+        POSE_RENDERER,
         [
             "--avatar",
             str(target),
