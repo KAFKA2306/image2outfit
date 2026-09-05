@@ -105,7 +105,6 @@ def clear_stale_previews(job: dict[str, Any]) -> None:
 def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     product_id = str(job["id"])
-    clear_stale_previews(job)
 
     resolution = resolve(
         root=ROOT,
@@ -116,7 +115,27 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     )
     env_map = resolution.environment
     if env_map.get("SKIP_PRODUCT_BUILD") == "true":
-        detail = f"{product_id}: build skipped ({resolution.reason})"
+        workspace = ROOT / str(job["productRoot"])
+        preview_root, source_kind = review_console.preview_directory(workspace)
+        preserved = review_console.image_files(preview_root)
+        if preserved:
+            preview_files = [
+                path.relative_to(ROOT).as_posix()
+                for path in preserved
+            ]
+            detail = (
+                f"{product_id}: build skipped ({resolution.reason}); "
+                f"preserved {len(preview_files)} {source_kind} images"
+            )
+            mark_attempt(job, job_path, status="PASS", stage="preserve", detail=detail)
+            return {
+                "productId": product_id,
+                "status": "PASS",
+                "stage": "preserve",
+                "detail": detail,
+                "previewFiles": preview_files,
+            }
+        detail = f"{product_id}: build skipped ({resolution.reason}) with no render evidence"
         mark_attempt(job, job_path, status="FAIL", stage="scope", detail=detail)
         return {
             "productId": product_id,
@@ -125,6 +144,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
             "detail": detail,
         }
 
+    clear_stale_previews(job)
     process_env = os.environ.copy()
     process_env.update(env_map)
     reports = ROOT / env_map["REPORT_DIR"]
