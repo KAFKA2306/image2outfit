@@ -102,6 +102,42 @@ def clear_stale_previews(job: dict[str, Any]) -> None:
     previews.mkdir(parents=True, exist_ok=True)
 
 
+def snapshot_previews(job: dict[str, Any]) -> Path:
+    previews = ROOT / str(job["productRoot"]) / "Previews"
+    backup = (
+        ROOT
+        / ".image2outfit"
+        / "render-current-backups"
+        / str(job["id"])
+        / "Previews"
+    )
+    shutil.rmtree(backup.parent, ignore_errors=True)
+    if review_console.image_files(previews):
+        backup.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(previews, backup)
+    return backup
+
+
+def restore_previews_if_generation_produced_none(
+    job: dict[str, Any], backup: Path
+) -> bool:
+    previews = ROOT / str(job["productRoot"]) / "Previews"
+    if review_console.image_files(previews):
+        shutil.rmtree(backup.parent, ignore_errors=True)
+        return False
+    if not review_console.image_files(backup):
+        shutil.rmtree(backup.parent, ignore_errors=True)
+        return False
+    shutil.rmtree(previews, ignore_errors=True)
+    shutil.copytree(backup, previews)
+    shutil.rmtree(backup.parent, ignore_errors=True)
+    return True
+
+
+def discard_preview_snapshot(backup: Path) -> None:
+    shutil.rmtree(backup.parent, ignore_errors=True)
+
+
 def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     product_id = str(job["id"])
@@ -144,6 +180,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
             "detail": detail,
         }
 
+    preview_backup = snapshot_previews(job)
     clear_stale_previews(job)
     process_env = os.environ.copy()
     process_env.update(env_map)
@@ -170,7 +207,11 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         ]
         code = run_logged(command, reports / "render-current-pipeline.log", process_env)
         if code != 0:
-            detail = f"{product_id}: canonical pipeline exited {code}"
+            restored = restore_previews_if_generation_produced_none(
+                job, preview_backup
+            )
+            suffix = "; restored previous render evidence" if restored else ""
+            detail = f"{product_id}: canonical pipeline exited {code}{suffix}"
             mark_attempt(job, job_path, status="FAIL", stage="pipeline", detail=detail)
             return {
                 "productId": product_id,
@@ -198,7 +239,11 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
             process_env,
         )
         if code != 0:
-            detail = f"{product_id}: Blender build exited {code}"
+            restored = restore_previews_if_generation_produced_none(
+                job, preview_backup
+            )
+            suffix = "; restored previous render evidence" if restored else ""
+            detail = f"{product_id}: Blender build exited {code}{suffix}"
             mark_attempt(job, job_path, status="FAIL", stage="build", detail=detail)
             return {
                 "productId": product_id,
@@ -228,7 +273,11 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
                 process_env,
             )
             if code != 0:
-                detail = f"{product_id}: hosted pose render exited {code}"
+                restored = restore_previews_if_generation_produced_none(
+                    job, preview_backup
+                )
+                suffix = "; restored previous render evidence" if restored else ""
+                detail = f"{product_id}: hosted pose render exited {code}{suffix}"
                 mark_attempt(job, job_path, status="FAIL", stage="poses", detail=detail)
                 return {
                     "productId": product_id,
@@ -255,6 +304,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         for path in preview_root.rglob("*")
         if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
     )
+    discard_preview_snapshot(preview_backup)
     status = "PASS" if preview_files else "FAIL"
     detail = (
         f"{product_id}: current render captured {len(preview_files)} images"
