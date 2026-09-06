@@ -116,7 +116,37 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
             raise RuntimeError(
                 f"negative-control variant unexpectedly succeeded: {item['variantId']}"
             )
+        if not report_path.is_file():
+            raise RuntimeError(
+                f"negative control failed before auditable coarse gate: {item['variantId']}"
+            )
+        rejected_report = read_object(report_path)
+        coarse = rejected_report.get("coarseGeometryReview")
+        if rejected_report.get("highQualityRenderSkipped") is not True:
+            raise ValueError("negative control did not skip high-quality rendering")
+        if not isinstance(coarse, dict) or set(coarse) != {"front", "left"}:
+            raise ValueError("negative control coarse geometry evidence is incomplete")
+        for value in coarse.values():
+            if not isinstance(value, dict):
+                raise ValueError("negative control coarse evidence entry is invalid")
+            path = ROOT / str(value.get("path", ""))
+            if not path.is_file() or sha256(path) != value.get("sha256"):
+                raise ValueError("negative control coarse evidence hash mismatch")
+        unexpected_final = [
+            path
+            for path in job.get("previewPaths", {}).values()
+            if (ROOT / str(path)).is_file()
+        ]
+        if unexpected_final:
+            raise ValueError(
+                "negative control generated high-quality preview files: "
+                + ", ".join(str(path) for path in unexpected_final)
+            )
         result["status"] = "EXPECTED_FAIL"
+        result["coarseGateRejected"] = True
+        result["highQualityRenderSkipped"] = True
+        result["coarseEvidenceCount"] = len(coarse)
+        result["reportSha256"] = sha256(report_path)
         result["errorTail"] = "\n".join(
             (completed.stderr or completed.stdout).splitlines()[-12:]
         )
@@ -346,6 +376,12 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         raise ValueError("roughness-only control did not change rendered evidence")
     if negative["status"] != "EXPECTED_FAIL":
         raise ValueError("negative-control variant did not fail as expected")
+    if negative.get("coarseGateRejected") is not True:
+        raise ValueError("negative control did not reach the coarse geometry gate")
+    if negative.get("highQualityRenderSkipped") is not True:
+        raise ValueError("negative control did not stop high-quality rendering")
+    if int(negative.get("coarseEvidenceCount", 0)) != 2:
+        raise ValueError("negative control coarse evidence count is invalid")
 
     baseline_report = ROOT / str(baseline["reportPath"])
     if sha256(baseline_report) != baseline["reportSha256"]:
@@ -368,6 +404,7 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         "roughnessControlChangedRenderKeys": roughness_changed_render_keys,
         "clothCacheReopenValidated": True,
         "negativeControlFailed": True,
+        "coarseRejectStoppedHighQualityRender": True,
         "baselinePreservedAfterFailure": True,
         "canonicalSuccessfulCandidates": 3,
         "auxiliarySuccessfulControls": 1,
