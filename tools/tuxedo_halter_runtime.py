@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import math
 import uuid
 from collections.abc import Mapping
@@ -12,6 +14,53 @@ import bmesh
 import bpy
 
 import genworks_product_common as g
+
+
+def mesh_geometry_sha256(
+    obj: bpy.types.Object,
+    *,
+    evaluated: bool = False,
+) -> str:
+    if obj.type != "MESH":
+        raise ValueError(f"mesh hash requires a mesh object: {obj.name}")
+    evaluated_object = None
+    mesh = obj.data
+    if evaluated:
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        evaluated_object = obj.evaluated_get(depsgraph)
+        mesh = evaluated_object.to_mesh()
+    try:
+        payload = {
+            "vertices": [
+                [round(float(value), 7) for value in vertex.co]
+                for vertex in mesh.vertices
+            ],
+            "polygons": [list(polygon.vertices) for polygon in mesh.polygons],
+        }
+        encoded = json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+    finally:
+        if evaluated_object is not None:
+            evaluated_object.to_mesh_clear()
+
+
+def cloth_cache_state(obj: bpy.types.Object, modifier_name: str) -> dict[str, object]:
+    modifier = obj.modifiers.get(modifier_name)
+    if modifier is None or modifier.type != "CLOTH":
+        raise ValueError(f"cloth modifier is missing: {obj.name}/{modifier_name}")
+    cache = modifier.point_cache
+    return {
+        "object": obj.name,
+        "modifier": modifier.name,
+        "cacheBakedActual": bool(cache.is_baked),
+        "frameStart": int(cache.frame_start),
+        "frameEnd": int(cache.frame_end),
+        "cacheInfo": str(cache.info or ""),
+    }
 
 
 def configure_cloth(
