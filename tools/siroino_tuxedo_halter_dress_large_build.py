@@ -307,8 +307,10 @@ def bake_skirts(
     lower_skirt: bpy.types.Object,
     upper_pin: list[int],
     lower_pin: list[int],
-) -> tuple[list[dict[str, object]], int]:
+    cache_snapshot: Path,
+) -> tuple[list[dict[str, object]], int, Path]:
     frame_end = 24
+    frame_mid = (1 + frame_end) // 2
     skirts = (upper_skirt, lower_skirt)
     pre_bake_hashes = {skirt.name: mesh_geometry_sha256(skirt) for skirt in skirts}
     contracts = [
@@ -320,23 +322,45 @@ def bake_skirts(
     scene.frame_start = 1
     scene.frame_end = frame_end
     scene.gravity = (0.0, 0.0, -4.8)
+
+    cache_snapshot.parent.mkdir(parents=True, exist_ok=True)
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(cache_snapshot),
+        check_existing=False,
+    )
     bpy.context.view_layer.objects.active = upper_skirt
     bpy.ops.ptcache.bake_all(bake=True)
-    scene.frame_set(frame_end)
-    bpy.context.view_layer.update()
 
     for skirt in skirts:
         contract = contract_by_object[skirt.name]
         cache = cloth_cache_state(skirt, "Reference Cloth")
         contract.update(cache)
         contract["preBakeMeshSha256"] = pre_bake_hashes[skirt.name]
-        contract["evaluatedFrameMeshSha256"] = mesh_geometry_sha256(
-            skirt,
-            evaluated=True,
-        )
+        frame_hashes: dict[str, str] = {}
+        for frame in (1, frame_mid, frame_end):
+            scene.frame_set(frame)
+            bpy.context.view_layer.update()
+            frame_hashes[str(frame)] = mesh_geometry_sha256(
+                skirt,
+                evaluated=True,
+            )
+        contract["frameMeshSha256"] = frame_hashes
+        contract["evaluatedFrameMeshSha256"] = frame_hashes[str(frame_end)]
         if not contract["cacheBakedActual"]:
             raise RuntimeError(f"cloth cache was not baked for {skirt.name}")
 
+    scene.frame_set(frame_end)
+    bpy.context.view_layer.update()
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(cache_snapshot),
+        check_existing=False,
+    )
+    snapshot_sha = base.sha256(cache_snapshot)
+    for contract in contracts:
+        contract["cacheSnapshotSha256"] = snapshot_sha
+
+    for skirt in skirts:
+        contract = contract_by_object[skirt.name]
         bpy.ops.object.select_all(action="DESELECT")
         skirt.select_set(True)
         bpy.context.view_layer.objects.active = skirt
@@ -360,8 +384,7 @@ def bake_skirts(
         soft.segments = 2
         bpy.ops.object.modifier_apply(modifier=soft.name)
         skirt.select_set(False)
-    return contracts, frame_end
-
+    return contracts, frame_end, cache_snapshot
 
 def main() -> int:
     args = parse_args()
@@ -439,8 +462,13 @@ def main() -> int:
         movable=lambda obj: not obj.name.startswith("Silver_"),
     )
     clean_meshes(garments)
-    cloth_contracts, frame_end = bake_skirts(
-        body, upper_skirt, lower_skirt, upper_pin, lower_pin
+    cloth_contracts, frame_end, cloth_cache_snapshot = bake_skirts(
+        body,
+        upper_skirt,
+        lower_skirt,
+        upper_pin,
+        lower_pin,
+        evidence_dir / "cloth-cache-authority.blend",
     )
     clean_meshes(garments)
     weight_report = normalize_bone_weights(
@@ -528,6 +556,10 @@ def main() -> int:
             "gravity": list(scene.gravity),
             "contracts": cloth_contracts,
             "bodyCollisionThicknessM": 0.004,
+            "cacheSnapshot": str(
+                cloth_cache_snapshot.relative_to(ROOT)
+            ).replace("\\", "/"),
+            "cacheSnapshotSha256": base.sha256(cloth_cache_snapshot),
         },
     )
     bib_object = bpy.data.objects.get("White_Jacquard_Bib")
