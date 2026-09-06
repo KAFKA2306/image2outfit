@@ -91,17 +91,13 @@ class VisualReviewBundleTests(unittest.TestCase):
             "id": product,
             "adapterId": "adapter",
             "renderLoopRevision": "r1",
-            "productManifestPath": (
-                f"Assets/GenWorks/{product}/ProductManifest.json"
-            ),
+            "productManifestPath": (f"Assets/GenWorks/{product}/ProductManifest.json"),
             "previewPaths": {
                 "front": f"Assets/GenWorks/{product}/Previews/front.png",
                 "back": f"Assets/GenWorks/{product}/Previews/back.png",
             },
             "posePaths": {
-                "neutral": (
-                    f"Assets/GenWorks/{product}/Previews/Poses/neutral.png"
-                )
+                "neutral": (f"Assets/GenWorks/{product}/Previews/Poses/neutral.png")
             },
         }
         job_path = reference_dir / "job.json"
