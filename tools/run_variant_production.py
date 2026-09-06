@@ -144,6 +144,23 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
         if not (ROOT / str(relative)).is_file():
             raise FileNotFoundError(relative)
 
+    target_profile = report.get("targetProfile")
+    weight_normalization = report.get("weightNormalization")
+    if not isinstance(target_profile, dict):
+        raise ValueError(f"target profile evidence missing for {item['variantId']}")
+    if not isinstance(weight_normalization, dict):
+        raise ValueError(
+            f"weight normalization evidence missing for {item['variantId']}"
+        )
+    if int(weight_normalization.get("vertices", 0)) <= 0:
+        raise ValueError(
+            f"weight normalization processed no vertices for {item['variantId']}"
+        )
+    if int(weight_normalization.get("maximumInfluences", 99)) > 4:
+        raise ValueError(
+            f"weight normalization exceeded four influences for {item['variantId']}"
+        )
+
     result.update(
         {
             "status": "PASS",
@@ -152,6 +169,13 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
             "materialRecipeSha256": report["materialRecipe"]["sha256"],
             "poseEvidenceCount": len(pose_views),
             "geometryPassed": bool(report.get("passed")),
+            "shapeProfileEvidence": target_profile,
+            "weightNormalizationEvidence": {
+                "objects": weight_normalization.get("objects"),
+                "vertices": weight_normalization.get("vertices"),
+                "maximumInfluences": weight_normalization.get("maximumInfluences"),
+                "fallbackVertices": weight_normalization.get("fallbackVertices"),
+            },
         }
     )
     if report.get("passed") is not True:
@@ -191,6 +215,19 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         raise ValueError("color variant did not change the material recipe")
     if baseline["geometryFingerprint"] == size["geometryFingerprint"]:
         raise ValueError("size variant did not change geometry")
+    if size.get("poseEvidenceCount", 0) < 6:
+        raise ValueError("size variant did not regenerate all required pose evidence")
+    size_profile = size.get("shapeProfileEvidence")
+    if not isinstance(size_profile, dict):
+        raise ValueError("size variant shape profile evidence is missing")
+    applied_shape_keys = size_profile.get("appliedShapeKeys")
+    if not isinstance(applied_shape_keys, dict) or applied_shape_keys.get("All_L") != 0.85:
+        raise ValueError("size variant did not apply the requested shape profile")
+    size_weights = size.get("weightNormalizationEvidence")
+    if not isinstance(size_weights, dict) or int(size_weights.get("vertices", 0)) <= 0:
+        raise ValueError("size variant did not rerun weight normalization")
+    if int(size_weights.get("maximumInfluences", 99)) > 4:
+        raise ValueError("size variant weight normalization is invalid")
     if negative["status"] != "EXPECTED_FAIL":
         raise ValueError("negative-control variant did not fail as expected")
 
@@ -202,6 +239,9 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         "colorGeometryMatchesBaseline": True,
         "colorMaterialChanged": True,
         "sizeGeometryChanged": True,
+        "sizeFitRevalidated": True,
+        "sizeWeightsRevalidated": True,
+        "sizePoseEvidenceRevalidated": True,
         "negativeControlFailed": True,
         "baselinePreservedAfterFailure": True,
         "successfulCandidates": 3,
