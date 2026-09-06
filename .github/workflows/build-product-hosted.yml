@@ -359,6 +359,18 @@ jobs:
                   'Artifacts are preserved for exact inspection and resume.'
               )
               raise SystemExit(0)
+          expected_private_reference_boundary = (
+              state.get('status') == 'FAILED'
+              and state.get('current_stage') == 'normalize-view'
+              and completed == ['ingest-reference']
+              and 'private reference image is required' in state.get('errors', [''])[-1]
+          )
+          if expected_private_reference_boundary:
+              print(
+                  'Hosted execution reached the private-reference boundary. '
+                  'normalize-view correctly refused to PASS without the audited source image.'
+              )
+              raise SystemExit(0)
           raise SystemExit(
               f"Pipeline stopped unexpectedly at {state.get('current_stage')}: "
               f"{state.get('errors', ['unknown error'])[-1]}"
