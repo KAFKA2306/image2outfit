@@ -452,16 +452,107 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         label="cloth report",
     )
     payload = read_object(report, "cloth simulation report")
-    if payload.get("status") != "PASS" or not payload.get("cacheBaked"):
-        raise ValueError("cloth simulation report must record a baked PASS cache")
+    pipeline = job.get("garmentPipeline", {})
+    contract_version = (
+        int(pipeline.get("stageContractVersion", 1))
+        if isinstance(pipeline, Mapping)
+        else 1
+    )
+    if contract_version < 2:
+        if payload.get("status") != "PASS" or not payload.get("cacheBaked"):
+            raise ValueError("cloth simulation report must record a baked PASS cache")
+        emit(
+            result,
+            stage="simulate-cloth",
+            product_id=product_id,
+            paths=[report],
+            extra={"cacheBaked": True, "frameEnd": payload.get("frameEnd")},
+        )
+        return
+
+    construction_path, construction = validate_product_document(
+        job,
+        "constructionPath",
+        "construction contract",
+    )
+    policy = construction.get("clothSimulation")
+    if not isinstance(policy, Mapping):
+        raise ValueError("construction clothSimulation policy is required")
+    applicability = policy.get("applicability")
+    if applicability not in {"REQUIRED", "NOT_REQUIRED"}:
+        raise ValueError("cloth applicability must be REQUIRED or NOT_REQUIRED")
+    if payload.get("status") != "PASS":
+        raise ValueError("cloth simulation report status must be PASS")
+    if payload.get("applicability") != applicability:
+        raise ValueError("cloth report applicability does not match construction policy")
+
+    contracts = payload.get("contracts")
+    if not isinstance(contracts, list):
+        raise ValueError("cloth report contracts must be a list")
+
+    blend = repo_path(job["blendPath"], label="blend")
+    if applicability == "REQUIRED":
+        expected_components = policy.get("components")
+        if (
+            not isinstance(expected_components, list)
+            or not expected_components
+            or not all(isinstance(value, str) and value for value in expected_components)
+        ):
+            raise ValueError("required cloth components must be declared")
+        actual_components = [
+            contract.get("object")
+            for contract in contracts
+            if isinstance(contract, Mapping)
+        ]
+        if sorted(actual_components) != sorted(expected_components):
+            raise ValueError(
+                "cloth report object set does not match construction policy"
+            )
+        if not payload.get("cacheBaked") or not payload.get("geometryChanged"):
+            raise ValueError("required cloth simulation did not bake and settle")
+
+        def valid_hash(value: object) -> bool:
+            return (
+                isinstance(value, str)
+                and len(value) == 64
+                and all(character in "0123456789abcdef" for character in value)
+            )
+
+        for index, contract in enumerate(contracts):
+            if not isinstance(contract, Mapping):
+                raise ValueError(f"cloth contract {index} must be an object")
+            if contract.get("cacheBakedActual") is not True:
+                raise ValueError(f"cloth contract {index} has no actual baked cache")
+            if contract.get("geometryChanged") is not True:
+                raise ValueError(f"cloth contract {index} did not change geometry")
+            before = contract.get("preBakeMeshSha256")
+            evaluated = contract.get("evaluatedFrameMeshSha256")
+            settled = contract.get("settledMeshSha256")
+            if not all(valid_hash(value) for value in (before, evaluated, settled)):
+                raise ValueError(f"cloth contract {index} mesh hashes are invalid")
+            if before == settled:
+                raise ValueError(f"cloth contract {index} settled mesh is unchanged")
+            if contract.get("frameStart") != payload.get("frameStart"):
+                raise ValueError(f"cloth contract {index} frameStart mismatch")
+            if contract.get("frameEnd") != payload.get("frameEnd"):
+                raise ValueError(f"cloth contract {index} frameEnd mismatch")
+    elif contracts:
+        raise ValueError("NOT_REQUIRED cloth policy must not report simulated objects")
+
     emit(
         result,
         stage="simulate-cloth",
         product_id=product_id,
-        paths=[report],
-        extra={"cacheBaked": True, "frameEnd": payload.get("frameEnd")},
+        paths=[construction_path, report, blend],
+        extra={
+            "cacheEvidenceValidated": True,
+            "simulationApplicability": applicability,
+            "cacheBaked": bool(payload.get("cacheBaked")),
+            "geometryChanged": bool(payload.get("geometryChanged")),
+            "simulatedObjectCount": len(contracts),
+            "frameEnd": payload.get("frameEnd"),
+        },
     )
-
 
 def stage_export(job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
