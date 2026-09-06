@@ -92,13 +92,14 @@
       "proofRole": "MATERIAL_CONTROL"
     },
     {
-      "id": "invalid-zero-bib",
+      "id": "coarse-gate-reject",
       "kind": "SIZE",
       "expectedResult": "FAIL",
       "geometryRelation": "NOT_APPLICABLE",
       "bodyShapeProfileOverrides": {},
       "geometryVariablesOverrides": {
-        "bibWidthScale": 0
+        "bibWidthScale": 1,
+        "coarseGateMinimumP01M": 1
       },
       "materialOverrides": {},
       "requiredRevalidation": [
