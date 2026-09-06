@@ -12,6 +12,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from image2outfit.pattern_projection import project_pattern_piece
 from image2outfit.stage_contracts import (
     normalize_observed_variants,
     resolve_private_reference,
@@ -142,6 +143,34 @@ class ObservedReferenceContractTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "hash mismatch"):
                 resolve_private_reference(root, job, audit)
+
+
+class PatternProjectionTests(unittest.TestCase):
+    def test_width_perturbation_changes_generated_geometry_fingerprint(self) -> None:
+        piece = pattern_fixture()["pieces"][0]
+        baseline = project_pattern_piece(
+            piece,
+            x_scale=1.0,
+            z_scale=1.0,
+            z_offset=0.0,
+        )
+        widened = project_pattern_piece(
+            piece,
+            x_scale=1.0,
+            z_scale=1.0,
+            z_offset=0.0,
+            width_scale=1.1,
+        )
+
+        self.assertNotEqual(baseline["fingerprint"], widened["fingerprint"])
+        self.assertAlmostEqual(
+            baseline["bounds"]["width"] * 1.1,
+            widened["bounds"]["width"],
+        )
+        self.assertEqual(
+            baseline["edgeVertexMap"],
+            widened["edgeVertexMap"],
+        )
 
 
 class SemanticPatternBoundaryTests(unittest.TestCase):
