@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "baseVariant": "wine-red-black",
+  "variants": [
+    {
+      "id": "black-black",
+      "kind": "color",
+      "materialOverrides": {
+        "waistcoat": "black"
+      },
+      "geometryReuseRequired": true
+    },
+    {
+      "id": "waist-plus-10",
+      "kind": "size",
+      "patternOverrides": {
+        "lower-skirt-ring": {
+          "widthScale": 1.1
+        }
+      },
+      "geometryReuseRequired": false
+    }
+  ]
+}

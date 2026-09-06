@@ -4,20 +4,474 @@
   "units": "meter",
   "coordinateSystem": "x-horizontal-y-vertical",
   "pieces": [
-    {"pieceId":"bib-front","partId":"white-bib-front","boundary":[[-0.105,0.0],[-0.068,0.215],[0.0,0.27],[0.068,0.215],[0.105,0.0],[0.0,-0.145]],"cutCount":1,"onFold":true,"grainAngleDegrees":0,"seamAllowanceM":0.008},
-    {"pieceId":"waistcoat-left","partId":"waistcoat-front-left","boundary":[[-0.155,-0.145],[-0.145,0.035],[-0.112,0.235],[-0.055,0.27],[-0.012,0.105],[-0.055,-0.055],[-0.03,-0.225]],"cutCount":1,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.01},
-    {"pieceId":"waistcoat-right","partId":"waistcoat-front-right","boundary":[[0.155,-0.145],[0.145,0.035],[0.112,0.235],[0.055,0.27],[0.012,0.105],[0.055,-0.055],[0.03,-0.225]],"cutCount":1,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.01},
-    {"pieceId":"waistcoat-back","partId":"waistcoat-back","boundary":[[-0.145,-0.155],[-0.15,0.12],[-0.07,0.265],[0.07,0.265],[0.15,0.12],[0.145,-0.155]],"cutCount":1,"onFold":true,"grainAngleDegrees":0,"seamAllowanceM":0.01},
-    {"pieceId":"tail-left","partId":"waistcoat-tail-left","boundary":[[-0.145,0.0],[-0.015,0.0],[-0.055,-0.225],[-0.145,-0.13]],"cutCount":1,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.008},
-    {"pieceId":"tail-right","partId":"waistcoat-tail-right","boundary":[[0.145,0.0],[0.015,0.0],[0.055,-0.225],[0.145,-0.13]],"cutCount":1,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.008},
-    {"pieceId":"upper-skirt-ring","partId":"upper-skirt","boundary":[[-0.47,0.0],[0.47,0.0],[0.74,-0.245],[-0.74,-0.245]],"cutCount":2,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.012,"pleatCount":16},
-    {"pieceId":"lower-skirt-ring","partId":"lower-skirt","boundary":[[-0.51,0.0],[0.51,0.0],[0.92,-0.315],[-0.92,-0.315]],"cutCount":2,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.012,"pleatCount":20},
-    {"pieceId":"neck-band","partId":"black-neck-band","boundary":[[-0.185,0.0],[0.185,0.0],[0.185,-0.038],[-0.185,-0.038]],"cutCount":1,"onFold":false,"grainAngleDegrees":90,"seamAllowanceM":0.006},
-    {"pieceId":"ruffle-strip","partId":"white-bib-ruffle-center","boundary":[[-0.19,0.0],[0.19,0.0],[0.19,-0.045],[-0.19,-0.045]],"cutCount":3,"onFold":false,"grainAngleDegrees":90,"seamAllowanceM":0.004}
+    {
+      "pieceId": "bib-front",
+      "partId": "white-bib-front",
+      "boundary": [
+        [
+          -0.105,
+          0
+        ],
+        [
+          -0.068,
+          0.215
+        ],
+        [
+          0,
+          0.27
+        ],
+        [
+          0.068,
+          0.215
+        ],
+        [
+          0.105,
+          0
+        ],
+        [
+          0,
+          -0.145
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": true,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.008,
+      "edges": {
+        "left-side": [
+          5,
+          0,
+          1,
+          2
+        ],
+        "right-side": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "centerline": [
+          2,
+          5
+        ]
+      }
+    },
+    {
+      "pieceId": "waistcoat-left",
+      "partId": "waistcoat-front-left",
+      "boundary": [
+        [
+          -0.155,
+          -0.145
+        ],
+        [
+          -0.145,
+          0.035
+        ],
+        [
+          -0.112,
+          0.235
+        ],
+        [
+          -0.055,
+          0.27
+        ],
+        [
+          -0.012,
+          0.105
+        ],
+        [
+          -0.055,
+          -0.055
+        ],
+        [
+          -0.03,
+          -0.225
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.01,
+      "edges": {
+        "outer-side": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "inner-v": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "lower-waist": [
+          6,
+          0
+        ]
+      }
+    },
+    {
+      "pieceId": "waistcoat-right",
+      "partId": "waistcoat-front-right",
+      "boundary": [
+        [
+          0.155,
+          -0.145
+        ],
+        [
+          0.145,
+          0.035
+        ],
+        [
+          0.112,
+          0.235
+        ],
+        [
+          0.055,
+          0.27
+        ],
+        [
+          0.012,
+          0.105
+        ],
+        [
+          0.055,
+          -0.055
+        ],
+        [
+          0.03,
+          -0.225
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.01,
+      "edges": {
+        "outer-side": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "inner-v": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "lower-waist": [
+          6,
+          0
+        ]
+      }
+    },
+    {
+      "pieceId": "waistcoat-back",
+      "partId": "waistcoat-back",
+      "boundary": [
+        [
+          -0.145,
+          -0.155
+        ],
+        [
+          -0.15,
+          0.12
+        ],
+        [
+          -0.07,
+          0.265
+        ],
+        [
+          0.07,
+          0.265
+        ],
+        [
+          0.15,
+          0.12
+        ],
+        [
+          0.145,
+          -0.155
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": true,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.01,
+      "edges": {
+        "left-side": [
+          0,
+          1,
+          2
+        ],
+        "right-side": [
+          3,
+          4,
+          5
+        ],
+        "lower-waist": [
+          5,
+          0
+        ]
+      }
+    },
+    {
+      "pieceId": "tail-left",
+      "partId": "waistcoat-tail-left",
+      "boundary": [
+        [
+          -0.145,
+          0
+        ],
+        [
+          -0.015,
+          0
+        ],
+        [
+          -0.055,
+          -0.225
+        ],
+        [
+          -0.145,
+          -0.13
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.008,
+      "edges": {
+        "waist": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "pieceId": "tail-right",
+      "partId": "waistcoat-tail-right",
+      "boundary": [
+        [
+          0.145,
+          0
+        ],
+        [
+          0.015,
+          0
+        ],
+        [
+          0.055,
+          -0.225
+        ],
+        [
+          0.145,
+          -0.13
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.008,
+      "edges": {
+        "waist": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "pieceId": "upper-skirt-ring",
+      "partId": "upper-skirt",
+      "boundary": [
+        [
+          -0.47,
+          0
+        ],
+        [
+          0.47,
+          0
+        ],
+        [
+          0.74,
+          -0.245
+        ],
+        [
+          -0.74,
+          -0.245
+        ]
+      ],
+      "cutCount": 2,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.012,
+      "pleatCount": 16,
+      "edges": {
+        "waist": [
+          0,
+          1
+        ],
+        "right-back": [
+          1,
+          2
+        ],
+        "hem": [
+          2,
+          3
+        ],
+        "left-back": [
+          3,
+          0
+        ]
+      }
+    },
+    {
+      "pieceId": "lower-skirt-ring",
+      "partId": "lower-skirt",
+      "boundary": [
+        [
+          -0.51,
+          0
+        ],
+        [
+          0.51,
+          0
+        ],
+        [
+          0.92,
+          -0.315
+        ],
+        [
+          -0.92,
+          -0.315
+        ]
+      ],
+      "cutCount": 2,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.012,
+      "pleatCount": 20,
+      "edges": {
+        "waist": [
+          0,
+          1
+        ],
+        "right-back": [
+          1,
+          2
+        ],
+        "hem": [
+          2,
+          3
+        ],
+        "left-back": [
+          3,
+          0
+        ]
+      },
+      "construction3d": {
+        "mapping": "closed-ring-circumference",
+        "waistEdge": "waist",
+        "hemEdge": "hem",
+        "aspectRatioY": 0.74,
+        "topZM": 0.694,
+        "bottomZM": 0.465
+      }
+    },
+    {
+      "pieceId": "neck-band",
+      "partId": "black-neck-band",
+      "boundary": [
+        [
+          -0.185,
+          0
+        ],
+        [
+          0.185,
+          0
+        ],
+        [
+          0.185,
+          -0.038
+        ],
+        [
+          -0.185,
+          -0.038
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 90,
+      "seamAllowanceM": 0.006,
+      "edges": {
+        "waist": [
+          0,
+          1
+        ],
+        "right-end": [
+          1,
+          2
+        ],
+        "hem": [
+          2,
+          3
+        ],
+        "left-end": [
+          3,
+          0
+        ]
+      }
+    },
+    {
+      "pieceId": "ruffle-strip",
+      "partId": "white-bib-ruffle-center",
+      "boundary": [
+        [
+          -0.19,
+          0
+        ],
+        [
+          0.19,
+          0
+        ],
+        [
+          0.19,
+          -0.045
+        ],
+        [
+          -0.19,
+          -0.045
+        ]
+      ],
+      "cutCount": 3,
+      "onFold": false,
+      "grainAngleDegrees": 90,
+      "seamAllowanceM": 0.004,
+      "edges": {
+        "centerline": [
+          0,
+          1
+        ],
+        "right-end": [
+          1,
+          2
+        ],
+        "hem": [
+          2,
+          3
+        ],
+        "left-end": [
+          3,
+          0
+        ]
+      }
+    }
   ],
   "method": {
     "name": "pattern-first structured garment reconstruction",
-    "status": "TRIAL",
-    "rationale": "Explicit panels and seam topology are retained as auditable intermediate data before Blender construction."
+    "status": "ACTIVE",
+    "rationale": "Named pattern edges are validated against the stitch graph; lower-skirt-ring dimensions are consumed directly by the Blender builder."
   }
 }
