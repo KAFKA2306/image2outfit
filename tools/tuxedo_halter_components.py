@@ -3,33 +3,60 @@
 
 from __future__ import annotations
 
+import json
 import math
+import sys
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
 import bpy
 from PIL import Image
 
 import siroino_strappy_knit_build as base
 
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
-def make_image_maps(directory: Path) -> dict[str, Path]:
+from image2outfit.pattern_projection import project_pattern_piece
+
+
+def make_image_maps(
+    directory: Path,
+    specs: Mapping[str, Any],
+) -> dict[str, Path]:
     directory.mkdir(parents=True, exist_ok=True)
     size = 512
     outputs: dict[str, Path] = {}
-    specs = {
-        "wine_satin": ((82, 2, 19), 124, 9),
-        "black_satin": ((8, 8, 12), 132, 8),
-        "white_jacquard": ((238, 237, 233), 180, 7),
-    }
-    for name, (base_color, roughness, normal_amp) in specs.items():
+    if not specs:
+        raise ValueError("material mapSets must be non-empty")
+    for name, raw_spec in specs.items():
+        if not isinstance(name, str) or not isinstance(raw_spec, Mapping):
+            raise ValueError("material mapSet entries must be named objects")
+        base_color = raw_spec.get("baseColorRgb")
+        roughness = raw_spec.get("roughnessValue")
+        normal_amp = raw_spec.get("normalAmplitude")
+        if (
+            not isinstance(base_color, list)
+            or len(base_color) != 3
+            or not all(
+                isinstance(value, int) and 0 <= value <= 255 for value in base_color
+            )
+        ):
+            raise ValueError(f"material mapSet {name!r} baseColorRgb is invalid")
+        if not isinstance(roughness, int) or not 0 <= roughness <= 255:
+            raise ValueError(f"material mapSet {name!r} roughnessValue is invalid")
+        if not isinstance(normal_amp, int) or not 0 <= normal_amp <= 127:
+            raise ValueError(f"material mapSet {name!r} normalAmplitude is invalid")
+        base_color_tuple = tuple(base_color)
         albedo = Image.new("RGB", (size, size))
         normal = Image.new("RGB", (size, size))
         rough = Image.new("L", (size, size))
         for y in range(size):
             for x in range(size):
-                weave = math.sin(x * math.tau / 18.0) + math.sin(
-                    y * math.tau / 22.0
-                )
+                weave = math.sin(x * math.tau / 18.0) + math.sin(y * math.tau / 22.0)
                 diagonal = math.sin((x + y * 0.41) * math.tau / 44.0)
                 if name == "white_jacquard":
                     motif = math.sin(x * math.tau / 64.0) * math.sin(
@@ -39,7 +66,7 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
                 else:
                     delta = int(3 * weave + 5 * diagonal)
                 pixel = tuple(
-                    max(0, min(255, channel + delta)) for channel in base_color
+                    max(0, min(255, channel + delta)) for channel in base_color_tuple
                 )
                 albedo.putpixel((x, y), pixel)
                 normal.putpixel(
@@ -51,7 +78,8 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
                     ),
                 )
                 rough.putpixel(
-                    (x, y), max(0, min(255, roughness + int(7 * diagonal)))
+                    (x, y),
+                    max(0, min(255, roughness + int(7 * diagonal))),
                 )
         for suffix, image in (
             ("albedo", albedo),
@@ -183,33 +211,43 @@ def bib_panel(
     body: bpy.types.Object,
     armature: bpy.types.Object,
     material: bpy.types.Material,
+    pattern_piece: Mapping[str, Any],
+    *,
+    width_scale: float = 1.0,
 ) -> bpy.types.Object:
-    rows = [
-        (1.020, 0.028),
-        (0.982, 0.050),
-        (0.930, 0.072),
-        (0.870, 0.074),
-        (0.810, 0.056),
-        (0.758, 0.002),
+    projection = project_pattern_piece(
+        pattern_piece,
+        x_scale=0.7047619047619048,
+        z_scale=0.6313253012048193,
+        z_offset=0.8495421686746988,
+        width_scale=width_scale,
+    )
+    vertices = [
+        (x, base.body_front_y(body, x, z) - 0.020, z) for x, z in projection["pointsXZ"]
     ]
-    vertices: list[tuple[float, float, float]] = []
-    for z, width in rows:
-        for x in (-max(width, 0.002), max(width, 0.002)):
-            vertices.append((x, base.body_front_y(body, x, z) - 0.020, z))
-    faces = [
-        (index, index + 1, index + 3, index + 2)
-        for index in range(0, (len(rows) - 1) * 2, 2)
-    ]
-    return mesh_object(
+    obj = mesh_object(
         "White_Jacquard_Bib",
         vertices,
-        faces,
+        [tuple(range(len(vertices)))],
         material,
         body,
         armature,
         thickness=0.0011,
         bevel=0.0005,
     )
+    obj["patternPieceId"] = str(projection["pieceId"])
+    obj["patternProjectionFingerprint"] = str(projection["fingerprint"])
+    obj["patternEdgeVertexMap"] = json.dumps(
+        projection["edgeVertexMap"],
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    obj["patternProjection"] = json.dumps(
+        projection,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return obj
 
 
 def waistcoat_side(
@@ -249,9 +287,9 @@ def waistcoat_back(
         body,
         armature,
         "Wine_Waistcoat_Back",
-        lambda center: 0.715 <= center.z <= 0.900
-        and center.y >= -0.004
-        and abs(center.x) <= 0.152,
+        lambda center: (
+            0.715 <= center.z <= 0.900 and center.y >= -0.004 and abs(center.x) <= 0.152
+        ),
         material,
         0.0070,
     )
@@ -270,9 +308,7 @@ def tail_panel(
         (sign * 0.112, 0.680),
         (sign * 0.045, 0.590),
     ]
-    vertices = [
-        (x, base.body_front_y(body, x, z) - 0.012, z) for x, z in coordinates
-    ]
+    vertices = [(x, base.body_front_y(body, x, z) - 0.012, z) for x, z in coordinates]
     face = (0, 1, 2, 3) if side == "R" else (0, 3, 2, 1)
     return mesh_object(
         f"Wine_Waistcoat_Tail_{side}",
@@ -386,9 +422,7 @@ def ellipsoid(
     body: bpy.types.Object,
     armature: bpy.types.Object,
 ) -> bpy.types.Object:
-    bpy.ops.mesh.primitive_uv_sphere_add(
-        segments=24, ring_count=12, location=location
-    )
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=12, location=location)
     obj = bpy.context.active_object
     obj.name = name
     obj.scale = scale

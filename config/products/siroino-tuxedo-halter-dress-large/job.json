@@ -20,12 +20,39 @@
     "strategy": "repository-search",
     "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
     "normalSizeFallbackAllowed": true,
-    "searchRoots": ["Assets"],
-    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"],
-    "prefab": {"extensions":[".prefab"],"includeRegex":"(?i)(siroino|sotai)","profileRegex":"(?i)SiroinoSotai_PC\\.prefab$","contentRegex":null,"preferredRegex":"(?i)SiroinoSotai_PC\\.prefab$"},
-    "source": {"extensions":[".fbx"],"includeRegex":"(?i)(siroino|sotai)","profileRegex":"(?i)SiroinoSotai_PC\\.fbx$","fallbackNameRegex":"(?i)^SiroinoSotai_PC\\.fbx$","preferredRegex":"(?i)SiroinoSotai_PC\\.fbx$"}
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ],
+    "prefab": {
+      "extensions": [
+        ".prefab"
+      ],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.prefab$",
+      "contentRegex": null,
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.prefab$"
+    },
+    "source": {
+      "extensions": [
+        ".fbx"
+      ],
+      "includeRegex": "(?i)(siroino|sotai)",
+      "profileRegex": "(?i)SiroinoSotai_PC\\.fbx$",
+      "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$",
+      "preferredRegex": "(?i)SiroinoSotai_PC\\.fbx$"
+    }
   },
-  "bodyShapeProfile": {"All_L":1.0,"Chest_L":1.0,"Hips_01_L":1.0,"UpperLeg_L":1.0,"Breasts_L":0.65},
+  "bodyShapeProfile": {
+    "All_L": 1,
+    "Chest_L": 1,
+    "Hips_01_L": 1,
+    "UpperLeg_L": 1,
+    "Breasts_L": 0.65
+  },
   "garmentPipeline": {
     "referenceAuditPath": "config/products/siroino-tuxedo-halter-dress-large/reference-audit.json",
     "decompositionPath": "config/products/siroino-tuxedo-halter-dress-large/garment-decomposition.json",
@@ -36,7 +63,10 @@
     "researchTrial": "pattern-first explicit panels + deterministic body-clearance refinement",
     "releaseRequiresEditableSource": true,
     "releaseRequiresFiveViews": true,
-    "releaseRequiresPoseEvidence": true
+    "releaseRequiresPoseEvidence": true,
+    "stageContractVersion": 2,
+    "constructionPath": "config/products/siroino-tuxedo-halter-dress-large/construction.json",
+    "materialRecipePath": "config/products/siroino-tuxedo-halter-dress-large/material-recipe.json"
   },
   "researchMethod": {
     "name": "pattern-first structured reconstruction",
@@ -45,7 +75,10 @@
     "secondaryEvidence": "config/products/siroino-tuxedo-halter-dress-large/stitch-graph.json"
   },
   "licenseEvidence": "config/products/siroino-tuxedo-halter-dress-large/license.json",
-  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor"],
+  "privateSourceRoots": [
+    "Assets/_Local",
+    "Assets/_Vendor"
+  ],
   "deliveryAssets": [
     "Assets/GenWorks/siroino-tuxedo-halter-dress-large/ProductManifest.json",
     "Assets/GenWorks/siroino-tuxedo-halter-dress-large/README.md",
@@ -86,24 +119,27 @@
     "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Evidence/Candidate/candidate-state.json"
   ],
   "previewPaths": {
-    "front":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/front.png",
-    "back":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/back.png",
-    "left":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/left.png",
-    "right":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/right.png",
-    "three-quarter":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/three-quarter.png"
+    "front": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/three-quarter.png"
   },
   "posePaths": {
-    "neutral":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/neutral.png",
-    "arms-up":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/arms-up.png",
-    "arm-cross":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/arm-cross.png",
-    "crouch":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/crouch.png",
-    "sit":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/sit.png",
-    "prone":"Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/prone.png"
+    "neutral": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/prone.png"
   },
   "humanEvidence": {
-    "visual-review":"Assets/_Local/Evidence/siroino-tuxedo-halter-dress-large/visual-review.json",
-    "pose-penetration-review":"Assets/_Local/Evidence/siroino-tuxedo-halter-dress-large/pose-penetration-review.json",
-    "vrchat-runtime-review":"Assets/_Local/Evidence/siroino-tuxedo-halter-dress-large/vrchat-runtime-review.json"
+    "visual-review": "Assets/_Local/Evidence/siroino-tuxedo-halter-dress-large/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-tuxedo-halter-dress-large/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-tuxedo-halter-dress-large/vrchat-runtime-review.json"
   },
-  "allowedExtraBones": []
+  "allowedExtraBones": [],
+  "geometryVariables": {
+    "bibWidthScale": 1
+  }
 }

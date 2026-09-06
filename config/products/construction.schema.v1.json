@@ -4,18 +4,103 @@
   "title": "image2outfit construction contract v1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "productId", "profile"],
+  "required": [
+    "schemaVersion",
+    "productId",
+    "profile"
+  ],
   "properties": {
-    "schemaVersion": {"const": 1},
-    "productId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
-    "profile": {"type": "string", "pattern": "^(fitted|panel-sewn|loose-layered)$"},
-    "target": {"type": "string", "minLength": 1},
-    "designRevision": {"type": "string", "minLength": 1},
-    "panels": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-    "separateGeometry": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-    "priorityFitZones": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-    "requiredPoses": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-    "researchTrial": {"type": "object"},
-    "releaseBoundary": {"type": "string", "minLength": 1}
+    "schemaVersion": {
+      "const": 1
+    },
+    "productId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "profile": {
+      "type": "string",
+      "pattern": "^(fitted|panel-sewn|loose-layered)$"
+    },
+    "target": {
+      "type": "string",
+      "minLength": 1
+    },
+    "designRevision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "panels": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "separateGeometry": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "priorityFitZones": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "requiredPoses": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "researchTrial": {
+      "type": "object"
+    },
+    "releaseBoundary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "clothSimulation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "applicability",
+        "components",
+        "evidence",
+        "reason"
+      ],
+      "properties": {
+        "applicability": {
+          "enum": [
+            "REQUIRED",
+            "NOT_REQUIRED"
+          ]
+        },
+        "components": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
   }
 }
