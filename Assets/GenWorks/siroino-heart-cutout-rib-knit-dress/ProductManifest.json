@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-heart-cutout-rib-knit-dress",
+  "productName": "Heart Cutout Rib Knit Long Dress for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-heart-cutout-rib-knit-dress",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-heart-cutout-rib-knit-dress/Prefab/SiroinoHeartCutoutRibKnitDress.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-heart-cutout-rib-knit-dress/Prefab/SiroinoSotai_HeartCutoutRibKnitDress.prefab",
+  "previewPath": "Assets/GenWorks/siroino-heart-cutout-rib-knit-dress/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-heart-cutout-rib-knit-dress/README.md",
+  "sourceJobPath": "config/products/siroino-heart-cutout-rib-knit-dress/job.json",
+  "productBuildScript": "tools/siroino_heart_cutout_rib_knit_dress.py",
+  "designRevision": "v2-connected-yoke-draped-hem-long-warmers",
+  "sourceReference": "private-reference://sha256/e7b267d6aa9b9143fb645f85266cb81beb02f09eb4443c1f9c81bfee4daf88d3",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-heart-cutout-rib-knit-dress",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "tools/siroino_heart_cutout_rib_knit_dress.py",
+    "blockers": [
+      "Replace nearest-body lower-skirt weighting with a deformation design that preserves a convincing long-dress silhouette in crouch and sit.",
+      "Prevent the long skirt from separating from the body in prone.",
+      "Rerender five views and six required poses, then directly review the new evidence before COMPLETE."
+    ],
+    "lastAttempt": {
+      "result": "DIRECT_VISUAL_REVIEW_FAIL",
+      "visualRevision": "v2-connected-yoke-draped-hem-long-warmers",
+      "hostedWorkflowRun": 33931757807,
+      "artifactId": 9959008939,
+      "artifactDigest": "sha256:14be59bbad0ca3ef9aa3b37b0de88f518f10c5ee12fad5ef4bd8297da9ce8e86"
+    }
+  },
+  "technicalGates": {
+    "blender": "PENDING",
+    "editableSource": "PENDING",
+    "fbx": "PENDING",
+    "prefabDeclared": "PENDING",
+    "fiveViewEvidence": "PENDING",
+    "poseEvidence": "PENDING",
+    "visualAppearanceReview": "PENDING",
+    "unityImport": "OUT_OF_SCOPE",
+    "unitySaveReload": "OUT_OF_SCOPE",
+    "prefabReload": "OUT_OF_SCOPE",
+    "modularAvatar": "OUT_OF_SCOPE",
+    "ndmf": "OUT_OF_SCOPE",
+    "vrchatBuildTest": "OUT_OF_SCOPE",
+    "vrchatRuntime": "OUT_OF_SCOPE",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "referenceAssumptions": [
+    "Back-panel construction is not visible in the supplied reference and is not claimed as a literal reconstruction.",
+    "Side ties are authored symmetrically because their exact rear attachment is not visible."
+  ],
+  "rejectedHistory": [
+    {
+      "revision": "v1-parametric-heart-cutout-rib-panel",
+      "result": "DIRECT_VISUAL_REVIEW_FAIL",
+      "workflowRun": 33929507356,
+      "artifactId": 9958230033,
+      "artifactDigest": "sha256:c707fa785bfb9fa901312ee149c3f8145bea2d6d6d946266ed1290d364c98ee1",
+      "visibleDefects": [
+        "Heart opening erased most of the upper yoke, leaving the collar visually detached.",
+        "Lower front slit started too high and read as two rigid trouser-like panels rather than a dress.",
+        "Back and lower panels intersected the body and legs in static and pose views.",
+        "Detached arm warmers were too short and read as cuffs.",
+        "Black knit rendered too light relative to the supplied reference.",
+        "Crouch, sit, and prone deformation did not preserve a convincing long-dress silhouette."
+      ]
+    },
+    {
+      "revision": "v2-connected-yoke-draped-hem-long-warmers",
+      "result": "DIRECT_VISUAL_REVIEW_FAIL",
+      "workflowRun": 33931757807,
+      "artifactId": 9959008939,
+      "artifactDigest": "sha256:14be59bbad0ca3ef9aa3b37b0de88f518f10c5ee12fad5ef4bd8297da9ce8e86",
+      "visibleDefects": [
+        "Crouch deformation folds the lower dress into rigid overlapping panels instead of preserving a skirt silhouette.",
+        "Sit deformation collapses the lower dress around the thighs and chair-height region.",
+        "Prone deformation separates large skirt sections from the body, so the asset is not release-ready."
+      ]
+    }
+  ]
+}

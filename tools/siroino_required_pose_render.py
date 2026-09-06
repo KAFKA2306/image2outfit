@@ -5,6 +5,7 @@ Every frame uses the same generated garment and exact target body. The prone
 case rotates both armatures into an actual horizontal body orientation rather
 than merely bending the legs of an upright avatar.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -49,7 +50,9 @@ def clear(
         bone.scale = (1.0, 1.0, 1.0)
 
 
-def rotate(armature: bpy.types.Object, name: str, degrees: tuple[float, float, float]) -> None:
+def rotate(
+    armature: bpy.types.Object, name: str, degrees: tuple[float, float, float]
+) -> None:
     bone = armature.pose.bones.get(name)
     if bone is not None:
         bone.rotation_mode = "XYZ"
@@ -195,7 +198,28 @@ def main() -> int:
         bpy.ops.render.render(write_still=True)
         paths[name] = path
     apply_pose(armatures, base_transforms, "neutral")
-    sheet(paths, root / "Previews" / "siroino-wide-cargo-pose-review.webp")
+    sheet_path = root / "Previews" / f"{job['id']}-pose-review.webp"
+    sheet(paths, sheet_path)
+
+    manifest_path = root / "ProductManifest.json"
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest.setdefault("technicalGates", {})["poseEvidence"] = "PASS"
+        manifest["poseEvidence"] = {
+            name: {
+                "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": common.sha256(path),
+            }
+            for name, path in paths.items()
+        }
+        manifest["poseEvidence"]["sheet"] = {
+            "path": str(sheet_path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": common.sha256(sheet_path),
+        }
+        manifest_path.write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     print(
         json.dumps(
             {
