@@ -220,7 +220,7 @@ def materialize_variant(
                 .replace(base_job_rel, job_path.relative_to(root).as_posix())
                 .replace(base_request_rel, request_path.relative_to(root).as_posix())
                 .replace(
-                    ".image2outfit/products/{productId}/",
+                    ".image2outfit/products/{productId}/stages/",
                     candidate_runtime_prefix,
                 )
                 for item in command
