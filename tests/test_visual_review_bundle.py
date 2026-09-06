@@ -211,5 +211,43 @@ class VisualReviewBundleTests(unittest.TestCase):
                 M.validate_review_result(review, bundle)
 
 
+    def test_tracked_wide_cargo_builds_real_bundle(self) -> None:
+        product_id = "siroino-wide-cargo"
+        job_path = (
+            self.original_root
+            / "config"
+            / "products"
+            / product_id
+            / "job.json"
+        )
+        with tempfile.TemporaryDirectory(dir=self.original_root) as tmp:
+            request_path = Path(tmp) / "request.json"
+            request_path.write_text(
+                json.dumps(
+                    {
+                        "schemaVersion": 1,
+                        "productId": product_id,
+                        "revisionId": "tracked-wide-cargo-smoke",
+                        "sourceReference": (
+                            "private-reference://sha256/" + "b" * 64
+                        ),
+                    }
+                ),
+                encoding="utf-8",
+            )
+            bundle = M.build_review_bundle(job_path, request_path)
+
+        self.assertEqual(bundle["productId"], product_id)
+        self.assertEqual(len(bundle["currentImages"]), 11)
+        self.assertEqual(
+            {item["kind"] for item in bundle["currentImages"]},
+            {"view", "pose"},
+        )
+        self.assertEqual(
+            bundle["reference"]["sourceSha256"],
+            "b" * 64,
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
