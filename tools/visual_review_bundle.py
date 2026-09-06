@@ -163,8 +163,7 @@ def build_review_bundle(
 
     protocol = {
         "schemaVersion": 1,
-        "renderLoopRevision": job.get("renderLoopRevision")
-        or job.get("buildRevision"),
+        "renderLoopRevision": job.get("renderLoopRevision") or job.get("buildRevision"),
         "adapterId": job["adapterId"],
         "views": required_views,
         "poses": required_poses,
@@ -207,8 +206,7 @@ def build_review_bundle(
         previous = read_object(previous_path)
         if (
             previous.get("productId") != product_id
-            or previous.get("renderProtocolSha256")
-            != bundle["renderProtocolSha256"]
+            or previous.get("renderProtocolSha256") != bundle["renderProtocolSha256"]
         ):
             raise ValueError("previous bundle identity/protocol mismatch")
         if previous.get("bundleSha256") != _bundle_digest(previous):
@@ -300,9 +298,7 @@ def validate_review_result(
                     "observedDefect": item["observedDefect"],
                     "probableCause": item["probableCause"],
                     "confidence": confidence,
-                    "recommendedReturnStage": metadata[
-                        "recommendedReturnStage"
-                    ],
+                    "recommendedReturnStage": metadata["recommendedReturnStage"],
                     "completionGate": metadata["completionGate"],
                 }
             )
