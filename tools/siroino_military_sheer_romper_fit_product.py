@@ -174,9 +174,7 @@ def extract(
             if source_index not in used:
                 source = body.data.vertices[source_index]
                 used[source_index] = len(vertices)
-                vertices.append(
-                    tuple(source.co + source.normal.normalized() * offset)
-                )
+                vertices.append(tuple(source.co + source.normal.normalized() * offset))
             face.append(used[source_index])
             if source_uv is not None:
                 uv = source_uv.data[loop_index].uv
@@ -230,11 +228,7 @@ def skin(body: bpy.types.Object) -> None:
 def fabric(textures: dict[str, Path]) -> bpy.types.Material:
     material = ORIGINAL_FABRIC(textures)
     shader = next(
-        (
-            node
-            for node in material.node_tree.nodes
-            if node.type == "BSDF_PRINCIPLED"
-        ),
+        (node for node in material.node_tree.nodes if node.type == "BSDF_PRINCIPLED"),
         None,
     )
     if shader is not None:
@@ -347,7 +341,7 @@ def rigid_chain(
     obj["image2outfit_attachment"] = "local-rigid-decoration"
     obj["image2outfit_nominal_path_length_m"] = sum(
         (Vector(second) - Vector(first)).length
-        for first, second in zip(points, points[1:], strict=True)
+        for first, second in zip(points, points[1:])
     )
     return parent_rigid(obj, armature, semantic)
 
@@ -561,9 +555,7 @@ def build(
         if z(0.64) <= (body.matrix_world @ vertex.co).z <= z(0.74)
         and abs((body.matrix_world @ vertex.co).x - center.x) <= torso_width
     ]
-    front = (
-        min(front_candidates) if front_candidates else minimum.y
-    ) - height * 0.018
+    front = (min(front_candidates) if front_candidates else minimum.y) - height * 0.018
 
     objects: list[bpy.types.Object] = []
     objects.append(
@@ -700,9 +692,7 @@ def target_fit_audit(
     total_vertices = 0
 
     for obj in garments:
-        if obj.type != "MESH" or not bool(
-            obj.get("image2outfit_fit_audit", False)
-        ):
+        if obj.type != "MESH" or not bool(obj.get("image2outfit_fit_audit", False)):
             continue
 
         modifier_states = [
@@ -732,9 +722,7 @@ def target_fit_audit(
                     nearest = tree.find_nearest(point)
                     if nearest[0] is None or nearest[1] is None:
                         continue
-                    local_clearances.append(
-                        float((point - nearest[0]).dot(nearest[1]))
-                    )
+                    local_clearances.append(float((point - nearest[0]).dot(nearest[1])))
             finally:
                 evaluated.to_mesh_clear()
         finally:
@@ -753,9 +741,7 @@ def target_fit_audit(
                 min(local_clearances) if local_clearances else None
             ),
             "medianClearanceMeters": (
-                statistics.median(local_clearances)
-                if local_clearances
-                else None
+                statistics.median(local_clearances) if local_clearances else None
             ),
         }
 
