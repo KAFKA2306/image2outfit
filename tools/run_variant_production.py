@@ -1,0 +1,545 @@
+#!/usr/bin/env python3
+"""Build and verify production variants with the canonical product builder."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from image2outfit.variant_production import materialize_all_variants
+
+
+def read_object(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(value, dict):
+        raise ValueError(f"expected JSON object: {path}")
+    return value
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def blender_executable() -> str:
+    configured = os.environ.get("IMAGE2OUTFIT_BLENDER", "").strip()
+    for candidate in (
+        configured,
+        str(ROOT / ".image2outfit" / "blender" / "blender"),
+        shutil.which("blender") or "",
+    ):
+        if candidate and Path(candidate).is_file():
+            return candidate
+    raise FileNotFoundError("Blender executable was not found")
+
+
+def base_paths(recipe: dict[str, Any]) -> dict[str, Path]:
+    product_id = recipe.get("baseProductId")
+    if not isinstance(product_id, str) or not product_id:
+        raise ValueError("production recipe baseProductId is required")
+    product = ROOT / "config" / "products" / product_id
+    return {
+        "job": product / "job.json",
+        "request": ROOT / "config" / "pipeline" / "requests" / f"{product_id}.json",
+        "material": product / "material-recipe.json",
+    }
+
+
+def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
+    job = read_object(item["jobPath"])
+    contract = item["variantContract"]
+    expected = contract["expectedResult"]
+    log_path = item["contractPath"].parent / "blender.log"
+    command = [
+        blender,
+        "--python-use-system-env",
+        "--background",
+        "--factory-startup",
+        "--python-exit-code",
+        "1",
+        "--python",
+        str(ROOT / job["buildScript"]),
+        "--",
+        "--job",
+        str(item["jobPath"]),
+    ]
+    started = time.monotonic()
+    completed = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    elapsed = time.monotonic() - started
+    log_path.write_text(
+        completed.stdout + "\n--- STDERR ---\n" + completed.stderr,
+        encoding="utf-8",
+    )
+
+    product_root = ROOT / job["productRoot"]
+    report_path = product_root / "Evidence" / "Build" / "product-build-report.json"
+    result: dict[str, Any] = {
+        "candidateId": item["candidateId"],
+        "variantId": item["variantId"],
+        "proofRole": contract["proofRole"],
+        "workspaceId": item["workspaceId"],
+        "expectedResult": expected,
+        "returnCode": completed.returncode,
+        "elapsedSeconds": round(elapsed, 3),
+        "attempts": 1,
+        "logPath": log_path.relative_to(ROOT).as_posix(),
+        "productRoot": job["productRoot"],
+        "reportPath": (
+            report_path.relative_to(ROOT).as_posix() if report_path.is_file() else None
+        ),
+    }
+
+    if expected == "FAIL":
+        if completed.returncode == 0:
+            raise RuntimeError(
+                f"negative-control variant unexpectedly succeeded: {item['variantId']}"
+            )
+        if not report_path.is_file():
+            raise RuntimeError(
+                f"negative control failed before auditable coarse gate: {item['variantId']}"
+            )
+        rejected_report = read_object(report_path)
+        coarse = rejected_report.get("coarseGeometryReview")
+        if rejected_report.get("highQualityRenderSkipped") is not True:
+            raise ValueError("negative control did not skip high-quality rendering")
+        if not isinstance(coarse, dict) or set(coarse) != {"front", "left"}:
+            raise ValueError("negative control coarse geometry evidence is incomplete")
+        for value in coarse.values():
+            if not isinstance(value, dict):
+                raise ValueError("negative control coarse evidence entry is invalid")
+            path = ROOT / str(value.get("path", ""))
+            if not path.is_file() or sha256(path) != value.get("sha256"):
+                raise ValueError("negative control coarse evidence hash mismatch")
+        unexpected_final = [
+            path
+            for path in job.get("previewPaths", {}).values()
+            if (ROOT / str(path)).is_file()
+        ]
+        if unexpected_final:
+            raise ValueError(
+                "negative control generated high-quality preview files: "
+                + ", ".join(str(path) for path in unexpected_final)
+            )
+        result["status"] = "EXPECTED_FAIL"
+        result["coarseGateRejected"] = True
+        result["highQualityRenderSkipped"] = True
+        result["coarseEvidenceCount"] = len(coarse)
+        result["reportSha256"] = sha256(report_path)
+        result["errorTail"] = "\n".join(
+            (completed.stderr or completed.stdout).splitlines()[-12:]
+        )
+        return result
+
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"variant {item['variantId']} failed with exit code "
+            f"{completed.returncode}; see {log_path}"
+        )
+    if not report_path.is_file():
+        raise FileNotFoundError(report_path)
+    report = read_object(report_path)
+
+    cloth_report_path = (
+        product_root / "Evidence" / "Build" / "cloth-simulation.json"
+    )
+    if not cloth_report_path.is_file():
+        raise FileNotFoundError(cloth_report_path)
+    cloth_report = read_object(cloth_report_path)
+    snapshot_relative = cloth_report.get("cacheSnapshot")
+    if not isinstance(snapshot_relative, str) or not snapshot_relative:
+        raise ValueError(f"cloth cache snapshot missing for {item['variantId']}")
+    snapshot_path = ROOT / snapshot_relative
+    reopen_path = item["contractPath"].parent / "cloth-cache-reopen.json"
+    reopen_command = [
+        blender,
+        str(snapshot_path),
+        "--background",
+        "--python-use-system-env",
+        "--python-exit-code",
+        "1",
+        "--python",
+        str(ROOT / "tools" / "verify_cloth_cache_snapshot.py"),
+        "--",
+        "--report",
+        str(cloth_report_path),
+        "--snapshot",
+        str(snapshot_path),
+        "--result",
+        str(reopen_path),
+    ]
+    reopened = subprocess.run(
+        reopen_command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if reopened.returncode != 0:
+        raise RuntimeError(
+            f"cloth cache reopen failed for {item['variantId']}: "
+            + reopened.stderr[-4000:]
+        )
+    reopen_evidence = read_object(reopen_path)
+    if reopen_evidence.get("status") != "PASS":
+        raise ValueError(
+            f"cloth cache reopen did not PASS for {item['variantId']}"
+        )
+
+    if report.get("candidateId") != item["candidateId"]:
+        raise ValueError(f"candidate identity mismatch for {item['variantId']}")
+    fingerprint = report.get("geometryFingerprint")
+    if not isinstance(fingerprint, str) or len(fingerprint) != 64:
+        raise ValueError(f"geometry fingerprint missing for {item['variantId']}")
+    pose_views = report.get("poseViews")
+    if not isinstance(pose_views, dict) or len(pose_views) < 6:
+        raise ValueError(f"pose evidence incomplete for {item['variantId']}")
+    views = report.get("views")
+    if not isinstance(views, dict) or len(views) < 5:
+        raise ValueError(f"five-view evidence incomplete for {item['variantId']}")
+    render_hashes: dict[str, str] = {}
+    for kind, mapping in (("view", views), ("pose", pose_views)):
+        for name, relative in sorted(mapping.items()):
+            path = ROOT / str(relative)
+            if not path.is_file():
+                raise FileNotFoundError(relative)
+            render_hashes[f"{kind}:{name}"] = sha256(path)
+
+    target_profile = report.get("targetProfile")
+    weight_normalization = report.get("weightNormalization")
+    if not isinstance(target_profile, dict):
+        raise ValueError(f"target profile evidence missing for {item['variantId']}")
+    if not isinstance(weight_normalization, dict):
+        raise ValueError(
+            f"weight normalization evidence missing for {item['variantId']}"
+        )
+    if int(weight_normalization.get("vertices", 0)) <= 0:
+        raise ValueError(
+            f"weight normalization processed no vertices for {item['variantId']}"
+        )
+    if int(weight_normalization.get("maximumInfluences", 99)) > 4:
+        raise ValueError(
+            f"weight normalization exceeded four influences for {item['variantId']}"
+        )
+
+    result.update(
+        {
+            "status": "PASS",
+            "geometryFingerprint": fingerprint,
+            "reportSha256": sha256(report_path),
+            "materialRecipeSha256": report["materialRecipe"]["sha256"],
+            "fiveViewEvidenceCount": len(views),
+            "poseEvidenceCount": len(pose_views),
+            "renderEvidenceSha256": render_hashes,
+            "geometryPassed": bool(report.get("passed")),
+            "clothCacheReopenValidated": True,
+            "clothCacheReopenEvidencePath": reopen_path.relative_to(ROOT).as_posix(),
+            "clothCacheReopenObjectCount": len(
+                reopen_evidence.get("objects", [])
+            ),
+            "shapeProfileEvidence": target_profile,
+            "weightNormalizationEvidence": {
+                "objects": weight_normalization.get("objects"),
+                "vertices": weight_normalization.get("vertices"),
+                "maximumInfluences": weight_normalization.get("maximumInfluences"),
+                "fallbackVertices": weight_normalization.get("fallbackVertices"),
+            },
+            "bibPattern": report.get("patternDrivenGeometry", {})
+            .get("pieces", {})
+            .get("bib-front", {}),
+            "materialOverrides": contract.get("materialOverrides", {}),
+        }
+    )
+    if report.get("passed") is not True:
+        raise RuntimeError(
+            f"variant {item['variantId']} generated artifacts but failed geometry gates"
+        )
+    return result
+
+
+def by_role(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    mapped: dict[str, dict[str, Any]] = {}
+    for result in results:
+        role = str(result["proofRole"])
+        if role in mapped:
+            raise ValueError(f"duplicate proof role: {role}")
+        mapped[role] = result
+    return mapped
+
+
+def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
+    roles = by_role(results)
+    required = {"BASELINE", "COLOR", "SIZE", "MATERIAL_CONTROL", "NEGATIVE"}
+    if set(roles) != required:
+        raise ValueError("variant batch does not contain the canonical proof roles")
+
+    baseline = roles["BASELINE"]
+    color = roles["COLOR"]
+    size = roles["SIZE"]
+    material_control = roles["MATERIAL_CONTROL"]
+    negative = roles["NEGATIVE"]
+    if baseline["status"] != "PASS" or color["status"] != "PASS":
+        raise ValueError("baseline/color production candidate did not PASS")
+    if size["status"] != "PASS":
+        raise ValueError("size production candidate did not PASS")
+    for role in ("BASELINE", "COLOR", "SIZE", "MATERIAL_CONTROL"):
+        if roles[role].get("clothCacheReopenValidated") is not True:
+            raise ValueError(f"{role} cloth cache was not validated after reopen")
+        if int(roles[role].get("clothCacheReopenObjectCount", 0)) < 2:
+            raise ValueError(f"{role} reopened cloth object evidence is incomplete")
+    if baseline["geometryFingerprint"] != color["geometryFingerprint"]:
+        raise ValueError("color variant changed geometry")
+    if baseline["materialRecipeSha256"] == color["materialRecipeSha256"]:
+        raise ValueError("color variant did not change the material recipe")
+    baseline_renders = baseline.get("renderEvidenceSha256")
+    color_renders = color.get("renderEvidenceSha256")
+    if not isinstance(baseline_renders, dict) or not isinstance(color_renders, dict):
+        raise ValueError("color render evidence hashes are missing")
+    shared_render_keys = sorted(set(baseline_renders) & set(color_renders))
+    if not shared_render_keys:
+        raise ValueError("baseline/color render evidence has no shared views")
+    changed_render_keys = [
+        key
+        for key in shared_render_keys
+        if baseline_renders[key] != color_renders[key]
+    ]
+    if not changed_render_keys:
+        raise ValueError("color variant did not change any rendered evidence")
+    if baseline["geometryFingerprint"] == size["geometryFingerprint"]:
+        raise ValueError("size variant did not change geometry")
+    if size.get("poseEvidenceCount", 0) < 6:
+        raise ValueError("size variant did not regenerate all required pose evidence")
+    baseline_bib = baseline.get("bibPattern", {})
+    size_bib = size.get("bibPattern", {})
+    baseline_bounds = baseline_bib.get("bounds", {})
+    size_bounds = size_bib.get("bounds", {})
+    baseline_width = float(baseline_bounds.get("width", 0.0))
+    size_width = float(size_bounds.get("width", 0.0))
+    size_scale = float(size_bib.get("transform", {}).get("widthScale", 0.0))
+    if baseline_width <= 0 or size_width <= 0:
+        raise ValueError("pattern-driven bib width evidence is missing")
+    width_ratio = size_width / baseline_width
+    if abs(width_ratio - 1.1) > 1e-6 or abs(size_scale - 1.1) > 1e-9:
+        raise ValueError(
+            f"size pattern propagation mismatch: ratio={width_ratio}, "
+            f"scale={size_scale}"
+        )
+    size_weights = size.get("weightNormalizationEvidence")
+    if (
+        not isinstance(size_weights, dict)
+        or int(size_weights.get("vertices", 0)) <= 0
+    ):
+        raise ValueError("size variant did not rerun weight normalization")
+    if int(size_weights.get("maximumInfluences", 99)) > 4:
+        raise ValueError("size variant weight normalization is invalid")
+    if material_control["status"] != "PASS":
+        raise ValueError("roughness material control did not PASS")
+    if baseline["geometryFingerprint"] != material_control["geometryFingerprint"]:
+        raise ValueError("roughness-only control changed geometry")
+    if baseline["materialRecipeSha256"] == material_control["materialRecipeSha256"]:
+        raise ValueError("roughness-only control did not change material recipe")
+    if material_control.get("materialOverrides") != {
+        "mapSets": {"wine_satin": {"roughnessValue": 156}}
+    }:
+        raise ValueError("roughness-only control changed an unexpected material field")
+    control_renders = material_control.get("renderEvidenceSha256")
+    if not isinstance(control_renders, dict):
+        raise ValueError("roughness-only control render evidence hashes are missing")
+    control_shared = sorted(set(baseline_renders) & set(control_renders))
+    roughness_changed_render_keys = [
+        key
+        for key in control_shared
+        if baseline_renders[key] != control_renders[key]
+    ]
+    if not roughness_changed_render_keys:
+        raise ValueError("roughness-only control did not change rendered evidence")
+    if negative["status"] != "EXPECTED_FAIL":
+        raise ValueError("negative-control variant did not fail as expected")
+    if negative.get("coarseGateRejected") is not True:
+        raise ValueError("negative control did not reach the coarse geometry gate")
+    if negative.get("highQualityRenderSkipped") is not True:
+        raise ValueError("negative control did not stop high-quality rendering")
+    if int(negative.get("coarseEvidenceCount", 0)) != 2:
+        raise ValueError("negative control coarse evidence count is invalid")
+
+    baseline_report = ROOT / str(baseline["reportPath"])
+    if sha256(baseline_report) != baseline["reportSha256"]:
+        raise ValueError("failed variant corrupted the baseline candidate")
+
+    return {
+        "colorGeometryMatchesBaseline": True,
+        "colorMaterialChanged": True,
+        "colorRenderChanged": True,
+        "colorChangedRenderKeys": changed_render_keys,
+        "sizeGeometryChanged": True,
+        "sizePatternRevalidated": True,
+        "sizeBibWidthRatio": width_ratio,
+        "sizeBibWidthScale": size_scale,
+        "sizeWeightsRevalidated": True,
+        "sizePoseEvidenceRevalidated": True,
+        "roughnessControlGeometryMatchesBaseline": True,
+        "roughnessControlMaterialChanged": True,
+        "roughnessControlRenderChanged": True,
+        "roughnessControlChangedRenderKeys": roughness_changed_render_keys,
+        "clothCacheReopenValidated": True,
+        "negativeControlFailed": True,
+        "coarseRejectStoppedHighQualityRender": True,
+        "baselinePreservedAfterFailure": True,
+        "canonicalSuccessfulCandidates": 3,
+        "auxiliarySuccessfulControls": 1,
+        "successfulCandidates": 4,
+        "totalAttempts": 5,
+        "retryCount": 0,
+        "elapsedSeconds": round(
+            sum(float(result["elapsedSeconds"]) for result in results),
+            3,
+        ),
+    }
+
+
+def materialized_items(
+    recipe: dict[str, Any],
+    *,
+    workspace_id: str,
+) -> list[dict[str, Any]]:
+    paths = base_paths(recipe)
+    return materialize_all_variants(
+        ROOT,
+        base_job=read_object(paths["job"]),
+        base_request=read_object(paths["request"]),
+        base_material_recipe=read_object(paths["material"]),
+        production_recipe=recipe,
+        workspace_id=workspace_id,
+    )
+
+
+def run_workspace(
+    workspace_id: str,
+    *,
+    recipe: dict[str, Any],
+    blender: str,
+    include_roles: set[str] | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+    items = materialized_items(recipe, workspace_id=workspace_id)
+    if include_roles is not None:
+        items = [
+            item
+            for item in items
+            if item["variantContract"]["proofRole"] in include_roles
+        ]
+    results = [build_candidate(item, blender=blender) for item in items]
+    proof = verify_workspace(results) if include_roles is None else None
+    return results, proof
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--recipe", type=Path, required=True)
+    parser.add_argument("--workspace", default="proof-a")
+    parser.add_argument("--replay-workspace")
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args()
+
+    recipe_path = args.recipe if args.recipe.is_absolute() else ROOT / args.recipe
+    recipe = read_object(recipe_path)
+    product_id = str(recipe["baseProductId"])
+    blender = blender_executable()
+
+    primary_results, primary_proof = run_workspace(
+        args.workspace,
+        recipe=recipe,
+        blender=blender,
+    )
+    replay_results: list[dict[str, Any]] = []
+    replay_proof: dict[str, Any] | None = None
+    if args.replay_workspace:
+        replay_results, _ = run_workspace(
+            args.replay_workspace,
+            recipe=recipe,
+            blender=blender,
+            include_roles={"COLOR", "SIZE"},
+        )
+        first = by_role(primary_results)
+        replay = by_role(replay_results)
+        for role in ("COLOR", "SIZE"):
+            if (
+                first[role]["geometryFingerprint"]
+                != replay[role]["geometryFingerprint"]
+            ):
+                raise ValueError(f"replay geometry fingerprint mismatch: {role}")
+            if first[role]["geometryPassed"] != replay[role]["geometryPassed"]:
+                raise ValueError(f"replay geometry gate mismatch: {role}")
+        if abs(
+            float(first["SIZE"]["bibPattern"]["bounds"]["width"])
+            - float(replay["SIZE"]["bibPattern"]["bounds"]["width"])
+        ) > 1e-9:
+            raise ValueError("replay pattern-driven bib width mismatch")
+        replay_proof = {
+            "workspace": args.replay_workspace,
+            "roles": ["COLOR", "SIZE"],
+            "sameGeometryFingerprints": True,
+            "sameGeometryGateResults": True,
+            "samePatternDrivenSizeResult": True,
+            "successfulCandidates": 2,
+            "totalAttempts": 2,
+            "retryCount": 0,
+            "elapsedSeconds": round(
+                sum(float(result["elapsedSeconds"]) for result in replay_results),
+                3,
+            ),
+        }
+
+    report = {
+        "schemaVersion": 1,
+        "baseProductId": product_id,
+        "recipePath": recipe_path.relative_to(ROOT).as_posix(),
+        "recipeSha256": sha256(recipe_path),
+        "recipeVersion": recipe["recipeVersion"],
+        "workspace": args.workspace,
+        "primary": primary_results,
+        "primaryProof": primary_proof,
+        "replay": replay_results,
+        "replayProof": replay_proof,
+        "productionSuccessCount": sum(
+            result["status"] == "PASS" for result in [*primary_results, *replay_results]
+        ),
+        "productionAttemptCount": len(primary_results) + len(replay_results),
+    }
+    output = args.output
+    if output is None:
+        output = (
+            Path(".image2outfit") / "variant-production" / product_id / "report.json"
+        )
+    output = output if output.is_absolute() else ROOT / output
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

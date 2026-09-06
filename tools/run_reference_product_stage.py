@@ -27,10 +27,12 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from image2outfit.cloth_evidence import validate_reopened_cloth_evidence
 from image2outfit.stage_contracts import (
     normalize_observed_variants,
     resolve_private_reference,
     validate_pattern_contract,
+    validate_producer_artifact_binding,
     validate_stitch_contract,
 )
 
@@ -132,8 +134,81 @@ def emit(
     write_json(result_path, payload)
 
 
-def runtime_root(product_id: str) -> Path:
+def runtime_root(
+    product_id: str,
+    job: Mapping[str, Any] | None = None,
+) -> Path:
+    if job is not None:
+        configured = job.get("variantRuntimeRoot")
+        if isinstance(configured, str) and configured:
+            path = repo_path(configured, label="variant runtime root")
+            if ".image2outfit/products/" not in path.as_posix():
+                raise ValueError("variant runtime root must stay under .image2outfit/products")
+            return path
     return ROOT / ".image2outfit" / "products" / product_id
+
+
+def stage_lineage(job: Mapping[str, Any], stage: str) -> dict[str, Any] | None:
+    pipeline = job.get("garmentPipeline", {})
+    contract_version = (
+        int(pipeline.get("stageContractVersion", 1))
+        if isinstance(pipeline, Mapping)
+        else 1
+    )
+    if contract_version < 2 or stage == STAGES[0]:
+        return None
+
+    previous_stage = STAGES[STAGES.index(stage) - 1]
+    product_id = str(job["id"])
+    previous_result = (
+        runtime_root(product_id, job) / "stages" / f"{previous_stage}.json"
+    )
+    if not previous_result.is_file():
+        raise FileNotFoundError(
+            f"{stage} requires previous stage result: {relative(previous_result)}"
+        )
+    payload = read_object(previous_result, f"{previous_stage} result")
+    if (
+        payload.get("schemaVersion") != 1
+        or payload.get("stage") != previous_stage
+        or payload.get("productId") != product_id
+        or payload.get("status") != "PASS"
+    ):
+        raise ValueError(
+            f"{stage} previous stage identity/status mismatch: {previous_stage}"
+        )
+
+    records = payload.get("evidence")
+    if not isinstance(records, list) or not records:
+        raise ValueError(f"{previous_stage} result has no evidence")
+    verified: list[dict[str, str]] = []
+    for index, record in enumerate(records):
+        if not isinstance(record, Mapping):
+            raise ValueError(f"{previous_stage} evidence {index} is invalid")
+        raw_path = record.get("path")
+        expected_hash = record.get("sha256")
+        if not isinstance(raw_path, str) or not isinstance(expected_hash, str):
+            raise ValueError(f"{previous_stage} evidence {index} is incomplete")
+        path = repo_path(raw_path, label=f"{previous_stage} evidence")
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"{stage} previous evidence is missing: {raw_path}"
+            )
+        actual_hash = sha256(path)
+        if actual_hash != expected_hash:
+            raise ValueError(
+                f"{stage} stale previous evidence: {raw_path}; "
+                f"expected {expected_hash}, found {actual_hash}"
+            )
+        verified.append({"path": raw_path, "sha256": actual_hash})
+
+    return {
+        "producerStage": previous_stage,
+        "producerResultPath": relative(previous_result),
+        "producerResultSha256": sha256(previous_result),
+        "producerEvidenceValidated": True,
+        "producerEvidence": verified,
+    }
 
 
 def review_image_paths(job: Mapping[str, Any]) -> list[Path]:
@@ -165,7 +240,7 @@ def stage_ingest(
     ):
         raise ValueError("public repository must not retain the private source image")
     binding = write_json(
-        runtime_root(product_id) / "reference" / "source-binding.json",
+        runtime_root(product_id, job) / "reference" / "source-binding.json",
         {
             "schemaVersion": 1,
             "productId": product_id,
@@ -196,7 +271,7 @@ def stage_normalize(job: Mapping[str, Any], result: Path) -> None:
         "reference audit",
     )
     source_path = resolve_private_reference(ROOT, job, audit)
-    output_root = runtime_root(product_id) / "normalized"
+    output_root = runtime_root(product_id, job) / "normalized"
     outputs, manifest = normalize_observed_variants(source_path, audit, output_root)
     report = write_json(output_root / "normalized-view.json", manifest)
     emit(
@@ -273,6 +348,27 @@ def stage_static(job: Mapping[str, Any], stage: str, key: str, result: Path) -> 
     pattern_path, pattern = validate_product_document(
         job, "patternContractPath", "pattern contract"
     )
+    producer_result_path = (
+        runtime_root(product_id, job) / "stages" / "draft-patterns.json"
+    )
+    if not producer_result_path.is_file():
+        raise FileNotFoundError(
+            "required producer result for role patternSpecification is missing: "
+            + relative(producer_result_path)
+        )
+    producer_result = read_object(
+        producer_result_path,
+        "draft-patterns producer result",
+    )
+    producer_binding = validate_producer_artifact_binding(
+        producer_result,
+        producer_result_path=relative(producer_result_path),
+        artifact_path=pattern_path,
+        artifact_repository_path=relative(pattern_path),
+        expected_stage="draft-patterns",
+        expected_role="patternSpecification",
+        expected_product_id=product_id,
+    )
     summary = validate_stitch_contract(
         payload,
         pattern,
@@ -286,6 +382,9 @@ def stage_static(job: Mapping[str, Any], stage: str, key: str, result: Path) -> 
         extra={
             "artifactContractValidated": True,
             "consumerBindingValidated": True,
+            "consumerInputRole": producer_binding["role"],
+            "producerResultPath": producer_binding["producerResultPath"],
+            "producerArtifactSha256": producer_binding["artifactSha256"],
             "artifactRole": "stitchGraph",
             "inputPatternSha256": sha256(pattern_path),
             "stitchGraphSha256": sha256(path),
@@ -342,7 +441,7 @@ def stage_initialize(job: Mapping[str, Any], result: Path) -> None:
         "lower-skirt-ring": {"anchor": "Hips", "offsetM": [0.0, 0.0, 0.625]},
     }
     report = write_json(
-        runtime_root(product_id) / "initialization" / "initialization-3d.json",
+        runtime_root(product_id, job) / "initialization" / "initialization-3d.json",
         {
             "schemaVersion": 1,
             "productId": product_id,
@@ -381,7 +480,7 @@ def blender_executable() -> str:
 def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
     script = repo_path(job["buildScript"], label="build script")
-    log = runtime_root(product_id) / "reports" / "blender-build.log"
+    log = runtime_root(product_id, job) / "reports" / "blender-build.log"
     log.parent.mkdir(parents=True, exist_ok=True)
     report = repo_path(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
@@ -543,16 +642,78 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
                 raise ValueError(f"cloth contract {index} frameStart mismatch")
             if contract.get("frameEnd") != payload.get("frameEnd"):
                 raise ValueError(f"cloth contract {index} frameEnd mismatch")
+        snapshot_value = payload.get("cacheSnapshot")
+        if not isinstance(snapshot_value, str) or not snapshot_value:
+            raise ValueError("required cloth cache snapshot path is missing")
+        snapshot = repo_path(snapshot_value, label="cloth cache snapshot")
+        if not snapshot.is_file():
+            raise FileNotFoundError(
+                f"cloth cache snapshot is missing: {relative(snapshot)}"
+            )
+        snapshot_sha = sha256(snapshot)
+        if snapshot_sha != payload.get("cacheSnapshotSha256"):
+            raise ValueError("cloth cache snapshot SHA-256 is stale or mismatched")
+
+        reopen_result = (
+            runtime_root(product_id, job)
+            / "reports"
+            / "cloth-cache-reopen.json"
+        )
+        reopen_result.parent.mkdir(parents=True, exist_ok=True)
+        verifier = ROOT / "tools" / "verify_cloth_cache_snapshot.py"
+        command = [
+            blender_executable(),
+            str(snapshot),
+            "--background",
+            "--python-use-system-env",
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(verifier),
+            "--",
+            "--report",
+            str(report),
+            "--snapshot",
+            str(snapshot),
+            "--result",
+            str(reopen_result),
+        ]
+        completed = subprocess.run(
+            command,
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode != 0:
+            raise RuntimeError(
+                "reopened cloth-cache verification failed: "
+                + completed.stderr[-4000:]
+            )
+        reopened = read_object(reopen_result, "reopened cloth cache evidence")
+        reopen_summary = validate_reopened_cloth_evidence(payload, reopened)
     elif contracts:
         raise ValueError("NOT_REQUIRED cloth policy must not report simulated objects")
+    else:
+        reopen_result = None
+        reopen_summary = {
+            "applicability": "NOT_REQUIRED",
+            "objectCount": 0,
+            "reopenValidated": True,
+        }
+
+    evidence_paths = [construction_path, report, blend]
+    if applicability == "REQUIRED":
+        evidence_paths.extend([snapshot, reopen_result])
 
     emit(
         result,
         stage="simulate-cloth",
         product_id=product_id,
-        paths=[construction_path, report, blend],
+        paths=evidence_paths,
         extra={
             "cacheEvidenceValidated": True,
+            "cacheReopenValidated": bool(reopen_summary["reopenValidated"]),
             "simulationApplicability": applicability,
             "cacheBaked": bool(payload.get("cacheBaked")),
             "geometryChanged": bool(payload.get("geometryChanged")),
@@ -753,6 +914,7 @@ def main() -> int:
         raise ValueError("job/request product identity mismatch")
 
     stage = args.stage
+    lineage = stage_lineage(job, stage)
     if stage == "ingest-reference":
         stage_ingest(job, request, result_path)
     elif stage == "normalize-view":
@@ -781,6 +943,10 @@ def main() -> int:
         stage_finalize(job, request, result_path)
     else:  # pragma: no cover
         raise AssertionError(stage)
+    if lineage is not None:
+        current = read_object(result_path, f"{stage} result")
+        current["inputLineage"] = lineage
+        write_json(result_path, current)
     return 0
 
 

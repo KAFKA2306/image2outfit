@@ -29,6 +29,7 @@ from tuxedo_halter_components import (
 from tuxedo_halter_runtime import (
     clean_meshes,
     cloth_cache_state,
+    combined_geometry_sha256,
     configure_cloth,
     mesh_geometry_sha256,
     normalize_bone_weights,
@@ -300,14 +301,55 @@ def add_hardware(
     return garments
 
 
+def render_coarse_geometry_review(
+    armature: bpy.types.Object,
+    camera: bpy.types.Object,
+    directory: Path,
+    *,
+    frame_end: int,
+) -> dict[str, Path]:
+    directory.mkdir(parents=True, exist_ok=True)
+    scene = bpy.context.scene
+    view_layer = bpy.context.view_layer
+    neutral = base.plain_material(
+        "MAT_Coarse_Geometry_Check",
+        (0.45, 0.45, 0.45, 1.0),
+        roughness=0.82,
+    )
+    previous_override = view_layer.material_override
+    outputs = {
+        "front": directory / "front.png",
+        "left": directory / "left.png",
+    }
+    try:
+        view_layer.material_override = neutral
+        g.reset_pose(armature)
+        scene.frame_set(frame_end)
+        g.configure_render(384)
+        scene.cycles.samples = 8
+        for name, location in (
+            ("front", (0.0, -2.55, 0.70)),
+            ("left", (2.55, 0.0, 0.70)),
+        ):
+            g.point_camera(camera, location)
+            scene.render.filepath = str(outputs[name])
+            bpy.ops.render.render(write_still=True)
+    finally:
+        view_layer.material_override = previous_override
+        g.reset_pose(armature)
+    return outputs
+
+
 def bake_skirts(
     body: bpy.types.Object,
     upper_skirt: bpy.types.Object,
     lower_skirt: bpy.types.Object,
     upper_pin: list[int],
     lower_pin: list[int],
-) -> tuple[list[dict[str, object]], int]:
+    cache_snapshot: Path,
+) -> tuple[list[dict[str, object]], int, Path]:
     frame_end = 24
+    frame_mid = (1 + frame_end) // 2
     skirts = (upper_skirt, lower_skirt)
     pre_bake_hashes = {skirt.name: mesh_geometry_sha256(skirt) for skirt in skirts}
     contracts = [
@@ -319,23 +361,45 @@ def bake_skirts(
     scene.frame_start = 1
     scene.frame_end = frame_end
     scene.gravity = (0.0, 0.0, -4.8)
+
+    cache_snapshot.parent.mkdir(parents=True, exist_ok=True)
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(cache_snapshot),
+        check_existing=False,
+    )
     bpy.context.view_layer.objects.active = upper_skirt
     bpy.ops.ptcache.bake_all(bake=True)
-    scene.frame_set(frame_end)
-    bpy.context.view_layer.update()
 
     for skirt in skirts:
         contract = contract_by_object[skirt.name]
         cache = cloth_cache_state(skirt, "Reference Cloth")
         contract.update(cache)
         contract["preBakeMeshSha256"] = pre_bake_hashes[skirt.name]
-        contract["evaluatedFrameMeshSha256"] = mesh_geometry_sha256(
-            skirt,
-            evaluated=True,
-        )
+        frame_hashes: dict[str, str] = {}
+        for frame in (1, frame_mid, frame_end):
+            scene.frame_set(frame)
+            bpy.context.view_layer.update()
+            frame_hashes[str(frame)] = mesh_geometry_sha256(
+                skirt,
+                evaluated=True,
+            )
+        contract["frameMeshSha256"] = frame_hashes
+        contract["evaluatedFrameMeshSha256"] = frame_hashes[str(frame_end)]
         if not contract["cacheBakedActual"]:
             raise RuntimeError(f"cloth cache was not baked for {skirt.name}")
 
+    scene.frame_set(frame_end)
+    bpy.context.view_layer.update()
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(cache_snapshot),
+        check_existing=False,
+    )
+    snapshot_sha = base.sha256(cache_snapshot)
+    for contract in contracts:
+        contract["cacheSnapshotSha256"] = snapshot_sha
+
+    for skirt in skirts:
+        contract = contract_by_object[skirt.name]
         bpy.ops.object.select_all(action="DESELECT")
         skirt.select_set(True)
         bpy.context.view_layer.objects.active = skirt
@@ -359,8 +423,7 @@ def bake_skirts(
         soft.segments = 2
         bpy.ops.object.modifier_apply(modifier=soft.name)
         skirt.select_set(False)
-    return contracts, frame_end
-
+    return contracts, frame_end, cache_snapshot
 
 def main() -> int:
     args = parse_args()
@@ -368,6 +431,10 @@ def main() -> int:
     job = read_json(job_path)
     if job.get("id") != PRODUCT_ID:
         raise ValueError("job product identity mismatch")
+    candidate_id = str(job.get("candidateId") or PRODUCT_ID)
+    variant_id = str(job.get("variantId") or "baseline")
+    variant_recipe_version = str(job.get("variantRecipeVersion") or "")
+    workspace_id = str(job.get("workspaceId") or "")
 
     base.clean_scene()
     source = repo_path(job["targetSourcePath"])
@@ -434,8 +501,13 @@ def main() -> int:
         movable=lambda obj: not obj.name.startswith("Silver_"),
     )
     clean_meshes(garments)
-    cloth_contracts, frame_end = bake_skirts(
-        body, upper_skirt, lower_skirt, upper_pin, lower_pin
+    cloth_contracts, frame_end, cloth_cache_snapshot = bake_skirts(
+        body,
+        upper_skirt,
+        lower_skirt,
+        upper_pin,
+        lower_pin,
+        evidence_dir / "cloth-cache-authority.blend",
     )
     clean_meshes(garments)
     weight_report = normalize_bone_weights(
@@ -452,84 +524,51 @@ def main() -> int:
         },
     )
     measured = base.metrics(garments)
-    passed = (
-        measured["meshObjects"] >= 18
-        and measured["vertices"] > 1800
-        and measured["triangles"] > 2500
-        and measured["unweightedVertices"] == 0
-        and measured["weightSumErrors"] == 0
-        and measured["degenerateTriangles"] == 0
-        and measured["maxBoneInfluences"] <= 4
-        and clearance_history[-1]["clearance"]["p01"] >= 0.0030
+    geometry_fingerprint = combined_geometry_sha256(garments)
+    coarse_minimum_p01 = float(
+        geometry_variables.get("coarseGateMinimumP01M", 0.0030)
     )
+    geometry_checks = {
+        "meshObjects>=18": measured["meshObjects"] >= 18,
+        "vertices>1800": measured["vertices"] > 1800,
+        "triangles>2500": measured["triangles"] > 2500,
+        "unweightedVertices==0": measured["unweightedVertices"] == 0,
+        "weightSumErrors==0": measured["weightSumErrors"] == 0,
+        "degenerateTriangles==0": measured["degenerateTriangles"] == 0,
+        "maxBoneInfluences<=4": measured["maxBoneInfluences"] <= 4,
+        "clearanceP01>=configuredMinimum": (
+            clearance_history[-1]["clearance"]["p01"] >= coarse_minimum_p01
+        ),
+    }
+    passed = all(geometry_checks.values())
 
     blend_path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
 
     scene = bpy.context.scene
     _, camera = g.pastel_studio()
-    g.set_pose(armature, "neutral")
-    scene.frame_set(frame_end)
-    previews = {name: repo_path(value) for name, value in job["previewPaths"].items()}
-    g.render_five_views(camera, previews)
-    multiview = preview_dir / f"{PRODUCT_ID}-multiview.webp"
-    g.contact_sheet(
-        previews,
-        multiview,
-        order=("front", "three-quarter", "left", "right", "back"),
-        title="TUXEDO HALTER LAYERED DRESS / SIROINO _LARGE",
+    coarse_paths = render_coarse_geometry_review(
+        armature,
+        camera,
+        evidence_dir / "CoarseGeometry",
+        frame_end=frame_end,
     )
-    pose_images = g.render_pose_set(armature, camera, pose_dir)
-    obsolete_twist = pose_images.pop("twist", None)
-    if obsolete_twist is not None and obsolete_twist.is_file():
-        obsolete_twist.unlink()
-    pose_images["prone"] = render_prone_pose(armature, camera, pose_dir / "prone.png")
-    pose_sheet = preview_dir / f"{PRODUCT_ID}-pose-review.webp"
-    g.contact_sheet(
-        pose_images,
-        pose_sheet,
-        order=("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
-        title="POSE AND PENETRATION REVIEW",
-    )
-
-    g.reset_pose(armature)
-    scene.frame_set(frame_end)
-    body.hide_render = True
-    base.export_fbx(fbx_path, armature, garments)
-    sidecars = write_prefabs(
-        fbx_path, prefab_path, integrated_prefab, job["productName"]
-    )
-
-    cloth_report = write_json(
-        evidence_dir / "cloth-simulation.json",
-        {
-            "schemaVersion": 1,
-            "productId": PRODUCT_ID,
-            "status": "PASS",
-            "engine": "Blender Cloth",
-            "applicability": "REQUIRED",
-            "frameStart": 1,
-            "frameEnd": frame_end,
-            "cacheBaked": all(
-                bool(contract.get("cacheBakedActual")) for contract in cloth_contracts
-            ),
-            "geometryChanged": all(
-                bool(contract.get("geometryChanged")) for contract in cloth_contracts
-            ),
-            "gravity": list(scene.gravity),
-            "contracts": cloth_contracts,
-            "bodyCollisionThicknessM": 0.004,
-        },
-    )
-    bib_object = bpy.data.objects.get("White_Jacquard_Bib")
-    if bib_object is None:
-        raise RuntimeError("pattern-driven bib object was not generated")
-    bib_projection = json.loads(str(bib_object["patternProjection"]))
+    coarse_evidence = {
+        name: {
+            "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": base.sha256(path),
+        }
+        for name, path in coarse_paths.items()
+    }
 
     report = {
         "schemaVersion": 1,
         "passed": passed,
         "productId": PRODUCT_ID,
+        "candidateId": candidate_id,
+        "variantId": variant_id,
+        "variantRecipeVersion": variant_recipe_version,
+        "workspaceId": workspace_id,
         "productName": job["productName"],
         "buildRevision": job["buildRevision"],
         "targetProfile": profile,
@@ -559,6 +598,14 @@ def main() -> int:
                 }
             },
         },
+        "geometryFingerprint": geometry_fingerprint,
+        "geometryGate": {
+            "checks": geometry_checks,
+            "minimumClearanceP01M": coarse_minimum_p01,
+            "decision": "PASS",
+        },
+        "coarseGeometryReview": coarse_evidence,
+        "highQualityRenderSkipped": False,
         "metrics": measured,
         "weightNormalization": weight_report,
         "clearanceRefinement": clearance_history,
@@ -586,6 +633,8 @@ def main() -> int:
         {
             "schemaVersion": 1,
             "productId": PRODUCT_ID,
+            "candidateId": candidate_id,
+            "variantId": variant_id,
             "default": "wine-red-black",
             "variants": [
                 {
@@ -605,6 +654,10 @@ def main() -> int:
     manifest = {
         "schemaVersion": 1,
         "productId": PRODUCT_ID,
+        "candidateId": candidate_id,
+        "variantId": variant_id,
+        "variantRecipeVersion": variant_recipe_version,
+        "workspaceId": workspace_id,
         "productName": job["productName"],
         "status": "WORKING" if passed else "REJECTED",
         "targetAdapterId": job["adapterId"],
@@ -626,7 +679,11 @@ def main() -> int:
             "resumable": True,
             "canonicalWorkspace": job["productRoot"],
             "doNotRebuildFromZero": True,
-            "resumeFrom": f".image2outfit/products/{PRODUCT_ID}/pipeline-state.json",
+            "resumeFrom": (
+                f"{job.get('variantRuntimeRoot')}/pipeline-state.json"
+                if job.get("variantRuntimeRoot")
+                else f".image2outfit/products/{PRODUCT_ID}/pipeline-state.json"
+            ),
             "lastAttempt": {
                 "result": "BLENDER_MODELED" if passed else "BLENDER_REJECTED",
                 "visualRevision": job["buildRevision"],

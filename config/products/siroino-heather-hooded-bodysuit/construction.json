@@ -52,5 +52,11 @@
     "authorsCodeCopied": false,
     "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smoothed-clearance-yoke-trial.json"
   },
-  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
+  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Fitted shell geometry is authored directly from the target body surface and validated by deterministic clearance and pose checks; no Cloth modifier or point cache is part of this construction.",
+    "reason": "The fitted bodysuit is not gravity-settled drapery, so a cloth bake would add cost without representing the authored construction method."
+  }
 }
