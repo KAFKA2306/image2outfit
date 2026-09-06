@@ -46,8 +46,7 @@ def _rewrite_value(value: Any, replacements: Mapping[str, str]) -> Any:
         return [_rewrite_value(item, replacements) for item in value]
     if isinstance(value, Mapping):
         return {
-            str(key): _rewrite_value(item, replacements)
-            for key, item in value.items()
+            str(key): _rewrite_value(item, replacements) for key, item in value.items()
         }
     return copy.deepcopy(value)
 
@@ -132,7 +131,9 @@ def materialize_variant(
     root = root.resolve()
     base_product_id = production_recipe.get("baseProductId")
     recipe_version = production_recipe.get("recipeVersion")
-    if base_product_id != base_job.get("id") or base_product_id != base_request.get("productId"):
+    if base_product_id != base_job.get("id") or base_product_id != base_request.get(
+        "productId"
+    ):
         raise ValueError("production recipe/base job/base request identity mismatch")
     if base_material_recipe.get("productId") != base_product_id:
         raise ValueError("base material recipe identity mismatch")
@@ -187,8 +188,12 @@ def materialize_variant(
     request_path = runtime_root / "request.json"
     report_path = runtime_root / "variant-contract.json"
     visual_review_path = runtime_root / "visual-review.json"
-    job["garmentPipeline"]["materialRecipePath"] = material_path.relative_to(root).as_posix()
-    job["garmentPipeline"]["visualReviewPath"] = visual_review_path.relative_to(root).as_posix()
+    job["garmentPipeline"]["materialRecipePath"] = material_path.relative_to(
+        root
+    ).as_posix()
+    job["garmentPipeline"]["visualReviewPath"] = visual_review_path.relative_to(
+        root
+    ).as_posix()
 
     request = copy.deepcopy(dict(base_request))
     base_job_rel = f"config/products/{base_product_id}/job.json"
