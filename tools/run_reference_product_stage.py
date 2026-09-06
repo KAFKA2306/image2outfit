@@ -429,11 +429,56 @@ def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
         raise FileNotFoundError(f"build report was not created: {relative(report)}")
 
     blend = repo_path(job["blendPath"], label="blend")
+    stage_paths = [blend, report, log]
+    variant_proof_validated = False
+    pipeline = job.get("garmentPipeline", {})
+    proof_script_value = (
+        pipeline.get("variantProofScript") if isinstance(pipeline, Mapping) else None
+    )
+    if quality["passed"] and isinstance(proof_script_value, str) and proof_script_value:
+        proof_script = repo_path(proof_script_value, label="variant proof script")
+        proof_log = runtime_root(product_id) / "reports" / "variant-proof.log"
+        proof_command = [
+            sys.executable,
+            str(proof_script),
+            "--job",
+            str(job_path),
+            "--blender",
+            blender_executable(),
+        ]
+        proof_completed = subprocess.run(
+            proof_command,
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        proof_log.parent.mkdir(parents=True, exist_ok=True)
+        proof_log.write_text(
+            proof_completed.stdout
+            + "\n--- STDERR ---\n"
+            + proof_completed.stderr,
+            encoding="utf-8",
+        )
+        if proof_completed.returncode != 0:
+            raise RuntimeError(
+                "variant proof failed with exit code "
+                f"{proof_completed.returncode}; see {relative(proof_log)}"
+            )
+        proof_path = (
+            runtime_root(product_id) / "variants" / "variant-proof.json"
+        )
+        proof_payload = read_object(proof_path, "variant proof")
+        if proof_payload.get("status") != "PASS":
+            raise ValueError("variant proof did not record PASS")
+        stage_paths.extend([proof_path, proof_log])
+        variant_proof_validated = True
+
     emit(
         result,
         stage="build-blender",
         product_id=product_id,
-        paths=[blend, report, log],
+        paths=stage_paths,
         extra={
             "blenderReturnCode": completed.returncode,
             "executionDisposition": (
@@ -444,6 +489,7 @@ def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
             "qualityDecision": quality["decision"],
             "geometryPassed": quality["passed"],
             "failedGeometryChecks": quality["failedChecks"],
+            "variantProofValidated": variant_proof_validated,
         },
     )
 
@@ -525,6 +571,35 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
                 and all(character in "0123456789abcdef" for character in value)
             )
 
+        reopen = payload.get("reopenVerification")
+        if not isinstance(reopen, Mapping) or reopen.get("status") != "PASS":
+            raise ValueError("cloth cache reopen verification is missing or failed")
+        reopened_objects = reopen.get("objects")
+        if not isinstance(reopened_objects, Mapping):
+            raise ValueError("cloth cache reopen objects are missing")
+        expected_inputs = {
+            "pattern": sha256(
+                repo_path(
+                    job["garmentPipeline"]["patternContractPath"],
+                    label="pattern contract",
+                )
+            ),
+            "stitches": sha256(
+                repo_path(
+                    job["garmentPipeline"]["stitchGraphPath"],
+                    label="stitch graph",
+                )
+            ),
+            "materialRecipe": sha256(
+                repo_path(
+                    job["garmentPipeline"]["materialRecipePath"],
+                    label="material recipe",
+                )
+            ),
+        }
+        if payload.get("inputHashes") != expected_inputs:
+            raise ValueError("cloth simulation input hashes are stale")
+
         for index, contract in enumerate(contracts):
             if not isinstance(contract, Mapping):
                 raise ValueError(f"cloth contract {index} must be an object")
@@ -533,10 +608,38 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
             if contract.get("geometryChanged") is not True:
                 raise ValueError(f"cloth contract {index} did not change geometry")
             before = contract.get("preBakeMeshSha256")
-            evaluated = contract.get("evaluatedFrameMeshSha256")
+            evaluated_frames = contract.get("evaluatedFrames")
             settled = contract.get("settledMeshSha256")
-            if not all(valid_hash(value) for value in (before, evaluated, settled)):
+            if not valid_hash(before) or not valid_hash(settled):
                 raise ValueError(f"cloth contract {index} mesh hashes are invalid")
+            if not isinstance(evaluated_frames, Mapping):
+                raise ValueError(f"cloth contract {index} frame hashes are missing")
+            if list(evaluated_frames) != ["start", "middle", "end"]:
+                raise ValueError(f"cloth contract {index} frame labels are invalid")
+            reopened = reopened_objects.get(str(contract.get("object")))
+            if not isinstance(reopened, Mapping):
+                raise ValueError(f"cloth contract {index} reopen object is missing")
+            reopened_frames = reopened.get("frames")
+            if not isinstance(reopened_frames, Mapping):
+                raise ValueError(f"cloth contract {index} reopen frames are missing")
+            for label in ("start", "middle", "end"):
+                frame_record = evaluated_frames.get(label)
+                reopen_record = reopened_frames.get(label)
+                if not isinstance(frame_record, Mapping) or not isinstance(
+                    reopen_record, Mapping
+                ):
+                    raise ValueError(
+                        f"cloth contract {index} frame {label} is invalid"
+                    )
+                frame_hash = frame_record.get("sha256")
+                if not valid_hash(frame_hash):
+                    raise ValueError(
+                        f"cloth contract {index} frame {label} hash is invalid"
+                    )
+                if reopen_record.get("sha256") != frame_hash:
+                    raise ValueError(
+                        f"cloth contract {index} frame {label} reopen mismatch"
+                    )
             if before == settled:
                 raise ValueError(f"cloth contract {index} settled mesh is unchanged")
             if contract.get("frameStart") != payload.get("frameStart"):

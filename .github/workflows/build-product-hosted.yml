@@ -219,6 +219,63 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Resolve technical proof after private-reference boundary
+        if: env.SKIP_PRODUCT_BUILD != 'true' && env.PIPELINE_MODE == 'true'
+        id: technical-proof
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+
+          checkpoint = Path(os.environ['CHECKPOINT_PATH'])
+          run = False
+          if checkpoint.is_file():
+              state = json.loads(checkpoint.read_text(encoding='utf-8'))
+              run = (
+                  state.get('status') == 'FAILED'
+                  and state.get('current_stage') == 'normalize-view'
+                  and state.get('completed_stages') == ['ingest-reference']
+                  and 'private reference image is required'
+                  in state.get('errors', [''])[-1]
+              )
+          with Path(os.environ['GITHUB_OUTPUT']).open('a', encoding='utf-8') as stream:
+              stream.write(f"run={'true' if run else 'false'}\n")
+          PY
+
+      - name: Generate technical proof after private-reference boundary
+        if: steps.technical-proof.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p "$REPORT_DIR"
+          .image2outfit/blender/blender --python-use-system-env --background             --factory-startup --python-exit-code 1 --python "$BUILD_SCRIPT"             -- --job "$JOB_PATH" | tee "$REPORT_DIR/technical-base-build.log"
+          proof_script="$(
+            python - <<'PY'
+          import json, os
+          from pathlib import Path
+          job = json.loads(Path(os.environ['JOB_PATH']).read_text(encoding='utf-8'))
+          print(job.get('garmentPipeline', {}).get('variantProofScript', ''))
+          PY
+          )"
+          if [[ -n "$proof_script" ]]; then
+            python "$proof_script"               --job "$JOB_PATH"               --blender ".image2outfit/blender/blender"               | tee "$REPORT_DIR/technical-variant-proof.log"
+          fi
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          checkpoint = Path(os.environ['CHECKPOINT_PATH'])
+          state = json.loads(checkpoint.read_text(encoding='utf-8'))
+          Path(os.environ['REPORT_DIR'], 'technical-proof-boundary.json').write_text(
+              json.dumps({
+                  'schemaVersion': 1,
+                  'status': 'PASS',
+                  'canonicalPipelineState': state.get('status'),
+                  'canonicalStoppedAt': state.get('current_stage'),
+                  'technicalProofSeparateFromCanonicalPipeline': True,
+              }, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          PY
+
       - name: Generate product assets directly
         if: env.SKIP_PRODUCT_BUILD != 'true' && env.PIPELINE_MODE != 'true'
         run: |
@@ -318,6 +375,10 @@ jobs:
           path: |
             ${{ env.REPORT_DIR }}/**/*.json
             ${{ env.PRODUCT_RUNTIME }}/**/*.json
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.webp
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.blend
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.fbx
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.prefab
             ${{ env.PRODUCT_AUDIT }}/**/*.json
             ${{ env.PRODUCT_ROOT }}/Models/**/*.fbx
             ${{ env.PRODUCT_ROOT }}/Prefab/**/*.prefab

@@ -60,7 +60,8 @@
       "regions": [
         "bib-front",
         "bib-ruffles"
-      ]
+      ],
+      "roughnessScale": 1
     },
     "wine": {
       "materialName": "MAT_Wine_Satin",
@@ -76,7 +77,8 @@
         "waistcoat-front",
         "waistcoat-back",
         "tails"
-      ]
+      ],
+      "roughnessScale": 1
     },
     "black": {
       "materialName": "MAT_Black_Satin",
@@ -94,7 +96,8 @@
         "bow",
         "buttons",
         "lace"
-      ]
+      ],
+      "roughnessScale": 1
     },
     "sheer": {
       "materialName": "MAT_Black_Sheer",
@@ -108,7 +111,8 @@
       ],
       "regions": [
         "lower-skirt"
-      ]
+      ],
+      "roughnessScale": 1
     },
     "silver": {
       "materialName": "MAT_Silver_Hardware",
@@ -131,5 +135,11 @@
     "coarseGeometryMaterial": "neutral-matte",
     "finishAfterGeometryGate": true,
     "finalVisualReviewRequired": true
+  },
+  "controlExperiment": {
+    "parameter": "wine.roughnessScale",
+    "baseValue": 1,
+    "controlValue": 1.18,
+    "expectedInvariant": "garment geometry SHA-256"
   }
 }

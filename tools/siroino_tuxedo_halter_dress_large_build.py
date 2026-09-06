@@ -7,6 +7,7 @@ import argparse
 import json
 import math
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -30,6 +31,7 @@ from tuxedo_halter_runtime import (
     clean_meshes,
     cloth_cache_state,
     configure_cloth,
+    garment_geometry_sha256,
     mesh_geometry_sha256,
     normalize_bone_weights,
     render_prone_pose,
@@ -37,6 +39,12 @@ from tuxedo_halter_runtime import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from image2outfit.stage_contracts import validate_stitch_contract
+
 PRODUCT_ID = "siroino-tuxedo-halter-dress-large"
 
 
@@ -111,6 +119,7 @@ def create_materials(
             maps[f"{map_set}_roughness"],
             sheen=float(spec.get("sheen", 0.0)),
             alpha=float(spec.get("alpha", 1.0)),
+            roughness_scale=float(spec.get("roughnessScale", 1.0)),
         )
 
     silver = material_specs.get("silver")
@@ -142,7 +151,11 @@ def add_bodice(
     pattern: dict,
     *,
     bib_width_scale: float = 1.0,
+    waistcoat_material_key: str = "wine",
 ) -> list[bpy.types.Object]:
+    if waistcoat_material_key not in {"wine", "black"}:
+        raise ValueError("waistcoat material must be wine or black")
+    waistcoat_material = materials[waistcoat_material_key]
     garments: list[bpy.types.Object] = [
         bib_panel(
             body,
@@ -151,11 +164,11 @@ def add_bodice(
             find_pattern_piece(pattern, "bib-front"),
             width_scale=bib_width_scale,
         ),
-        waistcoat_side("L", body, armature, materials["wine"]),
-        waistcoat_side("R", body, armature, materials["wine"]),
-        waistcoat_back(body, armature, materials["wine"]),
-        tail_panel("L", body, armature, materials["wine"]),
-        tail_panel("R", body, armature, materials["wine"]),
+        waistcoat_side("L", body, armature, waistcoat_material),
+        waistcoat_side("R", body, armature, waistcoat_material),
+        waistcoat_back(body, armature, waistcoat_material),
+        tail_panel("L", body, armature, waistcoat_material),
+        tail_panel("R", body, armature, waistcoat_material),
     ]
     garments.extend(
         vertical_ruffle(index, body, armature, materials["white"]) for index in range(3)
@@ -202,12 +215,12 @@ def add_skirts(
         armature,
         materials["black"],
         top_z=0.705,
-        bottom_z=0.550,
+        bottom_z=0.515,
         top_rx=0.145,
         top_ry=0.105,
-        bottom_rx=0.245,
-        bottom_ry=0.177,
-        pleats=12,
+        bottom_rx=0.285,
+        bottom_ry=0.210,
+        pleats=16,
         thickness=0.0014,
     )
     lower_skirt, lower_pin = ring_skirt(
@@ -216,39 +229,50 @@ def add_skirts(
         armature,
         materials["sheer"],
         top_z=0.694,
-        bottom_z=0.465,
+        bottom_z=0.405,
         top_rx=0.150,
         top_ry=0.110,
-        bottom_rx=0.275,
-        bottom_ry=0.204,
-        pleats=14,
+        bottom_rx=0.315,
+        bottom_ry=0.235,
+        pleats=20,
         thickness=0.0008,
     )
-    garments = [upper_skirt, lower_skirt]
+    return [upper_skirt, lower_skirt], upper_skirt, lower_skirt, upper_pin, lower_pin
 
-    hem_points = []
-    for index in range(168):
-        angle = math.tau * index / 168
-        scallop = 0.0045 * (0.5 + 0.5 * math.cos(angle * 20))
-        hem_points.append(
-            (
-                0.276 * math.cos(angle),
-                0.205 * math.sin(angle),
-                0.465 + scallop,
-            )
-        )
-    garments.append(
-        base.curve_tube(
-            "Black_Lace_Scallop_Hem",
-            hem_points,
-            0.0017,
-            materials["black"],
-            armature,
-            "Hips",
-            cyclic=True,
-        )
+
+def add_baked_hem_trim(
+    hem_points: list[tuple[float, float, float]],
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+) -> tuple[bpy.types.Object, dict[str, object]]:
+    if len(hem_points) < 16:
+        raise RuntimeError("lower skirt hem boundary is too small to trim")
+    trim_points: list[tuple[float, float, float]] = []
+    offsets: list[float] = []
+    count = len(hem_points)
+    for index, (x, y, z) in enumerate(hem_points):
+        angle = math.tau * index / count
+        scallop = 0.0020 * (0.5 + 0.5 * math.cos(angle * 20))
+        trim_points.append((x, y, z + scallop))
+        offsets.append(scallop)
+    trim = base.curve_tube(
+        "Black_Lace_Scallop_Hem",
+        trim_points,
+        0.0017,
+        material,
+        armature,
+        "Hips",
+        cyclic=True,
     )
-    return garments, upper_skirt, lower_skirt, upper_pin, lower_pin
+    alignment = {
+        "sourceBoundary": "Black_Sheer_Lower_Skirt settled bottom ring",
+        "samples": count,
+        "maximumCenterlineOffsetM": max(offsets),
+        "meanCenterlineOffsetM": sum(offsets) / count,
+        "requiredMaximumCenterlineOffsetM": 0.0030,
+        "passed": max(offsets) <= 0.0030,
+    }
+    return trim, alignment
 
 
 def add_hardware(
@@ -306,7 +330,14 @@ def bake_skirts(
     lower_skirt: bpy.types.Object,
     upper_pin: list[int],
     lower_pin: list[int],
-) -> tuple[list[dict[str, object]], int]:
+    *,
+    cache_root: Path,
+) -> tuple[
+    list[dict[str, object]],
+    int,
+    list[tuple[float, float, float]],
+    dict[str, object],
+]:
     frame_end = 24
     skirts = (upper_skirt, lower_skirt)
     pre_bake_hashes = {skirt.name: mesh_geometry_sha256(skirt) for skirt in skirts}
@@ -319,27 +350,104 @@ def bake_skirts(
     scene.frame_start = 1
     scene.frame_end = frame_end
     scene.gravity = (0.0, 0.0, -4.8)
+
+    cache_root.mkdir(parents=True, exist_ok=True)
+    cache_blend = cache_root / "cloth-cache-verification.blend"
+    expected_path = cache_root / "cloth-cache-expected.json"
+    reopened_path = cache_root / "cloth-cache-reopened.json"
+    bpy.ops.wm.save_as_mainfile(filepath=str(cache_blend), check_existing=False)
+
     bpy.context.view_layer.objects.active = upper_skirt
     bpy.ops.ptcache.bake_all(bake=True)
-    scene.frame_set(frame_end)
-    bpy.context.view_layer.update()
 
+    frame_map = {"start": 1, "middle": frame_end // 2, "end": frame_end}
+    expected_objects: dict[str, object] = {}
     for skirt in skirts:
         contract = contract_by_object[skirt.name]
         cache = cloth_cache_state(skirt, "Reference Cloth")
         contract.update(cache)
         contract["preBakeMeshSha256"] = pre_bake_hashes[skirt.name]
-        contract["evaluatedFrameMeshSha256"] = mesh_geometry_sha256(
-            skirt,
-            evaluated=True,
-        )
         if not contract["cacheBakedActual"]:
             raise RuntimeError(f"cloth cache was not baked for {skirt.name}")
 
+        evaluated_frames: dict[str, object] = {}
+        for label, frame in frame_map.items():
+            scene.frame_set(frame)
+            bpy.context.view_layer.update()
+            evaluated_frames[label] = {
+                "frame": frame,
+                "sha256": mesh_geometry_sha256(skirt, evaluated=True),
+            }
+        contract["evaluatedFrames"] = evaluated_frames
+        expected_objects[skirt.name] = {
+            "modifier": "Reference Cloth",
+            "frames": evaluated_frames,
+        }
+
+    write_json(
+        expected_path,
+        {
+            "schemaVersion": 1,
+            "productId": PRODUCT_ID,
+            "objects": expected_objects,
+        },
+    )
+    scene.frame_set(frame_end)
+    bpy.context.view_layer.update()
+    bpy.ops.wm.save_as_mainfile(filepath=str(cache_blend), check_existing=False)
+
+    verifier = ROOT / "tools" / "verify_tuxedo_cloth_cache.py"
+    command = [
+        bpy.app.binary_path,
+        "--background",
+        str(cache_blend),
+        "--python-exit-code",
+        "1",
+        "--python",
+        str(verifier),
+        "--",
+        "--expected",
+        str(expected_path),
+        "--result",
+        str(reopened_path),
+    ]
+    completed = subprocess.run(
+        command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "reopened cloth cache verification failed: "
+            + completed.stdout[-2000:]
+            + completed.stderr[-2000:]
+        )
+    reopened = read_json(reopened_path)
+    if reopened.get("status") != "PASS":
+        raise RuntimeError("reopened cloth cache verification did not PASS")
+
+    lower_hem_points: list[tuple[float, float, float]] = []
+    scene.frame_set(frame_end)
+    bpy.context.view_layer.update()
+    for skirt in skirts:
+        contract = contract_by_object[skirt.name]
         bpy.ops.object.select_all(action="DESELECT")
         skirt.select_set(True)
         bpy.context.view_layer.objects.active = skirt
         bpy.ops.object.modifier_apply(modifier="Reference Cloth")
+        if skirt is lower_skirt:
+            segment_count = len(lower_pin)
+            if segment_count <= 0 or len(skirt.data.vertices) < segment_count * 2:
+                raise RuntimeError(
+                    "lower skirt topology cannot expose its settled hem ring"
+                )
+            start = len(skirt.data.vertices) - segment_count
+            lower_hem_points = [
+                tuple(skirt.matrix_world @ skirt.data.vertices[index].co)
+                for index in range(start, len(skirt.data.vertices))
+            ]
         contract["settledMeshSha256"] = mesh_geometry_sha256(skirt)
         contract["geometryChanged"] = (
             contract["settledMeshSha256"] != contract["preBakeMeshSha256"]
@@ -359,7 +467,46 @@ def bake_skirts(
         soft.segments = 2
         bpy.ops.object.modifier_apply(modifier=soft.name)
         skirt.select_set(False)
-    return contracts, frame_end
+
+    if len(lower_hem_points) != len(lower_pin):
+        raise RuntimeError("settled lower skirt hem sampling is incomplete")
+    return contracts, frame_end, lower_hem_points, reopened
+
+
+def render_webp_preview(
+    camera: bpy.types.Object,
+    output: Path,
+    *,
+    resolution: int,
+) -> Path:
+    scene = bpy.context.scene
+    g.configure_render(resolution)
+    scene.cycles.samples = 8
+    scene.render.image_settings.file_format = "WEBP"
+    scene.render.image_settings.color_mode = "RGB"
+    scene.render.image_settings.quality = 92
+    output.parent.mkdir(parents=True, exist_ok=True)
+    scene.render.filepath = str(output)
+    bpy.ops.render.render(write_still=True)
+    return output
+
+
+def required_bib_stitches(stitches: dict, pattern: dict) -> list[str]:
+    validate_stitch_contract(
+        stitches,
+        pattern,
+        expected_product_id=PRODUCT_ID,
+    )
+    required = {"bib-to-left-lapel", "bib-to-right-lapel"}
+    present = {
+        str(item.get("stitchId"))
+        for item in stitches.get("stitches", [])
+        if isinstance(item, dict)
+    }
+    missing = sorted(required - present)
+    if missing:
+        raise ValueError("required bib stitches are missing: " + ", ".join(missing))
+    return sorted(required)
 
 
 def main() -> int:
@@ -397,6 +544,10 @@ def main() -> int:
         raise ValueError("pattern contract product identity mismatch")
     shutil.copyfile(tracked_pattern, pattern_dir / "tuxedo-halter.pattern.json")
 
+    tracked_stitches = repo_path(job["garmentPipeline"]["stitchGraphPath"])
+    stitch_contract = read_json(tracked_stitches)
+    required_stitches = required_bib_stitches(stitch_contract, pattern_contract)
+
     tracked_material_recipe = repo_path(job["garmentPipeline"]["materialRecipePath"])
     material_recipe = read_json(tracked_material_recipe)
     if material_recipe.get("productId") != PRODUCT_ID:
@@ -413,12 +564,17 @@ def main() -> int:
     if not isinstance(geometry_variables, dict):
         raise ValueError("job geometryVariables must be an object")
     bib_width_scale = float(geometry_variables.get("bibWidthScale", 1.0))
+    material_overrides = job.get("materialOverrides", {})
+    if not isinstance(material_overrides, dict):
+        raise ValueError("job materialOverrides must be an object")
+    waistcoat_material_key = str(material_overrides.get("waistcoat", "wine"))
     garments = add_bodice(
         body,
         armature,
         materials,
         pattern_contract,
         bib_width_scale=bib_width_scale,
+        waistcoat_material_key=waistcoat_material_key,
     )
     skirt_parts, upper_skirt, lower_skirt, upper_pin, lower_pin = add_skirts(
         body, armature, materials
@@ -434,9 +590,29 @@ def main() -> int:
         movable=lambda obj: not obj.name.startswith("Silver_"),
     )
     clean_meshes(garments)
-    cloth_contracts, frame_end = bake_skirts(
-        body, upper_skirt, lower_skirt, upper_pin, lower_pin
+    variant_id = str(job.get("variantId", "wine-red-black"))
+    cache_root = (
+        ROOT
+        / ".image2outfit"
+        / "products"
+        / PRODUCT_ID
+        / "cloth-cache-verification"
+        / variant_id
     )
+    cloth_contracts, frame_end, settled_hem, reopened_cache = bake_skirts(
+        body,
+        upper_skirt,
+        lower_skirt,
+        upper_pin,
+        lower_pin,
+        cache_root=cache_root,
+    )
+    hem_trim, hem_alignment = add_baked_hem_trim(
+        settled_hem,
+        armature,
+        materials["black"],
+    )
+    garments.append(hem_trim)
     clean_meshes(garments)
     weight_report = normalize_bone_weights(
         garments,
@@ -461,7 +637,9 @@ def main() -> int:
         and measured["degenerateTriangles"] == 0
         and measured["maxBoneInfluences"] <= 4
         and clearance_history[-1]["clearance"]["p01"] >= 0.0030
+        and hem_alignment["passed"]
     )
+    geometry_sha256 = garment_geometry_sha256(garments)
 
     blend_path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
@@ -471,6 +649,62 @@ def main() -> int:
     g.set_pose(armature, "neutral")
     scene.frame_set(frame_end)
     previews = {name: repo_path(value) for name, value in job["previewPaths"].items()}
+    geometry_preview = preview_dir / "geometry-check.webp"
+    neutral_material = base.plain_material(
+        "MAT_Geometry_Check",
+        (0.55, 0.55, 0.55, 1.0),
+        roughness=0.82,
+        metallic=0.0,
+    )
+    view_layer = bpy.context.view_layer
+    previous_override = view_layer.material_override
+    view_layer.material_override = neutral_material
+    g.point_camera(camera, (0.0, -2.55, 0.70))
+    render_webp_preview(camera, geometry_preview, resolution=384)
+    view_layer.material_override = previous_override
+
+    roughness_control = preview_dir / "material-roughness-control.webp"
+    wine_material = materials["wine"]
+    scale_node = wine_material.node_tree.nodes.get("Roughness Scale")
+    if scale_node is None:
+        raise RuntimeError("wine material has no Roughness Scale node")
+    original_roughness_scale = float(scale_node.inputs[1].default_value)
+    before_control_geometry = garment_geometry_sha256(garments)
+    scale_node.inputs[1].default_value = 1.18
+    after_control_geometry = garment_geometry_sha256(garments)
+    if after_control_geometry != before_control_geometry:
+        raise RuntimeError("roughness control changed garment geometry")
+    render_webp_preview(camera, roughness_control, resolution=384)
+    scale_node.inputs[1].default_value = original_roughness_scale
+    material_control = {
+        "parameter": "wine.roughnessScale",
+        "before": original_roughness_scale,
+        "after": 1.18,
+        "geometrySha256Before": before_control_geometry,
+        "geometrySha256After": after_control_geometry,
+        "geometryUnchanged": before_control_geometry == after_control_geometry,
+        "preview": str(roughness_control.relative_to(ROOT)).replace("\\", "/"),
+    }
+
+    if not passed:
+        rejected_report = {
+            "schemaVersion": 1,
+            "passed": False,
+            "productId": PRODUCT_ID,
+            "productName": job["productName"],
+            "buildRevision": job["buildRevision"],
+            "metrics": measured,
+            "geometrySha256": geometry_sha256,
+            "geometryPreview": str(geometry_preview.relative_to(ROOT)).replace(
+                "\\", "/"
+            ),
+            "materialControl": material_control,
+            "hemAlignment": hem_alignment,
+        }
+        write_json(evidence_dir / "product-build-report.json", rejected_report)
+        print(json.dumps(rejected_report, ensure_ascii=False, indent=2))
+        return 2
+
     g.render_five_views(camera, previews)
     multiview = preview_dir / f"{PRODUCT_ID}-multiview.webp"
     g.contact_sheet(
@@ -507,6 +741,7 @@ def main() -> int:
             "productId": PRODUCT_ID,
             "status": "PASS",
             "engine": "Blender Cloth",
+            "blenderVersion": bpy.app.version_string,
             "applicability": "REQUIRED",
             "frameStart": 1,
             "frameEnd": frame_end,
@@ -518,6 +753,12 @@ def main() -> int:
             ),
             "gravity": list(scene.gravity),
             "contracts": cloth_contracts,
+            "reopenVerification": reopened_cache,
+            "inputHashes": {
+                "pattern": base.sha256(tracked_pattern),
+                "stitches": base.sha256(tracked_stitches),
+                "materialRecipe": base.sha256(tracked_material_recipe),
+            },
             "bodyCollisionThicknessM": 0.004,
         },
     )
@@ -531,15 +772,21 @@ def main() -> int:
         "passed": passed,
         "productId": PRODUCT_ID,
         "productName": job["productName"],
+        "variantId": variant_id,
         "buildRevision": job["buildRevision"],
         "targetProfile": profile,
         "targetAvatarAssetPath": job["targetAvatarAssetPath"],
         "targetSourcePath": job["targetSourcePath"],
         "blenderVersion": bpy.app.version_string,
+        "geometrySha256": geometry_sha256,
+        "geometryPreview": str(geometry_preview.relative_to(ROOT)).replace("\\", "/"),
+        "materialControl": material_control,
+        "hemAlignment": hem_alignment,
         "materialRecipe": {
             "path": str(tracked_material_recipe.relative_to(ROOT)).replace("\\", "/"),
             "sha256": base.sha256(tracked_material_recipe),
             "recipeVersion": material_recipe["recipeVersion"],
+            "waistcoatMaterial": waistcoat_material_key,
             "regions": {
                 key: value.get("regions", [])
                 for key, value in material_recipe["materials"].items()
@@ -549,6 +796,11 @@ def main() -> int:
         "patternDrivenGeometry": {
             "patternPath": str(tracked_pattern.relative_to(ROOT)).replace("\\", "/"),
             "patternSha256": base.sha256(tracked_pattern),
+            "stitchGraphPath": str(tracked_stitches.relative_to(ROOT)).replace(
+                "\\", "/"
+            ),
+            "stitchGraphSha256": base.sha256(tracked_stitches),
+            "requiredStitches": required_stitches,
             "pieces": {
                 "bib-front": {
                     "object": bib_object.name,
@@ -709,6 +961,8 @@ Unity import, Modular Avatar/NDMF execution, VRChat Build & Test, and runtime in
         *pose_images.values(),
         multiview,
         pose_sheet,
+        geometry_preview,
+        roughness_control,
         cloth_report,
         report_path,
         variants,

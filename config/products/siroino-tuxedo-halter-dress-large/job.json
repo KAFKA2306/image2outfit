@@ -5,7 +5,7 @@
   "adapterId": "siroino-v1.0-large",
   "automaticBuild": false,
   "buildCapability": "canonical-resumable-reference-pipeline",
-  "buildRevision": "v1-reference-audited-pattern-first",
+  "buildRevision": "v2-standard-flow-proof",
   "renderLoopRevision": "v1-five-view-six-pose",
   "productRoot": "Assets/GenWorks/siroino-tuxedo-halter-dress-large",
   "productManifestPath": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/ProductManifest.json",
@@ -66,7 +66,9 @@
     "releaseRequiresPoseEvidence": true,
     "stageContractVersion": 2,
     "constructionPath": "config/products/siroino-tuxedo-halter-dress-large/construction.json",
-    "materialRecipePath": "config/products/siroino-tuxedo-halter-dress-large/material-recipe.json"
+    "materialRecipePath": "config/products/siroino-tuxedo-halter-dress-large/material-recipe.json",
+    "variantSpecPath": "config/products/siroino-tuxedo-halter-dress-large/variants.json",
+    "variantProofScript": "tools/run_tuxedo_variant_proof.py"
   },
   "researchMethod": {
     "name": "pattern-first structured reconstruction",

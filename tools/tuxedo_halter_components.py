@@ -109,6 +109,7 @@ def textured_material(
     *,
     sheen: float,
     alpha: float = 1.0,
+    roughness_scale: float = 1.0,
 ) -> bpy.types.Material:
     material = bpy.data.materials.new(name)
     material.use_nodes = True
@@ -119,6 +120,11 @@ def textured_material(
     shader = nodes.new("ShaderNodeBsdfPrincipled")
     color = image_node(nodes, albedo)
     rough = image_node(nodes, roughness, non_color=True)
+    rough.name = "Roughness Texture"
+    rough_scale = nodes.new("ShaderNodeMath")
+    rough_scale.name = "Roughness Scale"
+    rough_scale.operation = "MULTIPLY"
+    rough_scale.inputs[1].default_value = roughness_scale
     normal_image = image_node(nodes, normal, non_color=True)
     normal_map = nodes.new("ShaderNodeNormalMap")
     normal_map.inputs["Strength"].default_value = 0.30
@@ -129,7 +135,8 @@ def textured_material(
         shader.inputs["Sheen Weight"].default_value = sheen
         shader.inputs["Sheen Roughness"].default_value = 0.48
     links.new(color.outputs["Color"], shader.inputs["Base Color"])
-    links.new(rough.outputs["Color"], shader.inputs["Roughness"])
+    links.new(rough.outputs["Color"], rough_scale.inputs[0])
+    links.new(rough_scale.outputs["Value"], shader.inputs["Roughness"])
     links.new(normal_image.outputs["Color"], normal_map.inputs["Color"])
     links.new(normal_map.outputs["Normal"], shader.inputs["Normal"])
     links.new(shader.outputs["BSDF"], output.inputs["Surface"])

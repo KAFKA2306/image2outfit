@@ -3,7 +3,7 @@
   "productId": "siroino-tuxedo-halter-dress-large",
   "profile": "panel-sewn",
   "target": "Siroino _Large via official shape keys",
-  "designRevision": "v1-reference-audited-pattern-first",
+  "designRevision": "v2-standard-flow-proof",
   "panels": [
     "white-bib-front",
     "waistcoat-front-left",
@@ -42,7 +42,7 @@
       "Black_Upper_Pleated_Skirt",
       "Black_Sheer_Lower_Skirt"
     ],
-    "evidence": "actual Blender point-cache state and pre/evaluated/settled mesh SHA-256",
+    "evidence": "actual Blender point-cache state, start/middle/end evaluated mesh SHA-256, and a second Blender reopen verification before modifier apply",
     "reason": "The two skirt rings rely on gravity settling; fitted surface-extracted bodice panels do not."
   }
 }
