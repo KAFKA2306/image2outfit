@@ -301,6 +301,45 @@ def add_hardware(
     return garments
 
 
+def render_coarse_geometry_review(
+    armature: bpy.types.Object,
+    camera: bpy.types.Object,
+    directory: Path,
+    *,
+    frame_end: int,
+) -> dict[str, Path]:
+    directory.mkdir(parents=True, exist_ok=True)
+    scene = bpy.context.scene
+    view_layer = bpy.context.view_layer
+    neutral = base.plain_material(
+        "MAT_Coarse_Geometry_Check",
+        (0.45, 0.45, 0.45, 1.0),
+        roughness=0.82,
+    )
+    previous_override = view_layer.material_override
+    outputs = {
+        "front": directory / "front.png",
+        "left": directory / "left.png",
+    }
+    try:
+        view_layer.material_override = neutral
+        g.reset_pose(armature)
+        scene.frame_set(frame_end)
+        g.configure_render(384)
+        scene.cycles.samples = 8
+        for name, location in (
+            ("front", (0.0, -2.55, 0.70)),
+            ("left", (2.55, 0.0, 0.70)),
+        ):
+            g.point_camera(camera, location)
+            scene.render.filepath = str(outputs[name])
+            bpy.ops.render.render(write_still=True)
+    finally:
+        view_layer.material_override = previous_override
+        g.reset_pose(armature)
+    return outputs
+
+
 def bake_skirts(
     body: bpy.types.Object,
     upper_skirt: bpy.types.Object,
