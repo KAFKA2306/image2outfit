@@ -138,9 +138,16 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
     pose_views = report.get("poseViews")
     if not isinstance(pose_views, dict) or len(pose_views) < 6:
         raise ValueError(f"pose evidence incomplete for {item['variantId']}")
-    for relative in pose_views.values():
-        if not (ROOT / str(relative)).is_file():
-            raise FileNotFoundError(relative)
+    views = report.get("views")
+    if not isinstance(views, dict) or len(views) < 5:
+        raise ValueError(f"five-view evidence incomplete for {item['variantId']}")
+    render_hashes: dict[str, str] = {}
+    for kind, mapping in (("view", views), ("pose", pose_views)):
+        for name, relative in sorted(mapping.items()):
+            path = ROOT / str(relative)
+            if not path.is_file():
+                raise FileNotFoundError(relative)
+            render_hashes[f"{kind}:{name}"] = sha256(path)
 
     target_profile = report.get("targetProfile")
     weight_normalization = report.get("weightNormalization")
@@ -165,7 +172,9 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
             "geometryFingerprint": fingerprint,
             "reportSha256": sha256(report_path),
             "materialRecipeSha256": report["materialRecipe"]["sha256"],
+            "fiveViewEvidenceCount": len(views),
             "poseEvidenceCount": len(pose_views),
+            "renderEvidenceSha256": render_hashes,
             "geometryPassed": bool(report.get("passed")),
             "shapeProfileEvidence": target_profile,
             "weightNormalizationEvidence": {
@@ -211,6 +220,20 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         raise ValueError("color variant changed geometry")
     if baseline["materialRecipeSha256"] == color["materialRecipeSha256"]:
         raise ValueError("color variant did not change the material recipe")
+    baseline_renders = baseline.get("renderEvidenceSha256")
+    color_renders = color.get("renderEvidenceSha256")
+    if not isinstance(baseline_renders, dict) or not isinstance(color_renders, dict):
+        raise ValueError("color render evidence hashes are missing")
+    shared_render_keys = sorted(set(baseline_renders) & set(color_renders))
+    if not shared_render_keys:
+        raise ValueError("baseline/color render evidence has no shared views")
+    changed_render_keys = [
+        key
+        for key in shared_render_keys
+        if baseline_renders[key] != color_renders[key]
+    ]
+    if not changed_render_keys:
+        raise ValueError("color variant did not change any rendered evidence")
     if baseline["geometryFingerprint"] == size["geometryFingerprint"]:
         raise ValueError("size variant did not change geometry")
     if size.get("poseEvidenceCount", 0) < 6:
@@ -236,6 +259,8 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "colorGeometryMatchesBaseline": True,
         "colorMaterialChanged": True,
+        "colorRenderChanged": True,
+        "colorChangedRenderKeys": changed_render_keys,
         "sizeGeometryChanged": True,
         "sizeFitRevalidated": True,
         "sizeWeightsRevalidated": True,
