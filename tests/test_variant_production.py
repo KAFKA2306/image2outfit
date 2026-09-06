@@ -66,10 +66,7 @@ class ProductionVariantTests(unittest.TestCase):
                 by_id["black-black"]["variantContract"]["materialRecipeSha256"],
             )
 
-            roots = {
-                read_json(item["jobPath"])["productRoot"]
-                for item in items
-            }
+            roots = {read_json(item["jobPath"])["productRoot"] for item in items}
             self.assertEqual(4, len(roots))
             for item in items:
                 derived_job = read_json(item["jobPath"])
