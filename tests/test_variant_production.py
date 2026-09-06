@@ -55,7 +55,7 @@ class ProductionVariantTests(unittest.TestCase):
                     "black-black",
                     "bib-width-plus-10",
                     "roughness-control",
-                    "invalid-zero-bib",
+                    "coarse-gate-reject",
                 },
                 set(by_id),
             )
@@ -87,9 +87,15 @@ class ProductionVariantTests(unittest.TestCase):
                 by_id["baseline"]["variantContract"]["materialRecipeSha256"],
                 by_id["roughness-control"]["variantContract"]["materialRecipeSha256"],
             )
+            self.assertEqual(
+                1.0,
+                by_id["coarse-gate-reject"]["variantContract"]["geometryVariables"][
+                    "coarseGateMinimumP01M"
+                ],
+            )
 
             roots = {read_json(item["jobPath"])["productRoot"] for item in items}
-            self.assertEqual(4, len(roots))
+            self.assertEqual(5, len(roots))
             for item in items:
                 derived_job = read_json(item["jobPath"])
                 derived_request = read_json(item["requestPath"])
