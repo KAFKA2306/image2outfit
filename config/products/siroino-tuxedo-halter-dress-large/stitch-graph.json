@@ -2,21 +2,186 @@
   "schemaVersion": 1,
   "productId": "siroino-tuxedo-halter-dress-large",
   "stitches": [
-    {"stitchId":"left-front-to-back-side","first":{"pieceId":"waistcoat-left","edge":"outer-side"},"second":{"pieceId":"waistcoat-back","edge":"left-side"},"type":"plain","easingRatio":1.0},
-    {"stitchId":"right-front-to-back-side","first":{"pieceId":"waistcoat-right","edge":"outer-side"},"second":{"pieceId":"waistcoat-back","edge":"right-side"},"type":"plain","easingRatio":1.0},
-    {"stitchId":"left-tail-to-waistcoat","first":{"pieceId":"tail-left","edge":"waist"},"second":{"pieceId":"waistcoat-left","edge":"lower-waist"},"type":"attachment","easingRatio":1.0},
-    {"stitchId":"right-tail-to-waistcoat","first":{"pieceId":"tail-right","edge":"waist"},"second":{"pieceId":"waistcoat-right","edge":"lower-waist"},"type":"attachment","easingRatio":1.0},
-    {"stitchId":"bib-to-left-lapel","first":{"pieceId":"bib-front","edge":"left-side"},"second":{"pieceId":"waistcoat-left","edge":"inner-v"},"type":"bound","easingRatio":1.0},
-    {"stitchId":"bib-to-right-lapel","first":{"pieceId":"bib-front","edge":"right-side"},"second":{"pieceId":"waistcoat-right","edge":"inner-v"},"type":"bound","easingRatio":1.0},
-    {"stitchId":"upper-skirt-center-back","first":{"pieceId":"upper-skirt-ring","edge":"left-back"},"second":{"pieceId":"upper-skirt-ring","edge":"right-back"},"type":"plain","easingRatio":1.0},
-    {"stitchId":"lower-skirt-center-back","first":{"pieceId":"lower-skirt-ring","edge":"left-back"},"second":{"pieceId":"lower-skirt-ring","edge":"right-back"},"type":"plain","easingRatio":1.0},
-    {"stitchId":"upper-skirt-to-waist","first":{"pieceId":"upper-skirt-ring","edge":"waist"},"second":{"pieceId":"waistcoat-back","edge":"lower-waist"},"type":"attachment","easingRatio":0.68},
-    {"stitchId":"lower-skirt-to-waist","first":{"pieceId":"lower-skirt-ring","edge":"waist"},"second":{"pieceId":"waistcoat-back","edge":"lower-waist"},"type":"attachment","easingRatio":0.56},
-    {"stitchId":"neck-band-close","first":{"pieceId":"neck-band","edge":"left-end"},"second":{"pieceId":"neck-band","edge":"right-end"},"type":"plain","easingRatio":1.0},
-    {"stitchId":"ruffle-to-bib","first":{"pieceId":"ruffle-strip","edge":"centerline"},"second":{"pieceId":"bib-front","edge":"centerline"},"type":"attachment","easingRatio":1.8}
+    {
+      "stitchId": "left-front-to-back-side",
+      "first": {
+        "pieceId": "waistcoat-left",
+        "edgeId": "outer-side"
+      },
+      "second": {
+        "pieceId": "waistcoat-back",
+        "edgeId": "left-side"
+      },
+      "type": "plain",
+      "easingRatio": 1,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "right-front-to-back-side",
+      "first": {
+        "pieceId": "waistcoat-right",
+        "edgeId": "outer-side"
+      },
+      "second": {
+        "pieceId": "waistcoat-back",
+        "edgeId": "right-side"
+      },
+      "type": "plain",
+      "easingRatio": 1,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "left-tail-to-waistcoat",
+      "first": {
+        "pieceId": "tail-left",
+        "edgeId": "waist"
+      },
+      "second": {
+        "pieceId": "waistcoat-left",
+        "edgeId": "lower-waist"
+      },
+      "type": "attachment",
+      "easingRatio": 1,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "right-tail-to-waistcoat",
+      "first": {
+        "pieceId": "tail-right",
+        "edgeId": "waist"
+      },
+      "second": {
+        "pieceId": "waistcoat-right",
+        "edgeId": "lower-waist"
+      },
+      "type": "attachment",
+      "easingRatio": 1,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "bib-to-left-lapel",
+      "first": {
+        "pieceId": "bib-front",
+        "edgeId": "left-side"
+      },
+      "second": {
+        "pieceId": "waistcoat-left",
+        "edgeId": "inner-v"
+      },
+      "type": "bound",
+      "easingRatio": 1,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "bib-to-right-lapel",
+      "first": {
+        "pieceId": "bib-front",
+        "edgeId": "right-side"
+      },
+      "second": {
+        "pieceId": "waistcoat-right",
+        "edgeId": "inner-v"
+      },
+      "type": "bound",
+      "easingRatio": 1,
+      "direction": "same"
+    },
+    {
+      "stitchId": "upper-skirt-center-back",
+      "first": {
+        "pieceId": "upper-skirt-ring",
+        "edgeId": "left-back"
+      },
+      "second": {
+        "pieceId": "upper-skirt-ring",
+        "edgeId": "right-back"
+      },
+      "type": "plain",
+      "easingRatio": 1,
+      "direction": "same"
+    },
+    {
+      "stitchId": "lower-skirt-center-back",
+      "first": {
+        "pieceId": "lower-skirt-ring",
+        "edgeId": "left-back"
+      },
+      "second": {
+        "pieceId": "lower-skirt-ring",
+        "edgeId": "right-back"
+      },
+      "type": "plain",
+      "easingRatio": 1,
+      "direction": "same"
+    },
+    {
+      "stitchId": "upper-skirt-to-waist",
+      "first": {
+        "pieceId": "upper-skirt-ring",
+        "edgeId": "waist"
+      },
+      "second": {
+        "pieceId": "waistcoat-back",
+        "edgeId": "lower-waist"
+      },
+      "type": "attachment",
+      "easingRatio": 0.68,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "lower-skirt-to-waist",
+      "first": {
+        "pieceId": "lower-skirt-ring",
+        "edgeId": "waist"
+      },
+      "second": {
+        "pieceId": "waistcoat-back",
+        "edgeId": "lower-waist"
+      },
+      "type": "attachment",
+      "easingRatio": 0.56,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "neck-band-close",
+      "first": {
+        "pieceId": "neck-band",
+        "edgeId": "left-end"
+      },
+      "second": {
+        "pieceId": "neck-band",
+        "edgeId": "right-end"
+      },
+      "type": "plain",
+      "easingRatio": 1,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "ruffle-to-bib",
+      "first": {
+        "pieceId": "ruffle-strip",
+        "edgeId": "centerline"
+      },
+      "second": {
+        "pieceId": "bib-front",
+        "edgeId": "centerline"
+      },
+      "type": "attachment",
+      "easingRatio": 1.8,
+      "direction": "not-applicable"
+    }
   ],
   "unresolved": [
-    {"item":"exact commercial seam allowance","status":"not-observable","decision":"use 8–12 mm construction allowances appropriate to panel function"},
-    {"item":"back closure hardware","status":"not-observable","decision":"omit visible hardware and preserve a center-back seam"}
-  ]
+    {
+      "item": "exact commercial seam allowance",
+      "status": "not-observable",
+      "decision": "use 8–12 mm construction allowances appropriate to panel function"
+    },
+    {
+      "item": "back closure hardware",
+      "status": "not-observable",
+      "decision": "omit visible hardware and preserve a center-back seam"
+    }
+  ],
+  "contractVersion": 2
 }
