@@ -23,16 +23,32 @@ if str(SRC) not in sys.path:
 from image2outfit.pattern_projection import project_pattern_piece
 
 
-def make_image_maps(directory: Path) -> dict[str, Path]:
+def make_image_maps(
+    directory: Path,
+    specs: Mapping[str, Any],
+) -> dict[str, Path]:
     directory.mkdir(parents=True, exist_ok=True)
     size = 512
     outputs: dict[str, Path] = {}
-    specs = {
-        "wine_satin": ((82, 2, 19), 124, 9),
-        "black_satin": ((8, 8, 12), 132, 8),
-        "white_jacquard": ((238, 237, 233), 180, 7),
-    }
-    for name, (base_color, roughness, normal_amp) in specs.items():
+    if not specs:
+        raise ValueError("material mapSets must be non-empty")
+    for name, raw_spec in specs.items():
+        if not isinstance(name, str) or not isinstance(raw_spec, Mapping):
+            raise ValueError("material mapSet entries must be named objects")
+        base_color = raw_spec.get("baseColorRgb")
+        roughness = raw_spec.get("roughnessValue")
+        normal_amp = raw_spec.get("normalAmplitude")
+        if (
+            not isinstance(base_color, list)
+            or len(base_color) != 3
+            or not all(isinstance(value, int) and 0 <= value <= 255 for value in base_color)
+        ):
+            raise ValueError(f"material mapSet {name!r} baseColorRgb is invalid")
+        if not isinstance(roughness, int) or not 0 <= roughness <= 255:
+            raise ValueError(f"material mapSet {name!r} roughnessValue is invalid")
+        if not isinstance(normal_amp, int) or not 0 <= normal_amp <= 127:
+            raise ValueError(f"material mapSet {name!r} normalAmplitude is invalid")
+        base_color_tuple = tuple(base_color)
         albedo = Image.new("RGB", (size, size))
         normal = Image.new("RGB", (size, size))
         rough = Image.new("L", (size, size))
@@ -50,7 +66,8 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
                 else:
                     delta = int(3 * weave + 5 * diagonal)
                 pixel = tuple(
-                    max(0, min(255, channel + delta)) for channel in base_color
+                    max(0, min(255, channel + delta))
+                    for channel in base_color_tuple
                 )
                 albedo.putpixel((x, y), pixel)
                 normal.putpixel(
@@ -62,7 +79,8 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
                     ),
                 )
                 rough.putpixel(
-                    (x, y), max(0, min(255, roughness + int(7 * diagonal)))
+                    (x, y),
+                    max(0, min(255, roughness + int(7 * diagonal))),
                 )
         for suffix, image in (
             ("albedo", albedo),
@@ -73,7 +91,6 @@ def make_image_maps(directory: Path) -> dict[str, Path]:
             image.save(path, optimize=True)
             outputs[f"{name}_{suffix}"] = path
     return outputs
-
 
 def image_node(nodes, path: Path, *, non_color: bool = False):
     node = nodes.new("ShaderNodeTexImage")
