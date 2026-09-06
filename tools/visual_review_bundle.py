@@ -70,14 +70,25 @@ def _reference_identity(
     product_id: str,
     request: Mapping[str, Any],
 ) -> dict[str, Any]:
+    source = str(request.get("sourceReference") or "")
+    prefix = "private-reference://sha256/"
+    request_digest = source.removeprefix(prefix) if source.startswith(prefix) else None
+    if request_digest is not None and len(request_digest) != 64:
+        request_digest = None
+
     path = ROOT / "config" / "products" / product_id / "reference.json"
     if path.is_file():
         reference = read_object(path)
         if reference.get("productId") != product_id:
             raise ValueError("reference product identity mismatch")
-        digest = reference.get("sha256")
-        if not isinstance(digest, str) or len(digest) != 64:
-            raise ValueError("reference SHA-256 is missing")
+        manifest_digest = reference.get("sha256")
+        digest = (
+            manifest_digest
+            if isinstance(manifest_digest, str) and len(manifest_digest) == 64
+            else request_digest
+        )
+        if digest is None:
+            raise ValueError("reference SHA-256 is unavailable")
         observed = reference.get("observedViews")
         observed_views = (
             [str(value) for value in observed] if isinstance(observed, list) else []
@@ -90,16 +101,13 @@ def _reference_identity(
             "observedViews": observed_views,
         }
 
-    source = str(request.get("sourceReference") or "")
-    prefix = "private-reference://sha256/"
-    digest = source.removeprefix(prefix)
-    if not source.startswith(prefix) or len(digest) != 64:
+    if request_digest is None:
         raise ValueError("reference identity is unavailable")
     return {
         "kind": "private-reference",
         "path": None,
         "manifestSha256": None,
-        "sourceSha256": digest,
+        "sourceSha256": request_digest,
         "observedViews": [],
     }
 
@@ -132,8 +140,15 @@ def build_review_bundle(
     direct = quality["directImageReview"]
     required_views = list(direct["requiredViews"])
     required_poses = list(direct["requiredPoses"])
-    previews = job.get("previewPaths") or {}
-    poses = job.get("posePaths") or {}
+    previews = dict(job.get("previewPaths") or {})
+    poses = dict(job.get("posePaths") or {})
+    product_root = repo_path(job["productRoot"])
+    for pose in required_poses:
+        if pose in poses:
+            continue
+        conventional = product_root / "Previews" / "Poses" / f"{pose}.png"
+        if conventional.is_file():
+            poses[pose] = conventional.relative_to(ROOT).as_posix()
 
     missing_views = [view for view in required_views if view not in previews]
     missing_poses = [pose for pose in required_poses if pose not in poses]
