@@ -321,9 +321,7 @@ def main() -> int:
             lambda point: (
                 dress_bottom <= point.z <= dress_bottom + 0.055 * height
                 and point.y <= front_limit
-                and hip_radius * 0.30
-                <= abs(point.x - center.x)
-                <= hip_radius * 0.82
+                and hip_radius * 0.30 <= abs(point.x - center.x) <= hip_radius * 0.82
             ),
             lace,
             0.0075,
@@ -334,9 +332,7 @@ def main() -> int:
         fitted(body, armature, name, predicate, material, offset=offset)
         for name, predicate, material, offset in specs
     ]
-    long_panel = next(
-        obj for obj in garments if obj.name == "Long_Sheer_Front_Panel"
-    )
+    long_panel = next(obj for obj in garments if obj.name == "Long_Sheer_Front_Panel")
     drape_front_panel(
         long_panel,
         low_z=dress_bottom,
