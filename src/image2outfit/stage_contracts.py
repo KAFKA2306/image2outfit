@@ -234,6 +234,91 @@ def normalize_observed_variants(
     return outputs, manifest
 
 
+def validate_producer_artifact_binding(
+    producer_result: Mapping[str, Any],
+    *,
+    producer_result_path: str,
+    artifact_path: Path,
+    artifact_repository_path: str,
+    expected_stage: str,
+    expected_role: str,
+    expected_product_id: str,
+) -> dict[str, str]:
+    """Bind a consumer read to the exact artifact emitted by its producer stage."""
+    if producer_result.get("schemaVersion") != 1:
+        raise ValueError(
+            f"producer result schema mismatch for role {expected_role}: "
+            f"{producer_result_path}"
+        )
+    if producer_result.get("stage") != expected_stage:
+        raise ValueError(
+            f"producer stage mismatch for role {expected_role}: "
+            f"{producer_result_path}"
+        )
+    if producer_result.get("productId") != expected_product_id:
+        raise ValueError(
+            f"producer product mismatch for role {expected_role}: "
+            f"{producer_result_path}"
+        )
+    if producer_result.get("status") != "PASS":
+        raise ValueError(
+            f"producer did not PASS for role {expected_role}: "
+            f"{producer_result_path}"
+        )
+    if producer_result.get("artifactRole") != expected_role:
+        raise ValueError(
+            f"required role {expected_role} missing from producer result: "
+            f"{producer_result_path}"
+        )
+    producer_hash = producer_result.get("artifactSha256")
+    if not isinstance(producer_hash, str) or len(producer_hash) != 64:
+        raise ValueError(
+            f"producer artifact hash missing for role {expected_role}: "
+            f"{producer_result_path}"
+        )
+    if not artifact_path.is_file():
+        raise FileNotFoundError(
+            f"canonical artifact missing for role {expected_role}: "
+            f"{artifact_repository_path}"
+        )
+    actual_hash = _sha256(artifact_path)
+    if actual_hash != producer_hash:
+        raise ValueError(
+            f"stale input hash for role {expected_role}: producer "
+            f"{producer_result_path} recorded {producer_hash}, canonical "
+            f"{artifact_repository_path} is {actual_hash}"
+        )
+
+    evidence = producer_result.get("evidence")
+    if not isinstance(evidence, list):
+        raise ValueError(
+            f"producer evidence missing for role {expected_role}: "
+            f"{producer_result_path}"
+        )
+    matches = [
+        item
+        for item in evidence
+        if isinstance(item, Mapping)
+        and item.get("path") == artifact_repository_path
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            f"producer evidence path mismatch for role {expected_role}: "
+            f"producer={producer_result_path}, canonical={artifact_repository_path}"
+        )
+    if matches[0].get("sha256") != actual_hash:
+        raise ValueError(
+            f"producer evidence hash mismatch for role {expected_role}: "
+            f"producer={producer_result_path}, canonical={artifact_repository_path}"
+        )
+    return {
+        "role": expected_role,
+        "producerResultPath": producer_result_path,
+        "artifactPath": artifact_repository_path,
+        "artifactSha256": actual_hash,
+    }
+
+
 def _piece_id(piece: Mapping[str, Any]) -> str:
     value = piece.get("pieceId", piece.get("id"))
     if not isinstance(value, str) or not value:
