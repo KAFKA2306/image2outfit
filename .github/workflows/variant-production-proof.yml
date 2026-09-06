@@ -6,6 +6,9 @@ on:
     paths:
       - config/products/**/production-variants.json
       - src/image2outfit/variant_production.py
+      - src/image2outfit/cloth_evidence.py
+      - tools/verify_cloth_cache_snapshot.py
+      - config/products/**/construction.json
       - tools/run_variant_production.py
       - tools/run_reference_product_stage.py
       - tools/tuxedo_halter_runtime.py
