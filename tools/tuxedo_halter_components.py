@@ -41,7 +41,9 @@ def make_image_maps(
         if (
             not isinstance(base_color, list)
             or len(base_color) != 3
-            or not all(isinstance(value, int) and 0 <= value <= 255 for value in base_color)
+            or not all(
+                isinstance(value, int) and 0 <= value <= 255 for value in base_color
+            )
         ):
             raise ValueError(f"material mapSet {name!r} baseColorRgb is invalid")
         if not isinstance(roughness, int) or not 0 <= roughness <= 255:
@@ -54,9 +56,7 @@ def make_image_maps(
         rough = Image.new("L", (size, size))
         for y in range(size):
             for x in range(size):
-                weave = math.sin(x * math.tau / 18.0) + math.sin(
-                    y * math.tau / 22.0
-                )
+                weave = math.sin(x * math.tau / 18.0) + math.sin(y * math.tau / 22.0)
                 diagonal = math.sin((x + y * 0.41) * math.tau / 44.0)
                 if name == "white_jacquard":
                     motif = math.sin(x * math.tau / 64.0) * math.sin(
@@ -66,8 +66,7 @@ def make_image_maps(
                 else:
                     delta = int(3 * weave + 5 * diagonal)
                 pixel = tuple(
-                    max(0, min(255, channel + delta))
-                    for channel in base_color_tuple
+                    max(0, min(255, channel + delta)) for channel in base_color_tuple
                 )
                 albedo.putpixel((x, y), pixel)
                 normal.putpixel(
@@ -91,6 +90,7 @@ def make_image_maps(
             image.save(path, optimize=True)
             outputs[f"{name}_{suffix}"] = path
     return outputs
+
 
 def image_node(nodes, path: Path, *, non_color: bool = False):
     node = nodes.new("ShaderNodeTexImage")
@@ -223,8 +223,7 @@ def bib_panel(
         width_scale=width_scale,
     )
     vertices = [
-        (x, base.body_front_y(body, x, z) - 0.020, z)
-        for x, z in projection["pointsXZ"]
+        (x, base.body_front_y(body, x, z) - 0.020, z) for x, z in projection["pointsXZ"]
     ]
     obj = mesh_object(
         "White_Jacquard_Bib",
@@ -249,6 +248,7 @@ def bib_panel(
         separators=(",", ":"),
     )
     return obj
+
 
 def waistcoat_side(
     side: str,
@@ -287,9 +287,9 @@ def waistcoat_back(
         body,
         armature,
         "Wine_Waistcoat_Back",
-        lambda center: 0.715 <= center.z <= 0.900
-        and center.y >= -0.004
-        and abs(center.x) <= 0.152,
+        lambda center: (
+            0.715 <= center.z <= 0.900 and center.y >= -0.004 and abs(center.x) <= 0.152
+        ),
         material,
         0.0070,
     )
@@ -308,9 +308,7 @@ def tail_panel(
         (sign * 0.112, 0.680),
         (sign * 0.045, 0.590),
     ]
-    vertices = [
-        (x, base.body_front_y(body, x, z) - 0.012, z) for x, z in coordinates
-    ]
+    vertices = [(x, base.body_front_y(body, x, z) - 0.012, z) for x, z in coordinates]
     face = (0, 1, 2, 3) if side == "R" else (0, 3, 2, 1)
     return mesh_object(
         f"Wine_Waistcoat_Tail_{side}",
@@ -424,9 +422,7 @@ def ellipsoid(
     body: bpy.types.Object,
     armature: bpy.types.Object,
 ) -> bpy.types.Object:
-    bpy.ops.mesh.primitive_uv_sphere_add(
-        segments=24, ring_count=12, location=location
-    )
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=12, location=location)
     obj = bpy.context.active_object
     obj.name = name
     obj.scale = scale
