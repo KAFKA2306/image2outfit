@@ -134,6 +134,7 @@ def create_materials(
     }
     return maps, materials
 
+
 def add_bodice(
     body: bpy.types.Object,
     armature: bpy.types.Object,
@@ -157,8 +158,7 @@ def add_bodice(
         tail_panel("R", body, armature, materials["wine"]),
     ]
     garments.extend(
-        vertical_ruffle(index, body, armature, materials["white"])
-        for index in range(3)
+        vertical_ruffle(index, body, armature, materials["white"]) for index in range(3)
     )
     garments.extend(bow_tie(body, armature, materials["black"]))
 
@@ -193,7 +193,9 @@ def add_skirts(
     body: bpy.types.Object,
     armature: bpy.types.Object,
     materials: dict[str, object],
-) -> tuple[list[bpy.types.Object], bpy.types.Object, bpy.types.Object, list[int], list[int]]:
+) -> tuple[
+    list[bpy.types.Object], bpy.types.Object, bpy.types.Object, list[int], list[int]
+]:
     upper_skirt, upper_pin = ring_skirt(
         "Black_Upper_Pleated_Skirt",
         body,
@@ -307,18 +309,12 @@ def bake_skirts(
 ) -> tuple[list[dict[str, object]], int]:
     frame_end = 24
     skirts = (upper_skirt, lower_skirt)
-    pre_bake_hashes = {
-        skirt.name: mesh_geometry_sha256(skirt)
-        for skirt in skirts
-    }
+    pre_bake_hashes = {skirt.name: mesh_geometry_sha256(skirt) for skirt in skirts}
     contracts = [
         configure_cloth(upper_skirt, body, upper_pin, frame_end=frame_end),
         configure_cloth(lower_skirt, body, lower_pin, frame_end=frame_end),
     ]
-    contract_by_object = {
-        str(contract["object"]): contract
-        for contract in contracts
-    }
+    contract_by_object = {str(contract["object"]): contract for contract in contracts}
     scene = bpy.context.scene
     scene.frame_start = 1
     scene.frame_end = frame_end
@@ -365,6 +361,7 @@ def bake_skirts(
         skirt.select_set(False)
     return contracts, frame_end
 
+
 def main() -> int:
     args = parse_args()
     job_path = repo_path(args.job)
@@ -400,9 +397,7 @@ def main() -> int:
         raise ValueError("pattern contract product identity mismatch")
     shutil.copyfile(tracked_pattern, pattern_dir / "tuxedo-halter.pattern.json")
 
-    tracked_material_recipe = repo_path(
-        job["garmentPipeline"]["materialRecipePath"]
-    )
+    tracked_material_recipe = repo_path(job["garmentPipeline"]["materialRecipePath"])
     material_recipe = read_json(tracked_material_recipe)
     if material_recipe.get("productId") != PRODUCT_ID:
         raise ValueError("material recipe product identity mismatch")
@@ -475,9 +470,7 @@ def main() -> int:
     _, camera = g.pastel_studio()
     g.set_pose(armature, "neutral")
     scene.frame_set(frame_end)
-    previews = {
-        name: repo_path(value) for name, value in job["previewPaths"].items()
-    }
+    previews = {name: repo_path(value) for name, value in job["previewPaths"].items()}
     g.render_five_views(camera, previews)
     multiview = preview_dir / f"{PRODUCT_ID}-multiview.webp"
     g.contact_sheet(
@@ -490,9 +483,7 @@ def main() -> int:
     obsolete_twist = pose_images.pop("twist", None)
     if obsolete_twist is not None and obsolete_twist.is_file():
         obsolete_twist.unlink()
-    pose_images["prone"] = render_prone_pose(
-        armature, camera, pose_dir / "prone.png"
-    )
+    pose_images["prone"] = render_prone_pose(armature, camera, pose_dir / "prone.png")
     pose_sheet = preview_dir / f"{PRODUCT_ID}-pose-review.webp"
     g.contact_sheet(
         pose_images,
@@ -520,12 +511,10 @@ def main() -> int:
             "frameStart": 1,
             "frameEnd": frame_end,
             "cacheBaked": all(
-                bool(contract.get("cacheBakedActual"))
-                for contract in cloth_contracts
+                bool(contract.get("cacheBakedActual")) for contract in cloth_contracts
             ),
             "geometryChanged": all(
-                bool(contract.get("geometryChanged"))
-                for contract in cloth_contracts
+                bool(contract.get("geometryChanged")) for contract in cloth_contracts
             ),
             "gravity": list(scene.gravity),
             "contracts": cloth_contracts,
@@ -680,7 +669,7 @@ def main() -> int:
 
     readme = product_root / "README.md"
     readme.write_text(
-        f"""# {job['productName']}
+        f"""# {job["productName"]}
 
 Target: **Siroino `_Large`**.
 
@@ -699,12 +688,12 @@ The reference image visibly declares `winered × black` and `black × black`. No
 
 ## Outputs
 
-- Blender source: `{job['blendPath']}`
-- FBX: `{job['fbxAssetPath']}`
-- outfit Prefab declaration: `{job['prefabAssetPath']}`
-- integrated Prefab declaration: `{job['integratedPrefabAssetPath']}`
-- five-view sheet: `{manifest['outputs']['multiview']}`
-- pose-review sheet: `{manifest['outputs']['poseReview']}`
+- Blender source: `{job["blendPath"]}`
+- FBX: `{job["fbxAssetPath"]}`
+- outfit Prefab declaration: `{job["prefabAssetPath"]}`
+- integrated Prefab declaration: `{job["integratedPrefabAssetPath"]}`
+- five-view sheet: `{manifest["outputs"]["multiview"]}`
+- pose-review sheet: `{manifest["outputs"]["poseReview"]}`
 
 Unity import, Modular Avatar/NDMF execution, VRChat Build & Test, and runtime inspection are outside the completion scope and are not represented as PASS.
 """,
