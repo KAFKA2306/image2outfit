@@ -213,13 +213,7 @@ class VisualReviewBundleTests(unittest.TestCase):
 
     def test_tracked_wide_cargo_builds_real_bundle(self) -> None:
         product_id = "siroino-wide-cargo"
-        job_path = (
-            self.original_root
-            / "config"
-            / "products"
-            / product_id
-            / "job.json"
-        )
+        job_path = self.original_root / "config" / "products" / product_id / "job.json"
         with tempfile.TemporaryDirectory(dir=self.original_root) as tmp:
             request_path = Path(tmp) / "request.json"
             request_path.write_text(
@@ -228,9 +222,7 @@ class VisualReviewBundleTests(unittest.TestCase):
                         "schemaVersion": 1,
                         "productId": product_id,
                         "revisionId": "tracked-wide-cargo-smoke",
-                        "sourceReference": (
-                            "private-reference://sha256/" + "b" * 64
-                        ),
+                        "sourceReference": ("private-reference://sha256/" + "b" * 64),
                     }
                 ),
                 encoding="utf-8",
