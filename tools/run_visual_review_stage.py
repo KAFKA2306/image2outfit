@@ -9,6 +9,12 @@ from pathlib import Path
 from typing import Any
 
 from run_reference_product_stage import emit, read_object, repo_path
+import visual_review_bundle
+
+
+def build_review_bundle(job_path: Path, request_path: Path) -> dict[str, Any]:
+    """Build the Stage 12 hash-bound review bundle using the canonical helper."""
+    return visual_review_bundle.build_review_bundle(job_path, request_path)
 
 
 def parse_args() -> argparse.Namespace:
