@@ -228,7 +228,9 @@ class SemanticPatternBoundaryTests(unittest.TestCase):
     def test_tuxedo_contract_is_migrated_and_semantically_valid(self) -> None:
         product = ROOT / "config" / "products" / "siroino-tuxedo-halter-dress-large"
         job = json.loads((product / "job.json").read_text(encoding="utf-8"))
-        pattern = json.loads((product / "pattern-draft.json").read_text(encoding="utf-8"))
+        pattern = json.loads(
+            (product / "pattern-draft.json").read_text(encoding="utf-8")
+        )
         stitch = json.loads((product / "stitch-graph.json").read_text(encoding="utf-8"))
 
         self.assertEqual(2, job["garmentPipeline"]["stageContractVersion"])
