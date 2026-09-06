@@ -3,13 +3,24 @@
 
 from __future__ import annotations
 
+import json
 import math
+import sys
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
 import bpy
 from PIL import Image
 
 import siroino_strappy_knit_build as base
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from image2outfit.pattern_projection import project_pattern_piece
 
 
 def make_image_maps(directory: Path) -> dict[str, Path]:
@@ -183,34 +194,44 @@ def bib_panel(
     body: bpy.types.Object,
     armature: bpy.types.Object,
     material: bpy.types.Material,
+    pattern_piece: Mapping[str, Any],
+    *,
+    width_scale: float = 1.0,
 ) -> bpy.types.Object:
-    rows = [
-        (1.020, 0.028),
-        (0.982, 0.050),
-        (0.930, 0.072),
-        (0.870, 0.074),
-        (0.810, 0.056),
-        (0.758, 0.002),
+    projection = project_pattern_piece(
+        pattern_piece,
+        x_scale=0.7047619047619048,
+        z_scale=0.6313253012048193,
+        z_offset=0.8495421686746988,
+        width_scale=width_scale,
+    )
+    vertices = [
+        (x, base.body_front_y(body, x, z) - 0.020, z)
+        for x, z in projection["pointsXZ"]
     ]
-    vertices: list[tuple[float, float, float]] = []
-    for z, width in rows:
-        for x in (-max(width, 0.002), max(width, 0.002)):
-            vertices.append((x, base.body_front_y(body, x, z) - 0.020, z))
-    faces = [
-        (index, index + 1, index + 3, index + 2)
-        for index in range(0, (len(rows) - 1) * 2, 2)
-    ]
-    return mesh_object(
+    obj = mesh_object(
         "White_Jacquard_Bib",
         vertices,
-        faces,
+        [tuple(range(len(vertices)))],
         material,
         body,
         armature,
         thickness=0.0011,
         bevel=0.0005,
     )
-
+    obj["patternPieceId"] = str(projection["pieceId"])
+    obj["patternProjectionFingerprint"] = str(projection["fingerprint"])
+    obj["patternEdgeVertexMap"] = json.dumps(
+        projection["edgeVertexMap"],
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    obj["patternProjection"] = json.dumps(
+        projection,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return obj
 
 def waistcoat_side(
     side: str,
