@@ -50,7 +50,13 @@ class ProductionVariantTests(unittest.TestCase):
 
             by_id = {item["variantId"]: item for item in items}
             self.assertEqual(
-                {"baseline", "black-black", "compact-large", "invalid-zero-bib"},
+                {
+                    "baseline",
+                    "black-black",
+                    "bib-width-plus-10",
+                    "roughness-control",
+                    "invalid-zero-bib",
+                },
                 set(by_id),
             )
             self.assertEqual(
@@ -59,11 +65,27 @@ class ProductionVariantTests(unittest.TestCase):
             )
             self.assertNotEqual(
                 by_id["baseline"]["variantContract"]["geometryInputFingerprint"],
-                by_id["compact-large"]["variantContract"]["geometryInputFingerprint"],
+                by_id["bib-width-plus-10"]["variantContract"]["geometryInputFingerprint"],
             )
             self.assertNotEqual(
                 by_id["baseline"]["variantContract"]["materialRecipeSha256"],
                 by_id["black-black"]["variantContract"]["materialRecipeSha256"],
+            )
+            self.assertEqual(
+                1.1,
+                by_id["bib-width-plus-10"]["variantContract"]["geometryVariables"][
+                    "bibWidthScale"
+                ],
+            )
+            self.assertEqual(
+                by_id["baseline"]["variantContract"]["geometryInputFingerprint"],
+                by_id["roughness-control"]["variantContract"][
+                    "geometryInputFingerprint"
+                ],
+            )
+            self.assertNotEqual(
+                by_id["baseline"]["variantContract"]["materialRecipeSha256"],
+                by_id["roughness-control"]["variantContract"]["materialRecipeSha256"],
             )
 
             roots = {read_json(item["jobPath"])["productRoot"] for item in items}
@@ -112,7 +134,7 @@ class ProductionVariantTests(unittest.TestCase):
                 base_request=request,
                 base_material_recipe=material,
                 production_recipe=recipe,
-                variant_id="compact-large",
+                variant_id="bib-width-plus-10",
                 workspace_id="unit-size",
             )
 

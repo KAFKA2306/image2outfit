@@ -146,6 +146,69 @@ def runtime_root(
     return ROOT / ".image2outfit" / "products" / product_id
 
 
+def stage_lineage(job: Mapping[str, Any], stage: str) -> dict[str, Any] | None:
+    pipeline = job.get("garmentPipeline", {})
+    contract_version = (
+        int(pipeline.get("stageContractVersion", 1))
+        if isinstance(pipeline, Mapping)
+        else 1
+    )
+    if contract_version < 2 or stage == STAGES[0]:
+        return None
+
+    previous_stage = STAGES[STAGES.index(stage) - 1]
+    product_id = str(job["id"])
+    previous_result = (
+        runtime_root(product_id, job) / "stages" / f"{previous_stage}.json"
+    )
+    if not previous_result.is_file():
+        raise FileNotFoundError(
+            f"{stage} requires previous stage result: {relative(previous_result)}"
+        )
+    payload = read_object(previous_result, f"{previous_stage} result")
+    if (
+        payload.get("schemaVersion") != 1
+        or payload.get("stage") != previous_stage
+        or payload.get("productId") != product_id
+        or payload.get("status") != "PASS"
+    ):
+        raise ValueError(
+            f"{stage} previous stage identity/status mismatch: {previous_stage}"
+        )
+
+    records = payload.get("evidence")
+    if not isinstance(records, list) or not records:
+        raise ValueError(f"{previous_stage} result has no evidence")
+    verified: list[dict[str, str]] = []
+    for index, record in enumerate(records):
+        if not isinstance(record, Mapping):
+            raise ValueError(f"{previous_stage} evidence {index} is invalid")
+        raw_path = record.get("path")
+        expected_hash = record.get("sha256")
+        if not isinstance(raw_path, str) or not isinstance(expected_hash, str):
+            raise ValueError(f"{previous_stage} evidence {index} is incomplete")
+        path = repo_path(raw_path, label=f"{previous_stage} evidence")
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"{stage} previous evidence is missing: {raw_path}"
+            )
+        actual_hash = sha256(path)
+        if actual_hash != expected_hash:
+            raise ValueError(
+                f"{stage} stale previous evidence: {raw_path}; "
+                f"expected {expected_hash}, found {actual_hash}"
+            )
+        verified.append({"path": raw_path, "sha256": actual_hash})
+
+    return {
+        "producerStage": previous_stage,
+        "producerResultPath": relative(previous_result),
+        "producerResultSha256": sha256(previous_result),
+        "producerEvidenceValidated": True,
+        "producerEvidence": verified,
+    }
+
+
 def review_image_paths(job: Mapping[str, Any]) -> list[Path]:
     views = [
         repo_path(value, label="preview") for value in job["previewPaths"].values()
@@ -763,6 +826,7 @@ def main() -> int:
         raise ValueError("job/request product identity mismatch")
 
     stage = args.stage
+    lineage = stage_lineage(job, stage)
     if stage == "ingest-reference":
         stage_ingest(job, request, result_path)
     elif stage == "normalize-view":
@@ -791,6 +855,10 @@ def main() -> int:
         stage_finalize(job, request, result_path)
     else:  # pragma: no cover
         raise AssertionError(stage)
+    if lineage is not None:
+        current = read_object(result_path, f"{stage} result")
+        current["inputLineage"] = lineage
+        write_json(result_path, current)
     return 0
 
 

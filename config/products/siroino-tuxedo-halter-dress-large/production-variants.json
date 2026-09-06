@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "baseProductId": "siroino-tuxedo-halter-dress-large",
-  "recipeVersion": "tuxedo-variants-v1",
+  "recipeVersion": "tuxedo-variants-v2",
   "variants": [
     {
       "id": "baseline",
@@ -47,19 +47,13 @@
       "proofRole": "COLOR"
     },
     {
-      "id": "compact-large",
+      "id": "bib-width-plus-10",
       "kind": "SIZE",
       "expectedResult": "PASS",
       "geometryRelation": "DIFFER_FROM_BASELINE",
-      "bodyShapeProfileOverrides": {
-        "All_L": 0.85,
-        "Chest_L": 0.85,
-        "Hips_01_L": 0.85,
-        "UpperLeg_L": 0.85,
-        "Breasts_L": 0.55
-      },
+      "bodyShapeProfileOverrides": {},
       "geometryVariablesOverrides": {
-        "bibWidthScale": 0.9
+        "bibWidthScale": 1.1
       },
       "materialOverrides": {},
       "requiredRevalidation": [
@@ -73,6 +67,29 @@
         "finalize-candidate"
       ],
       "proofRole": "SIZE"
+    },
+    {
+      "id": "roughness-control",
+      "kind": "COLOR",
+      "expectedResult": "PASS",
+      "geometryRelation": "MATCH_BASELINE",
+      "bodyShapeProfileOverrides": {},
+      "geometryVariablesOverrides": {},
+      "materialOverrides": {
+        "mapSets": {
+          "wine_satin": {
+            "roughnessValue": 156
+          }
+        }
+      },
+      "requiredRevalidation": [
+        "build-blender",
+        "skin-and-export",
+        "render-evidence",
+        "visual-review",
+        "finalize-candidate"
+      ],
+      "proofRole": "MATERIAL_CONTROL"
     },
     {
       "id": "invalid-zero-bib",

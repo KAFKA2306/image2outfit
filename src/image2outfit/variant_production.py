@@ -12,7 +12,7 @@ from typing import Any
 
 _ALLOWED_KINDS = {"BASE", "COLOR", "SIZE"}
 _ALLOWED_RESULTS = {"PASS", "FAIL"}
-_ALLOWED_PROOF_ROLES = {"BASELINE", "COLOR", "SIZE", "NEGATIVE"}
+_ALLOWED_PROOF_ROLES = {"BASELINE", "COLOR", "SIZE", "MATERIAL_CONTROL", "NEGATIVE"}
 _ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 
 
@@ -70,6 +70,28 @@ def _variant_map(recipe: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
             raise ValueError(f"variant {variant_id!r} expectedResult is invalid")
         if item.get("proofRole") not in _ALLOWED_PROOF_ROLES:
             raise ValueError(f"variant {variant_id!r} proofRole is invalid")
+        if item.get("proofRole") == "MATERIAL_CONTROL":
+            if item.get("kind") != "COLOR" or item.get("expectedResult") != "PASS":
+                raise ValueError("material control must be a passing COLOR variant")
+            overrides = item.get("materialOverrides")
+            if not isinstance(overrides, Mapping):
+                raise ValueError("material control overrides must be an object")
+            expected = {
+                "mapSets": {
+                    "wine_satin": {
+                        "roughnessValue": overrides.get("mapSets", {})
+                        .get("wine_satin", {})
+                        .get("roughnessValue")
+                    }
+                }
+            }
+            if dict(overrides) != expected:
+                raise ValueError(
+                    "material control must change only wine_satin.roughnessValue"
+                )
+            roughness = expected["mapSets"]["wine_satin"]["roughnessValue"]
+            if not isinstance(roughness, int) or not 0 <= roughness <= 255:
+                raise ValueError("material control roughnessValue is invalid")
         result[variant_id] = item
     return result
 
@@ -247,6 +269,7 @@ def materialize_variant(
         "bodyShapeProfile": job["bodyShapeProfile"],
         "geometryVariables": job["geometryVariables"],
         "materialRecipeSha256": stable_sha256(material_recipe),
+        "materialOverrides": copy.deepcopy(variant.get("materialOverrides", {})),
     }
     variant_contract["geometryInputFingerprint"] = stable_sha256(
         {

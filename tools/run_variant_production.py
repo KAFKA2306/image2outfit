@@ -183,6 +183,10 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
                 "maximumInfluences": weight_normalization.get("maximumInfluences"),
                 "fallbackVertices": weight_normalization.get("fallbackVertices"),
             },
+            "bibPattern": report.get("patternDrivenGeometry", {})
+            .get("pieces", {})
+            .get("bib-front", {}),
+            "materialOverrides": contract.get("materialOverrides", {}),
         }
     )
     if report.get("passed") is not True:
@@ -204,13 +208,14 @@ def by_role(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
 def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
     roles = by_role(results)
-    required = {"BASELINE", "COLOR", "SIZE", "NEGATIVE"}
+    required = {"BASELINE", "COLOR", "SIZE", "MATERIAL_CONTROL", "NEGATIVE"}
     if set(roles) != required:
         raise ValueError("variant batch does not contain the canonical proof roles")
 
     baseline = roles["BASELINE"]
     color = roles["COLOR"]
     size = roles["SIZE"]
+    material_control = roles["MATERIAL_CONTROL"]
     negative = roles["NEGATIVE"]
     if baseline["status"] != "PASS" or color["status"] != "PASS":
         raise ValueError("baseline/color production candidate did not PASS")
@@ -238,15 +243,21 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         raise ValueError("size variant did not change geometry")
     if size.get("poseEvidenceCount", 0) < 6:
         raise ValueError("size variant did not regenerate all required pose evidence")
-    size_profile = size.get("shapeProfileEvidence")
-    if not isinstance(size_profile, dict):
-        raise ValueError("size variant shape profile evidence is missing")
-    applied_shape_keys = size_profile.get("appliedShapeKeys")
-    if (
-        not isinstance(applied_shape_keys, dict)
-        or applied_shape_keys.get("All_L") != 0.85
-    ):
-        raise ValueError("size variant did not apply the requested shape profile")
+    baseline_bib = baseline.get("bibPattern", {})
+    size_bib = size.get("bibPattern", {})
+    baseline_bounds = baseline_bib.get("bounds", {})
+    size_bounds = size_bib.get("bounds", {})
+    baseline_width = float(baseline_bounds.get("width", 0.0))
+    size_width = float(size_bounds.get("width", 0.0))
+    size_scale = float(size_bib.get("transform", {}).get("widthScale", 0.0))
+    if baseline_width <= 0 or size_width <= 0:
+        raise ValueError("pattern-driven bib width evidence is missing")
+    width_ratio = size_width / baseline_width
+    if abs(width_ratio - 1.1) > 1e-6 or abs(size_scale - 1.1) > 1e-9:
+        raise ValueError(
+            f"size pattern propagation mismatch: ratio={width_ratio}, "
+            f"scale={size_scale}"
+        )
     size_weights = size.get("weightNormalizationEvidence")
     if (
         not isinstance(size_weights, dict)
@@ -255,6 +266,16 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         raise ValueError("size variant did not rerun weight normalization")
     if int(size_weights.get("maximumInfluences", 99)) > 4:
         raise ValueError("size variant weight normalization is invalid")
+    if material_control["status"] != "PASS":
+        raise ValueError("roughness material control did not PASS")
+    if baseline["geometryFingerprint"] != material_control["geometryFingerprint"]:
+        raise ValueError("roughness-only control changed geometry")
+    if baseline["materialRecipeSha256"] == material_control["materialRecipeSha256"]:
+        raise ValueError("roughness-only control did not change material recipe")
+    if material_control.get("materialOverrides") != {
+        "mapSets": {"wine_satin": {"roughnessValue": 156}}
+    }:
+        raise ValueError("roughness-only control changed an unexpected material field")
     if negative["status"] != "EXPECTED_FAIL":
         raise ValueError("negative-control variant did not fail as expected")
 
@@ -268,13 +289,19 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         "colorRenderChanged": True,
         "colorChangedRenderKeys": changed_render_keys,
         "sizeGeometryChanged": True,
-        "sizeFitRevalidated": True,
+        "sizePatternRevalidated": True,
+        "sizeBibWidthRatio": width_ratio,
+        "sizeBibWidthScale": size_scale,
         "sizeWeightsRevalidated": True,
         "sizePoseEvidenceRevalidated": True,
+        "roughnessControlGeometryMatchesBaseline": True,
+        "roughnessControlMaterialChanged": True,
         "negativeControlFailed": True,
         "baselinePreservedAfterFailure": True,
-        "successfulCandidates": 3,
-        "totalAttempts": 4,
+        "canonicalSuccessfulCandidates": 3,
+        "auxiliarySuccessfulControls": 1,
+        "successfulCandidates": 4,
+        "totalAttempts": 5,
         "retryCount": 0,
         "elapsedSeconds": round(
             sum(float(result["elapsedSeconds"]) for result in results),
@@ -355,11 +382,17 @@ def main() -> int:
                 raise ValueError(f"replay geometry fingerprint mismatch: {role}")
             if first[role]["geometryPassed"] != replay[role]["geometryPassed"]:
                 raise ValueError(f"replay geometry gate mismatch: {role}")
+        if abs(
+            float(first["SIZE"]["bibPattern"]["bounds"]["width"])
+            - float(replay["SIZE"]["bibPattern"]["bounds"]["width"])
+        ) > 1e-9:
+            raise ValueError("replay pattern-driven bib width mismatch")
         replay_proof = {
             "workspace": args.replay_workspace,
             "roles": ["COLOR", "SIZE"],
             "sameGeometryFingerprints": True,
             "sameGeometryGateResults": True,
+            "samePatternDrivenSizeResult": True,
             "successfulCandidates": 2,
             "totalAttempts": 2,
             "retryCount": 0,
