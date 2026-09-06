@@ -149,22 +149,30 @@ def materialize_variant(
     required_revalidation = _validate_required_revalidation(variant)
 
     candidate_id = f"{base_product_id}--{variant_id}"
-    runtime_root = root / ".image2outfit" / "variants" / workspace_id / candidate_id
-    product_root = f"Assets/GenWorks/{candidate_id}--{workspace_id}"
+    runtime_root = (
+        root
+        / ".image2outfit"
+        / "products"
+        / base_product_id
+        / "variants"
+        / workspace_id
+        / candidate_id
+    )
+    product_root = (runtime_root / "product").relative_to(root).as_posix()
+    human_evidence_root = (runtime_root / "human-evidence").relative_to(root).as_posix()
     base_product_root = str(base_job["productRoot"])
 
     job = copy.deepcopy(dict(base_job))
     replacements = {
         base_product_root: product_root,
-        f"Assets/_Local/Evidence/{base_product_id}": (
-            f"Assets/_Local/Evidence/{candidate_id}--{workspace_id}"
-        ),
+        f"Assets/_Local/Evidence/{base_product_id}": human_evidence_root,
     }
     job = _rewrite_value(job, replacements)
     job["candidateId"] = candidate_id
     job["variantId"] = variant_id
     job["variantRecipeVersion"] = recipe_version
     job["workspaceId"] = workspace_id
+    job["variantRuntimeRoot"] = runtime_root.relative_to(root).as_posix()
     job["productRoot"] = product_root
     job["bodyShapeProfile"] = deep_merge(
         base_job.get("bodyShapeProfile", {}),
@@ -198,7 +206,7 @@ def materialize_variant(
     request = copy.deepcopy(dict(base_request))
     base_job_rel = f"config/products/{base_product_id}/job.json"
     base_request_rel = f"config/pipeline/requests/{base_product_id}.json"
-    candidate_runtime_prefix = f".image2outfit/products/{candidate_id}--{workspace_id}/"
+    candidate_runtime_prefix = runtime_root.relative_to(root).as_posix() + "/stages/"
     bindings = request.get("stageBindings")
     if not isinstance(bindings, dict):
         raise ValueError("base request stageBindings must be an object")
@@ -220,7 +228,7 @@ def materialize_variant(
         result_path = binding.get("resultPath")
         if isinstance(result_path, str):
             binding["resultPath"] = result_path.replace(
-                ".image2outfit/products/{productId}/",
+                ".image2outfit/products/{productId}/stages/",
                 candidate_runtime_prefix,
             )
 
