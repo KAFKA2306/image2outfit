@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "recipeVersion": "v1",
+  "provenance": "rendering hypothesis from audited visual regions; not a measured textile property set",
+  "presets": {
+    "wine": {
+      "materialName": "MAT_Wine_Satin",
+      "class": "cloth",
+      "baseColorSource": "generated-wine-satin-albedo",
+      "roughnessSource": "generated-wine-satin-roughness",
+      "metallic": 0,
+      "alpha": 1
+    },
+    "black": {
+      "materialName": "MAT_Black_Satin",
+      "class": "cloth",
+      "baseColorSource": "generated-black-satin-albedo",
+      "roughnessSource": "generated-black-satin-roughness",
+      "metallic": 0,
+      "alpha": 1
+    },
+    "sheer": {
+      "materialName": "MAT_Black_Sheer",
+      "class": "sheer-cloth",
+      "baseColorSource": "generated-black-satin-albedo",
+      "roughnessSource": "generated-black-satin-roughness",
+      "metallic": 0,
+      "alpha": 0.52
+    },
+    "white": {
+      "materialName": "MAT_White_Jacquard",
+      "class": "cloth",
+      "baseColorSource": "generated-white-jacquard-albedo",
+      "roughnessSource": "generated-white-jacquard-roughness",
+      "metallic": 0,
+      "alpha": 1
+    },
+    "silver": {
+      "materialName": "MAT_Silver_Hardware",
+      "class": "metal",
+      "baseColor": [
+        0.64,
+        0.69,
+        0.76,
+        1
+      ],
+      "roughness": 0.18,
+      "metallic": 0.92,
+      "alpha": 1
+    }
+  },
+  "regions": {
+    "white-bib-front": "white",
+    "white-bib-ruffle-center": "white",
+    "waistcoat-front-left": "wine",
+    "waistcoat-front-right": "wine",
+    "waistcoat-back": "wine",
+    "waistcoat-tail-left": "wine",
+    "waistcoat-tail-right": "wine",
+    "upper-skirt": "black",
+    "lower-skirt": "sheer",
+    "black-neck-band": "black",
+    "black-bow-tie": "black",
+    "button-placket": "black",
+    "waist-chain": "silver",
+    "lace-hem": "black"
+  }
+}

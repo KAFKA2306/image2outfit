@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "sourceSha256": "66cd898014d3f503da8015207a0240d946aac72b596f28bef8d6574a0afb678b",
+  "sourceSizePx": [
+    854,
+    854
+  ],
+  "sourceView": "front",
+  "measurementMethod": "direct-source-landmark-annotation",
+  "verification": {
+    "verifiedFromDirectSource": true,
+    "verifiedAt": "2026-09-06",
+    "roundTripMaxErrorPx": 0
+  },
+  "observations": [
+    {
+      "variantId": "wine-red-black",
+      "view": "front",
+      "status": "OBSERVED",
+      "sourceBoundingBoxPx": [
+        134,
+        217,
+        429,
+        703
+      ],
+      "landmarksPx": {
+        "neck-center": [
+          280,
+          258
+        ],
+        "waist-center": [
+          279,
+          449
+        ],
+        "hem-center": [
+          279,
+          666
+        ],
+        "left-waist-anchor": [
+          254,
+          434
+        ],
+        "right-waist-anchor": [
+          298,
+          434
+        ]
+      },
+      "unknownFields": [
+        "back-view",
+        "side-depth",
+        "fabric-physical-parameters"
+      ]
+    },
+    {
+      "variantId": "black-black",
+      "view": "front",
+      "status": "OBSERVED",
+      "sourceBoundingBoxPx": [
+        433,
+        217,
+        722,
+        688
+      ],
+      "landmarksPx": {
+        "neck-center": [
+          572,
+          258
+        ],
+        "waist-center": [
+          572,
+          449
+        ],
+        "hem-center": [
+          572,
+          648
+        ],
+        "left-waist-anchor": [
+          548,
+          435
+        ],
+        "right-waist-anchor": [
+          595,
+          435
+        ]
+      },
+      "unknownFields": [
+        "back-view",
+        "side-depth",
+        "fabric-physical-parameters"
+      ]
+    }
+  ],
+  "derivedDesignHypotheses": [
+    {
+      "field": "rear-closure",
+      "evidenceClass": "INFERRED",
+      "value": "center-back concealed closure or seam",
+      "reason": "rear view is not observed"
+    },
+    {
+      "field": "textile-fiber",
+      "evidenceClass": "UNKNOWN",
+      "value": null,
+      "reason": "fiber composition cannot be measured from this image"
+    }
+  ]
+}

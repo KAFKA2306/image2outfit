@@ -3,7 +3,7 @@
   "productId": "siroino-tuxedo-halter-dress-large",
   "profile": "panel-sewn",
   "target": "Siroino _Large via official shape keys",
-  "designRevision": "v1-reference-audited-pattern-first",
+  "designRevision": "v2-standard-flow-data-bound",
   "panels": [
     "white-bib-front",
     "waistcoat-front-left",
@@ -22,12 +22,35 @@
     "lace-hem",
     "white-bib-ruffle-center"
   ],
-  "priorityFitZones": ["neck", "chest", "waist", "pelvis", "upper-leg"],
+  "priorityFitZones": [
+    "neck",
+    "chest",
+    "waist",
+    "pelvis",
+    "upper-leg"
+  ],
   "researchTrial": {
     "name": "pattern-first explicit panel and stitch graph",
     "status": "DECLARED",
     "patternPath": "config/products/siroino-tuxedo-halter-dress-large/pattern-draft.json",
     "stitchPath": "config/products/siroino-tuxedo-halter-dress-large/stitch-graph.json"
   },
-  "releaseBoundary": "Blender render evidence; Unity/Modular Avatar/NDMF/VRChat runtime are out of scope."
+  "releaseBoundary": "Blender render evidence; Unity/Modular Avatar/NDMF/VRChat runtime are out of scope.",
+  "simulation": {
+    "method": "evaluated-and-applied-cloth",
+    "required": true,
+    "reusableCacheRequired": false,
+    "verification": "start-mid-end evaluated mesh digests bound to pattern/stitch hashes",
+    "requiredFrames": [
+      "start",
+      "middle",
+      "end"
+    ]
+  },
+  "geometryPreview": {
+    "requiredBeforeFinish": true,
+    "materialOverride": "neutral-gray",
+    "resolutionPx": 384,
+    "view": "front"
+  }
 }
