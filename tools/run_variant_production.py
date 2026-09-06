@@ -107,9 +107,7 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
         "logPath": log_path.relative_to(ROOT).as_posix(),
         "productRoot": job["productRoot"],
         "reportPath": (
-            report_path.relative_to(ROOT).as_posix()
-            if report_path.is_file()
-            else None
+            report_path.relative_to(ROOT).as_posix() if report_path.is_file() else None
         ),
     }
 
@@ -319,7 +317,10 @@ def main() -> int:
         first = by_role(primary_results)
         replay = by_role(replay_results)
         for role in ("COLOR", "SIZE"):
-            if first[role]["geometryFingerprint"] != replay[role]["geometryFingerprint"]:
+            if (
+                first[role]["geometryFingerprint"]
+                != replay[role]["geometryFingerprint"]
+            ):
                 raise ValueError(f"replay geometry fingerprint mismatch: {role}")
             if first[role]["geometryPassed"] != replay[role]["geometryPassed"]:
                 raise ValueError(f"replay geometry gate mismatch: {role}")
@@ -349,14 +350,15 @@ def main() -> int:
         "replay": replay_results,
         "replayProof": replay_proof,
         "productionSuccessCount": sum(
-            result["status"] == "PASS"
-            for result in [*primary_results, *replay_results]
+            result["status"] == "PASS" for result in [*primary_results, *replay_results]
         ),
         "productionAttemptCount": len(primary_results) + len(replay_results),
     }
     output = args.output
     if output is None:
-        output = Path(".image2outfit") / "variant-production" / product_id / "report.json"
+        output = (
+            Path(".image2outfit") / "variant-production" / product_id / "report.json"
+        )
     output = output if output.is_absolute() else ROOT / output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
