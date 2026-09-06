@@ -150,4 +150,12 @@ for old, new in replacements.items():
         raise RuntimeError(f"expected product-source contract missing: {old}")
     source = source.replace(old, new)
 
+legacy_artifact_lookup = 'job["artifactDir"]'
+if legacy_artifact_lookup not in source:
+    raise RuntimeError("expected legacy artifactDir lookup missing from product source")
+source = source.replace(
+    legacy_artifact_lookup,
+    'job.get("artifactDir", f"{job[\'productRoot\']}/Evidence/Build")',
+)
+
 exec(compile(source, __file__, "exec"), globals(), globals())
