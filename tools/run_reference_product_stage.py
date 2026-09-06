@@ -496,6 +496,7 @@ def _run_blender_build(
     job: Mapping[str, Any],
     variant_id: str | None = None,
     output_root: Path | None = None,
+    reuse_base_blend: Path | None = None,
 ) -> dict[str, Any]:
     product_id = str(job["id"])
     script = repo_path(job["buildScript"], label="build script")
@@ -528,6 +529,8 @@ def _run_blender_build(
         command.extend(["--variant", variant_id])
     if output_root is not None:
         command.extend(["--output-root", relative(output_root)])
+    if reuse_base_blend is not None:
+        command.extend(["--reuse-base-blend", relative(reuse_base_blend)])
     started = time.perf_counter()
     completed = subprocess.run(
         command,
@@ -606,6 +609,9 @@ def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
                 job=job,
                 variant_id=variant_id,
                 output_root=variant_root,
+                reuse_base_blend=(
+                    base_run["blendPath"] if variant["kind"] == "color" else None
+                ),
             )
             variant_quality = variant_run["quality"]
             if not variant_quality["passed"]:
@@ -708,11 +714,12 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         expected_path=report,
     )
     payload = read_object(report, "cloth simulation report")
-    construction_path = repo_path(
-        job["garmentPipeline"]["constructionPath"], label="construction"
+    verification_path = repo_path(
+        job["garmentPipeline"]["verificationContractPath"],
+        label="verification contract",
     )
-    construction = read_object(construction_path, "construction")
-    simulation = construction.get("simulation", {})
+    verification = read_object(verification_path, "verification contract")
+    simulation = verification.get("simulation", {})
     method = simulation.get("method")
     if payload.get("status") != "PASS" or payload.get("method") != method:
         raise ValueError("cloth simulation method/status does not match construction")
@@ -775,7 +782,7 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         result,
         stage="simulate-cloth",
         product_id=product_id,
-        paths=[report, construction_path, blend],
+        paths=[report, verification_path, blend],
         extra={
             "simulationMethod": method,
             "cacheValidatedBeforeApply": True,

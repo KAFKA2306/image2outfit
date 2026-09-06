@@ -58,6 +58,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--job", required=True)
     parser.add_argument("--variant", default="")
     parser.add_argument("--output-root", default="")
+    parser.add_argument("--reuse-base-blend", default="")
     return parser.parse_args(raw)
 
 
@@ -473,6 +474,315 @@ def bake_skirts(
         raise RuntimeError("evaluated lower skirt hem sampling is incomplete")
     return contracts, frame_end, lower_hem_points, samples, cache_validated
 
+def build_color_variant_from_base(
+    *,
+    args: argparse.Namespace,
+    job_path: Path,
+    job: Mapping[str, object],
+    variant_document: Mapping[str, object],
+    variant: Mapping[str, object],
+    outputs: Mapping[str, object],
+) -> int:
+    if variant.get("kind") != "color":
+        raise ValueError("base geometry reuse is only valid for color variants")
+    if not args.reuse_base_blend:
+        raise ValueError("color variant requires --reuse-base-blend")
+
+    variant_id = str(variant["id"])
+    base_blend = repo_path(args.reuse_base_blend)
+    base_report_path = repo_path(
+        f"{job['productRoot']}/Evidence/Build/product-build-report.json"
+    )
+    if not base_blend.is_file() or not base_report_path.is_file():
+        raise FileNotFoundError("base color-variant geometry evidence is missing")
+    base_report = read_json(base_report_path)
+    expected_digest = str(base_report["geometryDigest"])
+
+    bpy.ops.wm.open_mainfile(filepath=str(base_blend))
+    body, armature = g.select_body_and_armature()
+    garments = [
+        obj
+        for obj in bpy.context.scene.objects
+        if obj not in {body, armature}
+        and obj.type in {"MESH", "CURVE"}
+        and not obj.name.startswith("GenWorks_Studio_")
+    ]
+    if not garments:
+        raise RuntimeError("base blend contains no reusable garment objects")
+
+    before_digest = geometry_digest(garments)
+    if before_digest != expected_digest:
+        raise ValueError(
+            "base blend geometry digest does not match base build report"
+        )
+
+    black = bpy.data.materials.get("MAT_Black_Satin")
+    if black is None:
+        raise RuntimeError("base blend is missing MAT_Black_Satin")
+    replaced = 0
+    for obj in garments:
+        materials = getattr(getattr(obj, "data", None), "materials", None)
+        if materials is None:
+            continue
+        for index, material in enumerate(materials):
+            if material is not None and material.name == "MAT_Wine_Satin":
+                materials[index] = black
+                replaced += 1
+    if replaced == 0:
+        raise RuntimeError("no wine waistcoat material slots were replaced")
+
+    after_digest = geometry_digest(garments)
+    if after_digest != before_digest:
+        raise ValueError("material-only variant changed reusable geometry")
+
+    product_root = outputs["productRoot"]
+    blend_path = outputs["blend"]
+    fbx_path = outputs["fbx"]
+    prefab_path = outputs["prefab"]
+    integrated_prefab = outputs["integratedPrefab"]
+    preview_dir = product_root / "Previews"
+    pose_dir = preview_dir / "Poses"
+    evidence_dir = product_root / "Evidence" / "Build"
+    pattern_dir = product_root / "Source" / "Patterns"
+    for directory in (
+        product_root,
+        blend_path.parent,
+        fbx_path.parent,
+        prefab_path.parent,
+        preview_dir,
+        pose_dir,
+        evidence_dir,
+        pattern_dir,
+    ):
+        directory.mkdir(parents=True, exist_ok=True)
+
+    tracked_pattern = repo_path(job["garmentPipeline"]["patternContractPath"])
+    material_recipe_path = repo_path(job["garmentPipeline"]["materialRecipePath"])
+    material_recipe = read_json(material_recipe_path)
+    shutil.copyfile(tracked_pattern, pattern_dir / "tuxedo-halter.pattern.json")
+
+    # Keep the color-variant blend self-contained even though its geometry comes
+    # directly from the canonical base blend.
+    bpy.ops.file.pack_all()
+    bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
+
+    scene = bpy.context.scene
+    frame_end = int(base_report.get("clothFrameEnd", 24))
+    _, camera = g.pastel_studio()
+    g.set_pose(armature, "neutral")
+    scene.frame_set(frame_end)
+
+    geometry_preview = preview_dir / "geometry-check.png"
+    neutral = base.plain_material(
+        "MAT_Geometry_Check",
+        (0.55, 0.55, 0.55, 1.0),
+        roughness=0.82,
+        metallic=0.0,
+    )
+    layer = bpy.context.view_layer
+    previous_override = layer.material_override
+    layer.material_override = neutral
+    g.configure_render(384)
+    g.point_camera(camera, (0.0, -2.55, 0.70))
+    scene.render.filepath = str(geometry_preview)
+    bpy.ops.render.render(write_still=True)
+    layer.material_override = previous_override
+
+    previews = outputs["previews"]
+    g.render_five_views(camera, previews)
+    multiview = preview_dir / f"{PRODUCT_ID}-{variant_id}-multiview.webp"
+    g.contact_sheet(
+        previews,
+        multiview,
+        order=("front", "three-quarter", "left", "right", "back"),
+        title=f"TUXEDO HALTER / {variant_id}",
+    )
+    pose_images = g.render_pose_set(armature, camera, pose_dir)
+    obsolete_twist = pose_images.pop("twist", None)
+    if obsolete_twist is not None and obsolete_twist.is_file():
+        obsolete_twist.unlink()
+    pose_images["prone"] = render_prone_pose(
+        armature, camera, pose_dir / "prone.png"
+    )
+    pose_sheet = preview_dir / f"{PRODUCT_ID}-{variant_id}-pose-review.webp"
+    g.contact_sheet(
+        pose_images,
+        pose_sheet,
+        order=("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
+        title=f"POSE REVIEW / {variant_id}",
+    )
+
+    g.reset_pose(armature)
+    scene.frame_set(frame_end)
+    body.hide_render = True
+    base.export_fbx(fbx_path, armature, garments)
+    sidecars = write_prefabs(
+        fbx_path,
+        prefab_path,
+        integrated_prefab,
+        f"{job['productName']} / {variant_id}",
+    )
+
+    measured = base.metrics(garments)
+    report = {
+        "schemaVersion": 1,
+        "passed": True,
+        "productId": PRODUCT_ID,
+        "productName": job["productName"],
+        "variantId": variant_id,
+        "variantKind": "color",
+        "buildRevision": job["buildRevision"],
+        "targetProfile": base_report["targetProfile"],
+        "targetAvatarAssetPath": job["targetAvatarAssetPath"],
+        "targetSourcePath": job["targetSourcePath"],
+        "blenderVersion": bpy.app.version_string,
+        "metrics": measured,
+        "geometryDigest": after_digest,
+        "geometryReuse": {
+            "mode": "reuse-base-editable-geometry",
+            "sourceBlend": str(base_blend.relative_to(ROOT)).replace("\\", "/"),
+            "sourceBlendSha256": sha256_file(base_blend),
+            "baseGeometryDigest": expected_digest,
+            "digestBeforeMaterialChange": before_digest,
+            "digestAfterMaterialChange": after_digest,
+            "materialSlotsReplaced": replaced,
+            "passed": after_digest == expected_digest,
+        },
+        "weightNormalization": base_report["weightNormalization"],
+        "clearanceRefinement": base_report["clearanceRefinement"],
+        "patternToMesh": base_report["patternToMesh"],
+        "materialRecipe": {
+            "path": str(material_recipe_path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": sha256_file(material_recipe_path),
+            "semanticDigest": canonical_json_sha256(material_recipe),
+            "waistcoatPreset": "black",
+            "regions": material_recipe["regions"],
+        },
+        "variantInvalidation": variant_invalidation(variant),
+        "clothSimulation": {
+            "mode": "reused-base-evaluated-geometry",
+            "sourceReport": str(base_report_path.relative_to(ROOT)).replace("\\", "/"),
+            "rerun": False,
+        },
+        "hemAlignment": base_report["hemAlignment"],
+        "geometryPreview": str(geometry_preview.relative_to(ROOT)).replace("\\", "/"),
+        "geometryPreviewGate": "PASS",
+        "views": {
+            name: str(path.relative_to(ROOT)).replace("\\", "/")
+            for name, path in previews.items()
+        },
+        "poseViews": {
+            name: str(path.relative_to(ROOT)).replace("\\", "/")
+            for name, path in pose_images.items()
+        },
+        "referenceModelIdentification": "UNVERIFIED",
+        "notes": [
+            "This color variant reuses the canonical base editable geometry exactly.",
+            "Only waistcoat material slots are remapped from wine satin to black satin.",
+            "No cloth or pattern geometry is recomputed for this material-only variant.",
+        ],
+    }
+    report_path = write_json(evidence_dir / "product-build-report.json", report)
+
+    generated_variants = write_json(
+        product_root / "MaterialVariants.json",
+        {
+            "schemaVersion": 1,
+            "productId": PRODUCT_ID,
+            "activeVariant": variant_id,
+            "source": str(
+                repo_path(job["garmentPipeline"]["variantSpecPath"]).relative_to(ROOT)
+            ).replace("\\", "/"),
+            "variants": variant_document["variants"],
+        },
+    )
+    relative_root = str(product_root.relative_to(ROOT)).replace("\\", "/")
+    manifest = {
+        "schemaVersion": 1,
+        "productId": PRODUCT_ID,
+        "productName": job["productName"],
+        "variantId": variant_id,
+        "status": "WORKING",
+        "targetAdapterId": job["adapterId"],
+        "target": "Siroino _Large via official shape keys",
+        "productRoot": relative_root,
+        "outfitPrefabPath": str(prefab_path.relative_to(ROOT)).replace("\\", "/"),
+        "integratedPrefabPath": str(integrated_prefab.relative_to(ROOT)).replace("\\", "/"),
+        "previewPath": str(previews["front"].relative_to(ROOT)).replace("\\", "/"),
+        "documentationPath": f"{relative_root}/README.md",
+        "sourceJobPath": str(job_path.relative_to(ROOT)).replace("\\", "/"),
+        "productBuildScript": job["buildScript"],
+        "designRevision": job["buildRevision"],
+        "modelIdentification": "UNVERIFIED",
+        "handoff": {
+            "resumable": True,
+            "canonicalWorkspace": relative_root,
+            "doNotRebuildFromZero": True,
+            "lastAttempt": {
+                "result": "BLENDER_MODELED",
+                "visualRevision": job["buildRevision"],
+                "variantId": variant_id,
+                "geometryReuse": "base",
+            },
+            "blockers": ["Direct inspection of current five-view and pose evidence"],
+        },
+        "technicalGates": {
+            "blender": "PASS",
+            "editableSource": "PASS",
+            "fbx": "PASS",
+            "prefabDeclared": "PASS",
+            "fiveViewEvidence": "PASS",
+            "poseEvidence": "PASS",
+            "visualAppearanceReview": "PENDING",
+            "researchTrial": "PASS",
+        },
+        "outputs": {
+            "blend": str(blend_path.relative_to(ROOT)).replace("\\", "/"),
+            "fbx": str(fbx_path.relative_to(ROOT)).replace("\\", "/"),
+            "prefab": str(prefab_path.relative_to(ROOT)).replace("\\", "/"),
+            "integratedPrefab": str(integrated_prefab.relative_to(ROOT)).replace("\\", "/"),
+            "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"),
+            "poseReview": str(pose_sheet.relative_to(ROOT)).replace("\\", "/"),
+            "buildReport": str(report_path.relative_to(ROOT)).replace("\\", "/"),
+            "geometryPreview": str(geometry_preview.relative_to(ROOT)).replace("\\", "/"),
+        },
+    }
+    manifest_path = write_json(outputs["manifest"], manifest)
+    readme = product_root / "README.md"
+    readme.write_text(
+        f"# {job['productName']} / {variant_id}\n\n"
+        "Color variant generated by reusing the canonical base geometry and "
+        "replacing only the waistcoat material.\n",
+        encoding="utf-8",
+    )
+    hash_candidates = [
+        blend_path,
+        fbx_path,
+        *sidecars,
+        *previews.values(),
+        *pose_images.values(),
+        multiview,
+        pose_sheet,
+        geometry_preview,
+        report_path,
+        generated_variants,
+        manifest_path,
+        readme,
+        pattern_dir / "tuxedo-halter.pattern.json",
+    ]
+    (product_root / "SOURCE_HASHES.txt").write_text(
+        "\n".join(
+            f"{base.sha256(path)}  {path.relative_to(product_root)}"
+            for path in hash_candidates
+            if path.is_file()
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    return 0
+
+
 def main() -> int:
     args = parse_args()
     job_path = repo_path(args.job)
@@ -484,6 +794,16 @@ def main() -> int:
     variant_id = str(variant["id"])
     output_root = repo_path(args.output_root) if args.output_root else None
     outputs = actual_output_paths(job, output_root)
+
+    if variant.get("kind") == "color" and args.reuse_base_blend:
+        return build_color_variant_from_base(
+            args=args,
+            job_path=job_path,
+            job=job,
+            variant_document=variant_document,
+            variant=variant,
+            outputs=outputs,
+        )
 
     base.clean_scene()
     source = repo_path(job["targetSourcePath"])

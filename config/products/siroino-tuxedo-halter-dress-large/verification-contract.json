@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "simulation": {
+    "method": "evaluated-and-applied-cloth",
+    "required": true,
+    "reusableCacheRequired": false,
+    "verification": "start-mid-end evaluated mesh digests bound to pattern/stitch hashes",
+    "requiredFrames": [
+      "start",
+      "middle",
+      "end"
+    ]
+  },
+  "geometryPreview": {
+    "requiredBeforeFinish": true,
+    "materialOverride": "neutral-gray",
+    "resolutionPx": 384,
+    "view": "front"
+  },
+  "variantProof": {
+    "requiredCandidates": [
+      "wine-red-black",
+      "black-black",
+      "waist-plus-10"
+    ],
+    "colorGeometryPolicy": "reuse-base-editable-geometry",
+    "sizeGeometryPolicy": "rebuild-from-pattern-override",
+    "requiredColorGeometryDigestRelation": "equal",
+    "requiredSizeGeometryDigestRelation": "different"
+  }
+}
