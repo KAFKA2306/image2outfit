@@ -18,12 +18,14 @@ Continue an existing workline/checkpoint when it already owns the same outcome. 
 
 Use existing owners; do not duplicate their rules in prose or new files.
 
+- PR merge boundary: `config/pr-merge-policy.json`
 - completion boundary: `config/genworks-handoff-policy.json`
-- required views/poses/evidence: `config/release-policy.json`
+- required views/poses/evidence and customer release: `config/release-policy.json`
 - product identity/input/output: `config/products/<slug>/job.json`
 - construction: `config/products/<slug>/construction.json`
 - current state/gates/defects/hashes: `Assets/GenWorks/<slug>/ProductManifest.json`
 - quality: `contracts/quality/quality-spec.json`
+- merge-policy verification: `tools/pr_merge_gate.py`
 - shared validation: `tools/production_contract.py`
 - runtime directory transaction and canonical workspace last-good protection: `tools/runtime_transaction.py`
 - commands: `Taskfile.yml` / `tools/manage.py`
@@ -64,18 +66,12 @@ Do not add a second command path when an existing Taskfile/manage entry point ca
 
 ## Evidence and completion
 
-Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence.
+Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence. Visual decisions require direct inspection of the current evidence owned by `contracts/quality/quality-spec.json` and `config/release-policy.json`.
 
-`visualAppearanceReview` may pass only after directly opening the current required images/poses and checking visible defects such as clipping, detached geometry, scale/silhouette failure, extreme/asymmetric geometry, UV/normal/material failure, and pose breakage.
-
-The only machine-readable definition of product `COMPLETE` is `config/genworks-handoff-policy.json.requiredCompletionGates`; do not copy the gate list here.
-
-Unity import/save/reload, Modular Avatar/NDMF, VRChat Build & Test/runtime, and human runtime review are `OUT_OF_SCOPE` unless the current policy/task explicitly changes that boundary. Do not claim them PASS without direct evidence, but do not make unavailable out-of-scope runtime a merge blocker.
+Product completion and runtime scope are defined only by `config/genworks-handoff-policy.json`. Do not copy gate lists or scope rules into agent prose, and do not claim PASS without the evidence required by the owning policy.
 
 ## PR and continuation
 
-Use one coherent PR workline. Verify the exact head for the changed surface. Incremental implementation PRs do not need full product completion gates unless they themselves claim release/completion.
-
-Merge blockers are limited to actual conflict, required CI failure caused by the diff, contract inconsistency, or a required verification that is currently executable but not run. Merge/read-back and product release are separate states.
+Use one coherent PR workline and verify the exact head for the changed surface. Merge eligibility is owned by `config/pr-merge-policy.json` and `tools/pr_merge_gate.py`; product completion and customer release remain separate policy decisions.
 
 If work stops, persist the current manifest/checkpoint, verified revision, failing stage/visible defect, blocker, and one exact next action in the existing canonical workline. Do not create a second agent-state database.
