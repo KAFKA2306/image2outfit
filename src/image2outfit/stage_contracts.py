@@ -38,7 +38,9 @@ def resolve_private_reference(
         raise ValueError("reference audit originalFileName is required")
 
     pipeline = job.get("garmentPipeline")
-    explicit = pipeline.get("privateReferencePath") if isinstance(pipeline, Mapping) else None
+    explicit = (
+        pipeline.get("privateReferencePath") if isinstance(pipeline, Mapping) else None
+    )
     candidates: list[Path] = []
     if isinstance(explicit, str) and explicit:
         candidates.append((repository_root / explicit).resolve())
@@ -68,7 +70,9 @@ def resolve_private_reference(
         actual = _sha256(candidate)
         if actual == expected_hash:
             return candidate
-        mismatches.append(f"{candidate.relative_to(repository_root).as_posix()}={actual}")
+        mismatches.append(
+            f"{candidate.relative_to(repository_root).as_posix()}={actual}"
+        )
 
     if mismatches:
         raise ValueError(
@@ -83,7 +87,9 @@ def resolve_private_reference(
     )
 
 
-def _bbox(value: object, *, width: int, height: int, label: str) -> tuple[int, int, int, int]:
+def _bbox(
+    value: object, *, width: int, height: int, label: str
+) -> tuple[int, int, int, int]:
     if (
         not isinstance(value, list)
         or len(value) != 4
@@ -179,9 +185,7 @@ def normalize_observed_variants(
             (float(right), float(bottom)),
             (float(left), float(bottom)),
         )
-        round_trip = max(
-            math.dist(point, inverse(forward(point))) for point in corners
-        )
+        round_trip = max(math.dist(point, inverse(forward(point))) for point in corners)
         max_round_trip = max(max_round_trip, round_trip)
         records.append(
             {
@@ -278,13 +282,19 @@ def validate_pattern_contract(
                 for point in boundary
             )
         ):
-            raise ValueError(f"pattern piece {piece_id!r} requires a finite 2D boundary")
+            raise ValueError(
+                f"pattern piece {piece_id!r} requires a finite 2D boundary"
+            )
 
         seam_allowance = raw_piece.get("seamAllowanceM")
-        if not isinstance(seam_allowance, (int, float)) or not math.isfinite(seam_allowance):
+        if not isinstance(seam_allowance, (int, float)) or not math.isfinite(
+            seam_allowance
+        ):
             raise ValueError(f"pattern piece {piece_id!r} seamAllowanceM is required")
         if seam_allowance < 0:
-            raise ValueError(f"pattern piece {piece_id!r} seamAllowanceM must be non-negative")
+            raise ValueError(
+                f"pattern piece {piece_id!r} seamAllowanceM must be non-negative"
+            )
 
         declared_edges = raw_piece.get("edges")
         if not isinstance(declared_edges, list) or not declared_edges:
@@ -308,7 +318,9 @@ def validate_pattern_contract(
                 or not 0 <= start < len(boundary)
                 or not 0 <= end < len(boundary)
             ):
-                raise ValueError(f"pattern edge {piece_id}.{edge_id} has invalid vertices")
+                raise ValueError(
+                    f"pattern edge {piece_id}.{edge_id} has invalid vertices"
+                )
             role = raw_edge.get("role")
             if role not in {"seam", "attachment", "open", "hem", "fold", "internal"}:
                 raise ValueError(f"pattern edge {piece_id}.{edge_id} has invalid role")
@@ -423,7 +435,11 @@ def validate_stitch_contract(
             orientation_checks += 1
 
         easing = raw_stitch.get("easingRatio", 1.0)
-        if not isinstance(easing, (int, float)) or not math.isfinite(easing) or easing <= 0:
+        if (
+            not isinstance(easing, (int, float))
+            or not math.isfinite(easing)
+            or easing <= 0
+        ):
             raise ValueError(f"stitch {stitch_id!r} easingRatio must be positive")
 
     for key, count in usage.items():
