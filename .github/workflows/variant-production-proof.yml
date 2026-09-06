@@ -102,9 +102,9 @@ jobs:
           name: production-variant-proof-${{ github.run_id }}
           path: |
             .image2outfit/variant-production/**/*.json
-            .image2outfit/variants/**/*.json
-            Assets/GenWorks/*--*--proof-*/Evidence/Build/*.json
-            Assets/GenWorks/*--*--proof-*/Previews/**/*.webp
+            .image2outfit/products/**/variants/**/*.json
+            .image2outfit/products/**/variants/**/product/Evidence/Build/*.json
+            .image2outfit/products/**/variants/**/product/Previews/**/*.webp
           if-no-files-found: warn
           retention-days: 3
           compression-level: 6
