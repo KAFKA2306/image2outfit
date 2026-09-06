@@ -22,12 +22,27 @@
     "lace-hem",
     "white-bib-ruffle-center"
   ],
-  "priorityFitZones": ["neck", "chest", "waist", "pelvis", "upper-leg"],
+  "priorityFitZones": [
+    "neck",
+    "chest",
+    "waist",
+    "pelvis",
+    "upper-leg"
+  ],
   "researchTrial": {
     "name": "pattern-first explicit panel and stitch graph",
     "status": "DECLARED",
     "patternPath": "config/products/siroino-tuxedo-halter-dress-large/pattern-draft.json",
     "stitchPath": "config/products/siroino-tuxedo-halter-dress-large/stitch-graph.json"
   },
-  "releaseBoundary": "Blender render evidence; Unity/Modular Avatar/NDMF/VRChat runtime are out of scope."
+  "releaseBoundary": "Blender render evidence; Unity/Modular Avatar/NDMF/VRChat runtime are out of scope.",
+  "clothSimulation": {
+    "applicability": "REQUIRED",
+    "components": [
+      "upper-skirt",
+      "lower-skirt"
+    ],
+    "evidence": "actual Blender point-cache state and pre/evaluated/settled mesh SHA-256",
+    "reason": "The two skirt rings rely on gravity settling; fitted surface-extracted bodice panels do not."
+  }
 }
