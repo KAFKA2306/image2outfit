@@ -116,6 +116,7 @@ def configure_cloth(
     cloth.collision_settings.distance_min = 0.003
     cloth.point_cache.frame_start = 1
     cloth.point_cache.frame_end = frame_end
+    cloth.point_cache.use_disk_cache = True
     return {
         "object": skirt.name,
         "modifier": cloth.name,
