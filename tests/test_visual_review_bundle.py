@@ -210,7 +210,6 @@ class VisualReviewBundleTests(unittest.TestCase):
             ):
                 M.validate_review_result(review, bundle)
 
-
     def test_tracked_wide_cargo_builds_real_bundle(self) -> None:
         product_id = "siroino-wide-cargo"
         job_path = self.original_root / "config" / "products" / product_id / "job.json"
