@@ -771,10 +771,34 @@ def main() -> int:
         "targetAdapterId": job["adapterId"],
         "target": "Siroino _Large via official shape keys",
         "productRoot": relative_root,
+        "outfitPrefabPath": str(prefab_path.relative_to(ROOT)).replace("\\", "/"),
+        "integratedPrefabPath": str(integrated_prefab.relative_to(ROOT)).replace("\\", "/"),
+        "previewPath": str(previews["front"].relative_to(ROOT)).replace("\\", "/"),
+        "documentationPath": f"{relative_root}/README.md",
         "sourceJobPath": str(job_path.relative_to(ROOT)).replace("\\", "/"),
         "productBuildScript": job["buildScript"],
         "designRevision": job["buildRevision"],
+        "sourceReference": (
+            "private-reference://sha256/"
+            "66cd898014d3f503da8015207a0240d946aac72b596f28bef8d6574a0afb678b"
+        ),
         "modelIdentification": "UNVERIFIED",
+        "handoff": {
+            "resumable": True,
+            "canonicalWorkspace": relative_root,
+            "doNotRebuildFromZero": True,
+            "resumeFrom": f".image2outfit/products/{PRODUCT_ID}/pipeline-state.json",
+            "lastAttempt": {
+                "result": "BLENDER_MODELED",
+                "visualRevision": job["buildRevision"],
+                "shapeProfile": "Siroino _Large via official shape keys",
+                "variantId": variant_id,
+            },
+            "blockers": [
+                "Direct inspection of current five-view and pose evidence",
+                "Finalize the candidate state through the canonical pipeline",
+            ],
+        },
         "technicalGates": {
             "blender": "PASS",
             "editableSource": "PASS",
