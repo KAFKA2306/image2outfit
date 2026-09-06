@@ -28,7 +28,9 @@ from tuxedo_halter_components import (
 )
 from tuxedo_halter_runtime import (
     clean_meshes,
+    cloth_cache_state,
     configure_cloth,
+    mesh_geometry_sha256,
     normalize_bone_weights,
     render_prone_pose,
     write_prefabs,
@@ -299,10 +301,19 @@ def bake_skirts(
     lower_pin: list[int],
 ) -> tuple[list[dict[str, object]], int]:
     frame_end = 24
+    skirts = (upper_skirt, lower_skirt)
+    pre_bake_hashes = {
+        skirt.name: mesh_geometry_sha256(skirt)
+        for skirt in skirts
+    }
     contracts = [
         configure_cloth(upper_skirt, body, upper_pin, frame_end=frame_end),
         configure_cloth(lower_skirt, body, lower_pin, frame_end=frame_end),
     ]
+    contract_by_object = {
+        str(contract["object"]): contract
+        for contract in contracts
+    }
     scene = bpy.context.scene
     scene.frame_start = 1
     scene.frame_end = frame_end
@@ -311,11 +322,32 @@ def bake_skirts(
     bpy.ops.ptcache.bake_all(bake=True)
     scene.frame_set(frame_end)
     bpy.context.view_layer.update()
-    for skirt in (upper_skirt, lower_skirt):
+
+    for skirt in skirts:
+        contract = contract_by_object[skirt.name]
+        cache = cloth_cache_state(skirt, "Reference Cloth")
+        contract.update(cache)
+        contract["preBakeMeshSha256"] = pre_bake_hashes[skirt.name]
+        contract["evaluatedFrameMeshSha256"] = mesh_geometry_sha256(
+            skirt,
+            evaluated=True,
+        )
+        if not contract["cacheBakedActual"]:
+            raise RuntimeError(f"cloth cache was not baked for {skirt.name}")
+
         bpy.ops.object.select_all(action="DESELECT")
         skirt.select_set(True)
         bpy.context.view_layer.objects.active = skirt
         bpy.ops.object.modifier_apply(modifier="Reference Cloth")
+        contract["settledMeshSha256"] = mesh_geometry_sha256(skirt)
+        contract["geometryChanged"] = (
+            contract["settledMeshSha256"] != contract["preBakeMeshSha256"]
+        )
+        if not contract["geometryChanged"]:
+            raise RuntimeError(
+                f"cloth evaluation did not change mesh geometry for {skirt.name}"
+            )
+
         solidify = skirt.modifiers.new("Fabric thickness", "SOLIDIFY")
         solidify.thickness = 0.0012 if skirt is upper_skirt else 0.0007
         solidify.offset = 0.0
@@ -327,7 +359,6 @@ def bake_skirts(
         bpy.ops.object.modifier_apply(modifier=soft.name)
         skirt.select_set(False)
     return contracts, frame_end
-
 
 def main() -> int:
     args = parse_args()
@@ -473,9 +504,17 @@ def main() -> int:
             "productId": PRODUCT_ID,
             "status": "PASS",
             "engine": "Blender Cloth",
+            "applicability": "REQUIRED",
             "frameStart": 1,
             "frameEnd": frame_end,
-            "cacheBaked": True,
+            "cacheBaked": all(
+                bool(contract.get("cacheBakedActual"))
+                for contract in cloth_contracts
+            ),
+            "geometryChanged": all(
+                bool(contract.get("geometryChanged"))
+                for contract in cloth_contracts
+            ),
             "gravity": list(scene.gravity),
             "contracts": cloth_contracts,
             "bodyCollisionThicknessM": 0.004,
