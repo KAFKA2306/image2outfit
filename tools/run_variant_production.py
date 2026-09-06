@@ -276,6 +276,17 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         "mapSets": {"wine_satin": {"roughnessValue": 156}}
     }:
         raise ValueError("roughness-only control changed an unexpected material field")
+    control_renders = material_control.get("renderEvidenceSha256")
+    if not isinstance(control_renders, dict):
+        raise ValueError("roughness-only control render evidence hashes are missing")
+    control_shared = sorted(set(baseline_renders) & set(control_renders))
+    roughness_changed_render_keys = [
+        key
+        for key in control_shared
+        if baseline_renders[key] != control_renders[key]
+    ]
+    if not roughness_changed_render_keys:
+        raise ValueError("roughness-only control did not change rendered evidence")
     if negative["status"] != "EXPECTED_FAIL":
         raise ValueError("negative-control variant did not fail as expected")
 
@@ -296,6 +307,8 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         "sizePoseEvidenceRevalidated": True,
         "roughnessControlGeometryMatchesBaseline": True,
         "roughnessControlMaterialChanged": True,
+        "roughnessControlRenderChanged": True,
+        "roughnessControlChangedRenderKeys": roughness_changed_render_keys,
         "negativeControlFailed": True,
         "baselinePreservedAfterFailure": True,
         "canonicalSuccessfulCandidates": 3,
