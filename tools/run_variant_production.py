@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and verify a small production-variant batch with the canonical product builder."""
+"""Build and verify production variants with the canonical product builder."""
 
 from __future__ import annotations
 
@@ -20,14 +20,6 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from image2outfit.variant_production import materialize_all_variants
-
-BASE_PRODUCT_ID = "siroino-tuxedo-halter-dress-large"
-BASE_JOB = ROOT / "config" / "products" / BASE_PRODUCT_ID / "job.json"
-BASE_REQUEST = ROOT / "config" / "pipeline" / "requests" / f"{BASE_PRODUCT_ID}.json"
-BASE_MATERIAL = ROOT / "config" / "products" / BASE_PRODUCT_ID / "material-recipe.json"
-DEFAULT_RECIPE = (
-    ROOT / "config" / "products" / BASE_PRODUCT_ID / "production-variants.json"
-)
 
 
 def read_object(path: Path) -> dict[str, Any]:
@@ -57,9 +49,22 @@ def blender_executable() -> str:
     raise FileNotFoundError("Blender executable was not found")
 
 
+def base_paths(recipe: dict[str, Any]) -> dict[str, Path]:
+    product_id = recipe.get("baseProductId")
+    if not isinstance(product_id, str) or not product_id:
+        raise ValueError("production recipe baseProductId is required")
+    product = ROOT / "config" / "products" / product_id
+    return {
+        "job": product / "job.json",
+        "request": ROOT / "config" / "pipeline" / "requests" / f"{product_id}.json",
+        "material": product / "material-recipe.json",
+    }
+
+
 def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
     job = read_object(item["jobPath"])
-    expected = item["variantContract"]["expectedResult"]
+    contract = item["variantContract"]
+    expected = contract["expectedResult"]
     log_path = item["contractPath"].parent / "blender.log"
     command = [
         blender,
@@ -93,6 +98,7 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
     result: dict[str, Any] = {
         "candidateId": item["candidateId"],
         "variantId": item["variantId"],
+        "proofRole": contract["proofRole"],
         "workspaceId": item["workspaceId"],
         "expectedResult": expected,
         "returnCode": completed.returncode,
@@ -155,18 +161,30 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
     return result
 
 
-def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
-    by_variant = {result["variantId"]: result for result in results}
-    required = {"baseline", "black-black", "compact-large", "invalid-zero-bib"}
-    if set(by_variant) != required:
-        raise ValueError("variant batch does not contain the canonical proof set")
+def by_role(results: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    mapped: dict[str, dict[str, Any]] = {}
+    for result in results:
+        role = str(result["proofRole"])
+        if role in mapped:
+            raise ValueError(f"duplicate proof role: {role}")
+        mapped[role] = result
+    return mapped
 
-    baseline = by_variant["baseline"]
-    color = by_variant["black-black"]
-    size = by_variant["compact-large"]
-    negative = by_variant["invalid-zero-bib"]
-    if baseline["status"] != color["status"] or baseline["status"] != size["status"]:
-        raise ValueError("successful production variants did not all PASS")
+
+def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
+    roles = by_role(results)
+    required = {"BASELINE", "COLOR", "SIZE", "NEGATIVE"}
+    if set(roles) != required:
+        raise ValueError("variant batch does not contain the canonical proof roles")
+
+    baseline = roles["BASELINE"]
+    color = roles["COLOR"]
+    size = roles["SIZE"]
+    negative = roles["NEGATIVE"]
+    if baseline["status"] != "PASS" or color["status"] != "PASS":
+        raise ValueError("baseline/color production candidate did not PASS")
+    if size["status"] != "PASS":
+        raise ValueError("size production candidate did not PASS")
     if baseline["geometryFingerprint"] != color["geometryFingerprint"]:
         raise ValueError("color variant changed geometry")
     if baseline["materialRecipeSha256"] == color["materialRecipeSha256"]:
@@ -196,42 +214,52 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def materialized_items(
+    recipe: dict[str, Any],
+    *,
+    workspace_id: str,
+) -> list[dict[str, Any]]:
+    paths = base_paths(recipe)
+    return materialize_all_variants(
+        ROOT,
+        base_job=read_object(paths["job"]),
+        base_request=read_object(paths["request"]),
+        base_material_recipe=read_object(paths["material"]),
+        production_recipe=recipe,
+        workspace_id=workspace_id,
+    )
+
+
 def run_workspace(
     workspace_id: str,
     *,
     recipe: dict[str, Any],
     blender: str,
-    include_variants: set[str] | None = None,
+    include_roles: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
-    items = materialize_all_variants(
-        ROOT,
-        base_job=read_object(BASE_JOB),
-        base_request=read_object(BASE_REQUEST),
-        base_material_recipe=read_object(BASE_MATERIAL),
-        production_recipe=recipe,
-        workspace_id=workspace_id,
-    )
-    if include_variants is not None:
-        items = [item for item in items if item["variantId"] in include_variants]
+    items = materialized_items(recipe, workspace_id=workspace_id)
+    if include_roles is not None:
+        items = [
+            item
+            for item in items
+            if item["variantContract"]["proofRole"] in include_roles
+        ]
     results = [build_candidate(item, blender=blender) for item in items]
-    proof = verify_workspace(results) if include_variants is None else None
+    proof = verify_workspace(results) if include_roles is None else None
     return results, proof
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--recipe", type=Path, default=DEFAULT_RECIPE)
+    parser.add_argument("--recipe", type=Path, required=True)
     parser.add_argument("--workspace", default="proof-a")
     parser.add_argument("--replay-workspace")
-    parser.add_argument(
-        "--output",
-        type=Path,
-        default=Path(".image2outfit/variant-production/report.json"),
-    )
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
     recipe_path = args.recipe if args.recipe.is_absolute() else ROOT / args.recipe
     recipe = read_object(recipe_path)
+    product_id = str(recipe["baseProductId"])
     blender = blender_executable()
 
     primary_results, primary_proof = run_workspace(
@@ -246,23 +274,18 @@ def main() -> int:
             args.replay_workspace,
             recipe=recipe,
             blender=blender,
-            include_variants={"black-black", "compact-large"},
+            include_roles={"COLOR", "SIZE"},
         )
-        first = {item["variantId"]: item for item in primary_results}
-        replay = {item["variantId"]: item for item in replay_results}
-        for variant_id in ("black-black", "compact-large"):
-            if (
-                first[variant_id]["geometryFingerprint"]
-                != replay[variant_id]["geometryFingerprint"]
-            ):
-                raise ValueError(
-                    f"replay geometry fingerprint mismatch: {variant_id}"
-                )
-            if first[variant_id]["geometryPassed"] != replay[variant_id]["geometryPassed"]:
-                raise ValueError(f"replay geometry gate mismatch: {variant_id}")
+        first = by_role(primary_results)
+        replay = by_role(replay_results)
+        for role in ("COLOR", "SIZE"):
+            if first[role]["geometryFingerprint"] != replay[role]["geometryFingerprint"]:
+                raise ValueError(f"replay geometry fingerprint mismatch: {role}")
+            if first[role]["geometryPassed"] != replay[role]["geometryPassed"]:
+                raise ValueError(f"replay geometry gate mismatch: {role}")
         replay_proof = {
             "workspace": args.replay_workspace,
-            "variants": ["black-black", "compact-large"],
+            "roles": ["COLOR", "SIZE"],
             "sameGeometryFingerprints": True,
             "sameGeometryGateResults": True,
             "successfulCandidates": 2,
@@ -276,7 +299,7 @@ def main() -> int:
 
     report = {
         "schemaVersion": 1,
-        "baseProductId": BASE_PRODUCT_ID,
+        "baseProductId": product_id,
         "recipePath": recipe_path.relative_to(ROOT).as_posix(),
         "recipeSha256": sha256(recipe_path),
         "recipeVersion": recipe["recipeVersion"],
@@ -285,10 +308,16 @@ def main() -> int:
         "primaryProof": primary_proof,
         "replay": replay_results,
         "replayProof": replay_proof,
-        "productionSuccessCount": 3 + (2 if replay_results else 0),
-        "productionAttemptCount": 4 + (2 if replay_results else 0),
+        "productionSuccessCount": sum(
+            result["status"] == "PASS"
+            for result in [*primary_results, *replay_results]
+        ),
+        "productionAttemptCount": len(primary_results) + len(replay_results),
     }
-    output = args.output if args.output.is_absolute() else ROOT / args.output
+    output = args.output
+    if output is None:
+        output = Path(".image2outfit") / "variant-production" / product_id / "report.json"
+    output = output if output.is_absolute() else ROOT / output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",
