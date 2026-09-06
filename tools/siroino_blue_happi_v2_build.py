@@ -151,9 +151,8 @@ def create_sleeve(
         half_depth = 0.043 + 0.004 * shoulder_bulge - 0.003 * t
         for segment in range(segments):
             angle = math.tau * segment / segments
-            offset = (
-                vertical * (math.cos(angle) * half_height)
-                + front * (math.sin(angle) * half_depth)
+            offset = vertical * (math.cos(angle) * half_height) + front * (
+                math.sin(angle) * half_depth
             )
             vertices.append(tuple(center + offset))
     for ring in range(len(points) - 1):
@@ -161,9 +160,7 @@ def create_sleeve(
         b = (ring + 1) * segments
         for segment in range(segments):
             next_segment = (segment + 1) % segments
-            faces.append(
-                (a + segment, a + next_segment, b + next_segment, b + segment)
-            )
+            faces.append((a + segment, a + next_segment, b + next_segment, b + segment))
     obj = v1.mesh_object(name, vertices, faces, material)
     obj["happiUpperBone"] = upper_name
     obj["happiLowerBone"] = lower_name
@@ -240,7 +237,10 @@ def sleeve_root_contract(
         obj = bpy.data.objects.get(f"Happi_Sleeve_{'Left' if side == 'L' else 'Right'}")
         bone = armature.data.bones.get(f"UpperArm_{side}")
         if obj is None or bone is None:
-            result[side] = {"passed": False, "reason": "missing sleeve or upper-arm bone"}
+            result[side] = {
+                "passed": False,
+                "reason": "missing sleeve or upper-arm bone",
+            }
             passed = False
             continue
         segments = int(obj.get("happiRingSegments", 0))
@@ -249,8 +249,7 @@ def sleeve_root_contract(
             passed = False
             continue
         root_points = [
-            obj.matrix_world @ obj.data.vertices[index].co
-            for index in range(segments)
+            obj.matrix_world @ obj.data.vertices[index].co for index in range(segments)
         ]
         center = sum(root_points, Vector()) / segments
         head = armature.matrix_world @ bone.head_local
@@ -285,10 +284,7 @@ def configure_cloth(
             vertex.index
             for vertex, coordinate in zip(panel.data.vertices, coordinates)
             if coordinate.z > 0.965
-            or (
-                panel.name.startswith("Happi_Front")
-                and abs(coordinate.x) <= 0.055
-            )
+            or (panel.name.startswith("Happi_Front") and abs(coordinate.x) <= 0.055)
         ]
         pin = panel.vertex_groups.new(name="HappiClothPin")
         pin.add(selected, 1.0, "REPLACE")
@@ -413,9 +409,7 @@ def postprocess(job: dict, result: int) -> int:
 
     report = v1.read_json(report_path)
     clearance = float(report["clearanceRefinement"][-1]["clearance"]["p01"])
-    mean_clearance = float(
-        report["clearanceRefinement"][-1]["clearance"]["mean"]
-    )
+    mean_clearance = float(report["clearanceRefinement"][-1]["clearance"]["mean"])
     front_opening = float(report["frontOpeningM"])
     root_contract = sleeve_root_contract(bpy.data.objects["SiroinoSotai_Armature"])
     fit_pass = (
@@ -468,13 +462,13 @@ def postprocess(job: dict, result: int) -> int:
 
     readme = product_root / "README.md"
     readme.write_text(
-        f"""# {job['productName']}
+        f"""# {job["productName"]}
 
 Product ID: `{PRODUCT_ID}`  
-State: **{manifest['status']}**  
+State: **{manifest["status"]}**  
 Target: **SiroinoSotai_PC**
 
-The private source is bound only as `{manifest['sourceReference']}`; the original
+The private source is bound only as `{manifest["sourceReference"]}`; the original
 image is not redistributed.
 
 ## Generated construction
@@ -487,7 +481,7 @@ image is not redistributed.
 
 ## Current boundary
 
-Technical evidence is recorded in `{manifest['outputs']['buildReport']}`. The fit
+Technical evidence is recorded in `{manifest["outputs"]["buildReport"]}`. The fit
 envelope also rejects excessive body clearance, not only penetration. Silhouette
 and styling stay pending until the current five-view and six-pose images are
 opened directly; metrics alone cannot make this product COMPLETE.
