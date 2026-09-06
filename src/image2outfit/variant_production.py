@@ -12,6 +12,7 @@ from typing import Any
 
 _ALLOWED_KINDS = {"BASE", "COLOR", "SIZE"}
 _ALLOWED_RESULTS = {"PASS", "FAIL"}
+_ALLOWED_PROOF_ROLES = {"BASELINE", "COLOR", "SIZE", "NEGATIVE"}
 _ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 
 
@@ -68,6 +69,8 @@ def _variant_map(recipe: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
             raise ValueError(f"variant {variant_id!r} kind is invalid")
         if item.get("expectedResult") not in _ALLOWED_RESULTS:
             raise ValueError(f"variant {variant_id!r} expectedResult is invalid")
+        if item.get("proofRole") not in _ALLOWED_PROOF_ROLES:
+            raise ValueError(f"variant {variant_id!r} proofRole is invalid")
         result[variant_id] = item
     return result
 
@@ -215,6 +218,7 @@ def materialize_variant(
         "candidateId": candidate_id,
         "variantId": variant_id,
         "kind": variant["kind"],
+        "proofRole": variant["proofRole"],
         "expectedResult": variant["expectedResult"],
         "geometryRelation": variant.get("geometryRelation"),
         "recipeVersion": recipe_version,
