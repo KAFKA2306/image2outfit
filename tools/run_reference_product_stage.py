@@ -132,8 +132,19 @@ def emit(
     write_json(result_path, payload)
 
 
-def runtime_root(product_id: str) -> Path:
-    return ROOT / ".image2outfit" / "products" / product_id
+def runtime_root(
+    product_id: str,
+    job: Mapping[str, Any] | None = None,
+) -> Path:
+    runtime_id = product_id
+    if job is not None:
+        candidate_id = job.get("candidateId")
+        workspace_id = job.get("workspaceId")
+        if isinstance(candidate_id, str) and candidate_id:
+            runtime_id = candidate_id
+            if isinstance(workspace_id, str) and workspace_id:
+                runtime_id = f"{candidate_id}--{workspace_id}"
+    return ROOT / ".image2outfit" / "products" / runtime_id
 
 
 def review_image_paths(job: Mapping[str, Any]) -> list[Path]:
@@ -165,7 +176,7 @@ def stage_ingest(
     ):
         raise ValueError("public repository must not retain the private source image")
     binding = write_json(
-        runtime_root(product_id) / "reference" / "source-binding.json",
+        runtime_root(product_id, job) / "reference" / "source-binding.json",
         {
             "schemaVersion": 1,
             "productId": product_id,
@@ -196,7 +207,7 @@ def stage_normalize(job: Mapping[str, Any], result: Path) -> None:
         "reference audit",
     )
     source_path = resolve_private_reference(ROOT, job, audit)
-    output_root = runtime_root(product_id) / "normalized"
+    output_root = runtime_root(product_id, job) / "normalized"
     outputs, manifest = normalize_observed_variants(source_path, audit, output_root)
     report = write_json(output_root / "normalized-view.json", manifest)
     emit(
@@ -340,7 +351,7 @@ def stage_initialize(job: Mapping[str, Any], result: Path) -> None:
         "lower-skirt-ring": {"anchor": "Hips", "offsetM": [0.0, 0.0, 0.625]},
     }
     report = write_json(
-        runtime_root(product_id) / "initialization" / "initialization-3d.json",
+        runtime_root(product_id, job) / "initialization" / "initialization-3d.json",
         {
             "schemaVersion": 1,
             "productId": product_id,
@@ -378,7 +389,7 @@ def blender_executable() -> str:
 def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
     script = repo_path(job["buildScript"], label="build script")
-    log = runtime_root(product_id) / "reports" / "blender-build.log"
+    log = runtime_root(product_id, job) / "reports" / "blender-build.log"
     log.parent.mkdir(parents=True, exist_ok=True)
     report = repo_path(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
