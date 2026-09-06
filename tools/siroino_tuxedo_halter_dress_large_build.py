@@ -647,9 +647,9 @@ def main() -> int:
             "canonicalWorkspace": job["productRoot"],
             "doNotRebuildFromZero": True,
             "resumeFrom": (
-                f".image2outfit/products/{candidate_id}"
-                + (f"--{workspace_id}" if workspace_id else "")
-                + "/pipeline-state.json"
+                f"{job.get('variantRuntimeRoot')}/pipeline-state.json"
+                if job.get("variantRuntimeRoot")
+                else f".image2outfit/products/{PRODUCT_ID}/pipeline-state.json"
             ),
             "lastAttempt": {
                 "result": "BLENDER_MODELED" if passed else "BLENDER_REJECTED",
