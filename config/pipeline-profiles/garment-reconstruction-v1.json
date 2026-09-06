@@ -22,7 +22,12 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "managedOutputs": ["referenceManifest", "sourceSha256", "provenance", "targetAvatarBinding"]
+      "managedOutputs": [
+        "referenceManifest",
+        "sourceSha256",
+        "provenance",
+        "targetAvatarBinding"
+      ]
     },
     {
       "stage": "normalize-view",
@@ -30,8 +35,16 @@
       "purpose": "Separate pose and viewpoint effects from garment evidence.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
-      "requiredResultFields": {},
-      "managedOutputs": ["normalizedReference", "cameraPose", "bodyLandmarks", "normalizationMetrics"]
+      "requiredResultFields": {
+        "normalizationContractValidated": true,
+        "observationSource": "original-image"
+      },
+      "managedOutputs": [
+        "normalizedReference",
+        "cameraPose",
+        "bodyLandmarks",
+        "normalizationMetrics"
+      ]
     },
     {
       "stage": "decompose-garment",
@@ -40,7 +53,12 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "managedOutputs": ["garmentPartGraph", "spatialAssignments", "materialRegions", "ambiguityLog"]
+      "managedOutputs": [
+        "garmentPartGraph",
+        "spatialAssignments",
+        "materialRegions",
+        "ambiguityLog"
+      ]
     },
     {
       "stage": "draft-patterns",
@@ -49,7 +67,13 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "managedOutputs": ["patternSpecification", "patternEdges", "seamAllowances", "notchesAndDarts", "correspondenceMap"]
+      "managedOutputs": [
+        "patternSpecification",
+        "patternEdges",
+        "seamAllowances",
+        "notchesAndDarts",
+        "correspondenceMap"
+      ]
     },
     {
       "stage": "infer-stitches",
@@ -58,7 +82,12 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "managedOutputs": ["stitchGraph", "edgePairings", "stitchDirections", "topologyValidation"]
+      "managedOutputs": [
+        "stitchGraph",
+        "edgePairings",
+        "stitchDirections",
+        "topologyValidation"
+      ]
     },
     {
       "stage": "initialize-3d",
@@ -67,7 +96,11 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "managedOutputs": ["initializedMesh", "panelTransforms", "initialClearanceAudit"]
+      "managedOutputs": [
+        "initializedMesh",
+        "panelTransforms",
+        "initialClearanceAudit"
+      ]
     },
     {
       "stage": "build-blender",
@@ -76,7 +109,11 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 2,
       "requiredResultFields": {},
-      "managedOutputs": ["editableBlend", "buildReport", "geometryMetrics"]
+      "managedOutputs": [
+        "editableBlend",
+        "buildReport",
+        "geometryMetrics"
+      ]
     },
     {
       "stage": "simulate-cloth",
@@ -85,7 +122,12 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "managedOutputs": ["clothCache", "simulationConfig", "collisionReport", "simulatedMesh"]
+      "managedOutputs": [
+        "clothCache",
+        "simulationConfig",
+        "collisionReport",
+        "simulatedMesh"
+      ]
     },
     {
       "stage": "skin-and-export",
@@ -94,7 +136,12 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 2,
       "requiredResultFields": {},
-      "managedOutputs": ["skinnedBlend", "fbx", "weightAudit", "prefabDeclaration"]
+      "managedOutputs": [
+        "skinnedBlend",
+        "fbx",
+        "weightAudit",
+        "prefabDeclaration"
+      ]
     },
     {
       "stage": "render-evidence",
@@ -103,7 +150,11 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 5,
       "requiredResultFields": {},
-      "managedOutputs": ["fiveViewImages", "requiredPoseImages", "renderManifest"]
+      "managedOutputs": [
+        "fiveViewImages",
+        "requiredPoseImages",
+        "renderManifest"
+      ]
     },
     {
       "stage": "audit-geometry",
@@ -112,7 +163,12 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "managedOutputs": ["geometryAudit", "penetrationAudit", "evidenceHashAudit", "gateSummary"]
+      "managedOutputs": [
+        "geometryAudit",
+        "penetrationAudit",
+        "evidenceHashAudit",
+        "gateSummary"
+      ]
     },
     {
       "stage": "visual-review",
@@ -120,8 +176,14 @@
       "purpose": "Require direct inspection of current images before visualAppearanceReview can pass.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 5,
-      "requiredResultFields": {"reviewMethod": "direct-image-inspection"},
-      "managedOutputs": ["visualReview", "inspectedImageHashes", "blockingFindings"]
+      "requiredResultFields": {
+        "reviewMethod": "direct-image-inspection"
+      },
+      "managedOutputs": [
+        "visualReview",
+        "inspectedImageHashes",
+        "blockingFindings"
+      ]
     },
     {
       "stage": "finalize-candidate",
@@ -129,8 +191,14 @@
       "purpose": "Write the truthful WORKING, COMPLETE, or REJECTED candidate state.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
-      "requiredResultFields": {"decisionRecorded": true},
-      "managedOutputs": ["candidateState", "completionGateRecord", "releaseDecision"]
+      "requiredResultFields": {
+        "decisionRecorded": true
+      },
+      "managedOutputs": [
+        "candidateState",
+        "completionGateRecord",
+        "releaseDecision"
+      ]
     }
   ]
 }
