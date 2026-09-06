@@ -1,0 +1,161 @@
+name: Production variant proof
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - config/products/**/production-variants.json
+      - src/image2outfit/variant_production.py
+      - tools/run_variant_production.py
+      - tools/run_reference_product_stage.py
+      - tools/tuxedo_halter_runtime.py
+      - tools/siroino_tuxedo_halter_dress_large_build.py
+      - .github/workflows/variant-production-proof.yml
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: variant-production-proof-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: '0.11.32'
+          enable-cache: true
+
+      - name: Compile and test variant contracts
+        run: |
+          uv run --locked --no-default-groups python -m compileall -q src tools tests
+          uv run --locked --no-default-groups python -m unittest             tests.test_variant_production -v
+
+      - name: Install Blender runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends             xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0             libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
+
+      - name: Download pinned Blender
+        run: |
+          set -euo pipefail
+          BLENDER_VERSION="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('config/toolchain-lock.json').read_text())['blender']['version'])
+          PY
+          )"
+          BLENDER_SERIES="${BLENDER_VERSION%.*}"
+          curl --fail --location --retry 4 --retry-all-errors             "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"             --output blender.tar.xz
+          mkdir -p .image2outfit/blender
+          tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
+          echo "IMAGE2OUTFIT_BLENDER=$PWD/.image2outfit/blender/blender" >> "$GITHUB_ENV"
+
+      - name: Restore pinned Blender Python environment
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from tools.blender_python_env import prepare
+
+          prepared = prepare('.image2outfit/blender/blender')
+          paths = [
+              str((Path.cwd() / 'tools').resolve()),
+              str((Path.cwd() / 'src').resolve()),
+              prepared.environment['PYTHONPATH'],
+          ]
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as stream:
+              stream.write(f"PYTHONPATH={os.pathsep.join(paths)}\n")
+          PY
+
+      - name: Run all tracked production variant proofs
+        run: |
+          set -euo pipefail
+          mapfile -t recipes < <(find config/products -mindepth 2 -maxdepth 2             -name production-variants.json -print | sort)
+          if [[ ${#recipes[@]} -eq 0 ]]; then
+            echo "No production variant recipes found."
+            exit 0
+          fi
+          for recipe in "${recipes[@]}"; do
+            python tools/run_variant_production.py               --recipe "$recipe"               --workspace proof-a               --replay-workspace proof-b
+          done
+
+      - name: Delete previous variant proof artifact
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          ARTIFACT_NAME: production-variant-proof
+        with:
+          script: |
+            const current = process.env.ARTIFACT_NAME;
+            const artifacts = await github.paginate(
+              github.rest.actions.listArtifactsForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100,
+              },
+            );
+            for (const artifact of artifacts) {
+              if (artifact.name === current) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+              }
+            }
+
+      - name: Delete previous variant proof artifact
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.paginate(
+              github.rest.actions.listArtifactsForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100,
+              }
+            );
+            for (const artifact of artifacts) {
+              if (artifact.name === 'production-variant-proof') {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+              }
+            }
+
+      - name: Upload variant proof evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-variant-proof
+          path: |
+            .image2outfit/variant-production/**/*.json
+            .image2outfit/products/**/variants/**/*.json
+            .image2outfit/products/**/variants/**/product/Evidence/Build/*.json
+            .image2outfit/products/**/variants/**/product/Previews/**/*.webp
+          if-no-files-found: warn
+          retention-days: 1
+          overwrite: true
+          compression-level: 6

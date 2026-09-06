@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "baseProductId": "siroino-tuxedo-halter-dress-large",
+  "recipeVersion": "tuxedo-variants-v2",
+  "variants": [
+    {
+      "id": "baseline",
+      "kind": "BASE",
+      "expectedResult": "PASS",
+      "geometryRelation": "BASELINE",
+      "bodyShapeProfileOverrides": {},
+      "geometryVariablesOverrides": {},
+      "materialOverrides": {},
+      "requiredRevalidation": [
+        "build-blender",
+        "simulate-cloth",
+        "skin-and-export",
+        "render-evidence",
+        "audit-geometry",
+        "visual-review",
+        "finalize-candidate"
+      ],
+      "proofRole": "BASELINE"
+    },
+    {
+      "id": "black-black",
+      "kind": "COLOR",
+      "expectedResult": "PASS",
+      "geometryRelation": "MATCH_BASELINE",
+      "bodyShapeProfileOverrides": {},
+      "geometryVariablesOverrides": {},
+      "materialOverrides": {
+        "materials": {
+          "wine": {
+            "materialName": "MAT_Black_Waistcoat",
+            "mapSet": "black_satin"
+          }
+        }
+      },
+      "requiredRevalidation": [
+        "build-blender",
+        "skin-and-export",
+        "render-evidence",
+        "visual-review",
+        "finalize-candidate"
+      ],
+      "proofRole": "COLOR"
+    },
+    {
+      "id": "bib-width-plus-10",
+      "kind": "SIZE",
+      "expectedResult": "PASS",
+      "geometryRelation": "DIFFER_FROM_BASELINE",
+      "bodyShapeProfileOverrides": {},
+      "geometryVariablesOverrides": {
+        "bibWidthScale": 1.1
+      },
+      "materialOverrides": {},
+      "requiredRevalidation": [
+        "initialize-3d",
+        "build-blender",
+        "simulate-cloth",
+        "skin-and-export",
+        "render-evidence",
+        "audit-geometry",
+        "visual-review",
+        "finalize-candidate"
+      ],
+      "proofRole": "SIZE"
+    },
+    {
+      "id": "roughness-control",
+      "kind": "COLOR",
+      "expectedResult": "PASS",
+      "geometryRelation": "MATCH_BASELINE",
+      "bodyShapeProfileOverrides": {},
+      "geometryVariablesOverrides": {},
+      "materialOverrides": {
+        "mapSets": {
+          "wine_satin": {
+            "roughnessValue": 156
+          }
+        }
+      },
+      "requiredRevalidation": [
+        "build-blender",
+        "skin-and-export",
+        "render-evidence",
+        "visual-review",
+        "finalize-candidate"
+      ],
+      "proofRole": "MATERIAL_CONTROL"
+    },
+    {
+      "id": "invalid-zero-bib",
+      "kind": "SIZE",
+      "expectedResult": "FAIL",
+      "geometryRelation": "NOT_APPLICABLE",
+      "bodyShapeProfileOverrides": {},
+      "geometryVariablesOverrides": {
+        "bibWidthScale": 0
+      },
+      "materialOverrides": {},
+      "requiredRevalidation": [
+        "initialize-3d",
+        "build-blender"
+      ],
+      "proofRole": "NEGATIVE"
+    }
+  ]
+}
