@@ -29,6 +29,7 @@ from tuxedo_halter_components import (
 from tuxedo_halter_runtime import (
     clean_meshes,
     cloth_cache_state,
+    combined_geometry_sha256,
     configure_cloth,
     mesh_geometry_sha256,
     normalize_bone_weights,
@@ -371,6 +372,10 @@ def main() -> int:
     job = read_json(job_path)
     if job.get("id") != PRODUCT_ID:
         raise ValueError("job product identity mismatch")
+    candidate_id = str(job.get("candidateId") or PRODUCT_ID)
+    variant_id = str(job.get("variantId") or "baseline")
+    variant_recipe_version = str(job.get("variantRecipeVersion") or "")
+    workspace_id = str(job.get("workspaceId") or "")
 
     base.clean_scene()
     source = repo_path(job["targetSourcePath"])
@@ -457,6 +462,7 @@ def main() -> int:
         },
     )
     measured = base.metrics(garments)
+    geometry_fingerprint = combined_geometry_sha256(garments)
     passed = (
         measured["meshObjects"] >= 18
         and measured["vertices"] > 1800
@@ -514,6 +520,9 @@ def main() -> int:
         {
             "schemaVersion": 1,
             "productId": PRODUCT_ID,
+            "candidateId": candidate_id,
+            "variantId": variant_id,
+            "workspaceId": workspace_id,
             "status": "PASS",
             "engine": "Blender Cloth",
             "applicability": "REQUIRED",
@@ -541,6 +550,10 @@ def main() -> int:
         "schemaVersion": 1,
         "passed": passed,
         "productId": PRODUCT_ID,
+        "candidateId": candidate_id,
+        "variantId": variant_id,
+        "variantRecipeVersion": variant_recipe_version,
+        "workspaceId": workspace_id,
         "productName": job["productName"],
         "buildRevision": job["buildRevision"],
         "targetProfile": profile,
@@ -570,6 +583,7 @@ def main() -> int:
                 }
             },
         },
+        "geometryFingerprint": geometry_fingerprint,
         "metrics": measured,
         "weightNormalization": weight_report,
         "clearanceRefinement": clearance_history,
@@ -597,6 +611,8 @@ def main() -> int:
         {
             "schemaVersion": 1,
             "productId": PRODUCT_ID,
+            "candidateId": candidate_id,
+            "variantId": variant_id,
             "default": "wine-red-black",
             "variants": [
                 {
@@ -616,6 +632,10 @@ def main() -> int:
     manifest = {
         "schemaVersion": 1,
         "productId": PRODUCT_ID,
+        "candidateId": candidate_id,
+        "variantId": variant_id,
+        "variantRecipeVersion": variant_recipe_version,
+        "workspaceId": workspace_id,
         "productName": job["productName"],
         "status": "WORKING" if passed else "REJECTED",
         "targetAdapterId": job["adapterId"],
@@ -637,7 +657,11 @@ def main() -> int:
             "resumable": True,
             "canonicalWorkspace": job["productRoot"],
             "doNotRebuildFromZero": True,
-            "resumeFrom": f".image2outfit/products/{PRODUCT_ID}/pipeline-state.json",
+            "resumeFrom": (
+                f".image2outfit/products/{candidate_id}"
+                + (f"--{workspace_id}" if workspace_id else "")
+                + "/pipeline-state.json"
+            ),
             "lastAttempt": {
                 "result": "BLENDER_MODELED" if passed else "BLENDER_REJECTED",
                 "visualRevision": job["buildRevision"],
