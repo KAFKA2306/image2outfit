@@ -25,7 +25,33 @@ permissions:
   id-token: write
 
 jobs:
+  classify:
+    runs-on: ubuntu-latest
+    outputs:
+      render_required: ${{ steps.scope.outputs.render_required }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: scope
+        name: Classify Pages change
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "render_required=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only HEAD^ HEAD > /tmp/pages-changed.txt
+          if grep -Eq '^(config/products/|config/pipeline/|config/toolchain-lock\.json$|Assets/GenWorks/[^/]+/(ProductManifest\.json|Source/|Previews/|Evidence/Rejected/)|src/image2outfit/|tools/(?!review_console\.py$|render_all_current\.py$))' /tmp/pages-changed.txt; then
+            echo "render_required=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "render_required=false" >> "$GITHUB_OUTPUT"
+          fi
+          cat /tmp/pages-changed.txt
+
   render-and-deploy:
+    needs: classify
     runs-on: ubuntu-latest
     timeout-minutes: 360
     environment:
@@ -44,8 +70,10 @@ jobs:
           version: '0.11.32'
           enable-cache: true
       - name: Install Blender runtime libraries
+        if: needs.classify.outputs.render_required == 'true'
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
       - name: Download pinned Blender
+        if: needs.classify.outputs.render_required == 'true'
         run: |
           BLENDER_VERSION="$(python -c "import json; print(json.load(open('config/toolchain-lock.json'))['blender']['version'])")"
           BLENDER_SERIES="${BLENDER_VERSION%.*}"
@@ -54,6 +82,7 @@ jobs:
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
           echo "IMAGE2OUTFIT_BLENDER=$PWD/.image2outfit/blender/blender" >> "$GITHUB_ENV"
       - name: Prepare Blender Python environment
+        if: needs.classify.outputs.render_required == 'true'
         run: |
           python - <<'PY'
           import os
@@ -65,12 +94,17 @@ jobs:
               f.write(f"PYTHONPATH={os.pathsep.join(paths)}\n")
           PY
       - name: Render and capture every canonical product
+        if: needs.classify.outputs.render_required == 'true'
         run: python tools/render_all_current.py --blender "$IMAGE2OUTFIT_BLENDER" --summary .image2outfit/render-current-summary.json --site _site
+      - name: Build Pages from tracked canonical evidence
+        if: needs.classify.outputs.render_required != 'true'
+        run: python tools/render_all_current.py --site-only --summary .image2outfit/render-current-summary.json --site _site
       - name: Audit repository contracts
         run: |
           python tools/audit_genworks_layout.py
           python tools/audit_repository_hygiene.py
       - name: Delete previous render evidence artifact
+        if: needs.classify.outputs.render_required == 'true'
         uses: actions/github-script@v7
         with:
           script: |
@@ -89,8 +123,8 @@ jobs:
                 });
               }
             }
-
       - name: Upload render evidence
+        if: needs.classify.outputs.render_required == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: image2outfit-current-all-products
@@ -107,7 +141,6 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-
           catalog = json.loads(Path('_site/io/catalog.json').read_text(encoding='utf-8'))
           missing = [p['productId'] for p in catalog['products'] if p['webpCount'] == 0]
           print(f"io_products={catalog['productCount']} io_webp={catalog['webpCount']} missing={missing}")
@@ -120,7 +153,6 @@ jobs:
                   if not (Path('_site') / asset['href']).is_file():
                       raise SystemExit(f"missing io asset: {asset['href']}")
           PY
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
