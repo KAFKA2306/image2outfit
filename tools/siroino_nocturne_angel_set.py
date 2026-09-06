@@ -20,6 +20,7 @@ from siroino_nocturne_modules import build
 from siroino_nocturne_records import write_integrated_prefab, write_records
 
 PRODUCT_ID = "siroino-nocturne-angel-set"
+# Repair audit trigger: regenerate current v7 geometry for direct visual inspection.
 
 
 def _apply_shape_profile(body, profile: dict) -> None:
