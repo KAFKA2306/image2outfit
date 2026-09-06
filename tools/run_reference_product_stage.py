@@ -27,6 +27,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from image2outfit.cloth_evidence import validate_reopened_cloth_evidence
 from image2outfit.stage_contracts import (
     normalize_observed_variants,
     resolve_private_reference,
@@ -616,16 +617,78 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
                 raise ValueError(f"cloth contract {index} frameStart mismatch")
             if contract.get("frameEnd") != payload.get("frameEnd"):
                 raise ValueError(f"cloth contract {index} frameEnd mismatch")
+        snapshot_value = payload.get("cacheSnapshot")
+        if not isinstance(snapshot_value, str) or not snapshot_value:
+            raise ValueError("required cloth cache snapshot path is missing")
+        snapshot = repo_path(snapshot_value, label="cloth cache snapshot")
+        if not snapshot.is_file():
+            raise FileNotFoundError(
+                f"cloth cache snapshot is missing: {relative(snapshot)}"
+            )
+        snapshot_sha = sha256(snapshot)
+        if snapshot_sha != payload.get("cacheSnapshotSha256"):
+            raise ValueError("cloth cache snapshot SHA-256 is stale or mismatched")
+
+        reopen_result = (
+            runtime_root(product_id, job)
+            / "reports"
+            / "cloth-cache-reopen.json"
+        )
+        reopen_result.parent.mkdir(parents=True, exist_ok=True)
+        verifier = ROOT / "tools" / "verify_cloth_cache_snapshot.py"
+        command = [
+            blender_executable(),
+            str(snapshot),
+            "--background",
+            "--python-use-system-env",
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(verifier),
+            "--",
+            "--report",
+            str(report),
+            "--snapshot",
+            str(snapshot),
+            "--result",
+            str(reopen_result),
+        ]
+        completed = subprocess.run(
+            command,
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode != 0:
+            raise RuntimeError(
+                "reopened cloth-cache verification failed: "
+                + completed.stderr[-4000:]
+            )
+        reopened = read_object(reopen_result, "reopened cloth cache evidence")
+        reopen_summary = validate_reopened_cloth_evidence(payload, reopened)
     elif contracts:
         raise ValueError("NOT_REQUIRED cloth policy must not report simulated objects")
+    else:
+        reopen_result = None
+        reopen_summary = {
+            "applicability": "NOT_REQUIRED",
+            "objectCount": 0,
+            "reopenValidated": True,
+        }
+
+    evidence_paths = [construction_path, report, blend]
+    if applicability == "REQUIRED":
+        evidence_paths.extend([snapshot, reopen_result])
 
     emit(
         result,
         stage="simulate-cloth",
         product_id=product_id,
-        paths=[construction_path, report, blend],
+        paths=evidence_paths,
         extra={
             "cacheEvidenceValidated": True,
+            "cacheReopenValidated": bool(reopen_summary["reopenValidated"]),
             "simulationApplicability": applicability,
             "cacheBaked": bool(payload.get("cacheBaked")),
             "geometryChanged": bool(payload.get("geometryChanged")),
