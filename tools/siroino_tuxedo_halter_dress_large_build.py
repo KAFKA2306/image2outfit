@@ -69,6 +69,22 @@ def write_json(path: Path, payload: dict) -> Path:
     return path
 
 
+def find_pattern_piece(pattern: dict, piece_id: str) -> dict:
+    pieces = pattern.get("pieces")
+    if not isinstance(pieces, list):
+        raise ValueError("pattern pieces must be a list")
+    matches = [
+        piece
+        for piece in pieces
+        if isinstance(piece, dict) and piece.get("pieceId") == piece_id
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            f"pattern piece {piece_id!r} must exist exactly once; found {len(matches)}"
+        )
+    return matches[0]
+
+
 def create_materials(texture_dir: Path) -> tuple[dict[str, Path], dict[str, object]]:
     maps = make_image_maps(texture_dir)
     materials = {
@@ -115,9 +131,18 @@ def add_bodice(
     body: bpy.types.Object,
     armature: bpy.types.Object,
     materials: dict[str, object],
+    pattern: dict,
+    *,
+    bib_width_scale: float = 1.0,
 ) -> list[bpy.types.Object]:
     garments: list[bpy.types.Object] = [
-        bib_panel(body, armature, materials["white"]),
+        bib_panel(
+            body,
+            armature,
+            materials["white"],
+            find_pattern_piece(pattern, "bib-front"),
+            width_scale=bib_width_scale,
+        ),
         waistcoat_side("L", body, armature, materials["wine"]),
         waistcoat_side("R", body, armature, materials["wine"]),
         waistcoat_back(body, armature, materials["wine"]),
@@ -334,6 +359,9 @@ def main() -> int:
         directory.mkdir(parents=True, exist_ok=True)
 
     tracked_pattern = repo_path(job["garmentPipeline"]["patternContractPath"])
+    pattern_contract = read_json(tracked_pattern)
+    if pattern_contract.get("productId") != PRODUCT_ID:
+        raise ValueError("pattern contract product identity mismatch")
     shutil.copyfile(tracked_pattern, pattern_dir / "tuxedo-halter.pattern.json")
 
     bpy.ops.import_scene.fbx(filepath=str(source), use_anim=False)
@@ -343,7 +371,17 @@ def main() -> int:
     base.set_skin_material(body)
 
     maps, materials = create_materials(texture_dir)
-    garments = add_bodice(body, armature, materials)
+    geometry_variables = job.get("geometryVariables", {})
+    if not isinstance(geometry_variables, dict):
+        raise ValueError("job geometryVariables must be an object")
+    bib_width_scale = float(geometry_variables.get("bibWidthScale", 1.0))
+    garments = add_bodice(
+        body,
+        armature,
+        materials,
+        pattern_contract,
+        bib_width_scale=bib_width_scale,
+    )
     skirt_parts, upper_skirt, lower_skirt, upper_pin, lower_pin = add_skirts(
         body, armature, materials
     )
@@ -443,6 +481,11 @@ def main() -> int:
             "bodyCollisionThicknessM": 0.004,
         },
     )
+    bib_object = bpy.data.objects.get("White_Jacquard_Bib")
+    if bib_object is None:
+        raise RuntimeError("pattern-driven bib object was not generated")
+    bib_projection = json.loads(str(bib_object["patternProjection"]))
+
     report = {
         "schemaVersion": 1,
         "passed": passed,
@@ -453,6 +496,19 @@ def main() -> int:
         "targetAvatarAssetPath": job["targetAvatarAssetPath"],
         "targetSourcePath": job["targetSourcePath"],
         "blenderVersion": bpy.app.version_string,
+        "patternDrivenGeometry": {
+            "patternPath": str(tracked_pattern.relative_to(ROOT)).replace("\\", "/"),
+            "patternSha256": base.sha256(tracked_pattern),
+            "pieces": {
+                "bib-front": {
+                    "object": bib_object.name,
+                    "projectionFingerprint": bib_projection["fingerprint"],
+                    "edgeVertexMap": bib_projection["edgeVertexMap"],
+                    "bounds": bib_projection["bounds"],
+                    "transform": bib_projection["transform"],
+                }
+            },
+        },
         "metrics": measured,
         "weightNormalization": weight_report,
         "clearanceRefinement": clearance_history,
