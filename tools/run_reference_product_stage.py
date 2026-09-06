@@ -136,15 +136,14 @@ def runtime_root(
     product_id: str,
     job: Mapping[str, Any] | None = None,
 ) -> Path:
-    runtime_id = product_id
     if job is not None:
-        candidate_id = job.get("candidateId")
-        workspace_id = job.get("workspaceId")
-        if isinstance(candidate_id, str) and candidate_id:
-            runtime_id = candidate_id
-            if isinstance(workspace_id, str) and workspace_id:
-                runtime_id = f"{candidate_id}--{workspace_id}"
-    return ROOT / ".image2outfit" / "products" / runtime_id
+        configured = job.get("variantRuntimeRoot")
+        if isinstance(configured, str) and configured:
+            path = repo_path(configured, label="variant runtime root")
+            if ".image2outfit/products/" not in path.as_posix():
+                raise ValueError("variant runtime root must stay under .image2outfit/products")
+            return path
+    return ROOT / ".image2outfit" / "products" / product_id
 
 
 def review_image_paths(job: Mapping[str, Any]) -> list[Path]:
