@@ -48,6 +48,23 @@ def mesh_geometry_sha256(
             evaluated_object.to_mesh_clear()
 
 
+def combined_geometry_sha256(objects: list[bpy.types.Object]) -> str:
+    records = [
+        {
+            "object": obj.name,
+            "meshSha256": mesh_geometry_sha256(obj),
+        }
+        for obj in sorted(objects, key=lambda item: item.name)
+        if obj.type == "MESH"
+    ]
+    encoded = json.dumps(
+        records,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def cloth_cache_state(obj: bpy.types.Object, modifier_name: str) -> dict[str, object]:
     modifier = obj.modifiers.get(modifier_name)
     if modifier is None or modifier.type != "CLOTH":
