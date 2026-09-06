@@ -242,10 +242,16 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
     if not isinstance(size_profile, dict):
         raise ValueError("size variant shape profile evidence is missing")
     applied_shape_keys = size_profile.get("appliedShapeKeys")
-    if not isinstance(applied_shape_keys, dict) or applied_shape_keys.get("All_L") != 0.85:
+    if (
+        not isinstance(applied_shape_keys, dict)
+        or applied_shape_keys.get("All_L") != 0.85
+    ):
         raise ValueError("size variant did not apply the requested shape profile")
     size_weights = size.get("weightNormalizationEvidence")
-    if not isinstance(size_weights, dict) or int(size_weights.get("vertices", 0)) <= 0:
+    if (
+        not isinstance(size_weights, dict)
+        or int(size_weights.get("vertices", 0)) <= 0
+    ):
         raise ValueError("size variant did not rerun weight normalization")
     if int(size_weights.get("maximumInfluences", 99)) > 4:
         raise ValueError("size variant weight normalization is invalid")

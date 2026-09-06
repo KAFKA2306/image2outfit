@@ -14,6 +14,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: read
 
 concurrency:
@@ -95,16 +96,43 @@ jobs:
             python tools/run_variant_production.py               --recipe "$recipe"               --workspace proof-a               --replay-workspace proof-b
           done
 
+      - name: Delete previous variant proof artifact
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          ARTIFACT_NAME: production-variant-proof
+        with:
+          script: |
+            const current = process.env.ARTIFACT_NAME;
+            const artifacts = await github.paginate(
+              github.rest.actions.listArtifactsForRepo,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100,
+              },
+            );
+            for (const artifact of artifacts) {
+              if (artifact.name === current) {
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id,
+                });
+              }
+            }
+
       - name: Upload variant proof evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: production-variant-proof-${{ github.run_id }}
+          name: production-variant-proof
           path: |
             .image2outfit/variant-production/**/*.json
             .image2outfit/products/**/variants/**/*.json
             .image2outfit/products/**/variants/**/product/Evidence/Build/*.json
             .image2outfit/products/**/variants/**/product/Previews/**/*.webp
           if-no-files-found: warn
-          retention-days: 3
+          retention-days: 1
+          overwrite: true
           compression-level: 6
