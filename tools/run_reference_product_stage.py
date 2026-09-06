@@ -32,6 +32,7 @@ from image2outfit.stage_contracts import (
     normalize_observed_variants,
     resolve_private_reference,
     validate_pattern_contract,
+    validate_producer_artifact_binding,
     validate_stitch_contract,
 )
 
@@ -347,6 +348,27 @@ def stage_static(job: Mapping[str, Any], stage: str, key: str, result: Path) -> 
     pattern_path, pattern = validate_product_document(
         job, "patternContractPath", "pattern contract"
     )
+    producer_result_path = (
+        runtime_root(product_id, job) / "stages" / "draft-patterns.json"
+    )
+    if not producer_result_path.is_file():
+        raise FileNotFoundError(
+            "required producer result for role patternSpecification is missing: "
+            + relative(producer_result_path)
+        )
+    producer_result = read_object(
+        producer_result_path,
+        "draft-patterns producer result",
+    )
+    producer_binding = validate_producer_artifact_binding(
+        producer_result,
+        producer_result_path=relative(producer_result_path),
+        artifact_path=pattern_path,
+        artifact_repository_path=relative(pattern_path),
+        expected_stage="draft-patterns",
+        expected_role="patternSpecification",
+        expected_product_id=product_id,
+    )
     summary = validate_stitch_contract(
         payload,
         pattern,
@@ -360,6 +382,9 @@ def stage_static(job: Mapping[str, Any], stage: str, key: str, result: Path) -> 
         extra={
             "artifactContractValidated": True,
             "consumerBindingValidated": True,
+            "consumerInputRole": producer_binding["role"],
+            "producerResultPath": producer_binding["producerResultPath"],
+            "producerArtifactSha256": producer_binding["artifactSha256"],
             "artifactRole": "stitchGraph",
             "inputPatternSha256": sha256(pattern_path),
             "stitchGraphSha256": sha256(path),
