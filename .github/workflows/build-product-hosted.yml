@@ -106,7 +106,8 @@ jobs:
             tests.test_pipeline_core \
             tests.test_pipeline_audit \
             tests.test_pipeline_resume \
-            tests.test_reference_product_contract -v
+            tests.test_reference_product_contract \
+            tests.test_standard_garment_flow -v
 
       - name: Install Blender runtime libraries
         if: env.SKIP_PRODUCT_BUILD != 'true'
@@ -318,6 +319,11 @@ jobs:
           path: |
             ${{ env.REPORT_DIR }}/**/*.json
             ${{ env.PRODUCT_RUNTIME }}/**/*.json
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.blend
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.fbx
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.png
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.webp
+            ${{ env.PRODUCT_RUNTIME }}/variants/**/*.prefab
             ${{ env.PRODUCT_AUDIT }}/**/*.json
             ${{ env.PRODUCT_ROOT }}/Models/**/*.fbx
             ${{ env.PRODUCT_ROOT }}/Prefab/**/*.prefab

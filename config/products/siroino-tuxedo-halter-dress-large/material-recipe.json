@@ -7,34 +7,42 @@
     "wine": {
       "materialName": "MAT_Wine_Satin",
       "class": "cloth",
-      "baseColorSource": "generated-wine-satin-albedo",
-      "roughnessSource": "generated-wine-satin-roughness",
+      "baseColorSource": "wine_satin_albedo",
+      "roughnessSource": "wine_satin_roughness",
       "metallic": 0,
-      "alpha": 1
+      "alpha": 1,
+      "normalSource": "wine_satin_normal",
+      "sheen": 0.26
     },
     "black": {
       "materialName": "MAT_Black_Satin",
       "class": "cloth",
-      "baseColorSource": "generated-black-satin-albedo",
-      "roughnessSource": "generated-black-satin-roughness",
+      "baseColorSource": "black_satin_albedo",
+      "roughnessSource": "black_satin_roughness",
       "metallic": 0,
-      "alpha": 1
+      "alpha": 1,
+      "normalSource": "black_satin_normal",
+      "sheen": 0.18
     },
     "sheer": {
       "materialName": "MAT_Black_Sheer",
       "class": "sheer-cloth",
-      "baseColorSource": "generated-black-satin-albedo",
-      "roughnessSource": "generated-black-satin-roughness",
+      "baseColorSource": "black_satin_albedo",
+      "roughnessSource": "black_satin_roughness",
       "metallic": 0,
-      "alpha": 0.52
+      "alpha": 0.52,
+      "normalSource": "black_satin_normal",
+      "sheen": 0.08
     },
     "white": {
       "materialName": "MAT_White_Jacquard",
       "class": "cloth",
-      "baseColorSource": "generated-white-jacquard-albedo",
-      "roughnessSource": "generated-white-jacquard-roughness",
+      "baseColorSource": "white_jacquard_albedo",
+      "roughnessSource": "white_jacquard_roughness",
       "metallic": 0,
-      "alpha": 1
+      "alpha": 1,
+      "normalSource": "white_jacquard_normal",
+      "sheen": 0.1
     },
     "silver": {
       "materialName": "MAT_Silver_Hardware",
@@ -65,5 +73,10 @@
     "button-placket": "black",
     "waist-chain": "silver",
     "lace-hem": "black"
+  },
+  "controlExperiment": {
+    "parameter": "roughness",
+    "invariant": "geometryDigest",
+    "expectation": "material-only changes do not invalidate geometry"
   }
 }

@@ -10,6 +10,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -489,15 +490,27 @@ def blender_executable() -> str:
     raise FileNotFoundError("Blender executable was not found")
 
 
-def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
+def _run_blender_build(
+    *,
+    job_path: Path,
+    job: Mapping[str, Any],
+    variant_id: str | None = None,
+    output_root: Path | None = None,
+) -> dict[str, Any]:
     product_id = str(job["id"])
     script = repo_path(job["buildScript"], label="build script")
-    log = runtime_root(product_id) / "reports" / "blender-build.log"
+    label = variant_id or "base"
+    log = runtime_root(product_id) / "reports" / f"blender-build-{label}.log"
     log.parent.mkdir(parents=True, exist_ok=True)
-    report = repo_path(
-        f"{job['productRoot']}/Evidence/Build/product-build-report.json",
-        label="build report",
-    )
+    if output_root is None:
+        report = repo_path(
+            f"{job['productRoot']}/Evidence/Build/product-build-report.json",
+            label="build report",
+        )
+        blend = repo_path(job["blendPath"], label="blend")
+    else:
+        report = output_root / "Evidence" / "Build" / "product-build-report.json"
+        blend = output_root / "Source" / "Blender" / Path(job["blendPath"]).name
     command = [
         blender_executable(),
         "--python-use-system-env",
@@ -511,6 +524,11 @@ def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
         "--job",
         str(job_path),
     ]
+    if variant_id:
+        command.extend(["--variant", variant_id])
+    if output_root is not None:
+        command.extend(["--output-root", relative(output_root)])
+    started = time.perf_counter()
     completed = subprocess.run(
         command,
         cwd=ROOT,
@@ -518,14 +536,13 @@ def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
         capture_output=True,
         text=True,
     )
+    elapsed = time.perf_counter() - started
     log.write_text(
         completed.stdout + "\n--- STDERR ---\n" + completed.stderr,
         encoding="utf-8",
     )
-
-    quality: dict[str, Any] | None = None
-    if report.is_file():
-        quality = geometry_quality(read_object(report, "build report"))
+    payload = read_object(report, f"{label} build report") if report.is_file() else None
+    quality = geometry_quality(payload) if payload is not None else None
     accepted_quality_reject = (
         completed.returncode == 2
         and quality is not None
@@ -533,31 +550,151 @@ def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
     )
     if completed.returncode != 0 and not accepted_quality_reject:
         raise RuntimeError(
-            f"Blender build failed with exit code {completed.returncode}; "
+            f"Blender {label} build failed with exit code {completed.returncode}; "
             f"see {relative(log)}"
         )
-    if quality is None:
-        raise FileNotFoundError(f"build report was not created: {relative(report)}")
+    if payload is None or quality is None:
+        raise FileNotFoundError(f"{label} build report was not created")
+    return {
+        "variantId": str(payload.get("variantId", variant_id or "")),
+        "returnCode": completed.returncode,
+        "elapsedSeconds": elapsed,
+        "reportPath": report,
+        "blendPath": blend,
+        "logPath": log,
+        "report": payload,
+        "quality": quality,
+        "acceptedQualityReject": accepted_quality_reject,
+    }
 
-    blend = repo_path(job["blendPath"], label="blend")
+
+def stage_build(job_path: Path, job: Mapping[str, Any], result: Path) -> None:
+    product_id = str(job["id"])
+    base_run = _run_blender_build(job_path=job_path, job=job)
+    quality = base_run["quality"]
+    evidence_paths = [
+        base_run["blendPath"],
+        base_run["reportPath"],
+        base_run["logPath"],
+    ]
+    proof: dict[str, Any] = {
+        "schemaVersion": 1,
+        "productId": product_id,
+        "status": "PASS",
+        "baseVariant": base_run["report"]["variantId"],
+        "runs": [
+            {
+                "variantId": base_run["report"]["variantId"],
+                "kind": "base",
+                "geometryDigest": base_run["report"]["geometryDigest"],
+                "elapsedSeconds": base_run["elapsedSeconds"],
+                "qualityDecision": quality["decision"],
+            }
+        ],
+    }
+    if quality["passed"]:
+        variants_path = repo_path(
+            job["garmentPipeline"]["variantSpecPath"], label="variant spec"
+        )
+        variant_document = read_object(variants_path, "variant spec")
+        base_digest = str(base_run["report"]["geometryDigest"])
+        for variant in variant_document["variants"]:
+            variant_id = str(variant["id"])
+            variant_root = runtime_root(product_id) / "variants" / variant_id
+            variant_run = _run_blender_build(
+                job_path=job_path,
+                job=job,
+                variant_id=variant_id,
+                output_root=variant_root,
+            )
+            variant_quality = variant_run["quality"]
+            if not variant_quality["passed"]:
+                raise ValueError(
+                    f"variant {variant_id} failed geometry quality: "
+                    f"{variant_quality['failedChecks']}"
+                )
+            report_payload = variant_run["report"]
+            geometry_digest = str(report_payload["geometryDigest"])
+            if variant["kind"] == "color" and geometry_digest != base_digest:
+                raise ValueError(
+                    f"color variant {variant_id} unexpectedly changed geometry"
+                )
+            if variant["kind"] == "size":
+                if geometry_digest == base_digest:
+                    raise ValueError(
+                        f"size variant {variant_id} did not change geometry"
+                    )
+                width_scale = float(
+                    report_payload["patternToMesh"]["widthScale"]
+                )
+                expected_scale = float(
+                    variant["patternOverrides"]["lower-skirt-ring"]["widthScale"]
+                )
+                if abs(width_scale - expected_scale) > 1e-9:
+                    raise ValueError(
+                        f"size variant {variant_id} pattern scale was not consumed"
+                    )
+            invalidation = report_payload["variantInvalidation"]
+            if bool(invalidation["reuseGeometry"]) != (
+                variant["kind"] == "color"
+            ):
+                raise ValueError(
+                    f"variant {variant_id} invalidation contract is inconsistent"
+                )
+            proof["runs"].append(
+                {
+                    "variantId": variant_id,
+                    "kind": variant["kind"],
+                    "geometryDigest": geometry_digest,
+                    "elapsedSeconds": variant_run["elapsedSeconds"],
+                    "qualityDecision": variant_quality["decision"],
+                    "outputRoot": relative(variant_root),
+                    "patternWidthScale": report_payload["patternToMesh"]["widthScale"],
+                }
+            )
+            evidence_paths.extend(
+                [
+                    variant_run["reportPath"],
+                    variant_run["blendPath"],
+                    variant_run["logPath"],
+                    variant_root / "ProductManifest.json",
+                    variant_root / "Previews" / "geometry-check.png",
+                ]
+            )
+        proof["successfulCandidates"] = len(proof["runs"])
+        proof["attemptedCandidates"] = len(proof["runs"])
+        proof["geometryReuseVerified"] = True
+        proof["sizePropagationVerified"] = True
+    else:
+        proof["successfulCandidates"] = 0
+        proof["attemptedCandidates"] = 1
+        proof["geometryReuseVerified"] = False
+        proof["sizePropagationVerified"] = False
+
+    proof_path = write_json(
+        runtime_root(product_id) / "variants" / "variant-proof.json",
+        proof,
+    )
+    evidence_paths.append(proof_path)
     emit(
         result,
         stage="build-blender",
         product_id=product_id,
-        paths=[blend, report, log],
+        paths=evidence_paths,
         extra={
-            "blenderReturnCode": completed.returncode,
+            "blenderReturnCode": base_run["returnCode"],
             "executionDisposition": (
                 "COMPLETED_WITH_QUALITY_REJECT"
-                if accepted_quality_reject
+                if base_run["acceptedQualityReject"]
                 else "COMPLETED"
             ),
             "qualityDecision": quality["decision"],
             "geometryPassed": quality["passed"],
             "failedGeometryChecks": quality["failedChecks"],
+            "variantProofed": bool(proof.get("geometryReuseVerified")),
+            "candidateCount": len(proof["runs"]),
         },
     )
-
 
 def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
@@ -565,17 +702,87 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         f"{job['productRoot']}/Evidence/Build/cloth-simulation.json",
         label="cloth report",
     )
+    _require_stage_evidence(
+        product_id,
+        producer_stage="build-blender",
+        expected_path=report,
+    )
     payload = read_object(report, "cloth simulation report")
-    if payload.get("status") != "PASS" or not payload.get("cacheBaked"):
-        raise ValueError("cloth simulation report must record a baked PASS cache")
+    construction_path = repo_path(
+        job["garmentPipeline"]["constructionPath"], label="construction"
+    )
+    construction = read_object(construction_path, "construction")
+    simulation = construction.get("simulation", {})
+    method = simulation.get("method")
+    if payload.get("status") != "PASS" or payload.get("method") != method:
+        raise ValueError("cloth simulation method/status does not match construction")
+    if simulation.get("required") is True:
+        if payload.get("cacheBakedDuringBuild") is not True:
+            raise ValueError("cloth cache was not baked during the build")
+        if payload.get("cacheValidatedBeforeApply") is not True:
+            raise ValueError("cloth cache was not validated before apply")
+    if simulation.get("reusableCacheRequired") is False:
+        if payload.get("reusableCacheAvailable") is not False:
+            raise ValueError("applied cloth must not claim a reusable cache")
+
+    expected_inputs = {
+        "pattern": sha256(
+            repo_path(
+                job["garmentPipeline"]["patternContractPath"],
+                label="pattern contract",
+            )
+        ),
+        "stitches": sha256(
+            repo_path(
+                job["garmentPipeline"]["stitchGraphPath"],
+                label="stitch graph",
+            )
+        ),
+        "materialRecipe": sha256(
+            repo_path(
+                job["garmentPipeline"]["materialRecipePath"],
+                label="material recipe",
+            )
+        ),
+    }
+    if payload.get("inputHashes") != expected_inputs:
+        raise ValueError("cloth report input hashes are stale")
+    blend = repo_path(job["blendPath"], label="blend")
+    if payload.get("blendSha256") != sha256(blend):
+        raise ValueError("cloth report does not match current blend")
+
+    frames = payload.get("evaluatedFrames")
+    expected_labels = list(simulation.get("requiredFrames", []))
+    if (
+        not isinstance(frames, list)
+        or [item.get("label") for item in frames] != expected_labels
+    ):
+        raise ValueError("cloth evaluated frames do not match construction contract")
+    for frame in frames:
+        meshes = frame.get("meshes")
+        if not isinstance(meshes, list) or not meshes:
+            raise ValueError("cloth evaluated frame is missing meshes")
+        for mesh in meshes:
+            digest = mesh.get("meshDigest")
+            if (
+                mesh.get("finiteBounds") is not True
+                or not isinstance(digest, str)
+                or len(digest) != 64
+            ):
+                raise ValueError("cloth evaluated mesh proof is invalid")
+
     emit(
         result,
         stage="simulate-cloth",
         product_id=product_id,
-        paths=[report],
-        extra={"cacheBaked": True, "frameEnd": payload.get("frameEnd")},
+        paths=[report, construction_path, blend],
+        extra={
+            "simulationMethod": method,
+            "cacheValidatedBeforeApply": True,
+            "reusableCacheAvailable": False,
+            "evaluatedFrameCount": len(frames),
+        },
     )
-
 
 def stage_export(job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
