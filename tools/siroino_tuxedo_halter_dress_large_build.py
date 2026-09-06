@@ -87,47 +87,52 @@ def find_pattern_piece(pattern: dict, piece_id: str) -> dict:
     return matches[0]
 
 
-def create_materials(texture_dir: Path) -> tuple[dict[str, Path], dict[str, object]]:
-    maps = make_image_maps(texture_dir)
+def create_materials(
+    texture_dir: Path,
+    recipe: dict,
+) -> tuple[dict[str, Path], dict[str, object]]:
+    map_sets = recipe.get("mapSets")
+    material_specs = recipe.get("materials")
+    if not isinstance(map_sets, dict) or not isinstance(material_specs, dict):
+        raise ValueError("material recipe must contain mapSets and materials")
+    maps = make_image_maps(texture_dir, map_sets)
+
+    def textured(key: str) -> object:
+        spec = material_specs.get(key)
+        if not isinstance(spec, dict):
+            raise ValueError(f"material recipe entry is missing: {key}")
+        map_set = spec.get("mapSet")
+        if not isinstance(map_set, str) or map_set not in map_sets:
+            raise ValueError(f"material {key!r} mapSet is invalid")
+        return textured_material(
+            str(spec["materialName"]),
+            maps[f"{map_set}_albedo"],
+            maps[f"{map_set}_normal"],
+            maps[f"{map_set}_roughness"],
+            sheen=float(spec.get("sheen", 0.0)),
+            alpha=float(spec.get("alpha", 1.0)),
+        )
+
+    silver = material_specs.get("silver")
+    if not isinstance(silver, dict):
+        raise ValueError("silver material recipe is required")
+    color = silver.get("baseColorRgba")
+    if not isinstance(color, list) or len(color) != 4:
+        raise ValueError("silver baseColorRgba is invalid")
+
     materials = {
-        "wine": textured_material(
-            "MAT_Wine_Satin",
-            maps["wine_satin_albedo"],
-            maps["wine_satin_normal"],
-            maps["wine_satin_roughness"],
-            sheen=0.26,
-        ),
-        "black": textured_material(
-            "MAT_Black_Satin",
-            maps["black_satin_albedo"],
-            maps["black_satin_normal"],
-            maps["black_satin_roughness"],
-            sheen=0.18,
-        ),
-        "sheer": textured_material(
-            "MAT_Black_Sheer",
-            maps["black_satin_albedo"],
-            maps["black_satin_normal"],
-            maps["black_satin_roughness"],
-            sheen=0.08,
-            alpha=0.52,
-        ),
-        "white": textured_material(
-            "MAT_White_Jacquard",
-            maps["white_jacquard_albedo"],
-            maps["white_jacquard_normal"],
-            maps["white_jacquard_roughness"],
-            sheen=0.10,
-        ),
+        "wine": textured("wine"),
+        "black": textured("black"),
+        "sheer": textured("sheer"),
+        "white": textured("white"),
         "silver": base.plain_material(
-            "MAT_Silver_Hardware",
-            (0.64, 0.69, 0.76, 1.0),
-            roughness=0.18,
-            metallic=0.92,
+            str(silver["materialName"]),
+            tuple(float(value) for value in color),
+            roughness=float(silver["roughness"]),
+            metallic=float(silver["metallic"]),
         ),
     }
     return maps, materials
-
 
 def add_bodice(
     body: bpy.types.Object,
@@ -395,13 +400,20 @@ def main() -> int:
         raise ValueError("pattern contract product identity mismatch")
     shutil.copyfile(tracked_pattern, pattern_dir / "tuxedo-halter.pattern.json")
 
+    tracked_material_recipe = repo_path(
+        job["garmentPipeline"]["materialRecipePath"]
+    )
+    material_recipe = read_json(tracked_material_recipe)
+    if material_recipe.get("productId") != PRODUCT_ID:
+        raise ValueError("material recipe product identity mismatch")
+
     bpy.ops.import_scene.fbx(filepath=str(source), use_anim=False)
     body, armature = g.select_body_and_armature()
     armature.name = "SiroinoSotai_Armature"
     profile = g.apply_large_profile(body, job.get("bodyShapeProfile"))
     base.set_skin_material(body)
 
-    maps, materials = create_materials(texture_dir)
+    maps, materials = create_materials(texture_dir, material_recipe)
     geometry_variables = job.get("geometryVariables", {})
     if not isinstance(geometry_variables, dict):
         raise ValueError("job geometryVariables must be an object")
@@ -535,6 +547,16 @@ def main() -> int:
         "targetAvatarAssetPath": job["targetAvatarAssetPath"],
         "targetSourcePath": job["targetSourcePath"],
         "blenderVersion": bpy.app.version_string,
+        "materialRecipe": {
+            "path": str(tracked_material_recipe.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": base.sha256(tracked_material_recipe),
+            "recipeVersion": material_recipe["recipeVersion"],
+            "regions": {
+                key: value.get("regions", [])
+                for key, value in material_recipe["materials"].items()
+                if isinstance(value, dict)
+            },
+        },
         "patternDrivenGeometry": {
             "patternPath": str(tracked_pattern.relative_to(ROOT)).replace("\\", "/"),
             "patternSha256": base.sha256(tracked_pattern),
