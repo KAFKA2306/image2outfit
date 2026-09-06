@@ -130,6 +130,53 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
     if not report_path.is_file():
         raise FileNotFoundError(report_path)
     report = read_object(report_path)
+
+    cloth_report_path = (
+        product_root / "Evidence" / "Build" / "cloth-simulation.json"
+    )
+    if not cloth_report_path.is_file():
+        raise FileNotFoundError(cloth_report_path)
+    cloth_report = read_object(cloth_report_path)
+    snapshot_relative = cloth_report.get("cacheSnapshot")
+    if not isinstance(snapshot_relative, str) or not snapshot_relative:
+        raise ValueError(f"cloth cache snapshot missing for {item['variantId']}")
+    snapshot_path = ROOT / snapshot_relative
+    reopen_path = item["contractPath"].parent / "cloth-cache-reopen.json"
+    reopen_command = [
+        blender,
+        str(snapshot_path),
+        "--background",
+        "--python-use-system-env",
+        "--python-exit-code",
+        "1",
+        "--python",
+        str(ROOT / "tools" / "verify_cloth_cache_snapshot.py"),
+        "--",
+        "--report",
+        str(cloth_report_path),
+        "--snapshot",
+        str(snapshot_path),
+        "--result",
+        str(reopen_path),
+    ]
+    reopened = subprocess.run(
+        reopen_command,
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if reopened.returncode != 0:
+        raise RuntimeError(
+            f"cloth cache reopen failed for {item['variantId']}: "
+            + reopened.stderr[-4000:]
+        )
+    reopen_evidence = read_object(reopen_path)
+    if reopen_evidence.get("status") != "PASS":
+        raise ValueError(
+            f"cloth cache reopen did not PASS for {item['variantId']}"
+        )
+
     if report.get("candidateId") != item["candidateId"]:
         raise ValueError(f"candidate identity mismatch for {item['variantId']}")
     fingerprint = report.get("geometryFingerprint")
@@ -176,6 +223,11 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
             "poseEvidenceCount": len(pose_views),
             "renderEvidenceSha256": render_hashes,
             "geometryPassed": bool(report.get("passed")),
+            "clothCacheReopenValidated": True,
+            "clothCacheReopenEvidencePath": reopen_path.relative_to(ROOT).as_posix(),
+            "clothCacheReopenObjectCount": len(
+                reopen_evidence.get("objects", [])
+            ),
             "shapeProfileEvidence": target_profile,
             "weightNormalizationEvidence": {
                 "objects": weight_normalization.get("objects"),
@@ -221,6 +273,11 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         raise ValueError("baseline/color production candidate did not PASS")
     if size["status"] != "PASS":
         raise ValueError("size production candidate did not PASS")
+    for role in ("BASELINE", "COLOR", "SIZE", "MATERIAL_CONTROL"):
+        if roles[role].get("clothCacheReopenValidated") is not True:
+            raise ValueError(f"{role} cloth cache was not validated after reopen")
+        if int(roles[role].get("clothCacheReopenObjectCount", 0)) < 2:
+            raise ValueError(f"{role} reopened cloth object evidence is incomplete")
     if baseline["geometryFingerprint"] != color["geometryFingerprint"]:
         raise ValueError("color variant changed geometry")
     if baseline["materialRecipeSha256"] == color["materialRecipeSha256"]:
@@ -309,6 +366,7 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         "roughnessControlMaterialChanged": True,
         "roughnessControlRenderChanged": True,
         "roughnessControlChangedRenderKeys": roughness_changed_render_keys,
+        "clothCacheReopenValidated": True,
         "negativeControlFailed": True,
         "baselinePreservedAfterFailure": True,
         "canonicalSuccessfulCandidates": 3,
