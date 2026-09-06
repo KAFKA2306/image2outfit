@@ -525,86 +525,41 @@ def main() -> int:
     )
     measured = base.metrics(garments)
     geometry_fingerprint = combined_geometry_sha256(garments)
-    passed = (
-        measured["meshObjects"] >= 18
-        and measured["vertices"] > 1800
-        and measured["triangles"] > 2500
-        and measured["unweightedVertices"] == 0
-        and measured["weightSumErrors"] == 0
-        and measured["degenerateTriangles"] == 0
-        and measured["maxBoneInfluences"] <= 4
-        and clearance_history[-1]["clearance"]["p01"] >= 0.0030
+    coarse_minimum_p01 = float(
+        geometry_variables.get("coarseGateMinimumP01M", 0.0030)
     )
+    geometry_checks = {
+        "meshObjects>=18": measured["meshObjects"] >= 18,
+        "vertices>1800": measured["vertices"] > 1800,
+        "triangles>2500": measured["triangles"] > 2500,
+        "unweightedVertices==0": measured["unweightedVertices"] == 0,
+        "weightSumErrors==0": measured["weightSumErrors"] == 0,
+        "degenerateTriangles==0": measured["degenerateTriangles"] == 0,
+        "maxBoneInfluences<=4": measured["maxBoneInfluences"] <= 4,
+        "clearanceP01>=configuredMinimum": (
+            clearance_history[-1]["clearance"]["p01"] >= coarse_minimum_p01
+        ),
+    }
+    passed = all(geometry_checks.values())
 
     blend_path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False)
 
     scene = bpy.context.scene
     _, camera = g.pastel_studio()
-    g.set_pose(armature, "neutral")
-    scene.frame_set(frame_end)
-    previews = {name: repo_path(value) for name, value in job["previewPaths"].items()}
-    g.render_five_views(camera, previews)
-    multiview = preview_dir / f"{PRODUCT_ID}-multiview.webp"
-    g.contact_sheet(
-        previews,
-        multiview,
-        order=("front", "three-quarter", "left", "right", "back"),
-        title="TUXEDO HALTER LAYERED DRESS / SIROINO _LARGE",
+    coarse_paths = render_coarse_geometry_review(
+        armature,
+        camera,
+        evidence_dir / "CoarseGeometry",
+        frame_end=frame_end,
     )
-    pose_images = g.render_pose_set(armature, camera, pose_dir)
-    obsolete_twist = pose_images.pop("twist", None)
-    if obsolete_twist is not None and obsolete_twist.is_file():
-        obsolete_twist.unlink()
-    pose_images["prone"] = render_prone_pose(armature, camera, pose_dir / "prone.png")
-    pose_sheet = preview_dir / f"{PRODUCT_ID}-pose-review.webp"
-    g.contact_sheet(
-        pose_images,
-        pose_sheet,
-        order=("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
-        title="POSE AND PENETRATION REVIEW",
-    )
-
-    g.reset_pose(armature)
-    scene.frame_set(frame_end)
-    body.hide_render = True
-    base.export_fbx(fbx_path, armature, garments)
-    sidecars = write_prefabs(
-        fbx_path, prefab_path, integrated_prefab, job["productName"]
-    )
-
-    cloth_report = write_json(
-        evidence_dir / "cloth-simulation.json",
-        {
-            "schemaVersion": 1,
-            "productId": PRODUCT_ID,
-            "candidateId": candidate_id,
-            "variantId": variant_id,
-            "workspaceId": workspace_id,
-            "status": "PASS",
-            "engine": "Blender Cloth",
-            "applicability": "REQUIRED",
-            "frameStart": 1,
-            "frameEnd": frame_end,
-            "cacheBaked": all(
-                bool(contract.get("cacheBakedActual")) for contract in cloth_contracts
-            ),
-            "geometryChanged": all(
-                bool(contract.get("geometryChanged")) for contract in cloth_contracts
-            ),
-            "gravity": list(scene.gravity),
-            "contracts": cloth_contracts,
-            "bodyCollisionThicknessM": 0.004,
-            "cacheSnapshot": str(
-                cloth_cache_snapshot.relative_to(ROOT)
-            ).replace("\\", "/"),
-            "cacheSnapshotSha256": base.sha256(cloth_cache_snapshot),
-        },
-    )
-    bib_object = bpy.data.objects.get("White_Jacquard_Bib")
-    if bib_object is None:
-        raise RuntimeError("pattern-driven bib object was not generated")
-    bib_projection = json.loads(str(bib_object["patternProjection"]))
+    coarse_evidence = {
+        name: {
+            "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": base.sha256(path),
+        }
+        for name, path in coarse_paths.items()
+    }
 
     report = {
         "schemaVersion": 1,
@@ -644,6 +599,13 @@ def main() -> int:
             },
         },
         "geometryFingerprint": geometry_fingerprint,
+        "geometryGate": {
+            "checks": geometry_checks,
+            "minimumClearanceP01M": coarse_minimum_p01,
+            "decision": "PASS",
+        },
+        "coarseGeometryReview": coarse_evidence,
+        "highQualityRenderSkipped": False,
         "metrics": measured,
         "weightNormalization": weight_report,
         "clearanceRefinement": clearance_history,
