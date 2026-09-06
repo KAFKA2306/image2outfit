@@ -74,6 +74,11 @@ class ProductionVariantTests(unittest.TestCase):
                 self.assertEqual(PRODUCT_ID, derived_job["id"])
                 self.assertEqual(PRODUCT_ID, derived_request["productId"])
                 self.assertEqual(item["candidateId"], derived_job["candidateId"])
+                self.assertTrue(
+                    derived_job["variantRuntimeRoot"].startswith(
+                        f".image2outfit/products/{PRODUCT_ID}/variants/"
+                    )
+                )
                 self.assertIn(
                     item["candidateId"],
                     derived_request["stageBindings"]["build-blender"]["resultPath"],
