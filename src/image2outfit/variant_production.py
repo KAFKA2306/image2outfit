@@ -84,6 +84,13 @@ def _validate_required_revalidation(variant: Mapping[str, Any]) -> list[str]:
     ):
         raise ValueError("variant requiredRevalidation must be a non-empty string list")
     kind = variant["kind"]
+    expected_result = variant["expectedResult"]
+    if expected_result == "FAIL":
+        required = {"initialize-3d", "build-blender"}
+        if not required.issubset(stages):
+            raise ValueError("failing variant must validate through its build boundary")
+        return list(stages)
+
     if kind == "COLOR":
         required = {"build-blender", "render-evidence", "visual-review"}
         if not required.issubset(stages):
