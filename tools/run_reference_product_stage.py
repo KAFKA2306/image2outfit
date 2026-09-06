@@ -213,6 +213,7 @@ def stage_normalize(job: Mapping[str, Any], result: Path) -> None:
         },
     )
 
+
 def validate_product_document(
     job: Mapping[str, Any], key: str, label: str
 ) -> tuple[Path, dict[str, Any]]:
@@ -294,6 +295,7 @@ def stage_static(job: Mapping[str, Any], stage: str, key: str, result: Path) -> 
         },
     )
 
+
 def stage_initialize(job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
     pattern_path, pattern = validate_product_document(
@@ -361,6 +363,7 @@ def stage_initialize(job: Mapping[str, Any], result: Path) -> None:
         paths=[pattern_path, stitch_path, report],
         extra=contract_summary or None,
     )
+
 
 def blender_executable() -> str:
     configured = os.environ.get("IMAGE2OUTFIT_BLENDER", "").strip()
@@ -484,7 +487,9 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     if payload.get("status") != "PASS":
         raise ValueError("cloth simulation report status must be PASS")
     if payload.get("applicability") != applicability:
-        raise ValueError("cloth report applicability does not match construction policy")
+        raise ValueError(
+            "cloth report applicability does not match construction policy"
+        )
 
     contracts = payload.get("contracts")
     if not isinstance(contracts, list):
@@ -496,7 +501,9 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         if (
             not isinstance(expected_components, list)
             or not expected_components
-            or not all(isinstance(value, str) and value for value in expected_components)
+            or not all(
+                isinstance(value, str) and value for value in expected_components
+            )
         ):
             raise ValueError("required cloth components must be declared")
         actual_components = [
@@ -553,6 +560,7 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
             "frameEnd": payload.get("frameEnd"),
         },
     )
+
 
 def stage_export(job: Mapping[str, Any], result: Path) -> None:
     product_id = str(job["id"])
