@@ -107,11 +107,12 @@ def sleeve_chain(
     lower_head = armature.matrix_world @ lower.head_local
     lower_tail = armature.matrix_world @ lower.tail_local
     cuff = lower_head.lerp(lower_tail, 0.78)
+    upper_axis = upper_tail - upper_head
     points = [
-        upper_head.lerp(upper_tail, 0.10),
-        upper_head.lerp(upper_tail, 0.32),
-        upper_head.lerp(upper_tail, 0.58),
-        upper_head.lerp(upper_tail, 0.84),
+        upper_head - upper_axis * 0.06,
+        upper_head.lerp(upper_tail, 0.22),
+        upper_head.lerp(upper_tail, 0.50),
+        upper_head.lerp(upper_tail, 0.80),
         upper_tail.lerp(lower_head, 0.50),
         lower_head.lerp(cuff, 0.25),
         lower_head.lerp(cuff, 0.50),
@@ -144,14 +145,14 @@ def create_sleeve(
             vertical = tangent.cross(front)
         vertical.normalize()
         front = vertical.cross(tangent).normalized()
-        shoulder_ease = min(1.0, t / 0.28)
-        half_height = 0.046 + 0.020 * shoulder_ease - 0.006 * t
-        half_depth = 0.034 + 0.011 * shoulder_ease
+        shoulder_ease = min(1.0, t / 0.30)
+        shoulder_bulge = math.sin(math.pi * shoulder_ease) if t <= 0.30 else 0.0
+        half_height = 0.061 + 0.007 * shoulder_bulge - 0.008 * t
+        half_depth = 0.043 + 0.004 * shoulder_bulge - 0.003 * t
         for segment in range(segments):
             angle = math.tau * segment / segments
-            offset = (
-                vertical * (math.cos(angle) * half_height)
-                + front * (math.sin(angle) * half_depth)
+            offset = vertical * (math.cos(angle) * half_height) + front * (
+                math.sin(angle) * half_depth
             )
             vertices.append(tuple(center + offset))
     for ring in range(len(points) - 1):
@@ -159,9 +160,7 @@ def create_sleeve(
         b = (ring + 1) * segments
         for segment in range(segments):
             next_segment = (segment + 1) % segments
-            faces.append(
-                (a + segment, a + next_segment, b + next_segment, b + segment)
-            )
+            faces.append((a + segment, a + next_segment, b + next_segment, b + segment))
     obj = v1.mesh_object(name, vertices, faces, material)
     obj["happiUpperBone"] = upper_name
     obj["happiLowerBone"] = lower_name
@@ -229,6 +228,46 @@ def create_collar_bridge(material: bpy.types.Material) -> bpy.types.Object:
     return obj
 
 
+def sleeve_root_contract(
+    armature: bpy.types.Object,
+) -> dict[str, object]:
+    result: dict[str, object] = {}
+    passed = True
+    for side in ("L", "R"):
+        obj = bpy.data.objects.get(f"Happi_Sleeve_{'Left' if side == 'L' else 'Right'}")
+        bone = armature.data.bones.get(f"UpperArm_{side}")
+        if obj is None or bone is None:
+            result[side] = {
+                "passed": False,
+                "reason": "missing sleeve or upper-arm bone",
+            }
+            passed = False
+            continue
+        segments = int(obj.get("happiRingSegments", 0))
+        if segments <= 0 or len(obj.data.vertices) < segments:
+            result[side] = {"passed": False, "reason": "invalid sleeve root ring"}
+            passed = False
+            continue
+        root_points = [
+            obj.matrix_world @ obj.data.vertices[index].co for index in range(segments)
+        ]
+        center = sum(root_points, Vector()) / segments
+        head = armature.matrix_world @ bone.head_local
+        radius = max((point - center).length for point in root_points)
+        center_offset = (center - head).length
+        overlap_margin = radius - center_offset
+        side_pass = overlap_margin >= 0.010
+        passed = passed and side_pass
+        result[side] = {
+            "rootRadiusM": radius,
+            "rootCenterToShoulderM": center_offset,
+            "overlapMarginM": overlap_margin,
+            "requiredMinimumOverlapMarginM": 0.010,
+            "passed": side_pass,
+        }
+    return {"passed": passed, "sides": result}
+
+
 def configure_cloth(
     panels: list[bpy.types.Object],
     body: bpy.types.Object,
@@ -245,10 +284,7 @@ def configure_cloth(
             vertex.index
             for vertex, coordinate in zip(panel.data.vertices, coordinates)
             if coordinate.z > 0.965
-            or (
-                panel.name.startswith("Happi_Front")
-                and abs(coordinate.x) <= 0.055
-            )
+            or (panel.name.startswith("Happi_Front") and abs(coordinate.x) <= 0.055)
         ]
         pin = panel.vertex_groups.new(name="HappiClothPin")
         pin.add(selected, 1.0, "REPLACE")
@@ -373,14 +409,14 @@ def postprocess(job: dict, result: int) -> int:
 
     report = v1.read_json(report_path)
     clearance = float(report["clearanceRefinement"][-1]["clearance"]["p01"])
-    mean_clearance = float(
-        report["clearanceRefinement"][-1]["clearance"]["mean"]
-    )
+    mean_clearance = float(report["clearanceRefinement"][-1]["clearance"]["mean"])
     front_opening = float(report["frontOpeningM"])
+    root_contract = sleeve_root_contract(bpy.data.objects["SiroinoSotai_Armature"])
     fit_pass = (
         0.006 <= clearance <= 0.035
         and mean_clearance <= 0.050
         and 0.025 <= front_opening <= 0.090
+        and root_contract["passed"]
     )
     report["passed"] = bool(report["passed"] and fit_pass)
     report["silhouetteRevision"] = "v2-shaped-shell-long-sleeve"
@@ -394,10 +430,11 @@ def postprocess(job: dict, result: int) -> int:
             "frontOpeningM": [0.025, 0.090],
         },
         "status": "PASS" if fit_pass else "FAIL",
+        "sleeveRootContract": root_contract,
     }
     report["notes"] = [
         "The body uses curved front and back panels with sloped shoulder seams.",
-        "Sleeves run from the upper arm to before the wrist and blend across the elbow.",
+        "Sleeves overlap the shoulder seam at the root, then taper through upper-arm/lower-arm blended weights.",
         "The collar bridge shares the chest frame with the front bands to stay connected.",
         "The fit gate rejects both body penetration and an oversized rigid box.",
         "No manufacturer, product code, text, or crest is asserted.",
@@ -425,13 +462,13 @@ def postprocess(job: dict, result: int) -> int:
 
     readme = product_root / "README.md"
     readme.write_text(
-        f"""# {job['productName']}
+        f"""# {job["productName"]}
 
 Product ID: `{PRODUCT_ID}`  
-State: **{manifest['status']}**  
+State: **{manifest["status"]}**  
 Target: **SiroinoSotai_PC**
 
-The private source is bound only as `{manifest['sourceReference']}`; the original
+The private source is bound only as `{manifest["sourceReference"]}`; the original
 image is not redistributed.
 
 ## Generated construction
@@ -444,7 +481,7 @@ image is not redistributed.
 
 ## Current boundary
 
-Technical evidence is recorded in `{manifest['outputs']['buildReport']}`. The fit
+Technical evidence is recorded in `{manifest["outputs"]["buildReport"]}`. The fit
 envelope also rejects excessive body clearance, not only penetration. Silhouette
 and styling stay pending until the current five-view and six-pose images are
 opened directly; metrics alone cannot make this product COMPLETE.
