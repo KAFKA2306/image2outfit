@@ -142,7 +142,12 @@ def build_review_bundle(
     required_poses = list(direct["requiredPoses"])
     previews = dict(job.get("previewPaths") or {})
     poses = dict(job.get("posePaths") or {})
-    product_root = repo_path(job["productRoot"])
+    product_root_value = job.get("productRoot")
+    product_root = (
+        repo_path(product_root_value)
+        if isinstance(product_root_value, str) and product_root_value
+        else manifest_path.parent
+    )
     for pose in required_poses:
         if pose in poses:
             continue
