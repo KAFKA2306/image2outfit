@@ -79,10 +79,13 @@ class ProductionVariantTests(unittest.TestCase):
                         f".image2outfit/products/{PRODUCT_ID}/variants/"
                     )
                 )
-                self.assertIn(
-                    item["candidateId"],
-                    derived_request["stageBindings"]["build-blender"]["resultPath"],
+                build_result_path = derived_request["stageBindings"]["build-blender"]["resultPath"]
+                self.assertIn(item["candidateId"], build_result_path)
+                self.assertNotIn("/stages/stages/", build_result_path)
+                build_command = " ".join(
+                    derived_request["stageBindings"]["build-blender"]["command"]
                 )
+                self.assertNotIn("/stages/stages/", build_command)
                 self.assertIn(
                     "variantFingerprint",
                     derived_request["variables"],
