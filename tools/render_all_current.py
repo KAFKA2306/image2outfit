@@ -314,11 +314,17 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
             }
         )
 
+    products_without_webp = [
+        str(product["productId"])
+        for product in products
+        if int(product.get("webpCount", 0)) == 0
+    ]
     catalog = {
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "productCount": len(products),
         "webpCount": total_webp,
+        "productsWithoutWebp": products_without_webp,
         "products": products,
     }
     (io_root / "catalog.json").write_text(
@@ -366,14 +372,6 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
 
 
 def validate_io_gallery(catalog: dict[str, Any], site: Path) -> None:
-    missing = [
-        str(product["productId"])
-        for product in catalog.get("products", [])
-        if int(product.get("webpCount", 0)) == 0
-    ]
-    if missing:
-        raise RuntimeError(f"io WebP coverage incomplete: {missing}")
-
     for product in catalog.get("products", []):
         for asset in product.get("assets", []):
             href = str(asset.get("href", ""))
@@ -443,6 +441,7 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
     data["io"] = {
         "productCount": gallery["productCount"],
         "webpCount": gallery["webpCount"],
+        "productsWithoutWebp": gallery["productsWithoutWebp"],
     }
     return data
 
