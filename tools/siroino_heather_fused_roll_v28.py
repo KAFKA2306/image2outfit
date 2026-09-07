@@ -18,7 +18,7 @@ import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
-import siroino_heather_closed_components_v27 as base
+import siroino_heather_component_foundation as base
 
 DESIGN_REVISION = "v28-flat-saddle-contoured-cap-hood-roll"
 RESEARCH_OUTPUT = Path(
