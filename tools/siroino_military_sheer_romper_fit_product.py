@@ -575,7 +575,7 @@ def build(
             ),
             cloth,
             values,
-            offset=0.034,
+            offset=0.043,
             thickness=0.0025,
         )
     )
@@ -603,7 +603,7 @@ def build(
             lambda point: z(0.42) <= point.z <= z(0.56),
             cloth,
             values,
-            offset=0.040,
+            offset=0.057,
             thickness=0.0028,
         )
     )
