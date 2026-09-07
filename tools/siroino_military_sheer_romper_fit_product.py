@@ -145,6 +145,63 @@ def finish(
     return result
 
 
+def finish_surface(
+    obj: bpy.types.Object,
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    values: dict[str, float],
+    source_indices: list[int],
+    *,
+    fit_audit: bool,
+) -> bpy.types.Object:
+    """Transfer weights/shape keys from the exact source vertices used for extraction."""
+    if len(source_indices) != len(obj.data.vertices):
+        raise RuntimeError(
+            f"source vertex map mismatch for {obj.name}: "
+            f"{len(source_indices)} != {len(obj.data.vertices)}"
+        )
+
+    world = obj.matrix_world.copy()
+    groups = {
+        group.name: obj.vertex_groups.new(name=group.name)
+        for group in body.vertex_groups
+    }
+    for vertex, source_index in zip(
+        obj.data.vertices,
+        source_indices,
+        strict=True,
+    ):
+        assignments = body.data.vertices[source_index].groups
+        total = sum(item.weight for item in assignments)
+        if total <= 0.0:
+            continue
+        for assignment in assignments:
+            source_group = body.vertex_groups[assignment.group]
+            groups[source_group.name].add(
+                [vertex.index],
+                assignment.weight / total,
+                "REPLACE",
+            )
+
+    fit.add_nearest_shape_keys(obj, body, source_indices, values)
+    parent = body.parent if body.parent is not None else armature
+    obj.parent = parent
+    if body.parent is not None:
+        obj.parent_type = body.parent_type
+        obj.parent_bone = body.parent_bone
+        obj.matrix_parent_inverse = body.matrix_parent_inverse.copy()
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+    obj["image2outfit_role"] = "garment"
+    obj["image2outfit_fit_audit"] = fit_audit
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = True
+    obj.matrix_world = world
+    bpy.context.view_layer.update()
+    return obj
+
+
 def extract(
     body: bpy.types.Object,
     armature: bpy.types.Object,
@@ -200,11 +257,13 @@ def extract(
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     obj.matrix_world = body.matrix_world.copy()
-    obj = fit.finish_skinned(
+    source_indices = list(used.keys())
+    obj = finish_surface(
         obj,
         body,
         armature,
         values,
+        source_indices,
         fit_audit=fit_audit,
     )
     obj["image2outfit_base_vertex_count"] = len(obj.data.vertices)
@@ -575,7 +634,7 @@ def build(
             ),
             cloth,
             values,
-            offset=0.043,
+            offset=0.034,
             thickness=0.0025,
         )
     )
@@ -603,7 +662,7 @@ def build(
             lambda point: z(0.42) <= point.z <= z(0.56),
             cloth,
             values,
-            offset=0.057,
+            offset=0.040,
             thickness=0.0028,
         )
     )
@@ -795,7 +854,7 @@ def main() -> int:
     fit.build_outfit = build
     fit.target_fit_audit = target_fit_audit
     fit.configure_scene = scene
-    fit.REVISION = "siroino-pc-base-surface-fit-v13-local-chain-attachment"
+    fit.REVISION = "siroino-pc-base-surface-fit-v14-exact-surface-source"
     return fit.main()
 
 
