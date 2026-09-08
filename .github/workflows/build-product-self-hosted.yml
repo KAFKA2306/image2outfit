@@ -42,7 +42,7 @@ concurrency:
 
 jobs:
   candidate:
-    runs-on: self-hosted
+    runs-on: [self-hosted, windows, x64, image2outfit]
     timeout-minutes: 240
 
     steps:

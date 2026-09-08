@@ -211,6 +211,49 @@
       "additionalProperties": {
         "type": "number"
       }
+    },
+    "unityReady": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimumDistinctMaterials",
+        "materialRoles"
+      ],
+      "properties": {
+        "minimumDistinctMaterials": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "materialRoles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "material",
+              "role"
+            ],
+            "properties": {
+              "material": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "fabric",
+                  "trim",
+                  "metal",
+                  "accent",
+                  "transparent",
+                  "other"
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

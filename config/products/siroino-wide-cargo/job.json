@@ -43,8 +43,6 @@
     "Assets/GenWorks/siroino-wide-cargo/Materials/MAT_Black_Cargo_Fabric.mat.meta",
     "Assets/GenWorks/siroino-wide-cargo/Materials/MAT_Black_Cargo_Straps.mat",
     "Assets/GenWorks/siroino-wide-cargo/Materials/MAT_Black_Cargo_Straps.mat.meta",
-    "Assets/GenWorks/siroino-wide-cargo/Materials/MAT_Brushed_Gunmetal.mat",
-    "Assets/GenWorks/siroino-wide-cargo/Materials/MAT_Brushed_Gunmetal.mat.meta",
     "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
     "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab.meta",
     "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab",
@@ -55,7 +53,8 @@
     "Assets/GenWorks/siroino-wide-cargo/Previews/right.png",
     "Assets/GenWorks/siroino-wide-cargo/Previews/three-quarter.png",
     "Assets/GenWorks/siroino-wide-cargo/Previews/siroino-wide-cargo-multiview.webp",
-    "Assets/GenWorks/siroino-wide-cargo/Previews/siroino-wide-cargo-pose-review.webp"
+    "Assets/GenWorks/siroino-wide-cargo/Previews/siroino-wide-cargo-pose-review.webp",
+    "Assets/GenWorks/siroino-wide-cargo/Evidence/Unity/unity-ready.json"
   ],
   "previewPaths": {
     "front": "Assets/GenWorks/siroino-wide-cargo/Previews/front.png",
@@ -69,5 +68,18 @@
     "pose-penetration-review": "Assets/_Local/Evidence/siroino-wide-cargo/pose-penetration-review.json",
     "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-wide-cargo/vrchat-runtime-review.json"
   },
-  "allowedExtraBones": []
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 2,
+    "materialRoles": [
+      {
+        "material": "MAT_Black_Cargo_Fabric",
+        "role": "fabric"
+      },
+      {
+        "material": "MAT_Black_Cargo_Straps",
+        "role": "trim"
+      }
+    ]
+  }
 }

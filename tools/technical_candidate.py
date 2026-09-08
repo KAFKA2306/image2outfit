@@ -57,6 +57,56 @@ def run_command(
     return process.returncode
 
 
+def record_unity_ready_product_state(
+    job: dict[str, Any],
+    report: dict[str, Any],
+    artifact: Path,
+) -> Path:
+    if report.get("unityReadyStatus") != "VERIFIED":
+        raise ValueError("cannot record Unity-ready state from an unverified report")
+
+    product_root = candidate_contract.path(job["productRoot"])
+    evidence = product_root / "Evidence" / "Unity" / "unity-ready.json"
+    evidence.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(artifact / "unity-ready.json", evidence)
+
+    manifest_path = candidate_contract.path(job["productManifestPath"])
+    manifest = candidate_contract.read(manifest_path)
+    if not manifest_path.is_file() or not manifest:
+        raise FileNotFoundError(
+            "ProductManifest.json is missing after Unity-ready validation"
+        )
+
+    technical = manifest.setdefault("technicalGates", {})
+    if not isinstance(technical, dict):
+        raise ValueError("ProductManifest technicalGates must be an object")
+    technical.update(
+        {
+            "unityImport": "PASS",
+            "prefabSerialized": "PASS",
+            "prefabReload": "PASS",
+            "modularAvatar": "PASS",
+            "ndmf": "PASS",
+        }
+    )
+    release_readiness = manifest.setdefault("releaseReadiness", {})
+    if not isinstance(release_readiness, dict):
+        raise ValueError("ProductManifest releaseReadiness must be an object")
+    release_readiness["unityReady"] = {
+        "status": "VERIFIED",
+        "multiMaterialSetup": "VERIFIED",
+        "modularAvatarSetup": "VERIFIED",
+        "ndmfBake": "VERIFIED",
+        "reimport": "VERIFIED",
+        "targetAvatarAssetPath": job["targetAvatarAssetPath"],
+        "materialRoles": job["unityReady"]["materialRoles"],
+        "evidencePath": candidate_contract.rel(evidence),
+        "evidenceSha256": candidate_contract.digest(evidence),
+    }
+    candidate_contract.write(manifest_path, manifest)
+    return evidence
+
+
 def run_blender_structure_gate(job_path: Path) -> int:
     """Validate the current Blender scene without a legacy job adapter."""
     import bmesh  # type: ignore
@@ -297,6 +347,131 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
     else:
         stages["unityStatic"] = {"passed": False, "error": "not run"}
 
+    unity_ready_report: dict[str, Any] = {}
+    if stages["unityStatic"]["passed"] and isinstance(job.get("unityReady"), dict):
+        immutable_before = {
+            "fbx": candidate_contract.digest(
+                candidate_contract.path(job["fbxAssetPath"])
+            ),
+            "targetAvatar": candidate_contract.digest(
+                candidate_contract.path(job["targetAvatarAssetPath"])
+            ),
+        }
+        material_exit = run_command(
+            [
+                unity,
+                "-batchmode",
+                "-projectPath",
+                str(ROOT),
+                "-executeMethod",
+                "GenWorks.Editor.GenWorksMaterialExtractor.RunFromCommandLine",
+                "-image2outfitJob",
+                str(job_path),
+                "-image2outfitArtifactDir",
+                str(artifact),
+                "-logFile",
+                str(artifact / "unity-materials.log"),
+            ],
+            artifact / "unity-materials-process.log",
+        )
+        material_report = candidate_contract.read(artifact / "materials.json")
+        minimum_materials = int(job["unityReady"].get("minimumDistinctMaterials", 1))
+        material_assets = material_report.get("materialAssets", [])
+        stages["unityMaterials"] = {
+            "passed": (
+                material_exit == 0
+                and material_report.get("passed") is True
+                and isinstance(material_assets, list)
+                and len(material_assets) >= minimum_materials
+            ),
+            "exitCode": material_exit,
+            "materialAssets": material_assets
+            if isinstance(material_assets, list)
+            else [],
+            "errors": material_report.get("errors", []),
+        }
+
+        if stages["unityMaterials"]["passed"]:
+            ready_exit = run_command(
+                [
+                    unity,
+                    "-batchmode",
+                    "-projectPath",
+                    str(ROOT),
+                    "-executeMethod",
+                    "Image2Outfit.Editor.Pipeline.RunUnityReady",
+                    "-image2outfitJob",
+                    str(job_path),
+                    "-logFile",
+                    str(artifact / "unity-ready.log"),
+                ],
+                artifact / "unity-ready-process.log",
+            )
+            unity_ready_report = candidate_contract.read(artifact / "unity-ready.json")
+            stages["unityReady"] = {
+                "passed": (
+                    ready_exit == 0
+                    and unity_ready_report.get("passed") is True
+                    and unity_ready_report.get("unityReadyStatus") == "VERIFIED"
+                    and unity_ready_report.get("multiMaterialValidated") is True
+                    and unity_ready_report.get("modularAvatarValidated") is True
+                    and unity_ready_report.get("reimportValidated") is True
+                ),
+                "exitCode": ready_exit,
+                "status": unity_ready_report.get("unityReadyStatus"),
+                "multiMaterialValidated": unity_ready_report.get(
+                    "multiMaterialValidated"
+                )
+                is True,
+                "modularAvatarValidated": unity_ready_report.get(
+                    "modularAvatarValidated"
+                )
+                is True,
+                "reimportValidated": unity_ready_report.get("reimportValidated")
+                is True,
+                "metrics": unity_ready_report.get("metrics", {}),
+                "errors": unity_ready_report.get("errors", []),
+            }
+        else:
+            stages["unityReady"] = {"passed": False, "error": "material setup failed"}
+
+        immutable_after = {
+            "fbx": candidate_contract.digest(
+                candidate_contract.path(job["fbxAssetPath"])
+            ),
+            "targetAvatar": candidate_contract.digest(
+                candidate_contract.path(job["targetAvatarAssetPath"])
+            ),
+        }
+        stages["unitySourceImmutability"] = {
+            "passed": immutable_before == immutable_after,
+            "before": immutable_before,
+            "after": immutable_after,
+        }
+        if (
+            stages["unityReady"]["passed"]
+            and stages["unitySourceImmutability"]["passed"]
+        ):
+            try:
+                evidence_path = record_unity_ready_product_state(
+                    job, unity_ready_report, artifact
+                )
+                stages["unityReadyProductState"] = {
+                    "passed": True,
+                    "evidencePath": candidate_contract.rel(evidence_path),
+                    "evidenceSha256": candidate_contract.digest(evidence_path),
+                }
+            except (OSError, ValueError, KeyError) as exc:
+                stages["unityReadyProductState"] = {
+                    "passed": False,
+                    "error": str(exc),
+                }
+        else:
+            stages["unityReadyProductState"] = {
+                "passed": False,
+                "error": "Unity-ready verification did not pass",
+            }
+
     if stages["unityStatic"]["passed"]:
         resolved_toolchain = audit_toolchain.audit(ROOT, require_unity_lock=True)
         candidate_contract.write(
@@ -335,6 +510,17 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination)
             copied.append(destination)
+        if isinstance(job.get("unityReady"), dict):
+            for report_name in ("materials.json", "unity-ready.json"):
+                source = artifact / report_name
+                if not source.is_file():
+                    raise FileNotFoundError(
+                        f"Unity-ready evidence missing after successful gate: {report_name}"
+                    )
+                destination = candidate / "Evidence" / report_name
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, destination)
+                copied.append(destination)
         candidate_contract.write(
             candidate_manifest_path,
             {
@@ -348,6 +534,43 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                 "sourceCommit": os.environ.get("GITHUB_SHA", "local"),
                 "inputHashes": candidate_contract.inputs(job_path, job),
                 "files": candidate_contract.manifest(copied, candidate),
+                "unityReady": (
+                    {
+                        "status": unity_ready_report.get("unityReadyStatus"),
+                        "multiMaterialSetup": (
+                            "VERIFIED"
+                            if unity_ready_report.get("multiMaterialValidated") is True
+                            else "UNVERIFIED"
+                        ),
+                        "modularAvatarSetup": (
+                            "VERIFIED"
+                            if unity_ready_report.get("modularAvatarValidated") is True
+                            else "UNVERIFIED"
+                        ),
+                        "ndmfBake": (
+                            "VERIFIED"
+                            if unity_ready_report.get("modularAvatarValidated") is True
+                            else "UNVERIFIED"
+                        ),
+                        "reimport": (
+                            "VERIFIED"
+                            if unity_ready_report.get("reimportValidated") is True
+                            else "UNVERIFIED"
+                        ),
+                        "targetAvatarAssetPath": job["targetAvatarAssetPath"],
+                        "evidencePath": (
+                            candidate_contract.rel(
+                                candidate_contract.path(job["productRoot"])
+                                / "Evidence"
+                                / "Unity"
+                                / "unity-ready.json"
+                            )
+                        ),
+                        "metrics": unity_ready_report.get("metrics", {}),
+                    }
+                    if isinstance(job.get("unityReady"), dict)
+                    else {"status": "NOT_REQUESTED"}
+                ),
                 "releaseDecision": "REVIEW_REQUIRED",
             },
         )
