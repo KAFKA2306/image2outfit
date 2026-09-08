@@ -27,13 +27,12 @@ class UnityReadyOutfitContractTest(unittest.TestCase):
         roles = {
             item["material"]: item["role"] for item in unity_ready["materialRoles"]
         }
-        self.assertGreaterEqual(unity_ready["minimumDistinctMaterials"], 2)
+        self.assertEqual(unity_ready["minimumDistinctMaterials"], 2)
         self.assertEqual(
             roles,
             {
                 "MAT_Black_Cargo_Fabric": "fabric",
                 "MAT_Black_Cargo_Straps": "trim",
-                "MAT_Brushed_Gunmetal": "metal",
             },
         )
 
