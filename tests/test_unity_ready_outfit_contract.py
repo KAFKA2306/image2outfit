@@ -42,6 +42,10 @@ class UnityReadyOutfitContractTest(unittest.TestCase):
             asset = f"Assets/GenWorks/siroino-wide-cargo/Materials/{material}.mat"
             self.assertIn(asset, delivery)
             self.assertIn(asset + ".meta", delivery)
+        self.assertIn(
+            "Assets/GenWorks/siroino-wide-cargo/Evidence/Unity/unity-ready.json",
+            delivery,
+        )
 
 
 if __name__ == "__main__":
