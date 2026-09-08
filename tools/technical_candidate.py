@@ -87,18 +87,19 @@ def record_unity_ready_product_state(
             "ndmf": "PASS",
         }
     )
-    manifest["releaseReadiness"] = {
-        "unityReady": {
-            "status": "VERIFIED",
-            "multiMaterialSetup": "VERIFIED",
-            "modularAvatarSetup": "VERIFIED",
-            "ndmfBake": "VERIFIED",
-            "reimport": "VERIFIED",
-            "targetAvatarAssetPath": job["targetAvatarAssetPath"],
-            "materialRoles": job["unityReady"]["materialRoles"],
-            "evidencePath": candidate_contract.rel(evidence),
-            "evidenceSha256": candidate_contract.digest(evidence),
-        }
+    release_readiness = manifest.setdefault("releaseReadiness", {})
+    if not isinstance(release_readiness, dict):
+        raise ValueError("ProductManifest releaseReadiness must be an object")
+    release_readiness["unityReady"] = {
+        "status": "VERIFIED",
+        "multiMaterialSetup": "VERIFIED",
+        "modularAvatarSetup": "VERIFIED",
+        "ndmfBake": "VERIFIED",
+        "reimport": "VERIFIED",
+        "targetAvatarAssetPath": job["targetAvatarAssetPath"],
+        "materialRoles": job["unityReady"]["materialRoles"],
+        "evidencePath": candidate_contract.rel(evidence),
+        "evidenceSha256": candidate_contract.digest(evidence),
     }
     candidate_contract.write(manifest_path, manifest)
     return evidence
