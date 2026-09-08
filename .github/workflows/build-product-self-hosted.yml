@@ -41,6 +41,63 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  runner-diagnostics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect Unity runner availability
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runners" > /tmp/runners.json
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          runners = json.loads(Path("/tmp/runners.json").read_text(encoding="utf-8")).get(
+              "runners", []
+          )
+          required = {"self-hosted", "windows", "x64", "image2outfit"}
+          report = []
+          target = []
+          for runner in runners:
+              labels = {
+                  label["name"]
+                  for label in runner.get("labels", [])
+                  if isinstance(label, dict) and isinstance(label.get("name"), str)
+              }
+              record = {
+                  "name": runner.get("name"),
+                  "status": runner.get("status"),
+                  "busy": runner.get("busy"),
+                  "labels": sorted(labels),
+                  "matchesUnityRunner": required.issubset(labels),
+              }
+              report.append(record)
+              if record["matchesUnityRunner"]:
+                  target.append(record)
+
+          value = {
+              "requiredLabels": sorted(required),
+              "registeredRunnerCount": len(runners),
+              "matchingRunners": target,
+              "runners": report,
+          }
+          print(json.dumps(value, ensure_ascii=False, indent=2))
+          summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          with summary.open("a", encoding="utf-8") as stream:
+              stream.write("## Unity self-hosted runner diagnostics\n\n")
+              stream.write(f"- Registered runners: {len(runners)}\n")
+              stream.write(f"- Matching runners: {len(target)}\n")
+              for runner in target:
+                  stream.write(
+                      f"- \`{runner['name']}\`: status=\`{runner['status']}\`, "
+                      f"busy=\`{runner['busy']}\`\n"
+                  )
+          PY
+
   candidate:
     runs-on: [self-hosted, windows, x64, image2outfit]
     timeout-minutes: 240
