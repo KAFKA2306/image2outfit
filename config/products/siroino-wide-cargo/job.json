@@ -69,5 +69,22 @@
     "pose-penetration-review": "Assets/_Local/Evidence/siroino-wide-cargo/pose-penetration-review.json",
     "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-wide-cargo/vrchat-runtime-review.json"
   },
-  "allowedExtraBones": []
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 3,
+    "materialRoles": [
+      {
+        "material": "MAT_Black_Cargo_Fabric",
+        "role": "fabric"
+      },
+      {
+        "material": "MAT_Black_Cargo_Straps",
+        "role": "trim"
+      },
+      {
+        "material": "MAT_Brushed_Gunmetal",
+        "role": "metal"
+      }
+    ]
+  }
 }
