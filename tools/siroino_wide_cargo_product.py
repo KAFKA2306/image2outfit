@@ -739,6 +739,29 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
         encoding="utf-8",
     )
 
+    artifact_dir = implementation.build.c.repo_path(job["artifactDir"])
+    build_report_path = artifact_dir / "blender-product.json"
+    build_report = (
+        json.loads(build_report_path.read_text(encoding="utf-8-sig"))
+        if build_report_path.is_file()
+        else {}
+    )
+    build_report["passed"] = bool(report["passed"])
+    build_report["finalAudit"] = {
+        "passed": bool(report["passed"]),
+        "unityReadyMaterialContractPassed": bool(
+            report.get("checks", {}).get("unityReadyMaterialContractPassed")
+        ),
+        "materialNames": report.get("checks", {})
+        .get("metrics", {})
+        .get("materialNames", []),
+    }
+    build_report_path.parent.mkdir(parents=True, exist_ok=True)
+    build_report_path.write_text(
+        json.dumps(build_report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
 
 def main() -> int:
     implementation = current
