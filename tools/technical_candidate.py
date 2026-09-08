@@ -73,7 +73,9 @@ def record_unity_ready_product_state(
     manifest_path = candidate_contract.path(job["productManifestPath"])
     manifest = candidate_contract.read(manifest_path)
     if not manifest_path.is_file() or not manifest:
-        raise FileNotFoundError("ProductManifest.json is missing after Unity-ready validation")
+        raise FileNotFoundError(
+            "ProductManifest.json is missing after Unity-ready validation"
+        )
 
     technical = manifest.setdefault("technicalGates", {})
     if not isinstance(technical, dict):
@@ -421,7 +423,8 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                     "modularAvatarValidated"
                 )
                 is True,
-                "reimportValidated": unity_ready_report.get("reimportValidated") is True,
+                "reimportValidated": unity_ready_report.get("reimportValidated")
+                is True,
                 "metrics": unity_ready_report.get("metrics", {}),
                 "errors": unity_ready_report.get("errors", []),
             }
