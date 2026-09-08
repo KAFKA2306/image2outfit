@@ -57,6 +57,53 @@ def run_command(
     return process.returncode
 
 
+def record_unity_ready_product_state(
+    job: dict[str, Any],
+    report: dict[str, Any],
+    artifact: Path,
+) -> Path:
+    if report.get("unityReadyStatus") != "VERIFIED":
+        raise ValueError("cannot record Unity-ready state from an unverified report")
+
+    product_root = candidate_contract.path(job["productRoot"])
+    evidence = product_root / "Evidence" / "Unity" / "unity-ready.json"
+    evidence.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(artifact / "unity-ready.json", evidence)
+
+    manifest_path = candidate_contract.path(job["productManifestPath"])
+    manifest = candidate_contract.read(manifest_path)
+    if not manifest_path.is_file() or not manifest:
+        raise FileNotFoundError("ProductManifest.json is missing after Unity-ready validation")
+
+    technical = manifest.setdefault("technicalGates", {})
+    if not isinstance(technical, dict):
+        raise ValueError("ProductManifest technicalGates must be an object")
+    technical.update(
+        {
+            "unityImport": "PASS",
+            "prefabSerialized": "PASS",
+            "prefabReload": "PASS",
+            "modularAvatar": "PASS",
+            "ndmf": "PASS",
+        }
+    )
+    manifest["releaseReadiness"] = {
+        "unityReady": {
+            "status": "VERIFIED",
+            "multiMaterialSetup": "VERIFIED",
+            "modularAvatarSetup": "VERIFIED",
+            "ndmfBake": "VERIFIED",
+            "reimport": "VERIFIED",
+            "targetAvatarAssetPath": job["targetAvatarAssetPath"],
+            "materialRoles": job["unityReady"]["materialRoles"],
+            "evidencePath": candidate_contract.rel(evidence),
+            "evidenceSha256": candidate_contract.digest(evidence),
+        }
+    }
+    candidate_contract.write(manifest_path, manifest)
+    return evidence
+
+
 def run_blender_structure_gate(job_path: Path) -> int:
     """Validate the current Blender scene without a legacy job adapter."""
     import bmesh  # type: ignore
@@ -391,6 +438,26 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             "before": immutable_before,
             "after": immutable_after,
         }
+        if stages["unityReady"]["passed"] and stages["unitySourceImmutability"]["passed"]:
+            try:
+                evidence_path = record_unity_ready_product_state(
+                    job, unity_ready_report, artifact
+                )
+                stages["unityReadyProductState"] = {
+                    "passed": True,
+                    "evidencePath": candidate_contract.rel(evidence_path),
+                    "evidenceSha256": candidate_contract.digest(evidence_path),
+                }
+            except (OSError, ValueError, KeyError) as exc:
+                stages["unityReadyProductState"] = {
+                    "passed": False,
+                    "error": str(exc),
+                }
+        else:
+            stages["unityReadyProductState"] = {
+                "passed": False,
+                "error": "Unity-ready verification did not pass",
+            }
 
     if stages["unityStatic"]["passed"]:
         resolved_toolchain = audit_toolchain.audit(ROOT, require_unity_lock=True)
@@ -478,6 +545,14 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                             else "UNVERIFIED"
                         ),
                         "targetAvatarAssetPath": job["targetAvatarAssetPath"],
+                        "evidencePath": (
+                            candidate_contract.rel(
+                                candidate_contract.path(job["productRoot"])
+                                / "Evidence"
+                                / "Unity"
+                                / "unity-ready.json"
+                            )
+                        ),
                         "metrics": unity_ready_report.get("metrics", {}),
                     }
                     if isinstance(job.get("unityReady"), dict)
