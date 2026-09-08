@@ -350,7 +350,9 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
     unity_ready_report: dict[str, Any] = {}
     if stages["unityStatic"]["passed"] and isinstance(job.get("unityReady"), dict):
         immutable_before = {
-            "fbx": candidate_contract.digest(candidate_contract.path(job["fbxAssetPath"])),
+            "fbx": candidate_contract.digest(
+                candidate_contract.path(job["fbxAssetPath"])
+            ),
             "targetAvatar": candidate_contract.digest(
                 candidate_contract.path(job["targetAvatarAssetPath"])
             ),
@@ -383,7 +385,9 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                 and len(material_assets) >= minimum_materials
             ),
             "exitCode": material_exit,
-            "materialAssets": material_assets if isinstance(material_assets, list) else [],
+            "materialAssets": material_assets
+            if isinstance(material_assets, list)
+            else [],
             "errors": material_report.get("errors", []),
         }
 
@@ -432,7 +436,9 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             stages["unityReady"] = {"passed": False, "error": "material setup failed"}
 
         immutable_after = {
-            "fbx": candidate_contract.digest(candidate_contract.path(job["fbxAssetPath"])),
+            "fbx": candidate_contract.digest(
+                candidate_contract.path(job["fbxAssetPath"])
+            ),
             "targetAvatar": candidate_contract.digest(
                 candidate_contract.path(job["targetAvatarAssetPath"])
             ),
@@ -442,7 +448,10 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             "before": immutable_before,
             "after": immutable_after,
         }
-        if stages["unityReady"]["passed"] and stages["unitySourceImmutability"]["passed"]:
+        if (
+            stages["unityReady"]["passed"]
+            and stages["unitySourceImmutability"]["passed"]
+        ):
             try:
                 evidence_path = record_unity_ready_product_state(
                     job, unity_ready_report, artifact
