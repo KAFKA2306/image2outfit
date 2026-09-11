@@ -194,6 +194,25 @@ def _record_candidate_failure(
     candidate_contract.write(audit_path, audit)
 
 
+def _state_protection(
+    candidate_had_original: bool,
+    workspace_had_original: bool,
+    release_had_original: bool,
+    failed: bool,
+) -> dict[str, Any]:
+    return {
+        "candidateLastGoodProtected": True,
+        "previousCandidateExisted": candidate_had_original,
+        "previousCandidateRestored": failed and candidate_had_original,
+        "canonicalWorkspaceProtected": True,
+        "previousWorkspaceExisted": workspace_had_original,
+        "previousWorkspaceRestored": failed and workspace_had_original,
+        "customerReleaseProtected": True,
+        "previousReleaseExisted": release_had_original,
+        "previousReleaseRestored": release_had_original,
+    }
+
+
 def _run_candidate(
     job_path: Path,
     job: dict[str, Any],
@@ -264,17 +283,12 @@ def _run_candidate(
 
         _augment_audit(
             artifact,
-            {
-                "candidateLastGoodProtected": True,
-                "previousCandidateExisted": candidate_had_original,
-                "previousCandidateRestored": result != 0 and candidate_had_original,
-                "canonicalWorkspaceProtected": True,
-                "previousWorkspaceExisted": workspace_had_original,
-                "previousWorkspaceRestored": result != 0 and workspace_had_original,
-                "customerReleaseProtected": True,
-                "previousReleaseExisted": release_had_original,
-                "previousReleaseRestored": release_had_original,
-            },
+            _state_protection(
+                candidate_had_original,
+                workspace_had_original,
+                release_had_original,
+                result != 0,
+            ),
         )
         return result
     except Exception:
@@ -282,5 +296,15 @@ def _run_candidate(
             release_tx.rollback(release_had_original)
         if workspace_started:
             workspace_tx.rollback(workspace_had_original)
+            workspace_started = False
         candidate_tx.rollback(candidate_had_original)
+        _augment_audit(
+            artifact,
+            _state_protection(
+                candidate_had_original,
+                workspace_had_original,
+                release_had_original,
+                True,
+            ),
+        )
         raise
