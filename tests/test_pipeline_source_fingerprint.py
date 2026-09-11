@@ -12,7 +12,10 @@ sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "src"))
 
 from image2outfit.pipeline import ExecutionMode, new_pipeline_state
-from pipeline_source_fingerprint import fingerprint_paths, pipeline_source_fingerprint
+from pipeline_source_fingerprint import (
+    fingerprint_paths,
+    pipeline_source_fingerprint,
+)
 from run_garment_pipeline import _identity_mismatches, _resume_or_reset
 
 
@@ -124,7 +127,9 @@ class PipelineSourceFingerprintTests(unittest.TestCase):
                 fingerprint_paths(root, [right]),
             )
 
-    def test_execution_semantic_dependencies_invalidate_checkpoint_identity(self) -> None:
+    def test_execution_semantic_dependencies_invalidate_checkpoint_identity(
+        self,
+    ) -> None:
         dependencies = (
             "src/image2outfit/runtime.py",
             "tools/runner.py",
@@ -143,7 +148,10 @@ class PipelineSourceFingerprintTests(unittest.TestCase):
             "uv.lock",
         )
         for relative in dependencies:
-            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as directory:
+            with (
+                self.subTest(relative=relative),
+                tempfile.TemporaryDirectory() as directory,
+            ):
                 root = Path(directory)
                 request_path, profile_path = make_source_fixture(root)
                 initial = fixture_fingerprint(root, request_path, profile_path)
@@ -157,7 +165,10 @@ class PipelineSourceFingerprintTests(unittest.TestCase):
                         path.read_text(encoding="utf-8") + "changed\n",
                         encoding="utf-8",
                     )
-                self.assertNotEqual(initial, fixture_fingerprint(root, request_path, profile_path))
+                self.assertNotEqual(
+                    initial,
+                    fixture_fingerprint(root, request_path, profile_path),
+                )
 
     def test_generated_runtime_outputs_do_not_change_source_fingerprint(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -174,7 +185,10 @@ class PipelineSourceFingerprintTests(unittest.TestCase):
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text("generated\n", encoding="utf-8")
 
-            self.assertEqual(initial, fixture_fingerprint(root, request_path, profile_path))
+            self.assertEqual(
+                initial,
+                fixture_fingerprint(root, request_path, profile_path),
+            )
 
     def test_missing_referenced_schema_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
