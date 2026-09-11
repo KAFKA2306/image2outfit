@@ -43,10 +43,13 @@ def validate_reopened_cloth_evidence(
         cloth_report.get("cacheSnapshotSha256"),
         label="cloth report cacheSnapshotSha256",
     )
-    if _hash(
-        reopened.get("cacheSnapshotSha256"),
-        label="reopened cacheSnapshotSha256",
-    ) != expected_snapshot:
+    if (
+        _hash(
+            reopened.get("cacheSnapshotSha256"),
+            label="reopened cacheSnapshotSha256",
+        )
+        != expected_snapshot
+    ):
         raise ValueError("reopened cloth snapshot hash mismatch")
 
     expected_contracts = cloth_report.get("contracts")
@@ -65,7 +68,9 @@ def validate_reopened_cloth_evidence(
             raise ValueError(f"cloth report contract {index} object is required")
         frames = contract.get("frameMeshSha256")
         if not isinstance(frames, Mapping) or len(frames) < 3:
-            raise ValueError(f"cloth report contract {name} frame hashes are incomplete")
+            raise ValueError(
+                f"cloth report contract {name} frame hashes are incomplete"
+            )
         expected[name] = {
             str(frame): _hash(digest, label=f"{name} frame {frame}")
             for frame, digest in frames.items()

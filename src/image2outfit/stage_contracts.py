@@ -252,8 +252,7 @@ def validate_producer_artifact_binding(
         )
     if producer_result.get("stage") != expected_stage:
         raise ValueError(
-            f"producer stage mismatch for role {expected_role}: "
-            f"{producer_result_path}"
+            f"producer stage mismatch for role {expected_role}: {producer_result_path}"
         )
     if producer_result.get("productId") != expected_product_id:
         raise ValueError(
@@ -262,8 +261,7 @@ def validate_producer_artifact_binding(
         )
     if producer_result.get("status") != "PASS":
         raise ValueError(
-            f"producer did not PASS for role {expected_role}: "
-            f"{producer_result_path}"
+            f"producer did not PASS for role {expected_role}: {producer_result_path}"
         )
     if producer_result.get("artifactRole") != expected_role:
         raise ValueError(
@@ -298,8 +296,7 @@ def validate_producer_artifact_binding(
     matches = [
         item
         for item in evidence
-        if isinstance(item, Mapping)
-        and item.get("path") == artifact_repository_path
+        if isinstance(item, Mapping) and item.get("path") == artifact_repository_path
     ]
     if len(matches) != 1:
         raise ValueError(

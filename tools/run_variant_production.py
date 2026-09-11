@@ -161,9 +161,7 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
         raise FileNotFoundError(report_path)
     report = read_object(report_path)
 
-    cloth_report_path = (
-        product_root / "Evidence" / "Build" / "cloth-simulation.json"
-    )
+    cloth_report_path = product_root / "Evidence" / "Build" / "cloth-simulation.json"
     if not cloth_report_path.is_file():
         raise FileNotFoundError(cloth_report_path)
     cloth_report = read_object(cloth_report_path)
@@ -203,9 +201,7 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
         )
     reopen_evidence = read_object(reopen_path)
     if reopen_evidence.get("status") != "PASS":
-        raise ValueError(
-            f"cloth cache reopen did not PASS for {item['variantId']}"
-        )
+        raise ValueError(f"cloth cache reopen did not PASS for {item['variantId']}")
 
     if report.get("candidateId") != item["candidateId"]:
         raise ValueError(f"candidate identity mismatch for {item['variantId']}")
@@ -255,9 +251,7 @@ def build_candidate(item: dict[str, Any], *, blender: str) -> dict[str, Any]:
             "geometryPassed": bool(report.get("passed")),
             "clothCacheReopenValidated": True,
             "clothCacheReopenEvidencePath": reopen_path.relative_to(ROOT).as_posix(),
-            "clothCacheReopenObjectCount": len(
-                reopen_evidence.get("objects", [])
-            ),
+            "clothCacheReopenObjectCount": len(reopen_evidence.get("objects", [])),
             "shapeProfileEvidence": target_profile,
             "weightNormalizationEvidence": {
                 "objects": weight_normalization.get("objects"),
@@ -320,9 +314,7 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
     if not shared_render_keys:
         raise ValueError("baseline/color render evidence has no shared views")
     changed_render_keys = [
-        key
-        for key in shared_render_keys
-        if baseline_renders[key] != color_renders[key]
+        key for key in shared_render_keys if baseline_renders[key] != color_renders[key]
     ]
     if not changed_render_keys:
         raise ValueError("color variant did not change any rendered evidence")
@@ -346,10 +338,7 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
             f"scale={size_scale}"
         )
     size_weights = size.get("weightNormalizationEvidence")
-    if (
-        not isinstance(size_weights, dict)
-        or int(size_weights.get("vertices", 0)) <= 0
-    ):
+    if not isinstance(size_weights, dict) or int(size_weights.get("vertices", 0)) <= 0:
         raise ValueError("size variant did not rerun weight normalization")
     if int(size_weights.get("maximumInfluences", 99)) > 4:
         raise ValueError("size variant weight normalization is invalid")
@@ -368,9 +357,7 @@ def verify_workspace(results: list[dict[str, Any]]) -> dict[str, Any]:
         raise ValueError("roughness-only control render evidence hashes are missing")
     control_shared = sorted(set(baseline_renders) & set(control_renders))
     roughness_changed_render_keys = [
-        key
-        for key in control_shared
-        if baseline_renders[key] != control_renders[key]
+        key for key in control_shared if baseline_renders[key] != control_renders[key]
     ]
     if not roughness_changed_render_keys:
         raise ValueError("roughness-only control did not change rendered evidence")
@@ -490,10 +477,13 @@ def main() -> int:
                 raise ValueError(f"replay geometry fingerprint mismatch: {role}")
             if first[role]["geometryPassed"] != replay[role]["geometryPassed"]:
                 raise ValueError(f"replay geometry gate mismatch: {role}")
-        if abs(
-            float(first["SIZE"]["bibPattern"]["bounds"]["width"])
-            - float(replay["SIZE"]["bibPattern"]["bounds"]["width"])
-        ) > 1e-9:
+        if (
+            abs(
+                float(first["SIZE"]["bibPattern"]["bounds"]["width"])
+                - float(replay["SIZE"]["bibPattern"]["bounds"]["width"])
+            )
+            > 1e-9
+        ):
             raise ValueError("replay pattern-driven bib width mismatch")
         replay_proof = {
             "workspace": args.replay_workspace,

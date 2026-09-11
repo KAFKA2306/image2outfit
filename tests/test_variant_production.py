@@ -65,7 +65,9 @@ class ProductionVariantTests(unittest.TestCase):
             )
             self.assertNotEqual(
                 by_id["baseline"]["variantContract"]["geometryInputFingerprint"],
-                by_id["bib-width-plus-10"]["variantContract"]["geometryInputFingerprint"],
+                by_id["bib-width-plus-10"]["variantContract"][
+                    "geometryInputFingerprint"
+                ],
             )
             self.assertNotEqual(
                 by_id["baseline"]["variantContract"]["materialRecipeSha256"],

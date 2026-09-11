@@ -143,7 +143,9 @@ def runtime_root(
         if isinstance(configured, str) and configured:
             path = repo_path(configured, label="variant runtime root")
             if ".image2outfit/products/" not in path.as_posix():
-                raise ValueError("variant runtime root must stay under .image2outfit/products")
+                raise ValueError(
+                    "variant runtime root must stay under .image2outfit/products"
+                )
             return path
     return ROOT / ".image2outfit" / "products" / product_id
 
@@ -191,9 +193,7 @@ def stage_lineage(job: Mapping[str, Any], stage: str) -> dict[str, Any] | None:
             raise ValueError(f"{previous_stage} evidence {index} is incomplete")
         path = repo_path(raw_path, label=f"{previous_stage} evidence")
         if not path.is_file():
-            raise FileNotFoundError(
-                f"{stage} previous evidence is missing: {raw_path}"
-            )
+            raise FileNotFoundError(f"{stage} previous evidence is missing: {raw_path}")
         actual_hash = sha256(path)
         if actual_hash != expected_hash:
             raise ValueError(
@@ -655,9 +655,7 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
             raise ValueError("cloth cache snapshot SHA-256 is stale or mismatched")
 
         reopen_result = (
-            runtime_root(product_id, job)
-            / "reports"
-            / "cloth-cache-reopen.json"
+            runtime_root(product_id, job) / "reports" / "cloth-cache-reopen.json"
         )
         reopen_result.parent.mkdir(parents=True, exist_ok=True)
         verifier = ROOT / "tools" / "verify_cloth_cache_snapshot.py"
@@ -687,8 +685,7 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         )
         if completed.returncode != 0:
             raise RuntimeError(
-                "reopened cloth-cache verification failed: "
-                + completed.stderr[-4000:]
+                "reopened cloth-cache verification failed: " + completed.stderr[-4000:]
             )
         reopened = read_object(reopen_result, "reopened cloth cache evidence")
         reopen_summary = validate_reopened_cloth_evidence(payload, reopened)

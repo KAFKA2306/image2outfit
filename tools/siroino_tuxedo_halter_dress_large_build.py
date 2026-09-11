@@ -526,9 +526,7 @@ def main() -> int:
     )
     measured = base.metrics(garments)
     geometry_fingerprint = combined_geometry_sha256(garments)
-    coarse_minimum_p01 = float(
-        geometry_variables.get("coarseGateMinimumP01M", 0.0030)
-    )
+    coarse_minimum_p01 = float(geometry_variables.get("coarseGateMinimumP01M", 0.0030))
     geometry_checks = {
         "meshObjects>=18": measured["meshObjects"] >= 18,
         "vertices>1800": measured["vertices"] > 1800,

@@ -50,11 +50,7 @@ def finite_extent(obj: bpy.types.Object) -> tuple[bool, float]:
     evaluated = obj.evaluated_get(depsgraph)
     mesh = evaluated.to_mesh()
     try:
-        coords = [
-            float(value)
-            for vertex in mesh.vertices
-            for value in vertex.co
-        ]
+        coords = [float(value) for vertex in mesh.vertices for value in vertex.co]
         finite = bool(coords) and all(math.isfinite(value) for value in coords)
         if not finite:
             return False, 0.0
