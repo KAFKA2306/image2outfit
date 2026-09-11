@@ -126,7 +126,9 @@ def apply_update(
     current = read_json(manifest_path)
     pre_errors = _validate_with_completion_policy(current, job, root, suffix="precheck")
     if pre_errors:
-        raise ValueError("ProductManifest precondition failed: " + "; ".join(pre_errors))
+        raise ValueError(
+            "ProductManifest precondition failed: " + "; ".join(pre_errors)
+        )
 
     updated = copy.deepcopy(current)
     technical = updated.setdefault("technicalGates", {})
@@ -139,9 +141,13 @@ def apply_update(
         raise ValueError("ProductManifest releaseReadiness must be an object")
     readiness["unityReady"] = _validate_unity_ready_payload(intent.get("payload"), root)
 
-    post_errors = _validate_with_completion_policy(updated, job, root, suffix="postcheck")
+    post_errors = _validate_with_completion_policy(
+        updated, job, root, suffix="postcheck"
+    )
     if post_errors:
-        raise ValueError("ProductManifest transition invalid: " + "; ".join(post_errors))
+        raise ValueError(
+            "ProductManifest transition invalid: " + "; ".join(post_errors)
+        )
 
     staged = manifest_path.with_name(f".{manifest_path.name}.replace.tmp")
     try:
@@ -150,7 +156,9 @@ def apply_update(
         staged_job["productManifestPath"] = relative(root, staged)
         final_errors = production_contract.product_state_errors(staged_job, root)
         if final_errors:
-            raise ValueError("staged ProductManifest invalid: " + "; ".join(final_errors))
+            raise ValueError(
+                "staged ProductManifest invalid: " + "; ".join(final_errors)
+            )
         if before_replace is not None:
             before_replace(staged, manifest_path)
         os.replace(staged, manifest_path)
@@ -188,11 +196,15 @@ def replace_legacy_snapshot(
     allowed_top_level = {"technicalGates", "releaseReadiness"}
     for key in set(current) | set(proposed):
         if key not in allowed_top_level and current.get(key) != proposed.get(key):
-            raise ValueError(f"direct ProductManifest field mutation is forbidden: {key}")
+            raise ValueError(
+                f"direct ProductManifest field mutation is forbidden: {key}"
+            )
 
     current_technical = current.get("technicalGates")
     proposed_technical = proposed.get("technicalGates")
-    if not isinstance(current_technical, dict) or not isinstance(proposed_technical, dict):
+    if not isinstance(current_technical, dict) or not isinstance(
+        proposed_technical, dict
+    ):
         raise ValueError("ProductManifest technicalGates must be objects")
     for key in set(current_technical) | set(proposed_technical):
         if key in UNITY_GATE_NAMES:
@@ -203,10 +215,14 @@ def replace_legacy_snapshot(
 
     current_readiness = current.get("releaseReadiness", {})
     proposed_readiness = proposed.get("releaseReadiness", {})
-    if not isinstance(current_readiness, dict) or not isinstance(proposed_readiness, dict):
+    if not isinstance(current_readiness, dict) or not isinstance(
+        proposed_readiness, dict
+    ):
         raise ValueError("ProductManifest releaseReadiness must be objects")
     for key in set(current_readiness) | set(proposed_readiness):
-        if key != "unityReady" and current_readiness.get(key) != proposed_readiness.get(key):
+        if key != "unityReady" and current_readiness.get(key) != proposed_readiness.get(
+            key
+        ):
             raise ValueError(f"direct release readiness mutation is forbidden: {key}")
     payload = proposed_readiness.get("unityReady")
 
