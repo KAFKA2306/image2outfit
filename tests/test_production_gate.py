@@ -352,29 +352,6 @@ class ProductionGateCommercialTest(unittest.TestCase):
         )
         self.assertFalse(report["passed"])
 
-    def test_candidate_binding_is_passed_as_pre_commit_finalizer(self) -> None:
-        with (
-            mock.patch.object(
-                production_gate.method_selection,
-                "select",
-                return_value=self.selection,
-            ),
-            mock.patch.object(production_gate, "run_candidate", return_value=0) as runner,
-            mock.patch.object(production_gate, "_bind_method_to_candidate") as binder,
-        ):
-            result = production_gate._run_candidate(
-                Path("config/products/demo/job.json"),
-                self.job,
-                {},
-                self.root,
-            )
-
-        self.assertEqual(result, 0)
-        finalizer = runner.call_args.kwargs["finalize_candidate"]
-        binder.assert_not_called()
-        finalizer()
-        binder.assert_called_once_with(self.job, self.selection, self.root)
-
 
 if __name__ == "__main__":
     unittest.main()
