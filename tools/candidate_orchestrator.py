@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import audit_research_baseline
 import candidate_manifest as candidate_contract
@@ -194,7 +194,12 @@ def _record_candidate_failure(
     candidate_contract.write(audit_path, audit)
 
 
-def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
+def _run_candidate(
+    job_path: Path,
+    job: dict[str, Any],
+    policy: dict[str, Any],
+    finalize_candidate: Callable[[], None] | None = None,
+) -> int:
     candidate = candidate_contract.path(job["candidateDir"])
     release = candidate_contract.path(job["releaseDir"])
     artifact = candidate_contract.path(job["artifactDir"])
@@ -247,6 +252,8 @@ def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) 
                 baseline,
                 baseline_hash,
             )
+            if finalize_candidate is not None:
+                finalize_candidate()
             candidate_tx.commit(candidate_had_original)
             workspace_tx.commit(workspace_had_original)
             workspace_started = False
