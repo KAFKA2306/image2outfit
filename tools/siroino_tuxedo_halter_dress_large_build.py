@@ -425,6 +425,7 @@ def bake_skirts(
         skirt.select_set(False)
     return contracts, frame_end, cache_snapshot
 
+
 def main() -> int:
     args = parse_args()
     job_path = repo_path(args.job)
@@ -561,9 +562,105 @@ def main() -> int:
         for name, path in coarse_paths.items()
     }
 
+    if not passed:
+        rejected_report = {
+            "schemaVersion": 1,
+            "passed": False,
+            "productId": PRODUCT_ID,
+            "candidateId": candidate_id,
+            "variantId": variant_id,
+            "variantRecipeVersion": variant_recipe_version,
+            "workspaceId": workspace_id,
+            "productName": job["productName"],
+            "buildRevision": job["buildRevision"],
+            "targetProfile": profile,
+            "targetAvatarAssetPath": job["targetAvatarAssetPath"],
+            "targetSourcePath": job["targetSourcePath"],
+            "blenderVersion": bpy.app.version_string,
+            "geometryFingerprint": geometry_fingerprint,
+            "geometryGate": {
+                "checks": geometry_checks,
+                "minimumClearanceP01M": coarse_minimum_p01,
+                "decision": "FAIL",
+            },
+            "coarseGeometryReview": coarse_evidence,
+            "highQualityRenderSkipped": True,
+            "metrics": measured,
+            "weightNormalization": weight_report,
+            "clearanceRefinement": clearance_history,
+        }
+        write_json(evidence_dir / "product-build-report.json", rejected_report)
+        print(json.dumps(rejected_report, ensure_ascii=False, indent=2))
+        return 2
+
+    g.set_pose(armature, "neutral")
+    scene.frame_set(frame_end)
+    previews = {name: repo_path(value) for name, value in job["previewPaths"].items()}
+    g.render_five_views(camera, previews)
+    multiview = preview_dir / f"{PRODUCT_ID}-multiview.webp"
+    g.contact_sheet(
+        previews,
+        multiview,
+        order=("front", "three-quarter", "left", "right", "back"),
+        title="TUXEDO HALTER LAYERED DRESS / SIROINO _LARGE",
+    )
+    pose_images = g.render_pose_set(armature, camera, pose_dir)
+    obsolete_twist = pose_images.pop("twist", None)
+    if obsolete_twist is not None and obsolete_twist.is_file():
+        obsolete_twist.unlink()
+    pose_images["prone"] = render_prone_pose(armature, camera, pose_dir / "prone.png")
+    pose_sheet = preview_dir / f"{PRODUCT_ID}-pose-review.webp"
+    g.contact_sheet(
+        pose_images,
+        pose_sheet,
+        order=("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
+        title="POSE AND PENETRATION REVIEW",
+    )
+
+    g.reset_pose(armature)
+    scene.frame_set(frame_end)
+    body.hide_render = True
+    base.export_fbx(fbx_path, armature, garments)
+    sidecars = write_prefabs(
+        fbx_path, prefab_path, integrated_prefab, job["productName"]
+    )
+
+    cloth_report = write_json(
+        evidence_dir / "cloth-simulation.json",
+        {
+            "schemaVersion": 1,
+            "productId": PRODUCT_ID,
+            "candidateId": candidate_id,
+            "variantId": variant_id,
+            "workspaceId": workspace_id,
+            "status": "PASS",
+            "engine": "Blender Cloth",
+            "applicability": "REQUIRED",
+            "frameStart": 1,
+            "frameEnd": frame_end,
+            "cacheBaked": all(
+                bool(contract.get("cacheBakedActual")) for contract in cloth_contracts
+            ),
+            "geometryChanged": all(
+                bool(contract.get("geometryChanged")) for contract in cloth_contracts
+            ),
+            "gravity": list(scene.gravity),
+            "contracts": cloth_contracts,
+            "bodyCollisionThicknessM": 0.004,
+            "cacheSnapshot": str(cloth_cache_snapshot.relative_to(ROOT)).replace(
+                "\\", "/"
+            ),
+            "cacheSnapshotSha256": base.sha256(cloth_cache_snapshot),
+        },
+    )
+    bib_object = bpy.data.objects.get("White_Jacquard_Bib")
+    if bib_object is None:
+        raise RuntimeError("pattern-driven bib object was not generated")
+    bib_projection = json.loads(str(bib_object["patternProjection"]))
+
     report = {
         "schemaVersion": 1,
-        "passed": passed,
+        "passed": True,
         "productId": PRODUCT_ID,
         "candidateId": candidate_id,
         "variantId": variant_id,
@@ -659,7 +756,7 @@ def main() -> int:
         "variantRecipeVersion": variant_recipe_version,
         "workspaceId": workspace_id,
         "productName": job["productName"],
-        "status": "WORKING" if passed else "REJECTED",
+        "status": "WORKING",
         "targetAdapterId": job["adapterId"],
         "target": "Siroino _Large via official shape keys",
         "productRoot": job["productRoot"],
@@ -685,7 +782,7 @@ def main() -> int:
                 else f".image2outfit/products/{PRODUCT_ID}/pipeline-state.json"
             ),
             "lastAttempt": {
-                "result": "BLENDER_MODELED" if passed else "BLENDER_REJECTED",
+                "result": "BLENDER_MODELED",
                 "visualRevision": job["buildRevision"],
                 "shapeProfile": "Siroino _Large via official shape keys",
             },
@@ -695,7 +792,7 @@ def main() -> int:
             ],
         },
         "technicalGates": {
-            "blender": "PASS" if passed else "FAIL",
+            "blender": "PASS",
             "editableSource": "PASS" if blend_path.is_file() else "FAIL",
             "fbx": "PASS" if fbx_path.is_file() else "FAIL",
             "prefabDeclared": "PASS" if prefab_path.is_file() else "FAIL",
@@ -783,7 +880,7 @@ Unity import, Modular Avatar/NDMF execution, VRChat Build & Test, and runtime in
         encoding="utf-8",
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
-    return 0 if passed else 2
+    return 0
 
 
 if __name__ == "__main__":
