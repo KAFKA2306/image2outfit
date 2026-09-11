@@ -48,7 +48,9 @@ class CandidateInputProvenanceTest(unittest.TestCase):
                     )
                     if expected_error is None:
                         self.assertFalse(
-                            any(error.startswith("candidate input") for error in errors),
+                            any(
+                                error.startswith("candidate input") for error in errors
+                            ),
                             errors,
                         )
                     else:
@@ -62,8 +64,7 @@ class CandidateInputProvenanceTest(unittest.TestCase):
             helper = root / "tools/shared_helper.py"
             construction = root / "config/products/wide-cargo/construction.json"
             pattern = (
-                root
-                / "Assets/GenWorks/wide-cargo/Source/Patterns/pattern-spec.json"
+                root / "Assets/GenWorks/wide-cargo/Source/Patterns/pattern-spec.json"
             )
             generated = (
                 root
@@ -90,10 +91,10 @@ class CandidateInputProvenanceTest(unittest.TestCase):
                 code_changed = candidate_manifest.execution_source_fingerprint(job)
                 self.assertNotEqual(pattern_changed, code_changed)
 
-                construction.write_text(
-                    '{"method": "changed"}\n', encoding="utf-8"
+                construction.write_text('{"method": "changed"}\n', encoding="utf-8")
+                construction_changed = candidate_manifest.execution_source_fingerprint(
+                    job
                 )
-                construction_changed = candidate_manifest.execution_source_fingerprint(job)
                 self.assertNotEqual(code_changed, construction_changed)
 
                 generated.write_text('{"generated": 2}\n', encoding="utf-8")
