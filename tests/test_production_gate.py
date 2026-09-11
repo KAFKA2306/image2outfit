@@ -124,14 +124,18 @@ class CandidateFinalizeTransactionTest(unittest.TestCase):
 
     def _run(self, finalize_candidate: object) -> int:
         with (
-            mock.patch.object(candidate_orchestrator.candidate_contract, "ROOT", self.root),
+            mock.patch.object(
+                candidate_orchestrator.candidate_contract, "ROOT", self.root
+            ),
             mock.patch.object(
                 candidate_orchestrator,
                 "_research_state",
                 return_value=({"passed": True}, {}, "0" * 64),
             ),
             mock.patch.object(
-                candidate_orchestrator, "run_candidate", side_effect=self._fake_candidate_run
+                candidate_orchestrator,
+                "run_candidate",
+                side_effect=self._fake_candidate_run,
             ),
             mock.patch.object(
                 candidate_orchestrator.contract,
@@ -203,8 +207,12 @@ class CandidateFinalizeTransactionTest(unittest.TestCase):
             "old-release",
             (self.release / "marker.txt").read_text(encoding="utf-8"),
         )
-        self.assertFalse(self.candidate.parent.joinpath(".candidate.last-good").exists())
-        self.assertFalse(self.workspace.parent.joinpath(".demo.last-good-workspace").exists())
+        self.assertFalse(
+            self.candidate.parent.joinpath(".candidate.last-good").exists()
+        )
+        self.assertFalse(
+            self.workspace.parent.joinpath(".demo.last-good-workspace").exists()
+        )
 
 
 class ProductionGateCommercialTest(unittest.TestCase):
