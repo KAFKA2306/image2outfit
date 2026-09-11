@@ -139,6 +139,7 @@ class PipelineSourceFingerprintTests(unittest.TestCase):
             "config/pipeline/stage-audit-record.schema.v1.json",
             "config/pipeline/run-audit-manifest.schema.v1.json",
             "config/toolchain-lock.json",
+            "pyproject.toml",
             "uv.lock",
         )
         for relative in dependencies:
@@ -147,7 +148,15 @@ class PipelineSourceFingerprintTests(unittest.TestCase):
                 request_path, profile_path = make_source_fixture(root)
                 initial = fixture_fingerprint(root, request_path, profile_path)
                 path = root / relative
-                path.write_text(path.read_text(encoding="utf-8") + "changed\n", encoding="utf-8")
+                if path == profile_path:
+                    profile = json.loads(path.read_text(encoding="utf-8"))
+                    profile["profileId"] = "garment-reconstruction-v2"
+                    path.write_text(json.dumps(profile), encoding="utf-8")
+                else:
+                    path.write_text(
+                        path.read_text(encoding="utf-8") + "changed\n",
+                        encoding="utf-8",
+                    )
                 self.assertNotEqual(initial, fixture_fingerprint(root, request_path, profile_path))
 
     def test_generated_runtime_outputs_do_not_change_source_fingerprint(self) -> None:
