@@ -9,10 +9,30 @@ represent the code that will execute now.
 from __future__ import annotations
 
 import hashlib
+import json
 from collections.abc import Iterable
 from pathlib import Path
 
 IGNORED_PARTS = {"__pycache__", ".pytest_cache", ".ruff_cache"}
+
+# Canonical machine-readable contracts that can change production execution,
+# validation, completion, or release semantics. Keep this as the single owner for
+# repository-wide checkpoint source dependencies.
+PRODUCTION_RUNTIME_DEPENDENCIES = (
+    "config/release-policy.json",
+    "config/genworks-handoff-policy.json",
+    "contracts/quality/quality-spec.json",
+    "config/job.schema.v2.json",
+    "config/products/construction.schema.v1.json",
+    "config/pipeline/visual-quality-defaults.v1.json",
+    "config/toolchain-lock.json",
+    "pyproject.toml",
+    "uv.lock",
+)
+
+# These profile fields point at validation contracts read by the canonical audit
+# path. Generated storageRoot values are deliberately not source dependencies.
+PROFILE_AUDIT_DEPENDENCY_FIELDS = ("recordSchema", "manifestSchema")
 
 
 def _iter_files(path: Path) -> Iterable[Path]:
@@ -53,6 +73,41 @@ def fingerprint_paths(root: Path, paths: Iterable[Path]) -> str:
     return digest.hexdigest()
 
 
+def _profile_dependency_paths(root: Path, profile_path: Path) -> list[Path]:
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    audit_contract = profile.get("auditContract")
+    if not isinstance(audit_contract, dict):
+        raise ValueError("pipeline profile auditContract must be an object")
+
+    dependencies: list[Path] = []
+    for field in PROFILE_AUDIT_DEPENDENCY_FIELDS:
+        value = audit_contract.get(field)
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"pipeline profile auditContract.{field} must be a repository path")
+        dependencies.append(root / value)
+    return dependencies
+
+
+def pipeline_source_dependencies(
+    root: Path,
+    *,
+    product_id: str,
+    request_path: Path,
+    profile_path: Path,
+) -> tuple[Path, ...]:
+    """Return the fail-closed source dependency closure for checkpoint reuse."""
+    inputs = [
+        root / "src" / "image2outfit",
+        root / "tools",
+        root / "config" / "products" / product_id,
+        request_path,
+        profile_path,
+        *(root / relative for relative in PRODUCTION_RUNTIME_DEPENDENCIES),
+        *_profile_dependency_paths(root, profile_path),
+    ]
+    return tuple(inputs)
+
+
 def pipeline_source_fingerprint(
     root: Path,
     *,
@@ -61,15 +116,12 @@ def pipeline_source_fingerprint(
     profile_path: Path,
 ) -> str:
     """Fingerprint all runtime sources that can affect a canonical product run."""
-    inputs = [
-        root / "src" / "image2outfit",
-        root / "tools",
-        root / "config" / "products" / product_id,
-        request_path,
-        profile_path,
-        root / "config" / "pipeline" / "visual-quality-defaults.v1.json",
-        root / "config" / "toolchain-lock.json",
-        root / "pyproject.toml",
-        root / "uv.lock",
-    ]
-    return fingerprint_paths(root, inputs)
+    return fingerprint_paths(
+        root,
+        pipeline_source_dependencies(
+            root,
+            product_id=product_id,
+            request_path=request_path,
+            profile_path=profile_path,
+        ),
+    )
