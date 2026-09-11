@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import contract_io
+from pipeline_source_fingerprint import fingerprint_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "release-policy.json"
@@ -139,6 +140,21 @@ def preview_gate(
     return passed, result
 
 
+def execution_source_fingerprint(job: dict[str, Any]) -> str:
+    """Fingerprint repository/product source that can change candidate execution."""
+    product_id = job["id"]
+    candidates = [
+        ROOT / "src" / "image2outfit",
+        ROOT / "tools",
+        ROOT / "config" / "products" / product_id,
+        ROOT / "Assets" / "GenWorks" / product_id / "Source",
+    ]
+    source_paths = [candidate for candidate in candidates if candidate.exists()]
+    if not source_paths:
+        raise FileNotFoundError("candidate execution source set is empty")
+    return fingerprint_paths(ROOT, source_paths)
+
+
 def inputs(job_path: Path, job: dict[str, Any]) -> dict[str, str]:
     files = {
         "job": job_path,
@@ -162,7 +178,9 @@ def inputs(job_path: Path, job: dict[str, Any]) -> dict[str, str]:
     missing = [name for name, file in files.items() if not file.is_file()]
     if missing:
         raise FileNotFoundError(f"input missing: {', '.join(missing)}")
-    return {name: digest(file) for name, file in files.items()}
+    result = {name: digest(file) for name, file in files.items()}
+    result["executionSource"] = execution_source_fingerprint(job)
+    return result
 
 
 def candidate_files(job: dict[str, Any], policy: dict[str, Any]) -> list[Path]:
@@ -212,8 +230,20 @@ def verify_candidate(
     if current_commit and data.get("sourceCommit") != current_commit:
         errors.append("candidate source commit differs from current commit")
     current_inputs = inputs(job_path, job)
-    for name, expected in data.get("inputHashes", {}).items():
-        if current_inputs.get(name) != expected:
+    reported_inputs = data.get("inputHashes")
+    if not isinstance(reported_inputs, dict):
+        errors.append("candidate inputHashes invalid")
+        reported_inputs = {}
+    current_names = set(current_inputs)
+    reported_names = set(reported_inputs)
+    missing_names = sorted(current_names - reported_names)
+    extra_names = sorted(reported_names - current_names)
+    if missing_names:
+        errors.append(f"candidate inputs missing: {', '.join(missing_names)}")
+    if extra_names:
+        errors.append(f"candidate inputs unexpected: {', '.join(extra_names)}")
+    for name in sorted(current_names & reported_names):
+        if current_inputs[name] != reported_inputs[name]:
             errors.append(f"candidate input changed: {name}")
     expected_paths = set()
     for item in data.get("files", []):
