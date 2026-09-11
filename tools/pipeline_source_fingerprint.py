@@ -83,7 +83,9 @@ def _profile_dependency_paths(root: Path, profile_path: Path) -> list[Path]:
     for field in PROFILE_AUDIT_DEPENDENCY_FIELDS:
         value = audit_contract.get(field)
         if not isinstance(value, str) or not value.strip():
-            raise ValueError(f"pipeline profile auditContract.{field} must be a repository path")
+            raise ValueError(
+                f"pipeline profile auditContract.{field} must be a repository path"
+            )
         dependencies.append(root / value)
     return dependencies
 
