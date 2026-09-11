@@ -57,7 +57,7 @@ def _validate_with_completion_policy(
 def _validate_unity_ready_payload(payload: Any, root: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError("unity-ready payload must be an object")
-    forbidden = {"state", "status", "completionGates", "completionBlocker"} & set(payload)
+    forbidden = {"state", "completionGates", "completionBlocker"} & set(payload)
     if forbidden:
         raise ValueError(
             "policy-derived completion fields cannot be supplied by callers: "
@@ -83,7 +83,13 @@ def _validate_unity_ready_payload(payload: Any, root: Path) -> dict[str, Any]:
         if extra:
             details.append("extra=" + ",".join(extra))
         raise ValueError("invalid unity-ready payload: " + " ".join(details))
-    for field in ("status", "multiMaterialSetup", "modularAvatarSetup", "ndmfBake", "reimport"):
+    for field in (
+        "status",
+        "multiMaterialSetup",
+        "modularAvatarSetup",
+        "ndmfBake",
+        "reimport",
+    ):
         if payload.get(field) != "VERIFIED":
             raise ValueError(f"unity-ready {field} must be VERIFIED")
     evidence_path = repo_path(root, str(payload["evidencePath"]))
@@ -154,7 +160,10 @@ def apply_update(
     stored = read_json(manifest_path)
     stored_errors = _manifest_errors(stored, job)
     if stored_errors:
-        raise RuntimeError("stored ProductManifest failed post-write validation: " + "; ".join(stored_errors))
+        raise RuntimeError(
+            "stored ProductManifest failed post-write validation: "
+            + "; ".join(stored_errors)
+        )
     return stored
 
 
