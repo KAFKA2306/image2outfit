@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import unittest
 
 from image2outfit.cloth_evidence import validate_reopened_cloth_evidence
