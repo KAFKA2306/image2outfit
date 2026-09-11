@@ -43,7 +43,9 @@ class ProductManifestStateTest(unittest.TestCase):
         }
         manifest_path = root / job["productManifestPath"]
         manifest_path.parent.mkdir(parents=True)
-        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+        )
         evidence = manifest_path.parent / "Evidence" / "Unity" / "unity-ready.json"
         evidence.parent.mkdir(parents=True)
         evidence.write_text('{"passed": true}\n', encoding="utf-8")
@@ -65,7 +67,9 @@ class ProductManifestStateTest(unittest.TestCase):
         proposed = json.loads(manifest_path.read_text(encoding="utf-8"))
         for name in state.UNITY_GATE_NAMES:
             proposed["technicalGates"][name] = "PASS"
-        proposed.setdefault("releaseReadiness", {})["unityReady"] = copy.deepcopy(payload)
+        proposed.setdefault("releaseReadiness", {})["unityReady"] = copy.deepcopy(
+            payload
+        )
         return proposed
 
     def test_valid_update_uses_canonical_completion_semantics(self) -> None:
@@ -78,7 +82,10 @@ class ProductManifestStateTest(unittest.TestCase):
             stored = json.loads(manifest_path.read_text(encoding="utf-8"))
             self.assertEqual(stored["releaseReadiness"]["unityReady"], payload)
             self.assertTrue(
-                all(stored["technicalGates"][name] == "PASS" for name in state.UNITY_GATE_NAMES)
+                all(
+                    stored["technicalGates"][name] == "PASS"
+                    for name in state.UNITY_GATE_NAMES
+                )
             )
             self.assertEqual(production_contract.product_state_errors(job, root), [])
 
@@ -104,7 +111,9 @@ class ProductManifestStateTest(unittest.TestCase):
                     },
                 )
             self.assertEqual(manifest_path.read_bytes(), before)
-            with self.assertRaisesRegex(ValueError, "unknown ProductManifest update kind"):
+            with self.assertRaisesRegex(
+                ValueError, "unknown ProductManifest update kind"
+            ):
                 state.apply_update(
                     **common,
                     intent={
@@ -140,7 +149,11 @@ class ProductManifestStateTest(unittest.TestCase):
                 state.apply_update(
                     manifest_path=manifest_path,
                     job=job,
-                    intent={**base, "buildRevision": "r7", "expectedManifestSha256": "0" * 64},
+                    intent={
+                        **base,
+                        "buildRevision": "r7",
+                        "expectedManifestSha256": "0" * 64,
+                    },
                     root=root,
                 )
             self.assertEqual(manifest_path.read_bytes(), before)
@@ -152,11 +165,15 @@ class ProductManifestStateTest(unittest.TestCase):
             before = manifest_path.read_bytes()
             proposed = self._proposed(manifest_path, payload)
             proposed["state"] = "COMPLETE"
-            with self.assertRaisesRegex(ValueError, "direct ProductManifest field mutation"):
+            with self.assertRaisesRegex(
+                ValueError, "direct ProductManifest field mutation"
+            ):
                 state.replace_legacy_snapshot(manifest_path, proposed, root=root)
             self.assertEqual(manifest_path.read_bytes(), before)
 
-    def test_fault_before_atomic_replace_preserves_valid_previous_manifest(self) -> None:
+    def test_fault_before_atomic_replace_preserves_valid_previous_manifest(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             manifest_path, _, payload = self._fixture(root)
@@ -190,7 +207,9 @@ class ProductManifestStateTest(unittest.TestCase):
 
     def test_generic_json_writer_routes_product_manifest_to_single_owner(self) -> None:
         contract_source = (TOOLS / "contract_io.py").read_text(encoding="utf-8")
-        candidate_source = (TOOLS / "technical_candidate.py").read_text(encoding="utf-8")
+        candidate_source = (TOOLS / "technical_candidate.py").read_text(
+            encoding="utf-8"
+        )
         self.assertIn('path.name == "ProductManifest.json"', contract_source)
         self.assertIn("product_manifest_state.replace_legacy_snapshot", contract_source)
         self.assertNotIn(".replace(manifest_path)", candidate_source)
