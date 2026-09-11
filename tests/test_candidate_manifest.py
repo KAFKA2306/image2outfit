@@ -170,6 +170,21 @@ class CandidateManifestTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "private avatar source"):
             candidate_manifest.candidate_files(self.job, POLICY)
 
+    def test_target_bytes_change_input_identity(self) -> None:
+        before = candidate_manifest.inputs(self.job_path, self.job)
+        target_source = self.root / self.job["targetSourcePath"]
+        target_source.write_text("changed private source", encoding="utf-8")
+        after_source = candidate_manifest.inputs(self.job_path, self.job)
+        self.assertNotEqual(before["targetSource"], after_source["targetSource"])
+        self.assertEqual(before["targetAvatarAsset"], after_source["targetAvatarAsset"])
+
+        target_avatar = self.root / self.job["targetAvatarAssetPath"]
+        target_avatar.write_text("changed private avatar", encoding="utf-8")
+        after_avatar = candidate_manifest.inputs(self.job_path, self.job)
+        self.assertNotEqual(
+            after_source["targetAvatarAsset"], after_avatar["targetAvatarAsset"]
+        )
+
     def test_tampered_candidate_file_is_rejected(self) -> None:
         candidate = self.root / self.job["candidateDir"]
         file = candidate / "UnityAssets/GenWorks/test-product/Outfit.fbx"
