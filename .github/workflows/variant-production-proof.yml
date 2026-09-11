@@ -22,7 +22,7 @@ permissions:
 
 concurrency:
   group: variant-production-proof-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   prove:
@@ -48,12 +48,14 @@ jobs:
       - name: Compile and test variant contracts
         run: |
           uv run --locked --no-default-groups python -m compileall -q src tools tests
-          uv run --locked --no-default-groups python -m unittest             tests.test_variant_production -v
+          uv run --locked --no-default-groups python -m unittest tests.test_variant_production -v
 
       - name: Install Blender runtime libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends             xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0             libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
+          sudo apt-get install -y --no-install-recommends \
+            xz-utils libxi6 libxrender1 libxfixes3 libxkbcommon0 \
+            libsm6 libgl1 libegl1 libx11-6 libxxf86vm1
 
       - name: Download pinned Blender
         run: |
@@ -65,7 +67,9 @@ jobs:
           PY
           )"
           BLENDER_SERIES="${BLENDER_VERSION%.*}"
-          curl --fail --location --retry 4 --retry-all-errors             "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"             --output blender.tar.xz
+          curl --fail --location --retry 4 --retry-all-errors \
+            "https://download.blender.org/release/Blender${BLENDER_SERIES}/blender-${BLENDER_VERSION}-linux-x64.tar.xz" \
+            --output blender.tar.xz
           mkdir -p .image2outfit/blender
           tar -xJf blender.tar.xz --strip-components=1 -C .image2outfit/blender
           echo "IMAGE2OUTFIT_BLENDER=$PWD/.image2outfit/blender/blender" >> "$GITHUB_ENV"
@@ -90,13 +94,17 @@ jobs:
       - name: Run all tracked production variant proofs
         run: |
           set -euo pipefail
-          mapfile -t recipes < <(find config/products -mindepth 2 -maxdepth 2             -name production-variants.json -print | sort)
+          mapfile -t recipes < <(find config/products -mindepth 2 -maxdepth 2 \
+            -name production-variants.json -print | sort)
           if [[ ${#recipes[@]} -eq 0 ]]; then
             echo "No production variant recipes found."
             exit 0
           fi
           for recipe in "${recipes[@]}"; do
-            python tools/run_variant_production.py               --recipe "$recipe"               --workspace proof-a               --replay-workspace proof-b
+            python tools/run_variant_production.py \
+              --recipe "$recipe" \
+              --workspace proof-a \
+              --replay-workspace proof-b
           done
 
       - name: Delete previous variant proof artifact
