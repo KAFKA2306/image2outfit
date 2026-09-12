@@ -23,11 +23,19 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         root = Path(temporary.name)
         subprocess.run(["git", "init", "-q"], cwd=root, check=True)
-        subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=root, check=True)
-        subprocess.run(["git", "config", "user.name", "test"], cwd=root, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "test@example.invalid"],
+            cwd=root,
+            check=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "test"], cwd=root, check=True
+        )
         (root / ".gitignore").write_text(".image2outfit/\n", encoding="utf-8")
         (root / "protected.txt").write_text("last-good\n", encoding="utf-8")
-        subprocess.run(["git", "add", ".gitignore", "protected.txt"], cwd=root, check=True)
+        subprocess.run(
+            ["git", "add", ".gitignore", "protected.txt"], cwd=root, check=True
+        )
         subprocess.run(["git", "commit", "-qm", "fixture"], cwd=root, check=True)
         return temporary
 
@@ -99,8 +107,14 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
                     self._adapter(script)({"product_id": "test-garment"})
             self.assertEqual(context.exception.failure_code, "UNDECLARED_OUTPUT_WRITE")
             self.assertEqual(context.exception.affected_paths, ("protected.txt",))
-            self.assertEqual((root / "protected.txt").read_text(encoding="utf-8"), "last-good\n")
-            self.assertFalse(root.joinpath(".image2outfit/products/test-garment/evidence.txt").exists())
+            self.assertEqual(
+                (root / "protected.txt").read_text(encoding="utf-8"), "last-good\n"
+            )
+            self.assertFalse(
+                root.joinpath(
+                    ".image2outfit/products/test-garment/evidence.txt"
+                ).exists()
+            )
 
     def test_other_product_write_fails_and_restores_bytes(self) -> None:
         with self._repo() as name:
@@ -119,7 +133,9 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
                 context.exception.affected_paths,
                 (".image2outfit/products/other-product/ProductManifest.json",),
             )
-            self.assertEqual(other.read_text(encoding="utf-8"), '{"state":"last-good"}\n')
+            self.assertEqual(
+                other.read_text(encoding="utf-8"), '{"state":"last-good"}\n'
+            )
 
     def test_dirty_before_is_not_a_violation_when_stage_leaves_it_unchanged(self) -> None:
         with self._repo() as name:
@@ -130,9 +146,13 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
             with patch("pipeline_stage_adapters.ROOT", root):
                 result = self._adapter(script)({"product_id": "test-garment"})
             self.assertEqual(result["mode"], "executed")
-            self.assertEqual(protected.read_text(encoding="utf-8"), "preexisting-dirty\n")
+            self.assertEqual(
+                protected.read_text(encoding="utf-8"), "preexisting-dirty\n"
+            )
 
-    def test_evidence_symlink_escape_is_rejected_and_workspace_is_rolled_back(self) -> None:
+    def test_evidence_symlink_escape_is_rejected_and_workspace_is_rolled_back(
+        self,
+    ) -> None:
         with self._repo() as name:
             root = Path(name)
             outside = root.parent / f"{root.name}-outside.txt"
@@ -168,7 +188,11 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
                 with patch("pipeline_stage_adapters.ROOT", root):
                     with self.assertRaisesRegex(ValueError, "escapes repository"):
                         self._adapter(script)({"product_id": "test-garment"})
-                self.assertFalse(root.joinpath(".image2outfit/products/test-garment/evidence.txt").exists())
+                self.assertFalse(
+                    root.joinpath(
+                        ".image2outfit/products/test-garment/evidence.txt"
+                    ).exists()
+                )
                 self.assertEqual(outside.read_text(encoding="utf-8"), "outside\n")
             finally:
                 outside.unlink(missing_ok=True)
