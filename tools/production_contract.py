@@ -267,11 +267,7 @@ _CANONICAL_ZIP_MODE = 0o100644
 
 def _write_canonical_zip(release: Path, archive: Path) -> None:
     members = sorted(
-        (
-            path
-            for path in release.rglob("*")
-            if path.is_file() and path != archive
-        ),
+        (path for path in release.rglob("*") if path.is_file() and path != archive),
         key=lambda path: path.relative_to(release).as_posix(),
     )
     with zipfile.ZipFile(
