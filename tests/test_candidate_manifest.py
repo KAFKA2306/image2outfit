@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import tempfile
 import unittest
+from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
 
@@ -158,6 +160,32 @@ class CandidateManifestTest(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
 
+    def make_candidate(self) -> tuple[Path, Path, dict]:
+        candidate = self.root / self.job["candidateDir"]
+        file = candidate / "UnityAssets/GenWorks/test-product/Outfit.fbx"
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text("original", encoding="utf-8")
+        value = {
+            "schemaVersion": 2,
+            "kind": "image2outfit-candidate",
+            "jobId": self.job["id"],
+            "productName": self.job["productName"],
+            "adapterId": self.job["adapterId"],
+            "runId": "test-run",
+            "createdAt": "2026-09-12T00:00:00Z",
+            "sourceCommit": os.environ.get("GITHUB_SHA", "local"),
+            "inputHashes": candidate_manifest.inputs(self.job_path, self.job),
+            "files": candidate_manifest.manifest([file], candidate),
+            "unityReady": {"status": "NOT_REQUESTED"},
+            "releaseDecision": "REVIEW_REQUIRED",
+        }
+        return candidate, file, value
+
+    def verify(self, candidate: Path, value: dict) -> list[str]:
+        return candidate_manifest.verify_candidate(
+            self.job_path, self.job, candidate, value
+        )
+
     def test_legacy_job_is_rejected(self) -> None:
         legacy_job = dict(self.job)
         legacy_job["schemaVersion"] = 1
@@ -170,24 +198,77 @@ class CandidateManifestTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "private avatar source"):
             candidate_manifest.candidate_files(self.job, POLICY)
 
-    def test_tampered_candidate_file_is_rejected(self) -> None:
-        candidate = self.root / self.job["candidateDir"]
-        file = candidate / "UnityAssets/GenWorks/test-product/Outfit.fbx"
-        file.parent.mkdir(parents=True)
-        file.write_text("original", encoding="utf-8")
-        manifest = {
-            "schemaVersion": 2,
-            "kind": "image2outfit-candidate",
-            "jobId": self.job["id"],
-            "adapterId": self.job["adapterId"],
-            "sourceCommit": "local",
-            "inputHashes": {},
-            "files": candidate_manifest.manifest([file], candidate),
-        }
-        file.write_text("tampered", encoding="utf-8")
-        errors = candidate_manifest.verify_candidate(
-            self.job_path, self.job, candidate, manifest
+    def test_valid_v2_manifest_passes(self) -> None:
+        candidate, _, value = self.make_candidate()
+        self.assertEqual(self.verify(candidate, value), [])
+
+    def test_missing_required_field_is_rejected_by_schema_and_writer(self) -> None:
+        candidate, _, value = self.make_candidate()
+        value.pop("runId")
+        errors = self.verify(candidate, value)
+        self.assertTrue(any("runId is required" in error for error in errors), errors)
+        with self.assertRaisesRegex(ValueError, "runId is required"):
+            candidate_manifest.write(candidate / "candidate-manifest.json", value)
+
+    def test_wrong_types_are_rejected(self) -> None:
+        candidate, _, value = self.make_candidate()
+        value["files"] = {}
+        errors = self.verify(candidate, value)
+        self.assertTrue(any("files must be array" in error for error in errors), errors)
+
+        _, _, value = self.make_candidate()
+        value["files"][0]["bytes"] = "8"
+        errors = self.verify(candidate, value)
+        self.assertTrue(
+            any("bytes must be integer" in error for error in errors), errors
         )
+
+    def test_invalid_enum_and_sha_are_rejected(self) -> None:
+        candidate, _, value = self.make_candidate()
+        value["releaseDecision"] = "GO"
+        errors = self.verify(candidate, value)
+        self.assertTrue(
+            any("releaseDecision must be one of" in error for error in errors), errors
+        )
+
+        _, _, value = self.make_candidate()
+        value["files"][0]["sha256"] = "not-a-sha"
+        errors = self.verify(candidate, value)
+        self.assertTrue(
+            any("sha256 does not match" in error for error in errors), errors
+        )
+
+    def test_duplicate_file_path_is_rejected(self) -> None:
+        candidate, _, value = self.make_candidate()
+        value["files"].append(deepcopy(value["files"][0]))
+        errors = self.verify(candidate, value)
+        self.assertTrue(
+            any("duplicate candidate manifest path" in error for error in errors),
+            errors,
+        )
+
+    def test_unexpected_top_level_field_is_rejected(self) -> None:
+        candidate, _, value = self.make_candidate()
+        value["surpriseAuthority"] = True
+        errors = self.verify(candidate, value)
+        self.assertTrue(
+            any("surpriseAuthority is not allowed" in error for error in errors),
+            errors,
+        )
+
+    def test_stale_input_hash_is_rejected_semantically(self) -> None:
+        candidate, _, value = self.make_candidate()
+        key = next(iter(value["inputHashes"]))
+        value["inputHashes"][key] = "0" * 64
+        errors = self.verify(candidate, value)
+        self.assertTrue(
+            any("candidate input changed" in error for error in errors), errors
+        )
+
+    def test_tampered_candidate_file_is_rejected(self) -> None:
+        candidate, file, value = self.make_candidate()
+        file.write_text("tampered", encoding="utf-8")
+        errors = self.verify(candidate, value)
         self.assertTrue(
             any("candidate file changed" in error for error in errors), errors
         )

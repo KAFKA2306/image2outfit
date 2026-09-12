@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "image2outfit candidate manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "jobId",
+    "productName",
+    "adapterId",
+    "runId",
+    "createdAt",
+    "sourceCommit",
+    "inputHashes",
+    "files",
+    "unityReady",
+    "releaseDecision"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "kind": {"const": "image2outfit-candidate"},
+    "jobId": {"type": "string", "minLength": 1},
+    "productName": {"type": "string", "minLength": 1},
+    "adapterId": {"type": "string", "minLength": 1},
+    "runId": {"type": "string", "minLength": 1},
+    "createdAt": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "sourceCommit": {
+      "type": "string",
+      "pattern": "^(?:local|[0-9a-f]{40})$"
+    },
+    "inputHashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+          "bytes": {"type": "integer"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "unityReady": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"type": "string", "enum": ["NOT_REQUESTED", "VERIFIED"]},
+        "multiMaterialSetup": {"type": "string", "enum": ["VERIFIED", "UNVERIFIED"]},
+        "modularAvatarSetup": {"type": "string", "enum": ["VERIFIED", "UNVERIFIED"]},
+        "ndmfBake": {"type": "string", "enum": ["VERIFIED", "UNVERIFIED"]},
+        "reimport": {"type": "string", "enum": ["VERIFIED", "UNVERIFIED"]},
+        "targetAvatarAssetPath": {"type": "string", "minLength": 1},
+        "evidencePath": {"type": "string", "minLength": 1},
+        "metrics": {"type": "object"}
+      }
+    },
+    "releaseDecision": {
+      "type": "string",
+      "enum": ["REVIEW_REQUIRED"]
+    },
+    "constructionMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commercialProfile",
+        "constructionProfile",
+        "constructionPath",
+        "constructionSha256",
+        "releasePolicySha256",
+        "requiredCapabilities",
+        "requiredCommercialEvidence",
+        "buildScript"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "commercialProfile": {"type": "string", "minLength": 1},
+        "constructionProfile": {"type": "string", "minLength": 1},
+        "constructionPath": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "constructionSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "releasePolicySha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "requiredCapabilities": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "requiredCommercialEvidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "buildScript": {"type": "string", "minLength": 1}
+      }
+    },
+    "researchBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "baselineId",
+        "surveyYear",
+        "reviewedAt",
+        "sha256",
+        "requiredCapabilities"
+      ],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "baselineId": {"type": "string", "minLength": 1},
+        "surveyYear": {"type": "integer"},
+        "reviewedAt": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "requiredCapabilities": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "poseContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "requiredPoses", "poses"],
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "requiredPoses": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "poses": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "bytes", "sha256", "sourcePath", "width", "height"],
+            "properties": {
+              "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+              "bytes": {"type": "integer"},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "sourcePath": {"type": "string", "minLength": 1},
+              "width": {"type": "integer"},
+              "height": {"type": "integer"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
