@@ -41,7 +41,9 @@ class HypothesisToolSelectionTests(unittest.TestCase):
             "review.direct-image-inspection",
         )
 
-    def test_external_hypothesis_path_requires_explicit_capabilities_and_pins(self) -> None:
+    def test_external_hypothesis_path_requires_explicit_capabilities_and_pins(
+        self,
+    ) -> None:
         registry = build_registry(
             self.profile,
             tool_requirements={
@@ -104,7 +106,9 @@ class HypothesisToolSelectionTests(unittest.TestCase):
             item for item in self.profile["stages"] if item["stage"] == "initialize-3d"
         )
         external = next(
-            tool for tool in stage["tools"] if tool["toolName"] == "initialize.external-hypothesis"
+            tool
+            for tool in stage["tools"]
+            if tool["toolName"] == "initialize.external-hypothesis"
         )
         self.assertEqual(
             external["requiredResultFields"],
