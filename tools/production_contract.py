@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 import shutil
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Callable
 
 from contract_io import (
@@ -241,6 +241,104 @@ def validate_hashed_artifacts(
     return normalized, errors
 
 
+def _release_inventory_path(release: Path, value: str) -> Path:
+    path = PurePosixPath(value)
+    if (
+        not value
+        or "\\" in value
+        or path.is_absolute()
+        or path.as_posix() != value
+        or any(part in {"", ".", ".."} for part in path.parts)
+    ):
+        raise ValueError(f"release inventory path is not canonical: {value!r}")
+    target = (release / Path(*path.parts)).resolve()
+    release_root = release.resolve()
+    if target == release_root or release_root not in target.parents:
+        raise ValueError(f"release inventory path escapes package: {value!r}")
+    return target
+
+
+def verify_release_package(
+    *,
+    root: Path,
+    release: Path,
+    expected_job_id: str,
+    expected_adapter_id: str,
+    expected_candidate_manifest_sha256: str,
+) -> list[str]:
+    """Independently verify a generated release manifest against packaged bytes."""
+    manifest_path = release / "release-manifest.json"
+    try:
+        manifest = read_json(manifest_path)
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        return [f"release manifest unreadable: {exc}"]
+
+    errors = validate_schema_file(
+        manifest,
+        root / "config" / "release-manifest.schema.v2.json",
+        "release-manifest",
+    )
+    for field, expected in (
+        ("jobId", expected_job_id),
+        ("adapterId", expected_adapter_id),
+        ("candidateManifestSha256", expected_candidate_manifest_sha256),
+    ):
+        if manifest.get(field) != expected:
+            errors.append(f"release manifest {field} does not match expected identity")
+
+    excluded = {"release-manifest.json", f"{expected_job_id}.zip"}
+    declared: set[str] = set()
+    files = manifest.get("files")
+    if isinstance(files, list):
+        for index, item in enumerate(files):
+            prefix = f"release-manifest.files[{index}]"
+            if not isinstance(item, dict):
+                continue
+            value = item.get("path")
+            if not isinstance(value, str):
+                continue
+            if value in declared:
+                errors.append(f"{prefix}.path is duplicated: {value}")
+                continue
+            declared.add(value)
+            if value in excluded:
+                errors.append(f"{prefix}.path is reserved from inventory: {value}")
+                continue
+            try:
+                target = _release_inventory_path(release, value)
+            except ValueError as exc:
+                errors.append(f"{prefix}: {exc}")
+                continue
+            if not target.is_file():
+                errors.append(f"{prefix}.path is missing: {value}")
+                continue
+            if target.is_symlink():
+                errors.append(f"{prefix}.path must not be a symlink: {value}")
+                continue
+            expected_bytes = item.get("bytes")
+            if not isinstance(expected_bytes, int) or isinstance(expected_bytes, bool):
+                continue
+            if expected_bytes < 0:
+                errors.append(f"{prefix}.bytes must be non-negative")
+            elif target.stat().st_size != expected_bytes:
+                errors.append(f"{prefix}.bytes mismatch: {value}")
+            expected_hash = item.get("sha256")
+            if isinstance(expected_hash, str) and SHA256.fullmatch(expected_hash):
+                if digest(target) != expected_hash:
+                    errors.append(f"{prefix}.sha256 mismatch: {value}")
+
+    actual = {
+        relative(release, path)
+        for path in release.rglob("*")
+        if path.is_file() and relative(release, path) not in excluded
+    }
+    for value in sorted(actual - declared):
+        errors.append(f"release package file is omitted from manifest: {value}")
+    for value in sorted(declared - actual):
+        errors.append(f"release manifest lists non-package file: {value}")
+    return list(dict.fromkeys(errors))
+
+
 def _copy_evidence_document(
     source: Path,
     destination: Path,
@@ -340,6 +438,18 @@ def package_release(
             "decision": "GO",
         },
     )
+    manifest_errors = verify_release_package(
+        root=root,
+        release=release,
+        expected_job_id=job["id"],
+        expected_adapter_id=job["adapterId"],
+        expected_candidate_manifest_sha256=candidate_hash,
+    )
+    if manifest_errors:
+        raise ValueError(
+            "release manifest verification failed: " + "; ".join(manifest_errors)
+        )
+
     archive = release / f"{job['id']}.zip"
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as output:
         for path in sorted(release.rglob("*")):
@@ -369,4 +479,5 @@ __all__ = [
     "validate_hashed_artifacts",
     "validate_job",
     "validate_schema_file",
+    "verify_release_package",
 ]
