@@ -29,6 +29,7 @@ class RuntimeArtifactBindingTests(unittest.TestCase):
             "product_id": "garment-a",
             "target_avatar": "avatar-a",
             "source_reference": "reference-a",
+            "source_fingerprint": "canonical-fixture",
             "profile_id": "profile-a",
             "revision_id": "revision-a",
             "execution_mode": ExecutionMode.EXECUTE.value,
