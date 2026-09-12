@@ -141,7 +141,27 @@ class ProductionGateCommercialTest(unittest.TestCase):
             runtime_paths.for_job(self.root, self.job).candidate
             / "candidate-manifest.json"
         )
-        self.write_json(path, value or {"schemaVersion": 2, "jobId": "demo"})
+        default = {
+            "schemaVersion": 2,
+            "kind": "image2outfit-candidate",
+            "jobId": "demo",
+            "productName": "Demo",
+            "adapterId": "demo-v1",
+            "runId": "test-run",
+            "createdAt": "2026-09-12T00:00:00Z",
+            "sourceCommit": "local",
+            "inputHashes": {},
+            "files": [
+                {
+                    "path": "UnityAssets/demo.prefab",
+                    "bytes": 1,
+                    "sha256": "0" * 64,
+                }
+            ],
+            "unityReady": {"status": "NOT_REQUESTED"},
+            "releaseDecision": "REVIEW_REQUIRED",
+        }
+        self.write_json(path, value or default)
         return path
 
     def test_candidate_manifest_binds_method_and_policy_hashes(self) -> None:
