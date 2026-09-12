@@ -178,9 +178,7 @@ def sanitized_input_hashes(request: Mapping[str, Any]) -> dict[str, str | None]:
     """Return view hashes only, never file tokens, URLs, object keys, or credentials."""
     return {
         name: (
-            None
-            if request["views"][name] is None
-            else request["views"][name]["sha256"]
+            None if request["views"][name] is None else request["views"][name]["sha256"]
         )
         for name in VIEW_ORDER
     }
