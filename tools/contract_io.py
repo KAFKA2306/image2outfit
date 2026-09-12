@@ -75,6 +75,9 @@ def validate_json_schema(
         return [f"{path} must be {expected_type}"]
     if "const" in schema and value != schema["const"]:
         errors.append(f"{path} must equal {schema['const']!r}")
+    allowed_values = schema.get("enum")
+    if isinstance(allowed_values, list) and value not in allowed_values:
+        errors.append(f"{path} must be one of {allowed_values!r}")
     if isinstance(value, str):
         minimum = schema.get("minLength")
         if isinstance(minimum, int) and len(value) < minimum:
