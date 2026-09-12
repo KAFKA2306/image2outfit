@@ -21,9 +21,12 @@ from image2outfit.blueprint import (  # noqa: E402
 )
 from image2outfit.tripo_adapter import (  # noqa: E402
     SMART_MESH_MODEL_VERSION,
+    TEXTURE_MODEL_VERSION,
     TripoClient,
+    build_import_model_request,
     build_multiview_request,
     build_smart_mesh_request,
+    build_texture_model_request,
 )
 import tripo_blueprint_adapter  # noqa: E402
 
@@ -152,14 +155,42 @@ class TripoAdapterTests(unittest.TestCase):
                 front={"type": "png", "url": "https://example.test/front.png"}
             )
 
-    def test_smart_mesh_is_quad_p2_and_bounded(self) -> None:
+    def test_smart_mesh_is_quad_p2_and_uses_current_face_limit(self) -> None:
         request = build_smart_mesh_request("task-123", face_limit=12000)
         self.assertEqual(request["type"], "highpoly_to_lowpoly")
         self.assertEqual(request["model_version"], SMART_MESH_MODEL_VERSION)
         self.assertTrue(request["quad"])
         self.assertEqual(request["face_limit"], 12000)
-        with self.assertRaisesRegex(ValueError, "between 500 and 25000"):
-            build_smart_mesh_request("task-123", face_limit=26000)
+        with self.assertRaisesRegex(ValueError, "between 500 and 20000"):
+            build_smart_mesh_request("task-123", face_limit=20001)
+
+    def test_adjusted_model_can_be_imported_then_reference_textured(self) -> None:
+        model_ref = {
+            "type": "glb",
+            "object": {"bucket": "tripo-data", "key": "adjusted.glb"},
+        }
+        imported = build_import_model_request(model_ref)
+        self.assertEqual(imported["type"], "import_model")
+        self.assertEqual(imported["file"], model_ref)
+
+        texture = build_texture_model_request(
+            "import-task",
+            reference_images=[
+                {"type": "png", "url": "https://example.test/shading.png"}
+            ],
+        )
+        self.assertEqual(texture["type"], "texture_model")
+        self.assertEqual(texture["model_version"], TEXTURE_MODEL_VERSION)
+        self.assertEqual(texture["texture_alignment"], "geometry")
+        self.assertFalse(texture["pbr"])
+        self.assertEqual(
+            texture["texture_prompt"]["images"][0]["url"],
+            "https://example.test/shading.png",
+        )
+
+    def test_reference_texture_requires_explicit_reference(self) -> None:
+        with self.assertRaisesRegex(ValueError, "requires prompt_text or reference_images"):
+            build_texture_model_request("import-task")
 
     def test_api_key_is_never_optional(self) -> None:
         with self.assertRaisesRegex(ValueError, "API key"):
