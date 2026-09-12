@@ -1,24 +1,31 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import os
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "tools"))
 
-from image2outfit.blueprint import (
+from image2outfit.blueprint import (  # noqa: E402
     BlueprintOutcome,
     digest_blueprint,
     make_blueprint_audit,
     validate_blueprint,
 )
-from image2outfit.tripo_adapter import (
+from image2outfit.tripo_adapter import (  # noqa: E402
     SMART_MESH_MODEL_VERSION,
     TripoClient,
     build_multiview_request,
     build_smart_mesh_request,
 )
+import tripo_blueprint_adapter  # noqa: E402
 
 HASH_A = "a" * 64
 HASH_B = "b" * 64
@@ -169,6 +176,41 @@ class TripoAdapterTests(unittest.TestCase):
         client = TripoClient("test-key")
         with self.assertRaisesRegex(ValueError, "must be positive"):
             client.wait_for_task("task-123", timeout_seconds=0)
+
+    def test_experiment_adapter_records_missing_credential_as_fail(self) -> None:
+        with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+            root = Path(directory)
+            blueprint_path = root / "blueprint.json"
+            request_path = root / "request.json"
+            result_path = root / "result.json"
+            blueprint = mesh_blueprint()
+            blueprint_path.write_text(json.dumps(blueprint), encoding="utf-8")
+            blueprint_sha = hashlib.sha256(blueprint_path.read_bytes()).hexdigest()
+            request = {
+                "schemaVersion": 1,
+                "productId": blueprint["productId"],
+                "blueprint": {
+                    "path": blueprint_path.relative_to(ROOT).as_posix(),
+                    "sha256": blueprint_sha,
+                },
+                "views": {
+                    "front": {
+                        "type": "png",
+                        "url": "https://example.test/front.png",
+                    },
+                    "back": {
+                        "type": "png",
+                        "url": "https://example.test/back.png",
+                    },
+                },
+            }
+            request_path.write_text(json.dumps(request), encoding="utf-8")
+            with patch.dict(os.environ, {"TRIPO_API_KEY": ""}):
+                code = tripo_blueprint_adapter.run(request_path, result_path)
+            result = json.loads(result_path.read_text(encoding="utf-8"))
+            self.assertEqual(code, 1)
+            self.assertEqual(result["status"], "FAIL")
+            self.assertEqual(result["error"], "TRIPO_API_KEY is required")
 
 
 if __name__ == "__main__":
