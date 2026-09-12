@@ -18,7 +18,7 @@ import candidate_manifest as candidate_contract
 import customer_quality
 import production_contract as contract
 from candidate_orchestrator import _research_state
-from runtime_transaction import DirectoryTransaction
+from runtime_transaction import ReceiptBoundDirectoryTransaction
 
 QUALITY_SPEC_PATH = Path("contracts/quality/quality-spec.json")
 
@@ -124,6 +124,97 @@ def _strict_release_audit(
     return quality, research, list(dict.fromkeys(errors)), candidate_hash
 
 
+def _go_receipt(
+    *,
+    job: dict[str, Any],
+    candidate_hash: str,
+    package: dict[str, Any],
+    release_had_original: bool,
+) -> dict[str, Any]:
+    return {
+        "schemaVersion": 2,
+        "phase": "release",
+        "jobId": job["id"],
+        "adapterId": job["adapterId"],
+        "checkedAt": candidate_contract.now(),
+        "decision": "GO",
+        "releaseEligible": True,
+        "candidateManifestSha256": candidate_hash,
+        **package,
+        "stateProtection": {
+            "customerReleaseProtected": True,
+            "previousReleaseExisted": release_had_original,
+            "previousReleaseRestored": False,
+            "strictCustomerQualityPassed": True,
+            "qualitySpecPassed": True,
+            "researchBaselinePassed": True,
+            "singleReleaseValidator": "tools/customer_quality.py",
+            "qualitySpecValidator": "src/image2outfit/quality.py",
+            "qualitySpecPath": QUALITY_SPEC_PATH.as_posix(),
+            "rawEvidencePackaged": True,
+            "receiptBoundToRelease": True,
+        },
+    }
+
+
+def validate_go_release_pair(
+    *,
+    release: Path,
+    receipt_path: Path,
+    job_id: str,
+    adapter_id: str,
+    candidate_hash: str,
+) -> list[str]:
+    """Verify that a GO receipt identifies the exact release payload."""
+    errors: list[str] = []
+    try:
+        receipt = candidate_contract.read(receipt_path)
+    except Exception as exc:
+        return [f"GO receipt unreadable: {exc}"]
+
+    expected = {
+        "decision": "GO",
+        "releaseEligible": True,
+        "jobId": job_id,
+        "adapterId": adapter_id,
+        "candidateManifestSha256": candidate_hash,
+    }
+    for field, value in expected.items():
+        if receipt.get(field) != value:
+            errors.append(f"GO receipt {field} mismatch")
+
+    manifest = release / "release-manifest.json"
+    archive = release / f"{job_id}.zip"
+    if not manifest.is_file():
+        errors.append("release manifest is missing")
+    else:
+        actual = candidate_contract.digest(manifest)
+        if receipt.get("releaseManifestSha256") != actual:
+            errors.append("GO receipt releaseManifestSha256 mismatch")
+        try:
+            manifest_data = candidate_contract.read(manifest)
+        except Exception as exc:
+            errors.append(f"release manifest unreadable: {exc}")
+        else:
+            for field, value in (
+                ("jobId", job_id),
+                ("adapterId", adapter_id),
+                ("candidateManifestSha256", candidate_hash),
+            ):
+                if manifest_data.get(field) != value:
+                    errors.append(f"release manifest {field} mismatch")
+
+    zip_data = receipt.get("zip")
+    if not isinstance(zip_data, dict):
+        errors.append("GO receipt zip binding is missing")
+    elif not archive.is_file():
+        errors.append("release archive is missing")
+    elif zip_data.get("sha256") != candidate_contract.digest(archive):
+        errors.append("GO receipt archive sha256 mismatch")
+
+    return list(dict.fromkeys(errors))
+
+
 def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
     artifact = candidate_contract.path(job["artifactDir"])
     candidate = candidate_contract.path(job["candidateDir"])
@@ -174,7 +265,8 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
         )
         return 2
 
-    release_tx = DirectoryTransaction(release)
+    audit_path = artifact / "audit.json"
+    release_tx = ReceiptBoundDirectoryTransaction(release, audit_path)
     release_had_original = release_tx.begin()
     try:
         candidate_manifest = candidate_contract.read(
@@ -193,34 +285,27 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
             verify_candidate=candidate_contract.verify_candidate,
             now=candidate_contract.now,
         )
-        release_tx.commit(release_had_original)
-        candidate_contract.write(
-            artifact / "audit.json",
-            {
-                "schemaVersion": 2,
-                "phase": "release",
-                "jobId": job["id"],
-                "adapterId": job["adapterId"],
-                "checkedAt": candidate_contract.now(),
-                "decision": "GO",
-                "releaseEligible": True,
-                "candidateManifestSha256": candidate_hash,
-                **package,
-                "stateProtection": {
-                    "customerReleaseProtected": True,
-                    "previousReleaseExisted": release_had_original,
-                    "previousReleaseRestored": False,
-                    "strictCustomerQualityPassed": True,
-                    "qualitySpecPassed": True,
-                    "researchBaselinePassed": True,
-                    "singleReleaseValidator": "tools/customer_quality.py",
-                    "qualitySpecValidator": "src/image2outfit/quality.py",
-                    "qualitySpecPath": QUALITY_SPEC_PATH.as_posix(),
-                    "rawEvidencePackaged": True,
-                },
-            },
+        receipt = _go_receipt(
+            job=job,
+            candidate_hash=candidate_hash,
+            package=package,
+            release_had_original=release_had_original,
         )
+        candidate_contract.write(release_tx.receipt_staging, receipt)
+        pair_errors = validate_go_release_pair(
+            release=release,
+            receipt_path=release_tx.receipt_staging,
+            job_id=job["id"],
+            adapter_id=job["adapterId"],
+            candidate_hash=candidate_hash,
+        )
+        if pair_errors:
+            raise ValueError(
+                "release pair validation failed: " + "; ".join(pair_errors)
+            )
+        release_tx.commit(release_had_original)
         return 0
     except Exception:
-        release_tx.rollback(release_had_original)
+        if release_tx.journal.exists():
+            release_tx.rollback(release_had_original)
         raise
