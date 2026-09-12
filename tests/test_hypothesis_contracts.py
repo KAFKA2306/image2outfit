@@ -58,7 +58,9 @@ class HypothesisContractTests(unittest.TestCase):
             expected_avatar_id="SiroinoSotai_PC",
         )
 
-    def test_blueprint_separates_observed_inferred_unknown_and_is_not_evidence(self) -> None:
+    def test_blueprint_separates_observed_inferred_unknown_and_is_not_evidence(
+        self,
+    ) -> None:
         summary = self.blueprint_summary
         self.assertEqual(summary["observationCounts"]["OBSERVED"], 1)
         self.assertEqual(summary["observationCounts"]["INFERRED"], 1)
