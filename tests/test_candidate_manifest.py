@@ -252,10 +252,7 @@ class CandidateManifestTest(unittest.TestCase):
         value["surpriseAuthority"] = True
         errors = self.verify(candidate, value)
         self.assertTrue(
-            any(
-                "surpriseAuthority is not allowed" in error
-                for error in errors
-            ),
+            any("surpriseAuthority is not allowed" in error for error in errors),
             errors,
         )
 
