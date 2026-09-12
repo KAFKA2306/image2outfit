@@ -116,10 +116,7 @@ def api_json(
 def download_file(url: str, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
-    with (
-        urllib.request.urlopen(url, timeout=60) as response,
-        temporary.open("wb") as output,
-    ):
+    with urllib.request.urlopen(url, timeout=60) as response, temporary.open("wb") as output:
         while True:
             block = response.read(1024 * 1024)
             if not block:
@@ -165,38 +162,35 @@ def execute(args: argparse.Namespace) -> int:
     request = validate_multiview_request(raw_request)
     product_id = request["productId"]
 
-    blueprint_path = repo_path(request["blueprintPath"], label="blueprint")
-    authority_path = repo_path(
-        request["targetAvatarAuthorityPath"], label="target avatar authority"
-    )
-    blueprint = read_object(blueprint_path, "blueprint")
-    authority = read_object(authority_path, "target avatar authority")
-    authority_summary = validate_target_avatar_authority(authority)
-    blueprint_summary = validate_blueprint(
-        blueprint,
-        expected_product_id=product_id,
-        expected_avatar_id=authority_summary["avatarId"],
-    )
-    if (
-        blueprint_summary["targetAvatarAuthoritySha256"]
-        != authority_summary["authoritySha256"]
-    ):
-        raise ValueError("blueprint target-avatar authority does not match authority file")
-    if blueprint_summary["consumingStage"] != "initialize-3d":
-        raise ValueError("Tripo mesh-draft blueprint must consume initialize-3d")
-
-    api_key = os.environ.get("TRIPO_API_KEY", "").strip()
-    if not api_key:
-        write_failed_result(
-            result_path,
-            product_id=product_id,
-            failure_reason="TRIPO_API_KEY is not configured",
-        )
-        return 2
-
     task_id: str | None = None
     started = time.monotonic()
     try:
+        blueprint_path = repo_path(request["blueprintPath"], label="blueprint")
+        authority_path = repo_path(
+            request["targetAvatarAuthorityPath"], label="target avatar authority"
+        )
+        blueprint = read_object(blueprint_path, "blueprint")
+        authority = read_object(authority_path, "target avatar authority")
+        authority_summary = validate_target_avatar_authority(authority)
+        blueprint_summary = validate_blueprint(
+            blueprint,
+            expected_product_id=product_id,
+            expected_avatar_id=authority_summary["avatarId"],
+        )
+        if (
+            blueprint_summary["targetAvatarAuthoritySha256"]
+            != authority_summary["authoritySha256"]
+        ):
+            raise ValueError(
+                "blueprint target-avatar authority does not match authority file"
+            )
+        if blueprint_summary["consumingStage"] != "initialize-3d":
+            raise ValueError("Tripo mesh-draft blueprint must consume initialize-3d")
+
+        api_key = os.environ.get("TRIPO_API_KEY", "").strip()
+        if not api_key:
+            raise RuntimeError("TRIPO_API_KEY is not configured")
+
         created = api_json(
             "POST",
             "/task",
