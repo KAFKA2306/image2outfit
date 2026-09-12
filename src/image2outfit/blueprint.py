@@ -87,7 +87,10 @@ def validate_blueprint(value: Mapping[str, Any]) -> dict[str, Any]:
         errors.append("schemaVersion must be 1")
 
     blueprint_id = value.get("blueprintId")
-    if not isinstance(blueprint_id, str) or _BLUEPRINT_ID.fullmatch(blueprint_id) is None:
+    if (
+        not isinstance(blueprint_id, str)
+        or _BLUEPRINT_ID.fullmatch(blueprint_id) is None
+    ):
         errors.append("blueprintId must be a canonical id")
     product_id = value.get("productId")
     if not isinstance(product_id, str) or _PRODUCT_ID.fullmatch(product_id) is None:
@@ -106,9 +109,7 @@ def validate_blueprint(value: Mapping[str, Any]) -> dict[str, Any]:
     except ValueError:
         errors.append("role is not supported")
     if role is not None and value.get("consumingStage") != ROLE_STAGE[role].value:
-        errors.append(
-            f"role {role.value} must consume stage {ROLE_STAGE[role].value}"
-        )
+        errors.append(f"role {role.value} must consume stage {ROLE_STAGE[role].value}")
 
     revision = value.get("revision")
     parent = value.get("parentBlueprintSha256")
