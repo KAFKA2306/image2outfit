@@ -6,11 +6,17 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from image2outfit.hypothesis_contracts import validate_blueprint
 
 
 def sha256_file(path: str | Path) -> str:
@@ -112,6 +118,40 @@ def _reference_identity(
     }
 
 
+def _blueprint_identity(
+    job: Mapping[str, Any],
+    *,
+    product_id: str,
+    source_sha256: str,
+) -> dict[str, Any] | None:
+    pipeline = job.get("garmentPipeline")
+    if not isinstance(pipeline, Mapping):
+        return None
+    raw_path = pipeline.get("blueprintPath")
+    if raw_path is None:
+        return None
+    if not isinstance(raw_path, str) or not raw_path:
+        raise ValueError("garmentPipeline.blueprintPath must be a non-empty string")
+    path = repo_path(raw_path)
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    payload = read_object(path)
+    summary = validate_blueprint(
+        payload,
+        expected_product_id=product_id,
+        expected_source_sha256=source_sha256,
+    )
+    return {
+        "kind": "planning-blueprint",
+        "path": path.relative_to(ROOT).as_posix(),
+        "fileSha256": sha256_file(path),
+        "blueprintSha256": summary["blueprintSha256"],
+        "blueprintId": summary["blueprintId"],
+        "revision": summary["revision"],
+        "isEvidence": False,
+    }
+
+
 def build_review_bundle(
     job_path: str | Path,
     request_path: str | Path,
@@ -192,6 +232,11 @@ def build_review_bundle(
         raise ValueError("job must bind renderLoopRevision or buildRevision")
 
     reference = _reference_identity(product_id, request)
+    blueprint = _blueprint_identity(
+        job,
+        product_id=product_id,
+        source_sha256=str(reference["sourceSha256"]),
+    )
     observed = set(reference.get("observedViews") or [])
     assessability = {
         view: "ASSESSABLE" if view in observed else "NOT_ASSESSABLE"
@@ -208,6 +253,7 @@ def build_review_bundle(
             "sha256": sha256_file(manifest_path),
         },
         "reference": reference,
+        "blueprint": blueprint,
         "referenceAssessability": assessability,
         "renderProtocol": protocol,
         "renderProtocolSha256": stable_sha256(protocol),
@@ -253,6 +299,9 @@ def validate_review_result(
         "candidateManifestSha256": bundle["candidateManifest"]["sha256"],
         "renderProtocolSha256": bundle["renderProtocolSha256"],
     }
+    blueprint = bundle.get("blueprint")
+    if isinstance(blueprint, Mapping):
+        expected["blueprintSha256"] = blueprint["blueprintSha256"]
     for key, value in expected.items():
         if review.get(key) != value:
             raise ValueError(f"review binding mismatch: {key}")
