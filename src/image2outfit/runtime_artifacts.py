@@ -115,6 +115,8 @@ def attach_runtime_artifact_ref(
 ) -> dict[str, Any]:
     """Attach the canonical produced ArtifactRef to a successful executed output."""
     result = dict(output)
+    if state.get("execution_mode") != ExecutionMode.EXECUTE.value:
+        return result
     if result.get("mode") != "executed":
         return result
     payload = result.get("result")
