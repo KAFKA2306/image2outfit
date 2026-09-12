@@ -275,7 +275,7 @@ def verify_release_package(
 
     errors = validate_schema_file(
         manifest,
-        root / "config" / "release-manifest.schema.v2.json",
+        root / "contracts" / "release" / "release-manifest.schema.v2.json",
         "release-manifest",
     )
     for field, expected in (
