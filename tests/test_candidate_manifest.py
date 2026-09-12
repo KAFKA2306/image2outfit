@@ -219,37 +219,50 @@ class CandidateManifestTest(unittest.TestCase):
         _, _, value = self.make_candidate()
         value["files"][0]["bytes"] = "8"
         errors = self.verify(candidate, value)
-        self.assertTrue(any("bytes must be integer" in error for error in errors), errors)
+        self.assertTrue(
+            any("bytes must be integer" in error for error in errors), errors
+        )
 
     def test_invalid_enum_and_sha_are_rejected(self) -> None:
         candidate, _, value = self.make_candidate()
         value["releaseDecision"] = "GO"
         errors = self.verify(candidate, value)
-        self.assertTrue(any("releaseDecision must be one of" in error for error in errors), errors)
+        self.assertTrue(
+            any("releaseDecision must be one of" in error for error in errors), errors
+        )
 
         _, _, value = self.make_candidate()
         value["files"][0]["sha256"] = "not-a-sha"
         errors = self.verify(candidate, value)
-        self.assertTrue(any("sha256 does not match" in error for error in errors), errors)
+        self.assertTrue(
+            any("sha256 does not match" in error for error in errors), errors
+        )
 
     def test_duplicate_file_path_is_rejected(self) -> None:
         candidate, _, value = self.make_candidate()
         value["files"].append(deepcopy(value["files"][0]))
         errors = self.verify(candidate, value)
-        self.assertTrue(any("duplicate candidate manifest path" in error for error in errors), errors)
+        self.assertTrue(
+            any("duplicate candidate manifest path" in error for error in errors),
+            errors,
+        )
 
     def test_unexpected_top_level_field_is_rejected(self) -> None:
         candidate, _, value = self.make_candidate()
         value["surpriseAuthority"] = True
         errors = self.verify(candidate, value)
-        self.assertTrue(any("surpriseAuthority is not allowed" in error for error in errors), errors)
+        self.assertTrue(
+            any("surpriseAuthority is not allowed" in error for error in errors), errors
+        )
 
     def test_stale_input_hash_is_rejected_semantically(self) -> None:
         candidate, _, value = self.make_candidate()
         key = next(iter(value["inputHashes"]))
         value["inputHashes"][key] = "0" * 64
         errors = self.verify(candidate, value)
-        self.assertTrue(any("candidate input changed" in error for error in errors), errors)
+        self.assertTrue(
+            any("candidate input changed" in error for error in errors), errors
+        )
 
     def test_tampered_candidate_file_is_rejected(self) -> None:
         candidate, file, value = self.make_candidate()
