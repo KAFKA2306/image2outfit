@@ -15,7 +15,9 @@ sys.path.insert(0, str(TOOLS))
 import contract_io  # noqa: E402
 import production_contract  # noqa: E402
 
-SCHEMA = Path(__file__).resolve().parents[1] / "config/candidate-manifest.schema.v2.json"
+SCHEMA = (
+    Path(__file__).resolve().parents[1] / "config/candidate-manifest.schema.v2.json"
+)
 
 
 class ReleasePackagingTest(unittest.TestCase):
