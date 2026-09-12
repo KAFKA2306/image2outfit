@@ -46,9 +46,7 @@ def mesh_blueprint() -> dict:
         "targetAvatarSha256": HASH_A,
         "sourceReferenceSha256": HASH_B,
         "consumingStage": "initialize-3d",
-        "upstreamArtifacts": [
-            {"path": "artifacts/turnaround.png", "sha256": HASH_C}
-        ],
+        "upstreamArtifacts": [{"path": "artifacts/turnaround.png", "sha256": HASH_C}],
         "regions": [
             {
                 "id": "body-cloth",
@@ -87,7 +85,9 @@ class BlueprintTests(unittest.TestCase):
         value["consumingStage"] = "render-evidence"
         result = validate_blueprint(value)
         self.assertFalse(result["passed"])
-        self.assertTrue(any("must consume stage" in error for error in result["errors"]))
+        self.assertTrue(
+            any("must consume stage" in error for error in result["errors"])
+        )
 
     def test_hard_surface_requires_manual_review_flag(self) -> None:
         value = mesh_blueprint()
@@ -189,7 +189,9 @@ class TripoAdapterTests(unittest.TestCase):
         )
 
     def test_reference_texture_requires_explicit_reference(self) -> None:
-        with self.assertRaisesRegex(ValueError, "requires prompt_text or reference_images"):
+        with self.assertRaisesRegex(
+            ValueError, "requires prompt_text or reference_images"
+        ):
             build_texture_model_request("import-task")
 
     def test_api_key_is_never_optional(self) -> None:
