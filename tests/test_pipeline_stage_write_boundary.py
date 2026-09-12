@@ -28,9 +28,7 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
             cwd=root,
             check=True,
         )
-        subprocess.run(
-            ["git", "config", "user.name", "test"], cwd=root, check=True
-        )
+        subprocess.run(["git", "config", "user.name", "test"], cwd=root, check=True)
         (root / ".gitignore").write_text(".image2outfit/\n", encoding="utf-8")
         (root / "protected.txt").write_text("last-good\n", encoding="utf-8")
         subprocess.run(
@@ -137,7 +135,9 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
                 other.read_text(encoding="utf-8"), '{"state":"last-good"}\n'
             )
 
-    def test_dirty_before_is_not_a_violation_when_stage_leaves_it_unchanged(self) -> None:
+    def test_dirty_before_is_not_a_violation_when_stage_leaves_it_unchanged(
+        self,
+    ) -> None:
         with self._repo() as name:
             root = Path(name)
             protected = root / "protected.txt"
