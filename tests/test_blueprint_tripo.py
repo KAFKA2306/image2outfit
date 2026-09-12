@@ -158,6 +158,18 @@ class TripoAdapterTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "API key"):
             TripoClient("")
 
+    def test_generate_smart_mesh_rejects_missing_front_before_network(self) -> None:
+        client = TripoClient("test-key")
+        with self.assertRaisesRegex(ValueError, "front view is required"):
+            client.generate_smart_mesh(
+                {"back": {"type": "png", "url": "https://example.test/back.png"}}
+            )
+
+    def test_wait_rejects_nonpositive_poll_contract_before_network(self) -> None:
+        client = TripoClient("test-key")
+        with self.assertRaisesRegex(ValueError, "must be positive"):
+            client.wait_for_task("task-123", timeout_seconds=0)
+
 
 if __name__ == "__main__":
     unittest.main()
