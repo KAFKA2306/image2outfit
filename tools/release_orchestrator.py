@@ -300,7 +300,9 @@ def _run_release(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) ->
             candidate_hash=candidate_hash,
         )
         if pair_errors:
-            raise ValueError("release pair validation failed: " + "; ".join(pair_errors))
+            raise ValueError(
+                "release pair validation failed: " + "; ".join(pair_errors)
+            )
         release_tx.commit(release_had_original)
         return 0
     except Exception:
