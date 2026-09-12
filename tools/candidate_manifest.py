@@ -15,6 +15,7 @@ import contract_io
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "release-policy.json"
 JOB_SCHEMA_PATH = ROOT / "config" / "job.schema.v2.json"
+CANDIDATE_SCHEMA_PATH = ROOT / "config" / "candidate-manifest.schema.v2.json"
 UNITY_PIPELINE_PATH = (
     ROOT / "Assets" / "GenWorks" / "Shared" / "Editor" / "Image2OutfitPipeline.cs"
 )
@@ -203,31 +204,42 @@ def verify_candidate(
     candidate: Path,
     data: dict[str, Any],
 ) -> list[str]:
+    schema_errors = contract_io.validate_schema_file(
+        data, CANDIDATE_SCHEMA_PATH, "candidate manifest"
+    )
+    if schema_errors:
+        return [f"candidate manifest schema: {error}" for error in schema_errors]
+
     errors = []
-    if data.get("schemaVersion") != 2 or data.get("kind") != "image2outfit-candidate":
-        errors.append("candidate manifest invalid")
-    if data.get("jobId") != job["id"] or data.get("adapterId") != job["adapterId"]:
+    if data["jobId"] != job["id"] or data["adapterId"] != job["adapterId"]:
         errors.append("candidate identity mismatch")
     current_commit = os.environ.get("GITHUB_SHA")
-    if current_commit and data.get("sourceCommit") != current_commit:
+    if current_commit and data["sourceCommit"] != current_commit:
         errors.append("candidate source commit differs from current commit")
     current_inputs = inputs(job_path, job)
-    for name, expected in data.get("inputHashes", {}).items():
+    for name, expected in data["inputHashes"].items():
         if current_inputs.get(name) != expected:
             errors.append(f"candidate input changed: {name}")
+
     expected_paths = set()
-    for item in data.get("files", []):
-        file = (candidate / item.get("path", "")).resolve()
+    seen_paths: set[str] = set()
+    for item in data["files"]:
+        item_path = item["path"]
+        if item_path in seen_paths:
+            errors.append(f"duplicate candidate manifest path: {item_path}")
+            continue
+        seen_paths.add(item_path)
+        file = (candidate / item_path).resolve()
         if not inside(file, candidate):
             errors.append("candidate manifest path escapes directory")
             continue
         expected_paths.add(file)
         if (
             not file.is_file()
-            or digest(file) != item.get("sha256")
-            or file.stat().st_size != item.get("bytes")
+            or digest(file) != item["sha256"]
+            or file.stat().st_size != item["bytes"]
         ):
-            errors.append(f"candidate file changed: {item.get('path')}")
+            errors.append(f"candidate file changed: {item_path}")
     actual = {file.resolve() for file in candidate.rglob("*") if file.is_file()}
     actual.discard((candidate / "candidate-manifest.json").resolve())
     if actual != expected_paths:
