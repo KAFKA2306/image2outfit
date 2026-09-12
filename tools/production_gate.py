@@ -15,6 +15,7 @@ from typing import Any
 
 import candidate_manifest as candidate_contract
 import method_selection
+import production_contract as contract
 import runtime_paths
 from candidate_orchestrator import _augment_audit, _run_candidate as run_candidate
 from release_orchestrator import _run_release as run_release
@@ -59,6 +60,9 @@ def _load(job_path: Path, root: Path = ROOT) -> tuple[dict[str, Any], dict[str, 
     missing = [key for key in required if key not in job or job[key] in (None, "")]
     if missing:
         raise ValueError(f"job v2 missing: {', '.join(missing)}")
+    validation_errors = contract.validate_job(job, policy, root)
+    if validation_errors:
+        raise ValueError("job contract invalid: " + "; ".join(validation_errors))
     runtime_paths.for_job(root, job)
     return _runtime_job(job, root), policy
 

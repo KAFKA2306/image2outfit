@@ -26,6 +26,53 @@ from contract_io import (
 )
 
 
+def _owned_path_error(*, root: Path, value: Any, owner: str, field: str) -> str | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        resolved = repo_path(root, value)
+        owner_root = repo_path(root, owner)
+    except ValueError as exc:
+        return f"job.{field}: {exc}"
+    if resolved != owner_root and owner_root not in resolved.parents:
+        return f"job.{field} must belong to {owner}"
+    return None
+
+
+def _human_evidence_identity_errors(job: dict[str, Any], *, root: Path) -> list[str]:
+    errors: list[str] = []
+    evidence = job.get("humanEvidence")
+    if not isinstance(evidence, dict):
+        return errors
+    for kind, value in evidence.items():
+        if not isinstance(value, str) or not value:
+            continue
+        try:
+            path = repo_path(root, value)
+        except ValueError as exc:
+            errors.append(f"job.humanEvidence.{kind}: {exc}")
+            continue
+        if not path.is_file():
+            continue
+        try:
+            document = read_json(path)
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            errors.append(f"job.humanEvidence.{kind} is unreadable: {exc}")
+            continue
+        if document.get("jobId") != job.get("id"):
+            errors.append(f"job.humanEvidence.{kind} jobId must match job.id")
+        if document.get("adapterId") != job.get("adapterId"):
+            errors.append(
+                f"job.humanEvidence.{kind} adapterId must match job.adapterId"
+            )
+        candidate_hash = document.get("candidateManifestSha256")
+        if not isinstance(candidate_hash, str) or not SHA256.fullmatch(candidate_hash):
+            errors.append(
+                f"job.humanEvidence.{kind} candidateManifestSha256 must be a lowercase SHA-256"
+            )
+    return errors
+
+
 def validate_job(job: dict[str, Any], policy: dict[str, Any], root: Path) -> list[str]:
     errors = validate_schema_file(job, root / "config" / "job.schema.v2.json", "job")
     product_id = job.get("id")
@@ -80,17 +127,47 @@ def validate_job(job: dict[str, Any], policy: dict[str, Any], root: Path) -> lis
             "job.posePaths must exactly match the canonical release-policy pose paths"
         )
 
-    for field in (
-        "blendPath",
-        "fbxAssetPath",
-        "prefabAssetPath",
-        "integratedPrefabAssetPath",
-    ):
-        value = job.get(field)
-        if isinstance(value, str) and product_id:
-            prefix = canonical_product_root(product_id) + "/"
-            if not value.startswith(prefix):
-                errors.append(f"job.{field} must stay inside {prefix[:-1]}")
+    if product_id:
+        product_root = canonical_product_root(product_id)
+        for field in (
+            "blendPath",
+            "fbxAssetPath",
+            "prefabAssetPath",
+            "integratedPrefabAssetPath",
+            "patternLayoutPath",
+        ):
+            error = _owned_path_error(
+                root=root,
+                value=job.get(field),
+                owner=product_root,
+                field=field,
+            )
+            if error:
+                errors.append(error)
+
+        delivery_assets = job.get("deliveryAssets")
+        if isinstance(delivery_assets, list):
+            for index, value in enumerate(delivery_assets):
+                error = _owned_path_error(
+                    root=root,
+                    value=value,
+                    owner=product_root,
+                    field=f"deliveryAssets[{index}]",
+                )
+                if error:
+                    errors.append(error)
+
+        error = _owned_path_error(
+            root=root,
+            value=job.get("licenseEvidence"),
+            owner=f"config/products/{product_id}",
+            field="licenseEvidence",
+        )
+        if error:
+            errors.append(error)
+
+        errors.extend(_human_evidence_identity_errors(job, root=root))
+
     return list(dict.fromkeys(errors))
 
 
