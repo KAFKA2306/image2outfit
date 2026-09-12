@@ -33,6 +33,10 @@ def read(path: Path) -> dict[str, Any]:
 
 
 def write(path: Path, value: dict[str, Any]) -> None:
+    if path.name == "candidate-manifest.json":
+        errors = candidate_structure_errors(value)
+        if errors:
+            raise ValueError("; ".join(errors))
     contract_io.write_json(path, value)
 
 
@@ -198,17 +202,31 @@ def manifest(files: list[Path], base: Path) -> list[dict[str, Any]]:
     ]
 
 
+def candidate_structure_errors(data: dict[str, Any]) -> list[str]:
+    schema_errors = contract_io.validate_schema_file(
+        data, CANDIDATE_SCHEMA_PATH, "candidate manifest"
+    )
+    if schema_errors:
+        return [f"candidate manifest schema: {error}" for error in schema_errors]
+    seen_paths: set[str] = set()
+    errors: list[str] = []
+    for item in data["files"]:
+        item_path = item["path"]
+        if item_path in seen_paths:
+            errors.append(f"duplicate candidate manifest path: {item_path}")
+        seen_paths.add(item_path)
+    return errors
+
+
 def verify_candidate(
     job_path: Path,
     job: dict[str, Any],
     candidate: Path,
     data: dict[str, Any],
 ) -> list[str]:
-    schema_errors = contract_io.validate_schema_file(
-        data, CANDIDATE_SCHEMA_PATH, "candidate manifest"
-    )
-    if schema_errors:
-        return [f"candidate manifest schema: {error}" for error in schema_errors]
+    structure_errors = candidate_structure_errors(data)
+    if structure_errors:
+        return structure_errors
 
     errors = []
     if data["jobId"] != job["id"] or data["adapterId"] != job["adapterId"]:
@@ -222,13 +240,8 @@ def verify_candidate(
             errors.append(f"candidate input changed: {name}")
 
     expected_paths = set()
-    seen_paths: set[str] = set()
     for item in data["files"]:
         item_path = item["path"]
-        if item_path in seen_paths:
-            errors.append(f"duplicate candidate manifest path: {item_path}")
-            continue
-        seen_paths.add(item_path)
         file = (candidate / item_path).resolve()
         if not inside(file, candidate):
             errors.append("candidate manifest path escapes directory")
