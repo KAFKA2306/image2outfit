@@ -72,6 +72,32 @@
       "type": "string",
       "enum": ["REVIEW_REQUIRED"]
     },
+    "constructionMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "commercialProfile",
+        "constructionProfile",
+        "constructionPath",
+        "constructionSha256",
+        "releasePolicySha256",
+        "requiredCapabilities",
+        "requiredCommercialEvidence",
+        "buildScript"
+      ],
+      "properties": {
+        "schemaVersion": {"const": 1},
+        "commercialProfile": {"type": "string", "minLength": 1},
+        "constructionProfile": {"type": "string", "minLength": 1},
+        "constructionPath": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
+        "constructionSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "releasePolicySha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "requiredCapabilities": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "requiredCommercialEvidence": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "buildScript": {"type": "string", "minLength": 1}
+      }
+    },
     "researchBaseline": {
       "type": "object",
       "additionalProperties": false,
