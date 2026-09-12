@@ -81,8 +81,7 @@ def build_smart_mesh_request(
         raise ValueError("original_model_task_id is required")
     if not 500 <= face_limit <= SMART_MESH_FACE_LIMIT_MAX:
         raise ValueError(
-            "face_limit must be between 500 and "
-            f"{SMART_MESH_FACE_LIMIT_MAX}"
+            "face_limit must be between 500 and " f"{SMART_MESH_FACE_LIMIT_MAX}"
         )
     return {
         "type": "highpoly_to_lowpoly",
@@ -110,7 +109,7 @@ def build_texture_model_request(
     """Build geometry-aligned retexturing for downstream mask authoring.
 
     Tripo returns a textured model, not a semantic mask. A shading-only or region
-    reference image can be projected here, then extracted/edited downstream.
+    reference image can be projected here, then extracted or edited downstream.
     """
     if not original_model_task_id:
         raise ValueError("original_model_task_id is required")
@@ -224,7 +223,7 @@ class TripoClient:
                 raise TripoError(f"Tripo task {task_id} timed out")
             time.sleep(poll_seconds)
 
-    def _run_model_task(
+    def _run_task(
         self,
         payload: Mapping[str, Any],
         *,
@@ -235,18 +234,28 @@ class TripoClient:
             submitted["taskId"], timeout_seconds=timeout_seconds
         )
         output = task.get("output")
-        if not isinstance(output, dict) or not any(
-            isinstance(output.get(key), str) and output[key]
-            for key in ("model", "pbr_model", "base_model")
-        ):
-            raise TripoError("successful Tripo task has no documented model output")
         return {
             "taskId": submitted["taskId"],
             "submitTraceId": submitted["traceId"],
             "pollTraceId": task.get("traceId"),
             "consumedCredit": task.get("consumed_credit"),
-            "output": output,
+            "output": output if isinstance(output, dict) else {},
         }
+
+    def _run_model_task(
+        self,
+        payload: Mapping[str, Any],
+        *,
+        timeout_seconds: float,
+    ) -> dict[str, Any]:
+        result = self._run_task(payload, timeout_seconds=timeout_seconds)
+        output = result["output"]
+        if not any(
+            isinstance(output.get(key), str) and output[key]
+            for key in ("model", "pbr_model", "base_model")
+        ):
+            raise TripoError("successful Tripo task has no documented model output")
+        return result
 
     def generate_smart_mesh(
         self,
@@ -297,7 +306,7 @@ class TripoClient:
         timeout_seconds: float = 600.0,
     ) -> dict[str, Any]:
         """Import an uploaded Blender-adjusted model for post-process operations."""
-        return self._run_model_task(
+        return self._run_task(
             build_import_model_request(file_ref), timeout_seconds=timeout_seconds
         )
 
