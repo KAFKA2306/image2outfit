@@ -116,7 +116,10 @@ def api_json(
 def download_file(url: str, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
-    with urllib.request.urlopen(url, timeout=60) as response, temporary.open("wb") as output:
+    with (
+        urllib.request.urlopen(url, timeout=60) as response,
+        temporary.open("wb") as output,
+    ):
         while True:
             block = response.read(1024 * 1024)
             if not block:
