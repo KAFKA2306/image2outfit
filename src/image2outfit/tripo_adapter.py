@@ -29,7 +29,9 @@ def _file_ref(value: Mapping[str, Any] | None) -> dict[str, Any]:
     ref = dict(value)
     selectors = [name for name in ("file_token", "url", "object") if name in ref]
     if len(selectors) != 1:
-        raise ValueError("Tripo file ref requires exactly one of file_token, url, object")
+        raise ValueError(
+            "Tripo file ref requires exactly one of file_token, url, object"
+        )
     file_type = ref.get("type")
     if not isinstance(file_type, str) or not file_type:
         raise ValueError("Tripo file ref type is required")
@@ -81,7 +83,7 @@ def build_smart_mesh_request(
         raise ValueError("original_model_task_id is required")
     if not 500 <= face_limit <= SMART_MESH_FACE_LIMIT_MAX:
         raise ValueError(
-            "face_limit must be between 500 and " f"{SMART_MESH_FACE_LIMIT_MAX}"
+            f"face_limit must be between 500 and {SMART_MESH_FACE_LIMIT_MAX}"
         )
     return {
         "type": "highpoly_to_lowpoly",
@@ -230,9 +232,7 @@ class TripoClient:
         timeout_seconds: float,
     ) -> dict[str, Any]:
         submitted = self.submit(payload)
-        task = self.wait_for_task(
-            submitted["taskId"], timeout_seconds=timeout_seconds
-        )
+        task = self.wait_for_task(submitted["taskId"], timeout_seconds=timeout_seconds)
         output = task.get("output")
         return {
             "taskId": submitted["taskId"],
