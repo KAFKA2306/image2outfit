@@ -82,14 +82,22 @@ def _identity(
     return str(state["product_id"]), hypothesis_id, candidate_id, avatar_sha256
 
 
+def _enforced(state: Mapping[str, Any]) -> bool:
+    return (
+        state.get("execution_mode") == ExecutionMode.EXECUTE.value
+        and isinstance(state.get("source_fingerprint"), str)
+        and bool(state["source_fingerprint"])
+    )
+
+
 def validate_runtime_artifact_inputs(
     stage: PipelineStage | str,
     state: Mapping[str, Any],
     *,
     repository_root: str,
 ) -> None:
-    """Fail closed before a consumer handler starts in execute mode."""
-    if state.get("execution_mode") != ExecutionMode.EXECUTE.value:
+    """Fail closed before a canonical execute-mode consumer starts."""
+    if not _enforced(state):
         return
     resolved = PipelineStage(stage)
     refs = _completed_refs(state)
@@ -113,11 +121,9 @@ def attach_runtime_artifact_ref(
     state: Mapping[str, Any],
     output: Mapping[str, Any],
 ) -> dict[str, Any]:
-    """Attach the canonical produced ArtifactRef to a successful executed output."""
+    """Attach the canonical produced ArtifactRef to an executed stage output."""
     result = dict(output)
-    if state.get("execution_mode") != ExecutionMode.EXECUTE.value:
-        return result
-    if result.get("mode") != "executed":
+    if not _enforced(state) or result.get("mode") != "executed":
         return result
     payload = result.get("result")
     if not isinstance(payload, Mapping):
