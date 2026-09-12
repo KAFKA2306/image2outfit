@@ -205,9 +205,7 @@ class RepositoryWriteBoundary:
     def changed_paths(self) -> tuple[str, ...]:
         if not self._begun:
             raise RuntimeError("repository write boundary has not started")
-        return tuple(
-            sorted(self._changed_git_paths() | self._changed_product_paths())
-        )
+        return tuple(sorted(self._changed_git_paths() | self._changed_product_paths()))
 
     def _restore_git(self) -> None:
         changed = self._changed_git_paths()
