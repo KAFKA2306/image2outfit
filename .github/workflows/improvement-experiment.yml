@@ -56,6 +56,7 @@ jobs:
         env:
           MANIFEST: ${{ inputs.manifest }}
           METHOD: ${{ matrix.method }}
+          TRIPO_API_KEY: ${{ secrets.TRIPO_API_KEY }}
         run: >-
           uv run --locked --no-default-groups
           python tools/manage.py experiment-method
