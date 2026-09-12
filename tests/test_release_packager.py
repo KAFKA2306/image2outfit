@@ -19,9 +19,11 @@ import production_contract  # noqa: E402
 
 class ReleasePackagingTest(unittest.TestCase):
     def _install_release_schema(self, root: Path) -> None:
-        schema = root / "config/release-manifest.schema.v2.json"
+        schema = root / "contracts/release/release-manifest.schema.v2.json"
         schema.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(ROOT / "config/release-manifest.schema.v2.json", schema)
+        shutil.copy2(
+            ROOT / "contracts/release/release-manifest.schema.v2.json", schema
+        )
 
     def test_raw_human_and_runtime_evidence_are_packaged(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
