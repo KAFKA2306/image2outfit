@@ -135,7 +135,9 @@ class VisualReviewBlueprintBindingTests(unittest.TestCase):
         )
         return job_path, request_path, blueprint_path
 
-    def test_bundle_hash_binds_blueprint_but_does_not_treat_it_as_evidence(self) -> None:
+    def test_bundle_hash_binds_blueprint_but_does_not_treat_it_as_evidence(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             job_path, request_path, _ = self.fixture(Path(tmp))
             bundle = M.build_review_bundle(job_path, request_path)
