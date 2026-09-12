@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/config/pipeline/blueprint.schema.v1.json",
+  "title": "image2outfit pipeline blueprint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "blueprintId",
+    "revision",
+    "role",
+    "productId",
+    "targetAvatar",
+    "targetAvatarSha256",
+    "sourceReferenceSha256",
+    "consumingStage",
+    "upstreamArtifacts",
+    "regions",
+    "mustPreserve",
+    "allowedFreedom",
+    "knownAmbiguity",
+    "expectedArtifactKinds"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "blueprintId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "revision": {"type": "integer", "minimum": 1},
+    "parentBlueprintSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "role": {
+      "enum": [
+        "initial-design",
+        "turnaround",
+        "mesh-draft",
+        "blender-cleanup",
+        "render-back",
+        "semantic-mask",
+        "texture-authoring"
+      ]
+    },
+    "productId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "targetAvatar": {"type": "string", "minLength": 1},
+    "targetAvatarSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "sourceReferenceSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "consumingStage": {
+      "enum": [
+        "normalize-view",
+        "decompose-garment",
+        "initialize-3d",
+        "build-blender",
+        "render-evidence"
+      ]
+    },
+    "upstreamArtifacts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/artifactRef"}
+    },
+    "regions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/region"}
+    },
+    "mustPreserve": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "allowedFreedom": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "knownAmbiguity": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "expectedArtifactKinds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "reviewImage": {"$ref": "#/$defs/artifactRef"},
+    "metadata": {"type": "object"}
+  },
+  "$defs": {
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "epistemicStatus", "kind"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "epistemicStatus": {"enum": ["observed", "inferred", "unknown"]},
+        "kind": {
+          "enum": [
+            "cloth",
+            "hard-surface",
+            "trim",
+            "decoration",
+            "material",
+            "body-interface"
+          ]
+        },
+        "manualReviewRequired": {"type": "boolean"},
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}
