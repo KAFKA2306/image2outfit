@@ -56,7 +56,9 @@ def _completed_refs(state: Mapping[str, Any]) -> list[ArtifactRef]:
     return refs
 
 
-def _identity(state: Mapping[str, Any], refs: list[ArtifactRef]) -> tuple[str, str, str, str]:
+def _identity(
+    state: Mapping[str, Any], refs: list[ArtifactRef]
+) -> tuple[str, str, str, str]:
     if refs:
         anchor = refs[0]
         return (
@@ -71,8 +73,12 @@ def _identity(state: Mapping[str, Any], refs: list[ArtifactRef]) -> tuple[str, s
         or state.get("profile_id")
         or "default-hypothesis"
     )
-    candidate_id = str(state.get("parent_run_id") or state.get("run_id") or "default-candidate")
-    avatar_sha256 = hashlib.sha256(str(state["target_avatar"]).encode("utf-8")).hexdigest()
+    candidate_id = str(
+        state.get("parent_run_id") or state.get("run_id") or "default-candidate"
+    )
+    avatar_sha256 = hashlib.sha256(
+        str(state["target_avatar"]).encode("utf-8")
+    ).hexdigest()
     return str(state["product_id"]), hypothesis_id, candidate_id, avatar_sha256
 
 
