@@ -145,9 +145,7 @@ def _reference_texture(
     task_id = request.get("originalModelTaskId")
     model_file = request.get("modelFile")
     if bool(task_id) == bool(model_file):
-        raise ValueError(
-            "provide exactly one of originalModelTaskId or modelFile"
-        )
+        raise ValueError("provide exactly one of originalModelTaskId or modelFile")
     imported: dict[str, Any] | None = None
     if model_file is not None:
         if not isinstance(model_file, dict) or "object" not in model_file:
@@ -179,8 +177,7 @@ def _reference_texture(
     provider = {"provider": "tripo", "importModel": imported, "texture": textured}
     url = _model_url(textured.get("output"))
     output_path = str(
-        request.get("outputModelPath")
-        or ".image2outfit/tripo/reference-textured.glb"
+        request.get("outputModelPath") or ".image2outfit/tripo/reference-textured.glb"
     )
     return provider, url, output_path
 
