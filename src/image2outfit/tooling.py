@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Protocol
 
 
@@ -196,10 +197,25 @@ class ToolRegistry:
             handler = self._handlers[stage_name]
         except KeyError as exc:
             raise KeyError(f"no tool is registered for stage {stage_name!r}") from exc
+
+        # Keep the dependency authority at the canonical invocation boundary so every
+        # selected implementation, including future production adapters, gets the
+        # same fail-closed producer identity and content-hash checks.
+        from .runtime_artifacts import (
+            attach_runtime_artifact_ref,
+            validate_runtime_artifact_inputs,
+        )
+
+        repository_root = str(Path(__file__).resolve().parents[2])
+        validate_runtime_artifact_inputs(
+            stage_name,
+            state,
+            repository_root=repository_root,
+        )
         result = handler(state)
         if not isinstance(result, Mapping):
             raise TypeError(f"stage {stage_name!r} returned a non-mapping result")
-        return dict(result)
+        return attach_runtime_artifact_ref(stage_name, state, result)
 
     def descriptor(self, stage: StageName | str) -> ToolDescriptor:
         return self._descriptors[_stage_name(stage)]
