@@ -47,12 +47,12 @@ class HypothesisExperimentEvaluationTests(unittest.TestCase):
             "semanticMasks": [],
         }
         if route == "C" and status == "PASS":
-            record["semanticMasks"] = [
-                {"role": "wrinkle", "artifactSha256": "e" * 64}
-            ]
+            record["semanticMasks"] = [{"role": "wrinkle", "artifactSha256": "e" * 64}]
         return record
 
-    def test_c_is_selected_when_quality_does_not_regress_and_elapsed_improves(self) -> None:
+    def test_c_is_selected_when_quality_does_not_regress_and_elapsed_improves(
+        self,
+    ) -> None:
         result = compare_experiment_records(
             [
                 self.record("A", elapsed=100, findings=2),
