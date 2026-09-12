@@ -45,7 +45,12 @@ class _PathSnapshot:
         if not path.exists():
             return cls(False)
         if path.is_file():
-            return cls(True, "file", path.read_bytes(), stat.S_IMODE(path.stat().st_mode))
+            return cls(
+                True,
+                "file",
+                path.read_bytes(),
+                stat.S_IMODE(path.stat().st_mode),
+            )
         return cls(True, "other", b"", stat.S_IMODE(path.stat().st_mode))
 
     def signature(self) -> tuple[bool, str, str, int]:
@@ -88,9 +93,17 @@ def _tree_state(root: Path) -> dict[str, tuple[str, str, int]]:
     for path in sorted(root.rglob("*")):
         relative = path.relative_to(root).as_posix()
         if path.is_symlink():
-            state[relative] = ("symlink", os.readlink(path), stat.S_IMODE(path.lstat().st_mode))
+            state[relative] = (
+                "symlink",
+                os.readlink(path),
+                stat.S_IMODE(path.lstat().st_mode),
+            )
         elif path.is_file():
-            state[relative] = ("file", _sha256(path), stat.S_IMODE(path.stat().st_mode))
+            state[relative] = (
+                "file",
+                _sha256(path),
+                stat.S_IMODE(path.stat().st_mode),
+            )
     return state
 
 
@@ -192,7 +205,9 @@ class RepositoryWriteBoundary:
     def changed_paths(self) -> tuple[str, ...]:
         if not self._begun:
             raise RuntimeError("repository write boundary has not started")
-        return tuple(sorted(self._changed_git_paths() | self._changed_product_paths()))
+        return tuple(
+            sorted(self._changed_git_paths() | self._changed_product_paths())
+        )
 
     def _restore_git(self) -> None:
         changed = self._changed_git_paths()
@@ -204,12 +219,15 @@ class RepositoryWriteBoundary:
             if name in self._untracked_snapshots:
                 self._untracked_snapshots[name].restore(path)
                 continue
-            tracked = subprocess.run(
-                ["git", "ls-files", "--error-unmatch", "--", name],
-                cwd=self.root,
-                check=False,
-                capture_output=True,
-            ).returncode == 0
+            tracked = (
+                subprocess.run(
+                    ["git", "ls-files", "--error-unmatch", "--", name],
+                    cwd=self.root,
+                    check=False,
+                    capture_output=True,
+                ).returncode
+                == 0
+            )
             if tracked:
                 subprocess.run(
                     ["git", "restore", "--worktree", "--source=HEAD", "--", name],
