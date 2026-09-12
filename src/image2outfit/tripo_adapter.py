@@ -158,6 +158,8 @@ class TripoClient:
         timeout_seconds: float = 600.0,
         poll_seconds: float = 2.0,
     ) -> dict[str, Any]:
+        if timeout_seconds <= 0 or poll_seconds <= 0:
+            raise ValueError("timeout_seconds and poll_seconds must be positive")
         deadline = time.monotonic() + timeout_seconds
         while True:
             task = self.get_task(task_id)
@@ -180,8 +182,11 @@ class TripoClient:
         face_limit: int = 8000,
         timeout_seconds: float = 600.0,
     ) -> dict[str, Any]:
+        front = views.get("front")
+        if not isinstance(front, Mapping):
+            raise ValueError("front view is required")
         multiview_payload = build_multiview_request(
-            front=views["front"],
+            front=front,
             left=views.get("left"),
             back=views.get("back"),
             right=views.get("right"),
