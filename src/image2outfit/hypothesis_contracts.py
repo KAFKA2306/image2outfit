@@ -47,7 +47,9 @@ def _string(value: object, *, label: str) -> str:
 
 def _sha256(value: object, *, label: str) -> str:
     text = _string(value, label=label)
-    if len(text) != 64 or any(character not in "0123456789abcdef" for character in text):
+    if len(text) != 64 or any(
+        character not in "0123456789abcdef" for character in text
+    ):
         raise ValueError(f"{label} must be a lowercase SHA-256")
     return text
 
@@ -228,7 +230,10 @@ def validate_hypothesis_set(
     blueprint_sha = _sha256(
         payload.get("blueprintSha256"), label="hypothesisSet.blueprintSha256"
     )
-    if expected_blueprint_sha256 is not None and blueprint_sha != expected_blueprint_sha256:
+    if (
+        expected_blueprint_sha256 is not None
+        and blueprint_sha != expected_blueprint_sha256
+    ):
         raise ValueError("hypothesis set blueprint hash mismatch")
     authority_sha = _sha256(
         payload.get("targetAvatarAuthoritySha256"),
@@ -259,14 +264,18 @@ def validate_hypothesis_set(
         if source in EXTERNAL_HYPOTHESIS_SOURCES:
             external_count += 1
             if canonical_source:
-                raise ValueError("external hypothesis cannot be promoted to canonical source")
+                raise ValueError(
+                    "external hypothesis cannot be promoted to canonical source"
+                )
             provenance = _mapping(
                 item.get("generatorProvenance"),
                 label=f"hypotheses[{index}].generatorProvenance",
             )
             _string(provenance.get("tool"), label="generatorProvenance.tool")
             _string(provenance.get("version"), label="generatorProvenance.version")
-    selected = _string(payload.get("selectedHypothesisId"), label="selectedHypothesisId")
+    selected = _string(
+        payload.get("selectedHypothesisId"), label="selectedHypothesisId"
+    )
     if selected not in seen:
         raise ValueError("selectedHypothesisId is not present in hypotheses")
     if payload.get("silentFallbackUsed") is not False:
@@ -357,7 +366,10 @@ def validate_blueprint_actual_audit(
     if payload.get("productId") != expected_product_id:
         raise ValueError("blueprint audit product identity mismatch")
     _sha256(payload.get("blueprintSha256"), label="blueprintAudit.blueprintSha256")
-    _sha256(payload.get("actualArtifactSha256"), label="blueprintAudit.actualArtifactSha256")
+    _sha256(
+        payload.get("actualArtifactSha256"),
+        label="blueprintAudit.actualArtifactSha256",
+    )
     decision = payload.get("decision")
     if decision not in AUDIT_DECISIONS:
         raise ValueError("blueprint audit decision is invalid")
