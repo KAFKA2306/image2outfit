@@ -133,5 +133,4 @@ jobs:
         shell: bash
         run: |
           mapfile -t files < /tmp/changed-python.txt
-          uv run --locked --no-default-groups --group dev ruff format --diff "${files[@]}"
           uv run --locked --no-default-groups --group dev ruff format --check "${files[@]}"
