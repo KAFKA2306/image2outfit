@@ -13,8 +13,10 @@ SEMANTIC_MASK_ROLES = frozenset(
 
 
 def _sha256(value: object, *, label: str) -> str:
-    if not isinstance(value, str) or len(value) != 64 or any(
-        character not in "0123456789abcdef" for character in value
+    if (
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(character not in "0123456789abcdef" for character in value)
     ):
         raise ValueError(f"{label} must be a lowercase SHA-256")
     return value
