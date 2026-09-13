@@ -55,6 +55,7 @@ src/image2outfit
 | 必須 view / pose | `config/release-policy.json` |
 | 製品 job | `config/products/<slug>/job.json` |
 | construction | `config/products/<slug>/construction.json` |
+| pipeline request schema | `config/pipeline/pipeline-request.schema.v1.json` |
 | stage profile | `config/pipeline-profiles/garment-reconstruction-v1.json` |
 | stage result schema | `config/pipeline/stage-result.schema.v1.json` |
 | audit record schema | `config/pipeline/stage-audit-record.schema.v1.json` |
