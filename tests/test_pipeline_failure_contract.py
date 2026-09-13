@@ -59,7 +59,14 @@ class PipelineFailureContractTests(unittest.TestCase):
             output = base / "failure.json"
             request.write_text("{not-json", encoding="utf-8")
             completed = subprocess.run(
-                [sys.executable, str(RUNNER), "--request", str(request), "--output", str(output)],
+                [
+                    sys.executable,
+                    str(RUNNER),
+                    "--request",
+                    str(request),
+                    "--output",
+                    str(output),
+                ],
                 cwd=ROOT,
                 capture_output=True,
                 text=True,
@@ -108,16 +115,26 @@ class PipelineFailureContractTests(unittest.TestCase):
             request.write_text(json.dumps(_valid_request()), encoding="utf-8")
             stdout = io.StringIO()
             argv = [str(RUNNER), "--request", str(request), "--engine", "langchain"]
-            with patch.object(sys, "argv", argv), patch.object(
-                runner, "run_langchain", side_effect=RuntimeError("LangChain Core is not installed")
-            ), contextlib.redirect_stdout(stdout):
+            with (
+                patch.object(sys, "argv", argv),
+                patch.object(
+                    runner,
+                    "run_langchain",
+                    side_effect=RuntimeError("LangChain Core is not installed"),
+                ),
+                contextlib.redirect_stdout(stdout),
+            ):
                 code = runner.main()
             self.assertEqual(code, 1)
             payload = json.loads(stdout.getvalue())
-            self.assertEqual(payload["failure"]["errorCode"], "PIPELINE_ENGINE_UNAVAILABLE")
+            self.assertEqual(
+                payload["failure"]["errorCode"], "PIPELINE_ENGINE_UNAVAILABLE"
+            )
             self.assertEqual(payload["failure"]["phase"], "pipeline")
 
-    def test_stage_failure_exposes_stable_domain_cause_without_exception_class(self) -> None:
+    def test_stage_failure_exposes_stable_domain_cause_without_exception_class(
+        self,
+    ) -> None:
         descriptor = failed_state_descriptor(
             {
                 "status": "FAILED",
