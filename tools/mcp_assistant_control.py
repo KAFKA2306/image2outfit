@@ -29,7 +29,9 @@ def classify_process_outcome(
     if unavailable_reason:
         return AssistantOutcome(AssistantStatus.UNAVAILABLE, unavailable_reason.strip())
     if cancelled:
-        return AssistantOutcome(AssistantStatus.CANCELLED, "Codex execution was cancelled.")
+        return AssistantOutcome(
+            AssistantStatus.CANCELLED, "Codex execution was cancelled."
+        )
 
     output = stdout.strip()
     error = stderr.strip()
