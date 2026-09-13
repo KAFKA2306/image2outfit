@@ -24,6 +24,7 @@ from contract_io import (
     validate_schema_file,
     write_json,
 )
+from product_completion import normalize_gate_name, project_product_completion
 
 
 def validate_job(job: dict[str, Any], policy: dict[str, Any], root: Path) -> list[str]:
@@ -132,10 +133,6 @@ def validate_construction(
     return value, list(dict.fromkeys(errors)), warnings
 
 
-def _normalize_gate_name(value: Any) -> str:
-    return "".join(character for character in str(value).lower() if character.isalnum())
-
-
 def _handoff_policy(root: Path) -> dict[str, Any]:
     try:
         value = read_json(root / "config" / "genworks-handoff-policy.json")
@@ -154,11 +151,12 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
         return [f"product manifest unreadable: {exc}"]
 
     handoff = _handoff_policy(root)
+    projection = project_product_completion(manifest, handoff)
     rules = handoff.get("rules", {})
     if not isinstance(rules, dict):
         rules = {}
     out_of_scope = {
-        _normalize_gate_name(name) for name in handoff.get("outOfScopeGates", [])
+        normalize_gate_name(name) for name in handoff.get("outOfScopeGates", [])
     }
 
     errors: list[str] = []
@@ -168,6 +166,7 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
         errors.append("product manifest productId must match job.id")
     if manifest.get("productRoot") != job.get("productRoot"):
         errors.append("product manifest productRoot must match job.productRoot")
+    errors.extend(projection["errors"])
 
     technical_gates = manifest.get("technicalGates")
     if isinstance(technical_gates, dict):
@@ -175,7 +174,7 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
             name
             for name, value in technical_gates.items()
             if value == "FAIL"
-            and _normalize_gate_name(name) not in out_of_scope
+            and normalize_gate_name(name) not in out_of_scope
             and not name.lower().startswith("human")
         )
         errors.extend(f"product technical gate failed: {name}" for name in failed)
@@ -187,17 +186,6 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
         and rules.get("fitAuditFailureBlocksCompletion", True)
     ):
         errors.append("product fit audit is explicitly failing")
-
-    state = str(manifest.get("state", manifest.get("status", "WORKING"))).upper()
-    completion_status = str(handoff.get("completionStatus", "COMPLETE")).upper()
-    if state == completion_status:
-        completion_gates = manifest.get("completionGates")
-        if not isinstance(completion_gates, dict):
-            errors.append("complete product requires completionGates")
-        else:
-            for name in handoff.get("requiredCompletionGates", []):
-                if completion_gates.get(name) != "PASS":
-                    errors.append(f"complete product gate is not PASS: {name}")
 
     return list(dict.fromkeys(errors))
 
