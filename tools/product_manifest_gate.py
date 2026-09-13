@@ -58,7 +58,11 @@ def _gate_evidence(
         if isinstance(value, str) and value.strip():
             resolved = _resolve_evidence_path(root, product_root, value)
             if resolved.is_file():
-                paths.append(str(resolved.relative_to(root)) if root in resolved.parents else str(resolved))
+                paths.append(
+                    str(resolved.relative_to(root))
+                    if root in resolved.parents
+                    else str(resolved)
+                )
 
     if gate == "visualAppearanceReview":
         review = manifest.get("visualAppearanceReview")
@@ -71,7 +75,9 @@ def _gate_evidence(
                     resolved = _resolve_evidence_path(root, product_root, value)
                     if resolved.is_file():
                         paths.append(
-                            str(resolved.relative_to(root)) if root in resolved.parents else str(resolved)
+                            str(resolved.relative_to(root))
+                            if root in resolved.parents
+                            else str(resolved)
                         )
     return list(dict.fromkeys(paths))
 
@@ -80,8 +86,14 @@ def evaluate_manifest(
     manifest: dict[str, Any], policy: dict[str, Any], root: Path = ROOT
 ) -> dict[str, Any]:
     required = policy.get("requiredCompletionGates")
-    if not isinstance(required, list) or not required or not all(isinstance(x, str) for x in required):
-        raise ValueError("policy.requiredCompletionGates must be a non-empty string array")
+    if (
+        not isinstance(required, list)
+        or not required
+        or not all(isinstance(x, str) for x in required)
+    ):
+        raise ValueError(
+            "policy.requiredCompletionGates must be a non-empty string array"
+        )
 
     product_root_value = manifest.get("productRoot")
     if not isinstance(product_root_value, str) or not product_root_value.strip():
@@ -139,14 +151,18 @@ def evaluate_manifest(
         "schemaVersion": 1,
         "productId": manifest.get("productId"),
         "gateStatus": overall,
-        "completionStatus": policy.get("completionStatus", "COMPLETE") if overall == PASS else None,
+        "completionStatus": policy.get("completionStatus", "COMPLETE")
+        if overall == PASS
+        else None,
         "requiredGates": rows,
         "outOfScopeGates": list(policy.get("outOfScopeGates", [])),
     }
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Evaluate a GenWorks ProductManifest completion gate")
+    parser = argparse.ArgumentParser(
+        description="Evaluate a GenWorks ProductManifest completion gate"
+    )
     parser.add_argument("manifest", type=Path)
     parser.add_argument(
         "--policy",
@@ -159,7 +175,13 @@ def main(argv: list[str] | None = None) -> int:
         policy = _read_json(args.policy)
         result = evaluate_manifest(manifest, policy)
     except (OSError, json.JSONDecodeError, ValueError) as exc:
-        print(json.dumps({"gateStatus": UNVERIFIED, "error": str(exc)}, ensure_ascii=False, sort_keys=True))
+        print(
+            json.dumps(
+                {"gateStatus": UNVERIFIED, "error": str(exc)},
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+        )
         return EXIT_CODES[UNVERIFIED]
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return EXIT_CODES[result["gateStatus"]]
