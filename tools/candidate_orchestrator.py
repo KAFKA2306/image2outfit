@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import audit_research_baseline
 import candidate_manifest as candidate_contract
@@ -194,7 +194,31 @@ def _record_candidate_failure(
     candidate_contract.write(audit_path, audit)
 
 
-def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -> int:
+def _state_protection(
+    candidate_had_original: bool,
+    workspace_had_original: bool,
+    release_had_original: bool,
+    failed: bool,
+) -> dict[str, Any]:
+    return {
+        "candidateLastGoodProtected": True,
+        "previousCandidateExisted": candidate_had_original,
+        "previousCandidateRestored": failed and candidate_had_original,
+        "canonicalWorkspaceProtected": True,
+        "previousWorkspaceExisted": workspace_had_original,
+        "previousWorkspaceRestored": failed and workspace_had_original,
+        "customerReleaseProtected": True,
+        "previousReleaseExisted": release_had_original,
+        "previousReleaseRestored": release_had_original,
+    }
+
+
+def _run_candidate(
+    job_path: Path,
+    job: dict[str, Any],
+    policy: dict[str, Any],
+    finalize_candidate: Callable[[], None] | None = None,
+) -> int:
     candidate = candidate_contract.path(job["candidateDir"])
     release = candidate_contract.path(job["releaseDir"])
     artifact = candidate_contract.path(job["artifactDir"])
@@ -247,6 +271,8 @@ def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) 
                 baseline,
                 baseline_hash,
             )
+            if finalize_candidate is not None:
+                finalize_candidate()
             candidate_tx.commit(candidate_had_original)
             workspace_tx.commit(workspace_had_original)
             workspace_started = False
@@ -257,17 +283,12 @@ def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) 
 
         _augment_audit(
             artifact,
-            {
-                "candidateLastGoodProtected": True,
-                "previousCandidateExisted": candidate_had_original,
-                "previousCandidateRestored": result != 0 and candidate_had_original,
-                "canonicalWorkspaceProtected": True,
-                "previousWorkspaceExisted": workspace_had_original,
-                "previousWorkspaceRestored": result != 0 and workspace_had_original,
-                "customerReleaseProtected": True,
-                "previousReleaseExisted": release_had_original,
-                "previousReleaseRestored": release_had_original,
-            },
+            _state_protection(
+                candidate_had_original,
+                workspace_had_original,
+                release_had_original,
+                result != 0,
+            ),
         )
         return result
     except Exception:
@@ -275,5 +296,15 @@ def _run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) 
             release_tx.rollback(release_had_original)
         if workspace_started:
             workspace_tx.rollback(workspace_had_original)
+            workspace_started = False
         candidate_tx.rollback(candidate_had_original)
+        _augment_audit(
+            artifact,
+            _state_protection(
+                candidate_had_original,
+                workspace_had_original,
+                release_had_original,
+                True,
+            ),
+        )
         raise
