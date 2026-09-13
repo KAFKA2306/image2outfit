@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-aster-fold-culotte-set",
+  "productName": "Aster Fold Culotte Set for SiroinoSotai_PC",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-aster-fold-panel-prototype",
+  "renderLoopRevision": "v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-aster-fold-culotte-set",
+  "productManifestPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/ProductManifest.json",
+  "buildScript": "tools/run_garment_pipeline.py",
+  "blendPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Blender/AsterFoldCulotte.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/Models/AsterFoldCulotte.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/Prefab/AsterFoldCulotte.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/Prefab/SiroinoSotai_AsterFoldCulotte.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "SiroinoSotai_PC neutral official body",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"],
+    "prefab": {"extensions": [".prefab"], "includeRegex": "(?i)(siroino|sotai)", "profileRegex": "(?i)SiroinoSotai_PC\\.prefab$", "contentRegex": null, "preferredRegex": "(?i)SiroinoSotai_PC\\.prefab$"},
+    "source": {"extensions": [".fbx"], "includeRegex": "(?i)(siroino|sotai)", "profileRegex": "(?i)SiroinoSotai_PC\\.fbx$", "fallbackNameRegex": "(?i)^SiroinoSotai_PC\\.fbx$", "preferredRegex": "(?i)SiroinoSotai_PC\\.fbx$"}
+  },
+  "garmentPipeline": {
+    "constructionPath": "config/products/siroino-aster-fold-culotte-set/construction.json",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "researchTrial": "panel-first asymmetrical folded-yoke culotte set",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true
+  },
+  "researchMethod": {
+    "name": "panel-first folded-yoke garment reconstruction",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Patterns/pattern-spec.json",
+    "secondaryEvidence": "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Prototype/aster-fold-culotte.obj",
+    "authorsImplementationExecuted": false,
+    "authorsCodeCopied": false
+  },
+  "licenseEvidence": "config/products/siroino-aster-fold-culotte-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-aster-fold-culotte-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Patterns/pattern-spec.json",
+    "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Prototype/aster-fold-culotte.obj",
+    "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Prototype/aster-fold-culotte.mtl"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-aster-fold-culotte-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-aster-fold-culotte-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-aster-fold-culotte-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": []
+}
