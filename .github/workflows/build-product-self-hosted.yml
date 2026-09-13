@@ -41,7 +41,71 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  scope:
+    runs-on: ubuntu-latest
+    outputs:
+      run_candidate: ${{ steps.resolve.outputs.run_candidate }}
+      selected_job: ${{ steps.resolve.outputs.selected_job }}
+      reason: ${{ steps.resolve.outputs.reason }}
+    steps:
+      - name: Checkout tracked pipeline for scope resolution
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Resolve product build scope before runner allocation
+        id: resolve
+        shell: bash
+        env:
+          DISPATCH_JOB_PATH: ${{ inputs.job_path }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          scope_json="$RUNNER_TEMP/product-build-scope.json"
+          uv run --no-cache --locked --no-default-groups --python 3.11 \
+            python tools/resolve_product_build_scope.py \
+            --job-path "$DISPATCH_JOB_PATH" \
+            --event-name "$EVENT_NAME" \
+            --base-sha "$BASE_SHA" \
+            --head-sha "$HEAD_SHA" > "$scope_json"
+          python - "$scope_json" "$GITHUB_OUTPUT" <<'PY'
+          import json
+          import sys
+
+          scope_path, output_path = sys.argv[1:]
+          with open(scope_path, encoding="utf-8") as stream:
+              scope = json.load(stream)
+          environment = scope.get("environment", {})
+          run_candidate = environment.get("SKIP_PRODUCT_BUILD") != "true"
+          selected_job = scope.get("selectedJob") or ""
+          reason = scope.get("reason") or ""
+          for name, value in (
+              ("run_candidate", "true" if run_candidate else "false"),
+              ("selected_job", selected_job),
+              ("reason", reason),
+          ):
+              if "\n" in value or "\r" in value:
+                  raise ValueError(f"unsafe workflow output: {name}")
+          with open(output_path, "a", encoding="utf-8") as stream:
+              stream.write(f"run_candidate={'true' if run_candidate else 'false'}\n")
+              stream.write(f"selected_job={selected_job}\n")
+              stream.write(f"reason={reason}\n")
+          PY
+
+      - name: Record scope decision
+        run: |
+          echo "run_candidate=${{ steps.resolve.outputs.run_candidate }}"
+          echo "selected_job=${{ steps.resolve.outputs.selected_job }}"
+          echo "reason=${{ steps.resolve.outputs.reason }}"
+
   candidate:
+    needs: scope
+    if: needs.scope.outputs.run_candidate == 'true'
     runs-on: [self-hosted, windows, x64, image2outfit]
     timeout-minutes: 240
 

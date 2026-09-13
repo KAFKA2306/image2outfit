@@ -24,6 +24,13 @@ def read_json(path: Path) -> dict[str, Any]:
 
 
 def write_json(path: Path, value: dict[str, Any]) -> None:
+    if path.name == "ProductManifest.json" and path.is_file():
+        # ProductManifest has state-transition semantics, so generic JSON callers
+        # must cross its single mutation boundary instead of replacing it directly.
+        import product_manifest_state
+
+        product_manifest_state.replace_legacy_snapshot(path, value)
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
         "w", encoding="utf-8", dir=path.parent, delete=False
@@ -75,6 +82,9 @@ def validate_json_schema(
         return [f"{path} must be {expected_type}"]
     if "const" in schema and value != schema["const"]:
         errors.append(f"{path} must equal {schema['const']!r}")
+    allowed_values = schema.get("enum")
+    if isinstance(allowed_values, list) and value not in allowed_values:
+        errors.append(f"{path} must be one of {allowed_values!r}")
     if isinstance(value, str):
         minimum = schema.get("minLength")
         if isinstance(minimum, int) and len(value) < minimum:

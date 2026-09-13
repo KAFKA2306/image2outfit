@@ -12,7 +12,8 @@
     "pattern-first-structured-garment",
     "geometry-first-stitch-graph",
     "pose-normalized-pattern-recovery",
-    "pattern-coordinate-mapping"
+    "pattern-coordinate-mapping",
+    "external-generators-are-bounded-hypotheses"
   ],
   "stages": [
     {
@@ -32,7 +33,7 @@
     {
       "stage": "normalize-view",
       "toolName": "pose-view-normalizer",
-      "purpose": "Separate pose and viewpoint effects from garment evidence.",
+      "purpose": "Separate pose and viewpoint effects from garment evidence and preserve observed/inferred/unknown boundaries.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {
@@ -43,13 +44,14 @@
         "normalizedReference",
         "cameraPose",
         "bodyLandmarks",
-        "normalizationMetrics"
+        "normalizationMetrics",
+        "initialBlueprint"
       ]
     },
     {
       "stage": "decompose-garment",
       "toolName": "semantic-part-decomposer",
-      "purpose": "Name garment parts by construction role and body region.",
+      "purpose": "Name garment parts by construction role and body region while keeping generation method separate.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
@@ -57,7 +59,8 @@
         "garmentPartGraph",
         "spatialAssignments",
         "materialRegions",
-        "ambiguityLog"
+        "ambiguityLog",
+        "generationAssignments"
       ]
     },
     {
@@ -92,27 +95,31 @@
     {
       "stage": "initialize-3d",
       "toolName": "pattern-initializer",
-      "purpose": "Place pattern pieces around the avatar without folds or intersections.",
+      "purpose": "Place pattern pieces around the avatar and own any selected external draft only as a bounded hypothesis.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
       "managedOutputs": [
         "initializedMesh",
         "panelTransforms",
-        "initialClearanceAudit"
+        "initialClearanceAudit",
+        "hypothesisSet",
+        "selectedHypothesis",
+        "targetAvatarAuthority"
       ]
     },
     {
       "stage": "build-blender",
       "toolName": "blender-python-runner",
-      "purpose": "Invoke the declared Blender Python build script through one reusable adapter.",
+      "purpose": "Invoke the declared Blender Python build script and own bounded reconciliation of a selected hypothesis.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 2,
       "requiredResultFields": {},
       "managedOutputs": [
         "editableBlend",
         "buildReport",
-        "geometryMetrics"
+        "geometryMetrics",
+        "reconciliationContract"
       ]
     },
     {
@@ -146,20 +153,22 @@
     {
       "stage": "render-evidence",
       "toolName": "evidence-renderer",
-      "purpose": "Render required five views and declared poses from the current artifact.",
+      "purpose": "Render canonical review evidence while keeping optional AI re-input render-back separate from quality evidence.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 5,
       "requiredResultFields": {},
       "managedOutputs": [
         "fiveViewImages",
         "requiredPoseImages",
-        "renderManifest"
+        "renderManifest",
+        "qaRenderManifest",
+        "renderBackManifest"
       ]
     },
     {
       "stage": "audit-geometry",
       "toolName": "geometry-fit-auditor",
-      "purpose": "Measure topology, weights, degeneracy, collisions, and evidence hashes.",
+      "purpose": "Measure topology, weights, degeneracy, collisions, evidence hashes, and blueprint-vs-actual deviations when declared.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
@@ -167,13 +176,14 @@
         "geometryAudit",
         "penetrationAudit",
         "evidenceHashAudit",
-        "gateSummary"
+        "gateSummary",
+        "blueprintActualAudit"
       ]
     },
     {
       "stage": "visual-review",
       "toolName": "visual-appearance-gate",
-      "purpose": "Require direct inspection of current images before visualAppearanceReview can pass.",
+      "purpose": "Require direct inspection of current images and bind the planning blueprint without treating it as visual evidence.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 5,
       "requiredResultFields": {
@@ -182,7 +192,8 @@
       "managedOutputs": [
         "visualReview",
         "inspectedImageHashes",
-        "blockingFindings"
+        "blockingFindings",
+        "reviewBundle"
       ]
     },
     {
