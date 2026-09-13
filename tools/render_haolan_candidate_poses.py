@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Render required deformation poses for an actual HAOLAN outfit candidate."""
+
 from __future__ import annotations
 
 import argparse
