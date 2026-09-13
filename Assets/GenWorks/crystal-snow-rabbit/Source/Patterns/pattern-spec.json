@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "productId": "crystal-snow-rabbit",
+  "construction": "panel-sewn",
+  "parts": [
+    {"id":"hood_crown","role":"garment"},{"id":"ear_L","role":"hero"},{"id":"ear_R","role":"hero"},
+    {"id":"jacket_front_L","role":"garment"},{"id":"jacket_front_R","role":"garment"},{"id":"jacket_back","role":"garment"},
+    {"id":"sleeve_L","role":"garment"},{"id":"sleeve_R","role":"garment"},{"id":"inner_bodice_front","role":"garment"},{"id":"inner_bodice_back","role":"garment"},
+    {"id":"waist_corset","role":"garment"},{"id":"skirt_upper","role":"garment"},{"id":"skirt_lower","role":"garment"},{"id":"lace_hem","role":"trim"},
+    {"id":"chest_bow","role":"accent"},{"id":"back_bow","role":"accent"},{"id":"crystal_charm_set","role":"hero"},
+    {"id":"boot_cuff_L","role":"accessory"},{"id":"boot_cuff_R","role":"accessory"}
+  ],
+  "heroDetail": {"requiredGeometry":["ear_L","ear_R","crystal_charm_set"]},
+  "uvPolicy": "UV0 explicit islands; hero ears and crystal accents non-overlapping; symmetric non-hero cloth may mirror",
+  "lod0TriangleTargetMax": 26000
+}
