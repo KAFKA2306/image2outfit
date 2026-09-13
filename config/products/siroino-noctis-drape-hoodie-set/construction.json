@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-noctis-drape-hoodie-set",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "designRevision": "v1-split-drape-prototype",
+  "panels": ["hood_center","hood_side_L","hood_side_R","shoulder_yoke_front_L","shoulder_yoke_front_R","shoulder_yoke_back","shell_front_L","shell_front_R","shell_back","sleeve_upper_L","sleeve_upper_R","sleeve_lower_L","sleeve_lower_R","cuff_L","cuff_R","inner_front","inner_back","drape_front_L","drape_front_R","drape_side_L","drape_side_R","drape_back_L","drape_back_R","waist_belt","vertical_harness_L","vertical_harness_R","split_drape_gate_L","split_drape_gate_R","hem_tab_L","hem_tab_R"],
+  "separateGeometry": ["drape_front_L","drape_front_R","drape_side_L","drape_side_R","drape_back_L","drape_back_R","split_drape_gate_L","split_drape_gate_R"],
+  "priorityFitZones": ["hood_clearance","shoulders","elbows","waist","hips","drape_roots"],
+  "requiredPoses": ["neutral","arms-up","arm-cross","crouch","sit","prone"],
+  "releaseBoundary": "Technical manufacturing only; no merge, release, deployment, or BOOTH publication in this workline.",
+  "clothSimulation": {"applicability":"NOT_REQUIRED","components":[],"evidence":"First technical pass is weight-driven.","reason":"Physics is not required to establish garment identity or baseline fit."}
+}
