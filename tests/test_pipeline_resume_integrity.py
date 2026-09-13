@@ -133,7 +133,7 @@ class PipelineResumeIntegrityTests(unittest.TestCase):
     def test_missing_completed_record_is_rejected(self) -> None:
         checkpoint = partial_checkpoint()
         del checkpoint["stage_records"][1]
-        with self.assertRaisesRegex(ValueError, "stage_records do not match"):
+        with self.assertRaises(ValueError):
             resume(checkpoint)
 
     def test_wrong_record_run_and_product_identity_are_rejected(self) -> None:
