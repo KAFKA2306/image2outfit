@@ -77,9 +77,7 @@ class ProductManifestGateTest(unittest.TestCase):
         )
         self.assertEqual("PASS", result["gateStatus"])
         self.assertEqual("COMPLETE", result["completionStatus"])
-        self.assertEqual(
-            ["unityImport", "vrchatRuntime"], result["outOfScopeGates"]
-        )
+        self.assertEqual(["unityImport", "vrchatRuntime"], result["outOfScopeGates"])
 
     def test_missing_required_evidence_is_unverified(self) -> None:
         (self.product_root / "Previews" / "demo-pose.webp").unlink()
@@ -87,21 +85,27 @@ class ProductManifestGateTest(unittest.TestCase):
             self.manifest, self.policy, self.root
         )
         self.assertEqual("UNVERIFIED", result["gateStatus"])
-        pose = next(item for item in result["requiredGates"] if item["id"] == "poseEvidence")
+        pose = next(
+            item for item in result["requiredGates"] if item["id"] == "poseEvidence"
+        )
         self.assertEqual("UNVERIFIED", pose["status"])
         self.assertIsNone(result["completionStatus"])
 
     def test_explicit_required_fail_is_fail(self) -> None:
         manifest = json.loads(json.dumps(self.manifest))
         manifest["visualAppearanceReview"]["result"] = "FAIL"
-        result = product_manifest_gate.evaluate_manifest(manifest, self.policy, self.root)
+        result = product_manifest_gate.evaluate_manifest(
+            manifest, self.policy, self.root
+        )
         self.assertEqual("FAIL", result["gateStatus"])
         self.assertIsNone(result["completionStatus"])
 
     def test_missing_required_gate_is_unverified(self) -> None:
         manifest = json.loads(json.dumps(self.manifest))
         del manifest["technicalGates"]["fbx"]
-        result = product_manifest_gate.evaluate_manifest(manifest, self.policy, self.root)
+        result = product_manifest_gate.evaluate_manifest(
+            manifest, self.policy, self.root
+        )
         self.assertEqual("UNVERIFIED", result["gateStatus"])
 
 
