@@ -16,7 +16,7 @@ if str(SRC) not in sys.path:
 if str(ROOT / "tools") not in sys.path:
     sys.path.insert(0, str(ROOT / "tools"))
 
-from image2outfit.audit import write_audit_bundle
+from image2outfit.audit import sha256_json, validate_stage_records, write_audit_bundle
 from image2outfit.pipeline import (
     PIPELINE_STAGES,
     ExecutionMode,
@@ -148,6 +148,35 @@ def _new_state(
     return state
 
 
+def _validate_resume_integrity(previous: dict[str, Any]) -> None:
+    """Validate the successful checkpoint prefix before any reuse is created."""
+    completed = list(previous.get("completed_stages", []))
+    if not completed:
+        return
+
+    raw_records = previous.get("stage_records", [])
+    if not isinstance(raw_records, list) or len(raw_records) < len(completed):
+        raise ValueError(
+            "resume checkpoint is missing audit records for the completed prefix"
+        )
+    records = raw_records[: len(completed)]
+    validate_stage_records(
+        records,
+        expected_run_id=str(previous["run_id"]),
+        expected_product_id=str(previous["product_id"]),
+        canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+    )
+
+    outputs = previous.get("outputs", {})
+    for index, stage in enumerate(completed):
+        state_output = outputs[stage]
+        record = records[index]
+        if record.get("output") != state_output:
+            raise ValueError(f"resume checkpoint output mismatch for stage {stage}")
+        if record.get("outputDigest") != sha256_json(state_output):
+            raise ValueError(f"resume checkpoint output digest mismatch for stage {stage}")
+
+
 def _resume_or_reset(
     previous: dict[str, Any],
     *,
@@ -163,6 +192,7 @@ def _resume_or_reset(
     if non_source_mismatches:
         _assert_identity(previous, expected)
     if "sourceFingerprint" not in mismatches:
+        _validate_resume_integrity(previous)
         return resume_pipeline_state(previous, execution_mode=mode)
 
     state = _new_state(request, expected, mode)
