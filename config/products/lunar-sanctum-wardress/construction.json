@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "profile": "loose-layered",
+  "productId": "lunar-sanctum-wardress",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v0-generated-reference-prototype",
+  "panels": [
+    "welded projected sleeveless bodice shell",
+    "left and right high-low overskirt leaves",
+    "short lace underskirt",
+    "left and right detached bell sleeves",
+    "waist sash and rear bow"
+  ],
+  "separateGeometry": [
+    "crescent_back_charm",
+    "star charm",
+    "tassel pair",
+    "head-dress band",
+    "garter straps"
+  ],
+  "priorityFitZones": [
+    "neckline",
+    "armhole",
+    "chest",
+    "back",
+    "waist",
+    "hip",
+    "skirt-body layer",
+    "elbow",
+    "wrist",
+    "upper back charm mount"
+  ],
+  "researchTrial": {
+    "primaryPaper": "https://arxiv.org/abs/2606.24564",
+    "secondaryPaper": "https://arxiv.org/abs/2602.22052",
+    "implementation": "reuse repository-owned logical-panel, projected-shell, cloth-checkpoint and nearest-body weight-transfer path; no new one-off generator",
+    "externalResearchCodeExecuted": false,
+    "generatedEvidence": "Assets/GenWorks/lunar-sanctum-wardress/Documentation/pattern-spec.json"
+  },
+  "releaseBoundary": "WORKING; Blender fit, weighted export, render evidence, Unity and VRChat are not yet verified"
+}
