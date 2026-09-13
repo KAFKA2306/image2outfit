@@ -146,7 +146,9 @@ def validate_pipeline_state(state: Mapping[str, Any]) -> tuple[PipelineStage, ..
         if state.get("status") == "FAILED" and len(records) == len(completed_names) + 1:
             allowed = [*completed_names, canonical_names[len(completed_names)]]
         if record_stages != allowed:
-            raise ValueError("stage_records do not match the completed canonical prefix")
+            raise ValueError(
+                "stage_records do not match the completed canonical prefix"
+            )
     return tuple(PipelineStage(name) for name in completed_names)
 
 
