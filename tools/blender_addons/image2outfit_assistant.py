@@ -26,7 +26,10 @@ _TOOLS_DIR = Path(__file__).resolve().parents[1]
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 
-from mcp_assistant_control import AssistantStatus, classify_process_outcome
+from mcp_assistant_control import (  # noqa: E402
+    AssistantStatus,
+    classify_process_outcome,
+)
 
 
 _RESULT_QUEUE: queue.Queue[tuple[str, str]] = queue.Queue()
@@ -143,7 +146,10 @@ User request:
                 stdout,
                 "\n".join(
                     part
-                    for part in (stderr, "Codex execution exceeded the 1800 second local safety timeout.")
+                    for part in (
+                        stderr,
+                        "Codex execution exceeded the 1800 second local safety timeout.",
+                    )
                     if part
                 ),
             )
@@ -158,7 +164,9 @@ User request:
             )
         _RESULT_QUEUE.put((outcome.status.value, outcome.content))
     except FileNotFoundError:
-        outcome = classify_process_outcome(None, unavailable_reason="Codex not found on PATH")
+        outcome = classify_process_outcome(
+            None, unavailable_reason="Codex not found on PATH"
+        )
         _RESULT_QUEUE.put((outcome.status.value, outcome.content))
     except Exception as exc:  # noqa: BLE001 - surface local operator failures to Blender UI.
         outcome = classify_process_outcome(None, stderr=f"Failed to launch Codex: {exc}")
