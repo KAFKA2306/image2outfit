@@ -238,9 +238,9 @@ def main() -> int:
         else None
     )
     if args.engine == "langgraph":
-        result = run_langgraph(state, registry)
+        result = run_langgraph(state, registry, checkpoint=checkpoint)
     elif args.engine == "langchain":
-        result = run_langchain(state, registry)
+        result = run_langchain(state, registry, checkpoint=checkpoint)
     else:
         result = run_pipeline(state, registry, checkpoint=checkpoint)
 
