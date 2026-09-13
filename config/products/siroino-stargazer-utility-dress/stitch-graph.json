@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-stargazer-utility-dress",
+  "status": "DECLARED",
+  "stitches": [
+    {"id":"front-princess-left","a":"front-bodice-center.side-left","b":"front-bodice-side-left.center","type":"lockstitch"},
+    {"id":"front-princess-right","a":"front-bodice-center.side-right","b":"front-bodice-side-right.center","type":"lockstitch"},
+    {"id":"back-princess-left","a":"back-bodice-center.side-left","b":"back-bodice-side-left.center","type":"lockstitch"},
+    {"id":"back-princess-right","a":"back-bodice-center.side-right","b":"back-bodice-side-right.center","type":"lockstitch"},
+    {"id":"shoulder-left","a":"back-bodice-center.shoulder-left","b":"front-bodice-side-left.shoulder","type":"lockstitch"},
+    {"id":"shoulder-right","a":"back-bodice-center.shoulder-right","b":"front-bodice-side-right.shoulder","type":"lockstitch"},
+    {"id":"side-left","a":"front-bodice-side-left.side","b":"back-bodice-side-left.side","type":"lockstitch"},
+    {"id":"side-right","a":"front-bodice-side-right.side","b":"back-bodice-side-right.side","type":"lockstitch"},
+    {"id":"sleeve-left","a":"sleeve-left.cap","b":"front-bodice-side-left.armhole","type":"set-in-with-ease"},
+    {"id":"sleeve-right","a":"sleeve-right.cap","b":"front-bodice-side-right.armhole","type":"set-in-with-ease"},
+    {"id":"sleeve-under-left","a":"sleeve-left.underarm-front","b":"sleeve-left.underarm-back","type":"lockstitch"},
+    {"id":"sleeve-under-right","a":"sleeve-right.underarm-front","b":"sleeve-right.underarm-back","type":"lockstitch"},
+    {"id":"collar-front","a":"stand-collar.neckline","b":"front-bodice-center.neck","type":"structural-band"},
+    {"id":"collar-back","a":"stand-collar.neckline","b":"back-bodice-center.neck","type":"structural-band"},
+    {"id":"waist-front-left","a":"front-skirt-left.waist","b":"front-bodice-center.waist","type":"waist-seam"},
+    {"id":"waist-front-right","a":"front-skirt-right.waist","b":"front-bodice-center.waist","type":"waist-seam"},
+    {"id":"waist-back-left","a":"back-skirt-left.waist","b":"back-bodice-center.waist","type":"waist-seam"},
+    {"id":"waist-back-right","a":"back-skirt-right.waist","b":"back-bodice-center.waist","type":"waist-seam"},
+    {"id":"yoke-upper","a":"crescent-utility-yoke.upper","b":"front-bodice-side-left.center","type":"topstitched-overlay"},
+    {"id":"yoke-lower","a":"crescent-utility-yoke.lower","b":"front-bodice-center.waist","type":"topstitched-overlay"},
+    {"id":"pocket-facing","a":"yoke-pocket-facing.opening","b":"crescent-utility-yoke.pocket-opening","type":"pocket-opening"}
+  ],
+  "edgeFinishes": [
+    {"edge":"front-skirt-left.hem","finish":"double-fold hem"},
+    {"edge":"front-skirt-right.hem","finish":"double-fold hem"},
+    {"edge":"back-skirt-left.hem","finish":"double-fold hem"},
+    {"edge":"back-skirt-right.hem","finish":"double-fold hem"},
+    {"edge":"sleeve-left.cuff","finish":"faced cuff"},
+    {"edge":"sleeve-right.cuff","finish":"faced cuff"}
+  ]
+}
