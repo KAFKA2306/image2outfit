@@ -110,9 +110,7 @@ def _write_json_atomic(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def _identity_mismatches(
-    state: dict[str, Any], expected: dict[str, str]
-) -> list[str]:
+def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
     return [
         request_name
         for state_name, request_name in IDENTITY_FIELDS.items()
@@ -174,7 +172,9 @@ def _validate_resume_integrity(previous: dict[str, Any]) -> None:
         if record.get("output") != state_output:
             raise ValueError(f"resume checkpoint output mismatch for stage {stage}")
         if record.get("outputDigest") != sha256_json(state_output):
-            raise ValueError(f"resume checkpoint output digest mismatch for stage {stage}")
+            raise ValueError(
+                f"resume checkpoint output digest mismatch for stage {stage}"
+            )
 
 
 def _resume_or_reset(
