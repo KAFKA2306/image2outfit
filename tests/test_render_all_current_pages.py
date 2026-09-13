@@ -91,6 +91,56 @@ class IoPagesGalleryTests(unittest.TestCase):
             self.assertIn("working/front.webp", html)
             self.assertIn("rejected/front.webp", html)
 
+    def test_missing_product_webp_is_reported_without_blocking_validation(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir) / "repo"
+            site = root / "_site"
+            missing = root / "Assets" / "GenWorks" / "missing"
+            missing.mkdir(parents=True)
+            (missing / "ProductManifest.json").write_text(
+                json.dumps(
+                    {
+                        "schemaVersion": 1,
+                        "productId": "missing",
+                        "status": "WORKING",
+                        "productRoot": "Assets/GenWorks/missing",
+                        "technicalGates": {"visualAppearanceReview": "PENDING"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            previous_root = MODULE.ROOT
+            try:
+                MODULE.ROOT = root
+                catalog = MODULE.build_io_gallery(site)
+            finally:
+                MODULE.ROOT = previous_root
+
+            self.assertEqual(catalog["productsWithoutWebp"], ["missing"])
+            MODULE.validate_io_gallery(catalog, site)
+            html = (site / "io" / "index.html").read_text(encoding="utf-8")
+            self.assertIn("現時点で追跡済みレンダーなし", html)
+
+    def test_complete_webp_catalog_passes_production_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            site = Path(temp_dir)
+            asset = site / "io" / "working" / "front.webp"
+            asset.parent.mkdir(parents=True)
+            asset.write_bytes(b"webp")
+            catalog = {
+                "products": [
+                    {
+                        "productId": "working",
+                        "webpCount": 1,
+                        "assets": [{"href": "io/working/front.webp"}],
+                    }
+                ]
+            }
+            MODULE.validate_io_gallery(catalog, site)
+
     def test_skipped_product_preserves_existing_preview_evidence(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir) / "repo"
