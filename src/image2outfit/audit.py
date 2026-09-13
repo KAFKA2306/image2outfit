@@ -21,13 +21,7 @@ def utc_now() -> str:
 
 def canonical_json_bytes(value: Any) -> bytes:
     try:
-        payload = json.dumps(
-            value,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-            allow_nan=False,
-        )
+        payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
     except (TypeError, ValueError) as exc:
         raise ValueError("audit payload must be finite JSON data") from exc
     return payload.encode("utf-8")
@@ -64,61 +58,29 @@ def _normalized_evidence(output: Mapping[str, Any]) -> list[dict[str, str]]:
 
 
 def make_stage_record(
-    *,
-    run_id: str,
-    product_id: str,
-    sequence: int,
-    stage: str,
-    requested_mode: str,
-    outcome_mode: str,
-    status: str,
-    tool_name: str,
-    purpose: str,
-    output_contract: str,
-    input_snapshot: Mapping[str, Any],
-    output: Mapping[str, Any],
-    previous_record_digest: str = _ZERO_HASH,
-    started_at: str,
-    finished_at: str,
+    *, run_id: str, product_id: str, sequence: int, stage: str, requested_mode: str,
+    outcome_mode: str, status: str, tool_name: str, purpose: str, output_contract: str,
+    input_snapshot: Mapping[str, Any], output: Mapping[str, Any],
+    previous_record_digest: str = _ZERO_HASH, started_at: str, finished_at: str,
 ) -> dict[str, Any]:
     if sequence < 1:
         raise ValueError("stage audit sequence must be positive")
     if not _HASH.fullmatch(previous_record_digest):
         raise ValueError("previous_record_digest must be a SHA-256 digest")
     record: dict[str, Any] = {
-        "schemaVersion": 1,
-        "runId": run_id,
-        "productId": product_id,
-        "sequence": sequence,
-        "stage": stage,
-        "requestedMode": requested_mode,
-        "outcomeMode": outcome_mode,
-        "status": status,
-        "startedAt": started_at,
-        "finishedAt": finished_at,
-        "tool": {
-            "name": tool_name,
-            "purpose": purpose,
-            "outputContract": output_contract,
-        },
-        "inputDigest": sha256_json(input_snapshot),
-        "outputDigest": sha256_json(output),
-        "previousRecordDigest": previous_record_digest,
-        "resultPath": output.get("resultPath", ""),
-        "evidence": _normalized_evidence(output),
-        "output": dict(output),
+        "schemaVersion": 1, "runId": run_id, "productId": product_id, "sequence": sequence,
+        "stage": stage, "requestedMode": requested_mode, "outcomeMode": outcome_mode, "status": status,
+        "startedAt": started_at, "finishedAt": finished_at,
+        "tool": {"name": tool_name, "purpose": purpose, "outputContract": output_contract},
+        "inputDigest": sha256_json(input_snapshot), "outputDigest": sha256_json(output),
+        "previousRecordDigest": previous_record_digest, "resultPath": output.get("resultPath", ""),
+        "evidence": _normalized_evidence(output), "output": dict(output),
     }
     record["recordDigest"] = sha256_json(record)
     return record
 
 
-def validate_stage_records(
-    records: Sequence[Mapping[str, Any]],
-    *,
-    expected_run_id: str | None = None,
-    expected_product_id: str | None = None,
-    canonical_stages: Sequence[str] | None = None,
-) -> None:
+def validate_stage_records(records: Sequence[Mapping[str, Any]], *, expected_run_id: str | None = None, expected_product_id: str | None = None, canonical_stages: Sequence[str] | None = None) -> None:
     previous = _ZERO_HASH
     for index, raw in enumerate(records, start=1):
         record = dict(raw)
@@ -128,25 +90,19 @@ def validate_stage_records(
             raise ValueError(f"stage audit record {index} sequence is invalid")
         if expected_run_id is not None and record.get("runId") != expected_run_id:
             raise ValueError(f"stage audit record {index} runId mismatch")
-        if (
-            expected_product_id is not None
-            and record.get("productId") != expected_product_id
-        ):
+        if expected_product_id is not None and record.get("productId") != expected_product_id:
             raise ValueError(f"stage audit record {index} productId mismatch")
         if canonical_stages is not None:
             if index > len(canonical_stages):
                 raise ValueError("stage audit records exceed the canonical stage count")
             if record.get("stage") != canonical_stages[index - 1]:
-                raise ValueError(
-                    f"stage audit record {index} is out of canonical order"
-                )
+                raise ValueError(f"stage audit record {index} is out of canonical order")
         if record.get("previousRecordDigest") != previous:
             raise ValueError(f"stage audit record {index} chain is broken")
         claimed = record.pop("recordDigest", None)
         if not isinstance(claimed, str) or not _HASH.fullmatch(claimed):
             raise ValueError(f"stage audit record {index} digest is invalid")
-        actual = sha256_json(record)
-        if actual != claimed:
+        if sha256_json(record) != claimed:
             raise ValueError(f"stage audit record {index} digest mismatch")
         previous = claimed
 
@@ -171,35 +127,20 @@ def _resolve_inside(root: Path, value: str, *, label: str) -> Path:
 def _write_json_atomic(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
-    temporary.write_text(
-        json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     temporary.replace(path)
 
 
-def write_audit_bundle(
-    state: Mapping[str, Any],
-    *,
-    audit_root: Path,
-    canonical_stages: Sequence[str],
-) -> dict[str, Any]:
+def write_audit_bundle(state: Mapping[str, Any], *, audit_root: Path, canonical_stages: Sequence[str]) -> dict[str, Any]:
     run_id = _safe_identifier(str(state["run_id"]), label="run_id")
     product_id = _safe_identifier(str(state["product_id"]), label="product_id")
     raw_records = state.get("stage_records", [])
     if not isinstance(raw_records, list):
         raise ValueError("pipeline stage_records must be a list")
     records = [dict(record) for record in raw_records]
-    validate_stage_records(
-        records,
-        expected_run_id=run_id,
-        expected_product_id=product_id,
-        canonical_stages=canonical_stages,
-    )
+    validate_stage_records(records, expected_run_id=run_id, expected_product_id=product_id, canonical_stages=canonical_stages)
     final_status = state.get("status")
-    if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(
-        canonical_stages
-    ):
+    if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(canonical_stages):
         raise ValueError("successful pipeline audit must contain all canonical stages")
 
     resolved_audit_root = audit_root.resolve()
@@ -213,60 +154,62 @@ def write_audit_bundle(
         stage = str(record["stage"])
         path = stages_root / f"{sequence:02d}-{stage}.json"
         _write_json_atomic(path, record)
-        stage_entries.append(
-            {
-                "sequence": sequence,
-                "stage": stage,
-                "status": record["status"],
-                "path": path.relative_to(run_root).as_posix(),
-                "sha256": sha256_file(path),
-                "recordDigest": record["recordDigest"],
-            }
-        )
+        stage_entries.append({"sequence": sequence, "stage": stage, "status": record["status"], "path": path.relative_to(run_root).as_posix(), "sha256": sha256_file(path), "recordDigest": record["recordDigest"]})
 
     state_path = run_root / "pipeline-state.json"
     _write_json_atomic(state_path, state)
     manifest = {
-        "schemaVersion": 1,
-        "runId": run_id,
-        "productId": product_id,
-        "profileId": state.get("profile_id", ""),
-        "executionMode": state.get("execution_mode", ""),
-        "finalStatus": final_status,
-        "createdAt": utc_now(),
-        "canonicalStages": list(canonical_stages),
-        "recordedStageCount": len(stage_entries),
+        "schemaVersion": 1, "runId": run_id, "productId": product_id, "profileId": state.get("profile_id", ""),
+        "executionMode": state.get("execution_mode", ""), "finalStatus": final_status, "createdAt": utc_now(),
+        "canonicalStages": list(canonical_stages), "recordedStageCount": len(stage_entries),
         "chainHeadDigest": records[-1]["recordDigest"] if records else _ZERO_HASH,
-        "pipelineState": {
-            "path": state_path.relative_to(run_root).as_posix(),
-            "sha256": sha256_file(state_path),
-        },
+        "pipelineState": {"path": state_path.relative_to(run_root).as_posix(), "sha256": sha256_file(state_path)},
         "stages": stage_entries,
     }
     manifest_path = run_root / "manifest.json"
     _write_json_atomic(manifest_path, manifest)
     manifest_sha256 = sha256_file(manifest_path)
-    latest_path = resolved_audit_root / product_id / "latest.json"
-    _write_json_atomic(
-        latest_path,
-        {
-            "schemaVersion": 1,
-            "productId": product_id,
-            "runId": run_id,
-            "finalStatus": final_status,
-            "manifestPath": manifest_path.relative_to(resolved_audit_root).as_posix(),
-            "manifestSha256": manifest_sha256,
-            "updatedAt": utc_now(),
-        },
-    )
+
     verify_audit_bundle(run_root)
-    return {
-        "root": run_root.as_posix(),
-        "manifestPath": manifest_path.as_posix(),
-        "manifestSha256": manifest_sha256,
-        "latestPath": latest_path.as_posix(),
-        "chainHeadDigest": manifest["chainHeadDigest"],
-    }
+    latest_path = resolved_audit_root / product_id / "latest.json"
+    _write_json_atomic(latest_path, {
+        "schemaVersion": 1, "productId": product_id, "runId": run_id, "finalStatus": final_status,
+        "manifestPath": manifest_path.relative_to(resolved_audit_root).as_posix(), "manifestSha256": manifest_sha256,
+        "updatedAt": utc_now(),
+    })
+    return {"root": run_root.as_posix(), "manifestPath": manifest_path.as_posix(), "manifestSha256": manifest_sha256, "latestPath": latest_path.as_posix(), "chainHeadDigest": manifest["chainHeadDigest"]}
+
+
+def verify_latest_audit_pointer(audit_root: Path, product_id: str) -> dict[str, Any]:
+    """Verify that latest points to one valid immutable run for the requested product."""
+    product_id = _safe_identifier(product_id, label="product_id")
+    resolved_audit_root = audit_root.resolve()
+    latest_path = resolved_audit_root / product_id / "latest.json"
+    pointer = json.loads(latest_path.read_text(encoding="utf-8"))
+    if not isinstance(pointer, dict):
+        raise ValueError("latest audit pointer must be an object")
+    if pointer.get("schemaVersion") != 1:
+        raise ValueError("latest audit pointer schemaVersion must be 1")
+    if pointer.get("productId") != product_id:
+        raise ValueError("latest audit pointer productId mismatch")
+    manifest_value = pointer.get("manifestPath")
+    if not isinstance(manifest_value, str) or not manifest_value:
+        raise ValueError("latest audit pointer manifestPath is required")
+    manifest_path = _resolve_inside(resolved_audit_root, manifest_value, label="latest manifestPath")
+    product_root = (resolved_audit_root / product_id).resolve()
+    if product_root not in manifest_path.parents:
+        raise ValueError("latest audit pointer manifestPath escapes product namespace")
+    if manifest_path.name != "manifest.json" or not manifest_path.is_file():
+        raise ValueError("latest audit pointer target manifest is missing")
+    claimed_sha = pointer.get("manifestSha256")
+    if not isinstance(claimed_sha, str) or not _HASH.fullmatch(claimed_sha) or sha256_file(manifest_path) != claimed_sha:
+        raise ValueError("latest audit pointer manifestSha256 mismatch")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    for field in ("productId", "runId", "finalStatus"):
+        if pointer.get(field) != manifest.get(field):
+            raise ValueError(f"latest audit pointer {field} mismatch")
+    verify_audit_bundle(manifest_path.parent)
+    return pointer
 
 
 def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
@@ -275,16 +218,13 @@ def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
     if manifest.get("schemaVersion") != 1:
         raise ValueError("audit manifest schemaVersion must be 1")
     canonical_stages = manifest.get("canonicalStages")
-    if not isinstance(canonical_stages, list) or not all(
-        isinstance(stage, str) and stage for stage in canonical_stages
-    ):
+    if not isinstance(canonical_stages, list) or not all(isinstance(stage, str) and stage for stage in canonical_stages):
         raise ValueError("audit manifest canonicalStages must be a string list")
     stage_entries = manifest.get("stages")
     if not isinstance(stage_entries, list):
         raise ValueError("audit manifest stages must be a list")
     if manifest.get("recordedStageCount") != len(stage_entries):
         raise ValueError("audit manifest recordedStageCount mismatch")
-
     records: list[dict[str, Any]] = []
     for index, entry in enumerate(stage_entries, start=1):
         if not isinstance(entry, Mapping):
@@ -299,18 +239,10 @@ def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
         if record.get("recordDigest") != entry.get("recordDigest"):
             raise ValueError(f"audit stage record digest mismatch: {value}")
         records.append(record)
-    validate_stage_records(
-        records,
-        expected_run_id=manifest.get("runId"),
-        expected_product_id=manifest.get("productId"),
-        canonical_stages=canonical_stages,
-    )
+    validate_stage_records(records, expected_run_id=manifest.get("runId"), expected_product_id=manifest.get("productId"), canonical_stages=canonical_stages)
     final_status = manifest.get("finalStatus")
-    if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(
-        canonical_stages
-    ):
+    if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(canonical_stages):
         raise ValueError("successful audit manifest must contain every canonical stage")
-
     state_entry = manifest.get("pipelineState")
     if not isinstance(state_entry, Mapping):
         raise ValueError("audit manifest pipelineState must be an object")
