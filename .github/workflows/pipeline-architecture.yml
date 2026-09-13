@@ -76,6 +76,7 @@ jobs:
           tests/test_pattern_ir.py
           tests/test_pipeline_core.py
           tests/test_pipeline_profile.py
+          tests/test_pipeline_checkpoint_engines.py
           tests/test_research_and_specs.py
 
       - name: Reject unresolved production execution
@@ -86,36 +87,10 @@ jobs:
             exit 1
           fi
 
-      - name: Smoke-test LangChain and LangGraph planning
+      - name: Verify LangChain and LangGraph checkpoint parity
         run: |
           uv run \
             --with langchain-core==1.5.0 \
             --with langgraph==1.2.9 \
-            python - <<'PY'
-          import sys
-          from pathlib import Path
-
-          root = Path.cwd()
-          sys.path.insert(0, str(root / 'src'))
-          sys.path.insert(0, str(root / 'tools'))
-
-          from image2outfit.pipeline import (
-              new_pipeline_state,
-              run_langchain,
-              run_langgraph,
-          )
-          from pipeline_stage_adapters import build_registry, load_profile
-
-          profile = load_profile(
-              root / 'config/pipeline-profiles/garment-reconstruction-v1.json'
-          )
-          state = new_pipeline_state(
-              product_id='ci-garment',
-              target_avatar='SiroinoSotai_PC',
-              source_reference='private-reference://sha256/ci',
-          )
-          for runner in (run_langchain, run_langgraph):
-              result = runner(state, build_registry(profile))
-              if result['status'] != 'PLANNED':
-                  raise SystemExit(result)
-          PY
+            python -m unittest discover -s tests \
+              -p 'test_pipeline_checkpoint_engines.py' -v
