@@ -207,7 +207,6 @@ def _load_pattern_baseline() -> dict[str, object]:
         "upperRows": _numeric_rows(baseline.get("upperRows"), 2, "upperRows"),
         "frontRise": front_rise,
         "backRise": back_rise,
-        "crotchCentre": back_rise + front_rise[1:],
     }
 
 
@@ -218,7 +217,6 @@ LEG_BOUNDARY_ROWS = PATTERN_BASELINE["legBoundaryRows"]
 UPPER_SPECS = PATTERN_BASELINE["upperRows"]
 FRONT_RISE = PATTERN_BASELINE["frontRise"]
 BACK_RISE = PATTERN_BASELINE["backRise"]
-CROTCH_CENTRE = PATTERN_BASELINE["crotchCentre"]
 
 
 def install_runtime_path_compat(implementation: ModuleType) -> None:
@@ -291,71 +289,6 @@ def _bridge_panel_rows(
         )
 
 
-def _cross_row(mesh, first: int, second: int, *, segments: int = 4) -> list[int]:
-    if first == second:
-        return [first]
-    if segments < 2:
-        raise ValueError("Wide Cargo seam strip needs at least two segments")
-    a = mesh.vertices[first]
-    b = mesh.vertices[second]
-    row = [first]
-    for step in range(1, segments):
-        t = step / segments
-        point = tuple(a[axis] + (b[axis] - a[axis]) * t for axis in range(3))
-        row.append(mesh.add_ring([point])[0])
-    row.append(second)
-    return row
-
-
-def _bridge_cross_rows(
-    mesh,
-    lower: list[int],
-    upper: list[int],
-    *,
-    reverse: bool = False,
-) -> None:
-    if len(lower) == 1 and len(upper) == 1:
-        return
-    if len(lower) == 1:
-        tip = lower[0]
-        for index in range(len(upper) - 1):
-            _append_face(mesh, (tip, upper[index], upper[index + 1]), reverse=reverse)
-        return
-    if len(upper) == 1:
-        tip = upper[0]
-        for index in range(len(lower) - 1):
-            _append_face(mesh, (lower[index], lower[index + 1], tip), reverse=reverse)
-        return
-    _bridge_panel_rows(mesh, lower, upper, reverse=reverse)
-
-
-def _bridge_seam_strip(
-    mesh,
-    first: list[int],
-    second: list[int],
-    *,
-    reverse: bool = False,
-    segments: int = 4,
-) -> None:
-    if len(first) != len(second):
-        raise ValueError("Wide Cargo seam chain sizes differ")
-    rows = [
-        _cross_row(mesh, first_index, second_index, segments=segments)
-        for first_index, second_index in zip(first, second)
-    ]
-    for lower, upper in zip(rows, rows[1:]):
-        _bridge_cross_rows(mesh, lower, upper, reverse=reverse)
-
-
-def _inner_seam_factor(z: float, top_z: float) -> float:
-    start = 0.440
-    if z <= start:
-        return 1.0
-    if z >= top_z:
-        return 0.0
-    return 1.0 - _smoothstep((z - start) / (top_z - start))
-
-
 def _row_specs() -> list[dict[str, float | str]]:
     if not LEG_BOUNDARY_ROWS:
         raise RuntimeError("Wide Cargo pattern has no leg boundary rows")
@@ -363,7 +296,7 @@ def _row_specs() -> list[dict[str, float | str]]:
         {"phase": "leg", "z": z, "outer": outer, "inner": inner}
         for z, outer, inner in LEG_BOUNDARY_ROWS
     ]
-    top_z, top_outer, top_inner = LEG_BOUNDARY_ROWS[-1]
+    top_z = float(LEG_BOUNDARY_ROWS[-1][0])
     rise_end = max(max(z for _, z in FRONT_RISE), max(z for _, z in BACK_RISE))
     transition_heights = sorted(
         {
@@ -372,15 +305,13 @@ def _row_specs() -> list[dict[str, float | str]]:
             if top_z < z <= rise_end + 1e-9
         }
     )
-    target_outer = _profile_value(rise_end, UPPER_SPECS)
     for z in transition_heights:
-        t = _smoothstep((z - top_z) / (rise_end - top_z))
         specs.append(
             {
                 "phase": "transition",
                 "z": z,
-                "outer": top_outer + (target_outer - top_outer) * t,
-                "inner": top_inner * (1.0 - t),
+                "outer": _profile_value(z, UPPER_SPECS),
+                "inner": 0.0,
             }
         )
     for z, half_width in UPPER_SPECS:
@@ -397,28 +328,31 @@ def _panel_y(
     face: str,
     phase: str,
     z: float,
-    x: float,
+    x_abs: float,
     outer: float,
-    t: float,
-    top_z: float,
+    inner: float,
 ) -> float:
     front = face == "front"
     profile = FRONT_DEPTH if front else REAR_DEPTH
     sign = -1.0 if front else 1.0
     depth = _profile_value(z, profile)
-    x_ratio = min(1.0, abs(x) / max(outer, 1e-9))
-    curved_depth = depth * (0.88 + 0.12 * (1.0 - x_ratio**2))
+
     if phase == "leg":
-        inner_factor = _inner_seam_factor(z, top_z)
-        local_t = _smoothstep(min(1.0, t / 0.25))
-        seam_factor = inner_factor + (1.0 - inner_factor) * local_t
-        return sign * curved_depth * seam_factor
+        centre = (outer + inner) * 0.5
+        half_width = (outer - inner) * 0.5
+        local_x = (x_abs - centre) / max(half_width, 1e-9)
+        cross_section = max(0.0, 1.0 - local_x * local_x) ** 0.5
+        return sign * depth * cross_section
+
+    x_ratio = min(1.0, x_abs / max(outer, 1e-9))
+    cross_section = max(0.0, 1.0 - x_ratio * x_ratio) ** 0.5
+    elliptical_y = sign * depth * cross_section
     if phase == "transition":
         rise = FRONT_RISE if front else BACK_RISE
         centre_y = _rise_value(z, rise)
-        outer_y = sign * depth * 0.88
-        return centre_y + (outer_y - centre_y) * _smoothstep(t)
-    return sign * curved_depth
+        centre_correction = (centre_y - sign * depth) * (1.0 - x_ratio) ** 2
+        return elliptical_y + centre_correction
+    return elliptical_y
 
 
 def _panel_grid(
@@ -430,7 +364,6 @@ def _panel_grid(
     columns: int,
     shared: dict[tuple[object, ...], int],
 ) -> list[list[int]]:
-    top_z = float(LEG_BOUNDARY_ROWS[-1][0])
     rows: list[list[int]] = []
     for spec in specs:
         phase = str(spec["phase"])
@@ -446,16 +379,19 @@ def _panel_grid(
                 face=face,
                 phase=phase,
                 z=z,
-                x=x,
+                x_abs=x_abs,
                 outer=outer,
-                t=t,
-                top_z=top_z,
+                inner=inner,
             )
+
             key: tuple[object, ...] | None = None
-            if column == 0 and inner <= 1e-9:
+            if column == columns - 1:
+                key = ("outseam", side, round(z, 6))
+            elif column == 0 and phase == "leg":
+                key = ("inseam", side, round(z, 6))
+            elif column == 0:
                 key = ("centre", face, round(z, 6))
-            elif column == 0 and phase == "leg" and abs(z - top_z) <= 1e-9:
-                key = ("crotch-tip", side, round(z, 6))
+
             if key is not None and key in shared:
                 index = shared[key]
             else:
@@ -511,13 +447,12 @@ def add_side_pocket_panel(
 
 
 def reviewed_geometry(implementation: ModuleType, segments: int = 48):
-    """Build four sewn pattern surfaces instead of legacy closed-ring transitions."""
+    """Build four sewn panels with shared seam vertices and curved sections."""
     del segments
     mesh = implementation.MeshBuilder()
     specs = _row_specs()
-    columns = 6
+    columns = 10
     shared: dict[tuple[object, ...], int] = {}
-    grids: dict[tuple[str, float], list[list[int]]] = {}
 
     for face in ("front", "back"):
         for side in (-1.0, 1.0):
@@ -529,38 +464,11 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
                 columns=columns,
                 shared=shared,
             )
-            grids[(face, side)] = grid
             reverse = (face == "front" and side < 0.0) or (
                 face == "back" and side > 0.0
             )
             for lower, upper in zip(grid, grid[1:]):
                 _bridge_panel_rows(mesh, lower, upper, reverse=reverse)
-
-    for side in (-1.0, 1.0):
-        front_outer = [row[-1] for row in grids[("front", side)]]
-        back_outer = [row[-1] for row in grids[("back", side)]]
-        _bridge_seam_strip(
-            mesh,
-            front_outer,
-            back_outer,
-            reverse=side < 0.0,
-            segments=4,
-        )
-
-        crotch_end = max(
-            index
-            for index, spec in enumerate(specs)
-            if float(spec["z"]) <= 0.6000001
-        )
-        front_inner = [row[0] for row in grids[("front", side)][: crotch_end + 1]]
-        back_inner = [row[0] for row in grids[("back", side)][: crotch_end + 1]]
-        _bridge_seam_strip(
-            mesh,
-            front_inner,
-            back_inner,
-            reverse=side > 0.0,
-            segments=4,
-        )
 
     for side in (-1.0, 1.0):
         add_side_pocket_panel(
@@ -852,7 +760,7 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
     path = implementation.build.c.repo_path(job["productManifestPath"])
     manifest = json.loads(path.read_text(encoding="utf-8-sig"))
     manifest["status"] = "WORKING"
-    manifest["designRevision"] = "v75-pattern-panel-surface"
+    manifest["designRevision"] = "v76-shared-seam-elliptic-panels"
     manifest["wearabilityAudit"] = report
     gates = manifest.setdefault("technicalGates", {})
     gates["latestGeometryRender"] = "PASS" if report["passed"] else "FAIL"
