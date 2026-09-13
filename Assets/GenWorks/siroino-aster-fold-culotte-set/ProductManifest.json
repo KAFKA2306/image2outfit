@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-aster-fold-culotte-set",
+  "productName": "Aster Fold Culotte Set for SiroinoSotai_PC",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-aster-fold-culotte-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/Prefab/AsterFoldCulotte.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/Prefab/SiroinoSotai_AsterFoldCulotte.prefab",
+  "previewPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-aster-fold-culotte-set/README.md",
+  "sourceJobPath": "config/products/siroino-aster-fold-culotte-set/job.json",
+  "productBuildScript": "tools/run_garment_pipeline.py",
+  "designRevision": "v1-aster-fold-panel-prototype",
+  "sourceReference": "https://photoshop-api.adobe.io/v2/short-url/urn:aaid:ps:US:015f71fd-b70a-46ca-b90b-31fef13844d6",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-aster-fold-culotte-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-aster-fold-culotte-set/pipeline-state.json",
+    "lastAttempt": {
+      "result": "PROTOTYPE_GEOMETRY_COMMITTED",
+      "visualRevision": "v1-aster-fold-panel-prototype",
+      "workflowRun": null,
+      "review": null
+    },
+    "blockers": [
+      "Canonical job/schema validation has not been executed in a checkout.",
+      "Prototype OBJ has not been imported into Blender or fitted to the Siroino body.",
+      "Rig/weights, FBX, prefab, five-view, pose and direct visual evidence are not produced."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "clothSimulation": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "tenAxisAudit": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "researchTrial": "DECLARED",
+    "unityImport": "OUT_OF_SCOPE",
+    "unitySaveReload": "OUT_OF_SCOPE",
+    "prefabReload": "OUT_OF_SCOPE",
+    "modularAvatar": "OUT_OF_SCOPE",
+    "ndmf": "OUT_OF_SCOPE",
+    "vrchatBuildTest": "OUT_OF_SCOPE",
+    "vrchatRuntime": "OUT_OF_SCOPE",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "prototypeObj": "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Prototype/aster-fold-culotte.obj",
+    "prototypeMtl": "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Prototype/aster-fold-culotte.mtl",
+    "patternSpec": "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Patterns/pattern-spec.json",
+    "blend": "Assets/GenWorks/siroino-aster-fold-culotte-set/Source/Blender/AsterFoldCulotte.blend",
+    "fbx": "Assets/GenWorks/siroino-aster-fold-culotte-set/Models/AsterFoldCulotte.fbx",
+    "prefab": "Assets/GenWorks/siroino-aster-fold-culotte-set/Prefab/AsterFoldCulotte.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-aster-fold-culotte-set/Prefab/SiroinoSotai_AsterFoldCulotte.prefab",
+    "multiview": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/siroino-aster-fold-culotte-set-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-aster-fold-culotte-set/Previews/siroino-aster-fold-culotte-set-pose-review.webp"
+  }
+}
