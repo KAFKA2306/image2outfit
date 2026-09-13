@@ -170,7 +170,9 @@ def evaluated_bounds(objects: list[bpy.types.Object]) -> tuple[Vector, Vector]:
         evaluated = obj.evaluated_get(depsgraph)
         mesh = evaluated.to_mesh()
         try:
-            points.extend(\n                evaluated.matrix_world @ vertex.co for vertex in mesh.vertices\n            )
+            points.extend(
+                evaluated.matrix_world @ vertex.co for vertex in mesh.vertices
+            )
         finally:
             evaluated.to_mesh_clear()
     if not points:
@@ -197,7 +199,9 @@ def main() -> int:
     render_objects = avatar_objects + outfit_objects
     armatures = [obj for obj in render_objects if obj.type == "ARMATURE"]
     if len(armatures) < 2:
-        raise RuntimeError(\n            f"Expected target and outfit armatures, found {len(armatures)}"\n        )
+        raise RuntimeError(
+            f"Expected target and outfit armatures, found {len(armatures)}"
+        )
 
     ensure_materials(
         avatar_objects,
@@ -252,23 +256,45 @@ def main() -> int:
 
         for light in [obj for obj in list(bpy.data.objects) if obj.type == "LIGHT"]:
             bpy.data.objects.remove(light, do_unlink=True)
-        add_area_light("Pose_Key", target + Vector((-scale * 1.8, -scale * 2.0, scale * 1.8)), target, 1100.0, scale * 1.2)
-        add_area_light("Pose_Fill", target + Vector((scale * 1.6, -scale * 1.2, scale * 1.0)), target, 650.0, scale * 1.4)
-        add_area_light("Pose_Rim", target + Vector((0.0, scale * 2.0, scale * 1.5)), target, 850.0, scale)
+        add_area_light(
+            "Pose_Key",
+            target + Vector((-scale * 1.8, -scale * 2.0, scale * 1.8)),
+            target,
+            1100.0,
+            scale * 1.2,
+        )
+        add_area_light(
+            "Pose_Fill",
+            target + Vector((scale * 1.6, -scale * 1.2, scale * 1.0)),
+            target,
+            650.0,
+            scale * 1.4,
+        )
+        add_area_light(
+            "Pose_Rim",
+            target + Vector((0.0, scale * 2.0, scale * 1.5)),
+            target,
+            850.0,
+            scale,
+        )
 
         direction = Vector((0.68, -0.73, 0.16))
         if pose_name == "prone":
             direction = Vector((0.58, -0.58, 0.58))
         direction.normalize()
         camera.location = target + direction * max(scale * 3.0, 2.0)
-        camera.data.ortho_scale = max(\n            dimensions.z * 1.18, dimensions.x * 1.45, dimensions.y * 1.45\n        )
+        camera.data.ortho_scale = max(
+            dimensions.z * 1.18, dimensions.x * 1.45, dimensions.y * 1.45
+        )
         look_at(camera, target)
 
         output = outdir / f"{pose_name}.png"
         scene.render.filepath = str(output)
         bpy.ops.render.render(write_still=True)
         if not output.is_file() or output.stat().st_size < 10_000:
-            raise RuntimeError(\n                f"Pose render is missing or unexpectedly small: {output}"\n            )
+            raise RuntimeError(
+                f"Pose render is missing or unexpectedly small: {output}"
+            )
         rendered[pose_name] = output.name
 
     manifest = {
