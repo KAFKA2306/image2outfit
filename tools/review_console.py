@@ -697,7 +697,10 @@ def build(root: Path, output: Path) -> dict[str, Any]:
                     )
                 )
     states = [str(item).upper() for item in handoff_policy.get("statuses", STATES)]
-    if any(product.state == "INVALID" for product in products) and "INVALID" not in states:
+    if (
+        any(product.state == "INVALID" for product in products)
+        and "INVALID" not in states
+    ):
         states.append("INVALID")
     data = {
         "schema_version": "review-console.v2",

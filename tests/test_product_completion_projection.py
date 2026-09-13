@@ -88,7 +88,9 @@ class ProductCompletionProjectionTest(unittest.TestCase):
         self.assertEqual(runtime["humanRuntimeReview"], "PENDING")
         self.assertEqual(projection["errors"], [])
 
-    def test_complete_allows_runtime_pending_but_not_missing_required_gate(self) -> None:
+    def test_complete_allows_runtime_pending_but_not_missing_required_gate(
+        self,
+    ) -> None:
         complete = manifest(state="COMPLETE", visual="PASS")
         projection = project_product_completion(complete, POLICY)
         self.assertEqual(projection["completionBlockers"], [])
@@ -97,7 +99,9 @@ class ProductCompletionProjectionTest(unittest.TestCase):
         missing = manifest()
         del missing["completionGates"]["poseEvidence"]  # type: ignore[index]
         projection = project_product_completion(missing, POLICY)
-        blocker = {row["gate"]: row["status"] for row in projection["completionBlockers"]}
+        blocker = {
+            row["gate"]: row["status"] for row in projection["completionBlockers"]
+        }
         self.assertEqual(blocker["poseEvidence"], "MISSING")
 
     def test_out_of_scope_fail_is_not_a_completion_blocker(self) -> None:
@@ -112,20 +116,31 @@ class ProductCompletionProjectionTest(unittest.TestCase):
         unknown["state"] = "READYISH"
         projection = project_product_completion(unknown, POLICY)
         self.assertEqual(projection["state"], "INVALID")
-        self.assertTrue(any("unknown product lifecycle state" in error for error in projection["errors"]))
+        self.assertTrue(
+            any(
+                "unknown product lifecycle state" in error
+                for error in projection["errors"]
+            )
+        )
 
         contradictory = manifest()
         contradictory["status"] = "COMPLETE"
         projection = project_product_completion(contradictory, POLICY)
         self.assertEqual(projection["state"], "INVALID")
-        self.assertIn("product lifecycle fields contradict each other", projection["errors"])
+        self.assertIn(
+            "product lifecycle fields contradict each other", projection["errors"]
+        )
 
         unknown_gate = manifest()
         unknown_gate["completionGates"]["visualAppearanceReview"] = "MAYBE"  # type: ignore[index]
         projection = project_product_completion(unknown_gate, POLICY)
-        self.assertTrue(any("unknown status" in error for error in projection["errors"]))
+        self.assertTrue(
+            any("unknown status" in error for error in projection["errors"])
+        )
 
-    def test_review_console_and_production_validation_share_policy_semantics(self) -> None:
+    def test_review_console_and_production_validation_share_policy_semantics(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / "config").mkdir(parents=True)
@@ -160,7 +175,9 @@ class ProductCompletionProjectionTest(unittest.TestCase):
             runtime = {row["name"]: row["status"] for row in record["runtime_gates"]}
             self.assertEqual(runtime["unityImport"], "PENDING")
             self.assertEqual(runtime["vrchatBuildAndTest"], "PENDING")
-            self.assertFalse(any(row["name"] == "unityImport" for row in record["gates"]))
+            self.assertFalse(
+                any(row["name"] == "unityImport" for row in record["gates"])
+            )
 
             errors = production_contract.product_state_errors(
                 {
@@ -190,7 +207,9 @@ class ProductCompletionProjectionTest(unittest.TestCase):
 
     def test_current_siroino_wide_cargo_keeps_visual_failure_visible(self) -> None:
         policy = json.loads(
-            (ROOT / "config" / "genworks-handoff-policy.json").read_text(encoding="utf-8")
+            (ROOT / "config" / "genworks-handoff-policy.json").read_text(
+                encoding="utf-8"
+            )
         )
         value = json.loads(
             (
@@ -203,7 +222,9 @@ class ProductCompletionProjectionTest(unittest.TestCase):
         )
         projection = project_product_completion(value, policy)
         self.assertEqual(projection["state"], "WORKING")
-        blockers = {row["gate"]: row["status"] for row in projection["completionBlockers"]}
+        blockers = {
+            row["gate"]: row["status"] for row in projection["completionBlockers"]
+        }
         self.assertEqual(blockers["visualAppearanceReview"], "FAIL")
         runtime = {row["name"]: row["status"] for row in projection["runtimeGates"]}
         self.assertEqual(runtime["unityImport"], "PENDING")
