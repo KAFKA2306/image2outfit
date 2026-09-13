@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "tools"))
 
-from contract_io import validate_against_schema
+from contract_io import validate_json_schema
 from image2outfit.failure_contract import (
     ERROR_CODES,
     PHASES,
@@ -50,7 +50,7 @@ class PipelineFailureContractTests(unittest.TestCase):
         self.assertEqual(tuple(schema["properties"]["errorCode"]["enum"]), ERROR_CODES)
         self.assertEqual(tuple(schema["properties"]["phase"]["enum"]), PHASES)
         sample = failure_descriptor("INVALID_PIPELINE_INPUT", "request", "bad request")
-        self.assertEqual(validate_against_schema(sample, schema), [])
+        self.assertEqual(validate_json_schema(sample, schema), [])
 
     def test_malformed_request_is_json_failure_and_output_matches_stdout(self) -> None:
         with tempfile.TemporaryDirectory(dir=ROOT) as directory:
