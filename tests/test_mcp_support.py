@@ -83,6 +83,7 @@ class McpSupportTests(unittest.TestCase):
         self.assertIn(blender["host"], {"localhost", "127.0.0.1", "::1"})
         self.assertEqual(unity["host"], "127.0.0.1")
         self.assertTrue(unity["url"].startswith("http://127.0.0.1:"))
+        self.assertTrue(unity["packageUrl"].endswith(f"#v{unity['version']}"))
         project_version = (ROOT / unity["projectVersionSource"]).read_text(
             encoding="utf-8"
         )
@@ -127,6 +128,9 @@ class McpSupportTests(unittest.TestCase):
         self.assertIn("Get-GitBlobSha1", script)
         self.assertIn("addonGitBlobSha1", script)
         self.assertIn("Pinned Blender MCP addon identity mismatch", script)
+        self.assertIn("Get-UnityMcpPackageStatus", script)
+        self.assertIn("versionVerified = ($source -eq $UnityMcpPackageUrl)", script)
+        self.assertIn("packageVersionVerified = $unityPackage.versionVerified", script)
         self.assertIn("Resolve-DoctorState", script)
         for state in self.contract["doctorStates"]:
             self.assertIn(f'return "{state}"', script)
