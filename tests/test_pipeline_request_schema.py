@@ -37,7 +37,9 @@ class PipelineRequestSchemaTests(unittest.TestCase):
             runner._validate_request(value)
 
     def test_all_tracked_requests_match_canonical_schema(self) -> None:
-        requests = sorted((ROOT / "config" / "pipeline" / "requests").glob("*.json"))
+        requests = sorted(
+            (ROOT / "config" / "pipeline" / "requests").glob("*.json")
+        )
         self.assertTrue(requests)
         for path in requests:
             with self.subTest(path=path.name):
@@ -136,7 +138,11 @@ class PipelineRequestSchemaTests(unittest.TestCase):
         )
         self.assert_valid(valid)
 
-        for key, invalid in (("revisionId", 1), ("runId", 1), ("profilePath", [])):
+        for key, invalid in (
+            ("revisionId", 1),
+            ("runId", 1),
+            ("profilePath", []),
+        ):
             value = copy.deepcopy(valid)
             value[key] = invalid
             with self.subTest(key=key):
