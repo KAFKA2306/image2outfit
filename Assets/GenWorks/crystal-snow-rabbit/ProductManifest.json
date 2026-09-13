@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "productId": "crystal-snow-rabbit",
+  "status": "manufacturing-checkpoint",
+  "workline": "Issue #508",
+  "baseRevision": "c9ef37340a4a489f1ccb90d23d0def3dbc773e26",
+  "evidence": {
+    "reference": "PASS",
+    "constructionContract": "PASS",
+    "licenseEvidence": "PASS",
+    "pattern": "PASS",
+    "prototypeGeometry": "PASS",
+    "uv0": "PASS",
+    "materials": "PASS",
+    "heroGeometry": "PASS",
+    "canonicalJob": "UNVERIFIED",
+    "blenderBuild": "UNVERIFIED",
+    "fitRigWeight": "UNVERIFIED",
+    "physics": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefab": "UNVERIFIED",
+    "fiveViews": "UNVERIFIED",
+    "poses": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat": "UNVERIFIED"
+  },
+  "reference": {
+    "path": "Assets/GenWorks/crystal-snow-rabbit/References/crystal-snow-rabbit-manufacturing-sheet.webp",
+    "generated": true,
+    "issueVisible": true
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/crystal-snow-rabbit/Source/Prototype/crystal-snow-rabbit.obj",
+    "vertices": 76,
+    "polygonFaces": 20,
+    "namedGroups": 20,
+    "uvCoordinates": 4,
+    "materialRoles": 4,
+    "heroGroups": ["ear_L","ear_R","crystal_charm_set","ear_crystal_bridge"],
+    "note": "Flat panel manufacturing checkpoint only. Non-empty OBJ geometry with UV0 and material assignments; not a fitted Blender candidate."
+  },
+  "blocker": {
+    "stage": "canonical-job",
+    "status": "UNVERIFIED",
+    "reason": "No repository-owned executable buildScript for this product has yet been proven reusable. A one-off builder is intentionally not added.",
+    "nextAction": "Reuse an existing canonical garment build path, add schema-valid config/products/crystal-snow-rabbit/job.json, then execute Blender fit/weight/material build and five-view renders on Issue #508."
+  }
+}
