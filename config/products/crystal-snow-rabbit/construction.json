@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "productId": "crystal-snow-rabbit",
+  "profile": "panel-sewn",
+  "target": "Siroino canonical adapter siroino-v1.0",
+  "designRevision": "issue-508-reference-v1",
+  "panels": ["hood_crown","ear_L","ear_R","jacket_front_L","jacket_front_R","jacket_back","sleeve_L","sleeve_R","inner_bodice_front","inner_bodice_back","waist_corset","skirt_upper","skirt_lower","lace_hem"],
+  "separateGeometry": ["ear_L","ear_R","chest_bow","back_bow","crystal_charm_set","boot_cuff_L","boot_cuff_R"],
+  "priorityFitZones": ["neck","shoulder","elbow","waist","hip","upper_leg"],
+  "requiredPoses": ["idle","arms-up","arms-forward","crouch"],
+  "releaseBoundary": "No release until canonical Blender/FBX/prefab/five-view/pose/Unity evidence exists.",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "UNVERIFIED",
+    "reason": "Initial product uses weighted panels and limited PhysBone candidates rather than cloth simulation."
+  }
+}
