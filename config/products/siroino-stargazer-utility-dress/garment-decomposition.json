@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-stargazer-utility-dress",
+  "garmentClass": "utility-dress",
+  "parts": [
+    {"id":"front-bodice-center","category":"body-panel","symmetry":"centered","certainty":"designed"},
+    {"id":"front-bodice-side-left","category":"body-panel","symmetry":"left","certainty":"designed"},
+    {"id":"front-bodice-side-right","category":"body-panel","symmetry":"right","certainty":"designed"},
+    {"id":"back-bodice-center","category":"body-panel","symmetry":"centered","certainty":"designed"},
+    {"id":"back-bodice-side-left","category":"body-panel","symmetry":"left","certainty":"designed"},
+    {"id":"back-bodice-side-right","category":"body-panel","symmetry":"right","certainty":"designed"},
+    {"id":"crescent-utility-yoke","category":"hero-overlay","symmetry":"asymmetric","certainty":"designed"},
+    {"id":"yoke-pocket-facing","category":"pocket","symmetry":"asymmetric","certainty":"designed"},
+    {"id":"sleeve-left","category":"sleeve","symmetry":"left","certainty":"designed"},
+    {"id":"sleeve-right","category":"sleeve","symmetry":"right","certainty":"designed"},
+    {"id":"stand-collar","category":"structural-trim","symmetry":"centered","certainty":"designed"},
+    {"id":"waist-facing","category":"structural-trim","symmetry":"centered","certainty":"designed"},
+    {"id":"front-skirt-left","category":"skirt-panel","symmetry":"left","certainty":"designed"},
+    {"id":"front-skirt-right","category":"skirt-panel","symmetry":"right","certainty":"designed"},
+    {"id":"back-skirt-left","category":"skirt-panel","symmetry":"left","certainty":"designed"},
+    {"id":"back-skirt-right","category":"skirt-panel","symmetry":"right","certainty":"designed"}
+  ],
+  "layerOrder": [
+    "SiroinoSotai_PC",
+    "bodice and skirt panels",
+    "sleeves and collar",
+    "crescent utility yoke and pocket facing"
+  ],
+  "negativeEvidence": [
+    "No transparent panel",
+    "No chain decoration",
+    "No long dangling accessory",
+    "No mandatory PhysBone part"
+  ]
+}
