@@ -18,7 +18,9 @@ ROOT = Path(__file__).resolve().parents[1]
 LEGACY_BUILDER = ROOT / "tools/haolan_knit_build.py"
 TURNAROUND_RENDERER = ROOT / "tools/render_haolan_candidate_turnaround.py"
 POSE_RENDERER = ROOT / "tools/render_haolan_candidate_poses.py"
-LOCAL_JOB = (\n    ROOT / "Assets" / "_Local" / "Jobs" / "haolan-bordeaux-knit-set" / "job.json"\n)
+LOCAL_JOB = (
+    ROOT / "Assets" / "_Local" / "Jobs" / "haolan-bordeaux-knit-set" / "job.json"
+)
 SEED_FBX = ROOT / "Assets" / "_Local" / "GeneratedSeeds" / "haolan-v1.6-skeleton.fbx"
 
 
@@ -80,7 +82,9 @@ def materialize_skeleton(seed_path: Path) -> Path:
         axis_up="Y",
     )
     if not SEED_FBX.is_file() or SEED_FBX.stat().st_size < 1_000:
-        raise RuntimeError(\n            "Failed to materialize the geometry-free HAOLAN skeleton seed"\n        )
+        raise RuntimeError(
+            "Failed to materialize the geometry-free HAOLAN skeleton seed"
+        )
     return SEED_FBX
 
 
