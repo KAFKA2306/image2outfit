@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "productId": "lunar-sanctum-wardress",
+  "productName": "Lunar Sanctum Wardress",
+  "designRevision": "v0-generated-reference-prototype",
+  "issue": 511,
+  "status": "WORKING",
+  "reference": "Assets/GenWorks/lunar-sanctum-wardress/References/lunar-sanctum-manufacturing-sheet.svg",
+  "prototype": "Assets/GenWorks/lunar-sanctum-wardress/Models/lunar-sanctum-prototype.obj",
+  "gates": {
+    "generated_reference": {"status": "PASS", "evidence": "Assets/GenWorks/lunar-sanctum-wardress/References/lunar-sanctum-manufacturing-sheet.svg"},
+    "pattern_decomposition": {"status": "PASS", "evidence": "Assets/GenWorks/lunar-sanctum-wardress/Documentation/pattern-spec.json"},
+    "prototype_geometry": {"status": "PASS", "evidence": "Assets/GenWorks/lunar-sanctum-wardress/Models/lunar-sanctum-prototype.obj"},
+    "uv0": {"status": "PASS", "evidence": "28 vt records in prototype OBJ"},
+    "materials": {"status": "PASS", "evidence": "Assets/GenWorks/lunar-sanctum-wardress/Models/lunar-sanctum-prototype.mtl"},
+    "hero_detail_geometry": {"status": "PASS", "evidence": "named group crescent_back_charm"},
+    "canonical_job": {"status": "UNVERIFIED", "evidence": null},
+    "blender_fit": {"status": "UNVERIFIED", "evidence": null},
+    "rig_weight": {"status": "UNVERIFIED", "evidence": null},
+    "fbx_export": {"status": "UNVERIFIED", "evidence": null},
+    "multi_angle_render": {"status": "UNVERIFIED", "evidence": null},
+    "unity": {"status": "UNVERIFIED", "evidence": null},
+    "vrchat": {"status": "UNVERIFIED", "evidence": null}
+  },
+  "blocker": "A repository-owned generic garment build entrypoint for this new product has not been identified in this runtime; do not reuse a product-specific script that would generate a different garment.",
+  "nextAction": "Identify the current generic Siroino garment build path, add a schema-valid job.json pointing only to that existing path, then execute Blender fit/weight/export/render for issue #511."
+}
