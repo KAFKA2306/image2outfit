@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-jade-knot-tulip-dress-set",
+  "productName": "Jade Knot Tulip Dress Set for SiroinoSotai_PC",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Prefab/JadeKnotTulipDress.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Prefab/SiroinoSotai_JadeKnotTulipDress.prefab",
+  "previewPath": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/README.md",
+  "sourceJobPath": "config/products/siroino-jade-knot-tulip-dress-set/job.json",
+  "productBuildScript": "tools/run_garment_pipeline.py",
+  "designRevision": "v1-jade-knot-panel-prototype",
+  "sourceReference": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/References/jade-knot-tulip-dress-manufacturing-sheet.svg",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-jade-knot-tulip-dress-set/pipeline-state.json",
+    "lastAttempt": {"result":"PROTOTYPE_CHECKPOINT_CREATED","visualRevision":"v1-jade-knot-panel-prototype","workflowRun":null,"review":null},
+    "blockers": [
+      "Prototype OBJ has not been imported, fitted or weighted to Siroino in Blender.",
+      "Blend/FBX/Prefab/five-view/six-pose evidence and Unity/VRChat evidence are not yet produced."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "clothSimulation": "NOT_APPLICABLE",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "tenAxisAudit": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "researchTrial": "DECLARED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "manufacturingReference": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/References/jade-knot-tulip-dress-manufacturing-sheet.svg",
+    "prototypeObj": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Source/Prototype/jade-knot-tulip.obj",
+    "prototypeMtl": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Source/Prototype/jade-knot-tulip.mtl",
+    "patternSpec": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Source/Patterns/pattern-spec.json",
+    "blend": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Source/Blender/JadeKnotTulipDress.blend",
+    "fbx": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Models/JadeKnotTulipDress.fbx",
+    "prefab": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Prefab/JadeKnotTulipDress.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-jade-knot-tulip-dress-set/Prefab/SiroinoSotai_JadeKnotTulipDress.prefab"
+  }
+}
