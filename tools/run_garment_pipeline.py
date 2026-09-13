@@ -7,7 +7,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -17,6 +17,11 @@ if str(ROOT / "tools") not in sys.path:
     sys.path.insert(0, str(ROOT / "tools"))
 
 from image2outfit.audit import write_audit_bundle
+from image2outfit.failure_contract import (
+    failed_state_descriptor,
+    failure_descriptor,
+    stable_cause_code,
+)
 from image2outfit.pipeline import (
     PIPELINE_STAGES,
     ExecutionMode,
@@ -44,11 +49,7 @@ IDENTITY_FIELDS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--request", required=True, type=Path)
-    parser.add_argument(
-        "--profile",
-        type=Path,
-        help="Override request.profilePath. Otherwise the request or default profile is used.",
-    )
+    parser.add_argument("--profile", type=Path)
     parser.add_argument(
         "--engine",
         choices=("deterministic", "langchain", "langgraph"),
@@ -58,12 +59,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--resume-state", type=Path)
     parser.add_argument("--checkpoint-output", type=Path)
-    parser.add_argument(
-        "--audit-root",
-        type=Path,
-        default=Path(".image2outfit/audit"),
-        help="Repository-relative root for immutable per-run audit bundles.",
-    )
+    parser.add_argument("--audit-root", type=Path, default=Path(".image2outfit/audit"))
     return parser.parse_args()
 
 
@@ -110,9 +106,35 @@ def _write_json_atomic(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def _identity_mismatches(
-    state: dict[str, Any], expected: dict[str, str]
-) -> list[str]:
+def _emit(args: argparse.Namespace, value: dict[str, Any]) -> int:
+    payload = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    if args.output:
+        output = _repo_path(args.output, label="output")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(payload, encoding="utf-8")
+    sys.stdout.write(payload)
+    return 1 if value.get("status") == "FAILED" else 0
+
+
+def _emit_failure(
+    args: argparse.Namespace,
+    *,
+    error_code: str,
+    phase: str,
+    exc: BaseException,
+    stage: str | None = None,
+) -> int:
+    failure = failure_descriptor(
+        error_code,
+        phase,
+        str(exc) or error_code,
+        stage=stage,
+        cause_code=stable_cause_code(exc),
+    )
+    return _emit(args, {"status": "FAILED", "failure": failure})
+
+
+def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
     return [
         request_name
         for state_name, request_name in IDENTITY_FIELDS.items()
@@ -124,8 +146,7 @@ def _assert_identity(state: dict[str, Any], expected: dict[str, str]) -> None:
     mismatches = _identity_mismatches(state, expected)
     if mismatches:
         raise ValueError(
-            "resume checkpoint identity does not match request: "
-            + ", ".join(mismatches)
+            "resume checkpoint identity does not match request: " + ", ".join(mismatches)
         )
 
 
@@ -157,14 +178,11 @@ def _resume_or_reset(
 ) -> dict[str, Any]:
     validate_pipeline_state(previous)
     mismatches = _identity_mismatches(previous, expected)
-    non_source_mismatches = [
-        value for value in mismatches if value != "sourceFingerprint"
-    ]
+    non_source_mismatches = [value for value in mismatches if value != "sourceFingerprint"]
     if non_source_mismatches:
         _assert_identity(previous, expected)
     if "sourceFingerprint" not in mismatches:
         return resume_pipeline_state(previous, execution_mode=mode)
-
     state = _new_state(request, expected, mode)
     state["checkpoint_reset"] = {
         "reason": "source-fingerprint-changed",
@@ -177,90 +195,139 @@ def _resume_or_reset(
 
 def main() -> int:
     args = parse_args()
-    request_path = _repo_path(args.request, label="request")
-    request = _read_object(request_path, label="request")
-    if request.get("schemaVersion") != 1:
-        raise ValueError("request.schemaVersion must be 1")
-    profile_path = _profile_path(args, request)
-    profile = load_profile(profile_path)
-    product_id = str(request["productId"])
-    expected = {
-        "productId": product_id,
-        "targetAvatar": str(request["targetAvatar"]),
-        "sourceReference": str(request["sourceReference"]),
-        "profileId": str(profile["profileId"]),
-        "revisionId": str(request.get("revisionId", "")),
-        "sourceFingerprint": pipeline_source_fingerprint(
-            ROOT,
-            product_id=product_id,
-            request_path=request_path,
-            profile_path=profile_path,
-        ),
-    }
-    variables = {
-        **expected,
-        **{
-            str(key): str(value)
-            for key, value in _mapping(request.get("variables"), "variables").items()
-        },
-    }
-    mode = ExecutionMode.EXECUTE if args.execute else ExecutionMode.PLAN
-    if args.resume_state:
-        previous = _read_object(
-            _repo_path(args.resume_state, label="resume state"),
-            label="resume state",
-        )
-        state = _resume_or_reset(
-            previous,
-            request=request,
-            expected=expected,
-            mode=mode,
-        )
-        if state.get("checkpoint_reset"):
-            print(
-                "Ignoring stale resume checkpoint because pipeline sources changed.",
-                file=sys.stderr,
-            )
-    else:
-        state = _new_state(request, expected, mode)
+    try:
+        request_path = _repo_path(args.request, label="request")
+        request = _read_object(request_path, label="request")
+        if request.get("schemaVersion") != 1:
+            raise ValueError("request.schemaVersion must be 1")
+        product_id = str(request["productId"])
+        target_avatar = str(request["targetAvatar"])
+        source_reference = str(request["sourceReference"])
+    except Exception as exc:  # noqa: BLE001 - CLI contract boundary
+        return _emit_failure(args, error_code="INVALID_PIPELINE_INPUT", phase="request", exc=exc)
 
-    registry = build_registry(
-        profile,
-        execute=args.execute,
-        bindings=_mapping(request.get("stageBindings"), "stageBindings"),
-        variables=variables,
-        tool_requirements=_mapping(request.get("toolRequirements"), "toolRequirements"),
-        tool_pins=_mapping(request.get("toolPins"), "toolPins"),
-    )
-    checkpoint = (
+    try:
+        profile_path = _profile_path(args, request)
+        profile = load_profile(profile_path)
+    except Exception as exc:  # noqa: BLE001 - CLI contract boundary
+        return _emit_failure(
+            args, error_code="PIPELINE_CONFIGURATION_INVALID", phase="profile", exc=exc
+        )
+
+    try:
+        expected = {
+            "productId": product_id,
+            "targetAvatar": target_avatar,
+            "sourceReference": source_reference,
+            "profileId": str(profile["profileId"]),
+            "revisionId": str(request.get("revisionId", "")),
+            "sourceFingerprint": pipeline_source_fingerprint(
+                ROOT,
+                product_id=product_id,
+                request_path=request_path,
+                profile_path=profile_path,
+            ),
+        }
+        variables = {
+            **expected,
+            **{
+                str(key): str(value)
+                for key, value in _mapping(request.get("variables"), "variables").items()
+            },
+        }
+        mode = ExecutionMode.EXECUTE if args.execute else ExecutionMode.PLAN
+    except Exception as exc:  # noqa: BLE001 - contract boundary
+        return _emit_failure(
+            args, error_code="PIPELINE_CONFIGURATION_INVALID", phase="contract", exc=exc
+        )
+
+    try:
+        if args.resume_state:
+            previous = _read_object(
+                _repo_path(args.resume_state, label="resume state"), label="resume state"
+            )
+            state = _resume_or_reset(
+                previous, request=request, expected=expected, mode=mode
+            )
+            if state.get("checkpoint_reset"):
+                print(
+                    "Ignoring stale resume checkpoint because pipeline sources changed.",
+                    file=sys.stderr,
+                )
+        else:
+            state = _new_state(request, expected, mode)
+    except Exception as exc:  # noqa: BLE001 - resume boundary
+        return _emit_failure(args, error_code="INVALID_RESUME_STATE", phase="resume", exc=exc)
+
+    try:
+        registry = build_registry(
+            profile,
+            execute=args.execute,
+            bindings=_mapping(request.get("stageBindings"), "stageBindings"),
+            variables=variables,
+            tool_requirements=_mapping(request.get("toolRequirements"), "toolRequirements"),
+            tool_pins=_mapping(request.get("toolPins"), "toolPins"),
+        )
+    except Exception as exc:  # noqa: BLE001 - registry boundary
+        return _emit_failure(
+            args, error_code="PIPELINE_CONFIGURATION_INVALID", phase="registry", exc=exc
+        )
+
+    checkpoint: Callable[[dict[str, Any]], None] | None = (
         (lambda current: _write_json_atomic(args.checkpoint_output, current))
         if args.checkpoint_output
         else None
     )
-    if args.engine == "langgraph":
-        result = run_langgraph(state, registry)
-    elif args.engine == "langchain":
-        result = run_langchain(state, registry)
-    else:
-        result = run_pipeline(state, registry, checkpoint=checkpoint)
+    try:
+        if args.engine == "langgraph":
+            result = run_langgraph(state, registry)
+        elif args.engine == "langchain":
+            result = run_langchain(state, registry)
+        else:
+            result = run_pipeline(state, registry, checkpoint=checkpoint)
+    except RuntimeError as exc:
+        if args.engine in {"langchain", "langgraph"} and "not installed" in str(exc).lower():
+            return _emit_failure(
+                args,
+                error_code="PIPELINE_ENGINE_UNAVAILABLE",
+                phase="pipeline",
+                exc=exc,
+            )
+        return _emit_failure(
+            args, error_code="INTERNAL_PIPELINE_ERROR", phase="pipeline", exc=exc
+        )
+    except Exception as exc:  # noqa: BLE001 - pipeline boundary
+        return _emit_failure(
+            args, error_code="INTERNAL_PIPELINE_ERROR", phase="pipeline", exc=exc
+        )
 
     result["toolPlan"] = registry.selection_plan()
-    audit_root = (
-        args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
-    )
-    result["audit"] = write_audit_bundle(
-        result,
-        audit_root=audit_root,
-        canonical_stages=[stage.value for stage in PIPELINE_STAGES],
-    )
+    if result.get("status") == "FAILED":
+        result["failure"] = failed_state_descriptor(result)
+
+    try:
+        audit_root = args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
+        result["audit"] = write_audit_bundle(
+            result,
+            audit_root=audit_root,
+            canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+        )
+    except Exception as exc:  # noqa: BLE001 - audit publication boundary
+        return _emit_failure(
+            args, error_code="AUDIT_PUBLICATION_FAILED", phase="audit", exc=exc
+        )
+
     if args.checkpoint_output:
         _write_json_atomic(args.checkpoint_output, result)
-    payload = json.dumps(result, ensure_ascii=False, indent=2)
-    if args.output:
-        _write_json_atomic(args.output, result)
-    print(payload)
     expected_status = "EXECUTED" if args.execute else "PLANNED"
-    return 0 if result.get("status") == expected_status else 1
+    if result.get("status") != expected_status and result.get("status") != "FAILED":
+        result["status"] = "FAILED"
+        result["failure"] = failure_descriptor(
+            "INTERNAL_PIPELINE_ERROR",
+            "pipeline",
+            f"pipeline finished with unexpected status: {result.get('status')}",
+        )
+    return _emit(args, result)
 
 
 if __name__ == "__main__":
