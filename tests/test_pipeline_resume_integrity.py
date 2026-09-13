@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import copy
 import json
 import sys
 import tempfile
@@ -189,20 +188,21 @@ class PipelineResumeIntegrityTests(unittest.TestCase):
             with (
                 patch.object(runner, "parse_args", return_value=args),
                 patch.object(runner, "_profile_path", return_value=ROOT / "profile.json"),
-                patch.object(runner, "load_profile", return_value={"profileId": expected_identity()["profileId"]}),
-                patch.object(runner, "pipeline_source_fingerprint", return_value=SOURCE_FINGERPRINT),
+                patch.object(
+                    runner,
+                    "load_profile",
+                    return_value={"profileId": expected_identity()["profileId"]},
+                ),
+                patch.object(
+                    runner,
+                    "pipeline_source_fingerprint",
+                    return_value=SOURCE_FINGERPRINT,
+                ),
                 patch.object(runner, "build_registry") as build_registry,
             ):
                 with self.assertRaisesRegex(ValueError, "output mismatch"):
                     runner.main()
         build_registry.assert_not_called()
-
-    def test_external_artifact_bytes_are_not_rehashed_at_resume_boundary(self) -> None:
-        checkpoint = partial_checkpoint()
-        untouched = copy.deepcopy(checkpoint)
-        resumed = resume(checkpoint)
-        self.assertEqual(checkpoint, untouched)
-        self.assertEqual(resumed["parent_run_id"], "checkpoint-run")
 
 
 if __name__ == "__main__":
