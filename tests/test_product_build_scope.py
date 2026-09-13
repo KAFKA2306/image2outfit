@@ -197,6 +197,10 @@ class ProductBuildScopeTest(unittest.TestCase):
             PROJECT / ".github/workflows/build-product-hosted.yml",
             PROJECT / ".github/workflows/build-product-self-hosted.yml",
         ]
+        expected_invocations = {
+            "build-product-hosted.yml": 1,
+            "build-product-self-hosted.yml": 2,
+        }
         for path in workflows:
             text = path.read_text(encoding="utf-8")
             invocation_lines = [
@@ -204,7 +208,9 @@ class ProductBuildScopeTest(unittest.TestCase):
                 for line in text.splitlines()
                 if "python tools/resolve_product_build_scope.py" in line
             ]
-            self.assertEqual(len(invocation_lines), 1, path.name)
+            self.assertEqual(
+                len(invocation_lines), expected_invocations[path.name], path.name
+            )
             self.assertNotIn("Only schemaVersion 2 jobs are accepted", text)
             self.assertNotIn("selected-product-jobs-", text)
         hosted = workflows[0].read_text(encoding="utf-8")
