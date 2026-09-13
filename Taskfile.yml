@@ -105,9 +105,9 @@ tasks:
         --request "{{.REQUEST}}"
 
   runner:audit:
-    desc: Evaluate tri-state metrics and Runner COMPLETE from producer observations and evidence.
+    desc: Evaluate tri-state metrics and Runner COMPLETE from producer observations, evidence, and the attempt ledger.
     requires:
-      vars: [REQUEST, OBSERVATIONS, EVIDENCE, OUTPUT]
+      vars: [REQUEST, OBSERVATIONS, EVIDENCE, LEDGER, OUTPUT]
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
@@ -115,6 +115,7 @@ tasks:
         --request "{{.REQUEST}}"
         --observations "{{.OBSERVATIONS}}"
         --evidence-index "{{.EVIDENCE}}"
+        --attempt-ledger "{{.LEDGER}}"
         --output "{{.OUTPUT}}"
 
   runner:compare:
