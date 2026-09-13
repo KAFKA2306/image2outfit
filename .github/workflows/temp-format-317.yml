@@ -19,10 +19,10 @@ jobs:
           ref: fix/317-product-completion-projection
       - uses: astral-sh/setup-uv@v7
         with:
-          version: '0.8.22'
+          version: '0.11.32'
           enable-cache: true
       - name: Format files
-        run: uv run --frozen ruff format tools/review_console.py tests/test_product_completion_projection.py
+        run: uv run --locked --no-default-groups --group dev ruff format tools/review_console.py tests/test_product_completion_projection.py
       - name: Commit formatting
         run: |
           if git diff --quiet; then exit 0; fi
