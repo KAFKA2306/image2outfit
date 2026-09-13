@@ -106,20 +106,41 @@ function Test-RegistrationContains {
     return $true
 }
 
-function Get-UnityMcpDetected {
+function Get-UnityMcpPackageStatus {
     $manifestPath = Join-Path $RepoRoot "Packages\manifest.json"
-    if (Test-Path $manifestPath) {
-        $manifestText = Get-Content -Raw -LiteralPath $manifestPath
-        if ($manifestText -match [regex]::Escape([string]$Contract.unityMcp.packageId)) { return $true }
+    if (-not (Test-Path $manifestPath)) {
+        return [pscustomobject]@{
+            detected = $false
+            source = $null
+            versionVerified = $false
+        }
     }
-    $packageCache = Join-Path $RepoRoot "Library\PackageCache"
-    if (Test-Path $packageCache) {
-        $resolved = Get-ChildItem -LiteralPath $packageCache -Directory -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -like "$($Contract.unityMcp.packageId)*" } |
-            Select-Object -First 1
-        if ($null -ne $resolved) { return $true }
+
+    try {
+        $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+        $property = $manifest.dependencies.PSObject.Properties[[string]$Contract.unityMcp.packageId]
+        if ($null -eq $property) {
+            return [pscustomobject]@{
+                detected = $false
+                source = $null
+                versionVerified = $false
+            }
+        }
+
+        $source = [string]$property.Value
+        return [pscustomobject]@{
+            detected = $true
+            source = $source
+            versionVerified = ($source -eq $UnityMcpPackageUrl)
+        }
     }
-    return $false
+    catch {
+        return [pscustomobject]@{
+            detected = $false
+            source = $null
+            versionVerified = $false
+        }
+    }
 }
 
 function Get-UnityProjectVersion {
@@ -179,12 +200,12 @@ function Invoke-McpDoctor {
 
     $unityRegistrationVerified = Test-RegistrationContains -Registration $unityRegistration -RequiredTokens @($UnityMcpUrl)
     $unityProjectCompatible = $unityProjectVersion -eq $ExpectedUnityVersion
-    $unityPackageDetected = Get-UnityMcpDetected
+    $unityPackage = Get-UnityMcpPackageStatus
     $unityReachable = Test-LoopbackPort -HostName $UnityHost -Port $UnityPort
     $unityState = Resolve-DoctorState `
         -PrerequisitesAvailable $codexAvailable `
         -Configured ($null -ne $unityRegistration) `
-        -Verified ($unityRegistrationVerified -and $unityProjectCompatible -and $unityPackageDetected) `
+        -Verified ($unityRegistrationVerified -and $unityProjectCompatible -and $unityPackage.versionVerified) `
         -Reachable $unityReachable
 
     return [pscustomobject][ordered]@{
@@ -216,8 +237,11 @@ function Invoke-McpDoctor {
             codexAvailable = $codexAvailable
             registered = ($null -ne $unityRegistration)
             registrationVerified = $unityRegistrationVerified
-            packageDetected = $unityPackageDetected
+            packageDetected = $unityPackage.detected
+            packageSource = $unityPackage.source
+            packageVersionVerified = $unityPackage.versionVerified
             expectedPackageVersion = $UnityMcpVersion
+            expectedPackageSource = $UnityMcpPackageUrl
             projectVersion = $unityProjectVersion
             expectedProjectVersion = $ExpectedUnityVersion
             projectVersionCompatible = $unityProjectCompatible
