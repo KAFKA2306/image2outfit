@@ -83,6 +83,52 @@ tasks:
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py improve --product "{{.PRODUCT}}"
 
+  runner:freeze:
+    desc: Freeze a Runner-only request with the selected threshold profile and emit its request digest.
+    requires:
+      vars: [REQUEST, OUTPUT]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/runner_machine_audit.py freeze
+        --request "{{.REQUEST}}"
+        --output "{{.OUTPUT}}"
+
+  runner:validate:
+    desc: Validate a frozen Runner-only request and reference hashes.
+    requires:
+      vars: [REQUEST]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/runner_machine_audit.py validate
+        --request "{{.REQUEST}}"
+
+  runner:audit:
+    desc: Evaluate tri-state metrics and Runner COMPLETE from producer observations and evidence.
+    requires:
+      vars: [REQUEST, OBSERVATIONS, EVIDENCE, OUTPUT]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/runner_machine_audit.py evaluate
+        --request "{{.REQUEST}}"
+        --observations "{{.OBSERVATIONS}}"
+        --evidence-index "{{.EVIDENCE}}"
+        --output "{{.OUTPUT}}"
+
+  runner:compare:
+    desc: Apply Pareto KEEP/REVERT to two audit results.
+    requires:
+      vars: [REQUEST, BEFORE, AFTER]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/runner_machine_audit.py compare
+        --request "{{.REQUEST}}"
+        --before "{{.BEFORE}}"
+        --after "{{.AFTER}}"
+
   audit:all:
     desc: Run every repository, runtime, toolchain, research, and method audit.
     cmds:
