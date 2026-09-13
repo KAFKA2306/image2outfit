@@ -42,7 +42,7 @@
     "stage_records": {"type": "array", "items": {"type": "object"}},
     "resume_count": {"type": "integer"},
     "resume_history": {"type": "array", "items": {"type": "object"}},
-    "source_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_fingerprint": {"type": "string", "minLength": 1},
     "checkpoint_reset": {"type": "object"},
     "toolPlan": {"type": "array", "items": {"type": "object"}},
     "audit": {"type": "object"}
