@@ -261,6 +261,32 @@ def _copy_evidence_document(
         copied.append(runtime_destination)
 
 
+_CANONICAL_ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+_CANONICAL_ZIP_MODE = 0o100644
+
+
+def _write_canonical_zip(release: Path, archive: Path) -> None:
+    members = sorted(
+        (path for path in release.rglob("*") if path.is_file() and path != archive),
+        key=lambda path: path.relative_to(release).as_posix(),
+    )
+    with zipfile.ZipFile(
+        archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+    ) as output:
+        for path in members:
+            member_name = path.relative_to(release).as_posix()
+            info = zipfile.ZipInfo(member_name, date_time=_CANONICAL_ZIP_TIMESTAMP)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3
+            info.external_attr = _CANONICAL_ZIP_MODE << 16
+            output.writestr(
+                info,
+                path.read_bytes(),
+                compress_type=zipfile.ZIP_DEFLATED,
+                compresslevel=9,
+            )
+
+
 def package_release(
     *,
     root: Path,
@@ -332,7 +358,6 @@ def package_release(
             "jobId": job["id"],
             "productName": job["productName"],
             "adapterId": job["adapterId"],
-            "releasedAt": now(),
             "sourceCommit": candidate_manifest.get("sourceCommit"),
             "candidateManifestSha256": candidate_hash,
             "files": files,
@@ -341,10 +366,16 @@ def package_release(
         },
     )
     archive = release / f"{job['id']}.zip"
-    with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as output:
-        for path in sorted(release.rglob("*")):
-            if path.is_file() and path != archive:
-                output.write(path, path.relative_to(release))
+    _write_canonical_zip(release, archive)
+
+    audit = release / "release-audit.json"
+    write_json(
+        audit,
+        {
+            "schemaVersion": 1,
+            "releasedAt": now(),
+        },
+    )
     return {
         "releaseManifest": relative(root, release_manifest),
         "releaseManifestSha256": digest(release_manifest),
