@@ -52,17 +52,18 @@ def engine_runners():
     return runners
 
 
-def state_for(engine: str):
+def state_for():
     return new_pipeline_state(
         product_id="checkpoint-parity",
         target_avatar="SiroinoSotai_PC",
         source_reference="private-reference://sha256/checkpoint-parity",
-        run_id=f"{engine}-initial",
+        run_id="checkpoint-parity-run",
     )
 
 
 def semantic_checkpoint(state):
     return {
+        "run_id": state["run_id"],
         "product_id": state["product_id"],
         "completed_stages": list(state["completed_stages"]),
         "status": state["status"],
@@ -95,7 +96,7 @@ class PipelineCheckpointEngineTests(unittest.TestCase):
 
                 with self.assertRaises(StopAfterCheckpoint):
                     runner(
-                        state_for(engine),
+                        state_for(),
                         registry_for(first_calls),
                         checkpoint=checkpoint,
                     )
@@ -137,7 +138,7 @@ class PipelineCheckpointEngineTests(unittest.TestCase):
                     saved.append(copy.deepcopy(state))
 
                 result = runner(
-                    state_for(engine),
+                    state_for(),
                     registry_for(called, fail_at=failing.value),
                     checkpoint=checkpoint,
                 )
@@ -171,7 +172,7 @@ class PipelineCheckpointEngineTests(unittest.TestCase):
 
                 with self.assertRaisesRegex(OSError, "checkpoint storage unavailable"):
                     runner(
-                        state_for(engine),
+                        state_for(),
                         registry_for(called),
                         checkpoint=broken_writer,
                     )
@@ -188,7 +189,7 @@ class PipelineCheckpointEngineTests(unittest.TestCase):
                 saved.append(semantic_checkpoint(state))
 
             result = runner(
-                state_for(engine),
+                state_for(),
                 registry_for(called),
                 checkpoint=checkpoint,
             )
