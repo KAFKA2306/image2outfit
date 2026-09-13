@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-rainveil-cape-skort-set",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-panel-sewn-rainveil",
+  "panels": [
+    "cape_front_L", "cape_front_R", "cape_back", "storm_flap",
+    "stand_collar_outer", "stand_collar_inner", "arm_slit_facing_L", "arm_slit_facing_R",
+    "shorts_front_L", "shorts_front_R", "shorts_back_L", "shorts_back_R",
+    "wrap_front", "skirt_back", "waistband_outer", "waistband_inner"
+  ],
+  "separateGeometry": ["storm_flap", "wrap_front", "hardware_snaps"],
+  "priorityFitZones": ["neck", "shoulder", "arm slits", "waist", "hip", "crotch", "wrap overlap", "cape side drape"],
+  "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+  "releaseBoundary": "WORKING until every requiredCompletionGate in config/genworks-handoff-policy.json passes"
+}
