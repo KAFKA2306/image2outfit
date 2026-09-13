@@ -210,6 +210,37 @@ class VisualReviewBundleTests(unittest.TestCase):
             ):
                 M.validate_review_result(review, bundle)
 
+    def test_tracked_tuxedo_reference_marks_only_front_as_observed(self) -> None:
+        product_id = "siroino-tuxedo-halter-dress-large"
+        product = self.original_root / "config" / "products" / product_id
+        request = json.loads(
+            (
+                self.original_root
+                / "config"
+                / "pipeline"
+                / "requests"
+                / f"{product_id}.json"
+            ).read_text(encoding="utf-8")
+        )
+        reference = json.loads((product / "reference.json").read_text(encoding="utf-8"))
+
+        identity = M._reference_identity(product_id, request)
+
+        self.assertEqual(
+            identity["sourceSha256"],
+            "66cd898014d3f503da8015207a0240d946aac72b596f28bef8d6574a0afb678b",
+        )
+        self.assertEqual(identity["observedViews"], ["front"])
+        self.assertIn("back", reference["unobservedViews"])
+        self.assertLessEqual(
+            reference["normalizationProof"]["roundTripMaxErrorPx"],
+            1,
+        )
+        self.assertFalse(reference["referenceCommitted"])
+        self.assertTrue(
+            reference["evidencePolicy"]["unobservedViewsCannotPassReferenceFidelity"]
+        )
+
     def test_tracked_wide_cargo_builds_real_bundle(self) -> None:
         product_id = "siroino-wide-cargo"
         job_path = self.original_root / "config" / "products" / product_id / "job.json"
