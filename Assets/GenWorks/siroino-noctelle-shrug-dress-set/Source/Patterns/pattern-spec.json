@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-noctelle-shrug-dress-set",
+  "units": "meters",
+  "profile": "panel-sewn",
+  "sourceReference": "References/noctelle-shrug-dress-manufacturing-sheet.webp",
+  "heroDetail": "off-shoulder gathered shrug frame with center-back bow termination",
+  "panels": ["bodice_front_L","bodice_front_R","bodice_back_L","bodice_back_R","skirt_front_L","skirt_front_R","skirt_back_L","skirt_back_R","shrug_back_yoke","shrug_front_L","shrug_front_R","sleeve_upper_L","sleeve_upper_R","sleeve_lower_L","sleeve_lower_R","cuff_L","cuff_R","offshoulder_band"],
+  "separateGeometry": ["chest_strap_L","chest_strap_R","back_strap_L","back_strap_R","waist_belt","back_bow_L","back_bow_R","back_bow_knot"],
+  "materialRoles": {"dress":"MAT_Noctelle_Dress","shrug":"MAT_Noctelle_Shrug","trim":"MAT_Noctelle_Trim","metal":"MAT_Noctelle_Metal"},
+  "uvPolicy": {"setCount":1,"overlap":"none except deliberate mirrored minor trim","priority":["dress","shrug","trim","metal"]},
+  "lod0TriangleBudget": 24000,
+  "prototypeEvidence": {"path":"Source/Prototype/noctelle-shrug-dress.obj","vertexCount":208,"faceCount":156,"uvCount":208,"namedGeometryGroups":26,"objSha256":"6f21a1bda0c3df0f8e1b2a64a68cdf49232fa2026d09226fdf4c3bb4330dac6e"}
+}
