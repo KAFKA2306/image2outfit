@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-rainveil-cape-skort-set",
+  "productName": "Rainveil Cape-Skort Set for Siroino",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": true,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-panel-sewn-rainveil",
+  "renderLoopRevision": "v1-five-view",
+  "productRoot": "Assets/GenWorks/siroino-rainveil-cape-skort-set",
+  "productManifestPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/ProductManifest.json",
+  "buildScript": "tools/siroino_rainveil_cape_skort_set.py",
+  "productBuildScript": "tools/siroino_rainveil_cape_skort_set.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Source/Blender/SiroinoRainveilCapeSkortSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Models/SiroinoRainveilCapeSkortSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Prefab/SiroinoRainveilCapeSkortSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Prefab/SiroinoSotai_RainveilCapeSkortSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "garmentPipeline": {
+    "patternContractPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Source/Patterns/rainveil.pattern.json",
+    "constructionPath": "config/products/siroino-rainveil-cape-skort-set/construction.json",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true
+  },
+  "licenseEvidence": "config/products/siroino-rainveil-cape-skort-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/README.md",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/Source/Patterns/rainveil.pattern.json",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/Source/Blender/SiroinoRainveilCapeSkortSet.blend",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/Models/SiroinoRainveilCapeSkortSet.fbx",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/front.png",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/back.png",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/left.png",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/right.png",
+    "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-rainveil-cape-skort-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-rainveil-cape-skort-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-rainveil-cape-skort-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Rainveil_Cape", "role": "fabric"},
+      {"material": "MAT_Rainveil_Skort", "role": "fabric"},
+      {"material": "MAT_Rainveil_LiningTrim", "role": "trim"},
+      {"material": "MAT_Rainveil_Hardware", "role": "metal"}
+    ]
+  }
+}
