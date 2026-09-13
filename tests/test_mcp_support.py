@@ -13,15 +13,16 @@ TOOLS = ROOT / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-from mcp_assistant_control import AssistantStatus, classify_process_outcome
+from mcp_assistant_control import AssistantStatus, classify_process_outcome  # noqa: E402
 
 
 class McpSupportTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.contract = json.loads(
-            (ROOT / "config" / "mcp-authoring.json").read_text(encoding="utf-8")
+        cls.toolchain = json.loads(
+            (ROOT / "config" / "toolchain-lock.json").read_text(encoding="utf-8")
         )
+        cls.contract = cls.toolchain["authoringAdapters"]
 
     def test_blender_assistant_is_valid_python(self) -> None:
         path = ROOT / "tools" / "blender_addons" / "image2outfit_assistant.py"
@@ -44,7 +45,7 @@ class McpSupportTests(unittest.TestCase):
             ROOT / "tools" / "blender_addons" / "image2outfit_assistant.py"
         ).read_text(encoding="utf-8")
         self.assertIn("IMAGE2OUTFIT_OT_cancel_codex", source)
-        self.assertIn('process.terminate()', source)
+        self.assertIn("process.terminate()", source)
 
     def test_control_harness_distinguishes_all_outcomes(self) -> None:
         success = classify_process_outcome(0, "ok")
@@ -61,6 +62,8 @@ class McpSupportTests(unittest.TestCase):
 
     def test_authoring_contract_is_optional_loopback_only_and_pinned(self) -> None:
         contract = self.contract
+        blender = contract["blenderMcp"]
+        unity = contract["unityMcp"]
         self.assertFalse(contract["affectsProductCompletion"])
         self.assertTrue(contract["security"]["loopbackOnly"])
         self.assertFalse(contract["security"]["trackedSecretsAllowed"])
@@ -73,16 +76,19 @@ class McpSupportTests(unittest.TestCase):
             ["CONFIGURED", "REACHABLE", "UNAVAILABLE", "UNVERIFIED"],
         )
         self.assertEqual(
-            contract["blender"]["commit"],
-            "3ab892510cc0e5435ba5e611c01fb1021fbde8de",
+            blender["commit"], "3ab892510cc0e5435ba5e611c01fb1021fbde8de"
         )
         self.assertEqual(
-            contract["blender"]["addonGitBlobSha1"],
+            blender["addonGitBlobSha1"],
             "0a93c497693193f16bbd291499a760b3ebce09fb",
         )
-        self.assertIn(contract["blender"]["host"], {"localhost", "127.0.0.1", "::1"})
-        self.assertEqual(contract["unity"]["host"], "127.0.0.1")
-        self.assertTrue(contract["unity"]["url"].startswith("http://127.0.0.1:"))
+        self.assertIn(blender["host"], {"localhost", "127.0.0.1", "::1"})
+        self.assertEqual(unity["host"], "127.0.0.1")
+        self.assertTrue(unity["url"].startswith("http://127.0.0.1:"))
+        project_version = (
+            ROOT / unity["projectVersionSource"]
+        ).read_text(encoding="utf-8")
+        self.assertIn(f'm_EditorVersion: {self.toolchain["unity"]["version"]}', project_version)
 
     def test_windows_example_matches_canonical_contract(self) -> None:
         config = json.loads(
@@ -91,16 +97,18 @@ class McpSupportTests(unittest.TestCase):
             )
         )
         servers = config["mcpServers"]
+        expected_blender = self.contract["blenderMcp"]
+        expected_unity = self.contract["unityMcp"]
         blender = servers["blender"]
         self.assertIn(
-            f'blender-mcp=={self.contract["blender"]["version"]}', blender["args"]
+            f'blender-mcp=={expected_blender["version"]}', blender["args"]
         )
-        self.assertEqual(blender["env"]["BLENDER_HOST"], self.contract["blender"]["host"])
+        self.assertEqual(blender["env"]["BLENDER_HOST"], expected_blender["host"])
         self.assertEqual(
-            blender["env"]["BLENDER_PORT"], str(self.contract["blender"]["port"])
+            blender["env"]["BLENDER_PORT"], str(expected_blender["port"])
         )
         self.assertEqual(blender["env"]["DISABLE_TELEMETRY"], "true")
-        self.assertEqual(servers["unityMCP"]["url"], self.contract["unity"]["url"])
+        self.assertEqual(servers["unityMCP"]["url"], expected_unity["url"])
 
     def test_codex_example_matches_canonical_contract(self) -> None:
         config = tomllib.loads(
@@ -109,18 +117,21 @@ class McpSupportTests(unittest.TestCase):
             )
         )
         servers = config["mcp_servers"]
-        blender = servers[self.contract["blender"]["serverName"]]
+        expected_blender = self.contract["blenderMcp"]
+        expected_unity = self.contract["unityMcp"]
+        blender = servers[expected_blender["serverName"]]
         self.assertEqual(blender["command"], "cmd")
         self.assertIn(
-            f'blender-mcp=={self.contract["blender"]["version"]}', blender["args"]
+            f'blender-mcp=={expected_blender["version"]}', blender["args"]
         )
         self.assertEqual(blender["env"]["DISABLE_TELEMETRY"], "true")
-        unity = servers[self.contract["unity"]["serverName"]]
-        self.assertEqual(unity["url"], self.contract["unity"]["url"])
+        unity = servers[expected_unity["serverName"]]
+        self.assertEqual(unity["url"], expected_unity["url"])
 
     def test_setup_verifies_identity_and_four_state_doctor(self) -> None:
         script = (ROOT / "tools" / "setup_mcp.ps1").read_text(encoding="utf-8")
-        self.assertIn('config\\mcp-authoring.json', script)
+        self.assertIn("config\\toolchain-lock.json", script)
+        self.assertIn("$Toolchain.authoringAdapters", script)
         self.assertIn("Get-GitBlobSha1", script)
         self.assertIn("addonGitBlobSha1", script)
         self.assertIn("Pinned Blender MCP addon identity mismatch", script)
