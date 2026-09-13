@@ -5,6 +5,7 @@ The licensed HAOLAN avatar is used when it exists on a self-hosted runner. On a
 public runner, a geometry-free skeleton seed reproduces the garment rig without
 redistributing HAOLAN meshes, materials, textures, or Prefabs.
 """
+
 from __future__ import annotations
 
 import json
