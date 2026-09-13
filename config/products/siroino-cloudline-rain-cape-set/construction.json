@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-cloudline-rain-cape-set",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "cloudline-rain-cape-v1",
+  "panels": [
+    "hood-side-left",
+    "hood-side-right",
+    "hood-center-gusset",
+    "cape-front-left",
+    "cape-front-right",
+    "cape-back",
+    "storm-channel-facing",
+    "bodice-front",
+    "bodice-back",
+    "sleeve-left",
+    "sleeve-right",
+    "cuff-left",
+    "cuff-right",
+    "waistband",
+    "skirt-front-pleated",
+    "skirt-back-pleated"
+  ],
+  "separateGeometry": [
+    "cape-shell",
+    "inner-dress"
+  ],
+  "priorityFitZones": [
+    "neck-hood-root",
+    "shoulder-cape-root",
+    "elbow",
+    "waistband",
+    "upper-thigh-skirt-clearance"
+  ],
+  "requiredPoses": [
+    "t-pose",
+    "arms-up",
+    "arms-forward",
+    "wide-step"
+  ],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Static rigged silhouette is the minimum canonical target; optional cape-tip secondary motion is non-blocking.",
+    "reason": "The product is designed to pass without runtime cloth or PhysBone so manufacturing and fit can be verified deterministically."
+  },
+  "releaseBoundary": "Technical acceptance requires canonical mesh, UV/material, rig/weight and required render evidence; Unity/VRChat layers remain UNVERIFIED unless actually executed."
+}
