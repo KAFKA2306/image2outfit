@@ -146,7 +146,8 @@ def _assert_identity(state: dict[str, Any], expected: dict[str, str]) -> None:
     mismatches = _identity_mismatches(state, expected)
     if mismatches:
         raise ValueError(
-            "resume checkpoint identity does not match request: " + ", ".join(mismatches)
+            "resume checkpoint identity does not match request: "
+            + ", ".join(mismatches)
         )
 
 
@@ -178,7 +179,9 @@ def _resume_or_reset(
 ) -> dict[str, Any]:
     validate_pipeline_state(previous)
     mismatches = _identity_mismatches(previous, expected)
-    non_source_mismatches = [value for value in mismatches if value != "sourceFingerprint"]
+    non_source_mismatches = [
+        value for value in mismatches if value != "sourceFingerprint"
+    ]
     if non_source_mismatches:
         _assert_identity(previous, expected)
     if "sourceFingerprint" not in mismatches:
@@ -204,7 +207,9 @@ def main() -> int:
         target_avatar = str(request["targetAvatar"])
         source_reference = str(request["sourceReference"])
     except Exception as exc:  # noqa: BLE001 - CLI contract boundary
-        return _emit_failure(args, error_code="INVALID_PIPELINE_INPUT", phase="request", exc=exc)
+        return _emit_failure(
+            args, error_code="INVALID_PIPELINE_INPUT", phase="request", exc=exc
+        )
 
     try:
         profile_path = _profile_path(args, request)
@@ -232,7 +237,9 @@ def main() -> int:
             **expected,
             **{
                 str(key): str(value)
-                for key, value in _mapping(request.get("variables"), "variables").items()
+                for key, value in _mapping(
+                    request.get("variables"), "variables"
+                ).items()
             },
         }
         mode = ExecutionMode.EXECUTE if args.execute else ExecutionMode.PLAN
@@ -244,7 +251,8 @@ def main() -> int:
     try:
         if args.resume_state:
             previous = _read_object(
-                _repo_path(args.resume_state, label="resume state"), label="resume state"
+                _repo_path(args.resume_state, label="resume state"),
+                label="resume state",
             )
             state = _resume_or_reset(
                 previous, request=request, expected=expected, mode=mode
@@ -257,7 +265,9 @@ def main() -> int:
         else:
             state = _new_state(request, expected, mode)
     except Exception as exc:  # noqa: BLE001 - resume boundary
-        return _emit_failure(args, error_code="INVALID_RESUME_STATE", phase="resume", exc=exc)
+        return _emit_failure(
+            args, error_code="INVALID_RESUME_STATE", phase="resume", exc=exc
+        )
 
     try:
         registry = build_registry(
@@ -265,7 +275,9 @@ def main() -> int:
             execute=args.execute,
             bindings=_mapping(request.get("stageBindings"), "stageBindings"),
             variables=variables,
-            tool_requirements=_mapping(request.get("toolRequirements"), "toolRequirements"),
+            tool_requirements=_mapping(
+                request.get("toolRequirements"), "toolRequirements"
+            ),
             tool_pins=_mapping(request.get("toolPins"), "toolPins"),
         )
     except Exception as exc:  # noqa: BLE001 - registry boundary
@@ -286,7 +298,10 @@ def main() -> int:
         else:
             result = run_pipeline(state, registry, checkpoint=checkpoint)
     except RuntimeError as exc:
-        if args.engine in {"langchain", "langgraph"} and "not installed" in str(exc).lower():
+        if (
+            args.engine in {"langchain", "langgraph"}
+            and "not installed" in str(exc).lower()
+        ):
             return _emit_failure(
                 args,
                 error_code="PIPELINE_ENGINE_UNAVAILABLE",
@@ -306,7 +321,9 @@ def main() -> int:
         result["failure"] = failed_state_descriptor(result)
 
     try:
-        audit_root = args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
+        audit_root = (
+            args.audit_root if args.audit_root.is_absolute() else ROOT / args.audit_root
+        )
         result["audit"] = write_audit_bundle(
             result,
             audit_root=audit_root,
