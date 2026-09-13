@@ -113,7 +113,7 @@ Before mutating anything, read AGENTS.md and the relevant product job, construct
 Use configured MCP tools only when necessary. Preserve the canonical GenWorks layout and existing evidence contracts.
 Do not treat MCP success, Unity import, NDMF, Modular Avatar, or VRChat runtime as a repository COMPLETE gate unless the canonical policy explicitly says so.
 Do not bypass approvals or claim a tool ran when it did not.
-Current Blender file: {blend_path or '(unsaved)'}
+Current Blender file: {blend_path or "(unsaved)"}
 
 User request:
 {prompt}
@@ -169,7 +169,9 @@ User request:
         )
         _RESULT_QUEUE.put((outcome.status.value, outcome.content))
     except Exception as exc:  # noqa: BLE001 - surface local operator failures to Blender UI.
-        outcome = classify_process_outcome(None, stderr=f"Failed to launch Codex: {exc}")
+        outcome = classify_process_outcome(
+            None, stderr=f"Failed to launch Codex: {exc}"
+        )
         _RESULT_QUEUE.put((outcome.status.value, outcome.content))
     finally:
         with _PROCESS_LOCK:
@@ -180,13 +182,17 @@ User request:
 class IMAGE2OUTFIT_OT_ask_codex(Operator):
     bl_idname = "image2outfit.ask_codex"
     bl_label = "Ask OpenAI / Codex"
-    bl_description = "Run Codex from the image2outfit repository root with local MCP tools"
+    bl_description = (
+        "Run Codex from the image2outfit repository root with local MCP tools"
+    )
 
     def execute(self, context):
         global _RUNNING, _TIMER_REGISTERED, _CANCEL_REQUESTED
 
         if _RUNNING:
-            self.report({"WARNING"}, "An Image2Outfit Codex request is already running.")
+            self.report(
+                {"WARNING"}, "An Image2Outfit Codex request is already running."
+            )
             return {"CANCELLED"}
 
         prompt = context.scene.image2outfit_assistant_prompt.strip()
@@ -197,7 +203,9 @@ class IMAGE2OUTFIT_OT_ask_codex(Operator):
         connected, reason = _connection_status()
         if not connected:
             self.report({"ERROR"}, reason)
-            context.scene.image2outfit_assistant_status = AssistantStatus.UNAVAILABLE.value
+            context.scene.image2outfit_assistant_status = (
+                AssistantStatus.UNAVAILABLE.value
+            )
             context.scene.image2outfit_assistant_preview = reason
             return {"CANCELLED"}
 
