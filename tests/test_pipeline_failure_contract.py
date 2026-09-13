@@ -24,7 +24,7 @@ from image2outfit.failure_contract import (
 )
 
 RUNNER = ROOT / "tools" / "run_garment_pipeline.py"
-SCHEMA = ROOT / "config" / "pipeline-failure.schema.json"
+SCHEMA = ROOT / "config" / "pipeline" / "failure.schema.v1.json"
 
 
 def _valid_request() -> dict[str, object]:
