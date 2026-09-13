@@ -25,7 +25,9 @@ from image2outfit.tooling import ToolDescriptor, ToolRegistry
 SOURCE_FINGERPRINT = "same-source"
 
 
-def expected_identity(*, source_fingerprint: str = SOURCE_FINGERPRINT) -> dict[str, str]:
+def expected_identity(
+    *, source_fingerprint: str = SOURCE_FINGERPRINT
+) -> dict[str, str]:
     return {
         "productId": "resume-integrity",
         "targetAvatar": "SiroinoSotai_PC",
@@ -81,7 +83,9 @@ def resume(previous: dict, *, source_fingerprint: str = SOURCE_FINGERPRINT) -> d
 
 
 class PipelineResumeIntegrityTests(unittest.TestCase):
-    def test_control_resumes_at_next_unfinished_stage_without_replaying_prefix(self) -> None:
+    def test_control_resumes_at_next_unfinished_stage_without_replaying_prefix(
+        self,
+    ) -> None:
         resumed = resume(partial_checkpoint())
         called: list[str] = []
         result = run_pipeline(resumed, registry_for(called))
@@ -137,7 +141,10 @@ class PipelineResumeIntegrityTests(unittest.TestCase):
             resume(checkpoint)
 
     def test_wrong_record_run_and_product_identity_are_rejected(self) -> None:
-        for field, message in (("runId", "runId mismatch"), ("productId", "productId mismatch")):
+        for field, message in (
+            ("runId", "runId mismatch"),
+            ("productId", "productId mismatch"),
+        ):
             with self.subTest(field=field):
                 checkpoint = partial_checkpoint()
                 checkpoint["stage_records"][0][field] = "wrong"
@@ -147,17 +154,24 @@ class PipelineResumeIntegrityTests(unittest.TestCase):
     def test_source_fingerprint_change_keeps_fresh_reset_semantics(self) -> None:
         checkpoint = partial_checkpoint()
         stage = PIPELINE_STAGES[0].value
-        checkpoint["outputs"][stage] = {"mode": "planned", "stage": "stale-and-tampered"}
+        checkpoint["outputs"][stage] = {
+            "mode": "planned",
+            "stage": "stale-and-tampered",
+        }
 
         reset = resume(checkpoint, source_fingerprint="new-source")
 
         self.assertEqual(reset["completed_stages"], [])
         self.assertEqual(reset["stage_records"], [])
         self.assertEqual(reset["outputs"], {})
-        self.assertEqual(reset["checkpoint_reset"]["reason"], "source-fingerprint-changed")
+        self.assertEqual(
+            reset["checkpoint_reset"]["reason"], "source-fingerprint-changed"
+        )
         self.assertEqual(reset["source_fingerprint"], "new-source")
 
-    def test_runner_boundary_rejects_tamper_before_registry_or_adapter_creation(self) -> None:
+    def test_runner_boundary_rejects_tamper_before_registry_or_adapter_creation(
+        self,
+    ) -> None:
         checkpoint = partial_checkpoint()
         stage = PIPELINE_STAGES[0].value
         checkpoint["outputs"][stage] = {"mode": "planned", "stage": "tampered"}
@@ -187,7 +201,9 @@ class PipelineResumeIntegrityTests(unittest.TestCase):
             )
             with (
                 patch.object(runner, "parse_args", return_value=args),
-                patch.object(runner, "_profile_path", return_value=ROOT / "profile.json"),
+                patch.object(
+                    runner, "_profile_path", return_value=ROOT / "profile.json"
+                ),
                 patch.object(
                     runner,
                     "load_profile",
