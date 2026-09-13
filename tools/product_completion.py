@@ -3,7 +3,10 @@
 
 from __future__ import annotations
 
+import json
 import re
+import sys
+from pathlib import Path
 from typing import Any
 
 KNOWN_GATE_STATUSES = frozenset({"PASS", "FAIL", "PENDING", "NOT_RUN"})
@@ -134,8 +137,29 @@ def project_product_completion(
     }
 
 
+def safe_state(manifest: dict[str, Any]) -> str:
+    """Compatibility entrypoint backed by the canonical handoff policy."""
+    policy_path = Path(__file__).resolve().parents[1] / "config" / "genworks-handoff-policy.json"
+    try:
+        policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        policy = {}
+    if not isinstance(policy, dict):
+        policy = {}
+    return str(project_product_completion(manifest, policy)["state"])
+
+
+# review_console historically exposed safe_state() and render_all_current imports that
+# public surface. Keep the compatibility name without reintroducing a second policy
+# implementation; the function above delegates to the canonical projection.
+_review_console = sys.modules.get("review_console")
+if _review_console is not None and not hasattr(_review_console, "safe_state"):
+    setattr(_review_console, "safe_state", safe_state)
+
+
 __all__ = [
     "KNOWN_GATE_STATUSES",
     "normalize_gate_name",
     "project_product_completion",
+    "safe_state",
 ]
