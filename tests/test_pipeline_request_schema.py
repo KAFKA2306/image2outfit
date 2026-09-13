@@ -37,9 +37,7 @@ class PipelineRequestSchemaTests(unittest.TestCase):
             runner._validate_request(value)
 
     def test_all_tracked_requests_match_canonical_schema(self) -> None:
-        requests = sorted(
-            (ROOT / "config" / "pipeline" / "requests").glob("*.json")
-        )
+        requests = sorted((ROOT / "config" / "pipeline" / "requests").glob("*.json"))
         self.assertTrue(requests)
         for path in requests:
             with self.subTest(path=path.name):
@@ -189,9 +187,7 @@ class PipelineRequestSchemaTests(unittest.TestCase):
             with (
                 mock.patch.object(runner, "parse_args", return_value=args),
                 mock.patch.object(runner, "load_profile") as load_profile,
-                mock.patch.object(
-                    runner, "pipeline_source_fingerprint"
-                ) as fingerprint,
+                mock.patch.object(runner, "pipeline_source_fingerprint") as fingerprint,
                 mock.patch.object(runner, "build_registry") as build_registry,
             ):
                 with self.assertRaisesRegex(ValueError, "invalid pipeline request"):
