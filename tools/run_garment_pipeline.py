@@ -117,7 +117,9 @@ def _validate_persisted_pipeline_state(
 ) -> None:
     errors = validate_schema_file(state, PIPELINE_STATE_SCHEMA, label)
     if errors:
-        raise ValueError("pipeline state schema validation failed: " + "; ".join(errors))
+        raise ValueError(
+            "pipeline state schema validation failed: " + "; ".join(errors)
+        )
     validate_pipeline_state(state)
 
 
@@ -132,9 +134,7 @@ def _write_pipeline_state_atomic(path: Path, state: dict[str, Any]) -> None:
     _write_json_atomic(path, state)
 
 
-def _identity_mismatches(
-    state: dict[str, Any], expected: dict[str, str]
-) -> list[str]:
+def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
     return [
         request_name
         for state_name, request_name in IDENTITY_FIELDS.items()
