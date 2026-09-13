@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-prism-collar-cocoon-dress-set",
+  "productName": "Prism Collar Cocoon Dress Set for SiroinoSotai_PC",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Prefab/PrismCollarCocoonDress.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Prefab/SiroinoSotai_PrismCollarCocoonDress.prefab",
+  "previewPath": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/README.md",
+  "sourceJobPath": "config/products/siroino-prism-collar-cocoon-dress-set/job.json",
+  "productBuildScript": "tools/run_garment_pipeline.py",
+  "designRevision": "v1-prism-collar-panel-prototype",
+  "sourceReference": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/References/prism-collar-cocoon-manufacturing-sheet.svg",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-prism-collar-cocoon-dress-set/pipeline-state.json",
+    "lastAttempt": {
+      "result": "PROTOTYPE_CHECKPOINT_CREATED",
+      "visualRevision": "v1-prism-collar-panel-prototype",
+      "workflowRun": null,
+      "review": null
+    },
+    "blockers": [
+      "Current tool container cannot clone GitHub because DNS/network access is unavailable, so repository-local task/candidate commands were not executed here.",
+      "Prototype OBJ has not been imported, fitted or weighted to Siroino in Blender.",
+      "Blend/FBX/Prefab/five-view/six-pose evidence and Unity/VRChat evidence are not yet produced."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "clothSimulation": "NOT_APPLICABLE",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "tenAxisAudit": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "researchTrial": "DECLARED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "manufacturingReference": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/References/prism-collar-cocoon-manufacturing-sheet.svg",
+    "prototypeObj": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Source/Prototype/prism-collar-cocoon.obj",
+    "prototypeMtl": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Source/Prototype/prism-collar-cocoon.mtl",
+    "patternSpec": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Source/Patterns/pattern-spec.json",
+    "blend": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Source/Blender/PrismCollarCocoonDress.blend",
+    "fbx": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Models/PrismCollarCocoonDress.fbx",
+    "prefab": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Prefab/PrismCollarCocoonDress.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-prism-collar-cocoon-dress-set/Prefab/SiroinoSotai_PrismCollarCocoonDress.prefab"
+  }
+}
