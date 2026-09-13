@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kafka2306.github.io/image2outfit/contracts/runner-request-manifest.schema.v1.json",
+  "title": "image2outfit Runner-only request manifest v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "requestId", "productId", "referenceImages", "targetAvatarAuthoritySha256",
+    "garmentType", "regionFitClass", "requiredViews", "requiredPoses",
+    "materialTargets", "thresholdProfileId", "randomSeed", "blenderVersion",
+    "producerVersions", "maxAttemptsPerBlocker", "maxTotalAttempts",
+    "maxRunnerMinutes", "thresholds", "fitBands", "epsilonArea",
+    "epsilonPenetrationMeters"
+  ],
+  "properties": {
+    "requestId": {"type": "string", "minLength": 1},
+    "productId": {"type": "string", "minLength": 1},
+    "referenceImages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "view": {"type": "string"}
+        }
+      }
+    },
+    "targetAvatarAuthoritySha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "garmentType": {"type": "string", "minLength": 1},
+    "regionFitClass": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"enum": ["close", "regular", "loose"]}
+    },
+    "requiredViews": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "requiredPoses": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "materialTargets": {"type": "object"},
+    "thresholdProfileId": {"type": "string", "minLength": 1},
+    "randomSeed": {"type": "integer"},
+    "blenderVersion": {"type": "string", "minLength": 1},
+    "producerVersions": {"type": "object", "additionalProperties": {"type": "string"}},
+    "maxAttemptsPerBlocker": {"type": "integer", "minimum": 1},
+    "maxTotalAttempts": {"type": "integer", "minimum": 1},
+    "maxRunnerMinutes": {"type": "integer", "minimum": 1},
+    "thresholds": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "fitBands": {"type": "object", "minProperties": 1},
+    "epsilonArea": {"type": "number", "minimum": 0},
+    "epsilonPenetrationMeters": {"type": "number", "minimum": 0},
+    "stageOrder": {"type": "array", "items": {"type": "string"}},
+    "auditPolicyVersion": {"type": "integer", "minimum": 1}
+  }
+}
