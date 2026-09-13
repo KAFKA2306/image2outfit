@@ -161,7 +161,9 @@ class PipelineCheckpointEngineTests(unittest.TestCase):
             with self.subTest(equivalence=engine):
                 self.assertEqual(snapshot, baseline)
 
-    def test_checkpoint_write_failure_is_fail_visible_and_stops_later_stages(self) -> None:
+    def test_checkpoint_write_failure_is_fail_visible_and_stops_later_stages(
+        self,
+    ) -> None:
         for engine, runner in engine_runners():
             with self.subTest(engine=engine):
                 called: list[str] = []
