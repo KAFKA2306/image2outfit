@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import sys
 import tempfile
 import unittest
@@ -17,26 +18,43 @@ class CandidateInputProvenanceTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             candidate = Path(temporary) / "candidate"
             candidate.mkdir()
+            payload = candidate / "payload.bin"
+            payload.write_bytes(b"")
             job = {"id": "product", "adapterId": "adapter"}
             base = {
                 "schemaVersion": 2,
                 "kind": "image2outfit-candidate",
                 "jobId": "product",
+                "productName": "Product",
                 "adapterId": "adapter",
+                "runId": "run-1",
+                "createdAt": "2026-09-13T00:00:00Z",
                 "sourceCommit": "local",
-                "files": [],
+                "files": [
+                    {
+                        "path": "payload.bin",
+                        "bytes": 0,
+                        "sha256": hashlib.sha256(b"").hexdigest(),
+                    }
+                ],
+                "unityReady": {"status": "NOT_REQUESTED"},
+                "releaseDecision": "REVIEW_REQUIRED",
             }
-            expected = {"job": "aaa", "executionSource": "bbb"}
+            expected = {"job": "a" * 64, "executionSource": "b" * 64}
             cases = [
-                ({"job": "aaa", "executionSource": "bbb"}, None),
-                ({"job": "aaa"}, "candidate inputs missing: executionSource"),
+                ({"job": "a" * 64, "executionSource": "b" * 64}, None),
+                ({"job": "a" * 64}, "candidate inputs missing: executionSource"),
                 ({}, "candidate inputs missing:"),
                 (
-                    {"job": "aaa", "executionSource": "bbb", "unknown": "ccc"},
+                    {
+                        "job": "a" * 64,
+                        "executionSource": "b" * 64,
+                        "unknown": "c" * 64,
+                    },
                     "candidate inputs unexpected: unknown",
                 ),
                 (
-                    {"job": "changed", "executionSource": "bbb"},
+                    {"job": "c" * 64, "executionSource": "b" * 64},
                     "candidate input changed: job",
                 ),
             ]
