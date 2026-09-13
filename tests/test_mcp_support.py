@@ -75,9 +75,7 @@ class McpSupportTests(unittest.TestCase):
             contract["doctorStates"],
             ["CONFIGURED", "REACHABLE", "UNAVAILABLE", "UNVERIFIED"],
         )
-        self.assertEqual(
-            blender["commit"], "3ab892510cc0e5435ba5e611c01fb1021fbde8de"
-        )
+        self.assertEqual(blender["commit"], "3ab892510cc0e5435ba5e611c01fb1021fbde8de")
         self.assertEqual(
             blender["addonGitBlobSha1"],
             "0a93c497693193f16bbd291499a760b3ebce09fb",
@@ -85,28 +83,24 @@ class McpSupportTests(unittest.TestCase):
         self.assertIn(blender["host"], {"localhost", "127.0.0.1", "::1"})
         self.assertEqual(unity["host"], "127.0.0.1")
         self.assertTrue(unity["url"].startswith("http://127.0.0.1:"))
-        project_version = (
-            ROOT / unity["projectVersionSource"]
-        ).read_text(encoding="utf-8")
-        self.assertIn(f'm_EditorVersion: {self.toolchain["unity"]["version"]}', project_version)
+        project_version = (ROOT / unity["projectVersionSource"]).read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            f"m_EditorVersion: {self.toolchain['unity']['version']}", project_version
+        )
 
     def test_windows_example_matches_canonical_contract(self) -> None:
         config = json.loads(
-            (ROOT / "examples" / "mcp" / "windows-mcp.json").read_text(
-                encoding="utf-8"
-            )
+            (ROOT / "examples" / "mcp" / "windows-mcp.json").read_text(encoding="utf-8")
         )
         servers = config["mcpServers"]
         expected_blender = self.contract["blenderMcp"]
         expected_unity = self.contract["unityMcp"]
         blender = servers["blender"]
-        self.assertIn(
-            f'blender-mcp=={expected_blender["version"]}', blender["args"]
-        )
+        self.assertIn(f"blender-mcp=={expected_blender['version']}", blender["args"])
         self.assertEqual(blender["env"]["BLENDER_HOST"], expected_blender["host"])
-        self.assertEqual(
-            blender["env"]["BLENDER_PORT"], str(expected_blender["port"])
-        )
+        self.assertEqual(blender["env"]["BLENDER_PORT"], str(expected_blender["port"]))
         self.assertEqual(blender["env"]["DISABLE_TELEMETRY"], "true")
         self.assertEqual(servers["unityMCP"]["url"], expected_unity["url"])
 
@@ -121,9 +115,7 @@ class McpSupportTests(unittest.TestCase):
         expected_unity = self.contract["unityMcp"]
         blender = servers[expected_blender["serverName"]]
         self.assertEqual(blender["command"], "cmd")
-        self.assertIn(
-            f'blender-mcp=={expected_blender["version"]}', blender["args"]
-        )
+        self.assertIn(f"blender-mcp=={expected_blender['version']}", blender["args"])
         self.assertEqual(blender["env"]["DISABLE_TELEMETRY"], "true")
         unity = servers[expected_unity["serverName"]]
         self.assertEqual(unity["url"], expected_unity["url"])
@@ -139,7 +131,9 @@ class McpSupportTests(unittest.TestCase):
         for state in self.contract["doctorStates"]:
             self.assertIn(f'return "{state}"', script)
         self.assertIn("mutatesProductState = $false", script)
-        self.assertIn("MCP contract violates the loopback-only security boundary", script)
+        self.assertIn(
+            "MCP contract violates the loopback-only security boundary", script
+        )
 
     def test_local_state_and_secret_patterns_are_excluded_from_git(self) -> None:
         ignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
