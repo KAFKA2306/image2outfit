@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-rainveil-cape-skort-set",
+  "units": "m",
+  "designRevision": "v1-panel-sewn-rainveil",
+  "palette": {
+    "cape": "#6F7C84",
+    "skort": "#343638",
+    "piping": "#4F7774",
+    "lining": "#DDD1B8",
+    "hardware": "#45494A"
+  },
+  "panels": [
+    {"id":"cape_front_L","material":"cape","mirror":false,"seams":["shoulder_L","center_front_L","side_L","hem_front_L"]},
+    {"id":"cape_front_R","material":"cape","mirror":false,"seams":["shoulder_R","center_front_R","side_R","hem_front_R"]},
+    {"id":"cape_back","material":"cape","mirror":false,"seams":["shoulder_L","shoulder_R","side_L","side_R","hem_back"]},
+    {"id":"storm_flap","material":"cape","mirror":false,"seams":["flap_anchor","flap_free_edge"],"hero":true},
+    {"id":"stand_collar_outer","material":"cape","mirror":false,"seams":["collar_neck","collar_top"]},
+    {"id":"stand_collar_inner","material":"lining","mirror":false,"seams":["collar_neck","collar_top"]},
+    {"id":"shorts_front_L","material":"skort","mirror":true,"seams":["waist","side","inseam","crotch"]},
+    {"id":"shorts_back_L","material":"skort","mirror":true,"seams":["waist","side","inseam","crotch"]},
+    {"id":"wrap_front","material":"skort","mirror":false,"seams":["waist","wrap_side","wrap_hem","wrap_free_edge"],"hero":true},
+    {"id":"skirt_back","material":"skort","mirror":false,"seams":["waist","side_L","side_R","back_hem"]},
+    {"id":"waistband_outer","material":"skort","mirror":false,"seams":["waist_top","waist_bottom"]},
+    {"id":"waistband_inner","material":"lining","mirror":false,"seams":["waist_top","waist_bottom"]}
+  ],
+  "heroRelation": {
+    "stormFlapAngleDeg": -31,
+    "wrapEdgeAngleDeg": -34,
+    "maximumAngleDifferenceDeg": 8
+  },
+  "manufacturingNotes": [
+    "Cape center front/back hem is cropped; side drape extends lower without becoming a full poncho.",
+    "Arm access is produced by open side/arm-slit boundaries rather than sleeve tubes.",
+    "Inner shorts remain separate construction under the wrap panel.",
+    "No transparent or emissive material roles are permitted."
+  ]
+}
