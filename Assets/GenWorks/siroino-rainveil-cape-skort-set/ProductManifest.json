@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-rainveil-cape-skort-set",
+  "productName": "Rainveil Cape-Skort Set for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-rainveil-cape-skort-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Prefab/SiroinoRainveilCapeSkortSet.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Prefab/SiroinoSotai_RainveilCapeSkortSet.prefab",
+  "previewPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-rainveil-cape-skort-set/README.md",
+  "sourceJobPath": "config/products/siroino-rainveil-cape-skort-set/job.json",
+  "productBuildScript": "tools/siroino_rainveil_cape_skort_set.py",
+  "designRevision": "v1-panel-sewn-rainveil",
+  "sourceReference": "adobe-firefly://urn:aaid:sc:AP:f787299c-ba46-4269-830f-8725f680d354",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-rainveil-cape-skort-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "tools/siroino_rainveil_cape_skort_set.py",
+    "blockers": [
+      "Run the product builder on hosted Blender and inspect the generated five-view evidence.",
+      "Run required pose evidence and penetration checks.",
+      "Run Unity/VRChat integration only when that runtime is actually available."
+    ]
+  },
+  "technicalGates": {
+    "blender": "PENDING",
+    "editableSource": "PENDING",
+    "fbx": "PENDING",
+    "prefabDeclared": "PENDING",
+    "fiveViewEvidence": "PENDING",
+    "poseEvidence": "PENDING",
+    "visualAppearanceReview": "PENDING",
+    "unityImport": "OUT_OF_SCOPE",
+    "unitySaveReload": "OUT_OF_SCOPE",
+    "prefabReload": "OUT_OF_SCOPE",
+    "modularAvatar": "OUT_OF_SCOPE",
+    "ndmf": "OUT_OF_SCOPE",
+    "vrchatBuildTest": "OUT_OF_SCOPE",
+    "vrchatRuntime": "OUT_OF_SCOPE",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  }
+}
