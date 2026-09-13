@@ -1,8 +1,24 @@
 {
   "schemaVersion": 1,
   "specId": "garment-quality-2026-v1",
-  "completionGate": "visualAppearanceReview",
+  "completionGate": "runnerMachineAudit",
   "hashAlgorithm": "sha256",
+  "runnerOnlyMachineAudit": {
+    "profile": "contracts/quality/runner-only-machine-audit-v1.json",
+    "requestSchema": "config/pipeline/runner-request-manifest.schema.v1.json",
+    "metricStates": [
+      "PASS",
+      "FAIL",
+      "UNVERIFIED"
+    ],
+    "unverifiedBlocksCompletion": true,
+    "missingProducerState": "UNVERIFIED",
+    "missingEvidenceState": "UNVERIFIED",
+    "hashMismatchState": "UNVERIFIED",
+    "thresholdsFrozenIntoRequest": true,
+    "candidateDecision": "PARETO_DOMINANCE",
+    "equalCandidateDecision": "REVERT"
+  },
   "directImageReview": {
     "requiredMethod": "DIRECT_IMAGE_REVIEW",
     "allowedReviewerPrefixes": [
@@ -30,7 +46,8 @@
       ".jpg",
       ".jpeg",
       ".webp"
-    ]
+    ],
+    "blockingForRunnerComplete": false
   },
   "aspects": [
     {
@@ -52,7 +69,7 @@
       ],
       "defectCode": "TOPOLOGY_INVALID",
       "returnStage": "build-blender",
-      "completionGate": "blender",
+      "completionGate": "runnerMachineAudit",
       "allowOutOfScope": false
     },
     {
@@ -74,8 +91,8 @@
       ],
       "defectCode": "SEAM_CORRESPONDENCE_INVALID",
       "returnStage": "infer-stitches",
-      "completionGate": "editableSource",
-      "allowOutOfScope": true
+      "completionGate": "runnerMachineAudit",
+      "allowOutOfScope": false
     },
     {
       "id": "fit",
@@ -85,8 +102,7 @@
         "threshold": 0
       },
       "allowedReviewMethods": [
-        "AUTOMATED",
-        "DIRECT_IMAGE_REVIEW"
+        "AUTOMATED"
       ],
       "requiredEvidenceKinds": [
         "fit-audit"
@@ -105,7 +121,7 @@
       ],
       "defectCode": "FIT_OUT_OF_TOLERANCE",
       "returnStage": "draft-patterns",
-      "completionGate": "visualAppearanceReview",
+      "completionGate": "runnerMachineAudit",
       "allowOutOfScope": false
     },
     {
@@ -116,8 +132,7 @@
         "threshold": 0
       },
       "allowedReviewMethods": [
-        "AUTOMATED",
-        "DIRECT_IMAGE_REVIEW"
+        "AUTOMATED"
       ],
       "requiredEvidenceKinds": [
         "material-response-audit"
@@ -134,7 +149,7 @@
       ],
       "defectCode": "MATERIAL_RESPONSE_INVALID",
       "returnStage": "simulate-cloth",
-      "completionGate": "visualAppearanceReview",
+      "completionGate": "runnerMachineAudit",
       "allowOutOfScope": false
     },
     {
@@ -145,8 +160,7 @@
         "threshold": 0
       },
       "allowedReviewMethods": [
-        "AUTOMATED",
-        "DIRECT_IMAGE_REVIEW"
+        "AUTOMATED"
       ],
       "requiredEvidenceKinds": [
         "layering-audit"
@@ -167,7 +181,7 @@
       ],
       "defectCode": "LAYERING_ORDER_INVALID",
       "returnStage": "decompose-garment",
-      "completionGate": "visualAppearanceReview",
+      "completionGate": "runnerMachineAudit",
       "allowOutOfScope": true
     },
     {
@@ -178,8 +192,7 @@
         "threshold": 0
       },
       "allowedReviewMethods": [
-        "AUTOMATED",
-        "DIRECT_IMAGE_REVIEW"
+        "AUTOMATED"
       ],
       "requiredEvidenceKinds": [
         "skinning-audit"
@@ -200,7 +213,7 @@
       ],
       "defectCode": "SKINNING_DEFORMATION_INVALID",
       "returnStage": "skin-and-export",
-      "completionGate": "poseEvidence",
+      "completionGate": "runnerMachineAudit",
       "allowOutOfScope": false
     },
     {
@@ -211,8 +224,7 @@
         "threshold": 0
       },
       "allowedReviewMethods": [
-        "AUTOMATED",
-        "DIRECT_IMAGE_REVIEW"
+        "AUTOMATED"
       ],
       "requiredEvidenceKinds": [
         "collision-audit"
@@ -233,7 +245,7 @@
       ],
       "defectCode": "COLLISION_BLOCKING",
       "returnStage": "simulate-cloth",
-      "completionGate": "poseEvidence",
+      "completionGate": "runnerMachineAudit",
       "allowOutOfScope": false
     },
     {
@@ -244,10 +256,10 @@
         "threshold": 0
       },
       "allowedReviewMethods": [
-        "DIRECT_IMAGE_REVIEW"
+        "AUTOMATED"
       ],
       "requiredEvidenceKinds": [
-        "direct-render-image"
+        "silhouette-audit"
       ],
       "targetViews": [
         "front",
@@ -261,7 +273,7 @@
       ],
       "defectCode": "SILHOUETTE_FIDELITY_INVALID",
       "returnStage": "build-blender",
-      "completionGate": "visualAppearanceReview",
+      "completionGate": "runnerMachineAudit",
       "allowOutOfScope": false
     },
     {
@@ -288,7 +300,7 @@
       "defectCode": "STYLING_FIDELITY_INVALID",
       "returnStage": "decompose-garment",
       "completionGate": "visualAppearanceReview",
-      "allowOutOfScope": false
+      "allowOutOfScope": true
     },
     {
       "id": "evidence-completeness",
@@ -305,7 +317,7 @@
       "targetPoses": [],
       "defectCode": "EVIDENCE_INCOMPLETE_OR_TAMPERED",
       "returnStage": "render-evidence",
-      "completionGate": "fiveViewEvidence",
+      "completionGate": "runnerMachineAudit",
       "allowOutOfScope": false,
       "computed": true
     }
