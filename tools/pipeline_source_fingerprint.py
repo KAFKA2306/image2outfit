@@ -25,6 +25,7 @@ PRODUCTION_RUNTIME_DEPENDENCIES = (
     "config/job.schema.v2.json",
     "config/products/construction.schema.v1.json",
     "config/pipeline/visual-quality-defaults.v1.json",
+    "config/pipeline/pipeline-state.schema.v1.json",
     "config/toolchain-lock.json",
     "pyproject.toml",
     "uv.lock",

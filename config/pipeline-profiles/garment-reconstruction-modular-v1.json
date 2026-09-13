@@ -18,7 +18,8 @@
     "pattern-first-structured-garment",
     "geometry-first-stitch-graph",
     "pose-normalized-pattern-recovery",
-    "pattern-coordinate-mapping"
+    "pattern-coordinate-mapping",
+    "external-generators-are-bounded-hypotheses"
   ],
   "stages": [
     {
@@ -37,7 +38,7 @@
     {
       "stage": "normalize-view",
       "toolName": "reference.normalize.pose-view",
-      "purpose": "Separate pose and viewpoint effects from garment evidence.",
+      "purpose": "Separate pose and viewpoint effects from garment evidence while preserving observed/inferred/unknown boundaries.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
@@ -45,12 +46,12 @@
       "requires": ["reference.bound"],
       "provides": ["reference.normalized"],
       "runtime": "python",
-      "managedOutputs": ["normalizedReference", "cameraPose", "bodyLandmarks", "normalizationMetrics"]
+      "managedOutputs": ["normalizedReference", "cameraPose", "bodyLandmarks", "normalizationMetrics", "initialBlueprint"]
     },
     {
       "stage": "decompose-garment",
       "toolName": "garment.decompose.semantic-parts",
-      "purpose": "Name garment parts by construction role and body region.",
+      "purpose": "Name garment parts by construction role and body region, keeping semantic role separate from generation method.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
@@ -58,7 +59,7 @@
       "requires": ["reference.normalized"],
       "provides": ["garment.decomposed"],
       "runtime": "python",
-      "managedOutputs": ["garmentPartGraph", "spatialAssignments", "materialRegions", "ambiguityLog"]
+      "managedOutputs": ["garmentPartGraph", "spatialAssignments", "materialRegions", "ambiguityLog", "generationAssignments"]
     },
     {
       "stage": "draft-patterns",
@@ -122,24 +123,48 @@
     },
     {
       "stage": "initialize-3d",
-      "toolName": "initialize.pattern-around-avatar",
-      "purpose": "Place selected garment representation around the avatar without initial intersections.",
+      "purpose": "Select a target-avatar-bound initial geometry hypothesis without changing canonical pattern/seam authority.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "capabilities": ["initialize.3d"],
-      "requires": ["pattern.drafted", "stitch.graph"],
-      "provides": ["geometry.initialized"],
-      "runtime": "python",
-      "managedOutputs": ["initializedMesh", "panelTransforms", "initialClearanceAudit"]
+      "managedOutputs": ["initializedMesh", "panelTransforms", "initialClearanceAudit", "hypothesisSet", "selectedHypothesis", "targetAvatarAuthority"],
+      "tools": [
+        {
+          "toolName": "initialize.pattern-around-avatar",
+          "purpose": "Place the selected canonical garment representation around the target avatar without initial intersections.",
+          "capabilities": ["initialize.3d", "initialize.pattern-first", "target-avatar-bound"],
+          "requires": ["pattern.drafted", "stitch.graph"],
+          "provides": ["geometry.initialized"],
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "initialize.external-hypothesis",
+          "purpose": "Accept Astra-guided/Tripo or other external 3D drafts only as hash-bound hypotheses under the same target-avatar and canonical quality contracts.",
+          "requiredResultFields": {
+            "hypothesisContractValidated": true,
+            "blueprintBound": true,
+            "targetAvatarAuthorityValidated": true,
+            "externalDraftCanonicalSource": false,
+            "silentFallbackUsed": false
+          },
+          "capabilities": ["initialize.3d", "initialize.multi-hypothesis", "generator.tripo", "assistant.astra", "target-avatar-bound"],
+          "requires": ["pattern.drafted", "stitch.graph"],
+          "provides": ["geometry.initialized", "hypothesis.external-selected"],
+          "runtime": "external",
+          "priority": 100,
+          "deterministic": false
+        }
+      ]
     },
     {
       "stage": "build-blender",
-      "purpose": "Select a Blender construction implementation compatible with the chosen representation.",
+      "purpose": "Select a Blender construction/reconciliation implementation compatible with the chosen representation.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 2,
       "requiredResultFields": {},
-      "managedOutputs": ["editableBlend", "buildReport", "geometryMetrics"],
+      "managedOutputs": ["editableBlend", "buildReport", "geometryMetrics", "reconciliationContract"],
       "tools": [
         {
           "toolName": "build.blender.pattern-sewn",
@@ -160,6 +185,21 @@
           "runtime": "blender",
           "priority": 20,
           "deterministic": true
+        },
+        {
+          "toolName": "build.blender.reconcile-hypothesis",
+          "purpose": "Reconcile a selected external 3D hypothesis against canonical garment structure while bounding changed and preserved regions.",
+          "requiredResultFields": {
+            "reconciliationContractValidated": true,
+            "mustPreserveRegionsValidated": true,
+            "targetAvatarAuthorityValidated": true
+          },
+          "capabilities": ["build.blender", "build.reconcile-hypothesis"],
+          "requires": ["geometry.initialized", "hypothesis.external-selected"],
+          "provides": ["garment.blend"],
+          "runtime": "blender",
+          "priority": 100,
+          "deterministic": false
         }
       ]
     },
@@ -208,42 +248,105 @@
     },
     {
       "stage": "render-evidence",
-      "toolName": "render.bpy-review",
-      "purpose": "Render pattern appearance, five views, required poses, and review contact sheets from the current artifact.",
+      "purpose": "Render canonical review evidence and optionally a separately-bound AI re-input render-back set.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 5,
       "requiredResultFields": {},
-      "capabilities": ["render.bpy", "render.pattern", "render.five-view", "render.required-poses"],
-      "requires": ["garment.exported"],
-      "provides": ["review.images"],
-      "runtime": "blender",
-      "managedOutputs": ["fiveViewImages", "requiredPoseImages", "renderManifest"]
+      "managedOutputs": ["fiveViewImages", "requiredPoseImages", "renderManifest", "qaRenderManifest", "renderBackManifest"],
+      "tools": [
+        {
+          "toolName": "render.bpy-review",
+          "purpose": "Render pattern appearance, five views, required poses, and review contact sheets from the current artifact.",
+          "capabilities": ["render.bpy", "render.pattern", "render.five-view", "render.required-poses"],
+          "requires": ["garment.exported"],
+          "provides": ["review.images"],
+          "runtime": "blender",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "render.bpy-review-with-render-back",
+          "purpose": "Render canonical QA evidence plus a distinct fixed-protocol AI re-input set that cannot satisfy canonical quality evidence.",
+          "requiredResultFields": {
+            "renderBackContractValidated": true,
+            "renderBackSeparatedFromQualityEvidence": true
+          },
+          "capabilities": ["render.bpy", "render.pattern", "render.five-view", "render.required-poses", "render.ai-reinput"],
+          "requires": ["garment.exported"],
+          "provides": ["review.images", "render.ai-reinput"],
+          "runtime": "blender",
+          "priority": 100,
+          "deterministic": true
+        }
+      ]
     },
     {
       "stage": "audit-geometry",
-      "toolName": "verify.geometry-fit",
-      "purpose": "Measure topology, weights, degeneracy, collisions, and evidence hashes.",
+      "purpose": "Measure topology, fit, evidence hashes, and optionally blueprint-vs-actual deviations.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
-      "capabilities": ["verify.geometry", "verify.fit"],
-      "requires": ["review.images"],
-      "provides": ["geometry.audited"],
-      "runtime": "python",
-      "managedOutputs": ["geometryAudit", "penetrationAudit", "evidenceHashAudit", "gateSummary"]
+      "managedOutputs": ["geometryAudit", "penetrationAudit", "evidenceHashAudit", "gateSummary", "blueprintActualAudit"],
+      "tools": [
+        {
+          "toolName": "verify.geometry-fit",
+          "purpose": "Measure topology, weights, degeneracy, collisions, and evidence hashes.",
+          "capabilities": ["verify.geometry", "verify.fit"],
+          "requires": ["review.images"],
+          "provides": ["geometry.audited"],
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "verify.geometry-fit-blueprint",
+          "purpose": "Run canonical geometry/fit checks and record measurable blueprint-vs-actual deviations with explicit routing.",
+          "requiredResultFields": {
+            "blueprintActualAuditValidated": true
+          },
+          "capabilities": ["verify.geometry", "verify.fit", "verify.blueprint-actual"],
+          "requires": ["review.images"],
+          "provides": ["geometry.audited", "blueprint.audited"],
+          "runtime": "python",
+          "priority": 100,
+          "deterministic": true
+        }
+      ]
     },
     {
       "stage": "visual-review",
-      "toolName": "review.direct-image-inspection",
-      "purpose": "Require direct inspection of current pattern and assembled images before appearance can pass.",
+      "purpose": "Require direct inspection of current images, with optional blueprint binding, before appearance can pass.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 5,
       "requiredResultFields": {"reviewMethod": "direct-image-inspection"},
-      "capabilities": ["review.direct-image-inspection"],
-      "requires": ["review.images", "geometry.audited"],
-      "provides": ["visual.reviewed"],
-      "runtime": "human",
-      "managedOutputs": ["visualReview", "inspectedImageHashes", "blockingFindings"]
+      "managedOutputs": ["visualReview", "inspectedImageHashes", "blockingFindings", "reviewBundle"],
+      "tools": [
+        {
+          "toolName": "review.direct-image-inspection",
+          "purpose": "Require direct inspection of current pattern and assembled images before appearance can pass.",
+          "capabilities": ["review.direct-image-inspection"],
+          "requires": ["review.images", "geometry.audited"],
+          "provides": ["visual.reviewed"],
+          "runtime": "human",
+          "priority": 10,
+          "deterministic": false
+        },
+        {
+          "toolName": "review.blueprint-bound-direct-image-inspection",
+          "purpose": "Review reference, blueprint, previous candidate, and current candidate under the same render protocol without allowing blueprint to count as evidence.",
+          "requiredResultFields": {
+            "reviewMethod": "direct-image-inspection",
+            "blueprintBound": true,
+            "blueprintUsedAsQualityEvidence": false
+          },
+          "capabilities": ["review.direct-image-inspection", "review.blueprint-bound"],
+          "requires": ["review.images", "geometry.audited"],
+          "provides": ["visual.reviewed"],
+          "runtime": "human",
+          "priority": 100,
+          "deterministic": false
+        }
+      ]
     },
     {
       "stage": "finalize-candidate",
