@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-rosette-fan-peplum-set",
+  "productName": "Rosette Fan Peplum Set for SiroinoSotai_PC",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-rosette-fan-peplum-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Prefab/RosetteFanPeplum.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Prefab/SiroinoSotai_RosetteFanPeplum.prefab",
+  "previewPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/README.md",
+  "sourceJobPath": "config/products/siroino-rosette-fan-peplum-set/job.json",
+  "productBuildScript": "tools/run_garment_pipeline.py",
+  "designRevision": "v1-rosette-panel-prototype",
+  "sourceReference": "Assets/GenWorks/siroino-rosette-fan-peplum-set/References/rosette-fan-peplum-manufacturing-sheet.svg",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-rosette-fan-peplum-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-rosette-fan-peplum-set/pipeline-state.json",
+    "lastAttempt": {"result":"PROTOTYPE_GEOMETRY_COMMITTED","visualRevision":"v1-rosette-panel-prototype","workflowRun":null,"review":null},
+    "blockers": [
+      "Canonical contract validation has not yet been executed on the exact branch head.",
+      "Prototype OBJ has not been imported, fitted or weighted to Siroino in Blender.",
+      "Blend/FBX/Prefab/five-view/six-pose evidence and Unity/VRChat evidence are not yet produced."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "clothSimulation": "NOT_APPLICABLE",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "tenAxisAudit": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "researchTrial": "DECLARED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "manufacturingReference": "Assets/GenWorks/siroino-rosette-fan-peplum-set/References/rosette-fan-peplum-manufacturing-sheet.svg",
+    "prototypeObj": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Prototype/rosette-fan-peplum.obj",
+    "prototypeMtl": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Prototype/rosette-fan-peplum.mtl",
+    "patternSpec": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Patterns/pattern-spec.json",
+    "blend": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Blender/RosetteFanPeplum.blend",
+    "fbx": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Models/RosetteFanPeplum.fbx",
+    "prefab": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Prefab/RosetteFanPeplum.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Prefab/SiroinoSotai_RosetteFanPeplum.prefab"
+  }
+}
