@@ -21,9 +21,7 @@ class ReleasePackagingTest(unittest.TestCase):
     def _install_release_schema(self, root: Path) -> None:
         schema = root / "contracts/release/release-manifest.schema.v2.json"
         schema.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(
-            ROOT / "contracts/release/release-manifest.schema.v2.json", schema
-        )
+        shutil.copy2(ROOT / "contracts/release/release-manifest.schema.v2.json", schema)
 
     def test_raw_human_and_runtime_evidence_are_packaged(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -117,7 +115,9 @@ class ReleasePackagingTest(unittest.TestCase):
             candidate_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
             release = root / "release"
             original = production_contract.verify_release_package
-            production_contract.verify_release_package = lambda **_: ["injected failure"]
+            production_contract.verify_release_package = lambda **_: [
+                "injected failure"
+            ]
             try:
                 with self.assertRaisesRegex(ValueError, "injected failure"):
                     production_contract.package_release(
