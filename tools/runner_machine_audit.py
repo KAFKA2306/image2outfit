@@ -31,7 +31,12 @@ from image2outfit.runner_audit import (  # noqa: E402
     verified_evidence_ratio,
     verify_artifacts,
 )
-from image2outfit.runner_loop import new_ledger, record_attempt, validate_ledger  # noqa: E402
+from image2outfit.runner_loop import (  # noqa: E402
+    blocker_stats,
+    new_ledger,
+    record_attempt,
+    validate_ledger,
+)
 
 DEFAULT_PROFILE = ROOT / "contracts" / "quality" / "runner-only-machine-audit-v1.json"
 HASH = re.compile(r"^[0-9a-f]{64}$")
@@ -121,6 +126,8 @@ def evaluate_command(args: argparse.Namespace) -> int:
     validate_request_manifest(request)
     digest = request_sha256(request)
     profile = frozen_profile(request)
+    ledger = read_json(repo_path(args.attempt_ledger))
+    validate_ledger(ledger, digest)
     observations_payload = read_json(repo_path(args.observations))
     observations = observations_payload.get("metrics", observations_payload)
     if not isinstance(observations, dict):
@@ -137,6 +144,8 @@ def evaluate_command(args: argparse.Namespace) -> int:
         evidence, root=ROOT, product_id=str(request["productId"]), request_digest=digest
     )
     candidate_sha, candidate_error = candidate_identity(index)
+    if not candidate_error and candidate_sha != ledger["currentCandidateSha256"]:
+        candidate_error = "CANDIDATE_LEDGER_HASH_MISMATCH"
     if candidate_error:
         results["evidence.artifact_identity"] = MetricResult(
             "evidence.artifact_identity",
@@ -150,6 +159,10 @@ def evaluate_command(args: argparse.Namespace) -> int:
             "runner-audit-v1",
         )
 
+    attempts = len(ledger["attempts"])
+    final_decision = None
+    if attempts:
+        final_decision = Decision(str(ledger["attempts"][-1]["decision"]))
     required = required_metric_ids(profile, request)
     complete = runner_complete(
         results,
@@ -157,14 +170,15 @@ def evaluate_command(args: argparse.Namespace) -> int:
         request_digest=digest,
         audit_request_digest=digest,
         candidate_sha256=candidate_sha,
-        audit_candidate_sha256=candidate_sha,
-        final_attempt_decision=None,
+        audit_candidate_sha256=str(ledger["currentCandidateSha256"]),
+        final_attempt_decision=final_decision,
     )
     blocker = select_blocker(profile, results)
-    attempts = int(index.get("attempts", 0) or 0)
     elapsed = float(index.get("elapsedMinutes", 0) or 0)
-    blocker_attempts = int(index.get("blockerAttempts", 0) or 0)
-    accepted = int(index.get("acceptedForBlocker", 0) or 0)
+    blocker_attempts = 0
+    accepted = 0
+    if blocker:
+        blocker_attempts, accepted = blocker_stats(ledger, blocker)
     stop = stop_reason(
         complete=complete,
         failed_hard=bool(index.get("failedHard", False)),
@@ -186,6 +200,7 @@ def evaluate_command(args: argparse.Namespace) -> int:
     result["runnerComplete"] = complete
     result["highestBlocker"] = blocker
     result["requiredMetricIds"] = required
+    result["attemptLedgerSha256"] = sha256_file(repo_path(args.attempt_ledger))
     output = repo_path(args.output)
     write_json(output, result)
     print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -270,6 +285,7 @@ def build_parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--request", required=True)
     evaluate.add_argument("--observations", required=True)
     evaluate.add_argument("--evidence-index", required=True)
+    evaluate.add_argument("--attempt-ledger", required=True)
     evaluate.add_argument("--output", required=True)
 
     compare = commands.add_parser("compare")
