@@ -129,12 +129,13 @@ def resolve_stop(
     ledger: Mapping[str, Any],
     *,
     request: Mapping[str, Any],
+    request_sha256: str,
     blocker: str | None,
     complete: bool,
     failed_hard: bool,
     elapsed_minutes: float,
 ) -> StopReason | None:
-    validate_ledger(ledger, str(request["requestSha256"]))
+    validate_ledger(ledger, request_sha256)
     blocker_attempts = 0
     accepted_for_blocker = 0
     if blocker:
