@@ -18,6 +18,10 @@ from pathlib import Path
 from typing import Any
 
 _HASH = re.compile(r"^[0-9a-f]{64}$")
+_INTERNAL_PRODUCERS = {
+    "artifact-verifier": "runner-audit-v1",
+    "evidence-verifier": "runner-audit-v1",
+}
 
 
 class MetricState(StrEnum):
@@ -82,6 +86,7 @@ class MetricResult:
     producer: str | None
     evidence_sha256: str | None
     cause: str | None = None
+    producer_version: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -89,6 +94,7 @@ class MetricResult:
             "threshold": self.threshold,
             "state": self.state.value,
             "producer": self.producer,
+            "producerVersion": self.producer_version,
             "evidenceSha256": self.evidence_sha256,
             "cause": self.cause,
             "stage": self.stage,
@@ -166,8 +172,14 @@ def validate_request_manifest(request: Mapping[str, Any]) -> None:
             raise ValueError(f"{field} must not contain duplicates")
     if not isinstance(request["materialTargets"], (dict, list)):
         raise ValueError("materialTargets must be an object or list")
-    if not isinstance(request["producerVersions"], Mapping):
+    producer_versions = request["producerVersions"]
+    if not isinstance(producer_versions, Mapping):
         raise ValueError("producerVersions must be an object")
+    for producer, version in producer_versions.items():
+        if not isinstance(producer, str) or not producer:
+            raise ValueError("producerVersions keys must be non-empty strings")
+        if not isinstance(version, str) or not version:
+            raise ValueError(f"producerVersions[{producer!r}] must be a non-empty string")
     if not isinstance(request["thresholds"], list) or not request["thresholds"]:
         raise ValueError("thresholds must be a non-empty frozen metric list")
     if not isinstance(request["fitBands"], Mapping) or not request["fitBands"]:
@@ -197,6 +209,10 @@ def freeze_request_manifest(
     if not isinstance(metrics, list) or not metrics:
         raise ValueError("threshold profile metrics must be a non-empty list")
     frozen = dict(draft)
+    producer_versions = dict(draft.get("producerVersions", {}))
+    for producer, version in _INTERNAL_PRODUCERS.items():
+        producer_versions.setdefault(producer, version)
+    frozen["producerVersions"] = producer_versions
     frozen["thresholds"] = [dict(item) for item in metrics if isinstance(item, Mapping)]
     frozen["fitBands"] = dict(profile.get("fitBands", {}))
     frozen["epsilonArea"] = profile.get("epsilonArea")
@@ -320,10 +336,12 @@ def evaluate_metric(
     observation: Mapping[str, Any] | None,
     *,
     root: Path,
+    producer_versions: Mapping[str, Any],
 ) -> MetricResult:
     metric_id = str(definition["id"])
     stage = str(definition["stage"])
     threshold = definition.get("threshold")
+    expected_producer = definition.get("producer")
     if observation is None:
         return MetricResult(
             metric_id, stage, None, threshold, MetricState.UNVERIFIED,
@@ -335,24 +353,49 @@ def evaluate_metric(
             metric_id, stage, observation.get("value"), threshold,
             MetricState.UNVERIFIED, None, None, "PRODUCER_MISSING",
         )
+    if isinstance(expected_producer, str) and producer != expected_producer:
+        return MetricResult(
+            metric_id, stage, observation.get("value"), threshold,
+            MetricState.UNVERIFIED, producer, None, "PRODUCER_ID_MISMATCH",
+        )
+    declared_version = producer_versions.get(producer)
+    if not isinstance(declared_version, str) or not declared_version:
+        return MetricResult(
+            metric_id, stage, observation.get("value"), threshold,
+            MetricState.UNVERIFIED, producer, None, "PRODUCER_NOT_DECLARED",
+        )
+    observed_version = observation.get("producerVersion")
+    if not isinstance(observed_version, str) or not observed_version:
+        return MetricResult(
+            metric_id, stage, observation.get("value"), threshold,
+            MetricState.UNVERIFIED, producer, None, "PRODUCER_VERSION_MISSING",
+            declared_version,
+        )
+    if observed_version != declared_version:
+        return MetricResult(
+            metric_id, stage, observation.get("value"), threshold,
+            MetricState.UNVERIFIED, producer, None, "PRODUCER_VERSION_MISMATCH",
+            observed_version,
+        )
     actual_evidence_sha, evidence_error = _evidence_state(observation, root=root)
     if evidence_error:
         return MetricResult(
             metric_id, stage, observation.get("value"), threshold,
             MetricState.UNVERIFIED, producer, actual_evidence_sha, evidence_error,
+            observed_version,
         )
     value = _finite_number(observation.get("value"))
     if value is None:
         return MetricResult(
             metric_id, stage, observation.get("value"), threshold,
             MetricState.UNVERIFIED, producer, actual_evidence_sha,
-            "VALUE_UNMEASURABLE",
+            "VALUE_UNMEASURABLE", observed_version,
         )
     passed = _compare(value, str(definition["operator"]), threshold)
     return MetricResult(
         metric_id, stage, value, threshold,
         MetricState.PASS if passed else MetricState.FAIL,
-        producer, actual_evidence_sha, None,
+        producer, actual_evidence_sha, None, observed_version,
     )
 
 
@@ -360,44 +403,58 @@ def verify_artifacts(
     artifacts: Sequence[Mapping[str, Any]],
     *, root: Path, product_id: str, request_digest: str,
 ) -> MetricResult:
+    producer = "artifact-verifier"
+    version = _INTERNAL_PRODUCERS[producer]
     if not artifacts:
         return MetricResult(
             "evidence.artifact_identity", "reproducibility-evidence", None, 0,
-            MetricState.UNVERIFIED, "artifact-verifier", None,
-            "ARTIFACT_SET_MISSING",
+            MetricState.UNVERIFIED, producer, None,
+            "ARTIFACT_SET_MISSING", version,
         )
-    mismatches = 0
+    identity_mismatches = 0
     for artifact in artifacts:
         path_value = artifact.get("path")
         declared = artifact.get("sha256")
         if not isinstance(path_value, str) or not path_value:
             return MetricResult(
                 "evidence.artifact_identity", "reproducibility-evidence", None, 0,
-                MetricState.UNVERIFIED, "artifact-verifier", None,
-                "ARTIFACT_PATH_MISSING",
+                MetricState.UNVERIFIED, producer, None,
+                "ARTIFACT_PATH_MISSING", version,
             )
         if not isinstance(declared, str) or not _HASH.fullmatch(declared):
             return MetricResult(
                 "evidence.artifact_identity", "reproducibility-evidence", None, 0,
-                MetricState.UNVERIFIED, "artifact-verifier", None,
-                "ARTIFACT_HASH_MISSING",
+                MetricState.UNVERIFIED, producer, None,
+                "ARTIFACT_HASH_MISSING", version,
             )
         try:
             path = _resolve_inside(root, path_value)
         except ValueError:
-            mismatches += 1
-            continue
-        if (
-            not path.is_file()
-            or sha256_file(path) != declared
-            or artifact.get("productId") != product_id
-            or artifact.get("requestSha256") != request_digest
-        ):
-            mismatches += 1
+            return MetricResult(
+                "evidence.artifact_identity", "reproducibility-evidence", None, 0,
+                MetricState.UNVERIFIED, producer, None,
+                "ARTIFACT_PATH_INVALID", version,
+            )
+        if not path.is_file():
+            return MetricResult(
+                "evidence.artifact_identity", "reproducibility-evidence", None, 0,
+                MetricState.UNVERIFIED, producer, None,
+                "ARTIFACT_MISSING", version,
+            )
+        actual = sha256_file(path)
+        if actual != declared:
+            return MetricResult(
+                "evidence.artifact_identity", "reproducibility-evidence", None, 0,
+                MetricState.UNVERIFIED, producer, actual,
+                "ARTIFACT_HASH_MISMATCH", version,
+            )
+        if artifact.get("productId") != product_id or artifact.get("requestSha256") != request_digest:
+            identity_mismatches += 1
     return MetricResult(
-        "evidence.artifact_identity", "reproducibility-evidence", mismatches, 0,
-        MetricState.PASS if mismatches == 0 else MetricState.FAIL,
-        "artifact-verifier", None, None,
+        "evidence.artifact_identity", "reproducibility-evidence",
+        identity_mismatches, 0,
+        MetricState.PASS if identity_mismatches == 0 else MetricState.FAIL,
+        producer, None, None, version,
     )
 
 
@@ -405,46 +462,59 @@ def verified_evidence_ratio(
     evidence: Sequence[Mapping[str, Any]],
     *, root: Path, product_id: str, request_digest: str,
 ) -> MetricResult:
+    producer = "evidence-verifier"
+    version = _INTERNAL_PRODUCERS[producer]
     required = [item for item in evidence if item.get("required") is True]
     if not required:
         return MetricResult(
             "evidence.verified_ratio", "reproducibility-evidence", None, 1.0,
-            MetricState.UNVERIFIED, "evidence-verifier", None,
-            "REQUIRED_EVIDENCE_UNDEFINED",
+            MetricState.UNVERIFIED, producer, None,
+            "REQUIRED_EVIDENCE_UNDEFINED", version,
         )
     verified = 0
-    unverifiable = False
     for item in required:
         path_value = item.get("path")
         declared = item.get("sha256")
         if not isinstance(path_value, str) or not path_value:
-            unverifiable = True
-            continue
+            return MetricResult(
+                "evidence.verified_ratio", "reproducibility-evidence", None, 1.0,
+                MetricState.UNVERIFIED, producer, None,
+                "EVIDENCE_PATH_MISSING", version,
+            )
         if not isinstance(declared, str) or not _HASH.fullmatch(declared):
-            unverifiable = True
-            continue
+            return MetricResult(
+                "evidence.verified_ratio", "reproducibility-evidence", None, 1.0,
+                MetricState.UNVERIFIED, producer, None,
+                "EVIDENCE_HASH_MISSING", version,
+            )
         try:
             path = _resolve_inside(root, path_value)
         except ValueError:
-            unverifiable = True
-            continue
+            return MetricResult(
+                "evidence.verified_ratio", "reproducibility-evidence", None, 1.0,
+                MetricState.UNVERIFIED, producer, None,
+                "EVIDENCE_PATH_INVALID", version,
+            )
         if not path.is_file():
-            unverifiable = True
-            continue
-        if item.get("productId") != product_id or item.get("requestSha256") != request_digest:
-            continue
-        if sha256_file(path) == declared:
+            return MetricResult(
+                "evidence.verified_ratio", "reproducibility-evidence", None, 1.0,
+                MetricState.UNVERIFIED, producer, None,
+                "EVIDENCE_MISSING", version,
+            )
+        actual = sha256_file(path)
+        if actual != declared:
+            return MetricResult(
+                "evidence.verified_ratio", "reproducibility-evidence", None, 1.0,
+                MetricState.UNVERIFIED, producer, actual,
+                "EVIDENCE_HASH_MISMATCH", version,
+            )
+        if item.get("productId") == product_id and item.get("requestSha256") == request_digest:
             verified += 1
     ratio = verified / len(required)
-    if unverifiable:
-        state = MetricState.UNVERIFIED
-        cause = "EVIDENCE_MISSING_OR_UNMEASURABLE"
-    else:
-        state = MetricState.PASS if ratio == 1.0 else MetricState.FAIL
-        cause = None
     return MetricResult(
         "evidence.verified_ratio", "reproducibility-evidence", ratio, 1.0,
-        state, "evidence-verifier", None, cause,
+        MetricState.PASS if ratio == 1.0 else MetricState.FAIL,
+        producer, None, None, version,
     )
 
 
@@ -453,16 +523,22 @@ def evaluate_metrics(
     observations: Mapping[str, Any], *, root: Path,
 ) -> dict[str, MetricResult]:
     result: dict[str, MetricResult] = {}
+    producer_versions = request.get("producerVersions", {})
+    if not isinstance(producer_versions, Mapping):
+        producer_versions = {}
     metrics = profile.get("metrics", [])
     for definition in metrics:
         if not isinstance(definition, Mapping) or not _required_metric(definition, request):
             continue
         metric_id = str(definition["id"])
+        if metric_id in {"evidence.artifact_identity", "evidence.verified_ratio"}:
+            continue
         observation = observations.get(metric_id)
         result[metric_id] = evaluate_metric(
             definition,
             observation if isinstance(observation, Mapping) else None,
             root=root,
+            producer_versions=producer_versions,
         )
     return result
 
@@ -499,7 +575,14 @@ def select_blocker(
         if not candidates:
             continue
         candidates.sort(
-            key=lambda item: (-_severity(definitions[item.metric_id], item), item.metric_id)
+            key=lambda item: (
+                -_severity(definitions.get(item.metric_id, {
+                    "threshold": item.threshold,
+                    "scale": 1,
+                    "direction": "lower",
+                }), item),
+                item.metric_id,
+            )
         )
         return candidates[0].metric_id
     return None
@@ -550,6 +633,10 @@ def runner_complete(
     request_digest: str, audit_request_digest: str, candidate_sha256: str,
     audit_candidate_sha256: str, final_attempt_decision: Decision | None,
 ) -> bool:
+    if not _HASH.fullmatch(request_digest) or not _HASH.fullmatch(audit_request_digest):
+        return False
+    if not _HASH.fullmatch(candidate_sha256) or not _HASH.fullmatch(audit_candidate_sha256):
+        return False
     if request_digest != audit_request_digest or candidate_sha256 != audit_candidate_sha256:
         return False
     if final_attempt_decision is Decision.REVERT:
