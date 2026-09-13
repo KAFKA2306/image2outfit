@@ -232,9 +232,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
             process_env,
         )
         if code != 0:
-            restored = restore_previews_if_generation_produced_none(
-                job, preview_backup
-            )
+            restored = restore_previews_if_generation_produced_none(job, preview_backup)
             suffix = "; restored previous render evidence" if restored else ""
             detail = f"{product_id}: Blender build exited {code}{suffix}"
             mark_attempt(job, job_path, status="FAIL", stage="build", detail=detail)
@@ -392,11 +390,17 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
             }
         )
 
+    products_without_webp = [
+        str(product["productId"])
+        for product in products
+        if int(product.get("webpCount", 0)) == 0
+    ]
     catalog = {
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "productCount": len(products),
         "webpCount": total_webp,
+        "productsWithoutWebp": products_without_webp,
         "products": products,
     }
     (io_root / "catalog.json").write_text(
@@ -441,6 +445,16 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
         encoding="utf-8",
     )
     return catalog
+
+
+def validate_io_gallery(catalog: dict[str, Any], site: Path) -> None:
+    for product in catalog.get("products", []):
+        for asset in product.get("assets", []):
+            href = str(asset.get("href", ""))
+            if not href.endswith(".webp"):
+                raise RuntimeError(f"non-WebP io asset: {asset}")
+            if not (site / href).is_file():
+                raise RuntimeError(f"missing io asset: {href}")
 
 
 def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
@@ -491,6 +505,7 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
         shutil.copy2(summary_path, destination)
 
     gallery = build_io_gallery(site)
+    validate_io_gallery(gallery, site)
     index_path = site / "index.html"
     html = index_path.read_text(encoding="utf-8")
     html = html.replace(
@@ -502,6 +517,7 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
     data["io"] = {
         "productCount": gallery["productCount"],
         "webpCount": gallery["webpCount"],
+        "productsWithoutWebp": gallery["productsWithoutWebp"],
     }
     return data
 
