@@ -28,6 +28,7 @@ PROFILE = {
             "tolerance": 0,
             "minImprovement": 1,
             "required": True,
+            "producer": "geometry-audit",
         },
         {
             "id": "silhouette.min_iou",
@@ -39,6 +40,7 @@ PROFILE = {
             "tolerance": 0,
             "minImprovement": 0.01,
             "required": True,
+            "producer": "silhouette-audit",
         },
     ],
 }
@@ -74,6 +76,11 @@ class RunnerAuditTests(unittest.TestCase):
         second = audit.freeze_request_manifest(draft(), changed)
         self.assertNotEqual(audit.request_sha256(first), audit.request_sha256(second))
 
+    def test_freeze_declares_internal_verifiers(self) -> None:
+        request = audit.freeze_request_manifest(draft(), PROFILE)
+        self.assertEqual(request["producerVersions"]["artifact-verifier"], "runner-audit-v1")
+        self.assertEqual(request["producerVersions"]["evidence-verifier"], "runner-audit-v1")
+
     def test_missing_producer_is_unverified_not_zero(self) -> None:
         request = audit.freeze_request_manifest(draft(), PROFILE)
         results = audit.evaluate_metrics(PROFILE, request, {}, root=Path("."))
@@ -81,6 +88,31 @@ class RunnerAuditTests(unittest.TestCase):
         self.assertEqual(result.state, audit.MetricState.UNVERIFIED)
         self.assertIsNone(result.value)
         self.assertEqual(result.cause, "OBSERVATION_MISSING")
+
+    def test_producer_version_mismatch_is_unverified(self) -> None:
+        request = audit.freeze_request_manifest(draft(), PROFILE)
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            evidence = root / "metric.json"
+            evidence.write_text("{}", encoding="utf-8")
+            digest = hashlib.sha256(evidence.read_bytes()).hexdigest()
+            results = audit.evaluate_metrics(
+                PROFILE,
+                request,
+                {
+                    "geometry.degenerate_triangles": {
+                        "value": 0,
+                        "producer": "geometry-audit",
+                        "producerVersion": "2",
+                        "evidencePath": "metric.json",
+                        "evidenceSha256": digest,
+                    }
+                },
+                root=root,
+            )
+        result = results["geometry.degenerate_triangles"]
+        self.assertEqual(result.state, audit.MetricState.UNVERIFIED)
+        self.assertEqual(result.cause, "PRODUCER_VERSION_MISMATCH")
 
     def test_hash_mismatch_is_unverified(self) -> None:
         request = audit.freeze_request_manifest(draft(), PROFILE)
@@ -95,6 +127,7 @@ class RunnerAuditTests(unittest.TestCase):
                     "geometry.degenerate_triangles": {
                         "value": 0,
                         "producer": "geometry-audit",
+                        "producerVersion": "1",
                         "evidencePath": "metric.json",
                         "evidenceSha256": "0" * 64,
                     }
@@ -105,11 +138,50 @@ class RunnerAuditTests(unittest.TestCase):
         self.assertEqual(result.state, audit.MetricState.UNVERIFIED)
         self.assertEqual(result.cause, "EVIDENCE_HASH_MISMATCH")
 
+    def test_artifact_hash_mismatch_is_unverified(self) -> None:
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            artifact = root / "candidate.blend"
+            artifact.write_bytes(b"candidate")
+            result = audit.verify_artifacts(
+                [{
+                    "path": "candidate.blend",
+                    "sha256": "0" * 64,
+                    "productId": "garment",
+                    "requestSha256": "c" * 64,
+                }],
+                root=root,
+                product_id="garment",
+                request_digest="c" * 64,
+            )
+        self.assertEqual(result.state, audit.MetricState.UNVERIFIED)
+        self.assertEqual(result.cause, "ARTIFACT_HASH_MISMATCH")
+
     def test_required_evidence_zero_is_unverified(self) -> None:
         result = audit.verified_evidence_ratio(
             [], root=Path("."), product_id="garment", request_digest="a" * 64
         )
         self.assertEqual(result.state, audit.MetricState.UNVERIFIED)
+
+    def test_verified_evidence_hash_mismatch_is_unverified(self) -> None:
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "evidence.json"
+            path.write_text('{"ok":true}', encoding="utf-8")
+            result = audit.verified_evidence_ratio(
+                [{
+                    "required": True,
+                    "path": "evidence.json",
+                    "sha256": "0" * 64,
+                    "productId": "garment",
+                    "requestSha256": "c" * 64,
+                }],
+                root=root,
+                product_id="garment",
+                request_digest="c" * 64,
+            )
+        self.assertEqual(result.state, audit.MetricState.UNVERIFIED)
+        self.assertEqual(result.cause, "EVIDENCE_HASH_MISMATCH")
 
     def test_verified_evidence_ratio_requires_identity_and_hash(self) -> None:
         with TemporaryDirectory() as temporary:
@@ -200,6 +272,27 @@ class RunnerAuditTests(unittest.TestCase):
         self.assertEqual(
             audit.pareto_decision(PROFILE, current, new), audit.Decision.REVERT
         )
+
+    def test_runner_complete_rejects_missing_candidate_hash(self) -> None:
+        result = {
+            "evidence.artifact_identity": audit.MetricResult(
+                "evidence.artifact_identity", "reproducibility-evidence", 0, 0,
+                audit.MetricState.PASS, "artifact-verifier", None
+            ),
+            "evidence.verified_ratio": audit.MetricResult(
+                "evidence.verified_ratio", "reproducibility-evidence", 1.0, 1.0,
+                audit.MetricState.PASS, "evidence-verifier", None
+            ),
+        }
+        self.assertFalse(audit.runner_complete(
+            result,
+            required_ids=[],
+            request_digest="a" * 64,
+            audit_request_digest="a" * 64,
+            candidate_sha256="",
+            audit_candidate_sha256="",
+            final_attempt_decision=None,
+        ))
 
     def test_stop_reason_has_no_human_wait_state(self) -> None:
         self.assertEqual(
