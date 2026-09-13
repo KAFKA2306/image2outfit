@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kafka2306.github.io/image2outfit/contracts/runner-attempt-ledger.schema.v1.json",
+  "title": "image2outfit Runner attempt ledger v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "requestSha256", "initialCandidateSha256", "currentCandidateSha256", "attempts", "stopReason", "earlyStopCandidate"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "requestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "initialCandidateSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "currentCandidateSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "earlyStopCandidate": {"type": "boolean"},
+    "stopReason": {"enum": ["SUCCESS", "STALLED", "BUDGET_EXHAUSTED", "FAILED_HARD", null]},
+    "attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["attempt", "requestSha256", "blocker", "patchId", "beforeCandidateSha256", "afterCandidateSha256", "beforeAuditSha256", "afterAuditSha256", "decision", "elapsedMinutes"],
+        "properties": {
+          "attempt": {"type": "integer", "minimum": 1},
+          "requestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "blocker": {"type": "string", "minLength": 1},
+          "patchId": {"type": "string", "minLength": 1},
+          "beforeCandidateSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "afterCandidateSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "beforeAuditSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "afterAuditSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "decision": {"enum": ["KEEP", "REVERT"]},
+          "elapsedMinutes": {"type": "number", "minimum": 0}
+        }
+      }
+    }
+  }
+}
