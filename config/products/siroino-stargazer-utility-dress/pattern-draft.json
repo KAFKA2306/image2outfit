@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-stargazer-utility-dress",
+  "units": "metres and avatar-relative scale",
+  "status": "PARAMETRIC_INITIAL_HYPOTHESIS",
+  "pieces": [
+    {"id":"front-bodice-center","quantity":1,"shape":"fitted center front with concealed opening","parameterization":{"lengthM":0.31,"halfWidthScale":0.34,"waistEaseM":0.018},"edges":["neck","center-front","waist","side-left","side-right"]},
+    {"id":"front-bodice-side-left","quantity":1,"shape":"princess side front","parameterization":{"lengthM":0.31,"bustEaseM":0.024},"edges":["shoulder","armhole","center","side","waist"]},
+    {"id":"front-bodice-side-right","quantity":1,"shape":"mirror of front-bodice-side-left","mirrorOf":"front-bodice-side-left","edges":["shoulder","armhole","center","side","waist"]},
+    {"id":"back-bodice-center","quantity":1,"shape":"center back with shoulder-blade ease","parameterization":{"lengthM":0.31,"backEaseM":0.022},"edges":["neck","shoulder-left","shoulder-right","side-left","side-right","waist"]},
+    {"id":"back-bodice-side-left","quantity":1,"shape":"side back panel","parameterization":{"lengthM":0.31,"sideEaseM":0.018},"edges":["armhole","center","side","waist"]},
+    {"id":"back-bodice-side-right","quantity":1,"shape":"mirror of back-bodice-side-left","mirrorOf":"back-bodice-side-left","edges":["armhole","center","side","waist"]},
+    {"id":"crescent-utility-yoke","quantity":1,"shape":"asymmetric crescent from left upper chest to right waist","parameterization":{"maxWidthM":0.115,"minWidthM":0.045,"offsetFromBodyM":0.004},"edges":["upper","lower","left-end","right-end","pocket-opening"]},
+    {"id":"yoke-pocket-facing","quantity":1,"shape":"shallow curved pocket facing","parameterization":{"depthM":0.085,"openingM":0.12},"edges":["opening","bag","side-left","side-right"]},
+    {"id":"sleeve-left","quantity":1,"shape":"set-in long sleeve tapered at forearm","parameterization":{"lengthM":0.47,"upperEaseM":0.03,"cuffEaseM":0.018},"edges":["cap","underarm-front","underarm-back","cuff"]},
+    {"id":"sleeve-right","quantity":1,"shape":"mirror of sleeve-left","mirrorOf":"sleeve-left","edges":["cap","underarm-front","underarm-back","cuff"]},
+    {"id":"stand-collar","quantity":1,"shape":"curved low stand collar","parameterization":{"heightM":0.032,"neckEaseM":0.01},"edges":["neckline","outer","left","right"]},
+    {"id":"waist-facing","quantity":1,"shape":"narrow internal waist support","parameterization":{"heightM":0.028,"waistEaseM":0.012},"edges":["upper","lower","left","right"]},
+    {"id":"front-skirt-left","quantity":1,"shape":"A-line front panel","parameterization":{"lengthM":0.44,"hemFlareM":0.105},"edges":["waist","center","side","hem"]},
+    {"id":"front-skirt-right","quantity":1,"shape":"mirror of front-skirt-left","mirrorOf":"front-skirt-left","edges":["waist","center","side","hem"]},
+    {"id":"back-skirt-left","quantity":1,"shape":"A-line back panel with vent allowance","parameterization":{"lengthM":0.455,"hemFlareM":0.11,"ventM":0.075},"edges":["waist","center","side","hem","vent"]},
+    {"id":"back-skirt-right","quantity":1,"shape":"mirror of back-skirt-left","mirrorOf":"back-skirt-left","edges":["waist","center","side","hem","vent"]}
+  ],
+  "allowance": {"seamM":0.008,"hemM":0.02,"cuffM":0.015,"collarM":0.008,"pocketM":0.008},
+  "validation": [
+    "all pattern ids resolve to garment decomposition parts",
+    "bilateral sleeve and skirt symmetry except hero yoke",
+    "continuous bodice-to-waist seam",
+    "crescent yoke remains asymmetric and non-degenerate",
+    "positive armhole and elbow ease",
+    "skirt flare remains clear of neutral thigh envelope"
+  ]
+}
