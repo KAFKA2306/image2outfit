@@ -27,10 +27,12 @@ from image2outfit.pipeline import (
     run_pipeline,
     validate_pipeline_state,
 )
+from contract_io import validate_schema_file
 from pipeline_source_fingerprint import pipeline_source_fingerprint
 from pipeline_stage_adapters import build_registry, load_profile
 
 DEFAULT_PROFILE = Path("config/pipeline-profiles/garment-reconstruction-v1.json")
+REQUEST_SCHEMA = Path("config/pipeline/pipeline-request.schema.v1.json")
 IDENTITY_FIELDS = {
     "product_id": "productId",
     "target_avatar": "targetAvatar",
@@ -80,6 +82,12 @@ def _read_object(path: Path, *, label: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{label} must contain a JSON object")
     return value
+
+
+def _validate_request(request: dict[str, Any]) -> None:
+    errors = validate_schema_file(request, ROOT / REQUEST_SCHEMA, "request")
+    if errors:
+        raise ValueError("invalid pipeline request: " + "; ".join(errors))
 
 
 def _repo_path(path: Path, *, label: str) -> Path:
@@ -179,17 +187,16 @@ def main() -> int:
     args = parse_args()
     request_path = _repo_path(args.request, label="request")
     request = _read_object(request_path, label="request")
-    if request.get("schemaVersion") != 1:
-        raise ValueError("request.schemaVersion must be 1")
+    _validate_request(request)
     profile_path = _profile_path(args, request)
     profile = load_profile(profile_path)
-    product_id = str(request["productId"])
+    product_id = request["productId"]
     expected = {
         "productId": product_id,
-        "targetAvatar": str(request["targetAvatar"]),
-        "sourceReference": str(request["sourceReference"]),
+        "targetAvatar": request["targetAvatar"],
+        "sourceReference": request["sourceReference"],
         "profileId": str(profile["profileId"]),
-        "revisionId": str(request.get("revisionId", "")),
+        "revisionId": request.get("revisionId", ""),
         "sourceFingerprint": pipeline_source_fingerprint(
             ROOT,
             product_id=product_id,
