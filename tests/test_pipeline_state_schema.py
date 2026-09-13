@@ -17,7 +17,11 @@ for path in (SRC, TOOLS):
         sys.path.insert(0, str(path))
 
 import run_garment_pipeline as runner
-from image2outfit.pipeline import ExecutionMode, new_pipeline_state, resume_pipeline_state
+from image2outfit.pipeline import (
+    ExecutionMode,
+    new_pipeline_state,
+    resume_pipeline_state,
+)
 from pipeline_source_fingerprint import pipeline_source_fingerprint
 
 
@@ -61,7 +65,9 @@ class PipelineStateSchemaTests(unittest.TestCase):
         resumed = resume_pipeline_state(one_stage, run_id="run-two")
         self.assert_valid(resumed)
 
-    def test_schema_rejects_wrong_version_missing_identity_and_wrong_types(self) -> None:
+    def test_schema_rejects_wrong_version_missing_identity_and_wrong_types(
+        self,
+    ) -> None:
         wrong_version = self.state()
         wrong_version["schema_version"] = 2
         self.assert_invalid(wrong_version, "schema_version")
@@ -92,7 +98,9 @@ class PipelineStateSchemaTests(unittest.TestCase):
 
             self.assertEqual(before, path.read_bytes())
 
-    def test_resume_reader_rejects_malformed_state_before_adapter_registry(self) -> None:
+    def test_resume_reader_rejects_malformed_state_before_adapter_registry(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory(dir=ROOT) as temp_dir:
             work = Path(temp_dir)
             request_path = work / "request.json"
@@ -123,8 +131,14 @@ class PipelineStateSchemaTests(unittest.TestCase):
             )
             with (
                 patch.object(runner, "parse_args", return_value=args),
-                patch.object(runner, "load_profile", return_value={"profileId": "garment-reconstruction-v1"}),
-                patch.object(runner, "pipeline_source_fingerprint", return_value="a" * 64),
+                patch.object(
+                    runner,
+                    "load_profile",
+                    return_value={"profileId": "garment-reconstruction-v1"},
+                ),
+                patch.object(
+                    runner, "pipeline_source_fingerprint", return_value="a" * 64
+                ),
                 patch.object(runner, "build_registry") as build_registry,
                 self.assertRaisesRegex(ValueError, "run_id"),
             ):
@@ -141,7 +155,7 @@ class PipelineStateSchemaTests(unittest.TestCase):
                 "config/products/schema-fixture/request.json": "{}\n",
                 "config/pipeline-profiles/profile.json": "{}\n",
                 "config/pipeline/visual-quality-defaults.v1.json": "{}\n",
-                "config/pipeline/pipeline-state.schema.v1.json": "{\"version\":1}\n",
+                "config/pipeline/pipeline-state.schema.v1.json": '{"version":1}\n',
                 "config/toolchain-lock.json": "{}\n",
                 "pyproject.toml": "[project]\nname='fixture'\n",
                 "uv.lock": "fixture\n",
@@ -159,7 +173,7 @@ class PipelineStateSchemaTests(unittest.TestCase):
                 profile_path=profile_path,
             )
             schema_path = root / "config/pipeline/pipeline-state.schema.v1.json"
-            schema_path.write_text("{\"version\":2}\n", encoding="utf-8")
+            schema_path.write_text('{"version":2}\n', encoding="utf-8")
             after = pipeline_source_fingerprint(
                 root,
                 product_id="schema-fixture",
