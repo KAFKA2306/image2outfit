@@ -110,9 +110,7 @@ def _write_json_atomic(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def _identity_mismatches(
-    state: dict[str, Any], expected: dict[str, str]
-) -> list[str]:
+def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
     return [
         request_name
         for state_name, request_name in IDENTITY_FIELDS.items()
@@ -238,9 +236,9 @@ def main() -> int:
         else None
     )
     if args.engine == "langgraph":
-        result = run_langgraph(state, registry)
+        result = run_langgraph(state, registry, checkpoint=checkpoint)
     elif args.engine == "langchain":
-        result = run_langchain(state, registry)
+        result = run_langchain(state, registry, checkpoint=checkpoint)
     else:
         result = run_pipeline(state, registry, checkpoint=checkpoint)
 
