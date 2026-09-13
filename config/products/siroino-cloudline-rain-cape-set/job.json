@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-cloudline-rain-cape-set",
+  "productName": "Siroino Cloudline Rain Cape Set",
+  "adapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-cloudline-rain-cape-set",
+  "productManifestPath": "Assets/GenWorks/siroino-cloudline-rain-cape-set/ProductManifest.json",
+  "buildScript": "tools/candidate_orchestrator.py",
+  "blendPath": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Source/Blender/SiroinoCloudlineRainCapeSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Models/SiroinoCloudlineRainCapeSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Prefab/SiroinoCloudlineRainCapeSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Prefab/SiroinoSotai_CloudlineRainCapeSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-cloudline-rain-cape-set/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local",
+    "Assets/_Vendor",
+    "Assets/SiroinoWorks"
+  ],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/README.md",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/References/cloudline-rain-cape-set-concept.png",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Source/Blender/SiroinoCloudlineRainCapeSet.blend",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Models/SiroinoCloudlineRainCapeSet.fbx",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Prefab/SiroinoCloudlineRainCapeSet.prefab",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Prefab/SiroinoSotai_CloudlineRainCapeSet.prefab",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/front.png",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/back.png",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/left.png",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/right.png",
+    "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-cloudline-rain-cape-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-cloudline-rain-cape-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-cloudline-rain-cape-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-cloudline-rain-cape-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 2,
+    "materialRoles": [
+      {
+        "material": "MAT_Cloudline_Shell",
+        "role": "fabric"
+      },
+      {
+        "material": "MAT_Cloudline_Dress",
+        "role": "fabric"
+      }
+    ]
+  }
+}
