@@ -70,5 +70,5 @@ def failed_state_descriptor(state: Mapping[str, Any]) -> dict[str, str]:
         "pipeline",
         message,
         stage=stage,
-        cause_code=cause if isinstance(cause, str) else None,
+        cause_code=cause if isinstance(cause, str) else "STAGE_EXECUTION_FAILED",
     )
