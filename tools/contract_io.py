@@ -24,6 +24,13 @@ def read_json(path: Path) -> dict[str, Any]:
 
 
 def write_json(path: Path, value: dict[str, Any]) -> None:
+    if path.name == "ProductManifest.json" and path.is_file():
+        # ProductManifest has state-transition semantics, so generic JSON callers
+        # must cross its single mutation boundary instead of replacing it directly.
+        import product_manifest_state
+
+        product_manifest_state.replace_legacy_snapshot(path, value)
+        return
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
         "w", encoding="utf-8", dir=path.parent, delete=False
