@@ -9,27 +9,29 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$ContractPath = Join-Path $RepoRoot "config\mcp-authoring.json"
-$Contract = Get-Content -Raw -LiteralPath $ContractPath | ConvertFrom-Json
+$ContractPath = Join-Path $RepoRoot "config\toolchain-lock.json"
+$Toolchain = Get-Content -Raw -LiteralPath $ContractPath | ConvertFrom-Json
+$Contract = $Toolchain.authoringAdapters
 $StateRoot = Join-Path $RepoRoot ($Contract.stateRoot -replace '/', '\')
 $BlenderStateRoot = Join-Path $StateRoot "blender-mcp"
 $BlenderAddonPath = Join-Path $BlenderStateRoot "addon.py"
 $BlenderManifestPath = Join-Path $BlenderStateRoot "provenance.json"
 
-$BlenderMcpVersion = [string]$Contract.blender.version
-$BlenderMcpPython = [string]$Contract.blender.python
-$BlenderMcpCommit = [string]$Contract.blender.commit
-$BlenderAddonUrl = [string]$Contract.blender.addonUrl
-$BlenderAddonGitBlobSha1 = [string]$Contract.blender.addonGitBlobSha1
-$BlenderHost = [string]$Contract.blender.host
-$BlenderPort = [int]$Contract.blender.port
-$UnityMcpVersion = [string]$Contract.unity.version
-$UnityMcpPackageUrl = [string]$Contract.unity.packageUrl
-$UnityMcpUrl = [string]$Contract.unity.url
-$UnityHost = [string]$Contract.unity.host
-$UnityPort = [int]$Contract.unity.port
-$BlenderCodexServerName = [string]$Contract.blender.serverName
-$UnityCodexServerName = [string]$Contract.unity.serverName
+$BlenderMcpVersion = [string]$Contract.blenderMcp.version
+$BlenderMcpPython = [string]$Contract.blenderMcp.python
+$BlenderMcpCommit = [string]$Contract.blenderMcp.commit
+$BlenderAddonUrl = [string]$Contract.blenderMcp.addonUrl
+$BlenderAddonGitBlobSha1 = [string]$Contract.blenderMcp.addonGitBlobSha1
+$BlenderHost = [string]$Contract.blenderMcp.host
+$BlenderPort = [int]$Contract.blenderMcp.port
+$UnityMcpVersion = [string]$Contract.unityMcp.version
+$UnityMcpPackageUrl = [string]$Contract.unityMcp.packageUrl
+$UnityMcpUrl = [string]$Contract.unityMcp.url
+$UnityHost = [string]$Contract.unityMcp.host
+$UnityPort = [int]$Contract.unityMcp.port
+$BlenderCodexServerName = [string]$Contract.blenderMcp.serverName
+$UnityCodexServerName = [string]$Contract.unityMcp.serverName
+$ExpectedUnityVersion = [string]$Toolchain.unity.version
 
 function Test-Executable {
     param([Parameter(Mandatory = $true)][string]$Name)
@@ -108,12 +110,12 @@ function Get-UnityMcpDetected {
     $manifestPath = Join-Path $RepoRoot "Packages\manifest.json"
     if (Test-Path $manifestPath) {
         $manifestText = Get-Content -Raw -LiteralPath $manifestPath
-        if ($manifestText -match [regex]::Escape([string]$Contract.unity.packageId)) { return $true }
+        if ($manifestText -match [regex]::Escape([string]$Contract.unityMcp.packageId)) { return $true }
     }
     $packageCache = Join-Path $RepoRoot "Library\PackageCache"
     if (Test-Path $packageCache) {
         $resolved = Get-ChildItem -LiteralPath $packageCache -Directory -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -like "$($Contract.unity.packageId)*" } |
+            Where-Object { $_.Name -like "$($Contract.unityMcp.packageId)*" } |
             Select-Object -First 1
         if ($null -ne $resolved) { return $true }
     }
@@ -121,7 +123,7 @@ function Get-UnityMcpDetected {
 }
 
 function Get-UnityProjectVersion {
-    $versionPath = Join-Path $RepoRoot ([string]$Contract.unity.projectVersionSource -replace '/', '\')
+    $versionPath = Join-Path $RepoRoot ([string]$Contract.unityMcp.projectVersionSource -replace '/', '\')
     if (-not (Test-Path $versionPath)) { return $null }
     $line = Get-Content -LiteralPath $versionPath |
         Where-Object { $_ -match '^m_EditorVersion:\s*(.+)$' } |
@@ -176,13 +178,13 @@ function Invoke-McpDoctor {
         -Reachable $blenderReachable
 
     $unityRegistrationVerified = Test-RegistrationContains -Registration $unityRegistration -RequiredTokens @($UnityMcpUrl)
-    $unityProjectCompatible = $unityProjectVersion -eq [string]$Contract.unity.expectedUnityVersion
+    $unityProjectCompatible = $unityProjectVersion -eq $ExpectedUnityVersion
     $unityPackageDetected = Get-UnityMcpDetected
     $unityReachable = Test-LoopbackPort -HostName $UnityHost -Port $UnityPort
     $unityState = Resolve-DoctorState `
         -PrerequisitesAvailable $codexAvailable `
         -Configured ($null -ne $unityRegistration) `
-        -Verified ($unityRegistrationVerified -and $unityProjectCompatible) `
+        -Verified ($unityRegistrationVerified -and $unityProjectCompatible -and $unityPackageDetected) `
         -Reachable $unityReachable
 
     return [pscustomobject][ordered]@{
@@ -217,6 +219,7 @@ function Invoke-McpDoctor {
             packageDetected = $unityPackageDetected
             expectedPackageVersion = $UnityMcpVersion
             projectVersion = $unityProjectVersion
+            expectedProjectVersion = $ExpectedUnityVersion
             projectVersionCompatible = $unityProjectCompatible
             reachable = $unityReachable
             url = $UnityMcpUrl
@@ -224,7 +227,7 @@ function Invoke-McpDoctor {
     }
 }
 
-if (-not [bool]$Contract.security.loopbackOnly -or -not (Test-LoopbackHost $BlenderHost) -or -not (Test-LoopbackHost $UnityHost)) {
+if (-not [bool]$Contract.security.loopbackOnly -or -not (Test-LoopbackHost -HostName $BlenderHost) -or -not (Test-LoopbackHost -HostName $UnityHost)) {
     throw "MCP contract violates the loopback-only security boundary."
 }
 if ([bool]$Contract.affectsProductCompletion) {
@@ -240,8 +243,8 @@ if (-not (Test-Path (Join-Path $RepoRoot "AGENTS.md"))) { throw "Repository root
 if (-not (Test-Executable "codex")) { throw "codex was not found on PATH. Install/update OpenAI Codex before running this setup." }
 if (-not (Test-Executable "uvx")) { throw "uvx was not found on PATH. Install uv before running this setup." }
 $projectVersion = Get-UnityProjectVersion
-if ($projectVersion -and $projectVersion -ne [string]$Contract.unity.expectedUnityVersion) {
-    throw "Unity project version '$projectVersion' is incompatible with MCP contract '$($Contract.unity.expectedUnityVersion)'."
+if ($projectVersion -and $projectVersion -ne $ExpectedUnityVersion) {
+    throw "Unity project version '$projectVersion' is incompatible with toolchain lock '$ExpectedUnityVersion'."
 }
 
 New-Item -ItemType Directory -Force -Path $BlenderStateRoot | Out-Null
@@ -256,14 +259,14 @@ $addonSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $BlenderAddonPath).H
 $provenance = [ordered]@{
     schemaVersion = 2
     downloadedAtUtc = [DateTime]::UtcNow.ToString("o")
-    upstream = [string]$Contract.blender.upstream
+    upstream = [string]$Contract.blenderMcp.upstream
     serverVersion = $BlenderMcpVersion
     python = $BlenderMcpPython
     commit = $BlenderMcpCommit
     addonUrl = $BlenderAddonUrl
     addonGitBlobSha1 = $actualBlobSha1
     addonSha256 = $addonSha256
-    telemetryDisabled = [bool]$Contract.blender.telemetryDisabled
+    telemetryDisabled = [bool]$Contract.blenderMcp.telemetryDisabled
 }
 $provenance | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $BlenderManifestPath -Encoding UTF8
 
