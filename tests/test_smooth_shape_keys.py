@@ -67,9 +67,7 @@ class SmoothShapeKeysTests(unittest.TestCase):
                 "properties": {},
             }
         )
-        self.assertIn(
-            "module is required when applicability is REQUIRED", errors
-        )
+        self.assertIn("module is required when applicability is REQUIRED", errors)
         self.assertIn("operator must be an exact Blender operator id", errors)
 
     def test_schema_requires_exact_api_when_required(self) -> None:
@@ -88,7 +86,10 @@ class SmoothShapeKeysTests(unittest.TestCase):
         for field in ("module", "operator", "invocation", "targets", "properties"):
             with self.subTest(field=field):
                 self.assertTrue(
-                    any(f"shapeKeyPostprocess.{field} is required" in item for item in errors),
+                    any(
+                        f"shapeKeyPostprocess.{field} is required" in item
+                        for item in errors
+                    ),
                     errors,
                 )
 
@@ -118,9 +119,7 @@ class SmoothShapeKeysTests(unittest.TestCase):
             {"Garment:Corrective"},
             allow_extra_keys=False,
         )
-        self.assertTrue(
-            any("non-target shape key changed" in item for item in errors)
-        )
+        self.assertTrue(any("non-target shape key changed" in item for item in errors))
 
     def test_basis_change_blocks(self) -> None:
         before = state()
