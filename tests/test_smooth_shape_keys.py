@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import ast
 import importlib.util
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "tools" / "smooth_shape_keys.py"
+TOOLS = ROOT / "tools"
+SCRIPT = TOOLS / "smooth_shape_keys.py"
+sys.path.insert(0, str(TOOLS))
+
+import contract_io  # noqa: E402
+
 SPEC = importlib.util.spec_from_file_location("smooth_shape_keys", SCRIPT)
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -65,6 +71,43 @@ class SmoothShapeKeysTests(unittest.TestCase):
             "module is required when applicability is REQUIRED", errors
         )
         self.assertIn("operator must be an exact Blender operator id", errors)
+
+    def test_schema_requires_exact_api_when_required(self) -> None:
+        schema = ROOT / "config" / "products" / "construction.schema.v1.json"
+        contract = {
+            "schemaVersion": 1,
+            "productId": "test-product",
+            "profile": "fitted",
+            "shapeKeyPostprocess": {
+                "provider": MODULE.PROVIDER,
+                "applicability": "REQUIRED",
+                "reason": "corrective cleanup",
+            },
+        }
+        errors = contract_io.validate_schema_file(contract, schema, "construction")
+        for field in ("module", "operator", "invocation", "targets", "properties"):
+            with self.subTest(field=field):
+                self.assertTrue(
+                    any(f"shapeKeyPostprocess.{field} is required" in item for item in errors),
+                    errors,
+                )
+
+    def test_schema_allows_explicit_not_required(self) -> None:
+        schema = ROOT / "config" / "products" / "construction.schema.v1.json"
+        contract = {
+            "schemaVersion": 1,
+            "productId": "test-product",
+            "profile": "fitted",
+            "shapeKeyPostprocess": {
+                "provider": MODULE.PROVIDER,
+                "applicability": "NOT_REQUIRED",
+                "reason": "product contains no corrective shape keys",
+            },
+        }
+        self.assertEqual(
+            [],
+            contract_io.validate_schema_file(contract, schema, "construction"),
+        )
 
     def test_non_target_change_blocks(self) -> None:
         before = state()
