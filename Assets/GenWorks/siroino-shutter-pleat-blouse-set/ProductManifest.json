@@ -1,13 +1,18 @@
 {
   "schemaVersion": 1,
   "productId": "siroino-shutter-pleat-blouse-set",
+  "productName": "Shutter Pleat Blouse Set",
   "status": "IN_PROGRESS",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-shutter-pleat-blouse-set",
+  "documentationPath": "Assets/GenWorks/siroino-shutter-pleat-blouse-set/README.md",
+  "generatedAt": "2026-09-14T04:47:00Z",
   "evidence": {
     "manufacturingReference": "References/shutter-pleat-blouse-set-manufacturing-sheet.svg",
     "prototype": "Prototype/shutter-pleat-blouse-set.obj",
     "structuralValidation": "Evidence/prototype-validation.json"
   },
-  "gates": {
+  "completionGates": {
     "manufacturingReference": "PASS",
     "constructionContract": "PASS",
     "prototypeGeometry": "PASS",
@@ -17,9 +22,16 @@
     "blenderFit": "UNVERIFIED",
     "rigWeight": "UNVERIFIED",
     "fbxExport": "UNVERIFIED",
-    "multiAngleRender": "UNVERIFIED",
-    "poseRender": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
     "unity": "UNVERIFIED",
     "vrchatRuntime": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-shutter-pleat-blouse-set",
+    "resumeFrom": "config/products/siroino-shutter-pleat-blouse-set/construction.json",
+    "doNotRebuildFromZero": true,
+    "blockers": ["No canonical job.json or proven reusable current-main builder is bound to this product yet; Blender/rig/export/render evidence must remain UNVERIFIED until that build boundary is established and executed."]
   }
 }
