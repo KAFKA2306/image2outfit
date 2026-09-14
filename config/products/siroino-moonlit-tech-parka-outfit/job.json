@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-generic-structural",
+  "id": "siroino-moonlit-tech-parka-outfit",
+  "productName": "Moonlit Suspension Parka Set",
+  "adapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit",
+  "productManifestPath": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Source/Blender/MoonlitSuspensionParka.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Models/MoonlitSuspensionParka.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Prefab/MoonlitSuspensionParka.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Prefab/SiroinoSotai_MoonlitSuspensionParka.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-moonlit-tech-parka-outfit/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/ProductManifest.json",
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/README.md",
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Source/Blender/MoonlitSuspensionParka.blend",
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Models/MoonlitSuspensionParka.fbx",
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/front.png",
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/back.png",
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/left.png",
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/right.png",
+    "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-moonlit-tech-parka-outfit/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-moonlit-tech-parka-outfit/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-moonlit-tech-parka-outfit/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Shell", "role": "fabric"},
+      {"material": "MAT_Inner", "role": "fabric"},
+      {"material": "MAT_Bottoms", "role": "fabric"},
+      {"material": "MAT_Rail", "role": "trim"}
+    ]
+  }
+}
