@@ -19,6 +19,7 @@ CANDIDATE_SCHEMA_PATH = ROOT / "config" / "candidate-manifest.schema.v2.json"
 UNITY_PIPELINE_PATH = (
     ROOT / "Assets" / "GenWorks" / "Shared" / "Editor" / "Image2OutfitPipeline.cs"
 )
+SHAPE_KEY_REPORT = "smooth-shape-keys.json"
 
 
 def now() -> str:
@@ -124,6 +125,49 @@ def png_size(file: Path) -> tuple[int, int]:
     return struct.unpack(">II", header[16:24])
 
 
+def _shape_key_requirement(job: dict[str, Any]) -> str | None:
+    product_id = job.get("id")
+    if not isinstance(product_id, str) or not product_id:
+        return None
+    construction = read(ROOT / "config" / "products" / product_id / "construction.json")
+    postprocess = construction.get("shapeKeyPostprocess")
+    if not isinstance(postprocess, dict):
+        return None
+    applicability = postprocess.get("applicability")
+    return applicability if isinstance(applicability, str) else None
+
+
+def _shape_key_gate(job: dict[str, Any]) -> dict[str, Any]:
+    artifact_value = job.get("artifactDir")
+    if not isinstance(artifact_value, str) or not artifact_value:
+        return {
+            "passed": False,
+            "error": "job.artifactDir is required for Shape Key evidence",
+        }
+    report_path = path(artifact_value) / SHAPE_KEY_REPORT
+    report = read(report_path)
+    item: dict[str, Any] = {
+        "path": rel(report_path),
+        "passed": report_path.is_file() and report.get("passed") is True,
+        "status": report.get("status"),
+        "provider": report.get("provider"),
+        "errors": report.get("errors", []),
+        "metrics": report.get("metrics", {}),
+    }
+    if not report_path.is_file():
+        item["error"] = "Smooth Shape Keys report is missing"
+    elif report.get("provider") != "maxwilso-smooth-shape-keys":
+        item["passed"] = False
+        item["error"] = "unexpected Shape Key postprocess provider"
+    elif (
+        _shape_key_requirement(job) == "REQUIRED"
+        and report.get("status") == "NOT_APPLICABLE"
+    ):
+        item["passed"] = False
+        item["error"] = "required Shape Keys were not generated"
+    return item
+
+
 def preview_gate(
     job: dict[str, Any], policy: dict[str, Any]
 ) -> tuple[bool, dict[str, Any]]:
@@ -141,6 +185,10 @@ def preview_gate(
             item["error"] = str(exc)
         passed = passed and item["passed"]
         result[view] = item
+
+    shape_key = _shape_key_gate(job)
+    result["shapeKeyPostprocess"] = shape_key
+    passed = passed and shape_key["passed"] is True
     return passed, result
 
 
