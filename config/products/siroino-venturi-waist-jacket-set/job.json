@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-generic-structural",
+  "id": "siroino-venturi-waist-jacket-set",
+  "productName": "Venturi Waist Jacket Set",
+  "adapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-venturi-waist-jacket-set",
+  "productManifestPath": "Assets/GenWorks/siroino-venturi-waist-jacket-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Source/Blender/VenturiWaistJacketSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Models/VenturiWaistJacketSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Prefab/VenturiWaistJacketSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Prefab/SiroinoSotai_VenturiWaistJacketSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-venturi-waist-jacket-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/README.md",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Source/Blender/VenturiWaistJacketSet.blend",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Models/VenturiWaistJacketSet.fbx",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Prefab/VenturiWaistJacketSet.prefab",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Prefab/SiroinoSotai_VenturiWaistJacketSet.prefab",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/front.png",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/back.png",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/left.png",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/right.png",
+    "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-venturi-waist-jacket-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-venturi-waist-jacket-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-venturi-waist-jacket-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-venturi-waist-jacket-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Shell", "role": "fabric"},
+      {"material": "MAT_Inner", "role": "fabric"},
+      {"material": "MAT_Bottoms", "role": "fabric"},
+      {"material": "MAT_Hero", "role": "trim"},
+      {"material": "MAT_Accent", "role": "trim"}
+    ]
+  }
+}
