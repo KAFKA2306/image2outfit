@@ -17,8 +17,10 @@ from typing import Any, Iterable
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
+sys.path.insert(0, str(REPO_ROOT / "tools"))
 
 from image2outfit import improvement  # noqa: E402
+from product_completion import normalize_gate_name, project_product_completion  # noqa: E402
 
 STATES = (
     "WORKING",
@@ -79,20 +81,6 @@ def status_text(value: Any) -> str:
 
 def relative_href(path: Path, output_dir: Path) -> str:
     return Path(os.path.relpath(path, output_dir)).as_posix()
-
-
-def safe_state(manifest: dict[str, Any]) -> str:
-    state = str(
-        pick(
-            manifest,
-            "state",
-            "status",
-            "product_state",
-            "release_state",
-            default="WORKING",
-        )
-    ).upper()
-    return state if state in STATES else "WORKING"
 
 
 def policy_requirements(policy: dict[str, Any]) -> tuple[list[str], list[str]]:
@@ -226,13 +214,20 @@ class Product:
     human_review_url: str
     manifest_href: str
     assets: list[Asset]
+    completion_gates: list[Gate]
+    runtime_gates: list[Gate]
     gates: list[Gate]
     evidence: list[Evidence]
 
 
 def parse_gate_rows(
-    manifest: dict[str, Any], workspace: Path, output_dir: Path
+    manifest: dict[str, Any],
+    workspace: Path,
+    output_dir: Path,
+    *,
+    excluded_gate_names: set[str] | None = None,
 ) -> list[Gate]:
+    excluded = excluded_gate_names or set()
     raw: Any = pick(
         manifest,
         "technicalGates",
@@ -261,6 +256,8 @@ def parse_gate_rows(
                 "",
                 None,
             )
+        if normalize_gate_name(name) in excluded:
+            continue
         href = None
         if raw_path:
             target = workspace / str(raw_path)
@@ -518,13 +515,22 @@ def collect_product(
 ) -> Product:
     manifest_path = workspace / "ProductManifest.json"
     manifest: dict[str, Any] = load_json(manifest_path, {})
+    handoff_policy = load_json(root / "config" / "genworks-handoff-policy.json", {})
+    completion = project_product_completion(manifest, handoff_policy)
     blockers = [
-        {"severity": issue_severity(item), "message": issue_message(item)}
+        {"severity": item["severity"], "message": item["message"]}
+        for item in completion["completionBlockers"]
+    ]
+    blockers.extend(
+        {
+            "severity": issue_severity(item),
+            "message": issue_message(item),
+        }
         for item in as_list(
             pick(manifest, "blockers", "defects", "issues", "findings", default=[])
         )
         if open_issue(item)
-    ]
+    )
     quality_blockers, quality_gates, quality_evidence, quality_hash = (
         parse_quality_projection(root, workspace.name, output_dir)
     )
@@ -594,12 +600,19 @@ def collect_product(
             "restart_from",
             "next_action",
             "resume_from",
-            default="未登録",
+            default=pick(manifest.get("handoff", {}), "resumeFrom", default="未登録"),
         )
     )
+    excluded_gate_names = {
+        normalize_gate_name(name)
+        for name in [
+            *handoff_policy.get("requiredCompletionGates", []),
+            *handoff_policy.get("outOfScopeGates", []),
+        ]
+    }
     return Product(
         slug=workspace.name,
-        state=safe_state(manifest),
+        state=completion["state"],
         updated_at=str(updated_at or "UNKNOWN"),
         blocker_count=len(blockers),
         blockers=blockers,
@@ -616,8 +629,31 @@ def collect_product(
         ),
         manifest_href=relative_href(manifest_path, output_dir),
         assets=assets,
+        completion_gates=[
+            Gate(
+                name=item["name"],
+                status=item["status"],
+                detail="required for repository completion",
+                href=None,
+            )
+            for item in completion["completionGates"]
+        ],
+        runtime_gates=[
+            Gate(
+                name=item["name"],
+                status=item["status"],
+                detail=f"runtime/release state; policy={item['policyName']}",
+                href=None,
+            )
+            for item in completion["runtimeGates"]
+        ],
         gates=[
-            *parse_gate_rows(manifest, workspace, output_dir),
+            *parse_gate_rows(
+                manifest,
+                workspace,
+                output_dir,
+                excluded_gate_names=excluded_gate_names,
+            ),
             *quality_gates,
             *improvement_gates,
         ],
@@ -634,13 +670,13 @@ STYLE = """
 """
 
 SCRIPT = """
-(()=>{'use strict';const DATA=window.REVIEW_CONSOLE_DATA;const state={q:'',status:'all',blockers:'all',slug:new URLSearchParams(location.search).get('product')||'',assetIndex:0};const $=s=>document.querySelector(s);const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'})[c]);const records=DATA.products||[];const bySlug=s=>records.find(r=>r.slug===s);function filtered(){const q=state.q.toLowerCase();return records.filter(r=>(!q||JSON.stringify(r).toLowerCase().includes(q))&&(state.status==='all'||r.state===state.status)&&(state.blockers==='all'||(state.blockers==='yes'?r.blocker_count>0:r.blocker_count===0)))}function writeUrl(){const p=new URLSearchParams;if(state.slug)p.set('product',state.slug);history.replaceState(null,'',`${location.pathname}${p.size?'?'+p:''}`)}function badge(v,k='gate'){return`<span class="${k}-status ${k}-status-${esc(v)}">${esc(v)}</span>`}function heroAsset(r){return(r.assets||[]).find(a=>a.href&&/front/i.test(a.name))||(r.assets||[]).find(a=>a.href)}function renderCatalog(){const list=filtered();$('#product-count').textContent=`${list.length}/${records.length}`;$('#catalog-grid').innerHTML=list.map(r=>{const hero=heroAsset(r);return`<button class="catalog-card" data-product="${esc(r.slug)}" aria-label="${esc(r.slug)} を見る">${hero?`<img class="catalog-image" src="${esc(hero.href)}" alt="${esc(r.slug)} ${esc(hero.name)}">`:'<span class="catalog-placeholder">preview unavailable</span>'}<span class="catalog-copy"><strong>${esc(r.slug)}</strong><span class="catalog-meta"><span class="state">${esc(r.state)}</span><span>blocker ${r.blocker_count}</span></span></span></button>`}).join('')||'<div class="empty">該当製品なし</div>';document.querySelectorAll('[data-product]').forEach(b=>b.onclick=()=>{state.slug=b.dataset.product;writeUrl();renderDetail();$('#product-detail').scrollIntoView({block:'start',behavior:'smooth'})})}function renderDetail(){const r=bySlug(state.slug);$('#detail-empty').hidden=!!r;$('#detail-content').hidden=!r;if(!r)return;$('#product-title').textContent=r.slug;$('#product-state').textContent=r.state;$('#updated').textContent=r.updated_at;$('#manifest-link').href=r.manifest_href;for(const[k,v]of Object.entries({blockers:r.blocker_count,resume:r.resume_point,hash:r.candidate_hash,review:r.human_review_url||'未登録'}))document.querySelector(`[data-summary="${k}"]`).textContent=v;$('#blockers-list').innerHTML=r.blockers.map(b=>`<li><strong>${esc(b.severity)}</strong> ${esc(b.message)}</li>`).join('')||'<li>未解決blockerなし</li>';$('#image-grid').innerHTML=r.assets.map((a,i)=>`<article class="image-card">${a.href?`<img src="${esc(a.href)}" alt="${esc(a.name)}"><button data-viewer="${i}">拡大</button>`:'<div class="empty">画像なし</div>'}<div>${esc(a.kind)} / ${esc(a.name)} ${badge(a.status,'asset')}</div></article>`).join('');document.querySelectorAll('[data-viewer]').forEach(b=>b.onclick=()=>openViewer(Number(b.dataset.viewer)));$('#gate-grid').innerHTML=r.gates.map(g=>`<article class="gate-card"><strong>${esc(g.name)}</strong> ${badge(g.status)}<div>${esc(g.detail)}</div>${g.href?`<a href="${esc(g.href)}">ログを開く</a>`:''}</article>`).join('');$('#evidence-grid').innerHTML=r.evidence.map(e=>`<article class="evidence-card"><strong>${esc(e.label)}</strong> ${badge(e.status)}${e.sha256?`<small>SHA-256 ${esc(e.sha256)}</small>`:''}${e.href?`<div><a href="${esc(e.href)}">証拠を開く</a></div>`:''}</article>`).join('')}function openViewer(i){const r=bySlug(state.slug),a=(r?.assets||[]).filter(x=>x.href);if(!a.length)return;state.assetIndex=(i+a.length)%a.length;$('#viewer-image').src=a[state.assetIndex].href;$('#viewer').hidden=false}function move(d){openViewer(state.assetIndex+d)}$('#q').oninput=e=>{state.q=e.target.value;renderCatalog()};$('#status-filter').onchange=e=>{state.status=e.target.value;renderCatalog()};$('#blocker-filter').onchange=e=>{state.blockers=e.target.value;renderCatalog()};$('#clear').onclick=()=>{state.q='';state.status='all';state.blockers='all';$('#q').value='';renderCatalog()};$('#viewer-close').onclick=()=>$('#viewer').hidden=true;$('#viewer-prev').onclick=()=>move(-1);$('#viewer-next').onclick=()=>move(1);document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#viewer').hidden=true;if(e.key==='ArrowLeft')move(-1);if(e.key==='ArrowRight')move(1)});for(const s of DATA.states){const o=document.createElement('option');o.value=s;o.textContent=s;$('#status-filter').append(o)}if(!bySlug(state.slug))state.slug=records[0]?.slug||'';renderCatalog();renderDetail();writeUrl()})();
+(()=>{'use strict';const DATA=window.REVIEW_CONSOLE_DATA;const state={q:'',status:'all',blockers:'all',slug:new URLSearchParams(location.search).get('product')||'',assetIndex:0};const $=s=>document.querySelector(s);const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'})[c]);const records=DATA.products||[];const bySlug=s=>records.find(r=>r.slug===s);function filtered(){const q=state.q.toLowerCase();return records.filter(r=>(!q||JSON.stringify(r).toLowerCase().includes(q))&&(state.status==='all'||r.state===state.status)&&(state.blockers==='all'||(state.blockers==='yes'?r.blocker_count>0:r.blocker_count===0)))}function writeUrl(){const p=new URLSearchParams;if(state.slug)p.set('product',state.slug);history.replaceState(null,'',`${location.pathname}${p.size?'?'+p:''}`)}function badge(v,k='gate'){return`<span class="${k}-status ${k}-status-${esc(v)}">${esc(v)}</span>`}function heroAsset(r){return(r.assets||[]).find(a=>a.href&&/front/i.test(a.name))||(r.assets||[]).find(a=>a.href)}function gateRows(rows){return(rows||[]).map(g=>`<article class="gate-card"><strong>${esc(g.name)}</strong> ${badge(g.status)}<div>${esc(g.detail)}</div>${g.href?`<a href="${esc(g.href)}">ログを開く</a>`:''}</article>`).join('')||'<div class="empty">該当 gate なし</div>'}function renderCatalog(){const list=filtered();$('#product-count').textContent=`${list.length}/${records.length}`;$('#catalog-grid').innerHTML=list.map(r=>{const hero=heroAsset(r);return`<button class="catalog-card" data-product="${esc(r.slug)}" aria-label="${esc(r.slug)} を見る">${hero?`<img class="catalog-image" src="${esc(hero.href)}" alt="${esc(r.slug)} ${esc(hero.name)}">`:'<span class="catalog-placeholder">preview unavailable</span>'}<span class="catalog-copy"><strong>${esc(r.slug)}</strong><span class="catalog-meta"><span class="state">${esc(r.state)}</span><span>blocker ${r.blocker_count}</span></span></span></button>`}).join('')||'<div class="empty">該当製品なし</div>';document.querySelectorAll('[data-product]').forEach(b=>b.onclick=()=>{state.slug=b.dataset.product;writeUrl();renderDetail();$('#product-detail').scrollIntoView({block:'start',behavior:'smooth'})})}function renderDetail(){const r=bySlug(state.slug);$('#detail-empty').hidden=!!r;$('#detail-content').hidden=!r;if(!r)return;$('#product-title').textContent=r.slug;$('#product-state').textContent=r.state;$('#updated').textContent=r.updated_at;$('#manifest-link').href=r.manifest_href;for(const[k,v]of Object.entries({blockers:r.blocker_count,resume:r.resume_point,hash:r.candidate_hash,review:r.human_review_url||'未登録'}))document.querySelector(`[data-summary="${k}"]`).textContent=v;$('#blockers-list').innerHTML=r.blockers.map(b=>`<li><strong>${esc(b.severity)}</strong> ${esc(b.message)}</li>`).join('')||'<li>未解決blockerなし</li>';$('#image-grid').innerHTML=r.assets.map((a,i)=>`<article class="image-card">${a.href?`<img src="${esc(a.href)}" alt="${esc(a.name)}"><button data-viewer="${i}">拡大</button>`:'<div class="empty">画像なし</div>'}<div>${esc(a.kind)} / ${esc(a.name)} ${badge(a.status,'asset')}</div></article>`).join('');document.querySelectorAll('[data-viewer]').forEach(b=>b.onclick=()=>openViewer(Number(b.dataset.viewer)));$('#completion-gate-grid').innerHTML=gateRows(r.completion_gates);$('#runtime-gate-grid').innerHTML=gateRows(r.runtime_gates);$('#gate-grid').innerHTML=gateRows(r.gates);$('#evidence-grid').innerHTML=r.evidence.map(e=>`<article class="evidence-card"><strong>${esc(e.label)}</strong> ${badge(e.status)}${e.sha256?`<small>SHA-256 ${esc(e.sha256)}</small>`:''}${e.href?`<div><a href="${esc(e.href)}">証拠を開く</a></div>`:''}</article>`).join('')}function openViewer(i){const r=bySlug(state.slug),a=(r?.assets||[]).filter(x=>x.href);if(!a.length)return;state.assetIndex=(i+a.length)%a.length;$('#viewer-image').src=a[state.assetIndex].href;$('#viewer').hidden=false}function move(d){openViewer(state.assetIndex+d)}$('#q').oninput=e=>{state.q=e.target.value;renderCatalog()};$('#status-filter').onchange=e=>{state.status=e.target.value;renderCatalog()};$('#blocker-filter').onchange=e=>{state.blockers=e.target.value;renderCatalog()};$('#clear').onclick=()=>{state.q='';state.status='all';state.blockers='all';$('#q').value='';renderCatalog()};$('#viewer-close').onclick=()=>$('#viewer').hidden=true;$('#viewer-prev').onclick=()=>move(-1);$('#viewer-next').onclick=()=>move(1);document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#viewer').hidden=true;if(e.key==='ArrowLeft')move(-1);if(e.key==='ArrowRight')move(1)});for(const s of DATA.states){const o=document.createElement('option');o.value=s;o.textContent=s;$('#status-filter').append(o)}if(!bySlug(state.slug))state.slug=records[0]?.slug||'';renderCatalog();renderDetail();writeUrl()})();
 """
 
 
 def render_html(data: dict[str, Any]) -> str:
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
-    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>image2outfit</title><style>{STYLE}</style></head><body><a class="skip" href="#catalog">作品一覧へ移動</a><header><strong>image2outfit</strong><nav><a href="#catalog">作品</a><a href="#assets">画像</a><a href="#gates-section">検証</a><a href="#evidence-section">証拠</a></nav></header><main><section class="hero"><p class="hero-kicker">READ ONLY · 3D OUTFIT CATALOG</p><h1>作品から選ぶ。状態と証拠はあとから確認する。</h1><p>現在のProductManifestとレンダリングを同じ正準projectionから公開しています。まず見た目を確認し、必要ならblocker・gate・evidenceまで掘り下げられます。</p></section><section class="controls" aria-label="作品を絞り込む"><input id="q" type="search" aria-label="作品を検索" placeholder="作品を検索"><select id="status-filter"><option value="all">すべての状態</option></select><select id="blocker-filter"><option value="all">blockerすべて</option><option value="yes">あり</option><option value="no">なし</option></select><button id="clear">条件解除</button></section><section id="catalog"><div class="catalog-heading"><div><p class="hero-kicker">CURRENT OUTPUT</p><h2>作品 <span id="product-count"></span></h2></div><small>レンダリング画像を選ぶと詳細を確認できます</small></div><div class="catalog-grid" id="catalog-grid"></div></section><section class="product-detail" id="product-detail"><div id="detail-empty" class="empty">製品なし</div><div id="detail-content" hidden><div class="detail-head"><div><p class="hero-kicker">PRODUCT DETAIL</p><h2 id="product-title"></h2><span id="product-state" class="state"></span><p id="updated"></p></div><a id="manifest-link">ProductManifestを開く</a></div><dl class="summary-grid"><div><dt>blocker</dt><dd data-summary="blockers"></dd></div><div><dt>再開地点</dt><dd data-summary="resume"></dd></div><div><dt>candidate hash</dt><dd data-summary="hash"></dd></div><div><dt>human review</dt><dd data-summary="review"></dd></div></dl><section class="section" id="assets"><h3>レンダリング</h3><div class="image-grid" id="image-grid"></div></section><section class="section"><h3>未解決blocker</h3><ul id="blockers-list"></ul></section><section class="section" id="gates-section"><h3>release gate</h3><div class="gate-grid" id="gate-grid"></div></section><section class="section" id="evidence-section"><h3>証拠 · QualitySpec release projection</h3><div class="evidence-grid" id="evidence-grid"></div></section></div></section></main><div class="viewer" id="viewer" hidden><img id="viewer-image" alt=""><div class="viewer-controls"><button id="viewer-prev">前</button><button id="viewer-next">次</button><button id="viewer-close">閉じる</button></div></div><footer>image2outfit · canonical renders and release evidence · 読み取り専用。</footer><script>window.REVIEW_CONSOLE_DATA={payload};</script><script>{SCRIPT}</script></body></html>"""
+    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>image2outfit</title><style>{STYLE}</style></head><body><a class="skip" href="#catalog">作品一覧へ移動</a><header><strong>image2outfit</strong><nav><a href="#catalog">作品</a><a href="#assets">画像</a><a href="#gates-section">検証</a><a href="#evidence-section">証拠</a></nav></header><main><section class="hero"><p class="hero-kicker">READ ONLY · 3D OUTFIT CATALOG</p><h1>作品から選ぶ。状態と証拠はあとから確認する。</h1><p>現在のProductManifestとレンダリングを同じ正準projectionから公開しています。まず見た目を確認し、必要ならblocker・gate・evidenceまで掘り下げられます。</p></section><section class="controls" aria-label="作品を絞り込む"><input id="q" type="search" aria-label="作品を検索" placeholder="作品を検索"><select id="status-filter"><option value="all">すべての状態</option></select><select id="blocker-filter"><option value="all">blockerすべて</option><option value="yes">あり</option><option value="no">なし</option></select><button id="clear">条件解除</button></section><section id="catalog"><div class="catalog-heading"><div><p class="hero-kicker">CURRENT OUTPUT</p><h2>作品 <span id="product-count"></span></h2></div><small>レンダリング画像を選ぶと詳細を確認できます</small></div><div class="catalog-grid" id="catalog-grid"></div></section><section class="product-detail" id="product-detail"><div id="detail-empty" class="empty">製品なし</div><div id="detail-content" hidden><div class="detail-head"><div><p class="hero-kicker">PRODUCT DETAIL</p><h2 id="product-title"></h2><span id="product-state" class="state"></span><p id="updated"></p></div><a id="manifest-link">ProductManifestを開く</a></div><dl class="summary-grid"><div><dt>blocker</dt><dd data-summary="blockers"></dd></div><div><dt>再開地点</dt><dd data-summary="resume"></dd></div><div><dt>candidate hash</dt><dd data-summary="hash"></dd></div><div><dt>human review</dt><dd data-summary="review"></dd></div></dl><section class="section" id="assets"><h3>レンダリング</h3><div class="image-grid" id="image-grid"></div></section><section class="section"><h3>未解決blocker</h3><ul id="blockers-list"></ul></section><section class="section" id="gates-section"><h3>completion gate</h3><div class="gate-grid" id="completion-gate-grid"></div><h3>runtime / release state</h3><div class="gate-grid" id="runtime-gate-grid"></div><h3>その他の検証</h3><div class="gate-grid" id="gate-grid"></div></section><section class="section" id="evidence-section"><h3>証拠 · QualitySpec release projection</h3><div class="evidence-grid" id="evidence-grid"></div></section></div></section></main><div class="viewer" id="viewer" hidden><img id="viewer-image" alt=""><div class="viewer-controls"><button id="viewer-prev">前</button><button id="viewer-next">次</button><button id="viewer-close">閉じる</button></div></div><footer>image2outfit · canonical renders and release evidence · 読み取り専用。</footer><script>window.REVIEW_CONSOLE_DATA={payload};</script><script>{SCRIPT}</script></body></html>"""
 
 
 def build(root: Path, output: Path) -> dict[str, Any]:
@@ -648,6 +684,7 @@ def build(root: Path, output: Path) -> dict[str, Any]:
     output = output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     policy = load_json(root / "config" / "release-policy.json", {})
+    handoff_policy = load_json(root / "config" / "genworks-handoff-policy.json", {})
     required_views, required_poses = policy_requirements(policy)
     products: list[Product] = []
     product_root = root / "Assets" / "GenWorks"
@@ -659,10 +696,16 @@ def build(root: Path, output: Path) -> dict[str, Any]:
                         root, workspace, output, required_views, required_poses
                     )
                 )
+    states = [str(item).upper() for item in handoff_policy.get("statuses", STATES)]
+    if (
+        any(product.state == "INVALID" for product in products)
+        and "INVALID" not in states
+    ):
+        states.append("INVALID")
     data = {
         "schema_version": "review-console.v2",
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "states": list(STATES),
+        "states": states,
         "required_views": required_views,
         "required_poses": required_poses,
         "products": [asdict(product) for product in products],
