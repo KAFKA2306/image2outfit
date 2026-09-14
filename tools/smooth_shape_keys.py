@@ -5,6 +5,7 @@ The vendor add-on is intentionally not bundled. Exact module/operator ids are
 read from the product construction contract and must come from the installed
 add-on, never from guesses in this repository.
 """
+
 from __future__ import annotations
 
 import importlib
@@ -17,9 +18,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 PROVIDER = "maxwilso-smooth-shape-keys"
 REPORT_NAME = "smooth-shape-keys.json"
-OPERATOR_ID = re.compile(
-    r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$"
-)
+OPERATOR_ID = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$")
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -40,9 +39,7 @@ def _write_json(path: Path, value: dict[str, Any]) -> None:
 
 def _construction(job: dict[str, Any], root: Path) -> dict[str, Any]:
     product_id = str(job.get("id") or "")
-    return _read_json(
-        root / "config" / "products" / product_id / "construction.json"
-    )
+    return _read_json(root / "config" / "products" / product_id / "construction.json")
 
 
 def _report_path(job: dict[str, Any], root: Path) -> Path:
@@ -80,8 +77,10 @@ def _contract_errors(contract: Any) -> list[str]:
             errors.append("operator must be an exact Blender operator id")
         if invocation not in {"ACTIVE_KEY", "OPERATOR_MANAGED"}:
             errors.append("invocation must be ACTIVE_KEY or OPERATOR_MANAGED")
-        if not isinstance(targets, list) or not targets or not all(
-            isinstance(item, str) and item.strip() for item in targets
+        if (
+            not isinstance(targets, list)
+            or not targets
+            or not all(isinstance(item, str) and item.strip() for item in targets)
         ):
             errors.append("targets must contain at least one exact selector")
         if not isinstance(properties, dict):
@@ -119,10 +118,7 @@ def _uv_state(mesh: Any) -> tuple[Any, ...]:
 def _weights(obj: Any) -> tuple[Any, ...]:
     return tuple(
         tuple(
-            sorted(
-                (int(group.group), float(group.weight))
-                for group in vertex.groups
-            )
+            sorted((int(group.group), float(group.weight)) for group in vertex.groups)
         )
         for vertex in obj.data.vertices
     )
@@ -163,9 +159,7 @@ def _selectors(snapshot: dict[str, Any]) -> list[str]:
     return result
 
 
-def _resolve_targets(
-    snapshot: dict[str, Any], requested: list[str]
-) -> list[str]:
+def _resolve_targets(snapshot: dict[str, Any], requested: list[str]) -> list[str]:
     available = _selectors(snapshot)
     resolved: list[str] = []
     for selector in requested:
@@ -173,9 +167,7 @@ def _resolve_targets(
             matches = [value for value in available if value == selector]
         else:
             matches = [
-                value
-                for value in available
-                if value.rsplit(":", 1)[1] == selector
+                value for value in available if value.rsplit(":", 1)[1] == selector
             ]
         for match in matches:
             if match not in resolved:
@@ -189,10 +181,7 @@ def _max_mean_change(
     distances: list[float] = []
     for left, right in zip(before, after, strict=True):
         distance = math.sqrt(
-            sum(
-                (a - b) ** 2
-                for a, b in zip(left, right, strict=True)
-            )
+            sum((a - b) ** 2 for a, b in zip(left, right, strict=True))
         )
         distances.append(distance)
     return (
@@ -250,17 +239,13 @@ def _validate(
                 continue
             right_coords = right_keys[key_name]
             if any(
-                not math.isfinite(value)
-                for point in right_coords
-                for value in point
+                not math.isfinite(value) for point in right_coords for value in point
             ):
                 errors.append(f"{selector}: non-finite coordinates")
                 continue
             if selector not in targets:
                 if left_coords != right_coords:
-                    errors.append(
-                        f"{selector}: non-target shape key changed"
-                    )
+                    errors.append(f"{selector}: non-target shape key changed")
                 continue
             maximum, mean = _max_mean_change(left_coords, right_coords)
             metrics["targets"][selector] = {
@@ -357,14 +342,11 @@ def apply_for_job(
     requested = list(contract["targets"])
     targets = _resolve_targets(before, requested)
     unresolved = [
-        selector
-        for selector in requested
-        if not _resolve_targets(before, [selector])
+        selector for selector in requested if not _resolve_targets(before, [selector])
     ]
     if unresolved or not targets:
         errors = [
-            "shape key targets did not resolve: "
-            + ", ".join(unresolved or requested)
+            "shape key targets did not resolve: " + ", ".join(unresolved or requested)
         ]
         report = {
             **base_report,
