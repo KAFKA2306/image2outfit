@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-crescent-rail-romper-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "crescent-rail-r1",
+  "panels": ["romper_front_L","romper_front_R","romper_back_L","romper_back_R","waistband_front","waistband_back","sleeve_cap_L","sleeve_cap_R","modesty_insert","zip_facing"],
+  "separateGeometry": ["crescent_rail_outer","crescent_rail_inner","rail_facing_outer","rail_facing_inner"],
+  "priorityFitZones": ["chest","waist","hip","crotch","upper-leg"],
+  "requiredPoses": ["neutral","arms-up","arm-cross","crouch","sit","prone"],
+  "releaseBoundary": "Technical manufacturing only; sales/adoption are not completion gates.",
+  "clothSimulation": {"applicability":"NOT_REQUIRED","components":[],"evidence":"all hero rails are bounded weight-driven geometry","reason":"No long cloth or physics-dependent silhouette."},
+  "shapeKeyPostprocess": {"provider":"maxwilso-smooth-shape-keys","applicability":"NOT_REQUIRED","reason":"Structural checkpoint has no generated garment Shape Keys; reassess after fitted candidate exists."}
+}
