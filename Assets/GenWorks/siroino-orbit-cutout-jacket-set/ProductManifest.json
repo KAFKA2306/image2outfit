@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-orbit-cutout-jacket-set",
+  "productName": "Orbit Cutout Jacket Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-orbit-cutout-jacket-set",
+  "sourceJobPath": "config/products/siroino-orbit-cutout-jacket-set/job.json",
+  "generatedAt": "2026-09-15T06:44:00+09:00",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "structuralPrototype": "PASS",
+    "canonicalJob": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "technicalGates": {
+    "blender": "UNVERIFIED",
+    "uvMapping": "PASS",
+    "weightTransfer": "UNVERIFIED",
+    "exactBodyPoseRenders": "UNVERIFIED",
+    "latestGeometryRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabSerialized": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-orbit-cutout-jacket-set",
+    "doNotRebuildFromZero": true,
+    "issue": 563,
+    "resumeFrom": "config/products/siroino-orbit-cutout-jacket-set/job.json",
+    "blockers": []
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-orbit-cutout-jacket-set/Source/Prototype/structural.obj",
+    "sha256": "c8f446a131b1e8f32077021ec422fdf0dbc0eab545b7d7fc351797559e7b12b8",
+    "vertices": 128,
+    "uvCoordinates": 128,
+    "polygonFaces": 32,
+    "namedGroups": 15,
+    "materialRoles": 5,
+    "heroGroups": ["orbit_frame_outer", "orbit_frame_inner", "cutout_facing_front", "cutout_facing_back"]
+  }
+}
