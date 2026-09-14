@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-bellows-knee-utility-set",
+  "productName": "Bellows Knee Utility Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-bellows-knee-utility-set",
+  "sourceJobPath": "config/products/siroino-bellows-knee-utility-set/job.json",
+  "generatedAt": "2026-09-15T03:45:00+09:00",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "structuralPrototype": "PASS",
+    "canonicalJob": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "technicalGates": {
+    "blender": "UNVERIFIED",
+    "uvMapping": "PASS",
+    "weightTransfer": "UNVERIFIED",
+    "exactBodyPoseRenders": "UNVERIFIED",
+    "latestGeometryRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabSerialized": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-bellows-knee-utility-set",
+    "doNotRebuildFromZero": true,
+    "issue": 553,
+    "resumeFrom": "config/products/siroino-bellows-knee-utility-set/job.json",
+    "blockers": []
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-bellows-knee-utility-set/Source/Prototype/structural.obj",
+    "sha256": "2c67a8b91ba7e33e8622f958426df650f8cbeff9ee983943210ea65311242198",
+    "vertices": 64,
+    "uvCoordinates": 64,
+    "polygonFaces": 16,
+    "namedGroups": 16,
+    "materialRoles": 5,
+    "heroGroups": [
+      "bellows_knee_L_outer",
+      "bellows_knee_L_inner",
+      "knee_facing_L",
+      "bellows_knee_R_outer",
+      "bellows_knee_R_inner",
+      "knee_facing_R"
+    ]
+  }
+}
