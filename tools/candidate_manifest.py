@@ -129,9 +129,7 @@ def _shape_key_requirement(job: dict[str, Any]) -> str | None:
     product_id = job.get("id")
     if not isinstance(product_id, str) or not product_id:
         return None
-    construction = read(
-        ROOT / "config" / "products" / product_id / "construction.json"
-    )
+    construction = read(ROOT / "config" / "products" / product_id / "construction.json")
     postprocess = construction.get("shapeKeyPostprocess")
     if not isinstance(postprocess, dict):
         return None
