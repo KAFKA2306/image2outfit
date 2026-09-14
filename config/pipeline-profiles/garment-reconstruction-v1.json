@@ -129,6 +129,30 @@
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
+      "tools": [
+        {
+          "toolName": "blender-cloth-simulator",
+          "purpose": "Apply the declared cloth, collision, and cache contract in the existing Blender runtime.",
+          "runtime": "blender",
+          "priority": 100,
+          "deterministic": true,
+          "capabilities": [
+            "cloth-simulation"
+          ]
+        },
+        {
+          "toolName": "marvelous-designer-python-api",
+          "purpose": "Replay canonical pattern, stitch, arrangement, and realized Fabric/PBR contracts through the official Marvelous Designer Python API.",
+          "runtime": "marvelous-designer",
+          "priority": 200,
+          "deterministic": true,
+          "capabilities": [
+            "cloth-simulation",
+            "pattern-sewing",
+            "pbr-fabric"
+          ]
+        }
+      ],
       "managedOutputs": [
         "clothCache",
         "simulationConfig",
