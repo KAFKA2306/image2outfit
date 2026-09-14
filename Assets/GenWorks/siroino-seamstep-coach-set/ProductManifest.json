@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-seamstep-coach-set",
+  "productName": "Seamstep Coach Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-seamstep-coach-set",
+  "documentationPath": "Assets/GenWorks/siroino-seamstep-coach-set/README.md",
+  "sourceJobPath": "config/products/siroino-seamstep-coach-set/job.json",
+  "generatedAt": "2026-09-14T09:45:00Z",
+  "designRevision": "v1-seamstep-coach",
+  "completionGates": {
+    "manufacturingImage": "PASS",
+    "constructionContract": "PASS",
+    "patternDecomposition": "PASS",
+    "prototypeGeometry": "PASS",
+    "uvMapping": "PASS",
+    "heroGeometry": "PASS",
+    "canonicalJob": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "rigWeight": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat": "UNVERIFIED"
+  },
+  "metrics": {
+    "prototypeVertices": 60,
+    "prototypeUvCoordinates": 60,
+    "prototypePolygonFaces": 15,
+    "prototypeNamedGroups": 15,
+    "heroGroups": 6,
+    "degenerateFaces": 0
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-seamstep-coach-set",
+    "blockers": [
+      "No compatible generic repository-owned garment builder has yet been proven for this new panel set."
+    ],
+    "nextAction": "Prove a current-main repository-owned generic garment build entrypoint, then add a schema-valid job.json and execute task candidate for this exact product."
+  }
+}
