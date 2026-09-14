@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Register a Blender render hook that records reproducible evidence metadata."""
+"""Register Blender hooks for reproducible render and Shape Key evidence."""
 
 from __future__ import annotations
 
@@ -14,6 +14,12 @@ import bpy
 from bpy.app.handlers import persistent
 
 ROOT = Path(__file__).resolve().parents[1]
+TOOLS = ROOT / "tools"
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
+import smooth_shape_keys  # noqa: E402
+
 SCHEMA_VERSION = 1
 KIND = "image2outfit-render-evidence-metadata"
 
@@ -25,7 +31,9 @@ def _read_job() -> dict[str, Any]:
         job_index = arguments.index("--job")
         job_path = Path(arguments[job_index + 1]).resolve()
     except (ValueError, IndexError) as exc:
-        raise RuntimeError("render metadata bootstrap requires --job <path>") from exc
+        raise RuntimeError(
+            "render metadata bootstrap requires --job <path>"
+        ) from exc
     return json.loads(job_path.read_text(encoding="utf-8"))
 
 
@@ -61,9 +69,28 @@ def install() -> None:
             "render evidence requires job.renderLoopRevision or job.buildRevision"
         )
     source_commit = _source_commit()
+    shape_key_finished = False
 
     @persistent
-    def record(scene: bpy.types.Scene, _depsgraph: object | None = None) -> None:
+    def smooth_before_save(*_args: object) -> None:
+        nonlocal shape_key_finished
+        if shape_key_finished:
+            return
+        report = smooth_shape_keys.apply_for_job(
+            job,
+            root=ROOT,
+            bpy_module=bpy,
+        )
+        shape_key_finished = report.get("status") in {
+            "APPLIED",
+            "EXPLICITLY_NOT_REQUIRED",
+        }
+
+    @persistent
+    def record(
+        scene: bpy.types.Scene,
+        _depsgraph: object | None = None,
+    ) -> None:
         output = Path(bpy.path.abspath(scene.render.filepath)).resolve()
         try:
             output.relative_to(preview_root)
@@ -93,22 +120,38 @@ def install() -> None:
                 "engine": str(scene.render.engine),
                 "resolutionX": int(scene.render.resolution_x),
                 "resolutionY": int(scene.render.resolution_y),
-                "resolutionPercentage": int(scene.render.resolution_percentage),
+                "resolutionPercentage": int(
+                    scene.render.resolution_percentage
+                ),
             },
         }
         sidecar = output.with_name(output.name + ".render.json")
         sidecar.write_text(
-            json.dumps(metadata, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            json.dumps(
+                metadata,
+                ensure_ascii=False,
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
             encoding="utf-8",
         )
 
-    handlers = bpy.app.handlers.render_post
+    save_handlers = bpy.app.handlers.save_pre
+    if not any(
+        getattr(handler, "__name__", "") == "image2outfit_smooth_shape_keys"
+        for handler in save_handlers
+    ):
+        smooth_before_save.__name__ = "image2outfit_smooth_shape_keys"
+        save_handlers.append(smooth_before_save)
+
+    render_handlers = bpy.app.handlers.render_post
     if not any(
         getattr(handler, "__name__", "") == "record_render_evidence"
-        for handler in handlers
+        for handler in render_handlers
     ):
         record.__name__ = "record_render_evidence"
-        handlers.append(record)
+        render_handlers.append(record)
 
 
 install()
