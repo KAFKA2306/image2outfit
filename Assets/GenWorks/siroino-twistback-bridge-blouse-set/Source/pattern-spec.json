@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-twistback-bridge-blouse-set",
+  "units": "normalized-prototype",
+  "parts": [
+    {"name":"blouse_front_L","role":"fabric_outer"},
+    {"name":"blouse_front_R","role":"fabric_outer"},
+    {"name":"blouse_back","role":"fabric_outer"},
+    {"name":"sleeve_L","role":"fabric_outer"},
+    {"name":"sleeve_R","role":"fabric_outer"},
+    {"name":"inner_front","role":"fabric_inner"},
+    {"name":"inner_back","role":"fabric_inner"},
+    {"name":"trouser_front_L","role":"fabric_bottom"},
+    {"name":"trouser_front_R","role":"fabric_bottom"},
+    {"name":"trouser_back_L","role":"fabric_bottom"},
+    {"name":"trouser_back_R","role":"fabric_bottom"},
+    {"name":"waistband","role":"fabric_bottom"},
+    {"name":"back_yoke","role":"fabric_outer"},
+    {"name":"twist_bridge_outer","role":"accent","hero":true},
+    {"name":"twist_bridge_inner","role":"accent","hero":true},
+    {"name":"bridge_facing_L","role":"accent","hero":true},
+    {"name":"bridge_facing_R","role":"accent","hero":true}
+  ],
+  "heroContract": {
+    "requiredGroups": ["twist_bridge_outer","twist_bridge_inner","bridge_facing_L","bridge_facing_R"],
+    "crossingCount": 1,
+    "freeTailCount": 0,
+    "textureOnlySubstituteAllowed": false
+  },
+  "materialRoles": ["fabric_outer","fabric_inner","fabric_bottom","accent"],
+  "uv": {"set":"UV0","domain":"0..1","heroIslandsUnique":true},
+  "lod0TriangleTargetMax": 20000
+}
