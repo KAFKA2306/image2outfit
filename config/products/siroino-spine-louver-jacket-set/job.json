@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-generic-structural",
+  "id": "siroino-spine-louver-jacket-set",
+  "productName": "Spine Louver Jacket Set",
+  "adapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-spine-louver-jacket-set",
+  "productManifestPath": "Assets/GenWorks/siroino-spine-louver-jacket-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-spine-louver-jacket-set/Source/Blender/SpineLouverJacketSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-spine-louver-jacket-set/Models/SpineLouverJacketSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-spine-louver-jacket-set/Prefab/SpineLouverJacketSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-spine-louver-jacket-set/Prefab/SiroinoSotai_SpineLouverJacketSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-spine-louver-jacket-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/README.md",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Source/Blender/SpineLouverJacketSet.blend",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Models/SpineLouverJacketSet.fbx",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Prefab/SpineLouverJacketSet.prefab",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Prefab/SiroinoSotai_SpineLouverJacketSet.prefab",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/front.png",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/back.png",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/left.png",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/right.png",
+    "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-spine-louver-jacket-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-spine-louver-jacket-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-spine-louver-jacket-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-spine-louver-jacket-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Shell", "role": "fabric"},
+      {"material": "MAT_Inner", "role": "fabric"},
+      {"material": "MAT_Bottoms", "role": "fabric"},
+      {"material": "MAT_Hero", "role": "trim"},
+      {"material": "MAT_Accent", "role": "trim"}
+    ]
+  }
+}

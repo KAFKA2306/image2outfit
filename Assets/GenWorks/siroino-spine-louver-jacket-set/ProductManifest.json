@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-spine-louver-jacket-set",
+  "productName": "Spine Louver Jacket Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-spine-louver-jacket-set",
+  "sourceJobPath": "config/products/siroino-spine-louver-jacket-set/job.json",
+  "generatedAt": "2026-09-15T04:45:00+09:00",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "structuralPrototype": "PASS",
+    "canonicalJob": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "technicalGates": {
+    "blender": "UNVERIFIED",
+    "uvMapping": "PASS",
+    "weightTransfer": "UNVERIFIED",
+    "exactBodyPoseRenders": "UNVERIFIED",
+    "latestGeometryRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabSerialized": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-spine-louver-jacket-set",
+    "doNotRebuildFromZero": true,
+    "issue": 559,
+    "resumeFrom": "config/products/siroino-spine-louver-jacket-set/job.json",
+    "blockers": []
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-spine-louver-jacket-set/Source/Prototype/structural.obj",
+    "sha256": "f1b6323d40c5c10e733f4f7cdabae23c6b3109299d6de965e26d03e822784660",
+    "vertices": 72,
+    "uvCoordinates": 72,
+    "polygonFaces": 18,
+    "namedGroups": 18,
+    "materialRoles": 5,
+    "heroGroups": ["louver_A","louver_B","louver_C","louver_D","louver_E","louver_facing"]
+  }
+}

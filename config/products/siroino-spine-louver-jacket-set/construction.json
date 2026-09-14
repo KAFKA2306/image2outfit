@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-spine-louver-jacket-set",
+  "profile": "panel-sewn",
+  "target": "Siroino first",
+  "designRevision": "spine-louver-v1",
+  "panels": ["jacket_front_L","jacket_front_R","jacket_back","sleeve_L","sleeve_R","inner_front","inner_back","trouser_front_L","trouser_front_R","trouser_back_L","trouser_back_R","waistband"],
+  "separateGeometry": ["louver_A","louver_B","louver_C","louver_D","louver_E","louver_facing"],
+  "priorityFitZones": ["shoulder","elbow","waist","hip","knee","center_back"],
+  "releaseBoundary": "Technical acceptance only; sales, adoption and human preference are not completion gates.",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Spine louvers are short structured shells intended for deterministic skinning in v1.",
+    "reason": "No long free cloth component is needed for product identity."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "Initial pass owns no corrective garment Shape Keys; fit and deformation are owned by canonical fit/weight stages."
+  }
+}
