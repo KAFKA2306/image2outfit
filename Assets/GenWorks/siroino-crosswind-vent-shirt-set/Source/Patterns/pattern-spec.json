@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-crosswind-vent-shirt-set",
+  "designRevision": "v1-crosswind-vent",
+  "units": "normalized-avatar-space",
+  "pieces": [
+    {"id":"shirt_front_L","quantity":1,"materialRole":"fabric_outer","mirrorOf":"shirt_front_R"},
+    {"id":"shirt_front_R","quantity":1,"materialRole":"fabric_outer","mirrorOf":"shirt_front_L"},
+    {"id":"shirt_back","quantity":1,"materialRole":"fabric_outer"},
+    {"id":"short_sleeve_L","quantity":1,"materialRole":"fabric_outer","mirrorOf":"short_sleeve_R"},
+    {"id":"short_sleeve_R","quantity":1,"materialRole":"fabric_outer","mirrorOf":"short_sleeve_L"},
+    {"id":"inner_front","quantity":1,"materialRole":"fabric_inner"},
+    {"id":"inner_back","quantity":1,"materialRole":"fabric_inner"},
+    {"id":"short_front_L","quantity":1,"materialRole":"fabric_inner","mirrorOf":"short_front_R"},
+    {"id":"short_front_R","quantity":1,"materialRole":"fabric_inner","mirrorOf":"short_front_L"},
+    {"id":"short_back_L","quantity":1,"materialRole":"fabric_inner","mirrorOf":"short_back_R"},
+    {"id":"short_back_R","quantity":1,"materialRole":"fabric_inner","mirrorOf":"short_back_L"},
+    {"id":"waistband_outer","quantity":1,"materialRole":"trim"},
+    {"id":"waistband_inner","quantity":1,"materialRole":"trim"},
+    {"id":"shirt_facing","quantity":1,"materialRole":"trim"},
+    {"id":"vent_facing_L","quantity":2,"materialRole":"accent"},
+    {"id":"vent_facing_R","quantity":2,"materialRole":"accent"}
+  ],
+  "heroGeometry": [
+    {"id":"back_vent_L","role":"shoulder-blade ventilation flap","bounded":true},
+    {"id":"back_vent_R","role":"shoulder-blade ventilation flap","bounded":true},
+    {"id":"side_vent_L","role":"side-hem ventilation flap","bounded":true},
+    {"id":"side_vent_R","role":"side-hem ventilation flap","bounded":true}
+  ],
+  "materialRoles": ["fabric_outer","fabric_inner","accent","trim","metal"],
+  "uvPolicy": "UV0 in 0..1; all hero flap islands unique in production candidate",
+  "rigPolicy": "reuse target humanoid; no extra bones in v1",
+  "physicsPolicy": "NOT_REQUIRED"
+}
