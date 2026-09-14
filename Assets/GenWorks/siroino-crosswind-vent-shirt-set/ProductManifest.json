@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-crosswind-vent-shirt-set",
+  "productName": "Crosswind Vent Shirt Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-crosswind-vent-shirt-set",
+  "documentationPath": "Assets/GenWorks/siroino-crosswind-vent-shirt-set/README.md",
+  "generatedAt": "2026-09-14T05:47:00Z",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-crosswind-vent-shirt-set",
+    "resumeFrom": "Assets/GenWorks/siroino-crosswind-vent-shirt-set/Models/crosswind-vent-shirt-set-prototype.obj",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "No compatible reusable current-main buildScript has been proven for this new panel set. Do not bind the product to an unrelated product-specific builder."
+    ],
+    "nextAction": "Prove a reusable repository-owned garment build entrypoint, then add a schema-valid config/products/siroino-crosswind-vent-shirt-set/job.json and execute the exact candidate through hosted Blender."
+  },
+  "prototype": {
+    "artifact": "Assets/GenWorks/siroino-crosswind-vent-shirt-set/Models/crosswind-vent-shirt-set-prototype.obj",
+    "validation": "Assets/GenWorks/siroino-crosswind-vent-shirt-set/Evidence/prototype-validation.json",
+    "sha256": "a582cd84801ca0e80e97e7a66ec765b19a54273610c6f051dac45565ed59c034",
+    "vertices": 60,
+    "uvCoordinates": 60,
+    "polygonFaces": 15,
+    "namedGroups": 15,
+    "degenerateFaces": 0,
+    "heroGroups": ["back_vent_L", "back_vent_R", "side_vent_L", "side_vent_R"]
+  },
+  "technicalGates": {
+    "constructionContract": "PASS",
+    "patternDecomposition": "PASS",
+    "prototypeGeometry": "PASS",
+    "prototypeUV0": "PASS",
+    "heroGeometry": "PASS",
+    "prototypeStructuralValidation": "PASS",
+    "avatarFit": "UNVERIFIED",
+    "rigging": "UNVERIFIED",
+    "weighting": "UNVERIFIED",
+    "fbxExport": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "designRevision": "v1-crosswind-vent"
+}
