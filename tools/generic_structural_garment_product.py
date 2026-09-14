@@ -37,7 +37,9 @@ def _require_bpy():
     try:
         import bpy
     except ImportError as exc:
-        raise RuntimeError("generic_structural_garment_product.py must run inside Blender") from exc
+        raise RuntimeError(
+            "generic_structural_garment_product.py must run inside Blender"
+        ) from exc
     return bpy
 
 
@@ -84,7 +86,8 @@ def main() -> int:
         import_vertex_groups=True,
     )
     garment = [
-        item for item in bpy.context.scene.objects
+        item
+        for item in bpy.context.scene.objects
         if item not in before and item.type == "MESH"
     ]
     if not garment:
@@ -102,7 +105,9 @@ def main() -> int:
         bpy.ops.object.modifier_apply(modifier=solid.name)
         item.select_set(False)
 
-        transfer = item.modifiers.new(name="Image2OutfitWeightTransfer", type="DATA_TRANSFER")
+        transfer = item.modifiers.new(
+            name="Image2OutfitWeightTransfer", type="DATA_TRANSFER"
+        )
         transfer.object = body
         transfer.use_vert_data = True
         transfer.data_types_verts = {"VGROUP_WEIGHTS"}
@@ -119,11 +124,13 @@ def main() -> int:
         arm = item.modifiers.new(name="Armature", type="ARMATURE")
         arm.object = armature
         item.parent = armature
-        transferred.append({
-            "name": item.name,
-            "vertices": len(item.data.vertices),
-            "vertexGroups": len(item.vertex_groups),
-        })
+        transferred.append(
+            {
+                "name": item.name,
+                "vertices": len(item.data.vertices),
+                "vertexGroups": len(item.vertex_groups),
+            }
+        )
 
     blend_path = _repo_path(job["blendPath"])
     fbx_path = _repo_path(job["fbxAssetPath"])
