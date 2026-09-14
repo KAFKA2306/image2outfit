@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-arc-tabard-layer-set",
+  "status": "IN_PROGRESS",
+  "worklineIssue": 494,
+  "verification": {
+    "manufacturingReference": "PASS",
+    "patternDecomposition": "PASS",
+    "prototypeGeometry": "PASS",
+    "prototypeUV0": "PASS",
+    "prototypeMaterialRoles": "PASS",
+    "canonicalJobValidation": "UNVERIFIED",
+    "blenderBuild": "UNVERIFIED",
+    "siroinoFit": "UNVERIFIED",
+    "rigWeight": "UNVERIFIED",
+    "fbxExport": "UNVERIFIED",
+    "prefabIntegration": "UNVERIFIED",
+    "fiveViewRender": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat": "UNVERIFIED"
+  },
+  "artifacts": {
+    "reference": "Assets/GenWorks/siroino-arc-tabard-layer-set/References/arc-tabard-manufacturing-sheet.svg",
+    "pattern": "config/products/siroino-arc-tabard-layer-set/pattern-spec.json",
+    "prototypeObj": "Assets/GenWorks/siroino-arc-tabard-layer-set/Source/Prototype/arc-tabard-prototype.obj",
+    "prototypeMtl": "Assets/GenWorks/siroino-arc-tabard-layer-set/Source/Prototype/arc-tabard-prototype.mtl"
+  },
+  "blocker": "Canonical executable job/build path has not yet been connected or executed in a Blender-capable runtime.",
+  "nextAction": "Create schema-valid canonical job.json by reusing the existing Siroino product contract, then run the existing candidate/build path for this same product; do not claim Blender/rig/export/render PASS until actual evidence exists."
+}
