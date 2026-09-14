@@ -31,9 +31,7 @@ def _read_job() -> dict[str, Any]:
         job_index = arguments.index("--job")
         job_path = Path(arguments[job_index + 1]).resolve()
     except (ValueError, IndexError) as exc:
-        raise RuntimeError(
-            "render metadata bootstrap requires --job <path>"
-        ) from exc
+        raise RuntimeError("render metadata bootstrap requires --job <path>") from exc
     return json.loads(job_path.read_text(encoding="utf-8"))
 
 
@@ -120,9 +118,7 @@ def install() -> None:
                 "engine": str(scene.render.engine),
                 "resolutionX": int(scene.render.resolution_x),
                 "resolutionY": int(scene.render.resolution_y),
-                "resolutionPercentage": int(
-                    scene.render.resolution_percentage
-                ),
+                "resolutionPercentage": int(scene.render.resolution_percentage),
             },
         }
         sidecar = output.with_name(output.name + ".render.json")
