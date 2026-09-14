@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-orbit-cutout-jacket-set",
+  "units": "m",
+  "source": {
+    "manufacturingReference": "Assets/GenWorks/siroino-orbit-cutout-jacket-set/References/orbit-cutout-jacket-set-manufacturing-sheet.svg",
+    "designRevision": "orbit-cutout-v1"
+  },
+  "panels": [
+    {"id":"jacket_front_L","role":"shell","material":"MAT_Shell"},
+    {"id":"jacket_front_R","role":"shell","material":"MAT_Shell"},
+    {"id":"jacket_back","role":"shell","material":"MAT_Shell"},
+    {"id":"sleeve_L","role":"shell","material":"MAT_Shell"},
+    {"id":"sleeve_R","role":"shell","material":"MAT_Shell"},
+    {"id":"inner_front","role":"inner","material":"MAT_Inner"},
+    {"id":"inner_back","role":"inner","material":"MAT_Inner"},
+    {"id":"trouser_L","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"trouser_R","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"waistband","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"back_yoke","role":"trim","material":"MAT_Accent"},
+    {"id":"orbit_frame_outer","role":"hero","material":"MAT_Hero"},
+    {"id":"orbit_frame_inner","role":"hero","material":"MAT_Hero"},
+    {"id":"cutout_facing_front","role":"hero-facing","material":"MAT_Accent"},
+    {"id":"cutout_facing_back","role":"hero-facing","material":"MAT_Accent"}
+  ],
+  "heroDetail": {
+    "id": "asymmetric-orbit-waist-cutout",
+    "requiredGroups": ["orbit_frame_outer","orbit_frame_inner","cutout_facing_front","cutout_facing_back"],
+    "requirements": ["real negative-space opening", "raised outer and inner frame geometry", "bounded wearer-left deformation", "unique UV islands"]
+  },
+  "fitZones": ["shoulder","elbow","waist","hip","crotch","knee"],
+  "acceptance": {
+    "structuralGroups": 15,
+    "heroGroups": 4,
+    "minimumMaterialRoles": 4,
+    "lod0TriangleTarget": 20000
+  }
+}
