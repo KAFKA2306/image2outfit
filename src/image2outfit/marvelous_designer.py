@@ -45,15 +45,22 @@ MARVELOUS_DESIGNER_RUNTIME = MarvelousDesignerRuntimeDescriptor(
         "utility_api",
     ),
     required_functions=(
+        "import_api.ImportFBX",
         "pattern_api.CreatePatternWithPoints",
+        "pattern_api.CreateInternalShapeWithPoints",
         "pattern_api.SetPatternPieceName",
         "pattern_api.SetPatternPieceGrainDirection",
         "pattern_api.AddSeamlinePairGroup",
         "pattern_api.SetArrangement",
+        "pattern_api.SetArrangementPosition",
+        "pattern_api.SetArrangementOrientation",
         "fabric_api.CreateZfabFromTextures",
         "fabric_api.AddFabric",
         "fabric_api.AssignFabricToPattern",
         "utility_api.NewProject",
+        "utility_api.SetSimulationQuality",
+        "utility_api.SetSimulationTimeStep",
+        "utility_api.SetSimulationNumberOfSimulation",
         "utility_api.Simulate",
         "export_api.ExportZPrj",
         "export_api.ExportOBJ",
@@ -100,20 +107,54 @@ def _require_list(value: object, label: str) -> list[Any]:
     return value
 
 
+def _piece_id(piece: Mapping[str, Any]) -> str:
+    value = piece.get("pieceId", piece.get("id"))
+    if not isinstance(value, str) or not value:
+        raise MarvelousDesignerContractError("pattern pieceId is required")
+    return value
+
+
 def _piece_lookup(pattern: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
     pieces = _require_list(pattern.get("pieces"), "pattern.pieces")
     result: dict[str, Mapping[str, Any]] = {}
     for raw in pieces:
         piece = _require_object(raw, "pattern piece")
-        piece_id = piece.get("pieceId")
-        if not isinstance(piece_id, str) or not piece_id:
-            raise MarvelousDesignerContractError("pattern pieceId is required")
+        piece_id = _piece_id(piece)
         if piece_id in result:
             raise MarvelousDesignerContractError(f"duplicate pattern piece: {piece_id}")
         result[piece_id] = piece
     if not result:
         raise MarvelousDesignerContractError("pattern.pieces must not be empty")
     return result
+
+
+def _scale_to_mm(units: str) -> float:
+    if units == "meter":
+        return 1000.0
+    if units == "millimeter":
+        return 1.0
+    raise MarvelousDesignerContractError(
+        f"unsupported canonical pattern units {units!r}; expected meter or millimeter"
+    )
+
+
+def _point_mm(raw: object, units: str) -> list[float | int]:
+    if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)) or len(raw) != 2:
+        raise MarvelousDesignerContractError("pattern point must contain x,y")
+    x, y = raw
+    if isinstance(x, bool) or not isinstance(x, (int, float)):
+        raise MarvelousDesignerContractError("pattern x must be numeric")
+    if isinstance(y, bool) or not isinstance(y, (int, float)):
+        raise MarvelousDesignerContractError("pattern y must be numeric")
+    scale = _scale_to_mm(units)
+    return [float(x) * scale, float(y) * scale, 0]
+
+
+def _points_mm(piece: Mapping[str, Any], units: str) -> list[list[float | int]]:
+    return [
+        _point_mm(raw, units)
+        for raw in _require_list(piece.get("boundary"), "pattern piece boundary")
+    ]
 
 
 def _walk_segments(vertex_count: int, start: int, end: int, step: int) -> list[dict[str, Any]]:
@@ -137,18 +178,11 @@ def _walk_segments(vertex_count: int, start: int, end: int, step: int) -> list[d
     return segments
 
 
-def edge_segments(piece: Mapping[str, Any], edge: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """Resolve a named canonical edge to one or more MD boundary line indices.
-
-    Legacy pattern contracts may name a seam using two non-adjacent vertices. MD's
-    sewing API addresses one line at a time, so we choose the unique shortest
-    boundary arc. Ties are rejected instead of guessing which side of the polygon
-    was intended.
-    """
-
+def _edge_vertices(
+    piece: Mapping[str, Any], edge: Mapping[str, Any]
+) -> tuple[list[Any], int, int]:
     boundary = _require_list(piece.get("boundary"), "pattern piece boundary")
-    vertex_count = len(boundary)
-    if vertex_count < 3:
+    if len(boundary) < 3:
         raise MarvelousDesignerContractError("pattern boundary requires at least 3 vertices")
     start = edge.get("startVertex")
     end = edge.get("endVertex")
@@ -156,10 +190,23 @@ def edge_segments(piece: Mapping[str, Any], edge: Mapping[str, Any]) -> list[dic
         raise MarvelousDesignerContractError("edge.startVertex must be an integer")
     if isinstance(end, bool) or not isinstance(end, int):
         raise MarvelousDesignerContractError("edge.endVertex must be an integer")
-    if start == end or min(start, end) < 0 or max(start, end) >= vertex_count:
+    if start == end or min(start, end) < 0 or max(start, end) >= len(boundary):
         raise MarvelousDesignerContractError("edge vertex indices are invalid")
-    forward = _walk_segments(vertex_count, start, end, 1)
-    reverse = _walk_segments(vertex_count, start, end, -1)
+    return boundary, start, end
+
+
+def edge_segments(piece: Mapping[str, Any], edge: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Resolve a canonical boundary edge to one or more MD boundary line indices.
+
+    Non-adjacent legacy edges are represented by the unique shortest boundary arc.
+    An equal-length tie is deliberately rejected here because it is not a unique
+    boundary address. The higher-level adapter may map an attachment/internal tie
+    to an explicit MD internal shape instead.
+    """
+
+    boundary, start, end = _edge_vertices(piece, edge)
+    forward = _walk_segments(len(boundary), start, end, 1)
+    reverse = _walk_segments(len(boundary), start, end, -1)
     if len(forward) == len(reverse):
         edge_id = edge.get("edgeId", "<unnamed>")
         raise MarvelousDesignerContractError(
@@ -168,8 +215,48 @@ def edge_segments(piece: Mapping[str, Any], edge: Mapping[str, Any]) -> list[dic
     return forward if len(forward) < len(reverse) else reverse
 
 
-def _edge_index(piece: Mapping[str, Any]) -> dict[str, list[dict[str, Any]]]:
-    result: dict[str, list[dict[str, Any]]] = {}
+def _edge_binding(
+    piece: Mapping[str, Any], edge: Mapping[str, Any], units: str
+) -> dict[str, Any]:
+    boundary, start, end = _edge_vertices(piece, edge)
+    role = edge.get("role")
+    explicit_locus = edge.get("locus")
+    if explicit_locus not in {None, "boundary", "internal"}:
+        raise MarvelousDesignerContractError("edge.locus must be boundary or internal")
+
+    forward = _walk_segments(len(boundary), start, end, 1)
+    reverse = _walk_segments(len(boundary), start, end, -1)
+    equal_arc = len(forward) == len(reverse)
+    internal = explicit_locus == "internal" or role == "internal"
+    inference = None
+    if explicit_locus is None and not internal and equal_arc and role == "attachment":
+        # Legacy v2 pattern contracts have no geometric-locus field. An attachment
+        # chord with no unique boundary route is representable in MD only as an
+        # internal line. Preserve the inference in the request so it is auditable.
+        internal = True
+        inference = "legacy-equal-arc-attachment-as-internal"
+
+    if internal:
+        return {
+            "kind": "internal",
+            "internalEdgeId": str(edge.get("edgeId")),
+            "pointsMm": [_point_mm(boundary[start], units), _point_mm(boundary[end], units)],
+            "segments": [{"lineIndex": 0, "forward": True}],
+            "inference": inference,
+        }
+    if equal_arc:
+        edge_id = edge.get("edgeId", "<unnamed>")
+        raise MarvelousDesignerContractError(
+            f"edge {edge_id!r} has an ambiguous equal-length boundary arc"
+        )
+    return {
+        "kind": "boundary",
+        "segments": forward if len(forward) < len(reverse) else reverse,
+    }
+
+
+def _edge_index(piece: Mapping[str, Any], units: str) -> dict[str, dict[str, Any]]:
+    result: dict[str, dict[str, Any]] = {}
     for raw in _require_list(piece.get("edges", []), "pattern piece edges"):
         edge = _require_object(raw, "pattern edge")
         edge_id = edge.get("edgeId")
@@ -177,32 +264,32 @@ def _edge_index(piece: Mapping[str, Any]) -> dict[str, list[dict[str, Any]]]:
             raise MarvelousDesignerContractError("pattern edgeId is required")
         if edge_id in result:
             raise MarvelousDesignerContractError(f"duplicate edge id: {edge_id}")
-        result[edge_id] = edge_segments(piece, edge)
+        result[edge_id] = _edge_binding(piece, edge, units)
     return result
 
 
-def _points_mm(piece: Mapping[str, Any], units: str) -> list[list[float | int]]:
-    if units != "meter":
-        raise MarvelousDesignerContractError(
-            f"unsupported canonical pattern units {units!r}; expected 'meter'"
-        )
-    points: list[list[float | int]] = []
-    for raw in _require_list(piece.get("boundary"), "pattern piece boundary"):
-        if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)) or len(raw) != 2:
-            raise MarvelousDesignerContractError("pattern boundary point must contain x,y")
-        x, y = raw
-        if isinstance(x, bool) or not isinstance(x, (int, float)):
-            raise MarvelousDesignerContractError("pattern x must be numeric")
-        if isinstance(y, bool) or not isinstance(y, (int, float)):
-            raise MarvelousDesignerContractError("pattern y must be numeric")
-        points.append([float(x) * 1000.0, float(y) * 1000.0, 0])
-    return points
+def _endpoint_segments(
+    piece_id: str, edge_id: str, binding: Mapping[str, Any]
+) -> list[dict[str, Any]]:
+    output: list[dict[str, Any]] = []
+    for raw in _require_list(binding.get("segments"), "edge binding segments"):
+        segment = _require_object(raw, "edge binding segment")
+        endpoint: dict[str, Any] = {
+            "pieceId": piece_id,
+            "kind": str(binding["kind"]),
+            "lineIndex": int(segment["lineIndex"]),
+            "direction": bool(segment["forward"]),
+        }
+        if binding["kind"] == "internal":
+            endpoint["internalEdgeId"] = str(binding["internalEdgeId"])
+        output.append(endpoint)
+    return output
 
 
 def _stitch_requests(
     stitch_graph: Mapping[str, Any],
     pieces: Mapping[str, Mapping[str, Any]],
-    edge_maps: Mapping[str, Mapping[str, list[dict[str, Any]]]],
+    edge_maps: Mapping[str, Mapping[str, Mapping[str, Any]]],
 ) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
     for raw in _require_list(stitch_graph.get("stitches"), "stitchGraph.stitches"):
@@ -210,7 +297,7 @@ def _stitch_requests(
         stitch_id = stitch.get("stitchId")
         if not isinstance(stitch_id, str) or not stitch_id:
             raise MarvelousDesignerContractError("stitchId is required")
-        endpoints: list[tuple[str, str, list[dict[str, Any]]]] = []
+        endpoints: list[tuple[str, str, Mapping[str, Any]]] = []
         for side in ("first", "second"):
             endpoint = _require_object(stitch.get(side), f"stitch.{side}")
             piece_id = endpoint.get("pieceId")
@@ -224,10 +311,12 @@ def _stitch_requests(
                     f"stitch {stitch_id!r} references unknown edge {edge_id!r}"
                 )
             endpoints.append((piece_id, edge_id, edge_maps[piece_id][edge_id]))
-        first, second = endpoints
-        if len(first[2]) != len(second[2]):
+
+        first_raw = _endpoint_segments(*endpoints[0])
+        second_raw = _endpoint_segments(*endpoints[1])
+        if len(first_raw) != len(second_raw):
             raise MarvelousDesignerContractError(
-                f"stitch {stitch_id!r} maps to {len(first[2])} vs {len(second[2])} MD lines; "
+                f"stitch {stitch_id!r} maps to {len(first_raw)} vs {len(second_raw)} MD lines; "
                 "explicit edge subdivision is required"
             )
         direction = stitch.get("direction", "reversed")
@@ -235,26 +324,12 @@ def _stitch_requests(
             raise MarvelousDesignerContractError(
                 f"stitch {stitch_id!r} has unsupported direction {direction!r}"
             )
-        segments = []
-        for first_segment, second_segment in zip(first[2], second[2], strict=True):
-            direction_a = bool(first_segment["forward"])
-            direction_b = bool(second_segment["forward"])
+        segments: list[dict[str, Any]] = []
+        for first, second in zip(first_raw, second_raw, strict=True):
+            second = dict(second)
             if direction == "reversed":
-                direction_b = not direction_b
-            segments.append(
-                {
-                    "first": {
-                        "pieceId": first[0],
-                        "lineIndex": first_segment["lineIndex"],
-                        "direction": direction_a,
-                    },
-                    "second": {
-                        "pieceId": second[0],
-                        "lineIndex": second_segment["lineIndex"],
-                        "direction": direction_b,
-                    },
-                }
-            )
+                second["direction"] = not bool(second["direction"])
+            segments.append({"first": first, "second": second})
         output.append(
             {
                 "stitchId": stitch_id,
@@ -270,13 +345,14 @@ def _material_requests(
     material_recipe: Mapping[str, Any] | None,
     pieces: Mapping[str, Mapping[str, Any]],
     product_root: str,
-) -> tuple[list[dict[str, Any]], list[str]]:
+) -> tuple[list[dict[str, Any]], list[str], bool]:
     if not material_recipe:
-        return [], sorted(pieces)
+        return [], sorted(pieces), False
     map_sets = _require_object(material_recipe.get("mapSets", {}), "materialRecipe.mapSets")
     materials = _require_object(material_recipe.get("materials", {}), "materialRecipe.materials")
     assigned: set[str] = set()
     result: list[dict[str, Any]] = []
+    all_realized = True
     for role, raw in sorted(materials.items()):
         material = _require_object(raw, f"materialRecipe.materials.{role}")
         map_set_name = material.get("mapSet")
@@ -305,16 +381,39 @@ def _material_requests(
         }
         if isinstance(map_set_name, str) and map_set_name in map_sets:
             map_set = _require_object(map_sets[map_set_name], f"mapSet {map_set_name}")
-            texture_root = f"{product_root}/Textures"
             entry["mapSet"] = map_set_name
-            entry["textures"] = {
-                "baseColor": f"{texture_root}/{map_set_name}_albedo.png",
-                "normal": f"{texture_root}/{map_set_name}_normal.png",
-                "roughness": f"{texture_root}/{map_set_name}_roughness.png",
-            }
+            entry["textureIntent"] = dict(map_set)
             entry["textureProvenance"] = map_set.get("provenance", {})
+            files = map_set.get("files")
+            if isinstance(files, Mapping) and all(
+                isinstance(files.get(name), str) and files.get(name)
+                for name in ("baseColor", "normal", "roughness")
+            ):
+                entry["textures"] = {
+                    name: str(files[name])
+                    for name in (
+                        "baseColor",
+                        "normal",
+                        "roughness",
+                        "displacement",
+                        "opacity",
+                        "metalness",
+                    )
+                    if isinstance(files.get(name), str) and files.get(name)
+                }
+                entry["realizationStatus"] = "BOUND"
+            else:
+                expected_root = f"{product_root}/Textures"
+                entry["expectedTextureRoot"] = expected_root
+                entry["realizationStatus"] = "UNVERIFIED"
+                all_realized = False
+        elif matched:
+            # Constant/non-texture materials are valid material assignments but are
+            # not enough to claim the PBR texture path implemented by this backend.
+            entry["realizationStatus"] = "UNVERIFIED"
+            all_realized = False
         result.append(entry)
-    return result, sorted(set(pieces).difference(assigned))
+    return result, sorted(set(pieces).difference(assigned)), all_realized
 
 
 def build_request(
@@ -343,10 +442,30 @@ def build_request(
         raise MarvelousDesignerContractError("simulation_steps must be a positive integer")
 
     pieces = _piece_lookup(pattern)
-    edge_maps = {piece_id: _edge_index(piece) for piece_id, piece in pieces.items()}
     units = str(pattern.get("units", ""))
-    pattern_requests = []
+    _scale_to_mm(units)
+    edge_maps = {
+        piece_id: _edge_index(piece, units) for piece_id, piece in pieces.items()
+    }
+    pattern_requests: list[dict[str, Any]] = []
     for piece_id, piece in sorted(pieces.items()):
+        internal_lines = []
+        named_edges: dict[str, Any] = {}
+        for edge_id, binding in edge_maps[piece_id].items():
+            named_edges[edge_id] = {
+                key: value
+                for key, value in binding.items()
+                if key not in {"pointsMm"}
+            }
+            if binding["kind"] == "internal":
+                internal_lines.append(
+                    {
+                        "edgeId": edge_id,
+                        "pointsMm": binding["pointsMm"],
+                        "isClosed": False,
+                        "inference": binding.get("inference"),
+                    }
+                )
         pattern_requests.append(
             {
                 "pieceId": piece_id,
@@ -355,12 +474,15 @@ def build_request(
                 "grainAngleDegrees": float(piece.get("grainAngleDegrees", 0.0)),
                 "cutCount": int(piece.get("cutCount", 1)),
                 "onFold": bool(piece.get("onFold", False)),
-                "namedEdges": edge_maps[piece_id],
+                "namedEdges": named_edges,
+                "internalLines": internal_lines,
             }
         )
 
-    placements = {}
+    placements: dict[str, dict[str, Any]] = {}
     if initialization:
+        if initialization.get("productId") not in {None, product_id}:
+            raise MarvelousDesignerContractError("initialization product identity mismatch")
         raw_placements = initialization.get("placements", {})
         if isinstance(raw_placements, Mapping):
             placements = {
@@ -368,7 +490,7 @@ def build_request(
                 for key, value in raw_placements.items()
                 if key in pieces and isinstance(value, Mapping)
             }
-    materials, unassigned = _material_requests(
+    materials, unassigned, materials_realized = _material_requests(
         material_recipe, pieces, str(job.get("productRoot", ""))
     )
     runtime_root = f".image2outfit/products/{product_id}/marvelous-designer"
@@ -385,7 +507,11 @@ def build_request(
             "requiredFunctions": list(MARVELOUS_DESIGNER_RUNTIME.required_functions),
         },
         "sourceBindings": dict(sorted((source_bindings or {}).items())),
-        "units": {"canonical": "meter", "marvelousDesigner": "millimeter", "scale": 1000},
+        "units": {
+            "canonical": units,
+            "marvelousDesigner": "millimeter",
+            "scale": _scale_to_mm(units),
+        },
         "avatar": {
             "sourcePath": job.get("targetSourcePath"),
             "adapterId": job.get("adapterId"),
@@ -399,10 +525,14 @@ def build_request(
             "policy": "canonical-initialize-3d-output-only",
         },
         "materials": {
-            "status": "BOUND" if materials else "UNVERIFIED",
+            "status": (
+                "BOUND"
+                if materials and materials_realized and not unassigned
+                else "UNVERIFIED"
+            ),
             "definitions": materials,
             "unassignedPatterns": unassigned,
-            "policy": "canonical-material-recipe-only",
+            "policy": "canonical-material-recipe-and-realized-textures-only",
         },
         "simulation": {
             "steps": simulation_steps,
