@@ -1,9 +1,9 @@
 """Marvelous Designer in-application executor for image2outfit request manifests.
 
 Run this script from Marvelous Designer's Python environment (directly or through
-an MCP/editor bridge). It intentionally refuses to simulate when the canonical
-request does not contain an explicit arrangement, and it never marks downstream
-image2outfit verification as PASS.
+an MCP/editor bridge). It refuses to simulate when canonical arrangement or
+material realization is missing and never marks downstream image2outfit
+verification as PASS.
 """
 
 from __future__ import annotations
@@ -50,6 +50,85 @@ def _repo_path(root: Path, relative: str) -> Path:
 
 def _status(name: str, state: str, **extra: Any) -> dict[str, Any]:
     return {"stage": name, "status": state, **extra}
+
+
+def _inner_child(
+    endpoint: Mapping[str, Any],
+    internal_indices: Mapping[tuple[str, str], int],
+) -> int:
+    key = (str(endpoint["pieceId"]), str(endpoint["internalEdgeId"]))
+    if key not in internal_indices:
+        raise ExecutionBlocked(f"internal edge was not created: {key[0]}.{key[1]}")
+    return internal_indices[key]
+
+
+def _add_seam(
+    pattern_api: Any,
+    first: Mapping[str, Any],
+    second: Mapping[str, Any],
+    pattern_indices: Mapping[str, int],
+    internal_indices: Mapping[tuple[str, str], int],
+) -> bool:
+    first_pattern = pattern_indices[str(first["pieceId"])]
+    second_pattern = pattern_indices[str(second["pieceId"])]
+    first_line = int(first["lineIndex"])
+    second_line = int(second["lineIndex"])
+    first_direction = bool(first["direction"])
+    second_direction = bool(second["direction"])
+    first_kind = first["kind"]
+    second_kind = second["kind"]
+
+    if first_kind == "boundary" and second_kind == "boundary":
+        return bool(
+            pattern_api.AddSeamlinePairGroup(
+                first_pattern,
+                first_line,
+                second_pattern,
+                second_line,
+                first_direction,
+                second_direction,
+            )
+        )
+    if first_kind == "boundary" and second_kind == "internal":
+        return bool(
+            pattern_api.AddSeamlinePairGroup(
+                first_pattern,
+                first_line,
+                second_pattern,
+                _inner_child(second, internal_indices),
+                second_line,
+                first_direction,
+                second_direction,
+            )
+        )
+    if first_kind == "internal" and second_kind == "boundary":
+        # The official overload exposes boundary -> inner shape. Sewing is a pair,
+        # so reverse argument order without changing each endpoint's direction.
+        return bool(
+            pattern_api.AddSeamlinePairGroup(
+                second_pattern,
+                second_line,
+                first_pattern,
+                _inner_child(first, internal_indices),
+                first_line,
+                second_direction,
+                first_direction,
+            )
+        )
+    if first_kind == "internal" and second_kind == "internal":
+        return bool(
+            pattern_api.AddSeamlinePairGroup(
+                first_pattern,
+                _inner_child(first, internal_indices),
+                first_line,
+                second_pattern,
+                _inner_child(second, internal_indices),
+                second_line,
+                first_direction,
+                second_direction,
+            )
+        )
+    raise ExecutionBlocked(f"unsupported seam kinds: {first_kind!r}, {second_kind!r}")
 
 
 def execute(request_path: str, repo_root: str) -> dict[str, Any]:
@@ -102,6 +181,7 @@ def execute(request_path: str, repo_root: str) -> dict[str, Any]:
         result["phases"].append(_status("avatar-import", "PASS", path=str(avatar_path)))
 
         pattern_indices: dict[str, int] = {}
+        internal_indices: dict[tuple[str, str], int] = {}
         for spec in request.get("patterns", []):
             points = [tuple(point) for point in spec["pointsMm"]]
             pattern_index = int(pattern_api.CreatePatternWithPoints(points))
@@ -111,9 +191,28 @@ def execute(request_path: str, repo_root: str) -> dict[str, Any]:
             pattern_api.SetPatternPieceGrainDirection(
                 pattern_index, float(spec.get("grainAngleDegrees", 0.0))
             )
-            pattern_indices[str(spec["pieceId"])] = pattern_index
+            piece_id = str(spec["pieceId"])
+            pattern_indices[piece_id] = pattern_index
+            for internal in spec.get("internalLines", []):
+                child_index = int(
+                    pattern_api.CreateInternalShapeWithPoints(
+                        pattern_index,
+                        [tuple(point) for point in internal["pointsMm"]],
+                        bool(internal.get("isClosed", False)),
+                    )
+                )
+                if child_index < 0:
+                    raise ExecutionBlocked(
+                        f"internal shape creation failed: {piece_id}.{internal['edgeId']}"
+                    )
+                internal_indices[(piece_id, str(internal["edgeId"]))] = child_index
         result["phases"].append(
-            _status("pattern-create", "PASS", patternCount=len(pattern_indices))
+            _status(
+                "pattern-create",
+                "PASS",
+                patternCount=len(pattern_indices),
+                internalLineCount=len(internal_indices),
+            )
         )
 
         arrangement = request.get("arrangement", {})
@@ -121,6 +220,12 @@ def execute(request_path: str, repo_root: str) -> dict[str, Any]:
         if arrangement.get("status") != "BOUND" or not placements:
             raise ExecutionBlocked(
                 "canonical initialize-3d output is not bound; simulation stays UNVERIFIED"
+            )
+        missing_placements = sorted(set(pattern_indices).difference(placements))
+        if missing_placements:
+            raise ExecutionBlocked(
+                "canonical arrangement is incomplete for patterns: "
+                + ", ".join(missing_placements)
             )
         for piece_id, placement in placements.items():
             pattern_index = pattern_indices[piece_id]
@@ -145,28 +250,35 @@ def execute(request_path: str, repo_root: str) -> dict[str, Any]:
         seam_count = 0
         for stitch in request.get("stitches", []):
             for segment in stitch.get("segments", []):
-                first = segment["first"]
-                second = segment["second"]
-                ok = pattern_api.AddSeamlinePairGroup(
-                    pattern_indices[first["pieceId"]],
-                    int(first["lineIndex"]),
-                    pattern_indices[second["pieceId"]],
-                    int(second["lineIndex"]),
-                    bool(first["direction"]),
-                    bool(second["direction"]),
-                )
-                if not ok:
+                if not _add_seam(
+                    pattern_api,
+                    segment["first"],
+                    segment["second"],
+                    pattern_indices,
+                    internal_indices,
+                ):
                     raise ExecutionBlocked(f"sewing failed: {stitch['stitchId']}")
                 seam_count += 1
         result["phases"].append(_status("sewing", "PASS", segmentCount=seam_count))
 
+        materials = request.get("materials", {})
+        if materials.get("status") != "BOUND":
+            missing = materials.get("unassignedPatterns", [])
+            suffix = f"; unassigned={missing}" if missing else ""
+            raise ExecutionBlocked(
+                "canonical realized PBR textures are not fully bound" + suffix
+            )
         material_root = _repo_path(root, str(request["outputs"]["root"])) / "fabrics"
         material_root.mkdir(parents=True, exist_ok=True)
-        for definition in request.get("materials", {}).get("definitions", []):
+        for definition in materials.get("definitions", []):
             patterns = definition.get("patterns", [])
             if not patterns:
                 continue
-            textures = definition.get("textures", {})
+            textures = definition.get("textures")
+            if not isinstance(textures, Mapping):
+                raise ExecutionBlocked(
+                    f"material {definition['role']!r} has no realized texture binding"
+                )
             required = ("baseColor", "normal", "roughness")
             missing = [
                 key
