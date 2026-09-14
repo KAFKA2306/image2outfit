@@ -128,6 +128,22 @@ Blender側には `View3D > Sidebar > Image2Outfit > OpenAI Assistant` の薄いp
 - Unity MCP `v10.1.2`: <https://github.com/CoplayDev/unity-mcp/releases/tag/v10.1.2>
 - Codex MCP CLI: <https://github.com/openai/codex/blob/main/codex-rs/cli/src/mcp_cmd.rs>
 
+## Marvelous Designer backend
+
+Issue #518 の Marvelous Designer 連携は、既存 canonical garment contract を公式 Python API の再生可能な request へ変換する外部 DCC adapter です。新しい product schema、state DB、completion authority、release path は作りません。
+
+repository 側の変換は `src/image2outfit/marvelous_designer.py`、request 準備 helper は `tools/prepare_marvelous_designer.py`、Marvelous Designer 内で実行する script は `tools/marvelous_designer_execute.py` が担当します。後者2つは `tools/manage.py` や既存 verifier を置き換える operator facade ではありません。
+
+request は pattern、stitch、material、任意の Stage 06 placement と source hash を固定し、Marvelous Designer 内では Pattern 作成、配置、縫製、Fabric/PBR 適用、simulation、ZPRJ/OBJ/FBX export を実行します。named edge を MD の boundary/internal line へ一意に変換できない場合、canonical placement がない場合、必要 texture が実在しない場合は推測せず停止します。
+
+Marvelous Designer 内の実行成功は製品 `PASS` を意味しません。export 後の artifact は既存 verifier と ProductManifest の completion authority へ戻します。Marvelous Designer runtime を実行していない環境では、その段階は `UNVERIFIED` のままです。
+
+公式 API 参照:
+
+- <https://developer.marvelousdesigner.com/list.html>
+- <https://developer.marvelousdesigner.com/scenario.html>
+- <https://developer.marvelousdesigner.com/python.html>
+
 ## 実行結果と証拠
 
 パイプラインの計画状態 `PLANNED`、実行状態 `EXECUTED` は製品状態 `COMPLETE` とは別です。工程は終了コード 0 だけで成功にはなりません。
