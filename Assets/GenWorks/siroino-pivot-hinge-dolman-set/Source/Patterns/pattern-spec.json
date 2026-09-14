@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-pivot-hinge-dolman-set",
+  "units": "m",
+  "reference": "References/pivot-hinge-dolman-manufacturing-sheet.svg",
+  "parts": [
+    {"id":"dolman_front_L","count":1,"material":"MAT_Outer"},
+    {"id":"dolman_front_R","count":1,"material":"MAT_Outer"},
+    {"id":"dolman_back","count":1,"material":"MAT_Outer"},
+    {"id":"inner_front","count":1,"material":"MAT_Inner"},
+    {"id":"inner_back","count":1,"material":"MAT_Inner"},
+    {"id":"trouser_front_L","count":1,"material":"MAT_Bottoms"},
+    {"id":"trouser_front_R","count":1,"material":"MAT_Bottoms"},
+    {"id":"trouser_back_L","count":1,"material":"MAT_Bottoms"},
+    {"id":"trouser_back_R","count":1,"material":"MAT_Bottoms"},
+    {"id":"waistband","count":1,"material":"MAT_Bottoms"},
+    {"id":"hinge_gusset_L","count":1,"material":"MAT_Hinge","hero":true},
+    {"id":"hinge_gusset_R","count":1,"material":"MAT_Hinge","hero":true},
+    {"id":"hinge_facing_L","count":1,"material":"MAT_Hinge","hero":true},
+    {"id":"hinge_facing_R","count":1,"material":"MAT_Hinge","hero":true},
+    {"id":"cuff_L","count":1,"material":"MAT_Outer"},
+    {"id":"cuff_R","count":1,"material":"MAT_Outer"}
+  ],
+  "heroDetail": {
+    "name": "Pivot Hinge Gusset",
+    "groups": ["hinge_gusset_L","hinge_gusset_R","hinge_facing_L","hinge_facing_R"],
+    "requireRealGeometry": true,
+    "criticalFitZone": "elbow"
+  },
+  "uvPolicy": "UV0_0_TO_1_HERO_IDENTIFIABLE",
+  "physics": "NOT_REQUIRED",
+  "lod0TriangleTargetMax": 20000
+}
