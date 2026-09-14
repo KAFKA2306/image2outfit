@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-parallax-collar-jacket-set",
+  "productName": "Parallax Collar Jacket Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-parallax-collar-jacket-set",
+  "sourceJobPath": "config/products/siroino-parallax-collar-jacket-set/job.json",
+  "generatedAt": "2026-09-15T07:36:51+09:00",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "structuralPrototype": "PASS",
+    "canonicalJob": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "technicalGates": {
+    "blender": "UNVERIFIED",
+    "uvMapping": "PASS",
+    "weightTransfer": "UNVERIFIED",
+    "exactBodyPoseRenders": "UNVERIFIED",
+    "latestGeometryRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabSerialized": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-parallax-collar-jacket-set",
+    "doNotRebuildFromZero": true,
+    "issue": 565,
+    "resumeFrom": "config/products/siroino-parallax-collar-jacket-set/job.json",
+    "blockers": []
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-parallax-collar-jacket-set/Source/Prototype/structural.obj",
+    "sha256": "d952855d3041c00516da62ca08b27d2a15e810ca442e5758dc2bc6c58fd1c48e",
+    "vertices": 60,
+    "uvCoordinates": 60,
+    "polygonFaces": 15,
+    "namedGroups": 15,
+    "materialRoles": 5,
+    "heroGroups": ["parallax_collar_outer", "parallax_collar_inner", "collar_facing_outer", "collar_facing_inner"]
+  }
+}
