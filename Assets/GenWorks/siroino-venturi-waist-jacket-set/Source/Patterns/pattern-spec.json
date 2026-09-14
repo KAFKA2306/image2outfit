@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-venturi-waist-jacket-set",
+  "units": "m",
+  "source": {
+    "manufacturingReference": "Assets/GenWorks/siroino-venturi-waist-jacket-set/References/venturi-waist-jacket-set-manufacturing-sheet.svg",
+    "designRevision": "venturi-waist-v1"
+  },
+  "panels": [
+    {"id":"jacket_front_L","role":"shell","material":"MAT_Shell"},
+    {"id":"jacket_front_R","role":"shell","material":"MAT_Shell"},
+    {"id":"jacket_back","role":"shell","material":"MAT_Shell"},
+    {"id":"sleeve_L","role":"shell","material":"MAT_Shell"},
+    {"id":"sleeve_R","role":"shell","material":"MAT_Shell"},
+    {"id":"inner_front","role":"inner","material":"MAT_Inner"},
+    {"id":"inner_back","role":"inner","material":"MAT_Inner"},
+    {"id":"trouser_L","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"trouser_R","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"waistband","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"back_yoke","role":"trim","material":"MAT_Accent"},
+    {"id":"venturi_channel_L","role":"hero","material":"MAT_Hero"},
+    {"id":"venturi_channel_R","role":"hero","material":"MAT_Hero"},
+    {"id":"venturi_facing_L","role":"hero-facing","material":"MAT_Accent"},
+    {"id":"venturi_facing_R","role":"hero-facing","material":"MAT_Accent"}
+  ],
+  "heroDetail": {
+    "id": "paired-venturi-waist-channel",
+    "requiredGroups": ["venturi_channel_L","venturi_channel_R","venturi_facing_L","venturi_facing_R"],
+    "requirements": ["real geometry", "narrow throat plus flared exit", "bounded corresponding-side deformation", "unique UV islands"]
+  },
+  "fitZones": ["shoulder","elbow","waist","hip","crotch","knee"],
+  "acceptance": {
+    "structuralGroups": 15,
+    "heroGroups": 4,
+    "minimumMaterialRoles": 4,
+    "lod0TriangleTarget": 22000
+  }
+}
