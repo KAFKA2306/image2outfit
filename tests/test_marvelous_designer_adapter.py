@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import copy
+import json
 import unittest
+from pathlib import Path
 
 from image2outfit.marvelous_designer import (
     MarvelousDesignerContractError,
@@ -36,7 +38,13 @@ class MarvelousDesignerAdapterTests(unittest.TestCase):
                 {
                     "pieceId": "back",
                     "partId": "body",
-                    "boundary": [[0, 0], [0.1, 0], [0.1, 0.2], [0, 0.2], [-0.02, 0.1]],
+                    "boundary": [
+                        [0, 0],
+                        [0.1, 0],
+                        [0.1, 0.2],
+                        [0, 0.2],
+                        [-0.02, 0.1],
+                    ],
                     "grainAngleDegrees": 90,
                     "edges": [
                         {"edgeId": "left", "startVertex": 3, "endVertex": 2},
@@ -72,7 +80,13 @@ class MarvelousDesignerAdapterTests(unittest.TestCase):
 
     def test_edge_maps_shortest_arc(self) -> None:
         piece = copy.deepcopy(self.pattern["pieces"][0])
-        piece["boundary"] = [[0, 0], [0.05, 0], [0.1, 0], [0.1, 0.2], [0, 0.2]]
+        piece["boundary"] = [
+            [0, 0],
+            [0.05, 0],
+            [0.1, 0],
+            [0.1, 0.2],
+            [0, 0.2],
+        ]
         edge = {"edgeId": "two-lines", "startVertex": 0, "endVertex": 2}
         segments = edge_segments(piece, edge)
         self.assertEqual([item["lineIndex"] for item in segments], [0, 1])
@@ -129,7 +143,9 @@ class MarvelousDesignerAdapterTests(unittest.TestCase):
         pattern["pieces"][0]["edges"] = [
             {"edgeId": "top", "startVertex": 0, "endVertex": 2}
         ]
-        with self.assertRaisesRegex(MarvelousDesignerContractError, "explicit edge subdivision"):
+        with self.assertRaisesRegex(
+            MarvelousDesignerContractError, "explicit edge subdivision"
+        ):
             build_request(
                 job=self.job,
                 pattern=pattern,
@@ -159,6 +175,26 @@ class MarvelousDesignerAdapterTests(unittest.TestCase):
         self.assertEqual(material["patterns"], ["back", "front"])
         self.assertEqual(material["textureProvenance"], {"source": "generated"})
         self.assertEqual(request["materials"]["unassignedPatterns"], [])
+
+    def test_existing_siroino_fixture_prepares_request(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        product = root / "config" / "products" / "siroino-tuxedo-halter-dress-large"
+        if not product.is_dir():
+            self.skipTest("repository fixture not available")
+        job = json.loads((product / "job.json").read_text(encoding="utf-8"))
+        pattern = json.loads((product / "pattern-draft.json").read_text(encoding="utf-8"))
+        stitches = json.loads((product / "stitch-graph.json").read_text(encoding="utf-8"))
+        materials = json.loads((product / "material-recipe.json").read_text(encoding="utf-8"))
+        request = build_request(
+            job=job,
+            pattern=pattern,
+            stitch_graph=stitches,
+            material_recipe=materials,
+        )
+        self.assertEqual(request["productId"], "siroino-tuxedo-halter-dress-large")
+        self.assertEqual(request["arrangement"]["status"], "UNVERIFIED")
+        self.assertGreater(len(request["patterns"]), 0)
+        self.assertGreater(len(request["stitches"]), 0)
 
     def test_identity_mismatch_is_rejected(self) -> None:
         pattern = copy.deepcopy(self.pattern)
