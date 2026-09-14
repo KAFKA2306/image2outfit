@@ -153,7 +153,7 @@ def main() -> int:
         "schemaVersion": 1,
         "productId": product_id,
         "builder": "tools/generic_structural_garment_product.py",
-        "prototype": str(prototype.relative_to(ROOT)).replace("\\\\", "/"),
+        "prototype": str(prototype.relative_to(ROOT)).replace("\\", "/"),
         "targetSource": target_value,
         "build": "PASS",
         "weightTransfer": "PASS",
