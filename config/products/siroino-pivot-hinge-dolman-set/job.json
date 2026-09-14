@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-generic-structural",
+  "id": "siroino-pivot-hinge-dolman-set",
+  "productName": "Pivot Hinge Dolman Set",
+  "adapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-pivot-hinge-dolman-set",
+  "productManifestPath": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Source/Blender/PivotHingeDolman.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Models/PivotHingeDolman.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Prefab/PivotHingeDolman.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Prefab/SiroinoSotai_PivotHingeDolman.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-pivot-hinge-dolman-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/README.md",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Source/Blender/PivotHingeDolman.blend",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Models/PivotHingeDolman.fbx",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Prefab/PivotHingeDolman.prefab",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Prefab/SiroinoSotai_PivotHingeDolman.prefab",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/front.png",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/back.png",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/left.png",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/right.png",
+    "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-pivot-hinge-dolman-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-pivot-hinge-dolman-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-pivot-hinge-dolman-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Outer", "role": "fabric"},
+      {"material": "MAT_Inner", "role": "fabric"},
+      {"material": "MAT_Bottoms", "role": "fabric"},
+      {"material": "MAT_Hinge", "role": "trim"}
+    ]
+  }
+}
