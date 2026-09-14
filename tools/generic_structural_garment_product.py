@@ -81,6 +81,8 @@ def main() -> int:
     before = set(bpy.context.scene.objects)
     bpy.ops.wm.obj_import(
         filepath=str(prototype),
+        forward_axis="NEGATIVE_Y",
+        up_axis="Z",
         use_split_objects=True,
         use_split_groups=True,
         import_vertex_groups=True,
@@ -154,6 +156,7 @@ def main() -> int:
         "productId": product_id,
         "builder": "tools/generic_structural_garment_product.py",
         "prototype": str(prototype.relative_to(ROOT)).replace("\\\\", "/"),
+        "prototypeAxes": {"forward": "NEGATIVE_Y", "up": "Z"},
         "targetSource": target_value,
         "build": "PASS",
         "weightTransfer": "PASS",
