@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-cascade-pleat-vest-set",
+  "profile": "panel-sewn",
+  "target": "Siroino via existing siroino-v1.0 adapter",
+  "designRevision": "issue-515-v0-prototype",
+  "panels": ["vest_front_L","vest_front_R","vest_back","inner_front","inner_back","sleeve_L","sleeve_R","trouser_front_L","trouser_front_R","trouser_back_L","trouser_back_R","cascade_pleat_A","cascade_pleat_B"],
+  "separateGeometry": ["waistband","waist_bridge_L","pleat_edge_facing","vyoke_back"],
+  "priorityFitZones": ["shoulder","elbow","waist","hip","crotch","knee"],
+  "requiredPoses": ["neutral","arms-up","arm-cross","crouch","sit","prone"],
+  "releaseBoundary": "Technical manufacturing only; no release/publication claim from this checkpoint.",
+  "clothSimulation": {"applicability":"NOT_REQUIRED","components":[],"evidence":"Structured vest, tapered trousers and bounded folded waist pleat are intended for skinned geometry first.","reason":"No long free-hanging cloth is required to establish technical fit and construction."}
+}
