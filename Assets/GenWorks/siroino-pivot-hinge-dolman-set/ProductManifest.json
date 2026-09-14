@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-pivot-hinge-dolman-set",
+  "productName": "Pivot Hinge Dolman Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-pivot-hinge-dolman-set",
+  "sourceJobPath": "config/products/siroino-pivot-hinge-dolman-set/job.json",
+  "generatedAt": "2026-09-15T03:00:00+09:00",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "structuralPrototype": "PASS",
+    "canonicalJob": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "technicalGates": {
+    "blender": "UNVERIFIED",
+    "uvMapping": "PASS",
+    "weightTransfer": "UNVERIFIED",
+    "exactBodyPoseRenders": "UNVERIFIED",
+    "latestGeometryRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabSerialized": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-pivot-hinge-dolman-set",
+    "doNotRebuildFromZero": true,
+    "issue": 551,
+    "resumeFrom": "config/products/siroino-pivot-hinge-dolman-set/job.json",
+    "blockers": ["Shared generic structural garment builder is currently supplied by open dependency PR #550 rather than default branch main."]
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-pivot-hinge-dolman-set/Source/Prototype/structural.obj",
+    "sha256": "3fdc41208b14a8ad5a25adbf82108012ad9a8860b0ad4e09f6742402c44d9017",
+    "vertices": 64,
+    "uvCoordinates": 64,
+    "polygonFaces": 16,
+    "namedGroups": 16,
+    "materialRoles": 4,
+    "heroGroups": ["hinge_gusset_L","hinge_gusset_R","hinge_facing_L","hinge_facing_R"]
+  }
+}
