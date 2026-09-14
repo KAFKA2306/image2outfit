@@ -6,7 +6,7 @@
   "targetAdapterId": "siroino-v1.0",
   "productRoot": "Assets/GenWorks/siroino-sidelock-column-set",
   "documentationPath": "Assets/GenWorks/siroino-sidelock-column-set/README.md",
-  "generatedAt": "2026-09-14T07:46:00Z",
+  "generatedAt": "2026-09-14T07:53:00Z",
   "completionPolicyPath": "config/genworks-handoff-policy.json",
   "completionPolicySchemaVersion": 2,
   "completionGates": {
@@ -24,9 +24,10 @@
     "resumeFrom": "Assets/GenWorks/siroino-sidelock-column-set/Models/sidelock-column-set-prototype.obj",
     "doNotRebuildFromZero": true,
     "blockers": [
-      "A reusable current-main garment buildScript compatible with this new panel set has not yet been proven. Do not bind the product to an unrelated product-specific builder."
+      "Hosted Blender workflow 34819798796 executed repository audit and failed with missing-product-config at config/products/siroino-sidelock-column-set/job.json before Blender execution.",
+      "Current main proves product-specific Siroino Wide Cargo buildScript tools/siroino_wide_cargo_product.py; it hard-codes Wide Cargo pattern/source identity and is not a valid builder for Sidelock Column Set. A compatible reusable repository-owned entrypoint has not yet been proven."
     ],
-    "nextAction": "Prove a reusable repository-owned garment build entrypoint, add schema-valid config/products/siroino-sidelock-column-set/job.json, then execute the exact candidate through hosted Blender."
+    "nextAction": "Prove or refactor a reusable repository-owned garment build entrypoint without creating a second authority, add schema-valid config/products/siroino-sidelock-column-set/job.json, then re-run the exact candidate through hosted Blender."
   },
   "prototype": {
     "artifact": "Assets/GenWorks/siroino-sidelock-column-set/Models/sidelock-column-set-prototype.obj",
@@ -37,14 +38,7 @@
     "polygonFaces": 14,
     "namedGroups": 14,
     "degenerateFaces": 0,
-    "heroGroups": [
-      "side_lock_L_A",
-      "side_lock_L_B",
-      "side_lock_L_C",
-      "side_lock_R_A",
-      "side_lock_R_B",
-      "side_lock_R_C"
-    ]
+    "heroGroups": ["side_lock_L_A","side_lock_L_B","side_lock_L_C","side_lock_R_A","side_lock_R_B","side_lock_R_C"]
   },
   "technicalGates": {
     "manufacturingReference": "PASS",
@@ -55,7 +49,9 @@
     "heroGeometry": "PASS",
     "rearSlitGeometry": "PASS",
     "prototypeStructuralValidation": "PASS",
-    "canonicalJob": "UNVERIFIED",
+    "canonicalJob": "FAIL",
+    "hostedPipelineBoundary": "FAIL",
+    "blenderExecution": "UNVERIFIED",
     "avatarFit": "UNVERIFIED",
     "rigging": "UNVERIFIED",
     "weighting": "UNVERIFIED",
