@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-bellows-knee-utility-set",
+  "units": "m",
+  "source": {
+    "manufacturingReference": "Assets/GenWorks/siroino-bellows-knee-utility-set/References/bellows-knee-utility-set-manufacturing-sheet.svg",
+    "designRevision": "bellows-knee-v1"
+  },
+  "panels": [
+    {"id":"vest_front_L","role":"shell","material":"MAT_Shell"},
+    {"id":"vest_front_R","role":"shell","material":"MAT_Shell"},
+    {"id":"vest_back","role":"shell","material":"MAT_Shell"},
+    {"id":"inner_front","role":"inner","material":"MAT_Inner"},
+    {"id":"inner_back","role":"inner","material":"MAT_Inner"},
+    {"id":"trouser_front_L","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"trouser_front_R","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"trouser_back_L","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"trouser_back_R","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"waistband","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"bellows_knee_L_outer","role":"hero","material":"MAT_Hero"},
+    {"id":"bellows_knee_L_inner","role":"hero","material":"MAT_Accent"},
+    {"id":"bellows_knee_R_outer","role":"hero","material":"MAT_Hero"},
+    {"id":"bellows_knee_R_inner","role":"hero","material":"MAT_Accent"},
+    {"id":"knee_facing_L","role":"hero-facing","material":"MAT_Hero"},
+    {"id":"knee_facing_R","role":"hero-facing","material":"MAT_Hero"}
+  ],
+  "heroDetail": {
+    "id": "paired-bellows-knee",
+    "requiredGroups": ["bellows_knee_L_outer","bellows_knee_L_inner","knee_facing_L","bellows_knee_R_outer","bellows_knee_R_inner","knee_facing_R"],
+    "requirements": ["real geometry", "visible nested depth after Blender build", "bounded corresponding-leg deformation", "unique UV islands"]
+  },
+  "fitZones": ["waist","hip","crotch","upper-leg","knee","lower-leg","ankle"],
+  "acceptance": {
+    "structuralGroups": 16,
+    "heroGroups": 6,
+    "minimumMaterialRoles": 4,
+    "lod0TriangleTarget": 22000
+  }
+}

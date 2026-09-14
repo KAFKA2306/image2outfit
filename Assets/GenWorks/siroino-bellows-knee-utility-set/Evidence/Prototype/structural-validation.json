@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-bellows-knee-utility-set",
+  "artifact": "Assets/GenWorks/siroino-bellows-knee-utility-set/Source/Prototype/structural.obj",
+  "sha256": "2c67a8b91ba7e33e8622f958426df650f8cbeff9ee983943210ea65311242198",
+  "status": "PASS",
+  "checks": {
+    "nonEmptyGeometry": "PASS",
+    "vertexCount": 64,
+    "uvCoordinateCount": 64,
+    "polygonFaceCount": 16,
+    "namedGroupCount": 16,
+    "degenerateFaces": 0,
+    "uv0Present": "PASS",
+    "materialRolesPresent": ["MAT_Shell", "MAT_Inner", "MAT_Bottoms", "MAT_Hero", "MAT_Accent"],
+    "heroGroupsPresent": [
+      "bellows_knee_L_outer",
+      "bellows_knee_L_inner",
+      "knee_facing_L",
+      "bellows_knee_R_outer",
+      "bellows_knee_R_inner",
+      "knee_facing_R"
+    ]
+  },
+  "scope": "Structural OBJ checkpoint only. Does not claim Blender visual fit, pose deformation, Unity import, Modular Avatar, NDMF or VRChat runtime."
+}
