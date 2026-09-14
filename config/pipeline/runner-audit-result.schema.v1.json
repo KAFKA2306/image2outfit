@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kafka2306.github.io/image2outfit/contracts/runner-audit-result.schema.v1.json",
+  "title": "image2outfit Runner audit result v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["requestSha256", "candidateSha256", "status", "metrics", "attempts", "stopReason"],
+  "properties": {
+    "requestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "candidateSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "status": {"enum": ["PASS", "FAIL", "UNVERIFIED"]},
+    "metrics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["value", "threshold", "state", "producer", "producerVersion", "evidenceSha256", "stage"],
+        "properties": {
+          "state": {"enum": ["PASS", "FAIL", "UNVERIFIED"]},
+          "producer": {"type": ["string", "null"]},
+          "producerVersion": {"type": ["string", "null"]},
+          "evidenceSha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+          "cause": {"type": ["string", "null"]},
+          "stage": {"type": "string"}
+        }
+      }
+    },
+    "attempts": {"type": "integer", "minimum": 0},
+    "stopReason": {"enum": ["SUCCESS", "STALLED", "BUDGET_EXHAUSTED", "FAILED_HARD", null]},
+    "runnerComplete": {"type": "boolean"},
+    "highestBlocker": {"type": ["string", "null"]},
+    "requiredMetricIds": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+  }
+}

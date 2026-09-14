@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "profileId": "runner-only-machine-audit-v1",
+  "metricStates": ["PASS", "FAIL", "UNVERIFIED"],
+  "stageOrder": [
+    "reproducibility-evidence",
+    "geometry",
+    "seam-structure",
+    "fit-collision",
+    "pose-robustness",
+    "silhouette-fidelity",
+    "material-fidelity"
+  ],
+  "epsilonArea": 1e-12,
+  "epsilonPenetrationMeters": 0.002,
+  "fitBands": {
+    "close": [0.002, 0.03],
+    "regular": [0.003, 0.08],
+    "loose": [0.003, 0.2]
+  },
+  "defaultBudget": {
+    "maxAttemptsPerBlocker": 8,
+    "maxTotalAttempts": 24,
+    "earlyStopAcceptedImprovementWindow": 3
+  },
+  "metrics": [
+    {"id":"evidence.artifact_identity","stage":"reproducibility-evidence","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"artifact-verifier"},
+    {"id":"evidence.verified_ratio","stage":"reproducibility-evidence","operator":"gte","threshold":1.0,"direction":"higher","scale":1.0,"tolerance":0,"minImprovement":0.001,"required":true,"producer":"evidence-verifier"},
+    {"id":"geometry.degenerate_triangles","stage":"geometry","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"geometry-audit"},
+    {"id":"geometry.nonfinite_values","stage":"geometry","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"geometry-audit"},
+    {"id":"geometry.nonmanifold_edges","stage":"geometry","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"geometry-audit"},
+    {"id":"skinning.unweighted_vertices","stage":"geometry","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"skinning-audit"},
+    {"id":"skinning.max_weight_sum_error","stage":"geometry","operator":"lte","threshold":0.001,"direction":"lower","scale":0.001,"tolerance":0,"minImprovement":0.0001,"required":true,"producer":"skinning-audit"},
+    {"id":"skinning.max_influences","stage":"geometry","operator":"lte","threshold":4,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"skinning-audit"},
+    {"id":"seam.match_ratio","stage":"seam-structure","operator":"gte","threshold":1.0,"direction":"higher","scale":1.0,"tolerance":0,"minImprovement":0.01,"required":true,"producer":"seam-audit"},
+    {"id":"seam.unmatched","stage":"seam-structure","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"seam-audit"},
+    {"id":"seam.orientation_errors","stage":"seam-structure","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"seam-audit"},
+    {"id":"seam.multiplicity_errors","stage":"seam-structure","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"seam-audit"},
+    {"id":"seam.unknown_references","stage":"seam-structure","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"seam-audit"},
+    {"id":"fit.penetration_ratio","stage":"fit-collision","operator":"eq","threshold":0,"direction":"lower","scale":0.001,"tolerance":0,"minImprovement":0.0001,"required":true,"producer":"fit-signed-distance"},
+    {"id":"fit.max_penetration_depth_m","stage":"fit-collision","operator":"lte","threshold":0.002,"direction":"lower","scale":0.002,"tolerance":0,"minImprovement":0.0001,"required":true,"producer":"fit-signed-distance"},
+    {"id":"fit.max_region_violation_ratio","stage":"fit-collision","operator":"lte","threshold":0.01,"direction":"lower","scale":0.01,"tolerance":0,"minImprovement":0.001,"required":true,"producer":"fit-signed-distance"},
+    {"id":"pose.max_penetration_ratio","stage":"pose-robustness","operator":"eq","threshold":0,"direction":"lower","scale":0.001,"tolerance":0,"minImprovement":0.0001,"required":true,"producer":"pose-audit"},
+    {"id":"pose.edge_stretch_q99","stage":"pose-robustness","operator":"lte","threshold":0.5,"direction":"lower","scale":0.5,"tolerance":0,"minImprovement":0.01,"required":true,"producer":"pose-audit"},
+    {"id":"pose.new_degenerate_triangles","stage":"pose-robustness","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"pose-audit"},
+    {"id":"pose.new_nonfinite_values","stage":"pose-robustness","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"pose-audit"},
+    {"id":"pose.new_blocking_collisions","stage":"pose-robustness","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"required":true,"producer":"pose-audit"},
+    {"id":"silhouette.min_iou","stage":"silhouette-fidelity","operator":"gte","threshold":0.85,"direction":"higher","scale":0.15,"tolerance":0,"minImprovement":0.005,"required":true,"producer":"silhouette-audit"},
+    {"id":"silhouette.max_chamfer","stage":"silhouette-fidelity","operator":"lte","threshold":0.03,"direction":"lower","scale":0.03,"tolerance":0,"minImprovement":0.001,"required":true,"producer":"silhouette-audit"},
+    {"id":"silhouette.max_landmark_error","stage":"silhouette-fidelity","operator":"lte","threshold":0.05,"direction":"lower","scale":0.05,"tolerance":0,"minImprovement":0.002,"required":true,"producer":"silhouette-audit"},
+    {"id":"material.region_completeness","stage":"material-fidelity","operator":"gte","threshold":1.0,"direction":"higher","scale":1,"tolerance":0,"minImprovement":0.01,"requiredIfMaterialTargets":true,"producer":"material-audit"},
+    {"id":"material.unknown_regions","stage":"material-fidelity","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"requiredIfMaterialTargets":true,"producer":"material-audit"},
+    {"id":"material.delta_e00_median","stage":"material-fidelity","operator":"lte","threshold":8,"direction":"lower","scale":8,"tolerance":0,"minImprovement":0.5,"requiredWhenMaterialKey":"colorSwatches","producer":"material-audit"},
+    {"id":"material.delta_e00_p95","stage":"material-fidelity","operator":"lte","threshold":15,"direction":"lower","scale":15,"tolerance":0,"minImprovement":0.5,"requiredWhenMaterialKey":"colorSwatches","producer":"material-audit"},
+    {"id":"material.roughness_violation_ratio","stage":"material-fidelity","operator":"lte","threshold":0.01,"direction":"lower","scale":0.01,"tolerance":0,"minImprovement":0.001,"requiredWhenMaterialKey":"roughnessRanges","producer":"material-audit"},
+    {"id":"material.unintended_alpha_holes","stage":"material-fidelity","operator":"eq","threshold":0,"direction":"lower","scale":1,"tolerance":0,"minImprovement":1,"requiredWhenMaterialKey":"opaqueRegions","producer":"material-audit"}
+  ]
+}

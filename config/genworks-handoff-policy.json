@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "canonicalWorkspacePattern": "Assets/GenWorks/<product-id>",
   "statuses": [
     "WORKING",
@@ -30,8 +30,33 @@
     "prefabDeclared",
     "fiveViewEvidence",
     "poseEvidence",
-    "visualAppearanceReview"
+    "runnerMachineAudit"
   ],
+  "runnerMachineAudit": {
+    "required": true,
+    "profile": "contracts/quality/runner-only-machine-audit-v1.json",
+    "requestSchema": "config/pipeline/runner-request-manifest.schema.v1.json",
+    "states": [
+      "PASS",
+      "FAIL",
+      "UNVERIFIED"
+    ],
+    "completionState": "PASS",
+    "missingProducerState": "UNVERIFIED",
+    "missingEvidenceState": "UNVERIFIED",
+    "hashMismatchState": "UNVERIFIED",
+    "unmeasurableState": "UNVERIFIED",
+    "requiredEvidenceRatio": 1.0,
+    "humanApprovalRequired": false,
+    "candidateAdoption": "PARETO_DOMINANCE",
+    "equalCandidateDecision": "REVERT",
+    "stopReasons": [
+      "SUCCESS",
+      "STALLED",
+      "BUDGET_EXHAUSTED",
+      "FAILED_HARD"
+    ]
+  },
   "outOfScopeGates": [
     "unityImport",
     "unitySaveReload",
@@ -40,21 +65,27 @@
     "ndmf",
     "vrchatBuildTest",
     "vrchatRuntime",
-    "humanRuntimeReview"
+    "humanRuntimeReview",
+    "visualAppearanceReview"
   ],
   "rules": {
     "actionsArtifactsAreCanonicalWorkState": false,
     "trackedCheckpointRequiredForHandoff": true,
     "completionDeterminedByRenderedEvidence": true,
-    "visualAppearanceReviewRequired": true,
+    "runnerMachineAuditRequired": true,
+    "visualAppearanceReviewRequiredForCompletion": false,
     "visualAppearanceReviewMayBePerformedByChatGPT": true,
     "unityRequiredForCompletion": false,
     "runtimeValidationInScope": false,
     "outOfScopeFailuresAreBlockers": false,
-    "fitAuditFailureBlocksCompletion": false,
+    "fitAuditFailureBlocksCompletion": true,
     "runtimeCompatibilityMustNotBeClaimedWithoutExternalEvidence": true,
     "rebuildFromZeroWhenCheckpointExists": false,
-    "retainRejectedCheckpointAndReason": true
+    "retainRejectedCheckpointAndReason": true,
+    "missingProducerMayPass": false,
+    "unverifiedMayPass": false,
+    "thresholdMutationDuringRunAllowed": false,
+    "humanDecisionWaitStateAllowed": false
   },
   "canonicalPrefabPattern": "Assets/GenWorks/<product-id>/Prefab/*.prefab"
 }

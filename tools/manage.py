@@ -29,6 +29,14 @@ AUDITS = {
     "research": "audit_research_baseline.py",
 }
 AUDIT_TARGETS = (*AUDITS, "methods")
+RUNNER_ACTIONS = (
+    "freeze",
+    "validate",
+    "evaluate",
+    "compare",
+    "ledger-init",
+    "ledger-record",
+)
 
 
 def _run(script: str, *arguments: str) -> int:
@@ -174,9 +182,7 @@ def _experiment_matrix(path_text: str) -> int:
         "include": [
             {
                 "method": method_id,
-                "runner": str(
-                    by_id.get(method_id, {}).get("runner") or "ubuntu-latest"
-                ),
+                "runner": str(by_id.get(method_id, {}).get("runner") or "ubuntu-latest"),
             }
             for method_id in methods
         ]
@@ -246,6 +252,10 @@ def build_parser() -> argparse.ArgumentParser:
     aggregate.add_argument("--results-dir")
     aggregate.add_argument("--output")
 
+    runner = commands.add_parser("runner")
+    runner.add_argument("action", choices=RUNNER_ACTIONS)
+    runner.add_argument("arguments", nargs=argparse.REMAINDER)
+
     audit = commands.add_parser("audit")
     audit.add_argument("target", choices=(*AUDIT_TARGETS, "all"))
     return parser
@@ -265,11 +275,9 @@ def main() -> int:
     if options.command == "experiment-method":
         return _experiment_method(options.manifest, options.method)
     if options.command == "experiment-aggregate":
-        return _experiment_aggregate(
-            options.manifest,
-            options.results_dir,
-            options.output,
-        )
+        return _experiment_aggregate(options.manifest, options.results_dir, options.output)
+    if options.command == "runner":
+        return _run("runner_machine_audit.py", options.action, *options.arguments)
     if options.command == "audit":
         return _audit_all() if options.target == "all" else _audit(options.target)
     raise AssertionError(options.command)

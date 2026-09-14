@@ -150,7 +150,7 @@ class RepositoryContractTest(unittest.TestCase):
         )
 
         handoff = read_json(ROOT / "config" / "genworks-handoff-policy.json")
-        self.assertEqual(handoff["schemaVersion"], 2)
+        self.assertEqual(handoff["schemaVersion"], 3)
         self.assertEqual(
             handoff["statuses"],
             ["WORKING", "COMPLETE", "REJECTED"],
@@ -167,7 +167,7 @@ class RepositoryContractTest(unittest.TestCase):
                 "prefabDeclared",
                 "fiveViewEvidence",
                 "poseEvidence",
-                "visualAppearanceReview",
+                "runnerMachineAudit",
             },
         )
         self.assertEqual(
@@ -181,23 +181,40 @@ class RepositoryContractTest(unittest.TestCase):
                 "vrchatBuildTest",
                 "vrchatRuntime",
                 "humanRuntimeReview",
+                "visualAppearanceReview",
             },
         )
         self.assertFalse(completion & out_of_scope)
+        runner = handoff["runnerMachineAudit"]
+        self.assertEqual(runner["states"], ["PASS", "FAIL", "UNVERIFIED"])
+        self.assertEqual(runner["completionState"], "PASS")
+        self.assertEqual(runner["requiredEvidenceRatio"], 1.0)
+        self.assertFalse(runner["humanApprovalRequired"])
+        self.assertEqual(runner["candidateAdoption"], "PARETO_DOMINANCE")
+        self.assertEqual(runner["equalCandidateDecision"], "REVERT")
+        self.assertEqual(
+            runner["stopReasons"],
+            ["SUCCESS", "STALLED", "BUDGET_EXHAUSTED", "FAILED_HARD"],
+        )
 
         expected_rules = {
             "actionsArtifactsAreCanonicalWorkState": False,
             "trackedCheckpointRequiredForHandoff": True,
             "completionDeterminedByRenderedEvidence": True,
-            "visualAppearanceReviewRequired": True,
+            "runnerMachineAuditRequired": True,
+            "visualAppearanceReviewRequiredForCompletion": False,
             "visualAppearanceReviewMayBePerformedByChatGPT": True,
             "unityRequiredForCompletion": False,
             "runtimeValidationInScope": False,
             "outOfScopeFailuresAreBlockers": False,
-            "fitAuditFailureBlocksCompletion": False,
+            "fitAuditFailureBlocksCompletion": True,
             "runtimeCompatibilityMustNotBeClaimedWithoutExternalEvidence": True,
             "rebuildFromZeroWhenCheckpointExists": False,
             "retainRejectedCheckpointAndReason": True,
+            "missingProducerMayPass": False,
+            "unverifiedMayPass": False,
+            "thresholdMutationDuringRunAllowed": False,
+            "humanDecisionWaitStateAllowed": False,
         }
         for name, value in expected_rules.items():
             with self.subTest(rule=name):
