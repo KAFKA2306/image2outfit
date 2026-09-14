@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-crosswind-vent-shirt-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "v1-crosswind-vent",
+  "panels": [
+    "shirt_front_L",
+    "shirt_front_R",
+    "shirt_back",
+    "short_sleeve_L",
+    "short_sleeve_R",
+    "inner_front",
+    "inner_back",
+    "short_front_L",
+    "short_front_R",
+    "short_back_L",
+    "short_back_R",
+    "waistband_outer",
+    "waistband_inner",
+    "shirt_facing",
+    "vent_facing_L",
+    "vent_facing_R"
+  ],
+  "separateGeometry": [
+    "back_vent_L",
+    "back_vent_R",
+    "side_vent_L",
+    "side_vent_R",
+    "closure_tab"
+  ],
+  "priorityFitZones": [
+    "shoulder",
+    "armhole",
+    "waist",
+    "hip",
+    "upper-thigh"
+  ],
+  "requiredPoses": [
+    "neutral",
+    "arms-up",
+    "arm-cross",
+    "crouch",
+    "sit",
+    "prone"
+  ],
+  "releaseBoundary": "Technical completion only; customer release/runtime review remains governed by repository policy.",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Issue #522 design contract and bounded short vent geometry",
+    "reason": "All four vent flaps are short faced panels intended to follow neighboring torso/hip skinning in the first accepted build; no long free-hanging cloth component is present."
+  }
+}
