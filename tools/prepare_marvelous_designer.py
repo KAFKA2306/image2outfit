@@ -101,13 +101,15 @@ def main() -> int:
     blockers = []
     if request["arrangement"]["status"] != "BOUND":
         blockers.append("canonical initialize-3d placement is not bound")
+    if request["materials"]["status"] != "BOUND":
+        blockers.append("canonical realized PBR textures are not fully bound")
     if request["materials"]["unassignedPatterns"]:
         blockers.append("some patterns have no canonical material assignment")
     print(
         json.dumps(
             {
                 "status": "PREPARED",
-                "executionStatus": "UNVERIFIED",
+                "executionStatus": "UNVERIFIED" if blockers else "READY_FOR_MD",
                 "productId": product_id,
                 "request": str(output.relative_to(ROOT)),
                 "requestSha256": request["requestSha256"],
