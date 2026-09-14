@@ -1,6 +1,6 @@
 # Siroino Origami Pocket Camp Set
 
-Technical manufacturing workline: Issue #529.
+Technical manufacturing workline: Issue #528.
 
 This product is a cropped camp-collar overshirt, fitted inner top and tailored high-waist shorts. Product identity is carried by three separately named bounded Origami Box Pockets: one chest pocket and paired hip pockets.
 
@@ -12,4 +12,4 @@ Blender fit, armature weighting, FBX export, five-view renders, six-pose renders
 
 ## Restart point
 
-Do not add a product-only builder. First prove a repository-owned generic garment build entrypoint on current main, then add a schema-valid product job pointing to that existing authority. Continue on Issue #529 if that boundary fails.
+Do not add a product-only builder. First prove a repository-owned generic garment build entrypoint on current main, then add a schema-valid product job pointing to that existing authority. Continue on Issue #528 if that boundary fails.
