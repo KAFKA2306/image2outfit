@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-sidelock-column-set",
+  "designRevision": "v1-sidelock-column",
+  "units": "m",
+  "pieces": [
+    {"id":"top_front_L","role":"fabric_top","mirrorOf":"top_front_R"},
+    {"id":"top_front_R","role":"fabric_top","mirrorOf":"top_front_L"},
+    {"id":"top_back","role":"fabric_top"},
+    {"id":"neck_facing_front","role":"trim"},
+    {"id":"neck_facing_back","role":"trim"},
+    {"id":"skirt_front_L","role":"fabric_skirt","mirrorOf":"skirt_front_R"},
+    {"id":"skirt_front_R","role":"fabric_skirt","mirrorOf":"skirt_front_L"},
+    {"id":"skirt_back_L","role":"fabric_skirt","mirrorOf":"skirt_back_R"},
+    {"id":"skirt_back_R","role":"fabric_skirt","mirrorOf":"skirt_back_L"},
+    {"id":"waistband_outer","role":"fabric_skirt"},
+    {"id":"waistband_inner","role":"trim"},
+    {"id":"rear_slit_facing_L","role":"trim"},
+    {"id":"rear_slit_facing_R","role":"trim"},
+    {"id":"side_lock_L_A","role":"hero"},
+    {"id":"side_lock_L_B","role":"hero"},
+    {"id":"side_lock_L_C","role":"hero"},
+    {"id":"side_lock_R_A","role":"hero"},
+    {"id":"side_lock_R_B","role":"hero"},
+    {"id":"side_lock_R_C","role":"hero"}
+  ],
+  "heroGeometry": ["side_lock_L_A","side_lock_L_B","side_lock_L_C","side_lock_R_A","side_lock_R_B","side_lock_R_C"],
+  "seamIntent": [
+    "square neckline remains bounded and symmetric",
+    "waistband joins top of column skirt without peplum flare",
+    "rear center seam terminates in a real walking slit",
+    "each three-leaf Side-Lock stack is attached only along its inner hip edge"
+  ]
+}
