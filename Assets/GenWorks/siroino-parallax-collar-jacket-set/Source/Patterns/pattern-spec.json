@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-parallax-collar-jacket-set",
+  "constructionProfile": "panel-sewn",
+  "pieces": [
+    "jacket_front_L", "jacket_front_R", "jacket_back", "sleeve_L", "sleeve_R", "cuff_L", "cuff_R",
+    "front_facing_L", "front_facing_R", "back_yoke", "inner_front", "inner_back",
+    "trouser_front_L", "trouser_front_R", "trouser_back_L", "trouser_back_R", "waistband_outer", "waistband_inner",
+    "parallax_collar_outer", "parallax_collar_inner", "collar_facing_outer", "collar_facing_inner"
+  ],
+  "heroPieces": ["parallax_collar_outer", "parallax_collar_inner", "collar_facing_outer", "collar_facing_inner"],
+  "heroContract": {
+    "outerHeightGreaterThanInner": true,
+    "outerRearBiasMm": 12,
+    "innerForwardBiasMm": 8,
+    "textureOnlySubstitutionAllowed": false
+  },
+  "criticalFitZones": ["neck", "shoulder", "elbow", "waist", "hip", "crotch", "knee"],
+  "physics": "NOT_REQUIRED"
+}
