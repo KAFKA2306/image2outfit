@@ -125,6 +125,20 @@ def png_size(file: Path) -> tuple[int, int]:
     return struct.unpack(">II", header[16:24])
 
 
+def _shape_key_requirement(job: dict[str, Any]) -> str | None:
+    product_id = job.get("id")
+    if not isinstance(product_id, str) or not product_id:
+        return None
+    construction = read(
+        ROOT / "config" / "products" / product_id / "construction.json"
+    )
+    postprocess = construction.get("shapeKeyPostprocess")
+    if not isinstance(postprocess, dict):
+        return None
+    applicability = postprocess.get("applicability")
+    return applicability if isinstance(applicability, str) else None
+
+
 def _shape_key_gate(job: dict[str, Any]) -> dict[str, Any]:
     artifact_value = job.get("artifactDir")
     if not isinstance(artifact_value, str) or not artifact_value:
@@ -147,6 +161,12 @@ def _shape_key_gate(job: dict[str, Any]) -> dict[str, Any]:
     elif report.get("provider") != "maxwilso-smooth-shape-keys":
         item["passed"] = False
         item["error"] = "unexpected Shape Key postprocess provider"
+    elif (
+        _shape_key_requirement(job) == "REQUIRED"
+        and report.get("status") == "NOT_APPLICABLE"
+    ):
+        item["passed"] = False
+        item["error"] = "required Shape Keys were not generated"
     return item
 
 
