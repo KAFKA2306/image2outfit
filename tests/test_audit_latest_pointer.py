@@ -72,9 +72,7 @@ class AuditLatestPointerTests(unittest.TestCase):
                 audit_root=root,
                 canonical_stages=["pattern"],
             )
-            self.assertEqual(
-                verify_latest_audit_pointer(root, "demo")["runId"], "run-1"
-            )
+            self.assertEqual(verify_latest_audit_pointer(root, "demo")["runId"], "run-1")
 
             manifest = root / "demo" / "run-1" / "manifest.json"
             data = json.loads(manifest.read_text(encoding="utf-8"))
