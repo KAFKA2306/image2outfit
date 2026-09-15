@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-aperture-sleeve-jacket-set",
+  "productName": "Aperture Sleeve Jacket Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-aperture-sleeve-jacket-set",
+  "sourceJobPath": "config/products/siroino-aperture-sleeve-jacket-set/job.json",
+  "generatedAt": "2026-09-15T08:31:26+09:00",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "structuralPrototype": "PASS",
+    "canonicalJob": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "technicalGates": {
+    "blender": "UNVERIFIED",
+    "uvMapping": "PASS",
+    "weightTransfer": "UNVERIFIED",
+    "exactBodyPoseRenders": "UNVERIFIED",
+    "latestGeometryRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabSerialized": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-aperture-sleeve-jacket-set",
+    "doNotRebuildFromZero": true,
+    "issue": 567,
+    "resumeFrom": "config/products/siroino-aperture-sleeve-jacket-set/job.json",
+    "blockers": []
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-aperture-sleeve-jacket-set/Source/Prototype/structural.obj",
+    "sha256": "a3127748cd1ff3e3018d7a949d2bab2c965309481a337d1069e3ed86cf3f4d7c",
+    "vertices": 152,
+    "uvCoordinates": 152,
+    "polygonFaces": 38,
+    "namedGroups": 20,
+    "materialRoles": 5,
+    "heroGroups": ["aperture_ring_L", "aperture_ring_R", "aperture_facing_L", "aperture_facing_R"]
+  }
+}
