@@ -42,13 +42,24 @@ class AuditLatestPointerTests(unittest.TestCase):
     def test_latest_is_published_only_after_bundle_verification(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            write_audit_bundle(self._state("good"), audit_root=root, canonical_stages=["pattern"])
+            write_audit_bundle(
+                self._state("good"),
+                audit_root=root,
+                canonical_stages=["pattern"],
+            )
             latest = root / "demo" / "latest.json"
             before = latest.read_bytes()
 
-            with patch("image2outfit.audit.verify_audit_bundle", side_effect=ValueError("bad bundle")):
+            with patch(
+                "image2outfit.audit.verify_audit_bundle",
+                side_effect=ValueError("bad bundle"),
+            ):
                 with self.assertRaisesRegex(ValueError, "bad bundle"):
-                    write_audit_bundle(self._state("bad"), audit_root=root, canonical_stages=["pattern"])
+                    write_audit_bundle(
+                        self._state("bad"),
+                        audit_root=root,
+                        canonical_stages=["pattern"],
+                    )
 
             self.assertEqual(latest.read_bytes(), before)
             self.assertTrue((root / "demo" / "bad" / "manifest.json").is_file())
@@ -56,8 +67,14 @@ class AuditLatestPointerTests(unittest.TestCase):
     def test_verified_latest_pointer_rejects_manifest_tamper(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            write_audit_bundle(self._state("run-1"), audit_root=root, canonical_stages=["pattern"])
-            self.assertEqual(verify_latest_audit_pointer(root, "demo")["runId"], "run-1")
+            write_audit_bundle(
+                self._state("run-1"),
+                audit_root=root,
+                canonical_stages=["pattern"],
+            )
+            self.assertEqual(
+                verify_latest_audit_pointer(root, "demo")["runId"], "run-1"
+            )
 
             manifest = root / "demo" / "run-1" / "manifest.json"
             data = json.loads(manifest.read_text(encoding="utf-8"))
@@ -69,8 +86,16 @@ class AuditLatestPointerTests(unittest.TestCase):
     def test_verified_latest_pointer_rejects_cross_product_target(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            write_audit_bundle(self._state("a-run", "a"), audit_root=root, canonical_stages=["pattern"])
-            write_audit_bundle(self._state("b-run", "b"), audit_root=root, canonical_stages=["pattern"])
+            write_audit_bundle(
+                self._state("a-run", "a"),
+                audit_root=root,
+                canonical_stages=["pattern"],
+            )
+            write_audit_bundle(
+                self._state("b-run", "b"),
+                audit_root=root,
+                canonical_stages=["pattern"],
+            )
             latest = root / "a" / "latest.json"
             pointer = json.loads(latest.read_text(encoding="utf-8"))
             pointer["manifestPath"] = "b/b-run/manifest.json"
