@@ -128,19 +128,25 @@ def validate_stage_records(
             raise ValueError(f"stage audit record {index} sequence is invalid")
         if expected_run_id is not None and record.get("runId") != expected_run_id:
             raise ValueError(f"stage audit record {index} runId mismatch")
-        if expected_product_id is not None and record.get("productId") != expected_product_id:
+        if (
+            expected_product_id is not None
+            and record.get("productId") != expected_product_id
+        ):
             raise ValueError(f"stage audit record {index} productId mismatch")
         if canonical_stages is not None:
             if index > len(canonical_stages):
                 raise ValueError("stage audit records exceed the canonical stage count")
             if record.get("stage") != canonical_stages[index - 1]:
-                raise ValueError(f"stage audit record {index} is out of canonical order")
+                raise ValueError(
+                    f"stage audit record {index} is out of canonical order"
+                )
         if record.get("previousRecordDigest") != previous:
             raise ValueError(f"stage audit record {index} chain is broken")
         claimed = record.pop("recordDigest", None)
         if not isinstance(claimed, str) or not _HASH.fullmatch(claimed):
             raise ValueError(f"stage audit record {index} digest is invalid")
-        if sha256_json(record) != claimed:
+        actual = sha256_json(record)
+        if actual != claimed:
             raise ValueError(f"stage audit record {index} digest mismatch")
         previous = claimed
 
@@ -173,7 +179,10 @@ def _write_json_atomic(path: Path, value: Any) -> None:
 
 
 def write_audit_bundle(
-    state: Mapping[str, Any], *, audit_root: Path, canonical_stages: Sequence[str]
+    state: Mapping[str, Any],
+    *,
+    audit_root: Path,
+    canonical_stages: Sequence[str],
 ) -> dict[str, Any]:
     run_id = _safe_identifier(str(state["run_id"]), label="run_id")
     product_id = _safe_identifier(str(state["product_id"]), label="product_id")
@@ -188,7 +197,9 @@ def write_audit_bundle(
         canonical_stages=canonical_stages,
     )
     final_status = state.get("status")
-    if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(canonical_stages):
+    if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(
+        canonical_stages
+    ):
         raise ValueError("successful pipeline audit must contain all canonical stages")
 
     resolved_audit_root = audit_root.resolve()
@@ -312,6 +323,7 @@ def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
         raise ValueError("audit manifest stages must be a list")
     if manifest.get("recordedStageCount") != len(stage_entries):
         raise ValueError("audit manifest recordedStageCount mismatch")
+
     records: list[dict[str, Any]] = []
     for index, entry in enumerate(stage_entries, start=1):
         if not isinstance(entry, Mapping):
@@ -333,8 +345,11 @@ def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
         canonical_stages=canonical_stages,
     )
     final_status = manifest.get("finalStatus")
-    if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(canonical_stages):
+    if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(
+        canonical_stages
+    ):
         raise ValueError("successful audit manifest must contain every canonical stage")
+
     state_entry = manifest.get("pipelineState")
     if not isinstance(state_entry, Mapping):
         raise ValueError("audit manifest pipelineState must be an object")
