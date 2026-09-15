@@ -7,11 +7,13 @@ import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest import mock
 
 TOOLS = Path(__file__).resolve().parents[1] / 'tools'
 sys.path.insert(0, str(TOOLS))
 
 import audit_research_baseline  # noqa: E402
+import candidate_orchestrator  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,6 +51,16 @@ class ResearchBaselineTest(unittest.TestCase):
         self.assertEqual(
             set(result['requiredCapabilities']),
             set(result['productionCoverage']),
+        )
+
+    def test_candidate_orchestrator_resolves_relative_baseline_from_active_root(self) -> None:
+        with mock.patch.object(candidate_orchestrator.candidate_contract, 'ROOT', self.root):
+            report, baseline, baseline_hash = candidate_orchestrator._research_state()
+        self.assertTrue(report['passed'], report['errors'])
+        self.assertEqual(baseline['baselineId'], report['baselineId'])
+        self.assertEqual(
+            baseline_hash,
+            candidate_orchestrator.candidate_contract.digest(self.path),
         )
 
     def test_stale_survey_blocks_production(self) -> None:

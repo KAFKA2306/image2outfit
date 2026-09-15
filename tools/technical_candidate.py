@@ -12,6 +12,12 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Blender executes this file as a standalone script and does not guarantee
+# that its sibling tools directory is on sys.path.
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
 import audit_toolchain
 import blender_python_env
 import candidate_manifest as candidate_contract

@@ -28,7 +28,9 @@ def _augment_audit(artifact: Path, values: dict[str, Any]) -> None:
 
 def _research_state() -> tuple[dict[str, Any], dict[str, Any], str]:
     report = audit_research_baseline.audit(candidate_contract.ROOT)
-    baseline_path = audit_research_baseline.BASELINE_PATH
+    baseline_path = (
+        candidate_contract.ROOT / audit_research_baseline.BASELINE_RELATIVE_PATH
+    )
     baseline = candidate_contract.read(baseline_path)
     baseline_hash = (
         candidate_contract.digest(baseline_path) if baseline_path.is_file() else ""
