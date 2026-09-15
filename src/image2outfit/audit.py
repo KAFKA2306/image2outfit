@@ -246,6 +246,8 @@ def write_audit_bundle(
     manifest_path = run_root / "manifest.json"
     _write_json_atomic(manifest_path, manifest)
     manifest_sha256 = sha256_file(manifest_path)
+
+    verify_audit_bundle(run_root)
     latest_path = resolved_audit_root / product_id / "latest.json"
     _write_json_atomic(
         latest_path,
@@ -259,7 +261,6 @@ def write_audit_bundle(
             "updatedAt": utc_now(),
         },
     )
-    verify_audit_bundle(run_root)
     return {
         "root": run_root.as_posix(),
         "manifestPath": manifest_path.as_posix(),
@@ -267,6 +268,44 @@ def write_audit_bundle(
         "latestPath": latest_path.as_posix(),
         "chainHeadDigest": manifest["chainHeadDigest"],
     }
+
+
+def verify_latest_audit_pointer(audit_root: Path, product_id: str) -> dict[str, Any]:
+    """Verify that latest points to one valid immutable run for the requested product."""
+    product_id = _safe_identifier(product_id, label="product_id")
+    resolved_audit_root = audit_root.resolve()
+    latest_path = resolved_audit_root / product_id / "latest.json"
+    pointer = json.loads(latest_path.read_text(encoding="utf-8"))
+    if not isinstance(pointer, dict):
+        raise ValueError("latest audit pointer must be an object")
+    if pointer.get("schemaVersion") != 1:
+        raise ValueError("latest audit pointer schemaVersion must be 1")
+    if pointer.get("productId") != product_id:
+        raise ValueError("latest audit pointer productId mismatch")
+    manifest_value = pointer.get("manifestPath")
+    if not isinstance(manifest_value, str) or not manifest_value:
+        raise ValueError("latest audit pointer manifestPath is required")
+    manifest_path = _resolve_inside(
+        resolved_audit_root, manifest_value, label="latest manifestPath"
+    )
+    product_root = (resolved_audit_root / product_id).resolve()
+    if product_root not in manifest_path.parents:
+        raise ValueError("latest audit pointer manifestPath escapes product namespace")
+    if manifest_path.name != "manifest.json" or not manifest_path.is_file():
+        raise ValueError("latest audit pointer target manifest is missing")
+    claimed_sha = pointer.get("manifestSha256")
+    if (
+        not isinstance(claimed_sha, str)
+        or not _HASH.fullmatch(claimed_sha)
+        or sha256_file(manifest_path) != claimed_sha
+    ):
+        raise ValueError("latest audit pointer manifestSha256 mismatch")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    for field in ("productId", "runId", "finalStatus"):
+        if pointer.get(field) != manifest.get(field):
+            raise ValueError(f"latest audit pointer {field} mismatch")
+    verify_audit_bundle(manifest_path.parent)
+    return pointer
 
 
 def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
