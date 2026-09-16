@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Shared schema-v2 builder for panel-sewn structural garments.
-
-The garment silhouette is driven by construction.json and pattern-draft.json.
-This entrypoint intentionally owns only reusable panel primitives and export mechanics;
-product identity remains in tracked product contracts.
-"""
+"""Shared schema-v2 builder for panel-sewn structural garments."""
 from __future__ import annotations
 
 import argparse
@@ -19,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def args() -> argparse.Namespace:
-    raw = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
+    raw = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else sys.argv[1:]
     p = argparse.ArgumentParser()
     p.add_argument("--job", required=True)
     return p.parse_args(raw)
@@ -34,7 +29,7 @@ def resolve(value: str) -> Path:
     return p if p.is_absolute() else (ROOT / p).resolve()
 
 
-def material(name: str, rgba: tuple[float, float, float, float], roughness: float = .72):
+def material(name: str, rgba: tuple[float, float, float, float], roughness: float = 0.72):
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     bsdf = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
@@ -43,7 +38,7 @@ def material(name: str, rgba: tuple[float, float, float, float], roughness: floa
     return m
 
 
-def cube(name: str, loc, scale, mat, bevel=.012):
+def cube(name: str, loc, scale, mat, bevel=0.008):
     bpy.ops.mesh.primitive_cube_add(size=1, location=loc)
     o = bpy.context.object
     o.name = name
@@ -57,8 +52,14 @@ def cube(name: str, loc, scale, mat, bevel=.012):
 
 
 def sleeve(name: str, side: float, mat):
-    bpy.ops.mesh.primitive_cone_add(vertices=20, radius1=.075, radius2=.105, depth=.43,
-                                    location=(side*.245, 0, .93), rotation=(0, math.radians(74), 0))
+    bpy.ops.mesh.primitive_cone_add(
+        vertices=20,
+        radius1=0.052,
+        radius2=0.072,
+        depth=0.34,
+        location=(side * 0.19, 0, 0.91),
+        rotation=(0, math.radians(78), 0),
+    )
     o = bpy.context.object
     o.name = name
     o.data.materials.append(mat)
@@ -66,17 +67,17 @@ def sleeve(name: str, side: float, mat):
 
 
 def pannier(name: str, side: float, index: int, mat):
-    z = .61 - index*.055
-    x = side * (.19 + index*.035)
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(x, -.005, z))
+    z = 0.61 - index * 0.045
+    x = side * (0.145 + index * 0.025)
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(x, -0.005, z))
     o = bpy.context.object
     o.name = name
-    o.scale = (.105, .018, .16)
-    o.rotation_euler[1] = side * math.radians(13 + index*10)
-    o.rotation_euler[2] = side * math.radians(7 + index*5)
+    o.scale = (0.072, 0.014, 0.12)
+    o.rotation_euler[1] = side * math.radians(10 + index * 8)
+    o.rotation_euler[2] = side * math.radians(5 + index * 4)
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     b = o.modifiers.new("BoundedThickness", "BEVEL")
-    b.width = .012
+    b.width = 0.008
     b.segments = 3
     o.data.materials.append(mat)
     return o
@@ -93,7 +94,7 @@ def uv_all(objects):
                 other.select_set(False)
         bpy.ops.object.mode_set(mode="EDIT")
         bpy.ops.mesh.select_all(action="SELECT")
-        bpy.ops.uv.smart_project(island_margin=.03)
+        bpy.ops.uv.smart_project(island_margin=0.03)
         bpy.ops.object.mode_set(mode="OBJECT")
 
 
@@ -112,22 +113,27 @@ def main() -> int:
         raise ValueError("pattern draft productId mismatch")
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    shell = material("MAT_Shell", (.78, .73, .62, 1))
-    inner = material("MAT_Inner", (.28, .34, .40, 1))
-    bottoms = material("MAT_Bottoms", (.10, .11, .13, 1))
-    hero = material("MAT_Hero", (.48, .25, .14, 1), .62)
-    hardware = material("MAT_Hardware", (.08, .09, .10, 1), .38)
+    shell = material("MAT_Shell", (0.78, 0.73, 0.62, 1))
+    inner = material("MAT_Inner", (0.28, 0.34, 0.40, 1))
+    bottoms = material("MAT_Bottoms", (0.10, 0.11, 0.13, 1))
+    hero = material("MAT_Hero", (0.48, 0.25, 0.14, 1), 0.62)
+    hardware = material("MAT_Hardware", (0.08, 0.09, 0.10, 1), 0.38)
 
-    made = [cube("jacket_back", (0,.055,.83), (.17,.025,.24), shell),
-            cube("jacket_front_L", (-.087,-.055,.83), (.082,.025,.24), shell),
-            cube("jacket_front_R", (.087,-.055,.83), (.082,.025,.24), shell),
-            sleeve("sleeve_L", -1, shell), sleeve("sleeve_R", 1, shell),
-            cube("inner_front", (0,-.065,.69), (.145,.018,.15), inner),
-            cube("bottom_front", (0,-.025,.48), (.16,.04,.17), bottoms),
-            cube("bottom_back", (0,.035,.48), (.16,.04,.17), bottoms),
-            cube("waistband_outer", (0,-.075,.625), (.17,.018,.025), inner)]
-    for side, label in [(-1,"L"),(1,"R")]:
-        made.append(cube(f"hinge_root_{label}", (side*.18,-.005,.66), (.022,.025,.11), hardware, .006))
+    # Conservative Siroino-scale envelope. The prior dimensions were visibly oversized
+    # in pose evidence, so keep the shell close to the body while preserving the pannier hero detail.
+    made = [
+        cube("jacket_back", (0, 0.035, 0.82), (0.125, 0.018, 0.19), shell),
+        cube("jacket_front_L", (-0.064, -0.038, 0.82), (0.059, 0.018, 0.19), shell),
+        cube("jacket_front_R", (0.064, -0.038, 0.82), (0.059, 0.018, 0.19), shell),
+        sleeve("sleeve_L", -1, shell),
+        sleeve("sleeve_R", 1, shell),
+        cube("inner_front", (0, -0.045, 0.68), (0.105, 0.012, 0.115), inner),
+        cube("bottom_front", (0, -0.018, 0.49), (0.115, 0.026, 0.13), bottoms),
+        cube("bottom_back", (0, 0.025, 0.49), (0.115, 0.026, 0.13), bottoms),
+        cube("waistband_outer", (0, -0.05, 0.625), (0.125, 0.012, 0.018), inner),
+    ]
+    for side, label in [(-1, "L"), (1, "R")]:
+        made.append(cube(f"hinge_root_{label}", (side * 0.135, -0.004, 0.65), (0.015, 0.018, 0.075), hardware, 0.004))
         for i, suffix in enumerate("ABC"):
             made.append(pannier(f"pannier_{label}_{suffix}", side, i, hero))
     uv_all(made)
@@ -140,8 +146,14 @@ def main() -> int:
     bpy.ops.object.select_all(action="DESELECT")
     for o in made:
         o.select_set(True)
-    bpy.ops.export_scene.fbx(filepath=str(fbx), use_selection=True, add_leaf_bones=False,
-                             bake_anim=False, axis_forward="-Z", axis_up="Y")
+    bpy.ops.export_scene.fbx(
+        filepath=str(fbx),
+        use_selection=True,
+        add_leaf_bones=False,
+        bake_anim=False,
+        axis_forward="-Z",
+        axis_up="Y",
+    )
     if not blend.is_file() or not fbx.is_file():
         raise RuntimeError("structural garment export did not materialize expected outputs")
     print(json.dumps({"product": product, "meshObjects": len(made), "blend": str(blend), "fbx": str(fbx)}))
