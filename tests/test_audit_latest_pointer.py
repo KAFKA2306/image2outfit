@@ -39,7 +39,9 @@ class AuditLatestPointerTests(unittest.TestCase):
             "stage_records": [record],
         }
 
-    def _write(self, root: Path, run_id: str = "run-1", product_id: str = "demo") -> Path:
+    def _write(
+        self, root: Path, run_id: str = "run-1", product_id: str = "demo"
+    ) -> Path:
         write_audit_bundle(
             self._state(run_id, product_id),
             audit_root=root,
@@ -60,7 +62,9 @@ class AuditLatestPointerTests(unittest.TestCase):
             self.assertEqual(pointer["runId"], "run-1")
             self.assertEqual(pointer["productId"], "demo")
 
-    def test_existing_latest_is_preserved_when_new_bundle_verification_fails(self) -> None:
+    def test_existing_latest_is_preserved_when_new_bundle_verification_fails(
+        self,
+    ) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             latest = self._write(root, "good")
@@ -121,7 +125,11 @@ class AuditLatestPointerTests(unittest.TestCase):
                     verify_latest_audit_pointer(root, "demo")
 
     def test_cross_product_and_path_escape_targets_are_rejected(self) -> None:
-        cases = ("b/b-run/manifest.json", "../outside/manifest.json", "/tmp/manifest.json")
+        cases = (
+            "b/b-run/manifest.json",
+            "../outside/manifest.json",
+            "/tmp/manifest.json",
+        )
         for target in cases:
             with self.subTest(target=target), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
@@ -138,17 +146,23 @@ class AuditLatestPointerTests(unittest.TestCase):
             latest = self._write(root)
             pointer = json.loads(latest.read_text(encoding="utf-8"))
             stage = root / "demo" / "run-1" / "stages" / "001-pattern.json"
-            stage.write_text(stage.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+            stage.write_text(
+                stage.read_text(encoding="utf-8") + "\n", encoding="utf-8"
+            )
             with self.assertRaisesRegex(ValueError, "stage file hash mismatch"):
                 verify_latest_audit_pointer(root, "demo")
-            self.assertEqual(json.loads(latest.read_text(encoding="utf-8"))["runId"], pointer["runId"])
+            self.assertEqual(
+                json.loads(latest.read_text(encoding="utf-8"))["runId"], pointer["runId"]
+            )
 
     def test_latest_replacement_is_parseable_and_leaves_no_temp_file(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             latest = self._write(root, "run-1")
             self._write(root, "run-2")
-            self.assertEqual(json.loads(latest.read_text(encoding="utf-8"))["runId"], "run-2")
+            self.assertEqual(
+                json.loads(latest.read_text(encoding="utf-8"))["runId"], "run-2"
+            )
             self.assertEqual(list(latest.parent.glob("*.tmp")), [])
 
 
