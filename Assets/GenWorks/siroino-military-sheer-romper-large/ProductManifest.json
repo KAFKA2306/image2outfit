@@ -3,50 +3,106 @@
   "productId": "siroino-military-sheer-romper-large",
   "productName": "Military Sheer-Back Romper for Siroino _Large",
   "status": "WORKING",
-  "classification": "HOSTED_GENERATED_PREFAB_CHECKPOINT",
+  "classification": "ACTUAL_TARGET_FITTED_PREFAB_CHECKPOINT",
   "targetAdapterId": "siroino-v1.0-large",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetBodyObject": "SiroinoSotai_PC",
+  "targetArmatureObject": "SiroinoSotai_Armature",
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
   "productRoot": "Assets/GenWorks/siroino-military-sheer-romper-large",
   "outfitPrefabPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/SiroinoMilitarySheerRomperLarge.prefab",
   "integratedPrefabPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/Siroino_Large_MilitarySheerRomper.prefab",
   "previewPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-military-sheer-romper-large/README.md",
   "sourceJobPath": "config/products/siroino-military-sheer-romper-large/job.json",
-  "generatedAt": "2026-08-02T09:57:12.424454Z",
+  "generatedAt": "2026-09-16T01:44:20.254668Z",
   "blenderVersion": "4.4.3",
-  "constructionProfile": "panel-sewn",
-  "designRevision": "smooth-tailored-v4",
-  "reference": {
-    "sourceImageRedistributed": false,
-    "sourceImageSha256": "3f69a72daa79102c0af5679e2c54d4f078231bdab124314703e2626bcef0e460",
-    "sourceImageDimensions": [1200, 1022],
-    "interpretation": "black military short romper with stand collar, asymmetric front, gold hardware, shoulder chains, belt, short sleeves, and sheer upper back"
-  },
+  "constructionProfile": "target-surface-panel-sewn",
+  "designRevision": "siroino-pc-base-surface-fit-v12",
   "metrics": {
-    "meshObjects": 30,
-    "vertices": 13092,
-    "triangles": 26076,
+    "meshObjects": 17,
+    "vertices": 6933,
+    "triangles": 12816,
     "degenerateTriangles": 0,
-    "boundaryEdges": 60,
-    "maxBoneInfluences": 1,
-    "unweightedVertices": 0
+    "unweightedVertices": 0,
+    "shapeKeys": 120
+  },
+  "targetFitAudit": {
+    "schemaVersion": 1,
+    "target": "SiroinoSotai_PC",
+    "usesActualTargetSource": true,
+    "auditSurface": "deformed-garment-base",
+    "auditedVertices": 4314,
+    "penetratingVertices": 84,
+    "penetrationRatio": 0.019471488178025034,
+    "minimumClearanceMeters": -0.016698361607268453,
+    "medianClearanceMeters": 0.03256721730576828,
+    "maximumClearanceMeters": 0.0399877282907255,
+    "objects": {
+      "Military_Opaque_Bodice": {
+        "vertices": 2033,
+        "penetratingVertices": 19,
+        "minimumClearanceMeters": -0.0095171551220119,
+        "medianClearanceMeters": 0.032597782323136926
+      },
+      "Military_Sheer_Back": {
+        "vertices": 724,
+        "penetratingVertices": 0,
+        "minimumClearanceMeters": 0.008203178411349654,
+        "medianClearanceMeters": 0.015647666372387903
+      },
+      "Military_Fitted_Shorts": {
+        "vertices": 617,
+        "penetratingVertices": 65,
+        "minimumClearanceMeters": -0.016698361607268453,
+        "medianClearanceMeters": 0.037494161166250706
+      },
+      "Military_Standing_Collar": {
+        "vertices": 314,
+        "penetratingVertices": 0,
+        "minimumClearanceMeters": 0.02221336413640529,
+        "medianClearanceMeters": 0.03477644792292267
+      },
+      "Military_Sleeve_L": {
+        "vertices": 313,
+        "penetratingVertices": 0,
+        "minimumClearanceMeters": 0.0204256524448283,
+        "medianClearanceMeters": 0.034609965456184
+      },
+      "Military_Sleeve_R": {
+        "vertices": 313,
+        "penetratingVertices": 0,
+        "minimumClearanceMeters": 0.020425754715688527,
+        "medianClearanceMeters": 0.03469516395125538
+      }
+    },
+    "passed": false
   },
   "technicalGates": {
-    "blender": "PASS",
-    "editableSource": "PASS",
-    "fbx": "PASS",
-    "prefabDeclared": "PASS",
-    "fiveViewEvidence": "PASS",
-    "poseEvidence": "PASS",
-    "visualAppearanceReview": "PENDING",
-    "researchTrial": "PASS",
-    "unityImport": "OUT_OF_SCOPE",
-    "unitySaveReload": "OUT_OF_SCOPE",
-    "prefabReload": "OUT_OF_SCOPE",
-    "modularAvatar": "OUT_OF_SCOPE",
-    "ndmf": "OUT_OF_SCOPE",
-    "vrchatBuildTest": "OUT_OF_SCOPE",
-    "vrchatRuntime": "OUT_OF_SCOPE",
-    "humanRuntimeReview": "OUT_OF_SCOPE"
+    "actualTargetSourceImport": "PASS",
+    "actualTargetBodyRender": "PASS",
+    "bodySurfacePanelFit": "REVIEW",
+    "armatureWeightTransfer": "PASS",
+    "bodyShapeKeyTransfer": "PASS",
+    "fbxExport": "PASS",
+    "fiveViewRender": "PASS",
+    "unityPrefabYamlGenerated": "PASS",
+    "unityImport": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "ndmf": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING",
+    "actualTargetPoseRender": "PASS"
   },
   "handoff": {
     "resumable": true,
@@ -54,12 +110,16 @@
     "resumeFrom": "Assets/GenWorks/siroino-military-sheer-romper-large/Source/Blender/SiroinoMilitarySheerRomperLarge.blend",
     "doNotRebuildFromZero": true,
     "blockers": [
-      "Open the tracked five-view and pose-review images and record visualAppearanceReview.",
-      "Set status to COMPLETE only when every requiredCompletionGate is PASS."
+      "Run the actual SiroinoSotai_PC pose suite and review penetration evidence.",
+      "Import, save, and reload the generated Prefabs in Unity 2022.3.22f1.",
+      "Validate Modular Avatar/NDMF integration against SiroinoSotai_PC.prefab.",
+      "Run VRChat Build & Test and capture runtime evidence."
     ]
   },
   "hashes": {
-    "fbxSha256": "110231b70bb043c9ad03820062c186b49b7c97d9af4e35bfac089920d29077b5",
-    "frontPreviewSha256": "b796d29378b7485745b1db4e9bd4e30162dd3b2bf26e6a69c4fab9a886c9f249"
-  }
+    "fbxSha256": "ebda7d636e00a0b66120567878641c0963982446de27a6f9c1164ca9fe7b718b",
+    "frontPreviewSha256": "66991bddd715612faa7b3c0296d9c304c879759163e1c97de8edf24b51e0ec43",
+    "targetFitEvidenceSha256": "5e028cc26b1f28909d8a8f0cbe034732e25837cb67d1ba59ee33de4350702d11"
+  },
+  "poseEvidenceUsesActualTarget": true
 }

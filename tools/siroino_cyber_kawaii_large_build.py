@@ -20,6 +20,7 @@ from PIL import Image
 
 import genworks_product_common as g
 import siroino_strappy_knit_build as base
+from tuxedo_halter_runtime import render_prone_pose
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-cyber-kawaii-large"
@@ -526,11 +527,19 @@ def main() -> int:
         title="CYBER KAWAII LAYERED SET / SIROINO _LARGE",
     )
     pose_images = g.render_pose_set(armature, camera, pose_dir)
+    obsolete_twist = pose_images.pop("twist", None)
+    if obsolete_twist is not None and obsolete_twist.is_file():
+        obsolete_twist.unlink()
+    pose_images["prone"] = render_prone_pose(
+        armature,
+        camera,
+        pose_dir / "prone.png",
+    )
     pose_sheet = preview_dir / "siroino-cyber-kawaii-large-pose-review.webp"
     g.contact_sheet(
         pose_images,
         pose_sheet,
-        order=("neutral", "arms-up", "arm-cross", "crouch", "sit", "twist"),
+        order=("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
         title="POSE AND PENETRATION REVIEW",
     )
 

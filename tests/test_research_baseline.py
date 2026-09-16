@@ -58,6 +58,11 @@ class ResearchBaselineTest(unittest.TestCase):
             report, baseline, baseline_hash = candidate_orchestrator._research_state()
         self.assertTrue(report['passed'], report['errors'])
         self.assertEqual(baseline['baselineId'], report['baselineId'])
+        self.assertEqual(baseline['surveyYear'], report['surveyYear'])
+        self.assertEqual(baseline['reviewedAt'], report['reviewedAt'])
+        self.assertEqual(
+            baseline['requiredCapabilities'], report['requiredCapabilities']
+        )
         self.assertEqual(
             baseline_hash,
             candidate_orchestrator.candidate_contract.digest(self.path),

@@ -144,6 +144,7 @@ replacements = {
     'The five-view and six-pose renders are regenerated from the tracked Blender source.': (
         'The five-view and seven-pose review renders are regenerated from the tracked Blender source.'
     ),
+    '"neutral", 800, 24, drape_state)': '"neutral", 1024, 24, drape_state)',
 }
 for old, new in replacements.items():
     if old not in source:

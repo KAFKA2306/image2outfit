@@ -259,12 +259,20 @@ def parent_rigid(
     semantic: str,
 ) -> bpy.types.Object:
     item = resolve_bone(armature, semantic)
+    if item is None:
+        raise RuntimeError(
+            f"cannot attach rigid garment object {obj.name!r}: "
+            f"target bone for {semantic!r} was not found"
+        )
     world = obj.matrix_world.copy()
     obj.parent = armature
-    if item is not None:
-        obj.parent_type = "BONE"
-        obj.parent_bone = item.name
+    obj.parent_type = "OBJECT"
     obj.matrix_world = world
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+    group = obj.vertex_groups.get(item.name) or obj.vertex_groups.new(name=item.name)
+    group.add(range(len(obj.data.vertices)), 1.0, "REPLACE")
     obj["image2outfit_role"] = "garment"
     obj["image2outfit_fit_audit"] = False
     return obj
@@ -663,8 +671,8 @@ def target_fit_audit(
 def scene(body: bpy.types.Object) -> bpy.types.Object:
     camera = ORIGINAL_SCENE(body)
     render = bpy.context.scene.render
-    render.resolution_x = 512
-    render.resolution_y = 512
+    render.resolution_x = 1024
+    render.resolution_y = 1024
     render.resolution_percentage = 100
     for obj in bpy.data.objects:
         if obj.type == "LIGHT":

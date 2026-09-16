@@ -16,24 +16,20 @@ This is a resumable `WORKING` checkpoint for a heather-grey hooded high-cut body
 
 ## Static metrics
 
-- mesh objects: 17
-- vertices: 18056
-- triangles: 35750
-- material slots: 17
-- exported shape keys: 255
+- mesh objects: 12
+- vertices: 19950
+- triangles: 40004
+- material slots: 12
+- exported shape keys: 180
 - maximum bone influences: 4
 
 ## Research trial
 
 The 2026 source is **Learning-based Seam Correspondence Reconstruction in Sewing Patterns**, submitted 2026-07-23. An independent deterministic ablation compares global edge-length pairing with semantic panel-graph filtering. The authors' model, code, dataset and weights are not used or redistributed. See `Research/seam-correspondence-graph-trial.json` for measured precision, recall and F1.
 
-## Current review result
-
-The v6 multiview and required-pose evidence was reviewed on 2026-08-03 and rejected for shoulder/underarm gaps, rigid waist fins, detached hood-back panels and intersections in every required pose. The files are preserved as a resumable `WORKING` checkpoint, not a completed outfit.
-
 ## Remaining gates
 
-- rebuild the shoulder/underarm, waist transition and hood geometry
+- inspect the exact five-view and required-pose renders for silhouette and penetration
 - import/save/reload both Prefabs in pinned Unity
 - validate Modular Avatar/NDMF and VRChat Build & Test
 - capture runtime evidence and complete human review

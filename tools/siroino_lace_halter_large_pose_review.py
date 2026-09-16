@@ -199,8 +199,8 @@ def fit_camera(camera: bpy.types.Object, direction: Vector, *, margin: float = 1
 def setup_scene() -> bpy.types.Object:
     scene = bpy.context.scene
     scene.render.engine = "BLENDER_EEVEE_NEXT"
-    scene.render.resolution_x = 720
-    scene.render.resolution_y = 960
+    scene.render.resolution_x = 1024
+    scene.render.resolution_y = 1024
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGBA"

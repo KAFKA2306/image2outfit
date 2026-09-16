@@ -750,7 +750,7 @@ def main() -> int:
             "integratedPrefabPath": "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab",
             "previewPath": "Assets/GenWorks/siroino-wide-cargo/Previews/front.png",
             "documentationPath": "Assets/GenWorks/siroino-wide-cargo/README.md",
-            "sourceJobPath": "Assets/_Local/Jobs/siroino-wide-cargo/job.json",
+            "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json",
             "generatedAt": report["checkedAt"],
             "blenderVersion": report["blenderVersion"],
             "metrics": metrics,

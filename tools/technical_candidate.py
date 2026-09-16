@@ -21,6 +21,7 @@ if str(TOOLS) not in sys.path:
 import audit_toolchain
 import blender_python_env
 import candidate_manifest as candidate_contract
+from contract_io import required_pose_paths
 
 ROOT = candidate_contract.ROOT
 
@@ -63,6 +64,62 @@ def run_command(
     return process.returncode
 
 
+def run_hosted_pose_render(
+    job_path: Path,
+    job: dict[str, Any],
+    policy: dict[str, Any],
+    prepared: blender_python_env.PreparedEnvironment,
+    artifact: Path,
+) -> dict[str, Any]:
+    pose_script = job.get("hostedPoseScript")
+    if not pose_script:
+        return {"passed": True, "status": "NOT_REQUESTED"}
+    if not isinstance(pose_script, str):
+        return {
+            "passed": False,
+            "status": "INVALID",
+            "error": "hostedPoseScript must be a string",
+        }
+
+    script_path = candidate_contract.path(pose_script)
+    blend_path = candidate_contract.path(job["blendPath"])
+    if not script_path.is_file():
+        return {
+            "passed": False,
+            "status": "MISSING_SCRIPT",
+            "error": f"hosted pose script missing: {pose_script}",
+        }
+
+    exit_code = run_command(
+        [
+            *prepared.command_prefix,
+            "--background",
+            str(blend_path),
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(script_path),
+            "--",
+            "--job",
+            str(job_path),
+        ],
+        artifact / "blender-poses.log",
+        prepared.environment,
+    )
+    pose_paths = required_pose_paths(job, policy)
+    missing = [
+        value for value in pose_paths.values() if not candidate_contract.path(value).is_file()
+    ]
+    return {
+        "passed": exit_code == 0 and not missing,
+        "status": "PASS" if exit_code == 0 and not missing else "FAIL",
+        "script": pose_script,
+        "exitCode": exit_code,
+        "requiredPoses": list(pose_paths),
+        "missingPoses": missing,
+    }
+
+
 def record_unity_ready_product_state(
     job: dict[str, Any],
     report: dict[str, Any],
@@ -98,6 +155,26 @@ def record_unity_ready_product_state(
     release_readiness = manifest.setdefault("releaseReadiness", {})
     if not isinstance(release_readiness, dict):
         raise ValueError("ProductManifest releaseReadiness must be an object")
+    declared_roles = job["unityReady"].get("materialRoles")
+    if isinstance(declared_roles, list):
+        material_roles = {}
+        for item in declared_roles:
+            if not isinstance(item, dict):
+                raise ValueError("unity-ready materialRoles contains a non-object")
+            material = item.get("material")
+            role = item.get("role")
+            if not isinstance(material, str) or not material:
+                raise ValueError("unity-ready materialRoles contains an invalid material")
+            if not isinstance(role, str) or not role:
+                raise ValueError("unity-ready materialRoles contains an invalid role")
+            if material in material_roles:
+                raise ValueError(f"unity-ready materialRoles contains duplicate material: {material}")
+            material_roles[material] = role
+    elif isinstance(declared_roles, dict):
+        material_roles = dict(declared_roles)
+    else:
+        raise ValueError("unity-ready materialRoles must be a list or object")
+
     release_readiness["unityReady"] = {
         "status": "VERIFIED",
         "multiMaterialSetup": "VERIFIED",
@@ -105,7 +182,7 @@ def record_unity_ready_product_state(
         "ndmfBake": "VERIFIED",
         "reimport": "VERIFIED",
         "targetAvatarAssetPath": job["targetAvatarAssetPath"],
-        "materialRoles": job["unityReady"]["materialRoles"],
+        "materialRoles": material_roles,
         "evidencePath": candidate_contract.rel(evidence),
         "evidenceSha256": candidate_contract.digest(evidence),
     }
@@ -281,6 +358,17 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
         and candidate_contract.path(job["fbxAssetPath"]).is_file(),
         "exitCode": build_exit,
     }
+
+    if stages["blenderBuild"]["passed"]:
+        stages["hostedPose"] = run_hosted_pose_render(
+            job_path,
+            job,
+            policy,
+            prepared,
+            artifact,
+        )
+    else:
+        stages["hostedPose"] = {"passed": False, "error": "not run"}
 
     if stages["blenderBuild"]["passed"]:
         gate_exit = run_command(

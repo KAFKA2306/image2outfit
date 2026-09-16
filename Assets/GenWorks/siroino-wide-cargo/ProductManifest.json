@@ -11,7 +11,7 @@
   "documentationPath": "Assets/GenWorks/siroino-wide-cargo/README.md",
   "demoScenePath": "Assets/GenWorks/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
   "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
-  "generatedAt": "2026-09-01T16:26:04.913665Z",
+  "generatedAt": "2026-09-16T01:22:54.887039Z",
   "blenderVersion": "4.4.3",
   "completionPolicyPath": "config/genworks-handoff-policy.json",
   "completionPolicySchemaVersion": 2,
@@ -57,12 +57,13 @@
     "uvMapping": "PASS",
     "exactBodyPoseRenders": "PASS",
     "latestGeometryRender": "PASS",
-    "unityImport": "PENDING",
-    "prefabSerialized": "PENDING",
-    "prefabReload": "PENDING",
-    "modularAvatar": "PENDING",
+    "unityImport": "PASS",
+    "prefabSerialized": "PASS",
+    "prefabReload": "PASS",
+    "modularAvatar": "PASS",
     "vrchatBuildAndTest": "PENDING",
-    "humanRuntimeReview": "PENDING"
+    "humanRuntimeReview": "PENDING",
+    "ndmf": "PASS"
   },
   "designRevision": "v74-centre-crotch-seam",
   "wearabilityAudit": {
@@ -79,7 +80,7 @@
         "maximumZ": 0.8399999737739563,
         "totalWidth": 0.36899998784065247,
         "totalDepth": 0.25600000470876694,
-        "maximumEdgeLength": 0.09983612762564116,
+        "maximumEdgeLength": 0.09704841465894758,
         "maximumEdgeZSpan": 0.06000000238418579,
         "degenerateTriangles": 0,
         "uvLayers": 1,
@@ -96,8 +97,8 @@
           },
           "thigh": {
             "width": 0.36899998784065247,
-            "depth": 0.20085422694683075,
-            "rear": 0.10591253638267517
+            "depth": 0.1929825022816658,
+            "rear": 0.1011895015835762
           },
           "knee": {
             "width": 0.3580000102519989,
@@ -113,7 +114,6 @@
         "frontCentreCoverageVertices": 11,
         "rearCentreCoverageVertices": 11,
         "centreCoverageLevels": [
-          0.565,
           0.574,
           0.576,
           0.578,
@@ -132,15 +132,16 @@
           0.79,
           0.815
         ],
-        "crotchPanelVertices": 27,
+        "crotchPanelVertices": 57,
         "crossSectionCurvature": {
           "frontDepthDifference": 0.03713922910392284,
           "rearDepthDifference": 0.04746828501423199
         },
         "upperInnerThighGapByLevel": {
           "0.440": 0.01600000075995922,
+          "0.480": 0.014000000432133675,
           "0.520": 0.012000000104308128,
-          "0.565": 0.00800000037997961
+          "0.574": 0.00800000037997961
         },
         "maximumUpperInnerThighGap": 0.01600000075995922,
         "silhouetteByLevel": {
@@ -160,7 +161,11 @@
             "width": 0.3400000035762787,
             "depth": 0.17400000244379044
           }
-        }
+        },
+        "materialNames": [
+          "MAT_Black_Cargo_Fabric",
+          "MAT_Black_Cargo_Straps"
+        ]
       },
       "singleMeshObjectPassed": true,
       "finiteCoordinatesPassed": true,
@@ -176,6 +181,7 @@
       "fittedSeatPassed": true,
       "innerThighCoveragePassed": true,
       "straightWideProfilePassed": true,
+      "unityReadyMaterialContractPassed": true,
       "crossSectionCurvaturePassed": true,
       "upperInnerThighClearancePassed": true,
       "waistTaperPassed": true,
@@ -187,6 +193,22 @@
       "crotchPanelCoveragePassed": true,
       "panelFreeTransitionPassed": true,
       "armatureObjectParentPassed": true
+    }
+  },
+  "releaseReadiness": {
+    "unityReady": {
+      "status": "VERIFIED",
+      "multiMaterialSetup": "VERIFIED",
+      "modularAvatarSetup": "VERIFIED",
+      "ndmfBake": "VERIFIED",
+      "reimport": "VERIFIED",
+      "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+      "materialRoles": {
+        "MAT_Black_Cargo_Fabric": "fabric",
+        "MAT_Black_Cargo_Straps": "trim"
+      },
+      "evidencePath": "Assets/GenWorks/siroino-wide-cargo/Evidence/Unity/unity-ready.json",
+      "evidenceSha256": "c6995f146cb7bc15dcdc0c89ec4d3ec297e8a96c878590d6438e8e1b6a8c95f4"
     }
   }
 }
