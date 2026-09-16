@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Shared schema-v2 builder for panel-sewn structural garments."""
+
 from __future__ import annotations
 
 import argparse
@@ -29,7 +30,9 @@ def resolve(value: str) -> Path:
     return p if p.is_absolute() else (ROOT / p).resolve()
 
 
-def material(name: str, rgba: tuple[float, float, float, float], roughness: float = 0.72):
+def material(
+    name: str, rgba: tuple[float, float, float, float], roughness: float = 0.72
+):
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     bsdf = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
@@ -133,7 +136,15 @@ def main() -> int:
         cube("waistband_outer", (0, -0.05, 0.625), (0.125, 0.012, 0.018), inner),
     ]
     for side, label in [(-1, "L"), (1, "R")]:
-        made.append(cube(f"hinge_root_{label}", (side * 0.135, -0.004, 0.65), (0.015, 0.018, 0.075), hardware, 0.004))
+        made.append(
+            cube(
+                f"hinge_root_{label}",
+                (side * 0.135, -0.004, 0.65),
+                (0.015, 0.018, 0.075),
+                hardware,
+                0.004,
+            )
+        )
         for i, suffix in enumerate("ABC"):
             made.append(pannier(f"pannier_{label}_{suffix}", side, i, hero))
     uv_all(made)
@@ -155,8 +166,19 @@ def main() -> int:
         axis_up="Y",
     )
     if not blend.is_file() or not fbx.is_file():
-        raise RuntimeError("structural garment export did not materialize expected outputs")
-    print(json.dumps({"product": product, "meshObjects": len(made), "blend": str(blend), "fbx": str(fbx)}))
+        raise RuntimeError(
+            "structural garment export did not materialize expected outputs"
+        )
+    print(
+        json.dumps(
+            {
+                "product": product,
+                "meshObjects": len(made),
+                "blend": str(blend),
+                "fbx": str(fbx),
+            }
+        )
+    )
     return 0
 
 
