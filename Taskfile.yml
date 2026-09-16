@@ -132,6 +132,41 @@ tasks:
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py audit methods
 
+  avatar:plan:
+    desc: Write the generated avatar workflow plan and CAU handoff boundary.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar plan
+
+  avatar:preflight:
+    desc: Validate the nine baked Prefabs, CAU settings, packages, and visual evidence paths.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar preflight
+
+  avatar:visual:
+    desc: Compare required outfit views and poses against the local visual baselines.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar visual
+
+  avatar:ledger:
+    desc: Initialize the local CAU upload ledger without storing credentials.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar ledger init
+
+  avatar:run:
+    desc: Run the local avatar workflow and emit the Unity MCP/CAU handoff status.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar run
+
   audit:research:
     desc: Reject stale, incomplete, non-primary, or license-unsafe research.
     cmds:

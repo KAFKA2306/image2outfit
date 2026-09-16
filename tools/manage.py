@@ -19,6 +19,7 @@ from image2outfit import improvement  # noqa: E402
 import improvement_loop  # noqa: E402
 import method_selection  # noqa: E402
 import runtime_paths  # noqa: E402
+import avatar_workflow  # noqa: E402
 
 AUDITS = {
     "toolchain": "audit_toolchain.py",
@@ -246,6 +247,40 @@ def build_parser() -> argparse.ArgumentParser:
     aggregate.add_argument("--results-dir")
     aggregate.add_argument("--output")
 
+    avatar = commands.add_parser(
+        "avatar",
+        help="Run the generated avatar preflight, visual, ledger, and CAU handoff tools.",
+    )
+    avatar_commands = avatar.add_subparsers(dest="avatar_command", required=True)
+
+    preflight = avatar_commands.add_parser("preflight")
+    preflight.add_argument("--outfit", action="append")
+    preflight.add_argument("--output")
+
+    visual = avatar_commands.add_parser("visual")
+    visual.add_argument("--outfit", action="append")
+    visual.add_argument("--record-baseline", action="store_true")
+    visual.add_argument("--output")
+
+    ledger = avatar_commands.add_parser("ledger")
+    ledger.add_argument("ledger_action", choices=("init", "record"))
+    ledger.add_argument("--outfit-id")
+    ledger.add_argument(
+        "--status",
+        choices=("PENDING", "READY", "UPLOADING", "SUCCEEDED", "FAILED", "SKIPPED"),
+    )
+    ledger.add_argument("--blueprint-id")
+    ledger.add_argument("--upload-id")
+    ledger.add_argument("--error")
+    ledger.add_argument("--output")
+
+    plan = avatar_commands.add_parser("plan")
+    plan.add_argument("--output")
+
+    run = avatar_commands.add_parser("run")
+    run.add_argument("--record-baseline", action="store_true")
+    run.add_argument("--output")
+
     audit = commands.add_parser("audit")
     audit.add_argument("target", choices=(*AUDIT_TARGETS, "all"))
     return parser
@@ -270,6 +305,15 @@ def main() -> int:
             options.results_dir,
             options.output,
         )
+    if options.command == "avatar":
+        if options.avatar_command == "ledger" and options.ledger_action == "record":
+            if not options.outfit_id or not options.status:
+                print(
+                    "avatar ledger record requires --outfit-id and --status",
+                    file=sys.stderr,
+                )
+                return 2
+        return avatar_workflow.dispatch(ROOT, options)
     if options.command == "audit":
         return _audit_all() if options.target == "all" else _audit(options.target)
     raise AssertionError(options.command)
