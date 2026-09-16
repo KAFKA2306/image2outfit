@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-arc-latch-cocoon-bomber-set",
+  "productName": "Arc-Latch Cocoon Bomber Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Prefab/ArcLatchCocoonBomberSet.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Prefab/SiroinoSotai_ArcLatchCocoonBomberSet.prefab",
+  "previewPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/README.md",
+  "sourceJobPath": "config/products/siroino-arc-latch-cocoon-bomber-set/job.json",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "designRevision": "v1-arc-latch-side-bridges",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-arc-latch-cocoon-bomber-set/pipeline-state.json",
+    "lastAttempt": {
+      "result": "HOSTED_SCOPE_FAILED_INCOMPLETE_JOB_CONTRACT",
+      "visualRevision": "v1-arc-latch-side-bridges"
+    },
+    "blockers": [
+      "Re-run the existing candidate path after completing humanEvidence, license, pattern draft, delivery prefab checkpoints and shared builder availability.",
+      "Retain exact generated blend/FBX and visual evidence before advancing downstream gates."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "PENDING",
+    "blender": "PENDING_RETRY",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "clothSimulation": "NOT_REQUIRED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "tenAxisAudit": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Source/Blender/ArcLatchCocoonBomberSet.blend",
+    "fbx": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Models/ArcLatchCocoonBomberSet.fbx",
+    "prefab": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Prefab/ArcLatchCocoonBomberSet.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Prefab/SiroinoSotai_ArcLatchCocoonBomberSet.prefab"
+  }
+}
