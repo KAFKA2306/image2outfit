@@ -40,7 +40,10 @@ class AuditLatestPointerTests(unittest.TestCase):
         }
 
     def _write(
-        self, root: Path, run_id: str = "run-1", product_id: str = "demo"
+        self,
+        root: Path,
+        run_id: str = "run-1",
+        product_id: str = "demo",
     ) -> Path:
         write_audit_bundle(
             self._state(run_id, product_id),
@@ -158,7 +161,8 @@ class AuditLatestPointerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "stage file hash mismatch"):
                 verify_latest_audit_pointer(root, "demo")
             self.assertEqual(
-                json.loads(latest.read_text(encoding="utf-8"))["runId"], pointer["runId"]
+                json.loads(latest.read_text(encoding="utf-8"))["runId"],
+                pointer["runId"],
             )
 
     def test_latest_replacement_is_parseable_and_leaves_no_temp_file(self) -> None:
