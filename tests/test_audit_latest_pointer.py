@@ -117,7 +117,10 @@ class AuditLatestPointerTests(unittest.TestCase):
             ("finalStatus", "EXECUTED", "finalStatus mismatch"),
         )
         for field, value, message in cases:
-            with self.subTest(field=field), tempfile.TemporaryDirectory() as temporary:
+            with (
+                self.subTest(field=field),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
                 root = Path(temporary)
                 latest = self._write(root)
                 self._mutate_pointer(latest, **{field: value})
@@ -131,7 +134,10 @@ class AuditLatestPointerTests(unittest.TestCase):
             "/tmp/manifest.json",
         )
         for target in cases:
-            with self.subTest(target=target), tempfile.TemporaryDirectory() as temporary:
+            with (
+                self.subTest(target=target),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
                 root = Path(temporary)
                 self._write(root, "a-run", "a")
                 self._write(root, "b-run", "b")
