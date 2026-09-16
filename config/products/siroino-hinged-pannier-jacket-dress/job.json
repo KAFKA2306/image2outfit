@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-generic-structural",
+  "id": "siroino-hinged-pannier-jacket-dress",
+  "productName": "Hinged Pannier Jacket Dress",
+  "adapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress",
+  "productManifestPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Source/Blender/HingedPannierJacketDress.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Models/HingedPannierJacketDress.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Prefab/HingedPannierJacketDress.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Prefab/SiroinoSotai_HingedPannierJacketDress.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-hinged-pannier-jacket-dress/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/ProductManifest.json",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/README.md",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Source/Blender/HingedPannierJacketDress.blend",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Models/HingedPannierJacketDress.fbx",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Prefab/HingedPannierJacketDress.prefab",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Prefab/SiroinoSotai_HingedPannierJacketDress.prefab",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/front.png",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/back.png",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/left.png",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/right.png",
+    "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-hinged-pannier-jacket-dress/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-hinged-pannier-jacket-dress/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-hinged-pannier-jacket-dress/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Shell", "role": "fabric"},
+      {"material": "MAT_Inner", "role": "fabric"},
+      {"material": "MAT_Bottoms", "role": "fabric"},
+      {"material": "MAT_Hero", "role": "trim"},
+      {"material": "MAT_Hardware", "role": "trim"}
+    ]
+  }
+}
