@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Shared schema-v2 builder for panel-sewn structural garments.
 
-The garment silhouette is driven by construction.json and pattern-decomposition.json.
+The garment silhouette is driven by construction.json and pattern-draft.json.
 This entrypoint intentionally owns only reusable panel primitives and export mechanics;
 product identity remains in tracked product contracts.
 """
@@ -14,7 +14,6 @@ import sys
 from pathlib import Path
 
 import bpy
-from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -67,7 +66,6 @@ def sleeve(name: str, side: float, mat):
 
 
 def pannier(name: str, side: float, index: int, mat):
-    # Three bounded, separately readable fan leaves per hip.
     z = .61 - index*.055
     x = side * (.19 + index*.035)
     bpy.ops.mesh.primitive_cube_add(size=1, location=(x, -.005, z))
@@ -107,11 +105,11 @@ def main() -> int:
     product = job["id"]
     contract_dir = job_path.parent
     construction = load(contract_dir / "construction.json")
-    decomposition = load(contract_dir / "pattern-decomposition.json")
+    decomposition = load(contract_dir / "pattern-draft.json")
     if construction.get("profile") != "panel-sewn":
         raise ValueError("builder only accepts profile=panel-sewn")
     if decomposition.get("productId") != product:
-        raise ValueError("pattern decomposition productId mismatch")
+        raise ValueError("pattern draft productId mismatch")
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     shell = material("MAT_Shell", (.78, .73, .62, 1))
@@ -120,15 +118,14 @@ def main() -> int:
     hero = material("MAT_Hero", (.48, .25, .14, 1), .62)
     hardware = material("MAT_Hardware", (.08, .09, .10, 1), .38)
 
-    made = []
-    made += [cube("jacket_back", (0,.055,.83), (.17,.025,.24), shell),
-             cube("jacket_front_L", (-.087,-.055,.83), (.082,.025,.24), shell),
-             cube("jacket_front_R", (.087,-.055,.83), (.082,.025,.24), shell),
-             sleeve("sleeve_L", -1, shell), sleeve("sleeve_R", 1, shell),
-             cube("inner_front", (0,-.065,.69), (.145,.018,.15), inner),
-             cube("bottom_front", (0,-.025,.48), (.16,.04,.17), bottoms),
-             cube("bottom_back", (0,.035,.48), (.16,.04,.17), bottoms),
-             cube("waistband_outer", (0,-.075,.625), (.17,.018,.025), inner)]
+    made = [cube("jacket_back", (0,.055,.83), (.17,.025,.24), shell),
+            cube("jacket_front_L", (-.087,-.055,.83), (.082,.025,.24), shell),
+            cube("jacket_front_R", (.087,-.055,.83), (.082,.025,.24), shell),
+            sleeve("sleeve_L", -1, shell), sleeve("sleeve_R", 1, shell),
+            cube("inner_front", (0,-.065,.69), (.145,.018,.15), inner),
+            cube("bottom_front", (0,-.025,.48), (.16,.04,.17), bottoms),
+            cube("bottom_back", (0,.035,.48), (.16,.04,.17), bottoms),
+            cube("waistband_outer", (0,-.075,.625), (.17,.018,.025), inner)]
     for side, label in [(-1,"L"),(1,"R")]:
         made.append(cube(f"hinge_root_{label}", (side*.18,-.005,.66), (.022,.025,.11), hardware, .006))
         for i, suffix in enumerate("ABC"):
