@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-hinged-pannier-jacket-dress",
+  "designRevision": "v1-hinged-pannier-fan",
+  "parts": [
+    "jacket_front_L", "jacket_front_R", "jacket_back", "sleeve_L", "sleeve_R", "cuff_L", "cuff_R",
+    "inner_front", "inner_back", "bottom_front", "bottom_back", "waistband_outer", "waistband_inner",
+    "pannier_L_A", "pannier_L_B", "pannier_L_C", "pannier_R_A", "pannier_R_B", "pannier_R_C",
+    "pannier_facing_L_A", "pannier_facing_L_B", "pannier_facing_L_C",
+    "pannier_facing_R_A", "pannier_facing_R_B", "pannier_facing_R_C", "hinge_root_L", "hinge_root_R"
+  ],
+  "heroDetail": {
+    "name": "paired-hinged-pannier-fans",
+    "leftPanels": ["pannier_L_A", "pannier_L_B", "pannier_L_C"],
+    "rightPanels": ["pannier_R_A", "pannier_R_B", "pannier_R_C"],
+    "roots": ["hinge_root_L", "hinge_root_R"],
+    "requirements": [
+      "three separately readable panels per hip",
+      "visible spacing and bounded thickness",
+      "terminate above mid-thigh",
+      "remain side-local",
+      "read in side and three-quarter evidence"
+    ]
+  },
+  "materials": {
+    "shell": "warm-ivory-matte-twill",
+    "secondary": "slate-blue-woven",
+    "bottom": "charcoal-matte-twill",
+    "hero": "muted-copper-textile-facing",
+    "hardware": "dark-nickel-low-gloss"
+  },
+  "uvPolicy": {
+    "set": "UV0",
+    "range": "0..1",
+    "heroIslandsUnique": true,
+    "mirrorHero": false
+  }
+}
