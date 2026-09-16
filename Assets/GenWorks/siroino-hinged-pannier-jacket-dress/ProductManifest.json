@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-hinged-pannier-jacket-dress",
+  "productName": "Hinged Pannier Jacket Dress",
+  "status": "BLOCKED",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Prefab/HingedPannierJacketDress.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Prefab/SiroinoSotai_HingedPannierJacketDress.prefab",
+  "previewPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/README.md",
+  "sourceJobPath": "config/products/siroino-hinged-pannier-jacket-dress/job.json",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "designRevision": "v1-hinged-pannier-fan",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-hinged-pannier-jacket-dress/pipeline-state.json",
+    "lastAttempt": {
+      "result": "PRODUCT_BUILD_SCRIPT_MISSING",
+      "visualRevision": "v1-hinged-pannier-fan"
+    },
+    "blockers": [
+      "Implement or restore the repository-owned shared panel-sewn structural garment builder at tools/generic_structural_garment_product.py.",
+      "Run task candidate PRODUCT=siroino-hinged-pannier-jacket-dress and retain exact-artifact evidence before advancing any downstream gate."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "PENDING",
+    "blender": "BLOCKED_MISSING_PRODUCT_BUILD_SCRIPT",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "clothSimulation": "NOT_REQUIRED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "tenAxisAudit": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Source/Blender/HingedPannierJacketDress.blend",
+    "fbx": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Models/HingedPannierJacketDress.fbx",
+    "prefab": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Prefab/HingedPannierJacketDress.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-hinged-pannier-jacket-dress/Prefab/SiroinoSotai_HingedPannierJacketDress.prefab"
+  }
+}
