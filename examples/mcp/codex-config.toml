@@ -11,5 +11,5 @@ BLENDER_PORT = "9876"
 UV_PYTHON_PREFERENCE = "only-managed"
 DISABLE_TELEMETRY = "true"
 
-[mcp_servers.image2outfit-unity]
-url = "http://127.0.0.1:8080/mcp"
+# TunaSync Unity MCP is discovered from the loopback registry by the native
+# `unity_mcp` connector; it is not a streamable-HTTP mcp_servers entry.
