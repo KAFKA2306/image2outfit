@@ -120,6 +120,8 @@ Window > Package Manager > + > Add package from git URL
 https://github.com/TunaSync-Studio/UnityMCP-VCC.git?path=/package/com.tunasync.unity-mcp#50597089589137c5186f5badbde1d72f5d335243
 ```
 
+VRChatアバターの連続公開にはAnatawa12 Continuous Avatar Uploader `0.3.12`を使用します。設定済みの9件は `Assets/UnityMCP_CAU/siroino-all-outfits.asset` にまとめ、各Prefabは個別の `Avatar Upload Setting` としてPC向けだけを有効化しています。アップロード開始はUnityの `Tools > Continuous Avatar Uploader` から行います。
+
 Blender側には `View3D > Sidebar > Image2Outfit > OpenAI Assistant` の薄いprompt UIを用意します。bridgeはlocalhost限定とし、OpenAI/API/provider secrets、`.codex`、`.image2outfit/` のローカル状態をcommitしません。外部Blender連携は明示的に有効化した場合だけ使用します。
 
 確認済みupstream:
