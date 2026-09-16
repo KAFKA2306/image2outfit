@@ -30,7 +30,9 @@ def resolve(value: str) -> Path:
     return p if p.is_absolute() else (ROOT / p).resolve()
 
 
-def material(name: str, rgba: tuple[float, float, float, float], roughness: float = 0.72):
+def material(
+    name: str, rgba: tuple[float, float, float, float], roughness: float = 0.72
+):
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     bsdf = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
@@ -53,7 +55,14 @@ def cube(name: str, loc, scale, mat, bevel=0.008):
 
 
 def sleeve(name: str, side: float, mat):
-    bpy.ops.mesh.primitive_cone_add(vertices=20, radius1=0.052, radius2=0.072, depth=0.34, location=(side * 0.19, 0, 0.91), rotation=(0, math.radians(78), 0))
+    bpy.ops.mesh.primitive_cone_add(
+        vertices=20,
+        radius1=0.052,
+        radius2=0.072,
+        depth=0.34,
+        location=(side * 0.19, 0, 0.91),
+        rotation=(0, math.radians(78), 0),
+    )
     o = bpy.context.object
     o.name = name
     o.data.materials.append(mat)
@@ -133,13 +142,39 @@ def main() -> int:
         cube("waistband_outer", (0, -0.05, 0.625), (0.125, 0.012, 0.018), inner),
     ]
     for side, label in [(-1, "L"), (1, "R")]:
-        root_name = f"arc_latch_root_{label}_A" if arc_latch else f"hinge_root_{label}"
-        made.append(cube(root_name, (side * 0.135, -0.004, 0.65), (0.015, 0.018, 0.075), hardware, 0.004))
+        root_name = (
+            f"arc_latch_root_{label}_A" if arc_latch else f"hinge_root_{label}"
+        )
+        made.append(
+            cube(
+                root_name,
+                (side * 0.135, -0.004, 0.65),
+                (0.015, 0.018, 0.075),
+                hardware,
+                0.004,
+            )
+        )
         for i, suffix in enumerate("ABC"):
-            hero_name = f"arc_latch_{label}_{suffix}" if arc_latch else f"pannier_{label}_{suffix}"
-            made.append(hero_piece(hero_name, side, i, hero, "arc_latch" if arc_latch else "pannier"))
+            hero_name = (
+                f"arc_latch_{label}_{suffix}"
+                if arc_latch
+                else f"pannier_{label}_{suffix}"
+            )
+            made.append(
+                hero_piece(
+                    hero_name, side, i, hero, "arc_latch" if arc_latch else "pannier"
+                )
+            )
             if arc_latch and suffix != "A":
-                made.append(cube(f"arc_latch_root_{label}_{suffix}", (side * 0.135, -0.004, 0.65 - i * 0.045), (0.015, 0.018, 0.022), hardware, 0.004))
+                made.append(
+                    cube(
+                        f"arc_latch_root_{label}_{suffix}",
+                        (side * 0.135, -0.004, 0.65 - i * 0.045),
+                        (0.015, 0.018, 0.022),
+                        hardware,
+                        0.004,
+                    )
+                )
     uv_all(made)
 
     blend = resolve(job["blendPath"])
@@ -150,10 +185,28 @@ def main() -> int:
     bpy.ops.object.select_all(action="DESELECT")
     for o in made:
         o.select_set(True)
-    bpy.ops.export_scene.fbx(filepath=str(fbx), use_selection=True, add_leaf_bones=False, bake_anim=False, axis_forward="-Z", axis_up="Y")
+    bpy.ops.export_scene.fbx(
+        filepath=str(fbx),
+        use_selection=True,
+        add_leaf_bones=False,
+        bake_anim=False,
+        axis_forward="-Z",
+        axis_up="Y",
+    )
     if not blend.is_file() or not fbx.is_file():
-        raise RuntimeError("structural garment export did not materialize expected outputs")
-    print(json.dumps({"product": product, "meshObjects": len(made), "blend": str(blend), "fbx": str(fbx)}))
+        raise RuntimeError(
+            "structural garment export did not materialize expected outputs"
+        )
+    print(
+        json.dumps(
+            {
+                "product": product,
+                "meshObjects": len(made),
+                "blend": str(blend),
+                "fbx": str(fbx),
+            }
+        )
+    )
     return 0
 
 
