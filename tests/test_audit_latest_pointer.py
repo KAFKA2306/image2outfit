@@ -4,7 +4,11 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from image2outfit.audit import make_stage_record, verify_latest_audit_pointer, write_audit_bundle
+from image2outfit.audit import (
+    make_stage_record,
+    verify_latest_audit_pointer,
+    write_audit_bundle,
+)
 
 
 class AuditLatestPointerTests(unittest.TestCase):
