@@ -87,7 +87,9 @@ def _validate_config(root: Path, config: dict[str, Any]) -> None:
             raise AvatarWorkflowError("avatar workflow config.scenes must be an object")
         workbench = scenes.get("workbench")
         if not isinstance(workbench, str) or not workbench:
-            raise AvatarWorkflowError("avatar workflow config.scenes.workbench is required")
+            raise AvatarWorkflowError(
+                "avatar workflow config.scenes.workbench is required"
+            )
         _asset(root, workbench)
     visual = config.get("visual")
     required_visuals = visual.get("requiredPaths") if isinstance(visual, dict) else None
@@ -122,7 +124,9 @@ def _validate_config(root: Path, config: dict[str, Any]) -> None:
         for key in ("clothEvidence", "scene"):
             if key in outfit:
                 if not isinstance(outfit[key], str) or not outfit[key]:
-                    raise AvatarWorkflowError(f"outfits[{index}].{key} must be a non-empty string")
+                    raise AvatarWorkflowError(
+                        f"outfits[{index}].{key} must be a non-empty string"
+                    )
                 _asset(root, outfit[key])
 
 
@@ -244,7 +248,10 @@ def _outfit_preflight(
                 cloth_report = read_json(cloth_path)
             except (OSError, ValueError):
                 errors.append(f"cloth evidence is not valid JSON: {cloth_evidence}")
-            if cloth_path.is_file() and not cloth_path.with_name(cloth_path.name + ".meta").is_file():
+            if (
+                cloth_path.is_file()
+                and not cloth_path.with_name(cloth_path.name + ".meta").is_file()
+            ):
                 errors.append(f"cloth evidence meta missing: {cloth_evidence}.meta")
             if isinstance(cloth_report, dict):
                 if cloth_report.get("status") != "PASS":
@@ -255,10 +262,14 @@ def _outfit_preflight(
                     errors.append(f"cloth cache was not baked: {outfit['id']}")
                 contracts = cloth_report.get("contracts")
                 if not isinstance(contracts, list) or not contracts:
-                    errors.append(f"cloth evidence has no component contracts: {outfit['id']}")
+                    errors.append(
+                        f"cloth evidence has no component contracts: {outfit['id']}"
+                    )
                 for contract in contracts or []:
                     if contract.get("cacheBakedActual") is False:
-                        errors.append(f"cloth cache verification failed: {outfit['id']}")
+                        errors.append(
+                            f"cloth cache verification failed: {outfit['id']}"
+                        )
                     if contract.get("geometryChanged") is False:
                         errors.append(f"cloth geometry did not change: {outfit['id']}")
 
@@ -335,9 +346,15 @@ def _outfit_preflight(
         "clothEvidence": cloth_evidence,
         "scene": scene_path,
         "clothSimulation": {
-            "status": cloth_report.get("status") if isinstance(cloth_report, dict) else None,
-            "cacheBaked": cloth_report.get("cacheBaked") if isinstance(cloth_report, dict) else None,
-            "contractCount": len(cloth_report.get("contracts", [])) if isinstance(cloth_report, dict) else 0,
+            "status": cloth_report.get("status")
+            if isinstance(cloth_report, dict)
+            else None,
+            "cacheBaked": cloth_report.get("cacheBaked")
+            if isinstance(cloth_report, dict)
+            else None,
+            "contractCount": len(cloth_report.get("contracts", []))
+            if isinstance(cloth_report, dict)
+            else 0,
         },
         "prefabGuid": prefab_guid,
         "serializedScriptReferences": serialized_script_count,
@@ -365,7 +382,9 @@ def preflight(
         if not workbench.is_file():
             errors.append(f"workbench scene missing: {scene_layout['workbench']}")
         elif not workbench.with_name(workbench.name + ".meta").is_file():
-            errors.append(f"workbench scene meta missing: {scene_layout['workbench']}.meta")
+            errors.append(
+                f"workbench scene meta missing: {scene_layout['workbench']}.meta"
+            )
     cau_group = _asset(root, config["paths"]["cauRoot"]) / "siroino-all-outfits.asset"
     group_guids = _referenced_guids(cau_group) if cau_group.is_file() else []
     selected = _selected_outfits(config, outfit_ids)
@@ -630,10 +649,18 @@ def visual_before_after(
                 "comparisonMode": "versioned-baseline-vs-current-visual-root",
             }
             if not baseline.is_file():
-                item.update({"status": "ERROR", "passed": False, "error": "before image missing"})
+                item.update(
+                    {
+                        "status": "ERROR",
+                        "passed": False,
+                        "error": "before image missing",
+                    }
+                )
                 errors.append(f"before visual missing: {item['beforePath']}")
             elif not current.is_file():
-                item.update({"status": "ERROR", "passed": False, "error": "after image missing"})
+                item.update(
+                    {"status": "ERROR", "passed": False, "error": "after image missing"}
+                )
                 errors.append(f"after visual missing: {item['path']}")
             else:
                 try:
@@ -653,7 +680,9 @@ def visual_before_after(
                 except (OSError, ValueError, AvatarWorkflowError) as exc:
                     item.update({"status": "ERROR", "passed": False, "error": str(exc)})
                 if item.get("status") == "ERROR":
-                    errors.append(f"visual before/after failed: {item['path']}: {item.get('error')}")
+                    errors.append(
+                        f"visual before/after failed: {item['path']}: {item.get('error')}"
+                    )
                 elif item.get("meanAbsoluteError", 0) > threshold:
                     item["status"] = "WARN"
                     item["visualGate"] = "NON_BLOCKING"
@@ -676,7 +705,9 @@ def visual_before_after(
             scene_comparison: dict[str, Any] = {
                 "outfitId": outfit_id,
                 "path": scene_capture.relative_to(root).as_posix(),
-                "beforePath": (baseline_root / outfit_id / "front.png").relative_to(root).as_posix(),
+                "beforePath": (baseline_root / outfit_id / "front.png")
+                .relative_to(root)
+                .as_posix(),
                 "comparisonMode": "versioned-baseline-vs-unity-scene-capture",
             }
             try:
@@ -698,7 +729,9 @@ def visual_before_after(
                     }
                 )
             except (OSError, ValueError, AvatarWorkflowError) as exc:
-                scene_comparison.update({"status": "ERROR", "passed": False, "error": str(exc)})
+                scene_comparison.update(
+                    {"status": "ERROR", "passed": False, "error": str(exc)}
+                )
             if scene_comparison.get("status") == "ERROR":
                 errors.append(
                     f"Unity scene visual comparison failed: {outfit_id}: {scene_comparison.get('error')}"
@@ -713,8 +746,12 @@ def visual_before_after(
             outfit_results.append(scene_comparison)
             results.append(scene_comparison)
         elif require_unity_scene:
-            errors.append(f"Unity scene after capture missing: {scene_capture.relative_to(root).as_posix()}")
-        evidence_path = _asset(root, outfit["clothEvidence"]).parent / "cloth-visual-diff.json"
+            errors.append(
+                f"Unity scene after capture missing: {scene_capture.relative_to(root).as_posix()}"
+            )
+        evidence_path = (
+            _asset(root, outfit["clothEvidence"]).parent / "cloth-visual-diff.json"
+        )
         write_json(
             evidence_path,
             {
@@ -731,14 +768,21 @@ def visual_before_after(
                     (
                         item
                         for item in outfit_results
-                        if item.get("comparisonMode") == "versioned-baseline-vs-unity-scene-capture"
+                        if item.get("comparisonMode")
+                        == "versioned-baseline-vs-unity-scene-capture"
                     ),
                     None,
                 ),
                 "results": outfit_results,
                 "visualIssuesAreNonBlocking": True,
-                "passed": not any(item.get("status") == "ERROR" for item in outfit_results),
-                "errors": [item.get("error") for item in outfit_results if item.get("status") == "ERROR"],
+                "passed": not any(
+                    item.get("status") == "ERROR" for item in outfit_results
+                ),
+                "errors": [
+                    item.get("error")
+                    for item in outfit_results
+                    if item.get("status") == "ERROR"
+                ],
             },
         )
     report = {
@@ -1010,12 +1054,9 @@ def dispatch(root: Path, options: argparse.Namespace) -> int:
                 outfit_ids=outfit_ids,
                 require_unity_scene=True,
             )
-            output = (
-                options.output
-                or config["paths"].get(
-                    "visualDiffReport",
-                    f"{config['paths']['runtimeRoot']}/cloth-visual-diff.json",
-                )
+            output = options.output or config["paths"].get(
+                "visualDiffReport",
+                f"{config['paths']['runtimeRoot']}/cloth-visual-diff.json",
             )
         elif options.avatar_command == "ledger":
             if options.ledger_action == "init":

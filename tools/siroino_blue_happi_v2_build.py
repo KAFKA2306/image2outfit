@@ -429,15 +429,18 @@ def postprocess(job: dict, result: int) -> int:
     mean_clearance = float(report["clearanceRefinement"][-1]["clearance"]["mean"])
     front_opening = float(report["frontOpeningM"])
     root_contract = sleeve_root_contract(bpy.data.objects["SiroinoSotai_Armature"])
+
     def minimum_mesh_distance(first_name: str, second_name: str) -> float:
         first = bpy.data.objects[first_name]
         second = bpy.data.objects[second_name]
-        first_points = [first.matrix_world @ vertex.co for vertex in first.data.vertices]
-        second_points = [second.matrix_world @ vertex.co for vertex in second.data.vertices]
+        first_points = [
+            first.matrix_world @ vertex.co for vertex in first.data.vertices
+        ]
+        second_points = [
+            second.matrix_world @ vertex.co for vertex in second.data.vertices
+        ]
         return min(
-            (left - right).length
-            for left in first_points
-            for right in second_points
+            (left - right).length for left in first_points for right in second_points
         )
 
     collar_band_distance = min(

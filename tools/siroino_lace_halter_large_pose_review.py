@@ -7,6 +7,7 @@ importing a second avatar. Only the validation body and the eight authored
 product meshes are visible, preventing face, hair, eye, and helper meshes from
 being mistaken for clothing during review.
 """
+
 from __future__ import annotations
 
 import json
@@ -89,12 +90,14 @@ def prepare_review_appearance(target_body: bpy.types.Object) -> list[bpy.types.O
         "LaceHalter_ReviewSkin", (0.36, 0.18, 0.12, 1.0), roughness=0.72
     )
     cloth = make_material(
-        "LaceHalter_ReviewCloth", (0.010, 0.014, 0.024, 1.0),
+        "LaceHalter_ReviewCloth",
+        (0.010, 0.014, 0.024, 1.0),
         roughness=0.62,
         coat=0.0,
     )
     sheer = make_material(
-        "LaceHalter_ReviewSheer", (0.025, 0.032, 0.052, 1.0),
+        "LaceHalter_ReviewSheer",
+        (0.025, 0.032, 0.052, 1.0),
         roughness=0.56,
         alpha=0.28,
     )
@@ -102,7 +105,8 @@ def prepare_review_appearance(target_body: bpy.types.Object) -> list[bpy.types.O
         "LaceHalter_ReviewLace", (0.035, 0.045, 0.070, 1.0), roughness=0.48
     )
     metal = make_material(
-        "LaceHalter_ReviewMetal", (0.12, 0.15, 0.21, 1.0),
+        "LaceHalter_ReviewMetal",
+        (0.12, 0.15, 0.21, 1.0),
         roughness=0.30,
         metallic=0.70,
     )
@@ -147,7 +151,9 @@ def clear_lights_and_build_studio(center: Vector, height: float) -> None:
         background.inputs["Color"].default_value = (0.16, 0.18, 0.22, 1.0)
         background.inputs["Strength"].default_value = 0.38
 
-    def area(name: str, offset: tuple[float, float, float], energy: float, size: float) -> None:
+    def area(
+        name: str, offset: tuple[float, float, float], energy: float, size: float
+    ) -> None:
         data = bpy.data.lights.new(name, "AREA")
         data.energy = energy
         data.shape = "DISK"
@@ -171,12 +177,26 @@ def render_objects() -> list[bpy.types.Object]:
 
 
 def bounds(objects: list[bpy.types.Object]) -> tuple[Vector, Vector]:
-    points = [obj.matrix_world @ Vector(corner) for obj in objects for corner in obj.bound_box]
+    points = [
+        obj.matrix_world @ Vector(corner) for obj in objects for corner in obj.bound_box
+    ]
     if not points:
         raise RuntimeError("no visible review meshes")
     return (
-        Vector((min(p.x for p in points), min(p.y for p in points), min(p.z for p in points))),
-        Vector((max(p.x for p in points), max(p.y for p in points), max(p.z for p in points))),
+        Vector(
+            (
+                min(p.x for p in points),
+                min(p.y for p in points),
+                min(p.z for p in points),
+            )
+        ),
+        Vector(
+            (
+                max(p.x for p in points),
+                max(p.y for p in points),
+                max(p.z for p in points),
+            )
+        ),
     )
 
 
@@ -185,7 +205,9 @@ def point_camera(camera: bpy.types.Object, location: Vector, target: Vector) -> 
     camera.rotation_euler = (target - location).to_track_quat("-Z", "Y").to_euler()
 
 
-def fit_camera(camera: bpy.types.Object, direction: Vector, *, margin: float = 1.12) -> None:
+def fit_camera(
+    camera: bpy.types.Object, direction: Vector, *, margin: float = 1.12
+) -> None:
     minimum, maximum = bounds(render_objects())
     center = (minimum + maximum) * 0.5
     extent = maximum - minimum
@@ -209,9 +231,9 @@ def setup_scene() -> bpy.types.Object:
     scene.view_settings.look = "AgX - Medium High Contrast"
     scene.view_settings.exposure = -0.8
     scene.view_settings.gamma = 1.0
-    camera_data = bpy.data.cameras.get("LaceHalter_ReviewCamera") or bpy.data.cameras.new(
+    camera_data = bpy.data.cameras.get(
         "LaceHalter_ReviewCamera"
-    )
+    ) or bpy.data.cameras.new("LaceHalter_ReviewCamera")
     camera = bpy.data.objects.get("LaceHalter_ReviewCamera") or bpy.data.objects.new(
         "LaceHalter_ReviewCamera", camera_data
     )
@@ -221,7 +243,9 @@ def setup_scene() -> bpy.types.Object:
     return camera
 
 
-def render(path: Path, camera: bpy.types.Object, direction: Vector, *, margin: float = 1.12) -> None:
+def render(
+    path: Path, camera: bpy.types.Object, direction: Vector, *, margin: float = 1.12
+) -> None:
     fit_camera(camera, direction, margin=margin)
     path.parent.mkdir(parents=True, exist_ok=True)
     bpy.context.scene.render.filepath = str(path)
@@ -248,7 +272,9 @@ def contact_sheet(
         image.thumbnail((tile_w, tile_h), Image.Resampling.LANCZOS)
         x = index % columns * tile_w
         y = index // columns * tile_h
-        canvas.paste(image, (x + (tile_w - image.width) // 2, y + (tile_h - image.height) // 2))
+        canvas.paste(
+            image, (x + (tile_w - image.width) // 2, y + (tile_h - image.height) // 2)
+        )
         draw.rounded_rectangle((x + 12, y + 12, x + 225, y + 52), 10, fill=(15, 18, 26))
         draw.text((x + 23, y + 18), name.upper(), fill=(246, 247, 250), font=label_font)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -298,7 +324,9 @@ def main() -> int:
     clear_lights_and_build_studio(center, max(maximum.z - minimum.z, 0.8))
     camera = setup_scene()
 
-    base.apply_pose([target_armature], {target_armature.name: base_transform}, "neutral")
+    base.apply_pose(
+        [target_armature], {target_armature.name: base_transform}, "neutral"
+    )
     view_directions = [
         ("front", Vector((0.0, -1.0, 0.05))),
         ("three-quarter", Vector((0.72, -1.0, 0.08))),
@@ -324,12 +352,16 @@ def main() -> int:
         if name == "twist":
             apply_twist(target_armature, base_transform)
         else:
-            base.apply_pose([target_armature], {target_armature.name: base_transform}, name)
+            base.apply_pose(
+                [target_armature], {target_armature.name: base_transform}, name
+            )
         path = pose_dir / f"{name}.png"
         direction = Vector((0.78, -1.0, 0.15 if name != "prone" else 0.52))
         render(path, camera, direction, margin=1.20)
         pose_items.append((name, path))
-    base.apply_pose([target_armature], {target_armature.name: base_transform}, "neutral")
+    base.apply_pose(
+        [target_armature], {target_armature.name: base_transform}, "neutral"
+    )
     contact_sheet(
         pose_items,
         preview_dir / f"{job['id']}-pose-review.webp",
@@ -346,7 +378,9 @@ def main() -> int:
         "targetSource": job["targetSourcePath"],
         "reviewMode": "saved-exact-body-isolated-product-meshes",
         "visibleGarmentObjects": sorted(obj.name for obj in garments),
-        "canonicalViews": {name: str(path.relative_to(ROOT)) for name, path in view_items},
+        "canonicalViews": {
+            name: str(path.relative_to(ROOT)) for name, path in view_items
+        },
         "poses": {name: str(path.relative_to(ROOT)) for name, path in pose_items},
         "checks": {
             "singleExactTargetBody": True,
