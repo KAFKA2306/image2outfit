@@ -16,11 +16,11 @@ This is a resumable `WORKING` checkpoint for a heather-grey hooded high-cut body
 
 ## Static metrics
 
-- mesh objects: 12
-- vertices: 19950
-- triangles: 40004
-- material slots: 12
-- exported shape keys: 180
+- mesh objects: 14
+- vertices: 21762
+- triangles: 43618
+- material slots: 14
+- exported shape keys: 210
 - maximum bone influences: 4
 
 ## Research trial

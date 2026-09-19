@@ -88,10 +88,10 @@ def prepare_review_appearance(target_body: bpy.types.Object) -> list[bpy.types.O
     skin = make_material(
         "LaceHalter_ReviewSkin", (0.36, 0.18, 0.12, 1.0), roughness=0.72
     )
-    glossy = make_material(
-        "LaceHalter_ReviewGlossy", (0.010, 0.014, 0.024, 1.0),
-        roughness=0.28,
-        coat=0.34,
+    cloth = make_material(
+        "LaceHalter_ReviewCloth", (0.010, 0.014, 0.024, 1.0),
+        roughness=0.62,
+        coat=0.0,
     )
     sheer = make_material(
         "LaceHalter_ReviewSheer", (0.025, 0.032, 0.052, 1.0),
@@ -128,7 +128,7 @@ def prepare_review_appearance(target_body: bpy.types.Object) -> list[bpy.types.O
         elif "lace" in lowered or "strap" in lowered:
             material = lace
         else:
-            material = glossy
+            material = cloth
         assign_material(obj, material)
         garments.append(obj)
     return garments

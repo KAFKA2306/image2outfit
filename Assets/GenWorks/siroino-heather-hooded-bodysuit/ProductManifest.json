@@ -35,10 +35,10 @@
     "blender": "PASS",
     "fbx": "PASS",
     "fiveViewRender": "PASS",
-    "poseRender": "PASS",
+    "poseRender": "PENDING",
     "seamCorrespondenceTrial": "PASS",
     "fourInfluenceLimit": "PASS",
-    "fitPenetration": "NON_BLOCKING_FAIL",
+    "fitPenetration": "NON_BLOCKING_PENDING",
     "unityImport": "OUT_OF_SCOPE",
     "prefabSerialized": "PENDING",
     "prefabReload": "OUT_OF_SCOPE",
@@ -52,8 +52,7 @@
     "unitySaveReload": "OUT_OF_SCOPE",
     "ndmf": "OUT_OF_SCOPE",
     "vrchatBuildTest": "OUT_OF_SCOPE",
-    "vrchatRuntime": "OUT_OF_SCOPE",
-    "clothSimulation": "PASS"
+    "vrchatRuntime": "OUT_OF_SCOPE"
   },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Source/Blender/SiroinoHeatherHoodedBodysuit.blend",
@@ -63,8 +62,7 @@
     "multiview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-multiview.webp",
     "poseReview": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
     "fitAudit": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
-    "researchTrial": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smoothed-clearance-yoke-trial.json",
-    "clothSimulation": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Evidence/Build/cloth-simulation.json"
+    "researchTrial": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smoothed-clearance-yoke-trial.json"
   },
   "research": {
     "result": "PASS",
@@ -74,20 +72,22 @@
     "authorsCodeCopied": false
   },
   "metrics": {
-    "meshObjects": 12,
-    "vertices": 19950,
-    "triangles": 40004,
-    "materialSlots": 12,
-    "shapeKeys": 180,
+    "meshObjects": 14,
+    "vertices": 21762,
+    "triangles": 43618,
+    "materialSlots": 14,
+    "shapeKeys": 210,
     "maxBoneInfluences": 4,
     "unweightedVertices": 0,
     "weightSumErrors": 0,
     "degenerateTriangles": 0,
-    "boundaryEdges": 0
+    "boundaryEdges": 4
   },
   "dynamicRebind": {
     "objects": [
       "Heather_Body_Shell",
+      "Heather_Highcut_Front_Panel",
+      "Heather_Highcut_Back_Panel",
       "Heather_Long_Sleeve_L",
       "Heather_Long_Sleeve_R",
       "Heather_Rib_Cuff_L",
@@ -111,6 +111,8 @@
   },
   "influencePruning": {
     "Heather_Body_Shell": 0,
+    "Heather_Highcut_Front_Panel": 0,
+    "Heather_Highcut_Back_Panel": 0,
     "Heather_Long_Sleeve_L": 42,
     "Heather_Long_Sleeve_R": 42,
     "Heather_Rib_Cuff_L": 0,
@@ -125,6 +127,8 @@
   },
   "meshCleanup": {
     "Heather_Body_Shell": 0,
+    "Heather_Highcut_Front_Panel": 0,
+    "Heather_Highcut_Back_Panel": 1,
     "Heather_Long_Sleeve_L": 0,
     "Heather_Long_Sleeve_R": 0,
     "Heather_Rib_Cuff_L": 0,
@@ -136,48 +140,5 @@
     "Heather_Henley_Button_03": 0,
     "Heather_Hood_Drawcord_L": 0,
     "Heather_Hood_Drawcord_R": 0
-  },
-  "poseEvidence": {
-    "neutral": {
-      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/neutral.png",
-      "sha256": "8fc85edf873cb2fa949dfd38f4377902cf2800d0353f4311cc635fd7a35385cb"
-    },
-    "arms-up": {
-      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/arms-up.png",
-      "sha256": "4929031abe3d15f66f08687fa13a5da65f0e54644d007018dad7237bd78642d3"
-    },
-    "arm-cross": {
-      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/arm-cross.png",
-      "sha256": "a6aa6add5c88dccdf6bab09f9bd8aae3c48f31de5a3528d1c1afac263fd7616a"
-    },
-    "crouch": {
-      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/crouch.png",
-      "sha256": "636560a69ba29408d0042e08ab2af78d2d0718e0943a44b6d5251540911421f3"
-    },
-    "sit": {
-      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/sit.png",
-      "sha256": "d2cf6ef6ab2a90c11e5e22da2f32adfb0efdb1dc5a0212a532b8f529377ed087"
-    },
-    "prone": {
-      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/Poses/prone.png",
-      "sha256": "5976a557b67ad0dbca2be3faebdad68a841af6d5c1d2b9677104703d55fa13fa"
-    },
-    "sheet": {
-      "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
-      "sha256": "850ceae7c740f795cf0e92f04cdfe3674922ccdcfe8819bad655d33e830f0d6a"
-    }
-  },
-  "fitAuditSummary": {
-    "pass": false,
-    "posesWithIntersections": [
-      "neutral",
-      "arms-up",
-      "arm-cross",
-      "crouch",
-      "sit",
-      "prone"
-    ],
-    "totalTriangleOverlapPairs": 10518
-  },
-  "clothSimulation": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Evidence/Build/cloth-simulation.json"
+  }
 }

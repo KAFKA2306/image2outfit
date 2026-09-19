@@ -219,6 +219,47 @@ def _torso_and_saddle(
     return obj
 
 
+def _highcut_panels(
+    pattern: ModuleType,
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    material: bpy.types.Material,
+) -> list[bpy.types.Object]:
+    """Build smooth center panels instead of jagged face-selection borders."""
+    return [
+        pattern.legacy.fitted_center_panel(
+            "Heather_Highcut_Front_Panel",
+            body,
+            armature,
+            material,
+            [
+                (0.650, 0.030),
+                (0.690, 0.044),
+                (0.735, 0.064),
+                (0.780, 0.088),
+                (0.825, 0.108),
+            ],
+            front=True,
+            segments=28,
+        ),
+        pattern.legacy.fitted_center_panel(
+            "Heather_Highcut_Back_Panel",
+            body,
+            armature,
+            material,
+            [
+                (0.650, 0.034),
+                (0.690, 0.050),
+                (0.735, 0.071),
+                (0.780, 0.096),
+                (0.825, 0.116),
+            ],
+            front=False,
+            segments=28,
+        ),
+    ]
+
+
 def _arm_centers(
     pattern: ModuleType,
     armature: bpy.types.Object,
@@ -390,6 +431,12 @@ def create_outfit(
         trim,
         button_material,
     )
+    # v29's polar shell intentionally owns the upper silhouette, but it must
+    # not replace the explicit high-cut bridge.  Add smooth body-sampled
+    # front/back panels so the visible leg openings survive the yoke revision
+    # without the jagged face-selection border of the rejected pass.
+    highcut_panels = _highcut_panels(pattern, body, armature, fabric)
+    garments[1:1] = highcut_panels
     _rewrite_trial()
     return garments
 
