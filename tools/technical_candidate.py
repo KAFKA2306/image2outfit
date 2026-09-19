@@ -34,14 +34,14 @@ def find_executable(
     configured = os.environ.get(env_name)
     if configured and Path(configured).is_file():
         return configured
-    for name in names:
-        found = shutil.which(name)
-        if found:
-            return found
     for candidate in candidates:
         expanded = Path(os.path.expandvars(candidate))
         if expanded.is_file():
             return str(expanded)
+    for name in names:
+        found = shutil.which(name)
+        if found:
+            return found
     raise FileNotFoundError(f"{env_name} is not set and executable was not found")
 
 
@@ -320,7 +320,11 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
     blender = find_executable(
         "BLENDER_EXE",
         ("blender",),
-        (r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",),
+        (
+            str(ROOT / ".image2outfit" / "blender-4.4.3" / "blender.exe"),
+            str(ROOT / ".image2outfit" / "blender" / "blender.exe"),
+            r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",
+        ),
     )
     try:
         prepared = blender_python_env.prepare(blender, root=ROOT)

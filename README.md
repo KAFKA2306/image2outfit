@@ -27,7 +27,7 @@ Markdown は入口と設計説明に限定します。変更され得る要件�
 
 画像の存在、ファイルサイズ、hash、CI 成功だけでは visual appearance review の PASS にはなりません。
 
-Unity 2022.3.22f1 の import/save/reload、Modular Avatar / NDMF bake、VRChat avatar dry-run は `task avatar:preflight` と Unity MCP の検証経路で確認します。VRChat実公開、VRChat runtime、人間による runtime visual review は `OUT_OF_SCOPE` とし、外部検証なしに動作確認済みとは表現しません。
+Unity 2022.3.22f1 import/save/reload、Modular Avatar / NDMF bake、VRChat Build & Test / avatar dry-run は `task avatar:preflight` と Unity MCP の検証経路で確認します。VRChat実公開、VRChat runtime、人間による runtime visual review は `OUT_OF_SCOPE` とし、外部検証なしに動作確認済みとは表現しません。
 
 ## ワークスペース
 

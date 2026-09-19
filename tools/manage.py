@@ -118,7 +118,8 @@ def _avatar_cloth(outfits: list[str] | None, force: bool = False) -> int:
         "siroino-nocturne-angel-set",
         "siroino-wide-cargo",
     ]
-    script = TOOLS / "blender_cloth_simulation.py"
+    cloth_script = "tools/blender_cloth_simulation.py"
+    script = ROOT / cloth_script
     failed = False
     for product_id in ids:
         job = ROOT / "config" / "products" / product_id / "job.json"

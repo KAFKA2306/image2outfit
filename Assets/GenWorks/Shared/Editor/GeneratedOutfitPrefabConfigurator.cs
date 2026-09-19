@@ -359,7 +359,8 @@ namespace Image2Outfit.Editor
                 return false;
 
             var filename = normalized.Substring(markerIndex + CanonicalPrefabSegment.Length);
-            if (filename.Length == 0 || filename.IndexOf('/') >= 0)
+            var hasNoNestedPrefab = filename.IndexOf('/') < 0;
+            if (filename.Length == 0 || !hasNoNestedPrefab)
                 return false;
 
             // Integrated avatar/demo prefabs are intentionally excluded. Their

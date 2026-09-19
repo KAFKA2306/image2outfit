@@ -729,21 +729,41 @@ def export_fbx(
     for obj in garments:
         obj.select_set(True)
     bpy.context.view_layer.objects.active = armature
-    bpy.ops.export_scene.fbx(
-        filepath=str(path),
-        use_selection=True,
-        object_types={"ARMATURE", "MESH"},
-        apply_unit_scale=True,
-        apply_scale_options="FBX_SCALE_UNITS",
-        use_space_transform=True,
-        add_leaf_bones=False,
-        primary_bone_axis="Y",
-        secondary_bone_axis="X",
-        mesh_smooth_type="FACE",
-        use_mesh_modifiers=True,
-        bake_anim=False,
-        path_mode="AUTO",
-    )
+    # The Unity delivery keeps the armature and skin weights.  Applying the
+    # preview modifier stack during FBX export would bake the current pose into
+    # the vertex buffer, after which Unity skins that already-deformed buffer a
+    # second time.  This pipeline keeps Solidify/Bevel as non-destructive
+    # Blender preview modifiers, so export the authored mesh and shape keys
+    # directly; Unity owns the single armature deformation pass.
+    armature_modifiers = [
+        (modifier, modifier.show_viewport, modifier.show_render)
+        for obj in garments
+        for modifier in obj.modifiers
+        if modifier.type == "ARMATURE"
+    ]
+    for modifier, _, _ in armature_modifiers:
+        modifier.show_viewport = False
+        modifier.show_render = False
+    try:
+        bpy.ops.export_scene.fbx(
+            filepath=str(path),
+            use_selection=True,
+            object_types={"ARMATURE", "MESH"},
+            apply_unit_scale=True,
+            apply_scale_options="FBX_SCALE_UNITS",
+            use_space_transform=True,
+            add_leaf_bones=False,
+            primary_bone_axis="Y",
+            secondary_bone_axis="X",
+            mesh_smooth_type="FACE",
+            use_mesh_modifiers=False,
+            bake_anim=False,
+            path_mode="AUTO",
+        )
+    finally:
+        for modifier, show_viewport, show_render in armature_modifiers:
+            modifier.show_viewport = show_viewport
+            modifier.show_render = show_render
     return path
 
 
