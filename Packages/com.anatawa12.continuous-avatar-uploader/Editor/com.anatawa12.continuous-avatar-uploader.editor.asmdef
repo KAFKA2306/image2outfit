@@ -1,0 +1,47 @@
+{
+    "name": "com.anatawa12.continuous-avatar-uploader.editor",
+    "rootNamespace": "",
+    "references": [
+        "VRC.SDKBase",
+        "VRC.SDKBase.Editor",
+        "VRC.SDK3A",
+        "VRC.SDK3A.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "VRCSDK3A.dll",
+        "VRCSDKBase.dll",
+        "VRCCore-Editor.dll",
+        "VRCSDKBase-Editor.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.vrchat.base",
+            "expression": "3.6.0",
+            "define": "CAU_VRCSDK_BASE_3_6_0"
+        },
+        {
+            "name": "com.vrchat.base",
+            "expression": "3.8.0",
+            "define": "CAU_VRCSDK_BASE_3_8_0"
+        },
+        {
+            "name": "com.vrchat.base",
+            "expression": "3.8.1-beta.2",
+            "define": "CAU_VRCSDK_BASE_3_8_1"
+        },
+        {
+            "name": "com.vrchat.base",
+            "expression": "3.9.0-beta.1",
+            "define": "CAU_VRCSDK_BASE_3_9_0"
+        }
+    ],
+    "noEngineReferences": false
+}

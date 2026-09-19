@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "productName": "Tuxedo Halter Layered Dress for Siroino _Large",
+  "buildRevision": "v1-reference-audited-pattern-first",
+  "targetProfile": {
+    "profile": "Siroino _Large",
+    "appliedShapeKeys": {
+      "All_L": 1.0,
+      "Chest_L": 1.0,
+      "Hips_01_L": 1.0,
+      "UpperLeg_L": 1.0,
+      "Breasts_L": 0.65
+    },
+    "vertices": 8421
+  },
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "blenderVersion": "4.4.3",
+  "materialRecipe": {
+    "path": "config/products/siroino-tuxedo-halter-dress-large/material-recipe.json",
+    "sha256": "1cd9dc563c6d9312096110948694c5705144b01f8d760bc09376096a6846403e",
+    "recipeVersion": "tuxedo-material-v1",
+    "regions": {
+      "white": [
+        "bib-front",
+        "bib-ruffles"
+      ],
+      "wine": [
+        "waistcoat-front",
+        "waistcoat-back",
+        "tails"
+      ],
+      "black": [
+        "upper-skirt",
+        "neck-band",
+        "bow",
+        "buttons",
+        "lace"
+      ],
+      "sheer": [
+        "lower-skirt"
+      ],
+      "silver": [
+        "waist-anchors",
+        "waist-chain"
+      ]
+    }
+  },
+  "patternDrivenGeometry": {
+    "patternPath": "config/products/siroino-tuxedo-halter-dress-large/pattern-draft.json",
+    "patternSha256": "7d95c0bff323ff15d45956c0fa1c54b1797df59421a4a00dbe58dff34c593f0a",
+    "pieces": {
+      "bib-front": {
+        "object": "White_Jacquard_Bib",
+        "projectionFingerprint": "c8de82500b4a1406b28f22c1b2cebf843538f805fdb330f4a2a353c2632e9bf5",
+        "edgeVertexMap": {
+          "centerline": [
+            2,
+            5
+          ],
+          "left-side": [
+            0,
+            1
+          ],
+          "right-side": [
+            3,
+            4
+          ]
+        },
+        "bounds": {
+          "height": 0.262,
+          "maxX": 0.074,
+          "maxZ": 1.02,
+          "minX": -0.074,
+          "minZ": 0.758,
+          "width": 0.148
+        },
+        "transform": {
+          "widthScale": 1.0,
+          "xScale": 0.7047619047619048,
+          "zOffset": 0.8495421686746988,
+          "zScale": 0.6313253012048193
+        }
+      }
+    }
+  },
+  "metrics": {
+    "meshObjects": 24,
+    "vertices": 20970,
+    "triangles": 41776,
+    "materialSlots": 24,
+    "shapeKeys": 0,
+    "maxBoneInfluences": 4,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "boundaryEdges": 88
+  },
+  "weightNormalization": {
+    "objects": 24,
+    "vertices": 20970,
+    "rigidObjects": [
+      {
+        "object": "Black_Upper_Pleated_Skirt",
+        "bone": "Hips"
+      },
+      {
+        "object": "Black_Sheer_Lower_Skirt",
+        "bone": "Hips"
+      },
+      {
+        "object": "Silver_Waist_Anchor_L",
+        "bone": "Hips"
+      },
+      {
+        "object": "Silver_Waist_Anchor_R",
+        "bone": "Hips"
+      },
+      {
+        "object": "Silver_Waist_Chain_Upper",
+        "bone": "Hips"
+      },
+      {
+        "object": "Silver_Waist_Chain_Lower",
+        "bone": "Hips"
+      },
+      {
+        "object": "Black_Lace_Scallop_Hem",
+        "bone": "Hips"
+      }
+    ],
+    "fallbackVertices": 0,
+    "maximumInfluences": 4
+  },
+  "clearanceRefinement": [
+    {
+      "pass": 1,
+      "target": 0.0018,
+      "movedVertices": 30,
+      "maximumMove": 0.0010791167460381984,
+      "clearance": {
+        "vertices": 11719,
+        "minimum": 0.00179995596408844,
+        "p01": 0.00318147917278111,
+        "mean": 0.018887682253611204
+      }
+    },
+    {
+      "pass": 2,
+      "target": 0.0028,
+      "movedVertices": 100,
+      "maximumMove": 0.00100004403591156,
+      "clearance": {
+        "vertices": 11719,
+        "minimum": 0.0018266360275447369,
+        "p01": 0.00318147917278111,
+        "mean": 0.018892969617721276
+      }
+    },
+    {
+      "pass": 3,
+      "target": 0.0036,
+      "movedVertices": 152,
+      "maximumMove": 0.001773363972455263,
+      "clearance": {
+        "vertices": 11719,
+        "minimum": 0.0016508698463439941,
+        "p01": 0.0036000064574182034,
+        "mean": 0.01889882584460112
+      }
+    }
+  ],
+  "hemBoundary": {
+    "object": "Black_Lace_Scallop_Hem",
+    "sourceObject": "Black_Sheer_Lower_Skirt",
+    "sourceVertexCount": 112,
+    "source": "settled lower skirt boundary after cloth bake"
+  },
+  "clothSimulation": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Evidence/Build/cloth-simulation.json",
+  "views": {
+    "front": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/three-quarter.png"
+  },
+  "poseViews": {
+    "neutral": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/prone.png"
+  },
+  "referenceModelIdentification": "UNVERIFIED",
+  "notes": [
+    "The waistcoat is recovered as fitted body-surface panels, not detached planes.",
+    "The skirt layers use subdivided low-amplitude panels and baked cloth settling.",
+    "All exported deform weights are reduced to at most four bones and normalized.",
+    "No manufacturer, SKU, JAN, or model number is asserted without exact evidence."
+  ]
+}

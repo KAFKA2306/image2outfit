@@ -14,6 +14,7 @@ import audit_research_baseline
 import production_contract as contract
 
 ROOT = Path(__file__).resolve().parents[1]
+RUNTIME_JOB_FIELDS = frozenset(("artifactDir", "candidateDir", "releaseDir"))
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -61,7 +62,14 @@ def select(job: dict[str, Any], root: Path = ROOT) -> dict[str, Any]:
         errors.append(f"release policy unreadable: {exc}")
 
     if policy:
-        errors.extend(contract.validate_job(job, policy, root))
+        # Production runtime enrichment adds derived output paths to the job
+        # object.  Those paths are intentionally not part of the tracked job
+        # schema, so validate the canonical projection here while retaining
+        # the enriched object for path/evidence resolution below.
+        canonical_job = {
+            key: value for key, value in job.items() if key not in RUNTIME_JOB_FIELDS
+        }
+        errors.extend(contract.validate_job(canonical_job, policy, root))
         construction, construction_errors, construction_warnings = (
             contract.validate_construction(job, policy, root)
         )

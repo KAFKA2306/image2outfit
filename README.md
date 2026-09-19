@@ -27,7 +27,7 @@ Markdown は入口と設計説明に限定します。変更され得る要件�
 
 画像の存在、ファイルサイズ、hash、CI 成功だけでは visual appearance review の PASS にはなりません。
 
-Unity 2022.3.22f1 import/save/reload、Modular Avatar / NDMF、VRChat Build & Test、VRChat runtime、人間による runtime visual review は現在 `OUT_OF_SCOPE` です。外部検証なしに、それらが動作確認済みとは表現しません。
+Unity 2022.3.22f1 import/save/reload、Modular Avatar / NDMF bake、VRChat Build & Test / avatar dry-run は `task avatar:preflight` と Unity MCP の検証経路で確認します。VRChat実公開、VRChat runtime、人間による runtime visual review は `OUT_OF_SCOPE` とし、外部検証なしに動作確認済みとは表現しません。
 
 ## ワークスペース
 
@@ -111,21 +111,25 @@ task mcp:setup
 task mcp:doctor
 ```
 
-`task mcp:setup` は Codex 用に Blender MCP `1.8.0` と Unity MCP `10.1.2` のlocalhost接続を登録します。Blenderは `localhost:9876`、Unityは `http://127.0.0.1:8080/mcp` を使い、MCP状態そのものを製品証拠や `requiredCompletionGates` にはしません。
+`task mcp:setup` は Codex 用に Blender MCP `1.8.0` を登録し、Unity MCP `2.6.8` のloopback TCP discovery registryを準備します。Blenderは `localhost:9876`、Unityはプロジェクトごとの `127.0.0.1` ポートを `%LOCALAPPDATA%/UnityMCP/registry` から検出し、MCP状態そのものを製品証拠や `requiredCompletionGates` にはしません。
 
 Unity側のpackage導入はローカルUnity projectを変更するためsetup scriptでは自動実行しません。確認済みpinを明示的に導入します。
 
 ```text
 Window > Package Manager > + > Add package from git URL
-https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v10.1.2
+https://github.com/TunaSync-Studio/UnityMCP-VCC.git?path=/package/com.tunasync.unity-mcp#50597089589137c5186f5badbde1d72f5d335243
 ```
+
+VRChatアバターの連続公開にはAnatawa12 Continuous Avatar Uploader `0.3.12`を使用します。設定済みの9件は `Assets/UnityMCP_CAU/siroino-all-outfits.asset` にまとめ、各Prefabは個別の `Avatar Upload Setting` としてPC向けだけを有効化しています。アップロード開始はUnityの `Tools > Continuous Avatar Uploader` から行います。
+
+生成済みアバターの開発者向け自動化入口は `task avatar:cloth`、`task avatar:plan`、`task avatar:preflight`、`task avatar:visual`、`task avatar:visual-diff`、`task avatar:ledger`、`task avatar:run` です。Blender 4.4.3 のnative Cloth証拠は各製品の `Evidence/Build/cloth-simulation.json` に保存し、Unityシーンは `Assets/Scenes/Avatar/` に個別配置します。`task avatar:visual-diff` は9着×11ビューのbefore/after比較と、各個別Unity衣装Sceneを1着ずつ開いたcloth後キャプチャ、差分画像、各製品の `Evidence/Build/cloth-visual-diff.json` を生成します。Workbenchの重ね表示はafter証拠に使用しません。差分は可視性のための非ブロッキング警告として扱います。ローカルの検査結果とアップロード台帳は `.image2outfit/avatar-workflow/` に保存し、認証情報は保存しません。NDMF bakeとVRChat監査はUnity MCP、CAU実公開はUnityログインを必要とする外部境界として扱います。
 
 Blender側には `View3D > Sidebar > Image2Outfit > OpenAI Assistant` の薄いprompt UIを用意します。bridgeはlocalhost限定とし、OpenAI/API/provider secrets、`.codex`、`.image2outfit/` のローカル状態をcommitしません。外部Blender連携は明示的に有効化した場合だけ使用します。
 
 確認済みupstream:
 
 - Blender MCP `1.8.0`: <https://github.com/ahujasid/blender-mcp/commit/3ab892510cc0e5435ba5e611c01fb1021fbde8de>
-- Unity MCP `v10.1.2`: <https://github.com/CoplayDev/unity-mcp/releases/tag/v10.1.2>
+- Unity MCP `v2.6.8`: <https://github.com/TunaSync-Studio/UnityMCP-VCC/tree/50597089589137c5186f5badbde1d72f5d335243>
 - Codex MCP CLI: <https://github.com/openai/codex/blob/main/codex-rs/cli/src/mcp_cmd.rs>
 
 ## 実行結果と証拠

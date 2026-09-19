@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Generate a measured SiroinoSotai_PC fit for the military romper."""
+
 from __future__ import annotations
 
 import statistics
@@ -174,9 +175,7 @@ def extract(
             if source_index not in used:
                 source = body.data.vertices[source_index]
                 used[source_index] = len(vertices)
-                vertices.append(
-                    tuple(source.co + source.normal.normalized() * offset)
-                )
+                vertices.append(tuple(source.co + source.normal.normalized() * offset))
             face.append(used[source_index])
             if source_uv is not None:
                 uv = source_uv.data[loop_index].uv
@@ -230,11 +229,7 @@ def skin(body: bpy.types.Object) -> None:
 def fabric(textures: dict[str, Path]) -> bpy.types.Material:
     material = ORIGINAL_FABRIC(textures)
     shader = next(
-        (
-            node
-            for node in material.node_tree.nodes
-            if node.type == "BSDF_PRINCIPLED"
-        ),
+        (node for node in material.node_tree.nodes if node.type == "BSDF_PRINCIPLED"),
         None,
     )
     if shader is not None:
@@ -259,12 +254,20 @@ def parent_rigid(
     semantic: str,
 ) -> bpy.types.Object:
     item = resolve_bone(armature, semantic)
+    if item is None:
+        raise RuntimeError(
+            f"cannot attach rigid garment object {obj.name!r}: "
+            f"target bone for {semantic!r} was not found"
+        )
     world = obj.matrix_world.copy()
     obj.parent = armature
-    if item is not None:
-        obj.parent_type = "BONE"
-        obj.parent_bone = item.name
+    obj.parent_type = "OBJECT"
     obj.matrix_world = world
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+    group = obj.vertex_groups.get(item.name) or obj.vertex_groups.new(name=item.name)
+    group.add(range(len(obj.data.vertices)), 1.0, "REPLACE")
     obj["image2outfit_role"] = "garment"
     obj["image2outfit_fit_audit"] = False
     return obj
@@ -436,9 +439,7 @@ def build(
         if z(0.64) <= (body.matrix_world @ vertex.co).z <= z(0.74)
         and abs((body.matrix_world @ vertex.co).x - center.x) <= torso_width
     ]
-    front = (
-        min(front_candidates) if front_candidates else minimum.y
-    ) - height * 0.018
+    front = (min(front_candidates) if front_candidates else minimum.y) - height * 0.018
 
     objects: list[bpy.types.Object] = []
     objects.append(
@@ -457,7 +458,12 @@ def build(
             ),
             cloth,
             values,
-            offset=0.034,
+            # The imported target's local normals reverse on the chest/hip
+            # transition for this mesh.  A normal offset therefore pushes a
+            # subset of the surface into the actual target.  Keep the fit
+            # surface coincident and let Solidify's outward offset provide
+            # render thickness.
+            offset=0.0,
             thickness=0.0025,
         )
     )
@@ -485,7 +491,10 @@ def build(
             lambda point: z(0.42) <= point.z <= z(0.56),
             cloth,
             values,
-            offset=0.040,
+            # Same target-surface rule as the bodice: the audited base must
+            # remain on the measured body surface, not follow a flipped
+            # source normal into the hips and upper legs.
+            offset=0.0,
             thickness=0.0028,
         )
     )
@@ -575,9 +584,7 @@ def target_fit_audit(
     total_vertices = 0
 
     for obj in garments:
-        if obj.type != "MESH" or not bool(
-            obj.get("image2outfit_fit_audit", False)
-        ):
+        if obj.type != "MESH" or not bool(obj.get("image2outfit_fit_audit", False)):
             continue
 
         modifier_states = [
@@ -607,9 +614,7 @@ def target_fit_audit(
                     nearest = tree.find_nearest(point)
                     if nearest[0] is None or nearest[1] is None:
                         continue
-                    local_clearances.append(
-                        float((point - nearest[0]).dot(nearest[1]))
-                    )
+                    local_clearances.append(float((point - nearest[0]).dot(nearest[1])))
             finally:
                 evaluated.to_mesh_clear()
         finally:
@@ -628,9 +633,7 @@ def target_fit_audit(
                 min(local_clearances) if local_clearances else None
             ),
             "medianClearanceMeters": (
-                statistics.median(local_clearances)
-                if local_clearances
-                else None
+                statistics.median(local_clearances) if local_clearances else None
             ),
         }
 
@@ -663,8 +666,8 @@ def target_fit_audit(
 def scene(body: bpy.types.Object) -> bpy.types.Object:
     camera = ORIGINAL_SCENE(body)
     render = bpy.context.scene.render
-    render.resolution_x = 512
-    render.resolution_y = 512
+    render.resolution_x = 1024
+    render.resolution_y = 1024
     render.resolution_percentage = 100
     for obj in bpy.data.objects:
         if obj.type == "LIGHT":

@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import shutil
 import sys
 from pathlib import Path
@@ -224,31 +223,33 @@ def add_skirts(
         pleats=14,
         thickness=0.0008,
     )
-    garments = [upper_skirt, lower_skirt]
+    return [upper_skirt, lower_skirt], upper_skirt, lower_skirt, upper_pin, lower_pin
 
-    hem_points = []
-    for index in range(168):
-        angle = math.tau * index / 168
-        scallop = 0.0045 * (0.5 + 0.5 * math.cos(angle * 20))
-        hem_points.append(
-            (
-                0.276 * math.cos(angle),
-                0.205 * math.sin(angle),
-                0.465 + scallop,
-            )
+
+def hem_from_settled_boundary(
+    skirt: bpy.types.Object,
+    armature: bpy.types.Object,
+    material: object,
+) -> bpy.types.Object:
+    """Build the hem from the settled skirt boundary, never from a fixed ring."""
+    segments = 14 * 8
+    if len(skirt.data.vertices) < segments:
+        raise RuntimeError("settled lower skirt has no complete boundary ring")
+    points = [
+        tuple(skirt.data.vertices[index].co)
+        for index in range(
+            len(skirt.data.vertices) - segments, len(skirt.data.vertices)
         )
-    garments.append(
-        base.curve_tube(
-            "Black_Lace_Scallop_Hem",
-            hem_points,
-            0.0017,
-            materials["black"],
-            armature,
-            "Hips",
-            cyclic=True,
-        )
+    ]
+    return base.curve_tube(
+        "Black_Lace_Scallop_Hem",
+        points,
+        0.0017,
+        material,
+        armature,
+        "Hips",
+        cyclic=True,
     )
-    return garments, upper_skirt, lower_skirt, upper_pin, lower_pin
 
 
 def add_hardware(
@@ -306,7 +307,7 @@ def bake_skirts(
     lower_skirt: bpy.types.Object,
     upper_pin: list[int],
     lower_pin: list[int],
-) -> tuple[list[dict[str, object]], int]:
+) -> tuple[list[dict[str, object]], int, list[tuple[float, float, float]]]:
     frame_end = 24
     skirts = (upper_skirt, lower_skirt)
     pre_bake_hashes = {skirt.name: mesh_geometry_sha256(skirt) for skirt in skirts}
@@ -324,6 +325,7 @@ def bake_skirts(
     scene.frame_set(frame_end)
     bpy.context.view_layer.update()
 
+    settled_lower_boundary: list[tuple[float, float, float]] | None = None
     for skirt in skirts:
         contract = contract_by_object[skirt.name]
         cache = cloth_cache_state(skirt, "Reference Cloth")
@@ -349,6 +351,16 @@ def bake_skirts(
                 f"cloth evaluation did not change mesh geometry for {skirt.name}"
             )
 
+        if skirt is lower_skirt:
+            segments = 14 * 8
+            settled_lower_boundary = [
+                tuple(skirt.data.vertices[index].co)
+                for index in range(
+                    len(skirt.data.vertices) - segments,
+                    len(skirt.data.vertices),
+                )
+            ]
+
         solidify = skirt.modifiers.new("Fabric thickness", "SOLIDIFY")
         solidify.thickness = 0.0012 if skirt is upper_skirt else 0.0007
         solidify.offset = 0.0
@@ -359,7 +371,9 @@ def bake_skirts(
         soft.segments = 2
         bpy.ops.object.modifier_apply(modifier=soft.name)
         skirt.select_set(False)
-    return contracts, frame_end
+    if settled_lower_boundary is None:
+        raise RuntimeError("lower skirt settled boundary was not recorded")
+    return contracts, frame_end, settled_lower_boundary
 
 
 def main() -> int:
@@ -434,9 +448,11 @@ def main() -> int:
         movable=lambda obj: not obj.name.startswith("Silver_"),
     )
     clean_meshes(garments)
-    cloth_contracts, frame_end = bake_skirts(
+    cloth_contracts, frame_end, settled_lower_boundary = bake_skirts(
         body, upper_skirt, lower_skirt, upper_pin, lower_pin
     )
+    hem = hem_from_settled_boundary(lower_skirt, armature, materials["black"])
+    garments.append(hem)
     clean_meshes(garments)
     weight_report = normalize_bone_weights(
         garments,
@@ -562,6 +578,12 @@ def main() -> int:
         "metrics": measured,
         "weightNormalization": weight_report,
         "clearanceRefinement": clearance_history,
+        "hemBoundary": {
+            "object": hem.name,
+            "sourceObject": lower_skirt.name,
+            "sourceVertexCount": len(settled_lower_boundary),
+            "source": "settled lower skirt boundary after cloth bake",
+        },
         "clothSimulation": str(cloth_report.relative_to(ROOT)).replace("\\", "/"),
         "views": {
             name: str(path.relative_to(ROOT)).replace("\\", "/")

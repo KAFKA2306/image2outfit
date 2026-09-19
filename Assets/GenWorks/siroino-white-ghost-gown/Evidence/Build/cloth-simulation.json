@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "status": "PASS",
+  "engine": "Blender Cloth",
+  "frameStart": 1,
+  "frameEnd": 42,
+  "cacheBaked": true,
+  "gravity": [
+    0.0,
+    0.0,
+    -4.5
+  ],
+  "bodyCollisionThicknessM": 0.004,
+  "contracts": [
+    {
+      "object": "Ghost_Mermaid_Skirt",
+      "modifier": "Pattern Sewing Cloth",
+      "frameStart": 1,
+      "frameEnd": 42,
+      "cacheBaked": true,
+      "useSewingSprings": true,
+      "sewingForceMax": 4.0,
+      "sewingSpringEdgeCount": 7
+    }
+  ]
+}
