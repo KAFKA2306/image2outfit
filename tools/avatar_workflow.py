@@ -668,6 +668,8 @@ def visual_before_after(
             "path": scene_capture.relative_to(root).as_posix(),
             "exists": scene_capture.is_file(),
             "source": "Unity MCP scene capture after cloth bake",
+            "captureScope": "individual-outfit-scene",
+            "scenePath": outfit.get("scene"),
         }
         if scene_capture.is_file():
             capture_count += 1
@@ -749,6 +751,7 @@ def visual_before_after(
         "beforeLabel": "versioned visual baseline",
         "afterLabel": "current post-cloth visual root",
         "unityAfterSceneCaptureCount": capture_count,
+        "unityAfterSceneCaptureScope": "individual-outfit-scene",
         "unityAfterSceneCapturesAreSupplemental": True,
         "results": results,
         "visualIssuesAreNonBlocking": True,
