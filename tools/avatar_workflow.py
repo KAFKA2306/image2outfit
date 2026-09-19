@@ -441,6 +441,33 @@ def _image_metrics(current: Path, baseline: Path) -> dict[str, Any]:
     }
 
 
+def _image_metrics_resized(current: Path, baseline: Path) -> dict[str, Any]:
+    if Image is None or ImageChops is None or ImageStat is None:
+        raise AvatarWorkflowError("Pillow is required for visual before/after evidence")
+    with Image.open(current) as current_image, Image.open(baseline) as baseline_image:
+        source_size = current_image.size
+        baseline_rgba = baseline_image.convert("RGBA")
+        current_rgba = current_image.convert("RGBA").resize(
+            baseline_rgba.size, Image.Resampling.LANCZOS
+        )
+    difference = ImageChops.difference(current_rgba, baseline_rgba)
+    mean_absolute_error = sum(ImageStat.Stat(difference).mean) / 4.0 / 255.0
+    histogram = difference.convert("L").histogram()
+    pixels = baseline_rgba.width * baseline_rgba.height
+    changed_pixels = sum(histogram[9:])
+    return {
+        "passed": True,
+        "status": "PASS",
+        "width": baseline_rgba.width,
+        "height": baseline_rgba.height,
+        "sourceWidth": source_size[0],
+        "sourceHeight": source_size[1],
+        "resizedForComparison": True,
+        "meanAbsoluteError": round(mean_absolute_error, 8),
+        "changedPixelRatio": round(changed_pixels / pixels, 8) if pixels else 0.0,
+    }
+
+
 def visual_regression(
     root: Path = ROOT,
     *,
@@ -528,6 +555,208 @@ def visual_regression(
         "errors": list(dict.fromkeys(errors)),
         "warnings": list(dict.fromkeys(warnings)),
     }
+
+
+def _comparison_filename(relative_path: str, suffix: str) -> str:
+    safe = relative_path.replace("/", "__").replace("\\", "__")
+    return f"{Path(safe).stem}-{suffix}.png"
+
+
+def _write_visual_comparison(
+    current: Path,
+    baseline: Path,
+    output_root: Path,
+    relative_path: str,
+) -> dict[str, str]:
+    if Image is None or ImageChops is None:
+        raise AvatarWorkflowError("Pillow is required for visual before/after evidence")
+    with Image.open(current) as current_image, Image.open(baseline) as baseline_image:
+        current_rgba = current_image.convert("RGBA")
+        baseline_rgba = baseline_image.convert("RGBA")
+    if current_rgba.size != baseline_rgba.size:
+        current_rgba = current_rgba.resize(baseline_rgba.size, Image.Resampling.LANCZOS)
+    difference = ImageChops.difference(current_rgba, baseline_rgba)
+    comparison_path = output_root / _comparison_filename(relative_path, "before-after")
+    diff_path = output_root / _comparison_filename(relative_path, "diff")
+    comparison = Image.new(
+        "RGBA", (baseline_rgba.width * 2, baseline_rgba.height), (16, 16, 20, 255)
+    )
+    comparison.paste(baseline_rgba, (0, 0))
+    comparison.paste(current_rgba, (baseline_rgba.width, 0))
+    output_root.mkdir(parents=True, exist_ok=True)
+    comparison.save(comparison_path)
+    difference.save(diff_path)
+    return {
+        "beforeAfterImage": comparison_path.as_posix(),
+        "differenceImage": diff_path.as_posix(),
+    }
+
+
+def visual_before_after(
+    root: Path = ROOT,
+    *,
+    config: dict[str, Any] | None = None,
+    outfit_ids: Iterable[str] | None = None,
+    require_unity_scene: bool = False,
+) -> dict[str, Any]:
+    """Materialise before/after images and metrics for every required outfit view."""
+    root = root.resolve()
+    config = config or _load_config(root)
+    _validate_config(root, config)
+    selected = _selected_outfits(config, outfit_ids)
+    baseline_root = _asset(root, config["paths"]["visualBaselineRoot"])
+    paths = config["paths"]
+    diff_root = _asset(
+        root, paths.get("visualDiffRoot", f"{paths['runtimeRoot']}/visual-diffs")
+    )
+    after_root = _asset(
+        root, paths.get("visualAfterRoot", f"{paths['runtimeRoot']}/visual-after")
+    )
+    threshold = float(config["visual"]["warningMeanAbsoluteError"])
+    results: list[dict[str, Any]] = []
+    errors: list[str] = []
+    warnings: list[str] = []
+    capture_count = 0
+    for outfit in selected:
+        outfit_id = outfit["id"]
+        outfit_results: list[dict[str, Any]] = []
+        for relative_path in config["visual"]["requiredPaths"]:
+            current = _asset(root, outfit["visualRoot"]) / relative_path
+            baseline = baseline_root / outfit_id / relative_path
+            item: dict[str, Any] = {
+                "outfitId": outfit_id,
+                "path": current.relative_to(root).as_posix(),
+                "beforePath": baseline.relative_to(root).as_posix(),
+                "comparisonMode": "versioned-baseline-vs-current-visual-root",
+            }
+            if not baseline.is_file():
+                item.update({"status": "ERROR", "passed": False, "error": "before image missing"})
+                errors.append(f"before visual missing: {item['beforePath']}")
+            elif not current.is_file():
+                item.update({"status": "ERROR", "passed": False, "error": "after image missing"})
+                errors.append(f"after visual missing: {item['path']}")
+            else:
+                try:
+                    item.update(_image_metrics(current, baseline))
+                    artifact_paths = _write_visual_comparison(
+                        current,
+                        baseline,
+                        diff_root / outfit_id,
+                        relative_path,
+                    )
+                    item.update(
+                        {
+                            key: Path(value).relative_to(root).as_posix()
+                            for key, value in artifact_paths.items()
+                        }
+                    )
+                except (OSError, ValueError, AvatarWorkflowError) as exc:
+                    item.update({"status": "ERROR", "passed": False, "error": str(exc)})
+                if item.get("status") == "ERROR":
+                    errors.append(f"visual before/after failed: {item['path']}: {item.get('error')}")
+                elif item.get("meanAbsoluteError", 0) > threshold:
+                    item["status"] = "WARN"
+                    item["visualGate"] = "NON_BLOCKING"
+                    warnings.append(
+                        f"visual before/after difference above warning threshold: {item['path']} "
+                        f"({item['meanAbsoluteError']:.5f} > {threshold:.5f})"
+                    )
+            outfit_results.append(item)
+            results.append(item)
+        scene_capture = after_root / outfit_id / "scene.png"
+        scene_capture_item = {
+            "path": scene_capture.relative_to(root).as_posix(),
+            "exists": scene_capture.is_file(),
+            "source": "Unity MCP scene capture after cloth bake",
+        }
+        if scene_capture.is_file():
+            capture_count += 1
+            scene_comparison: dict[str, Any] = {
+                "outfitId": outfit_id,
+                "path": scene_capture.relative_to(root).as_posix(),
+                "beforePath": (baseline_root / outfit_id / "front.png").relative_to(root).as_posix(),
+                "comparisonMode": "versioned-baseline-vs-unity-scene-capture",
+            }
+            try:
+                scene_comparison.update(
+                    _image_metrics_resized(
+                        scene_capture,
+                        baseline_root / outfit_id / "front.png",
+                    )
+                )
+                scene_comparison.update(
+                    {
+                        key: Path(value).relative_to(root).as_posix()
+                        for key, value in _write_visual_comparison(
+                            scene_capture,
+                            baseline_root / outfit_id / "front.png",
+                            diff_root / outfit_id,
+                            "unity-scene-front.png",
+                        ).items()
+                    }
+                )
+            except (OSError, ValueError, AvatarWorkflowError) as exc:
+                scene_comparison.update({"status": "ERROR", "passed": False, "error": str(exc)})
+            if scene_comparison.get("status") == "ERROR":
+                errors.append(
+                    f"Unity scene visual comparison failed: {outfit_id}: {scene_comparison.get('error')}"
+                )
+            elif scene_comparison.get("meanAbsoluteError", 0) > threshold:
+                scene_comparison["status"] = "WARN"
+                scene_comparison["visualGate"] = "NON_BLOCKING"
+                warnings.append(
+                    f"Unity scene visual difference above warning threshold: {outfit_id} "
+                    f"({scene_comparison['meanAbsoluteError']:.5f} > {threshold:.5f})"
+                )
+            outfit_results.append(scene_comparison)
+            results.append(scene_comparison)
+        elif require_unity_scene:
+            errors.append(f"Unity scene after capture missing: {scene_capture.relative_to(root).as_posix()}")
+        evidence_path = _asset(root, outfit["clothEvidence"]).parent / "cloth-visual-diff.json"
+        write_json(
+            evidence_path,
+            {
+                "schemaVersion": 1,
+                "tool": "avatar-visual-before-after",
+                "checkedAt": _now(),
+                "gitRevision": _git_revision(root),
+                "outfitId": outfit_id,
+                "comparisonMode": "versioned-baseline-vs-current-visual-root",
+                "beforeLabel": "versioned visual baseline",
+                "afterLabel": "current post-cloth visual root",
+                "unityAfterSceneCapture": scene_capture_item,
+                "unitySceneComparison": next(
+                    (
+                        item
+                        for item in outfit_results
+                        if item.get("comparisonMode") == "versioned-baseline-vs-unity-scene-capture"
+                    ),
+                    None,
+                ),
+                "results": outfit_results,
+                "visualIssuesAreNonBlocking": True,
+                "passed": not any(item.get("status") == "ERROR" for item in outfit_results),
+                "errors": [item.get("error") for item in outfit_results if item.get("status") == "ERROR"],
+            },
+        )
+    report = {
+        "schemaVersion": 1,
+        "tool": "avatar-visual-before-after",
+        "checkedAt": _now(),
+        "gitRevision": _git_revision(root),
+        "selectedOutfitCount": len(selected),
+        "comparisonMode": "versioned-baseline-vs-current-visual-root",
+        "beforeLabel": "versioned visual baseline",
+        "afterLabel": "current post-cloth visual root",
+        "unityAfterSceneCaptureCount": capture_count,
+        "unityAfterSceneCapturesAreSupplemental": True,
+        "results": results,
+        "visualIssuesAreNonBlocking": True,
+        "passed": not errors,
+        "errors": list(dict.fromkeys(errors)),
+        "warnings": list(dict.fromkeys(warnings)),
+    }
+    return report
 
 
 def _ledger_path(root: Path, config: dict[str, Any]) -> Path:
@@ -691,6 +920,7 @@ def run_workflow(
     visual_result = visual_regression(
         root, config=config, record_baseline=record_baseline
     )
+    visual_before_after_result = visual_before_after(root, config=config)
     ledger = initialise_ledger(root, config=config)
     result = {
         "schemaVersion": 1,
@@ -707,6 +937,14 @@ def run_workflow(
             "errors": len(visual_result["errors"]),
             "warnings": len(visual_result["warnings"]),
         },
+        "visualBeforeAfter": {
+            "passed": visual_before_after_result["passed"],
+            "errors": len(visual_before_after_result["errors"]),
+            "warnings": len(visual_before_after_result["warnings"]),
+            "unityAfterSceneCaptureCount": visual_before_after_result[
+                "unityAfterSceneCaptureCount"
+            ],
+        },
         "ledger": {
             "path": config["paths"]["ledger"],
             "outfitCount": len(ledger["outfits"]),
@@ -719,9 +957,21 @@ def run_workflow(
         "realUploadCount": sum(
             1 for item in ledger["outfits"] if item.get("status") == "SUCCEEDED"
         ),
-        "passed": preflight_result["passed"] and visual_result["passed"],
-        "errors": [*preflight_result["errors"], *visual_result["errors"]],
-        "warnings": [*preflight_result["warnings"], *visual_result["warnings"]],
+        "passed": (
+            preflight_result["passed"]
+            and visual_result["passed"]
+            and visual_before_after_result["passed"]
+        ),
+        "errors": [
+            *preflight_result["errors"],
+            *visual_result["errors"],
+            *visual_before_after_result["errors"],
+        ],
+        "warnings": [
+            *preflight_result["warnings"],
+            *visual_result["warnings"],
+            *visual_before_after_result["warnings"],
+        ],
     }
     return result
 
@@ -749,6 +999,20 @@ def dispatch(root: Path, options: argparse.Namespace) -> int:
             output = (
                 options.output
                 or f"{config['paths']['runtimeRoot']}/visual-regression.json"
+            )
+        elif options.avatar_command == "visual-diff":
+            result = visual_before_after(
+                root,
+                config=config,
+                outfit_ids=outfit_ids,
+                require_unity_scene=True,
+            )
+            output = (
+                options.output
+                or config["paths"].get(
+                    "visualDiffReport",
+                    f"{config['paths']['runtimeRoot']}/cloth-visual-diff.json",
+                )
             )
         elif options.avatar_command == "ledger":
             if options.ledger_action == "init":

@@ -320,6 +320,13 @@ def build_parser() -> argparse.ArgumentParser:
     visual.add_argument("--record-baseline", action="store_true")
     visual.add_argument("--output")
 
+    visual_diff = avatar_commands.add_parser(
+        "visual-diff",
+        help="Write mandatory before/after image comparisons for every outfit view.",
+    )
+    visual_diff.add_argument("--outfit", action="append")
+    visual_diff.add_argument("--output")
+
     ledger = avatar_commands.add_parser("ledger")
     ledger.add_argument("ledger_action", choices=("init", "record"))
     ledger.add_argument("--outfit-id")

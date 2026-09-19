@@ -153,6 +153,13 @@ tasks:
         uv run --no-cache --locked --no-default-groups --python 3.11
         python tools/manage.py avatar visual
 
+  avatar:visual-diff:
+    desc: Write before/after image comparisons and per-outfit visual evidence.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar visual-diff
+
   avatar:ledger:
     desc: Initialize the local CAU upload ledger without storing credentials.
     cmds:
