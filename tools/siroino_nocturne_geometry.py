@@ -200,7 +200,7 @@ def sewn_bodice_shell(name, center, rings, mat, *, segments=72):
     for ring_index in range(len(rings) - 1):
         for segment in range(segments):
             angle = math.degrees(math.tau * (segment + 0.5) / segments)
-            if ring_index == len(rings) - 2 and 215.0 < angle < 325.0:
+            if ring_index == len(rings) - 2 and 230.0 < angle < 310.0:
                 continue
             next_segment = (segment + 1) % segments
             first = ring_index * segments + segment

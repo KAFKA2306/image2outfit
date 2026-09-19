@@ -40,8 +40,7 @@
     "vrchatBuildTest": "OUT_OF_SCOPE",
     "vrchatRuntime": "OUT_OF_SCOPE",
     "humanRuntimeReview": "OUT_OF_SCOPE",
-    "poseRender": "PASS",
-    "clothSimulation": "PASS"
+    "poseRender": "PASS"
   },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-nocturne-angel-set/Source/Blender/SiroinoNocturneAngelSet.blend",
@@ -53,13 +52,12 @@
     "patternSpec": "Assets/GenWorks/siroino-nocturne-angel-set/Documentation/pattern-spec.json",
     "researchTrial": "Assets/GenWorks/siroino-nocturne-angel-set/Research/patterngsl-autosew-cloth-trial.json",
     "fitAudit": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/fit-audit.json",
-    "visualReview": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review.json",
-    "clothSimulation": "Assets/GenWorks/siroino-nocturne-angel-set/Evidence/Build/cloth-simulation.json"
+    "visualReview": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review.json"
   },
   "metrics": {
     "meshObjects": 33,
-    "vertices": 10702,
-    "triangles": 20144,
+    "vertices": 10710,
+    "triangles": 20184,
     "materialSlots": 33,
     "shapeKeys": 0,
     "maxBoneInfluences": 4,
@@ -86,7 +84,7 @@
       "clearanceAdjustments": [
         {
           "object": "Nocturne_Sewn_Bodice",
-          "movedVertices": 249,
+          "movedVertices": 216,
           "maximumMove": 0.04189816212009025,
           "clearance": 0.01550218714773655,
           "onlyAbove": null,
@@ -94,48 +92,48 @@
         },
         {
           "object": "Nocturne_Bodice_Front_Inset",
-          "movedVertices": 0,
-          "maximumMove": 0.0,
+          "movedVertices": 15,
+          "maximumMove": 0.04856425152975921,
           "clearance": 0.01550218714773655,
           "onlyAbove": null,
           "iterations": 4
         },
         {
           "object": "Nocturne_Bodice_V_L",
-          "movedVertices": 2,
-          "maximumMove": 0.03818441003526925,
+          "movedVertices": 11,
+          "maximumMove": 0.04839925966975706,
           "clearance": 0.01550218714773655,
           "onlyAbove": null,
           "iterations": 4
         },
         {
           "object": "Nocturne_Bodice_V_R",
-          "movedVertices": 0,
-          "maximumMove": 0.0,
+          "movedVertices": 12,
+          "maximumMove": 0.048451707944438545,
           "clearance": 0.01550218714773655,
           "onlyAbove": null,
           "iterations": 4
         },
         {
           "object": "Nocturne_Sailor_Collar_L",
-          "movedVertices": 6,
-          "maximumMove": 0.03856463875445755,
+          "movedVertices": 9,
+          "maximumMove": 0.047236099119844575,
           "clearance": 0.01550218714773655,
           "onlyAbove": null,
           "iterations": 4
         },
         {
           "object": "Nocturne_Sailor_Collar_R",
-          "movedVertices": 4,
-          "maximumMove": 0.03832815250492159,
+          "movedVertices": 12,
+          "maximumMove": 0.048371860117285136,
           "clearance": 0.01550218714773655,
           "onlyAbove": null,
           "iterations": 4
         },
         {
           "object": "Nocturne_Cloth_Skirt",
-          "movedVertices": 185,
-          "maximumMove": 0.054291137889206746,
+          "movedVertices": 168,
+          "maximumMove": 0.04827507844975549,
           "clearance": 0.01550218714773655,
           "onlyAbove": null,
           "iterations": 4
@@ -242,23 +240,23 @@
   "fiveViewEvidence": {
     "front": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/front.png",
-      "sha256": "574f5c6bd1ed8689d304eec2e94cf2d95af111983f404204c97c9c2c7f2411ef"
+      "sha256": "0246986c00e50335ec8ce9bc971a950c7ca4b17a2770ea7edca16da7b8904557"
     },
     "back": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/back.png",
-      "sha256": "98580f12b9f6d81f2f607c2338b1f473358277a00947d05b6c36be16f9d2c328"
+      "sha256": "ad34750110ffa9d484937b2c413c8e0c269822b203e36919c2dc9afe5eaa9ac3"
     },
     "left": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/left.png",
-      "sha256": "c0d99bcbe4b3dddcbd5d527cdf49178ee375087dabfe1ff56606b34f9b941323"
+      "sha256": "3d3f6c3973226ecb17a2a28d6316dd002d9f1a46cc0c81b2ba70fc6c86817ad7"
     },
     "right": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/right.png",
-      "sha256": "f32010e2f1bd97ea74557c44572d702398425be713b8c2e03c6c7a8dab68f618"
+      "sha256": "01d61d87d3a94a6df37b75da0c3730815f86834b8e850a4291b81881a288b801"
     },
     "three-quarter": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/three-quarter.png",
-      "sha256": "550b69ae5b8ee30bf6ee7da020931c382e5392096d0e1ca247c147bf76d6d472"
+      "sha256": "13616012dc07371d9231a4841e1763a91d71c97ed425ffab2a312c29721fc5d7"
     }
   },
   "rejectedHistory": [
@@ -324,31 +322,31 @@
   "poseEvidence": {
     "neutral": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/neutral.png",
-      "sha256": "72a79dce455ca5208d027976f53503f94f2cb2ff2139024d861c7420dcf01a56"
+      "sha256": "b9b00796f98333a922d5105159883c424cfe559fc24fe70456358b0a25d235f8"
     },
     "arms-up": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/arms-up.png",
-      "sha256": "d72ff288fdc6168ec1a05c76822079795d7bbf8eeb99c908f16900f8421df35d"
+      "sha256": "2713fe0fc902c887ad771a9ca337452803b157eee684d7a7fb5e041bd49049b7"
     },
     "arm-cross": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/arm-cross.png",
-      "sha256": "19bf56bb754f3c7cfab1293db222143271c71521837cf3ab38c5394fe076db44"
+      "sha256": "8d6752c8634b4da47b7865a2e8c96283be96d4283caab8b6557c70d7b2defe8f"
     },
     "crouch": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/crouch.png",
-      "sha256": "b3641f199a6ae7cdf233f500cb8e8b23e56b59d0461b92b0c0ab480874c817e8"
+      "sha256": "7c2072748f4ac84e48934306c15cfe2fdad4e7be0b47503b6eef45e5c3394813"
     },
     "sit": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/sit.png",
-      "sha256": "85c7d83f4bd6b05924d4a981902ca4ad7c3f84c0430045ec7e3cfce279d1f153"
+      "sha256": "a5e60e0bea30a48392bcd01caf35fdd39fc3df39ed91e63f4a1fba81dead1f71"
     },
     "prone": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/prone.png",
-      "sha256": "1c6fec9e55f3cf644b8cfa1b8e9f6167be1bcad01865aa09c807cb76833af89c"
+      "sha256": "42aa0a44817704bf168855a0f3a1deae47f35a57802b03c6e86e90caabc993f4"
     },
     "sheet": {
       "path": "Assets/GenWorks/siroino-nocturne-angel-set/Previews/siroino-nocturne-angel-set-pose-review.webp",
-      "sha256": "5ec78668317e0b4f4d647f7890d3b3ea7d28f8f4d91e9ab391cbbe96242f6f72"
+      "sha256": "10490e7eb47ba2390dfc65e4a612f1e6335cc7c06186bce5d3e42e277b96a4a9"
     }
   },
   "fitAuditSummary": {
@@ -361,7 +359,6 @@
       "sit",
       "prone"
     ],
-    "totalTriangleOverlapPairs": 5541
-  },
-  "clothSimulationEvidence": "Assets/GenWorks/siroino-nocturne-angel-set/Evidence/Build/cloth-simulation.json"
+    "totalTriangleOverlapPairs": 6671
+  }
 }
