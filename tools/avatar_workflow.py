@@ -81,6 +81,14 @@ def _validate_config(root: Path, config: dict[str, Any]) -> None:
         if not isinstance(value, str) or not value:
             raise AvatarWorkflowError(f"avatar workflow config.paths.{key} is required")
         _asset(root, value)
+    scenes = config.get("scenes")
+    if scenes is not None:
+        if not isinstance(scenes, dict):
+            raise AvatarWorkflowError("avatar workflow config.scenes must be an object")
+        workbench = scenes.get("workbench")
+        if not isinstance(workbench, str) or not workbench:
+            raise AvatarWorkflowError("avatar workflow config.scenes.workbench is required")
+        _asset(root, workbench)
     visual = config.get("visual")
     required_visuals = visual.get("requiredPaths") if isinstance(visual, dict) else None
     if (
@@ -111,6 +119,11 @@ def _validate_config(root: Path, config: dict[str, Any]) -> None:
         seen.add(outfit_id)
         for key in ("prefab", "cauSetting", "visualRoot"):
             _asset(root, outfit[key])
+        for key in ("clothEvidence", "scene"):
+            if key in outfit:
+                if not isinstance(outfit[key], str) or not outfit[key]:
+                    raise AvatarWorkflowError(f"outfits[{index}].{key} must be a non-empty string")
+                _asset(root, outfit[key])
 
 
 def _selected_outfits(
@@ -220,6 +233,43 @@ def _outfit_preflight(
                 f"{label} meta missing: {path.relative_to(root).as_posix()}.meta"
             )
 
+    cloth_evidence = outfit.get("clothEvidence")
+    cloth_report = None
+    if cloth_evidence:
+        cloth_path = _asset(root, cloth_evidence)
+        if not cloth_path.is_file():
+            errors.append(f"cloth evidence missing: {cloth_evidence}")
+        else:
+            try:
+                cloth_report = read_json(cloth_path)
+            except (OSError, ValueError):
+                errors.append(f"cloth evidence is not valid JSON: {cloth_evidence}")
+            if cloth_path.is_file() and not cloth_path.with_name(cloth_path.name + ".meta").is_file():
+                errors.append(f"cloth evidence meta missing: {cloth_evidence}.meta")
+            if isinstance(cloth_report, dict):
+                if cloth_report.get("status") != "PASS":
+                    errors.append(f"cloth simulation did not pass: {outfit['id']}")
+                if cloth_report.get("engine") != "Blender Cloth":
+                    errors.append(f"cloth evidence engine mismatch: {outfit['id']}")
+                if cloth_report.get("cacheBaked") is not True:
+                    errors.append(f"cloth cache was not baked: {outfit['id']}")
+                contracts = cloth_report.get("contracts")
+                if not isinstance(contracts, list) or not contracts:
+                    errors.append(f"cloth evidence has no component contracts: {outfit['id']}")
+                for contract in contracts or []:
+                    if contract.get("cacheBakedActual") is False:
+                        errors.append(f"cloth cache verification failed: {outfit['id']}")
+                    if contract.get("geometryChanged") is False:
+                        errors.append(f"cloth geometry did not change: {outfit['id']}")
+
+    scene_path = outfit.get("scene")
+    if scene_path:
+        scene = _asset(root, scene_path)
+        if not scene.is_file():
+            errors.append(f"outfit scene missing: {scene_path}")
+        elif not scene.with_name(scene.name + ".meta").is_file():
+            errors.append(f"outfit scene meta missing: {scene_path}.meta")
+
     prefab_guid = _meta_guid(prefab) if prefab.is_file() else None
     setting_guids = _referenced_guids(setting) if setting.is_file() else []
     if prefab_guid is None:
@@ -282,6 +332,13 @@ def _outfit_preflight(
         "prefab": outfit["prefab"],
         "cauSetting": outfit["cauSetting"],
         "visualRoot": outfit["visualRoot"],
+        "clothEvidence": cloth_evidence,
+        "scene": scene_path,
+        "clothSimulation": {
+            "status": cloth_report.get("status") if isinstance(cloth_report, dict) else None,
+            "cacheBaked": cloth_report.get("cacheBaked") if isinstance(cloth_report, dict) else None,
+            "contractCount": len(cloth_report.get("contracts", [])) if isinstance(cloth_report, dict) else 0,
+        },
         "prefabGuid": prefab_guid,
         "serializedScriptReferences": serialized_script_count,
         "descriptorEvidence": descriptor_evidence,
@@ -302,6 +359,13 @@ def preflight(
     config = config or _load_config(root)
     _validate_config(root, config)
     package_snapshot, errors = _package_report(root, config)
+    scene_layout = config.get("scenes")
+    if isinstance(scene_layout, dict):
+        workbench = _asset(root, scene_layout["workbench"])
+        if not workbench.is_file():
+            errors.append(f"workbench scene missing: {scene_layout['workbench']}")
+        elif not workbench.with_name(workbench.name + ".meta").is_file():
+            errors.append(f"workbench scene meta missing: {scene_layout['workbench']}.meta")
     cau_group = _asset(root, config["paths"]["cauRoot"]) / "siroino-all-outfits.asset"
     group_guids = _referenced_guids(cau_group) if cau_group.is_file() else []
     selected = _selected_outfits(config, outfit_ids)

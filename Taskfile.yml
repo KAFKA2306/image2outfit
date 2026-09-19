@@ -140,7 +140,7 @@ tasks:
         python tools/manage.py avatar plan
 
   avatar:preflight:
-    desc: Validate the nine baked Prefabs, CAU settings, packages, and visual evidence paths.
+    desc: Validate the nine baked Prefabs, CAU settings, cloth evidence, scenes, packages, and visual evidence paths.
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
@@ -166,6 +166,13 @@ tasks:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
         python tools/manage.py avatar run
+
+  avatar:cloth:
+    desc: Bake native Blender Cloth and export the settled garment meshes for the avatar set.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar cloth
 
   audit:research:
     desc: Reject stale, incomplete, non-primary, or license-unsafe research.

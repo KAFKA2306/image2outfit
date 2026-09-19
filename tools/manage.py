@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -93,6 +94,63 @@ def _audit_all() -> int:
         print("\nFailed audits: " + ", ".join(failed), file=sys.stderr)
         return 1
     return 0
+
+
+def _avatar_cloth(outfits: list[str] | None, force: bool = False) -> int:
+    configured = os.environ.get("IMAGE2OUTFIT_BLENDER", "").strip()
+    candidates = [
+        configured,
+        str(ROOT / ".image2outfit" / "blender-4.4.3" / "blender.exe"),
+        str(ROOT / ".image2outfit" / "blender" / "blender.exe"),
+    ]
+    blender = next((item for item in candidates if item and Path(item).is_file()), None)
+    if blender is None:
+        print(
+            "image2outfit avatar cloth: pinned Blender 4.4.3 was not found",
+            file=sys.stderr,
+        )
+        return 1
+    ids = outfits or [
+        "siroino-cyber-kawaii-large",
+        "siroino-heather-hooded-bodysuit",
+        "siroino-lace-halter-large",
+        "siroino-military-sheer-romper-large",
+        "siroino-nocturne-angel-set",
+        "siroino-wide-cargo",
+    ]
+    script = TOOLS / "blender_cloth_simulation.py"
+    failed = False
+    for product_id in ids:
+        job = ROOT / "config" / "products" / product_id / "job.json"
+        if not job.is_file():
+            print(
+                f"image2outfit avatar cloth: missing job: {product_id}",
+                file=sys.stderr,
+            )
+            failed = True
+            continue
+        command = [
+            blender,
+            "--python-use-system-env",
+            "--background",
+            "--factory-startup",
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(script),
+            "--",
+            "--job",
+            str(job),
+        ]
+        if force:
+            command.append("--force")
+        result = subprocess.run(
+            command,
+            cwd=ROOT,
+            check=False,
+        )
+        failed = failed or result.returncode != 0
+    return 1 if failed else 0
 
 
 def _load_manifest(path_text: str) -> dict[str, Any]:
@@ -281,6 +339,13 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--record-baseline", action="store_true")
     run.add_argument("--output")
 
+    cloth = avatar_commands.add_parser(
+        "cloth",
+        help="Bake native Blender Cloth and settled FBX evidence for the outfit set.",
+    )
+    cloth.add_argument("--outfit", action="append")
+    cloth.add_argument("--force", action="store_true")
+
     audit = commands.add_parser("audit")
     audit.add_argument("target", choices=(*AUDIT_TARGETS, "all"))
     return parser
@@ -306,6 +371,8 @@ def main() -> int:
             options.output,
         )
     if options.command == "avatar":
+        if options.avatar_command == "cloth":
+            return _avatar_cloth(options.outfit, options.force)
         if options.avatar_command == "ledger" and options.ledger_action == "record":
             if not options.outfit_id or not options.status:
                 print(

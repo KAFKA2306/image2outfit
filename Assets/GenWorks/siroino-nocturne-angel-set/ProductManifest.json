@@ -40,7 +40,8 @@
     "vrchatBuildTest": "OUT_OF_SCOPE",
     "vrchatRuntime": "OUT_OF_SCOPE",
     "humanRuntimeReview": "OUT_OF_SCOPE",
-    "poseRender": "PASS"
+    "poseRender": "PASS",
+    "clothSimulation": "PASS"
   },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-nocturne-angel-set/Source/Blender/SiroinoNocturneAngelSet.blend",
@@ -52,7 +53,8 @@
     "patternSpec": "Assets/GenWorks/siroino-nocturne-angel-set/Documentation/pattern-spec.json",
     "researchTrial": "Assets/GenWorks/siroino-nocturne-angel-set/Research/patterngsl-autosew-cloth-trial.json",
     "fitAudit": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/fit-audit.json",
-    "visualReview": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review.json"
+    "visualReview": "Assets/GenWorks/siroino-nocturne-angel-set/Tests/visual-review.json",
+    "clothSimulation": "Assets/GenWorks/siroino-nocturne-angel-set/Evidence/Build/cloth-simulation.json"
   },
   "metrics": {
     "meshObjects": 33,
@@ -360,5 +362,6 @@
       "prone"
     ],
     "totalTriangleOverlapPairs": 5541
-  }
+  },
+  "clothSimulationEvidence": "Assets/GenWorks/siroino-nocturne-angel-set/Evidence/Build/cloth-simulation.json"
 }

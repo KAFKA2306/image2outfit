@@ -22,6 +22,12 @@ class AvatarWorkflowTests(unittest.TestCase):
             len({item["id"] for item in config["outfits"]}),
             9,
         )
+        self.assertEqual(
+            config["scenes"]["workbench"],
+            "Assets/Scenes/Avatar/00_SiroinoOutfitWorkbench.unity",
+        )
+        self.assertTrue(all(item.get("clothEvidence") for item in config["outfits"]))
+        self.assertTrue(all(item.get("scene") for item in config["outfits"]))
 
     def test_project_preflight_passes_for_baked_upload_set(self) -> None:
         result = avatar_workflow.preflight(ROOT)
