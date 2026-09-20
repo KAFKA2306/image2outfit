@@ -181,7 +181,8 @@ class ProductBuildScopeTest(unittest.TestCase):
                 materialized_job["artifactDir"], ".image2outfit/products/demo/reports"
             )
             self.assertEqual(
-                materialized_job["candidateDir"], ".image2outfit/products/demo/candidate"
+                materialized_job["candidateDir"],
+                ".image2outfit/products/demo/candidate",
             )
             self.assertEqual(
                 materialized_job["releaseDir"], ".image2outfit/products/demo/release"
