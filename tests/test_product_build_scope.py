@@ -167,17 +167,30 @@ class ProductBuildScopeTest(unittest.TestCase):
                 materialize_job=True,
                 include_pipeline_request=False,
             )
-        self.assertEqual(hosted.environment["JOB_ID"], "demo")
-        self.assertEqual(
-            hosted.environment["JOB_PATH"], "config/products/demo/job.json"
-        )
-        self.assertEqual(
-            self_hosted.environment["JOB_PATH"], "Assets/_Local/Jobs/demo/job.json"
-        )
-        self.assertEqual(hosted.environment["BLENDER_VERSION"], "4.4.3")
-        self.assertEqual(
-            hosted.environment["PRODUCT_ROOT"], self_hosted.environment["PRODUCT_ROOT"]
-        )
+            self.assertEqual(hosted.environment["JOB_ID"], "demo")
+            self.assertEqual(
+                hosted.environment["JOB_PATH"], "config/products/demo/job.json"
+            )
+            self.assertEqual(
+                self_hosted.environment["JOB_PATH"], "Assets/_Local/Jobs/demo/job.json"
+            )
+            materialized = root / self_hosted.environment["JOB_PATH"]
+            self.assertTrue(materialized.is_file())
+            materialized_job = json.loads(materialized.read_text(encoding="utf-8"))
+            self.assertEqual(
+                materialized_job["artifactDir"], ".image2outfit/products/demo/reports"
+            )
+            self.assertEqual(
+                materialized_job["candidateDir"], ".image2outfit/products/demo/candidate"
+            )
+            self.assertEqual(
+                materialized_job["releaseDir"], ".image2outfit/products/demo/release"
+            )
+            self.assertEqual(hosted.environment["BLENDER_VERSION"], "4.4.3")
+            self.assertEqual(
+                hosted.environment["PRODUCT_ROOT"],
+                self_hosted.environment["PRODUCT_ROOT"],
+            )
 
     def test_manual_recovery_stays_skipped_on_self_hosted(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
