@@ -130,9 +130,7 @@ def find_body(product_id: str, names: tuple[str, ...]) -> bpy.types.Object:
     proxy.name = "Image2Outfit Collision Proxy"
     selected = [find_object(name) for name in names]
     coordinates = [
-        obj.matrix_world @ vertex.co
-        for obj in selected
-        for vertex in obj.data.vertices
+        obj.matrix_world @ vertex.co for obj in selected for vertex in obj.data.vertices
     ]
     minimum = [min(point[index] for point in coordinates) for index in range(3)]
     maximum = [max(point[index] for point in coordinates) for index in range(3)]
@@ -160,10 +158,17 @@ def pin_vertices(obj: bpy.types.Object) -> list[int]:
         if point.z >= threshold
     ]
     if len(selected) < 2:
-        ordered = sorted(obj.data.vertices, key=lambda vertex: vertex.co.z, reverse=True)
+        ordered = sorted(
+            obj.data.vertices, key=lambda vertex: vertex.co.z, reverse=True
+        )
         selected = [vertex.index for vertex in ordered[: max(2, len(ordered) // 20)]]
     if len(selected) >= len(obj.data.vertices):
-        selected = [vertex.index for vertex in sorted(obj.data.vertices, key=lambda vertex: vertex.co.z, reverse=True)[:2]]
+        selected = [
+            vertex.index
+            for vertex in sorted(
+                obj.data.vertices, key=lambda vertex: vertex.co.z, reverse=True
+            )[:2]
+        ]
     return selected
 
 
@@ -336,7 +341,12 @@ def main() -> int:
     product_id = str(job.get("id", ""))
     if product_id not in COMPONENTS:
         raise ValueError(f"no cloth component contract for {product_id}")
-    report_path = repo_path(str(job["productRoot"])) / "Evidence" / "Build" / "cloth-simulation.json"
+    report_path = (
+        repo_path(str(job["productRoot"]))
+        / "Evidence"
+        / "Build"
+        / "cloth-simulation.json"
+    )
     fbx = repo_path(str(job["fbxAssetPath"]))
     if not options.force and report_path.is_file() and fbx.is_file():
         existing = read_json(report_path)
@@ -367,7 +377,9 @@ def main() -> int:
     ]
     for obj in objects:
         sanitize_mesh(obj)
-    bpy.ops.wm.save_as_mainfile(filepath=str(blend), check_existing=False, compress=True)
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(blend), check_existing=False, compress=True
+    )
     export_settled_fbx(fbx, armature, objects)
     report = {
         "schemaVersion": 1,
@@ -387,10 +399,17 @@ def main() -> int:
         "settledFbx": str(fbx.relative_to(ROOT)).replace("\\", "/"),
     }
     write_json(report_path, report)
-    build_report = repo_path(str(job["productRoot"])) / "Evidence" / "Build" / "product-build-report.json"
+    build_report = (
+        repo_path(str(job["productRoot"]))
+        / "Evidence"
+        / "Build"
+        / "product-build-report.json"
+    )
     if build_report.is_file():
         current = read_json(build_report)
-        current["clothSimulation"] = str(report_path.relative_to(ROOT)).replace("\\", "/")
+        current["clothSimulation"] = str(report_path.relative_to(ROOT)).replace(
+            "\\", "/"
+        )
         current["blenderVersion"] = bpy.app.version_string
         write_json(build_report, current)
     manifest_path = repo_path(str(job["productManifestPath"]))
@@ -401,7 +420,9 @@ def main() -> int:
             gates["clothSimulation"] = "PASS"
         outputs = manifest.get("outputs")
         if isinstance(outputs, dict):
-            outputs["clothSimulation"] = str(report_path.relative_to(ROOT)).replace("\\", "/")
+            outputs["clothSimulation"] = str(report_path.relative_to(ROOT)).replace(
+                "\\", "/"
+            )
         report_relative = str(report_path.relative_to(ROOT)).replace("\\", "/")
         if isinstance(manifest.get("clothSimulation"), list):
             manifest["clothSimulationEvidence"] = report_relative

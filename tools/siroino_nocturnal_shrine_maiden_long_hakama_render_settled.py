@@ -14,7 +14,10 @@ import bpy
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-nocturnal-shrine-maiden-long-hakama-set"
 JOB = ROOT / f"config/products/{PRODUCT_ID}/job.json"
-BLEND = ROOT / f"Assets/GenWorks/{PRODUCT_ID}/Source/Blender/SiroinoNocturnalShrineMaidenLongHakama.blend"
+BLEND = (
+    ROOT
+    / f"Assets/GenWorks/{PRODUCT_ID}/Source/Blender/SiroinoNocturnalShrineMaidenLongHakama.blend"
+)
 REPORT = ROOT / f"Assets/GenWorks/{PRODUCT_ID}/Evidence/Build/product-build-report.json"
 EVIDENCE = ROOT / f"Assets/GenWorks/{PRODUCT_ID}/Evidence/Build/post-cloth-render.json"
 
@@ -45,12 +48,17 @@ def main() -> int:
         sys.path.insert(0, str(ROOT / "tools"))
     import siroino_strappy_knit_build as import_base
     import siroino_lunar_tech_hoodie_build as shared_base
+
     builder.base = shared_base
     builder.base.import_base = import_base
     settled_frame = int(job["garmentPipeline"]["clothSimulation"].get("frameEnd", 32))
     bpy.context.scene.frame_set(settled_frame)
     armature = next(obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE")
-    body = next(obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC"))
+    body = next(
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
+    )
     body.hide_render = False
     _, camera = import_base.studio_setup()
     camera.data.ortho_scale = 1.44
@@ -60,10 +68,18 @@ def main() -> int:
     shared_base.render_product_views(camera, previews, target)
     pose_dir = ROOT / Path(job["posePaths"]["neutral"]).parent
     pose_paths = shared_base.render_poses(armature, camera, pose_dir, target)
-    multiview = ROOT / f"Assets/GenWorks/{PRODUCT_ID}/Previews/{PRODUCT_ID}-multiview.webp"
-    pose_review = ROOT / f"Assets/GenWorks/{PRODUCT_ID}/Previews/{PRODUCT_ID}-pose-review.webp"
+    multiview = (
+        ROOT / f"Assets/GenWorks/{PRODUCT_ID}/Previews/{PRODUCT_ID}-multiview.webp"
+    )
+    pose_review = (
+        ROOT / f"Assets/GenWorks/{PRODUCT_ID}/Previews/{PRODUCT_ID}-pose-review.webp"
+    )
     import_base.contact_sheet(previews, multiview)
-    shared_base.contact_sheet_named(pose_paths, pose_review, ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"))
+    shared_base.contact_sheet_named(
+        pose_paths,
+        pose_review,
+        ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
+    )
     report = json.loads(REPORT.read_text(encoding="utf-8"))
     report["checkedAt"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     report["evidenceRenderFrame"] = settled_frame
@@ -71,17 +87,33 @@ def main() -> int:
         report["previews"][name]["sha256"] = sha256(path)
     for name, path in pose_paths.items():
         report["poses"][name]["sha256"] = sha256(path)
-    REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    REPORT.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     evidence = {
         "schemaVersion": 1,
         "productId": PRODUCT_ID,
         "status": "PASS",
         "frame": settled_frame,
         "renderedAfter": f"Assets/GenWorks/{PRODUCT_ID}/Evidence/Build/cloth-simulation.json",
-        "views": {name: {"path": str(path.relative_to(ROOT)).replace("\\", "/"), "sha256": sha256(path)} for name, path in previews.items()},
-        "poses": {name: {"path": str(path.relative_to(ROOT)).replace("\\", "/"), "sha256": sha256(path)} for name, path in pose_paths.items()},
+        "views": {
+            name: {
+                "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": sha256(path),
+            }
+            for name, path in previews.items()
+        },
+        "poses": {
+            name: {
+                "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": sha256(path),
+            }
+            for name, path in pose_paths.items()
+        },
     }
-    EVIDENCE.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    EVIDENCE.write_text(
+        json.dumps(evidence, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(json.dumps(evidence, ensure_ascii=False, indent=2))
     return 0
 

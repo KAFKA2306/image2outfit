@@ -465,7 +465,9 @@ def metrics(objects: list[bpy.types.Object]) -> dict[str, int]:
                 group.weight
                 for group in vertex.groups
                 if group.weight > 1e-8
-                and not obj.vertex_groups[group.group].name.startswith("Image2Outfit Cloth")
+                and not obj.vertex_groups[group.group].name.startswith(
+                    "Image2Outfit Cloth"
+                )
             ]
             result["maxBoneInfluences"] = max(result["maxBoneInfluences"], len(weights))
             if not weights:
