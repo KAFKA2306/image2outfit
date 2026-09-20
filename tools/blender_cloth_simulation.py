@@ -37,6 +37,14 @@ COMPONENTS: dict[str, tuple[str, ...]] = {
         "Lunar_Overskirt_Left",
         "Lunar_Overskirt_Right",
     ),
+    "siroino-nocturnal-shrine-maiden-long-hakama-set": (
+        "Nocturnal_Hakama_Front_L",
+        "Nocturnal_Hakama_Front_R",
+        "Nocturnal_Hakama_Back_L",
+        "Nocturnal_Hakama_Back_R",
+        "Nocturnal_Hakama_Side_L",
+        "Nocturnal_Hakama_Side_R",
+    ),
 }
 
 FRAME_END = {
@@ -47,6 +55,7 @@ FRAME_END = {
     "siroino-nocturne-angel-set": 24,
     "siroino-wide-cargo": 18,
     "siroino-lunar-tech-hoodie": 30,
+    "siroino-nocturnal-shrine-maiden-long-hakama-set": 32,
 }
 
 
