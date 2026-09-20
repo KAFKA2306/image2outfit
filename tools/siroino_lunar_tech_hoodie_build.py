@@ -19,9 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
-import bmesh
 import bpy
-from mathutils import Vector
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,10 +63,14 @@ def sha256(path: Path) -> str:
 
 def write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
-def apply_large_profile(body: bpy.types.Object, profile: dict[str, float]) -> dict[str, float]:
+def apply_large_profile(
+    body: bpy.types.Object, profile: dict[str, float]
+) -> dict[str, float]:
     if body.data.shape_keys is None:
         raise RuntimeError("Siroino target has no shape keys")
     for key in body.data.shape_keys.key_blocks:
@@ -85,7 +87,12 @@ def apply_large_profile(body: bpy.types.Object, profile: dict[str, float]) -> di
     return applied
 
 
-def plain_material(name: str, color: tuple[float, float, float, float], roughness: float, metallic: float = 0.0) -> bpy.types.Material:
+def plain_material(
+    name: str,
+    color: tuple[float, float, float, float],
+    roughness: float,
+    metallic: float = 0.0,
+) -> bpy.types.Material:
     material = bpy.data.materials.new(name)
     material.use_nodes = True
     nodes = material.node_tree.nodes
@@ -129,7 +136,12 @@ def make_pattern_layout(path: Path) -> None:
     except OSError:
         title_font = ImageFont.load_default()
         label_font = title_font
-    draw.text((36, 26), "LUNAR TECH HOODIE — PANEL / SEAM LAYOUT", fill=(242, 244, 250), font=title_font)
+    draw.text(
+        (36, 26),
+        "LUNAR TECH HOODIE — PANEL / SEAM LAYOUT",
+        fill=(242, 244, 250),
+        font=title_font,
+    )
     panels = [
         ("Hood Side L", [(70, 160), (270, 120), (330, 285), (110, 320)]),
         ("Hood Center", [(360, 120), (520, 120), (548, 330), (360, 330)]),
@@ -143,9 +155,19 @@ def make_pattern_layout(path: Path) -> None:
     ]
     for label, points in panels:
         draw.polygon(points, fill=(214, 218, 230), outline=(153, 166, 198), width=4)
-        center = (sum(point[0] for point in points) // len(points), sum(point[1] for point in points) // len(points))
-        draw.text((center[0] - 65, center[1] - 12), label, fill=(36, 40, 52), font=label_font)
-    draw.text((36, 946), "Panel-first construction • split hem • integrated hood • no separate shorts or harness", fill=(184, 194, 218), font=label_font)
+        center = (
+            sum(point[0] for point in points) // len(points),
+            sum(point[1] for point in points) // len(points),
+        )
+        draw.text(
+            (center[0] - 65, center[1] - 12), label, fill=(36, 40, 52), font=label_font
+        )
+    draw.text(
+        (36, 946),
+        "Panel-first construction • split hem • integrated hood • no separate shorts or harness",
+        fill=(184, 194, 218),
+        font=label_font,
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     image.save(path, optimize=True)
 
@@ -227,7 +249,9 @@ def grid_panel(
         for column in range(x_steps):
             a = row * stride + column
             faces.append((a, a + 1, a + stride + 1, a + stride))
-    return mesh_object(name, vertices, faces, material, armature, body, solidify=solidify)
+    return mesh_object(
+        name, vertices, faces, material, armature, body, solidify=solidify
+    )
 
 
 def tapered_grid_panel(
@@ -260,7 +284,9 @@ def tapered_grid_panel(
         for column in range(x_steps):
             a = row * stride + column
             faces.append((a, a + 1, a + stride + 1, a + stride))
-    return mesh_object(name, vertices, faces, material, armature, body, solidify=solidify)
+    return mesh_object(
+        name, vertices, faces, material, armature, body, solidify=solidify
+    )
 
 
 def side_wrap_panel(
@@ -298,7 +324,9 @@ def side_wrap_panel(
         for column in range(y_steps):
             a = row * stride + column
             faces.append((a, a + 1, a + stride + 1, a + stride))
-    return mesh_object(name, vertices, faces, material, armature, body, solidify=solidify)
+    return mesh_object(
+        name, vertices, faces, material, armature, body, solidify=solidify
+    )
 
 
 def add_shape_keys(obj: bpy.types.Object, body: bpy.types.Object) -> None:
@@ -316,11 +344,17 @@ def add_shape_keys(obj: bpy.types.Object, body: bpy.types.Object) -> None:
         target = obj.shape_key_add(name=name)
         for vertex in obj.data.vertices:
             _, index, _ = tree.find(obj.matrix_world @ vertex.co)
-            delta = body.matrix_world.to_3x3() @ (source.data[index].co - body.data.vertices[index].co)
-            target.data[vertex.index].co = vertex.co + obj.matrix_world.to_3x3().inverted() @ delta
+            delta = body.matrix_world.to_3x3() @ (
+                source.data[index].co - body.data.vertices[index].co
+            )
+            target.data[vertex.index].co = (
+                vertex.co + obj.matrix_world.to_3x3().inverted() @ delta
+            )
 
 
-def add_hood(armature: bpy.types.Object, body: bpy.types.Object, material: bpy.types.Material) -> list[bpy.types.Object]:
+def add_hood(
+    armature: bpy.types.Object, body: bpy.types.Object, material: bpy.types.Material
+) -> list[bpy.types.Object]:
     # A shallow rear hood panel keeps the avatar's face open and reads as
     # attached fabric from the side instead of a floating helmet plate.
     hood = tapered_grid_panel(
@@ -357,10 +391,30 @@ def add_hood(armature: bpy.types.Object, body: bpy.types.Object, material: bpy.t
     return [hood, left_edge, right_edge]
 
 
-def add_seams(armature: bpy.types.Object, material: bpy.types.Material) -> list[bpy.types.Object]:
+def add_seams(
+    armature: bpy.types.Object, material: bpy.types.Material
+) -> list[bpy.types.Object]:
     seams = []
-    seams.append(import_base.curve_tube("Lunar_Diagonal_Wrap_Seam", [(-0.22, -0.152, 1.02), (0.0, -0.165, 0.91), (0.24, -0.156, 0.82)], 0.0028, material, armature, "Chest"))
-    seams.append(import_base.curve_tube("Lunar_Center_Back_Seam", [(0.0, 0.14, 1.08), (0.0, 0.14, 0.82), (0.0, 0.13, 0.55)], 0.0024, material, armature, "Chest"))
+    seams.append(
+        import_base.curve_tube(
+            "Lunar_Diagonal_Wrap_Seam",
+            [(-0.22, -0.152, 1.02), (0.0, -0.165, 0.91), (0.24, -0.156, 0.82)],
+            0.0028,
+            material,
+            armature,
+            "Chest",
+        )
+    )
+    seams.append(
+        import_base.curve_tube(
+            "Lunar_Center_Back_Seam",
+            [(0.0, 0.14, 1.08), (0.0, 0.14, 0.82), (0.0, 0.13, 0.55)],
+            0.0024,
+            material,
+            armature,
+            "Chest",
+        )
+    )
     return seams
 
 
@@ -389,7 +443,15 @@ def write_integrated_prefab(outfit_prefab: Path, integrated_prefab: Path) -> lis
 
 
 def metrics(objects: list[bpy.types.Object]) -> dict[str, int]:
-    result = {"meshObjects": 0, "vertices": 0, "triangles": 0, "degenerateTriangles": 0, "unweightedVertices": 0, "weightSumErrors": 0, "maxBoneInfluences": 0}
+    result = {
+        "meshObjects": 0,
+        "vertices": 0,
+        "triangles": 0,
+        "degenerateTriangles": 0,
+        "unweightedVertices": 0,
+        "weightSumErrors": 0,
+        "maxBoneInfluences": 0,
+    }
     for obj in objects:
         mesh = obj.data
         mesh.calc_loop_triangles()
@@ -417,33 +479,60 @@ def metrics(objects: list[bpy.types.Object]) -> dict[str, int]:
     return result
 
 
-def render_poses(armature: bpy.types.Object, camera: bpy.types.Object, pose_dir: Path, target: tuple[float, float, float]) -> dict[str, Path]:
+def render_poses(
+    armature: bpy.types.Object,
+    camera: bpy.types.Object,
+    pose_dir: Path,
+    target: tuple[float, float, float],
+) -> dict[str, Path]:
     pose_dir.mkdir(parents=True, exist_ok=True)
     outputs: dict[str, Path] = {}
-    locations = {"neutral": (0.0, -2.55, 0.72), "arms-up": (0.0, -2.55, 0.74), "arm-cross": (1.6, -2.1, 0.72), "crouch": (1.7, -2.05, 0.55), "sit": (1.7, -2.05, 0.52), "prone": (1.7, -2.05, 0.68)}
+    locations = {
+        "neutral": (0.0, -2.55, 0.72),
+        "arms-up": (0.0, -2.55, 0.74),
+        "arm-cross": (1.6, -2.1, 0.72),
+        "crouch": (1.7, -2.05, 0.55),
+        "sit": (1.7, -2.05, 0.52),
+        "prone": (1.7, -2.05, 0.68),
+    }
     for name, location in locations.items():
         import_base.reset_pose(armature)
+
         def rotate(bone_name: str, xyz: tuple[float, float, float]) -> None:
             bone = armature.pose.bones.get(bone_name)
             if bone is not None:
                 bone.rotation_mode = "XYZ"
                 bone.rotation_euler = tuple(math.radians(value) for value in xyz)
+
         if name == "arms-up":
-            rotate("UpperArm_L", (12, 0, -132)); rotate("UpperArm_R", (12, 0, 132))
-            rotate("LowerArm_L", (0, 0, -20)); rotate("LowerArm_R", (0, 0, 20))
+            rotate("UpperArm_L", (12, 0, -132))
+            rotate("UpperArm_R", (12, 0, 132))
+            rotate("LowerArm_L", (0, 0, -20))
+            rotate("LowerArm_R", (0, 0, 20))
         elif name == "arm-cross":
-            rotate("UpperArm_L", (-38, 10, -48)); rotate("UpperArm_R", (-38, -10, 48))
-            rotate("LowerArm_L", (0, 0, -96)); rotate("LowerArm_R", (0, 0, 96))
+            rotate("UpperArm_L", (-38, 10, -48))
+            rotate("UpperArm_R", (-38, -10, 48))
+            rotate("LowerArm_L", (0, 0, -96))
+            rotate("LowerArm_R", (0, 0, 96))
         elif name == "crouch":
-            rotate("Hips", (13, 0, 0)); rotate("UpperLeg_L", (-62, 5, -6)); rotate("UpperLeg_R", (-62, -5, 6))
-            rotate("LowerLeg_L", (92, 0, 0)); rotate("LowerLeg_R", (92, 0, 0))
-            rotate("UpperArm_L", (-35, 0, -12)); rotate("UpperArm_R", (-35, 0, 12))
+            rotate("Hips", (13, 0, 0))
+            rotate("UpperLeg_L", (-62, 5, -6))
+            rotate("UpperLeg_R", (-62, -5, 6))
+            rotate("LowerLeg_L", (92, 0, 0))
+            rotate("LowerLeg_R", (92, 0, 0))
+            rotate("UpperArm_L", (-35, 0, -12))
+            rotate("UpperArm_R", (-35, 0, 12))
         elif name == "sit":
-            rotate("Hips", (8, 0, 0)); rotate("UpperLeg_L", (-82, 0, -5)); rotate("UpperLeg_R", (-82, 0, 5))
-            rotate("LowerLeg_L", (84, 0, 0)); rotate("LowerLeg_R", (84, 0, 0))
-            rotate("UpperArm_L", (-50, 0, -8)); rotate("UpperArm_R", (-50, 0, 8))
+            rotate("Hips", (8, 0, 0))
+            rotate("UpperLeg_L", (-82, 0, -5))
+            rotate("UpperLeg_R", (-82, 0, 5))
+            rotate("LowerLeg_L", (84, 0, 0))
+            rotate("LowerLeg_R", (84, 0, 0))
+            rotate("UpperArm_L", (-50, 0, -8))
+            rotate("UpperArm_R", (-50, 0, 8))
         elif name == "prone":
-            rotate("Hips", (-72, 0, 0)); rotate("Chest", (-18, 0, 0))
+            rotate("Hips", (-72, 0, 0))
+            rotate("Chest", (-18, 0, 0))
         import_base.point_camera(camera, location, target)
         path = pose_dir / f"{name}.png"
         bpy.context.scene.render.filepath = str(path)
@@ -453,7 +542,9 @@ def render_poses(armature: bpy.types.Object, camera: bpy.types.Object, pose_dir:
     return outputs
 
 
-def render_product_views(camera: bpy.types.Object, paths: dict[str, Path], target: tuple[float, float, float]) -> None:
+def render_product_views(
+    camera: bpy.types.Object, paths: dict[str, Path], target: tuple[float, float, float]
+) -> None:
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
@@ -468,7 +559,13 @@ def render_product_views(camera: bpy.types.Object, paths: dict[str, Path], targe
     scene.render.image_settings.color_depth = "8"
     scene.render.film_transparent = False
     scene.view_settings.look = "AgX - Medium High Contrast"
-    views = {"front": (0.0, -2.55, 0.72), "back": (0.0, 2.55, 0.72), "left": (2.55, 0.0, 0.72), "right": (-2.55, 0.0, 0.72), "three-quarter": (1.70, -2.05, 0.74)}
+    views = {
+        "front": (0.0, -2.55, 0.72),
+        "back": (0.0, 2.55, 0.72),
+        "left": (2.55, 0.0, 0.72),
+        "right": (-2.55, 0.0, 0.72),
+        "three-quarter": (1.70, -2.05, 0.74),
+    }
     for name, location in views.items():
         import_base.point_camera(camera, location, target)
         scene.render.filepath = str(paths[name])
@@ -476,7 +573,9 @@ def render_product_views(camera: bpy.types.Object, paths: dict[str, Path], targe
         bpy.ops.render.render(write_still=True)
 
 
-def contact_sheet_named(previews: dict[str, Path], path: Path, names: tuple[str, ...]) -> None:
+def contact_sheet_named(
+    previews: dict[str, Path], path: Path, names: tuple[str, ...]
+) -> None:
     """Build a labeled contact sheet for an arbitrary ordered preview set."""
     from PIL import Image, ImageDraw, ImageFont
 
@@ -504,6 +603,7 @@ def contact_sheet_named(previews: dict[str, Path], path: Path, names: tuple[str,
 def main() -> int:
     global import_base, lavender
     import sys as _sys
+
     tools_dir = ROOT / "tools"
     if str(tools_dir) not in _sys.path:
         _sys.path.insert(0, str(tools_dir))
@@ -517,7 +617,11 @@ def main() -> int:
     clean_scene()
     source = repo_path(job["targetSourcePath"])
     bpy.ops.import_scene.fbx(filepath=str(source), use_anim=False)
-    body = next(obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC"))
+    body = next(
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
+    )
     armature = next(obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE")
     armature.name = "SiroinoSotai_Armature"
     for obj in list(bpy.context.scene.objects):
@@ -527,36 +631,162 @@ def main() -> int:
     import_base.set_skin_material(body)
 
     product_root = repo_path(job["productRoot"])
-    for relative in ("Source/Blender", "Source/Patterns", "Models", "Textures", "Materials", "Prefab", "Previews/Poses", "Evidence/Build", "Demo", "Editor", "Tests", "Documentation"):
+    for relative in (
+        "Source/Blender",
+        "Source/Patterns",
+        "Models",
+        "Textures",
+        "Materials",
+        "Prefab",
+        "Previews/Poses",
+        "Evidence/Build",
+        "Demo",
+        "Editor",
+        "Tests",
+        "Documentation",
+    ):
         (product_root / relative).mkdir(parents=True, exist_ok=True)
-    textures = make_texture_maps(product_root / "Textures")
-    white = plain_material("MAT_Lunar_Tech_White_SoftShell", (0.34, 0.40, 0.58, 1.0), 0.56)
-    graphite = plain_material("MAT_Lunar_Tech_Graphite_Knit", (0.035, 0.045, 0.065, 1.0), 0.72)
-    lavender = plain_material("MAT_Lunar_Tech_Lavender_Lining", (0.25, 0.30, 0.48, 1.0), 0.66)
-    silver = plain_material("MAT_Lunar_Tech_Satin_Silver", (0.48, 0.56, 0.68, 1.0), 0.22, 0.9)
+    make_texture_maps(product_root / "Textures")
+    white = plain_material(
+        "MAT_Lunar_Tech_White_SoftShell", (0.34, 0.40, 0.58, 1.0), 0.56
+    )
+    graphite = plain_material(
+        "MAT_Lunar_Tech_Graphite_Knit", (0.035, 0.045, 0.065, 1.0), 0.72
+    )
+    lavender = plain_material(
+        "MAT_Lunar_Tech_Lavender_Lining", (0.25, 0.30, 0.48, 1.0), 0.66
+    )
+    silver = plain_material(
+        "MAT_Lunar_Tech_Satin_Silver", (0.48, 0.56, 0.68, 1.0), 0.22, 0.9
+    )
 
     garments: list[bpy.types.Object] = []
-    garments.append(import_base.extract_surface(body, armature, "Lunar_Inner_Torso_Front", lambda c: 0.82 <= c.z <= 1.065 and c.y < -0.004 and abs(c.x) <= 0.24, graphite, 0.008))
-    garments.append(import_base.extract_surface(body, armature, "Lunar_Inner_Torso_Back", lambda c: 0.82 <= c.z <= 1.06 and c.y >= -0.004 and abs(c.x) <= 0.24, graphite, 0.008))
-    garments.append(import_base.extract_surface(body, armature, "Lunar_Integrated_Sleeve_L", lambda c: 0.78 <= c.z <= 1.08 and c.x < -0.255, white, 0.012))
-    garments.append(import_base.extract_surface(body, armature, "Lunar_Integrated_Sleeve_R", lambda c: 0.78 <= c.z <= 1.08 and c.x > 0.255, white, 0.012))
+    garments.append(
+        import_base.extract_surface(
+            body,
+            armature,
+            "Lunar_Inner_Torso_Front",
+            lambda c: 0.82 <= c.z <= 1.065 and c.y < -0.004 and abs(c.x) <= 0.24,
+            graphite,
+            0.008,
+        )
+    )
+    garments.append(
+        import_base.extract_surface(
+            body,
+            armature,
+            "Lunar_Inner_Torso_Back",
+            lambda c: 0.82 <= c.z <= 1.06 and c.y >= -0.004 and abs(c.x) <= 0.24,
+            graphite,
+            0.008,
+        )
+    )
+    garments.append(
+        import_base.extract_surface(
+            body,
+            armature,
+            "Lunar_Integrated_Sleeve_L",
+            lambda c: 0.78 <= c.z <= 1.08 and c.x < -0.255,
+            white,
+            0.012,
+        )
+    )
+    garments.append(
+        import_base.extract_surface(
+            body,
+            armature,
+            "Lunar_Integrated_Sleeve_R",
+            lambda c: 0.78 <= c.z <= 1.08 and c.x > 0.255,
+            white,
+            0.012,
+        )
+    )
 
     # The outer shell follows a cocoon silhouette: narrow at the shoulders,
     # gently widened toward the asymmetric hem, and curved around the avatar
     # instead of using the rejected flat rectangular card.
-    front_y = lambda x, z: -0.145 - 0.018 * (0.96 - z) - 0.014 * (x / 0.28) ** 2
-    back_y = lambda x, z: 0.082 + 0.016 * (0.96 - z) + 0.010 * (x / 0.28) ** 2
-    garments.append(tapered_grid_panel("Lunar_Robe_Outer_Front", 0.19, 0.285, 0.43, 0.975, front_y, white, armature, body, x_steps=22, z_steps=24, solidify=True))
-    garments.append(tapered_grid_panel("Lunar_Robe_Outer_Back", 0.19, 0.275, 0.43, 0.975, back_y, white, armature, body, x_steps=22, z_steps=24, solidify=True))
-    garments.append(side_wrap_panel("Lunar_Robe_Side_L", -1.0, 0.43, 0.975, white, armature, body))
-    garments.append(side_wrap_panel("Lunar_Robe_Side_R", 1.0, 0.43, 0.975, white, armature, body))
-    overskirt_left = tapered_grid_panel("Lunar_Overskirt_Left", 0.19, 0.33, 0.34, 0.79, lambda x, z: -0.162 - 0.020 * (0.79 - z) - 0.010 * math.sin((z - 0.34) * 10.0), lavender, armature, body, x_steps=18, z_steps=28, solidify=False)
-    overskirt_right = tapered_grid_panel("Lunar_Overskirt_Right", 0.19, 0.28, 0.42, 0.79, lambda x, z: -0.164 - 0.018 * (0.79 - z) - 0.008 * math.sin((z - 0.42) * 9.0 + 0.6), lavender, armature, body, x_steps=18, z_steps=24, solidify=False)
+    def front_y(x, z):
+        return -0.145 - 0.018 * (0.96 - z) - 0.014 * (x / 0.28) ** 2
+
+    def back_y(x, z):
+        return 0.082 + 0.016 * (0.96 - z) + 0.010 * (x / 0.28) ** 2
+
+    garments.append(
+        tapered_grid_panel(
+            "Lunar_Robe_Outer_Front",
+            0.19,
+            0.285,
+            0.43,
+            0.975,
+            front_y,
+            white,
+            armature,
+            body,
+            x_steps=22,
+            z_steps=24,
+            solidify=True,
+        )
+    )
+    garments.append(
+        tapered_grid_panel(
+            "Lunar_Robe_Outer_Back",
+            0.19,
+            0.275,
+            0.43,
+            0.975,
+            back_y,
+            white,
+            armature,
+            body,
+            x_steps=22,
+            z_steps=24,
+            solidify=True,
+        )
+    )
+    garments.append(
+        side_wrap_panel("Lunar_Robe_Side_L", -1.0, 0.43, 0.975, white, armature, body)
+    )
+    garments.append(
+        side_wrap_panel("Lunar_Robe_Side_R", 1.0, 0.43, 0.975, white, armature, body)
+    )
+    overskirt_left = tapered_grid_panel(
+        "Lunar_Overskirt_Left",
+        0.19,
+        0.33,
+        0.34,
+        0.79,
+        lambda x, z: -0.162 - 0.020 * (0.79 - z) - 0.010 * math.sin((z - 0.34) * 10.0),
+        lavender,
+        armature,
+        body,
+        x_steps=18,
+        z_steps=28,
+        solidify=False,
+    )
+    overskirt_right = tapered_grid_panel(
+        "Lunar_Overskirt_Right",
+        0.19,
+        0.28,
+        0.42,
+        0.79,
+        lambda x, z: (
+            -0.164 - 0.018 * (0.79 - z) - 0.008 * math.sin((z - 0.42) * 9.0 + 0.6)
+        ),
+        lavender,
+        armature,
+        body,
+        x_steps=18,
+        z_steps=24,
+        solidify=False,
+    )
     garments.extend((overskirt_left, overskirt_right))
     garments.extend(add_hood(armature, body, graphite))
     garments.extend(add_seams(armature, silver))
     for obj in garments:
-        if obj.type == "MESH" and obj.name not in {"Lunar_Overskirt_Left", "Lunar_Overskirt_Right"}:
+        if obj.type == "MESH" and obj.name not in {
+            "Lunar_Overskirt_Left",
+            "Lunar_Overskirt_Right",
+        }:
             add_shape_keys(obj, body)
 
     # Cloth-ready pin groups are explicit and remain in the .blend before the bake.
@@ -567,18 +797,26 @@ def main() -> int:
         obj["image2outfit_role"] = "cloth-panel"
 
     blend_path = repo_path(job["blendPath"])
-    bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False, compress=True)
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(blend_path), check_existing=False, compress=True
+    )
 
     _, camera = import_base.studio_setup()
     camera.data.ortho_scale = 1.42
     target = (0.0, -0.005, 0.70)
     previews = {name: repo_path(path) for name, path in job["previewPaths"].items()}
     render_product_views(camera, previews, target)
-    pose_paths = render_poses(armature, camera, repo_path(job["posePaths"]["neutral"]).parent, target)
+    pose_paths = render_poses(
+        armature, camera, repo_path(job["posePaths"]["neutral"]).parent, target
+    )
     multiview = product_root / "Previews" / f"{PRODUCT_ID}-multiview.webp"
     import_base.contact_sheet(previews, multiview)
     pose_review = product_root / "Previews" / f"{PRODUCT_ID}-pose-review.webp"
-    contact_sheet_named(pose_paths, pose_review, ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"))
+    contact_sheet_named(
+        pose_paths,
+        pose_review,
+        ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
+    )
     pattern_layout = product_root / "Previews" / "pattern-layout.png"
     make_pattern_layout(pattern_layout)
 
@@ -586,7 +824,9 @@ def main() -> int:
     fbx_path = repo_path(job["fbxAssetPath"])
     import_base.export_fbx(fbx_path, armature, garments)
     prefab_path = repo_path(job["prefabAssetPath"])
-    sidecars = import_base.write_unity_sidecars(fbx_path, prefab_path, job["productName"])
+    sidecars = import_base.write_unity_sidecars(
+        fbx_path, prefab_path, job["productName"]
+    )
     integrated = repo_path(job["integratedPrefabAssetPath"])
     sidecars.extend(write_integrated_prefab(prefab_path, integrated))
 
@@ -603,17 +843,106 @@ def main() -> int:
         "metrics": measured,
         "clothComponents": ["Lunar_Overskirt_Left", "Lunar_Overskirt_Right"],
         "clothSimulation": "PENDING_BAKE",
-        "previews": {name: {"path": str(path.relative_to(ROOT)).replace("\\", "/"), "sha256": sha256(path), "width": Image.open(path).width, "height": Image.open(path).height} for name, path in previews.items()},
-        "poses": {name: {"path": str(path.relative_to(ROOT)).replace("\\", "/"), "sha256": sha256(path), "width": Image.open(path).width, "height": Image.open(path).height} for name, path in pose_paths.items()},
-        "design": {"construction": "full-length integrated cocoon hoodie-dress with asymmetric split overskirt", "excludedOverlap": ["separate shorts", "dense harness", "leg straps", "detachable rabbit-ear hood extensions"]},
+        "previews": {
+            name: {
+                "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": sha256(path),
+                "width": Image.open(path).width,
+                "height": Image.open(path).height,
+            }
+            for name, path in previews.items()
+        },
+        "poses": {
+            name: {
+                "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": sha256(path),
+                "width": Image.open(path).width,
+                "height": Image.open(path).height,
+            }
+            for name, path in pose_paths.items()
+        },
+        "design": {
+            "construction": "full-length integrated cocoon hoodie-dress with asymmetric split overskirt",
+            "excludedOverlap": [
+                "separate shorts",
+                "dense harness",
+                "leg straps",
+                "detachable rabbit-ear hood extensions",
+            ],
+        },
     }
     write_json(product_root / "Evidence/Build/product-build-report.json", report)
-    manifest = read_json(repo_path(job["productManifestPath"])) if repo_path(job["productManifestPath"]).is_file() else {}
-    manifest.update({"schemaVersion": 1, "productId": PRODUCT_ID, "productName": job["productName"], "status": "WORKING", "targetAdapterId": job["adapterId"], "productRoot": job["productRoot"], "outfitPrefabPath": job["prefabAssetPath"], "integratedPrefabPath": job["integratedPrefabAssetPath"], "previewPath": job["previewPaths"]["front"], "documentationPath": f"{job['productRoot']}/README.md", "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json", "outputs": {"blend": job["blendPath"], "fbx": job["fbxAssetPath"], "prefab": job["prefabAssetPath"], "integratedPrefab": job["integratedPrefabAssetPath"], "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"), "poseReview": str(pose_review.relative_to(ROOT)).replace("\\", "/")}, "technicalGates": {"blender": "PASS", "editableSource": "PASS", "fbx": "PASS", "prefabDeclared": "PASS", "fiveViewEvidence": "PASS", "poseEvidence": "PASS", "visualAppearanceReview": "PENDING", "clothSimulation": "PENDING_BAKE", "unityImport": "UNVERIFIED", "modularAvatar": "UNVERIFIED", "ndmf": "UNVERIFIED", "vrchatRuntime": "UNVERIFIED"}, "metrics": measured})
+    manifest = (
+        read_json(repo_path(job["productManifestPath"]))
+        if repo_path(job["productManifestPath"]).is_file()
+        else {}
+    )
+    manifest.update(
+        {
+            "schemaVersion": 1,
+            "productId": PRODUCT_ID,
+            "productName": job["productName"],
+            "status": "WORKING",
+            "targetAdapterId": job["adapterId"],
+            "productRoot": job["productRoot"],
+            "outfitPrefabPath": job["prefabAssetPath"],
+            "integratedPrefabPath": job["integratedPrefabAssetPath"],
+            "previewPath": job["previewPaths"]["front"],
+            "documentationPath": f"{job['productRoot']}/README.md",
+            "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json",
+            "outputs": {
+                "blend": job["blendPath"],
+                "fbx": job["fbxAssetPath"],
+                "prefab": job["prefabAssetPath"],
+                "integratedPrefab": job["integratedPrefabAssetPath"],
+                "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"),
+                "poseReview": str(pose_review.relative_to(ROOT)).replace("\\", "/"),
+            },
+            "technicalGates": {
+                "blender": "PASS",
+                "editableSource": "PASS",
+                "fbx": "PASS",
+                "prefabDeclared": "PASS",
+                "fiveViewEvidence": "PASS",
+                "poseEvidence": "PASS",
+                "visualAppearanceReview": "PENDING",
+                "clothSimulation": "PENDING_BAKE",
+                "unityImport": "UNVERIFIED",
+                "modularAvatar": "UNVERIFIED",
+                "ndmf": "UNVERIFIED",
+                "vrchatRuntime": "UNVERIFIED",
+            },
+            "metrics": measured,
+        }
+    )
     write_json(repo_path(job["productManifestPath"]), manifest)
-    (product_root / "README.md").write_text("# Lunar Tech Hoodie\n\nA full-length, panel-first cocoon hoodie-dress for SiroinoSotai. The garment uses an integrated sculpted hood, continuous robe body, articulated sleeve gussets, and two asymmetric split overskirt panels. It intentionally excludes the rejected crop-top, shorts, harness, dense strap-field construction.\n\nBlender 4.4.3 native Cloth is required for `Lunar_Overskirt_Left` and `Lunar_Overskirt_Right`; the bake report is recorded under `Evidence/Build/cloth-simulation.json`.\n", encoding="utf-8")
-    source_files = [blend_path, fbx_path, prefab_path, integrated, multiview, pose_review, pattern_layout, *previews.values(), *pose_paths.values(), product_root / "README.md", repo_path(job["productManifestPath"]), product_root / "Evidence/Build/product-build-report.json"]
-    (product_root / "SOURCE_HASHES.txt").write_text("\n".join(f"{sha256(path)}  {path.relative_to(product_root).as_posix()}" for path in sorted(source_files) if path.is_file()) + "\n", encoding="utf-8")
+    (product_root / "README.md").write_text(
+        "# Lunar Tech Hoodie\n\nA full-length, panel-first cocoon hoodie-dress for SiroinoSotai. The garment uses an integrated sculpted hood, continuous robe body, articulated sleeve gussets, and two asymmetric split overskirt panels. It intentionally excludes the rejected crop-top, shorts, harness, dense strap-field construction.\n\nBlender 4.4.3 native Cloth is required for `Lunar_Overskirt_Left` and `Lunar_Overskirt_Right`; the bake report is recorded under `Evidence/Build/cloth-simulation.json`.\n",
+        encoding="utf-8",
+    )
+    source_files = [
+        blend_path,
+        fbx_path,
+        prefab_path,
+        integrated,
+        multiview,
+        pose_review,
+        pattern_layout,
+        *previews.values(),
+        *pose_paths.values(),
+        product_root / "README.md",
+        repo_path(job["productManifestPath"]),
+        product_root / "Evidence/Build/product-build-report.json",
+    ]
+    (product_root / "SOURCE_HASHES.txt").write_text(
+        "\n".join(
+            f"{sha256(path)}  {path.relative_to(product_root).as_posix()}"
+            for path in sorted(source_files)
+            if path.is_file()
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
