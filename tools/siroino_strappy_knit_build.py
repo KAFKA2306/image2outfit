@@ -173,9 +173,7 @@ def textured_material(
     links.new(normal_map.outputs["Normal"], shader.inputs["Normal"])
     links.new(shader.outputs["BSDF"], output.inputs["Surface"])
     material.diffuse_color = (
-        (0.92, 0.90, 0.86, 1.0)
-        if "Ivory" in name
-        else (0.012, 0.013, 0.018, 1.0)
+        (0.92, 0.90, 0.86, 1.0) if "Ivory" in name else (0.012, 0.013, 0.018, 1.0)
     )
     return material
 
@@ -207,7 +205,9 @@ def plain_material(
 
 def set_skin_material(body: bpy.types.Object) -> None:
     skin = plain_material("Preview_Skin", (0.43, 0.18, 0.11, 1.0), roughness=0.52)
-    shader = next(node for node in skin.node_tree.nodes if node.type == "BSDF_PRINCIPLED")
+    shader = next(
+        node for node in skin.node_tree.nodes if node.type == "BSDF_PRINCIPLED"
+    )
     shader.inputs["Subsurface Weight"].default_value = 0.08
     body.data.materials.clear()
     body.data.materials.append(skin)
@@ -269,7 +269,9 @@ def extract_surface(
     edge_counts: Counter[tuple[int, int]] = Counter()
     for face in faces:
         for index in range(len(face)):
-            edge_counts[tuple(sorted((face[index], face[(index + 1) % len(face)])))] += 1
+            edge_counts[
+                tuple(sorted((face[index], face[(index + 1) % len(face)])))
+            ] += 1
     boundary_neighbors: dict[int, set[int]] = defaultdict(set)
     for (a, b), count in edge_counts.items():
         if count == 1:
@@ -298,7 +300,10 @@ def extract_surface(
     modifier.object = armature
     modifier.use_deform_preserve_volume = True
 
-    groups = {group.name: obj.vertex_groups.new(name=group.name) for group in body.vertex_groups}
+    groups = {
+        group.name: obj.vertex_groups.new(name=group.name)
+        for group in body.vertex_groups
+    }
     for new_index, source_index in enumerate(source_indices):
         assignments = body.data.vertices[source_index].groups
         total = sum(item.weight for item in assignments)
@@ -350,8 +355,14 @@ def extract_surface(
         triangle.polygon_index
         for triangle in mesh.loop_triangles
         if (
-            (mesh.vertices[triangle.vertices[1]].co - mesh.vertices[triangle.vertices[0]].co)
-            .cross(mesh.vertices[triangle.vertices[2]].co - mesh.vertices[triangle.vertices[0]].co)
+            (
+                mesh.vertices[triangle.vertices[1]].co
+                - mesh.vertices[triangle.vertices[0]].co
+            )
+            .cross(
+                mesh.vertices[triangle.vertices[2]].co
+                - mesh.vertices[triangle.vertices[0]].co
+            )
             .length_squared
             <= 1e-20
         )
@@ -394,8 +405,11 @@ def ellipse_points(
     cx, cy, cz = center
     rx, ry = radii
     return [
-        (cx + rx * math.cos(start + (end - start) * index / count),
-         cy + ry * math.sin(start + (end - start) * index / count), cz)
+        (
+            cx + rx * math.cos(start + (end - start) * index / count),
+            cy + ry * math.sin(start + (end - start) * index / count),
+            cz,
+        )
         for index in range(count)
     ]
 
@@ -456,13 +470,27 @@ def collar_mesh(
     )
     vertices = []
     for rx, ry, z in rings:
-        vertices.extend((rx * math.cos(i * math.tau / segments), ry * math.sin(i * math.tau / segments) - 0.006, z) for i in range(segments))
+        vertices.extend(
+            (
+                rx * math.cos(i * math.tau / segments),
+                ry * math.sin(i * math.tau / segments) - 0.006,
+                z,
+            )
+            for i in range(segments)
+        )
     faces = []
     for ring in range(len(rings)):
         next_ring = (ring + 1) % len(rings)
         for i in range(segments):
             j = (i + 1) % segments
-            faces.append((ring * segments + i, ring * segments + j, next_ring * segments + j, next_ring * segments + i))
+            faces.append(
+                (
+                    ring * segments + i,
+                    ring * segments + j,
+                    next_ring * segments + j,
+                    next_ring * segments + i,
+                )
+            )
     mesh = bpy.data.meshes.new("Ribbed_Collar_Mesh")
     mesh.from_pydata(vertices, [], faces)
     mesh.update(calc_edges=True)
@@ -485,7 +513,9 @@ def collar_mesh(
     return obj
 
 
-def rigid_mesh_weight(obj: bpy.types.Object, armature: bpy.types.Object, group: str) -> None:
+def rigid_mesh_weight(
+    obj: bpy.types.Object, armature: bpy.types.Object, group: str
+) -> None:
     obj.parent = armature
     modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
     modifier.object = armature
@@ -533,15 +563,24 @@ def heart_curve(
     for index in range(65):
         t = math.tau * index / 64
         x = 16 * math.sin(t) ** 3
-        z = 13 * math.cos(t) - 5 * math.cos(2 * t) - 2 * math.cos(3 * t) - math.cos(4 * t)
+        z = (
+            13 * math.cos(t)
+            - 5 * math.cos(2 * t)
+            - 2 * math.cos(3 * t)
+            - math.cos(4 * t)
+        )
         points.append((cx + scale * x, cy, cz + scale * z))
-    return curve_tube(name, points, scale * 1.35, material, armature, group, cyclic=True, resolution=3)
+    return curve_tube(
+        name, points, scale * 1.35, material, armature, group, cyclic=True, resolution=3
+    )
 
 
 def cube_pendant(
     material: bpy.types.Material, armature: bpy.types.Object
 ) -> bpy.types.Object:
-    bpy.ops.mesh.primitive_cube_add(location=(0.0, -0.111, 0.900), scale=(0.006, 0.0022, 0.024))
+    bpy.ops.mesh.primitive_cube_add(
+        location=(0.0, -0.111, 0.900), scale=(0.006, 0.0022, 0.024)
+    )
     obj = bpy.context.active_object
     obj.name = "Silver_Pendant"
     obj.data.materials.append(material)
@@ -588,7 +627,9 @@ def add_nearest_shape_keys(obj: bpy.types.Object, body: bpy.types.Object) -> int
             delta = body.matrix_world.to_3x3() @ (
                 source_key.data[index].co - body.data.vertices[index].co
             )
-            target.data[vertex.index].co = vertex.co + obj.matrix_world.to_3x3().inverted() @ delta
+            target.data[vertex.index].co = (
+                vertex.co + obj.matrix_world.to_3x3().inverted() @ delta
+            )
         added += 1
     return added
 
@@ -596,8 +637,10 @@ def add_nearest_shape_keys(obj: bpy.types.Object, body: bpy.types.Object) -> int
 def body_front_y(body: bpy.types.Object, x: float, z: float) -> float:
     candidates = sorted(
         body.data.vertices,
-        key=lambda vertex: (mesh_world_vertex(body, vertex.index).x - x) ** 2
-        + (mesh_world_vertex(body, vertex.index).z - z) ** 2,
+        key=lambda vertex: (
+            (mesh_world_vertex(body, vertex.index).x - x) ** 2
+            + (mesh_world_vertex(body, vertex.index).z - z) ** 2
+        ),
     )[:32]
     return min(mesh_world_vertex(body, vertex.index).y for vertex in candidates)
 
@@ -605,8 +648,10 @@ def body_front_y(body: bpy.types.Object, x: float, z: float) -> float:
 def body_back_y(body: bpy.types.Object, x: float, z: float) -> float:
     candidates = sorted(
         body.data.vertices,
-        key=lambda vertex: (mesh_world_vertex(body, vertex.index).x - x) ** 2
-        + (mesh_world_vertex(body, vertex.index).z - z) ** 2,
+        key=lambda vertex: (
+            (mesh_world_vertex(body, vertex.index).x - x) ** 2
+            + (mesh_world_vertex(body, vertex.index).z - z) ** 2
+        ),
     )[:32]
     return max(mesh_world_vertex(body, vertex.index).y for vertex in candidates)
 
@@ -626,14 +671,19 @@ def surface_cross_section_loop(
     return front + back
 
 
-def transfer_nearest_body_weights(obj: bpy.types.Object, body: bpy.types.Object) -> None:
+def transfer_nearest_body_weights(
+    obj: bpy.types.Object, body: bpy.types.Object
+) -> None:
     """Copy the nearest exact avatar weights onto authored trim and hardware."""
     tree = KDTree(len(body.data.vertices))
     for vertex in body.data.vertices:
         tree.insert(body.matrix_world @ vertex.co, vertex.index)
     tree.balance()
     obj.vertex_groups.clear()
-    groups = {group.name: obj.vertex_groups.new(name=group.name) for group in body.vertex_groups}
+    groups = {
+        group.name: obj.vertex_groups.new(name=group.name)
+        for group in body.vertex_groups
+    }
     for vertex in obj.data.vertices:
         _, source_index, _ = tree.find(obj.matrix_world @ vertex.co)
         assignments = sorted(
@@ -659,9 +709,12 @@ def create_outfit(body, armature, materials):
         body,
         armature,
         "Ivory_Ribbed_Front",
-        lambda c: 0.873 <= c.z <= 1.034
-        and c.y < -0.002
-        and abs(c.x) <= (0.128 if c.z < 0.985 else 0.104 - max(0.0, c.z - 0.985) * 0.78),
+        lambda c: (
+            0.873 <= c.z <= 1.034
+            and c.y < -0.002
+            and abs(c.x)
+            <= (0.128 if c.z < 0.985 else 0.104 - max(0.0, c.z - 0.985) * 0.78)
+        ),
         ivory,
         0.0055,
     )
@@ -682,9 +735,11 @@ def create_outfit(body, armature, materials):
         body,
         armature,
         "Black_Highcut_Front",
-        lambda c: 0.660 <= c.z <= 0.782
-        and c.y < 0.0
-        and abs(c.x) <= 0.031 + max(0.0, c.z - 0.660) * 0.62,
+        lambda c: (
+            0.660 <= c.z <= 0.782
+            and c.y < 0.0
+            and abs(c.x) <= 0.031 + max(0.0, c.z - 0.660) * 0.62
+        ),
         black,
         0.0045,
     )
@@ -693,9 +748,11 @@ def create_outfit(body, armature, materials):
         body,
         armature,
         "Black_Highcut_Back",
-        lambda c: 0.650 <= c.z <= 0.782
-        and c.y >= -0.006
-        and abs(c.x) <= 0.058 + max(0.0, c.z - 0.650) * 0.45,
+        lambda c: (
+            0.650 <= c.z <= 0.782
+            and c.y >= -0.006
+            and abs(c.x) <= 0.058 + max(0.0, c.z - 0.650) * 0.45
+        ),
         black,
         0.0045,
     )
@@ -715,13 +772,19 @@ def create_outfit(body, armature, materials):
     for index in range(13):
         x = -0.108 + 0.216 * index / 12
         front_hem.append((x, body_front_y(body, x, 0.876) - 0.008, 0.876))
-    ivory_trim.append(curve_tube("Knit_Front_Hem", front_hem, 0.00165, ivory, armature, "Chest"))
+    ivory_trim.append(
+        curve_tube("Knit_Front_Hem", front_hem, 0.00165, ivory, armature, "Chest")
+    )
     for label, z in (("Top", 0.912), ("Hem", 0.874)):
         back_edge = []
         for index in range(13):
             x = -0.104 + 0.208 * index / 12
             back_edge.append((x, body_back_y(body, x, z) + 0.008, z))
-        ivory_trim.append(curve_tube(f"Knit_Back_Band_{label}", back_edge, 0.00145, ivory, armature, "Chest"))
+        ivory_trim.append(
+            curve_tube(
+                f"Knit_Back_Band_{label}", back_edge, 0.00145, ivory, armature, "Chest"
+            )
+        )
     joined_ivory_trim = join_objects("Ivory_Knit_Edge_Binding", ivory_trim)
     transfer_nearest_body_weights(joined_ivory_trim, body)
     garments.append(joined_ivory_trim)
@@ -738,74 +801,187 @@ def create_outfit(body, armature, materials):
         "sr": (0.105, body_front_y(body, 0.105, 0.762) - 0.008, 0.762),
     }
     links = (
-        ("tl", "ml"), ("tr", "mr"), ("tl", "mr"), ("tr", "ml"),
-        ("ml", "lc"), ("mr", "lc"), ("sl", "ml"), ("sr", "mr"),
+        ("tl", "ml"),
+        ("tr", "mr"),
+        ("tl", "mr"),
+        ("tr", "ml"),
+        ("ml", "lc"),
+        ("mr", "lc"),
+        ("sl", "ml"),
+        ("sr", "mr"),
     )
     for index, (start, end) in enumerate(links):
         midpoint = (Vector(harness_points[start]) + Vector(harness_points[end])) * 0.5
         midpoint.y -= 0.002
-        strap_objects.append(curve_tube(
-            f"Harness_{index:02d}",
-            [harness_points[start], midpoint, harness_points[end]],
-            0.00255,
-            strap,
-            armature,
-            "Spine" if index >= 4 else "Chest",
-        ))
-    for label, group in (("tl", "Chest"), ("tr", "Chest"), ("ml", "Spine"), ("mr", "Spine"), ("lc", "Hips")):
-        hardware.append(torus(f"Harness_Ring_{label.upper()}", harness_points[label], 0.0092, 0.0017, silver, armature, group))
+        strap_objects.append(
+            curve_tube(
+                f"Harness_{index:02d}",
+                [harness_points[start], midpoint, harness_points[end]],
+                0.00255,
+                strap,
+                armature,
+                "Spine" if index >= 4 else "Chest",
+            )
+        )
+    for label, group in (
+        ("tl", "Chest"),
+        ("tr", "Chest"),
+        ("ml", "Spine"),
+        ("mr", "Spine"),
+        ("lc", "Hips"),
+    ):
+        hardware.append(
+            torus(
+                f"Harness_Ring_{label.upper()}",
+                harness_points[label],
+                0.0092,
+                0.0017,
+                silver,
+                armature,
+                group,
+            )
+        )
 
     for label, sign in (("L", -1.0), ("R", 1.0)):
         front_opening = []
         back_opening = []
-        for x, z in ((0.101, 0.770), (0.089, 0.738), (0.071, 0.704), (0.050, 0.676), (0.031, 0.660)):
+        for x, z in (
+            (0.101, 0.770),
+            (0.089, 0.738),
+            (0.071, 0.704),
+            (0.050, 0.676),
+            (0.031, 0.660),
+        ):
             px = sign * x
             front_opening.append((px, body_front_y(body, px, z) - 0.007, z))
             back_opening.append((px, body_back_y(body, px, z) + 0.007, z))
         opening_loop = front_opening + list(reversed(back_opening))
-        strap_objects.append(curve_tube(
-            f"Bottom_Opening_{label}", opening_loop, 0.00175, strap, armature, "Hips", cyclic=True
-        ))
+        strap_objects.append(
+            curve_tube(
+                f"Bottom_Opening_{label}",
+                opening_loop,
+                0.00175,
+                strap,
+                armature,
+                "Hips",
+                cyclic=True,
+            )
+        )
 
     back_z = 0.792
     back_center_y = body_back_y(body, 0.0, back_z) + 0.009
     waist = surface_cross_section_loop(body, back_z, -0.098, 0.098, 0.005, 48)
-    strap_objects.append(curve_tube("Back_Tie_Waist", waist, 0.0018, strap, armature, "Hips", cyclic=True))
+    strap_objects.append(
+        curve_tube(
+            "Back_Tie_Waist", waist, 0.0018, strap, armature, "Hips", cyclic=True
+        )
+    )
     left_loop = [
-        (-0.006 + 0.030 * math.sin(t), back_center_y + 0.012 * math.sin(t) ** 2, back_z + 0.017 * math.sin(2 * t))
+        (
+            -0.006 + 0.030 * math.sin(t),
+            back_center_y + 0.012 * math.sin(t) ** 2,
+            back_z + 0.017 * math.sin(2 * t),
+        )
         for t in [math.tau * i / 48 for i in range(49)]
     ]
     right_loop = [(-x, y, z) for x, y, z in left_loop]
-    strap_objects.append(curve_tube("Back_Bow_Left", left_loop, 0.0018, strap, armature, "Hips", cyclic=True))
-    strap_objects.append(curve_tube("Back_Bow_Right", right_loop, 0.0018, strap, armature, "Hips", cyclic=True))
-    strap_objects.append(curve_tube("Back_Bow_Tail_L", [(-0.004, back_center_y, back_z), (-0.018, back_center_y + 0.005, back_z - 0.032), (-0.010, back_center_y + 0.003, back_z - 0.060)], 0.0017, strap, armature, "Hips"))
-    strap_objects.append(curve_tube("Back_Bow_Tail_R", [(0.004, back_center_y, back_z), (0.020, back_center_y + 0.005, back_z - 0.030), (0.014, back_center_y + 0.003, back_z - 0.055)], 0.0017, strap, armature, "Hips"))
+    strap_objects.append(
+        curve_tube(
+            "Back_Bow_Left", left_loop, 0.0018, strap, armature, "Hips", cyclic=True
+        )
+    )
+    strap_objects.append(
+        curve_tube(
+            "Back_Bow_Right", right_loop, 0.0018, strap, armature, "Hips", cyclic=True
+        )
+    )
+    strap_objects.append(
+        curve_tube(
+            "Back_Bow_Tail_L",
+            [
+                (-0.004, back_center_y, back_z),
+                (-0.018, back_center_y + 0.005, back_z - 0.032),
+                (-0.010, back_center_y + 0.003, back_z - 0.060),
+            ],
+            0.0017,
+            strap,
+            armature,
+            "Hips",
+        )
+    )
+    strap_objects.append(
+        curve_tube(
+            "Back_Bow_Tail_R",
+            [
+                (0.004, back_center_y, back_z),
+                (0.020, back_center_y + 0.005, back_z - 0.030),
+                (0.014, back_center_y + 0.003, back_z - 0.055),
+            ],
+            0.0017,
+            strap,
+            armature,
+            "Hips",
+        )
+    )
 
     for side, x in (("L", 0.057), ("R", -0.057)):
-        leg_points = surface_cross_section_loop(body, 0.535, x - 0.033, x + 0.033, 0.004, 32)
-        strap_objects.append(curve_tube(f"Thigh_Strap_{side}", leg_points, 0.0020, strap, armature, f"UpperLeg_{side}", cyclic=True))
+        leg_points = surface_cross_section_loop(
+            body, 0.535, x - 0.033, x + 0.033, 0.004, 32
+        )
+        strap_objects.append(
+            curve_tube(
+                f"Thigh_Strap_{side}",
+                leg_points,
+                0.0020,
+                strap,
+                armature,
+                f"UpperLeg_{side}",
+                cyclic=True,
+            )
+        )
         front = body_front_y(body, x, 0.535) - 0.010
-        hardware.append(heart_curve(f"Thigh_Heart_{side}", (x, front, 0.535), 0.00072, silver, armature, f"UpperLeg_{side}"))
+        hardware.append(
+            heart_curve(
+                f"Thigh_Heart_{side}",
+                (x, front, 0.535),
+                0.00072,
+                silver,
+                armature,
+                f"UpperLeg_{side}",
+            )
+        )
 
     chain_y = body_front_y(body, 0.0, 0.950) - 0.011
-    strap_objects.append(curve_tube(
-        "Necklace_Chain_Left",
-        [(-0.038, body_front_y(body, -0.038, 1.041) - 0.009, 1.041), (-0.024, chain_y, 0.974), (0.0, chain_y - 0.002, 0.925)],
-        0.00075,
-        silver,
-        armature,
-        "Chest",
-        resolution=2,
-    ))
-    strap_objects.append(curve_tube(
-        "Necklace_Chain_Right",
-        [(0.038, body_front_y(body, 0.038, 1.041) - 0.009, 1.041), (0.024, chain_y, 0.974), (0.0, chain_y - 0.002, 0.925)],
-        0.00075,
-        silver,
-        armature,
-        "Chest",
-        resolution=2,
-    ))
+    strap_objects.append(
+        curve_tube(
+            "Necklace_Chain_Left",
+            [
+                (-0.038, body_front_y(body, -0.038, 1.041) - 0.009, 1.041),
+                (-0.024, chain_y, 0.974),
+                (0.0, chain_y - 0.002, 0.925),
+            ],
+            0.00075,
+            silver,
+            armature,
+            "Chest",
+            resolution=2,
+        )
+    )
+    strap_objects.append(
+        curve_tube(
+            "Necklace_Chain_Right",
+            [
+                (0.038, body_front_y(body, 0.038, 1.041) - 0.009, 1.041),
+                (0.024, chain_y, 0.974),
+                (0.0, chain_y - 0.002, 0.925),
+            ],
+            0.00075,
+            silver,
+            armature,
+            "Chest",
+            resolution=2,
+        )
+    )
     hardware.append(cube_pendant(silver, armature))
 
     joined_straps = join_objects("Black_Geometric_Straps", strap_objects)
@@ -822,7 +998,12 @@ def studio_setup() -> tuple[bpy.types.Object, bpy.types.Object]:
     world = bpy.context.scene.world or bpy.data.worlds.new("Studio World")
     bpy.context.scene.world = world
     world.use_nodes = True
-    world.node_tree.nodes["Background"].inputs["Color"].default_value = (0.035, 0.040, 0.055, 1.0)
+    world.node_tree.nodes["Background"].inputs["Color"].default_value = (
+        0.035,
+        0.040,
+        0.055,
+        1.0,
+    )
     world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.25
 
     backdrop = plain_material("Backdrop", (0.68, 0.72, 0.82, 1.0), roughness=0.72)
@@ -861,7 +1042,9 @@ def studio_setup() -> tuple[bpy.types.Object, bpy.types.Object]:
 
 def point_camera(camera, location, target=(0.0, -0.006, 0.805)) -> None:
     camera.location = location
-    camera.rotation_euler = (Vector(target) - camera.location).to_track_quat("-Z", "Y").to_euler()
+    camera.rotation_euler = (
+        (Vector(target) - camera.location).to_track_quat("-Z", "Y").to_euler()
+    )
 
 
 def preview_pose(armature: bpy.types.Object) -> None:
@@ -936,7 +1119,9 @@ def contact_sheet(previews: dict[str, Path], path: Path) -> None:
     canvas.save(path, "WEBP", quality=94, method=6)
 
 
-def export_fbx(path: Path, armature: bpy.types.Object, garments: list[bpy.types.Object]) -> None:
+def export_fbx(
+    path: Path, armature: bpy.types.Object, garments: list[bpy.types.Object]
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.object.select_all(action="DESELECT")
     armature.hide_render = True
@@ -1086,7 +1271,9 @@ def boundary_count(obj: bpy.types.Object) -> int:
     for polygon in obj.data.polygons:
         vertices = list(polygon.vertices)
         for index in range(len(vertices)):
-            edge = tuple(sorted((vertices[index], vertices[(index + 1) % len(vertices)])))
+            edge = tuple(
+                sorted((vertices[index], vertices[(index + 1) % len(vertices)]))
+            )
             counter[edge] += 1
     return sum(value == 1 for value in counter.values())
 
@@ -1111,7 +1298,9 @@ def metrics(garments: list[bpy.types.Object]) -> dict:
         result["vertices"] += len(mesh.vertices)
         result["triangles"] += len(mesh.loop_triangles)
         result["materialSlots"] += len(mesh.materials)
-        result["shapeKeys"] += max(0, len(mesh.shape_keys.key_blocks) - 1) if mesh.shape_keys else 0
+        result["shapeKeys"] += (
+            max(0, len(mesh.shape_keys.key_blocks) - 1) if mesh.shape_keys else 0
+        )
         result["boundaryEdges"] += boundary_count(obj)
         for vertex in mesh.vertices:
             weights = [item.weight for item in vertex.groups if item.weight > 1e-8]
@@ -1146,12 +1335,12 @@ Contents:
 
 Measured static mesh:
 
-- mesh objects: {measured['meshObjects']}
-- vertices: {measured['vertices']}
-- triangles: {measured['triangles']}
-- material slots: {measured['materialSlots']}
-- exported blend shapes: {measured['shapeKeys']}
-- maximum bone influences: {measured['maxBoneInfluences']}
+- mesh objects: {measured["meshObjects"]}
+- vertices: {measured["vertices"]}
+- triangles: {measured["triangles"]}
+- material slots: {measured["materialSlots"]}
+- exported blend shapes: {measured["shapeKeys"]}
+- maximum bone influences: {measured["maxBoneInfluences"]}
 
 Import the entire generated folder into a Unity 2022.3.22f1 VRChat avatar project. Keep `.meta` files with the FBX and Prefab. The committed official SiroinoSotai Prefab is the validation target; the avatar body itself is not part of this garment delivery folder.
 
@@ -1175,7 +1364,11 @@ def main() -> int:
     generated_dir.mkdir(parents=True, exist_ok=True)
 
     bpy.ops.import_scene.fbx(filepath=str(source), use_anim=False)
-    body = next(obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC"))
+    body = next(
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
+    )
     armature = next(obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE")
     armature.name = "SiroinoSotai_Armature"
     set_skin_material(body)
@@ -1197,8 +1390,12 @@ def main() -> int:
         normal_strength=0.22,
         sheen=0.12,
     )
-    strap = plain_material("MAT_Black_Straps", (0.009, 0.010, 0.014, 1.0), roughness=0.28)
-    silver = plain_material("MAT_Brushed_Silver", (0.64, 0.70, 0.78, 1.0), roughness=0.18, metallic=0.93)
+    strap = plain_material(
+        "MAT_Black_Straps", (0.009, 0.010, 0.014, 1.0), roughness=0.28
+    )
+    silver = plain_material(
+        "MAT_Brushed_Silver", (0.64, 0.70, 0.78, 1.0), roughness=0.18, metallic=0.93
+    )
     garments = create_outfit(body, armature, (ivory, black, strap, silver))
 
     blend_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1245,11 +1442,24 @@ def main() -> int:
             "Unity import, animated pose penetration, and VRChat runtime review remain separate release gates.",
         ],
     }
-    (artifact_dir / "build-report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    (artifact_dir / "build-report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
     write_readme(generated_dir / "README.md", job["productName"], measured)
-    manifest_files = [blend_path, fbx_path, contact, generated_dir / "README.md", *sidecars, *textures.values(), *previews.values()]
+    manifest_files = [
+        blend_path,
+        fbx_path,
+        contact,
+        generated_dir / "README.md",
+        *sidecars,
+        *textures.values(),
+        *previews.values(),
+    ]
     (generated_dir / "SOURCE_HASHES.txt").write_text(
-        "\n".join(f"{sha256(path)}  {path.name}" for path in manifest_files if path.is_file()) + "\n",
+        "\n".join(
+            f"{sha256(path)}  {path.name}" for path in manifest_files if path.is_file()
+        )
+        + "\n",
         encoding="utf-8",
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
