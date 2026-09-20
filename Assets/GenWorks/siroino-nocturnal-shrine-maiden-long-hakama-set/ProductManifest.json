@@ -10,6 +10,19 @@
   "previewPath": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/README.md",
   "sourceJobPath": "config/products/siroino-nocturnal-shrine-maiden-long-hakama-set/job.json",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set",
+    "resumeFrom": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Prefab/SiroinoNocturnalShrineMaidenLongHakama.prefab",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "exact original manufacturing image is unavailable; replacement board is explicitly not exact",
+      "visualAppearanceReview remains REVIEW_REQUIRED for the structured side silhouette",
+      "real VRChat upload was not performed; only SDK dry-run evidence exists"
+    ]
+  },
   "sourceReferenceStatus": "EXACT_ORIGINAL_MISSING_REPLACEMENT_BOARD_NOT_EXACT",
   "outputs": {
     "blend": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Source/Blender/SiroinoNocturnalShrineMaidenLongHakama.blend",
