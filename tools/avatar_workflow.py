@@ -26,6 +26,12 @@ except ImportError:  # pragma: no cover - the locked project set includes Pillow
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_RELATIVE = Path("config/avatar-workflow.v1.json")
 GUID_PATTERN = re.compile(r"\bguid:\s*([0-9a-f]{32})\b", re.IGNORECASE)
+CAU_DESCRIPTOR_ASSET_PATTERN = re.compile(
+    r"^\s*asset:\s*\{fileID:\s*(\d+),\s*guid:\s*([0-9a-f]{32}),\s*type:\s*3\}\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+PREFAB_COMPONENT_PATTERN = re.compile(r"^--- !u!114 &(\d+)\s*$")
+VRC_AVATAR_DESCRIPTOR_SCRIPT_GUID = "52fa21b17bc14dc294959f976e3e184f"
 
 
 class AvatarWorkflowError(ValueError):
@@ -198,6 +204,24 @@ def _referenced_guids(path: Path) -> list[str]:
     return [value.lower() for value in GUID_PATTERN.findall(_read_text(path))]
 
 
+def _prefab_avatar_descriptor_file_id(path: Path) -> int | None:
+    component_file_id: int | None = None
+    for line in _read_text(path).splitlines():
+        component_match = PREFAB_COMPONENT_PATTERN.match(line)
+        if component_match:
+            component_file_id = int(component_match.group(1))
+            continue
+        if component_file_id is None or "m_Script:" not in line:
+            continue
+        script_guid = re.search(r"guid:\s*([0-9a-f]{32})\b", line, re.IGNORECASE)
+        if (
+            script_guid
+            and script_guid.group(1).lower() == VRC_AVATAR_DESCRIPTOR_SCRIPT_GUID
+        ):
+            return component_file_id
+    return None
+
+
 def _package_report(
     root: Path, config: dict[str, Any]
 ) -> tuple[dict[str, Any], list[str]]:
@@ -321,17 +345,32 @@ def _outfit_preflight(
         elif not scene.with_name(scene.name + ".meta").is_file():
             errors.append(f"outfit scene meta missing: {scene_path}.meta")
 
+    setting_text = _read_text(setting) if setting.is_file() else ""
     prefab_guid = _meta_guid(prefab) if prefab.is_file() else None
     setting_guids = _referenced_guids(setting) if setting.is_file() else []
     if prefab_guid is None:
         errors.append(f"prefab GUID missing: {outfit['prefab']}")
     elif prefab_guid not in setting_guids:
         errors.append(f"CAU setting does not reference prefab: {outfit['id']}")
+    descriptor_reference = CAU_DESCRIPTOR_ASSET_PATTERN.search(setting_text)
+    descriptor_file_id = (
+        _prefab_avatar_descriptor_file_id(prefab) if prefab.is_file() else None
+    )
+    if descriptor_reference is None:
+        errors.append(f"CAU descriptor asset reference missing: {outfit['id']}")
+    elif descriptor_file_id is None:
+        errors.append(
+            f"VRCAvatarDescriptor component missing in prefab: {outfit['id']}"
+        )
+    elif int(descriptor_reference.group(1)) != descriptor_file_id:
+        errors.append(
+            "CAU descriptor fileID does not match prefab VRCAvatarDescriptor: "
+            f"{outfit['id']}"
+        )
 
     scene_capture = _scene_capture_contract(root, config, outfit, prefab_guid)
     errors.extend(scene_capture["errors"])
 
-    setting_text = _read_text(setting) if setting.is_file() else ""
     if "windows:\n    enabled: 1" not in setting_text:
         errors.append(f"Windows upload is not enabled in CAU setting: {outfit['id']}")
     for platform in ("ios", "quest"):
