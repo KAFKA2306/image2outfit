@@ -128,6 +128,46 @@ def _validate_config(root: Path, config: dict[str, Any]) -> None:
                         f"outfits[{index}].{key} must be a non-empty string"
                     )
                 _asset(root, outfit[key])
+    scene_capture = config.get("sceneCapture")
+    if scene_capture is not None:
+        if not isinstance(scene_capture, dict):
+            raise AvatarWorkflowError("avatar workflow sceneCapture must be an object")
+        if (
+            not isinstance(scene_capture.get("cameraPath"), str)
+            or not scene_capture["cameraPath"]
+        ):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.cameraPath is required"
+            )
+        if scene_capture.get("view") != "camera":
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.view must be camera"
+            )
+        for key in ("localPosition", "localRotationQuaternion"):
+            value = scene_capture.get(key)
+            axes = (
+                ("x", "y", "z", "w")
+                if key == "localRotationQuaternion"
+                else (
+                    "x",
+                    "y",
+                    "z",
+                )
+            )
+            if not isinstance(value, dict) or not all(
+                isinstance(value.get(axis), (int, float)) for axis in axes
+            ):
+                raise AvatarWorkflowError(
+                    f"avatar workflow sceneCapture.{key} must contain numeric axes"
+                )
+        if not isinstance(scene_capture.get("orthographic"), bool):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.orthographic is required"
+            )
+        if not isinstance(scene_capture.get("orthographicSize"), (int, float)):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.orthographicSize is required"
+            )
 
 
 def _selected_outfits(
@@ -288,6 +328,9 @@ def _outfit_preflight(
     elif prefab_guid not in setting_guids:
         errors.append(f"CAU setting does not reference prefab: {outfit['id']}")
 
+    scene_capture = _scene_capture_contract(root, config, outfit, prefab_guid)
+    errors.extend(scene_capture["errors"])
+
     setting_text = _read_text(setting) if setting.is_file() else ""
     if "windows:\n    enabled: 1" not in setting_text:
         errors.append(f"Windows upload is not enabled in CAU setting: {outfit['id']}")
@@ -345,6 +388,7 @@ def _outfit_preflight(
         "visualRoot": outfit["visualRoot"],
         "clothEvidence": cloth_evidence,
         "scene": scene_path,
+        "sceneCapture": scene_capture,
         "clothSimulation": {
             "status": cloth_report.get("status")
             if isinstance(cloth_report, dict)
@@ -363,6 +407,131 @@ def _outfit_preflight(
         "passed": not errors,
         "errors": errors,
         "warnings": warnings,
+    }
+
+
+def _scene_capture_contract(
+    root: Path,
+    config: dict[str, Any],
+    outfit: dict[str, Any],
+    prefab_guid: str | None,
+) -> dict[str, Any]:
+    """Verify that each outfit scene can be captured from its matching prefab camera."""
+    scene_path = outfit.get("scene")
+    spec = config.get("sceneCapture")
+    if not scene_path or not isinstance(spec, dict):
+        return {"passed": True, "cameraPath": None, "errors": []}
+    scene = _asset(root, scene_path)
+    if not scene.is_file():
+        return {
+            "passed": False,
+            "cameraPath": spec.get("cameraPath"),
+            "errors": [f"outfit scene missing: {scene_path}"],
+        }
+    text = _read_text(scene)
+    errors: list[str] = []
+    blocks = re.split(r"(?=^--- !u!)", text, flags=re.MULTILINE)
+    camera_game_object_id = None
+    for block in blocks:
+        if re.search(r"^  m_Name: PreviewCamera\s*$", block, re.MULTILINE):
+            match = re.match(r"^--- !u!1 &(\d+)", block)
+            if match:
+                camera_game_object_id = match.group(1)
+                break
+    if camera_game_object_id is None:
+        errors.append(f"PreviewCamera GameObject missing: {scene_path}")
+    transform = next(
+        (
+            block
+            for block in blocks
+            if block.startswith("--- !u!4 ")
+            and f"m_GameObject: {{fileID: {camera_game_object_id}}}" in block
+        ),
+        "",
+    )
+    camera = next(
+        (
+            block
+            for block in blocks
+            if block.startswith("--- !u!20 ")
+            and f"m_GameObject: {{fileID: {camera_game_object_id}}}" in block
+        ),
+        "",
+    )
+    if not transform:
+        errors.append(f"PreviewCamera Transform missing: {scene_path}")
+    if not camera:
+        errors.append(f"PreviewCamera component missing: {scene_path}")
+
+    def vector_from(
+        block: str, field: str, axes: tuple[str, ...]
+    ) -> dict[str, float] | None:
+        match = re.search(
+            rf"^  {re.escape(field)}: \{{([^}}]+)\}}$",
+            block,
+            re.MULTILINE,
+        )
+        if not match:
+            return None
+        values: dict[str, float] = {}
+        for axis in axes:
+            axis_match = re.search(rf"(?:^|, ){axis}: ([^,}}]+)", match.group(1))
+            if not axis_match:
+                return None
+            try:
+                values[axis] = float(axis_match.group(1))
+            except ValueError:
+                return None
+        return values
+
+    def matches(actual: dict[str, float] | None, expected: dict[str, Any]) -> bool:
+        return actual is not None and all(
+            abs(actual[axis] - float(expected[axis])) <= 1e-4 for axis in expected
+        )
+
+    actual_position = vector_from(transform, "m_LocalPosition", ("x", "y", "z"))
+    expected_position = spec["localPosition"]
+    if not matches(actual_position, expected_position):
+        errors.append(
+            f"PreviewCamera position mismatch for {outfit['id']}: "
+            f"expected {expected_position}, found {actual_position}"
+        )
+    actual_rotation = vector_from(transform, "m_LocalRotation", ("x", "y", "z", "w"))
+    expected_rotation = spec["localRotationQuaternion"]
+    if not matches(actual_rotation, expected_rotation):
+        errors.append(
+            f"PreviewCamera rotation mismatch for {outfit['id']}: "
+            f"expected {expected_rotation}, found {actual_rotation}"
+        )
+    orthographic = re.search(r"^  orthographic: (0|1)$", camera, re.MULTILINE)
+    if not orthographic or bool(int(orthographic.group(1))) != spec["orthographic"]:
+        errors.append(f"PreviewCamera orthographic mode mismatch: {scene_path}")
+    size = re.search(r"^  orthographic size: ([^\s]+)$", camera, re.MULTILINE)
+    if not size or abs(float(size.group(1)) - float(spec["orthographicSize"])) > 1e-4:
+        errors.append(f"PreviewCamera orthographic size mismatch: {scene_path}")
+
+    source_prefab = re.search(
+        r"m_SourcePrefab: \{fileID: 100100000, guid: ([0-9a-f]{32}), type: 3\}",
+        text,
+        re.IGNORECASE,
+    )
+    if not source_prefab:
+        errors.append(f"scene prefab source missing: {scene_path}")
+    elif prefab_guid and source_prefab.group(1).lower() != prefab_guid.lower():
+        errors.append(
+            f"scene prefab mismatch for {outfit['id']}: "
+            f"scene={source_prefab.group(1).lower()} config={prefab_guid.lower()}"
+        )
+    return {
+        "passed": not errors,
+        "cameraPath": spec["cameraPath"],
+        "view": spec["view"],
+        "localPosition": actual_position,
+        "localRotationQuaternion": actual_rotation,
+        "orthographic": bool(int(orthographic.group(1))) if orthographic else None,
+        "orthographicSize": float(size.group(1)) if size else None,
+        "sourcePrefabGuid": source_prefab.group(1).lower() if source_prefab else None,
+        "errors": errors,
     }
 
 
