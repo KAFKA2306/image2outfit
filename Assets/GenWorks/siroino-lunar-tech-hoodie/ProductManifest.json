@@ -10,6 +10,18 @@
   "previewPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/README.md",
   "sourceJobPath": "config/products/siroino-lunar-tech-hoodie/job.json",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-lunar-tech-hoodie",
+    "resumeFrom": "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoLunarTechHoodie.prefab",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "visualAppearanceReview remains REVIEW_REQUIRED for the hood and planar side silhouette",
+      "real VRChat upload was not performed; only SDK dry-run evidence exists"
+    ]
+  },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-lunar-tech-hoodie/Source/Blender/SiroinoLunarTechHoodie.blend",
     "fbx": "Assets/GenWorks/siroino-lunar-tech-hoodie/Models/SiroinoLunarTechHoodie.fbx",
