@@ -26,6 +26,11 @@ class AvatarWorkflowTests(unittest.TestCase):
             config["scenes"]["workbench"],
             "Assets/Scenes/Avatar/00_SiroinoOutfitWorkbench.unity",
         )
+        self.assertEqual(config["sceneCapture"]["view"], "camera")
+        self.assertEqual(
+            config["sceneCapture"]["cameraPath"],
+            "AvatarPreviewStage/PreviewCamera",
+        )
         self.assertTrue(all(item.get("clothEvidence") for item in config["outfits"]))
         self.assertTrue(all(item.get("scene") for item in config["outfits"]))
 
@@ -35,6 +40,9 @@ class AvatarWorkflowTests(unittest.TestCase):
         self.assertEqual(result["selectedOutfitCount"], 9)
         self.assertEqual(len(result["outfits"]), 9)
         self.assertFalse(result["errors"])
+        self.assertTrue(
+            all(item["sceneCapture"]["passed"] for item in result["outfits"])
+        )
 
     def test_visual_regression_records_and_compares_baselines(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
