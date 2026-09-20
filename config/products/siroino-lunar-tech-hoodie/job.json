@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-lunar-tech-hoodie",
+  "productName": "Lunar Tech Hoodie for Siroino",
+  "adapterId": "siroino-v1.0-large",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4.3-panel-cloth-modular",
+  "buildRevision": "v1-integrated-cocoon-hoodie-dress",
+  "renderLoopRevision": "lunar-tech-hoodie-v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-lunar-tech-hoodie",
+  "productManifestPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/ProductManifest.json",
+  "buildScript": "tools/siroino_lunar_tech_hoodie_build.py",
+  "productBuildScript": "tools/siroino_lunar_tech_hoodie_build.py",
+  "blendPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Source/Blender/SiroinoLunarTechHoodie.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Models/SiroinoLunarTechHoodie.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoLunarTechHoodie.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoSotai_LunarTechHoodie.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"]
+  },
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "referenceAuditPath": "config/products/siroino-lunar-tech-hoodie/reference-audit.json",
+    "referenceIdentityPath": "config/products/siroino-lunar-tech-hoodie/reference-identity.json",
+    "decompositionPath": "config/products/siroino-lunar-tech-hoodie/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-lunar-tech-hoodie/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-lunar-tech-hoodie/stitch-graph.json",
+    "visualReviewPath": "config/products/siroino-lunar-tech-hoodie/visual-review.json",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "researchTrial": "explicit panel layout + Blender 4.4.3 native Cloth on asymmetric split overskirt panels + four-influence nearest-body weights",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true,
+    "clothSimulation": {
+      "applicability": "REQUIRED",
+      "components": ["Lunar_Overskirt_Left", "Lunar_Overskirt_Right"],
+      "evidence": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/cloth-simulation.json",
+      "reason": "The split overskirt is a loose layered panel and must be settled against the Siroino body with native Blender Cloth before export."
+    }
+  },
+  "researchMethod": {
+    "name": "panel-first structured reconstruction with native Blender Cloth",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-lunar-tech-hoodie/pattern-draft.json",
+    "secondaryEvidence": "config/products/siroino-lunar-tech-hoodie/stitch-graph.json"
+  },
+  "licenseEvidence": "config/products/siroino-lunar-tech-hoodie/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "patternLayoutPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-lunar-tech-hoodie/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-lunar-tech-hoodie/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-lunar-tech-hoodie/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 3,
+    "materialRoles": [
+      {"material": "MAT_Lunar_Tech_White_SoftShell", "role": "fabric"},
+      {"material": "MAT_Lunar_Tech_Graphite_Knit", "role": "fabric"},
+      {"material": "MAT_Lunar_Tech_Lavender_Lining", "role": "accent"},
+      {"material": "MAT_Lunar_Tech_Satin_Silver", "role": "metal"}
+    ]
+  },
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/ProductManifest.json",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/README.md",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/References/lunar-tech-hoodie-manufacturing-sheet.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Source/Blender/SiroinoLunarTechHoodie.blend",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Models/SiroinoLunarTechHoodie.fbx",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Models/SiroinoLunarTechHoodie.fbx.meta",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoLunarTechHoodie.prefab",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoLunarTechHoodie.prefab.meta",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoSotai_LunarTechHoodie.prefab",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Unity/NDMF-Bake/SiroinoSotai_LunarTechHoodie_baked.prefab",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Unity/lunar-tech-hoodie-unity-validation.json",
+    "Assets/Scenes/Avatar/10_LunarTechHoodie.unity",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoSotai_LunarTechHoodie.prefab.meta",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/front.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/back.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/left.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/right.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/prone.png",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/product-build-report.json",
+    "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/cloth-simulation.json"
+  ]
+}

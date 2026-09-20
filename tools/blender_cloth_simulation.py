@@ -33,6 +33,10 @@ COMPONENTS: dict[str, tuple[str, ...]] = {
     ),
     "siroino-nocturne-angel-set": ("Nocturne_Cloth_Skirt",),
     "siroino-wide-cargo": ("Cargo_Continuous_Pants",),
+    "siroino-lunar-tech-hoodie": (
+        "Lunar_Overskirt_Left",
+        "Lunar_Overskirt_Right",
+    ),
 }
 
 FRAME_END = {
@@ -42,6 +46,7 @@ FRAME_END = {
     "siroino-military-sheer-romper-large": 20,
     "siroino-nocturne-angel-set": 24,
     "siroino-wide-cargo": 18,
+    "siroino-lunar-tech-hoodie": 30,
 }
 
 

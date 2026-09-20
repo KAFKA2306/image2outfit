@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lunar-tech-hoodie",
+  "productName": "Lunar Tech Hoodie for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0-large",
+  "productRoot": "Assets/GenWorks/siroino-lunar-tech-hoodie",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoLunarTechHoodie.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoSotai_LunarTechHoodie.prefab",
+  "previewPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/README.md",
+  "sourceJobPath": "config/products/siroino-lunar-tech-hoodie/job.json",
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-lunar-tech-hoodie/Source/Blender/SiroinoLunarTechHoodie.blend",
+    "fbx": "Assets/GenWorks/siroino-lunar-tech-hoodie/Models/SiroinoLunarTechHoodie.fbx",
+    "prefab": "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoLunarTechHoodie.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoSotai_LunarTechHoodie.prefab",
+    "multiview": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/siroino-lunar-tech-hoodie-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/siroino-lunar-tech-hoodie-pose-review.webp",
+    "clothSimulation": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/cloth-simulation.json",
+    "scene": "Assets/Scenes/Avatar/10_LunarTechHoodie.unity",
+    "ndmfBakedPrefab": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Unity/NDMF-Bake/SiroinoSotai_LunarTechHoodie_baked.prefab",
+    "unityValidation": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Unity/lunar-tech-hoodie-unity-validation.json"
+  },
+  "technicalGates": {
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "REVIEW_REQUIRED",
+    "clothSimulation": "PASS",
+    "unityImport": "PASS",
+    "modularAvatar": "PASS",
+    "ndmf": "PASS",
+    "vrchatRuntime": "DRY_RUN_PASS"
+  },
+  "metrics": {
+    "meshObjects": 15,
+    "vertices": 31794,
+    "triangles": 61128,
+    "degenerateTriangles": 0,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "maxBoneInfluences": 5
+  },
+  "clothSimulation": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/cloth-simulation.json"
+}

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lunar-tech-hoodie",
+  "units": "meter",
+  "coordinateSystem": "x-horizontal-y-vertical",
+  "pieces": [
+    {"pieceId": "hood-side-left", "partId": "hood", "boundary": [[-0.18, 0.32], [-0.24, 0.02], [-0.18, -0.27], [0.0, -0.18], [0.0, 0.28]], "cutCount": 1, "onFold": false, "seamAllowanceM": 0.008},
+    {"pieceId": "hood-center", "partId": "hood", "boundary": [[-0.12, 0.34], [0.12, 0.34], [0.16, -0.20], [0.0, -0.28], [-0.16, -0.20]], "cutCount": 1, "onFold": true, "seamAllowanceM": 0.008},
+    {"pieceId": "robe-front", "partId": "robe-front-left", "boundary": [[-0.20, 0.48], [-0.30, 0.22], [-0.35, -0.42], [0.0, -0.52], [0.18, -0.08], [0.12, 0.48]], "cutCount": 2, "onFold": false, "seamAllowanceM": 0.01},
+    {"pieceId": "robe-back", "partId": "robe-back", "boundary": [[-0.30, 0.46], [0.30, 0.46], [0.34, -0.42], [-0.34, -0.42]], "cutCount": 1, "onFold": true, "seamAllowanceM": 0.01},
+    {"pieceId": "overskirt-left", "partId": "overskirt-left", "boundary": [[-0.30, 0.38], [0.04, 0.38], [0.38, -0.55], [-0.34, -0.48]], "cutCount": 1, "onFold": false, "seamAllowanceM": 0.01},
+    {"pieceId": "overskirt-right", "partId": "overskirt-right", "boundary": [[-0.04, 0.38], [0.30, 0.38], [0.34, -0.45], [-0.22, -0.55]], "cutCount": 1, "onFold": false, "seamAllowanceM": 0.01}
+  ],
+  "method": {"name": "panel-first structured reconstruction", "status": "TRIAL", "rationale": "The panel layout is explicit before Blender construction; the two split overskirt panels are settled with native Cloth."}
+}

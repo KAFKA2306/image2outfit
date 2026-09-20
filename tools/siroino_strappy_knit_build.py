@@ -942,33 +942,47 @@ def export_fbx(path: Path, armature: bpy.types.Object, garments: list[bpy.types.
     armature.hide_render = True
     armature.hide_set(False)
     armature.select_set(True)
+    # Unity's FBX importer rejects a small subset of smooth custom normals
+    # produced by Blender's curve conversion and cloth modifier evaluation.
+    # Export flat face normals, then restore the authored smoothing state so
+    # the editable .blend and its previews keep their intended appearance.
+    smooth_flags: dict[tuple[bpy.types.Mesh, int], bool] = {}
     for obj in garments:
         obj.hide_render = False
         obj.hide_set(False)
         obj.select_set(True)
+        if obj.type == "MESH":
+            for polygon in obj.data.polygons:
+                smooth_flags[(obj.data, polygon.index)] = polygon.use_smooth
+                polygon.use_smooth = False
     bpy.context.view_layer.objects.active = armature
-    bpy.ops.export_scene.fbx(
-        filepath=str(path),
-        use_selection=True,
-        object_types={"ARMATURE", "MESH"},
-        apply_unit_scale=True,
-        apply_scale_options="FBX_SCALE_ALL",
-        use_space_transform=True,
-        bake_space_transform=False,
-        mesh_smooth_type="FACE",
-        use_subsurf=False,
-        use_mesh_modifiers=True,
-        use_mesh_edges=False,
-        use_tspace=True,
-        use_armature_deform_only=True,
-        add_leaf_bones=False,
-        primary_bone_axis="Y",
-        secondary_bone_axis="X",
-        armature_nodetype="NULL",
-        bake_anim=False,
-        path_mode="RELATIVE",
-        embed_textures=False,
-    )
+    try:
+        bpy.ops.export_scene.fbx(
+            filepath=str(path),
+            use_selection=True,
+            object_types={"ARMATURE", "MESH"},
+            apply_unit_scale=True,
+            apply_scale_options="FBX_SCALE_ALL",
+            use_space_transform=True,
+            bake_space_transform=False,
+            mesh_smooth_type="FACE",
+            use_subsurf=False,
+            use_mesh_modifiers=True,
+            use_mesh_edges=False,
+            use_tspace=True,
+            use_armature_deform_only=True,
+            add_leaf_bones=False,
+            primary_bone_axis="Y",
+            secondary_bone_axis="X",
+            armature_nodetype="NULL",
+            bake_anim=False,
+            path_mode="RELATIVE",
+            embed_textures=False,
+        )
+    finally:
+        for (mesh, index), use_smooth in smooth_flags.items():
+            if index < len(mesh.polygons):
+                mesh.polygons[index].use_smooth = use_smooth
 
 
 def write_unity_sidecars(fbx: Path, prefab: Path, product_name: str) -> list[Path]:
