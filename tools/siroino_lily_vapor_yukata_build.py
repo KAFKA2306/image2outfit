@@ -613,7 +613,6 @@ def main() -> int:
         "previewPath": job["previewPaths"]["front"],
         "documentationPath": f"{job['productRoot']}/README.md",
         "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json",
-        "sourceReferenceStatus": job["sourceReferenceStatus"],
         "outputs": {
             "blend": job["blendPath"],
             "fbx": job["fbxAssetPath"],
