@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 import bpy
-from mathutils import Euler, Vector
+from mathutils import Euler, Matrix, Vector
 from PIL import Image, ImageDraw, ImageFont
 
 TOOLS = Path(__file__).resolve().parent
@@ -25,6 +25,7 @@ if str(TOOLS) not in sys.path:
 import siroino_strappy_knit_build as common
 
 ROOT = Path(__file__).resolve().parents[1]
+_GARMENT_MESH_BASES: dict[str, Matrix] = {}
 
 
 def args() -> argparse.Namespace:
@@ -64,13 +65,29 @@ def apply_pose(
     base_transforms: dict[str, tuple[Vector, Euler, Vector]],
     name: str,
 ) -> None:
+    garment_armature = armatures[0]
+    garment_meshes = [
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH"
+        and any(
+            modifier.type == "ARMATURE" and modifier.object is garment_armature
+            for modifier in obj.modifiers
+        )
+    ]
+    for obj in garment_meshes:
+        _GARMENT_MESH_BASES.setdefault(obj.name, obj.matrix_world.copy())
+        obj.matrix_world = _GARMENT_MESH_BASES[obj.name].copy()
     for armature in armatures:
         clear(armature, base_transforms[armature.name])
         if name == "arms-up":
-            rotate(armature, "UpperArm_L", (-105.0, 0.0, -8.0))
-            rotate(armature, "UpperArm_R", (-105.0, 0.0, 8.0))
-            rotate(armature, "LowerArm_L", (-8.0, 0.0, 0.0))
-            rotate(armature, "LowerArm_R", (-8.0, 0.0, 0.0))
+            # Use a moderate local-X elevation.  The earlier extreme value
+            # sent the sleeves behind the camera; this remains readable while
+            # still exercising the upper-arm deformation.
+            rotate(armature, "UpperArm_L", (45.0, 0.0, -8.0))
+            rotate(armature, "UpperArm_R", (45.0, 0.0, 8.0))
+            rotate(armature, "LowerArm_L", (12.0, 0.0, 0.0))
+            rotate(armature, "LowerArm_R", (12.0, 0.0, 0.0))
         elif name == "arm-cross":
             rotate(armature, "UpperArm_L", (-38.0, 18.0, -54.0))
             rotate(armature, "UpperArm_R", (-38.0, -18.0, 54.0))
@@ -104,6 +121,14 @@ def apply_pose(
             rotate(armature, "UpperArm_R", (-34.0, 0.0, 18.0))
             rotate(armature, "LowerArm_L", (-48.0, 0.0, 0.0))
             rotate(armature, "LowerArm_R", (-48.0, 0.0, 0.0))
+    if name == "prone":
+        # The imported target body rotates with its armature root, while the
+        # generated rigid panels retain their object-space origin. Apply the
+        # same root rotation to generated meshes only for this evidence pose.
+        prone_root = Matrix.Rotation(math.radians(90.0), 4, "X")
+        prone_offset = Matrix.Translation((0.0, 0.40, 0.07))
+        for obj in garment_meshes:
+            obj.matrix_world = prone_offset @ prone_root @ _GARMENT_MESH_BASES[obj.name]
     bpy.context.view_layer.update()
 
 
@@ -197,6 +222,15 @@ def main() -> int:
             "crouch": ((1.72, -2.05, 0.68), (0.0, 0.0, 0.52), 1.30),
             "sit": ((1.72, -2.05, 0.68), (0.0, 0.0, 0.50), 1.30),
             "prone": ((1.90, -0.46, 0.86), (0.0, -0.44, 0.50), 1.38),
+        }
+    elif job["id"] == "siroino-aster-fold-utility-kimono-set":
+        camera_settings = {
+            "neutral": ((1.62, -1.90, 0.80), (0.0, 0.0, 0.62), 1.28),
+            "arms-up": ((1.72, -2.05, 0.98), (0.0, 0.0, 0.86), 1.58),
+            "arm-cross": ((1.62, -1.90, 0.80), (0.0, 0.0, 0.62), 1.28),
+            "crouch": ((1.72, -2.05, 0.62), (0.0, 0.0, 0.46), 1.28),
+            "sit": ((1.72, -2.05, 0.62), (0.0, 0.0, 0.44), 1.28),
+            "prone": ((1.90, -0.46, 0.80), (0.0, -0.44, 0.44), 1.36),
         }
 
     # Materialize the contract's five neutral turnaround views alongside the
