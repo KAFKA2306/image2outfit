@@ -5,6 +5,7 @@ Every frame uses the same generated garment and exact target body. The prone
 case rotates both armatures into an actual horizontal body orientation rather
 than merely bending the legs of an upright avatar.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -49,7 +50,9 @@ def clear(
         bone.scale = (1.0, 1.0, 1.0)
 
 
-def rotate(armature: bpy.types.Object, name: str, degrees: tuple[float, float, float]) -> None:
+def rotate(
+    armature: bpy.types.Object, name: str, degrees: tuple[float, float, float]
+) -> None:
     bone = armature.pose.bones.get(name)
     if bone is not None:
         bone.rotation_mode = "XYZ"
@@ -135,6 +138,9 @@ def import_target(job: dict) -> tuple[bpy.types.Object, bpy.types.Object]:
         if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
     )
     armature = next(obj for obj in imported if obj.type == "ARMATURE")
+    for obj in imported:
+        if obj not in {body, armature}:
+            bpy.data.objects.remove(obj, do_unlink=True)
     common.set_skin_material(body)
     return body, armature
 
@@ -183,6 +189,36 @@ def main() -> int:
         "sit": ((1.72, -2.05, 0.46), (0.0, 0.0, 0.30), 1.23),
         "prone": ((1.90, -0.46, 0.70), (0.0, -0.44, 0.17), 1.32),
     }
+    if job["id"] == "siroino-arc-latch-cocoon-bomber-set":
+        camera_settings = {
+            "neutral": ((1.62, -1.90, 0.86), (0.0, 0.0, 0.70), 1.30),
+            "arms-up": ((1.62, -1.90, 0.86), (0.0, 0.0, 0.70), 1.30),
+            "arm-cross": ((1.62, -1.90, 0.86), (0.0, 0.0, 0.70), 1.30),
+            "crouch": ((1.72, -2.05, 0.68), (0.0, 0.0, 0.52), 1.30),
+            "sit": ((1.72, -2.05, 0.68), (0.0, 0.0, 0.50), 1.30),
+            "prone": ((1.90, -0.46, 0.86), (0.0, -0.44, 0.50), 1.38),
+        }
+
+    # Materialize the contract's five neutral turnaround views alongside the
+    # required motion evidence.  The exact target armature is reset first so
+    # these views cannot inherit a pose from the previous render run.
+    apply_pose(armatures, base_transforms, "neutral")
+    preview_settings = {
+        "front": ((0.0, -2.45, 0.70), (0.0, 0.0, 0.42)),
+        "back": ((0.0, 2.45, 0.70), (0.0, 0.0, 0.42)),
+        "left": ((2.45, 0.0, 0.70), (0.0, 0.0, 0.42)),
+        "right": ((-2.45, 0.0, 0.70), (0.0, 0.0, 0.42)),
+        "three-quarter": ((1.62, -1.90, 0.70), (0.0, 0.0, 0.42)),
+    }
+    preview_paths: dict[str, Path] = {}
+    for name, (location, target) in preview_settings.items():
+        path = root / "Previews" / f"{name}.png"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        camera.data.ortho_scale = 1.30
+        common.point_camera(camera, location, target)
+        scene.render.filepath = str(path)
+        bpy.ops.render.render(write_still=True)
+        preview_paths[name] = path
 
     paths: dict[str, Path] = {}
     for name in ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"):
@@ -202,6 +238,9 @@ def main() -> int:
                 "passed": True,
                 "targetSource": job["targetSourcePath"],
                 "proneBodyOrientation": "horizontal",
+                "fiveViewPreviews": {
+                    name: str(path) for name, path in preview_paths.items()
+                },
                 "poses": {name: str(path) for name, path in paths.items()},
             },
             indent=2,
