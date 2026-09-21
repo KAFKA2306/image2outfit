@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-kite-panel-cardigan-dress-set",
+  "status": "manufacturing-checkpoint",
+  "evidence": {
+    "reference": "PASS",
+    "constructionContract": "PASS",
+    "pattern": "PASS",
+    "prototypeGeometry": "PASS",
+    "uv0": "PASS",
+    "materials": "PASS",
+    "canonicalJob": "UNVERIFIED",
+    "blenderBuild": "UNVERIFIED",
+    "fitRigWeight": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefab": "UNVERIFIED",
+    "fiveViews": "UNVERIFIED",
+    "poses": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat": "UNVERIFIED"
+  },
+  "prototype": {
+    "vertices": 56,
+    "polygonFaces": 14,
+    "namedGroups": 14,
+    "uvCoordinates": 56,
+    "materialRoles": 5,
+    "heroGroups": ["kite_panel_A","kite_panel_B","kite_panel_C","kite_panel_D","overlap_leaf_R"],
+    "note": "Flat panel manufacturing checkpoint only. Non-empty real OBJ geometry with UV0 and material assignments; not a fitted Blender candidate."
+  },
+  "blocker": {
+    "stage": "canonical-job",
+    "status": "UNVERIFIED",
+    "reason": "No repository-owned executable buildScript for this new product has been proven reusable yet; do not invent a one-off builder.",
+    "nextAction": "Connect this product to an existing reusable garment build path, create schema-valid job.json, then execute candidate/Blender fit and render evidence on the same Issue #504 workline."
+  }
+}
