@@ -47,7 +47,23 @@ class HypothesisExperimentEvaluationTests(unittest.TestCase):
             "semanticMasks": [],
         }
         if route == "C" and status == "PASS":
-            record["semanticMasks"] = [{"role": "wrinkle", "artifactSha256": "e" * 64}]
+            record["semanticMasks"] = [
+                {"role": "wrinkle", "artifactSha256": "e" * 64}
+            ]
+            record["maskConsumptionReceipts"] = [
+                {
+                    "maskArtifactSha256": "e" * 64,
+                    "outputArtifactSha256": "f" * 64,
+                }
+            ]
+            record["finalArtifactLineage"] = {
+                "candidateArtifactSha256": "1" * 64,
+                "includedAuthoredArtifactSha256s": ["f" * 64],
+            }
+            record["canonicalQualityReceipt"] = {
+                "candidateArtifactSha256": "1" * 64,
+                "qualityResultSha256": "2" * 64,
+            }
         return record
 
     def test_c_is_selected_when_quality_does_not_regress_and_elapsed_improves(
@@ -98,6 +114,44 @@ class HypothesisExperimentEvaluationTests(unittest.TestCase):
         c["semanticMasks"] = []
         with self.assertRaisesRegex(ValueError, "semantic mask"):
             validate_experiment_record(c)
+
+    def test_passing_c_binds_consumed_authored_output_to_final_candidate(self) -> None:
+        normalized = validate_experiment_record(
+            self.record("C", elapsed=70, findings=1)
+        )
+        self.assertEqual(
+            normalized["maskConsumptionReceipts"][0]["outputArtifactSha256"],
+            normalized["finalArtifactLineage"]["includedAuthoredArtifactSha256s"][0],
+        )
+        self.assertEqual(
+            normalized["finalArtifactLineage"]["candidateArtifactSha256"],
+            normalized["canonicalQualityReceipt"]["candidateArtifactSha256"],
+        )
+
+    def test_passing_c_rejects_authored_output_missing_from_final_candidate(self) -> None:
+        c = self.record("C", elapsed=70, findings=1)
+        c["finalArtifactLineage"]["includedAuthoredArtifactSha256s"] = ["3" * 64]
+        with self.assertRaisesRegex(ValueError, "missing authored artifacts"):
+            validate_experiment_record(c)
+
+    def test_passing_c_rejects_quality_receipt_for_different_candidate(self) -> None:
+        c = self.record("C", elapsed=70, findings=1)
+        c["canonicalQualityReceipt"]["candidateArtifactSha256"] = "3" * 64
+        with self.assertRaisesRegex(ValueError, "evaluate the final candidate"):
+            validate_experiment_record(c)
+
+    def test_passing_c_rejects_swapped_authored_output_hash(self) -> None:
+        c = self.record("C", elapsed=70, findings=1)
+        c["maskConsumptionReceipts"][0]["outputArtifactSha256"] = "4" * 64
+        with self.assertRaisesRegex(ValueError, "missing authored artifacts"):
+            validate_experiment_record(c)
+
+    def test_non_c_routes_do_not_require_final_artifact_lineage(self) -> None:
+        for route in ("A", "B"):
+            normalized = validate_experiment_record(
+                self.record(route, elapsed=70, findings=1)
+            )
+            self.assertNotIn("finalArtifactLineage", normalized)
 
     def test_input_record_is_not_mutated(self) -> None:
         record = self.record("B", elapsed=70, findings=1)

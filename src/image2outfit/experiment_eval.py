@@ -39,6 +39,104 @@ def _nonnegative_int(value: object, *, label: str) -> int:
     return value
 
 
+def _validate_final_artifact_lineage(
+    payload: Mapping[str, Any],
+    *,
+    semantic_masks: Sequence[Mapping[str, str]],
+) -> tuple[list[dict[str, str]], dict[str, Any], dict[str, str]]:
+    raw_receipts = payload.get("maskConsumptionReceipts")
+    if not isinstance(raw_receipts, list) or not raw_receipts:
+        raise ValueError("a passing C route must record maskConsumptionReceipts")
+
+    mask_hashes = {mask["artifactSha256"] for mask in semantic_masks}
+    receipts: list[dict[str, str]] = []
+    authored_hashes: set[str] = set()
+    for index, raw in enumerate(raw_receipts):
+        if not isinstance(raw, Mapping):
+            raise ValueError(f"maskConsumptionReceipts[{index}] must be an object")
+        mask_hash = _sha256(
+            raw.get("maskArtifactSha256"),
+            label=f"maskConsumptionReceipts[{index}].maskArtifactSha256",
+        )
+        output_hash = _sha256(
+            raw.get("outputArtifactSha256"),
+            label=f"maskConsumptionReceipts[{index}].outputArtifactSha256",
+        )
+        if mask_hash not in mask_hashes:
+            raise ValueError(
+                f"maskConsumptionReceipts[{index}] references an undeclared semantic mask"
+            )
+        if output_hash in authored_hashes:
+            raise ValueError(
+                "maskConsumptionReceipts outputArtifactSha256 values must be unique"
+            )
+        authored_hashes.add(output_hash)
+        receipts.append(
+            {
+                "maskArtifactSha256": mask_hash,
+                "outputArtifactSha256": output_hash,
+            }
+        )
+
+    raw_lineage = payload.get("finalArtifactLineage")
+    if not isinstance(raw_lineage, Mapping):
+        raise ValueError("a passing C route must record finalArtifactLineage")
+    candidate_hash = _sha256(
+        raw_lineage.get("candidateArtifactSha256"),
+        label="finalArtifactLineage.candidateArtifactSha256",
+    )
+    raw_included = raw_lineage.get("includedAuthoredArtifactSha256s")
+    if not isinstance(raw_included, list) or not raw_included:
+        raise ValueError(
+            "finalArtifactLineage.includedAuthoredArtifactSha256s must be a non-empty list"
+        )
+    included = [
+        _sha256(
+            value,
+            label=f"finalArtifactLineage.includedAuthoredArtifactSha256s[{index}]",
+        )
+        for index, value in enumerate(raw_included)
+    ]
+    if len(set(included)) != len(included):
+        raise ValueError(
+            "finalArtifactLineage.includedAuthoredArtifactSha256s must be unique"
+        )
+    missing = sorted(authored_hashes.difference(included))
+    if missing:
+        raise ValueError(
+            "final candidate is missing authored artifacts from mask consumption: "
+            f"{missing}"
+        )
+
+    raw_quality = payload.get("canonicalQualityReceipt")
+    if not isinstance(raw_quality, Mapping):
+        raise ValueError("a passing C route must record canonicalQualityReceipt")
+    quality_candidate_hash = _sha256(
+        raw_quality.get("candidateArtifactSha256"),
+        label="canonicalQualityReceipt.candidateArtifactSha256",
+    )
+    quality_result_hash = _sha256(
+        raw_quality.get("qualityResultSha256"),
+        label="canonicalQualityReceipt.qualityResultSha256",
+    )
+    if quality_candidate_hash != candidate_hash:
+        raise ValueError(
+            "canonical quality receipt must evaluate the final candidate artifact"
+        )
+
+    return (
+        receipts,
+        {
+            "candidateArtifactSha256": candidate_hash,
+            "includedAuthoredArtifactSha256s": included,
+        },
+        {
+            "candidateArtifactSha256": quality_candidate_hash,
+            "qualityResultSha256": quality_result_hash,
+        },
+    )
+
+
 def validate_experiment_record(
     payload: Mapping[str, Any],
     *,
@@ -132,7 +230,7 @@ def validate_experiment_record(
     if route == "C" and status == "PASS" and not normalized_masks:
         raise ValueError("a passing C route must record at least one semantic mask")
 
-    return {
+    normalized: dict[str, Any] = {
         "schemaVersion": 1,
         "route": route,
         "productId": product_id,
@@ -142,6 +240,15 @@ def validate_experiment_record(
         "canonicalQualityGatePassed": gate_passed,
         "semanticMasks": normalized_masks,
     }
+    if route == "C" and status == "PASS":
+        receipts, lineage, quality_receipt = _validate_final_artifact_lineage(
+            payload,
+            semantic_masks=normalized_masks,
+        )
+        normalized["maskConsumptionReceipts"] = receipts
+        normalized["finalArtifactLineage"] = lineage
+        normalized["canonicalQualityReceipt"] = quality_receipt
+    return normalized
 
 
 def compare_experiment_records(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
