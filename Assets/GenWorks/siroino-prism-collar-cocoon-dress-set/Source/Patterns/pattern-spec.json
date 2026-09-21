@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-prism-collar-cocoon-dress-set",
+  "units": "meters",
+  "constructionProfile": "panel-sewn",
+  "heroDetail": {
+    "name": "four-piece-prism-collar",
+    "geometryRequired": true,
+    "parts": ["collar_front_L","collar_front_R","collar_center","collar_side_L"],
+    "minimumThicknessMm": 2.0,
+    "textureOnlyForbidden": true
+  },
+  "parts": [
+    {"id":"bodice_front","count":1,"material":"MAT_Prism_Graphite","grain":"vertical","seams":["shoulder_L","shoulder_R","side_L","side_R","waist_front"]},
+    {"id":"bodice_back","count":1,"material":"MAT_Prism_Graphite","grain":"vertical","seams":["shoulder_L","shoulder_R","side_L","side_R","waist_back","center_back_zip"]},
+    {"id":"collar_front_L","count":1,"material":"MAT_Prism_Mist","grain":"bias","seams":["collar_center_L","neck_L"]},
+    {"id":"collar_front_R","count":1,"material":"MAT_Prism_Ivory","grain":"bias","seams":["collar_center_R","neck_R"]},
+    {"id":"collar_center","count":1,"material":"MAT_Prism_Ivory","grain":"bias","seams":["collar_center_L","collar_center_R"]},
+    {"id":"collar_side_L","count":1,"material":"MAT_Prism_Ivory","grain":"bias","seams":["neck_L","collar_return_L"]},
+    {"id":"skirt_front","count":1,"material":"MAT_Prism_Ivory","grain":"vertical","seams":["waist_front","side_L","side_R","hem_front"]},
+    {"id":"skirt_back","count":1,"material":"MAT_Prism_Ivory","grain":"vertical","seams":["waist_back","side_L","side_R","hem_back"]},
+    {"id":"box_pleat_L","count":1,"material":"MAT_Prism_Mist","grain":"vertical","seams":["pleat_L_in","pleat_L_out"]},
+    {"id":"box_pleat_R","count":1,"material":"MAT_Prism_Mist","grain":"vertical","seams":["pleat_R_in","pleat_R_out"]},
+    {"id":"waist_facing","count":1,"material":"MAT_Prism_Graphite","grain":"horizontal","seams":["waist_front","waist_back"]},
+    {"id":"center_accent","count":1,"material":"MAT_Prism_Plum","grain":"vertical","seams":["accent_top","accent_bottom"]}
+  ],
+  "uv": {
+    "channel": 0,
+    "heroDetailUniqueIslands": true,
+    "separateIslands": ["collar_front_L","collar_front_R","collar_center","collar_side_L","box_pleat_L","box_pleat_R","center_accent"]
+  },
+  "topology": {
+    "deformationZones": ["neck","shoulder","underarm","waist","upper-thigh"],
+    "preferred": "quad-dominant",
+    "forbid": ["non-manifold","zero-area-face","duplicate-shell"]
+  },
+  "lod": {"lod0TriangleBudget":20000,"preserveOrder":["silhouette","prism-collar","box-pleats","center-accent","micro-trim"]}
+}
