@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-generic-structural",
+  "id": "siroino-bellows-knee-utility-set",
+  "productName": "Bellows Knee Utility Set",
+  "adapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-bellows-knee-utility-set",
+  "productManifestPath": "Assets/GenWorks/siroino-bellows-knee-utility-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-bellows-knee-utility-set/Source/Blender/BellowsKneeUtilitySet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-bellows-knee-utility-set/Models/BellowsKneeUtilitySet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-bellows-knee-utility-set/Prefab/BellowsKneeUtilitySet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-bellows-knee-utility-set/Prefab/SiroinoSotai_BellowsKneeUtilitySet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-bellows-knee-utility-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/README.md",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Source/Blender/BellowsKneeUtilitySet.blend",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Models/BellowsKneeUtilitySet.fbx",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Prefab/BellowsKneeUtilitySet.prefab",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Prefab/SiroinoSotai_BellowsKneeUtilitySet.prefab",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/front.png",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/back.png",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/left.png",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/right.png",
+    "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-bellows-knee-utility-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-bellows-knee-utility-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-bellows-knee-utility-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-bellows-knee-utility-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Shell", "role": "fabric"},
+      {"material": "MAT_Inner", "role": "fabric"},
+      {"material": "MAT_Bottoms", "role": "fabric"},
+      {"material": "MAT_Hero", "role": "trim"},
+      {"material": "MAT_Accent", "role": "trim"}
+    ]
+  }
+}
