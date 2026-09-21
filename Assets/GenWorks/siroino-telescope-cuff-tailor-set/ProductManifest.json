@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-telescope-cuff-tailor-set",
+  "productName": "Telescope Cuff Tailor Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-telescope-cuff-tailor-set",
+  "sourceJobPath": "config/products/siroino-telescope-cuff-tailor-set/job.json",
+  "generatedAt": "2026-09-15T04:10:00+09:00",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "structuralPrototype": "PASS",
+    "canonicalJob": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "technicalGates": {
+    "blender": "UNVERIFIED",
+    "uvMapping": "PASS",
+    "weightTransfer": "UNVERIFIED",
+    "exactBodyPoseRenders": "UNVERIFIED",
+    "latestGeometryRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabSerialized": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-telescope-cuff-tailor-set",
+    "doNotRebuildFromZero": true,
+    "issue": 555,
+    "resumeFrom": "config/products/siroino-telescope-cuff-tailor-set/job.json",
+    "blockers": []
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-telescope-cuff-tailor-set/Source/Prototype/structural.obj",
+    "sha256": "79b66cbb9e3ac0257e38a2e134be3901941da701ca98b1f861428acd53cdbfa4",
+    "vertices": 80,
+    "uvCoordinates": 80,
+    "polygonFaces": 20,
+    "namedGroups": 20,
+    "materialRoles": 5,
+    "heroGroups": ["cuff_L_A", "cuff_L_B", "cuff_L_C", "cuff_R_A", "cuff_R_B", "cuff_R_C", "cuff_facing_L", "cuff_facing_R"]
+  }
+}

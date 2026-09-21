@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-telescope-cuff-tailor-set",
+  "units": "m",
+  "source": {
+    "manufacturingReference": "Assets/GenWorks/siroino-telescope-cuff-tailor-set/References/telescope-cuff-tailor-set-manufacturing-sheet.svg",
+    "designRevision": "telescope-cuff-v1"
+  },
+  "panels": [
+    {"id":"vest_front_L","role":"shell","material":"MAT_Shell"},
+    {"id":"vest_front_R","role":"shell","material":"MAT_Shell"},
+    {"id":"vest_back","role":"shell","material":"MAT_Shell"},
+    {"id":"sleeve_L","role":"shell","material":"MAT_Shell"},
+    {"id":"sleeve_R","role":"shell","material":"MAT_Shell"},
+    {"id":"inner_front","role":"inner","material":"MAT_Inner"},
+    {"id":"inner_back","role":"inner","material":"MAT_Inner"},
+    {"id":"trouser_front_L","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"trouser_front_R","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"trouser_back_L","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"trouser_back_R","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"waistband","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"cuff_L_A","role":"hero","material":"MAT_Hero"},
+    {"id":"cuff_L_B","role":"hero","material":"MAT_Accent"},
+    {"id":"cuff_L_C","role":"hero","material":"MAT_Hero"},
+    {"id":"cuff_R_A","role":"hero","material":"MAT_Hero"},
+    {"id":"cuff_R_B","role":"hero","material":"MAT_Accent"},
+    {"id":"cuff_R_C","role":"hero","material":"MAT_Hero"},
+    {"id":"cuff_facing_L","role":"hero-facing","material":"MAT_Hero"},
+    {"id":"cuff_facing_R","role":"hero-facing","material":"MAT_Hero"}
+  ],
+  "heroDetail": {
+    "id": "paired-telescope-cuff",
+    "requiredGroups": ["cuff_L_A","cuff_L_B","cuff_L_C","cuff_R_A","cuff_R_B","cuff_R_C","cuff_facing_L","cuff_facing_R"],
+    "requirements": ["real geometry", "three nested stages per forearm", "bounded corresponding-arm deformation", "unique UV islands"]
+  },
+  "fitZones": ["shoulder","elbow","forearm","wrist","waist","hip","knee"],
+  "acceptance": {
+    "structuralGroups": 20,
+    "heroGroups": 8,
+    "minimumMaterialRoles": 4,
+    "lod0TriangleTarget": 22000
+  }
+}
