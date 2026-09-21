@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-framecut-zip-shirt-set",
+  "productName": "Framecut Zip Shirt Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-framecut-zip-shirt-set",
+  "documentationPath": "Assets/GenWorks/siroino-framecut-zip-shirt-set/README.md",
+  "generatedAt": "2026-09-14T06:43:00Z",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-framecut-zip-shirt-set",
+    "resumeFrom": "Assets/GenWorks/siroino-framecut-zip-shirt-set/Models/framecut-zip-shirt-set-prototype.obj",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "No compatible reusable current-main buildScript has been proven for this new panel set. Do not bind the product to an unrelated product-specific builder."
+    ],
+    "nextAction": "Prove a reusable repository-owned garment build entrypoint, then add schema-valid config/products/siroino-framecut-zip-shirt-set/job.json and execute the exact candidate through hosted Blender."
+  },
+  "prototype": {
+    "artifact": "Assets/GenWorks/siroino-framecut-zip-shirt-set/Models/framecut-zip-shirt-set-prototype.obj",
+    "validation": "Assets/GenWorks/siroino-framecut-zip-shirt-set/Evidence/prototype-validation.json",
+    "sha256": "343c796059d8a2a832f6d7b183589234108646f914d43fc867815242ab511ee9",
+    "vertices": 36,
+    "uvCoordinates": 36,
+    "polygonFaces": 9,
+    "namedGroups": 9,
+    "degenerateFaces": 0,
+    "heroGroups": ["chest_frame_outer", "chest_frame_inner", "zip_bridge"]
+  },
+  "technicalGates": {
+    "constructionContract": "PASS",
+    "patternDecomposition": "PASS",
+    "prototypeGeometry": "PASS",
+    "prototypeUV0": "PASS",
+    "heroGeometry": "PASS",
+    "prototypeStructuralValidation": "PASS",
+    "avatarFit": "UNVERIFIED",
+    "rigging": "UNVERIFIED",
+    "weighting": "UNVERIFIED",
+    "fbxExport": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "designRevision": "v1-framecut-zip"
+}
