@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-verdant-ranger-explorer-set",
+  "profile": "panel-sewn",
+  "target": "Siroino _Large via official shape keys",
+  "designRevision": "v1-longline-tunic-articulated-trouser",
+  "panels": [
+    "tunic-front",
+    "tunic-back",
+    "tunic-side-left",
+    "tunic-side-right",
+    "cream-inner-front",
+    "cream-inner-back",
+    "trouser-upper-left",
+    "trouser-upper-right",
+    "trouser-lower-left",
+    "trouser-lower-right",
+    "knee-gusset-left-upper",
+    "knee-gusset-left-lower",
+    "knee-gusset-right-upper",
+    "knee-gusset-right-lower"
+  ],
+  "separateGeometry": ["mandarin-collar-facing", "front-center-pleat", "back-yoke-facing", "split-tail-side-vent-facings", "four-knee-gusset-facings"],
+  "priorityFitZones": ["neck", "shoulders", "chest", "waist", "hip", "knee", "ankle", "split-tail-hem"],
+  "researchTrial": {
+    "method": "explicit tunic/trouser panel layout plus native Blender Cloth settlement for four tunic panels",
+    "physicalSewingStitch": "tunic-side-panels-to-tunic-front-and-back",
+    "review": "render the pattern layout before assembly and five-view/six-pose evidence after settlement"
+  },
+  "clothSimulation": {
+    "applicability": "REQUIRED",
+    "components": ["Verdant_Tunic_Front", "Verdant_Tunic_Back", "Verdant_Tunic_Side_L", "Verdant_Tunic_Side_R"],
+    "evidence": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Build/cloth-simulation.json",
+    "reason": "The longline tunic is a loose outer layer; four pinned panels must be physically settled against the target body."
+  },
+  "releaseBoundary": "Keep WORKING until the replacement-source audit, current Blender source, cloth evidence, five views, six poses, and direct visual review pass.",
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "The deterministic target-fit build owns shape-key transfer from Siroino; the vendor smoothing operator is not required."
+  }
+}
+

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-verdant-ranger-explorer-set",
+  "stitches": [
+    {"stitchId": "tunic-left-side", "first": {"pieceId": "tunic-front", "edge": "left-side"}, "second": {"pieceId": "tunic-side-left", "edge": "front"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "tunic-right-side", "first": {"pieceId": "tunic-front", "edge": "right-side"}, "second": {"pieceId": "tunic-side-right", "edge": "front"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "tunic-left-back", "first": {"pieceId": "tunic-back", "edge": "left-side"}, "second": {"pieceId": "tunic-side-left", "edge": "back"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "tunic-right-back", "first": {"pieceId": "tunic-back", "edge": "right-side"}, "second": {"pieceId": "tunic-side-right", "edge": "back"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "tunic-front-cloth", "first": {"pieceId": "tunic-front", "edge": "top"}, "second": {"pieceId": "cream-inner", "edge": "chest"}, "type": "attachment", "easingRatio": 1.0, "realization": "Blender Cloth pin group"},
+    {"stitchId": "tunic-back-cloth", "first": {"pieceId": "tunic-back", "edge": "top"}, "second": {"pieceId": "cream-inner", "edge": "back"}, "type": "attachment", "easingRatio": 1.0, "realization": "Blender Cloth pin group"},
+    {"stitchId": "knee-gusset-left", "first": {"pieceId": "knee-gusset", "edge": "left"}, "second": {"pieceId": "trouser-upper-left-right", "edge": "knee"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "knee-gusset-right", "first": {"pieceId": "knee-gusset", "edge": "right"}, "second": {"pieceId": "trouser-upper-left-right", "edge": "knee"}, "type": "plain", "easingRatio": 1.0}
+  ],
+  "unresolved": [{"item": "exact factory seam allowance", "status": "not-observable", "decision": "use 6–10 mm by panel function"}]
+}
