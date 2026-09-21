@@ -60,7 +60,9 @@ def sha256(path: Path) -> str:
 
 def write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def plain_material(name, color, roughness, metallic=0.0):
@@ -102,7 +104,12 @@ def make_pattern_layout(path: Path) -> None:
     except OSError:
         title_font = ImageFont.load_default()
         label_font = title_font
-    draw.text((36, 24), "SAGE BREEZE ONEPIECE — PANEL / SEAM / UV LAYOUT", fill=(244, 244, 238), font=title_font)
+    draw.text(
+        (36, 24),
+        "SAGE BREEZE ONEPIECE — PANEL / SEAM / UV LAYOUT",
+        fill=(244, 244, 238),
+        font=title_font,
+    )
     panels = [
         ("Breeze Front L/R", [(70, 150), (310, 120), (330, 460), (100, 480)]),
         ("Breeze Back", [(370, 120), (610, 145), (600, 480), (350, 460)]),
@@ -113,14 +120,37 @@ def make_pattern_layout(path: Path) -> None:
     ]
     for label, points in panels:
         draw.polygon(points, fill=(207, 207, 191), outline=(143, 158, 132), width=4)
-        center = (sum(point[0] for point in points) // len(points), sum(point[1] for point in points) // len(points))
-        draw.text((center[0] - 70, center[1] - 12), label, fill=(40, 43, 42), font=label_font)
-    draw.text((36, 930), "Closed column shell • exactly two recessed wind-pleat channels • one three-plate leaf clasp • no belt, strap or cape", fill=(190, 201, 184), font=label_font)
+        center = (
+            sum(point[0] for point in points) // len(points),
+            sum(point[1] for point in points) // len(points),
+        )
+        draw.text(
+            (center[0] - 70, center[1] - 12), label, fill=(40, 43, 42), font=label_font
+        )
+    draw.text(
+        (36, 930),
+        "Closed column shell • exactly two recessed wind-pleat channels • one three-plate leaf clasp • no belt, strap or cape",
+        fill=(190, 201, 184),
+        font=label_font,
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     image.save(path, optimize=True)
 
 
-def ribbon_panel(name, side, z_min, z_max, y_center, y_width, material, armature, body, *, x_offset=0.0, z_steps=30):
+def ribbon_panel(
+    name,
+    side,
+    z_min,
+    z_max,
+    y_center,
+    y_width,
+    material,
+    armature,
+    body,
+    *,
+    x_offset=0.0,
+    z_steps=30,
+):
     vertices = []
     for row in range(z_steps + 1):
         z = z_min + (z_max - z_min) * row / z_steps
@@ -138,10 +168,25 @@ def ribbon_panel(name, side, z_min, z_max, y_center, y_width, material, armature
         for column in range(2):
             a = row * 3 + column
             faces.append((a, a + 1, a + 4, a + 3))
-    return base.mesh_object(name, vertices, faces, material, armature, body, solidify=True)
+    return base.mesh_object(
+        name, vertices, faces, material, armature, body, solidify=True
+    )
 
 
-def breeze_side_wrap_panel(name, side, z_min, z_max, material, armature, body, *, y_front=-0.164, y_back=0.108, y_steps=12, z_steps=34):
+def breeze_side_wrap_panel(
+    name,
+    side,
+    z_min,
+    z_max,
+    material,
+    armature,
+    body,
+    *,
+    y_front=-0.164,
+    y_back=0.108,
+    y_steps=12,
+    z_steps=34,
+):
     """Close the shell with a tapered side panel that meets the shoulders."""
     vertices = []
     for row in range(z_steps + 1):
@@ -167,10 +212,26 @@ def breeze_side_wrap_panel(name, side, z_min, z_max, material, armature, body, *
         for column in range(y_steps):
             a = row * stride + column
             faces.append((a, a + 1, a + stride + 1, a + stride))
-    return base.mesh_object(name, vertices, faces, material, armature, body, solidify=True)
+    return base.mesh_object(
+        name, vertices, faces, material, armature, body, solidify=True
+    )
 
 
-def breeze_back_panel(name, z_min, z_max, material, armature, body, *, x_top=0.255, x_bottom=0.294, vent_top=0.50, vent_gap=0.032, x_steps=12, z_steps=34):
+def breeze_back_panel(
+    name,
+    z_min,
+    z_max,
+    material,
+    armature,
+    body,
+    *,
+    x_top=0.255,
+    x_bottom=0.294,
+    vent_top=0.50,
+    vent_gap=0.032,
+    x_steps=12,
+    z_steps=34,
+):
     """Build one back Cloth object with a real center-back walking vent."""
     vertices = []
     rows = []
@@ -196,12 +257,23 @@ def breeze_back_panel(name, z_min, z_max, material, armature, body, *, x_top=0.2
             lower = rows[row][side_index]
             upper = rows[row + 1][side_index]
             for column in range(x_steps):
-                faces.append((lower[column], lower[column + 1], upper[column + 1], upper[column]))
-    return base.mesh_object(name, vertices, faces, material, armature, body, solidify=True)
+                faces.append(
+                    (lower[column], lower[column + 1], upper[column + 1], upper[column])
+                )
+    return base.mesh_object(
+        name, vertices, faces, material, armature, body, solidify=True
+    )
 
 
 def leaf_plate(name, center_x, center_z, scale, angle, material, armature, body, layer):
-    local = [(-0.030, 0.0), (-0.005, 0.020), (0.038, 0.012), (0.052, 0.0), (0.014, -0.020), (-0.020, -0.018)]
+    local = [
+        (-0.030, 0.0),
+        (-0.005, 0.020),
+        (0.038, 0.012),
+        (0.052, 0.0),
+        (0.014, -0.020),
+        (-0.020, -0.018),
+    ]
     vertices = []
     for x, z in local:
         x *= scale
@@ -210,7 +282,9 @@ def leaf_plate(name, center_x, center_z, scale, angle, material, armature, body,
         rz = x * math.sin(angle) + z * math.cos(angle)
         vertices.append((center_x + rx, -0.207 - layer * 0.004, center_z + rz))
     faces = [(0, 1, 2), (0, 2, 3), (0, 3, 4), (0, 4, 5)]
-    return base.mesh_object(name, vertices, faces, material, armature, body, solidify=True)
+    return base.mesh_object(
+        name, vertices, faces, material, armature, body, solidify=True
+    )
 
 
 def add_shape_keys(obj, body):
@@ -228,15 +302,40 @@ def add_shape_keys(obj, body):
         target = obj.shape_key_add(name=name)
         for vertex in obj.data.vertices:
             _, index, _ = tree.find(obj.matrix_world @ vertex.co)
-            delta = body.matrix_world.to_3x3() @ (source.data[index].co - body.data.vertices[index].co)
-            target.data[vertex.index].co = vertex.co + obj.matrix_world.to_3x3().inverted() @ delta
+            delta = body.matrix_world.to_3x3() @ (
+                source.data[index].co - body.data.vertices[index].co
+            )
+            target.data[vertex.index].co = (
+                vertex.co + obj.matrix_world.to_3x3().inverted() @ delta
+            )
 
 
 def add_seams(armature, material):
     return [
-        base.import_base.curve_tube("Sage_Breeze_Front_Center_Seam", [(0.0, -0.174, 1.055), (0.0, -0.178, 0.78), (0.0, -0.176, 0.25)], 0.0023, material, armature, "Chest"),
-        base.import_base.curve_tube("Sage_Breeze_Back_Vent_L", [(-0.017, 0.120, 0.50), (-0.017, 0.122, 0.27)], 0.0025, material, armature, "Hips"),
-        base.import_base.curve_tube("Sage_Breeze_Back_Vent_R", [(0.017, 0.120, 0.50), (0.017, 0.122, 0.27)], 0.0025, material, armature, "Hips"),
+        base.import_base.curve_tube(
+            "Sage_Breeze_Front_Center_Seam",
+            [(0.0, -0.174, 1.055), (0.0, -0.178, 0.78), (0.0, -0.176, 0.25)],
+            0.0023,
+            material,
+            armature,
+            "Chest",
+        ),
+        base.import_base.curve_tube(
+            "Sage_Breeze_Back_Vent_L",
+            [(-0.017, 0.120, 0.50), (-0.017, 0.122, 0.27)],
+            0.0025,
+            material,
+            armature,
+            "Hips",
+        ),
+        base.import_base.curve_tube(
+            "Sage_Breeze_Back_Vent_R",
+            [(0.017, 0.120, 0.50), (0.017, 0.122, 0.27)],
+            0.0025,
+            material,
+            armature,
+            "Hips",
+        ),
     ]
 
 
@@ -257,7 +356,11 @@ def main() -> int:
     base.clean_scene()
     source = repo_path(job["targetSourcePath"])
     bpy.ops.import_scene.fbx(filepath=str(source), use_anim=False)
-    body = next(obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC"))
+    body = next(
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
+    )
     armature = next(obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE")
     armature.name = "SiroinoSotai_Armature"
     for obj in list(bpy.context.scene.objects):
@@ -267,7 +370,20 @@ def main() -> int:
     import_base.set_skin_material(body)
 
     product_root = repo_path(job["productRoot"])
-    for relative in ("Source/Blender", "Source/Patterns", "Models", "Textures", "Materials", "Prefab", "Previews/Poses", "Evidence/Build", "Demo", "Editor", "Tests", "Documentation"):
+    for relative in (
+        "Source/Blender",
+        "Source/Patterns",
+        "Models",
+        "Textures",
+        "Materials",
+        "Prefab",
+        "Previews/Poses",
+        "Evidence/Build",
+        "Demo",
+        "Editor",
+        "Tests",
+        "Documentation",
+    ):
         (product_root / relative).mkdir(parents=True, exist_ok=True)
     make_texture_maps(product_root / "Textures")
     shell = plain_material("MAT_BreezeShell", (0.52, 0.42, 0.27, 1.0), 0.78)
@@ -276,8 +392,22 @@ def main() -> int:
     brass = plain_material("MAT_BreezeHardware", (0.32, 0.18, 0.045, 1.0), 0.32, 0.65)
 
     garments = [
-        import_base.extract_surface(body, armature, "Sage_Breeze_Sleeve_L", lambda c: 0.79 <= c.z <= 1.08 and c.x < -0.255, shell, 0.014),
-        import_base.extract_surface(body, armature, "Sage_Breeze_Sleeve_R", lambda c: 0.79 <= c.z <= 1.08 and c.x > 0.255, shell, 0.014),
+        import_base.extract_surface(
+            body,
+            armature,
+            "Sage_Breeze_Sleeve_L",
+            lambda c: 0.79 <= c.z <= 1.08 and c.x < -0.255,
+            shell,
+            0.014,
+        ),
+        import_base.extract_surface(
+            body,
+            armature,
+            "Sage_Breeze_Sleeve_R",
+            lambda c: 0.79 <= c.z <= 1.08 and c.x > 0.255,
+            shell,
+            0.014,
+        ),
     ]
 
     def front_y(x, z):
@@ -290,51 +420,129 @@ def main() -> int:
         across = max(0.0, 1.0 - (x / 0.30) ** 2)
         return 0.130 + 0.022 * across + 0.008 * (0.96 - z)
 
-    garments.extend([
-        base.tapered_grid_panel("Sage_Breeze_Front", 0.255, 0.300, 0.22, 1.055, front_y, shell, armature, body, x_steps=24, z_steps=34, solidify=True),
-        breeze_back_panel("Sage_Breeze_Back", 0.22, 1.055, shell, armature, body),
-        breeze_side_wrap_panel("Sage_Breeze_Side_L", -1.0, 0.22, 1.055, shell, armature, body),
-        breeze_side_wrap_panel("Sage_Breeze_Side_R", 1.0, 0.22, 1.055, shell, armature, body),
-    ])
+    garments.extend(
+        [
+            base.tapered_grid_panel(
+                "Sage_Breeze_Front",
+                0.255,
+                0.300,
+                0.22,
+                1.055,
+                front_y,
+                shell,
+                armature,
+                body,
+                x_steps=24,
+                z_steps=34,
+                solidify=True,
+            ),
+            breeze_back_panel("Sage_Breeze_Back", 0.22, 1.055, shell, armature, body),
+            breeze_side_wrap_panel(
+                "Sage_Breeze_Side_L", -1.0, 0.22, 1.055, shell, armature, body
+            ),
+            breeze_side_wrap_panel(
+                "Sage_Breeze_Side_R", 1.0, 0.22, 1.055, shell, armature, body
+            ),
+        ]
+    )
 
     tunnel_names = []
     for side_name, side in (("L", -1), ("R", 1)):
-        for role, material, center, width, offset in (("Outer", facing, -0.135, 0.018, 0.006), ("Inner", moss, -0.101, 0.014, 0.012), ("Facing", facing, -0.064, 0.018, 0.018)):
+        for role, material, center, width, offset in (
+            ("Outer", facing, -0.135, 0.018, 0.006),
+            ("Inner", moss, -0.101, 0.014, 0.012),
+            ("Facing", facing, -0.064, 0.018, 0.018),
+        ):
             name = f"Sage_Wind_Tunnel_{role}_{side_name}"
-            garments.append(ribbon_panel(name, side, 0.31, 0.77, center, width, material, armature, body, x_offset=offset))
+            garments.append(
+                ribbon_panel(
+                    name,
+                    side,
+                    0.31,
+                    0.77,
+                    center,
+                    width,
+                    material,
+                    armature,
+                    body,
+                    x_offset=offset,
+                )
+            )
             tunnel_names.append(name)
 
     collar = import_base.collar_mesh(moss, armature)
     collar.name = "Sage_Stand_Collar"
     garments.append(collar)
-    for index, (x, z, scale, angle) in enumerate(((-0.018, 1.067, 1.0, -0.25), (0.014, 1.073, 0.84, 0.35), (0.0, 1.047, 0.70, 1.48)), start=1):
-        garments.append(leaf_plate(f"Sage_Leaf_Clasp_{index}", x, z, scale, angle, moss, armature, body, index))
+    for index, (x, z, scale, angle) in enumerate(
+        (
+            (-0.018, 1.067, 1.0, -0.25),
+            (0.014, 1.073, 0.84, 0.35),
+            (0.0, 1.047, 0.70, 1.48),
+        ),
+        start=1,
+    ):
+        garments.append(
+            leaf_plate(
+                f"Sage_Leaf_Clasp_{index}",
+                x,
+                z,
+                scale,
+                angle,
+                moss,
+                armature,
+                body,
+                index,
+            )
+        )
     garments.extend(add_seams(armature, brass))
 
-    excluded_from_shape_keys = {"Sage_Breeze_Front", "Sage_Breeze_Back", "Sage_Breeze_Side_L", "Sage_Breeze_Side_R", *tunnel_names}
+    excluded_from_shape_keys = {
+        "Sage_Breeze_Front",
+        "Sage_Breeze_Back",
+        "Sage_Breeze_Side_L",
+        "Sage_Breeze_Side_R",
+        *tunnel_names,
+    }
     for obj in garments:
         if obj.type == "MESH" and obj.name not in excluded_from_shape_keys:
             add_shape_keys(obj, body)
 
-    cloth_names = ["Sage_Breeze_Front", "Sage_Breeze_Back", "Sage_Breeze_Side_L", "Sage_Breeze_Side_R"]
+    cloth_names = [
+        "Sage_Breeze_Front",
+        "Sage_Breeze_Back",
+        "Sage_Breeze_Side_L",
+        "Sage_Breeze_Side_R",
+    ]
     for name in cloth_names:
         obj = bpy.data.objects[name]
         pin = obj.vertex_groups.new(name="Image2Outfit Cloth Pin")
-        pin.add([vertex.index for vertex in obj.data.vertices if vertex.co.z >= 0.96], 1.0, "REPLACE")
+        pin.add(
+            [vertex.index for vertex in obj.data.vertices if vertex.co.z >= 0.96],
+            1.0,
+            "REPLACE",
+        )
         obj["image2outfit_role"] = "cloth-panel"
 
     blend_path = repo_path(job["blendPath"])
-    bpy.ops.wm.save_as_mainfile(filepath=str(blend_path), check_existing=False, compress=True)
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(blend_path), check_existing=False, compress=True
+    )
     _, camera = import_base.studio_setup()
     camera.data.ortho_scale = 1.42
     target = (0.0, -0.005, 0.70)
     previews = {name: repo_path(path) for name, path in job["previewPaths"].items()}
     base.render_product_views(camera, previews, target)
-    pose_paths = base.render_poses(armature, camera, repo_path(job["posePaths"]["neutral"]).parent, target)
+    pose_paths = base.render_poses(
+        armature, camera, repo_path(job["posePaths"]["neutral"]).parent, target
+    )
     multiview = product_root / "Previews" / f"{PRODUCT_ID}-multiview.webp"
     import_base.contact_sheet(previews, multiview)
     pose_review = product_root / "Previews" / f"{PRODUCT_ID}-pose-review.webp"
-    base.contact_sheet_named(pose_paths, pose_review, ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"))
+    base.contact_sheet_named(
+        pose_paths,
+        pose_review,
+        ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
+    )
     pattern_layout = product_root / "Previews" / "pattern-layout.png"
     make_pattern_layout(pattern_layout)
 
@@ -347,27 +555,136 @@ def main() -> int:
     base.write_integrated_prefab(prefab_path, integrated)
     measured = base.metrics(garments)
     report = {
-        "schemaVersion": 1, "productId": PRODUCT_ID, "status": "WORKING", "checkedAt": utc_now(), "blenderVersion": bpy.app.version_string,
-        "targetSource": str(source.relative_to(ROOT)).replace("\\", "/"), "targetSourceSha256": sha256(source), "shapeProfile": profile, "metrics": measured,
-        "clothComponents": cloth_names, "clothSimulation": "PENDING_BAKE",
-        "previews": {name: {"path": str(path.relative_to(ROOT)).replace("\\", "/"), "sha256": sha256(path), "width": Image.open(path).width, "height": Image.open(path).height} for name, path in previews.items()},
-        "poses": {name: {"path": str(path.relative_to(ROOT)).replace("\\", "/"), "sha256": sha256(path), "width": Image.open(path).width, "height": Image.open(path).height} for name, path in pose_paths.items()},
-        "design": {"construction": "closed ankle-above breeze-column onepiece with exactly two side wind-pleat tunnels, compact stand collar, three-plate leaf clasp and center-back walking vent", "excludedOverlap": ["broad belt", "thigh strap", "exposed high side slit", "cape", "detached sleeves", "rear bow", "hanging strap field"], "windTunnelAssemblies": 2, "leafClaspPlates": 3},
+        "schemaVersion": 1,
+        "productId": PRODUCT_ID,
+        "status": "WORKING",
+        "checkedAt": utc_now(),
+        "blenderVersion": bpy.app.version_string,
+        "targetSource": str(source.relative_to(ROOT)).replace("\\", "/"),
+        "targetSourceSha256": sha256(source),
+        "shapeProfile": profile,
+        "metrics": measured,
+        "clothComponents": cloth_names,
+        "clothSimulation": "PENDING_BAKE",
+        "previews": {
+            name: {
+                "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": sha256(path),
+                "width": Image.open(path).width,
+                "height": Image.open(path).height,
+            }
+            for name, path in previews.items()
+        },
+        "poses": {
+            name: {
+                "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": sha256(path),
+                "width": Image.open(path).width,
+                "height": Image.open(path).height,
+            }
+            for name, path in pose_paths.items()
+        },
+        "design": {
+            "construction": "closed ankle-above breeze-column onepiece with exactly two side wind-pleat tunnels, compact stand collar, three-plate leaf clasp and center-back walking vent",
+            "excludedOverlap": [
+                "broad belt",
+                "thigh strap",
+                "exposed high side slit",
+                "cape",
+                "detached sleeves",
+                "rear bow",
+                "hanging strap field",
+            ],
+            "windTunnelAssemblies": 2,
+            "leafClaspPlates": 3,
+        },
     }
     write_json(product_root / "Evidence/Build/product-build-report.json", report)
     manifest = {
-        "schemaVersion": 1, "productId": PRODUCT_ID, "productName": job["productName"], "status": "WORKING", "targetAdapterId": job["adapterId"], "productRoot": job["productRoot"],
-        "outfitPrefabPath": job["prefabAssetPath"], "integratedPrefabPath": job["integratedPrefabAssetPath"], "previewPath": job["previewPaths"]["front"], "documentationPath": f"{job['productRoot']}/README.md", "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json",
-        "outputs": {"blend": job["blendPath"], "fbx": job["fbxAssetPath"], "prefab": job["prefabAssetPath"], "integratedPrefab": job["integratedPrefabAssetPath"], "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"), "poseReview": str(pose_review.relative_to(ROOT)).replace("\\", "/")},
-        "technicalGates": {"blender": "PASS", "editableSource": "PASS", "fbx": "PASS", "prefabDeclared": "PASS", "fiveViewEvidence": "PASS", "poseEvidence": "PASS", "visualAppearanceReview": "REVIEW_REQUIRED", "clothSimulation": "PENDING_BAKE", "unityImport": "UNVERIFIED", "modularAvatar": "UNVERIFIED", "ndmf": "UNVERIFIED", "vrchatRuntime": "UNVERIFIED"},
-        "metrics": measured, "reference": {"status": "REPAIRED_REPLACEMENT_BOARD_GENERATED", "exactIssueImageAvailable": False, "replacementPath": f"{job['productRoot']}/References/sage-breeze-onepiece-manufacturing-board-replacement.png"},
-        "handoff": {"resumable": True, "canonicalWorkspace": job["productRoot"], "resumeFrom": job["prefabAssetPath"], "doNotRebuildFromZero": True, "blockers": ["exact original Issue PNG was unavailable in this Windows workspace; replacement board is persisted", "visual review and shoulder/pleat deformation review remain required", "Unity/Modular Avatar/NDMF and VRChat SDK dry-run are not executed by this Blender build"]},
+        "schemaVersion": 1,
+        "productId": PRODUCT_ID,
+        "productName": job["productName"],
+        "status": "WORKING",
+        "targetAdapterId": job["adapterId"],
+        "productRoot": job["productRoot"],
+        "outfitPrefabPath": job["prefabAssetPath"],
+        "integratedPrefabPath": job["integratedPrefabAssetPath"],
+        "previewPath": job["previewPaths"]["front"],
+        "documentationPath": f"{job['productRoot']}/README.md",
+        "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json",
+        "outputs": {
+            "blend": job["blendPath"],
+            "fbx": job["fbxAssetPath"],
+            "prefab": job["prefabAssetPath"],
+            "integratedPrefab": job["integratedPrefabAssetPath"],
+            "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"),
+            "poseReview": str(pose_review.relative_to(ROOT)).replace("\\", "/"),
+        },
+        "technicalGates": {
+            "blender": "PASS",
+            "editableSource": "PASS",
+            "fbx": "PASS",
+            "prefabDeclared": "PASS",
+            "fiveViewEvidence": "PASS",
+            "poseEvidence": "PASS",
+            "visualAppearanceReview": "REVIEW_REQUIRED",
+            "clothSimulation": "PENDING_BAKE",
+            "unityImport": "UNVERIFIED",
+            "modularAvatar": "UNVERIFIED",
+            "ndmf": "UNVERIFIED",
+            "vrchatRuntime": "UNVERIFIED",
+        },
+        "metrics": measured,
+        "reference": {
+            "status": "REPAIRED_REPLACEMENT_BOARD_GENERATED",
+            "exactIssueImageAvailable": False,
+            "replacementPath": f"{job['productRoot']}/References/sage-breeze-onepiece-manufacturing-board-replacement.png",
+        },
+        "handoff": {
+            "resumable": True,
+            "canonicalWorkspace": job["productRoot"],
+            "resumeFrom": job["prefabAssetPath"],
+            "doNotRebuildFromZero": True,
+            "blockers": [
+                "exact original Issue PNG was unavailable in this Windows workspace; replacement board is persisted",
+                "visual review and shoulder/pleat deformation review remain required",
+                "Unity/Modular Avatar/NDMF and VRChat SDK dry-run are not executed by this Blender build",
+            ],
+        },
     }
     write_json(repo_path(job["productManifestPath"]), manifest)
-    (product_root / "README.md").write_text("# Sage Breeze Onepiece\n\nRepaired Issue #675 construction: a closed ankle-above breeze-column onepiece with exactly two side-seam wind-pleat tunnels, a compact stand collar, a three-plate leaf clasp and a center-back walking vent. Broad belts, thigh straps, exposed high slits, capes, detached sleeves, rear bows and hanging straps are intentionally excluded.\n\nThe original Issue PNG was unavailable in this Windows workspace. The persisted replacement manufacturing board is evidence of the repaired construction only and does not claim exact-source identity. Native Blender Cloth remains required for the four shell panels before release.\n", encoding="utf-8")
-    reference = product_root / "References/sage-breeze-onepiece-manufacturing-board-replacement.png"
-    source_files = [blend_path, fbx_path, prefab_path, integrated, multiview, pose_review, pattern_layout, reference, *previews.values(), *pose_paths.values(), product_root / "README.md", repo_path(job["productManifestPath"]), product_root / "Evidence/Build/product-build-report.json"]
-    (product_root / "SOURCE_HASHES.txt").write_text("\n".join(f"{sha256(path)}  {path.relative_to(product_root).as_posix()}" for path in sorted(source_files) if path.is_file()) + "\n", encoding="utf-8")
+    (product_root / "README.md").write_text(
+        "# Sage Breeze Onepiece\n\nRepaired Issue #675 construction: a closed ankle-above breeze-column onepiece with exactly two side-seam wind-pleat tunnels, a compact stand collar, a three-plate leaf clasp and a center-back walking vent. Broad belts, thigh straps, exposed high slits, capes, detached sleeves, rear bows and hanging straps are intentionally excluded.\n\nThe original Issue PNG was unavailable in this Windows workspace. The persisted replacement manufacturing board is evidence of the repaired construction only and does not claim exact-source identity. Native Blender Cloth remains required for the four shell panels before release.\n",
+        encoding="utf-8",
+    )
+    reference = (
+        product_root
+        / "References/sage-breeze-onepiece-manufacturing-board-replacement.png"
+    )
+    source_files = [
+        blend_path,
+        fbx_path,
+        prefab_path,
+        integrated,
+        multiview,
+        pose_review,
+        pattern_layout,
+        reference,
+        *previews.values(),
+        *pose_paths.values(),
+        product_root / "README.md",
+        repo_path(job["productManifestPath"]),
+        product_root / "Evidence/Build/product-build-report.json",
+    ]
+    (product_root / "SOURCE_HASHES.txt").write_text(
+        "\n".join(
+            f"{sha256(path)}  {path.relative_to(product_root).as_posix()}"
+            for path in sorted(source_files)
+            if path.is_file()
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
