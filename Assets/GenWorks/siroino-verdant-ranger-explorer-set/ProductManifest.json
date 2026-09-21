@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-verdant-ranger-explorer-set",
+  "productName": "Verdant Ranger Explorer Set for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0-large",
+  "productRoot": "Assets/GenWorks/siroino-verdant-ranger-explorer-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoVerdantRangerExplorer.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoSotai_VerdantRangerExplorer.prefab",
+  "previewPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/README.md",
+  "sourceJobPath": "config/products/siroino-verdant-ranger-explorer-set/job.json",
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Source/Blender/SiroinoVerdantRangerExplorer.blend",
+    "fbx": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Models/SiroinoVerdantRangerExplorer.fbx",
+    "prefab": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoVerdantRangerExplorer.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoSotai_VerdantRangerExplorer.prefab",
+    "multiview": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/siroino-verdant-ranger-explorer-set-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/siroino-verdant-ranger-explorer-set-pose-review.webp",
+    "clothSimulation": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Build/cloth-simulation.json",
+    "scene": "Assets/Scenes/Avatar/11_VerdantRangerExplorer.unity",
+    "continuousAvatarUploader": "Assets/UnityMCP_CAU/verdant-ranger-explorer-set.asset",
+    "ndmfBakedPrefab": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/NDMF-Bake/SiroinoSotai_VerdantRangerExplorer_baked 1.prefab",
+    "unityValidation": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/verdant-ranger-explorer-unity-validation.json",
+    "vrcDryRun": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/verdant-ranger-explorer-vrc-dry-run.json",
+    "vrcAvatarAudit": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/verdant-ranger-explorer-vrc-avatar-audit.json"
+  },
+  "technicalGates": {
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "PENDING",
+    "clothSimulation": "PASS",
+    "unityImport": "PASS",
+    "modularAvatar": "PASS",
+    "ndmf": "PASS",
+    "vrchatRuntime": "DRY_RUN_PASS"
+  },
+  "metrics": {
+    "meshObjects": 20,
+    "vertices": 31662,
+    "triangles": 61024,
+    "degenerateTriangles": 0,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "maxBoneInfluences": 5
+  },
+  "clothSimulation": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Build/cloth-simulation.json",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-verdant-ranger-explorer-set",
+    "resumeFrom": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoVerdantRangerExplorer.prefab",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "reference-audit remains FAIL_EXACT_ORIGINAL_MISSING_REPLACEMENT_PERSISTED because the exact Issue PNG was unavailable",
+      "visualAppearanceReview remains PENDING until direct review",
+      "real VRChat upload was not performed; only SDK dry-run evidence was recorded",
+      "baked avatar audit is VeryPoor at 77,724 polygons and has no mapped viseme mesh; optimization/review remains pending"
+    ]
+  }
+}

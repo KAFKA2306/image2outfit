@@ -37,6 +37,12 @@ COMPONENTS: dict[str, tuple[str, ...]] = {
         "Lunar_Overskirt_Left",
         "Lunar_Overskirt_Right",
     ),
+    "siroino-verdant-ranger-explorer-set": (
+        "Verdant_Tunic_Front",
+        "Verdant_Tunic_Back",
+        "Verdant_Tunic_Side_L",
+        "Verdant_Tunic_Side_R",
+    ),
 }
 
 FRAME_END = {
@@ -47,6 +53,7 @@ FRAME_END = {
     "siroino-nocturne-angel-set": 24,
     "siroino-wide-cargo": 18,
     "siroino-lunar-tech-hoodie": 30,
+    "siroino-verdant-ranger-explorer-set": 30,
 }
 
 
