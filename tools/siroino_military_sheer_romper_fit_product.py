@@ -145,6 +145,63 @@ def finish(
     return result
 
 
+def finish_surface(
+    obj: bpy.types.Object,
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    values: dict[str, float],
+    source_indices: list[int],
+    *,
+    fit_audit: bool,
+) -> bpy.types.Object:
+    """Transfer weights/shape keys from the exact source vertices used for extraction."""
+    if len(source_indices) != len(obj.data.vertices):
+        raise RuntimeError(
+            f"source vertex map mismatch for {obj.name}: "
+            f"{len(source_indices)} != {len(obj.data.vertices)}"
+        )
+
+    world = obj.matrix_world.copy()
+    groups = {
+        group.name: obj.vertex_groups.new(name=group.name)
+        for group in body.vertex_groups
+    }
+    for vertex, source_index in zip(
+        obj.data.vertices,
+        source_indices,
+        strict=True,
+    ):
+        assignments = body.data.vertices[source_index].groups
+        total = sum(item.weight for item in assignments)
+        if total <= 0.0:
+            continue
+        for assignment in assignments:
+            source_group = body.vertex_groups[assignment.group]
+            groups[source_group.name].add(
+                [vertex.index],
+                assignment.weight / total,
+                "REPLACE",
+            )
+
+    fit.add_nearest_shape_keys(obj, body, source_indices, values)
+    parent = body.parent if body.parent is not None else armature
+    obj.parent = parent
+    if body.parent is not None:
+        obj.parent_type = body.parent_type
+        obj.parent_bone = body.parent_bone
+        obj.matrix_parent_inverse = body.matrix_parent_inverse.copy()
+    modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
+    modifier.object = armature
+    modifier.use_deform_preserve_volume = True
+    obj["image2outfit_role"] = "garment"
+    obj["image2outfit_fit_audit"] = fit_audit
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = True
+    obj.matrix_world = world
+    bpy.context.view_layer.update()
+    return obj
+
+
 def extract(
     body: bpy.types.Object,
     armature: bpy.types.Object,
@@ -200,11 +257,13 @@ def extract(
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     obj.matrix_world = body.matrix_world.copy()
-    obj = fit.finish_skinned(
+    source_indices = list(used.keys())
+    obj = finish_surface(
         obj,
         body,
         armature,
         values,
+        source_indices,
         fit_audit=fit_audit,
     )
     obj["image2outfit_base_vertex_count"] = len(obj.data.vertices)
@@ -319,6 +378,98 @@ def rigid_button(
     return parent_rigid(obj, armature, semantic)
 
 
+def rigid_chain(
+    name: str,
+    points: list[tuple[float, float, float]],
+    material: bpy.types.Material,
+    armature: bpy.types.Object,
+    semantic: str,
+    radius: float,
+) -> bpy.types.Object:
+    curve = bpy.data.curves.new(f"{name}_Curve", "CURVE")
+    curve.dimensions = "3D"
+    curve.bevel_depth = radius
+    curve.bevel_resolution = 3
+    spline = curve.splines.new("BEZIER")
+    spline.bezier_points.add(len(points) - 1)
+    for point, coordinate in zip(spline.bezier_points, points, strict=True):
+        point.co = coordinate
+        point.handle_left_type = "AUTO"
+        point.handle_right_type = "AUTO"
+    obj = bpy.data.objects.new(name, curve)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(material)
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.convert(target="MESH")
+    obj = bpy.context.object
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = True
+    obj["image2outfit_attachment"] = "local-rigid-decoration"
+    obj["image2outfit_nominal_path_length_m"] = sum(
+        (Vector(second) - Vector(first)).length
+        for first, second in zip(points, points[1:])
+    )
+    return parent_rigid(obj, armature, semantic)
+
+
+def decorative_part_audit(
+    body: bpy.types.Object,
+    garments: list[bpy.types.Object],
+) -> dict[str, object]:
+    minimum, maximum = bounds(body)
+    height = max(maximum.z - minimum.z, 1e-6)
+    objects: dict[str, object] = {}
+    passed = True
+    for obj in garments:
+        if not obj.name.startswith("Military_Shoulder_Chain_"):
+            continue
+        points = [obj.matrix_world @ vertex.co for vertex in obj.data.vertices]
+        if not points:
+            objects[obj.name] = {"passed": False, "reason": "empty chain mesh"}
+            passed = False
+            continue
+        diagonal = (
+            Vector(
+                (
+                    max(point.x for point in points),
+                    max(point.y for point in points),
+                    max(point.z for point in points),
+                )
+            )
+            - Vector(
+                (
+                    min(point.x for point in points),
+                    min(point.y for point in points),
+                    min(point.z for point in points),
+                )
+            )
+        ).length
+        nominal = float(obj.get("image2outfit_nominal_path_length_m", 0.0))
+        parent_ok = obj.parent_type == "BONE" and obj.parent is not None
+        size_ok = diagonal <= height * 0.24 and nominal <= height * 0.30
+        item_passed = parent_ok and size_ok
+        passed = passed and item_passed
+        objects[obj.name] = {
+            "boundsDiagonalM": diagonal,
+            "nominalPathLengthM": nominal,
+            "maximumBoundsDiagonalM": height * 0.24,
+            "maximumNominalPathLengthM": height * 0.30,
+            "parentType": obj.parent_type,
+            "parentBone": obj.parent_bone,
+            "passed": item_passed,
+        }
+    if len(objects) != 3:
+        passed = False
+    return {
+        "chainCount": len(objects),
+        "expectedChainCount": 3,
+        "objects": objects,
+        "passed": passed,
+    }
+
+
 def hardware(
     body: bpy.types.Object,
     armature: bpy.types.Object,
@@ -404,6 +555,39 @@ def hardware(
                 semantic,
             )
         )
+    shoulder_candidates = [
+        item
+        for semantic in ("upper_arm_l", "upper_arm_r")
+        if (item := segment(armature, semantic)) is not None
+    ]
+    if shoulder_candidates:
+        shoulder = max(shoulder_candidates, key=lambda item: item[0].x)[0]
+        sign = 1.0 if shoulder.x >= center.x else -1.0
+        anchor_x = shoulder.x - sign * height * 0.020
+        for index, drop in enumerate((0.080, 0.096, 0.112), start=1):
+            points = [
+                (anchor_x, front + height * 0.002, shoulder.z - height * 0.010),
+                (
+                    center.x + sign * torso_width * (0.70 - index * 0.05),
+                    front - height * 0.010,
+                    shoulder.z - height * drop,
+                ),
+                (
+                    center.x + sign * torso_width * (0.46 - index * 0.04),
+                    front - height * 0.006,
+                    shoulder.z - height * (drop + 0.055),
+                ),
+            ]
+            objects.append(
+                rigid_chain(
+                    f"Military_Shoulder_Chain_{index}",
+                    points,
+                    gold,
+                    armature,
+                    "chest",
+                    height * 0.0022,
+                )
+            )
     return objects
 
 
@@ -645,6 +829,8 @@ def target_fit_audit(
         and minimum is not None
         and minimum >= -0.003
     )
+    decorative = decorative_part_audit(body, garments)
+    passed = passed and decorative["passed"]
     return {
         "schemaVersion": 1,
         "target": "SiroinoSotai_PC",
@@ -659,6 +845,7 @@ def target_fit_audit(
         ),
         "maximumClearanceMeters": max(clearances) if clearances else None,
         "objects": per_object,
+        "decorativePartAudit": decorative,
         "passed": passed,
     }
 
@@ -683,7 +870,7 @@ def main() -> int:
     fit.build_outfit = build
     fit.target_fit_audit = target_fit_audit
     fit.configure_scene = scene
-    fit.REVISION = "siroino-pc-base-surface-fit-v12"
+    fit.REVISION = "siroino-pc-base-surface-fit-v14-exact-surface-source"
     return fit.main()
 
 
