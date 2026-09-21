@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-hinged-pannier-jacket-dress",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-hinged-pannier-fan",
+  "panels": [
+    "jacket_front_L", "jacket_front_R", "jacket_back", "sleeve_L", "sleeve_R", "cuff_L", "cuff_R",
+    "inner_front", "inner_back", "bottom_front", "bottom_back", "waistband_outer", "waistband_inner"
+  ],
+  "separateGeometry": [
+    "pannier_L_A", "pannier_L_B", "pannier_L_C", "pannier_R_A", "pannier_R_B", "pannier_R_C",
+    "pannier_facing_L_A", "pannier_facing_L_B", "pannier_facing_L_C",
+    "pannier_facing_R_A", "pannier_facing_R_B", "pannier_facing_R_C", "hinge_root_L", "hinge_root_R"
+  ],
+  "priorityFitZones": ["shoulder", "elbow", "waist", "hip", "upper-leg", "pannier-root"],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "weight-driven first technical pass",
+    "reason": "The bounded pannier fans are structured skinned geometry; technical acceptance must not depend on unexecuted cloth simulation."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "No product-specific corrective shape-key stage is required for the first structural candidate."
+  },
+  "releaseBoundary": "Canonical release policy remains authoritative; this workline does not infer customer release from contract creation."
+}
