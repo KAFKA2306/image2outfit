@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-signal-fold-transit-tabard",
+  "productName": "Signal Fold Transit Tabard for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-signal-fold-transit-tabard",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSignalFoldTransitTabard.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSotai_SignalFoldTransitTabard.prefab",
+  "previewPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/README.md",
+  "sourceJobPath": "config/products/siroino-signal-fold-transit-tabard/job.json",
+  "productBuildScript": "tools/siroino_signal_fold_transit_tabard_build.py",
+  "designRevision": "v1-closed-tabard-two-side-wedges-signal-fold",
+  "reference": {
+    "status": "ISSUE_VISIBLE_CONSTRUCTION_RECORDED_SOURCE_IMAGE_UNAVAILABLE",
+    "issue": 669,
+    "sourcePath": "/mnt/data/a_detailed_concept_art_design_sheet_poster_a_cl.png",
+    "exactIssueImageAvailable": false,
+    "repositoryContainsSourceImage": false,
+    "note": "The Issue records the exact generated board path but neither the local attachment nor a GitHub-visible binary is available in this workspace."
+  },
+  "technicalGates": {
+    "referenceAudit": "UNVERIFIED",
+    "patternContract": "PASS",
+    "blender": "PENDING_RETRY",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "PASS",
+    "clothSimulation": "NOT_REQUIRED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Source/Blender/SiroinoSignalFoldTransitTabard.blend",
+    "fbx": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Models/SiroinoSignalFoldTransitTabard.fbx",
+    "prefab": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSignalFoldTransitTabard.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSotai_SignalFoldTransitTabard.prefab"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-signal-fold-transit-tabard",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSignalFoldTransitTabard.prefab",
+    "blockers": [
+      "Issue #669 exact generated board is not GitHub-visible in this workspace",
+      "Unity/Modular Avatar/NDMF/VRChat runtime evidence is not executed in the isolated Blender workflow",
+      "direct visual review remains required"
+    ]
+  }
+}
