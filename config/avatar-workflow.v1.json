@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "workflowId": "siroino-avatar-workflow",
+  "project": {
+    "unityVersion": "2022.3.22f1",
+    "buildPlatform": "Windows",
+    "packages": {
+      "com.vrchat.avatars": "3.10.4",
+      "com.vrchat.base": "3.10.4",
+      "nadena.dev.modular-avatar": "1.17.1",
+      "nadena.dev.ndmf": "1.14.1",
+      "com.anatawa12.avatar-optimizer": "1.9.16",
+      "com.anatawa12.continuous-avatar-uploader": "0.3.12"
+    }
+  },
+  "paths": {
+    "bakeRoot": "Assets/UnityMCP_Bakes",
+    "cauRoot": "Assets/UnityMCP_CAU",
+    "runtimeRoot": ".image2outfit/avatar-workflow",
+    "ledger": ".image2outfit/avatar-workflow/upload-ledger.json",
+    "visualBaselineRoot": ".image2outfit/avatar-workflow/visual-baselines",
+    "visualAfterRoot": ".image2outfit/avatar-workflow/visual-after",
+    "visualDiffRoot": ".image2outfit/avatar-workflow/visual-diffs",
+    "visualDiffReport": ".image2outfit/avatar-workflow/cloth-visual-diff.json"
+  },
+  "scenes": {
+    "workbench": "Assets/Scenes/Avatar/00_SiroinoOutfitWorkbench.unity"
+  },
+  "sceneCapture": {
+    "cameraPath": "AvatarPreviewStage/PreviewCamera",
+    "view": "camera",
+    "localPosition": {
+      "x": 0.0,
+      "y": 0.58,
+      "z": 2.7
+    },
+    "localRotationQuaternion": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0,
+      "w": 0.0
+    },
+    "orthographic": true,
+    "orthographicSize": 0.7
+  },
+  "visual": {
+    "requiredPaths": [
+      "front.png",
+      "back.png",
+      "left.png",
+      "right.png",
+      "three-quarter.png",
+      "Poses/arm-cross.png",
+      "Poses/arms-up.png",
+      "Poses/crouch.png",
+      "Poses/neutral.png",
+      "Poses/prone.png",
+      "Poses/sit.png"
+    ],
+    "warningMeanAbsoluteError": 0.03
+  },
+  "outfits": [
+    {
+      "id": "blue-happi",
+      "name": "Siroino Blue Happi",
+      "productId": "siroino-blue-happi",
+      "prefab": "Assets/UnityMCP_Bakes/blue/SiroinoSotai_BlueHappi_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/blue-happi.asset",
+      "visualRoot": "Assets/GenWorks/siroino-blue-happi/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-blue-happi/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/01_BlueHappi.unity"
+    },
+    {
+      "id": "cyber-kawaii-large",
+      "name": "Siroino Cyber Kawaii Large",
+      "productId": "siroino-cyber-kawaii-large",
+      "prefab": "Assets/UnityMCP_Bakes/cyber/SiroinoSotai_CyberKawaii_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/cyber-kawaii-large.asset",
+      "visualRoot": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-cyber-kawaii-large/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/02_CyberKawaii.unity"
+    },
+    {
+      "id": "heather-hooded-bodysuit",
+      "name": "Siroino Heather Hooded Bodysuit",
+      "productId": "siroino-heather-hooded-bodysuit",
+      "prefab": "Assets/UnityMCP_Bakes/heather/SiroinoSotai_HeatherHoodedBodysuit_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/heather-hooded-bodysuit.asset",
+      "visualRoot": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/03_HeatherHoodedBodysuit.unity"
+    },
+    {
+      "id": "lace-halter-large",
+      "name": "Siroino Lace Halter Large",
+      "productId": "siroino-lace-halter-large",
+      "prefab": "Assets/UnityMCP_Bakes/lace/Siroino_Large_LaceHalter_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/lace-halter-large.asset",
+      "visualRoot": "Assets/GenWorks/siroino-lace-halter-large/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-lace-halter-large/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/04_LaceHalter.unity"
+    },
+    {
+      "id": "military-sheer-romper-large",
+      "name": "Siroino Military Sheer Romper Large",
+      "productId": "siroino-military-sheer-romper-large",
+      "prefab": "Assets/UnityMCP_Bakes/military-fixed2/Siroino_Large_MilitarySheerRomper_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/military-sheer-romper-large.asset",
+      "visualRoot": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-military-sheer-romper-large/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/05_MilitarySheerRomper.unity"
+    },
+    {
+      "id": "nocturne-angel-set",
+      "name": "Siroino Nocturne Angel Set",
+      "productId": "siroino-nocturne-angel-set",
+      "prefab": "Assets/UnityMCP_Bakes/nocturne/SiroinoSotai_NocturneAngelSet_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/nocturne-angel-set.asset",
+      "visualRoot": "Assets/GenWorks/siroino-nocturne-angel-set/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-nocturne-angel-set/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/06_NocturneAngelSet.unity"
+    },
+    {
+      "id": "tuxedo-halter-dress-large",
+      "name": "Siroino Tuxedo Halter Dress Large",
+      "productId": "siroino-tuxedo-halter-dress-large",
+      "prefab": "Assets/UnityMCP_Bakes/tuxedo/Siroino_Large_TuxedoHalterDress_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/tuxedo-halter-dress-large.asset",
+      "visualRoot": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/07_TuxedoHalterDress.unity"
+    },
+    {
+      "id": "white-ghost-gown",
+      "name": "Siroino White Ghost Gown",
+      "productId": "siroino-white-ghost-gown",
+      "prefab": "Assets/UnityMCP_Bakes/white/Siroino_Large_WhiteGhostGown_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/white-ghost-gown.asset",
+      "visualRoot": "Assets/GenWorks/siroino-white-ghost-gown/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/08_WhiteGhostGown.unity"
+    },
+    {
+      "id": "wide-cargo",
+      "name": "Siroino Wide Cargo",
+      "productId": "siroino-wide-cargo",
+      "prefab": "Assets/UnityMCP_Bakes/wide/SiroinoSotai_WideCargo_baked.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/wide-cargo.asset",
+      "visualRoot": "Assets/GenWorks/siroino-wide-cargo/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-wide-cargo/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/09_WideCargo.unity"
+    },
+    {
+      "id": "verdant-ranger-explorer-set",
+      "name": "Siroino Verdant Ranger Explorer Set",
+      "productId": "siroino-verdant-ranger-explorer-set",
+      "prefab": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/NDMF-Bake/SiroinoSotai_VerdantRangerExplorer_baked 1.prefab",
+      "cauSetting": "Assets/UnityMCP_CAU/verdant-ranger-explorer-set.asset",
+      "visualRoot": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews",
+      "clothEvidence": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Build/cloth-simulation.json",
+      "scene": "Assets/Scenes/Avatar/11_VerdantRangerExplorer.unity"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ The design is intentionally not a replica of a retail garment. It keeps the
 useful visual grammar—wide legs, knee openings, asymmetric belts, cargo pockets,
 and metal hardware—while producing an original, logo-free Unity product.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -53,7 +54,9 @@ def make_texture_maps(directory: Path) -> dict[str, Path]:
             weft = math.sin(y * math.tau / 11.0)
             diagonal = math.sin((x + y * 1.7) * math.tau / 31.0)
             micro = math.sin(x * 0.61 + y * 0.37)
-            value = max(4, min(18, int(9 + 2 * warp + 1.5 * weft + 2 * diagonal + micro)))
+            value = max(
+                4, min(18, int(9 + 2 * warp + 1.5 * weft + 2 * diagonal + micro))
+            )
             maps["fabric_albedo"].append((value, value + 1, value + 3))
             maps["fabric_normal"].append(
                 (
@@ -112,8 +115,14 @@ def clean_topology(obj: bpy.types.Object) -> None:
         triangle.polygon_index
         for triangle in mesh.loop_triangles
         if (
-            (mesh.vertices[triangle.vertices[1]].co - mesh.vertices[triangle.vertices[0]].co)
-            .cross(mesh.vertices[triangle.vertices[2]].co - mesh.vertices[triangle.vertices[0]].co)
+            (
+                mesh.vertices[triangle.vertices[1]].co
+                - mesh.vertices[triangle.vertices[0]].co
+            )
+            .cross(
+                mesh.vertices[triangle.vertices[2]].co
+                - mesh.vertices[triangle.vertices[0]].co
+            )
             .length_squared
             <= 1e-20
         )
@@ -374,12 +383,22 @@ def create_outfit(
     for side_name, side in (("L", -1), ("R", 1)):
         objects.append(
             asymmetric_leg_shell(
-                f"Cargo_UpperLeg_{side_name}", side, list(upper_rings), fabric, armature, body
+                f"Cargo_UpperLeg_{side_name}",
+                side,
+                list(upper_rings),
+                fabric,
+                armature,
+                body,
             )
         )
         objects.append(
             asymmetric_leg_shell(
-                f"Cargo_LowerLeg_{side_name}", side, list(lower_rings), fabric, armature, body
+                f"Cargo_LowerLeg_{side_name}",
+                side,
+                list(lower_rings),
+                fabric,
+                armature,
+                body,
             )
         )
 
@@ -510,10 +529,26 @@ def create_outfit(
         )
     )
     objects.append(
-        buckle("Front_Belt_Buckle", (0.071, -0.116, 0.794), 0.015, 0.013, metal, armature, body)
+        buckle(
+            "Front_Belt_Buckle",
+            (0.071, -0.116, 0.794),
+            0.015,
+            0.013,
+            metal,
+            armature,
+            body,
+        )
     )
     objects.append(
-        buckle("Side_Belt_Buckle", (-0.148, -0.045, 0.819), 0.012, 0.011, metal, armature, body)
+        buckle(
+            "Side_Belt_Buckle",
+            (-0.148, -0.045, 0.819),
+            0.012,
+            0.011,
+            metal,
+            armature,
+            body,
+        )
     )
 
     objects.append(
@@ -532,7 +567,9 @@ def create_outfit(
         )
     )
     objects.append(
-        buckle("Center_Zip_Pull", (0.0, -0.124, 0.614), 0.006, 0.010, metal, armature, body)
+        buckle(
+            "Center_Zip_Pull", (0.0, -0.124, 0.614), 0.006, 0.010, metal, armature, body
+        )
     )
 
     return objects
@@ -668,10 +705,14 @@ def main() -> int:
 
     _, camera = c.studio_setup()
     camera.data.ortho_scale = 1.20
-    preview_paths = {name: repo_path(value) for name, value in job["previewPaths"].items()}
+    preview_paths = {
+        name: repo_path(value) for name, value in job["previewPaths"].items()
+    }
     neutral_pose = studio_previews(camera, armature, preview_paths)
     contact_sheet(preview_paths, preview_dir / "siroino-wide-cargo-multiview.webp")
-    contact_sheet(neutral_pose, preview_dir / "siroino-wide-cargo-pose-review.webp", columns=1)
+    contact_sheet(
+        neutral_pose, preview_dir / "siroino-wide-cargo-pose-review.webp", columns=1
+    )
 
     c.reset_pose(armature)
     body.hide_render = True
@@ -750,7 +791,7 @@ def main() -> int:
             "integratedPrefabPath": "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab",
             "previewPath": "Assets/GenWorks/siroino-wide-cargo/Previews/front.png",
             "documentationPath": "Assets/GenWorks/siroino-wide-cargo/README.md",
-            "sourceJobPath": "Assets/_Local/Jobs/siroino-wide-cargo/job.json",
+            "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json",
             "generatedAt": report["checkedAt"],
             "blenderVersion": report["blenderVersion"],
             "metrics": metrics,

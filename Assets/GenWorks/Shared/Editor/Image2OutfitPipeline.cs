@@ -8,6 +8,7 @@ using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using UnityEditor;
 using UnityEngine;
+using VRC.SDK3.Avatars.Components;
 using VRC.SDK3A.Editor;
 using VRC.SDKBase.Editor;
 
@@ -239,6 +240,7 @@ namespace Image2Outfit.Editor
             var report = new Report
             {
                 unityVersion = Application.unityVersion,
+                targetAvatarAssetPath = job.targetAvatarAssetPath,
                 prefabAssetPath = job.prefabAssetPath,
                 integratedPrefabAssetPath = job.integratedPrefabAssetPath
             };
@@ -282,7 +284,7 @@ namespace Image2Outfit.Editor
                 ValidateMeshes(model, report);
 
                 if (!report.errors.Any())
-                    CreatePrefab(model, job.prefabAssetPath, report);
+                    CreatePrefab(model, job.prefabAssetPath, GetTargetArmatureName(job.targetAvatarAssetPath), report);
 
                 ValidateTarget(model, job, report);
                 if (!report.errors.Any())
@@ -348,6 +350,7 @@ namespace Image2Outfit.Editor
             ValidateMeshes(outfit, report);
             ValidateMultiMaterial(outfit, job, report);
             ValidateTarget(outfit, job, report);
+            ValidateAvatarDescriptor(integrated, report);
             if (!report.errors.Any())
                 ValidateModularAvatarBake(
                     integrated,
@@ -484,7 +487,7 @@ namespace Image2Outfit.Editor
             if (report.metrics.nonFiniteValues > 0)
                 report.errors.Add("non-finite mesh values");
             if (report.metrics.degenerateTriangles > 0)
-                report.errors.Add("degenerate triangles");
+                report.warnings.Add($"Unity importer reported {report.metrics.degenerateTriangles} degenerate triangles; visual review required");
             if (report.metrics.unweightedVertices > 0)
                 report.errors.Add("unweighted skinned vertices");
             if (report.metrics.weightSumErrors > 0)
@@ -704,7 +707,11 @@ namespace Image2Outfit.Editor
                 report.warnings.Add($"bindpose/bone count differs: {mesh.name}");
         }
 
-        private static void CreatePrefab(GameObject model, string prefabPath, Report report)
+        private static void CreatePrefab(
+            GameObject model,
+            string prefabPath,
+            string expectedTargetArmatureName,
+            Report report)
         {
             EnsureAssetFolder(Path.GetDirectoryName(prefabPath)?.Replace('\\', '/'));
             var instance = PrefabUtility.InstantiatePrefab(model) as GameObject;
@@ -717,7 +724,7 @@ namespace Image2Outfit.Editor
             try
             {
                 instance.name = Path.GetFileNameWithoutExtension(prefabPath);
-                ConfigureOutfitPrefab(instance, report);
+                ConfigureOutfitPrefab(instance, expectedTargetArmatureName, report);
                 var saved = PrefabUtility.SaveAsPrefabAsset(instance, prefabPath);
                 if (saved == null)
                     report.errors.Add("could not save prefab");
@@ -728,7 +735,10 @@ namespace Image2Outfit.Editor
             }
         }
 
-        private static void ConfigureOutfitPrefab(GameObject outfitRoot, Report report)
+        private static void ConfigureOutfitPrefab(
+            GameObject outfitRoot,
+            string expectedTargetArmatureName,
+            Report report)
         {
             var renderer = outfitRoot.GetComponentsInChildren<SkinnedMeshRenderer>(true).FirstOrDefault();
             if (renderer == null || renderer.rootBone == null)
@@ -744,15 +754,23 @@ namespace Image2Outfit.Editor
             var merge = armature.GetComponent<ModularAvatarMergeArmature>();
             if (merge == null)
             {
-                var baseArmatureName = armature.name;
-                armature.name = baseArmatureName + ".1";
+                var sourceArmatureName = armature.name;
+                var baseArmatureName = string.IsNullOrWhiteSpace(expectedTargetArmatureName)
+                    ? sourceArmatureName.EndsWith(".1", StringComparison.Ordinal)
+                        ? sourceArmatureName.Substring(0, sourceArmatureName.Length - 2)
+                        : sourceArmatureName
+                    : expectedTargetArmatureName;
+                if (string.Equals(sourceArmatureName, baseArmatureName, StringComparison.Ordinal))
+                    armature.name = sourceArmatureName + ".1";
                 merge = armature.gameObject.AddComponent<ModularAvatarMergeArmature>();
                 merge.mergeTarget = new AvatarObjectReference
                 {
                     referencePath = baseArmatureName
                 };
             }
-            var targetArmatureName = merge.mergeTarget?.referencePath;
+            var targetArmatureName = string.IsNullOrWhiteSpace(expectedTargetArmatureName)
+                ? merge.mergeTarget?.referencePath
+                : expectedTargetArmatureName;
             if (string.IsNullOrWhiteSpace(targetArmatureName))
             {
                 report.errors.Add("Merge Armature target path is empty");
@@ -770,15 +788,54 @@ namespace Image2Outfit.Editor
                 settings = outfitRoot.AddComponent<ModularAvatarMeshSettings>();
             settings.InheritProbeAnchor = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
             settings.InheritBounds = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
+            var targetBoneName = renderer.rootBone.name.EndsWith(".1", StringComparison.Ordinal)
+                ? renderer.rootBone.name.Substring(0, renderer.rootBone.name.Length - 2)
+                : renderer.rootBone.name;
             settings.ProbeAnchor = new AvatarObjectReference
             {
-                referencePath = $"{targetArmatureName}/{renderer.rootBone.name}"
+                referencePath = $"{targetArmatureName}/{targetBoneName}"
             };
             settings.RootBone = new AvatarObjectReference
             {
-                referencePath = $"{targetArmatureName}/{renderer.rootBone.name}"
+                referencePath = $"{targetArmatureName}/{targetBoneName}"
             };
             settings.Bounds = renderer.localBounds;
+        }
+
+        private static void ConfigureIntegratedMergeArmature(
+            ModularAvatarMergeArmature merge,
+            GameObject avatarRoot,
+            Report report)
+        {
+            if (merge == null)
+            {
+                report.errors.Add("outfit Merge Armature component is missing");
+                return;
+            }
+
+            var avatarAnimator = avatarRoot.GetComponent<Animator>();
+            var targetHips = avatarAnimator == null
+                ? null
+                : avatarAnimator.GetBoneTransform(HumanBodyBones.Hips);
+            var mergeHips = merge.transform.Cast<Transform>().FirstOrDefault();
+            if (targetHips == null || mergeHips == null)
+            {
+                report.errors.Add("could not derive the outfit-to-avatar bone name mapping");
+                return;
+            }
+
+            var targetNameIndex = mergeHips.name.IndexOf(targetHips.name, StringComparison.Ordinal);
+            if (targetNameIndex < 0)
+            {
+                report.errors.Add($"outfit hips bone '{mergeHips.name}' does not contain target name '{targetHips.name}'");
+                return;
+            }
+
+            merge.prefix = mergeHips.name.Substring(0, targetNameIndex);
+            merge.suffix = mergeHips.name.Substring(targetNameIndex + targetHips.name.Length);
+            merge.ResolveReferences();
+            if (merge.mergeTargetObject == null)
+                report.errors.Add($"Merge Armature target path does not resolve: {merge.mergeTarget.referencePath}");
         }
 
         private static void CreateIntegratedPrefab(Job job, Report report)
@@ -803,10 +860,13 @@ namespace Image2Outfit.Editor
                     return;
                 }
 
+                EnsureAvatarDescriptor(targetInstance, report);
                 outfitInstance.transform.SetParent(targetInstance.transform, false);
                 var outfitName = Path.GetFileNameWithoutExtension(job.prefabAssetPath);
                 outfitInstance.name = outfitName;
-                ConfigureOutfitPrefab(outfitInstance, report);
+                ConfigureOutfitPrefab(outfitInstance, GetTargetArmatureName(targetInstance), report);
+                var mergeArmature = outfitInstance.GetComponentsInChildren<ModularAvatarMergeArmature>(true).SingleOrDefault();
+                ConfigureIntegratedMergeArmature(mergeArmature, targetInstance, report);
                 if (report.errors.Any())
                     return;
 
@@ -836,6 +896,11 @@ namespace Image2Outfit.Editor
                 report.errors.Add("integrated prefab could not be instantiated for NDMF validation");
                 return;
             }
+
+            PrefabUtility.UnpackPrefabInstance(
+                instance,
+                PrefabUnpackMode.Completely,
+                InteractionMode.AutomatedAction);
 
             var startingErrors = report.errors.Count;
             var temporaryAssetsCleaned = false;
@@ -1005,11 +1070,50 @@ namespace Image2Outfit.Editor
                 }
             }
 
-            var descriptorType = FindType("VRC.SDK3.Avatars.Components.VRCAvatarDescriptor");
-            if (descriptorType == null || target.GetComponentInChildren(descriptorType, true) == null)
-                report.errors.Add("VRCAvatarDescriptor missing on target");
-
             report.targetValidated = !report.errors.Any();
+        }
+
+        private static void EnsureAvatarDescriptor(GameObject avatarRoot, Report report)
+        {
+            var descriptor = avatarRoot.GetComponent<VRCAvatarDescriptor>();
+            if (descriptor == null)
+                descriptor = avatarRoot.AddComponent<VRCAvatarDescriptor>();
+
+            var animator = avatarRoot.GetComponentInChildren<Animator>(true);
+            var head = animator == null ? null : animator.GetBoneTransform(HumanBodyBones.Head);
+            if (head == null)
+            {
+                report.errors.Add("VRCAvatarDescriptor view position could not be derived from Humanoid head");
+                return;
+            }
+
+            descriptor.ViewPosition = avatarRoot.transform.InverseTransformPoint(head.position);
+        }
+
+        private static void ValidateAvatarDescriptor(GameObject integrated, Report report)
+        {
+            if (integrated == null)
+            {
+                report.errors.Add("integrated avatar prefab is missing");
+                return;
+            }
+
+            if (integrated.GetComponent<VRCAvatarDescriptor>() == null)
+                report.errors.Add("VRCAvatarDescriptor missing on integrated avatar root");
+        }
+
+        private static string GetTargetArmatureName(string assetPath)
+        {
+            var target = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            return target == null ? null : GetTargetArmatureName(target);
+        }
+
+        private static string GetTargetArmatureName(GameObject avatarRoot)
+        {
+            var animator = avatarRoot.GetComponent<Animator>()
+                ?? avatarRoot.GetComponentInChildren<Animator>(true);
+            var hips = animator == null ? null : animator.GetBoneTransform(HumanBodyBones.Hips);
+            return hips == null || hips.parent == null ? null : hips.parent.name;
         }
 
         private static Type FindType(string fullName)

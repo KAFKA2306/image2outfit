@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-wide-cargo",
+  "status": "PASS",
+  "engine": "Blender Cloth",
+  "blenderVersion": "4.4.3",
+  "applicability": "REQUIRED",
+  "frameStart": 1,
+  "frameEnd": 18,
+  "cacheBaked": true,
+  "geometryChanged": true,
+  "gravity": [
+    0.0,
+    0.0,
+    -4.5
+  ],
+  "contracts": [
+    {
+      "object": "Cargo_Continuous_Pants",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 160,
+      "frameStart": 1,
+      "frameEnd": 18,
+      "cacheBakedActual": true,
+      "cacheInfo": "18 frames in memory (632 KiB).",
+      "preBakeMeshSha256": "acf58569586f86763ef1348a9f67fa9786cb999ef0c095ff2f25af43e3605aeb",
+      "evaluatedFrameMeshSha256": "9faee9c1b08104d7aa6ec991a67ec5278b3efd071644f6aa777a225bd6e0df0c",
+      "settledMeshSha256": "efce404c4f31f6821c22c027be8ea2e2918bef89e8710a937316484b8f2b42fa",
+      "geometryChanged": true
+    }
+  ],
+  "bodyCollisionThicknessM": 0.004,
+  "collisionObject": "Image2Outfit Collision Proxy.001",
+  "settledFbx": "Assets/GenWorks/siroino-wide-cargo/Models/SiroinoWideCargo.fbx"
+}

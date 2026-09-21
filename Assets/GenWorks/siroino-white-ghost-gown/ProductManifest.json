@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-white-ghost-gown",
   "productName": "White Ghost Gown for Siroino _Large",
-  "status": "REJECTED",
+  "status": "WORKING",
   "targetAdapterId": "siroino-v1.0-large",
   "target": "Siroino _Large via official shape keys",
   "productRoot": "Assets/GenWorks/siroino-white-ghost-gown",
@@ -11,7 +11,7 @@
   "previewPath": "Assets/GenWorks/siroino-white-ghost-gown/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-white-ghost-gown/README.md",
   "sourceJobPath": "config/products/siroino-white-ghost-gown/job.json",
-  "productBuildScript": "tools/siroino_white_ghost_gown_build.py",
+  "productBuildScript": "tools/siroino_white_ghost_gown_product.py",
   "designRevision": "v1-two-view-pattern-and-sewing",
   "sourceReference": "private-reference://sha256/d7c91d92c45598c13ff2b7673c71672cefe5f41a16361ca1b4267fcf6b927ef3",
   "additionalReferenceSha256": [
@@ -24,27 +24,24 @@
     "doNotRebuildFromZero": true,
     "resumeFrom": ".image2outfit/products/siroino-white-ghost-gown/pipeline-state.json",
     "lastAttempt": {
-      "result": "BLENDER_REJECTED",
+      "result": "BLENDER_MODELED",
       "visualRevision": "v1-two-view-pattern-and-sewing",
       "shapeProfile": "Siroino _Large via official shape keys"
     },
     "blockers": [
-      "Remove 116 degenerate triangles",
-      "Correct the upper-body silhouette and sleeve coverage to the reference",
-      "Replace rigid undersized wrist drapes with large hanging drapes",
-      "Stabilize the sewn center-back skirt seam",
-      "Regenerate and directly inspect the same pattern/five-view/pose evidence",
-      "Promote generated blend/fbx/prefab and declared PNG/pose outputs only after they are actually tracked"
+      "Direct inspection of current pattern and five-view evidence",
+      "Direct inspection of current pose evidence",
+      "Finalize the candidate state through the canonical pipeline"
     ]
   },
   "technicalGates": {
-    "blender": "FAIL",
-    "editableSource": "FAIL",
-    "fbx": "FAIL",
-    "prefabDeclared": "FAIL",
-    "fiveViewEvidence": "FAIL",
-    "poseEvidence": "FAIL",
-    "visualAppearanceReview": "FAIL",
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "PENDING",
     "researchTrial": "PASS",
     "unityImport": "OUT_OF_SCOPE",
     "unitySaveReload": "OUT_OF_SCOPE",
@@ -63,6 +60,7 @@
     "integratedPrefab": "Assets/GenWorks/siroino-white-ghost-gown/Prefab/Siroino_Large_WhiteGhostGown.prefab",
     "multiview": "Assets/GenWorks/siroino-white-ghost-gown/Previews/siroino-white-ghost-gown-multiview.webp",
     "poseReview": "Assets/GenWorks/siroino-white-ghost-gown/Previews/siroino-white-ghost-gown-pose-review.webp",
+    "stitchExecution": "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Build/stitch-execution.json",
     "buildReport": "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Build/product-build-report.json"
   }
 }

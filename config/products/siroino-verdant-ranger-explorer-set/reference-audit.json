@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-verdant-ranger-explorer-set",
+  "auditStatus": "FAIL_EXACT_ORIGINAL_MISSING_REPLACEMENT_PERSISTED",
+  "source": {
+    "kind": "replacement-generated-manufacturing-concept-board",
+    "view": "front-side-back-board",
+    "originalFileName": "a_detailed_concept_sheet_design_board_image_cle.png",
+    "originalSha256": null,
+    "replacementFileName": "verdant-ranger-manufacturing-sheet-replacement.png",
+    "replacementSha256": "9e08fbed4d590273d8bbcc1fb82f62fe12c7153aeab1e39cd8449ebda6f30d25",
+    "widthPx": 2048,
+    "heightPx": 1536,
+    "colorMode": "RGB",
+    "sourceRetention": {
+      "repositoryContainsSourceImage": false,
+      "repositoryContainsReplacementBoard": true,
+      "reason": "The exact Issue generation artifact was unavailable; the user requested production to continue, so a clearly labeled replacement board is retained without claiming exact-source identity.",
+      "reconstructionInput": "replacement board front/side/back views, explicit tunic/trouser panel layout, knee gusset details and material swatches"
+    }
+  },
+  "visibleText": ["Verdant Ranger Explorer Set", "VRCHAT OUTFIT REPLACEMENT"],
+  "variants": [{
+    "variantId": "verdant-ranger-explorer-replacement",
+    "label": "long sleeveless mandarin-collar tunic with articulated tapered trousers",
+    "dominantColors": [
+      {"name": "sage green", "rgb": [132, 148, 116]},
+      {"name": "olive", "rgb": [74, 88, 58]},
+      {"name": "cream", "rgb": [218, 211, 187]}
+    ]
+  }],
+  "modelIdentification": {
+    "status": "NOT_APPLICABLE",
+    "manufacturer": null,
+    "brand": null,
+    "modelName": "Verdant Ranger Explorer Set",
+    "modelNumber": null,
+    "reason": "The replacement board is an independently generated concept for this Issue, not a commercial product reference."
+  },
+  "observations": [
+    "Long sleeveless tunic with mandarin collar, center pleat, shaped back yoke and split-tail side vents.",
+    "High-waisted tapered trousers with four separate articulated knee-gusset facings.",
+    "Minimal hardware and no accessory field used as construction identity.",
+    "Replacement design excludes the rejected cropped hooded jacket, wrap skirt, shorts, harness and dense pouch field."
+  ],
+  "uncertainties": [
+    {"field": "exact Issue source image", "status": "unavailable", "decision": "retain replacement status and never claim exact-source persistence"},
+    {"field": "exact avatar proportions", "status": "estimated", "decision": "fit to Siroino _Large shape profile and record mesh evidence"},
+    {"field": "fabric behavior", "status": "estimated", "decision": "settle four tunic panels using native Blender 4.4.3 Cloth"}
+  ],
+  "designUsePolicy": {
+    "interpretation": "Treat the replacement board as the active redesign contract only; the missing original remains a recorded blocker.",
+    "logosObserved": false,
+    "textilePrintObserved": false,
+    "primaryVariant": "verdant-ranger-explorer-replacement"
+  }
+}

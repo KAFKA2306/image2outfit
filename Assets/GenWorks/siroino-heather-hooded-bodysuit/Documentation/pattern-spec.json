@@ -66,7 +66,7 @@
     },
     {
       "id": "sleeve-l",
-      "object": "Heather_Body_Shell",
+      "object": "Heather_Long_Sleeve_L",
       "semantic": "sleeve-left",
       "uvDomain": [
         0,
@@ -77,7 +77,7 @@
     },
     {
       "id": "sleeve-r",
-      "object": "Heather_Body_Shell",
+      "object": "Heather_Long_Sleeve_R",
       "semantic": "sleeve-right",
       "uvDomain": [
         0,
@@ -88,7 +88,7 @@
     },
     {
       "id": "cuff-l",
-      "object": "Heather_Body_Shell",
+      "object": "Heather_Rib_Cuff_L",
       "semantic": "cuff-left",
       "uvDomain": [
         0,
@@ -99,7 +99,7 @@
     },
     {
       "id": "cuff-r",
-      "object": "Heather_Body_Shell",
+      "object": "Heather_Rib_Cuff_R",
       "semantic": "cuff-right",
       "uvDomain": [
         0,
@@ -218,6 +218,12 @@
   ],
   "separateGeometry": [
     "Heather_Body_Shell",
+    "Heather_Highcut_Front_Panel",
+    "Heather_Highcut_Back_Panel",
+    "Heather_Long_Sleeve_L",
+    "Heather_Long_Sleeve_R",
+    "Heather_Rib_Cuff_L",
+    "Heather_Rib_Cuff_R",
     "Heather_Hood_Folded_Roll",
     "Heather_Henley_Placket",
     "Heather_Henley_Button_01",
@@ -234,5 +240,21 @@
     "seamPairsMinimum": 18,
     "semanticTrialPass": true
   },
-  "designRevision": "v23-dama-anchor-lobomap-residual-fit"
+  "designRevision": "v29-smoothed-clearance-tapered-yoke-fitted-sleeve",
+  "representation": {
+    "canonical": "polar torso with tapered yoke, shallow saddle, fitted sleeves and compact hood",
+    "bodyTopologyCopied": false,
+    "boundedClearanceProjection": true,
+    "clearanceDisplacementSmoothing": 4,
+    "components": [
+      "smoothed height-by-angle torso field",
+      "five-ring tapered shoulder yoke and fitted neck",
+      "seventeen-column shallow pelvic saddle",
+      "small-root fitted sleeve tubes",
+      "left and right fitted cuffs",
+      "compact six-row folded hood shell at rear neck"
+    ],
+    "bodyRole": "polar statistics, smoothed bounded clearance and skin-weight reference"
+  },
+  "researchTrialEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smoothed-clearance-yoke-trial.json"
 }

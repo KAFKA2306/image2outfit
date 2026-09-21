@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lunar-tech-hoodie",
+  "profile": "loose-layered",
+  "target": "Siroino _Large via official shape keys",
+  "designRevision": "v1-integrated-cocoon-hoodie-dress",
+  "panels": [
+    "hood-side-left",
+    "hood-center",
+    "hood-side-right",
+    "robe-front-left",
+    "robe-front-right",
+    "robe-back",
+    "integrated-sleeve-left",
+    "integrated-sleeve-right",
+    "overskirt-left",
+    "overskirt-right"
+  ],
+  "separateGeometry": ["hood-brim", "diagonal-wrap-seam", "center-back-seam"],
+  "priorityFitZones": ["hood opening", "neck", "shoulders", "chest", "waist", "hip", "elbow", "hem split"],
+  "researchTrial": {
+    "method": "explicit panel layout plus native Blender Cloth settlement for both overskirt panels",
+    "physicalSewingStitch": "overskirt-to-robe-waist",
+    "review": "render the pattern layout before assembly and five-view/six-pose evidence after settlement"
+  },
+  "clothSimulation": {
+    "applicability": "REQUIRED",
+    "components": ["Lunar_Overskirt_Left", "Lunar_Overskirt_Right"],
+    "evidence": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/cloth-simulation.json",
+    "reason": "The asymmetric overskirt is a loose layer and must be physically settled against the body."
+  },
+  "releaseBoundary": "Keep WORKING until the current Blender source, cloth evidence, five views, six poses, and direct visual review pass.",
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "The deterministic target-fit build owns shape-key transfer from Siroino; the vendor smoothing operator is not required."
+  }
+}

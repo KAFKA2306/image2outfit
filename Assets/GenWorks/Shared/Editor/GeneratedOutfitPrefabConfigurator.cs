@@ -359,7 +359,30 @@ namespace Image2Outfit.Editor
                 return false;
 
             var filename = normalized.Substring(markerIndex + CanonicalPrefabSegment.Length);
-            return filename.Length > 0 && filename.IndexOf('/') < 0;
+            var hasNoNestedPrefab = filename.IndexOf('/') < 0;
+            if (filename.Length == 0 || !hasNoNestedPrefab)
+                return false;
+
+            // Integrated avatar/demo prefabs are intentionally excluded. Their
+            // full body and outfit armatures must remain authored together;
+            // only the outfit-only prefab receives the Modular Avatar contract.
+            if (filename.StartsWith("SiroinoSotai_", StringComparison.Ordinal)
+                || filename.StartsWith("Siroino_Large_", StringComparison.Ordinal)
+                || filename.StartsWith("HAOLAN_", StringComparison.Ordinal))
+                return false;
+
+            // Integrated Siroino prefabs contain both the avatar body armature
+            // and the generated outfit armature. They are upload/demo assets,
+            // not modular outfit packages, so configuring them would create a
+            // false "multiple armatures" error. The outfit-only prefab remains
+            // the canonical Modular Avatar input.
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (prefab == null)
+                return false;
+
+            var renderers = prefab.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+            return renderers.Length > 0
+                && !renderers.Any(renderer => renderer.name == "SiroinoSotai_PC");
         }
     }
 

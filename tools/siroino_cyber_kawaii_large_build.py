@@ -6,6 +6,7 @@ brand product: white cropped blouse, detached sleeves, black/pink harness
 accents, plaid pleated mini skirt, white ruffle underlayer, thigh-high legwear,
 and small metallic hardware. All geometry is original and logo-free.
 """
+
 from __future__ import annotations
 
 import json
@@ -20,6 +21,7 @@ from PIL import Image
 
 import genworks_product_common as g
 import siroino_strappy_knit_build as base
+from tuxedo_halter_runtime import render_prone_pose
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-cyber-kawaii-large"
@@ -38,7 +40,9 @@ def image_node(nodes, path: Path, *, non_color: bool = False):
     return node
 
 
-def texture_material(name: str, albedo: Path, normal: Path, roughness: Path, *, sheen: float = 0.0):
+def texture_material(
+    name: str, albedo: Path, normal: Path, roughness: Path, *, sheen: float = 0.0
+):
     material = bpy.data.materials.new(name)
     material.use_nodes = True
     nodes = material.node_tree.nodes
@@ -82,8 +86,17 @@ def make_textures(directory: Path) -> dict[str, Path]:
             weave = math.sin(x * math.tau / 10.0) + math.sin(y * math.tau / 12.0)
             micro = math.sin(x * 0.43 + y * 0.31)
             white_value = max(205, min(255, int(240 + 4 * weave + 2 * micro)))
-            white_albedo.putpixel((x, y), (white_value, white_value - 1, min(255, white_value + 3)))
-            white_normal.putpixel((x, y), (int(128 + 8 * math.sin(x * 0.6)), int(128 + 8 * math.sin(y * 0.55)), 252))
+            white_albedo.putpixel(
+                (x, y), (white_value, white_value - 1, min(255, white_value + 3))
+            )
+            white_normal.putpixel(
+                (x, y),
+                (
+                    int(128 + 8 * math.sin(x * 0.6)),
+                    int(128 + 8 * math.sin(y * 0.55)),
+                    252,
+                ),
+            )
             white_rough.putpixel((x, y), int(178 + 10 * micro))
 
             block_x = (x // 48) % 4
@@ -99,11 +112,20 @@ def make_textures(directory: Path) -> dict[str, Path]:
             if (x % 96 < 4) or (y % 96 < 4):
                 color = (214, 96, 143)
             plaid_albedo.putpixel((x, y), color)
-            plaid_normal.putpixel((x, y), (128 + int(5 * math.sin(x * 0.25)), 128 + int(5 * math.sin(y * 0.25)), 253))
+            plaid_normal.putpixel(
+                (x, y),
+                (
+                    128 + int(5 * math.sin(x * 0.25)),
+                    128 + int(5 * math.sin(y * 0.25)),
+                    253,
+                ),
+            )
             plaid_rough.putpixel((x, y), int(165 + 12 * micro))
 
             satin = 0.5 + 0.5 * math.sin((x + y * 0.32) * math.tau / 36.0)
-            pink_albedo.putpixel((x, y), (235, int(115 + 22 * satin), int(171 + 24 * satin)))
+            pink_albedo.putpixel(
+                (x, y), (235, int(115 + 22 * satin), int(171 + 24 * satin))
+            )
             pink_normal.putpixel((x, y), (128 + int(10 * math.sin(x * 0.20)), 128, 252))
             pink_rough.putpixel((x, y), int(112 + 18 * (1.0 - satin)))
 
@@ -116,7 +138,7 @@ def make_textures(directory: Path) -> dict[str, Path]:
         "plaid_rough": directory / "plaid_roughness.png",
         "pink_albedo": directory / "pink_satin_albedo.png",
         "pink_normal": directory / "pink_satin_normal.png",
-        "pink_rough": directory / "pink_satin_roughness.png"
+        "pink_rough": directory / "pink_satin_roughness.png",
     }
     white_albedo.save(outputs["white_albedo"], optimize=True)
     white_normal.save(outputs["white_normal"], optimize=True)
@@ -130,7 +152,13 @@ def make_textures(directory: Path) -> dict[str, Path]:
     return outputs
 
 
-def finish_mesh(obj: bpy.types.Object, body: bpy.types.Object, armature: bpy.types.Object, *, smooth: bool = True) -> bpy.types.Object:
+def finish_mesh(
+    obj: bpy.types.Object,
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    *,
+    smooth: bool = True,
+) -> bpy.types.Object:
     obj.parent = armature
     modifier = obj.modifiers.new("SiroinoSotai Armature", "ARMATURE")
     modifier.object = armature
@@ -160,14 +188,18 @@ def ring_skirt(
     segments = pleats * 4
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, int, int, int]] = []
-    for ring_index, (z, rx, ry) in enumerate(((top_z, top_rx, top_ry), (bottom_z, bottom_rx, bottom_ry))):
+    for ring_index, (z, rx, ry) in enumerate(
+        ((top_z, top_rx, top_ry), (bottom_z, bottom_rx, bottom_ry))
+    ):
         for index in range(segments):
             angle = math.tau * index / segments
             fold = 1.0 + 0.055 * math.sin(angle * pleats * 2)
             local_z = z
             if ring_index == 1 and scallop:
                 local_z += scallop * (0.5 + 0.5 * math.cos(angle * pleats))
-            vertices.append((rx * fold * math.cos(angle), ry * fold * math.sin(angle), local_z))
+            vertices.append(
+                (rx * fold * math.cos(angle), ry * fold * math.sin(angle), local_z)
+            )
     for index in range(segments):
         next_index = (index + 1) % segments
         faces.append((index, next_index, segments + next_index, segments + index))
@@ -227,9 +259,26 @@ def bow(
     armature: bpy.types.Object,
 ) -> list[bpy.types.Object]:
     x, y, z = center
-    left = ellipsoid(f"{name}_L", (x - scale * 0.78, y, z), (scale, scale * 0.26, scale * 0.56), material, body, armature)
-    right = ellipsoid(f"{name}_R", (x + scale * 0.78, y, z), (scale, scale * 0.26, scale * 0.56), material, body, armature)
-    bpy.ops.mesh.primitive_cube_add(location=(x, y - scale * 0.03, z), scale=(scale * 0.25, scale * 0.22, scale * 0.30))
+    left = ellipsoid(
+        f"{name}_L",
+        (x - scale * 0.78, y, z),
+        (scale, scale * 0.26, scale * 0.56),
+        material,
+        body,
+        armature,
+    )
+    right = ellipsoid(
+        f"{name}_R",
+        (x + scale * 0.78, y, z),
+        (scale, scale * 0.26, scale * 0.56),
+        material,
+        body,
+        armature,
+    )
+    bpy.ops.mesh.primitive_cube_add(
+        location=(x, y - scale * 0.03, z),
+        scale=(scale * 0.25, scale * 0.22, scale * 0.30),
+    )
     knot = bpy.context.active_object
     knot.name = f"{name}_Knot"
     knot.data.materials.append(material)
@@ -248,7 +297,11 @@ def bone_midpoint(armature: bpy.types.Object, bone_name: str) -> Vector:
     return armature.matrix_world @ ((bone.head_local + bone.tail_local) * 0.5)
 
 
-def create_outfit(body: bpy.types.Object, armature: bpy.types.Object, materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object]:
+def create_outfit(
+    body: bpy.types.Object,
+    armature: bpy.types.Object,
+    materials: dict[str, bpy.types.Material],
+) -> list[bpy.types.Object]:
     white = materials["white"]
     plaid = materials["plaid"]
     pink = materials["pink"]
@@ -349,23 +402,99 @@ def create_outfit(body: bpy.types.Object, armature: bpy.types.Object, materials:
         garments.append(warmer)
 
         x = -0.067 if side_name == "L" else 0.067
-        thigh_loop = base.surface_cross_section_loop(body, 0.505, x - 0.043, x + 0.043, 0.006, 32)
-        garments.append(base.curve_tube(f"Black_Thigh_Band_{side_name}", thigh_loop, 0.0030, black, armature, f"UpperLeg_{side_name}", cyclic=True))
+        thigh_loop = base.surface_cross_section_loop(
+            body, 0.505, x - 0.043, x + 0.043, 0.006, 32
+        )
+        garments.append(
+            base.curve_tube(
+                f"Black_Thigh_Band_{side_name}",
+                thigh_loop,
+                0.0030,
+                black,
+                armature,
+                f"UpperLeg_{side_name}",
+                cyclic=True,
+            )
+        )
         pink_loop = [(px, py - 0.002, pz - 0.012) for px, py, pz in thigh_loop]
-        garments.append(base.curve_tube(f"Pink_Thigh_Trim_{side_name}", pink_loop, 0.0017, pink, armature, f"UpperLeg_{side_name}", cyclic=True))
+        garments.append(
+            base.curve_tube(
+                f"Pink_Thigh_Trim_{side_name}",
+                pink_loop,
+                0.0017,
+                pink,
+                armature,
+                f"UpperLeg_{side_name}",
+                cyclic=True,
+            )
+        )
 
     neck_y = base.body_front_y(body, 0.0, 1.005) - 0.012
-    garments.append(base.curve_tube("Black_Neck_Ribbon", [(-0.040, neck_y, 1.030), (0.0, neck_y - 0.002, 0.952), (0.040, neck_y, 1.030)], 0.0028, black, armature, "Chest"))
-    garments.extend(bow("Pink_Collar_Bow", (0.0, neck_y - 0.004, 0.965), 0.026, pink, body, armature))
+    garments.append(
+        base.curve_tube(
+            "Black_Neck_Ribbon",
+            [
+                (-0.040, neck_y, 1.030),
+                (0.0, neck_y - 0.002, 0.952),
+                (0.040, neck_y, 1.030),
+            ],
+            0.0028,
+            black,
+            armature,
+            "Chest",
+        )
+    )
+    garments.extend(
+        bow(
+            "Pink_Collar_Bow", (0.0, neck_y - 0.004, 0.965), 0.026, pink, body, armature
+        )
+    )
 
     waist_y = base.body_front_y(body, 0.0, 0.770) - 0.014
-    garments.append(base.curve_tube("Black_Waist_Harness", [(-0.135, waist_y, 0.782), (-0.090, waist_y - 0.003, 0.716), (0.0, waist_y - 0.004, 0.690), (0.090, waist_y - 0.003, 0.716), (0.135, waist_y, 0.782)], 0.0030, black, armature, "Hips"))
+    garments.append(
+        base.curve_tube(
+            "Black_Waist_Harness",
+            [
+                (-0.135, waist_y, 0.782),
+                (-0.090, waist_y - 0.003, 0.716),
+                (0.0, waist_y - 0.004, 0.690),
+                (0.090, waist_y - 0.003, 0.716),
+                (0.135, waist_y, 0.782),
+            ],
+            0.0030,
+            black,
+            armature,
+            "Hips",
+        )
+    )
     for side, x in (("L", -0.155), ("R", 0.155)):
-        garments.extend(bow(f"Pink_Skirt_Bow_{side}", (x, -0.030, 0.650), 0.022, pink, body, armature))
-        garments.append(base.heart_curve(f"Silver_Heart_{side}", (x, -0.045, 0.700), 0.00062, silver, armature, "Hips"))
+        garments.extend(
+            bow(
+                f"Pink_Skirt_Bow_{side}",
+                (x, -0.030, 0.650),
+                0.022,
+                pink,
+                body,
+                armature,
+            )
+        )
+        garments.append(
+            base.heart_curve(
+                f"Silver_Heart_{side}",
+                (x, -0.045, 0.700),
+                0.00062,
+                silver,
+                armature,
+                "Hips",
+            )
+        )
 
     hem_loop = base.ellipse_points((0.0, 0.0, 0.565), (0.266, 0.195), 96)
-    garments.append(base.curve_tube("Pink_Underskirt_Hem", hem_loop, 0.0022, pink, armature, "Hips", cyclic=True))
+    garments.append(
+        base.curve_tube(
+            "Pink_Underskirt_Hem", hem_loop, 0.0022, pink, armature, "Hips", cyclic=True
+        )
+    )
 
     for obj in garments:
         if obj.type == "MESH" and obj.parent is None:
@@ -493,11 +622,36 @@ def main() -> int:
 
     textures = make_textures(texture_dir)
     materials = {
-        "white": texture_material("MAT_White_Soft_Fabric", textures["white_albedo"], textures["white_normal"], textures["white_rough"], sheen=0.18),
-        "plaid": texture_material("MAT_Black_Pink_Plaid", textures["plaid_albedo"], textures["plaid_normal"], textures["plaid_rough"], sheen=0.04),
-        "pink": texture_material("MAT_Pink_Satin", textures["pink_albedo"], textures["pink_normal"], textures["pink_rough"], sheen=0.24),
-        "black": base.plain_material("MAT_Black_Straps", (0.010, 0.011, 0.016, 1.0), roughness=0.28),
-        "silver": base.plain_material("MAT_Silver_Hardware", (0.72, 0.76, 0.84, 1.0), roughness=0.17, metallic=0.94)
+        "white": texture_material(
+            "MAT_White_Soft_Fabric",
+            textures["white_albedo"],
+            textures["white_normal"],
+            textures["white_rough"],
+            sheen=0.18,
+        ),
+        "plaid": texture_material(
+            "MAT_Black_Pink_Plaid",
+            textures["plaid_albedo"],
+            textures["plaid_normal"],
+            textures["plaid_rough"],
+            sheen=0.04,
+        ),
+        "pink": texture_material(
+            "MAT_Pink_Satin",
+            textures["pink_albedo"],
+            textures["pink_normal"],
+            textures["pink_rough"],
+            sheen=0.24,
+        ),
+        "black": base.plain_material(
+            "MAT_Black_Straps", (0.010, 0.011, 0.016, 1.0), roughness=0.28
+        ),
+        "silver": base.plain_material(
+            "MAT_Silver_Hardware",
+            (0.72, 0.76, 0.84, 1.0),
+            roughness=0.17,
+            metallic=0.94,
+        ),
     }
     garments = create_outfit(body, armature, materials)
     clean_meshes(garments)
@@ -526,11 +680,19 @@ def main() -> int:
         title="CYBER KAWAII LAYERED SET / SIROINO _LARGE",
     )
     pose_images = g.render_pose_set(armature, camera, pose_dir)
+    obsolete_twist = pose_images.pop("twist", None)
+    if obsolete_twist is not None and obsolete_twist.is_file():
+        obsolete_twist.unlink()
+    pose_images["prone"] = render_prone_pose(
+        armature,
+        camera,
+        pose_dir / "prone.png",
+    )
     pose_sheet = preview_dir / "siroino-cyber-kawaii-large-pose-review.webp"
     g.contact_sheet(
         pose_images,
         pose_sheet,
-        order=("neutral", "arms-up", "arm-cross", "crouch", "sit", "twist"),
+        order=("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"),
         title="POSE AND PENETRATION REVIEW",
     )
 
@@ -559,14 +721,20 @@ def main() -> int:
         "blenderVersion": bpy.app.version_string,
         "metrics": measured,
         "improvementLoop": improvement,
-        "views": {name: str(path.relative_to(ROOT)).replace("\\", "/") for name, path in previews.items()},
-        "poseViews": {name: str(path.relative_to(ROOT)).replace("\\", "/") for name, path in pose_images.items()},
+        "views": {
+            name: str(path.relative_to(ROOT)).replace("\\", "/")
+            for name, path in previews.items()
+        },
+        "poseViews": {
+            name: str(path.relative_to(ROOT)).replace("\\", "/")
+            for name, path in pose_images.items()
+        },
         "notes": [
             "The target must resolve to a Large-labelled Siroino prefab on the self-hosted runner.",
             "The standard PC FBX may be shared by size prefabs; official Large shape keys are baked before garment extraction.",
             "All preview and pose images are Blender renders of the generated FBX source scene.",
-            "The design is original, logo-free, and based on the visual grammar of the supplied reference image."
-        ]
+            "The design is original, logo-free, and based on the visual grammar of the supplied reference image.",
+        ],
     }
     g.write_json(artifact_dir / "product-build-report.json", report)
     g.write_json(artifact_dir / "improvement-loop.json", {"passes": improvement})
@@ -581,14 +749,16 @@ def main() -> int:
         "technicalGates": {
             "largeProfileResolved": "PASS",
             "blender": "PASS" if passed else "FAIL",
-            "bodyClearance": "PASS" if improvement[-1]["clearance"]["p01"] >= 0.0030 else "FAIL",
+            "bodyClearance": "PASS"
+            if improvement[-1]["clearance"]["p01"] >= 0.0030
+            else "FAIL",
             "fiveViewRender": "PASS",
             "poseRender": "PASS",
             "unityImport": "PENDING",
             "modularAvatar": "PENDING",
             "humanVisualReview": "PENDING",
             "humanPoseReview": "PENDING",
-            "humanRuntimeReview": "PENDING"
+            "humanRuntimeReview": "PENDING",
         },
         "outputs": {
             "blend": job["blendPath"],
@@ -596,14 +766,14 @@ def main() -> int:
             "prefab": job["prefabAssetPath"],
             "integratedPrefab": job["integratedPrefabAssetPath"],
             "multiview": str(multiview.relative_to(ROOT)).replace("\\", "/"),
-            "poseReview": str(pose_sheet.relative_to(ROOT)).replace("\\", "/")
-        }
+            "poseReview": str(pose_sheet.relative_to(ROOT)).replace("\\", "/"),
+        },
     }
     g.write_json(repo_path(job["productManifestPath"]), manifest)
 
     readme = product_root / "README.md"
     readme.write_text(
-        f"""# {job['productName']}
+        f"""# {job["productName"]}
 
 Target: **Siroino `_Large`**. The workflow requires a Large-labelled official prefab and applies the Large body shape profile before garment extraction.
 
@@ -620,21 +790,37 @@ Target: **Siroino `_Large`**. The workflow requires a Large-labelled official pr
 
 ## Outputs
 
-- Blender source: `{job['blendPath']}`
-- FBX: `{job['fbxAssetPath']}`
-- outfit Prefab: `{job['prefabAssetPath']}`
-- integrated Prefab: `{job['integratedPrefabAssetPath']}`
-- five-view render: `{manifest['outputs']['multiview']}`
-- pose review: `{manifest['outputs']['poseReview']}`
+- Blender source: `{job["blendPath"]}`
+- FBX: `{job["fbxAssetPath"]}`
+- outfit Prefab: `{job["prefabAssetPath"]}`
+- integrated Prefab: `{job["integratedPrefabAssetPath"]}`
+- five-view render: `{manifest["outputs"]["multiview"]}`
+- pose review: `{manifest["outputs"]["poseReview"]}`
 
 The avatar package is private validation input and is never included in delivery assets.
 """,
         encoding="utf-8",
     )
 
-    hash_candidates = [blend_path, fbx_path, *sidecars, *textures.values(), *previews.values(), *pose_images.values(), multiview, pose_sheet, readme, repo_path(job["productManifestPath"])]
+    hash_candidates = [
+        blend_path,
+        fbx_path,
+        *sidecars,
+        *textures.values(),
+        *previews.values(),
+        *pose_images.values(),
+        multiview,
+        pose_sheet,
+        readme,
+        repo_path(job["productManifestPath"]),
+    ]
     (product_root / "SOURCE_HASHES.txt").write_text(
-        "\n".join(f"{base.sha256(path)}  {path.relative_to(product_root)}" for path in hash_candidates if path.is_file()) + "\n",
+        "\n".join(
+            f"{base.sha256(path)}  {path.relative_to(product_root)}"
+            for path in hash_candidates
+            if path.is_file()
+        )
+        + "\n",
         encoding="utf-8",
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))

@@ -52,5 +52,10 @@
     "authorsCodeCopied": false,
     "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smoothed-clearance-yoke-trial.json"
   },
-  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE"
+  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE",
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "Deterministic target-fit generation owns the garment shape keys; the vendor smoothing operator is not required for this path."
+  }
 }

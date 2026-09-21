@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -19,6 +20,7 @@ from image2outfit import improvement  # noqa: E402
 import improvement_loop  # noqa: E402
 import method_selection  # noqa: E402
 import runtime_paths  # noqa: E402
+import avatar_workflow  # noqa: E402
 
 AUDITS = {
     "toolchain": "audit_toolchain.py",
@@ -92,6 +94,64 @@ def _audit_all() -> int:
         print("\nFailed audits: " + ", ".join(failed), file=sys.stderr)
         return 1
     return 0
+
+
+def _avatar_cloth(outfits: list[str] | None, force: bool = False) -> int:
+    configured = os.environ.get("IMAGE2OUTFIT_BLENDER", "").strip()
+    candidates = [
+        configured,
+        str(ROOT / ".image2outfit" / "blender-4.4.3" / "blender.exe"),
+        str(ROOT / ".image2outfit" / "blender" / "blender.exe"),
+    ]
+    blender = next((item for item in candidates if item and Path(item).is_file()), None)
+    if blender is None:
+        print(
+            "image2outfit avatar cloth: pinned Blender 4.4.3 was not found",
+            file=sys.stderr,
+        )
+        return 1
+    ids = outfits or [
+        "siroino-cyber-kawaii-large",
+        "siroino-heather-hooded-bodysuit",
+        "siroino-lace-halter-large",
+        "siroino-military-sheer-romper-large",
+        "siroino-nocturne-angel-set",
+        "siroino-wide-cargo",
+    ]
+    cloth_script = "tools/blender_cloth_simulation.py"
+    script = ROOT / cloth_script
+    failed = False
+    for product_id in ids:
+        job = ROOT / "config" / "products" / product_id / "job.json"
+        if not job.is_file():
+            print(
+                f"image2outfit avatar cloth: missing job: {product_id}",
+                file=sys.stderr,
+            )
+            failed = True
+            continue
+        command = [
+            blender,
+            "--python-use-system-env",
+            "--background",
+            "--factory-startup",
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(script),
+            "--",
+            "--job",
+            str(job),
+        ]
+        if force:
+            command.append("--force")
+        result = subprocess.run(
+            command,
+            cwd=ROOT,
+            check=False,
+        )
+        failed = failed or result.returncode != 0
+    return 1 if failed else 0
 
 
 def _load_manifest(path_text: str) -> dict[str, Any]:
@@ -246,6 +306,54 @@ def build_parser() -> argparse.ArgumentParser:
     aggregate.add_argument("--results-dir")
     aggregate.add_argument("--output")
 
+    avatar = commands.add_parser(
+        "avatar",
+        help="Run the generated avatar preflight, visual, ledger, and CAU handoff tools.",
+    )
+    avatar_commands = avatar.add_subparsers(dest="avatar_command", required=True)
+
+    preflight = avatar_commands.add_parser("preflight")
+    preflight.add_argument("--outfit", action="append")
+    preflight.add_argument("--output")
+
+    visual = avatar_commands.add_parser("visual")
+    visual.add_argument("--outfit", action="append")
+    visual.add_argument("--record-baseline", action="store_true")
+    visual.add_argument("--output")
+
+    visual_diff = avatar_commands.add_parser(
+        "visual-diff",
+        help="Write mandatory before/after image comparisons for every outfit view.",
+    )
+    visual_diff.add_argument("--outfit", action="append")
+    visual_diff.add_argument("--output")
+
+    ledger = avatar_commands.add_parser("ledger")
+    ledger.add_argument("ledger_action", choices=("init", "record"))
+    ledger.add_argument("--outfit-id")
+    ledger.add_argument(
+        "--status",
+        choices=("PENDING", "READY", "UPLOADING", "SUCCEEDED", "FAILED", "SKIPPED"),
+    )
+    ledger.add_argument("--blueprint-id")
+    ledger.add_argument("--upload-id")
+    ledger.add_argument("--error")
+    ledger.add_argument("--output")
+
+    plan = avatar_commands.add_parser("plan")
+    plan.add_argument("--output")
+
+    run = avatar_commands.add_parser("run")
+    run.add_argument("--record-baseline", action="store_true")
+    run.add_argument("--output")
+
+    cloth = avatar_commands.add_parser(
+        "cloth",
+        help="Bake native Blender Cloth and settled FBX evidence for the outfit set.",
+    )
+    cloth.add_argument("--outfit", action="append")
+    cloth.add_argument("--force", action="store_true")
+
     audit = commands.add_parser("audit")
     audit.add_argument("target", choices=(*AUDIT_TARGETS, "all"))
     return parser
@@ -270,6 +378,17 @@ def main() -> int:
             options.results_dir,
             options.output,
         )
+    if options.command == "avatar":
+        if options.avatar_command == "cloth":
+            return _avatar_cloth(options.outfit, options.force)
+        if options.avatar_command == "ledger" and options.ledger_action == "record":
+            if not options.outfit_id or not options.status:
+                print(
+                    "avatar ledger record requires --outfit-id and --status",
+                    file=sys.stderr,
+                )
+                return 2
+        return avatar_workflow.dispatch(ROOT, options)
     if options.command == "audit":
         return _audit_all() if options.target == "all" else _audit(options.target)
     raise AssertionError(options.command)

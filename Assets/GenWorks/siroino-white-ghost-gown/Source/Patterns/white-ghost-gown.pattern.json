@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "units": "meter",
+  "coordinateSystem": "x-horizontal-y-vertical",
+  "pieces": [
+    {"pieceId":"dress-front","partId":"dress-front","boundary":[[-0.155,0.74],[-0.17,0.47],[-0.145,0.12],[-0.125,-0.37],[-0.205,-0.72],[0.205,-0.72],[0.125,-0.37],[0.145,0.12],[0.17,0.47],[0.155,0.74]],"cutCount":1,"onFold":true,"grainAngleDegrees":0,"seamAllowanceM":0.01},
+    {"pieceId":"dress-back-left","partId":"dress-back-left","boundary":[[-0.155,0.74],[-0.17,0.47],[-0.145,0.12],[-0.125,-0.37],[-0.205,-0.72],[0.0,-0.72],[0.0,0.02],[-0.065,0.16],[-0.07,0.48],[-0.125,0.74]],"cutCount":1,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.01},
+    {"pieceId":"dress-back-right","partId":"dress-back-right","boundary":[[0.155,0.74],[0.17,0.47],[0.145,0.12],[0.125,-0.37],[0.205,-0.72],[0.0,-0.72],[0.0,0.02],[0.065,0.16],[0.07,0.48],[0.125,0.74]],"cutCount":1,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.01},
+    {"pieceId":"sleeve","partId":"sleeve-left","boundary":[[-0.115,0.30],[-0.085,-0.31],[0.075,-0.31],[0.125,0.30]],"cutCount":2,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.008},
+    {"pieceId":"wrist-drape","partId":"wrist-drape-left","boundary":[[-0.19,0.03],[-0.07,0.16],[0.07,0.16],[0.19,0.03],[0.15,-0.28],[0.0,-0.36],[-0.15,-0.28]],"cutCount":2,"onFold":false,"grainAngleDegrees":0,"seamAllowanceM":0.006},
+    {"pieceId":"hood-front","partId":"hood-front","boundary":[[-0.18,-0.22],[-0.155,0.11],[-0.10,0.30],[0.0,0.38],[0.10,0.30],[0.155,0.11],[0.18,-0.22]],"cutCount":1,"onFold":true,"grainAngleDegrees":0,"seamAllowanceM":0.008},
+    {"pieceId":"hood-back","partId":"hood-back","boundary":[[-0.19,-0.24],[-0.16,0.12],[-0.10,0.31],[0.0,0.39],[0.10,0.31],[0.16,0.12],[0.19,-0.24]],"cutCount":1,"onFold":true,"grainAngleDegrees":0,"seamAllowanceM":0.008},
+    {"pieceId":"back-tie","partId":"back-lacing","boundary":[[-0.22,0.015],[0.22,0.015],[0.22,-0.015],[-0.22,-0.015]],"cutCount":4,"onFold":false,"grainAngleDegrees":90,"seamAllowanceM":0.004}
+  ],
+  "method": {
+    "name": "pattern-first structured garment reconstruction",
+    "status": "TRIAL",
+    "rationale": "The auditable 2D pattern remains explicit before Blender construction. The long skirt center-back seam is realized with Blender Cloth sewing springs before the settled mesh is exported."
+  }
+}

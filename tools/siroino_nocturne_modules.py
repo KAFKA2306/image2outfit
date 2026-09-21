@@ -46,16 +46,24 @@ def _build_sewn_bodice(body, center, height, z, mats):
     add_outward_thickness(bodice, height * 0.0030)
     triangulate(bodice)
 
-    front_y = center.y - height * 0.105
+    # The chest is the most forward part of the target body.  A panel placed at
+    # the torso average is therefore hidden behind the bust after shrinkwrap;
+    # keep the authored closure in front of that contour so the bodice reads as
+    # one garment rather than two side strips.
+    front_y = center.y - height * 0.175
     front_inset = panel(
         "Nocturne_Bodice_Front_Inset",
         [
-            (center.x - height * 0.070, front_y, z(0.535)),
-            (center.x + height * 0.070, front_y, z(0.535)),
-            (center.x + height * 0.062, front_y, z(0.686)),
-            (center.x - height * 0.062, front_y, z(0.686)),
+            (center.x - height * 0.092, front_y, z(0.535)),
+            (center.x + height * 0.092, front_y, z(0.535)),
+            (center.x + height * 0.125, front_y, z(0.800)),
+            (center.x + height * 0.100, front_y, z(0.920)),
+            (center.x + height * 0.060, front_y, z(0.985)),
+            (center.x - height * 0.060, front_y, z(0.985)),
+            (center.x - height * 0.100, front_y, z(0.920)),
+            (center.x - height * 0.125, front_y, z(0.800)),
         ],
-        mats["black"],
+        mats["cream"],
         height * 0.0028,
     )
     v_left = panel(
@@ -180,14 +188,14 @@ def _build_wings(armature, height, mats):
         (0.0, height * 0.112, height * 0.004)
     )
     specs = (
-        (66.0, 0.135, 0.011, 0.005, 0.020),
-        (46.0, 0.155, 0.012, 0.0055, 0.008),
-        (27.0, 0.150, 0.0125, 0.0055, -0.006),
-        (10.0, 0.125, 0.011, 0.005, -0.020),
+        (42.0, 0.205, 0.009, 0.0040, 0.026),
+        (27.0, 0.235, 0.010, 0.0045, 0.012),
+        (12.0, 0.225, 0.0105, 0.0048, -0.004),
+        (-4.0, 0.190, 0.009, 0.0040, -0.020),
     )
     wings = []
     for side, sign in (("L", 1.0), ("R", -1.0)):
-        side_origin = anchor + Vector((sign * height * 0.040, 0.0, 0.0))
+        side_origin = anchor + Vector((sign * height * 0.045, height * 0.006, 0.0))
         for index, (
             angle_degrees,
             length_ratio,
@@ -199,7 +207,7 @@ def _build_wings(armature, height, mats):
             root = side_origin + Vector(
                 (
                     sign * height * (0.004 + index * 0.004),
-                    index * height * 0.002,
+                    index * height * 0.007,
                     height * drop,
                 )
             )
@@ -207,7 +215,7 @@ def _build_wings(armature, height, mats):
             tip = root + Vector(
                 (
                     sign * length * math.cos(angle),
-                    height * (0.010 + index * 0.002),
+                    height * (0.018 + index * 0.006),
                     length * math.sin(angle),
                 )
             )
@@ -237,9 +245,7 @@ def build(body, armature, mats):
     rigid = []
     clearance_objects = []
 
-    bodice, bodice_overlays, front_y = _build_sewn_bodice(
-        body, center, height, z, mats
-    )
+    bodice, bodice_overlays, front_y = _build_sewn_bodice(body, center, height, z, mats)
     garments.extend([bodice, *bodice_overlays])
     weighted.extend([bodice, *bodice_overlays])
     clearance_objects.extend([bodice, *bodice_overlays])
@@ -248,12 +254,12 @@ def build(body, armature, mats):
         "Nocturne_Cloth_Skirt",
         center,
         [
-            (z(0.430), height * 0.166, height * 0.094, 0.0),
-            (z(0.455), height * 0.154, height * 0.090, 0.0),
-            (z(0.480), height * 0.142, height * 0.086, 0.0),
-            (z(0.505), height * 0.130, height * 0.082, 0.0),
-            (z(0.530), height * 0.120, height * 0.078, 0.0),
-            (z(0.550), height * 0.112, height * 0.075, 0.0),
+            (z(0.355), height * 0.220, height * 0.132, 0.0),
+            (z(0.390), height * 0.212, height * 0.128, 0.0),
+            (z(0.430), height * 0.195, height * 0.120, 0.0),
+            (z(0.475), height * 0.170, height * 0.106, 0.0),
+            (z(0.530), height * 0.145, height * 0.094, 0.0),
+            (z(0.565), height * 0.125, height * 0.084, 0.0),
         ],
         mats["black"],
         segments=96,
@@ -265,9 +271,9 @@ def build(body, armature, mats):
         "Nocturne_Cream_Hem_Frill",
         center,
         [
-            (z(0.416), height * 0.172, height * 0.096, 0.0),
-            (z(0.431), height * 0.168, height * 0.094, 0.0),
-            (z(0.446), height * 0.161, height * 0.092, 0.0),
+            (z(0.335), height * 0.228, height * 0.137, 0.0),
+            (z(0.350), height * 0.222, height * 0.134, 0.0),
+            (z(0.368), height * 0.214, height * 0.130, 0.0),
         ],
         mats["cream"],
         segments=96,
