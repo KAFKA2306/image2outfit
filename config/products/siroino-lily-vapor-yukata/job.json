@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-lily-vapor-yukata",
+  "productName": "Lily Vapor Yukata for Siroino",
+  "adapterId": "siroino-v1.0-large",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4.3-panel-cloth-modular",
+  "buildRevision": "v1-closed-summer-column-split-rail-petal-lock",
+  "renderLoopRevision": "lily-vapor-yukata-v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-lily-vapor-yukata",
+  "productManifestPath": "Assets/GenWorks/siroino-lily-vapor-yukata/ProductManifest.json",
+  "buildScript": "tools/siroino_lily_vapor_yukata_build.py",
+  "productBuildScript": "tools/siroino_lily_vapor_yukata_build.py",
+  "hostedPoseScript": "tools/siroino_lily_vapor_yukata_render_settled.py",
+  "blendPath": "Assets/GenWorks/siroino-lily-vapor-yukata/Source/Blender/SiroinoLilyVaporYukata.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-lily-vapor-yukata/Models/SiroinoLilyVaporYukata.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoLilyVaporYukata.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoSotai_LilyVaporYukata.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"]
+  },
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
+  "sourceReferenceStatus": "REPAIRED_REPLACEMENT_BOARD_GENERATED",
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "referenceAuditPath": "config/products/siroino-lily-vapor-yukata/reference-audit.json",
+    "referenceIdentityPath": "config/products/siroino-lily-vapor-yukata/reference-identity.json",
+    "decompositionPath": "config/products/siroino-lily-vapor-yukata/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-lily-vapor-yukata/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-lily-vapor-yukata/stitch-graph.json",
+    "visualReviewPath": "config/products/siroino-lily-vapor-yukata/visual-review.json",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "researchTrial": "explicit closed shell and split-rail panel layout plus native Blender Cloth settlement",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true,
+    "clothSimulation": {
+      "applicability": "REQUIRED",
+      "components": [
+        "Lily_Summer_Front_Under",
+        "Lily_Summer_Front_Over",
+        "Lily_Summer_Back",
+        "Lily_Sleeve_Rail_Outer_L",
+        "Lily_Sleeve_Rail_Inner_L",
+        "Lily_Sleeve_Rail_Inner_R",
+        "Lily_Sleeve_Rail_Outer_R"
+      ],
+      "evidence": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/cloth-simulation.json",
+      "frameEnd": 32,
+      "reason": "The summer shell and both split-rail sleeve systems are loose construction and must be physically settled against the body."
+    }
+  },
+  "researchMethod": {
+    "name": "panel-first closed-column reconstruction with native Blender Cloth",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-lily-vapor-yukata/pattern-draft.json",
+    "secondaryEvidence": "config/products/siroino-lily-vapor-yukata/stitch-graph.json"
+  },
+  "licenseEvidence": "config/products/siroino-lily-vapor-yukata/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "patternLayoutPath": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-lily-vapor-yukata/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-lily-vapor-yukata/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-lily-vapor-yukata/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Lily_Summer_Shell", "role": "fabric"},
+      {"material": "MAT_Lily_Under_Sleeve", "role": "fabric"},
+      {"material": "MAT_Lily_Petal_Lock", "role": "accent"},
+      {"material": "MAT_Lily_Indigo_Facing", "role": "facing"},
+      {"material": "MAT_Lily_Silver_Hardware", "role": "metal"}
+    ]
+  },
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-lily-vapor-yukata/ProductManifest.json",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/README.md",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/References/lily-vapor-yukata-manufacturing-sheet.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Source/Blender/SiroinoLilyVaporYukata.blend",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Models/SiroinoLilyVaporYukata.fbx",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Models/SiroinoLilyVaporYukata.fbx.meta",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoLilyVaporYukata.prefab",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoLilyVaporYukata.prefab.meta",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoSotai_LilyVaporYukata.prefab",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/NDMF-Bake/SiroinoSotai_LilyVaporYukata_baked.prefab",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/NDMF-Bake/SiroinoSotai_LilyVaporYukata_baked.prefab.meta",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-unity-preview.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-unity-preview.png.meta",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-unity-validation.json",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-vrc-dry-run.json",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-vrc-avatar-audit.json",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoSotai_LilyVaporYukata.prefab.meta",
+    "Assets/Scenes/Avatar/12_LilyVaporYukata.unity",
+    "Assets/Scenes/Avatar/12_LilyVaporYukata.unity.meta",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/product-build-report.json",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/cloth-simulation.json",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/front.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/back.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/left.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/right.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/prone.png",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/siroino-lily-vapor-yukata-multiview.webp",
+    "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/siroino-lily-vapor-yukata-pose-review.webp"
+  ]
+}

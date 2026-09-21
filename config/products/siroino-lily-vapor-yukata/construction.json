@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lily-vapor-yukata",
+  "profile": "panel-sewn",
+  "target": "Siroino _Large via official shape keys",
+  "designRevision": "v1-closed-summer-column-split-rail-petal-lock",
+  "panels": [
+    "summer_front_under",
+    "summer_front_over",
+    "summer_back",
+    "sleeve_rail_outer_L/R",
+    "sleeve_rail_inner_L/R",
+    "sleeve_underlayer_L/R",
+    "collar_L/R",
+    "cuff_L/R",
+    "waist_stay",
+    "center_vent_facings"
+  ],
+  "separateGeometry": [
+    "petal_lock_root",
+    "petal_lock_outer",
+    "petal_lock_inner",
+    "narrow_indigo_facings",
+    "flat_55mm_waist_stay",
+    "center_back_walking_vent"
+  ],
+  "priorityFitZones": ["neck", "shoulders", "elbows", "waist", "hip", "knee", "hem", "back_vent"],
+  "heroDetail": "Three separately readable overlapping shallow Petal Lock plates at the wearer-left upper waist plus two narrow split-rail sleeves with real longitudinal air channels.",
+  "excludedConstruction": ["broad obi", "rear bow", "detached waterfall panels", "conventional wide kimono sleeves", "cape", "lantern bag", "hanging tassel field", "thigh straps"],
+  "researchTrial": {
+    "method": "explicit closed-column shell, sleeve-rail, and Petal Lock layout plus native Blender Cloth settlement",
+    "physicalSewingStitch": "front shell/back shell to waist stay and rail-to-under-sleeve seams",
+    "review": "render the panel layout before assembly and five-view/six-pose evidence after settlement"
+  },
+  "clothSimulation": {
+    "applicability": "REQUIRED",
+    "components": ["Lily_Summer_Front_Under", "Lily_Summer_Front_Over", "Lily_Summer_Back", "Lily_Sleeve_Rail_Outer_L", "Lily_Sleeve_Rail_Inner_L", "Lily_Sleeve_Rail_Inner_R", "Lily_Sleeve_Rail_Outer_R"],
+    "evidence": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/cloth-simulation.json",
+    "reason": "The closed summer shell and split-rail sleeve system are loose fabric and must be physically settled against the body."
+  },
+  "releaseBoundary": "Keep WORKING until the repaired manufacturing board, current Blender source, cloth evidence, five views, six poses, and direct visual review pass.",
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "The deterministic target-fit build owns shape-key transfer from Siroino; vendor smoothing is not required."
+  }
+}

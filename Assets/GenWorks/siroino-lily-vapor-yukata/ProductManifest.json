@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lily-vapor-yukata",
+  "productName": "Lily Vapor Yukata for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0-large",
+  "productRoot": "Assets/GenWorks/siroino-lily-vapor-yukata",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoLilyVaporYukata.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoSotai_LilyVaporYukata.prefab",
+  "previewPath": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-lily-vapor-yukata/README.md",
+  "sourceJobPath": "config/products/siroino-lily-vapor-yukata/job.json",
+  "sourceReferenceStatus": "REPAIRED_REPLACEMENT_BOARD_GENERATED",
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-lily-vapor-yukata/Source/Blender/SiroinoLilyVaporYukata.blend",
+    "fbx": "Assets/GenWorks/siroino-lily-vapor-yukata/Models/SiroinoLilyVaporYukata.fbx",
+    "prefab": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoLilyVaporYukata.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoSotai_LilyVaporYukata.prefab",
+    "multiview": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/siroino-lily-vapor-yukata-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/siroino-lily-vapor-yukata-pose-review.webp",
+    "clothSimulation": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/cloth-simulation.json",
+    "scene": "Assets/Scenes/Avatar/12_LilyVaporYukata.unity",
+    "continuousAvatarUploader": "Assets/UnityMCP_CAU/lily-vapor-yukata.asset",
+    "ndmfBakedPrefab": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/NDMF-Bake/SiroinoSotai_LilyVaporYukata_baked.prefab",
+    "unityValidation": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-unity-validation.json",
+    "vrcDryRun": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-vrc-dry-run.json",
+    "vrcAvatarAudit": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-vrc-avatar-audit.json",
+    "unityPreview": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/lily-vapor-yukata-unity-preview.png"
+  },
+  "technicalGates": {
+    "referenceArtifact": "REPLACEMENT_GENERATED",
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "REVIEW_REQUIRED",
+    "clothSimulation": "PASS",
+    "unityImport": "PASS",
+    "modularAvatar": "PASS",
+    "ndmf": "PASS",
+    "vrchatRuntime": "DRY_RUN_PASS"
+  },
+  "metrics": {
+    "meshObjects": 19,
+    "vertices": 30473,
+    "triangles": 59356,
+    "degenerateTriangles": 0,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "maxBoneInfluences": 5
+  },
+  "clothSimulation": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/cloth-simulation.json",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-lily-vapor-yukata",
+    "resumeFrom": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoLilyVaporYukata.prefab",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "exact original Issue PNG was unavailable; the repaired replacement board is persisted with its identity record",
+      "visualAppearanceReview remains REVIEW_REQUIRED for the split-rail sleeve silhouette",
+      "real VRChat upload was not performed; only SDK dry-run evidence exists",
+      "baked avatar audit is VeryPoor at 76,059 polygons and has no mapped viseme mesh; optimization/review remains pending"
+    ]
+  }
+}

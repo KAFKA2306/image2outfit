@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lily-vapor-yukata",
+  "stitches": [
+    {"id": "shell-waist", "from": "summer_front_under.waist", "to": "waist_stay.front", "type": "sewn"},
+    {"id": "shell-back-waist", "from": "summer_back.waist", "to": "waist_stay.back", "type": "sewn"},
+    {"id": "rail-outer-left", "from": "sleeve_rail_outer_L.shoulder-cuff", "to": "sleeve_underlayer_L.shoulder-cuff", "type": "split-rail"},
+    {"id": "rail-inner-left", "from": "sleeve_rail_inner_L.shoulder-cuff", "to": "sleeve_underlayer_L.shoulder-cuff", "type": "split-rail"},
+    {"id": "rail-outer-right", "from": "sleeve_rail_outer_R.shoulder-cuff", "to": "sleeve_underlayer_R.shoulder-cuff", "type": "split-rail"},
+    {"id": "rail-inner-right", "from": "sleeve_rail_inner_R.shoulder-cuff", "to": "sleeve_underlayer_R.shoulder-cuff", "type": "split-rail"},
+    {"id": "petal-lock-overlap", "from": "petal_lock_root", "to": "petal_lock_outer -> petal_lock_inner", "type": "layered-overlap"}
+  ],
+  "airChannels": ["left longitudinal sleeve gap", "right longitudinal sleeve gap"],
+  "vent": "center_back_walking_vent"
+}
