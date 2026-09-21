@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-noctis-drape-hoodie-set",
+  "productName": "Noctis Drape Hoodie Set for SiroinoSotai_PC",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-noctis-drape-hoodie-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Prefab/NoctisDrapeHoodie.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Prefab/SiroinoSotai_NoctisDrapeHoodie.prefab",
+  "previewPath": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/README.md",
+  "sourceJobPath": "config/products/siroino-noctis-drape-hoodie-set/job.json",
+  "productBuildScript": "tools/run_garment_pipeline.py",
+  "designRevision": "v1-split-drape-prototype",
+  "sourceReference": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/References/noctis-drape-hoodie-manufacturing-sheet.webp",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-noctis-drape-hoodie-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-noctis-drape-hoodie-set/pipeline-state.json",
+    "lastAttempt": {"result":"PROTOTYPE_CHECKPOINT_CREATED","visualRevision":"v1-split-drape-prototype","workflowRun":null,"review":null},
+    "blockers": [
+      "Prototype OBJ has not been imported, fitted or weighted to Siroino in Blender.",
+      "Blend/FBX/Prefab/five-view/six-pose and Unity/VRChat evidence are not yet produced."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "clothSimulation": "NOT_APPLICABLE",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "tenAxisAudit": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "researchTrial": "DECLARED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "manufacturingReference": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/References/noctis-drape-hoodie-manufacturing-sheet.webp",
+    "prototypeObj": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Source/Prototype/noctis-drape-hoodie.obj",
+    "prototypeMtl": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Source/Prototype/noctis-drape-hoodie.mtl",
+    "patternSpec": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Source/Patterns/pattern-spec.json",
+    "blend": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Source/Blender/NoctisDrapeHoodie.blend",
+    "fbx": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Models/NoctisDrapeHoodie.fbx",
+    "prefab": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Prefab/NoctisDrapeHoodie.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-noctis-drape-hoodie-set/Prefab/SiroinoSotai_NoctisDrapeHoodie.prefab"
+  }
+}
