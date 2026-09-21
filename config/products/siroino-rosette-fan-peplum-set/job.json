@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-rosette-fan-peplum-set",
+  "productName": "Rosette Fan Peplum Set for SiroinoSotai_PC",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-rosette-panel-prototype",
+  "renderLoopRevision": "v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-rosette-fan-peplum-set",
+  "productManifestPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/ProductManifest.json",
+  "buildScript": "tools/run_garment_pipeline.py",
+  "blendPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Blender/RosetteFanPeplum.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Models/RosetteFanPeplum.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Prefab/RosetteFanPeplum.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Prefab/SiroinoSotai_RosetteFanPeplum.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-rosette-fan-peplum-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/References/rosette-fan-peplum-manufacturing-sheet.svg",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Patterns/pattern-spec.json",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Prototype/rosette-fan-peplum.obj",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Prototype/rosette-fan-peplum.mtl",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Source/Blender/RosetteFanPeplum.blend",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Models/RosetteFanPeplum.fbx",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Prefab/RosetteFanPeplum.prefab",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Prefab/SiroinoSotai_RosetteFanPeplum.prefab",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/front.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/back.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/left.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/right.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/prone.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-rosette-fan-peplum-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-rosette-fan-peplum-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-rosette-fan-peplum-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-rosette-fan-peplum-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material":"MAT_Rosette_Jacket","role":"fabric"},
+      {"material":"MAT_Rosette_InnerFan","role":"fabric"},
+      {"material":"MAT_Rosette_Shorts","role":"fabric"},
+      {"material":"MAT_Rosette_Accent","role":"accent"}
+    ]
+  }
+}
