@@ -45,7 +45,16 @@ Repository-wide checks are `task audit:all` and `task check:python`. Do not add 
 
 Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence. Visual acceptance requires direct inspection of the current evidence required by `contracts/quality/quality-spec.json` and `config/release-policy.json`.
 
+Use a visual feedback loop for appearance-sensitive work: capture the current Blender/Unity view, inspect silhouette, seams, UV/material appearance, intersections, and required poses, make the smallest source change, then recapture and re-run the numeric checks. Use deterministic CLI/`uv` automation for repeatable generation and inspection; use computer use when the decision depends on the rendered UI rather than serialized values alone. When a visual defect is reproducible, encode its check in the existing verifier so later products do not repeat it.
+
 Merge eligibility, product completion, and customer release are separate decisions owned by their canonical policies.
+
+## Astra quality review
+
+- Delegate to Astra only for quality-critical review, especially cloth simulation, pose behavior, visual feedback, and release-blocking evidence.
+- Use the Astra model with `medium` reasoning effort.
+- Keep delegated input limited to the exact product, evidence paths, and acceptance question; do not send unrelated repository history or task context.
+- Require concise output limited to a verdict, up to three critical findings, and required actions, with no implementation unless explicitly requested.
 
 ## Continuation
 

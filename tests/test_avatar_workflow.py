@@ -15,12 +15,12 @@ import avatar_workflow  # noqa: E402
 
 
 class AvatarWorkflowTests(unittest.TestCase):
-    def test_project_workflow_has_ten_separate_outfits(self) -> None:
+    def test_project_workflow_has_eleven_separate_outfits(self) -> None:
         config = avatar_workflow._load_config(ROOT)
-        self.assertEqual(len(config["outfits"]), 10)
+        self.assertEqual(len(config["outfits"]), 11)
         self.assertEqual(
             len({item["id"] for item in config["outfits"]}),
-            10,
+            11,
         )
         self.assertEqual(
             config["scenes"]["workbench"],
@@ -37,8 +37,8 @@ class AvatarWorkflowTests(unittest.TestCase):
     def test_project_preflight_passes_for_baked_upload_set(self) -> None:
         result = avatar_workflow.preflight(ROOT)
         self.assertTrue(result["passed"], result["errors"])
-        self.assertEqual(result["selectedOutfitCount"], 10)
-        self.assertEqual(len(result["outfits"]), 10)
+        self.assertEqual(result["selectedOutfitCount"], 11)
+        self.assertEqual(len(result["outfits"]), 11)
         self.assertFalse(result["errors"])
         self.assertTrue(
             all(item["sceneCapture"]["passed"] for item in result["outfits"])

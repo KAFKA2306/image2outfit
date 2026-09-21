@@ -57,6 +57,15 @@ COMPONENTS: dict[str, tuple[str, ...]] = {
         "Nocturnal_Hakama_Side_L",
         "Nocturnal_Hakama_Side_R",
     ),
+    "siroino-lily-vapor-yukata": (
+        "Lily_Summer_Front_Under",
+        "Lily_Summer_Front_Over",
+        "Lily_Summer_Back",
+        "Lily_Sleeve_Rail_Outer_L",
+        "Lily_Sleeve_Rail_Inner_L",
+        "Lily_Sleeve_Rail_Inner_R",
+        "Lily_Sleeve_Rail_Outer_R",
+    ),
 }
 
 FRAME_END = {
@@ -70,6 +79,7 @@ FRAME_END = {
     "siroino-verdant-ranger-explorer-set": 30,
     "siroino-sage-breeze-onepiece": 30,
     "siroino-nocturnal-shrine-maiden-long-hakama-set": 32,
+    "siroino-lily-vapor-yukata": 32,
 }
 
 GRAVITY_Z = {
@@ -93,6 +103,14 @@ def read_json(path: Path) -> dict[str, object]:
     if not isinstance(value, dict):
         raise ValueError(f"expected JSON object: {path}")
     return value
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def repo_path(value: str | Path) -> Path:
@@ -413,6 +431,8 @@ def main() -> int:
         filepath=str(blend), check_existing=False, compress=True
     )
     export_settled_fbx(fbx, armature, objects)
+    blend_sha256 = sha256(blend)
+    fbx_sha256 = sha256(fbx)
     report = {
         "schemaVersion": 1,
         "productId": product_id,
@@ -428,7 +448,10 @@ def main() -> int:
         "contracts": contracts,
         "bodyCollisionThicknessM": 0.004,
         "collisionObject": body.name,
+        "sourceBlend": str(blend.relative_to(ROOT)).replace("\\", "/"),
+        "sourceBlendSha256": blend_sha256,
         "settledFbx": str(fbx.relative_to(ROOT)).replace("\\", "/"),
+        "settledFbxSha256": fbx_sha256,
     }
     write_json(report_path, report)
     build_report = (
@@ -443,6 +466,16 @@ def main() -> int:
             "\\", "/"
         )
         current["blenderVersion"] = bpy.app.version_string
+        current["artifacts"] = {
+            "blend": {
+                "path": str(blend.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": blend_sha256,
+            },
+            "settledFbx": {
+                "path": str(fbx.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": fbx_sha256,
+            },
+        }
         write_json(build_report, current)
     manifest_path = repo_path(str(job["productManifestPath"]))
     if manifest_path.is_file():
