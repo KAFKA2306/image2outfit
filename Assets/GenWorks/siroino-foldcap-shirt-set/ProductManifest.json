@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-foldcap-shirt-set",
+  "productName": "Foldcap Shirt Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-foldcap-shirt-set",
+  "documentationPath": "Assets/GenWorks/siroino-foldcap-shirt-set/README.md",
+  "sourceJobPath": "config/products/siroino-foldcap-shirt-set/job.json",
+  "generatedAt": "2026-09-14T10:45:00Z",
+  "designRevision": "v1-foldcap-shirt",
+  "completionGates": {
+    "manufacturingImage": "PASS",
+    "constructionContract": "PASS",
+    "patternDecomposition": "PASS",
+    "prototypeGeometry": "PASS",
+    "uvMapping": "PASS",
+    "heroGeometry": "PASS",
+    "canonicalJob": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "rigWeight": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat": "UNVERIFIED"
+  },
+  "metrics": {
+    "prototypeVertices": 52,
+    "prototypeUvCoordinates": 52,
+    "prototypePolygonFaces": 13,
+    "prototypeNamedGroups": 13,
+    "heroGroups": 4,
+    "degenerateFaces": 0
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-foldcap-shirt-set",
+    "blockers": ["No compatible generic repository-owned garment builder has yet been proven for this new Foldcap panel set."],
+    "nextAction": "Prove a current-main repository-owned generic garment build entrypoint, then add a schema-valid job.json and execute task candidate for this exact product."
+  }
+}
