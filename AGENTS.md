@@ -47,6 +47,13 @@ Generated files, hashes, inventory, CI success, and plausible prose are not visu
 
 Merge eligibility, product completion, and customer release are separate decisions owned by their canonical policies.
 
+## Astra quality review
+
+- Delegate to Astra only for quality-critical review, especially cloth simulation, pose behavior, visual feedback, and release-blocking evidence.
+- Use the Astra model with `medium` reasoning effort.
+- Keep delegated input limited to the exact product, evidence paths, and acceptance question; do not send unrelated repository history or task context.
+- Require concise output limited to a verdict, up to three critical findings, and required actions, with no implementation unless explicitly requested.
+
 ## Continuation
 
 If work stops, persist the current manifest/checkpoint, verified revision, failing stage or visible defect, blocker, and one exact next action in the existing canonical workline. Do not create a second agent-state database.
