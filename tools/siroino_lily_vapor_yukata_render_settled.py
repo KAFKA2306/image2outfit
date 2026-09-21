@@ -89,6 +89,29 @@ def main() -> int:
     REPORT.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
+    build_report = json.loads(REPORT.read_text(encoding="utf-8"))
+    build_report.setdefault("preClothPreviews", build_report.get("previews", {}))
+    build_report.setdefault("preClothPoses", build_report.get("poses", {}))
+    build_report["renderEvidenceFrame"] = settled_frame
+    build_report["previews"] = {
+        name: {
+            **build_report.get("previews", {}).get(name, {}),
+            "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": sha256(path),
+        }
+        for name, path in previews.items()
+    }
+    build_report["poses"] = {
+        name: {
+            **build_report.get("poses", {}).get(name, {}),
+            "path": str(path.relative_to(ROOT)).replace("\\", "/"),
+            "sha256": sha256(path),
+        }
+        for name, path in pose_paths.items()
+    }
+    REPORT.write_text(
+        json.dumps(build_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     evidence = {
         "schemaVersion": 1,
         "productId": PRODUCT_ID,

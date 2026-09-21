@@ -11,6 +11,18 @@
   "documentationPath": "Assets/GenWorks/siroino-lily-vapor-yukata/README.md",
   "sourceJobPath": "config/products/siroino-lily-vapor-yukata/job.json",
   "sourceReferenceStatus": "REPAIRED_REPLACEMENT_BOARD_GENERATED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-lily-vapor-yukata",
+    "resumeFrom": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoLilyVaporYukata.prefab",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "exact original Issue PNG was unavailable; the repaired replacement board is persisted with its identity record",
+      "visualAppearanceReview remains REVIEW_REQUIRED for shoulder and seated-pose deformation",
+      "real VRChat upload was not performed; only SDK dry-run evidence exists",
+      "baked avatar audit is VeryPoor at 77,499 polygons and has no mapped viseme mesh; optimization/review remains pending"
+    ]
+  },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-lily-vapor-yukata/Source/Blender/SiroinoLilyVaporYukata.blend",
     "fbx": "Assets/GenWorks/siroino-lily-vapor-yukata/Models/SiroinoLilyVaporYukata.fbx",
@@ -43,9 +55,9 @@
     "vrchatRuntime": "DRY_RUN_PASS"
   },
   "metrics": {
-    "meshObjects": 19,
-    "vertices": 30473,
-    "triangles": 59356,
+    "meshObjects": 21,
+    "vertices": 31279,
+    "triangles": 60796,
     "degenerateTriangles": 0,
     "unweightedVertices": 0,
     "weightSumErrors": 0,
@@ -53,17 +65,5 @@
   },
   "clothSimulation": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/cloth-simulation.json",
   "completionPolicyPath": "config/genworks-handoff-policy.json",
-  "completionPolicySchemaVersion": 2,
-  "handoff": {
-    "resumable": true,
-    "canonicalWorkspace": "Assets/GenWorks/siroino-lily-vapor-yukata",
-    "resumeFrom": "Assets/GenWorks/siroino-lily-vapor-yukata/Prefab/SiroinoLilyVaporYukata.prefab",
-    "doNotRebuildFromZero": true,
-    "blockers": [
-      "exact original Issue PNG was unavailable; the repaired replacement board is persisted with its identity record",
-      "visualAppearanceReview remains REVIEW_REQUIRED for the split-rail sleeve silhouette",
-      "real VRChat upload was not performed; only SDK dry-run evidence exists",
-      "baked avatar audit is VeryPoor at 76,059 polygons and has no mapped viseme mesh; optimization/review remains pending"
-    ]
-  }
+  "completionPolicySchemaVersion": 2
 }

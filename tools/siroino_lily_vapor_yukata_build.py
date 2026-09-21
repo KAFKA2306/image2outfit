@@ -171,11 +171,11 @@ def side_gusset(
     vertices: list[tuple[float, float, float]] = []
     for row in range(z_steps + 1):
         t = row / z_steps
-        z = 0.28 + (0.83 - 0.28) * t
+        z = 0.29 + (1.075 - 0.29) * t
         x = side * (0.34 - 0.19 * t)
         for column in range(y_steps + 1):
             u = column / y_steps
-            y = -0.170 + 0.305 * u + 0.006 * math.sin(math.pi * u) * (1.0 - t)
+            y = -0.205 + 0.350 * u + 0.006 * math.sin(math.pi * u) * (1.0 - t)
             vertices.append((x, y, z))
     faces: list[tuple[int, int, int, int]] = []
     stride = y_steps + 1
@@ -221,33 +221,33 @@ def add_petal_lock_and_details(armature, milk, lavender, indigo, silver, body):
         (
             petal_plate(
                 "Lily_Petal_Lock_Root",
-                -0.060,
-                0.785,
-                0.040,
+                0.000,
+                0.805,
                 0.060,
-                -0.203,
-                milk,
+                0.072,
+                -0.218,
+                lavender,
                 armature,
                 body,
             ),
             petal_plate(
                 "Lily_Petal_Lock_Outer",
-                -0.030,
-                0.820,
-                0.052,
-                0.072,
-                -0.209,
+                -0.055,
+                0.835,
+                0.044,
+                0.064,
+                -0.226,
                 lavender,
                 armature,
                 body,
             ),
             petal_plate(
                 "Lily_Petal_Lock_Inner",
-                -0.090,
-                0.820,
-                0.048,
-                0.068,
-                -0.214,
+                0.055,
+                0.775,
+                0.044,
+                0.064,
+                -0.230,
                 lavender,
                 armature,
                 body,
@@ -507,8 +507,24 @@ def main() -> int:
     ]
     garments.extend(panels)
     garments.extend(
+        (
+            side_gusset("Lily_Summer_Side_L", -1.0, milk, armature, body),
+            side_gusset("Lily_Summer_Side_R", 1.0, milk, armature, body),
+        )
+    )
+    garments.extend(
         add_petal_lock_and_details(armature, milk, lavender, indigo, silver, body)
     )
+
+    def bind_sleeve_rail(obj: bpy.types.Object, bone_name: str) -> None:
+        obj.vertex_groups.clear()
+        group = obj.vertex_groups.new(name=bone_name)
+        group.add(list(range(len(obj.data.vertices))), 1.0, "REPLACE")
+
+    bind_sleeve_rail(panels[3], "UpperArm_L")
+    bind_sleeve_rail(panels[4], "UpperArm_L")
+    bind_sleeve_rail(panels[5], "UpperArm_R")
+    bind_sleeve_rail(panels[6], "UpperArm_R")
     for obj in garments:
         if obj.type == "MESH" and obj.name not in {panel.name for panel in panels}:
             add_shape_keys(obj, body)
