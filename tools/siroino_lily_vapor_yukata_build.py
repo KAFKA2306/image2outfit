@@ -629,6 +629,18 @@ def main() -> int:
         "previewPath": job["previewPaths"]["front"],
         "documentationPath": f"{job['productRoot']}/README.md",
         "sourceJobPath": f"config/products/{PRODUCT_ID}/job.json",
+        "sourceReferenceStatus": "REPAIRED_REPLACEMENT_BOARD_GENERATED",
+        "handoff": {
+            "resumable": True,
+            "canonicalWorkspace": job["productRoot"],
+            "resumeFrom": job["prefabAssetPath"],
+            "doNotRebuildFromZero": True,
+            "blockers": [
+                "exact original Issue PNG was unavailable; the repaired replacement board is persisted with its identity record",
+                "visualAppearanceReview remains REVIEW_REQUIRED until the shoulder and seated-pose deformation loop is accepted",
+                "real VRChat upload is not performed by the automated build; only SDK dry-run evidence is recorded",
+            ],
+        },
         "outputs": {
             "blend": job["blendPath"],
             "fbx": job["fbxAssetPath"],
