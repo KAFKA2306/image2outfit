@@ -232,6 +232,15 @@ def main() -> int:
             "sit": ((1.72, -2.05, 0.62), (0.0, 0.0, 0.44), 1.28),
             "prone": ((1.90, -0.46, 0.80), (0.0, -0.44, 0.44), 1.36),
         }
+    elif job["id"] == "siroino-quiet-arc-panel-dress":
+        camera_settings = {
+            "neutral": ((1.62, -1.90, 0.72), (0.0, 0.0, 0.54), 1.30),
+            "arms-up": ((1.72, -2.05, 0.90), (0.0, 0.0, 0.76), 1.56),
+            "arm-cross": ((1.62, -1.90, 0.72), (0.0, 0.0, 0.54), 1.30),
+            "crouch": ((1.72, -2.05, 0.50), (0.0, 0.0, 0.36), 1.30),
+            "sit": ((1.72, -2.05, 0.48), (0.0, 0.0, 0.34), 1.30),
+            "prone": ((1.90, -0.46, 0.72), (0.0, -0.44, 0.38), 1.38),
+        }
 
     # Materialize the contract's five neutral turnaround views alongside the
     # required motion evidence.  The exact target armature is reset first so
@@ -265,7 +274,7 @@ def main() -> int:
         bpy.ops.render.render(write_still=True)
         paths[name] = path
     apply_pose(armatures, base_transforms, "neutral")
-    sheet(paths, root / "Previews" / "siroino-wide-cargo-pose-review.webp")
+    sheet(paths, root / "Previews" / f"{root.name}-pose-review.webp")
     print(
         json.dumps(
             {
