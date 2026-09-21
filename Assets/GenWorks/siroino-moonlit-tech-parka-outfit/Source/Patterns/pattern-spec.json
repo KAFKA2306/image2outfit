@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-moonlit-tech-parka-outfit",
+  "units": "m",
+  "source": {
+    "manufacturingReference": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/References/moonlit-tech-parka-manufacturing-sheet.webp",
+    "designRevision": "moonlit-suspension-rail-v1"
+  },
+  "panels": [
+    {"id":"shell_front_L","role":"shell","material":"MAT_Shell"},
+    {"id":"shell_front_R","role":"shell","material":"MAT_Shell"},
+    {"id":"shell_back","role":"shell","material":"MAT_Shell"},
+    {"id":"sleeve_L","role":"sleeve","material":"MAT_Shell"},
+    {"id":"sleeve_R","role":"sleeve","material":"MAT_Shell"},
+    {"id":"inner_front","role":"inner","material":"MAT_Inner"},
+    {"id":"inner_back","role":"inner","material":"MAT_Inner"},
+    {"id":"short_front_L","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"short_front_R","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"short_back_L","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"short_back_R","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"waistband","role":"bottoms","material":"MAT_Bottoms"},
+    {"id":"suspension_rail_L","role":"hero","material":"MAT_Rail"},
+    {"id":"suspension_rail_R","role":"hero","material":"MAT_Rail"},
+    {"id":"rail_anchor_L","role":"hero-facing","material":"MAT_Rail"},
+    {"id":"rail_anchor_R","role":"hero-facing","material":"MAT_Rail"}
+  ],
+  "heroDetail": {
+    "id": "twin-suspension-rail",
+    "requiredGroups": ["suspension_rail_L","suspension_rail_R","rail_anchor_L","rail_anchor_R"],
+    "requirements": ["real geometry", "visible thickness after Blender build", "bounded torso/hip deformation", "unique UV islands"]
+  },
+  "fitZones": ["shoulder","upper-arm","elbow","chest","waist","hip","upper-leg"],
+  "acceptance": {
+    "structuralGroups": 16,
+    "heroGroups": 4,
+    "minimumMaterialRoles": 4,
+    "lod0TriangleTarget": 25000
+  }
+}

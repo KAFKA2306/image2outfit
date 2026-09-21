@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-moonlit-tech-parka-outfit",
+  "productName": "Moonlit Suspension Parka Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit",
+  "sourceJobPath": "config/products/siroino-moonlit-tech-parka-outfit/job.json",
+  "generatedAt": "2026-09-15T02:31:51+09:00",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "structuralPrototype": "PASS",
+    "canonicalJob": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "technicalGates": {
+    "blender": "UNVERIFIED",
+    "uvMapping": "PASS",
+    "weightTransfer": "UNVERIFIED",
+    "exactBodyPoseRenders": "UNVERIFIED",
+    "latestGeometryRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabSerialized": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit",
+    "doNotRebuildFromZero": true,
+    "issue": 549,
+    "resumeFrom": "config/products/siroino-moonlit-tech-parka-outfit/job.json",
+    "blockers": []
+  },
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-moonlit-tech-parka-outfit/Source/Prototype/structural.obj",
+    "sha256": "a46754fb029f4db1b0b11375cfefada8505f8b2ca926be7edd4fbf744be209b1",
+    "vertices": 64,
+    "uvCoordinates": 64,
+    "polygonFaces": 16,
+    "namedGroups": 16,
+    "materialRoles": 4,
+    "heroGroups": ["suspension_rail_L", "suspension_rail_R", "rail_anchor_L", "rail_anchor_R"]
+  }
+}
