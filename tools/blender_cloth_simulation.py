@@ -43,6 +43,12 @@ COMPONENTS: dict[str, tuple[str, ...]] = {
         "Verdant_Tunic_Side_L",
         "Verdant_Tunic_Side_R",
     ),
+    "siroino-sage-breeze-onepiece": (
+        "Sage_Breeze_Front",
+        "Sage_Breeze_Back",
+        "Sage_Breeze_Side_L",
+        "Sage_Breeze_Side_R",
+    ),
     "siroino-nocturnal-shrine-maiden-long-hakama-set": (
         "Nocturnal_Hakama_Front_L",
         "Nocturnal_Hakama_Front_R",
@@ -62,7 +68,15 @@ FRAME_END = {
     "siroino-wide-cargo": 18,
     "siroino-lunar-tech-hoodie": 30,
     "siroino-verdant-ranger-explorer-set": 30,
+    "siroino-sage-breeze-onepiece": 30,
     "siroino-nocturnal-shrine-maiden-long-hakama-set": 32,
+}
+
+GRAVITY_Z = {
+    # The Sage shell is a stiff column garment.  A reduced gravity value keeps
+    # native Cloth from collapsing the long, open-hem panels while still
+    # producing a reproducible settled deformation.
+    "siroino-sage-breeze-onepiece": -0.8,
 }
 
 
@@ -158,7 +172,7 @@ def pin_vertices(obj: bpy.types.Object) -> list[int]:
         raise RuntimeError(f"cloth mesh is too small to pin: {obj.name}")
     minimum = min(point.z for point in coordinates)
     maximum = max(point.z for point in coordinates)
-    threshold = maximum - max(1e-6, maximum - minimum) * 0.16
+    threshold = maximum - max(1e-6, maximum - minimum) * 0.28
     selected = [
         vertex.index
         for vertex, point in zip(obj.data.vertices, coordinates)
@@ -199,12 +213,12 @@ def configure_cloth(obj: bpy.types.Object, frame_end: int) -> dict[str, object]:
     pin.add(vertices, 1.0, "REPLACE")
     cloth = obj.modifiers.new("Image2Outfit Cloth", "CLOTH")
     cloth.settings.quality = 6
-    cloth.settings.mass = 0.20
-    cloth.settings.tension_stiffness = 25.0
-    cloth.settings.compression_stiffness = 25.0
-    cloth.settings.shear_stiffness = 10.0
-    cloth.settings.bending_stiffness = 0.45
-    cloth.settings.air_damping = 3.0
+    cloth.settings.mass = 0.02
+    cloth.settings.tension_stiffness = 120.0
+    cloth.settings.compression_stiffness = 120.0
+    cloth.settings.shear_stiffness = 60.0
+    cloth.settings.bending_stiffness = 4.0
+    cloth.settings.air_damping = 2.5
     cloth.settings.vertex_group_mass = pin.name
     cloth.settings.pin_stiffness = 1.0
     cloth.collision_settings.use_collision = True
@@ -214,6 +228,10 @@ def configure_cloth(obj: bpy.types.Object, frame_end: int) -> dict[str, object]:
         cloth.collision_settings.use_self_collision = False
     cloth.point_cache.frame_start = 1
     cloth.point_cache.frame_end = frame_end
+    # Settle in garment-local space and leave the armature modifier after the
+    # baked cloth is applied.  Applying Cloth after Armature causes the
+    # Blender warning about a non-first modifier and exaggerated pose folds.
+    obj.modifiers.move(len(obj.modifiers) - 1, 0)
     return {
         "object": obj.name,
         "modifier": cloth.name,
@@ -228,13 +246,14 @@ def bake_components(
     armature: bpy.types.Object,
     names: tuple[str, ...],
     frame_end: int,
+    gravity_z: float,
 ) -> list[dict[str, object]]:
     objects = [find_object(name) for name in names]
     ensure_collision(body)
     scene = bpy.context.scene
     scene.frame_start = 1
     scene.frame_end = frame_end
-    scene.gravity = (0.0, 0.0, -4.5)
+    scene.gravity = (0.0, 0.0, gravity_z)
     contracts = []
     before = {}
     for obj in objects:
@@ -373,7 +392,13 @@ def main() -> int:
         raise RuntimeError("Siroino armature is missing")
     names = COMPONENTS[product_id]
     body = find_body(product_id, names)
-    contracts = bake_components(body, armature, names, FRAME_END[product_id])
+    contracts = bake_components(
+        body,
+        armature,
+        names,
+        FRAME_END[product_id],
+        GRAVITY_Z.get(product_id, -4.5),
+    )
     objects = [
         obj
         for obj in bpy.context.scene.objects

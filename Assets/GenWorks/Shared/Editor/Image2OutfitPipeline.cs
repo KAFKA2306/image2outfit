@@ -253,6 +253,10 @@ namespace Image2Outfit.Editor
             if (report.errors.Any())
                 return report;
 
+            AssetDatabase.ImportAsset(
+                job.fbxAssetPath,
+                ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport
+            );
             var importer = AssetImporter.GetAtPath(job.fbxAssetPath) as ModelImporter;
             if (importer == null)
             {
