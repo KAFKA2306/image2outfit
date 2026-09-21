@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-aster-fold-utility-kimono-set",
+  "designRevision": "v1-modern-kimono-aster-fold-clasp",
+  "parts": [
+    "kimono_front_L", "kimono_front_R", "kimono_back", "shoulder_L", "shoulder_R", "sleeve_L", "sleeve_R",
+    "sleeve_facing_L", "sleeve_facing_R", "inner_front", "inner_back",
+    "skort_front_L", "skort_front_R", "skort_back", "waistband_outer", "waistband_inner",
+    "obi_base_front", "obi_base_back", "aster_fold_outer", "aster_fold_inner",
+    "aster_fold_facing_outer", "aster_fold_facing_inner"
+  ],
+  "heroDetail": {
+    "name": "aster-fold-obi-clasp",
+    "plates": ["aster_fold_outer", "aster_fold_inner"],
+    "facings": ["aster_fold_facing_outer", "aster_fold_facing_inner"],
+    "requirements": [
+      "two separately named interlocking folded fabric-shell plates",
+      "real thickness and readable overlap",
+      "bounded front obi placement",
+      "visible in front and three-quarter evidence"
+    ]
+  },
+  "materials": {
+    "kimono": "warm-rice-white-matte-cotton-linen",
+    "inner": "sumi-charcoal-matte-twill",
+    "skortObi": "sumi-charcoal-matte-twill",
+    "hero": "dusty-persimmon-fold-facing",
+    "hardware": "dark-nickel-low-gloss"
+  },
+  "uvPolicy": {"set": "UV0", "range": "0..1", "heroIslandsUnique": true, "mirrorHero": false}
+}

@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-aster-fold-utility-kimono-set",
+  "productName": "Aster Fold Utility Kimono Set for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoAsterFoldUtilityKimonoSet.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoSotai_AsterFoldUtilityKimonoSet.prefab",
+  "previewPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/README.md",
+  "sourceJobPath": "config/products/siroino-aster-fold-utility-kimono-set/job.json",
+  "productBuildScript": "tools/siroino_aster_fold_utility_kimono_build.py",
+  "designRevision": "v1-modern-kimono-aster-fold-clasp",
+  "reference": {
+    "status": "ISSUE_VISIBLE_EXACT_CONCEPT_RECORDED",
+    "issue": 596,
+    "sourceUrl": "https://photoshop-api.adobe.io/v2/short-url/urn:aaid:ps:US:ce5edeed-b604-4e3d-a106-5bdc3aa0f94c",
+    "exactIssueImageAvailable": true,
+    "repositoryContainsSourceImage": false
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "blender": "PENDING_RETRY",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "PASS",
+    "clothSimulation": "NOT_REQUIRED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Source/Blender/SiroinoAsterFoldUtilityKimonoSet.blend",
+    "fbx": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Models/SiroinoAsterFoldUtilityKimonoSet.fbx",
+    "prefab": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoAsterFoldUtilityKimonoSet.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoSotai_AsterFoldUtilityKimonoSet.prefab"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoAsterFoldUtilityKimonoSet.prefab",
+    "blockers": [
+      "Unity/Modular Avatar/NDMF/VRChat runtime evidence is not executed in the isolated Blender workflow",
+      "direct visual review remains required"
+    ]
+  }
+}
