@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-crescent-rail-romper-set",
+  "designRevision": "crescent-rail-r1",
+  "pieces": [
+    {"name":"romper_front_L","count":1,"role":"shell"},
+    {"name":"romper_front_R","count":1,"role":"shell"},
+    {"name":"romper_back_L","count":1,"role":"shell"},
+    {"name":"romper_back_R","count":1,"role":"shell"},
+    {"name":"waistband_front","count":1,"role":"shell"},
+    {"name":"waistband_back","count":1,"role":"shell"},
+    {"name":"sleeve_cap_L","count":1,"role":"secondary"},
+    {"name":"sleeve_cap_R","count":1,"role":"secondary"},
+    {"name":"modesty_insert","count":1,"role":"inner"},
+    {"name":"zip_facing","count":1,"role":"inner"},
+    {"name":"crescent_rail_outer","count":1,"role":"hero"},
+    {"name":"crescent_rail_inner","count":1,"role":"hero"},
+    {"name":"rail_facing_outer","count":1,"role":"hero-facing"},
+    {"name":"rail_facing_inner","count":1,"role":"hero-facing"}
+  ],
+  "heroGroups": ["crescent_rail_outer","crescent_rail_inner","rail_facing_outer","rail_facing_inner"],
+  "uvPolicy": "UV0 in 0..1; hero islands unique; mirroring only for symmetric non-hero cloth"
+}
