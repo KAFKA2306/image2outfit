@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-latchfold-wrap-shirt-set",
+  "productName": "Latchfold Wrap Shirt Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-latchfold-wrap-shirt-set",
+  "documentationPath": "Assets/GenWorks/siroino-latchfold-wrap-shirt-set/README.md",
+  "sourceJobPath": "config/products/siroino-latchfold-wrap-shirt-set/job.json",
+  "generatedAt": "2026-09-14T11:39:00Z",
+  "designRevision": "v1-latchfold-wrap",
+  "completionGates": {
+    "manufacturingImage": "PASS",
+    "constructionContract": "PASS",
+    "patternDecomposition": "PASS",
+    "prototypeGeometry": "PASS",
+    "uvMapping": "PASS",
+    "heroGeometry": "PASS",
+    "canonicalJob": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "rigWeight": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat": "UNVERIFIED"
+  },
+  "metrics": {
+    "prototypeVertices": 76,
+    "prototypeUvCoordinates": 76,
+    "prototypePolygonFaces": 19,
+    "prototypeNamedGroups": 19,
+    "heroGroups": 6,
+    "degenerateFaces": 0
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-latchfold-wrap-shirt-set",
+    "blockers": ["No compatible generic repository-owned garment build entrypoint has yet been proven for this new Latchfold panel set; current main contains orchestration plus multiple garment-specific builders."],
+    "nextAction": "Prove or land a current-main generic garment build entrypoint without adding a product-only one-off, then add schema-valid job.json and execute this exact product through the canonical candidate path."
+  }
+}
