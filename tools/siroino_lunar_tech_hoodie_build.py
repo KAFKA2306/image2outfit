@@ -459,7 +459,16 @@ def metrics(objects: list[bpy.types.Object]) -> dict[str, int]:
         result["vertices"] += len(mesh.vertices)
         result["triangles"] += len(mesh.loop_triangles)
         for vertex in mesh.vertices:
-            weights = [group.weight for group in vertex.groups if group.weight > 1e-8]
+            # Cloth pin groups are simulation metadata, not deform weights;
+            # exclude them from the normalized humanoid-weight audit.
+            weights = [
+                group.weight
+                for group in vertex.groups
+                if group.weight > 1e-8
+                and not obj.vertex_groups[group.group].name.startswith(
+                    "Image2Outfit Cloth"
+                )
+            ]
             result["maxBoneInfluences"] = max(result["maxBoneInfluences"], len(weights))
             if not weights:
                 result["unweightedVertices"] += 1
