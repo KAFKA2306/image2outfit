@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "benchmarkId": "2026-image-to-3d-oss-lily-vapor-yukata",
+  "date": "2026-09-23",
+  "project": "M:/win11projects/unity/image2outfit",
+  "unityVersion": "2022.3.22f1",
+  "packages": {
+    "com.vrchat.avatars": "3.10.4",
+    "nadena.dev.modular-avatar": "1.17.1",
+    "nadena.dev.ndmf": "1.14.1",
+    "com.anatawa12.continuous-avatar-uploader": "0.3.12"
+  },
+  "unityImport": {
+    "status": "PASS",
+    "evidence": "AssetDatabase.Refresh followed by ModelImporter and mesh inspection for all five FBX assets",
+    "comparisonScene": "Assets/OSSBenchmarks/2026-09-23-garmentized/OSS_Garmentized_Comparison.unity",
+    "comparisonCapture": "Assets/OSSBenchmarks/2026-09-23-garmentized/unity-comparison.png",
+    "avatarComparisonScene": "Assets/OSSBenchmarks/2026-09-23-garmentized/OSS_Avatar_Baked_Comparison.unity",
+    "avatarComparisonCapture": "Assets/OSSBenchmarks/2026-09-23-garmentized/unity-avatar-comparison.png",
+    "captureResolution": [2400, 700]
+  },
+  "candidates": [
+    {
+      "candidate": "Pixal3D",
+      "fbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/pixal3d/pixal3d-cloth-sim.fbx",
+      "skinnedFbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/pixal3d/pixal3d-cloth-sim-skinned.fbx",
+      "mainAsset": "GameObject",
+      "importer": "ModelImporter",
+      "meshCount": 1,
+      "unityVertexCount": 2596472,
+      "skinnedRendererCount": 0,
+      "meshRendererCount": 1,
+      "visualFinding": "Recognizable garment silhouette; highest imported mesh density.",
+      "ndmfBake": "PASS",
+      "avatarAudit": {"overall": "VeryPoor", "polyCount": 1088217, "skinnedMeshCount": 2},
+      "vrcDryRun": {"valid": true, "performanceOverall": "VeryPoor", "warnings": ["PipelineManager.blueprintId empty (new content)", "overall performance rating is VeryPoor"]}
+    },
+    {
+      "candidate": "TRELLIS.2",
+      "fbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/trellis2/trellis2-cloth-sim.fbx",
+      "skinnedFbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/trellis2/trellis2-cloth-sim-skinned.fbx",
+      "mainAsset": "GameObject",
+      "importer": "ModelImporter",
+      "meshCount": 1,
+      "unityVertexCount": 61242,
+      "skinnedRendererCount": 0,
+      "meshRendererCount": 1,
+      "visualFinding": "Spiked settled mesh is visible in the Unity capture; failed visual gate.",
+      "ndmfBake": "PASS",
+      "avatarAudit": {"overall": "Good", "polyCount": 46704, "skinnedMeshCount": 2},
+      "vrcDryRun": {"valid": true, "performanceOverall": "Good", "warnings": ["PipelineManager.blueprintId empty (new content)"]}
+    },
+    {
+      "candidate": "Hunyuan3D-2.1",
+      "fbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/hunyuan3d-2.1/hunyuan3d-2.1-cloth-sim.fbx",
+      "skinnedFbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/hunyuan3d-2.1/hunyuan3d-2.1-cloth-sim-skinned.fbx",
+      "mainAsset": "GameObject",
+      "importer": "ModelImporter",
+      "meshCount": 1,
+      "unityVertexCount": 81604,
+      "skinnedRendererCount": 0,
+      "meshRendererCount": 1,
+      "visualFinding": "Coherent robe silhouette with the Blender-identified floating artifact.",
+      "ndmfBake": "PASS",
+      "avatarAudit": {"overall": "Good", "polyCount": 46693, "skinnedMeshCount": 2},
+      "vrcDryRun": {"valid": true, "performanceOverall": "Good", "warnings": ["PipelineManager.blueprintId empty (new content)"]}
+    },
+    {
+      "candidate": "Hunyuan3D-2mv",
+      "fbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/hunyuan3d-2mv/hunyuan3d-2mv-cloth-sim.fbx",
+      "skinnedFbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/hunyuan3d-2mv/hunyuan3d-2mv-cloth-sim-skinned.fbx",
+      "mainAsset": "GameObject",
+      "importer": "ModelImporter",
+      "meshCount": 1,
+      "unityVertexCount": 78988,
+      "skinnedRendererCount": 0,
+      "meshRendererCount": 1,
+      "visualFinding": "Cleanest multi-view silhouette in this Unity static comparison, but still a raw surface.",
+      "ndmfBake": "PASS",
+      "avatarAudit": {"overall": "Good", "polyCount": 46703, "skinnedMeshCount": 2},
+      "vrcDryRun": {"valid": true, "performanceOverall": "Good", "warnings": ["PipelineManager.blueprintId empty (new content)"]}
+    },
+    {
+      "candidate": "Step1X-3D",
+      "fbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/step1x-3d/step1x-3d-cloth-sim.fbx",
+      "skinnedFbx": "Assets/OSSBenchmarks/2026-09-23-garmentized/step1x-3d/step1x-3d-cloth-sim-skinned.fbx",
+      "mainAsset": "GameObject",
+      "importer": "ModelImporter",
+      "meshCount": 1,
+      "unityVertexCount": 77457,
+      "skinnedRendererCount": 0,
+      "meshRendererCount": 1,
+      "visualFinding": "Readable robe silhouette and successful static import.",
+      "ndmfBake": "PASS",
+      "avatarAudit": {"overall": "Good", "polyCount": 46703, "skinnedMeshCount": 2},
+      "vrcDryRun": {"valid": true, "performanceOverall": "Good", "warnings": ["PipelineManager.blueprintId empty (new content)"]}
+    }
+  ],
+  "modularAvatar": {
+    "status": "PASS_NDMF_BAKE",
+    "observed": "All five candidates have a separate Modular Avatar outfit prefab, a separate VRCAvatarDescriptor avatar prefab, 60 imported bones, and an NDMF baked prefab.",
+    "meaning": "The five candidates are wearable avatar candidates. Visual quality and performance gates remain candidate-specific.",
+    "nextRequired": "Perform VRChat SDK Build & Test and review pose/animation deformation before any publication upload."
+  },
+  "ndmf": {
+    "status": "PASS",
+    "outputs": "Assets/OSSBenchmarks/2026-09-23-garmentized/NDMF-Bake/<candidate>/OSS_<candidate>_Avatar_baked.prefab",
+    "stats": {"gameObjects": 66, "meshes": 2}
+  },
+  "vrchatDryRun": {
+    "status": "PASS_VALID",
+    "scope": "Five baked avatar scene objects in OSS_Avatar_Baked_Comparison.unity",
+    "commonWarning": "PipelineManager.blueprintId empty (new content)",
+    "realUpload": "NOT_RUN"
+  },
+  "vrchatUpload": "NOT_RUN",
+  "baselineAudit": {
+    "scope": "Existing Lily Vapor Yukata baked avatar only; not a pass for the five OSS candidates.",
+    "avatar": "SiroinoSotai_LilyVaporYukata_baked 1",
+    "performanceOverall": "VeryPoor",
+    "polyCount": 16704,
+    "skinnedMeshCount": 22,
+    "note": "This audit is baseline evidence and was not used to claim candidate readiness."
+  }
+}
