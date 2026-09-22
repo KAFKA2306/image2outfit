@@ -75,13 +75,43 @@
       "candidate": "TRELLIS.2",
       "rank": 2,
       "repository": "https://github.com/microsoft/TRELLIS.2",
-      "runner": "Official TRELLIS.2 repository and Hugging Face Space microsoft/TRELLIS.2",
-      "status": "BLOCKED_ZERO_GPU_QUOTA",
-      "rawGeneration": "official local low-VRAM loader reached the image encoder but required gated DINOv3 access; official Space API then rejected the 512 request because the shared ZeroGPU quota was exhausted",
+      "runner": "Official TRELLIS.2 repository and official TRELLIS.2-4B weights with public DINOv3 ViT-L/16 redistribution, local WSL CUDA runner",
+      "status": "RAW_SHAPE_GENERATED",
+      "inputs": ["hero-three-quarter.png"],
+      "derivedInput": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata/hero-three-quarter-grabcut-alpha.png",
+      "settings": {
+        "seed": 42,
+        "pipelineType": "512",
+        "lowVram": true,
+        "attentionBackend": "xformers",
+        "sparseStructureSteps": 12,
+        "shapeSteps": 12,
+        "textureSteps": 12,
+        "sparseGuidanceStrength": 7.5,
+        "shapeGuidanceStrength": 7.5,
+        "textureGuidanceStrength": 1.0,
+        "backgroundRemoval": "pre-masked RGBA input; preprocess_image=false; rembg disabled"
+      },
+      "rawGeneration": "official local 512 shape plus texture pipeline completed; PBR GLB export completed",
       "garmentization": "NOT_RUN",
       "unityImport": "NOT_RUN",
       "vrchatHandoff": "NOT_RUN",
-      "output": null
+      "output": {
+        "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/trellis2/lily-vapor-yukata-shape-512.glb",
+        "sha256": "7CE57A787E08FA5BBE7C48C69BC61D8E1B5D567E507498837A664D412E43569D",
+        "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/trellis2/lily-vapor-yukata-shape-512-preview.png",
+        "clayPreview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/trellis2/lily-vapor-yukata-shape-512-clay-preview.png",
+        "geometry": {
+          "vertices": 618918,
+          "faces": 989029,
+          "texture": true
+        }
+      },
+      "notes": [
+        "The original gated DINOv3 endpoint and the public Space ZeroGPU quota were unavailable; a public DINOv3 ViT-L/16 redistribution was locally verified against the official architecture and used only for the image-conditioning stage.",
+        "A Torch SDPA fallback was generated for diagnosis but produced a visibly fragmented mesh and is not counted; the retained output uses the official xformers attention path.",
+        "The retained GLB is a raw model result with PBR material data, not a panel/seam garment or a completed VRChat garment."
+      ]
     },
     {
       "candidate": "Hunyuan3D-2.1",
