@@ -39,9 +39,7 @@ def prism(
     verts.extend((x, y + depth, z) for x, z in outline)
     n = len(outline)
     faces = [tuple(range(n)), tuple(range(2 * n - 1, n - 1, -1))]
-    faces.extend(
-        (i, (i + 1) % n, n + (i + 1) % n, n + i) for i in range(n)
-    )
+    faces.extend((i, (i + 1) % n, n + (i + 1) % n, n + i) for i in range(n))
     mesh = bpy.data.meshes.new(f"{name}_Mesh")
     mesh.from_pydata(verts, [], faces)
     mesh.update()
@@ -200,37 +198,233 @@ def build(job: dict):
     armature.name = "BellflowerLanternArmature"
     armature.data.name = "BellflowerLanternArmatureData"
 
-    navy = structural.material("MAT_Bellflower_Navy_Twill", (0.025, 0.045, 0.090, 1), 0.82)
+    navy = structural.material(
+        "MAT_Bellflower_Navy_Twill", (0.025, 0.045, 0.090, 1), 0.82
+    )
     ivory = structural.material("MAT_Bellflower_Ivory", (0.78, 0.72, 0.61, 1), 0.76)
     celadon = structural.material("MAT_Bellflower_Celadon", (0.48, 0.58, 0.48, 1), 0.52)
     coral = structural.material("MAT_Bellflower_Coral", (0.72, 0.22, 0.16, 1), 0.34)
-    smoke = structural.material("MAT_Bellflower_Smoke_Organza", (0.18, 0.24, 0.28, 0.38), 0.48)
+    smoke = structural.material(
+        "MAT_Bellflower_Smoke_Organza", (0.18, 0.24, 0.28, 0.38), 0.48
+    )
     try:
         smoke.surface_render_method = "DITHERED"
     except AttributeError:
         pass
 
     made = [
-        asymmetric_panel("blouse_front_left", -0.115, -0.008, -0.108, -0.010, 0.895, 0.735, -0.105, 0.018, ivory),
-        asymmetric_panel("blouse_front_right", 0.008, 0.115, 0.010, 0.108, 0.895, 0.735, -0.105, 0.018, ivory),
-        asymmetric_panel("blouse_back_left", -0.115, -0.006, -0.108, -0.010, 0.895, 0.735, 0.058, 0.020, ivory),
-        asymmetric_panel("blouse_back_right", 0.006, 0.115, 0.010, 0.108, 0.895, 0.735, 0.058, 0.020, ivory),
-        asymmetric_panel("yoke_front_left", -0.118, -0.005, -0.105, -0.008, 0.955, 0.875, -0.126, 0.014, navy),
-        asymmetric_panel("yoke_front_right", 0.005, 0.118, 0.008, 0.105, 0.955, 0.875, -0.126, 0.014, navy),
-        asymmetric_panel("yoke_back_left", -0.118, -0.004, -0.105, -0.008, 0.955, 0.875, 0.080, 0.015, navy),
-        asymmetric_panel("yoke_back_right", 0.004, 0.118, 0.008, 0.105, 0.955, 0.875, 0.080, 0.015, navy),
-        asymmetric_panel("waistband_front", -0.175, 0.175, -0.170, 0.170, 0.752, 0.700, -0.115, 0.018, navy),
-        asymmetric_panel("waistband_back", -0.175, 0.175, -0.170, 0.170, 0.752, 0.700, 0.070, 0.020, navy),
-        asymmetric_panel("trouser_front_left", -0.175, -0.014, -0.115, -0.018, 0.705, 0.190, -0.105, 0.021, navy),
-        asymmetric_panel("trouser_front_right", 0.014, 0.175, 0.018, 0.115, 0.705, 0.190, -0.105, 0.021, navy),
-        asymmetric_panel("trouser_back_left", -0.175, -0.014, -0.115, -0.018, 0.705, 0.190, 0.060, 0.024, navy),
-        asymmetric_panel("trouser_back_right", 0.014, 0.175, 0.018, 0.115, 0.705, 0.190, 0.060, 0.024, navy),
-        asymmetric_panel("ankle_facing_left", -0.120, -0.018, -0.112, -0.020, 0.220, 0.165, -0.108, 0.024, navy),
-        asymmetric_panel("ankle_facing_right", 0.018, 0.120, 0.020, 0.112, 0.220, 0.165, -0.108, 0.024, navy),
-        structural.cube("standing_collar", (0.0, -0.075, 0.935), (0.108, 0.026, 0.036), navy, bevel=0.008),
-        structural.cube("collar_tab", (0.0, -0.112, 0.936), (0.022, 0.010, 0.016), coral, bevel=0.004),
-        structural.cube("cuff_L", (-0.455, 0.006, 0.940), (0.030, 0.050, 0.036), navy, bevel=0.006),
-        structural.cube("cuff_R", (0.455, 0.006, 0.940), (0.030, 0.050, 0.036), navy, bevel=0.006),
+        asymmetric_panel(
+            "blouse_front_left",
+            -0.115,
+            -0.008,
+            -0.108,
+            -0.010,
+            0.895,
+            0.735,
+            -0.105,
+            0.018,
+            ivory,
+        ),
+        asymmetric_panel(
+            "blouse_front_right",
+            0.008,
+            0.115,
+            0.010,
+            0.108,
+            0.895,
+            0.735,
+            -0.105,
+            0.018,
+            ivory,
+        ),
+        asymmetric_panel(
+            "blouse_back_left",
+            -0.115,
+            -0.006,
+            -0.108,
+            -0.010,
+            0.895,
+            0.735,
+            0.058,
+            0.020,
+            ivory,
+        ),
+        asymmetric_panel(
+            "blouse_back_right",
+            0.006,
+            0.115,
+            0.010,
+            0.108,
+            0.895,
+            0.735,
+            0.058,
+            0.020,
+            ivory,
+        ),
+        asymmetric_panel(
+            "yoke_front_left",
+            -0.118,
+            -0.005,
+            -0.105,
+            -0.008,
+            0.955,
+            0.875,
+            -0.126,
+            0.014,
+            navy,
+        ),
+        asymmetric_panel(
+            "yoke_front_right",
+            0.005,
+            0.118,
+            0.008,
+            0.105,
+            0.955,
+            0.875,
+            -0.126,
+            0.014,
+            navy,
+        ),
+        asymmetric_panel(
+            "yoke_back_left",
+            -0.118,
+            -0.004,
+            -0.105,
+            -0.008,
+            0.955,
+            0.875,
+            0.080,
+            0.015,
+            navy,
+        ),
+        asymmetric_panel(
+            "yoke_back_right",
+            0.004,
+            0.118,
+            0.008,
+            0.105,
+            0.955,
+            0.875,
+            0.080,
+            0.015,
+            navy,
+        ),
+        asymmetric_panel(
+            "waistband_front",
+            -0.175,
+            0.175,
+            -0.170,
+            0.170,
+            0.752,
+            0.700,
+            -0.115,
+            0.018,
+            navy,
+        ),
+        asymmetric_panel(
+            "waistband_back",
+            -0.175,
+            0.175,
+            -0.170,
+            0.170,
+            0.752,
+            0.700,
+            0.070,
+            0.020,
+            navy,
+        ),
+        asymmetric_panel(
+            "trouser_front_left",
+            -0.175,
+            -0.014,
+            -0.115,
+            -0.018,
+            0.705,
+            0.190,
+            -0.105,
+            0.021,
+            navy,
+        ),
+        asymmetric_panel(
+            "trouser_front_right",
+            0.014,
+            0.175,
+            0.018,
+            0.115,
+            0.705,
+            0.190,
+            -0.105,
+            0.021,
+            navy,
+        ),
+        asymmetric_panel(
+            "trouser_back_left",
+            -0.175,
+            -0.014,
+            -0.115,
+            -0.018,
+            0.705,
+            0.190,
+            0.060,
+            0.024,
+            navy,
+        ),
+        asymmetric_panel(
+            "trouser_back_right",
+            0.014,
+            0.175,
+            0.018,
+            0.115,
+            0.705,
+            0.190,
+            0.060,
+            0.024,
+            navy,
+        ),
+        asymmetric_panel(
+            "ankle_facing_left",
+            -0.120,
+            -0.018,
+            -0.112,
+            -0.020,
+            0.220,
+            0.165,
+            -0.108,
+            0.024,
+            navy,
+        ),
+        asymmetric_panel(
+            "ankle_facing_right",
+            0.018,
+            0.120,
+            0.020,
+            0.112,
+            0.220,
+            0.165,
+            -0.108,
+            0.024,
+            navy,
+        ),
+        structural.cube(
+            "standing_collar",
+            (0.0, -0.075, 0.935),
+            (0.108, 0.026, 0.036),
+            navy,
+            bevel=0.008,
+        ),
+        structural.cube(
+            "collar_tab",
+            (0.0, -0.112, 0.936),
+            (0.022, 0.010, 0.016),
+            coral,
+            bevel=0.004,
+        ),
+        structural.cube(
+            "cuff_L", (-0.455, 0.006, 0.940), (0.030, 0.050, 0.036), navy, bevel=0.006
+        ),
+        structural.cube(
+            "cuff_R", (0.455, 0.006, 0.940), (0.030, 0.050, 0.036), navy, bevel=0.006
+        ),
         blouse_sleeve("sleeve_L", -1.0, ivory),
         blouse_sleeve("sleeve_R", 1.0, ivory),
     ]
@@ -277,27 +471,85 @@ def build(job: dict):
 
     made.extend(
         [
-            structural.cube("front_pintuck_01", (-0.040, -0.126, 0.820), (0.004, 0.006, 0.070), navy, bevel=0.001),
-            structural.cube("front_pintuck_02", (-0.014, -0.126, 0.820), (0.004, 0.006, 0.070), navy, bevel=0.001),
-            structural.cube("front_pintuck_03", (0.014, -0.126, 0.820), (0.004, 0.006, 0.070), navy, bevel=0.001),
-            structural.cube("front_pintuck_04", (0.040, -0.126, 0.820), (0.004, 0.006, 0.070), navy, bevel=0.001),
+            structural.cube(
+                "front_pintuck_01",
+                (-0.040, -0.126, 0.820),
+                (0.004, 0.006, 0.070),
+                navy,
+                bevel=0.001,
+            ),
+            structural.cube(
+                "front_pintuck_02",
+                (-0.014, -0.126, 0.820),
+                (0.004, 0.006, 0.070),
+                navy,
+                bevel=0.001,
+            ),
+            structural.cube(
+                "front_pintuck_03",
+                (0.014, -0.126, 0.820),
+                (0.004, 0.006, 0.070),
+                navy,
+                bevel=0.001,
+            ),
+            structural.cube(
+                "front_pintuck_04",
+                (0.040, -0.126, 0.820),
+                (0.004, 0.006, 0.070),
+                navy,
+                bevel=0.001,
+            ),
         ]
     )
 
     structural.uv_all(made)
     sleeves = [obj for obj in made if obj.name in {"sleeve_L", "sleeve_R"}]
     cuffs = [obj for obj in made if obj.name in {"cuff_L", "cuff_R"}]
-    lower_panels = [obj for obj in panels if obj.name.endswith("_L") or obj.name.endswith("_R")]
+    lower_panels = [
+        obj for obj in panels if obj.name.endswith("_L") or obj.name.endswith("_R")
+    ]
     lower_underlays = underlays
     lower_tabs = tabs
-    torso = [obj for obj in made if obj not in sleeves and obj not in cuffs and obj not in lower_panels and obj not in lower_underlays and obj not in lower_tabs]
+    torso = [
+        obj
+        for obj in made
+        if obj not in sleeves
+        and obj not in cuffs
+        and obj not in lower_panels
+        and obj not in lower_underlays
+        and obj not in lower_tabs
+    ]
     structural.bind_to_bone(torso, armature, "Hips")
-    structural.bind_to_bone([obj for obj in sleeves if obj.name == "sleeve_L"], armature, "UpperArm_L")
-    structural.bind_to_bone([obj for obj in sleeves if obj.name == "sleeve_R"], armature, "UpperArm_R")
-    structural.bind_to_bone([obj for obj in cuffs if obj.name == "cuff_L"], armature, "LowerArm_L")
-    structural.bind_to_bone([obj for obj in cuffs if obj.name == "cuff_R"], armature, "LowerArm_R")
-    structural.bind_to_bone([obj for obj in lower_panels + lower_underlays + lower_tabs if obj.name.endswith("_L") or "_L_" in obj.name], armature, "UpperLeg_L")
-    structural.bind_to_bone([obj for obj in lower_panels + lower_underlays + lower_tabs if obj.name.endswith("_R") or "_R_" in obj.name], armature, "UpperLeg_R")
+    structural.bind_to_bone(
+        [obj for obj in sleeves if obj.name == "sleeve_L"], armature, "UpperArm_L"
+    )
+    structural.bind_to_bone(
+        [obj for obj in sleeves if obj.name == "sleeve_R"], armature, "UpperArm_R"
+    )
+    structural.bind_to_bone(
+        [obj for obj in cuffs if obj.name == "cuff_L"], armature, "LowerArm_L"
+    )
+    structural.bind_to_bone(
+        [obj for obj in cuffs if obj.name == "cuff_R"], armature, "LowerArm_R"
+    )
+    structural.bind_to_bone(
+        [
+            obj
+            for obj in lower_panels + lower_underlays + lower_tabs
+            if obj.name.endswith("_L") or "_L_" in obj.name
+        ],
+        armature,
+        "UpperLeg_L",
+    )
+    structural.bind_to_bone(
+        [
+            obj
+            for obj in lower_panels + lower_underlays + lower_tabs
+            if obj.name.endswith("_R") or "_R_" in obj.name
+        ],
+        armature,
+        "UpperLeg_R",
+    )
 
     blend = structural.resolve(job["blendPath"])
     fbx = structural.resolve(job["fbxAssetPath"])
@@ -332,7 +584,11 @@ def build(job: dict):
                 "meshObjects": len(made),
                 "materialSlots": 5,
                 "heroDetail": "nested-bellflower-outer-leg-panels",
-                "weighting": {"torso": "Hips", "sleeves": "UpperArm", "panels": "UpperLeg"},
+                "weighting": {
+                    "torso": "Hips",
+                    "sleeves": "UpperArm",
+                    "panels": "UpperLeg",
+                },
                 "clothSimulation": "NOT_REQUIRED",
                 "blend": job["blendPath"],
                 "fbx": job["fbxAssetPath"],
@@ -343,7 +599,13 @@ def build(job: dict):
         + "\n",
         encoding="utf-8",
     )
-    return {"product": PRODUCT_ID, "status": "PASS", "meshObjects": len(made), "blend": str(blend), "fbx": str(fbx)}
+    return {
+        "product": PRODUCT_ID,
+        "status": "PASS",
+        "meshObjects": len(made),
+        "blend": str(blend),
+        "fbx": str(fbx),
+    }
 
 
 def main() -> int:
