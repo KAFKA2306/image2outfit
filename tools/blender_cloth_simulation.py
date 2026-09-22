@@ -43,29 +43,6 @@ COMPONENTS: dict[str, tuple[str, ...]] = {
         "Verdant_Tunic_Side_L",
         "Verdant_Tunic_Side_R",
     ),
-    "siroino-sage-breeze-onepiece": (
-        "Sage_Breeze_Front",
-        "Sage_Breeze_Back",
-        "Sage_Breeze_Side_L",
-        "Sage_Breeze_Side_R",
-    ),
-    "siroino-nocturnal-shrine-maiden-long-hakama-set": (
-        "Nocturnal_Hakama_Front_L",
-        "Nocturnal_Hakama_Front_R",
-        "Nocturnal_Hakama_Back_L",
-        "Nocturnal_Hakama_Back_R",
-        "Nocturnal_Hakama_Side_L",
-        "Nocturnal_Hakama_Side_R",
-    ),
-    "siroino-lily-vapor-yukata": (
-        "Lily_Summer_Front_Under",
-        "Lily_Summer_Front_Over",
-        "Lily_Summer_Back",
-        "Lily_Sleeve_Rail_Outer_L",
-        "Lily_Sleeve_Rail_Inner_L",
-        "Lily_Sleeve_Rail_Inner_R",
-        "Lily_Sleeve_Rail_Outer_R",
-    ),
 }
 
 FRAME_END = {
@@ -77,16 +54,6 @@ FRAME_END = {
     "siroino-wide-cargo": 18,
     "siroino-lunar-tech-hoodie": 30,
     "siroino-verdant-ranger-explorer-set": 30,
-    "siroino-sage-breeze-onepiece": 30,
-    "siroino-nocturnal-shrine-maiden-long-hakama-set": 32,
-    "siroino-lily-vapor-yukata": 32,
-}
-
-GRAVITY_Z = {
-    # The Sage shell is a stiff column garment.  A reduced gravity value keeps
-    # native Cloth from collapsing the long, open-hem panels while still
-    # producing a reproducible settled deformation.
-    "siroino-sage-breeze-onepiece": -0.8,
 }
 
 
