@@ -565,9 +565,15 @@ def main() -> int:
                 # hand influence.  The transition is continuous across the
                 # rail instead of being a hard nearest-vertex boundary.
                 if distance < 0.285:
-                    add(vertex.index, {f"Shoulder_{side}": 0.45, f"UpperArm_{side}": 0.55})
+                    add(
+                        vertex.index,
+                        {f"Shoulder_{side}": 0.45, f"UpperArm_{side}": 0.55},
+                    )
                 elif distance < 0.405:
-                    add(vertex.index, {f"UpperArm_{side}": 0.55, f"LowerArm_{side}": 0.45})
+                    add(
+                        vertex.index,
+                        {f"UpperArm_{side}": 0.55, f"LowerArm_{side}": 0.45},
+                    )
                 else:
                     add(vertex.index, {f"LowerArm_{side}": 0.72, f"Hand_{side}": 0.28})
                 continue
@@ -595,7 +601,8 @@ def main() -> int:
         # weights remain bound to their authored attachment bones.
         if obj.type == "MESH" and (
             obj.name.startswith("Lily_Summer_Front_")
-            or obj.name in {"Lily_Summer_Back", "Lily_Summer_Side_L", "Lily_Summer_Side_R"}
+            or obj.name
+            in {"Lily_Summer_Back", "Lily_Summer_Side_L", "Lily_Summer_Side_R"}
         ):
             assign_region_weights(obj)
 

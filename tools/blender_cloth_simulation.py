@@ -174,7 +174,11 @@ def pin_vertices(obj: bpy.types.Object) -> list[int]:
         # follow the arm toward the cuff.  Pinning the whole narrow rail made
         # the cloth pass vacuous and produced floating card-like sleeves.
         left = obj.name.endswith("_L")
-        root = max(point.x for point in coordinates) if left else min(point.x for point in coordinates)
+        root = (
+            max(point.x for point in coordinates)
+            if left
+            else min(point.x for point in coordinates)
+        )
         selected = [
             vertex.index
             for vertex, point in zip(obj.data.vertices, coordinates)
