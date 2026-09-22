@@ -227,6 +227,21 @@ def resolve(
         "BLENDER_VERSION": blender_version,
         "BLENDER_SERIES": ".".join(blender_version.split(".")[:2]),
     }
+    if materialize_job:
+        runtime_job_path = root / runtime_job
+        runtime_job_value = dict(job)
+        runtime_job_value.update(
+            {
+                "artifactDir": f"{runtime}/reports",
+                "candidateDir": f"{runtime}/candidate",
+                "releaseDir": f"{runtime}/release",
+            }
+        )
+        runtime_job_path.parent.mkdir(parents=True, exist_ok=True)
+        runtime_job_path.write_text(
+            json.dumps(runtime_job_value, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     return Resolution(selected_job=selected, environment=environment, reason="selected")
 
 

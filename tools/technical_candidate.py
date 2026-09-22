@@ -108,7 +108,9 @@ def run_hosted_pose_render(
     )
     pose_paths = required_pose_paths(job, policy)
     missing = [
-        value for value in pose_paths.values() if not candidate_contract.path(value).is_file()
+        value
+        for value in pose_paths.values()
+        if not candidate_contract.path(value).is_file()
     ]
     return {
         "passed": exit_code == 0 and not missing,
@@ -164,11 +166,15 @@ def record_unity_ready_product_state(
             material = item.get("material")
             role = item.get("role")
             if not isinstance(material, str) or not material:
-                raise ValueError("unity-ready materialRoles contains an invalid material")
+                raise ValueError(
+                    "unity-ready materialRoles contains an invalid material"
+                )
             if not isinstance(role, str) or not role:
                 raise ValueError("unity-ready materialRoles contains an invalid role")
             if material in material_roles:
-                raise ValueError(f"unity-ready materialRoles contains duplicate material: {material}")
+                raise ValueError(
+                    f"unity-ready materialRoles contains duplicate material: {material}"
+                )
             material_roles[material] = role
     elif isinstance(declared_roles, dict):
         material_roles = dict(declared_roles)

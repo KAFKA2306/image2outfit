@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Body-derived v7 pattern for the Siroino heather hooded bodysuit."""
+
 from __future__ import annotations
 
 import math
@@ -30,7 +31,9 @@ def _group_index(body: bpy.types.Object, name: str) -> int | None:
     return None if group is None else group.index
 
 
-def _vertex_weight(body: bpy.types.Object, vertex_index: int, group_index: int | None) -> float:
+def _vertex_weight(
+    body: bpy.types.Object, vertex_index: int, group_index: int | None
+) -> float:
     if group_index is None:
         return 0.0
     for assignment in body.data.vertices[vertex_index].groups:
@@ -187,7 +190,7 @@ def _torso_top(x: float) -> float:
 
 def _highcut_width(z: float) -> float:
     t = max(0.0, min(1.0, (z - 0.640) / (0.825 - 0.640)))
-    return 0.026 + 0.096 * (t ** 0.86)
+    return 0.026 + 0.096 * (t**0.86)
 
 
 def _front(center: Vector) -> bool:
@@ -204,10 +207,9 @@ def _torso_shells(
     material: bpy.types.Material,
 ) -> list[bpy.types.Object]:
     def common(center: Vector) -> bool:
-        return (
-            0.792 <= center.z <= _torso_top(center.x)
-            and abs(center.x) <= _torso_width(center.z)
-        )
+        return 0.792 <= center.z <= _torso_top(center.x) and abs(
+            center.x
+        ) <= _torso_width(center.z)
 
     front = _copy_shell(
         "Heather_Front_Upper_Panel",
@@ -234,10 +236,7 @@ def _highcut_shells(
     material: bpy.types.Material,
 ) -> list[bpy.types.Object]:
     def common(center: Vector) -> bool:
-        return (
-            0.630 <= center.z <= 0.830
-            and abs(center.x) <= _highcut_width(center.z)
-        )
+        return 0.630 <= center.z <= 0.830 and abs(center.x) <= _highcut_width(center.z)
 
     front = _copy_shell(
         "Heather_Highcut_Front_Panel",
@@ -473,7 +472,11 @@ def _surface_y(
         ]
     if not candidates:
         raise RuntimeError(f"Could not sample body surface at x={x}, z={z}")
-    return min(point.y for point in candidates) if front else max(point.y for point in candidates)
+    return (
+        min(point.y for point in candidates)
+        if front
+        else max(point.y for point in candidates)
+    )
 
 
 def _placket_and_buttons(
@@ -564,14 +567,10 @@ def _seams(
 ) -> list[bpy.types.Object]:
     front_points = []
     for z in (0.650, 0.700, 0.755, 0.810, 0.865, 0.920):
-        front_points.append(
-            (0.0, _surface_y(body, 0.0, z, front=True) - 0.0085, z)
-        )
+        front_points.append((0.0, _surface_y(body, 0.0, z, front=True) - 0.0085, z))
     back_points = []
     for z in (0.650, 0.700, 0.755, 0.810, 0.865, 0.920):
-        back_points.append(
-            (0.0, _surface_y(body, 0.0, z, front=False) + 0.0085, z)
-        )
+        back_points.append((0.0, _surface_y(body, 0.0, z, front=False) + 0.0085, z))
     front = base.curve_tube(
         "Heather_Center_Front_Seam",
         front_points,
@@ -629,9 +628,7 @@ def create_outfit(
             _neck_band(body, armature, fabric),
         ]
     )
-    garments.extend(
-        _placket_and_buttons(body, armature, trim, button_material)
-    )
+    garments.extend(_placket_and_buttons(body, armature, trim, button_material))
     garments.extend(_cords_and_ties(body, armature, trim))
     garments.extend(_seams(body, armature, trim))
     return garments

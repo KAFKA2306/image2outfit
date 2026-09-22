@@ -72,6 +72,14 @@ def read_json(path: Path) -> dict[str, object]:
     return value
 
 
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def repo_path(value: str | Path) -> Path:
     path = Path(value)
     resolved = path.resolve() if path.is_absolute() else (ROOT / path).resolve()
@@ -149,7 +157,7 @@ def pin_vertices(obj: bpy.types.Object) -> list[int]:
         raise RuntimeError(f"cloth mesh is too small to pin: {obj.name}")
     minimum = min(point.z for point in coordinates)
     maximum = max(point.z for point in coordinates)
-    threshold = maximum - max(1e-6, maximum - minimum) * 0.16
+    threshold = maximum - max(1e-6, maximum - minimum) * 0.28
     selected = [
         vertex.index
         for vertex, point in zip(obj.data.vertices, coordinates)
@@ -190,12 +198,12 @@ def configure_cloth(obj: bpy.types.Object, frame_end: int) -> dict[str, object]:
     pin.add(vertices, 1.0, "REPLACE")
     cloth = obj.modifiers.new("Image2Outfit Cloth", "CLOTH")
     cloth.settings.quality = 6
-    cloth.settings.mass = 0.20
-    cloth.settings.tension_stiffness = 25.0
-    cloth.settings.compression_stiffness = 25.0
-    cloth.settings.shear_stiffness = 10.0
-    cloth.settings.bending_stiffness = 0.45
-    cloth.settings.air_damping = 3.0
+    cloth.settings.mass = 0.02
+    cloth.settings.tension_stiffness = 120.0
+    cloth.settings.compression_stiffness = 120.0
+    cloth.settings.shear_stiffness = 60.0
+    cloth.settings.bending_stiffness = 4.0
+    cloth.settings.air_damping = 2.5
     cloth.settings.vertex_group_mass = pin.name
     cloth.settings.pin_stiffness = 1.0
     cloth.collision_settings.use_collision = True
@@ -205,6 +213,10 @@ def configure_cloth(obj: bpy.types.Object, frame_end: int) -> dict[str, object]:
         cloth.collision_settings.use_self_collision = False
     cloth.point_cache.frame_start = 1
     cloth.point_cache.frame_end = frame_end
+    # Settle in garment-local space and leave the armature modifier after the
+    # baked cloth is applied.  Applying Cloth after Armature causes the
+    # Blender warning about a non-first modifier and exaggerated pose folds.
+    obj.modifiers.move(len(obj.modifiers) - 1, 0)
     return {
         "object": obj.name,
         "modifier": cloth.name,
@@ -219,13 +231,14 @@ def bake_components(
     armature: bpy.types.Object,
     names: tuple[str, ...],
     frame_end: int,
+    gravity_z: float,
 ) -> list[dict[str, object]]:
     objects = [find_object(name) for name in names]
     ensure_collision(body)
     scene = bpy.context.scene
     scene.frame_start = 1
     scene.frame_end = frame_end
-    scene.gravity = (0.0, 0.0, -4.5)
+    scene.gravity = (0.0, 0.0, gravity_z)
     contracts = []
     before = {}
     for obj in objects:
@@ -364,7 +377,13 @@ def main() -> int:
         raise RuntimeError("Siroino armature is missing")
     names = COMPONENTS[product_id]
     body = find_body(product_id, names)
-    contracts = bake_components(body, armature, names, FRAME_END[product_id])
+    contracts = bake_components(
+        body,
+        armature,
+        names,
+        FRAME_END[product_id],
+        GRAVITY_Z.get(product_id, -4.5),
+    )
     objects = [
         obj
         for obj in bpy.context.scene.objects
@@ -379,6 +398,8 @@ def main() -> int:
         filepath=str(blend), check_existing=False, compress=True
     )
     export_settled_fbx(fbx, armature, objects)
+    blend_sha256 = sha256(blend)
+    fbx_sha256 = sha256(fbx)
     report = {
         "schemaVersion": 1,
         "productId": product_id,
@@ -394,7 +415,10 @@ def main() -> int:
         "contracts": contracts,
         "bodyCollisionThicknessM": 0.004,
         "collisionObject": body.name,
+        "sourceBlend": str(blend.relative_to(ROOT)).replace("\\", "/"),
+        "sourceBlendSha256": blend_sha256,
         "settledFbx": str(fbx.relative_to(ROOT)).replace("\\", "/"),
+        "settledFbxSha256": fbx_sha256,
     }
     write_json(report_path, report)
     build_report = (
@@ -409,6 +433,16 @@ def main() -> int:
             "\\", "/"
         )
         current["blenderVersion"] = bpy.app.version_string
+        current["artifacts"] = {
+            "blend": {
+                "path": str(blend.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": blend_sha256,
+            },
+            "settledFbx": {
+                "path": str(fbx.relative_to(ROOT)).replace("\\", "/"),
+                "sha256": fbx_sha256,
+            },
+        }
         write_json(build_report, current)
     manifest_path = repo_path(str(job["productManifestPath"]))
     if manifest_path.is_file():

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lumen-atelier-apron",
+  "designRevision": "v1-closed-maker-coat-dress-twin-work-trays",
+  "parts": [
+    "maker_front_L", "maker_front_R", "maker_center_front", "maker_back",
+    "maker_shoulder_L", "maker_shoulder_R", "sleeve_L", "sleeve_R", "cuff_L", "cuff_R",
+    "collar", "front_facing_L", "front_facing_R", "center_walking_vent", "chest_slot_L", "chest_slot_R",
+    "worktray_root_L", "worktray_root_R", "worktray_outer_L", "worktray_outer_R",
+    "worktray_inner_L", "worktray_inner_R", "tray_facing_L", "tray_facing_R"
+  ],
+  "heroDetail": {
+    "name": "twin-fold-out-work-trays",
+    "assemblies": ["worktray_root_L", "worktray_root_R", "worktray_outer_L", "worktray_outer_R", "worktray_inner_L", "worktray_inner_R"],
+    "facings": ["tray_facing_L", "tray_facing_R"],
+    "requirements": [
+      "exactly two shallow side-seam tray assemblies",
+      "each tray has a named hinge root and separate outer and inner shell",
+      "real depth and bounded space between outer and inner tray shells",
+      "closed maker coat-dress remains continuous from collar to knee line"
+    ]
+  },
+  "materials": {
+    "shell": "muted-sage-matte-compact-twill",
+    "facing": "warm-gray-low-sheen-facing",
+    "reinforcement": "dark-brown-bounded-synthetic-leather",
+    "trayInner": "graphite-matte-tray-lining",
+    "hardware": "restrained-antique-brass-low-gloss"
+  },
+  "uvPolicy": {"set": "UV0", "range": "0..1", "heroIslandsUnique": true, "mirrorHero": false}
+}

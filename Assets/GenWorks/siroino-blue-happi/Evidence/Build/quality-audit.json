@@ -9,14 +9,14 @@
       "evidence": {
         "meshObjects": 8,
         "vertices": 957,
-        "triangles": 1612,
+        "triangles": 1624,
         "materialSlots": 8,
         "shapeKeys": 0,
         "maxBoneInfluences": 2,
         "unweightedVertices": 0,
         "weightSumErrors": 0,
         "degenerateTriangles": 0,
-        "boundaryEdges": 290
+        "boundaryEdges": 274
       }
     },
     {
@@ -44,8 +44,8 @@
       "axis": "fit",
       "status": "PASS",
       "evidence": {
-        "clearanceP01M": 0.013513157144188881,
-        "meanClearanceM": 0.04438762417329209,
+        "clearanceP01M": 0.013285312801599503,
+        "meanClearanceM": 0.04261784222402743,
         "frontOpeningM": 0.05000000074505806,
         "required": {
           "clearanceP01M": [
@@ -63,20 +63,29 @@
           "passed": true,
           "sides": {
             "L": {
-              "rootRadiusM": 0.06386183771040416,
-              "rootCenterToShoulderM": 0.0032808284935616737,
-              "overlapMarginM": 0.06058100921684248,
+              "rootRadiusM": 0.04759197611636751,
+              "rootCenterToShoulderM": 0.007556536226818867,
+              "overlapMarginM": 0.04003543988954864,
               "requiredMinimumOverlapMarginM": 0.01,
+              "rootClosed": true,
+              "rootCapFaceCount": 1,
               "passed": true
             },
             "R": {
-              "rootRadiusM": 0.06386195792407556,
-              "rootCenterToShoulderM": 0.0032807978871560077,
-              "overlapMarginM": 0.06058116003691955,
+              "rootRadiusM": 0.04759198059294405,
+              "rootCenterToShoulderM": 0.007556536074489915,
+              "overlapMarginM": 0.04003544451845413,
               "requiredMinimumOverlapMarginM": 0.01,
+              "rootClosed": true,
+              "rootCapFaceCount": 1,
               "passed": true
             }
           }
+        },
+        "seamConnectionAudit": {
+          "collarBridgeToFrontBandMinimumDistanceM": 0.0037879022605551917,
+          "requiredMaximumDistanceM": 0.006,
+          "status": "PASS"
         }
       }
     },
@@ -132,37 +141,37 @@
           {
             "pass": 1,
             "target": 0.008,
-            "movedVertices": 14,
+            "movedVertices": 30,
             "maximumMove": 0.0060209313798695804,
             "clearance": {
               "vertices": 875,
-              "minimum": 0.0064061488956213,
-              "p01": 0.007999993860721588,
-              "mean": 0.04383690128209335
+              "minimum": 0.007128194905817509,
+              "p01": 0.007965349592268467,
+              "mean": 0.04175231539191944
             }
           },
           {
             "pass": 2,
             "target": 0.012,
-            "movedVertices": 80,
-            "maximumMove": 0.0055938511043787005,
+            "movedVertices": 122,
+            "maximumMove": 0.0048718050941824916,
             "clearance": {
               "vertices": 875,
-              "minimum": 0.00790178682655096,
-              "p01": 0.011528104543685913,
-              "mean": 0.04397836519564901
+              "minimum": 0.006051977630704641,
+              "p01": 0.010014510713517666,
+              "mean": 0.04201022784305471
             }
           },
           {
             "pass": 3,
             "target": 0.015,
-            "movedVertices": 152,
-            "maximumMove": 0.007098213173449039,
+            "movedVertices": 232,
+            "maximumMove": 0.008948022369295358,
             "clearance": {
               "vertices": 875,
-              "minimum": 0.013110857456922531,
-              "p01": 0.013513157144188881,
-              "mean": 0.04438762417329209
+              "minimum": 0.012597193941473961,
+              "p01": 0.013285312801599503,
+              "mean": 0.04261784222402743
             }
           }
         ]

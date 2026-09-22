@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Research, documentation and Unity handoff writers for the hooded bodysuit."""
+
 from __future__ import annotations
 
 import json
@@ -28,10 +29,26 @@ RESEARCH_SOURCE = {
 }
 
 PANELS = [
-    {"id": "front-upper", "object": "Heather_Front_Upper_Panel", "semantic": "torso-front"},
-    {"id": "back-upper", "object": "Heather_Back_Upper_Panel", "semantic": "torso-back"},
-    {"id": "front-lower", "object": "Heather_Highcut_Front_Panel", "semantic": "pelvis-front"},
-    {"id": "back-lower", "object": "Heather_Highcut_Back_Panel", "semantic": "pelvis-back"},
+    {
+        "id": "front-upper",
+        "object": "Heather_Front_Upper_Panel",
+        "semantic": "torso-front",
+    },
+    {
+        "id": "back-upper",
+        "object": "Heather_Back_Upper_Panel",
+        "semantic": "torso-back",
+    },
+    {
+        "id": "front-lower",
+        "object": "Heather_Highcut_Front_Panel",
+        "semantic": "pelvis-front",
+    },
+    {
+        "id": "back-lower",
+        "object": "Heather_Highcut_Back_Panel",
+        "semantic": "pelvis-back",
+    },
     {"id": "sleeve-l", "object": "Heather_Long_Sleeve_L", "semantic": "sleeve-left"},
     {"id": "sleeve-r", "object": "Heather_Long_Sleeve_R", "semantic": "sleeve-right"},
     {"id": "cuff-l", "object": "Heather_Rib_Cuff_L", "semantic": "cuff-left"},
@@ -108,7 +125,9 @@ def _edge_key(edge: tuple[str, str, str, float]) -> tuple[str, str]:
     return edge[0], edge[1]
 
 
-def _metrics(predicted: set[frozenset], expected: set[frozenset]) -> dict[str, float | int]:
+def _metrics(
+    predicted: set[frozenset], expected: set[frozenset]
+) -> dict[str, float | int]:
     true_positive = len(predicted & expected)
     precision = true_positive / len(predicted) if predicted else 0.0
     recall = true_positive / len(expected) if expected else 0.0
@@ -163,7 +182,11 @@ def run_seam_graph_trial() -> dict:
             role_match = first[2] == second[2]
             length_ratio = min(first[3], second[3]) / max(first[3], second[3])
             # The semantic prior dominates; edge length is the local geometric cue.
-            score = (2.0 if semantic_match else 0.0) + (0.6 if role_match else 0.0) + 0.4 * length_ratio
+            score = (
+                (2.0 if semantic_match else 0.0)
+                + (0.6 if role_match else 0.0)
+                + 0.4 * length_ratio
+            )
             if semantic_match or role_match:
                 candidates.append((score, second_key, second, pair))
         if not candidates:
@@ -215,9 +238,7 @@ def run_seam_graph_trial() -> dict:
         "deltaF1": round(semantic_metrics["f1"] - baseline_metrics["f1"], 6),
         "result": "PASS" if pass_trial else "FAIL",
         "failureCondition": "FAIL when semantic filtering does not improve F1 or precision/recall falls below 0.90.",
-        "productionDecision": (
-            "ADOPT_METADATA_ONLY" if pass_trial else "REJECT"
-        ),
+        "productionDecision": ("ADOPT_METADATA_ONLY" if pass_trial else "REJECT"),
         "productionUse": [
             "Panel and seam IDs are persisted for editability and audit.",
             "The split hood center seam and four hood-to-neck seam segments encode many-to-one neck assembly.",
@@ -244,10 +265,7 @@ def write_pattern_and_research(product_root: Path) -> tuple[Path, Path]:
                 "schemaVersion": 2,
                 "method": "semantic panel graph with explicit fine seam correspondence",
                 "source": RESEARCH_SOURCE,
-                "panels": [
-                    {**panel, "uvDomain": [0, 0, 1, 1]}
-                    for panel in PANELS
-                ],
+                "panels": [{**panel, "uvDomain": [0, 0, 1, 1]} for panel in PANELS],
                 "seamPairs": seam_pairs,
                 "separateGeometry": [
                     "Heather_Henley_Placket",
@@ -308,7 +326,7 @@ def write_integrated_prefab(job: dict, outfit_sidecars: list[Path]) -> list[Path
 
 def write_readme(path: Path, job: dict, measured: dict) -> None:
     path.write_text(
-        f"""# {job['productName']}
+        f"""# {job["productName"]}
 
 Target: `SiroinoSotai_PC` neutral official PC body.
 
@@ -326,16 +344,16 @@ This is a resumable `WORKING` checkpoint for a heather-grey hooded high-cut body
 
 ## Static metrics
 
-- mesh objects: {measured['meshObjects']}
-- vertices: {measured['vertices']}
-- triangles: {measured['triangles']}
-- material slots: {measured['materialSlots']}
-- exported shape keys: {measured['shapeKeys']}
-- maximum bone influences: {measured['maxBoneInfluences']}
+- mesh objects: {measured["meshObjects"]}
+- vertices: {measured["vertices"]}
+- triangles: {measured["triangles"]}
+- material slots: {measured["materialSlots"]}
+- exported shape keys: {measured["shapeKeys"]}
+- maximum bone influences: {measured["maxBoneInfluences"]}
 
 ## Research trial
 
-The 2026 source is **{RESEARCH_SOURCE['title']}**, submitted 2026-07-23. An independent deterministic ablation compares global edge-length pairing with semantic panel-graph filtering. The authors' model, code, dataset and weights are not used or redistributed. See `Research/seam-correspondence-graph-trial.json` for measured precision, recall and F1.
+The 2026 source is **{RESEARCH_SOURCE["title"]}**, submitted 2026-07-23. An independent deterministic ablation compares global edge-length pairing with semantic panel-graph filtering. The authors' model, code, dataset and weights are not used or redistributed. See `Research/seam-correspondence-graph-trial.json` for measured precision, recall and F1.
 
 ## Remaining gates
 
