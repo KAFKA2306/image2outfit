@@ -134,6 +134,8 @@ def curved_panel(
     *,
     x_steps: int = 18,
     z_steps: int = 30,
+    center_vent_z: float | None = None,
+    center_vent_width: float = 0.024,
 ) -> bpy.types.Object:
     vertices: list[tuple[float, float, float]] = []
     for row in range(z_steps + 1):
@@ -149,8 +151,14 @@ def curved_panel(
     faces: list[tuple[int, int, int, int]] = []
     stride = x_steps + 1
     for row in range(z_steps):
+        row_z = z_min + (z_max - z_min) * (row + 0.5) / z_steps
         for column in range(x_steps):
             a = row * stride + column
+            if center_vent_z is not None and row_z < center_vent_z:
+                left = vertices[a][0]
+                right = vertices[a + 1][0]
+                if abs((left + right) * 0.5) < center_vent_width * 0.5:
+                    continue
             faces.append((a, a + 1, a + stride + 1, a + stride))
     return base.mesh_object(
         name, vertices, faces, material, armature, body, solidify=False
@@ -172,10 +180,12 @@ def side_gusset(
     for row in range(z_steps + 1):
         t = row / z_steps
         z = 0.29 + (1.075 - 0.29) * t
-        x = side * (0.34 - 0.19 * t)
+        # Match the side edges of the tapered front/back shell exactly.  The
+        # previous 0.34 -> 0.15 rail left a visible 15-95 mm open seam.
+        x = side * (0.18 - 0.060 * t)
         for column in range(y_steps + 1):
             u = column / y_steps
-            y = -0.205 + 0.350 * u + 0.006 * math.sin(math.pi * u) * (1.0 - t)
+            y = -0.186 + 0.292 * u + 0.004 * math.sin(math.pi * u) * (1.0 - t)
             vertices.append((x, y, z))
     faces: list[tuple[int, int, int, int]] = []
     stride = y_steps + 1
@@ -398,27 +408,27 @@ def main() -> int:
 
     def front_y(x, z, u, t):
         return (
-            -0.194
-            - 0.018 * (0.82 - z)
-            - 0.016 * (x / 0.34) ** 2
-            + 0.006 * math.sin(math.pi * u) * (1.0 - t)
+            -0.186
+            - 0.014 * (0.82 - z)
+            - 0.020 * (x / 0.30) ** 2
+            + 0.004 * math.sin(math.pi * u) * (1.0 - t)
         )
 
     def back_y(x, z, u, t):
         return (
-            0.132
-            + 0.016 * (0.82 - z)
-            + 0.012 * (x / 0.34) ** 2
-            + 0.005 * math.sin(math.pi * u) * (1.0 - t)
+            0.106
+            + 0.012 * (0.82 - z)
+            + 0.016 * (x / 0.30) ** 2
+            + 0.004 * math.sin(math.pi * u) * (1.0 - t)
         )
 
     panels = [
         curved_panel(
             "Lily_Summer_Front_Under",
-            -0.16,
-            0.012,
-            -0.34,
-            -0.012,
+            -0.135,
+            0.010,
+            -0.180,
+            0.010,
             0.29,
             1.075,
             front_y,
@@ -428,10 +438,10 @@ def main() -> int:
         ),
         curved_panel(
             "Lily_Summer_Front_Over",
-            -0.012,
-            0.16,
-            0.012,
-            0.34,
+            -0.010,
+            0.135,
+            -0.010,
+            0.180,
             0.29,
             1.075,
             front_y,
@@ -441,39 +451,41 @@ def main() -> int:
         ),
         curved_panel(
             "Lily_Summer_Back",
-            -0.16,
-            0.16,
-            -0.34,
-            0.34,
+            -0.135,
+            0.135,
+            -0.180,
+            0.180,
             0.29,
             1.075,
             back_y,
             milk,
             armature,
             body,
+            center_vent_z=0.49,
+            center_vent_width=0.026,
         ),
         curved_panel(
             "Lily_Sleeve_Rail_Outer_L",
-            -0.38,
-            -0.32,
-            -0.43,
-            -0.37,
-            0.56,
-            1.075,
-            lambda x, z, u, t: -0.045 + 0.012 * t,
+            -0.235,
+            -0.500,
+            -0.235,
+            -0.500,
+            0.91,
+            1.00,
+            lambda x, z, u, t: -0.052 - 0.010 * (x / 0.575) ** 2,
             milk,
             armature,
             body,
         ),
         curved_panel(
             "Lily_Sleeve_Rail_Inner_L",
-            -0.295,
             -0.235,
-            -0.345,
-            -0.285,
-            0.56,
-            1.075,
-            lambda x, z, u, t: -0.050 + 0.012 * t,
+            -0.500,
+            -0.235,
+            -0.500,
+            0.80,
+            0.88,
+            lambda x, z, u, t: -0.050 - 0.010 * (x / 0.575) ** 2,
             mist,
             armature,
             body,
@@ -481,25 +493,25 @@ def main() -> int:
         curved_panel(
             "Lily_Sleeve_Rail_Inner_R",
             0.235,
-            0.295,
-            0.285,
-            0.345,
-            0.56,
-            1.075,
-            lambda x, z, u, t: -0.050 + 0.012 * t,
+            0.500,
+            0.235,
+            0.500,
+            0.80,
+            0.88,
+            lambda x, z, u, t: -0.050 - 0.010 * (x / 0.575) ** 2,
             mist,
             armature,
             body,
         ),
         curved_panel(
             "Lily_Sleeve_Rail_Outer_R",
-            0.32,
-            0.38,
-            0.37,
-            0.43,
-            0.56,
-            1.075,
-            lambda x, z, u, t: -0.045 + 0.012 * t,
+            0.235,
+            0.500,
+            0.235,
+            0.500,
+            0.91,
+            1.00,
+            lambda x, z, u, t: -0.052 - 0.010 * (x / 0.575) ** 2,
             milk,
             armature,
             body,
@@ -516,15 +528,77 @@ def main() -> int:
         add_petal_lock_and_details(armature, milk, lavender, indigo, silver, body)
     )
 
-    def bind_sleeve_rail(obj: bpy.types.Object, bone_name: str) -> None:
-        obj.vertex_groups.clear()
-        group = obj.vertex_groups.new(name=bone_name)
-        group.add(list(range(len(obj.data.vertices))), 1.0, "REPLACE")
+    def assign_region_weights(obj: bpy.types.Object) -> None:
+        """Use stable garment-region weights instead of one nearest body vertex.
 
-    bind_sleeve_rail(panels[3], "UpperArm_L")
-    bind_sleeve_rail(panels[4], "UpperArm_L")
-    bind_sleeve_rail(panels[5], "UpperArm_R")
-    bind_sleeve_rail(panels[6], "UpperArm_R")
+        The shell follows the torso/pelvis as a single garment.  Only the
+        split rails follow the arms, with a small shoulder transition.  This
+        prevents a seated pose from dragging the hem into the thighs while
+        retaining authored deformation on the sleeves.
+        """
+        obj.vertex_groups.clear()
+        groups = {
+            group.name: obj.vertex_groups.new(name=group.name)
+            for group in body.vertex_groups
+        }
+
+        def add(index: int, weights: dict[str, float]) -> None:
+            valid = {
+                name: value
+                for name, value in weights.items()
+                if name in groups and value > 1e-8
+            }
+            total = sum(valid.values())
+            if total <= 1e-8:
+                groups["Hips"].add([index], 1.0, "REPLACE")
+                return
+            for name, value in valid.items():
+                groups[name].add([index], value / total, "REPLACE")
+
+        for vertex in obj.data.vertices:
+            point = obj.matrix_world @ vertex.co
+            if "Sleeve_Rail" in obj.name:
+                left = point.x < 0.0
+                side = "L" if left else "R"
+                distance = abs(point.x)
+                # Root -> cuff: Shoulder, upper arm, forearm, then a small
+                # hand influence.  The transition is continuous across the
+                # rail instead of being a hard nearest-vertex boundary.
+                if distance < 0.285:
+                    add(vertex.index, {f"Shoulder_{side}": 0.45, f"UpperArm_{side}": 0.55})
+                elif distance < 0.405:
+                    add(vertex.index, {f"UpperArm_{side}": 0.55, f"LowerArm_{side}": 0.45})
+                else:
+                    add(vertex.index, {f"LowerArm_{side}": 0.72, f"Hand_{side}": 0.28})
+                continue
+            # The shell and its side seams remain attached to the torso.  A
+            # short chest/hip blend keeps the waist from folding abruptly.
+            if point.z >= 0.93:
+                add(vertex.index, {"Chest": 1.0})
+            elif point.z >= 0.79:
+                blend = (point.z - 0.79) / 0.14
+                add(vertex.index, {"Chest": blend, "Hips": 1.0 - blend})
+            else:
+                # Let the lower side panels travel a little with the
+                # corresponding upper leg in seated/crouched poses.  The
+                # centre remains pelvis-bound so the front overlap stays
+                # closed instead of splitting into two rigid cards.
+                if point.x < -0.035:
+                    add(vertex.index, {"Hips": 0.62, "UpperLeg_L": 0.38})
+                elif point.x > 0.035:
+                    add(vertex.index, {"Hips": 0.62, "UpperLeg_R": 0.38})
+                else:
+                    add(vertex.index, {"Hips": 1.0})
+
+    for obj in garments:
+        # Select only the shell and sleeve meshes; decorative curve/tube
+        # weights remain bound to their authored attachment bones.
+        if obj.type == "MESH" and (
+            obj.name.startswith("Lily_Summer_Front_")
+            or obj.name in {"Lily_Summer_Back", "Lily_Summer_Side_L", "Lily_Summer_Side_R"}
+        ):
+            assign_region_weights(obj)
+
     for obj in garments:
         if obj.type == "MESH" and obj.name not in {panel.name for panel in panels}:
             add_shape_keys(obj, body)

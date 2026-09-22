@@ -43,6 +43,15 @@ COMPONENTS: dict[str, tuple[str, ...]] = {
         "Verdant_Tunic_Side_L",
         "Verdant_Tunic_Side_R",
     ),
+    "siroino-lily-vapor-yukata": (
+        "Lily_Summer_Front_Under",
+        "Lily_Summer_Front_Over",
+        "Lily_Summer_Back",
+        "Lily_Sleeve_Rail_Outer_L",
+        "Lily_Sleeve_Rail_Inner_L",
+        "Lily_Sleeve_Rail_Inner_R",
+        "Lily_Sleeve_Rail_Outer_R",
+    ),
 }
 
 FRAME_END = {
@@ -54,6 +63,11 @@ FRAME_END = {
     "siroino-wide-cargo": 18,
     "siroino-lunar-tech-hoodie": 30,
     "siroino-verdant-ranger-explorer-set": 30,
+    "siroino-lily-vapor-yukata": 32,
+}
+
+GRAVITY_Z = {
+    "siroino-lily-vapor-yukata": -4.5,
 }
 
 
@@ -155,6 +169,19 @@ def pin_vertices(obj: bpy.types.Object) -> list[int]:
     coordinates = [obj.matrix_world @ vertex.co for vertex in obj.data.vertices]
     if len(coordinates) < 4:
         raise RuntimeError(f"cloth mesh is too small to pin: {obj.name}")
+    if "Sleeve_Rail" in obj.name:
+        # Rails are attached at the shoulder/root edge and must be free to
+        # follow the arm toward the cuff.  Pinning the whole narrow rail made
+        # the cloth pass vacuous and produced floating card-like sleeves.
+        left = obj.name.endswith("_L")
+        root = max(point.x for point in coordinates) if left else min(point.x for point in coordinates)
+        selected = [
+            vertex.index
+            for vertex, point in zip(obj.data.vertices, coordinates)
+            if abs(point.x - root) <= 0.018
+        ]
+        if len(selected) >= 2:
+            return selected
     minimum = min(point.z for point in coordinates)
     maximum = max(point.z for point in coordinates)
     threshold = maximum - max(1e-6, maximum - minimum) * 0.28
