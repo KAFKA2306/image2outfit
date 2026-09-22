@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "benchmarkId": "2026-image-to-3d-oss-lily-vapor-yukata",
+  "date": "2026-09-22",
+  "purpose": "Actual manufacturing comparison for the Lily Vapor Yukata reference using the requested OSS candidates.",
+  "protocol": {
+    "referenceSheet": "Assets/GenWorks/siroino-lily-vapor-yukata/References/lily-vapor-yukata-manufacturing-sheet.png",
+    "referenceSheetSha256": "",
+    "fixedInputDirectory": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata",
+    "viewPolicy": "hero-three-quarter is the single-image input; front, side, and back are fixed crops; Hunyuan3D-2mv receives front/back/side/side because only one side view is available.",
+    "comparisonRule": "Raw model geometry, garmentization, cloth evidence, Unity import, and VRChat handoff are recorded as separate gates; a blocked or raw-shape run is not counted as a completed VRChat garment."
+  },
+  "inputImages": [
+    {
+      "name": "hero-three-quarter.png",
+      "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata/hero-three-quarter.png",
+      "sha256": "8DF4EFB205427D3AE417A032B0AE76708F4A824BB1D560A99BFF0327512D424F"
+    },
+    {
+      "name": "front.png",
+      "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata/front.png",
+      "sha256": "963E70C862BBAE8CE6F34C7FE9789535E319CE0E7228AE0F0162E50C8F6852AD"
+    },
+    {
+      "name": "side.png",
+      "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata/side.png",
+      "sha256": "F7E3F4E14C0BD7F5E72AB01B7F040BFC5F398BC6943108E1C42ECD8016CC75EB"
+    },
+    {
+      "name": "back.png",
+      "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata/back.png",
+      "sha256": "43FD1DBE6EE823200166563549B0DC43F524D7FE7CC1F02D771B3388FD1DB17F"
+    }
+  ],
+  "runs": [
+    {
+      "candidate": "Pixal3D",
+      "rank": 1,
+      "repository": "https://github.com/TencentARC/Pixal3D",
+      "runner": "Hugging Face Space TencentARC/Pixal3D",
+      "status": "BLOCKED_ZERO_GPU_QUOTA",
+      "rawGeneration": "preprocess completed; 3D generation was rejected by the shared ZeroGPU quota",
+      "garmentization": "NOT_RUN",
+      "unityImport": "NOT_RUN",
+      "vrchatHandoff": "NOT_RUN",
+      "output": null
+    },
+    {
+      "candidate": "TRELLIS.2",
+      "rank": 2,
+      "repository": "https://github.com/microsoft/TRELLIS.2",
+      "runner": "Hugging Face Space microsoft/TRELLIS.2",
+      "status": "BLOCKED_ZERO_GPU_QUOTA",
+      "rawGeneration": "official Space session was rejected because the shared ZeroGPU quota was exhausted",
+      "garmentization": "NOT_RUN",
+      "unityImport": "NOT_RUN",
+      "vrchatHandoff": "NOT_RUN",
+      "output": null
+    },
+    {
+      "candidate": "Hunyuan3D-2.1",
+      "rank": 3,
+      "repository": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1",
+      "runner": "Hugging Face official Space",
+      "status": "BLOCKED_SPACE_UNAVAILABLE",
+      "rawGeneration": "official hosted inference was unavailable during this run; no local weights were present",
+      "garmentization": "NOT_RUN",
+      "unityImport": "NOT_RUN",
+      "vrchatHandoff": "NOT_RUN",
+      "output": null
+    },
+    {
+      "candidate": "Hunyuan3D-2mv",
+      "rank": 4,
+      "repository": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2",
+      "runner": "Hugging Face Space tencent/Hunyuan3D-2mv",
+      "status": "RAW_SHAPE_GENERATED",
+      "inputs": ["front.png", "back.png", "side.png", "side.png"],
+      "settings": {
+        "seed": 42,
+        "steps": 5,
+        "guidanceScale": 5.0,
+        "octreeResolution": 128,
+        "numChunks": 4000,
+        "removeBackground": true,
+        "randomizeSeed": false
+      },
+      "wallSeconds": 5.66,
+      "geometry": {
+        "vertices": 22094,
+        "faces": 63150,
+        "texture": false
+      },
+      "garmentization": "NOT_RUN; this is a raw generated shape, not a panel/seam garment",
+      "unityImport": "NOT_RUN",
+      "vrchatHandoff": "NOT_RUN",
+      "output": {
+        "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/hunyuan3d-2mv/lily-vapor-yukata-shape.glb",
+        "sha256": "F4E2084C8B43A495D61FC7607A51015D765D8AA7BCE2936D546EC99B87B15FCB"
+      },
+      "notes": [
+        "generation_all at octree 256/8000 failed with PyMeshLabException; the shape-only endpoint completed and was retained."
+      ]
+    },
+    {
+      "candidate": "Step1X-3D",
+      "rank": 5,
+      "repository": "https://github.com/stepfun-ai/Step1X-3D",
+      "runner": "Hugging Face official Space",
+      "status": "BLOCKED_SPACE_PAUSED",
+      "rawGeneration": "official hosted Space was paused during this run",
+      "garmentization": "NOT_RUN",
+      "unityImport": "NOT_RUN",
+      "vrchatHandoff": "NOT_RUN",
+      "output": null
+    },
+    {
+      "candidate": "PatternGSL",
+      "rank": 6,
+      "repository": "https://github.com/Lagrangeli/PatternGSL",
+      "runner": "Local repository inspection",
+      "status": "BLOCKED_NO_PUBLIC_INFERENCE_PATH",
+      "rawGeneration": "the public repository did not expose a runnable inference entry point or weights for this run",
+      "garmentization": "NOT_RUN",
+      "unityImport": "NOT_RUN",
+      "vrchatHandoff": "NOT_RUN",
+      "output": null,
+      "notes": [
+        "The existing PatternGSL-inspired cloth trial in this repository is not counted as an official PatternGSL run."
+      ]
+    },
+    {
+      "candidate": "image2outfit baseline",
+      "rank": null,
+      "repository": "local repository",
+      "runner": "existing Lily manufacturing pipeline",
+      "status": "GARMENT_PIPELINE_COMPLETE",
+      "rawGeneration": "panel-authored garment asset",
+      "garmentization": "Blender Cloth evidence PASS with seven component contracts and baked cache",
+      "unityImport": "CONFIG_PREFLIGHT_PASS; Unity Editor import not run in this environment",
+      "vrchatHandoff": "CAU/NDMF/VRChat external boundary NOT_RUN",
+      "output": {
+        "prefab": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Unity/NDMF-Bake/SiroinoSotai_LilyVaporYukata_baked.prefab",
+        "clothEvidence": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/cloth-simulation.json"
+      },
+      "notes": [
+        "This baseline is structurally comparable as a VRChat garment, while Hunyuan3D-2mv is currently comparable only as raw geometry."
+      ]
+    }
+  ]
+}
