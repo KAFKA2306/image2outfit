@@ -75,9 +75,9 @@
       "candidate": "TRELLIS.2",
       "rank": 2,
       "repository": "https://github.com/microsoft/TRELLIS.2",
-      "runner": "Hugging Face Space microsoft/TRELLIS.2",
+      "runner": "Official TRELLIS.2 repository and Hugging Face Space microsoft/TRELLIS.2",
       "status": "BLOCKED_ZERO_GPU_QUOTA",
-      "rawGeneration": "official Space session was rejected because the shared ZeroGPU quota was exhausted",
+      "rawGeneration": "official local low-VRAM loader reached the image encoder but required gated DINOv3 access; official Space API then rejected the 512 request because the shared ZeroGPU quota was exhausted",
       "garmentization": "NOT_RUN",
       "unityImport": "NOT_RUN",
       "vrchatHandoff": "NOT_RUN",
@@ -156,13 +156,37 @@
       "candidate": "Step1X-3D",
       "rank": 5,
       "repository": "https://github.com/stepfun-ai/Step1X-3D",
-      "runner": "Hugging Face official Space",
-      "status": "BLOCKED_SPACE_PAUSED",
-      "rawGeneration": "official hosted Space was paused during this run",
+      "runner": "Official Step1X-3D repository, local WSL CUDA runner",
+      "status": "RAW_SHAPE_GENERATED",
+      "inputs": ["hero-three-quarter.png"],
+      "derivedInput": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata/hero-three-quarter-grabcut.png",
+      "settings": {
+        "seed": 42,
+        "numInferenceSteps": 50,
+        "guidanceScale": 7.5,
+        "octreeResolution": 256,
+        "maxFaceNum": 200000,
+        "dtype": "float16",
+        "backgroundRemoval": "derived GrabCut alpha mask; official pipeline used alpha channel as mask"
+      },
+      "wallSeconds": 40.5,
+      "rawGeneration": "official local geometry pipeline completed; texture synthesis stage was not run",
       "garmentization": "NOT_RUN",
       "unityImport": "NOT_RUN",
       "vrchatHandoff": "NOT_RUN",
-      "output": null
+      "output": {
+        "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/step1x-3d/lily-vapor-yukata-shape.glb",
+        "sha256": "13B0EC9AD5120878E4E2CE47AFCD0EEFDA5112294E1BA3A93FDEFE7ED2F4F4D1",
+        "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/step1x-3d/lily-vapor-yukata-shape-preview.png",
+        "geometry": {
+          "vertices": 112776,
+          "faces": 200000,
+          "texture": false
+        }
+      },
+      "notes": [
+        "The official Space was paused, so the public local geometry checkpoint and inference code were used for the raw-shape gate."
+      ]
     },
     {
       "candidate": "PatternGSL",
