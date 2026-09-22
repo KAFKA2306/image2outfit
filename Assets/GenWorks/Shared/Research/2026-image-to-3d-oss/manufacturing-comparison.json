@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "benchmarkId": "2026-image-to-3d-oss-lily-vapor-yukata",
+  "date": "2026-09-23",
+  "method": {
+    "baseScene": "Assets/GenWorks/siroino-lily-vapor-yukata/Source/Blender/SiroinoLilyVaporYukata.blend",
+    "clothEngine": "Blender 4.2.23 native Cloth",
+    "targetFaces": 30000,
+    "frameStart": 1,
+    "frameEnd": 12,
+    "fitPolicy": "Each raw GLB was imported separately, normalized to the Siroino body, fitted to the same collision body, and simulated with the same pinning and gravity settings.",
+    "interpretation": "BLENDER_CLOTH_PASS proves cache baking and changed geometry; it does not prove panel/seam topology, Unity import, Modular Avatar setup, or VRChat upload."
+  },
+  "comparisonGrid": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/oss-garmentized-comparison-grid.png",
+  "runs": [
+    {
+      "candidate": "Pixal3D",
+      "status": "BLENDER_CLOTH_PASS",
+      "visualReview": "REVIEW_REQUIRED",
+      "decimatedFaces": 1071537,
+      "clothCacheBaked": true,
+      "geometryChanged": true,
+      "report": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/pixal3d/pixal3d-cloth-sim.json",
+      "glb": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/pixal3d/pixal3d-cloth-sim.glb",
+      "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/pixal3d/pixal3d-cloth-sim-clay.png",
+      "finding": "Cloth cache baked and the silhouette remained recognizable, but the high-density raw mesh did not reach the common 30k-face target and needs topology cleanup before Unity use."
+    },
+    {
+      "candidate": "TRELLIS.2",
+      "status": "BLENDER_CLOTH_PASS",
+      "visualReview": "FAIL_SPIKED_SETTLED_MESH",
+      "decimatedFaces": 30000,
+      "clothCacheBaked": true,
+      "geometryChanged": true,
+      "report": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/trellis2/trellis2-cloth-sim.json",
+      "glb": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/trellis2/trellis2-cloth-sim.glb",
+      "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/trellis2/trellis2-cloth-sim-clay.png",
+      "finding": "The raw PBR output is valid, but the thin open-surface mesh became a spiked settled shape under the generic cloth pass."
+    },
+    {
+      "candidate": "Hunyuan3D-2.1",
+      "status": "BLENDER_CLOTH_PASS",
+      "visualReview": "REVIEW_REQUIRED",
+      "decimatedFaces": 30000,
+      "clothCacheBaked": true,
+      "geometryChanged": true,
+      "report": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/hunyuan3d-2.1/hunyuan3d-2.1-cloth-sim.json",
+      "glb": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/hunyuan3d-2.1/hunyuan3d-2.1-cloth-sim.glb",
+      "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/hunyuan3d-2.1/hunyuan3d-2.1-cloth-sim-clay.png",
+      "finding": "The most coherent drape among the tested raw meshes, with a visible floating artifact that requires cleanup."
+    },
+    {
+      "candidate": "Hunyuan3D-2mv",
+      "status": "BLENDER_CLOTH_PASS",
+      "visualReview": "REVIEW_REQUIRED",
+      "decimatedFaces": 30000,
+      "clothCacheBaked": true,
+      "geometryChanged": true,
+      "report": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/hunyuan3d-2mv/hunyuan3d-2mv-cloth-sim.json",
+      "glb": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/hunyuan3d-2mv/hunyuan3d-2mv-cloth-sim.glb",
+      "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/hunyuan3d-2mv/hunyuan3d-2mv-cloth-sim-clay.png",
+      "finding": "The multi-view result fitted and settled cleanly enough for comparison, but it remains a raw surface without editable garment construction."
+    },
+    {
+      "candidate": "Step1X-3D",
+      "status": "BLENDER_CLOTH_PASS",
+      "visualReview": "REVIEW_REQUIRED",
+      "decimatedFaces": 29999,
+      "clothCacheBaked": true,
+      "geometryChanged": true,
+      "report": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/step1x-3d/step1x-3d-cloth-sim.json",
+      "glb": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/step1x-3d/step1x-3d-cloth-sim.glb",
+      "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/garmentized/step1x-3d/step1x-3d-cloth-sim-clay.png",
+      "finding": "The fitted result produced a readable robe-like silhouette and completed the common cloth gate, but has no panel or stitch semantics."
+    },
+    {
+      "candidate": "PatternGSL",
+      "status": "BLOCKED_NO_PUBLIC_INFERENCE_PATH",
+      "visualReview": "NOT_RUN",
+      "clothCacheBaked": false,
+      "geometryChanged": false,
+      "finding": "The official public repository and project page describe the method but expose no runnable inference checkpoint for this benchmark; no substitute implementation is counted."
+    }
+  ],
+  "nextGates": {
+    "unityImport": "NOT_RUN",
+    "modularAvatar": "NOT_RUN",
+    "ndmf": "NOT_RUN",
+    "vrchatHandoff": "NOT_RUN"
+  }
+}
