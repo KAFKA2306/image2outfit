@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-bellflower-lantern-trouser-set",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-sewn-bellflower-panels-and-yoke",
+  "panels": [
+    "blouse_front_left", "blouse_front_right", "blouse_back_left", "blouse_back_right",
+    "yoke_front_left", "yoke_front_right", "yoke_back_left", "yoke_back_right",
+    "sleeve_left", "sleeve_right", "cuff_left", "cuff_right", "standing_collar",
+    "waistband_front", "waistband_back", "trouser_front_left", "trouser_front_right",
+    "trouser_back_left", "trouser_back_right", "ankle_facing_left", "ankle_facing_right",
+    "outer_leg_panel_01", "outer_leg_panel_02", "outer_leg_panel_03", "outer_leg_panel_04"
+  ],
+  "separateGeometry": [
+    "outer_leg_panel_01_L", "outer_leg_panel_02_L", "outer_leg_panel_03_L", "outer_leg_panel_04_L",
+    "outer_leg_panel_01_R", "outer_leg_panel_02_R", "outer_leg_panel_03_R", "outer_leg_panel_04_R",
+    "magnetic_tab_L_01", "magnetic_tab_L_02", "magnetic_tab_R_01", "magnetic_tab_R_02",
+    "piping_outer_L", "piping_outer_R", "organza_underlay_L", "organza_underlay_R"
+  ],
+  "priorityFitZones": ["collar", "shoulder", "underarm", "waist", "seat", "inner-thigh", "outer-knee", "ankle", "panel-vents"],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "rig-driven bounded structural first pass",
+    "reason": "The blouse, trouser shell, and sewn bellflower panels are structured skinned geometry; the narrow organza underlay is a bounded static layer in this first contract pass."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "The current builder owns a deterministic target-fit shape; no product-specific corrective shape-key stage is required for the first candidate."
+  },
+  "releaseBoundary": "Keep WORKING until the current Blender source, FBX, five views, six poses, geometry audit, pattern/seam evidence, and direct visual review are available."
+}
