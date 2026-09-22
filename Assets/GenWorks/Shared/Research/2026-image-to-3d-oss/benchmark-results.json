@@ -37,13 +37,39 @@
       "candidate": "Pixal3D",
       "rank": 1,
       "repository": "https://github.com/TencentARC/Pixal3D",
-      "runner": "Hugging Face Space TencentARC/Pixal3D",
-      "status": "BLOCKED_ZERO_GPU_QUOTA",
-      "rawGeneration": "preprocess completed; 3D generation was rejected by the shared ZeroGPU quota",
+      "runner": "Official Pixal3D repository, local WSL CUDA runner",
+      "status": "RAW_SHAPE_GENERATED",
+      "inputs": ["hero-three-quarter.png"],
+      "derivedInput": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata/hero-three-quarter-grabcut.png",
+      "derivedInputSha256": "30EAE76D62F418EA687968E0EAA4EF7B103F6F8A28874876AFF6E89ED6F87166",
+      "settings": {
+        "seed": 42,
+        "resolution": 512,
+        "lowVram": true,
+        "sparseStructureSteps": 12,
+        "shapeSteps": 12,
+        "sparseGuidanceStrength": 7.5,
+        "shapeGuidanceStrength": 7.5,
+        "backgroundRemoval": "derived GrabCut alpha mask; official BiRefNet checkpoint was gated"
+      },
+      "rawGeneration": "official local shape pipeline completed at 512 resolution; texture and PBR stages were not completed",
       "garmentization": "NOT_RUN",
       "unityImport": "NOT_RUN",
       "vrchatHandoff": "NOT_RUN",
-      "output": null
+      "output": {
+        "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/pixal3d/lily-vapor-yukata-shape-512-masked.glb",
+        "sha256": "7D41C091416362FE2D7B552C6D7925C7C55B1E351ED881C08AF6D875BB8FEB80",
+        "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/pixal3d/lily-vapor-yukata-shape-512-masked-preview.png",
+        "geometry": {
+          "vertices": 721434,
+          "faces": 1675848,
+          "texture": false
+        }
+      },
+      "notes": [
+        "The 1024 cascade completed sparse and shape sampling but failed during the official texture condition path with CUDA driver error: device not ready; the 1024 shape decoder reproduced the same error.",
+        "The retained 512 shape-only GLB uses the documented derived alpha-mask input to avoid background planes and is a raw model result, not a completed VRChat garment."
+      ]
     },
     {
       "candidate": "TRELLIS.2",
@@ -94,9 +120,10 @@
       "garmentization": "NOT_RUN; this is a raw generated shape, not a panel/seam garment",
       "unityImport": "NOT_RUN",
       "vrchatHandoff": "NOT_RUN",
-      "output": {
+        "output": {
         "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/hunyuan3d-2mv/lily-vapor-yukata-shape.glb",
-        "sha256": "F4E2084C8B43A495D61FC7607A51015D765D8AA7BCE2936D546EC99B87B15FCB"
+        "sha256": "F4E2084C8B43A495D61FC7607A51015D765D8AA7BCE2936D546EC99B87B15FCB",
+        "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/hunyuan3d-2mv/lily-vapor-yukata-shape-preview.png"
       },
       "notes": [
         "generation_all at octree 256/8000 failed with PyMeshLabException; the shape-only endpoint completed and was retained."
