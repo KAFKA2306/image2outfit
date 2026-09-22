@@ -87,13 +87,36 @@
       "candidate": "Hunyuan3D-2.1",
       "rank": 3,
       "repository": "https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1",
-      "runner": "Hugging Face official Space",
-      "status": "BLOCKED_SPACE_UNAVAILABLE",
-      "rawGeneration": "official hosted inference was unavailable during this run; no local weights were present",
+      "runner": "Official Hunyuan3D-2.1 repository, local WSL CUDA runner",
+      "status": "RAW_SHAPE_GENERATED",
+      "inputs": ["hero-three-quarter.png"],
+      "derivedInput": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/inputs/lily-vapor-yukata/hero-three-quarter-grabcut.png",
+      "settings": {
+        "seed": 42,
+        "numInferenceSteps": 50,
+        "guidanceScale": 7.5,
+        "octreeResolution": 256,
+        "numChunks": 4000,
+        "dtype": "float16",
+        "backgroundRemoval": "derived GrabCut alpha mask"
+      },
+      "rawGeneration": "official local shape pipeline completed; PBR texture stage was not run",
       "garmentization": "NOT_RUN",
       "unityImport": "NOT_RUN",
       "vrchatHandoff": "NOT_RUN",
-      "output": null
+      "output": {
+        "path": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/hunyuan3d-2.1/lily-vapor-yukata-shape.glb",
+        "sha256": "E22D906A21324A96A7519BF5D857FD5B1AEE6790B1B6C001C241EA025CA2D805",
+        "preview": "Assets/GenWorks/Shared/Research/2026-image-to-3d-oss/outputs/hunyuan3d-2.1/lily-vapor-yukata-shape-preview.png",
+        "geometry": {
+          "vertices": 233887,
+          "faces": 468016,
+          "texture": false
+        }
+      },
+      "notes": [
+        "The official PBR texture pipeline was not run because it requires approximately 21GB VRAM and this host has 12GB."
+      ]
     },
     {
       "candidate": "Hunyuan3D-2mv",
