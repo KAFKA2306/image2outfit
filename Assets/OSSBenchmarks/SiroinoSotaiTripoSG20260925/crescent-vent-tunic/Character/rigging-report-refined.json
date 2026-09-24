@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "kind": "triposg-refined-garment",
+  "sourceModel": "TripoSG",
+  "constructionMethod": "TripoSG-shape-hypothesis-plus-deterministic-garment-envelope",
+  "hypothesisInput": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/crescent-vent-tunic/TripoSG/crescent-vent-tunic-triposg.glb",
+  "outputFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/crescent-vent-tunic/Character/CrescentVentTunic_TripoSG_Refined.fbx",
+  "outputBlend": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/crescent-vent-tunic/Character/CrescentVentTunic_TripoSG_Refined.blend",
+  "blenderVersion": "4.2.23 LTS",
+  "skeleton": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "kindVariant": "crescent",
+  "triangleBudget": 22000,
+  "triangleCount": 920,
+  "normalizedBounds": {
+    "min": [
+      -0.3631170392036438,
+      -0.18349140882492065,
+      0.035296209156513214
+    ],
+    "max": [
+      0.3631170392036438,
+      0.11564337462186813,
+      1.1425952911376953
+    ]
+  },
+  "weightTransfer": {
+    "targetObject": "TripoSGRefinedGarmentMesh",
+    "schemaVersion": 1,
+    "kind": "weight-transfer-artifact",
+    "stage": "skin-and-export",
+    "sourceMeshHash": "e9e06568951977f90a42af7407ab45423b59db8b02e1aeb1d16876d3606cb8af",
+    "targetMeshHash": "2949384a0241c5facf38cbe52402757494ce1e07448c0358ea3bb8396d0a41be",
+    "armatureHash": "6a200335c0a4cf09097baecb248830f6c2bf2bba743c71416349db56444f400b",
+    "bindPoseHash": "75b176da3cb7df21f177e0f93aa257448c50e69fc54d2afe8097b70395d88ec3",
+    "method": "blender-data-transfer",
+    "methodVersion": "4.2.23 LTS",
+    "parameters": {
+      "mapping": "nearest-face-interpolated",
+      "maxInfluences": 4,
+      "minimumWeight": 1e-08,
+      "lateralityAxis": "X",
+      "lateralityCenterTolerance": 0.05,
+      "leftPositive": true
+    },
+    "vertexGroupHash": "757059fd9c5ed313ce1c53fa9b223c711933a00a67406c974b758ca16c1a8bbd",
+    "audit": {
+      "vertexCount": 474,
+      "zeroWeightVertices": [],
+      "inputNonNormalizedVertices": [],
+      "overLimitVertices": [],
+      "lateralityContaminationVertices": [],
+      "rejectedBoneGroups": [],
+      "influenceHistogram": {
+        "1": 71,
+        "2": 265,
+        "3": 114,
+        "4": 24
+      },
+      "maximumDiscardedWeight": 0,
+      "vertexGroupHash": "757059fd9c5ed313ce1c53fa9b223c711933a00a67406c974b758ca16c1a8bbd",
+      "passed": true
+    },
+    "warnings": [],
+    "artifactDigest": "3be4533eabf3314efc7aef996f98ec88eceb883572832e3d7f0017d0a1bec663"
+  },
+  "status": "PASS"
+}
