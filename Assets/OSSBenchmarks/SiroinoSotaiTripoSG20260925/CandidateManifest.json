@@ -3,11 +3,23 @@
   "kind": "triposg-siroino-candidate-batch",
   "targetAvatar": "SiroinoSotai_PC",
   "sourceModel": "TripoSG",
-  "sourceInputKind": "generated-four-view-concept-sheet-cropped-to-front-left-back-right",
+  "sourceInputKind": "issue-locked-four-view-concept-boards-cropped-to-front-left-back-right; TripoSG inference uses the front crop",
   "canonicalProduct": false,
   "unityComparisonScene": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/SiroinoSotai_TripoSG_Candidates.unity",
   "comparisonCapture": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/Evidence/siroino-triposg-comparison-optimized.png",
   "garmentOnlyCapture": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/Evidence/siroino-triposg-garment-only.png",
+  "remainingIssuesComparisonScenes": [
+    "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/SiroinoSotai_TripoSG_Remaining.unity",
+    "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/SiroinoSotai_TripoSG_Remaining_Voxel02.unity",
+    "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/SiroinoSotai_TripoSG_Remaining_Voxel008.unity"
+  ],
+  "remainingIssuesCaptures": [
+    "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/Evidence/siroino-triposg-remaining-front-v2.png",
+    "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/Evidence/siroino-triposg-remaining-voxel02-front.png",
+    "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/Evidence/siroino-triposg-remaining-voxel008-front.png",
+    "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/Evidence/siroino-triposg-remaining-raw-threequarter.png",
+    "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/Evidence/siroino-triposg-remaining-voxel02-threequarter.png"
+  ],
   "candidates": [
     {
       "issue": 790,
@@ -70,6 +82,76 @@
       "unityChecks": { "bones": 60, "materials": 1, "mergeArmature": true, "weightTransfer": "PASS", "triangleBudget": "PASS" },
       "visualGate": "REVIEW_REQUIRED",
       "canonicalPromotion": "BLOCKED_BY_VISUAL_GATE"
+    },
+    {
+      "issue": 793,
+      "slug": "lattice-bloom-shift",
+      "lockedName": "Lattice Bloom Shift",
+      "triangleBudget": 30000,
+      "measuredTriangles": 30000,
+      "inputFront": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Inputs/front.png",
+      "inputViews": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Inputs",
+      "inputBoard": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Inputs/turnaround-sheet.png",
+      "triposgMesh": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/TripoSG/lattice-bloom-shift-triposg.glb",
+      "preparedInput": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/TripoSG/prepared.png",
+      "characterFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Character/LatticeBloomShift_TripoSG.fbx",
+      "outfitPrefab": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Unity/LatticeBloomShift_TripoSG_Outfit.prefab",
+      "postprocessVariants": [
+        {
+          "name": "Voxel02",
+          "voxelRemeshSize": 0.02,
+          "triangleCount": 14132,
+          "characterFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Character/LatticeBloomShift_TripoSG_Voxel02.fbx",
+          "outfitPrefab": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Unity/LatticeBloomShift_TripoSG_Voxel02_Outfit.prefab"
+        },
+        {
+          "name": "Voxel008",
+          "voxelRemeshSize": 0.008,
+          "triangleCount": 30000,
+          "characterFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Character/LatticeBloomShift_TripoSG_Voxel008.fbx",
+          "outfitPrefab": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Unity/LatticeBloomShift_TripoSG_Voxel008_Outfit.prefab"
+        }
+      ],
+      "ndmfBake": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lattice-bloom-shift/Evidence/Unity/NDMF-Bake/LatticeBloomShift_TripoSG_Outfit_baked.prefab",
+      "unityChecks": { "bones": 60, "materials": 1, "mergeArmature": true, "weightTransfer": "PASS", "triangleBudget": "PASS", "ndmfBake": "PASS" },
+      "visualGate": "REVIEW_REQUIRED",
+      "canonicalPromotion": "BLOCKED_BY_VISUAL_GATE"
+    },
+    {
+      "issue": 788,
+      "slug": "lunar-transit-shell-788",
+      "lockedName": "Lunar Transit Shell 788",
+      "triangleBudget": 24000,
+      "measuredTriangles": 24000,
+      "inputFront": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Inputs/front.png",
+      "inputViews": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Inputs",
+      "failureBoard": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Inputs/repair-3-board.webp",
+      "inputBoard": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Inputs/repair-4-board.png",
+      "triposgMesh": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/TripoSG/lunar-transit-shell-788-triposg.glb",
+      "preparedInput": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/TripoSG/prepared.png",
+      "characterFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Character/LunarTransitShell788_TripoSG.fbx",
+      "outfitPrefab": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Unity/LunarTransitShell788_TripoSG_Outfit.prefab",
+      "postprocessVariants": [
+        {
+          "name": "Voxel02",
+          "voxelRemeshSize": 0.02,
+          "triangleCount": 13696,
+          "characterFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Character/LunarTransitShell788_TripoSG_Voxel02.fbx",
+          "outfitPrefab": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Unity/LunarTransitShell788_TripoSG_Voxel02_Outfit.prefab"
+        },
+        {
+          "name": "Voxel008",
+          "voxelRemeshSize": 0.008,
+          "triangleCount": 24000,
+          "characterFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Character/LunarTransitShell788_TripoSG_Voxel008.fbx",
+          "outfitPrefab": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Unity/LunarTransitShell788_TripoSG_Voxel008_Outfit.prefab"
+        }
+      ],
+      "ndmfBake": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/lunar-transit-shell-788/Evidence/Unity/NDMF-Bake/LunarTransitShell788_TripoSG_Outfit_baked.prefab",
+      "unityChecks": { "bones": 60, "materials": 1, "mergeArmature": true, "weightTransfer": "PASS", "triangleBudget": "PASS", "ndmfBake": "PASS" },
+      "visualGate": "REVIEW_REQUIRED",
+      "canonicalPromotion": "BLOCKED_BY_VISUAL_GATE",
+      "issueState": "BLOCKED"
     }
   ]
 }
