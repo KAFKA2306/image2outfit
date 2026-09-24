@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "product_id": "noir-atelier-apron-dress-r13",
+  "silhouette": "below-knee sleeveless A-line atelier smock",
+  "front": {"tool_pleats": 5, "pleat_layout": "offset, rooted at lower front", "closure": "none"},
+  "back": {"rear_shoulder_yoke": 1, "center_back": "clean uninterrupted panel"},
+  "mobility": {"underarm_gussets": 2},
+  "parts": ["front_body", "back_body", "rear_yoke", "underarm_gusset_L", "underarm_gusset_R", "tool_pleat_1", "tool_pleat_2", "tool_pleat_3", "tool_pleat_4", "tool_pleat_5"],
+  "hero_detail": "five asymmetric rooted tool pleats form functional-looking vertical storage channels without separate pockets",
+  "materials": ["matte cotton canvas", "linen blend"],
+  "palette": ["charcoal black", "warm greige", "khaki", "cream"],
+  "forbidden": ["belt", "pouch", "garter", "ribbon", "charm", "detached sleeve", "harness"],
+  "mesh": {"target_lod0_triangles": 18000, "topology": "deformation-aware quads before triangulated export"},
+  "uv": {"sets": 1, "strategy": "single atlas, pleat islands aligned to warp direction"},
+  "material": {"slots": 1, "shader_target": "lilToon-compatible PBR maps"},
+  "rigging": {"base": "Humanoid", "weighting": "body transfer then manual underarm/hem cleanup"},
+  "physics": {"required": false, "optional": "hem secondary motion only after Unity validation"},
+  "lod": [{"level": 0, "triangles": 18000}, {"level": 1, "triangles": 9000}, {"level": 2, "triangles": 4500}]
+}
