@@ -2,25 +2,65 @@
   "schemaVersion": 1,
   "kind": "triposg-refined-garment",
   "sourceModel": "TripoSG",
-  "constructionMethod": "TripoSG-shape-hypothesis-plus-deterministic-garment-envelope",
+  "constructionMethod": "TripoSG-imported-shape-metrics-plus-deterministic-garment-envelope",
   "hypothesisInput": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/herbarium-shutter-tunic/TripoSG/herbarium-shutter-tunic-triposg.glb",
   "outputFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/herbarium-shutter-tunic/Character/HerbariumShutterTunic_TripoSG_Refined.fbx",
   "outputBlend": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/herbarium-shutter-tunic/Character/HerbariumShutterTunic_TripoSG_Refined.blend",
   "blenderVersion": "4.2.23 LTS",
   "skeleton": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
   "kindVariant": "herbarium",
+  "hypothesisMetrics": {
+    "vertexCount": 132377,
+    "meshObjectCount": 1,
+    "topology": {
+      "boundaryEdgeCount": 0,
+      "nonManifoldEdgeCount": 0,
+      "degenerateFaceCount": 5
+    },
+    "bounds": {
+      "min": [
+        -0.432356059551239,
+        -0.23748934268951416,
+        -0.9519420862197876
+      ],
+      "max": [
+        0.44514238834381104,
+        0.23831939697265625,
+        0.9501408338546753
+      ]
+    },
+    "dimensions": [
+      0.87749844789505,
+      0.4758087396621704,
+      1.902082920074463
+    ]
+  },
+  "bodyDimensions": [
+    1.1767631769180298,
+    0.18782640993595123,
+    1.1072990894317627
+  ],
+  "hypothesisAspectRatios": {
+    "widthToHeight": 0.46133553833746516,
+    "depthToHeight": 0.25015141802731894
+  },
+  "inputDependentScales": {
+    "widthScale": 1.021820436936044,
+    "depthScale": 1.1051584757858355,
+    "heightScale": 1.06
+  },
   "triangleBudget": 24000,
   "triangleCount": 864,
   "normalizedBounds": {
     "min": [
-      -0.3631170392036438,
-      -0.18296104669570923,
+      -0.5961493849754333,
+      -0.19863353669643402,
       0.035296209156513214
     ],
     "max": [
-      0.3631170392036438,
-      0.11511299759149551,
-      1.1425952911376953
+      0.5961493849754333,
+      0.1307854950428009,
+      1.2090331315994263
     ]
   },
   "weightTransfer": {
@@ -29,7 +69,7 @@
     "kind": "weight-transfer-artifact",
     "stage": "skin-and-export",
     "sourceMeshHash": "e9e06568951977f90a42af7407ab45423b59db8b02e1aeb1d16876d3606cb8af",
-    "targetMeshHash": "88eb6383c6a48e75aa095f221aa1c070ca5c0aed1e84d1767d6312edbcdcc09d",
+    "targetMeshHash": "afbe411c9c72e0415e86d64e7477690316b94676fb11b9469c574a2f9ad89fc6",
     "armatureHash": "6a200335c0a4cf09097baecb248830f6c2bf2bba743c71416349db56444f400b",
     "bindPoseHash": "75b176da3cb7df21f177e0f93aa257448c50e69fc54d2afe8097b70395d88ec3",
     "method": "blender-data-transfer",
@@ -42,7 +82,7 @@
       "lateralityCenterTolerance": 0.05,
       "leftPositive": true
     },
-    "vertexGroupHash": "246e9491338253c2dd03af17971d2db21874b22c586136e89bedf6aa43d6a70d",
+    "vertexGroupHash": "fd7c8e6062d011297f2045c2df6ec20b0bd7fc09c7ddc092411e621dd2b4d45b",
     "audit": {
       "vertexCount": 454,
       "zeroWeightVertices": [],
@@ -51,17 +91,17 @@
       "lateralityContaminationVertices": [],
       "rejectedBoneGroups": [],
       "influenceHistogram": {
-        "1": 66,
-        "2": 248,
-        "3": 114,
-        "4": 26
+        "1": 89,
+        "2": 254,
+        "3": 101,
+        "4": 10
       },
       "maximumDiscardedWeight": 0,
-      "vertexGroupHash": "246e9491338253c2dd03af17971d2db21874b22c586136e89bedf6aa43d6a70d",
+      "vertexGroupHash": "fd7c8e6062d011297f2045c2df6ec20b0bd7fc09c7ddc092411e621dd2b4d45b",
       "passed": true
     },
     "warnings": [],
-    "artifactDigest": "eeb924f709e0dcafd3aadfc9b979261f0f5055b128a03e5c83e9cd96e8f5dd3e"
+    "artifactDigest": "0ec47378a5b8f7ea540170d8cbf3017ce4110a77646c182a253a1aa47be2b684"
   },
   "status": "PASS"
 }

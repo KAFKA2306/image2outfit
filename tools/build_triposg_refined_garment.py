@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """Build a clean Siroino garment from a local TripoSG shape hypothesis.
 
-TripoSG is intentionally kept as the upstream shape hypothesis and provenance
-anchor.  This adapter replaces the unstable reconstructed surface with a
-deterministic, garment-only envelope and the locked hero construction required
-by the Siroino candidate issues before weight transfer and FBX export.
+The unstable reconstructed surface is not used directly.  Instead, the GLB is
+actually imported and measured, then those measurements drive the garment-only
+envelope and the locked hero construction required by the Siroino candidate
+issues before weight transfer and FBX export.  This keeps the cleanup
+deterministic while making the result depend on the TripoSG hypothesis.
 """
 
 from __future__ import annotations
 
 import argparse
+import bmesh
 import json
 import math
 import sys
@@ -56,6 +58,94 @@ def mesh_object(name: str, vertices: list[tuple[float, float, float]], faces: li
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     return obj
+
+
+def aggregate_bounds(objects: list[bpy.types.Object]) -> tuple[Vector, Vector]:
+    points = [
+        obj.matrix_world @ vertex.co
+        for obj in objects
+        for vertex in obj.data.vertices
+    ]
+    if not points:
+        raise RuntimeError("TripoSG hypothesis contains no mesh vertices")
+    return (
+        Vector(min(point[index] for point in points) for index in range(3)),
+        Vector(max(point[index] for point in points) for index in range(3)),
+    )
+
+
+def topology_diagnostics(objects: list[bpy.types.Object]) -> dict[str, int]:
+    boundary_edges = 0
+    non_manifold_edges = 0
+    degenerate_faces = 0
+    for obj in objects:
+        bm = bmesh.new()
+        try:
+            bm.from_mesh(obj.data)
+            boundary_edges += sum(1 for edge in bm.edges if len(edge.link_faces) == 1)
+            non_manifold_edges += sum(1 for edge in bm.edges if len(edge.link_faces) > 2)
+            degenerate_faces += sum(1 for face in bm.faces if face.calc_area() <= 1e-12)
+        finally:
+            bm.free()
+    return {
+        "boundaryEdgeCount": boundary_edges,
+        "nonManifoldEdgeCount": non_manifold_edges,
+        "degenerateFaceCount": degenerate_faces,
+    }
+
+
+def import_hypothesis(path: Path) -> dict[str, object]:
+    """Import the GLB, record its geometry envelope, then remove it.
+
+    The raw surface remains an upstream hypothesis and evidence artifact.  It
+    is not joined into the garment because the local TripoSG reconstructions
+    have shown visible holes and self-overlap in Unity.
+    """
+
+    existing = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=str(path))
+    imported_meshes = [
+        obj for obj in bpy.data.objects
+        if obj not in existing and obj.type == "MESH" and len(obj.data.vertices) > 0
+    ]
+    if not imported_meshes:
+        raise RuntimeError(f"TripoSG hypothesis imported without mesh geometry: {path}")
+    minimum, maximum = aggregate_bounds(imported_meshes)
+    dimensions = maximum - minimum
+    vertex_count = sum(len(obj.data.vertices) for obj in imported_meshes)
+    mesh_object_count = len(imported_meshes)
+    topology = topology_diagnostics(imported_meshes)
+    for obj in list(bpy.data.objects):
+        if obj not in existing:
+            bpy.data.objects.remove(obj, do_unlink=True)
+    return {
+        "vertexCount": vertex_count,
+        "meshObjectCount": mesh_object_count,
+        "topology": topology,
+        "bounds": {"min": list(minimum), "max": list(maximum)},
+        "dimensions": list(dimensions),
+    }
+
+
+def hypothesis_scales(hypothesis: dict[str, object], body_min: Vector, body_max: Vector) -> dict[str, float]:
+    dimensions = Vector(hypothesis["dimensions"])
+    body_dimensions = body_max - body_min
+    if dimensions.z <= 1e-8:
+        return {"widthScale": 1.0, "depthScale": 1.0, "heightScale": 1.0}
+
+    # TripoSG and the Siroino FBX use different absolute units.  Compare the
+    # hypothesis silhouette as width/height and depth/height ratios instead of
+    # clamping raw dimensions against the avatar's very shallow depth.
+    width_aspect = dimensions.x / dimensions.z
+    depth_aspect = dimensions.y / dimensions.z
+    width_scale = 1.0 + 0.45 * ((width_aspect / 0.44) - 1.0)
+    depth_scale = 1.0 + 0.55 * ((depth_aspect / 0.21) - 1.0)
+    height_scale = dimensions.z / body_dimensions.z if body_dimensions.z > 1e-8 else 1.0
+    return {
+        "widthScale": max(0.82, min(1.18, width_scale)),
+        "depthScale": max(0.82, min(1.18, depth_scale)),
+        "heightScale": max(0.94, min(1.06, height_scale)),
+    }
 
 
 def shell(name: str) -> bpy.types.Object:
@@ -194,14 +284,14 @@ def add_components(kind: str) -> list[bpy.types.Object]:
             tube_between(
                 "SleeveL",
                 Vector((-0.17, 0.0, 0.96)),
-                Vector((-0.29, 0.0, 0.59)),
+                Vector((-0.55, 0.0, 0.96)),
                 0.075,
                 0.055,
             ),
             tube_between(
                 "SleeveR",
                 Vector((0.17, 0.0, 0.96)),
-                Vector((0.29, 0.0, 0.59)),
+                Vector((0.55, 0.0, 0.96)),
                 0.075,
                 0.055,
             ),
@@ -306,8 +396,13 @@ def main() -> int:
     if source is None or armature is None:
         raise RuntimeError("Siroino base mesh or Armature was not imported")
 
-    target = join_parts(add_components(args.kind))
     body_min, body_max = bounds(source)
+    hypothesis_metrics = import_hypothesis(hypothesis)
+    shape_scales = hypothesis_scales(hypothesis_metrics, body_min, body_max)
+    target = join_parts(add_components(args.kind))
+    target.scale.x *= shape_scales["widthScale"]
+    target.scale.y *= shape_scales["depthScale"]
+    target.scale.z *= shape_scales["heightScale"]
     target_min, target_max = bounds(target)
     target.scale *= (body_max.z - body_min.z) / (target_max.z - target_min.z)
     bpy.context.view_layer.update()
@@ -336,13 +431,20 @@ def main() -> int:
         "schemaVersion": 1,
         "kind": "triposg-refined-garment",
         "sourceModel": "TripoSG",
-        "constructionMethod": "TripoSG-shape-hypothesis-plus-deterministic-garment-envelope",
+        "constructionMethod": "TripoSG-imported-shape-metrics-plus-deterministic-garment-envelope",
         "hypothesisInput": str(hypothesis.relative_to(ROOT)).replace("\\", "/"),
         "outputFbx": str(output_fbx.relative_to(ROOT)).replace("\\", "/"),
         "outputBlend": str(output_blend.relative_to(ROOT)).replace("\\", "/"),
         "blenderVersion": bpy.app.version_string,
         "skeleton": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
         "kindVariant": args.kind,
+        "hypothesisMetrics": hypothesis_metrics,
+        "bodyDimensions": list(body_max - body_min),
+        "hypothesisAspectRatios": {
+            "widthToHeight": hypothesis_metrics["dimensions"][0] / hypothesis_metrics["dimensions"][2],
+            "depthToHeight": hypothesis_metrics["dimensions"][1] / hypothesis_metrics["dimensions"][2],
+        },
+        "inputDependentScales": shape_scales,
         "triangleBudget": args.triangle_budget,
         "triangleCount": triangle_count,
         "normalizedBounds": {"min": list(final_min), "max": list(final_max)},

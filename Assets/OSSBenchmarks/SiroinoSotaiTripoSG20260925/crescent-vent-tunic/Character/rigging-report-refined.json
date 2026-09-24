@@ -2,25 +2,65 @@
   "schemaVersion": 1,
   "kind": "triposg-refined-garment",
   "sourceModel": "TripoSG",
-  "constructionMethod": "TripoSG-shape-hypothesis-plus-deterministic-garment-envelope",
+  "constructionMethod": "TripoSG-imported-shape-metrics-plus-deterministic-garment-envelope",
   "hypothesisInput": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/crescent-vent-tunic/TripoSG/crescent-vent-tunic-triposg.glb",
   "outputFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/crescent-vent-tunic/Character/CrescentVentTunic_TripoSG_Refined.fbx",
   "outputBlend": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/crescent-vent-tunic/Character/CrescentVentTunic_TripoSG_Refined.blend",
   "blenderVersion": "4.2.23 LTS",
   "skeleton": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
   "kindVariant": "crescent",
+  "hypothesisMetrics": {
+    "vertexCount": 126387,
+    "meshObjectCount": 1,
+    "topology": {
+      "boundaryEdgeCount": 0,
+      "nonManifoldEdgeCount": 0,
+      "degenerateFaceCount": 9
+    },
+    "bounds": {
+      "min": [
+        -0.44228124618530273,
+        -0.19121849536895752,
+        -0.9527577757835388
+      ],
+      "max": [
+        0.4426107406616211,
+        0.19916725158691406,
+        0.9501891136169434
+      ]
+    },
+    "dimensions": [
+      0.8848919868469238,
+      0.3903857469558716,
+      1.902946949005127
+    ]
+  },
+  "bodyDimensions": [
+    1.1767631769180298,
+    0.18782640993595123,
+    1.1072990894317627
+  ],
+  "hypothesisAspectRatios": {
+    "widthToHeight": 0.4650113800122232,
+    "depthToHeight": 0.20514799278033882
+  },
+  "inputDependentScales": {
+    "widthScale": 1.0255798204670463,
+    "depthScale": 0.9872923620437446,
+    "heightScale": 1.06
+  },
   "triangleBudget": 22000,
   "triangleCount": 920,
   "normalizedBounds": {
     "min": [
-      -0.3631170392036438,
-      -0.18349140882492065,
+      -0.5983426570892334,
+      -0.18159076571464539,
       0.035296209156513214
     ],
     "max": [
-      0.3631170392036438,
-      0.11564337462186813,
-      1.1425952911376953
+      0.5983426570892334,
+      0.11374272406101227,
+      1.2090331315994263
     ]
   },
   "weightTransfer": {
@@ -29,7 +69,7 @@
     "kind": "weight-transfer-artifact",
     "stage": "skin-and-export",
     "sourceMeshHash": "e9e06568951977f90a42af7407ab45423b59db8b02e1aeb1d16876d3606cb8af",
-    "targetMeshHash": "2949384a0241c5facf38cbe52402757494ce1e07448c0358ea3bb8396d0a41be",
+    "targetMeshHash": "6749f9a58d6ae1f6ca00a38e66be06193ca6ea7e082cfc791b535242203f76ca",
     "armatureHash": "6a200335c0a4cf09097baecb248830f6c2bf2bba743c71416349db56444f400b",
     "bindPoseHash": "75b176da3cb7df21f177e0f93aa257448c50e69fc54d2afe8097b70395d88ec3",
     "method": "blender-data-transfer",
@@ -42,7 +82,7 @@
       "lateralityCenterTolerance": 0.05,
       "leftPositive": true
     },
-    "vertexGroupHash": "757059fd9c5ed313ce1c53fa9b223c711933a00a67406c974b758ca16c1a8bbd",
+    "vertexGroupHash": "91a29df8d9e356f9fb732bf58ed936096306511147b435b2367714743e7c1b57",
     "audit": {
       "vertexCount": 474,
       "zeroWeightVertices": [],
@@ -51,17 +91,17 @@
       "lateralityContaminationVertices": [],
       "rejectedBoneGroups": [],
       "influenceHistogram": {
-        "1": 71,
-        "2": 265,
-        "3": 114,
-        "4": 24
+        "1": 95,
+        "2": 259,
+        "3": 108,
+        "4": 12
       },
       "maximumDiscardedWeight": 0,
-      "vertexGroupHash": "757059fd9c5ed313ce1c53fa9b223c711933a00a67406c974b758ca16c1a8bbd",
+      "vertexGroupHash": "91a29df8d9e356f9fb732bf58ed936096306511147b435b2367714743e7c1b57",
       "passed": true
     },
     "warnings": [],
-    "artifactDigest": "3be4533eabf3314efc7aef996f98ec88eceb883572832e3d7f0017d0a1bec663"
+    "artifactDigest": "4a432877fa787d075355975438e9eb0c75e900e089424f15da962d2227acd13b"
   },
   "status": "PASS"
 }
