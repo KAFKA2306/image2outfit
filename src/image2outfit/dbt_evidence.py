@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+
 def _read_json(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8-sig"))
     if not isinstance(value, dict):
