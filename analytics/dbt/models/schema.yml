@@ -44,3 +44,9 @@ models:
         data_tests: [not_null]
       - name: gate_state
         data_tests: [not_null]
+      - name: normalized_gate_state
+        data_tests: [not_null]
+      - name: gate_state_known
+        data_tests: [not_null]
+      - name: gate_state_policy_sha256
+        data_tests: [not_null]
