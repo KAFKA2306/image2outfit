@@ -11,9 +11,9 @@ join {{ ref('stg_gates') }} b
  and a.gate_name = b.gate_name
  and a.gate_family < b.gate_family
 where (
-  a.gate_state = 'PASS'
-  and b.gate_state in ('UNVERIFIED', 'PENDING')
+  a.normalized_gate_state = 'PASS'
+  and b.normalized_gate_state in ('UNVERIFIED', 'PENDING')
 ) or (
-  b.gate_state = 'PASS'
-  and a.gate_state in ('UNVERIFIED', 'PENDING')
+  b.normalized_gate_state = 'PASS'
+  and a.normalized_gate_state in ('UNVERIFIED', 'PENDING')
 )
