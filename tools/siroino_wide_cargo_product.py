@@ -577,6 +577,7 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
         )
     return mesh
 
+
 def reviewed_create_outfit(
     implementation: ModuleType,
     body,
