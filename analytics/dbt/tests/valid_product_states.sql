@@ -1,4 +1,3 @@
 select *
 from {{ ref('stg_products') }}
-where product_status is null
-   or product_status not in ('WORKING', 'COMPLETE', 'REJECTED')
+where not product_status_known
