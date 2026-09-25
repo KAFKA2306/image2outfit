@@ -5,6 +5,8 @@ models:
     columns:
       - name: product_id
         data_tests: [not_null, unique]
+      - name: product_status_known
+        data_tests: [not_null]
       - name: job_path
         data_tests: [not_null, unique]
       - name: manifest_path
