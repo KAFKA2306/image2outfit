@@ -100,12 +100,16 @@ DBT_PROJECT = ROOT / "analytics" / "dbt"
 DBT_RUNTIME = ROOT / ".image2outfit" / "dbt"
 
 
-def _dbt_package() -> str:
+def _dbt_packages() -> tuple[str, str]:
     lock = json.loads(
         (ROOT / "config" / "toolchain-lock.json").read_text(encoding="utf-8")
     )
-    spec = lock["analytics"]["dbtDuckdb"]
-    return f"{spec['package']}=={spec['version']}"
+    core = lock["analytics"]["dbtCore"]
+    adapter = lock["analytics"]["dbtDuckdb"]
+    return (
+        f"{core['package']}=={core['version']}",
+        f"{adapter['package']}=={adapter['version']}",
+    )
 
 
 def _dbt_extract() -> dict[str, Any]:
@@ -148,6 +152,7 @@ def _dbt(action: str) -> int:
         separators=(",", ":"),
     )
     profiles_dir = _dbt_profiles_dir()
+    dbt_core, dbt_adapter = _dbt_packages()
     commands = {
         "build": ("run",),
         "test": ("run", "test"),
@@ -159,7 +164,9 @@ def _dbt(action: str) -> int:
             [
                 "uvx",
                 "--from",
-                _dbt_package(),
+                dbt_core,
+                "--with",
+                dbt_adapter,
                 "dbt",
                 dbt_command,
                 "--project-dir",
