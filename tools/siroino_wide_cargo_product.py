@@ -206,6 +206,8 @@ def _load_pattern_baseline() -> dict[str, object]:
         ),
         "legBoundaryRows": tuple(leg_boundary_rows),
         "upperRows": _numeric_rows(baseline.get("upperRows"), 2, "upperRows"),
+        "backRise": back_rise,
+        "frontRise": front_rise,
         "crotchCentre": back_rise + front_rise[1:],
     }
 
@@ -215,7 +217,10 @@ FRONT_DEPTH = PATTERN_BASELINE["frontDepthProfile"]
 REAR_DEPTH = PATTERN_BASELINE["rearDepthProfile"]
 LEG_BOUNDARY_ROWS = PATTERN_BASELINE["legBoundaryRows"]
 UPPER_SPECS = PATTERN_BASELINE["upperRows"]
+BACK_RISE = PATTERN_BASELINE["backRise"]
+FRONT_RISE = PATTERN_BASELINE["frontRise"]
 CROTCH_CENTRE = PATTERN_BASELINE["crotchCentre"]
+PANEL_SAMPLES = 9
 
 
 def install_runtime_path_compat(implementation: ModuleType) -> None:
@@ -346,99 +351,217 @@ def add_side_pocket_panel(
     _triangulate_fan(mesh, oriented, centre)
 
 
+def _add_vertex(mesh, point: tuple[float, float, float]) -> int:
+    index = len(mesh.vertices)
+    mesh.vertices.append(point)
+    return index
+
+
+def _panel_curve(
+    mesh,
+    *,
+    outer_index: int,
+    inner_index: int,
+    outer_point: tuple[float, float, float],
+    inner_point: tuple[float, float, float],
+    depth: float,
+    front: bool,
+) -> list[int]:
+    """Create one sewn panel row while reusing seam-boundary vertices."""
+    sign = -1.0 if front else 1.0
+    endpoint_depth = abs(inner_point[1])
+    depth_blend = min(1.0, endpoint_depth / max(depth, 1e-6))
+    row = [outer_index]
+    for sample in range(1, PANEL_SAMPLES - 1):
+        t = sample / (PANEL_SAMPLES - 1)
+        x = outer_point[0] + (inner_point[0] - outer_point[0]) * t
+        z = outer_point[2] + (inner_point[2] - outer_point[2]) * t
+        free_bulge = sign * depth * (1.0 - depth_blend) * math.sin(math.pi * t)
+        sewn_rise = inner_point[1] * math.sin(math.pi * 0.5 * t)
+        row.append(_add_vertex(mesh, (x, free_bulge + sewn_rise, z)))
+    row.append(inner_index)
+    return row
+
+
+def _oriented_panel_row(
+    canonical: list[int],
+    *,
+    side: float,
+    front: bool,
+) -> list[int]:
+    """Orient panel rows consistently so generated face normals point outward."""
+    if front:
+        return canonical if side < 0.0 else list(reversed(canonical))
+    return list(reversed(canonical)) if side < 0.0 else canonical
+
+
+def _interpolate_width(
+    z: float,
+    *,
+    z0: float,
+    width0: float,
+    z1: float,
+    width1: float,
+) -> float:
+    if z1 <= z0:
+        raise ValueError("Wide Cargo width interpolation requires increasing z")
+    t = min(1.0, max(0.0, (z - z0) / (z1 - z0)))
+    return width0 + (width1 - width0) * _smoothstep(t)
+
+
 def reviewed_geometry(implementation: ModuleType, segments: int = 48):
-    """Generate the verified baseline from canonical Wide Cargo pattern data."""
+    """Generate four sewn trouser panels from the canonical pattern boundaries."""
     del segments
     mesh = implementation.MeshBuilder()
 
-    ring_count = 32
-    quarter = ring_count // 4
-    leg_rows: dict[float, list[list[int]]] = {-1.0: [], 1.0: []}
-    for z, outer, inner in LEG_BOUNDARY_ROWS:
-        centre = (outer + inner) * 0.5
-        half_width = (outer - inner) * 0.5
-        for side in (-1.0, 1.0):
-            ring = mesh.add_ring(
-                _circumferential_points(
-                    centre_x=side * centre,
-                    half_width=half_width,
-                    z=z,
-                    count=ring_count,
-                )
+    panel_rows: dict[str, list[list[int]]] = {
+        "front-left": [],
+        "front-right": [],
+        "back-left": [],
+        "back-right": [],
+    }
+
+    def append_leg_row(z: float, outer: float, inner: float) -> None:
+        front_depth = _profile_value(z, FRONT_DEPTH)
+        rear_depth = _profile_value(z, REAR_DEPTH)
+        for side, side_name in ((-1.0, "left"), (1.0, "right")):
+            outer_point = (side * outer, 0.0, z)
+            inner_point = (side * inner, 0.0, z)
+            outer_index = _add_vertex(mesh, outer_point)
+            inner_index = _add_vertex(mesh, inner_point)
+
+            front = _panel_curve(
+                mesh,
+                outer_index=outer_index,
+                inner_index=inner_index,
+                outer_point=outer_point,
+                inner_point=inner_point,
+                depth=front_depth,
+                front=True,
             )
-            leg_rows[side].append(ring)
-
-    for side in (-1.0, 1.0):
-        for lower, upper in zip(leg_rows[side], leg_rows[side][1:]):
-            _bridge_closed_rings(mesh, lower, upper)
-
-    upper_rows = [
-        mesh.add_ring(
-            _circumferential_points(
-                centre_x=0.0,
-                half_width=half_width,
-                z=z,
-                count=ring_count,
+            back = _panel_curve(
+                mesh,
+                outer_index=outer_index,
+                inner_index=inner_index,
+                outer_point=outer_point,
+                inner_point=inner_point,
+                depth=rear_depth,
+                front=False,
             )
+            panel_rows[f"front-{side_name}"].append(
+                _oriented_panel_row(front, side=side, front=True)
+            )
+            panel_rows[f"back-{side_name}"].append(
+                _oriented_panel_row(back, side=side, front=False)
+            )
+
+    # Below the crotch, front/back panels share the outseam and inseam exactly.
+    # The last legacy row at z=0.574 is replaced by the rise construction below.
+    for z, outer, inner in LEG_BOUNDARY_ROWS[:-1]:
+        append_leg_row(z, outer, inner)
+
+    rise_start_z = FRONT_RISE[0][1]
+    rise_end_z = FRONT_RISE[-1][1]
+    lower_outer = LEG_BOUNDARY_ROWS[-1][1]
+    upper_width_at_end = _profile_value(rise_end_z, UPPER_SPECS)
+
+    for (front_y, front_z), (back_y, back_z) in zip(FRONT_RISE, BACK_RISE):
+        if abs(front_z - back_z) > 1e-9:
+            raise ValueError("Wide Cargo front/back rise levels differ")
+        z = front_z
+        half_width = _interpolate_width(
+            z,
+            z0=rise_start_z,
+            width0=lower_outer,
+            z1=rise_end_z,
+            width1=upper_width_at_end,
         )
-        for z, half_width in UPPER_SPECS
-    ]
-    for lower, upper in zip(upper_rows, upper_rows[1:]):
-        _bridge_closed_rings(mesh, lower, upper)
+        front_depth = _profile_value(z, FRONT_DEPTH)
+        rear_depth = _profile_value(z, REAR_DEPTH)
 
-    first_upper = upper_rows[0]
-    right_leg = leg_rows[1.0][-1]
-    left_leg = leg_rows[-1.0][-1]
+        # At the crotch root all four panels meet at one sewn point. Above it,
+        # left/right front panels share centre-front and left/right back panels
+        # share centre-back. This is the actual 4-panel seam graph.
+        if abs(front_y) <= 1e-12 and abs(back_y) <= 1e-12:
+            crotch_index = _add_vertex(mesh, (0.0, 0.0, z))
+            front_centre = crotch_index
+            back_centre = crotch_index
+        else:
+            front_centre = _add_vertex(mesh, (0.0, front_y, z))
+            back_centre = _add_vertex(mesh, (0.0, back_y, z))
 
-    right_outer_indices = list(range(3 * quarter + 1, ring_count)) + list(
-        range(0, quarter)
-    )
-    right_inner_indices = list(range(quarter, 3 * quarter + 1))
-    left_outer_indices = list(range(quarter + 1, 3 * quarter))
-    left_inner_indices = list(range(quarter, -1, -1)) + list(
-        range(ring_count - 1, 3 * quarter - 1, -1)
-    )
+        for side, side_name in ((-1.0, "left"), (1.0, "right")):
+            outer_point = (side * half_width, 0.0, z)
+            outer_index = _add_vertex(mesh, outer_point)
 
-    right_outer = _ring_chain(right_leg, right_outer_indices)
-    left_outer = _ring_chain(left_leg, left_outer_indices)
-    upper_right = _ring_chain(first_upper, right_outer_indices)
-    upper_left = _ring_chain(first_upper, left_outer_indices)
-    _bridge_chains(mesh, right_outer, upper_right)
-    _bridge_chains(mesh, upper_left, left_outer)
+            front_point = (0.0, front_y, z)
+            back_point = (0.0, back_y, z)
+            front = _panel_curve(
+                mesh,
+                outer_index=outer_index,
+                inner_index=front_centre,
+                outer_point=outer_point,
+                inner_point=front_point,
+                depth=front_depth,
+                front=True,
+            )
+            back = _panel_curve(
+                mesh,
+                outer_index=outer_index,
+                inner_index=back_centre,
+                outer_point=outer_point,
+                inner_point=back_point,
+                depth=rear_depth,
+                front=False,
+            )
+            panel_rows[f"front-{side_name}"].append(
+                _oriented_panel_row(front, side=side, front=True)
+            )
+            panel_rows[f"back-{side_name}"].append(
+                _oriented_panel_row(back, side=side, front=False)
+            )
 
-    right_inner = _ring_chain(right_leg, right_inner_indices)
-    left_inner = _ring_chain(left_leg, left_inner_indices)
-    if len(CROTCH_CENTRE) != len(right_inner) or len(CROTCH_CENTRE) != len(left_inner):
-        raise ValueError(
-            "Wide Cargo crotch pattern point count does not match inner-leg chains"
-        )
-    centre_crotch_points = [(0.0, y, z) for y, z in CROTCH_CENTRE]
-    centre_crotch = mesh.add_ring(centre_crotch_points)
-    _bridge_chains(mesh, right_inner, centre_crotch)
-    _bridge_chains(mesh, centre_crotch, left_inner)
+    # Continue the same four sewn panels from the completed rise to the waist.
+    for z, half_width in UPPER_SPECS:
+        if z <= rise_end_z:
+            continue
+        front_depth = _profile_value(z, FRONT_DEPTH)
+        rear_depth = _profile_value(z, REAR_DEPTH)
+        front_centre = _add_vertex(mesh, (0.0, -front_depth, z))
+        back_centre = _add_vertex(mesh, (0.0, rear_depth, z))
+        for side, side_name in ((-1.0, "left"), (1.0, "right")):
+            outer_point = (side * half_width, 0.0, z)
+            outer_index = _add_vertex(mesh, outer_point)
+            front_point = (0.0, -front_depth, z)
+            back_point = (0.0, rear_depth, z)
+            front = _panel_curve(
+                mesh,
+                outer_index=outer_index,
+                inner_index=front_centre,
+                outer_point=outer_point,
+                inner_point=front_point,
+                depth=front_depth,
+                front=True,
+            )
+            back = _panel_curve(
+                mesh,
+                outer_index=outer_index,
+                inner_index=back_centre,
+                outer_point=outer_point,
+                inner_point=back_point,
+                depth=rear_depth,
+                front=False,
+            )
+            panel_rows[f"front-{side_name}"].append(
+                _oriented_panel_row(front, side=side, front=True)
+            )
+            panel_rows[f"back-{side_name}"].append(
+                _oriented_panel_row(back, side=side, front=False)
+            )
 
-    rear_upper_right = first_upper[quarter - 1]
-    rear_upper_centre = first_upper[quarter]
-    rear_upper_left = first_upper[quarter + 1]
-    front_upper_left = first_upper[3 * quarter - 1]
-    front_upper_centre = first_upper[3 * quarter]
-    front_upper_right = first_upper[3 * quarter + 1]
-
-    mesh.faces.append(
-        (rear_upper_right, right_outer[-1], right_inner[0], centre_crotch[0])
-    )
-    mesh.faces.append((rear_upper_right, centre_crotch[0], rear_upper_centre))
-    mesh.faces.append((rear_upper_centre, centre_crotch[0], rear_upper_left))
-    mesh.faces.append((rear_upper_left, centre_crotch[0], left_inner[0], left_outer[0]))
-
-    mesh.faces.append(
-        (front_upper_right, centre_crotch[-1], right_inner[-1], right_outer[0])
-    )
-    mesh.faces.append((front_upper_right, front_upper_centre, centre_crotch[-1]))
-    mesh.faces.append((front_upper_centre, front_upper_left, centre_crotch[-1]))
-    mesh.faces.append(
-        (front_upper_left, left_outer[-1], left_inner[-1], centre_crotch[-1])
-    )
+    for rows in panel_rows.values():
+        for lower, upper in zip(rows, rows[1:]):
+            _bridge_chains(mesh, lower, upper)
 
     for side in (-1.0, 1.0):
         add_side_pocket_panel(
@@ -451,7 +574,6 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
             corner_radius=0.012,
         )
     return mesh
-
 
 def reviewed_create_outfit(
     implementation: ModuleType,
@@ -730,7 +852,7 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
     path = implementation.build.c.repo_path(job["productManifestPath"])
     manifest = json.loads(path.read_text(encoding="utf-8-sig"))
     manifest["status"] = "WORKING"
-    manifest["designRevision"] = "v74-centre-crotch-seam"
+    manifest["designRevision"] = "v75-panel-sewn-rise"
     manifest["wearabilityAudit"] = report
     gates = manifest.setdefault("technicalGates", {})
     gates["latestGeometryRender"] = "PASS" if report["passed"] else "FAIL"
