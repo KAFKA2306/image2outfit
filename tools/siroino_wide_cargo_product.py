@@ -220,7 +220,7 @@ UPPER_SPECS = PATTERN_BASELINE["upperRows"]
 BACK_RISE = PATTERN_BASELINE["backRise"]
 FRONT_RISE = PATTERN_BASELINE["frontRise"]
 CROTCH_CENTRE = PATTERN_BASELINE["crotchCentre"]
-PANEL_SAMPLES = 9
+PANEL_SAMPLES = 17
 
 
 def install_runtime_path_compat(implementation: ModuleType) -> None:
@@ -374,7 +374,13 @@ def _panel_curve(
     row = [outer_index]
     for sample in range(1, PANEL_SAMPLES - 1):
         t = sample / (PANEL_SAMPLES - 1)
-        x = outer_point[0] + (inner_point[0] - outer_point[0]) * t
+        midpoint_x = (outer_point[0] + inner_point[0]) * 0.5
+        half_width_x = (outer_point[0] - inner_point[0]) * 0.5
+        half_ellipse_x = midpoint_x + half_width_x * math.cos(math.pi * t)
+        quarter_ellipse_x = inner_point[0] + (
+            outer_point[0] - inner_point[0]
+        ) * math.cos(math.pi * 0.5 * t)
+        x = half_ellipse_x + (quarter_ellipse_x - half_ellipse_x) * depth_blend
         z = outer_point[2] + (inner_point[2] - outer_point[2]) * t
         free_bulge = sign * depth * (1.0 - depth_blend) * math.sin(math.pi * t)
         sewn_rise = inner_point[1] * math.sin(math.pi * 0.5 * t)
@@ -465,9 +471,7 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
     lower_outer = LEG_BOUNDARY_ROWS[-1][1]
     upper_width_at_end = _profile_value(rise_end_z, UPPER_SPECS)
 
-    for (front_y, front_z), (back_y, back_z) in zip(
-        FRONT_RISE, reversed(BACK_RISE)
-    ):
+    for (front_y, front_z), (back_y, back_z) in zip(FRONT_RISE, reversed(BACK_RISE)):
         if abs(front_z - back_z) > 1e-9:
             raise ValueError("Wide Cargo front/back rise levels differ")
         z = front_z
