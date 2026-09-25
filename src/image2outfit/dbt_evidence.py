@@ -7,20 +7,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-PRODUCT_STATES = {"WORKING", "COMPLETE", "REJECTED"}
-GATE_STATES = {
-    "PASS",
-    "FAIL",
-    "PENDING",
-    "UNVERIFIED",
-    "OUT_OF_SCOPE",
-    "VERIFIED",
-    "REJECTED",
-    "SKIPPED",
-    "NOT_APPLICABLE",
-}
-
-
 def _read_json(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8-sig"))
     if not isinstance(value, dict):
@@ -63,6 +49,28 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
     root = root.resolve()
     output_dir = output_dir.resolve()
     products_root = root / "config" / "products"
+    policy_path = root / "config" / "genworks-handoff-policy.json"
+    policy = _read_json(policy_path)
+    canonical_gate_states = {
+        str(value) for value in policy.get("canonicalGateStates", [])
+    }
+    normalization = policy.get("gateStateNormalization")
+    if not canonical_gate_states or not isinstance(normalization, dict):
+        raise ValueError(
+            "genworks-handoff-policy must own canonicalGateStates and "
+            "gateStateNormalization"
+        )
+    invalid_normalized = {
+        str(value)
+        for value in normalization.values()
+        if str(value) not in canonical_gate_states
+    }
+    if invalid_normalized:
+        raise ValueError(
+            "gateStateNormalization contains unknown canonical states: "
+            + ", ".join(sorted(invalid_normalized))
+        )
+    policy_hash = _sha256(policy_path)
 
     product_rows: list[dict[str, Any]] = []
     gate_rows: list[dict[str, Any]] = []
@@ -133,15 +141,25 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
             if not isinstance(values, dict):
                 continue
             for gate_name, gate_state in sorted(values.items()):
+                raw_state = _state(gate_state)
+                normalized_state = normalization.get(raw_state)
+                known_state = (
+                    raw_state in normalization
+                    and normalized_state in canonical_gate_states
+                )
                 gate_rows.append(
                     {
                         "product_id": product_id,
                         "run_id": f"{product_id}:{manifest_hash}",
                         "gate_family": family,
                         "gate_name": str(gate_name),
-                        "gate_state": _state(gate_state),
+                        "gate_state": raw_state,
+                        "normalized_gate_state": normalized_state,
+                        "gate_state_known": known_state,
                         "manifest_path": _relative(root, manifest_path),
                         "manifest_sha256": manifest_hash,
+                        "gate_state_policy_path": _relative(root, policy_path),
+                        "gate_state_policy_sha256": policy_hash,
                     }
                 )
 
@@ -155,9 +173,14 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
     _write_jsonl(paths["gates"], gate_rows)
 
     gate_state_counts: dict[str, int] = {}
+    normalized_state_counts: dict[str, int] = {}
     for row in gate_rows:
         state = str(row.get("gate_state") or "<NULL>")
+        normalized = str(row.get("normalized_gate_state") or "<UNKNOWN>")
         gate_state_counts[state] = gate_state_counts.get(state, 0) + 1
+        normalized_state_counts[normalized] = (
+            normalized_state_counts.get(normalized, 0) + 1
+        )
 
     return {
         "schemaVersion": 1,
@@ -165,5 +188,11 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
         "runCount": len(run_rows),
         "gateCount": len(gate_rows),
         "gateStateCounts": dict(sorted(gate_state_counts.items())),
+        "normalizedGateStateCounts": dict(sorted(normalized_state_counts.items())),
+        "unknownGateStateCount": sum(
+            1 for row in gate_rows if row.get("gate_state_known") is not True
+        ),
+        "gateStatePolicyPath": _relative(root, policy_path),
+        "gateStatePolicySha256": policy_hash,
         "paths": {name: str(path) for name, path in paths.items()},
     }
