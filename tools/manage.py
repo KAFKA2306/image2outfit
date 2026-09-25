@@ -98,7 +98,14 @@ def _audit_all() -> int:
 
 DBT_PROJECT = ROOT / "analytics" / "dbt"
 DBT_RUNTIME = ROOT / ".image2outfit" / "dbt"
-DBT_PACKAGE = "dbt-duckdb==1.11.0"
+
+
+def _dbt_package() -> str:
+    lock = json.loads(
+        (ROOT / "config" / "toolchain-lock.json").read_text(encoding="utf-8")
+    )
+    spec = lock["analytics"]["dbtDuckdb"]
+    return f"{spec['package']}=={spec['version']}"
 
 
 def _dbt_extract() -> dict[str, Any]:
@@ -364,7 +371,10 @@ def build_parser() -> argparse.ArgumentParser:
         command = commands.add_parser(name)
         command.add_argument("--product", required=True)
 
-    dbt = commands.add_parser("dbt")\n    dbt.add_argument("dbt_action", choices=("extract", "build", "test", "check"))\n\n    improve = commands.add_parser("improve")
+    dbt = commands.add_parser("dbt")
+    dbt.add_argument("dbt_action", choices=("extract", "build", "test", "check"))
+
+    improve = commands.add_parser("improve")
     improve.add_argument("--product", required=True)
     improve.add_argument("--max-steps", type=int, default=8)
 
@@ -437,7 +447,9 @@ def main() -> int:
     options = build_parser().parse_args()
     if options.command in {"candidate", "release", "explain"}:
         return _product(options.command, options.product)
-    if options.command == "dbt":\n        return _dbt(options.dbt_action)\n    if options.command == "improve":
+    if options.command == "dbt":
+        return _dbt(options.dbt_action)
+    if options.command == "improve":
         if options.max_steps < 1:
             print("--max-steps must be >= 1", file=sys.stderr)
             return 2
