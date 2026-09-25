@@ -62,6 +62,34 @@ tasks:
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py explain --product "{{.PRODUCT}}"
 
+  dbt:extract:
+    desc: Project canonical product evidence into generated dbt inputs.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py dbt extract
+
+  dbt:build:
+    desc: Extract canonical evidence and build dbt manufacturing models.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py dbt build
+
+  dbt:test:
+    desc: Rebuild dbt manufacturing models and execute dbt data tests.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py dbt test
+
+  check:dbt:
+    desc: Run the complete dbt manufacturing evidence build and test gate.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py dbt check
+
   mcp:setup:
     desc: Prepare pinned Blender MCP and register Blender + Unity MCP with Codex on Windows.
     platforms: [windows]
