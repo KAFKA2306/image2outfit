@@ -17,6 +17,7 @@ class DbtEvidenceTests(unittest.TestCase):
         config = root / "config"
         config.mkdir(parents=True, exist_ok=True)
         policy = {
+            "statuses": ["WORKING", "COMPLETE", "REJECTED"],
             "canonicalGateStates": [
                 "PASS",
                 "FAIL",
@@ -85,6 +86,7 @@ class DbtEvidenceTests(unittest.TestCase):
                 for line in (output / "products.jsonl").read_text().splitlines()
             ]
             self.assertEqual(products[0]["product_id"], product_id)
+            self.assertTrue(products[0]["product_status_known"])
             self.assertTrue(products[0]["construction_exists"])
             self.assertTrue(products[0]["manifest_exists"])
 
@@ -170,6 +172,7 @@ class DbtEvidenceTests(unittest.TestCase):
             self.assertFalse(row["construction_exists"])
             self.assertFalse(row["manifest_exists"])
             self.assertIsNone(row["product_status"])
+            self.assertFalse(row["product_status_known"])
 
 
 if __name__ == "__main__":
