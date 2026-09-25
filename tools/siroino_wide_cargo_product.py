@@ -465,7 +465,9 @@ def reviewed_geometry(implementation: ModuleType, segments: int = 48):
     lower_outer = LEG_BOUNDARY_ROWS[-1][1]
     upper_width_at_end = _profile_value(rise_end_z, UPPER_SPECS)
 
-    for (front_y, front_z), (back_y, back_z) in zip(FRONT_RISE, BACK_RISE):
+    for (front_y, front_z), (back_y, back_z) in zip(
+        FRONT_RISE, reversed(BACK_RISE)
+    ):
         if abs(front_z - back_z) > 1e-9:
             raise ValueError("Wide Cargo front/back rise levels differ")
         z = front_z
