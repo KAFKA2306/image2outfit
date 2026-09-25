@@ -41,6 +41,16 @@ Repository-wide checks are `task audit:all` and `task check:python`. Do not add 
 - While GitHub Pages is enabled, keep the canonical public URL as plain text on the first line of `README.md`.
 - Read public product state from each `ProductManifest.json` or its existing canonical projection; do not maintain a handwritten state catalog.
 
+## dbt responsibility
+
+dbt is a first-class repository responsibility for reproducible transformation, testing, and analytics over manufacturing/product evidence.
+
+- Canonical owners above remain the only authorities. dbt reads their existing projections and never becomes a second source of truth.
+- Model only facts that already exist in canonical product/manufacturing evidence, including product identity, manufacturing runs, gate/verification state, defects, artifacts, hashes, and release observations.
+- A manufacturing run should leave dbt-consumable evidence through the existing canonical files. Do not introduce a parallel hand-written ledger just to feed dbt.
+- dbt tests may reject inconsistent or incomplete derived data, but dbt must never turn an unexecuted mesh, UV, material, rig, render, Unity, or VRChat layer into PASS.
+- Route dbt extraction/build/test commands through the existing `Taskfile.yml` / `tools/manage.py` command authority. Do not create one-off SQL/export command paths.
+
 ## Evidence
 
 Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence. Visual acceptance requires direct inspection of the current evidence required by `contracts/quality/quality-spec.json` and `config/release-policy.json`.
