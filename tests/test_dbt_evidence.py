@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-from image2outfit import dbt_evidence
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from image2outfit import dbt_evidence  # noqa: E402
 
 
 class DbtEvidenceTests(unittest.TestCase):
