@@ -51,14 +51,19 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
     products_root = root / "config" / "products"
     policy_path = root / "config" / "genworks-handoff-policy.json"
     policy = _read_json(policy_path)
+    allowed_product_states = {str(value) for value in policy.get("statuses", [])}
     canonical_gate_states = {
         str(value) for value in policy.get("canonicalGateStates", [])
     }
     normalization = policy.get("gateStateNormalization")
-    if not canonical_gate_states or not isinstance(normalization, dict):
+    if (
+        not allowed_product_states
+        or not canonical_gate_states
+        or not isinstance(normalization, dict)
+    ):
         raise ValueError(
-            "genworks-handoff-policy must own canonicalGateStates and "
-            "gateStateNormalization"
+            "genworks-handoff-policy must own statuses, canonicalGateStates, "
+            "and gateStateNormalization"
         )
     invalid_normalized = {
         str(value)
@@ -96,11 +101,13 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
         )
         manifest_hash = _sha256(manifest_path) if manifest_path.is_file() else None
 
+        product_status = _state(manifest.get("status")) if manifest else None
         product_rows.append(
             {
                 "product_id": product_id,
                 "product_name": job.get("productName"),
-                "product_status": _state(manifest.get("status")) if manifest else None,
+                "product_status": product_status,
+                "product_status_known": product_status in allowed_product_states,
                 "job_path": _relative(root, job_path),
                 "construction_path": _relative(root, construction_path),
                 "manifest_path": _relative(root, manifest_path),
