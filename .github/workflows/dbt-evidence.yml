@@ -1,0 +1,20 @@
+name: dbt manufacturing evidence
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  dbt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Build and test dbt evidence
+        run: >-
+          uv run --locked --no-default-groups --python 3.11
+          python tools/manage.py dbt check
