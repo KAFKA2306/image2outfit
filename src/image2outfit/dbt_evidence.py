@@ -154,10 +154,16 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
     _write_jsonl(paths["runs"], run_rows)
     _write_jsonl(paths["gates"], gate_rows)
 
+    gate_state_counts: dict[str, int] = {}
+    for row in gate_rows:
+        state = str(row.get("gate_state") or "<NULL>")
+        gate_state_counts[state] = gate_state_counts.get(state, 0) + 1
+
     return {
         "schemaVersion": 1,
         "productCount": len(product_rows),
         "runCount": len(run_rows),
         "gateCount": len(gate_rows),
+        "gateStateCounts": dict(sorted(gate_state_counts.items())),
         "paths": {name: str(path) for name, path in paths.items()},
     }
