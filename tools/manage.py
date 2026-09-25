@@ -152,7 +152,7 @@ def _dbt(action: str) -> int:
             [
                 "uvx",
                 "--from",
-                DBT_PACKAGE,
+                _dbt_package(),
                 "dbt",
                 dbt_command,
                 "--project-dir",
