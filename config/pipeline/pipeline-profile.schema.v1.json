@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "image2outfit pipeline profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "profileId", "auditContract", "stages"],
+  "properties": {
+    "schemaVersion": {"type": "integer", "const": 1},
+    "profileId": {"type": "string", "minLength": 1},
+    "auditContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recordSchema", "manifestSchema", "storageRoot", "hashAlgorithm", "chain"],
+      "properties": {
+        "recordSchema": {"type": "string", "minLength": 1},
+        "manifestSchema": {"type": "string", "minLength": 1},
+        "storageRoot": {"type": "string", "minLength": 1},
+        "hashAlgorithm": {"type": "string", "minLength": 1},
+        "chain": {"type": "string", "minLength": 1}
+      }
+    },
+    "researchPrinciples": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "purpose", "requiredInExecute", "minimumEvidenceCount", "requiredResultFields", "managedOutputs"],
+        "properties": {
+          "stage": {"type": "string", "minLength": 1},
+          "toolName": {"type": "string", "minLength": 1},
+          "purpose": {"type": "string", "minLength": 1},
+          "requiredInExecute": {"type": "boolean"},
+          "minimumEvidenceCount": {"type": "integer", "minimum": 0},
+          "requiredResultFields": {"type": "object"},
+          "managedOutputs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "capabilities": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "requires": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "provides": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "runtime": {"type": "string", "minLength": 1},
+          "priority": {"type": "integer"},
+          "deterministic": {"type": "boolean"},
+          "tools": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["toolName"],
+              "properties": {
+                "toolName": {"type": "string", "minLength": 1},
+                "purpose": {"type": "string", "minLength": 1},
+                "requiredInExecute": {"type": "boolean"},
+                "minimumEvidenceCount": {"type": "integer", "minimum": 0},
+                "requiredResultFields": {"type": "object"},
+                "capabilities": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+                "requires": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+                "provides": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+                "runtime": {"type": "string", "minLength": 1},
+                "priority": {"type": "integer"},
+                "deterministic": {"type": "boolean"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

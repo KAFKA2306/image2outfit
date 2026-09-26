@@ -28,8 +28,9 @@ from image2outfit.pipeline import (
     run_pipeline,
     validate_pipeline_state,
 )
+from pipeline_profile_contract import load_profile
 from pipeline_source_fingerprint import pipeline_source_fingerprint
-from pipeline_stage_adapters import build_registry, load_profile
+from pipeline_stage_adapters import build_registry
 
 DEFAULT_PROFILE = Path("config/pipeline-profiles/garment-reconstruction-v1.json")
 PIPELINE_STATE_SCHEMA = ROOT / "config/pipeline/pipeline-state.schema.v1.json"

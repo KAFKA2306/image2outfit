@@ -67,6 +67,7 @@ def pipeline_source_fingerprint(
         root / "config" / "products" / product_id,
         request_path,
         profile_path,
+        root / "config" / "pipeline" / "pipeline-profile.schema.v1.json",
         root / "config" / "pipeline" / "visual-quality-defaults.v1.json",
         root / "config" / "pipeline" / "pipeline-state.schema.v1.json",
         root / "config" / "toolchain-lock.json",
