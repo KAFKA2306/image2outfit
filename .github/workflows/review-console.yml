@@ -8,16 +8,20 @@ on:
       - "src/image2outfit/improvement.py"
       - "tools/improvement_loop.py"
       - "tools/manage.py"
+      - "tools/product_completion.py"
+      - "tools/production_contract.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
       - "site/review-showcase.css"
       - "site/review-showcase.js"
       - "tests/test_quality_spec.py"
+      - "tests/test_product_completion_projection.py"
       - "tests/test_review_console_v2.py"
       - "tests/test_improvement_loop.py"
       - "tests/test_improvement_orchestrator.py"
       - "tests/test_improvement_review_projection.py"
       - ".github/workflows/review-console.yml"
+      - "config/genworks-handoff-policy.json"
       - "config/release-policy.json"
       - "Assets/GenWorks/**/ProductManifest.json"
       - "Assets/GenWorks/**/Previews/**"
@@ -50,7 +54,10 @@ jobs:
           src/image2outfit/improvement.py
           tools/improvement_loop.py
           tools/manage.py
+          tools/product_completion.py
+          tools/production_contract.py
           tools/review_console.py
+          tests/test_product_completion_projection.py
           tests/test_review_console_v2.py
           tests/test_improvement_loop.py
           tests/test_improvement_orchestrator.py
@@ -58,6 +65,7 @@ jobs:
 
       - name: Run focused fixture tests
         run: |
+          python -m unittest discover -s tests -p "test_product_completion_projection.py" -v
           python -m unittest discover -s tests -p "test_review_console_v2.py" -v
           python -m unittest discover -s tests -p "test_improvement_loop.py" -v
           python -m unittest discover -s tests -p "test_improvement_orchestrator.py" -v
@@ -102,7 +110,13 @@ jobs:
           hrefs = set()
           for product in products:
               hrefs.add(product["manifest_href"])
-              for key in ("assets", "gates", "evidence"):
+              for key in (
+                  "assets",
+                  "completion_gates",
+                  "runtime_gates",
+                  "gates",
+                  "evidence",
+              ):
                   for item in product.get(key, []):
                       href = item.get("href")
                       if href and not href.startswith(("https://", "http://")):
@@ -126,4 +140,3 @@ jobs:
 
           print(f"pages_products={len(products)} linked_files={copied} showcase=PASS")
           PY
-

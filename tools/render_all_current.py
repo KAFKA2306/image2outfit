@@ -343,6 +343,9 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
     io_root.mkdir(parents=True, exist_ok=True)
     products: list[dict[str, Any]] = []
     total_webp = 0
+    handoff_policy = review_console.load_json(
+        ROOT / "config" / "genworks-handoff-policy.json", {}
+    )
 
     product_root = ROOT / "Assets" / "GenWorks"
     for workspace in sorted(product_root.iterdir()):
@@ -382,7 +385,9 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
         products.append(
             {
                 "productId": workspace.name,
-                "state": review_console.safe_state(manifest),
+                "state": review_console.project_product_completion(
+                    manifest, handoff_policy
+                )["state"],
                 "visualAppearanceReview": visual_status,
                 "sourceKind": origin,
                 "webpCount": len(assets),
@@ -483,7 +488,13 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
     hrefs: set[str] = set()
     for product in data.get("products", []):
         hrefs.add(product["manifest_href"])
-        for key in ("assets", "gates", "evidence"):
+        for key in (
+            "assets",
+            "completion_gates",
+            "runtime_gates",
+            "gates",
+            "evidence",
+        ):
             for item in product.get(key, []):
                 href = item.get("href")
                 if href and not href.startswith(("https://", "http://")):

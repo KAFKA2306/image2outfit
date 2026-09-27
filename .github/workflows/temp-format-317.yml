@@ -1,0 +1,33 @@
+name: Temporary format issue 317
+
+on:
+  push:
+    branches:
+      - fix/317-product-completion-projection
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/317-product-completion-projection
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.11.32'
+          enable-cache: true
+      - name: Format files
+        run: uv run --locked --no-default-groups --group dev ruff format tools/review_console.py tests/test_product_completion_projection.py
+      - name: Commit formatting
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/review_console.py tests/test_product_completion_projection.py
+          git commit -m 'style: format issue 317 projection'
+          git push origin HEAD:fix/317-product-completion-projection
