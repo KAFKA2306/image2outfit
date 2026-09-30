@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections import Counter
 from pathlib import Path
 
 IMAGE_SUFFIXES = {".png", ".webp", ".jpg", ".jpeg"}
@@ -63,6 +64,7 @@ def reconcile(root: Path, console_path: Path) -> dict:
         )
         for slug in sorted(canonical)
     }
+    classification_counts = Counter(classification.values())
     return {
         "schemaVersion": "publication-reconciliation.v1",
         "canonicalProductCount": len(canonical),
@@ -73,6 +75,11 @@ def reconcile(root: Path, console_path: Path) -> dict:
         "missingProjection": missing_projection,
         "brokenPublicProducts": broken_public,
         "silentOmissionCount": len(missing_projection),
+        "classificationCounts": {
+            "A": classification_counts.get("A", 0),
+            "B": classification_counts.get("B", 0),
+            "C": classification_counts.get("C", 0),
+        },
         "classification": classification,
     }
 
