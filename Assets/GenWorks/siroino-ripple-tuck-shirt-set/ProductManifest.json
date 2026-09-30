@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-ripple-tuck-shirt-set",
+  "productName": "Ripple Tuck Shirt Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-ripple-tuck-shirt-set",
+  "documentationPath": "Assets/GenWorks/siroino-ripple-tuck-shirt-set/README.md",
+  "sourceJobPath": "config/products/siroino-ripple-tuck-shirt-set/job.json",
+  "generatedAt": "2026-09-14T12:38:00Z",
+  "designRevision": "v1-ripple-tuck",
+  "completionGates": {
+    "manufacturingImage": "PASS",
+    "constructionContract": "PASS",
+    "patternDecomposition": "PASS",
+    "prototypeGeometry": "PASS",
+    "uvMapping": "PASS",
+    "heroGeometry": "PASS",
+    "canonicalJob": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "rigWeight": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat": "UNVERIFIED"
+  },
+  "metrics": {
+    "prototypeVertices": 76,
+    "prototypeUvCoordinates": 76,
+    "prototypePolygonFaces": 19,
+    "prototypeNamedGroups": 19,
+    "heroGroups": 6,
+    "degenerateFaces": 0
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-ripple-tuck-shirt-set",
+    "blockers": ["No compatible generic repository-owned garment build entrypoint has yet been proven for this new Ripple Tuck panel set; current main exposes canonical orchestration but inspected recent product work still reports garment-specific builders."],
+    "nextAction": "Prove a reusable current-main garment build entrypoint, then add schema-valid job.json and execute this exact product through task candidate PRODUCT=siroino-ripple-tuck-shirt-set."
+  }
+}

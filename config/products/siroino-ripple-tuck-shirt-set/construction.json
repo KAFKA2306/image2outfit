@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-ripple-tuck-shirt-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "v1-ripple-tuck",
+  "panels": ["shirt_front_L","shirt_front_R","shirt_back","sleeve_L","sleeve_R","neck_facing_front","neck_facing_back","inner_front","inner_back","trouser_front_L","trouser_front_R","trouser_back_L","trouser_back_R","waistband_outer","waistband_inner","back_yoke","tuck_facing_L_A","tuck_facing_L_B","tuck_facing_L_C","tuck_facing_R_A","tuck_facing_R_B","tuck_facing_R_C"],
+  "separateGeometry": ["tuck_L_A","tuck_L_B","tuck_L_C","tuck_R_A","tuck_R_B","tuck_R_C"],
+  "priorityFitZones": ["shoulder","chest","upper-arm","elbow","waist","hip","crotch","knee"],
+  "requiredPoses": ["neutral","arms-up","arm-cross","crouch","sit","prone"],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Ripple Tuck shells and base garments are structured/weight-driven in v1.",
+    "reason": "No free long cloth is required for the first technical candidate."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "No corrective garment Shape Keys are produced at this structural prototype checkpoint."
+  },
+  "releaseBoundary": "Technical candidate only; customer release requires canonical release-policy evidence."
+}
