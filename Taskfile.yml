@@ -1,6 +1,13 @@
 version: '3'
 
 tasks:
+  publication:reconcile:
+    desc: Reconcile canonical rendered products against the review-console publication projection.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/reconcile_publication.py
+
   plan:
     desc: Resolve and print the selected modular toolchain without executing stages.
     requires:
