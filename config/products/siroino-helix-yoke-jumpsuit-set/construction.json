@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-helix-yoke-jumpsuit-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "helix-yoke-v1",
+  "panels": ["jumpsuit_front_L","jumpsuit_front_R","jumpsuit_back_L","jumpsuit_back_R","waistband_front","waistband_back","modesty_insert","back_yoke"],
+  "separateGeometry": ["helix_yoke_outer","helix_yoke_inner","helix_facing_outer","helix_facing_inner"],
+  "priorityFitZones": ["chest","waist","hip","crotch","knee"],
+  "requiredPoses": ["arms-down","arms-up","sit","crouch","wide-stance","torso-twist"],
+  "releaseBoundary": "Structural manufacturing checkpoint only; runtime evidence required before release.",
+  "clothSimulation": {"applicability":"NOT_REQUIRED","components":[],"evidence":"Structured bounded yoke; no long free cloth.","reason":"v1 is fully weight-driven."},
+  "shapeKeyPostprocess": {"provider":"maxwilso-smooth-shape-keys","applicability":"NOT_REQUIRED","reason":"Structural prototype has no outfit Shape Keys."}
+}

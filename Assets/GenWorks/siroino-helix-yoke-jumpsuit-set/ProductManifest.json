@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-helix-yoke-jumpsuit-set",
+  "productName": "Helix Yoke Jumpsuit Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-helix-yoke-jumpsuit-set",
+  "documentationPath": "Assets/GenWorks/siroino-helix-yoke-jumpsuit-set/README.md",
+  "lifecycle": "manufacturing",
+  "designRevision": "helix-yoke-v1",
+  "manufacturingReference": "Assets/GenWorks/siroino-helix-yoke-jumpsuit-set/References/helix-yoke-jumpsuit-set-manufacturing-sheet.svg",
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-helix-yoke-jumpsuit-set/Source/Prototype/helix-yoke-jumpsuit-set-prototype.obj",
+    "sha256": "60bff14f0ad751361f708e92846a13ba08fedf8d54df35695ed0981794113c0b",
+    "status": "PASS"
+  },
+  "gates": {
+    "manufacturing-image": "PASS",
+    "construction": "PASS",
+    "pattern-decomposition": "PASS",
+    "prototype-geometry": "PASS",
+    "uv0": "PASS",
+    "hero-geometry": "PASS",
+    "canonical-job": "UNVERIFIED",
+    "blender-fit": "UNVERIFIED",
+    "rig-weight": "UNVERIFIED",
+    "fbx-export": "UNVERIFIED",
+    "five-view-render": "UNVERIFIED",
+    "pose-render": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat-runtime": "UNVERIFIED"
+  },
+  "blocker": "Current main proves orchestration but the inspected production job pattern delegates to product-specific buildScript implementations. No compatible reusable repository-owned garment builder has been proven for this new full-length jumpsuit panel set, so job.json is intentionally not fabricated.",
+  "nextAction": "Prove a reusable current-main garment buildScript compatible with this panel contract, then add schema-valid job.json and execute task candidate for this exact product."
+}
