@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-latchfold-wrap-shirt-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "v1-latchfold-wrap",
+  "panels": ["wrap_front_L","wrap_front_R","shirt_back","sleeve_L","sleeve_R","cuff_L","cuff_R","inner_front","inner_back","trouser_front_L","trouser_front_R","trouser_back_L","trouser_back_R","waistband_outer","waistband_inner","shirt_facing","back_yoke","latch_facing_A","latch_facing_B","latch_facing_C"],
+  "separateGeometry": ["latch_A","latch_B","latch_C","latch_facing_A","latch_facing_B","latch_facing_C"],
+  "priorityFitZones": ["shoulder","upper-arm","elbow","waist","hip","crotch","knee"],
+  "requiredPoses": ["neutral","arms-up","arm-cross","crouch","sit","prone"],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "structured latch shells and base garments are weight-driven in v1",
+    "reason": "No free long cloth is required for the first technical candidate."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "No corrective garment Shape Keys are produced at this structural prototype checkpoint."
+  },
+  "releaseBoundary": "Technical candidate only; customer release requires canonical release-policy evidence."
+}
