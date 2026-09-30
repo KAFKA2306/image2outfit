@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-linen-breeze-cardigan-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "linen-breeze-r1",
+  "panels": ["cardigan_front_L","cardigan_front_R","cardigan_back","sleeve_L","sleeve_R","front_facing_L","front_facing_R","camisole_front","camisole_back","short_front_L","short_front_R","short_back_L","short_back_R","waistband_outer","waistband_inner"],
+  "separateGeometry": ["knot_gusset_L","knot_gusset_R","knot_facing_L","knot_facing_R","ribbon_tail_L_A","ribbon_tail_L_B","ribbon_tail_R_A","ribbon_tail_R_B","drawcord"],
+  "priorityFitZones": ["shoulder","elbow","waist","hip","crotch"],
+  "requiredPoses": ["neutral","arms-up","arm-cross","crouch","sit","prone"],
+  "releaseBoundary": "Technical manufacturing only; sales/adoption are not completion gates.",
+  "clothSimulation": {"applicability":"NOT_REQUIRED","components":[],"evidence":"structured short details are weight-driven in v1","reason":"No long cloth or physics-dependent silhouette."},
+  "shapeKeyPostprocess": {"provider":"maxwilso-smooth-shape-keys","applicability":"NOT_REQUIRED","reason":"Structural checkpoint has no generated garment Shape Keys; reassess after fitted candidate exists."}
+}
