@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-pulse-bloom-track-set",
+  "profile": "panel-sewn",
+  "target": "Siroino via existing siroino-v1.0 adapter",
+  "designRevision": "v0-prototype",
+  "panels": ["bomber_front_L","bomber_front_R","bomber_back","raglan_sleeve_L","raglan_sleeve_R","inner_top_front","inner_top_back","short_front_L","short_front_R","short_back_L","short_back_R","side_gusset_L","side_gusset_R"],
+  "separateGeometry": ["rib_collar","rib_hem","waistband","sleeve_cuff_L","sleeve_cuff_R","leg_cuff_L","leg_cuff_R","center_zip","zip_pull","piping_gusset_L","piping_gusset_R"],
+  "priorityFitZones": ["shoulder","underarm","waist","crotch","upper-thigh-cuff"],
+  "requiredPoses": ["neutral","arms-up","arm-cross","crouch","sit","prone"],
+  "releaseBoundary": "Technical manufacturing only; customer/runtime release remains governed by existing repository policy.",
+  "clothSimulation": {"applicability":"NOT_REQUIRED","components":[],"evidence":"Structured short bomber and balloon shorts are geometry-led; no long free cloth panels.","reason":"Avoid unnecessary simulation authority; only optional zipper-pull secondary motion later."}
+}

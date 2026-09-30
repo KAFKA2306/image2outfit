@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-pulse-bloom-track-set",
+  "productName": "Pulse Bloom Track Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-pulse-bloom-track-set",
+  "documentationPath": "Assets/GenWorks/siroino-pulse-bloom-track-set/README.md",
+  "sourceJobPath": "config/products/siroino-pulse-bloom-track-set/job.json",
+  "designRevision": "v0-prototype",
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "constructionContract": "PASS",
+    "prototypeGeometry": "PASS",
+    "uvMapping": "PASS",
+    "heroGeometry": "PASS",
+    "structuralValidation": "PASS",
+    "canonicalJob": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "rigWeight": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "metrics": {
+    "prototypeSha256": "f7268b0dd7f36fd50a31a7bb9cda2c87886c1a5ee3c7e1726c2dd1f7e8986bd9",
+    "vertices": 104,
+    "uvCoordinates": 104,
+    "triangles": 156,
+    "namedGroups": 13,
+    "materialNames": 7,
+    "degenerateTriangles": 0
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-pulse-bloom-track-set",
+    "blockers": [
+      "The automation runtime has no Blender executable, no Unity executable, and no repository checkout; canonical job/build/rig/render/runtime stages were not executed.",
+      "Existing current-main product builders inspected are product-specific; no compatible generic arbitrary panel-sewn builder was proven, so no fake job.json was added."
+    ],
+    "nextAction": "Continue Issue #513: identify a compatible repository-owned build entrypoint, create only a schema-valid canonical job when that executable path is real, then run exact-head candidate/Blender fit+weight+FBX+five-view+required-pose validation."
+  }
+}
