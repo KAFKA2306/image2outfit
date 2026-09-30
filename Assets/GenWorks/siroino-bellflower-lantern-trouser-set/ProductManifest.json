@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-bellflower-lantern-trouser-set",
+  "productName": "Siroino Bellflower Lantern Trouser Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Prefab/SiroinoBellflowerLanternTrouserSet.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Prefab/SiroinoSotai_BellflowerLanternTrouserSet.prefab",
+  "previewPath": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/README.md",
+  "sourceJobPath": "config/products/siroino-bellflower-lantern-trouser-set/job.json",
+  "productBuildScript": "tools/siroino_bellflower_lantern_trouser_set_build.py",
+  "designRevision": "v1-sewn-bellflower-panels-and-yoke",
+  "reference": {
+    "status": "ISSUE_VISIBLE_GENERATED_BOARD",
+    "issue": 726,
+    "sourcePath": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/manufacturing-blueprint.png",
+    "exactIssueImageAvailable": true,
+    "repositoryContainsSourceImage": true
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "clothSimulation": "NOT_REQUIRED",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "FAIL",
+    "unityImport": "BLOCKED",
+    "modularAvatar": "BLOCKED",
+    "ndmf": "BLOCKED",
+    "vrchatRuntime": "NOT_EXECUTED"
+  },
+  "completionGates": {
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "FAIL"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Source/Patterns/pattern-spec.json",
+    "blockers": [
+      "Direct visual review found sleeve-to-shoulder discontinuity, box-like torso/leg planes, and side-view body clearance gaps; the current render is a technical checkpoint, not a customer-ready appearance pass.",
+      "Unity Static was not executable in the isolated origin/main worktree because the project has compiler errors for missing VRChat SDK and Modular Avatar namespaces; see Evidence/Build/unity-compile.log and candidate-audit.json.",
+      "VRChat runtime was not executed and is not claimed."
+    ]
+  }
+}
