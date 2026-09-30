@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-jade-knot-tulip-dress-set",
+  "units": "m",
+  "heroDetail": "asymmetric diagonal frog-knot placket feeding into wearer-right overlapping tulip leaf",
+  "panels": [
+    {"id":"stand_collar_outer","material":"MAT_Jade_Ivory"},
+    {"id":"stand_collar_inner","material":"MAT_Jade_Ivory"},
+    {"id":"bodice_front_L","material":"MAT_Jade_Body"},
+    {"id":"bodice_front_R","material":"MAT_Jade_Body"},
+    {"id":"bodice_back","material":"MAT_Jade_Body"},
+    {"id":"sleeve_L","material":"MAT_Jade_Ivory"},
+    {"id":"sleeve_R","material":"MAT_Jade_Ivory"},
+    {"id":"placket_facing","material":"MAT_Jade_Plum"},
+    {"id":"frog_knot_A","material":"MAT_Jade_Knot"},
+    {"id":"frog_knot_B","material":"MAT_Jade_Knot"},
+    {"id":"frog_knot_C","material":"MAT_Jade_Knot"},
+    {"id":"waist_facing","material":"MAT_Jade_Ivory"},
+    {"id":"skirt_base_L","material":"MAT_Jade_Body"},
+    {"id":"skirt_base_R","material":"MAT_Jade_Ivory"},
+    {"id":"tulip_leaf_L","material":"MAT_Jade_Body"},
+    {"id":"tulip_leaf_R","material":"MAT_Jade_Ivory"},
+    {"id":"accent_leaf_R","material":"MAT_Jade_Plum"}
+  ],
+  "stitchIntent": [
+    ["bodice_front_L","bodice_back"], ["bodice_front_R","bodice_back"],
+    ["sleeve_L","bodice_front_L"], ["sleeve_R","bodice_front_R"],
+    ["skirt_base_L","skirt_base_R"], ["tulip_leaf_L","skirt_base_L"],
+    ["tulip_leaf_R","skirt_base_R"], ["accent_leaf_R","tulip_leaf_R"]
+  ],
+  "uvPolicy": {
+    "uvSet": "UV0",
+    "heroIslandsUnique": ["placket_facing","frog_knot_A","frog_knot_B","frog_knot_C","tulip_leaf_L","tulip_leaf_R","accent_leaf_R"]
+  },
+  "lod": {"lod0TriangleTargetMax": 22000}
+}
