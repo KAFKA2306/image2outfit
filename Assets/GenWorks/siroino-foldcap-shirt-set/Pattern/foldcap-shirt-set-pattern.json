@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-foldcap-shirt-set",
+  "units": "normalized-pattern-space",
+  "pieces": [
+    {"name":"shirt_front_L","count":1,"materialRole":"fabric_outer"},
+    {"name":"shirt_front_R","count":1,"materialRole":"fabric_outer"},
+    {"name":"shirt_back","count":1,"materialRole":"fabric_outer"},
+    {"name":"sleeve_L","count":1,"materialRole":"fabric_outer"},
+    {"name":"sleeve_R","count":1,"materialRole":"fabric_outer"},
+    {"name":"cuff_L","count":1,"materialRole":"fabric_outer"},
+    {"name":"cuff_R","count":1,"materialRole":"fabric_outer"},
+    {"name":"inner_front","count":1,"materialRole":"fabric_inner"},
+    {"name":"inner_back","count":1,"materialRole":"fabric_inner"},
+    {"name":"trouser_front_L","count":1,"materialRole":"fabric_bottom"},
+    {"name":"trouser_front_R","count":1,"materialRole":"fabric_bottom"},
+    {"name":"trouser_back_L","count":1,"materialRole":"fabric_bottom"},
+    {"name":"trouser_back_R","count":1,"materialRole":"fabric_bottom"},
+    {"name":"waistband_outer","count":1,"materialRole":"fabric_bottom"},
+    {"name":"waistband_inner","count":1,"materialRole":"fabric_bottom"},
+    {"name":"shirt_facing","count":1,"materialRole":"fabric_outer"},
+    {"name":"back_yoke","count":1,"materialRole":"fabric_outer"},
+    {"name":"foldcap_L","count":1,"materialRole":"accent","hero":true},
+    {"name":"foldcap_R","count":1,"materialRole":"accent","hero":true},
+    {"name":"foldcap_facing_L","count":1,"materialRole":"accent","hero":true},
+    {"name":"foldcap_facing_R","count":1,"materialRole":"accent","hero":true}
+  ],
+  "heroConstraint": "foldcap_L/R and their facings remain separately named bounded geometry through the build boundary"
+}
