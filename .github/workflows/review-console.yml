@@ -136,3 +136,12 @@ jobs:
               f"silent_omissions={reconciliation['silentOmissionCount']}"
           )
           PY
+
+      - name: Upload publication reconciliation inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-reconciliation
+          path: publication-reconciliation.json
+          if-no-files-found: error
+          retention-days: 30
