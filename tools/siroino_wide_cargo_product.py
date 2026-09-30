@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import json
-import math
 import shutil
 import sys
 from pathlib import Path
@@ -206,7 +205,8 @@ def _load_pattern_baseline() -> dict[str, object]:
         ),
         "legBoundaryRows": tuple(leg_boundary_rows),
         "upperRows": _numeric_rows(baseline.get("upperRows"), 2, "upperRows"),
-        "crotchCentre": back_rise + front_rise[1:],
+        "frontRise": front_rise,
+        "backRise": back_rise,
     }
 
 
@@ -215,7 +215,8 @@ FRONT_DEPTH = PATTERN_BASELINE["frontDepthProfile"]
 REAR_DEPTH = PATTERN_BASELINE["rearDepthProfile"]
 LEG_BOUNDARY_ROWS = PATTERN_BASELINE["legBoundaryRows"]
 UPPER_SPECS = PATTERN_BASELINE["upperRows"]
-CROTCH_CENTRE = PATTERN_BASELINE["crotchCentre"]
+FRONT_RISE = PATTERN_BASELINE["frontRise"]
+BACK_RISE = PATTERN_BASELINE["backRise"]
 
 
 def install_runtime_path_compat(implementation: ModuleType) -> None:
@@ -244,6 +245,7 @@ def clear_stale_evidence(implementation: ModuleType) -> None:
 
 
 def _smoothstep(value: float) -> float:
+    value = max(0.0, min(1.0, value))
     return value * value * (3.0 - 2.0 * value)
 
 
@@ -259,48 +261,146 @@ def _profile_value(z: float, points: tuple[tuple[float, float], ...]) -> float:
     raise RuntimeError(f"Wide Cargo profile interpolation failed at z={z}")
 
 
-def _circumferential_points(
+def _rise_value(z: float, points: tuple[tuple[float, float], ...]) -> float:
+    by_height = tuple(sorted((height, y) for y, height in points))
+    return _profile_value(z, by_height)
+
+
+def _append_face(mesh, vertices: tuple[int, ...], *, reverse: bool = False) -> None:
+    face = tuple(reversed(vertices)) if reverse else vertices
+    if len(set(face)) >= 3:
+        mesh.faces.append(face)
+
+
+def _bridge_panel_rows(
+    mesh,
+    lower: list[int],
+    upper: list[int],
     *,
-    centre_x: float,
-    half_width: float,
-    z: float,
-    count: int,
-) -> list[tuple[float, float, float]]:
-    front_depth = _profile_value(z, FRONT_DEPTH)
-    rear_depth = _profile_value(z, REAR_DEPTH)
-    points = []
-    for index in range(count):
-        angle = 2.0 * math.pi * index / count
-        x = centre_x + half_width * math.cos(angle)
-        sine = math.sin(angle)
-        depth = rear_depth if sine >= 0.0 else front_depth
-        y = depth * sine
-        points.append((x, y, z))
-    return points
-
-
-def _bridge_closed_rings(mesh, lower: list[int], upper: list[int]) -> None:
+    reverse: bool = False,
+) -> None:
     if len(lower) != len(upper):
-        raise ValueError("Wide Cargo ring sizes differ")
-    count = len(lower)
-    for index in range(count):
-        next_index = (index + 1) % count
-        mesh.faces.append(
-            (lower[index], lower[next_index], upper[next_index], upper[index])
+        raise ValueError("Wide Cargo panel row sizes differ")
+    for index in range(len(lower) - 1):
+        _append_face(
+            mesh,
+            (lower[index], lower[index + 1], upper[index + 1], upper[index]),
+            reverse=reverse,
         )
 
 
-def _bridge_chains(mesh, first: list[int], second: list[int]) -> None:
-    if len(first) != len(second):
-        raise ValueError("Wide Cargo chain sizes differ")
-    for index in range(len(first) - 1):
-        mesh.faces.append(
-            (first[index], first[index + 1], second[index + 1], second[index])
+def _row_specs() -> list[dict[str, float | str]]:
+    if not LEG_BOUNDARY_ROWS:
+        raise RuntimeError("Wide Cargo pattern has no leg boundary rows")
+    specs: list[dict[str, float | str]] = [
+        {"phase": "leg", "z": z, "outer": outer, "inner": inner}
+        for z, outer, inner in LEG_BOUNDARY_ROWS
+    ]
+    top_z = float(LEG_BOUNDARY_ROWS[-1][0])
+    rise_end = max(max(z for _, z in FRONT_RISE), max(z for _, z in BACK_RISE))
+    transition_heights = sorted(
+        {
+            z
+            for _, z in FRONT_RISE + BACK_RISE
+            if top_z < z <= rise_end + 1e-9
+        }
+    )
+    for z in transition_heights:
+        specs.append(
+            {
+                "phase": "transition",
+                "z": z,
+                "outer": _profile_value(z, UPPER_SPECS),
+                "inner": 0.0,
+            }
         )
+    for z, half_width in UPPER_SPECS:
+        if z > rise_end + 1e-9:
+            specs.append(
+                {"phase": "upper", "z": z, "outer": half_width, "inner": 0.0}
+            )
+    specs.sort(key=lambda row: float(row["z"]))
+    return specs
 
 
-def _ring_chain(ring: list[int], indices: list[int]) -> list[int]:
-    return [ring[index] for index in indices]
+def _panel_y(
+    *,
+    face: str,
+    phase: str,
+    z: float,
+    x_abs: float,
+    outer: float,
+    inner: float,
+) -> float:
+    front = face == "front"
+    profile = FRONT_DEPTH if front else REAR_DEPTH
+    sign = -1.0 if front else 1.0
+    depth = _profile_value(z, profile)
+
+    if phase == "leg":
+        centre = (outer + inner) * 0.5
+        half_width = (outer - inner) * 0.5
+        local_x = (x_abs - centre) / max(half_width, 1e-9)
+        cross_section = max(0.0, 1.0 - local_x * local_x) ** 0.5
+        return sign * depth * cross_section
+
+    x_ratio = min(1.0, x_abs / max(outer, 1e-9))
+    cross_section = max(0.0, 1.0 - x_ratio * x_ratio) ** 0.5
+    elliptical_y = sign * depth * cross_section
+    if phase == "transition":
+        rise = FRONT_RISE if front else BACK_RISE
+        centre_y = _rise_value(z, rise)
+        centre_correction = (centre_y - sign * depth) * (1.0 - x_ratio) ** 2
+        return elliptical_y + centre_correction
+    return elliptical_y
+
+
+def _panel_grid(
+    mesh,
+    specs: list[dict[str, float | str]],
+    *,
+    face: str,
+    side: float,
+    columns: int,
+    shared: dict[tuple[object, ...], int],
+) -> list[list[int]]:
+    rows: list[list[int]] = []
+    for spec in specs:
+        phase = str(spec["phase"])
+        z = float(spec["z"])
+        outer = float(spec["outer"])
+        inner = float(spec["inner"])
+        row: list[int] = []
+        for column in range(columns):
+            t = column / (columns - 1)
+            x_abs = inner + (outer - inner) * t
+            x = side * x_abs
+            y = _panel_y(
+                face=face,
+                phase=phase,
+                z=z,
+                x_abs=x_abs,
+                outer=outer,
+                inner=inner,
+            )
+
+            key: tuple[object, ...] | None = None
+            if column == columns - 1:
+                key = ("outseam", side, round(z, 6))
+            elif column == 0 and phase == "leg":
+                key = ("inseam", side, round(z, 6))
+            elif column == 0:
+                key = ("centre", face, round(z, 6))
+
+            if key is not None and key in shared:
+                index = shared[key]
+            else:
+                index = mesh.add_ring([(x, y, z)])[0]
+                if key is not None:
+                    shared[key] = index
+            row.append(index)
+        rows.append(row)
+    return rows
 
 
 def _triangulate_fan(mesh, ring: list[int], centre: int) -> None:
@@ -347,98 +447,28 @@ def add_side_pocket_panel(
 
 
 def reviewed_geometry(implementation: ModuleType, segments: int = 48):
-    """Generate the verified baseline from canonical Wide Cargo pattern data."""
+    """Build four sewn panels with shared seam vertices and curved sections."""
     del segments
     mesh = implementation.MeshBuilder()
+    specs = _row_specs()
+    columns = 10
+    shared: dict[tuple[object, ...], int] = {}
 
-    ring_count = 32
-    quarter = ring_count // 4
-    leg_rows: dict[float, list[list[int]]] = {-1.0: [], 1.0: []}
-    for z, outer, inner in LEG_BOUNDARY_ROWS:
-        centre = (outer + inner) * 0.5
-        half_width = (outer - inner) * 0.5
+    for face in ("front", "back"):
         for side in (-1.0, 1.0):
-            ring = mesh.add_ring(
-                _circumferential_points(
-                    centre_x=side * centre,
-                    half_width=half_width,
-                    z=z,
-                    count=ring_count,
-                )
+            grid = _panel_grid(
+                mesh,
+                specs,
+                face=face,
+                side=side,
+                columns=columns,
+                shared=shared,
             )
-            leg_rows[side].append(ring)
-
-    for side in (-1.0, 1.0):
-        for lower, upper in zip(leg_rows[side], leg_rows[side][1:]):
-            _bridge_closed_rings(mesh, lower, upper)
-
-    upper_rows = [
-        mesh.add_ring(
-            _circumferential_points(
-                centre_x=0.0,
-                half_width=half_width,
-                z=z,
-                count=ring_count,
+            reverse = (face == "front" and side < 0.0) or (
+                face == "back" and side > 0.0
             )
-        )
-        for z, half_width in UPPER_SPECS
-    ]
-    for lower, upper in zip(upper_rows, upper_rows[1:]):
-        _bridge_closed_rings(mesh, lower, upper)
-
-    first_upper = upper_rows[0]
-    right_leg = leg_rows[1.0][-1]
-    left_leg = leg_rows[-1.0][-1]
-
-    right_outer_indices = list(range(3 * quarter + 1, ring_count)) + list(
-        range(0, quarter)
-    )
-    right_inner_indices = list(range(quarter, 3 * quarter + 1))
-    left_outer_indices = list(range(quarter + 1, 3 * quarter))
-    left_inner_indices = list(range(quarter, -1, -1)) + list(
-        range(ring_count - 1, 3 * quarter - 1, -1)
-    )
-
-    right_outer = _ring_chain(right_leg, right_outer_indices)
-    left_outer = _ring_chain(left_leg, left_outer_indices)
-    upper_right = _ring_chain(first_upper, right_outer_indices)
-    upper_left = _ring_chain(first_upper, left_outer_indices)
-    _bridge_chains(mesh, right_outer, upper_right)
-    _bridge_chains(mesh, upper_left, left_outer)
-
-    right_inner = _ring_chain(right_leg, right_inner_indices)
-    left_inner = _ring_chain(left_leg, left_inner_indices)
-    if len(CROTCH_CENTRE) != len(right_inner) or len(CROTCH_CENTRE) != len(left_inner):
-        raise ValueError(
-            "Wide Cargo crotch pattern point count does not match inner-leg chains"
-        )
-    centre_crotch_points = [(0.0, y, z) for y, z in CROTCH_CENTRE]
-    centre_crotch = mesh.add_ring(centre_crotch_points)
-    _bridge_chains(mesh, right_inner, centre_crotch)
-    _bridge_chains(mesh, centre_crotch, left_inner)
-
-    rear_upper_right = first_upper[quarter - 1]
-    rear_upper_centre = first_upper[quarter]
-    rear_upper_left = first_upper[quarter + 1]
-    front_upper_left = first_upper[3 * quarter - 1]
-    front_upper_centre = first_upper[3 * quarter]
-    front_upper_right = first_upper[3 * quarter + 1]
-
-    mesh.faces.append(
-        (rear_upper_right, right_outer[-1], right_inner[0], centre_crotch[0])
-    )
-    mesh.faces.append((rear_upper_right, centre_crotch[0], rear_upper_centre))
-    mesh.faces.append((rear_upper_centre, centre_crotch[0], rear_upper_left))
-    mesh.faces.append((rear_upper_left, centre_crotch[0], left_inner[0], left_outer[0]))
-
-    mesh.faces.append(
-        (front_upper_right, centre_crotch[-1], right_inner[-1], right_outer[0])
-    )
-    mesh.faces.append((front_upper_right, front_upper_centre, centre_crotch[-1]))
-    mesh.faces.append((front_upper_centre, front_upper_left, centre_crotch[-1]))
-    mesh.faces.append(
-        (front_upper_left, left_outer[-1], left_inner[-1], centre_crotch[-1])
-    )
+            for lower, upper in zip(grid, grid[1:]):
+                _bridge_panel_rows(mesh, lower, upper, reverse=reverse)
 
     for side in (-1.0, 1.0):
         add_side_pocket_panel(
@@ -730,7 +760,7 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
     path = implementation.build.c.repo_path(job["productManifestPath"])
     manifest = json.loads(path.read_text(encoding="utf-8-sig"))
     manifest["status"] = "WORKING"
-    manifest["designRevision"] = "v74-centre-crotch-seam"
+    manifest["designRevision"] = "v76-shared-seam-elliptic-panels"
     manifest["wearabilityAudit"] = report
     gates = manifest.setdefault("technicalGates", {})
     gates["latestGeometryRender"] = "PASS" if report["passed"] else "FAIL"
