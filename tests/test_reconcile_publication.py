@@ -11,9 +11,7 @@ assert spec.loader
 spec.loader.exec_module(module)
 
 
-def product(
-    root: Path, slug: str, rendered: bool, preview_name: str = "front.png"
-) -> None:
+def product(root: Path, slug: str, rendered: bool, preview_name: str = "front.png") -> None:
     workspace = root / "Assets" / "GenWorks" / slug
     workspace.mkdir(parents=True)
     (workspace / "ProductManifest.json").write_text("{}", encoding="utf-8")
