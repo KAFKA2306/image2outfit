@@ -1,5 +1,7 @@
 import importlib.util
 import json
+import tempfile
+import unittest
 from pathlib import Path
 
 MODULE_PATH = Path(__file__).parents[1] / "tools" / "reconcile_publication.py"
@@ -19,32 +21,40 @@ def product(root: Path, slug: str, rendered: bool, preview_name: str = "front.pn
         (previews / preview_name).write_bytes(b"real-render")
 
 
-def test_reconciliation_exposes_silent_omission(tmp_path: Path) -> None:
-    product(tmp_path, "public", True)
-    product(tmp_path, "omitted", True)
-    product(tmp_path, "no-render", False)
-    console = tmp_path / "review-console.json"
-    console.write_text(json.dumps({"products": [{"slug": "public"}]}), encoding="utf-8")
+class PublicationReconciliationTests(unittest.TestCase):
+    def test_reconciliation_exposes_silent_omission(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            product(root, "public", True)
+            product(root, "omitted", True)
+            product(root, "no-render", False)
+            console = root / "review-console.json"
+            console.write_text(json.dumps({"products": [{"slug": "public"}]}), encoding="utf-8")
 
-    result = module.reconcile(tmp_path, console)
+            result = module.reconcile(root, console)
 
-    assert result["canonicalProductCount"] == 3
-    assert result["productsWithRealRender"] == 2
-    assert result["publicProductCount"] == 1
-    assert result["missingProjection"] == ["omitted"]
-    assert result["missingPrimaryRender"] == ["no-render"]
-    assert result["silentOmissionCount"] == 1
-    assert result["classification"] == {"no-render": "C", "omitted": "B", "public": "A"}
+            self.assertEqual(result["canonicalProductCount"], 3)
+            self.assertEqual(result["productsWithRealRender"], 2)
+            self.assertEqual(result["publicProductCount"], 1)
+            self.assertEqual(result["missingProjection"], ["omitted"])
+            self.assertEqual(result["missingPrimaryRender"], ["no-render"])
+            self.assertEqual(result["silentOmissionCount"], 1)
+            self.assertEqual(result["classification"], {"no-render": "C", "omitted": "B", "public": "A"})
+
+    def test_non_primary_preview_does_not_count_as_rendered(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            product(root, "pattern-only", True, "pattern-layout.png")
+            console = root / "review-console.json"
+            console.write_text(json.dumps({"products": [{"slug": "pattern-only"}]}), encoding="utf-8")
+
+            result = module.reconcile(root, console)
+
+            self.assertEqual(result["productsWithRealRender"], 0)
+            self.assertEqual(result["publicProductCount"], 0)
+            self.assertEqual(result["missingPrimaryRender"], ["pattern-only"])
+            self.assertEqual(result["classification"], {"pattern-only": "C"})
 
 
-def test_non_primary_preview_does_not_count_as_rendered(tmp_path: Path) -> None:
-    product(tmp_path, "pattern-only", True, "pattern-layout.png")
-    console = tmp_path / "review-console.json"
-    console.write_text(json.dumps({"products": [{"slug": "pattern-only"}]}), encoding="utf-8")
-
-    result = module.reconcile(tmp_path, console)
-
-    assert result["productsWithRealRender"] == 0
-    assert result["publicProductCount"] == 0
-    assert result["missingPrimaryRender"] == ["pattern-only"]
-    assert result["classification"] == {"pattern-only": "C"}
+if __name__ == "__main__":
+    unittest.main()
