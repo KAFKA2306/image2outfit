@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-sidelock-column-set",
+  "productName": "Sidelock Column Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-sidelock-column-set",
+  "documentationPath": "Assets/GenWorks/siroino-sidelock-column-set/README.md",
+  "generatedAt": "2026-09-14T07:53:00Z",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-sidelock-column-set",
+    "resumeFrom": "Assets/GenWorks/siroino-sidelock-column-set/Models/sidelock-column-set-prototype.obj",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "Hosted Blender workflow 34819798796 executed repository audit and failed with missing-product-config at config/products/siroino-sidelock-column-set/job.json before Blender execution.",
+      "Current main proves product-specific Siroino Wide Cargo buildScript tools/siroino_wide_cargo_product.py; it hard-codes Wide Cargo pattern/source identity and is not a valid builder for Sidelock Column Set. A compatible reusable repository-owned entrypoint has not yet been proven."
+    ],
+    "nextAction": "Prove or refactor a reusable repository-owned garment build entrypoint without creating a second authority, add schema-valid config/products/siroino-sidelock-column-set/job.json, then re-run the exact candidate through hosted Blender."
+  },
+  "prototype": {
+    "artifact": "Assets/GenWorks/siroino-sidelock-column-set/Models/sidelock-column-set-prototype.obj",
+    "validation": "Assets/GenWorks/siroino-sidelock-column-set/Evidence/prototype-validation.json",
+    "sha256": "b47652e2ddacd4fa648df853f6752293b39e17aacf1aa0be4c44eca65a1c4155",
+    "vertices": 56,
+    "uvCoordinates": 56,
+    "polygonFaces": 14,
+    "namedGroups": 14,
+    "degenerateFaces": 0,
+    "heroGroups": ["side_lock_L_A","side_lock_L_B","side_lock_L_C","side_lock_R_A","side_lock_R_B","side_lock_R_C"]
+  },
+  "technicalGates": {
+    "manufacturingReference": "PASS",
+    "constructionContract": "PASS",
+    "patternDecomposition": "PASS",
+    "prototypeGeometry": "PASS",
+    "prototypeUV0": "PASS",
+    "heroGeometry": "PASS",
+    "rearSlitGeometry": "PASS",
+    "prototypeStructuralValidation": "PASS",
+    "canonicalJob": "FAIL",
+    "hostedPipelineBoundary": "FAIL",
+    "blenderExecution": "UNVERIFIED",
+    "avatarFit": "UNVERIFIED",
+    "rigging": "UNVERIFIED",
+    "weighting": "UNVERIFIED",
+    "fbxExport": "UNVERIFIED",
+    "fiveViewRender": "UNVERIFIED",
+    "poseRender": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "designRevision": "v1-sidelock-column"
+}

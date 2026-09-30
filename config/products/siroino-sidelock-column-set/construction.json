@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-sidelock-column-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "v1-sidelock-column",
+  "panels": [
+    "top_front_L",
+    "top_front_R",
+    "top_back",
+    "neck_facing_front",
+    "neck_facing_back",
+    "skirt_front_L",
+    "skirt_front_R",
+    "skirt_back_L",
+    "skirt_back_R",
+    "waistband_outer",
+    "waistband_inner",
+    "rear_slit_facing_L",
+    "rear_slit_facing_R"
+  ],
+  "separateGeometry": [
+    "side_lock_L_A",
+    "side_lock_L_B",
+    "side_lock_L_C",
+    "side_lock_R_A",
+    "side_lock_R_B",
+    "side_lock_R_C"
+  ],
+  "priorityFitZones": ["waist", "hip", "seat", "thigh", "rear_slit"],
+  "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+  "releaseBoundary": "Technical manufacturing only; sales and subjective market approval are not completion gates.",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Structured top, column skirt and bounded pleat leaves are intended for skinning-based first-pass verification.",
+    "reason": "No long free cloth or drape is required for the product-defining silhouette."
+  }
+}
