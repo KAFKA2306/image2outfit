@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-origami-pocket-camp-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "v1-origami-pocket-camp",
+  "panels": [
+    "shirt_front_L",
+    "shirt_front_R",
+    "shirt_back",
+    "sleeve_L",
+    "sleeve_R",
+    "inner_front",
+    "inner_back",
+    "short_front_L",
+    "short_front_R",
+    "short_back_L",
+    "short_back_R",
+    "waistband_outer",
+    "waistband_inner",
+    "collar_L",
+    "collar_R",
+    "shirt_facing"
+  ],
+  "separateGeometry": [
+    "origami_pocket_chest",
+    "origami_pocket_hip_L",
+    "origami_pocket_hip_R",
+    "origami_pocket_facing_chest",
+    "origami_pocket_facing_L",
+    "origami_pocket_facing_R"
+  ],
+  "priorityFitZones": ["shoulder", "elbow", "waist", "hip", "crotch"],
+  "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+  "releaseBoundary": "technical-acceptance-only",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "UNVERIFIED until canonical candidate runtime executes",
+    "reason": "Structured short garments and bounded folded pockets are weight-driven in v1."
+  }
+}
