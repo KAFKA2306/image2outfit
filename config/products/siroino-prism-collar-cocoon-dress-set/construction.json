@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-prism-collar-cocoon-dress-set",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "designRevision": "v1-prism-collar-panel-prototype",
+  "panels": ["bodice_front","bodice_back","skirt_front","skirt_back","box_pleat_L","box_pleat_R","waist_facing","center_accent"],
+  "separateGeometry": ["collar_front_L","collar_front_R","collar_center","collar_side_L"],
+  "priorityFitZones": ["neck","clavicle","shoulder","underarm","waist","upper-thigh"],
+  "releaseBoundary": "technical acceptance only; no merge/release/BOOTH publication in this workline",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "static structured collar and short cocoon skirt; first technical pass uses skinning only",
+    "reason": "The hero silhouette is structural and bounded; cloth simulation is not required to prove fit, topology, rigging or render evidence."
+  }
+}
