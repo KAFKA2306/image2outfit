@@ -29,7 +29,9 @@ class PublicationReconciliationTests(unittest.TestCase):
             product(root, "omitted", True)
             product(root, "no-render", False)
             console = root / "review-console.json"
-            console.write_text(json.dumps({"products": [{"slug": "public"}]}), encoding="utf-8")
+            console.write_text(
+                json.dumps({"products": [{"slug": "public"}]}), encoding="utf-8"
+            )
 
             result = module.reconcile(root, console)
 
@@ -39,14 +41,19 @@ class PublicationReconciliationTests(unittest.TestCase):
             self.assertEqual(result["missingProjection"], ["omitted"])
             self.assertEqual(result["missingPrimaryRender"], ["no-render"])
             self.assertEqual(result["silentOmissionCount"], 1)
-            self.assertEqual(result["classification"], {"no-render": "C", "omitted": "B", "public": "A"})
+            self.assertEqual(
+                result["classification"],
+                {"no-render": "C", "omitted": "B", "public": "A"},
+            )
 
     def test_non_primary_preview_does_not_count_as_rendered(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             product(root, "pattern-only", True, "pattern-layout.png")
             console = root / "review-console.json"
-            console.write_text(json.dumps({"products": [{"slug": "pattern-only"}]}), encoding="utf-8")
+            console.write_text(
+                json.dumps({"products": [{"slug": "pattern-only"}]}), encoding="utf-8"
+            )
 
             result = module.reconcile(root, console)
 
