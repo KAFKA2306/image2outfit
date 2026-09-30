@@ -1,0 +1,16 @@
+{
+  "schemaVersion":1,
+  "productId":"siroino-crescent-rail-romper-set",
+  "productName":"Crescent Rail Romper Set",
+  "status":"WORKING",
+  "targetAdapterId":"siroino-v1.0",
+  "productRoot":"Assets/GenWorks/siroino-crescent-rail-romper-set",
+  "documentationPath":"Assets/GenWorks/siroino-crescent-rail-romper-set/README.md",
+  "lifecycle":"manufacturing",
+  "designRevision":"crescent-rail-r1",
+  "manufacturingReference":"Assets/GenWorks/siroino-crescent-rail-romper-set/References/crescent-rail-romper-set-manufacturing-sheet.svg",
+  "prototype":{"path":"Assets/GenWorks/siroino-crescent-rail-romper-set/Prototype/crescent-rail-structural.obj","blobSha":"8d0bb8aa73d85cc0aa601d82df0ba08a0124d7c8","status":"PASS"},
+  "gates":{"manufacturing-image":"PASS","construction":"PASS","pattern-decomposition":"PASS","prototype-geometry":"PASS","uv0":"PASS","hero-geometry":"PASS","canonical-job":"UNVERIFIED","blender-fit":"UNVERIFIED","rig-weight":"UNVERIFIED","fbx-export":"UNVERIFIED","five-view-render":"UNVERIFIED","pose-render":"UNVERIFIED","unity":"UNVERIFIED","vrchat-runtime":"UNVERIFIED"},
+  "blocker":"Current main exposes product-specific Blender execution via job buildScript; no compatible reusable repository-owned garment builder has been proven for this new romper panel set, so job.json is intentionally not fabricated.",
+  "nextAction":"Prove a reusable current-main garment buildScript compatible with this panel contract, then add schema-valid job.json and run task candidate for this exact product."
+}
