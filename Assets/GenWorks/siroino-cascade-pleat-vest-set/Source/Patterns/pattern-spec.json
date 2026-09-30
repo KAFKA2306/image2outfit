@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-cascade-pleat-vest-set",
+  "construction": "panel-sewn",
+  "parts": [
+    {"id":"vest_front_L","role":"garment"},{"id":"vest_front_R","role":"garment"},{"id":"vest_back","role":"garment"},
+    {"id":"inner_front","role":"garment"},{"id":"inner_back","role":"garment"},{"id":"sleeve_L","role":"garment"},{"id":"sleeve_R","role":"garment"},
+    {"id":"trouser_front_L","role":"garment"},{"id":"trouser_front_R","role":"garment"},{"id":"trouser_back_L","role":"garment"},{"id":"trouser_back_R","role":"garment"},
+    {"id":"waistband","role":"garment"},{"id":"cascade_pleat_A","role":"hero"},{"id":"cascade_pleat_B","role":"hero"},
+    {"id":"waist_bridge_L","role":"hero"},{"id":"pleat_edge_facing","role":"hero"},{"id":"vyoke_back","role":"garment"}
+  ],
+  "heroDetail": {"requiredGeometry":["cascade_pleat_A","cascade_pleat_B","waist_bridge_L","pleat_edge_facing"]},
+  "uvPolicy": "UV0 explicit islands; all hero parts unique; mirror only symmetric non-hero cloth",
+  "lod0TriangleTargetMax": 24000,
+  "preserveOrder": ["silhouette","cascade-pleat","waist-bridge","vest-crop-vyoke","trouser-taper","micro-trim"]
+}

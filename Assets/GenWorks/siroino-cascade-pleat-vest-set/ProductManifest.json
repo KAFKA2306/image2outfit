@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-cascade-pleat-vest-set",
+  "productName": "Cascade Pleat Vest Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-cascade-pleat-vest-set",
+  "documentationPath": "Assets/GenWorks/siroino-cascade-pleat-vest-set/README.md",
+  "sourceJobPath": "config/products/siroino-cascade-pleat-vest-set/job.json",
+  "designRevision": "issue-515-v0-prototype",
+  "completionGates": {
+    "manufacturingReference": "PASS",
+    "constructionContract": "PASS",
+    "prototypeGeometry": "PASS",
+    "uvMapping": "PASS",
+    "heroGeometry": "PASS",
+    "structuralValidation": "PASS",
+    "canonicalJob": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "rigWeight": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "metrics": {
+    "prototypeSha256": "cdd9c0a75cfcd22284290655eb854be854b366c16aa316a8a61b5427e52326b7",
+    "vertices": 68,
+    "uvCoordinates": 68,
+    "polygonFaces": 17,
+    "trianglesIfTriangulated": 34,
+    "namedGroups": 17,
+    "materialNames": 5,
+    "degenerateFaces": 0
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-cascade-pleat-vest-set",
+    "blockers": [
+      "No compatible generic repository-owned build entrypoint has yet been proven for this new panel set; no fake job.json or one-off builder was added.",
+      "Blender fit/rig/weight/export/render and Unity/VRChat stages were not executed in this runtime."
+    ],
+    "nextAction": "Continue Issue #515: bind only to a proven existing executable garment build path, then run exact-head candidate/Blender fit+weight+FBX+five-view+required-pose validation."
+  }
+}
