@@ -48,7 +48,9 @@ def reconcile(root: Path, console_path: Path) -> dict:
         if isinstance(row, dict) and row.get("slug")
     }
     rendered = {
-        slug for slug, workspace in canonical.items() if real_render_exists(workspace)
+        slug
+        for slug, workspace in canonical.items()
+        if real_render_exists(workspace)
     }
     missing_projection = sorted(rendered - projected)
     missing_primary_render = sorted(set(canonical) - rendered)
