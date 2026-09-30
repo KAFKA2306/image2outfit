@@ -97,7 +97,8 @@ def main() -> int:
     result = reconcile(root, console)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
-        json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        json.dumps(result, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
     )
     print(json.dumps(result, ensure_ascii=False))
     return 1 if result["silentOmissionCount"] else 0
