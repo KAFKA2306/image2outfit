@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-twistback-bridge-blouse-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "twistback-bridge-v1",
+  "panels": [
+    "blouse_front_L", "blouse_front_R", "blouse_back", "sleeve_L", "sleeve_R",
+    "cuff_L", "cuff_R", "inner_front", "inner_back", "trouser_front_L",
+    "trouser_front_R", "trouser_back_L", "trouser_back_R", "waistband_outer",
+    "waistband_inner", "neck_facing_front", "neck_facing_back", "back_yoke"
+  ],
+  "separateGeometry": [
+    "twist_bridge_outer", "twist_bridge_inner", "bridge_facing_L", "bridge_facing_R"
+  ],
+  "priorityFitZones": ["shoulder", "upper-back", "upper-arm", "elbow", "waist", "hip", "crotch", "knee"],
+  "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+  "releaseBoundary": "Technical acceptance only; customer release requires canonical release policy and direct current evidence.",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Assets/GenWorks/siroino-twistback-bridge-blouse-set/Evidence/Prototype/structural-validation.json",
+    "reason": "The v1 blouse, trousers and Twistback Bridge are bounded weight-driven panels without long free cloth."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "No generated garment Shape Keys exist at this structural checkpoint; applicability must be re-evaluated after an actual fitted Blender candidate exists."
+  }
+}

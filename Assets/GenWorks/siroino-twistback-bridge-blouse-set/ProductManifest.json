@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-twistback-bridge-blouse-set",
+  "productName": "Twistback Bridge Blouse Set",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-twistback-bridge-blouse-set",
+  "documentationPath": "Assets/GenWorks/siroino-twistback-bridge-blouse-set/README.md",
+  "lifecycle": "manufacturing",
+  "designRevision": "twistback-bridge-v1",
+  "manufacturingReference": "Assets/GenWorks/siroino-twistback-bridge-blouse-set/References/twistback-bridge-blouse-set-manufacturing-sheet.svg",
+  "prototype": {
+    "path": "Assets/GenWorks/siroino-twistback-bridge-blouse-set/Source/Prototype/twistback-bridge-blouse-set-prototype.obj",
+    "sha256": "2f9867e98fc39de8f9728b69be87d0f70535637970fc15351d104be0cd97927a",
+    "status": "PASS"
+  },
+  "gates": {
+    "manufacturing-image": "PASS",
+    "construction": "PASS",
+    "pattern-decomposition": "PASS",
+    "prototype-geometry": "PASS",
+    "uv0": "PASS",
+    "hero-geometry": "PASS",
+    "canonical-job": "UNVERIFIED",
+    "blender-fit": "UNVERIFIED",
+    "rig-weight": "UNVERIFIED",
+    "fbx-export": "UNVERIFIED",
+    "five-view-render": "UNVERIFIED",
+    "pose-render": "UNVERIFIED",
+    "unity": "UNVERIFIED",
+    "vrchat-runtime": "UNVERIFIED"
+  },
+  "blocker": "Current main proves orchestration but the inspected production job pattern delegates to product-specific buildScript implementations. No compatible reusable repository-owned garment builder has been proven for this new back-bridge panel set, so job.json is intentionally not fabricated.",
+  "nextAction": "Prove a reusable current-main garment buildScript compatible with this panel contract, then add schema-valid job.json and execute task candidate for this exact product."
+}
