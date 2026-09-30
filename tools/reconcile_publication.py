@@ -7,12 +7,21 @@ import json
 from pathlib import Path
 
 IMAGE_SUFFIXES = {".png", ".webp", ".jpg", ".jpeg"}
+PRIMARY_VIEW_STEMS = {"front", "primary"}
 
 
 def real_render_exists(workspace: Path) -> bool:
+    """Return true only when a canonical primary garment view exists."""
     for root in (workspace / "Previews", workspace / "Evidence" / "Rejected"):
-        if root.is_dir() and any(p.is_file() and p.suffix.lower() in IMAGE_SUFFIXES for p in root.rglob("*")):
-            return True
+        if not root.is_dir():
+            continue
+        for path in root.rglob("*"):
+            if (
+                path.is_file()
+                and path.suffix.lower() in IMAGE_SUFFIXES
+                and path.stem.lower() in PRIMARY_VIEW_STEMS
+            ):
+                return True
     return False
 
 
