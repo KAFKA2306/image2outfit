@@ -27,6 +27,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: review-console-${{ github.workflow }}-${{ github.ref }}
@@ -137,6 +138,12 @@ jobs:
           )
           PY
 
+      - name: Delete previous publication reconciliation inventory
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/delete_previous_artifacts.py publication-reconciliation
+
       - name: Upload publication reconciliation inventory
         if: always()
         uses: actions/upload-artifact@v4
@@ -144,4 +151,5 @@ jobs:
           name: publication-reconciliation
           path: publication-reconciliation.json
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 1
+          overwrite: true
