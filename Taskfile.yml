@@ -6,7 +6,7 @@ tasks:
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
-        python tools/reconcile_publication.py
+        python tools/manage.py publication reconcile
 
   plan:
     desc: Resolve and print the selected modular toolchain without executing stages.
