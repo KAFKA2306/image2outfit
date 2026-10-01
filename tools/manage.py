@@ -233,11 +233,7 @@ def _avatar_cloth(outfits: list[str] | None, force: bool = False) -> int:
         ]
         if force:
             command.append("--force")
-        result = subprocess.run(
-            command,
-            cwd=ROOT,
-            check=False,
-        )
+        result = subprocess.run(command, cwd=ROOT, check=False)
         failed = failed or result.returncode != 0
     return 1 if failed else 0
 
@@ -322,9 +318,7 @@ def _experiment_matrix(path_text: str) -> int:
         "include": [
             {
                 "method": method_id,
-                "runner": str(
-                    by_id.get(method_id, {}).get("runner") or "ubuntu-latest"
-                ),
+                "runner": str(by_id.get(method_id, {}).get("runner") or "ubuntu-latest"),
             }
             for method_id in methods
         ]
@@ -380,6 +374,20 @@ def build_parser() -> argparse.ArgumentParser:
 
     dbt = commands.add_parser("dbt")
     dbt.add_argument("dbt_action", choices=("extract", "build", "test", "check"))
+
+    publication = commands.add_parser("publication")
+    publication_commands = publication.add_subparsers(
+        dest="publication_command", required=True
+    )
+    reconcile = publication_commands.add_parser("reconcile")
+    reconcile.add_argument(
+        "--console",
+        default=".image2outfit/review-console/review-console.json",
+    )
+    reconcile.add_argument(
+        "--output",
+        default=".image2outfit/review-console/publication-reconciliation.json",
+    )
 
     improve = commands.add_parser("improve")
     improve.add_argument("--product", required=True)
@@ -456,6 +464,18 @@ def main() -> int:
         return _product(options.command, options.product)
     if options.command == "dbt":
         return _dbt(options.dbt_action)
+    if options.command == "publication":
+        if options.publication_command == "reconcile":
+            return _run(
+                "reconcile_publication.py",
+                "--root",
+                str(ROOT),
+                "--console",
+                options.console,
+                "--output",
+                options.output,
+            )
+        raise AssertionError(options.publication_command)
     if options.command == "improve":
         if options.max_steps < 1:
             print("--max-steps must be >= 1", file=sys.stderr)
