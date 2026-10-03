@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-petal-hem-tunic-shorts-set",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "designRevision": "v1-petal-panel-prototype",
+  "panels": [
+    "tunic_front_L","tunic_front_R","tunic_back","sleeve_L","sleeve_R","inner_front","inner_back",
+    "shorts_front_L","shorts_front_R","shorts_back_L","shorts_back_R","waistband_outer","waistband_inner",
+    "petal_A","petal_B","petal_C","petal_D","petal_E","overlap_flap_R"
+  ],
+  "separateGeometry": ["petal_A","petal_B","petal_C","petal_D","petal_E","overlap_flap_R"],
+  "priorityFitZones": ["shoulders","elbows","waist","hips","crotch","petal_roots"],
+  "requiredPoses": ["neutral","arms-up","arm-cross","crouch","sit","prone"],
+  "releaseBoundary": "Technical manufacturing only; no merge, release, deployment, or BOOTH publication in this workline.",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Petal hem is structured and weight-driven for first technical pass.",
+    "reason": "The compact bounded silhouette does not require cloth simulation to establish technical fit or product identity."
+  }
+}

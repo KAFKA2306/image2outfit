@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-petal-hem-tunic-shorts-set",
+  "productName": "Petal Hem Tunic Shorts Set for SiroinoSotai_PC",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Prefab/PetalHemTunic.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Prefab/SiroinoSotai_PetalHemTunic.prefab",
+  "previewPath": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/README.md",
+  "sourceJobPath": "config/products/siroino-petal-hem-tunic-shorts-set/job.json",
+  "productBuildScript": "tools/run_garment_pipeline.py",
+  "designRevision": "v1-petal-panel-prototype",
+  "sourceReference": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/References/petal-hem-tunic-manufacturing-sheet.svg",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-petal-hem-tunic-shorts-set/pipeline-state.json",
+    "lastAttempt": {"result":"PROTOTYPE_CHECKPOINT_CREATED","visualRevision":"v1-petal-panel-prototype","workflowRun":null,"review":null},
+    "blockers": [
+      "Prototype OBJ has not been imported, fitted or weighted to Siroino in Blender.",
+      "Blend/FBX/Prefab/five-view/six-pose evidence and Unity/VRChat evidence are not yet produced."
+    ]
+  },
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "UNVERIFIED",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "UNVERIFIED",
+    "clothSimulation": "NOT_APPLICABLE",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "tenAxisAudit": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "researchTrial": "DECLARED",
+    "unityImport": "UNVERIFIED",
+    "unitySaveReload": "UNVERIFIED",
+    "prefabReload": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatBuildTest": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "manufacturingReference": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/References/petal-hem-tunic-manufacturing-sheet.svg",
+    "prototypeObj": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Source/Prototype/petal-hem-tunic.obj",
+    "prototypeMtl": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Source/Prototype/petal-hem-tunic.mtl",
+    "patternSpec": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Source/Patterns/pattern-spec.json",
+    "blend": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Source/Blender/PetalHemTunic.blend",
+    "fbx": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Models/PetalHemTunic.fbx",
+    "prefab": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Prefab/PetalHemTunic.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-petal-hem-tunic-shorts-set/Prefab/SiroinoSotai_PetalHemTunic.prefab"
+  }
+}

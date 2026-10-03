@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-petal-hem-tunic-shorts-set",
+  "designRevision": "v1-petal-panel-prototype",
+  "units": "normalized-manufacturing-prototype",
+  "heroDetail": "five overlapping petal hem panels plus wearer-right overlap_flap_R",
+  "panels": [
+    {"name":"tunic_front_L","material":"MAT_Petal_Tunic","role":"outer"},
+    {"name":"tunic_front_R","material":"MAT_Petal_Tunic","role":"outer"},
+    {"name":"tunic_back","material":"MAT_Petal_Tunic","role":"outer"},
+    {"name":"sleeve_L","material":"MAT_Petal_Tunic","role":"outer"},
+    {"name":"sleeve_R","material":"MAT_Petal_Tunic","role":"outer"},
+    {"name":"inner_front","material":"MAT_Petal_Inner","role":"inner"},
+    {"name":"inner_back","material":"MAT_Petal_Inner","role":"inner"},
+    {"name":"shorts_front_L","material":"MAT_Petal_Shorts","role":"lower"},
+    {"name":"shorts_front_R","material":"MAT_Petal_Shorts","role":"lower"},
+    {"name":"shorts_back_L","material":"MAT_Petal_Shorts","role":"lower"},
+    {"name":"shorts_back_R","material":"MAT_Petal_Shorts","role":"lower"},
+    {"name":"waistband_outer","material":"MAT_Petal_Shorts","role":"support"},
+    {"name":"waistband_inner","material":"MAT_Petal_Shorts","role":"support"},
+    {"name":"petal_A","material":"MAT_Petal_Inner","role":"hero"},
+    {"name":"petal_B","material":"MAT_Petal_Inner","role":"hero"},
+    {"name":"petal_C","material":"MAT_Petal_Inner","role":"hero"},
+    {"name":"petal_D","material":"MAT_Petal_Inner","role":"hero"},
+    {"name":"petal_E","material":"MAT_Petal_Inner","role":"hero"},
+    {"name":"overlap_flap_R","material":"MAT_Petal_Accent","role":"hero-accent"}
+  ],
+  "uvPolicy": {"uv0Required":true,"heroIslandsUnique":true,"mirrorHero":false},
+  "topologyPolicy": {"panelFirst":true,"quadDominantDeformationZones":true,"lod0TriangleTargetMax":24000},
+  "preserveOrder": ["silhouette","petal-rhythm","overlap-flap","square-neckline","sleeve-profile","micro-trim"]
+}
