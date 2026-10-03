@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-noctelle-shrug-dress-set",
+  "productName": "Noctelle Shrug Dress Set for SiroinoSotai_PC",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-noctelle-panel-prototype",
+  "renderLoopRevision": "v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-noctelle-shrug-dress-set",
+  "productManifestPath": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/ProductManifest.json",
+  "buildScript": "tools/run_garment_pipeline.py",
+  "blendPath": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Source/Blender/NoctelleShrugDress.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Models/NoctelleShrugDress.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Prefab/NoctelleShrugDress.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Prefab/SiroinoSotai_NoctelleShrugDress.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-noctelle-shrug-dress-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/References/noctelle-shrug-dress-manufacturing-sheet.webp",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Source/Patterns/pattern-spec.json",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Source/Prototype/noctelle-shrug-dress.obj",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Source/Prototype/noctelle-shrug-dress.mtl",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Source/Blender/NoctelleShrugDress.blend",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Models/NoctelleShrugDress.fbx",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Prefab/NoctelleShrugDress.prefab",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Prefab/SiroinoSotai_NoctelleShrugDress.prefab",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/front.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/back.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/left.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/right.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/prone.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-noctelle-shrug-dress-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-noctelle-shrug-dress-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-noctelle-shrug-dress-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-noctelle-shrug-dress-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 3,
+    "materialRoles": [
+      {"material": "MAT_Noctelle_Dress", "role": "fabric"},
+      {"material": "MAT_Noctelle_Shrug", "role": "fabric"},
+      {"material": "MAT_Noctelle_Trim", "role": "trim"},
+      {"material": "MAT_Noctelle_Metal", "role": "metal"}
+    ]
+  }
+}
