@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-kite-panel-cardigan-dress-set",
+  "construction": "panel-sewn",
+  "parts": [
+    {"id":"cardigan_front_L","role":"garment"},{"id":"cardigan_front_R","role":"garment"},{"id":"cardigan_back","role":"garment"},
+    {"id":"sleeve_L","role":"garment"},{"id":"sleeve_R","role":"garment"},{"id":"dress_front","role":"garment"},{"id":"dress_back","role":"garment"},
+    {"id":"skirt_front","role":"garment"},{"id":"skirt_back","role":"garment"},
+    {"id":"kite_panel_A","role":"hero"},{"id":"kite_panel_B","role":"hero"},{"id":"kite_panel_C","role":"hero"},{"id":"kite_panel_D","role":"hero"},{"id":"overlap_leaf_R","role":"hero"}
+  ],
+  "heroDetail": {"requiredGeometry":["kite_panel_A","kite_panel_B","kite_panel_C","kite_panel_D","overlap_leaf_R"]},
+  "uvPolicy": "UV0 explicit islands; all kite panels and overlap leaf unique",
+  "lod0TriangleTargetMax": 22000
+}

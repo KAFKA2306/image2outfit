@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-kite-panel-cardigan-dress-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "issue-504-v1",
+  "panels": [
+    "cardigan_front_L",
+    "cardigan_front_R",
+    "cardigan_back",
+    "sleeve_L",
+    "sleeve_R",
+    "cuff_L",
+    "cuff_R",
+    "dress_front",
+    "dress_back",
+    "waist_facing",
+    "skirt_front",
+    "skirt_back",
+    "kite_panel_A",
+    "kite_panel_B",
+    "kite_panel_C",
+    "kite_panel_D",
+    "overlap_leaf_R"
+  ],
+  "separateGeometry": [
+    "kite_panel_A",
+    "kite_panel_B",
+    "kite_panel_C",
+    "kite_panel_D",
+    "overlap_leaf_R"
+  ],
+  "priorityFitZones": ["shoulder", "elbow", "waist", "hip", "upper_thigh"],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "Issue #504 first technical pass",
+    "reason": "Structured short cardigan, sheath dress and bounded kite panels are intended to pass first through skinned panel geometry without mandatory cloth simulation."
+  },
+  "releaseBoundary": "No merge, release, deployment, or BOOTH publication in Issue #504 workline."
+}
