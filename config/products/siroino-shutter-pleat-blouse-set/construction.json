@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-shutter-pleat-blouse-set",
+  "profile": "panel-sewn",
+  "target": "Siroino",
+  "designRevision": "shutter-pleat-v1",
+  "panels": ["blouse_front_L/R", "blouse_back", "sleeve_L/R", "cuff_base_L/R", "trouser_front_L/R", "trouser_back_L/R", "waistband_outer/inner", "ankle_facing_L/R"],
+  "separateGeometry": ["wrist_L_pleat_A", "wrist_L_pleat_B", "wrist_L_pleat_C", "wrist_R_pleat_A", "wrist_R_pleat_B", "wrist_R_pleat_C", "ankle_L_pleat_A", "ankle_L_pleat_B", "ankle_L_pleat_C", "ankle_R_pleat_A", "ankle_R_pleat_B", "ankle_R_pleat_C"],
+  "priorityFitZones": ["shoulder", "elbow", "waist", "hip", "knee", "ankle"],
+  "requiredPoses": ["A-pose", "arms-forward", "elbow-flex", "seated", "deep-knee-bend", "wide-step"],
+  "releaseBoundary": "Technical acceptance requires real candidate, Blender fit/weight/export and required evidence; this prototype alone is not release-ready.",
+  "clothSimulation": {"applicability": "NOT_REQUIRED", "components": [], "evidence": "Prototype uses bounded structured panels only.", "reason": "No long free-hanging cloth panel is required for v1 silhouette."}
+}
