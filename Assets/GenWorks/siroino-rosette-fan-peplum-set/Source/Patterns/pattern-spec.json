@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-rosette-fan-peplum-set",
+  "units": "m",
+  "authority": "manufacturing-reference-and-panel-prototype",
+  "panels": ["jacket_front_L","jacket_front_R","jacket_back","inner_front","inner_back","sleeve_L","sleeve_R","shorts_front_L","shorts_front_R","shorts_back_L","shorts_back_R","waistband","fan_A","fan_B","fan_C","fan_D","fan_E","fan_F","overlap_flap_R"],
+  "heroDetail": {"type":"radial-fan-peplum","panels":["fan_A","fan_B","fan_C","fan_D","fan_E","fan_F"],"overlap":"overlap_flap_R","requireRealGeometry":true},
+  "uv": {"channel":"UV0","prototypeCoordinatesPresent":true,"heroPanelsUniqueNamedSurfaces":true},
+  "topology": {"prototype":"panel-surfaces","productionTarget":"quad-dominant deformation zones","lod0TriangleBudget":24000},
+  "materials": {"jacket":"MAT_Rosette_Jacket","innerFan":"MAT_Rosette_InnerFan","shorts":"MAT_Rosette_Shorts","accent":"MAT_Rosette_Accent"},
+  "rigging": {"armature":"reuse Siroino","extraDeformBones":[],"fanWeightIntent":"pelvis/hips bounded blend"},
+  "physics": {"applicability":"NOT_REQUIRED","reason":"structured bounded peplum; first pass must validate weight-driven fit"}
+}
