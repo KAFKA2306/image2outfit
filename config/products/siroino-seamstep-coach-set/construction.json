@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-seamstep-coach-set",
+  "profile": "panel-sewn",
+  "target": "siroino-v1.0",
+  "designRevision": "v1-seamstep-coach",
+  "panels": [
+    "jacket_front_L",
+    "jacket_front_R",
+    "jacket_back",
+    "sleeve_L",
+    "sleeve_R",
+    "inner_front",
+    "inner_back",
+    "short_front_L",
+    "short_front_R",
+    "short_back_L",
+    "short_back_R",
+    "waistband_outer",
+    "waistband_inner",
+    "collar_L",
+    "collar_R",
+    "jacket_facing",
+    "rear_welt_facing_L",
+    "rear_welt_facing_R"
+  ],
+  "separateGeometry": [
+    "step_L_A",
+    "step_L_B",
+    "step_L_C",
+    "step_R_A",
+    "step_R_B",
+    "step_R_C",
+    "step_facing_L_A",
+    "step_facing_L_B",
+    "step_facing_L_C",
+    "step_facing_R_A",
+    "step_facing_R_B",
+    "step_facing_R_C"
+  ],
+  "priorityFitZones": ["shoulder", "elbow", "waist", "hip", "crotch", "knee"],
+  "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+  "releaseBoundary": "technical-acceptance-only",
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "UNVERIFIED until canonical candidate runtime executes",
+    "reason": "Structured coach jacket, Bermuda shorts and faced step leaves are weight-driven in v1."
+  }
+}
