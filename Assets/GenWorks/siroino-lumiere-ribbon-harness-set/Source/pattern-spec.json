@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lumiere-ribbon-harness-set",
+  "construction": "panel-sewn",
+  "parts": [
+    {"id":"inner_front","role":"garment"},
+    {"id":"inner_back","role":"garment"},
+    {"id":"jacket_front_L","role":"garment"},
+    {"id":"jacket_front_R","role":"garment"},
+    {"id":"jacket_back","role":"garment"},
+    {"id":"sleeve_L","role":"garment"},
+    {"id":"sleeve_R","role":"garment"},
+    {"id":"skirt_front","role":"garment"},
+    {"id":"skirt_back","role":"garment"},
+    {"id":"harness_front_L","role":"hero"},
+    {"id":"harness_front_R","role":"hero"},
+    {"id":"harness_back_L","role":"hero"},
+    {"id":"harness_back_R","role":"hero"},
+    {"id":"harness_center_ring","role":"hero"},
+    {"id":"side_ribbon_L","role":"garment"},
+    {"id":"side_ribbon_R","role":"garment"}
+  ],
+  "heroDetail": {"requiredGeometry":["harness_front_L","harness_front_R","harness_back_L","harness_back_R","harness_center_ring"]},
+  "uvPolicy": "UV0 explicit islands; hero harness unique",
+  "lod0TriangleTargetMax": 24000
+}
