@@ -34,6 +34,28 @@ tasks:
         --execute
         --checkpoint-output ".image2outfit/products/{{.PRODUCT}}/pipeline-state.json"
 
+  batch:status:
+    desc: Summarize the existing per-product execution states for a tracked batch.
+    vars:
+      BATCH: '{{.BATCH | default "config/batch/tracked-requests.json"}}'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py batch status --manifest "{{.BATCH}}"
+
+  batch:run:
+    desc: Serially execute or resume every canonical request in a tracked batch.
+    vars:
+      BATCH: '{{.BATCH | default "config/batch/tracked-requests.json"}}'
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py batch run --manifest "{{.BATCH}}"
+
   candidate:
     desc: Build a candidate after validating its construction contract.
     requires:
