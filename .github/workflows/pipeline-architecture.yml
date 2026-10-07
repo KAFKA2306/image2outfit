@@ -13,6 +13,16 @@ on:
       - tests/**
       - config/pipeline/**
       - config/pipeline-profiles/**
+      - config/batch/**
+      - ops/docker/**
+      - tools/batch_execution.py
+      - tools/run_product_execution.py
+      - Taskfile.yml
+      - config/batch/**
+      - ops/docker/**
+      - tools/batch_execution.py
+      - tools/run_product_execution.py
+      - Taskfile.yml
       - examples/pipeline-request.example.json
       - .github/workflows/pipeline-architecture.yml
   push:
@@ -60,6 +70,16 @@ jobs:
         run: >-
           uv run --locked --no-default-groups
           python -m unittest discover -s tests -v
+
+      - name: Build Python batch coordinator image
+        run: docker compose -f ops/docker/compose.batch.yml build batch
+
+      - name: Smoke-test Docker batch status path
+        run: >-
+          docker compose -f ops/docker/compose.batch.yml run --rm batch
+          python tools/manage.py batch status
+          --manifest config/batch/tracked-requests.json
+        continue-on-error: true
 
       - name: Ruff reusable core and adapters
         run: >-
