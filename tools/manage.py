@@ -21,6 +21,7 @@ import improvement_loop  # noqa: E402
 import method_selection  # noqa: E402
 import runtime_paths  # noqa: E402
 import avatar_workflow  # noqa: E402
+import batch_execution  # noqa: E402
 
 AUDITS = {
     "toolchain": "audit_toolchain.py",
@@ -389,6 +390,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=".image2outfit/review-console/publication-reconciliation.json",
     )
 
+    batch = commands.add_parser(
+        "batch",
+        help="Inspect or execute a serialized batch of canonical product requests.",
+    )
+    batch_commands = batch.add_subparsers(dest="batch_command", required=True)
+    for name in ("status", "run"):
+        batch_command = batch_commands.add_parser(name)
+        batch_command.add_argument(
+            "--manifest",
+            default="config/batch/tracked-requests.json",
+        )
+
     improve = commands.add_parser("improve")
     improve.add_argument("--product", required=True)
     improve.add_argument("--max-steps", type=int, default=8)
@@ -476,6 +489,18 @@ def main() -> int:
                 options.output,
             )
         raise AssertionError(options.publication_command)
+    if options.command == "batch":
+        try:
+            report, return_code = batch_execution.run_batch(
+                ROOT,
+                options.manifest,
+                execute=options.batch_command == "run",
+            )
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"image2outfit batch: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return return_code
     if options.command == "improve":
         if options.max_steps < 1:
             print("--max-steps must be >= 1", file=sys.stderr)
