@@ -75,11 +75,20 @@ jobs:
         run: docker compose -f ops/docker/compose.batch.yml build batch
 
       - name: Smoke-test Docker batch status path
-        run: >-
-          docker compose -f ops/docker/compose.batch.yml run --rm batch
-          python tools/manage.py batch status
-          --manifest config/batch/tracked-requests.json
-        continue-on-error: true
+        shell: bash
+        run: |
+          set -uo pipefail
+          output="$RUNNER_TEMP/batch-status.json"
+          set +e
+          docker compose -f ops/docker/compose.batch.yml run --rm batch \
+            python tools/manage.py batch status \
+            --manifest config/batch/tracked-requests.json >"$output"
+          code=$?
+          set -e
+          cat "$output"
+          test "$code" -eq 1
+          grep -F '"status": "FAILED"' "$output"
+          grep -F '"NO_STATE": 3' "$output"
 
       - name: Ruff reusable core and adapters
         run: >-
