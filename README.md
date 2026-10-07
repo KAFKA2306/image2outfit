@@ -85,6 +85,15 @@ task candidate PRODUCT=<slug>
 task improve PRODUCT=<slug>
 ```
 
+複数のcanonical requestを直列で実行・再開する場合は次を使用します。成功済み製品は既存terminal checkpointを再利用し、失敗製品は既存checkpointから再開します。
+
+```powershell
+task batch:status
+task batch:run
+```
+
+Docker coordinatorの境界と実行方法は [`ops/docker/README.md`](ops/docker/README.md) を参照してください。
+
 レビュー済み candidate を release validator に通す場合は次を使用します。
 
 ```powershell
