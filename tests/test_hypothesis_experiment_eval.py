@@ -47,9 +47,7 @@ class HypothesisExperimentEvaluationTests(unittest.TestCase):
             "semanticMasks": [],
         }
         if route == "C" and status == "PASS":
-            record["semanticMasks"] = [
-                {"role": "wrinkle", "artifactSha256": "e" * 64}
-            ]
+            record["semanticMasks"] = [{"role": "wrinkle", "artifactSha256": "e" * 64}]
             record["maskConsumptionReceipts"] = [
                 {
                     "maskArtifactSha256": "e" * 64,
@@ -128,7 +126,9 @@ class HypothesisExperimentEvaluationTests(unittest.TestCase):
             normalized["canonicalQualityReceipt"]["candidateArtifactSha256"],
         )
 
-    def test_passing_c_rejects_authored_output_missing_from_final_candidate(self) -> None:
+    def test_passing_c_rejects_authored_output_missing_from_final_candidate(
+        self,
+    ) -> None:
         c = self.record("C", elapsed=70, findings=1)
         c["finalArtifactLineage"]["includedAuthoredArtifactSha256s"] = ["3" * 64]
         with self.assertRaisesRegex(ValueError, "missing authored artifacts"):

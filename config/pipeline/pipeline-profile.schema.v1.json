@@ -7,6 +7,17 @@
   "properties": {
     "schemaVersion": {"type": "integer", "const": 1},
     "profileId": {"type": "string", "minLength": 1},
+    "selectionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "agentCanProposeRequirements", "agentCanBypassContracts", "tieBreaker"],
+      "properties": {
+        "mode": {"const": "capability-contract-then-stable-priority"},
+        "agentCanProposeRequirements": {"const": true},
+        "agentCanBypassContracts": {"const": false},
+        "tieBreaker": {"const": ["priority", "toolName"]}
+      }
+    },
     "auditContract": {
       "type": "object",
       "additionalProperties": false,

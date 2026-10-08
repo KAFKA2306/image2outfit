@@ -189,9 +189,16 @@ class PipelineRequestSchemaTests(unittest.TestCase):
                 mock.patch.object(runner, "load_profile") as load_profile,
                 mock.patch.object(runner, "pipeline_source_fingerprint") as fingerprint,
                 mock.patch.object(runner, "build_registry") as build_registry,
+                mock.patch.object(runner, "_emit_failure", return_value=1) as failure,
             ):
-                with self.assertRaisesRegex(ValueError, "invalid pipeline request"):
-                    runner.main()
+                self.assertEqual(runner.main(), 1)
+                self.assertEqual(
+                    failure.call_args.kwargs["error_code"], "INVALID_PIPELINE_INPUT"
+                )
+                self.assertEqual(failure.call_args.kwargs["phase"], "request")
+                self.assertIn(
+                    "invalid pipeline request", str(failure.call_args.kwargs["exc"])
+                )
                 load_profile.assert_not_called()
                 fingerprint.assert_not_called()
                 build_registry.assert_not_called()
@@ -204,13 +211,24 @@ class PipelineRequestSchemaTests(unittest.TestCase):
                 "tools/tool.py": "pass\n",
                 "config/products/demo/job.json": "{}\n",
                 "config/pipeline/request.json": "{}\n",
-                "config/pipeline/profile.json": "{}\n",
+                "config/pipeline/profile.json": json.dumps(
+                    {
+                        "auditContract": {
+                            "recordSchema": "config/pipeline/stage-audit-record.schema.v1.json",
+                            "manifestSchema": "config/pipeline/run-audit-manifest.schema.v1.json",
+                        }
+                    }
+                ),
                 "config/pipeline/pipeline-request.schema.v1.json": "{}\n",
                 "config/pipeline/visual-quality-defaults.v1.json": "{}\n",
                 "config/toolchain-lock.json": "{}\n",
                 "pyproject.toml": "[project]\nname='demo'\n",
                 "uv.lock": "version = 1\n",
             }
+            for relative in source_fingerprint.PRODUCTION_RUNTIME_DEPENDENCIES:
+                files.setdefault(relative, "{}\n")
+            files["config/pipeline/stage-audit-record.schema.v1.json"] = "{}\n"
+            files["config/pipeline/run-audit-manifest.schema.v1.json"] = "{}\n"
             for relative, content in files.items():
                 path = root / relative
                 path.parent.mkdir(parents=True, exist_ok=True)

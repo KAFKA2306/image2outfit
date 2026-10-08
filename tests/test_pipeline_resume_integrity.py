@@ -207,7 +207,12 @@ class PipelineResumeIntegrityTests(unittest.TestCase):
                 patch.object(
                     runner,
                     "load_profile",
-                    return_value={"profileId": expected_identity()["profileId"]},
+                    return_value=json.loads(
+                        (
+                            ROOT
+                            / "config/pipeline-profiles/garment-reconstruction-v1.json"
+                        ).read_text()
+                    ),
                 ),
                 patch.object(
                     runner,
@@ -215,9 +220,14 @@ class PipelineResumeIntegrityTests(unittest.TestCase):
                     return_value=SOURCE_FINGERPRINT,
                 ),
                 patch.object(runner, "build_registry") as build_registry,
+                patch.object(runner, "_emit_failure", return_value=1) as failure,
             ):
-                with self.assertRaisesRegex(ValueError, "output mismatch"):
-                    runner.main()
+                self.assertEqual(runner.main(), 1)
+                self.assertEqual(
+                    failure.call_args.kwargs["error_code"], "INVALID_RESUME_STATE"
+                )
+                self.assertEqual(failure.call_args.kwargs["phase"], "resume")
+                self.assertIn("output mismatch", str(failure.call_args.kwargs["exc"]))
         build_registry.assert_not_called()
 
 

@@ -134,28 +134,55 @@ class PipelineStateSchemaTests(unittest.TestCase):
                 patch.object(
                     runner,
                     "load_profile",
-                    return_value={"profileId": "garment-reconstruction-v1"},
+                    return_value=json.loads(
+                        (
+                            ROOT
+                            / "config/pipeline-profiles/garment-reconstruction-v1.json"
+                        ).read_text()
+                    ),
                 ),
                 patch.object(
                     runner, "pipeline_source_fingerprint", return_value="a" * 64
                 ),
                 patch.object(runner, "build_registry") as build_registry,
-                self.assertRaisesRegex(ValueError, "run_id"),
+                patch.object(runner, "_emit_failure", return_value=1) as failure,
             ):
-                runner.main()
+                self.assertEqual(runner.main(), 1)
+                self.assertEqual(
+                    failure.call_args.kwargs["error_code"], "INVALID_RESUME_STATE"
+                )
+                self.assertEqual(failure.call_args.kwargs["phase"], "resume")
+                self.assertIn("run_id", str(failure.call_args.kwargs["exc"]))
             build_registry.assert_not_called()
 
     def test_pipeline_schema_bytes_participate_in_source_fingerprint(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
+            profile = {
+                "profileId": "fixture",
+                "auditContract": {
+                    "recordSchema": "config/pipeline/stage-audit-record.schema.v1.json",
+                    "manifestSchema": "config/pipeline/run-audit-manifest.schema.v1.json",
+                    "storageRoot": ".image2outfit/audit/{productId}/{runId}",
+                },
+            }
             paths = {
                 "src/image2outfit/dummy.py": "pass\n",
                 "tools/dummy.py": "pass\n",
                 "config/products/schema-fixture/job.json": "{}\n",
                 "config/products/schema-fixture/request.json": "{}\n",
-                "config/pipeline-profiles/profile.json": "{}\n",
+                "config/pipeline-profiles/profile.json": json.dumps(profile),
+                "config/release-policy.json": "{}\n",
+                "config/genworks-handoff-policy.json": "{}\n",
+                "contracts/quality/quality-spec.json": "{}\n",
+                "config/job.schema.v2.json": "{}\n",
+                "config/products/construction.schema.v1.json": "{}\n",
                 "config/pipeline/visual-quality-defaults.v1.json": "{}\n",
                 "config/pipeline/pipeline-state.schema.v1.json": '{"version":1}\n',
+                "config/pipeline/pipeline-request.schema.v1.json": "{}\n",
+                "config/pipeline/pipeline-profile.schema.v1.json": "{}\n",
+                "config/pipeline/stage-audit-record.schema.v1.json": "{}\n",
+                "config/pipeline/run-audit-manifest.schema.v1.json": "{}\n",
                 "config/toolchain-lock.json": "{}\n",
                 "pyproject.toml": "[project]\nname='fixture'\n",
                 "uv.lock": "fixture\n",
