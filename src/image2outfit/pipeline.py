@@ -413,6 +413,24 @@ def _execute_stage(
     }
 
 
+def _transition_stage(
+    state: PipelineState,
+    stage: PipelineStage,
+    registry: ToolRegistry,
+    checkpoint: CheckpointCallback | None,
+) -> PipelineState:
+    """Execute one real stage transition and durably expose the resulting state."""
+    if state.get("status") == "FAILED" or stage.value in state.get(
+        "completed_stages", []
+    ):
+        return state
+    current = _execute_stage(state, stage, registry)
+    validate_pipeline_state(current)
+    if checkpoint is not None:
+        checkpoint(current)
+    return current
+
+
 def run_pipeline(
     state: PipelineState,
     registry: ToolRegistry,
@@ -426,15 +444,17 @@ def run_pipeline(
     completed = validate_pipeline_state(current)
     current = _rebuild_reused_prefix(current, registry)
     for stage in PIPELINE_STAGES[len(completed) :]:
-        current = _execute_stage(current, stage, registry)
-        if checkpoint is not None:
-            checkpoint(current)
+        current = _transition_stage(current, stage, registry, checkpoint)
         if current.get("status") == "FAILED":
             break
     return current
 
 
-def build_langchain(registry: ToolRegistry):
+def build_langchain(
+    registry: ToolRegistry,
+    *,
+    checkpoint: CheckpointCallback | None = None,
+):
     """Build the same canonical stage sequence as a LangChain runnable."""
     missing = registry.missing(PIPELINE_STAGES)
     if missing:
@@ -450,19 +470,28 @@ def build_langchain(registry: ToolRegistry):
     chain = RunnableLambda(lambda state: _rebuild_reused_prefix(state, registry))
     for stage in PIPELINE_STAGES:
         chain = chain | RunnableLambda(
-            lambda state, current_stage=stage: _execute_stage(
-                state, current_stage, registry
+            lambda state, current_stage=stage: _transition_stage(
+                state, current_stage, registry, checkpoint
             )
         )
     return chain
 
 
-def run_langchain(state: PipelineState, registry: ToolRegistry) -> PipelineState:
+def run_langchain(
+    state: PipelineState,
+    registry: ToolRegistry,
+    *,
+    checkpoint: CheckpointCallback | None = None,
+) -> PipelineState:
     validate_pipeline_state(state)
-    return build_langchain(registry).invoke(state)
+    return build_langchain(registry, checkpoint=checkpoint).invoke(state)
 
 
-def build_langgraph(registry: ToolRegistry):
+def build_langgraph(
+    registry: ToolRegistry,
+    *,
+    checkpoint: CheckpointCallback | None = None,
+):
     """Compile the same stage contract with LangGraph when it is available."""
     missing = registry.missing(PIPELINE_STAGES)
     if missing:
@@ -483,8 +512,8 @@ def build_langgraph(registry: ToolRegistry):
     for stage in PIPELINE_STAGES:
         builder.add_node(
             stage.value,
-            lambda state, current_stage=stage: _execute_stage(
-                state, current_stage, registry
+            lambda state, current_stage=stage: _transition_stage(
+                state, current_stage, registry, checkpoint
             ),
         )
     builder.add_edge(START, "resume-prefix")
@@ -495,6 +524,11 @@ def build_langgraph(registry: ToolRegistry):
     return builder.compile()
 
 
-def run_langgraph(state: PipelineState, registry: ToolRegistry) -> PipelineState:
+def run_langgraph(
+    state: PipelineState,
+    registry: ToolRegistry,
+    *,
+    checkpoint: CheckpointCallback | None = None,
+) -> PipelineState:
     validate_pipeline_state(state)
-    return build_langgraph(registry).invoke(state)
+    return build_langgraph(registry, checkpoint=checkpoint).invoke(state)
