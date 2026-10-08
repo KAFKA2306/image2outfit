@@ -12,6 +12,7 @@
     return href && !href.toLowerCase().startsWith('javascript:') ? esc(href) : '';
   };
   const stateLabel = (state) => ({
+    COMPLETE: '制作完了',
     RELEASED: '公開準備済み',
     TECHNICAL_READY: '技術確認済み',
     HUMAN_REVIEW_PENDING: 'レビュー待ち',
@@ -132,8 +133,10 @@
               <span class="status-pill" data-state="${esc(product.state)}">${esc(stateLabel(product.state))}</span>
               <span class="status-pill">${images.length} renders</span>
             </div>
-            <p class="product-summary">実際のレンダリングを最初に確認し、必要なときだけ制作状態・品質証拠へ進める構成です。画像はこの製品に紐づく正準成果物だけを表示します。</p>
+            <p class="product-summary">衣装の正面・背面・着用ポーズを紹介しています。画像セットを保存できます。衣装本体は配布の確認が済み次第、ここからダウンロードできます。</p>
+            <p>${(product.downloads || []).some(row => row.kind === 'outfit') ? '衣装パッケージを配布中。内容と導入条件は同梱の説明をご確認ください。' : '試作紹介。衣装本体は配布準備中・VRChat動作未確認です。'}</p>
             <div class="primary-actions">
+              ${(product.downloads || []).map(row => `<a class="primary-action" href="${safeHref(row.href)}" download>${esc(row.label)}</a>`).join('')}
               ${images.length ? '<a class="primary-action" href="#renders">すべてのレンダリングを見る</a>' : ''}
               ${manifestHref ? `<a class="primary-action secondary-action" href="${manifestHref}">制作データを見る</a>` : ''}
               ${reviewHref ? `<a class="primary-action secondary-action" href="${reviewHref}" target="_blank" rel="noreferrer">レビューを開く ↗</a>` : ''}

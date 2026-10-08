@@ -483,7 +483,7 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
     hrefs: set[str] = set()
     for product in data.get("products", []):
         hrefs.add(product["manifest_href"])
-        for key in ("assets", "gates", "evidence"):
+        for key in ("assets", "gates", "evidence", "downloads"):
             for item in product.get(key, []):
                 href = item.get("href")
                 if href and not href.startswith(("https://", "http://")):
