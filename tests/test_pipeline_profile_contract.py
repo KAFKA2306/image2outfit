@@ -17,7 +17,9 @@ from pipeline_profile_contract import load_profile
 
 class PipelineProfileContractTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.profile_path = ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json"
+        self.profile_path = (
+            ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json"
+        )
         self.profile = json.loads(self.profile_path.read_text(encoding="utf-8"))
 
     def _assert_rejected(self, profile: dict) -> None:

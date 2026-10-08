@@ -45,7 +45,9 @@ def _type_matches(value: Any, expected: str) -> bool:
         "array": lambda item: isinstance(item, list),
         "string": lambda item: isinstance(item, str),
         "integer": lambda item: isinstance(item, int) and not isinstance(item, bool),
-        "number": lambda item: isinstance(item, (int, float)) and not isinstance(item, bool),
+        "number": lambda item: (
+            isinstance(item, (int, float)) and not isinstance(item, bool)
+        ),
         "boolean": lambda item: isinstance(item, bool),
         "null": lambda item: item is None,
     }
@@ -87,7 +89,9 @@ def validate_schema(value: Any, schema: dict[str, Any], *, path: str) -> None:
             if isinstance(maximum, int) and len(item) > maximum:
                 errors.append(f"{location} must contain at most {maximum} items")
             if rule.get("uniqueItems") is True:
-                encoded = [json.dumps(v, sort_keys=True, ensure_ascii=False) for v in item]
+                encoded = [
+                    json.dumps(v, sort_keys=True, ensure_ascii=False) for v in item
+                ]
                 if len(encoded) != len(set(encoded)):
                     errors.append(f"{location} must contain unique items")
             child = rule.get("items")

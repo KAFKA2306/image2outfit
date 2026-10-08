@@ -19,7 +19,11 @@ if str(ROOT / "tools") not in sys.path:
 from contract_io import validate_schema_file
 from image2outfit.audit import sha256_json, validate_stage_records, write_audit_bundle
 from image2outfit.audit_schema import load_audit_schemas
-from image2outfit.failure_contract import failed_state_descriptor, failure_descriptor, stable_cause_code
+from image2outfit.failure_contract import (
+    failed_state_descriptor,
+    failure_descriptor,
+    stable_cause_code,
+)
 from image2outfit.pipeline import (
     PIPELINE_STAGES,
     ExecutionMode,
@@ -284,7 +288,9 @@ def main() -> int:
     try:
         profile_path = _profile_path(args, request)
         profile = load_profile(profile_path)
-        _, record_schema, _, manifest_schema = load_audit_schemas(ROOT, profile["auditContract"])
+        _, record_schema, _, manifest_schema = load_audit_schemas(
+            ROOT, profile["auditContract"]
+        )
     except Exception as exc:  # noqa: BLE001 - CLI contract boundary
         return _emit_failure(
             args, error_code="PIPELINE_CONFIGURATION_INVALID", phase="profile", exc=exc

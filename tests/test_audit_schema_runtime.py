@@ -10,7 +10,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from image2outfit.audit import verify_audit_bundle, write_audit_bundle
-from image2outfit.audit_schema import load_audit_schemas, load_schema, resolve_schema_path
+from image2outfit.audit_schema import (
+    load_audit_schemas,
+    load_schema,
+    resolve_schema_path,
+)
 from image2outfit.pipeline import PIPELINE_STAGES, new_pipeline_state, run_pipeline
 from image2outfit.tooling import ToolDescriptor, ToolRegistry
 
@@ -56,17 +60,26 @@ class AuditSchemaRuntimeTests(unittest.TestCase):
 
     def test_profile_declared_schemas_resolve_inside_repository(self) -> None:
         record_schema, manifest_schema = self._schemas()
-        self.assertEqual(record_schema["properties"]["status"]["enum"], ["PLANNED", "PASS", "FAILED"])
-        self.assertEqual(manifest_schema["properties"]["finalStatus"]["enum"], ["PLANNED", "EXECUTED", "FAILED"])
+        self.assertEqual(
+            record_schema["properties"]["status"]["enum"], ["PLANNED", "PASS", "FAILED"]
+        )
+        self.assertEqual(
+            manifest_schema["properties"]["finalStatus"]["enum"],
+            ["PLANNED", "EXECUTED", "FAILED"],
+        )
         with self.assertRaisesRegex(ValueError, "escapes repository"):
             resolve_schema_path(ROOT, "../outside.json", label="audit schema")
         with self.assertRaisesRegex(ValueError, "does not exist"):
-            resolve_schema_path(ROOT, "config/pipeline/missing.schema.json", label="audit schema")
+            resolve_schema_path(
+                ROOT, "config/pipeline/missing.schema.json", label="audit schema"
+            )
 
     def test_unsupported_schema_version_fails_closed(self) -> None:
         with TemporaryDirectory() as temporary:
             path = Path(temporary) / "schema.json"
-            path.write_text(json.dumps({"$schema": "draft-07", "type": "object"}), encoding="utf-8")
+            path.write_text(
+                json.dumps({"$schema": "draft-07", "type": "object"}), encoding="utf-8"
+            )
             with self.assertRaisesRegex(ValueError, "unsupported JSON Schema version"):
                 load_schema(path, label="audit schema")
 
