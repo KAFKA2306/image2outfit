@@ -15,11 +15,16 @@ from typing import Any
 
 import candidate_manifest as candidate_contract
 import method_selection
+import production_contract as contract
 import runtime_paths
 from candidate_orchestrator import _augment_audit, _run_candidate as run_candidate
 from release_orchestrator import _run_release as run_release
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+class CandidateBindingError(RuntimeError):
+    """Raised when a mandatory pre-commit candidate binding cannot be completed."""
 
 
 def _repo_path(root: Path, value: str) -> Path:
@@ -59,6 +64,9 @@ def _load(job_path: Path, root: Path = ROOT) -> tuple[dict[str, Any], dict[str, 
     missing = [key for key in required if key not in job or job[key] in (None, "")]
     if missing:
         raise ValueError(f"job v2 missing: {', '.join(missing)}")
+    validation_errors = contract.validate_job(job, policy, root)
+    if validation_errors:
+        raise ValueError("job contract invalid: " + "; ".join(validation_errors))
     runtime_paths.for_job(root, job)
     return _runtime_job(job, root), policy
 
@@ -126,6 +134,29 @@ def _write_no_go(
     }
     value.update(details)
     candidate_contract.write(paths.reports / "audit.json", value)
+
+
+def _record_binding_failure(
+    job: dict[str, Any],
+    selection: dict[str, Any],
+    error: str,
+    root: Path = ROOT,
+) -> None:
+    artifact = _artifact_path(job, root)
+    audit_path = artifact / "audit.json"
+    audit = candidate_contract.read(audit_path)
+    audit.setdefault("schemaVersion", 2)
+    audit.setdefault("phase", "candidate")
+    audit.setdefault("jobId", job.get("id"))
+    audit.setdefault("adapterId", job.get("adapterId"))
+    audit["checkedAt"] = candidate_contract.now()
+    audit["decision"] = "NO-GO"
+    audit["releaseEligible"] = False
+    stages = audit.setdefault("stages", {})
+    stages["constructionMethod"] = {"passed": False, "errors": [error]}
+    audit["errors"] = list(dict.fromkeys([*audit.get("errors", []), error]))
+    candidate_contract.write(audit_path, audit)
+    _write_selection(job, selection, root)
 
 
 def _bind_method_to_candidate(
@@ -204,18 +235,30 @@ def _run_candidate(
         _write_no_go(job, "candidate", errors, root, methodSelection=selection)
         return 2
 
-    result = run_candidate(job_path, job, policy)
-    if result != 0:
-        _write_selection(job, selection, root)
-        return result
+    def finalize_candidate() -> None:
+        try:
+            _bind_method_to_candidate(job, selection, root)
+        except Exception as exc:
+            raise CandidateBindingError(
+                f"candidate construction method binding failed: {exc}"
+            ) from exc
+
     try:
-        _bind_method_to_candidate(job, selection, root)
-    except Exception as exc:
-        error = f"candidate construction method binding failed: {exc}"
-        _write_no_go(job, "candidate", [error], root, methodSelection=selection)
+        result = run_candidate(
+            job_path,
+            job,
+            policy,
+            finalize_candidate=finalize_candidate,
+        )
+    except CandidateBindingError as exc:
+        error = str(exc)
+        _record_binding_failure(job, selection, error, root)
         print(f"image2outfit production gate: {error}", file=sys.stderr)
         return 1
-    return 0
+
+    if result != 0:
+        _write_selection(job, selection, root)
+    return result
 
 
 def _run_release(

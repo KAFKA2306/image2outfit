@@ -31,5 +31,10 @@
     "physicalSewingStitch": "center-back-lower",
     "review": "render pattern layout before assembly and five-view/pose evidence after sewing"
   },
-  "releaseBoundary": "Keep WORKING until direct inspection of the current bpy pattern render and assembled garment render passes visual review."
+  "releaseBoundary": "Keep WORKING until direct inspection of the current bpy pattern render and assembled garment render passes visual review.",
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "Deterministic target-fit generation owns the garment shape keys; the vendor smoothing operator is not required for this path."
+  }
 }

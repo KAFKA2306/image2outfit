@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-signal-fold-transit-tabard",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-closed-tabard-two-side-wedges-signal-fold",
+  "panels": [
+    "tabard_front_under", "tabard_front_over", "tabard_back", "underlayer_front", "underlayer_back",
+    "underlayer_sleeve_L", "underlayer_sleeve_R", "underlayer_cuff_L", "underlayer_cuff_R",
+    "neck_facing", "armhole_facing_L", "armhole_facing_R", "center_back_vent"
+  ],
+  "separateGeometry": [
+    "side_wedge_root_L", "side_wedge_root_R", "side_wedge_L", "side_wedge_R",
+    "side_wedge_fold_A_L", "side_wedge_fold_A_R", "side_wedge_fold_B_L", "side_wedge_fold_B_R",
+    "signal_fold_root", "signal_fold_outer", "signal_fold_inner", "signal_fold_lock"
+  ],
+  "priorityFitZones": ["neck", "shoulder", "elbow", "waist", "hip", "upper-leg", "hem", "side-wedges", "signal-fold"],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "weight-driven first technical pass",
+    "reason": "The closed tabard, side wedges and bounded signal closure are structural skinned geometry; cloth simulation is not required for this first contract pass."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "No product-specific corrective shape-key stage is required for the first structural candidate."
+  },
+  "releaseBoundary": "Keep WORKING until current Blender source, FBX, five views, six poses, and direct visual review are available."
+}

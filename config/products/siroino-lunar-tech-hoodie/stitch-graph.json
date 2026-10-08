@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lunar-tech-hoodie",
+  "stitches": [
+    {"stitchId": "front-left-side", "first": {"pieceId": "robe-front", "edge": "left-side"}, "second": {"pieceId": "robe-back", "edge": "left-side"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "front-right-side", "first": {"pieceId": "robe-front", "edge": "right-side"}, "second": {"pieceId": "robe-back", "edge": "right-side"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "hood-crown", "first": {"pieceId": "hood-side-left", "edge": "crown"}, "second": {"pieceId": "hood-center", "edge": "left-crown"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "hood-crown-right", "first": {"pieceId": "hood-center", "edge": "right-crown"}, "second": {"pieceId": "hood-side-left", "edge": "crown-right"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "overskirt-left-waist", "first": {"pieceId": "overskirt-left", "edge": "top"}, "second": {"pieceId": "robe-front", "edge": "left-waist"}, "type": "attachment", "easingRatio": 1.2, "realization": "Blender Cloth pin group"},
+    {"stitchId": "overskirt-right-waist", "first": {"pieceId": "overskirt-right", "edge": "top"}, "second": {"pieceId": "robe-front", "edge": "right-waist"}, "type": "attachment", "easingRatio": 1.2, "realization": "Blender Cloth pin group"}
+  ],
+  "unresolved": [{"item": "exact factory seam allowance", "status": "not-observable", "decision": "use 8–10 mm by panel function"}]
+}

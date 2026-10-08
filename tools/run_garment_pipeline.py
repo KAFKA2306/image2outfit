@@ -16,6 +16,7 @@ if str(SRC) not in sys.path:
 if str(ROOT / "tools") not in sys.path:
     sys.path.insert(0, str(ROOT / "tools"))
 
+from contract_io import validate_schema_file
 from image2outfit.audit import write_audit_bundle
 from image2outfit.pipeline import (
     PIPELINE_STAGES,
@@ -31,6 +32,7 @@ from pipeline_source_fingerprint import pipeline_source_fingerprint
 from pipeline_stage_adapters import build_registry, load_profile
 
 DEFAULT_PROFILE = Path("config/pipeline-profiles/garment-reconstruction-v1.json")
+PIPELINE_STATE_SCHEMA = ROOT / "config/pipeline/pipeline-state.schema.v1.json"
 IDENTITY_FIELDS = {
     "product_id": "productId",
     "target_avatar": "targetAvatar",
@@ -110,9 +112,29 @@ def _write_json_atomic(path: Path, value: Any) -> None:
     temporary.replace(path)
 
 
-def _identity_mismatches(
-    state: dict[str, Any], expected: dict[str, str]
-) -> list[str]:
+def _validate_persisted_pipeline_state(
+    state: dict[str, Any], *, label: str = "pipeline state"
+) -> None:
+    errors = validate_schema_file(state, PIPELINE_STATE_SCHEMA, label)
+    if errors:
+        raise ValueError(
+            "pipeline state schema validation failed: " + "; ".join(errors)
+        )
+    validate_pipeline_state(state)
+
+
+def _read_pipeline_state(path: Path, *, label: str) -> dict[str, Any]:
+    state = _read_object(path, label=label)
+    _validate_persisted_pipeline_state(state, label=label)
+    return state
+
+
+def _write_pipeline_state_atomic(path: Path, state: dict[str, Any]) -> None:
+    _validate_persisted_pipeline_state(state)
+    _write_json_atomic(path, state)
+
+
+def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
     return [
         request_name
         for state_name, request_name in IDENTITY_FIELDS.items()
@@ -155,7 +177,7 @@ def _resume_or_reset(
     expected: dict[str, str],
     mode: ExecutionMode,
 ) -> dict[str, Any]:
-    validate_pipeline_state(previous)
+    _validate_persisted_pipeline_state(previous, label="resume state")
     mismatches = _identity_mismatches(previous, expected)
     non_source_mismatches = [
         value for value in mismatches if value != "sourceFingerprint"
@@ -206,7 +228,7 @@ def main() -> int:
     }
     mode = ExecutionMode.EXECUTE if args.execute else ExecutionMode.PLAN
     if args.resume_state:
-        previous = _read_object(
+        previous = _read_pipeline_state(
             _repo_path(args.resume_state, label="resume state"),
             label="resume state",
         )
@@ -233,7 +255,7 @@ def main() -> int:
         tool_pins=_mapping(request.get("toolPins"), "toolPins"),
     )
     checkpoint = (
-        (lambda current: _write_json_atomic(args.checkpoint_output, current))
+        (lambda current: _write_pipeline_state_atomic(args.checkpoint_output, current))
         if args.checkpoint_output
         else None
     )
@@ -254,10 +276,10 @@ def main() -> int:
         canonical_stages=[stage.value for stage in PIPELINE_STAGES],
     )
     if args.checkpoint_output:
-        _write_json_atomic(args.checkpoint_output, result)
+        _write_pipeline_state_atomic(args.checkpoint_output, result)
     payload = json.dumps(result, ensure_ascii=False, indent=2)
     if args.output:
-        _write_json_atomic(args.output, result)
+        _write_pipeline_state_atomic(args.output, result)
     print(payload)
     expected_status = "EXECUTED" if args.execute else "PLANNED"
     return 0 if result.get("status") == expected_status else 1

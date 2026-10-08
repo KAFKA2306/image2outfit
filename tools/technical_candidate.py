@@ -12,9 +12,16 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Blender executes this file as a standalone script and does not guarantee
+# that its sibling tools directory is on sys.path.
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
 import audit_toolchain
 import blender_python_env
 import candidate_manifest as candidate_contract
+from contract_io import required_pose_paths
 
 ROOT = candidate_contract.ROOT
 
@@ -27,14 +34,14 @@ def find_executable(
     configured = os.environ.get(env_name)
     if configured and Path(configured).is_file():
         return configured
-    for name in names:
-        found = shutil.which(name)
-        if found:
-            return found
     for candidate in candidates:
         expanded = Path(os.path.expandvars(candidate))
         if expanded.is_file():
             return str(expanded)
+    for name in names:
+        found = shutil.which(name)
+        if found:
+            return found
     raise FileNotFoundError(f"{env_name} is not set and executable was not found")
 
 
@@ -55,6 +62,64 @@ def run_command(
             text=True,
         )
     return process.returncode
+
+
+def run_hosted_pose_render(
+    job_path: Path,
+    job: dict[str, Any],
+    policy: dict[str, Any],
+    prepared: blender_python_env.PreparedEnvironment,
+    artifact: Path,
+) -> dict[str, Any]:
+    pose_script = job.get("hostedPoseScript")
+    if not pose_script:
+        return {"passed": True, "status": "NOT_REQUESTED"}
+    if not isinstance(pose_script, str):
+        return {
+            "passed": False,
+            "status": "INVALID",
+            "error": "hostedPoseScript must be a string",
+        }
+
+    script_path = candidate_contract.path(pose_script)
+    blend_path = candidate_contract.path(job["blendPath"])
+    if not script_path.is_file():
+        return {
+            "passed": False,
+            "status": "MISSING_SCRIPT",
+            "error": f"hosted pose script missing: {pose_script}",
+        }
+
+    exit_code = run_command(
+        [
+            *prepared.command_prefix,
+            "--background",
+            str(blend_path),
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(script_path),
+            "--",
+            "--job",
+            str(job_path),
+        ],
+        artifact / "blender-poses.log",
+        prepared.environment,
+    )
+    pose_paths = required_pose_paths(job, policy)
+    missing = [
+        value
+        for value in pose_paths.values()
+        if not candidate_contract.path(value).is_file()
+    ]
+    return {
+        "passed": exit_code == 0 and not missing,
+        "status": "PASS" if exit_code == 0 and not missing else "FAIL",
+        "script": pose_script,
+        "exitCode": exit_code,
+        "requiredPoses": list(pose_paths),
+        "missingPoses": missing,
+    }
 
 
 def record_unity_ready_product_state(
@@ -92,6 +157,30 @@ def record_unity_ready_product_state(
     release_readiness = manifest.setdefault("releaseReadiness", {})
     if not isinstance(release_readiness, dict):
         raise ValueError("ProductManifest releaseReadiness must be an object")
+    declared_roles = job["unityReady"].get("materialRoles")
+    if isinstance(declared_roles, list):
+        material_roles = {}
+        for item in declared_roles:
+            if not isinstance(item, dict):
+                raise ValueError("unity-ready materialRoles contains a non-object")
+            material = item.get("material")
+            role = item.get("role")
+            if not isinstance(material, str) or not material:
+                raise ValueError(
+                    "unity-ready materialRoles contains an invalid material"
+                )
+            if not isinstance(role, str) or not role:
+                raise ValueError("unity-ready materialRoles contains an invalid role")
+            if material in material_roles:
+                raise ValueError(
+                    f"unity-ready materialRoles contains duplicate material: {material}"
+                )
+            material_roles[material] = role
+    elif isinstance(declared_roles, dict):
+        material_roles = dict(declared_roles)
+    else:
+        raise ValueError("unity-ready materialRoles must be a list or object")
+
     release_readiness["unityReady"] = {
         "status": "VERIFIED",
         "multiMaterialSetup": "VERIFIED",
@@ -99,7 +188,7 @@ def record_unity_ready_product_state(
         "ndmfBake": "VERIFIED",
         "reimport": "VERIFIED",
         "targetAvatarAssetPath": job["targetAvatarAssetPath"],
-        "materialRoles": job["unityReady"]["materialRoles"],
+        "materialRoles": material_roles,
         "evidencePath": candidate_contract.rel(evidence),
         "evidenceSha256": candidate_contract.digest(evidence),
     }
@@ -237,7 +326,11 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
     blender = find_executable(
         "BLENDER_EXE",
         ("blender",),
-        (r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",),
+        (
+            str(ROOT / ".image2outfit" / "blender-4.4.3" / "blender.exe"),
+            str(ROOT / ".image2outfit" / "blender" / "blender.exe"),
+            r"%ProgramFiles%\Blender Foundation\Blender 4.4\blender.exe",
+        ),
     )
     try:
         prepared = blender_python_env.prepare(blender, root=ROOT)
@@ -275,6 +368,17 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
         and candidate_contract.path(job["fbxAssetPath"]).is_file(),
         "exitCode": build_exit,
     }
+
+    if stages["blenderBuild"]["passed"]:
+        stages["hostedPose"] = run_hosted_pose_render(
+            job_path,
+            job,
+            policy,
+            prepared,
+            artifact,
+        )
+    else:
+        stages["hostedPose"] = {"passed": False, "error": "not run"}
 
     if stages["blenderBuild"]["passed"]:
         gate_exit = run_command(

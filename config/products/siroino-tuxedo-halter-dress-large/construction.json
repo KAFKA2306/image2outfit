@@ -44,5 +44,10 @@
     ],
     "evidence": "actual Blender point-cache state and pre/evaluated/settled mesh SHA-256",
     "reason": "The two skirt rings rely on gravity settling; fitted surface-extracted bodice panels do not."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "Deterministic target-fit generation owns the garment shape keys; the vendor smoothing operator is not required for this path."
   }
 }

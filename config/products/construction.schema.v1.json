@@ -101,6 +101,83 @@
           "minLength": 1
         }
       }
+    },
+    "shapeKeyPostprocess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "applicability",
+        "reason"
+      ],
+      "properties": {
+        "provider": {
+          "const": "maxwilso-smooth-shape-keys"
+        },
+        "applicability": {
+          "enum": [
+            "REQUIRED",
+            "NOT_REQUIRED"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operator": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*\\.[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "invocation": {
+          "enum": [
+            "ACTIVE_KEY",
+            "OPERATOR_MANAGED"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "properties": {
+          "type": "object"
+        },
+        "cleanupOperator": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*\\.[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "cleanupProperties": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "const": "REQUIRED"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "module",
+              "operator",
+              "invocation",
+              "targets",
+              "properties"
+            ]
+          }
+        }
+      ]
     }
   }
 }
