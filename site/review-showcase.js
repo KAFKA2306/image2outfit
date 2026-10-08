@@ -43,7 +43,9 @@
 
   const params = new URLSearchParams(location.search);
   const requestedSlug = params.get('product');
-  let product = data.products.find((row) => row.slug === requestedSlug) || data.products[0];
+  let product = data.products.find((row) => row.slug === requestedSlug)
+    || data.products.find((row) => row.slug === data.featured_product)
+    || data.products[0];
   if (!product) return;
 
   let productName = prettySlug(product.slug);
