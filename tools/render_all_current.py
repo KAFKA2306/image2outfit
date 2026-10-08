@@ -134,6 +134,34 @@ def discard_preview_snapshot(backup: Path) -> None:
     shutil.rmtree(backup.parent, ignore_errors=True)
 
 
+def render_mesh_showcase(blender: str, job_path: Path, reports: Path) -> None:
+    job = json.loads(job_path.read_text(encoding="utf-8"))
+    blend_path = job.get("blendPath")
+    if not blend_path or not (ROOT / blend_path).is_file():
+        return
+    reports.mkdir(parents=True, exist_ok=True)
+    code = run_logged(
+        [
+            blender,
+            "--background",
+            "--factory-startup",
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(ROOT / "tools/blender_mesh_showcase.py"),
+            "--",
+            "--job",
+            job_path.relative_to(ROOT).as_posix(),
+        ],
+        reports / "mesh-showcase.log",
+        os.environ.copy(),
+    )
+    if code != 0:
+        raise RuntimeError(
+            f"{job['id']}: mesh showcase generation failed; see {reports / 'mesh-showcase.log'}"
+        )
+
+
 def render_one(blender: str, job_path: Path) -> dict[str, Any]:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     product_id = str(job["id"])
@@ -151,6 +179,11 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         preview_root, source_kind = review_console.preview_directory(workspace)
         preserved = review_console.image_files(preview_root)
         if preserved:
+            render_mesh_showcase(
+                blender,
+                job_path,
+                ROOT / ".image2outfit/products" / product_id / "reports",
+            )
             preview_files = [path.relative_to(ROOT).as_posix() for path in preserved]
             detail = (
                 f"{product_id}: build skipped ({resolution.reason}); "
@@ -202,6 +235,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         ]
         code = run_logged(command, reports / "render-current-pipeline.log", process_env)
         if code != 0:
+            render_mesh_showcase(blender, job_path, reports)
             restored = restore_previews_if_generation_produced_none(job, preview_backup)
             suffix = "; restored previous render evidence" if restored else ""
             detail = f"{product_id}: canonical pipeline exited {code}{suffix}"
@@ -277,6 +311,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
                     "detail": detail,
                 }
 
+    render_mesh_showcase(blender, job_path, reports)
     subprocess.run(
         [
             sys.executable,
@@ -483,7 +518,7 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
     hrefs: set[str] = set()
     for product in data.get("products", []):
         hrefs.add(product["manifest_href"])
-        for key in ("assets", "gates", "evidence"):
+        for key in ("assets", "gates", "evidence", "downloads"):
             for item in product.get(key, []):
                 href = item.get("href")
                 if href and not href.startswith(("https://", "http://")):

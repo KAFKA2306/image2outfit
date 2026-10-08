@@ -109,7 +109,7 @@ jobs:
           hrefs = set()
           for product in products:
               hrefs.add(product["manifest_href"])
-              for key in ("assets", "gates", "evidence"):
+              for key in ("assets", "gates", "evidence", "downloads"):
                   for item in product.get(key, []):
                       href = item.get("href")
                       if href and not href.startswith(("https://", "http://")):
