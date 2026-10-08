@@ -16,11 +16,12 @@ TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(TOOLS))
 
-from image2outfit import improvement  # noqa: E402
+from image2outfit import dbt_evidence, improvement  # noqa: E402
 import improvement_loop  # noqa: E402
 import method_selection  # noqa: E402
 import runtime_paths  # noqa: E402
 import avatar_workflow  # noqa: E402
+import batch_execution  # noqa: E402
 
 AUDITS = {
     "toolchain": "audit_toolchain.py",
@@ -96,6 +97,94 @@ def _audit_all() -> int:
     return 0
 
 
+DBT_PROJECT = ROOT / "analytics" / "dbt"
+DBT_RUNTIME = ROOT / ".image2outfit" / "dbt"
+
+
+def _dbt_packages() -> tuple[str, str]:
+    lock = json.loads(
+        (ROOT / "config" / "toolchain-lock.json").read_text(encoding="utf-8")
+    )
+    core = lock["analytics"]["dbtCore"]
+    adapter = lock["analytics"]["dbtDuckdb"]
+    return (
+        f"{core['package']}=={core['version']}",
+        f"{adapter['package']}=={adapter['version']}",
+    )
+
+
+def _dbt_extract() -> dict[str, Any]:
+    report = dbt_evidence.extract(ROOT, DBT_RUNTIME / "sources")
+    _write(DBT_RUNTIME / "extract-report.json", report)
+    return report
+
+
+def _dbt_profiles_dir() -> Path:
+    profiles_dir = DBT_RUNTIME / "profiles"
+    profiles_dir.mkdir(parents=True, exist_ok=True)
+    database = (DBT_RUNTIME / "image2outfit.duckdb").resolve().as_posix()
+    content = (
+        "image2outfit_evidence:\n"
+        "  target: local\n"
+        "  outputs:\n"
+        "    local:\n"
+        "      type: duckdb\n"
+        f"      path: {json.dumps(database)}\n"
+        "      schema: image2outfit\n"
+        "      threads: 4\n"
+    )
+    (profiles_dir / "profiles.yml").write_text(content, encoding="utf-8")
+    return profiles_dir
+
+
+def _dbt(action: str) -> int:
+    report = _dbt_extract()
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if action == "extract":
+        return 0
+
+    paths = report["paths"]
+    variables = json.dumps(
+        {
+            "products_path": Path(paths["products"]).resolve().as_posix(),
+            "runs_path": Path(paths["runs"]).resolve().as_posix(),
+            "gates_path": Path(paths["gates"]).resolve().as_posix(),
+        },
+        separators=(",", ":"),
+    )
+    profiles_dir = _dbt_profiles_dir()
+    dbt_core, dbt_adapter = _dbt_packages()
+    commands = {
+        "build": ("run",),
+        "test": ("run", "test"),
+        "check": ("build",),
+    }[action]
+
+    for dbt_command in commands:
+        result = subprocess.run(
+            [
+                "uvx",
+                "--from",
+                dbt_core,
+                "--with",
+                dbt_adapter,
+                "dbt",
+                dbt_command,
+                "--project-dir",
+                str(DBT_PROJECT),
+                "--profiles-dir",
+                str(profiles_dir),
+                "--vars",
+                variables,
+            ],
+            cwd=ROOT,
+            check=False,
+        )
+        if result.returncode != 0:
+            return result.returncode
+    return 0
+
+
 def _avatar_cloth(outfits: list[str] | None, force: bool = False) -> int:
     configured = os.environ.get("IMAGE2OUTFIT_BLENDER", "").strip()
     candidates = [
@@ -145,11 +234,7 @@ def _avatar_cloth(outfits: list[str] | None, force: bool = False) -> int:
         ]
         if force:
             command.append("--force")
-        result = subprocess.run(
-            command,
-            cwd=ROOT,
-            check=False,
-        )
+        result = subprocess.run(command, cwd=ROOT, check=False)
         failed = failed or result.returncode != 0
     return 1 if failed else 0
 
@@ -234,9 +319,7 @@ def _experiment_matrix(path_text: str) -> int:
         "include": [
             {
                 "method": method_id,
-                "runner": str(
-                    by_id.get(method_id, {}).get("runner") or "ubuntu-latest"
-                ),
+                "runner": str(by_id.get(method_id, {}).get("runner") or "ubuntu-latest"),
             }
             for method_id in methods
         ]
@@ -289,6 +372,35 @@ def build_parser() -> argparse.ArgumentParser:
     for name in ("candidate", "release", "explain"):
         command = commands.add_parser(name)
         command.add_argument("--product", required=True)
+
+    dbt = commands.add_parser("dbt")
+    dbt.add_argument("dbt_action", choices=("extract", "build", "test", "check"))
+
+    publication = commands.add_parser("publication")
+    publication_commands = publication.add_subparsers(
+        dest="publication_command", required=True
+    )
+    reconcile = publication_commands.add_parser("reconcile")
+    reconcile.add_argument(
+        "--console",
+        default=".image2outfit/review-console/review-console.json",
+    )
+    reconcile.add_argument(
+        "--output",
+        default=".image2outfit/review-console/publication-reconciliation.json",
+    )
+
+    batch = commands.add_parser(
+        "batch",
+        help="Inspect or execute a serialized batch of canonical product requests.",
+    )
+    batch_commands = batch.add_subparsers(dest="batch_command", required=True)
+    for name in ("status", "run"):
+        batch_command = batch_commands.add_parser(name)
+        batch_command.add_argument(
+            "--manifest",
+            default="config/batch/tracked-requests.json",
+        )
 
     improve = commands.add_parser("improve")
     improve.add_argument("--product", required=True)
@@ -363,6 +475,32 @@ def main() -> int:
     options = build_parser().parse_args()
     if options.command in {"candidate", "release", "explain"}:
         return _product(options.command, options.product)
+    if options.command == "dbt":
+        return _dbt(options.dbt_action)
+    if options.command == "publication":
+        if options.publication_command == "reconcile":
+            return _run(
+                "reconcile_publication.py",
+                "--root",
+                str(ROOT),
+                "--console",
+                options.console,
+                "--output",
+                options.output,
+            )
+        raise AssertionError(options.publication_command)
+    if options.command == "batch":
+        try:
+            report, return_code = batch_execution.run_batch(
+                ROOT,
+                options.manifest,
+                execute=options.batch_command == "run",
+            )
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            print(f"image2outfit batch: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return return_code
     if options.command == "improve":
         if options.max_steps < 1:
             print("--max-steps must be >= 1", file=sys.stderr)
