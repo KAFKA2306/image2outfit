@@ -17,6 +17,13 @@ class ReleaseReproducibilityTests(unittest.TestCase):
     def test_identical_candidate_bytes_produce_identical_release_hashes(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_directory:
             root = Path(temporary_directory)
+            schema_path = root / "contracts/release/release-manifest.schema.v2.json"
+            schema_path.parent.mkdir(parents=True)
+            schema_path.write_bytes(
+                (
+                    ROOT / "contracts/release/release-manifest.schema.v2.json"
+                ).read_bytes()
+            )
             candidate = root / "candidate"
             candidate.mkdir()
             source = candidate / "garment.txt"

@@ -9,6 +9,16 @@ from image2outfit.audit import (
     verify_latest_audit_pointer,
     write_audit_bundle,
 )
+from image2outfit.audit_schema import load_audit_schemas
+from image2outfit.pipeline import PIPELINE_STAGES
+
+ROOT = Path(__file__).resolve().parents[1]
+PROFILE = json.loads(
+    (ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json").read_text()
+)
+_, RECORD_SCHEMA, _, MANIFEST_SCHEMA = load_audit_schemas(
+    ROOT, PROFILE["auditContract"]
+)
 
 
 class AuditLatestPointerTests(unittest.TestCase):
@@ -18,10 +28,10 @@ class AuditLatestPointerTests(unittest.TestCase):
             run_id=run_id,
             product_id="demo",
             sequence=1,
-            stage="pattern",
+            stage=PIPELINE_STAGES[0].value,
             requested_mode="execute",
-            outcome_mode="execute",
-            status="FAIL",
+            outcome_mode="failed",
+            status="FAILED",
             tool_name="fixture",
             purpose="test",
             output_contract="fixture-v1",
@@ -45,10 +55,17 @@ class AuditLatestPointerTests(unittest.TestCase):
             write_audit_bundle(
                 self._state("run-1"),
                 audit_root=root,
-                canonical_stages=["pattern"],
+                canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+                record_schema=RECORD_SCHEMA,
+                manifest_schema=MANIFEST_SCHEMA,
             )
 
-            pointer = verify_latest_audit_pointer(root, "demo")
+            pointer = verify_latest_audit_pointer(
+                root,
+                "demo",
+                record_schema=RECORD_SCHEMA,
+                manifest_schema=MANIFEST_SCHEMA,
+            )
 
             self.assertEqual(pointer["runId"], "run-1")
             self.assertEqual(pointer["productId"], "demo")
@@ -59,7 +76,9 @@ class AuditLatestPointerTests(unittest.TestCase):
             write_audit_bundle(
                 self._state("good"),
                 audit_root=root,
-                canonical_stages=["pattern"],
+                canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+                record_schema=RECORD_SCHEMA,
+                manifest_schema=MANIFEST_SCHEMA,
             )
             latest = root / "demo" / "latest.json"
             before = json.loads(latest.read_text(encoding="utf-8"))
@@ -72,7 +91,9 @@ class AuditLatestPointerTests(unittest.TestCase):
                     write_audit_bundle(
                         self._state("bad"),
                         audit_root=root,
-                        canonical_stages=["pattern"],
+                        canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+                        record_schema=RECORD_SCHEMA,
+                        manifest_schema=MANIFEST_SCHEMA,
                     )
 
             after = json.loads(latest.read_text(encoding="utf-8"))

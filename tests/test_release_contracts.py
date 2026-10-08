@@ -69,8 +69,11 @@ class ReleaseIntegrationTest(unittest.TestCase):
 class ReleaseRawEvidenceContractTest(unittest.TestCase):
     def test_packager_copies_raw_evidence_before_manifesting_release(self) -> None:
         source = (TOOLS / "production_contract.py").read_text(encoding="utf-8")
-        human = source.index('package / "Evidence" / "Human"')
-        commercial = source.index('package / "Evidence" / "Commercial"')
-        release_manifest = source.index('release / "release-manifest.json"')
+        packager = source[source.index("def package_release(") :]
+        human = packager.index('package / "Evidence" / "Human"')
+        commercial = packager.index('package / "Evidence" / "Commercial"')
+        release_manifest = packager.index(
+            'release_manifest = release / "release-manifest.json"'
+        )
         self.assertLess(human, release_manifest)
         self.assertLess(commercial, release_manifest)

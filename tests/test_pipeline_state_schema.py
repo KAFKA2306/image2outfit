@@ -134,15 +134,25 @@ class PipelineStateSchemaTests(unittest.TestCase):
                 patch.object(
                     runner,
                     "load_profile",
-                    return_value={"profileId": "garment-reconstruction-v1"},
+                    return_value=json.loads(
+                        (
+                            ROOT
+                            / "config/pipeline-profiles/garment-reconstruction-v1.json"
+                        ).read_text()
+                    ),
                 ),
                 patch.object(
                     runner, "pipeline_source_fingerprint", return_value="a" * 64
                 ),
                 patch.object(runner, "build_registry") as build_registry,
-                self.assertRaisesRegex(ValueError, "run_id"),
+                patch.object(runner, "_emit_failure", return_value=1) as failure,
             ):
-                runner.main()
+                self.assertEqual(runner.main(), 1)
+                self.assertEqual(
+                    failure.call_args.kwargs["error_code"], "INVALID_RESUME_STATE"
+                )
+                self.assertEqual(failure.call_args.kwargs["phase"], "resume")
+                self.assertIn("run_id", str(failure.call_args.kwargs["exc"]))
             build_registry.assert_not_called()
 
     def test_pipeline_schema_bytes_participate_in_source_fingerprint(self) -> None:
@@ -169,6 +179,8 @@ class PipelineStateSchemaTests(unittest.TestCase):
                 "config/products/construction.schema.v1.json": "{}\n",
                 "config/pipeline/visual-quality-defaults.v1.json": "{}\n",
                 "config/pipeline/pipeline-state.schema.v1.json": '{"version":1}\n',
+                "config/pipeline/pipeline-request.schema.v1.json": "{}\n",
+                "config/pipeline/pipeline-profile.schema.v1.json": "{}\n",
                 "config/pipeline/stage-audit-record.schema.v1.json": "{}\n",
                 "config/pipeline/run-audit-manifest.schema.v1.json": "{}\n",
                 "config/toolchain-lock.json": "{}\n",

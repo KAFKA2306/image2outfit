@@ -57,6 +57,8 @@ def make_source_fixture(root: Path) -> tuple[Path, Path]:
         "config/products/construction.schema.v1.json": "{}\n",
         "config/pipeline/visual-quality-defaults.v1.json": "{}\n",
         "config/pipeline/pipeline-state.schema.v1.json": "{}\n",
+        "config/pipeline/pipeline-request.schema.v1.json": "{}\n",
+        "config/pipeline/pipeline-profile.schema.v1.json": "{}\n",
         "config/toolchain-lock.json": "{}\n",
         "config/pipeline/stage-audit-record.schema.v1.json": "{}\n",
         "config/pipeline/run-audit-manifest.schema.v1.json": "{}\n",

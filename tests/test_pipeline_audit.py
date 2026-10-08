@@ -11,13 +11,34 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from image2outfit.audit import (
     validate_stage_records,
-    verify_audit_bundle,
-    write_audit_bundle,
+    verify_audit_bundle as _verify_audit_bundle,
+    write_audit_bundle as _write_audit_bundle,
 )
+from image2outfit.audit_schema import load_audit_schemas
 from image2outfit.pipeline import PIPELINE_STAGES, new_pipeline_state, run_pipeline
 from image2outfit.tooling import ToolDescriptor, ToolRegistry
 
 CANONICAL_STAGES = [stage.value for stage in PIPELINE_STAGES]
+_PROFILE = json.loads(
+    (ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json").read_text(
+        encoding="utf-8"
+    )
+)
+_, RECORD_SCHEMA, _, MANIFEST_SCHEMA = load_audit_schemas(
+    ROOT, _PROFILE["auditContract"]
+)
+
+
+def write_audit_bundle(*args, **kwargs):
+    kwargs.setdefault("record_schema", RECORD_SCHEMA)
+    kwargs.setdefault("manifest_schema", MANIFEST_SCHEMA)
+    return _write_audit_bundle(*args, **kwargs)
+
+
+def verify_audit_bundle(*args, **kwargs):
+    kwargs.setdefault("record_schema", RECORD_SCHEMA)
+    kwargs.setdefault("manifest_schema", MANIFEST_SCHEMA)
+    return _verify_audit_bundle(*args, **kwargs)
 
 
 class PipelineAuditTests(unittest.TestCase):
@@ -59,10 +80,7 @@ class PipelineAuditTests(unittest.TestCase):
         )
 
     def test_every_stage_is_recorded_and_persisted(self) -> None:
-        result = self._result(
-            product_id="audit-garment",
-            run_id="audit-run-001",
-        )
+        result = self._result(product_id="audit-garment", run_id="audit-run-001")
         records = result["stage_records"]
         self.assertEqual(len(records), len(PIPELINE_STAGES))
         self.assertTrue(all(record["status"] == "PLANNED" for record in records))
@@ -71,18 +89,13 @@ class PipelineAuditTests(unittest.TestCase):
             expected_run_id="audit-run-001",
             expected_product_id="audit-garment",
             canonical_stages=CANONICAL_STAGES,
+            record_schema=RECORD_SCHEMA,
         )
-        self.assertEqual(
-            [record["stage"] for record in records],
-            CANONICAL_STAGES,
-        )
-
+        self.assertEqual([record["stage"] for record in records], CANONICAL_STAGES)
         with TemporaryDirectory() as temporary:
             audit_root = Path(temporary) / "audit"
             bundle = write_audit_bundle(
-                result,
-                audit_root=audit_root,
-                canonical_stages=CANONICAL_STAGES,
+                result, audit_root=audit_root, canonical_stages=CANONICAL_STAGES
             )
             run_root = Path(bundle["root"])
             manifest = verify_audit_bundle(run_root)
@@ -110,13 +123,11 @@ class PipelineAuditTests(unittest.TestCase):
         validate_stage_records(
             result["stage_records"],
             canonical_stages=CANONICAL_STAGES,
+            record_schema=RECORD_SCHEMA,
         )
 
     def test_modified_stage_file_is_rejected(self) -> None:
-        result = self._result(
-            product_id="audit-tamper",
-            run_id="audit-run-tamper",
-        )
+        result = self._result(product_id="audit-tamper", run_id="audit-run-tamper")
         with TemporaryDirectory() as temporary:
             bundle = write_audit_bundle(
                 result,
@@ -133,28 +144,20 @@ class PipelineAuditTests(unittest.TestCase):
 
     def test_existing_run_cannot_be_overwritten(self) -> None:
         result = self._result(
-            product_id="audit-immutable",
-            run_id="audit-run-immutable",
+            product_id="audit-immutable", run_id="audit-run-immutable"
         )
         with TemporaryDirectory() as temporary:
             audit_root = Path(temporary) / "audit"
             write_audit_bundle(
-                result,
-                audit_root=audit_root,
-                canonical_stages=CANONICAL_STAGES,
+                result, audit_root=audit_root, canonical_stages=CANONICAL_STAGES
             )
             with self.assertRaisesRegex(FileExistsError, "immutable"):
                 write_audit_bundle(
-                    result,
-                    audit_root=audit_root,
-                    canonical_stages=CANONICAL_STAGES,
+                    result, audit_root=audit_root, canonical_stages=CANONICAL_STAGES
                 )
 
     def test_manifest_path_escape_is_rejected(self) -> None:
-        result = self._result(
-            product_id="audit-path",
-            run_id="audit-run-path",
-        )
+        result = self._result(product_id="audit-path", run_id="audit-run-path")
         with TemporaryDirectory() as temporary:
             bundle = write_audit_bundle(
                 result,

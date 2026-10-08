@@ -10,6 +10,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from .audit_schema import validate_schema
+
 _HASH = re.compile(r"^[0-9a-f]{64}$")
 _IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 _ZERO_HASH = "0" * 64
@@ -118,10 +120,13 @@ def validate_stage_records(
     expected_run_id: str | None = None,
     expected_product_id: str | None = None,
     canonical_stages: Sequence[str] | None = None,
+    record_schema: dict[str, Any] | None = None,
 ) -> None:
     previous = _ZERO_HASH
     for index, raw in enumerate(records, start=1):
         record = dict(raw)
+        if record_schema is not None:
+            validate_schema(record, record_schema, path=f"stageRecords[{index - 1}]")
         if record.get("schemaVersion") != 1:
             raise ValueError(f"stage audit record {index} schemaVersion must be 1")
         if record.get("sequence") != index:
@@ -183,6 +188,8 @@ def write_audit_bundle(
     *,
     audit_root: Path,
     canonical_stages: Sequence[str],
+    record_schema: dict[str, Any],
+    manifest_schema: dict[str, Any],
 ) -> dict[str, Any]:
     run_id = _safe_identifier(str(state["run_id"]), label="run_id")
     product_id = _safe_identifier(str(state["product_id"]), label="product_id")
@@ -195,6 +202,7 @@ def write_audit_bundle(
         expected_run_id=run_id,
         expected_product_id=product_id,
         canonical_stages=canonical_stages,
+        record_schema=record_schema,
     )
     final_status = state.get("status")
     if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(
@@ -243,11 +251,14 @@ def write_audit_bundle(
         },
         "stages": stage_entries,
     }
+    validate_schema(manifest, manifest_schema, path="auditManifest")
     manifest_path = run_root / "manifest.json"
     _write_json_atomic(manifest_path, manifest)
     manifest_sha256 = sha256_file(manifest_path)
 
-    verify_audit_bundle(run_root)
+    verify_audit_bundle(
+        run_root, record_schema=record_schema, manifest_schema=manifest_schema
+    )
     latest_path = resolved_audit_root / product_id / "latest.json"
     _write_json_atomic(
         latest_path,
@@ -270,7 +281,13 @@ def write_audit_bundle(
     }
 
 
-def verify_latest_audit_pointer(audit_root: Path, product_id: str) -> dict[str, Any]:
+def verify_latest_audit_pointer(
+    audit_root: Path,
+    product_id: str,
+    *,
+    record_schema: dict[str, Any],
+    manifest_schema: dict[str, Any],
+) -> dict[str, Any]:
     """Verify that latest points to one valid immutable run for the requested product."""
     product_id = _safe_identifier(product_id, label="product_id")
     resolved_audit_root = audit_root.resolve()
@@ -304,13 +321,20 @@ def verify_latest_audit_pointer(audit_root: Path, product_id: str) -> dict[str, 
     for field in ("productId", "runId", "finalStatus"):
         if pointer.get(field) != manifest.get(field):
             raise ValueError(f"latest audit pointer {field} mismatch")
-    verify_audit_bundle(manifest_path.parent)
+    verify_audit_bundle(
+        manifest_path.parent,
+        record_schema=record_schema,
+        manifest_schema=manifest_schema,
+    )
     return pointer
 
 
-def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
+def verify_audit_bundle(
+    run_root: Path, *, record_schema: dict[str, Any], manifest_schema: dict[str, Any]
+) -> dict[str, Any]:
     manifest_path = run_root / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    validate_schema(manifest, manifest_schema, path="auditManifest")
     if manifest.get("schemaVersion") != 1:
         raise ValueError("audit manifest schemaVersion must be 1")
     canonical_stages = manifest.get("canonicalStages")
@@ -335,6 +359,7 @@ def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
         if not path.is_file() or sha256_file(path) != entry.get("sha256"):
             raise ValueError(f"audit stage file hash mismatch: {value}")
         record = json.loads(path.read_text(encoding="utf-8"))
+        validate_schema(record, record_schema, path=f"stageRecords[{index - 1}]")
         if record.get("recordDigest") != entry.get("recordDigest"):
             raise ValueError(f"audit stage record digest mismatch: {value}")
         records.append(record)
@@ -343,6 +368,7 @@ def verify_audit_bundle(run_root: Path) -> dict[str, Any]:
         expected_run_id=manifest.get("runId"),
         expected_product_id=manifest.get("productId"),
         canonical_stages=canonical_stages,
+        record_schema=record_schema,
     )
     final_status = manifest.get("finalStatus")
     if final_status in {"PLANNED", "EXECUTED"} and len(records) != len(
