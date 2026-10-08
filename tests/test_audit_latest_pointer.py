@@ -10,7 +10,7 @@ from image2outfit.audit import (
     write_audit_bundle,
 )
 from image2outfit.audit_schema import load_audit_schemas
-from image2outfit.domain import PIPELINE_STAGES
+from image2outfit.pipeline import PIPELINE_STAGES
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = json.loads(
