@@ -41,7 +41,9 @@ def load_profile(path: Path) -> dict[str, Any]:
         if "tools" in item:
             tool_names = [tool["toolName"] for tool in item["tools"]]
             if len(tool_names) != len(set(tool_names)):
-                raise ValueError(f"stage {item['stage']!r} declares duplicate tool names")
+                raise ValueError(
+                    f"stage {item['stage']!r} declares duplicate tool names"
+                )
             for tool in item["tools"]:
                 count = tool.get("minimumEvidenceCount", item["minimumEvidenceCount"])
                 if not _valid_evidence_count(count):
