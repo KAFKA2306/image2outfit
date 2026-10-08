@@ -10,6 +10,7 @@ from image2outfit.audit import (
     write_audit_bundle,
 )
 from image2outfit.audit_schema import load_audit_schemas
+from image2outfit.domain import PIPELINE_STAGES
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = json.loads(
@@ -27,7 +28,7 @@ class AuditLatestPointerTests(unittest.TestCase):
             run_id=run_id,
             product_id="demo",
             sequence=1,
-            stage="pattern",
+            stage=PIPELINE_STAGES[0].value,
             requested_mode="execute",
             outcome_mode="failed",
             status="FAILED",
@@ -54,7 +55,7 @@ class AuditLatestPointerTests(unittest.TestCase):
             write_audit_bundle(
                 self._state("run-1"),
                 audit_root=root,
-                canonical_stages=["pattern"],
+                canonical_stages=[stage.value for stage in PIPELINE_STAGES],
                 record_schema=RECORD_SCHEMA,
                 manifest_schema=MANIFEST_SCHEMA,
             )
@@ -75,7 +76,7 @@ class AuditLatestPointerTests(unittest.TestCase):
             write_audit_bundle(
                 self._state("good"),
                 audit_root=root,
-                canonical_stages=["pattern"],
+                canonical_stages=[stage.value for stage in PIPELINE_STAGES],
                 record_schema=RECORD_SCHEMA,
                 manifest_schema=MANIFEST_SCHEMA,
             )
@@ -90,7 +91,7 @@ class AuditLatestPointerTests(unittest.TestCase):
                     write_audit_bundle(
                         self._state("bad"),
                         audit_root=root,
-                        canonical_stages=["pattern"],
+                        canonical_stages=[stage.value for stage in PIPELINE_STAGES],
                         record_schema=RECORD_SCHEMA,
                         manifest_schema=MANIFEST_SCHEMA,
                     )
