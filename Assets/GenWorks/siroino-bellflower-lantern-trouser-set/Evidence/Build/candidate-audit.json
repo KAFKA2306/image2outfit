@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 2,
+  "phase": "candidate",
+  "jobId": "siroino-bellflower-lantern-trouser-set",
+  "adapterId": "siroino-v1.0",
+  "checkedAt": "2026-09-22T14:02:34.883144Z",
+  "decision": "NO-GO",
+  "releaseEligible": false,
+  "stages": {
+    "toolchainSource": {
+      "passed": true,
+      "errors": [],
+      "warnings": []
+    },
+    "license": {
+      "passed": true,
+      "errors": []
+    },
+    "blenderPython": {
+      "passed": true,
+      "blenderVersion": "4.4.3",
+      "pythonVersion": "3.11.11",
+      "pythonPrefix": "M:\\win11projects\\unity\\image2outfit\\.image2outfit\\blender-4.4.3\\4.4\\python",
+      "dependencySource": "pyproject.toml",
+      "dependencyGroup": "project",
+      "dependencySetSha256": "77cca7ae7243e597aec5c7fea5a6ea1a1b466c793839320a1b1689e562e7ada5",
+      "packages": {
+        "Pillow": "12.3.0"
+      }
+    },
+    "blenderBuild": {
+      "passed": true,
+      "exitCode": 0
+    },
+    "hostedPose": {
+      "passed": true,
+      "status": "PASS",
+      "script": "tools/siroino_required_pose_render_entry.py",
+      "exitCode": 0,
+      "requiredPoses": [
+        "neutral",
+        "arms-up",
+        "arm-cross",
+        "crouch",
+        "sit",
+        "prone"
+      ],
+      "missingPoses": []
+    },
+    "blenderStructure": {
+      "passed": true,
+      "exitCode": 0,
+      "expectedVersion": "4.4.3",
+      "actualVersion": "4.4.3"
+    },
+    "unityStatic": {
+      "passed": false,
+      "exitCode": 1,
+      "toolchainValidated": false,
+      "modularAvatarValidated": false
+    },
+    "toolchainResolved": {
+      "passed": false,
+      "error": "not run"
+    },
+    "previewSet": {
+      "passed": false,
+      "views": {}
+    }
+  },
+  "candidateManifest": null,
+  "candidateManifestSha256": null,
+  "note": "Technical validity is not product approval. Visual, pose and VRChat runtime evidence are mandatory.",
+  "stateProtection": {
+    "candidateLastGoodProtected": true,
+    "previousCandidateExisted": false,
+    "previousCandidateRestored": false,
+    "canonicalWorkspaceProtected": true,
+    "previousWorkspaceExisted": true,
+    "previousWorkspaceRestored": true,
+    "customerReleaseProtected": true,
+    "previousReleaseExisted": false,
+    "previousReleaseRestored": false
+  }
+}
