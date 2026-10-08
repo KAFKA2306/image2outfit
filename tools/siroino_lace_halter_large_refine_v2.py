@@ -6,6 +6,7 @@ made the edges read as rigid bands. This revision keeps one fitted base, restore
 selective front/strap/lace panels, gives the long front panel a small garment-native
 drape, and uses alpha only for the intended sheer/lace materials.
 """
+
 from __future__ import annotations
 
 import json
