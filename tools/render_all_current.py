@@ -136,7 +136,8 @@ def discard_preview_snapshot(backup: Path) -> None:
 
 def render_mesh_showcase(blender: str, job_path: Path, reports: Path) -> None:
     job = json.loads(job_path.read_text(encoding="utf-8"))
-    if not (ROOT / job["blendPath"]).is_file():
+    blend_path = job.get("blendPath")
+    if not blend_path or not (ROOT / blend_path).is_file():
         return
     reports.mkdir(parents=True, exist_ok=True)
     code = run_logged(
