@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "productId": "siroino-blue-happi",
+  "productName": "Blue Happi for SiroinoSotai_PC",
+  "buildRevision": "v3-connected-shoulder-sleeve-collar",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "blenderVersion": "4.4.3",
+  "metrics": {
+    "meshObjects": 8,
+    "vertices": 957,
+    "triangles": 1624,
+    "materialSlots": 8,
+    "shapeKeys": 0,
+    "maxBoneInfluences": 2,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "boundaryEdges": 274
+  },
+  "weightNormalization": {
+    "objects": 8,
+    "vertices": 957,
+    "rigidObjects": [
+      {
+        "object": "Happi_Collar_Front_Left",
+        "bone": "Chest"
+      },
+      {
+        "object": "Happi_Collar_Front_Right",
+        "bone": "Chest"
+      },
+      {
+        "object": "Happi_Collar_Back",
+        "bone": "Neck"
+      }
+    ],
+    "fallbackVertices": 0,
+    "maximumInfluences": 2
+  },
+  "frontOpeningM": 0.05000000074505806,
+  "clearanceRefinement": [
+    {
+      "pass": 1,
+      "target": 0.008,
+      "movedVertices": 30,
+      "maximumMove": 0.0060209313798695804,
+      "clearance": {
+        "vertices": 875,
+        "minimum": 0.007128194905817509,
+        "p01": 0.007965349592268467,
+        "mean": 0.04175231539191944
+      }
+    },
+    {
+      "pass": 2,
+      "target": 0.012,
+      "movedVertices": 122,
+      "maximumMove": 0.0048718050941824916,
+      "clearance": {
+        "vertices": 875,
+        "minimum": 0.006051977630704641,
+        "p01": 0.010014510713517666,
+        "mean": 0.04201022784305471
+      }
+    },
+    {
+      "pass": 3,
+      "target": 0.015,
+      "movedVertices": 232,
+      "maximumMove": 0.008948022369295358,
+      "clearance": {
+        "vertices": 875,
+        "minimum": 0.012597193941473961,
+        "p01": 0.013285312801599503,
+        "mean": 0.04261784222402743
+      }
+    }
+  ],
+  "clothSimulation": "Assets\\GenWorks\\siroino-blue-happi\\Evidence\\Build\\cloth-simulation.json",
+  "qualityAudit": "Assets\\GenWorks\\siroino-blue-happi\\Evidence\\Build\\quality-audit.json",
+  "views": {
+    "front": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\front.png",
+    "back": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\back.png",
+    "left": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\left.png",
+    "right": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\right.png",
+    "three-quarter": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\three-quarter.png"
+  },
+  "poseViews": {
+    "neutral": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\Poses\\neutral.png",
+    "arms-up": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\Poses\\arms-up.png",
+    "arm-cross": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\Poses\\arm-cross.png",
+    "crouch": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\Poses\\crouch.png",
+    "sit": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\Poses\\sit.png",
+    "prone": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\Poses\\prone.png"
+  },
+  "referenceModelIdentification": "UNVERIFIED",
+  "notes": [
+    "The body uses curved front and back panels with sloped shoulder seams.",
+    "Sleeves overlap the shoulder seam at the root, then taper through upper-arm/lower-arm blended weights.",
+    "The closed shoulder-side sleeve rings and front-matched collar endpoints are audited as sewn connections.",
+    "The fit gate rejects both body penetration and an oversized rigid box.",
+    "No manufacturer, product code, text, or crest is asserted.",
+    "Silhouette and styling remain pending direct inspection of current images."
+  ],
+  "silhouetteRevision": "v3-connected-shoulder-sleeve-collar",
+  "fitEnvelope": {
+    "clearanceP01M": 0.013285312801599503,
+    "meanClearanceM": 0.04261784222402743,
+    "frontOpeningM": 0.05000000074505806,
+    "required": {
+      "clearanceP01M": [
+        0.006,
+        0.035
+      ],
+      "maximumMeanClearanceM": 0.05,
+      "frontOpeningM": [
+        0.025,
+        0.09
+      ]
+    },
+    "status": "PASS",
+    "sleeveRootContract": {
+      "passed": true,
+      "sides": {
+        "L": {
+          "rootRadiusM": 0.04759197611636751,
+          "rootCenterToShoulderM": 0.007556536226818867,
+          "overlapMarginM": 0.04003543988954864,
+          "requiredMinimumOverlapMarginM": 0.01,
+          "rootClosed": true,
+          "rootCapFaceCount": 1,
+          "passed": true
+        },
+        "R": {
+          "rootRadiusM": 0.04759198059294405,
+          "rootCenterToShoulderM": 0.007556536074489915,
+          "overlapMarginM": 0.04003544451845413,
+          "requiredMinimumOverlapMarginM": 0.01,
+          "rootClosed": true,
+          "rootCapFaceCount": 1,
+          "passed": true
+        }
+      }
+    },
+    "seamConnectionAudit": {
+      "collarBridgeToFrontBandMinimumDistanceM": 0.0037879022605551917,
+      "requiredMaximumDistanceM": 0.006,
+      "status": "PASS"
+    }
+  }
+}

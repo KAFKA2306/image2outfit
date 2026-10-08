@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-military-sheer-romper-large",
+  "status": "PASS",
+  "engine": "Blender Cloth",
+  "blenderVersion": "4.4.3",
+  "applicability": "REQUIRED",
+  "frameStart": 1,
+  "frameEnd": 20,
+  "cacheBaked": true,
+  "geometryChanged": true,
+  "gravity": [
+    0.0,
+    0.0,
+    -4.5
+  ],
+  "contracts": [
+    {
+      "object": "Military_Asymmetric_Front_Flap",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 260,
+      "frameStart": 1,
+      "frameEnd": 20,
+      "cacheBakedActual": true,
+      "cacheInfo": "20 frames in memory (1.0 MiB).",
+      "preBakeMeshSha256": "500467830cefa548387f0337dcac919e3f268693a96eac0411336a9b13be6baa",
+      "evaluatedFrameMeshSha256": "d5ac535b8ca522e627b2212e790e92f445ebf3b4d3dcccd1e7389189370868d6",
+      "settledMeshSha256": "e1a919f187f04051e241af838aa3e8e5f6918c6d6d9458c93f9eee05132563cf",
+      "geometryChanged": true
+    },
+    {
+      "object": "Military_Sheer_Back",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 50,
+      "frameStart": 1,
+      "frameEnd": 20,
+      "cacheBakedActual": true,
+      "cacheInfo": "20 frames in memory (3.3 MiB).",
+      "preBakeMeshSha256": "40abac753d71e3fd96207d67c646078efaac72ce1509d55cf8904796aef2aacf",
+      "evaluatedFrameMeshSha256": "86bbfb2b8dda4e2d63549e83ef2ff6f97b5f296d7c1cfb46d92d1872e16e5b09",
+      "settledMeshSha256": "86bbfb2b8dda4e2d63549e83ef2ff6f97b5f296d7c1cfb46d92d1872e16e5b09",
+      "geometryChanged": true
+    }
+  ],
+  "bodyCollisionThicknessM": 0.004,
+  "collisionObject": "Image2Outfit Collision Proxy.002",
+  "settledFbx": "Assets/GenWorks/siroino-military-sheer-romper-large/Models/SiroinoMilitarySheerRomperLarge.fbx"
+}

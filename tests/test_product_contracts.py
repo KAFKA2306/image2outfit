@@ -60,6 +60,18 @@ class MethodSelectionTest(unittest.TestCase):
         ):
             self.assertIn(value, report["requiredCommercialEvidence"])
 
+    def test_runtime_derived_paths_do_not_break_method_selection(self) -> None:
+        job = method_selection.read_json(
+            ROOT / "config" / "products" / "siroino-wide-cargo" / "job.json"
+        )
+        job.update(
+            artifactDir=".image2outfit/products/siroino-wide-cargo/reports",
+            candidateDir=".image2outfit/products/siroino-wide-cargo/candidate",
+            releaseDir=".image2outfit/products/siroino-wide-cargo/release",
+        )
+        report = method_selection.select(job, ROOT)
+        self.assertTrue(report["passed"], report["errors"])
+
     def test_wide_cargo_pattern_seams_reference_declared_boundaries(self) -> None:
         path = (
             ROOT

@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: stg_products
+    columns:
+      - name: product_id
+        data_tests: [not_null, unique]
+      - name: product_status_known
+        data_tests: [not_null]
+      - name: job_path
+        data_tests: [not_null, unique]
+      - name: manifest_path
+        data_tests: [not_null, unique]
+
+  - name: stg_runs
+    columns:
+      - name: run_id
+        data_tests: [not_null, unique]
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+
+  - name: stg_gates
+    columns:
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: run_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_runs')
+                field: run_id
+      - name: gate_family
+        data_tests: [not_null]
+      - name: gate_name
+        data_tests: [not_null]
+      - name: gate_state
+        data_tests: [not_null]
+      - name: normalized_gate_state
+        data_tests: [not_null]
+      - name: gate_state_known
+        data_tests: [not_null]
+      - name: gate_state_policy_sha256
+        data_tests: [not_null]

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-signal-fold-transit-tabard",
+  "id": "siroino-signal-fold-transit-tabard",
+  "productName": "Signal Fold Transit Tabard for Siroino",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4.3-panel-structural",
+  "buildRevision": "v1-closed-tabard-two-side-wedges-signal-fold",
+  "productRoot": "Assets/GenWorks/siroino-signal-fold-transit-tabard",
+  "productManifestPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/siroino_signal_fold_transit_tabard_build.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Source/Blender/SiroinoSignalFoldTransitTabard.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Models/SiroinoSignalFoldTransitTabard.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSignalFoldTransitTabard.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSotai_SignalFoldTransitTabard.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-signal-fold-transit-tabard/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/ProductManifest.json",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/README.md",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Source/Blender/SiroinoSignalFoldTransitTabard.blend",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Models/SiroinoSignalFoldTransitTabard.fbx",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSignalFoldTransitTabard.prefab",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Prefab/SiroinoSotai_SignalFoldTransitTabard.prefab",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/front.png",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/back.png",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/left.png",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/right.png",
+    "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-signal-fold-transit-tabard/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-signal-fold-transit-tabard/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-signal-fold-transit-tabard/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 3,
+    "materialRoles": [
+      {"material": "MAT_Tabard", "role": "fabric"},
+      {"material": "MAT_Underlayer", "role": "fabric"},
+      {"material": "MAT_SignalFold", "role": "accent"},
+      {"material": "MAT_Hardware", "role": "metal"}
+    ]
+  }
+}

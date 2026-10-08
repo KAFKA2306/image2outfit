@@ -59,6 +59,24 @@ function Test-LoopbackPort {
     finally { $client.Dispose() }
 }
 
+function Get-UnityMcpRegistryEntry {
+    $configuredDir = [Environment]::ExpandEnvironmentVariables([string]$Contract.unityMcp.registryDir)
+    if (-not [System.IO.Path]::IsPathRooted($configuredDir)) {
+        $configuredDir = Join-Path $RepoRoot $configuredDir
+    }
+    if (-not (Test-Path $configuredDir)) { return $null }
+    $normalizedRoot = $RepoRoot.Replace('\', '/').TrimEnd('/').ToLowerInvariant()
+    foreach ($file in (Get-ChildItem -LiteralPath $configuredDir -Filter '*.json' -File -ErrorAction SilentlyContinue)) {
+        try {
+            $entry = Get-Content -Raw -LiteralPath $file.FullName | ConvertFrom-Json
+            $entryPath = ([string]$entry.projectPath).Replace('\', '/').TrimEnd('/').ToLowerInvariant()
+            if ($entryPath -eq $normalizedRoot) { return $entry }
+        }
+        catch { }
+    }
+    return $null
+}
+
 function Get-GitBlobSha1 {
     param([Parameter(Mandatory = $true)][string]$Path)
     [byte[]]$content = [System.IO.File]::ReadAllBytes($Path)
@@ -184,7 +202,7 @@ function Invoke-McpDoctor {
     $codexAvailable = Test-Executable "codex"
     $uvxAvailable = Test-Executable "uvx"
     $blenderRegistration = Get-CodexMcpRegistration -Name $BlenderCodexServerName
-    $unityRegistration = Get-CodexMcpRegistration -Name $UnityCodexServerName
+    $unityRegistryEntry = Get-UnityMcpRegistryEntry
     $unityProjectVersion = Get-UnityProjectVersion
 
     $blenderRegistrationVerified = Test-RegistrationContains -Registration $blenderRegistration -RequiredTokens @(
@@ -198,14 +216,16 @@ function Invoke-McpDoctor {
         -Verified ($blenderRegistrationVerified -and $blenderArtifactVerified) `
         -Reachable $blenderReachable
 
-    $unityRegistrationVerified = Test-RegistrationContains -Registration $unityRegistration -RequiredTokens @($UnityMcpUrl)
     $unityProjectCompatible = $unityProjectVersion -eq $ExpectedUnityVersion
     $unityPackage = Get-UnityMcpPackageStatus
-    $unityReachable = Test-LoopbackPort -HostName $UnityHost -Port $UnityPort
+    $unityReachable = $false
+    if ($null -ne $unityRegistryEntry -and [int]$unityRegistryEntry.port -gt 0) {
+        $unityReachable = Test-LoopbackPort -HostName $UnityHost -Port ([int]$unityRegistryEntry.port)
+    }
     $unityState = Resolve-DoctorState `
-        -PrerequisitesAvailable $codexAvailable `
-        -Configured ($null -ne $unityRegistration) `
-        -Verified ($unityRegistrationVerified -and $unityProjectCompatible -and $unityPackage.versionVerified) `
+        -PrerequisitesAvailable $true `
+        -Configured $unityPackage.detected `
+        -Verified ($unityProjectCompatible -and $unityPackage.versionVerified) `
         -Reachable $unityReachable
 
     return [pscustomobject][ordered]@{
@@ -235,8 +255,8 @@ function Invoke-McpDoctor {
         unity = [ordered]@{
             state = $unityState
             codexAvailable = $codexAvailable
-            registered = ($null -ne $unityRegistration)
-            registrationVerified = $unityRegistrationVerified
+            registered = ($null -ne $unityRegistryEntry)
+            registrationVerified = ($null -ne $unityRegistryEntry -and [string]$unityRegistryEntry.projectPath -ne '')
             packageDetected = $unityPackage.detected
             packageSource = $unityPackage.source
             packageVersionVerified = $unityPackage.versionVerified
@@ -246,6 +266,9 @@ function Invoke-McpDoctor {
             expectedProjectVersion = $ExpectedUnityVersion
             projectVersionCompatible = $unityProjectCompatible
             reachable = $unityReachable
+            transport = [string]$Contract.unityMcp.transport
+            registryDir = [string]$Contract.unityMcp.registryDir
+            registryEntry = $unityRegistryEntry
             url = $UnityMcpUrl
         }
     }
@@ -313,18 +336,7 @@ elseif (-not (Test-RegistrationContains -Registration $existingBlender -Required
 }
 
 if (-not $SkipUnityRegistration) {
-    $existingUnity = Get-CodexMcpRegistration -Name $UnityCodexServerName
-    if ($null -ne $existingUnity -and $Force) {
-        Remove-CodexMcpRegistration -Name $UnityCodexServerName
-        $existingUnity = $null
-    }
-    if ($null -eq $existingUnity) {
-        & codex mcp add $UnityCodexServerName --url $UnityMcpUrl
-        if ($LASTEXITCODE -ne 0) { throw "codex mcp add failed for '$UnityCodexServerName'." }
-    }
-    elseif (-not (Test-RegistrationContains -Registration $existingUnity -RequiredTokens @($UnityMcpUrl))) {
-        throw "Existing '$UnityCodexServerName' registration does not match the loopback contract. Re-run with -Force to replace it."
-    }
+    Write-Host "Unity MCP uses the native unity_mcp connector and the loopback discovery registry; no streamable-HTTP Codex entry is created."
 }
 
 Write-Host "Blender addon prepared at: $BlenderAddonPath"

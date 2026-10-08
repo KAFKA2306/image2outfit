@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "adapterId": "haolan-v1.6",
+  "coordinateSystem": "blender-meters-z-up",
+  "source": {
+    "kind": "derived-skeleton-only",
+    "avatarGeometryIncluded": false,
+    "avatarMaterialsIncluded": false,
+    "avatarTexturesIncluded": false,
+    "purpose": "Reproducible garment rig generation without redistributing the HAOLAN avatar source"
+  },
+  "bones": [
+    {"name":"Hips","parent":null,"head":[0.0,-0.0241,0.6719],"tail":[0.0,-0.0241,0.7219]},
+    {"name":"Spine","parent":"Hips","head":[0.0,-0.0241,0.7219],"tail":[0.0,-0.0241,0.8095]},
+    {"name":"Chest","parent":"Spine","head":[0.0,-0.0241,0.8095],"tail":[0.0,-0.0028,0.9815]},
+    {"name":"Neck","parent":"Chest","head":[0.0,-0.0028,0.9815],"tail":[0.0,-0.0276,1.0230]},
+    {"name":"Head","parent":"Neck","head":[0.0,-0.0276,1.0230],"tail":[0.0,-0.0276,1.1450]},
+    {"name":"Shoulder_L","parent":"Chest","head":[0.0,-0.0048,0.9401],"tail":[0.0873,-0.0048,0.9401]},
+    {"name":"UpperArm_L","parent":"Shoulder_L","head":[0.0873,-0.0048,0.9401],"tail":[0.2583,-0.0048,0.9401]},
+    {"name":"LowerArm_L","parent":"UpperArm_L","head":[0.2583,-0.0048,0.9401],"tail":[0.4596,-0.0048,0.9401]},
+    {"name":"Hand_L","parent":"LowerArm_L","head":[0.4596,-0.0048,0.9401],"tail":[0.5350,-0.0048,0.9401]},
+    {"name":"Shoulder_R","parent":"Chest","head":[0.0,-0.0048,0.9401],"tail":[-0.0873,-0.0048,0.9401]},
+    {"name":"UpperArm_R","parent":"Shoulder_R","head":[-0.0873,-0.0048,0.9401],"tail":[-0.2583,-0.0048,0.9401]},
+    {"name":"LowerArm_R","parent":"UpperArm_R","head":[-0.2583,-0.0048,0.9401],"tail":[-0.4596,-0.0048,0.9401]},
+    {"name":"Hand_R","parent":"LowerArm_R","head":[-0.4596,-0.0048,0.9401],"tail":[-0.5350,-0.0048,0.9401]},
+    {"name":"UpperLeg_L","parent":"Hips","head":[0.0586,-0.0241,0.6289],"tail":[0.0586,-0.0172,0.3704]},
+    {"name":"LowerLeg_L","parent":"UpperLeg_L","head":[0.0586,-0.0172,0.3704],"tail":[0.0586,-0.0175,0.0906]},
+    {"name":"Foot_L","parent":"LowerLeg_L","head":[0.0586,-0.0175,0.0906],"tail":[0.0586,-0.1300,0.0450]},
+    {"name":"UpperLeg_R","parent":"Hips","head":[-0.0586,-0.0241,0.6289],"tail":[-0.0586,-0.0172,0.3704]},
+    {"name":"LowerLeg_R","parent":"UpperLeg_R","head":[-0.0586,-0.0172,0.3704],"tail":[-0.0586,-0.0175,0.0906]},
+    {"name":"Foot_R","parent":"LowerLeg_R","head":[-0.0586,-0.0175,0.0906],"tail":[-0.0586,-0.1300,0.0450]}
+  ]
+}

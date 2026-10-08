@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "status": "EXECUTED",
+  "result": "PASS",
+  "executedAt": "2026-08-05",
+  "revision": "v29-smoothed-clearance-tapered-yoke-fitted-sleeve",
+  "method": "smoothed bounded clearance, tapered yoke, fitted sleeves and compact hood",
+  "sources": [
+    {
+      "title": "GarmentCode: Programming Parametric Sewing Patterns",
+      "url": "https://arxiv.org/abs/2306.03642",
+      "officialCode": "https://github.com/maria-korosteleva/GarmentCode"
+    },
+    {
+      "title": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
+      "url": "https://arxiv.org/abs/2606.24564",
+      "officialCode": "https://github.com/PatternGSL/PatternGSL"
+    }
+  ],
+  "implementation": {
+    "kind": "independent Blender implementation",
+    "authorsImplementationExecuted": false,
+    "authorsCodeCopied": false,
+    "bodyRole": "polar statistics, bounded clearance and skin-weight reference",
+    "topologySource": "continuous polar torso, five-ring tapered yoke, seventeen-column shallow saddle, fitted sleeve caps, cuffs and compact six-row rear-neck hood"
+  },
+  "metrics": {
+    "meshObjects": [
+      "Heather_Body_Shell",
+      "Heather_Highcut_Front_Panel",
+      "Heather_Highcut_Back_Panel",
+      "Heather_Long_Sleeve_L",
+      "Heather_Long_Sleeve_R",
+      "Heather_Rib_Cuff_L",
+      "Heather_Rib_Cuff_R",
+      "Heather_Hood_Folded_Roll",
+      "Heather_Henley_Placket",
+      "Heather_Henley_Button_01",
+      "Heather_Henley_Button_02",
+      "Heather_Henley_Button_03",
+      "Heather_Hood_Drawcord_L",
+      "Heather_Hood_Drawcord_R"
+    ],
+    "meshObjectCount": 14,
+    "vertices": 21762,
+    "polygons": 21809,
+    "bodyTopologyCopied": false,
+    "pelvicSaddleColumns": 17,
+    "boundedClearanceProjection": {
+      "Heather_Body_Shell": {
+        "adjustedVertices": 538,
+        "meanStepM": 0.0028561356013958442,
+        "maximumStepM": 0.012,
+        "minimumClearanceM": 0.006,
+        "smoothingIterations": 4
+      },
+      "Heather_Highcut_Front_Panel": {
+        "adjustedVertices": 0,
+        "meanStepM": 0.0,
+        "maximumStepM": 0.0,
+        "minimumClearanceM": 0.0,
+        "smoothingIterations": 0
+      },
+      "Heather_Highcut_Back_Panel": {
+        "adjustedVertices": 0,
+        "meanStepM": 0.0,
+        "maximumStepM": 0.0,
+        "minimumClearanceM": 0.0,
+        "smoothingIterations": 0
+      },
+      "Heather_Long_Sleeve_L": {
+        "adjustedVertices": 450,
+        "meanStepM": 0.0021816883173602763,
+        "maximumStepM": 0.011744396643526243,
+        "minimumClearanceM": 0.004,
+        "smoothingIterations": 4
+      },
+      "Heather_Long_Sleeve_R": {
+        "adjustedVertices": 448,
+        "meanStepM": 0.0021924267633424703,
+        "maximumStepM": 0.0117506205266072,
+        "minimumClearanceM": 0.004,
+        "smoothingIterations": 4
+      },
+      "Heather_Rib_Cuff_L": {
+        "adjustedVertices": 52,
+        "meanStepM": 0.0004603866571374697,
+        "maximumStepM": 0.0022127962753830262,
+        "minimumClearanceM": 0.005,
+        "smoothingIterations": 4
+      },
+      "Heather_Rib_Cuff_R": {
+        "adjustedVertices": 52,
+        "meanStepM": 0.0004721651071392603,
+        "maximumStepM": 0.0022133443584521966,
+        "minimumClearanceM": 0.005,
+        "smoothingIterations": 4
+      },
+      "Heather_Hood_Folded_Roll": {
+        "adjustedVertices": 30,
+        "meanStepM": 0.0001672474637998627,
+        "maximumStepM": 0.000787923945629805,
+        "minimumClearanceM": 0.004,
+        "smoothingIterations": 4
+      }
+    },
+    "primaryRepresentation": "polar torso with tapered yoke, smooth high-cut bridge panels, shallow saddle, fitted sleeves and compact hood",
+    "profile": {
+      "heightSamples": 50,
+      "angleSamples": 72,
+      "sourceVertexCount": 8421,
+      "centerYRangeM": [
+        -0.042679,
+        -0.00575
+      ],
+      "radiusRangeM": [
+        0.049459,
+        0.135293
+      ]
+    },
+    "taperedYokeRings": 5,
+    "clearanceDisplacementSmoothing": 4
+  },
+  "acceptance": {
+    "researchTrial": "PASS",
+    "visualAppearanceReview": "PENDING",
+    "poseEvidence": "PENDING"
+  }
+}

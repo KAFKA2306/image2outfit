@@ -28,8 +28,17 @@ def _augment_audit(artifact: Path, values: dict[str, Any]) -> None:
 
 def _research_state() -> tuple[dict[str, Any], dict[str, Any], str]:
     report = audit_research_baseline.audit(candidate_contract.ROOT)
-    baseline_path = audit_research_baseline.BASELINE_PATH
+    baseline_path = (
+        candidate_contract.ROOT / audit_research_baseline.BASELINE_RELATIVE_PATH
+    )
     baseline = candidate_contract.read(baseline_path)
+    # The canonical baseline keeps survey metadata nested under ``survey``;
+    # candidate manifests intentionally bind the flattened audit fields.  Keep
+    # the canonical document intact while exposing the fields required by the
+    # manifest contract.
+    for field in ("surveyYear", "reviewedAt", "requiredCapabilities"):
+        if field not in baseline:
+            baseline[field] = report.get(field)
     baseline_hash = (
         candidate_contract.digest(baseline_path) if baseline_path.is_file() else ""
     )
