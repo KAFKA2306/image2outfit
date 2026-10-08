@@ -56,5 +56,31 @@
     "rebuildFromZeroWhenCheckpointExists": false,
     "retainRejectedCheckpointAndReason": true
   },
-  "canonicalPrefabPattern": "Assets/GenWorks/<product-id>/Prefab/*.prefab"
+  "canonicalPrefabPattern": "Assets/GenWorks/<product-id>/Prefab/*.prefab",
+  "canonicalGateStates": [
+    "PASS",
+    "FAIL",
+    "PENDING",
+    "UNVERIFIED",
+    "OUT_OF_SCOPE"
+  ],
+  "gateStateNormalization": {
+    "PASS": "PASS",
+    "FAIL": "FAIL",
+    "PENDING": "PENDING",
+    "UNVERIFIED": "UNVERIFIED",
+    "OUT_OF_SCOPE": "OUT_OF_SCOPE",
+    "DRY_RUN_PASS": "UNVERIFIED",
+    "FAIL_EXACT_ORIGINAL_MISSING": "FAIL",
+    "MISSING": "UNVERIFIED",
+    "NON_BLOCKING_FAIL": "FAIL",
+    "NON_BLOCKING_PENDING": "PENDING",
+    "NOT_REQUIRED": "OUT_OF_SCOPE",
+    "NOT_RUN": "UNVERIFIED",
+    "PENDING_RETRY": "PENDING",
+    "PRESERVED_UNVERIFIED": "UNVERIFIED",
+    "REPLACEMENT_GENERATED": "UNVERIFIED",
+    "REVIEW_REQUIRED": "PENDING",
+    "WORKING": "UNVERIFIED"
+  }
 }

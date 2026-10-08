@@ -9,7 +9,9 @@ import json
 import os
 import socketserver
 import sys
-from dataclasses import asdict, dataclass
+import zipfile
+import shutil
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler
 from pathlib import Path
@@ -228,6 +230,7 @@ class Product:
     assets: list[Asset]
     gates: list[Gate]
     evidence: list[Evidence]
+    downloads: list[dict[str, Any]] = field(default_factory=list)
 
 
 def parse_gate_rows(
@@ -509,6 +512,93 @@ def parse_improvement_projection(
     return blockers, gates, evidence, resume
 
 
+def collect_downloads(root, workspace, output_dir, manifest, assets):
+    """Images are public previews; outfit distribution requires the release owner's receipt."""
+    downloads = []
+    images = [a for a in assets if a.href and a.sha256]
+    if images:
+        fingerprint = hashlib.sha256(
+            json.dumps([(a.kind, a.name, a.sha256) for a in images]).encode()
+        ).hexdigest()
+        archive = (
+            output_dir / "downloads" / workspace.name / f"images-{fingerprint[:16]}.zip"
+        )
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
+            bundle.writestr(
+                "README.txt",
+                "Render images only; no usable VRChat outfit or fit/runtime approval.\n"
+                + workspace.name
+                + "\n",
+            )
+            for i, asset in enumerate(images):
+                source = (output_dir / asset.href).resolve()
+                if workspace.resolve() not in source.parents:
+                    raise ValueError("Render download escapes the product workspace")
+                bundle.write(
+                    source,
+                    f"{i:02d}-{asset.kind}-{Path(asset.name).stem}{source.suffix}",
+                )
+            bundle.writestr(
+                "images.json", json.dumps([asdict(a) for a in images], indent=2)
+            )
+        downloads.append(
+            {
+                "kind": "images",
+                "label": "画像セットを保存",
+                "href": relative_href(archive, output_dir),
+                "sha256": digest(archive),
+            }
+        )
+    job = load_json(root / "config" / "products" / workspace.name / "job.json", {})
+    if manifest.get("releaseReadiness", {}).get("status") in {
+        "READY",
+        "RELEASABLE",
+        "RELEASED",
+    } and all(
+        job.get(k) for k in ("releaseDir", "artifactDir", "candidateDir", "adapterId")
+    ):
+
+        def contained(value):
+            path = (root / value).resolve()
+            if root not in path.parents:
+                raise ValueError("Release download escapes repository")
+            return path
+
+        release = contained(job["releaseDir"])
+        receipt = contained(job["artifactDir"]) / "audit.json"
+        candidate = contained(job["candidateDir"]) / "candidate-manifest.json"
+        if receipt.is_file() and candidate.is_file():
+            from release_orchestrator import validate_go_release_pair
+
+            errors = validate_go_release_pair(
+                release=release,
+                receipt_path=receipt,
+                job_id=workspace.name,
+                adapter_id=job["adapterId"],
+                candidate_hash=digest(candidate),
+            )
+            if not errors:
+                source = release / f"{workspace.name}.zip"
+                archive = (
+                    output_dir
+                    / "downloads"
+                    / workspace.name
+                    / f"outfit-{digest(source)[:16]}.zip"
+                )
+                archive.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, archive)
+                downloads.append(
+                    {
+                        "kind": "outfit",
+                        "label": "衣装パッケージを保存",
+                        "href": relative_href(archive, output_dir),
+                        "sha256": digest(archive),
+                    }
+                )
+    return downloads
+
+
 def collect_product(
     root: Path,
     workspace: Path,
@@ -571,6 +661,31 @@ def collect_product(
             )
         )
 
+    mesh_report = workspace / "Previews/Mesh/mesh-showcase.json"
+    if mesh_report.is_file():
+        mesh = load_json(mesh_report, {})
+        source = (root / mesh.get("sourcePath", "")).resolve()
+        if (
+            root in source.parents
+            and source.is_file()
+            and digest(source) == mesh.get("sourceSha256")
+        ):
+            for record in mesh.get("records", []):
+                target = (root / record["path"]).resolve()
+                if workspace.resolve() not in target.parents or target.suffix != ".svg":
+                    raise ValueError("Mesh showcase image escapes product workspace")
+                if digest(target) != record["sha256"]:
+                    raise ValueError("Mesh showcase diagram hash mismatch")
+                assets.append(
+                    Asset(
+                        kind="mesh",
+                        name=record["name"],
+                        status="UNVERIFIED",
+                        href=relative_href(target, output_dir),
+                        sha256=digest(target),
+                    )
+                )
+
     candidate = pick(manifest, "candidate", "candidate_manifest", default={})
     review = pick(manifest, "human_review", "review", default={})
     updated_at = pick(manifest, "updated_at", "last_updated", "generated_at")
@@ -599,6 +714,7 @@ def collect_product(
     )
     return Product(
         slug=workspace.name,
+        downloads=collect_downloads(root, workspace, output_dir, manifest, assets),
         state=safe_state(manifest),
         updated_at=str(updated_at or "UNKNOWN"),
         blocker_count=len(blockers),
