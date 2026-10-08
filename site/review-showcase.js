@@ -155,6 +155,13 @@
           <div class="render-wall">${renderWallMarkup()}</div>
         </section>
 
+        <section class="section-block" id="mesh-details">
+          <div class="section-head"><h2>UV・トポロジー</h2><p>衣装メッシュの辺と実際のUV配置を展示します。品質やVRChat動作の合格を示すものではありません。</p></div>
+          <div class="render-wall">${images.filter(a => a.kind === 'mesh').map(a => `<article class="render-tile"><a href="${safeHref(a.href)}"><img src="${safeHref(a.href)}" alt="${esc(a.name)}"><span>${a.name === 'uv' ? 'UV配置' : 'トポロジー（正面投影・背面の辺も表示）'}</span></a></article>`).join('')}</div>
+          ${images.some(a => a.name === 'uv' && a.kind === 'mesh') ? '' : '<p>UV配置は未作成、または現在の3Dデータに結び付いた展示図が未生成です。</p>'}
+          ${images.some(a => a.name === 'topology' && a.kind === 'mesh') ? '' : '<p>トポロジー展示図は準備中です。</p>'}
+        </section>
+
         <section class="section-block">
           <div class="section-head"><h2>制作・品質情報</h2><p>画像を見たあとで必要になる検証情報です。販売・作品閲覧の主導線からは一段下げています。</p></div>
           <div class="info-grid">

@@ -661,6 +661,31 @@ def collect_product(
             )
         )
 
+    mesh_report = workspace / "Previews/Mesh/mesh-showcase.json"
+    if mesh_report.is_file():
+        mesh = load_json(mesh_report, {})
+        source = (root / mesh.get("sourcePath", "")).resolve()
+        if (
+            root in source.parents
+            and source.is_file()
+            and digest(source) == mesh.get("sourceSha256")
+        ):
+            for record in mesh.get("records", []):
+                target = (root / record["path"]).resolve()
+                if workspace.resolve() not in target.parents or target.suffix != ".svg":
+                    raise ValueError("Mesh showcase image escapes product workspace")
+                if digest(target) != record["sha256"]:
+                    raise ValueError("Mesh showcase diagram hash mismatch")
+                assets.append(
+                    Asset(
+                        kind="mesh",
+                        name=record["name"],
+                        status="UNVERIFIED",
+                        href=relative_href(target, output_dir),
+                        sha256=digest(target),
+                    )
+                )
+
     candidate = pick(manifest, "candidate", "candidate_manifest", default={})
     review = pick(manifest, "human_review", "review", default={})
     updated_at = pick(manifest, "updated_at", "last_updated", "generated_at")
