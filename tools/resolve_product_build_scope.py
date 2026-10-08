@@ -68,17 +68,20 @@ def _local_tool_dependencies(root: Path, build_script: str) -> set[str]:
     return discovered
 
 
-def _jobs_for_build_scripts(root: Path) -> dict[str, set[str]]:
-    """Map each build script and its local Python dependencies to product jobs."""
+def _jobs_for_product_scripts(root: Path) -> dict[str, set[str]]:
+    """Map executable product scripts and local dependencies to their jobs."""
     owners: dict[str, set[str]] = {}
     for path in sorted((root / "config/products").glob("*/job.json")):
         relative = path.relative_to(root).as_posix()
         job = read_json(path)
-        build_script = job.get("buildScript")
-        if not isinstance(build_script, str) or not build_script:
-            continue
-        for dependency in _local_tool_dependencies(root, build_script):
-            owners.setdefault(dependency, set()).add(relative)
+        entrypoints = {
+            value
+            for field in ("buildScript", "hostedPoseScript")
+            if isinstance((value := job.get(field)), str) and value
+        }
+        for entrypoint in entrypoints:
+            for dependency in _local_tool_dependencies(root, entrypoint):
+                owners.setdefault(dependency, set()).add(relative)
     return owners
 
 
@@ -87,7 +90,7 @@ def select_job(
 ) -> tuple[str | None, str]:
     changed_paths = list(changed)
     jobs: set[str] = set()
-    build_script_owners = _jobs_for_build_scripts(root)
+    script_owners = _jobs_for_product_scripts(root)
     for value in changed_paths:
         job_match = JOB_PATH.fullmatch(value)
         if job_match:
@@ -107,7 +110,7 @@ def select_job(
             if (root / candidate).is_file():
                 jobs.add(candidate)
             continue
-        jobs.update(build_script_owners.get(value, set()))
+        jobs.update(script_owners.get(value, set()))
     if len(jobs) != 1:
         return None, f"selected-product-jobs-{len(jobs)}"
     return next(iter(jobs)), "selected"
@@ -224,6 +227,21 @@ def resolve(
         "BLENDER_VERSION": blender_version,
         "BLENDER_SERIES": ".".join(blender_version.split(".")[:2]),
     }
+    if materialize_job:
+        runtime_job_path = root / runtime_job
+        runtime_job_value = dict(job)
+        runtime_job_value.update(
+            {
+                "artifactDir": f"{runtime}/reports",
+                "candidateDir": f"{runtime}/candidate",
+                "releaseDir": f"{runtime}/release",
+            }
+        )
+        runtime_job_path.parent.mkdir(parents=True, exist_ok=True)
+        runtime_job_path.write_text(
+            json.dumps(runtime_job_value, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     return Resolution(selected_job=selected, environment=environment, reason="selected")
 
 

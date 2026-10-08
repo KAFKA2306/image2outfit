@@ -1,38 +1,27 @@
 # image2outfit Agent Contract
 
-## Short-context start
+## Start
 
-Read this file, then only the canonical files for the current product/task. Do not preload all product folders, docs, Issues, PR history, renders, or research notes.
+For product work, identify the product slug and requested outcome, then read only the relevant canonical owners below plus the current `ProductManifest.json`. Do not preload unrelated product folders, docs, Issues, PR history, renders, or research notes.
 
-For a product task, identify only:
-
-1. product slug
-2. requested outcome
-3. canonical contract owner
-4. current manifest/evidence
-5. next verifier and completion condition
-
-Continue an existing workline/checkpoint when it already owns the same outcome. Do not rely on chat history for continuation.
+Continue an existing checkpoint/workline when it already owns the same outcome.
 
 ## Canonical owners
 
-Use existing owners; do not duplicate their rules in prose or new files.
-
-- completion boundary: `config/genworks-handoff-policy.json`
-- required views/poses/evidence: `config/release-policy.json`
+- PR merge: `config/pr-merge-policy.json` and `tools/pr_merge_gate.py`
+- completion/runtime scope: `config/genworks-handoff-policy.json`
+- required visual evidence and customer release: `config/release-policy.json` and `contracts/quality/quality-spec.json`
 - product identity/input/output: `config/products/<slug>/job.json`
 - construction: `config/products/<slug>/construction.json`
 - current state/gates/defects/hashes: `Assets/GenWorks/<slug>/ProductManifest.json`
-- quality: `contracts/quality/quality-spec.json`
-- shared validation: `tools/production_contract.py`
-- runtime directory transaction and canonical workspace last-good protection: `tools/runtime_transaction.py`
+- runtime transaction/last-good protection: `tools/runtime_transaction.py`
 - commands: `Taskfile.yml` / `tools/manage.py`
 
 `README.md` is the user entry point and `ARCHITECTURE.md` describes stable design relationships. Machine-readable owners outrank prose.
 
-## Product workflow
+## Product commands
 
-Use the smallest existing command that owns the task:
+Use the existing command that owns the task:
 
 ```powershell
 task explain PRODUCT=<slug>
@@ -41,41 +30,42 @@ task improve PRODUCT=<slug>
 task release PRODUCT=<slug>
 ```
 
-For repository-wide checks when needed:
+Repository-wide checks are `task audit:all` and `task check:python`. Do not add a second command path when the existing Taskfile/manage path owns the behavior.
 
-```powershell
-task audit:all
-task check:python
-```
+## Product invariants
 
-Do not add a second command path when an existing Taskfile/manage entry point can own the behavior.
+- Keep `Assets/GenWorks/<slug>/` as the canonical product workspace.
+- Keep local reports/candidates/releases under `.image2outfit/products/<slug>/...` and out of Git.
+- Do not weaken gates to fit failing data or overwrite last-good state with a worse candidate.
+- Do not commit credentials, private assets, caches, machine state, or unintended Unity `.meta`/GUID changes.
+- While GitHub Pages is enabled, keep the canonical public URL as plain text on the first line of `README.md`.
+- Read public product state from each `ProductManifest.json` or its existing canonical projection; do not maintain a handwritten state catalog.
 
-## Change rules
+## dbt responsibility
 
-- one rule, one owner; generic defects belong in the generic layer.
-- `DELETE > MERGE > REPLACE > ADD`; remove superseded paths only after current references prove them unused.
-- keep `Assets/GenWorks/<slug>/` as the canonical product workspace; do not create alternate tracked product roots.
-- keep local reports/candidates/releases under `.image2outfit/products/<slug>/...` and out of Git.
-- do not weaken gates to fit failing data or overwrite last-good state with a worse candidate.
-- do not commit credentials, private assets, caches, machine state, or unintended Unity `.meta`/GUID changes.
-- comments should explain non-obvious rationale/external constraints, not narrate code.
-- GitHub Pages が有効な間は、`README.md` の先頭行に `https://...` の正準公開URLを平文で置く。
-- 公開製品状態は各 `ProductManifest.json` または既存の正準投影から読み、手書きの製品状態カタログを追加・復活させない。
+dbt is a first-class repository responsibility for reproducible transformation, testing, and analytics over manufacturing/product evidence.
 
-## Evidence and completion
+- Canonical owners above remain the only authorities. dbt reads their existing projections and never becomes a second source of truth.
+- Model only facts that already exist in canonical product/manufacturing evidence, including product identity, manufacturing runs, gate/verification state, defects, artifacts, hashes, and release observations.
+- A manufacturing run should leave dbt-consumable evidence through the existing canonical files. Do not introduce a parallel hand-written ledger just to feed dbt.
+- dbt tests may reject inconsistent or incomplete derived data, but dbt must never turn an unexecuted mesh, UV, material, rig, render, Unity, or VRChat layer into PASS.
+- Route dbt extraction/build/test commands through the existing `Taskfile.yml` / `tools/manage.py` command authority. Do not create one-off SQL/export command paths.
 
-Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence.
+## Evidence
 
-`visualAppearanceReview` may pass only after directly opening the current required images/poses and checking visible defects such as clipping, detached geometry, scale/silhouette failure, extreme/asymmetric geometry, UV/normal/material failure, and pose breakage.
+Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence. Visual acceptance requires direct inspection of the current evidence required by `contracts/quality/quality-spec.json` and `config/release-policy.json`.
 
-The only machine-readable definition of product `COMPLETE` is `config/genworks-handoff-policy.json.requiredCompletionGates`; do not copy the gate list here.
+Use a visual feedback loop for appearance-sensitive work: capture the current Blender/Unity view, inspect silhouette, seams, UV/material appearance, intersections, and required poses, make the smallest source change, then recapture and re-run the numeric checks. Use deterministic CLI/`uv` automation for repeatable generation and inspection; use computer use when the decision depends on the rendered UI rather than serialized values alone. When a visual defect is reproducible, encode its check in the existing verifier so later products do not repeat it.
 
-Unity import/save/reload, Modular Avatar/NDMF, VRChat Build & Test/runtime, and human runtime review are `OUT_OF_SCOPE` unless the current policy/task explicitly changes that boundary. Do not claim them PASS without direct evidence, but do not make unavailable out-of-scope runtime a merge blocker.
+Merge eligibility, product completion, and customer release are separate decisions owned by their canonical policies.
 
-## PR and continuation
+## Astra quality review
 
-Use one coherent PR workline. Verify the exact head for the changed surface. Incremental implementation PRs do not need full product completion gates unless they themselves claim release/completion.
+- Delegate to Astra only for quality-critical review, especially cloth simulation, pose behavior, visual feedback, and release-blocking evidence.
+- Use the Astra model with `medium` reasoning effort.
+- Keep delegated input limited to the exact product, evidence paths, and acceptance question; do not send unrelated repository history or task context.
+- Require concise output limited to a verdict, up to three critical findings, and required actions, with no implementation unless explicitly requested.
 
-Merge blockers are limited to actual conflict, required CI failure caused by the diff, contract inconsistency, or a required verification that is currently executable but not run. Merge/read-back and product release are separate states.
+## Continuation
 
-If work stops, persist the current manifest/checkpoint, verified revision, failing stage/visible defect, blocker, and one exact next action in the existing canonical workline. Do not create a second agent-state database.
+If work stops, persist the current manifest/checkpoint, verified revision, failing stage or visible defect, blocker, and one exact next action in the existing canonical workline. Do not create a second agent-state database.

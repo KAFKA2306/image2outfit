@@ -1,5 +1,10 @@
 {
   "schemaVersion": 1,
   "productId": "siroino-cyber-kawaii-large",
-  "profile": "loose-layered"
+  "profile": "loose-layered",
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "Deterministic target-fit generation owns the garment shape keys; the vendor smoothing operator is not required for this path."
+  }
 }

@@ -107,11 +107,12 @@ def sleeve_chain(
     lower_head = armature.matrix_world @ lower.head_local
     lower_tail = armature.matrix_world @ lower.tail_local
     cuff = lower_head.lerp(lower_tail, 0.78)
+    upper_axis = upper_tail - upper_head
     points = [
-        upper_head.lerp(upper_tail, 0.10),
-        upper_head.lerp(upper_tail, 0.32),
-        upper_head.lerp(upper_tail, 0.58),
-        upper_head.lerp(upper_tail, 0.84),
+        upper_head - upper_axis * 0.06,
+        upper_head.lerp(upper_tail, 0.22),
+        upper_head.lerp(upper_tail, 0.50),
+        upper_head.lerp(upper_tail, 0.80),
         upper_tail.lerp(lower_head, 0.50),
         lower_head.lerp(cuff, 0.25),
         lower_head.lerp(cuff, 0.50),
@@ -144,14 +145,16 @@ def create_sleeve(
             vertical = tangent.cross(front)
         vertical.normalize()
         front = vertical.cross(tangent).normalized()
-        shoulder_ease = min(1.0, t / 0.28)
-        half_height = 0.046 + 0.020 * shoulder_ease - 0.006 * t
-        half_depth = 0.034 + 0.011 * shoulder_ease
+        shoulder_ease = min(1.0, t / 0.30)
+        shoulder_bulge = math.sin(math.pi * shoulder_ease) if t <= 0.30 else 0.0
+        # Keep the shoulder-side ring below the body shoulder line. The old
+        # 61 mm root height produced pointed fins that read as detached.
+        half_height = 0.038 + 0.004 * shoulder_bulge - 0.008 * t
+        half_depth = 0.038 + 0.003 * shoulder_bulge - 0.003 * t
         for segment in range(segments):
             angle = math.tau * segment / segments
-            offset = (
-                vertical * (math.cos(angle) * half_height)
-                + front * (math.sin(angle) * half_depth)
+            offset = vertical * (math.cos(angle) * half_height) + front * (
+                math.sin(angle) * half_depth
             )
             vertices.append(tuple(center + offset))
     for ring in range(len(points) - 1):
@@ -159,10 +162,13 @@ def create_sleeve(
         b = (ring + 1) * segments
         for segment in range(segments):
             next_segment = (segment + 1) % segments
-            faces.append(
-                (a + segment, a + next_segment, b + next_segment, b + segment)
-            )
+            faces.append((a + segment, a + next_segment, b + next_segment, b + segment))
+    # Close the shoulder-side ring. The open tube was rendered as a detached
+    # hollow at the sleeve head in the direct review.
+    faces.append(tuple(reversed(range(segments))))
     obj = v1.mesh_object(name, vertices, faces, material)
+    obj["happiShoulderRootClosed"] = True
+    obj["happiShoulderRootCapFaces"] = 1
     obj["happiUpperBone"] = upper_name
     obj["happiLowerBone"] = lower_name
     obj["happiRingCount"] = len(points)
@@ -201,14 +207,20 @@ def create_front_band(
 
 def create_collar_bridge(material: bpy.types.Material) -> bpy.types.Object:
     _, top_depth = body_dimensions(1.0)
+    # Place the endpoint centre so its near edge lands on the front-band
+    # inner edge after the 25 mm bridge width is applied.
+    front_y = -top_depth - 0.006
     centerline = [
-        Vector((-0.0375, -top_depth - 0.006, Z_NECK)),
+        # The previous endpoints were behind the neckline and visibly
+        # floated. This small inward/upward join leaves the bridge edge on
+        # the front-band edge rather than merely aiming at it.
+        Vector((-0.0386, front_y + 0.0066, Z_NECK)),
         Vector((-0.052, -0.030, 1.030)),
         Vector((-0.046, 0.030, 1.040)),
         Vector((0.000, 0.052, 1.044)),
         Vector((0.046, 0.030, 1.040)),
         Vector((0.052, -0.030, 1.030)),
-        Vector((0.0375, -top_depth - 0.006, Z_NECK)),
+        Vector((0.0386, front_y + 0.0066, Z_NECK)),
     ]
     half_width = 0.0125
     vertices: list[tuple[float, float, float]] = []
@@ -225,8 +237,52 @@ def create_collar_bridge(material: bpy.types.Material) -> bpy.types.Object:
         a = index * 2
         faces.append((a, a + 1, a + 3, a + 2))
     obj = v1.mesh_object("Happi_Collar_Back", vertices, faces, material)
+    obj["happiCollarEndpointY"] = front_y
+    obj["happiCollarEndpointZ"] = Z_NECK
     v1.add_surface_finish(obj, thickness=0.0022, bevel_width=0.0008)
     return obj
+
+
+def sleeve_root_contract(
+    armature: bpy.types.Object,
+) -> dict[str, object]:
+    result: dict[str, object] = {}
+    passed = True
+    for side in ("L", "R"):
+        obj = bpy.data.objects.get(f"Happi_Sleeve_{'Left' if side == 'L' else 'Right'}")
+        bone = armature.data.bones.get(f"UpperArm_{side}")
+        if obj is None or bone is None:
+            result[side] = {
+                "passed": False,
+                "reason": "missing sleeve or upper-arm bone",
+            }
+            passed = False
+            continue
+        segments = int(obj.get("happiRingSegments", 0))
+        if segments <= 0 or len(obj.data.vertices) < segments:
+            result[side] = {"passed": False, "reason": "invalid sleeve root ring"}
+            passed = False
+            continue
+        root_points = [
+            obj.matrix_world @ obj.data.vertices[index].co for index in range(segments)
+        ]
+        center = sum(root_points, Vector()) / segments
+        head = armature.matrix_world @ bone.head_local
+        radius = max((point - center).length for point in root_points)
+        center_offset = (center - head).length
+        overlap_margin = radius - center_offset
+        side_pass = overlap_margin >= 0.010
+        passed = passed and side_pass
+        result[side] = {
+            "rootRadiusM": radius,
+            "rootCenterToShoulderM": center_offset,
+            "overlapMarginM": overlap_margin,
+            "requiredMinimumOverlapMarginM": 0.010,
+            "rootClosed": bool(obj.get("happiShoulderRootClosed", False)),
+            "rootCapFaceCount": int(obj.get("happiShoulderRootCapFaces", 0)),
+            "passed": side_pass,
+        }
+    return {"passed": passed, "sides": result}
 
 
 def configure_cloth(
@@ -245,10 +301,7 @@ def configure_cloth(
             vertex.index
             for vertex, coordinate in zip(panel.data.vertices, coordinates)
             if coordinate.z > 0.965
-            or (
-                panel.name.startswith("Happi_Front")
-                and abs(coordinate.x) <= 0.055
-            )
+            or (panel.name.startswith("Happi_Front") and abs(coordinate.x) <= 0.055)
         ]
         pin = panel.vertex_groups.new(name="HappiClothPin")
         pin.add(selected, 1.0, "REPLACE")
@@ -373,17 +426,36 @@ def postprocess(job: dict, result: int) -> int:
 
     report = v1.read_json(report_path)
     clearance = float(report["clearanceRefinement"][-1]["clearance"]["p01"])
-    mean_clearance = float(
-        report["clearanceRefinement"][-1]["clearance"]["mean"]
-    )
+    mean_clearance = float(report["clearanceRefinement"][-1]["clearance"]["mean"])
     front_opening = float(report["frontOpeningM"])
+    root_contract = sleeve_root_contract(bpy.data.objects["SiroinoSotai_Armature"])
+
+    def minimum_mesh_distance(first_name: str, second_name: str) -> float:
+        first = bpy.data.objects[first_name]
+        second = bpy.data.objects[second_name]
+        first_points = [
+            first.matrix_world @ vertex.co for vertex in first.data.vertices
+        ]
+        second_points = [
+            second.matrix_world @ vertex.co for vertex in second.data.vertices
+        ]
+        return min(
+            (left - right).length for left in first_points for right in second_points
+        )
+
+    collar_band_distance = min(
+        minimum_mesh_distance("Happi_Collar_Back", name)
+        for name in ("Happi_Collar_Front_Left", "Happi_Collar_Front_Right")
+    )
     fit_pass = (
         0.006 <= clearance <= 0.035
         and mean_clearance <= 0.050
         and 0.025 <= front_opening <= 0.090
+        and root_contract["passed"]
+        and collar_band_distance <= 0.006
     )
     report["passed"] = bool(report["passed"] and fit_pass)
-    report["silhouetteRevision"] = "v2-shaped-shell-long-sleeve"
+    report["silhouetteRevision"] = "v3-connected-shoulder-sleeve-collar"
     report["fitEnvelope"] = {
         "clearanceP01M": clearance,
         "meanClearanceM": mean_clearance,
@@ -394,11 +466,17 @@ def postprocess(job: dict, result: int) -> int:
             "frontOpeningM": [0.025, 0.090],
         },
         "status": "PASS" if fit_pass else "FAIL",
+        "sleeveRootContract": root_contract,
+        "seamConnectionAudit": {
+            "collarBridgeToFrontBandMinimumDistanceM": collar_band_distance,
+            "requiredMaximumDistanceM": 0.006,
+            "status": "PASS" if collar_band_distance <= 0.006 else "FAIL",
+        },
     }
     report["notes"] = [
         "The body uses curved front and back panels with sloped shoulder seams.",
-        "Sleeves run from the upper arm to before the wrist and blend across the elbow.",
-        "The collar bridge shares the chest frame with the front bands to stay connected.",
+        "Sleeves overlap the shoulder seam at the root, then taper through upper-arm/lower-arm blended weights.",
+        "The closed shoulder-side sleeve rings and front-matched collar endpoints are audited as sewn connections.",
         "The fit gate rejects both body penetration and an oversized rigid box.",
         "No manufacturer, product code, text, or crest is asserted.",
         "Silhouette and styling remain pending direct inspection of current images.",
@@ -425,13 +503,13 @@ def postprocess(job: dict, result: int) -> int:
 
     readme = product_root / "README.md"
     readme.write_text(
-        f"""# {job['productName']}
+        f"""# {job["productName"]}
 
 Product ID: `{PRODUCT_ID}`  
-State: **{manifest['status']}**  
+State: **{manifest["status"]}**  
 Target: **SiroinoSotai_PC**
 
-The private source is bound only as `{manifest['sourceReference']}`; the original
+The private source is bound only as `{manifest["sourceReference"]}`; the original
 image is not redistributed.
 
 ## Generated construction
@@ -444,7 +522,7 @@ image is not redistributed.
 
 ## Current boundary
 
-Technical evidence is recorded in `{manifest['outputs']['buildReport']}`. The fit
+Technical evidence is recorded in `{manifest["outputs"]["buildReport"]}`. The fit
 envelope also rejects excessive body clearance, not only penetration. Silhouette
 and styling stay pending until the current five-view and six-pose images are
 opened directly; metrics alone cannot make this product COMPLETE.

@@ -9,11 +9,10 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
-
-from PIL import Image
 
 from candidate_quality import (
     QUALITY_REJECT,
@@ -24,6 +23,17 @@ from candidate_quality import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from image2outfit.stage_contracts import (
+    normalize_observed_variants,
+    resolve_private_reference,
+    validate_pattern_contract,
+    validate_stitch_contract,
+)
+
 STAGES = (
     "ingest-reference",
     "normalize-view",
@@ -185,73 +195,22 @@ def stage_normalize(job: Mapping[str, Any], result: Path) -> None:
         repo_path(job["garmentPipeline"]["referenceAuditPath"], label="audit"),
         "reference audit",
     )
+    source_path = resolve_private_reference(ROOT, job, audit)
     output_root = runtime_root(product_id) / "normalized"
-    output_root.mkdir(parents=True, exist_ok=True)
-    outputs: list[Path] = []
-    normalized_records: list[dict[str, Any]] = []
-    for variant in audit["variants"]:
-        canvas = Image.new("RGB", (768, 768), "white")
-        from PIL import ImageDraw
-
-        draw = ImageDraw.Draw(canvas)
-        colors = variant["dominantColors"]
-        primary = tuple(
-            colors[1]["rgb"]
-            if variant["variantId"] == "wine-red-black"
-            else colors[0]["rgb"]
-        )
-        black = (15, 15, 18)
-        white = (242, 242, 240)
-        silver = (142, 148, 160)
-        draw.rounded_rectangle(
-            (286, 105, 482, 420), radius=48, fill=primary, outline=black, width=6
-        )
-        draw.polygon(
-            [(330, 120), (438, 120), (408, 355), (384, 390), (360, 355)],
-            fill=white,
-        )
-        draw.polygon([(286, 390), (482, 390), (590, 650), (178, 650)], fill=black)
-        draw.polygon(
-            [(205, 620), (563, 620), (610, 700), (158, 700)],
-            fill=(30, 30, 34),
-        )
-        draw.ellipse((335, 92, 433, 160), fill=black)
-        draw.line((320, 405, 384, 455, 448, 405), fill=silver, width=5)
-        for y in (225, 265, 305, 345):
-            draw.ellipse((377, y, 391, y + 14), fill=black)
-        path = output_root / f"{variant['variantId']}.png"
-        canvas.save(path, optimize=True)
-        outputs.append(path)
-        normalized_records.append(
-            {
-                "variantId": variant["variantId"],
-                "sourceBoundingBoxPx": variant["boundingBoxPx"],
-                "output": relative(path),
-                "normalization": (
-                    "privacy-preserving construction schematic from audited observations"
-                ),
-            }
-        )
-    report = write_json(
-        output_root / "normalized-view.json",
-        {
-            "schemaVersion": 1,
-            "productId": product_id,
-            "status": "PASS",
-            "records": normalized_records,
-            "poseNormalization": "not-applicable-product-mannequin-front-view",
-            "sourceImageRedistributed": False,
-            "viewLimitations": [
-                "front view only",
-                "back construction inferred and marked uncertain",
-            ],
-        },
-    )
+    outputs, manifest = normalize_observed_variants(source_path, audit, output_root)
+    report = write_json(output_root / "normalized-view.json", manifest)
     emit(
         result,
         stage="normalize-view",
         product_id=product_id,
         paths=[*outputs, report],
+        extra={
+            "observationSource": "original-image",
+            "sourceImageResolved": True,
+            "sourceImageSha256": audit["source"]["originalSha256"],
+            "normalizationContractValidated": True,
+            "roundTripMaxErrorPx": manifest["roundTripMaxErrorPx"],
+        },
     )
 
 
@@ -275,12 +234,65 @@ def stage_static(job: Mapping[str, Any], stage: str, key: str, result: Path) -> 
     items = payload.get(count_key)
     if not isinstance(items, list) or not items:
         raise ValueError(f"{stage} requires a non-empty {count_key} list")
+
+    pipeline = job.get("garmentPipeline", {})
+    contract_version = (
+        int(pipeline.get("stageContractVersion", 1))
+        if isinstance(pipeline, Mapping)
+        else 1
+    )
+    if contract_version < 2 or stage == "decompose-garment":
+        emit(
+            result,
+            stage=stage,
+            product_id=str(job["id"]),
+            paths=[path],
+            extra={f"{count_key}Count": len(items)},
+        )
+        return
+
+    product_id = str(job["id"])
+    if stage == "draft-patterns":
+        summary = validate_pattern_contract(payload, expected_product_id=product_id)
+        emit(
+            result,
+            stage=stage,
+            product_id=product_id,
+            paths=[path],
+            extra={
+                "artifactContractValidated": True,
+                "artifactRole": "patternSpecification",
+                "artifactSha256": sha256(path),
+                "piecesCount": summary["pieceCount"],
+                "edgeCount": summary["edgeCount"],
+                "units": summary["units"],
+            },
+        )
+        return
+
+    pattern_path, pattern = validate_product_document(
+        job, "patternContractPath", "pattern contract"
+    )
+    summary = validate_stitch_contract(
+        payload,
+        pattern,
+        expected_product_id=product_id,
+    )
     emit(
         result,
         stage=stage,
-        product_id=str(job["id"]),
-        paths=[path],
-        extra={f"{count_key}Count": len(items)},
+        product_id=product_id,
+        paths=[pattern_path, path],
+        extra={
+            "artifactContractValidated": True,
+            "consumerBindingValidated": True,
+            "artifactRole": "stitchGraph",
+            "inputPatternSha256": sha256(pattern_path),
+            "stitchGraphSha256": sha256(path),
+            "stitchesCount": summary["stitchCount"],
+            "referencedEdgeCount": summary["referencedEdgeCount"],
+            "orientationChecks": summary["orientationChecks"],
+        },
     )
 
 
@@ -292,6 +304,29 @@ def stage_initialize(job: Mapping[str, Any], result: Path) -> None:
     stitch_path, stitches = validate_product_document(
         job, "stitchGraphPath", "stitch graph"
     )
+    pipeline = job.get("garmentPipeline", {})
+    contract_version = (
+        int(pipeline.get("stageContractVersion", 1))
+        if isinstance(pipeline, Mapping)
+        else 1
+    )
+    contract_summary: dict[str, Any] = {}
+    if contract_version >= 2:
+        pattern_summary = validate_pattern_contract(
+            pattern, expected_product_id=product_id
+        )
+        stitch_summary = validate_stitch_contract(
+            stitches, pattern, expected_product_id=product_id
+        )
+        contract_summary = {
+            "inputBindingsValidated": True,
+            "patternSha256": sha256(pattern_path),
+            "stitchSha256": sha256(stitch_path),
+            "patternPieceCount": pattern_summary["pieceCount"],
+            "patternEdgeCount": pattern_summary["edgeCount"],
+            "stitchCount": stitch_summary["stitchCount"],
+        }
+
     placements = {
         "bib-front": {"anchor": "Chest", "offsetM": [0.0, -0.009, 0.885]},
         "waistcoat-left": {
@@ -318,6 +353,7 @@ def stage_initialize(job: Mapping[str, Any], result: Path) -> None:
             "patternPieceCount": len(pattern["pieces"]),
             "stitchCount": len(stitches["stitches"]),
             "placements": placements,
+            **contract_summary,
         },
     )
     emit(
@@ -325,6 +361,7 @@ def stage_initialize(job: Mapping[str, Any], result: Path) -> None:
         stage="initialize-3d",
         product_id=product_id,
         paths=[pattern_path, stitch_path, report],
+        extra=contract_summary or None,
     )
 
 
@@ -418,14 +455,110 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         label="cloth report",
     )
     payload = read_object(report, "cloth simulation report")
-    if payload.get("status") != "PASS" or not payload.get("cacheBaked"):
-        raise ValueError("cloth simulation report must record a baked PASS cache")
+    pipeline = job.get("garmentPipeline", {})
+    contract_version = (
+        int(pipeline.get("stageContractVersion", 1))
+        if isinstance(pipeline, Mapping)
+        else 1
+    )
+    if contract_version < 2:
+        if payload.get("status") != "PASS" or not payload.get("cacheBaked"):
+            raise ValueError("cloth simulation report must record a baked PASS cache")
+        emit(
+            result,
+            stage="simulate-cloth",
+            product_id=product_id,
+            paths=[report],
+            extra={"cacheBaked": True, "frameEnd": payload.get("frameEnd")},
+        )
+        return
+
+    construction_path, construction = validate_product_document(
+        job,
+        "constructionPath",
+        "construction contract",
+    )
+    policy = construction.get("clothSimulation")
+    if not isinstance(policy, Mapping):
+        raise ValueError("construction clothSimulation policy is required")
+    applicability = policy.get("applicability")
+    if applicability not in {"REQUIRED", "NOT_REQUIRED"}:
+        raise ValueError("cloth applicability must be REQUIRED or NOT_REQUIRED")
+    if payload.get("status") != "PASS":
+        raise ValueError("cloth simulation report status must be PASS")
+    if payload.get("applicability") != applicability:
+        raise ValueError(
+            "cloth report applicability does not match construction policy"
+        )
+
+    contracts = payload.get("contracts")
+    if not isinstance(contracts, list):
+        raise ValueError("cloth report contracts must be a list")
+
+    blend = repo_path(job["blendPath"], label="blend")
+    if applicability == "REQUIRED":
+        expected_components = policy.get("components")
+        if (
+            not isinstance(expected_components, list)
+            or not expected_components
+            or not all(
+                isinstance(value, str) and value for value in expected_components
+            )
+        ):
+            raise ValueError("required cloth components must be declared")
+        actual_components = [
+            contract.get("object")
+            for contract in contracts
+            if isinstance(contract, Mapping)
+        ]
+        if sorted(actual_components) != sorted(expected_components):
+            raise ValueError(
+                "cloth report object set does not match construction policy"
+            )
+        if not payload.get("cacheBaked") or not payload.get("geometryChanged"):
+            raise ValueError("required cloth simulation did not bake and settle")
+
+        def valid_hash(value: object) -> bool:
+            return (
+                isinstance(value, str)
+                and len(value) == 64
+                and all(character in "0123456789abcdef" for character in value)
+            )
+
+        for index, contract in enumerate(contracts):
+            if not isinstance(contract, Mapping):
+                raise ValueError(f"cloth contract {index} must be an object")
+            if contract.get("cacheBakedActual") is not True:
+                raise ValueError(f"cloth contract {index} has no actual baked cache")
+            if contract.get("geometryChanged") is not True:
+                raise ValueError(f"cloth contract {index} did not change geometry")
+            before = contract.get("preBakeMeshSha256")
+            evaluated = contract.get("evaluatedFrameMeshSha256")
+            settled = contract.get("settledMeshSha256")
+            if not all(valid_hash(value) for value in (before, evaluated, settled)):
+                raise ValueError(f"cloth contract {index} mesh hashes are invalid")
+            if before == settled:
+                raise ValueError(f"cloth contract {index} settled mesh is unchanged")
+            if contract.get("frameStart") != payload.get("frameStart"):
+                raise ValueError(f"cloth contract {index} frameStart mismatch")
+            if contract.get("frameEnd") != payload.get("frameEnd"):
+                raise ValueError(f"cloth contract {index} frameEnd mismatch")
+    elif contracts:
+        raise ValueError("NOT_REQUIRED cloth policy must not report simulated objects")
+
     emit(
         result,
         stage="simulate-cloth",
         product_id=product_id,
-        paths=[report],
-        extra={"cacheBaked": True, "frameEnd": payload.get("frameEnd")},
+        paths=[construction_path, report, blend],
+        extra={
+            "cacheEvidenceValidated": True,
+            "simulationApplicability": applicability,
+            "cacheBaked": bool(payload.get("cacheBaked")),
+            "geometryChanged": bool(payload.get("geometryChanged")),
+            "simulatedObjectCount": len(contracts),
+            "frameEnd": payload.get("frameEnd"),
+        },
     )
 
 

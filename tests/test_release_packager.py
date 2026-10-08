@@ -12,7 +12,12 @@ from pathlib import Path
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
+import contract_io  # noqa: E402
 import production_contract  # noqa: E402
+
+SCHEMA = (
+    Path(__file__).resolve().parents[1] / "config/candidate-manifest.schema.v2.json"
+)
 
 
 class ReleasePackagingTest(unittest.TestCase):
@@ -93,6 +98,49 @@ class ReleasePackagingTest(unittest.TestCase):
                 names = set(bundle.namelist())
             self.assertIn("Package/Evidence/Human/vrchat-runtime-review.json", names)
             self.assertIn("Package/Evidence/Human/runtime/runtime.png", names)
+
+    def test_schema_invalid_candidate_is_refused_before_packaging(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            candidate = root / ".image2outfit/products/demo/candidate"
+            release = root / ".image2outfit/products/demo/release"
+            candidate.mkdir(parents=True)
+            manifest = {
+                "schemaVersion": 2,
+                "kind": "image2outfit-candidate",
+                "jobId": "demo",
+            }
+            job_path = root / "config/products/demo/job.json"
+            job_path.parent.mkdir(parents=True)
+            job_path.write_text("{}\n", encoding="utf-8")
+            job = {
+                "id": "demo",
+                "adapterId": "demo-v1",
+                "productRoot": "Assets/GenWorks/demo",
+                "humanEvidence": {},
+            }
+
+            def validate_schema(*_args: object) -> list[str]:
+                return contract_io.validate_schema_file(
+                    manifest, SCHEMA, "candidate manifest"
+                )
+
+            with self.assertRaisesRegex(ValueError, "release packaging refused"):
+                production_contract.package_release(
+                    root=root,
+                    job_path=job_path,
+                    job=job,
+                    policy={"blockedReleaseAdapterIds": []},
+                    candidate=candidate,
+                    release=release,
+                    candidate_manifest=manifest,
+                    candidate_hash="0" * 64,
+                    human_evidence={},
+                    verify_candidate=validate_schema,
+                    now=lambda: datetime.now(timezone.utc).isoformat(),
+                )
+
+            self.assertFalse(release.exists())
 
 
 if __name__ == "__main__":

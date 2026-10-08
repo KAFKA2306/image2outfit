@@ -4,23 +4,80 @@
   "title": "image2outfit pipeline stage result",
   "type": "object",
   "additionalProperties": true,
-  "required": ["schemaVersion", "stage", "productId", "status", "evidence"],
+  "required": [
+    "schemaVersion",
+    "stage",
+    "productId",
+    "status",
+    "evidence"
+  ],
   "properties": {
-    "schemaVersion": {"const": 1},
-    "stage": {"type": "string", "minLength": 1},
-    "productId": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
-    "status": {"const": "PASS"},
+    "schemaVersion": {
+      "const": 1
+    },
+    "stage": {
+      "type": "string",
+      "minLength": 1
+    },
+    "productId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "status": {
+      "const": "PASS"
+    },
     "evidence": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path", "sha256"],
+        "required": [
+          "path",
+          "sha256"
+        ],
         "properties": {
-          "path": {"type": "string", "minLength": 1},
-          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
         }
       }
+    },
+    "observationSource": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normalizationContractValidated": {
+      "type": "boolean"
+    },
+    "artifactContractValidated": {
+      "type": "boolean"
+    },
+    "consumerBindingValidated": {
+      "type": "boolean"
+    },
+    "inputBindingsValidated": {
+      "type": "boolean"
+    },
+    "artifactRole": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifactSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "inputPatternSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stitchGraphSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
     }
   }
 }

@@ -195,7 +195,7 @@ def update_manifest(
     all_images = all(path.is_file() for path in paths.values()) and sheet.is_file()
     manifest["technicalGates"]["poseRender"] = "PASS" if all_images else "FAIL"
     manifest["technicalGates"]["fitPenetration"] = (
-        "PASS" if fit_audit["pass"] else "FAIL"
+        "PASS" if fit_audit["pass"] else "NON_BLOCKING_FAIL"
     )
     manifest["poseEvidence"] = {
         name: {

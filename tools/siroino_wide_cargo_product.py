@@ -616,9 +616,36 @@ def reviewed_audit(implementation: ModuleType, baseline_audit) -> dict[str, obje
         "hem": hem_extent,
     }
 
+    _, job = implementation.build.c.load_job()
+    unity_ready = job.get("unityReady")
+    if not isinstance(unity_ready, dict):
+        raise RuntimeError("Wide Cargo job is missing unityReady material contract")
+    declared_roles = unity_ready.get("materialRoles")
+    minimum_materials = unity_ready.get("minimumDistinctMaterials")
+    if (
+        not isinstance(declared_roles, list)
+        or not isinstance(minimum_materials, int)
+        or minimum_materials < 2
+    ):
+        raise RuntimeError("Wide Cargo unityReady material contract is invalid")
+    declared_materials = {
+        item.get("material")
+        for item in declared_roles
+        if isinstance(item, dict) and isinstance(item.get("material"), str)
+    }
+    material_names = [
+        material.name for material in garment.data.materials if material is not None
+    ]
+    metrics["materialNames"] = material_names
+
     armature_parent = garment.parent
     checks.update(
         {
+            "unityReadyMaterialContractPassed": (
+                len(material_names) >= minimum_materials
+                and len(material_names) == len(set(material_names))
+                and set(material_names) == declared_materials
+            ),
             "sourceFaceIndependencePassed": min(zs) >= 0.10 and max(zs) <= 0.85,
             "spikeGuardPassed": (
                 float(metrics["maximumEdgeLength"]) <= 0.155
@@ -674,6 +701,7 @@ def reviewed_audit(implementation: ModuleType, baseline_audit) -> dict[str, obje
         "spikeGuardPassed",
         "uvPassed",
         "materialSeparationPassed",
+        "unityReadyMaterialContractPassed",
         "shapeKeyIsolationPassed",
         "weightingPassed",
         "footAndFloorClearancePassed",
@@ -708,6 +736,29 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
     gates["latestGeometryRender"] = "PASS" if report["passed"] else "FAIL"
     path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    artifact_dir = implementation.build.c.repo_path(job["artifactDir"])
+    build_report_path = artifact_dir / "blender-product.json"
+    build_report = (
+        json.loads(build_report_path.read_text(encoding="utf-8-sig"))
+        if build_report_path.is_file()
+        else {}
+    )
+    build_report["passed"] = bool(report["passed"])
+    build_report["finalAudit"] = {
+        "passed": bool(report["passed"]),
+        "unityReadyMaterialContractPassed": bool(
+            report.get("checks", {}).get("unityReadyMaterialContractPassed")
+        ),
+        "materialNames": report.get("checks", {})
+        .get("metrics", {})
+        .get("materialNames", []),
+    }
+    build_report_path.parent.mkdir(parents=True, exist_ok=True)
+    build_report_path.write_text(
+        json.dumps(build_report, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
 

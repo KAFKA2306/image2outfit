@@ -105,3 +105,19 @@ validation:
   semantic: The research baseline keeps publication claims, project assessments, requirements, tests, evidence, and decisions as separate records with validated references.
   evidence: Mandatory source, assessment, view, pose, dynamic, human-review, runtime, and hash-binding records.
   publication: Release artifacts exist only after GO; Published snapshots are not treated as releases and unverified publication code is not copied.
+
+operational_model:
+  implementation_status: "Existing Blender/Unity job and release policy enforce candidate review; source asset and runtime evidence remain local."
+  canonical_sources: ["config/genworks-handoff-policy.json","config/release-policy.json","Assets/GenWorks/","src/image2outfit/pipeline.py"]
+  objects: ["ProductIntent","LicensedAvatar","GarmentCandidate","CandidateManifest","Evidence","QualityGate","Release"]
+  links:
+    - ["GarmentCandidate","TARGETS","LicensedAvatar"]
+    - ["GarmentCandidate","RECORDED_IN","CandidateManifest"]
+    - ["Evidence","VERIFIES","QualityGate"]
+    - ["Release","PROMOTED_FROM","GarmentCandidate"]
+  actions:
+    - id: "promote_verified_candidate"
+      preconditions: "The selected ProductIntent has explicit handoff evidence. The exact licensed avatar, manifest hash and every required technical and human gate pass without changing reviewed artifacts."
+      recorded_effect: "Promote the unchanged candidate manifest into a release with hashes and retained review evidence."
+      rollback_or_recovery: "On any missing visual, pose, runtime, licensing or hash evidence, remain REVIEW_REQUIRED or NO-GO; do not publish a release."
+  outcome_metrics: ["candidate_first_pass_yield","required_gate_coverage","critical_penetration_failure_count","verified_release_count"]

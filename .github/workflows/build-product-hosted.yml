@@ -39,7 +39,7 @@ permissions:
 
 concurrency:
   group: image2outfit-hosted-${{ inputs.job_path || github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   blender:
@@ -96,6 +96,7 @@ jobs:
             --base-sha "$BASE_SHA" \
             --head-sha "$HEAD_SHA" \
             --github-env "$GITHUB_ENV" \
+            --materialize-job \
             --include-pipeline-request
 
       - name: Compile and test pipeline contracts
@@ -359,6 +360,18 @@ jobs:
                   'Artifacts are preserved for exact inspection and resume.'
               )
               raise SystemExit(0)
+          expected_private_reference_boundary = (
+              state.get('status') == 'FAILED'
+              and state.get('current_stage') == 'normalize-view'
+              and completed == ['ingest-reference']
+              and 'private reference image is required' in state.get('errors', [''])[-1]
+          )
+          if expected_private_reference_boundary:
+              print(
+                  'Hosted execution reached the private-reference boundary. '
+                  'normalize-view correctly refused to PASS without the audited source image.'
+              )
+              raise SystemExit(0)
           raise SystemExit(
               f"Pipeline stopped unexpectedly at {state.get('current_stage')}: "
               f"{state.get('errors', ['unknown error'])[-1]}"
@@ -496,4 +509,3 @@ jobs:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

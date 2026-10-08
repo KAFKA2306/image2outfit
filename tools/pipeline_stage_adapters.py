@@ -23,6 +23,7 @@ from image2outfit.execution import (
 )
 from image2outfit.pipeline import PIPELINE_STAGES, PipelineStage
 from image2outfit.tooling import ToolDescriptor, ToolRegistry, choose_tool
+from repository_write_boundary import RepositoryWriteBoundary
 
 
 class PlannedStageAdapter:
@@ -117,49 +118,58 @@ class CommandStageAdapter(PlannedStageAdapter):
             result_path.unlink()
         result_path.parent.mkdir(parents=True, exist_ok=True)
 
-        result = subprocess.run(
-            self.command,
-            cwd=ROOT,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            raise RuntimeError(
-                f"stage command failed with exit code {result.returncode}: "
-                f"{' '.join(self.command)}\n{result.stderr}"
-            )
-
-        if not result_path.is_file():
-            raise FileNotFoundError(
-                f"stage result file was not created: {self.result_path}"
-            )
+        boundary = RepositoryWriteBoundary(ROOT)
+        boundary.begin()
         try:
-            payload = json.loads(result_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"stage result file is invalid JSON: {self.result_path}"
-            ) from exc
-        if not isinstance(payload, Mapping):
-            raise ValueError("stage result JSON must be an object")
-        validated = validate_stage_result(
-            payload,
-            expected_stage=self.stage.value,
-            expected_product_id=str(state["product_id"]),
-            requirement=self.result_requirement,
-        )
-        for item in validated["evidence"]:
-            evidence_path = self._repo_path(item["path"], label="evidence path")
-            if not evidence_path.is_file():
+            result = subprocess.run(
+                self.command,
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"stage command failed with exit code {result.returncode}: "
+                    f"{' '.join(self.command)}\n{result.stderr}"
+                )
+
+            if not result_path.is_file():
                 raise FileNotFoundError(
-                    f"stage evidence file is missing: {item['path']}"
+                    f"stage result file was not created: {self.result_path}"
                 )
-            actual = self._sha256(evidence_path)
-            if actual != item["sha256"]:
+            try:
+                payload = json.loads(result_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError as exc:
                 raise ValueError(
-                    f"stage evidence hash mismatch for {item['path']}: "
-                    f"expected {item['sha256']}, found {actual}"
-                )
+                    f"stage result file is invalid JSON: {self.result_path}"
+                ) from exc
+            if not isinstance(payload, Mapping):
+                raise ValueError("stage result JSON must be an object")
+            validated = validate_stage_result(
+                payload,
+                expected_stage=self.stage.value,
+                expected_product_id=str(state["product_id"]),
+                requirement=self.result_requirement,
+            )
+            evidence_paths: list[Path] = []
+            for item in validated["evidence"]:
+                evidence_path = self._repo_path(item["path"], label="evidence path")
+                if not evidence_path.is_file():
+                    raise FileNotFoundError(
+                        f"stage evidence file is missing: {item['path']}"
+                    )
+                actual = self._sha256(evidence_path)
+                if actual != item["sha256"]:
+                    raise ValueError(
+                        f"stage evidence hash mismatch for {item['path']}: "
+                        f"expected {item['sha256']}, found {actual}"
+                    )
+                evidence_paths.append(evidence_path)
+            changed_paths = boundary.verify_and_commit([result_path, *evidence_paths])
+        except Exception:
+            boundary.rollback()
+            raise
         return {
             **planned,
             "mode": "executed",
@@ -167,6 +177,7 @@ class CommandStageAdapter(PlannedStageAdapter):
             "stdout": result.stdout,
             "stderr": result.stderr,
             "result": validated,
+            "changedPaths": list(changed_paths),
         }
 
 

@@ -68,6 +68,7 @@ def pipeline_source_fingerprint(
         request_path,
         profile_path,
         root / "config" / "pipeline" / "visual-quality-defaults.v1.json",
+        root / "config" / "pipeline" / "pipeline-state.schema.v1.json",
         root / "config" / "toolchain-lock.json",
         root / "pyproject.toml",
         root / "uv.lock",

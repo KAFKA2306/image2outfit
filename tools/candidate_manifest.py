@@ -15,9 +15,11 @@ import contract_io
 ROOT = Path(__file__).resolve().parents[1]
 POLICY_PATH = ROOT / "config" / "release-policy.json"
 JOB_SCHEMA_PATH = ROOT / "config" / "job.schema.v2.json"
+CANDIDATE_SCHEMA_PATH = ROOT / "config" / "candidate-manifest.schema.v2.json"
 UNITY_PIPELINE_PATH = (
     ROOT / "Assets" / "GenWorks" / "Shared" / "Editor" / "Image2OutfitPipeline.cs"
 )
+SHAPE_KEY_REPORT = "smooth-shape-keys.json"
 
 
 def now() -> str:
@@ -32,6 +34,10 @@ def read(path: Path) -> dict[str, Any]:
 
 
 def write(path: Path, value: dict[str, Any]) -> None:
+    if path.name == "candidate-manifest.json":
+        errors = candidate_structure_errors(value)
+        if errors:
+            raise ValueError("; ".join(errors))
     contract_io.write_json(path, value)
 
 
@@ -119,6 +125,49 @@ def png_size(file: Path) -> tuple[int, int]:
     return struct.unpack(">II", header[16:24])
 
 
+def _shape_key_requirement(job: dict[str, Any]) -> str | None:
+    product_id = job.get("id")
+    if not isinstance(product_id, str) or not product_id:
+        return None
+    construction = read(ROOT / "config" / "products" / product_id / "construction.json")
+    postprocess = construction.get("shapeKeyPostprocess")
+    if not isinstance(postprocess, dict):
+        return None
+    applicability = postprocess.get("applicability")
+    return applicability if isinstance(applicability, str) else None
+
+
+def _shape_key_gate(job: dict[str, Any]) -> dict[str, Any]:
+    artifact_value = job.get("artifactDir")
+    if not isinstance(artifact_value, str) or not artifact_value:
+        return {
+            "passed": False,
+            "error": "job.artifactDir is required for Shape Key evidence",
+        }
+    report_path = path(artifact_value) / SHAPE_KEY_REPORT
+    report = read(report_path)
+    item: dict[str, Any] = {
+        "path": rel(report_path),
+        "passed": report_path.is_file() and report.get("passed") is True,
+        "status": report.get("status"),
+        "provider": report.get("provider"),
+        "errors": report.get("errors", []),
+        "metrics": report.get("metrics", {}),
+    }
+    if not report_path.is_file():
+        item["error"] = "Smooth Shape Keys report is missing"
+    elif report.get("provider") != "maxwilso-smooth-shape-keys":
+        item["passed"] = False
+        item["error"] = "unexpected Shape Key postprocess provider"
+    elif (
+        _shape_key_requirement(job) == "REQUIRED"
+        and report.get("status") == "NOT_APPLICABLE"
+    ):
+        item["passed"] = False
+        item["error"] = "required Shape Keys were not generated"
+    return item
+
+
 def preview_gate(
     job: dict[str, Any], policy: dict[str, Any]
 ) -> tuple[bool, dict[str, Any]]:
@@ -136,6 +185,10 @@ def preview_gate(
             item["error"] = str(exc)
         passed = passed and item["passed"]
         result[view] = item
+
+    shape_key = _shape_key_gate(job)
+    result["shapeKeyPostprocess"] = shape_key
+    passed = passed and shape_key["passed"] is True
     return passed, result
 
 
@@ -197,37 +250,57 @@ def manifest(files: list[Path], base: Path) -> list[dict[str, Any]]:
     ]
 
 
+def candidate_structure_errors(data: dict[str, Any]) -> list[str]:
+    schema_errors = contract_io.validate_schema_file(
+        data, CANDIDATE_SCHEMA_PATH, "candidate manifest"
+    )
+    if schema_errors:
+        return [f"candidate manifest schema: {error}" for error in schema_errors]
+    seen_paths: set[str] = set()
+    errors: list[str] = []
+    for item in data["files"]:
+        item_path = item["path"]
+        if item_path in seen_paths:
+            errors.append(f"duplicate candidate manifest path: {item_path}")
+        seen_paths.add(item_path)
+    return errors
+
+
 def verify_candidate(
     job_path: Path,
     job: dict[str, Any],
     candidate: Path,
     data: dict[str, Any],
 ) -> list[str]:
+    structure_errors = candidate_structure_errors(data)
+    if structure_errors:
+        return structure_errors
+
     errors = []
-    if data.get("schemaVersion") != 2 or data.get("kind") != "image2outfit-candidate":
-        errors.append("candidate manifest invalid")
-    if data.get("jobId") != job["id"] or data.get("adapterId") != job["adapterId"]:
+    if data["jobId"] != job["id"] or data["adapterId"] != job["adapterId"]:
         errors.append("candidate identity mismatch")
     current_commit = os.environ.get("GITHUB_SHA")
-    if current_commit and data.get("sourceCommit") != current_commit:
+    if current_commit and data["sourceCommit"] != current_commit:
         errors.append("candidate source commit differs from current commit")
     current_inputs = inputs(job_path, job)
-    for name, expected in data.get("inputHashes", {}).items():
+    for name, expected in data["inputHashes"].items():
         if current_inputs.get(name) != expected:
             errors.append(f"candidate input changed: {name}")
+
     expected_paths = set()
-    for item in data.get("files", []):
-        file = (candidate / item.get("path", "")).resolve()
+    for item in data["files"]:
+        item_path = item["path"]
+        file = (candidate / item_path).resolve()
         if not inside(file, candidate):
             errors.append("candidate manifest path escapes directory")
             continue
         expected_paths.add(file)
         if (
             not file.is_file()
-            or digest(file) != item.get("sha256")
-            or file.stat().st_size != item.get("bytes")
+            or digest(file) != item["sha256"]
+            or file.stat().st_size != item["bytes"]
         ):
-            errors.append(f"candidate file changed: {item.get('path')}")
+            errors.append(f"candidate file changed: {item_path}")
     actual = {file.resolve() for file in candidate.rglob("*") if file.is_file()}
     actual.discard((candidate / "candidate-manifest.json").resolve())
     if actual != expected_paths:

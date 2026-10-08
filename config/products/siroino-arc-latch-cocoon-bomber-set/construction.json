@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-arc-latch-cocoon-bomber-set",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-arc-latch-side-bridges",
+  "panels": [
+    "bomber_front_L", "bomber_front_R", "bomber_back", "sleeve_L", "sleeve_R", "cuff_L", "cuff_R",
+    "inner_front", "inner_back", "short_front_L", "short_front_R", "short_back_L", "short_back_R",
+    "waistband_outer", "waistband_inner", "side_placket_front_L", "side_placket_front_R",
+    "side_placket_back_L", "side_placket_back_R"
+  ],
+  "separateGeometry": [
+    "arc_latch_L_A", "arc_latch_L_B", "arc_latch_L_C", "arc_latch_R_A", "arc_latch_R_B", "arc_latch_R_C",
+    "arc_latch_root_L_A", "arc_latch_root_L_B", "arc_latch_root_L_C",
+    "arc_latch_root_R_A", "arc_latch_root_R_B", "arc_latch_root_R_C"
+  ],
+  "priorityFitZones": ["shoulder", "elbow", "waist", "hip", "side-waist-latch"],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "weight-driven first technical pass",
+    "reason": "The bounded arc-latch bridges are structured skinned geometry; technical acceptance must not depend on unexecuted cloth simulation."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "No product-specific corrective shape-key stage is required for the first structural candidate."
+  },
+  "releaseBoundary": "Canonical release policy remains authoritative; this workline does not infer customer release from contract creation."
+}

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lunar-tech-hoodie",
+  "unityVersion": "2022.3.22f1",
+  "sdkVersion": "VRChat SDK 3.10.4",
+  "scenePath": "Assets/Scenes/Avatar/10_LunarTechHoodie.unity",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Prefab/SiroinoSotai_LunarTechHoodie.prefab",
+  "modularAvatar": {
+    "status": "PASS",
+    "mergeArmature": "SiroinoLunarTechHoodie/SiroinoSotai_Armature.1",
+    "mergeTarget": "Armature",
+    "meshSettings": "SiroinoLunarTechHoodie"
+  },
+  "ndmf": {
+    "status": "PASS",
+    "bakedPrefabPath": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Unity/NDMF-Bake/SiroinoSotai_LunarTechHoodie_baked.prefab",
+    "gameObjects": 79,
+    "meshes": 16
+  },
+  "vrchatDryRun": {
+    "status": "PASS",
+    "valid": true,
+    "warnings": [
+      "PipelineManager.blueprintId empty (new content)",
+      "overall performance rating is VeryPoor"
+    ],
+    "realUpload": "UNVERIFIED"
+  },
+  "appearanceReview": "REVIEW_REQUIRED",
+  "notes": "Unity import uses calculated normals because the Blender FBX exporter emits invalid imported normals for four generated meshes; cloth and pose evidence remain valid. No real VRChat upload was performed."
+}

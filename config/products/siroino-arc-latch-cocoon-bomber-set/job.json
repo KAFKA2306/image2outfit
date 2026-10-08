@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-generic-structural",
+  "id": "siroino-arc-latch-cocoon-bomber-set",
+  "productName": "Arc-Latch Cocoon Bomber Set",
+  "adapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set",
+  "productManifestPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/generic_structural_garment_product.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Source/Blender/ArcLatchCocoonBomberSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Models/ArcLatchCocoonBomberSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Prefab/ArcLatchCocoonBomberSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Prefab/SiroinoSotai_ArcLatchCocoonBomberSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-arc-latch-cocoon-bomber-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/README.md",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Source/Blender/ArcLatchCocoonBomberSet.blend",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Models/ArcLatchCocoonBomberSet.fbx",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Prefab/ArcLatchCocoonBomberSet.prefab",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Prefab/SiroinoSotai_ArcLatchCocoonBomberSet.prefab",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/front.png",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/back.png",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/left.png",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/right.png",
+    "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-arc-latch-cocoon-bomber-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-arc-latch-cocoon-bomber-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-arc-latch-cocoon-bomber-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Shell", "role": "fabric"},
+      {"material": "MAT_Inner", "role": "fabric"},
+      {"material": "MAT_Bottoms", "role": "fabric"},
+      {"material": "MAT_Hero", "role": "trim"},
+      {"material": "MAT_Hardware", "role": "trim"}
+    ]
+  }
+}

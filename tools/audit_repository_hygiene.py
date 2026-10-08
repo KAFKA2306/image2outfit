@@ -9,8 +9,10 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 GLOBAL_CONFIG_FILES = {
+    "candidate-manifest.schema.v2.json",
     "genworks-handoff-policy.json",
     "genworks-layout.json",
+    "avatar-workflow.v1.json",
     "job.schema.v2.json",
     "pr-merge-policy.json",
     "release-policy.json",

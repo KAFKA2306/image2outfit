@@ -1,17 +1,21 @@
 # Military Sheer-Back Romper for Siroino _Large
 
-`WORKING` — Blend、FBX、Prefab宣言、五面画像、ポーズ画像、研究試行の証跡を追跡しています。現在の完了阻害要因は、実画像を直接確認して行う `visualAppearanceReview` だけです。
+`WORKING` — the garment is generated from and rendered on the actual `SiroinoSotai_PC.fbx` surface. Weight groups and supported Siroino body-size shape keys are transferred from the target body. Unity import/reload, Modular Avatar/NDMF, VRChat Build & Test, and human approval remain pending.
 
-Unity import/save/reload、Modular Avatar、NDMF、VRChat Build & Test、VRChat runtime、人間runtime確認は、このリポジトリの完成判定では `OUT_OF_SCOPE` です。外部検証なしにruntime互換性を主張しません。
+## Target-fit evidence
 
-ユーザー提供の参照画像は再配布しません。SHA-256は `3f69a72daa79102c0af5679e2c54d4f078231bdab124314703e2626bcef0e460`、寸法は1200×1022です。参照画像の特徴を再構成していますが、商用品の完全複製は主張しません。
+- Target source: `Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx`
+- Target Prefab: `Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab`
+- Body shape profile: `{"All_L": 1.0, "Chest_L": 1.0, "Hips_01_L": 1.0, "UpperLeg_L": 1.0, "Breasts_L": 0.65}`
+- Fit audit: `Assets/GenWorks/siroino-military-sheer-romper-large/Evidence/target-fit.json`
+- Five-view review: `Assets/GenWorks/siroino-military-sheer-romper-large/Previews/siroino-military-sheer-romper-large-multiview.webp`
+- Pose review: `Assets/GenWorks/siroino-military-sheer-romper-large/Previews/siroino-military-sheer-romper-large-pose-review.webp`
 
-## 正準成果物
+## Unity entry points
 
 - Outfit Prefab: `Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/SiroinoMilitarySheerRomperLarge.prefab`
 - Integration checkpoint: `Assets/GenWorks/siroino-military-sheer-romper-large/Prefab/Siroino_Large_MilitarySheerRomper.prefab`
 - FBX: `Assets/GenWorks/siroino-military-sheer-romper-large/Models/SiroinoMilitarySheerRomperLarge.fbx`
 - Blend: `Assets/GenWorks/siroino-military-sheer-romper-large/Source/Blender/SiroinoMilitarySheerRomperLarge.blend`
-- Pattern/seam specification: `Assets/GenWorks/siroino-military-sheer-romper-large/Documentation/pattern-spec.json`
 
-Prefabは追跡可能な宣言済みYAMLです。Unityでの実import結果やruntime互換性の証拠ではありません。
+The generated integration Prefab remains a checkpoint until Unity imports, saves, reloads, and validates it against `SiroinoSotai_PC.prefab`.
