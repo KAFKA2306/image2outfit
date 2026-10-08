@@ -126,6 +126,20 @@ def validate_json_schema(
                 errors.append(f"{child_path} is not allowed")
             elif isinstance(additional, dict):
                 errors.extend(validate_json_schema(item, additional, child_path))
+
+    all_of = schema.get("allOf")
+    if isinstance(all_of, list):
+        for item in all_of:
+            if isinstance(item, dict):
+                errors.extend(validate_json_schema(value, item, path))
+
+    condition = schema.get("if")
+    if isinstance(condition, dict):
+        matched = not validate_json_schema(value, condition, path)
+        branch = schema.get("then") if matched else schema.get("else")
+        if isinstance(branch, dict):
+            errors.extend(validate_json_schema(value, branch, path))
+
     return errors
 
 

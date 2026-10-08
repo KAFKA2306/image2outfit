@@ -5,6 +5,7 @@ The encoded product source was authored against the former shared
 ``front_strip_mesh`` helper. Keep the compatibility adapter scoped to this
 product instead of silently changing every generator in the repository.
 """
+
 from __future__ import annotations
 
 import base64
@@ -25,8 +26,10 @@ import siroino_strappy_knit_build as _base
 def _body_front(body: bpy.types.Object, x: float, z: float) -> float:
     vertices = sorted(
         body.data.vertices,
-        key=lambda vertex: (_base.mesh_world_vertex(body, vertex.index).x - x) ** 2
-        + (_base.mesh_world_vertex(body, vertex.index).z - z) ** 2,
+        key=lambda vertex: (
+            (_base.mesh_world_vertex(body, vertex.index).x - x) ** 2
+            + (_base.mesh_world_vertex(body, vertex.index).z - z) ** 2
+        ),
     )[:32]
     return min(_base.mesh_world_vertex(body, vertex.index).y for vertex in vertices)
 
@@ -135,15 +138,16 @@ replacements = {
     '"finalDecision": "TECHNICAL_PASS_VISUAL_PASS_RUNTIME_REVIEW_REQUIRED"': (
         '"finalDecision": "BLENDER_PASS_HUMAN_AND_UNITY_REVIEW_REQUIRED"'
     ),
-    'Siroino _Large shape-key profile baked from private source': (
-        'Siroino _Large shape-key profile baked from tracked source'
+    "Siroino _Large shape-key profile baked from private source": (
+        "Siroino _Large shape-key profile baked from tracked source"
     ),
-    'The exact private target is resolved generically by the self-hosted pipeline;': (
-        'The exact tracked target is resolved deterministically by the product pipeline;'
+    "The exact private target is resolved generically by the self-hosted pipeline;": (
+        "The exact tracked target is resolved deterministically by the product pipeline;"
     ),
-    'The five-view and six-pose renders are regenerated from the tracked Blender source.': (
-        'The five-view and seven-pose review renders are regenerated from the tracked Blender source.'
+    "The five-view and six-pose renders are regenerated from the tracked Blender source.": (
+        "The five-view and seven-pose review renders are regenerated from the tracked Blender source."
     ),
+    '"neutral", 800, 24, drape_state)': '"neutral", 1024, 24, drape_state)',
 }
 for old, new in replacements.items():
     if old not in source:

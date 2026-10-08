@@ -6,6 +6,9 @@ on:
       - ARCHITECTURE.md
       - README.md
       - src/**
+      - tools/manage.py
+      - tools/batch_execution.py
+      - tools/run_product_execution.py
       - tools/run_garment_pipeline.py
       - tools/pipeline_stage_adapters.py
       - tools/run_blender_stage.py
@@ -13,6 +16,9 @@ on:
       - tests/**
       - config/pipeline/**
       - config/pipeline-profiles/**
+      - config/batch/**
+      - ops/docker/**
+      - Taskfile.yml
       - examples/pipeline-request.example.json
       - .github/workflows/pipeline-architecture.yml
   push:
@@ -21,6 +27,9 @@ on:
       - ARCHITECTURE.md
       - README.md
       - src/**
+      - tools/manage.py
+      - tools/batch_execution.py
+      - tools/run_product_execution.py
       - tools/run_garment_pipeline.py
       - tools/pipeline_stage_adapters.py
       - tools/run_blender_stage.py
@@ -28,6 +37,9 @@ on:
       - tests/**
       - config/pipeline/**
       - config/pipeline-profiles/**
+      - config/batch/**
+      - ops/docker/**
+      - Taskfile.yml
       - examples/pipeline-request.example.json
       - .github/workflows/pipeline-architecture.yml
 
@@ -60,6 +72,25 @@ jobs:
         run: >-
           uv run --locked --no-default-groups
           python -m unittest discover -s tests -v
+
+      - name: Build Python batch coordinator image
+        run: docker compose -f ops/docker/compose.batch.yml build batch
+
+      - name: Smoke-test Docker batch status path
+        shell: bash
+        run: |
+          set -uo pipefail
+          output="$RUNNER_TEMP/batch-status.json"
+          set +e
+          docker compose -f ops/docker/compose.batch.yml run --rm batch \
+            python tools/manage.py batch status \
+            --manifest config/batch/tracked-requests.json >"$output"
+          code=$?
+          set -e
+          cat "$output"
+          test "$code" -eq 1
+          grep -F '"status": "FAILED"' "$output"
+          grep -F '"NO_STATE": 3' "$output"
 
       - name: Ruff reusable core and adapters
         run: >-

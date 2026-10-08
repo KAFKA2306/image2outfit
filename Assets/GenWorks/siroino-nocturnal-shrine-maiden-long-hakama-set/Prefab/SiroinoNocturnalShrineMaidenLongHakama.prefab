@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &1001000000000000
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -7316719748936713070, guid: dc853a3017bd453b998bc3b1c857eb90,
+        type: 3}
+      propertyPath: m_Name
+      value: SiroinoSotai_Armature.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: dc853a3017bd453b998bc3b1c857eb90, type: 3}
+      propertyPath: m_Name
+      value: Nocturnal Shrine Maiden Long Hakama Set for Siroino
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dc853a3017bd453b998bc3b1c857eb90,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7011961751964008022}
+    - targetCorrespondingSourceObject: {fileID: -7316719748936713070, guid: dc853a3017bd453b998bc3b1c857eb90,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 197058715546215941}
+  m_SourcePrefab: {fileID: 100100000, guid: dc853a3017bd453b998bc3b1c857eb90, type: 3}
+--- !u!1 &919552045447818577 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: dc853a3017bd453b998bc3b1c857eb90,
+    type: 3}
+  m_PrefabInstance: {fileID: 1001000000000000}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7011961751964008022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919552045447818577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 560fdafd46c74b2db6422fdf0e7f2363, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  InheritProbeAnchor: 3
+  ProbeAnchor:
+    referencePath: SiroinoSotai_Armature/Hips
+    targetObject: {fileID: 0}
+  InheritBounds: 3
+  RootBone:
+    referencePath: SiroinoSotai_Armature/Hips
+    targetObject: {fileID: 0}
+  Bounds:
+    m_Center: {x: 0.44529045, y: 0.26646924, z: -0.029169949}
+    m_Extent: {x: 0.18804242, y: 0.053090088, z: 0.0581265}
+--- !u!1 &1906786534223326354 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7316719748936713070, guid: dc853a3017bd453b998bc3b1c857eb90,
+    type: 3}
+  m_PrefabInstance: {fileID: 1001000000000000}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &197058715546215941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906786534223326354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2df373bf91cf30b4bbd495e11cb1a2ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mergeTarget:
+    referencePath: SiroinoSotai_Armature
+    targetObject: {fileID: 0}
+  prefix: 
+  suffix: 
+  legacyLocked: 0
+  LockMode: 2
+  mangleNames: 1

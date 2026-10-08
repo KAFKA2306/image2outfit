@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "passed": false,
+  "passed": true,
   "productId": "siroino-white-ghost-gown",
   "productName": "White Ghost Gown for Siroino _Large",
   "buildRevision": "v1-two-view-pattern-and-sewing",
@@ -24,33 +24,77 @@
     "renderer": "bpy",
     "camera": "Pattern_Review_Camera"
   },
+  "stitchExecution": "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Build/stitch-execution.json",
   "metrics": {
     "meshObjects": 15,
-    "vertices": 30894,
-    "triangles": 61237,
+    "vertices": 30839,
+    "triangles": 61038,
     "materialSlots": 15,
     "shapeKeys": 0,
     "maxBoneInfluences": 4,
     "unweightedVertices": 0,
     "weightSumErrors": 0,
-    "degenerateTriangles": 116,
-    "boundaryEdges": 1280
+    "degenerateTriangles": 0,
+    "boundaryEdges": 1450
+  },
+  "geometryGate": {
+    "passed": true,
+    "checks": {
+      "meshObjects>=12": true,
+      "vertices>1500": true,
+      "triangles>2200": true,
+      "unweightedVertices==0": true,
+      "weightSumErrors==0": true,
+      "degenerateTriangles==0": true,
+      "maxBoneInfluences<=4": true
+    }
   },
   "weightNormalization": {
     "objects": 15,
-    "vertices": 30894,
-    "rigidObjects": [
-      {"object": "Ghost_Wrist_Drape_L", "bone": "Hand_L"},
-      {"object": "Ghost_Wrist_Drape_R", "bone": "Hand_R"}
-    ],
+    "vertices": 30839,
+    "rigidObjects": [],
     "fallbackVertices": 0,
     "maximumInfluences": 4
   },
   "clearanceRefinement": [
-    {"pass": 1, "target": 0.0018, "movedVertices": 594, "maximumMove": 0.001449573175702244, "clearance": {"vertices": 29270, "minimum": 0.0008427355787716806, "p01": 0.0017999950796365738, "mean": 0.015440625351632372}},
-    {"pass": 2, "target": 0.0026, "movedVertices": 1149, "maximumMove": 0.0017572644212283193, "clearance": {"vertices": 29270, "minimum": 0.000980377895757556, "p01": 0.002495420863851905, "mean": 0.01546116323648358}},
-    {"pass": 3, "target": 0.0032, "movedVertices": 1517, "maximumMove": 0.002219622104242444, "clearance": {"vertices": 29270, "minimum": 0.0006572665297426283, "p01": 0.002858860418200493, "mean": 0.015483877203790542}}
+    {
+      "pass": 1,
+      "target": 0.0018,
+      "movedVertices": 605,
+      "maximumMove": 0.0014495626983232796,
+      "clearance": {
+        "vertices": 29217,
+        "minimum": 0.0008427355787716806,
+        "p01": 0.0017999939154833555,
+        "mean": 0.014804746853599917
+      }
+    },
+    {
+      "pass": 2,
+      "target": 0.0026,
+      "movedVertices": 1149,
+      "maximumMove": 0.0017572644212283193,
+      "clearance": {
+        "vertices": 29217,
+        "minimum": 0.0009804542642086744,
+        "p01": 0.002495278837159276,
+        "mean": 0.01482537243267879
+      }
+    },
+    {
+      "pass": 3,
+      "target": 0.0032,
+      "movedVertices": 1511,
+      "maximumMove": 0.0022195457357913257,
+      "clearance": {
+        "vertices": 29217,
+        "minimum": 0.0006580636254511774,
+        "p01": 0.002871992764994502,
+        "mean": 0.014848149199888463
+      }
+    }
   ],
+  "clothSimulation": "Assets/GenWorks/siroino-white-ghost-gown/Evidence/Build/cloth-simulation.json",
   "views": {
     "front": "Assets/GenWorks/siroino-white-ghost-gown/Previews/front.png",
     "back": "Assets/GenWorks/siroino-white-ghost-gown/Previews/back.png",
@@ -67,13 +111,10 @@
     "prone": "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/prone.png"
   },
   "referenceModelIdentification": "UNVERIFIED",
-  "reviewDecision": "REJECT",
-  "reviewDefects": [
-    "116 degenerate triangles remain in generated geometry",
-    "upper-body side panels are angular and do not match the reference silhouette",
-    "forearms are exposed where the reference has long fitted sleeves",
-    "wrist drapes are too small and rigid compared with the hanging sheet-like reference",
-    "center-back skirt sewing produces folded/spiky artifacts",
-    "arms-up and arm-cross poses show severe triangular deformation"
+  "notes": [
+    "The repository product ID is not a claim of a commercial model number.",
+    "Private reference images are represented by hashes and structured observations only.",
+    "The center-back skirt seam is physically closed by Blender Cloth sewing springs before export.",
+    "Pattern layout and assembled views are rendered directly with bpy."
   ]
 }

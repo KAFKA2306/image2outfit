@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lily-vapor-yukata",
+  "patternSystem": "panel-first-structured",
+  "units": "meters",
+  "panels": [
+    {"id": "summer_front_under", "seams": ["collar_L", "waist_stay", "summer_front_over", "sleeve_underlayer_L/R"]},
+    {"id": "summer_front_over", "seams": ["collar_R", "waist_stay", "summer_front_under", "front_facing_L/R"]},
+    {"id": "summer_back", "seams": ["collar_L/R", "waist_stay", "center_vent_facings"]},
+    {"id": "sleeve_rail_outer_L/R", "seams": ["shoulder", "cuff_L/R", "rail_air_channel"]},
+    {"id": "sleeve_rail_inner_L/R", "seams": ["shoulder", "cuff_L/R", "rail_air_channel"]},
+    {"id": "petal_lock_root/outer/inner", "seams": ["overlap_depth", "silver_hardware"]}
+  ],
+  "uvContract": {"uvSet": "UVMap", "range": [0, 1], "uniqueIslandsRequired": true},
+  "topologyContract": {"noCoincidentFaces": true, "zeroAreaFaces": false, "targetGarmentTriangles": "<=24000"}
+}

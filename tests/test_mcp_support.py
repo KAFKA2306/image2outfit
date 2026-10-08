@@ -83,7 +83,11 @@ class McpSupportTests(unittest.TestCase):
         self.assertIn(blender["host"], {"localhost", "127.0.0.1", "::1"})
         self.assertEqual(unity["host"], "127.0.0.1")
         self.assertTrue(unity["url"].startswith("http://127.0.0.1:"))
-        self.assertTrue(unity["packageUrl"].endswith(f"#v{unity['version']}"))
+        self.assertEqual(unity["transport"], "loopback-tcp-discovery-registry")
+        self.assertIn("UnityMCP/registry", unity["registryDir"])
+        self.assertTrue(
+            unity["packageUrl"].endswith("#50597089589137c5186f5badbde1d72f5d335243")
+        )
         project_version = (ROOT / unity["projectVersionSource"]).read_text(
             encoding="utf-8"
         )
@@ -103,7 +107,8 @@ class McpSupportTests(unittest.TestCase):
         self.assertEqual(blender["env"]["BLENDER_HOST"], expected_blender["host"])
         self.assertEqual(blender["env"]["BLENDER_PORT"], str(expected_blender["port"]))
         self.assertEqual(blender["env"]["DISABLE_TELEMETRY"], "true")
-        self.assertEqual(servers["unityMCP"]["url"], expected_unity["url"])
+        self.assertEqual(servers["unityMCP"]["transport"], expected_unity["transport"])
+        self.assertEqual(servers["unityMCP"]["registry"], expected_unity["registryDir"])
 
     def test_codex_example_matches_canonical_contract(self) -> None:
         config = tomllib.loads(
@@ -118,8 +123,7 @@ class McpSupportTests(unittest.TestCase):
         self.assertEqual(blender["command"], "cmd")
         self.assertIn(f"blender-mcp=={expected_blender['version']}", blender["args"])
         self.assertEqual(blender["env"]["DISABLE_TELEMETRY"], "true")
-        unity = servers[expected_unity["serverName"]]
-        self.assertEqual(unity["url"], expected_unity["url"])
+        self.assertNotIn(expected_unity["serverName"], servers)
 
     def test_setup_verifies_identity_and_four_state_doctor(self) -> None:
         script = (ROOT / "tools" / "setup_mcp.ps1").read_text(encoding="utf-8")

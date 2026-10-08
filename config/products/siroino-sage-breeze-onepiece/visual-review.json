@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "productId": "siroino-sage-breeze-onepiece",
+  "status": "REVIEW_REQUIRED",
+  "reviewer": "agent:build-pipeline",
+  "reviewerReference": "https://github.com/KAFKA2306/image2outfit/issues/675",
+  "scores": {"referenceFidelity": 0, "silhouette": 0, "fitCoverage": 0, "deformation": 0, "material": 0, "presentation": 0, "customerUsability": 0},
+  "criticalDefects": [],
+  "defects": [{"id": "missing-exact-reference", "severity": "major", "status": "OPEN", "summary": "The exact Issue PNG is not available in the Windows workspace; replacement board is not exact-source evidence."}],
+  "reviewedAssets": [],
+  "reviewSummary": "Automated geometry and render generation is not a human visual acceptance review.",
+  "customerUseCase": "Siroino VRChat avatar outfit; not customer-ready until visual review and Unity/VRChat evidence pass."
+}

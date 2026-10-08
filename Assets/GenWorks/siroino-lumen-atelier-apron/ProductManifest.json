@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lumen-atelier-apron",
+  "productName": "Lumen Atelier Apron for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-lumen-atelier-apron",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoLumenAtelierApron.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoSotai_LumenAtelierApron.prefab",
+  "previewPath": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-lumen-atelier-apron/README.md",
+  "sourceJobPath": "config/products/siroino-lumen-atelier-apron/job.json",
+  "productBuildScript": "tools/siroino_lumen_atelier_apron_build.py",
+  "designRevision": "v1-closed-maker-coat-dress-twin-work-trays",
+  "reference": {
+    "status": "ISSUE_VISIBLE_CONSTRUCTION_RECORDED_SOURCE_IMAGE_UNAVAILABLE",
+    "issue": 670,
+    "sourcePath": "/mnt/data/a_detailed_concept_board_reference_sheet_style_i.png",
+    "exactIssueImageAvailable": false,
+    "repositoryContainsSourceImage": false,
+    "note": "The Issue records the exact generated board path but neither the local attachment nor a GitHub-visible binary is available in this workspace."
+  },
+  "technicalGates": {
+    "referenceAudit": "UNVERIFIED",
+    "patternContract": "PASS",
+    "blender": "PENDING_RETRY",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "PASS",
+    "clothSimulation": "NOT_REQUIRED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-lumen-atelier-apron/Source/Blender/SiroinoLumenAtelierApron.blend",
+    "fbx": "Assets/GenWorks/siroino-lumen-atelier-apron/Models/SiroinoLumenAtelierApron.fbx",
+    "prefab": "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoLumenAtelierApron.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoSotai_LumenAtelierApron.prefab"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-lumen-atelier-apron",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoLumenAtelierApron.prefab",
+    "blockers": [
+      "Issue #670 exact generated board is not GitHub-visible in this workspace",
+      "Unity/Modular Avatar/NDMF/VRChat runtime evidence is not executed in the isolated Blender workflow",
+      "direct visual review remains required"
+    ]
+  }
+}

@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "status": "PENDING_EXECUTION",
-  "result": "PENDING",
-  "designRevision": "v5-skinweighted-pleated-volume",
-  "method": "PatternGSL-inspired explicit panel and seam specification with Blender cloth, outward evaluated-body clearance and four-influence nearest-body weight transfer",
+  "status": "EXECUTED",
+  "result": "PASS",
+  "executedAt": "2026-09-19T10:55:39.711896Z",
+  "method": "PatternGSL-inspired logical panels and seams, welded independent shell, Blender cloth checkpoint and evaluated-body projection",
   "sources": [
     {
-      "title": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
+      "title": "PatternGSL structured garment specification",
       "url": "https://arxiv.org/abs/2606.24564"
     },
     {
-      "title": "AutoSew: A Geometric Approach to Stitching Prediction with Graph Neural Networks",
+      "title": "AutoSew geometric stitching prediction",
       "url": "https://arxiv.org/abs/2602.22052"
     },
     {
@@ -19,22 +19,184 @@
     }
   ],
   "implementation": {
-    "bodyTopologyCopied": false,
     "externalResearchCodeExecuted": false,
-    "bodicePanels": 5,
-    "bodySurfaceConstraint": "evaluated-body nearest surface with outward-normal correction",
-    "weightTransfer": "four strongest groups from the nearest evaluated body vertex",
-    "cloth": {
-      "pleats": 12,
-      "frames": 32,
-      "gravityWeight": 0.18,
-      "shapePreservingStiffness": true
-    },
-    "volumetricWings": true,
-    "explicitTriangleExport": true
+    "bodyTopologyCopied": false,
+    "logicalPanelCount": 5,
+    "generatedBodiceObjects": 4,
+    "nearestSurfaceProjection": true,
+    "outwardSolidify": true,
+    "actualBlenderClothExecuted": true,
+    "clothGravityWeight": 0.0,
+    "weightTransfer": "four strongest groups from nearest evaluated body vertex"
   },
+  "clothSimulation": [
+    {
+      "object": "Nocturne_Cloth_Skirt",
+      "frames": 32,
+      "pinVertices": 96,
+      "bodyCollision": true,
+      "selfCollision": true,
+      "gravityWeight": 0.0,
+      "shapePreservingStiffness": true,
+      "baked": true,
+      "clearanceAdjustments": [
+        {
+          "object": "Nocturne_Sewn_Bodice",
+          "movedVertices": 216,
+          "maximumMove": 0.04189816212009025,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Bodice_Front_Inset",
+          "movedVertices": 15,
+          "maximumMove": 0.04856425152975921,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Bodice_V_L",
+          "movedVertices": 11,
+          "maximumMove": 0.04839925966975706,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Bodice_V_R",
+          "movedVertices": 12,
+          "maximumMove": 0.048451707944438545,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Sailor_Collar_L",
+          "movedVertices": 9,
+          "maximumMove": 0.047236099119844575,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Sailor_Collar_R",
+          "movedVertices": 12,
+          "maximumMove": 0.048371860117285136,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Cloth_Skirt",
+          "movedVertices": 168,
+          "maximumMove": 0.04827507844975549,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Waist_Band",
+          "movedVertices": 364,
+          "maximumMove": 0.05681337790829221,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Puff_Sleeve_L",
+          "movedVertices": 346,
+          "maximumMove": 0.031024583776806745,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Detached_Arm_Warmer_L",
+          "movedVertices": 360,
+          "maximumMove": 0.030936866912415137,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Lace_Cuff_L",
+          "movedVertices": 247,
+          "maximumMove": 0.030599460041226278,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Puff_Sleeve_R",
+          "movedVertices": 340,
+          "maximumMove": 0.03102461921897333,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Detached_Arm_Warmer_R",
+          "movedVertices": 364,
+          "maximumMove": 0.030936830223177534,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Lace_Cuff_R",
+          "movedVertices": 279,
+          "maximumMove": 0.030942359047472588,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Leg_Warmer_L",
+          "movedVertices": 275,
+          "maximumMove": 0.05081496300258056,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Shoe_L",
+          "movedVertices": 1202,
+          "maximumMove": 0.03545835221690101,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Leg_Warmer_R",
+          "movedVertices": 293,
+          "maximumMove": 0.05081494632148603,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Shoe_R",
+          "movedVertices": 1359,
+          "maximumMove": 0.03545834029378325,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        },
+        {
+          "object": "Nocturne_Choker",
+          "movedVertices": 1044,
+          "maximumMove": 0.04563694732940609,
+          "clearance": 0.01550218714773655,
+          "onlyAbove": null,
+          "iterations": 4
+        }
+      ]
+    }
+  ],
   "acceptance": {
-    "researchTrial": "PENDING",
+    "researchTrial": "PASS",
     "visualAppearanceReview": "PENDING"
   }
 }
