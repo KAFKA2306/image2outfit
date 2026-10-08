@@ -18,6 +18,7 @@ if str(ROOT / "tools") not in sys.path:
 
 from contract_io import validate_schema_file
 from image2outfit.audit import sha256_json, validate_stage_records, write_audit_bundle
+from image2outfit.audit_schema import load_audit_schemas
 from image2outfit.pipeline import (
     PIPELINE_STAGES,
     ExecutionMode,
@@ -244,6 +245,10 @@ def main() -> int:
     _validate_request(request)
     profile_path = _profile_path(args, request)
     profile = load_profile(profile_path)
+    audit_contract = profile.get("auditContract")
+    if not isinstance(audit_contract, dict):
+        raise ValueError("profile.auditContract must be an object")
+    _, record_schema, _, manifest_schema = load_audit_schemas(ROOT, audit_contract)
     product_id = request["productId"]
     expected = {
         "productId": product_id,
@@ -313,6 +318,8 @@ def main() -> int:
         result,
         audit_root=audit_root,
         canonical_stages=[stage.value for stage in PIPELINE_STAGES],
+        record_schema=record_schema,
+        manifest_schema=manifest_schema,
     )
     if args.checkpoint_output:
         _write_pipeline_state_atomic(args.checkpoint_output, result)
