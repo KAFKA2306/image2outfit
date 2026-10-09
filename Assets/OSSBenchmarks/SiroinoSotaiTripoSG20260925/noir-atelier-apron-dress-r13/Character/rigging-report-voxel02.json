@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "kind": "oss-character-rig",
+  "model": "TripoSG",
+  "input": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/noir-atelier-apron-dress-r13/TripoSG/noir-atelier-apron-dress-r13-triposg.glb",
+  "outputFbx": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/noir-atelier-apron-dress-r13/Character/NoirAtelierApronDressR13_TripoSG_Voxel02.fbx",
+  "outputBlend": "Assets/OSSBenchmarks/SiroinoSotaiTripoSG20260925/noir-atelier-apron-dress-r13/Character/NoirAtelierApronDressR13_TripoSG_Voxel02.blend",
+  "blenderVersion": "4.2.23 LTS",
+  "skeleton": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetObject": "TripoSG_CharacterMesh",
+  "inputVertexCountAfterCleanup": 7552,
+  "inputFaceCountAfterCleanup": 7618,
+  "triangleBudget": 18000,
+  "decimatedTriangles": 0,
+  "finalTriangleCount": 15236,
+  "singleGarmentMaterial": true,
+  "voxelRemeshSize": 0.02,
+  "filledBoundaryEdges": 0,
+  "removedVerticesBelowCrop": 0,
+  "normalizedBounds": {
+    "min": [
+      -0.25445565581321716,
+      -0.20096002519130707,
+      0.03628218546509743
+    ],
+    "max": [
+      0.25832852721214294,
+      0.13359712064266205,
+      1.1424789428710938
+    ]
+  },
+  "weightTransfer": {
+    "targetObject": "TripoSG_CharacterMesh",
+    "schemaVersion": 1,
+    "kind": "weight-transfer-artifact",
+    "stage": "skin-and-export",
+    "sourceMeshHash": "e9e06568951977f90a42af7407ab45423b59db8b02e1aeb1d16876d3606cb8af",
+    "targetMeshHash": "05ee1646e4773e507cae98701e9f046b5b49ab31420ba847eb08528d4ff1cc05",
+    "armatureHash": "6a200335c0a4cf09097baecb248830f6c2bf2bba743c71416349db56444f400b",
+    "bindPoseHash": "75b176da3cb7df21f177e0f93aa257448c50e69fc54d2afe8097b70395d88ec3",
+    "method": "blender-data-transfer",
+    "methodVersion": "4.2.23 LTS",
+    "parameters": {
+      "mapping": "nearest-face-interpolated",
+      "maxInfluences": 4,
+      "minimumWeight": 1e-08,
+      "lateralityAxis": "X",
+      "lateralityCenterTolerance": 0.05,
+      "leftPositive": true
+    },
+    "vertexGroupHash": "766a38bbe6bf444dc8f4f971d85445693d3c877273da9d592d4c5e86b9ab4e1a",
+    "audit": {
+      "vertexCount": 7552,
+      "zeroWeightVertices": [],
+      "inputNonNormalizedVertices": [],
+      "overLimitVertices": [],
+      "lateralityContaminationVertices": [],
+      "rejectedBoneGroups": [],
+      "influenceHistogram": {
+        "1": 1767,
+        "2": 4583,
+        "3": 951,
+        "4": 251
+      },
+      "maximumDiscardedWeight": 0,
+      "vertexGroupHash": "766a38bbe6bf444dc8f4f971d85445693d3c877273da9d592d4c5e86b9ab4e1a",
+      "passed": true
+    },
+    "warnings": [],
+    "artifactDigest": "dd499d8555d9ba7a4aa900a8fbdd37d69d1da448630e753b79f9f1aa542acddc"
+  },
+  "materials": [
+    "OSS TripoSG_CharacterMesh Garment"
+  ],
+  "status": "PASS"
+}
