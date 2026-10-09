@@ -26,6 +26,12 @@ except ImportError:  # pragma: no cover - the locked project set includes Pillow
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG_RELATIVE = Path("config/avatar-workflow.v1.json")
 GUID_PATTERN = re.compile(r"\bguid:\s*([0-9a-f]{32})\b", re.IGNORECASE)
+CAU_DESCRIPTOR_ASSET_PATTERN = re.compile(
+    r"^\s*asset:\s*\{fileID:\s*(\d+),\s*guid:\s*([0-9a-f]{32}),\s*type:\s*3\}\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+PREFAB_COMPONENT_PATTERN = re.compile(r"^--- !u!114 &(\d+)\s*$")
+VRC_AVATAR_DESCRIPTOR_SCRIPT_GUID = "67cc4cb7839cd3741b63733d5adf0442"
 
 
 class AvatarWorkflowError(ValueError):
@@ -87,7 +93,9 @@ def _validate_config(root: Path, config: dict[str, Any]) -> None:
             raise AvatarWorkflowError("avatar workflow config.scenes must be an object")
         workbench = scenes.get("workbench")
         if not isinstance(workbench, str) or not workbench:
-            raise AvatarWorkflowError("avatar workflow config.scenes.workbench is required")
+            raise AvatarWorkflowError(
+                "avatar workflow config.scenes.workbench is required"
+            )
         _asset(root, workbench)
     visual = config.get("visual")
     required_visuals = visual.get("requiredPaths") if isinstance(visual, dict) else None
@@ -122,8 +130,50 @@ def _validate_config(root: Path, config: dict[str, Any]) -> None:
         for key in ("clothEvidence", "scene"):
             if key in outfit:
                 if not isinstance(outfit[key], str) or not outfit[key]:
-                    raise AvatarWorkflowError(f"outfits[{index}].{key} must be a non-empty string")
+                    raise AvatarWorkflowError(
+                        f"outfits[{index}].{key} must be a non-empty string"
+                    )
                 _asset(root, outfit[key])
+    scene_capture = config.get("sceneCapture")
+    if scene_capture is not None:
+        if not isinstance(scene_capture, dict):
+            raise AvatarWorkflowError("avatar workflow sceneCapture must be an object")
+        if (
+            not isinstance(scene_capture.get("cameraPath"), str)
+            or not scene_capture["cameraPath"]
+        ):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.cameraPath is required"
+            )
+        if scene_capture.get("view") != "camera":
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.view must be camera"
+            )
+        for key in ("localPosition", "localRotationQuaternion"):
+            value = scene_capture.get(key)
+            axes = (
+                ("x", "y", "z", "w")
+                if key == "localRotationQuaternion"
+                else (
+                    "x",
+                    "y",
+                    "z",
+                )
+            )
+            if not isinstance(value, dict) or not all(
+                isinstance(value.get(axis), (int, float)) for axis in axes
+            ):
+                raise AvatarWorkflowError(
+                    f"avatar workflow sceneCapture.{key} must contain numeric axes"
+                )
+        if not isinstance(scene_capture.get("orthographic"), bool):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.orthographic is required"
+            )
+        if not isinstance(scene_capture.get("orthographicSize"), (int, float)):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.orthographicSize is required"
+            )
 
 
 def _selected_outfits(
@@ -152,6 +202,24 @@ def _meta_guid(path: Path) -> str | None:
 
 def _referenced_guids(path: Path) -> list[str]:
     return [value.lower() for value in GUID_PATTERN.findall(_read_text(path))]
+
+
+def _prefab_avatar_descriptor_file_id(path: Path) -> int | None:
+    component_file_id: int | None = None
+    for line in _read_text(path).splitlines():
+        component_match = PREFAB_COMPONENT_PATTERN.match(line)
+        if component_match:
+            component_file_id = int(component_match.group(1))
+            continue
+        if component_file_id is None or "m_Script:" not in line:
+            continue
+        script_guid = re.search(r"guid:\s*([0-9a-f]{32})\b", line, re.IGNORECASE)
+        if (
+            script_guid
+            and script_guid.group(1).lower() == VRC_AVATAR_DESCRIPTOR_SCRIPT_GUID
+        ):
+            return component_file_id
+    return None
 
 
 def _package_report(
@@ -244,7 +312,10 @@ def _outfit_preflight(
                 cloth_report = read_json(cloth_path)
             except (OSError, ValueError):
                 errors.append(f"cloth evidence is not valid JSON: {cloth_evidence}")
-            if cloth_path.is_file() and not cloth_path.with_name(cloth_path.name + ".meta").is_file():
+            if (
+                cloth_path.is_file()
+                and not cloth_path.with_name(cloth_path.name + ".meta").is_file()
+            ):
                 errors.append(f"cloth evidence meta missing: {cloth_evidence}.meta")
             if isinstance(cloth_report, dict):
                 if cloth_report.get("status") != "PASS":
@@ -255,10 +326,14 @@ def _outfit_preflight(
                     errors.append(f"cloth cache was not baked: {outfit['id']}")
                 contracts = cloth_report.get("contracts")
                 if not isinstance(contracts, list) or not contracts:
-                    errors.append(f"cloth evidence has no component contracts: {outfit['id']}")
+                    errors.append(
+                        f"cloth evidence has no component contracts: {outfit['id']}"
+                    )
                 for contract in contracts or []:
                     if contract.get("cacheBakedActual") is False:
-                        errors.append(f"cloth cache verification failed: {outfit['id']}")
+                        errors.append(
+                            f"cloth cache verification failed: {outfit['id']}"
+                        )
                     if contract.get("geometryChanged") is False:
                         errors.append(f"cloth geometry did not change: {outfit['id']}")
 
@@ -270,14 +345,32 @@ def _outfit_preflight(
         elif not scene.with_name(scene.name + ".meta").is_file():
             errors.append(f"outfit scene meta missing: {scene_path}.meta")
 
+    setting_text = _read_text(setting) if setting.is_file() else ""
     prefab_guid = _meta_guid(prefab) if prefab.is_file() else None
     setting_guids = _referenced_guids(setting) if setting.is_file() else []
     if prefab_guid is None:
         errors.append(f"prefab GUID missing: {outfit['prefab']}")
     elif prefab_guid not in setting_guids:
         errors.append(f"CAU setting does not reference prefab: {outfit['id']}")
+    descriptor_reference = CAU_DESCRIPTOR_ASSET_PATTERN.search(setting_text)
+    descriptor_file_id = (
+        _prefab_avatar_descriptor_file_id(prefab) if prefab.is_file() else None
+    )
+    if descriptor_reference is None:
+        errors.append(f"CAU descriptor asset reference missing: {outfit['id']}")
+    elif descriptor_file_id is None:
+        errors.append(
+            f"VRCAvatarDescriptor component missing in prefab: {outfit['id']}"
+        )
+    elif int(descriptor_reference.group(1)) != descriptor_file_id:
+        errors.append(
+            "CAU descriptor fileID does not match prefab VRCAvatarDescriptor: "
+            f"{outfit['id']}"
+        )
 
-    setting_text = _read_text(setting) if setting.is_file() else ""
+    scene_capture = _scene_capture_contract(root, config, outfit, prefab_guid)
+    errors.extend(scene_capture["errors"])
+
     if "windows:\n    enabled: 1" not in setting_text:
         errors.append(f"Windows upload is not enabled in CAU setting: {outfit['id']}")
     for platform in ("ios", "quest"):
@@ -334,10 +427,17 @@ def _outfit_preflight(
         "visualRoot": outfit["visualRoot"],
         "clothEvidence": cloth_evidence,
         "scene": scene_path,
+        "sceneCapture": scene_capture,
         "clothSimulation": {
-            "status": cloth_report.get("status") if isinstance(cloth_report, dict) else None,
-            "cacheBaked": cloth_report.get("cacheBaked") if isinstance(cloth_report, dict) else None,
-            "contractCount": len(cloth_report.get("contracts", [])) if isinstance(cloth_report, dict) else 0,
+            "status": cloth_report.get("status")
+            if isinstance(cloth_report, dict)
+            else None,
+            "cacheBaked": cloth_report.get("cacheBaked")
+            if isinstance(cloth_report, dict)
+            else None,
+            "contractCount": len(cloth_report.get("contracts", []))
+            if isinstance(cloth_report, dict)
+            else 0,
         },
         "prefabGuid": prefab_guid,
         "serializedScriptReferences": serialized_script_count,
@@ -346,6 +446,131 @@ def _outfit_preflight(
         "passed": not errors,
         "errors": errors,
         "warnings": warnings,
+    }
+
+
+def _scene_capture_contract(
+    root: Path,
+    config: dict[str, Any],
+    outfit: dict[str, Any],
+    prefab_guid: str | None,
+) -> dict[str, Any]:
+    """Verify that each outfit scene can be captured from its matching prefab camera."""
+    scene_path = outfit.get("scene")
+    spec = config.get("sceneCapture")
+    if not scene_path or not isinstance(spec, dict):
+        return {"passed": True, "cameraPath": None, "errors": []}
+    scene = _asset(root, scene_path)
+    if not scene.is_file():
+        return {
+            "passed": False,
+            "cameraPath": spec.get("cameraPath"),
+            "errors": [f"outfit scene missing: {scene_path}"],
+        }
+    text = _read_text(scene)
+    errors: list[str] = []
+    blocks = re.split(r"(?=^--- !u!)", text, flags=re.MULTILINE)
+    camera_game_object_id = None
+    for block in blocks:
+        if re.search(r"^  m_Name: PreviewCamera\s*$", block, re.MULTILINE):
+            match = re.match(r"^--- !u!1 &(\d+)", block)
+            if match:
+                camera_game_object_id = match.group(1)
+                break
+    if camera_game_object_id is None:
+        errors.append(f"PreviewCamera GameObject missing: {scene_path}")
+    transform = next(
+        (
+            block
+            for block in blocks
+            if block.startswith("--- !u!4 ")
+            and f"m_GameObject: {{fileID: {camera_game_object_id}}}" in block
+        ),
+        "",
+    )
+    camera = next(
+        (
+            block
+            for block in blocks
+            if block.startswith("--- !u!20 ")
+            and f"m_GameObject: {{fileID: {camera_game_object_id}}}" in block
+        ),
+        "",
+    )
+    if not transform:
+        errors.append(f"PreviewCamera Transform missing: {scene_path}")
+    if not camera:
+        errors.append(f"PreviewCamera component missing: {scene_path}")
+
+    def vector_from(
+        block: str, field: str, axes: tuple[str, ...]
+    ) -> dict[str, float] | None:
+        match = re.search(
+            rf"^  {re.escape(field)}: \{{([^}}]+)\}}$",
+            block,
+            re.MULTILINE,
+        )
+        if not match:
+            return None
+        values: dict[str, float] = {}
+        for axis in axes:
+            axis_match = re.search(rf"(?:^|, ){axis}: ([^,}}]+)", match.group(1))
+            if not axis_match:
+                return None
+            try:
+                values[axis] = float(axis_match.group(1))
+            except ValueError:
+                return None
+        return values
+
+    def matches(actual: dict[str, float] | None, expected: dict[str, Any]) -> bool:
+        return actual is not None and all(
+            abs(actual[axis] - float(expected[axis])) <= 1e-4 for axis in expected
+        )
+
+    actual_position = vector_from(transform, "m_LocalPosition", ("x", "y", "z"))
+    expected_position = spec["localPosition"]
+    if not matches(actual_position, expected_position):
+        errors.append(
+            f"PreviewCamera position mismatch for {outfit['id']}: "
+            f"expected {expected_position}, found {actual_position}"
+        )
+    actual_rotation = vector_from(transform, "m_LocalRotation", ("x", "y", "z", "w"))
+    expected_rotation = spec["localRotationQuaternion"]
+    if not matches(actual_rotation, expected_rotation):
+        errors.append(
+            f"PreviewCamera rotation mismatch for {outfit['id']}: "
+            f"expected {expected_rotation}, found {actual_rotation}"
+        )
+    orthographic = re.search(r"^  orthographic: (0|1)$", camera, re.MULTILINE)
+    if not orthographic or bool(int(orthographic.group(1))) != spec["orthographic"]:
+        errors.append(f"PreviewCamera orthographic mode mismatch: {scene_path}")
+    size = re.search(r"^  orthographic size: ([^\s]+)$", camera, re.MULTILINE)
+    if not size or abs(float(size.group(1)) - float(spec["orthographicSize"])) > 1e-4:
+        errors.append(f"PreviewCamera orthographic size mismatch: {scene_path}")
+
+    source_prefab = re.search(
+        r"m_SourcePrefab: \{fileID: 100100000, guid: ([0-9a-f]{32}), type: 3\}",
+        text,
+        re.IGNORECASE,
+    )
+    if not source_prefab:
+        errors.append(f"scene prefab source missing: {scene_path}")
+    elif prefab_guid and source_prefab.group(1).lower() != prefab_guid.lower():
+        errors.append(
+            f"scene prefab mismatch for {outfit['id']}: "
+            f"scene={source_prefab.group(1).lower()} config={prefab_guid.lower()}"
+        )
+    return {
+        "passed": not errors,
+        "cameraPath": spec["cameraPath"],
+        "view": spec["view"],
+        "localPosition": actual_position,
+        "localRotationQuaternion": actual_rotation,
+        "orthographic": bool(int(orthographic.group(1))) if orthographic else None,
+        "orthographicSize": float(size.group(1)) if size else None,
+        "sourcePrefabGuid": source_prefab.group(1).lower() if source_prefab else None,
+        "errors": errors,
     }
 
 
@@ -365,7 +590,9 @@ def preflight(
         if not workbench.is_file():
             errors.append(f"workbench scene missing: {scene_layout['workbench']}")
         elif not workbench.with_name(workbench.name + ".meta").is_file():
-            errors.append(f"workbench scene meta missing: {scene_layout['workbench']}.meta")
+            errors.append(
+                f"workbench scene meta missing: {scene_layout['workbench']}.meta"
+            )
     cau_group = _asset(root, config["paths"]["cauRoot"]) / "siroino-all-outfits.asset"
     group_guids = _referenced_guids(cau_group) if cau_group.is_file() else []
     selected = _selected_outfits(config, outfit_ids)
@@ -630,10 +857,18 @@ def visual_before_after(
                 "comparisonMode": "versioned-baseline-vs-current-visual-root",
             }
             if not baseline.is_file():
-                item.update({"status": "ERROR", "passed": False, "error": "before image missing"})
+                item.update(
+                    {
+                        "status": "ERROR",
+                        "passed": False,
+                        "error": "before image missing",
+                    }
+                )
                 errors.append(f"before visual missing: {item['beforePath']}")
             elif not current.is_file():
-                item.update({"status": "ERROR", "passed": False, "error": "after image missing"})
+                item.update(
+                    {"status": "ERROR", "passed": False, "error": "after image missing"}
+                )
                 errors.append(f"after visual missing: {item['path']}")
             else:
                 try:
@@ -653,7 +888,9 @@ def visual_before_after(
                 except (OSError, ValueError, AvatarWorkflowError) as exc:
                     item.update({"status": "ERROR", "passed": False, "error": str(exc)})
                 if item.get("status") == "ERROR":
-                    errors.append(f"visual before/after failed: {item['path']}: {item.get('error')}")
+                    errors.append(
+                        f"visual before/after failed: {item['path']}: {item.get('error')}"
+                    )
                 elif item.get("meanAbsoluteError", 0) > threshold:
                     item["status"] = "WARN"
                     item["visualGate"] = "NON_BLOCKING"
@@ -676,7 +913,9 @@ def visual_before_after(
             scene_comparison: dict[str, Any] = {
                 "outfitId": outfit_id,
                 "path": scene_capture.relative_to(root).as_posix(),
-                "beforePath": (baseline_root / outfit_id / "front.png").relative_to(root).as_posix(),
+                "beforePath": (baseline_root / outfit_id / "front.png")
+                .relative_to(root)
+                .as_posix(),
                 "comparisonMode": "versioned-baseline-vs-unity-scene-capture",
             }
             try:
@@ -698,7 +937,9 @@ def visual_before_after(
                     }
                 )
             except (OSError, ValueError, AvatarWorkflowError) as exc:
-                scene_comparison.update({"status": "ERROR", "passed": False, "error": str(exc)})
+                scene_comparison.update(
+                    {"status": "ERROR", "passed": False, "error": str(exc)}
+                )
             if scene_comparison.get("status") == "ERROR":
                 errors.append(
                     f"Unity scene visual comparison failed: {outfit_id}: {scene_comparison.get('error')}"
@@ -713,8 +954,12 @@ def visual_before_after(
             outfit_results.append(scene_comparison)
             results.append(scene_comparison)
         elif require_unity_scene:
-            errors.append(f"Unity scene after capture missing: {scene_capture.relative_to(root).as_posix()}")
-        evidence_path = _asset(root, outfit["clothEvidence"]).parent / "cloth-visual-diff.json"
+            errors.append(
+                f"Unity scene after capture missing: {scene_capture.relative_to(root).as_posix()}"
+            )
+        evidence_path = (
+            _asset(root, outfit["clothEvidence"]).parent / "cloth-visual-diff.json"
+        )
         write_json(
             evidence_path,
             {
@@ -731,14 +976,21 @@ def visual_before_after(
                     (
                         item
                         for item in outfit_results
-                        if item.get("comparisonMode") == "versioned-baseline-vs-unity-scene-capture"
+                        if item.get("comparisonMode")
+                        == "versioned-baseline-vs-unity-scene-capture"
                     ),
                     None,
                 ),
                 "results": outfit_results,
                 "visualIssuesAreNonBlocking": True,
-                "passed": not any(item.get("status") == "ERROR" for item in outfit_results),
-                "errors": [item.get("error") for item in outfit_results if item.get("status") == "ERROR"],
+                "passed": not any(
+                    item.get("status") == "ERROR" for item in outfit_results
+                ),
+                "errors": [
+                    item.get("error")
+                    for item in outfit_results
+                    if item.get("status") == "ERROR"
+                ],
             },
         )
     report = {
@@ -1010,12 +1262,9 @@ def dispatch(root: Path, options: argparse.Namespace) -> int:
                 outfit_ids=outfit_ids,
                 require_unity_scene=True,
             )
-            output = (
-                options.output
-                or config["paths"].get(
-                    "visualDiffReport",
-                    f"{config['paths']['runtimeRoot']}/cloth-visual-diff.json",
-                )
+            output = options.output or config["paths"].get(
+                "visualDiffReport",
+                f"{config['paths']['runtimeRoot']}/cloth-visual-diff.json",
             )
         elif options.avatar_command == "ledger":
             if options.ledger_action == "init":

@@ -18,9 +18,9 @@
     "doNotRebuildFromZero": true,
     "blockers": [
       "exact original Issue PNG was unavailable; the repaired replacement board is persisted with its identity record",
-      "visualAppearanceReview remains REVIEW_REQUIRED for shoulder and seated-pose deformation",
-      "real VRChat upload was not performed; only SDK dry-run evidence exists",
-      "baked avatar audit is VeryPoor at 77,499 polygons and has no mapped viseme mesh; optimization/review remains pending"
+      "visualAppearanceReview remains REVIEW_REQUIRED until the shoulder and seated-pose deformation loop is accepted",
+      "Unity/NDMF/VRChat evidence must be regenerated for this changed FBX candidate",
+      "real VRChat upload was not performed by the automated build"
     ]
   },
   "outputs": {
@@ -49,15 +49,15 @@
     "poseEvidence": "PASS",
     "visualAppearanceReview": "REVIEW_REQUIRED",
     "clothSimulation": "PASS",
-    "unityImport": "PASS",
-    "modularAvatar": "PASS",
-    "ndmf": "PASS",
-    "vrchatRuntime": "DRY_RUN_PASS"
+    "unityImport": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
   },
   "metrics": {
     "meshObjects": 21,
     "vertices": 31279,
-    "triangles": 60796,
+    "triangles": 60764,
     "degenerateTriangles": 0,
     "unweightedVertices": 0,
     "weightSumErrors": 0,

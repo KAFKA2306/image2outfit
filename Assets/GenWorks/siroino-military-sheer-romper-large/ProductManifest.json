@@ -22,7 +22,7 @@
   "previewPath": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/front.png",
   "documentationPath": "Assets/GenWorks/siroino-military-sheer-romper-large/README.md",
   "sourceJobPath": "config/products/siroino-military-sheer-romper-large/job.json",
-  "generatedAt": "2026-09-19T10:04:54.008248Z",
+  "generatedAt": "2026-09-19T16:16:28.080012Z",
   "blenderVersion": "4.4.3",
   "constructionProfile": "target-surface-panel-sewn",
   "designRevision": "siroino-pc-base-surface-fit-v12",
@@ -40,17 +40,17 @@
     "usesActualTargetSource": true,
     "auditSurface": "deformed-garment-base",
     "auditedVertices": 4314,
-    "penetratingVertices": 84,
-    "penetrationRatio": 0.019471488178025034,
-    "minimumClearanceMeters": -0.016698361607268453,
-    "medianClearanceMeters": 0.03256721730576828,
-    "maximumClearanceMeters": 0.0399877282907255,
+    "penetratingVertices": 0,
+    "penetrationRatio": 0.0,
+    "minimumClearanceMeters": -2.5535547959476546e-07,
+    "medianClearanceMeters": 3.523074738887022e-08,
+    "maximumClearanceMeters": 0.03599581053106249,
     "objects": {
       "Military_Opaque_Bodice": {
         "vertices": 2033,
-        "penetratingVertices": 19,
-        "minimumClearanceMeters": -0.0095171551220119,
-        "medianClearanceMeters": 0.032597782323136926
+        "penetratingVertices": 0,
+        "minimumClearanceMeters": -2.5535547959476546e-07,
+        "medianClearanceMeters": 0.0
       },
       "Military_Sheer_Back": {
         "vertices": 724,
@@ -60,9 +60,9 @@
       },
       "Military_Fitted_Shorts": {
         "vertices": 617,
-        "penetratingVertices": 65,
-        "minimumClearanceMeters": -0.016698361607268453,
-        "medianClearanceMeters": 0.037494161166250706
+        "penetratingVertices": 0,
+        "minimumClearanceMeters": -8.063538992075792e-08,
+        "medianClearanceMeters": 0.0
       },
       "Military_Standing_Collar": {
         "vertices": 314,
@@ -83,12 +83,12 @@
         "medianClearanceMeters": 0.03469516395125538
       }
     },
-    "passed": false
+    "passed": true
   },
   "technicalGates": {
     "actualTargetSourceImport": "PASS",
     "actualTargetBodyRender": "PASS",
-    "bodySurfacePanelFit": "REVIEW",
+    "bodySurfacePanelFit": "PASS",
     "armatureWeightTransfer": "PASS",
     "bodyShapeKeyTransfer": "PASS",
     "fbxExport": "PASS",
@@ -116,8 +116,8 @@
     ]
   },
   "hashes": {
-    "fbxSha256": "b2bb82f725f27577f418a12c4818558088e26aec5d1cf6f69c617dc8ace463c5",
-    "frontPreviewSha256": "893661f500826debc00ca935033acc1d883c5f0b131afacc8736d9be4a54284e",
-    "targetFitEvidenceSha256": "5e028cc26b1f28909d8a8f0cbe034732e25837cb67d1ba59ee33de4350702d11"
+    "fbxSha256": "d554ebd4ddfbd38d78bf1853dd7f552138b11deff1d73920bb4da630afddae30",
+    "frontPreviewSha256": "9583bfa201dfd10978c359a64627aa406f1caf20ff00efa92d8c48fc201236d2",
+    "targetFitEvidenceSha256": "cb079f068455d591c6c0e1799f262af57e95c9ebe39f547d260e48d9c7b47f13"
   }
 }

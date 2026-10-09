@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-quiet-arc-panel-dress",
+  "id": "siroino-quiet-arc-panel-dress",
+  "productName": "Quiet Arc Panel Dress for Siroino",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4.3-panel-structural",
+  "buildRevision": "v1-closed-panel-twin-crescent-arch",
+  "productRoot": "Assets/GenWorks/siroino-quiet-arc-panel-dress",
+  "productManifestPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/siroino_quiet_arc_panel_dress_build.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Source/Blender/SiroinoQuietArcPanelDress.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Models/SiroinoQuietArcPanelDress.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoQuietArcPanelDress.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoSotai_QuietArcPanelDress.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-quiet-arc-panel-dress/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/ProductManifest.json",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/README.md",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Source/Blender/SiroinoQuietArcPanelDress.blend",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Models/SiroinoQuietArcPanelDress.fbx",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoQuietArcPanelDress.prefab",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoSotai_QuietArcPanelDress.prefab",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/front.png",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/back.png",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/left.png",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/right.png",
+    "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-quiet-arc-panel-dress/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-quiet-arc-panel-dress/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-quiet-arc-panel-dress/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_ArcShell", "role": "fabric"},
+      {"material": "MAT_ArcInner", "role": "fabric"},
+      {"material": "MAT_ArcFacing", "role": "trim"},
+      {"material": "MAT_ArcTrim", "role": "trim"},
+      {"material": "MAT_Hardware", "role": "trim"}
+    ]
+  }
+}

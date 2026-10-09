@@ -1,0 +1,14 @@
+name: image2outfit_evidence
+version: "1.0"
+config-version: 2
+
+profile: image2outfit_evidence
+model-paths: ["models"]
+test-paths: ["tests"]
+
+models:
+  image2outfit_evidence:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

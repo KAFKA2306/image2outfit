@@ -147,8 +147,10 @@ def create_sleeve(
         front = vertical.cross(tangent).normalized()
         shoulder_ease = min(1.0, t / 0.30)
         shoulder_bulge = math.sin(math.pi * shoulder_ease) if t <= 0.30 else 0.0
-        half_height = 0.061 + 0.007 * shoulder_bulge - 0.008 * t
-        half_depth = 0.043 + 0.004 * shoulder_bulge - 0.003 * t
+        # Keep the shoulder-side ring below the body shoulder line. The old
+        # 61 mm root height produced pointed fins that read as detached.
+        half_height = 0.038 + 0.004 * shoulder_bulge - 0.008 * t
+        half_depth = 0.038 + 0.003 * shoulder_bulge - 0.003 * t
         for segment in range(segments):
             angle = math.tau * segment / segments
             offset = vertical * (math.cos(angle) * half_height) + front * (
@@ -161,7 +163,12 @@ def create_sleeve(
         for segment in range(segments):
             next_segment = (segment + 1) % segments
             faces.append((a + segment, a + next_segment, b + next_segment, b + segment))
+    # Close the shoulder-side ring. The open tube was rendered as a detached
+    # hollow at the sleeve head in the direct review.
+    faces.append(tuple(reversed(range(segments))))
     obj = v1.mesh_object(name, vertices, faces, material)
+    obj["happiShoulderRootClosed"] = True
+    obj["happiShoulderRootCapFaces"] = 1
     obj["happiUpperBone"] = upper_name
     obj["happiLowerBone"] = lower_name
     obj["happiRingCount"] = len(points)
@@ -200,14 +207,20 @@ def create_front_band(
 
 def create_collar_bridge(material: bpy.types.Material) -> bpy.types.Object:
     _, top_depth = body_dimensions(1.0)
+    # Place the endpoint centre so its near edge lands on the front-band
+    # inner edge after the 25 mm bridge width is applied.
+    front_y = -top_depth - 0.006
     centerline = [
-        Vector((-0.0375, -top_depth - 0.006, Z_NECK)),
+        # The previous endpoints were behind the neckline and visibly
+        # floated. This small inward/upward join leaves the bridge edge on
+        # the front-band edge rather than merely aiming at it.
+        Vector((-0.0386, front_y + 0.0066, Z_NECK)),
         Vector((-0.052, -0.030, 1.030)),
         Vector((-0.046, 0.030, 1.040)),
         Vector((0.000, 0.052, 1.044)),
         Vector((0.046, 0.030, 1.040)),
         Vector((0.052, -0.030, 1.030)),
-        Vector((0.0375, -top_depth - 0.006, Z_NECK)),
+        Vector((0.0386, front_y + 0.0066, Z_NECK)),
     ]
     half_width = 0.0125
     vertices: list[tuple[float, float, float]] = []
@@ -224,6 +237,8 @@ def create_collar_bridge(material: bpy.types.Material) -> bpy.types.Object:
         a = index * 2
         faces.append((a, a + 1, a + 3, a + 2))
     obj = v1.mesh_object("Happi_Collar_Back", vertices, faces, material)
+    obj["happiCollarEndpointY"] = front_y
+    obj["happiCollarEndpointZ"] = Z_NECK
     v1.add_surface_finish(obj, thickness=0.0022, bevel_width=0.0008)
     return obj
 
@@ -263,6 +278,8 @@ def sleeve_root_contract(
             "rootCenterToShoulderM": center_offset,
             "overlapMarginM": overlap_margin,
             "requiredMinimumOverlapMarginM": 0.010,
+            "rootClosed": bool(obj.get("happiShoulderRootClosed", False)),
+            "rootCapFaceCount": int(obj.get("happiShoulderRootCapFaces", 0)),
             "passed": side_pass,
         }
     return {"passed": passed, "sides": result}
@@ -412,14 +429,33 @@ def postprocess(job: dict, result: int) -> int:
     mean_clearance = float(report["clearanceRefinement"][-1]["clearance"]["mean"])
     front_opening = float(report["frontOpeningM"])
     root_contract = sleeve_root_contract(bpy.data.objects["SiroinoSotai_Armature"])
+
+    def minimum_mesh_distance(first_name: str, second_name: str) -> float:
+        first = bpy.data.objects[first_name]
+        second = bpy.data.objects[second_name]
+        first_points = [
+            first.matrix_world @ vertex.co for vertex in first.data.vertices
+        ]
+        second_points = [
+            second.matrix_world @ vertex.co for vertex in second.data.vertices
+        ]
+        return min(
+            (left - right).length for left in first_points for right in second_points
+        )
+
+    collar_band_distance = min(
+        minimum_mesh_distance("Happi_Collar_Back", name)
+        for name in ("Happi_Collar_Front_Left", "Happi_Collar_Front_Right")
+    )
     fit_pass = (
         0.006 <= clearance <= 0.035
         and mean_clearance <= 0.050
         and 0.025 <= front_opening <= 0.090
         and root_contract["passed"]
+        and collar_band_distance <= 0.006
     )
     report["passed"] = bool(report["passed"] and fit_pass)
-    report["silhouetteRevision"] = "v2-shaped-shell-long-sleeve"
+    report["silhouetteRevision"] = "v3-connected-shoulder-sleeve-collar"
     report["fitEnvelope"] = {
         "clearanceP01M": clearance,
         "meanClearanceM": mean_clearance,
@@ -431,11 +467,16 @@ def postprocess(job: dict, result: int) -> int:
         },
         "status": "PASS" if fit_pass else "FAIL",
         "sleeveRootContract": root_contract,
+        "seamConnectionAudit": {
+            "collarBridgeToFrontBandMinimumDistanceM": collar_band_distance,
+            "requiredMaximumDistanceM": 0.006,
+            "status": "PASS" if collar_band_distance <= 0.006 else "FAIL",
+        },
     }
     report["notes"] = [
         "The body uses curved front and back panels with sloped shoulder seams.",
         "Sleeves overlap the shoulder seam at the root, then taper through upper-arm/lower-arm blended weights.",
-        "The collar bridge shares the chest frame with the front bands to stay connected.",
+        "The closed shoulder-side sleeve rings and front-matched collar endpoints are audited as sewn connections.",
         "The fit gate rejects both body penetration and an oversized rigid box.",
         "No manufacturer, product code, text, or crest is asserted.",
         "Silhouette and styling remain pending direct inspection of current images.",

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+  "stitches": [
+    {"stitchId": "tunic-neck", "first": {"pieceId": "tunic-front", "edge": "neck"}, "second": {"pieceId": "tunic-back", "edge": "neck"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "front-left-side", "first": {"pieceId": "tunic-front", "edge": "left-side"}, "second": {"pieceId": "tunic-back", "edge": "left-side"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "front-right-side", "first": {"pieceId": "tunic-front", "edge": "right-side"}, "second": {"pieceId": "tunic-back", "edge": "right-side"}, "type": "plain", "easingRatio": 1.0},
+    {"stitchId": "hakama-front-left-waist", "first": {"pieceId": "hakama-front-left", "edge": "top"}, "second": {"pieceId": "tunic-front", "edge": "left-waist"}, "type": "attachment", "easingRatio": 1.05, "realization": "Blender Cloth pin group"},
+    {"stitchId": "hakama-front-right-waist", "first": {"pieceId": "hakama-front-right", "edge": "top"}, "second": {"pieceId": "tunic-front", "edge": "right-waist"}, "type": "attachment", "easingRatio": 1.05, "realization": "Blender Cloth pin group"},
+    {"stitchId": "hakama-back-waist", "first": {"pieceId": "hakama-back-left", "edge": "top"}, "second": {"pieceId": "tunic-back", "edge": "waist"}, "type": "attachment", "easingRatio": 1.05, "realization": "Blender Cloth pin group"}
+    ,{"stitchId": "hakama-left-side-front", "first": {"pieceId": "hakama-side-left", "edge": "front"}, "second": {"pieceId": "hakama-front-left", "edge": "outer-side"}, "type": "plain", "easingRatio": 1.0}
+    ,{"stitchId": "hakama-left-side-back", "first": {"pieceId": "hakama-side-left", "edge": "back"}, "second": {"pieceId": "hakama-back-left", "edge": "outer-side"}, "type": "plain", "easingRatio": 1.0}
+    ,{"stitchId": "hakama-right-side-front", "first": {"pieceId": "hakama-side-right", "edge": "front"}, "second": {"pieceId": "hakama-front-right", "edge": "outer-side"}, "type": "plain", "easingRatio": 1.0}
+    ,{"stitchId": "hakama-right-side-back", "first": {"pieceId": "hakama-side-right", "edge": "back"}, "second": {"pieceId": "hakama-back-right", "edge": "outer-side"}, "type": "plain", "easingRatio": 1.0}
+  ],
+  "unresolved": [{"item": "exact factory seam allowance", "status": "not-observable", "decision": "use 8–10 mm by panel function"}]
+}

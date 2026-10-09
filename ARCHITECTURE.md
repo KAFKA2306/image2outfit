@@ -55,6 +55,7 @@ src/image2outfit
 | 必須 view / pose | `config/release-policy.json` |
 | 製品 job | `config/products/<slug>/job.json` |
 | construction | `config/products/<slug>/construction.json` |
+| pipeline request schema | `config/pipeline/pipeline-request.schema.v1.json` |
 | stage profile | `config/pipeline-profiles/garment-reconstruction-v1.json` |
 | stage result schema | `config/pipeline/stage-result.schema.v1.json` |
 | audit record schema | `config/pipeline/stage-audit-record.schema.v1.json` |
@@ -113,6 +114,22 @@ pipeline の実行状態と製品 lifecycle を分離します。
 - `WORKING` / `COMPLETE` / `REJECTED`: 製品 lifecycle
 
 `PLANNED` や `EXECUTED` を `COMPLETE` の代替にしません。製品 lifecycle と必須 completion gate は `config/genworks-handoff-policy.json` と `ProductManifest.json` が所有します。
+
+## Batch execution
+
+複数製品のbatchは新しいpipelineを所有しません。正準入口は引き続き `tools/manage.py`、製品ごとの実行authorityは `tools/run_product_execution.py` です。
+
+```text
+config/batch/*.json
+  -> manage.py batch
+  -> batch_execution.py
+  -> run_product_execution.py
+  -> canonical pipeline checkpoint / audit bundle
+```
+
+batchは `maxConcurrency: 1` で直列化し、1製品の失敗後も後続製品を観測します。再実行時は各製品の既存checkpointをそのまま使い、`EXECUTED` は再利用、`FAILED` は最初の未完stageから再開します。batch固有のretry state databaseは持ちません。
+
+DockerはPython batch coordinatorの再現可能な実行環境だけを担当します。Blender / Unity / private reference / direct visual reviewの実行境界をcontainer内で代替したことにはしません。
 
 ## Stage result contract
 

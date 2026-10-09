@@ -52,6 +52,16 @@ jobs:
       - name: Verify PR merge and product release separation
         run: uv run --locked --no-default-groups python tools/pr_merge_gate.py
 
+      - name: Verify canonical dbt evidence extractor
+        run: >-
+          uv run --locked --no-default-groups
+          python -m unittest tests.test_dbt_evidence -v
+
+      - name: Build and test dbt manufacturing evidence
+        run: >-
+          uv run --locked --no-default-groups
+          python tools/manage.py dbt check
+
       - name: Parse tracked contracts
         run: |
           uv run --locked --no-default-groups python - <<'PY'

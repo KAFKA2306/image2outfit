@@ -1,0 +1,27 @@
+{
+  "productSlug": "siroino-bellflower-lantern-trouser-set",
+  "status": "BLOCKED",
+  "gate": "unityStatic",
+  "observed": {
+    "exitCode": 1,
+    "summary": "Unity project compilation stopped before product import validation.",
+    "missingDependencyNamespaces": [
+      "nadena",
+      "VRC.SDK3",
+      "VRC.SDK3A",
+      "VRC.SDKBase"
+    ],
+    "missingTypes": [
+      "ModularAvatarMergeArmature"
+    ],
+    "affectedArea": "existing Continuous Avatar Uploader and Modular Avatar integration scripts"
+  },
+  "evidence": "candidate-audit.json and unity-compile.log",
+  "resumeCondition": "Restore the repository's pinned VRChat SDK and Modular Avatar dependencies, then rerun the candidate pipeline for this same product slug.",
+  "notClaimed": [
+    "Unity import",
+    "Modular Avatar validation",
+    "NDMF validation",
+    "VRChat runtime validation"
+  ]
+}

@@ -41,11 +41,30 @@ Repository-wide checks are `task audit:all` and `task check:python`. Do not add 
 - While GitHub Pages is enabled, keep the canonical public URL as plain text on the first line of `README.md`.
 - Read public product state from each `ProductManifest.json` or its existing canonical projection; do not maintain a handwritten state catalog.
 
+## dbt responsibility
+
+dbt is a first-class repository responsibility for reproducible transformation, testing, and analytics over manufacturing/product evidence.
+
+- Canonical owners above remain the only authorities. dbt reads their existing projections and never becomes a second source of truth.
+- Model only facts that already exist in canonical product/manufacturing evidence, including product identity, manufacturing runs, gate/verification state, defects, artifacts, hashes, and release observations.
+- A manufacturing run should leave dbt-consumable evidence through the existing canonical files. Do not introduce a parallel hand-written ledger just to feed dbt.
+- dbt tests may reject inconsistent or incomplete derived data, but dbt must never turn an unexecuted mesh, UV, material, rig, render, Unity, or VRChat layer into PASS.
+- Route dbt extraction/build/test commands through the existing `Taskfile.yml` / `tools/manage.py` command authority. Do not create one-off SQL/export command paths.
+
 ## Evidence
 
 Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence. Visual acceptance requires direct inspection of the current evidence required by `contracts/quality/quality-spec.json` and `config/release-policy.json`.
 
+Use a visual feedback loop for appearance-sensitive work: capture the current Blender/Unity view, inspect silhouette, seams, UV/material appearance, intersections, and required poses, make the smallest source change, then recapture and re-run the numeric checks. Use deterministic CLI/`uv` automation for repeatable generation and inspection; use computer use when the decision depends on the rendered UI rather than serialized values alone. When a visual defect is reproducible, encode its check in the existing verifier so later products do not repeat it.
+
 Merge eligibility, product completion, and customer release are separate decisions owned by their canonical policies.
+
+## Astra quality review
+
+- Delegate to Astra only for quality-critical review, especially cloth simulation, pose behavior, visual feedback, and release-blocking evidence.
+- Use the Astra model with `medium` reasoning effort.
+- Keep delegated input limited to the exact product, evidence paths, and acceptance question; do not send unrelated repository history or task context.
+- Require concise output limited to a verdict, up to three critical findings, and required actions, with no implementation unless explicitly requested.
 
 ## Continuation
 

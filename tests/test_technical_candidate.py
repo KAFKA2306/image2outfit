@@ -62,7 +62,11 @@ class HostedPoseRenderTests(unittest.TestCase):
     def test_unconfigured_hosted_pose_is_explicitly_not_requested(self) -> None:
         prepared = blender_python_env.PreparedEnvironment([], {}, {})
         result = technical_candidate.run_hosted_pose_render(
-            Path("job.json"), {}, {"requiredPoses": ["neutral"]}, prepared, Path("reports")
+            Path("job.json"),
+            {},
+            {"requiredPoses": ["neutral"]},
+            prepared,
+            Path("reports"),
         )
         self.assertEqual(result, {"passed": True, "status": "NOT_REQUESTED"})
 

@@ -96,6 +96,7 @@ jobs:
             --base-sha "$BASE_SHA" \
             --head-sha "$HEAD_SHA" \
             --github-env "$GITHUB_ENV" \
+            --materialize-job \
             --include-pipeline-request
 
       - name: Compile and test pipeline contracts
@@ -508,4 +509,3 @@ jobs:
       - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-

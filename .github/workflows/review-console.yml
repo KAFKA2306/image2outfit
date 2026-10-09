@@ -10,10 +10,12 @@ on:
       - "tools/manage.py"
       - "tools/release_orchestrator.py"
       - "tools/review_console.py"
+      - "tools/reconcile_publication.py"
       - "site/review-showcase.css"
       - "site/review-showcase.js"
       - "tests/test_quality_spec.py"
       - "tests/test_review_console_v2.py"
+      - "tests/test_reconcile_publication.py"
       - "tests/test_improvement_loop.py"
       - "tests/test_improvement_orchestrator.py"
       - "tests/test_improvement_review_projection.py"
@@ -25,6 +27,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: review-console-${{ github.workflow }}-${{ github.ref }}
@@ -51,7 +54,9 @@ jobs:
           tools/improvement_loop.py
           tools/manage.py
           tools/review_console.py
+          tools/reconcile_publication.py
           tests/test_review_console_v2.py
+          tests/test_reconcile_publication.py
           tests/test_improvement_loop.py
           tests/test_improvement_orchestrator.py
           tests/test_improvement_review_projection.py
@@ -59,13 +64,15 @@ jobs:
       - name: Run focused fixture tests
         run: |
           python -m unittest discover -s tests -p "test_review_console_v2.py" -v
+          python -m unittest discover -s tests -p "test_reconcile_publication.py" -v
           python -m unittest discover -s tests -p "test_improvement_loop.py" -v
           python -m unittest discover -s tests -p "test_improvement_orchestrator.py" -v
           python -m unittest discover -s tests -p "test_improvement_review_projection.py" -v
 
-      - name: Build public review console
+      - name: Build public review console and publication reconciliation
         run: |
           python tools/review_console.py --output .
+          python tools/reconcile_publication.py --console review-console.json --output publication-reconciliation.json
           python - <<'PY'
           import json
           import shutil
@@ -74,7 +81,7 @@ jobs:
           root = Path.cwd().resolve()
           site = root / "_site"
           site.mkdir(exist_ok=True)
-          for name in ("index.html", "review-console.json"):
+          for name in ("index.html", "review-console.json", "publication-reconciliation.json"):
               shutil.copy2(root / name, site / name)
 
           for name in ("review-showcase.css", "review-showcase.js"):
@@ -124,6 +131,25 @@ jobs:
           if "review-showcase.css" not in built_html or "review-showcase.js" not in built_html:
               raise SystemExit("render showcase assets were not injected")
 
-          print(f"pages_products={len(products)} linked_files={copied} showcase=PASS")
+          reconciliation = json.loads((root / "publication-reconciliation.json").read_text(encoding="utf-8"))
+          print(
+              f"pages_products={len(products)} linked_files={copied} showcase=PASS "
+              f"silent_omissions={reconciliation['silentOmissionCount']}"
+          )
           PY
 
+      - name: Delete previous publication reconciliation inventory
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/delete_previous_artifacts.py publication-reconciliation
+
+      - name: Upload publication reconciliation inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-reconciliation
+          path: publication-reconciliation.json
+          if-no-files-found: error
+          retention-days: 1
+          overwrite: true

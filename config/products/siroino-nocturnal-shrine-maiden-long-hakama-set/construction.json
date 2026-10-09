@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+  "profile": "panel-sewn",
+  "target": "Siroino _Large via official shape keys",
+  "designRevision": "v2-architectural-moon-gate-long-hakama",
+  "panels": [
+    "attached midnight-indigo high-neck tunic front and back",
+    "fitted long sleeves with structured cuffs",
+    "front-left and front-right long hakama panels",
+    "back-left and back-right long hakama panels",
+    "left and right side gusset panels",
+    "integrated crescent clasp and silver gate trim"
+  ],
+  "separateGeometry": [
+    "integrated crescent clasp",
+    "silver gate trim",
+    "structured sleeve cuffs"
+  ],
+  "priorityFitZones": [
+    "neck",
+    "shoulders",
+    "chest",
+    "waist",
+    "hip",
+    "side seam",
+    "knee",
+    "hem"
+  ],
+  "researchTrial": {
+    "method": "explicit sewn panel layout plus native Blender Cloth settlement for four primary long hakama panels and two side gussets",
+    "physicalSewingStitch": "tunic-to-hakama waist and front/back panel seams",
+    "review": "render the replacement pattern layout before assembly and five-view/six-pose evidence after settlement"
+  },
+  "clothSimulation": {
+    "applicability": "REQUIRED",
+    "components": [
+      "Nocturnal_Hakama_Front_L",
+      "Nocturnal_Hakama_Front_R",
+      "Nocturnal_Hakama_Back_L",
+      "Nocturnal_Hakama_Back_R",
+      "Nocturnal_Hakama_Side_L",
+      "Nocturnal_Hakama_Side_R"
+    ],
+    "evidence": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Evidence/Build/cloth-simulation.json",
+    "reason": "The long hakama panels and side gussets are loose fabric and must be physically settled against the body."
+  },
+  "releaseBoundary": "Keep WORKING while the exact source artifact is unavailable and visual appearance review remains unresolved; Unity and VRChat evidence is a separate technical checkpoint."
+}

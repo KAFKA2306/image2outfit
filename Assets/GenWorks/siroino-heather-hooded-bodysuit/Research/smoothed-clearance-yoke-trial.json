@@ -27,6 +27,8 @@
   "metrics": {
     "meshObjects": [
       "Heather_Body_Shell",
+      "Heather_Highcut_Front_Panel",
+      "Heather_Highcut_Back_Panel",
       "Heather_Long_Sleeve_L",
       "Heather_Long_Sleeve_R",
       "Heather_Rib_Cuff_L",
@@ -39,9 +41,9 @@
       "Heather_Hood_Drawcord_L",
       "Heather_Hood_Drawcord_R"
     ],
-    "meshObjectCount": 12,
-    "vertices": 19982,
-    "polygons": 20090,
+    "meshObjectCount": 14,
+    "vertices": 21762,
+    "polygons": 21809,
     "bodyTopologyCopied": false,
     "pelvicSaddleColumns": 17,
     "boundedClearanceProjection": {
@@ -51,6 +53,20 @@
         "maximumStepM": 0.012,
         "minimumClearanceM": 0.006,
         "smoothingIterations": 4
+      },
+      "Heather_Highcut_Front_Panel": {
+        "adjustedVertices": 0,
+        "meanStepM": 0.0,
+        "maximumStepM": 0.0,
+        "minimumClearanceM": 0.0,
+        "smoothingIterations": 0
+      },
+      "Heather_Highcut_Back_Panel": {
+        "adjustedVertices": 0,
+        "meanStepM": 0.0,
+        "maximumStepM": 0.0,
+        "minimumClearanceM": 0.0,
+        "smoothingIterations": 0
       },
       "Heather_Long_Sleeve_L": {
         "adjustedVertices": 450,
@@ -88,7 +104,7 @@
         "smoothingIterations": 4
       }
     },
-    "primaryRepresentation": "polar torso with tapered yoke, shallow saddle, fitted sleeves and compact hood",
+    "primaryRepresentation": "polar torso with tapered yoke, smooth high-cut bridge panels, shallow saddle, fitted sleeves and compact hood",
     "profile": {
       "heightSamples": 50,
       "angleSamples": 72,

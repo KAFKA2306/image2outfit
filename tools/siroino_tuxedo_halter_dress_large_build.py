@@ -237,7 +237,9 @@ def hem_from_settled_boundary(
         raise RuntimeError("settled lower skirt has no complete boundary ring")
     points = [
         tuple(skirt.data.vertices[index].co)
-        for index in range(len(skirt.data.vertices) - segments, len(skirt.data.vertices))
+        for index in range(
+            len(skirt.data.vertices) - segments, len(skirt.data.vertices)
+        )
     ]
     return base.curve_tube(
         "Black_Lace_Scallop_Hem",

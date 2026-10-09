@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "batchId": "tracked-product-execution-v1",
+  "requests": [
+    "config/pipeline/requests/siroino-blue-happi.json",
+    "config/pipeline/requests/siroino-tuxedo-halter-dress-large.json",
+    "config/pipeline/requests/siroino-white-ghost-gown.json"
+  ],
+  "maxConcurrency": 1,
+  "continueOnError": true,
+  "resumePolicy": "canonical-checkpoint",
+  "terminalCachePolicy": "reuse-executed"
+}

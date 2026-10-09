@@ -245,9 +245,7 @@ def build(body, armature, mats):
     rigid = []
     clearance_objects = []
 
-    bodice, bodice_overlays, front_y = _build_sewn_bodice(
-        body, center, height, z, mats
-    )
+    bodice, bodice_overlays, front_y = _build_sewn_bodice(body, center, height, z, mats)
     garments.extend([bodice, *bodice_overlays])
     weighted.extend([bodice, *bodice_overlays])
     clearance_objects.extend([bodice, *bodice_overlays])

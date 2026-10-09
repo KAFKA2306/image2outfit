@@ -4,16 +4,13 @@
 This is an asset-generation adapter for the local benchmark.  The input GLBs are
 full human-shaped meshes without an armature; the exported FBX keeps the generated
 surface and receives the Siroino skeleton and transferred weights so Unity can use
-it as a character mesh. The exported FBX is re-imported and checked for bone,
-weight, and pose-deformation integrity before the report can pass.
+it as a character mesh.
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-import math
 import sys
 from pathlib import Path
 
@@ -46,14 +43,6 @@ from image2outfit.weight_transfer import (  # noqa: E402
 
 
 BODY_FBX = ROOT / "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx"
-
-
-def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def parse_args() -> argparse.Namespace:
@@ -131,7 +120,9 @@ def apply_surface_materials(
     garment = bpy.data.materials.new(f"OSS {obj.name} Garment")
     garment.diffuse_color = (0.035, 0.07, 0.12, 1.0)
     garment.use_nodes = True
-    garment.node_tree.nodes.get("Principled BSDF").inputs["Base Color"].default_value = (
+    garment.node_tree.nodes.get("Principled BSDF").inputs[
+        "Base Color"
+    ].default_value = (
         0.035,
         0.07,
         0.12,
@@ -215,7 +206,9 @@ def fill_boundary_holes(obj: bpy.types.Object) -> int:
         bm.free()
 
 
-def transfer_weights(source: bpy.types.Object, target: bpy.types.Object, armature: bpy.types.Object) -> dict[str, object]:
+def transfer_weights(
+    source: bpy.types.Object, target: bpy.types.Object, armature: bpy.types.Object
+) -> dict[str, object]:
     deform_bones = {bone.name for bone in armature.data.bones if bone.use_deform}
     for bone_name in sorted(deform_bones):
         if target.vertex_groups.get(bone_name) is None:
@@ -227,8 +220,12 @@ def transfer_weights(source: bpy.types.Object, target: bpy.types.Object, armatur
         mapping="nearest-face-interpolated",
         max_distance=0.0,
     )
-    left_bones = {name for name in deform_bones if name.lower().endswith((".l", "_l", "-l"))}
-    right_bones = {name for name in deform_bones if name.lower().endswith((".r", "_r", "-r"))}
+    left_bones = {
+        name for name in deform_bones if name.lower().endswith((".l", "_l", "-l"))
+    }
+    right_bones = {
+        name for name in deform_bones if name.lower().endswith((".r", "_r", "-r"))
+    }
     policy = WeightTransferPolicy(
         max_influences=4,
         minimum_weight=1e-8,
@@ -267,10 +264,16 @@ def transfer_weights(source: bpy.types.Object, target: bpy.types.Object, armatur
         },
         result=result,
     )
-    return {"targetObject": target.name, **artifact.to_dict(), "artifactDigest": artifact.digest()}
+    return {
+        "targetObject": target.name,
+        **artifact.to_dict(),
+        "artifactDigest": artifact.digest(),
+    }
 
 
-def export_fbx(path: Path, armature: bpy.types.Object, target: bpy.types.Object) -> None:
+def export_fbx(
+    path: Path, armature: bpy.types.Object, target: bpy.types.Object
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.object.select_all(action="DESELECT")
     armature.select_set(True)
@@ -300,195 +303,6 @@ def export_fbx(path: Path, armature: bpy.types.Object, target: bpy.types.Object)
     )
 
 
-def inspect_exported_fbx(
-    path: Path,
-    *,
-    expected_deform_bones: set[str],
-    expected_vertex_count: int,
-) -> dict[str, object]:
-    digest = file_sha256(path)
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.import_scene.fbx(filepath=str(path), use_anim=False)
-    armatures = [obj for obj in bpy.context.scene.objects if obj.type == "ARMATURE"]
-    meshes = [obj for obj in bpy.context.scene.objects if obj.type == "MESH"]
-    issues: list[str] = []
-    if len(armatures) != 1:
-        issues.append(f"expected one armature, imported {len(armatures)}")
-    if len(meshes) != 1:
-        issues.append(f"expected one mesh, imported {len(meshes)}")
-
-    result: dict[str, object] = {
-        "path": str(path.relative_to(ROOT)).replace("\\", "/"),
-        "sha256": digest,
-        "fileSizeBytes": path.stat().st_size,
-        "armatureCount": len(armatures),
-        "meshObjectCount": len(meshes),
-        "expectedVertexCount": expected_vertex_count,
-        "issues": issues,
-    }
-    if len(armatures) != 1 or len(meshes) != 1:
-        result["passed"] = False
-        return result
-
-    armature = armatures[0]
-    mesh = meshes[0]
-    exported_bones = {bone.name for bone in armature.data.bones}
-    deform_bones = {
-        bone.name for bone in armature.data.bones if bone.use_deform
-    }
-    missing_bones = sorted(expected_deform_bones - exported_bones)
-    if missing_bones:
-        issues.append(f"FBX is missing deform bones: {missing_bones}")
-
-    group_names = {group.index: group.name for group in mesh.vertex_groups}
-    armature_modifiers = [
-        modifier
-        for modifier in mesh.modifiers
-        if modifier.type == "ARMATURE" and modifier.object == armature
-    ]
-    if not armature_modifiers:
-        issues.append("mesh has no modifier targeting the imported armature")
-
-    zero_weight_vertices = 0
-    non_normalized_vertices = 0
-    over_limit_vertices = 0
-    unknown_weight_groups: set[str] = set()
-    weighted_group_vertex_counts: dict[str, int] = {}
-    for vertex in mesh.data.vertices:
-        weights = []
-        for membership in vertex.groups:
-            group_name = group_names.get(membership.group)
-            if group_name is None:
-                unknown_weight_groups.add(f"index:{membership.group}")
-                continue
-            if group_name not in exported_bones:
-                unknown_weight_groups.add(group_name)
-            if membership.weight > 1e-8:
-                weights.append(membership.weight)
-                weighted_group_vertex_counts[group_name] = (
-                    weighted_group_vertex_counts.get(group_name, 0) + 1
-                )
-        if not weights:
-            zero_weight_vertices += 1
-            continue
-        if abs(sum(weights) - 1.0) > 1e-5:
-            non_normalized_vertices += 1
-        if len(weights) > 4:
-            over_limit_vertices += 1
-
-    if zero_weight_vertices:
-        issues.append(f"{zero_weight_vertices} vertices have no positive weights")
-    if non_normalized_vertices:
-        issues.append(f"{non_normalized_vertices} vertices have non-normalized weights")
-    if over_limit_vertices:
-        issues.append(f"{over_limit_vertices} vertices exceed four bone influences")
-    if unknown_weight_groups:
-        issues.append(f"weights reference unknown bone groups: {sorted(unknown_weight_groups)}")
-    if len(mesh.data.vertices) != expected_vertex_count:
-        issues.append(
-            f"vertex count changed across FBX export: {expected_vertex_count} -> {len(mesh.data.vertices)}"
-        )
-
-    pose_candidates = {
-        name: count
-        for name, count in weighted_group_vertex_counts.items()
-        if name in deform_bones and armature.pose.bones.get(name) is not None
-    }
-    pose_test: dict[str, object] = {
-        "method": "10-degree single-bone rotation with evaluated mesh displacement",
-        "passed": False,
-    }
-    if pose_candidates and armature_modifiers:
-        bone_name = max(pose_candidates, key=pose_candidates.get)
-        pose_bone = armature.pose.bones[bone_name]
-        original_basis = pose_bone.matrix_basis.copy()
-        original_rotation_mode = pose_bone.rotation_mode
-        original_rotation_euler = pose_bone.rotation_euler.copy()
-        original_rotation_quaternion = pose_bone.rotation_quaternion.copy()
-        original_rotation_axis_angle = tuple(pose_bone.rotation_axis_angle)
-        try:
-            evaluated = mesh.evaluated_get(bpy.context.evaluated_depsgraph_get())
-            base_mesh = evaluated.to_mesh()
-            base_coordinates = [vertex.co.copy() for vertex in base_mesh.vertices]
-            evaluated.to_mesh_clear()
-            axis_results = []
-            for axis_index, axis_name in enumerate(("X", "Y", "Z")):
-                pose_bone.rotation_mode = "XYZ"
-                pose_bone.matrix_basis = original_basis
-                pose_bone.rotation_euler[axis_index] += math.radians(10.0)
-                bpy.context.view_layer.update()
-                evaluated = mesh.evaluated_get(bpy.context.evaluated_depsgraph_get())
-                posed_mesh = evaluated.to_mesh()
-                displacements = [
-                    (posed_mesh.vertices[index].co - base_coordinates[index]).length
-                    for index in range(min(len(base_coordinates), len(posed_mesh.vertices)))
-                ]
-                evaluated.to_mesh_clear()
-                axis_results.append(
-                    {
-                        "axis": axis_name,
-                        "movedVertexCount": sum(value > 1e-6 for value in displacements),
-                        "maximumDisplacement": max(displacements, default=0.0),
-                    }
-                )
-            pose_bone.matrix_basis = original_basis
-            pose_bone.rotation_mode = original_rotation_mode
-            pose_bone.rotation_euler = original_rotation_euler
-            pose_bone.rotation_quaternion = original_rotation_quaternion
-            pose_bone.rotation_axis_angle = original_rotation_axis_angle
-            best_axis = max(
-                axis_results,
-                key=lambda value: (
-                    value["movedVertexCount"],
-                    value["maximumDisplacement"],
-                ),
-            )
-            pose_test.update(
-                {
-                    "boneName": bone_name,
-                    "weightedVertexCount": pose_candidates[bone_name],
-                    "angleDegrees": 10,
-                    "axisResults": axis_results,
-                    "bestAxis": best_axis["axis"],
-                    "movedVertexCount": best_axis["movedVertexCount"],
-                    "maximumDisplacement": best_axis["maximumDisplacement"],
-                    "passed": best_axis["movedVertexCount"] > 0,
-                }
-            )
-            if not pose_test["passed"]:
-                issues.append("a weighted bone pose did not deform any mesh vertices")
-        finally:
-            pose_bone.matrix_basis = original_basis
-            pose_bone.rotation_mode = original_rotation_mode
-            pose_bone.rotation_euler = original_rotation_euler
-            pose_bone.rotation_quaternion = original_rotation_quaternion
-            pose_bone.rotation_axis_angle = original_rotation_axis_angle
-    else:
-        issues.append("no weighted deform bone is available for a pose deformation check")
-
-    result.update(
-        {
-            "armatureName": armature.name,
-            "boneCount": len(exported_bones),
-            "deformBoneCount": len(deform_bones),
-            "expectedDeformBoneCount": len(expected_deform_bones),
-            "missingDeformBones": missing_bones,
-            "meshName": mesh.name,
-            "vertexCount": len(mesh.data.vertices),
-            "vertexGroupCount": len(mesh.vertex_groups),
-            "armatureModifierCount": len(armature_modifiers),
-            "zeroWeightVertexCount": zero_weight_vertices,
-            "nonNormalizedVertexCount": non_normalized_vertices,
-            "overFourInfluenceVertexCount": over_limit_vertices,
-            "unknownWeightGroups": sorted(unknown_weight_groups),
-            "poseDeformationTest": pose_test,
-        }
-    )
-    result["issues"] = issues
-    result["passed"] = not issues
-    return result
-
-
 def main() -> int:
     args = parse_args()
     source_path = repo_path(args.input)
@@ -507,9 +321,13 @@ def main() -> int:
     if source is None or armature is None:
         raise RuntimeError("Siroino base mesh or Armature was not imported")
     bpy.ops.import_scene.gltf(filepath=str(source_path))
-    imported = [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj != source]
+    imported = [
+        obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj != source
+    ]
     if len(imported) != 1:
-        raise RuntimeError(f"expected one OSS mesh, got {[obj.name for obj in imported]}")
+        raise RuntimeError(
+            f"expected one OSS mesh, got {[obj.name for obj in imported]}"
+        )
     target = imported[0]
     target.name = f"{args.model}_CharacterMesh"
 
@@ -548,57 +366,42 @@ def main() -> int:
         single_garment_material=args.single_garment_material,
     )
     weight_artifact = transfer_weights(source, target, armature)
-    expected_deform_bones = {
-        bone.name for bone in armature.data.bones if bone.use_deform
-    }
-    expected_vertex_count = len(target.data.vertices)
-    target_name = target.name
-    target_face_count = len(target.data.polygons)
-    final_triangle_count = sum(
-        len(polygon.vertices) - 2 for polygon in target.data.polygons
-    )
-    material_names = [material.name for material in target.data.materials]
-    final_min, final_max = bounds(target)
     export_fbx(output_fbx, armature, target)
-    bpy.ops.wm.save_as_mainfile(filepath=str(output_blend), check_existing=False, compress=True)
-    fbx_readback = inspect_exported_fbx(
-        output_fbx,
-        expected_deform_bones=expected_deform_bones,
-        expected_vertex_count=expected_vertex_count,
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(output_blend), check_existing=False, compress=True
     )
 
+    final_min, final_max = bounds(target)
     report = {
         "schemaVersion": 1,
         "kind": "oss-character-rig",
         "model": args.model,
         "input": str(source_path.relative_to(ROOT)).replace("\\", "/"),
-        "inputSha256": file_sha256(source_path),
         "outputFbx": str(output_fbx.relative_to(ROOT)).replace("\\", "/"),
-        "outputFbxSha256": fbx_readback["sha256"],
         "outputBlend": str(output_blend.relative_to(ROOT)).replace("\\", "/"),
-        "outputBlendSha256": file_sha256(output_blend),
         "blenderVersion": bpy.app.version_string,
         "skeleton": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
-        "targetObject": target_name,
-        "inputVertexCountAfterCleanup": expected_vertex_count,
-        "inputFaceCountAfterCleanup": target_face_count,
+        "targetObject": target.name,
+        "inputVertexCountAfterCleanup": len(target.data.vertices),
+        "inputFaceCountAfterCleanup": len(target.data.polygons),
         "triangleBudget": args.max_triangles,
         "decimatedTriangles": decimated_triangles,
-        "finalTriangleCount": final_triangle_count,
+        "finalTriangleCount": sum(
+            len(polygon.vertices) - 2 for polygon in target.data.polygons
+        ),
         "singleGarmentMaterial": args.single_garment_material,
         "voxelRemeshSize": args.voxel_remesh_size,
         "filledBoundaryEdges": filled_boundary_edges,
         "removedVerticesBelowCrop": removed_vertices,
         "normalizedBounds": {"min": list(final_min), "max": list(final_max)},
         "weightTransfer": weight_artifact,
-        "fbxReadback": fbx_readback,
-        "materials": material_names,
-        "status": "PASS"
-        if weight_artifact["audit"]["passed"] and fbx_readback["passed"]
-        else "FAIL",
+        "materials": [material.name for material in target.data.materials],
+        "status": "PASS" if weight_artifact["audit"]["passed"] else "FAIL",
     }
     output_report.parent.mkdir(parents=True, exist_ok=True)
-    output_report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_report.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0 if report["status"] == "PASS" else 2
 

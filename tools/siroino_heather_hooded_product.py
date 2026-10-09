@@ -43,6 +43,8 @@ DESIGN_REVISION = manifold_yoke.DESIGN_REVISION
 RESEARCH_TRIAL = str(manifold_yoke.RESEARCH_OUTPUT).replace("\\", "/")
 ACTUAL_SEPARATE_GEOMETRY = [
     "Heather_Body_Shell",
+    "Heather_Highcut_Front_Panel",
+    "Heather_Highcut_Back_Panel",
     "Heather_Long_Sleeve_L",
     "Heather_Long_Sleeve_R",
     "Heather_Rib_Cuff_L",
