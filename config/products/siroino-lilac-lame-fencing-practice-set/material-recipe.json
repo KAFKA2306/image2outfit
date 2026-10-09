@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "status": "PROTOTYPE_HYPOTHESIS",
+  "evidenceBoundary": "Explicit preview hypotheses only; ivory/lavender material appearance, lam\u00e9 response, trims and quilting require direct rendered review. No measured PBR approval.",
+  "prototypeMaterial": {
+    "name": "ivory-prototype-hypothesis",
+    "baseColorLinearRgb": [
+      0.85,
+      0.82,
+      0.74
+    ],
+    "roughness": 0.65
+  },
+  "prototypeEdgeTrim": {
+    "enabled": false,
+    "name": "lavender-piping-prototype-hypothesis",
+    "pieceIds": [
+      "jacket-overlap-front",
+      "jacket-sleeve-left",
+      "jacket-sleeve-right",
+      "stand-collar",
+      "overskirt-front",
+      "overskirt-back",
+      "waistband-front",
+      "waistband-back"
+    ],
+    "baseColorLinearRgb": [
+      0.32,
+      0.23,
+      0.52
+    ],
+    "roughness": 0.48,
+    "metallic": 0.08,
+    "bevelRadiusM": 0.0012,
+    "evidenceBoundary": "Disabled because unclassified panel boundaries produced floating loops. Trim remains unimplemented until canonical 3D stitch-edge mappings exist."
+  },
+  "prototypeSurfaceMotifs": {
+    "materialName": "lilac-surface-motif-hypothesis",
+    "baseColorLinearRgb": [
+      0.55,
+      0.42,
+      0.72
+    ],
+    "roughness": 0.52,
+    "metallic": 0.12,
+    "evidenceBoundary": "Surface-projected visual hypotheses added to make the missing diagonal bodice motif and elbow quilting visible for direct review. Not a sewn panel, approved design, fit, or release evidence.",
+    "plastron": {
+      "hostPieceIds": [
+        "jacket-front-left",
+        "jacket-overlap-front"
+      ],
+      "pathStartXZ": [
+        -0.055,
+        0.995
+      ],
+      "pathEndXZ": [
+        0.055,
+        0.825
+      ],
+      "sampleCount": 32,
+      "halfWidthM": 0.018,
+      "surfaceOffsetM": 0.0015,
+      "frontQueryYM": -0.16
+    },
+    "elbowQuilting": {
+      "hostPieceIds": [
+        "jacket-sleeve-left",
+        "jacket-sleeve-right"
+      ],
+      "centerAbsXM": 0.275,
+      "centerZM": 1.012,
+      "halfLengthM": 0.035,
+      "halfHeightM": 0.024,
+      "threadRadiusM": 0.001,
+      "surfaceOffsetM": 0.0015,
+      "frontQueryYM": -0.08
+    }
+  }
+}

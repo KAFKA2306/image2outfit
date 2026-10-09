@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "sourceReference": "private-reference://sha256/cc0aa34b4824f24ee57d3b557853dbf98c64efa156b07ea36d181959cd53866f",
+  "parts": [
+    {
+      "partId": "high-collar-fencing-jacket",
+      "kind": "fitted-long-sleeve-fencing-jacket",
+      "regions": ["neck", "chest", "waist", "upper-back", "arms"],
+      "role": "structural-panel",
+      "layer": "outer",
+      "material": "ivory fabric appearance with slight sheen; fiber and lamé content unverified",
+      "fit": "fitted appearance; avatar fit unverified",
+      "evidenceViews": ["front", "left", "back", "right"],
+      "observation": "The four normalized views show an ivory high-collar jacket with long sleeves, a fitted torso, a diagonal front overlap edged in lavender, and a short waist-level hem. The rear view shows a center-back seam and a narrow waist adjustment tab with two visible buttons.",
+      "constructionHypothesis": "Draft as a shell with front and back panels, two sleeves, and a separate collar. Treat the diagonal front as an overlapping plastron panel and the back tab as an attached adjustment detail. Exact seam paths, closure, allowance, dimensions, and assembly order are not established by the image."
+    },
+    {
+      "partId": "quilted-elbow-panel-pair",
+      "kind": "diamond-quilted-elbow-overlays",
+      "regions": ["left-elbow", "right-elbow"],
+      "role": "attached-overlay",
+      "layer": "outer",
+      "material": "ivory quilted appearance; fill, backing, and attachment method unverified",
+      "fit": "not-applicable",
+      "evidenceViews": ["left", "back", "right"],
+      "observation": "Diamond-quilted patches are visible over both elbow regions in the left, back, and right views; their relief and padding depth cannot be measured.",
+      "constructionHypothesis": "Represent as two separate surface or layered panels on the sleeves. Do not infer padding thickness, quilting stitch density, or sleeve cut boundaries from the rendered appearance."
+    },
+    {
+      "partId": "lavender-piping-set",
+      "kind": "narrow-lavender-edge-trim",
+      "regions": ["front-overlap-edge", "sleeve-edges", "overskirt-hem", "jacket-hem"],
+      "role": "edge-finish",
+      "layer": "surface",
+      "material": "lavender trim appearance; textile, reflectance, and cross-section unverified",
+      "fit": "not-applicable",
+      "evidenceViews": ["front", "left", "back", "right"],
+      "observation": "Narrow lavender-colored lines follow the jacket's diagonal front edge, sleeve edges, and overskirt hem in the normalized views.",
+      "constructionHypothesis": "Treat visible lines as trim placement only. Whether they are piping, binding, folded fabric, or surface graphics is unresolved; keep them separate from structural seam assumptions."
+    },
+    {
+      "partId": "short-pleated-overskirt",
+      "kind": "short-pleated-overskirt",
+      "regions": ["waist", "hip", "upper-leg"],
+      "role": "structural-panel",
+      "layer": "mid",
+      "material": "ivory fabric appearance; weave and pleat memory unverified",
+      "fit": "flared appearance; attachment and fit unverified",
+      "evidenceViews": ["front", "left", "back", "right"],
+      "observation": "A short flared pleated layer sits over the shorts and ends at the upper thigh. Pleat folds are visible from front, side, and rear.",
+      "constructionHypothesis": "Draft front and back skirt sections with provisional pleat folds. Pleat count, waist attachment, waistband, underlap, hem turn, ease, and cloth behavior remain unmeasured."
+    },
+    {
+      "partId": "fitted-short",
+      "kind": "fitted-shorts",
+      "regions": ["waist", "hip", "crotch", "upper-leg"],
+      "role": "structural-panel",
+      "layer": "base",
+      "material": "ivory fabric appearance; stretch and opacity unverified",
+      "fit": "close-fitting appearance; avatar fit unverified",
+      "evidenceViews": ["front", "left", "back", "right"],
+      "observation": "A fitted short garment is visible beneath the overskirt from front, side, and rear; the leg hems sit above mid-thigh.",
+      "constructionHypothesis": "Draft a shorts shell with front/back and crotch construction as a 2D hypothesis. The waistband, rise, gusset, inseam, material stretch, and clearance are not observable."
+    },
+    {
+      "partId": "back-waist-adjustment-tab",
+      "kind": "buttoned-back-waist-adjuster",
+      "regions": ["center-back-waist"],
+      "role": "attached-overlay",
+      "layer": "attached",
+      "material": "ivory fabric appearance with two dark button-like details; material and function unverified",
+      "fit": "adjustment function inferred, not verified",
+      "evidenceViews": ["back"],
+      "observation": "A narrow horizontal tab crosses the back waist and has two round dark button-like details.",
+      "constructionHypothesis": "Model a separate tab attached at both ends only as a provisional construction; the buttons' function, fastening, tab overlap, and adjustability are unknown."
+    }
+  ],
+  "uncertainties": [
+    {
+      "field": "garment dimensions, ease, and fit",
+      "status": "not-measured",
+      "assumption": "Four-view concept imagery supplies appearance only; no avatar measurements, pattern scale, ease, or Siroino shape-key fit is established."
+    },
+    {
+      "field": "jacket front overlap and closure",
+      "status": "partially-observed",
+      "assumption": "The diagonal overlap edge is visible, but its panel boundary, fastening, lining, and whether it opens are not shown."
+    },
+    {
+      "field": "sleeve and elbow panel construction",
+      "status": "partially-observed",
+      "assumption": "Sleeves and quilted elbow appearances are visible, but armhole/cap seams, quilting layers, padding, and panel attachment are unresolved."
+    },
+    {
+      "field": "overskirt pleats and attachment",
+      "status": "not-measured",
+      "assumption": "The pleated shape is visible; pleat count, fold direction, waist anchoring, lining, and motion behavior are not confirmed."
+    },
+    {
+      "field": "shorts pattern and material",
+      "status": "partially-observed",
+      "assumption": "The shorts silhouette is visible, but rise, crotch seam, gusset, stretch, opacity, and garment-to-overskirt attachment are unknown."
+    },
+    {
+      "field": "textile and trim identity",
+      "status": "not-verified",
+      "assumption": "Ivory color, surface sheen, and lavender lines are visual observations only; lamé fiber/content, PBR response, and piping construction are not established."
+    },
+    {
+      "field": "avatar motion and penetration",
+      "status": "unverified",
+      "assumption": "No mesh, shape-key fit, cloth motion, pose, or penetration evaluation has been performed."
+    }
+  ]
+}
