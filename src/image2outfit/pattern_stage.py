@@ -5,10 +5,16 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass
+from typing import Sequence
 
 from .construction import ConstructionSpec
+from .curves import DEFAULT_CURVE_TOLERANCE_M, sample_pattern_boundary
 from .decomposition import GarmentDecomposition
 from .domain import PatternPiece
+
+DEFAULT_PATTERN_MINIMUM_AREA_M2 = 1e-6
+DEFAULT_PATTERN_MINIMUM_EDGE_M = 1e-4
+DEFAULT_PATTERN_MINIMUM_ANGLE_DEGREES = 2.0
 
 Point2 = tuple[float, float]
 
@@ -73,8 +79,11 @@ def _minimum_angle_degrees(boundary: tuple[Point2, ...]) -> float:
     return min(angles)
 
 
-def _self_intersections(piece: PatternPiece) -> tuple[tuple[int, int], ...]:
-    boundary = piece.boundary
+def _self_intersections(
+    piece: PatternPiece,
+    boundary: Sequence[Point2] | None = None,
+) -> tuple[tuple[int, int], ...]:
+    boundary = piece.boundary if boundary is None else boundary
     count = len(boundary)
     intersections = []
     for first in range(count):
@@ -155,6 +164,64 @@ class PatternGeometryDefect:
     threshold: float
 
 
+def audit_pattern_piece_geometry(
+    pattern_pieces: Sequence[PatternPiece],
+    *,
+    minimum_area_m2: float = DEFAULT_PATTERN_MINIMUM_AREA_M2,
+    minimum_edge_m: float = DEFAULT_PATTERN_MINIMUM_EDGE_M,
+    minimum_angle_degrees: float = DEFAULT_PATTERN_MINIMUM_ANGLE_DEGREES,
+) -> tuple[PatternGeometryDefect, ...]:
+    """Audit planar piece geometry independently of avatar fit or assembly."""
+    defects: list[PatternGeometryDefect] = []
+    for piece in pattern_pieces:
+        boundary, _ = sample_pattern_boundary(
+            piece.boundary,
+            piece.edges,
+            tolerance=DEFAULT_CURVE_TOLERANCE_M,
+        )
+        area = _polygon_area(boundary)
+        if area < minimum_area_m2:
+            defects.append(
+                PatternGeometryDefect(
+                    piece.piece_id,
+                    "area",
+                    area,
+                    minimum_area_m2,
+                )
+            )
+        minimum_edge = min(_edge_lengths(boundary))
+        if minimum_edge < minimum_edge_m:
+            defects.append(
+                PatternGeometryDefect(
+                    piece.piece_id,
+                    "edge-length",
+                    minimum_edge,
+                    minimum_edge_m,
+                )
+            )
+        minimum_angle = _minimum_angle_degrees(boundary)
+        if minimum_angle < minimum_angle_degrees:
+            defects.append(
+                PatternGeometryDefect(
+                    piece.piece_id,
+                    "angle",
+                    minimum_angle,
+                    minimum_angle_degrees,
+                )
+            )
+        intersections = _self_intersections(piece, boundary)
+        if intersections:
+            defects.append(
+                PatternGeometryDefect(
+                    piece.piece_id,
+                    "self-intersection",
+                    float(len(intersections)),
+                    0.0,
+                )
+            )
+    return tuple(defects)
+
+
 @dataclass(frozen=True, slots=True)
 class PatternHypothesis:
     hypothesis_id: str
@@ -198,53 +265,16 @@ class PatternHypothesis:
     def geometry_defects(
         self,
         *,
-        minimum_area_m2: float = 1e-6,
-        minimum_edge_m: float = 1e-4,
-        minimum_angle_degrees: float = 2.0,
+        minimum_area_m2: float = DEFAULT_PATTERN_MINIMUM_AREA_M2,
+        minimum_edge_m: float = DEFAULT_PATTERN_MINIMUM_EDGE_M,
+        minimum_angle_degrees: float = DEFAULT_PATTERN_MINIMUM_ANGLE_DEGREES,
     ) -> tuple[PatternGeometryDefect, ...]:
-        defects: list[PatternGeometryDefect] = []
-        for piece in self.construction.garment.pattern_pieces:
-            area = _polygon_area(piece.boundary)
-            if area < minimum_area_m2:
-                defects.append(
-                    PatternGeometryDefect(
-                        piece.piece_id,
-                        "area",
-                        area,
-                        minimum_area_m2,
-                    )
-                )
-            minimum_edge = min(_edge_lengths(piece.boundary))
-            if minimum_edge < minimum_edge_m:
-                defects.append(
-                    PatternGeometryDefect(
-                        piece.piece_id,
-                        "edge-length",
-                        minimum_edge,
-                        minimum_edge_m,
-                    )
-                )
-            minimum_angle = _minimum_angle_degrees(piece.boundary)
-            if minimum_angle < minimum_angle_degrees:
-                defects.append(
-                    PatternGeometryDefect(
-                        piece.piece_id,
-                        "angle",
-                        minimum_angle,
-                        minimum_angle_degrees,
-                    )
-                )
-            intersections = _self_intersections(piece)
-            if intersections:
-                defects.append(
-                    PatternGeometryDefect(
-                        piece.piece_id,
-                        "self-intersection",
-                        float(len(intersections)),
-                        0.0,
-                    )
-                )
-        return tuple(defects)
+        return audit_pattern_piece_geometry(
+            self.construction.garment.pattern_pieces,
+            minimum_area_m2=minimum_area_m2,
+            minimum_edge_m=minimum_edge_m,
+            minimum_angle_degrees=minimum_angle_degrees,
+        )
 
     def preview_svg(self) -> str:
         return self.construction.preview_svg()
@@ -276,6 +306,11 @@ class PatternHypothesis:
             self.construction.garment.pattern_pieces,
             key=lambda value: value.piece_id,
         ):
+            boundary, _ = sample_pattern_boundary(
+                piece.boundary,
+                piece.edges,
+                tolerance=DEFAULT_CURVE_TOLERANCE_M,
+            )
             lines.extend(
                 (
                     "0",
@@ -283,12 +318,12 @@ class PatternHypothesis:
                     "8",
                     piece.piece_id,
                     "90",
-                    str(len(piece.boundary)),
+                    str(len(boundary)),
                     "70",
                     "1",
                 )
             )
-            for x, y in piece.boundary:
+            for x, y in boundary:
                 lines.extend(("10", f"{x * 1000:.6f}", "20", f"{y * 1000:.6f}"))
         lines.extend(("0", "ENDSEC", "0", "EOF"))
         return "\n".join(lines) + "\n"

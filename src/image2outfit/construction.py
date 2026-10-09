@@ -8,7 +8,10 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Mapping
 
+from .curves import curve_length, sample_pattern_boundary
 from .domain import GarmentSpecification, LayerPosition, PatternEdge, PatternPiece
+
+DEFAULT_RELATIVE_LENGTH_TOLERANCE = 0.05
 
 
 class ConstructionComponentKind(StrEnum):
@@ -150,10 +153,20 @@ class ConstructionSpec:
 
     @classmethod
     def _edge_length(cls, piece: PatternPiece, edge: PatternEdge) -> float:
+        if edge.curvature is not None:
+            return curve_length(
+                piece.boundary[edge.start_vertex],
+                piece.boundary[edge.end_vertex],
+                edge.curvature,
+            )
         x, y = cls._edge_vector(piece, edge)
         return math.hypot(x, y)
 
-    def audit(self, *, relative_length_tolerance: float = 0.05) -> ConstructionAudit:
+    def audit(
+        self,
+        *,
+        relative_length_tolerance: float = DEFAULT_RELATIVE_LENGTH_TOLERANCE,
+    ) -> ConstructionAudit:
         edge_map = self.edge_by_id
         stitched_edge_ids: set[str] = set()
         length_mismatches: list[str] = []
@@ -214,8 +227,9 @@ class ConstructionSpec:
         rendered: list[str] = []
         maximum_height = 0.0
         for piece in pieces:
-            xs = [point[0] * 1000 for point in piece.boundary]
-            ys = [point[1] * 1000 for point in piece.boundary]
+            boundary, _ = sample_pattern_boundary(piece.boundary, piece.edges)
+            xs = [point[0] * 1000 for point in boundary]
+            ys = [point[1] * 1000 for point in boundary]
             width = max(xs) - min(xs)
             height = max(ys) - min(ys)
             maximum_height = max(maximum_height, height)
@@ -248,6 +262,16 @@ class ConstructionSpec:
                     "boundary": piece.boundary,
                     "grainAngleDegrees": piece.grain_angle_degrees,
                     "correspondenceIds": dict(sorted(piece.correspondence_ids.items())),
+                    "edges": [
+                        {
+                            "edgeId": edge.edge_id,
+                            "startVertex": edge.start_vertex,
+                            "endVertex": edge.end_vertex,
+                            "role": edge.role.value,
+                            "curvature": edge.curvature,
+                        }
+                        for edge in sorted(piece.edges, key=lambda value: value.edge_id)
+                    ],
                 }
                 for piece in sorted(
                     self.garment.pattern_pieces, key=lambda item: item.piece_id

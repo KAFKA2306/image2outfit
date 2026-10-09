@@ -131,6 +131,18 @@ tasks:
     cmds:
       - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_mcp.ps1 -DoctorOnly
 
+  oss:garmentcode:setup:
+    desc: Prepare the isolated, pinned GarmentCode/PyGarment 2D runtime.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_garmentcode_runtime.ps1
+
+  oss:opensew:setup:
+    desc: Prepare pinned OpenSew and Blender for 2D-only panel mesh comparisons.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_opensew_runtime.ps1
+
   improve:
     desc: Advance defect diagnosis, targeted learning, measured experiments, adoption, regeneration, and re-evaluation until a real external boundary or no defect remains.
     requires:

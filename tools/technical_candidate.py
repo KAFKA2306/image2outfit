@@ -64,6 +64,60 @@ def run_command(
     return process.returncode
 
 
+def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
+    """Resolve the current checkpoint-bound sewn mesh for a candidate build."""
+    pipeline = job.get("garmentPipeline")
+    if not isinstance(pipeline, dict) or pipeline.get("meshSource") != "garmentcode-boxmesh":
+        raise ValueError("job does not declare the GarmentCode BoxMesh source")
+
+    state_path = ROOT / ".image2outfit" / "products" / str(job["id"]) / "pipeline-state.json"
+    state = candidate_contract.read(state_path)
+    if state.get("product_id") != job.get("id") or state.get("status") != "EXECUTED":
+        raise ValueError("an executed product checkpoint is required for the sewn mesh")
+
+    pattern_path = candidate_contract.path(pipeline["patternContractPath"])
+    stitch_path = candidate_contract.path(pipeline["stitchGraphPath"])
+    expected_inputs = {
+        "patternSha256": candidate_contract.digest(pattern_path),
+        "stitchGraphSha256": candidate_contract.digest(stitch_path),
+    }
+    records = state.get("stage_records")
+    if not isinstance(records, list):
+        raise ValueError("product checkpoint has no stage evidence")
+
+    for record in reversed(records):
+        if not isinstance(record, dict) or record.get("stage") != "build-blender":
+            continue
+        evidence = record.get("evidence")
+        if not isinstance(evidence, list):
+            continue
+        for item in evidence:
+            if not isinstance(item, dict) or not str(item.get("path", "")).endswith("/sewn-mesh.json"):
+                continue
+            mesh_path = candidate_contract.path(item["path"])
+            if not mesh_path.is_file() or candidate_contract.digest(mesh_path) != item.get("sha256"):
+                continue
+            mesh = candidate_contract.read(mesh_path)
+            topology = mesh.get("topology")
+            if (
+                mesh.get("productId") != job.get("id")
+                or mesh.get("units") != "meter"
+                or mesh.get("coordinateSystem") != "blender-z-up"
+                or mesh.get("canonicalInputs") != expected_inputs
+                or not isinstance(mesh.get("vertices"), list)
+                or not mesh["vertices"]
+                or not isinstance(mesh.get("faces"), list)
+                or not mesh["faces"]
+                or not isinstance(topology, dict)
+                or topology.get("degenerateFaceCount") != 0
+                or topology.get("nonManifoldEdgeCount") != 0
+            ):
+                continue
+            return mesh_path, item["sha256"], int(record.get("sequence", 0))
+
+    raise ValueError("checkpoint has no hash-current, topology-valid sewn-mesh exchange")
+
+
 def run_hosted_pose_render(
     job_path: Path,
     job: dict[str, Any],
@@ -343,26 +397,63 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
 
     if prepared is None:
         build_exit = None
+        stages["sewnMeshInput"] = {"passed": False, "error": "Blender runtime unavailable"}
     else:
-        build_exit = run_command(
-            [
-                *prepared.command_prefix,
-                "--background",
-                "--python-exit-code",
-                "1",
-                "--python",
-                str(ROOT / "tools" / "render_evidence_bootstrap.py"),
-                "--python",
-                str(candidate_contract.path(job["buildScript"])),
-                "--",
-                "--job",
-                str(job_path),
-            ],
-            artifact / "blender-build.log",
-            prepared.environment,
-        )
+        build_environment = dict(prepared.environment)
+        build_environment["IMAGE2OUTFIT_RUN_ID"] = str(run_id)
+        if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
+            try:
+                mesh_path, mesh_sha256, source_sequence = sewn_mesh_exchange(job)
+            except (OSError, KeyError, TypeError, ValueError) as exc:
+                stages["sewnMeshInput"] = {"passed": False, "error": str(exc)}
+                build_exit = None
+            else:
+                build_environment["IMAGE2OUTFIT_SEWN_MESH_PATH"] = str(mesh_path)
+                stages["sewnMeshInput"] = {
+                    "passed": True,
+                    "path": candidate_contract.rel(mesh_path),
+                    "sha256": mesh_sha256,
+                    "pipelineStageSequence": source_sequence,
+                }
+                build_exit = run_command(
+                    [
+                        *prepared.command_prefix,
+                        "--background",
+                        "--python-exit-code",
+                        "1",
+                        "--python",
+                        str(ROOT / "tools" / "render_evidence_bootstrap.py"),
+                        "--python",
+                        str(candidate_contract.path(job["buildScript"])),
+                        "--",
+                        "--job",
+                        str(job_path),
+                    ],
+                    artifact / "blender-build.log",
+                    build_environment,
+                )
+        else:
+            stages["sewnMeshInput"] = {"passed": True, "status": "NOT_REQUIRED"}
+            build_exit = run_command(
+                [
+                    *prepared.command_prefix,
+                    "--background",
+                    "--python-exit-code",
+                    "1",
+                    "--python",
+                    str(ROOT / "tools" / "render_evidence_bootstrap.py"),
+                    "--python",
+                    str(candidate_contract.path(job["buildScript"])),
+                    "--",
+                    "--job",
+                    str(job_path),
+                ],
+                artifact / "blender-build.log",
+                build_environment,
+            )
     stages["blenderBuild"] = {
         "passed": prepared is not None
+        and stages["sewnMeshInput"].get("passed") is True
         and build_exit == 0
         and candidate_contract.path(job["blendPath"]).is_file()
         and candidate_contract.path(job["fbxAssetPath"]).is_file(),

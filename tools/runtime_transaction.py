@@ -262,13 +262,21 @@ class WorkspaceSnapshot:
     """Protect one canonical product workspace by copying its last-good state."""
 
     target: Path
+    backup_name: str | None = None
+    backup_path_override: Path | None = None
+    journal_path_override: Path | None = None
 
     @property
     def backup(self) -> Path:
-        return self.target.parent / f".{self.target.name}.last-good-workspace"
+        if self.backup_path_override is not None:
+            return self.backup_path_override
+        name = self.backup_name or f".{self.target.name}.last-good-workspace"
+        return self.target.parent / name
 
     @property
     def journal(self) -> Path:
+        if self.journal_path_override is not None:
+            return self.journal_path_override
         return self.target.parent / f".{self.target.name}.workspace-transaction.json"
 
     def _write_journal(self, phase: str, had_original: bool) -> None:
@@ -313,6 +321,7 @@ class WorkspaceSnapshot:
         if self.backup.exists():
             raise RuntimeError(f"stale workspace backup exists: {self.backup}")
         if had_original:
+            self.backup.parent.mkdir(parents=True, exist_ok=True)
             shutil.copytree(self.target, self.backup)
         self._write_journal("SNAPSHOTTED", had_original)
         return had_original

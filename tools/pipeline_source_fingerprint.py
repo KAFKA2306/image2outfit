@@ -100,11 +100,25 @@ def pipeline_source_dependencies(
     request_path: Path,
     profile_path: Path,
 ) -> tuple[Path, ...]:
-    """Return the fail-closed source dependency closure for checkpoint reuse."""
+    """Return the fail-closed source dependency closure for checkpoint reuse.
+
+    The visual review document is consumed only by the visual-review stage, after
+    render-evidence has produced the exact images it hashes. Including that
+    document in the upstream source fingerprint would invalidate those earlier
+    stages whenever a reviewer records the current image hashes, forcing another
+    render and making the review stale again.
+    """
+    product_config = root / "config" / "products" / product_id
+    review_document = (product_config / "visual-review.json").resolve()
+    product_sources = [
+        candidate
+        for candidate in sorted(product_config.rglob("*"))
+        if candidate.is_file() and candidate.resolve() != review_document
+    ]
     inputs = [
         root / "src" / "image2outfit",
         root / "tools",
-        root / "config" / "products" / product_id,
+        *product_sources,
         request_path,
         profile_path,
         *(root / relative for relative in PRODUCTION_RUNTIME_DEPENDENCIES),

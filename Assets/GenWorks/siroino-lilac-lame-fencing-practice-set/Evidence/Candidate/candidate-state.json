@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "status": "REJECTED",
+  "revision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
+  "gates": {
+    "blender": "FAIL",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "FAIL",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "FAIL",
+    "researchTrial": "PASS"
+  },
+  "qualityDecisions": {
+    "geometry": "REJECT",
+    "visual": "REJECT"
+  },
+  "blockingFindings": [
+    {
+      "severity": "BLOCKER",
+      "code": "DESIGN_DETAILS_NOT_RENDERED",
+      "description": "Directly inspected all five current views and six poses (all current image SHA-256 values recorded). The base garment remains near-white with only thin lavender seam/cuff/hem lines; the visible diagonal plastron, elbow quilting and rear waist adjustment tab are still absent."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "SLEEVE_SURFACE_QUALITY",
+      "description": "Current front, back, side and pose renders show pronounced irregular faceting and wrinkling across both sleeves and underarms. Sleeve surface remains rejected."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "SKIRT_CONSTRUCTION_UNRESOLVED",
+      "description": "The skirt still presents irregular broad folds instead of the ordered pleats in the reference. In both crouch and sit, the hem lifts and exposes large gray avatar regions; shorts do not follow the pose and a crotch gusset is absent. This is a rejected prototype, not fit evidence."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "COLLAR_AND_FRONT_CLOSURE",
+      "description": "The collar remains a tall narrow tube and the intended diagonal front plastron/closure is absent. Neck clearance and garment retention remain unverified."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
+      "description": "These are Blender prototype renders only. Large/Shape Key fit, continuous penetration, weight deformation acceptance, Unity import, VRChat Build & Test, and SDK upload have not been verified."
+    }
+  ],
+  "failedGeometryChecks": [
+    "avatarFitVerified",
+    "buildReportPassed",
+    "deformWeightsVerified",
+    "unweightedVertices==0"
+  ],
+  "outOfScope": [
+    "Unity import/save/reload",
+    "Modular Avatar and NDMF execution",
+    "VRChat Build & Test and runtime inspection"
+  ],
+  "decisionRecorded": true
+}

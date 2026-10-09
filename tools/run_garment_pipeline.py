@@ -16,7 +16,7 @@ if str(SRC) not in sys.path:
 if str(ROOT / "tools") not in sys.path:
     sys.path.insert(0, str(ROOT / "tools"))
 
-from contract_io import validate_schema_file
+from contract_io import digest, read_json, validate_schema_file
 from image2outfit.audit import sha256_json, validate_stage_records, write_audit_bundle
 from image2outfit.audit_schema import load_audit_schemas
 from image2outfit.failure_contract import (
@@ -146,6 +146,32 @@ def _read_pipeline_state(path: Path, *, label: str) -> dict[str, Any]:
 def _write_pipeline_state_atomic(path: Path, state: dict[str, Any]) -> None:
     _validate_persisted_pipeline_state(state)
     _write_json_atomic(path, state)
+
+
+def _record_product_handoff(result: dict[str, Any], checkpoint_path: Path) -> None:
+    product_id = result.get("product_id")
+    if not isinstance(product_id, str) or not product_id:
+        raise ValueError("executed pipeline result is missing product_id")
+    job_path = _repo_path(
+        Path("config") / "products" / product_id / "job.json",
+        label="product job",
+    )
+    job = read_json(job_path)
+    manifest_rel = job.get("productManifestPath")
+    if not isinstance(manifest_rel, str) or not manifest_rel:
+        raise ValueError("product job is missing productManifestPath")
+    manifest_path = _repo_path(Path(manifest_rel), label="product manifest")
+    if not manifest_path.is_file():
+        raise FileNotFoundError(f"ProductManifest missing: {manifest_path}")
+    import product_manifest_state
+
+    product_manifest_state.record_workflow_attempt(
+        manifest_path=manifest_path,
+        job=job,
+        checkpoint_path=checkpoint_path,
+        expected_manifest_sha256=digest(manifest_path),
+        root=ROOT,
+    )
 
 
 def _identity_mismatches(state: dict[str, Any], expected: dict[str, str]) -> list[str]:
@@ -326,9 +352,16 @@ def main() -> int:
         )
 
     try:
-        if args.resume_state:
+        resume_path = args.resume_state
+        if resume_path is None and args.execute and args.checkpoint_output:
+            existing_checkpoint = _repo_path(
+                args.checkpoint_output, label="checkpoint output"
+            )
+            if existing_checkpoint.is_file():
+                resume_path = existing_checkpoint
+        if resume_path:
             previous = _read_pipeline_state(
-                _repo_path(args.resume_state, label="resume state"),
+                _repo_path(resume_path, label="resume state"),
                 label="resume state",
             )
             state = _resume_or_reset(
@@ -423,6 +456,16 @@ def main() -> int:
             "pipeline",
             f"pipeline finished with unexpected status: {result.get('status')}",
         )
+    if args.execute:
+        try:
+            checkpoint_path = _repo_path(
+                args.checkpoint_output, label="checkpoint output"
+            )
+            _record_product_handoff(result, checkpoint_path)
+        except Exception as exc:  # noqa: BLE001 - product manifest handoff boundary
+            return _emit_failure(
+                args, error_code="PRODUCT_HANDOFF_FAILED", phase="handoff", exc=exc
+            )
     return _emit(args, result)
 
 

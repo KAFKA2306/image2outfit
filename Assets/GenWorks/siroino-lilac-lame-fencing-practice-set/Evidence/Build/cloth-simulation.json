@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "status": "PASS",
+  "engine": "Blender Cloth",
+  "blenderVersion": "4.4.3",
+  "applicability": "REQUIRED",
+  "frameStart": 1,
+  "frameEnd": 16,
+  "cacheBaked": true,
+  "geometryChanged": true,
+  "contracts": [
+    {
+      "object": "jacket-sleeves",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 50,
+      "frameStart": 1,
+      "frameEnd": 16,
+      "pinMethod": "canonical shared seam vertices",
+      "preBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.9734007120132446,
+          1.0522043704986572
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.002434275891573634,
+          "maximum": 0.008114241434668656
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 1317,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "postBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.9727828502655029,
+          1.0559940338134766
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.003952310807193271,
+          "maximum": 0.015928672037262004
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 613,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "cacheBakedActual": true,
+      "preBakeMeshSha256": "942c35efb02136157906efdc00c09475e2885a0d6873e54600aa42ee61246e0d",
+      "evaluatedFrameMeshSha256": "913c85a9a08b0ce957bdfb6c51e3ba89e90bffcb099eef7ebcb83bab3f61d907",
+      "settledMeshSha256": "913c85a9a08b0ce957bdfb6c51e3ba89e90bffcb099eef7ebcb83bab3f61d907",
+      "geometryChanged": true
+    },
+    {
+      "object": "pleated-overskirt",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 80,
+      "frameStart": 1,
+      "frameEnd": 16,
+      "componentBending": {
+        "stiffness": 20.0,
+        "maximum": 20.0,
+        "model": "ANGULAR",
+        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-fb785348c03ef0a1.json",
+        "evidenceSha256": "fb785348c03ef0a117e723f837c3a07bc0999557bfbcbfdb6c1c74052732d920",
+        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated overskirt bending comparison at stiffness 20 for the current shaped-shorts pattern and measured Neutral contour anchors. Diagnostic geometry only; no fit, pose, or visual acceptance.",
+        "grantsFitAcceptance": false
+      },
+      "pinMethod": "canonical shared seam vertices",
+      "preBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5995782613754272,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.006258426310523646,
+          "maximum": 0.1451066953522968
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 4,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "postBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5418339967727661,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.006186715388139419,
+          "maximum": 0.05742883787024766
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 37,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "cacheBakedActual": true,
+      "preBakeMeshSha256": "928e04907982513286a635e1231f8dfa05b8f45a487a9dc15185f67da9a47f31",
+      "evaluatedFrameMeshSha256": "1531dc079ef3a4d485d6a29d3f6fa2481d3688b698fd7656f128ce7bb8fd0c24",
+      "settledMeshSha256": "1531dc079ef3a4d485d6a29d3f6fa2481d3688b698fd7656f128ce7bb8fd0c24",
+      "geometryChanged": true
+    }
+  ],
+  "sourceBlendSha256": "e31d906868db3a425f06ad2b09fbe96d60f7dffe565e725c33f7bf1c3523cd04",
+  "constructionSha256": "3673628b963e7993a47033a1b249e36d2f352177c758d455e56072f53c029b82",
+  "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
+  "candidateSha256": "9ea2efb724d5cb19aa9fa335b96985db870c0a56665307f3724e46ef0ad147d9",
+  "collisionObjects": [
+    "SiroinoSotai_PC"
+  ],
+  "qualityDecision": "UNVERIFIED",
+  "grantsFitAcceptance": false,
+  "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance."
+}

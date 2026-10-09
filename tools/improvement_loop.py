@@ -24,6 +24,7 @@ ADOPTION_DECISION = "adoption-decision.json"
 INTEGRATION_RECORD = "production-integration.json"
 
 WAITING = {
+    "WAITING_FOR_CANDIDATE_QUALITY",
     "WAITING_FOR_EXTERNAL_RESEARCH",
     "WAITING_FOR_EXPERIMENT_BINDING",
     "WAITING_FOR_COMPARISON",
@@ -84,7 +85,30 @@ def _same_context(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
 
 
 def _base_plan(root: Path, product_id: str) -> dict[str, Any]:
-    fresh = improvement.plan_improvement(root, product_id)
+    quality_report = root / improvement.QUALITY_REPORT.format(product=product_id)
+    try:
+        fresh = improvement.plan_improvement(root, product_id)
+    except FileNotFoundError as exc:
+        missing_path = Path(exc.filename).resolve() if exc.filename else None
+        if quality_report.is_file() or missing_path != quality_report.resolve():
+            raise
+        waiting = {
+            "schemaVersion": 1,
+            "productId": product_id,
+            "candidateHash": None,
+            "status": "WAITING",
+            "nextAction": "WAITING_FOR_CANDIDATE_QUALITY",
+            "waitingReason": (
+                "No customer-quality report exists for this product yet. The improvement "
+                "loop needs a candidate-bound defect report before it can select or compare "
+                "an OSS method."
+            ),
+            "requiredArtifact": _relative(root, quality_report),
+            "updatedAt": improvement.utc_now(),
+        }
+        waiting["planDigest"] = improvement.digest_value(waiting)
+        improvement.persist_plan(root, product_id, waiting)
+        return waiting
     stored = _stored_plan(root, product_id)
     if stored and _same_context(stored, fresh) and stored.get("nextAction") in WAITING:
         return stored
@@ -703,6 +727,24 @@ def advance(
             reason=str(
                 plan.get("waitingReason")
                 or "New QualitySpec evidence is required before another retry."
+            ),
+            required_artifact=(
+                root / improvement.QUALITY_REPORT.format(product=product_id)
+            ),
+        )
+
+    if action == "WAITING_FOR_CANDIDATE_QUALITY":
+        return _waiting(
+            root,
+            product_id,
+            plan,
+            "WAITING_FOR_CANDIDATE_QUALITY",
+            reason=str(
+                plan.get("waitingReason")
+                or (
+                    "Candidate-bound customer-quality evidence is required before "
+                    "planning an improvement."
+                )
             ),
             required_artifact=(
                 root / improvement.QUALITY_REPORT.format(product=product_id)

@@ -221,6 +221,7 @@ class PatternEdge:
     role: PatternEdgeRole = PatternEdgeRole.CUT
     seam_allowance_m: float = 0.0
     notch_positions: tuple[float, ...] = ()
+    curvature: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         _require_identifier(self.edge_id, "edge_id")
@@ -238,6 +239,11 @@ class PatternEdge:
                 raise ValueError(
                     "notch positions must be finite ratios between 0 and 1"
                 )
+        if self.curvature is not None:
+            from .curves import normalize_curvature
+
+            normalized = normalize_curvature(self.curvature, self.edge_id)
+            object.__setattr__(self, "curvature", normalized)
 
 
 @dataclass(frozen=True, slots=True)
@@ -299,6 +305,12 @@ class PatternPiece:
                 raise ValueError(
                     f"pattern edge {edge.edge_id!r} exceeds piece boundary"
                 )
+            if edge.curvature is not None:
+                forward = (edge.end_vertex - edge.start_vertex) % boundary_size
+                if forward not in {1, boundary_size - 1}:
+                    raise ValueError(
+                        f"curved edge {edge.edge_id!r} must map to one boundary segment"
+                    )
         for dart in self.darts:
             if dart.piece_id != self.piece_id:
                 raise ValueError(f"dart {dart.dart_id!r} references another piece")

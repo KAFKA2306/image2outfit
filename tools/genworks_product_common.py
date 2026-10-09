@@ -15,7 +15,6 @@ from typing import Callable, Iterable
 import bpy
 from mathutils import Vector
 from mathutils.kdtree import KDTree
-from PIL import Image, ImageDraw, ImageFont
 
 
 def select_body_and_armature() -> tuple[bpy.types.Object, bpy.types.Object]:
@@ -362,6 +361,8 @@ def contact_sheet(
     order: tuple[str, ...] | None = None,
     title: str = "",
 ) -> None:
+    from PIL import Image, ImageDraw, ImageFont
+
     order = order or tuple(images)
     tile = 640
     columns = 3

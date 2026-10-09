@@ -7,7 +7,10 @@ import math
 from dataclasses import dataclass
 from enum import StrEnum
 
-from .construction import ConstructionComponentKind
+from .construction import (
+    DEFAULT_RELATIVE_LENGTH_TOLERANCE,
+    ConstructionComponentKind,
+)
 from .domain import PatternEdgeRole
 from .pattern_stage import PatternHypothesis, PatternHypothesisSet
 
@@ -97,7 +100,7 @@ class SeamHypothesis:
         self,
         pattern: PatternHypothesis,
         *,
-        relative_length_tolerance: float = 0.05,
+        relative_length_tolerance: float = DEFAULT_RELATIVE_LENGTH_TOLERANCE,
     ) -> tuple[SeamGraphDefect, ...]:
         if pattern.hypothesis_id != self.pattern_hypothesis_id:
             raise ValueError("seam hypothesis references another pattern hypothesis")
