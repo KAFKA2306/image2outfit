@@ -1,0 +1,3475 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "reviewMethod": "direct-image-inspection",
+  "reviewedRevision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
+  "reviewer": "chatgpt:codex",
+  "status": "REJECTED",
+  "decision": "REJECT",
+  "inspectedImages": {
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "4604ddb89404094df9db6ce6d24305b7ea734aec34a6580b141c369f789ef9f4",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "e947029562a602a0c58482cd037ca1d5d829389123ace2f21ddcc8a43aaabd46",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "afba8deb3121fa9f805c569b73b26d7a290e7e684675141febf2343a2b857de6",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "22309a4be0aab8349820321cf2575326ee7298573d795e241191f0b6c39f046c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "ef304112f003ccb8f6fe4c66cbeab77aa2a1e4a6adca29e5338d8500472662b9",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "76b0bd467d2c481e4076138882af649e89394b06769dd73544409873d98c5000",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "da60a4f5783b0f3ca4cb1cc861e09e966a4a5cecb68d650920e9f76ae67ad289",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "959463bfeffc4b05b187d8f1da521294fdb2592d8f11c8668dfa775b7882bf07",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "3b3a9b0dbfabb8742102866e649199ea8f3abb7e3efc8e95e9780d0b0256961f",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "9b99b71b4cb34609b4ffdba317ff04f1b5a35cab2fc3b389d584c78253ba645c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "864afc0a9093903822f17d55b0ef39608df80f6c0ebc3bd7ffa2c59a3c104dbd"
+  },
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "code": "DESIGN_DETAILS_NOT_RENDERED",
+      "description": "Directly inspected all five current views and six poses (all current image SHA-256 values recorded). The base garment remains near-white with only thin lavender seam/cuff/hem lines; the visible diagonal plastron, elbow quilting and rear waist adjustment tab are still absent."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "SLEEVE_SURFACE_QUALITY",
+      "description": "Current front, back, side and pose renders show pronounced irregular faceting and wrinkling across both sleeves and underarms. Sleeve surface remains rejected."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "SKIRT_CONSTRUCTION_UNRESOLVED",
+      "description": "The skirt still presents irregular broad folds instead of the ordered pleats in the reference. In both crouch and sit, the hem lifts and exposes large gray avatar regions; shorts do not follow the pose and a crotch gusset is absent. This is a rejected prototype, not fit evidence."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "COLLAR_AND_FRONT_CLOSURE",
+      "description": "The collar remains a tall narrow tube and the intended diagonal front plastron/closure is absent. Neck clearance and garment retention remain unverified."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
+      "description": "These are Blender prototype renders only. Large/Shape Key fit, continuous penetration, weight deformation acceptance, Unity import, VRChat Build & Test, and SDK upload have not been verified."
+    }
+  ],
+  "sourceEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
+  "nextAction": "Add a dedicated, four-edge crotch gusset and reshape the shorts seat/rise and thigh panel boundaries; use the existing Neutral avatar landmarks only as explicit placement hypotheses. Then refresh pattern-bound cloth evidence, execute the canonical workflow, and directly inspect all eleven current renders for crouch/sit coverage. Keep REJECTED until exposed avatar is eliminated and front plastron, elbow quilting, rear waist tab, sleeve surface and ordered skirt pleats are visibly corrected. Do not claim fit, Shape Key, Unity or VRChat acceptance.",
+  "verifiedPoseCorrection": {
+    "pose": "arms-up",
+    "method": "imported bone local Y mapped to world +Z",
+    "upperArmDirectionZ": {
+      "left": 1.0,
+      "right": 1.0
+    },
+    "directImageConfirmed": true,
+    "grantsGarmentAcceptance": false
+  },
+  "previousReviewEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reviews/fd9e3962a6e41342f9fa9c8c761f8433d8d65a131ac974b260eac5335dacf1e4.json",
+  "measuredContourPlacementExperiment": {
+    "buildReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "buildReportSha256": "658b2121eb09530cf7c20d814841363741eb93e46d25272103a4c105cb749f4e",
+    "assemblyPoseSha256": "fb61a86fde903df712545691694d900736a2b52ce897c27a16d601a03ebfa98f",
+    "measuredSections": 24,
+    "placedVertices": 2281,
+    "heightExtrapolatedVertices": 842,
+    "radialClearanceM": 0.004,
+    "observation": "Front coverage retained. Upper shoulder vertices additionally use measured nearest-body placement; the current back view no longer shows the former broad shoulder patches/two upper-back holes. Narrow sleeve seam creases/slits remain; no penetration or fit acceptance.",
+    "bodyFacesCopied": false,
+    "distanceIsPenetrationOrFitAcceptance": false,
+    "grantsGarmentAcceptance": false,
+    "layerOffsetVertexCount": 601,
+    "exclusiveOuterLayerOffsetM": 0.002,
+    "sharedSeamVerticesLayerOffsetM": 0
+  },
+  "anatomicalOrientationCorrection": {
+    "frontAxis": "Blender -Y",
+    "backAxis": "Blender +Y",
+    "garmentCodeToBlenderDepth": "GC +Z maps to Blender -Y",
+    "centerBackSeamAlreadyPresent": true,
+    "centerBackSharedVertexCountObservedBeforeCorrection": 31,
+    "canonicalStitchGraphSha256": "e8b674ff565e45092ef0b4bb6740eb73e6016b6b2e274aa66fce4431aa512c7f",
+    "directImageConfirmedRearSlitAbsent": true,
+    "grantsGarmentAcceptance": false
+  },
+  "frontOverlapPrototype": {
+    "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
+    "constructionSha256": "b51ec9be834e59667ff0824515808ac16548f171b6c01dbaff0b5ed82b86e64b",
+    "patternSha256": "d0ec60dff77a0e9d06f075fe6617413a7b635e588e0616a46244c04c97f50e8a",
+    "hemExtensionAcrossCenterM": 0.04,
+    "layerOffsetM": 0.002,
+    "directImageConfirmedFormerFrontCutoutCovered": true,
+    "fastenersImplemented": false,
+    "grantsGarmentAcceptance": false
+  },
+  "sleeveCapPlacementExperiment": {
+    "assemblyPoseSha256": "fb61a86fde903df712545691694d900736a2b52ce897c27a16d601a03ebfa98f",
+    "manufacturerSha256": "d9d06c919cd04046e2ee8c641ea490e4f4a52b9e9f97359fdd2cd56ed72fcf27",
+    "sourceRenderSha256": "594adc4eb22f21d2c1c13eb6fa6bd7e07ade43364a87b6c6d05b2b9a484a4e32",
+    "capAxisDepthM": 0.025,
+    "previousFlatCapDepthM": 0.13637287344911259,
+    "cuffAnchorPreservedByPlacementFormula": true,
+    "original2dRestLengthsPreserved": true,
+    "directInspection": "Sleeves reach wrists. Subsequent nearest-body upper surface placement improves back-view shoulder coverage but seam creases/slits, heavy wrinkles and arms-up underarm deformation remain.",
+    "grantsFitAcceptance": false,
+    "nextDependency": "Curved overskirt assembly, collar and remaining seam defects; unobscured shorts fit evidence.",
+    "circumferenceOrientation": "apex-superior-seam-inferior-front-anterior"
+  },
+  "measuredUpperSurfacePlacementExperiment": {
+    "buildReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "buildReportSha256": "658b2121eb09530cf7c20d814841363741eb93e46d25272103a4c105cb749f4e",
+    "builderSha256": "0224d6e0eeebebbb7ded5fbcaf6e7c67cbde3146cc991f882aedd64aeb5dceb0",
+    "assemblyPoseSha256": "fb61a86fde903df712545691694d900736a2b52ce897c27a16d601a03ebfa98f",
+    "sourceRenderSha256": "594adc4eb22f21d2c1c13eb6fa6bd7e07ade43364a87b6c6d05b2b9a484a4e32",
+    "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "method": "evaluated-body-nearest-surface-blended-placement",
+    "placedVertices": 1249,
+    "maximumBlendWeight": 0.9,
+    "normalClearanceM": 0.004,
+    "zeroTargetShapeKeyValuesObserved": true,
+    "bodyFacesCopied": false,
+    "garmentFacesRemoved": 0,
+    "fullProjectionFailure": {
+      "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/shoulder-surface-failed/707627685de48e9a6f835b16e4040f5b4fc60d41db168f059c212b16b2e981b3/shoulder-surface-probe.log",
+      "sha256": "707627685de48e9a6f835b16e4040f5b4fc60d41db168f059c212b16b2e981b3",
+      "reason": "Upper surface projection collapsed a triangle",
+      "disposition": "REJECTED; retained original faces and unchanged collapse rejection, then explicitly bounded displacement to 90 percent"
+    },
+    "directInspection": "Five views and six poses inspected. Former broad shoulder exposure/two upper-back holes absent in current back view; narrow seam creases/slits remain. Collar plates, waist panel arm coupling, skirt assembly and final appearance remain rejected.",
+    "grantsFitAcceptance": false
+  },
+  "lowerBodyWeightTransferExperiment": {
+    "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
+    "constructionSha256": "b51ec9be834e59667ff0824515808ac16548f171b6c01dbaff0b5ed82b86e64b",
+    "assemblyPoseSha256": "b7c0481fd1c95a2affe4bed165cd94efe92766df9ab4e542c4888d0fe03219f8",
+    "skinReportPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/skin-export-report.json",
+    "skinReportSha256": "0d87ea53cf39a8bb0646029aca4235f772daaa5d70517cbce62645ea409aeea5",
+    "skinBuilderSha256": "55235406cdab1a4e63668feab853fb19dcfdb031343d5688ac72d3746bd9f907",
+    "clothBuilderSha256": "d4fb97d552bea842c6248eb7a2e8692acb6c791aaf8ebca9d7023546cd46fdf0",
+    "sourceRenderSha256": "30ae3e1c2ded3b83312415788945da94bea5f556c6ebc0331a44e86b2a144bc7",
+    "regions": [
+      {
+        "pieceIds": [
+          "overskirt-front",
+          "overskirt-back",
+          "shorts-front-left",
+          "shorts-front-right",
+          "shorts-back-left",
+          "shorts-back-right"
+        ],
+        "bodyTriangleZM": [
+          0.45,
+          0.87
+        ],
+        "excludedBoneNamePrefixes": [
+          "UpperArm",
+          "LowerArm",
+          "Hand",
+          "Finger",
+          "Shoulder"
+        ],
+        "evidenceBoundary": "Explicit provisional pelvis/leg surface window in rest coordinates. Prevent arm/hand nearest-surface transfer to displaced lower garment panels; no approved fit or runtime motion."
+      }
+    ],
+    "regionalVertexCount": 2797,
+    "unboundedArmInfluenceVertexCount": 36,
+    "unweightedVertices": 0,
+    "method": "Preserved canonical face provenance through cloth; mirrored shorts right/left and corrected anterior/posterior signed anchors; barycentric transfer restricted to explicitly declared lower-body triangles excluding arm/hand weights.",
+    "directInspection": "Tall waist panel following arms-up is absent; lower sheets remain oversized rectangular surfaces in all views. Shorts placement is incomplete and complete appearance/deformation rejected.",
+    "schemaFailureEvidence": ".image2outfit/audit/siroino-lilac-lame-fencing-practice-set/e21d30c124bd47efa56554a4ea9c63a0/manifest.json",
+    "schemaFailureReason": "prototypeWeightRegions was not declared in construction schema; added strict typed property, preserved rejection and reran normal workflow.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "shortsLegPlacementExperiment": {
+    "assemblyPoseSha256": "fb61a86fde903df712545691694d900736a2b52ce897c27a16d601a03ebfa98f",
+    "manufacturerSha256": "d9d06c919cd04046e2ee8c641ea490e4f4a52b9e9f97359fdd2cd56ed72fcf27",
+    "stageOwnerSha256": "b9de8dab9eb19ac80bea38ecc15944f6415f5a417509647c36a2ee2b9c820c7c",
+    "nativeMeshPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261006T001527847891Z/sewn-mesh.json",
+    "nativeMeshSha256": "5a3176f04fbde18b554382f5dd2ccb7d834030e23ae771f0d17945924411904f",
+    "buildReportSha256": "658b2121eb09530cf7c20d814841363741eb93e46d25272103a4c105cb749f4e",
+    "sourceRenderSha256": "594adc4eb22f21d2c1c13eb6fa6bd7e07ade43364a87b6c6d05b2b9a484a4e32",
+    "method": "pattern-half-leg-to-quarter-pelvis",
+    "measuredImportedBoneHeadsBlenderM": {
+      "Hips": [
+        2.5860916437342733e-16,
+        -0.03788188099861145,
+        0.7395782470703125
+      ],
+      "UpperLeg_L": [
+        0.05588259547948837,
+        -0.014512968249619007,
+        0.6962927579879761
+      ],
+      "UpperLeg_R": [
+        -0.05588259547948837,
+        -0.014512970112264156,
+        0.6962927579879761
+      ]
+    },
+    "measurementBlenderVersion": "4.4.3",
+    "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "shortsVertexCount": 1313,
+    "shortsBoundsBlenderM": [
+      [
+        -0.12591077043992233,
+        0.12591077043992233
+      ],
+      [
+        -0.09135233908593626,
+        0.06232640072405311
+      ],
+      [
+        0.5995782470703125,
+        0.7395782470703125
+      ]
+    ],
+    "original2dRestLengthsChanged": false,
+    "bodyFacesCopied": false,
+    "canonicalTriangleCount": 12707,
+    "degenerateTriangles": 0,
+    "directInspection": "Eleven required images inspected. Oversized shorts waist plates disappear; shorts are occluded by overskirt, so per-leg/crotch penetration and fit remain unverified. Flat skirt sheets and collar spikes still rejected.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "skirtCurvedPlacementExperiment": {
+    "assemblyPoseSha256": "c1d0cf1d8a4baaa38e916c23746b8f8f817d9fe08060e7d0633f9a062f133fa8",
+    "manufacturerSha256": "d4b398ab38a853d8e1a7fee4d13300aaa8de9d615f5b1866886623d05294b8ab",
+    "stageOwnerSha256": "9e26bfab794a9cdf4b80b94661870c7b06a71e33481307652bd270e6194e4779",
+    "nativeMeshPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261006T021606442760Z/sewn-mesh.json",
+    "nativeMeshSha256": "e1ca4feaf4f7fea46fbd8269d9bd3f4f82efc80c8e30fb7600101380a7d63fe2",
+    "buildReportSha256": "37819011c88791c98add7e7f124bd4f14ad70b47ef32ab566b2bde5ada4b5fe2",
+    "sourceRenderSha256": "ef858ce9d2c49c3dba4cbd8f0eebea7bf8dedd815549a954bc6c0d61ffe39d27",
+    "method": "pattern-half-circumference-skirt",
+    "configuration": {
+      "overskirt-front": {
+        "method": "pattern-half-circumference-skirt",
+        "depthDirection": 1,
+        "axisAnchorGarmentCodeM": [
+          0,
+          0.7395782470703125,
+          0.03788188099861145
+        ],
+        "widthRadiusProfileM": [
+          [
+            -0.19,
+            0.19,
+            0.12095775674984047
+          ],
+          [
+            0,
+            0.119301,
+            0.09777510638451054
+          ]
+        ],
+        "evidenceBoundary": "Top height/depth use imported Hips landmark. Top radius is measured neutral Hips circumference / 2pi + provisional 6 mm radial clearance. Hem radius uses original half-panel width. Original 2D panel/rest lengths unchanged; waist strain, ease, pinning, pleats, shape-key fit and deformation remain unapproved."
+      },
+      "overskirt-back": {
+        "method": "pattern-half-circumference-skirt",
+        "depthDirection": -1,
+        "axisAnchorGarmentCodeM": [
+          0,
+          0.7395782470703125,
+          0.03788188099861145
+        ],
+        "widthRadiusProfileM": [
+          [
+            -0.19,
+            0.19,
+            0.12095775674984047
+          ],
+          [
+            0,
+            0.119301,
+            0.09777510638451054
+          ]
+        ],
+        "evidenceBoundary": "Top height/depth use imported Hips landmark. Top radius is measured neutral Hips circumference / 2pi + provisional 6 mm radial clearance. Hem radius uses original half-panel width. Original 2D panel/rest lengths unchanged; waist strain, ease, pinning, pleats, shape-key fit and deformation remain unapproved."
+      }
+    },
+    "skirtVertexCount": 1484,
+    "nativeSkirtBoundsBlenderM": [
+      [
+        -0.12095775674984047,
+        0.12095775674984047
+      ],
+      [
+        -0.15883963774845192,
+        0.08307587575122902
+      ],
+      [
+        0.5495782470703126,
+        0.7395782470703125
+      ]
+    ],
+    "original2dRestLengthsChanged": false,
+    "bodyFacesCopied": false,
+    "degenerateTriangles": 0,
+    "directInspection": "Eleven required images inspected. Former boxlike side planes are absent; settled skirt instead shows heavy irregular crumpling and compressed silhouette, not ordered pleats. Crouch/sit distort skirt around thighs. Failure of appearance recorded; shorts remain occluded.",
+    "nextDependency": "Explicit waist attachment and pleat/fold rest geometry plus investigation of native-to-cloth strain/clearance; do not repeat unchanged simulation.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "waistBoundarySupportExperiment": {
+    "constructionSha256": "64c78784bdd1404407ce8a0f127ad2e13df3b89bf0228709cb7d81130dbb649c",
+    "clothBuilderSha256": "6fc03b735d1e3d9a29932c009ddc14c63af9c38435ee483c8268caa5926080f2",
+    "schemaSha256": "101a106274228e76e5eee085f31c8840d6c0308dbd0afe33dc0738e53b086f06",
+    "sourceRenderSha256": "a3650edc1a4cf7ecb818d5b8f7e08894dc287cf92f7e834fb0e40a34f2e42be4",
+    "clothReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json",
+    "clothReportSha256": "8eb2e340d0b8b29fde9e8056eea6db4de26cc19f9fca9192822d4f8f8fa8d899",
+    "boundaryConfiguration": {
+      "component": "pleated-overskirt",
+      "edgeId": "waist-opening",
+      "heightM": 0.7395782470703125,
+      "toleranceM": 1e-06,
+      "method": "open-boundary-at-declared-waist-height"
+    },
+    "pinVertexCount": 48,
+    "pinMethod": "canonical open waist boundary; provisional static support only",
+    "preBakeBodySurfaceDiagnostic": {
+      "heightRangeM": [
+        0.5495782494544983,
+        0.7395782470703125
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": -0.02230338769732043,
+        "maximum": 0.10152793512679636
+      },
+      "negativeSignedVertexCount": 405,
+      "belowCombinedCollisionMarginVertexCount": 537,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "postBakeBodySurfaceDiagnostic": {
+      "heightRangeM": [
+        0.5699111819267273,
+        0.7538254261016846
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": -0.010563924675807357,
+        "maximum": 0.05560858454555273
+      },
+      "negativeSignedVertexCount": 20,
+      "belowCombinedCollisionMarginVertexCount": 245,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "directInspection": "Eleven images inspected. Exact waist-edge support executes but heavy skirt crumpling/side protrusions remain; no reference pleats. Source inward placement indicated by signed-normal diagnostics, not a formal penetration result.",
+    "sewnWaistbandImplemented": false,
+    "pleatsImplemented": false,
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "measuredSkirtEnvelopePlacementExperiment": {
+    "assemblyPoseSha256": "a978caea071f7e76e7593ad1ae423d4aadd92acd3a78cc83b7d8d911ab8eed6f",
+    "builderSha256": "6e1a296fb3f3bc81c318a4d190ff643ded5adf075b7671b72fc2211acd9c4030",
+    "buildReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "buildReportSha256": "75a8fd610c950b34f977be293c55561ecbea13212365d9b48a3c5c954f37281c",
+    "sourceRenderSha256": "c2a0cc38f409a6301bb6dbc3ee5996d726247a30cd9978838764475b44aa5ea5",
+    "clothReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json",
+    "clothReportSha256": "464c9cfa94568b389607023516b492dc717ad12a0d6616f563bddc5c364c8bd2",
+    "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "method": "measured-horizontal-body-envelope-minimum-clearance",
+    "measuredSections": 20,
+    "selectedVertexCount": 1484,
+    "radialClearanceM": 0.01,
+    "beforeVerticesSha256": "4eda8a960de881d9d94a6bcafcc7014a20f30576b7e208ae6c6ad148bc0db9e8",
+    "afterVerticesSha256": "f246f701cc9aa284427a6b76d241c39a42ed39c21641e7a0e8965f18ca79b30f",
+    "bodyFacesCopied": false,
+    "originalGarmentFacesAndSeamsRetained": true,
+    "degenerateTriangles": 0,
+    "pinVertexCount": 48,
+    "pinMethod": "canonical open waist boundary; provisional static support only",
+    "preBakeBodySurfaceDiagnostic": {
+      "heightRangeM": [
+        0.5495782494544983,
+        0.7395782470703125
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": 0.006643959481152706,
+        "maximum": 0.10152793512679636
+      },
+      "negativeSignedVertexCount": 0,
+      "belowCombinedCollisionMarginVertexCount": 5,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "postBakeBodySurfaceDiagnostic": {
+      "heightRangeM": [
+        0.5476460456848145,
+        0.7395782470703125
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": 0.006302657779997389,
+        "maximum": 0.09627484908560291
+      },
+      "negativeSignedVertexCount": 0,
+      "belowCombinedCollisionMarginVertexCount": 18,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "previousDiagnosticEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reviews/7d4d997fd38be42737395b0514f4f809dc3ce61b268dba06000458a220de11d2.json",
+    "previousNegativeSignedVertexCount": {
+      "preBake": 405,
+      "postBake": 20
+    },
+    "directInspection": "All eleven current images inspected. Heavy irregular skirt crumpling substantially reduced; smoother short skirt silhouette. Reference ordered pleats remain absent; seated/crouched hem lifts and shorts coverage remain unapproved. Collar plates and shoulder/underarm defects persist.",
+    "evidenceBoundary": "20 neutral sampled convex cross-section envelopes and provisional 10 mm radial minimum. Selected vertex count is not a displaced vertex count. The nearest raw body triangle normal diagnostic is not formal face intersection or runtime fit. Five source and eighteen settled skirt vertices remain below the combined 7 mm collision margin.",
+    "pleatsImplemented": false,
+    "sewnWaistbandImplemented": false,
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "standingCollarPlacementExperiment": {
+    "assemblyPoseSha256": "8d60e818c9291d5102e14c326d122e7a8fe1eac240c647cd12b2b33442a7c6d1",
+    "nativeManufacturerSha256": "a9fe7825fb34ef3a7f1dd6565c66059995be3cccd863ef34b190dc7b40c87f0b",
+    "stageOwnerSha256": "b87f41c02ea66fba06aef9089694d67c35c6506636a72287209187ba69b0af1a",
+    "blenderManufacturerSha256": "158e6249346bd6ea87b6ad5d46fc36be137f7191f809f40d47634300a635a674",
+    "buildReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "buildReportSha256": "0559ec4ef6b2e6eb3fdd6071d67cdc655b3af435f55540b98eef701bdeef65af",
+    "sourceRenderSha256": "2981f04b3bd9fb95b47a26092444e4d7ab3079382279140ccb70fcc24a86e15c",
+    "weightedCandidateSha256": "385508f1900fc3f4dc3d3ab70b49013d423aa413bd0bd9cca19f36b4d904700c",
+    "configuration": {
+      "method": "pattern-length-standing-collar",
+      "axisAnchorGarmentCodeM": [
+        0,
+        1.0351301431655884,
+        0.0093428585678339
+      ],
+      "circumferenceLocalYM": 0.24,
+      "evidenceBoundary": "Base uses actual imported Neck bone head; pattern -X maps to standing height and local Y to circumference before sewn vertex averaging. 240 mm length and 60 mm height retain original 2D pattern. Neutral neckline placement and ease remain prototype hypotheses, not fit approval."
+    },
+    "landmarkMeasurement": {
+      "blenderVersion": "4.4.3",
+      "bone": "Neck",
+      "headBlenderM": [
+        -2.053701209092651e-09,
+        -0.0093428585678339,
+        1.0351301431655884
+      ],
+      "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+      "measurementScriptPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/collar-landmarks.py"
+    },
+    "measuredNeutralNeckSections": 13,
+    "selectedVertexCount": 207,
+    "radialClearanceM": 0.004,
+    "heightExtrapolatedVertexCount": 12,
+    "beforeVerticesSha256": "6b6c91f3dbd866198fae039e073b9749adddcb5ceb3df5d2c790f19ea05271c9",
+    "afterVerticesSha256": "39d5738ad41ca012d62d4e30216a9c4aef0b506572b7387f8d315b7ae6c7fa1e",
+    "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "bodyFacesCopied": false,
+    "original2dRestLengthsChanged": false,
+    "degenerateTriangles": 0,
+    "directInspection": "Five views and six poses inspected. Former broad horizontal collar plates gone; standing collar follows neck. Pointed/tapered neck junction folds and hanging front strip remain. Shoulder seam slits and spikes, sleeves/underarm wrinkles, missing pleats and sewn waistband, crouch/sit lower coverage remain rejected.",
+    "evidenceBoundary": "Original collar X-height/Y-circumference mapping occurs before canonical sewn-vertex averaging, then measured neutral body radial placement moves original collar/shared seam vertices. Four mm ease and unchanged 60 mm height are prototype hypotheses. No neck strain, face penetration, Large, runtime or complete garment acceptance.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "necklineRingAlignmentExperiment": {
+    "assemblyPoseSha256": "e831d2647b909546f393899c5fd0868abd50b5bc5773fc9cc6714a0c1f8858ae",
+    "nativeManufacturerSha256": "39f383cb24e2531e524813c07a53c5b970dae4663473746806b8d993907410dd",
+    "blenderManufacturerSha256": "944c3b4f95706d9ac3d2084fa54fb4d005af521b8361b1b3c3869021599aba5b",
+    "buildReportSha256": "07a29e9394ba7beb334ae3cbb006ba5651c72de2cf32fe1c33bd2909c55da276",
+    "sourceRenderSha256": "a8fe8c183a5fc364413d9fb5d6a2b6466da56dff557cce3e92c0311e944f9c5c",
+    "sourceBlendSha256": "67317b2e8b041c1c598ff319bc1dc6a2860575ca00c20a61d94c517a9d1bf05e",
+    "necklineConfigurations": {
+      "jacket-front-left": {
+        "method": "collar-base-quarter-ring-with-local-blend",
+        "patternEdgeM": [
+          [
+            0,
+            0.36
+          ],
+          [
+            0,
+            0.3
+          ]
+        ],
+        "edgeAnglesRadians": [
+          1.5707963267948966,
+          0
+        ],
+        "axisAnchorGarmentCodeM": [
+          0,
+          1.0351301431655884,
+          0.0093428585678339
+        ],
+        "circumferenceM": 0.24,
+        "blendDistanceM": 0.08,
+        "evidenceBoundary": "Canonical neckline endpoints mapped to sewn collar quarter using stitch endpointMapping; 80 mm linear transition is a declared prototype placement hypothesis. Original 2D edge lengths/faces unchanged; strain and fit unapproved."
+      },
+      "jacket-overlap-front": {
+        "method": "collar-base-quarter-ring-with-local-blend",
+        "patternEdgeM": [
+          [
+            0,
+            0.36
+          ],
+          [
+            0,
+            0.3
+          ]
+        ],
+        "edgeAnglesRadians": [
+          4.71238898038469,
+          6.283185307179586
+        ],
+        "axisAnchorGarmentCodeM": [
+          0,
+          1.0351301431655884,
+          0.0093428585678339
+        ],
+        "circumferenceM": 0.24,
+        "blendDistanceM": 0.08,
+        "evidenceBoundary": "Canonical neckline endpoints mapped to sewn collar quarter using stitch endpointMapping; 80 mm linear transition is a declared prototype placement hypothesis. Original 2D edge lengths/faces unchanged; strain and fit unapproved."
+      },
+      "jacket-back-left": {
+        "method": "collar-base-quarter-ring-with-local-blend",
+        "patternEdgeM": [
+          [
+            0,
+            0.36
+          ],
+          [
+            0,
+            0.3
+          ]
+        ],
+        "edgeAnglesRadians": [
+          1.5707963267948966,
+          3.141592653589793
+        ],
+        "axisAnchorGarmentCodeM": [
+          0,
+          1.0351301431655884,
+          0.0093428585678339
+        ],
+        "circumferenceM": 0.24,
+        "blendDistanceM": 0.08,
+        "evidenceBoundary": "Canonical neckline endpoints mapped to sewn collar quarter using stitch endpointMapping; 80 mm linear transition is a declared prototype placement hypothesis. Original 2D edge lengths/faces unchanged; strain and fit unapproved."
+      },
+      "jacket-back-right": {
+        "method": "collar-base-quarter-ring-with-local-blend",
+        "patternEdgeM": [
+          [
+            0,
+            0.36
+          ],
+          [
+            0,
+            0.3
+          ]
+        ],
+        "edgeAnglesRadians": [
+          4.71238898038469,
+          3.141592653589793
+        ],
+        "axisAnchorGarmentCodeM": [
+          0,
+          1.0351301431655884,
+          0.0093428585678339
+        ],
+        "circumferenceM": 0.24,
+        "blendDistanceM": 0.08,
+        "evidenceBoundary": "Canonical neckline endpoints mapped to sewn collar quarter using stitch endpointMapping; 80 mm linear transition is a declared prototype placement hypothesis. Original 2D edge lengths/faces unchanged; strain and fit unapproved."
+      }
+    },
+    "preserveSharedPieceIds": [
+      "stand-collar"
+    ],
+    "seamMeasurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/neckline-seam-measurement.json",
+    "seamMeasurementSha256": "1fb49021d22eda601de011457fbda4b61326dc57a896c5d4b9261886051651b3",
+    "seamMeasurementRecords": [
+      {
+        "pieceId": "jacket-front-left",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.05037150523813986,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.839525087302331
+      },
+      {
+        "pieceId": "jacket-back-left",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.6466918625498165,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 10.778197709163608
+      },
+      {
+        "pieceId": "jacket-back-right",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.6466903896972136,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 10.778173161620227
+      },
+      {
+        "pieceId": "jacket-overlap-front",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.05037305640266682,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.8395509400444471
+      }
+    ],
+    "degenerateTriangles": 0,
+    "directInspection": "Eleven images inspected. Hanging front strip absent, cleaner front collar-to-jacket junction. Triangular side/back neck folds and shoulder defects remain. Rear seam strain diagnostics reject the placement despite visual improvement. Lower skirt and pose defects remain unapproved.",
+    "disposition": "REJECTED_NECKLINE_PLACEMENT_STRAIN",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "measuredNeckSectionCorrection": {
+    "assemblyPoseSha256": "2c5e466534554ff68db6b010c05175a29a65dd146500334b5ae5bdb4568c5c09",
+    "builderSha256": "bbd4013e06f9332f6bd44d4c35c3fd25f9376d8980df362d1dd73f8b8957cf3f",
+    "buildReportSha256": "3df1b6518b5a4930dd2c2bab60ddb1cef4f9cd74dee4fc031f8645d5bc40d54f",
+    "sourceRenderSha256": "08ae7619a19c331a93cc66f834eb427de114236bfca2f0f9727fedeea7d72deb",
+    "anchorDerivation": {
+      "method": "measured-neutral-neck-section-above-shoulder-branch",
+      "sourceBuildReportSha256": "07a29e9394ba7beb334ae3cbb006ba5651c72de2cf32fe1c33bd2909c55da276",
+      "sourceBuildReportEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/neck-contour-before/07a29e9394ba7beb334ae3cbb006ba5651c72de2cf32fe1c33bd2909c55da276/product-build-report.json",
+      "neckBoneHeadZM": 1.0351301431655884,
+      "baseZM": 1.0551301431655884,
+      "baseSectionCircumferenceM": 0.19678541646874284,
+      "boneHeadSectionCircumferenceM": 1.4318719305718843,
+      "prototypeOnly": true
+    },
+    "maximumSectionCircumferenceM": 0.3,
+    "measurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/neckline-seam-356976636529f826f26fd5bb10b5f2f579ccf4f141b8d7380196bfebc7356e77.json",
+    "measurementSha256": "356976636529f826f26fd5bb10b5f2f579ccf4f141b8d7380196bfebc7356e77",
+    "measurementRecords": [
+      {
+        "pieceId": "jacket-front-left",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.031668085009724484,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.5278014168287414
+      },
+      {
+        "pieceId": "jacket-back-left",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.07434870950399433,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 1.2391451583999056
+      },
+      {
+        "pieceId": "jacket-back-right",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.07434871397848813,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 1.2391452329748023
+      },
+      {
+        "pieceId": "jacket-overlap-front",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.031668086917081215,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.5278014486180203
+      }
+    ],
+    "degenerateTriangles": 0,
+    "directInspection": "Eleven current images inspected. Extreme rear spread removed numerically. Raised tall standing collar, side neckline spikes/folds remain; no final appearance or head fit pass. Shoulder seams/underarm and lower garment motion remain rejected.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "continuousNecklineTransitionExperiment": {
+    "assemblyPoseSha256": "c7c5c6bcd140ce2c14f495dec08d5fe8bc56eebf9fc84b275fdc23d3fe9f1682",
+    "manufacturerSha256": "9dfded16189f5113ec2e9652b9960cf0e9a3524e3430ebe8b96ddb383d48375c",
+    "buildReportSha256": "35404efbc2a885da4510f8279998c0eba13d984702491cd5bf6cf31b46b11c75",
+    "sourceRenderSha256": "dc89aaae4534eb4a0ed70db2c52b72f2ec19a13867268bb30610a3fd7b4ad768",
+    "sourceBlendSha256": "9456bea5e6cf16e0f8939fcb9410e061a602536f5c4c4145b2fd16078497348a",
+    "configuration": {
+      "method": "place-collar-first-preserve-shared-base-smoothstep-displacement-fade",
+      "fadeDistanceM": 0.04,
+      "evidenceBoundary": "40 mm Euclidean distance to original shared seam vertices is an explicit prototype transition hypothesis. Angular origin uses declared native collar seed center. Original faces and rest lengths unchanged; no strain, head clearance, penetration or fit acceptance."
+    },
+    "measurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/neckline-seam-2085027b9df11383d1015984bf8b2d63b31de48250ca10eca53299de282e2a7c.json",
+    "measurementSha256": "2085027b9df11383d1015984bf8b2d63b31de48250ca10eca53299de282e2a7c",
+    "measurementRecords": [
+      {
+        "pieceId": "jacket-front-left",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.047729319999309384,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.7954886666551564
+      },
+      {
+        "pieceId": "jacket-back-left",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.05953477322123665,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.9922462203539443
+      },
+      {
+        "pieceId": "jacket-back-right",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.05953477257343931,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.9922462095573219
+      },
+      {
+        "pieceId": "jacket-overlap-front",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.04772931891218082,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.7954886485363469
+      }
+    ],
+    "degenerateTriangles": 0,
+    "directInspection": "All five views and six poses inspected. Neck base seam lengths more balanced and rear near 60 mm rest length, but visible tall triangular neckline sheets remain. Shoulder seam defects, sleeves wrinkles/underarm deformation, missing ordered pleats, lifted crouch/sit hem and inner coverage still rejected.",
+    "disposition": "EXECUTED_WITH_APPEARANCE_AND_FRONT_STRAIN_REJECT",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "necklinePlacementTraceExperiment": {
+    "buildReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "buildReportSha256": "39e4eb538d161b981dc174133d9e76dfeeb2d1ddf9df454b28e90c2051f8989f",
+    "builderPath": "tools/build_sewn_pattern_prototype.py",
+    "builderSha256": "17cb064f159b275d178a46750b4ef5fd78d8affaf9949f32cd911dd5d4604d1f",
+    "renderReportSha256": "e72675892cfd322543015fb0c1fddcb178d00960b62045ce2864d47390ade305",
+    "tracedOriginalVertexCount": 1193,
+    "representativeVertices": [
+      {
+        "vertexIndex": 1936,
+        "pieceIds": [
+          "jacket-front-left"
+        ],
+        "coordinatesByStageM": {
+          "native-sewn": [
+            0.06953323412952864,
+            -0.060003038803218695,
+            1.0827969962692745
+          ],
+          "collar-contour": [
+            0.06953323412952864,
+            -0.060003038803218695,
+            1.0827969962692745
+          ],
+          "torso-contour": [
+            0.06223679333925247,
+            -0.07694271206855774,
+            1.0827969962692745
+          ],
+          "upper-surface": [
+            0.02212398312985897,
+            -0.03165555000305176,
+            1.090610384941101
+          ]
+        },
+        "upperSurfaceDisplacementM": 0.06100011174890793,
+        "upperSurfaceHeightChangeM": 0.007813388671826571
+      },
+      {
+        "vertexIndex": 2419,
+        "pieceIds": [
+          "jacket-overlap-front"
+        ],
+        "coordinatesByStageM": {
+          "native-sewn": [
+            -0.06478133711314399,
+            -0.06108572818709871,
+            1.0821532809789722
+          ],
+          "collar-contour": [
+            -0.06478133711314399,
+            -0.06108572818709871,
+            1.0821532809789722
+          ],
+          "torso-contour": [
+            -0.06071615219116211,
+            -0.08048851788043976,
+            1.0821532809789722
+          ],
+          "upper-surface": [
+            -0.02320612221956253,
+            -0.033183615654706955,
+            1.0897080898284912
+          ]
+        },
+        "upperSurfaceDisplacementM": 0.060842676303801836,
+        "upperSurfaceHeightChangeM": 0.007554808849518979
+      }
+    ],
+    "observation": "Original upper-front vertices are already above the measured UpperArm shoulder height (1.018263339996338 m). Upper-surface projection moves these examples inward toward the neck and upward by about 7.5-7.8 mm. Coordinates establish stage displacement, not exact rendered-pixel attribution.",
+    "inference": "Native upper shoulder placement and subsequent nearest-body neck attraction are likely contributors to the persistent triangular neck sheets; a complete root cause is not yet proved.",
+    "directInspection": "All eleven current views/poses inspected. Tall collar, triangular side neck sheets, shoulder/sleeve slits, missing pleats and crouch/sit coverage concerns remain. No geometry correction or appearance improvement claimed.",
+    "grantsGarmentAcceptance": false
+  },
+  "measuredShoulderEdgePlacementExperiment": {
+    "builderPath": "tools/run_garmentcode_boxmesh_audit.py",
+    "builderSha256": "8754abeeb3ab31999d22f337caba0a86b7758d496823cbf3e55a5baa69c21eb3",
+    "executedAssemblyPosePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/shoulder-placement-before/d5fab5144e2de684442a6ca76010259630b2e79b1925072747982a893b16856e/assembly-pose.json",
+    "executedAssemblyPoseSha256": "d5fab5144e2de684442a6ca76010259630b2e79b1925072747982a893b16856e",
+    "currentAssemblyPoseSha256": "7a6af785a59ef9c18746ddaf7deb8d99ca7df84d8087ff2cb5c8dfe9bca51a16",
+    "postExecutionChange": "Landmark evidence pointer corrected to immutable prior assembly pose containing measured UpperArm coordinates. Geometry parameters unchanged; current owner hash differs from executed input and requires normal source-fingerprint handling on next run.",
+    "buildReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "buildReportSha256": "b4c8379b931cf54fa8ee3fca179db745c645792255d29a973e6160de916e0f1b",
+    "renderReportSha256": "181f0a210865ba5303212af3fb365791f63143c2d9b50ec52968200615a88402",
+    "representativeVertices": [
+      {
+        "vertexIndex": 1936,
+        "pieceIds": [
+          "jacket-front-left"
+        ],
+        "coordinatesByStageM": {
+          "native-sewn": [
+            0.08409446119949132,
+            0.003077510237649247,
+            1.021204920151156
+          ],
+          "collar-contour": [
+            0.08409446119949132,
+            0.003077510237649247,
+            1.021204920151156
+          ],
+          "torso-contour": [
+            0.08171993494033813,
+            -0.020245453342795372,
+            1.021204920151156
+          ],
+          "upper-surface": [
+            0.08317433297634125,
+            -0.02952258288860321,
+            1.0240428447723389
+          ]
+        },
+        "upperSurfaceDisplacementM": 0.009809904301895444
+      },
+      {
+        "vertexIndex": 2419,
+        "pieceIds": [
+          "jacket-overlap-front"
+        ],
+        "coordinatesByStageM": {
+          "native-sewn": [
+            -0.07894518356459497,
+            0.00094599789240082,
+            1.0247111076674384
+          ],
+          "collar-contour": [
+            -0.07894518356459497,
+            0.00094599789240082,
+            1.0247111076674384
+          ],
+          "torso-contour": [
+            -0.08331210911273956,
+            -0.022237738594412804,
+            1.0247111076674384
+          ],
+          "upper-surface": [
+            -0.08413976430892944,
+            -0.029384566470980644,
+            1.0290089845657349
+          ]
+        },
+        "upperSurfaceDisplacementM": 0.008380567263257142
+      }
+    ],
+    "metrics": {
+      "vertices": 6598,
+      "triangles": 12707,
+      "unweightedVertices": 6598,
+      "degenerateTriangles": 0
+    },
+    "seamMeasurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/neckline-seam-ebda6829a424f6647db390fa28c0baf449811db5f2371a6820662f4d78a0f4d5.json",
+    "seamMeasurementSha256": "ebda6829a424f6647db390fa28c0baf449811db5f2371a6820662f4d78a0f4d5",
+    "seamRecords": [
+      {
+        "pieceId": "jacket-front-left",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.047729319999309384,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.7954886666551564
+      },
+      {
+        "pieceId": "jacket-back-left",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.05953477322123665,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.9922462203539443
+      },
+      {
+        "pieceId": "jacket-back-right",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.05953477257343931,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.9922462095573219
+      },
+      {
+        "pieceId": "jacket-overlap-front",
+        "sharedEdgeCount": 6,
+        "actual3dSeamLengthM": 0.04772931891218082,
+        "canonical2dRestLengthM": 0.06,
+        "lengthRatio3dTo2d": 0.7954886485363469
+      }
+    ],
+    "directInspection": "All five views and six poses inspected. Former prominent triangular neck-side sheets substantially reduced in three-quarter/neutral, but pointed shoulder caps, rear sleeve junction slits and heavy sleeve wrinkles persist. Collar remains tall. Reference pleats absent; seated/crouch hem lifting and shorts coverage unapproved.",
+    "grantsGarmentAcceptance": false
+  },
+  "pairedSleeveCapPlacementExperiment": {
+    "assemblyPoseSha256": "39ba2b3b4ab2e2b082385a6df7383cb58e9f7025531b8d2a63774e3f0f369ca3",
+    "nativePlacementBuilderSha256": "a0d8397b5468989fc13b2773f3640545d72e021ed4be7be3504e838683567a4a",
+    "workflowAdapterSha256": "f3e88fea2b175438ee4b033841eeaf33071eb466794593ba5eeb6b2f8976ffd7",
+    "buildReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "buildReportSha256": "309ec79899507ad822821ca97a538074657af7e6150d303a1185755c70bd2f6d",
+    "renderReportSha256": "4914ff1b994a58b03d4a9e1f0020d9c97155ae9385e13ff0bd1597b7151c8578",
+    "sourceBlendSha256": "2be52640f6335924c47b5ccc5771c01de0e38e1898b67cfb61dfd1377bbb92f8",
+    "geometryMetrics": {
+      "vertices": 6598,
+      "triangles": 12707,
+      "unweightedVertices": 6598,
+      "degenerateTriangles": 0
+    },
+    "capSharedEdgeMeasurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/sleeve-cap-seam-8dea9f65bc77eb0945d5b30e49049373195685cd2629be5d2b454b46ffc0acdc.json",
+    "capSharedEdgeMeasurementSha256": "8dea9f65bc77eb0945d5b30e49049373195685cd2629be5d2b454b46ffc0acdc",
+    "capSharedEdgeRecords": [
+      {
+        "sleevePieceId": "jacket-sleeve-left",
+        "torsoPieceId": "jacket-back-left",
+        "stitchIds": [
+          "left-back-armscye-lower",
+          "left-back-armscye-upper"
+        ],
+        "sharedEdgeCount": 17,
+        "actual3dSeamLengthM": 0.15476782347428544,
+        "canonical2dRestLengthM": 0.16000150272284852,
+        "lengthRatio3dTo2d": 0.9672898119111496
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-left",
+        "torsoPieceId": "jacket-front-left",
+        "stitchIds": [
+          "left-front-armscye-lower",
+          "left-front-armscye-upper"
+        ],
+        "sharedEdgeCount": 17,
+        "actual3dSeamLengthM": 0.16395972933428088,
+        "canonical2dRestLengthM": 0.16000150272284852,
+        "lengthRatio3dTo2d": 1.0247386839752919
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-right",
+        "torsoPieceId": "jacket-back-right",
+        "stitchIds": [
+          "right-back-armscye-lower",
+          "right-back-armscye-upper"
+        ],
+        "sharedEdgeCount": 17,
+        "actual3dSeamLengthM": 0.1559725395575344,
+        "canonical2dRestLengthM": 0.16000150272284852,
+        "lengthRatio3dTo2d": 0.9748192167151517
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-right",
+        "torsoPieceId": "jacket-overlap-front",
+        "stitchIds": [
+          "right-front-armscye-lower",
+          "right-front-armscye-upper"
+        ],
+        "sharedEdgeCount": 17,
+        "actual3dSeamLengthM": 0.16516448166370581,
+        "canonical2dRestLengthM": 0.16000150272284852,
+        "lengthRatio3dTo2d": 1.0322683153157661
+      }
+    ],
+    "directInspection": "Five current views and six poses inspected. Pointed shoulder cap spikes substantially reduced in neutral, three-quarter and arm-cross. Dark rear sleeve-to-body creases/open-looking bands persist; heavy sleeve wrinkles and underarm folding remain. Shared source topology does not prove that these dark bands are open seams or that cloth/weighted surfaces avoid inversion/intersection. Collar height/head clearance and lower-layer coverage remain unapproved.",
+    "changes2dRestLengths": false,
+    "grantsGarmentAcceptance": false
+  },
+  "coherentDisplacementExperiment": {
+    "decision": "REJECTED_AND_REVERTED",
+    "baselineDiagnosticPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/cap-stage-surface-e0fc62e483bf66b7a1f1818ee707f8ac9aaec65831296fbfe09b16c17544eace.json",
+    "baselineDiagnosticSha256": "e0fc62e483bf66b7a1f1818ee707f8ac9aaec65831296fbfe09b16c17544eace",
+    "failedDiagnosticPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/cap-stage-surface-2bee238c9f64ff6b8eeee019d2bc026b7b97a8ec106470e489c014c3fe8e8cb8.json",
+    "failedDiagnosticSha256": "2bee238c9f64ff6b8eeee019d2bc026b7b97a8ec106470e489c014c3fe8e8cb8",
+    "baselineDiagnosticSummary": [
+      {
+        "stage": "manufacturer",
+        "selectedFaceCount": 795,
+        "opposedBodyNormalCount": 110,
+        "negativeNearestBodyDistanceCount": 103
+      },
+      {
+        "stage": "cloth",
+        "selectedFaceCount": 785,
+        "opposedBodyNormalCount": 120,
+        "negativeNearestBodyDistanceCount": 52
+      },
+      {
+        "stage": "weighted",
+        "selectedFaceCount": 785,
+        "opposedBodyNormalCount": 120,
+        "negativeNearestBodyDistanceCount": 52
+      }
+    ],
+    "failedDiagnosticSummary": [
+      {
+        "stage": "manufacturer",
+        "selectedFaceCount": 816,
+        "opposedBodyNormalCount": 94,
+        "negativeNearestBodyDistanceCount": 273
+      },
+      {
+        "stage": "cloth",
+        "selectedFaceCount": 817,
+        "opposedBodyNormalCount": 127,
+        "negativeNearestBodyDistanceCount": 133
+      },
+      {
+        "stage": "weighted",
+        "selectedFaceCount": 817,
+        "opposedBodyNormalCount": 127,
+        "negativeNearestBodyDistanceCount": 133
+      }
+    ],
+    "failedArtifactDirectory": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/coherent-rejected/ef82b78de16f",
+    "failedSourceBlendSha256": "ef82b78de16f764187a63b39595b8d2054eb3aa70cbdd140c0bb03d9a7501a4e",
+    "failedBuildReportSha256": "69a09f453ebafaf20f352e0b8fa213c729aff248f708986a5bedb0d32f929d92",
+    "failedRenderReportSha256": "38db508be60715a00482960fc3b55be5aac6aac4afbb315f10b046c17c7eb567",
+    "failedInspectedImages": {
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "0bf141936ce480ad2150df03d01b7206d3ea09c6060a678b98ec8a72cf327005",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "13ad26b847e3d8e7113188f30e8aa8885e3e0af2ec1a8954b68c44f420153031",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "53cbba5cc37d6275ae19f0865b7ce1399e12adf3dbd70f7ee88cc6ca182415d1",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "f936b426973bc08d58719241bbf58a9253d9dd63a8c24d6be8a2ba77efb995e2",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "3c43415a66047d1a4b11f430a696d0738c81678322dcc4f0d5cdb56b55a311f0",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "0ab38434f1fab6293d5401e129332815cf648a1f2c1701cd04af64c4262ef070",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "f1a60b26c43569c94669bf02d1d1ed60bb4ecbc4d23347c61fe39019d092264b",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "f7e8e8021121ba398f9db516793a458a74c4fb6f899eb4931da7e5d1914e76f4",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "c9241be7802c49afa59eac13cefd529c4113897e56c03157eaf11376afca4662",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "12a3eb4e13cd425d75bb3de91e646210e70f8661b095c3c9a960196734ccf567",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "0c41de3a32ca8c543c90054807d96864fbba00ccaf5525d3fb2e4f56ca83194a"
+    },
+    "observation": "Six iterations of shared-topology displacement relaxation reduced manufacturer opposed-normal count 110 to 94 but increased negative nearest-body centroid distance count 103 to 273; final weighted counts 120 to 127 opposed and 52 to 133 negative. Spatial region membership differs after displacement; these are regional diagnostics, not a matched-face causal or continuous-penetration test. All eleven failed-trial images inspected; new upper-chest visible gray patches and worse shoulder region reject the experiment.",
+    "recovery": "Experimental builder and configuration restored byte-for-byte to prior snapshots. Normal workflow regenerated manufacturer, cloth, weighted mesh and eleven images; current images directly inspected and new chest patches absent. Persistent rear junction bands/creases and sleeve wrinkles remain rejected.",
+    "recoveredSourceBlendSha256": "1985e743a3b398be94c1e23788df0795331a033b979e2b359291ed603eef11fb",
+    "recoveredBuildReportSha256": "bc80aa6f50f63f72c6457a8220d0e38a5f2ef8530bce2aca36627695544dcfd2",
+    "recoveredRenderReportSha256": "154bcb3756d5e17f757a73124474e0c30d6224ceeef36bbcb5f677ff438ee0b3",
+    "grantsGarmentAcceptance": false
+  },
+  "nativeUpperTorsoChartExperiment": {
+    "disposition": "REJECTED_AND_REVERTED",
+    "archivePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/chart-rejected/9296a3444a02",
+    "assemblyPoseSha256": "9296a3444a02d2abce14b71af302353f52cbf1ac696c0b3eb54446a3332a7406",
+    "nativeBuilderSha256": "b97fefe4f157c9eff98691e4a4c81fb976da8bc314db8c1a74bb69051bb4d390",
+    "method": "rowwise-neckline-to-armhole-boundary",
+    "unapprovedAnchor": {
+      "garmentCodeAbsXM": 0.105,
+      "heightM": 1.0,
+      "depthFromBoneM": 0.04
+    },
+    "failedInspectedImages": {
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "e3d1ce76c6e5016acb9df08e9615fd13095de48830d242a8dd60818e2c463db9",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "c10adf30470e92e0c8b7534156e286a4b28737e6b5bde6d939ee6c8e3b590b3a",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "dae5d901ffdefb35bec16649639a44eb8fc9f63b95318bdaaa77d29da6338572",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "5ebe67d0cfc2ac5fe64b3d98f7eec48ecf52576d167453cb6caa13aa2f2e92c5",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "9d26332fda3884235521e34bcc041e1da90c2ecba7115b181c38a47ac9f1243f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "6072d3355dda56c6332e4b1c594c59bf1e0c7763ddfece786ac71c6376e7a72c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "1780ed897dfaf6d59b8efe6a3b3823d063d694b597a5490585a1546dc8302b53",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "17745452b029340c000f8b8b05520dd76333add204270bf5ed6d0a5cb9eddcfe",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "2f63061d3a0c83ce8ec86d43500a8a0e54474559d2d2e94794c254bb5672b72c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "441f3d0e30d5a26d74755a1ee1243d673b38bf8e1f975df54f1e31cc0820520a",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "5b47461575405c256ff46decb049b46dfa11ad7d7f83b86fb7a6b1e107a612c5"
+    },
+    "diagnosticPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/cap-stage-surface-8720719844778dbfc874cfe34ba0d8ad964412a19941ffa4d3e37991c45ebca8.json",
+    "diagnosticSha256": "8720719844778dbfc874cfe34ba0d8ad964412a19941ffa4d3e37991c45ebca8",
+    "diagnosticCounts": [
+      {
+        "stage": "manufacturer",
+        "selectedFaceCount": 892,
+        "opposedBodyNormalCount": 114,
+        "negativeNearestBodyDistanceCount": 62
+      },
+      {
+        "stage": "cloth",
+        "selectedFaceCount": 876,
+        "opposedBodyNormalCount": 170,
+        "negativeNearestBodyDistanceCount": 47
+      },
+      {
+        "stage": "weighted",
+        "selectedFaceCount": 876,
+        "opposedBodyNormalCount": 170,
+        "negativeNearestBodyDistanceCount": 47
+      }
+    ],
+    "diagnosticBoundary": "Nearest raw rest-body normals and stage-local centroid selection only; region membership changes with geometry. Counts do not prove continuous penetration, matched-face improvement or fit acceptance.",
+    "directInspection": "Failed chart: broad exposed gray shoulder patches in front/back/neutral and bent poses; sleeve roots attach too low and remain jagged. Rejected. Restored current eleven images: broad chart exposure absent; rear junction creases, sleeve wrinkles, tall collar, missing reference pleats and seated hem lift persist.",
+    "restoredAssemblyPoseSha256": "39ba2b3b4ab2e2b082385a6df7383cb58e9f7025531b8d2a63774e3f0f369ca3",
+    "restoredNativeBuilderSha256": "a0d8397b5468989fc13b2773f3640545d72e021ed4be7be3504e838683567a4a",
+    "restoredBuildReportSha256": "b9275a470b8edb30202ab60269cdc3d96e699ff5b448583163d7f0088de8617c",
+    "restoredRenderReportSha256": "c13c4e5ff8d5f3b566ec85c839ac365d330ca3a04fdfe12388d31ab3d4716bca",
+    "restoredWeightedSourceSha256": "a9e4e41ebf4580ecb6fd431e38a7e450e37de5571769f4c376e8aa43db569770",
+    "grantsQualityAcceptance": false,
+    "grantsFitAcceptance": false,
+    "failureReportingImprovement": {
+      "path": "tools/run_reference_product_stage.py",
+      "sha256": "488cf86a5105ea912bf6e358a3223bf5fada32b4ee0ed247e1017be70e161ebc",
+      "behavior": "Native audit exception type/message retained in stage error instead of status alone."
+    }
+  },
+  "measuredShoulderSupportExperiment": {
+    "disposition": "MEASURED_PLACEMENT_RETAINED_AS_UNAPPROVED_PROTOTYPE",
+    "measurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/shoulder-surface-dd2b66fd4a9b407aa3fc2d3073f22fc90c7e89d3d96a2d8447d2172b0eac1853.json",
+    "measurementSha256": "dd2b66fd4a9b407aa3fc2d3073f22fc90c7e89d3d96a2d8447d2172b0eac1853",
+    "measurementToolPath": "tools/measure_shoulder_surface.py",
+    "measurementToolSha256": "d64a95a43ccc6004dd6fc7eebb738d9d064e273bb2b56b8833ea2ca262040802",
+    "sourceAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "records": [
+      {
+        "side": "left",
+        "bone": "UpperArm_L",
+        "samplingAnchorBlenderM": [
+          0.08518362045288086,
+          0.006030093878507614,
+          1.018263339996338
+        ],
+        "rayOriginBlenderM": [
+          0.08518362045288086,
+          0.006030093878507614,
+          1.1525951623916626
+        ],
+        "bodyTriangle": 10727,
+        "surfaceBlenderM": [
+          0.08518362045288086,
+          0.006030093878507614,
+          1.0481815338134766
+        ],
+        "surfaceNormalBlender": [
+          0.05203605815768242,
+          0.14445187151432037,
+          0.9881426095962524
+        ],
+        "normalClearanceM": 0.004,
+        "supportGarmentCodeM": [
+          0.08539176732301712,
+          1.0521341562271118,
+          -0.006607901304960251
+        ]
+      },
+      {
+        "side": "right",
+        "bone": "UpperArm_R",
+        "samplingAnchorBlenderM": [
+          -0.08518360555171967,
+          0.006030089687556028,
+          1.018263339996338
+        ],
+        "rayOriginBlenderM": [
+          -0.08518360555171967,
+          0.006030089687556028,
+          1.1525951623916626
+        ],
+        "bodyTriangle": 14177,
+        "surfaceBlenderM": [
+          -0.08518360555171967,
+          0.006030089687556028,
+          1.0481815338134766
+        ],
+        "surfaceNormalBlender": [
+          -0.052036069333553314,
+          0.14445188641548157,
+          0.9881426095962524
+        ],
+        "normalClearanceM": 0.004,
+        "supportGarmentCodeM": [
+          -0.08539175242185593,
+          1.0521341562271118,
+          -0.006607897114008665
+        ]
+      }
+    ],
+    "previousArtifactsPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/surface-before/39ba2b3b4ab2",
+    "assemblyPoseSha256": "950240eaee159fe35e74e4771f8ea7eaf32a269149b8dd3646f6c5e6f2c4c66b",
+    "buildReportSha256": "97ecd83694dea25004357f1238fb0fae377a6593cb39ad4dd73b7b0ae0637155",
+    "renderReportSha256": "3a490ddd3d4d306dcf7eb7db4654082698ae171044f07a667bf3e0ec1956332d",
+    "weightedSourceSha256": "ed2f920357ec6601923b6115e94ab75c4dbefe73dec2b75262728a1dc558154b",
+    "diagnosticPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/cap-stage-surface-5ba68510467ac33bcb3f9bbf44fceea6ee146dfd71aae95d18d22ce3aa8682fb.json",
+    "diagnosticSha256": "5ba68510467ac33bcb3f9bbf44fceea6ee146dfd71aae95d18d22ce3aa8682fb",
+    "diagnosticCounts": [
+      {
+        "stage": "manufacturer",
+        "selectedFaceCount": 804,
+        "opposedBodyNormalCount": 76,
+        "negativeNearestBodyDistanceCount": 72
+      },
+      {
+        "stage": "cloth",
+        "selectedFaceCount": 804,
+        "opposedBodyNormalCount": 75,
+        "negativeNearestBodyDistanceCount": 26
+      },
+      {
+        "stage": "weighted",
+        "selectedFaceCount": 804,
+        "opposedBodyNormalCount": 75,
+        "negativeNearestBodyDistanceCount": 26
+      }
+    ],
+    "diagnosticBoundary": "Stage-local centroid selection and nearest raw rest-body normals. Selected region membership differs across placements; counts do not prove matched-face improvement, continuous penetration or fit acceptance.",
+    "directInspection": "Five views and six poses inspected. Broad gray shoulder exposure from rejected chart remains absent. Rear sleeve junction bands, wrinkles, tall collar, waist gap, missing reference pleats, crouch/sit hem lift and occluded shorts persist. No final appearance acceptance.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "measuredArmholeBoundaryExperiment": {
+    "disposition": "EXECUTED_PROTOTYPE_WITH_QUALITY_REJECT",
+    "measurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/armhole-section-ecf4d66a722889c37a6f3bc41335e05e9384d2e868f462debec133089671ccc7.json",
+    "measurementSha256": "ecf4d66a722889c37a6f3bc41335e05e9384d2e868f462debec133089671ccc7",
+    "measurementToolSha256": "a37a6afedf5c7569da64e24c19d80e2c080231922bdfad2bf0c570321134c46b",
+    "nativeBuilderSha256": "7b38290158f98d77c12382e2356555a561612a1699676086ae0ec511b96caa3e",
+    "assemblyPoseSha256": "7bbaf6a127bbf0fb509f3075ac4ea27746dec89092f81f685f0a9bfe63458e62",
+    "sourceAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "radialSamplesPerSide": 32,
+    "selectedBoneFractions": {
+      "left": 0.0,
+      "right": 0.0
+    },
+    "previousArtifactsPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/armhole-before/950240eaee15",
+    "buildReportSha256": "8d87e2defd17388482ad7202ac6569d1dab0e22f28430e2ea98b8e1ee99b4c21",
+    "renderReportSha256": "c0a5cba7ef1c502c8fbdcd44af03f2d31850e91dcdf55d7990b673fc039c1b17",
+    "weightedSourceSha256": "fdb5948bf05abd1c683772612e7a8782e4bad894b14f73c8560c06dbcd23b254",
+    "placementCurveLengths": [
+      {
+        "pieceId": "jacket-front-left",
+        "edgeIndex": 0,
+        "measuredPlacementCurveLengthM": 0.07134322512968692,
+        "canonical2dRestLengthM": 0.06000150272284852,
+        "curveToRestRatio": 1.1890239726032643
+      },
+      {
+        "pieceId": "jacket-front-left",
+        "edgeIndex": 1,
+        "measuredPlacementCurveLengthM": 0.05516182806955958,
+        "canonical2dRestLengthM": 0.09999999999999999,
+        "curveToRestRatio": 0.5516182806955959
+      },
+      {
+        "pieceId": "jacket-overlap-front",
+        "edgeIndex": 0,
+        "measuredPlacementCurveLengthM": 0.0713433635775535,
+        "canonical2dRestLengthM": 0.06000150272284852,
+        "curveToRestRatio": 1.1890262800099172
+      },
+      {
+        "pieceId": "jacket-overlap-front",
+        "edgeIndex": 1,
+        "measuredPlacementCurveLengthM": 0.05516179171292538,
+        "canonical2dRestLengthM": 0.09999999999999999,
+        "curveToRestRatio": 0.5516179171292539
+      },
+      {
+        "pieceId": "jacket-back-left",
+        "edgeIndex": 0,
+        "measuredPlacementCurveLengthM": 0.05519415367598387,
+        "canonical2dRestLengthM": 0.06000150272284852,
+        "curveToRestRatio": 0.9198795225334578
+      },
+      {
+        "pieceId": "jacket-back-left",
+        "edgeIndex": 1,
+        "measuredPlacementCurveLengthM": 0.04975534437740631,
+        "canonical2dRestLengthM": 0.09999999999999999,
+        "curveToRestRatio": 0.49755344377406313
+      },
+      {
+        "pieceId": "jacket-back-right",
+        "edgeIndex": 0,
+        "measuredPlacementCurveLengthM": 0.05519425116256452,
+        "canonical2dRestLengthM": 0.06000150272284852,
+        "curveToRestRatio": 0.9198811472691099
+      },
+      {
+        "pieceId": "jacket-back-right",
+        "edgeIndex": 1,
+        "measuredPlacementCurveLengthM": 0.04975534531814339,
+        "canonical2dRestLengthM": 0.09999999999999999,
+        "curveToRestRatio": 0.49755345318143396
+      }
+    ],
+    "seamMeasurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/sleeve-cap-seam-c601eeac1a8a3ca4b4255802e0e60a72d5f5152873752d91463715483df3a77a.json",
+    "seamMeasurementSha256": "c601eeac1a8a3ca4b4255802e0e60a72d5f5152873752d91463715483df3a77a",
+    "sourceSeamLengths": [
+      {
+        "sleevePieceId": "jacket-sleeve-left",
+        "torsoPieceId": "jacket-back-left",
+        "stitchIds": [
+          "left-back-armscye-lower",
+          "left-back-armscye-upper"
+        ],
+        "sharedEdgeCount": 17,
+        "actual3dSeamLengthM": 0.10481857098467727,
+        "canonical2dRestLengthM": 0.16000150272284852,
+        "lengthRatio3dTo2d": 0.6551099158502401
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-left",
+        "torsoPieceId": "jacket-front-left",
+        "stitchIds": [
+          "left-front-armscye-lower",
+          "left-front-armscye-upper"
+        ],
+        "sharedEdgeCount": 17,
+        "actual3dSeamLengthM": 0.12625353188749977,
+        "canonical2dRestLengthM": 0.16000150272284852,
+        "lengthRatio3dTo2d": 0.789077163270108
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-right",
+        "torsoPieceId": "jacket-back-right",
+        "stitchIds": [
+          "right-back-armscye-lower",
+          "right-back-armscye-upper"
+        ],
+        "sharedEdgeCount": 17,
+        "actual3dSeamLengthM": 0.10481871389802808,
+        "canonical2dRestLengthM": 0.16000150272284852,
+        "lengthRatio3dTo2d": 0.6551108090502937
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-right",
+        "torsoPieceId": "jacket-overlap-front",
+        "stitchIds": [
+          "right-front-armscye-lower",
+          "right-front-armscye-upper"
+        ],
+        "sharedEdgeCount": 17,
+        "actual3dSeamLengthM": 0.1262536329232612,
+        "canonical2dRestLengthM": 0.16000150272284852,
+        "lengthRatio3dTo2d": 0.7890777947376861
+      }
+    ],
+    "diagnosticPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/cap-stage-surface-58ad3176b5393fc6418955715107874fc91399f19ea8620827e76d9ffc35834f.json",
+    "diagnosticSha256": "58ad3176b5393fc6418955715107874fc91399f19ea8620827e76d9ffc35834f",
+    "diagnosticCounts": [
+      {
+        "stage": "manufacturer",
+        "selectedFaceCount": 927,
+        "opposedBodyNormalCount": 67,
+        "negativeNearestBodyDistanceCount": 28
+      },
+      {
+        "stage": "cloth",
+        "selectedFaceCount": 921,
+        "opposedBodyNormalCount": 123,
+        "negativeNearestBodyDistanceCount": 0
+      },
+      {
+        "stage": "weighted",
+        "selectedFaceCount": 921,
+        "opposedBodyNormalCount": 123,
+        "negativeNearestBodyDistanceCount": 0
+      }
+    ],
+    "directInspection": "Five views and six poses inspected. Rear dark junction bands reduced; shoulder rim protrusions and sleeve wrinkles persist. Broad exposed shoulder patches absent. Tall collar, waist gap, missing reference pleats, sit/crouch hem lift and occluded shorts remain.",
+    "evidenceBoundary": "Measured neutral body section with explicit 4 mm clearance and 60 mm neighborhood blend hypotheses. Region membership differs across diagnostic runs. Zero negative nearest-normal face-centroid distances in selected cloth faces is not a continuous penetration PASS; 123 opposed normals remain in 921 selected faces. Actual source seam compression is unapproved.",
+    "original2dRestLengthsChanged": false,
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "measuredPairedCapDraftExperiment": {
+    "disposition": "EXECUTED_PROTOTYPE_WITH_QUALITY_REJECT",
+    "measurementBasis": {
+      "status": "MEASURED_NEUTRAL_REST_LENGTH_PROTOTYPE",
+      "sourceEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/armhole-section-ecf4d66a722889c37a6f3bc41335e05e9384d2e868f462debec133089671ccc7.json",
+      "sourceEvidenceSha256": "ecf4d66a722889c37a6f3bc41335e05e9384d2e868f462debec133089671ccc7",
+      "frontSegmentLengthsM": [
+        0.07134329435362022,
+        0.05516180989124248
+      ],
+      "backSegmentLengthsM": [
+        0.055194202419274196,
+        0.04975534484777485
+      ],
+      "additionalStitchLineEaseRatio": 0,
+      "surfacePlacementClearanceM": 0.004,
+      "capChordToHalfPerimeterRatio": 0.9,
+      "cuffAxisDistancePreserved": true,
+      "evidenceBoundary": "Neutral surface plus explicit 4 mm normal clearance sets draft edge lengths; 0 extra stitch-line ease and 0.9 cap chord ratio are design hypotheses. Large, strain, fit, appearance and runtime remain unapproved."
+    },
+    "patternSha256": "a7f9432192371306ff2457a39d18ada2afc4ebf9bec59b0ec35c7dfa25b3b047",
+    "assemblyPoseSha256": "8ae802cc5df61be7924d1ce41fca1e8701cc2f11153c7f023b7e81a9108e0f14",
+    "stitchGraphSha256": "8c8169af9a8ae13945ad751c0f7170161e092939c427467a8a686cb2a0df6ce1",
+    "nativeBuilderSha256": "a348f3f0c505c638ebab6dbfc20e7aed52c79a072889290a6caabb925bedd494",
+    "previousArtifactsPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/cap-draft-before/d0ec60dff77a",
+    "buildReportSha256": "856a057575bb70c60abcb45a506eef2f388a9c116aa8a3062b85b59ebfea0016",
+    "renderReportSha256": "cbd0f93324a10a909f8dfb3d2e3655ef2b3e99f35f46987515c7b986cd075c1e",
+    "weightedSourceSha256": "d2020d530646b0e1d56de193ff6c22542677e88fb3cdc8649a90e30ca1f8dee7",
+    "seamMeasurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/sleeve-cap-seam-b943e32ee81521a6bdddf90e27fb72f0093566a7b8358251a1884a03e0db2381.json",
+    "seamMeasurementSha256": "b943e32ee81521a6bdddf90e27fb72f0093566a7b8358251a1884a03e0db2381",
+    "sourceSeamLengths": [
+      {
+        "sleevePieceId": "jacket-sleeve-left",
+        "torsoPieceId": "jacket-back-left",
+        "stitchIds": [
+          "left-back-armscye-lower",
+          "left-back-armscye-upper"
+        ],
+        "sharedEdgeCount": 11,
+        "actual3dSeamLengthM": 0.10441918186837215,
+        "canonical2dRestLengthM": 0.104949547267049,
+        "lengthRatio3dTo2d": 0.9949464727339195
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-left",
+        "torsoPieceId": "jacket-front-left",
+        "stitchIds": [
+          "left-front-armscye-lower",
+          "left-front-armscye-upper"
+        ],
+        "sharedEdgeCount": 14,
+        "actual3dSeamLengthM": 0.1263271090332168,
+        "canonical2dRestLengthM": 0.12650510424486272,
+        "lengthRatio3dTo2d": 0.9985929800010174
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-right",
+        "torsoPieceId": "jacket-back-right",
+        "stitchIds": [
+          "right-back-armscye-lower",
+          "right-back-armscye-upper"
+        ],
+        "sharedEdgeCount": 11,
+        "actual3dSeamLengthM": 0.10441929932111024,
+        "canonical2dRestLengthM": 0.104949547267049,
+        "lengthRatio3dTo2d": 0.994947591869172
+      },
+      {
+        "sleevePieceId": "jacket-sleeve-right",
+        "torsoPieceId": "jacket-overlap-front",
+        "stitchIds": [
+          "right-front-armscye-lower",
+          "right-front-armscye-upper"
+        ],
+        "sharedEdgeCount": 14,
+        "actual3dSeamLengthM": 0.12632719918807078,
+        "canonical2dRestLengthM": 0.12650510424486272,
+        "lengthRatio3dTo2d": 0.9985936926588544
+      }
+    ],
+    "diagnosticPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/cap-stage-surface-fa96042d8e326cf4091070590254590718e51e77d3638527a9830121c43ebfa6.json",
+    "diagnosticSha256": "fa96042d8e326cf4091070590254590718e51e77d3638527a9830121c43ebfa6",
+    "diagnosticCounts": [
+      {
+        "stage": "manufacturer",
+        "selectedFaceCount": 718,
+        "opposedBodyNormalCount": 13,
+        "negativeNearestBodyDistanceCount": 0
+      },
+      {
+        "stage": "cloth",
+        "selectedFaceCount": 715,
+        "opposedBodyNormalCount": 36,
+        "negativeNearestBodyDistanceCount": 0
+      },
+      {
+        "stage": "weighted",
+        "selectedFaceCount": 715,
+        "opposedBodyNormalCount": 36,
+        "negativeNearestBodyDistanceCount": 0
+      }
+    ],
+    "connectionBoundary": "All stitch endpointMapping values preserved. Two back upper edges changed geometric direction metadata reversed to same because their new 2D vectors have positive dot product; explicit start-to-end correspondence retained.",
+    "failuresRepaired": [
+      "draft-patterns stopped on stale back-edge geometric direction; recorded actual new direction without changing endpoint identity",
+      "initialize-3d rejected duplicate armholeDimensionEvidence property in construction; retained evidence only in pattern measurementBasis, unchanged schema"
+    ],
+    "directInspection": "Five views and six poses inspected. Shoulder rim protrusions reduced; cuffs still reach wrists. Heavy sleeve wrinkles, underarm creases, tall collar, waist gap, absent pleats and seated hem lift remain.",
+    "evidenceBoundary": "Source seam lengths before cloth only. 715 cloth faces selected by stage-local centroid region; 36 opposed nearest-body normals and zero negative nearest-normal centroid distances are diagnostics, not matched-face improvement or continuous penetration acceptance. New draft has explicit provisional zero extra stitch-line ease above measured 4 mm surface clearance and 0.9 cap chord ratio.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "sleeveTubeAxialDraftExperiment": {
+    "measurementEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/sleeve-tube-3ddddbe292a4.json",
+    "measurementEvidenceSha256": "f175c1cfa5dfa63f2e6db37b6a1147b22cd3acc231ce46277120447db010c548",
+    "measurementScriptSha256": "3ddddbe292a4a59d9c7b8ffa9155a40f59b89ad4e18042c14d8d74961c610225",
+    "measurementSourceBlendSha256": "badb9bfc1b979092fea8c8b30df41852963cf8516a72c65904a8687ea63bfd72",
+    "measurementMethod": "64 radial samples at five fractions each of UpperArm head to LowerArm head and LowerArm head to Hand head, both sides; evaluated Neutral body",
+    "measuredSectionCount": 20,
+    "normalClearanceM": 0.004,
+    "previousTubePatternLengthM": 0.26,
+    "tubePatternLengthM": 0.3713728734491126,
+    "tubePlacedAxialLengthM": 0.3713728734491126,
+    "previousAxialPlacementRatio": 1.4283572055735099,
+    "currentAxialPlacementRatio": 1.0,
+    "currentUniformCircumferenceM": 0.16,
+    "capBoundaryAndPhysicalCuffPreserved": true,
+    "patternDraftSha256": "d42f2ef6ee9ad7dff0be9c8b2a8797fe0a26307d7e09de5a0af67c3d1301203b",
+    "assemblyPoseSha256": "3e9b2a00bd1c460d68210dfc91dbc8246fd4c8d469c7d615d203b38a5e27254a",
+    "stitchGraphSha256": "8c8169af9a8ae13945ad751c0f7170161e092939c427467a8a686cb2a0df6ce1",
+    "buildReportSha256": "74cb6b7552f64aa8fa54ed60c3601d5fcb8bdb5c53f759afc6f1f493375424ed",
+    "sourceBlendSha256": "5496e0cd98f8531ce41dabb2089d4dab99a894cf0a1f9c4d938546cb8fdff276",
+    "weightedBlendSha256": "c068f3688001ff5a5a359f5353155484a3f98c25e9651879afaf7498f33abdf2",
+    "renderReportSha256": "7b30bf815dae99fb3ddae125abb834afda394faa603eb957fbd4eaec18a6ae3d",
+    "buildMetrics": {
+      "vertices": 6842,
+      "triangles": 13195,
+      "unweightedVertices": 6842,
+      "degenerateTriangles": 0
+    },
+    "beforeEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/tube-length-before/a7f943219237",
+    "directInspection": "Five current views and six poses inspected. Heavy sleeve wrinkling persists; sleeve/cuff coverage and prior torso/skirt placement retained. No visual acceptance or claimed wrinkle improvement.",
+    "measurementCorrection": "Initial radial scans used bone tails and covered only half each joint span. Those preliminary reports are superseded by this explicit head-to-next-head measurement. Hand head is 378.855 mm from UpperArm head; current cuff is 17.518 mm beyond that joint axially, not 115 mm beyond the wrist.",
+    "evidenceBoundary": "Axial placement ratio is a draft/placement comparison, not an actual cloth strain measure. 4 mm normal clearance is provisional. 20 sections do not prove continuous fit, Large, motion or runtime.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "sleeveTubeTaperExperiment": {
+    "patternDraftSha256": "de29ae079d57351a2dfb1ccb99e235f1ec7459e45c618003f312c9f08dac0c2f",
+    "assemblyPoseSha256": "e7902f5271c80b21f1e60e1ca60f34b13523ac5859153bc966d193e2a3aa023f",
+    "stitchGraphSha256": "b30d166baef04d321a3fc22d5d0db4c824974077b35b3d25a0d0d82eb72f4b49",
+    "nativePlacementScriptSha256": "fbb6ee62a99ac472a48539f9c303398571c82aa5eeb107ac4604fcbed42b1925",
+    "measurementEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/sleeve-tube-3ddddbe292a4.json",
+    "measurementEvidenceSha256": "f175c1cfa5dfa63f2e6db37b6a1147b22cd3acc231ce46277120447db010c548",
+    "pairedUnderarmSegmentsPerSleeve": 10,
+    "totalStitches": 47,
+    "cuffCircumferencesM": [
+      0.11752267901574204,
+      0.11752263131739873
+    ],
+    "tubePatternAxialLengthM": 0.3713728734491126,
+    "capEndpointsAndPhysicalCuffPreserved": true,
+    "beforeEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/taper-before/d42f2ef6ee9a",
+    "buildReportSha256": "feb70ce7e85295fe09c364fdd8dbe01a81819fea7fc1136bc3a7d6958f8ab756",
+    "buildMetrics": {
+      "vertices": 6767,
+      "triangles": 13053,
+      "unweightedVertices": 6767,
+      "degenerateTriangles": 0
+    },
+    "sourceBlendSha256": "5a918f0808abab66214f493b6bc0fc192539cbc9b5a73737ad39e97749514efe",
+    "weightedBlendSha256": "6afe2ec66990f22f2ac6116c316608f10b22ef15ff57af19d661bb888b76f411",
+    "renderReportSha256": "62f2624a50c384d4bfd5e9a7ad7633dce3c2bed20e7cc4c93bc912a5d9d25ba1",
+    "clothReportSha256": "fc6839eae67b7d7f1a3192791c8939380fee7da05e06e768571ddd56201ee0cd",
+    "preBakeDiagnostic": {
+      "heightRangeM": [
+        0.9734007120132446,
+        1.0523360967636108
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": -0.006308977808657801,
+        "maximum": 0.011472436201756864
+      },
+      "negativeSignedVertexCount": 156,
+      "belowCombinedCollisionMarginVertexCount": 1392,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "postBakeDiagnostic": {
+      "heightRangeM": [
+        0.972389280796051,
+        1.0568794012069702
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": 0.003952310807193271,
+        "maximum": 0.018506328196963295
+      },
+      "negativeSignedVertexCount": 0,
+      "belowCombinedCollisionMarginVertexCount": 551,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "collisionSettingsEvidence": {
+      "scriptPath": "tools/blender_cloth_simulation.py",
+      "scriptSha256": "6fc03b735d1e3d9a29932c009ddc14c63af9c38435ee483c8268caa5926080f2",
+      "bodyOuterThicknessM": 0.004,
+      "clothDistanceMinM": 0.003,
+      "combinedMarginM": 0.007,
+      "draftNormalClearanceM": 0.004
+    },
+    "directInspection": "Five views and six poses inspected. Tapered forearm silhouette reflected in renders. Cuff rumpling, underarm folds and rear sleeve creases remain. Tall collar, visible waist gap, absent pleats and seated hem lift persist.",
+    "evidenceBoundary": "Matched side seam lengths and hash-bound execution are drafting/manufacturing evidence only. Radial circle placement with matched circumference does not reproduce an actual noncircular body section. Nearest raw rest-body vertex normal diagnostics are not continuous face intersection or fit acceptance. Most proximal measured section excluded from tube taper inside sewn-cap transition.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "sleeveNoncircularContourExperiment": {
+    "measurementEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/tube-cuff-dc01d008b0dc.json",
+    "measurementEvidenceSha256": "6f0cfed232c19189de56aa45f5c68cbcaa8ed5855eed7c247947a8d1774343b8",
+    "measuredNormalClearanceM": 0.007,
+    "bodyOuterThicknessM": 0.004,
+    "clothDistanceMinM": 0.003,
+    "collisionMarginsUnchanged": true,
+    "profiles": [
+      {
+        "side": "left",
+        "previousCuffAxisDistanceM": 0.3963728734491126,
+        "cuffAxisDistanceM": 0.378854900598526,
+        "cuffRelocationM": 0.017517972850586594,
+        "tubePatternAxialLengthM": 0.353854900598526,
+        "cuffCircumferenceM": 0.14564678648443272,
+        "measuredWristBodyCircumferenceM": 0.0959039602167748,
+        "oldCuffBodyCircumferenceM": 0.1328281305362868,
+        "pairedSideSegments": 10
+      },
+      {
+        "side": "right",
+        "previousCuffAxisDistanceM": 0.3963728734491126,
+        "cuffAxisDistanceM": 0.37885497510433197,
+        "cuffRelocationM": 0.017517898344780625,
+        "tubePatternAxialLengthM": 0.35385497510433195,
+        "cuffCircumferenceM": 0.14564678003656972,
+        "measuredWristBodyCircumferenceM": 0.09590426228104992,
+        "oldCuffBodyCircumferenceM": 0.13282787305600374,
+        "pairedSideSegments": 10
+      }
+    ],
+    "patternDraftSha256": "5581de3eaa277637f965316f8a6cc2cc89a4800ae848326199b6cd34d05d110f",
+    "assemblyPoseSha256": "226d01fe3843fefcef05dd54857abf25c435fcf368a262a34ee1dc82bc0f49e5",
+    "stitchGraphSha256": "b30d166baef04d321a3fc22d5d0db4c824974077b35b3d25a0d0d82eb72f4b49",
+    "nativePlacementScriptSha256": "b748fd32bd331c55b653e95f08fd02669ae2c62f76d723586e6f0129175ec878",
+    "measurementScriptSha256": "dc01d008b0dc32e9ee9d13d660858ecbc8d99afebcd10a4675ab77bce7da4b4c",
+    "beforeEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/contour-before/de29ae079d57",
+    "buildReportSha256": "61ac434dc5dc23f1ca4f2733c5abb44d1d98da5b3199d58ee436cf6123e3b869",
+    "buildMetrics": {
+      "vertices": 6844,
+      "triangles": 13201,
+      "unweightedVertices": 6844,
+      "degenerateTriangles": 0
+    },
+    "sourceBlendSha256": "d6c323a4594d72fcd694ade3b269722ce86f85292391ebcefeb3deb37f54288b",
+    "weightedBlendSha256": "b3b525fb01a496abc0a946b4674a2f4ed57efa3ae09cbd9ecf377e5986888ee2",
+    "renderReportSha256": "7046ad5ad4b8be118ef966e4e6cf0dcdbb213e7e9e42f8551388a17ab416c7fc",
+    "clothReportSha256": "15e46bd0be55cb2359fa10f0dfc80d33b501db113b7d9b989eb7921cce8f78f3",
+    "preBakeDiagnostic": {
+      "heightRangeM": [
+        0.9734007120132446,
+        1.0522043704986572
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": 0.002434275891573634,
+        "maximum": 0.008114241434668656
+      },
+      "negativeSignedVertexCount": 0,
+      "belowCombinedCollisionMarginVertexCount": 1317,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "postBakeDiagnostic": {
+      "heightRangeM": [
+        0.9727828502655029,
+        1.0559940338134766
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": 0.003952310807193271,
+        "maximum": 0.015928672037262004
+      },
+      "negativeSignedVertexCount": 0,
+      "belowCombinedCollisionMarginVertexCount": 613,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "comparisonImagesInspected": {
+      "front.png": "379e153c7c9b2c2b4c551bdcb0b04f111effa675dd43fc3986c543b636dea7a4",
+      "neutral.png": "38629657c2dcd01351303bbf45ea7eed3682730b89f3adcebb2d810a32cbec8f",
+      "arms-up.png": "c157d88d0cabfdba2ee2100e378a51ea596d5c60c0fd96b7551a57f153daa5be"
+    },
+    "directInspection": "Eleven current images inspected. Archived previous front, neutral and arms-up additionally inspected: cuff bunching and heavy sleeve crumpling substantially reduced; wrist coverage maintained. Shoulder/underarm folds remain, tall collar, waist gap, smooth unpleated skirt and seated hem lift persist.",
+    "evidenceBoundary": "Body radial support points, not copied body triangles. Arc-length coordinates follow inferior seam through posterior/superior/anterior. Nine tube sections plus measured wrist ring and unchanged cap-base circle; linear interpolation and cap transition do not establish continuous clearance. Mesh vertex counts changed, so diagnostic counts are aggregate stage evidence rather than a matched-vertex improvement study. Final fit, fabric strain, Large, Shape Keys and runtime unverified.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "sewnWaistbandExperiment": {
+    "evidence": {
+      "config/products/siroino-lilac-lame-fencing-practice-set/job.json": "a2bff804b7b3c10345b2e090c3a351c27dab374882e65b9d3264f8df2ee9b1be",
+      "config/products/siroino-lilac-lame-fencing-practice-set/construction.json": "ff4625340b9abcfb8b95ad6f27082df6350cadfb69d5114951428e5216ef7f24",
+      "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json": "225bd96b4745f29b70d74d1caf3d3eb44d465e95486f516eaa1d750096f73ac8",
+      "config/products/siroino-lilac-lame-fencing-practice-set/stitch-graph.json": "6326049bb16bdb166fdad02bf9f91f2f7fe7f9c83020401d4d60812a9c5f4397",
+      "config/products/siroino-lilac-lame-fencing-practice-set/assembly-pose.json": "759c6910aca8f730d570faf7ec3d5c10b55525c2a99995d19a9cb1288512a0f3",
+      "tools/measure_waist_sections.py": "ddeea5889541789317c615dbe8e278110b71cad0be415e752041b5cbf8dd20ad",
+      "tools/build_sewn_pattern_prototype.py": "a6f55cbd0c5a313b90eaa28b02922ae3aa308edcc3423ff6ccd83be25fd99b4a",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/waist-ddeea5889541.json": "360595e6bcbf0932a0cddc2e97e6228c0e569d5809a5f98933dd99b4a6390cde",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json": "f7fb3fb9486b4eb4ad36164f13c97f4eb90a731027a47985770b1a24cafcb7ff",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json": "6de1fc1f97a1e837d4f33361a3681c99f84dd16eb9a50ad9d83831e699014adc",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json": "d0b62c4dea61c49eb3c5f99bd8afefcfba216125e6e321527e0b996cb324f68e",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend": "d6358404bc7c6259bc35fe9800d9f80c088c4c7cac6215f36478175829db8dd1",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend": "59cdc25c01a15ba25604400f2d24761e2ae03cbbbb6adaf1a113037ff0bdaa64"
+    },
+    "previousCandidateArchive": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/band-before/5581de3eaa27",
+    "pieceCount": 16,
+    "stitchCount": 51,
+    "bandHeightM": 0.025,
+    "radialClearanceM": 0.01,
+    "neutralBottomRestCircumferenceM": 0.6326204732098188,
+    "neutralTopRestCircumferenceM": 0.5909986924078097,
+    "previousSkirtWaistRestCircumferenceM": 0.477204,
+    "measurementProfiles": [
+      "Neutral",
+      "Large"
+    ],
+    "largeGarmentFitImplemented": false,
+    "pinVertexCount": 64,
+    "pinMethod": "canonical shared seam vertices",
+    "preBakeBodySurfaceDiagnostic": {
+      "heightRangeM": [
+        0.5495782494544983,
+        0.7395782470703125
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": 0.00615734701295878,
+        "maximum": 0.10152793512679636
+      },
+      "negativeSignedVertexCount": 0,
+      "belowCombinedCollisionMarginVertexCount": 9,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "postBakeBodySurfaceDiagnostic": {
+      "heightRangeM": [
+        0.5427639484405518,
+        0.7395782470703125
+      ],
+      "nearestNormalSignedDistanceM": {
+        "minimum": 0.00615734701295878,
+        "maximum": 0.074923121939662
+      },
+      "negativeSignedVertexCount": 0,
+      "belowCombinedCollisionMarginVertexCount": 38,
+      "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+    },
+    "geometryMetrics": {
+      "vertices": 7186,
+      "triangles": 13873,
+      "unweightedVertices": 7186,
+      "degenerateTriangles": 0
+    },
+    "directInspection": "All five views and six poses directly inspected. Band closes the former neutral waist gap, while skirt front protrusion and crumpling visibly regress compared with archived pre-band candidate; sleeve improvements retained. Reject current appearance. No cause attribution until source/rest/settled comparison is measured.",
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "grantsReleaseAcceptance": false
+  },
+  "waistbandOriginCorrectionExperiment": {
+    "evidence": {
+      "config/products/siroino-lilac-lame-fencing-practice-set/assembly-pose.json": "b158f117f7cfc5fd49fb7683c628a719c27b3204be834b360f2ea011e31edfd5",
+      "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json": "68aab6310ef32f0f929011b4ea179f70e568239bd97dfb612a5b7e33efa4fbe6",
+      "config/products/siroino-lilac-lame-fencing-practice-set/construction.json": "ff4625340b9abcfb8b95ad6f27082df6350cadfb69d5114951428e5216ef7f24",
+      "tools/build_sewn_pattern_prototype.py": "a6f55cbd0c5a313b90eaa28b02922ae3aa308edcc3423ff6ccd83be25fd99b4a",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/waist-seam-measurement.py": "6b6e12c73f61bc9949974a92cc104d0ba76cbb5feb03032b210bbb709c66806c",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/waist-seam-a9875504a9f1768c.json": "a9875504a9f1768c9f67bbac9bab39ca9d78a2f4c0a991e1646ff3fef4a63f5b",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json": "392574cff8d9885859127570efee58a3423392931d57142acb2eb3ddf19cab68",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json": "8fcbdc40e1ed8a484f5de388915c898111a2f1c774c940b076b882fb272a3a0b",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json": "41d6c333d0bb48a18d1b01da2f7b74057aee7ad0a2d2cbb18bee12ae4aea9e63",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend": "b14ce1303a5ea38afcd61cbe2296825d6408905ce3cf5ad1e8f70b4a2282b97d",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend": "b9fc32714f6df8ce7c8dbb87de0d234feebcfa2d63995dc15f50e4a7ded66ac0"
+    },
+    "angularOriginBlenderXYM": [
+      0,
+      -0.03788188099861145
+    ],
+    "previousCandidateArchive": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/band-origin-before/759c6910aca8",
+    "priorDependencyEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/waist-seam-636ec8ada017da95.json",
+    "sharedSeamMeasurements": [
+      {
+        "stitchId": "front-waistband-skirt",
+        "pieceIds": [
+          "overskirt-front",
+          "waistband-front"
+        ],
+        "edgeCount": 32,
+        "restM": 0.3163102366049094,
+        "actualM": 0.3144370546105631,
+        "ratio": 0.9940780228472781
+      },
+      {
+        "stitchId": "back-waistband-skirt",
+        "pieceIds": [
+          "overskirt-back",
+          "waistband-back"
+        ],
+        "edgeCount": 32,
+        "restM": 0.3163102366049094,
+        "actualM": 0.3180515594673225,
+        "ratio": 1.0055051106821689
+      },
+      {
+        "stitchId": "waistband-left-side+waistband-right-side",
+        "pieceIds": [
+          "waistband-back",
+          "waistband-front"
+        ],
+        "edgeCount": 6,
+        "restM": 0.05415803873186902,
+        "actualM": 0.05473630073694684,
+        "ratio": 1.0106773069819004
+      }
+    ],
+    "frontSkirtStageProfiles": [
+      {
+        "stage": "current-source",
+        "path": "Assets\\GenWorks\\siroino-lilac-lame-fencing-practice-set\\Source\\Blender\\SiroinoLilacLameFencingPracticeSet.blend",
+        "sha256": "b9fc32714f6df8ce7c8dbb87de0d234feebcfa2d63995dc15f50e4a7ded66ac0",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08727085590362549,
+            "maximumYM": -0.0867539569735527,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 4,
+            "minimumYM": -0.13927951455116272,
+            "maximumYM": -0.137931689620018,
+            "heightRangeM": [
+              0.7313538789749146,
+              0.7322629690170288
+            ]
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 10,
+            "minimumYM": -0.14157332479953766,
+            "maximumYM": -0.13929739594459534,
+            "heightRangeM": [
+              0.7099196910858154,
+              0.7270892262458801
+            ]
+          }
+        ]
+      },
+      {
+        "stage": "current-cloth",
+        "path": ".image2outfit\\products\\siroino-lilac-lame-fencing-practice-set\\cloth\\settled-prototype.blend",
+        "sha256": "3f6090f66fc7d9c651f0a04386584eb03984644a0fd41b897a280e014ef1fbf9",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08727085590362549,
+            "maximumYM": -0.0867539569735527,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 0,
+            "status": "NO_SAMPLES"
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 4,
+            "minimumYM": -0.13143444061279297,
+            "maximumYM": -0.12991294264793396,
+            "heightRangeM": [
+              0.7103314399719238,
+              0.7113317251205444
+            ]
+          }
+        ]
+      },
+      {
+        "stage": "current-weighted",
+        "path": ".image2outfit\\products\\siroino-lilac-lame-fencing-practice-set\\skin\\weighted-prototype.blend",
+        "sha256": "b14ce1303a5ea38afcd61cbe2296825d6408905ce3cf5ad1e8f70b4a2282b97d",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08727085590362549,
+            "maximumYM": -0.0867539569735527,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 0,
+            "status": "NO_SAMPLES"
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 4,
+            "minimumYM": -0.13143444061279297,
+            "maximumYM": -0.12991294264793396,
+            "heightRangeM": [
+              0.7103314399719238,
+              0.7113317251205444
+            ]
+          }
+        ]
+      },
+      {
+        "stage": "before-band-source",
+        "path": ".image2outfit\\products\\siroino-lilac-lame-fencing-practice-set\\evidence\\band-before\\5581de3eaa27\\SiroinoLilacLameFencingPracticeSet.blend",
+        "sha256": "d6c323a4594d72fcd694ade3b269722ce86f85292391ebcefeb3deb37f54288b",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 3,
+            "minimumYM": -0.13565698266029358,
+            "maximumYM": -0.13482050597667694,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 3,
+            "minimumYM": -0.13660775125026703,
+            "maximumYM": -0.13617867231369019,
+            "heightRangeM": [
+              0.7296794056892395,
+              0.7316843867301941
+            ]
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 8,
+            "minimumYM": -0.13868583738803864,
+            "maximumYM": -0.1353207379579544,
+            "heightRangeM": [
+              0.7107901573181152,
+              0.727794885635376
+            ]
+          }
+        ]
+      }
+    ],
+    "clothContract": {
+      "object": "pleated-overskirt",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 64,
+      "frameStart": 1,
+      "frameEnd": 16,
+      "pinMethod": "canonical shared seam vertices",
+      "preBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5495782494544983,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.006258426310523646,
+          "maximum": 0.10152793512679636
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 9,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "postBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5388612151145935,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.0062117264278640505,
+          "maximum": 0.07171586685581133
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 20,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "cacheBakedActual": true,
+      "preBakeMeshSha256": "d296686726a947f9097c0e22e0c8cc03c7f088a7ab93c912af4969d9cd3c6e9f",
+      "evaluatedFrameMeshSha256": "2aab00d2d66f2114b8f2bceaabaa66f8b4eb2500b85b565b13e5efce61cf3742",
+      "settledMeshSha256": "2aab00d2d66f2114b8f2bceaabaa66f8b4eb2500b85b565b13e5efce61cf3742",
+      "geometryChanged": true
+    },
+    "buildMetrics": {
+      "vertices": 7186,
+      "triangles": 13873,
+      "unweightedVertices": 7186,
+      "degenerateTriangles": 0
+    },
+    "directInspection": "Five views and six poses directly inspected. Corrected actual seam lengths verified but visible front protrusion/crumpling persists; no clear visual recovery. Source, cloth and weighted samples identify upper skirt contour discontinuity before cloth. Reject current appearance.",
+    "diagnosticCorrection": "Side seam lengths grouped by piece pair: both side seams must be summed in the 2D denominator. Earlier isolated-side totals are superseded by the grouped measurement report.",
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "grantsReleaseAcceptance": false
+  },
+  "jointWaistSkirtTransitionExperiment": {
+    "evidence": {
+      "config/products/siroino-lilac-lame-fencing-practice-set/assembly-pose.json": "8fd33e8e3f635ffecea978cd4963469e850f568390b080d176e0d8117b5c0364",
+      "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json": "68aab6310ef32f0f929011b4ea179f70e568239bd97dfb612a5b7e33efa4fbe6",
+      "config/products/siroino-lilac-lame-fencing-practice-set/construction.json": "ff4625340b9abcfb8b95ad6f27082df6350cadfb69d5114951428e5216ef7f24",
+      "tools/build_sewn_pattern_prototype.py": "a1dcdc4483666763719d5ac6d429cdcd303bb444c1906afef3b68105dba31b3a",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/waist-seam-measurement.py": "6068c730d22e4afb021f60604899bcdd1ea7678beaa4837664f65beff7d41d9d",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/waist-seam-336d920612f17988.json": "336d920612f17988cb81c857a4faa1805da135473908c2019f73aa35e1ea031c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json": "b1e333516883fef54d10df5f9ab3de2679e32c572316ac5d894d6bffca7021cc",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json": "c54cf5fe7f3ac371780e6f73d884cdeb2383d16f64bcb6c44424f24474ef69df",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json": "cb9db182c0b5748c83f518117238029f3ef4c6d76ff6e8c3368eaa6f1b968dcc",
+      ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend": "fb785b2a0df5e4449a90fa55c9d2ef8c1e4e4466645229bb04cc8bc31b59aaa1",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend": "838679c866044d2e81179a7b8ce1a87276146cabe500439d579d745ef5666e51"
+    },
+    "previousCandidateArchive": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/waist-transition-before/b158f117f7cf",
+    "method": "common-native-angle measured radial contour with smooth height blend",
+    "configuration": {
+      "method": "measured-horizontal-body-contour-radial-placement",
+      "pieceIds": [
+        "waistband-front",
+        "waistband-back",
+        "overskirt-front",
+        "overskirt-back"
+      ],
+      "bodyMeshNamePrefix": "SiroinoSotai_PC",
+      "sampleZM": [
+        0.6795782470703124,
+        0.6895782470703125,
+        0.6995782470703125,
+        0.7095782470703125,
+        0.7195782470703125,
+        0.7295782470703125,
+        0.7395782470703125,
+        0.7520782470703125,
+        0.7645782470703125
+      ],
+      "radialClearanceM": 0.01,
+      "outsideSampleRange": "hold-nearest-contour",
+      "evidenceBoundary": "One measured Neutral radial-contour placement for waistband and upper skirt, with common native angular coordinates about Hips. Smooth height blend across declared 60 mm waist transition; lower skirt/hem retains previous measured envelope/flare. 60 mm blend, 25 mm band and 10 mm radial clearance are explicit prototype hypotheses, not fit or rest-strain acceptance. No body faces copied. Large/Shape Keys, continuous clearance and motion remain unapproved.",
+      "angularOriginBlenderXYM": [
+        0,
+        -0.03788188099861145
+      ],
+      "heightBlendM": [
+        0.6795782470703124,
+        0.7395782470703125
+      ]
+    },
+    "selectedVertexCount": 1826,
+    "heightBlendSkippedVertexCount": 1162,
+    "positiveHeightBlendVertexCount": 664,
+    "angularSourceVerticesSha256": "d24b6b3037239526cbe59bd9ec2f817d363377ec7e1751932acec7ea48cfcb6a",
+    "sharedSeamMeasurements": [
+      {
+        "stitchId": "front-waistband-skirt",
+        "pieceIds": [
+          "overskirt-front",
+          "waistband-front"
+        ],
+        "edgeCount": 32,
+        "restM": 0.3163102366049094,
+        "actualM": 0.3208141654198809,
+        "ratio": 1.0142389600264412
+      },
+      {
+        "stitchId": "back-waistband-skirt",
+        "pieceIds": [
+          "overskirt-back",
+          "waistband-back"
+        ],
+        "edgeCount": 32,
+        "restM": 0.3163102366049094,
+        "actualM": 0.3115578011826187,
+        "ratio": 0.9849753979722548
+      },
+      {
+        "stitchId": "waistband-left-side+waistband-right-side",
+        "pieceIds": [
+          "waistband-back",
+          "waistband-front"
+        ],
+        "edgeCount": 6,
+        "restM": 0.05415803873186902,
+        "actualM": 0.05602700811528044,
+        "ratio": 1.0345095470067611
+      }
+    ],
+    "frontSkirtStageProfiles": [
+      {
+        "stage": "current-source",
+        "path": "Assets\\GenWorks\\siroino-lilac-lame-fencing-practice-set\\Source\\Blender\\SiroinoLilacLameFencingPracticeSet.blend",
+        "sha256": "838679c866044d2e81179a7b8ce1a87276146cabe500439d579d745ef5666e51",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08727085590362549,
+            "maximumYM": -0.0867539569735527,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08644607663154602,
+            "maximumYM": -0.08561021834611893,
+            "heightRangeM": [
+              0.7310829162597656,
+              0.7322629690170288
+            ]
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 13,
+            "minimumYM": -0.1076311469078064,
+            "maximumYM": -0.08641098439693451,
+            "heightRangeM": [
+              0.7099196910858154,
+              0.7288558483123779
+            ]
+          }
+        ]
+      },
+      {
+        "stage": "current-cloth",
+        "path": ".image2outfit\\products\\siroino-lilac-lame-fencing-practice-set\\cloth\\settled-prototype.blend",
+        "sha256": "3d00ccc0f16c9fa0eefde2e90af6452a34c72d17b05d628f9edf64f584be7e30",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08727085590362549,
+            "maximumYM": -0.0867539569735527,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08775460720062256,
+            "maximumYM": -0.08675283193588257,
+            "heightRangeM": [
+              0.7311100363731384,
+              0.7322076559066772
+            ]
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 9,
+            "minimumYM": -0.09760194271802902,
+            "maximumYM": -0.08778245002031326,
+            "heightRangeM": [
+              0.714004397392273,
+              0.728990912437439
+            ]
+          }
+        ]
+      },
+      {
+        "stage": "current-weighted",
+        "path": ".image2outfit\\products\\siroino-lilac-lame-fencing-practice-set\\skin\\weighted-prototype.blend",
+        "sha256": "fb785b2a0df5e4449a90fa55c9d2ef8c1e4e4466645229bb04cc8bc31b59aaa1",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08727085590362549,
+            "maximumYM": -0.0867539569735527,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08775460720062256,
+            "maximumYM": -0.08675283193588257,
+            "heightRangeM": [
+              0.7311100363731384,
+              0.7322076559066772
+            ]
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 9,
+            "minimumYM": -0.09760194271802902,
+            "maximumYM": -0.08778245002031326,
+            "heightRangeM": [
+              0.714004397392273,
+              0.728990912437439
+            ]
+          }
+        ]
+      },
+      {
+        "stage": "before-transition-source",
+        "path": ".image2outfit\\products\\siroino-lilac-lame-fencing-practice-set\\evidence\\waist-transition-before\\b158f117f7cf\\SiroinoLilacLameFencingPracticeSet.blend",
+        "sha256": "b9fc32714f6df8ce7c8dbb87de0d234feebcfa2d63995dc15f50e4a7ded66ac0",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 5,
+            "minimumYM": -0.08727085590362549,
+            "maximumYM": -0.0867539569735527,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 4,
+            "minimumYM": -0.13927951455116272,
+            "maximumYM": -0.137931689620018,
+            "heightRangeM": [
+              0.7313538789749146,
+              0.7322629690170288
+            ]
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 10,
+            "minimumYM": -0.14157332479953766,
+            "maximumYM": -0.13929739594459534,
+            "heightRangeM": [
+              0.7099196910858154,
+              0.7270892262458801
+            ]
+          }
+        ]
+      },
+      {
+        "stage": "before-band-source",
+        "path": ".image2outfit\\products\\siroino-lilac-lame-fencing-practice-set\\evidence\\band-before\\5581de3eaa27\\SiroinoLilacLameFencingPracticeSet.blend",
+        "sha256": "d6c323a4594d72fcd694ade3b269722ce86f85292391ebcefeb3deb37f54288b",
+        "bins": [
+          {
+            "region": "seam",
+            "vertexCount": 3,
+            "minimumYM": -0.13565698266029358,
+            "maximumYM": -0.13482050597667694,
+            "heightRangeM": [
+              0.7395782470703125,
+              0.7395782470703125
+            ]
+          },
+          {
+            "region": "first-10mm-below-seam",
+            "vertexCount": 3,
+            "minimumYM": -0.13660775125026703,
+            "maximumYM": -0.13617867231369019,
+            "heightRangeM": [
+              0.7296794056892395,
+              0.7316843867301941
+            ]
+          },
+          {
+            "region": "10-to-30mm-below-seam",
+            "vertexCount": 8,
+            "minimumYM": -0.13868583738803864,
+            "maximumYM": -0.1353207379579544,
+            "heightRangeM": [
+              0.7107901573181152,
+              0.727794885635376
+            ]
+          }
+        ]
+      }
+    ],
+    "clothContract": {
+      "object": "pleated-overskirt",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 64,
+      "frameStart": 1,
+      "frameEnd": 16,
+      "pinMethod": "canonical shared seam vertices",
+      "preBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5495782494544983,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.006147975058411248,
+          "maximum": 0.10152793512679636
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 25,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "postBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.540926992893219,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.006196651183927315,
+          "maximum": 0.07414044882170856
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 48,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "cacheBakedActual": true,
+      "preBakeMeshSha256": "ba9d80e7c5ce03a892f036fdddcd59f4d162f8ed45e9932db508227d2bf8e3c4",
+      "evaluatedFrameMeshSha256": "c6b819f4da7ab7a45d234fc7443b93c1a86f67209661e8ef4fbd03399560a1dc",
+      "settledMeshSha256": "c6b819f4da7ab7a45d234fc7443b93c1a86f67209661e8ef4fbd03399560a1dc",
+      "geometryChanged": true
+    },
+    "buildMetrics": {
+      "vertices": 7186,
+      "triangles": 13873,
+      "unweightedVertices": 7186,
+      "degenerateTriangles": 0
+    },
+    "referenceDirectlyInspected": true,
+    "directInspection": "Five views and six poses directly inspected. Former abrupt front waist step absent in source, cloth and weighted samples; upper waist transition smoother. Lower front protrusion and irregular folds still visible, sit/crouch hem lift unresolved. Reference ordered pleats absent. Reject complete appearance.",
+    "restLengthPreservingArclengthImplemented": false,
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "grantsReleaseAcceptance": false
+  },
+  "skirtFoldSeedExperiment": {
+    "buildReport": {
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+      "sha256": "e0e3c195cf8ec03830ad58d92a77e9c356dd1d5eb1b93475e1927687896e64e1"
+    },
+    "manufacturer": {
+      "path": "tools/build_sewn_pattern_prototype.py",
+      "sha256": "3248b4fe06143a19baefa5c2ccdec2d009e6d28f2d33b8676dcfb13797e09125"
+    },
+    "pattern": {
+      "path": "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json",
+      "sha256": "9b457e3e7cec2c917300190874e6b06acb19fd08eace7644ece51300c7faf02c"
+    },
+    "assemblyPose": {
+      "path": "config/products/siroino-lilac-lame-fencing-practice-set/assembly-pose.json",
+      "sha256": "d9f53b1d759d4e2ce84c3a0d0af1c0890924c0f38b5199fec6f69652c7680232"
+    },
+    "construction": {
+      "path": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
+      "sha256": "ff4625340b9abcfb8b95ad6f27082df6350cadfb69d5114951428e5216ef7f24"
+    },
+    "source": {
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
+      "sha256": "3be795a60f7f3c2277a51035e6ef73916e37a799898b2221058dedaf74b0575e"
+    },
+    "weightedRender": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
+      "sha256": "8316b33b74e8e48398d09964f42b4126d88be98207d73703d858ad4c221a53b1"
+    },
+    "clothReport": {
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json",
+      "sha256": "ebcd68a160f6799a7ffe99fd98717dab26a873582248c6f6b5a464440cef7029"
+    },
+    "sectionMeasurement": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-sections-8511078343f46558.json",
+      "sha256": "8511078343f4655827db4c2bfdd1a1a0cee17f56f27283fe36ed44b339d367bd"
+    },
+    "sectionMeasurementScript": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-section-measurement.py",
+      "sha256": "773159fb6bc4420cfd546cd0c13bfbd1ad9b8e74cd66f68f92a304c85439471c"
+    },
+    "previousCandidateDirectory": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/pleat-before/8fd33e8e3f63",
+    "foldPlacement": {
+      "applied": true,
+      "configuration": {
+        "method": "outward-triangular-radial-fold-seed",
+        "pieceIds": [
+          "overskirt-front",
+          "overskirt-back"
+        ],
+        "axisOriginBlenderXYM": [
+          0,
+          -0.03788188099861145
+        ],
+        "waistZM": 0.7395782470703125,
+        "hemZM": 0.5495782470703126,
+        "foldCount": 12,
+        "hemFoldDepthM": 0.012,
+        "phaseRadians": 0,
+        "evidenceBoundary": "Twelve full-circumference folds and 12 mm outward hem depth are explicit design hypotheses from ordered folds in the directly inspected four-view reference, not an exact inferred fold count. Fold depth grows linearly from zero at the sewn waistband; shared seam vertices move once. No body faces copied. Flat pattern hem adds computed triangular radial-fold intake; intermediate rest strain, cloth retention, clearance and fit remain unapproved."
+      },
+      "selectedVertexCount": 1814,
+      "movedVertexCount": 1750,
+      "maximumRadialDisplacementM": 0.01172093023255815,
+      "minimumTriangleAreaM2": 1.0472661275604241e-07,
+      "beforeVerticesSha256": "c6c63c75c5e6b91ac1e48c085851195a154a682753ca98a59d388b5a868347f4",
+      "afterVerticesSha256": "f621f13f4d2ad02978075a782e78ef789d0838b9310d1c33324396764b89ebce",
+      "canonicalFacesChanged": false,
+      "sewnWaistDisplacementM": 0,
+      "grantsFitAcceptance": false,
+      "grantsVisualAcceptance": false
+    },
+    "metrics": {
+      "vertices": 7332,
+      "triangles": 14155,
+      "unweightedVertices": 7332,
+      "degenerateTriangles": 0
+    },
+    "flatHemCircumferenceM": 0.8481288461277137,
+    "addedHemIntakeM": 0.08812884612771366,
+    "sectionMetrics": [
+      {
+        "stage": "source",
+        "sections": [
+          {
+            "zM": 0.5695782470703125,
+            "outerRayCircumferenceM": 0.822125989768343,
+            "allSectionSegmentLengthM": 0.8232818495156781,
+            "flatPatternRowCircumferenceM": 0.8254437542416195,
+            "outerRayToFlatRatio": 0.9959806292600459,
+            "foldCountRadialHarmonicAmplitudeM": 0.004164395574615069
+          },
+          {
+            "zM": 0.6195782470703125,
+            "outerRayCircumferenceM": 0.7952208953953002,
+            "allSectionSegmentLengthM": 0.7958918848009876,
+            "flatPatternRowCircumferenceM": 0.7687310245263841,
+            "outerRayToFlatRatio": 1.0344592191855877,
+            "foldCountRadialHarmonicAmplitudeM": 0.0023204544906171845
+          },
+          {
+            "zM": 0.6695782470703125,
+            "outerRayCircumferenceM": 0.7797203216975004,
+            "allSectionSegmentLengthM": 0.7801802159875185,
+            "flatPatternRowCircumferenceM": 0.7120182948111485,
+            "outerRayToFlatRatio": 1.0950846732165902,
+            "foldCountRadialHarmonicAmplitudeM": 0.0015082809966233631
+          },
+          {
+            "zM": 0.7295782470703125,
+            "outerRayCircumferenceM": 0.6523099895906264,
+            "allSectionSegmentLengthM": 0.6527109078450274,
+            "flatPatternRowCircumferenceM": 0.6439630191528659,
+            "outerRayToFlatRatio": 1.0129618785388343,
+            "foldCountRadialHarmonicAmplitudeM": 0.0002750056121089205
+          }
+        ]
+      },
+      {
+        "stage": "cloth",
+        "sections": [
+          {
+            "zM": 0.5695782470703125,
+            "outerRayCircumferenceM": 0.8152177630752498,
+            "allSectionSegmentLengthM": 0.8203229352330633,
+            "flatPatternRowCircumferenceM": 0.8254437542416195,
+            "outerRayToFlatRatio": 0.9876115227550969,
+            "foldCountRadialHarmonicAmplitudeM": 0.0022206850650821563
+          },
+          {
+            "zM": 0.6195782470703125,
+            "outerRayCircumferenceM": 0.7908673739021514,
+            "allSectionSegmentLengthM": 0.7938470692688355,
+            "flatPatternRowCircumferenceM": 0.7687310245263841,
+            "outerRayToFlatRatio": 1.0287959620068743,
+            "foldCountRadialHarmonicAmplitudeM": 0.001873393179583931
+          },
+          {
+            "zM": 0.6695782470703125,
+            "outerRayCircumferenceM": 0.7740837901866335,
+            "allSectionSegmentLengthM": 0.7772220173321407,
+            "flatPatternRowCircumferenceM": 0.7120182948111485,
+            "outerRayToFlatRatio": 1.0871683997838102,
+            "foldCountRadialHarmonicAmplitudeM": 0.001790490431900188
+          },
+          {
+            "zM": 0.7295782470703125,
+            "outerRayCircumferenceM": 0.6525231381038964,
+            "allSectionSegmentLengthM": 0.65307555954332,
+            "flatPatternRowCircumferenceM": 0.6439630191528659,
+            "outerRayToFlatRatio": 1.0132928734980642,
+            "foldCountRadialHarmonicAmplitudeM": 0.0002039855463479677
+          }
+        ]
+      },
+      {
+        "stage": "weighted",
+        "sections": [
+          {
+            "zM": 0.5695782470703125,
+            "outerRayCircumferenceM": 0.8152177630752498,
+            "allSectionSegmentLengthM": 0.8203229352330633,
+            "flatPatternRowCircumferenceM": 0.8254437542416195,
+            "outerRayToFlatRatio": 0.9876115227550969,
+            "foldCountRadialHarmonicAmplitudeM": 0.0022206850650821563
+          },
+          {
+            "zM": 0.6195782470703125,
+            "outerRayCircumferenceM": 0.7908673739021514,
+            "allSectionSegmentLengthM": 0.7938470692688355,
+            "flatPatternRowCircumferenceM": 0.7687310245263841,
+            "outerRayToFlatRatio": 1.0287959620068743,
+            "foldCountRadialHarmonicAmplitudeM": 0.001873393179583931
+          },
+          {
+            "zM": 0.6695782470703125,
+            "outerRayCircumferenceM": 0.7740837901866335,
+            "allSectionSegmentLengthM": 0.7772220173321407,
+            "flatPatternRowCircumferenceM": 0.7120182948111485,
+            "outerRayToFlatRatio": 1.0871683997838102,
+            "foldCountRadialHarmonicAmplitudeM": 0.001790490431900188
+          },
+          {
+            "zM": 0.7295782470703125,
+            "outerRayCircumferenceM": 0.6525231381038964,
+            "allSectionSegmentLengthM": 0.65307555954332,
+            "flatPatternRowCircumferenceM": 0.6439630191528659,
+            "outerRayToFlatRatio": 1.0132928734980642,
+            "foldCountRadialHarmonicAmplitudeM": 0.0002039855463479677
+          }
+        ]
+      }
+    ],
+    "directInspection": "Five current views and six current poses directly inspected. Small longitudinal folds visible especially at back/right, but skirt remains narrow with irregular front rumpling instead of reference flared ordered pleats. Sit/crouch front hem lifts and shorts coverage remains unresolved. Improved cuffs retained; underarm folds, tall collar, closure, piping/quilt materials, Large Shape Keys and runtime remain unaccepted.",
+    "evidenceBoundary": "Horizontal neutral base-mesh sections using canonical skirt face ownership. Outermost intersections and radial harmonic are diagnostic, not fold count proof, cloth strain, continuous penetration, pose or fit acceptance. Flat trapezoid rows are canonical 2D lengths; cloth uses initial 3D mesh rest lengths.",
+    "restLengthPreservingFoldMappingImplemented": false,
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "grantsReleaseAcceptance": false
+  },
+  "skirtMidRowCurveExperiment": {
+    "pattern": {
+      "path": "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json",
+      "sha256": "dfc1d129ab6374d881a7466f9187de3343e7164626d0720a9dcab0aad2514b40"
+    },
+    "assemblyPose": {
+      "path": "config/products/siroino-lilac-lame-fencing-practice-set/assembly-pose.json",
+      "sha256": "789256c0c8f08c411a7bcb872c311327fedec03bd6e1884322e31e781df72409"
+    },
+    "nativeManufacturer": {
+      "path": "tools/run_garmentcode_boxmesh_audit.py",
+      "sha256": "0a02e4c50e0391c1890246b4a1dea64685b948d92c0f16479451b061a3e00c73"
+    },
+    "sourceManufacturer": {
+      "path": "tools/build_sewn_pattern_prototype.py",
+      "sha256": "3248b4fe06143a19baefa5c2ccdec2d009e6d28f2d33b8676dcfb13797e09125"
+    },
+    "buildReport": {
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+      "sha256": "786f6f17a6f49735494365a30abeb476d42937ca515f79d62ac7483a735541c0"
+    },
+    "clothReport": {
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json",
+      "sha256": "e40c098087acf8972b2fe3f91a740d88e0796cb499261bc252b263ffe92280bc"
+    },
+    "weightedRender": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
+      "sha256": "9f1b81b962341607dd15a7ebab5afc4cc9d2bfbbd06a080deb045cab012a803c"
+    },
+    "sectionMeasurement": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-sections-e53309b03920daf8.json",
+      "sha256": "e53309b03920daf876f321dd9042599bbb528e93216090d5ff5667e85e5c6d28"
+    },
+    "sectionMeasurementScript": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-section-measurement.py",
+      "sha256": "2d3e39976f47f8913e1330f6c526ad292e3255cd99f5fe053482982482a3edc8"
+    },
+    "previousCandidateDirectory": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/midrow-before/9b457e3e7cec",
+    "method": "Matched mirrored quadratic side curves with exact quadratic half-width placement; waist and hem widths unchanged. Control inferred from prior actual source middle section. No crease edges or cloth rest-shape linkage implemented.",
+    "halfWidthQuadraticControlM": [
+      0.1581551183024547,
+      0.22146335495584196,
+      0.21203221153192842
+    ],
+    "previousSourceToFlatMiddleRatio": 1.0950846732165902,
+    "currentSourceToFlatMiddleRatio": 1.000694868176273,
+    "currentClothToFlatMiddleRatio": 0.9911072561128346,
+    "nearHemHarmonicBeforeClothM": 0.004147182391846573,
+    "nearHemHarmonicAfterClothM": 0.0014687398770913559,
+    "sectionMetrics": [
+      {
+        "stage": "source",
+        "sections": [
+          {
+            "zM": 0.5695782470703125,
+            "outerRayCircumferenceM": 0.8207683644218579,
+            "allSectionSegmentLengthM": 0.8219961369327845,
+            "flatPatternRowCircumferenceM": 0.8528469556003809,
+            "outerRayToFlatRatio": 0.962386462227633,
+            "foldCountRadialHarmonicAmplitudeM": 0.004147182391846573
+          },
+          {
+            "zM": 0.6195782470703125,
+            "outerRayCircumferenceM": 0.7942661808436378,
+            "allSectionSegmentLengthM": 0.7948458711553956,
+            "flatPatternRowCircumferenceM": 0.836433051412736,
+            "outerRayToFlatRatio": 0.9495872736044105,
+            "foldCountRadialHarmonicAmplitudeM": 0.0022646113292195927
+          },
+          {
+            "zM": 0.6695782470703125,
+            "outerRayCircumferenceM": 0.7802621245354415,
+            "allSectionSegmentLengthM": 0.7808209248293922,
+            "flatPatternRowCircumferenceM": 0.7797203216975005,
+            "outerRayToFlatRatio": 1.000694868176273,
+            "foldCountRadialHarmonicAmplitudeM": 0.0015812647713099666
+          },
+          {
+            "zM": 0.7295782470703125,
+            "outerRayCircumferenceM": 0.6522128724868432,
+            "allSectionSegmentLengthM": 0.6526715738262363,
+            "flatPatternRowCircumferenceM": 0.6584705963427986,
+            "outerRayToFlatRatio": 0.9904965781453093,
+            "foldCountRadialHarmonicAmplitudeM": 0.00031516942644111383
+          }
+        ]
+      },
+      {
+        "stage": "cloth",
+        "sections": [
+          {
+            "zM": 0.5695782470703125,
+            "outerRayCircumferenceM": 0.8120422087592951,
+            "allSectionSegmentLengthM": 0.8198441601056595,
+            "flatPatternRowCircumferenceM": 0.8528469556003809,
+            "outerRayToFlatRatio": 0.9521546667041094,
+            "foldCountRadialHarmonicAmplitudeM": 0.0014687398770913559
+          },
+          {
+            "zM": 0.6195782470703125,
+            "outerRayCircumferenceM": 0.7875658186721998,
+            "allSectionSegmentLengthM": 0.7936465720998022,
+            "flatPatternRowCircumferenceM": 0.836433051412736,
+            "outerRayToFlatRatio": 0.9415766358610537,
+            "foldCountRadialHarmonicAmplitudeM": 0.0009986447593241306
+          },
+          {
+            "zM": 0.6695782470703125,
+            "outerRayCircumferenceM": 0.7727864685730264,
+            "allSectionSegmentLengthM": 0.7776593096957385,
+            "flatPatternRowCircumferenceM": 0.7797203216975005,
+            "outerRayToFlatRatio": 0.9911072561128346,
+            "foldCountRadialHarmonicAmplitudeM": 0.0016704565941681939
+          },
+          {
+            "zM": 0.7295782470703125,
+            "outerRayCircumferenceM": 0.65249380116917,
+            "allSectionSegmentLengthM": 0.6530124211986552,
+            "flatPatternRowCircumferenceM": 0.6584705963427986,
+            "outerRayToFlatRatio": 0.9909232163033183,
+            "foldCountRadialHarmonicAmplitudeM": 0.00032826434181870305
+          }
+        ]
+      },
+      {
+        "stage": "weighted",
+        "sections": [
+          {
+            "zM": 0.5695782470703125,
+            "outerRayCircumferenceM": 0.8120422087592951,
+            "allSectionSegmentLengthM": 0.8198441601056595,
+            "flatPatternRowCircumferenceM": 0.8528469556003809,
+            "outerRayToFlatRatio": 0.9521546667041094,
+            "foldCountRadialHarmonicAmplitudeM": 0.0014687398770913559
+          },
+          {
+            "zM": 0.6195782470703125,
+            "outerRayCircumferenceM": 0.7875658186721998,
+            "allSectionSegmentLengthM": 0.7936465720998022,
+            "flatPatternRowCircumferenceM": 0.836433051412736,
+            "outerRayToFlatRatio": 0.9415766358610537,
+            "foldCountRadialHarmonicAmplitudeM": 0.0009986447593241306
+          },
+          {
+            "zM": 0.6695782470703125,
+            "outerRayCircumferenceM": 0.7727864685730264,
+            "allSectionSegmentLengthM": 0.7776593096957385,
+            "flatPatternRowCircumferenceM": 0.7797203216975005,
+            "outerRayToFlatRatio": 0.9911072561128346,
+            "foldCountRadialHarmonicAmplitudeM": 0.0016704565941681939
+          },
+          {
+            "zM": 0.7295782470703125,
+            "outerRayCircumferenceM": 0.65249380116917,
+            "allSectionSegmentLengthM": 0.6530124211986552,
+            "flatPatternRowCircumferenceM": 0.6584705963427986,
+            "outerRayToFlatRatio": 0.9909232163033183,
+            "foldCountRadialHarmonicAmplitudeM": 0.00032826434181870305
+          }
+        ]
+      }
+    ],
+    "metrics": {
+      "vertices": 7434,
+      "triangles": 14359,
+      "unweightedVertices": 7434,
+      "degenerateTriangles": 0
+    },
+    "clothContract": {
+      "object": "pleated-overskirt",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 64,
+      "frameStart": 1,
+      "frameEnd": 16,
+      "pinMethod": "canonical shared seam vertices",
+      "preBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5495782494544983,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.006258426310523646,
+          "maximum": 0.1010019603127148
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 7,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "postBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5350752472877502,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.0061716769845929775,
+          "maximum": 0.0668722108239308
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 34,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "cacheBakedActual": true,
+      "preBakeMeshSha256": "86affec45351fb557e87b79670b63c54492dcf9788b17c675fb21d5a7fb692ee",
+      "evaluatedFrameMeshSha256": "8bbe0ac2650c5e0fc517f378df35a33c90cf8817881a72197c28770e5bfb4df2",
+      "settledMeshSha256": "8bbe0ac2650c5e0fc517f378df35a33c90cf8817881a72197c28770e5bfb4df2",
+      "geometryChanged": true
+    },
+    "directInspection": "Five current views and six current poses directly inspected. Narrow skirt silhouette, irregular front/hip rumpling and lack of reference ordered flared pleats persist. Sit/crouch hem lift and incomplete shorts coverage remain rejected. Sleeve/cuff improvement retained; underarm folds and tall collar unresolved. Curved mid-row pattern alone did not produce acceptable pleats. Closure, piping/quilt materials, Large Shape Keys and runtime remain unaccepted.",
+    "evidenceBoundary": "Horizontal neutral base-mesh sections using canonical skirt face ownership. Outermost intersections and radial harmonic are diagnostic, not fold count proof, cloth strain, continuous penetration, pose or fit acceptance. Flat rows are canonical 2D lengths, with quadratic side control agreement checked when declared; cloth uses initial 3D mesh rest lengths.",
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "grantsReleaseAcceptance": false
+  },
+  "canonicalClothRestShapeExperiment": {
+    "status": "FAILED_NO_OBSERVED_SOLVER_EFFECT",
+    "construction": {
+      "path": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
+      "sha256": "ccd834651135ba63444160a032665655e24b10f05cbc05a5ccb2772b9703ed45"
+    },
+    "schema": {
+      "path": "config/products/construction.schema.v1.json",
+      "sha256": "dd2bba11cc050e3d5b7a8745fbba0fed90a3fec0acf056c2ab2a29a326ee1852"
+    },
+    "clothImplementation": {
+      "path": "tools/blender_cloth_simulation.py",
+      "sha256": "1130d116f5465b1cfb62c8e1ba93eecfbff0fa7191e697959151303b2515dcf6"
+    },
+    "clothReport": {
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json",
+      "sha256": "d30f71d6492cd52b5e3129173c5fe00338c0e9ddce5db414d9b6cfd7fafea6df"
+    },
+    "sectionMeasurement": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-sections-c296396dbfe7a8b6.json",
+      "sha256": "c296396dbfe7a8b676db0a4263fffe910efc2dfd11abc0ae0c5d60e4e4292ff8"
+    },
+    "weightedRender": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
+      "sha256": "595adf41f8ecc26cbe486a418e89167c6ff5186eb019c5a908d304be6f86db18"
+    },
+    "previousClothReport": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/restkey-before/ff4625340b9a/cloth-simulation.json",
+      "sha256": "e40c098087acf8972b2fe3f91a740d88e0796cb499261bc252b263ffe92280bc"
+    },
+    "firstNoEffectClothReport": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/restkey-no-effect-b63b91c085573850.json",
+      "sha256": "b63b91c08557385076f103e1970d65dd93def8975c0f161ce5ba6a3c7daa4759"
+    },
+    "contract": {
+      "object": "pleated-overskirt",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 64,
+      "frameStart": 1,
+      "frameEnd": 16,
+      "canonicalRestShape": {
+        "method": "canonical-row-circumference-rest-springs",
+        "shapeKey": "Canonical Fabric Rest Springs",
+        "shapeKeyValue": 0.0,
+        "movedRestVertexCount": 1852,
+        "sewnWaistRestDisplacementM": 0,
+        "rows": [
+          {
+            "zM": 0.5495882470703125,
+            "sourceSectionCircumferenceM": 0.8386167982661564,
+            "canonicalFlatCircumferenceM": 0.8481328163294946,
+            "radialRestScale": 1.011347278140639
+          },
+          {
+            "zM": 0.5544595291215946,
+            "sourceSectionCircumferenceM": 0.8356799514217303,
+            "canonicalFlatCircumferenceM": 0.8498751676831313,
+            "radialRestScale": 1.0169864267262256
+          },
+          {
+            "zM": 0.5593308111728766,
+            "sourceSectionCircumferenceM": 0.8322450306808562,
+            "canonicalFlatCircumferenceM": 0.8512350124367438,
+            "radialRestScale": 1.0228177772841154
+          },
+          {
+            "zM": 0.5642020932241587,
+            "sourceSectionCircumferenceM": 0.8270770254063933,
+            "canonicalFlatCircumferenceM": 0.8522123505903323,
+            "radialRestScale": 1.0303905493827354
+          },
+          {
+            "zM": 0.5690733752754407,
+            "sourceSectionCircumferenceM": 0.8224708389737654,
+            "canonicalFlatCircumferenceM": 0.8528071821438967,
+            "radialRestScale": 1.036884399704655
+          },
+          {
+            "zM": 0.5739446573267227,
+            "sourceSectionCircumferenceM": 0.8178933582256318,
+            "canonicalFlatCircumferenceM": 0.8530195070974371,
+            "radialRestScale": 1.0429471012553633
+          },
+          {
+            "zM": 0.5788159393780048,
+            "sourceSectionCircumferenceM": 0.813098822523752,
+            "canonicalFlatCircumferenceM": 0.8528493254509534,
+            "radialRestScale": 1.048887665098101
+          },
+          {
+            "zM": 0.5836872214292869,
+            "sourceSectionCircumferenceM": 0.8090922686066593,
+            "canonicalFlatCircumferenceM": 0.8522966372044456,
+            "radialRestScale": 1.0533985680918552
+          },
+          {
+            "zM": 0.5885585034805689,
+            "sourceSectionCircumferenceM": 0.8061123529937265,
+            "canonicalFlatCircumferenceM": 0.8513614423579137,
+            "radialRestScale": 1.056132484753697
+          },
+          {
+            "zM": 0.593429785531851,
+            "sourceSectionCircumferenceM": 0.8039047949311721,
+            "canonicalFlatCircumferenceM": 0.8500437409113578,
+            "radialRestScale": 1.0573935449459984
+          },
+          {
+            "zM": 0.5983010675831331,
+            "sourceSectionCircumferenceM": 0.801905359888071,
+            "canonicalFlatCircumferenceM": 0.8483435328647778,
+            "radialRestScale": 1.057909792476245
+          },
+          {
+            "zM": 0.603172349634415,
+            "sourceSectionCircumferenceM": 0.7989120981536746,
+            "canonicalFlatCircumferenceM": 0.8462608182181738,
+            "radialRestScale": 1.0592664952426236
+          },
+          {
+            "zM": 0.6080436316856971,
+            "sourceSectionCircumferenceM": 0.7972020827258111,
+            "canonicalFlatCircumferenceM": 0.8437955969715456,
+            "radialRestScale": 1.058446302707114
+          },
+          {
+            "zM": 0.6129149137369792,
+            "sourceSectionCircumferenceM": 0.7963155594441222,
+            "canonicalFlatCircumferenceM": 0.8409478691248933,
+            "radialRestScale": 1.056048521407678
+          },
+          {
+            "zM": 0.6177861957882612,
+            "sourceSectionCircumferenceM": 0.7951342536056536,
+            "canonicalFlatCircumferenceM": 0.837717634678217,
+            "radialRestScale": 1.0535549573917395
+          },
+          {
+            "zM": 0.6226574778395433,
+            "sourceSectionCircumferenceM": 0.79455260915275,
+            "canonicalFlatCircumferenceM": 0.8341048936315166,
+            "radialRestScale": 1.0497793148284318
+          },
+          {
+            "zM": 0.6275287598908253,
+            "sourceSectionCircumferenceM": 0.794122947620688,
+            "canonicalFlatCircumferenceM": 0.8301096459847921,
+            "radialRestScale": 1.0453162806488916
+          },
+          {
+            "zM": 0.6324000419421074,
+            "sourceSectionCircumferenceM": 0.7932942979432462,
+            "canonicalFlatCircumferenceM": 0.8257318917380436,
+            "radialRestScale": 1.0408897352204567
+          },
+          {
+            "zM": 0.6372713239933894,
+            "sourceSectionCircumferenceM": 0.7934065026915696,
+            "canonicalFlatCircumferenceM": 0.8209716308912712,
+            "radialRestScale": 1.0347427555813937
+          },
+          {
+            "zM": 0.6421426060446714,
+            "sourceSectionCircumferenceM": 0.7926325179078852,
+            "canonicalFlatCircumferenceM": 0.8158288634444746,
+            "radialRestScale": 1.0292649431010161
+          },
+          {
+            "zM": 0.6470138880959535,
+            "sourceSectionCircumferenceM": 0.7911196324934432,
+            "canonicalFlatCircumferenceM": 0.8103035893976537,
+            "radialRestScale": 1.0242491225299855
+          },
+          {
+            "zM": 0.6518851701472356,
+            "sourceSectionCircumferenceM": 0.7904377312737392,
+            "canonicalFlatCircumferenceM": 0.804395808750809,
+            "radialRestScale": 1.0176586680073803
+          },
+          {
+            "zM": 0.6567564521985176,
+            "sourceSectionCircumferenceM": 0.7882556163789011,
+            "canonicalFlatCircumferenceM": 0.7981055215039401,
+            "radialRestScale": 1.0124958261259052
+          },
+          {
+            "zM": 0.6616277342497997,
+            "sourceSectionCircumferenceM": 0.7851451248789058,
+            "canonicalFlatCircumferenceM": 0.791432727657047,
+            "radialRestScale": 1.0080082045712389
+          },
+          {
+            "zM": 0.6664990163010818,
+            "sourceSectionCircumferenceM": 0.7824079300359468,
+            "canonicalFlatCircumferenceM": 0.7843774272101299,
+            "radialRestScale": 1.0025172254760923
+          },
+          {
+            "zM": 0.6713702983523637,
+            "sourceSectionCircumferenceM": 0.7797438026677975,
+            "canonicalFlatCircumferenceM": 0.776939620163189,
+            "radialRestScale": 0.9964037129951987
+          },
+          {
+            "zM": 0.6762415804036458,
+            "sourceSectionCircumferenceM": 0.7768470608978953,
+            "canonicalFlatCircumferenceM": 0.7691193065162238,
+            "radialRestScale": 0.9900524121533786
+          },
+          {
+            "zM": 0.6811128624549279,
+            "sourceSectionCircumferenceM": 0.7729837276203273,
+            "canonicalFlatCircumferenceM": 0.7609164862692345,
+            "radialRestScale": 0.9843887511212656
+          },
+          {
+            "zM": 0.6859841445062099,
+            "sourceSectionCircumferenceM": 0.7653097830577078,
+            "canonicalFlatCircumferenceM": 0.7523311594222213,
+            "radialRestScale": 0.9830413462328524
+          },
+          {
+            "zM": 0.690855426557492,
+            "sourceSectionCircumferenceM": 0.7532032974863647,
+            "canonicalFlatCircumferenceM": 0.7433633259751837,
+            "radialRestScale": 0.986935835857305
+          },
+          {
+            "zM": 0.6957267086087741,
+            "sourceSectionCircumferenceM": 0.7384780470471461,
+            "canonicalFlatCircumferenceM": 0.7340129859281223,
+            "radialRestScale": 0.99395369823534
+          },
+          {
+            "zM": 0.700597990660056,
+            "sourceSectionCircumferenceM": 0.7228795154152,
+            "canonicalFlatCircumferenceM": 0.7242801392810371,
+            "radialRestScale": 1.0019375619808961
+          },
+          {
+            "zM": 0.7054692727113381,
+            "sourceSectionCircumferenceM": 0.7077916716178091,
+            "canonicalFlatCircumferenceM": 0.7141647860339272,
+            "radialRestScale": 1.0090042235189784
+          },
+          {
+            "zM": 0.7103405547626201,
+            "sourceSectionCircumferenceM": 0.6938305739182467,
+            "canonicalFlatCircumferenceM": 0.7036669261867937,
+            "radialRestScale": 1.0141768792530985
+          },
+          {
+            "zM": 0.7152118368139022,
+            "sourceSectionCircumferenceM": 0.6817325740228976,
+            "canonicalFlatCircumferenceM": 0.6927865597396357,
+            "radialRestScale": 1.016214548252416
+          },
+          {
+            "zM": 0.7200831188651843,
+            "sourceSectionCircumferenceM": 0.6713219937193927,
+            "canonicalFlatCircumferenceM": 0.681523686692454,
+            "radialRestScale": 1.0151964229810793
+          },
+          {
+            "zM": 0.7249544009164663,
+            "sourceSectionCircumferenceM": 0.6617253502277155,
+            "canonicalFlatCircumferenceM": 0.669878307045248,
+            "radialRestScale": 1.0123207563602132
+          },
+          {
+            "zM": 0.7298256829677483,
+            "sourceSectionCircumferenceM": 0.652215003541022,
+            "canonicalFlatCircumferenceM": 0.6578504207980181,
+            "radialRestScale": 1.00864042873347
+          },
+          {
+            "zM": 0.7346969650190305,
+            "sourceSectionCircumferenceM": 0.6424755045282959,
+            "canonicalFlatCircumferenceM": 0.6454400279507639,
+            "radialRestScale": 1.004614220155591
+          },
+          {
+            "zM": 0.7395682470703124,
+            "sourceSectionCircumferenceM": 0.632392664952433,
+            "canonicalFlatCircumferenceM": 0.6326471285034859,
+            "radialRestScale": 1.0004023821988386
+          }
+        ],
+        "restToInitialEdgeRatio": {
+          "minimum": 0.9280623305163599,
+          "maximum": 1.0741879647293089,
+          "mean": 1.0140175479261848,
+          "edgeCount": 5598
+        },
+        "restCoordinatesSha256": "69207bfad594aa31d75ae6cffcf06fb3c0602cec9cae4ba45c0b9d60132b2956",
+        "patternSha256": "dfc1d129ab6374d881a7466f9187de3343e7164626d0720a9dcab0aad2514b40",
+        "assemblyPoseSha256": "789256c0c8f08c411a7bcb872c311327fedec03bd6e1884322e31e781df72409",
+        "grantsFitAcceptance": false,
+        "evidenceBoundary": "Prototype spring rest shape scales neutral source rings to canonical quadratic flat row circumferences; no crease topology, exact 2D isometry, fit or appearance acceptance. Longitudinal rest edges also change and must be measured.",
+        "nativeRestShapeKeyBound": true,
+        "initializationOrder": "rest key created before Cloth modifier",
+        "settledCapture": "actual evaluated native Cloth mesh"
+      },
+      "pinMethod": "canonical shared seam vertices",
+      "preBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5495782494544983,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.006258426310523646,
+          "maximum": 0.1010019603127148
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 7,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "postBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.5350752472877502,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.0061716769845929775,
+          "maximum": 0.0668722108239308
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 34,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "cacheBakedActual": true,
+      "preBakeMeshSha256": "86affec45351fb557e87b79670b63c54492dcf9788b17c675fb21d5a7fb692ee",
+      "evaluatedFrameMeshSha256": "8bbe0ac2650c5e0fc517f378df35a33c90cf8817881a72197c28770e5bfb4df2",
+      "settledMeshSha256": "8bbe0ac2650c5e0fc517f378df35a33c90cf8817881a72197c28770e5bfb4df2",
+      "geometryChanged": true
+    },
+    "previousSettledMeshSha256": "8bbe0ac2650c5e0fc517f378df35a33c90cf8817881a72197c28770e5bfb4df2",
+    "currentSettledMeshSha256": "8bbe0ac2650c5e0fc517f378df35a33c90cf8817881a72197c28770e5bfb4df2",
+    "sameActualSettledMesh": true,
+    "nativeSettingBound": true,
+    "actualSolverRestCoordinateConsumption": "UNVERIFIED",
+    "attemptedRepair": "Create rest key before Cloth modifier and reset frames 0 to 1 before bake; output still identical. No more unchanged rebakes.",
+    "observedSchemaFailureAuditPath": ".image2outfit/audit/siroino-lilac-lame-fencing-practice-set/38c6b4149c5a41aeb48c7a7a33861725/manifest.json",
+    "directInspection": "Five current views and six current poses directly inspected after rest-key initialization-order retry. Narrow irregularly rumpled skirt persists; reference ordered pleats and flare absent. Sit/crouch front hem lift and shorts coverage remain rejected. Improved sleeves retained but underarm folds, tall collar, closure, materials, Large garment Shape Keys and runtime remain unaccepted. Exact settled skirt mesh hash equals pre-rest-key candidate; no observed effect from declared spring rest key.",
+    "implementationReferences": [
+      {
+        "url": "https://raw.githubusercontent.com/blender/blender/v4.4.3/source/blender/blenkernel/intern/cloth.cc",
+        "scope": "Pinned upstream code uses CD_CLOTH_ORCO when a rest key is selected and dynamic base mesh disabled; local layer consumption unverified."
+      },
+      {
+        "url": "https://raw.githubusercontent.com/blender/blender/v4.4.3/source/blender/blenkernel/intern/mesh_data_update.cc",
+        "scope": "Pinned upstream get_orco_coords reads selected key for cloth; not runtime proof."
+      }
+    ],
+    "evidenceBoundary": "Rest-edge ratios are computed from intended key coordinates, not a readout of native solver spring lengths. Technical bake PASS and a bound RNA pointer do not prove canonical rest metric consumption or product acceptance. Row radial scaling is not exact flat-panel isometry and no crease topology was implemented.",
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "grantsReleaseAcceptance": false
+  },
+  "nativeRestSolverDeliveryAudit": {
+    "status": "FAIL_NO_MEASURABLE_RESPONSE",
+    "evidence": [
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/cloth-rest-response-failure.json",
+        "sha256": "53d58d936687c72e923f8e30b9836c7efb833071c99c90dfe05ec0954069c63c"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/native-rest-delivery.json",
+        "sha256": "c7ebe0482842f0ef81cdaf880ad1a9b7afaf28046d4e5b5ddd7fd089cced105f"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/native-rest-delivery-probe.py",
+        "sha256": "dad7a3d9e7ce1719d14c3a3feae0e5497f61c01c46812987ea4c4c09a9b00e2d"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/native-rest-solver-probe.py",
+        "sha256": "07d8286947cea4e24920c4184c8dbc40a60135db1e071970bd374146657bfcb2"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/native-rest-solver-none.json",
+        "sha256": "10902cabbd80118771a3f601dcf67be10957f2768a1fa6ac021e55d3b9a60a64"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/native-rest-solver-extreme.json",
+        "sha256": "63e1dc9c39944557618996c57a92857e97971d53e0dba776173a7724ef902b17"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/native-rest-solver-tagged.json",
+        "sha256": "7450b792ec19c0aa1318fcfcdcb041824beafdd5e17898ed29aaf80f58697c09"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/native-rest-solver-triangulate.json",
+        "sha256": "da0c573ca7c36ba59ef64ab2815cb34743371dbd88446e7afa82e0128d946c24"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/rest-response-rejected/53d58d936687c72e/blender_cloth_simulation.py",
+        "sha256": "370b47b4e14d41ee28dea0ebe74f90980b086e545c3d10bdc7098566e10ab12c"
+      }
+    ],
+    "normalCheckpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
+    "normalCheckpointSha256": "0ac216127e17da0311d72dcd813241a1d78558924305da06b609ee3fa81d00ef",
+    "sourceBlendSha256": "a4d6dd17108ce0749e88f1a7a3dadcde3670f008fc6a3e4fb77cdc636960191d",
+    "constructionSha256": "ccd834651135ba63444160a032665655e24b10f05cbc05a5ccb2772b9703ed45",
+    "response": {
+      "method": "same-input-native-cloth-declared-vs-basis-rest",
+      "declaredEvaluatedMeshSha256": "8bbe0ac2650c5e0fc517f378df35a33c90cf8817881a72197c28770e5bfb4df2",
+      "basisEvaluatedMeshSha256": "8bbe0ac2650c5e0fc517f378df35a33c90cf8817881a72197c28770e5bfb4df2",
+      "coordinateRoundingDecimalPlaces": 7,
+      "measurableResponse": false,
+      "controlCacheBakedActual": true,
+      "useDynamicMesh": false,
+      "grantsFitAcceptance": false
+    },
+    "grantsQualityAcceptance": false,
+    "evidenceBoundary": "Native declared-vs-Basis control comparison on current source; no new renders, fit or runtime acceptance. Failed-stage rollback removes local reports, so the same existing manufacturer was executed separately to retain input-bound evidence. Native CD_CLOTH_ORCO consumption remains unobserved."
+  },
+  "creaseAlignedSkirtManufacture": {
+    "status": "MANUFACTURED_VISUALLY_REJECTED",
+    "buildReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "buildReportSha256": "6ac4b651b904169604dcdd0fe5856aff0887594e6eef4d16ca03d8d42c442c24",
+    "topology": {
+      "applied": true,
+      "method": "crease-aligned-triangular-radial-fold",
+      "cuts": [
+        {
+          "planeAngleRadians": 0.0,
+          "newVertexCount": 88,
+          "cutEdgeCount": 92
+        },
+        {
+          "planeAngleRadians": 0.2617993877991494,
+          "newVertexCount": 99,
+          "cutEdgeCount": 97
+        },
+        {
+          "planeAngleRadians": 0.5235987755982988,
+          "newVertexCount": 98,
+          "cutEdgeCount": 98
+        },
+        {
+          "planeAngleRadians": 0.7853981633974483,
+          "newVertexCount": 101,
+          "cutEdgeCount": 101
+        },
+        {
+          "planeAngleRadians": 1.0471975511965976,
+          "newVertexCount": 101,
+          "cutEdgeCount": 101
+        },
+        {
+          "planeAngleRadians": 1.3089969389957472,
+          "newVertexCount": 105,
+          "cutEdgeCount": 103
+        },
+        {
+          "planeAngleRadians": 1.5707963267948966,
+          "newVertexCount": 0,
+          "cutEdgeCount": 48
+        },
+        {
+          "planeAngleRadians": 1.832595714594046,
+          "newVertexCount": 105,
+          "cutEdgeCount": 103
+        },
+        {
+          "planeAngleRadians": 2.0943951023931953,
+          "newVertexCount": 101,
+          "cutEdgeCount": 101
+        },
+        {
+          "planeAngleRadians": 2.356194490192345,
+          "newVertexCount": 101,
+          "cutEdgeCount": 101
+        },
+        {
+          "planeAngleRadians": 2.6179938779914944,
+          "newVertexCount": 98,
+          "cutEdgeCount": 98
+        },
+        {
+          "planeAngleRadians": 2.8797932657906435,
+          "newVertexCount": 99,
+          "cutEdgeCount": 97
+        }
+      ],
+      "beforeVertexCount": 7434,
+      "afterVertexCount": 8530,
+      "beforeTriangleCount": 14359,
+      "afterTriangleCount": 16517,
+      "sharedSkirtWaistbandEdgeCount": 80,
+      "degenerateTriangleCount": 0,
+      "nonManifoldEdgeCount": 0,
+      "originalVertexIdentityPreserved": true,
+      "grantsFitAcceptance": false,
+      "grantsVisualAcceptance": false,
+      "evidenceBoundary": "Native radial cuts align fold extrema to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."
+    },
+    "sourceBlendSha256": "c10d20d2d3c3245dabe59f33ab23063f84823059d1538348f1c35c250d5db907",
+    "clothReportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json",
+    "clothReportSha256": "37aca173c9761fbd24fdaf904025d655109ade3afb300c76cd6ae2a2fe00c004",
+    "weightedRenderReportPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
+    "weightedRenderReportSha256": "20eff6d35a39bfd9e830bc7224da28665b39dec3651e84e4b62be32bba2ec2dd",
+    "sectionMeasurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-sections-5d6ac4b4c24f071c.json",
+    "sectionMeasurementSha256": "5d6ac4b4c24f071cc3a70dcb33243669171a272099b104a3179fd7ee4410d816",
+    "comparison": {
+      "previousMeasurementPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-sections-c296396dbfe7a8b6.json",
+      "previousMeasurementSha256": "c296396dbfe7a8b676db0a4263fffe910efc2dfd11abc0ae0c5d60e4e4292ff8",
+      "heightM": 0.5695782470703125,
+      "previousSettled12thRadialHarmonicM": 0.0014687398770913559,
+      "currentSettled12thRadialHarmonicM": 0.003023312778237438,
+      "previousSourceToSettledHarmonicRetention": 0.35415367310078333,
+      "currentSourceToSettledHarmonicRetention": 0.683817171425065,
+      "previousOuterRayToFlatRatio": 0.9521546667041094,
+      "currentOuterRayToFlatRatio": 0.9022546699042565
+    },
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "evidenceBoundary": "Twelve-fold harmonic strengthened but outer silhouette circumference contracted more; this is not proof of pleat count, rest isometry, or improvement in accepted appearance. Fold-plane topology and actual Native Cloth/weighted renders were exercised in normal workflow. No Unity/VRChat runtime claim."
+  },
+  "componentBendingComparison": {
+    "selectedStiffness": 20,
+    "blenderVersion": "4.4.3",
+    "comparisonStiffnesses": [
+      0.45,
+      5,
+      20
+    ],
+    "meanAbsoluteHighDihedralAngleChangeRad": [
+      0.472329836,
+      0.312036117,
+      0.191641092
+    ],
+    "nearHemOuterPerimeterM": [
+      0.7694851484,
+      0.8226530434,
+      0.8233622465
+    ],
+    "sourceNearHemOuterPerimeterM": 0.8291715247536873,
+    "normalWorkflowReproducedSelectedNearHemPerimeterM": 0.823362246498158,
+    "normalWorkflowComponent": "pleated-overskirt",
+    "evidence": [
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-f53dbd28fd49ce12.json",
+        "sha256": "f53dbd28fd49ce12bc6baa4d45748030a5b92f29b8d0546443b5c47514500df7"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-7323268708b75e84.json",
+        "sha256": "7323268708b75e84438cc4e3c318c8c20ccf8ae289c82baa7fd7301c2dd20a2a"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-b7a6905e8b59a8df.json",
+        "sha256": "b7a6905e8b59a8dfd289d7290d341e685eafbc15e01b9bdede46dd309ddc04e0"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-2c07a6ec328b0b4c.json",
+        "sha256": "2c07a6ec328b0b4c8af8d16e56087240aed3d3aa4cdea37a96dbce4a6b83b34a"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-sections-68ce0e5061d7880c.json",
+        "sha256": "68ce0e5061d7880c379752e0caeb6bfaf7e33229d0f73f63b1db05d21ed0b870"
+      },
+      {
+        "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json",
+        "sha256": "bd8a86aa6d7c5ab1a4b0acb48797acd9c5bb02e034376851bed6acbe68faa2da"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
+        "sha256": "09b2ce2776dc769d2fdd45e141f883f72c4098bab4a3a596faef14e96e85c2b7"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-preview-0.45.png",
+        "sha256": "54a53859d2e78c8939965df5851dcd745a4a3e6012ad2ca3ea5cacf068761fd6"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-preview-20.0.png",
+        "sha256": "b97bc6a1fa482c05d1dc3947ec3e88c56c16f1228501126cc3d3c5a488caf69d"
+      }
+    ],
+    "inspectedCurrentRenderCount": 11,
+    "sourceSha256": "961a68c67c7677925f3c6c5b3801807d2a6efe99f2e5bb2291fb0fea339bd428",
+    "boundary": "Historical same-source comparisons select a prototype solver parameter. Exact current normal workflow reports and all eleven inspected images are bound separately. Nearest body vertex diagnostics are not continuous face clearance. Current silhouette and motion review remain rejected.",
+    "grantsVisualAcceptance": false,
+    "grantsFitAcceptance": false
+  },
+  "referenceRatioSkirtManufacture": {
+    "designHypothesis": {
+      "lengthM": 0.14,
+      "hemValleyRadiusM": 0.17116394820121025,
+      "flatHemHalfWidthM": 0.2782884790749424,
+      "referenceFlareRatio": 1.7
+    },
+    "configurationHashes": {
+      "assemblyPoseSha256": "84692711dd636f717ad2e127be77f9626e8a4664e578deb24dd7ebf97d55f3c7",
+      "patternSha256": "82a061d5fddcda93c8038579e9ed23937f020a0cb565e0639b2a501ec74b9936",
+      "constructionSha256": "930976a51ccc6a91729ca16a2dea0cf90d79c64f4f02c3c0b1e31d6fabb1b9c2"
+    },
+    "creaseTopology": {
+      "applied": true,
+      "method": "crease-aligned-triangular-radial-fold",
+      "cuts": [
+        {
+          "planeAngleRadians": 0.0,
+          "newVertexCount": 62,
+          "cutEdgeCount": 66
+        },
+        {
+          "planeAngleRadians": 0.2617993877991494,
+          "newVertexCount": 81,
+          "cutEdgeCount": 79
+        },
+        {
+          "planeAngleRadians": 0.5235987755982988,
+          "newVertexCount": 73,
+          "cutEdgeCount": 73
+        },
+        {
+          "planeAngleRadians": 0.7853981633974483,
+          "newVertexCount": 77,
+          "cutEdgeCount": 79
+        },
+        {
+          "planeAngleRadians": 1.0471975511965976,
+          "newVertexCount": 86,
+          "cutEdgeCount": 86
+        },
+        {
+          "planeAngleRadians": 1.3089969389957472,
+          "newVertexCount": 89,
+          "cutEdgeCount": 87
+        },
+        {
+          "planeAngleRadians": 1.5707963267948966,
+          "newVertexCount": 0,
+          "cutEdgeCount": 44
+        },
+        {
+          "planeAngleRadians": 1.832595714594046,
+          "newVertexCount": 89,
+          "cutEdgeCount": 87
+        },
+        {
+          "planeAngleRadians": 2.0943951023931953,
+          "newVertexCount": 86,
+          "cutEdgeCount": 86
+        },
+        {
+          "planeAngleRadians": 2.356194490192345,
+          "newVertexCount": 77,
+          "cutEdgeCount": 79
+        },
+        {
+          "planeAngleRadians": 2.6179938779914944,
+          "newVertexCount": 73,
+          "cutEdgeCount": 73
+        },
+        {
+          "planeAngleRadians": 2.8797932657906435,
+          "newVertexCount": 81,
+          "cutEdgeCount": 79
+        }
+      ],
+      "beforeVertexCount": 7122,
+      "afterVertexCount": 7996,
+      "beforeTriangleCount": 13709,
+      "afterTriangleCount": 15429,
+      "sharedSkirtWaistbandEdgeCount": 80,
+      "degenerateTriangleCount": 0,
+      "nonManifoldEdgeCount": 0,
+      "originalVertexIdentityPreserved": true,
+      "grantsFitAcceptance": false,
+      "grantsVisualAcceptance": false,
+      "evidenceBoundary": "Native radial cuts align fold extrema to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."
+    },
+    "sectionMeasurement": {
+      "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-sections-c8dc53608b731810.json",
+      "sha256": "c8dc53608b731810eb91afc58c04a48fea27b9b47ee162be371ac9e6e3647888",
+      "sourceNearHemPerimeterM": 1.0729587335172424,
+      "settledNearHemPerimeterM": 1.0165244870424945
+    },
+    "evidence": [
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
+        "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-a85c9a64cfc96f3a.json",
+        "sha256": "a85c9a64cfc96f3afa985eb60f11160c68c95f0bb4d94ce245c49a10558a5eb4"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-fold-sections-c8dc53608b731810.json",
+        "sha256": "c8dc53608b731810eb91afc58c04a48fea27b9b47ee162be371ac9e6e3647888"
+      },
+      {
+        "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+        "sha256": "e415e08ee79dc8c43c1f3bdc84cc50d284f8b1b2fa0bf738f84c13927acaed0c"
+      },
+      {
+        "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/cloth-simulation.json",
+        "sha256": "5bddc46d020d96b099f33f67f1037febc9c3ebcd3e2b0ecbfc65ee20afbf22a2"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
+        "sha256": "289b6dce6aeb1b343171a5422f994f4259a44eb553e7a4ca56597b0685edc65b"
+      },
+      {
+        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/skin-export-report.json",
+        "sha256": "d02ec8afb3270fffcce5e558088e9abf5931371a9ade56460aee9e6523540d84"
+      }
+    ],
+    "inspectedCurrentRenderCount": 11,
+    "sourceSha256": "5de3239c409c43cdabb0bb0e96755efc2ef6156719160608e44254d17c30e752",
+    "observedImprovement": "Standing skirt has a wider flared silhouette; ordered folds and shorts exposure remain unresolved.",
+    "failures": [
+      {
+        "stage": "draft-patterns",
+        "cause": "Concurrent diagnostic backup/measurement writes violated stage write boundary; automatic rollback removed those new files. Retried sequentially."
+      },
+      {
+        "stage": "simulate-cloth",
+        "cause": "Previous geometry-bound bending selection rejected as stale; new-source bounded native solve recorded before re-registering setting."
+      },
+      {
+        "stage": "visual-review",
+        "cause": "Normal pipeline stopped on old image hashes; all current images subsequently directly inspected and rejection updated."
+      }
+    ],
+    "grantsVisualAcceptance": false,
+    "grantsFitAcceptance": false
+  },
+  "prototypeTrimAttachmentCorrection": {
+    "method": "settled-sewn-edge-position-and-weight-interpolation",
+    "reportSha256": "5bc7c899ca324b28b98b1302b72ba3aaf88f482c60caac7aece96fa4cfff8890",
+    "inspectedCurrentRenderCount": 11,
+    "boundTrimVertices": 2720.0,
+    "grantsVisualAcceptance": false,
+    "observedResult": "Detached horizontal hem rings and lavender pose flaps no longer appear in the current eleven renders. Trim follows the garment boundary; design and fit blockers remain.",
+    "reportPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/skin-export-report.json",
+    "grantsFitAcceptance": false
+  },
+  "shortsCoverageReview": {
+    "method": "direct-inspection-after-segmented-four-panel-contour-redraft",
+    "patternDraftPath": "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json",
+    "patternDraftSha256": "3b10f385e97e4e3c4da506d075ca3187ee501235e9fcb29916bccc139871d97a",
+    "inspectedCurrentRenderCount": 11,
+    "result": "REJECT",
+    "observation": "The segmented outer-thigh and inner-rise draft passes the 2D boundary/stitch contract and was rebuilt in 3D, but its rendered shorts still look like blunt straight tubes. Current crouch and sit images show substantial gray avatar exposure where the skirt lifts; the contour-only revision and 120 mm hem extension do not establish coverage. A gusset and a clearer fitted seat/thigh construction remain necessary.",
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false
+  },
+  "shortsContourRedraftReview": {
+    "method": "direct-inspection-of-current-render-set",
+    "patternSha256": "3b10f385e97e4e3c4da506d075ca3187ee501235e9fcb29916bccc139871d97a",
+    "stitchGraphSha256": "8b101c2c74ca3c383d031e282c09376fe89fc35df595d8d16b253ceebb9d3237",
+    "inspectedImages": {
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "4604ddb89404094df9db6ce6d24305b7ea734aec34a6580b141c369f789ef9f4",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "e947029562a602a0c58482cd037ca1d5d829389123ace2f21ddcc8a43aaabd46",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "afba8deb3121fa9f805c569b73b26d7a290e7e684675141febf2343a2b857de6",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "22309a4be0aab8349820321cf2575326ee7298573d795e241191f0b6c39f046c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "ef304112f003ccb8f6fe4c66cbeab77aa2a1e4a6adca29e5338d8500472662b9",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "76b0bd467d2c481e4076138882af649e89394b06769dd73544409873d98c5000",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "da60a4f5783b0f3ca4cb1cc861e09e966a4a5cecb68d650920e9f76ae67ad289",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "959463bfeffc4b05b187d8f1da521294fdb2592d8f11c8668dfa775b7882bf07",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "3b3a9b0dbfabb8742102866e649199ea8f3abb7e3efc8e95e9780d0b0256961f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "9b99b71b4cb34609b4ffdba317ff04f1b5a35cab2fc3b389d584c78253ba645c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "864afc0a9093903822f17d55b0ef39608df80f6c0ebc3bd7ffa2c59a3c104dbd"
+    },
+    "inspectedCurrentRenderCount": 11,
+    "result": "REJECT",
+    "observation": "The added segmented outer-thigh and crotch-rise vertices do not read as a fitted contour in the current 3D renders. Standing shorts remain blunt straight panels; crouch and sit still expose the avatar. No gusset is present. This contour revision alone is insufficient.",
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false
+  }
+}

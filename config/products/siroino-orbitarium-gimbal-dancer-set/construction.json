@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-orbitarium-gimbal-dancer-set",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai v1.0 PC; garment measurements, shape-key fit, and motion remain unverified.",
+  "designRevision": "v1-orbitarium-gimbal-dancer-concept",
+  "panels": [
+    "top-front-left",
+    "top-front-right",
+    "top-back",
+    "top-collar-band",
+    "shorts-front-left",
+    "shorts-front-right",
+    "shorts-back-left",
+    "shorts-back-right",
+    "shorts-waistband",
+    "overskirt-yoke",
+    "overskirt-right-long",
+    "overskirt-left-short",
+    "wrist-cuff-left",
+    "wrist-cuff-right"
+  ],
+  "requiredPatternComponents": [
+    {
+      "componentId": "ivory-sleeveless-top",
+      "partId": "top",
+      "requiredPieceIds": [
+        "top-front-left",
+        "top-front-right",
+        "top-back",
+        "top-collar-band"
+      ],
+      "reason": "The concept sheet shows an ivory fitted sleeveless mock-neck top with a center-front seam and teal piping. Pattern dimensions and Siroino fit have not been measured."
+    },
+    {
+      "componentId": "indigo-tailored-shorts",
+      "partId": "shorts",
+      "requiredPieceIds": [
+        "shorts-front-left",
+        "shorts-front-right",
+        "shorts-back-left",
+        "shorts-back-right",
+        "shorts-waistband"
+      ],
+      "reason": "The shorts remain visible at center front beneath the overskirt; front/back leg panels and waistband are required to preserve coverage and a leg opening."
+    },
+    {
+      "componentId": "under-belt-overskirt-yoke",
+      "partId": "overskirt-yoke",
+      "requiredPieceIds": ["overskirt-yoke"],
+      "reason": "A separate narrow waist anchor is a provisional construction hypothesis to attach each asymmetric panel through a unique seam without reusing the shorts waistband edge. This layer is not clearly visible and requires direct appearance review."
+    },
+    {
+      "componentId": "right-long-overskirt-panel",
+      "partId": "overskirt-right",
+      "requiredPieceIds": [
+        "overskirt-right-long"
+      ],
+      "reason": "The front and back crops show this separate opaque panel as the longer panel on wearer-right. Its exact curvature, walking clearance, lining, and attachment to the provisional under-belt yoke require pattern review."
+    },
+    {
+      "componentId": "left-short-overskirt-panel",
+      "partId": "overskirt-left",
+      "requiredPieceIds": [
+        "overskirt-left-short"
+      ],
+      "reason": "The front and back crops show this separate opaque panel as the shorter panel on wearer-left. Its exact curvature, walking clearance, lining, and attachment to the provisional under-belt yoke require pattern review."
+    },
+    {
+      "componentId": "left-wrist-cuff",
+      "partId": "cuff-left",
+      "requiredPieceIds": ["wrist-cuff-left"],
+      "reason": "An ivory cuff with a copper-colored fastener is visible at the wearer-left wrist; closure and arm clearance remain provisional."
+    },
+    {
+      "componentId": "right-wrist-cuff",
+      "partId": "cuff-right",
+      "requiredPieceIds": ["wrist-cuff-right"],
+      "reason": "An ivory cuff with a copper-colored fastener is visible at the wearer-right wrist; closure and arm clearance remain provisional."
+    }
+  ],
+  "separateGeometry": [
+    "copper-belt-buckle",
+    "orbit-dot-appliques",
+    "teal-top-piping",
+    "overskirt-edge-piping",
+    "wrist-cuff-fasteners"
+  ],
+  "priorityFitZones": [
+    "mock-neck-and-throat",
+    "shoulders",
+    "underarm",
+    "bust",
+    "waist",
+    "hip",
+    "crotch-and-rise",
+    "short-leg-openings",
+    "overskirt-walking-clearance",
+    "wrist-cuffs"
+  ],
+  "requiredPoses": [
+    "neutral",
+    "arms-up",
+    "arm-cross",
+    "crouch",
+    "sit",
+    "prone"
+  ],
+  "researchTrial": {
+    "method": "Original concept sheet to explicit 2D panels and edge-based stitch graph; compare pinned GarmentCode native pattern layout and OpenSew endpoint audit before any assembled-mesh gate.",
+    "status": "DECLARED",
+    "referenceViews": [
+      "front",
+      "back"
+    ],
+    "review": "The current generated sheet supports visible silhouette and layer-order observations only. Measurements, fit, backside panel construction, panel placement, sewing, avatar motion, and cloth response remain unverified."
+  },
+  "releaseBoundary": "WORKING concept only. Do not build 3D until the current hash-bound visualAppearanceReview is PASS; product fit, motion, runtime, and commercial release remain separate gates.",
+  "clothSimulation": {
+    "applicability": "REQUIRED",
+    "components": [
+      "asymmetric-overskirt-right-long",
+      "asymmetric-overskirt-left-short"
+    ],
+    "evidence": "Pending: no garment mesh or cloth simulation exists.",
+    "reason": "The asymmetric long overskirt panels may collide with the shorts and legs during walking, sitting, crouching, or turning."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "No garment mesh or transferred shape keys exist; reassess after measured 2D fit and 3D construction."
+  }
+}

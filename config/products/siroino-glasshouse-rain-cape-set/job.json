@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-glasshouse-rain-cape-set",
+  "productName": "Glasshouse Rain Cape Set for Siroino",
+  "adapterId": "siroino-v1.0-large",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v10-glasshouse-measured-belt-pattern-draft",
+  "renderLoopRevision": "v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-glasshouse-rain-cape-set",
+  "productManifestPath": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/ProductManifest.json",
+  "buildScript": "tools/siroino_glasshouse_rain_cape_set_build.py",
+  "productBuildScript": "tools/siroino_glasshouse_rain_cape_set_build.py",
+  "blendPath": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Source/Blender/SiroinoGlasshouseRainCapeSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Models/SiroinoGlasshouseRainCapeSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Prefab/SiroinoGlasshouseRainCapeSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Prefab/SiroinoSotai_GlasshouseRainCapeSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ]
+  },
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "identityManifestPath": "config/products/siroino-glasshouse-rain-cape-set/reference-identity.json",
+    "referenceAuditPath": "config/products/siroino-glasshouse-rain-cape-set/reference-audit.json",
+    "privateReferencePath": "Assets/_Local/ReferenceImages/siroino-glasshouse-rain-cape-set.png",
+    "decompositionPath": "config/products/siroino-glasshouse-rain-cape-set/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-glasshouse-rain-cape-set/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-glasshouse-rain-cape-set/stitch-graph.json",
+    "visualReviewPath": "config/products/siroino-glasshouse-rain-cape-set/visual-review.json",
+    "constructionPath": "config/products/siroino-glasshouse-rain-cape-set/construction.json",
+    "materialRecipePath": "config/products/siroino-glasshouse-rain-cape-set/material-recipe.json",
+    "garmentcodeStitchExport": "strict-boundary-edges",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true,
+    "clothSimulation": {
+      "applicability": "REQUIRED",
+      "components": [
+        "RainCapeShell",
+        "CreamWrapSkirt"
+      ],
+      "evidence": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Evidence/Build/cloth-simulation.json",
+      "reason": "The translucent cape and loose wrap skirt require observed settlement and avatar collision evidence before fit can be accepted."
+    }
+  },
+  "researchMethod": {
+    "name": "original rainwear set drafted as addressable panels and stitched through the pinned GarmentCode 2D stage",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-glasshouse-rain-cape-set/pattern-draft.json",
+    "secondaryEvidence": "config/products/siroino-glasshouse-rain-cape-set/stitch-graph.json"
+  },
+  "licenseEvidence": "config/products/siroino-glasshouse-rain-cape-set/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local"
+  ],
+  "patternLayoutPath": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-glasshouse-rain-cape-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-glasshouse-rain-cape-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-glasshouse-rain-cape-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/README.md",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Source/Patterns/glasshouse-rain-cape.pattern.json",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Source/Patterns/glasshouse-rain-cape.stitches.json",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Source/Blender/SiroinoGlasshouseRainCapeSet.blend",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Models/SiroinoGlasshouseRainCapeSet.fbx",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Prefab/SiroinoGlasshouseRainCapeSet.prefab",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Prefab/SiroinoSotai_GlasshouseRainCapeSet.prefab",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/front.png",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/back.png",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/left.png",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/right.png",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Evidence/Build/product-build-report.json",
+    "Assets/GenWorks/siroino-glasshouse-rain-cape-set/Evidence/Build/cloth-simulation.json"
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-harbor-signalist-uniform",
+  "units": "meter",
+  "coordinateSystem": "x-horizontal-y-vertical",
+  "pieces": [
+    {
+      "pieceId": "jacket-front",
+      "partId": "navy-jacket-body",
+      "boundary": [[-0.14,0.0],[0.14,0.0],[0.14,0.26],[0.08,0.29],[-0.08,0.29],[-0.14,0.26]],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.008,
+      "edges": [
+        {"edgeId":"hem","startVertex":0,"endVertex":1,"role":"hem","maxConnections":0},
+        {"edgeId":"side-right","startVertex":1,"endVertex":2,"role":"seam","maxConnections":1},
+        {"edgeId":"shoulder-right","startVertex":2,"endVertex":3,"role":"seam","maxConnections":1},
+        {"edgeId":"neckline","startVertex":3,"endVertex":4,"role":"open","maxConnections":0},
+        {"edgeId":"shoulder-left","startVertex":4,"endVertex":5,"role":"seam","maxConnections":1},
+        {"edgeId":"side-left","startVertex":5,"endVertex":0,"role":"seam","maxConnections":1}
+      ]
+    },
+    {
+      "pieceId": "jacket-back",
+      "partId": "navy-jacket-body",
+      "boundary": [[-0.14,0.0],[0.14,0.0],[0.14,0.26],[0.08,0.29],[-0.08,0.29],[-0.14,0.26]],
+      "cutCount": 1,
+      "onFold": true,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.008,
+      "edges": [
+        {"edgeId":"hem","startVertex":0,"endVertex":1,"role":"hem","maxConnections":0},
+        {"edgeId":"side-right","startVertex":1,"endVertex":2,"role":"seam","maxConnections":1},
+        {"edgeId":"shoulder-right","startVertex":2,"endVertex":3,"role":"seam","maxConnections":1},
+        {"edgeId":"neckline","startVertex":3,"endVertex":4,"role":"open","maxConnections":0},
+        {"edgeId":"shoulder-left","startVertex":4,"endVertex":5,"role":"seam","maxConnections":1},
+        {"edgeId":"side-left","startVertex":5,"endVertex":0,"role":"seam","maxConnections":1}
+      ]
+    },
+    {
+      "pieceId": "blouse-front",
+      "partId": "ivory-high-neck-blouse",
+      "boundary": [[-0.12,0.0],[0.12,0.0],[0.12,0.30],[0.08,0.32],[-0.08,0.32],[-0.12,0.30]],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.008,
+      "edges": [
+        {"edgeId":"hem","startVertex":0,"endVertex":1,"role":"hem","maxConnections":0},
+        {"edgeId":"side-right","startVertex":1,"endVertex":2,"role":"seam","maxConnections":1},
+        {"edgeId":"shoulder-right","startVertex":2,"endVertex":3,"role":"seam","maxConnections":1},
+        {"edgeId":"neckline","startVertex":3,"endVertex":4,"role":"open","maxConnections":0},
+        {"edgeId":"shoulder-left","startVertex":4,"endVertex":5,"role":"seam","maxConnections":1},
+        {"edgeId":"side-left","startVertex":5,"endVertex":0,"role":"seam","maxConnections":1}
+      ]
+    },
+    {
+      "pieceId": "blouse-back",
+      "partId": "ivory-high-neck-blouse",
+      "boundary": [[-0.12,0.0],[0.12,0.0],[0.12,0.30],[0.08,0.32],[-0.08,0.32],[-0.12,0.30]],
+      "cutCount": 1,
+      "onFold": true,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.008,
+      "edges": [
+        {"edgeId":"hem","startVertex":0,"endVertex":1,"role":"hem","maxConnections":0},
+        {"edgeId":"side-right","startVertex":1,"endVertex":2,"role":"seam","maxConnections":1},
+        {"edgeId":"shoulder-right","startVertex":2,"endVertex":3,"role":"seam","maxConnections":1},
+        {"edgeId":"neckline","startVertex":3,"endVertex":4,"role":"open","maxConnections":0},
+        {"edgeId":"shoulder-left","startVertex":4,"endVertex":5,"role":"seam","maxConnections":1},
+        {"edgeId":"side-left","startVertex":5,"endVertex":0,"role":"seam","maxConnections":1}
+      ]
+    },
+    {
+      "pieceId": "culotte-left-front",
+      "partId": "wine-pleated-culottes",
+      "boundary": [[-0.075,0.31],[0.075,0.31],[0.06,0.0],[-0.06,0.0],[-0.095,0.1]],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.01,
+      "edges": [
+        {"edgeId":"hem","startVertex":0,"endVertex":1,"role":"hem","maxConnections":0},
+        {"edgeId":"outer-side","startVertex":1,"endVertex":2,"role":"seam","maxConnections":1},
+        {"edgeId":"waist","startVertex":2,"endVertex":3,"role":"open","maxConnections":0},
+        {"edgeId":"crotch","startVertex":3,"endVertex":4,"role":"seam","maxConnections":1},
+        {"edgeId":"inseam","startVertex":4,"endVertex":0,"role":"seam","maxConnections":1}
+      ]
+    },
+    {
+      "pieceId": "culotte-right-front",
+      "partId": "wine-pleated-culottes",
+      "boundary": [[-0.075,0.31],[0.075,0.31],[0.06,0.0],[-0.06,0.0],[-0.095,0.1]],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.01,
+      "edges": [
+        {"edgeId":"hem","startVertex":0,"endVertex":1,"role":"hem","maxConnections":0},
+        {"edgeId":"outer-side","startVertex":1,"endVertex":2,"role":"seam","maxConnections":1},
+        {"edgeId":"waist","startVertex":2,"endVertex":3,"role":"open","maxConnections":0},
+        {"edgeId":"crotch","startVertex":3,"endVertex":4,"role":"seam","maxConnections":1},
+        {"edgeId":"inseam","startVertex":4,"endVertex":0,"role":"seam","maxConnections":1}
+      ]
+    },
+    {
+      "pieceId": "culotte-left-back",
+      "partId": "wine-pleated-culottes",
+      "boundary": [[-0.075,0.31],[0.075,0.31],[0.06,0.0],[-0.06,0.0],[-0.095,0.1]],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.01,
+      "edges": [
+        {"edgeId":"hem","startVertex":0,"endVertex":1,"role":"hem","maxConnections":0},
+        {"edgeId":"outer-side","startVertex":1,"endVertex":2,"role":"seam","maxConnections":1},
+        {"edgeId":"waist","startVertex":2,"endVertex":3,"role":"open","maxConnections":0},
+        {"edgeId":"crotch","startVertex":3,"endVertex":4,"role":"seam","maxConnections":1},
+        {"edgeId":"inseam","startVertex":4,"endVertex":0,"role":"seam","maxConnections":1}
+      ]
+    },
+    {
+      "pieceId": "culotte-right-back",
+      "partId": "wine-pleated-culottes",
+      "boundary": [[-0.075,0.31],[0.075,0.31],[0.06,0.0],[-0.06,0.0],[-0.095,0.1]],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.01,
+      "edges": [
+        {"edgeId":"hem","startVertex":0,"endVertex":1,"role":"hem","maxConnections":0},
+        {"edgeId":"outer-side","startVertex":1,"endVertex":2,"role":"seam","maxConnections":1},
+        {"edgeId":"waist","startVertex":2,"endVertex":3,"role":"open","maxConnections":0},
+        {"edgeId":"crotch","startVertex":3,"endVertex":4,"role":"seam","maxConnections":1},
+        {"edgeId":"inseam","startVertex":4,"endVertex":0,"role":"seam","maxConnections":1}
+      ]
+    }
+  ]
+}

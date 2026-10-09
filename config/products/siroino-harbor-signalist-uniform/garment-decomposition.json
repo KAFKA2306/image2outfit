@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-harbor-signalist-uniform",
+  "sourceReference": "private-reference://sha256/8fa171840d646d7b207039dac0a4adcd3fbead18758e3113907e5e739aff07c3",
+  "parts": [
+    {"partId":"navy-jacket-body","kind":"cropped-jacket","regions":["chest","waist","upper-back"],"role":"structural-panel","layer":"outer","material":"matte-woven","fit":"fitted","evidence":"Short navy sailor jacket with broad cream square collar, visible short sleeves, and vermilion piping; full-body front/back views."},
+    {"partId":"short-sleeve-panels","kind":"short-sleeve-set","regions":["shoulder","upper-arm"],"role":"structural-panel","layer":"outer","material":"matte-woven","fit":"regular","evidence":"Short jacket sleeves are visible in the reference; their cap and armhole seam path is unresolved and absent from the current flat pattern."},
+    {"partId":"cream-sailor-collar","kind":"collar","regions":["neck","upper-back"],"role":"edge-finish","layer":"outer","material":"matte-woven","fit":"regular","evidence":"Broad cream square collar with narrow vermilion border, clearly visible front and back."},
+    {"partId":"ivory-high-neck-blouse","kind":"sleeveless-blouse","regions":["neck","chest","abdomen"],"role":"base-layer","layer":"base","material":"smooth-woven","fit":"fitted","evidence":"Ivory high-neck blouse visible between jacket fronts; sleeve construction is not clearly exposed."},
+    {"partId":"wine-pleated-culottes","kind":"wide-leg-culotte-shorts","regions":["waist","hip","upper-leg"],"role":"structural-panel","layer":"mid","material":"matte-woven","fit":"relaxed","evidence":"Wine-red high-waist pleated culotte shorts with separate mid-thigh legs and visible center split."},
+    {"partId":"vermilion-hip-flap","kind":"asymmetric-utility-flap","regions":["waist","hip"],"role":"attached-overlay","layer":"outer","material":"matte-woven","fit":"regular","evidence":"Single buttoned vermilion flap attached at the left hip."},
+    {"partId":"brass-jacket-buttons","kind":"button-hardware","regions":["chest","waist"],"role":"closure","layer":"attached","material":"brass","fit":"rigid","evidence":"Two small brass jacket buttons; exact closure method is not observable."}
+  ],
+  "uncertainties": [
+    {"field":"sleeve-cap pattern and armhole join","status":"unresolved","assumption":"Short sleeves are required by the visible jacket silhouette. Their cap curve, width, and armhole join are unresolved; design and review those 2D panels and seams before pattern coverage can pass or any 3D stage can start."},
+    {"field":"culotte crotch rise and stride ease","status":"not-observable","assumption":"Draft only; no fit or motion claim until pattern and runtime evidence exist."},
+    {"field":"back and blouse closure","status":"not-observable","assumption":"Use concealed seams only after construction review; no hardware is assumed."}
+  ]
+}

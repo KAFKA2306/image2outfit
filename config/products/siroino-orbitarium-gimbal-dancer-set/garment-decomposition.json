@@ -1,0 +1,450 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-orbitarium-gimbal-dancer-set",
+  "sourceReference": "private-reference://sha256/ec17188ac201750a8022ba5dd32209e8dd1977891001523aa673055e6963d739",
+  "parts": [
+    {
+      "partId": "top",
+      "kind": "fitted-sleeveless-mock-neck-top",
+      "regions": [
+        "chest",
+        "waist",
+        "neckline",
+        "shoulders"
+      ],
+      "role": "structural-panel",
+      "layer": "base",
+      "material": "ivory matte woven appearance with teal edge piping; fiber and physical values unverified",
+      "fit": "unverified",
+      "evidence": "Observed in the front and back crops: sleeveless fitted torso, raised neckline, teal outlines, and a vertical center line. The line's construction role is not established.",
+      "constructionHypothesis": "Front-left, front-right, back, and collar-band pieces are a drafting hypothesis. The center line may be a seam, opening, or decoration; closure and internal finish are not shown."
+    },
+    {
+      "partId": "shorts",
+      "kind": "high-waisted-short-trousers",
+      "regions": [
+        "waist",
+        "hip",
+        "crotch",
+        "upper-leg"
+      ],
+      "role": "structural-panel",
+      "layer": "base-lower",
+      "material": "deep-indigo matte suiting appearance; fiber, stretch, and thickness unverified",
+      "fit": "unverified",
+      "evidence": "Observed in both crops: high-waisted shorts with a waistband and separate left/right leg openings, partly covered by the overskirt.",
+      "constructionHypothesis": "Front and back leg panels with a waistband are proposed; rise, closure, pocket construction, ease, and exact seam placement require pattern review."
+    },
+    {
+      "partId": "overskirt-yoke",
+      "kind": "under-belt-overskirt-waist-anchor",
+      "regions": [
+        "waist",
+        "hip"
+      ],
+      "role": "structural-panel",
+      "layer": "between-shorts-waistband-and-overskirt",
+      "material": "unobserved; provisional cloth assumption only",
+      "fit": "unverified",
+      "evidence": "No independent waist anchor is clearly visible in the front or back crop; only the copper belt and panel attachment region are observed.",
+      "constructionHypothesis": "A narrow concealed band is proposed to join the two asymmetric panels through unique seams beneath the copper belt. This extra layer must be accepted or rejected during direct appearance review."
+    },
+    {
+      "partId": "overskirt-right",
+      "kind": "long-asymmetric-overskirt-panel",
+      "regions": [
+        "waist",
+        "hip",
+        "upper-leg",
+        "knee",
+        "lower-leg"
+      ],
+      "role": "structural-panel",
+      "layer": "outer-over-shorts",
+      "material": "opaque ivory and deep-teal color-blocked cloth appearance with copper-colored lines and accents; all physical properties unverified",
+      "fit": "unverified",
+      "evidence": "Observed in front and back crops: the longer draped panel appears on wearer-right.",
+      "constructionHypothesis": "One waist-attached panel is proposed. The source does not establish whether it is a crescent cut, a folded or lined panel, or how it attaches."
+    },
+    {
+      "partId": "overskirt-left",
+      "kind": "short-asymmetric-overskirt-panel",
+      "regions": [
+        "waist",
+        "hip",
+        "upper-leg",
+        "knee"
+      ],
+      "role": "structural-panel",
+      "layer": "outer-over-shorts",
+      "material": "opaque ivory and deep-teal color-blocked cloth appearance with copper-colored lines and accents; all physical properties unverified",
+      "fit": "unverified",
+      "evidence": "Observed in front and back crops: the shorter draped panel appears on wearer-left.",
+      "constructionHypothesis": "One waist-attached panel is proposed. The source does not establish whether it is a crescent cut, a folded or lined panel, or how it attaches."
+    },
+    {
+      "partId": "cuff-left",
+      "kind": "single-wrist-cuff",
+      "regions": [
+        "left-wrist",
+        "right-wrist"
+      ],
+      "role": "structural-panel",
+      "layer": "accessory",
+      "material": "ivory cloth appearance with copper-colored fasteners; material and closure function unverified",
+      "fit": "unverified",
+      "evidence": "Observed at wearer-left wrist in the front and back crops.",
+      "constructionHypothesis": "One cuff band is proposed; opening, fastening, wrist ease, and arm-motion clearance are not shown."
+    },
+    {
+      "partId": "cuff-right",
+      "kind": "single-wrist-cuff",
+      "regions": [
+        "right-wrist"
+      ],
+      "role": "structural-panel",
+      "layer": "accessory",
+      "material": "ivory cloth appearance with copper-colored fastener; material and closure function unverified",
+      "fit": "unverified",
+      "evidence": "Observed at wearer-right wrist in the front and back crops.",
+      "constructionHypothesis": "One cuff band is proposed; opening, fastening, wrist ease, and arm-motion clearance are not shown."
+    },
+    {
+      "partId": "copper-belt-hardware-and-orbit-details",
+      "kind": "belt-hardware-and-flat-decoration",
+      "regions": [
+        "waist",
+        "overskirt-surface"
+      ],
+      "role": "separate-geometry",
+      "layer": "surface",
+      "material": "copper-colored appearance; alloy, attachment, thickness, and PBR values unverified",
+      "fit": "not-applicable",
+      "evidence": "Observed at the waist and on the overskirt: ring-like hardware, small round accents, and thin curved lines.",
+      "constructionHypothesis": "Keep the belt hardware and surface accents outside the cut-panel graph until their actual attachment and material are specified."
+    }
+  ],
+  "uncertainties": [
+    {
+      "field": "garment panel boundaries and closure paths",
+      "status": "partially-observed",
+      "assumption": "The concept supports garment-part separation but does not establish exact cut-piece boundaries, seam allowances, or closure construction."
+    },
+    {
+      "field": "wearer-side mapping",
+      "status": "partially-observed",
+      "assumption": "Comparing the front and rear crops places the long panel on wearer-right and the short panel on wearer-left; reconfirm this mapping during direct appearance review before 3D work."
+    },
+    {
+      "field": "SiroinoSotai fit and measurements",
+      "status": "not-observable",
+      "assumption": "The illustrated avatar is not a measured SiroinoSotai body. No body dimensions, ease, or shape-key fit are established."
+    },
+    {
+      "field": "cloth material and motion",
+      "status": "not-observable",
+      "assumption": "The concept does not establish textile fiber, PBR values, thickness, stretch, simulation response, or clearance during motion."
+    },
+    {
+      "field": "side profile, interior, and closure details",
+      "status": "not-observable",
+      "assumption": "Only front and back views are available; side and inside construction, fasteners, facings, and pocket details are not visible."
+    }
+  ],
+  "surfaceDecorationPlan": {
+    "schemaVersion": 1,
+    "status": "PROVISIONAL_UNMEASURED_2D",
+    "units": "meter",
+    "coordinateSystem": "piece-local pattern plane; all coordinates are drafting hypotheses, not measured fit values",
+    "referenceScope": "visible garment surface details in the normalized front and back concept views; hair ornament excluded from this outfit set",
+    "items": [
+      {
+        "itemId": "teal-top-piping-front-left",
+        "treatment": "piping-centerline",
+        "hostPieceId": "top-front-left",
+        "sourceView": "front",
+        "pointsM": [
+          [
+            -0.045,
+            0.315
+          ],
+          [
+            -0.075,
+            0.285
+          ],
+          [
+            -0.096,
+            0.22
+          ],
+          [
+            -0.11,
+            0.13
+          ],
+          [
+            -0.105,
+            0.025
+          ]
+        ]
+      },
+      {
+        "itemId": "teal-top-piping-front-right",
+        "treatment": "piping-centerline",
+        "hostPieceId": "top-front-right",
+        "sourceView": "front",
+        "pointsM": [
+          [
+            0.045,
+            0.315
+          ],
+          [
+            0.075,
+            0.285
+          ],
+          [
+            0.096,
+            0.22
+          ],
+          [
+            0.11,
+            0.13
+          ],
+          [
+            0.105,
+            0.025
+          ]
+        ]
+      },
+      {
+        "itemId": "teal-mock-neck-edge-finish",
+        "treatment": "edge-finish",
+        "sourceViews": [
+          "front",
+          "back"
+        ],
+        "edgeRefs": [
+          {
+            "pieceId": "top-collar-band",
+            "edgeId": "top-left-1"
+          },
+          {
+            "pieceId": "top-collar-band",
+            "edgeId": "top-left-2"
+          },
+          {
+            "pieceId": "top-collar-band",
+            "edgeId": "top-right-2"
+          },
+          {
+            "pieceId": "top-collar-band",
+            "edgeId": "top-right-3"
+          }
+        ]
+      },
+      {
+        "itemId": "copper-overskirt-edge-piping",
+        "treatment": "edge-finish",
+        "sourceViews": [
+          "front",
+          "back"
+        ],
+        "edgeRefs": [
+          {
+            "pieceId": "overskirt-right-long",
+            "edgeId": "outer-drop"
+          },
+          {
+            "pieceId": "overskirt-right-long",
+            "edgeId": "lower-hem"
+          },
+          {
+            "pieceId": "overskirt-right-long",
+            "edgeId": "inner-hem"
+          },
+          {
+            "pieceId": "overskirt-left-short",
+            "edgeId": "outer-drop"
+          },
+          {
+            "pieceId": "overskirt-left-short",
+            "edgeId": "lower-hem"
+          },
+          {
+            "pieceId": "overskirt-left-short",
+            "edgeId": "inner-hem"
+          }
+        ]
+      },
+      {
+        "itemId": "copper-orbit-arcs-long-panel",
+        "treatment": "surface-polyline",
+        "hostPieceId": "overskirt-right-long",
+        "sourceView": "front",
+        "pathsM": [
+          [
+            [
+              -0.19,
+              -0.46
+            ],
+            [
+              -0.1,
+              -0.55
+            ],
+            [
+              -0.01,
+              -0.64
+            ],
+            [
+              0.06,
+              -0.71
+            ]
+          ],
+          [
+            [
+              -0.21,
+              -0.52
+            ],
+            [
+              -0.13,
+              -0.61
+            ],
+            [
+              -0.04,
+              -0.7
+            ],
+            [
+              0.04,
+              -0.77
+            ]
+          ]
+        ]
+      },
+      {
+        "itemId": "copper-orbit-arcs-short-panel",
+        "treatment": "surface-polyline",
+        "hostPieceId": "overskirt-left-short",
+        "sourceView": "front",
+        "pathsM": [
+          [
+            [
+              -0.08,
+              -0.24
+            ],
+            [
+              -0.02,
+              -0.3
+            ],
+            [
+              0.08,
+              -0.36
+            ],
+            [
+              0.14,
+              -0.43
+            ]
+          ],
+          [
+            [
+              -0.08,
+              -0.28
+            ],
+            [
+              -0.01,
+              -0.34
+            ],
+            [
+              0.09,
+              -0.4
+            ],
+            [
+              0.16,
+              -0.46
+            ]
+          ]
+        ]
+      },
+      {
+        "itemId": "copper-front-overskirt-orbit-discs",
+        "treatment": "graph-backed-polygon-placements",
+        "sourceView": "front",
+        "graphOverlayIds": [
+          "orbit-stud-left",
+          "orbit-stud-right"
+        ]
+      },
+      {
+        "itemId": "copper-belt-strap-and-frame",
+        "treatment": "surface-polyline",
+        "hostPieceId": "shorts-waistband",
+        "sourceView": "front",
+        "pathsM": [
+          [
+            [
+              -0.3,
+              0.03
+            ],
+            [
+              0.3,
+              0.03
+            ]
+          ],
+          [
+            [
+              -0.04,
+              0.005
+            ],
+            [
+              0.04,
+              0.005
+            ],
+            [
+              0.04,
+              0.055
+            ],
+            [
+              -0.04,
+              0.055
+            ],
+            [
+              -0.04,
+              0.005
+            ]
+          ]
+        ]
+      },
+      {
+        "itemId": "copper-mock-neck-clasp",
+        "treatment": "point-placement",
+        "hostPieceId": "top-collar-band",
+        "sourceView": "front",
+        "pointM": [
+          0.0,
+          0.02
+        ]
+      },
+      {
+        "itemId": "copper-wrist-fasteners",
+        "treatment": "graph-backed-polygon-placements",
+        "sourceViews": [
+          "front",
+          "back"
+        ],
+        "graphOverlayIds": [
+          "wrist-fastener-left",
+          "wrist-fastener-right"
+        ]
+      },
+      {
+        "itemId": "top-center-front-line",
+        "treatment": "structural-center-front-stitch",
+        "hostPieceIds": [
+          "top-front-left",
+          "top-front-right"
+        ],
+        "stitchEdgeId": "center-front",
+        "sourceView": "front",
+        "note": "The visible center line is assigned to the existing center-front seam hypothesis, not duplicated as surface piping."
+      }
+    ],
+    "reviewBoundary": "2D plans describe visible concept details and provisional attachment locations only. They do not establish material response, sewn construction, avatar fit, or 3D placement."
+  }
+}

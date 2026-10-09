@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-orbitarium-gimbal-dancer-set",
+  "designRevision": "v1-orbitarium-gimbal-dancer-concept",
+  "reviewedAt": "2026-09-29T03:34:25+09:00",
+  "reviewer": "chatgpt:codex-direct-image-review",
+  "reviewMethod": "direct-image-inspection",
+  "scope": "pre-3d-concept-and-2d-construction",
+  "status": "PASS",
+  "decision": "PASS",
+  "evidence": [
+    {
+      "kind": "reference-view",
+      "view": "front",
+      "path": ".image2outfit/products/siroino-orbitarium-gimbal-dancer-set/normalized/front.png",
+      "sha256": "159db13f6027fc553ca314bbfd558788cf7f73ec9df105157fc40ab737417e4d"
+    },
+    {
+      "kind": "reference-view",
+      "view": "back",
+      "path": ".image2outfit/products/siroino-orbitarium-gimbal-dancer-set/normalized/back.png",
+      "sha256": "095d446661e71aab49867f3c016340a44b803775c9c6e49bae46f94cbeabf5c9"
+    },
+    {
+      "kind": "pattern-layout",
+      "path": ".image2outfit/products/siroino-orbitarium-gimbal-dancer-set/pattern/garmentcode/garmentcode-pattern-layout.png",
+      "sha256": "a0057fbc802a9066b658388b0e87e64f0978ef53d2e9b80e7f0e4fd60cfca4b9"
+    },
+    {
+      "kind": "construction-contract",
+      "path": "config/products/siroino-orbitarium-gimbal-dancer-set/construction.json",
+      "sha256": "5410f818729a010df3fc05319f68971a86f042caf9a30fb57bdb5be7e1dfa923"
+    },
+    {
+      "kind": "pattern-contract",
+      "path": "config/products/siroino-orbitarium-gimbal-dancer-set/pattern-draft.json",
+      "sha256": "1d5f97e0e0b735bf4484e19bc384a6387e75ace401a3aee229387194bd6ebf1b"
+    },
+    {
+      "kind": "stitch-graph",
+      "path": "config/products/siroino-orbitarium-gimbal-dancer-set/stitch-graph.json",
+      "sha256": "cda716526c2327e4ab36850912d4365dd083c25274c475d648bab0bc49442235"
+    },
+    {
+      "kind": "surface-attachment-graph",
+      "path": "config/products/siroino-orbitarium-gimbal-dancer-set/surface-attachment-graph.json",
+      "sha256": "68b82e01a969ce539300ca483a8e0585eb2b0cc2f87ae74238b75261aacefce1"
+    },
+    {
+      "kind": "garment-decomposition",
+      "path": "config/products/siroino-orbitarium-gimbal-dancer-set/garment-decomposition.json",
+      "sha256": "6f30db65cfc4fd1d955a34d60fd16818a8d147ece2accdb01c46ba67e20ae899"
+    },
+    {
+      "kind": "job-contract",
+      "path": "config/products/siroino-orbitarium-gimbal-dancer-set/job.json",
+      "sha256": "53261ccd4489cd2e375c66775d4450e7c545ce65e69e65651f1702db6d7ab051"
+    },
+    {
+      "kind": "quality-policy",
+      "path": "contracts/quality/quality-spec.json",
+      "sha256": "01e182542d62fe5e16e7ce28e6e47ea6564c43a98a67e06fe354dc22edd746d3"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "front-back-silhouette-and-palette",
+      "status": "PASS",
+      "rationale": "Direct inspection of the normalized front and back shows a consistent sleeveless ivory mock-neck top with teal piping, indigo shorts, an opaque asymmetric ivory/teal overskirt, and copper accents. The long draped panel stays on wearer-right in both views; the shorter panel stays on wearer-left. The 2D panels express that visible hierarchy as an unmeasured concept hypothesis."
+    },
+    {
+      "id": "visible-layer-and-component-coverage",
+      "status": "PASS",
+      "rationale": "The pattern contract still covers the visible top, shorts, asymmetric overskirt panels, and wrist cuffs. Direct inspection of the current front/back references and unchanged GarmentCode panel layout shows the reviewed silhouette and layer order are unchanged by four endpoint-mapping corrections. The updated waist and rear-collar endpoints are explicit; the 2D seam audits pass all 28 pairs. This remains a provisional 2D construction review and does not establish a sewn 3D garment or avatar fit."
+    },
+    {
+      "id": "visible-surface-details-have-a-2d-plan",
+      "status": "PASS",
+      "rationale": "The current decomposition includes piece-local centerlines for front teal top piping, copper orbit arcs, belt framing, collar clasp, and named edge-finish references for both overskirt hems and the mock-neck band. The attachment graph places the two front skirt discs on their corresponding asymmetric panels and the cuff fasteners on both cuffs; the 2D placement audit reports four contained overlays in two reflected pairs, while the detail-path audit reports eight hosted paths and ten valid edge references. The center-front line is assigned to the existing stitch-graph seam. All placements are unmeasured and remain 2D-only hypotheses."
+    }
+  ],
+  "unassessedAreas": [
+    "left-view",
+    "right-view",
+    "three-quarter-view",
+    "avatar-fit",
+    "motion-poses",
+    "cloth-and-material-response",
+    "3d-construction-quality"
+  ],
+  "findings": [],
+  "releaseBoundary": "This PASS approves the directly observed concept and its current provisional 2D construction plan for prototype construction only. It does not verify body measurements, fit, assembly, 3D silhouette, motion, fabric response, Unity/VRChat runtime, or commercial release."
+}

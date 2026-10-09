@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-orbitarium-gimbal-dancer-set",
+  "units": "meter",
+  "layoutStatus": "PROVISIONAL_UNMEASURED_2D",
+  "evaluationBoundary": "Unmeasured flat-pattern placement for two copper orbit appliques on the two front overskirt panels. Containment and reflection are 2D-only; no sewn attachment, fit, 3D, or runtime result is implied.",
+  "overlays": [
+    {
+      "overlayId": "orbit-stud-left",
+      "hostPieceId": "overskirt-left-short",
+      "overlayPieceId": "orbit-stud-left",
+      "mirrorGroupId": "copper-front-studs",
+      "side": "left",
+      "transform": {
+        "anchorLocalM": [
+          0,
+          0
+        ],
+        "targetPointOnHostM": [
+          0.17,
+          -0.35
+        ],
+        "rotationDegrees": 0,
+        "mirrorX": false
+      },
+      "openingEdgeId": "opening",
+      "attachmentEdgeIds": [
+        "attach-1",
+        "attach-2",
+        "attach-3",
+        "attach-4",
+        "attach-5",
+        "attach-6",
+        "attach-7"
+      ],
+      "attachmentHypothesis": "planned-topstitch"
+    },
+    {
+      "overlayId": "orbit-stud-right",
+      "hostPieceId": "overskirt-right-long",
+      "overlayPieceId": "orbit-stud-right",
+      "mirrorGroupId": "copper-front-studs",
+      "side": "right",
+      "transform": {
+        "anchorLocalM": [
+          0,
+          0
+        ],
+        "targetPointOnHostM": [
+          -0.17,
+          -0.35
+        ],
+        "rotationDegrees": 0,
+        "mirrorX": true
+      },
+      "openingEdgeId": "opening",
+      "attachmentEdgeIds": [
+        "attach-1",
+        "attach-2",
+        "attach-3",
+        "attach-4",
+        "attach-5",
+        "attach-6",
+        "attach-7"
+      ],
+      "attachmentHypothesis": "planned-topstitch"
+    },
+    {
+      "overlayId": "wrist-fastener-left",
+      "hostPieceId": "wrist-cuff-left",
+      "overlayPieceId": "orbit-stud-left",
+      "mirrorGroupId": "copper-wrist-fasteners",
+      "side": "left",
+      "transform": {
+        "anchorLocalM": [
+          0,
+          0
+        ],
+        "targetPointOnHostM": [
+          0.08,
+          0.0225
+        ],
+        "rotationDegrees": 0,
+        "mirrorX": false
+      },
+      "openingEdgeId": "opening",
+      "attachmentEdgeIds": [
+        "attach-1",
+        "attach-2",
+        "attach-3",
+        "attach-4",
+        "attach-5",
+        "attach-6",
+        "attach-7"
+      ],
+      "attachmentHypothesis": "planned-topstitch"
+    },
+    {
+      "overlayId": "wrist-fastener-right",
+      "hostPieceId": "wrist-cuff-right",
+      "overlayPieceId": "orbit-stud-right",
+      "mirrorGroupId": "copper-wrist-fasteners",
+      "side": "right",
+      "transform": {
+        "anchorLocalM": [
+          0,
+          0
+        ],
+        "targetPointOnHostM": [
+          -0.08,
+          0.0225
+        ],
+        "rotationDegrees": 0,
+        "mirrorX": true
+      },
+      "openingEdgeId": "opening",
+      "attachmentEdgeIds": [
+        "attach-1",
+        "attach-2",
+        "attach-3",
+        "attach-4",
+        "attach-5",
+        "attach-6",
+        "attach-7"
+      ],
+      "attachmentHypothesis": "planned-topstitch"
+    }
+  ]
+}

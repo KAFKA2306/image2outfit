@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-moonlit-patisserie-uniform-set",
+  "productName": "Moonlit Patisserie Uniform for Siroino",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-moonlit-patisserie-concept",
+  "renderLoopRevision": "v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set",
+  "productManifestPath": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "blendPath": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Source/Blender/SiroinoMoonlitPatisserieUniform.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Models/SiroinoMoonlitPatisserieUniform.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Prefab/SiroinoMoonlitPatisserieUniform.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Prefab/SiroinoSotai_MoonlitPatisserieUniform.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "SiroinoSotai_PC; this outfit's fit has not been measured",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ]
+  },
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "identityManifestPath": "config/products/siroino-moonlit-patisserie-uniform-set/reference-identity.json",
+    "referenceAuditPath": "config/products/siroino-moonlit-patisserie-uniform-set/reference-audit.json",
+    "privateReferencePath": "Assets/_Local/ReferenceImages/siroino-moonlit-patisserie-uniform.png",
+    "decompositionPath": "config/products/siroino-moonlit-patisserie-uniform-set/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-moonlit-patisserie-uniform-set/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-moonlit-patisserie-uniform-set/stitch-graph.json",
+    "surfaceAttachmentGraphPath": "config/products/siroino-moonlit-patisserie-uniform-set/surface-attachment-graph.json",
+    "conceptReviewPath": "config/products/siroino-moonlit-patisserie-uniform-set/design-appearance-review.json",
+    "visualReviewPath": "config/products/siroino-moonlit-patisserie-uniform-set/visual-review.json",
+    "constructionPath": "config/products/siroino-moonlit-patisserie-uniform-set/construction.json",
+    "materialRecipePath": "config/products/siroino-moonlit-patisserie-uniform-set/material-recipe.json",
+    "garmentcodeStitchExport": "strict-boundary-edges",
+    "openSew2dPreview": true,
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true
+  },
+  "researchMethod": {
+    "name": "original two-view Moonlit Patisserie concept decomposed into separate blouse, waistcoat, skirt, and waist-apron layers",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-moonlit-patisserie-uniform-set/reference-audit.json",
+    "secondaryEvidence": "config/products/siroino-moonlit-patisserie-uniform-set/construction.json"
+  },
+  "licenseEvidence": "config/products/siroino-moonlit-patisserie-uniform-set/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local"
+  ],
+  "patternLayoutPath": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-moonlit-patisserie-uniform-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-moonlit-patisserie-uniform-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-moonlit-patisserie-uniform-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/README.md",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Source/Patterns/moonlit-patisserie.pattern.json",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Source/Patterns/moonlit-patisserie.stitches.json",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Source/Blender/SiroinoMoonlitPatisserieUniform.blend",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Models/SiroinoMoonlitPatisserieUniform.fbx",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Prefab/SiroinoMoonlitPatisserieUniform.prefab",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Prefab/SiroinoSotai_MoonlitPatisserieUniform.prefab",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/front.png",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/back.png",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/left.png",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/right.png",
+    "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Previews/three-quarter.png"
+  ]
+}

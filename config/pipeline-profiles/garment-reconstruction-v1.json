@@ -65,13 +65,29 @@
     },
     {
       "stage": "draft-patterns",
-      "toolName": "pattern-piece-drafter",
-      "purpose": "Create explicit two-dimensional panel boundaries and correspondence identifiers.",
+      "purpose": "Validate explicit two-dimensional panel boundaries and produce a construction-compatible review artifact.",
       "requiredInExecute": true,
       "minimumEvidenceCount": 1,
       "requiredResultFields": {},
+      "tools": [
+        {
+          "toolName": "pattern-piece-drafter",
+          "purpose": "Create explicit two-dimensional panel boundaries and correspondence identifiers.",
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "pattern.garmentcode-2d",
+          "purpose": "Validate supplied panel boundaries and render their non-overlapping 2D review layout through pinned GarmentCode/PyGarment.",
+          "runtime": "garmentcode-pygarment",
+          "priority": 100,
+          "deterministic": true
+        }
+      ],
       "managedOutputs": [
         "patternSpecification",
+        "patternLayoutPreview",
         "patternEdges",
         "seamAllowances",
         "notchesAndDarts",

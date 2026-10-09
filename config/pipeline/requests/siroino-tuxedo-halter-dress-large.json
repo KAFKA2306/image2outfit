@@ -4,7 +4,9 @@
   "targetAvatar": "SiroinoSotai_PC",
   "sourceReference": "private-reference://sha256/66cd898014d3f503da8015207a0240d946aac72b596f28bef8d6574a0afb678b",
   "revisionId": "v1-reference-audited-pattern-first",
+  "profilePath": "config/pipeline-profiles/garment-reconstruction-v1.json",
   "variables": {},
+  "toolPins": {"draft-patterns": "pattern.garmentcode-2d"},
   "stageBindings": {
     "ingest-reference": {"command":["python","tools/run_ingest_reference_stage.py","--stage","ingest-reference","--job","config/products/siroino-tuxedo-halter-dress-large/job.json","--request","config/pipeline/requests/siroino-tuxedo-halter-dress-large.json","--result",".image2outfit/products/{productId}/stages/ingest-reference.json"],"resultPath":".image2outfit/products/{productId}/stages/ingest-reference.json"},
     "normalize-view": {"command":["python","tools/run_reference_product_stage.py","--stage","normalize-view","--job","config/products/siroino-tuxedo-halter-dress-large/job.json","--request","config/pipeline/requests/siroino-tuxedo-halter-dress-large.json","--result",".image2outfit/products/{productId}/stages/normalize-view.json"],"resultPath":".image2outfit/products/{productId}/stages/normalize-view.json"},

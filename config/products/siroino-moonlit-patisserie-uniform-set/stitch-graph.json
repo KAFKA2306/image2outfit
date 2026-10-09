@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-moonlit-patisserie-uniform-set",
+  "draftStatus": "PROVISIONAL_BOUNDARY_EDGE_GRAPH",
+  "evaluationBoundary": "The graph covers structural shell seams. Patch-pocket surface placement and attachment remain unverified because the current GarmentCode/OpenSew exchange accepts outer-boundary edge chains only.",
+  "stitches": [
+    {
+      "stitchId": "blouse-left-side",
+      "first": {
+        "pieceId": "blouse-front-left",
+        "edgeId": "side-seam"
+      },
+      "second": {
+        "pieceId": "blouse-back",
+        "edgeId": "side-right"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "blouse-left-shoulder",
+      "first": {
+        "pieceId": "blouse-front-left",
+        "edgeId": "shoulder-seam"
+      },
+      "second": {
+        "pieceId": "blouse-back",
+        "edgeId": "shoulder-right"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "blouse-right-side",
+      "first": {
+        "pieceId": "blouse-front-right",
+        "edgeId": "side-seam"
+      },
+      "second": {
+        "pieceId": "blouse-back",
+        "edgeId": "side-left"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-right-shoulder",
+      "first": {
+        "pieceId": "blouse-front-right",
+        "edgeId": "shoulder-seam"
+      },
+      "second": {
+        "pieceId": "blouse-back",
+        "edgeId": "shoulder-left"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-left-armhole-front-lower",
+      "first": {
+        "pieceId": "blouse-front-left",
+        "edgeId": "armhole-lower"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-left",
+        "edgeId": "cap-front-lower"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "blouse-left-armhole-front-upper",
+      "first": {
+        "pieceId": "blouse-front-left",
+        "edgeId": "armhole-upper"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-left",
+        "edgeId": "cap-front-upper"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "blouse-left-armhole-back-upper",
+      "first": {
+        "pieceId": "blouse-back",
+        "edgeId": "armhole-right-upper"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-left",
+        "edgeId": "cap-back-upper"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-left-armhole-back-lower",
+      "first": {
+        "pieceId": "blouse-back",
+        "edgeId": "armhole-right-lower"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-left",
+        "edgeId": "cap-back-lower"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-left-sleeve-underarm",
+      "first": {
+        "pieceId": "blouse-sleeve-left",
+        "edgeId": "underarm-back"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-left",
+        "edgeId": "underarm-front"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-left-sleeve-cuff",
+      "first": {
+        "pieceId": "blouse-sleeve-left",
+        "edgeId": "cuff-edge"
+      },
+      "second": {
+        "pieceId": "blouse-cuff-left",
+        "edgeId": "sleeve-join"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-left-cuff-close",
+      "first": {
+        "pieceId": "blouse-cuff-left",
+        "edgeId": "cuff-end-right"
+      },
+      "second": {
+        "pieceId": "blouse-cuff-left",
+        "edgeId": "cuff-end-left"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-right-armhole-front-lower",
+      "first": {
+        "pieceId": "blouse-front-right",
+        "edgeId": "armhole-lower"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-right",
+        "edgeId": "cap-front-lower"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "blouse-right-armhole-front-upper",
+      "first": {
+        "pieceId": "blouse-front-right",
+        "edgeId": "armhole-upper"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-right",
+        "edgeId": "cap-front-upper"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "blouse-right-armhole-back-upper",
+      "first": {
+        "pieceId": "blouse-back",
+        "edgeId": "armhole-left-upper"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-right",
+        "edgeId": "cap-back-upper"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "blouse-right-armhole-back-lower",
+      "first": {
+        "pieceId": "blouse-back",
+        "edgeId": "armhole-left-lower"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-right",
+        "edgeId": "cap-back-lower"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "blouse-right-sleeve-underarm",
+      "first": {
+        "pieceId": "blouse-sleeve-right",
+        "edgeId": "underarm-back"
+      },
+      "second": {
+        "pieceId": "blouse-sleeve-right",
+        "edgeId": "underarm-front"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-right-sleeve-cuff",
+      "first": {
+        "pieceId": "blouse-sleeve-right",
+        "edgeId": "cuff-edge"
+      },
+      "second": {
+        "pieceId": "blouse-cuff-right",
+        "edgeId": "sleeve-join"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-right-cuff-close",
+      "first": {
+        "pieceId": "blouse-cuff-right",
+        "edgeId": "cuff-end-right"
+      },
+      "second": {
+        "pieceId": "blouse-cuff-right",
+        "edgeId": "cuff-end-left"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-front-left-to-collar",
+      "first": {
+        "pieceId": "blouse-front-left",
+        "edgeId": "neckline"
+      },
+      "second": {
+        "pieceId": "blouse-collar-band",
+        "edgeId": "neck-front-left"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "blouse-front-right-to-collar",
+      "first": {
+        "pieceId": "blouse-front-right",
+        "edgeId": "neckline"
+      },
+      "second": {
+      "pieceId": "blouse-collar-band",
+      "edgeId": "neck-front-right"
+    },
+    "type": "plain",
+    "easingRatio": 1.0,
+    "direction": "same",
+    "endpointMapping": "start-to-start"
+    },
+    {
+      "stitchId": "blouse-back-right-to-collar",
+      "first": {
+        "pieceId": "blouse-back",
+        "edgeId": "neckline-right"
+      },
+      "second": {
+      "pieceId": "blouse-collar-band",
+      "edgeId": "neck-back-right"
+    },
+    "type": "plain",
+    "easingRatio": 1.0,
+    "direction": "reversed",
+    "endpointMapping": "start-to-start"
+    },
+    {
+      "stitchId": "blouse-back-left-to-collar",
+      "first": {
+        "pieceId": "blouse-back",
+        "edgeId": "neckline-left"
+      },
+      "second": {
+      "pieceId": "blouse-collar-band",
+      "edgeId": "neck-back-left"
+    },
+    "type": "plain",
+    "easingRatio": 1.0,
+    "direction": "reversed",
+    "endpointMapping": "start-to-start"
+    },
+    {
+      "stitchId": "vest-left-side",
+      "first": {
+        "pieceId": "vest-front-left",
+        "edgeId": "side-seam"
+      },
+      "second": {
+        "pieceId": "vest-back",
+        "edgeId": "side-right"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "vest-left-shoulder",
+      "first": {
+        "pieceId": "vest-front-left",
+        "edgeId": "shoulder-seam"
+      },
+      "second": {
+        "pieceId": "vest-back",
+        "edgeId": "shoulder-right"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "vest-right-side",
+      "first": {
+        "pieceId": "vest-front-right",
+        "edgeId": "side-seam"
+      },
+      "second": {
+        "pieceId": "vest-back",
+        "edgeId": "side-left"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "vest-right-shoulder",
+      "first": {
+        "pieceId": "vest-front-right",
+        "edgeId": "shoulder-seam"
+      },
+      "second": {
+        "pieceId": "vest-back",
+        "edgeId": "shoulder-left"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "vest-back-waistband",
+      "first": {
+        "pieceId": "vest-back-waistband",
+        "edgeId": "back-join"
+      },
+      "second": {
+        "pieceId": "vest-back",
+        "edgeId": "waistband-join"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "skirt-right-side",
+      "first": {
+        "pieceId": "skirt-front-panels",
+        "edgeId": "side-right"
+      },
+      "second": {
+        "pieceId": "skirt-back-panels",
+        "edgeId": "side-right"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "skirt-left-side",
+      "first": {
+        "pieceId": "skirt-front-panels",
+        "edgeId": "side-left"
+      },
+      "second": {
+        "pieceId": "skirt-back-panels",
+        "edgeId": "side-left"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "skirt-front-to-waistband",
+      "first": {
+        "pieceId": "skirt-front-panels",
+        "edgeId": "waist-edge"
+      },
+      "second": {
+        "pieceId": "skirt-waistband",
+        "edgeId": "skirt-front-join"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "skirt-back-to-waistband",
+      "first": {
+        "pieceId": "skirt-back-panels",
+        "edgeId": "waist-edge"
+      },
+      "second": {
+      "pieceId": "skirt-waistband",
+      "edgeId": "skirt-back-join"
+    },
+    "type": "plain",
+    "easingRatio": 1.0,
+    "direction": "same",
+    "endpointMapping": "start-to-end"
+    },
+    {
+      "stitchId": "skirt-waistband-close",
+      "first": {
+        "pieceId": "skirt-waistband",
+        "edgeId": "right-end"
+      },
+      "second": {
+        "pieceId": "skirt-waistband",
+        "edgeId": "left-end"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    },
+    {
+      "stitchId": "apron-panel-to-waistband",
+      "first": {
+        "pieceId": "apron-front-panel",
+        "edgeId": "waistband-join"
+      },
+      "second": {
+        "pieceId": "apron-waistband",
+        "edgeId": "apron-join"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "apron-left-tie",
+      "first": {
+        "pieceId": "apron-waistband",
+        "edgeId": "tie-left-join"
+      },
+      "second": {
+        "pieceId": "apron-tie-left",
+        "edgeId": "waistband-end"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "same"
+    },
+    {
+      "stitchId": "apron-right-tie",
+      "first": {
+        "pieceId": "apron-waistband",
+        "edgeId": "tie-right-join"
+      },
+      "second": {
+        "pieceId": "apron-tie-right",
+        "edgeId": "waistband-end"
+      },
+      "type": "plain",
+      "easingRatio": 1.0,
+      "direction": "reversed"
+    }
+  ]
+}

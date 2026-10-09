@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-moonlit-patisserie-uniform-set",
+  "designRevision": "v1-moonlit-patisserie-concept",
+  "reviewedAt": "2026-09-28T16:21:29+09:00",
+  "reviewer": "chatgpt:codex-visual-review",
+  "reviewMethod": "direct-image-inspection",
+  "scope": "pre-3d-concept-and-2d-construction",
+  "status": "PASS",
+  "decision": "PASS",
+  "evidence": [
+    {
+      "kind": "reference-view",
+      "view": "front",
+      "path": ".image2outfit/products/siroino-moonlit-patisserie-uniform-set/normalized/front.png",
+      "sha256": "23c6644a4ab1c13f4ac4de732297468f51d52b0759e3ddcd31b7cbb92aa64adb"
+    },
+    {
+      "kind": "reference-view",
+      "view": "back",
+      "path": ".image2outfit/products/siroino-moonlit-patisserie-uniform-set/normalized/back.png",
+      "sha256": "60f31edda415c772a4a00f0130ea7d094e0060c28f5a8b54c16fbb4803b6aa09"
+    },
+    {
+      "kind": "pattern-layout",
+      "path": ".image2outfit/products/siroino-moonlit-patisserie-uniform-set/pattern/garmentcode/garmentcode-pattern-layout.png",
+      "sha256": "1831b1e1c1661457f4117bb2032bcb9e9fe4d7c07ea8d1b8012b682e6d5a798e"
+    },
+    {
+      "kind": "construction-contract",
+      "path": "config/products/siroino-moonlit-patisserie-uniform-set/construction.json",
+      "sha256": "456f54753d9294b3a5ffbce4eb3667448b587d0d58412b9c6eeb40ce5ff8faaf"
+    },
+    {
+      "kind": "pattern-contract",
+      "path": "config/products/siroino-moonlit-patisserie-uniform-set/pattern-draft.json",
+      "sha256": "1be11542a8c70c12cabf45068400e677320f821ad811a6725ca50e437e0a0571"
+    },
+    {
+      "kind": "stitch-graph",
+      "path": "config/products/siroino-moonlit-patisserie-uniform-set/stitch-graph.json",
+      "sha256": "19f38f62bfc13390032fe62faba5c1d9d3d7925d001c9318546c251e87e19f0a"
+    },
+    {
+      "kind": "surface-attachment-graph",
+      "path": "config/products/siroino-moonlit-patisserie-uniform-set/surface-attachment-graph.json",
+      "sha256": "838f01440a58360b72d164aa26ca43131a8b096ce7ed296013cff6085b021e19"
+    },
+    {
+      "kind": "garment-decomposition",
+      "path": "config/products/siroino-moonlit-patisserie-uniform-set/garment-decomposition.json",
+      "sha256": "edf629e6b4438fcb7c35f8bad3837a25aa3501edea307d92b25798f9663544f0"
+    },
+    {
+      "kind": "job-contract",
+      "path": "config/products/siroino-moonlit-patisserie-uniform-set/job.json",
+      "sha256": "13b220657efb74986e72187481dea294e74865fd523aa9ee356e63f1bb860a83"
+    },
+    {
+      "kind": "quality-policy",
+      "path": "contracts/quality/quality-spec.json",
+      "sha256": "01e182542d62fe5e16e7ce28e6e47ea6564c43a98a67e06fe354dc22edd746d3"
+    }
+  ],
+  "criteria": [
+    {
+      "id": "front-back-silhouette-and-palette",
+      "status": "PASS",
+      "rationale": "The observed front and back consistently show the cream puff-sleeve blouse, cropped cocoa waistcoat, plum A-line skirt, pale apron, and matching muted palette. No visible front/back silhouette or styling contradiction was found in the concept views."
+    },
+    {
+      "id": "visible-layer-and-component-coverage",
+      "status": "PASS",
+      "rationale": "The 2D construction declares separate blouse, waistcoat, skirt, and apron pieces, matching the visible layered concept. This approves the planned concept structure only; estimated dimensions are not fit evidence."
+    },
+    {
+      "id": "visible-surface-details-have-a-2d-plan",
+      "status": "PASS",
+      "rationale": "The front-view apron pockets and crescent detail have corresponding 2D surface-attachment and separate-geometry entries. The pocket graph remains planned placement/topstitch intent, not proof of sewn attachment."
+    }
+  ],
+  "unassessedAreas": [
+    "left-view",
+    "right-view",
+    "three-quarter-view",
+    "avatar-fit",
+    "motion-poses",
+    "cloth-and-material-response",
+    "3d-construction-quality"
+  ],
+  "findings": [],
+  "releaseBoundary": "This PASS approves the observed concept and its current 2D construction plan to enter prototype construction. It does not pass the required five-view rendered review, six-pose review, avatar fit, cloth/material response, 3D quality, or commercial release gates."
+}

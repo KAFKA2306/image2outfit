@@ -115,14 +115,22 @@ class CommandStageAdapter(PlannedStageAdapter):
         if result_path.exists():
             if not result_path.is_file():
                 raise ValueError(f"resultPath is not a file: {self.result_path}")
+
+        boundary = RepositoryWriteBoundary(
+            ROOT,
+            product_id=str(state["product_id"]),
+            product_workspace_output=self.stage.value in {"build-blender", "finalize-candidate"},
+        )
+        boundary.begin()
+        if result_path.exists():
             result_path.unlink()
         result_path.parent.mkdir(parents=True, exist_ok=True)
-
-        boundary = RepositoryWriteBoundary(ROOT)
-        boundary.begin()
+        command = list(self.command)
+        if command and command[0] == "python":
+            command[0] = sys.executable
         try:
             result = subprocess.run(
-                self.command,
+                command,
                 cwd=ROOT,
                 check=False,
                 capture_output=True,
@@ -131,7 +139,7 @@ class CommandStageAdapter(PlannedStageAdapter):
             if result.returncode != 0:
                 raise RuntimeError(
                     f"stage command failed with exit code {result.returncode}: "
-                    f"{' '.join(self.command)}\n{result.stderr}"
+                    f"{' '.join(command)}\n{result.stderr}"
                 )
 
             if not result_path.is_file():

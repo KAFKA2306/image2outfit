@@ -10,6 +10,17 @@ from typing import Any
 
 from PIL import Image
 
+from .construction import DEFAULT_RELATIVE_LENGTH_TOLERANCE
+from .curves import curve_length, normalize_curvature, scale_curvature
+from .domain import PatternEdge, PatternEdgeRole, PatternPiece
+from .pattern_stage import (
+    DEFAULT_PATTERN_MINIMUM_ANGLE_DEGREES,
+    DEFAULT_PATTERN_MINIMUM_AREA_M2,
+    DEFAULT_PATTERN_MINIMUM_EDGE_M,
+    audit_pattern_piece_geometry,
+)
+from .stitch_mapping import resolve_endpoint_mapping
+
 _NORMALIZED_SIZE = 768
 
 
@@ -130,6 +141,13 @@ def normalize_observed_variants(
     variants = audit.get("variants")
     if not isinstance(variants, list) or not variants:
         raise ValueError("reference audit variants must be a non-empty list")
+    unobserved = audit.get("unobserved", ["back-view"])
+    if not isinstance(unobserved, list) or any(
+        not isinstance(view, str) or not view.strip() for view in unobserved
+    ):
+        raise ValueError("reference audit unobserved must be a list of non-empty views")
+    if len(unobserved) != len(set(unobserved)):
+        raise ValueError("reference audit unobserved views must be unique")
 
     output_root.mkdir(parents=True, exist_ok=True)
     outputs: list[Path] = []
@@ -228,7 +246,7 @@ def normalize_observed_variants(
         "normalizedCanvasSizePx": [_NORMALIZED_SIZE, _NORMALIZED_SIZE],
         "variants": records,
         "designHypotheses": [],
-        "unobserved": ["back-view"],
+        "unobserved": unobserved,
         "roundTripMaxErrorPx": max_round_trip,
     }
     return outputs, manifest
@@ -253,6 +271,7 @@ def validate_pattern_contract(
         raise ValueError("pattern product identity mismatch")
     if payload.get("units") not in {"meter", "millimeter"}:
         raise ValueError("pattern units must be meter or millimeter")
+    coordinate_scale = 1.0 if payload["units"] == "meter" else 0.001
 
     pieces = payload.get("pieces")
     if not isinstance(pieces, list) or not pieces:
@@ -337,6 +356,26 @@ def validate_pattern_contract(
             )
             if math.hypot(*vector) <= 0:
                 raise ValueError(f"pattern edge {piece_id}.{edge_id} has zero length")
+            curvature = raw_edge.get("curvature")
+            length_m = math.hypot(*vector) * coordinate_scale
+            if curvature is not None:
+                if not isinstance(curvature, Mapping):
+                    raise ValueError(
+                        f"pattern edge {piece_id}.{edge_id} curvature must be an object"
+                    )
+                normalized_curve = normalize_curvature(
+                    curvature,
+                    f"pattern edge {piece_id}.{edge_id}",
+                )
+                if (end - start) % len(boundary) not in {1, len(boundary) - 1}:
+                    raise ValueError(
+                        f"curved pattern edge {piece_id}.{edge_id} must map to one boundary segment"
+                    )
+                length_m = curve_length(
+                    (float(first[0]) * coordinate_scale, float(first[1]) * coordinate_scale),
+                    (float(second[0]) * coordinate_scale, float(second[1]) * coordinate_scale),
+                    scale_curvature(normalized_curve, coordinate_scale),
+                )
             edges[(piece_id, edge_id)] = {
                 "pieceId": piece_id,
                 "edgeId": edge_id,
@@ -344,6 +383,8 @@ def validate_pattern_contract(
                 "startVertex": start,
                 "endVertex": end,
                 "vector": vector,
+                "lengthM": length_m,
+                "curvature": normalized_curve if curvature is not None else None,
                 "maxConnections": max_connections,
             }
 
@@ -355,13 +396,104 @@ def validate_pattern_contract(
     }
 
 
+def audit_pattern_geometry_contract(
+    payload: Mapping[str, Any],
+    *,
+    expected_product_id: str,
+) -> dict[str, Any]:
+    """Audit canonical pattern polygons with the shared domain geometry rules."""
+    validate_pattern_contract(payload, expected_product_id=expected_product_id)
+    units = payload["units"]
+    coordinate_scale = 1.0 if units == "meter" else 0.001
+    edge_roles = {
+        "seam": PatternEdgeRole.SEAM,
+        "attachment": PatternEdgeRole.ATTACHMENT,
+        "open": PatternEdgeRole.OPENING,
+        "hem": PatternEdgeRole.HEM,
+        "fold": PatternEdgeRole.FOLD,
+        "internal": PatternEdgeRole.CUT,
+    }
+    pattern_pieces: list[PatternPiece] = []
+    for raw_piece in payload["pieces"]:
+        piece_id = _piece_id(raw_piece)
+        edges: list[PatternEdge] = []
+        for raw_edge in raw_piece["edges"]:
+            role = edge_roles.get(raw_edge["role"])
+            if role is None:
+                raise ValueError(
+                    f"pattern edge {piece_id}.{raw_edge['edgeId']} has no geometry role mapping"
+                )
+            edges.append(
+                PatternEdge(
+                    edge_id=raw_edge["edgeId"],
+                    piece_id=piece_id,
+                    start_vertex=raw_edge["startVertex"],
+                    end_vertex=raw_edge["endVertex"],
+                    role=role,
+                    seam_allowance_m=float(raw_piece["seamAllowanceM"]),
+                    curvature=(
+                        scale_curvature(raw_edge["curvature"], coordinate_scale)
+                        if raw_edge.get("curvature") is not None
+                        else None
+                    ),
+                )
+            )
+        pattern_pieces.append(
+            PatternPiece(
+                piece_id=piece_id,
+                part_id=raw_piece["partId"],
+                boundary=tuple(
+                    tuple(float(value) * coordinate_scale for value in point)
+                    for point in raw_piece["boundary"]
+                ),
+                grain_angle_degrees=float(raw_piece.get("grainAngleDegrees", 0.0)),
+                cut_count=raw_piece.get("cutCount", 1),
+                on_fold=raw_piece.get("onFold", False),
+                edges=tuple(edges),
+            )
+        )
+
+    defects = audit_pattern_piece_geometry(pattern_pieces)
+    defect_codes = sorted({item.code for item in defects})
+    return {
+        "auditType": "pattern-piece-planar-geometry",
+        "status": "PASS" if not defects else "FAIL",
+        "pieceCount": len(pattern_pieces),
+        "thresholds": {
+            "minimumAreaM2": DEFAULT_PATTERN_MINIMUM_AREA_M2,
+            "minimumEdgeM": DEFAULT_PATTERN_MINIMUM_EDGE_M,
+            "minimumAngleDegrees": DEFAULT_PATTERN_MINIMUM_ANGLE_DEGREES,
+            "maximumSelfIntersections": 0,
+        },
+        "defectCount": len(defects),
+        "defectCounts": {
+            code: sum(item.code == code for item in defects)
+            for code in defect_codes
+        },
+        "defects": [
+            {
+                "pieceId": item.piece_id,
+                "code": item.code,
+                "value": item.value,
+                "threshold": item.threshold,
+            }
+            for item in defects
+        ],
+        "evaluationLimit": (
+            "Planar pattern geometry only; this does not evaluate fabric grain suitability, "
+            "stitch assembly, avatar fit, 3D silhouette, motion, or appearance."
+        ),
+    }
+
+
 def validate_stitch_contract(
     payload: Mapping[str, Any],
     pattern: Mapping[str, Any],
     *,
     expected_product_id: str,
+    relative_length_tolerance: float = DEFAULT_RELATIVE_LENGTH_TOLERANCE,
 ) -> dict[str, Any]:
-    """Validate stitch references, direction declarations, and edge multiplicity."""
+    """Validate stitch references, geometric direction, endpoint mapping, and edge multiplicity."""
     pattern_summary = validate_pattern_contract(
         pattern,
         expected_product_id=expected_product_id,
@@ -375,9 +507,19 @@ def validate_stitch_contract(
         raise ValueError("stitch graph stitches must be a non-empty list")
 
     edges = pattern_summary["edges"]
+    if (
+        not isinstance(relative_length_tolerance, (int, float))
+        or not math.isfinite(relative_length_tolerance)
+        or relative_length_tolerance < 0
+    ):
+        raise ValueError("relative_length_tolerance must be finite and non-negative")
     seen_ids: set[str] = set()
     usage: dict[tuple[str, str], int] = {}
     orientation_checks = 0
+    endpoint_mapping_checks: list[dict[str, str]] = []
+    edge_length_checks = 0
+    edge_length_mismatches: list[dict[str, Any]] = []
+    edge_length_discrepancies: list[float] = []
     for raw_stitch in stitches:
         if not isinstance(raw_stitch, Mapping):
             raise ValueError("stitch graph entries must be objects")
@@ -434,6 +576,17 @@ def validate_stitch_contract(
                 )
             orientation_checks += 1
 
+        endpoint_mapping, endpoint_mapping_source = resolve_endpoint_mapping(
+            raw_stitch
+        )
+        endpoint_mapping_checks.append(
+            {
+                "stitchId": stitch_id,
+                "mapping": endpoint_mapping,
+                "source": endpoint_mapping_source,
+            }
+        )
+
         easing = raw_stitch.get("easingRatio", 1.0)
         if (
             not isinstance(easing, (int, float))
@@ -441,6 +594,70 @@ def validate_stitch_contract(
             or easing <= 0
         ):
             raise ValueError(f"stitch {stitch_id!r} easingRatio must be positive")
+        first_length = first_edge["lengthM"]
+        second_length = second_edge["lengthM"]
+        interface_ruffle = raw_stitch.get("garmentCodeInterfaceRuffle")
+        ruffle_factors = {"first": 1.0, "second": 1.0}
+        if interface_ruffle is not None:
+            if not isinstance(interface_ruffle, Mapping):
+                raise ValueError(
+                    f"stitch {stitch_id!r} garmentCodeInterfaceRuffle must be an object"
+                )
+            side = interface_ruffle.get("side")
+            ratio = interface_ruffle.get("ratio")
+            source = interface_ruffle.get("source")
+            if side not in {"first", "second"}:
+                raise ValueError(
+                    f"stitch {stitch_id!r} ruffle side must be first or second"
+                )
+            if (
+                isinstance(ratio, bool)
+                or not isinstance(ratio, (int, float))
+                or not math.isfinite(ratio)
+                or ratio < 1.0
+            ):
+                raise ValueError(
+                    f"stitch {stitch_id!r} ruffle ratio must be finite and at least 1"
+                )
+            if (
+                not isinstance(source, Mapping)
+                or not isinstance(source.get("path"), str)
+                or not source.get("path")
+                or not isinstance(source.get("field"), str)
+                or not source.get("field")
+                or not isinstance(source.get("sha256"), str)
+                or len(source["sha256"]) != 64
+                or any(character not in "0123456789abcdef" for character in source["sha256"])
+            ):
+                raise ValueError(
+                    f"stitch {stitch_id!r} ruffle metadata requires source path, field, and SHA-256"
+                )
+            ruffle_factors[side] = float(ratio)
+        projected_first_length = first_length / ruffle_factors["first"]
+        projected_second_length = (
+            second_length / ruffle_factors["second"]
+        ) * float(easing)
+        denominator = max(projected_first_length, projected_second_length, 1e-12)
+        relative_discrepancy = abs(projected_first_length - projected_second_length) / denominator
+        edge_length_checks += 1
+        edge_length_discrepancies.append(relative_discrepancy)
+        if relative_discrepancy > relative_length_tolerance:
+            edge_length_mismatches.append(
+                {
+                    "stitchId": stitch_id,
+                    "firstEdge": f"{endpoints[0][0]}.{endpoints[0][1]}",
+                    "secondEdge": f"{endpoints[1][0]}.{endpoints[1][1]}",
+                    "firstLengthM": first_length,
+                    "secondLengthM": second_length,
+                    "firstRuffleRatio": ruffle_factors["first"],
+                    "secondRuffleRatio": ruffle_factors["second"],
+                    "projectedFirstLengthM": projected_first_length,
+                    "projectedSecondLengthM": projected_second_length,
+                    "easingRatio": float(easing),
+                    "expectedSecondLengthM": projected_second_length,
+                    "relativeDiscrepancy": relative_discrepancy,
+                }
+            )
 
     for key, count in usage.items():
         maximum = edges[key]["maxConnections"]
@@ -464,6 +681,263 @@ def validate_stitch_contract(
         "stitchCount": len(seen_ids),
         "referencedEdgeCount": len(usage),
         "orientationChecks": orientation_checks,
+        "endpointMappingChecks": endpoint_mapping_checks,
+        "explicitEndpointMappingCount": sum(
+            check["source"] == "explicit" for check in endpoint_mapping_checks
+        ),
         "patternPieceCount": pattern_summary["pieceCount"],
         "patternEdgeCount": pattern_summary["edgeCount"],
+        "edgeLengthCompatibilityAudit": {
+            "status": "PASS" if not edge_length_mismatches else "FAIL",
+            "relativeTolerance": relative_length_tolerance,
+            "checkedPairCount": edge_length_checks,
+            "compatiblePairCount": edge_length_checks - len(edge_length_mismatches),
+            "mismatchCount": len(edge_length_mismatches),
+            "maximumRelativeDiscrepancy": max(edge_length_discrepancies, default=0.0),
+            "meanRelativeDiscrepancy": (
+                sum(edge_length_discrepancies) / len(edge_length_discrepancies)
+                if edge_length_discrepancies
+                else 0.0
+            ),
+            "mismatches": edge_length_mismatches,
+            "evaluationLimit": (
+                "2D edge lengths use exact circles and bounded Bezier flattening; this does not evaluate sewn 3D curves, "
+                "physical ease, assembly, avatar fit, collision, motion, or appearance."
+            ),
+        },
+    }
+
+
+def audit_structural_pattern_coverage(
+    pattern: Mapping[str, Any],
+    stitches: Mapping[str, Any],
+    decomposition: Mapping[str, Any],
+    construction: Mapping[str, Any] | None,
+    *,
+    expected_product_id: str,
+) -> dict[str, Any]:
+    """Check that required structural parts exist and their seams form components."""
+    payloads = [
+        ("pattern", pattern),
+        ("stitch graph", stitches),
+        ("decomposition", decomposition),
+    ]
+    if construction is not None:
+        payloads.append(("construction", construction))
+    for label, payload in payloads:
+        if payload.get("schemaVersion") != 1:
+            raise ValueError(f"{label} schemaVersion must be 1")
+        if payload.get("productId") != expected_product_id:
+            raise ValueError(f"{label} product identity mismatch")
+
+    pattern_pieces = pattern.get("pieces")
+    decomposition_parts = decomposition.get("parts")
+    stitch_pairs = stitches.get("stitches")
+    if not all(
+        isinstance(items, list)
+        for items in (pattern_pieces, decomposition_parts, stitch_pairs)
+    ):
+        raise ValueError("pattern pieces, decomposition parts, and stitch graph must be lists")
+
+    piece_ids: set[str] = set()
+    part_id_by_piece: dict[str, str] = {}
+    piece_ids_by_part: dict[str, list[str]] = {}
+    for index, raw_piece in enumerate(pattern_pieces):
+        if not isinstance(raw_piece, Mapping):
+            raise ValueError(f"pattern piece {index} must be an object")
+        piece_id = _piece_id(raw_piece)
+        if piece_id in piece_ids:
+            raise ValueError(f"duplicate pattern pieceId: {piece_id}")
+        part_id = raw_piece.get("partId")
+        if not isinstance(part_id, str) or not part_id:
+            raise ValueError(f"pattern piece {piece_id!r} partId is required")
+        piece_ids.add(piece_id)
+        part_id_by_piece[piece_id] = part_id
+        piece_ids_by_part.setdefault(part_id, []).append(piece_id)
+
+    structural_part_ids: list[str] = []
+    for index, raw_part in enumerate(decomposition_parts):
+        if not isinstance(raw_part, Mapping):
+            raise ValueError(f"decomposition part {index} must be an object")
+        if raw_part.get("role") != "structural-panel":
+            continue
+        part_id = raw_part.get("partId")
+        if not isinstance(part_id, str) or not part_id:
+            raise ValueError(f"structural decomposition part {index} requires partId")
+        if part_id in structural_part_ids:
+            raise ValueError(f"duplicate structural decomposition partId: {part_id}")
+        structural_part_ids.append(part_id)
+
+    required_components = (
+        construction.get("requiredPatternComponents", [])
+        if construction is not None
+        else []
+    )
+    if not isinstance(required_components, list):
+        raise ValueError("construction requiredPatternComponents must be a list")
+    construction_panels = construction.get("panels") if construction is not None else None
+    if required_components:
+        if not isinstance(construction_panels, list) or not all(
+            isinstance(item, str) and item for item in construction_panels
+        ):
+            raise ValueError(
+                "construction panels must list every required pattern piece ID"
+            )
+        if len(construction_panels) != len(set(construction_panels)):
+            raise ValueError("construction panels must contain unique piece IDs")
+
+    adjacency = {piece_id: set() for piece_id in piece_ids}
+    for index, raw_stitch in enumerate(stitch_pairs):
+        if not isinstance(raw_stitch, Mapping):
+            raise ValueError(f"stitch {index} must be an object")
+        first = raw_stitch.get("first")
+        second = raw_stitch.get("second")
+        if not isinstance(first, Mapping) or not isinstance(second, Mapping):
+            raise ValueError(f"stitch {index} must have two endpoints")
+        first_piece = first.get("pieceId")
+        second_piece = second.get("pieceId")
+        if first_piece not in adjacency or second_piece not in adjacency:
+            raise ValueError(f"stitch {index} references an unknown pattern piece")
+        adjacency[first_piece].add(second_piece)
+        adjacency[second_piece].add(first_piece)
+
+    connectivity_audits: dict[str, dict[str, Any]] = {}
+    for part_id in sorted(structural_part_ids):
+        part_piece_ids = sorted(piece_ids_by_part.get(part_id, []))
+        if not part_piece_ids:
+            connectivity_audits[part_id] = {
+                "partId": part_id,
+                "patternPieceIds": [],
+                "connectedByStitchGraph": False,
+                "status": "MISSING_PATTERN_PIECES",
+            }
+            continue
+        pending = [part_piece_ids[0]]
+        connected = {part_piece_ids[0]}
+        while pending:
+            current = pending.pop()
+            same_part_neighbours = {
+                neighbour
+                for neighbour in adjacency[current]
+                if part_id_by_piece[neighbour] == part_id
+            }
+            for neighbour in same_part_neighbours.difference(connected):
+                connected.add(neighbour)
+                pending.append(neighbour)
+        is_connected = connected == set(part_piece_ids)
+        connectivity_audits[part_id] = {
+            "partId": part_id,
+            "patternPieceIds": part_piece_ids,
+            "connectedByStitchGraph": is_connected,
+            "status": "PASS" if is_connected else "DISCONNECTED_STITCH_GRAPH",
+        }
+
+    component_audits: list[dict[str, Any]] = []
+    component_ids: set[str] = set()
+    for index, raw_component in enumerate(required_components):
+        if not isinstance(raw_component, Mapping):
+            raise ValueError(f"required pattern component {index} must be an object")
+        component_id = raw_component.get("componentId")
+        part_id = raw_component.get("partId")
+        required_piece_ids = raw_component.get("requiredPieceIds")
+        if not isinstance(component_id, str) or not component_id:
+            raise ValueError(f"required pattern component {index} needs componentId")
+        if component_id in component_ids:
+            raise ValueError(f"duplicate required pattern componentId: {component_id}")
+        component_ids.add(component_id)
+        if not isinstance(part_id, str) or part_id not in structural_part_ids:
+            raise ValueError(
+                f"required pattern component {component_id!r} must bind to a structural decomposition part"
+            )
+        if not isinstance(required_piece_ids, list) or not required_piece_ids:
+            raise ValueError(
+                f"required pattern component {component_id!r} needs requiredPieceIds"
+            )
+        if not all(isinstance(item, str) and item for item in required_piece_ids):
+            raise ValueError(
+                f"required pattern component {component_id!r} has an invalid piece ID"
+            )
+        if len(required_piece_ids) != len(set(required_piece_ids)):
+            raise ValueError(
+                f"required pattern component {component_id!r} needs unique requiredPieceIds"
+            )
+        observed_piece_ids = set(piece_ids_by_part.get(part_id, []))
+        missing_piece_ids = sorted(set(required_piece_ids).difference(piece_ids))
+        undeclared_piece_ids = sorted(
+            set(required_piece_ids).difference(construction_panels or [])
+        )
+        wrong_part_piece_ids = sorted(
+            item
+            for item in set(required_piece_ids).intersection(piece_ids)
+            if part_id_by_piece[item] != part_id
+        )
+        connectivity = connectivity_audits[part_id]
+        if undeclared_piece_ids:
+            status = "REQUIRED_PANELS_NOT_DECLARED_IN_CONSTRUCTION"
+        elif missing_piece_ids:
+            status = "MISSING_REQUIRED_PANELS"
+        elif wrong_part_piece_ids:
+            status = "WRONG_PATTERN_PART_BINDING"
+        elif connectivity["status"] != "PASS":
+            status = "DISCONNECTED_STITCH_GRAPH"
+        else:
+            status = "PASS"
+        component_audits.append(
+            {
+                "componentId": component_id,
+                "partId": part_id,
+                "requiredPieceIds": list(required_piece_ids),
+                "observedPieceIds": sorted(observed_piece_ids),
+                "undeclaredRequiredPieceIds": undeclared_piece_ids,
+                "missingPieceIds": missing_piece_ids,
+                "wrongPartPieceIds": wrong_part_piece_ids,
+                "connectedByStitchGraph": connectivity["connectedByStitchGraph"],
+                "status": status,
+            }
+        )
+
+    missing_components = [
+        item["componentId"]
+        for item in component_audits
+        if item["status"] != "PASS"
+    ]
+    missing_panels = sorted(
+        {piece_id for item in component_audits for piece_id in item["missingPieceIds"]}
+    )
+    undeclared_panels = sorted(
+        {
+            piece_id
+            for item in component_audits
+            for piece_id in item["undeclaredRequiredPieceIds"]
+        }
+    )
+    disconnected_components = [
+        item["componentId"]
+        for item in component_audits
+        if item["status"] == "DISCONNECTED_STITCH_GRAPH"
+    ]
+    passed = not missing_components
+    audit_status = (
+        "BLOCKED"
+        if not passed
+        else "PASS"
+        if required_components
+        else "NOT_REQUIRED"
+    )
+    return {
+        "status": audit_status,
+        "patternPieceCount": len(piece_ids),
+        "requiredPatternComponentCount": len(component_audits),
+        "constructionPanelCount": (
+            len(construction_panels) if isinstance(construction_panels, list) else None
+        ),
+        "missingExpectedPanels": missing_panels,
+        "undeclaredRequiredPanels": undeclared_panels,
+        "structuralComponentCoverage": component_audits,
+        "structuralPartStitchConnectivity": [
+            connectivity_audits[part_id] for part_id in sorted(connectivity_audits)
+        ],
+        "missingStructuralComponents": missing_components,
+        "disconnectedStructuralComponents": disconnected_components,
+        "stitchConnectivityScope": "Per required structural component; graph-level piece connectivity only, no physical assembly or 3D claim.",
     }

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-astral-tabi-boot-set",
+  "productName": "Astral Tabi Trail Boots for Siroino",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-astral-tabi-concept",
+  "renderLoopRevision": "v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-astral-tabi-boot-set",
+  "productManifestPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/siroino_astral_tabi_boot_set_build.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/Source/Blender/SiroinoAstralTabiBootSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/Models/SiroinoAstralTabiBootSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/Prefab/SiroinoAstralTabiBootSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/Prefab/SiroinoSotai_AstralTabiBootSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "SiroinoSotai_PC; footwear fit not measured",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ]
+  },
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "identityManifestPath": "config/products/siroino-astral-tabi-boot-set/reference-identity.json",
+    "referenceAuditPath": "config/products/siroino-astral-tabi-boot-set/reference-audit.json",
+    "privateReferencePath": "Assets/_Local/ReferenceImages/siroino-astral-tabi-boot-set.png",
+    "decompositionPath": "config/products/siroino-astral-tabi-boot-set/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-astral-tabi-boot-set/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-astral-tabi-boot-set/stitch-graph.json",
+    "visualReviewPath": "config/products/siroino-astral-tabi-boot-set/visual-review.json",
+    "constructionPath": "config/products/siroino-astral-tabi-boot-set/construction.json",
+    "materialRecipePath": "config/products/siroino-astral-tabi-boot-set/material-recipe.json",
+    "garmentcodeStitchExport": "strict-boundary-edges",
+    "openSew2dPreview": true,
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true
+  },
+  "researchMethod": {
+    "name": "original four-view tabi trail footwear concept drafted as 2D panels and stitched through the pinned GarmentCode 2D stage",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-astral-tabi-boot-set/reference-audit.json",
+    "secondaryEvidence": "config/products/siroino-astral-tabi-boot-set/construction.json"
+  },
+  "licenseEvidence": "config/products/siroino-astral-tabi-boot-set/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local"
+  ],
+  "patternLayoutPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-astral-tabi-boot-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-astral-tabi-boot-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-astral-tabi-boot-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/README.md",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Source/Patterns/astral-tabi-boot.pattern.json",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Source/Patterns/astral-tabi-boot.stitches.json",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Source/Blender/SiroinoAstralTabiBootSet.blend",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Models/SiroinoAstralTabiBootSet.fbx",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Prefab/SiroinoAstralTabiBootSet.prefab",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Prefab/SiroinoSotai_AstralTabiBootSet.prefab",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/front.png",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/back.png",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/left.png",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/right.png",
+    "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/three-quarter.png"
+  ]
+}

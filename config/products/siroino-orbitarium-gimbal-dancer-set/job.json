@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-orbitarium-gimbal-dancer-set",
+  "productName": "Orbitarium Gimbal Dancer Set for Siroino",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-orbitarium-gimbal-dancer-concept",
+  "renderLoopRevision": "v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set",
+  "productManifestPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "blendPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Source/Blender/SiroinoOrbitariumGimbalDancer.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Models/SiroinoOrbitariumGimbalDancer.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Prefab/SiroinoOrbitariumGimbalDancer.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Prefab/SiroinoSotai_OrbitariumGimbalDancer.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "SiroinoSotai_PC; this outfit's fit has not been measured",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ]
+  },
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "identityManifestPath": "config/products/siroino-orbitarium-gimbal-dancer-set/reference-identity.json",
+    "referenceAuditPath": "config/products/siroino-orbitarium-gimbal-dancer-set/reference-audit.json",
+    "privateReferencePath": "Assets/_Local/ReferenceImages/siroino-orbitarium-gimbal-dancer.png",
+    "decompositionPath": "config/products/siroino-orbitarium-gimbal-dancer-set/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-orbitarium-gimbal-dancer-set/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-orbitarium-gimbal-dancer-set/stitch-graph.json",
+    "surfaceAttachmentGraphPath": "config/products/siroino-orbitarium-gimbal-dancer-set/surface-attachment-graph.json",
+    "conceptReviewPath": "config/products/siroino-orbitarium-gimbal-dancer-set/design-appearance-review.json",
+    "visualReviewPath": "config/products/siroino-orbitarium-gimbal-dancer-set/visual-review.json",
+    "constructionPath": "config/products/siroino-orbitarium-gimbal-dancer-set/construction.json",
+    "materialRecipePath": "config/products/siroino-orbitarium-gimbal-dancer-set/material-recipe.json",
+    "garmentcodeStitchExport": "strict-boundary-edges",
+    "openSew2dPreview": true,
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true
+  },
+  "researchMethod": {
+    "name": "original Orbitarium Gimbal Dancer two-view concept, decomposed into a sleeveless top, tailored shorts, and asymmetric overskirt panels",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-orbitarium-gimbal-dancer-set/reference-audit.json",
+    "secondaryEvidence": "config/products/siroino-orbitarium-gimbal-dancer-set/construction.json"
+  },
+  "licenseEvidence": "config/products/siroino-orbitarium-gimbal-dancer-set/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local"
+  ],
+  "patternLayoutPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-orbitarium-gimbal-dancer-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-orbitarium-gimbal-dancer-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-orbitarium-gimbal-dancer-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/README.md",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Source/Patterns/orbitarium-gimbal-dancer.pattern.json",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Source/Patterns/orbitarium-gimbal-dancer.stitches.json",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Source/Blender/SiroinoOrbitariumGimbalDancer.blend",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Models/SiroinoOrbitariumGimbalDancer.fbx",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Prefab/SiroinoOrbitariumGimbalDancer.prefab",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Prefab/SiroinoSotai_OrbitariumGimbalDancer.prefab",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/front.png",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/back.png",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/left.png",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/right.png",
+    "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/three-quarter.png"
+  ]
+}

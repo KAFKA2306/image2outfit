@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "units": "meter",
+  "layoutStatus": "PROVISIONAL_UNMEASURED_2D",
+  "evaluationBoundary": "A paired diamond-quilt elbow overlay is visible in the left, rear, and right reference views. The eight-sided panel and its position on the flat sleeve patterns are proportional hypotheses only; overlay dimensions, surface mapping, attachment method, stitch type, relief depth, fit, and cloth behavior are unmeasured. This graph audits only 2D containment and bilateral reflection.",
+  "overlays": [
+    {
+      "overlayId": "jacket-elbow-left",
+      "hostPieceId": "jacket-sleeve-left",
+      "overlayPieceId": "jacket-elbow-quilt-overlay",
+      "mirrorGroupId": "jacket-elbow-patch-pair",
+      "side": "left",
+      "transform": {
+        "anchorLocalM": [
+          0.0,
+          0.0
+        ],
+        "targetPointOnHostM": [
+          0.0,
+          0.2
+        ],
+        "rotationDegrees": 0.0,
+        "mirrorX": false
+      },
+      "openingEdgeId": null,
+      "attachmentEdgeIds": [
+        "elbow-overlay-edge-0",
+        "elbow-overlay-edge-1",
+        "elbow-overlay-edge-2",
+        "elbow-overlay-edge-3",
+        "elbow-overlay-edge-4",
+        "elbow-overlay-edge-5",
+        "elbow-overlay-edge-6",
+        "elbow-overlay-edge-7"
+      ],
+      "attachmentHypothesis": "planned-topstitch"
+    },
+    {
+      "overlayId": "jacket-elbow-right",
+      "hostPieceId": "jacket-sleeve-right",
+      "overlayPieceId": "jacket-elbow-quilt-overlay",
+      "mirrorGroupId": "jacket-elbow-patch-pair",
+      "side": "right",
+      "transform": {
+        "anchorLocalM": [
+          0.0,
+          0.0
+        ],
+        "targetPointOnHostM": [
+          0.0,
+          0.2
+        ],
+        "rotationDegrees": 0.0,
+        "mirrorX": false
+      },
+      "openingEdgeId": null,
+      "attachmentEdgeIds": [
+        "elbow-overlay-edge-0",
+        "elbow-overlay-edge-1",
+        "elbow-overlay-edge-2",
+        "elbow-overlay-edge-3",
+        "elbow-overlay-edge-4",
+        "elbow-overlay-edge-5",
+        "elbow-overlay-edge-6",
+        "elbow-overlay-edge-7"
+      ],
+      "attachmentHypothesis": "planned-topstitch"
+    }
+  ]
+}

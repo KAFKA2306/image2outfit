@@ -10,6 +10,116 @@
     "profile"
   ],
   "properties": {
+    "prototypeWeightRegions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pieceIds",
+          "bodyTriangleZM",
+          "excludedBoneNamePrefixes",
+          "evidenceBoundary"
+        ],
+        "properties": {
+          "pieceIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "bodyTriangleZM": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          "excludedBoneNamePrefixes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "evidenceBoundary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "weightProfile": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "method",
+              "pieceIds",
+              "hipBone",
+              "leftThighBone",
+              "rightThighBone",
+              "waistThighWeight",
+              "hemThighWeight",
+              "centerlineHalfWidthM",
+              "fullSideWeightWidthM",
+              "evidenceBoundary"
+            ],
+            "properties": {
+              "method": {
+                "const": "hip-anchored-lateral-thigh-fade-v1"
+              },
+              "pieceIds": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "hipBone": {
+                "type": "string",
+                "minLength": 1
+              },
+              "leftThighBone": {
+                "type": "string",
+                "minLength": 1
+              },
+              "rightThighBone": {
+                "type": "string",
+                "minLength": 1
+              },
+              "waistThighWeight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "hemThighWeight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "centerlineHalfWidthM": {
+                "type": "number",
+                "minimum": 0
+              },
+              "fullSideWeightWidthM": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "evidenceBoundary": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
     "schemaVersion": {
       "const": 1
     },
@@ -35,6 +145,41 @@
       "items": {
         "type": "string",
         "minLength": 1
+      }
+    },
+    "requiredPatternComponents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "componentId",
+          "partId",
+          "requiredPieceIds"
+        ],
+        "properties": {
+          "componentId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "partId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requiredPieceIds": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     },
     "separateGeometry": {
@@ -78,6 +223,28 @@
         "reason"
       ],
       "properties": {
+        "prototypePanelGroups": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "prototypeFrameEnd": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 120
+        },
+        "prototypeWaistPinUpperFraction": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 0.5
+        },
         "applicability": {
           "enum": [
             "REQUIRED",
@@ -99,6 +266,107 @@
         "reason": {
           "type": "string",
           "minLength": 1
+        },
+        "prototypeWaistPinBoundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "component",
+            "edgeId",
+            "heightM",
+            "toleranceM",
+            "method"
+          ],
+          "properties": {
+            "component": {
+              "type": "string",
+              "minLength": 1
+            },
+            "edgeId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "heightM": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "toleranceM": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.0001
+            },
+            "method": {
+              "const": "open-boundary-at-declared-waist-height"
+            }
+          }
+        },
+        "prototypeRestShape": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pleated-overskirt": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "method",
+                "sampleRowCount",
+                "sectionBoundaryInsetM",
+                "evidenceBoundary"
+              ],
+              "properties": {
+                "method": {
+                  "const": "canonical-row-circumference-rest-springs"
+                },
+                "sampleRowCount": {
+                  "type": "integer",
+                  "minimum": 8,
+                  "maximum": 128
+                },
+                "sectionBoundaryInsetM": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "exclusiveMaximum": 0.001
+                },
+                "evidenceBoundary": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "prototypeComponentBending": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "stiffness",
+              "evidencePath",
+              "evidenceSha256",
+              "evidenceBoundary"
+            ],
+            "properties": {
+              "stiffness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10000
+              },
+              "evidencePath": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidenceSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "evidenceBoundary": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
         }
       }
     },
@@ -178,6 +446,104 @@
           }
         }
       ]
+    },
+    "bodyProfileEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "path",
+        "sourceEvidencePath",
+        "sourceAvatar",
+        "evidenceBoundary",
+        "sha256",
+        "sourceEvidenceSha256",
+        "sourceAvatarSha256"
+      ],
+      "properties": {
+        "status": {
+          "const": "MEASURED_BODY_ONLY"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceEvidencePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceAvatar": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidenceBoundary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceEvidenceSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceAvatarSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "frontClosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "outerPieceId",
+        "underPieceId",
+        "diagonalEdgeId",
+        "outerHemExtensionAcrossCenterM",
+        "outerExclusiveVertexLayerOffsetM",
+        "construction",
+        "fastenerStatus",
+        "evidenceBoundary"
+      ],
+      "properties": {
+        "status": {
+          "const": "PROTOTYPE_OVERLAP_UNFASTENED"
+        },
+        "outerPieceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "underPieceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "diagonalEdgeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outerHemExtensionAcrossCenterM": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "outerExclusiveVertexLayerOffsetM": {
+          "type": "number",
+          "minimum": 0
+        },
+        "construction": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fastenerStatus": {
+          "const": "NOT_IMPLEMENTED"
+        },
+        "evidenceBoundary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     }
   }
 }

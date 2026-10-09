@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lattice-bloom-shift-dress",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai v1.0 PC; garment measurements, shape-key fit, and motion remain unverified.",
+  "designRevision": "v2-lattice-bloom-shift-private-reference-20260930",
+  "panels": [
+    "shift-front-shell",
+    "shift-back-left-shell",
+    "shift-back-right-shell",
+    "front-vent-underlay",
+    "back-vent-underlay",
+    "waist-diamond-motif"
+  ],
+  "requiredPatternComponents": [
+    {
+      "componentId": "sleeveless-shift-shell",
+      "partId": "main-shift-shell",
+      "requiredPieceIds": [
+        "shift-front-shell",
+        "shift-back-left-shell",
+        "shift-back-right-shell"
+      ],
+      "reason": "The reference shows a slate-blue sleeveless crew-neck dress with a fitted waist and A-line knee-length hem. This diagnostic uses a full front panel and two back panels because the back center seam is visible; closure, ease, seam allowance, lining, scale, and fit remain unverified."
+    },
+    {
+      "componentId": "front-petal-vent-backing",
+      "partId": "front-lower-vent-underlay",
+      "requiredPieceIds": [
+        "front-vent-underlay"
+      ],
+      "reason": "One matching opaque pattern piece is required behind the front shell notch; fit and motion remain unverified."
+    },
+    {
+      "componentId": "back-petal-vent-backing",
+      "partId": "back-lower-vent-underlay",
+      "requiredPieceIds": [
+        "back-vent-underlay"
+      ],
+      "reason": "One matching opaque pattern piece is required behind the center-back shell notch; fit and motion remain unverified."
+    }
+  ],
+  "separateGeometry": [
+    "diamond-waist-applique-band",
+    "front-vent-underlay",
+    "back-vent-underlay"
+  ],
+  "priorityFitZones": [
+    "neckline",
+    "shoulders",
+    "armholes",
+    "bust",
+    "waist",
+    "hip",
+    "front-vent",
+    "back-vent",
+    "hem"
+  ],
+  "requiredPoses": [
+    "neutral",
+    "arms-up",
+    "arm-cross",
+    "crouch",
+    "sit",
+    "prone"
+  ],
+  "researchTrial": {
+    "method": "Use the four directly observed generated views plus a read-only target-avatar profile report to draft a hash-bound 2D shell candidate and named stitch graph; validate with pinned GarmentCode and OpenSew before any 3D stage.",
+    "status": "DECLARED",
+    "referenceViews": [
+      "front",
+      "left",
+      "back",
+      "right"
+    ],
+    "review": "The concept supports silhouette and visible detail observations. The referenced avatar report measures body sections only; it does not establish garment ease, seam allowance, sewn assembly, avatar fit, shape-key behavior, or cloth motion."
+  },
+  "releaseBoundary": "WORKING concept only. Keep visualAppearanceReview PENDING until a candidate 2D pattern is directly reviewed and hash-bound. Do not initialize or generate product 3D before that gate passes.",
+  "clothSimulation": {
+    "applicability": "REQUIRED",
+    "components": [
+      "front-and-back-lower-vents"
+    ],
+    "evidence": "Pending: no garment mesh exists.",
+    "reason": "The two lower hem vents may expose or deform against the avatar during crouching, sitting, and walking."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_ASSESSED",
+    "reason": "No garment mesh or transferred shape keys exist."
+  },
+  "bodyProfileEvidence": {
+    "status": "MEASURED_BODY_ONLY",
+    "path": ".image2outfit/products/siroino-lattice-bloom-shift-dress/stages/avatar-profile-measurements.json",
+    "sha256": "55700843d123eb3a0016f052ea6f332ff0d65eb2aebc58f8b94faa4a08f2e364",
+    "sourceAvatar": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+    "sourceAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "evidenceBoundary": "Neutral and repository-defined Large body cross-sections only; not garment measurements, ease, fit acceptance, or approved size coverage."
+  },
+  "waistAppliqueDraft": {
+    "status": "PROVISIONAL_UNMEASURED_2D",
+    "motif": "repeated-diamond-applique",
+    "patchCount": 16,
+    "candidatePatchSizeMm": {
+      "width": 26,
+      "height": 30
+    },
+    "placement": "Eight motifs on the front shell and eight across the two back shell halves; shell remains opaque behind all patches.",
+    "basis": "Relative visual proportion measured against the four-view private concept and provisional shell coordinates; not body-derived ease or an approved garment specification; the provisional center and 30 mm vertical width are recorded with a knee-hem-to-Spine.head arithmetic match, but the avatar hem anchor and dimensions are not visually approved.",
+    "referenceLinework": "The reference reads as interlaced outlined diamonds; this revision uses individual rhombus patches and does not yet model the complete interlaced surface linework.",
+    "candidateBandCenterFromHemMm": 385.0,
+    "candidateVerticalBandWidthMm": 30.0,
+    "dimensionsApproved": false,
+    "verticalRegistrationCandidate": {
+      "status": "CANDIDATE_ANCHOR_MATCH_UNVERIFIED",
+      "method": "Assume the knee-length hem is placed at the avatar Knee landmark, then add the flat-pattern waistline height above that anchor.",
+      "patternHemToWaistMm": 379.763,
+      "avatarKneeZFromArmatureM": 0.414416,
+      "avatarSpineHeadZFromArmatureM": 0.794179,
+      "derivedWaistPlaneZFromArmatureM": 0.794179,
+      "differenceFromSpineHeadMm": 0.0,
+      "assumption": "The 2D hem origin maps to the avatar Knee landmark; this anchor is suggested by the knee-length reference and is not confirmed by a garment-on-avatar view.",
+      "threeDAuthorization": false
+    }
+  },
+  "hemVentDraft": {
+    "status": "PROVISIONAL_UNMEASURED_2D",
+    "count": 2,
+    "features": [
+      {
+        "ventId": "front-petal-vent",
+        "hostPieceId": "shift-front-shell",
+        "underlayPieceId": "front-vent-underlay",
+        "openingLengthMm": 112,
+        "hemWidthMm": 76
+      },
+      {
+        "ventId": "back-petal-vent",
+        "hostPieceIds": [
+          "shift-back-left-shell",
+          "shift-back-right-shell"
+        ],
+        "underlayPieceId": "back-vent-underlay",
+        "openingLengthMm": 112,
+        "hemWidthMm": 76
+      }
+    ],
+    "basis": "Draft dimensions are image-proportion estimates mapped to provisional shell coordinates. They are not approved garment measurements, ease, or fit targets.",
+    "evidenceBoundary": "Planar notches and matching seam edges only; no sewn 3D assembly, binding, opacity-in-motion, fit, or avatar clearance was evaluated."
+  },
+  "waistFitAudit": {
+    "status": "BLOCKED",
+    "evidencePath": ".image2outfit/products/siroino-lattice-bloom-shift-dress/stages/waist-registration-candidate-2026-09-30T085030+0900.json",
+    "evidenceSha256": "cfa222925e09c2ad10d72d1c7eb7049a1fdb2fd74d379b0b306521eec2068bb2",
+    "evaluatedConstructionSha256": "11c995661c22d988e524713aa0f8665e41a77d5b96e8d24e1033460e6753126c",
+    "candidateCircumferenceMm": 477.204,
+    "neutralBodyCircumferenceMm": 477.204,
+    "neutralRawEaseMm": 0.0,
+    "largeBodyCircumferenceMm": 499.853,
+    "largeRawEaseMm": -22.649,
+    "largeProfileShapeKeys": {
+      "All_L": 1.0,
+      "Chest_L": 1.0,
+      "Hips_01_L": 1.0,
+      "UpperLeg_L": 1.0,
+      "Breasts_L": 0.65
+    },
+    "measurementBoundary": "The waist seam maps to the avatar Spine.head plane only when the 2D hem origin is assumed at Knee; this is a candidate landmark arithmetic match, not hem placement, positive ease, fit, or shape-key deformation evidence.",
+    "threeDAuthorization": false,
+    "unresolved": [
+      "visually confirm the hem-at-Knee anchor on the Siroino avatar",
+      "establish positive ease for a specified material",
+      "define and validate the garment mapping for the recorded Large Shape Key set",
+      "replace discrete patches with the continuous interlaced surface detail"
+    ],
+    "verticalRegistrationCandidate": {
+      "status": "CANDIDATE_ANCHOR_MATCH_UNVERIFIED",
+      "method": "Assume the knee-length hem is placed at the avatar Knee landmark, then add the flat-pattern waistline height above that anchor.",
+      "patternHemToWaistMm": 379.763,
+      "avatarKneeZFromArmatureM": 0.414416,
+      "avatarSpineHeadZFromArmatureM": 0.794179,
+      "derivedWaistPlaneZFromArmatureM": 0.794179,
+      "differenceFromSpineHeadMm": 0.0,
+      "assumption": "The 2D hem origin maps to the avatar Knee landmark; this anchor is suggested by the knee-length reference and is not confirmed by a garment-on-avatar view.",
+      "threeDAuthorization": false
+    },
+    "candidateBandCenterFromHemMm": 385.0,
+    "candidateVerticalBandWidthMm": 30.0
+  }
+}

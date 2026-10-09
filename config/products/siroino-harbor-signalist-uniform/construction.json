@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-harbor-signalist-uniform",
+  "profile": "panel-sewn",
+  "target": "Siroino _Large via official shape keys",
+  "designRevision": "v1-harbor-signalist-reference-draft",
+  "panels": [
+    "jacket-front",
+    "jacket-back",
+    "jacket-sleeve-left",
+    "jacket-sleeve-right",
+    "blouse-front",
+    "blouse-back",
+    "culotte-left-front",
+    "culotte-right-front",
+    "culotte-left-back",
+    "culotte-right-back"
+  ],
+  "requiredPatternComponents": [
+    {
+      "componentId": "short-sleeve-panels",
+      "partId": "short-sleeve-panels",
+      "requiredPieceIds": ["jacket-sleeve-left", "jacket-sleeve-right"],
+      "reason": "The reference and construction record require short jacket sleeves; their 2D cap and armhole geometry must be explicit before GarmentCode can accept the panel set."
+    }
+  ],
+  "separateGeometry": [
+    "wide-cream-sailor-collar",
+    "left-vermilion-utility-flap",
+    "two-brass-jacket-buttons",
+    "vermilion-jacket-piping",
+    "short-sleeve-panels"
+  ],
+  "priorityFitZones": ["neck", "shoulders", "chest", "armhole", "waist", "hip", "upper-leg"],
+  "requiredPoses": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+  "researchTrial": {
+    "method": "explicit polygon panels with canonical one-to-one seam edges projected into GarmentCode/PyGarment",
+    "status": "DECLARED",
+    "patternPath": "config/products/siroino-harbor-signalist-uniform/pattern-draft.json",
+    "stitchPath": "config/products/siroino-harbor-signalist-uniform/stitch-graph.json",
+    "physicalSewingStitch": "jacket shoulder and side seams, blouse shoulder and side seams, culotte outer seams, front and back rises, and front-to-back inseams",
+    "review": "Inspect the GarmentCode 2D panel layout and mapped stitch specification before any 3D stage."
+  },
+  "releaseBoundary": "Keep WORKING until fit and construction are reviewed against direct rendered evidence; do not initialize 3D before visualAppearanceReview PASS.",
+  "clothSimulation": {
+    "applicability": "REQUIRED",
+    "components": ["Harbor_Culotte_Left", "Harbor_Culotte_Right"],
+    "evidence": "Assets/GenWorks/siroino-harbor-signalist-uniform/Evidence/Build/cloth-simulation.json",
+    "reason": "Wide pleated culotte legs need physical settlement and collision evidence before fit can be accepted."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "Shape-key handling is not applicable before the product passes its visual design gate and enters avatar-fit generation."
+  }
+}
