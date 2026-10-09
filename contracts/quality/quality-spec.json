@@ -309,5 +309,26 @@
       "allowOutOfScope": false,
       "computed": true
     }
-  ]
+  ],
+  "prototypeReadiness": {
+    "scope": "construction-inputs-only",
+    "executionStage": "initialize-3d",
+    "requiredDocumentFields": [
+      "constructionPath",
+      "decompositionPath",
+      "patternContractPath",
+      "stitchGraphPath",
+      "surfaceAttachmentGraphPath",
+      "materialRecipePath"
+    ],
+    "unassessedAreas": [
+      "visual-appearance",
+      "avatar-fit",
+      "motion-poses",
+      "cloth-and-material-response",
+      "3d-construction-quality"
+    ],
+    "grantsVisualAcceptance": false,
+    "boundary": "Executable builder and current product construction contracts admit a disposable 3D prototype. Rendered visual acceptance and customer release remain mandatory after manufacture."
+  }
 }

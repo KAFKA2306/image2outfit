@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-orbitarium-gimbal-dancer-set",
+  "productName": "Orbitarium Gimbal Dancer Set for Siroino",
+  "status": "WORKING",
+  "state": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Prefab/SiroinoOrbitariumGimbalDancer.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Prefab/SiroinoSotai_OrbitariumGimbalDancer.prefab",
+  "previewPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/README.md",
+  "sourceJobPath": "config/products/siroino-orbitarium-gimbal-dancer-set/job.json",
+  "sourceReference": "private-reference://sha256/ec17188ac201750a8022ba5dd32209e8dd1977891001523aa673055e6963d739",
+  "createdAt": "2026-09-28T16:45:12Z",
+  "designRevision": "v1-orbitarium-gimbal-dancer-concept",
+  "technicalGates": {
+    "referenceAudit": "PENDING",
+    "referenceIdentity": "PENDING",
+    "garmentDecomposition": "PENDING",
+    "construction": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "PASS",
+    "garmentCodeStitchExport": "PASS",
+    "openSew2dEndpointAudit": "PASS",
+    "visualAppearanceReview": "PASS",
+    "blender": "PENDING",
+    "editableSource": "PENDING",
+    "fbx": "PENDING",
+    "prefabDeclared": "PENDING",
+    "fiveViewEvidence": "PENDING",
+    "poseEvidence": "PENDING",
+    "licenseReview": "PENDING"
+  },
+  "releaseReadiness": {
+    "status": "BLOCKED",
+    "reasons": [
+      "Latest saved GarmentCode BoxMesh probe used flat 2D preview panel transforms: 0 invalid stitches, 78 zero-area faces, all 16 rotations zero, and no product mesh artifact; evidence .image2outfit/products/siroino-orbitarium-gimbal-dancer-set/stages/attempts/garmentcode-edge-direction-correction-20260929-01/garmentcode-boxmesh-after-endpoint-remap.json.",
+      "Neutral-rest Siroino body sections were measured in Blender 5.2.2 from the current target FBX (waist-rig-transition 454.7 mm, hip-rig-head 575.9 mm, upper-chest profile about 490 mm); Orbitarium ease, assembly, avatar fit, shape-key variants, movement, and cloth simulation remain unverified. Evidence .image2outfit/products/siroino-orbitarium-gimbal-dancer-set/stages/attempts/avatar-section-profile-20260928T192727Z/avatar-section-profile.json (sha256 e5a118bc0f925876b582dbfbcd62488a16b5819d7fb48cd3b220834b2c2834cf).",
+      "3D source, FBX, Unity prefab, runtime package, and five-view/six-pose evidence do not exist.",
+      "Commercial terms and target-avatar license review are pending.",
+      "Saved initialize-3d evidence is bound to an older review and stitch graph; regenerate it from current reviewed inputs after the 2D sizing trial."
+    ]
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set",
+    "resumeFrom": ".image2outfit/products/siroino-orbitarium-gimbal-dancer-set/pipeline-state.json",
+    "lastAttempt": {
+      "runId": "38be4958f2f04d32914aa313f5ad90f0",
+      "status": "PARTIAL",
+      "checkedAt": "2026-09-28T17:52:55Z",
+      "visualAppearanceReview": "PASS",
+      "lastPassedStage": "initialize-3d",
+      "stageEvidence": ".image2outfit/products/siroino-orbitarium-gimbal-dancer-set/stages/initialize-3d.json",
+      "stageEvidenceSha256": "c791dd8f97f43e4998d7f8dbacbec8955ed3884ae649690ea095374136089acc",
+      "completedStages": {
+        "ingest-reference": {
+          "status": "PASS",
+          "stageResultSha256": "d3109135e4d92a490a5ec81fc0ce1283bbeb3bd441b24db9ee22502bc0dd085e"
+        },
+        "normalize-view": {
+          "status": "PASS",
+          "stageResultSha256": "77dc6be162406f527ca9f9dbf4c3fe5be7e86af869bc3421d1551b02ba9ba04b"
+        },
+        "decompose-garment": {
+          "status": "PASS",
+          "stageResultSha256": "0fb80425910051a7d42cee26f392d48f1557b67fcecc5bf7e2eafacf16bf0104"
+        },
+        "draft-patterns": {
+          "status": "PASS",
+          "stageResultSha256": "6b7ab47e962740f27b7f9dc819ba97d863adc192f2c379ca4d93e3529f96d927"
+        },
+        "infer-stitches": {
+          "status": "PASS",
+          "stageResultSha256": "4911777cdcf06ace03de0962be8581d2612f69871653f08fe243bf785644fe71"
+        },
+        "initialize-3d": {
+          "status": "PASS",
+          "stageResultSha256": "c791dd8f97f43e4998d7f8dbacbec8955ed3884ae649690ea095374136089acc"
+        }
+      },
+      "contractResult": "Workflow FAILED; completed 6 stage(s).",
+      "failedAttemptEvidencePaths": [
+        ".image2outfit/products/siroino-orbitarium-gimbal-dancer-set/pipeline-state.json"
+      ],
+      "checkpointPath": ".image2outfit/products/siroino-orbitarium-gimbal-dancer-set/pipeline-state.json",
+      "checkpointSha256": "84e3e18964b5db19a51de2073531d6ed1940d6457f22df9d186fc4620d3c5f45",
+      "blockedStage": "build-blender",
+      "failure": "stage command failed with exit code 1: M:\\win11projects\\unity\\image2outfit\\Assets\\_Local\\.venv\\Scripts\\python.exe tools/run_reference_product_stage.py --stage build-blender --job config/products/siroino-orbitarium-gimbal-dancer-set/job.json --request config/pipeline/requests/siroino-orbitarium-gimbal-dancer-set.json --result .image2outfit/products/siroino-orbitarium-gimbal-dancer-set/stages/build-blender.json\nTraceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 1982, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 1963, in main\n    stage_build(job_path, job, request, result_path)\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 1562, in stage_build\n    boxmesh_evidence = _run_garmentcode_boxmesh_preflight(job_path, job, request)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 1534, in _run_garmentcode_boxmesh_preflight\n    raise RuntimeError(\nRuntimeError: GarmentCode BoxMesh preflight blocked Blender; status=FAIL, invalid stitches=15, review=config/products/siroino-orbitarium-gimbal-dancer-set/design-appearance-review.json, evidence=.image2outfit/products/siroino-orbitarium-gimbal-dancer-set/stages/attempts/build-blender-boxmesh-20260928T175251291230Z/garmentcode-boxmesh-audit.json\n",
+      "nextAction": "Create an isolated measured 2D sizing candidate with declared waist/chest ease assumptions, preserve exact seam lengths across connected pieces, render it through pinned GarmentCode, and inspect it against the current front/back review before replacing canonical pattern sources. Evidence: .image2outfit/products/siroino-orbitarium-gimbal-dancer-set/stages/attempts/avatar-section-profile-20260928T192727Z/pattern-body-measurement-comparison.json (sha256 77d35a6b12b8f482a61bbdb3945312708d13b724c4e7bec4ef5a6133cfc516b0)."
+    }
+  }
+}

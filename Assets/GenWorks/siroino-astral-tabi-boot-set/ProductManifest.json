@@ -1,0 +1,1579 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-astral-tabi-boot-set",
+  "productName": "Astral Tabi Trail Boots for Siroino",
+  "status": "WORKING",
+  "state": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-astral-tabi-boot-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/Prefab/SiroinoAstralTabiBootSet.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/Prefab/SiroinoSotai_AstralTabiBootSet.prefab",
+  "previewPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-astral-tabi-boot-set/README.md",
+  "sourceJobPath": "config/products/siroino-astral-tabi-boot-set/job.json",
+  "sourceReference": "private-reference://sha256/ffe72bd5f7a528875ae7d629567b81e6e48936044dba6294d77c6b8f0b35d354",
+  "createdAt": "2026-09-27T15:26:10Z",
+  "designRevision": "v1-astral-tabi-concept",
+  "technicalGates": {
+    "referenceAudit": "PASS",
+    "patternContract": "PASS",
+    "stitchGraph": "PASS",
+    "garmentCodeStitchExport": "PASS",
+    "visualAppearanceReview": "PENDING",
+    "blender": "PENDING",
+    "editableSource": "PENDING",
+    "fbx": "PENDING",
+    "prefabDeclared": "PENDING",
+    "fiveViewEvidence": "PENDING",
+    "poseEvidence": "PENDING",
+    "licenseReview": "PENDING"
+  },
+  "releaseReadiness": {
+    "status": "BLOCKED",
+    "reasons": [
+      "The upper remains a provisional pattern draft. A combined side/rear collar trial passes individual paired-curve and stitch-direction checks in GarmentCode but creates a visible tangent kink where image-derived segments meet; the image-to-flat-pattern mapping is therefore rejected. Complete panel outlines, outsole clearance, tread, physical assembly, and footwear fit remain unverified.",
+      "Blender measured 15 Foot/Toe-weighted X-Z contour stations per foot; 10 close and five ankle-side profiles remain open. Adding LowerLeg alone introduces approximately 350-431 mm shin-height section spans and was rejected. These avatar-surface measurements do not define a shoe last, cuff, ease, contact, toe clearance, sole profile, or fit. The connected ankle-joint is measured, and the visual reference supports a raised cuff, but its pixel ratio has no scale calibration and cannot serve as a fit-accepted opening boundary. Three local horizontal cut heights yield stable closed avatar contours with a 146.92-148.57 mm body perimeter range, but garment ease, knit compression, and clearance remain unselected. Individual shape-key measurement shows the current base-body cuff sweep does not span All_Slim through All_M; no material-ease choice or garment shape-key transfer has been validated.",
+      "The generated footwear concept has not passed visualAppearanceReview.",
+      "No 3D source, fitted candidate, FBX, prefab, or customer package exists.",
+      "Avatar license and commercial release clearance are pending.",
+      "Product-specific Blender builder is not authored."
+    ]
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-astral-tabi-boot-set",
+    "resumeFrom": "draft-patterns",
+    "lastAttempt": {
+      "status": "PARTIAL",
+      "checkedAt": "2026-09-27T23:19:13Z",
+      "visualAppearanceReview": "PENDING",
+      "lastPassedStage": "draft-patterns",
+      "stageEvidence": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/draft-patterns.json",
+      "contractResult": "Reran the normal draft-patterns stage on unchanged canonical pattern and stitch contracts. GarmentCode/PyGarment accepted all 18 planar panels and 22 strict-boundary stitch pairs; the newly integrated OpenSew-2 preview produced 18 flat meshes, 82 connected endpoint-inclusive named edge chains, and 22 endpoint-inclusive stitch pairs. Two pairs have unequal sampled counts; OpenSew's measured max-count station mapping gap is 0.51282 mm. The remesh has 16 non-quad faces at the tabi-slit vamp panels. No canonical pattern or stitch graph changed; no garment assembly, cloth simulation, fit, visual pass, or 3D was produced.",
+      "nextAction": "Measure or obtain a calibrated shoe-last surface and choose the outsole-to-upper attachment interface; derive a connected sole-vamp boundary from that data, preserve the 22 upper stitch pairs, then run only the affected named GarmentCode pairs. Keep 3D blocked until visualAppearanceReview passes.",
+      "stageEvidenceSha256": "4b6ad08d06937abd0e7971ebf740d05445611bbe1847cd47be1cdd886ce6333b",
+      "completedStages": {
+        "ingest-reference": {
+          "status": "PASS",
+          "stageResultSha256": "52c62bbe6caa7f60ada68ef1965654d39032de1f6b8bfd10757dfecc89c67e17"
+        },
+        "normalize-view": {
+          "status": "PASS",
+          "stageResultSha256": "2744b5fc29af91b438ad78886c504f6b183e58d927b01f301ab0bdf2cd8ec7c7"
+        },
+        "decompose-garment": {
+          "status": "PASS",
+          "stageResultSha256": "987e713bfab6d13014521667661c5dc19018965357dd60466e0968ef0b9861b0"
+        },
+        "draft-patterns": {
+          "status": "PASS",
+          "stageResultSha256": "4b6ad08d06937abd0e7971ebf740d05445611bbe1847cd47be1cdd886ce6333b"
+        },
+        "infer-stitches": {
+          "status": "PASS",
+          "stageResultSha256": "6bd0f6a42ddec384f707e9e5dfb63a284c2aef314f680409fd75f470b812ad88"
+        }
+      },
+      "normalizerImplementationEvidence": {
+        "path": "src/image2outfit/stage_contracts.py",
+        "sha256": "809cb3e6923e8b391f0cb84756d4fb2a885affc989466412873c6c53d94ff407",
+        "gitHead": "e686b6f55e9ff83adba1a30cc1d5e6b699a964a1",
+        "usesWorkingTreeSource": true,
+        "behavior": "Validate and preserve the reference-audit unobserved-view list; legacy references default to back-view."
+      },
+      "pipelinePlanEvidence": {
+        "path": ".image2outfit/audit/siroino-astral-tabi-boot-set/d381ec214d3f423cad293d0ecf110cb1/manifest.json",
+        "sha256": "4e0f5653b9a4f6efc1161eb3434bac33cf0b7a51053a1ee3a142d2cc32586c4a",
+        "runId": "d381ec214d3f423cad293d0ecf110cb1",
+        "mode": "PLANNED_NOT_EXECUTED",
+        "draftPatterns": {
+          "tool": "pattern.garmentcode-2d",
+          "runtime": "garmentcode-pygarment",
+          "pinned": true,
+          "executedForProduct": false
+        },
+        "stitchGraph": "The canonical local infer-stitches stage produces the graph; the subsequent GarmentCode 2D draft-patterns stage validates and exchanges that graph using strict-boundary-edges.",
+        "threeDEnabled": false
+      },
+      "garmentCode2DTrial": {
+        "status": "PASS_2D_EXCHANGE_ONLY_NOT_PRODUCT_PATTERN",
+        "reportPath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/draft-patterns.json",
+        "reportSha256": "40f6286c39909ac851bc391b7de9ac0acd23057bb49f5774175165971be0b948",
+        "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+        "pygarmentVersion": "2.0.2",
+        "stitchExportMode": "strict-boundary-edges",
+        "panelCount": 18,
+        "stitchPairCount": 22,
+        "seamDirectionsMatched": 22,
+        "planarGeometryDefects": 0,
+        "layoutArtifactSha256": "d10f5344929f2900a0be68922e78c0f20fdd1e0d0177bc84dcd508df1a9899cc",
+        "stitchEdgeLengthPairsMatched": 22,
+        "maxRelativeEdgeLengthDiscrepancy": 1.982541115402065e-16,
+        "panelGraphComponents": 6,
+        "connectedUpperComponents": 2,
+        "isolatedStrapPanels": 4,
+        "assemblyConnectivityEvaluated": false,
+        "threeDGenerated": false,
+        "productPatternSuitable": false,
+        "observedLimitation": "Canonical product boundaries remain straight and provisional; one synthetic unstitched strap-edge curve passed only in an isolated adapter trial.",
+        "strapConnectivityInterpretation": "The four strap panels are intended closure overlays per construction.researchTrial, not shell seams; buckle geometry, fastening path, and adjustment are still unverified.",
+        "adapterSourcePath": "src/image2outfit/garmentcode.py",
+        "adapterSourceSha256": "e095818d9bd8e19675c3b5cd38fdddb63629b7df77ab5b7db68aae93052f9605"
+      },
+      "footProbeEvidence": {
+        "path": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/target-foot-probe.json",
+        "sha256": "f714d0ad0b9551727d73a2cf5e689646960d9f0bb6737b53988f02852948697e",
+        "sourceFbx": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+        "sourceFbxSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+        "blenderVersion": "4.4.3",
+        "threshold": 0.05,
+        "leftAndRightFootToeVertexCounts": [
+          1048,
+          1048
+        ],
+        "approximateEnvelopeMillimeters": {
+          "widthX": 66.81,
+          "lengthY": 180.978,
+          "heightZ": 72.178
+        },
+        "limitation": "Rig-weighted bounds only; no foot surface contour, last, ease, or footwear fit was measured."
+      },
+      "blenderFootSurfaceSectionTrial": {
+        "status": "MEASURED_PROJECTION_ONLY_NOT_FIT",
+        "measuredAt": "2026-09-27T16:08:22Z",
+        "reportPath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/target-foot-sections.json",
+        "reportSha256": "4cd237e4195225ad6559300ea1c0a97c511004ddd7a71b93ec6c2ec0b6ab741d",
+        "scriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/probe_siroino_foot_sections.py",
+        "scriptSha256": "b4fccc78bf5aba73baaf7d97053a5872098def940eb6f8513af740c38941ffde",
+        "sourceAvatarFbx": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+        "sourceAvatarFbxSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+        "blenderVersion": "4.4.3",
+        "shapeKeyCount": 99,
+        "allShapeKeysDefaultZero": true,
+        "weightThreshold": 0.05,
+        "weightedVerticesPerFoot": 1048,
+        "sectionsPerFoot": 15,
+        "maximumLeftRightSectionSpanDifferenceM": 2.23517417907715e-08,
+        "observedProfile": "Toe-side sections are about 40.8 mm wide, maximum sampled width is about 66.0 mm near Y=-82.6 mm, and heel/ankle-side widths narrow to about 38.2 mm at Y=+30.5 mm.",
+        "axes": "Avatar toes extend toward negative Y; each sampled section projects X width and Z height.",
+        "limitation": "Vertex-group-filtered triangle sections do not provide a last, flattened pattern, collision clearance, material ease, or fit acceptance."
+      },
+      "garmentCodeCurveEdgeTrial": {
+        "status": "UPSTREAM_CURVE_PASS_NORMAL_ADAPTER_GAP",
+        "trialAt": "2026-09-27T16:23:23Z",
+        "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+        "pygarmentVersion": "2.0.2",
+        "trialInputPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/garmentcode-pattern-curve-trial-03-input.json",
+        "trialInputSha256": "950e6440a1910cd0a91c83ef5263214d09a426d63c208ec1363b68a001579853",
+        "editedPanel": "P03 / left-instep-strap-a",
+        "editedEdge": "free-1 (unstitched long edge)",
+        "curve": "quadratic relative control point [0.5, 0.035]",
+        "runRecordPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/garmentcode-curve-trial-03/garmentcode-run.json",
+        "runRecordSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPngPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/garmentcode-curve-trial-03/garmentcode-pattern-layout.png",
+        "layoutPngSha256": "8865ea33090eca6924fc87032dbfa6057180f5e7fedeb36fb4b7f80076176417",
+        "selfIntersection": false,
+        "stitchPairCount": 22,
+        "seamDirectionsMatched": 22,
+        "threeDGenerated": false,
+        "curveVisibleOnDirectInspection": true,
+        "normalAdapterPassesCurve": false,
+        "limitation": "This trial injected one quadratic curve directly into GarmentCode input, bypassing the canonical adapter. Only an unstitched strap edge was curved; no curved seam lengths or footwear fit were tested, and the remaining layout is still rectangular/trapezoidal.",
+        "attempts": [
+          {
+            "id": "01",
+            "status": "INVALID_FIXTURE",
+            "reason": "Malformed nested control-point array caused GarmentCode JSON curve parsing to fail before producing an output."
+          },
+          {
+            "id": "02",
+            "status": "INVALID_FIXTURE",
+            "reason": "PowerShell did not add the curvature property to the edge; the runner processed the unchanged linear input, so it is not counted as curve evidence."
+          },
+          {
+            "id": "03",
+            "status": "PASS",
+            "reason": "Correct quadratic curvature was injected and pinned GarmentCode produced a non-self-intersecting 2D layout with the 22 existing stitch directions validated."
+          }
+        ]
+      },
+      "garmentCodeAdapterImplementationEvidence": {
+        "path": "src/image2outfit/garmentcode.py",
+        "sha256": "e095818d9bd8e19675c3b5cd38fdddb63629b7df77ab5b7db68aae93052f9605",
+        "usesWorkingTreeSource": true,
+        "behavior": "Preserves validated relative quadratic controls on one unstitched canonical boundary edge, reorients controls for reverse boundary traversal, estimates the quadratic arc length, and rejects curved edges referenced by stitches."
+      },
+      "garmentCodeCurveAdapterTrial": {
+        "status": "PASS_2D_UNSTITCHED_QUADRATIC_EDGE_ONLY",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/garmentcode-curve-adapter-trial/curve-adapter-trial-evidence.json",
+        "evidenceSha256": "59434acfb154ef97e4e13a6b24cd765233b01fe2ece39fe3980faeeb48545de2",
+        "adapterInputPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/garmentcode-curve-adapter-trial/garmentcode-pattern-input.json",
+        "adapterInputSha256": "750108f1a8dfeec30b7e4791d0e5bc359e37331d70bd90777a94dd3d9d124435",
+        "curvedEdge": {
+          "pieceId": "left-instep-strap-a",
+          "edgeId": "free-1",
+          "curvature": {
+            "type": "quadratic",
+            "params": [
+              [
+                0.5,
+                0.035
+              ]
+            ]
+          },
+          "adapterMapping": {
+            "pieceId": "left-instep-strap-a",
+            "edgeId": "free-1",
+            "panel": "P03",
+            "edgeIndex": 0,
+            "orientationReversedForBoundaryLoop": false,
+            "chordLengthM": 0.105,
+            "quadraticArcLengthM": 0.10508568186279456
+          }
+        },
+        "runRecordPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/garmentcode-curve-adapter-trial/garmentcode-output/garmentcode-run.json",
+        "runRecordSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/garmentcode-curve-adapter-trial/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "8865ea33090eca6924fc87032dbfa6057180f5e7fedeb36fb4b7f80076176417",
+        "curvedStitchGuardPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/garmentcode-curve-adapter-trial/curved-seam-guard.json",
+        "curvedStitchGuardSha256": "0985aa508af238f06ef230b77701d8475076417030f289bcc9a59ec55d8390ba",
+        "canonicalPatternChanged": false,
+        "threeDGenerated": false,
+        "limitation": "Synthetic unstitched outline only; curved stitched-edge matching, measured shoe contours, and fit remain unsupported."
+      },
+      "avatarFootAlphaRadiusCrossReview": {
+        "status": "DIRECT_2D_COMPARISON_ONLY_NOT_FIT_NOT_VISUAL_GATE",
+        "measuredAt": "2026-09-27T22:20:57Z",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/alpha-radius-cross-review-2026-09-28/alpha-radius-cross-review.json",
+        "evidenceSha256": "3e40dda2637bdcaa65a9c4375853e78d4e45a078773881a057fc81bb0f9f4137",
+        "figurePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/alpha-radius-cross-review-2026-09-28/alpha-radius-reference-comparison.png",
+        "figureSha256": "c1e5d50559ac13d4ce8eb628cf93cce24851c68285de6d9bc4fa1b1bfeb8dbb5",
+        "measurementScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/alpha-radius-cross-review-2026-09-28/run_alpha_radius_cross_review.py",
+        "measurementScriptSha256": "d870f2a330849b1752e0a0d6352d7ea9a55c3e5c01d37d54fd61a229302de2d9",
+        "runtime": {
+          "python": "3.9.25",
+          "numpy": "1.26.4",
+          "scipy": "1.13.1",
+          "matplotlib": "3.9.4",
+          "Pillow": "11.3.0"
+        },
+        "alphaRadiiComparedMm": [
+          5.0,
+          7.5,
+          10.0
+        ],
+        "profilesReviewed": [
+          "All_Slim:left",
+          "All_Slim:right",
+          "base:left",
+          "base:right"
+        ],
+        "topologySummary": [
+          {
+            "alphaRadiusMm": 5.0,
+            "closedLoopCountRange": [
+              6,
+              8
+            ],
+            "branchVertexCountRange": [
+              2,
+              4
+            ],
+            "profileSideCount": 4
+          },
+          {
+            "alphaRadiusMm": 7.5,
+            "closedLoopCountRange": [
+              2,
+              3
+            ],
+            "branchVertexCountRange": [
+              3,
+              4
+            ],
+            "profileSideCount": 4
+          },
+          {
+            "alphaRadiusMm": 10.0,
+            "closedLoopCountRange": [
+              2,
+              3
+            ],
+            "branchVertexCountRange": [
+              0,
+              0
+            ],
+            "profileSideCount": 4
+          }
+        ],
+        "directObservation": "The 5 mm and 7.5 mm candidates retain multiple loops and branch vertices. At 10 mm the largest outline has zero branch vertices, yet base and All_Slim still contain secondary closed loops that the current outer-only pattern omits. The All_Slim dominant contour continues to show a deep lateral forefoot indentation; the separate reference crop places the intended tabi cleft at the centered toe tip, so the two features cannot be equated.",
+        "referenceComparison": "The source outsole crop places a short groove at the forefoot end. Because the reference has no calibrated relation to the projected avatar plane, the crop is feature evidence only, not a contour overlay.",
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "garmentCodeRerun": false,
+        "fitEvaluated": false,
+        "visualAppearanceReview": "PENDING",
+        "garment3DCreated": false,
+        "decision": "Do not use the alpha radius sweep to select footwear ease or promote a contour. Preserve all loops as evidence; define a reviewed, dimensioned shoe-last/toe-split boundary before connecting the outsole to the vamp and rerunning the canonical seam audit.",
+        "nextAction": "Prepare a dimensioned outsole/toe-split design boundary in the shoe plane that is explicitly distinct from the avatar alpha contours; compare it to the front and outsole feature crops, then rerun GarmentCode on the connected sole-vamp candidate with real named stitch pairs."
+      },
+      "soleVampBoundaryBudgetAudit": {
+        "status": "DIRECT_FULL_PERIMETER_STITCH_MISMATCH; SEPARATE_GEOMETRY_PATH_REMAINS_UNVERIFIED",
+        "measuredAt": "2026-09-27T22:33:39Z",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/sole-vamp-attachment-budget-2026-09-28/sole-vamp-attachment-budget.json",
+        "evidenceSha256": "5052fdd13d42cf134fa9ca84fa9f8d77f3e2232d7decc9294822eebbefce91ce",
+        "figurePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/sole-vamp-attachment-budget-2026-09-28/sole-vamp-perimeter-budget.png",
+        "figureSha256": "94190a327603f05345a631be0121b434e8e6eee40526056ea26deaad0da693b3",
+        "measurementScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/sole-vamp-attachment-budget-2026-09-28/run_sole_vamp_attachment_budget.py",
+        "measurementScriptSha256": "e7c92380d6d45ee1c22f11e9f358512e52894b5bf36feca5dc003044cc1b9810",
+        "upperAttachmentLengthMmPerBoot": {
+          "left": 310.0,
+          "right": 310.0
+        },
+        "outsolePerimeterBudget": [
+          {
+            "candidate": "base-left-orientation-1",
+            "upperAttachmentLengthMm": 310.0,
+            "outsolePerimeterMm": 420.977,
+            "perimeterDifferenceMm": 110.977,
+            "differencePercentOfUpperAttachment": 35.799,
+            "outsolePerimeterToUpperAttachmentRatio": 1.35799,
+            "uniformScaleToForceLengthMatch": 0.73638,
+            "impliedOutsoleLengthAfterUniformScaleMm": 133.269,
+            "measuredAvatarBodyLengthAnchorMm": 180.978,
+            "impliedLengthReductionPercent": 26.362,
+            "interpretation": "A perimeter-only arithmetic counterfactual; do not shrink the outsole to force a seam match or treat this as fit."
+          },
+          {
+            "candidate": "base-left-orientation-1-slot",
+            "upperAttachmentLengthMm": 310.0,
+            "outsolePerimeterMm": 488.626,
+            "perimeterDifferenceMm": 178.626,
+            "differencePercentOfUpperAttachment": 57.621,
+            "outsolePerimeterToUpperAttachmentRatio": 1.57621,
+            "uniformScaleToForceLengthMatch": 0.63443,
+            "impliedOutsoleLengthAfterUniformScaleMm": 114.818,
+            "measuredAvatarBodyLengthAnchorMm": 180.978,
+            "impliedLengthReductionPercent": 36.557,
+            "interpretation": "A perimeter-only arithmetic counterfactual; do not shrink the outsole to force a seam match or treat this as fit."
+          }
+        ],
+        "referenceSlotWidthHypothesisMm": [
+          1.06,
+          3.445
+        ],
+        "currentConstruction": {
+          "outsoleAndMidsoleDeclaredAsSeparateGeometry": true,
+          "currentSewingDecision": "Do not add a perimeter stitch between the upper and outsole. The canonical construction keeps soles separate, while current upper attachment edges are not full-length matches.",
+          "interfaceStatus": "UNSPECIFIED; no measured last/sole contact surface or adhesive/cement interface contract exists."
+        },
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "GarmentCodeRerunForStitch": false,
+        "fitEvaluated": false,
+        "visualAppearanceReview": "PENDING",
+        "garment3DCreated": false,
+        "decision": "Reject a direct stitched full-perimeter outsole joint with the current canonical upper edges. Do not uniformly shrink the 181 mm reference-scaled outsole to force a 310 mm perimeter match; that counterfactual makes the outsole 133 mm long without the cleft or 115 mm with it. Keep the separate-geometry construction and 22 named upper stitch pairs; resolve a dimensioned last and outsole-to-upper interface before any assembly claim.",
+        "nextAction": "Define the shoe-last surface and outsole attachment method (separate mechanical/adhesive interface or a revised sewn welt) from calibrated dimensions; then measure the upper interface against that surface and rerun only the necessary named GarmentCode seam pairs. Keep appearance PENDING and do not generate garment 3D before review passes."
+      },
+      "currentOutcome": "OPENSEW_2D_ALL_18_PANELS_TESTED_NOT_ADOPTED; IMAGEGEN_SIX_VIEW_CONCEPT_CREATED; PILLOW_SCIPY_CONTOURS_EXTRACTED_FROM_NEUTRAL_SHEET; ORIGINAL_WARM_BACKGROUND_MASK_REJECTED; VISUAL_GATE_PENDING; NO_GARMENT_3D",
+      "footContourMeasurementTrial": {
+        "status": "MEASURED_PARTIAL_CONTOURS_NO_FIT",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-contour-measurement-evidence.json",
+        "evidenceSha256": "4394ad45c9379d6015805a78f17f4cbe1c3c62174dade89dd152cc27f56e7fd0",
+        "contourReportPath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/target-foot-contours.json",
+        "contourReportSha256": "317544734ed3427289011e488b3605c5d7249230965fed45a2dad7e95f48b45a",
+        "measurementScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/probe_siroino_foot_contours.py",
+        "measurementScriptSha256": "13117507533259597c50f0b8239d9d2e9477ec20d0516e295db5e278bad06c34",
+        "reviewImagePath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-contours-review.png",
+        "reviewImageSha256": "f8f11638fd805fe6d7bf19e39e88398c0df504c133ba9ab33e46338f9252544e",
+        "closedContourStationsPerSide": [
+          10,
+          10
+        ],
+        "openPolylineStationsPerSide": [
+          5,
+          5
+        ],
+        "maximumMirroredContourHausdorffMm": 0.00018823580534913734,
+        "canonicalPatternChanged": false,
+        "shoeLastGenerated": false,
+        "threeDGenerated": false,
+        "limitation": "Foot/Toe-weighted contours only; ankle stations remain open and do not establish shoe fit or a manufacturing pattern."
+      },
+      "footWeightTransitionTrial": {
+        "status": "MEASURED_LOWER_LEG_UNION_REJECTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-weight-transition-comparison.json",
+        "evidenceSha256": "4dd41a95b87e72f0f7286b8fe57ad720dc52f7ebd0b4fd2e819cc18273fad124",
+        "recorderPath": "M:/win11projects/unity/image2outfit/.image2outfit/products/siroino-astral-tabi-boot-set/measurement/record_foot_weight_transition_evidence.py",
+        "recorderSha256": "edb2a389cff257e71c65379e4fb8363cd532210397696c8d24a14ea7c073e30e",
+        "sourceAvatarFbxSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+        "pinnedBlenderVersion": "4.4.3",
+        "footOnlyClosedContourStationsPerSide": [
+          10,
+          10
+        ],
+        "footOnlyOpenPolylineStationsPerSide": [
+          5,
+          5
+        ],
+        "preservedToeLoopCountsAtFirstThreeStationsPerSide": [
+          3,
+          4,
+          3
+        ],
+        "unionClosedContourStationsPerSide": [
+          12,
+          12
+        ],
+        "unionOpenPolylineStationsPerSide": [
+          7,
+          7
+        ],
+        "unionVerticalSectionSpansMmAtStations7To15": [
+          422.5,
+          424.1,
+          425.6,
+          426.9,
+          428.4,
+          430.2,
+          431.1,
+          390.5,
+          349.6
+        ],
+        "canonicalPatternChanged": false,
+        "shoeLastGenerated": false,
+        "fitEvaluated": false,
+        "threeDGenerated": false,
+        "visualAppearanceReview": "PENDING",
+        "limitation": "Nearest-vertex weights indicate the transition approximately; the union includes shin sections and is not a cuff boundary or shoe fit result."
+      },
+      "ankleReferenceTrial": {
+        "status": "ANKLE_JOINT_MEASURED_REFERENCE_SCALE_PROVISIONAL",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/ankle-reference-scale-trial.json",
+        "evidenceSha256": "04914552510568dc10cb11b7495955be07f973b54165a4338dfff56e43216823",
+        "recorderPath": "M:/win11projects/unity/image2outfit/.image2outfit/products/siroino-astral-tabi-boot-set/measurement/record_ankle_reference_scale_trial.py",
+        "recorderSha256": "01025466290400471d670627ab97f3e87604ab78c7696eb728d444d7388f49b2",
+        "ankleCenterWorldZMm": 84.23,
+        "footLengthMm": 180.98,
+        "estimatedSoleToOpeningMm": [
+          98.1,
+          108.3
+        ],
+        "estimatedOpeningWorldZMm": [
+          133.4,
+          143.6
+        ],
+        "quantitativeCuffBoundaryAccepted": false,
+        "canonicalPatternChanged": false,
+        "visualAppearanceReview": "PENDING",
+        "threeDGenerated": false
+      },
+      "cuffCutBandTrial": {
+        "status": "MEASURED_CUFF_CROSS_SECTIONS_STABLE_NO_EASE",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/cuff-cut-band-trial-evidence.json",
+        "evidenceSha256": "d61ba7a39baf41f490455db522ca795272953a7de14a538660aadd3e105aea7c",
+        "recorderPath": "M:/win11projects/unity/image2outfit/.image2outfit/products/siroino-astral-tabi-boot-set/measurement/record_cuff_cut_band_trial.py",
+        "recorderSha256": "c53e9ba6d5ce534a075347813cb49b0fc38c6cc7040ccc75cb8fd11c0ca33e11",
+        "cutHeightsWorldZMm": [
+          133.4,
+          138.5,
+          143.6
+        ],
+        "closedLoopCountAtEachHeightPerSide": [
+          1,
+          1,
+          1
+        ],
+        "openPathCountAtEachHeightPerSide": [
+          0,
+          0,
+          0
+        ],
+        "bodyCircumferenceRangeMm": [
+          146.92,
+          148.57
+        ],
+        "perimeterChangeAcrossBandPct": 1.12,
+        "firstThreeToeLoopCounts": [
+          3,
+          4,
+          3
+        ],
+        "quantitativeCuffBoundaryAccepted": false,
+        "canonicalPatternChanged": false,
+        "fitEvaluated": false,
+        "threeDGenerated": false,
+        "visualAppearanceReview": "PENDING"
+      },
+      "garmentCodeCuffEaseSweep": {
+        "status": "GARMENTCODE_CUFF_EASE_SWEEP_PASS_2D_NOT_FIT",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/cuff-ease-sweep/cuff-ease-sweep-evidence.json",
+        "evidenceSha256": "336590a3426fdf91b6413ce8da84f4a0ce09309f5b7c06b07d40af587c3a13ed",
+        "recorderPath": "M:/win11projects/unity/image2outfit/.image2outfit/products/siroino-astral-tabi-boot-set/pattern/record_cuff_ease_sweep.py",
+        "recorderSha256": "ec375b3485c5611a2ae42acf99e440ced9c90df4303a32cfd2d813df58fd9129",
+        "candidateEasePercent": [
+          -5,
+          0,
+          5
+        ],
+        "candidateTargetCircumferenceMm": [
+          140.08,
+          147.45,
+          154.82
+        ],
+        "avatarBodyPerimeterAtMidCutMm": 147.45,
+        "panelCountPerCandidate": [
+          18,
+          18,
+          18
+        ],
+        "strictStitchPairsPerCandidate": [
+          22,
+          22,
+          22
+        ],
+        "directionMatchesPerCandidate": [
+          22,
+          22,
+          22
+        ],
+        "selfIntersectionPerCandidate": [
+          false,
+          false,
+          false
+        ],
+        "threeDGenerated": false,
+        "fitEvaluated": false,
+        "canonicalPatternChanged": false,
+        "visualAppearanceReview": "PENDING"
+      },
+      "shapeKeyCuffFitTrial": {
+        "status": "SHAPE_KEY_CUFF_RANGE_MEASURED_NOT_COVERED_BY_BASE_EASE_SWEEP",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/shape-key-cuff-fit-evidence.json",
+        "evidenceSha256": "b7143d8f5f884163f2b3f5110da7d49a14e69ad3eb90d360f71f366310653f24",
+        "recorderPath": "M:/win11projects/unity/image2outfit/.image2outfit/products/siroino-astral-tabi-boot-set/measurement/record_shape_key_cuff_variation.py",
+        "recorderSha256": "ee3bbc854e9f1e3fddc35ec4147ad68bd232133d9490b9bc384f0b713d0292f4",
+        "shapeKeyCount": 99,
+        "individualExtremesMeasured": 99,
+        "relevantFitKeys": [
+          "All_Slim",
+          "LowerLeg_Slim",
+          "Foot_Slim",
+          "All_M",
+          "LowerLeg_M",
+          "All_L",
+          "LowerLeg_L"
+        ],
+        "midBandCircumferenceMm": {
+          "All_Slim": 134.35,
+          "LowerLeg_Slim": 136.25,
+          "Foot_Slim": 145.5,
+          "All_M": 153.7,
+          "LowerLeg_M": 153.7,
+          "All_L": 149.14,
+          "LowerLeg_L": 149.14
+        },
+        "baseCuffWidthsMm": {
+          "-5": 140.08,
+          "0": 147.45,
+          "5": 154.82
+        },
+        "allMediumHighCutShortfallVsLargestCandidateMm": 1.02,
+        "easeSelected": false,
+        "canonicalPatternChanged": false,
+        "fitEvaluated": false,
+        "threeDGenerated": false,
+        "visualAppearanceReview": "PENDING"
+      },
+      "garmentCodeShapeKeyCuffMatrix": {
+        "status": "GARMENTCODE_SHAPE_KEY_CUFF_MATRIX_PASS_2D_GEOMETRY_ONLY_NOT_PRODUCT_PATTERN",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/shape-key-cuff-matrix/shape-key-cuff-matrix-evidence.json",
+        "evidenceSha256": "4b17ded717068cb14365a61c0be61ea632b702d21773e14c8c57b115eba54ada",
+        "inputManifestPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/shape-key-cuff-matrix/shape-key-cuff-matrix-inputs.json",
+        "inputManifestSha256": "cfabac808db3cf938d6e1692c6baaa18d4407bd47d919c4184db2a73120d0d1c",
+        "candidateCount": 9,
+        "profiles": [
+          "All_Slim",
+          "All_M",
+          "All_L"
+        ],
+        "easePercentages": [
+          -5,
+          0,
+          5
+        ],
+        "panelCountPerCandidate": [
+          18
+        ],
+        "stitchPairCountPerCandidate": [
+          22
+        ],
+        "directionMatchesPerCandidate": [
+          22
+        ],
+        "maximumStitchLengthMismatchMm": 0.0,
+        "midBandBodyPerimeterMmByProfile": {
+          "All_L": 149.14,
+          "All_M": 153.7,
+          "All_Slim": 134.35
+        },
+        "allLIsSmallerThanAllMByMm": 4.56,
+        "selfIntersectionPerCandidate": false,
+        "visuallyInspectedCandidates": [
+          "All_Slim/0%",
+          "All_M/5%",
+          "All_L/0%"
+        ],
+        "allCandidatesProductReady": false,
+        "canonicalPatternChanged": false,
+        "fitEvaluated": false,
+        "threeDGenerated": false,
+        "visualAppearanceReview": "PENDING"
+      },
+      "footPlanformGarmentCodeTrial": {
+        "status": "GARMENTCODE_2D_FOOT_ENVELOPE_PASS_NOT_OUTSOLE_OR_TABI_FIT",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/footprint-alpha10-garmentcode-preview/footprint-garmentcode-evidence.json",
+        "evidenceSha256": "5bf344d21561810236a5d48d968523894fda00f5d1012351385b44357f27b37e",
+        "blenderSourcePath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-planform-source.json",
+        "blenderSourceSha256": "8e742274a9b6cc35e0233bb8bfa7f474048333fcc7a45e2d7b59e06d79fe9074",
+        "alphaShapePath": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-planform-alpha-shapes.json",
+        "alphaShapeSha256": "6995b794326f3bd8b23d7962a0817e2304fca770c7ce83846a9bc8ecd6edbbe5",
+        "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/footprint-alpha10-garmentcode-preview/garmentcode-output/garmentcode-run.json",
+        "garmentCodeRunSha256": "734c314d33d6ff945600f66b4ad06633f612af85fcf5f64046153ff1d2cb31ca",
+        "garmentCodeLayoutSha256": "721a65dcba0abc2f034498ed598d08d951a0028bd252d0381eeb0a465f8b537f",
+        "panelCount": 8,
+        "strictBoundaryMode": "strict-boundary-edges",
+        "stitchCount": 0,
+        "selfIntersection": false,
+        "leftRightMirrorHausdorffMm": {
+          "base": {
+            "leftOutlinePointCount": 93,
+            "rightOutlinePointCount": 93,
+            "mirroredOutlineHausdorffMm": 0.0001
+          },
+          "All_Slim": {
+            "leftOutlinePointCount": 105,
+            "rightOutlinePointCount": 105,
+            "mirroredOutlineHausdorffMm": 0.0001
+          },
+          "All_M": {
+            "leftOutlinePointCount": 93,
+            "rightOutlinePointCount": 93,
+            "mirroredOutlineHausdorffMm": 0.0001
+          },
+          "All_L": {
+            "leftOutlinePointCount": 93,
+            "rightOutlinePointCount": 93,
+            "mirroredOutlineHausdorffMm": 0.0001
+          }
+        },
+        "projectedLengthMmByProfile": {
+          "base": 180.978,
+          "All_Slim": 168.517,
+          "All_M": 180.978,
+          "All_L": 180.978
+        },
+        "projectedWidthMmByProfile": {
+          "base": 66.81,
+          "All_Slim": 56.623,
+          "All_M": 66.81,
+          "All_L": 66.81
+        },
+        "alphaRadiusMm": 10.0,
+        "internalLoopsOmitted": true,
+        "tabiToeCutDimensioned": false,
+        "fitEvaluated": false,
+        "canonicalPatternChanged": false,
+        "visualAppearanceReview": "PENDING",
+        "threeDGenerated": false
+      },
+      "tabiSlotRatioSweep": {
+        "status": "GARMENTCODE_TABI_SLOT_RATIO_SWEEP_PASS_2D_NOT_FIT",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-ratio-sweep/tabi-slot-ratio-evidence.json",
+        "evidenceSha256": "cc3eeeaaf23c9168cad8eb5acd05f034ccddad0bb2748a0d4ce988e02aa72a70",
+        "inputManifestPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-ratio-sweep/slot-ratio-input-manifest.json",
+        "inputManifestSha256": "631efcff564a1f949b30e43258c9dd237b7ba067e59f51ff2259615edb904d4e",
+        "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-ratio-sweep/garmentcode-output/garmentcode-run.json",
+        "garmentCodeRunSha256": "02dd00483ae8353c50a70b8d5b68e717b5648d3abc6bc6f110ac9fcd5d1d5a0a",
+        "candidateCount": 12,
+        "profileKeys": [
+          "All_M",
+          "All_Slim"
+        ],
+        "ratios": [
+          0.15,
+          0.2,
+          0.25
+        ],
+        "slotWidthHypothesisMm": 4.0,
+        "localMidpointSelected": "All_M / 20%",
+        "panelCount": 12,
+        "stitchCount": 0,
+        "selfIntersection": false,
+        "fitEvaluated": false,
+        "canonicalPatternChanged": false,
+        "visualAppearanceReview": "PENDING",
+        "threeDGenerated": false
+      },
+      "garmentCodeTabiVampStitchTrial": {
+        "status": "GARMENTCODE_TABI_VAMP_STITCH_EXCHANGE_PASS_2D_NOT_FIT",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-vamp-stitch-trial/trial-evidence.json",
+        "evidenceSha256": "5432d7f36f0f2ffbb769cecffad5ced8cb6982c7ca356c7ccb70da26b5f98aef",
+        "candidatePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-vamp-stitch-trial/combined-pattern-candidate.json",
+        "candidateSha256": "a36c49e3c0d4fec0789b3b4e76af55af6b7f081c3d4966fba70ea494eaa1f837",
+        "garmentCodeInputPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-vamp-stitch-trial/garmentcode-pattern-input.json",
+        "garmentCodeInputSha256": "6450e92b5799f866f6ea919dbcd71fcaf9c7b7038ee5eef428c96bbfabcc9525",
+        "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-vamp-stitch-trial/garmentcode-output/garmentcode-run.json",
+        "garmentCodeRunSha256": "9f26e4e752729360238c83c12525d1d021cec4bad08af742ca270cff3c3d073e",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-vamp-stitch-trial/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "c8f627bf84bc5199a0a2b03c8c2efd9bbefc92039c4ac53dbbc7a444bb282b31",
+        "panelCount": 20,
+        "canonicalStitchCount": 22,
+        "stitchesSubmitted": 22,
+        "directionsMatched": 22,
+        "seamPairsWithZeroLengthDifference": 22,
+        "maximumSeamLengthDifferenceMm": 0.0,
+        "selfIntersection": false,
+        "physicalFitEvaluated": false,
+        "physicalSewingEvaluated": false,
+        "visualAppearanceReview": "PENDING",
+        "canonicalPatternChanged": false,
+        "threeDGenerated": false
+      },
+      "improvementLoopReadiness": {
+        "status": "WAITING_FOR_CANDIDATE_QUALITY",
+        "planPath": ".image2outfit/products/siroino-astral-tabi-boot-set/reports/improvement-plan.json",
+        "planSha256": "62c93f6dc192178c3836759c128734e71f086b524049c017b84ee1fd8e1f599e",
+        "planDigest": "9119e5439979035d3706f2606065dba0460f4a52ca60251f26e2abdc585c7439",
+        "implementationPath": "tools/improvement_loop.py",
+        "implementationSha256": "c62465b4aa8e81db6edb6f66ff848a2d699466b8c2072b79bf1b571f96c12bec",
+        "requiredArtifact": ".image2outfit/products/siroino-astral-tabi-boot-set/reports/customer-quality.json",
+        "candidateHash": null,
+        "reason": "No customer-quality report exists for this product yet. The improvement loop needs a candidate-bound defect report before it can select or compare an OSS method.",
+        "visualAppearanceReview": "PENDING",
+        "threeDGenerated": false
+      },
+      "prebuildDesignVisualAssessment": {
+        "status": "REJECTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/review/prebuild-design-visual-assessment.json",
+        "evidenceSha256": "6b881faa3c4adaf84e8bf610bd72535ae82eae113b137b00fa6bfc999bca111d",
+        "reviewer": "chatgpt:Codex",
+        "reviewedArtifactCount": 7,
+        "findingIds": [
+          "assembled-silhouette-not-reviewable",
+          "outsole-not-in-current-pattern-layout",
+          "declared-appearance-details-have-no-current-panel-preview",
+          "final-preview-and-product-builder-absent"
+        ],
+        "visualAppearanceReview": "PENDING",
+        "releaseReadiness": "BLOCKED",
+        "threeDGenerated": false
+      },
+      "prebuildDesignVisualReassessment": {
+        "status": "REJECTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-mapped-upper-trial/upper-curve-trial-evidence.json",
+        "evidenceSha256": "ae9a877c18ca641df9ee8dcbc1a04e7e499aa2eb79a0573e51a7367cde47cd09",
+        "checkedAt": "2026-09-27T19:14:04Z",
+        "reviewPhase": "PRE_BUILD_2D_DESIGN",
+        "visualAppearanceReview": "PENDING",
+        "releaseReadiness": "BLOCKED",
+        "threeDGenerated": false
+      },
+      "garmentCodeCurvedStitchTrial": {
+        "status": "GARMENTCODE_CURVED_STITCH_2D_INTEROPERABILITY_PASS_NOT_SEWING_OR_FIT",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/curved-seam-garmentcode-trial/curved-stitch-trial-evidence.json",
+        "evidenceSha256": "eef683d51d7efd419b990f4a77469e0678995fb86ad5858a49303e01a9ad9e92",
+        "candidatePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/curved-seam-garmentcode-trial/curved-seam-pattern-candidate.json",
+        "candidateSha256": "8cfb9753a414fc3bd1b6d8a195dc0da10a764fc437b189e771d962fbc0c6ffa6",
+        "adapterInputPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/curved-seam-garmentcode-trial/garmentcode-pattern-input.json",
+        "adapterInputSha256": "930364acf64e85f9c434b3ad25501ded14b96016f3914543bcac1d4014d8829f",
+        "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/curved-seam-garmentcode-trial/garmentcode-output/garmentcode-run.json",
+        "garmentCodeRunSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/curved-seam-garmentcode-trial/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "691db0836c97fa155d44854f6e184d1b6a6e67b7649c296aba19e9d826aeb542",
+        "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+        "pygarmentVersion": "2.0.2",
+        "pythonVersion": "3.9.25",
+        "panelCount": 18,
+        "stitchPairCount": 22,
+        "curvedBoundaryCount": 4,
+        "curvedStitchIds": [
+          "left-medial-vamp-to-quarter",
+          "right-medial-vamp-to-quarter"
+        ],
+        "curvedPairArcLengthDifferencesMm": [
+          0.0,
+          0.0
+        ],
+        "directionMatchedCount": 22,
+        "selfIntersection": false,
+        "physicalSewingEvaluated": false,
+        "fitEvaluated": false,
+        "canonicalPatternChanged": false,
+        "threeDGenerated": false
+      },
+      "normalWorkflowPlanEvidence": {
+        "path": ".image2outfit/audit/siroino-astral-tabi-boot-set/91646a3f8a6b4792b1995c4b6971037d/manifest.json",
+        "sha256": "c73f5cab8ca3609ca2a093f02195f24fe0fd2e768fcf716bf9991769d87e09c8",
+        "runId": "91646a3f8a6b4792b1995c4b6971037d",
+        "mode": "PLANNED_NOT_EXECUTED",
+        "draftPatternsTool": "pattern.garmentcode-2d",
+        "pinned": true,
+        "reason": "explicit tool pin after capability validation",
+        "threeDStagesPlannedButNotExecuted": true
+      },
+      "garmentCodeReferenceMappedUpperTrial": {
+        "status": "GARMENTCODE_UPPER_CURVE_2D_OUTPUT_PASS_VISUAL_REVIEW_REJECTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-mapped-upper-trial/upper-curve-trial-evidence.json",
+        "evidenceSha256": "ae9a877c18ca641df9ee8dcbc1a04e7e499aa2eb79a0573e51a7367cde47cd09",
+        "candidatePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-mapped-upper-trial/upper-pattern-candidate.json",
+        "candidateSha256": "6c544a175fc2f498aa89978a2aef8ebb24087b47c81725bef4e9e5bdeeb1f9ab",
+        "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-mapped-upper-trial/garmentcode-output/garmentcode-run.json",
+        "garmentCodeRunSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-mapped-upper-trial/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "8e0c648d11e210d6ef9bf970b8fd08f1e76b05ea28d9acbb071eeeb727b40ba6",
+        "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+        "pygarmentVersion": "2.0.2",
+        "pythonVersion": "3.9.25",
+        "panelCount": 18,
+        "stitchPairCount": 22,
+        "directionMatchedCount": 22,
+        "curvedBoundaryCount": 40,
+        "curvedStitchPairCount": 16,
+        "maxCurvedSeamLengthDifferenceMm": 0.0,
+        "visualDecision": "REJECTED",
+        "canonicalPatternChanged": false,
+        "threeDGenerated": false
+      },
+      "garmentCodeReferenceSlotMeasurementTrial": {
+        "status": "GARMENTCODE_2D_GEOMETRY_PASS_PIXEL_MEASURED_SLOT_VARIANT_NOT_PRODUCT_ACCEPTANCE",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-reference-measurement-2026-09-28/reference-slot-measurement-trial.json",
+        "evidenceSha256": "37a4fbea9775f79eaaeafe27d330ada1f5ca9b3b69a59788afbb5ac94aba7d06",
+        "patternCandidatePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-reference-measurement-2026-09-28/tabi-slot-pattern.json",
+        "patternCandidateSha256": "f89e22d7e13d1e0fc78f3842edbfa4eb30c07379c427b0a06cae93019a250c31",
+        "garmentCodeInputPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-reference-measurement-2026-09-28/garmentcode-pattern-input.json",
+        "garmentCodeInputSha256": "c625e1441be5993b379919fffdb3f99a47c20acb081b90403cf819cd8f138dec",
+        "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-reference-measurement-2026-09-28/garmentcode-output/garmentcode-run.json",
+        "garmentCodeRunSha256": "e789612a3835f59b7cb049b0d7a4c36c552f09f167a5e578ddd54b10395f4ba1",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-reference-measurement-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "d789ef21ec321f2f4b01e7e4ad79a972bdbe67924be15ce3c0044dfdf99fff43",
+        "referenceRatio": 0.18777292576419213,
+        "nearestWholePercent": 19,
+        "panelCount": 4,
+        "stitchPairCount": 0,
+        "selfIntersection": false,
+        "visualDecision": "LIMITED_COMPONENT_ONLY_NOT_PRODUCT_APPEARANCE_PASS",
+        "canonicalPatternChanged": false,
+        "threeDGenerated": false
+      },
+      "garmentCodeReferenceTracedSeamTrial": {
+        "status": "GARMENTCODE_SOURCE_TRACED_CURVED_STITCH_2D_PASS_COMPLETE_PRODUCT_APPEARANCE_REJECTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-traced-vamp-quarter-seam-2026-09-28/trial-input-evidence.json",
+        "evidenceSha256": "b6c1bb9d7640f5712be8d04b79c219963951930e7f0618e644320cb6bf232407",
+        "tracePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-traced-vamp-quarter-seam-2026-09-28/reference-side-landmarks.json",
+        "traceSha256": "f20c356665739ece3e84503baa36302fbde7042d0c87cca7bc265d86715d0267",
+        "patternCandidatePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-traced-vamp-quarter-seam-2026-09-28/pattern-candidate.json",
+        "patternCandidateSha256": "b8c49a98ff16c84d54fb956c8eff35e9244d91d8189cb8fc578de6a782abadfe",
+        "garmentCodeInputPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-traced-vamp-quarter-seam-2026-09-28/garmentcode-pattern-input.json",
+        "garmentCodeInputSha256": "3ba309e9dd234f7408dc2fb91a9f4acd04ea2cd407b8343f7f3e6b9b69effcd5",
+        "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-traced-vamp-quarter-seam-2026-09-28/garmentcode-output/garmentcode-run.json",
+        "garmentCodeRunSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-traced-vamp-quarter-seam-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "0523aeba0750bbc6192b139c8cc8f5750f180d107d06a77d1865af3cd30e3605",
+        "panelCount": 18,
+        "stitchPairCount": 22,
+        "directionMatchedCount": 22,
+        "curvedStitchPairCount": 2,
+        "maxCurvedArcLengthDifferenceMm": 0.0,
+        "visualDecision": "REJECTED_AS_COMPLETE_PRODUCT_PATTERN",
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "threeDGenerated": false
+      },
+      "garmentCodeMultiviewSplitToeTrial": {
+        "status": "GARMENTCODE_MULTIVIEW_TRACE_2D_GEOMETRY_PASS_COMPLETE_PRODUCT_APPEARANCE_REJECTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-split-toe-trial-2026-09-28/trial-input-evidence.json",
+        "evidenceSha256": "8622c71590a20b4813064f1bce43c00a2f65f4b74b2342367e2f3de347de6d34",
+        "frontTracePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-split-toe-trial-2026-09-28/reference-front-toe-landmarks.json",
+        "frontTraceSha256": "71539b4a815afe1646e17b900867c750908206895436dbb4d3d80ac1064e51c1",
+        "sideTracePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-traced-vamp-quarter-seam-2026-09-28/reference-side-landmarks.json",
+        "sideTraceSha256": "f20c356665739ece3e84503baa36302fbde7042d0c87cca7bc265d86715d0267",
+        "patternCandidatePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-split-toe-trial-2026-09-28/pattern-candidate.json",
+        "patternCandidateSha256": "921106bdd748b0eb584df825493403a609ce8ced506c45281b265faf37ef99f2",
+        "garmentCodeInputPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-split-toe-trial-2026-09-28/garmentcode-pattern-input.json",
+        "garmentCodeInputSha256": "e118dd498a276a2b7104b9cd6cd2f6d3950b3fe4fbac0febdddab66a04d19586",
+        "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-split-toe-trial-2026-09-28/garmentcode-output/garmentcode-run.json",
+        "garmentCodeRunSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-split-toe-trial-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "86f18eec52448277011412a1ec8bab7cde24ae431ef5c893f6f73878b1507a87",
+        "panelCount": 18,
+        "stitchPairCount": 22,
+        "directionMatchedCount": 22,
+        "curvedStitchPairCount": 2,
+        "curvedBoundaryCount": 8,
+        "maxCurvedArcLengthDifferenceMm": 0.0,
+        "visualDecision": "REJECTED_AS_COMPLETE_PRODUCT_PATTERN",
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "threeDGenerated": false
+      },
+      "improvementLoop": {
+        "status": "WAITING_FOR_CANDIDATE_QUALITY",
+        "requiredArtifact": ".image2outfit/products/siroino-astral-tabi-boot-set/reports/customer-quality.json",
+        "artifactExists": false,
+        "reason": "No candidate-bound customer-quality report exists. The improvement loop cannot compare OSS methods until a reviewable product candidate exists.",
+        "planPath": ".image2outfit/products/siroino-astral-tabi-boot-set/reports/improvement-plan.json",
+        "planSha256": "61caec3afffa0a80ec253b3a144edb9bdc548458f6f5650f13cd698dc15990a6"
+      },
+      "garmentCodeConstructionAwareTrial": {
+        "status": "GARMENTCODE_2D_EXCHANGE_PASS_COMPLETE_PRODUCT_APPEARANCE_REJECTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-construction-aware-trial-2026-09-28/trial-input-evidence.json",
+        "evidenceSha256": "b2e53f42ade034ffaf1d00f177c2c6d2e45cc227c058c588f979f905d6611125",
+        "patternPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-construction-aware-trial-2026-09-28/pattern-candidate.json",
+        "patternSha256": "63b6227bce307ad651361217ec54b59a9a031adc704c22254194d5827741c0c3",
+        "pipingTracePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-construction-aware-trial-2026-09-28/reflective-piping-source-traces.json",
+        "pipingTraceSha256": "0817406d08d1b98aca7186f21d23fa286c86afc3ae2dfc31be64aaa47a88c91d",
+        "runPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-construction-aware-trial-2026-09-28/garmentcode-output/garmentcode-run.json",
+        "runSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-multiview-construction-aware-trial-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "7772e23f7ce9837aeedf6e672895103a63204602bcd786f966d37d68c9e54978",
+        "panelCount": 18,
+        "stitchPairCount": 22,
+        "directionMatchedCount": 22,
+        "curvedStitchPairCount": 0,
+        "curvedOpenToeBoundaryCount": 4,
+        "selfIntersection": false,
+        "assemblyConnectivityEvaluated": false,
+        "directVisualReview": "REJECTED_AS_COMPLETE_PRODUCT_PATTERN",
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "threeDGenerated": false
+      },
+      "referenceBoundaryTraceTrial": {
+        "status": "MULTIVIEW_REFERENCE_BOUNDARIES_TRACED_NOT_PATTERN_ACCEPTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-view-boundary-traces-2026-09-28/reference-view-boundaries.json",
+        "evidenceSha256": "4900af5cf3fd08f33182a0114f2e37b37a8653bdb2fe0fe6f1148b16b8fcabe0",
+        "overlayPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-view-boundary-traces-2026-09-28/reference-view-boundaries-overlay.png",
+        "overlaySha256": "981999982b2007186053914f1cfc731b67e58219557c0bc46a0e1f65e452b739",
+        "sourceSha256": "ffe72bd5f7a528875ae7d629567b81e6e48936044dba6294d77c6b8f0b35d354",
+        "viewCount": 4,
+        "manualProjectedPathCount": 5,
+        "sideAndRearUpperSilhouettesTraced": true,
+        "outsolePlanformTraced": true,
+        "reflectivePipingUsedAsStitch": false,
+        "rearCenterSeamInferred": false,
+        "flatPatternGenerated": false,
+        "directVisualAppearanceAccepted": false,
+        "fitEvaluated": false,
+        "threeDGenerated": false,
+        "limitation": "Image-plane traces provide source correspondence only; they are not flattened panels, scaled pattern dimensions, or human appearance acceptance."
+      },
+      "canonicalPanelConnectivityAudit": {
+        "status": "COMPUTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/infer-stitches.json",
+        "evidenceSha256": "6bd0f6a42ddec384f707e9e5dfb63a284c2aef314f680409fd75f470b812ad88",
+        "panelConnectivityEvaluated": true,
+        "physicalAssemblyEvaluated": false,
+        "panelCount": 18,
+        "stitchPairCount": 22,
+        "componentCount": 6,
+        "leftUpperPanelCount": 7,
+        "rightUpperPanelCount": 7,
+        "isolatedOverlayPanels": [
+          "left-instep-strap-a",
+          "left-instep-strap-b",
+          "right-instep-strap-a",
+          "right-instep-strap-b"
+        ],
+        "evaluationLimit": "Panel graph connectivity only; this does not evaluate sewing, 3D assembly, fit, collision, or appearance."
+      },
+      "garmentCodeCurvedSeamTrial": {
+        "status": "GARMENTCODE_STRUCTURAL_CURVED_SEAMS_PASS_2D_EXCHANGE_ONLY",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/rear-collar-seam-curvature-trial-2026-09-28/trial-input-evidence.json",
+        "evidenceSha256": "978c0bfbbe908d450ad42ed063206dcff8a28fd6ab6a6e9e7d7fdce700a4f0b5",
+        "patternPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/rear-collar-seam-curvature-trial-2026-09-28/pattern-candidate.json",
+        "patternSha256": "d2f2ba630155ad97460ac8368511a70fa6c1f0947f2841a327fc0af8be46549a",
+        "inputPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/rear-collar-seam-curvature-trial-2026-09-28/garmentcode-pattern-input.json",
+        "inputSha256": "7ffb7c87925af9c1251ad5c18431a58e23b8a75741a2c5f5a0d5dfbade98c8da",
+        "runPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/rear-collar-seam-curvature-trial-2026-09-28/garmentcode-output/garmentcode-run.json",
+        "runSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/rear-collar-seam-curvature-trial-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "d4963cd5d93573b16c5c6a9dc0da4917f42ce389f79c8eabaf27ef148a7a17e4",
+        "curvedStitchIds": [
+          "left-collar-to-heel",
+          "right-collar-to-heel"
+        ],
+        "curvedStitchPairCount": 2,
+        "curvedBoundaryCount": 4,
+        "maxCurvedSeamArcLengthDifferenceMm": 0.0,
+        "all22StitchDirectionsMatched": true,
+        "selfIntersection": false,
+        "assemblyConnectivityEvaluated": false,
+        "directVisualReview": "LOCAL_CURVED_SEAM_GEOMETRY_ACCEPTED_COMPLETE_PRODUCT_PATTERN_REJECTED",
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "threeDGenerated": false,
+        "limitation": "The rear view is uncalibrated and does not identify left/right; applying the same relative curve to both boots is a provisional mirrored-pair assumption."
+      },
+      "garmentCodeMultiviewCollarTrial": {
+        "status": "GARMENTCODE_2D_EXCHANGE_PASS_MULTIVIEW_COLLAR_CONTINUITY_REJECTED",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/multiview-collar-seam-curvature-trial-2026-09-28/trial-input-evidence.json",
+        "evidenceSha256": "67b486589a141add8f8cf546355e722c77e2815f00da8f8431ffecb0725627a9",
+        "candidatePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/multiview-collar-seam-curvature-trial-2026-09-28/pattern-candidate.json",
+        "candidateSha256": "08ab0960e3b5395663aba650068de406ba1499ab3afed7e24d45b5bb98be4012",
+        "runPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/multiview-collar-seam-curvature-trial-2026-09-28/garmentcode-output/garmentcode-run.json",
+        "runSha256": "8f0f589eac943c162a70386378083e136274f5f6a61a010d8d5fd55691fdaeca",
+        "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/multiview-collar-seam-curvature-trial-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+        "layoutSha256": "ae4e6a47bb232c89dac39ec00ca1c7b65c9fea51830dd1a5c39795d7b4521da9",
+        "curvedStitchPairCount": 4,
+        "curvedBoundaryCount": 8,
+        "all22StitchDirectionsMatched": true,
+        "maxCurvedSeamArcLengthDifferenceMm": 0.0,
+        "selfIntersection": false,
+        "collarTangentDiscontinuityDegrees": 45.654153891033936,
+        "directVisualReview": "REJECTED_COLLAR_SEGMENT_TANGENT_DISCONTINUITY",
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "threeDGenerated": false
+      },
+      "openSew2DPanelTrial": {
+        "status": "COMPLETED_NOT_ADOPTED",
+        "measuredAt": "2026-09-27T20:32:05Z",
+        "stageEvidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/opensew-2d-panel-mesh-comparison-2026-09-28.json",
+        "stageEvidenceSha256": "577af997baa1ce80a27d199d2442f7f2dbca3eb797cde433a497a30e4f19d28a",
+        "runtimeRevision": "86b432238464d88e3d2c5e1cf3fbf693f1e51722",
+        "artifactPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/opensew-2d-1mm-all-panels-2026-09-28/opensew-flat-panels-only.blend",
+        "flatPreviewPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/opensew-2d-1mm-all-panels-2026-09-28/flat-pattern-layout.png",
+        "summary": "18 flat panels; 112000 faces; 16 triangles at tabi slit; 22/22 named stitch pairs; max paired group-span gap 0.025643 mm; exact endpoints unverified.",
+        "visualAppearanceReview": "PENDING",
+        "garment3D": "NOT_CREATED"
+      },
+      "openSew2DNormalWorkflowIntegration": {
+        "status": "PASS_2D_ENDPOINT_AUDIT_IN_NORMAL_DRAFT_PATTERN_STAGE",
+        "measuredAt": "2026-09-27T23:19:13Z",
+        "stageEvidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/draft-patterns.json",
+        "stageEvidenceSha256": "4b6ad08d06937abd0e7971ebf740d05445611bbe1847cd47be1cdd886ce6333b",
+        "runReportPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/opensew-2d/run-20260927T231900905000Z-adba3675/opensew-2d-run.json",
+        "runReportSha256": "4862a9494d9ef9a65f6c244393fdc6b3bb04334145bb71ccdaa0e736a76826aa",
+        "artifactPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/opensew-2d/run-20260927T231900905000Z-adba3675/opensew-2d-panels.blend",
+        "artifactSha256": "8a1907c5cbe18a8f9b3cc879aa84795f5d095dd259fd2aa7700bbb4f7ad4cccb",
+        "runtimeRevision": "86b432238464d88e3d2c5e1cf3fbf693f1e51722",
+        "blenderVersion": "5.2.2 LTS",
+        "panelCount": 18,
+        "namedEdgeGroupCount": 82,
+        "stitchPairCount": 22,
+        "allNamedEdgesHaveConnectedEndpointInclusiveChains": true,
+        "allStitchPairsHaveEndpointInclusiveChains": true,
+        "allStitchPairSampleCountsEqual": false,
+        "maximumIndexPairingStationGapMm": 0.51282,
+        "nonQuadFaceCount": 16,
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "garmentAssemblyCreated": false,
+        "clothSimulationRun": false,
+        "fitEvaluated": false,
+        "visualAppearanceReview": "PENDING",
+        "threeDGenerated": false,
+        "failedAttemptEvidencePaths": [
+          ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/opensew-2d/opensew-2-preflight-failure-version-line.json",
+          ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/opensew-2d/run-20260927T231836781771Z-1657eb81/opensew-2d-failure.json"
+        ],
+        "decision": "Adopt OpenSew only as a normal 2D remesh and endpoint-aware named-edge audit after GarmentCode; keep canonical patterns and the stitch graph unchanged. This does not validate sewn geometry, shoe-last shape, avatar fit, or appearance.",
+        "nextAction": "Measure or obtain a calibrated shoe-last surface and define the outsole-to-upper attachment boundary before deriving any connected footwear panels."
+      },
+      "referenceConceptContourTrial": {
+        "status": "CANDIDATE_ONLY_NOT_INTEGRATED",
+        "measuredAt": "2026-09-27T21:05:58Z",
+        "stageEvidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/pillow-scipy-view-contour-trial-2026-09-28.json",
+        "stageEvidenceSha256": "7caa2efe243c9d68338714f256157153918e9670a8de8abb28199240f5611d31",
+        "conceptImagePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/generated-concept-candidate-2026-09-28/astral-tabi-six-view-concept.png",
+        "conceptImageSha256": "814adbf974ad6715dab8a094e29dc95ea9cd3c4a76ca7cc5cf87744f6050fbd7",
+        "contourPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/generated-concept-candidate-2026-09-28/concept-view-contours.json",
+        "contourSha256": "63152a912a1be5e285926a625c78c6d47b7b0905cc77a88c0684a812eebb6502",
+        "outsolePlanformPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/generated-concept-candidate-2026-09-28/outsole-planform-candidate.json",
+        "outsolePlanformSha256": "a3410216354417c6469806139404037f259e557290f9e4ee43cd61ac4a731720",
+        "outsolePlanformComparison": {
+          "profileCount": 2,
+          "pointsPerProfile": 29,
+          "lengthWidthRatioDifferencePercent": 4.746,
+          "normalizedHausdorff": [
+            0.06916,
+            0.06978
+          ],
+          "normalizedChamfer": [
+            0.02744,
+            0.02747
+          ],
+          "status": "OUTLINE_SIMILARITY_ONLY_UNCALIBRATED"
+        },
+        "canonicalBackgroundAttempt": "REJECTED_BACKGROUND_MASK",
+        "visualAppearanceReview": "PENDING",
+        "garment3D": "NOT_CREATED"
+      },
+      "viewPatternCorrespondenceTrial": {
+        "status": "REGION_MAPPING_ONLY_NOT_PATTERN_ALIGNED",
+        "measuredAt": "2026-09-27T21:19:43Z",
+        "scriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/evaluate-view-pattern-correspondence.py",
+        "scriptSha256": "ee3de8daebf45b53768c61e9f12d85004abaa96cce05d7aa423ff5ad2c8f74e8",
+        "stageEvidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/view-pattern-correspondence-trial-2026-09-28.json",
+        "stageEvidenceSha256": "53476d22e992084d92ee65e07725d693941eeab0605cc9a144e6c8a04a5c8961",
+        "outerSideAspectDifferencePercent": 32.958,
+        "outerSideNormalizedHausdorff": 0.194197,
+        "frontSideOutsoleRatioDifferencePercent": 1.348,
+        "pixelToPatternTransform": "NOT_ESTABLISHED",
+        "canonicalPatternModified": false,
+        "canonicalStitchGraphModified": false,
+        "visualAppearanceReview": "PENDING",
+        "garment3D": "NOT_CREATED"
+      },
+      "referenceOutsoleAvatarScaleTrial": {
+        "status": "GARMENTCODE_2D_GEOMETRY_PASS_NO_STITCHES_NOT_FIT",
+        "measuredAt": "2026-09-27T21:47:55Z",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/reference-outsole-avatar-scale-trial.json",
+        "evidenceSha256": "87e346289e8a1be8e3992bac8c2097d885fbde3935a94bd02038803f0198ebff",
+        "measurementScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/measure_reference_outsole_avatar_scale.py",
+        "measurementScriptSha256": "431c7642bb007021381f91e7acdd834b17d22a5817c7b02623aeb0802938891d",
+        "adapterPreparationScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/prepare_slot_garmentcode_input.py",
+        "adapterPreparationScriptSha256": "59d2e6c2789bb18f869624884836cdbf45e007faf623643595cbf76f47cb2675",
+        "sourceInputs": {
+          "referenceTraces": {
+            "path": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-view-boundary-traces-2026-09-28/reference-view-boundaries.json",
+            "sha256": "4900af5cf3fd08f33182a0114f2e37b37a8653bdb2fe0fe6f1148b16b8fcabe0"
+          },
+          "footPlanformSource": {
+            "path": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-planform-source.json",
+            "sha256": "8e742274a9b6cc35e0233bb8bfa7f474048333fcc7a45e2d7b59e06d79fe9074"
+          },
+          "footAlphaShapes": {
+            "path": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-planform-alpha-shapes.json",
+            "sha256": "6995b794326f3bd8b23d7962a0817e2304fca770c7ce83846a9bc8ecd6edbbe5"
+          },
+          "canonicalPatternDraft": {
+            "path": "config/products/siroino-astral-tabi-boot-set/pattern-draft.json",
+            "sha256": "0aa3990916bb3e662092aed2a4eb610ad93b7992d466f597564f297700b7ec32"
+          },
+          "construction": {
+            "path": "config/products/siroino-astral-tabi-boot-set/construction.json",
+            "sha256": "b7371e8e961c1a9e46bb86eb25f34233b0913322d9efbda4bd8fd3be1b3e2e14"
+          },
+          "referenceSlotMeasurement": {
+            "path": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/tabi-slot-reference-measurement-2026-09-28/reference-slot-measurement-trial.json",
+            "sha256": "37a4fbea9775f79eaaeafe27d330ada1f5ca9b3b69a59788afbb5ac94aba7d06"
+          },
+          "referenceImage": {
+            "path": "Assets/_Local/ReferenceImages/siroino-astral-tabi-boot-set.png",
+            "sha256": "ffe72bd5f7a528875ae7d629567b81e6e48936044dba6294d77c6b8f0b35d354"
+          }
+        },
+        "baselinePatternPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/reference-outsole-avatar-scale-pattern.json",
+        "baselinePatternSha256": "6896f8fb77637a8b2dd1b8748436b7271074fda5c526fc8fa7849eba8db3e581",
+        "slottedPatternPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/reference-outsole-avatar-scale-slot-pattern.json",
+        "slottedPatternSha256": "d96677de78b77d8ce7894c5ae1fca18c46e8941c764fbfee099a79a84643b763",
+        "avatarOverlayPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/avatar-outsole-planform-overlay.png",
+        "avatarOverlaySha256": "60b74b332f8727c4b8c3fbcbdc7f04df3f99fe8334cb7b26b0560471044f04ad",
+        "slottedOverlayPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/avatar-outsole-slotted-overlay.png",
+        "slottedOverlaySha256": "ff4fa73f9bcc779901f59d444135dee78d8fae384d9326527ddbafc6b364e3f5",
+        "avatarCoveragePercentAtFootLengthScale": {
+          "baselineRange": [
+            79.485,
+            88.073
+          ],
+          "slottedRange": [
+            77.576,
+            85.019
+          ]
+        },
+        "scaleFor99PercentProjectedVertexCoverage": {
+          "baselineCandidates": [
+            1.12,
+            1.13,
+            1.13,
+            1.12
+          ],
+          "slottedCandidates": []
+        },
+        "slotHypothesis": {
+          "depthRatio": 0.187773,
+          "widthMmRange": [
+            1.974,
+            2.12
+          ],
+          "pixelWidthSensitivity": {
+            "maxChannelBelow20": 4.0,
+            "maxChannelBelow40": 8.0,
+            "maxChannelBelow60": 13.0
+          },
+          "calibrated": false
+        },
+        "garmentCode": {
+          "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+          "pythonVersion": "3.9.25",
+          "pygarmentVersion": "2.0.2",
+          "stitchExportMode": "strict-boundary-edges",
+          "baseline": {
+            "path": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/garmentcode-output/garmentcode-run.json",
+            "sha256": "734c314d33d6ff945600f66b4ad06633f612af85fcf5f64046153ff1d2cb31ca",
+            "status": "PASS_2D_GEOMETRY_ONLY",
+            "panelCount": 8,
+            "stitchCount": 0,
+            "selfIntersection": false,
+            "threeDGenerated": false,
+            "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+            "pythonVersion": "3.9.25",
+            "pygarmentVersion": "2.0.2",
+            "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+            "layoutSha256": "61b5987ebed18aff395817858682429caeab882eeef4518090290386a689fbc1"
+          },
+          "slotted": {
+            "path": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/garmentcode-slot-output/garmentcode-run.json",
+            "sha256": "734c314d33d6ff945600f66b4ad06633f612af85fcf5f64046153ff1d2cb31ca",
+            "status": "PASS_2D_GEOMETRY_ONLY",
+            "panelCount": 8,
+            "stitchCount": 0,
+            "selfIntersection": false,
+            "threeDGenerated": false,
+            "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+            "pythonVersion": "3.9.25",
+            "pygarmentVersion": "2.0.2",
+            "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/garmentcode-slot-output/garmentcode-pattern-layout.png",
+            "layoutSha256": "53c80865f1ac27695640a5596a6a44840eba7d83318d112f38e3f00fdc2f74b2"
+          },
+          "totalPanelPreviews": 16,
+          "totalStitchPairs": 0,
+          "selfIntersection": false,
+          "threeDGenerated": false
+        },
+        "directVisualReview": {
+          "decision": "2D_PANEL_GEOMETRY_ONLY_NOT_PRODUCT_APPEARANCE_PASS",
+          "observation": "Directly inspected the pinned GarmentCode layout: all eight isolated planform panels show the narrow longitudinal toe notch; profile and mirror variants remain separate. There are no sewn upper panels, outsole construction details, or product views, so this is not a complete boot appearance review."
+        },
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "fitEvaluated": false,
+        "visualAppearanceReview": "PENDING",
+        "garment3DCreated": false,
+        "decision": "Keep the 40-point source silhouette as a local, dimensioned 2D planform candidate for inspection. The scale anchor and projection containment do not establish footwear fit or clearance; do not promote this to canonical pattern or product acceptance.",
+        "nextAction": "Keep both scaled outsole candidates local. Obtain or define a footwear last and explicit sole clearance/ease, then derive a revised sole and vamp boundary from the measured foot sections with the source slot depth as a visual ratio. Run the existing 22-pair GarmentCode stitch audit and directly review the complete connected 2D boot before any 3D stage."
+      },
+      "avatarFootClearanceEnvelopeTrial": {
+        "status": "GARMENTCODE_2D_GEOMETRY_PASS_NO_STITCHES_NOT_FIT",
+        "measuredAt": "2026-09-27T22:00:28Z",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/avatar-foot-clearance-envelope-trial.json",
+        "evidenceSha256": "772fc5fa3c28ce83695395c8ee5e80ebf46557fdbd8be776513d26b8b71d55cb",
+        "measurementScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/measure_avatar_foot_clearance_envelopes.py",
+        "measurementScriptSha256": "3c20c0626ecb2bacd23c312dfef2c4354dd8f3ea5c53620c474626722adeb935",
+        "adapterPreparationScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/prepare_garmentcode_input.py",
+        "adapterPreparationScriptSha256": "ff7f9bb7948136be28ad9de7b61d8269ed46261fd75154e398cba3735fe046b3",
+        "patternPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/avatar-foot-clearance-envelope-pattern.json",
+        "patternSha256": "b9f657724cb1c865f50f1306720d0906a8c11dd15e006a0afe2fb598f687a5b7",
+        "overlayPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/avatar-foot-clearance-envelope-overlay.png",
+        "overlaySha256": "0e468d3360c36eec729a6ac40276a3ac04049ee994384560153a3d854a353df2",
+        "inputs": {
+          "footPlanformSource": {
+            "path": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-planform-source.json",
+            "sha256": "8e742274a9b6cc35e0233bb8bfa7f474048333fcc7a45e2d7b59e06d79fe9074"
+          },
+          "existingAlphaShapes": {
+            "path": ".image2outfit/products/siroino-astral-tabi-boot-set/measurement/foot-planform-alpha-shapes.json",
+            "sha256": "6995b794326f3bd8b23d7962a0817e2304fca770c7ce83846a9bc8ecd6edbbe5"
+          }
+        },
+        "method": "Rasterize the existing 10 mm SciPy alpha-shape outer boundary derived from measured Foot/Toe-weighted FBX XY vertices on a 0.25 mm grid, calculate Euclidean distance to the nearest occupied cell, apply each positive-radius envelope, fill enclosed interior cells, then trace the resulting boundary with ContourPy.",
+        "gridSpacingMm": 0.25,
+        "clearanceHypothesesMm": [
+          1.0,
+          2.0,
+          4.0,
+          6.0
+        ],
+        "variantCount": 16,
+        "alphaShapeComparison": [
+          {
+            "profile": "base",
+            "side": "left",
+            "existingAlphaRadiusMm": 10.0,
+            "existingAlphaLoopCount": 3,
+            "selectedOuterAreaMm2": 8759.558,
+            "additionalLoopAreasMm2": [
+              562.2,
+              361.148
+            ]
+          },
+          {
+            "profile": "base",
+            "side": "right",
+            "existingAlphaRadiusMm": 10.0,
+            "existingAlphaLoopCount": 3,
+            "selectedOuterAreaMm2": 8759.555,
+            "additionalLoopAreasMm2": [
+              562.199,
+              361.148
+            ]
+          },
+          {
+            "profile": "All_Slim",
+            "side": "left",
+            "existingAlphaRadiusMm": 10.0,
+            "existingAlphaLoopCount": 2,
+            "selectedOuterAreaMm2": 6253.349,
+            "additionalLoopAreasMm2": [
+              246.85
+            ]
+          },
+          {
+            "profile": "All_Slim",
+            "side": "right",
+            "existingAlphaRadiusMm": 10.0,
+            "existingAlphaLoopCount": 2,
+            "selectedOuterAreaMm2": 6253.347,
+            "additionalLoopAreasMm2": [
+              246.85
+            ]
+          }
+        ],
+        "polygonAreaRangeMm2": [
+          6707.281,
+          11468.844
+        ],
+        "projectedVertexCoverageRangePercent": [
+          100.0,
+          100.0
+        ],
+        "garmentCode": {
+          "path": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/garmentcode-output/garmentcode-run.json",
+          "sha256": "863f129c2f0df7fe912a9bb8bb0aa03b5ade7b387be946013da24a70ff3d4dce",
+          "status": "PASS_2D_GEOMETRY_ONLY",
+          "panelCount": 16,
+          "stitchCount": 0,
+          "selfIntersection": false,
+          "threeDGenerated": false,
+          "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+          "pythonVersion": "3.9.25",
+          "pygarmentVersion": "2.0.2",
+          "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+          "layoutSha256": "081ff2c41f754d14ebcd9189cb8bdd11368f85840563493cd0fb6bf225c19b7b"
+        },
+        "directVisualReview": {
+          "decision": "2D_GEOMETRY_ONLY_NOT_PRODUCT_APPEARANCE_PASS",
+          "observation": "The 16 GarmentCode panels offset only the selected alpha-10 outer loops at the four requested distances. The source alpha data has three loops for each base foot and two for each All_Slim foot; the smaller secondary loops are not represented in these panels. Direct review also shows a pronounced lateral forefoot indentation in both All_Slim outlines, away from the reference's front split-toe cleft. These are isolated planforms without outsole construction, upper panels, stitches, or a complete boot view."
+        },
+        "rawVertexRasterizationFailure": {
+          "status": "RAW_VERTEX_RASTERIZATION_REJECTED",
+          "observation": "Rasterizing the raw projected mesh vertices as occupied grid cells and applying a 1 mm radius left 172 disconnected components in the first profile. Sparse mesh vertices are not a continuous 2D skin boundary.",
+          "resolution": "Use the existing single-loop SciPy alpha-10 boundary as the continuous input contour; preserve the raw-point result as a rejected experiment, not a shoe envelope."
+        },
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "fitEvaluated": false,
+        "visualAppearanceReview": "PENDING",
+        "garment3DCreated": false,
+        "decision": "Compare these FBX-derived geometric envelopes with the source-scaled outsole and the existing alpha-10 outline. Do not select any radius as footwear ease or promote an isolated outline to the canonical product pattern.",
+        "nextAction": "Overlay the excluded alpha-10 secondary loops and the All_Slim lateral forefoot indentation against the source views, then compare the existing SciPy alpha-radius candidates to see which features persist. Keep the contours local until the shoe last, tabi toe split, ease, and connected vamp boundary are defined; then rerun the 22-pair stitch audit."
+      },
+      "convexHullPlanformTrial": {
+        "status": "GARMENTCODE_2D_GEOMETRY_PASS_ZERO_STITCHES_NOT_FIT",
+        "measuredAt": "2026-09-27T22:50:25Z",
+        "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/foot-planform-convex-hull-comparison-2026-09-28/convex-hull-alpha-comparison.json",
+        "evidenceSha256": "30ad6eb4b5b407e2c042c7acef5a1e6442e44ae5feb1025f89dd6a69eee2df71",
+        "garmentCode": {
+          "status": "PASS_2D_GEOMETRY_ONLY",
+          "runPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/foot-planform-convex-hull-comparison-2026-09-28/garmentcode-output/garmentcode-run.json",
+          "runSha256": "734c314d33d6ff945600f66b4ad06633f612af85fcf5f64046153ff1d2cb31ca",
+          "layoutPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/foot-planform-convex-hull-comparison-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+          "layoutSha256": "4f976274e5fe19742ce81f377c841066528d1f3a3c7e7e08a26eb8937b81d312",
+          "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+          "pythonVersion": "3.9.25",
+          "pygarmentVersion": "2.0.2",
+          "panelCount": 8,
+          "selfIntersection": false,
+          "stitchCount": 0,
+          "strictBoundaryEdges": true,
+          "seamOrientationAudit": "PASS",
+          "threeDGenerated": false,
+          "assemblyConnectivityEvaluated": false
+        },
+        "runtimeAdapterBoundary": {
+          "geometryCalculationPython": "3.9.25",
+          "patternAdapterPython": "3.11.11",
+          "finding": "The pinned GarmentCode Python 3.9 runtime cannot import the repository package because it uses enum.StrEnum; the repository adapter was therefore run with the repository Python 3.11 runtime, then the pinned GarmentCode runner consumed its JSON output.",
+          "resolution": "Keep the repository adapter on the project Python and keep PyGarment execution on its pinned Python runtime, matching the existing staged process boundary."
+        },
+        "directVisualReview": {
+          "decision": "REJECT_CONVEX_HULL_FOR_CANONICAL_PLANFORM",
+          "reviewedArtifacts": [
+            {
+              "path": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/foot-planform-convex-hull-comparison-2026-09-28/convex-hull-vs-alpha10.png",
+              "sha256": "ba163e4357fa387c4364a7dab595f53606e6f0ad6f0c5dab255799f3d63fca5f"
+            },
+            {
+              "path": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/foot-planform-convex-hull-comparison-2026-09-28/garmentcode-output/garmentcode-pattern-layout.png",
+              "sha256": "4f976274e5fe19742ce81f377c841066528d1f3a3c7e7e08a26eb8937b81d312"
+            }
+          ],
+          "observation": "The convex hull produces one smooth, self-intersection-free 2D outline for each profile/side. In the All_Slim overlay it bridges the inward forefoot boundary that is visible in the existing alpha-10 contour; the candidate also contains no split-toe notch, outsole thickness, attachment edge, or stitch. GarmentCode's eight isolated panels are an outline geometry check only."
+        },
+        "canonicalPatternChanged": false,
+        "canonicalStitchGraphChanged": false,
+        "fitEvaluated": false,
+        "visualAppearanceReview": "PENDING",
+        "garment3DCreated": false,
+        "decision": "Keep the convex hull as a rejected 2D comparison; retain GarmentCode/PyGarment only as the existing strict geometry stage. Do not promote any avatar-body outline to a shoe last or canonical product pattern.",
+        "nextAction": "Measure or obtain a calibrated shoe-last surface and choose the outsole-to-upper attachment interface; derive a connected sole-vamp boundary from that data, preserve the 22 upper stitch pairs, then run only the affected named GarmentCode pairs. Keep 3D blocked until visualAppearanceReview passes."
+      }
+    },
+    "ossCombinationTrial": {
+      "combination": "Blender 4.4.3 avatar-foot XY projection + SciPy 1.13.1 alpha-shape sweep + image2outfit pattern-contract/GarmentCode adapter + pinned GarmentCode/PyGarment 2.0.2 2D preview",
+      "measuredOutcome": "Pinned Blender 4.4.3 yields 15 bilateral Foot/Toe-weighted X-Z contour stations; 10 profiles close and five ankle-side profiles remain open. Normal GarmentCode draft-patterns/infer-stitches pass for 18 panels and 22 straight seams. A synthetic quadratic edge passes only on an unstitched strap outline. A real-avatar mask comparison found that adding LowerLeg creates 350-431 mm shin-height section spans; that union mask was rejected, while toe-island-preserving foot-only contours remain measurement evidence only. Blender measured connected ankle joints at Z=84.23 mm and a 180.98 mm weighted foot length. Visual inspection of the undimensioned side/rear concept supports a raised knit cuff; matching the side silhouette ratio to avatar foot length suggests a 98-108 mm opening height, but this remains uncalibrated. A real-FBX sweep at three reference-scaled cuff heights produced one closed, unbranched XY body contour per foot at every height; left perimeter varied 146.92-148.57 mm across the band. A GarmentCode/PyGarment sweep laid out three measured cuff candidates (-5/0/+5% ease) across the existing 18 panels; all three passed the 22/22 seam-direction audit with zero self-intersection, but the result remains a separate-panel 2D preview. A Blender audit of 99 individual shape-key extrema found a 134.35-155.84 mm cuff perimeter range across selected Slim/Medium/large states; global+regional stacks can extend it to 121.78-164.17 mm. The base GarmentCode -5/0/+5% panel sweep does not cover those variations. Blender 4.4.3 projected bilateral Foot/Toe-weighted XY body outlines for base, All_Slim, All_M, and All_L; SciPy 1.13.1 alpha-shape candidates were passed through the normal pattern adapter into pinned GarmentCode. Eight external-envelope panels pass 2D geometry without self-intersection; the body outlines are not outsole-fit results, secondary loops were omitted, and the concept's split-toe slot remains unscaled. The alpha contour cannot be called a tabi cleft: All_Slim's multi-crossing forefoot feature occurs behind the toe tip and is not classified as the design slit. An undimensioned concept-board estimate of a 20% split-toe slot was bracketed locally by 15/20/25% of the measured All_M and All_Slim body-outline lengths, with a separate 4.0 mm width hypothesis. All 12 panels pass pinned GarmentCode strict 2D geometry with no self-intersection. The 20% All_M variant is only a local visual midpoint; it has no material, clearance, upper-seam, fit, or 3D acceptance. Pinned GarmentCode/PyGarment processed a 20-panel local vamp-plus-outsole candidate with all 22 stitch pairs; all directions matched, all input seam lengths paired at 0.0 mm difference, and the panel layout had no self-intersection.",
+      "usableFor": "Avatar projection measurements, planar panel exchange, straight-edge stitch contracts, and rendering a quadratic unstitched outline edge.; extracting and comparing avatar foot-surface section contours.; foot-only body-surface sections and approximate foot/lower-leg transition sampling.; rest-rig ankle landmarks and local, reference-ratio cuff experiments.; measuring a bilateral body-circumference band to feed an isolated 2D cuff ease sweep.; comparing strict 2D layouts and preserving seam directions across measured cuff-ease variants.; mapping measured Siroino size-key body perimeters to multiple GarmentCode 2D cuff profiles.; extracting local avatar-foot envelope candidates and validating their 2D panels through the pinned GarmentCode stage.; extracting local avatar-foot envelope candidates and validating their 2D panels through the pinned GarmentCode stage.; extracting local avatar-foot envelope candidates and validating their 2D panels through the pinned GarmentCode stage.; sweeping provisional split-toe slot proportions on mirrored avatar-projected 2D envelopes.",
+      "notUsableFor": "Measured shoe contour construction, curved stitched-seam matching, shoe-last generation, sewing assembly, footwear fit, 3D build, or motion verification.; closing ankle profiles without a coverage boundary, shoe-last generation, or fit approval.; a Foot/Toe/LowerLeg union is not a shoe cuff or last because it includes shin-height sections.; the generated side-view ratio is not a calibrated cuff dimension, contact clearance, or footwear fit result.; avatar cross-section perimeter is not the finished sewn cuff circumference and does not include ease or deformation.; choosing knit ease, sewing the boot shell, shape-key fit, visual acceptance, or producing a wearable 3D garment.; selecting one-size cuff ease across all size keys or accepting stacked shape-key fit without material evidence.; accepting the result as a shoe last, outsole clearance, or tabi toe-cut dimension.; accepting the result as a shoe last, outsole clearance, or tabi toe-cut dimension.; accepting the result as a shoe last, outsole clearance, or tabi toe-cut dimension.; treating a source-image ratio or the 4.0 mm slot as dimensioned footwear fit.",
+      "decision": "Use Blender for measured avatar surface sections and GarmentCode for reviewed 2D panel/stitch exchange; preserve toe islands and resolve ankle coverage before mapping contours into footwear panels. LowerLeg mask union is not adopted; define the cuff from a reviewed design boundary before any contour clipping. Keep the provisional cuff ratio in local trials only; require clipped-section review before changing the canonical construction or pattern. Pass this measured circumference band into local GarmentCode 2D cuff candidates, then choose ease only after product construction review. Continue with Blender shape-key measurement and keep all three GarmentCode variants local until a supported ease choice is established. Replace the single default-size cuff experiment with separate All_Slim/All_M/All_L 2D variants before selecting a cuff size or shape-key corrective. Keep the body projection external to the canonical product pattern; size and review the explicit split-toe feature separately. Keep the body projection external to the canonical product pattern; size and review the explicit split-toe feature separately. Keep the body projection external to the canonical product pattern; size and review the explicit split-toe feature separately. Keep the 20% variant local as a visual hypothesis and connect it to reviewed vamp/split-web panels in 2D.",
+      "measuredAt": "2026-09-27T18:24:07Z"
+    },
+    "ossComparison": {
+      "measuredAt": "2026-09-27T23:19:13Z",
+      "candidates": [
+        {
+          "tool": "Blender 4.4.3",
+          "role": "avatar mesh measurement",
+          "practicalResult": "Pinned Blender measured 15 X-Z contour stations per foot from the real FBX; 10 are closed and five ankle-side sections remain open, with mirrored contours matching within 0.001 mm. A separate real-FBX test showed that adding LowerLeg changes the section mask into 350-431 mm vertical shin spans; the union was measured and rejected. Blender measured the connected LowerLeg-to-Foot rest-joint at Z=84.23 mm and the weighted foot/toe length at 180.98 mm; a rough side-reference scale ratio suggests a 98-108 mm sole-to-cuff-opening height, explicitly uncalibrated. The three reference-scaled horizontal cut planes produced one closed unbranched avatar cuff cross-section per foot, with a body perimeter of 146.92-148.57 mm across the band. Individual cuff measurements on the 99-key Siroino FBX found mid-band perimeters of 134.35 mm (All_Slim), 153.70 mm (All_M), and 149.14 mm (All_L); explicit global+regional stacks ranged further. Projecting Foot/Toe-weighted FBX geometry measured default/All_M/All_L envelopes of 180.978 x 66.810 mm and All_Slim 168.517 x 56.623 mm; these remain body bounds, not shoe size. Projecting Foot/Toe-weighted FBX geometry measured default/All_M/All_L envelopes of 180.978 x 66.810 mm and All_Slim 168.517 x 56.623 mm; these remain body bounds, not shoe size. Projecting Foot/Toe-weighted FBX geometry measured default/All_M/All_L envelopes of 180.978 x 66.810 mm and All_Slim 168.517 x 56.623 mm; these remain body bounds, not shoe size.",
+          "limitation": "Rig-weight-filtered avatar sections are not a shoe last, footwear ease, material clearance, or fit result; open ankle contours require a reviewed boundary. Nearest-vertex weight samples only approximate the Foot/LowerLeg transition and do not establish a boot cuff. The concept reference has no scale or camera calibration; its proportional cuff estimate is not fit evidence. Measured cross-section circumference does not include garment ease, material thickness, or motion deformation. Shape-key extrema were measured individually except for three selected stacks; this is not a material-fit or user-combination acceptance result. The All_Slim forefoot concavity is not confirmed as the intended tabi slit; no outsole or fit is inferred. The All_Slim forefoot concavity is not confirmed as the intended tabi slit; no outsole or fit is inferred. The All_Slim forefoot concavity is not confirmed as the intended tabi slit; no outsole or fit is inferred.",
+          "decision": "Use Blender to measure avatar cuff perimeters for each supported shape-key preset and treat overlapping regional keys as separate until combinations are validated. The initial single-size cuff sweep does not span Slim through Medium."
+        },
+        {
+          "tool": "SciPy 1.13.1",
+          "role": "projected-point-cloud alpha-shape experiment",
+          "practicalResult": "The pinned GarmentCode runtime's SciPy 1.13.1 formed local alpha-shape boundary candidates from Blender-projected Foot/Toe points; the 10 mm alpha setting yields a dominant unbranched outer loop for both feet in four measured profiles.",
+          "limitation": "Smaller tested radii retain branches or multiple loops; the 10 mm radius omits inner loops and smooths the anatomy. It is not a physical clearance or a validated outsole boundary.",
+          "decision": "Use only to draft local body-envelope candidates, then compare against a dimensioned outsole design and direct surface evidence before canonical adoption.",
+          "source": "config/oss-runtimes/garmentcode-pygarment-requirements.lock.txt"
+        },
+        {
+          "tool": "GarmentCode/PyGarment 2.0.2",
+          "role": "2D panels and stitch exchange",
+          "practicalResult": "The normal adapter and pinned GarmentCode/PyGarment strictly validate four source-mapped curved stitch pairs on the 18-panel/22-stitch boot candidate; paired arc lengths match exactly, all 22 directions match, and no panel self-intersects. Direct inspection of the combined side/rear collar candidate reveals an approximately 45.7 degree tangent kink where adjacent source-derived curves meet.",
+          "limitation": "GarmentCode's seam audit checks each paired curve independently but does not establish C1 continuity between adjacent cutline segments or an image-to-flat-pattern unwrapping. Image-space curvature is uncalibrated; the full product panels remain incomplete, and physical sewing, 3D assembly, footwear fit, collision, motion, and appearance acceptance are not evaluated.",
+          "decision": "Keep GarmentCode's strict matched-edge validation, but require a continuous flat-pattern mapping before combining curves from separate views. Preserve piping as independent geometry; do not infer a last, physical assembly, or visual gate pass from the 2D exchange."
+        },
+        {
+          "tool": "freecad-shoe-last-wb",
+          "role": "parametric footwear last candidate",
+          "practicalResult": "Source review only; repository describes a FreeCAD shoe-last workflow using foot measurements.",
+          "limitation": "No explicit LICENSE found (master/LICENSE returned 404) and FreeCAD is not installed in this worktree.",
+          "decision": "Not classified or used as OSS until licensing and runtime are verified.",
+          "source": "https://github.com/peterzask/freecad-shoe-last-wb"
+        },
+        {
+          "tool": "Pathstitch",
+          "role": "leathercraft pattern CAD and STEP unfolding comparison",
+          "source": "https://github.com/Mason363/Pathstitch",
+          "license": "GPL-3.0",
+          "runtimeStatus": "SOURCE_REVIEW_ONLY_NOT_INSTALLED",
+          "practicalResult": "Official project material describes macOS Apple-Silicon support, importing and unfolding STEP geometry, stitch-hole placement, and DXF/SVG/PDF export. This current Windows worktree could not execute it.",
+          "limitation": "Platform support is incompatible with this Windows host; importing STEP geometry is not part of the current canonical pattern-to-GarmentCode path. No local runtime, product data, or output has been verified.",
+          "decision": "Do not add it to the current production combination. Reconsider only with an available compatible Mac runtime and a reviewed STEP footwear source; treat this as a source-level comparison, not a verified stage replacement."
+        },
+        {
+          "tool": "Seamly2D",
+          "role": "parametric flat-pattern CAD comparison",
+          "source": "https://github.com/FashionFreedom/Seamly2D",
+          "license": "GPL-3.0+",
+          "platforms": [
+            "Windows",
+            "macOS",
+            "Linux"
+          ],
+          "runtimeStatus": "OFFICIAL_SOURCE_REVIEW_ONLY_NOT_INSTALLED",
+          "practicalResult": "The official project describes cross-platform apparel pattern drafting and custom or standardized measurement inputs. It is a possible manual 2D authoring companion for a reviewed shoe pattern.",
+          "limitation": "It does not establish automatic shoe-surface flattening from the current uncalibrated four-view concept. DXF/SVG conversion, named seam preservation, and integration with image2outfit's edge-addressed graph are not verified on this product.",
+          "decision": "Do not insert it into the current automated combination. Reconsider only after a valid continuous flat-pattern correspondence exists and a real export/import round-trip can preserve named seam edges."
+        },
+        {
+          "tool": "OpenSew-2",
+          "role": "2D flat-panel remesh and named-edge preview comparison",
+          "runtimeRevision": "86b432238464d88e3d2c5e1cf3fbf693f1e51722",
+          "license": "GPL-3.0-or-later",
+          "runtimeStatus": "INTEGRATED_2D_ENDPOINT_AUDIT_NOT_PRODUCT_PATTERN",
+          "practicalResult": "The normal draft-patterns stage now runs pinned OpenSew-2/Blender 5.2.2 after GarmentCode on the unchanged canonical pattern and stitch graph. The actual 18-panel run produced 82 connected endpoint-inclusive named edge chains and 22/22 stitch pairs with endpoint-inclusive chains.",
+          "limitation": "The remesh has 16 non-quad faces at the tabi-slit vamp panels. Two stitch pairs have unequal chain sample counts; OpenSew's max-count station mapping gap is 0.51282 mm. This 2D audit does not verify sewn geometry, shoe-last construction, avatar fit, appearance, or release.",
+          "decision": "Keep OpenSew in the normal stage only for 2D remeshing and endpoint-aware named-edge evidence. Preserve GarmentCode and the canonical contracts as the product design inputs; do not promote the OpenSew mesh into a footwear pattern or infer 3D, simulation, fit, or visual pass.",
+          "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/draft-patterns.json",
+          "evidenceSha256": "4b6ad08d06937abd0e7971ebf740d05445611bbe1847cd47be1cdd886ce6333b"
+        },
+        {
+          "tool": "NumPy 1.26.4 + SciPy 1.13.1",
+          "role": "cross-view silhouette and semantic pattern-region correspondence audit",
+          "runtimeStatus": "VERIFIED_2D_PROJECTION_TRIAL_NOT_INTEGRATED",
+          "practicalResult": "Using pinned NumPy/SciPy inside the isolated GarmentCode Python runtime, a provisional front-height-normalized side/front ratio differs from the extracted outsole ratio by 1.348%. However, the generated side silhouette differs from the canonical manual side trace by 32.958% in width/height ratio and normalized Hausdorff distance 0.194197; view-to-pattern links therefore remain semantic region associations only.",
+          "limitation": "Image scales, cameras, and wearer-side labels are uncalibrated. The apparent-height scale anchor is only a projection sanity check. No pixel-to-pattern transform, continuous flat-panel unwrapping, shoe last, physical fit, or visual gate evidence was produced.",
+          "decision": "Keep the generated concept for detail reference only; do not use its contours as pattern coordinates or change the canonical panels. Rebuild a dimensioned 2D candidate from the canonical source and measured avatar-foot evidence, then rerun the pinned GarmentCode stitch audit.",
+          "measurementScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/evaluate-view-pattern-correspondence.py",
+          "measurementScriptSha256": "ee3de8daebf45b53768c61e9f12d85004abaa96cce05d7aa423ff5ad2c8f74e8",
+          "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/view-pattern-correspondence-trial-2026-09-28.json",
+          "evidenceSha256": "53476d22e992084d92ee65e07725d693941eeab0605cc9a144e6c8a04a5c8961"
+        },
+        {
+          "tool": "Pillow 11.3.0 + NumPy 1.26.4 + SciPy 1.13.1",
+          "role": "neutral-background concept-view silhouette tracing",
+          "runtimeStatus": "VERIFIED_CONCEPT_ONLY_NOT_INTEGRATED",
+          "practicalResult": "On a generated neutral-background six-view sheet, Pillow/SciPy extracted 2 front, 2 rear, 1 outer-side, 1 inner-side, 1 overlapping three-quarter, and 2 outsole components with simplified pixel contours. Two 29-point outsole profiles were compared with the 40-point coarse source trace after 2D rotation/scale normalization: length/width ratio difference 4.746%; normalized Hausdorff 0.06916/0.06978 and Chamfer 0.02744/0.02747.",
+          "limitation": "Contours are unscaled image-space constraints, not cut patterns or a last. The same generic mask failed on the original warm studio reference and merged most of each view crop into background; cross-view registration and exact pattern mapping remain unverified.",
+          "decision": "Keep the silhouette contours and outsole profiles as local, uncalibrated 2D concept aids. Do not replace normal reference intake or modify canonical patterns until arbitrary source backgrounds are handled, view-to-pattern correspondence is calibrated, and direct prebuild appearance review passes.",
+          "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/stages/pillow-scipy-view-contour-trial-2026-09-28.json",
+          "evidenceSha256": "7caa2efe243c9d68338714f256157153918e9670a8de8abb28199240f5611d31"
+        },
+        {
+          "tool": "Blender 4.4.3 + Pillow 11.3.0 + NumPy 1.26.4 + SciPy 1.13.1 + GarmentCode/PyGarment 2.0.2",
+          "role": "avatar-relative outsole planform and reference toe-slot 2D comparison",
+          "runtimeStatus": "VERIFIED_2D_GEOMETRY_ONLY_NOT_FIT",
+          "practicalResult": "Toe-to-heel scaling of the 40-point manual source outsole trace to the real 180.978 mm target-avatar foot projection produced eight mirrored/profile variants; strict-boundary-edges GarmentCode produced eight planar panels without self-intersections. Adding the reference-derived 18.7773% slot-depth ratio and median 8 px dark-core width produced another eight panels also without self-intersections. Raw projected avatar-vertex coverage is 79.485-88.073% without a slot and 77.576-85.019% with it. The apparent slot-width hypothesis is 1.974-2.120 mm at these length scales, with 1.060-3.445 mm threshold sensitivity at the default profile.",
+          "limitation": "The source photo has no camera or lateral-scale calibration; the avatar FBX point projection is a body envelope, not a shoe last. Containment is only a 2D point-coverage comparison and is not fit or clearance. All candidates are isolated outsole outlines with zero stitches; no upper, physical assembly, appearance acceptance, or 3D output was evaluated.",
+          "decision": "Keep the trial local and reject canonical promotion. Use the reference slot depth only as a visual ratio; define or measure a shoe last and sole clearance/ease before deriving connected sole and vamp pattern boundaries, then rerun the product stitch audit and complete 2D appearance review.",
+          "measurementScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/measure_reference_outsole_avatar_scale.py",
+          "measurementScriptSha256": "431c7642bb007021381f91e7acdd834b17d22a5817c7b02623aeb0802938891d",
+          "adapterPreparationScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/prepare_slot_garmentcode_input.py",
+          "adapterPreparationScriptSha256": "59d2e6c2789bb18f869624884836cdbf45e007faf623643595cbf76f47cb2675",
+          "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/reference-outsole-avatar-scale-trial-2026-09-28/reference-outsole-avatar-scale-trial.json",
+          "evidenceSha256": "87e346289e8a1be8e3992bac8c2097d885fbde3935a94bd02038803f0198ebff"
+        },
+        {
+          "tool": "Blender 4.4.3 + SciPy 1.13.1 + ContourPy 1.3.0 + GarmentCode/PyGarment 2.0.2",
+          "role": "avatar-derived 2D footwear clearance-envelope sensitivity",
+          "runtimeStatus": "VERIFIED_2D_GEOMETRY_ONLY_NOT_FIT",
+          "practicalResult": "Offset the selected SciPy alpha-10 outer boundaries derived from the real Siroino FBX footprint at 1, 2, 4, and 6 mm on a 0.25 mm grid. The source alpha data has three loops per base foot and two per All_Slim foot; this candidate contains only the selected outer loop. All 16 profile/side/radius candidates remain one connected loop and pass the existing pinned strict-boundary-edges GarmentCode geometry preview without self-intersections.",
+          "limitation": "The radii are geometric sensitivity values, not chosen shoe ease. The base contour is a smoothed body projection, not a shoe last; secondary alpha loops are omitted. Direct review finds a pronounced All_Slim lateral forefoot indentation that does not match the front split-toe feature. The trial has zero stitch pairs and no fit, material, full-boot appearance, or 3D evidence.",
+          "decision": "Keep all offsets local. Compare the All_Slim indentation across the existing alpha-radius sweep before using the outline; require a reviewed shoe last and connected sole-vamp design for product pattern promotion.",
+          "measurementScriptPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/measure_avatar_foot_clearance_envelopes.py",
+          "measurementScriptSha256": "3c20c0626ecb2bacd23c312dfef2c4354dd8f3ea5c53620c474626722adeb935",
+          "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/avatar-foot-clearance-envelope-trial-2026-09-28/avatar-foot-clearance-envelope-trial.json",
+          "evidenceSha256": "772fc5fa3c28ce83695395c8ee5e80ebf46557fdbd8be776513d26b8b71d55cb"
+        },
+        {
+          "tool": "OpenShoeDesigner",
+          "role": "manufacturing-oriented footwear last and flattened-pattern authoring comparison",
+          "license": "GPL-3.0",
+          "sourceUrl": "https://sourceforge.net/projects/openshoedesigner/",
+          "sourceReviewUrl": "https://sourceforge.net/p/openshoedesigner/code/ci/master/tree/",
+          "runtimeStatus": "SOURCE_REVIEW_ONLY_PREALPHA_NOT_ADOPTED",
+          "practicalResult": "The project is aimed at combining foot measurements, shoe form, and upper design into a last, sole, and flattened pattern, but its official project page labels it Pre-Alpha and the source README states the MVP is not reached.",
+          "limitation": "The source README marks last adaptation and export as open; it is not installed or executed on this Windows worktree, so it cannot replace the current measured-pattern or GarmentCode stages.",
+          "decision": "Do not adopt until last adaptation and production export are implemented and verified on the real Siroino input."
+        },
+        {
+          "tool": "Blender 4.4.3 + SciPy 1.13.1 ConvexHull + GarmentCode/PyGarment 2.0.2",
+          "role": "avatar-foot convex-hull planform comparison",
+          "runtimeStatus": "VERIFIED_2D_GEOMETRY_ONLY_REJECTED_FOR_CANONICAL_PATTERN",
+          "practicalResult": "On real Foot/Toe-weighted FBX projection data, all projected points are inside their convex hulls. GarmentCode produced 8 planar panels with no self-intersections and 0 stitches. Convex-hull areas span 7282.36-9233.21 mm2 versus alpha-10 outer areas 6253.35-8759.56 mm2.",
+          "limitation": "The hull bridges concavities visible in the All_Slim alpha-10 comparison; every sampled hull cross-section 5-40 mm from the toe has only two boundary crossings. The avatar body projection is not a shoe last, and zero stitches means no upper attachment, fit, appearance, or 3D result.",
+          "decision": "Do not integrate the convex-hull generator as the production footwear pattern method. Retain GarmentCode as a strict 2D geometry validator for boundaries derived from a calibrated shoe last.",
+          "evidencePath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/foot-planform-convex-hull-comparison-2026-09-28/convex-hull-alpha-comparison.json",
+          "evidenceSha256": "30ad6eb4b5b407e2c042c7acef5a1e6442e44ae5feb1025f89dd6a69eee2df71",
+          "garmentCodeRunPath": ".image2outfit/products/siroino-astral-tabi-boot-set/pattern/foot-planform-convex-hull-comparison-2026-09-28/garmentcode-output/garmentcode-run.json",
+          "garmentCodeRunSha256": "734c314d33d6ff945600f66b4ad06633f612af85fcf5f64046153ff1d2cb31ca"
+        }
+      ],
+      "currentCombination": "Blender FBX foot-surface measurements + SciPy alpha-shape envelopes + SciPy/ContourPy raster offsets + GarmentCode/PyGarment strict 2D geometry and stitch exchange + OpenSew-2/Blender endpoint-aware 2D panel remesh audit in the normal draft-patterns stage",
+      "currentRecommendation": "Use GarmentCode/PyGarment 2.0.2 to validate the canonical planar boundaries and strict stitch exchange, followed by OpenSew-2/Blender 5.2.2 for the normal 2D mesh and endpoint-inclusive named-edge audit. The real run retained all 18 panels, 82 edge chains, and 22 endpoint-inclusive stitch pairs, with 16 non-quad faces and a 0.51282 mm max-count station gap across two unequal-count pairs. Keep Blender FBX projections and SciPy/ContourPy contours as local body-envelope experiments. Reject the eight-panel convex hull for canonical footwear geometry because it bridges the All_Slim forefoot indentation and contains no split-toe or outsole construction. Resolve a calibrated shoe last and the outsole-to-upper attachment boundary before deriving a connected sole-vamp pattern. No sewing simulation, 3D, avatar fit, or visualAppearanceReview pass is inferred."
+    }
+  }
+}

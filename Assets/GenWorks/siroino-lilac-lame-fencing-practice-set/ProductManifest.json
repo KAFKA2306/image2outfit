@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "productName": "Lilac Lamé Fencing Practice Set for SiroinoSotai PC",
+  "status": "REJECTED",
+  "state": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Prefab/SiroinoLilacLameFencingPracticeSet.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Prefab/SiroinoSotai_SiroinoLilacLameFencingPracticeSet.prefab",
+  "previewPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/README.md",
+  "sourceJobPath": "config/products/siroino-lilac-lame-fencing-practice-set/job.json",
+  "sourceReference": "private-reference://sha256/cc0aa34b4824f24ee57d3b557853dbf98c64efa156b07ea36d181959cd53866f",
+  "createdAt": "2026-10-04T11:11:27+09:00",
+  "designRevision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
+  "technicalGates": {
+    "referenceAudit": "PENDING",
+    "referenceIdentity": "PENDING",
+    "garmentDecomposition": "PENDING",
+    "construction": "PENDING",
+    "patternContract": "PENDING",
+    "stitchGraph": "PENDING",
+    "garmentCodeStitchExport": "PENDING",
+    "openSew2dEndpointAudit": "PENDING",
+    "visualAppearanceReview": "PENDING",
+    "blender": "PENDING",
+    "editableSource": "PENDING",
+    "fbx": "PENDING",
+    "prefabDeclared": "PENDING",
+    "fiveViewEvidence": "PENDING",
+    "poseEvidence": "PENDING",
+    "licenseReview": "PENDING"
+  },
+  "releaseReadiness": {
+    "status": "BLOCKED",
+    "reasons": [
+      "New product intake only; visualAppearanceReview is PENDING.",
+      "No 3D, avatar fit, Unity/VRChat runtime, or license clearance is evidenced."
+    ]
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
+    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
+    "nextAction": "Add a dedicated, four-edge crotch gusset and reshape the shorts seat/rise and thigh panel boundaries; use the existing Neutral avatar landmarks only as explicit placement hypotheses. Then refresh pattern-bound cloth evidence, execute the canonical workflow, and directly inspect all eleven current renders for crouch/sit coverage. Keep REJECTED until exposed avatar is eliminated and front plastron, elbow quilting, rear waist tab, sleeve surface and ordered skirt pleats are visibly corrected. Do not claim fit, Shape Key, Unity or VRChat acceptance.",
+    "lastAttempt": {
+      "runId": "2ee4bb1d97c5400b88f4d79f7fa1ef62",
+      "status": "EXECUTED",
+      "checkedAt": "2026-10-08T23:07:10Z",
+      "visualAppearanceReview": "PENDING",
+      "lastPassedStage": "finalize-candidate",
+      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
+      "stageEvidenceSha256": "cda855c997b6ff7c531b9aa4c0e5e27d80a64926ebafdfea4da090d81f722605",
+      "completedStages": {
+        "ingest-reference": {
+          "status": "REUSED",
+          "stageResultSha256": "30fd88522d5e8cf4f1c3bec0a473803b86723a8b10a7aef4e1e121c4324f6f42"
+        },
+        "normalize-view": {
+          "status": "REUSED",
+          "stageResultSha256": "ea26d14e1c799eb4acfbbd656ce7e1a2534c08aee1f8bb1357dbb1f068834dbe"
+        },
+        "decompose-garment": {
+          "status": "REUSED",
+          "stageResultSha256": "b2a9dc256694e2f7593968746d0b97eb92cd6b0c020e02aaa39f0b12ec4813f8"
+        },
+        "draft-patterns": {
+          "status": "REUSED",
+          "stageResultSha256": "36d33cce4c803368cf1bdf2d3800860b3ed9e6c2ae24e488d2cd4fc66e0c362e"
+        },
+        "infer-stitches": {
+          "status": "REUSED",
+          "stageResultSha256": "a532d26ab739c4b7e9c8838b6dc65817ba416152728689b3898cef82fdd6eb02"
+        },
+        "initialize-3d": {
+          "status": "REUSED",
+          "stageResultSha256": "f0c60a7ee8ac263cab28bb0f57e9af2687e9daf453dd6a0786d344f91e95183a"
+        },
+        "build-blender": {
+          "status": "REUSED",
+          "stageResultSha256": "d9bb6f544e30f5a320105db03e7ba01835650bac0c66074238af7b1649eacdce"
+        },
+        "simulate-cloth": {
+          "status": "REUSED",
+          "stageResultSha256": "c7f060f2caa0723c405fab0ce6358db7df0e66c7ac2d9da112cf818941cf36be"
+        },
+        "skin-and-export": {
+          "status": "REUSED",
+          "stageResultSha256": "63c0b7c29affe215b85dd06c4557c2065f600a9c296366a846e5d63d59f81fc4"
+        },
+        "render-evidence": {
+          "status": "REUSED",
+          "stageResultSha256": "93a6c95d28ee157e16df6aff14ad60070b419acab6d985d271462d36c979fb36"
+        },
+        "audit-geometry": {
+          "status": "REUSED",
+          "stageResultSha256": "ff09dd7649d7f83c6e930dfec327c15cd18832d4e1d52d9c9acfa4a14414be82"
+        },
+        "visual-review": {
+          "status": "PASS",
+          "stageResultSha256": "6d882744504eeefdd46548a132e94ba66dccaf90f8a86b01ea744112a61e2c79"
+        },
+        "finalize-candidate": {
+          "status": "PASS",
+          "stageResultSha256": "cda855c997b6ff7c531b9aa4c0e5e27d80a64926ebafdfea4da090d81f722605"
+        }
+      },
+      "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
+      "failedAttemptEvidencePaths": [],
+      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
+      "checkpointSha256": "d39a93f66677d0167215fe7cea26368803a1ecfb5207439ac92a2292543ed3d7",
+      "blockedStage": null,
+      "failure": null,
+      "nextAction": "Add a dedicated, four-edge crotch gusset and reshape the shorts seat/rise and thigh panel boundaries; use the existing Neutral avatar landmarks only as explicit placement hypotheses. Then refresh pattern-bound cloth evidence, execute the canonical workflow, and directly inspect all eleven current renders for crouch/sit coverage. Keep REJECTED until exposed avatar is eliminated and front plastron, elbow quilting, rear waist tab, sleeve surface and ordered skirt pleats are visibly corrected. Do not claim fit, Shape Key, Unity or VRChat acceptance."
+    },
+    "manufacturingPrototype": {
+      "stage": "build-blender",
+      "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
+      "qualityDecision": "REJECT",
+      "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
+      "sourceSha256": "e31d906868db3a425f06ad2b09fbe96d60f7dffe565e725c33f7bf1c3523cd04",
+      "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+      "reportSha256": "49633b9a4320a5af9a4ea4735af5cb39eee9e531988089f5e4d5c600341226c0",
+      "metrics": {
+        "vertices": 9412,
+        "triangles": 18253,
+        "unweightedVertices": 9412,
+        "degenerateTriangles": 0
+      },
+      "grantsQualityAcceptance": false
+    },
+    "currentVisualReview": {
+      "decision": "REJECT",
+      "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
+      "currentInputsMatch": true,
+      "sha256": "39494b97e40e843372cecf8f358076c115662e2f276d8875f883e92b464e45c4",
+      "findings": [
+        {
+          "severity": "BLOCKER",
+          "code": "DESIGN_DETAILS_NOT_RENDERED",
+          "description": "Directly inspected all five current views and six poses (all current image SHA-256 values recorded). The base garment remains near-white with only thin lavender seam/cuff/hem lines; the visible diagonal plastron, elbow quilting and rear waist adjustment tab are still absent."
+        },
+        {
+          "severity": "BLOCKER",
+          "code": "SLEEVE_SURFACE_QUALITY",
+          "description": "Current front, back, side and pose renders show pronounced irregular faceting and wrinkling across both sleeves and underarms. Sleeve surface remains rejected."
+        },
+        {
+          "severity": "BLOCKER",
+          "code": "SKIRT_CONSTRUCTION_UNRESOLVED",
+          "description": "The skirt still presents irregular broad folds instead of the ordered pleats in the reference. In both crouch and sit, the hem lifts and exposes large gray avatar regions; shorts do not follow the pose and a crotch gusset is absent. This is a rejected prototype, not fit evidence."
+        },
+        {
+          "severity": "BLOCKER",
+          "code": "COLLAR_AND_FRONT_CLOSURE",
+          "description": "The collar remains a tall narrow tube and the intended diagonal front plastron/closure is absent. Neck clearance and garment retention remain unverified."
+        },
+        {
+          "severity": "BLOCKER",
+          "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
+          "description": "These are Blender prototype renders only. Large/Shape Key fit, continuous penetration, weight deformation acceptance, Unity import, VRChat Build & Test, and SDK upload have not been verified."
+        }
+      ],
+      "grantsQualityAcceptance": false
+    }
+  },
+  "completionGates": {
+    "blender": "FAIL",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "FAIL",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "FAIL",
+    "researchTrial": "PASS"
+  },
+  "candidateState": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Candidate/candidate-state.json"
+}
