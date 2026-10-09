@@ -1,0 +1,399 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+  "model": "star-schema-triplet-graph",
+  "mainFlow": {
+    "hub": "product:siroino-nocturnal-shrine-maiden-long-hakama-set",
+    "stageOrder": [
+      "ingest-reference",
+      "normalize-view",
+      "decompose-garment",
+      "draft-patterns",
+      "infer-stitches",
+      "initialize-3d",
+      "build-blender",
+      "simulate-cloth",
+      "skin-and-export",
+      "render-evidence",
+      "audit-geometry",
+      "visual-review",
+      "finalize-candidate"
+    ],
+    "stageSource": "src/image2outfit/pipeline.py PIPELINE_STAGES"
+  },
+  "dimensions": {
+    "stage": [
+      {
+        "id": "ingest-reference",
+        "order": 0
+      },
+      {
+        "id": "normalize-view",
+        "order": 1
+      },
+      {
+        "id": "decompose-garment",
+        "order": 2
+      },
+      {
+        "id": "draft-patterns",
+        "order": 3
+      },
+      {
+        "id": "infer-stitches",
+        "order": 4
+      },
+      {
+        "id": "initialize-3d",
+        "order": 5
+      },
+      {
+        "id": "build-blender",
+        "order": 6
+      },
+      {
+        "id": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "id": "skin-and-export",
+        "order": 8
+      },
+      {
+        "id": "render-evidence",
+        "order": 9
+      },
+      {
+        "id": "audit-geometry",
+        "order": 10
+      },
+      {
+        "id": "visual-review",
+        "order": 11
+      },
+      {
+        "id": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "piece": [
+      {
+        "id": "hakama-back-left"
+      },
+      {
+        "id": "hakama-back-right"
+      },
+      {
+        "id": "hakama-front-left"
+      },
+      {
+        "id": "hakama-front-right"
+      },
+      {
+        "id": "hakama-side-left"
+      },
+      {
+        "id": "hakama-side-right"
+      },
+      {
+        "id": "tunic-back"
+      },
+      {
+        "id": "tunic-front"
+      }
+    ]
+  },
+  "facts": {
+    "stageRun": [
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "ingest-reference",
+        "order": 0
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "normalize-view",
+        "order": 1
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "decompose-garment",
+        "order": 2
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "draft-patterns",
+        "order": 3
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "infer-stitches",
+        "order": 4
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "initialize-3d",
+        "order": 5
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "build-blender",
+        "order": 6
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "skin-and-export",
+        "order": 8
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "render-evidence",
+        "order": 9
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "audit-geometry",
+        "order": 10
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "visual-review",
+        "order": 11
+      },
+      {
+        "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+        "stageId": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "stitch": [
+      {
+        "stitchId": "tunic-neck",
+        "firstPieceId": "tunic-front",
+        "firstEdgeId": null,
+        "secondPieceId": "tunic-back",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "front-left-side",
+        "firstPieceId": "tunic-front",
+        "firstEdgeId": null,
+        "secondPieceId": "tunic-back",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "front-right-side",
+        "firstPieceId": "tunic-front",
+        "firstEdgeId": null,
+        "secondPieceId": "tunic-back",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "hakama-front-left-waist",
+        "firstPieceId": "hakama-front-left",
+        "firstEdgeId": null,
+        "secondPieceId": "tunic-front",
+        "secondEdgeId": null,
+        "type": "attachment"
+      },
+      {
+        "stitchId": "hakama-front-right-waist",
+        "firstPieceId": "hakama-front-right",
+        "firstEdgeId": null,
+        "secondPieceId": "tunic-front",
+        "secondEdgeId": null,
+        "type": "attachment"
+      },
+      {
+        "stitchId": "hakama-back-waist",
+        "firstPieceId": "hakama-back-left",
+        "firstEdgeId": null,
+        "secondPieceId": "tunic-back",
+        "secondEdgeId": null,
+        "type": "attachment"
+      },
+      {
+        "stitchId": "hakama-left-side-front",
+        "firstPieceId": "hakama-side-left",
+        "firstEdgeId": null,
+        "secondPieceId": "hakama-front-left",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "hakama-left-side-back",
+        "firstPieceId": "hakama-side-left",
+        "firstEdgeId": null,
+        "secondPieceId": "hakama-back-left",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "hakama-right-side-front",
+        "firstPieceId": "hakama-side-right",
+        "firstEdgeId": null,
+        "secondPieceId": "hakama-front-right",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "hakama-right-side-back",
+        "firstPieceId": "hakama-side-right",
+        "firstEdgeId": null,
+        "secondPieceId": "hakama-back-right",
+        "secondEdgeId": null,
+        "type": "plain"
+      }
+    ],
+    "overlayAttachment": []
+  },
+  "unresolved": [
+    {
+      "item": "exact factory seam allowance",
+      "status": "not-observable",
+      "decision": "use 8–10 mm by panel function"
+    }
+  ],
+  "triples": [
+    {
+      "subject": "stage:ingest-reference",
+      "predicate": "precedes",
+      "object": "stage:normalize-view",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:normalize-view",
+      "predicate": "precedes",
+      "object": "stage:decompose-garment",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:decompose-garment",
+      "predicate": "precedes",
+      "object": "stage:draft-patterns",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:draft-patterns",
+      "predicate": "precedes",
+      "object": "stage:infer-stitches",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:infer-stitches",
+      "predicate": "precedes",
+      "object": "stage:initialize-3d",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:initialize-3d",
+      "predicate": "precedes",
+      "object": "stage:build-blender",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:build-blender",
+      "predicate": "precedes",
+      "object": "stage:simulate-cloth",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:simulate-cloth",
+      "predicate": "precedes",
+      "object": "stage:skin-and-export",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:skin-and-export",
+      "predicate": "precedes",
+      "object": "stage:render-evidence",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:render-evidence",
+      "predicate": "precedes",
+      "object": "stage:audit-geometry",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:audit-geometry",
+      "predicate": "precedes",
+      "object": "stage:visual-review",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:visual-review",
+      "predicate": "precedes",
+      "object": "stage:finalize-candidate",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "piece:tunic-front",
+      "predicate": "stitchedTo",
+      "object": "piece:tunic-back",
+      "evidence": "stitch:tunic-neck"
+    },
+    {
+      "subject": "piece:tunic-front",
+      "predicate": "stitchedTo",
+      "object": "piece:tunic-back",
+      "evidence": "stitch:front-left-side"
+    },
+    {
+      "subject": "piece:tunic-front",
+      "predicate": "stitchedTo",
+      "object": "piece:tunic-back",
+      "evidence": "stitch:front-right-side"
+    },
+    {
+      "subject": "piece:hakama-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:tunic-front",
+      "evidence": "stitch:hakama-front-left-waist"
+    },
+    {
+      "subject": "piece:hakama-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:tunic-front",
+      "evidence": "stitch:hakama-front-right-waist"
+    },
+    {
+      "subject": "piece:hakama-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:tunic-back",
+      "evidence": "stitch:hakama-back-waist"
+    },
+    {
+      "subject": "piece:hakama-side-left",
+      "predicate": "stitchedTo",
+      "object": "piece:hakama-front-left",
+      "evidence": "stitch:hakama-left-side-front"
+    },
+    {
+      "subject": "piece:hakama-side-left",
+      "predicate": "stitchedTo",
+      "object": "piece:hakama-back-left",
+      "evidence": "stitch:hakama-left-side-back"
+    },
+    {
+      "subject": "piece:hakama-side-right",
+      "predicate": "stitchedTo",
+      "object": "piece:hakama-front-right",
+      "evidence": "stitch:hakama-right-side-front"
+    },
+    {
+      "subject": "piece:hakama-side-right",
+      "predicate": "stitchedTo",
+      "object": "piece:hakama-back-right",
+      "evidence": "stitch:hakama-right-side-back"
+    }
+  ]
+}

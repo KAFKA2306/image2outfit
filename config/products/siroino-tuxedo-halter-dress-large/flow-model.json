@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "model": "star-schema-triplet-graph",
+  "mainFlow": {
+    "hub": "product:siroino-tuxedo-halter-dress-large",
+    "stageOrder": [
+      "ingest-reference",
+      "normalize-view",
+      "decompose-garment",
+      "draft-patterns",
+      "infer-stitches",
+      "initialize-3d",
+      "build-blender",
+      "simulate-cloth",
+      "skin-and-export",
+      "render-evidence",
+      "audit-geometry",
+      "visual-review",
+      "finalize-candidate"
+    ],
+    "stageSource": "src/image2outfit/pipeline.py PIPELINE_STAGES"
+  },
+  "dimensions": {
+    "stage": [
+      {
+        "id": "ingest-reference",
+        "order": 0
+      },
+      {
+        "id": "normalize-view",
+        "order": 1
+      },
+      {
+        "id": "decompose-garment",
+        "order": 2
+      },
+      {
+        "id": "draft-patterns",
+        "order": 3
+      },
+      {
+        "id": "infer-stitches",
+        "order": 4
+      },
+      {
+        "id": "initialize-3d",
+        "order": 5
+      },
+      {
+        "id": "build-blender",
+        "order": 6
+      },
+      {
+        "id": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "id": "skin-and-export",
+        "order": 8
+      },
+      {
+        "id": "render-evidence",
+        "order": 9
+      },
+      {
+        "id": "audit-geometry",
+        "order": 10
+      },
+      {
+        "id": "visual-review",
+        "order": 11
+      },
+      {
+        "id": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "piece": [
+      {
+        "id": "bib-front"
+      },
+      {
+        "id": "lower-skirt-ring"
+      },
+      {
+        "id": "neck-band"
+      },
+      {
+        "id": "ruffle-strip"
+      },
+      {
+        "id": "tail-left"
+      },
+      {
+        "id": "tail-right"
+      },
+      {
+        "id": "upper-skirt-ring"
+      },
+      {
+        "id": "waistcoat-back"
+      },
+      {
+        "id": "waistcoat-left"
+      },
+      {
+        "id": "waistcoat-right"
+      }
+    ]
+  },
+  "facts": {
+    "stageRun": [
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "ingest-reference",
+        "order": 0
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "normalize-view",
+        "order": 1
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "decompose-garment",
+        "order": 2
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "draft-patterns",
+        "order": 3
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "infer-stitches",
+        "order": 4
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "initialize-3d",
+        "order": 5
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "build-blender",
+        "order": 6
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "skin-and-export",
+        "order": 8
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "render-evidence",
+        "order": 9
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "audit-geometry",
+        "order": 10
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "visual-review",
+        "order": 11
+      },
+      {
+        "productId": "siroino-tuxedo-halter-dress-large",
+        "stageId": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "stitch": [
+      {
+        "stitchId": "left-front-to-back-side",
+        "firstPieceId": "waistcoat-left",
+        "firstEdgeId": "outer-side",
+        "secondPieceId": "waistcoat-back",
+        "secondEdgeId": "left-side",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-front-to-back-side",
+        "firstPieceId": "waistcoat-right",
+        "firstEdgeId": "outer-side",
+        "secondPieceId": "waistcoat-back",
+        "secondEdgeId": "right-side",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-tail-to-waistcoat",
+        "firstPieceId": "tail-left",
+        "firstEdgeId": "waist",
+        "secondPieceId": "waistcoat-left",
+        "secondEdgeId": "lower-waist",
+        "type": "attachment"
+      },
+      {
+        "stitchId": "right-tail-to-waistcoat",
+        "firstPieceId": "tail-right",
+        "firstEdgeId": "waist",
+        "secondPieceId": "waistcoat-right",
+        "secondEdgeId": "lower-waist",
+        "type": "attachment"
+      },
+      {
+        "stitchId": "bib-to-left-lapel",
+        "firstPieceId": "bib-front",
+        "firstEdgeId": "left-side",
+        "secondPieceId": "waistcoat-left",
+        "secondEdgeId": "inner-v",
+        "type": "bound"
+      },
+      {
+        "stitchId": "bib-to-right-lapel",
+        "firstPieceId": "bib-front",
+        "firstEdgeId": "right-side",
+        "secondPieceId": "waistcoat-right",
+        "secondEdgeId": "inner-v",
+        "type": "bound"
+      },
+      {
+        "stitchId": "upper-skirt-center-back",
+        "firstPieceId": "upper-skirt-ring",
+        "firstEdgeId": "left-back",
+        "secondPieceId": "upper-skirt-ring",
+        "secondEdgeId": "right-back",
+        "type": "plain"
+      },
+      {
+        "stitchId": "lower-skirt-center-back",
+        "firstPieceId": "lower-skirt-ring",
+        "firstEdgeId": "left-back",
+        "secondPieceId": "lower-skirt-ring",
+        "secondEdgeId": "right-back",
+        "type": "plain"
+      },
+      {
+        "stitchId": "upper-skirt-to-waist",
+        "firstPieceId": "upper-skirt-ring",
+        "firstEdgeId": "waist",
+        "secondPieceId": "waistcoat-back",
+        "secondEdgeId": "lower-waist",
+        "type": "attachment"
+      },
+      {
+        "stitchId": "lower-skirt-to-waist",
+        "firstPieceId": "lower-skirt-ring",
+        "firstEdgeId": "waist",
+        "secondPieceId": "waistcoat-back",
+        "secondEdgeId": "lower-waist",
+        "type": "attachment"
+      },
+      {
+        "stitchId": "neck-band-close",
+        "firstPieceId": "neck-band",
+        "firstEdgeId": "left-end",
+        "secondPieceId": "neck-band",
+        "secondEdgeId": "right-end",
+        "type": "plain"
+      },
+      {
+        "stitchId": "ruffle-to-bib",
+        "firstPieceId": "ruffle-strip",
+        "firstEdgeId": "centerline",
+        "secondPieceId": "bib-front",
+        "secondEdgeId": "centerline",
+        "type": "attachment"
+      }
+    ],
+    "overlayAttachment": []
+  },
+  "unresolved": [
+    {
+      "item": "exact commercial seam allowance",
+      "status": "not-observable",
+      "decision": "use 8–12 mm construction allowances appropriate to panel function"
+    },
+    {
+      "item": "back closure hardware",
+      "status": "not-observable",
+      "decision": "omit visible hardware and preserve a center-back seam"
+    }
+  ],
+  "triples": [
+    {
+      "subject": "stage:ingest-reference",
+      "predicate": "precedes",
+      "object": "stage:normalize-view",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:normalize-view",
+      "predicate": "precedes",
+      "object": "stage:decompose-garment",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:decompose-garment",
+      "predicate": "precedes",
+      "object": "stage:draft-patterns",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:draft-patterns",
+      "predicate": "precedes",
+      "object": "stage:infer-stitches",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:infer-stitches",
+      "predicate": "precedes",
+      "object": "stage:initialize-3d",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:initialize-3d",
+      "predicate": "precedes",
+      "object": "stage:build-blender",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:build-blender",
+      "predicate": "precedes",
+      "object": "stage:simulate-cloth",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:simulate-cloth",
+      "predicate": "precedes",
+      "object": "stage:skin-and-export",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:skin-and-export",
+      "predicate": "precedes",
+      "object": "stage:render-evidence",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:render-evidence",
+      "predicate": "precedes",
+      "object": "stage:audit-geometry",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:audit-geometry",
+      "predicate": "precedes",
+      "object": "stage:visual-review",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:visual-review",
+      "predicate": "precedes",
+      "object": "stage:finalize-candidate",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "piece:waistcoat-left",
+      "predicate": "stitchedTo",
+      "object": "piece:waistcoat-back",
+      "evidence": "stitch:left-front-to-back-side"
+    },
+    {
+      "subject": "piece:waistcoat-right",
+      "predicate": "stitchedTo",
+      "object": "piece:waistcoat-back",
+      "evidence": "stitch:right-front-to-back-side"
+    },
+    {
+      "subject": "piece:tail-left",
+      "predicate": "stitchedTo",
+      "object": "piece:waistcoat-left",
+      "evidence": "stitch:left-tail-to-waistcoat"
+    },
+    {
+      "subject": "piece:tail-right",
+      "predicate": "stitchedTo",
+      "object": "piece:waistcoat-right",
+      "evidence": "stitch:right-tail-to-waistcoat"
+    },
+    {
+      "subject": "piece:bib-front",
+      "predicate": "stitchedTo",
+      "object": "piece:waistcoat-left",
+      "evidence": "stitch:bib-to-left-lapel"
+    },
+    {
+      "subject": "piece:bib-front",
+      "predicate": "stitchedTo",
+      "object": "piece:waistcoat-right",
+      "evidence": "stitch:bib-to-right-lapel"
+    },
+    {
+      "subject": "piece:upper-skirt-ring",
+      "predicate": "stitchedTo",
+      "object": "piece:upper-skirt-ring",
+      "evidence": "stitch:upper-skirt-center-back"
+    },
+    {
+      "subject": "piece:lower-skirt-ring",
+      "predicate": "stitchedTo",
+      "object": "piece:lower-skirt-ring",
+      "evidence": "stitch:lower-skirt-center-back"
+    },
+    {
+      "subject": "piece:upper-skirt-ring",
+      "predicate": "stitchedTo",
+      "object": "piece:waistcoat-back",
+      "evidence": "stitch:upper-skirt-to-waist"
+    },
+    {
+      "subject": "piece:lower-skirt-ring",
+      "predicate": "stitchedTo",
+      "object": "piece:waistcoat-back",
+      "evidence": "stitch:lower-skirt-to-waist"
+    },
+    {
+      "subject": "piece:neck-band",
+      "predicate": "stitchedTo",
+      "object": "piece:neck-band",
+      "evidence": "stitch:neck-band-close"
+    },
+    {
+      "subject": "piece:ruffle-strip",
+      "predicate": "stitchedTo",
+      "object": "piece:bib-front",
+      "evidence": "stitch:ruffle-to-bib"
+    }
+  ]
+}

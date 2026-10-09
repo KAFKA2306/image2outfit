@@ -1,0 +1,449 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "model": "star-schema-triplet-graph",
+  "mainFlow": {
+    "hub": "product:siroino-blue-happi",
+    "stageOrder": [
+      "ingest-reference",
+      "normalize-view",
+      "decompose-garment",
+      "draft-patterns",
+      "infer-stitches",
+      "initialize-3d",
+      "build-blender",
+      "simulate-cloth",
+      "skin-and-export",
+      "render-evidence",
+      "audit-geometry",
+      "visual-review",
+      "finalize-candidate"
+    ],
+    "stageSource": "src/image2outfit/pipeline.py PIPELINE_STAGES"
+  },
+  "dimensions": {
+    "stage": [
+      {
+        "id": "ingest-reference",
+        "order": 0
+      },
+      {
+        "id": "normalize-view",
+        "order": 1
+      },
+      {
+        "id": "decompose-garment",
+        "order": 2
+      },
+      {
+        "id": "draft-patterns",
+        "order": 3
+      },
+      {
+        "id": "infer-stitches",
+        "order": 4
+      },
+      {
+        "id": "initialize-3d",
+        "order": 5
+      },
+      {
+        "id": "build-blender",
+        "order": 6
+      },
+      {
+        "id": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "id": "skin-and-export",
+        "order": 8
+      },
+      {
+        "id": "render-evidence",
+        "order": 9
+      },
+      {
+        "id": "audit-geometry",
+        "order": 10
+      },
+      {
+        "id": "visual-review",
+        "order": 11
+      },
+      {
+        "id": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "piece": [
+      {
+        "id": "back-body"
+      },
+      {
+        "id": "collar-back"
+      },
+      {
+        "id": "collar-left"
+      },
+      {
+        "id": "collar-right"
+      },
+      {
+        "id": "front-left"
+      },
+      {
+        "id": "front-right"
+      },
+      {
+        "id": "sleeve-left"
+      },
+      {
+        "id": "sleeve-right"
+      }
+    ]
+  },
+  "facts": {
+    "stageRun": [
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "ingest-reference",
+        "order": 0
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "normalize-view",
+        "order": 1
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "decompose-garment",
+        "order": 2
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "draft-patterns",
+        "order": 3
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "infer-stitches",
+        "order": 4
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "initialize-3d",
+        "order": 5
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "build-blender",
+        "order": 6
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "skin-and-export",
+        "order": 8
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "render-evidence",
+        "order": 9
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "audit-geometry",
+        "order": 10
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "visual-review",
+        "order": 11
+      },
+      {
+        "productId": "siroino-blue-happi",
+        "stageId": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "stitch": [
+      {
+        "stitchId": "shoulder-left",
+        "firstPieceId": "back-body",
+        "firstEdgeId": "shoulder-left",
+        "secondPieceId": "front-left",
+        "secondEdgeId": "shoulder",
+        "type": "lockstitch"
+      },
+      {
+        "stitchId": "shoulder-right",
+        "firstPieceId": "back-body",
+        "firstEdgeId": "shoulder-right",
+        "secondPieceId": "front-right",
+        "secondEdgeId": "shoulder",
+        "type": "lockstitch"
+      },
+      {
+        "stitchId": "sleeve-cap-left-front",
+        "firstPieceId": "sleeve-left",
+        "firstEdgeId": "cap",
+        "secondPieceId": "front-left",
+        "secondEdgeId": "armhole",
+        "type": "set-in-with-ease"
+      },
+      {
+        "stitchId": "sleeve-cap-left-back",
+        "firstPieceId": "sleeve-left",
+        "firstEdgeId": "cap",
+        "secondPieceId": "back-body",
+        "secondEdgeId": "shoulder-left",
+        "type": "set-in-with-ease"
+      },
+      {
+        "stitchId": "sleeve-cap-right-front",
+        "firstPieceId": "sleeve-right",
+        "firstEdgeId": "cap",
+        "secondPieceId": "front-right",
+        "secondEdgeId": "armhole",
+        "type": "set-in-with-ease"
+      },
+      {
+        "stitchId": "sleeve-cap-right-back",
+        "firstPieceId": "sleeve-right",
+        "firstEdgeId": "cap",
+        "secondPieceId": "back-body",
+        "secondEdgeId": "shoulder-right",
+        "type": "set-in-with-ease"
+      },
+      {
+        "stitchId": "side-left",
+        "firstPieceId": "back-body",
+        "firstEdgeId": "side-left",
+        "secondPieceId": "front-left",
+        "secondEdgeId": "side",
+        "type": "lockstitch"
+      },
+      {
+        "stitchId": "side-right",
+        "firstPieceId": "back-body",
+        "firstEdgeId": "side-right",
+        "secondPieceId": "front-right",
+        "secondEdgeId": "side",
+        "type": "lockstitch"
+      },
+      {
+        "stitchId": "sleeve-under-left",
+        "firstPieceId": "sleeve-left",
+        "firstEdgeId": "underarm-front",
+        "secondPieceId": "sleeve-left",
+        "secondEdgeId": "underarm-back",
+        "type": "lockstitch"
+      },
+      {
+        "stitchId": "sleeve-under-right",
+        "firstPieceId": "sleeve-right",
+        "firstEdgeId": "underarm-front",
+        "secondPieceId": "sleeve-right",
+        "secondEdgeId": "underarm-back",
+        "type": "lockstitch"
+      },
+      {
+        "stitchId": "collar-left-front",
+        "firstPieceId": "collar-left",
+        "firstEdgeId": "inner",
+        "secondPieceId": "front-left",
+        "secondEdgeId": "front",
+        "type": "structural-band"
+      },
+      {
+        "stitchId": "collar-right-front",
+        "firstPieceId": "collar-right",
+        "firstEdgeId": "inner",
+        "secondPieceId": "front-right",
+        "secondEdgeId": "front",
+        "type": "structural-band"
+      },
+      {
+        "stitchId": "collar-left-neck",
+        "firstPieceId": "collar-left",
+        "firstEdgeId": "top",
+        "secondPieceId": "collar-back",
+        "secondEdgeId": "left",
+        "type": "structural-band"
+      },
+      {
+        "stitchId": "collar-right-neck",
+        "firstPieceId": "collar-right",
+        "firstEdgeId": "top",
+        "secondPieceId": "collar-back",
+        "secondEdgeId": "right",
+        "type": "structural-band"
+      }
+    ],
+    "overlayAttachment": []
+  },
+  "unresolved": [],
+  "triples": [
+    {
+      "subject": "stage:ingest-reference",
+      "predicate": "precedes",
+      "object": "stage:normalize-view",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:normalize-view",
+      "predicate": "precedes",
+      "object": "stage:decompose-garment",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:decompose-garment",
+      "predicate": "precedes",
+      "object": "stage:draft-patterns",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:draft-patterns",
+      "predicate": "precedes",
+      "object": "stage:infer-stitches",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:infer-stitches",
+      "predicate": "precedes",
+      "object": "stage:initialize-3d",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:initialize-3d",
+      "predicate": "precedes",
+      "object": "stage:build-blender",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:build-blender",
+      "predicate": "precedes",
+      "object": "stage:simulate-cloth",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:simulate-cloth",
+      "predicate": "precedes",
+      "object": "stage:skin-and-export",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:skin-and-export",
+      "predicate": "precedes",
+      "object": "stage:render-evidence",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:render-evidence",
+      "predicate": "precedes",
+      "object": "stage:audit-geometry",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:audit-geometry",
+      "predicate": "precedes",
+      "object": "stage:visual-review",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:visual-review",
+      "predicate": "precedes",
+      "object": "stage:finalize-candidate",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "piece:back-body",
+      "predicate": "stitchedTo",
+      "object": "piece:front-left",
+      "evidence": "stitch:shoulder-left"
+    },
+    {
+      "subject": "piece:back-body",
+      "predicate": "stitchedTo",
+      "object": "piece:front-right",
+      "evidence": "stitch:shoulder-right"
+    },
+    {
+      "subject": "piece:sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:front-left",
+      "evidence": "stitch:sleeve-cap-left-front"
+    },
+    {
+      "subject": "piece:sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:back-body",
+      "evidence": "stitch:sleeve-cap-left-back"
+    },
+    {
+      "subject": "piece:sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:front-right",
+      "evidence": "stitch:sleeve-cap-right-front"
+    },
+    {
+      "subject": "piece:sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:back-body",
+      "evidence": "stitch:sleeve-cap-right-back"
+    },
+    {
+      "subject": "piece:back-body",
+      "predicate": "stitchedTo",
+      "object": "piece:front-left",
+      "evidence": "stitch:side-left"
+    },
+    {
+      "subject": "piece:back-body",
+      "predicate": "stitchedTo",
+      "object": "piece:front-right",
+      "evidence": "stitch:side-right"
+    },
+    {
+      "subject": "piece:sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:sleeve-left",
+      "evidence": "stitch:sleeve-under-left"
+    },
+    {
+      "subject": "piece:sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:sleeve-right",
+      "evidence": "stitch:sleeve-under-right"
+    },
+    {
+      "subject": "piece:collar-left",
+      "predicate": "stitchedTo",
+      "object": "piece:front-left",
+      "evidence": "stitch:collar-left-front"
+    },
+    {
+      "subject": "piece:collar-right",
+      "predicate": "stitchedTo",
+      "object": "piece:front-right",
+      "evidence": "stitch:collar-right-front"
+    },
+    {
+      "subject": "piece:collar-left",
+      "predicate": "stitchedTo",
+      "object": "piece:collar-back",
+      "evidence": "stitch:collar-left-neck"
+    },
+    {
+      "subject": "piece:collar-right",
+      "predicate": "stitchedTo",
+      "object": "piece:collar-back",
+      "evidence": "stitch:collar-right-neck"
+    }
+  ]
+}
