@@ -110,6 +110,25 @@ Thumbs.db
 /ProjectSettings/Packages/
 /ProjectSettings/XRPackageSettings.asset
 
+# OSS model downloads and isolated benchmark runtimes are local machine state
+/OSSBenchmarks/**/hf-cache/
+/OSSBenchmarks/**/cache/huggingface/
+/OSSBenchmarks/TRELLIS2/venv/
+/OSSBenchmarks/TRELLIS2/venv-512/
+
+# Per-method benchmark checkouts, venvs, uv/torch caches, and generated model
+# outputs are machine-specific. Only the top-level comparison files in
+# OSSBenchmarks/ are source. Assets/OSSBenchmarks/ outputs are large local binaries.
+/OSSBenchmarks/*/
+/Assets/OSSBenchmarks/
+**/.venv/
+**/venv/
+**/venv-*/
+**/_uv-cache/
+
+# Local download staging for product images is machine state, not product source
+/downloads/
+
 # All reports, candidate snapshots, and release packages are internal runtime state
 /.image2outfit/
 

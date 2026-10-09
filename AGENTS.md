@@ -50,3 +50,11 @@ Merge eligibility, product completion, and customer release are separate decisio
 ## Continuation
 
 If work stops, persist the current manifest/checkpoint, verified revision, failing stage or visible defect, blocker, and one exact next action in the existing canonical workline. Do not create a second agent-state database.
+
+## Repository hygiene (mandatory)
+
+- Keep exactly one local working branch and one worktree for this repository. Before ending any task that created a branch or worktree, merge or remove it.
+- Leave zero unmanaged state: no uncommitted, untracked, or stashed work at the end of a task. Each change must end as one of: committed (after the secret/private-asset/cache check above), gitignored local output, or archived outside the repository (for example a `git bundle` or patch in the scratchpad), with the choice reported.
+- Never delete a branch, worktree, or file that holds unique work until it is verified merged (`git merge-base --is-ancestor`) or backed up.
+- When a new kind of local-only output appears, add its path to `.gitignore` in the same change.
+- Finish by pushing the single branch and reporting `git status` as clean.
