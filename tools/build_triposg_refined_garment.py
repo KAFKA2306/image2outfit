@@ -35,7 +35,9 @@ from build_oss_character_meshes import (  # noqa: E402
 def parse_args() -> argparse.Namespace:
     values = sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else []
     parser = argparse.ArgumentParser()
-    parser.add_argument("--kind", required=True, choices=("crescent", "herbarium", "orbital"))
+    parser.add_argument(
+        "--kind", required=True, choices=("crescent", "herbarium", "orbital")
+    )
     parser.add_argument("--hypothesis-input", required=True, type=Path)
     parser.add_argument("--output-fbx", required=True, type=Path)
     parser.add_argument("--output-blend", required=True, type=Path)
@@ -51,7 +53,9 @@ def repo_path(path: Path) -> Path:
     return resolved
 
 
-def mesh_object(name: str, vertices: list[tuple[float, float, float]], faces: list[tuple[int, ...]]) -> bpy.types.Object:
+def mesh_object(
+    name: str, vertices: list[tuple[float, float, float]], faces: list[tuple[int, ...]]
+) -> bpy.types.Object:
     mesh = bpy.data.meshes.new(name + "Mesh")
     mesh.from_pydata(vertices, [], faces)
     mesh.update(calc_edges=True)
@@ -62,9 +66,7 @@ def mesh_object(name: str, vertices: list[tuple[float, float, float]], faces: li
 
 def aggregate_bounds(objects: list[bpy.types.Object]) -> tuple[Vector, Vector]:
     points = [
-        obj.matrix_world @ vertex.co
-        for obj in objects
-        for vertex in obj.data.vertices
+        obj.matrix_world @ vertex.co for obj in objects for vertex in obj.data.vertices
     ]
     if not points:
         raise RuntimeError("TripoSG hypothesis contains no mesh vertices")
@@ -83,7 +85,9 @@ def topology_diagnostics(objects: list[bpy.types.Object]) -> dict[str, int]:
         try:
             bm.from_mesh(obj.data)
             boundary_edges += sum(1 for edge in bm.edges if len(edge.link_faces) == 1)
-            non_manifold_edges += sum(1 for edge in bm.edges if len(edge.link_faces) > 2)
+            non_manifold_edges += sum(
+                1 for edge in bm.edges if len(edge.link_faces) > 2
+            )
             degenerate_faces += sum(1 for face in bm.faces if face.calc_area() <= 1e-12)
         finally:
             bm.free()
@@ -105,7 +109,8 @@ def import_hypothesis(path: Path) -> dict[str, object]:
     existing = set(bpy.data.objects)
     bpy.ops.import_scene.gltf(filepath=str(path))
     imported_meshes = [
-        obj for obj in bpy.data.objects
+        obj
+        for obj in bpy.data.objects
         if obj not in existing and obj.type == "MESH" and len(obj.data.vertices) > 0
     ]
     if not imported_meshes:
@@ -127,7 +132,9 @@ def import_hypothesis(path: Path) -> dict[str, object]:
     }
 
 
-def hypothesis_scales(hypothesis: dict[str, object], body_min: Vector, body_max: Vector) -> dict[str, float]:
+def hypothesis_scales(
+    hypothesis: dict[str, object], body_min: Vector, body_max: Vector
+) -> dict[str, float]:
     dimensions = Vector(hypothesis["dimensions"])
     body_dimensions = body_max - body_min
     if dimensions.z <= 1e-8:
@@ -196,7 +203,9 @@ def tube_between(
     for center, radius in ((start, start_radius), (end, end_radius)):
         for i in range(segments):
             angle = 2.0 * math.pi * i / segments
-            point = center + u * (math.cos(angle) * radius) + v * (math.sin(angle) * radius)
+            point = (
+                center + u * (math.cos(angle) * radius) + v * (math.sin(angle) * radius)
+            )
             vertices.append(tuple(point))
     faces: list[tuple[int, ...]] = []
     for i in range(segments):
@@ -207,7 +216,9 @@ def tube_between(
     return mesh_object(name, vertices, faces)
 
 
-def curve_tube(name: str, points: list[Vector], radius: float, segments: int = 10) -> bpy.types.Object:
+def curve_tube(
+    name: str, points: list[Vector], radius: float, segments: int = 10
+) -> bpy.types.Object:
     vertices: list[tuple[float, float, float]] = []
     for index, point in enumerate(points):
         previous = points[max(0, index - 1)]
@@ -220,7 +231,11 @@ def curve_tube(name: str, points: list[Vector], radius: float, segments: int = 1
         binormal = tangent.cross(normal).normalized()
         for ring in range(segments):
             angle = 2.0 * math.pi * ring / segments
-            vertex = point + normal * (math.cos(angle) * radius) + binormal * (math.sin(angle) * radius)
+            vertex = (
+                point
+                + normal * (math.cos(angle) * radius)
+                + binormal * (math.sin(angle) * radius)
+            )
             vertices.append(tuple(vertex))
     faces: list[tuple[int, ...]] = []
     for row in range(len(points) - 1):
@@ -237,7 +252,9 @@ def curve_tube(name: str, points: list[Vector], radius: float, segments: int = 1
     return mesh_object(name, vertices, faces)
 
 
-def elliptical_torus(name: str, z: float, rx: float, ry: float, tube_radius: float) -> bpy.types.Object:
+def elliptical_torus(
+    name: str, z: float, rx: float, ry: float, tube_radius: float
+) -> bpy.types.Object:
     major_segments = 48
     tube_segments = 8
     vertices: list[tuple[float, float, float]] = []
@@ -247,7 +264,11 @@ def elliptical_torus(name: str, z: float, rx: float, ry: float, tube_radius: flo
         center = Vector((rx * math.cos(angle), ry * math.sin(angle), z))
         for tube in range(tube_segments):
             phi = 2.0 * math.pi * tube / tube_segments
-            point = center + radial * (tube_radius * math.cos(phi)) + Vector((0.0, 0.0, tube_radius * math.sin(phi)))
+            point = (
+                center
+                + radial * (tube_radius * math.cos(phi))
+                + Vector((0.0, 0.0, tube_radius * math.sin(phi)))
+            )
             vertices.append(tuple(point))
     faces: list[tuple[int, ...]] = []
     for major in range(major_segments):
@@ -262,13 +283,22 @@ def elliptical_torus(name: str, z: float, rx: float, ry: float, tube_radius: flo
     return mesh_object(name, vertices, faces)
 
 
-def extruded_plate(name: str, center_x: float, center_y: float, center_z: float, sign: float, scale: float = 1.0) -> bpy.types.Object:
+def extruded_plate(
+    name: str,
+    center_x: float,
+    center_y: float,
+    center_z: float,
+    sign: float,
+    scale: float = 1.0,
+) -> bpy.types.Object:
     outline = ((0.0, -0.15), (0.075, -0.10), (0.10, 0.0), (0.075, 0.11), (0.0, 0.16))
     thickness = 0.018
     vertices: list[tuple[float, float, float]] = []
     for depth in (-thickness, thickness):
         for x, z in outline:
-            vertices.append((center_x + sign * x * scale, center_y + depth, center_z + z * scale))
+            vertices.append(
+                (center_x + sign * x * scale, center_y + depth, center_z + z * scale)
+            )
     count = len(outline)
     faces = [tuple(range(count - 1, -1, -1)), tuple(count + i for i in range(count))]
     for i in range(count):
@@ -295,7 +325,13 @@ def add_components(kind: str) -> list[bpy.types.Object]:
                 0.075,
                 0.055,
             ),
-            tube_between("StandCollar", Vector((-0.16, 0.0, 1.06)), Vector((0.16, 0.0, 1.06)), 0.045, 0.045),
+            tube_between(
+                "StandCollar",
+                Vector((-0.16, 0.0, 1.06)),
+                Vector((0.16, 0.0, 1.06)),
+                0.045,
+                0.045,
+            ),
         ]
     )
     if kind == "crescent":
@@ -315,7 +351,11 @@ def add_components(kind: str) -> list[bpy.types.Object]:
         parts.append(
             curve_tube(
                 "CrescentThroatLatch",
-                [Vector((-0.06, 0.13, 1.015)), Vector((0.0, 0.15, 0.995)), Vector((0.06, 0.13, 1.015))],
+                [
+                    Vector((-0.06, 0.13, 1.015)),
+                    Vector((0.0, 0.15, 0.995)),
+                    Vector((0.06, 0.13, 1.015)),
+                ],
                 0.014,
             )
         )
@@ -335,7 +375,11 @@ def add_components(kind: str) -> list[bpy.types.Object]:
         parts.append(
             curve_tube(
                 "CollarRootSampleClasp",
-                [Vector((-0.045, 0.135, 1.07)), Vector((0.0, 0.15, 1.055)), Vector((0.045, 0.135, 1.07))],
+                [
+                    Vector((-0.045, 0.135, 1.07)),
+                    Vector((0.0, 0.15, 1.055)),
+                    Vector((0.045, 0.135, 1.07)),
+                ],
                 0.013,
             )
         )
@@ -346,7 +390,11 @@ def add_components(kind: str) -> list[bpy.types.Object]:
                 elliptical_torus("OrbitalHemRailUpper", 0.34, 0.265, 0.135, 0.019),
                 curve_tube(
                     "CrescentSternumLock",
-                    [Vector((-0.055, 0.13, 0.995)), Vector((0.0, 0.15, 0.975)), Vector((0.055, 0.13, 0.995))],
+                    [
+                        Vector((-0.055, 0.13, 0.995)),
+                        Vector((0.0, 0.15, 0.975)),
+                        Vector((0.055, 0.13, 0.995)),
+                    ],
                     0.014,
                 ),
             ]
@@ -373,7 +421,9 @@ def apply_garment_material(obj: bpy.types.Object, kind: str) -> None:
     material = bpy.data.materials.new("TripoSG Refined Garment")
     material.use_nodes = True
     material.diffuse_color = colors[kind]
-    material.node_tree.nodes.get("Principled BSDF").inputs["Base Color"].default_value = colors[kind]
+    material.node_tree.nodes.get("Principled BSDF").inputs[
+        "Base Color"
+    ].default_value = colors[kind]
     obj.data.materials.clear()
     obj.data.materials.append(material)
 
@@ -424,7 +474,9 @@ def main() -> int:
     apply_garment_material(target, args.kind)
     weight_artifact = transfer_weights(source, target, armature)
     export_fbx(output_fbx, armature, target)
-    bpy.ops.wm.save_as_mainfile(filepath=str(output_blend), check_existing=False, compress=True)
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(output_blend), check_existing=False, compress=True
+    )
     final_min, final_max = bounds(target)
     triangle_count = sum(len(polygon.vertices) - 2 for polygon in target.data.polygons)
     report = {
@@ -441,18 +493,24 @@ def main() -> int:
         "hypothesisMetrics": hypothesis_metrics,
         "bodyDimensions": list(body_max - body_min),
         "hypothesisAspectRatios": {
-            "widthToHeight": hypothesis_metrics["dimensions"][0] / hypothesis_metrics["dimensions"][2],
-            "depthToHeight": hypothesis_metrics["dimensions"][1] / hypothesis_metrics["dimensions"][2],
+            "widthToHeight": hypothesis_metrics["dimensions"][0]
+            / hypothesis_metrics["dimensions"][2],
+            "depthToHeight": hypothesis_metrics["dimensions"][1]
+            / hypothesis_metrics["dimensions"][2],
         },
         "inputDependentScales": shape_scales,
         "triangleBudget": args.triangle_budget,
         "triangleCount": triangle_count,
         "normalizedBounds": {"min": list(final_min), "max": list(final_max)},
         "weightTransfer": weight_artifact,
-        "status": "PASS" if weight_artifact["audit"]["passed"] and triangle_count <= args.triangle_budget else "FAIL",
+        "status": "PASS"
+        if weight_artifact["audit"]["passed"] and triangle_count <= args.triangle_budget
+        else "FAIL",
     }
     output_report.parent.mkdir(parents=True, exist_ok=True)
-    output_report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_report.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0 if report["status"] == "PASS" else 2
 

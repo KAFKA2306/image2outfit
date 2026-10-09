@@ -120,7 +120,9 @@ def apply_surface_materials(
     garment = bpy.data.materials.new(f"OSS {obj.name} Garment")
     garment.diffuse_color = (0.035, 0.07, 0.12, 1.0)
     garment.use_nodes = True
-    garment.node_tree.nodes.get("Principled BSDF").inputs["Base Color"].default_value = (
+    garment.node_tree.nodes.get("Principled BSDF").inputs[
+        "Base Color"
+    ].default_value = (
         0.035,
         0.07,
         0.12,
@@ -204,7 +206,9 @@ def fill_boundary_holes(obj: bpy.types.Object) -> int:
         bm.free()
 
 
-def transfer_weights(source: bpy.types.Object, target: bpy.types.Object, armature: bpy.types.Object) -> dict[str, object]:
+def transfer_weights(
+    source: bpy.types.Object, target: bpy.types.Object, armature: bpy.types.Object
+) -> dict[str, object]:
     deform_bones = {bone.name for bone in armature.data.bones if bone.use_deform}
     for bone_name in sorted(deform_bones):
         if target.vertex_groups.get(bone_name) is None:
@@ -216,8 +220,12 @@ def transfer_weights(source: bpy.types.Object, target: bpy.types.Object, armatur
         mapping="nearest-face-interpolated",
         max_distance=0.0,
     )
-    left_bones = {name for name in deform_bones if name.lower().endswith((".l", "_l", "-l"))}
-    right_bones = {name for name in deform_bones if name.lower().endswith((".r", "_r", "-r"))}
+    left_bones = {
+        name for name in deform_bones if name.lower().endswith((".l", "_l", "-l"))
+    }
+    right_bones = {
+        name for name in deform_bones if name.lower().endswith((".r", "_r", "-r"))
+    }
     policy = WeightTransferPolicy(
         max_influences=4,
         minimum_weight=1e-8,
@@ -256,10 +264,16 @@ def transfer_weights(source: bpy.types.Object, target: bpy.types.Object, armatur
         },
         result=result,
     )
-    return {"targetObject": target.name, **artifact.to_dict(), "artifactDigest": artifact.digest()}
+    return {
+        "targetObject": target.name,
+        **artifact.to_dict(),
+        "artifactDigest": artifact.digest(),
+    }
 
 
-def export_fbx(path: Path, armature: bpy.types.Object, target: bpy.types.Object) -> None:
+def export_fbx(
+    path: Path, armature: bpy.types.Object, target: bpy.types.Object
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.object.select_all(action="DESELECT")
     armature.select_set(True)
@@ -307,9 +321,13 @@ def main() -> int:
     if source is None or armature is None:
         raise RuntimeError("Siroino base mesh or Armature was not imported")
     bpy.ops.import_scene.gltf(filepath=str(source_path))
-    imported = [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj != source]
+    imported = [
+        obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj != source
+    ]
     if len(imported) != 1:
-        raise RuntimeError(f"expected one OSS mesh, got {[obj.name for obj in imported]}")
+        raise RuntimeError(
+            f"expected one OSS mesh, got {[obj.name for obj in imported]}"
+        )
     target = imported[0]
     target.name = f"{args.model}_CharacterMesh"
 
@@ -349,7 +367,9 @@ def main() -> int:
     )
     weight_artifact = transfer_weights(source, target, armature)
     export_fbx(output_fbx, armature, target)
-    bpy.ops.wm.save_as_mainfile(filepath=str(output_blend), check_existing=False, compress=True)
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(output_blend), check_existing=False, compress=True
+    )
 
     final_min, final_max = bounds(target)
     report = {
@@ -379,7 +399,9 @@ def main() -> int:
         "status": "PASS" if weight_artifact["audit"]["passed"] else "FAIL",
     }
     output_report.parent.mkdir(parents=True, exist_ok=True)
-    output_report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    output_report.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0 if report["status"] == "PASS" else 2
 
