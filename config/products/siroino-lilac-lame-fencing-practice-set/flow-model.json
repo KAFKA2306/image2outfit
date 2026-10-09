@@ -1,0 +1,1176 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "model": "star-schema-triplet-graph",
+  "mainFlow": {
+    "hub": "product:siroino-lilac-lame-fencing-practice-set",
+    "stageOrder": [
+      "ingest-reference",
+      "normalize-view",
+      "decompose-garment",
+      "draft-patterns",
+      "infer-stitches",
+      "initialize-3d",
+      "build-blender",
+      "simulate-cloth",
+      "skin-and-export",
+      "render-evidence",
+      "audit-geometry",
+      "visual-review",
+      "finalize-candidate"
+    ],
+    "stageSource": "src/image2outfit/pipeline.py PIPELINE_STAGES"
+  },
+  "dimensions": {
+    "stage": [
+      {
+        "id": "ingest-reference",
+        "order": 0
+      },
+      {
+        "id": "normalize-view",
+        "order": 1
+      },
+      {
+        "id": "decompose-garment",
+        "order": 2
+      },
+      {
+        "id": "draft-patterns",
+        "order": 3
+      },
+      {
+        "id": "infer-stitches",
+        "order": 4
+      },
+      {
+        "id": "initialize-3d",
+        "order": 5
+      },
+      {
+        "id": "build-blender",
+        "order": 6
+      },
+      {
+        "id": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "id": "skin-and-export",
+        "order": 8
+      },
+      {
+        "id": "render-evidence",
+        "order": 9
+      },
+      {
+        "id": "audit-geometry",
+        "order": 10
+      },
+      {
+        "id": "visual-review",
+        "order": 11
+      },
+      {
+        "id": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "piece": [
+      {
+        "id": "jacket-back-left"
+      },
+      {
+        "id": "jacket-back-right"
+      },
+      {
+        "id": "jacket-elbow-quilt-overlay"
+      },
+      {
+        "id": "jacket-front-left"
+      },
+      {
+        "id": "jacket-overlap-front"
+      },
+      {
+        "id": "jacket-sleeve-left"
+      },
+      {
+        "id": "jacket-sleeve-right"
+      },
+      {
+        "id": "overskirt-back"
+      },
+      {
+        "id": "overskirt-front"
+      },
+      {
+        "id": "shorts-back-left"
+      },
+      {
+        "id": "shorts-back-right"
+      },
+      {
+        "id": "shorts-front-left"
+      },
+      {
+        "id": "shorts-front-right"
+      },
+      {
+        "id": "stand-collar"
+      },
+      {
+        "id": "waistband-back"
+      },
+      {
+        "id": "waistband-front"
+      }
+    ]
+  },
+  "facts": {
+    "stageRun": [
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "ingest-reference",
+        "order": 0
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "normalize-view",
+        "order": 1
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "decompose-garment",
+        "order": 2
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "draft-patterns",
+        "order": 3
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "infer-stitches",
+        "order": 4
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "initialize-3d",
+        "order": 5
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "build-blender",
+        "order": 6
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "skin-and-export",
+        "order": 8
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "render-evidence",
+        "order": 9
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "audit-geometry",
+        "order": 10
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "visual-review",
+        "order": 11
+      },
+      {
+        "productId": "siroino-lilac-lame-fencing-practice-set",
+        "stageId": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "stitch": [
+      {
+        "stitchId": "jacket-left-side-lower",
+        "firstPieceId": "jacket-front-left",
+        "firstEdgeId": "side-lower",
+        "secondPieceId": "jacket-back-left",
+        "secondEdgeId": "side-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "jacket-left-side-upper",
+        "firstPieceId": "jacket-front-left",
+        "firstEdgeId": "side-upper",
+        "secondPieceId": "jacket-back-left",
+        "secondEdgeId": "side-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "jacket-left-shoulder",
+        "firstPieceId": "jacket-front-left",
+        "firstEdgeId": "shoulder",
+        "secondPieceId": "jacket-back-left",
+        "secondEdgeId": "shoulder",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-front-armscye-lower",
+        "firstPieceId": "jacket-front-left",
+        "firstEdgeId": "armhole-lower",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "cap-front-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-front-armscye-upper",
+        "firstPieceId": "jacket-front-left",
+        "firstEdgeId": "armhole-upper",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "cap-front-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-back-armscye-lower",
+        "firstPieceId": "jacket-back-left",
+        "firstEdgeId": "armhole-lower",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "cap-back-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-back-armscye-upper",
+        "firstPieceId": "jacket-back-left",
+        "firstEdgeId": "armhole-upper",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "cap-back-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-neck-to-collar-front",
+        "firstPieceId": "jacket-front-left",
+        "firstEdgeId": "neckline",
+        "secondPieceId": "stand-collar",
+        "secondEdgeId": "base-front-left",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-neck-to-collar-back",
+        "firstPieceId": "jacket-back-left",
+        "firstEdgeId": "neckline",
+        "secondPieceId": "stand-collar",
+        "secondEdgeId": "base-back-left",
+        "type": "plain"
+      },
+      {
+        "stitchId": "jacket-right-side-lower",
+        "firstPieceId": "jacket-overlap-front",
+        "firstEdgeId": "side-lower",
+        "secondPieceId": "jacket-back-right",
+        "secondEdgeId": "side-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "jacket-right-side-upper",
+        "firstPieceId": "jacket-overlap-front",
+        "firstEdgeId": "side-upper",
+        "secondPieceId": "jacket-back-right",
+        "secondEdgeId": "side-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "jacket-right-shoulder",
+        "firstPieceId": "jacket-overlap-front",
+        "firstEdgeId": "shoulder",
+        "secondPieceId": "jacket-back-right",
+        "secondEdgeId": "shoulder",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-front-armscye-lower",
+        "firstPieceId": "jacket-overlap-front",
+        "firstEdgeId": "armhole-lower",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "cap-front-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-front-armscye-upper",
+        "firstPieceId": "jacket-overlap-front",
+        "firstEdgeId": "armhole-upper",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "cap-front-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-back-armscye-lower",
+        "firstPieceId": "jacket-back-right",
+        "firstEdgeId": "armhole-lower",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "cap-back-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-back-armscye-upper",
+        "firstPieceId": "jacket-back-right",
+        "firstEdgeId": "armhole-upper",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "cap-back-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-neck-to-collar-front",
+        "firstPieceId": "jacket-overlap-front",
+        "firstEdgeId": "neckline",
+        "secondPieceId": "stand-collar",
+        "secondEdgeId": "base-front-right",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-neck-to-collar-back",
+        "firstPieceId": "jacket-back-right",
+        "firstEdgeId": "neckline",
+        "secondPieceId": "stand-collar",
+        "secondEdgeId": "base-back-right",
+        "type": "plain"
+      },
+      {
+        "stitchId": "jacket-center-back-seam",
+        "firstPieceId": "jacket-back-left",
+        "firstEdgeId": "center-back",
+        "secondPieceId": "jacket-back-right",
+        "secondEdgeId": "center-back",
+        "type": "plain"
+      },
+      {
+        "stitchId": "overskirt-right-side",
+        "firstPieceId": "overskirt-front",
+        "firstEdgeId": "side-right",
+        "secondPieceId": "overskirt-back",
+        "secondEdgeId": "side-right",
+        "type": "plain"
+      },
+      {
+        "stitchId": "overskirt-left-side",
+        "firstPieceId": "overskirt-front",
+        "firstEdgeId": "side-left",
+        "secondPieceId": "overskirt-back",
+        "secondEdgeId": "side-left",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-1",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-1",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-1",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-2",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-2",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-2",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-3",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-3",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-3",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-4",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-4",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-4",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-5",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-5",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-5",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-6",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-6",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-6",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-7",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-7",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-7",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-8",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-8",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-8",
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm-9",
+        "firstPieceId": "jacket-sleeve-left",
+        "firstEdgeId": "underarm-outer-9",
+        "secondPieceId": "jacket-sleeve-left",
+        "secondEdgeId": "underarm-inner-9",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-1",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-1",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-1",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-2",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-2",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-2",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-3",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-3",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-3",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-4",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-4",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-4",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-5",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-5",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-5",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-6",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-6",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-6",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-7",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-7",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-7",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-8",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-8",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-8",
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm-9",
+        "firstPieceId": "jacket-sleeve-right",
+        "firstEdgeId": "underarm-outer-9",
+        "secondPieceId": "jacket-sleeve-right",
+        "secondEdgeId": "underarm-inner-9",
+        "type": "plain"
+      },
+      {
+        "stitchId": "front-waistband-skirt",
+        "firstPieceId": "overskirt-front",
+        "firstEdgeId": "waist-opening",
+        "secondPieceId": "waistband-front",
+        "secondEdgeId": "skirt-attachment",
+        "type": "plain"
+      },
+      {
+        "stitchId": "back-waistband-skirt",
+        "firstPieceId": "overskirt-back",
+        "firstEdgeId": "waist-opening",
+        "secondPieceId": "waistband-back",
+        "secondEdgeId": "skirt-attachment",
+        "type": "plain"
+      },
+      {
+        "stitchId": "waistband-left-side",
+        "firstPieceId": "waistband-front",
+        "firstEdgeId": "side-left",
+        "secondPieceId": "waistband-back",
+        "secondEdgeId": "side-left",
+        "type": "plain"
+      },
+      {
+        "stitchId": "waistband-right-side",
+        "firstPieceId": "waistband-front",
+        "firstEdgeId": "side-right",
+        "secondPieceId": "waistband-back",
+        "secondEdgeId": "side-right",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-left-outseam-lower",
+        "firstPieceId": "shorts-front-left",
+        "firstEdgeId": "outseam-lower",
+        "secondPieceId": "shorts-back-left",
+        "secondEdgeId": "outseam-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-left-outseam-thigh",
+        "firstPieceId": "shorts-front-left",
+        "firstEdgeId": "outseam-thigh",
+        "secondPieceId": "shorts-back-left",
+        "secondEdgeId": "outseam-thigh",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-left-outseam-hip",
+        "firstPieceId": "shorts-front-left",
+        "firstEdgeId": "outseam-hip",
+        "secondPieceId": "shorts-back-left",
+        "secondEdgeId": "outseam-hip",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-left-outseam-waist",
+        "firstPieceId": "shorts-front-left",
+        "firstEdgeId": "outseam-waist",
+        "secondPieceId": "shorts-back-left",
+        "secondEdgeId": "outseam-waist",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-left-inseam-upper",
+        "firstPieceId": "shorts-front-left",
+        "firstEdgeId": "inseam-upper",
+        "secondPieceId": "shorts-back-left",
+        "secondEdgeId": "inseam-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-left-inseam-lower",
+        "firstPieceId": "shorts-front-left",
+        "firstEdgeId": "inseam-lower",
+        "secondPieceId": "shorts-back-left",
+        "secondEdgeId": "inseam-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-right-outseam-lower",
+        "firstPieceId": "shorts-front-right",
+        "firstEdgeId": "outseam-lower",
+        "secondPieceId": "shorts-back-right",
+        "secondEdgeId": "outseam-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-right-outseam-thigh",
+        "firstPieceId": "shorts-front-right",
+        "firstEdgeId": "outseam-thigh",
+        "secondPieceId": "shorts-back-right",
+        "secondEdgeId": "outseam-thigh",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-right-outseam-hip",
+        "firstPieceId": "shorts-front-right",
+        "firstEdgeId": "outseam-hip",
+        "secondPieceId": "shorts-back-right",
+        "secondEdgeId": "outseam-hip",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-right-outseam-waist",
+        "firstPieceId": "shorts-front-right",
+        "firstEdgeId": "outseam-waist",
+        "secondPieceId": "shorts-back-right",
+        "secondEdgeId": "outseam-waist",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-right-inseam-upper",
+        "firstPieceId": "shorts-front-right",
+        "firstEdgeId": "inseam-upper",
+        "secondPieceId": "shorts-back-right",
+        "secondEdgeId": "inseam-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-right-inseam-lower",
+        "firstPieceId": "shorts-front-right",
+        "firstEdgeId": "inseam-lower",
+        "secondPieceId": "shorts-back-right",
+        "secondEdgeId": "inseam-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-front-crotch-upper",
+        "firstPieceId": "shorts-front-left",
+        "firstEdgeId": "crotch-rise-upper",
+        "secondPieceId": "shorts-front-right",
+        "secondEdgeId": "crotch-rise-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-front-crotch-lower",
+        "firstPieceId": "shorts-front-left",
+        "firstEdgeId": "crotch-rise-lower",
+        "secondPieceId": "shorts-front-right",
+        "secondEdgeId": "crotch-rise-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-back-crotch-upper",
+        "firstPieceId": "shorts-back-left",
+        "firstEdgeId": "crotch-rise-upper",
+        "secondPieceId": "shorts-back-right",
+        "secondEdgeId": "crotch-rise-upper",
+        "type": "plain"
+      },
+      {
+        "stitchId": "shorts-back-crotch-lower",
+        "firstPieceId": "shorts-back-left",
+        "firstEdgeId": "crotch-rise-lower",
+        "secondPieceId": "shorts-back-right",
+        "secondEdgeId": "crotch-rise-lower",
+        "type": "plain"
+      }
+    ],
+    "overlayAttachment": [
+      {
+        "overlayId": "jacket-elbow-left",
+        "hostPieceId": "jacket-sleeve-left",
+        "overlayPieceId": "jacket-elbow-quilt-overlay",
+        "side": "left",
+        "mirrorGroupId": "jacket-elbow-patch-pair",
+        "attachmentHypothesis": "planned-topstitch"
+      },
+      {
+        "overlayId": "jacket-elbow-right",
+        "hostPieceId": "jacket-sleeve-right",
+        "overlayPieceId": "jacket-elbow-quilt-overlay",
+        "side": "right",
+        "mirrorGroupId": "jacket-elbow-patch-pair",
+        "attachmentHypothesis": "planned-topstitch"
+      }
+    ]
+  },
+  "unresolved": [
+    {
+      "item": "garment fit and shape-key behavior",
+      "status": "unverified",
+      "decision": "All pairs are static 2D seam correspondences; no 3D assembly, physical ease, deformation, motion, or penetration is evaluated."
+    },
+    {
+      "item": "front closure and plastron attachment",
+      "status": "provisional",
+      "decision": "Diagonal outer front extends over the continuous left-front underlay. Both front opening edges remain unstitched because they have different lengths; no plain seam or fastener is claimed. Shoulder and side seams attach the outer panel. Edge fastening, trim and motion retention remain unimplemented."
+    },
+    {
+      "item": "overskirt pleating and attachment to shorts",
+      "status": "not-modeled",
+      "decision": "Pleat intake/folds and waistband attachment are not represented by these edge pairs."
+    }
+  ],
+  "triples": [
+    {
+      "subject": "stage:ingest-reference",
+      "predicate": "precedes",
+      "object": "stage:normalize-view",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:normalize-view",
+      "predicate": "precedes",
+      "object": "stage:decompose-garment",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:decompose-garment",
+      "predicate": "precedes",
+      "object": "stage:draft-patterns",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:draft-patterns",
+      "predicate": "precedes",
+      "object": "stage:infer-stitches",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:infer-stitches",
+      "predicate": "precedes",
+      "object": "stage:initialize-3d",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:initialize-3d",
+      "predicate": "precedes",
+      "object": "stage:build-blender",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:build-blender",
+      "predicate": "precedes",
+      "object": "stage:simulate-cloth",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:simulate-cloth",
+      "predicate": "precedes",
+      "object": "stage:skin-and-export",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:skin-and-export",
+      "predicate": "precedes",
+      "object": "stage:render-evidence",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:render-evidence",
+      "predicate": "precedes",
+      "object": "stage:audit-geometry",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:audit-geometry",
+      "predicate": "precedes",
+      "object": "stage:visual-review",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:visual-review",
+      "predicate": "precedes",
+      "object": "stage:finalize-candidate",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "piece:jacket-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-back-left",
+      "evidence": "stitch:jacket-left-side-lower"
+    },
+    {
+      "subject": "piece:jacket-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-back-left",
+      "evidence": "stitch:jacket-left-side-upper"
+    },
+    {
+      "subject": "piece:jacket-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-back-left",
+      "evidence": "stitch:jacket-left-shoulder"
+    },
+    {
+      "subject": "piece:jacket-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-front-armscye-lower"
+    },
+    {
+      "subject": "piece:jacket-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-front-armscye-upper"
+    },
+    {
+      "subject": "piece:jacket-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-back-armscye-lower"
+    },
+    {
+      "subject": "piece:jacket-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-back-armscye-upper"
+    },
+    {
+      "subject": "piece:jacket-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:stand-collar",
+      "evidence": "stitch:left-neck-to-collar-front"
+    },
+    {
+      "subject": "piece:jacket-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:stand-collar",
+      "evidence": "stitch:left-neck-to-collar-back"
+    },
+    {
+      "subject": "piece:jacket-overlap-front",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-back-right",
+      "evidence": "stitch:jacket-right-side-lower"
+    },
+    {
+      "subject": "piece:jacket-overlap-front",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-back-right",
+      "evidence": "stitch:jacket-right-side-upper"
+    },
+    {
+      "subject": "piece:jacket-overlap-front",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-back-right",
+      "evidence": "stitch:jacket-right-shoulder"
+    },
+    {
+      "subject": "piece:jacket-overlap-front",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-front-armscye-lower"
+    },
+    {
+      "subject": "piece:jacket-overlap-front",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-front-armscye-upper"
+    },
+    {
+      "subject": "piece:jacket-back-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-back-armscye-lower"
+    },
+    {
+      "subject": "piece:jacket-back-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-back-armscye-upper"
+    },
+    {
+      "subject": "piece:jacket-overlap-front",
+      "predicate": "stitchedTo",
+      "object": "piece:stand-collar",
+      "evidence": "stitch:right-neck-to-collar-front"
+    },
+    {
+      "subject": "piece:jacket-back-right",
+      "predicate": "stitchedTo",
+      "object": "piece:stand-collar",
+      "evidence": "stitch:right-neck-to-collar-back"
+    },
+    {
+      "subject": "piece:jacket-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-back-right",
+      "evidence": "stitch:jacket-center-back-seam"
+    },
+    {
+      "subject": "piece:overskirt-front",
+      "predicate": "stitchedTo",
+      "object": "piece:overskirt-back",
+      "evidence": "stitch:overskirt-right-side"
+    },
+    {
+      "subject": "piece:overskirt-front",
+      "predicate": "stitchedTo",
+      "object": "piece:overskirt-back",
+      "evidence": "stitch:overskirt-left-side"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-1"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-2"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-3"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-4"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-5"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-6"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-7"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-8"
+    },
+    {
+      "subject": "piece:jacket-sleeve-left",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "stitch:left-sleeve-underarm-9"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-1"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-2"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-3"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-4"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-5"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-6"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-7"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-8"
+    },
+    {
+      "subject": "piece:jacket-sleeve-right",
+      "predicate": "stitchedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "stitch:right-sleeve-underarm-9"
+    },
+    {
+      "subject": "piece:overskirt-front",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-front",
+      "evidence": "stitch:front-waistband-skirt"
+    },
+    {
+      "subject": "piece:overskirt-back",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-back",
+      "evidence": "stitch:back-waistband-skirt"
+    },
+    {
+      "subject": "piece:waistband-front",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-back",
+      "evidence": "stitch:waistband-left-side"
+    },
+    {
+      "subject": "piece:waistband-front",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-back",
+      "evidence": "stitch:waistband-right-side"
+    },
+    {
+      "subject": "piece:shorts-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-left",
+      "evidence": "stitch:shorts-left-outseam-lower"
+    },
+    {
+      "subject": "piece:shorts-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-left",
+      "evidence": "stitch:shorts-left-outseam-thigh"
+    },
+    {
+      "subject": "piece:shorts-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-left",
+      "evidence": "stitch:shorts-left-outseam-hip"
+    },
+    {
+      "subject": "piece:shorts-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-left",
+      "evidence": "stitch:shorts-left-outseam-waist"
+    },
+    {
+      "subject": "piece:shorts-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-left",
+      "evidence": "stitch:shorts-left-inseam-upper"
+    },
+    {
+      "subject": "piece:shorts-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-left",
+      "evidence": "stitch:shorts-left-inseam-lower"
+    },
+    {
+      "subject": "piece:shorts-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-right",
+      "evidence": "stitch:shorts-right-outseam-lower"
+    },
+    {
+      "subject": "piece:shorts-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-right",
+      "evidence": "stitch:shorts-right-outseam-thigh"
+    },
+    {
+      "subject": "piece:shorts-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-right",
+      "evidence": "stitch:shorts-right-outseam-hip"
+    },
+    {
+      "subject": "piece:shorts-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-right",
+      "evidence": "stitch:shorts-right-outseam-waist"
+    },
+    {
+      "subject": "piece:shorts-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-right",
+      "evidence": "stitch:shorts-right-inseam-upper"
+    },
+    {
+      "subject": "piece:shorts-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-right",
+      "evidence": "stitch:shorts-right-inseam-lower"
+    },
+    {
+      "subject": "piece:shorts-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-front-right",
+      "evidence": "stitch:shorts-front-crotch-upper"
+    },
+    {
+      "subject": "piece:shorts-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-front-right",
+      "evidence": "stitch:shorts-front-crotch-lower"
+    },
+    {
+      "subject": "piece:shorts-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-right",
+      "evidence": "stitch:shorts-back-crotch-upper"
+    },
+    {
+      "subject": "piece:shorts-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:shorts-back-right",
+      "evidence": "stitch:shorts-back-crotch-lower"
+    },
+    {
+      "subject": "piece:jacket-elbow-quilt-overlay",
+      "predicate": "attachedTo",
+      "object": "piece:jacket-sleeve-left",
+      "evidence": "overlay:jacket-elbow-left"
+    },
+    {
+      "subject": "piece:jacket-elbow-quilt-overlay",
+      "predicate": "attachedTo",
+      "object": "piece:jacket-sleeve-right",
+      "evidence": "overlay:jacket-elbow-right"
+    }
+  ]
+}
