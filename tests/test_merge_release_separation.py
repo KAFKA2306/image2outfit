@@ -66,6 +66,45 @@ class MergeReleaseSeparationTests(unittest.TestCase):
         self.assertNotIn("Keeping orphan branch with", workflow)
         self.assertNotIn("compareCommitsWithBasehead", workflow)
 
+    def test_branch_delete_tolerates_refs_already_removed_by_github(self) -> None:
+        # Issue #884: a merged PR's head is auto-deleted by GitHub while the
+        # govern listing can still show it, so the delete returns 422
+        # "Reference does not exist". That is an already-absent branch, not a
+        # failure, and it must not be classified as an orphan that cannot be removed.
+        workflow = (ROOT / ".github/workflows/branch-hygiene.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("error.status === 422", workflow)
+        self.assertIn("Reference does not exist", workflow)
+        self.assertIn("already absent", workflow)
+        self.assertLess(
+            workflow.index("Reference does not exist"),
+            workflow.index("core.setFailed(`Orphan branch"),
+        )
+
+    def test_branch_delete_rechecks_open_heads_before_deleting(self) -> None:
+        # Issue #884: the open-PR snapshot can lag the PR association, so the
+        # delete path must re-query PRs by head ref right before deleting.
+        workflow = (ROOT / ".github/workflows/branch-hygiene.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("head: `${owner}:${ref}`", workflow)
+        self.assertIn('state: "open"', workflow)
+        self.assertLess(
+            workflow.index("head: `${owner}:${ref}`"),
+            workflow.index("github.rest.git.deleteRef"),
+        )
+
+    def test_final_orphan_check_confirms_refs_with_getref(self) -> None:
+        # Issue #884: listBranches can lag a deletion; only refs that still
+        # resolve through getRef should fail the sweep.
+        workflow = (ROOT / ".github/workflows/branch-hygiene.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("github.rest.git.getRef", workflow)
+        self.assertIn("error.status !== 404", workflow)
+        self.assertIn("Orphan branches remain", workflow)
+
     def test_release_workflow_is_manual_and_not_a_merge_gate(self) -> None:
         policy = self.policy()
         workflows = ROOT / ".github" / "workflows"

@@ -150,6 +150,18 @@ jobs:
 
             async function deleteBranch(ref, reason, openPulls) {
               if (!ref || protectedBranches.has(ref) || isOpenHead(ref, openPulls)) return false;
+              // The open-PR snapshot can lag PR head associations, so re-query by head ref before deleting.
+              const { data: headPulls } = await github.rest.pulls.list({
+                owner,
+                repo,
+                state: "open",
+                head: `${owner}:${ref}`,
+                per_page: 100,
+              });
+              if (headPulls.length > 0) {
+                core.info(`Keeping branch ${ref}: open pull request #${headPulls[0].number} uses it as head`);
+                return false;
+              }
               if (dryRun) {
                 core.info(`[dry-run] delete branch ${ref}: ${reason}`);
                 return true;
@@ -159,7 +171,8 @@ jobs:
                 core.info(`Deleted branch ${ref}: ${reason}`);
                 return true;
               } catch (error) {
-                if (error.status === 404) {
+                // 422 "Reference does not exist": GitHub already removed the head of a merged PR and the listing was stale.
+                if (error.status === 404 || (error.status === 422 && String(error.message || "").includes("Reference does not exist"))) {
                   core.info(`Branch ${ref} already absent`);
                   return true;
                 }
@@ -330,9 +343,19 @@ jobs:
                   .map(pr => pr.head.ref),
               );
               const finalBranches = await github.paginate(github.rest.repos.listBranches, { owner, repo, per_page: 100 });
-              const orphanBranches = finalBranches
+              const orphanCandidates = finalBranches
                 .map(branch => branch.name)
                 .filter(ref => !protectedBranches.has(ref) && !finalOpenHeads.has(ref));
+              // The branch listing can lag deletions; only refs that still resolve are orphans.
+              const orphanBranches = [];
+              for (const ref of orphanCandidates) {
+                try {
+                  await github.rest.git.getRef({ owner, repo, ref: `heads/${ref}` });
+                  orphanBranches.push(ref);
+                } catch (error) {
+                  if (error.status !== 404) throw error;
+                }
+              }
               if (orphanBranches.length > 0) {
                 core.setFailed(`Orphan branches remain: ${orphanBranches.join(", ")}`);
               }
