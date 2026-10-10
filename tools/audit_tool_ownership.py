@@ -161,7 +161,11 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
             if source == script:
                 continue
             source_relative = source.relative_to(root).as_posix()
-            if relative in text or script.stem in _imports(text, source):
+            if (
+                relative in text
+                or script.name in text
+                or script.stem in _imports(text, source)
+            ):
                 references.add(source_relative)
         job_owners = owners.get(relative, [])
         raw_groups[hashlib.sha256(content.encode()).hexdigest()].append(relative)
