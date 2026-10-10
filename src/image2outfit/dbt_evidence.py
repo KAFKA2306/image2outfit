@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
+
+ATTEMPT_NAME = re.compile(r"^(?P<stage>.+)-(?P<stamp>\d{8}T\d{12}Z)$")
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -29,6 +32,36 @@ def _relative(root: Path, path: Path) -> str:
 
 def _load_optional(path: Path) -> dict[str, Any] | None:
     return _read_json(path) if path.is_file() else None
+
+
+def _attempt_rows(root: Path, product_id: str) -> list[dict[str, Any]]:
+    """One row per recorded stage attempt directory, hashed over its files."""
+    attempts_root = (
+        root / ".image2outfit" / "products" / product_id / "stages" / "attempts"
+    )
+    if not attempts_root.is_dir():
+        return []
+    rows: list[dict[str, Any]] = []
+    for attempt_dir in sorted(path for path in attempts_root.iterdir() if path.is_dir()):
+        match = ATTEMPT_NAME.match(attempt_dir.name)
+        files = sorted(path for path in attempt_dir.rglob("*") if path.is_file())
+        digest = hashlib.sha256()
+        for file_path in files:
+            relative_name = file_path.relative_to(attempt_dir).as_posix()
+            digest.update(f"{relative_name}\0{_sha256(file_path)}\n".encode("utf-8"))
+        rows.append(
+            {
+                "attempt_id": f"{product_id}:{attempt_dir.name}",
+                "product_id": product_id,
+                "attempt_name": attempt_dir.name,
+                "stage_name": match.group("stage") if match else attempt_dir.name,
+                "attempt_stamp": match.group("stamp") if match else None,
+                "attempt_path": _relative(root, attempt_dir),
+                "file_count": len(files),
+                "attempt_sha256": digest.hexdigest(),
+            }
+        )
+    return rows
 
 
 def _state(value: Any) -> str | None:
@@ -81,6 +114,7 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
     product_rows: list[dict[str, Any]] = []
     gate_rows: list[dict[str, Any]] = []
     run_rows: list[dict[str, Any]] = []
+    attempt_rows: list[dict[str, Any]] = []
 
     for job_path in sorted(products_root.glob("*/job.json")):
         job = _read_json(job_path)
@@ -101,6 +135,7 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
             _sha256(construction_path) if construction_path.is_file() else None
         )
         manifest_hash = _sha256(manifest_path) if manifest_path.is_file() else None
+        attempt_rows.extend(_attempt_rows(root, product_id))
 
         product_status = _state(manifest.get("status")) if manifest else None
         product_rows.append(
@@ -175,10 +210,12 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
         "products": output_dir / "products.jsonl",
         "runs": output_dir / "runs.jsonl",
         "gates": output_dir / "gates.jsonl",
+        "attempts": output_dir / "attempts.jsonl",
     }
     _write_jsonl(paths["products"], product_rows)
     _write_jsonl(paths["runs"], run_rows)
     _write_jsonl(paths["gates"], gate_rows)
+    _write_jsonl(paths["attempts"], attempt_rows)
 
     gate_state_counts: dict[str, int] = {}
     normalized_state_counts: dict[str, int] = {}
@@ -195,6 +232,7 @@ def extract(root: Path, output_dir: Path) -> dict[str, Any]:
         "productCount": len(product_rows),
         "runCount": len(run_rows),
         "gateCount": len(gate_rows),
+        "attemptCount": len(attempt_rows),
         "gateStateCounts": dict(sorted(gate_state_counts.items())),
         "normalizedGateStateCounts": dict(sorted(normalized_state_counts.items())),
         "unknownGateStateCount": sum(

@@ -149,6 +149,7 @@ def _dbt(action: str) -> int:
             "products_path": Path(paths["products"]).resolve().as_posix(),
             "runs_path": Path(paths["runs"]).resolve().as_posix(),
             "gates_path": Path(paths["gates"]).resolve().as_posix(),
+            "attempts_path": Path(paths["attempts"]).resolve().as_posix(),
         },
         separators=(",", ":"),
     )
