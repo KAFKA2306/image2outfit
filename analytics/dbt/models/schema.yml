@@ -24,6 +24,25 @@ models:
                 to: ref('stg_products')
                 field: product_id
 
+  - name: stg_attempts
+    description: One row per recorded stage attempt directory, hashed over its files.
+    columns:
+      - name: attempt_id
+        data_tests: [not_null, unique]
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: stage_name
+        data_tests: [not_null]
+      - name: attempt_sha256
+        data_tests: [not_null]
+      - name: file_count
+        data_tests: [not_null]
+
   - name: stg_gates
     columns:
       - name: product_id
