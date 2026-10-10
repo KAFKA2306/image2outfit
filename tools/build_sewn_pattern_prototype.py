@@ -189,30 +189,28 @@ def add_prototype_surface_motifs(mesh, job, recipe):
     def locator(piece_ids):
         faces = []
         selected = set(piece_ids)
+        face_owners = []
         for face, owner in zip(mesh["faces"], owners):
             if owner not in selected or len(face) != 3:
                 continue
             center_y = sum(points[index].y for index in face) / 3
             if center_y < -0.004:
                 faces.append(face)
+                face_owners.append(owner)
         if not faces:
             raise ValueError(f"No front-facing garment triangles for {sorted(selected)}")
-        face_owners = []
-        selected = set(piece_ids)
-        for face, owner in zip(mesh["faces"], owners):
-            if owner not in selected or len(face) != 3:
-                continue
-            center_y = sum(points[index].y for index in face) / 3
-            if center_y < -0.004:
-                face_owners.append(owner)
         return BVHTree.FromPolygons(points, faces, all_triangles=True), face_owners
 
     def surface_point(locator_value, x, z, query_y, offset):
         tree, face_owners = locator_value
-        result = tree.find_nearest(Vector((x, query_y, z)))
-        if result is None or result[0] is None or result[0].y >= -0.002:
-            raise ValueError("Prototype motif could not bind to the garment front surface")
-        return result[0] + Vector((0.0, -offset, 0.0)), face_owners[result[2]]
+        origin = Vector((x, query_y, z))
+        result = tree.ray_cast(origin, Vector((0.0, 1.0, 0.0)), 0.5)
+        if result is None or result[0] is None:
+            raise ValueError(f"Prototype motif ray missed front panel at x={x:.4f}, z={z:.4f}")
+        location, normal, face_index, _distance = result
+        if location.y >= -0.002 or normal.y > -0.05:
+            raise ValueError("Prototype motif ray did not hit an outward-facing front surface")
+        return location + normal.normalized() * offset, face_owners[face_index]
 
     def bind_piece_ownership(obj, piece_ids, face_piece_ids):
         obj["canonicalPieceIds"] = json.dumps(piece_ids)
@@ -246,7 +244,7 @@ def add_prototype_surface_motifs(mesh, job, recipe):
     surface_offset = float(plastron.get("surfaceOffsetM", 0.0015))
     if (not isinstance(start, list) or len(start) != 2
             or not isinstance(end, list) or len(end) != 2
-            or sample_count < 4 or not 0.005 <= half_width <= 0.04
+            or sample_count < 4 or not 0.001 <= half_width <= 0.04
             or not 0.0002 <= surface_offset <= 0.005):
         raise ValueError("Invalid prototype plastron path, width, or surface offset")
     front_tree = locator(plastron.get("hostPieceIds", []))
@@ -271,10 +269,17 @@ def add_prototype_surface_motifs(mesh, job, recipe):
             band_sample_owners.append(owner)
     band_faces = []
     band_face_owners = []
+    preferred_owner = "jacket-overlap-front"
+    cross_owner_transition_quads = []
     for index in range(sample_count):
         first = index * 2
-        band_faces.append((first, first + 1, first + 3, first + 2))
-        band_face_owners.append(band_sample_owners[index])
+        quad = (first, first + 1, first + 3, first + 2)
+        quad_owners = {band_sample_owners[item] for item in quad}
+        if len(quad_owners) > 1:
+            cross_owner_transition_quads.append(index)
+        owner = preferred_owner if preferred_owner in quad_owners else next(iter(quad_owners))
+        band_faces.append(quad)
+        band_face_owners.append(owner)
     band_data = bpy.data.meshes.new(f"{job['id']}-prototype-plastron-surface")
     band_data.from_pydata(band_vertices, [], band_faces)
     band_data.update()
@@ -367,7 +372,8 @@ def add_prototype_surface_motifs(mesh, job, recipe):
             "pathEndXZ": end,
             "halfWidthM": half_width,
             "hostPieceIds": plastron["hostPieceIds"],
-            "surfaceBinding": "nearest-point-on-current-front-sewn-panels",
+            "surfaceBinding": "positive-y-raycast-with-sewn-panel-transition",
+            "crossOwnerTransitionQuadCount": len(cross_owner_transition_quads),
             "uvStatus": "NOT_CREATED",
             "grantsAppearanceAcceptance": False,
         },

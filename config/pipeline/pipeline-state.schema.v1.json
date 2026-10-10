@@ -38,6 +38,18 @@
     "completed_stages": {"type": "array", "items": {"type": "string", "minLength": 1}},
     "events": {"type": "array", "items": {"type": "object"}},
     "errors": {"type": "array", "items": {"type": "string"}},
+    "failure": {
+      "type": "object",
+      "required": ["errorCode", "phase", "message"],
+      "properties": {
+        "errorCode": {"type": "string"},
+        "phase": {"type": "string"},
+        "message": {"type": "string", "minLength": 1},
+        "stage": {"type": "string"},
+        "causeCode": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
     "outputs": {"type": "object"},
     "stage_records": {"type": "array", "items": {"type": "object"}},
     "resume_count": {"type": "integer"},
