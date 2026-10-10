@@ -200,33 +200,53 @@ def validate_manufacturing_capability(job: Mapping[str, Any]) -> list[Path]:
 
 
 def validate_assembly_pose(job, pattern):
-    pose_path, pose = validate_product_document(job, "assemblyPosePath", "assembly pose")
+    pose_path, pose = validate_product_document(
+        job, "assemblyPosePath", "assembly pose"
+    )
     if pose.get("status") != "PROTOTYPE_PLACEMENT_HYPOTHESIS":
         raise ValueError("Assembly pose is not a declared prototype hypothesis")
     target = repo_path(job["targetSourcePath"], label="target source")
     measured = repo_path(pose["measurementEvidencePath"], label="measurement evidence")
-    if sha256(target) != pose["targetSourceSha256"] or sha256(measured) != pose["measurementEvidenceSha256"]:
+    if (
+        sha256(target) != pose["targetSourceSha256"]
+        or sha256(measured) != pose["measurementEvidenceSha256"]
+    ):
         raise ValueError("Assembly pose measurement binding is stale")
     for item in pose.get("placementEvidence", []):
-        if sha256(repo_path(item["path"], label="placement evidence")) != item["sha256"]:
+        if (
+            sha256(repo_path(item["path"], label="placement evidence"))
+            != item["sha256"]
+        ):
             raise ValueError("Assembly pose placement evidence is stale")
     if set(pose["poses"]) != {piece["pieceId"] for piece in pattern["pieces"]}:
         raise ValueError("Assembly pose must explicitly cover every pattern piece")
     for transform in pose["poses"].values():
         for field in ("rotationDegreesXYZ", "translationM"):
             values = transform[field]
-            if len(values) != 3 or any(isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) for v in values):
-                raise ValueError("Assembly pose transform must contain three finite numbers")
+            if len(values) != 3 or any(
+                isinstance(v, bool)
+                or not isinstance(v, (int, float))
+                or not math.isfinite(v)
+                for v in values
+            ):
+                raise ValueError(
+                    "Assembly pose transform must contain three finite numbers"
+                )
     return pose_path, pose, measured
 
 
 def validate_prototype_readiness(
-    job: Mapping[str, Any], request: Mapping[str, Any], job_path: Path,
+    job: Mapping[str, Any],
+    request: Mapping[str, Any],
+    job_path: Path,
 ) -> tuple[Path, dict[str, Any], list[Path]]:
     """Validate executable construction inputs; never grant visual acceptance."""
     policy_path = ROOT / "contracts" / "quality" / "quality-spec.json"
     policy = read_object(policy_path, "quality spec").get("prototypeReadiness")
-    if not isinstance(policy, Mapping) or policy.get("scope") != "construction-inputs-only":
+    if (
+        not isinstance(policy, Mapping)
+        or policy.get("scope") != "construction-inputs-only"
+    ):
         raise ValueError("quality spec is missing prototypeReadiness")
     paths = [job_path, policy_path, *validate_manufacturing_capability(job)]
     documents = {}
@@ -240,7 +260,8 @@ def validate_prototype_readiness(
     validate_stitch_contract(stitches, pattern, expected_product_id=str(job["id"]))
     construction = documents["constructionPath"]
     errors = validate_schema_file(
-        construction, ROOT / "config" / "products" / "construction.schema.v1.json",
+        construction,
+        ROOT / "config" / "products" / "construction.schema.v1.json",
         "prototype construction",
     )
     if errors:
@@ -254,17 +275,24 @@ def validate_prototype_readiness(
         ):
             bound = repo_path(body_evidence[path_field], label=path_field)
             if not bound.is_file() or sha256(bound) != body_evidence[hash_field]:
-                raise ValueError(f"prototype body-profile evidence is stale: {path_field}")
+                raise ValueError(
+                    f"prototype body-profile evidence is stale: {path_field}"
+                )
             if bound not in paths:
                 paths.append(bound)
     coverage = audit_structural_pattern_coverage(
-        pattern, stitches, documents["decompositionPath"], construction,
+        pattern,
+        stitches,
+        documents["decompositionPath"],
+        construction,
         expected_product_id=str(job["id"]),
     )
     if coverage.get("status") != "PASS":
         raise ValueError("prototype structural pattern coverage failed")
     attachments = audit_surface_attachment_graph(
-        documents["surfaceAttachmentGraphPath"], pattern, stitches,
+        documents["surfaceAttachmentGraphPath"],
+        pattern,
+        stitches,
         expected_product_id=str(job["id"]),
     )
     if attachments.get("status") != "PASS_2D_PLACEMENT_ONLY":
@@ -289,7 +317,8 @@ def validate_prototype_readiness(
         "placementOwner": job.get("productBuildScript", job["buildScript"]),
     }
     report_path = write_json(
-        runtime_root(str(job["id"])) / "initialization" / "prototype-readiness.json", report
+        runtime_root(str(job["id"])) / "initialization" / "prototype-readiness.json",
+        report,
     )
     return report_path, report, [*paths, report_path]
 
@@ -558,16 +587,26 @@ def stage_garmentcode_pattern(
             raise ValueError("OpenSew runtime config schema mismatch")
         if open_sew_config.get("runtimeId") != "opensew-2-blender-2d":
             raise ValueError("OpenSew runtime ID is unsupported")
-        if open_sew_config.get("upstreamRepository") != "https://github.com/MarcelloMorettoni/opensew-2":
+        if (
+            open_sew_config.get("upstreamRepository")
+            != "https://github.com/MarcelloMorettoni/opensew-2"
+        ):
             raise ValueError("OpenSew upstream repository does not match the adapter")
-        if open_sew_config.get("outputMode") != "2d-panel-mesh-only" or open_sew_config.get("threeDEnabled") is not False:
+        if (
+            open_sew_config.get("outputMode") != "2d-panel-mesh-only"
+            or open_sew_config.get("threeDEnabled") is not False
+        ):
             raise ValueError("OpenSew preview must keep 3D generation disabled")
         if open_sew_config.get("executionMode") != "external-isolated":
             raise ValueError("OpenSew must run in its isolated external runtime")
 
-        open_sew_root = repo_path(open_sew_config["runtimePath"], label="OpenSew runtime path")
+        open_sew_root = repo_path(
+            open_sew_config["runtimePath"], label="OpenSew runtime path"
+        )
         if not open_sew_root.is_dir():
-            raise FileNotFoundError("OpenSew runtime is not installed; run `task oss:opensew:setup`")
+            raise FileNotFoundError(
+                "OpenSew runtime is not installed; run `task oss:opensew:setup`"
+            )
         revision_result = subprocess.run(
             ["git", "-C", str(open_sew_root), "rev-parse", "HEAD"],
             cwd=ROOT,
@@ -575,8 +614,13 @@ def stage_garmentcode_pattern(
             capture_output=True,
             text=True,
         )
-        if revision_result.returncode != 0 or revision_result.stdout.strip() != open_sew_config.get("upstreamRevision"):
-            raise RuntimeError("OpenSew checkout revision does not match its runtime pin")
+        if (
+            revision_result.returncode != 0
+            or revision_result.stdout.strip() != open_sew_config.get("upstreamRevision")
+        ):
+            raise RuntimeError(
+                "OpenSew checkout revision does not match its runtime pin"
+            )
         remote_result = subprocess.run(
             ["git", "-C", str(open_sew_root), "remote", "get-url", "origin"],
             cwd=ROOT,
@@ -584,7 +628,10 @@ def stage_garmentcode_pattern(
             capture_output=True,
             text=True,
         )
-        if remote_result.returncode != 0 or remote_result.stdout.strip() != open_sew_config["upstreamRepository"]:
+        if (
+            remote_result.returncode != 0
+            or remote_result.stdout.strip() != open_sew_config["upstreamRepository"]
+        ):
             raise RuntimeError("OpenSew checkout remote does not match its runtime pin")
         status_result = subprocess.run(
             ["git", "-C", str(open_sew_root), "status", "--porcelain"],
@@ -594,11 +641,17 @@ def stage_garmentcode_pattern(
             text=True,
         )
         if status_result.returncode != 0 or status_result.stdout.strip():
-            raise RuntimeError("OpenSew checkout is dirty; refusing to run unpinned source")
+            raise RuntimeError(
+                "OpenSew checkout is dirty; refusing to run unpinned source"
+            )
 
-        blender_path = repo_path(open_sew_config["blenderExecutable"], label="pinned Blender executable")
+        blender_path = repo_path(
+            open_sew_config["blenderExecutable"], label="pinned Blender executable"
+        )
         if not blender_path.is_file():
-            raise FileNotFoundError("Pinned Blender is missing; run `task oss:opensew:setup`")
+            raise FileNotFoundError(
+                "Pinned Blender is missing; run `task oss:opensew:setup`"
+            )
         blender_version = subprocess.run(
             [str(blender_path), "--background", "--version"],
             cwd=ROOT,
@@ -608,13 +661,28 @@ def stage_garmentcode_pattern(
             timeout=30,
         )
         expected_blender_version = str(open_sew_config["blenderVersion"])
-        first_version_line = (blender_version.stdout or blender_version.stderr).splitlines()
-        if blender_version.returncode != 0 or not first_version_line or not first_version_line[0].startswith(f"Blender {expected_blender_version} "):
-            raise RuntimeError("Pinned Blender executable version does not match its runtime config")
+        first_version_line = (
+            blender_version.stdout or blender_version.stderr
+        ).splitlines()
+        if (
+            blender_version.returncode != 0
+            or not first_version_line
+            or not first_version_line[0].startswith(
+                f"Blender {expected_blender_version} "
+            )
+        ):
+            raise RuntimeError(
+                "Pinned Blender executable version does not match its runtime config"
+            )
 
         preview_script = ROOT / "tools" / "run_opensew_pattern_preview.py"
         run_stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-        open_sew_dir = runtime_root(product_id) / "pattern" / "opensew-2d" / f"run-{run_stamp}-{uuid.uuid4().hex[:8]}"
+        open_sew_dir = (
+            runtime_root(product_id)
+            / "pattern"
+            / "opensew-2d"
+            / f"run-{run_stamp}-{uuid.uuid4().hex[:8]}"
+        )
         open_sew_dir.mkdir(parents=True, exist_ok=False)
         command = [
             str(blender_path),
@@ -653,11 +721,19 @@ def stage_garmentcode_pattern(
                 timeout=300,
             )
             report_path = open_sew_dir / "opensew-2d-run.json"
-            report = read_object(report_path, "OpenSew 2D preview report") if report_path.is_file() else None
+            report = (
+                read_object(report_path, "OpenSew 2D preview report")
+                if report_path.is_file()
+                else None
+            )
             if open_sew_execution.returncode != 0:
-                raise RuntimeError(f"OpenSew 2D preview failed: {open_sew_execution.stderr or open_sew_execution.stdout}")
+                raise RuntimeError(
+                    f"OpenSew 2D preview failed: {open_sew_execution.stderr or open_sew_execution.stdout}"
+                )
             if report is None or report.get("status") != "PASS_2D_ENDPOINT_AWARE_ONLY":
-                raise ValueError("OpenSew did not pass its endpoint-aware 2D-only audit")
+                raise ValueError(
+                    "OpenSew did not pass its endpoint-aware 2D-only audit"
+                )
             counts = report.get("counts", {})
             checks = report.get("checks", {})
             expected_counts = {
@@ -667,7 +743,9 @@ def stage_garmentcode_pattern(
                 "stitchPairCount": stitch_summary["stitchCount"],
             }
             if any(counts.get(key) != value for key, value in expected_counts.items()):
-                raise ValueError("OpenSew panel, edge, or stitch counts differ from canonical contracts")
+                raise ValueError(
+                    "OpenSew panel, edge, or stitch counts differ from canonical contracts"
+                )
             for key in (
                 "allPanelMeshesFlatInXZ",
                 "noLooseOrNonmanifoldPanelEdges",
@@ -678,9 +756,16 @@ def stage_garmentcode_pattern(
             ):
                 if checks.get(key) is not True:
                     raise ValueError(f"OpenSew 2D audit failed: {key}")
-            if checks.get("threeDGenerated") is not False or report.get("output", {}).get("blendSha256") is None:
-                raise ValueError("OpenSew output crossed the 2D-only boundary or lacks saved evidence")
-            blend_path = repo_path(report["output"]["blendPath"], label="OpenSew 2D panel blend")
+            if (
+                checks.get("threeDGenerated") is not False
+                or report.get("output", {}).get("blendSha256") is None
+            ):
+                raise ValueError(
+                    "OpenSew output crossed the 2D-only boundary or lacks saved evidence"
+                )
+            blend_path = repo_path(
+                report["output"]["blendPath"], label="OpenSew 2D panel blend"
+            )
             if not blend_path.is_file():
                 raise FileNotFoundError("OpenSew 2D panel blend is missing")
         except Exception as exc:
@@ -693,8 +778,12 @@ def stage_garmentcode_pattern(
                         "status": "FAIL",
                         "error": f"{type(exc).__name__}: {exc}",
                         "command": command,
-                        "stdout": open_sew_execution.stdout[-12000:] if open_sew_execution else "",
-                        "stderr": open_sew_execution.stderr[-12000:] if open_sew_execution else "",
+                        "stdout": open_sew_execution.stdout[-12000:]
+                        if open_sew_execution
+                        else "",
+                        "stderr": open_sew_execution.stderr[-12000:]
+                        if open_sew_execution
+                        else "",
                         "patternSha256": sha256(pattern_path),
                         "stitchGraphSha256": sha256(stitch_path),
                     },
@@ -722,16 +811,26 @@ def stage_garmentcode_pattern(
             "panelCount": counts["panelCount"],
             "namedEdgeGroupCount": counts["namedEdgeGroupCount"],
             "stitchPairCount": counts["stitchPairCount"],
-            "allNamedEdgesHaveEndpointInclusiveChains": checks["allNamedEdgesHaveConnectedEndpointInclusiveChains"],
-            "allStitchPairsHaveEndpointInclusiveChains": checks["allStitchPairsHaveEndpointInclusiveChains"],
+            "allNamedEdgesHaveEndpointInclusiveChains": checks[
+                "allNamedEdgesHaveConnectedEndpointInclusiveChains"
+            ],
+            "allStitchPairsHaveEndpointInclusiveChains": checks[
+                "allStitchPairsHaveEndpointInclusiveChains"
+            ],
             "allStitchPairSampleCountsEqual": checks["allStitchPairSampleCountsEqual"],
-            "maximumIndexPairingStationGapMm": checks["maximumOpenSewIndexPairingStationGapMm"],
+            "maximumIndexPairingStationGapMm": checks[
+                "maximumOpenSewIndexPairingStationGapMm"
+            ],
             "allCurvedEdgesPreservedWithinSamplingTolerance": checks[
                 "allCurvedEdgesPreservedWithinSamplingTolerance"
             ],
             "curvedEdgeCount": checks["curvedEdgeCount"],
-            "maximumCurveSamplingErrorBoundMm": checks["maximumCurveSamplingErrorBoundMm"],
-            "maximumBoundaryProjectionErrorMm": checks["maximumBoundaryProjectionErrorMm"],
+            "maximumCurveSamplingErrorBoundMm": checks[
+                "maximumCurveSamplingErrorBoundMm"
+            ],
+            "maximumBoundaryProjectionErrorMm": checks[
+                "maximumBoundaryProjectionErrorMm"
+            ],
             "stitchPairSampleCountMismatchCount": checks[
                 "stitchPairSampleCountMismatchCount"
             ],
@@ -856,8 +955,7 @@ def stage_static(
         if construction_path is not None:
             source_paths.append(construction_path)
         source_artifacts = [
-            {"path": relative(item), "sha256": sha256(item)}
-            for item in source_paths
+            {"path": relative(item), "sha256": sha256(item)} for item in source_paths
         ]
         coverage_key = hashlib.sha256(
             "".join(item["sha256"] for item in source_artifacts).encode("ascii")
@@ -921,14 +1019,10 @@ def stage_static(
                 "stage": "draft-patterns",
                 "productId": product_id,
                 "revisionId": (
-                    request.get("revisionId")
-                    if isinstance(request, Mapping)
-                    else None
+                    request.get("revisionId") if isinstance(request, Mapping) else None
                 ),
                 **geometry_audit,
-                "sourceArtifacts": [
-                    {"path": relative(path), "sha256": sha256(path)}
-                ],
+                "sourceArtifacts": [{"path": relative(path), "sha256": sha256(path)}],
                 "implementationArtifacts": [
                     {"path": relative(item), "sha256": sha256(item)}
                     for item in geometry_implementation_paths
@@ -1012,15 +1106,11 @@ def stage_static(
         f"{sha256(pattern_path)}:{sha256(path)}".encode("ascii")
     ).hexdigest()[:12]
     connectivity_path = (
-        runtime_root(product_id)
-        / "stages"
-        / f"stitch-connectivity-{source_hash}.json"
+        runtime_root(product_id) / "stages" / f"stitch-connectivity-{source_hash}.json"
     )
     edge_length_audit = summary["edgeLengthCompatibilityAudit"]
     edge_length_path = (
-        runtime_root(product_id)
-        / "stages"
-        / f"stitch-edge-length-{source_hash}.json"
+        runtime_root(product_id) / "stages" / f"stitch-edge-length-{source_hash}.json"
     )
     edge_length_record: dict[str, Any] = {
         "schemaVersion": 1,
@@ -1028,9 +1118,7 @@ def stage_static(
         "auditType": "2d-stitch-edge-length-compatibility",
         "productId": product_id,
         "revisionId": (
-            request.get("revisionId")
-            if isinstance(request, Mapping)
-            else None
+            request.get("revisionId") if isinstance(request, Mapping) else None
         ),
         "sourceArtifacts": [
             {"path": relative(pattern_path), "sha256": sha256(pattern_path)},
@@ -1055,9 +1143,7 @@ def stage_static(
         "stage": "infer-stitches",
         "productId": product_id,
         "revisionId": (
-            request.get("revisionId")
-            if isinstance(request, Mapping)
-            else None
+            request.get("revisionId") if isinstance(request, Mapping) else None
         ),
         "sourceArtifacts": [
             {"path": relative(pattern_path), "sha256": sha256(pattern_path)},
@@ -1104,7 +1190,9 @@ def stage_static(
         ]
         attachment_source_artifacts = [pattern_path, path, surface_attachment_path]
         attachment_source_hash = hashlib.sha256(
-            "".join(sha256(item) for item in attachment_source_artifacts).encode("ascii")
+            "".join(sha256(item) for item in attachment_source_artifacts).encode(
+                "ascii"
+            )
         ).hexdigest()[:12]
         surface_attachment_report_path = (
             runtime_root(product_id)
@@ -1163,8 +1251,8 @@ def stage_static(
             reference_image_paths,
             surface_attachment_preview_path,
         )
-        surface_attachment_preview_report_path = surface_attachment_preview_path.with_suffix(
-            ".json"
+        surface_attachment_preview_report_path = (
+            surface_attachment_preview_path.with_suffix(".json")
         )
         write_json(
             surface_attachment_preview_report_path,
@@ -1213,9 +1301,13 @@ def stage_static(
         garmentcode_dir = runtime_root(product_id) / "pattern" / "garmentcode"
         input_path = garmentcode_dir / "garmentcode-pattern-input.json"
         run_path = garmentcode_dir / "garmentcode-run.json"
-        runtime_config_path = ROOT / "config" / "oss-runtimes" / "garmentcode-pygarment.json"
+        runtime_config_path = (
+            ROOT / "config" / "oss-runtimes" / "garmentcode-pygarment.json"
+        )
         requirements_path = repo_path(
-            read_object(runtime_config_path, "GarmentCode runtime config")["requirementsLockPath"],
+            read_object(runtime_config_path, "GarmentCode runtime config")[
+                "requirementsLockPath"
+            ],
             label="GarmentCode requirements lock",
         )
         if not input_path.is_file() or not run_path.is_file():
@@ -1224,7 +1316,9 @@ def stage_static(
                 "run draft-patterns first"
             )
         garmentcode_input = read_object(input_path, "GarmentCode pattern input")
-        input_parameters = garmentcode_input.get("parameters", {}).get("image2outfit", {})
+        input_parameters = garmentcode_input.get("parameters", {}).get(
+            "image2outfit", {}
+        )
         if (
             input_parameters.get("patternContractSha256") != sha256(pattern_path)
             or input_parameters.get("stitchGraphSha256") != sha256(path)
@@ -1237,11 +1331,15 @@ def stage_static(
         garmentcode_run = read_object(run_path, "GarmentCode run record")
         runtime_config = read_object(runtime_config_path, "GarmentCode runtime config")
         if (
-            garmentcode_run.get("upstreamRevision") != runtime_config.get("upstreamRevision")
-            or garmentcode_run.get("requirementsLockSha256") != sha256(requirements_path)
+            garmentcode_run.get("upstreamRevision")
+            != runtime_config.get("upstreamRevision")
+            or garmentcode_run.get("requirementsLockSha256")
+            != sha256(requirements_path)
             or garmentcode_run.get("threeDGenerated") is not False
         ):
-            raise ValueError("infer-stitches found an incompatible GarmentCode run record")
+            raise ValueError(
+                "infer-stitches found an incompatible GarmentCode run record"
+            )
         connectivity_record["garmentCodeEvidence"] = {
             "tool": GARMENTCODE_PATTERN_TOOL,
             "upstreamRevision": garmentcode_run["upstreamRevision"],
@@ -1289,9 +1387,7 @@ def stage_static(
             "stitchesCount": summary["stitchCount"],
             "referencedEdgeCount": summary["referencedEdgeCount"],
             "orientationChecks": summary["orientationChecks"],
-            "edgeLengthCompatibilityPassed": (
-                edge_length_audit["status"] == "PASS"
-            ),
+            "edgeLengthCompatibilityPassed": (edge_length_audit["status"] == "PASS"),
             "edgeLengthCompatibilityAudit": edge_length_audit,
             "edgeLengthCompatibilityAuditPath": relative(edge_length_path),
             "panelConnectivityAudit": connectivity,
@@ -1344,8 +1440,8 @@ def stage_initialize(
     manifest = read_object(manifest_path, "product manifest")
     if manifest.get("productId") != product_id:
         raise ValueError("product manifest identity does not match initialize-3d job")
-    review_path, review, review_evidence_paths = (
-        validate_prototype_readiness(job, request, job_path)
+    review_path, review, review_evidence_paths = validate_prototype_readiness(
+        job, request, job_path
     )
     gates = manifest.get("technicalGates", {})
     if not isinstance(gates, Mapping):
@@ -1427,20 +1523,29 @@ def blender_executable() -> str:
     version = str(lock["blender"]["version"])
     configured = os.environ.get("IMAGE2OUTFIT_BLENDER", "").strip()
     executable_name = "blender.exe" if os.name == "nt" else "blender"
-    candidates = [configured] if configured else [
-        str(ROOT / ".image2outfit" / f"blender-{version}" / executable_name),
-        str(ROOT / ".image2outfit" / "blender" / executable_name),
-        shutil.which("blender") or "",
-    ]
+    candidates = (
+        [configured]
+        if configured
+        else [
+            str(ROOT / ".image2outfit" / f"blender-{version}" / executable_name),
+            str(ROOT / ".image2outfit" / "blender" / executable_name),
+            shutil.which("blender") or "",
+        ]
+    )
     for candidate in candidates:
         if candidate and Path(candidate).is_file():
             result = subprocess.run(
-                [candidate, "--version"], capture_output=True, text=True,
-                check=False, timeout=30,
+                [candidate, "--version"],
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=30,
             )
             actual = result.stdout.splitlines()[0] if result.stdout else ""
             if result.returncode != 0 or actual != f"Blender {version}":
-                raise ValueError(f"Blender version must be {version}; observed {actual!r}")
+                raise ValueError(
+                    f"Blender version must be {version}; observed {actual!r}"
+                )
             return candidate
     raise FileNotFoundError(f"Pinned Blender {version} executable was not found")
 
@@ -1461,18 +1566,15 @@ def _run_garmentcode_boxmesh_preflight(
             "build-blender requires strict-boundary-edges for stage contract v2"
         )
 
-    review_path, review, review_evidence = (
-        validate_prototype_readiness(job, request, job_path)
+    review_path, review, review_evidence = validate_prototype_readiness(
+        job, request, job_path
     )
     manifest = read_object(
         repo_path(job["productManifestPath"], label="product manifest"),
         "product manifest",
     )
     gates = manifest.get("technicalGates")
-    if (
-        manifest.get("productId") != job.get("id")
-        or not isinstance(gates, Mapping)
-    ):
+    if manifest.get("productId") != job.get("id") or not isinstance(gates, Mapping):
         raise ValueError(
             "build-blender product manifest identity or technicalGates is invalid"
         )
@@ -1501,7 +1603,9 @@ def _run_garmentcode_boxmesh_preflight(
         "productMeshArtifactWritten": False,
     }
     if mesh_audit_config != expected_mesh_audit:
-        raise ValueError("GarmentCode post-review BoxMesh audit contract is inconsistent")
+        raise ValueError(
+            "GarmentCode post-review BoxMesh audit contract is inconsistent"
+        )
 
     pattern_path, pattern = validate_product_document(
         job, "patternContractPath", "pattern contract"
@@ -1522,30 +1626,55 @@ def _run_garmentcode_boxmesh_preflight(
     )
     attempt_dir = runtime_root(str(job["id"])) / "stages" / "attempts" / attempt_name
     native = pattern_contract_to_garmentcode_preview(
-        pattern, stitch_graph, pattern_sha256=pattern_hash,
-        stitch_graph_sha256=stitch_hash, stitch_export_mode="strict-boundary-edges",
+        pattern,
+        stitch_graph,
+        pattern_sha256=pattern_hash,
+        stitch_graph_sha256=stitch_hash,
+        stitch_export_mode="strict-boundary-edges",
     )
     if pipeline.get("assemblyPosePath"):
         _pose_path, pose, _measured = validate_assembly_pose(job, pattern)
-        for panel_key, piece_id in native["parameters"]["image2outfit"]["panelKeyMap"].items():
+        for panel_key, piece_id in native["parameters"]["image2outfit"][
+            "panelKeyMap"
+        ].items():
             transform = pose["poses"][piece_id]
-            native["pattern"]["panels"][panel_key]["rotation"] = transform["rotationDegreesXYZ"]
-            native["pattern"]["panels"][panel_key]["translation"] = [v * native["properties"]["units_in_meter"] for v in transform["translationM"]]
+            native["pattern"]["panels"][panel_key]["rotation"] = transform[
+                "rotationDegreesXYZ"
+            ]
+            native["pattern"]["panels"][panel_key]["translation"] = [
+                v * native["properties"]["units_in_meter"]
+                for v in transform["translationM"]
+            ]
             if "cylindricalWrap" in transform:
-                native["pattern"]["panels"][panel_key]["image2outfitCylindricalWrap"] = transform["cylindricalWrap"]
+                native["pattern"]["panels"][panel_key][
+                    "image2outfitCylindricalWrap"
+                ] = transform["cylindricalWrap"]
                 cap_placement = transform["cylindricalWrap"].get("sewnCapPlacement")
                 if cap_placement is not None:
-                    piece_keys = {value: key for key, value in native["parameters"]["image2outfit"]["panelKeyMap"].items()}
+                    piece_keys = {
+                        value: key
+                        for key, value in native["parameters"]["image2outfit"][
+                            "panelKeyMap"
+                        ].items()
+                    }
                     for edge in cap_placement["edges"]:
                         edge["targetPanelKey"] = piece_keys[edge["targetPieceId"]]
             if "torsoWrap" in transform:
-                native["pattern"]["panels"][panel_key]["image2outfitTorsoWrap"] = transform["torsoWrap"]
+                native["pattern"]["panels"][panel_key]["image2outfitTorsoWrap"] = (
+                    transform["torsoWrap"]
+                )
             if "legWrap" in transform:
-                native["pattern"]["panels"][panel_key]["image2outfitLegWrap"] = transform["legWrap"]
+                native["pattern"]["panels"][panel_key]["image2outfitLegWrap"] = (
+                    transform["legWrap"]
+                )
             if "collarWrap" in transform:
-                native["pattern"]["panels"][panel_key]["image2outfitCollarWrap"] = transform["collarWrap"]
+                native["pattern"]["panels"][panel_key]["image2outfitCollarWrap"] = (
+                    transform["collarWrap"]
+                )
             if "skirtWrap" in transform:
-                native["pattern"]["panels"][panel_key]["image2outfitSkirtWrap"] = transform["skirtWrap"]
+                native["pattern"]["panels"][panel_key]["image2outfitSkirtWrap"] = (
+                    transform["skirtWrap"]
+                )
     input_path = write_json(attempt_dir / "garmentcode-pattern-input.json", native)
     output_path = attempt_dir / "garmentcode-boxmesh-audit.json"
 
@@ -1574,8 +1703,13 @@ def _run_garmentcode_boxmesh_preflight(
     if not requirements_lock_path.is_file():
         raise FileNotFoundError("GarmentCode requirements lock is missing")
     command = [
-        "uv", "run", "--offline", "--no-project", "--no-python-downloads",
-        "--python", str(python_executable),
+        "uv",
+        "run",
+        "--offline",
+        "--no-project",
+        "--no-python-downloads",
+        "--python",
+        str(python_executable),
         str(ROOT / "tools" / "run_garmentcode_boxmesh_audit.py"),
         "--input",
         str(input_path),
@@ -1606,15 +1740,14 @@ def _run_garmentcode_boxmesh_preflight(
         raise RuntimeError(
             "GarmentCode BoxMesh preflight did not write evidence; "
             f"exit code {execution.returncode}: {execution.stderr or execution.stdout}"
-    )
+        )
     audit = read_object(output_path, "GarmentCode BoxMesh audit")
     audit["prototypeReadiness"] = {
         "status": review["status"],
         "path": relative(review_path),
         "sha256": sha256(review_path),
         "evidence": [
-            {"path": relative(path), "sha256": sha256(path)}
-            for path in review_evidence
+            {"path": relative(path), "sha256": sha256(path)} for path in review_evidence
         ],
     }
     audit["canonicalStitchInputs"] = {
@@ -1726,9 +1859,17 @@ def stage_build(
             log,
             *([*boxmesh_evidence] if boxmesh_evidence is not None else []),
             *(
-                [repo_path(read_object(boxmesh_evidence[1], "BoxMesh audit")["meshExchangePath"], label="sewn mesh exchange")]
+                [
+                    repo_path(
+                        read_object(boxmesh_evidence[1], "BoxMesh audit")[
+                            "meshExchangePath"
+                        ],
+                        label="sewn mesh exchange",
+                    )
+                ]
                 if job["garmentPipeline"].get("meshSource") == "garmentcode-boxmesh"
-                and boxmesh_evidence is not None else []
+                and boxmesh_evidence is not None
+                else []
             ),
         ],
         extra={
@@ -1764,18 +1905,37 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
         simulation_log = runtime_root(product_id) / "reports" / "cloth-simulation.log"
         simulation_log.parent.mkdir(parents=True, exist_ok=True)
-        command = [blender_executable(), "--background", "--factory-startup", "--python-exit-code", "1",
-                   "--python", str(ROOT / "tools/blender_cloth_simulation.py"), "--", "--job",
-                   str(ROOT / "config/products" / product_id / "job.json"), "--prototype"]
-        execution = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
-        simulation_log.write_text(execution.stdout + "\n" + execution.stderr, encoding="utf-8")
+        command = [
+            blender_executable(),
+            "--background",
+            "--factory-startup",
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(ROOT / "tools/blender_cloth_simulation.py"),
+            "--",
+            "--job",
+            str(ROOT / "config/products" / product_id / "job.json"),
+            "--prototype",
+        ]
+        execution = subprocess.run(
+            command, cwd=ROOT, capture_output=True, text=True, check=False
+        )
+        simulation_log.write_text(
+            execution.stdout + "\n" + execution.stderr, encoding="utf-8"
+        )
         if execution.returncode:
-            raise RuntimeError(f"Native sewn cloth solve failed; see {relative(simulation_log)}: {execution.stderr[-2500:]}")
+            raise RuntimeError(
+                f"Native sewn cloth solve failed; see {relative(simulation_log)}: {execution.stderr[-2500:]}"
+            )
     payload = read_object(report, "cloth simulation report")
     candidate_paths = []
     if simulation_log is not None:
-        if (payload.get("sourceBlendSha256") != sha256(repo_path(job["blendPath"], label="blend"))
-                or payload.get("constructionSha256") != sha256(repo_path(job["garmentPipeline"]["constructionPath"], label="construction"))):
+        if payload.get("sourceBlendSha256") != sha256(
+            repo_path(job["blendPath"], label="blend")
+        ) or payload.get("constructionSha256") != sha256(
+            repo_path(job["garmentPipeline"]["constructionPath"], label="construction")
+        ):
             raise ValueError("cloth experiment input binding is stale")
         candidate = repo_path(payload["candidatePath"], label="cloth candidate")
         if sha256(candidate) != payload["candidateSha256"]:
@@ -1893,10 +2053,21 @@ def stage_export(job: Mapping[str, Any], result: Path) -> None:
     if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
         log = runtime_root(product_id) / "reports/skin-export.log"
         log.parent.mkdir(parents=True, exist_ok=True)
-        command = [blender_executable(), "--background", "--factory-startup", "--python-exit-code", "1",
-                   "--python", str(ROOT / "tools/blender_sewn_skin_export.py"), "--", "--job",
-                   str(ROOT / "config/products" / product_id / "job.json")]
-        execution = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
+        command = [
+            blender_executable(),
+            "--background",
+            "--factory-startup",
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(ROOT / "tools/blender_sewn_skin_export.py"),
+            "--",
+            "--job",
+            str(ROOT / "config/products" / product_id / "job.json"),
+        ]
+        execution = subprocess.run(
+            command, cwd=ROOT, capture_output=True, text=True, check=False
+        )
         log.write_text(execution.stdout + "\n" + execution.stderr, encoding="utf-8")
         if execution.returncode:
             raise RuntimeError(f"Skin/export failed: {execution.stderr[-2500:]}")
@@ -1904,14 +2075,27 @@ def stage_export(job: Mapping[str, Any], result: Path) -> None:
         report = read_object(report_path, "skin report")
         source = repo_path(report["weightedBlendPath"], label="weighted prototype")
         fbx = repo_path(job["fbxAssetPath"], label="FBX")
-        if (report["productId"] != product_id or report["executionStatus"] != "PASS"
-                or sha256(source) != report["weightedBlendSha256"] or sha256(fbx) != report["fbxSha256"]):
+        if (
+            report["productId"] != product_id
+            or report["executionStatus"] != "PASS"
+            or sha256(source) != report["weightedBlendSha256"]
+            or sha256(fbx) != report["fbxSha256"]
+        ):
             raise ValueError("skin/export artifact binding mismatch")
-        emit(result, stage="skin-and-export", product_id=product_id,
-             paths=[source, fbx, report_path, log],
-             extra={"editableSource": True, "fbxExported": True, "prefabDeclared": False,
-                    "qualityDecision": "UNVERIFIED", "grantsFitAcceptance": False,
-                    "unweightedVertices": report["unweightedVertices"]})
+        emit(
+            result,
+            stage="skin-and-export",
+            product_id=product_id,
+            paths=[source, fbx, report_path, log],
+            extra={
+                "editableSource": True,
+                "fbxExported": True,
+                "prefabDeclared": False,
+                "qualityDecision": "UNVERIFIED",
+                "grantsFitAcceptance": False,
+                "unweightedVertices": report["unweightedVertices"],
+            },
+        )
         return
     paths = [
         repo_path(job["blendPath"], label="blend"),
@@ -1934,14 +2118,28 @@ def stage_render(job: Mapping[str, Any], result: Path) -> None:
     if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
         log = runtime_root(product_id) / "reports/weighted-render.log"
         log.parent.mkdir(parents=True, exist_ok=True)
-        command = [blender_executable(), "--background", "--factory-startup", "--python-exit-code", "1",
-                   "--python", str(ROOT / "tools/blender_sewn_render.py"), "--", "--job",
-                   str(ROOT / "config/products" / product_id / "job.json")]
-        execution = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=False)
+        command = [
+            blender_executable(),
+            "--background",
+            "--factory-startup",
+            "--python-exit-code",
+            "1",
+            "--python",
+            str(ROOT / "tools/blender_sewn_render.py"),
+            "--",
+            "--job",
+            str(ROOT / "config/products" / product_id / "job.json"),
+        ]
+        execution = subprocess.run(
+            command, cwd=ROOT, capture_output=True, text=True, check=False
+        )
         log.write_text(execution.stdout + "\n" + execution.stderr, encoding="utf-8")
         if execution.returncode:
             raise RuntimeError(f"Weighted render failed: {execution.stderr[-2500:]}")
-        render_artifacts = [log, runtime_root(product_id) / "reports/weighted-render.json"]
+        render_artifacts = [
+            log,
+            runtime_root(product_id) / "reports/weighted-render.json",
+        ]
     images = review_image_paths(job)
     view_count = len(job["previewPaths"])
     emit(
@@ -1976,7 +2174,9 @@ def _candidate_geometry_quality(
         product_id = str(job["id"])
         skin_path = runtime_root(product_id) / "skin/skin-export-report.json"
         skin = read_object(skin_path, "skin export report")
-        weighted_blend = repo_path(skin["weightedBlendPath"], label="weighted prototype")
+        weighted_blend = repo_path(
+            skin["weightedBlendPath"], label="weighted prototype"
+        )
         fbx = repo_path(job["fbxAssetPath"], label="FBX")
         if (
             skin.get("productId") != product_id
@@ -1984,13 +2184,17 @@ def _candidate_geometry_quality(
             or sha256(weighted_blend) != skin.get("weightedBlendSha256")
             or sha256(fbx) != skin.get("fbxSha256")
         ):
-            raise ValueError("skin/export evidence is stale or bound to another candidate")
+            raise ValueError(
+                "skin/export evidence is stale or bound to another candidate"
+            )
         audits = skin.get("audits")
         weights_verified = (
             isinstance(audits, Mapping)
             and bool(audits)
-            and all(isinstance(item, Mapping) and item.get("passed") is True
-                    for item in audits.values())
+            and all(
+                isinstance(item, Mapping) and item.get("passed") is True
+                for item in audits.values()
+            )
             and skin.get("unweightedVertices") == 0
         )
         combined = dict(report)
