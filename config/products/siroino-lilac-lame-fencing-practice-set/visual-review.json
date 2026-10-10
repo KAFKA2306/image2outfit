@@ -47,7 +47,79 @@
     }
   ],
   "sourceEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
-  "nextAction": "Keep the candidate REJECTED. Replace the piping-only marking with a visible, shell-conforming plastron and real elbow quilting; add the rear waist detail and intended color/material separation. Reshape the shorts into a fitted seat/thigh garment with continuous gusset coverage and remove the crouch/sit avatar gaps; also reduce sleeve faceting and form ordered skirt pleats. Regenerate through the canonical workflow, then directly inspect all eleven current image hashes before any acceptance decision. Do not claim Shape Key, fit, Unity, VRChat, or upload acceptance.",
+  "measuredCurrentPoseBoundsDiagnostic": {
+    "source": {
+      "weightedPrototypeBlendPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend",
+      "weightedPrototypeBlendSha256": "1eb91a6da98abb71ce84cc2abfba3a796c1e248065c5b8b5b7234ac24fe0fd15",
+      "skinExportReportPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/skin-export-report.json",
+      "skinExportReportSha256": "95504701666a66515fe47d684ae0c898691c7a562d62aa131a85b2a09eefbfee"
+    },
+    "method": "Blender 4.4.3 evaluated current weighted prototype under the deterministic neutral, crouch and sit bone rotations; garment ownership taken from canonical piece provenance. Bounds are world-Z extrema.",
+    "poseBoundsZM": {
+      "neutral": {
+        "overskirt-front": [0.54183, 0.73958],
+        "overskirt-back": [0.57833, 0.73958],
+        "shorts-front-left": [0.47958, 0.73958],
+        "shorts-front-right": [0.47958, 0.73958],
+        "shorts-back-left": [0.47958, 0.73958],
+        "shorts-back-right": [0.47958, 0.73958]
+      },
+      "crouch": {
+        "overskirt-front": [0.53411, 0.74350],
+        "overskirt-back": [0.58953, 0.75984],
+        "shorts-front-left": [0.55606, 0.74476],
+        "shorts-front-right": [0.55606, 0.74476],
+        "shorts-back-left": [0.50881, 0.76296],
+        "shorts-back-right": [0.50881, 0.76296]
+      },
+      "sit": {
+        "overskirt-front": [0.53593, 0.74013],
+        "overskirt-back": [0.58907, 0.75211],
+        "shorts-front-left": [0.63762, 0.74265],
+        "shorts-front-right": [0.63762, 0.74265],
+        "shorts-back-left": [0.57506, 0.75289],
+        "shorts-back-right": [0.57506, 0.75289]
+      }
+    },
+    "frontShortsHemAboveSkirtHemM": {
+      "crouch": 0.02195,
+      "sit": 0.10169,
+      "positiveMeaning": "The shorts' minimum world Z is higher than the front overskirt's minimum world Z."
+    },
+    "skirtMeanBoneWeights": {
+      "waistVertices": {
+        "sampleCount": 527,
+        "hips": 0.8579,
+        "upperLegLeft": 0.0699,
+        "upperLegRight": 0.0721
+      },
+      "hemVertices": {
+        "sampleCount": 251,
+        "hips": 0.6215,
+        "upperLegLeft": 0.1829,
+        "upperLegRight": 0.1956
+      }
+    },
+    "scopeLimit": "World-Z envelopes do not measure same-XY coverage, avatar gaps, penetration, clearance, strain, or fit. Weight averages do not establish pose acceptance.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "measuredShortsWeightTransferHypothesis": {
+    "executionStatus": "CONFIGURED_NOT_EXECUTED",
+    "executionBoundary": "The canonical workflow stopped at ingest-reference before any manufacturing stage because its transaction safety rollback detected an untracked path outside the declared product workspace. Existing generated mesh and render evidence remain from the previous source.",
+    "sourceWeightedPrototypeBlendSha256": "1eb91a6da98abb71ce84cc2abfba3a796c1e248065c5b8b5b7234ac24fe0fd15",
+    "sourceSkinExportReportSha256": "95504701666a66515fe47d684ae0c898691c7a562d62aa131a85b2a09eefbfee",
+    "measuredShortsMeanWeights": {
+      "waist": {"hips": 0.946, "ipsilateralUpperLeg": 0.047, "contralateralUpperLeg": 0.0},
+      "hem": {"hips": 0.008, "ipsilateralUpperLeg": 0.779, "contralateralUpperLeg": 0.211}
+    },
+    "prototypeChange": "Split shorts from the overskirt weight region. Use a Hips-to-ipsilateral-thigh lateral fade for shorts: 0.05 thigh at waist, 0.90 at hem, centerline fade 0.02 m to full side at 0.06 m.",
+    "reason": "Measured contralateral thigh influence at the shorts hem may pull panels across the centerline during leg rotation. This is a prototype hypothesis and must be inspected after rebuild.",
+    "validationRequired": "Regenerate weighted mesh and poses; inspect new renders and measure same-XY shorts coverage in crouch and sit. World-Z extrema do not prove coverage.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "nextAction": "Resume the canonical workflow only after its write-boundary safety check no longer encounters an unrelated untracked workspace path. Then inspect the rebuilt shorts in crouch and sit and measure same-XY underlayer coverage. Keep REJECTED unless direct evidence clears every blocker. The measured 21.95 mm crouch and 101.69 mm sit front-hem offsets still require a fitted seat/front coverage correction and sewn gusset. Reduce sleeve faceting, form ordered skirt pleats, make the plastron/quilt and back waist detail visibly constructed, and resolve collar/front closure. Do not claim fit, Unity, VRChat, or upload acceptance.",
   "verifiedPoseCorrection": {
     "pose": "arms-up",
     "method": "imported bone local Y mapped to world +Z",
