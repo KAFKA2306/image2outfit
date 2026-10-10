@@ -26,20 +26,25 @@ from garment_panel_builder import (  # noqa: E402
 PRODUCT_SOURCE = ROOT / "tools" / "siroino_wide_cargo_product.py"
 PATTERN_SOURCE = layout.PATTERN_SPEC_PATH
 
-# SHA-256 of the Wide Cargo panel mesh captured before the generic builder
-# extraction (origin/main fdae063). The extraction must not change output.
+# Digest (coordinates rounded to 1e-6) of the Wide Cargo panel mesh produced by
+# origin/main's product script before the generic builder extraction. The
+# extraction must not change output.
 EXPECTED_VERTEX_COUNT = 1745
 EXPECTED_FACE_COUNT = 1680
 EXPECTED_MESH_SHA256 = (
-    "3926febc88fa076c351c0f0b591cd8ca0ad5207d4ecd7d042a3879f24175dbb9"
+    "83e56c540548a82d9dc1bf8166a8914ae0836b07ecffbe36eb3f0020d5b7acb5"
 )
 
 
 def _mesh_digest(mesh: MeshBuilder) -> str:
+    # Coordinates are rounded to micrometres: sin/cos last-bit differences
+    # between platform math libraries must not change the digest.
     payload = {
         "vertexCount": len(mesh.vertices),
         "faceCount": len(mesh.faces),
-        "vertices": [list(map(float, vertex)) for vertex in mesh.vertices],
+        "vertices": [
+            [round(float(value), 6) for value in vertex] for vertex in mesh.vertices
+        ],
         "faces": [list(face) for face in mesh.faces],
     }
     blob = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
