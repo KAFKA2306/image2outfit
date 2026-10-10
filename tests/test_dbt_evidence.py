@@ -177,8 +177,7 @@ class DbtEvidenceTests(unittest.TestCase):
             second = (output / "attempts.jsonl").read_text(encoding="utf-8")
 
             rows = {
-                row["attempt_name"]: row
-                for row in map(json.loads, first.splitlines())
+                row["attempt_name"]: row for row in map(json.loads, first.splitlines())
             }
             self.assertEqual(report["attemptCount"], 2)
             self.assertEqual(first, second)
@@ -189,7 +188,8 @@ class DbtEvidenceTests(unittest.TestCase):
             unstamped_row = rows["draft-patterns-opensew-not-applicable-20261004"]
             self.assertIsNone(unstamped_row["attempt_stamp"])
             self.assertEqual(
-                unstamped_row["stage_name"], "draft-patterns-opensew-not-applicable-20261004"
+                unstamped_row["stage_name"],
+                "draft-patterns-opensew-not-applicable-20261004",
             )
 
     def test_missing_canonical_files_remain_visible(self) -> None:

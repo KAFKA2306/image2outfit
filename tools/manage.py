@@ -320,7 +320,9 @@ def _experiment_matrix(path_text: str) -> int:
         "include": [
             {
                 "method": method_id,
-                "runner": str(by_id.get(method_id, {}).get("runner") or "ubuntu-latest"),
+                "runner": str(
+                    by_id.get(method_id, {}).get("runner") or "ubuntu-latest"
+                ),
             }
             for method_id in methods
         ]

@@ -42,7 +42,9 @@ def _attempt_rows(root: Path, product_id: str) -> list[dict[str, Any]]:
     if not attempts_root.is_dir():
         return []
     rows: list[dict[str, Any]] = []
-    for attempt_dir in sorted(path for path in attempts_root.iterdir() if path.is_dir()):
+    for attempt_dir in sorted(
+        path for path in attempts_root.iterdir() if path.is_dir()
+    ):
         match = ATTEMPT_NAME.match(attempt_dir.name)
         files = sorted(path for path in attempt_dir.rglob("*") if path.is_file())
         digest = hashlib.sha256()
