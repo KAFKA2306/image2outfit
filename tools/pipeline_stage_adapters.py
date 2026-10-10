@@ -23,6 +23,7 @@ from image2outfit.execution import (
 )
 from image2outfit.pipeline import PIPELINE_STAGES, PipelineStage
 from image2outfit.tooling import ToolDescriptor, ToolRegistry, choose_tool
+from pipeline_profile_contract import load_profile as load_canonical_profile
 from repository_write_boundary import RepositoryWriteBoundary
 
 
@@ -119,7 +120,8 @@ class CommandStageAdapter(PlannedStageAdapter):
         boundary = RepositoryWriteBoundary(
             ROOT,
             product_id=str(state["product_id"]),
-            product_workspace_output=self.stage.value in {"build-blender", "finalize-candidate"},
+            product_workspace_output=self.stage.value
+            in {"build-blender", "finalize-candidate"},
         )
         boundary.begin()
         if result_path.exists():
@@ -253,56 +255,9 @@ def _tool_options(stage: Mapping[str, Any]) -> list[dict[str, Any]]:
     return options
 
 
-def _validate_tool_option(stage_name: str, option: Mapping[str, Any]) -> None:
-    tool_name = option.get("toolName")
-    if not isinstance(tool_name, str) or not tool_name:
-        raise ValueError(f"stage {stage_name!r} toolName is required")
-    if not isinstance(option.get("purpose"), str) or not option["purpose"]:
-        raise ValueError(f"tool {tool_name!r} purpose is required")
-    if not isinstance(option.get("requiredInExecute"), bool):
-        raise ValueError(f"tool {tool_name!r} must declare requiredInExecute")
-    minimum = option.get("minimumEvidenceCount")
-    if isinstance(minimum, bool) or not isinstance(minimum, int) or minimum < 0:
-        raise ValueError(f"tool {tool_name!r} minimumEvidenceCount is invalid")
-    required_fields = option.get("requiredResultFields", {})
-    if not isinstance(required_fields, dict):
-        raise ValueError(f"tool {tool_name!r} requiredResultFields must be an object")
-    for key in ("capabilities", "requires", "provides"):
-        _string_list(option.get(key, []), label=f"tool {tool_name!r} {key}")
-    if not isinstance(option.get("runtime"), str) or not option["runtime"]:
-        raise ValueError(f"tool {tool_name!r} runtime is required")
-    priority = option.get("priority")
-    if isinstance(priority, bool) or not isinstance(priority, int):
-        raise ValueError(f"tool {tool_name!r} priority must be an integer")
-    if not isinstance(option.get("deterministic"), bool):
-        raise ValueError(f"tool {tool_name!r} deterministic must be boolean")
-
-
 def load_profile(path: Path) -> dict[str, Any]:
-    profile = json.loads(path.read_text(encoding="utf-8"))
-    if profile.get("schemaVersion") != 1:
-        raise ValueError("pipeline profile schemaVersion must be 1")
-    declared = profile.get("stages")
-    if not isinstance(declared, list):
-        raise ValueError("pipeline profile stages must be a list")
-    names = [item.get("stage") for item in declared if isinstance(item, dict)]
-    expected = [stage.value for stage in PIPELINE_STAGES]
-    if names != expected:
-        raise ValueError("pipeline profile stages do not match the canonical order")
-    for item in declared:
-        if not isinstance(item, dict):
-            raise ValueError("pipeline profile stage entries must be objects")
-        options = _tool_options(item)
-        names = []
-        for option in options:
-            _validate_tool_option(str(item["stage"]), option)
-            names.append(str(option["toolName"]))
-        if len(names) != len(set(names)):
-            raise ValueError(f"stage {item['stage']!r} declares duplicate tool names")
-        outputs = item.get("managedOutputs")
-        if not isinstance(outputs, list) or not outputs:
-            raise ValueError(f"stage {item['stage']!r} managedOutputs are required")
-    return profile
+    """Load the profile through the canonical schema-first loader (single authority)."""
+    return load_canonical_profile(path)
 
 
 def _known_binding_keys(profile: Mapping[str, Any]) -> set[str]:
