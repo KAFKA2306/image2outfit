@@ -237,5 +237,57 @@ class HostedPoseRenderTests(unittest.TestCase):
         self.assertEqual(result, {"passed": True, "status": "NOT_REQUESTED"})
 
 
+class SkinBindingSummaryTests(unittest.TestCase):
+    def test_mesh_without_vertex_groups_is_unrigged_mesh_only_output(self) -> None:
+        summary = technical_candidate.skin_binding_summary(
+            [{"name": "TripoSG_Raw", "hasVertexGroups": False, "armatureTargets": []}]
+        )
+        self.assertEqual(summary["riggingState"], "UNRIGGED")
+        self.assertEqual(summary["unriggedMeshObjects"], ["TripoSG_Raw"])
+
+    def test_vertex_groups_without_armature_modifier_are_not_bound(self) -> None:
+        summary = technical_candidate.skin_binding_summary(
+            [{"name": "Garment", "hasVertexGroups": True, "armatureTargets": []}]
+        )
+        self.assertEqual(summary["riggingState"], "UNRIGGED")
+        self.assertEqual(summary["unriggedMeshObjects"], ["Garment"])
+
+    def test_one_unbound_mesh_makes_the_whole_scene_unrigged(self) -> None:
+        summary = technical_candidate.skin_binding_summary(
+            [
+                {
+                    "name": "Body",
+                    "hasVertexGroups": True,
+                    "armatureTargets": ["Armature"],
+                },
+                {"name": "Raw", "hasVertexGroups": False, "armatureTargets": []},
+            ]
+        )
+        self.assertEqual(summary["riggingState"], "UNRIGGED")
+        self.assertEqual(summary["unriggedMeshObjects"], ["Raw"])
+
+    def test_fully_bound_meshes_are_rigged(self) -> None:
+        summary = technical_candidate.skin_binding_summary(
+            [
+                {
+                    "name": "Body",
+                    "hasVertexGroups": True,
+                    "armatureTargets": ["Armature"],
+                },
+                {
+                    "name": "Garment",
+                    "hasVertexGroups": True,
+                    "armatureTargets": ["Armature"],
+                },
+            ]
+        )
+        self.assertEqual(summary["riggingState"], "RIGGED")
+        self.assertEqual(summary["unriggedMeshObjects"], [])
+
+    def test_empty_scene_is_not_reported_as_rigged(self) -> None:
+        summary = technical_candidate.skin_binding_summary([])
+        self.assertEqual(summary["riggingState"], "UNRIGGED")
+
+
 if __name__ == "__main__":
     unittest.main()
