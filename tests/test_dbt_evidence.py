@@ -150,6 +150,48 @@ class DbtEvidenceTests(unittest.TestCase):
             self.assertIsNone(gate["normalized_gate_state"])
             self.assertFalse(gate["gate_state_known"])
 
+    def test_stage_attempts_are_projected_with_stable_hashes(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            self._write_policy(root)
+            product_id = "attempt-garment"
+            config = root / "config" / "products" / product_id
+            config.mkdir(parents=True)
+            (config / "job.json").write_text(
+                json.dumps({"id": product_id}), encoding="utf-8"
+            )
+            attempts = (
+                root / ".image2outfit" / "products" / product_id / "stages" / "attempts"
+            )
+            stamped = attempts / "build-blender-boxmesh-20261010T032407781799Z"
+            stamped.mkdir(parents=True)
+            (stamped / "sewn-mesh.json").write_text("{}", encoding="utf-8")
+            unstamped = attempts / "draft-patterns-opensew-not-applicable-20261004"
+            unstamped.mkdir(parents=True)
+            (unstamped / "note.json").write_text("{}", encoding="utf-8")
+
+            output = root / ".image2outfit" / "dbt" / "sources"
+            report = dbt_evidence.extract(root, output)
+            first = (output / "attempts.jsonl").read_text(encoding="utf-8")
+            dbt_evidence.extract(root, output)
+            second = (output / "attempts.jsonl").read_text(encoding="utf-8")
+
+            rows = {
+                row["attempt_name"]: row for row in map(json.loads, first.splitlines())
+            }
+            self.assertEqual(report["attemptCount"], 2)
+            self.assertEqual(first, second)
+            stamped_row = rows["build-blender-boxmesh-20261010T032407781799Z"]
+            self.assertEqual(stamped_row["stage_name"], "build-blender-boxmesh")
+            self.assertEqual(stamped_row["attempt_stamp"], "20261010T032407781799Z")
+            self.assertEqual(stamped_row["file_count"], 1)
+            unstamped_row = rows["draft-patterns-opensew-not-applicable-20261004"]
+            self.assertIsNone(unstamped_row["attempt_stamp"])
+            self.assertEqual(
+                unstamped_row["stage_name"],
+                "draft-patterns-opensew-not-applicable-20261004",
+            )
+
     def test_missing_canonical_files_remain_visible(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
