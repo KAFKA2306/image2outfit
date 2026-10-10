@@ -250,6 +250,22 @@ def record_unity_ready_product_state(
     return evidence
 
 
+def skin_binding_summary(mesh_facts: list[dict[str, Any]]) -> dict[str, Any]:
+    """Classify whether every mesh is skinned to a scene armature.
+
+    A mesh is bound only when it has vertex groups and an Armature modifier that
+    targets an armature object. Anything else is UNRIGGED, so mesh-only input
+    (for example a raw TripoSG GLB) cannot pass as a rigged product.
+    """
+    unrigged = sorted(
+        str(fact["name"])
+        for fact in mesh_facts
+        if not (fact.get("hasVertexGroups") and fact.get("armatureTargets"))
+    )
+    state = "RIGGED" if mesh_facts and not unrigged else "UNRIGGED"
+    return {"riggingState": state, "unriggedMeshObjects": unrigged}
+
+
 def run_blender_structure_gate(job_path: Path) -> int:
     """Validate the current Blender scene without a legacy job adapter."""
     import bmesh  # type: ignore
@@ -278,12 +294,27 @@ def run_blender_structure_gate(job_path: Path) -> int:
         "nonManifoldEdges": 0,
         "unweightedVertices": 0,
         "weightSumErrors": 0,
+        "unriggedMeshObjects": 0,
     }
+    mesh_facts: list[dict[str, Any]] = []
 
     for obj in bpy.data.objects:
         if obj.type != "MESH":
             continue
         metrics["meshObjects"] += 1
+        mesh_facts.append(
+            {
+                "name": obj.name,
+                "hasVertexGroups": bool(obj.vertex_groups),
+                "armatureTargets": [
+                    modifier.object.name
+                    for modifier in obj.modifiers
+                    if modifier.type == "ARMATURE"
+                    and modifier.object is not None
+                    and modifier.object.type == "ARMATURE"
+                ],
+            }
+        )
         mesh = obj.data
         metrics["vertices"] += len(mesh.vertices)
         metrics["materials"] += len(mesh.materials)
@@ -323,8 +354,15 @@ def run_blender_structure_gate(job_path: Path) -> int:
         )
         bm.free()
 
+    rigging = skin_binding_summary(mesh_facts)
+    metrics["unriggedMeshObjects"] = len(rigging["unriggedMeshObjects"])
     if metrics["meshObjects"] == 0:
         errors.append("no mesh objects")
+    if rigging["unriggedMeshObjects"]:
+        errors.append(
+            "mesh objects lack armature skin binding (mesh-only input): "
+            + ", ".join(rigging["unriggedMeshObjects"])
+        )
     if metrics["nonFiniteValues"]:
         errors.append("non-finite geometry or UV values")
     if metrics["degenerateTriangles"]:
@@ -345,6 +383,8 @@ def run_blender_structure_gate(job_path: Path) -> int:
             "errors": errors,
             "warnings": warnings,
             "metrics": metrics,
+            "riggingState": rigging["riggingState"],
+            "unriggedMeshObjects": rigging["unriggedMeshObjects"],
             "blenderVersion": bpy.app.version_string,
         },
     )
