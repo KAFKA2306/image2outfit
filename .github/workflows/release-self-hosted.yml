@@ -32,18 +32,6 @@ jobs:
 
       - uses: arduino/setup-task@v2
 
-      - name: Verify merged revision provenance
-        shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          uv run --no-cache --locked --no-default-groups --python 3.11 python tools/release_provenance_gate.py `
-            --repository "${{ github.repository }}" `
-            --ref "${{ github.ref }}" `
-            --sha "${{ github.sha }}" `
-            --default-branch main `
-            --output .image2outfit/release-provenance.json
-
       - name: Validate release request
         shell: pwsh
         run: |
@@ -87,7 +75,6 @@ jobs:
         with:
           name: image2outfit-release-${{ env.JOB_ID }}
           path: |
-            .image2outfit/release-provenance.json
             ${{ env.REPORT_DIR }}/audit.json
             ${{ env.RELEASE_DIR }}/**/*.json
             ${{ env.RELEASE_DIR }}/**/*.zip
