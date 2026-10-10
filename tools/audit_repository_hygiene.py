@@ -14,7 +14,6 @@ GLOBAL_CONFIG_FILES = {
     "genworks-layout.json",
     "avatar-workflow.v1.json",
     "job.schema.v2.json",
-    "pr-merge-policy.json",
     "release-policy.json",
     "toolchain-lock.json",
 }
