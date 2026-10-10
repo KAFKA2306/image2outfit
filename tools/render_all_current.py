@@ -417,7 +417,7 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
         products.append(
             {
                 "productId": workspace.name,
-                "state": review_console.safe_state(manifest),
+                "state": review_console.safe_state(manifest, ROOT),
                 "visualAppearanceReview": visual_status,
                 "sourceKind": origin,
                 "webpCount": len(assets),

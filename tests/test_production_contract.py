@@ -241,5 +241,161 @@ class ProductionContractTest(unittest.TestCase):
         )
 
 
+class CompletionProjectionTest(unittest.TestCase):
+    POLICY = {
+        "statuses": ["WORKING", "COMPLETE", "REJECTED"],
+        "completionStatus": "COMPLETE",
+        "requiredCompletionGates": ["blender", "visualAppearanceReview"],
+        "outOfScopeGates": ["unityImport", "modularAvatar"],
+        "canonicalGateStates": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "UNVERIFIED",
+            "OUT_OF_SCOPE",
+        ],
+        "gateStateNormalization": {
+            "PASS": "PASS",
+            "FAIL": "FAIL",
+            "PENDING": "PENDING",
+        },
+        "rules": {"fitAuditFailureBlocksCompletion": False},
+    }
+
+    def _project(self, manifest: dict) -> tuple[dict, list[str]]:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "config").mkdir(parents=True)
+            (root / "config" / "genworks-handoff-policy.json").write_text(
+                json.dumps(self.POLICY), encoding="utf-8"
+            )
+            path = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"
+            path.parent.mkdir(parents=True)
+            base = {
+                "schemaVersion": 1,
+                "productId": "demo",
+                "productRoot": "Assets/GenWorks/demo",
+            }
+            path.write_text(json.dumps({**base, **manifest}), encoding="utf-8")
+            job = {
+                "id": "demo",
+                "productRoot": "Assets/GenWorks/demo",
+                "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+            }
+            projection = contract.completion_projection(
+                json.loads(path.read_text(encoding="utf-8")), root
+            )
+            errors = contract.product_state_errors(job, root)
+        return projection, errors
+
+    def test_failed_visual_review_keeps_product_working_with_one_completion_blocker(
+        self,
+    ) -> None:
+        projection, errors = self._project(
+            {
+                "state": "WORKING",
+                "completionGates": {
+                    "blender": "PASS",
+                    "visualAppearanceReview": "FAIL",
+                },
+                "technicalGates": {"unityImport": "PENDING"},
+            }
+        )
+        self.assertEqual(projection["state"], "WORKING")
+        self.assertEqual(
+            projection["completionBlockers"],
+            [{"gate": "visualAppearanceReview", "status": "FAIL"}],
+        )
+        self.assertEqual(
+            projection["runtimeGates"], [{"gate": "unityImport", "status": "PENDING"}]
+        )
+        self.assertEqual(projection["errors"], [])
+        self.assertEqual(errors, [])
+
+    def test_complete_requires_every_required_gate_pass_and_runtime_stays_pending(
+        self,
+    ) -> None:
+        projection, errors = self._project(
+            {
+                "state": "COMPLETE",
+                "completionGates": {
+                    "blender": "PASS",
+                    "visualAppearanceReview": "PASS",
+                },
+                "technicalGates": {
+                    "unityImport": "PENDING",
+                    "modularAvatar": "PENDING",
+                },
+            }
+        )
+        self.assertEqual(projection["completionBlockers"], [])
+        self.assertEqual(errors, [])
+
+    def test_missing_required_gate_is_visible_and_not_complete(self) -> None:
+        projection, errors = self._project(
+            {
+                "state": "COMPLETE",
+                "completionGates": {"blender": "PASS"},
+            }
+        )
+        self.assertEqual(
+            projection["completionBlockers"],
+            [{"gate": "visualAppearanceReview", "status": "MISSING"}],
+        )
+        self.assertIn(
+            "complete product gate is not PASS: visualAppearanceReview", errors
+        )
+
+    def test_out_of_scope_runtime_failure_is_not_a_completion_blocker(self) -> None:
+        projection, errors = self._project(
+            {
+                "state": "WORKING",
+                "completionGates": {
+                    "blender": "PASS",
+                    "visualAppearanceReview": "PASS",
+                },
+                "technicalGates": {"modularAvatar": "FAIL"},
+            }
+        )
+        self.assertEqual(projection["completionBlockers"], [])
+        self.assertEqual(
+            projection["runtimeGates"], [{"gate": "modularAvatar", "status": "FAIL"}]
+        )
+        self.assertEqual(errors, [])
+
+    def test_unknown_lifecycle_and_gate_values_fail_visibly(self) -> None:
+        projection, errors = self._project(
+            {
+                "state": "DONE",
+                "completionGates": {
+                    "blender": "MAYBE",
+                    "visualAppearanceReview": "PASS",
+                },
+            }
+        )
+        self.assertIsNone(projection["state"])
+        self.assertIn("unknown product lifecycle state: DONE", projection["errors"])
+        self.assertIn(
+            "unknown completion gate state: blender=MAYBE", projection["errors"]
+        )
+        self.assertIn("unknown product lifecycle state: DONE", errors)
+
+    def test_contradictory_state_and_status_fail_visibly(self) -> None:
+        projection, _ = self._project(
+            {
+                "state": "WORKING",
+                "status": "REJECTED",
+                "completionGates": {
+                    "blender": "PASS",
+                    "visualAppearanceReview": "PASS",
+                },
+            }
+        )
+        self.assertIsNone(projection["state"])
+        self.assertTrue(
+            any("contradicts status" in message for message in projection["errors"])
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

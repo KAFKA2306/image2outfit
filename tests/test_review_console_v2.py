@@ -147,6 +147,56 @@ class ReviewConsoleTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp.cleanup()
 
+    def test_completion_projection_is_shared_with_review_console(self) -> None:
+        (self.root / "config" / "genworks-handoff-policy.json").write_text(
+            json.dumps(
+                {
+                    "statuses": ["WORKING", "COMPLETE", "REJECTED"],
+                    "completionStatus": "COMPLETE",
+                    "requiredCompletionGates": ["blender", "visualAppearanceReview"],
+                    "outOfScopeGates": ["unityImport"],
+                }
+            ),
+            encoding="utf-8",
+        )
+        manifest = (
+            self.root / "Assets" / "GenWorks" / "demo-outfit" / "ProductManifest.json"
+        )
+        manifest.write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 1,
+                    "productId": "demo-outfit",
+                    "productRoot": "Assets/GenWorks/demo-outfit",
+                    "status": "WORKING",
+                    "completionGates": {
+                        "blender": "PASS",
+                        "visualAppearanceReview": "FAIL",
+                    },
+                    "technicalGates": {"unityImport": "PENDING"},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        data = MODULE.build(self.root, self.output)
+
+        record = data["products"][0]
+        self.assertEqual(record["state"], "WORKING")
+        self.assertEqual(
+            record["completion"]["completionBlockers"],
+            [{"gate": "visualAppearanceReview", "status": "FAIL"}],
+        )
+        gates = {gate["name"]: gate for gate in record["gates"]}
+        self.assertEqual(gates["visualAppearanceReview"]["status"], "FAIL")
+        self.assertEqual(gates["blender"]["status"], "PASS")
+        self.assertIn("runtime/release", gates["unityImport"]["detail"])
+        messages = [blocker["message"] for blocker in record["blockers"]]
+        self.assertIn(
+            "required completion gate is FAIL: visualAppearanceReview", messages
+        )
+        self.assertFalse(any("unityImport" in message for message in messages))
+
     def test_build_reports_state_blockers_assets_gates_and_hashes(self) -> None:
         data = MODULE.build(self.root, self.output)
         self.assertEqual(data["schema_version"], "review-console.v2")
