@@ -67,10 +67,15 @@ def run_command(
 def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
     """Resolve the current checkpoint-bound sewn mesh for a candidate build."""
     pipeline = job.get("garmentPipeline")
-    if not isinstance(pipeline, dict) or pipeline.get("meshSource") != "garmentcode-boxmesh":
+    if (
+        not isinstance(pipeline, dict)
+        or pipeline.get("meshSource") != "garmentcode-boxmesh"
+    ):
         raise ValueError("job does not declare the GarmentCode BoxMesh source")
 
-    state_path = ROOT / ".image2outfit" / "products" / str(job["id"]) / "pipeline-state.json"
+    state_path = (
+        ROOT / ".image2outfit" / "products" / str(job["id"]) / "pipeline-state.json"
+    )
     state = candidate_contract.read(state_path)
     if state.get("product_id") != job.get("id") or state.get("status") != "EXECUTED":
         raise ValueError("an executed product checkpoint is required for the sewn mesh")
@@ -92,10 +97,14 @@ def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
         if not isinstance(evidence, list):
             continue
         for item in evidence:
-            if not isinstance(item, dict) or not str(item.get("path", "")).endswith("/sewn-mesh.json"):
+            if not isinstance(item, dict) or not str(item.get("path", "")).endswith(
+                "/sewn-mesh.json"
+            ):
                 continue
             mesh_path = candidate_contract.path(item["path"])
-            if not mesh_path.is_file() or candidate_contract.digest(mesh_path) != item.get("sha256"):
+            if not mesh_path.is_file() or candidate_contract.digest(
+                mesh_path
+            ) != item.get("sha256"):
                 continue
             mesh = candidate_contract.read(mesh_path)
             topology = mesh.get("topology")
@@ -115,7 +124,9 @@ def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
                 continue
             return mesh_path, item["sha256"], int(record.get("sequence", 0))
 
-    raise ValueError("checkpoint has no hash-current, topology-valid sewn-mesh exchange")
+    raise ValueError(
+        "checkpoint has no hash-current, topology-valid sewn-mesh exchange"
+    )
 
 
 def run_hosted_pose_render(
@@ -437,7 +448,10 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
 
     if prepared is None:
         build_exit = None
-        stages["sewnMeshInput"] = {"passed": False, "error": "Blender runtime unavailable"}
+        stages["sewnMeshInput"] = {
+            "passed": False,
+            "error": "Blender runtime unavailable",
+        }
     else:
         build_environment = dict(prepared.environment)
         build_environment["IMAGE2OUTFIT_RUN_ID"] = str(run_id)
