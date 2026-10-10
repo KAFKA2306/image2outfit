@@ -43,7 +43,7 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Implement a sewn gusset and reshape the shorts seat/front coverage against the measured current 21.95 mm crouch and 101.69 mm sit front-hem offsets. Then measure same-XY coverage in both poses; world-Z bounds alone are not fit evidence. Preserve the current bounded skirt weight profile because its averages alone do not explain the remaining defect. Resume the canonical workflow, inspect eleven fresh renders, and keep visual, geometry, fit, Unity/VRChat, packaging, and release gates truthful. No SDK upload until those gates pass.",
+    "nextAction": "Resume the canonical workflow only after its write-boundary safety check no longer encounters an unrelated untracked workspace path. Then inspect rebuilt crouch/sit renders and measure same-XY shorts coverage; world-Z bounds alone are not fit evidence. The measured 21.95 mm crouch and 101.69 mm sit front-hem offsets still need a fitted front-seat correction and sewn gusset. Keep all appearance, fit, Unity/VRChat, package, and release gates truthful. No SDK upload until those gates pass.",
     "lastAttempt": {
       "runId": "93350e300feb494091eeb07f0fdcd8a7",
       "status": "PARTIAL",
@@ -106,7 +106,7 @@
       "checkpointSha256": "674d568bfccff1699c1129f84fca3eeab7f0cf3497a130e80625e3abe32a9379",
       "blockedStage": "visual-review",
       "failure": "visual-review failed because the inspected image hashes did not match the current rendered evidence.",
-      "nextAction": "Implement a sewn gusset and reshape the shorts seat/front coverage against the measured current 21.95 mm crouch and 101.69 mm sit front-hem offsets. Then measure same-XY coverage in both poses; world-Z bounds alone are not fit evidence. Preserve the current bounded skirt weight profile because its averages alone do not explain the remaining defect. Resume the canonical workflow, inspect eleven fresh renders, and keep visual, geometry, fit, Unity/VRChat, packaging, and release gates truthful. No SDK upload until those gates pass."
+        "nextAction": "Resume the canonical workflow only after its write-boundary safety check no longer encounters an unrelated untracked workspace path. Then inspect rebuilt crouch/sit renders and measure same-XY shorts coverage; world-Z bounds alone are not fit evidence. The measured 21.95 mm crouch and 101.69 mm sit front-hem offsets still need a fitted front-seat correction and sewn gusset. Keep all appearance, fit, Unity/VRChat, package, and release gates truthful. No SDK upload until those gates pass."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",

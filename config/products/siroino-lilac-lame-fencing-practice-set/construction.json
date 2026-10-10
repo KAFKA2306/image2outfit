@@ -142,10 +142,6 @@
       "pieceIds": [
         "overskirt-front",
         "overskirt-back",
-        "shorts-front-left",
-        "shorts-front-right",
-        "shorts-back-left",
-        "shorts-back-right",
         "waistband-front",
         "waistband-back"
       ],
@@ -175,6 +171,43 @@
         "centerlineHalfWidthM": 0.02,
         "fullSideWeightWidthM": 0.06,
         "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh: current side hem vertices average 0.963 ipsilateral thigh weight, while 67 centerline hem vertices average 0.970 combined thigh weight and 0.030 Hips. Fade centerline influence to Hips and cap lateral hem thigh influence at 0.65; retain 0.15 thigh weight at the waistband. Intended to reduce opposing thigh pull and raised/curling flaps; no pose, fit, penetration or runtime acceptance is granted."
+      }
+    },
+    {
+      "pieceIds": [
+        "shorts-front-left",
+        "shorts-front-right",
+        "shorts-back-left",
+        "shorts-back-right"
+      ],
+      "bodyTriangleZM": [
+        0.45,
+        0.87
+      ],
+      "excludedBoneNamePrefixes": [
+        "UpperArm",
+        "LowerArm",
+        "Hand",
+        "Finger",
+        "Shoulder"
+      ],
+      "evidenceBoundary": "Prototype-only lower-body transfer scope, split from the overskirt region so shorts can use a distinct leg-following profile. Measurements are from weighted-prototype.blend SHA-256 1eb91a6da98abb71ce84cc2abfba3a796c1e248065c5b8b5b7234ac24fe0fd15 and skin-export-report.json SHA-256 95504701666a66515fe47d684ae0c898691c7a562d62aa131a85b2a09eefbfee: shorts hem means 0.778 ipsilateral thigh, 0.211 contralateral thigh, 0.008 Hips; waist mean Hips 0.946. This hypothesis removes contralateral thigh influence away from the medial fade. No fit, coverage, pose, penetration, or runtime acceptance.",
+      "weightProfile": {
+        "method": "hip-anchored-lateral-thigh-fade-v1",
+        "pieceIds": [
+          "shorts-front-left",
+          "shorts-front-right",
+          "shorts-back-left",
+          "shorts-back-right"
+        ],
+        "hipBone": "Hips",
+        "leftThighBone": "UpperLeg_L",
+        "rightThighBone": "UpperLeg_R",
+        "waistThighWeight": 0.05,
+        "hemThighWeight": 0.9,
+        "centerlineHalfWidthM": 0.02,
+        "fullSideWeightWidthM": 0.06,
+        "evidenceBoundary": "Experimental shorts weighting hypothesis bounded by the current hash-bound weighted prototype: keep the waist nearly Hips-driven, fade medial vertices to Hips, and assign lateral hem vertices to their ipsilateral thigh only. Directly inspect rebuilt crouch/sit source and measure same-XY underlayer coverage; no fit or motion acceptance."
       }
     }
   ]

@@ -104,7 +104,22 @@
     "grantsFitAcceptance": false,
     "grantsQualityAcceptance": false
   },
-  "nextAction": "Keep the candidate REJECTED. Use the measured 21.95 mm crouch and 101.69 mm sit front-hem offsets to reshape the shorts seat/front coverage and add a sewn gusset; then measure same-XY underlayer coverage because world-Z envelopes alone do not prove it. Do not retune skirt weights from these bounded averages alone. Reduce sleeve faceting, form ordered skirt pleats, make the plastron/quilt and back waist detail visibly constructed, and resolve collar/front closure. Regenerate through the canonical workflow and directly inspect all eleven fresh image hashes. Do not claim fit, Unity, VRChat, or upload acceptance.",
+  "measuredShortsWeightTransferHypothesis": {
+    "executionStatus": "CONFIGURED_NOT_EXECUTED",
+    "executionBoundary": "The canonical workflow stopped at ingest-reference before any manufacturing stage because its transaction safety rollback detected an untracked path outside the declared product workspace. Existing generated mesh and render evidence remain from the previous source.",
+    "sourceWeightedPrototypeBlendSha256": "1eb91a6da98abb71ce84cc2abfba3a796c1e248065c5b8b5b7234ac24fe0fd15",
+    "sourceSkinExportReportSha256": "95504701666a66515fe47d684ae0c898691c7a562d62aa131a85b2a09eefbfee",
+    "measuredShortsMeanWeights": {
+      "waist": {"hips": 0.946, "ipsilateralUpperLeg": 0.047, "contralateralUpperLeg": 0.0},
+      "hem": {"hips": 0.008, "ipsilateralUpperLeg": 0.779, "contralateralUpperLeg": 0.211}
+    },
+    "prototypeChange": "Split shorts from the overskirt weight region. Use a Hips-to-ipsilateral-thigh lateral fade for shorts: 0.05 thigh at waist, 0.90 at hem, centerline fade 0.02 m to full side at 0.06 m.",
+    "reason": "Measured contralateral thigh influence at the shorts hem may pull panels across the centerline during leg rotation. This is a prototype hypothesis and must be inspected after rebuild.",
+    "validationRequired": "Regenerate weighted mesh and poses; inspect new renders and measure same-XY shorts coverage in crouch and sit. World-Z extrema do not prove coverage.",
+    "grantsFitAcceptance": false,
+    "grantsQualityAcceptance": false
+  },
+  "nextAction": "Resume the canonical workflow only after its write-boundary safety check no longer encounters an unrelated untracked workspace path. Then inspect the rebuilt shorts in crouch and sit and measure same-XY underlayer coverage. Keep REJECTED unless direct evidence clears every blocker. The measured 21.95 mm crouch and 101.69 mm sit front-hem offsets still require a fitted seat/front coverage correction and sewn gusset. Reduce sleeve faceting, form ordered skirt pleats, make the plastron/quilt and back waist detail visibly constructed, and resolve collar/front closure. Do not claim fit, Unity, VRChat, or upload acceptance.",
   "verifiedPoseCorrection": {
     "pose": "arms-up",
     "method": "imported bone local Y mapped to world +Z",
