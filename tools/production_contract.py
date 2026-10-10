@@ -246,28 +246,28 @@ def _canonical_gate_state(value: Any, handoff: dict[str, Any]) -> str | None:
 
 def _lifecycle_state(
     manifest: dict[str, Any], handoff: dict[str, Any], errors: list[str]
-) -> str | None:
+) -> tuple[str | None, str | None]:
     recorded = {
         key: str(manifest[key]).upper()
         for key in ("state", "status")
         if manifest.get(key) is not None
     }
     if not recorded:
-        return "WORKING"
+        return "WORKING", "MISSING"
     if len(set(recorded.values())) > 1:
         errors.append(
             "product lifecycle state contradicts status: "
             + ", ".join(f"{key}={value}" for key, value in recorded.items())
         )
-        return None
+        return None, "CONTRADICTORY"
     value = next(iter(recorded.values()))
     statuses = handoff.get("statuses")
     if not isinstance(statuses, list):
         statuses = list(LIFECYCLE_STATES)
     if value not in statuses:
         errors.append(f"unknown product lifecycle state: {value}")
-        return None
-    return value
+        return None, "UNKNOWN"
+    return value, None
 
 
 def completion_projection(manifest: dict[str, Any], root: Path) -> dict[str, Any]:
@@ -280,7 +280,7 @@ def completion_projection(manifest: dict[str, Any], root: Path) -> dict[str, Any
     """
     handoff = _handoff_policy(root)
     errors: list[str] = []
-    state = _lifecycle_state(manifest, handoff, errors)
+    state, lifecycle_issue = _lifecycle_state(manifest, handoff, errors)
 
     completion_gates = manifest.get("completionGates")
     if completion_gates is not None and not isinstance(completion_gates, dict):
@@ -318,6 +318,7 @@ def completion_projection(manifest: dict[str, Any], root: Path) -> dict[str, Any
 
     return {
         "state": state,
+        "lifecycleIssue": lifecycle_issue,
         "completionGates": gates,
         "completionBlockers": blockers,
         "runtimeGates": runtime,

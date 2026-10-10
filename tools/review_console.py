@@ -32,10 +32,15 @@ IMAGE_SUFFIXES = (".png", ".webp", ".jpg", ".jpeg")
 
 
 def load_json(path: Path, default: Any) -> Any:
+    """Return `default` only when the file is absent; malformed JSON is a hard failure."""
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (FileNotFoundError, UnicodeDecodeError, json.JSONDecodeError):
+        text = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
         return default
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as error:
+        raise ValueError(f"malformed JSON in {path}: {error}") from error
 
 
 def pick(mapping: Any, *keys: str, default: Any = None) -> Any:
@@ -83,10 +88,22 @@ def relative_href(path: Path, output_dir: Path) -> str:
     return Path(os.path.relpath(path, output_dir)).as_posix()
 
 
+def console_state(completion: dict[str, Any], manifest: dict[str, Any]) -> str:
+    """Lifecycle state from the shared projection.
+
+    Unknown or missing values fail the build. A contradiction between state and
+    status stays visible as INVALID; its errors are listed as blockers.
+    """
+    if completion["lifecycleIssue"] in {"UNKNOWN", "MISSING"}:
+        raw = pick(manifest, "state", "status")
+        raise ValueError(f"unknown or missing product state: {raw!r}")
+    return completion["state"] or "INVALID"
+
+
 def safe_state(manifest: dict[str, Any], root: Path) -> str:
-    """Lifecycle state from the shared completion projection; INVALID when unknown."""
-    state = production_contract.completion_projection(manifest, root)["state"]
-    return state or "INVALID"
+    return console_state(
+        production_contract.completion_projection(manifest, root), manifest
+    )
 
 
 def policy_requirements(policy: dict[str, Any]) -> tuple[list[str], list[str]]:
@@ -736,7 +753,7 @@ def collect_product(
         slug=workspace.name,
         downloads=collect_downloads(root, workspace, output_dir, manifest, assets),
         completion=completion,
-        state=completion["state"] or "INVALID",
+        state=console_state(completion, manifest),
         updated_at=str(updated_at or "UNKNOWN"),
         blocker_count=len(blockers),
         blockers=blockers,
