@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Audit ownership, duplication, opaque loaders, resources, and import depth."""
+
 from __future__ import annotations
 
 import ast
@@ -161,7 +162,11 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
             if source == script:
                 continue
             source_relative = source.relative_to(root).as_posix()
-            if relative in text or script.stem in _imports(text, source):
+            if (
+                relative in text
+                or script.name in text
+                or script.stem in _imports(text, source)
+            ):
                 references.add(source_relative)
         job_owners = owners.get(relative, [])
         raw_groups[hashlib.sha256(content.encode()).hexdigest()].append(relative)
@@ -207,7 +212,9 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                 )
             )
         )
-        resource_hashes[hashlib.sha256(resource.read_bytes()).hexdigest()].append(relative)
+        resource_hashes[hashlib.sha256(resource.read_bytes()).hexdigest()].append(
+            relative
+        )
         resource_inventory.append(
             {"path": relative, "references": references, "unreferenced": not references}
         )
@@ -234,7 +241,9 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
         "schemaVersion": 1,
         "scriptCount": len(inventory),
         "unreferenced": [item["path"] for item in inventory if item["unreferenced"]],
-        "duplicateGroups": [values for values in raw_groups.values() if len(values) > 1],
+        "duplicateGroups": [
+            values for values in raw_groups.values() if len(values) > 1
+        ],
         "semanticDuplicateGroups": [
             values for values in semantic_groups.values() if len(values) > 1
         ],

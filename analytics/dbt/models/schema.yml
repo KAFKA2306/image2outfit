@@ -52,3 +52,62 @@ models:
         data_tests: [not_null]
       - name: gate_state_policy_sha256
         data_tests: [not_null]
+
+  - name: dim_product
+    description: One row per canonical product job.
+    columns:
+      - name: product_id
+        data_tests: [not_null, unique]
+
+  - name: dim_run
+    description: One row per current manifest snapshot; run_id is derived from its hash.
+    columns:
+      - name: run_id
+        data_tests: [not_null, unique]
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_id
+
+  - name: dim_gate
+    description: Distinct canonical gate identities across all products.
+    columns:
+      - name: gate_id
+        data_tests: [not_null, unique]
+      - name: gate_family
+        data_tests: [not_null]
+      - name: gate_name
+        data_tests: [not_null]
+
+  - name: fct_gate_observation
+    description: One observed gate state per product, manifest snapshot, and gate identity.
+    columns:
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_id
+      - name: run_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_run')
+                field: run_id
+      - name: gate_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_gate')
+                field: gate_id
+      - name: gate_state_known
+        data_tests: [not_null]
+
+  - name: manufacturing_status
+    description: Product and current manifest gate counts derived from the star schema.

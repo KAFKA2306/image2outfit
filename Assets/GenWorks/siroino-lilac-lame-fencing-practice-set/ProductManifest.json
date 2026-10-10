@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "productName": "Lilac Lamé Fencing Practice Set for SiroinoSotai PC",
-  "status": "WORKING",
+  "status": "REJECTED",
   "state": "WORKING",
   "targetAdapterId": "siroino-v1.0",
   "productRoot": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
@@ -25,11 +25,11 @@
     "openSew2dEndpointAudit": "PENDING",
     "visualAppearanceReview": "FAIL",
     "blender": "PENDING",
-    "editableSource": "PENDING",
-    "fbx": "PENDING",
+    "editableSource": "PASS",
+    "fbx": "PASS",
     "prefabDeclared": "PENDING",
-    "fiveViewEvidence": "PENDING",
-    "poseEvidence": "PENDING",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
     "licenseReview": "PENDING"
   },
   "releaseReadiness": {
@@ -214,5 +214,16 @@
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"
-  }
+  },
+  "completionGates": {
+    "blender": "FAIL",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "FAIL",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "FAIL",
+    "researchTrial": "PASS"
+  },
+  "candidateState": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Candidate/candidate-state.json"
 }
