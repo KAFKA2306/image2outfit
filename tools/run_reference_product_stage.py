@@ -1956,18 +1956,65 @@ def stage_render(job: Mapping[str, Any], result: Path) -> None:
     )
 
 
-def stage_audit(job: Mapping[str, Any], result: Path) -> None:
-    product_id = str(job["id"])
-    report = repo_path(
+def _candidate_geometry_quality(
+    job: Mapping[str, Any],
+) -> tuple[dict[str, Any], list[Path]]:
+    """Combine sewn-topology and post-skin weight evidence for the current candidate.
+
+    The sewn prototype report is written before skin transfer and deliberately marks
+    every vertex unweighted.  That is not a measurement of the later exported
+    garment.  For this pipeline, use the hash-bound skin export report for weight
+    facts while retaining the prototype report's topology and fit gates.
+    """
+    build_report_path = repo_path(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
         label="build report",
     )
-    quality = geometry_quality(read_object(report, "build report"))
+    report = read_object(build_report_path, "build report")
+    evidence_paths = [build_report_path]
+    if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
+        product_id = str(job["id"])
+        skin_path = runtime_root(product_id) / "skin/skin-export-report.json"
+        skin = read_object(skin_path, "skin export report")
+        weighted_blend = repo_path(skin["weightedBlendPath"], label="weighted prototype")
+        fbx = repo_path(job["fbxAssetPath"], label="FBX")
+        if (
+            skin.get("productId") != product_id
+            or skin.get("executionStatus") != "PASS"
+            or sha256(weighted_blend) != skin.get("weightedBlendSha256")
+            or sha256(fbx) != skin.get("fbxSha256")
+        ):
+            raise ValueError("skin/export evidence is stale or bound to another candidate")
+        audits = skin.get("audits")
+        weights_verified = (
+            isinstance(audits, Mapping)
+            and bool(audits)
+            and all(isinstance(item, Mapping) and item.get("passed") is True
+                    for item in audits.values())
+            and skin.get("unweightedVertices") == 0
+        )
+        combined = dict(report)
+        metrics = dict(report.get("metrics", {}))
+        metrics["unweightedVertices"] = skin.get("unweightedVertices")
+        combined["metrics"] = metrics
+        geometry_gate = dict(report.get("geometryGate", {}))
+        checks = dict(geometry_gate.get("checks", {}))
+        checks["deformWeightsVerified"] = weights_verified
+        geometry_gate["checks"] = checks
+        combined["geometryGate"] = geometry_gate
+        report = combined
+        evidence_paths.append(skin_path)
+    return geometry_quality(report), evidence_paths
+
+
+def stage_audit(job: Mapping[str, Any], result: Path) -> None:
+    product_id = str(job["id"])
+    quality, evidence_paths = _candidate_geometry_quality(job)
     emit(
         result,
         stage="audit-geometry",
         product_id=product_id,
-        paths=[report],
+        paths=evidence_paths,
         extra={
             "qualityDecision": quality["decision"],
             "geometryPassed": quality["passed"],
@@ -2028,11 +2075,7 @@ def stage_finalize(
         {relative(path): sha256(path) for path in images},
     )
 
-    build_report_path = repo_path(
-        f"{job['productRoot']}/Evidence/Build/product-build-report.json",
-        label="build report",
-    )
-    geometry = geometry_quality(read_object(build_report_path, "build report"))
+    geometry, geometry_evidence = _candidate_geometry_quality(job)
     pose_paths = [
         repo_path(value, label="pose") for value in job.get("posePaths", {}).values()
     ]
@@ -2088,7 +2131,7 @@ def stage_finalize(
         result,
         stage="finalize-candidate",
         product_id=product_id,
-        paths=[candidate_path, manifest_path, review_path],
+        paths=[candidate_path, manifest_path, review_path, *geometry_evidence],
         extra={
             "decisionRecorded": True,
             "candidateStatus": status,
