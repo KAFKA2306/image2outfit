@@ -2139,6 +2139,10 @@ def stage_render(job: Mapping[str, Any], result: Path) -> None:
         render_artifacts = [
             log,
             runtime_root(product_id) / "reports/weighted-render.json",
+            repo_path(
+                f"{job['productRoot']}/Evidence/Build/pose-coverage-diagnostic.json",
+                label="pose coverage diagnostic",
+            ),
         ]
     images = review_image_paths(job)
     view_count = len(job["previewPaths"])

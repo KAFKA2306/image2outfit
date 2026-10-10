@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Keep the candidate REJECTED. The previous world-Z pose measurements belong to a superseded weighted prototype and must not be reused. On this rebuilt source, first measure garment-to-avatar coverage at matching surface coordinates in crouch and sit, then construct a fitted seat/thigh contour and gusset. Reduce sleeve faceting; form controlled skirt pleats; make plastron, elbow quilting, back waist detail, collar and closure visibly constructed. Regenerate the mesh and all poses, then directly inspect all eleven new image hashes. Do not claim Shape Key, fit, Unity, VRChat or upload acceptance.",
+    "nextAction": "Keep the candidate REJECTED. Use the hash-bound crouch/sit same-pose coverage report to reshape the fitted seat and upper-thigh shells and add a sewn gusset; do not reuse the invalidated world-Z prototype measurements. Reduce sleeve faceting, form controlled skirt pleats, make the plastron, elbow quilting, back waist detail, collar and closure visibly constructed. Regenerate the mesh and all poses, then directly inspect all eleven new image hashes. Do not claim Shape Key, fit, Unity, VRChat or upload acceptance.",
     "lastAttempt": {
-      "runId": "ed059b38b5ee4297bff34a1e6b0806d6",
+      "runId": "cd5959051bd14cc08bb56e7670914125",
       "status": "EXECUTED",
-      "checkedAt": "2026-10-10T19:54:20Z",
+      "checkedAt": "2026-10-10T21:56:04Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "1b0882cc296398b73fbd3c80bb67022ce8e3f707c1b36110696a00a52aa90879",
+      "stageEvidenceSha256": "9cb367b49a11281ab8d6c94e83bf885373d41f1c067c849637349ada7159f74b",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -67,61 +67,61 @@
         },
         "draft-patterns": {
           "status": "REUSED",
-          "stageResultSha256": "cc8e8d1a82bb377e0ebceab34cc50c0bb45a8937733287264063d88ee3570d7e"
+          "stageResultSha256": "8021016f500b3180461b71fd53dee4538091f7a7e88baf6187032d49a7969716"
         },
         "infer-stitches": {
           "status": "REUSED",
-          "stageResultSha256": "23d489c6284a9aa8c22f87744e71758ba5623602b65098d2c3e8ca3d2129afb2"
+          "stageResultSha256": "e31c66e8656a65d18c93817b618705ed657d70deff47f86df412e909c6ded8fd"
         },
         "initialize-3d": {
           "status": "REUSED",
-          "stageResultSha256": "fddf66a5b20539c8676d8e86a69930eef8c2706261b496c6d4bed741a0c2b2e1"
+          "stageResultSha256": "62280194d572a61dacd84ade2fee4243fc673c9e688f8fd72ab2db18ff208632"
         },
         "build-blender": {
           "status": "REUSED",
-          "stageResultSha256": "f3d1dd6d9db9d7dff946157d08da0bc0f076a450a67862802ef43135e06e22f4"
+          "stageResultSha256": "fdc9d46cfc452d7e7aae0c420e9bef71e051cd86fbff3edd52155eb30ee955cb"
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "56cfbfe4063e04d665506c6f5ee65402e1644bfad8c3c033a5cb3bfb398ebe6f"
+          "stageResultSha256": "ea976d067074ea671a0d2f4cca1c67df84096c31ba9c842286d9eb55b86d2720"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "dcc00ee656492d8a14d33798a62824cfbc4cd56875161799adced7d01155354e"
+          "stageResultSha256": "139c475280a7fd07e2dc9a8ffcb3527b8b344a4859353b580aad612f3c230bc3"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "63a04eff73b538a93fbb89a0ef2a225579fe762011e6263194a78cdded6aa6f7"
+          "stageResultSha256": "4cf3d98bcc3ca582b39bb6aa50d21f24ffd6123ace036c172af3e607397df184"
         },
         "audit-geometry": {
           "status": "REUSED",
-          "stageResultSha256": "3fbfe6753f30c66d7c57c422999bacf0de89f6e52165443514f907f980044a17"
+          "stageResultSha256": "06ce5979d13668ce15e9ed083942d3b1743f823f36799b32d9de597f416200eb"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "7c78860f9a004f89b3ef2b30d8e0dd254920b2dfe38d1f2e77f343caf325e977"
+          "stageResultSha256": "4650e0e7b54af8d02cbac09bc6e1660bf3c0c19159a513f5ac13f92af31bb543"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "1b0882cc296398b73fbd3c80bb67022ce8e3f707c1b36110696a00a52aa90879"
+          "stageResultSha256": "9cb367b49a11281ab8d6c94e83bf885373d41f1c067c849637349ada7159f74b"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "82e04de39454a01fa80053f8d6e660e69e19206a28e0d584bc5db5c84ca4efbe",
+      "checkpointSha256": "ba8da0a0618452af06d777b9397b46b4034c6060e44865433b27477e11ac9a3d",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Keep the candidate REJECTED. The previous world-Z pose measurements belong to a superseded weighted prototype and must not be reused. On this rebuilt source, first measure garment-to-avatar coverage at matching surface coordinates in crouch and sit, then construct a fitted seat/thigh contour and gusset. Reduce sleeve faceting; form controlled skirt pleats; make plastron, elbow quilting, back waist detail, collar and closure visibly constructed. Regenerate the mesh and all poses, then directly inspect all eleven new image hashes. Do not claim Shape Key, fit, Unity, VRChat or upload acceptance."
+      "nextAction": "Keep the candidate REJECTED. Use the hash-bound crouch/sit same-pose coverage report to reshape the fitted seat and upper-thigh shells and add a sewn gusset; do not reuse the invalidated world-Z prototype measurements. Reduce sleeve faceting, form controlled skirt pleats, make the plastron, elbow quilting, back waist detail, collar and closure visibly constructed. Regenerate the mesh and all poses, then directly inspect all eleven new image hashes. Do not claim Shape Key, fit, Unity, VRChat or upload acceptance."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "6365c6eca378f752029f95c61b40a9a44a4738abd5caadfa99feb6b2e751ecbc",
+      "sourceSha256": "91c663628b871a82808c2f5a23325bfc97212914c2aa0970f58d969179e49455",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "03c07e089c28897f71d6c575b2595944038361928545886f44fbd5ef98fcbdd4",
+      "reportSha256": "1eb80627bc1566d1e5ae0aa63aca618e4ebbf685bdcf71ecd332d278aef00ced",
       "metrics": {
         "vertices": 9412,
         "triangles": 18253,
@@ -134,7 +134,7 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "c6be3488cbadf05fd4f42e11566f4b430d350cbabd232f38a37508f8c637cf82",
+      "sha256": "dc13fbc1d70d4ef1d23dabbae04b27b6864ca9f040014467e1aca64bde618948",
       "findings": [
         {
           "severity": "BLOCKER",
@@ -149,7 +149,7 @@
         {
           "severity": "BLOCKER",
           "code": "SKIRT_CONSTRUCTION_UNRESOLVED",
-          "description": "The standing overskirt has an uncontrolled, rumpled flare rather than readable ordered pleats. In crouch the skirt separates into flaps and leaves large gaps to the shorts; in sit the shorts read as oversized blunt cylindrical thigh shells with visible avatar gaps."
+          "description": "Direct inspection of the current front/back/side/three-quarter views and all six poses confirms the skirt remains uncontrolled and opens into separated flaps under crouch; sitting lifts the skirt and exposes large gaps around blunt cylindrical shorts. Same-pose surface projection measured under-shorts coverage on posterior pelvis samples at 17.7% crouch and 19.3% sit, and upper-thigh samples at 60.6% crouch and 60.1% sit. Overskirt posterior-pelvis coverage was 59.0% crouch and 60.7% sit, with 80.6 mm and 115.5 mm p95 ray gaps. This is a geometric diagnostic only, not fit acceptance."
         },
         {
           "severity": "BLOCKER",
