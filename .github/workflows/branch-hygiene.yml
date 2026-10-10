@@ -197,38 +197,84 @@ jobs:
               return remainingOpen;
             }
 
+            const directPushMarker = "<!-- pr-governance:direct-push -->";
+            const mergeAssociationAttempts = 10;
+            const mergeAssociationDelayMs = 30000;
+
+            function sleep(ms) {
+              return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async function commitMergedThroughPull(sha) {
+              const associated = await github.paginate(
+                github.rest.repos.listPullRequestsAssociatedWithCommit,
+                { owner, repo, commit_sha: sha, per_page: 100 },
+              );
+              if (associated.some(pr =>
+                Boolean(pr.merged_at) && pr.base?.ref === defaultBranch && pr.merge_commit_sha === sha,
+              )) return true;
+              // The association can lag right after a merge; the newest closed PRs into the default branch are checked too.
+              const recentlyClosed = await github.rest.pulls.list({
+                owner,
+                repo,
+                state: "closed",
+                base: defaultBranch,
+                sort: "updated",
+                direction: "desc",
+                per_page: 100,
+              });
+              return recentlyClosed.data.some(pr => Boolean(pr.merged_at) && pr.merge_commit_sha === sha);
+            }
+
+            async function waitForMergeAssociation(sha) {
+              for (let attempt = 1; attempt <= mergeAssociationAttempts; attempt += 1) {
+                if (await commitMergedThroughPull(sha)) return true;
+                if (attempt < mergeAssociationAttempts) await sleep(mergeAssociationDelayMs);
+              }
+              return false;
+            }
+
+            async function findDirectPushIssue(sha) {
+              // Search by the full SHA, which every direct-push issue body contains, so the same push is tracked once.
+              const found = await github.rest.search.issuesAndPullRequests({
+                q: `repo:${owner}/${repo} is:issue in:body "${sha}"`,
+                per_page: 100,
+              });
+              return found.data.items.find(item =>
+                !item.pull_request && String(item.body || "").includes(directPushMarker) && String(item.body || "").includes(sha),
+              ) || null;
+            }
+
             async function guardDefaultBranchPush() {
               if (context.eventName !== "push" || context.ref !== `refs/heads/${defaultBranch}`) return false;
               const before = String(context.payload.before || "");
               const after = String(context.payload.after || "");
               if (!before || /^0+$/.test(before) || !after || before === after) return false;
 
-              const associated = await github.paginate(
-                github.rest.repos.listPullRequestsAssociatedWithCommit,
-                { owner, repo, commit_sha: after, per_page: 100 },
-              );
-              const mergedThroughPull = associated.some(pr =>
-                Boolean(pr.merged_at) && pr.base?.ref === defaultBranch && pr.merge_commit_sha === after,
-              );
-              if (mergedThroughPull) return false;
+              if (await waitForMergeAssociation(after)) return false;
 
               const message = `Direct push ${after} to ${defaultBranch} was not produced by a merged pull request.`;
               if (dryRun) {
                 core.warning(`[dry-run] ${message}`);
                 return false;
               }
-              await github.rest.issues.create({
-                owner,
-                repo,
-                title: `Direct push detected on ${defaultBranch}: ${after.slice(0, 12)}`,
-                body: [
-                  "<!-- pr-governance:direct-push -->",
-                  message,
-                  `Previous SHA: \`${before}\``,
-                  `Actor: \`${context.actor}\``,
-                  "Enable a GitHub branch ruleset requiring pull requests and the PR merge gate check to block this before the ref moves.",
-                ].join("\n\n"),
-              });
+              const existing = await findDirectPushIssue(after);
+              if (existing) {
+                core.info(`Direct push ${after} is already tracked by #${existing.number} (${existing.state}); not creating a duplicate issue.`);
+              } else {
+                await github.rest.issues.create({
+                  owner,
+                  repo,
+                  title: `Direct push detected on ${defaultBranch}: ${after.slice(0, 12)}`,
+                  body: [
+                    directPushMarker,
+                    message,
+                    `Previous SHA: \`${before}\``,
+                    `Actor: \`${context.actor}\``,
+                    "Enable a GitHub branch ruleset requiring pull requests and the PR merge gate check to block this before the ref moves.",
+                  ].join("\n\n"),
+                });
+              }
               core.setFailed(message);
               return true;
             }
