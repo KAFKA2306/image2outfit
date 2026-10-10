@@ -249,6 +249,40 @@ class ReviewConsoleTest(unittest.TestCase):
         gates = {gate["name"]: gate for gate in record["gates"]}
         self.assertEqual(gates["visualAppearanceReview"]["status"], "FAIL")
 
+    def test_malformed_manifest_fails_visibly_instead_of_becoming_empty(self) -> None:
+        product = self.root / "Assets" / "GenWorks" / "demo-outfit"
+        (product / "ProductManifest.json").write_text("{not json", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "malformed JSON"):
+            MODULE.build(self.root, self.output)
+
+    def test_unknown_or_missing_product_state_fails_visibly(self) -> None:
+        product = self.root / "Assets" / "GenWorks" / "demo-outfit"
+        manifest_path = product / "ProductManifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["state"] = "DONE"
+        manifest.pop("status", None)
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "unknown or missing product state"):
+            MODULE.build(self.root, self.output)
+
+        manifest.pop("state")
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "unknown or missing product state"):
+            MODULE.build(self.root, self.output)
+
+    def test_malformed_quality_report_fails_visibly(self) -> None:
+        report = (
+            self.root
+            / ".image2outfit"
+            / "products"
+            / "demo-outfit"
+            / "reports"
+            / "customer-quality.json"
+        )
+        report.write_text("[", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "malformed JSON"):
+            MODULE.build(self.root, self.output)
+
     def test_empty_repository_still_generates_valid_console(self) -> None:
         empty_root = Path(self.temp.name) / "empty"
         (empty_root / "config").mkdir(parents=True)

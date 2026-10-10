@@ -33,10 +33,15 @@ IMAGE_SUFFIXES = (".png", ".webp", ".jpg", ".jpeg")
 
 
 def load_json(path: Path, default: Any) -> Any:
+    """Return `default` only when the file is absent; malformed JSON is a hard failure."""
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (FileNotFoundError, UnicodeDecodeError, json.JSONDecodeError):
+        text = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
         return default
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as error:
+        raise ValueError(f"malformed JSON in {path}: {error}") from error
 
 
 def pick(mapping: Any, *keys: str, default: Any = None) -> Any:
@@ -85,17 +90,11 @@ def relative_href(path: Path, output_dir: Path) -> str:
 
 
 def safe_state(manifest: dict[str, Any]) -> str:
-    state = str(
-        pick(
-            manifest,
-            "state",
-            "status",
-            "product_state",
-            "release_state",
-            default="WORKING",
-        )
-    ).upper()
-    return state if state in STATES else "WORKING"
+    raw = pick(manifest, "state", "status", "product_state", "release_state")
+    state = str(raw).upper() if raw is not None else ""
+    if state not in STATES:
+        raise ValueError(f"unknown or missing product state: {raw!r}")
+    return state
 
 
 def policy_requirements(policy: dict[str, Any]) -> tuple[list[str], list[str]]:
