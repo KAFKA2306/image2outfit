@@ -56,30 +56,43 @@ def _completed_refs(state: Mapping[str, Any]) -> list[ArtifactRef]:
     return refs
 
 
-def _identity(
-    state: Mapping[str, Any], refs: list[ArtifactRef]
-) -> tuple[str, str, str, str]:
-    if refs:
-        anchor = refs[0]
-        return (
-            str(state["product_id"]),
-            anchor.hypothesis_id,
-            anchor.candidate_id,
-            anchor.avatar_sha256,
-        )
+def _lineage_candidate_id(state: Mapping[str, Any]) -> str:
+    """Return the run lineage root that owns a candidate across resumes.
+
+    A resume gets a new run_id and records the previous run as parent_run_id;
+    chained resumes keep the original root in resume_history[0]. Artifacts
+    produced by any run in the lineage therefore share one candidate identity,
+    while a fresh run or a different lineage does not.
+    """
+    history = state.get("resume_history")
+    if isinstance(history, list) and history and isinstance(history[0], Mapping):
+        root = history[0].get("parent_run_id")
+        if root:
+            return str(root)
+    return str(state.get("parent_run_id") or state.get("run_id") or "default-candidate")
+
+
+def _identity(state: Mapping[str, Any]) -> tuple[str, str, str, str]:
+    """Expected identity is derived from the current run, never from the refs.
+
+    Deriving it from a referenced artifact would let a stale ref from another
+    run, candidate, or avatar define its own expected identity.
+    """
     hypothesis_id = str(
         state.get("revision_id")
         or state.get("source_fingerprint")
         or state.get("profile_id")
         or "default-hypothesis"
     )
-    candidate_id = str(
-        state.get("parent_run_id") or state.get("run_id") or "default-candidate"
-    )
     avatar_sha256 = hashlib.sha256(
         str(state["target_avatar"]).encode("utf-8")
     ).hexdigest()
-    return str(state["product_id"]), hypothesis_id, candidate_id, avatar_sha256
+    return (
+        str(state["product_id"]),
+        hypothesis_id,
+        _lineage_candidate_id(state),
+        avatar_sha256,
+    )
 
 
 def _enforced(state: Mapping[str, Any]) -> bool:
@@ -101,7 +114,7 @@ def validate_runtime_artifact_inputs(
         return
     resolved = PipelineStage(stage)
     refs = _completed_refs(state)
-    garment_id, hypothesis_id, candidate_id, avatar_sha256 = _identity(state, refs)
+    garment_id, hypothesis_id, candidate_id, avatar_sha256 = _identity(state)
     _DAG.validate_inputs(
         resolved,
         refs,
@@ -129,8 +142,7 @@ def attach_runtime_artifact_ref(
     if not isinstance(payload, Mapping):
         raise ValueError("executed stage output is missing validated result payload")
     resolved = PipelineStage(stage)
-    refs = _completed_refs(state)
-    _, hypothesis_id, candidate_id, avatar_sha256 = _identity(state, refs)
+    _, hypothesis_id, candidate_id, avatar_sha256 = _identity(state)
     ref = artifact_ref_from_stage_result(
         payload,
         kind=_DAG.contract(resolved).produces,
