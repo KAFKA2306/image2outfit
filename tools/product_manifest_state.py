@@ -104,6 +104,42 @@ def _validate_unity_ready_payload(payload: Any, root: Path) -> dict[str, Any]:
     return copy.deepcopy(payload)
 
 
+def _candidate_identity_errors(
+    identity: Any, job: dict[str, Any], payload: dict[str, Any], root: Path
+) -> None:
+    """Bind a Unity-ready transition to the candidate manifest it was materialized with."""
+    if not isinstance(identity, dict):
+        raise ValueError("candidate identity must be an object")
+    manifest_value = identity.get("manifestPath")
+    if not isinstance(manifest_value, str) or not manifest_value:
+        raise ValueError("candidate identity manifestPath is required")
+    candidate_path = repo_path(root, manifest_value)
+    if not candidate_path.is_file():
+        raise FileNotFoundError(f"candidate manifest missing: {manifest_value}")
+    if digest(candidate_path) != identity.get("manifestSha256"):
+        raise ValueError(
+            "candidate identity is stale: candidate manifest SHA-256 mismatch"
+        )
+    candidate = read_json(candidate_path)
+    errors: list[str] = []
+    if candidate.get("kind") != "image2outfit-candidate":
+        errors.append("candidate manifest kind mismatch")
+    if candidate.get("jobId") != job.get("id"):
+        errors.append("candidate manifest jobId must match job.id")
+    if candidate.get("runId") != identity.get("runId"):
+        errors.append("candidate manifest runId mismatch")
+    candidate_ready = candidate.get("unityReady")
+    if not isinstance(candidate_ready, dict):
+        errors.append("candidate manifest has no unityReady block")
+    else:
+        if candidate_ready.get("status") != "VERIFIED":
+            errors.append("candidate manifest unityReady status must be VERIFIED")
+        if candidate_ready.get("evidencePath") != payload.get("evidencePath"):
+            errors.append("candidate manifest unityReady evidencePath mismatch")
+    if errors:
+        raise ValueError("candidate identity rejected: " + "; ".join(errors))
+
+
 def apply_update(
     *,
     manifest_path: Path,
@@ -112,7 +148,12 @@ def apply_update(
     root: Path = ROOT,
     before_replace: Callable[[Path, Path], None] | None = None,
 ) -> dict[str, Any]:
-    """Apply one typed ProductManifest transition and atomically replace the file."""
+    """Apply one typed ProductManifest transition and atomically replace the file.
+
+    An optional ``intent["candidate"]`` binds the transition to a materialized
+    candidate manifest (``runId``, ``manifestPath``, ``manifestSha256``); when
+    present it must match the job and the Unity-ready payload.
+    """
     if intent.get("kind") != "unity-ready":
         raise ValueError(f"unknown ProductManifest update kind: {intent.get('kind')!r}")
     if intent.get("productId") != job.get("id"):
@@ -142,6 +183,10 @@ def apply_update(
     if not isinstance(readiness, dict):
         raise ValueError("ProductManifest releaseReadiness must be an object")
     readiness["unityReady"] = _validate_unity_ready_payload(intent.get("payload"), root)
+    if intent.get("candidate") is not None:
+        _candidate_identity_errors(
+            intent["candidate"], job, readiness["unityReady"], root
+        )
 
     post_errors = _validate_with_completion_policy(
         updated, job, root, suffix="postcheck"
@@ -273,9 +318,7 @@ def record_workflow_attempt(
 
     current = read_json(manifest_path)
     pre_suffix = f"workflow-pre-{uuid.uuid4().hex}"
-    pre_errors = _validate_with_completion_policy(
-        current, job, root, suffix=pre_suffix
-    )
+    pre_errors = _validate_with_completion_policy(current, job, root, suffix=pre_suffix)
     if pre_errors:
         raise ValueError(
             "ProductManifest precondition failed: " + "; ".join(pre_errors)
@@ -294,9 +337,7 @@ def record_workflow_attempt(
 
     pipeline_status = checkpoint.get("status")
     if pipeline_status not in {"FAILED", "EXECUTED"}:
-        raise ValueError(
-            f"workflow checkpoint is not terminal: {pipeline_status!r}"
-        )
+        raise ValueError(f"workflow checkpoint is not terminal: {pipeline_status!r}")
     completed = checkpoint.get("completed_stages")
     stage_records = checkpoint.get("stage_records")
     if not isinstance(completed, list) or not all(
@@ -330,22 +371,24 @@ def record_workflow_attempt(
             )
         result_file = repo_path(root, result_path)
         if not result_file.is_file():
-            raise FileNotFoundError(
-                f"workflow stage evidence missing: {result_path}"
-            )
+            raise FileNotFoundError(f"workflow stage evidence missing: {result_path}")
         if record.get("status") == "REUSED":
             # A resumed run retains the original successful result, rather
             # than executing that stage again. Require the current result to
             # equal the immutable record's embedded execution evidence.
             result = read_json(result_file)
             output = record.get("output")
-            if (not isinstance(output, dict)
-                    or output.get("mode") != "executed"
-                    or result != output.get("result")
-                    or result.get("status") != "PASS"
-                    or result.get("productId") != product_id
-                    or result.get("stage") != stage_name):
-                raise ValueError(f"reused workflow stage lacks matching PASS evidence: {stage_name}")
+            if (
+                not isinstance(output, dict)
+                or output.get("mode") != "executed"
+                or result != output.get("result")
+                or result.get("status") != "PASS"
+                or result.get("productId") != product_id
+                or result.get("stage") != stage_name
+            ):
+                raise ValueError(
+                    f"reused workflow stage lacks matching PASS evidence: {stage_name}"
+                )
         completed_evidence[stage_name] = {
             "status": str(record["status"]),
             "stageResultSha256": digest(result_file),
@@ -379,9 +422,7 @@ def record_workflow_attempt(
     failed_stage = failed_record.get("stage") if failed_record else None
     failed_output = failed_record.get("output") if failed_record else None
     failure_message = (
-        failed_output.get("error")
-        if isinstance(failed_output, dict)
-        else None
+        failed_output.get("error") if isinstance(failed_output, dict) else None
     )
     if failure_message is not None:
         failure_message = str(failure_message)[:2000]
@@ -415,9 +456,7 @@ def record_workflow_attempt(
     updated_handoff["lastAttempt"] = {
         "runId": run_id,
         "status": (
-            "PARTIAL"
-            if pipeline_status == "FAILED" and completed
-            else pipeline_status
+            "PARTIAL" if pipeline_status == "FAILED" and completed else pipeline_status
         ),
         "checkedAt": datetime.now(timezone.utc)
         .isoformat(timespec="seconds")
@@ -441,34 +480,53 @@ def record_workflow_attempt(
     }
 
     if "build-blender" in completed:
-        build_result_path = repo_path(root, stage_records_by_name["build-blender"]["resultPath"])
+        build_result_path = repo_path(
+            root, stage_records_by_name["build-blender"]["resultPath"]
+        )
         build_result = read_json(build_result_path)
-        if (build_result.get("productId") != product_id
-                or build_result.get("status") != "PASS"):
-            raise ValueError("manufacturing execution evidence identity/status mismatch")
+        if (
+            build_result.get("productId") != product_id
+            or build_result.get("status") != "PASS"
+        ):
+            raise ValueError(
+                "manufacturing execution evidence identity/status mismatch"
+            )
         artifacts = build_result.get("evidence", [])
         for artifact in artifacts:
             if digest(repo_path(root, artifact["path"])) != artifact["sha256"]:
                 raise ValueError("manufacturing execution artifact is stale")
         sources = [item for item in artifacts if item["path"].endswith(".blend")]
-        reports = [item for item in artifacts if item["path"].endswith("/product-build-report.json")]
+        reports = [
+            item
+            for item in artifacts
+            if item["path"].endswith("/product-build-report.json")
+        ]
         if build_result.get("garmentCodeBoxMeshPreflight") == "PASS":
             if len(sources) != 1 or len(reports) != 1:
                 raise ValueError("sewn prototype requires one source and build report")
             report = read_json(repo_path(root, reports[0]["path"]))
-            if (report.get("productId") != product_id
-                    or report.get("sourceBlendSha256") != sources[0]["sha256"]):
+            if (
+                report.get("productId") != product_id
+                or report.get("sourceBlendSha256") != sources[0]["sha256"]
+            ):
                 raise ValueError("sewn prototype source binding mismatch")
-            for field, hash_field in (("patternContractPath", "patternSha256"),
-                                      ("stitchGraphPath", "stitchGraphSha256")):
-                if digest(repo_path(root, job["garmentPipeline"][field])) != report["canonicalInputs"][hash_field]:
+            for field, hash_field in (
+                ("patternContractPath", "patternSha256"),
+                ("stitchGraphPath", "stitchGraphSha256"),
+            ):
+                if (
+                    digest(repo_path(root, job["garmentPipeline"][field]))
+                    != report["canonicalInputs"][hash_field]
+                ):
                     raise ValueError("sewn prototype canonical inputs are stale")
             updated_handoff["manufacturingPrototype"] = {
                 "stage": "build-blender",
                 "executionDisposition": build_result.get("executionDisposition"),
                 "qualityDecision": build_result.get("qualityDecision"),
-                "sourcePath": sources[0]["path"], "sourceSha256": sources[0]["sha256"],
-                "reportPath": reports[0]["path"], "reportSha256": reports[0]["sha256"],
+                "sourcePath": sources[0]["path"],
+                "sourceSha256": sources[0]["sha256"],
+                "reportPath": reports[0]["path"],
+                "reportSha256": reports[0]["sha256"],
                 "metrics": report.get("metrics"),
                 "grantsQualityAcceptance": False,
             }
@@ -481,8 +539,12 @@ def record_workflow_attempt(
                     "and resume this checkpoint. Deform weights, Shape Keys, rendered appearance, "
                     "and runtime acceptance remain required."
                 )
-            if (failed_stage == "simulate-cloth" and failure_message
-                    and "Declared rest shape produced no measurable native Cloth response" in failure_message):
+            if (
+                failed_stage == "simulate-cloth"
+                and failure_message
+                and "Declared rest shape produced no measurable native Cloth response"
+                in failure_message
+            ):
                 updated_handoff["nextAction"] = (
                     "Replace the ineffective canonical-row rest-shape linkage with explicit "
                     "crease-aligned skirt topology and measured folded geometry in the existing "
@@ -499,7 +561,10 @@ def record_workflow_attempt(
         if product_runtime not in probe_path.parents:
             raise ValueError("manufacturing failure evidence escapes product runtime")
         probe = read_json(probe_path)
-        if probe.get("status") != "FAIL" or probe.get("productMeshArtifactWritten") is not False:
+        if (
+            probe.get("status") != "FAIL"
+            or probe.get("productMeshArtifactWritten") is not False
+        ):
             raise ValueError("manufacturing failure must be a rejected preflight")
         bindings = probe.get("canonicalStitchInputs", {})
         for path_key, hash_key, job_key in (
@@ -515,8 +580,10 @@ def record_workflow_attempt(
             if digest(repo_path(root, item["path"])) != item["sha256"]:
                 raise ValueError("manufacturing readiness evidence is stale")
         updated_handoff["manufacturingFailure"] = {
-            "stage": "build-blender", "status": "FAIL",
-            "evidencePath": relative(root, probe_path), "sha256": digest(probe_path),
+            "stage": "build-blender",
+            "status": "FAIL",
+            "evidencePath": relative(root, probe_path),
+            "sha256": digest(probe_path),
             "invalidStitchIds": [item["stitchId"] for item in probe["invalidStitches"]],
             "topology": probe.get("meshTopologyAudit"),
             "currentInputsMatch": True,
@@ -541,26 +608,38 @@ def record_workflow_attempt(
         if root / ".image2outfit" / "products" / str(job["id"]) not in env_path.parents:
             raise ValueError("environment failure escapes product runtime")
         env_failure = read_json(env_path)
-        if (env_failure.get("productId") != job["id"]
+        if (
+            env_failure.get("productId") != job["id"]
             or env_failure.get("status") != "BLOCKED"
-            or env_failure.get("code") != "DISK_SPACE_EXHAUSTED"):
+            or env_failure.get("code") != "DISK_SPACE_EXHAUSTED"
+        ):
             raise ValueError("invalid environment failure evidence")
         job_path = root / "config" / "products" / str(job["id"]) / "job.json"
         if digest(job_path) != env_failure.get("jobSha256"):
             raise ValueError("environment failure job binding is stale")
-        for field, hash_field in (("patternContractPath", "patternSha256"),
-                                  ("stitchGraphPath", "stitchGraphSha256")):
-            if digest(repo_path(root, job["garmentPipeline"][field])) != env_failure.get(hash_field):
+        for field, hash_field in (
+            ("patternContractPath", "patternSha256"),
+            ("stitchGraphPath", "stitchGraphSha256"),
+        ):
+            if digest(
+                repo_path(root, job["garmentPipeline"][field])
+            ) != env_failure.get(hash_field):
                 raise ValueError("environment failure input binding is stale")
         updated_handoff["environmentFailure"] = {
-            "status": "BLOCKED", "code": env_failure["code"],
-            "evidencePath": relative(root, env_path), "sha256": digest(env_path),
+            "status": "BLOCKED",
+            "code": env_failure["code"],
+            "evidencePath": relative(root, env_path),
+            "sha256": digest(env_path),
         }
         if "manufacturingFailure" in updated_handoff:
-            prior = read_json(repo_path(root, updated_handoff["manufacturingFailure"]["evidencePath"]))
+            prior = read_json(
+                repo_path(root, updated_handoff["manufacturingFailure"]["evidencePath"])
+            )
             updated_handoff["manufacturingFailure"]["currentInputsMatch"] = (
-                prior["canonicalStitchInputs"]["patternContractSha256"] == env_failure["patternSha256"]
-                and prior["canonicalStitchInputs"]["stitchGraphSha256"] == env_failure["stitchGraphSha256"]
+                prior["canonicalStitchInputs"]["patternContractSha256"]
+                == env_failure["patternSha256"]
+                and prior["canonicalStitchInputs"]["stitchGraphSha256"]
+                == env_failure["stitchGraphSha256"]
             )
         updated_handoff["nextAction"] = env_failure["nextAction"]
 
@@ -568,32 +647,47 @@ def record_workflow_attempt(
     if review_value and "render-evidence" in completed:
         review_file = repo_path(root, review_value)
         if review_file.is_file():
-            from candidate_quality import validate_visual_review, verify_inspected_images
+            from candidate_quality import (
+                validate_visual_review,
+                verify_inspected_images,
+            )
 
             review_document = read_json(review_file)
-            review = validate_visual_review(review_document, product_id=product_id,
-                                            revision_id=str(job["buildRevision"]))
+            review = validate_visual_review(
+                review_document,
+                product_id=product_id,
+                revision_id=str(job["buildRevision"]),
+            )
             image_paths = [*job["previewPaths"].values(), *job["posePaths"].values()]
-            current_images = {value: digest(repo_path(root, value)) for value in image_paths}
+            current_images = {
+                value: digest(repo_path(root, value)) for value in image_paths
+            }
             review_is_current = dict(review["inspectedImages"]) == current_images
             if not review_is_current:
                 updated_handoff["currentVisualReview"] = {
-                    "decision": review["decision"], "status": "STALE",
-                    "currentInputsMatch": False, "evidencePath": relative(root, review_file),
-                    "sha256": digest(review_file), "grantsQualityAcceptance": False,
+                    "decision": review["decision"],
+                    "status": "STALE",
+                    "currentInputsMatch": False,
+                    "evidencePath": relative(root, review_file),
+                    "sha256": digest(review_file),
+                    "grantsQualityAcceptance": False,
                 }
                 updated_handoff["nextAction"] = (
                     "Directly inspect the newly generated render evidence and replace the stale "
                     "visual review with current image hashes. Do not reuse prior visual acceptance."
                 )
-                updated_handoff["lastAttempt"]["nextAction"] = updated_handoff["nextAction"]
+                updated_handoff["lastAttempt"]["nextAction"] = updated_handoff[
+                    "nextAction"
+                ]
             else:
                 verify_inspected_images(review["inspectedImages"], current_images)
             if review_is_current and review["decision"] == "REJECT":
                 updated_handoff["currentVisualReview"] = {
-                    "decision": "REJECT", "evidencePath": relative(root, review_file),
+                    "decision": "REJECT",
+                    "evidencePath": relative(root, review_file),
                     "currentInputsMatch": True,
-                    "sha256": digest(review_file), "findings": review["findings"],
+                    "sha256": digest(review_file),
+                    "findings": review["findings"],
                     "grantsQualityAcceptance": False,
                 }
                 updated_handoff["nextAction"] = (
@@ -601,9 +695,14 @@ def record_workflow_attempt(
                     "starting with panel assembly and target-body fit; then regenerate the "
                     "weighted candidate and directly inspect its new renders."
                 )
-                if isinstance(review_document.get("nextAction"), str) and review_document["nextAction"].strip():
+                if (
+                    isinstance(review_document.get("nextAction"), str)
+                    and review_document["nextAction"].strip()
+                ):
                     updated_handoff["nextAction"] = review_document["nextAction"]
-                updated_handoff["lastAttempt"]["nextAction"] = updated_handoff["nextAction"]
+                updated_handoff["lastAttempt"]["nextAction"] = updated_handoff[
+                    "nextAction"
+                ]
 
     if updated.get("technicalGates") != current.get("technicalGates"):
         raise RuntimeError("workflow handoff must not alter technical gates")

@@ -14,6 +14,172 @@ import blender_python_env  # noqa: E402
 import technical_candidate  # noqa: E402
 
 
+import hashlib
+import json
+
+
+def _sha(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+class UnityReadyPublishTests(unittest.TestCase):
+    """Unity-ready publish happens only after the candidate manifest exists."""
+
+    def _fixture(self, root: Path) -> dict:
+        product = root / "Assets" / "GenWorks" / "demo"
+        manifest_path = product / "ProductManifest.json"
+        manifest_path.parent.mkdir(parents=True)
+        manifest = {
+            "schemaVersion": 1,
+            "productId": "demo",
+            "productRoot": "Assets/GenWorks/demo",
+            "sourceJobPath": "config/products/demo/job.json",
+            "state": "WORKING",
+            "technicalGates": {
+                "blender": "PASS",
+                "unityImport": "OUT_OF_SCOPE",
+                "prefabSerialized": "OUT_OF_SCOPE",
+                "prefabReload": "OUT_OF_SCOPE",
+                "modularAvatar": "OUT_OF_SCOPE",
+                "ndmf": "OUT_OF_SCOPE",
+            },
+        }
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+        )
+        evidence = product / "Evidence" / "Unity" / "unity-ready.json"
+        evidence.parent.mkdir(parents=True)
+        evidence.write_text('{"tracked": "before"}\n', encoding="utf-8")
+
+        artifact = root / "reports" / "artifact"
+        artifact.mkdir(parents=True)
+        (artifact / "unity-ready.json").write_text(
+            '{"unityReadyStatus": "VERIFIED"}\n', encoding="utf-8"
+        )
+        candidate_dir = root / "candidate"
+        candidate_dir.mkdir(parents=True)
+        candidate_manifest = candidate_dir / "candidate-manifest.json"
+        candidate_manifest.write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 2,
+                    "kind": "image2outfit-candidate",
+                    "jobId": "demo",
+                    "runId": "run-1",
+                    "unityReady": {
+                        "status": "VERIFIED",
+                        "evidencePath": "Assets/GenWorks/demo/Evidence/Unity/unity-ready.json",
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        job = {
+            "id": "demo",
+            "buildRevision": "r7",
+            "productRoot": "Assets/GenWorks/demo",
+            "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+            "targetAvatarAssetPath": "Assets/Avatar.prefab",
+            "unityReady": {"materialRoles": {"body": "Body"}},
+        }
+        return {
+            "job": job,
+            "manifest": manifest_path,
+            "evidence": evidence,
+            "artifact": artifact,
+            "candidate_manifest": candidate_manifest,
+        }
+
+    def _publish(self, root: Path, fx: dict, run_id: str = "run-1") -> Path:
+        with patch.object(technical_candidate.candidate_contract, "ROOT", root):
+            return technical_candidate.publish_unity_ready_product_state(
+                fx["job"],
+                {"unityReadyStatus": "VERIFIED"},
+                fx["artifact"],
+                fx["candidate_manifest"],
+                run_id,
+            )
+
+    def test_publish_updates_manifest_and_evidence_bound_to_candidate(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fx = self._fixture(root)
+            self._publish(root, fx)
+
+            stored = json.loads(fx["manifest"].read_text(encoding="utf-8"))
+            for gate in (
+                "unityImport",
+                "prefabSerialized",
+                "prefabReload",
+                "modularAvatar",
+                "ndmf",
+            ):
+                self.assertEqual(stored["technicalGates"][gate], "PASS")
+            unity = stored["releaseReadiness"]["unityReady"]
+            self.assertEqual(unity["status"], "VERIFIED")
+            self.assertEqual(unity["materialRoles"], {"body": "Body"})
+            self.assertEqual(
+                unity["evidenceSha256"], _sha(fx["artifact"] / "unity-ready.json")
+            )
+            self.assertEqual(
+                fx["evidence"].read_bytes(),
+                (fx["artifact"] / "unity-ready.json").read_bytes(),
+            )
+
+    def test_refused_candidate_identity_keeps_manifest_and_evidence_bytes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fx = self._fixture(root)
+            manifest_before = _sha(fx["manifest"])
+            evidence_before = fx["evidence"].read_bytes()
+
+            with self.assertRaises(ValueError):
+                self._publish(root, fx, run_id="run-2")
+
+            self.assertEqual(_sha(fx["manifest"]), manifest_before)
+            self.assertEqual(fx["evidence"].read_bytes(), evidence_before)
+
+    def test_refused_publish_without_prior_evidence_removes_staged_copy(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fx = self._fixture(root)
+            fx["evidence"].unlink()
+            manifest_before = _sha(fx["manifest"])
+
+            with self.assertRaises(ValueError):
+                self._publish(root, fx, run_id="run-2")
+
+            self.assertFalse(fx["evidence"].exists())
+            self.assertEqual(_sha(fx["manifest"]), manifest_before)
+
+    def test_stale_candidate_manifest_hash_is_rejected_by_canonical_writer(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fx = self._fixture(root)
+            manifest_before = _sha(fx["manifest"])
+            evidence_before = fx["evidence"].read_bytes()
+
+            real_digest = technical_candidate.candidate_contract.digest
+
+            def tampered(path: Path) -> str:
+                # Candidate identity is hashed before the writer re-reads it; a
+                # change in between must be refused, not published.
+                if path == fx["candidate_manifest"]:
+                    return "0" * 64
+                return real_digest(path)
+
+            with patch.object(
+                technical_candidate.candidate_contract, "digest", tampered
+            ):
+                with self.assertRaises(ValueError):
+                    self._publish(root, fx)
+
+            self.assertEqual(_sha(fx["manifest"]), manifest_before)
+            self.assertEqual(fx["evidence"].read_bytes(), evidence_before)
+
+
 class HostedPoseRenderTests(unittest.TestCase):
     def test_hosted_pose_script_is_run_and_required_outputs_are_checked(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
