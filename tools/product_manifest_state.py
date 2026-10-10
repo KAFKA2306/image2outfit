@@ -156,7 +156,7 @@ def apply_update(
         write_json(staged, updated)
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
-        final_errors = production_contract.product_state_errors(staged_job, root)
+        final_errors = _manifest_errors(updated, job)
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)
@@ -272,10 +272,10 @@ def record_workflow_attempt(
         raise ValueError("workflow handoff is stale: ProductManifest SHA-256 mismatch")
 
     current = read_json(manifest_path)
-    pre_suffix = f"workflow-pre-{uuid.uuid4().hex}"
-    pre_errors = _validate_with_completion_policy(
-        current, job, root, suffix=pre_suffix
-    )
+    # A workflow attempt records execution evidence only. A product with a
+    # failed technical gate must still be able to record its failed or rejected
+    # attempt without changing that gate or release readiness.
+    pre_errors = _manifest_errors(current, job)
     if pre_errors:
         raise ValueError(
             "ProductManifest precondition failed: " + "; ".join(pre_errors)
@@ -609,9 +609,7 @@ def record_workflow_attempt(
         raise RuntimeError("workflow handoff must not alter technical gates")
     if updated.get("releaseReadiness") != current.get("releaseReadiness"):
         raise RuntimeError("workflow handoff must not alter release readiness")
-    post_errors = _validate_with_completion_policy(
-        updated, job, root, suffix=f"workflow-post-{uuid.uuid4().hex}"
-    )
+    post_errors = _manifest_errors(updated, job)
     if post_errors:
         raise ValueError(
             "ProductManifest workflow handoff invalid: " + "; ".join(post_errors)
@@ -628,7 +626,7 @@ def record_workflow_attempt(
         write_json(staged, updated)
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
-        final_errors = production_contract.product_state_errors(staged_job, root)
+        final_errors = _manifest_errors(updated, job)
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)
