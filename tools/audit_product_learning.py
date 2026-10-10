@@ -59,7 +59,11 @@ PII_KEY_TOKENS = (
 
 def canonical_sha256(record: dict[str, Any]) -> str:
     text = json.dumps(
-        record, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False
+        record,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
     )
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
@@ -83,7 +87,11 @@ def _sha(value: Any) -> bool:
 
 
 def _finite(value: Any) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+    )
 
 
 def _strings(value: Any, *, allow_empty: bool = False) -> bool:
@@ -157,7 +165,11 @@ def validate_decision(record: dict[str, Any]) -> list[str]:
         errors.append("LAUNCH requires PASS quality evidence bound to a release record")
 
     spec = record.get("qualitySpec")
-    if not isinstance(spec, dict) or not _nonempty(spec.get("id")) or not _sha(spec.get("sha256")):
+    if (
+        not isinstance(spec, dict)
+        or not _nonempty(spec.get("id"))
+        or not _sha(spec.get("sha256"))
+    ):
         errors.append("qualitySpec needs id and SHA-256 identity")
 
     hypothesis = record.get("hypothesis")
@@ -182,9 +194,15 @@ def validate_decision(record: dict[str, Any]) -> list[str]:
         errors.append("hypothesis.criteria must be a non-empty string list")
 
     sources = record.get("metricSources")
-    if not isinstance(sources, list) or not sources or not all(
-        isinstance(item, dict) and _nonempty(item.get("id")) and _nonempty(item.get("reference"))
-        for item in sources
+    if (
+        not isinstance(sources, list)
+        or not sources
+        or not all(
+            isinstance(item, dict)
+            and _nonempty(item.get("id"))
+            and _nonempty(item.get("reference"))
+            for item in sources
+        )
     ):
         errors.append("metricSources needs at least one id/reference pair")
     return errors
@@ -198,10 +216,14 @@ def validate_outcome(record: dict[str, Any], decision: dict[str, Any]) -> list[s
     if record.get("decisionId") != decision.get("decisionId"):
         errors.append("decisionId does not match the decision record")
     if record.get("decisionSha256") != canonical_sha256(decision):
-        errors.append("decisionSha256 does not match the decision (rewritten or wrong decision)")
+        errors.append(
+            "decisionSha256 does not match the decision (rewritten or wrong decision)"
+        )
     for field in ("productId", "productRevision", "candidateManifestSha256"):
         if record.get(field) != decision.get(field):
-            errors.append(f"{field} differs from the decision; cross-revision outcomes are not merged")
+            errors.append(
+                f"{field} differs from the decision; cross-revision outcomes are not merged"
+            )
 
     period = record.get("observationPeriod")
     period = period if isinstance(period, dict) else {}
@@ -228,7 +250,9 @@ def validate_outcome(record: dict[str, Any], decision: dict[str, Any]) -> list[s
     if availability == "OBSERVED" and (not measurements or sample < 1):
         errors.append("OBSERVED requires at least one measurement and a sample")
     if availability == "NOT_OBSERVED" and (measurements or sample != 0):
-        errors.append("NOT_OBSERVED cannot carry measurements or a sample; missing is not zero")
+        errors.append(
+            "NOT_OBSERVED cannot carry measurements or a sample; missing is not zero"
+        )
     for index, item in enumerate(measurements):
         if (
             not isinstance(item, dict)
@@ -236,7 +260,9 @@ def validate_outcome(record: dict[str, Any], decision: dict[str, Any]) -> list[s
             or not _nonempty(item.get("unit"))
             or not _finite(item.get("value"))
         ):
-            errors.append(f"measurements[{index}] needs metric, unit, and a finite numeric value")
+            errors.append(
+                f"measurements[{index}] needs metric, unit, and a finite numeric value"
+            )
 
     defects = record.get("defectReferences")
     if not isinstance(defects, list) or not all(
@@ -245,11 +271,15 @@ def validate_outcome(record: dict[str, Any], decision: dict[str, Any]) -> list[s
         and item.get("authority") == DEFECT_AUTHORITY
         for item in defects
     ):
-        errors.append(f"defectReferences must be a list of {DEFECT_AUTHORITY} references")
+        errors.append(
+            f"defectReferences must be a list of {DEFECT_AUTHORITY} references"
+        )
 
     provenance = record.get("provenance")
-    if not isinstance(provenance, dict) or not _nonempty(provenance.get("source")) or not _nonempty(
-        provenance.get("reference")
+    if (
+        not isinstance(provenance, dict)
+        or not _nonempty(provenance.get("source"))
+        or not _nonempty(provenance.get("reference"))
     ):
         errors.append("provenance needs source and reference")
     return errors
@@ -271,13 +301,19 @@ def validate_retrospective(
     if record.get("outcomeSha256") != canonical_sha256(outcome):
         errors.append("outcomeSha256 does not match the outcome")
     for field in ("productId", "productRevision", "candidateManifestSha256"):
-        if record.get(field) != decision.get(field) or outcome.get(field) != decision.get(field):
-            errors.append(f"{field} is not identical across decision, outcome, and retrospective")
+        if record.get(field) != decision.get(field) or outcome.get(
+            field
+        ) != decision.get(field):
+            errors.append(
+                f"{field} is not identical across decision, outcome, and retrospective"
+            )
 
     reviewed = _utc(record.get("reviewedAt"))
     if reviewed is None:
         errors.append("reviewedAt must be an ISO-8601 UTC timestamp")
-    elif (data_as_of := _utc(outcome.get("dataAsOf"))) is not None and reviewed < data_as_of:
+    elif (
+        data_as_of := _utc(outcome.get("dataAsOf"))
+    ) is not None and reviewed < data_as_of:
         errors.append("reviewedAt cannot precede the outcome dataAsOf")
     if not _nonempty(record.get("summary")):
         errors.append("summary is required")
@@ -289,11 +325,17 @@ def validate_retrospective(
     quality = (decision.get("qualityEvidence") or {}).get("status")
     if verdict == "VALIDATED":
         if availability != "OBSERVED":
-            errors.append("VALIDATED requires an observed customer outcome; unobserved is not validated")
+            errors.append(
+                "VALIDATED requires an observed customer outcome; unobserved is not validated"
+            )
         if quality != "PASS":
-            errors.append("VALIDATED requires PASS quality evidence; value cannot promote a failed gate")
+            errors.append(
+                "VALIDATED requires PASS quality evidence; value cannot promote a failed gate"
+            )
     if verdict == "CHALLENGED" and availability != "OBSERVED" and quality != "FAIL":
-        errors.append("CHALLENGED requires an observed outcome or failed quality evidence")
+        errors.append(
+            "CHALLENGED requires an observed outcome or failed quality evidence"
+        )
 
     follow_ups = record.get("followUps")
     if not isinstance(follow_ups, list) or not all(
@@ -302,21 +344,32 @@ def validate_retrospective(
         and _nonempty(item.get("reference"))
         for item in follow_ups
     ):
-        errors.append("followUps must reference issue-190 or issue-408 with a reference")
+        errors.append(
+            "followUps must reference issue-190 or issue-408 with a reference"
+        )
         follow_ups = []
-    if quality == "FAIL" and not any(item.get("authority") == DEFECT_AUTHORITY for item in follow_ups):
+    if quality == "FAIL" and not any(
+        item.get("authority") == DEFECT_AUTHORITY for item in follow_ups
+    ):
         errors.append("failed quality evidence must be routed to issue-190")
     return errors
 
 
-def validate_chain(decision: dict[str, Any], outcome: dict[str, Any], retrospective: dict[str, Any]) -> list[str]:
+def validate_chain(
+    decision: dict[str, Any], outcome: dict[str, Any], retrospective: dict[str, Any]
+) -> list[str]:
     errors = [f"decision: {item}" for item in validate_decision(decision)]
     errors += [f"outcome: {item}" for item in validate_outcome(outcome, decision)]
-    errors += [f"retrospective: {item}" for item in validate_retrospective(retrospective, decision, outcome)]
+    errors += [
+        f"retrospective: {item}"
+        for item in validate_retrospective(retrospective, decision, outcome)
+    ]
     return errors
 
 
-def _rebind(decision: dict[str, Any], outcome: dict[str, Any], retrospective: dict[str, Any]) -> None:
+def _rebind(
+    decision: dict[str, Any], outcome: dict[str, Any], retrospective: dict[str, Any]
+) -> None:
     outcome["decisionSha256"] = canonical_sha256(decision)
     retrospective["decisionSha256"] = canonical_sha256(decision)
     retrospective["outcomeSha256"] = canonical_sha256(outcome)
@@ -325,7 +378,9 @@ def _rebind(decision: dict[str, Any], outcome: dict[str, Any], retrospective: di
 def _observed(outcome: dict[str, Any]) -> None:
     outcome["availability"] = "OBSERVED"
     outcome["sampleSize"] = 12
-    outcome["measurements"] = [{"metric": "fixture-paid-conversion", "unit": "ratio", "value": 0.03}]
+    outcome["measurements"] = [
+        {"metric": "fixture-paid-conversion", "unit": "ratio", "value": 0.03}
+    ]
 
 
 def _negative_cases(
@@ -338,20 +393,29 @@ def _negative_cases(
     """
 
     def case(name: str, mutate, *, rebind: bool = True) -> tuple[str, dict, dict, dict]:
-        d, o, r = copy.deepcopy(decision), copy.deepcopy(outcome), copy.deepcopy(retrospective)
+        d, o, r = (
+            copy.deepcopy(decision),
+            copy.deepcopy(outcome),
+            copy.deepcopy(retrospective),
+        )
         mutate(d, o, r)
         if rebind:
             _rebind(d, o, r)
         return name, d, o, r
 
     def rewritten(d, o, r):
-        d["approvedScope"] = [*d["approvedScope"], "added after the outcome was recorded"]
+        d["approvedScope"] = [
+            *d["approvedScope"],
+            "added after the outcome was recorded",
+        ]
 
     def revision_mismatch(d, o, r):
         o["productRevision"] = "fixture-rev-002"
 
     def not_observed_as_zero(d, o, r):
-        o["measurements"] = [{"metric": "fixture-paid-conversion", "unit": "ratio", "value": 0}]
+        o["measurements"] = [
+            {"metric": "fixture-paid-conversion", "unit": "ratio", "value": 0}
+        ]
 
     def validated_without_observation(d, o, r):
         r["verdict"] = "VALIDATED"
@@ -377,7 +441,11 @@ def _negative_cases(
         }
 
     def personal_data(d, o, r):
-        o["provenance"] = {"source": "fixture", "reference": "buyer contact list", "buyerEmail": "x@example.com"}
+        o["provenance"] = {
+            "source": "fixture",
+            "reference": "buyer contact list",
+            "buyerEmail": "x@example.com",
+        }
 
     return [
         case("decision rewritten without rebinding", rewritten, rebind=False),
@@ -385,14 +453,19 @@ def _negative_cases(
         case("missing outcome recorded as zero", not_observed_as_zero),
         case("validated without observed outcome", validated_without_observation),
         case("value promoted over failed quality", validated_on_failed_quality),
-        case("challenged failed quality without issue-190 route", challenged_without_defect_route),
+        case(
+            "challenged failed quality without issue-190 route",
+            challenged_without_defect_route,
+        ),
         case("launch without passing quality", launch_without_quality),
         case("outcome observed before decision", outcome_before_decision),
         case("personal data in provenance", personal_data),
     ]
 
 
-def _load_fixture_chain(root: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+def _load_fixture_chain(
+    root: Path,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     base = root / FIXTURE_DIR
     names = ("decision", "outcome", "retrospective")
     records = []
