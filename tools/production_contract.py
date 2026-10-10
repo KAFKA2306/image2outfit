@@ -221,6 +221,110 @@ def _handoff_policy(root: Path) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+LIFECYCLE_STATES = ("WORKING", "COMPLETE", "REJECTED")
+# Fallback only when the handoff policy omits canonicalGateStates.
+CANONICAL_GATE_STATES = ("PASS", "FAIL", "PENDING", "UNVERIFIED", "OUT_OF_SCOPE")
+
+
+def _canonical_gate_state(value: Any, handoff: dict[str, Any]) -> str | None:
+    """Map a recorded gate value onto the policy's canonical gate states.
+
+    Returns None for values the policy does not recognise, so callers can fail
+    visibly instead of treating them as success.
+    """
+    if not isinstance(value, str):
+        return None
+    normalization = handoff.get("gateStateNormalization")
+    if isinstance(normalization, dict) and value in normalization:
+        mapped = normalization[value]
+        return mapped if isinstance(mapped, str) else None
+    canonical = handoff.get("canonicalGateStates")
+    if not isinstance(canonical, list):
+        canonical = list(CANONICAL_GATE_STATES)
+    return value if value in canonical else None
+
+
+def _lifecycle_state(
+    manifest: dict[str, Any], handoff: dict[str, Any], errors: list[str]
+) -> str | None:
+    recorded = {
+        key: str(manifest[key]).upper()
+        for key in ("state", "status")
+        if manifest.get(key) is not None
+    }
+    if not recorded:
+        return "WORKING"
+    if len(set(recorded.values())) > 1:
+        errors.append(
+            "product lifecycle state contradicts status: "
+            + ", ".join(f"{key}={value}" for key, value in recorded.items())
+        )
+        return None
+    value = next(iter(recorded.values()))
+    statuses = handoff.get("statuses")
+    if not isinstance(statuses, list):
+        statuses = list(LIFECYCLE_STATES)
+    if value not in statuses:
+        errors.append(f"unknown product lifecycle state: {value}")
+        return None
+    return value
+
+
+def completion_projection(manifest: dict[str, Any], root: Path) -> dict[str, Any]:
+    """Classify a ProductManifest from the tracked manifest and handoff policy only.
+
+    Required completion gate names come solely from
+    ``genworks-handoff-policy.json``. Out-of-scope runtime/release gates are
+    reported separately and never become completion blockers. Local runtime
+    reports are not read here.
+    """
+    handoff = _handoff_policy(root)
+    errors: list[str] = []
+    state = _lifecycle_state(manifest, handoff, errors)
+
+    completion_gates = manifest.get("completionGates")
+    if completion_gates is not None and not isinstance(completion_gates, dict):
+        errors.append("completionGates must be an object")
+        completion_gates = None
+    completion_gates = completion_gates or {}
+
+    gates: list[dict[str, str]] = []
+    blockers: list[dict[str, str]] = []
+    for name in handoff.get("requiredCompletionGates", []):
+        name = str(name)
+        recorded = completion_gates.get(name)
+        if recorded is None:
+            status = "MISSING"
+        else:
+            status = _canonical_gate_state(recorded, handoff)
+            if status is None:
+                errors.append(f"unknown completion gate state: {name}={recorded}")
+                status = "INVALID"
+        gates.append({"gate": name, "status": status})
+        if status != "PASS":
+            blockers.append({"gate": name, "status": status})
+
+    out_of_scope = {
+        _normalize_gate_name(name) for name in handoff.get("outOfScopeGates", [])
+    }
+    technical_gates = manifest.get("technicalGates")
+    runtime = [
+        {"gate": name, "status": str(value)}
+        for name, value in (
+            technical_gates.items() if isinstance(technical_gates, dict) else []
+        )
+        if _normalize_gate_name(name) in out_of_scope
+    ]
+
+    return {
+        "state": state,
+        "completionGates": gates,
+        "completionBlockers": blockers,
+        "runtimeGates": runtime,
+        "errors": list(dict.fromkeys(errors)),
+    }
+
+
 def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
     manifest_value = job.get("productManifestPath")
     if not isinstance(manifest_value, str):
@@ -265,16 +369,17 @@ def product_state_errors(job: dict[str, Any], root: Path) -> list[str]:
     ):
         errors.append("product fit audit is explicitly failing")
 
-    state = str(manifest.get("state", manifest.get("status", "WORKING"))).upper()
+    projection = completion_projection(manifest, root)
+    errors.extend(projection["errors"])
     completion_status = str(handoff.get("completionStatus", "COMPLETE")).upper()
-    if state == completion_status:
-        completion_gates = manifest.get("completionGates")
-        if not isinstance(completion_gates, dict):
+    if projection["state"] == completion_status:
+        if not isinstance(manifest.get("completionGates"), dict):
             errors.append("complete product requires completionGates")
         else:
-            for name in handoff.get("requiredCompletionGates", []):
-                if completion_gates.get(name) != "PASS":
-                    errors.append(f"complete product gate is not PASS: {name}")
+            errors.extend(
+                f"complete product gate is not PASS: {blocker['gate']}"
+                for blocker in projection["completionBlockers"]
+            )
 
     return list(dict.fromkeys(errors))
 

@@ -22,11 +22,10 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from image2outfit import improvement  # noqa: E402
 
-STATES = (
-    "WORKING",
-    "COMPLETE",
-    "REJECTED",
-)
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import production_contract  # noqa: E402
+
+STATES = production_contract.LIFECYCLE_STATES
 DEFAULT_VIEWS = ("front", "back", "left", "right", "three-quarter")
 FEATURED_PRODUCT = "siroino-lilac-lame-fencing-practice-set"
 IMAGE_SUFFIXES = (".png", ".webp", ".jpg", ".jpeg")
@@ -84,18 +83,10 @@ def relative_href(path: Path, output_dir: Path) -> str:
     return Path(os.path.relpath(path, output_dir)).as_posix()
 
 
-def safe_state(manifest: dict[str, Any]) -> str:
-    state = str(
-        pick(
-            manifest,
-            "state",
-            "status",
-            "product_state",
-            "release_state",
-            default="WORKING",
-        )
-    ).upper()
-    return state if state in STATES else "WORKING"
+def safe_state(manifest: dict[str, Any], root: Path) -> str:
+    """Lifecycle state from the shared completion projection; INVALID when unknown."""
+    state = production_contract.completion_projection(manifest, root)["state"]
+    return state or "INVALID"
 
 
 def policy_requirements(policy: dict[str, Any]) -> tuple[list[str], list[str]]:
@@ -232,6 +223,7 @@ class Product:
     gates: list[Gate]
     evidence: list[Evidence]
     downloads: list[dict[str, Any]] = field(default_factory=list)
+    completion: dict[str, Any] = field(default_factory=dict)
 
 
 def parse_gate_rows(
@@ -609,13 +601,40 @@ def collect_product(
 ) -> Product:
     manifest_path = workspace / "ProductManifest.json"
     manifest: dict[str, Any] = load_json(manifest_path, {})
+    completion = production_contract.completion_projection(manifest, root)
+    completion_gates = [
+        Gate(
+            name=item["gate"],
+            status=item["status"],
+            detail="required completion gate",
+            href=None,
+        )
+        for item in completion["completionGates"]
+    ]
+    runtime_gates = [
+        Gate(
+            name=item["gate"],
+            status=item["status"],
+            detail="runtime/release gate: outside repository completion, not a completion blocker",
+            href=None,
+        )
+        for item in completion["runtimeGates"]
+    ]
+    projected_names = {gate.name for gate in (*completion_gates, *runtime_gates)}
     blockers = [
+        {
+            "severity": "COMPLETION",
+            "message": f"required completion gate is {item['status']}: {item['gate']}",
+        }
+        for item in completion["completionBlockers"]
+    ] + [{"severity": "INVALID", "message": error} for error in completion["errors"]]
+    blockers.extend(
         {"severity": issue_severity(item), "message": issue_message(item)}
         for item in as_list(
             pick(manifest, "blockers", "defects", "issues", "findings", default=[])
         )
         if open_issue(item)
-    ]
+    )
     quality_blockers, quality_gates, quality_evidence, quality_hash = (
         parse_quality_projection(root, workspace.name, output_dir)
     )
@@ -716,7 +735,8 @@ def collect_product(
     return Product(
         slug=workspace.name,
         downloads=collect_downloads(root, workspace, output_dir, manifest, assets),
-        state=safe_state(manifest),
+        completion=completion,
+        state=completion["state"] or "INVALID",
         updated_at=str(updated_at or "UNKNOWN"),
         blocker_count=len(blockers),
         blockers=blockers,
@@ -734,7 +754,13 @@ def collect_product(
         manifest_href=relative_href(manifest_path, output_dir),
         assets=assets,
         gates=[
-            *parse_gate_rows(manifest, workspace, output_dir),
+            *completion_gates,
+            *runtime_gates,
+            *(
+                gate
+                for gate in parse_gate_rows(manifest, workspace, output_dir)
+                if gate.name not in projected_names
+            ),
             *quality_gates,
             *improvement_gates,
         ],
