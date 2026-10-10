@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "product-learning-decision",
+  "fixture": true,
+  "decisionId": "fixture-decision-001",
+  "productId": "fixture-product",
+  "productRevision": "fixture-rev-001",
+  "candidateManifestSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+  "qualitySpec": {
+    "id": "contracts/quality/quality-spec.json",
+    "sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "qualityEvidence": {
+    "status": "PASS",
+    "releaseRecordSha256": "3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "decidedAt": "2026-10-01T00:00:00Z",
+  "decisionState": "LAUNCH",
+  "approvedScope": [
+    "fixture: technically reviewed candidate, no public exposure performed"
+  ],
+  "limitations": [
+    "fixture record: no customer data exists for this revision"
+  ],
+  "unknowns": [
+    "customer value has not been observed"
+  ],
+  "hypothesis": {
+    "statement": "fixture: customers value the candidate enough to convert after launch",
+    "expectedSignal": {
+      "metric": "fixture-paid-conversion",
+      "direction": "increase",
+      "threshold": 0.02
+    },
+    "evaluationWindow": {
+      "start": "2026-10-02T00:00:00Z",
+      "end": "2026-11-01T00:00:00Z"
+    },
+    "criteria": [
+      "OBSERVED availability with at least 30 samples before any VALIDATED verdict"
+    ]
+  },
+  "metricSources": [
+    {
+      "id": "acquisition-metrics",
+      "reference": "issue-205"
+    }
+  ]
+}

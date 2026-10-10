@@ -30,6 +30,7 @@ AUDITS = {
     "genworks": "audit_genworks_layout.py",
     "tools": "audit_tool_ownership.py",
     "research": "audit_research_baseline.py",
+    "learning": "audit_product_learning.py",
 }
 AUDIT_TARGETS = (*AUDITS, "methods")
 
