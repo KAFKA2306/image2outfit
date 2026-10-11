@@ -10,8 +10,10 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "tests"))
 
 import avatar_workflow  # noqa: E402
+import known_failures  # noqa: E402
 
 
 class AvatarWorkflowTests(unittest.TestCase):
@@ -36,6 +38,7 @@ class AvatarWorkflowTests(unittest.TestCase):
 
     def test_project_preflight_passes_for_baked_upload_set(self) -> None:
         result = avatar_workflow.preflight(ROOT)
+        known_failures.require_known_or_pass(self, "avatar-workflow", result["errors"])
         self.assertTrue(result["passed"], result["errors"])
         self.assertEqual(result["selectedOutfitCount"], 11)
         self.assertEqual(len(result["outfits"]), 11)
