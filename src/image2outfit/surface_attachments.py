@@ -12,7 +12,9 @@ from PIL import Image, ImageDraw, ImageFont
 _EPSILON = 1e-10
 
 
-def _cross(a: tuple[float, float], b: tuple[float, float], c: tuple[float, float]) -> float:
+def _cross(
+    a: tuple[float, float], b: tuple[float, float], c: tuple[float, float]
+) -> float:
     return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
 
 
@@ -21,8 +23,12 @@ def _on_segment(
 ) -> bool:
     return (
         abs(_cross(start, end, point)) <= _EPSILON
-        and min(start[0], end[0]) - _EPSILON <= point[0] <= max(start[0], end[0]) + _EPSILON
-        and min(start[1], end[1]) - _EPSILON <= point[1] <= max(start[1], end[1]) + _EPSILON
+        and min(start[0], end[0]) - _EPSILON
+        <= point[0]
+        <= max(start[0], end[0]) + _EPSILON
+        and min(start[1], end[1]) - _EPSILON
+        <= point[1]
+        <= max(start[1], end[1]) + _EPSILON
     )
 
 
@@ -37,8 +43,9 @@ def _segments_intersect(
     cd_a = _cross(c, d, a)
     cd_b = _cross(c, d, b)
     if (
-        ((ab_c > _EPSILON and ab_d < -_EPSILON) or (ab_c < -_EPSILON and ab_d > _EPSILON))
-        and ((cd_a > _EPSILON and cd_b < -_EPSILON) or (cd_a < -_EPSILON and cd_b > _EPSILON))
+        (ab_c > _EPSILON and ab_d < -_EPSILON) or (ab_c < -_EPSILON and ab_d > _EPSILON)
+    ) and (
+        (cd_a > _EPSILON and cd_b < -_EPSILON) or (cd_a < -_EPSILON and cd_b > _EPSILON)
     ):
         return True
     return (
@@ -76,7 +83,10 @@ def _point_segment_distance(
         return math.dist(point, start)
     fraction = max(
         0.0,
-        min(1.0, ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) / length_squared),
+        min(
+            1.0,
+            ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) / length_squared,
+        ),
     )
     projection = (start[0] + fraction * dx, start[1] + fraction * dy)
     return math.dist(point, projection)
@@ -114,7 +124,9 @@ def _bounds(polygon: list[tuple[float, float]]) -> list[float]:
 def _pattern_piece_map(pattern: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
     units = pattern.get("units")
     if units not in {"meter", "millimeter"}:
-        raise ValueError("surface attachment audit requires meter or millimeter pattern units")
+        raise ValueError(
+            "surface attachment audit requires meter or millimeter pattern units"
+        )
     pieces = pattern.get("pieces")
     if not isinstance(pieces, list):
         raise ValueError("surface attachment audit requires pattern pieces")
@@ -138,9 +150,14 @@ def _boundary(piece: Mapping[str, Any], unit_scale: float) -> list[tuple[float, 
         if (
             not isinstance(point, list)
             or len(point) != 2
-            or not all(isinstance(value, (int, float)) and math.isfinite(value) for value in point)
+            or not all(
+                isinstance(value, (int, float)) and math.isfinite(value)
+                for value in point
+            )
         ):
-            raise ValueError("surface attachment boundaries require finite 2D coordinates")
+            raise ValueError(
+                "surface attachment boundaries require finite 2D coordinates"
+            )
         points.append((float(point[0]) * unit_scale, float(point[1]) * unit_scale))
     return points
 
@@ -155,7 +172,9 @@ def _edge_map(piece: Mapping[str, Any], piece_id: str) -> dict[str, Mapping[str,
             raise ValueError(f"pattern piece {piece_id!r} contains an invalid edge")
         edge_id = str(edge["edgeId"])
         if edge_id in result:
-            raise ValueError(f"pattern piece {piece_id!r} has duplicate edge {edge_id!r}")
+            raise ValueError(
+                f"pattern piece {piece_id!r} has duplicate edge {edge_id!r}"
+            )
         result[edge_id] = edge
     return result
 
@@ -172,7 +191,10 @@ def _placed_boundary(
         or len(anchor) != 2
         or not isinstance(target, list)
         or len(target) != 2
-        or not all(isinstance(value, (int, float)) and math.isfinite(value) for value in [*anchor, *target])
+        or not all(
+            isinstance(value, (int, float)) and math.isfinite(value)
+            for value in [*anchor, *target]
+        )
         or not isinstance(rotation, (int, float))
         or not math.isfinite(rotation)
         or not isinstance(mirror_x, bool)
@@ -219,14 +241,18 @@ def audit_surface_attachment_graph(
     structural_refs: set[tuple[str, str]] = set()
     stitches = stitch_graph.get("stitches")
     if not isinstance(stitches, list):
-        raise ValueError("surface attachment audit requires the structural stitch graph")
+        raise ValueError(
+            "surface attachment audit requires the structural stitch graph"
+        )
     for stitch in stitches:
         if not isinstance(stitch, Mapping):
             raise ValueError("structural stitches must be objects")
         for side in ("first", "second"):
             endpoint = stitch.get(side)
             if isinstance(endpoint, Mapping):
-                structural_refs.add((str(endpoint.get("pieceId")), str(endpoint.get("edgeId"))))
+                structural_refs.add(
+                    (str(endpoint.get("pieceId")), str(endpoint.get("edgeId")))
+                )
 
     overlay_ids: set[str] = set()
     placed: list[dict[str, Any]] = []
@@ -236,13 +262,18 @@ def audit_surface_attachment_graph(
         overlay_id = raw.get("overlayId")
         host_id = raw.get("hostPieceId")
         overlay_piece_id = raw.get("overlayPieceId")
-        if not all(isinstance(value, str) and value for value in (overlay_id, host_id, overlay_piece_id)):
+        if not all(
+            isinstance(value, str) and value
+            for value in (overlay_id, host_id, overlay_piece_id)
+        ):
             raise ValueError("surface attachment overlay IDs are required")
         if overlay_id in overlay_ids:
             raise ValueError(f"duplicate surface attachment overlay ID: {overlay_id}")
         overlay_ids.add(overlay_id)
         if host_id not in pieces or overlay_piece_id not in pieces:
-            raise ValueError(f"overlay {overlay_id!r} references an unknown pattern piece")
+            raise ValueError(
+                f"overlay {overlay_id!r} references an unknown pattern piece"
+            )
         if host_id == overlay_piece_id:
             raise ValueError(f"overlay {overlay_id!r} cannot attach to itself")
 
@@ -256,23 +287,40 @@ def audit_surface_attachment_graph(
             expected_attachment_ids = set(edges)
         else:
             if not isinstance(opening_id, str) or opening_id not in edges:
-                raise ValueError(f"overlay {overlay_id!r} references an unknown opening edge")
+                raise ValueError(
+                    f"overlay {overlay_id!r} references an unknown opening edge"
+                )
             if edges[opening_id].get("role") != "open":
-                raise ValueError(f"overlay {overlay_id!r} opening edge must have role open")
+                raise ValueError(
+                    f"overlay {overlay_id!r} opening edge must have role open"
+                )
             expected_attachment_ids = set(edges) - {opening_id}
-        if not isinstance(attachment_ids, list) or set(attachment_ids) != expected_attachment_ids:
-            raise ValueError(f"overlay {overlay_id!r} attachment path must cover every attachable edge")
-        if any(edges[edge_id].get("role") != "attachment" for edge_id in attachment_ids):
-            raise ValueError(f"overlay {overlay_id!r} attachment path includes a non-attachment edge")
+        if (
+            not isinstance(attachment_ids, list)
+            or set(attachment_ids) != expected_attachment_ids
+        ):
+            raise ValueError(
+                f"overlay {overlay_id!r} attachment path must cover every attachable edge"
+            )
+        if any(
+            edges[edge_id].get("role") != "attachment" for edge_id in attachment_ids
+        ):
+            raise ValueError(
+                f"overlay {overlay_id!r} attachment path includes a non-attachment edge"
+            )
         if any((overlay_piece_id, edge_id) in structural_refs for edge_id in edges):
-            raise ValueError(f"overlay {overlay_id!r} is incorrectly mixed into the structural stitch graph")
+            raise ValueError(
+                f"overlay {overlay_id!r} is incorrectly mixed into the structural stitch graph"
+            )
 
         transform = raw.get("transform")
         if not isinstance(transform, Mapping):
             raise ValueError(f"overlay {overlay_id!r} requires a 2D transform")
         polygon = _placed_boundary(local, transform, overlay_id)
         if any(_point_location(point, host) != "inside" for point in polygon):
-            raise ValueError(f"overlay {overlay_id!r} boundary is not strictly inside host {host_id!r}")
+            raise ValueError(
+                f"overlay {overlay_id!r} boundary is not strictly inside host {host_id!r}"
+            )
         host_edges = _edges(host)
         overlay_edges = _edges(polygon)
         intersections = sum(
@@ -281,7 +329,9 @@ def audit_surface_attachment_graph(
             for third, fourth in host_edges
         )
         if intersections:
-            raise ValueError(f"overlay {overlay_id!r} crosses or touches the host boundary")
+            raise ValueError(
+                f"overlay {overlay_id!r} crosses or touches the host boundary"
+            )
         clearance = min(
             _segment_distance(first, second, third, fourth)
             for first, second in overlay_edges
@@ -315,12 +365,16 @@ def audit_surface_attachment_graph(
                 for a, b in _edges(first_polygon)
                 for c, d in _edges(second_polygon)
             )
-            if edge_collision or any(
-                _point_location(point, first_polygon) != "outside"
-                for point in second_polygon
-            ) or any(
-                _point_location(point, second_polygon) != "outside"
-                for point in first_polygon
+            if (
+                edge_collision
+                or any(
+                    _point_location(point, first_polygon) != "outside"
+                    for point in second_polygon
+                )
+                or any(
+                    _point_location(point, second_polygon) != "outside"
+                    for point in first_polygon
+                )
             ):
                 raise ValueError(
                     f"surface overlays {first['overlayId']!r} and {second['overlayId']!r} overlap"
@@ -330,18 +384,30 @@ def audit_surface_attachment_graph(
     for overlay in placed:
         group_id = overlay.get("mirrorGroupId")
         if not isinstance(group_id, str) or not group_id:
-            raise ValueError(f"overlay {overlay['overlayId']!r} requires a mirrorGroupId")
+            raise ValueError(
+                f"overlay {overlay['overlayId']!r} requires a mirrorGroupId"
+            )
         mirror_groups.setdefault(group_id, []).append(overlay)
     mirror_records: list[dict[str, Any]] = []
     for group_id, group in sorted(mirror_groups.items()):
         if len(group) != 2 or {item["side"] for item in group} != {"left", "right"}:
-            raise ValueError(f"mirror group {group_id!r} must contain one left and one right overlay")
+            raise ValueError(
+                f"mirror group {group_id!r} must contain one left and one right overlay"
+            )
         left = next(item for item in group if item["side"] == "left")
         right = next(item for item in group if item["side"] == "right")
-        reflected = sorted((round(-point[0], 9), round(point[1], 9)) for point in left["placedBoundaryM"])
-        right_points = sorted((round(point[0], 9), round(point[1], 9)) for point in right["placedBoundaryM"])
+        reflected = sorted(
+            (round(-point[0], 9), round(point[1], 9))
+            for point in left["placedBoundaryM"]
+        )
+        right_points = sorted(
+            (round(point[0], 9), round(point[1], 9))
+            for point in right["placedBoundaryM"]
+        )
         if reflected != right_points:
-            raise ValueError(f"mirror group {group_id!r} is not geometrically symmetric")
+            raise ValueError(
+                f"mirror group {group_id!r} is not geometrically symmetric"
+            )
         mirror_records.append(
             {
                 "mirrorGroupId": group_id,
@@ -373,15 +439,21 @@ def render_surface_attachment_preview(
 ) -> dict[str, Any]:
     """Render audited flat overlay polygons alongside the front/back references."""
     if pattern.get("units") not in {"meter", "millimeter"}:
-        raise ValueError("surface attachment preview requires meter or millimeter pattern units")
+        raise ValueError(
+            "surface attachment preview requires meter or millimeter pattern units"
+        )
     overlays = audit.get("overlays")
     if not isinstance(overlays, list) or not overlays:
         raise ValueError("surface attachment preview requires audited overlay polygons")
     if set(references) != {"front", "back"}:
-        raise ValueError("surface attachment preview requires front and back reference images")
+        raise ValueError(
+            "surface attachment preview requires front and back reference images"
+        )
     for view, path in references.items():
         if not path.is_file():
-            raise FileNotFoundError(f"surface attachment {view} reference is missing: {path}")
+            raise FileNotFoundError(
+                f"surface attachment {view} reference is missing: {path}"
+            )
 
     pieces = _pattern_piece_map(pattern)
     unit_scale = 1.0 if pattern["units"] == "meter" else 0.001
@@ -399,7 +471,12 @@ def render_surface_attachment_preview(
     title_font = font(29)
     label_font = font(21)
     small_font = font(16)
-    draw.text((30, 24), "GARMENTCODE / OPENSEW · 2D HOST-PANEL REVIEW", fill="#202b39", font=title_font)
+    draw.text(
+        (30, 24),
+        "GARMENTCODE / OPENSEW · 2D HOST-PANEL REVIEW",
+        fill="#202b39",
+        font=title_font,
+    )
     draw.text(
         (30, 68),
         "Reference images beside the current surface-attachment graph projected onto each host shell.",
@@ -409,10 +486,17 @@ def render_surface_attachment_preview(
 
     for view, top in (("front", 190), ("back", 545)):
         box = (30, top, 500, top + 318)
-        draw.text((box[0], box[1] - 30), f"REFERENCE · {view.upper()}", fill="#202b39", font=label_font)
+        draw.text(
+            (box[0], box[1] - 30),
+            f"REFERENCE · {view.upper()}",
+            fill="#202b39",
+            font=label_font,
+        )
         with Image.open(references[view]) as source:
             image = source.convert("RGB")
-            image.thumbnail((box[2] - box[0] - 12, box[3] - box[1] - 12), Image.Resampling.LANCZOS)
+            image.thumbnail(
+                (box[2] - box[0] - 12, box[3] - box[1] - 12), Image.Resampling.LANCZOS
+            )
             x = box[0] + (box[2] - box[0] - image.width) // 2
             y = box[1] + (box[3] - box[1] - image.height) // 2
             canvas.paste(image, (x, y))
@@ -420,8 +504,12 @@ def render_surface_attachment_preview(
 
     overlays_by_host: dict[str, list[Mapping[str, Any]]] = {}
     for item in overlays:
-        if not isinstance(item, Mapping) or not isinstance(item.get("hostPieceId"), str):
-            raise ValueError("surface attachment preview contains an invalid audited overlay")
+        if not isinstance(item, Mapping) or not isinstance(
+            item.get("hostPieceId"), str
+        ):
+            raise ValueError(
+                "surface attachment preview contains an invalid audited overlay"
+            )
         overlays_by_host.setdefault(str(item["hostPieceId"]), []).append(item)
 
     host_ids = sorted(overlays_by_host)
@@ -445,11 +533,15 @@ def render_surface_attachment_preview(
         top = round(panel_top + row * (panel_height + row_gap))
         right = round(left + panel_width)
         bottom = round(top + panel_height)
-        panel_specs.append((f"HOST PANEL · {piece_id}", piece_id, (left, top, right, bottom)))
+        panel_specs.append(
+            (f"HOST PANEL · {piece_id}", piece_id, (left, top, right, bottom))
+        )
 
     for label, piece_id, box in panel_specs:
         if piece_id not in pieces:
-            raise ValueError(f"surface attachment preview is missing host panel {piece_id!r}")
+            raise ValueError(
+                f"surface attachment preview is missing host panel {piece_id!r}"
+            )
         boundary = _boundary(pieces[piece_id], unit_scale)
         min_x = min(point[0] for point in boundary)
         max_x = max(point[0] for point in boundary)
@@ -458,7 +550,9 @@ def render_surface_attachment_preview(
         span_x = max_x - min_x
         span_y = max_y - min_y
         if span_x <= _EPSILON or span_y <= _EPSILON:
-            raise ValueError(f"surface attachment host panel {piece_id!r} has zero area bounds")
+            raise ValueError(
+                f"surface attachment host panel {piece_id!r} has zero area bounds"
+            )
         left, top, right, bottom = box
         scale = min((right - left - 22) / span_x, (bottom - top - 42) / span_y)
         panel_width = span_x * scale
@@ -474,15 +568,22 @@ def render_surface_attachment_preview(
         for overlay in overlays_by_host.get(piece_id, []):
             raw_polygon = overlay.get("placedBoundaryM")
             if not isinstance(raw_polygon, list) or len(raw_polygon) < 3:
-                raise ValueError("surface attachment preview requires an audited polygon boundary")
+                raise ValueError(
+                    "surface attachment preview requires an audited polygon boundary"
+                )
             polygon: list[tuple[float, float]] = []
             for point in raw_polygon:
                 if (
                     not isinstance(point, list)
                     or len(point) != 2
-                    or not all(isinstance(value, (int, float)) and math.isfinite(value) for value in point)
+                    or not all(
+                        isinstance(value, (int, float)) and math.isfinite(value)
+                        for value in point
+                    )
                 ):
-                    raise ValueError("surface attachment preview polygon coordinates must be finite pairs")
+                    raise ValueError(
+                        "surface attachment preview polygon coordinates must be finite pairs"
+                    )
                 polygon.append((float(point[0]), float(point[1])))
             draw.polygon(project(polygon), fill="#e7aa47", outline="#fff0c2", width=2)
 
