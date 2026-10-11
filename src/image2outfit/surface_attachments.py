@@ -115,7 +115,6 @@ def _pattern_piece_map(pattern: Mapping[str, Any]) -> dict[str, Mapping[str, Any
     units = pattern.get("units")
     if units not in {"meter", "millimeter"}:
         raise ValueError("surface attachment audit requires meter or millimeter pattern units")
-    unit_scale = 1.0 if units == "meter" else 0.001
     pieces = pattern.get("pieces")
     if not isinstance(pieces, list):
         raise ValueError("surface attachment audit requires pattern pieces")

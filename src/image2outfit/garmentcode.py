@@ -282,7 +282,6 @@ def pattern_contract_to_garmentcode_preview(
                         "edgeLengthM": edge_lengths_by_piece[piece_id][edge_id],
                     }
                 )
-            direction = stitch.get("direction")
             endpoint_mapping, endpoint_mapping_source = resolve_endpoint_mapping(
                 stitch
             )
