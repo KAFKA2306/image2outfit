@@ -2334,6 +2334,14 @@ def stage_finalize(
     manifest["status"] = status
     manifest["completionGates"] = candidate["gates"]
     manifest["candidateState"] = relative(candidate_path)
+    manifest["visualAppearanceReview"] = {
+        "result": "PASS" if visual["decision"] == "PASS" else "FAIL",
+        "decision": visual["decision"],
+        "findings": visual["findings"],
+        "inspectedImages": visual["inspectedImages"],
+        "status": visual["status"],
+        "reviewMethod": "direct-image-inspection",
+    }
     write_json(manifest_path, manifest)
     emit(
         result,
