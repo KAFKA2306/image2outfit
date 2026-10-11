@@ -1,11 +1,12 @@
 {
   "schema_version": "review-console.v2",
-  "generated_at": "2026-10-08T10:12:14.653662+00:00",
+  "generated_at": "2026-10-11T16:31:20.976210+00:00",
   "states": [
     "WORKING",
     "COMPLETE",
     "REJECTED"
   ],
+  "featured_product": "siroino-lilac-lame-fencing-practice-set",
   "required_views": [
     "front",
     "back",
@@ -154,6 +155,12 @@
           "status": "NOT_RUN",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/haolan-bordeaux-knit-set/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -162,7 +169,7 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/haolan-bordeaux-knit-set/images-4145c911910dc09b.zip",
-          "sha256": "def6e31603f955aaff1912d797ae9ad9ef7a3e5c1e9447d1745fbdcab147843d"
+          "sha256": "74d8b1f674db2a4b519684bf7596edfb563e73800d6e11ba8c1a49489903647b"
         }
       ]
     },
@@ -323,6 +330,12 @@
           "status": "NOT_RUN",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/haolan-cow-hood-knit-set/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -331,102 +344,104 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/haolan-cow-hood-knit-set/images-3b359f4eef9f8d4c.zip",
-          "sha256": "693924e9bfb5d4841ed3ec882af940284792ae2321815398c9c43c54f7a68ecc"
+          "sha256": "2d47fdff7a9cf693ce31c8248921060aaa329ee20812edb1f180e98160a74431"
         }
       ]
     },
     {
-      "slug": "siroino-astral-tabi-boot-set",
+      "slug": "siroino-arc-latch-cocoon-bomber-set",
       "state": "WORKING",
-      "updated_at": "2026-09-27T23:22:42.690907+00:00",
-      "blocker_count": 1,
-      "blockers": [
-        {
-          "severity": "IMPROVEMENT",
-          "message": "unknown · WAITING_FOR_CANDIDATE_QUALITY"
-        }
-      ],
-      "resume_point": "WAITING_FOR_CANDIDATE_QUALITY",
+      "updated_at": "2026-10-09T11:40:55.580112+00:00",
+      "blocker_count": 0,
+      "blockers": [],
+      "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
-      "manifest_href": "Assets/GenWorks/siroino-astral-tabi-boot-set/ProductManifest.json",
+      "manifest_href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/ProductManifest.json",
       "assets": [
         {
           "kind": "view",
           "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/front.png",
+          "sha256": "bb69c908d007e0c8d360e46e3be21238acd4d7fb1ab87a63051a60d468ce491b"
         },
         {
           "kind": "view",
           "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/back.png",
+          "sha256": "25126bb050d31c2dd884dc7013d86e3a5dca9b131f11c7c2972692647168d9d1"
         },
         {
           "kind": "view",
           "name": "left",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/left.png",
+          "sha256": "f5bbdb7189fe4b5bfa9ccbdf2fe52d7c397a161a634bf7bc915ad0668f294a67"
         },
         {
           "kind": "view",
           "name": "right",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/right.png",
+          "sha256": "c5b94068f32010f734a9061b66b58ed8409c5055676c52cc3e8e4aca0e0d5135"
         },
         {
           "kind": "view",
           "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/three-quarter.png",
+          "sha256": "dddc0fad139afbdc9df2f0f8fb07495ba16c1b1371bb1d5d84ead3d414430d1b"
         },
         {
           "kind": "pose",
           "name": "neutral",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/Poses/neutral.png",
+          "sha256": "27a8dfc3b19e51c0f6dfe647e8d0cdba0c44eb62ad3f3ee33f55512ff9c113c0"
         },
         {
           "kind": "pose",
           "name": "arms-up",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/Poses/arms-up.png",
+          "sha256": "75a44dd8778a4791b50fb45078c9bdfa5f573cd897d74ec6a61325992a1f5182"
         },
         {
           "kind": "pose",
           "name": "arm-cross",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/Poses/arm-cross.png",
+          "sha256": "9bed328ba4c847c35c7120712eddbc13ed99774804d88878d9552ebc39779fa8"
         },
         {
           "kind": "pose",
           "name": "crouch",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/Poses/crouch.png",
+          "sha256": "8edd81825c9fb9f9777c1cb08d1e51d09f4dceb116ccc9bdde8c95f691935aaf"
         },
         {
           "kind": "pose",
           "name": "sit",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/Poses/sit.png",
+          "sha256": "acfd113e1e3a21b9717563bc4995434c6f852baa769b37d5f54c161301427c50"
         },
         {
           "kind": "pose",
           "name": "prone",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/Poses/prone.png",
+          "sha256": "6a7ab415c1a34f8a82dd4d851bfecfd5e354eaffb0c91b84fa6fd9e8d70efa35"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-wide-cargo-pose-review.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/Previews/siroino-wide-cargo-pose-review.webp",
+          "sha256": "69c1d588d36785fb11d89b106512f80f88c6645e3fb4f640ef85f1b220b90b6e"
         }
       ],
       "gates": [
@@ -444,85 +459,543 @@
         },
         {
           "name": "stitchGraph",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "garmentCodeStitchExport",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
           "status": "PENDING",
           "detail": "",
           "href": null
         },
         {
           "name": "blender",
-          "status": "PENDING",
+          "status": "PENDING_RETRY",
           "detail": "",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "NOT_REQUIRED",
           "detail": "",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
-          "name": "licenseReview",
-          "status": "PENDING",
+          "name": "tenAxisAudit",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
-          "name": "improvement:next-action",
-          "status": "PENDING",
-          "detail": "unknown; selected=none",
+          "name": "visualAppearanceReview",
+          "status": "UNVERIFIED",
+          "detail": "",
           "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "unitySaveReload",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatBuildTest",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-arc-latch-cocoon-bomber-set/ProductManifest.json"
         }
       ],
-      "evidence": [
+      "evidence": [],
+      "downloads": [
         {
-          "label": "Improvement plan",
+          "kind": "images",
+          "label": "画像セットを保存",
+          "href": "downloads/siroino-arc-latch-cocoon-bomber-set/images-ec76e7631c4bd19d.zip",
+          "sha256": "3ce688cfd004d63182d2f2962f20122886cfd7106a1e64862500855341e3ba8b"
+        }
+      ]
+    },
+    {
+      "slug": "siroino-aster-fold-utility-kimono-set",
+      "state": "WORKING",
+      "updated_at": "2026-10-09T11:40:55.617098+00:00",
+      "blocker_count": 0,
+      "blockers": [],
+      "resume_point": "未登録",
+      "candidate_hash": "UNKNOWN",
+      "human_review_url": "",
+      "manifest_href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/ProductManifest.json",
+      "assets": [
+        {
+          "kind": "view",
+          "name": "front",
           "status": "PASS",
-          "href": ".image2outfit/products/siroino-astral-tabi-boot-set/reports/improvement-plan.json",
-          "sha256": "61caec3afffa0a80ec253b3a144edb9bdc548458f6f5650f13cd698dc15990a6"
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/front.png",
+          "sha256": "81d36b48c86563fd3361e88a609a3fc723b2b2b8349715cded1af81ba74bec27"
+        },
+        {
+          "kind": "view",
+          "name": "back",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/back.png",
+          "sha256": "1da83b2d4f5b3378d4a5e3456178ad51337bb72a68fd477693ea80fe83363f25"
+        },
+        {
+          "kind": "view",
+          "name": "left",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/left.png",
+          "sha256": "3110e62f1fc033cd03f19d5a34211648dd4564bfc8ba35676bac2b60e898895c"
+        },
+        {
+          "kind": "view",
+          "name": "right",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/right.png",
+          "sha256": "39c5fc8f03b7774774d3970d21f9129e0e387742ab6cf7af1065899dc0009279"
+        },
+        {
+          "kind": "view",
+          "name": "three-quarter",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/three-quarter.png",
+          "sha256": "b3a76d4caa64ad76c3db8a25bf4204f4288c28d3fc3b1f06f992b2fe0efeb08a"
+        },
+        {
+          "kind": "pose",
+          "name": "neutral",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/Poses/neutral.png",
+          "sha256": "ec0f0e96148a298afde70e1918ad1a6e796989b8c9afa35edd1cdd1c41c408da"
+        },
+        {
+          "kind": "pose",
+          "name": "arms-up",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/Poses/arms-up.png",
+          "sha256": "9f7ed84a26433c6da3f9f99b64c6132534f24032689821774c3d7e958ddea8f3"
+        },
+        {
+          "kind": "pose",
+          "name": "arm-cross",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/Poses/arm-cross.png",
+          "sha256": "1b0e5a5944f3bee1458a87818bc2d8fe0b91447995d42e42a090e43efaa3d72c"
+        },
+        {
+          "kind": "pose",
+          "name": "crouch",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/Poses/crouch.png",
+          "sha256": "96488bb6c8c7c61ee2cbc8007592c57995176cfae5425ac9081f1bb0e920288d"
+        },
+        {
+          "kind": "pose",
+          "name": "sit",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/Poses/sit.png",
+          "sha256": "504b06b8c541a5234c4e664c11fb64ca1dcb1c73c5f9037a445947ed8fc19950"
+        },
+        {
+          "kind": "pose",
+          "name": "prone",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/Poses/prone.png",
+          "sha256": "de9fdb13e23a2ce0598d46e125625ff4ab3697fa467137d4f143260c98274e90"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-wide-cargo-pose-review.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/siroino-wide-cargo-pose-review.webp",
+          "sha256": "306e414934870374ef467966332394429212f20189c72d248f17dc0cf301ad1a"
         }
       ],
-      "downloads": []
+      "gates": [
+        {
+          "name": "referenceAudit",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "patternContract",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "blender",
+          "status": "PENDING_RETRY",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "NOT_REQUIRED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/ProductManifest.json"
+        }
+      ],
+      "evidence": [],
+      "downloads": [
+        {
+          "kind": "images",
+          "label": "画像セットを保存",
+          "href": "downloads/siroino-aster-fold-utility-kimono-set/images-ba76fcc99b0993f7.zip",
+          "sha256": "5f8b049aa1585170d94b17e7a54bc66b8340f65735b6db38834ab4b8c6e2e5b5"
+        }
+      ]
+    },
+    {
+      "slug": "siroino-bellflower-lantern-trouser-set",
+      "state": "WORKING",
+      "updated_at": "2026-10-09T11:40:55.663141+00:00",
+      "blocker_count": 0,
+      "blockers": [],
+      "resume_point": "未登録",
+      "candidate_hash": "UNKNOWN",
+      "human_review_url": "",
+      "manifest_href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/ProductManifest.json",
+      "assets": [
+        {
+          "kind": "view",
+          "name": "front",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/front.png",
+          "sha256": "921423fd4f588242e048a45d796e94744f4bfc7647763e32e132d6fd5cc7149c"
+        },
+        {
+          "kind": "view",
+          "name": "back",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/back.png",
+          "sha256": "caa3ca9e34b2e4d77954c65ed265427fe387f23b28b0d3d5df19666d487d443a"
+        },
+        {
+          "kind": "view",
+          "name": "left",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/left.png",
+          "sha256": "0f18eb2529fc8ddb8622fad0730a0ca2d92dfd7c002e27fe14ac98b7ede62287"
+        },
+        {
+          "kind": "view",
+          "name": "right",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/right.png",
+          "sha256": "2f7e8236b2c61b2e839b2df37ffdc3be2397da0808a6478535993387002c7927"
+        },
+        {
+          "kind": "view",
+          "name": "three-quarter",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/three-quarter.png",
+          "sha256": "7373af1e7eebd7000a97a93430ee6aa3dc1e408a41b4bbfb70540936f04d67a0"
+        },
+        {
+          "kind": "pose",
+          "name": "neutral",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/Poses/neutral.png",
+          "sha256": "08e0205c43dce2d1e0d18c8c9d5ff1d913dca8d0208dc75d870ebc6e7c24f216"
+        },
+        {
+          "kind": "pose",
+          "name": "arms-up",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/Poses/arms-up.png",
+          "sha256": "08caf50cf556a4d6e19fbb545dec07c7a4394ca457047971372fc9cef565f6e5"
+        },
+        {
+          "kind": "pose",
+          "name": "arm-cross",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/Poses/arm-cross.png",
+          "sha256": "db514ee995c76cf4afcd63fec0f872dba24c37c0ced46d44b9206328664bb46f"
+        },
+        {
+          "kind": "pose",
+          "name": "crouch",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/Poses/crouch.png",
+          "sha256": "cbe00430dca879a8aa6d20171a39c49461962b7b615eb118830a644341619804"
+        },
+        {
+          "kind": "pose",
+          "name": "sit",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/Poses/sit.png",
+          "sha256": "d30e0b7bf2ef2f7b2558e4ff9770554dd88b7bdbbb8b75c53f78a52d4d0d8a8a"
+        },
+        {
+          "kind": "pose",
+          "name": "prone",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/Poses/prone.png",
+          "sha256": "237a75df471a4f165a524cdb0eb3e4edfdc335acec6ba1973331de176ec0e274"
+        },
+        {
+          "kind": "current-preview",
+          "name": "manufacturing-blueprint.png",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/manufacturing-blueprint.png",
+          "sha256": "2f281b1e6b24e9bef900666060e021a8f9e495433d946d778c88cfd68b0c4e24"
+        },
+        {
+          "kind": "current-preview",
+          "name": "pattern-layout.png",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/pattern-layout.png",
+          "sha256": "2f281b1e6b24e9bef900666060e021a8f9e495433d946d778c88cfd68b0c4e24"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-bellflower-lantern-trouser-set-pose-review.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/siroino-bellflower-lantern-trouser-set-pose-review.webp",
+          "sha256": "4cce97fbad4595f3d2d6e0b7d92fa862f7aa6e57acbee0e1dea1a8fe10eaa4b3"
+        }
+      ],
+      "gates": [
+        {
+          "name": "referenceAudit",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "patternContract",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "blender",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "NOT_REQUIRED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "FAIL",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/ProductManifest.json"
+        }
+      ],
+      "evidence": [],
+      "downloads": [
+        {
+          "kind": "images",
+          "label": "画像セットを保存",
+          "href": "downloads/siroino-bellflower-lantern-trouser-set/images-0fbfde375fb475ac.zip",
+          "sha256": "0548b5b0a7ad2de79a7ed1b35054ec8dbf918992a3d13a29194deab33ffe5c29"
+        }
+      ]
     },
     {
       "slug": "siroino-blue-happi",
       "state": "WORKING",
-      "updated_at": "2026-09-16T01:47:00.502227+00:00",
+      "updated_at": "2026-10-09T11:40:55.770159+00:00",
       "blocker_count": 0,
       "blockers": [],
       "resume_point": "未登録",
@@ -533,93 +1006,93 @@
         {
           "kind": "view",
           "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
+          "sha256": "cab700a5531078c83b5ed3cf77f7c54ac4f71e8f50df0ee5de4a4a440b5b5f11"
         },
         {
           "kind": "view",
           "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-blue-happi/Previews/back.png",
+          "sha256": "13e76ce1bc79e9958b645356e76d7031693eaefd8991977d6b17526dc67263e9"
         },
         {
           "kind": "view",
           "name": "left",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-blue-happi/Previews/left.png",
-          "sha256": "a1fb60713c213dc82d1c917f2f12afb53b3b65166da4c4f8c2ddfe6aa26c41d4"
+          "sha256": "f8740a90bb55cc0c075ebe28cea4f842740c9d113943bee93c7f88027481fdcf"
         },
         {
           "kind": "view",
           "name": "right",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-blue-happi/Previews/right.png",
-          "sha256": "45bb013f47b1acc4786f1a7ac7c0cf3d7f7193a77d427378b3787b74b0614102"
+          "sha256": "a7081ec1c9eca5f1a9a5a71afc72dc969066330c5e335bb47d00caf499c2d0e5"
         },
         {
           "kind": "view",
           "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-blue-happi/Previews/three-quarter.png",
+          "sha256": "6df5190be5ad6967a2152aec8054d180682c31a0fdd60ef5261be4f1d6e9fc7b"
         },
         {
           "kind": "pose",
           "name": "neutral",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/neutral.png",
+          "sha256": "89ef4857b6606539ba162a5651f83969c6485749a1049132444363fb7e7dfb75"
         },
         {
           "kind": "pose",
           "name": "arms-up",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arms-up.png",
+          "sha256": "7d6fe27b79c62cbbdd330b80352ae915f656cd033ad91c5d5c91ddc354aa7a36"
         },
         {
           "kind": "pose",
           "name": "arm-cross",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/arm-cross.png",
+          "sha256": "ef3d00fe9dc289fe70b102b21d4d4d502326ece7828c7e8ddd4595d73115c191"
         },
         {
           "kind": "pose",
           "name": "crouch",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/crouch.png",
+          "sha256": "b925bffb5e04d6c25688df6d9c0e413a949d7a8d23dfd7ebb1853ce511a419d2"
         },
         {
           "kind": "pose",
           "name": "sit",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/sit.png",
+          "sha256": "058993fd92633e0e21b82b758b74ebcef9912313222e0a7fc32bbeb5f4ef6223"
         },
         {
           "kind": "pose",
           "name": "prone",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-blue-happi/Previews/Poses/prone.png",
-          "sha256": "a1f9ccc79aa970278ec34d3f17b0ac59a46e51ba88277ff2889517f8d88f1e50"
+          "sha256": "0f3ac3ecb2602cc2aea19b163dccf72d8d44411e47b9285c08a0d130270b0adc"
         },
         {
           "kind": "current-preview",
           "name": "siroino-blue-happi-multiview.webp",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-blue-happi/Previews/siroino-blue-happi-multiview.webp",
-          "sha256": "f6e055182e340ba607516e301e5c36138ec8f94784e0e133ba0a603b6a3ea6d5"
+          "sha256": "0a4ca982df64395aed0555e85dcdc86f9b24c7802d37b6d3c810daec574238e0"
         },
         {
           "kind": "current-preview",
           "name": "siroino-blue-happi-pose-review.webp",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-blue-happi/Previews/siroino-blue-happi-pose-review.webp",
-          "sha256": "292d9dadf3b01a7dd1f4af15bb58618e6cebc11a3e82e0e15ca9da773e251c84"
+          "sha256": "0f7aa706ab2861ee5adc0df56126a011f23748c3a13320e59de2915a19d682c2"
         }
       ],
       "gates": [
@@ -730,6 +1203,12 @@
           "status": "OUT_OF_SCOPE",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-blue-happi/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -737,8 +1216,8 @@
         {
           "kind": "images",
           "label": "画像セットを保存",
-          "href": "downloads/siroino-blue-happi/images-6555d113e63c6f1f.zip",
-          "sha256": "e19a91dc432615f0630cf30e6b33c6e7dc06aa4e64423015bbebaefcd22651c6"
+          "href": "downloads/siroino-blue-happi/images-a1d40931ce06d3d9.zip",
+          "sha256": "2574fd29a8842b58f4321c41b663c0e7bb162c56a05223b03f3e82f3eae07f88"
         }
       ]
     },
@@ -977,6 +1456,12 @@
           "status": "PASS",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-cyber-kawaii-large/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -985,383 +1470,14 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/siroino-cyber-kawaii-large/images-dee15455d69cf993.zip",
-          "sha256": "ced87a0bc0b536a7c6ba3526e9b43c56af7e5ee52b6bd5745a2871296fc07d48"
+          "sha256": "08be98ebd2fa2a116cb9b1498f5cb8137966f1e4546fa14f22c313de7327ac1e"
         }
       ]
     },
     {
-      "slug": "siroino-glasshouse-rain-cape-set",
-      "state": "WORKING",
-      "updated_at": "2026-09-27T15:13:16.742249+00:00",
-      "blocker_count": 6,
-      "blockers": [
-        {
-          "severity": "UNKNOWN",
-          "message": "Visual appearance review is pending; the flat 2D panel layout is not assembled outfit or avatar fit evidence."
-        },
-        {
-          "severity": "UNKNOWN",
-          "message": "Pattern dimensions, cape arm openings, wrap closure, and avatar fit are draft hypotheses without measured validation."
-        },
-        {
-          "severity": "UNKNOWN",
-          "message": "The product-specific Blender builder is not authored and must wait until visualAppearanceReview passes."
-        },
-        {
-          "severity": "UNKNOWN",
-          "message": "Commercial use of the target avatar and all downstream customer-release gates remain unverified."
-        },
-        {
-          "severity": "UNKNOWN",
-          "message": "visualAppearanceReview requires direct-render images for five views and six poses, but initialize-3d is blocked until that gate passes and the current product has no compliant non-3D render path."
-        },
-        {
-          "severity": "UNKNOWN",
-          "message": "The 650 mm waist-belt strap is a provisional estimate derived from a reference-estimated belt position at 67% of target-avatar stature, a 550 mm measured bare-body section, a 20 mm garment/ease allowance, and an 80 mm buckle return; the wear height and allowance are not yet visually or physically validated."
-        }
-      ],
-      "resume_point": "未登録",
-      "candidate_hash": "UNKNOWN",
-      "human_review_url": "",
-      "manifest_href": "Assets/GenWorks/siroino-glasshouse-rain-cape-set/ProductManifest.json",
-      "assets": [
-        {
-          "kind": "view",
-          "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "view",
-          "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "view",
-          "name": "left",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "view",
-          "name": "right",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "view",
-          "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "neutral",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "arms-up",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "arm-cross",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "crouch",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "sit",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "prone",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        }
-      ],
-      "gates": [
-        {
-          "name": "referenceAudit",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "patternContract",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "stitchGraph",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "garmentCodeStitchExport",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "blender",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "clothSimulation",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "licenseReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        }
-      ],
-      "evidence": [],
-      "downloads": []
-    },
-    {
-      "slug": "siroino-harbor-signalist-uniform",
-      "state": "WORKING",
-      "updated_at": "2026-09-26T14:08:42.968323+00:00",
-      "blocker_count": 0,
-      "blockers": [],
-      "resume_point": "未登録",
-      "candidate_hash": "UNKNOWN",
-      "human_review_url": "",
-      "manifest_href": "Assets/GenWorks/siroino-harbor-signalist-uniform/ProductManifest.json",
-      "assets": [
-        {
-          "kind": "view",
-          "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "view",
-          "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "view",
-          "name": "left",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "view",
-          "name": "right",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "view",
-          "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "neutral",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "arms-up",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "arm-cross",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "crouch",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "sit",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        },
-        {
-          "kind": "pose",
-          "name": "prone",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
-        }
-      ],
-      "gates": [
-        {
-          "name": "referenceAudit",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "patternContract",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "stitchGraph",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "garmentCodeStitchExport",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "blender",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "clothSimulation",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "licenseReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        }
-      ],
-      "evidence": [],
-      "downloads": []
-    },
-    {
       "slug": "siroino-heather-hooded-bodysuit",
       "state": "WORKING",
-      "updated_at": "2026-09-19T07:19:16.039924+00:00",
+      "updated_at": "2026-10-09T11:40:55.852527+00:00",
       "blocker_count": 0,
       "blockers": [],
       "resume_point": "未登録",
@@ -1372,37 +1488,37 @@
         {
           "kind": "view",
           "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/front.png",
+          "sha256": "83568e1750ddbc8fa959d50f3cf928327fbb21b1680bbfb3887af78df431f543"
         },
         {
           "kind": "view",
           "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/back.png",
+          "sha256": "d2300ccb5e446b5550951105b0dddb211e47194d724ec76682d4a1663692116c"
         },
         {
           "kind": "view",
           "name": "left",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/left.png",
+          "sha256": "d6eed28acfece4689d597ecbfa74e1b6854a5ebf8d33c8aa574b34c9e90b58bb"
         },
         {
           "kind": "view",
           "name": "right",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/right.png",
+          "sha256": "d26105f5b70262031ce483d736eeec75f8dc4a9a11287032d8b563403b8dd6fd"
         },
         {
           "kind": "view",
           "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/three-quarter.png",
+          "sha256": "aebb233bcc3269c368943eea90632e0c5c9bc9b766d01177719949d8057c5c7b"
         },
         {
           "kind": "pose",
@@ -1451,7 +1567,7 @@
           "name": "siroino-heather-hooded-bodysuit-multiview.webp",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Previews/siroino-heather-hooded-bodysuit-multiview.webp",
-          "sha256": "79a43e2929d2c4b23011b6a827abf36b21bf410683401fed029f763d998dfdc2"
+          "sha256": "d2c213425289254627f016ebf3b34710c2ecde65307c0aa42b1220a821be9e3e"
         },
         {
           "kind": "current-preview",
@@ -1488,7 +1604,7 @@
         },
         {
           "name": "poseRender",
-          "status": "PASS",
+          "status": "PENDING",
           "detail": "",
           "href": null
         },
@@ -1506,7 +1622,7 @@
         },
         {
           "name": "fitPenetration",
-          "status": "NON_BLOCKING_FAIL",
+          "status": "NON_BLOCKING_PENDING",
           "detail": "",
           "href": null
         },
@@ -1595,10 +1711,10 @@
           "href": null
         },
         {
-          "name": "clothSimulation",
-          "status": "PASS",
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
           "detail": "",
-          "href": null
+          "href": "Assets/GenWorks/siroino-heather-hooded-bodysuit/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -1606,15 +1722,15 @@
         {
           "kind": "images",
           "label": "画像セットを保存",
-          "href": "downloads/siroino-heather-hooded-bodysuit/images-03de751fb163fcdd.zip",
-          "sha256": "182c74c41e5db4a7cfeac12dcf9baa7790d4b52d818aa4393d8a80074f9eb20f"
+          "href": "downloads/siroino-heather-hooded-bodysuit/images-5a2cbc434b39d62e.zip",
+          "sha256": "21b0bd72f928969476638354de2190dfca470ff7d2894dd2e3c750fac1fcd036"
         }
       ]
     },
     {
       "slug": "siroino-lace-halter-large",
       "state": "WORKING",
-      "updated_at": "2026-09-19T07:19:36.982372+00:00",
+      "updated_at": "2026-10-09T11:40:55.951835+00:00",
       "blocker_count": 0,
       "blockers": [],
       "resume_point": "未登録",
@@ -1625,100 +1741,100 @@
         {
           "kind": "view",
           "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/front.png",
+          "sha256": "bb2328f6b6476090080eb2330ff5f3824ec94d572eb2901788af8e1263ac0bf7"
         },
         {
           "kind": "view",
           "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/back.png",
+          "sha256": "09212b9afa76b9898f28be8c91acdca043ca6fcd062b4b4d2d19cd1e1165f053"
         },
         {
           "kind": "view",
           "name": "left",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/left.png",
+          "sha256": "194036cf337676de1526658ddad2ba6c2a35f34fbb6c3b058b5fa44a5e80c1dd"
         },
         {
           "kind": "view",
           "name": "right",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/right.png",
+          "sha256": "96316f784a515f9b3eb3a76123827caaa3ad2a39d6a8a35faf60442c466d8576"
         },
         {
           "kind": "view",
           "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/three-quarter.png",
+          "sha256": "207ffaf70e536b36c2a03e55c33b7a89748a197b08f8eaff2acf1f600cb1f2f4"
         },
         {
           "kind": "pose",
           "name": "neutral",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/neutral.png",
+          "sha256": "b8b1de7b4b7139afa263a62cfc93e4709ef0357e9dbf910265ae83b87e335359"
         },
         {
           "kind": "pose",
           "name": "arms-up",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/arms-up.png",
+          "sha256": "9536518ae964c831f42483ec71abed6720d5e7058d41d01451ebbb87a4d952d4"
         },
         {
           "kind": "pose",
           "name": "arm-cross",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/arm-cross.png",
+          "sha256": "3697a261e2771a84ca2ec8c951d6595fdb99806a42117b8a5d58a24e9288aa97"
         },
         {
           "kind": "pose",
           "name": "crouch",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/crouch.png",
+          "sha256": "04107301322e4351830486d24c6fcb41ba1b79c06704b818e5d647902cb23e7d"
         },
         {
           "kind": "pose",
           "name": "sit",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/sit.png",
+          "sha256": "15c6e3028e025f14b3833e3c833bd32c50e1cda91fb93edf9151ca6031350f11"
         },
         {
           "kind": "pose",
           "name": "prone",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/prone.png",
+          "sha256": "e1cbb64541478428c242c31381aac78428df1292cf1a884ddfe802b3fe590c1a"
         },
         {
           "kind": "current-preview",
           "name": "Poses/twist.png",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/Poses/twist.png",
-          "sha256": "7cc7a271517edecc70c9fca68b7f5e5591c7dec8fb67f90cfa18a7caff3e9c9f"
+          "sha256": "9c48a4e9b31577a3ae22bf437aa222de66dc4505fa5831fc3b5b1de345b20397"
         },
         {
           "kind": "current-preview",
           "name": "siroino-lace-halter-large-multiview.webp",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/siroino-lace-halter-large-multiview.webp",
-          "sha256": "4e2e71373d6b003516a97dd4bedb0f5e93d61f98d824c43d9af5b45127d484ea"
+          "sha256": "2c08bf7ceed321aa2eef6247828868dd3927071d52facbf25fd7bff933890c1a"
         },
         {
           "kind": "current-preview",
           "name": "siroino-lace-halter-large-pose-review.webp",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lace-halter-large/Previews/siroino-lace-halter-large-pose-review.webp",
-          "sha256": "fa5fc49550999b1480947df63f9b06561f9bdccc66030855f23ba88a55ad5478"
+          "sha256": "6044b6f818ece22eaafe77a21727eb8fbc669174aad0aee2253aaf9d052ebdff"
         }
       ],
       "gates": [
@@ -1805,6 +1921,12 @@
           "status": "PASS",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-lace-halter-large/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -1812,116 +1934,132 @@
         {
           "kind": "images",
           "label": "画像セットを保存",
-          "href": "downloads/siroino-lace-halter-large/images-dc6d9f5d5fe65221.zip",
-          "sha256": "c1cc9be53221b7e555a5185d03fe265466da5de2b63014500c8656b46c1ad00a"
+          "href": "downloads/siroino-lace-halter-large/images-a3216b5e2ca735ae.zip",
+          "sha256": "85e7f70cf9022e6dee5c3b9f4b8f814a5505459509f19821d8943bdaee95a64c"
         }
       ]
     },
     {
-      "slug": "siroino-lattice-bloom-shift-dress",
-      "state": "WORKING",
-      "updated_at": "2026-09-29T23:55:54.417485+00:00",
-      "blocker_count": 0,
-      "blockers": [],
-      "resume_point": "未登録",
+      "slug": "siroino-lilac-lame-fencing-practice-set",
+      "state": "REJECTED",
+      "updated_at": "2026-10-11T16:22:26.202637+00:00",
+      "blocker_count": 2,
+      "blockers": [
+        {
+          "severity": "IMPROVEMENT",
+          "message": "unknown · WAITING_FOR_CANDIDATE_QUALITY"
+        },
+        {
+          "severity": "RELEASE",
+          "message": "試作レンダーのみ。外観レビューはREJECTで、fit・骨/weight・UV・Unity/VRChat実行・衣装パッケージの合格は未確認。"
+        }
+      ],
+      "resume_point": "WAITING_FOR_CANDIDATE_QUALITY",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
-      "manifest_href": "Assets/GenWorks/siroino-lattice-bloom-shift-dress/ProductManifest.json",
+      "manifest_href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/ProductManifest.json",
       "assets": [
         {
           "kind": "view",
           "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png",
+          "sha256": "a5c319856d68c33c44f90a2f7379e827d9592c351dbc5e3ac6692f07b5bb9601"
         },
         {
           "kind": "view",
           "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png",
+          "sha256": "d2727f6310d050d552fcf4ad81f71b4791eac2d33b3154eb9fabf0a08ead8718"
         },
         {
           "kind": "view",
           "name": "left",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png",
+          "sha256": "d6acbef67a673c798b138b94e7756f2fa60ccd8a1958ee4819c63b444618f1d0"
         },
         {
           "kind": "view",
           "name": "right",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png",
+          "sha256": "7760ec32c713a7e9b961fe6c212fa80e63eded5840a4eae502f37ab77585bec8"
         },
         {
           "kind": "view",
           "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png",
+          "sha256": "1d2b2b4cb792138b8827bf7ddb42ea386e152480e20792798a0832e5ae273af5"
         },
         {
           "kind": "pose",
           "name": "neutral",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png",
+          "sha256": "3053dadb218349618b6f9046fdf4617d11cf83d08610e269d48b895e5f926cb7"
         },
         {
           "kind": "pose",
           "name": "arms-up",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png",
+          "sha256": "8a606d7649f56aad25793b4b460b452d2bb0506ce40d684e8977b079decae553"
         },
         {
           "kind": "pose",
           "name": "arm-cross",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png",
+          "sha256": "5687fd6dd32b796b9132b438e2a9abaafcba342645073ad3c25326cc17760819"
         },
         {
           "kind": "pose",
           "name": "crouch",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png",
+          "sha256": "4ce04dcd9f8510efcf191ae6f5316b69f5e2e757ea0cff7bf0cd5cc61146a80f"
         },
         {
           "kind": "pose",
           "name": "sit",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png",
+          "sha256": "145e2f89b849819bc4866c1f2d3c48291f7cf10e2085ac935a93e6ac30403aa8"
         },
         {
           "kind": "pose",
           "name": "prone",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png",
+          "sha256": "0c1c23983b11417a0209a4bd8c5b50d011694363fb21e4912a09341bf2612358"
+        },
+        {
+          "kind": "mesh",
+          "name": "topology",
+          "status": "UNVERIFIED",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Mesh/topology.svg",
+          "sha256": "8e30d8d82d2e36d7316878f6592bda6e3e8ea0441cffade5ea27b763d5847229"
         }
       ],
       "gates": [
         {
           "name": "referenceAudit",
-          "status": "PASS",
+          "status": "PENDING",
           "detail": "",
           "href": null
         },
         {
           "name": "referenceIdentity",
-          "status": "PASS",
+          "status": "PENDING",
           "detail": "",
           "href": null
         },
         {
           "name": "garmentDecomposition",
-          "status": "PASS",
+          "status": "PENDING",
           "detail": "",
           "href": null
         },
@@ -1933,25 +2071,25 @@
         },
         {
           "name": "patternContract",
-          "status": "PASS_2D_DIAGNOSTIC_ONLY",
+          "status": "PENDING",
           "detail": "",
           "href": null
         },
         {
           "name": "stitchGraph",
-          "status": "PASS_2D_ONLY",
+          "status": "PENDING",
           "detail": "",
           "href": null
         },
         {
           "name": "garmentCodeStitchExport",
-          "status": "PASS_2D_ONLY",
+          "status": "PENDING",
           "detail": "",
           "href": null
         },
         {
           "name": "openSew2dEndpointAudit",
-          "status": "PASS_2D_ENDPOINT_AWARE_ONLY",
+          "status": "PENDING",
           "detail": "",
           "href": null
         },
@@ -1969,13 +2107,13 @@
         },
         {
           "name": "editableSource",
-          "status": "PENDING",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PENDING",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -1987,13 +2125,13 @@
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PENDING",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PENDING",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -2004,241 +2142,39 @@
           "href": null
         },
         {
-          "name": "surfaceAttachmentLayoutAudit",
-          "status": "PASS_2D_PLACEMENT_ONLY",
-          "detail": "",
+          "name": "improvement:next-action",
+          "status": "PENDING",
+          "detail": "unknown; selected=none",
           "href": null
         },
         {
-          "name": "frontBackVentPattern",
-          "status": "PASS_2D_PATTERN_ONLY",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "surfaceAttachmentHostPreview",
-          "status": "RENDERED_2D_ONLY",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "waistVerticalRegistrationCandidate",
-          "status": "CANDIDATE_ANCHOR_MATCH_UNVERIFIED",
-          "detail": "",
-          "href": null
+          "name": "releaseReadiness",
+          "status": "BLOCKED",
+          "detail": "試作レンダーのみ。外観レビューはREJECTで、fit・骨/weight・UV・Unity/VRChat実行・衣装パッケージの合格は未確認。",
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/ProductManifest.json"
         }
       ],
-      "evidence": [],
-      "downloads": []
-    },
-    {
-      "slug": "siroino-lilac-lame-fencing-practice-set",
-      "state": "WORKING",
-      "updated_at": "2026-10-08T09:01:10.142854+00:00",
-      "blocker_count": 0,
-      "blockers": [],
-      "resume_point": "未登録",
-      "candidate_hash": "UNKNOWN",
-      "human_review_url": "",
-      "manifest_href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/ProductManifest.json",
-      "assets": [
+      "evidence": [
         {
-          "kind": "view",
-          "name": "front",
+          "label": "Improvement plan",
           "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png",
-          "sha256": "9494981359aa7f0127f48335d87dd4be8117e8f4c9987b733677bfda34b5296e"
-        },
-        {
-          "kind": "view",
-          "name": "back",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png",
-          "sha256": "53e23de449001bbd8df0ba4de7e2d6bdcb271db2bdb004914aec72ed69ad15e8"
-        },
-        {
-          "kind": "view",
-          "name": "left",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png",
-          "sha256": "746179f5463841ca51b687fb54cf83d995ea589e093790db545813cf9f1b2a82"
-        },
-        {
-          "kind": "view",
-          "name": "right",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png",
-          "sha256": "f63dc5a97422119c2a6bb6d8d85b3ecb1447a96134d2f71ba0a1ac81abc4cf61"
-        },
-        {
-          "kind": "view",
-          "name": "three-quarter",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png",
-          "sha256": "3d01c92542d09f655dbc94c8da7aeb04cb3c694909cc16d930e1689e3b4450fe"
-        },
-        {
-          "kind": "pose",
-          "name": "neutral",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png",
-          "sha256": "69575d49bb241eb097dbaac56e8fa754811615eb220f8b5109fd6685816a7f37"
-        },
-        {
-          "kind": "pose",
-          "name": "arms-up",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png",
-          "sha256": "726fc014622d146b46105322e7a6c9011a77c4ed7f83a6a7aa8cd6248b0dcbb2"
-        },
-        {
-          "kind": "pose",
-          "name": "arm-cross",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png",
-          "sha256": "fc111502d2a31dc67c952b090b6fe52df2df6137c1a108acf7918c23bd9aa72f"
-        },
-        {
-          "kind": "pose",
-          "name": "crouch",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png",
-          "sha256": "f4dac862e00ebafac60a8d11ef2e648dbef0c227528c978e4bb25ef602fc94aa"
-        },
-        {
-          "kind": "pose",
-          "name": "sit",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png",
-          "sha256": "3c66e93cb92a7f204a633af5043e3d83118d2dbd21f29d8f1d039032c2869750"
-        },
-        {
-          "kind": "pose",
-          "name": "prone",
-          "status": "PASS",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png",
-          "sha256": "5ecaed508d408f1f8331838a957d4ba8849281ff637dd7fc9ee87c5632195924"
-        },
-        {
-          "kind": "mesh",
-          "name": "topology",
-          "status": "UNVERIFIED",
-          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Mesh/topology.svg",
-          "sha256": "6c1044d2381794a2ce5883bffb5e1478d16335492505c1d965b845c8ef4b5452"
+          "href": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Research/Improvement/latest-plan.json",
+          "sha256": "37d9c1842b30126f29e4d70f40871c7812e3618f8a6dc44218fcfeb36c721e00"
         }
       ],
-      "gates": [
-        {
-          "name": "referenceAudit",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "referenceIdentity",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "garmentDecomposition",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "construction",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "patternContract",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "stitchGraph",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "garmentCodeStitchExport",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "openSew2dEndpointAudit",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "blender",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "licenseReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        }
-      ],
-      "evidence": [],
       "downloads": [
         {
           "kind": "images",
           "label": "画像セットを保存",
-          "href": "downloads/siroino-lilac-lame-fencing-practice-set/images-1a68cfdf2a082299.zip",
-          "sha256": "8290609239307702b0461b2168917f3d4f9ae88ba1760a10da0ba27fb635a94b"
+          "href": "downloads/siroino-lilac-lame-fencing-practice-set/images-4351bab07a4bb46f.zip",
+          "sha256": "7a6c821efda25ac0bc95000512d7557d46b6c7a5c5a36943e6eecbfcde028c1c"
         }
       ]
     },
     {
       "slug": "siroino-lily-vapor-yukata",
       "state": "WORKING",
-      "updated_at": "2026-09-21T07:31:43.425893+00:00",
+      "updated_at": "2026-10-09T11:41:03.287136+00:00",
       "blocker_count": 0,
       "blockers": [],
       "resume_point": "未登録",
@@ -2251,77 +2187,77 @@
           "name": "front",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/front.png",
-          "sha256": "487b6fcf485440aa0a24ceda2961d87ec1949b25aa2a65c3b8efade6fcc4cfa7"
+          "sha256": "dc3b249d221c8b6e1591a8d90a83d81fafa8562bb0d87cf63c0eccdfc71c1d41"
         },
         {
           "kind": "view",
           "name": "back",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/back.png",
-          "sha256": "707027f3da4ed16fe17af4e29117b9a90ee99f993ed48c3cfda50570b0c59d26"
+          "sha256": "63cbfcaf259ffd87512c55472e6966280b63ddfb1aa0ff249e0ff285af90a089"
         },
         {
           "kind": "view",
           "name": "left",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/left.png",
-          "sha256": "90a954c66b0c87effd747d11a8604fa5d224fb19ef04bbdaf644141060750c99"
+          "sha256": "3d1029a4e853cae41bd93825545f6760bf40f5aef59544934de60efc0c8599b7"
         },
         {
           "kind": "view",
           "name": "right",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/right.png",
-          "sha256": "e0c2978b5a3874cb43cff925f2bb8df3b2e36979e03239c03be16969a5f1e2c8"
+          "sha256": "9387e0d79d65c2fdbbf192f53fdd9271b09e9b5db4beb9a92cc4b224546d98e1"
         },
         {
           "kind": "view",
           "name": "three-quarter",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/three-quarter.png",
-          "sha256": "173e5e881342816fe5714e986cdfc40f4aeb2188ff8930fb916e690f4d639a76"
+          "sha256": "e006d1605863e2f95c3d43a1d32d0b2e3911a6a1791baf4107df9ad132cfb647"
         },
         {
           "kind": "pose",
           "name": "neutral",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/neutral.png",
-          "sha256": "24b5acbb732841f725f3dadc2a18b6fd15b8b1d853d83206b6f29a20e6fcf01e"
+          "sha256": "92f4f01da70c1254d1afe093bfd469eec6b666347a098daf4fe791d9b020c386"
         },
         {
           "kind": "pose",
           "name": "arms-up",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arms-up.png",
-          "sha256": "a640b0f1b8c67d2ba36b47c854312a3f97400f3bc9738d966f87121d2765dced"
+          "sha256": "c294b6d35583bc752fb1c56ff7d8a9dd263bf40f8eecebe959c91831098c0826"
         },
         {
           "kind": "pose",
           "name": "arm-cross",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arm-cross.png",
-          "sha256": "2db9fb38c8e7c2f5d0415c2b366187526c0e4e02d54dc0f35a1297045e0e4e21"
+          "sha256": "6b43ecf231dc281549ea4bb8855d0691ba54699002e8f42f1296d6e4ae35768f"
         },
         {
           "kind": "pose",
           "name": "crouch",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/crouch.png",
-          "sha256": "aa237b5012173f3e6677be587f949f6d7e0623e9118196d56d89b47295e31893"
+          "sha256": "c9a66ef8795962a15551692633bb4cc55c2e9cef358112868ed640dbe7e4b6b3"
         },
         {
           "kind": "pose",
           "name": "sit",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/sit.png",
-          "sha256": "510497cd46674793422a936ea08caf8974f581566c5851f94da87078d8a1e4cb"
+          "sha256": "d661948f8aa9609b965106bd08abe6c8f3e33cfb2761598e40f796ea0860dab2"
         },
         {
           "kind": "pose",
           "name": "prone",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/prone.png",
-          "sha256": "4f6f84175a03f16af13aef71877085ac6c07c7ae35a0e4eeb40a76fbc9b5d2be"
+          "sha256": "44c1edf6a1577d2a58031e851cb04c4192d4d6f5c2ee57d4daec623844682670"
         },
         {
           "kind": "current-preview",
@@ -2335,14 +2271,14 @@
           "name": "siroino-lily-vapor-yukata-multiview.webp",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/siroino-lily-vapor-yukata-multiview.webp",
-          "sha256": "ba64fbe0311eb643e6325ceceda1dcb60c0c6b2160dab19858cbaee49761bba2"
+          "sha256": "5e8d777b66954e046d10b9900844233adb2fbc6a022a105e8d8a3790e214732c"
         },
         {
           "kind": "current-preview",
           "name": "siroino-lily-vapor-yukata-pose-review.webp",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/siroino-lily-vapor-yukata-pose-review.webp",
-          "sha256": "f3979e3493c647269865e945379298e352786aeaa47f38ce1024d73e3e227545"
+          "sha256": "f6c47fc2fa6739ad5a901058b61864744fcc8365a785d8a1e1445f7fc28a6762"
         }
       ],
       "gates": [
@@ -2402,27 +2338,33 @@
         },
         {
           "name": "unityImport",
-          "status": "PASS",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "modularAvatar",
-          "status": "PASS",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "ndmf",
-          "status": "PASS",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "vrchatRuntime",
-          "status": "DRY_RUN_PASS",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-lily-vapor-yukata/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -2430,8 +2372,206 @@
         {
           "kind": "images",
           "label": "画像セットを保存",
-          "href": "downloads/siroino-lily-vapor-yukata/images-c5548fddababeab2.zip",
-          "sha256": "e767e08f38ec7d4a2c366b4ef91b06bd0381c2f56769b8a5acef2c24d8a43328"
+          "href": "downloads/siroino-lily-vapor-yukata/images-886fc67b41e1f8b5.zip",
+          "sha256": "dfbc4b40519cf7ee938037035a54a842a62ed3412522b1027a36b683e66b9449"
+        }
+      ]
+    },
+    {
+      "slug": "siroino-lumen-atelier-apron",
+      "state": "WORKING",
+      "updated_at": "2026-10-09T11:40:55.990324+00:00",
+      "blocker_count": 0,
+      "blockers": [],
+      "resume_point": "未登録",
+      "candidate_hash": "UNKNOWN",
+      "human_review_url": "",
+      "manifest_href": "Assets/GenWorks/siroino-lumen-atelier-apron/ProductManifest.json",
+      "assets": [
+        {
+          "kind": "view",
+          "name": "front",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/front.png",
+          "sha256": "a81916d94378c716cb49e8c5ec9909fba55157f3c2a9bc6a0ddb7bfa820982bf"
+        },
+        {
+          "kind": "view",
+          "name": "back",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/back.png",
+          "sha256": "91c2358e85466e44f06fd1f5fc51cabc8b1b03420b03a1a8729920ec9f3ff268"
+        },
+        {
+          "kind": "view",
+          "name": "left",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/left.png",
+          "sha256": "3e469bed13752788844302b5a0a11de758a2435f8313d5c160481e410f3031c5"
+        },
+        {
+          "kind": "view",
+          "name": "right",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/right.png",
+          "sha256": "3c22da33ea5f5cabad27631d3c7a2664ed3ac32a4d09f21dbf7b7e78155d5608"
+        },
+        {
+          "kind": "view",
+          "name": "three-quarter",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/three-quarter.png",
+          "sha256": "312c23eb1aea09113f59dcd787f51ab459678ac08b6a73f52a243050413cb066"
+        },
+        {
+          "kind": "pose",
+          "name": "neutral",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/Poses/neutral.png",
+          "sha256": "6ae9e18650c1482cb15b5d8abf622919e95c3c54ae069d1f8b7d0c6c0d3a50f8"
+        },
+        {
+          "kind": "pose",
+          "name": "arms-up",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/Poses/arms-up.png",
+          "sha256": "61fab13a4908ee7e493a69c47663785262adc16272f1379533bfd5d9110db267"
+        },
+        {
+          "kind": "pose",
+          "name": "arm-cross",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/Poses/arm-cross.png",
+          "sha256": "b61acfdcf233389555445e7faa76770c78d80940253204f47a485b440cddb68f"
+        },
+        {
+          "kind": "pose",
+          "name": "crouch",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/Poses/crouch.png",
+          "sha256": "d0d2170b1e4b668f619d8349501c15946faf82fbe5630207901af184dde36773"
+        },
+        {
+          "kind": "pose",
+          "name": "sit",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/Poses/sit.png",
+          "sha256": "9cfffe48a69d192f4cf5323e4e243cf2b5be41c28f454009217b7a0915c32eb8"
+        },
+        {
+          "kind": "pose",
+          "name": "prone",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/Poses/prone.png",
+          "sha256": "151b9a4187587a693e2fc35ac2beb731123d49e2135910850367298a59ad4e94"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-lumen-atelier-apron-pose-review.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/siroino-lumen-atelier-apron-pose-review.webp",
+          "sha256": "8c5840b51ba419379868b0cf94f128a878df42b1f9f88ff873e49a6aff3820d2"
+        }
+      ],
+      "gates": [
+        {
+          "name": "referenceAudit",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "patternContract",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "blender",
+          "status": "PENDING_RETRY",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "NOT_REQUIRED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-lumen-atelier-apron/ProductManifest.json"
+        }
+      ],
+      "evidence": [],
+      "downloads": [
+        {
+          "kind": "images",
+          "label": "画像セットを保存",
+          "href": "downloads/siroino-lumen-atelier-apron/images-c59a7bc2599ff1e7.zip",
+          "sha256": "d309e47580d9e950201a828776e4c11919438fe00cb7f0361884db0924cd6b07"
         }
       ]
     },
@@ -2617,6 +2757,12 @@
           "status": "DRY_RUN_PASS",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-lunar-tech-hoodie/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -2625,14 +2771,14 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/siroino-lunar-tech-hoodie/images-1c4b46d0878ea225.zip",
-          "sha256": "370a28c958eb58e1e23b6622930f99e90369f87fac10327e1d4f12dca3ffbe81"
+          "sha256": "c0ed8791dc1e766b6e619c2eca85a2e64b24284a0a3f6ff8d1d96684ea6195ac"
         }
       ]
     },
     {
       "slug": "siroino-military-sheer-romper-large",
       "state": "WORKING",
-      "updated_at": "2026-09-19T10:04:54.033537+00:00",
+      "updated_at": "2026-10-09T11:40:56.028486+00:00",
       "blocker_count": 0,
       "blockers": [],
       "resume_point": "未登録",
@@ -2645,35 +2791,35 @@
           "name": "front",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/front.png",
-          "sha256": "893661f500826debc00ca935033acc1d883c5f0b131afacc8736d9be4a54284e"
+          "sha256": "9583bfa201dfd10978c359a64627aa406f1caf20ff00efa92d8c48fc201236d2"
         },
         {
           "kind": "view",
           "name": "back",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/back.png",
-          "sha256": "8fb2763944e52cb7dd5afa359286ff437d669b181bafa68f0f468809e3412bfb"
+          "sha256": "b5f5fc855d805a590539df9f30ff8753b7268c872be9720ca0c55c9ab9d16774"
         },
         {
           "kind": "view",
           "name": "left",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/left.png",
-          "sha256": "e5aaf47b932451873adf9678861414d1c7dac46b138500d84b894305f2a4aae4"
+          "sha256": "6de929e71103bbb0144d275ddbcdbf98fb05a1b6968e98c4627bcba8c92181e8"
         },
         {
           "kind": "view",
           "name": "right",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/right.png",
-          "sha256": "e00e1870502f11b2975c44310cbddf76d5b35caa4e78521cdbd5ad406f0e378e"
+          "sha256": "039a80064c8d2c1f1a97540b868c4e9b274df8eb08b813dbe49307eafce3492e"
         },
         {
           "kind": "view",
           "name": "three-quarter",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/three-quarter.png",
-          "sha256": "e8333ed65b27d3441b79a63f92907273955588ed4b163a4fe72b05612b40ec2e"
+          "sha256": "3f1454ce20a6e504cb21caad85d2eeb1d41614be1cbcdbca85d858898d5b0825"
         },
         {
           "kind": "pose",
@@ -2722,7 +2868,7 @@
           "name": "siroino-military-sheer-romper-large-multiview.webp",
           "status": "PASS",
           "href": "Assets/GenWorks/siroino-military-sheer-romper-large/Previews/siroino-military-sheer-romper-large-multiview.webp",
-          "sha256": "e1be5a929b04418ef7e0e6c909be36e5084c21f9dc6bb30324e9004d539145e3"
+          "sha256": "d070ff143a755a7695d465a159d7e0f53e9c56789f6a7855e9e619275f64859b"
         },
         {
           "kind": "current-preview",
@@ -2747,7 +2893,7 @@
         },
         {
           "name": "bodySurfacePanelFit",
-          "status": "REVIEW",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -2828,6 +2974,12 @@
           "status": "PENDING",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-military-sheer-romper-large/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -2835,218 +2987,216 @@
         {
           "kind": "images",
           "label": "画像セットを保存",
-          "href": "downloads/siroino-military-sheer-romper-large/images-8f19453eb38aa1c3.zip",
-          "sha256": "ac3d04fa2256c0cc01f64f65ad021a03e5d22797218d6997451e8aa4f27a3911"
+          "href": "downloads/siroino-military-sheer-romper-large/images-3617c2288f798452.zip",
+          "sha256": "d8a8eb517165265b2fa7d3f6dae3477b35943d809cf1d3af478e2ff7d0b9f80b"
         }
       ]
     },
     {
-      "slug": "siroino-moonlit-patisserie-uniform-set",
+      "slug": "siroino-nocturnal-shrine-maiden-long-hakama-set",
       "state": "WORKING",
-      "updated_at": "2026-09-28T16:24:27.233881+00:00",
-      "blocker_count": 1,
-      "blockers": [
-        {
-          "severity": "IMPROVEMENT",
-          "message": "unknown · WAITING_FOR_CANDIDATE_QUALITY"
-        }
-      ],
-      "resume_point": "WAITING_FOR_CANDIDATE_QUALITY",
+      "updated_at": "2026-10-09T11:40:56.073110+00:00",
+      "blocker_count": 0,
+      "blockers": [],
+      "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
-      "manifest_href": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/ProductManifest.json",
+      "manifest_href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/ProductManifest.json",
       "assets": [
         {
           "kind": "view",
           "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/front.png",
+          "sha256": "618ae2648a2315167a9e8416f5bbc04550580ea8f93b796df291885ea86d162f"
         },
         {
           "kind": "view",
           "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/back.png",
+          "sha256": "6c1c0731a93dea15950a5e7c3a815798b01bd31588eda9b33611415cf1ad9875"
         },
         {
           "kind": "view",
           "name": "left",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/left.png",
+          "sha256": "e4a724edbe5224b2d90ff2ce89d71f6b180e1eeddf55e804328f8899bef64b26"
         },
         {
           "kind": "view",
           "name": "right",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/right.png",
+          "sha256": "56e269934c7c89d9b0fc6693e3bc076c9879e0c90a3d1942149d2507a1dde6d7"
         },
         {
           "kind": "view",
           "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/three-quarter.png",
+          "sha256": "ca4dfe391bccbd14fff613e483c2b4a2d988958cfd59f98ed944f9be758d61eb"
         },
         {
           "kind": "pose",
           "name": "neutral",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/Poses/neutral.png",
+          "sha256": "86c6ab7c103a63fd0fe2e236754a88eb6a4b90c9ecd1390bd031d79808daef11"
         },
         {
           "kind": "pose",
           "name": "arms-up",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/Poses/arms-up.png",
+          "sha256": "7e30a05c13e300d35a11104f0333774b8aacac86b280046e22796d54b2ec783e"
         },
         {
           "kind": "pose",
           "name": "arm-cross",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/Poses/arm-cross.png",
+          "sha256": "677ddb77eaae9fe6ab438fa5f5048d965d97091d46332ac1a682e84ec77ad75d"
         },
         {
           "kind": "pose",
           "name": "crouch",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/Poses/crouch.png",
+          "sha256": "cf3ab714fceae8f60429bbf13f95f9717d818755cab485b44ba623dc11d94684"
         },
         {
           "kind": "pose",
           "name": "sit",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/Poses/sit.png",
+          "sha256": "e1553a6c81df3c710c33e0718dd86fa063a73478c819c6f5d2fc10f46be9e205"
         },
         {
           "kind": "pose",
           "name": "prone",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/Poses/prone.png",
+          "sha256": "d4599033bc353ebeb3993e4a1f06107485cd0e9fd163bc7be54ed1df38cc689a"
+        },
+        {
+          "kind": "current-preview",
+          "name": "pattern-layout.png",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/pattern-layout.png",
+          "sha256": "c9fba120be10ca2546f7d03e755ccf7b0cc22b298902d97979dc3efd26f6f51e"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-nocturnal-shrine-maiden-long-hakama-set-multiview.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/siroino-nocturnal-shrine-maiden-long-hakama-set-multiview.webp",
+          "sha256": "8555a41592b40c222448caf2f13cbe67bfe90182c5753718016d7f0ff30a75c9"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-nocturnal-shrine-maiden-long-hakama-set-pose-review.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/Previews/siroino-nocturnal-shrine-maiden-long-hakama-set-pose-review.webp",
+          "sha256": "60dcb4a5100844577366d803f3e70658157ee6636c08b4f778b884924f9feac9"
         }
       ],
       "gates": [
         {
-          "name": "referenceAudit",
+          "name": "referenceArtifact",
+          "status": "FAIL_EXACT_ORIGINAL_MISSING",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "blender",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
-          "name": "referenceIdentity",
+          "name": "editableSource",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
-          "name": "garmentDecomposition",
+          "name": "fbx",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
-          "name": "construction",
+          "name": "prefabDeclared",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
-          "name": "patternContract",
+          "name": "fiveViewEvidence",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
-          "name": "stitchGraph",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "garmentCodeStitchExport",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "openSew2dEndpointAudit",
+          "name": "poseEvidence",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
           "name": "visualAppearanceReview",
+          "status": "REVIEW_REQUIRED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "licenseReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "improvement:next-action",
-          "status": "PENDING",
-          "detail": "unknown; selected=none",
-          "href": null
-        }
-      ],
-      "evidence": [
-        {
-          "label": "Improvement plan",
+          "name": "unityImport",
           "status": "PASS",
-          "href": "Assets/GenWorks/siroino-moonlit-patisserie-uniform-set/Research/Improvement/latest-plan.json",
-          "sha256": "9624c3227956fca4e3df572c17ca45ead993e62b41e11249674cba4e19df8b4d"
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "DRY_RUN_PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-nocturnal-shrine-maiden-long-hakama-set/ProductManifest.json"
         }
       ],
-      "downloads": []
+      "evidence": [],
+      "downloads": [
+        {
+          "kind": "images",
+          "label": "画像セットを保存",
+          "href": "downloads/siroino-nocturnal-shrine-maiden-long-hakama-set/images-9f1439b23e493bc6.zip",
+          "sha256": "90530a02384309fee183aeb5b3f1d01686e985c4a3334c8d244f4baa57d8c866"
+        }
+      ]
     },
     {
       "slug": "siroino-nocturne-angel-set",
@@ -3259,6 +3409,12 @@
           "status": "PASS",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-nocturne-angel-set/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -3267,121 +3423,110 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/siroino-nocturne-angel-set/images-041a42d5c6fc69ff.zip",
-          "sha256": "17658365931aa1ccd8f34aa3322b8fb13153ad8cc6b3802206bde293b03894a0"
+          "sha256": "ae35502814123db6cd8e5947107cf69a44629d13cc4bfa306b94f88380608e71"
         }
       ]
     },
     {
-      "slug": "siroino-orbitarium-gimbal-dancer-set",
+      "slug": "siroino-quiet-arc-panel-dress",
       "state": "WORKING",
-      "updated_at": "2026-09-28T19:34:26.446451+00:00",
+      "updated_at": "2026-10-09T11:40:56.117841+00:00",
       "blocker_count": 0,
       "blockers": [],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
-      "manifest_href": "Assets/GenWorks/siroino-orbitarium-gimbal-dancer-set/ProductManifest.json",
+      "manifest_href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/ProductManifest.json",
       "assets": [
         {
           "kind": "view",
           "name": "front",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/front.png",
+          "sha256": "cf66cf0edcfe43d6faaeffccdb0925f6bd8ce201291713c374b6af70e40f3b42"
         },
         {
           "kind": "view",
           "name": "back",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/back.png",
+          "sha256": "71950f39cd9b82629f1d1364e93ec9f57bc60d4e56a84538fbfa8f095497b5c3"
         },
         {
           "kind": "view",
           "name": "left",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/left.png",
+          "sha256": "9ffc328c3b6c01b0b20e5d7643b6706c22708b31ac6fa132a9a17726922c5f48"
         },
         {
           "kind": "view",
           "name": "right",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/right.png",
+          "sha256": "248c7d2b4f86c0cfa3ea9c29ab596e96f77f7923011321571d92fcfce66eb534"
         },
         {
           "kind": "view",
           "name": "three-quarter",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/three-quarter.png",
+          "sha256": "6ad6262040fd4cf5c5ede1b972d0866b2cc3c97f49fbf60381d84d5caa7200d7"
         },
         {
           "kind": "pose",
           "name": "neutral",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/Poses/neutral.png",
+          "sha256": "a048e43895b2a758e74d5871e266ea58137fadf2dc1d6210eef824074e711365"
         },
         {
           "kind": "pose",
           "name": "arms-up",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/Poses/arms-up.png",
+          "sha256": "6c6c2a4f765bf313f8181c19b211dc64b0d36932293adaa24acd67eabcf8d00f"
         },
         {
           "kind": "pose",
           "name": "arm-cross",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/Poses/arm-cross.png",
+          "sha256": "3215173476d2f1dd7ddb6512954a6f40597246f32cb90e051b2e1cf3bbc3cf79"
         },
         {
           "kind": "pose",
           "name": "crouch",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/Poses/crouch.png",
+          "sha256": "cfd6ff10cbe5435e90b738c3a79400d864d0fafcc94db756a8064cbec25652e4"
         },
         {
           "kind": "pose",
           "name": "sit",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/Poses/sit.png",
+          "sha256": "339904b2dad2549c603651844ad75338d42c6bd1a7099e26b79a8fb60fb5fe7b"
         },
         {
           "kind": "pose",
           "name": "prone",
-          "status": "MISSING",
-          "href": null,
-          "sha256": null
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/Poses/prone.png",
+          "sha256": "2ce2a74ab024f3f276a94301836226a1c23f305c17e5c7d9790712f815664d83"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-quiet-arc-panel-dress-pose-review.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/siroino-quiet-arc-panel-dress-pose-review.webp",
+          "sha256": "9e2c0927318e99e26fddf901f0adee1ad086626dcae26b40fab5831b738ab023"
         }
       ],
       "gates": [
         {
           "name": "referenceAudit",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "referenceIdentity",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "garmentDecomposition",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "construction",
-          "status": "PASS",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
@@ -3392,74 +3537,491 @@
           "href": null
         },
         {
-          "name": "stitchGraph",
+          "name": "blender",
+          "status": "PENDING_RETRY",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
-          "name": "garmentCodeStitchExport",
+          "name": "clothSimulation",
+          "status": "NOT_REQUIRED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-quiet-arc-panel-dress/ProductManifest.json"
+        }
+      ],
+      "evidence": [],
+      "downloads": [
+        {
+          "kind": "images",
+          "label": "画像セットを保存",
+          "href": "downloads/siroino-quiet-arc-panel-dress/images-483510d907193ae5.zip",
+          "sha256": "b7c235b1e6718ed77042b5f8a7ab94b594226bb6393e65109e14117b5ac0dfab"
+        }
+      ]
+    },
+    {
+      "slug": "siroino-sage-breeze-onepiece",
+      "state": "WORKING",
+      "updated_at": "2026-10-09T11:40:56.157887+00:00",
+      "blocker_count": 0,
+      "blockers": [],
+      "resume_point": "未登録",
+      "candidate_hash": "UNKNOWN",
+      "human_review_url": "",
+      "manifest_href": "Assets/GenWorks/siroino-sage-breeze-onepiece/ProductManifest.json",
+      "assets": [
+        {
+          "kind": "view",
+          "name": "front",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/front.png",
+          "sha256": "c0b1288f908c58c4994886f43caf54ebb53e157faffd4f814dcc4cd34dc1d135"
+        },
+        {
+          "kind": "view",
+          "name": "back",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/back.png",
+          "sha256": "0d86ca6cea4cd8bc918f82da3f72344f8ca0aec2919ee074be0aef0161d93c9d"
+        },
+        {
+          "kind": "view",
+          "name": "left",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/left.png",
+          "sha256": "4e2f97be601a98d59790c2e87e11588a0245975b8e743c2d8d7f6026009941d7"
+        },
+        {
+          "kind": "view",
+          "name": "right",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/right.png",
+          "sha256": "ef0127ee10a557e5bf956879e786de8c1443e1cb2dff6a66ce657e9f9bea1a76"
+        },
+        {
+          "kind": "view",
+          "name": "three-quarter",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/three-quarter.png",
+          "sha256": "df6663e86aca3bfee4dd2ed0b8e81afc0981a41a193368275d9ba6e7e635cb35"
+        },
+        {
+          "kind": "pose",
+          "name": "neutral",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/neutral.png",
+          "sha256": "f4d1541623081442699eb98092dc9a4f6810171376409be2adf8364ccdd66344"
+        },
+        {
+          "kind": "pose",
+          "name": "arms-up",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/arms-up.png",
+          "sha256": "8d406e2bb9ad0a5981cd8e2d34eaa981db64dd93acb949d1e10ab92bcff21fae"
+        },
+        {
+          "kind": "pose",
+          "name": "arm-cross",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/arm-cross.png",
+          "sha256": "5534690093114e51e6e9617d8c74b6b97d94be086861712143a7ed835bbc489f"
+        },
+        {
+          "kind": "pose",
+          "name": "crouch",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/crouch.png",
+          "sha256": "0bff775c25e0d9db27757b939ee323336ac14fbdaa3293aaef24aefbf2112663"
+        },
+        {
+          "kind": "pose",
+          "name": "sit",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/sit.png",
+          "sha256": "6fbe0a2a1f727e8ae52c83d94ea7b040f84539567728d529f23730a41b8728b9"
+        },
+        {
+          "kind": "pose",
+          "name": "prone",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/prone.png",
+          "sha256": "7a891bb39ab43410ae8379544d87ce2afa9713ade111bd29c0ff95cc076c2811"
+        },
+        {
+          "kind": "current-preview",
+          "name": "pattern-layout.png",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/pattern-layout.png",
+          "sha256": "89b64e21ff9320d83e6f77d2b8eb49cfa89e9d63da00aa7db9dd103f1a7d5473"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-sage-breeze-onepiece-multiview.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/siroino-sage-breeze-onepiece-multiview.webp",
+          "sha256": "5dec4124d25c8cf31c4cd296b24eaa0cb904c35ccfd29561992c22bbe87edda3"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-sage-breeze-onepiece-pose-review.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/siroino-sage-breeze-onepiece-pose-review.webp",
+          "sha256": "c90b33ab5700ca49c1ed1ba645efa9f819e20c4a2101eeb3fe3b50d1d6cb0300"
+        }
+      ],
+      "gates": [
+        {
+          "name": "blender",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
-          "name": "openSew2dEndpointAudit",
+          "name": "editableSource",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
           "name": "visualAppearanceReview",
+          "status": "REVIEW_REQUIRED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-sage-breeze-onepiece/ProductManifest.json"
+        }
+      ],
+      "evidence": [],
+      "downloads": [
+        {
+          "kind": "images",
+          "label": "画像セットを保存",
+          "href": "downloads/siroino-sage-breeze-onepiece/images-4038a644f147df1b.zip",
+          "sha256": "6d428da382d78dab2b0d5bcd330a6b6b04000c8c95f8a1e414db428c942cccd5"
+        }
+      ]
+    },
+    {
+      "slug": "siroino-signal-fold-transit-tabard",
+      "state": "WORKING",
+      "updated_at": "2026-10-09T11:40:56.211039+00:00",
+      "blocker_count": 0,
+      "blockers": [],
+      "resume_point": "未登録",
+      "candidate_hash": "UNKNOWN",
+      "human_review_url": "",
+      "manifest_href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/ProductManifest.json",
+      "assets": [
+        {
+          "kind": "view",
+          "name": "front",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/front.png",
+          "sha256": "301af2d77078c6f481b91c133604eda8f777505a35c34e82481aa5b570a42102"
+        },
+        {
+          "kind": "view",
+          "name": "back",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/back.png",
+          "sha256": "5d6b02d087770575d65dce93b0b46a8ff13136fbe557ff2e711b222247b292b0"
+        },
+        {
+          "kind": "view",
+          "name": "left",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/left.png",
+          "sha256": "b1b5fd3ef380635a489662ac98255f7a38fb559a67ee1f738e282c7a2adf890b"
+        },
+        {
+          "kind": "view",
+          "name": "right",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/right.png",
+          "sha256": "79c2e9d68c75bd6ed567c6cf6f1e31a920ddb731d9c1a6ffe35367f9c2165134"
+        },
+        {
+          "kind": "view",
+          "name": "three-quarter",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/three-quarter.png",
+          "sha256": "dc2b346d07aee1fd9d89ffa683d919b33018f36920e57562ba5c2ee397d2f562"
+        },
+        {
+          "kind": "pose",
+          "name": "neutral",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/Poses/neutral.png",
+          "sha256": "8278a743413472febd5a3023aad2d4fbb938320f0d4798bf58fdc173848ae354"
+        },
+        {
+          "kind": "pose",
+          "name": "arms-up",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/Poses/arms-up.png",
+          "sha256": "4478ae75220a53f91910a71133e83d38d89ff7665857778f4f219aa3c3eb751b"
+        },
+        {
+          "kind": "pose",
+          "name": "arm-cross",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/Poses/arm-cross.png",
+          "sha256": "f1832bc48127dda59b3aafeb13b1eeca1cf1e481f30e2a46569c437e1315e287"
+        },
+        {
+          "kind": "pose",
+          "name": "crouch",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/Poses/crouch.png",
+          "sha256": "07ffd9bc2ad078a3efa1f3fa4b43aa52be23aa7a777e572586dcfc9c20f5a89c"
+        },
+        {
+          "kind": "pose",
+          "name": "sit",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/Poses/sit.png",
+          "sha256": "d457ca053c5f7aadfbe6eed9aa6a8872a8c41c69a62d0bd865739a6423cc3ac7"
+        },
+        {
+          "kind": "pose",
+          "name": "prone",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/Poses/prone.png",
+          "sha256": "238b52071d948c01d9543317e126977285447f9b8bc8364046e89ee2edc19de6"
+        },
+        {
+          "kind": "current-preview",
+          "name": "siroino-signal-fold-transit-tabard-pose-review.webp",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/Previews/siroino-signal-fold-transit-tabard-pose-review.webp",
+          "sha256": "985a61953cc419f5e7684b53338fcfdb40fcaa14de353c47937addcf3e04415a"
+        }
+      ],
+      "gates": [
+        {
+          "name": "referenceAudit",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "patternContract",
           "status": "PASS",
           "detail": "",
           "href": null
         },
         {
           "name": "blender",
-          "status": "PENDING",
+          "status": "PENDING_RETRY",
           "detail": "",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PENDING",
+          "status": "PASS",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "NOT_REQUIRED",
           "detail": "",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
-          "name": "licenseReview",
-          "status": "PENDING",
+          "name": "visualAppearanceReview",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "",
+          "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-signal-fold-transit-tabard/ProductManifest.json"
         }
       ],
       "evidence": [],
-      "downloads": []
+      "downloads": [
+        {
+          "kind": "images",
+          "label": "画像セットを保存",
+          "href": "downloads/siroino-signal-fold-transit-tabard/images-53096b4052f50f68.zip",
+          "sha256": "97a064c682c44c8652595aa582fe0d2b9dc683589cc978df8f549a05e753164c"
+        }
+      ]
     },
     {
       "slug": "siroino-tuxedo-halter-dress-large",
@@ -3660,6 +4222,12 @@
           "status": "OUT_OF_SCOPE",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -3668,7 +4236,7 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/siroino-tuxedo-halter-dress-large/images-40580595fca95920.zip",
-          "sha256": "508abc5889bc09f0e5b150c535c648d0b0e15857e2d5903a60d3dcc0fda03f92"
+          "sha256": "6f0d69ab16249786980ff8b7aa61e3c8e8f2ace988ba4b810cbb3ab93fddd5c4"
         }
       ]
     },
@@ -3854,6 +4422,12 @@
           "status": "DRY_RUN_PASS",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -3862,7 +4436,7 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/siroino-verdant-ranger-explorer-set/images-90f7f2599371d4f6.zip",
-          "sha256": "b85f3e6b87a6d45344012497bde2d2b29f42baaf10d167a70db69c0989e5bd21"
+          "sha256": "533a45d0a56dafe754352f1e3da5268349ec524dbb1c29518763d9469f495271"
         }
       ]
     },
@@ -4086,6 +4660,12 @@
           "status": "OUT_OF_SCOPE",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-white-ghost-gown/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -4094,7 +4674,7 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/siroino-white-ghost-gown/images-2b2d3d1ff196b6b3.zip",
-          "sha256": "23607c44880655b3e1a9ac0999d8511fb3ab065c90e6a61039586a0f573eec50"
+          "sha256": "71a60300fd6b4c34858eee34f28a42b50d9159a89b1528d39568df1eed0614a6"
         }
       ]
     },
@@ -4273,6 +4853,12 @@
           "status": "PASS",
           "detail": "",
           "href": null
+        },
+        {
+          "name": "releaseReadiness",
+          "status": "UNKNOWN",
+          "detail": "",
+          "href": "Assets/GenWorks/siroino-wide-cargo/ProductManifest.json"
         }
       ],
       "evidence": [],
@@ -4281,7 +4867,7 @@
           "kind": "images",
           "label": "画像セットを保存",
           "href": "downloads/siroino-wide-cargo/images-5abcb33c0509fc29.zip",
-          "sha256": "e7d46383c05b9594ea027bfd453e591dfdb63e900bb76465a066eab3f6cb2a11"
+          "sha256": "df33d8dad89430bf93100f8999af2bd2cff437178572769b9da191d23589ce66"
         }
       ]
     }

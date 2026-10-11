@@ -88,8 +88,8 @@ def safe_state(manifest: dict[str, Any]) -> str:
     state = str(
         pick(
             manifest,
-            "state",
             "status",
+            "state",
             "product_state",
             "release_state",
             default="WORKING",
@@ -627,6 +627,27 @@ def collect_product(
     ) = parse_improvement_projection(root, workspace.name, output_dir)
     blockers.extend(quality_blockers)
     blockers.extend(improvement_blockers)
+    release_readiness = manifest.get("releaseReadiness", {})
+    if isinstance(release_readiness, dict):
+        release_status = status_text(release_readiness.get("status"))
+        release_reasons = [
+            str(reason)
+            for reason in as_list(release_readiness.get("reasons"))
+            if str(reason).strip()
+        ]
+        if release_status not in {"PASS", "READY", "RELEASABLE", "RELEASED"}:
+            blockers.extend(
+                {"severity": "RELEASE", "message": reason}
+                for reason in release_reasons
+            )
+        release_gate = Gate(
+            name="releaseReadiness",
+            status=release_status,
+            detail="; ".join(release_reasons),
+            href=relative_href(manifest_path, output_dir),
+        )
+    else:
+        release_gate = None
 
     assets: list[Asset] = []
     previews, preview_origin = preview_directory(workspace)
@@ -737,6 +758,7 @@ def collect_product(
             *parse_gate_rows(manifest, workspace, output_dir),
             *quality_gates,
             *improvement_gates,
+            *([release_gate] if release_gate else []),
         ],
         evidence=[
             *parse_evidence_rows(manifest, workspace, output_dir),
