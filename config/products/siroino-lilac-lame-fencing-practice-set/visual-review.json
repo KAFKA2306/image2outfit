@@ -3,47 +3,52 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewedRevision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
-  "reviewer": "chatgpt:codex",
+  "reviewer": "Codex direct image inspection",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "d36a9b56edf385e898b3b8c4a0035c04fbf9ef767195b4653f7e4d91a931b551",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "0cfb782f4c7ec20e96e6c6db2a92ec4b9818862f9f431b6ec257fbf43af7fd5e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "c26dee0528bc864bd1d64bcfb4e0c2ca1d194e733ce180595f5e4672f9972d04",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "a6f30519f4765f307c25674c31e3b2a7868f6fc8f6c9ea763c136ac57064a5cc",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "e1e147953b1252194ba7929234d8a8d5ed831e728c8714a87f58c10e03485655",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "0d632de475bbbff8de91d0b78e300510df2cdce63f0359b49ca84e3a2ed0212e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "102d2a2616954e4bcb668181560ca3be497e865909ebc5c98e75cdba1c6b5fec",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "0c0ec7fbb38ef3f6bd599e6706793094a129322068067cc35d373d2237993976",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "e32e2178c6be281543f1b1fe315b7b042c144a3c3164e404eb998478f799d4e0",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "7571a12c63d7add86aed8d5d8fbad1817f4697616e43094bb853c3f972f74437",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "8ea3b6b74898fb0eeae5009a1fd7b53438326148a0dd42de810994471f6a779f"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "3fbddfe7258f7cf9ab032b1354b17b43cabec28e5dbcb88d34a96be8ef855877",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "a37acec2ac49e7d6df27b839f9acb705d7d8724d9d5f42615194eed5a2719843",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "8b82d0dc55224695525e6fd7a3862c4df9452cc7eaaf7a9f3d90e725e02d4ca9",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "bd79b97ce4b1a276f2dcaaeb5c409a82a37a5d891f7f5218638e770ddb3e2b04",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "d351d4a4a3d932d761194736f5c75a78c52676a65c781563b906d5338ad3b931",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "0a06d5eb0b74cb67b16f65a35ebfb902c2b4f8b8823751a86646d21e2a4813b3",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "fdb9509705f76b1fd02f4ba17b725321ca95699a403a284f450d1bf32eba3fbd",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "4183400650f30cecfa5fc1c2160c062635f585c62c6b37cf5fd66af5a6f62635",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "57927ea30ce426fbc447ce6344d4221b0f212794671b25e4fa3effc264b41ac4",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "f30ca62decc633b85082c449d4058bfc23b988fc778f9b612ff490e2612404f4",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "072b07af6d6aded8e1540626b936bfad3f33608657bb761fbc72c3fb15227f10"
   },
   "findings": [
     {
       "severity": "BLOCKER",
-      "code": "DESIGN_DETAILS_NOT_RENDERED",
-      "description": "Directly inspected all five regenerated product views and all six regenerated poses. The jacket remains nearly featureless white: no readable broad fencing plastron or rear waist adjustment is visible; elbow diamonds and diagonal marking read only as faint contour lines."
+      "code": "PLASTRON_SURFACE_OCCLUSION",
+      "description": "Direct inspection of all 11 current renders after increasing the prototype surface offset from 2.5 mm to 4.5 mm still shows two white openings through the diagonal lilac chest panel, one near the collar and one near the lower torso. The offset experiment did not resolve the cutouts; the surface attachment/projection geometry must be corrected."
     },
     {
       "severity": "BLOCKER",
       "code": "SLEEVE_SURFACE_QUALITY",
-      "description": "Direct inspection of neutral, arms-up, arm-cross and prone renders shows dense irregular faceting and wrinkles across the sleeves and underarms. Sleeve surface quality remains visibly rough."
+      "description": "Current front, back, side and pose renders retain visibly faceted sleeves and pinched shoulder/underarm areas; elbow diamonds remain thin outlined marks."
     },
     {
       "severity": "BLOCKER",
-      "code": "SKIRT_CONSTRUCTION_UNRESOLVED",
-      "description": "Direct inspection of the current views and poses shows an uncontrolled skirt that separates into flaps in crouch and lifts in sitting, exposing large gaps around blunt cylindrical shorts. Same-pose projection records posterior-pelvis shorts coverage of 14.5% neutral, 17.7% crouch and 19.0% sit; overskirt coverage is 65.8%, 59.0% and 60.7%, with crouch/sit p95 gaps of 80.6/115.5 mm. The raised inner-crotch point did not materially resolve coverage. These geometric measurements are diagnostics only and do not establish fit acceptance."
+      "code": "POSE_COVERAGE",
+      "description": "Current crouch, sit and prone renders retain raised or separated skirt panels and white flaps/coverage artifacts under the seat. Shorts and overskirt coverage in motion remains unacceptable."
     },
     {
       "severity": "BLOCKER",
-      "code": "COLLAR_AND_FRONT_CLOSURE",
-      "description": "The collar remains a narrow upright open tube. The diagonal piping does not form a visible plastron or secure-looking closure, and neck clearance remains unestablished."
+      "code": "SIDE_ASSEMBLY_ARTIFACTS",
+      "description": "Current side views retain uneven skirt hem and a small rear waist-to-skirt projection."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "MISSING_DESIGN_DETAILS",
+      "description": "The front closure detail and rear waist adjustment detail are not visible; the high collar remains open."
     },
     {
       "severity": "BLOCKER",
       "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
-      "description": "These are Blender prototype renders and pose-matched geometry diagnostics only. Shape Key fit, continuous penetration, accepted deformation weights, Unity prefab integration, VRChat Build & Test and SDK upload remain unverified."
+      "description": "Only Blender prototype renders were inspected. Shape Key fit, accepted weights, continuous penetration, integrated Unity prefab, VRChat Build & Test, and SDK upload remain unverified; release remains blocked."
     }
   ],
   "sourceEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
@@ -160,7 +165,7 @@
     "valuesApplyToCurrentSource": false,
     "invalidatedByRebuildBlendSha256": "a8c7636f204e6d13b53bb185eb3630a84232a8f64936da9f78f44dd6f6194c72"
   },
-  "nextAction": "Keep the candidate REJECTED. Replace the single inner-crotch-point adjustment with a fitted rear seat and upper-thigh shell plus a sewn gusset, then measure new pose-matched coverage. Separately construct readable plastron, collar/closure, elbow quilting, rear waist detail and controlled skirt pleats; reduce sleeve faceting. Regenerate the mesh and all eleven views, bind a new review to their hashes, and directly inspect them. Do not claim Shape Key, fit, Unity, VRChat or upload acceptance.",
+  "nextAction": "Continue the chest-panel root-cause repair: capture per-piece surface ownership along the full diagonal path and eliminate occluded or discontinuous transitions instead of accepting the current band. Then correct sleeve faceting and seated/crouched/prone coverage, rebuild, and directly inspect all 11 hash-bound images.",
   "verifiedPoseCorrection": {
     "pose": "arms-up",
     "method": "imported bone local Y mapped to world +Z",
@@ -298,7 +303,7 @@
     "method": "pattern-half-leg-to-quarter-pelvis",
     "measuredImportedBoneHeadsBlenderM": {
       "Hips": [
-        2.5860916437342733e-16,
+        2.5860916437342733E-16,
         -0.03788188099861145,
         0.7395782470703125
       ],
@@ -427,7 +432,7 @@
       "component": "pleated-overskirt",
       "edgeId": "waist-opening",
       "heightM": 0.7395782470703125,
-      "toleranceM": 0.000001,
+      "toleranceM": 1E-06,
       "method": "open-boundary-at-declared-waist-height"
     },
     "pinVertexCount": 48,
@@ -545,7 +550,7 @@
       "blenderVersion": "4.4.3",
       "bone": "Neck",
       "headBlenderM": [
-        -2.053701209092651e-9,
+        -2.053701209092651E-09,
         -0.0093428585678339,
         1.0351301431655884
       ],
@@ -2464,7 +2469,7 @@
       "selectedVertexCount": 1814,
       "movedVertexCount": 1750,
       "maximumRadialDisplacementM": 0.01172093023255815,
-      "minimumTriangleAreaM2": 1.0472661275604241e-7,
+      "minimumTriangleAreaM2": 1.0472661275604241E-07,
       "beforeVerticesSha256": "c6c63c75c5e6b91ac1e48c085851195a154a682753ca98a59d388b5a868347f4",
       "afterVerticesSha256": "f621f13f4d2ad02978075a782e78ef789d0838b9310d1c33324396764b89ebce",
       "canonicalFacesChanged": false,
@@ -3553,270 +3558,317 @@
     "grantsFitAcceptance": false
   },
   "shortsCoverageReview": {
-    "method": "direct-inspection-after-segmented-four-panel-contour-redraft",
+    "method": "direct-inspection-after-ninety-percent-neutral-surface-relaxation",
     "patternDraftPath": "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json",
-    "patternDraftSha256": "3b10f385e97e4e3c4da506d075ca3187ee501235e9fcb29916bccc139871d97a",
+    "patternDraftSha256": "fa4fdbe01dfe911321a3425093d63d6893fb4d10879361a1ce441cb0d1ff502a",
     "inspectedCurrentRenderCount": 11,
     "result": "REJECT",
-    "observation": "The segmented outer-thigh and inner-rise draft passes the 2D boundary/stitch contract and was rebuilt in 3D, but its rendered shorts still look like blunt straight tubes. Current crouch and sit images show substantial gray avatar exposure where the skirt lifts; the contour-only revision and 120 mm hem extension do not establish coverage. A gusset and a clearer fitted seat/thigh construction remain necessary.",
+    "observation": "The four-panel draft passes the 2D boundary/stitch contract and was rebuilt after raising bounded neutral surface relaxation to 90%, but current views still show two blunt straight-sided leg tubes. Crouch and sit expose gray avatar through the lifted skirt; surface relaxation alone does not shape the seat, thighs, or leg openings. Redraft a fitted seat/upper-thigh shell with a gusset and shaped openings before another appearance review.",
     "grantsFitAcceptance": false,
     "grantsVisualAcceptance": false
   },
   "shortsContourRedraftReview": {
     "method": "direct-inspection-of-current-render-set",
-    "patternSha256": "3b10f385e97e4e3c4da506d075ca3187ee501235e9fcb29916bccc139871d97a",
+    "patternSha256": "fa4fdbe01dfe911321a3425093d63d6893fb4d10879361a1ce441cb0d1ff502a",
     "stitchGraphSha256": "8b101c2c74ca3c383d031e282c09376fe89fc35df595d8d16b253ceebb9d3237",
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "4604ddb89404094df9db6ce6d24305b7ea734aec34a6580b141c369f789ef9f4",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "e947029562a602a0c58482cd037ca1d5d829389123ace2f21ddcc8a43aaabd46",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "afba8deb3121fa9f805c569b73b26d7a290e7e684675141febf2343a2b857de6",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "22309a4be0aab8349820321cf2575326ee7298573d795e241191f0b6c39f046c",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "ef304112f003ccb8f6fe4c66cbeab77aa2a1e4a6adca29e5338d8500472662b9",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "76b0bd467d2c481e4076138882af649e89394b06769dd73544409873d98c5000",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "da60a4f5783b0f3ca4cb1cc861e09e966a4a5cecb68d650920e9f76ae67ad289",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "959463bfeffc4b05b187d8f1da521294fdb2592d8f11c8668dfa775b7882bf07",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "3b3a9b0dbfabb8742102866e649199ea8f3abb7e3efc8e95e9780d0b0256961f",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "9b99b71b4cb34609b4ffdba317ff04f1b5a35cab2fc3b389d584c78253ba645c",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "864afc0a9093903822f17d55b0ef39608df80f6c0ebc3bd7ffa2c59a3c104dbd"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "086eaf63582eb4330194e270eac64765105fbe8bf6ef8323f0f4e32409a17214",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "657e9c10140eb4af529063eaa9e9db4c5fcf0b644da8535b44eb71459ab7632c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "8ed60c9e94959a8499a6e8bc9908b09376d09dc0b4be4995126b678edf3d3efc",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "4b5e461ca1725273f97c15bddac2f161003cf22c99fe337986b8f0a1229435f7",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "0be2f4d324d26ddd72fbad94e6e49ab92ac6ec9488b3b42fee558fd77240a783",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "fea042894d6343858365be8a2cebd7e61706c10f5b98a5ca87f857aa7a7bcbc3",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "4be3f9beb5a6923c7f52b6d3f3f8afcbb7424c00f5e2efb4f20780fc570ba244",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "0c7980f3bf52cab236de5577dc97e729e2f2b2e94cc191906d7031fb671ad17a",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "13debbc67ff97cf86c47bb4e9d6dd9277f56c4d4b646e83783d225134cae2508",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "242f8ec4b1b12e7a38442d9fd4cbfbe21fb688491f4c9054635f6f9319a3c28f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "60fc71369416664aa25a53fb5a4018f374fe80c28ecce52cd1c3a381ae2802d0"
     },
-    "inspectedCurrentRenderCount": 11,
-    "result": "REJECT",
-    "observation": "The added segmented outer-thigh and crotch-rise vertices do not read as a fitted contour in the current 3D renders. Standing shorts remain blunt straight panels; crouch and sit still expose the avatar. No gusset is present. This contour revision alone is insufficient.",
-    "grantsFitAcceptance": false,
-    "grantsVisualAcceptance": false
-  },
-  "measuredSamePoseCoverage": {
-    "artifactPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/pose-coverage-diagnostic.json",
-    "artifactSha256": "81ea36efcbf4a6c79a291c1c6062b3307d4c4fbb159d09e9cc7403caf12a081e",
-    "renderReportPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
-    "renderReportSha256": "0bea2c66caca85d6093b4dbcfdb843f991a5d59de8d537eecc3c05d2ff09715f",
-    "method": "same-pose-body-surface-ray-coverage-v1",
-    "source": {
-      "weightedBlendPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend",
-      "weightedBlendSha256": "8021b5d24583b060034f7c216e058055d617dce959cb7901e3c85da579363e45",
-      "targetAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0"
+    "measuredSamePoseCoverage": {
+      "artifactPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/pose-coverage-diagnostic.json",
+      "artifactSha256": "81ea36efcbf4a6c79a291c1c6062b3307d4c4fbb159d09e9cc7403caf12a081e",
+      "renderReportPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
+      "renderReportSha256": "0bea2c66caca85d6093b4dbcfdb843f991a5d59de8d537eecc3c05d2ff09715f",
+      "method": "same-pose-body-surface-ray-coverage-v1",
+      "source": {
+        "weightedBlendPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend",
+        "weightedBlendSha256": "8021b5d24583b060034f7c216e058055d617dce959cb7901e3c85da579363e45",
+        "targetAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0"
+      },
+      "results": [
+        {
+          "pose": "neutral",
+          "zone": "pelvis-posterior",
+          "layer": "under-shorts",
+          "sampleCount": 634,
+          "coveredSampleCount": 92,
+          "coverageFraction": 0.14511041009463724,
+          "surfaceGapMedianM": 0.008630105294287205,
+          "surfaceGapP95M": 0.029388274997472763,
+          "sampleTriangleIdsSha256": "3e20dca74644f84b5942efe1233f47686595f24c2e85039aa2dbf7c27de67c02",
+          "coveredTriangleIdsSha256": "804d79932123cb8894964bfa4bffe397acac59412d5efadae6e9d5ac94c968a0"
+        },
+        {
+          "pose": "neutral",
+          "zone": "pelvis-posterior",
+          "layer": "overskirt",
+          "sampleCount": 634,
+          "coveredSampleCount": 417,
+          "coverageFraction": 0.6577287066246057,
+          "surfaceGapMedianM": 0.00958701316267252,
+          "surfaceGapP95M": 0.06200578436255455,
+          "sampleTriangleIdsSha256": "3e20dca74644f84b5942efe1233f47686595f24c2e85039aa2dbf7c27de67c02",
+          "coveredTriangleIdsSha256": "88527e8ee35608c13a84d3655de998c472b31257d41bb66bb8470f4428ed578f"
+        },
+        {
+          "pose": "neutral",
+          "zone": "upper-thigh-left",
+          "layer": "under-shorts",
+          "sampleCount": 885,
+          "coveredSampleCount": 544,
+          "coverageFraction": 0.6146892655367232,
+          "surfaceGapMedianM": 0.015659362077713013,
+          "surfaceGapP95M": 0.026325466111302376,
+          "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
+          "coveredTriangleIdsSha256": "eba7c5527a715eee42dd875ef66b760d17d19282c2bfdab713980db4159eba2c"
+        },
+        {
+          "pose": "neutral",
+          "zone": "upper-thigh-left",
+          "layer": "overskirt",
+          "sampleCount": 885,
+          "coveredSampleCount": 336,
+          "coverageFraction": 0.37966101694915255,
+          "surfaceGapMedianM": 0.030935177579522133,
+          "surfaceGapP95M": 0.14055505394935608,
+          "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
+          "coveredTriangleIdsSha256": "0182b994043192ef4caff9c15c2e34b30e25324a296b6866cf6852685ab9026a"
+        },
+        {
+          "pose": "neutral",
+          "zone": "upper-thigh-right",
+          "layer": "under-shorts",
+          "sampleCount": 885,
+          "coveredSampleCount": 544,
+          "coverageFraction": 0.6146892655367232,
+          "surfaceGapMedianM": 0.015659363940358162,
+          "surfaceGapP95M": 0.026325466111302376,
+          "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
+          "coveredTriangleIdsSha256": "822b1b2cff95e60810f960280e6adcb58b3d1d765eb47bfad8565f5e80d85a4c"
+        },
+        {
+          "pose": "neutral",
+          "zone": "upper-thigh-right",
+          "layer": "overskirt",
+          "sampleCount": 885,
+          "coveredSampleCount": 336,
+          "coverageFraction": 0.37966101694915255,
+          "surfaceGapMedianM": 0.03108665905892849,
+          "surfaceGapP95M": 0.13824407756328583,
+          "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
+          "coveredTriangleIdsSha256": "150053791d765a0f5589cf623554d779205aacda415e9211ed215378daf9173d"
+        },
+        {
+          "pose": "crouch",
+          "zone": "pelvis-posterior",
+          "layer": "under-shorts",
+          "sampleCount": 654,
+          "coveredSampleCount": 116,
+          "coverageFraction": 0.17737003058103976,
+          "surfaceGapMedianM": 0.010540677234530449,
+          "surfaceGapP95M": 0.09911264479160309,
+          "sampleTriangleIdsSha256": "ada1bde1dd14d063a96881cb49085195082c0020a9dd35553fc8c6a55b4562b7",
+          "coveredTriangleIdsSha256": "9e6d02e03d1ac396268ac9fe3a399c3820346a67e0f9bce32180781beea8b387"
+        },
+        {
+          "pose": "crouch",
+          "zone": "pelvis-posterior",
+          "layer": "overskirt",
+          "sampleCount": 654,
+          "coveredSampleCount": 386,
+          "coverageFraction": 0.5902140672782875,
+          "surfaceGapMedianM": 0.010633567348122597,
+          "surfaceGapP95M": 0.08059197664260864,
+          "sampleTriangleIdsSha256": "ada1bde1dd14d063a96881cb49085195082c0020a9dd35553fc8c6a55b4562b7",
+          "coveredTriangleIdsSha256": "98f2c52d1bb910d042b8a4b52a08c02ed8193f2d09b43a072f980f877995ca8e"
+        },
+        {
+          "pose": "crouch",
+          "zone": "upper-thigh-left",
+          "layer": "under-shorts",
+          "sampleCount": 885,
+          "coveredSampleCount": 535,
+          "coverageFraction": 0.6045197740112994,
+          "surfaceGapMedianM": 0.014194415882229805,
+          "surfaceGapP95M": 0.025884250178933144,
+          "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
+          "coveredTriangleIdsSha256": "7ff4c381127108badd1fe567ff3eb6f0d6c1ac1940949c8ec49f6b80435453ae"
+        },
+        {
+          "pose": "crouch",
+          "zone": "upper-thigh-left",
+          "layer": "overskirt",
+          "sampleCount": 885,
+          "coveredSampleCount": 136,
+          "coverageFraction": 0.1536723163841808,
+          "surfaceGapMedianM": 0.02518450655043125,
+          "surfaceGapP95M": 0.13687698543071747,
+          "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
+          "coveredTriangleIdsSha256": "a8101408e656ba69cdd30adb7919a63412107dc83d3172b2e08e87c57ee71018"
+        },
+        {
+          "pose": "crouch",
+          "zone": "upper-thigh-right",
+          "layer": "under-shorts",
+          "sampleCount": 885,
+          "coveredSampleCount": 535,
+          "coverageFraction": 0.6045197740112994,
+          "surfaceGapMedianM": 0.014194397255778313,
+          "surfaceGapP95M": 0.025884248316287994,
+          "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
+          "coveredTriangleIdsSha256": "21630641573f2c572f0fd9aaf7a48f96b57d1d2e8400672c95a45ec839fc66cb"
+        },
+        {
+          "pose": "crouch",
+          "zone": "upper-thigh-right",
+          "layer": "overskirt",
+          "sampleCount": 885,
+          "coveredSampleCount": 139,
+          "coverageFraction": 0.15706214689265538,
+          "surfaceGapMedianM": 0.023546162992715836,
+          "surfaceGapP95M": 0.1365303099155426,
+          "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
+          "coveredTriangleIdsSha256": "db5d750ddec00fc664651ba90057bbe6111ef3f209fb378a376fb45ae12a08dd"
+        },
+        {
+          "pose": "sit",
+          "zone": "pelvis-posterior",
+          "layer": "under-shorts",
+          "sampleCount": 672,
+          "coveredSampleCount": 128,
+          "coverageFraction": 0.19047619047619047,
+          "surfaceGapMedianM": 0.012195613235235214,
+          "surfaceGapP95M": 0.10385999083518982,
+          "sampleTriangleIdsSha256": "2c67353c1b6577d52be1f6a240c9381352ac2c56868b7355ce3950ced32b71cf",
+          "coveredTriangleIdsSha256": "7a549ead31a41f5ab437370860c64b0470482b488bf1d22263cde706402e7ef6"
+        },
+        {
+          "pose": "sit",
+          "zone": "pelvis-posterior",
+          "layer": "overskirt",
+          "sampleCount": 672,
+          "coveredSampleCount": 408,
+          "coverageFraction": 0.6071428571428571,
+          "surfaceGapMedianM": 0.011891970410943031,
+          "surfaceGapP95M": 0.11546025425195694,
+          "sampleTriangleIdsSha256": "2c67353c1b6577d52be1f6a240c9381352ac2c56868b7355ce3950ced32b71cf",
+          "coveredTriangleIdsSha256": "bdee850a2bf8542f5b0086ad71dbf71184d1b6e2dbad1ea8d66813a52f85d9a8"
+        },
+        {
+          "pose": "sit",
+          "zone": "upper-thigh-left",
+          "layer": "under-shorts",
+          "sampleCount": 885,
+          "coveredSampleCount": 531,
+          "coverageFraction": 0.6,
+          "surfaceGapMedianM": 0.014458647929131985,
+          "surfaceGapP95M": 0.02634846232831478,
+          "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
+          "coveredTriangleIdsSha256": "1c91722d1e60d4ced7e288c8e48ab6a7998f7cb94451fee5910959c09a6ba457"
+        },
+        {
+          "pose": "sit",
+          "zone": "upper-thigh-left",
+          "layer": "overskirt",
+          "sampleCount": 885,
+          "coveredSampleCount": 105,
+          "coverageFraction": 0.11864406779661017,
+          "surfaceGapMedianM": 0.025436267256736755,
+          "surfaceGapP95M": 0.10362973809242249,
+          "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
+          "coveredTriangleIdsSha256": "0a1bf6f170a61549cada26d59d753374b2c387128cffb9f69e2df930affe6fd6"
+        },
+        {
+          "pose": "sit",
+          "zone": "upper-thigh-right",
+          "layer": "under-shorts",
+          "sampleCount": 885,
+          "coveredSampleCount": 531,
+          "coverageFraction": 0.6,
+          "surfaceGapMedianM": 0.014458699151873589,
+          "surfaceGapP95M": 0.026348469778895378,
+          "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
+          "coveredTriangleIdsSha256": "e885cc216c7cf683afac1cac944aa7af0ce873bb1e3f406439429896bc251030"
+        },
+        {
+          "pose": "sit",
+          "zone": "upper-thigh-right",
+          "layer": "overskirt",
+          "sampleCount": 885,
+          "coveredSampleCount": 105,
+          "coverageFraction": 0.11864406779661017,
+          "surfaceGapMedianM": 0.02470235340297222,
+          "surfaceGapP95M": 0.08221960812807083,
+          "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
+          "coveredTriangleIdsSha256": "39a5745103679772ecd401e0069bf78f8687da4efe28b1e0a316804824fe2ebe"
+        }
+      ],
+      "grantsFitAcceptance": false,
+      "grantsVisualAcceptance": false,
+      "evidenceBoundary": "Pose-matched avatar triangle samples are ray-projected along their evaluated surface normals onto canonical shorts and overskirt faces. This geometric coverage diagnostic does not measure pressure, material stretch, collision response, Shape Keys, visual quality, or VRChat runtime fit and cannot pass a quality gate."
     },
-    "results": [
-      {
-        "pose": "neutral",
-        "zone": "pelvis-posterior",
-        "layer": "under-shorts",
-        "sampleCount": 634,
-        "coveredSampleCount": 92,
-        "coverageFraction": 0.14511041009463724,
-        "surfaceGapMedianM": 0.008630105294287205,
-        "surfaceGapP95M": 0.029388274997472763,
-        "sampleTriangleIdsSha256": "3e20dca74644f84b5942efe1233f47686595f24c2e85039aa2dbf7c27de67c02",
-        "coveredTriangleIdsSha256": "804d79932123cb8894964bfa4bffe397acac59412d5efadae6e9d5ac94c968a0"
+    "reviewedAt": "2026-10-11T18:36:42Z",
+    "prototypeMotifContrastExperiment": {
+      "materialRecipeSha256": "646c8c0ae2911d63bdb3be58d05f3fb377f2f4e4c0463e3cb793d2ad06a0d7f6",
+      "colorLinearRgb": [
+        0.18,
+        0.07,
+        0.34
+      ],
+      "plastronHalfWidthStartM": 0.024,
+      "plastronHalfWidthEndM": 0.02,
+      "priorNarrowTrial": {
+        "halfWidthStartM": 0.012,
+        "halfWidthEndM": 0.009,
+        "result": "VISIBLE_STRIPE_REJECTED",
+        "evidenceBoundary": "Previous hash-bound direct review; no acceptance."
       },
-      {
-        "pose": "neutral",
-        "zone": "pelvis-posterior",
-        "layer": "overskirt",
-        "sampleCount": 634,
-        "coveredSampleCount": 417,
-        "coverageFraction": 0.6577287066246057,
-        "surfaceGapMedianM": 0.00958701316267252,
-        "surfaceGapP95M": 0.06200578436255455,
-        "sampleTriangleIdsSha256": "3e20dca74644f84b5942efe1233f47686595f24c2e85039aa2dbf7c27de67c02",
-        "coveredTriangleIdsSha256": "88527e8ee35608c13a84d3655de998c472b31257d41bb66bb8470f4428ed578f"
+      "priorOversizedWidthTrial": {
+        "halfWidthStartM": 0.052,
+        "halfWidthEndM": 0.034,
+        "result": "BUILD_REJECTED",
+        "failure": "Positive-Y ray from widened upper plastron corner missed the declared front panel at x=0.0073, z=1.0657.",
+        "evidenceBoundary": "A failed prototype geometry attempt; no fit or appearance acceptance."
       },
-      {
-        "pose": "neutral",
-        "zone": "upper-thigh-left",
-        "layer": "under-shorts",
-        "sampleCount": 885,
-        "coveredSampleCount": 544,
-        "coverageFraction": 0.6146892655367232,
-        "surfaceGapMedianM": 0.015659362077713013,
-        "surfaceGapP95M": 0.026325466111302376,
-        "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-        "coveredTriangleIdsSha256": "eba7c5527a715eee42dd875ef66b760d17d19282c2bfdab713980db4159eba2c"
+      "currentImageReview": "Directly inspected all five views and six pose renders: the broader diagonal patch is legible, but has white cutout/intersection defects near both ends; it still lacks shaped closure details. Sleeve faceting, thin elbow diamonds, absent rear waist detail, and skirt/shorts pose artifacts remain.",
+      "evidenceBoundary": "All 11 directly inspected renders are SHA-256 bound in inspectedImages. Mesh/material prototype experiment only; no appearance, fit, or release acceptance.",
+      "result": "REJECT"
+    },
+    "prototypeMotifOrientationExperiment": {
+      "sourcePath": "tools/build_sewn_pattern_prototype.py",
+      "sourceSha256": "c515d4bd890e905c4f767ade61bdb51480b118586475932feac749d5fd117eab",
+      "orientationBefore": {
+        "meanNormalY": 0.4412,
+        "minimumNormalY": 0.4412,
+        "evidence": "Inspected saved prior widened prototype mesh directly in Blender."
       },
-      {
-        "pose": "neutral",
-        "zone": "upper-thigh-left",
-        "layer": "overskirt",
-        "sampleCount": 885,
-        "coveredSampleCount": 336,
-        "coverageFraction": 0.37966101694915255,
-        "surfaceGapMedianM": 0.030935177579522133,
-        "surfaceGapP95M": 0.14055505394935608,
-        "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-        "coveredTriangleIdsSha256": "0182b994043192ef4caff9c15c2e34b30e25324a296b6866cf6852685ab9026a"
+      "orientationAfter": {
+        "meanNormalY": -0.8971,
+        "minimumNormalY": -0.9994,
+        "inwardFaceCount": 0,
+        "evidence": "Inspected rebuilt prototype plastron mesh directly in Blender."
       },
-      {
-        "pose": "neutral",
-        "zone": "upper-thigh-right",
-        "layer": "under-shorts",
-        "sampleCount": 885,
-        "coveredSampleCount": 544,
-        "coverageFraction": 0.6146892655367232,
-        "surfaceGapMedianM": 0.015659363940358162,
-        "surfaceGapP95M": 0.026325466111302376,
-        "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-        "coveredTriangleIdsSha256": "822b1b2cff95e60810f960280e6adcb58b3d1d765eb47bfad8565f5e80d85a4c"
-      },
-      {
-        "pose": "neutral",
-        "zone": "upper-thigh-right",
-        "layer": "overskirt",
-        "sampleCount": 885,
-        "coveredSampleCount": 336,
-        "coverageFraction": 0.37966101694915255,
-        "surfaceGapMedianM": 0.03108665905892849,
-        "surfaceGapP95M": 0.13824407756328583,
-        "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-        "coveredTriangleIdsSha256": "150053791d765a0f5589cf623554d779205aacda415e9211ed215378daf9173d"
-      },
-      {
-        "pose": "crouch",
-        "zone": "pelvis-posterior",
-        "layer": "under-shorts",
-        "sampleCount": 654,
-        "coveredSampleCount": 116,
-        "coverageFraction": 0.17737003058103976,
-        "surfaceGapMedianM": 0.010540677234530449,
-        "surfaceGapP95M": 0.09911264479160309,
-        "sampleTriangleIdsSha256": "ada1bde1dd14d063a96881cb49085195082c0020a9dd35553fc8c6a55b4562b7",
-        "coveredTriangleIdsSha256": "9e6d02e03d1ac396268ac9fe3a399c3820346a67e0f9bce32180781beea8b387"
-      },
-      {
-        "pose": "crouch",
-        "zone": "pelvis-posterior",
-        "layer": "overskirt",
-        "sampleCount": 654,
-        "coveredSampleCount": 386,
-        "coverageFraction": 0.5902140672782875,
-        "surfaceGapMedianM": 0.010633567348122597,
-        "surfaceGapP95M": 0.08059197664260864,
-        "sampleTriangleIdsSha256": "ada1bde1dd14d063a96881cb49085195082c0020a9dd35553fc8c6a55b4562b7",
-        "coveredTriangleIdsSha256": "98f2c52d1bb910d042b8a4b52a08c02ed8193f2d09b43a072f980f877995ca8e"
-      },
-      {
-        "pose": "crouch",
-        "zone": "upper-thigh-left",
-        "layer": "under-shorts",
-        "sampleCount": 885,
-        "coveredSampleCount": 535,
-        "coverageFraction": 0.6045197740112994,
-        "surfaceGapMedianM": 0.014194415882229805,
-        "surfaceGapP95M": 0.025884250178933144,
-        "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-        "coveredTriangleIdsSha256": "7ff4c381127108badd1fe567ff3eb6f0d6c1ac1940949c8ec49f6b80435453ae"
-      },
-      {
-        "pose": "crouch",
-        "zone": "upper-thigh-left",
-        "layer": "overskirt",
-        "sampleCount": 885,
-        "coveredSampleCount": 136,
-        "coverageFraction": 0.1536723163841808,
-        "surfaceGapMedianM": 0.02518450655043125,
-        "surfaceGapP95M": 0.13687698543071747,
-        "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-        "coveredTriangleIdsSha256": "a8101408e656ba69cdd30adb7919a63412107dc83d3172b2e08e87c57ee71018"
-      },
-      {
-        "pose": "crouch",
-        "zone": "upper-thigh-right",
-        "layer": "under-shorts",
-        "sampleCount": 885,
-        "coveredSampleCount": 535,
-        "coverageFraction": 0.6045197740112994,
-        "surfaceGapMedianM": 0.014194397255778313,
-        "surfaceGapP95M": 0.025884248316287994,
-        "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-        "coveredTriangleIdsSha256": "21630641573f2c572f0fd9aaf7a48f96b57d1d2e8400672c95a45ec839fc66cb"
-      },
-      {
-        "pose": "crouch",
-        "zone": "upper-thigh-right",
-        "layer": "overskirt",
-        "sampleCount": 885,
-        "coveredSampleCount": 139,
-        "coverageFraction": 0.15706214689265538,
-        "surfaceGapMedianM": 0.023546162992715836,
-        "surfaceGapP95M": 0.1365303099155426,
-        "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-        "coveredTriangleIdsSha256": "db5d750ddec00fc664651ba90057bbe6111ef3f209fb378a376fb45ae12a08dd"
-      },
-      {
-        "pose": "sit",
-        "zone": "pelvis-posterior",
-        "layer": "under-shorts",
-        "sampleCount": 672,
-        "coveredSampleCount": 128,
-        "coverageFraction": 0.19047619047619047,
-        "surfaceGapMedianM": 0.012195613235235214,
-        "surfaceGapP95M": 0.10385999083518982,
-        "sampleTriangleIdsSha256": "2c67353c1b6577d52be1f6a240c9381352ac2c56868b7355ce3950ced32b71cf",
-        "coveredTriangleIdsSha256": "7a549ead31a41f5ab437370860c64b0470482b488bf1d22263cde706402e7ef6"
-      },
-      {
-        "pose": "sit",
-        "zone": "pelvis-posterior",
-        "layer": "overskirt",
-        "sampleCount": 672,
-        "coveredSampleCount": 408,
-        "coverageFraction": 0.6071428571428571,
-        "surfaceGapMedianM": 0.011891970410943031,
-        "surfaceGapP95M": 0.11546025425195694,
-        "sampleTriangleIdsSha256": "2c67353c1b6577d52be1f6a240c9381352ac2c56868b7355ce3950ced32b71cf",
-        "coveredTriangleIdsSha256": "bdee850a2bf8542f5b0086ad71dbf71184d1b6e2dbad1ea8d66813a52f85d9a8"
-      },
-      {
-        "pose": "sit",
-        "zone": "upper-thigh-left",
-        "layer": "under-shorts",
-        "sampleCount": 885,
-        "coveredSampleCount": 531,
-        "coverageFraction": 0.6,
-        "surfaceGapMedianM": 0.014458647929131985,
-        "surfaceGapP95M": 0.02634846232831478,
-        "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-        "coveredTriangleIdsSha256": "1c91722d1e60d4ced7e288c8e48ab6a7998f7cb94451fee5910959c09a6ba457"
-      },
-      {
-        "pose": "sit",
-        "zone": "upper-thigh-left",
-        "layer": "overskirt",
-        "sampleCount": 885,
-        "coveredSampleCount": 105,
-        "coverageFraction": 0.11864406779661017,
-        "surfaceGapMedianM": 0.025436267256736755,
-        "surfaceGapP95M": 0.10362973809242249,
-        "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-        "coveredTriangleIdsSha256": "0a1bf6f170a61549cada26d59d753374b2c387128cffb9f69e2df930affe6fd6"
-      },
-      {
-        "pose": "sit",
-        "zone": "upper-thigh-right",
-        "layer": "under-shorts",
-        "sampleCount": 885,
-        "coveredSampleCount": 531,
-        "coverageFraction": 0.6,
-        "surfaceGapMedianM": 0.014458699151873589,
-        "surfaceGapP95M": 0.026348469778895378,
-        "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-        "coveredTriangleIdsSha256": "e885cc216c7cf683afac1cac944aa7af0ce873bb1e3f406439429896bc251030"
-      },
-      {
-        "pose": "sit",
-        "zone": "upper-thigh-right",
-        "layer": "overskirt",
-        "sampleCount": 885,
-        "coveredSampleCount": 105,
-        "coverageFraction": 0.11864406779661017,
-        "surfaceGapMedianM": 0.02470235340297222,
-        "surfaceGapP95M": 0.08221960812807083,
-        "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-        "coveredTriangleIdsSha256": "39a5745103679772ecd401e0069bf78f8687da4efe28b1e0a316804824fe2ebe"
-      }
-    ],
-    "grantsFitAcceptance": false,
-    "grantsVisualAcceptance": false,
-    "evidenceBoundary": "Pose-matched avatar triangle samples are ray-projected along their evaluated surface normals onto canonical shorts and overskirt faces. This geometric coverage diagnostic does not measure pressure, material stretch, collision response, Shape Keys, visual quality, or VRChat runtime fit and cannot pass a quality gate."
+      "renderOutcome": "WHITE_CUTOUTS_REMAIN_REJECTED",
+      "currentImageReview": "All 11 newly rendered views were directly inspected; winding is now outward to -Y but two white openings remain through the diagonal panel. Sleeve faceting, skirt/shorts pose artifacts, plain rear detail and open collar are also still visible.",
+      "evidenceBoundary": "Mesh normal check and direct render review only; no appearance, fit, or runtime acceptance."
+    }
   },
-  "reviewedAt": "2026-10-10T23:54:04.989Z"
+  "reviewedAt": "2026-10-11T21:05:45Z",
+  "prototypeSurfaceOffsetExperiment": {
+    "evidenceBoundary": "Prototype surface-offset experiment and direct image review only; no appearance, fit, or release acceptance.",
+    "materialRecipeSha256": "74cdb6b7b48853768add49dcf064350af57c750aa03f65b23afe57b17ff4ac99",
+    "result": "WHITE_CUTOUTS_REMAIN_REJECTED",
+    "currentImageReview": "All 11 current renders were directly inspected and SHA-256 bound. Increasing the prototype motif surface offset to 4.5 mm did not close either white opening in the diagonal plastron; pose coverage and sleeve artifacts also remain.",
+    "surfaceOffsetM": 0.0045
+  }
 }
