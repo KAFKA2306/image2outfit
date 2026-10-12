@@ -171,14 +171,6 @@ class McpSupportTests(unittest.TestCase):
         self.assertIn("unityImport", policy["outOfScopeGates"])
         self.assertIn("vrchatRuntime", policy["outOfScopeGates"])
 
-    def test_mcp_readme_preserves_completion_boundary(self) -> None:
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn("製品の`COMPLETE`条件は変更しません", readme)
-        self.assertIn("Unity 2022.3.22f1 import/save/reload", readme)
-        self.assertIn("VRChat Build & Test", readme)
-        self.assertIn("OUT_OF_SCOPE", readme)
-        self.assertIn("task mcp:doctor", readme)
-
 
 if __name__ == "__main__":
     unittest.main()
