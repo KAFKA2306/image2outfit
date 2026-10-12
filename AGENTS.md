@@ -8,7 +8,6 @@ Continue an existing checkpoint/workline when it already owns the same outcome.
 
 ## Canonical owners
 
-- PR merge: `config/pr-merge-policy.json` and `tools/pr_merge_gate.py`
 - completion/runtime scope: `config/genworks-handoff-policy.json`
 - required visual evidence and customer release: `config/release-policy.json` and `contracts/quality/quality-spec.json`
 - product identity/input/output: `config/products/<slug>/job.json`
