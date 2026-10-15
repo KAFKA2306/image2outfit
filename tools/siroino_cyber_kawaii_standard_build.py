@@ -10,6 +10,7 @@ import bmesh
 import bpy
 from mathutils import Vector
 
+import gate_evidence
 import siroino_cyber_kawaii_large_build as legacy
 import siroino_strappy_knit_build as base
 
@@ -329,8 +330,14 @@ def rewrite_handoff(job: dict, return_code: int) -> None:
             "blender": "PASS" if passed else "FAIL",
             "fbx": "PASS" if passed else "FAIL",
             "bodyClearance": "PASS" if passed else "FAIL",
-            "fiveViewRender": "PASS" if passed else "FAIL",
-            "poseRender": "PASS" if passed else "FAIL",
+            "fiveViewRender": gate_evidence.view_gate_status(
+                ROOT, job["productRoot"]
+            )
+            if passed
+            else "FAIL",
+            "poseRender": gate_evidence.pose_gate_status(ROOT, job["productRoot"])
+            if passed
+            else "FAIL",
             "unityImport": "PENDING",
             "prefabSerialized": "PENDING",
             "prefabReload": "PENDING",

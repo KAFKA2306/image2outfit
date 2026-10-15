@@ -15,6 +15,8 @@ import bpy
 from mathutils import Vector
 from PIL import Image, ImageDraw
 
+import gate_evidence
+
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-military-sheer-romper-large"
 PRODUCT_NAME = "Military Sheer-Back Romper for Siroino _Large"
@@ -625,7 +627,7 @@ def write_contracts(job_path, job, directories, metrics, previews, fbx):
         },
         "metrics": metrics,
         "technicalGates": {
-            "blenderGeneration": "PASS", "fbxExport": "PASS", "fiveViewRender": "PASS",
+            "blenderGeneration": "PASS", "fbxExport": "PASS", "fiveViewRender": gate_evidence.view_gate_status(ROOT, job["productRoot"]),
             "unityPrefabYamlGenerated": "PASS", "unityImport": "PENDING", "prefabReload": "PENDING",
             "modularAvatar": "PENDING", "ndmf": "PENDING", "vrchatBuildAndTest": "PENDING",
             "humanVisualReview": "PENDING", "humanPoseReview": "PENDING", "humanRuntimeReview": "PENDING",

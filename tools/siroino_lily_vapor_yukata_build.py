@@ -20,6 +20,8 @@ from pathlib import Path
 import bpy
 from PIL import Image, ImageDraw, ImageFont
 
+import gate_evidence
+
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCT_ID = "siroino-lily-vapor-yukata"
 SHAPE_KEYS = ("All_L", "Chest_L", "Hips_01_L", "UpperLeg_L", "Breasts_L")
@@ -736,8 +738,10 @@ def main() -> int:
             "editableSource": "PASS",
             "fbx": "PASS",
             "prefabDeclared": "PASS",
-            "fiveViewEvidence": "PASS",
-            "poseEvidence": "PASS",
+            "fiveViewEvidence": gate_evidence.view_gate_status(
+                ROOT, job["productRoot"]
+            ),
+            "poseEvidence": gate_evidence.pose_gate_status(ROOT, job["productRoot"]),
             "visualAppearanceReview": "REVIEW_REQUIRED",
             "clothSimulation": "PENDING_BAKE",
             "unityImport": "UNVERIFIED",

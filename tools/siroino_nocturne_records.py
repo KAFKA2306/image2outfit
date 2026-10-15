@@ -6,6 +6,7 @@ import hashlib
 import json
 from pathlib import Path
 
+import gate_evidence
 import siroino_strappy_knit_build as base
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -238,7 +239,9 @@ def _gates() -> dict:
         "editableSource": "PASS",
         "fbx": "PASS",
         "prefabDeclared": "PASS",
-        "fiveViewEvidence": "PASS",
+        "fiveViewEvidence": gate_evidence.view_gate_status(
+            ROOT, f"Assets/GenWorks/{PRODUCT_ID}"
+        ),
         "poseEvidence": "PENDING",
         "visualAppearanceReview": "PENDING",
         "researchTrial": "PASS",

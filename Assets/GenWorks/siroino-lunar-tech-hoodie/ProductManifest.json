@@ -39,8 +39,8 @@
     "editableSource": "PASS",
     "fbx": "PASS",
     "prefabDeclared": "PASS",
-    "fiveViewEvidence": "PASS",
-    "poseEvidence": "PASS",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
     "visualAppearanceReview": "REVIEW_REQUIRED",
     "clothSimulation": "PASS",
     "unityImport": "PASS",
@@ -57,5 +57,19 @@
     "weightSumErrors": 0,
     "maxBoneInfluences": 5
   },
-  "clothSimulation": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/cloth-simulation.json"
+  "clothSimulation": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/cloth-simulation.json",
+  "gateEvidenceCorrections": {
+    "technicalGates.fiveViewEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.fiveViewEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/front.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/back.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/left.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/right.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/three-quarter.png",
+      "correctedOn": "2026-10-15"
+    },
+    "technicalGates.poseEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.poseEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/neutral.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/arms-up.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/arm-cross.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/crouch.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/sit.png, Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/Poses/prone.png",
+      "correctedOn": "2026-10-15"
+    }
+  }
 }

@@ -16,6 +16,7 @@ import bpy
 from mathutils import Vector
 from PIL import Image
 
+import gate_evidence
 import genworks_product_common as g
 import siroino_strappy_knit_build as base
 from tuxedo_halter_runtime import normalize_bone_weights, render_prone_pose
@@ -891,8 +892,10 @@ def main() -> int:
             "fbx": "PASS" if fbx_path.is_file() else "FAIL",
             "prefabDeclared": "PASS" if prefab_path.is_file() else "FAIL",
             "clothSimulation": "PASS",
-            "fiveViewEvidence": "PASS" if len(previews) == 5 else "FAIL",
-            "poseEvidence": "PASS" if len(pose_images) == 6 else "FAIL",
+            "fiveViewEvidence": gate_evidence.view_gate_status(
+                ROOT, job["productRoot"]
+            ),
+            "poseEvidence": gate_evidence.pose_gate_status(ROOT, job["productRoot"]),
             "tenAxisAudit": "WORKING",
             "visualAppearanceReview": "PENDING",
             "researchTrial": "PASS",

@@ -19,6 +19,7 @@ import bmesh
 from mathutils import Vector
 from PIL import Image
 
+import gate_evidence
 import genworks_product_common as g
 import siroino_strappy_knit_build as base
 from tuxedo_halter_runtime import render_prone_pose
@@ -752,8 +753,10 @@ def main() -> int:
             "bodyClearance": "PASS"
             if improvement[-1]["clearance"]["p01"] >= 0.0030
             else "FAIL",
-            "fiveViewRender": "PASS",
-            "poseRender": "PASS",
+            "fiveViewRender": gate_evidence.view_gate_status(
+                ROOT, job["productRoot"]
+            ),
+            "poseRender": gate_evidence.pose_gate_status(ROOT, job["productRoot"]),
             "unityImport": "PENDING",
             "modularAvatar": "PENDING",
             "humanVisualReview": "PENDING",

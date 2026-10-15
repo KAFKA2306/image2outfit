@@ -20,6 +20,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
+import gate_evidence
+
 import bpy
 from PIL import Image, ImageDraw, ImageFont
 
@@ -979,8 +981,10 @@ def main() -> int:
                 "editableSource": "PASS",
                 "fbx": "PASS",
                 "prefabDeclared": "PASS",
-                "fiveViewEvidence": "PASS",
-                "poseEvidence": "PASS",
+                "fiveViewEvidence": gate_evidence.view_gate_status(
+                    ROOT, job["productRoot"]
+                ),
+                "poseEvidence": gate_evidence.pose_gate_status(ROOT, job["productRoot"]),
                 "visualAppearanceReview": "PENDING",
                 "clothSimulation": "PENDING_BAKE",
                 "unityImport": "UNVERIFIED",

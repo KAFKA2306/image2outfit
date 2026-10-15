@@ -27,8 +27,8 @@
     "editableSource": "PASS",
     "fbx": "PASS",
     "prefabDeclared": "PASS",
-    "fiveViewEvidence": "PASS",
-    "poseEvidence": "PASS",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
     "visualAppearanceReview": "PENDING",
     "researchTrial": "PASS",
     "fitPenetration": "NON_BLOCKING_FAIL",
@@ -40,7 +40,7 @@
     "vrchatBuildTest": "OUT_OF_SCOPE",
     "vrchatRuntime": "OUT_OF_SCOPE",
     "humanRuntimeReview": "OUT_OF_SCOPE",
-    "poseRender": "PASS"
+    "poseRender": "UNVERIFIED"
   },
   "outputs": {
     "blend": "Assets/GenWorks/siroino-nocturne-angel-set/Source/Blender/SiroinoNocturneAngelSet.blend",
@@ -360,5 +360,25 @@
       "prone"
     ],
     "totalTriangleOverlapPairs": 6671
+  },
+  "gateEvidenceCorrections": {
+    "technicalGates.fiveViewEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.fiveViewEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-nocturne-angel-set/Previews/front.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/back.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/left.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/right.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/three-quarter.png",
+      "correctedOn": "2026-10-15"
+    },
+    "technicalGates.poseEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.poseEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/neutral.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/arms-up.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/arm-cross.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/crouch.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/sit.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/prone.png",
+      "correctedOn": "2026-10-15"
+    },
+    "technicalGates.poseRender": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.poseRender was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/neutral.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/arms-up.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/arm-cross.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/crouch.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/sit.png, Assets/GenWorks/siroino-nocturne-angel-set/Previews/Poses/prone.png",
+      "correctedOn": "2026-10-15"
+    }
   }
 }
