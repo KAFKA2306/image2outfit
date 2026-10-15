@@ -17,6 +17,7 @@ from pathlib import Path
 
 import bmesh
 import bpy
+from mathutils import Vector
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -179,7 +180,9 @@ def ensure_collision(body: bpy.types.Object) -> None:
     body.collision.damping = 0.5
 
 
-def configure_cloth(obj: bpy.types.Object, frame_end: int) -> dict[str, object]:
+def configure_cloth(
+    obj: bpy.types.Object, frame_end: int, bending_stiffness: float = 0.45
+) -> dict[str, object]:
     for modifier in list(obj.modifiers):
         if modifier.name.startswith("Image2Outfit Cloth"):
             obj.modifiers.remove(modifier)
@@ -196,7 +199,7 @@ def configure_cloth(obj: bpy.types.Object, frame_end: int) -> dict[str, object]:
     cloth.settings.tension_stiffness = 25.0
     cloth.settings.compression_stiffness = 25.0
     cloth.settings.shear_stiffness = 10.0
-    cloth.settings.bending_stiffness = 0.45
+    cloth.settings.bending_stiffness = bending_stiffness
     cloth.settings.air_damping = 3.0
     cloth.settings.vertex_group_mass = pin.name
     cloth.settings.pin_stiffness = 1.0
@@ -318,7 +321,7 @@ def export_settled_fbx(
         apply_scale_options="FBX_SCALE_ALL",
         use_space_transform=True,
         bake_space_transform=False,
-        mesh_smooth_type="OFF",
+        mesh_smooth_type="FACE",
         use_subsurf=False,
         use_mesh_modifiers=True,
         use_mesh_edges=False,
@@ -484,8 +487,12 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         for item, source_id in zip(source_ids.data, ids):
             item.value = source_id
         ownership = data.attributes.new("canonical_piece_index", "INT", "FACE")
-        for face, original_index in zip(ownership.data, indices):
-            face.value = owners.data[original_index].value
+        for face_index, original_index in enumerate(indices):
+            owner_index = owners.data[original_index].value
+            ownership.data[face_index].value = owner_index
+            piece_id = pieces[owner_index]
+            if piece_id in {"jacket-sleeve-left", "jacket-sleeve-right"}:
+                data.polygons[face_index].use_smooth = original.data.polygons[original_index].use_smooth
         for material in original.data.materials:
             obj.data.materials.append(material)
         objects[name] = obj
@@ -554,9 +561,72 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 "negativeSignedVertexCount": sum(v < -1e-6 for v in signed),
                 "belowCombinedCollisionMarginVertexCount": sum(v < .007 for v in signed),
                 "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"}
+
+    def smooth_sleeve_interior(obj, declaration):
+        """Run a declared, boundary-preserving geometry fairing hypothesis."""
+        iterations = declaration.get("iterations")
+        factor = declaration.get("factor")
+        if (isinstance(iterations, bool) or not isinstance(iterations, int)
+                or not 1 <= iterations <= 8
+                or isinstance(factor, bool) or not isinstance(factor, (int, float))
+                or not math.isfinite(factor) or not 0 < factor <= 0.5):
+            raise ValueError("Invalid post-bake smoothing hypothesis")
+        adjacency = [set() for _ in obj.data.vertices]
+        edge_counts = {}
+        for polygon in obj.data.polygons:
+            ids = list(polygon.vertices)
+            for index, vertex_id in enumerate(ids):
+                next_id = ids[(index + 1) % len(ids)]
+                adjacency[vertex_id].add(next_id)
+                adjacency[next_id].add(vertex_id)
+                edge = tuple(sorted((vertex_id, next_id)))
+                edge_counts[edge] = edge_counts.get(edge, 0) + 1
+        boundary = {vertex for edge, count in edge_counts.items() if count == 1 for vertex in edge}
+        pin_group = obj.vertex_groups.get("Image2Outfit Cloth Pin")
+        pinned = set()
+        if pin_group is not None:
+            for vertex in obj.data.vertices:
+                if any(group.group == pin_group.index and group.weight > 0 for group in vertex.groups):
+                    pinned.add(vertex.index)
+        fixed = boundary | pinned
+        initial = [vertex.co.copy() for vertex in obj.data.vertices]
+        coordinates = [value.copy() for value in initial]
+        for _ in range(iterations):
+            updated = [value.copy() for value in coordinates]
+            for vertex_id, neighbors in enumerate(adjacency):
+                if vertex_id in fixed or len(neighbors) < 3:
+                    continue
+                average = sum((coordinates[neighbor] for neighbor in neighbors), Vector((0.0, 0.0, 0.0))) / len(neighbors)
+                updated[vertex_id] = coordinates[vertex_id].lerp(average, float(factor))
+            coordinates = updated
+        displacements = [(coordinates[index] - initial[index]).length for index in range(len(initial))]
+        for vertex, coordinate in zip(obj.data.vertices, coordinates):
+            vertex.co = coordinate
+        obj.data.update()
+        changed = [value for index, value in enumerate(displacements) if index not in fixed and value > 1e-9]
+        return {
+            "method": "uniform-laplacian-interior-only-boundaries-and-pins-fixed",
+            "iterations": iterations,
+            "factor": float(factor),
+            "vertexCount": len(initial),
+            "boundaryVertexCount": len(boundary),
+            "pinnedVertexCount": len(pinned),
+            "fixedVertexCount": len(fixed),
+            "fixedVertexMaximumDisplacementM": max((displacements[index] for index in fixed), default=0.0),
+            "changedInteriorVertexCount": len(changed),
+            "maximumInteriorDisplacementM": max(changed, default=0.0),
+            "meanInteriorDisplacementM": sum(changed) / len(changed) if changed else 0.0,
+            "reason": declaration["reason"],
+            "evidenceBoundary": declaration["evidenceBoundary"],
+            "grantsFitAcceptance": False,
+            "grantsAppearanceAcceptance": False,
+        }
     scene = bpy.context.scene
     scene.frame_start, scene.frame_end = 1, frame_end
     scene.gravity = (0, 0, -4.5)
+    post_bake_smoothing = policy.get("prototypePostBakeLaplacianSmoothing", {})
+    if not set(post_bake_smoothing).issubset(groups):
+        raise ValueError("Post-bake smoothing hypothesis references an unknown cloth component")
     before, contracts = {}, []
     rest_controls = {}
     for name in groups:
@@ -565,7 +635,31 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         before[name] = mesh_hash(obj)
         rest = policy.get("prototypeRestShape", {}).get(name)
         rest_contract = bind_canonical_row_rest_shape(obj, job, rest) if rest is not None else None
+        bending_hypotheses = policy.get("prototypeComponentBendingHypotheses", {})
+        if not set(bending_hypotheses).issubset(groups):
+            raise ValueError("Bending hypothesis references an unknown cloth component")
+        bending_hypothesis = bending_hypotheses.get(name)
+        bending_stiffness = 0.45
         contract = configure_cloth(obj, frame_end)
+        modifier = obj.modifiers["Image2Outfit Cloth"]
+        if bending_hypothesis is not None:
+            value = bending_hypothesis.get("stiffness")
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                raise ValueError("Finite numeric bending hypothesis is required")
+            modifier_settings = modifier.settings
+            modifier_type = modifier_settings.bl_rna.properties["bending_stiffness"]
+            if not modifier_type.hard_min <= value <= modifier_type.hard_max:
+                raise ValueError("Bending hypothesis exceeds native Blender limits")
+            bending_stiffness = float(value)
+            modifier_settings.bending_stiffness = bending_stiffness
+            contract["componentBendingHypothesis"] = {
+                "stiffness": float(modifier.settings.bending_stiffness),
+                "maximum": float(modifier.settings.bending_stiffness_max),
+                "model": modifier.settings.bending_model,
+                "reason": bending_hypothesis["reason"],
+                "evidenceBoundary": bending_hypothesis["evidenceBoundary"],
+                "grantsFitAcceptance": False,
+            }
         bending = policy.get("prototypeComponentBending", {})
         if not set(bending).issubset(groups):
             raise ValueError("Bending declaration references an unknown cloth component")
@@ -624,7 +718,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             control.data = obj.data.copy()
             control.name = name + "-basis-rest-control"
             bpy.context.collection.objects.link(control)
-            configure_cloth(control, frame_end)
+            configure_cloth(control, frame_end, bending_stiffness)
             control_modifier = control.modifiers["Image2Outfit Cloth"]
             control_modifier.settings.rest_shape_key = control.data.shape_keys.key_blocks[0]
             if control_modifier.settings.rest_shape_key != control.data.shape_keys.key_blocks[0]:
@@ -692,6 +786,9 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             contract["canonicalRestShape"]["settledCapture"] = "actual evaluated native Cloth mesh"
         else:
             bpy.ops.object.modifier_apply(modifier=modifier.name)
+        if obj.name in post_bake_smoothing:
+            contract["postBakeGeometryHypothesis"] = smooth_sleeve_interior(
+                obj, post_bake_smoothing[obj.name])
         settled = mesh_hash(obj)
         contract["postBakeBodySurfaceDiagnostic"] = surface_diagnostics(obj)
         contract.update(cacheBakedActual=True, preBakeMeshSha256=before[obj.name],

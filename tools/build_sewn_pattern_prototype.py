@@ -174,6 +174,8 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
 
 def add_prototype_surface_motifs(mesh, job, recipe):
     """Place provisional plastron and elbow quilting on the sewn garment surface."""
+    import math
+
     spec = recipe.get("prototypeSurfaceMotifs")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
@@ -194,14 +196,18 @@ def add_prototype_surface_motifs(mesh, job, recipe):
             if owner not in selected or len(face) != 3:
                 continue
             center_y = sum(points[index].y for index in face) / 3
-            if center_y < -0.004:
-                faces.append(face)
-                face_owners.append(owner)
+            if center_y >= -0.004:
+                continue
+            first, second, third = (points[index] for index in face)
+            if (second - first).cross(third - first).normalized().y >= -0.05:
+                continue
+            faces.append(face)
+            face_owners.append(owner)
         if not faces:
             raise ValueError(f"No front-facing garment triangles for {sorted(selected)}")
         return BVHTree.FromPolygons(points, faces, all_triangles=True), face_owners
 
-    def surface_point(locator_value, x, z, query_y, offset):
+    def surface_point(locator_value, x, z, query_y, offset, offset_mode="surface-normal"):
         tree, face_owners = locator_value
         origin = Vector((x, query_y, z))
         result = tree.ray_cast(origin, Vector((0.0, 1.0, 0.0)), 0.5)
@@ -210,7 +216,17 @@ def add_prototype_surface_motifs(mesh, job, recipe):
         location, normal, face_index, _distance = result
         if location.y >= -0.002 or normal.y > -0.05:
             raise ValueError("Prototype motif ray did not hit an outward-facing front surface")
-        return location + normal.normalized() * offset, face_owners[face_index]
+        if offset_mode == "front-depth":
+            # Front orthographic renders look along +Y. A local face-normal
+            # offset can move the strip sideways/upward on sharply changing
+            # triangles, allowing the garment to occlude patches of the motif.
+            # Keep its sampled X/Z and move only toward the camera instead.
+            displacement = Vector((0.0, -offset, 0.0))
+        elif offset_mode == "surface-normal":
+            displacement = normal.normalized() * offset
+        else:
+            raise ValueError(f"Unsupported prototype motif surface offset mode: {offset_mode}")
+        return location + displacement, face_owners[face_index]
 
     def bind_piece_ownership(obj, piece_ids, face_piece_ids):
         obj["canonicalPieceIds"] = json.dumps(piece_ids)
@@ -241,13 +257,22 @@ def add_prototype_surface_motifs(mesh, job, recipe):
     end = plastron.get("pathEndXZ")
     sample_count = int(plastron.get("sampleCount", 32))
     half_width = float(plastron.get("halfWidthM", 0.018))
+    half_width_start = float(plastron.get("halfWidthStartM", half_width))
+    half_width_end = float(plastron.get("halfWidthEndM", half_width))
+    across_sample_count = int(plastron.get("acrossSampleCount", 8))
     surface_offset = float(plastron.get("surfaceOffsetM", 0.0015))
+    surface_offset_mode = str(plastron.get("surfaceOffsetMode", "surface-normal"))
     if (not isinstance(start, list) or len(start) != 2
             or not isinstance(end, list) or len(end) != 2
-            or sample_count < 4 or not 0.001 <= half_width <= 0.04
+            or sample_count < 4
+            or not 2 <= across_sample_count <= 32
+            or not 0.001 <= half_width_start <= 0.08
+            or not 0.001 <= half_width_end <= 0.08
             or not 0.0002 <= surface_offset <= 0.005):
         raise ValueError("Invalid prototype plastron path, width, or surface offset")
-    front_tree = locator(plastron.get("hostPieceIds", []))
+    front_piece_ids = plastron.get("hostPieceIds", [])
+    front_tree = locator(front_piece_ids)
+    front_piece_trees = {piece_id: locator([piece_id]) for piece_id in front_piece_ids}
     dx, dz = float(end[0]) - float(start[0]), float(end[1]) - float(start[1])
     length = (dx * dx + dz * dz) ** 0.5
     if length <= 0.02:
@@ -255,34 +280,108 @@ def add_prototype_surface_motifs(mesh, job, recipe):
     normal_x, normal_z = -dz / length, dx / length
     band_vertices = []
     band_sample_owners = []
+    corner_owner_fallback_count = 0
+    cross_owner_section_count = 0
     for index in range(sample_count + 1):
         fraction = index / sample_count
+        local_half_width = half_width_start + (half_width_end - half_width_start) * fraction
         center_x = float(start[0]) + dx * fraction
         center_z = float(start[1]) + dz * fraction
-        for side in (-1.0, 1.0):
-            x = center_x + normal_x * half_width * side
-            z = center_z + normal_z * half_width * side
-            point, owner = surface_point(
-                front_tree, x, z, float(plastron.get("frontQueryYM", -0.16)), surface_offset
-            )
+        # Prefer the centerline panel for each side of this section so the
+        # motif follows a sewn panel where it covers the full width. At a
+        # panel boundary, however, a corner can legitimately fall outside
+        # that panel's triangles. In that case resolve against the combined
+        # declared front surface and record the ownership transition instead
+        # of aborting the entire build or silently crossing an undeclared part.
+        _center, sample_owner = surface_point(
+            front_tree, center_x, center_z,
+            float(plastron.get("frontQueryYM", -0.16)), surface_offset,
+            surface_offset_mode,
+        )
+        sample_tree = front_piece_trees[sample_owner]
+        section_owners = set()
+        for across_index in range(across_sample_count + 1):
+            across_fraction = (2.0 * across_index / across_sample_count) - 1.0
+            x = center_x + normal_x * local_half_width * across_fraction
+            z = center_z + normal_z * local_half_width * across_fraction
+            try:
+                point, owner = surface_point(
+                    sample_tree, x, z,
+                    float(plastron.get("frontQueryYM", -0.16)), surface_offset,
+                    surface_offset_mode,
+                )
+            except ValueError as error:
+                if not str(error).startswith("Prototype motif ray"):
+                    raise
+                point, owner = surface_point(
+                    front_tree, x, z,
+                    float(plastron.get("frontQueryYM", -0.16)), surface_offset,
+                    surface_offset_mode,
+                )
+                corner_owner_fallback_count += 1
             band_vertices.append(list(point))
             band_sample_owners.append(owner)
+            section_owners.add(owner)
+        if len(section_owners) > 1:
+            cross_owner_section_count += 1
     band_faces = []
     band_face_owners = []
     preferred_owner = "jacket-overlap-front"
     cross_owner_transition_quads = []
+    triangulation_choices = {"diagonal-ac": 0, "diagonal-bd": 0}
+    weakest_triangle_front_normal = 1.0
+    row_width = across_sample_count + 1
     for index in range(sample_count):
-        first = index * 2
-        quad = (first, first + 1, first + 3, first + 2)
-        quad_owners = {band_sample_owners[item] for item in quad}
-        if len(quad_owners) > 1:
-            cross_owner_transition_quads.append(index)
-        owner = preferred_owner if preferred_owner in quad_owners else next(iter(quad_owners))
-        band_faces.append(quad)
-        band_face_owners.append(owner)
+        for across_index in range(across_sample_count):
+            first = index * row_width + across_index
+            next_row = first + row_width
+            # Raycasting every transverse sample makes each narrow patch cell
+            # follow the sewn cloth curvature instead of bridging across a
+            # concave chest section, which let the host fabric occlude the old
+            # two-edge ribbon and show through as white cutouts.
+            quad = (first, next_row, next_row + 1, first + 1)
+            quad_owners = {band_sample_owners[item] for item in quad}
+            if len(quad_owners) > 1:
+                cross_owner_transition_quads.append(index * across_sample_count + across_index)
+            owner = preferred_owner if preferred_owner in quad_owners else next(iter(quad_owners))
+
+            # Choose the outward-facing diagonal for each conforming cell.
+            candidates = {
+                "diagonal-ac": ((quad[0], quad[1], quad[2]), (quad[0], quad[2], quad[3])),
+                "diagonal-bd": ((quad[0], quad[1], quad[3]), (quad[1], quad[2], quad[3])),
+            }
+
+            def triangle_frontness(face):
+                a, b, c = (Vector(band_vertices[vertex]) for vertex in face)
+                cross = (b - a).cross(c - a)
+                if cross.length_squared <= 1e-14:
+                    return None
+                return -cross.normalized().y
+
+            scored = []
+            for diagonal, triangles in candidates.items():
+                frontness = [triangle_frontness(face) for face in triangles]
+                if any(value is None or value <= 0.05 for value in frontness):
+                    continue
+                scored.append((min(frontness), sum(frontness), diagonal, triangles, frontness))
+            if not scored:
+                raise ValueError(
+                    f"Prototype plastron cell {index}:{across_index} has no outward, "
+                    f"non-degenerate triangulation; panel owners={sorted(quad_owners)}"
+                )
+            _minimum, _total, diagonal, triangles, frontness = max(scored)
+            triangulation_choices[diagonal] += 1
+            weakest_triangle_front_normal = min(weakest_triangle_front_normal, *frontness)
+            band_faces.extend(triangles)
+            band_face_owners.extend([owner, owner])
     band_data = bpy.data.meshes.new(f"{job['id']}-prototype-plastron-surface")
     band_data.from_pydata(band_vertices, [], band_faces)
     band_data.update()
+    inward_faces = [polygon.index for polygon in band_data.polygons if polygon.normal.y >= -0.05]
+    if inward_faces:
+        raise ValueError(
+            f"Prototype plastron has {len(inward_faces)} faces not oriented toward -Y"
+        )
     band = bpy.data.objects.new(f"{job['id']}-prototype-plastron-hypothesis", band_data)
     bpy.context.collection.objects.link(band)
     band.data.materials.append(material)
@@ -291,6 +390,70 @@ def add_prototype_surface_motifs(mesh, job, recipe):
     band["prototypeRole"] = "unfitted-unweighted-sewn-pattern"
     band["canonicalHostPieceIds"] = json.dumps(plastron["hostPieceIds"])
     band["uvStatus"] = "NOT_CREATED"
+
+    fastener_spec = spec.get("frontFastenerHypothesis")
+    fastener_audit = {"applied": False, "reason": "not-declared", "grantsClosureAcceptance": False}
+    if fastener_spec is not None:
+        if not isinstance(fastener_spec, dict):
+            raise ValueError("frontFastenerHypothesis must be an object")
+        fractions = fastener_spec.get("pathFractions")
+        radius = fastener_spec.get("radiusM")
+        relief = fastener_spec.get("reliefM")
+        segment_count = fastener_spec.get("segments")
+        if (not isinstance(fractions, list) or not fractions
+                or any(not isinstance(value, (int, float)) or not 0.1 <= value <= 0.9 for value in fractions)
+                or any(a >= b for a, b in zip(fractions, fractions[1:]))
+                or not isinstance(radius, (int, float)) or not 0.003 <= radius <= 0.012
+                or not isinstance(relief, (int, float)) or not 0.0005 <= relief <= 0.004
+                or not isinstance(segment_count, int) or isinstance(segment_count, bool) or not 8 <= segment_count <= 32):
+            raise ValueError("Invalid surface-bound front fastener hypothesis")
+        fastener_color = fastener_spec.get("baseColorLinearRgb")
+        if (not isinstance(fastener_color, list) or len(fastener_color) != 3
+                or any(not isinstance(channel, (int, float)) or not 0 <= channel <= 1 for channel in fastener_color)):
+            raise ValueError("Front fastener color must contain three channels in [0, 1]")
+        fastener_material = bpy.data.materials.new(str(fastener_spec.get("materialName", "front-fastener-hypothesis")))
+        fastener_material.use_nodes = True
+        fastener_shader = fastener_material.node_tree.nodes.get("Principled BSDF")
+        fastener_shader.inputs["Base Color"].default_value = (*fastener_color, 1)
+        fastener_shader.inputs["Roughness"].default_value = float(fastener_spec.get("roughness", 0.3))
+        fastener_shader.inputs["Metallic"].default_value = float(fastener_spec.get("metallic", 0.55))
+        fastener_material["evidenceBoundary"] = fastener_spec["evidenceBoundary"]
+        dx, dz = float(end[0]) - float(start[0]), float(end[1]) - float(start[1])
+        centers = []
+        for index, fraction in enumerate(fractions):
+            center_x = float(start[0]) + dx * float(fraction)
+            center_z = float(start[1]) + dz * float(fraction)
+            vertices = [list(surface_point(front_tree, center_x, center_z, float(plastron.get("frontQueryYM", -0.16)), surface_offset + float(relief), surface_offset_mode)[0])]
+            for segment in range(segment_count):
+                angle = (2.0 * math.pi * segment) / segment_count
+                x = center_x + float(radius) * math.cos(angle)
+                z = center_z + float(radius) * math.sin(angle)
+                bound, _owner = surface_point(front_tree, x, z, float(plastron.get("frontQueryYM", -0.16)), surface_offset + float(relief), surface_offset_mode)
+                vertices.append(list(bound))
+            faces = [(0, 1 + (segment + 1) % segment_count, 1 + segment) for segment in range(segment_count)]
+            data = bpy.data.meshes.new(f"{job['id']}-front-fastener-{index + 1}-mesh")
+            data.from_pydata(vertices, [], faces)
+            data.update()
+            button = bpy.data.objects.new(f"{job['id']}-front-fastener-{index + 1}-hypothesis", data)
+            bpy.context.collection.objects.link(button)
+            button.data.materials.append(fastener_material)
+            bind_piece_ownership(button, ["jacket-overlap-front"], ["jacket-overlap-front"] * len(button.data.polygons))
+            button["hostPieceIds"] = json.dumps(["jacket-overlap-front"])
+            button["uvStatus"] = "NOT_CREATED"
+            centers.append({"pathFraction": float(fraction), "centerXZ": [center_x, center_z], "vertexCount": len(vertices), "triangleCount": len(faces)})
+        fastener_audit = {
+            "applied": True,
+            "method": "front-depth-raycast-bound-low-profile-metal-discs-on-declared-plastron-path",
+            "hostPieceIds": ["jacket-overlap-front"],
+            "radiusM": float(radius),
+            "reliefM": float(relief),
+            "segmentCount": segment_count,
+            "materialName": fastener_material.name,
+            "placements": centers,
+            "evidenceBoundary": fastener_spec["evidenceBoundary"],
+            "grantsClosureAcceptance": False,
+            "grantsFitAcceptance": False,
+        }
 
     quilt = spec.get("elbowQuilting")
     if not isinstance(quilt, dict):
@@ -305,6 +468,24 @@ def add_prototype_surface_motifs(mesh, job, recipe):
     half_height = float(quilt.get("halfHeightM", 0.024))
     curve_depth = float(quilt.get("threadRadiusM", 0.001))
     query_y = float(quilt.get("frontQueryYM", -0.08))
+    path_layout = quilt.get("pathLayout", "diamond-cross-v1")
+    if path_layout not in {"diamond-cross-v1", "integrated-panel-seams-v1"}:
+        raise ValueError(f"Unsupported elbow quilting pathLayout: {path_layout}")
+    quilt_material = material
+    if path_layout == "integrated-panel-seams-v1":
+        stitch_color = quilt.get("stitchColorLinearRgb")
+        if (not isinstance(stitch_color, list) or len(stitch_color) != 3
+                or any(not isinstance(channel, (int, float)) or not 0 <= channel <= 1 for channel in stitch_color)):
+            raise ValueError("Integrated elbow seam layout requires stitchColorLinearRgb in [0, 1]")
+        quilt_material = bpy.data.materials.new(str(quilt.get("stitchMaterialName", "elbow-seam-prototype")))
+        quilt_material.use_nodes = True
+        stitch_shader = quilt_material.node_tree.nodes.get("Principled BSDF")
+        stitch_shader.inputs["Base Color"].default_value = (*stitch_color, 1)
+        stitch_shader.inputs["Roughness"].default_value = float(quilt.get("stitchRoughness", 0.55))
+        stitch_shader.inputs["Metallic"].default_value = float(quilt.get("stitchMetallic", 0.0))
+        quilt_material["evidenceBoundary"] = quilt.get(
+            "evidenceBoundary", "Surface-bound prototype seam hypothesis; appearance unapproved."
+        )
     if not (0.01 <= half_length <= 0.08 and 0.01 <= half_height <= 0.06
             and 0.0002 <= curve_depth <= 0.003):
         raise ValueError("Invalid prototype elbow quilting dimensions")
@@ -318,15 +499,35 @@ def add_prototype_surface_motifs(mesh, job, recipe):
         curve_data.use_fill_caps = True
         sign = 1.0 if "left" in piece_id else -1.0
         center_x = sign * center_abs_x
-        raw_paths = [
-            [(center_x, center_z + half_height),
-             (center_x + sign * half_length, center_z),
-             (center_x, center_z - half_height),
-             (center_x - sign * half_length, center_z),
-             (center_x, center_z + half_height)],
-            [(center_x, center_z + half_height), (center_x, center_z - half_height)],
-            [(center_x - sign * half_length, center_z), (center_x + sign * half_length, center_z)],
-        ]
+        if path_layout == "integrated-panel-seams-v1":
+            # Replace the floating-looking diamond/cross motif with a small,
+            # surface-bound elbow panel perimeter and parallel seam channels.
+            # These remain prototype thread paths, not sewn garment topology.
+            raw_paths = [[
+                (center_x + sign * half_length * math.cos(2.0 * math.pi * i / 32),
+                 center_z + half_height * math.sin(2.0 * math.pi * i / 32))
+                for i in range(33)
+            ]]
+            inset_height = half_height * 0.38
+            inset_half_length = half_length * 0.72
+            for lane in (-1.0, 1.0):
+                lane_z = center_z + lane * inset_height
+                edge_fraction = math.sqrt(max(0.0, 1.0 - (inset_height / half_height) ** 2))
+                lane_half_length = inset_half_length * edge_fraction
+                raw_paths.append([
+                    (center_x - sign * lane_half_length + 2 * sign * lane_half_length * i / 12, lane_z)
+                    for i in range(13)
+                ])
+        else:
+            raw_paths = [
+                [(center_x, center_z + half_height),
+                 (center_x + sign * half_length, center_z),
+                 (center_x, center_z - half_height),
+                 (center_x - sign * half_length, center_z),
+                 (center_x, center_z + half_height)],
+                [(center_x, center_z + half_height), (center_x, center_z - half_height)],
+                [(center_x - sign * half_length, center_z), (center_x + sign * half_length, center_z)],
+            ]
         tree = sleeve_trees[piece_id]
         projected_count = 0
         for raw_path in raw_paths:
@@ -347,7 +548,7 @@ def add_prototype_surface_motifs(mesh, job, recipe):
                 projected_count += 1
         quilting = bpy.data.objects.new(f"{job['id']}-{piece_id}-prototype-elbow-quilting-hypothesis", curve_data)
         bpy.context.collection.objects.link(quilting)
-        quilting.data.materials.append(material)
+        quilting.data.materials.append(quilt_material)
         bpy.ops.object.select_all(action="DESELECT")
         bpy.context.view_layer.objects.active = quilting
         quilting.select_set(True)
@@ -357,9 +558,67 @@ def add_prototype_surface_motifs(mesh, job, recipe):
         quilting["prototypeRole"] = "unfitted-unweighted-sewn-pattern"
         quilting["hostPieceIds"] = json.dumps([piece_id])
         quilting.select_set(False)
+
+        filled_patch_enabled = quilt.get("filledPatchEnabled", True)
+        if not isinstance(filled_patch_enabled, bool):
+            raise ValueError("filledPatchEnabled must be a boolean")
+        patch_vertices = []
+        patch_faces = []
+        if filled_patch_enabled:
+            # Optional surface-bound inset hypothesis. Direct review rejected
+            # the filled geometric patch as a conspicuous applique rather than
+            # integrated seam quilting, so disabling it leaves only the bound
+            # stitch paths visible.
+            patch_segments_per_side = int(quilt.get("patchSegmentsPerSide", 8))
+            if not 4 <= patch_segments_per_side <= 24:
+                raise ValueError("patchSegmentsPerSide must be between 4 and 24")
+            corners = [
+                (center_x, center_z + half_height),
+                (center_x + sign * half_length, center_z),
+                (center_x, center_z - half_height),
+                (center_x - sign * half_length, center_z),
+            ]
+            patch_outline = []
+            for corner_index, first in enumerate(corners):
+                second = corners[(corner_index + 1) % len(corners)]
+                for step in range(patch_segments_per_side):
+                    fraction = step / patch_segments_per_side
+                    patch_outline.append((
+                        first[0] + (second[0] - first[0]) * fraction,
+                        first[1] + (second[1] - first[1]) * fraction,
+                    ))
+            patch_vertices = [
+                list(surface_point(tree, x, z, query_y, float(quilt.get("surfaceOffsetM", 0.0025)))[0])
+                for x, z in patch_outline
+            ]
+            patch_vertices.append(list(surface_point(
+                tree, center_x, center_z, query_y, float(quilt.get("surfaceOffsetM", 0.0025))
+            )[0]))
+            patch_center = len(patch_vertices) - 1
+            patch_faces = [
+                (patch_center, index, (index + 1) % len(patch_outline))
+                for index in range(len(patch_outline))
+            ]
+            patch_data = bpy.data.meshes.new(f"{job['id']}-{piece_id}-prototype-elbow-quilt-inset")
+            patch_data.from_pydata(patch_vertices, [], patch_faces)
+            patch_data.update()
+            patch = bpy.data.objects.new(
+                f"{job['id']}-{piece_id}-prototype-elbow-quilt-inset-hypothesis", patch_data
+            )
+            bpy.context.collection.objects.link(patch)
+            patch.data.materials.append(material)
+            bind_piece_ownership(patch, [piece_id], [piece_id] * len(patch.data.polygons))
+            patch["hostPieceIds"] = json.dumps([piece_id])
+            patch["uvStatus"] = "NOT_CREATED"
         quilt_audits[piece_id] = {
             "surfaceSampleCount": projected_count,
             "pathCount": len(raw_paths),
+            "pathLayout": path_layout,
+            "filledPatchEnabled": filled_patch_enabled,
+            "filledPatchVertexCount": len(patch_vertices),
+            "filledPatchTriangleCount": len(patch_faces),
+            "filledPatchStatus": "APPLIED" if filled_patch_enabled else "OMITTED_BY_REVIEWED_RECIPE",
+            "filledPatchBinding": "positive-y-raycast-to-declared-sleeve-panel" if filled_patch_enabled else None,
             "hostPieceId": piece_id,
             "grantsAppearanceAcceptance": False,
         }
@@ -367,17 +626,31 @@ def add_prototype_surface_motifs(mesh, job, recipe):
         "applied": True,
         "plastron": {
             "vertexCount": len(band_vertices),
-            "quadCount": len(band_faces),
+            "quadCount": sample_count * across_sample_count,
+            "acrossSampleCount": across_sample_count,
+            "triangleCount": len(band_faces),
             "pathStartXZ": start,
             "pathEndXZ": end,
-            "halfWidthM": half_width,
+            "halfWidthStartM": half_width_start,
+            "halfWidthEndM": half_width_end,
             "hostPieceIds": plastron["hostPieceIds"],
-            "surfaceBinding": "positive-y-raycast-with-sewn-panel-transition",
+            "surfaceBinding": f"positive-y-raycast-conforming-grid-with-sewn-panel-transition-and-{surface_offset_mode}-offset",
+            "cornerOwnerFallbackCount": corner_owner_fallback_count,
+            "crossOwnerSectionCount": cross_owner_section_count,
             "crossOwnerTransitionQuadCount": len(cross_owner_transition_quads),
+            "triangulation": {
+                "method": "explicit-outward-diagonal-selection",
+                "quadCount": sample_count * across_sample_count,
+                "acrossSampleCount": across_sample_count,
+                "triangleCount": len(band_faces),
+                "diagonalCounts": triangulation_choices,
+                "minimumOutwardNormalY": weakest_triangle_front_normal,
+            },
             "uvStatus": "NOT_CREATED",
             "grantsAppearanceAcceptance": False,
         },
         "elbowQuilting": quilt_audits,
+        "frontFastenerHypothesis": fastener_audit,
         "grantsFitOrAppearanceAcceptance": False,
         "evidenceBoundary": spec.get(
             "evidenceBoundary", "Unfitted visual hypothesis; requires direct image review."
@@ -657,6 +930,9 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
     if not preserve.issubset(set(mesh["facePieceIds"])):
         raise ValueError("Preserved seam pieces missing")
     seam_factors = preserved_seam_factors(mesh, spec)
+    outer_piece_ids = set(spec.get("outerPieceIds", []))
+    if "outerPieceId" in spec:
+        outer_piece_ids.add(spec["outerPieceId"])
     records = []
     for i, pieces in sorted(owners.items()):
         if pieces.intersection(preserve):
@@ -672,7 +948,12 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
         location, normal, _, distance = tree.find_nearest(point)
         if location is None or distance > limit or normal.length < .99:
             raise ValueError(f"Upper surface projection unavailable/out of bounds at vertex {i}")
-        offset = clearance + (spec["outerLayerOffsetM"] if pieces == {spec["outerPieceId"]} else 0)
+        outer_offset = (
+            spec["outerLayerOffsetM"]
+            if pieces and pieces.issubset(outer_piece_ids)
+            else 0
+        )
+        offset = clearance + outer_offset
         result = point.lerp(location + normal*offset, weight)
         mesh["vertices"][i] = list(result)
         records.append({"vertexIndex": i, "pieceIds": sorted(pieces), "beforeM": list(point),
@@ -779,6 +1060,112 @@ def split_declared_skirt_creases(mesh, pose):
         bm.free()
 
 
+def lengthen_declared_skirt_panels(mesh, pose):
+    """Extend the sewn overskirt downward while anchoring its waist seam."""
+    import math
+
+    spec = pose.get("skirtPleatPlacement")
+    if spec is None:
+        return {"applied": False}
+    pieces = set(spec.get("pieceIds", []))
+    owners = set(mesh.get("facePieceIds", []))
+    waist = spec.get("waistZM")
+    source_hem = spec.get("sourceHemZM")
+    target_hem = spec.get("hemZM")
+    if (not pieces or not pieces.issubset(owners)
+            or any(not isinstance(value, (int, float)) or not math.isfinite(value)
+                   for value in (waist, source_hem, target_hem))
+            or not target_hem < source_hem < waist):
+        raise ValueError("Invalid declared overskirt lengthening bounds")
+    extension = source_hem - target_hem
+    if not 0.02 <= extension <= 0.24:
+        raise ValueError("Overskirt extension must remain within the bounded 20-240 mm trial")
+    selected = {
+        vertex
+        for face, piece in zip(mesh["faces"], mesh["facePieceIds"])
+        if piece in pieces
+        for vertex in face
+    }
+    if not selected:
+        raise ValueError("Declared overskirt pieces have no vertices")
+    from collections import defaultdict
+    vertex_owners = defaultdict(set)
+    for face, owner in zip(mesh["faces"], mesh["facePieceIds"]):
+        for vertex in face:
+            vertex_owners[vertex].add(owner)
+    before_min = min(mesh["vertices"][index][2] for index in selected)
+    before_max = max(mesh["vertices"][index][2] for index in selected)
+    apron = spec.get("forwardApron")
+    if apron is not None:
+        if (apron.get("method") != "front-panel-short-apron-fade-v1"
+                or apron.get("pieceId") not in pieces
+                or not isinstance(apron.get("axisOriginBlenderXYM"), list)
+                or len(apron["axisOriginBlenderXYM"]) != 2
+                or not all(math.isfinite(v) for v in apron["axisOriginBlenderXYM"])
+                or not math.isfinite(apron.get("additionalExtensionM", math.nan))
+                or not 0 <= apron["additionalExtensionM"] <= 0.10
+                or not math.isfinite(apron.get("fullExtensionHalfAngleRadians", math.nan))
+                or not math.isfinite(apron.get("zeroExtensionHalfAngleRadians", math.nan))
+                or not 0 < apron["fullExtensionHalfAngleRadians"] < apron["zeroExtensionHalfAngleRadians"] <= math.pi):
+            raise ValueError("Invalid forward apron extension profile")
+        if extension + apron["additionalExtensionM"] > 0.24:
+            raise ValueError("Combined rear hem and forward apron extension exceeds the 240 mm trial bound")
+    moved = 0
+    max_displacement = 0.0
+    max_apron_displacement = 0.0
+    for index in selected:
+        point = mesh["vertices"][index]
+        z = float(point[2])
+        if z < source_hem - 0.002 or z > waist + 0.002:
+            raise ValueError("Overskirt vertex falls outside the declared source height span")
+        fraction = min(1.0, max(0.0, (waist - z) / (waist - source_hem)))
+        displacement = extension * fraction
+        apron_displacement = 0.0
+        if apron is not None:
+            if apron["pieceId"] in vertex_owners[index]:
+                origin = apron["axisOriginBlenderXYM"]
+                native = point
+                angle = math.atan2(native[0] - origin[0], -(native[1] - origin[1]))
+                delta = abs(math.atan2(math.sin(angle), math.cos(angle)))
+                start = apron["fullExtensionHalfAngleRadians"]
+                end = apron["zeroExtensionHalfAngleRadians"]
+                fade = min(1.0, max(0.0, (delta - start) / (end - start)))
+                fade = fade * fade * (3.0 - 2.0 * fade)
+                apron_displacement = apron["additionalExtensionM"] * fraction * (1.0 - fade)
+                displacement += apron_displacement
+        if displacement:
+            point[2] = z - displacement
+            moved += 1
+            max_displacement = max(max_displacement, displacement)
+            max_apron_displacement = max(max_apron_displacement, apron_displacement)
+    after_min = min(mesh["vertices"][index][2] for index in selected)
+    after_max = max(mesh["vertices"][index][2] for index in selected)
+    apron_allowance = apron["additionalExtensionM"] if apron else 0.0
+    if (after_min > target_hem + 0.003
+            or after_min < target_hem - apron_allowance - 0.003
+            or abs(after_max - before_max) > 0.003):
+        raise ValueError("Overskirt lengthening did not preserve the waist and declared hem")
+    return {
+        "applied": True,
+        "method": "short-panelized-hem-with-forward-apron-and-faded-side-seams" if apron else "linear-downward-extension-from-fixed-sewn-waist-to-overskirt-hem",
+        "pieceIds": sorted(pieces),
+        "sourceHemZM": source_hem,
+        "targetHemZM": target_hem,
+        "waistZM": waist,
+        "extensionM": extension,
+        "selectedVertexCount": len(selected),
+        "movedVertexCount": moved,
+        "maximumVertexDisplacementM": max_displacement,
+        "forwardApron": apron,
+        "maximumAdditionalForwardApronDisplacementM": max_apron_displacement,
+        "beforeBoundsZM": [before_min, before_max],
+        "afterBoundsZM": [after_min, after_max],
+        "grantsFitAcceptance": False,
+        "grantsVisualAcceptance": False,
+        "evidenceBoundary": "Sewn overskirt geometry-only length hypothesis. It adds lower panel area while preserving the waist seam; no sitting coverage, collision, cloth, weight, fit or appearance acceptance is implied.",
+    }
+
+
 def place_declared_skirt_folds(mesh, pose, native_vertices):
     """Seed explicit garment folds while retaining the sewn face topology."""
     import math
@@ -790,16 +1177,26 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
     if spec["method"] not in {"outward-triangular-radial-fold-seed", "crease-aligned-triangular-radial-fold"}:
         raise ValueError("Unknown skirt fold placement")
     origin = spec["axisOriginBlenderXYM"]
-    waist, hem = spec["waistZM"], spec["hemZM"]
+    waist, declared_hem = spec["waistZM"], spec["hemZM"]
     count, depth, phase = spec["foldCount"], spec["hemFoldDepthM"], spec["phaseRadians"]
-    if (len(origin) != 2 or not all(math.isfinite(v) for v in [*origin, waist, hem, depth, phase])
-            or not hem < waist or not isinstance(count, int) or isinstance(count, bool)
+    if (len(origin) != 2 or not all(math.isfinite(v) for v in [*origin, waist, declared_hem, depth, phase])
+            or not declared_hem < waist or not isinstance(count, int) or isinstance(count, bool)
             or count < 2 or depth <= 0 or len(native_vertices) != len(mesh["vertices"])):
         raise ValueError("Invalid skirt fold specification")
     ids = set(spec["pieceIds"])
     if not ids or not ids.issubset(set(mesh["facePieceIds"])):
         raise ValueError("Skirt fold pieces missing")
     vertices = {i for face, owner in zip(mesh["faces"], mesh["facePieceIds"]) if owner in ids for i in face}
+    # A preceding, separately bounded skirt-lengthening step can lower the
+    # panel hem below the original pleat-layout hem. Seed folds against the
+    # actual post-placement geometry while retaining the authored hem in the
+    # evidence. The lower limit remains bounded by the source hem and the
+    # existing 240 mm maximum extension trial.
+    effective_hem = min(mesh["vertices"][i][2] for i in vertices)
+    source_hem = float(spec.get("sourceHemZM", declared_hem))
+    if source_hem - effective_hem > 0.243:
+        raise ValueError("Skirt fold geometry exceeds the bounded extension range")
+    hem = effective_hem
     before = json.dumps(mesh["vertices"], separators=(",", ":"))
     moved = 0
     displacement_max = 0.0
@@ -828,7 +1225,10 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         if area <= 1e-12:
             raise ValueError("Skirt fold placement collapsed a triangle")
         minimum_area = min(minimum_area, area)
-    return {"applied": True, "configuration": spec, "selectedVertexCount": len(vertices),
+    return {"applied": True, "configuration": spec,
+            "effectiveHeightRangeZM": [effective_hem, waist],
+            "extensionBelowDeclaredPleatHemM": max(0.0, declared_hem - effective_hem),
+            "selectedVertexCount": len(vertices),
             "movedVertexCount": moved, "maximumRadialDisplacementM": displacement_max,
             "minimumTriangleAreaM2": minimum_area,
             "beforeVerticesSha256": hashlib.sha256(before.encode()).hexdigest(),
@@ -886,8 +1286,12 @@ def main():
     trace_stage("torso-contour")
     upper_surface_evidence = place_on_measured_upper_surface(mesh, body_objects, pose, resolve(job["targetSourcePath"]))
     trace_stage("upper-surface")
-    skirt_envelope_evidence = {"applied": False}
+    shorts_pose = dict(pose, upperSurfacePlacement=pose.get("shortsUpperSurfacePlacement"))
+    shorts_surface_evidence = place_on_measured_upper_surface(mesh, body_objects, shorts_pose, resolve(job["targetSourcePath"]))
+    trace_stage("shorts-surface")
     native_angular_vertices = [list(point) for point in mesh["vertices"]]
+    skirt_lengthening_evidence = lengthen_declared_skirt_panels(mesh, pose)
+    skirt_envelope_evidence = {"applied": False}
     if "skirtEnvelopePlacement" in pose:
         skirt_pose = dict(pose, bodyContourPlacement=pose["skirtEnvelopePlacement"])
         skirt_envelope_evidence = place_on_measured_contours(mesh, body_objects, skirt_pose, resolve(job["targetSourcePath"]))
@@ -906,6 +1310,12 @@ def main():
     ownership = data.attributes.new("canonical_piece_index", "INT", "FACE")
     for face, owner in zip(ownership.data, owners):
         face.value = pieces.index(owner)
+    # The sleeve panels are continuous cloth surfaces. Preserve smooth
+    # per-face normals so coarse prototype triangulation does not render as
+    # fabric creases.
+    smooth_surface_pieces = {"jacket-sleeve-left", "jacket-sleeve-right"}
+    for polygon, owner in zip(data.polygons, owners):
+        polygon.use_smooth = owner in smooth_surface_pieces
     garment = bpy.data.objects.new(job["id"], data)
     bpy.context.collection.objects.link(garment)
     garment["prototypeRole"] = "unfitted-unweighted-sewn-pattern"
@@ -939,6 +1349,7 @@ def main():
         "schemaVersion": 1, "productId": job["id"], "passed": False,
         "measuredWaistbandPlacement": waistband_evidence,
         "declaredSkirtFoldPlacement": fold_evidence,
+        "declaredSkirtLengthening": skirt_lengthening_evidence,
         "declaredSkirtCreaseTopology": crease_evidence,
         "buildDisposition": "EDITABLE_SEWN_PROTOTYPE_ONLY",
         "prototypeEdgeTrim": prototype_edge_trim,
@@ -947,12 +1358,20 @@ def main():
         "canonicalInputs": expected,
         "measuredContourPlacement": contour_evidence,
         "measuredUpperSurfacePlacement": upper_surface_evidence,
+        "measuredShortsUpperSurfacePlacement": shorts_surface_evidence,
         "measuredSkirtEnvelopePlacement": skirt_envelope_evidence,
         "measuredCollarPlacement": collar_evidence,
         "necklinePlacementTrace": {"coordinateSystem": "blender-z-up", "selection": {"nativeMinimumZM": .98, "nativeMaximumAbsXM": .12}, "records": list(neck_trace.values()), "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."},
         "metrics": {"vertices": len(data.vertices), "triangles": len(data.polygons),
                     "unweightedVertices": len(data.vertices),
                     "degenerateTriangles": mesh["topology"]["degenerateFaceCount"]},
+        "surfaceShadingHypothesis": {
+            "components": sorted(smooth_surface_pieces),
+            "method": "smooth-per-polygon normals on canonical sleeve faces",
+            "reason": "Direct inspection showed strong triangle faceting on the coarse sleeve prototype.",
+            "grantsAppearanceAcceptance": False,
+            "grantsFitAcceptance": False,
+        },
         "geometryGate": {"checks": {"sewnTopologyValid": True,
             "avatarFitVerified": False, "deformWeightsVerified": False}},
         "pending": ["panel placement and physical cloth settling", "avatar fit",

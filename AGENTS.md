@@ -1,27 +1,27 @@
-# image2outfit Agent Contract
+# image2outfit エージェント契約
 
-## Start
+## 作業の始め方
 
-For product work, identify the product slug and requested outcome, then read only the relevant canonical owners below plus the current `ProductManifest.json`. Do not preload unrelated product folders, docs, Issues, PR history, renders, or research notes.
+- 製品の作業では、まず製品の slug と依頼された成果を特定する。
+- 次に、関係する正本（下の「正本の一覧」）と現在の `ProductManifest.json` だけを読む。
+- 関係のない製品フォルダ、docs、Issue、PR 履歴、renders、調査メモは事前に読み込まない。
+- 同じ成果を担当する既存の checkpoint / workline があれば、それを引き継いで続ける。
 
-Continue an existing checkpoint/workline when it already owns the same outcome.
+## 正本の一覧
 
-## Canonical owners
+- 完了と実行範囲: `config/genworks-handoff-policy.json`
+- 必要な見た目の証拠と顧客への公開: `config/release-policy.json` と `contracts/quality/quality-spec.json`
+- 製品の識別・入力・出力: `config/products/<slug>/job.json`
+- 製品の構成: `config/products/<slug>/construction.json`
+- 現在の状態・ゲート・不具合・ハッシュ: `Assets/GenWorks/<slug>/ProductManifest.json`
+- 実行のトランザクションと last-good の保護: `tools/runtime_transaction.py`
+- コマンド: `Taskfile.yml` / `tools/manage.py`
 
-- PR merge: `config/pr-merge-policy.json` and `tools/pr_merge_gate.py`
-- completion/runtime scope: `config/genworks-handoff-policy.json`
-- required visual evidence and customer release: `config/release-policy.json` and `contracts/quality/quality-spec.json`
-- product identity/input/output: `config/products/<slug>/job.json`
-- construction: `config/products/<slug>/construction.json`
-- current state/gates/defects/hashes: `Assets/GenWorks/<slug>/ProductManifest.json`
-- runtime transaction/last-good protection: `tools/runtime_transaction.py`
-- commands: `Taskfile.yml` / `tools/manage.py`
+`README.md` は利用者向けの入口です。`ARCHITECTURE.md` は安定した設計の関係を説明します。機械が読む正本は、文章の説明より優先します。
 
-`README.md` is the user entry point and `ARCHITECTURE.md` describes stable design relationships. Machine-readable owners outrank prose.
+## 製品のコマンド
 
-## Product commands
-
-Use the existing command that owns the task:
+その作業を担当する既存のコマンドを使います。
 
 ```powershell
 task explain PRODUCT=<slug>
@@ -30,50 +30,50 @@ task improve PRODUCT=<slug>
 task release PRODUCT=<slug>
 ```
 
-Repository-wide checks are `task audit:all` and `task check:python`. Do not add a second command path when the existing Taskfile/manage path owns the behavior.
+リポジトリ全体の確認は `task audit:all` と `task check:python` です。既存の Taskfile / manage の経路が担当している処理には、別のコマンド経路を作らないでください。
 
-## Product invariants
+## 製品のルール
 
-- Keep `Assets/GenWorks/<slug>/` as the canonical product workspace.
-- Keep local reports/candidates/releases under `.image2outfit/products/<slug>/...` and out of Git.
-- Do not weaken gates to fit failing data or overwrite last-good state with a worse candidate.
-- Do not commit credentials, private assets, caches, machine state, or unintended Unity `.meta`/GUID changes.
-- While GitHub Pages is enabled, keep the canonical public URL as plain text on the first line of `README.md`.
-- Read public product state from each `ProductManifest.json` or its existing canonical projection; do not maintain a handwritten state catalog.
+- 製品の作業場所は `Assets/GenWorks/<slug>/` だけにする。
+- 認証情報、非公開アセット、キャッシュ、マシン固有の状態、意図しない Unity の `.meta` / GUID の変更はコミットしない。
+- GitHub Pages が有効な間は、公開 URL を `README.md` の 1 行目にプレーンテキストで書く。
+- 公開される製品の状態は、各 `ProductManifest.json` か、その既存の正本の投影から読む。手書きの状態一覧は作らない。
 
-## dbt responsibility
+## dbt の役割
 
-dbt is a first-class repository responsibility for reproducible transformation, testing, and analytics over manufacturing/product evidence.
+dbt は、製造と製品の証拠を再現可能に変換・テスト・分析するための、リポジトリの正式な役割です。
 
-- Canonical owners above remain the only authorities. dbt reads their existing projections and never becomes a second source of truth.
-- Model only facts that already exist in canonical product/manufacturing evidence, including product identity, manufacturing runs, gate/verification state, defects, artifacts, hashes, and release observations.
-- A manufacturing run should leave dbt-consumable evidence through the existing canonical files. Do not introduce a parallel hand-written ledger just to feed dbt.
-- dbt tests may reject inconsistent or incomplete derived data, but dbt must never turn an unexecuted mesh, UV, material, rig, render, Unity, or VRChat layer into PASS.
-- Route dbt extraction/build/test commands through the existing `Taskfile.yml` / `tools/manage.py` command authority. Do not create one-off SQL/export command paths.
+- 権威は上の正本だけです。dbt は正本の既存の投影を読むだけで、2 つ目の正本にはなりません。
+- モデル化してよいのは、製品の識別、製造の実行、ゲートと検証の状態、不具合、成果物、ハッシュ、リリースの観測など、正本の証拠に既にある事実だけです。
+- 製造の実行は、既存の正本ファイルを通じて dbt が読める証拠を残す。dbt のためだけに手書きの台帳を新しく作らない。
+- dbt のテストは、矛盾した不完全な派生データを拒否してよい。ただし、実行されていない mesh・UV・material・rig・render・Unity・VRChat の工程を dbt が PASS にしてはいけない。
+- dbt の抽出・ビルド・テストのコマンドは、既存の `Taskfile.yml` / `tools/manage.py` から実行する。SQL やエクスポートの単発コマンドを作らない。
 
-## Evidence
+## 証拠
 
-Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence. Visual acceptance requires direct inspection of the current evidence required by `contracts/quality/quality-spec.json` and `config/release-policy.json`.
+生成されたファイル、ハッシュ、一覧、CI の成功、もっともらしい説明文は、見た目の合格の証拠になりません。見た目の合格には、`contracts/quality/quality-spec.json` と `config/release-policy.json` が求める現在の証拠を、直接確認する必要があります。
 
-Use a visual feedback loop for appearance-sensitive work: capture the current Blender/Unity view, inspect silhouette, seams, UV/material appearance, intersections, and required poses, make the smallest source change, then recapture and re-run the numeric checks. Use deterministic CLI/`uv` automation for repeatable generation and inspection; use computer use when the decision depends on the rendered UI rather than serialized values alone. When a visual defect is reproducible, encode its check in the existing verifier so later products do not repeat it.
+見た目に影響する作業では、次の流れで確認します。
 
-Merge eligibility, product completion, and customer release are separate decisions owned by their canonical policies.
+1. Blender / Unity の現在の表示を撮る。
+2. シルエット、縫い目、UV・material の見え方、交差、必要なポーズを確認する。
+3. 最小限のソース変更をする。
+4. 撮り直して、数値の確認をもう一度行う。
 
-## Astra quality review
+## 作業の引き継ぎ
 
-- Delegate to Astra only for quality-critical review, especially cloth simulation, pose behavior, visual feedback, and release-blocking evidence.
-- Use the Astra model with `medium` reasoning effort.
-- Keep delegated input limited to the exact product, evidence paths, and acceptance question; do not send unrelated repository history or task context.
-- Require concise output limited to a verdict, up to three critical findings, and required actions, with no implementation unless explicitly requested.
+作業が止まったら、次の 5 点を既存の正本の workline に保存します。
 
-## Continuation
+- manifest / checkpoint の現在の状態
+- 失敗した工程、または見えている不具合
+- ブロッカー
 
-If work stops, persist the current manifest/checkpoint, verified revision, failing stage or visible defect, blocker, and one exact next action in the existing canonical workline. Do not create a second agent-state database.
+## リポジトリの衛生（必須）
 
-## Repository hygiene (mandatory)
-
-- Keep exactly one local working branch and one worktree for this repository. Before ending any task that created a branch or worktree, merge or remove it.
-- Leave zero unmanaged state: no uncommitted, untracked, or stashed work at the end of a task. Each change must end as one of: committed (after the secret/private-asset/cache check above), gitignored local output, or archived outside the repository (for example a `git bundle` or patch in the scratchpad), with the choice reported.
-- Never delete a branch, worktree, or file that holds unique work until it is verified merged (`git merge-base --is-ancestor`) or backed up.
-- When a new kind of local-only output appears, add its path to `.gitignore` in the same change.
-- Finish by pushing the single branch and reporting `git status` as clean.
+- この repository のローカル作業ブランチと worktree は、それぞれ 1 つだけにする。作業でブランチや worktree を作ったら、終了前に merge するか削除する。
+- 作業の終わりに、未コミット・未追跡・stash の作業を残さない。各変更は次のどれかにする。
+  - コミットする（上の secret / 非公開アセット / キャッシュの確認の後）
+  - `.gitignore` で無視されるローカル出力にする
+  - リポジトリの外に保管する（例: scratchpad に `git bundle` や patch を置く）
+- 新しい種類のローカル専用の出力が出たら、同じ変更でそのパスを `.gitignore` に追加する。
+- 最後に 1 つのブランチを push し、`git status` がクリーンであることを報告する。

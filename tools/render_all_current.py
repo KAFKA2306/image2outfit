@@ -559,14 +559,85 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--blender", required=True)
-    parser.add_argument("--summary", type=Path, required=True)
-    parser.add_argument("--site", type=Path, required=True)
+    parser.add_argument("--blender")
+    parser.add_argument("--summary", type=Path)
+    parser.add_argument("--site", type=Path)
+    parser.add_argument(
+        "--mesh-only",
+        metavar="PRODUCT",
+        help="Regenerate one product's source-hash-bound mesh showcase without rebuilding the garment.",
+    )
+    parser.add_argument(
+        "--site-only",
+        action="store_true",
+        help="Build Pages from current manifests and renders without rerunning product renders.",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+
+    if args.mesh_only:
+        if not args.blender:
+            raise SystemExit("--blender is required with --mesh-only")
+        job_path = ROOT / "config" / "products" / args.mesh_only / "job.json"
+        if not job_path.is_file():
+            raise SystemExit(f"product job not found: {args.mesh_only}")
+        reports = ROOT / ".image2outfit" / "products" / args.mesh_only / "reports"
+        render_mesh_showcase(args.blender, job_path, reports)
+        report_path = (
+            ROOT
+            / "Assets"
+            / "GenWorks"
+            / args.mesh_only
+            / "Previews"
+            / "Mesh"
+            / "mesh-showcase.json"
+        )
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        print(
+            json.dumps(
+                {
+                    "productId": args.mesh_only,
+                    "sourcePath": report.get("sourcePath"),
+                    "sourceSha256": report.get("sourceSha256"),
+                    "uvStatus": report.get("uvStatus", "UNKNOWN"),
+                    "records": report.get("records", []),
+                    "report": report_path.relative_to(ROOT).as_posix(),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
+
+    if args.summary is None or args.site is None:
+        raise SystemExit("--summary and --site are required for Pages generation")
+
+    summary_path = args.summary if args.summary.is_absolute() else ROOT / args.summary
+    site = args.site if args.site.is_absolute() else ROOT / args.site
+
+    if args.site_only:
+        data = build_site(site, summary_path)
+        print(
+            json.dumps(
+                {
+                    "renderSummary": "unchanged",
+                    "pagesProducts": len(data.get("products", [])),
+                    "ioProducts": data.get("io", {}).get("productCount", 0),
+                    "ioWebpCount": data.get("io", {}).get("webpCount", 0),
+                    "site": site.relative_to(ROOT).as_posix(),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
+
+    if not args.blender:
+        raise SystemExit("--blender is required unless --site-only is selected")
+
     jobs = sorted((ROOT / "config" / "products").glob("*/job.json"))
     results: list[dict[str, Any]] = []
 
@@ -596,7 +667,6 @@ def main() -> int:
                 }
             )
 
-    summary_path = args.summary if args.summary.is_absolute() else ROOT / args.summary
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     summary = {
         "schemaVersion": 1,
@@ -611,7 +681,6 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    site = args.site if args.site.is_absolute() else ROOT / args.site
     data = build_site(site, summary_path)
     print(
         json.dumps(

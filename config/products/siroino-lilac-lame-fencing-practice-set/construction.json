@@ -115,14 +115,26 @@
       ]
     },
     "prototypeFrameEnd": 16,
-    "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified.",
+    "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified. The overskirt stiffness 20 comparison is rerun as a hypothesis against the short rear hem, front apron and anterior thigh-weight profile.",
     "reason": "The shorts now use a provisional segmented thigh and crotch-rise outline; bending evidence is remeasured for the current pattern, target and assembly pose. Fit, gusset, Shape Key and motion acceptance remain open.",
-    "prototypeComponentBending": {
+    "prototypeComponentBendingHypotheses": {
+      "jacket-sleeves": {
+        "stiffness": 2.2,
+        "reason": "Direct review shows excessive sleeve wrinkling in the neutral render. Compare a structured sleeve cloth setting with the existing 0.45 baseline; 2.2 is a local prototype trial value, not a Lilac fabric calibration.",
+        "evidenceBoundary": "One neutral 16-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness."
+      },
       "pleated-overskirt": {
-        "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-035821af6d70f9c0.json",
-        "evidenceSha256": "035821af6d70f9c0d5aef54803f1fb87e5164b8eef9659324bcb659afa499a59",
-        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated overskirt bending comparison at stiffness 20 after the current shorts seat-rise pattern change and with measured Neutral contour anchors. Diagnostic geometry only; no fit, pose, or visual acceptance."
+        "stiffness": 20.0,
+        "reason": "The uniform 190 mm hem trial was rejected because it made the standing skirt too long while only slightly improving seated/crouched coverage. Re-run stiffness 20 as a hypothesis on the revised short rear/side panels and center-front apron, with forward-thigh weight transfer; the cloth stage records measured settings and output hashes for this exact solve.",
+        "evidenceBoundary": "One native Blender 4.4.3 16-frame trial on the revised short rear/side hem and tapered forward apron. This is parameter-trial evidence only; no dynamic coverage, penetration, fit, motion, visual appearance, or release acceptance."
+      }
+    },
+    "prototypePostBakeLaplacianSmoothing": {
+      "jacket-sleeves": {
+        "iterations": 3,
+        "factor": 0.18,
+        "reason": "Direct neutral and pose renders still show physical sleeve corrugation after the bounded cloth solve. Compare a low-strength interior-only fairing pass while locking all open garment boundaries and sewn pins.",
+        "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.18 on non-boundary sleeve vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes are recorded by this run. This is a geometry hypothesis only; it does not establish fit, fold quality, motion, appearance approval, or release readiness."
       }
     }
   },
@@ -162,7 +174,7 @@
       ],
       "evidenceBoundary": "Explicit provisional pelvis/leg surface window in rest coordinates. Prevent arm/hand nearest-surface transfer to displaced lower garment panels; no approved fit or runtime motion.",
       "weightProfile": {
-        "method": "hip-anchored-lateral-thigh-fade-v1",
+        "method": "hip-anchored-anterior-lateral-thigh-fade-v2",
         "pieceIds": [
           "overskirt-front",
           "overskirt-back"
@@ -170,11 +182,14 @@
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
-        "waistThighWeight": 0.15,
-        "hemThighWeight": 0.65,
+    "waistThighWeight": 0.0,
+      "hemThighWeight": 0.0,
+      "forwardHemThighWeight": 0.90,
+      "forwardCenterYM": -0.03788188099861145,
+      "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.02,
         "fullSideWeightWidthM": 0.06,
-        "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh: current side hem vertices average 0.963 ipsilateral thigh weight, while 67 centerline hem vertices average 0.970 combined thigh weight and 0.030 Hips. Fade centerline influence to Hips and cap lateral hem thigh influence at 0.65; retain 0.15 thigh weight at the waistband. Intended to reduce opposing thigh pull and raised/curling flaps; no pose, fit, penetration or runtime acceptance is granted."
+      "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh. The previous 0.55 cap left crouch thigh coverage at about 27% and seated coverage at about 19%; raise only the forward apron hem cap to 0.90 while retaining pelvis-only waist weighting and the existing front-side fade. This parameter change is a measured prototype experiment, not calibrated weight or fit; regenerate the weighted mesh, remeasure posed coverage, and directly inspect cloth intersection and all rendered poses before any acceptance."
       }
     }
   ]

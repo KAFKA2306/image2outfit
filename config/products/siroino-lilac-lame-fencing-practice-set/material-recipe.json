@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "PROTOTYPE_HYPOTHESIS",
-  "evidenceBoundary": "Explicit preview hypotheses only; ivory/lavender material appearance, lam\u00e9 response, trims and quilting require direct rendered review. No measured PBR approval.",
+  "evidenceBoundary": "Explicit preview hypotheses only; ivory/lavender material appearance, lamé response, trims and quilting require direct rendered review. No measured PBR approval.",
   "prototypeMaterial": {
     "name": "ivory-prototype-hypothesis",
     "baseColorLinearRgb": [
@@ -38,9 +38,9 @@
   "prototypeSurfaceMotifs": {
     "materialName": "lilac-surface-motif-hypothesis",
     "baseColorLinearRgb": [
-      0.28,
-      0.14,
-      0.46
+      0.18,
+      0.07,
+      0.34
     ],
     "roughness": 0.52,
     "metallic": 0.12,
@@ -59,22 +59,44 @@
         0.78
       ],
       "sampleCount": 96,
-      "halfWidthM": 0.0045,
-      "surfaceOffsetM": 0.0025,
+      "acrossSampleCount": 8,
+      "halfWidthStartM": 0.024,
+      "halfWidthEndM": 0.02,
+      "surfaceOffsetM": 0.0045,
+      "surfaceOffsetMode": "front-depth",
       "frontQueryYM": -0.16
+    },
+    "frontFastenerHypothesis": {
+      "pathFractions": [0.24, 0.5, 0.76],
+      "radiusM": 0.007,
+      "reliefM": 0.0015,
+      "segments": 16,
+      "materialName": "front-fastener-metal-prototype-hypothesis",
+      "baseColorLinearRgb": [0.66, 0.48, 0.19],
+      "roughness": 0.3,
+      "metallic": 0.55,
+      "evidenceBoundary": "Three 14 mm diameter low-profile metal-disc prototypes ray-bound to the declared diagonal plastron path and layered 1.5 mm above its fabric surface. Decorative geometry only; no true fastening, closure retention, fit, appearance, or release is claimed."
     },
     "elbowQuilting": {
       "hostPieceIds": [
         "jacket-sleeve-left",
         "jacket-sleeve-right"
       ],
+      "pathLayout": "integrated-panel-seams-v1",
       "centerAbsXM": 0.275,
       "centerZM": 1.012,
       "halfLengthM": 0.035,
       "halfHeightM": 0.024,
-      "threadRadiusM": 0.0018,
-      "surfaceOffsetM": 0.0015,
-      "frontQueryYM": -0.08
+      "threadRadiusM": 0.00045,
+      "surfaceOffsetM": 0.0008,
+      "stitchMaterialName": "elbow-seam-muted-lilac-prototype",
+      "stitchColorLinearRgb": [0.40, 0.32, 0.54],
+      "stitchRoughness": 0.62,
+      "stitchMetallic": 0.06,
+      "filledPatchEnabled": false,
+      "patchSegmentsPerSide": 8,
+      "frontQueryYM": -0.08,
+      "evidenceBoundary": "One revised, surface-bound elbow panel outline with two parallel seam channels per sleeve. This replaces the reviewed diamond/cross motif and is a visual construction hypothesis only; seam placement, fit, fold quality, runtime, appearance approval, and release remain unverified."
     }
   }
 }

@@ -1800,6 +1800,11 @@ def stage_build(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
         label="build report",
     )
+    report_signature_before = (
+        (report.stat().st_mtime_ns, report.stat().st_size, sha256(report))
+        if report.is_file()
+        else None
+    )
     command = [
         blender_executable(),
         "--python-use-system-env",
@@ -1833,17 +1838,47 @@ def stage_build(
     )
 
     quality: dict[str, Any] | None = None
+    build_report: dict[str, Any] | None = None
     if report.is_file():
-        quality = geometry_quality(read_object(report, "build report"))
+        build_report = read_object(report, "build report")
+        quality = geometry_quality(build_report)
+    report_signature_after = (
+        (report.stat().st_mtime_ns, report.stat().st_size, sha256(report))
+        if report.is_file()
+        else None
+    )
+    build_report_fresh = (
+        report_signature_after is not None
+        and report_signature_after != report_signature_before
+    )
+    reject_report_matches_current_inputs = False
+    if quality is not None and quality["decision"] == QUALITY_REJECT and build_report is not None:
+        expected_mesh = None
+        if boxmesh_evidence is not None:
+            boxmesh_audit = read_object(boxmesh_evidence[1], "BoxMesh audit")
+            expected_mesh = boxmesh_audit.get("meshExchangeSha256")
+        reject_report_matches_current_inputs = (
+            build_report.get("productId") == product_id
+            and isinstance(expected_mesh, str)
+            and build_report.get("sewnMeshSha256") == expected_mesh
+            and build_report.get("sourceBlendSha256")
+            == sha256(repo_path(job["blendPath"], label="blend"))
+        )
     accepted_quality_reject = (
-        completed.returncode == 2
+        completed.returncode in {1, 2}
+        and build_report_fresh
         and quality is not None
         and quality["decision"] == QUALITY_REJECT
+        and reject_report_matches_current_inputs
     )
     if completed.returncode != 0 and not accepted_quality_reject:
+        # Keep the subprocess failure diagnosable after the surrounding stage
+        # transaction rolls back its temporary log writes. Store only a bounded
+        # tail in the durable checkpoint error.
+        output_tail = (completed.stdout + "\n--- STDERR ---\n" + completed.stderr)[-12000:]
         raise RuntimeError(
             f"Blender build failed with exit code {completed.returncode}; "
-            f"see {relative(log)}"
+            f"see {relative(log)}\n{output_tail}"
         )
     if quality is None:
         raise FileNotFoundError(f"build report was not created: {relative(report)}")
@@ -1874,6 +1909,7 @@ def stage_build(
         ],
         extra={
             "blenderReturnCode": completed.returncode,
+            "buildReportFresh": build_report_fresh,
             "executionDisposition": (
                 "COMPLETED_WITH_QUALITY_REJECT"
                 if accepted_quality_reject

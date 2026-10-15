@@ -515,7 +515,14 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
             anchor = np.array(leg["axisAnchorGarmentCodeM"], dtype=float)*scale
             profile = np.array(leg["widthBoundsProfileM"], dtype=float)*scale
             start, end = np.array(leg["pelvisBlendLocalYM"], dtype=float)*scale
-            if side not in (-1, 1) or depth not in (-1, 1) or anchor.shape != (3,) or profile.shape != (3, 3):
+            if (
+                side not in (-1, 1)
+                or depth not in (-1, 1)
+                or anchor.shape != (3,)
+                or profile.ndim != 2
+                or profile.shape[1] != 3
+                or profile.shape[0] < 2
+            ):
                 raise ValueError("Invalid shorts placement specification")
             if not np.isfinite(anchor).all() or not np.isfinite(profile).all() or not math.isfinite(start+end) or not start < end or np.any(np.diff(profile[:,0]) <= 0) or np.any(profile[:,2] <= profile[:,1]):
                 raise ValueError("Invalid shorts placement bounds")

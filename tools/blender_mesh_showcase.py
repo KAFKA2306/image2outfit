@@ -71,6 +71,7 @@ def main():
         scale = 900 / max(xmax - xmin, zmax - zmin)
         topology = []
         uvlines = []
+        complete_uv_coverage = all(obj.data.uv_layers.active for obj in meshes)
         for obj in meshes:
             uv = obj.data.uv_layers.active
             report["objects"].append(
@@ -94,7 +95,9 @@ def main():
                         962 - (b.z - zmin) * scale,
                     )
                 )
-            if uv:
+            # A UV chart is an outfit-level claim. Do not emit a partial chart
+            # from whichever overlay objects happen to have a UV layer.
+            if complete_uv_coverage and uv:
                 for face in obj.data.polygons:
                     loops = list(face.loop_indices)
                     for i, j in zip(loops, loops[1:] + loops[:1]):
@@ -110,7 +113,7 @@ def main():
         diagrams = [("topology", topology, "Garment topology - front projection")]
         if uvlines:
             diagrams.append(("uv", uvlines, "Active UV layout - unit tile"))
-        report["uvStatus"] = "PRESENT_UNVERIFIED" if uvlines else "MISSING"
+        report["uvStatus"] = "PRESENT_UNVERIFIED" if complete_uv_coverage and uvlines else "MISSING"
         for name, lines, title in diagrams:
             path = out / f"{name}.svg"
             path.write_text(svg(lines, title), encoding="utf-8")
@@ -121,6 +124,10 @@ def main():
                     "sha256": digest(path),
                 }
             )
+        if report["uvStatus"] == "MISSING":
+            stale_uv = out / "uv.svg"
+            if stale_uv.exists():
+                stale_uv.unlink()
         report["status"] = "GENERATED_UNVERIFIED"
     (out / "mesh-showcase.json").write_text(
         json.dumps(report, indent=2) + "\n", encoding="utf-8"

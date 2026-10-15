@@ -707,6 +707,16 @@ def collect_product(
                         sha256=digest(target),
                     )
                 )
+            if mesh.get("uvStatus") == "MISSING":
+                assets.append(
+                    Asset(
+                        kind="uv",
+                        name="UV layout (not created)",
+                        status="MISSING",
+                        href=relative_href(mesh_report, output_dir),
+                        sha256=digest(mesh_report),
+                    )
+                )
 
     candidate = pick(manifest, "candidate", "candidate_manifest", default={})
     review = pick(manifest, "human_review", "review", default={})

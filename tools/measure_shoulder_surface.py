@@ -22,6 +22,7 @@ def main():
     parser.add_argument("--armhole", action="store_true")
     parser.add_argument("--sleeve-tube", action="store_true")
     parser.add_argument("--cuff-section", action="store_true")
+    parser.add_argument("--thigh-tube", action="store_true")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
     if args.cuff_section and not args.sleeve_tube:
         parser.error("--cuff-section requires --sleeve-tube")
@@ -171,7 +172,110 @@ def main():
             record["armholeSection"] = selected
             record["sectionSelection"] = {"attempts": attempts, "radialSamples": 32, "maximumRayDistanceM": 0.08, "minimumRadiusM": 0.004, "minimumOutwardAlignment": 0.2, "boneFractions": [0, 0.6, 0.05]}
         records.append(record)
-    report = {"schemaVersion": 1, "productId": job["id"], "sourceAvatarSha256": digest(source), "sourceBlendPath": job["blendPath"], "sourceBlendSha256": digest(blend), "measurementScriptSha256": digest(Path(__file__)), "bodyObject": body.name, "bodyVertexCount": len(vertices), "bodyTriangleCount": len(triangles), "shapeKeyValues": values, "method": "evaluated-neutral-body-shoulder-support-and-requested-bone-radial-sections", "records": records, "evidenceBoundary": "Only the requested neutral body sections are measured. Clearance is an explicit prototype hypothesis. No Large, continuous penetration, seam strain or motion acceptance.", "grantsFitAcceptance": False}
+    if args.thigh_tube:
+        from collections import defaultdict
+        if any(abs(value) > 1e-8 for value in values.values()):
+            raise ValueError("Thigh section measurement requires neutral body Shape Keys")
+
+        def horizontal_sections(z_value):
+            segments = []
+            for tri in triangles:
+                points = [vertices[index] for index in tri]
+                crossings = []
+                for a, b in zip(points, points[1:] + points[:1]):
+                    if (a.z < z_value <= b.z) or (b.z < z_value <= a.z):
+                        factor = (z_value - a.z) / (b.z - a.z)
+                        point = a + factor * (b - a)
+                        crossings.append((float(point.x), float(point.y)))
+                if len(crossings) == 2 and math.dist(*crossings) > 1e-9:
+                    segments.append(crossings)
+            graph = defaultdict(list)
+            for index, (a, b) in enumerate(segments):
+                for point in (a, b):
+                    graph[tuple(round(value, 6) for value in point)].append(index)
+            unseen = set(range(len(segments)))
+            loops = []
+            while unseen:
+                stack = [unseen.pop()]
+                segment_ids = set(stack)
+                while stack:
+                    segment_index = stack.pop()
+                    for point in segments[segment_index]:
+                        for neighbor in graph[tuple(round(value, 6) for value in point)]:
+                            if neighbor in unseen:
+                                unseen.remove(neighbor)
+                                segment_ids.add(neighbor)
+                                stack.append(neighbor)
+                selected = [segments[index] for index in segment_ids]
+                nodes = {
+                    tuple(round(value, 6) for value in point)
+                    for segment in selected
+                    for point in segment
+                }
+                if not selected or not all(len(graph[node]) == 2 for node in nodes):
+                    continue
+                points = sorted(nodes)
+                center_xy = [
+                    (min(point[axis] for point in points) + max(point[axis] for point in points)) / 2
+                    for axis in range(2)
+                ]
+                perimeter = sum(math.dist(a, b) for a, b in selected)
+                loops.append({
+                    "centerXYM": center_xy,
+                    "circumferenceM": perimeter,
+                    "segmentsXYM": selected,
+                    "pointCount": len(nodes),
+                })
+            return loops
+
+        for side, upper_name in [("left", "UpperLeg_L"), ("right", "UpperLeg_R")]:
+            rigs = [o for o in bpy.context.scene.objects if o.type == "ARMATURE" and upper_name in o.data.bones]
+            if len(rigs) != 1:
+                raise ValueError(f"Expected one avatar thigh bone: {upper_name}")
+            rig = rigs[0]
+            upper = rig.data.bones[upper_name]
+            lower_name = f"LowerLeg_{'L' if side == 'left' else 'R'}"
+            lower = rig.data.bones.get(lower_name)
+            if lower is None:
+                raise ValueError(f"Missing thigh section endpoint bone: {lower_name}")
+            head = rig.matrix_world @ upper.head_local
+            lower_head = rig.matrix_world @ lower.head_local
+            fractions = (0.15, 0.30, 0.45, 0.60, 0.75, 0.90)
+            sections = []
+            for fraction in fractions:
+                center = head.lerp(lower_head, fraction)
+                loops = horizontal_sections(float(center.z))
+                if not loops:
+                    raise ValueError(f"No closed thigh cross-section: {side}, {fraction}")
+                selected = min(
+                    loops,
+                    key=lambda loop: math.dist(loop["centerXYM"], [center.x, center.y]),
+                )
+                sections.append({
+                    "boneFraction": fraction,
+                    "centerBlenderM": list(center),
+                    "selectedLoopCenterXYM": selected["centerXYM"],
+                    "selectedLoopPointCount": selected["pointCount"],
+                    "bodyCircumferenceM": selected["circumferenceM"],
+                    "allClosedLoopCircumferencesM": sorted(
+                        loop["circumferenceM"] for loop in loops
+                    ),
+                    "segmentsXYM": selected["segmentsXYM"],
+                })
+            records.append({
+                "side": side,
+                "bone": upper_name,
+                "headBlenderM": list(head),
+                "lowerLegHeadBlenderM": list(lower_head),
+                "jointSpanM": (lower_head - head).length,
+                "thighTubeSections": sections,
+                "samplingPolicy": {
+                    "fractions": list(fractions),
+                    "method": "evaluated-body-horizontal-sections-nearest-to-upper-leg-bone-center",
+                    "evidenceBoundary": "Neutral body cross-sections only; selected loop identity follows nearest upper-leg bone center. No garment ease, fit, motion, Large Shape Key or release acceptance.",
+                },
+            })
+    report = {"schemaVersion": 1, "productId": job["id"], "sourceAvatarSha256": digest(source), "sourceBlendPath": job["blendPath"], "sourceBlendSha256": digest(blend), "measurementScriptSha256": digest(Path(__file__)), "bodyObject": body.name, "bodyVertexCount": len(vertices), "bodyTriangleCount": len(triangles), "shapeKeyValues": values, "method": "evaluated-neutral-body-shoulder-support-and-requested-bone-radial-sections", "records": records, "evidenceBoundary": "Only requested neutral body sections are measured. Radial clearance is an explicit prototype hypothesis. No Large, continuous penetration, seam strain or motion acceptance.", "grantsFitAcceptance": False}
     output = root / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
     raw = (json.dumps(report, indent=2) + "\n").encode()

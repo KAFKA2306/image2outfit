@@ -300,8 +300,8 @@ class RepositoryWriteBoundary:
                 )
             else:
                 # The pipeline executors are product-bound: runtime artifacts go
-                # under this product's runtime tree, and only build/finalize may
-                # write to its Assets/GenWorks workspace. Keep lightweight
+                # under this product's runtime tree, and only build, skin/export,
+                # and finalize may write to its Assets/GenWorks workspace. Keep lightweight
                 # metadata for unrelated untracked inputs without duplicating
                 # benchmark payloads; the scoped workspaces receive full backups.
                 self._untracked_metadata_before = {

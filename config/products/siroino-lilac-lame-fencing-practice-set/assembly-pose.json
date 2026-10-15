@@ -8694,7 +8694,22 @@
           [
             -0.12,
             0.0,
-            0.22
+            0.1472
+          ],
+          [
+            -0.08,
+            0.0,
+            0.1603
+          ],
+          [
+            -0.02,
+            0.0,
+            0.1826
+          ],
+          [
+            0.0,
+            0.0,
+            0.1886
           ],
           [
             0.05,
@@ -8738,7 +8753,22 @@
           [
             -0.12,
             0.0,
-            0.22
+            0.1472
+          ],
+          [
+            -0.08,
+            0.0,
+            0.1603
+          ],
+          [
+            -0.02,
+            0.0,
+            0.1826
+          ],
+          [
+            0.0,
+            0.0,
+            0.1886
           ],
           [
             0.05,
@@ -8782,7 +8812,22 @@
           [
             -0.12,
             0.0,
-            0.22
+            0.1472
+          ],
+          [
+            -0.08,
+            0.0,
+            0.1603
+          ],
+          [
+            -0.02,
+            0.0,
+            0.1826
+          ],
+          [
+            0.0,
+            0.0,
+            0.1886
           ],
           [
             0.05,
@@ -8826,7 +8871,22 @@
           [
             -0.12,
             0.0,
-            0.22
+            0.1472
+          ],
+          [
+            -0.08,
+            0.0,
+            0.1603
+          ],
+          [
+            -0.02,
+            0.0,
+            0.1826
+          ],
+          [
+            0.0,
+            0.0,
+            0.1886
           ],
           [
             0.05,
@@ -9038,8 +9098,49 @@
   "shortsOrientationEvidence": {
     "frontAxis": "GarmentCode +Z = Blender -Y",
     "leftAxis": "GarmentCode +X = Blender +X",
-    "method": "Signed half-leg to quarter-pelvis nonlinear placement follows the measured Neutral anchors; the four-panel boundary now adds explicit intermediate thigh and crotch-rise contours. Original and revised 2D lengths are retained as hypotheses; no fit acceptance.",
-    "evidenceBoundary": "Neutral avatar landmark placement and provisional contour geometry only. Gusset, garment ease, penetrations, crouch/sit coverage and Shape Key response remain unmeasured; review the regenerated poses before further decisions."
+    "method": "Signed half-leg to quarter-pelvis nonlinear placement follows measured Neutral anchors. The four-panel pattern and assembly width profile use interpolated target-body thigh sections plus an explicit 4 mm radial clearance hypothesis. The merged hip section is excluded from per-leg sizing.",
+    "measuredThighSections": {
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
+      "sha256": "5fef1c11dfd75e546c7054d6055fafc6728128f94a3d5170d41afdb3a12191ba",
+      "sourceAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+      "derivedNeutralHalfWidthsM": [
+        [-0.12, 0.1472],
+        [-0.08, 0.1603],
+        [-0.02, 0.1826],
+        [0.0, 0.1886]
+      ],
+      "radialClearanceHypothesisM": 0.004,
+      "evidenceBoundary": "Measured Neutral body circumferences only; four shorts-panel widths are derived as half of body section circumference plus a 4 mm radial-clearance assumption. At UpperLeg_L fraction 0.15 the only closed loop joins hip/crotch (0.712106 m), so it is excluded; no per-leg value is asserted there. Ease, gusset, garment deformation, crouch/sit coverage, Large shape-key fit, and customer acceptance remain unverified."
+    },
+    "evidenceBoundary": "Neutral body measurements guide a revised prototype outline only. Added ease, gusset function, penetrations, crouch/sit coverage, shape-key response, and fit acceptance remain unverified; inspect regenerated renders before deciding whether to continue this construction."
+  },
+  "shortsUpperSurfacePlacement": {
+    "method": "evaluated-body-nearest-surface-blended-placement",
+    "pieceIds": [
+      "shorts-front-left",
+      "shorts-front-right",
+      "shorts-back-left",
+      "shorts-back-right"
+    ],
+    "bodyMeshNamePrefix": "SiroinoSotai_PC",
+    "fadeStartZM": 0.445,
+    "fullWeightStartZM": 0.525,
+    "maximumZM": 0.755,
+    "fullWeightAbsXM": 0.22,
+    "fadeEndAbsXM": 0.30,
+    "normalClearanceM": 0.004,
+    "maximumProjectionDistanceM": 0.12,
+    "outerPieceIds": [
+      "shorts-front-left",
+      "shorts-front-right",
+      "shorts-back-left",
+      "shorts-back-right"
+    ],
+    "outerLayerOffsetM": 0.001,
+    "maximumBlendWeight": 0.9,
+    "preserveSharedPieceIds": [],
+    "preservedSeamFadeDistanceM": 0.04,
+    "evidenceBoundary": "Prototype-only, bounded nearest-surface relaxation for four sewn shorts panels, based on evaluated Neutral Siroino body geometry. Preserves vertices shared by the shorts panels themselves and keeps face ownership. The waistband is attached to the overskirt, not the shorts, so it is not a shorts preservation target. 4 mm body clearance, uniform 1 mm layer separation, 90% blend and spatial bounds are hypotheses; the prior 65% blend left visibly detached cylindrical panels in crouch/sit renders. No pose deformation, continuous penetration, opacity, strain, shape-key, appearance, or fit acceptance is implied."
   },
   "skirtEnvelopePlacement": {
     "method": "measured-horizontal-body-envelope-minimum-clearance",
@@ -9049,6 +9150,15 @@
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "sampleZM": [
+      0.5095782470703125,
+      0.5195782470703125,
+      0.5295782470703125,
+      0.5395782470703125,
+      0.5495782470703125,
+      0.5595782470703125,
+      0.5695782470703125,
+      0.5795782470703125,
+      0.5895782470703125,
       0.5995782470703125,
       0.6095782470703125,
       0.6195782470703125,
@@ -9164,11 +9274,25 @@
       -0.03788188099861145
     ],
     "waistZM": 0.7395782470703125,
-    "hemZM": 0.5995782470703125,
+    "sourceHemZM": 0.5995782470703125,
+    "hemZM": 0.5095782470703125,
+    "hemExtensionM": 0.09,
+    "forwardApron": {
+      "method": "front-panel-short-apron-fade-v1",
+      "pieceId": "overskirt-front",
+      "axisOriginBlenderXYM": [
+        0,
+        -0.03788188099861145
+      ],
+      "additionalExtensionM": 0.07,
+      "fullExtensionHalfAngleRadians": 0.95,
+      "zeroExtensionHalfAngleRadians": 1.5707963267948966,
+      "evidenceBoundary": "Short forward apron added only to the center of the sewn front panel and faded to zero at both side seams; short rear and side transitions remain. This construction hypothesis must be checked in seated and crouched renders; it grants no fit, dynamic coverage, or appearance acceptance."
+    },
     "foldCount": 12,
     "hemFoldDepthM": 0.012,
     "phaseRadians": 0,
-    "evidenceBoundary": "Twelve folds and 12 mm hem depth remain explicit design hypotheses. Native skirt/waistband faces are split together along radial fold extrema before contour placement, preserving sewn waist adjacency. No exact fabric isometry, cloth retention, fit or visual acceptance.",
+    "evidenceBoundary": "Twelve folds and 12 mm hem depth remain explicit design hypotheses. The uniform 190 mm extension was rejected for producing a standing hem that was too long while gaining little crouch/sit coverage. Return the short rear/side hem to a 90 mm extension and add a 70 mm center-front apron tapered smoothly to zero at the sewn side seams. Reproject measured body envelopes and inspect all poses; no fit or appearance acceptance is implied.",
     "seamContinuationPieceIds": [
       "waistband-front",
       "waistband-back"

@@ -19,29 +19,34 @@
   },
   "blockingFindings": [
     {
+      "code": "STYLING_FIDELITY",
       "severity": "BLOCKER",
-      "code": "DESIGN_DETAILS_NOT_RENDERED",
-      "description": "Directly inspected all five regenerated product views and all six regenerated poses. The jacket remains nearly featureless white: no readable broad fencing plastron or rear waist adjustment is visible; elbow diamonds and diagonal marking read only as faint contour lines."
+      "description": "Direct inspection of current front/three-quarter views: the design still reads as a plain ivory dress with a broad flat lavender front band and sparse buttons; the expected fencing-practice tailoring/detail is not convincingly present."
     },
     {
-      "severity": "BLOCKER",
       "code": "SLEEVE_SURFACE_QUALITY",
-      "description": "Direct inspection of neutral, arms-up, arm-cross and prone renders shows dense irregular faceting and wrinkles across the sleeves and underarms. Sleeve surface quality remains visibly rough."
+      "severity": "BLOCKER",
+      "description": "Arms-up and arm-cross images retain outlined elbow diamonds rather than integrated padded construction, plus angular shoulder/underarm folds."
     },
     {
+      "code": "POSE_COVERAGE",
       "severity": "BLOCKER",
-      "code": "SKIRT_CONSTRUCTION_UNRESOLVED",
-      "description": "Direct inspection of the current views and poses shows an uncontrolled skirt that separates into flaps in crouch and lifts in sitting, exposing large gaps around blunt cylindrical shorts. Same-pose projection records posterior-pelvis shorts coverage of 14.5% neutral, 17.7% crouch and 19.0% sit; overskirt coverage is 65.8%, 59.0% and 60.7%, with crouch/sit p95 gaps of 80.6/115.5 mm. The raised inner-crotch point did not materially resolve coverage. These geometric measurements are diagnostics only and do not establish fit acceptance."
+      "description": "Current crouch and seated images show shorts and large upper-thigh areas. Same-pose mesh coverage diagnostic measures crouch 31.0%/30.2% and sit 23.2%/22.4% on left/right upper thighs; higher forward hem thigh weights only modestly improved the prior 27.9%/27.3% and 19.2%/18.8%, so coverage remains unacceptable."
     },
     {
+      "code": "POSE_DRAPE",
       "severity": "BLOCKER",
-      "code": "COLLAR_AND_FRONT_CLOSURE",
-      "description": "The collar remains a narrow upright open tube. The diagonal piping does not form a visible plastron or secure-looking closure, and neck clearance remains unestablished."
+      "description": "The prone render shows the overskirt collapsed into a broad, stiff irregular spread rather than controlled cloth drape; the prototype remains visually unacceptable in this pose."
     },
     {
+      "code": "SIDE_ASSEMBLY_ARTIFACTS",
       "severity": "BLOCKER",
-      "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
-      "description": "These are Blender prototype renders and pose-matched geometry diagnostics only. Shape Key fit, continuous penetration, accepted deformation weights, Unity prefab integration, VRChat Build & Test and SDK upload remain unverified."
+      "description": "Left and right views retain visibly faceted skirt folds and an abrupt waist-to-skirt transition, so the prototype does not read as finished sewn clothing."
+    },
+    {
+      "code": "REAR_DESIGN_DETAIL",
+      "severity": "BLOCKER",
+      "description": "The back render remains nearly featureless ivory with no clear waist adjustment or rear finishing detail."
     }
   ],
   "failedGeometryChecks": [

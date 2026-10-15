@@ -2,11 +2,42 @@ version: '3'
 
 tasks:
   publication:reconcile:
-    desc: Reconcile canonical rendered products against the review-console publication projection.
+    desc: Reconcile canonical rendered products against the generated GitHub Pages projection.
+    env:
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
         python tools/manage.py publication reconcile
+        --console "pages/review-console.json"
+        --output "pages/publication-reconciliation.json"
+
+  pages:current:
+    desc: Build GitHub Pages from current manifests and renders without rerendering products.
+    env:
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/render_all_current.py
+        --site-only
+        --summary ".image2outfit/render-current-summary.json"
+        --site "pages"
+
+  mesh:current:
+    desc: Regenerate one product's source-bound topology and UV showcase without rebuilding the garment.
+    requires:
+      vars: [PRODUCT]
+    env:
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+    vars:
+      BLENDER: '{{.BLENDER | default ".image2outfit/blender-4.4.3/blender.exe"}}'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/render_all_current.py
+        --blender "{{.BLENDER}}"
+        --mesh-only "{{.PRODUCT}}"
 
   plan:
     desc: Resolve and print the selected modular toolchain without executing stages.

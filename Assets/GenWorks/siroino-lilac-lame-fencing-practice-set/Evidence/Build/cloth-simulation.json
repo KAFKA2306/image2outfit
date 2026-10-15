@@ -16,6 +16,14 @@
       "pinVertexCount": 50,
       "frameStart": 1,
       "frameEnd": 16,
+      "componentBendingHypothesis": {
+        "stiffness": 2.200000047683716,
+        "maximum": 2.200000047683716,
+        "model": "ANGULAR",
+        "reason": "Direct review shows excessive sleeve wrinkling in the neutral render. Compare a structured sleeve cloth setting with the existing 0.45 baseline; 2.2 is a local prototype trial value, not a Lilac fabric calibration.",
+        "evidenceBoundary": "One neutral 16-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness.",
+        "grantsFitAcceptance": false
+      },
       "pinMethod": "canonical shared seam vertices",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
@@ -30,23 +38,40 @@
         "belowCombinedCollisionMarginVertexCount": 1317,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
+      "postBakeGeometryHypothesis": {
+        "method": "uniform-laplacian-interior-only-boundaries-and-pins-fixed",
+        "iterations": 3,
+        "factor": 0.18,
+        "vertexCount": 1742,
+        "boundaryVertexCount": 80,
+        "pinnedVertexCount": 50,
+        "fixedVertexCount": 80,
+        "fixedVertexMaximumDisplacementM": 0.0,
+        "changedInteriorVertexCount": 1662,
+        "maximumInteriorDisplacementM": 0.006227373528022737,
+        "meanInteriorDisplacementM": 0.0011050410002161732,
+        "reason": "Direct neutral and pose renders still show physical sleeve corrugation after the bounded cloth solve. Compare a low-strength interior-only fairing pass while locking all open garment boundaries and sewn pins.",
+        "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.18 on non-boundary sleeve vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes are recorded by this run. This is a geometry hypothesis only; it does not establish fit, fold quality, motion, appearance approval, or release readiness.",
+        "grantsFitAcceptance": false,
+        "grantsAppearanceAcceptance": false
+      },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.9727828502655029,
-          1.0559940338134766
+          0.9734007120132446,
+          1.054686427116394
         ],
         "nearestNormalSignedDistanceM": {
           "minimum": 0.003952310807193271,
-          "maximum": 0.015928672037262004
+          "maximum": 0.012934384303662227
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 613,
+        "belowCombinedCollisionMarginVertexCount": 1027,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
       "preBakeMeshSha256": "942c35efb02136157906efdc00c09475e2885a0d6873e54600aa42ee61246e0d",
-      "evaluatedFrameMeshSha256": "913c85a9a08b0ce957bdfb6c51e3ba89e90bffcb099eef7ebcb83bab3f61d907",
-      "settledMeshSha256": "913c85a9a08b0ce957bdfb6c51e3ba89e90bffcb099eef7ebcb83bab3f61d907",
+      "evaluatedFrameMeshSha256": "99692cd6ac46103a3b5b87d447114ec91fc919830b3b9fe610f7033c465bd22b",
+      "settledMeshSha256": "08ddade8567963d5e3e3087331443b73859cbc97e4b8e5426cffebf7352722ce",
       "geometryChanged": true
     },
     {
@@ -55,53 +80,52 @@
       "pinVertexCount": 80,
       "frameStart": 1,
       "frameEnd": 16,
-      "componentBending": {
+      "componentBendingHypothesis": {
         "stiffness": 20.0,
         "maximum": 20.0,
         "model": "ANGULAR",
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-035821af6d70f9c0.json",
-        "evidenceSha256": "035821af6d70f9c0d5aef54803f1fb87e5164b8eef9659324bcb659afa499a59",
-        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated overskirt bending comparison at stiffness 20 after the current shorts seat-rise pattern change and with measured Neutral contour anchors. Diagnostic geometry only; no fit, pose, or visual acceptance.",
+        "reason": "The uniform 190 mm hem trial was rejected because it made the standing skirt too long while only slightly improving seated/crouched coverage. Re-run stiffness 20 as a hypothesis on the revised short rear/side panels and center-front apron, with forward-thigh weight transfer; the cloth stage records measured settings and output hashes for this exact solve.",
+        "evidenceBoundary": "One native Blender 4.4.3 16-frame trial on the revised short rear/side hem and tapered forward apron. This is parameter-trial evidence only; no dynamic coverage, penetration, fit, motion, visual appearance, or release acceptance.",
         "grantsFitAcceptance": false
       },
       "pinMethod": "canonical shared seam vertices",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.5995782613754272,
+          0.43957826495170593,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
           "minimum": 0.006258426310523646,
-          "maximum": 0.1451066953522968
+          "maximum": 0.1596769061870873
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 4,
+        "belowCombinedCollisionMarginVertexCount": 5,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.5418339967727661,
+          0.41576746106147766,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.006186715388139419,
-          "maximum": 0.05742883787024766
+          "minimum": 0.006063787262974074,
+          "maximum": 0.09789263131096959
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 37,
+        "belowCombinedCollisionMarginVertexCount": 26,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "928e04907982513286a635e1231f8dfa05b8f45a487a9dc15185f67da9a47f31",
-      "evaluatedFrameMeshSha256": "1531dc079ef3a4d485d6a29d3f6fa2481d3688b698fd7656f128ce7bb8fd0c24",
-      "settledMeshSha256": "1531dc079ef3a4d485d6a29d3f6fa2481d3688b698fd7656f128ce7bb8fd0c24",
+      "preBakeMeshSha256": "9f8dc28e0e8083f9783264560f662deeb3646975727cc757eb60b6cd7b1fe118",
+      "evaluatedFrameMeshSha256": "10619cc081b3c385eb7065a716de8c5995323d06c94b735270d50d3910135a1a",
+      "settledMeshSha256": "10619cc081b3c385eb7065a716de8c5995323d06c94b735270d50d3910135a1a",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "f2028a52a336925a01cb954e3e8f5d1b3f941345feb88ff0ad62db60f59ba7ce",
-  "constructionSha256": "17a1c7255e4cb440c0c8da3a24608e648c930d4b4158a6963526cc062882f7bd",
+  "sourceBlendSha256": "c92cec7ba7556a24c5d5af9dc359872220d82e5f9f2eafa1b1bbb82be83ddd78",
+  "constructionSha256": "5c112cc456f4334a465d7c8503bef5b7d13dd8ab80def62a42a77727816fcad2",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "4d8795f6ff65d4d4ae7821f51ac68443f9f5cd1aafdba839e25999b151072f50",
+  "candidateSha256": "248f9592b9c2b53660a2262b200ec2304c057b38709155691b0af77a77ba726d",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
