@@ -37,9 +37,9 @@
     "vrchatRuntime": "UNVERIFIED"
   },
   "completionGates": {
-    "blender": "PASS",
-    "editableSource": "PASS",
-    "fbx": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
     "prefabDeclared": "PASS",
     "fiveViewEvidence": "PASS",
     "poseEvidence": "PASS",
@@ -55,5 +55,25 @@
       "Unity Static was not executable in the isolated origin/main worktree because the project has compiler errors for missing VRChat SDK and Modular Avatar namespaces; see Evidence/Build/unity-compile.log and candidate-audit.json.",
       "VRChat runtime was not executed and is not claimed."
     ]
+  },
+  "gateEvidenceCorrections": {
+    "completionGates.blender": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.blender was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.editableSource": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.editableSource was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.fbx": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.fbx was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    }
   }
 }

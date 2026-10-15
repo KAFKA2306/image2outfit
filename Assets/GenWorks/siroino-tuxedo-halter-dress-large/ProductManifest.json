@@ -35,8 +35,8 @@
     "editableSource": "PASS",
     "fbx": "PASS",
     "prefabDeclared": "PASS",
-    "fiveViewEvidence": "PASS",
-    "poseEvidence": "PASS",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
     "visualAppearanceReview": "PENDING",
     "researchTrial": "PASS",
     "unityImport": "OUT_OF_SCOPE",
@@ -56,5 +56,19 @@
     "multiview": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/siroino-tuxedo-halter-dress-large-multiview.webp",
     "poseReview": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/siroino-tuxedo-halter-dress-large-pose-review.webp",
     "buildReport": "Assets/GenWorks/siroino-tuxedo-halter-dress-large/Evidence/Build/product-build-report.json"
+  },
+  "gateEvidenceCorrections": {
+    "technicalGates.fiveViewEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.fiveViewEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/front.png, Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/back.png, Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/three-quarter.png",
+      "correctedOn": "2026-10-15"
+    },
+    "technicalGates.poseEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.poseEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/neutral.png, Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/arms-up.png, Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/arm-cross.png, Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/crouch.png, Assets/GenWorks/siroino-tuxedo-halter-dress-large/Previews/Poses/sit.png",
+      "correctedOn": "2026-10-15"
+    }
   }
 }

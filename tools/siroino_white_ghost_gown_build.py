@@ -16,6 +16,7 @@ from pathlib import Path
 
 import bpy
 
+import gate_evidence
 import genworks_product_common as g
 import render_evidence_bootstrap  # noqa: F401  # installs render-post metadata hook
 import siroino_strappy_knit_build as base
@@ -583,8 +584,10 @@ def build_manifest(
             "editableSource": "PASS" if paths.blend_path.is_file() else "FAIL",
             "fbx": "PASS" if paths.fbx_path.is_file() else "FAIL",
             "prefabDeclared": "PASS" if paths.prefab_path.is_file() else "FAIL",
-            "fiveViewEvidence": "PASS",
-            "poseEvidence": "PASS",
+            "fiveViewEvidence": gate_evidence.view_gate_status(
+                ROOT, job["productRoot"]
+            ),
+            "poseEvidence": gate_evidence.pose_gate_status(ROOT, job["productRoot"]),
             "visualAppearanceReview": "PENDING",
             "researchTrial": "PASS",
             "unityImport": "OUT_OF_SCOPE",

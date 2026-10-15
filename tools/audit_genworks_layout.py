@@ -10,6 +10,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+import gate_evidence
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "config" / "genworks-layout.json"
 
@@ -167,6 +169,19 @@ def audit(root: Path = ROOT, config_path: Path = DEFAULT_CONFIG) -> dict[str, An
                         f"manifest field {field} must stay inside its product root",
                     )
                 )
+
+    handoff_policy, release_policy = gate_evidence.load_policies(root)
+    for manifest_path, data in manifests:
+        for row in gate_evidence.violations(data, handoff_policy, release_policy, root):
+            findings.append(
+                Finding(
+                    "error",
+                    "unbacked-pass-gate",
+                    relative(manifest_path, root),
+                    f"{row['section']}.{row['gate']} is {row['declared']} but: "
+                    + "; ".join(row["reasons"]),
+                )
+            )
 
     allowed_external = tuple(config["allowedExternalAssetRoots"])
     forbidden_roots = tuple(config.get("forbiddenAssetRoots", []))

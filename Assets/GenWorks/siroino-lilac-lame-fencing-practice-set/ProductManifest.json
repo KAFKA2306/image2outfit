@@ -217,13 +217,27 @@
   },
   "completionGates": {
     "blender": "FAIL",
-    "editableSource": "PASS",
-    "fbx": "PASS",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
     "prefabDeclared": "FAIL",
     "fiveViewEvidence": "PASS",
     "poseEvidence": "PASS",
     "visualAppearanceReview": "FAIL",
     "researchTrial": "PASS"
   },
-  "candidateState": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Candidate/candidate-state.json"
+  "candidateState": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Candidate/candidate-state.json",
+  "gateEvidenceCorrections": {
+    "completionGates.editableSource": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.editableSource was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.fbx": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.fbx was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    }
+  }
 }

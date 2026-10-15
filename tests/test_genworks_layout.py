@@ -6,7 +6,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-TOOLS = Path(__file__).resolve().parents[1] / "tools"
+ROOT = Path(__file__).resolve().parents[1]
+TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
 
 import audit_genworks_layout
@@ -50,6 +51,10 @@ class GenWorksLayoutTest(unittest.TestCase):
         (self.root / "config" / "genworks-layout.json").write_text(
             json.dumps(CONFIG), encoding="utf-8"
         )
+        for name in ("genworks-handoff-policy.json", "release-policy.json"):
+            (self.root / "config" / name).write_text(
+                (ROOT / "config" / name).read_text(encoding="utf-8"), encoding="utf-8"
+            )
 
     def tearDown(self) -> None:
         self.temporary.cleanup()

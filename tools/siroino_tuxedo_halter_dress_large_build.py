@@ -11,6 +11,7 @@ from pathlib import Path
 
 import bpy
 
+import gate_evidence
 import genworks_product_common as g
 import siroino_strappy_knit_build as base
 from tuxedo_halter_components import (
@@ -664,8 +665,10 @@ def main() -> int:
             "editableSource": "PASS" if blend_path.is_file() else "FAIL",
             "fbx": "PASS" if fbx_path.is_file() else "FAIL",
             "prefabDeclared": "PASS" if prefab_path.is_file() else "FAIL",
-            "fiveViewEvidence": "PASS",
-            "poseEvidence": "PASS",
+            "fiveViewEvidence": gate_evidence.view_gate_status(
+                ROOT, job["productRoot"]
+            ),
+            "poseEvidence": gate_evidence.pose_gate_status(ROOT, job["productRoot"]),
             "visualAppearanceReview": "PENDING",
             "researchTrial": "PASS",
             "unityImport": "OUT_OF_SCOPE",
