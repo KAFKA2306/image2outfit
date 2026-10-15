@@ -17,11 +17,15 @@ at least one evidence file, as product_manifest_gate.py already requires.
 
 from __future__ import annotations
 
+import hashlib
+import json
+import re
 from pathlib import Path
 from typing import Any
 
-from contract_io import SHA256, digest, read_json, repo_path, required_pose_paths
-
+# Deliberately not importing contract_io: its write path pulls in the
+# product_manifest_state chain, which breaks the product import-depth audit.
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
 ROOT = Path(__file__).resolve().parents[1]
 PASS = "PASS"
 UNVERIFIED = "UNVERIFIED"
@@ -46,16 +50,46 @@ OUTPUT_CLAIMS: dict[str, tuple[tuple[str, ...], ...]] = {
 }
 
 
+def _read_json(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(value, dict):
+        raise ValueError(f"JSON root must be an object: {path}")
+    return value
+
+
+def _digest(path: Path) -> str:
+    result = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            result.update(block)
+    return result.hexdigest()
+
+
+def _repo_path(root: Path, value: str) -> Path:
+    candidate = (root / value).resolve()
+    resolved_root = root.resolve()
+    if candidate != resolved_root and resolved_root not in candidate.parents:
+        raise ValueError(f"path escapes repository: {value}")
+    return candidate
+
+
 def load_policies(root: Path = ROOT) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return (handoff policy, release policy) read from the tracked config."""
-    handoff = read_json(root / "config" / "genworks-handoff-policy.json")
-    release = read_json(root / "config" / "release-policy.json")
+    handoff = _read_json(root / "config" / "genworks-handoff-policy.json")
+    release = _read_json(root / "config" / "release-policy.json")
     return handoff, release
 
 
 def canonical_view_paths(product_root: str, release: dict[str, Any]) -> list[str]:
     views = release["minimumPreview"]["requiredViews"]
     return [f"{product_root}/Previews/{view}.png" for view in views]
+
+
+def canonical_pose_paths(product_root: str, release: dict[str, Any]) -> list[str]:
+    poses = release["requiredPoses"]
+    if not isinstance(poses, list) or not poses:
+        raise ValueError("release-policy.requiredPoses must be a non-empty list")
+    return [f"{product_root}/Previews/Poses/{pose}.png" for pose in poses]
 
 
 def _dig(manifest: dict[str, Any], keys: tuple[str, ...]) -> Any:
@@ -74,9 +108,7 @@ def claims_for(
     if gate in VIEW_GATES:
         return canonical_view_paths(product_root, release)
     if gate in POSE_GATES:
-        return list(
-            required_pose_paths({"productRoot": product_root}, release).values()
-        )
+        return canonical_pose_paths(product_root, release)
     claims: list[str] = []
     for keys in OUTPUT_CLAIMS.get(gate, ()):
         value = _dig(manifest, keys)
@@ -87,7 +119,7 @@ def claims_for(
 
 def _existing(root: Path, value: str) -> Path | None:
     try:
-        path = repo_path(root, value)
+        path = _repo_path(root, value)
     except ValueError:
         return None
     return path if path.is_file() else None
@@ -125,7 +157,7 @@ def _hashed_row(root: Path, name: str, entry: dict[str, Any]) -> dict[str, Any] 
         reasons.append(f"claimed evidence is missing: {value}")
     if not isinstance(expected, str) or not SHA256.fullmatch(expected):
         reasons.append("evidenceSha256 must be a lowercase SHA-256")
-    elif path is not None and digest(path) != expected:
+    elif path is not None and _digest(path) != expected:
         reasons.append(f"evidenceSha256 mismatch: {value}")
     if not reasons:
         return None
@@ -193,6 +225,4 @@ def view_gate_status(root: Path, product_root: str) -> str:
 def pose_gate_status(root: Path, product_root: str) -> str:
     """Value a build script may record for poseEvidence: PASS only if all poses exist."""
     release = load_policies(root)[1]
-    return _status(
-        root, list(required_pose_paths({"productRoot": product_root}, release).values())
-    )
+    return _status(root, canonical_pose_paths(product_root, release))
