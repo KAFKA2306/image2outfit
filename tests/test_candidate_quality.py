@@ -79,7 +79,9 @@ class CandidateQualityTests(unittest.TestCase):
         self.assertEqual(review["decision"], QUALITY_REJECT)
 
     def test_direct_review_rejects_inconsistent_status_and_decision(self) -> None:
-        with self.assertRaisesRegex(ValueError, "inconsistent"):
+        with self.assertRaisesRegex(
+            ValueError, "visual review contract violation at decision"
+        ):
             validate_visual_review(
                 {
                     "schemaVersion": 1,
@@ -138,6 +140,54 @@ class CandidateQualityTests(unittest.TestCase):
             ),
             "WORKING",
         )
+
+    def test_direct_review_rejects_missing_required_key(self) -> None:
+        with self.assertRaisesRegex(ValueError, "inspectedImages"):
+            validate_visual_review(
+                {
+                    "schemaVersion": 1,
+                    "productId": "ghost-gown",
+                    "status": "PASS",
+                    "decision": "PASS",
+                    "reviewMethod": "direct-image-inspection",
+                    "reviewedRevision": "v1",
+                },
+                product_id="ghost-gown",
+                revision_id="v1",
+            )
+
+    def test_direct_review_rejects_wrong_digest_type(self) -> None:
+        with self.assertRaisesRegex(ValueError, "inspectedImages"):
+            validate_visual_review(
+                {
+                    "schemaVersion": 1,
+                    "productId": "ghost-gown",
+                    "status": "PASS",
+                    "decision": "PASS",
+                    "reviewMethod": "direct-image-inspection",
+                    "reviewedRevision": "v1",
+                    "inspectedImages": {"front.png": "a" * 63},
+                },
+                product_id="ghost-gown",
+                revision_id="v1",
+            )
+
+    def test_geometry_report_without_metrics_is_rejected(self) -> None:
+        with self.assertRaisesRegex(ValueError, "metrics"):
+            geometry_quality({"passed": True})
+
+    def test_quality_schemas_are_valid_draft_2020_12(self) -> None:
+        from jsonschema import Draft202012Validator
+
+        from quality_schema import load_schema
+
+        for name in (
+            "visual-review.schema.v1.json",
+            "geometry-report.schema.v1.json",
+            "human-evidence.schema.v2.json",
+        ):
+            with self.subTest(schema=name):
+                Draft202012Validator.check_schema(load_schema(name))
 
     def test_candidate_status_rejects_unknown_quality_decisions(self) -> None:
         with self.assertRaisesRegex(ValueError, "unknown quality decision"):

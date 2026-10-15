@@ -6,12 +6,21 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from quality_schema import load_schema, path_label, violations
+
 QUALITY_PASS = "PASS"
 QUALITY_REJECT = "REJECT"
 QUALITY_PENDING = "PENDING"
-VALID_QUALITY_DECISIONS = frozenset(
-    {QUALITY_PASS, QUALITY_REJECT, QUALITY_PENDING}
-)
+VALID_QUALITY_DECISIONS = frozenset({QUALITY_PASS, QUALITY_REJECT, QUALITY_PENDING})
+
+
+def _require_valid(schema_name: str, instance: Any, label: str) -> None:
+    """Raise ValueError at the first violation of a contracts/quality schema."""
+    errors = violations(load_schema(schema_name), instance)
+    if errors:
+        first = errors[0]
+        where = path_label(*first.absolute_path) or "$"
+        raise ValueError(f"{label} contract violation at {where}: {first.message}")
 
 
 def _validate_quality_decision(value: str, label: str) -> None:
@@ -21,9 +30,8 @@ def _validate_quality_decision(value: str, label: str) -> None:
 
 def geometry_quality(report: Mapping[str, Any]) -> dict[str, Any]:
     """Return a quality decision without conflating rejection with execution failure."""
-    metrics = report.get("metrics")
-    if not isinstance(metrics, Mapping):
-        raise ValueError("geometry report metrics are missing")
+    _require_valid("geometry-report.schema.v1.json", report, "geometry report")
+    metrics = report["metrics"]
 
     gate = report.get("geometryGate")
     failed_checks: list[str] = []
@@ -39,9 +47,7 @@ def geometry_quality(report: Mapping[str, Any]) -> dict[str, Any]:
         "unweightedVertices==0": metrics.get("unweightedVertices") == 0,
         "degenerateTriangles==0": metrics.get("degenerateTriangles") == 0,
     }
-    failed_checks.extend(
-        name for name, passed in fallback_checks.items() if not passed
-    )
+    failed_checks.extend(name for name, passed in fallback_checks.items() if not passed)
     failed_checks = sorted(set(failed_checks))
     passed = not failed_checks
     return {
@@ -59,56 +65,26 @@ def validate_visual_review(
     revision_id: str,
 ) -> dict[str, Any]:
     """Validate a direct-image review and normalize PASS/REJECT semantics."""
-    required = {
-        "schemaVersion": 1,
-        "productId": product_id,
-        "reviewMethod": "direct-image-inspection",
-        "reviewedRevision": revision_id,
-    }
+    _require_valid("visual-review.schema.v1.json", review, "visual review")
+
     mismatches = {
         key: {"found": review.get(key), "expected": expected}
-        for key, expected in required.items()
+        for key, expected in {
+            "productId": product_id,
+            "reviewedRevision": revision_id,
+        }.items()
         if review.get(key) != expected
     }
     if mismatches:
         raise ValueError(f"visual review contract mismatch: {mismatches}")
 
-    status = review.get("status")
-    decision = review.get("decision")
-    expected_decision = {
-        "PASS": QUALITY_PASS,
-        "REJECTED": QUALITY_REJECT,
-    }.get(status)
-    if expected_decision is None:
-        raise ValueError("visual review status must be PASS or REJECTED")
-    if decision != expected_decision:
-        raise ValueError(
-            "visual review decision is inconsistent with status: "
-            f"{decision!r} != {expected_decision!r}"
-        )
-
-    inspected = review.get("inspectedImages")
-    if not isinstance(inspected, Mapping) or not inspected:
-        raise ValueError("visual review inspectedImages must be a non-empty object")
-    if not all(isinstance(path, str) and path for path in inspected):
-        raise ValueError("visual review inspectedImages paths must be non-empty strings")
-    if not all(
-        isinstance(digest, str) and len(digest) == 64
-        for digest in inspected.values()
-    ):
-        raise ValueError("visual review inspectedImages values must be SHA-256 digests")
-
-    findings = review.get("findings", [])
-    if not isinstance(findings, list):
-        raise ValueError("visual review findings must be a list")
-    if expected_decision == QUALITY_REJECT and not findings:
-        raise ValueError("a rejected visual review must record at least one finding")
-
+    status = review["status"]
+    expected_decision = QUALITY_PASS if status == "PASS" else QUALITY_REJECT
     return {
         "decision": expected_decision,
         "status": str(status),
-        "inspectedImages": dict(inspected),
-        "findings": list(findings),
+        "inspectedImages": dict(review["inspectedImages"]),
+        "findings": list(review.get("findings", [])),
     }
 
 
