@@ -11,9 +11,7 @@ from quality_schema import load_schema, path_label, violations
 QUALITY_PASS = "PASS"
 QUALITY_REJECT = "REJECT"
 QUALITY_PENDING = "PENDING"
-VALID_QUALITY_DECISIONS = frozenset(
-    {QUALITY_PASS, QUALITY_REJECT, QUALITY_PENDING}
-)
+VALID_QUALITY_DECISIONS = frozenset({QUALITY_PASS, QUALITY_REJECT, QUALITY_PENDING})
 
 
 def _require_valid(schema_name: str, instance: Any, label: str) -> None:
@@ -49,9 +47,7 @@ def geometry_quality(report: Mapping[str, Any]) -> dict[str, Any]:
         "unweightedVertices==0": metrics.get("unweightedVertices") == 0,
         "degenerateTriangles==0": metrics.get("degenerateTriangles") == 0,
     }
-    failed_checks.extend(
-        name for name, passed in fallback_checks.items() if not passed
-    )
+    failed_checks.extend(name for name, passed in fallback_checks.items() if not passed)
     failed_checks = sorted(set(failed_checks))
     passed = not failed_checks
     return {

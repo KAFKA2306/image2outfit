@@ -123,9 +123,7 @@ def _defect_rules(common: dict[str, Any]) -> dict[str, Any]:
                 },
                 "then": {
                     "required": ["acceptanceRationale"],
-                    "properties": {
-                        "acceptanceRationale": {"$ref": "#/$defs/text"}
-                    },
+                    "properties": {"acceptanceRationale": {"$ref": "#/$defs/text"}},
                 },
             },
         ]
@@ -375,7 +373,9 @@ def validate(
                     required_assets.append(name)
             if value.get("criticalPenetrations") != 0:
                 item_failures.append("criticalPenetrations")
-            item_failures.extend(_reviewed_assets(value, required_assets, candidate_files))
+            item_failures.extend(
+                _reviewed_assets(value, required_assets, candidate_files)
+            )
 
         elif kind == "vrchat-runtime-review":
             screenshot = value.get("runtimeScreenshot")
