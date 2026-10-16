@@ -6,74 +6,76 @@
   "reviewer": "Codex direct image inspection",
   "status": "REJECTED",
   "decision": "REJECT",
-  "inspectedImages": {    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "822ea5d3a6fa3cf0e4738cde4f75bd6c87f2a2bbb8794599ed67f3a89046d703",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "9fb947e8441897729b7c97937a3ead948b4b1ea0e2473f379bb2e703ff5ba42e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "a4dc5a59174035db06ce0122307a9d4613d3d5a1597e85352a465490437ed264",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "cefd2c281e93a35cf1f16930a10fd92316e5b7c0ecc8bf8b64de7772f1b168a1",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "401ddda21ccb60779cdcc1f802dabe4ae3bbb012cc6ff5e134e6961651029497",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "a1da73c4abd3fdbd675caf4b70800a6480b8bb8805e56bec4c4843da26427520",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "26b36f9cfee0f2ac5e1f4d78f3b9288bc99542c49f46074383e684cd996da4d4",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "a9ea881976debec3739b94227be8fc7ed2d2299df8d361063c8c40a439abbe02",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "629a0b9d49280cd4f65c762c1e2e9ea654ab68286b0ae95684337d0ad023a7da",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "1adf4983225e77a6b03388f6cb68ffa00d28a9f26428ea74ef340676c5b52463",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "4fcd37d7cfaad8a2a8b945e8c8f52731bc2cfdd7ae12febe7fc64fd80fceee30"
-  },
-  "currentMeasuredPoseCoverage": {    "diagnosticPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/pose-coverage-diagnostic.json",
-    "diagnosticSha256": "8bcf51ee1f2c02796e29f4c2edc1f5d6f835ca6351911dc655c0a48fca2e7225",
-    "weightedPrototypeSha256": "839013cf8380d700cd03b483c819bd3521fd3651c6eb4acd9e12c76cfed0ef3f",
-    "method": "same-pose-body-surface-ray-coverage-v1",
-    "measuredZones": {
-      "neutral": {
-        "leftUpperThigh": 0.7593,
-        "rightUpperThigh": 0.7627,
-        "posteriorOverskirt": 0.6719
-      },
-      "crouch": {
-        "leftUpperThigh": 0.5797,
-        "rightUpperThigh": 0.574,
-        "posteriorOverskirt": 0.685
-      },
-      "sit": {
-        "leftUpperThigh": 0.4599,
-        "rightUpperThigh": 0.4814,
-        "posteriorOverskirt": 0.7083
-      }
+  "inspectedImages": {
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "6360c8ec1562dcee94e7daa96d9c6a057d8d353f1b52c6a043ab4c04a4c70e18",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "f3d02698e8f0a4dae6941076ff9a0df68f1482c0daa29a14ad071e609031e8dd",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "a59dafbaf403fd0be4261902dcf92c10b665b46bf93aa388cc353e3057807e5f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "035f78ba4943b61e9c49d2b653302685c0b3242d61b8bce0ac6d3e608dcf1064",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "a3b23da87b79e69a9b33f8832f0572fe3be81dda0328c2c38cf4b3db2a6d037b",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "4a1e8d31eaba7212b13f919bb95cd1f8f80414127f2e4efc77746fca4c533da2",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "4800c93c7e9fabbbf47b592c56c0957cfee499fa1fb57d72089b62cf4c280682",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "fa671408f1d776acb4d0487e32bab57ad65c8f23fc50d5b0be41719ac9b26836",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "576aa71e005e56ab6fdd7ae16f6c0b6a2a0ae15c10a678605f16d14562d4e140",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "2a80d50e79261ee35662a898b219dc3ad9de3a5e75fcbdaa59153b8fbac17933",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "9956c025182ca140360c408c82a9f23007eb5db948ee0da5cec5a1d0b8213cb4"
     },
-    "grantsFitAcceptance": false,
-    "grantsVisualAcceptance": false
-  },
+  "currentMeasuredPoseCoverage": {
+      "diagnosticPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/pose-coverage-diagnostic.json",
+      "diagnosticSha256": "9ab187b259d02573e62a08ddd05661911762ef3e23736797d9cb9bce4f2ca265",
+      "weightedPrototypeSha256": "8d3196dd6da01a3de1c532ccb88d27d9d221a543ee17d459f83cc07324e023c6",
+      "method": "same-pose-body-surface-ray-coverage-v1",
+      "measuredZones": {
+        "neutral": {
+          "leftUpperThigh": 0.7593220339,
+          "rightUpperThigh": 0.7627118644,
+          "posteriorOverskirt": 0.6719242902
+        },
+        "crouch": {
+          "leftUpperThigh": 0.5593220339,
+          "rightUpperThigh": 0.5581920904,
+          "posteriorOverskirt": 0.6850152905
+        },
+        "sit": {
+          "leftUpperThigh": 0.4497175141,
+          "rightUpperThigh": 0.4576271186,
+          "posteriorOverskirt": 0.7083333333
+        }
+      },
+      "grantsFitAcceptance": false,
+      "grantsVisualAcceptance": false
+    },
   "findings": [
-    {
-      "severity": "BLOCKER",
-      "code": "STYLING_FIDELITY",
-      "description": "Direct inspection of the current front, back and three-quarter renders: the jacket still reads mainly as plain ivory with a broad flat diagonal lavender band and sparse buttons; tailored seam detailing and clear rear finishing remain absent."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "SLEEVE_SURFACE_QUALITY",
-      "description": "Direct inspection of arms-up and arm-cross: the lavender elbow diamonds remain oversized, with angular and corrugated folds around the shoulders, underarms and sleeves."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "POSE_COVERAGE",
-      "description": "The bilateral center-hem weight trial measurably raises upper-thigh ray coverage to crouch 0.5797/0.5740 and sit 0.4599/0.4814 (left/right), from 0.4384/0.426 and 0.3424/0.3322 in the prior projection trial. Direct inspection still shows uncovered shorts and large rigid triangular side flaps in crouch and sit; the skirt also hangs near the knees while standing. Improvement is measured, but exposure and side flares remain a visual blocker; prototype metrics grant no fit acceptance."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "POSE_DRAPE",
-      "description": "Direct inspection of prone: the garment remains collapsed into a stiff, irregular fan with distorted sleeve and skirt surfaces; the bilateral center-hem weighting does not resolve the drape defect."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "SIDE_ASSEMBLY_ARTIFACTS",
-      "description": "Direct inspection of left and right side renders: skirt folds remain faceted and the waist-to-skirt transition is abrupt. The front projection is removed, but crouch and sit still produce large angular side flaps rather than a sewn-looking moving contour."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "REAR_DESIGN_DETAIL",
-      "description": "Direct inspection of back: the rear remains largely featureless ivory without clear rear finishing or waist-adjustment detail."
-    }
-  ],
+      {
+        "severity": "BLOCKER",
+        "code": "STYLING_FIDELITY",
+        "description": "Direct inspection of current front, back and three-quarter: jacket remains plain ivory with a broad flat diagonal lavender panel, sparse buttons and oversized elbow diamonds; rear has no clear tailoring or finishing."
+      },
+      {
+        "severity": "BLOCKER",
+        "code": "SKIRT_LENGTH_AND_FACETING",
+        "description": "Standing skirt remains long, near the knee, with strongly faceted pleats and an abrupt waist transition; proportions and surface still diverge from the short pleated concept."
+      },
+      {
+        "severity": "BLOCKER",
+        "code": "POSE_COVERAGE",
+        "description": "Crouch and sit directly show exposed fitted shorts and large rigid triangular side flaps. Current same-pose ray coverage for the overskirt is 0.5593/0.5582 on crouched left/right upper thighs and 0.4497/0.4576 seated. The 55 mm bilateral center fade did not improve the prior measurement and remains prototype-only."
+      },
+      {
+        "severity": "BLOCKER",
+        "code": "POSE_DRAPE",
+        "description": "Direct prone inspection shows the skirt and torso compressed into a broad irregular fan with angular folds; orderly drape is not achieved."
+      },
+      {
+        "severity": "BLOCKER",
+        "code": "SLEEVE_SURFACE_QUALITY",
+        "description": "Arms-up and arm-cross still show sleeve and underarm faceting, and elbow diamonds read as large surface decals rather than restrained quilted patches."
+      },
+      {
+        "severity": "BLOCKER",
+        "code": "REAR_AND_SIDE_FINISH",
+        "description": "Back and side views show a featureless rear panel and abrupt waist-to-skirt transitions with faceted side folds; no finished back adjustment detail is visible."
+      }
+    ],
   "sourceEvidence": {
     "currentPrototypeMotif": "Filled lavender elbow inset is enabled beneath the surface-bound diamond outline and crossing lines. Direct review finds it visible but oversized; it remains prototype-only, with UV NOT_CREATED and no fit acceptance."
   },
@@ -4156,5 +4158,53 @@
     "diagnosticSha256": "8bcf51ee1f2c02796e29f4c2edc1f5d6f835ca6351911dc655c0a48fca2e7225",
     "weightedPrototypeSha256": "839013cf8380d700cd03b483c819bd3521fd3651c6eb4acd9e12c76cfed0ef3f",
     "evidenceBoundary": "Direct appearance and prototype coverage only. Appearance is rejected; fit, Unity, VRChat, package and release are not accepted."
+  }
+,
+  "currentDirectInspectionAfterWideCenterFade": {
+    "reviewedAt": "2026-10-16T19:47:48Z",
+    "sourceChange": "Widened the front overskirt bilateral center fade from 5 mm to 55 mm half-width and increased side-specific fade width to 95 mm, while reducing center hem transfer 0.32 to 0.18. The hypothesis aimed to spread deformation across more mesh rows without rest projection.",
+    "currentImageHashes": {
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "6360c8ec1562dcee94e7daa96d9c6a057d8d353f1b52c6a043ab4c04a4c70e18",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "f3d02698e8f0a4dae6941076ff9a0df68f1482c0daa29a14ad071e609031e8dd",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "a59dafbaf403fd0be4261902dcf92c10b665b46bf93aa388cc353e3057807e5f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "035f78ba4943b61e9c49d2b653302685c0b3242d61b8bce0ac6d3e608dcf1064",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "a3b23da87b79e69a9b33f8832f0572fe3be81dda0328c2c38cf4b3db2a6d037b",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "4a1e8d31eaba7212b13f919bb95cd1f8f80414127f2e4efc77746fca4c533da2",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "4800c93c7e9fabbbf47b592c56c0957cfee499fa1fb57d72089b62cf4c280682",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "fa671408f1d776acb4d0487e32bab57ad65c8f23fc50d5b0be41719ac9b26836",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "576aa71e005e56ab6fdd7ae16f6c0b6a2a0ae15c10a678605f16d14562d4e140",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "2a80d50e79261ee35662a898b219dc3ad9de3a5e75fcbdaa59153b8fbac17933",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "9956c025182ca140360c408c82a9f23007eb5db948ee0da5cec5a1d0b8213cb4"
+    },
+    "weightedPrototypeSha256": "8d3196dd6da01a3de1c532ccb88d27d9d221a543ee17d459f83cc07324e023c6",
+    "fbxSha256": "71fe39b14ec83d7dc476e14db4756068ac08589d2b1d42b1d4424aa4dbea8bc9",
+    "diagnosticSha256": "9ab187b259d02573e62a08ddd05661911762ef3e23736797d9cb9bce4f2ca265",
+    "measuredPoseCoverage": {
+      "neutral": {
+        "leftUpperThigh": 0.7593220339,
+        "rightUpperThigh": 0.7627118644,
+        "posteriorOverskirt": 0.6719242902
+      },
+      "crouch": {
+        "leftUpperThigh": 0.5593220339,
+        "rightUpperThigh": 0.5581920904,
+        "posteriorOverskirt": 0.6850152905
+      },
+      "sit": {
+        "leftUpperThigh": 0.4497175141,
+        "rightUpperThigh": 0.4576271186,
+        "posteriorOverskirt": 0.7083333333
+      }
+    },
+    "allElevenImagesDirectlyInspected": true,
+    "decision": "REJECT",
+    "directObservations": [
+      "Standing front remains a plain ivory jacket with a broad lavender diagonal and sparse buttons; back is featureless and skirt falls near the knees with conspicuously faceted pleats.",
+      "Crouch shows exposed shorts and large triangular side flaps; sit exposes even more of the shorts with rigid triangular panels extending behind and beside the thighs.",
+      "The widened bilateral center fade reduced measured upper-thigh coverage from the prior trial (crouch about 0.56/0.56 vs 0.58/0.57; sit 0.45/0.46 vs 0.46/0.48). This hypothesis did not improve the measured zone.",
+      "Prone shows a broad compressed fan with irregular/angular surfaces; arms-up and arm-cross retain sleeve/underarm faceting and oversized elbow diamonds.",
+      "These are prototype ray-coverage values and direct render observations only. They do not establish fit, Shape Keys, Unity/VRChat behavior, package readiness, or release."
+    ],
+    "evidenceBoundary": "Direct visual rejection and same-pose prototype coverage only; no fit acceptance, runtime verification, package authorization, or release acceptance."
   }
 }
