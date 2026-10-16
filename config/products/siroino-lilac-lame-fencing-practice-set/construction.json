@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v4-lilac-wider-forward-apron-20261016",
+  "designRevision": "v5-lilac-central-apron-thigh-support-20261016",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -187,9 +187,9 @@
       "forwardHemThighWeight": 0.90,
       "forwardCenterYM": -0.03788188099861145,
       "forwardFadeDistanceM": 0.14,
-        "centerlineHalfWidthM": 0.02,
-        "fullSideWeightWidthM": 0.06,
-      "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh. The previous 0.55 cap left crouch thigh coverage at about 27% and seated coverage at about 19%; raise only the forward apron hem cap to 0.90 while retaining pelvis-only waist weighting and the existing front-side fade. This parameter change is a measured prototype experiment, not calibrated weight or fit; regenerate the weighted mesh, remeasure posed coverage, and directly inspect cloth intersection and all rendered poses before any acceptance."
+        "centerlineHalfWidthM": 0.005,
+        "fullSideWeightWidthM": 0.035,
+      "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh. The 0.90 anterior hem cap and 1.25-radian apron spread still left substantial crouch/sit thigh exposure. Narrow only the lateral centerline dead zone from 20 mm to 5 mm and the full thigh-transfer threshold from 60 mm to 35 mm so more of the central front apron follows the thighs while preserving zero thigh influence exactly on the centerline and pelvis-only waist weighting. This is a bounded spatial-weight experiment, not calibrated weight or fit; regenerate the weighted mesh, remeasure posed coverage, and directly inspect cloth intersection and all rendered poses before any acceptance."
       }
     }
   ]
