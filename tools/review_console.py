@@ -30,6 +30,8 @@ STATES = (
 DEFAULT_VIEWS = ("front", "back", "left", "right", "three-quarter")
 FEATURED_PRODUCT = "siroino-lilac-lame-fencing-practice-set"
 IMAGE_SUFFIXES = (".png", ".webp", ".jpg", ".jpeg")
+CANONICAL_ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+CANONICAL_ZIP_MODE = 0o100644
 
 
 def load_json(path: Path, default: Any) -> Any:
@@ -525,23 +527,40 @@ def collect_downloads(root, workspace, output_dir, manifest, assets):
             output_dir / "downloads" / workspace.name / f"images-{fingerprint[:16]}.zip"
         )
         archive.parent.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
-            bundle.writestr(
+        with zipfile.ZipFile(
+            archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+        ) as bundle:
+            def write_member(name: str, content: bytes) -> None:
+                info = zipfile.ZipInfo(name, date_time=CANONICAL_ZIP_TIMESTAMP)
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.create_system = 3
+                info.external_attr = CANONICAL_ZIP_MODE << 16
+                bundle.writestr(
+                    info,
+                    content,
+                    compress_type=zipfile.ZIP_DEFLATED,
+                    compresslevel=9,
+                )
+
+            write_member(
                 "README.txt",
-                "Render images only; no usable VRChat outfit or fit/runtime approval.\n"
-                + workspace.name
-                + "\n",
+                (
+                    "Render images only; no usable VRChat outfit or fit/runtime approval.\n"
+                    + workspace.name
+                    + "\n"
+                ).encode("utf-8"),
             )
             for i, asset in enumerate(images):
                 source = (output_dir / asset.href).resolve()
                 if workspace.resolve() not in source.parents:
                     raise ValueError("Render download escapes the product workspace")
-                bundle.write(
-                    source,
+                write_member(
                     f"{i:02d}-{asset.kind}-{Path(asset.name).stem}{source.suffix}",
+                    source.read_bytes(),
                 )
-            bundle.writestr(
-                "images.json", json.dumps([asdict(a) for a in images], indent=2)
+            write_member(
+                "images.json",
+                json.dumps([asdict(a) for a in images], indent=2).encode("utf-8"),
             )
         downloads.append(
             {
