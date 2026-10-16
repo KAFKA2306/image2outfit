@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v6-lilac-forward-scoop-20261016",
+  "designRevision": "v7-lilac-bilateral-center-hem-20261016",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -174,10 +174,9 @@
       ],
       "evidenceBoundary": "Explicit provisional pelvis/leg surface window in rest coordinates. Prevent arm/hand nearest-surface transfer to displaced lower garment panels; no approved fit or runtime motion.",
       "weightProfile": {
-        "method": "hip-anchored-anterior-lateral-thigh-fade-v2",
+        "method": "hip-anchored-anterior-bilateral-center-hem-fade-v3",
         "pieceIds": [
-          "overskirt-front",
-          "overskirt-back"
+          "overskirt-front"
         ],
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
@@ -185,11 +184,12 @@
     "waistThighWeight": 0.0,
       "hemThighWeight": 0.0,
       "forwardHemThighWeight": 0.90,
+      "centerlineHemThighWeight": 0.32,
       "forwardCenterYM": -0.03788188099861145,
       "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.005,
         "fullSideWeightWidthM": 0.035,
-      "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh. The 0.90 anterior hem cap and 1.25-radian apron spread still left substantial crouch/sit thigh exposure. Narrow only the lateral centerline dead zone from 20 mm to 5 mm and the full thigh-transfer threshold from 60 mm to 35 mm so more of the central front apron follows the thighs while preserving zero thigh influence exactly on the centerline and pelvis-only waist weighting. This is a bounded spatial-weight experiment, not calibrated weight or fit; regenerate the weighted mesh, remeasure posed coverage, and directly inspect cloth intersection and all rendered poses before any acceptance."
+      "evidenceBoundary": "Prototype-only pose-weight hypothesis for the single front panel. With zero thigh weight along its centerline, the prior apron moved unevenly across the legs and bent into sharp triangular flares. This revision removes the 30 mm rest-space forward projection and blends up to 0.32 of the center-front hem weight equally to both thigh bones, fading to the existing one-sided thigh transfer across a 5 mm centerline band. It may stretch or pinch between independently moving legs; regenerate, measure crouch/sit coverage, and directly inspect all poses. No fit, appearance, or release acceptance is implied."
       }
     }
   ]

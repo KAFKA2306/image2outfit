@@ -72,7 +72,8 @@
               "method": {
                 "enum": [
                   "hip-anchored-lateral-thigh-fade-v1",
-                  "hip-anchored-anterior-lateral-thigh-fade-v2"
+                  "hip-anchored-anterior-lateral-thigh-fade-v2",
+                  "hip-anchored-anterior-bilateral-center-hem-fade-v3"
                 ]
               },
               "pieceIds": {
@@ -107,6 +108,11 @@
                 "maximum": 1
               },
               "forwardHemThighWeight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "centerlineHemThighWeight": {
                 "type": "number",
                 "minimum": 0,
                 "maximum": 1
@@ -146,6 +152,24 @@
                     "forwardHemThighWeight",
                     "forwardCenterYM",
                     "forwardFadeDistanceM"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "method": {
+                      "const": "hip-anchored-anterior-bilateral-center-hem-fade-v3"
+                    }
+                  },
+                  "required": ["method"]
+                },
+                "then": {
+                  "required": [
+                    "forwardHemThighWeight",
+                    "forwardCenterYM",
+                    "forwardFadeDistanceM",
+                    "centerlineHemThighWeight"
                   ]
                 }
               }

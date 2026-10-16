@@ -67,19 +67,22 @@ def main():
         profile = region.get("weightProfile")
         if profile is not None:
             profile_piece_ids = set(profile["pieceIds"])
-            if (profile["method"] not in {"hip-anchored-lateral-thigh-fade-v1", "hip-anchored-anterior-lateral-thigh-fade-v2"}
+            if (profile["method"] not in {"hip-anchored-lateral-thigh-fade-v1", "hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3"}
                     or not profile_piece_ids
                     or not profile_piece_ids.issubset(set(region["pieceIds"]))
                     or not 0 <= profile["waistThighWeight"] <= profile["hemThighWeight"] <= 1
                     or profile["centerlineHalfWidthM"] < 0
                     or profile["fullSideWeightWidthM"] <= profile["centerlineHalfWidthM"]):
                 raise ValueError("Invalid explicit prototype weight profile")
-            if profile["method"] == "hip-anchored-anterior-lateral-thigh-fade-v2":
+            if profile["method"] in {"hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3"}:
                 if (not math.isfinite(profile.get("forwardCenterYM", math.nan))
                         or not math.isfinite(profile.get("forwardFadeDistanceM", math.nan))
                         or profile["forwardFadeDistanceM"] <= 0
                         or not 0 <= profile.get("forwardHemThighWeight", math.nan) <= 1):
                     raise ValueError("Invalid anterior prototype weight profile")
+                if (profile["method"] == "hip-anchored-anterior-bilateral-center-hem-fade-v3"
+                        and not 0 <= profile.get("centerlineHemThighWeight", math.nan) <= 1):
+                    raise ValueError("Invalid bilateral center-hem prototype weight profile")
             for bone_name in (profile["hipBone"], profile["leftThighBone"], profile["rightThighBone"]):
                 if bone_name not in bones:
                     raise ValueError(f"Prototype weight profile bone is missing or non-deform: {bone_name}")
@@ -192,12 +195,18 @@ def main():
                 lateral_fraction = ((lateral-profile["centerlineHalfWidthM"])
                                     / (profile["fullSideWeightWidthM"]-profile["centerlineHalfWidthM"]))
                 thigh_weight = base_thigh * _smoothstep(lateral_fraction)
-                if profile["method"] == "hip-anchored-anterior-lateral-thigh-fade-v2":
+                centerline_thigh_weight = 0.0
+                if profile["method"] in {"hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3"}:
                     forward_fraction = _smoothstep(
                         (profile["forwardCenterYM"] - point.y) / profile["forwardFadeDistanceM"]
                     )
                     thigh_weight += profile["forwardHemThighWeight"] * hem_fraction * forward_fraction * _smoothstep(lateral_fraction)
                     thigh_weight = min(1.0, thigh_weight)
+                    if profile["method"] == "hip-anchored-anterior-bilateral-center-hem-fade-v3":
+                        center_width = profile["centerlineHalfWidthM"]
+                        center_fraction = 1.0 - _smoothstep(lateral/center_width if center_width > 0 else (1.0 if lateral > 0 else 0.0))
+                        centerline_thigh_weight = profile["centerlineHemThighWeight"] * hem_fraction * forward_fraction * center_fraction
+                        thigh_weight = max(thigh_weight, centerline_thigh_weight)
                 if point.x > center_x:
                     thigh_bone = profile["leftThighBone"] if left_is_positive_x else profile["rightThighBone"]
                     profile_accumulators[profile_key]["leftSideVertexCount"] += int(left_is_positive_x)
@@ -210,7 +219,14 @@ def main():
                     thigh_bone = profile["hipBone"]
                     profile_accumulators[profile_key]["centerlineVertexCount"] += 1
                 if thigh_weight > 0:
-                    raw[vertex.index] = [(profile["hipBone"], 1.0-thigh_weight), (thigh_bone, thigh_weight)]
+                    if centerline_thigh_weight > 0:
+                        side_weight = max(0.0, thigh_weight-centerline_thigh_weight)
+                        raw[vertex.index] = [(profile["hipBone"], 1.0-thigh_weight),
+                                             (profile["leftThighBone"], centerline_thigh_weight/2),
+                                             (profile["rightThighBone"], centerline_thigh_weight/2),
+                                             (thigh_bone, side_weight)]
+                    else:
+                        raw[vertex.index] = [(profile["hipBone"], 1.0-thigh_weight), (thigh_bone, thigh_weight)]
                 else:
                     raw[vertex.index] = [(profile["hipBone"], 1.0)]
                 profile_accumulators[profile_key]["vertexCount"] += 1
