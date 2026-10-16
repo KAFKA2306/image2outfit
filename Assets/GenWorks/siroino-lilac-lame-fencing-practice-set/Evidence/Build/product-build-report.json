@@ -8865,8 +8865,8 @@
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "8ca3901e6837509d561c2d29ab0267d085de2bdec99bcf57c7ce959bbeeb7dd2",
-    "afterVerticesSha256": "9323361d25830a2ed48faac3a6d452ce162c4add3d88479dfa405cf6200946f0",
+    "beforeVerticesSha256": "54f50f91056b0ff03ec658eafc60b36e6544dd58c55377806718f5b94f5a7dc6",
+    "afterVerticesSha256": "789452d60baed3305cf868f90ba8fe5819a7f92d541a44f6dda52b2a238dbc2d",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -8887,16 +8887,17 @@
       "hemZM": 0.5095782470703125,
       "hemExtensionM": 0.09,
       "forwardApron": {
-        "method": "front-panel-short-apron-fade-v1",
+        "method": "front-panel-forward-scoop-v2",
         "pieceId": "overskirt-front",
         "axisOriginBlenderXYM": [
           0,
           -0.03788188099861145
         ],
         "additionalExtensionM": 0.1,
+        "forwardProjectionM": 0.03,
         "fullExtensionHalfAngleRadians": 1.25,
         "zeroExtensionHalfAngleRadians": 1.5707963267948966,
-        "evidenceBoundary": "The 100 mm center-front extension still left low thigh coverage in crouch and sit. Broaden its full-extension half-angle from 0.95 to 1.25 radians and shorten the fade to the unchanged 1.5707963267948966-radian side seam; this tests extension over more of the front panel without moving the side seam or increasing maximum length. Rebuild and remeasure poses and inspect all views. No fit, dynamic coverage, or appearance acceptance."
+        "evidenceBoundary": "The widened center-front apron still lifted away from forward thighs during crouch and sit. Add a bounded 30 mm forward Y projection to the same center-front lower panel, blended by hem depth and tapered to zero at the unchanged side seams. Keep vertical hem length and angular coverage unchanged. Rebuild, measure crouch/sit coverage, and directly inspect neutral silhouette, fabric intersections, and every rendered pose. This 3D shape trial grants no fit or appearance acceptance."
       },
       "foldCount": 12,
       "hemFoldDepthM": 0.012,
@@ -8916,8 +8917,8 @@
     "movedVertexCount": 2310,
     "maximumRadialDisplacementM": 0.011999999475332403,
     "minimumTriangleAreaM2": 1.4653217814325336e-09,
-    "beforeVerticesSha256": "9323361d25830a2ed48faac3a6d452ce162c4add3d88479dfa405cf6200946f0",
-    "afterVerticesSha256": "8ad69041d0eaecdab4deac41219389744e15f31650f270899b5052276777dcd5",
+    "beforeVerticesSha256": "789452d60baed3305cf868f90ba8fe5819a7f92d541a44f6dda52b2a238dbc2d",
+    "afterVerticesSha256": "59b158a5e40911b72294c1abaa0f9f9d833b89ae29f0c4725049251c8c50edbd",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "grantsFitAcceptance": false,
@@ -8938,18 +8939,20 @@
     "movedVertexCount": 2310,
     "maximumVertexDisplacementM": 0.18999998058591566,
     "forwardApron": {
-      "method": "front-panel-short-apron-fade-v1",
+      "method": "front-panel-forward-scoop-v2",
       "pieceId": "overskirt-front",
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
       "additionalExtensionM": 0.1,
+      "forwardProjectionM": 0.03,
       "fullExtensionHalfAngleRadians": 1.25,
       "zeroExtensionHalfAngleRadians": 1.5707963267948966,
-      "evidenceBoundary": "The 100 mm center-front extension still left low thigh coverage in crouch and sit. Broaden its full-extension half-angle from 0.95 to 1.25 radians and shorten the fade to the unchanged 1.5707963267948966-radian side seam; this tests extension over more of the front panel without moving the side seam or increasing maximum length. Rebuild and remeasure poses and inspect all views. No fit, dynamic coverage, or appearance acceptance."
+      "evidenceBoundary": "The widened center-front apron still lifted away from forward thighs during crouch and sit. Add a bounded 30 mm forward Y projection to the same center-front lower panel, blended by hem depth and tapered to zero at the unchanged side seams. Keep vertical hem length and angular coverage unchanged. Rebuild, measure crouch/sit coverage, and directly inspect neutral silhouette, fabric intersections, and every rendered pose. This 3D shape trial grants no fit or appearance acceptance."
     },
     "maximumAdditionalForwardApronDisplacementM": 0.09999998978206089,
+    "maximumForwardApronProjectionM": 0.029999996934618262,
     "beforeBoundsZM": [
       0.5995782613754272,
       0.7395782470703125
@@ -9155,7 +9158,7 @@
     "grantsFitOrAppearanceAcceptance": false,
     "evidenceBoundary": "Positive-Y raycast-bound prototype seam hypothesis on the declared sewn bodice panels, retained only for direct visual review. It is not thread/trim geometry, an approved design, fit, or release evidence."
   },
-  "sourceBlendSha256": "192eed052b3af6f976958a67c5a62aec0c658e2c2efe465b96e237cce285d67e",
+  "sourceBlendSha256": "cc4135008fd541c83d3709e7b1584ef8c497ec449b9638c58d03be26c0221032",
   "sewnMeshSha256": "828132d6856b38e58cb998fbdab7cf7221f49a44c8138848bc44ef3b0de8dc98",
   "canonicalInputs": {
     "patternSha256": "494bead10a54e6125474e2a2da57cd332d4b84796028f5a615c69131ba5b5266",
@@ -140188,8 +140191,8 @@
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 388,
-    "beforeVerticesSha256": "bf1402bfa44a11f12cc790264ed4a940d538e530dd4af24bbd22c76aec17633d",
-    "afterVerticesSha256": "8ca3901e6837509d561c2d29ab0267d085de2bdec99bcf57c7ce959bbeeb7dd2",
+    "beforeVerticesSha256": "c36143a04c2d1445b2d40b686529358ebd0ca64ad54ff1fc136ccf193b67cc62",
+    "afterVerticesSha256": "54f50f91056b0ff03ec658eafc60b36e6544dd58c55377806718f5b94f5a7dc6",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },

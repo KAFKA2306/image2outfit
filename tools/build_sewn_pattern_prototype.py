@@ -1097,13 +1097,15 @@ def lengthen_declared_skirt_panels(mesh, pose):
     before_max = max(mesh["vertices"][index][2] for index in selected)
     apron = spec.get("forwardApron")
     if apron is not None:
-        if (apron.get("method") != "front-panel-short-apron-fade-v1"
+        if (apron.get("method") != "front-panel-forward-scoop-v2"
                 or apron.get("pieceId") not in pieces
                 or not isinstance(apron.get("axisOriginBlenderXYM"), list)
                 or len(apron["axisOriginBlenderXYM"]) != 2
                 or not all(math.isfinite(v) for v in apron["axisOriginBlenderXYM"])
                 or not math.isfinite(apron.get("additionalExtensionM", math.nan))
                 or not 0 <= apron["additionalExtensionM"] <= 0.10
+                or not math.isfinite(apron.get("forwardProjectionM", math.nan))
+                or not 0 <= apron["forwardProjectionM"] <= 0.04
                 or not math.isfinite(apron.get("fullExtensionHalfAngleRadians", math.nan))
                 or not math.isfinite(apron.get("zeroExtensionHalfAngleRadians", math.nan))
                 or not 0 < apron["fullExtensionHalfAngleRadians"] < apron["zeroExtensionHalfAngleRadians"] <= math.pi):
@@ -1113,6 +1115,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
     moved = 0
     max_displacement = 0.0
     max_apron_displacement = 0.0
+    max_forward_projection = 0.0
     for index in selected:
         point = mesh["vertices"][index]
         z = float(point[2])
@@ -1121,6 +1124,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
         fraction = min(1.0, max(0.0, (waist - z) / (waist - source_hem)))
         displacement = extension * fraction
         apron_displacement = 0.0
+        forward_projection = 0.0
         if apron is not None:
             if apron["pieceId"] in vertex_owners[index]:
                 origin = apron["axisOriginBlenderXYM"]
@@ -1132,12 +1136,15 @@ def lengthen_declared_skirt_panels(mesh, pose):
                 fade = min(1.0, max(0.0, (delta - start) / (end - start)))
                 fade = fade * fade * (3.0 - 2.0 * fade)
                 apron_displacement = apron["additionalExtensionM"] * fraction * (1.0 - fade)
+                forward_projection = apron["forwardProjectionM"] * fraction * (1.0 - fade)
                 displacement += apron_displacement
         if displacement:
             point[2] = z - displacement
+            point[1] -= forward_projection
             moved += 1
             max_displacement = max(max_displacement, displacement)
             max_apron_displacement = max(max_apron_displacement, apron_displacement)
+            max_forward_projection = max(max_forward_projection, forward_projection)
     after_min = min(mesh["vertices"][index][2] for index in selected)
     after_max = max(mesh["vertices"][index][2] for index in selected)
     apron_allowance = apron["additionalExtensionM"] if apron else 0.0
@@ -1158,6 +1165,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
         "maximumVertexDisplacementM": max_displacement,
         "forwardApron": apron,
         "maximumAdditionalForwardApronDisplacementM": max_apron_displacement,
+        "maximumForwardApronProjectionM": max_forward_projection,
         "beforeBoundsZM": [before_min, before_max],
         "afterBoundsZM": [after_min, after_max],
         "grantsFitAcceptance": False,
