@@ -42,16 +42,16 @@
     "resumable": true,
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
-    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v10-state.json",
-    "nextAction": "REJECT; replace the overskirt shell with a genuinely short, sewn pleat construction and revise coverage/drum shape at the back and side; refine jacket panel details and reduce sleeve/elbow faceting, then render and directly inspect all views and poses.",
+    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v11-state.json",
+    "nextAction": "Inspect the decompose-garment failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v11-state.json, resolve it, then resume from this checkpoint.",
     "lastAttempt": {
-      "runId": "babf5891967f4efdbc2edbd7014bff76",
-      "status": "EXECUTED",
-      "checkedAt": "2026-10-17T01:48:46Z",
+      "runId": "7b8995474ae54982a340c458a56b3cc2",
+      "status": "PARTIAL",
+      "checkedAt": "2026-10-17T03:34:25Z",
       "visualAppearanceReview": "FAIL",
-      "lastPassedStage": "finalize-candidate",
-      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "0b538c2c150a5de0caa1d5f5058f423d03a0c38390373ed9289a89824515ddd7",
+      "lastPassedStage": "normalize-view",
+      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/normalize-view.json",
+      "stageEvidenceSha256": "ea26d14e1c799eb4acfbbd656ce7e1a2534c08aee1f8bb1357dbb1f068834dbe",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -60,59 +60,17 @@
         "normalize-view": {
           "status": "REUSED",
           "stageResultSha256": "ea26d14e1c799eb4acfbbd656ce7e1a2534c08aee1f8bb1357dbb1f068834dbe"
-        },
-        "decompose-garment": {
-          "status": "REUSED",
-          "stageResultSha256": "a2546cb3268bb8858a505ab2ad690c9c989e286655aecc84cef859e4a2f13ec9"
-        },
-        "draft-patterns": {
-          "status": "REUSED",
-          "stageResultSha256": "5a9fb68d2554717af217a56c6df0630dfb33946a3585789d807781e5c7594252"
-        },
-        "infer-stitches": {
-          "status": "REUSED",
-          "stageResultSha256": "9247cd71e34148b5198807753ae5709f8ef23545e2050862191666ab388fde10"
-        },
-        "initialize-3d": {
-          "status": "REUSED",
-          "stageResultSha256": "59f4fedc62b6717e1ad0279fc79c2150c539453211c29410b0ad0c0c7c34e106"
-        },
-        "build-blender": {
-          "status": "REUSED",
-          "stageResultSha256": "9b9e248c36ec42ae8fa4c201fa692ec00d434cc34bd041072ab515545b3315f0"
-        },
-        "simulate-cloth": {
-          "status": "REUSED",
-          "stageResultSha256": "30a4767e369c6bc55485e1ef55fbed781dfe02992feb17ae675404c89b6ed97f"
-        },
-        "skin-and-export": {
-          "status": "REUSED",
-          "stageResultSha256": "dc3fb4fc2cfffd61c6fbd86e36dae2441a6aa3c9145fe109564f9024df48c889"
-        },
-        "render-evidence": {
-          "status": "REUSED",
-          "stageResultSha256": "715467972940dc65416086999e8eb1f55470ed606ecd5b8c27b5bcdb4061c88f"
-        },
-        "audit-geometry": {
-          "status": "REUSED",
-          "stageResultSha256": "a09db5f26b02943e18825d329d54f34afa4bdeb0502105081a8919c0baeef557"
-        },
-        "visual-review": {
-          "status": "PASS",
-          "stageResultSha256": "a8f60e8aff384ae7f7b03e1375f0f9f6eaafe8a89db2564f310c210bb6a497ab"
-        },
-        "finalize-candidate": {
-          "status": "PASS",
-          "stageResultSha256": "0b538c2c150a5de0caa1d5f5058f423d03a0c38390373ed9289a89824515ddd7"
         }
       },
-      "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
-      "failedAttemptEvidencePaths": [],
-      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v10-state.json",
-      "checkpointSha256": "b33a9285b157c5c4c455ed96ee228452ca5f9ac31e4730026122b95f7a83d0b4",
-      "blockedStage": null,
-      "failure": null,
-      "nextAction": "REJECT; replace the overskirt shell with a genuinely short, sewn pleat construction and revise coverage/drum shape at the back and side; refine jacket panel details and reduce sleeve/elbow faceting, then render and directly inspect all views and poses."
+      "contractResult": "Workflow FAILED; completed 2 stage(s).",
+      "failedAttemptEvidencePaths": [
+        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v11-state.json"
+      ],
+      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v11-state.json",
+      "checkpointSha256": "881996c28b689efaac2a6f6897c05e33e02785085be63aa256321216690ba7a6",
+      "blockedStage": "decompose-garment",
+      "failure": "UNDECLARED_OUTPUT_WRITE: .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v11-state.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T100711818926Z/garmentcode-boxmesh-audit.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T100711818926Z/garmentcode-pattern-input.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T160220570488Z/garmentcode-boxmesh-audit.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T160220570488Z/garmentcode-pattern-input.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T180216046863Z/garmentcode-boxmesh-audit.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T180216046863Z/garmentcode-pattern-input.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T180538549477Z/garmentcode-boxmesh-audit.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T180538549477Z/garmentcode-pattern-input.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T180538549477Z/sewn-mesh.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T181420234666Z/garmentcode-boxmesh-audit.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T181420234666Z/garmentcode-pattern-input.json, .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/attempts/build-blender-boxmesh-20261004T181420234666Z/sewn-mesh.json, .image2outfit/products/siroino-lilac-lame-fenci",
+      "nextAction": "Inspect the decompose-garment failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v11-state.json, resolve it, then resume from this checkpoint."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",

@@ -1074,13 +1074,18 @@ def lengthen_declared_skirt_panels(mesh, pose):
     waist = spec.get("waistZM")
     source_hem = spec.get("sourceHemZM")
     target_hem = spec.get("hemZM")
+    placement_method = spec.get("method", "lower-to-declared-skirt-hem")
+    retain_pattern_hem = placement_method == "retain-short-sewn-pattern-hem-v1"
     if (not pieces or not pieces.issubset(owners)
             or any(not isinstance(value, (int, float)) or not math.isfinite(value)
                    for value in (waist, source_hem, target_hem))
-            or not target_hem < source_hem < waist):
+            or not source_hem < waist
+            or (retain_pattern_hem and abs(target_hem-source_hem) > 1e-6)
+            or (not retain_pattern_hem and not target_hem < source_hem)):
         raise ValueError("Invalid declared overskirt lengthening bounds")
     extension = source_hem - target_hem
-    if not 0.02 <= extension <= 0.24:
+    if ((retain_pattern_hem and extension != 0)
+            or (not retain_pattern_hem and not 0.02 <= extension <= 0.24)):
         raise ValueError("Overskirt extension must remain within the bounded 20-240 mm trial")
     selected = {
         vertex
@@ -1097,7 +1102,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
             vertex_owners[vertex].add(owner)
     before_min = min(mesh["vertices"][index][2] for index in selected)
     before_max = max(mesh["vertices"][index][2] for index in selected)
-    apron = spec.get("forwardApron")
+    apron = None if retain_pattern_hem else spec.get("forwardApron")
     if apron is not None:
         apron_piece_ids = apron.get("pieceIds", [apron.get("pieceId")])
         if (apron.get("method") != "front-panel-forward-scoop-v2"
@@ -1158,7 +1163,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
         raise ValueError("Overskirt lengthening did not preserve the waist and declared hem")
     return {
         "applied": True,
-        "method": "short-panelized-hem-with-forward-apron-and-faded-side-seams" if apron else "linear-downward-extension-from-fixed-sewn-waist-to-overskirt-hem",
+        "method": placement_method if retain_pattern_hem else "short-panelized-hem-with-forward-apron-and-faded-side-seams" if apron else "linear-downward-extension-from-fixed-sewn-waist-to-overskirt-hem",
         "pieceIds": sorted(pieces),
         "sourceHemZM": source_hem,
         "targetHemZM": target_hem,
@@ -1186,7 +1191,8 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
     spec = pose.get("skirtPleatPlacement")
     if spec is None:
         return {"applied": False}
-    if spec["method"] not in {
+    fold_method = spec.get("foldMethod", spec["method"])
+    if fold_method not in {
             "outward-triangular-radial-fold-seed",
             "crease-aligned-triangular-radial-fold",
             "crease-aligned-alternating-triangular-radial-pleat"}:
@@ -1225,7 +1231,7 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         native = native_vertices[i]
         angle = math.atan2(native[0]-origin[0], -(native[1]-origin[1]))
         position = ((angle-phase)*count/(2*math.pi)) % 1
-        if spec["method"] == "crease-aligned-alternating-triangular-radial-pleat":
+        if fold_method == "crease-aligned-alternating-triangular-radial-pleat":
             # Alternate raised and recessed knife folds around the hem. The
             # extrema lie on the crease cuts made above, so this produces a
             # faceted accordion profile instead of pushing every fold outward.
