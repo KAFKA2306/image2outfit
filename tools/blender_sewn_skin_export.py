@@ -67,23 +67,23 @@ def main():
         profile = region.get("weightProfile")
         if profile is not None:
             profile_piece_ids = set(profile["pieceIds"])
-            if (profile["method"] not in {"hip-anchored-lateral-thigh-fade-v1", "hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"}
+            if (profile["method"] not in {"hip-anchored-lateral-thigh-fade-v1", "hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4", "panel-balanced-hem-thigh-follow-v5"}
                     or not profile_piece_ids
                     or not profile_piece_ids.issubset(set(region["pieceIds"]))
                     or not 0 <= profile["waistThighWeight"] <= profile["hemThighWeight"] <= 1
                     or profile["centerlineHalfWidthM"] < 0
                     or profile["fullSideWeightWidthM"] <= profile["centerlineHalfWidthM"]):
                 raise ValueError("Invalid explicit prototype weight profile")
-            if profile["method"] in {"hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"}:
+            if profile["method"] in {"hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4", "panel-balanced-hem-thigh-follow-v5"}:
                 if (not math.isfinite(profile.get("forwardCenterYM", math.nan))
                         or not math.isfinite(profile.get("forwardFadeDistanceM", math.nan))
                         or profile["forwardFadeDistanceM"] <= 0
                         or not 0 <= profile.get("forwardHemThighWeight", math.nan) <= 1):
                     raise ValueError("Invalid anterior prototype weight profile")
-                if (profile["method"] in {"hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"}
+                if (profile["method"] in {"hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4", "panel-balanced-hem-thigh-follow-v5"}
                         and not 0 <= profile.get("centerlineHemThighWeight", math.nan) <= 1):
                     raise ValueError("Invalid bilateral center-hem prototype weight profile")
-                if (profile["method"] == "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"
+                if (profile["method"] in {"hip-anchored-anterior-bilateral-center-hem-fade-capped-v4", "panel-balanced-hem-thigh-follow-v5"}
                         and not 0 < profile.get("maximumThighWeight", math.nan) <= 0.75):
                     raise ValueError("Invalid capped center-hem prototype weight profile")
             for bone_name in (profile["hipBone"], profile["leftThighBone"], profile["rightThighBone"]):
@@ -199,18 +199,18 @@ def main():
                                     / (profile["fullSideWeightWidthM"]-profile["centerlineHalfWidthM"]))
                 thigh_weight = base_thigh * _smoothstep(lateral_fraction)
                 centerline_thigh_weight = 0.0
-                if profile["method"] in {"hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"}:
+                if profile["method"] in {"hip-anchored-anterior-lateral-thigh-fade-v2", "hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4", "panel-balanced-hem-thigh-follow-v5"}:
                     forward_fraction = _smoothstep(
                         (profile["forwardCenterYM"] - point.y) / profile["forwardFadeDistanceM"]
                     )
                     thigh_weight += profile["forwardHemThighWeight"] * hem_fraction * forward_fraction * _smoothstep(lateral_fraction)
                     thigh_weight = min(1.0, thigh_weight)
-                    if profile["method"] in {"hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"}:
+                    if profile["method"] in {"hip-anchored-anterior-bilateral-center-hem-fade-v3", "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4", "panel-balanced-hem-thigh-follow-v5"}:
                         center_width = profile["centerlineHalfWidthM"]
                         center_fraction = 1.0 - _smoothstep(lateral/center_width if center_width > 0 else (1.0 if lateral > 0 else 0.0))
                         centerline_thigh_weight = profile["centerlineHemThighWeight"] * hem_fraction * forward_fraction * center_fraction
                         thigh_weight = max(thigh_weight, centerline_thigh_weight)
-                    if profile["method"] == "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4":
+                    if profile["method"] in {"hip-anchored-anterior-bilateral-center-hem-fade-capped-v4", "panel-balanced-hem-thigh-follow-v5"}:
                         maximum = profile["maximumThighWeight"]
                         if thigh_weight > maximum:
                             centerline_thigh_weight *= maximum / thigh_weight

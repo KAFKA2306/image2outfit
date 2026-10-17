@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v14-hip-held-box-pleat-20261017",
+  "revision": "v15-panel-pleat-thigh-follow-20261017",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -19,28 +19,28 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct crouch and seated renders still show substantial undershorts below the lifted overskirt. Pose-matched overskirt ray coverage improved to crouch upper thigh L/R 0.4870/0.4825 and sit 0.4678/0.4678, but remains insufficient; this geometric coverage evidence is not fit acceptance.",
+      "description": "V15 direct crouch and sit renders still show broad fitted shorts under the lifted overskirt. Source-bound ray coverage falls to crouch upper thigh L/R 0.2983/0.2814 and sit 0.1955/0.1853. This diagnostic is geometric evidence only and does not establish fit.",
       "code": "POSE_COVERAGE",
       "severity": "BLOCKER"
     },
     {
-      "description": "The new cut-bound soft box-pleat profile and longer 100 mm hem extension are present in the sewn mesh, but direct front/back/profile renders still show coarse triangular facets and uneven panel highlights rather than controlled fabric pleats. Reduced stiffness and longer settling did not produce the needed surface form.",
+      "description": "The panel-local two-fold-per-panel field and 4 mm radial amplitude soften the front silhouette, but neutral front/back/profile still lack clearly readable regular pleats; back and right-side panels retain uneven angular faceting and abrupt panel transitions.",
       "code": "SKIRT_FORM_AND_FACETING",
       "severity": "BLOCKER"
     },
     {
-      "description": "Crouch and sit views show the skirt lifting around exposed shorts despite the longer hem and pelvis-dominant capped front weights; prone remains an uneven spread. The geometric revision does not establish motion-safe coverage or fabric response.",
+      "description": "V15 all-panel thigh-follow weights reduce overskirt coverage against the posed thighs versus V14; crouch and seated renders lift the hem and expose the shorts over a large area. Current weights are an unapproved deformation hypothesis.",
       "code": "POSE_DRAPE",
       "severity": "BLOCKER"
     },
     {
-      "description": "Direct inspection of all five current views and six pose renders shows a largely plain ivory jacket and broad diagonal lavender panel. Removing the filled elbow patch leaves only faint seam paths; the rear and side still lack enough finished fencing-practice detail.",
+      "description": "Direct five-view and six-pose review still shows a mostly plain ivory jacket, broad diagonal lavender chest panel, faint elbow channels, and no visible center-back waist adjustment tab.",
       "code": "STYLING_FIDELITY",
       "severity": "BLOCKER"
     },
     {
-      "description": "Back and profile views remain visually plain, with a broad featureless torso/back and abrupt skirt transition; the new surface still lacks a convincing finished rear waist/panel treatment.",
-      "code": "REAR_AND_SIDE_FINISH",
+      "description": "No authored UV layout exists for the current weighted garment mesh; UV status remains NOT_CREATED.",
+      "code": "UV_NOT_CREATED",
       "severity": "BLOCKER"
     }
   ],

@@ -8863,23 +8863,24 @@
         "closed": true
       }
     ],
-    "placedVertexCount": 3638,
-    "heightBlendSkippedVertexCount": 2722,
-    "angularSourceVerticesSha256": "8658804fe90f2807367c8ae2c6cd8169a4f541930f6d04a11ca4a755e03bfd40",
+    "placedVertexCount": 4044,
+    "heightBlendSkippedVertexCount": 3064,
+    "angularSourceVerticesSha256": "be8c8ab044511001d7fc6e021b4b46c734e46079f30ff05d34b4e9203381fec4",
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "e0bea90bd6d67d6bccbe8ff9a0f84a60102d0be121f716c0d472b5ad72e23494",
-    "afterVerticesSha256": "f5cb7e5b58e4ad4490df93df1e9d10c43cf6f6ebf80184903426db080f784247",
+    "beforeVerticesSha256": "d0739a6f3fe3c7d2db1c1e3c253fef83324d21d3a0b19f769622298f2fa58a2d",
+    "afterVerticesSha256": "080f0660e087a32d48eaa6a572d6e8138ea58453d1bb672320c0b75ebee41310",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
   "declaredSkirtFoldPlacement": {
     "applied": true,
     "configuration": {
-      "method": "bounded-panel-extension-v2-coverage-hem",
-      "foldMethod": "crease-bound-soft-box-pleat-v1",
-      "longitudinalSubdivisionCount": 4,
+      "method": "bounded-panel-extension-v3-panel-local-hem",
+      "foldMethod": "panel-local-soft-knife-pleat-v1",
+      "foldsPerPanel": 2,
+      "longitudinalSubdivisionCount": 8,
       "pieceIds": [
         "overskirt-front-left",
         "overskirt-front-right",
@@ -8894,12 +8895,10 @@
       "sourceHemZM": 0.5995782470703125,
       "hemZM": 0.49957824707,
       "hemExtensionM": 0.1,
-      "foldCount": 12,
-      "hemFoldDepthM": 0.012,
-      "foldValleyHalfWidthFraction": 0.24,
-      "foldValleyDepthRatio": 0.35,
+      "foldCount": 8,
+      "hemFoldDepthM": 0.004,
       "phaseRadians": 0,
-      "evidenceBoundary": "V14 prototype hypothesis: continue the sewn overskirt panels downward by 100 mm from the rejected short v11 hem. Replace the radial cosine field with repeated cut-bound soft valleys and broad raised panel centers, split the sewn mesh at the declared crease cuts and four height rows, and use a pelvis-dominant capped front-hem weight field with lower cloth bending stiffness. This targets crouch/sit shorts exposure and coarse/fan-like folds; direct pose renders, cloth response, coverage, fit, motion, penetration and appearance remain unapproved.",
+      "evidenceBoundary": "V15 prototype hypothesis: keep the 100 mm hem extension, assign two shallow soft fold cycles inside each of the four sewn panels, add eight height subdivisions, and make all four hem panels follow both thigh bones more evenly. The fold field is local to each panel with a shared recessed value at panel boundaries; 10.0 cloth stiffness tests between V13 fan and V14 crumpling. Direct renders, cloth response, coverage, fit, motion, penetration and appearance remain unapproved.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8912,14 +8911,32 @@
       0.7395782470703125
     ],
     "extensionBelowDeclaredPleatHemM": 0.0,
-    "selectedVertexCount": 3396,
-    "movedVertexCount": 3316,
-    "maximumRadialDisplacementM": 0.011990122117106358,
-    "minimumTriangleAreaM2": 8.355200878545788e-11,
-    "beforeVerticesSha256": "f5cb7e5b58e4ad4490df93df1e9d10c43cf6f6ebf80184903426db080f784247",
-    "afterVerticesSha256": "cc53c680f74aa57ebd3ec8aea9734a4e00a7e8e6e328136a5eb9887604d32da3",
+    "selectedVertexCount": 3838,
+    "movedVertexCount": 3774,
+    "maximumRadialDisplacementM": 0.003972953466101633,
+    "minimumTriangleAreaM2": 1.7512125463803552e-12,
+    "beforeVerticesSha256": "080f0660e087a32d48eaa6a572d6e8138ea58453d1bb672320c0b75ebee41310",
+    "afterVerticesSha256": "4f5bb3fa457772269421f1f0aa74ce5ec4b53371ad0d470e1bad87309363d311",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
+    "panelAngularRangesRadians": {
+      "overskirt-back-left": [
+        -3.141592653589794,
+        -1.1810225431274548
+      ],
+      "overskirt-back-right": [
+        1.1810225431274548,
+        3.141592653589793
+      ],
+      "overskirt-front-left": [
+        -1.9605701209043844,
+        0.0
+      ],
+      "overskirt-front-right": [
+        0.0,
+        1.9605701209043844
+      ]
+    },
     "grantsFitAcceptance": false,
     "grantsVisualAcceptance": false
   },
@@ -8936,8 +8953,8 @@
     "targetHemZM": 0.49957824707,
     "waistZM": 0.7395782470703125,
     "extensionM": 0.1000000000003125,
-    "selectedVertexCount": 3396,
-    "movedVertexCount": 3316,
+    "selectedVertexCount": 3838,
+    "movedVertexCount": 3774,
     "maximumVertexDisplacementM": 0.09999998978237339,
     "forwardApron": null,
     "maximumAdditionalForwardApronDisplacementM": 0.0,
@@ -8956,8 +8973,8 @@
   },
   "declaredSkirtCreaseTopology": {
     "applied": true,
-    "method": "bounded-panel-extension-v2-coverage-hem",
-    "foldMethod": "crease-bound-soft-box-pleat-v1",
+    "method": "bounded-panel-extension-v3-panel-local-hem",
+    "foldMethod": "panel-local-soft-knife-pleat-v1",
     "cuts": [
       {
         "planeAngleRadians": 0.0,
@@ -8965,12 +8982,7 @@
         "cutEdgeCount": 36
       },
       {
-        "planeAngleRadians": 0.2617993877991494,
-        "newVertexCount": 76,
-        "cutEdgeCount": 74
-      },
-      {
-        "planeAngleRadians": 0.5235987755982988,
+        "planeAngleRadians": 0.39269908169872414,
         "newVertexCount": 73,
         "cutEdgeCount": 73
       },
@@ -8980,14 +8992,9 @@
         "cutEdgeCount": 78
       },
       {
-        "planeAngleRadians": 1.0471975511965976,
+        "planeAngleRadians": 1.1780972450961724,
         "newVertexCount": 76,
         "cutEdgeCount": 76
-      },
-      {
-        "planeAngleRadians": 1.3089969389957472,
-        "newVertexCount": 135,
-        "cutEdgeCount": 131
       },
       {
         "planeAngleRadians": 1.5707963267948966,
@@ -8995,12 +9002,7 @@
         "cutEdgeCount": 166
       },
       {
-        "planeAngleRadians": 1.832595714594046,
-        "newVertexCount": 135,
-        "cutEdgeCount": 131
-      },
-      {
-        "planeAngleRadians": 2.0943951023931953,
+        "planeAngleRadians": 1.9634954084936207,
         "newVertexCount": 76,
         "cutEdgeCount": 76
       },
@@ -9010,44 +9012,59 @@
         "cutEdgeCount": 78
       },
       {
-        "planeAngleRadians": 2.6179938779914944,
+        "planeAngleRadians": 2.748893571891069,
         "newVertexCount": 73,
         "cutEdgeCount": 73
-      },
-      {
-        "planeAngleRadians": 2.8797932657906435,
-        "newVertexCount": 76,
-        "cutEdgeCount": 74
       }
     ],
     "longitudinalSubdivisionCuts": [
       {
-        "heightZM": 0.6275782470703125,
-        "newVertexCount": 270,
-        "cutEdgeCount": 272
+        "heightZM": 0.615133802625868,
+        "newVertexCount": 258,
+        "cutEdgeCount": 258
       },
       {
-        "heightZM": 0.6555782470703125,
-        "newVertexCount": 242,
-        "cutEdgeCount": 244
+        "heightZM": 0.6306893581814236,
+        "newVertexCount": 246,
+        "cutEdgeCount": 246
       },
       {
-        "heightZM": 0.6835782470703125,
-        "newVertexCount": 214,
-        "cutEdgeCount": 216
+        "heightZM": 0.6462449137369791,
+        "newVertexCount": 238,
+        "cutEdgeCount": 240
       },
       {
-        "heightZM": 0.7115782470703125,
-        "newVertexCount": 178,
-        "cutEdgeCount": 180
+        "heightZM": 0.6618004692925347,
+        "newVertexCount": 218,
+        "cutEdgeCount": 218
+      },
+      {
+        "heightZM": 0.6773560248480903,
+        "newVertexCount": 226,
+        "cutEdgeCount": 226
+      },
+      {
+        "heightZM": 0.6929115804036459,
+        "newVertexCount": 184,
+        "cutEdgeCount": 186
+      },
+      {
+        "heightZM": 0.7084671359592014,
+        "newVertexCount": 188,
+        "cutEdgeCount": 188
+      },
+      {
+        "heightZM": 0.724022691514757,
+        "newVertexCount": 174,
+        "cutEdgeCount": 174
       }
     ],
-    "longitudinalSubdivisionCount": 4,
+    "longitudinalSubdivisionCount": 8,
     "beforeVertexCount": 8124,
-    "afterVertexCount": 10026,
+    "afterVertexCount": 10432,
     "beforeTriangleCount": 15729,
-    "afterTriangleCount": 19489,
-    "sharedSkirtWaistbandEdgeCount": 80,
+    "afterTriangleCount": 20317,
+    "sharedSkirtWaistbandEdgeCount": 64,
     "degenerateTriangleCount": 0,
     "nonManifoldEdgeCount": 0,
     "originalVertexIdentityPreserved": true,
@@ -9171,7 +9188,7 @@
     "grantsFitOrAppearanceAcceptance": false,
     "evidenceBoundary": "Positive-Y raycast-bound prototype seam hypothesis on the declared sewn bodice panels, retained only for direct visual review. It is not thread/trim geometry, an approved design, fit, or release evidence."
   },
-  "sourceBlendSha256": "d12599df18a7ff347154863dc23f9a906a11c3ac92e8ff5ff599f46295e7cab1",
+  "sourceBlendSha256": "e19bc217d731993400df81242e14e0571ade06d02ee6e41fda394fea24be42e6",
   "sewnMeshSha256": "4fa4d01afaed94274b0ec36e0547b5458fbb9c2db0427df288d49bfd89c3ee0c",
   "canonicalInputs": {
     "patternSha256": "ea035d5c09402c176852405c1e23a6522918fb05c3c00f8b406970cc2de2d118",
@@ -32922,8 +32939,8 @@
     "layerOffsetVertexCount": 555,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 580,
-    "beforeVerticesSha256": "a589f6e0d9ddd39cf019110eb9d2a0645055e9b99265ae2c0dd000216d8a7afb",
-    "afterVerticesSha256": "1f2ee17d185be03eeefeef6bc2535080d61a679f6dba2ae7f1c9ee6584b53a20",
+    "beforeVerticesSha256": "7a5fc89bf5e55a6a77e0543f380e608530144321654b55051b3e36bafb88c484",
+    "afterVerticesSha256": "fe3963591b30ebbbd230872594ece856a71948ee1b4b33f05c4c095f4308b6b8",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -140200,14 +140217,14 @@
         "closed": true
       }
     ],
-    "placedVertexCount": 3396,
+    "placedVertexCount": 3838,
     "heightBlendSkippedVertexCount": 0,
     "angularSourceVerticesSha256": null,
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
-    "heightExtrapolatedVertexCount": 176,
-    "beforeVerticesSha256": "558fba96a4e44be7a1ee04f9e55b5f42988ef6e1b79e7fb40be68087dbb8fdcf",
-    "afterVerticesSha256": "e0bea90bd6d67d6bccbe8ff9a0f84a60102d0be121f716c0d472b5ad72e23494",
+    "heightExtrapolatedVertexCount": 148,
+    "beforeVerticesSha256": "83cb3631c59a1228d25476ac522e0edf57937e2dfa00ee7d21df138d5c4c15b6",
+    "afterVerticesSha256": "d0739a6f3fe3c7d2db1c1e3c253fef83324d21d3a0b19f769622298f2fa58a2d",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -143548,8 +143565,8 @@
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 100,
-    "beforeVerticesSha256": "980b24a116610cd7c2c5b762f54df61ed0c42cd7e327cab43e700f28da1f48c0",
-    "afterVerticesSha256": "a589f6e0d9ddd39cf019110eb9d2a0645055e9b99265ae2c0dd000216d8a7afb",
+    "beforeVerticesSha256": "d1024cb513e25f0f9dd6c251a6cc1dc3e31c5cc2261a6c1bcc94d21955e50ee3",
+    "afterVerticesSha256": "7a5fc89bf5e55a6a77e0543f380e608530144321654b55051b3e36bafb88c484",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -176531,9 +176548,9 @@
     "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."
   },
   "metrics": {
-    "vertices": 10026,
-    "triangles": 19489,
-    "unweightedVertices": 10026,
+    "vertices": 10432,
+    "triangles": 20317,
+    "unweightedVertices": 10432,
     "degenerateTriangles": 0
   },
   "surfaceShadingHypothesis": {

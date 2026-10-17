@@ -74,7 +74,8 @@
                   "hip-anchored-lateral-thigh-fade-v1",
                   "hip-anchored-anterior-lateral-thigh-fade-v2",
                   "hip-anchored-anterior-bilateral-center-hem-fade-v3",
-                  "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"
+                  "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
+                  "panel-balanced-hem-thigh-follow-v5"
                 ]
               },
               "pieceIds": {
@@ -167,7 +168,8 @@
                     "method": {
                       "enum": [
                         "hip-anchored-anterior-bilateral-center-hem-fade-v3",
-                        "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"
+                        "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
+                        "panel-balanced-hem-thigh-follow-v5"
                       ]
                     }
                   },
@@ -186,7 +188,10 @@
                 "if": {
                   "properties": {
                     "method": {
-                      "const": "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4"
+                      "enum": [
+                        "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
+                        "panel-balanced-hem-thigh-follow-v5"
+                      ]
                     }
                   },
                   "required": ["method"]

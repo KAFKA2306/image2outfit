@@ -985,7 +985,8 @@ def split_declared_skirt_creases(mesh, pose):
             "crease-aligned-triangular-radial-fold",
             "crease-aligned-alternating-triangular-radial-pleat",
             "crease-aligned-smooth-radial-pleat",
-            "crease-bound-soft-box-pleat-v1"}:
+            "crease-bound-soft-box-pleat-v1",
+            "panel-local-soft-knife-pleat-v1"}:
         return {"applied": False}
     count = spec["foldCount"]
     origin = spec["axisOriginBlenderXYM"]
@@ -1230,7 +1231,8 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "crease-aligned-triangular-radial-fold",
             "crease-aligned-alternating-triangular-radial-pleat",
             "crease-aligned-smooth-radial-pleat",
-            "crease-bound-soft-box-pleat-v1"}:
+            "crease-bound-soft-box-pleat-v1",
+            "panel-local-soft-knife-pleat-v1"}:
         raise ValueError("Unknown skirt fold placement")
     origin = spec["axisOriginBlenderXYM"]
     waist, declared_hem = spec["waistZM"], spec["hemZM"]
@@ -1242,6 +1244,28 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
     ids = set(spec["pieceIds"])
     if not ids or not ids.issubset(set(mesh["facePieceIds"])):
         raise ValueError("Skirt fold pieces missing")
+    panel_local = fold_method == "panel-local-soft-knife-pleat-v1"
+    panel_ranges = {}
+    if panel_local:
+        from collections import defaultdict
+        folds_per_panel = spec.get("foldsPerPanel")
+        if isinstance(folds_per_panel, bool) or not isinstance(folds_per_panel, int) or not 1 <= folds_per_panel <= 6:
+            raise ValueError("Panel-local pleats require 1-6 folds per sewn panel")
+        by_piece = {piece: set() for piece in ids}
+        vertex_piece_owners = defaultdict(set)
+        for face, piece in zip(mesh["faces"], mesh["facePieceIds"]):
+            if piece in by_piece:
+                by_piece[piece].update(face)
+                for vertex_id in face:
+                    vertex_piece_owners[vertex_id].add(piece)
+        for piece, indices in by_piece.items():
+            angles = [math.atan2(native_vertices[i][0]-origin[0], -(native_vertices[i][1]-origin[1])) for i in indices]
+            center = math.atan2(sum(math.sin(value) for value in angles), sum(math.cos(value) for value in angles))
+            unwrapped = [center + math.atan2(math.sin(value-center), math.cos(value-center)) for value in angles]
+            low, high = min(unwrapped), max(unwrapped)
+            if high-low < 0.08:
+                raise ValueError(f"Panel angular span is too small for local pleats: {piece}")
+            panel_ranges[piece] = [low, high]
     vertices = {i for face, owner in zip(mesh["faces"], mesh["facePieceIds"]) if owner in ids for i in face}
     # A preceding, separately bounded skirt-lengthening step can lower the
     # panel hem below the original pleat-layout hem. Seed folds against the
@@ -1266,7 +1290,24 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         native = native_vertices[i]
         angle = math.atan2(native[0]-origin[0], -(native[1]-origin[1]))
         position = ((angle-phase)*count/(2*math.pi)) % 1
-        if fold_method == "crease-aligned-smooth-radial-pleat":
+        if panel_local:
+            # Resolve phase inside each canonical sewn panel. The fold field
+            # returns to the same recessed boundary value at both side seams,
+            # so adjacent panels remain coincident while panel centers rise.
+            owners = vertex_piece_owners.get(i, set())
+            if not owners:
+                raise ValueError(f"Panel-local pleat vertex has no sewn panel owner: {i}")
+            waves = []
+            for owner in owners:
+                low, high = panel_ranges[owner]
+                angle = math.atan2(native[0]-origin[0], -(native[1]-origin[1]))
+                center = (low+high)/2
+                unwrapped_angle = center + math.atan2(math.sin(angle-center), math.cos(angle-center))
+                panel_fraction = min(1.0, max(0.0, (unwrapped_angle-low)/(high-low)))
+                local_phase = (panel_fraction * spec["foldsPerPanel"]) % 1.0
+                waves.append(-math.cos(2.0 * math.pi * local_phase))
+            wave = sum(waves)/len(waves)
+        elif fold_method == "crease-aligned-smooth-radial-pleat":
             # Crease cuts align with cosine extrema; the smooth field avoids
             # the sharp triangular facets rejected in the prior prototype.
             wave = math.cos(2.0 * math.pi * position)
@@ -1313,6 +1354,7 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "beforeVerticesSha256": hashlib.sha256(before.encode()).hexdigest(),
             "afterVerticesSha256": hashlib.sha256(json.dumps(mesh["vertices"], separators=(",", ":")).encode()).hexdigest(),
             "canonicalFacesChanged": False, "sewnWaistDisplacementM": 0,
+            "panelAngularRangesRadians": {key: value for key, value in sorted(panel_ranges.items())},
             "grantsFitAcceptance": False, "grantsVisualAcceptance": False}
 
 

@@ -77,15 +77,15 @@
     {
       "object": "pleated-overskirt",
       "modifier": "Image2Outfit Cloth",
-      "pinVertexCount": 80,
+      "pinVertexCount": 64,
       "frameStart": 1,
       "frameEnd": 48,
       "componentBendingHypothesis": {
-        "stiffness": 4.0,
-        "maximum": 4.0,
+        "stiffness": 10.0,
+        "maximum": 10.0,
         "model": "ANGULAR",
-        "reason": "V13 remained a stiff, broad fan after direct review. Compare a low bend-stiffness setting and 48-frame neutral settle on the newly lowered hem and sewn box-pleat profile; this is a local prototype hypothesis, not fabric calibration, fit, or appearance approval.",
-        "evidenceBoundary": "One native Blender 4.4.3 48-frame trial on sewn bilateral panels. The reduced stiffness and longer settle are geometric simulation hypotheses only and do not establish cloth material response, dynamic coverage, penetration, fit, motion, appearance, or release acceptance.",
+        "reason": "V13 at stiffness 20 retained a broad fan and V14 at stiffness 4 collapsed into coarse uneven facets. Compare a middle stiffness value on the panel-local fold geometry; this is a local prototype hypothesis, not fabric calibration, fit, or appearance approval.",
+        "evidenceBoundary": "One native Blender 4.4.3 48-frame trial on sewn bilateral panels. The middle stiffness value is a geometric simulation hypothesis only and does not establish cloth material response, dynamic coverage, penetration, fit, motion, appearance, or release acceptance.",
         "grantsFitAcceptance": false
       },
       "pinMethod": "canonical shared seam vertices",
@@ -95,37 +95,37 @@
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.006126956082880497,
-          "maximum": 0.14684074325487018
+          "minimum": 0.006258426310523646,
+          "maximum": 0.13880634843371809
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 41,
+        "belowCombinedCollisionMarginVertexCount": 43,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.4631229341030121,
+          0.4700683057308197,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.005960399284958839,
-          "maximum": 0.08520961599424481
+          "minimum": 0.006204217475897167,
+          "maximum": 0.08500198321416974
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 146,
+        "belowCombinedCollisionMarginVertexCount": 88,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "94e61e6a3d453c3f4dffc05b9dc3c48cf338803945bec0aeafc619d6ba3e2245",
-      "evaluatedFrameMeshSha256": "51df5bc64f67f2d167401f16bff278015c62384ca1594b9b31dbbf5bb48f36a6",
-      "settledMeshSha256": "51df5bc64f67f2d167401f16bff278015c62384ca1594b9b31dbbf5bb48f36a6",
+      "preBakeMeshSha256": "4733cb7332d25cdcaebff3541a90e323153648e61c52e53bf34d61ef8c68c5bc",
+      "evaluatedFrameMeshSha256": "8c21408dd3a8900e28a2c14701df6cbfafa3873a500c32b2acd7dec19b003cab",
+      "settledMeshSha256": "8c21408dd3a8900e28a2c14701df6cbfafa3873a500c32b2acd7dec19b003cab",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "d12599df18a7ff347154863dc23f9a906a11c3ac92e8ff5ff599f46295e7cab1",
-  "constructionSha256": "acf48e5b520036222be0a37b7a41a3f522b0201cec0ef464b622093b481545ba",
+  "sourceBlendSha256": "e19bc217d731993400df81242e14e0571ade06d02ee6e41fda394fea24be42e6",
+  "constructionSha256": "1e64f04b103dcda5d4462fb4d1d952395fd6e6e07b5f3607d725a22d27dd8ee0",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "2c210fcfb27f6165c18b8316d62d3f33debb292117f41792c6d0765e43a99d54",
+  "candidateSha256": "113e3d5f698de12514cc68b905cdfd2a3a5e24ffd5797693d92692bf971bcb77",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
