@@ -112,12 +112,9 @@ def _body_surface_samples(body, depsgraph, armature):
         evaluated.to_mesh_clear()
 
 
-def measure_pose_coverage(body, objects, depsgraph, armature):
+def measure_pose_coverage(body, objects, depsgraph, armature, shorts_ids, skirt_ids,
+                          piece_group_source):
     """Measure matched-pose body surface hits against shorts and skirt surfaces."""
-    shorts_ids = {
-        "shorts-front-left", "shorts-front-right", "shorts-back-left", "shorts-back-right"
-    }
-    skirt_ids = {"overskirt-front", "overskirt-back"}
     samples = _body_surface_samples(body, depsgraph, armature)
     layers = {
         "under-shorts": _piece_surface_tree(objects, depsgraph, shorts_ids),
@@ -125,6 +122,7 @@ def measure_pose_coverage(body, objects, depsgraph, armature):
     }
     body.data.calc_loop_triangles()
     result = {"surfaceCoordinateMethod": "posed-avatar-triangle-centroids; deformation-weight anatomical zones; outward-normal ray into matching-pose canonical garment faces",
+              "pieceGroupSource": piece_group_source,
               "bodySurfaceTriangleCount": len(body.data.loop_triangles),
               "zoneSelection": {"pelvisPosterior": "mean Hips vertex-group weight >= 0.50 and posed surface normal world-Y >= 0.15", "leftThigh": "mean UpperLeg_L vertex-group weight >= 0.55", "rightThigh": "mean UpperLeg_R vertex-group weight >= 0.55"},
               "ray": {"originOffsetM": 0.0005, "maximumDistanceM": 0.25, "direction": "posed avatar surface normal"},
@@ -168,6 +166,25 @@ def main():
     parser.add_argument("--job", required=True)
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
     job = read_json(repo_path(args.job))
+    construction_path = job["garmentPipeline"]["constructionPath"]
+    construction = read_json(repo_path(construction_path))
+    components = construction.get("requiredPatternComponents", [])
+    shorts_components = [item for item in components
+                         if item.get("componentId") == "fitted-under-shorts"]
+    cloth = construction.get("clothSimulation", {})
+    groups = cloth.get("prototypePanelGroups", {})
+    skirt_ids = set(groups.get("pleated-overskirt", []))
+    if len(shorts_components) != 1 or not shorts_components[0].get("requiredPieceIds") or not skirt_ids:
+        raise ValueError("pose coverage requires canonical fitted-under-shorts and pleated-overskirt piece groups")
+    shorts_ids = set(shorts_components[0]["requiredPieceIds"])
+    piece_group_source = {
+        "constructionPath": construction_path,
+        "constructionSha256": digest(repo_path(construction_path)),
+        "shortsComponentId": "fitted-under-shorts",
+        "shortsPieceIds": sorted(shorts_ids),
+        "skirtClothGroupId": "pleated-overskirt",
+        "skirtPieceIds": sorted(skirt_ids),
+    }
     runtime = ROOT / ".image2outfit/products" / job["id"]
     skin = read_json(runtime / "skin/skin-export-report.json")
     source = repo_path(skin["weightedBlendPath"])
@@ -209,7 +226,8 @@ def main():
                 else:
                     raise ValueError(f"unknown render pose: {name}")
             deps = bpy.context.evaluated_depsgraph_get()
-            pose_coverage = (measure_pose_coverage(body, bpy.context.scene.objects, deps, armature)
+            pose_coverage = (measure_pose_coverage(body, bpy.context.scene.objects, deps, armature,
+                                                   shorts_ids, skirt_ids, piece_group_source)
                              if kind == "pose" and name in {"neutral", "crouch", "sit"} else None)
             points = [obj.evaluated_get(deps).matrix_world @ Vector(corner)
                       for obj in bpy.context.scene.objects if obj.type == "MESH" and obj != floor

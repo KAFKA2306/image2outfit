@@ -1097,8 +1097,10 @@ def lengthen_declared_skirt_panels(mesh, pose):
     before_max = max(mesh["vertices"][index][2] for index in selected)
     apron = spec.get("forwardApron")
     if apron is not None:
+        apron_piece_ids = apron.get("pieceIds", [apron.get("pieceId")])
         if (apron.get("method") != "front-panel-forward-scoop-v2"
-                or apron.get("pieceId") not in pieces
+                or not apron_piece_ids
+                or not set(apron_piece_ids).issubset(pieces)
                 or not isinstance(apron.get("axisOriginBlenderXYM"), list)
                 or len(apron["axisOriginBlenderXYM"]) != 2
                 or not all(math.isfinite(v) for v in apron["axisOriginBlenderXYM"])
@@ -1126,7 +1128,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
         apron_displacement = 0.0
         forward_projection = 0.0
         if apron is not None:
-            if apron["pieceId"] in vertex_owners[index]:
+            if vertex_owners[index].intersection(apron_piece_ids):
                 origin = apron["axisOriginBlenderXYM"]
                 native = point
                 angle = math.atan2(native[0] - origin[0], -(native[1] - origin[1]))

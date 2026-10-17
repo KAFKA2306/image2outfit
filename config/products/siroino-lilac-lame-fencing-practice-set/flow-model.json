@@ -99,10 +99,16 @@
         "id": "jacket-sleeve-right"
       },
       {
-        "id": "overskirt-back"
+        "id": "overskirt-back-left"
       },
       {
-        "id": "overskirt-front"
+        "id": "overskirt-back-right"
+      },
+      {
+        "id": "overskirt-front-left"
+      },
+      {
+        "id": "overskirt-front-right"
       },
       {
         "id": "shorts-back-left"
@@ -120,10 +126,16 @@
         "id": "stand-collar"
       },
       {
-        "id": "waistband-back"
+        "id": "waistband-back-left"
       },
       {
-        "id": "waistband-front"
+        "id": "waistband-back-right"
+      },
+      {
+        "id": "waistband-front-left"
+      },
+      {
+        "id": "waistband-front-right"
       }
     ]
   },
@@ -349,22 +361,6 @@
         "type": "plain"
       },
       {
-        "stitchId": "overskirt-right-side",
-        "firstPieceId": "overskirt-front",
-        "firstEdgeId": "side-right",
-        "secondPieceId": "overskirt-back",
-        "secondEdgeId": "side-right",
-        "type": "plain"
-      },
-      {
-        "stitchId": "overskirt-left-side",
-        "firstPieceId": "overskirt-front",
-        "firstEdgeId": "side-left",
-        "secondPieceId": "overskirt-back",
-        "secondEdgeId": "side-left",
-        "type": "plain"
-      },
-      {
         "stitchId": "left-sleeve-underarm",
         "firstPieceId": "jacket-sleeve-left",
         "firstEdgeId": "underarm-outer",
@@ -525,38 +521,6 @@
         "type": "plain"
       },
       {
-        "stitchId": "front-waistband-skirt",
-        "firstPieceId": "overskirt-front",
-        "firstEdgeId": "waist-opening",
-        "secondPieceId": "waistband-front",
-        "secondEdgeId": "skirt-attachment",
-        "type": "plain"
-      },
-      {
-        "stitchId": "back-waistband-skirt",
-        "firstPieceId": "overskirt-back",
-        "firstEdgeId": "waist-opening",
-        "secondPieceId": "waistband-back",
-        "secondEdgeId": "skirt-attachment",
-        "type": "plain"
-      },
-      {
-        "stitchId": "waistband-left-side",
-        "firstPieceId": "waistband-front",
-        "firstEdgeId": "side-left",
-        "secondPieceId": "waistband-back",
-        "secondEdgeId": "side-left",
-        "type": "plain"
-      },
-      {
-        "stitchId": "waistband-right-side",
-        "firstPieceId": "waistband-front",
-        "firstEdgeId": "side-right",
-        "secondPieceId": "waistband-back",
-        "secondEdgeId": "side-right",
-        "type": "plain"
-      },
-      {
         "stitchId": "shorts-left-outseam-lower",
         "firstPieceId": "shorts-front-left",
         "firstEdgeId": "outseam-lower",
@@ -682,6 +646,102 @@
         "firstEdgeId": "crotch-rise-lower",
         "secondPieceId": "shorts-back-right",
         "secondEdgeId": "crotch-rise-lower",
+        "type": "plain"
+      },
+      {
+        "stitchId": "overskirt-front-center-seam",
+        "firstPieceId": "overskirt-front-left",
+        "firstEdgeId": "center-front",
+        "secondPieceId": "overskirt-front-right",
+        "secondEdgeId": "center-front",
+        "type": "plain"
+      },
+      {
+        "stitchId": "overskirt-back-center-seam",
+        "firstPieceId": "overskirt-back-left",
+        "firstEdgeId": "center-back",
+        "secondPieceId": "overskirt-back-right",
+        "secondEdgeId": "center-back",
+        "type": "plain"
+      },
+      {
+        "stitchId": "overskirt-left-side-seam",
+        "firstPieceId": "overskirt-front-left",
+        "firstEdgeId": "side-left",
+        "secondPieceId": "overskirt-back-left",
+        "secondEdgeId": "side-left",
+        "type": "plain"
+      },
+      {
+        "stitchId": "overskirt-right-side-seam",
+        "firstPieceId": "overskirt-front-right",
+        "firstEdgeId": "side-right",
+        "secondPieceId": "overskirt-back-right",
+        "secondEdgeId": "side-right",
+        "type": "plain"
+      },
+      {
+        "stitchId": "front-left-waistband-seam",
+        "firstPieceId": "overskirt-front-left",
+        "firstEdgeId": "waist-opening",
+        "secondPieceId": "waistband-front-left",
+        "secondEdgeId": "skirt-attachment",
+        "type": "plain"
+      },
+      {
+        "stitchId": "front-right-waistband-seam",
+        "firstPieceId": "overskirt-front-right",
+        "firstEdgeId": "waist-opening",
+        "secondPieceId": "waistband-front-right",
+        "secondEdgeId": "skirt-attachment",
+        "type": "plain"
+      },
+      {
+        "stitchId": "back-left-waistband-seam",
+        "firstPieceId": "overskirt-back-left",
+        "firstEdgeId": "waist-opening",
+        "secondPieceId": "waistband-back-left",
+        "secondEdgeId": "skirt-attachment",
+        "type": "plain"
+      },
+      {
+        "stitchId": "back-right-waistband-seam",
+        "firstPieceId": "overskirt-back-right",
+        "firstEdgeId": "waist-opening",
+        "secondPieceId": "waistband-back-right",
+        "secondEdgeId": "skirt-attachment",
+        "type": "plain"
+      },
+      {
+        "stitchId": "front-waistband-center-seam",
+        "firstPieceId": "waistband-front-left",
+        "firstEdgeId": "center-front",
+        "secondPieceId": "waistband-front-right",
+        "secondEdgeId": "center-front",
+        "type": "plain"
+      },
+      {
+        "stitchId": "back-waistband-center-seam",
+        "firstPieceId": "waistband-back-left",
+        "firstEdgeId": "center-back",
+        "secondPieceId": "waistband-back-right",
+        "secondEdgeId": "center-back",
+        "type": "plain"
+      },
+      {
+        "stitchId": "waistband-left-side",
+        "firstPieceId": "waistband-front-left",
+        "firstEdgeId": "side-left",
+        "secondPieceId": "waistband-back-left",
+        "secondEdgeId": "side-left",
+        "type": "plain"
+      },
+      {
+        "stitchId": "waistband-right-side",
+        "firstPieceId": "waistband-front-right",
+        "firstEdgeId": "side-right",
+        "secondPieceId": "waistband-back-right",
+        "secondEdgeId": "side-right",
         "type": "plain"
       }
     ],
@@ -909,18 +969,6 @@
       "evidence": "stitch:jacket-center-back-seam"
     },
     {
-      "subject": "piece:overskirt-front",
-      "predicate": "stitchedTo",
-      "object": "piece:overskirt-back",
-      "evidence": "stitch:overskirt-right-side"
-    },
-    {
-      "subject": "piece:overskirt-front",
-      "predicate": "stitchedTo",
-      "object": "piece:overskirt-back",
-      "evidence": "stitch:overskirt-left-side"
-    },
-    {
       "subject": "piece:jacket-sleeve-left",
       "predicate": "stitchedTo",
       "object": "piece:jacket-sleeve-left",
@@ -1041,30 +1089,6 @@
       "evidence": "stitch:right-sleeve-underarm-9"
     },
     {
-      "subject": "piece:overskirt-front",
-      "predicate": "stitchedTo",
-      "object": "piece:waistband-front",
-      "evidence": "stitch:front-waistband-skirt"
-    },
-    {
-      "subject": "piece:overskirt-back",
-      "predicate": "stitchedTo",
-      "object": "piece:waistband-back",
-      "evidence": "stitch:back-waistband-skirt"
-    },
-    {
-      "subject": "piece:waistband-front",
-      "predicate": "stitchedTo",
-      "object": "piece:waistband-back",
-      "evidence": "stitch:waistband-left-side"
-    },
-    {
-      "subject": "piece:waistband-front",
-      "predicate": "stitchedTo",
-      "object": "piece:waistband-back",
-      "evidence": "stitch:waistband-right-side"
-    },
-    {
       "subject": "piece:shorts-front-left",
       "predicate": "stitchedTo",
       "object": "piece:shorts-back-left",
@@ -1159,6 +1183,78 @@
       "predicate": "stitchedTo",
       "object": "piece:shorts-back-right",
       "evidence": "stitch:shorts-back-crotch-lower"
+    },
+    {
+      "subject": "piece:overskirt-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:overskirt-front-right",
+      "evidence": "stitch:overskirt-front-center-seam"
+    },
+    {
+      "subject": "piece:overskirt-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:overskirt-back-right",
+      "evidence": "stitch:overskirt-back-center-seam"
+    },
+    {
+      "subject": "piece:overskirt-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:overskirt-back-left",
+      "evidence": "stitch:overskirt-left-side-seam"
+    },
+    {
+      "subject": "piece:overskirt-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:overskirt-back-right",
+      "evidence": "stitch:overskirt-right-side-seam"
+    },
+    {
+      "subject": "piece:overskirt-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-front-left",
+      "evidence": "stitch:front-left-waistband-seam"
+    },
+    {
+      "subject": "piece:overskirt-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-front-right",
+      "evidence": "stitch:front-right-waistband-seam"
+    },
+    {
+      "subject": "piece:overskirt-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-back-left",
+      "evidence": "stitch:back-left-waistband-seam"
+    },
+    {
+      "subject": "piece:overskirt-back-right",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-back-right",
+      "evidence": "stitch:back-right-waistband-seam"
+    },
+    {
+      "subject": "piece:waistband-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-front-right",
+      "evidence": "stitch:front-waistband-center-seam"
+    },
+    {
+      "subject": "piece:waistband-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-back-right",
+      "evidence": "stitch:back-waistband-center-seam"
+    },
+    {
+      "subject": "piece:waistband-front-left",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-back-left",
+      "evidence": "stitch:waistband-left-side"
+    },
+    {
+      "subject": "piece:waistband-front-right",
+      "predicate": "stitchedTo",
+      "object": "piece:waistband-back-right",
+      "evidence": "stitch:waistband-right-side"
     },
     {
       "subject": "piece:jacket-elbow-quilt-overlay",

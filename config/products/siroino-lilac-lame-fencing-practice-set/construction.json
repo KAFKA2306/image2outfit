@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v8-lilac-broad-center-bilateral-fade-20261016",
+  "designRevision": "v9-bilateral-sewn-skirt-panels-20261017",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -12,15 +12,19 @@
     "jacket-sleeve-left",
     "jacket-sleeve-right",
     "stand-collar",
-    "overskirt-front",
-    "overskirt-back",
     "shorts-front-left",
     "shorts-front-right",
     "shorts-back-left",
     "shorts-back-right",
     "jacket-elbow-quilt-overlay",
-    "waistband-front",
-    "waistband-back"
+    "overskirt-front-left",
+    "overskirt-front-right",
+    "overskirt-back-left",
+    "overskirt-back-right",
+    "waistband-front-left",
+    "waistband-front-right",
+    "waistband-back-left",
+    "waistband-back-right"
   ],
   "requiredPatternComponents": [
     {
@@ -41,10 +45,14 @@
       "componentId": "pleated-overskirt",
       "partId": "short-pleated-overskirt",
       "requiredPieceIds": [
-        "overskirt-front",
-        "overskirt-back",
-        "waistband-front",
-        "waistband-back"
+        "overskirt-front-left",
+        "overskirt-front-right",
+        "overskirt-back-left",
+        "overskirt-back-right",
+        "waistband-front-left",
+        "waistband-front-right",
+        "waistband-back-left",
+        "waistband-back-right"
       ],
       "reason": "Directly observed as a short pleated layer over fitted shorts; pleat count, panelization, and attachment remain hypotheses."
     },
@@ -110,8 +118,10 @@
         "jacket-sleeve-right"
       ],
       "pleated-overskirt": [
-        "overskirt-front",
-        "overskirt-back"
+        "overskirt-front-left",
+        "overskirt-front-right",
+        "overskirt-back-left",
+        "overskirt-back-right"
       ]
     },
     "prototypeFrameEnd": 16,
@@ -125,7 +135,7 @@
       },
       "pleated-overskirt": {
         "stiffness": 20.0,
-        "reason": "The uniform 190 mm hem trial was rejected because it made the standing skirt too long while only slightly improving seated/crouched coverage. Re-run stiffness 20 as a hypothesis on the revised short rear/side panels and center-front apron, with forward-thigh weight transfer; the cloth stage records measured settings and output hashes for this exact solve.",
+        "reason": "Measure the short hem and center-front apron after splitting the front/back shells and waistband into center-seamed left/right panels. Keep a shared bilateral center-hem profile at the joined front seam, then inspect seam stress, body coverage, folds, and all poses. This changes construction topology; it does not establish fit or appearance approval.",
         "evidenceBoundary": "One native Blender 4.4.3 16-frame trial on the revised short rear/side hem and tapered forward apron. This is parameter-trial evidence only; no dynamic coverage, penetration, fit, motion, visual appearance, or release acceptance."
       }
     },
@@ -152,14 +162,18 @@
   "prototypeWeightRegions": [
     {
       "pieceIds": [
-        "overskirt-front",
-        "overskirt-back",
         "shorts-front-left",
         "shorts-front-right",
         "shorts-back-left",
         "shorts-back-right",
-        "waistband-front",
-        "waistband-back"
+        "overskirt-front-left",
+        "overskirt-front-right",
+        "overskirt-back-left",
+        "overskirt-back-right",
+        "waistband-front-left",
+        "waistband-front-right",
+        "waistband-back-left",
+        "waistband-back-right"
       ],
       "bodyTriangleZM": [
         0.45,
@@ -176,20 +190,21 @@
       "weightProfile": {
         "method": "hip-anchored-anterior-bilateral-center-hem-fade-v3",
         "pieceIds": [
-          "overskirt-front"
+          "overskirt-front-left",
+          "overskirt-front-right"
         ],
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
-    "waistThighWeight": 0.0,
-      "hemThighWeight": 0.0,
-      "forwardHemThighWeight": 0.90,
-      "centerlineHemThighWeight": 0.18,
-      "forwardCenterYM": -0.03788188099861145,
-      "forwardFadeDistanceM": 0.14,
+        "waistThighWeight": 0.0,
+        "hemThighWeight": 0.0,
+        "forwardHemThighWeight": 0.9,
+        "centerlineHemThighWeight": 0.18,
+        "forwardCenterYM": -0.03788188099861145,
+        "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.055,
         "fullSideWeightWidthM": 0.095,
-      "evidenceBoundary": "Prototype-only weight hypothesis for the single front panel. The prior 5 mm bilateral center band contained only one centerline vertex, leaving most of the panel to transition rapidly into one-sided thigh weights. Widen the bilateral fade to 55 mm, taper to side-specific transfer by 95 mm, and reduce its peak hem transfer to 0.18. This should distribute deformation more gradually across the center while retaining the no-forward-projection shape; it may still stretch or pinch between independently moving legs. Rebuild, measure poses, and inspect all current renders. No fit, appearance, or release acceptance is implied."
+        "evidenceBoundary": "One shared bilateral center-hem weight hypothesis spans both independently sewn front panels so the joined center-front seam retains a common deformation field. The panel split changes construction topology, not avatar fit or acceptance; seam stress, shorts exposure, pose coverage, and appearance require fresh measurement."
       }
     }
   ]

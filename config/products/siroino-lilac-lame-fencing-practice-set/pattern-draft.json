@@ -1523,23 +1523,23 @@
       "constructionStatus": "PROVISIONAL_NECK_CIRCUMFERENCE_NOT_MEASURED"
     },
     {
-      "pieceId": "overskirt-front",
+      "pieceId": "overskirt-front-left",
       "partId": "short-pleated-overskirt",
       "boundary": [
+        [
+          0,
+          0
+        ],
         [
           -0.1581551183024547,
           0
         ],
         [
-          0.1581551183024547,
-          0
-        ],
-        [
-          0.2782884790749424,
+          -0.2782884790749424,
           -0.14
         ],
         [
-          -0.2782884790749424,
+          0,
           -0.14
         ]
       ],
@@ -1555,7 +1555,7 @@
           "role": "seam"
         },
         {
-          "edgeId": "side-right",
+          "edgeId": "side-left",
           "startVertex": 1,
           "endVertex": 2,
           "role": "seam",
@@ -1564,7 +1564,7 @@
             "params": [
               [
                 0.5,
-                0.0
+                0
               ]
             ]
           }
@@ -1576,31 +1576,22 @@
           "role": "hem"
         },
         {
-          "edgeId": "side-left",
+          "edgeId": "center-front",
           "startVertex": 3,
           "endVertex": 0,
-          "role": "seam",
-          "curvature": {
-            "type": "quadratic",
-            "params": [
-              [
-                0.5,
-                0.0
-              ]
-            ]
-          }
+          "role": "seam"
         }
       ],
       "garmentSide": "front",
       "pleatConstructionStatus": "PROVISIONAL_TRIANGULAR_FOLD_SEED_WITH_HEM_INTAKE",
-      "constructionStatus": "PROVISIONAL_REFERENCE_RATIO_FLARED_SHORT_SKIRT"
+      "constructionStatus": "PROVISIONAL_CENTER_SEAM_PANEL_SPLIT"
     },
     {
-      "pieceId": "overskirt-back",
+      "pieceId": "overskirt-front-right",
       "partId": "short-pleated-overskirt",
       "boundary": [
         [
-          -0.1581551183024547,
+          0,
           0
         ],
         [
@@ -1612,7 +1603,7 @@
           -0.14
         ],
         [
-          -0.2782884790749424,
+          0,
           -0.14
         ]
       ],
@@ -1637,7 +1628,7 @@
             "params": [
               [
                 0.5,
-                0.0
+                0
               ]
             ]
           }
@@ -1649,24 +1640,143 @@
           "role": "hem"
         },
         {
-          "edgeId": "side-left",
+          "edgeId": "center-front",
           "startVertex": 3,
           "endVertex": 0,
+          "role": "seam"
+        }
+      ],
+      "garmentSide": "front",
+      "pleatConstructionStatus": "PROVISIONAL_TRIANGULAR_FOLD_SEED_WITH_HEM_INTAKE",
+      "constructionStatus": "PROVISIONAL_CENTER_SEAM_PANEL_SPLIT"
+    },
+    {
+      "pieceId": "overskirt-back-left",
+      "partId": "short-pleated-overskirt",
+      "boundary": [
+        [
+          0,
+          0
+        ],
+        [
+          -0.1581551183024547,
+          0
+        ],
+        [
+          -0.2782884790749424,
+          -0.14
+        ],
+        [
+          0,
+          -0.14
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.0,
+      "edges": [
+        {
+          "edgeId": "waist-opening",
+          "startVertex": 0,
+          "endVertex": 1,
+          "role": "seam"
+        },
+        {
+          "edgeId": "side-left",
+          "startVertex": 1,
+          "endVertex": 2,
           "role": "seam",
           "curvature": {
             "type": "quadratic",
             "params": [
               [
                 0.5,
-                0.0
+                0
               ]
             ]
           }
+        },
+        {
+          "edgeId": "hem",
+          "startVertex": 2,
+          "endVertex": 3,
+          "role": "hem"
+        },
+        {
+          "edgeId": "center-back",
+          "startVertex": 3,
+          "endVertex": 0,
+          "role": "seam"
         }
       ],
       "garmentSide": "back",
       "pleatConstructionStatus": "PROVISIONAL_TRIANGULAR_FOLD_SEED_WITH_HEM_INTAKE",
-      "constructionStatus": "PROVISIONAL_REFERENCE_RATIO_FLARED_SHORT_SKIRT"
+      "constructionStatus": "PROVISIONAL_CENTER_SEAM_PANEL_SPLIT"
+    },
+    {
+      "pieceId": "overskirt-back-right",
+      "partId": "short-pleated-overskirt",
+      "boundary": [
+        [
+          0,
+          0
+        ],
+        [
+          0.1581551183024547,
+          0
+        ],
+        [
+          0.2782884790749424,
+          -0.14
+        ],
+        [
+          0,
+          -0.14
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.0,
+      "edges": [
+        {
+          "edgeId": "waist-opening",
+          "startVertex": 0,
+          "endVertex": 1,
+          "role": "seam"
+        },
+        {
+          "edgeId": "side-right",
+          "startVertex": 1,
+          "endVertex": 2,
+          "role": "seam",
+          "curvature": {
+            "type": "quadratic",
+            "params": [
+              [
+                0.5,
+                0
+              ]
+            ]
+          }
+        },
+        {
+          "edgeId": "hem",
+          "startVertex": 2,
+          "endVertex": 3,
+          "role": "hem"
+        },
+        {
+          "edgeId": "center-back",
+          "startVertex": 3,
+          "endVertex": 0,
+          "role": "seam"
+        }
+      ],
+      "garmentSide": "back",
+      "pleatConstructionStatus": "PROVISIONAL_TRIANGULAR_FOLD_SEED_WITH_HEM_INTAKE",
+      "constructionStatus": "PROVISIONAL_CENTER_SEAM_PANEL_SPLIT"
     },
     {
       "pieceId": "shorts-front-left",
@@ -2262,7 +2372,7 @@
       "constructionStatus": "PROVISIONAL_REFERENCE_PROPORTION_ONLY"
     },
     {
-      "pieceId": "waistband-front",
+      "pieceId": "waistband-front-left",
       "partId": "short-pleated-overskirt",
       "boundary": [
         [
@@ -2271,6 +2381,61 @@
         ],
         [
           -0.14774967310195242,
+          0.025
+        ],
+        [
+          0,
+          0.025
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.0,
+      "edges": [
+        {
+          "edgeId": "side-left",
+          "startVertex": 0,
+          "endVertex": 1,
+          "role": "seam"
+        },
+        {
+          "edgeId": "top-opening",
+          "startVertex": 1,
+          "endVertex": 2,
+          "role": "open"
+        },
+        {
+          "edgeId": "center-front",
+          "startVertex": 2,
+          "endVertex": 3,
+          "role": "seam"
+        },
+        {
+          "edgeId": "skirt-attachment",
+          "startVertex": 3,
+          "endVertex": 0,
+          "role": "seam"
+        }
+      ],
+      "garmentSide": "front",
+      "pleatConstructionStatus": "NOT_REPRESENTED_IN_PANEL_BOUNDARIES",
+      "constructionStatus": "PROVISIONAL_CENTER_SEAM_SEGMENT"
+    },
+    {
+      "pieceId": "waistband-front-right",
+      "partId": "short-pleated-overskirt",
+      "boundary": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
           0.025
         ],
         [
@@ -2288,7 +2453,7 @@
       "seamAllowanceM": 0.0,
       "edges": [
         {
-          "edgeId": "side-left",
+          "edgeId": "center-front",
           "startVertex": 0,
           "endVertex": 1,
           "role": "seam"
@@ -2314,10 +2479,10 @@
       ],
       "garmentSide": "front",
       "pleatConstructionStatus": "NOT_REPRESENTED_IN_PANEL_BOUNDARIES",
-      "constructionStatus": "PROVISIONAL_MEASURED_NEUTRAL_WAISTBAND"
+      "constructionStatus": "PROVISIONAL_CENTER_SEAM_SEGMENT"
     },
     {
-      "pieceId": "waistband-back",
+      "pieceId": "waistband-back-left",
       "partId": "short-pleated-overskirt",
       "boundary": [
         [
@@ -2326,6 +2491,61 @@
         ],
         [
           -0.14774967310195242,
+          0.025
+        ],
+        [
+          0,
+          0.025
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0.0,
+      "edges": [
+        {
+          "edgeId": "side-left",
+          "startVertex": 0,
+          "endVertex": 1,
+          "role": "seam"
+        },
+        {
+          "edgeId": "top-opening",
+          "startVertex": 1,
+          "endVertex": 2,
+          "role": "open"
+        },
+        {
+          "edgeId": "center-back",
+          "startVertex": 2,
+          "endVertex": 3,
+          "role": "seam"
+        },
+        {
+          "edgeId": "skirt-attachment",
+          "startVertex": 3,
+          "endVertex": 0,
+          "role": "seam"
+        }
+      ],
+      "garmentSide": "back",
+      "pleatConstructionStatus": "NOT_REPRESENTED_IN_PANEL_BOUNDARIES",
+      "constructionStatus": "PROVISIONAL_CENTER_SEAM_SEGMENT"
+    },
+    {
+      "pieceId": "waistband-back-right",
+      "partId": "short-pleated-overskirt",
+      "boundary": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
           0.025
         ],
         [
@@ -2343,7 +2563,7 @@
       "seamAllowanceM": 0.0,
       "edges": [
         {
-          "edgeId": "side-left",
+          "edgeId": "center-back",
           "startVertex": 0,
           "endVertex": 1,
           "role": "seam"
@@ -2369,7 +2589,7 @@
       ],
       "garmentSide": "back",
       "pleatConstructionStatus": "NOT_REPRESENTED_IN_PANEL_BOUNDARIES",
-      "constructionStatus": "PROVISIONAL_MEASURED_NEUTRAL_WAISTBAND"
+      "constructionStatus": "PROVISIONAL_CENTER_SEAM_SEGMENT"
     }
   ],
   "method": {

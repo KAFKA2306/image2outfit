@@ -84,7 +84,7 @@
         "stiffness": 20.0,
         "maximum": 20.0,
         "model": "ANGULAR",
-        "reason": "The uniform 190 mm hem trial was rejected because it made the standing skirt too long while only slightly improving seated/crouched coverage. Re-run stiffness 20 as a hypothesis on the revised short rear/side panels and center-front apron, with forward-thigh weight transfer; the cloth stage records measured settings and output hashes for this exact solve.",
+        "reason": "Measure the short hem and center-front apron after splitting the front/back shells and waistband into center-seamed left/right panels. Keep a shared bilateral center-hem profile at the joined front seam, then inspect seam stress, body coverage, folds, and all poses. This changes construction topology; it does not establish fit or appearance approval.",
         "evidenceBoundary": "One native Blender 4.4.3 16-frame trial on the revised short rear/side hem and tapered forward apron. This is parameter-trial evidence only; no dynamic coverage, penetration, fit, motion, visual appearance, or release acceptance.",
         "grantsFitAcceptance": false
       },
@@ -99,33 +99,33 @@
           "maximum": 0.16447172174230218
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 5,
+        "belowCombinedCollisionMarginVertexCount": 7,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.38872745633125305,
+          0.3888462483882904,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
           "minimum": 0.006258426310523646,
-          "maximum": 0.10561266075819731
+          "maximum": 0.11072587827220559
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 12,
+        "belowCombinedCollisionMarginVertexCount": 13,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "9f6a3fbfc23275ef6e89bb84d88d9093af8e60c337988d0e059de8ea0c25418e",
-      "evaluatedFrameMeshSha256": "451e22fa6cfe6a976a908d4ef91493b5b2dd3ec882d77298e25f5f91b680d145",
-      "settledMeshSha256": "451e22fa6cfe6a976a908d4ef91493b5b2dd3ec882d77298e25f5f91b680d145",
+      "preBakeMeshSha256": "05efd637bce295e9887eecda0f7347305c385f427cd5ecf27e9594bac3c9ee19",
+      "evaluatedFrameMeshSha256": "4c43aabb9d418ea4bc65bb635cc68a8a703857fe5003bc8f0cf61774f8387574",
+      "settledMeshSha256": "4c43aabb9d418ea4bc65bb635cc68a8a703857fe5003bc8f0cf61774f8387574",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "ded7ebf8619fa45a8101e7ee83b4f1c4a5cb4bab0f6c2447efe377a69516058f",
-  "constructionSha256": "6a4ab2caab1be52ec0f5f703d864cc300707d1abc7bbabe6c642893d2fffbd8c",
+  "sourceBlendSha256": "6c0916519f8fc0962bb0ad5814861ee396d45fbbd3e7d7c50639303eb76f16f7",
+  "constructionSha256": "b27455db88163bb6aec2f5298fdfe9e9d0e513894cbf259e70a0f19f9b089160",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "62942e8abedc7a49f6214b52852f36309f0e0677e6a6b64545f763352536ab85",
+  "candidateSha256": "28873e82627dabc2c4a90d5f737a65d43639eb97cdf6753f4d541b3255c3bcd9",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

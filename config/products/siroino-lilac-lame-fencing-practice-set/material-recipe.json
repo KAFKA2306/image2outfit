@@ -20,10 +20,14 @@
       "jacket-sleeve-left",
       "jacket-sleeve-right",
       "stand-collar",
-      "overskirt-front",
-      "overskirt-back",
-      "waistband-front",
-      "waistband-back"
+      "overskirt-front-left",
+      "overskirt-front-right",
+      "overskirt-back-left",
+      "overskirt-back-right",
+      "waistband-front-left",
+      "waistband-front-right",
+      "waistband-back-left",
+      "waistband-back-right"
     ],
     "baseColorLinearRgb": [
       0.32,
@@ -67,12 +71,20 @@
       "frontQueryYM": -0.16
     },
     "frontFastenerHypothesis": {
-      "pathFractions": [0.24, 0.5, 0.76],
+      "pathFractions": [
+        0.24,
+        0.5,
+        0.76
+      ],
       "radiusM": 0.007,
       "reliefM": 0.0015,
       "segments": 16,
       "materialName": "front-fastener-metal-prototype-hypothesis",
-      "baseColorLinearRgb": [0.66, 0.48, 0.19],
+      "baseColorLinearRgb": [
+        0.66,
+        0.48,
+        0.19
+      ],
       "roughness": 0.3,
       "metallic": 0.55,
       "evidenceBoundary": "Three 14 mm diameter low-profile metal-disc prototypes ray-bound to the declared diagonal plastron path and layered 1.5 mm above its fabric surface. Decorative geometry only; no true fastening, closure retention, fit, appearance, or release is claimed."
@@ -90,7 +102,11 @@
       "threadRadiusM": 0.00045,
       "surfaceOffsetM": 0.0008,
       "stitchMaterialName": "elbow-seam-muted-lilac-prototype",
-      "stitchColorLinearRgb": [0.40, 0.32, 0.54],
+      "stitchColorLinearRgb": [
+        0.4,
+        0.32,
+        0.54
+      ],
       "stitchRoughness": 0.62,
       "stitchMetallic": 0.06,
       "filledPatchEnabled": true,
