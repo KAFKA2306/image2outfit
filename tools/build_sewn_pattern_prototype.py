@@ -658,6 +658,250 @@ def add_prototype_surface_motifs(mesh, job, recipe):
     }
 
 
+def append_declared_rear_waist_tab(mesh, body_objects, pose, recipe, target_path):
+    """Add a small rear waist tab projected from the actual avatar surface.
+
+    The tab remains part of the garment mesh so the existing cloth, weight,
+    export, and render stages process it with the rest of the candidate.
+    Projection and offsets are prototype hypotheses only.
+    """
+    import math
+    from mathutils import Vector
+    from mathutils.bvhtree import BVHTree
+
+    spec = pose.get("rearWaistAdjustmentTab")
+    if spec is None:
+        return {"applied": False, "reason": "not-declared", "grantsFitAcceptance": False}
+    if not isinstance(spec, dict) or spec.get("method") != "avatar-back-surface-projected-tab-v1":
+        raise ValueError("Invalid rear waist adjustment tab method")
+    piece_id = spec.get("pieceId")
+    center = spec.get("centerXZ")
+    width = spec.get("widthM")
+    height = spec.get("heightM")
+    x_segments = spec.get("xSegments")
+    z_segments = spec.get("zSegments")
+    query_y = spec.get("backQueryYM")
+    offset = spec.get("surfaceOffsetM")
+    buckle_offset = spec.get("buckleReliefM")
+    buckle_width = spec.get("buckleWidthM")
+    buckle_height = spec.get("buckleHeightM")
+    query_distance = spec.get("maximumProjectionDistanceM")
+    if (not isinstance(piece_id, str) or not piece_id
+            or not isinstance(center, list) or len(center) != 2
+            or not all(isinstance(value, (int, float)) and math.isfinite(value) for value in center)
+            or not all(isinstance(value, (int, float)) and math.isfinite(value)
+                       for value in (width, height, query_y, offset, buckle_offset,
+                                     buckle_width, buckle_height, query_distance))
+            or not 0.07 <= width <= 0.18 or not 0.018 <= height <= 0.05
+            or not isinstance(x_segments, int) or isinstance(x_segments, bool) or not 4 <= x_segments <= 16
+            or not isinstance(z_segments, int) or isinstance(z_segments, bool) or not 1 <= z_segments <= 4
+            or query_y <= 0.05 or not 0.006 <= offset <= 0.02
+            or not 0.0005 <= buckle_offset <= 0.004
+            or not 0.018 <= buckle_width <= width * 0.6
+            or not 0.008 <= buckle_height <= height * 0.8
+            or not 0.05 <= query_distance <= 0.8):
+        raise ValueError("Invalid rear waist adjustment tab dimensions or projection bounds")
+    bodies = [obj for obj in body_objects
+              if obj.type == "MESH" and obj.name.startswith(spec.get("bodyMeshNamePrefix", ""))]
+    if len(bodies) != 1:
+        raise ValueError("Rear waist tab requires exactly one declared target body mesh")
+    body = bodies[0]
+    shape_values = {key.name: float(key.value) for key in body.data.shape_keys.key_blocks} if body.data.shape_keys else {}
+    if any(abs(value) > 1e-8 for value in shape_values.values()):
+        raise ValueError("Rear waist tab projection requires zero-valued target Shape Keys")
+    evaluated = body.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    evaluated_data = evaluated.to_mesh()
+    try:
+        evaluated_data.calc_loop_triangles()
+        coordinates = [evaluated.matrix_world @ vertex.co for vertex in evaluated_data.vertices]
+        triangles = [tuple(triangle.vertices) for triangle in evaluated_data.loop_triangles]
+    finally:
+        evaluated.to_mesh_clear()
+    tree = BVHTree.FromPolygons(coordinates, triangles, all_triangles=True)
+
+    def project(x, z, extra_offset=0.0):
+        origin = Vector((x, query_y, z))
+        result = tree.ray_cast(origin, Vector((0.0, -1.0, 0.0)), query_distance)
+        if result is None or result[0] is None:
+            raise ValueError(f"Rear waist tab projection missed target body at x={x:.4f}, z={z:.4f}")
+        location, normal, face_index, distance = result
+        if normal.y <= 0.05 or distance <= 0:
+            raise ValueError("Rear waist tab projection did not hit an outward-facing posterior body surface")
+        point = location + normal.normalized() * (offset + extra_offset)
+        return point, normal.normalized(), face_index, float(distance)
+
+    tab_vertices = []
+    tab_normals = []
+    tab_samples = []
+    row_width = x_segments + 1
+    for row in range(z_segments + 1):
+        fraction_z = row / z_segments
+        z = center[1] - height / 2 + height * fraction_z
+        for column in range(x_segments + 1):
+            fraction_x = column / x_segments
+            x = center[0] - width / 2 + width * fraction_x
+            point, normal, face_index, distance = project(x, z)
+            tab_vertices.append(list(point))
+            tab_normals.append(list(normal))
+            tab_samples.append({"xM": x, "zM": z, "targetFaceIndex": face_index,
+                                "distanceM": distance, "pointM": list(point),
+                                "normal": list(normal)})
+    tab_faces = []
+    for row in range(z_segments):
+        for column in range(x_segments):
+            lower_left = row * row_width + column
+            upper_left = lower_left + row_width
+            quad = (lower_left, lower_left + 1, upper_left + 1, upper_left)
+            candidates = [(quad[0], quad[3], quad[2]), (quad[0], quad[2], quad[1])]
+            oriented = []
+            for face in candidates:
+                a, b, c = (Vector(tab_vertices[index]) for index in face)
+                face_normal = (b - a).cross(c - a)
+                if face_normal.length_squared <= 1e-14:
+                    raise ValueError("Rear waist tab grid produced a degenerate triangle")
+                expected_normal = sum((Vector(tab_normals[index]) for index in face), Vector())
+                oriented.append(tuple(reversed(face)) if face_normal.dot(expected_normal) < 0 else face)
+            tab_faces.extend(oriented)
+
+    buckle_vertices = []
+    buckle_normals = []
+    buckle_faces = []
+    buckle_row_width = 3
+    for row in range(3):
+        z = center[1] - buckle_height / 2 + buckle_height * row / 2
+        for column in range(3):
+            x = center[0] - buckle_width / 2 + buckle_width * column / 2
+            point, normal, _face_index, _distance = project(x, z, buckle_offset)
+            buckle_vertices.append(list(point))
+            buckle_normals.append(list(normal))
+    for row in range(2):
+        for column in range(2):
+            lower_left = row * buckle_row_width + column
+            upper_left = lower_left + buckle_row_width
+            quad = (lower_left, lower_left + 1, upper_left + 1, upper_left)
+            candidates = [(quad[0], quad[3], quad[2]), (quad[0], quad[2], quad[1])]
+            for face in candidates:
+                a, b, c = (Vector(buckle_vertices[index]) for index in face)
+                face_normal = (b - a).cross(c - a)
+                expected_normal = sum((Vector(buckle_normals[index]) for index in face), Vector())
+                if face_normal.length_squared <= 1e-14:
+                    raise ValueError("Rear waist tab buckle produced a degenerate triangle")
+                buckle_faces.append(tuple(reversed(face)) if face_normal.dot(expected_normal) < 0 else face)
+
+    old_vertex_count = len(mesh["vertices"])
+    old_face_count = len(mesh["faces"])
+    if "faceMaterialIds" not in mesh:
+        mesh["faceMaterialIds"] = ["prototypeMaterial"] * old_face_count
+    elif len(mesh["faceMaterialIds"]) != old_face_count:
+        raise ValueError("Face material ownership is not aligned to prototype topology")
+    mesh["vertices"].extend(tab_vertices)
+    mesh["vertices"].extend(buckle_vertices)
+    mesh["faces"].extend([tuple(old_vertex_count + index for index in face) for face in tab_faces])
+    mesh["facePieceIds"].extend([piece_id] * len(tab_faces))
+    mesh["faceMaterialIds"].extend(["rearWaistTabMaterial"] * len(tab_faces))
+    buckle_start = old_vertex_count + len(tab_vertices)
+    mesh["faces"].extend([tuple(buckle_start + index for index in face) for face in buckle_faces])
+    mesh["facePieceIds"].extend([piece_id] * len(buckle_faces))
+    mesh["faceMaterialIds"].extend(["rearWaistBuckleMaterial"] * len(buckle_faces))
+    if len(mesh["faces"]) != len(mesh["facePieceIds"]) or len(mesh["faces"]) != len(mesh["faceMaterialIds"]):
+        raise ValueError("Rear waist tab broke face ownership alignment")
+    material_spec = recipe.get("prototypeRearWaistTabMaterials")
+    if not isinstance(material_spec, dict):
+        raise ValueError("Rear waist tab requires declared prototype materials")
+    for key in ("tab", "buckle"):
+        entry = material_spec.get(key)
+        color = entry.get("baseColorLinearRgb") if isinstance(entry, dict) else None
+        if (not isinstance(color, list) or len(color) != 3
+                or any(not isinstance(channel, (int, float)) or not 0 <= channel <= 1 for channel in color)):
+            raise ValueError(f"Rear waist tab {key} material needs an RGB color in [0, 1]")
+    return {
+        "applied": True,
+        "method": spec["method"],
+        "pieceId": piece_id,
+        "targetBodyObject": body.name,
+        "targetAvatarSha256": digest(target_path),
+        "targetShapeKeyValues": shape_values,
+        "centerXZ": center,
+        "boundsM": {"width": width, "height": height},
+        "surfaceOffsetM": offset,
+        "buckleReliefM": buckle_offset,
+        "rayBoundVertexCount": len(tab_samples) + len(buckle_vertices),
+        "tabTriangleCount": len(tab_faces),
+        "buckleTriangleCount": len(buckle_faces),
+        "samples": tab_samples,
+        "grantsFitAcceptance": False,
+        "grantsVisualAcceptance": False,
+        "evidenceBoundary": spec["evidenceBoundary"],
+    }
+
+
+def lengthen_declared_shorts(mesh, pose):
+    """Extend only the lower edge zone of the sewn shorts before body projection."""
+    import math
+    from collections import defaultdict
+    from mathutils import Vector
+
+    spec = pose.get("shortsCoverageExtension")
+    if spec is None:
+        return {"applied": False, "grantsFitAcceptance": False}
+    if not isinstance(spec, dict) or spec.get("method") != "shorts-lower-hem-skirt-coverage-v1":
+        raise ValueError("Invalid shorts coverage extension method")
+    pieces = set(spec.get("pieceIds", []))
+    extension = spec.get("extensionM")
+    fade_height = spec.get("fadeHeightM")
+    if (not pieces or not pieces.issubset(set(mesh["facePieceIds"]))
+            or not all(isinstance(value, (int, float)) and math.isfinite(value)
+                       for value in (extension, fade_height))
+            or not 0.015 <= extension <= 0.08 or not 0.025 <= fade_height <= 0.12):
+        raise ValueError("Invalid shorts lower hem extension bounds or panel selection")
+    vertex_owners = defaultdict(set)
+    for face, owner in zip(mesh["faces"], mesh["facePieceIds"]):
+        for vertex in face:
+            vertex_owners[vertex].add(owner)
+    selected = {vertex for vertex, owners in vertex_owners.items()
+                if owners.intersection(pieces) and owners.issubset(pieces)}
+    if not selected:
+        raise ValueError("Shorts coverage extension selected no vertices")
+    lower = min(mesh["vertices"][index][2] for index in selected)
+    upper = max(mesh["vertices"][index][2] for index in selected)
+    if upper - lower < fade_height:
+        raise ValueError("Shorts coverage fade height exceeds panel length")
+    moved = 0
+    records = []
+    for index in sorted(selected):
+        point = mesh["vertices"][index]
+        fraction = max(0.0, min(1.0, (point[2] - lower) / fade_height))
+        smooth = fraction * fraction * (3.0 - 2.0 * fraction)
+        displacement = extension * (1.0 - smooth)
+        if displacement > 1e-7:
+            before = list(point)
+            point[2] -= displacement
+            moved += 1
+            records.append({"vertexIndex": index, "pieceIds": sorted(vertex_owners[index]),
+                            "beforeM": before, "afterM": list(point), "displacementM": displacement})
+    if not moved:
+        raise ValueError("Shorts coverage extension moved no vertices")
+    for face in mesh["faces"]:
+        a, b, c = [Vector(mesh["vertices"][vertex]) for vertex in face]
+        if (b - a).cross(c - a).length / 2 <= 1e-12:
+            raise ValueError("Shorts coverage extension collapsed a triangle")
+    return {
+        "applied": True,
+        "method": spec["method"],
+        "pieceIds": sorted(pieces),
+        "sourceLowerHemZM": lower,
+        "sourceUpperZM": upper,
+        "extensionM": extension,
+        "fadeHeightM": fade_height,
+        "movedVertexCount": moved,
+        "minimumAfterZM": min(mesh["vertices"][index][2] for index in selected),
+        "records": records,
+        "grantsFitAcceptance": False,
+        "grantsVisualAcceptance": False,
+        "evidenceBoundary": spec["evidenceBoundary"],
+    }
+
+
 def preserved_seam_factors(mesh, spec):
     """Fade placement displacement continuously away from preserved seams."""
     from collections import defaultdict
@@ -1407,6 +1651,7 @@ def main():
     trace_stage("torso-contour")
     upper_surface_evidence = place_on_measured_upper_surface(mesh, body_objects, pose, resolve(job["targetSourcePath"]))
     trace_stage("upper-surface")
+    shorts_extension_evidence = lengthen_declared_shorts(mesh, pose)
     shorts_pose = dict(pose, upperSurfacePlacement=pose.get("shortsUpperSurfacePlacement"))
     shorts_surface_evidence = place_on_measured_upper_surface(mesh, body_objects, shorts_pose, resolve(job["targetSourcePath"]))
     trace_stage("shorts-surface")
@@ -1421,6 +1666,10 @@ def main():
         waistband_pose = dict(pose, bodyContourPlacement=pose["waistbandContourPlacement"])
         waistband_evidence = place_on_measured_contours(mesh, body_objects, waistband_pose, resolve(job["targetSourcePath"]), angular_source_vertices=native_angular_vertices)
     fold_evidence = place_declared_skirt_folds(mesh, pose, native_angular_vertices)
+    recipe = read(resolve(pipeline["materialRecipePath"]))
+    rear_waist_tab_evidence = append_declared_rear_waist_tab(
+        mesh, body_objects, pose, recipe, resolve(job["targetSourcePath"])
+    )
     data = bpy.data.meshes.new(job["id"] + "-sewn-surface")
     data.from_pydata(mesh["vertices"], [], mesh["faces"])
     data.update()
@@ -1454,7 +1703,6 @@ def main():
     bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.uv.smart_project()
     bpy.ops.object.mode_set(mode="OBJECT")
-    recipe = read(resolve(pipeline["materialRecipePath"]))
     spec = recipe["prototypeMaterial"]
     material = bpy.data.materials.new(spec["name"])
     material.use_nodes = True
@@ -1463,6 +1711,24 @@ def main():
     shader.inputs["Roughness"].default_value = spec["roughness"]
     material["evidenceBoundary"] = recipe["evidenceBoundary"]
     garment.data.materials.append(material)
+    tab_material_indices = {"prototypeMaterial": 0}
+    if rear_waist_tab_evidence.get("applied"):
+        tab_material_spec = recipe["prototypeRearWaistTabMaterials"]
+        for material_id, key in (("rearWaistTabMaterial", "tab"), ("rearWaistBuckleMaterial", "buckle")):
+            entry = tab_material_spec[key]
+            tab_material = bpy.data.materials.new(entry["name"])
+            tab_material.use_nodes = True
+            tab_shader = tab_material.node_tree.nodes.get("Principled BSDF")
+            tab_shader.inputs["Base Color"].default_value = (*entry["baseColorLinearRgb"], 1)
+            tab_shader.inputs["Roughness"].default_value = entry["roughness"]
+            tab_shader.inputs["Metallic"].default_value = entry["metallic"]
+            tab_material["evidenceBoundary"] = entry["evidenceBoundary"]
+            garment.data.materials.append(tab_material)
+            tab_material_indices[material_id] = len(garment.data.materials) - 1
+        for polygon, material_id in zip(garment.data.polygons, mesh["faceMaterialIds"]):
+            if material_id not in tab_material_indices:
+                raise ValueError(f"Unknown prototype face material owner: {material_id}")
+            polygon.material_index = tab_material_indices[material_id]
     prototype_edge_trim = add_prototype_edge_trim(mesh, job, pieces, recipe)
     prototype_surface_motifs = add_prototype_surface_motifs(mesh, job, recipe)
     source = resolve(job["blendPath"])
@@ -1479,6 +1745,8 @@ def main():
         "buildDisposition": "EDITABLE_SEWN_PROTOTYPE_ONLY",
         "prototypeEdgeTrim": prototype_edge_trim,
         "prototypeSurfaceMotifs": prototype_surface_motifs,
+        "shortsCoverageExtension": shorts_extension_evidence,
+        "rearWaistAdjustmentTab": rear_waist_tab_evidence,
         "sourceBlendSha256": digest(source), "sewnMeshSha256": digest(mesh_path),
         "canonicalInputs": expected,
         "measuredContourPlacement": contour_evidence,

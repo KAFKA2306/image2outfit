@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v15-panel-pleat-thigh-follow-20261017",
+  "revision": "v16-skortsurface-rear-tab-20261018",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -19,22 +19,22 @@
   },
   "blockingFindings": [
     {
-      "description": "V15 direct crouch and sit renders still show broad fitted shorts under the lifted overskirt. Source-bound ray coverage falls to crouch upper thigh L/R 0.2983/0.2814 and sit 0.1955/0.1853. This diagnostic is geometric evidence only and does not establish fit.",
-      "code": "POSE_COVERAGE",
+      "description": "Direct neutral renders show the extended under-shorts hem protruding below the overskirt. In crouch the shorts cover more of the thighs, but in sit the shorts remain conspicuously exposed while the overskirt lifts and flares. The intended opaque skort coverage is not yet balanced across neutral and seated poses.",
+      "code": "SKORT_COVERAGE",
       "severity": "BLOCKER"
     },
     {
-      "description": "The panel-local two-fold-per-panel field and 4 mm radial amplitude soften the front silhouette, but neutral front/back/profile still lack clearly readable regular pleats; back and right-side panels retain uneven angular faceting and abrupt panel transitions.",
+      "description": "Across front, back, side, and three-quarter views the overskirt still reads as a plain flared skirt; regular pleats are not visually clear. Rear and side surfaces retain broad angular faceting and abrupt folds.",
       "code": "SKIRT_FORM_AND_FACETING",
       "severity": "BLOCKER"
     },
     {
-      "description": "V15 all-panel thigh-follow weights reduce overskirt coverage against the posed thighs versus V14; crouch and seated renders lift the hem and expose the shorts over a large area. Current weights are an unapproved deformation hypothesis.",
-      "code": "POSE_DRAPE",
+      "description": "The declared rear waist tab is present as a small protruding shape in the side view, but it is difficult to distinguish as an adjustment tab in the direct rear view and does not read clearly as a garment detail.",
+      "code": "REAR_TAB_LEGIBILITY",
       "severity": "BLOCKER"
     },
     {
-      "description": "Direct five-view and six-pose review still shows a mostly plain ivory jacket, broad diagonal lavender chest panel, faint elbow channels, and no visible center-back waist adjustment tab.",
+      "description": "The jacket remains mostly plain ivory with a broad diagonal lavender chest panel and minimal visible seam or trim detail in the five views.",
       "code": "STYLING_FIDELITY",
       "severity": "BLOCKER"
     },

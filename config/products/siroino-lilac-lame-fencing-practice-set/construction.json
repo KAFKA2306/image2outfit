@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v15-panel-pleat-thigh-follow-20261017",
+  "designRevision": "v16-skortsurface-rear-tab-20261018",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -162,6 +162,7 @@
   "prototypeWeightRegions": [
     {
       "pieceIds": [
+        "back-waist-adjustment-tab",
         "shorts-front-left",
         "shorts-front-right",
         "shorts-back-left",
@@ -176,7 +177,7 @@
         "waistband-back-right"
       ],
       "bodyTriangleZM": [
-        0.45,
+        0.32,
         0.87
       ],
       "excludedBoneNamePrefixes": [
@@ -186,7 +187,7 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "Explicit provisional pelvis/leg surface window in rest coordinates. Prevent arm/hand nearest-surface transfer to displaced lower garment panels; no approved fit or runtime motion.",
+      "evidenceBoundary": "V16 provisional pelvis/leg surface window is extended downward for the lower-hem coverage hypothesis and includes the surface-projected rear adjustment tab. Prevent arm/hand nearest-surface transfer to lower garment pieces; this does not establish pose deformation, opacity, penetration, approved fit, or runtime motion.",
       "weightProfile": {
         "method": "panel-balanced-hem-thigh-follow-v5",
         "pieceIds": [

@@ -9272,6 +9272,38 @@
     },
     "evidenceBoundary": "Neutral body measurements guide a revised prototype outline only. Added ease, gusset function, penetrations, crouch/sit coverage, shape-key response, and fit acceptance remain unverified; inspect regenerated renders before deciding whether to continue this construction."
   },
+  "shortsCoverageExtension": {
+    "method": "shorts-lower-hem-skirt-coverage-v1",
+    "pieceIds": [
+      "shorts-front-left",
+      "shorts-front-right",
+      "shorts-back-left",
+      "shorts-back-right"
+    ],
+    "extensionM": 0.045,
+    "fadeHeightM": 0.075,
+    "evidenceBoundary": "V16 adds a bounded 45 mm downward extension only near the four sewn shorts lower hems, fading to the original geometry 75 mm above the hem, then projects against the measured avatar surface. This tests opaque skort coverage under crouch/sit without changing the neutral skirt hem; pattern ease, opacity, pose coverage, collision, fit, Shape Keys, and appearance remain unverified."
+  },
+  "rearWaistAdjustmentTab": {
+    "method": "avatar-back-surface-projected-tab-v1",
+    "pieceId": "back-waist-adjustment-tab",
+    "bodyMeshNamePrefix": "SiroinoSotai_PC",
+    "centerXZ": [
+      0.0,
+      0.755
+    ],
+    "widthM": 0.125,
+    "heightM": 0.032,
+    "xSegments": 8,
+    "zSegments": 2,
+    "backQueryYM": 0.3,
+    "surfaceOffsetM": 0.012,
+    "buckleReliefM": 0.0015,
+    "buckleWidthM": 0.032,
+    "buckleHeightM": 0.018,
+    "maximumProjectionDistanceM": 0.5,
+    "evidenceBoundary": "V16 tab vertices are ray-bound to the evaluated neutral Siroino avatar back surface with zero-valued Shape Keys, and are included in the garment mesh so the existing weight, cloth, export, and render stages process them. The 125 by 32 mm dimensions and 12 mm offset are provisional appearance hypotheses; attachment strength, collision, weight quality, fit, and runtime remain unverified."
+  },
   "shortsUpperSurfacePlacement": {
     "method": "evaluated-body-nearest-surface-blended-placement",
     "pieceIds": [
@@ -9281,7 +9313,7 @@
       "shorts-back-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
-    "fadeStartZM": 0.445,
+    "fadeStartZM": 0.32,
     "fullWeightStartZM": 0.525,
     "maximumZM": 0.755,
     "fullWeightAbsXM": 0.22,
