@@ -84,8 +84,8 @@
         "stiffness": 20.0,
         "maximum": 20.0,
         "model": "ANGULAR",
-        "reason": "Measure the short hem and center-front apron after splitting the front/back shells and waistband into center-seamed left/right panels. Keep a shared bilateral center-hem profile at the joined front seam, then inspect seam stress, body coverage, folds, and all poses. This changes construction topology; it does not establish fit or appearance approval.",
-        "evidenceBoundary": "One native Blender 4.4.3 16-frame trial on the revised short rear/side hem and tapered forward apron. This is parameter-trial evidence only; no dynamic coverage, penetration, fit, motion, visual appearance, or release acceptance.",
+        "reason": "The prior outward-only radial bumps read as a flared shell and retained a stiff fan in seated renders. Compare twelve alternating raised and recessed triangular pleat facets aligned to actual crease cuts, with an 8 mm prototype amplitude; this is a reversible mesh-shape hypothesis, not fabric calibration, fit, or appearance approval.",
+        "evidenceBoundary": "One native Blender 4.4.3 16-frame trial on sewn bilateral panels with signed alternating radial pleat facets. This geometry/parameter trial does not establish cloth material response, dynamic coverage, penetration, fit, motion, appearance, or release acceptance.",
         "grantsFitAcceptance": false
       },
       "pinMethod": "canonical shared seam vertices",
@@ -95,37 +95,37 @@
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.006258426310523646,
-          "maximum": 0.16447172174230218
+          "minimum": 0.0061614945298060775,
+          "maximum": 0.15894429292529821
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 7,
+        "belowCombinedCollisionMarginVertexCount": 33,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.3888462483882904,
+          0.38985446095466614,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.006258426310523646,
-          "maximum": 0.11072587827220559
+          "minimum": 0.00620256646652706,
+          "maximum": 0.10180080437567085
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 13,
+        "belowCombinedCollisionMarginVertexCount": 29,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "05efd637bce295e9887eecda0f7347305c385f427cd5ecf27e9594bac3c9ee19",
-      "evaluatedFrameMeshSha256": "4c43aabb9d418ea4bc65bb635cc68a8a703857fe5003bc8f0cf61774f8387574",
-      "settledMeshSha256": "4c43aabb9d418ea4bc65bb635cc68a8a703857fe5003bc8f0cf61774f8387574",
+      "preBakeMeshSha256": "7d2f6fe4c91f6bea275f96bf6751106b2c2f765d09174ec957ec542a457f35b8",
+      "evaluatedFrameMeshSha256": "738450e6ba7d09e16b96d653e735114d0577d1a6c1779302bdbcc5dfd4c203c9",
+      "settledMeshSha256": "738450e6ba7d09e16b96d653e735114d0577d1a6c1779302bdbcc5dfd4c203c9",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "6c0916519f8fc0962bb0ad5814861ee396d45fbbd3e7d7c50639303eb76f16f7",
-  "constructionSha256": "b27455db88163bb6aec2f5298fdfe9e9d0e513894cbf259e70a0f19f9b089160",
+  "sourceBlendSha256": "3ef659c09528182daf9bab317b0dd2e10048768b9fdda6cb2fb6bbbd2e5d3e3e",
+  "constructionSha256": "d664b15b379df01f2bb3a6f885728f7656bf13cbee0730170c7eac57f472cee4",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "28873e82627dabc2c4a90d5f737a65d43639eb97cdf6753f4d541b3255c3bcd9",
+  "candidateSha256": "13a6528d95c904c905d41d4575b42fde547907f01a3aa776f0946b9313194ec0",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

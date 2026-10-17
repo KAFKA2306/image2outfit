@@ -978,7 +978,9 @@ def split_declared_skirt_creases(mesh, pose):
     from mathutils import Vector
 
     spec = pose.get("skirtPleatPlacement")
-    if spec is None or spec["method"] != "crease-aligned-triangular-radial-fold":
+    if spec is None or spec["method"] not in {
+            "crease-aligned-triangular-radial-fold",
+            "crease-aligned-alternating-triangular-radial-pleat"}:
         return {"applied": False}
     count = spec["foldCount"]
     origin = spec["axisOriginBlenderXYM"]
@@ -1184,7 +1186,10 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
     spec = pose.get("skirtPleatPlacement")
     if spec is None:
         return {"applied": False}
-    if spec["method"] not in {"outward-triangular-radial-fold-seed", "crease-aligned-triangular-radial-fold"}:
+    if spec["method"] not in {
+            "outward-triangular-radial-fold-seed",
+            "crease-aligned-triangular-radial-fold",
+            "crease-aligned-alternating-triangular-radial-pleat"}:
         raise ValueError("Unknown skirt fold placement")
     origin = spec["axisOriginBlenderXYM"]
     waist, declared_hem = spec["waistZM"], spec["hemZM"]
@@ -1220,9 +1225,16 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         native = native_vertices[i]
         angle = math.atan2(native[0]-origin[0], -(native[1]-origin[1]))
         position = ((angle-phase)*count/(2*math.pi)) % 1
-        displacement = depth*blend*(1-abs(2*position-1))
+        if spec["method"] == "crease-aligned-alternating-triangular-radial-pleat":
+            # Alternate raised and recessed knife folds around the hem. The
+            # extrema lie on the crease cuts made above, so this produces a
+            # faceted accordion profile instead of pushing every fold outward.
+            wave = 1.0 - 4.0*abs(position-0.5)
+        else:
+            wave = 1-abs(2*position-1)
+        displacement = depth*blend*wave
         radius = math.hypot(x-origin[0], y-origin[1])
-        if radius <= 1e-9:
+        if radius <= 1e-9 or radius + displacement <= 1e-9:
             raise ValueError("Skirt fold radial coordinate collapsed")
         mesh["vertices"][i] = [x+(x-origin[0])*displacement/radius,
                                 y+(y-origin[1])*displacement/radius, z]

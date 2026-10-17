@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v9-bilateral-sewn-skirt-panels-20261017",
+  "revision": "v10-alternating-knife-pleats-20261017",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -19,34 +19,34 @@
   },
   "blockingFindings": [
     {
-      "code": "STYLING_FIDELITY",
       "severity": "BLOCKER",
-      "description": "Direct review of all five current views shows a plain ivory fitted jacket with a broad flat lavender diagonal panel, sparse buttons and oversized elbow diamonds; torso surfaces remain visibly faceted."
+      "description": "Direct inspection of the five current views still shows a plain ivory fitted jacket, broad flat lavender diagonal chest panel, sparse closures, oversized elbow diamonds and visibly faceted torso/sleeves.",
+      "code": "STYLING_FIDELITY"
     },
     {
-      "code": "SKIRT_FORM_AND_FACETING",
       "severity": "BLOCKER",
-      "description": "The split skirt now has a clearer center seam, but the standing silhouette is still a simple flared shell with coarse vertical folds rather than the short, articulated pleated practice skirt in the concept."
+      "description": "The signed alternating radial pleat prototype creates stronger crease facets but the standing skirt remains a broad, low-detail flared shell rather than the short articulated fencing practice skirt visible in the concept.",
+      "code": "SKIRT_FORM_AND_FACETING"
     },
     {
-      "code": "POSE_COVERAGE",
       "severity": "BLOCKER",
-      "description": "Current crouch and sit images expose substantial shorts and show stiff triangular skirt flares beside and behind the thighs. Same-pose overskirt ray coverage is crouch 0.5548/0.5729, sit 0.4542/0.4497 (left/right upper thigh); this is prototype geometry evidence only."
+      "description": "Current crouch and seated renders show substantial shorts exposure and hard triangular panels beside the thighs. Current measured overskirt ray coverage on left/right upper thigh is neutral 0.7503/0.7525, crouch 0.5367/0.5424, sit 0.4373/0.4418; this is geometric prototype evidence only.",
+      "code": "POSE_COVERAGE"
     },
     {
-      "code": "POSE_DRAPE",
       "severity": "BLOCKER",
-      "description": "Prone render compresses the skirt into a wide, irregular fan with angular folds; neutral, crouch and seated renders also show uneven faceted drape."
+      "description": "The prone image still compresses the skirt into a wide uneven fan; crouch and seated images show stiff triangular panel flares. The signed pleat displacement has not resolved the posed drape failure.",
+      "code": "POSE_DRAPE"
     },
     {
-      "code": "SLEEVE_SURFACE_QUALITY",
       "severity": "BLOCKER",
-      "description": "Arms-up and arm-cross images retain visible sleeve/underarm faceting; elbow diamonds remain large surface decals rather than restrained quilted patches."
+      "description": "Arms-up and arm-cross images retain visible sleeve and underarm faceting; elbow diamonds remain oversized surface decals rather than restrained quilted patches.",
+      "code": "SLEEVE_SURFACE_QUALITY"
     },
     {
-      "code": "REAR_AND_SIDE_FINISH",
       "severity": "BLOCKER",
-      "description": "Rear and side views retain a featureless back and abrupt waist-to-skirt transition; no convincing back adjustment or finished panel detail is visible."
+      "description": "Rear and side views remain featureless and faceted with an abrupt waist-to-skirt transition and no convincing rear adjustment or finished panel detail.",
+      "code": "REAR_AND_SIDE_FINISH"
     }
   ],
   "failedGeometryChecks": [
