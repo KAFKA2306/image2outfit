@@ -55,6 +55,8 @@ tasks:
     desc: Execute the selected modular toolchain with a resumable checkpoint.
     requires:
       vars: [PRODUCT]
+    vars:
+      CHECKPOINT: '{{.CHECKPOINT | default (printf ".image2outfit/products/%s/pipeline-state.json" .PRODUCT)}}'
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
@@ -65,7 +67,7 @@ tasks:
         python tools/run_garment_pipeline.py
         --request "config/pipeline/requests/{{.PRODUCT}}.json"
         --execute
-        --checkpoint-output ".image2outfit/products/{{.PRODUCT}}/pipeline-state.json"
+        --checkpoint-output "{{.CHECKPOINT}}"
 
   batch:status:
     desc: Summarize the existing per-product execution states for a tracked batch.

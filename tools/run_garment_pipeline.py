@@ -4,10 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
+import hashlib
 import json
+import os
 import sys
+import time
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -297,7 +301,7 @@ def _emit_failure(
     return _emit(args, {"status": "FAILED", "failure": failure})
 
 
-def main() -> int:
+def _main_unlocked() -> int:
     args = parse_args()
     try:
         request_path = _repo_path(args.request, label="request")
@@ -467,6 +471,65 @@ def main() -> int:
                 args, error_code="PRODUCT_HANDOFF_FAILED", phase="handoff", exc=exc
             )
     return _emit(args, result)
+
+
+@contextlib.contextmanager
+def _product_pipeline_lock(product_id: str) -> Iterator[None]:
+    """Serialize writers that share a product's runtime and transaction journals."""
+    lock_root = ROOT / ".image2outfit" / "locks"
+    lock_root.mkdir(parents=True, exist_ok=True)
+    lock_name = hashlib.sha256(product_id.encode("utf-8")).hexdigest() + ".lock"
+    descriptor = os.open(lock_root / lock_name, os.O_CREAT | os.O_RDWR, 0o600)
+    locked = False
+    try:
+        if os.name == "nt":
+            import msvcrt
+
+            if os.fstat(descriptor).st_size == 0:
+                os.write(descriptor, b"\0")
+            while not locked:
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                try:
+                    msvcrt.locking(descriptor, msvcrt.LK_NBLCK, 1)
+                    locked = True
+                except OSError:
+                    time.sleep(0.25)
+        else:
+            import fcntl
+
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+            locked = True
+        yield
+    finally:
+        if locked:
+            if os.name == "nt":
+                import msvcrt
+
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+        os.close(descriptor)
+
+
+def main() -> int:
+    args = parse_args()
+    if not args.execute:
+        return _main_unlocked()
+    try:
+        request_path = _repo_path(args.request, label="request")
+        request = _read_object(request_path, label="request")
+        product_id = str(request["productId"])
+        if not product_id:
+            return _main_unlocked()
+    except Exception:
+        # Keep the normal request validator as the sole owner of user-facing
+        # malformed-request diagnostics.
+        return _main_unlocked()
+    with _product_pipeline_lock(product_id):
+        return _main_unlocked()
 
 
 if __name__ == "__main__":
