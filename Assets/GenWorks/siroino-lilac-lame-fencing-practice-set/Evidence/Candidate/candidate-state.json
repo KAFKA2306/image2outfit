@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v11-short-sewn-pleat-20261017",
+  "revision": "v12-moderate-smooth-pleat-20261017",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -20,33 +20,33 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "description": "Direct inspection of all current views still shows a plain ivory jacket with a broad lavender diagonal chest stripe, sparse closures, oversized elbow diamonds, and faceted torso, sleeves, skirt, and rear surfaces; the distinctive finished fencing-practice styling is absent.",
-      "code": "STYLING_FIDELITY"
+      "code": "STYLING_FIDELITY",
+      "description": "Direct inspection of all five current V12 views and six pose renders shows the plain ivory jacket, broad lavender diagonal panel and oversized elbow diamonds are still simplistic and do not yet read as a finished fencing-practice outfit; rear and side garment detailing remains sparse."
     },
     {
       "severity": "BLOCKER",
-      "description": "The v11 hem is visibly shorter at the standing front, but the skirt still reads as a broad low-detail flared shell; the sewn pleat structure is not legible as an articulated fencing skirt and the rear/side panels remain faceted.",
-      "code": "SKIRT_FORM_AND_FACETING"
+      "code": "SKIRT_FORM_AND_FACETING",
+      "description": "The 60 mm longer hem and restrained wrap reduce the standing flare slightly, but the overskirt remains a broad shell. Cosine pleat displacement on the current coarse panel mesh still renders as angular, jagged folds rather than controlled sewn pleats."
     },
     {
       "severity": "BLOCKER",
-      "description": "Current crouch and seated renders show substantial shorts exposure as the overskirt lifts behind and beside the thighs. The current geometric overskirt ray-coverage fractions on left/right upper thigh are neutral 0.3593/0.3605, crouch 0.2802/0.2780, and sit 0.2452/0.2475; these values are prototype geometry evidence only and do not grant fit acceptance.",
-      "code": "POSE_COVERAGE"
+      "code": "POSE_COVERAGE",
+      "description": "Current geometric overskirt ray coverage of upper-thigh samples is neutral L/R 0.5243/0.5232, crouch 0.3887/0.3853, and sit 0.3299/0.3299. Coverage improved over V11 but shorts remain visibly exposed during crouch and sit. These geometry diagnostics do not grant fit acceptance."
     },
     {
       "severity": "BLOCKER",
-      "description": "The prone render still compresses the skirt into a wide uneven fan, while crouch and seated views show rigid triangular folds and extensive shorts exposure. The shorter hem hypothesis has not resolved posed drape or coverage.",
-      "code": "POSE_DRAPE"
+      "code": "POSE_DRAPE",
+      "description": "Crouch and seated views still show the skirt lifting and breaking into rigid angular folds; prone view forms a wide uneven fan. The moderate length increase and smooth radial fold field did not resolve deformation or pose coverage."
     },
     {
       "severity": "BLOCKER",
-      "description": "Arms-up and arm-cross views retain visible sleeve and underarm faceting; elbow diamonds remain oversized surface decals rather than restrained quilted patches.",
-      "code": "SLEEVE_SURFACE_QUALITY"
+      "code": "SLEEVE_SURFACE_QUALITY",
+      "description": "Arms-up and arm-cross views retain faceted sleeve/underarm surfaces, and the elbow diamonds still read as oversized surface decals rather than restrained quilted patches."
     },
     {
       "severity": "BLOCKER",
-      "description": "Rear and side views remain featureless and faceted with an abrupt waist-to-skirt transition and no convincing rear adjustment or finished panel detail.",
-      "code": "REAR_AND_SIDE_FINISH"
+      "code": "REAR_AND_SIDE_FINISH",
+      "description": "Back and profile renders remain plain and faceted, with no convincing finished rear-waist adjustment or clean panel transition."
     }
   ],
   "failedGeometryChecks": [

@@ -8864,21 +8864,21 @@
       }
     ],
     "placedVertexCount": 1736,
-    "heightBlendSkippedVertexCount": 1020,
-    "angularSourceVerticesSha256": "3c918df7f546fbd7d49f175d3d8612c05b6f363afef64e8748890c0cdaaf4236",
+    "heightBlendSkippedVertexCount": 1198,
+    "angularSourceVerticesSha256": "8622449646e283bbed5a3f5bad30e307815f735ab7cb762eeaa51e4fd52e2549",
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "8d011b0c4b6233a6e3e88f28bdb0f9b86ad5f8ad886e0569dd01b424cfb6c5b5",
-    "afterVerticesSha256": "2a6313c02123af52c801b4eb0d2620239df6f62a1a1c3591ca2ee0612cdedd62",
+    "beforeVerticesSha256": "3fc56803b25eb1db705dcd378e2c70741835d667cfb71ab6196a6fcde0bbd157",
+    "afterVerticesSha256": "2ee806991b2328fa49a17aff17b55ad81cfce90e817a0ece616b75ef6bd19b13",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
   "declaredSkirtFoldPlacement": {
     "applied": true,
     "configuration": {
-      "method": "retain-short-sewn-pattern-hem-v1",
-      "foldMethod": "crease-aligned-alternating-triangular-radial-pleat",
+      "method": "bounded-panel-extension-v1",
+      "foldMethod": "crease-aligned-smooth-radial-pleat",
       "pieceIds": [
         "overskirt-front-left",
         "overskirt-front-right",
@@ -8891,12 +8891,12 @@
       ],
       "waistZM": 0.7395782470703125,
       "sourceHemZM": 0.5995782470703125,
-      "hemZM": 0.5995782470703125,
-      "hemExtensionM": 0,
+      "hemZM": 0.53957824707,
+      "hemExtensionM": 0.06,
       "foldCount": 12,
-      "hemFoldDepthM": 0.008,
+      "hemFoldDepthM": 0.018,
       "phaseRadians": 0,
-      "evidenceBoundary": "Keep the drafted 140 mm short sewn panel length and remove the added 90 mm downward extension plus 100 mm front apron that produced the long shell and stiff knee flares in v10. Retain twelve signed triangular radial pleat facets at 8 mm as a prototype-only mesh hypothesis. This does not establish drape, seated coverage, fit, motion, penetration, appearance or release acceptance.",
+      "evidenceBoundary": "V12 prototype hypothesis: continue the sewn overskirt panels downward by 60 mm from the rejected short v11 hem, use smooth cosine radial pleats at the existing crease-aligned topology, and restrain hem flare in the panel wrap. This targets the directly observed shorts exposure and rigid broad shell; cloth settling, coverage, fit, motion, penetration and appearance remain unapproved.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8905,16 +8905,16 @@
       ]
     },
     "effectiveHeightRangeZM": [
-      0.5995782470703125,
+      0.53957824707,
       0.7395782470703125
     ],
     "extensionBelowDeclaredPleatHemM": 0.0,
     "selectedVertexCount": 1578,
     "movedVertexCount": 1514,
-    "maximumRadialDisplacementM": 0.008,
+    "maximumRadialDisplacementM": 0.018,
     "minimumTriangleAreaM2": 1.0472661275604241e-07,
-    "beforeVerticesSha256": "2a6313c02123af52c801b4eb0d2620239df6f62a1a1c3591ca2ee0612cdedd62",
-    "afterVerticesSha256": "8723c5e5aaea6d059b13a2665ed7ab6522b3bb0a0f4f2591a4ca1b638a8518ab",
+    "beforeVerticesSha256": "2ee806991b2328fa49a17aff17b55ad81cfce90e817a0ece616b75ef6bd19b13",
+    "afterVerticesSha256": "196907f7018bd38860a05fc4987f88e43ee7007dfffb2ce941d480407f2eb660",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "grantsFitAcceptance": false,
@@ -8922,7 +8922,7 @@
   },
   "declaredSkirtLengthening": {
     "applied": true,
-    "method": "retain-short-sewn-pattern-hem-v1",
+    "method": "linear-downward-extension-from-fixed-sewn-waist-to-overskirt-hem",
     "pieceIds": [
       "overskirt-back-left",
       "overskirt-back-right",
@@ -8930,12 +8930,12 @@
       "overskirt-front-right"
     ],
     "sourceHemZM": 0.5995782470703125,
-    "targetHemZM": 0.5995782470703125,
+    "targetHemZM": 0.53957824707,
     "waistZM": 0.7395782470703125,
-    "extensionM": 0.0,
+    "extensionM": 0.06000000000031247,
     "selectedVertexCount": 1578,
-    "movedVertexCount": 0,
-    "maximumVertexDisplacementM": 0.0,
+    "movedVertexCount": 1514,
+    "maximumVertexDisplacementM": 0.06000000000031247,
     "forwardApron": null,
     "maximumAdditionalForwardApronDisplacementM": 0.0,
     "maximumForwardApronProjectionM": 0.0,
@@ -8944,7 +8944,7 @@
       0.7395782470703125
     ],
     "afterBoundsZM": [
-      0.5995782470703125,
+      0.53957824707,
       0.7395782470703125
     ],
     "grantsFitAcceptance": false,
@@ -9070,8 +9070,8 @@
     "grantsFitOrAppearanceAcceptance": false,
     "evidenceBoundary": "Positive-Y raycast-bound prototype seam hypothesis on the declared sewn bodice panels, retained only for direct visual review. It is not thread/trim geometry, an approved design, fit, or release evidence."
   },
-  "sourceBlendSha256": "bdb19e52d17c7af7ddc68680e94178af1c191abe732f6ed7669bf1de2e50a606",
-  "sewnMeshSha256": "e9c0557a851d779bded57c2a5c8850b28125aaa00b4f55af907ba58061a9fa49",
+  "sourceBlendSha256": "43e1e8e3b7f206648fd851ad6855adb30e229e2034542c1b2aec9d402cce7005",
+  "sewnMeshSha256": "4fa4d01afaed94274b0ec36e0547b5458fbb9c2db0427df288d49bfd89c3ee0c",
   "canonicalInputs": {
     "patternSha256": "ea035d5c09402c176852405c1e23a6522918fb05c3c00f8b406970cc2de2d118",
     "stitchGraphSha256": "9898cf54328f5167ca00944d29cdd6cf8650279c784f195fa5282212d6070838"
@@ -32821,8 +32821,8 @@
     "layerOffsetVertexCount": 555,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 580,
-    "beforeVerticesSha256": "48cd4337c3a13450709a5192981fa3299367fd950c0544197b066f6892f35e0f",
-    "afterVerticesSha256": "25741e7268d71abd5ade6b38ff4d898921bc8bc657a191d05e9455808c2c1bcc",
+    "beforeVerticesSha256": "f0e536a62aa851600c60c29eca0cca44e83973acf3f663d98220c60cc06e969b",
+    "afterVerticesSha256": "e6e0968495369ee6ecb595a6797bdee5a346c3a33fad4ddfdb26fb5d35f982e1",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -140105,8 +140105,8 @@
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "3c918df7f546fbd7d49f175d3d8612c05b6f363afef64e8748890c0cdaaf4236",
-    "afterVerticesSha256": "8d011b0c4b6233a6e3e88f28bdb0f9b86ad5f8ad886e0569dd01b424cfb6c5b5",
+    "beforeVerticesSha256": "757fd533c2973209d8f34dd0985956edbf72e7ffe49107bff192adc0e730187f",
+    "afterVerticesSha256": "3fc56803b25eb1db705dcd378e2c70741835d667cfb71ab6196a6fcde0bbd157",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -143447,8 +143447,8 @@
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 75,
-    "beforeVerticesSha256": "a5f37948c2588e73650b34a107d876bef7f040498c572f9b30d1930c91f2f3ea",
-    "afterVerticesSha256": "48cd4337c3a13450709a5192981fa3299367fd950c0544197b066f6892f35e0f",
+    "beforeVerticesSha256": "cd36c8ba390237aacdd9e0b01d944be9b717acd216930f150ab2fe0580cfb3d3",
+    "afterVerticesSha256": "f0e536a62aa851600c60c29eca0cca44e83973acf3f663d98220c60cc06e969b",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },

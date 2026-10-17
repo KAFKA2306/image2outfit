@@ -980,7 +980,8 @@ def split_declared_skirt_creases(mesh, pose):
     spec = pose.get("skirtPleatPlacement")
     if spec is None or spec["method"] not in {
             "crease-aligned-triangular-radial-fold",
-            "crease-aligned-alternating-triangular-radial-pleat"}:
+            "crease-aligned-alternating-triangular-radial-pleat",
+            "crease-aligned-smooth-radial-pleat"}:
         return {"applied": False}
     count = spec["foldCount"]
     origin = spec["axisOriginBlenderXYM"]
@@ -1195,7 +1196,8 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
     if fold_method not in {
             "outward-triangular-radial-fold-seed",
             "crease-aligned-triangular-radial-fold",
-            "crease-aligned-alternating-triangular-radial-pleat"}:
+            "crease-aligned-alternating-triangular-radial-pleat",
+            "crease-aligned-smooth-radial-pleat"}:
         raise ValueError("Unknown skirt fold placement")
     origin = spec["axisOriginBlenderXYM"]
     waist, declared_hem = spec["waistZM"], spec["hemZM"]
@@ -1231,10 +1233,11 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         native = native_vertices[i]
         angle = math.atan2(native[0]-origin[0], -(native[1]-origin[1]))
         position = ((angle-phase)*count/(2*math.pi)) % 1
-        if fold_method == "crease-aligned-alternating-triangular-radial-pleat":
-            # Alternate raised and recessed knife folds around the hem. The
-            # extrema lie on the crease cuts made above, so this produces a
-            # faceted accordion profile instead of pushing every fold outward.
+        if fold_method == "crease-aligned-smooth-radial-pleat":
+            # Crease cuts align with cosine extrema; the smooth field avoids
+            # the sharp triangular facets rejected in the prior prototype.
+            wave = math.cos(2.0 * math.pi * position)
+        elif fold_method == "crease-aligned-alternating-triangular-radial-pleat":
             wave = 1.0 - 4.0*abs(position-0.5)
         else:
             wave = 1-abs(2*position-1)
