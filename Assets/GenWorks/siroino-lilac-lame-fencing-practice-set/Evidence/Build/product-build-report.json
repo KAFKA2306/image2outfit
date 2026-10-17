@@ -8864,21 +8864,21 @@
       }
     ],
     "placedVertexCount": 3638,
-    "heightBlendSkippedVertexCount": 2626,
+    "heightBlendSkippedVertexCount": 2722,
     "angularSourceVerticesSha256": "8658804fe90f2807367c8ae2c6cd8169a4f541930f6d04a11ca4a755e03bfd40",
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "6608793acb7a05123c6e4a80760ac550cc4dde57b53a1eb360ed6e4a4debca6e",
-    "afterVerticesSha256": "92d017d59fd3461411eb563c76eb7f5ff07cb5321d09f4631815bc132c1d8d32",
+    "beforeVerticesSha256": "e0bea90bd6d67d6bccbe8ff9a0f84a60102d0be121f716c0d472b5ad72e23494",
+    "afterVerticesSha256": "f5cb7e5b58e4ad4490df93df1e9d10c43cf6f6ebf80184903426db080f784247",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
   "declaredSkirtFoldPlacement": {
     "applied": true,
     "configuration": {
-      "method": "bounded-panel-extension-v1",
-      "foldMethod": "crease-aligned-smooth-radial-pleat",
+      "method": "bounded-panel-extension-v2-coverage-hem",
+      "foldMethod": "crease-bound-soft-box-pleat-v1",
       "longitudinalSubdivisionCount": 4,
       "pieceIds": [
         "overskirt-front-left",
@@ -8892,12 +8892,14 @@
       ],
       "waistZM": 0.7395782470703125,
       "sourceHemZM": 0.5995782470703125,
-      "hemZM": 0.53957824707,
-      "hemExtensionM": 0.06,
+      "hemZM": 0.49957824707,
+      "hemExtensionM": 0.1,
       "foldCount": 12,
-      "hemFoldDepthM": 0.018,
+      "hemFoldDepthM": 0.012,
+      "foldValleyHalfWidthFraction": 0.24,
+      "foldValleyDepthRatio": 0.35,
       "phaseRadians": 0,
-      "evidenceBoundary": "V13 prototype hypothesis: continue the sewn overskirt panels downward by 60 mm from the rejected short v11 hem, split the actual sewn skirt mesh at 12 smooth radial crease extrema and four intermediate longitudinal height rows, and shade skirt panels smoothly. The added cuts create a five-band height grid without substituting a render-only effect. This targets shorts exposure and coarse angular folds; cloth settling, coverage, fit, motion, penetration and appearance remain unapproved.",
+      "evidenceBoundary": "V14 prototype hypothesis: continue the sewn overskirt panels downward by 100 mm from the rejected short v11 hem. Replace the radial cosine field with repeated cut-bound soft valleys and broad raised panel centers, split the sewn mesh at the declared crease cuts and four height rows, and use a pelvis-dominant capped front-hem weight field with lower cloth bending stiffness. This targets crouch/sit shorts exposure and coarse/fan-like folds; direct pose renders, cloth response, coverage, fit, motion, penetration and appearance remain unapproved.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8906,16 +8908,16 @@
       ]
     },
     "effectiveHeightRangeZM": [
-      0.5395782675058782,
+      0.49957827159305385,
       0.7395782470703125
     ],
     "extensionBelowDeclaredPleatHemM": 0.0,
     "selectedVertexCount": 3396,
     "movedVertexCount": 3316,
-    "maximumRadialDisplacementM": 0.018,
-    "minimumTriangleAreaM2": 6.635838325151757e-11,
-    "beforeVerticesSha256": "92d017d59fd3461411eb563c76eb7f5ff07cb5321d09f4631815bc132c1d8d32",
-    "afterVerticesSha256": "22afc996594ea84213ce0a9c87d68f3a9eb69f631b48304cdae5ce899a76d0e1",
+    "maximumRadialDisplacementM": 0.011990122117106358,
+    "minimumTriangleAreaM2": 8.355200878545788e-11,
+    "beforeVerticesSha256": "f5cb7e5b58e4ad4490df93df1e9d10c43cf6f6ebf80184903426db080f784247",
+    "afterVerticesSha256": "cc53c680f74aa57ebd3ec8aea9734a4e00a7e8e6e328136a5eb9887604d32da3",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "grantsFitAcceptance": false,
@@ -8931,12 +8933,12 @@
       "overskirt-front-right"
     ],
     "sourceHemZM": 0.5995782470703125,
-    "targetHemZM": 0.53957824707,
+    "targetHemZM": 0.49957824707,
     "waistZM": 0.7395782470703125,
-    "extensionM": 0.06000000000031247,
+    "extensionM": 0.1000000000003125,
     "selectedVertexCount": 3396,
     "movedVertexCount": 3316,
-    "maximumVertexDisplacementM": 0.059999993869549,
+    "maximumVertexDisplacementM": 0.09999998978237339,
     "forwardApron": null,
     "maximumAdditionalForwardApronDisplacementM": 0.0,
     "maximumForwardApronProjectionM": 0.0,
@@ -8945,7 +8947,7 @@
       0.7395782470703125
     ],
     "afterBoundsZM": [
-      0.5395782675058782,
+      0.49957827159305385,
       0.7395782470703125
     ],
     "grantsFitAcceptance": false,
@@ -8954,8 +8956,8 @@
   },
   "declaredSkirtCreaseTopology": {
     "applied": true,
-    "method": "bounded-panel-extension-v1",
-    "foldMethod": "crease-aligned-smooth-radial-pleat",
+    "method": "bounded-panel-extension-v2-coverage-hem",
+    "foldMethod": "crease-bound-soft-box-pleat-v1",
     "cuts": [
       {
         "planeAngleRadians": 0.0,
@@ -9051,7 +9053,7 @@
     "originalVertexIdentityPreserved": true,
     "grantsFitAcceptance": false,
     "grantsVisualAcceptance": false,
-    "evidenceBoundary": "Native radial cuts align fold extrema to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."
+    "evidenceBoundary": "Native radial cuts align the declared fold profile to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."
   },
   "buildDisposition": "EDITABLE_SEWN_PROTOTYPE_ONLY",
   "prototypeEdgeTrim": {
@@ -9102,11 +9104,11 @@
         "surfaceSampleCount": 283,
         "pathCount": 3,
         "pathLayout": "integrated-panel-seams-v1",
-        "filledPatchEnabled": true,
-        "filledPatchVertexCount": 33,
-        "filledPatchTriangleCount": 32,
-        "filledPatchStatus": "APPLIED",
-        "filledPatchBinding": "positive-y-raycast-to-declared-sleeve-panel",
+        "filledPatchEnabled": false,
+        "filledPatchVertexCount": 0,
+        "filledPatchTriangleCount": 0,
+        "filledPatchStatus": "OMITTED_BY_REVIEWED_RECIPE",
+        "filledPatchBinding": null,
         "hostPieceId": "jacket-sleeve-left",
         "grantsAppearanceAcceptance": false
       },
@@ -9114,11 +9116,11 @@
         "surfaceSampleCount": 283,
         "pathCount": 3,
         "pathLayout": "integrated-panel-seams-v1",
-        "filledPatchEnabled": true,
-        "filledPatchVertexCount": 33,
-        "filledPatchTriangleCount": 32,
-        "filledPatchStatus": "APPLIED",
-        "filledPatchBinding": "positive-y-raycast-to-declared-sleeve-panel",
+        "filledPatchEnabled": false,
+        "filledPatchVertexCount": 0,
+        "filledPatchTriangleCount": 0,
+        "filledPatchStatus": "OMITTED_BY_REVIEWED_RECIPE",
+        "filledPatchBinding": null,
         "hostPieceId": "jacket-sleeve-right",
         "grantsAppearanceAcceptance": false
       }
@@ -9169,7 +9171,7 @@
     "grantsFitOrAppearanceAcceptance": false,
     "evidenceBoundary": "Positive-Y raycast-bound prototype seam hypothesis on the declared sewn bodice panels, retained only for direct visual review. It is not thread/trim geometry, an approved design, fit, or release evidence."
   },
-  "sourceBlendSha256": "c0e0d3d47d50b11240fad9add3b01e4eb201db166ec978f6a21dab95e3842f04",
+  "sourceBlendSha256": "d12599df18a7ff347154863dc23f9a906a11c3ac92e8ff5ff599f46295e7cab1",
   "sewnMeshSha256": "4fa4d01afaed94274b0ec36e0547b5458fbb9c2db0427df288d49bfd89c3ee0c",
   "canonicalInputs": {
     "patternSha256": "ea035d5c09402c176852405c1e23a6522918fb05c3c00f8b406970cc2de2d118",
@@ -140203,9 +140205,9 @@
     "angularSourceVerticesSha256": null,
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
-    "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "f089bb26c26b0e63567d7cf5a8baaa7575450852ed517a14efe4d27b7ec579bc",
-    "afterVerticesSha256": "6608793acb7a05123c6e4a80760ac550cc4dde57b53a1eb360ed6e4a4debca6e",
+    "heightExtrapolatedVertexCount": 176,
+    "beforeVerticesSha256": "558fba96a4e44be7a1ee04f9e55b5f42988ef6e1b79e7fb40be68087dbb8fdcf",
+    "afterVerticesSha256": "e0bea90bd6d67d6bccbe8ff9a0f84a60102d0be121f716c0d472b5ad72e23494",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },

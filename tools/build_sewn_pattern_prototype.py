@@ -984,7 +984,8 @@ def split_declared_skirt_creases(mesh, pose):
     if fold_method not in {
             "crease-aligned-triangular-radial-fold",
             "crease-aligned-alternating-triangular-radial-pleat",
-            "crease-aligned-smooth-radial-pleat"}:
+            "crease-aligned-smooth-radial-pleat",
+            "crease-bound-soft-box-pleat-v1"}:
         return {"applied": False}
     count = spec["foldCount"]
     origin = spec["axisOriginBlenderXYM"]
@@ -1089,7 +1090,7 @@ def split_declared_skirt_creases(mesh, pose):
                 "degenerateTriangleCount": 0, "nonManifoldEdgeCount": non_manifold,
                 "originalVertexIdentityPreserved": True,
                 "grantsFitAcceptance": False, "grantsVisualAcceptance": False,
-                "evidenceBoundary": "Native radial cuts align fold extrema to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."}
+                "evidenceBoundary": "Native radial cuts align the declared fold profile to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."}
     finally:
         bm.free()
 
@@ -1228,7 +1229,8 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "outward-triangular-radial-fold-seed",
             "crease-aligned-triangular-radial-fold",
             "crease-aligned-alternating-triangular-radial-pleat",
-            "crease-aligned-smooth-radial-pleat"}:
+            "crease-aligned-smooth-radial-pleat",
+            "crease-bound-soft-box-pleat-v1"}:
         raise ValueError("Unknown skirt fold placement")
     origin = spec["axisOriginBlenderXYM"]
     waist, declared_hem = spec["waistZM"], spec["hemZM"]
@@ -1268,6 +1270,21 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             # Crease cuts align with cosine extrema; the smooth field avoids
             # the sharp triangular facets rejected in the prior prototype.
             wave = math.cos(2.0 * math.pi * position)
+        elif fold_method == "crease-bound-soft-box-pleat-v1":
+            # Each actual bisect plane is a shallow recessed sewn valley;
+            # each intervening panel eases into a broad raised center. This
+            # replaces the rejected radial cosine field with a piecewise
+            # sewn box-pleat hypothesis, not a render-only normal effect.
+            half_cell = (position * 2.0) % 1.0
+            distance_from_crease = min(half_cell, 1.0 - half_cell)
+            valley_width = float(spec.get("foldValleyHalfWidthFraction", math.nan))
+            valley_depth_ratio = float(spec.get("foldValleyDepthRatio", math.nan))
+            if not (0.05 <= valley_width < 0.45 and 0.0 < valley_depth_ratio <= 1.0):
+                raise ValueError("Invalid cut-bound soft box-pleat profile")
+            eased = max(0.0, min(1.0,
+                (distance_from_crease - valley_width) / (0.5 - valley_width)))
+            eased = eased * eased * (3.0 - 2.0 * eased)
+            wave = -valley_depth_ratio + (1.0 + valley_depth_ratio) * eased
         elif fold_method == "crease-aligned-alternating-triangular-radial-pleat":
             wave = 1.0 - 4.0*abs(position-0.5)
         else:

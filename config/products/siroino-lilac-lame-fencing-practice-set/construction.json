@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v13-sewn-crease-grid-20261017",
+  "designRevision": "v14-hip-held-box-pleat-20261017",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -124,19 +124,19 @@
         "overskirt-back-right"
       ]
     },
-    "prototypeFrameEnd": 16,
-    "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified. The overskirt stiffness 20 comparison is rerun as a hypothesis against the short rear hem, front apron and anterior thigh-weight profile.",
+    "prototypeFrameEnd": 48,
+    "evidence": "V14 bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified. Lower overskirt bending stiffness and a longer neutral settle are hypotheses intended to reduce the stiff fan after V13 direct review.",
     "reason": "The shorts now use a provisional segmented thigh and crotch-rise outline; bending evidence is remeasured for the current pattern, target and assembly pose. Fit, gusset, Shape Key and motion acceptance remain open.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
         "reason": "Direct review shows excessive sleeve wrinkling in the neutral render. Compare a structured sleeve cloth setting with the existing 0.45 baseline; 2.2 is a local prototype trial value, not a Lilac fabric calibration.",
-        "evidenceBoundary": "One neutral 16-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness."
+        "evidenceBoundary": "One neutral 48-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness."
       },
       "pleated-overskirt": {
-        "stiffness": 20,
-        "reason": "The prior outward-only radial bumps read as a flared shell and retained a stiff fan in seated renders. Compare twelve alternating raised and recessed triangular pleat facets aligned to actual crease cuts, with an 8 mm prototype amplitude; this is a reversible mesh-shape hypothesis, not fabric calibration, fit, or appearance approval.",
-        "evidenceBoundary": "One native Blender 4.4.3 16-frame trial on sewn bilateral panels with signed alternating radial pleat facets. This geometry/parameter trial does not establish cloth material response, dynamic coverage, penetration, fit, motion, appearance, or release acceptance."
+        "stiffness": 4,
+        "reason": "V13 remained a stiff, broad fan after direct review. Compare a low bend-stiffness setting and 48-frame neutral settle on the newly lowered hem and sewn box-pleat profile; this is a local prototype hypothesis, not fabric calibration, fit, or appearance approval.",
+        "evidenceBoundary": "One native Blender 4.4.3 48-frame trial on sewn bilateral panels. The reduced stiffness and longer settle are geometric simulation hypotheses only and do not establish cloth material response, dynamic coverage, penetration, fit, motion, appearance, or release acceptance."
       }
     },
     "prototypePostBakeLaplacianSmoothing": {
@@ -188,7 +188,7 @@
       ],
       "evidenceBoundary": "Explicit provisional pelvis/leg surface window in rest coordinates. Prevent arm/hand nearest-surface transfer to displaced lower garment panels; no approved fit or runtime motion.",
       "weightProfile": {
-        "method": "hip-anchored-anterior-bilateral-center-hem-fade-v3",
+        "method": "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
         "pieceIds": [
           "overskirt-front-left",
           "overskirt-front-right"
@@ -198,13 +198,14 @@
         "rightThighBone": "UpperLeg_R",
         "waistThighWeight": 0,
         "hemThighWeight": 0,
-        "forwardHemThighWeight": 0.9,
-        "centerlineHemThighWeight": 0.18,
+        "forwardHemThighWeight": 0.42,
+        "centerlineHemThighWeight": 0.08,
+        "maximumThighWeight": 0.42,
         "forwardCenterYM": -0.03788188099861145,
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.055,
         "fullSideWeightWidthM": 0.095,
-        "evidenceBoundary": "One shared bilateral center-hem weight hypothesis spans both independently sewn front panels so the joined center-front seam retains a common deformation field. The panel split changes construction topology, not avatar fit or acceptance; seam stress, shorts exposure, pose coverage, and appearance require fresh measurement."
+        "evidenceBoundary": "V14 shared bilateral center-hem profile keeps both sewn front panels on a pelvis-dominant field and caps combined thigh influence at 0.42. This deformation hypothesis targets the V13 front hem lift; seam stress, shorts exposure, pose coverage, fit, and appearance require fresh measurement."
       }
     }
   ]

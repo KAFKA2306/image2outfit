@@ -9428,8 +9428,8 @@
     ]
   },
   "skirtPleatPlacement": {
-    "method": "bounded-panel-extension-v1",
-    "foldMethod": "crease-aligned-smooth-radial-pleat",
+    "method": "bounded-panel-extension-v2-coverage-hem",
+    "foldMethod": "crease-bound-soft-box-pleat-v1",
     "longitudinalSubdivisionCount": 4,
     "pieceIds": [
       "overskirt-front-left",
@@ -9443,12 +9443,14 @@
     ],
     "waistZM": 0.7395782470703125,
     "sourceHemZM": 0.5995782470703125,
-    "hemZM": 0.53957824707,
-    "hemExtensionM": 0.06,
+    "hemZM": 0.49957824707,
+    "hemExtensionM": 0.10,
     "foldCount": 12,
-    "hemFoldDepthM": 0.018,
+    "hemFoldDepthM": 0.012,
+    "foldValleyHalfWidthFraction": 0.24,
+    "foldValleyDepthRatio": 0.35,
     "phaseRadians": 0,
-    "evidenceBoundary": "V13 prototype hypothesis: continue the sewn overskirt panels downward by 60 mm from the rejected short v11 hem, split the actual sewn skirt mesh at 12 smooth radial crease extrema and four intermediate longitudinal height rows, and shade skirt panels smoothly. The added cuts create a five-band height grid without substituting a render-only effect. This targets shorts exposure and coarse angular folds; cloth settling, coverage, fit, motion, penetration and appearance remain unapproved.",
+    "evidenceBoundary": "V14 prototype hypothesis: continue the sewn overskirt panels downward by 100 mm from the rejected short v11 hem. Replace the radial cosine field with repeated cut-bound soft valleys and broad raised panel centers, split the sewn mesh at the declared crease cuts and four height rows, and use a pelvis-dominant capped front-hem weight field with lower cloth bending stiffness. This targets crouch/sit shorts exposure and coarse/fan-like folds; direct pose renders, cloth response, coverage, fit, motion, penetration and appearance remain unapproved.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
