@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v12-moderate-smooth-pleat-20261017",
+  "revision": "v13-sewn-crease-grid-20261017",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -19,34 +19,29 @@
   },
   "blockingFindings": [
     {
-      "severity": "BLOCKER",
-      "code": "STYLING_FIDELITY",
-      "description": "Direct inspection of all five current V12 views and six pose renders shows the plain ivory jacket, broad lavender diagonal panel and oversized elbow diamonds are still simplistic and do not yet read as a finished fencing-practice outfit; rear and side garment detailing remains sparse."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "SKIRT_FORM_AND_FACETING",
-      "description": "The 60 mm longer hem and restrained wrap reduce the standing flare slightly, but the overskirt remains a broad shell. Cosine pleat displacement on the current coarse panel mesh still renders as angular, jagged folds rather than controlled sewn pleats."
-    },
-    {
-      "severity": "BLOCKER",
+      "description": "Direct crouch and seated renders still show the undershorts prominently below the lifted overskirt. Pose-matched overskirt ray coverage remains low: crouch upper thigh L/R 0.3955/0.4068 and sit 0.3525/0.3638; this is geometric coverage evidence only, not fit acceptance.",
       "code": "POSE_COVERAGE",
-      "description": "Current geometric overskirt ray coverage of upper-thigh samples is neutral L/R 0.5243/0.5232, crouch 0.3887/0.3853, and sit 0.3299/0.3299. Coverage improved over V11 but shorts remain visibly exposed during crouch and sit. These geometry diagnostics do not grant fit acceptance."
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
+      "description": "The 12 radial cut planes and four added height rows are present in the built sewn mesh (10,026 vertices; 19,489 triangles; no degenerate or non-manifold edges), but direct front/back/profile renders still show broad, wrinkled/faceted panel regions instead of controlled, clean pleats. Added topology alone did not yield the needed surface form.",
+      "code": "SKIRT_FORM_AND_FACETING",
+      "severity": "BLOCKER"
+    },
+    {
+      "description": "Crouch and sit views show the skirt lifting and folding upward around the exposed shorts; the prone view still reads as a wide uneven fan. The longer hem and denser mesh have not established motion-safe coverage or fabric response.",
       "code": "POSE_DRAPE",
-      "description": "Crouch and seated views still show the skirt lifting and breaking into rigid angular folds; prone view forms a wide uneven fan. The moderate length increase and smooth radial fold field did not resolve deformation or pose coverage."
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "code": "SLEEVE_SURFACE_QUALITY",
-      "description": "Arms-up and arm-cross views retain faceted sleeve/underarm surfaces, and the elbow diamonds still read as oversized surface decals rather than restrained quilted patches."
+      "description": "Direct inspection of all five current views and six pose renders shows a largely plain ivory jacket, broad diagonal lavender panel, and oversized angular elbow patches. Rear and side finish remain sparse and do not read as a finished fencing-practice garment.",
+      "code": "STYLING_FIDELITY",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
+      "description": "Back and profile views remain visually plain, with a broad featureless torso/back and abrupt skirt transition; the surface still lacks a convincing finished rear waist/panel treatment.",
       "code": "REAR_AND_SIDE_FINISH",
-      "description": "Back and profile renders remain plain and faceted, with no convincing finished rear-waist adjustment or clean panel transition."
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

@@ -978,7 +978,10 @@ def split_declared_skirt_creases(mesh, pose):
     from mathutils import Vector
 
     spec = pose.get("skirtPleatPlacement")
-    if spec is None or spec["method"] not in {
+    if spec is None:
+        return {"applied": False}
+    fold_method = spec.get("foldMethod", spec["method"])
+    if fold_method not in {
             "crease-aligned-triangular-radial-fold",
             "crease-aligned-alternating-triangular-radial-pleat",
             "crease-aligned-smooth-radial-pleat"}:
@@ -1006,6 +1009,7 @@ def split_declared_skirt_creases(mesh, pose):
         face = bm.faces.new([vertices[i] for i in indices])
         face[owner] = pieces.index(piece) + 1
     cuts = []
+    longitudinal_cuts = []
     try:
         for i in range(count):
             angle = phase + i * math.pi / count
@@ -1023,6 +1027,31 @@ def split_declared_skirt_creases(mesh, pose):
                 vertex[original_id] = 0
             cuts.append({"planeAngleRadians": angle, "newVertexCount": len(added),
                          "cutEdgeCount": sum(isinstance(g, bmesh.types.BMEdge) for g in result["geom_cut"])})
+        row_count = spec.get("longitudinalSubdivisionCount", 0)
+        waist = spec["waistZM"]
+        hem = spec["sourceHemZM"]
+        if (not isinstance(row_count, int) or isinstance(row_count, bool)
+                or not 0 <= row_count <= 12 or not math.isfinite(waist + hem)
+                or waist <= hem):
+            raise ValueError("Invalid declared longitudinal skirt subdivision count")
+        skirt_piece_ids = set(spec["pieceIds"])
+        for i in range(1, row_count + 1):
+            z = hem + (waist - hem) * i / (row_count + 1)
+            faces = [f for f in bm.faces if pieces[f[owner]-1] in skirt_piece_ids]
+            edges = {e for f in faces for e in f.edges}
+            verts = {v for f in faces for v in f.verts}
+            old_vertices = set(bm.verts)
+            result = bmesh.ops.bisect_plane(
+                bm, geom=[*verts, *edges, *faces], dist=1e-6,
+                plane_co=Vector((0, 0, z)), plane_no=Vector((0, 0, 1)),
+                clear_inner=False, clear_outer=False)
+            added = [v for v in bm.verts if v not in old_vertices]
+            for vertex in added:
+                vertex[original_id] = 0
+            longitudinal_cuts.append({
+                "heightZM": z, "newVertexCount": len(added),
+                "cutEdgeCount": sum(isinstance(g, bmesh.types.BMEdge)
+                                    for g in result["geom_cut"])})
         bmesh.ops.triangulate(bm, faces=list(bm.faces))
         original = {v[original_id]-1: v for v in bm.verts if v[original_id] > 0}
         if set(original) != set(range(initial_count)):
@@ -1051,7 +1080,9 @@ def split_declared_skirt_creases(mesh, pose):
         if non_manifold:
             raise ValueError("Crease cuts created non-manifold edges")
         mesh.update(vertices=result_vertices, faces=result_faces, facePieceIds=result_owners)
-        return {"applied": True, "method": spec["method"], "cuts": cuts,
+        return {"applied": True, "method": spec["method"], "foldMethod": fold_method,
+                "cuts": cuts, "longitudinalSubdivisionCuts": longitudinal_cuts,
+                "longitudinalSubdivisionCount": len(longitudinal_cuts),
                 "beforeVertexCount": initial_count, "afterVertexCount": len(ordered),
                 "beforeTriangleCount": initial_face_count, "afterTriangleCount": len(result_faces),
                 "sharedSkirtWaistbandEdgeCount": len(seam_edges),
@@ -1341,10 +1372,14 @@ def main():
     ownership = data.attributes.new("canonical_piece_index", "INT", "FACE")
     for face, owner in zip(ownership.data, owners):
         face.value = pieces.index(owner)
-    # The sleeve panels are continuous cloth surfaces. Preserve smooth
-    # per-face normals so coarse prototype triangulation does not render as
-    # fabric creases.
-    smooth_surface_pieces = {"jacket-sleeve-left", "jacket-sleeve-right"}
+    # The sleeves and the sewn overskirt are continuous cloth surfaces.
+    # Smooth shading complements the explicit crease and longitudinal cuts;
+    # those cuts remain real mesh topology, not a normal-map substitute.
+    smooth_surface_pieces = {
+        "jacket-sleeve-left", "jacket-sleeve-right",
+        "overskirt-front-left", "overskirt-front-right",
+        "overskirt-back-left", "overskirt-back-right",
+    }
     for polygon, owner in zip(data.polygons, owners):
         polygon.use_smooth = owner in smooth_surface_pieces
     garment = bpy.data.objects.new(job["id"], data)
