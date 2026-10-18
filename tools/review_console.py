@@ -732,8 +732,8 @@ def collect_product(
                         kind="uv",
                         name="UV layout (not created)",
                         status="MISSING",
-                        href=relative_href(mesh_report, output_dir),
-                        sha256=digest(mesh_report),
+                        href=None,
+                        sha256=None,
                     )
                 )
 

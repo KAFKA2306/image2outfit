@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v18-longer-underlayer-defined-pleats-visible-trim-20261018",
+  "revision": "v19-sit-crouch-skirt-thigh-follow-20261018",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -20,28 +20,28 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "description": "Direct crouch and sit views show the rear overskirt kicked behind the hips and the opaque shorts exposed across most of the thighs. Coverage is maintained by the shorts, but the intended skirt silhouette and coverage balance collapse in these poses.",
-      "code": "SKORT_COVERAGE"
+      "code": "SKIRT_POSE_COVERAGE",
+      "description": "Direct sit and crouch renders show the overskirt kicked behind the thighs, leaving the fitted shorts conspicuous across the lap. The pose-matched geometric diagnostic measured overskirt upper-thigh coverage at 25.4% left / 25.6% right when sitting and 36.5% / 36.9% when crouching, while under-shorts coverage was 95.5% and 95.4%; this is a coverage observation, not a fit pass."
     },
     {
       "severity": "BLOCKER",
-      "description": "The five neutral views retain broad, coarse angular surface facets across the overskirt and upper jacket. Pleats read as irregular crumpling rather than regular sewn folds; v18 softening did not resolve this.",
-      "code": "SKIRT_FORM_AND_FACETING"
+      "code": "SKIRT_FORM_AND_FACETING",
+      "description": "The neutral and turntable views still show irregular crumpled/faceted folds rather than controlled sewn pleats. The v19 hem-follow weight experiment did not resolve the visual form, and the seated side profile visibly kicks out behind the hips."
     },
     {
       "severity": "BLOCKER",
-      "description": "The back view still does not clearly reveal the rear adjustment tab or buckle; they remain low-contrast and nearly flush with the skirt/waist seam.",
-      "code": "REAR_TAB_LEGIBILITY"
+      "code": "REAR_TAB_LEGIBILITY",
+      "description": "The back view still does not clearly reveal an attached rear adjustment tab or buckle; the feature remains low-contrast and nearly flush with the waist/skirt seam."
     },
     {
       "severity": "BLOCKER",
-      "description": "Lavender hem piping is now visible, but jacket seam trim and elbow quilting remain faint. The predominantly plain ivory surface still misses the fencing-set detail level.",
-      "code": "STYLING_FIDELITY"
+      "code": "STYLING_FIDELITY",
+      "description": "Jacket seam trim and elbow quilting remain faint against the mostly plain ivory surface, and the outfit still lacks the intended fencing-set detail definition."
     },
     {
       "severity": "BLOCKER",
-      "description": "No authored UV layout exists for the current weighted garment mesh; UV status remains NOT_CREATED.",
-      "code": "UV_NOT_CREATED"
+      "code": "UV_NOT_CREATED",
+      "description": "No authored UV layout exists for the current weighted garment mesh; UV status remains NOT_CREATED."
     }
   ],
   "failedGeometryChecks": [
