@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -29,7 +30,12 @@ class ProductFlowModelTest(unittest.TestCase):
         self.assertEqual([stage.value for stage in flow.PIPELINE_STAGES], stage_ids)
         self.assertEqual(f"product:{LILAC}", model["mainFlow"]["hub"])
         self.assertEqual(len(stage_ids), len(model["facts"]["stageRun"]))
-        self.assertEqual(61, len(model["facts"]["stitch"]))
+        stitch_graph = json.loads(
+            (ROOT / "config" / "products" / LILAC / "stitch-graph.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(len(stitch_graph["stitches"]), len(model["facts"]["stitch"]))
         self.assertEqual(2, len(model["facts"]["overlayAttachment"]))
         predicates = {triple["predicate"] for triple in model["triples"]}
         self.assertEqual({"precedes", "stitchedTo", "attachedTo"}, predicates)
