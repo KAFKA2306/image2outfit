@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import json
 import math
 import sys
 from pathlib import Path

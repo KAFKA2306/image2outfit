@@ -996,23 +996,30 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             if len(crossings)==2 and math.dist(*crossings)>1e-9:
                 segments.append(crossings)
         graph = defaultdict(list)
-        for i,(a,b) in enumerate(segments):
-            for point in (a,b):graph[tuple(round(c,6) for c in point)].append(i)
-        unseen = set(range(len(segments))); loops=[]
+        for i, (a, b) in enumerate(segments):
+            for point in (a, b):
+                graph[tuple(round(c, 6) for c in point)].append(i)
+        unseen = set(range(len(segments)))
+        loops = []
         while unseen:
-            stack=[unseen.pop()]; ids=set(stack)
+            stack = [unseen.pop()]
+            ids = set(stack)
             while stack:
-                i=stack.pop()
+                i = stack.pop()
                 for point in segments[i]:
-                    for neighbor in graph[tuple(round(c,6) for c in point)]:
+                    for neighbor in graph[tuple(round(c, 6) for c in point)]:
                         if neighbor in unseen:
-                            unseen.remove(neighbor);ids.add(neighbor);stack.append(neighbor)
-            selected=[segments[i] for i in ids]
-            nodes={tuple(round(c,6) for c in point) for seg in selected for point in seg}
-            closed=all(len(graph[n])==2 for n in nodes)
-            xs=[point[0] for seg in selected for point in seg];ys=[point[1] for seg in selected for point in seg]
+                            unseen.remove(neighbor)
+                            ids.add(neighbor)
+                            stack.append(neighbor)
+            selected = [segments[i] for i in ids]
+            nodes = {tuple(round(c, 6) for c in point) for seg in selected for point in seg}
+            closed = all(len(graph[n]) == 2 for n in nodes)
+            xs = [point[0] for seg in selected for point in seg]
+            ys = [point[1] for seg in selected for point in seg]
             if closed and (envelope or min(xs)<0<max(xs)):
-                loops.append((sum(math.dist(a,b) for a,b in selected),selected,[(min(xs)+max(xs))/2,(min(ys)+max(ys))/2]))
+                loops.append((sum(math.dist(a, b) for a, b in selected), selected,
+                              [(min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2]))
         if not loops:
             raise ValueError(f"No closed central body contour at Z={z}")
         if envelope:
@@ -1045,20 +1052,27 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
         sections.append({"zM":z,"centerM":center,"circumferenceM":perimeter,"segmentsM":selected,"closed":True})
 
     def radial_point(section, direction, layer_offset):
-        c=section["centerM"];dx,dy=direction; distances=[]
-        for a,b in section["segmentsM"]:
-            ex,ey=b[0]-a[0],b[1]-a[1];qx,qy=a[0]-c[0],a[1]-c[1]
-            den=dx*ey-dy*ex
-            if abs(den)<1e-12:continue
-            distance=(qx*ey-qy*ex)/den
-            u=(qx*dy-qy*dx)/den
-            if distance>0 and -1e-8<=u<=1+1e-8:distances.append(distance)
-        if not distances:raise ValueError("Contour radial intersection missing")
-        distance=max(distances)+clearance+layer_offset
-        return Vector((c[0]+dx*distance,c[1]+dy*distance))
+        c = section["centerM"]
+        dx, dy = direction
+        distances = []
+        for a, b in section["segmentsM"]:
+            ex, ey = b[0] - a[0], b[1] - a[1]
+            qx, qy = a[0] - c[0], a[1] - c[1]
+            den = dx * ey - dy * ex
+            if abs(den) < 1e-12:
+                continue
+            distance = (qx * ey - qy * ex) / den
+            u = (qx * dy - qy * dx) / den
+            if distance > 0 and -1e-8 <= u <= 1 + 1e-8:
+                distances.append(distance)
+        if not distances:
+            raise ValueError("Contour radial intersection missing")
+        distance = max(distances) + clearance + layer_offset
+        return Vector((c[0] + dx * distance, c[1] + dy * distance))
 
-    ids=set(spec["pieceIds"])
-    if not ids.issubset(set(mesh["facePieceIds"])):raise ValueError("Contour placement pieces missing")
+    ids = set(spec["pieceIds"])
+    if not ids.issubset(set(mesh["facePieceIds"])):
+        raise ValueError("Contour placement pieces missing")
     layer_offsets = spec.get("exclusivePieceLayerOffsetM", {})
     if not set(layer_offsets).issubset(ids) or any(not math.isfinite(v) or v < 0 for v in layer_offsets.values()):
         raise ValueError("Invalid exclusive panel layer offsets")
@@ -1075,7 +1089,8 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
     for i in sorted(vertex_ids):
         if seam_factors.get(i, 1.0) == 0:
             continue
-        x,y,z=mesh["vertices"][i];length=math.hypot(x,y)
+        x, y, z = mesh["vertices"][i]
+        length = math.hypot(x, y)
         height_weight = 1.0
         if height_blend is not None:
             fraction = min(1.0, max(0.0, (z-height_blend[0])/(height_blend[1]-height_blend[0])))
@@ -1083,8 +1098,9 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             if height_weight == 0:
                 height_blend_skipped += 1
                 continue
-        if length<1e-9:raise ValueError("Torso angular coordinate collapsed")
-        direction=(x/length,y/length)
+        if length < 1e-9:
+            raise ValueError("Torso angular coordinate collapsed")
+        direction = (x / length, y / length)
         origin = spec.get("angularOriginBlenderXYM")
         if origin is not None:
             if len(origin) != 2 or any(not math.isfinite(v) for v in origin):
@@ -1102,7 +1118,8 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             if length < 1e-9:
                 raise ValueError("Skirt envelope angular coordinate collapsed")
             direction = ((x-center[0])/length,(y-center[1])/length)
-        if z<zs[0] or z>zs[-1]:extrapolated+=1
+        if z < zs[0] or z > zs[-1]:
+            extrapolated += 1
         # Keep shared sewing vertices on their common surface. Only the
         # exclusive vertices of an explicitly declared outer panel move out.
         owners = vertex_owners[i]
@@ -1117,7 +1134,8 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
     # Reject newly collapsed geometry instead of deleting or repairing faces.
     for face in mesh["faces"]:
         a,b,c=[Vector(mesh["vertices"][v]) for v in face]
-        if (b-a).cross(c-a).length/2<=1e-12:raise ValueError("Body contour placement collapsed a triangle")
+        if (b - a).cross(c - a).length / 2 <= 1e-12:
+            raise ValueError("Body contour placement collapsed a triangle")
     return {"applied":True,"targetSourceSha256":digest(target_path),"bodyObject":body.name,"configuration":spec,"sections":sections,"placedVertexCount":len(vertex_ids),"heightBlendSkippedVertexCount":height_blend_skipped,"angularSourceVerticesSha256":hashlib.sha256(json.dumps(angular_source_vertices,separators=(",",":")).encode()).hexdigest() if angular_source_vertices is not None else None,"layerOffsetVertexCount":layered,"sharedSeamVerticesLayerOffsetM":0,"heightExtrapolatedVertexCount":extrapolated,"beforeVerticesSha256":hashlib.sha256(before.encode()).hexdigest(),"afterVerticesSha256":hashlib.sha256(json.dumps(mesh["vertices"],separators=(",",":")).encode()).hexdigest(),"bodyFacesCopied":False,"grantsFitAcceptance":False}
 
 

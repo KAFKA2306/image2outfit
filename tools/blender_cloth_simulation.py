@@ -413,7 +413,8 @@ def bind_canonical_row_rest_shape(obj, job, declaration):
         if lo is None:
             scale = rows[0 if z < rows[0]["zM"] else -1]["radialRestScale"]
         else:
-            a, b = rows[lo], rows[lo+1]; t = (z-a["zM"])/(b["zM"]-a["zM"])
+            a, b = rows[lo], rows[lo + 1]
+            t = (z - a["zM"]) / (b["zM"] - a["zM"])
             scale = (1-t)*a["radialRestScale"]+t*b["radialRestScale"]
         from mathutils import Vector
         vertex.co = inverse @ Vector((origin[0]+(x-origin[0])*scale,
