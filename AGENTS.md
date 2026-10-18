@@ -84,3 +84,7 @@ If work stops, persist the current manifest/checkpoint, verified revision, faili
 - **Range:** Combine code, data, tests, runtime/UI, and domain expertise when that materially improves the outcome, while respecting canonical owners and avoiding duplicate systems.
 - **Speed:** Complete authorized read-only and reversible work through implementation, focused checks, and read-back without unnecessary approval loops. Bound retries and stop at the proven outcome.
 - These principles never bypass repository-specific security, privacy, permission, publication, spending, destructive-action, or release boundaries. State verified results and any remaining `UNVERIFIED` layers.
+
+## Compute-scaling adoption
+
+Keep the thirteen manufacturing stages and existing quality gates authoritative. Evaluate more compute or replaceable local OSS stage tools only when identical product input, model/tool revision, runtime, seed and evidence allow comparison. Measure garment fit, defects, visual acceptance, duration and GPU memory. Integrate eligible solver/tool comparisons with existing Issue #271 and stage audit; do not create a parallel state owner. Keep the lower-cost baseline if no improvement is measured.
