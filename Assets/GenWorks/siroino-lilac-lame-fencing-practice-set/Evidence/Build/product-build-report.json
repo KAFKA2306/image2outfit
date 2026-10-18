@@ -8864,13 +8864,13 @@
       }
     ],
     "placedVertexCount": 4348,
-    "heightBlendSkippedVertexCount": 3324,
+    "heightBlendSkippedVertexCount": 3400,
     "angularSourceVerticesSha256": "5317430fe143b7582207affd28ecd59eb7368efae8ee123b5cb5c0369812d29a",
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "4baa635b97c863f0f8e200c70ea72aa09b9ca23fa80d12e92f4750e382f99372",
-    "afterVerticesSha256": "ac69168a4889c6d01ea756e7784ff5f96f5f960877504cb11b96bb14e20f87ad",
+    "beforeVerticesSha256": "94df10561115901eac08989e64a2a7ae4084b9e60daa153fe2fd8402ad029806",
+    "afterVerticesSha256": "4444571c1043df71e27feb9ae58daa435147d02db4ec789f333f6e22a1f5c426",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -8898,7 +8898,23 @@
       "foldCount": 8,
       "hemFoldDepthM": 0.006,
       "phaseRadians": 0,
-      "evidenceBoundary": "V18 keeps two panel-local folds per sewn panel and eight longitudinal subdivisions, reducing fold depth from 10 mm to 6 mm to soften the observed faceting. Geometry, cloth response, coverage, fit, motion, penetration, and appearance remain unapproved.",
+      "forwardApron": {
+        "method": "front-panel-forward-scoop-v2",
+        "pieceIds": [
+          "overskirt-front-left",
+          "overskirt-front-right"
+        ],
+        "axisOriginBlenderXYM": [
+          0,
+          -0.03788188099861145
+        ],
+        "additionalExtensionM": 0.06,
+        "forwardProjectionM": 0.025,
+        "fullExtensionHalfAngleRadians": 0.45,
+        "zeroExtensionHalfAngleRadians": 1.25,
+        "evidenceBoundary": "V20 adds up to 60 mm downward extension and 25 mm forward projection to the front two overskirt panels, fading toward the sides. This pattern-level lap-drape hypothesis responds to v19 sit/crouch renders and measured skirt-vs-shorts upper-thigh coverage; it establishes no fit, collision, opacity, pose, appearance, or release acceptance."
+      },
+      "evidenceBoundary": "V20 retains the v18 panel-local fold profile and trials a front-only forward apron to improve lap drape; its additional extension and projection remain geometry hypotheses. The v19 skirt-hem weight increase did not restore sit/crouch upper-thigh coverage. Geometry, cloth response, continuous coverage, fit, motion, penetration, and appearance remain unapproved.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8907,16 +8923,16 @@
       ]
     },
     "effectiveHeightRangeZM": [
-      0.47957822084395635,
+      0.41957822084395635,
       0.7395782470703125
     ],
-    "extensionBelowDeclaredPleatHemM": 2.622604367008563e-08,
+    "extensionBelowDeclaredPleatHemM": 0.06000002622604367,
     "selectedVertexCount": 4142,
     "movedVertexCount": 4078,
-    "maximumRadialDisplacementM": 0.0059594301991524505,
-    "minimumTriangleAreaM2": 1.5747641203911946e-11,
-    "beforeVerticesSha256": "ac69168a4889c6d01ea756e7784ff5f96f5f960877504cb11b96bb14e20f87ad",
-    "afterVerticesSha256": "6da21839195cd1897b232d2c7349f574925b0cd24edfb8b50316c583533c669b",
+    "maximumRadialDisplacementM": 0.00594249476820348,
+    "minimumTriangleAreaM2": 1.5780856482687604e-11,
+    "beforeVerticesSha256": "4444571c1043df71e27feb9ae58daa435147d02db4ec789f333f6e22a1f5c426",
+    "afterVerticesSha256": "8612721b254f5ab2c46f31fa696eb07fab1b59a2eb5a610c948a7fbb33dd78fd",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "panelAngularRangesRadians": {
@@ -8942,7 +8958,7 @@
   },
   "declaredSkirtLengthening": {
     "applied": true,
-    "method": "linear-downward-extension-from-fixed-sewn-waist-to-overskirt-hem",
+    "method": "short-panelized-hem-with-forward-apron-and-faded-side-seams",
     "pieceIds": [
       "overskirt-back-left",
       "overskirt-back-right",
@@ -8955,16 +8971,31 @@
     "extensionM": 0.10000000000031245,
     "selectedVertexCount": 4142,
     "movedVertexCount": 4078,
-    "maximumVertexDisplacementM": 0.10000000000031245,
-    "forwardApron": null,
-    "maximumAdditionalForwardApronDisplacementM": 0.0,
-    "maximumForwardApronProjectionM": 0.0,
+    "maximumVertexDisplacementM": 0.16000000000031245,
+    "forwardApron": {
+      "method": "front-panel-forward-scoop-v2",
+      "pieceIds": [
+        "overskirt-front-left",
+        "overskirt-front-right"
+      ],
+      "axisOriginBlenderXYM": [
+        0,
+        -0.03788188099861145
+      ],
+      "additionalExtensionM": 0.06,
+      "forwardProjectionM": 0.025,
+      "fullExtensionHalfAngleRadians": 0.45,
+      "zeroExtensionHalfAngleRadians": 1.25,
+      "evidenceBoundary": "V20 adds up to 60 mm downward extension and 25 mm forward projection to the front two overskirt panels, fading toward the sides. This pattern-level lap-drape hypothesis responds to v19 sit/crouch renders and measured skirt-vs-shorts upper-thigh coverage; it establishes no fit, collision, opacity, pose, appearance, or release acceptance."
+    },
+    "maximumAdditionalForwardApronDisplacementM": 0.06,
+    "maximumForwardApronProjectionM": 0.025,
     "beforeBoundsZM": [
       0.5795782208442688,
       0.7395782470703125
     ],
     "afterBoundsZM": [
-      0.47957822084395635,
+      0.41957822084395635,
       0.7395782470703125
     ],
     "grantsFitAcceptance": false,
@@ -19856,7 +19887,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "9424b5d39f6254048e98d385041f21d3df598e33d3f4ea49830c02ad5029e02d",
+  "sourceBlendSha256": "0cc5ac9cf4f3606d7a609a990ec8f26cdfb50686d56cdcaaed43f46f81013b8f",
   "sewnMeshSha256": "3f3d2f5b94511e65579959ec3fe79f77e2f3941e967940ea33e5c499c3b353da",
   "canonicalInputs": {
     "patternSha256": "c44e7ba9d055db630a8952f2c473e734214f1c21103e8c7fcd6e387e4cea6b9c",
@@ -150890,9 +150921,9 @@
     "angularSourceVerticesSha256": null,
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
-    "heightExtrapolatedVertexCount": 640,
-    "beforeVerticesSha256": "3753c4a199256577132298f7f0cdd081509daec2e93da57df3bdd07b491879f6",
-    "afterVerticesSha256": "4baa635b97c863f0f8e200c70ea72aa09b9ca23fa80d12e92f4750e382f99372",
+    "heightExtrapolatedVertexCount": 787,
+    "beforeVerticesSha256": "44f67e4680e1412b6c2642d14ae576950ae1ade5d5b8e37de60bd7f3b0c2b52a",
+    "afterVerticesSha256": "94df10561115901eac08989e64a2a7ae4084b9e60daa153fe2fd8402ad029806",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },

@@ -9480,8 +9480,23 @@
     "hemExtensionM": 0.1,
     "foldCount": 8,
     "hemFoldDepthM": 0.006,
-    "phaseRadians": 0,
-    "evidenceBoundary": "V18 keeps two panel-local folds per sewn panel and eight longitudinal subdivisions, reducing fold depth from 10 mm to 6 mm to soften the observed faceting. Geometry, cloth response, coverage, fit, motion, penetration, and appearance remain unapproved.",
+    "phaseRadians": 0,    "forwardApron": {
+      "method": "front-panel-forward-scoop-v2",
+      "pieceIds": [
+        "overskirt-front-left",
+        "overskirt-front-right"
+      ],
+      "axisOriginBlenderXYM": [
+        0,
+        -0.03788188099861145
+      ],
+      "additionalExtensionM": 0.06,
+      "forwardProjectionM": 0.025,
+      "fullExtensionHalfAngleRadians": 0.45,
+      "zeroExtensionHalfAngleRadians": 1.25,
+      "evidenceBoundary": "V20 adds up to 60 mm downward extension and 25 mm forward projection to the front two overskirt panels, fading toward the sides. This pattern-level lap-drape hypothesis responds to v19 sit/crouch renders and measured skirt-vs-shorts upper-thigh coverage; it establishes no fit, collision, opacity, pose, appearance, or release acceptance."
+    },
+    "evidenceBoundary": "V20 retains the v18 panel-local fold profile and trials a front-only forward apron to improve lap drape; its additional extension and projection remain geometry hypotheses. The v19 skirt-hem weight increase did not restore sit/crouch upper-thigh coverage. Geometry, cloth response, continuous coverage, fit, motion, penetration, and appearance remain unapproved.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
