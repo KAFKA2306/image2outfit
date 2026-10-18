@@ -18,6 +18,8 @@ from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 from PIL import Image, ImageDraw
 
+import gate_evidence
+
 TOOLS = Path(__file__).resolve().parent
 ROOT = TOOLS.parent
 if str(TOOLS) not in sys.path:
@@ -928,7 +930,9 @@ def write_contracts(
             else "FAIL",
             "bodyShapeKeyTransfer": "PASS" if metrics["shapeKeys"] > 0 else "FAIL",
             "fbxExport": "PASS",
-            "fiveViewRender": "PASS",
+            "fiveViewRender": gate_evidence.view_gate_status(
+                ROOT, job["productRoot"]
+            ),
             "unityPrefabYamlGenerated": "PASS",
             "unityImport": "PENDING",
             "prefabReload": "PENDING",

@@ -12,7 +12,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from .construction import DEFAULT_RELATIVE_LENGTH_TOLERANCE
-from .curves import curve_length, normalize_curvature, reverse_curvature, scale_curvature
+from .curves import (
+    curve_length,
+    normalize_curvature,
+    reverse_curvature,
+    scale_curvature,
+)
 from .pattern_stage import PatternHypothesis
 from .stitch_mapping import resolve_endpoint_mapping
 
@@ -74,7 +79,9 @@ def _garmentcode_interface_ruffle(stitch: dict[str, Any]) -> dict[str, Any] | No
         or not math.isfinite(ratio)
         or ratio < 1.0
     ):
-        raise ValueError("garmentCodeInterfaceRuffle ratio must be finite and at least one")
+        raise ValueError(
+            "garmentCodeInterfaceRuffle ratio must be finite and at least one"
+        )
     if (
         not isinstance(source, dict)
         or not isinstance(source.get("path"), str)
@@ -85,7 +92,9 @@ def _garmentcode_interface_ruffle(stitch: dict[str, Any]) -> dict[str, Any] | No
         or len(source["sha256"]) != 64
         or any(character not in "0123456789abcdef" for character in source["sha256"])
     ):
-        raise ValueError("garmentCodeInterfaceRuffle requires a source path, field, and SHA-256")
+        raise ValueError(
+            "garmentCodeInterfaceRuffle requires a source path, field, and SHA-256"
+        )
     return {"side": value["side"], "ratio": float(ratio), "source": dict(source)}
 
 
@@ -180,9 +189,7 @@ def pattern_contract_to_garmentcode_preview(
             end = int(edge["endVertex"])
             start_point = boundary[start]
             end_point = boundary[end]
-            curvature = _canonical_curvature(
-                edge, f"pattern edge {piece_id}.{edge_id}"
-            )
+            curvature = _canonical_curvature(edge, f"pattern edge {piece_id}.{edge_id}")
             edge_key = (piece_id, edge_id)
             if curvature is not None:
                 curvature_by_edge[edge_key] = curvature
@@ -282,10 +289,7 @@ def pattern_contract_to_garmentcode_preview(
                         "edgeLengthM": edge_lengths_by_piece[piece_id][edge_id],
                     }
                 )
-            direction = stitch.get("direction")
-            endpoint_mapping, endpoint_mapping_source = resolve_endpoint_mapping(
-                stitch
-            )
+            endpoint_mapping, endpoint_mapping_source = resolve_endpoint_mapping(stitch)
             right_wrong = endpoint_mapping == "start-to-start"
             if right_wrong:
                 # BoxMesh's explicit tag selects start-to-start pairing;
@@ -322,7 +326,9 @@ def pattern_contract_to_garmentcode_preview(
             projected_first_length = first_length / first_ruffle
             projected_second_length = second_length / second_ruffle * float(easing)
             denominator = max(projected_first_length, projected_second_length, 1e-12)
-            relative_discrepancy = abs(projected_first_length - projected_second_length) / denominator
+            relative_discrepancy = (
+                abs(projected_first_length - projected_second_length) / denominator
+            )
             seam_curve_audit: dict[str, Any] = {
                 "status": "NOT_APPLICABLE",
                 "curvedEdges": 0,
@@ -352,10 +358,9 @@ def pattern_contract_to_garmentcode_preview(
                         raise ValueError(
                             f"stitch {stitch_id!r} has unsupported curve endpoint mapping"
                         )
-                    curve_parameters_match = (
-                        first_curve["type"] == comparable_second["type"]
-                        and len(first_curve["params"]) == len(comparable_second["params"])
-                    )
+                    curve_parameters_match = first_curve["type"] == comparable_second[
+                        "type"
+                    ] and len(first_curve["params"]) == len(comparable_second["params"])
                     if curve_parameters_match:
                         curve_parameters_match = all(
                             math.isclose(
@@ -365,16 +370,20 @@ def pattern_contract_to_garmentcode_preview(
                                 first_curve["params"], comparable_second["params"]
                             )
                             for left, right in zip(
-                                first_param if isinstance(first_param, list) else [first_param],
-                                second_param if isinstance(second_param, list) else [second_param],
+                                first_param
+                                if isinstance(first_param, list)
+                                else [first_param],
+                                second_param
+                                if isinstance(second_param, list)
+                                else [second_param],
                             )
                         )
                     curve_types = [first_curve["type"], second_curve["type"]]
                 else:
                     curve_types = [
-                        curvature_by_edge[
-                            (str(edge["pieceId"]), str(edge["edgeId"]))
-                        ]["type"]
+                        curvature_by_edge[(str(edge["pieceId"]), str(edge["edgeId"]))][
+                            "type"
+                        ]
                         if is_curved
                         else None
                         for edge, is_curved in zip(mapped_edges, curved_sides)
@@ -510,13 +519,17 @@ def audit_stitch_graph_connectivity(
         if not isinstance(stitch_id, str) or not stitch_id:
             raise ValueError("connectivity audit found a stitch without stitchId")
         if stitch_id in seen_stitches:
-            raise ValueError(f"connectivity audit found duplicate stitchId {stitch_id!r}")
+            raise ValueError(
+                f"connectivity audit found duplicate stitchId {stitch_id!r}"
+            )
         if not isinstance(first, dict) or not isinstance(second, dict):
             raise ValueError(f"connectivity audit found incomplete pair {stitch_id!r}")
         first_piece = first.get("pieceId")
         second_piece = second.get("pieceId")
         if not isinstance(first_piece, str) or not isinstance(second_piece, str):
-            raise ValueError(f"connectivity audit found invalid panel ids in {stitch_id!r}")
+            raise ValueError(
+                f"connectivity audit found invalid panel ids in {stitch_id!r}"
+            )
         if first_piece not in adjacency or second_piece not in adjacency:
             raise ValueError(f"connectivity audit found unknown piece in {stitch_id!r}")
         seen_stitches.add(stitch_id)
@@ -542,7 +555,11 @@ def audit_stitch_graph_connectivity(
             unseen.discard(piece_id)
             stack.extend(sorted(adjacency[piece_id] - members, reverse=True))
         member_stitches = sorted(
-            {stitch_id for piece_id in members for stitch_id in incident_stitches[piece_id]}
+            {
+                stitch_id
+                for piece_id in members
+                for stitch_id in incident_stitches[piece_id]
+            }
         )
         components.append(
             {
@@ -752,7 +769,9 @@ def import_garmentcode_native_pattern(
         or len(panel_order) != len(set(panel_order))
         or set(panel_order) != set(panels)
     ):
-        raise ValueError("native GarmentCode panel_order must enumerate every panel once")
+        raise ValueError(
+            "native GarmentCode panel_order must enumerate every panel once"
+        )
 
     units_in_meter = properties.get("units_in_meter")
     if (
@@ -761,10 +780,14 @@ def import_garmentcode_native_pattern(
         or not math.isfinite(units_in_meter)
         or units_in_meter <= 0
     ):
-        raise ValueError("native GarmentCode units_in_meter must be finite and positive")
+        raise ValueError(
+            "native GarmentCode units_in_meter must be finite and positive"
+        )
 
     native_panel_ids = set(panels)
-    if any(not isinstance(panel_id, str) or not panel_id for panel_id in native_panel_ids):
+    if any(
+        not isinstance(panel_id, str) or not panel_id for panel_id in native_panel_ids
+    ):
         raise ValueError("native GarmentCode panel ids must be non-empty strings")
     if set(semantic_panel_groups) != native_panel_ids:
         missing = sorted(native_panel_ids.difference(semantic_panel_groups))
@@ -773,7 +796,10 @@ def import_garmentcode_native_pattern(
             "semantic panel groups must map every native panel exactly once; "
             f"missing={missing}, extra={extra}"
         )
-    if any(not isinstance(group, str) or not group.strip() for group in semantic_panel_groups.values()):
+    if any(
+        not isinstance(group, str) or not group.strip()
+        for group in semantic_panel_groups.values()
+    ):
         raise ValueError("semantic panel groups must be non-empty strings")
 
     canonical_piece_ids = {
@@ -782,9 +808,13 @@ def import_garmentcode_native_pattern(
     }
     if len(set(canonical_piece_ids.values())) != len(canonical_piece_ids):
         raise ValueError("native panel ids collide after canonical piece-id conversion")
-    if any(not re.fullmatch(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*", piece_id)
-           for piece_id in canonical_piece_ids.values()):
-        raise ValueError("native panel ids cannot be converted to canonical identifiers")
+    if any(
+        not re.fullmatch(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*", piece_id)
+        for piece_id in canonical_piece_ids.values()
+    ):
+        raise ValueError(
+            "native panel ids cannot be converted to canonical identifiers"
+        )
 
     curve_types: dict[str, int] = {}
     for panel_id, panel in panels.items():
@@ -845,7 +875,9 @@ def import_garmentcode_native_pattern(
         endpoints: list[dict[str, Any]] = []
         for side in stitch[:2]:
             if not isinstance(side, dict):
-                raise ValueError(f"native stitch {stitch_index} contains an invalid edge ref")
+                raise ValueError(
+                    f"native stitch {stitch_index} contains an invalid edge ref"
+                )
             panel_id = side.get("panel")
             edge_index = side.get("edge")
             if panel_id not in panels:
@@ -952,7 +984,9 @@ def garmentcode_native_pattern_to_contract(
             or not math.isfinite(ratio)
             or ratio < 1.0
         ):
-            raise ValueError("GarmentCode ruffle rule ratio must be finite and at least one")
+            raise ValueError(
+                "GarmentCode ruffle rule ratio must be finite and at least one"
+            )
         if (
             not isinstance(source, dict)
             or not isinstance(source.get("path"), str)
@@ -961,9 +995,13 @@ def garmentcode_native_pattern_to_contract(
             or not source["field"]
             or not isinstance(source.get("sha256"), str)
             or len(source["sha256"]) != 64
-            or any(character not in "0123456789abcdef" for character in source["sha256"])
+            or any(
+                character not in "0123456789abcdef" for character in source["sha256"]
+            )
         ):
-            raise ValueError("GarmentCode ruffle rule requires source path, field, and SHA-256")
+            raise ValueError(
+                "GarmentCode ruffle rule requires source path, field, and SHA-256"
+            )
         key = (interface_group, peer_group)
         if key in ruffle_rules:
             raise ValueError(f"duplicate GarmentCode ruffle rule for {key!r}")
@@ -1047,7 +1085,9 @@ def garmentcode_native_pattern_to_contract(
             - float(second_vertices[second_native_edge["endpoints"][0]][axis])
             for axis in range(2)
         ]
-        direction_dot = sum(left * right for left, right in zip(first_vector, second_vector))
+        direction_dot = sum(
+            left * right for left, right in zip(first_vector, second_vector)
+        )
         direction = (
             "same"
             if direction_dot > 1e-12
@@ -1072,21 +1112,21 @@ def garmentcode_native_pattern_to_contract(
                     "source": rule["source"],
                 }
         contract_stitch = {
-                "stitchId": f"garmentcode-stitch-{stitch_index + 1:04d}",
-                "first": {
-                    "pieceId": imported.canonical_piece_ids[first_panel],
-                    "edgeId": edge_ids[(first_panel, first_edge)],
-                },
-                "second": {
-                    "pieceId": imported.canonical_piece_ids[second_panel],
-                    "edgeId": edge_ids[(second_panel, second_edge)],
-                },
-                "direction": direction,
-                "endpointMapping": (
-                    "start-to-start" if "right_wrong" in tags else "start-to-end"
-                ),
-                "nativeTags": tags,
-            }
+            "stitchId": f"garmentcode-stitch-{stitch_index + 1:04d}",
+            "first": {
+                "pieceId": imported.canonical_piece_ids[first_panel],
+                "edgeId": edge_ids[(first_panel, first_edge)],
+            },
+            "second": {
+                "pieceId": imported.canonical_piece_ids[second_panel],
+                "edgeId": edge_ids[(second_panel, second_edge)],
+            },
+            "direction": direction,
+            "endpointMapping": (
+                "start-to-start" if "right_wrong" in tags else "start-to-end"
+            ),
+            "nativeTags": tags,
+        }
         if interface_ruffle is not None:
             contract_stitch["garmentCodeInterfaceRuffle"] = interface_ruffle
         contract_stitches.append(contract_stitch)
@@ -1111,9 +1151,12 @@ def garmentcode_native_pattern_export(
 ) -> str:
     """Serialize an imported native pattern without changing its source fields."""
 
-    return json.dumps(
-        imported.document,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ) + "\n"
+    return (
+        json.dumps(
+            imported.document,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    )

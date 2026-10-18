@@ -194,6 +194,30 @@ class CustomerQualityTest(unittest.TestCase):
         _, errors = self.validate()
         self.assertIn("visual-review: reviewerReference", errors)
 
+    def test_missing_required_field_is_reported_by_name(self) -> None:
+        del self.evidence["visual-review"]["reviewSummary"]
+        _, errors = self.validate()
+        self.assertIn("visual-review: reviewSummary", errors)
+
+    def test_wrong_type_score_is_reported_by_field(self) -> None:
+        self.evidence["visual-review"]["scores"]["silhouette"] = "5"
+        _, errors = self.validate()
+        self.assertIn("visual-review: scores.silhouette", errors)
+
+    def test_defect_severity_outside_policy_is_rejected(self) -> None:
+        self.evidence["visual-review"]["defects"] = [
+            {
+                "id": "FIT-002",
+                "severity": "catastrophic",
+                "status": "OPEN",
+                "category": "fit",
+                "description": "Unknown severity must not pass the gate.",
+                "evidencePaths": ["Preview/back.png"],
+            }
+        ]
+        _, errors = self.validate()
+        self.assertIn("visual-review: defects[0].severity", errors)
+
     def test_one_image_cannot_prove_two_required_poses(self) -> None:
         self.evidence["pose-penetration-review"]["poseEvidence"]["sit"] = (
             "Pose/crouch.png"

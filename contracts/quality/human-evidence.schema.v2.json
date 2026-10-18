@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/contracts/quality/human-evidence.schema.v2.json",
+  "title": "Human release evidence shapes (customer_quality)",
+  "description": "Policy-independent shapes checked by tools/customer_quality.py. Values that come from config/release-policy.json (required field lists, passValue, score thresholds, allowed defect severities and statuses, reviewer rules, requiredPoses, and the job/candidate bindings) are injected by customer_quality.py at validation time and are deliberately not copied here.",
+  "$defs": {
+    "text": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "candidatePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "candidateManifest": {
+      "type": "object",
+      "required": ["files"],
+      "properties": {
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["path", "bytes", "sha256"],
+            "properties": {
+              "path": {"$ref": "#/$defs/candidatePath"},
+              "bytes": {"type": "integer", "minimum": 0},
+              "sha256": {"$ref": "#/$defs/sha256"}
+            }
+          }
+        }
+      }
+    },
+    "defect": {
+      "type": "object",
+      "required": ["id", "severity", "status", "category", "description", "evidencePaths"],
+      "properties": {
+        "id": {"$ref": "#/$defs/text"},
+        "severity": {"type": "string"},
+        "status": {"type": "string"},
+        "category": {"$ref": "#/$defs/text"},
+        "description": {"$ref": "#/$defs/text"},
+        "evidencePaths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/candidatePath"}
+        }
+      }
+    },
+    "common": {
+      "type": "object",
+      "properties": {
+        "reviewer": {"type": "string"},
+        "checkedAt": {"type": "string"},
+        "defects": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/defect"}
+        }
+      }
+    },
+    "visual-review": {
+      "type": "object",
+      "properties": {
+        "scores": {"type": "object"},
+        "criticalDefects": {},
+        "reviewedAssets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "pose-penetration-review": {
+      "type": "object",
+      "properties": {
+        "poses": {"type": "object"},
+        "poseEvidence": {"type": "object"},
+        "criticalPenetrations": {},
+        "reviewedAssets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string"}
+        },
+        "poseNotes": {"$ref": "#/$defs/text"}
+      }
+    },
+    "vrchat-runtime-review": {
+      "type": "object",
+      "properties": {
+        "vrchatBuildAndTest": {},
+        "testedInVRChat": {"const": true},
+        "runtimeScreenshot": {"$ref": "#/$defs/text"},
+        "runtimeScreenshotSha256": {"$ref": "#/$defs/sha256"},
+        "runtimeNotes": {"$ref": "#/$defs/text"},
+        "testedPlatform": {"$ref": "#/$defs/text"},
+        "installationStepsVerified": {"const": true},
+        "customerReady": {"const": true},
+        "customerAcceptance": {"type": "object"}
+      }
+    }
+  }
+}

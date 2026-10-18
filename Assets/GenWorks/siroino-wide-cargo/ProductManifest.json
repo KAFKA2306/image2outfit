@@ -16,12 +16,12 @@
   "completionPolicyPath": "config/genworks-handoff-policy.json",
   "completionPolicySchemaVersion": 2,
   "completionGates": {
-    "blender": "PASS",
-    "editableSource": "PASS",
-    "fbx": "PASS",
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
     "prefabDeclared": "PASS",
-    "fiveViewEvidence": "PASS",
-    "poseEvidence": "PASS",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
     "visualAppearanceReview": "FAIL"
   },
   "handoff": {
@@ -212,5 +212,37 @@
       "evidenceSha256": "c6995f146cb7bc15dcdc0c89ec4d3ec297e8a96c878590d6438e8e1b6a8c95f4"
     }
   },
-  "clothSimulation": "Assets/GenWorks/siroino-wide-cargo/Evidence/Build/cloth-simulation.json"
+  "clothSimulation": "Assets/GenWorks/siroino-wide-cargo/Evidence/Build/cloth-simulation.json",
+  "gateEvidenceCorrections": {
+    "completionGates.blender": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.blender was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.editableSource": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.editableSource was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.fbx": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.fbx was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.fiveViewEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.fiveViewEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-wide-cargo/Previews/front.png, Assets/GenWorks/siroino-wide-cargo/Previews/back.png, Assets/GenWorks/siroino-wide-cargo/Previews/left.png, Assets/GenWorks/siroino-wide-cargo/Previews/right.png, Assets/GenWorks/siroino-wide-cargo/Previews/three-quarter.png",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.poseEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.poseEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-wide-cargo/Previews/Poses/neutral.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/arms-up.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/arm-cross.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/crouch.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/sit.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/prone.png",
+      "correctedOn": "2026-10-15"
+    }
+  }
 }

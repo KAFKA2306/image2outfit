@@ -34,8 +34,8 @@
     "blender": "PASS",
     "fbx": "PASS",
     "bodyClearance": "PASS",
-    "fiveViewRender": "PASS",
-    "poseRender": "PASS",
+    "fiveViewRender": "UNVERIFIED",
+    "poseRender": "UNVERIFIED",
     "unityImport": "PENDING",
     "prefabSerialized": "PENDING",
     "prefabReload": "PENDING",
@@ -160,5 +160,19 @@
     "solver_report_present": false,
     "material_sources_present": false
   },
-  "clothSimulation": "Assets/GenWorks/siroino-cyber-kawaii-large/Evidence/Build/cloth-simulation.json"
+  "clothSimulation": "Assets/GenWorks/siroino-cyber-kawaii-large/Evidence/Build/cloth-simulation.json",
+  "gateEvidenceCorrections": {
+    "technicalGates.fiveViewRender": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.fiveViewRender was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-cyber-kawaii-large/Previews/front.png, Assets/GenWorks/siroino-cyber-kawaii-large/Previews/back.png, Assets/GenWorks/siroino-cyber-kawaii-large/Previews/three-quarter.png",
+      "correctedOn": "2026-10-15"
+    },
+    "technicalGates.poseRender": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.poseRender was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-cyber-kawaii-large/Previews/Poses/neutral.png, Assets/GenWorks/siroino-cyber-kawaii-large/Previews/Poses/crouch.png, Assets/GenWorks/siroino-cyber-kawaii-large/Previews/Poses/sit.png",
+      "correctedOn": "2026-10-15"
+    }
+  }
 }

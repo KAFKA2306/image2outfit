@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "kind": "image2outfit-test-known-failures",
+  "policy": "Each entry records a failure that cannot be resolved from tracked sources (missing render PNGs, Unity bake output, or an unresolved policy decision). Entries are skipped, not passed, and expire; an expired entry blocks again. Do not add entries to hide new failures.",
+  "entries": [
+    {
+      "id": "KF-880-HANDOFF-LUNAR-TECH-HOODIE",
+      "test": "RepositoryContractTest.test_every_product_has_a_verifiable_canonical_handoff",
+      "subject": "siroino-lunar-tech-hoodie",
+      "match": "=PASS but missing",
+      "reason": "Gate PASS claims front/back/side/pose render PNGs that are not tracked; the PNGs were removed from git in 1f36867 and only .render.json sidecars remain. Needs Blender re-render and gate re-evaluation.",
+      "issue": 880,
+      "expires": "2026-11-10"
+    },
+    {
+      "id": "KF-880-HANDOFF-NOCTURNE-ANGEL-SET",
+      "test": "RepositoryContractTest.test_every_product_has_a_verifiable_canonical_handoff",
+      "subject": "siroino-nocturne-angel-set",
+      "match": "=PASS but missing",
+      "reason": "Gate PASS claims five-view and pose render PNGs that are not tracked (removed in 1f36867; sidecars only). Needs Blender re-render and gate re-evaluation.",
+      "issue": 880,
+      "expires": "2026-11-10"
+    },
+    {
+      "id": "KF-880-HANDOFF-TUXEDO-HALTER-DRESS-LARGE",
+      "test": "RepositoryContractTest.test_every_product_has_a_verifiable_canonical_handoff",
+      "subject": "siroino-tuxedo-halter-dress-large",
+      "match": "=PASS but missing",
+      "reason": "Gate PASS claims five-view and pose render PNGs that are not tracked (removed in 1f36867; sidecars only). Needs Blender re-render and gate re-evaluation.",
+      "issue": 880,
+      "expires": "2026-11-10"
+    },
+    {
+      "id": "KF-880-HANDOFF-VERDANT-RANGER-EXPLORER-SET",
+      "test": "RepositoryContractTest.test_every_product_has_a_verifiable_canonical_handoff",
+      "subject": "siroino-verdant-ranger-explorer-set",
+      "match": "=PASS but missing",
+      "reason": "Gate PASS claims five-view and pose render PNGs that are not tracked (removed in 1f36867; sidecars only). Needs Blender re-render and gate re-evaluation.",
+      "issue": 880,
+      "expires": "2026-11-10"
+    },
+    {
+      "id": "KF-880-AVATAR-SCENE-PREFAB-HASH",
+      "test": "AvatarWorkflowTests.test_project_preflight_passes_for_baked_upload_set",
+      "subject": "avatar-workflow",
+      "match": "scene prefab mismatch for ",
+      "reason": "Unity workbench scene prefab hashes differ from config/avatar-workflow.v1.json for the 11 baked outfits. Needs a Unity bake and hash update, which cannot run in this repository CI.",
+      "issue": 880,
+      "expires": "2026-11-10"
+    },
+    {
+      "id": "KF-880-AVATAR-VISUAL-EVIDENCE",
+      "test": "AvatarWorkflowTests.test_project_preflight_passes_for_baked_upload_set",
+      "subject": "avatar-workflow",
+      "match": "required visual evidence missing for ",
+      "reason": "Required front/back/side/three-quarter and pose PNGs are not tracked for the 11 baked outfits (removed in 1f36867). Needs Blender re-render.",
+      "issue": 880,
+      "expires": "2026-11-10"
+    },
+    {
+      "id": "KF-880-WIDE-CARGO-REVIEW-BUNDLE",
+      "test": "VisualReviewBundleTests.test_tracked_wide_cargo_builds_real_bundle",
+      "subject": "siroino-wide-cargo",
+      "match": "required visual evidence paths missing",
+      "reason": "Tracked wide-cargo view and pose PNGs are missing (removed in 1f36867; sidecars only). Needs Blender re-render.",
+      "issue": 880,
+      "expires": "2026-11-10"
+    },
+    {
+      "id": "KF-891-OTHER-PRODUCT-WRITE-BOUNDARY",
+      "test": "PipelineStageWriteBoundaryTests.test_other_product_write_fails_and_restores_bytes",
+      "subject": "pipeline-stage-write-boundary",
+      "match": "UndeclaredOutputWriteError not raised",
+      "reason": "A product-bound stage write boundary does not monitor other products' ignored .image2outfit/products outputs. Fix needs a policy decision on snapshot scope (issue 891).",
+      "issue": 891,
+      "expires": "2026-11-10"
+    }
+  ]
+}

@@ -21,6 +21,7 @@ if str(TOOLS) not in sys.path:
 import audit_toolchain
 import blender_python_env
 import candidate_manifest as candidate_contract
+import product_manifest_state
 from contract_io import required_pose_paths
 
 ROOT = candidate_contract.ROOT
@@ -67,10 +68,15 @@ def run_command(
 def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
     """Resolve the current checkpoint-bound sewn mesh for a candidate build."""
     pipeline = job.get("garmentPipeline")
-    if not isinstance(pipeline, dict) or pipeline.get("meshSource") != "garmentcode-boxmesh":
+    if (
+        not isinstance(pipeline, dict)
+        or pipeline.get("meshSource") != "garmentcode-boxmesh"
+    ):
         raise ValueError("job does not declare the GarmentCode BoxMesh source")
 
-    state_path = ROOT / ".image2outfit" / "products" / str(job["id"]) / "pipeline-state.json"
+    state_path = (
+        ROOT / ".image2outfit" / "products" / str(job["id"]) / "pipeline-state.json"
+    )
     state = candidate_contract.read(state_path)
     if state.get("product_id") != job.get("id") or state.get("status") != "EXECUTED":
         raise ValueError("an executed product checkpoint is required for the sewn mesh")
@@ -92,10 +98,14 @@ def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
         if not isinstance(evidence, list):
             continue
         for item in evidence:
-            if not isinstance(item, dict) or not str(item.get("path", "")).endswith("/sewn-mesh.json"):
+            if not isinstance(item, dict) or not str(item.get("path", "")).endswith(
+                "/sewn-mesh.json"
+            ):
                 continue
             mesh_path = candidate_contract.path(item["path"])
-            if not mesh_path.is_file() or candidate_contract.digest(mesh_path) != item.get("sha256"):
+            if not mesh_path.is_file() or candidate_contract.digest(
+                mesh_path
+            ) != item.get("sha256"):
                 continue
             mesh = candidate_contract.read(mesh_path)
             topology = mesh.get("topology")
@@ -115,7 +125,9 @@ def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
                 continue
             return mesh_path, item["sha256"], int(record.get("sequence", 0))
 
-    raise ValueError("checkpoint has no hash-current, topology-valid sewn-mesh exchange")
+    raise ValueError(
+        "checkpoint has no hash-current, topology-valid sewn-mesh exchange"
+    )
 
 
 def run_hosted_pose_render(
@@ -176,44 +188,10 @@ def run_hosted_pose_render(
     }
 
 
-def record_unity_ready_product_state(
-    job: dict[str, Any],
-    report: dict[str, Any],
-    artifact: Path,
-) -> Path:
-    if report.get("unityReadyStatus") != "VERIFIED":
-        raise ValueError("cannot record Unity-ready state from an unverified report")
-
-    product_root = candidate_contract.path(job["productRoot"])
-    evidence = product_root / "Evidence" / "Unity" / "unity-ready.json"
-    evidence.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(artifact / "unity-ready.json", evidence)
-
-    manifest_path = candidate_contract.path(job["productManifestPath"])
-    manifest = candidate_contract.read(manifest_path)
-    if not manifest_path.is_file() or not manifest:
-        raise FileNotFoundError(
-            "ProductManifest.json is missing after Unity-ready validation"
-        )
-
-    technical = manifest.setdefault("technicalGates", {})
-    if not isinstance(technical, dict):
-        raise ValueError("ProductManifest technicalGates must be an object")
-    technical.update(
-        {
-            "unityImport": "PASS",
-            "prefabSerialized": "PASS",
-            "prefabReload": "PASS",
-            "modularAvatar": "PASS",
-            "ndmf": "PASS",
-        }
-    )
-    release_readiness = manifest.setdefault("releaseReadiness", {})
-    if not isinstance(release_readiness, dict):
-        raise ValueError("ProductManifest releaseReadiness must be an object")
+def unity_ready_material_roles(job: dict[str, Any]) -> dict[str, str]:
     declared_roles = job["unityReady"].get("materialRoles")
     if isinstance(declared_roles, list):
-        material_roles = {}
+        material_roles: dict[str, str] = {}
         for item in declared_roles:
             if not isinstance(item, dict):
                 raise ValueError("unity-ready materialRoles contains a non-object")
@@ -230,24 +208,93 @@ def record_unity_ready_product_state(
                     f"unity-ready materialRoles contains duplicate material: {material}"
                 )
             material_roles[material] = role
-    elif isinstance(declared_roles, dict):
-        material_roles = dict(declared_roles)
-    else:
-        raise ValueError("unity-ready materialRoles must be a list or object")
+        return material_roles
+    if isinstance(declared_roles, dict):
+        return dict(declared_roles)
+    raise ValueError("unity-ready materialRoles must be a list or object")
 
-    release_readiness["unityReady"] = {
+
+def publish_unity_ready_product_state(
+    job: dict[str, Any],
+    report: dict[str, Any],
+    artifact: Path,
+    candidate_manifest_path: Path,
+    run_id: str,
+) -> Path:
+    """Publish the Unity-ready state once, after the candidate manifest is committed.
+
+    The canonical ProductManifest writer verifies the candidate identity. If the
+    transition is refused, the tracked Unity-ready evidence is restored byte-for-byte.
+    """
+    if report.get("unityReadyStatus") != "VERIFIED":
+        raise ValueError("cannot record Unity-ready state from an unverified report")
+
+    product_root = candidate_contract.path(job["productRoot"])
+    evidence = product_root / "Evidence" / "Unity" / "unity-ready.json"
+    staged_evidence = artifact / "unity-ready.json"
+    manifest_path = candidate_contract.path(job["productManifestPath"])
+    if not manifest_path.is_file():
+        raise FileNotFoundError(
+            "ProductManifest.json is missing after Unity-ready validation"
+        )
+
+    payload = {
         "status": "VERIFIED",
         "multiMaterialSetup": "VERIFIED",
         "modularAvatarSetup": "VERIFIED",
         "ndmfBake": "VERIFIED",
         "reimport": "VERIFIED",
         "targetAvatarAssetPath": job["targetAvatarAssetPath"],
-        "materialRoles": material_roles,
+        "materialRoles": unity_ready_material_roles(job),
         "evidencePath": candidate_contract.rel(evidence),
-        "evidenceSha256": candidate_contract.digest(evidence),
+        "evidenceSha256": candidate_contract.digest(staged_evidence),
     }
-    candidate_contract.write(manifest_path, manifest)
+    intent = {
+        "kind": "unity-ready",
+        "productId": job["id"],
+        "buildRevision": job["buildRevision"],
+        "expectedManifestSha256": candidate_contract.digest(manifest_path),
+        "payload": payload,
+        "candidate": {
+            "runId": str(run_id),
+            "manifestPath": candidate_contract.rel(candidate_manifest_path),
+            "manifestSha256": candidate_contract.digest(candidate_manifest_path),
+        },
+    }
+
+    previous = evidence.read_bytes() if evidence.is_file() else None
+    evidence.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(staged_evidence, evidence)
+    try:
+        product_manifest_state.apply_update(
+            manifest_path=manifest_path,
+            job=job,
+            intent=intent,
+            root=candidate_contract.ROOT,
+        )
+    except BaseException:
+        if previous is None:
+            evidence.unlink(missing_ok=True)
+        else:
+            evidence.write_bytes(previous)
+        raise
     return evidence
+
+
+def skin_binding_summary(mesh_facts: list[dict[str, Any]]) -> dict[str, Any]:
+    """Classify whether every mesh is skinned to a scene armature.
+
+    A mesh is bound only when it has vertex groups and an Armature modifier that
+    targets an armature object. Anything else is UNRIGGED, so mesh-only input
+    (for example a raw TripoSG GLB) cannot pass as a rigged product.
+    """
+    unrigged = sorted(
+        str(fact["name"])
+        for fact in mesh_facts
+        if not (fact.get("hasVertexGroups") and fact.get("armatureTargets"))
+    )
+    state = "RIGGED" if mesh_facts and not unrigged else "UNRIGGED"
+    return {"riggingState": state, "unriggedMeshObjects": unrigged}
 
 
 def run_blender_structure_gate(job_path: Path) -> int:
@@ -278,12 +325,27 @@ def run_blender_structure_gate(job_path: Path) -> int:
         "nonManifoldEdges": 0,
         "unweightedVertices": 0,
         "weightSumErrors": 0,
+        "unriggedMeshObjects": 0,
     }
+    mesh_facts: list[dict[str, Any]] = []
 
     for obj in bpy.data.objects:
         if obj.type != "MESH":
             continue
         metrics["meshObjects"] += 1
+        mesh_facts.append(
+            {
+                "name": obj.name,
+                "hasVertexGroups": bool(obj.vertex_groups),
+                "armatureTargets": [
+                    modifier.object.name
+                    for modifier in obj.modifiers
+                    if modifier.type == "ARMATURE"
+                    and modifier.object is not None
+                    and modifier.object.type == "ARMATURE"
+                ],
+            }
+        )
         mesh = obj.data
         metrics["vertices"] += len(mesh.vertices)
         metrics["materials"] += len(mesh.materials)
@@ -323,8 +385,15 @@ def run_blender_structure_gate(job_path: Path) -> int:
         )
         bm.free()
 
+    rigging = skin_binding_summary(mesh_facts)
+    metrics["unriggedMeshObjects"] = len(rigging["unriggedMeshObjects"])
     if metrics["meshObjects"] == 0:
         errors.append("no mesh objects")
+    if rigging["unriggedMeshObjects"]:
+        errors.append(
+            "mesh objects lack armature skin binding (mesh-only input): "
+            + ", ".join(rigging["unriggedMeshObjects"])
+        )
     if metrics["nonFiniteValues"]:
         errors.append("non-finite geometry or UV values")
     if metrics["degenerateTriangles"]:
@@ -345,6 +414,8 @@ def run_blender_structure_gate(job_path: Path) -> int:
             "errors": errors,
             "warnings": warnings,
             "metrics": metrics,
+            "riggingState": rigging["riggingState"],
+            "unriggedMeshObjects": rigging["unriggedMeshObjects"],
             "blenderVersion": bpy.app.version_string,
         },
     )
@@ -397,7 +468,10 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
 
     if prepared is None:
         build_exit = None
-        stages["sewnMeshInput"] = {"passed": False, "error": "Blender runtime unavailable"}
+        stages["sewnMeshInput"] = {
+            "passed": False,
+            "error": "Blender runtime unavailable",
+        }
     else:
         build_environment = dict(prepared.environment)
         build_environment["IMAGE2OUTFIT_RUN_ID"] = str(run_id)
@@ -647,20 +721,12 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             stages["unityReady"]["passed"]
             and stages["unitySourceImmutability"]["passed"]
         ):
-            try:
-                evidence_path = record_unity_ready_product_state(
-                    job, unity_ready_report, artifact
-                )
-                stages["unityReadyProductState"] = {
-                    "passed": True,
-                    "evidencePath": candidate_contract.rel(evidence_path),
-                    "evidenceSha256": candidate_contract.digest(evidence_path),
-                }
-            except (OSError, ValueError, KeyError) as exc:
-                stages["unityReadyProductState"] = {
-                    "passed": False,
-                    "error": str(exc),
-                }
+            # The canonical ProductManifest publish is deferred until the
+            # candidate manifest is materialized; nothing tracked is written here.
+            stages["unityReadyProductState"] = {
+                "passed": True,
+                "status": "PENDING_CANDIDATE_COMMIT",
+            }
         else:
             stages["unityReadyProductState"] = {
                 "passed": False,
@@ -769,6 +835,24 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                 "releaseDecision": "REVIEW_REQUIRED",
             },
         )
+        if (
+            stages.get("unityReadyProductState", {}).get("status")
+            == "PENDING_CANDIDATE_COMMIT"
+        ):
+            try:
+                evidence_path = publish_unity_ready_product_state(
+                    job, unity_ready_report, artifact, candidate_manifest_path, run_id
+                )
+                stages["unityReadyProductState"] = {
+                    "passed": True,
+                    "evidencePath": candidate_contract.rel(evidence_path),
+                    "evidenceSha256": candidate_contract.digest(evidence_path),
+                }
+            except (OSError, ValueError, KeyError, RuntimeError) as exc:
+                # Refused publish: the candidate is not reviewable, so withdraw it.
+                stages["unityReadyProductState"] = {"passed": False, "error": str(exc)}
+                candidate_manifest_path.unlink(missing_ok=True)
+                technical_pass = False
 
     decision = "REVIEW_REQUIRED" if technical_pass else "NO-GO"
     candidate_contract.write(

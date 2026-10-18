@@ -16,6 +16,9 @@ from mathutils import Vector
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
+# Mirrors release-policy minimumPreview.requiredViews. gate_evidence is not
+# imported here because this build sits at the product import-depth limit.
+FIVE_VIEWS = ("front", "back", "left", "right", "three-quarter")
 PRODUCT_ID = "siroino-military-sheer-romper-large"
 PRODUCT_NAME = "Military Sheer-Back Romper for Siroino _Large"
 REVISION = "panel-sewn-v3"
@@ -600,6 +603,11 @@ def mesh_metrics(objects):
 
 
 def write_contracts(job_path, job, directories, metrics, previews, fbx):
+    views_present = all(
+        (ROOT / job["productRoot"] / "Previews" / f"{view}.png").is_file()
+        for view in FIVE_VIEWS
+    )
+    five_view_status = "PASS" if views_present else "UNVERIFIED"
     manifest = {
         "schemaVersion": 1,
         "productId": PRODUCT_ID,
@@ -625,7 +633,7 @@ def write_contracts(job_path, job, directories, metrics, previews, fbx):
         },
         "metrics": metrics,
         "technicalGates": {
-            "blenderGeneration": "PASS", "fbxExport": "PASS", "fiveViewRender": "PASS",
+            "blenderGeneration": "PASS", "fbxExport": "PASS", "fiveViewRender": five_view_status,
             "unityPrefabYamlGenerated": "PASS", "unityImport": "PENDING", "prefabReload": "PENDING",
             "modularAvatar": "PENDING", "ndmf": "PENDING", "vrchatBuildAndTest": "PENDING",
             "humanVisualReview": "PENDING", "humanPoseReview": "PENDING", "humanRuntimeReview": "PENDING",

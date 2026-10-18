@@ -147,6 +147,56 @@ class ReviewConsoleTest(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp.cleanup()
 
+    def test_completion_projection_is_shared_with_review_console(self) -> None:
+        (self.root / "config" / "genworks-handoff-policy.json").write_text(
+            json.dumps(
+                {
+                    "statuses": ["WORKING", "COMPLETE", "REJECTED"],
+                    "completionStatus": "COMPLETE",
+                    "requiredCompletionGates": ["blender", "visualAppearanceReview"],
+                    "outOfScopeGates": ["unityImport"],
+                }
+            ),
+            encoding="utf-8",
+        )
+        manifest = (
+            self.root / "Assets" / "GenWorks" / "demo-outfit" / "ProductManifest.json"
+        )
+        manifest.write_text(
+            json.dumps(
+                {
+                    "schemaVersion": 1,
+                    "productId": "demo-outfit",
+                    "productRoot": "Assets/GenWorks/demo-outfit",
+                    "status": "WORKING",
+                    "completionGates": {
+                        "blender": "PASS",
+                        "visualAppearanceReview": "FAIL",
+                    },
+                    "technicalGates": {"unityImport": "PENDING"},
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        data = MODULE.build(self.root, self.output)
+
+        record = data["products"][0]
+        self.assertEqual(record["state"], "WORKING")
+        self.assertEqual(
+            record["completion"]["completionBlockers"],
+            [{"gate": "visualAppearanceReview", "status": "FAIL"}],
+        )
+        gates = {gate["name"]: gate for gate in record["gates"]}
+        self.assertEqual(gates["visualAppearanceReview"]["status"], "FAIL")
+        self.assertEqual(gates["blender"]["status"], "PASS")
+        self.assertIn("runtime/release", gates["unityImport"]["detail"])
+        messages = [blocker["message"] for blocker in record["blockers"]]
+        self.assertIn(
+            "required completion gate is FAIL: visualAppearanceReview", messages
+        )
+        self.assertFalse(any("unityImport" in message for message in messages))
+
     def test_build_reports_state_blockers_assets_gates_and_hashes(self) -> None:
         data = MODULE.build(self.root, self.output)
         self.assertEqual(data["schema_version"], "review-console.v2")
@@ -248,6 +298,40 @@ class ReviewConsoleTest(unittest.TestCase):
         self.assertTrue(assets[("view", "front")]["href"].endswith("front.webp"))
         gates = {gate["name"]: gate for gate in record["gates"]}
         self.assertEqual(gates["visualAppearanceReview"]["status"], "FAIL")
+
+    def test_malformed_manifest_fails_visibly_instead_of_becoming_empty(self) -> None:
+        product = self.root / "Assets" / "GenWorks" / "demo-outfit"
+        (product / "ProductManifest.json").write_text("{not json", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "malformed JSON"):
+            MODULE.build(self.root, self.output)
+
+    def test_unknown_or_missing_product_state_fails_visibly(self) -> None:
+        product = self.root / "Assets" / "GenWorks" / "demo-outfit"
+        manifest_path = product / "ProductManifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["state"] = "DONE"
+        manifest.pop("status", None)
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "unknown or missing product state"):
+            MODULE.build(self.root, self.output)
+
+        manifest.pop("state")
+        manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "unknown or missing product state"):
+            MODULE.build(self.root, self.output)
+
+    def test_malformed_quality_report_fails_visibly(self) -> None:
+        report = (
+            self.root
+            / ".image2outfit"
+            / "products"
+            / "demo-outfit"
+            / "reports"
+            / "customer-quality.json"
+        )
+        report.write_text("[", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "malformed JSON"):
+            MODULE.build(self.root, self.output)
 
     def test_empty_repository_still_generates_valid_console(self) -> None:
         empty_root = Path(self.temp.name) / "empty"

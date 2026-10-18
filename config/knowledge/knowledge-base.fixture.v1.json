@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "note": "Synthetic contract fixture for the knowledge record shape. Records are marked fixture=true and are not product evidence; they are excluded from production projections.",
+  "fabricLibrary": "config/materials/kes-woven-fabrics-2025.v1.json",
+  "defects": [
+    {
+      "defectId": "fixture-defect-fit-tension-001",
+      "productSlug": "siroino-military-sheer-romper-large",
+      "revision": "fixture-r1",
+      "category": "fit-tension",
+      "severity": "major",
+      "sourceKind": "fixture",
+      "summary": "Fixture: shoulder region reports tension at the strap seam.",
+      "evidence": [
+        {
+          "path": "Assets/GenWorks/siroino-military-sheer-romper-large/Evidence/target-fit.json",
+          "sha256": "cd9c6bd429da2d2d23c994f64a88851af15538915860644b4d1e4a093e72b2c4"
+        }
+      ],
+      "fixture": true
+    },
+    {
+      "defectId": "fixture-defect-fit-tension-002",
+      "productSlug": "siroino-heather-hooded-bodysuit",
+      "revision": "fixture-r1",
+      "category": "fit-tension",
+      "severity": "minor",
+      "sourceKind": "fixture",
+      "summary": "Fixture: hood collar pulls across the neck at the fit audit tolerance.",
+      "evidence": [
+        {
+          "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
+          "sha256": "f8cf980e65cf773a9809ca96fdc0ed1be8802614e502aa7dd0a94866e04ab858"
+        }
+      ],
+      "fixture": true
+    }
+  ],
+  "trials": [
+    {
+      "trialId": "fixture-trial-accept-001",
+      "productSlug": "siroino-military-sheer-romper-large",
+      "revision": "fixture-r1",
+      "change": "Fixture: increase shoulder ease by one bounded step.",
+      "decision": "accepted",
+      "appliesWhen": ["shoulder-strap tension is reported on a sheer knit shell"],
+      "notApplicableWhen": ["no measured shoulder strain", "non-knit shell"],
+      "materialIds": ["kes-2025-m5-polyester-elastane-plain"],
+      "evidence": [
+        {
+          "path": "Assets/GenWorks/siroino-military-sheer-romper-large/Evidence/target-fit.json",
+          "sha256": "cd9c6bd429da2d2d23c994f64a88851af15538915860644b4d1e4a093e72b2c4"
+        }
+      ],
+      "fixture": true
+    },
+    {
+      "trialId": "fixture-trial-reject-001",
+      "productSlug": "siroino-heather-hooded-bodysuit",
+      "revision": "fixture-r1",
+      "change": "Fixture: reduce hood collar stiffness by scaling weft bending.",
+      "decision": "rejected",
+      "rejectionReason": "Fixture: collar stiffness change moved the fit audit past tolerance.",
+      "appliesWhen": ["hood collar pulls across the neck"],
+      "notApplicableWhen": ["collar stiffness already within audit tolerance"],
+      "materialIds": ["kes-2025-m3-wool-polyester-elastane-twill"],
+      "evidence": [
+        {
+          "path": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Tests/fit-audit.json",
+          "sha256": "f8cf980e65cf773a9809ca96fdc0ed1be8802614e502aa7dd0a94866e04ab858"
+        }
+      ],
+      "fixture": true
+    }
+  ]
+}
