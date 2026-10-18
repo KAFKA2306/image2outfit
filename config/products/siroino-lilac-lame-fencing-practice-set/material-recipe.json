@@ -13,7 +13,7 @@
     "roughness": 0.65
   },
   "prototypeEdgeTrim": {
-    "enabled": false,
+    "enabled": true,
     "name": "lavender-piping-prototype-hypothesis",
     "pieceIds": [
       "jacket-overlap-front",
@@ -36,23 +36,23 @@
     ],
     "roughness": 0.48,
     "metallic": 0.08,
-    "bevelRadiusM": 0.0012,
-    "evidenceBoundary": "Disabled because unclassified panel boundaries produced floating loops. Trim remains unimplemented until canonical 3D stitch-edge mappings exist."
+    "bevelRadiusM": 0.0018,
+    "evidenceBoundary": "V18 trials lavender piping on the declared open exterior panel boundaries using the existing canonical edge interpolation binding. Edge classification, intersections, appearance, fit, and release remain unapproved."
   },
   "prototypeRearWaistTabMaterials": {
     "tab": {
-      "name": "rear-waist-adjustment-tab-v16-prototype",
+      "name": "rear-waist-adjustment-tab-v18-prototype",
       "baseColorLinearRgb": [
-        0.32,
-        0.23,
-        0.52
+        0.28,
+        0.16,
+        0.47
       ],
       "roughness": 0.48,
       "metallic": 0.08,
-      "evidenceBoundary": "Provisional lavender tab surface color for direct appearance review; not approved material or final styling."
+      "evidenceBoundary": "V18 higher-contrast lavender surface color for direct review; not approved material or final styling."
     },
     "buckle": {
-      "name": "rear-waist-adjustment-buckle-v16-prototype",
+      "name": "rear-waist-adjustment-buckle-v18-prototype",
       "baseColorLinearRgb": [
         0.66,
         0.48,
@@ -123,20 +123,20 @@
       "centerZM": 1.012,
       "halfLengthM": 0.024,
       "halfHeightM": 0.016,
-      "threadRadiusM": 0.00045,
+      "threadRadiusM": 0.0008,
       "surfaceOffsetM": 0.0008,
       "stitchMaterialName": "elbow-seam-muted-lilac-prototype",
       "stitchColorLinearRgb": [
-        0.4,
-        0.32,
-        0.54
+        0.27,
+        0.19,
+        0.43
       ],
       "stitchRoughness": 0.62,
       "stitchMetallic": 0.06,
       "filledPatchEnabled": false,
       "patchSegmentsPerSide": 8,
       "frontQueryYM": -0.08,
-      "evidenceBoundary": "V14 reduces the oversized elbow perimeter and removes the filled diamond applique rejected by direct review, leaving smaller surface-bound parallel seam channels as a restrained quilting hypothesis. This does not establish textile attachment, fit, fold quality, runtime, appearance approval, or release."
+      "evidenceBoundary": "V18 increases the muted-lilac thread relief on existing surface-bound parallel elbow channels for visibility in the current render scale. Stitch attachment, fabric behavior, fit, appearance, and release remain unverified."
     }
   }
 }

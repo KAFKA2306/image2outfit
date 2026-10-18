@@ -58,14 +58,16 @@ def _piece_surface_tree(objects, depsgraph, piece_ids):
             ownership = mesh.attributes.get("canonical_piece_index")
             if ownership is None:
                 continue
+            mesh.calc_loop_triangles()
             offset = len(vertices)
             vertices.extend(evaluated.matrix_world @ vertex.co for vertex in mesh.vertices)
-            for polygon, owner in zip(mesh.polygons, ownership.data):
+            for triangle in mesh.loop_triangles:
+                owner = ownership.data[triangle.polygon_index]
                 if owner.value < 0 or owner.value >= len(pieces):
                     raise ValueError(f"Invalid sewn face owner on {obj.name}")
                 if pieces[owner.value] not in piece_ids:
                     continue
-                polygons.append(tuple(offset + index for index in polygon.vertices))
+                polygons.append(tuple(offset + index for index in triangle.vertices))
                 included_faces += 1
         finally:
             evaluated.to_mesh_clear()

@@ -1289,7 +1289,7 @@
                 [
                   0.46602588331699374,
                   1.0327540437579155,
-                  0.00002832724526524548
+                  2.832724526524548E-05
                 ],
                 [
                   0.4660173002481461,
@@ -1619,7 +1619,7 @@
                 [
                   0.4549138116054237,
                   1.034465266942978,
-                  -0.00005813505500555042
+                  -5.813505500555042E-05
                 ],
                 [
                   0.4549046622924507,
@@ -2599,7 +2599,7 @@
                 [
                   0.3430677967816591,
                   1.0409463762044906,
-                  0.00009349594637751571
+                  9.349594637751571E-05
                 ],
                 [
                   0.34305510099232195,
@@ -2734,7 +2734,7 @@
                 [
                   0.3438138972073793,
                   0.9865169734954834,
-                  0.000023979127407073968
+                  2.3979127407073968E-05
                 ],
                 [
                   0.3436575804427266,
@@ -5124,7 +5124,7 @@
                 [
                   -0.46602618220448494,
                   1.03275362855196,
-                  0.00002821132168173788
+                  2.821132168173788E-05
                 ],
                 [
                   -0.4660175991356373,
@@ -5454,7 +5454,7 @@
                 [
                   -0.4549138711579144,
                   1.0344650289416313,
-                  -0.00005818757042288787
+                  -5.818757042288787E-05
                 ],
                 [
                   -0.45490475164726374,
@@ -6434,7 +6434,7 @@
                 [
                   -0.34306788608431815,
                   1.0409460189938544,
-                  0.00009340183436870597
+                  9.340183436870597E-05
                 ],
                 [
                   -0.343055190294981,
@@ -6569,7 +6569,7 @@
                 [
                   -0.3438139269053936,
                   0.9865167346596718,
-                  0.000024023622274398863
+                  2.4023622274398863E-05
                 ],
                 [
                   -0.3436576402038336,
@@ -9280,9 +9280,9 @@
       "shorts-back-left",
       "shorts-back-right"
     ],
-    "extensionM": 0.025,
+    "extensionM": 0.06,
     "fadeHeightM": 0.075,
-    "evidenceBoundary": "V17 reduces the shorts hem extension from 45 mm to 25 mm while lengthening the sewn overskirt pattern by 20 mm, testing greater overskirt concealment at neutral while retaining some under-layer coverage. Sit/crouch opacity, pose coverage, collision, fit, Shape Keys, and appearance remain unverified."
+    "evidenceBoundary": "V18 lengthens the under-shorts hem to a 60 mm total extension while retaining the 20 mm longer sewn overskirt; seated/crouched coverage, neutral hem concealment, collision, fit, shape-key response, and appearance remain unverified."
   },
   "rearWaistAdjustmentTab": {
     "method": "avatar-back-surface-projected-tab-v1",
@@ -9290,19 +9290,19 @@
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "centerXZ": [
       0.0,
-      0.755
+      0.775
     ],
     "widthM": 0.16,
     "heightM": 0.045,
     "xSegments": 8,
     "zSegments": 2,
     "backQueryYM": 0.3,
-    "surfaceOffsetM": 0.008,
-    "buckleReliefM": 0.0035,
-    "buckleWidthM": 0.04,
-    "buckleHeightM": 0.025,
+    "surfaceOffsetM": 0.016,
+    "buckleReliefM": 0.004,
+    "buckleWidthM": 0.048,
+    "buckleHeightM": 0.03,
     "maximumProjectionDistanceM": 0.5,
-    "evidenceBoundary": "V17 enlarges the back-surface-projected tab to 160 by 45 mm, reduces the offset to 8 mm, and enlarges buckle relief to improve rear-view legibility while retaining vertex projection onto the avatar surface. Attachment, collision, weight, fit, and appearance remain unverified."
+    "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
   "shortsUpperSurfacePlacement": {
     "method": "evaluated-body-nearest-surface-blended-placement",
@@ -9401,7 +9401,7 @@
     "blenderVersion": "4.4.3",
     "bone": "Neck",
     "headBlenderM": [
-      -2.053701209092651e-9,
+      -2.053701209092651E-09,
       -0.0093428585678339,
       1.0351301431655884
     ],
@@ -9477,11 +9477,11 @@
     "waistZM": 0.7395782470703125,
     "sourceHemZM": 0.5795782470703125,
     "hemZM": 0.47957824707,
-    "hemExtensionM": 0.10,
+    "hemExtensionM": 0.1,
     "foldCount": 8,
-    "hemFoldDepthM": 0.01,
+    "hemFoldDepthM": 0.006,
     "phaseRadians": 0,
-    "evidenceBoundary": "V17 changes the actual 2D sewn panel height by 20 mm, retains the declared 100 mm 3D hem extension, and tests two soft folds per panel at 10 mm depth with eight longitudinal subdivisions. These geometry hypotheses respond to V16 direct visual rejection; cloth response, coverage, fit, motion, penetration, and appearance remain unapproved.",
+    "evidenceBoundary": "V18 keeps two panel-local folds per sewn panel and eight longitudinal subdivisions, reducing fold depth from 10 mm to 6 mm to soften the observed faceting. Geometry, cloth response, coverage, fit, motion, penetration, and appearance remain unapproved.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",

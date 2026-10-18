@@ -286,8 +286,9 @@ def main():
     edge_sources = {}
     for obj in garment_objects:
         source_ids = obj.data.attributes.get("canonical_sewn_vertex_index")
-        if trim_objects and source_ids is None:
-            raise ValueError(f"Settled garment lost sewn vertex identity: {obj.name}")
+        # Surface motifs are skinned with the garment but are not split from
+        # canonical sewn panels, so they have no sewn-vertex identity. Only
+        # canonical panel meshes can supply settled edge positions for trim.
         if source_ids is None:
             continue
         pieces = json.loads(obj["canonicalPieceIds"])
@@ -312,8 +313,16 @@ def main():
         raw, displacements = {}, []
         inverse = obj.matrix_world.inverted()
         for vertex, binding in zip(obj.data.vertices, bindings):
-            first, first_weights = edge_sources[(binding["first"], piece)]
-            second, second_weights = edge_sources[(binding["second"], piece)]
+            first_key = (binding["first"], piece)
+            second_key = (binding["second"], piece)
+            if first_key not in edge_sources or second_key not in edge_sources:
+                missing = [key for key in (first_key, second_key) if key not in edge_sources]
+                raise ValueError(
+                    f"Prototype trim binding references missing canonical sewn edge source: "
+                    f"{obj.name} {missing}"
+                )
+            first, first_weights = edge_sources[first_key]
+            second, second_weights = edge_sources[second_key]
             direction = second-first
             rest_direction = Vector(binding["restDirection"])
             if min(direction.length_squared, rest_direction.length_squared) <= 1e-16:
