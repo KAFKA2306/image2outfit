@@ -84,3 +84,9 @@ If work stops, persist the current manifest/checkpoint, verified revision, faili
 - **Range:** Combine code, data, tests, runtime/UI, and domain expertise when that materially improves the outcome, while respecting canonical owners and avoiding duplicate systems.
 - **Speed:** Complete authorized read-only and reversible work through implementation, focused checks, and read-back without unnecessary approval loops. Bound retries and stop at the proven outcome.
 - These principles never bypass repository-specific security, privacy, permission, publication, spending, destructive-action, or release boundaries. State verified results and any remaining `UNVERIFIED` layers.
+
+## Compute-scaling adoption
+
+Garment production: Keep the 13-stage and ProductManifest/QualitySpec authority fixed; scale only eligible stage implementation, candidate search, mesh/simulation resolution, solver iterations, and local OSS tool selection. Compare the same garment inputs, seeds and runtime versions with defect rates, cloth fit, visual evidence, time and VRAM. Route Stage 04/08 benchmark evidence through the existing stage trajectory workline (#271), not a second agent framework or state store. An LLM assertion or larger render is not a quality gate.
+
+Adopt a higher-compute path only after an identical-input baseline comparison and exact-revision verification; record input/model revision, budget, measured quality and measured resource usage. A no-gain result means keeping the existing path.
