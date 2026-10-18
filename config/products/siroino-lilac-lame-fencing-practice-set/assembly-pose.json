@@ -8861,7 +8861,7 @@
         ],
         "widthRadiusProfileM": [
           [
-            -0.14,
+            -0.16,
             0.215,
             0.165
           ],
@@ -8871,7 +8871,7 @@
             0.10068467541247662
           ]
         ],
-        "evidenceBoundary": "V12 restrained-flare panel-wrap hypothesis paired with a 60 mm hem continuation and smooth crease-aligned radial pleat field. Panel dimensions remain unverified against textile ease; no fit or motion acceptance.",
+        "evidenceBoundary": "V17 maps the lengthened 160 mm sewn panel to the corresponding expanded quadratic width profile while preserving its measured waist width and neutral envelope. Panel dimensions remain prototype hypotheses; textile ease, fit, and motion acceptance remain unverified.",
         "widthQuadraticControlM": [
           0.1581551183024547,
           0.18657705918869855,
@@ -8900,7 +8900,7 @@
         ],
         "widthRadiusProfileM": [
           [
-            -0.14,
+            -0.16,
             0.215,
             0.165
           ],
@@ -8910,7 +8910,7 @@
             0.10068467541247662
           ]
         ],
-        "evidenceBoundary": "V12 restrained-flare panel-wrap hypothesis paired with a 60 mm hem continuation and smooth crease-aligned radial pleat field. Panel dimensions remain unverified against textile ease; no fit or motion acceptance.",
+        "evidenceBoundary": "V17 maps the lengthened 160 mm sewn panel to the corresponding expanded quadratic width profile while preserving its measured waist width and neutral envelope. Panel dimensions remain prototype hypotheses; textile ease, fit, and motion acceptance remain unverified.",
         "widthQuadraticControlM": [
           0.1581551183024547,
           0.18657705918869855,
@@ -8939,7 +8939,7 @@
         ],
         "widthRadiusProfileM": [
           [
-            -0.14,
+            -0.16,
             0.215,
             0.165
           ],
@@ -8949,7 +8949,7 @@
             0.10068467541247662
           ]
         ],
-        "evidenceBoundary": "V12 restrained-flare panel-wrap hypothesis paired with a 60 mm hem continuation and smooth crease-aligned radial pleat field. Panel dimensions remain unverified against textile ease; no fit or motion acceptance.",
+        "evidenceBoundary": "V17 maps the lengthened 160 mm sewn panel to the corresponding expanded quadratic width profile while preserving its measured waist width and neutral envelope. Panel dimensions remain prototype hypotheses; textile ease, fit, and motion acceptance remain unverified.",
         "widthQuadraticControlM": [
           0.1581551183024547,
           0.18657705918869855,
@@ -8978,7 +8978,7 @@
         ],
         "widthRadiusProfileM": [
           [
-            -0.14,
+            -0.16,
             0.215,
             0.165
           ],
@@ -8988,7 +8988,7 @@
             0.10068467541247662
           ]
         ],
-        "evidenceBoundary": "V12 restrained-flare panel-wrap hypothesis paired with a 60 mm hem continuation and smooth crease-aligned radial pleat field. Panel dimensions remain unverified against textile ease; no fit or motion acceptance.",
+        "evidenceBoundary": "V17 maps the lengthened 160 mm sewn panel to the corresponding expanded quadratic width profile while preserving its measured waist width and neutral envelope. Panel dimensions remain prototype hypotheses; textile ease, fit, and motion acceptance remain unverified.",
         "widthQuadraticControlM": [
           0.1581551183024547,
           0.18657705918869855,
@@ -9280,9 +9280,9 @@
       "shorts-back-left",
       "shorts-back-right"
     ],
-    "extensionM": 0.045,
+    "extensionM": 0.025,
     "fadeHeightM": 0.075,
-    "evidenceBoundary": "V16 adds a bounded 45 mm downward extension only near the four sewn shorts lower hems, fading to the original geometry 75 mm above the hem, then projects against the measured avatar surface. This tests opaque skort coverage under crouch/sit without changing the neutral skirt hem; pattern ease, opacity, pose coverage, collision, fit, Shape Keys, and appearance remain unverified."
+    "evidenceBoundary": "V17 reduces the shorts hem extension from 45 mm to 25 mm while lengthening the sewn overskirt pattern by 20 mm, testing greater overskirt concealment at neutral while retaining some under-layer coverage. Sit/crouch opacity, pose coverage, collision, fit, Shape Keys, and appearance remain unverified."
   },
   "rearWaistAdjustmentTab": {
     "method": "avatar-back-surface-projected-tab-v1",
@@ -9292,17 +9292,17 @@
       0.0,
       0.755
     ],
-    "widthM": 0.125,
-    "heightM": 0.032,
+    "widthM": 0.16,
+    "heightM": 0.045,
     "xSegments": 8,
     "zSegments": 2,
     "backQueryYM": 0.3,
-    "surfaceOffsetM": 0.012,
-    "buckleReliefM": 0.0015,
-    "buckleWidthM": 0.032,
-    "buckleHeightM": 0.018,
+    "surfaceOffsetM": 0.008,
+    "buckleReliefM": 0.0035,
+    "buckleWidthM": 0.04,
+    "buckleHeightM": 0.025,
     "maximumProjectionDistanceM": 0.5,
-    "evidenceBoundary": "V16 tab vertices are ray-bound to the evaluated neutral Siroino avatar back surface with zero-valued Shape Keys, and are included in the garment mesh so the existing weight, cloth, export, and render stages process them. The 125 by 32 mm dimensions and 12 mm offset are provisional appearance hypotheses; attachment strength, collision, weight quality, fit, and runtime remain unverified."
+    "evidenceBoundary": "V17 enlarges the back-surface-projected tab to 160 by 45 mm, reduces the offset to 8 mm, and enlarges buckle relief to improve rear-view legibility while retaining vertex projection onto the avatar surface. Attachment, collision, weight, fit, and appearance remain unverified."
   },
   "shortsUpperSurfacePlacement": {
     "method": "evaluated-body-nearest-surface-blended-placement",
@@ -9475,13 +9475,13 @@
       -0.03788188099861145
     ],
     "waistZM": 0.7395782470703125,
-    "sourceHemZM": 0.5995782470703125,
-    "hemZM": 0.49957824707,
+    "sourceHemZM": 0.5795782470703125,
+    "hemZM": 0.47957824707,
     "hemExtensionM": 0.10,
     "foldCount": 8,
-    "hemFoldDepthM": 0.004,
+    "hemFoldDepthM": 0.01,
     "phaseRadians": 0,
-    "evidenceBoundary": "V15 prototype hypothesis: keep the 100 mm hem extension, assign two shallow soft fold cycles inside each of the four sewn panels, add eight height subdivisions, and make all four hem panels follow both thigh bones more evenly. The fold field is local to each panel with a shared recessed value at panel boundaries; 10.0 cloth stiffness tests between V13 fan and V14 crumpling. Direct renders, cloth response, coverage, fit, motion, penetration and appearance remain unapproved.",
+    "evidenceBoundary": "V17 changes the actual 2D sewn panel height by 20 mm, retains the declared 100 mm 3D hem extension, and tests two soft folds per panel at 10 mm depth with eight longitudinal subdivisions. These geometry hypotheses respond to V16 direct visual rejection; cloth response, coverage, fit, motion, penetration, and appearance remain unapproved.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",

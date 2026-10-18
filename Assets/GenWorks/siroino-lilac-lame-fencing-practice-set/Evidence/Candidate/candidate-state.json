@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v16-skortsurface-rear-tab-20261018",
+  "revision": "v17-lengthened-pleated-skort-20261018",
   "gates": {
     "blender": "FAIL",
     "editableSource": "PASS",
@@ -19,29 +19,29 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct neutral renders show the extended under-shorts hem protruding below the overskirt. In crouch the shorts cover more of the thighs, but in sit the shorts remain conspicuously exposed while the overskirt lifts and flares. The intended opaque skort coverage is not yet balanced across neutral and seated poses.",
       "code": "SKORT_COVERAGE",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "Direct neutral views show the 20 mm longer overskirt concealing the shorts hem better. In crouch the shorts remain conspicuous, and in sit the overskirt lifts and exposes most of the upper thighs; opaque coverage is not balanced across motion poses."
     },
     {
-      "description": "Across front, back, side, and three-quarter views the overskirt still reads as a plain flared skirt; regular pleats are not visually clear. Rear and side surfaces retain broad angular faceting and abrupt folds.",
       "code": "SKIRT_FORM_AND_FACETING",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "The front now shows repeated vertical fold lines, but the skirt still reads mainly as a plain flare. Rear and side views retain coarse angular wrinkles and abrupt facets that obscure an even pleated form."
     },
     {
-      "description": "The declared rear waist tab is present as a small protruding shape in the side view, but it is difficult to distinguish as an adjustment tab in the direct rear view and does not read clearly as a garment detail.",
       "code": "REAR_TAB_LEGIBILITY",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "The enlarged rear waist tab remains nearly flush and faint in the direct back view; its outline and buckle do not read clearly as an adjustment detail."
     },
     {
-      "description": "The jacket remains mostly plain ivory with a broad diagonal lavender chest panel and minimal visible seam or trim detail in the five views.",
       "code": "STYLING_FIDELITY",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "Across the five views the jacket remains mostly plain ivory with a broad diagonal lavender panel; visible piping, seam trim, and quilting detail remain insufficient."
     },
     {
-      "description": "No authored UV layout exists for the current weighted garment mesh; UV status remains NOT_CREATED.",
       "code": "UV_NOT_CREATED",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "No authored UV layout exists for the current weighted garment mesh; UV status remains NOT_CREATED."
     }
   ],
   "failedGeometryChecks": [
