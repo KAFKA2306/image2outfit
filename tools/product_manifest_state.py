@@ -323,6 +323,16 @@ def record_workflow_attempt(
     # not an approval transition.
     pre_suffix = f"workflow-pre-{uuid.uuid4().hex}"
     pre_errors = _validate_with_completion_policy(current, job, root, suffix=pre_suffix)
+    if str(current.get("state", current.get("status", ""))).upper() == "REJECTED":
+        # A workflow handoff records evidence and next steps; it does not claim
+        # that already-failed technical gates passed. Permit the rejected
+        # product's gate failures during this read-only precondition check so
+        # a failed or rejected run can still be bound to its fresh checkpoint.
+        pre_errors = [
+            error
+            for error in pre_errors
+            if not error.startswith("product technical gate failed:")
+        ]
     if pre_errors:
         raise ValueError(
             "ProductManifest precondition failed: " + "; ".join(pre_errors)

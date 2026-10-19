@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V20 keeps the v19 skirt weight profile and trials a pattern-level forward apron on the two front overskirt panels after v19 renders still kicked the skirt behind the lap. Sit/crouch geometric upper-thigh coverage was only 25.4-25.6% / 36.5-36.9% for the skirt versus 95.4-95.5% for shorts; panel extension and projection are unapproved construction hypotheses.",
-  "designRevision": "v20-front-apron-sit-drape-20261018",
+  "target": "V21 replaces the former two full-width front overskirt panels with two center lap panels and two flanking panels. New lap-to-flank and lap-waistband boundaries are sewn explicitly. Existing hem length and thigh-weight values are retained without another tuning pass; the split panel and pleat allowance are unapproved construction hypotheses. Shorts remain the fitted opaque under-layer.",
+  "designRevision": "v21-sewn-center-lap-panel-20261019",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -24,7 +24,11 @@
     "waistband-front-left",
     "waistband-front-right",
     "waistband-back-left",
-    "waistband-back-right"
+    "waistband-back-right",
+    "overskirt-front-lap-left",
+    "overskirt-front-lap-right",
+    "waistband-front-lap-left",
+    "waistband-front-lap-right"
   ],
   "requiredPatternComponents": [
     {
@@ -52,7 +56,11 @@
         "waistband-front-left",
         "waistband-front-right",
         "waistband-back-left",
-        "waistband-back-right"
+        "waistband-back-right",
+        "overskirt-front-lap-left",
+        "overskirt-front-lap-right",
+        "waistband-front-lap-left",
+        "waistband-front-lap-right"
       ],
       "reason": "Directly observed as a short pleated layer over fitted shorts; pleat count, panelization, and attachment remain hypotheses."
     },
@@ -121,7 +129,9 @@
         "overskirt-front-left",
         "overskirt-front-right",
         "overskirt-back-left",
-        "overskirt-back-right"
+        "overskirt-back-right",
+        "overskirt-front-lap-left",
+        "overskirt-front-lap-right"
       ]
     },
     "prototypeFrameEnd": 48,
@@ -174,7 +184,9 @@
         "waistband-front-left",
         "waistband-front-right",
         "waistband-back-left",
-        "waistband-back-right"
+        "waistband-back-right",
+        "overskirt-front-lap-left",
+        "overskirt-front-lap-right"
       ],
       "bodyTriangleZM": [
         0.32,
@@ -187,14 +199,16 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "V16 provisional pelvis/leg surface window is extended downward for the lower-hem coverage hypothesis and includes the surface-projected rear adjustment tab. Prevent arm/hand nearest-surface transfer to lower garment pieces; this does not establish pose deformation, opacity, penetration, approved fit, or runtime motion.",
+      "evidenceBoundary": "V21 preserves existing prototype weights and extends their ownership to the new center lap panels. This does not claim pose coverage, fit, collision, opacity, or release acceptance.",
       "weightProfile": {
         "method": "panel-balanced-hem-thigh-follow-v5",
         "pieceIds": [
           "overskirt-front-left",
           "overskirt-front-right",
           "overskirt-back-left",
-          "overskirt-back-right"
+          "overskirt-back-right",
+          "overskirt-front-lap-left",
+          "overskirt-front-lap-right"
         ],
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
@@ -208,7 +222,7 @@
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.055,
         "fullSideWeightWidthM": 0.095,
-        "evidenceBoundary": "V19 increases only the prototype hem thigh-follow field from V18 after direct pose coverage measured 21.7-32.9% overskirt coverage versus 95.4% shorts coverage over upper thighs in sit/crouch. The waistband remains Hips-anchored; this bounded reweighting is a hypothesis requiring new rendered coverage, deformation, seam, collision, and direct appearance review and grants no fit or release acceptance."
+        "evidenceBoundary": "V21 applies the unchanged V19 panel-balanced hem thigh-follow profile to the newly sewn lap panels; no additional weight values were tuned. This remains a hypothesis requiring rendered coverage, deformation, seam, collision, and direct appearance review, and grants no fit or release acceptance."
       }
     }
   ]

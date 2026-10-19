@@ -828,21 +828,6 @@
       "easingRatio": 1.0
     },
     {
-      "stitchId": "overskirt-front-center-seam",
-      "first": {
-        "pieceId": "overskirt-front-left",
-        "edgeId": "center-front"
-      },
-      "second": {
-        "pieceId": "overskirt-front-right",
-        "edgeId": "center-front"
-      },
-      "type": "plain",
-      "direction": "same",
-      "endpointMapping": "start-to-start",
-      "easingRatio": 1.0
-    },
-    {
       "stitchId": "overskirt-back-center-seam",
       "first": {
         "pieceId": "overskirt-back-left",
@@ -888,36 +873,6 @@
       "easingRatio": 1.0
     },
     {
-      "stitchId": "front-left-waistband-seam",
-      "first": {
-        "pieceId": "overskirt-front-left",
-        "edgeId": "waist-opening"
-      },
-      "second": {
-        "pieceId": "waistband-front-left",
-        "edgeId": "skirt-attachment"
-      },
-      "type": "plain",
-      "direction": "same",
-      "endpointMapping": "start-to-start",
-      "easingRatio": 1.0
-    },
-    {
-      "stitchId": "front-right-waistband-seam",
-      "first": {
-        "pieceId": "overskirt-front-right",
-        "edgeId": "waist-opening"
-      },
-      "second": {
-        "pieceId": "waistband-front-right",
-        "edgeId": "skirt-attachment"
-      },
-      "type": "plain",
-      "direction": "reversed",
-      "endpointMapping": "start-to-end",
-      "easingRatio": 1.0
-    },
-    {
       "stitchId": "back-left-waistband-seam",
       "first": {
         "pieceId": "overskirt-back-left",
@@ -941,21 +896,6 @@
       "second": {
         "pieceId": "waistband-back-right",
         "edgeId": "skirt-attachment"
-      },
-      "type": "plain",
-      "direction": "reversed",
-      "endpointMapping": "start-to-end",
-      "easingRatio": 1.0
-    },
-    {
-      "stitchId": "front-waistband-center-seam",
-      "first": {
-        "pieceId": "waistband-front-left",
-        "edgeId": "center-front"
-      },
-      "second": {
-        "pieceId": "waistband-front-right",
-        "edgeId": "center-front"
       },
       "type": "plain",
       "direction": "reversed",
@@ -1003,9 +943,159 @@
         "edgeId": "side-right"
       },
       "type": "plain",
+      "direction": "reversed",
+      "endpointMapping": "start-to-end",
+      "easingRatio": 1.0
+    },
+    {
       "direction": "same",
       "endpointMapping": "start-to-start",
-      "easingRatio": 1.0
+      "second": {
+        "edgeId": "center-front",
+        "pieceId": "overskirt-front-lap-right"
+      },
+      "first": {
+        "edgeId": "center-front",
+        "pieceId": "overskirt-front-lap-left"
+      },
+      "stitchId": "overskirt-lap-center-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "reversed",
+      "endpointMapping": "start-to-end",
+      "second": {
+        "edgeId": "lap-join",
+        "pieceId": "overskirt-front-left"
+      },
+      "first": {
+        "edgeId": "lap-side-left",
+        "pieceId": "overskirt-front-lap-left"
+      },
+      "stitchId": "overskirt-lap-left-flank-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "reversed",
+      "endpointMapping": "start-to-end",
+      "second": {
+        "edgeId": "lap-join",
+        "pieceId": "overskirt-front-right"
+      },
+      "first": {
+        "edgeId": "lap-side-right",
+        "pieceId": "overskirt-front-lap-right"
+      },
+      "stitchId": "overskirt-lap-right-flank-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "same",
+      "endpointMapping": "start-to-start",
+      "second": {
+        "edgeId": "skirt-attachment",
+        "pieceId": "waistband-front-left"
+      },
+      "first": {
+        "edgeId": "waist-opening",
+        "pieceId": "overskirt-front-left"
+      },
+      "stitchId": "front-left-flank-waistband-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "same",
+      "endpointMapping": "start-to-start",
+      "second": {
+        "edgeId": "skirt-attachment",
+        "pieceId": "waistband-front-right"
+      },
+      "first": {
+        "edgeId": "waist-opening",
+        "pieceId": "overskirt-front-right"
+      },
+      "stitchId": "front-right-flank-waistband-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "same",
+      "endpointMapping": "start-to-start",
+      "second": {
+        "edgeId": "skirt-attachment",
+        "pieceId": "waistband-front-lap-left"
+      },
+      "first": {
+        "edgeId": "waist-opening",
+        "pieceId": "overskirt-front-lap-left"
+      },
+      "stitchId": "front-left-lap-waistband-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "reversed",
+      "endpointMapping": "start-to-end",
+      "second": {
+        "edgeId": "skirt-attachment",
+        "pieceId": "waistband-front-lap-right"
+      },
+      "first": {
+        "edgeId": "waist-opening",
+        "pieceId": "overskirt-front-lap-right"
+      },
+      "stitchId": "front-right-lap-waistband-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "reversed",
+      "endpointMapping": "start-to-end",
+      "second": {
+        "edgeId": "lap-join",
+        "pieceId": "waistband-front-left"
+      },
+      "first": {
+        "edgeId": "lap-join",
+        "pieceId": "waistband-front-lap-left"
+      },
+      "stitchId": "front-waistband-lap-left-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "same",
+      "endpointMapping": "start-to-start",
+      "second": {
+        "edgeId": "lap-join",
+        "pieceId": "waistband-front-right"
+      },
+      "first": {
+        "edgeId": "lap-join",
+        "pieceId": "waistband-front-lap-right"
+      },
+      "stitchId": "front-waistband-lap-right-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
+    },
+    {
+      "direction": "reversed",
+      "endpointMapping": "start-to-end",
+      "second": {
+        "edgeId": "center-front",
+        "pieceId": "waistband-front-lap-right"
+      },
+      "first": {
+        "edgeId": "center-front",
+        "pieceId": "waistband-front-lap-left"
+      },
+      "stitchId": "front-lap-waistband-center-seam",
+      "easingRatio": 1.0,
+      "type": "plain"
     }
   ],
   "unresolved": [

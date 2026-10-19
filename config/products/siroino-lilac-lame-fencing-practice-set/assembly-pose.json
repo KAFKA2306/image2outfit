@@ -9131,6 +9131,152 @@
         ],
         "evidenceBoundary": "Measured Neutral bottom/top support perimeters, 25 mm band height and 10 mm radial clearance are prototype dimensions. Generic half-circumference placement is followed by measured contour mapping. No Large or motion acceptance."
       }
+    },
+    "overskirt-front-lap-left": {
+      "rotationDegreesXYZ": [
+        0,
+        0,
+        0
+      ],
+      "translationM": [
+        0,
+        0.739578,
+        -0.093913
+      ],
+      "skirtWrap": {
+        "method": "pattern-half-circumference-skirt",
+        "depthDirection": 1,
+        "axisAnchorGarmentCodeM": [
+          0,
+          0.7395782470703125,
+          0.03788188099861145
+        ],
+        "widthRadiusProfileM": [
+          [
+            -0.16,
+            0.215,
+            0.165
+          ],
+          [
+            0,
+            0.1581551183024547,
+            0.10068467541247662
+          ]
+        ],
+        "evidenceBoundary": "V17 maps the lengthened 160 mm sewn panel to the corresponding expanded quadratic width profile while preserving its measured waist width and neutral envelope. Panel dimensions remain prototype hypotheses; textile ease, fit, and motion acceptance remain unverified.",
+        "widthQuadraticControlM": [
+          0.1581551183024547,
+          0.18657705918869855,
+          0.215
+        ]
+      }
+    },
+    "overskirt-front-lap-right": {
+      "rotationDegreesXYZ": [
+        0,
+        0,
+        0
+      ],
+      "translationM": [
+        0,
+        0.739578,
+        -0.093913
+      ],
+      "skirtWrap": {
+        "method": "pattern-half-circumference-skirt",
+        "depthDirection": 1,
+        "axisAnchorGarmentCodeM": [
+          0,
+          0.7395782470703125,
+          0.03788188099861145
+        ],
+        "widthRadiusProfileM": [
+          [
+            -0.16,
+            0.215,
+            0.165
+          ],
+          [
+            0,
+            0.1581551183024547,
+            0.10068467541247662
+          ]
+        ],
+        "evidenceBoundary": "V17 maps the lengthened 160 mm sewn panel to the corresponding expanded quadratic width profile while preserving its measured waist width and neutral envelope. Panel dimensions remain prototype hypotheses; textile ease, fit, and motion acceptance remain unverified.",
+        "widthQuadraticControlM": [
+          0.1581551183024547,
+          0.18657705918869855,
+          0.215
+        ]
+      }
+    },
+    "waistband-front-lap-left": {
+      "rotationDegreesXYZ": [
+        0,
+        0,
+        0
+      ],
+      "translationM": [
+        0,
+        0.739578,
+        -0.093913
+      ],
+      "skirtWrap": {
+        "method": "pattern-half-circumference-skirt",
+        "depthDirection": 1,
+        "axisAnchorGarmentCodeM": [
+          0,
+          0.7395782470703125,
+          0.03788188099861145
+        ],
+        "widthRadiusProfileM": [
+          [
+            0,
+            0.1581551183024547,
+            0.10068467541247662
+          ],
+          [
+            0.025,
+            0.14774967310195242,
+            0.0940603632575495
+          ]
+        ],
+        "evidenceBoundary": "Measured Neutral bottom/top support perimeters, 25 mm band height and 10 mm radial clearance are prototype dimensions. Generic half-circumference placement is followed by measured contour mapping. No Large or motion acceptance."
+      }
+    },
+    "waistband-front-lap-right": {
+      "rotationDegreesXYZ": [
+        0,
+        0,
+        0
+      ],
+      "translationM": [
+        0,
+        0.739578,
+        -0.093913
+      ],
+      "skirtWrap": {
+        "method": "pattern-half-circumference-skirt",
+        "depthDirection": 1,
+        "axisAnchorGarmentCodeM": [
+          0,
+          0.7395782470703125,
+          0.03788188099861145
+        ],
+        "widthRadiusProfileM": [
+          [
+            0,
+            0.1581551183024547,
+            0.10068467541247662
+          ],
+          [
+            0.025,
+            0.14774967310195242,
+            0.0940603632575495
+          ]
+        ],
+        "evidenceBoundary": "Measured Neutral bottom/top support perimeters, 25 mm band height and 10 mm radial clearance are prototype dimensions. Generic half-circumference placement is followed by measured contour mapping. No Large or motion acceptance."
+      }
     }
   },
   "placementEvidence": [
@@ -9338,7 +9484,9 @@
       "overskirt-front-left",
       "overskirt-front-right",
       "overskirt-back-left",
-      "overskirt-back-right"
+      "overskirt-back-right",
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "sampleZM": [
@@ -9433,7 +9581,9 @@
       "overskirt-front-left",
       "overskirt-front-right",
       "overskirt-back-left",
-      "overskirt-back-right"
+      "overskirt-back-right",
+      "waistband-front-lap-left",
+      "waistband-front-lap-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "sampleZM": [
@@ -9468,7 +9618,9 @@
       "overskirt-front-left",
       "overskirt-front-right",
       "overskirt-back-left",
-      "overskirt-back-right"
+      "overskirt-back-right",
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right"
     ],
     "axisOriginBlenderXYM": [
       0,
@@ -9480,33 +9632,21 @@
     "hemExtensionM": 0.1,
     "foldCount": 8,
     "hemFoldDepthM": 0.006,
-    "phaseRadians": 0,    "forwardApron": {
-      "method": "front-panel-forward-scoop-v2",
-      "pieceIds": [
-        "overskirt-front-left",
-        "overskirt-front-right"
-      ],
-      "axisOriginBlenderXYM": [
-        0,
-        -0.03788188099861145
-      ],
-      "additionalExtensionM": 0.06,
-      "forwardProjectionM": 0.025,
-      "fullExtensionHalfAngleRadians": 0.45,
-      "zeroExtensionHalfAngleRadians": 1.25,
-      "evidenceBoundary": "V20 adds up to 60 mm downward extension and 25 mm forward projection to the front two overskirt panels, fading toward the sides. This pattern-level lap-drape hypothesis responds to v19 sit/crouch renders and measured skirt-vs-shorts upper-thigh coverage; it establishes no fit, collision, opacity, pose, appearance, or release acceptance."
-    },
-    "evidenceBoundary": "V20 retains the v18 panel-local fold profile and trials a front-only forward apron to improve lap drape; its additional extension and projection remain geometry hypotheses. The v19 skirt-hem weight increase did not restore sit/crouch upper-thigh coverage. Geometry, cloth response, continuous coverage, fit, motion, penetration, and appearance remain unapproved.",
+    "phaseRadians": 0,
+    "evidenceBoundary": "V21 trials the new center lap and flank sewn panel architecture using the existing overall hem and pleat parameters unchanged; no extra front-only length or forward projection is applied. All geometry remains unapproved pending pose and visual review.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
       "waistband-back-left",
-      "waistband-back-right"
+      "waistband-back-right",
+      "waistband-front-lap-left",
+      "waistband-front-lap-right"
     ]
   },
   "skirtFlareDesignEvidence": {
     "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
-  }
+  },
+  "designRevision": "v21-sewn-center-lap-panel-20261019"
 }

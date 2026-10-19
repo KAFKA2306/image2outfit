@@ -1704,6 +1704,7 @@ def main():
     smooth_surface_pieces = {
         "jacket-sleeve-left", "jacket-sleeve-right",
         "overskirt-front-left", "overskirt-front-right",
+        "overskirt-front-lap-left", "overskirt-front-lap-right",
         "overskirt-back-left", "overskirt-back-right",
     }
     for polygon, owner in zip(data.polygons, owners):
