@@ -74,9 +74,20 @@ def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
     ):
         raise ValueError("job does not declare the GarmentCode BoxMesh source")
 
-    state_path = (
-        ROOT / ".image2outfit" / "products" / str(job["id"]) / "pipeline-state.json"
-    )
+    manifest_path_value = job.get("productManifestPath")
+    if not isinstance(manifest_path_value, str) or not manifest_path_value:
+        raise ValueError("job.productManifestPath is required for the sewn mesh")
+    manifest = candidate_contract.read(candidate_contract.path(manifest_path_value))
+    if manifest.get("productId") != job.get("id"):
+        raise ValueError("ProductManifest identity does not match the sewn-mesh job")
+    handoff = manifest.get("handoff")
+    resume_from = handoff.get("resumeFrom") if isinstance(handoff, dict) else None
+    if not isinstance(resume_from, str) or not resume_from:
+        raise ValueError("ProductManifest.handoff.resumeFrom is required for the sewn mesh")
+    # The canonical product workline may be versioned (for example,
+    # pipeline-v21d-state.json). Resolve it from ProductManifest instead of
+    # assuming the obsolete pipeline-state.json filename.
+    state_path = candidate_contract.path(resume_from)
     state = candidate_contract.read(state_path)
     if state.get("product_id") != job.get("id") or state.get("status") != "EXECUTED":
         raise ValueError("an executed product checkpoint is required for the sewn mesh")
