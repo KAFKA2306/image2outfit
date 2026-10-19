@@ -1,6 +1,6 @@
 {
   "schema_version": "review-console.v2",
-  "generated_at": "2026-10-18T09:46:37.346331+00:00",
+  "generated_at": "2026-10-19T15:59:47.635677+00:00",
   "states": [
     "WORKING",
     "COMPLETE",
@@ -27,8 +27,37 @@
       "slug": "haolan-bordeaux-knit-set",
       "state": "REJECTED",
       "updated_at": "2026-09-15T11:41:06.603804+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -123,36 +152,66 @@
         {
           "name": "blender",
           "status": "MISSING",
-          "detail": "",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
           "status": "MISSING",
-          "detail": "",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "unityImport",
           "status": "NOT_RUN",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabSerialized",
-          "status": "PRESERVED_UNVERIFIED",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "prefabReload",
           "status": "NOT_RUN",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "modularAvatar",
           "status": "NOT_RUN",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabSerialized",
+          "status": "PRESERVED_UNVERIFIED",
           "detail": "",
           "href": null
         },
@@ -171,14 +230,122 @@
           "href": "downloads/haolan-bordeaux-knit-set/images-4145c911910dc09b.zip",
           "sha256": "fe6fd884267cb649674758e648e14c31e92f1c57e9945fb1c0b5fe5696dd1f38"
         }
-      ]
+      ],
+      "completion": {
+        "state": "REJECTED",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "NOT_RUN"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "NOT_RUN"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "NOT_RUN"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "haolan-cow-hood-knit-set",
       "state": "WORKING",
       "updated_at": "2026-09-15T11:41:06.639887+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -279,37 +446,73 @@
       "gates": [
         {
           "name": "blender",
-          "status": "NOT_RUN",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "unityImport",
           "status": "NOT_RUN",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabSerialized",
-          "status": "PASS",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "prefabReload",
           "status": "NOT_RUN",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "modularAvatar",
           "status": "NOT_RUN",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "NOT_RUN",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabSerialized",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -321,12 +524,6 @@
         },
         {
           "name": "humanPoseReview",
-          "status": "NOT_RUN",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "humanRuntimeReview",
           "status": "NOT_RUN",
           "detail": "",
           "href": null
@@ -346,14 +543,126 @@
           "href": "downloads/haolan-cow-hood-knit-set/images-3b359f4eef9f8d4c.zip",
           "sha256": "53fd216d6986d767d425326efee9602de0c5171456df9bf9f0388e32fbb6c7a7"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "NOT_RUN"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "NOT_RUN"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "NOT_RUN"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "NOT_RUN"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-arc-latch-cocoon-bomber-set",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:55.580112+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -446,6 +755,96 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "unitySaveReload",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatBuildTest",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "referenceAudit",
           "status": "PASS",
           "detail": "",
@@ -464,103 +863,13 @@
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PENDING_RETRY",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "clothSimulation",
           "status": "NOT_REQUIRED",
           "detail": "",
           "href": null
         },
         {
-          "name": "fiveViewEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "tenAxisAudit",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unitySaveReload",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabReload",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatBuildTest",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "humanRuntimeReview",
           "status": "UNVERIFIED",
           "detail": "",
           "href": null
@@ -580,14 +889,142 @@
           "href": "downloads/siroino-arc-latch-cocoon-bomber-set/images-ec76e7631c4bd19d.zip",
           "sha256": "b155f280ab26b38bb748c5cc2179b0e5740de21f3234c12be379bee125b5bb38"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "unitySaveReload",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "ndmf",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatBuildTest",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-aster-fold-utility-kimono-set",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:55.617098+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -680,6 +1117,72 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "referenceAudit",
           "status": "PASS",
           "detail": "",
@@ -692,74 +1195,8 @@
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PENDING_RETRY",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "clothSimulation",
           "status": "NOT_REQUIRED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
@@ -778,15 +1215,119 @@
           "href": "downloads/siroino-aster-fold-utility-kimono-set/images-ba76fcc99b0993f7.zip",
           "sha256": "2b5f2d183ac3b9855b055335c73cca0077d8dd6c9a0c597d35f50489ac9f48f1"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "ndmf",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-bellflower-lantern-trouser-set",
       "state": "WORKING",
-      "updated_at": "2026-10-09T11:40:55.663141+00:00",
-      "blocker_count": 0,
-      "blockers": [],
-      "resume_point": "未登録",
+      "updated_at": "2026-10-18T11:41:00.396527+00:00",
+      "blocker_count": 5,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is FAIL: visualAppearanceReview"
+        },
+        {
+          "severity": "IMPROVEMENT",
+          "message": "unknown · WAITING_FOR_CANDIDATE_QUALITY"
+        }
+      ],
+      "resume_point": "WAITING_FOR_CANDIDATE_QUALITY",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
       "manifest_href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/ProductManifest.json",
@@ -892,6 +1433,72 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "PASS",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "PASS",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "PASS",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "FAIL",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "referenceAudit",
           "status": "PASS",
           "detail": "",
@@ -904,75 +1511,15 @@
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "clothSimulation",
           "status": "NOT_REQUIRED",
           "detail": "",
           "href": null
         },
         {
-          "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "FAIL",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "UNVERIFIED",
-          "detail": "",
+          "name": "improvement:next-action",
+          "status": "PENDING",
+          "detail": "unknown; selected=none",
           "href": null
         },
         {
@@ -982,7 +1529,14 @@
           "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/ProductManifest.json"
         }
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "label": "Improvement plan",
+          "status": "PASS",
+          "href": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Research/Improvement/latest-plan.json",
+          "sha256": "c746543bc5c4fe817956f8f8cd1442e96dde2b63cdc5ad4c85be07cf18825f3e"
+        }
+      ],
       "downloads": [
         {
           "kind": "images",
@@ -990,14 +1544,114 @@
           "href": "downloads/siroino-bellflower-lantern-trouser-set/images-0fbfde375fb475ac.zip",
           "sha256": "c99d5d04e9645bf8ff8f781d648fc447e4d55920f80e2b9cf9a72365a3c948de"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "editableSource",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "fbx",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "PASS"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "PASS"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "PASS"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "FAIL"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "editableSource",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "fbx",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "FAIL"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "ndmf",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-blue-happi",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:55.770159+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -1098,42 +1752,96 @@
       "gates": [
         {
           "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "clothSimulation",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "unitySaveReload",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatBuildTest",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
           "status": "PASS",
           "detail": "",
           "href": null
@@ -1145,62 +1853,8 @@
           "href": null
         },
         {
-          "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "researchTrial",
           "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unitySaveReload",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabReload",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatBuildTest",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "humanRuntimeReview",
-          "status": "OUT_OF_SCOPE",
           "detail": "",
           "href": null
         },
@@ -1219,14 +1873,142 @@
           "href": "downloads/siroino-blue-happi/images-a1d40931ce06d3d9.zip",
           "sha256": "71b6e1f5d7dd8344991cde5dd727f798737d77e4e57338230e8fa814b4e7c905"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "unitySaveReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "ndmf",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatBuildTest",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "OUT_OF_SCOPE"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-cyber-kawaii-large",
       "state": "WORKING",
-      "updated_at": "2026-09-19T07:19:14.345205+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "updated_at": "2026-10-18T11:41:00.399524+00:00",
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -1326,19 +2108,73 @@
       ],
       "gates": [
         {
-          "name": "standardTargetResolved",
-          "status": "PASS",
-          "detail": "",
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "standardTargetResolved",
           "status": "PASS",
           "detail": "",
           "href": null
@@ -1351,36 +2187,18 @@
         },
         {
           "name": "fiveViewRender",
-          "status": "PASS",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "poseRender",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "PENDING",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
         {
           "name": "prefabSerialized",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabReload",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
           "status": "PENDING",
           "detail": "",
           "href": null
@@ -1399,12 +2217,6 @@
         },
         {
           "name": "humanPoseReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "humanRuntimeReview",
           "status": "PENDING",
           "detail": "",
           "href": null
@@ -1472,14 +2284,126 @@
           "href": "downloads/siroino-cyber-kawaii-large/images-dee15455d69cf993.zip",
           "sha256": "db717bde07522a5d27732e9468bab81e49b2736fadef84d440db5f6e7a774c94"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "PENDING"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "PENDING"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "PENDING"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "PENDING"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-heather-hooded-bodysuit",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:55.852527+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -1579,19 +2503,97 @@
       ],
       "gates": [
         {
-          "name": "standardTargetResolved",
-          "status": "PASS",
-          "detail": "",
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "unitySaveReload",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatBuildTest",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "standardTargetResolved",
           "status": "PASS",
           "detail": "",
           "href": null
@@ -1627,26 +2629,8 @@
           "href": null
         },
         {
-          "name": "unityImport",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "prefabSerialized",
           "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabReload",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "OUT_OF_SCOPE",
           "detail": "",
           "href": null
         },
@@ -1669,44 +2653,8 @@
           "href": null
         },
         {
-          "name": "humanRuntimeReview",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "researchTrial",
           "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unitySaveReload",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatBuildTest",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "OUT_OF_SCOPE",
           "detail": "",
           "href": null
         },
@@ -1725,14 +2673,142 @@
           "href": "downloads/siroino-heather-hooded-bodysuit/images-5a2cbc434b39d62e.zip",
           "sha256": "7b59e0c55535cc0eed465074b4a4b6c573861fa75b15483b1481a3d4c5b623b7"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "unitySaveReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "ndmf",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatBuildTest",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "OUT_OF_SCOPE"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-lace-halter-large",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:55.951835+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -1840,14 +2916,68 @@
       "gates": [
         {
           "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
@@ -1869,25 +2999,7 @@
           "href": null
         },
         {
-          "name": "unityImport",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "prefabSerialized",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabReload",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
           "status": "PENDING",
           "detail": "",
           "href": null
@@ -1906,12 +3018,6 @@
         },
         {
           "name": "humanPoseReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "humanRuntimeReview",
           "status": "PENDING",
           "detail": "",
           "href": null
@@ -1937,14 +3043,117 @@
           "href": "downloads/siroino-lace-halter-large/images-a3216b5e2ca735ae.zip",
           "sha256": "41d7603cffab3be216dcca5e0c4f2b98edc4dde30701e171d58aefa35cb5810a"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "PENDING"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "PENDING"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "PENDING"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "PENDING"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-lilac-lame-fencing-practice-set",
       "state": "REJECTED",
-      "updated_at": "2026-10-18T09:46:02.118917+00:00",
-      "blocker_count": 2,
+      "updated_at": "2026-10-19T15:59:36.405866+00:00",
+      "blocker_count": 7,
       "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is FAIL: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is FAIL: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is FAIL: visualAppearanceReview"
+        },
         {
           "severity": "IMPROVEMENT",
           "message": "unknown · WAITING_FOR_CANDIDATE_QUALITY"
@@ -2053,6 +3262,48 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "FAIL",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "FAIL",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "PASS",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "PASS",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "FAIL",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
           "name": "referenceAudit",
           "status": "PENDING",
           "detail": "",
@@ -2101,48 +3352,6 @@
           "href": null
         },
         {
-          "name": "visualAppearanceReview",
-          "status": "FAIL",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "blender",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "licenseReview",
           "status": "PENDING",
           "detail": "",
@@ -2176,14 +3385,101 @@
           "href": "downloads/siroino-lilac-lame-fencing-practice-set/images-2c5300973b992c67.zip",
           "sha256": "ec776b7a5495e21e7c8fc51f995c2e0cc38f188792970eabfce5b2823088ee89"
         }
-      ]
+      ],
+      "completion": {
+        "state": "REJECTED",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "FAIL"
+          },
+          {
+            "gate": "editableSource",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "fbx",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "FAIL"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "PASS"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "PASS"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "FAIL"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "FAIL"
+          },
+          {
+            "gate": "editableSource",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "fbx",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "FAIL"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "FAIL"
+          }
+        ],
+        "runtimeGates": [],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-lily-vapor-yukata",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:41:03.287136+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -2290,80 +3586,80 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "referenceArtifact",
           "status": "REPLACEMENT_GENERATED",
           "detail": "",
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "REVIEW_REQUIRED",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "clothSimulation",
           "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
@@ -2382,14 +3678,126 @@
           "href": "downloads/siroino-lily-vapor-yukata/images-886fc67b41e1f8b5.zip",
           "sha256": "b9ae32fcfd66a8adcf86c23b5c2d3c885286bf46ae890e9d5914a8a97ca626fc"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "ndmf",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-lumen-atelier-apron",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:55.990324+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -2482,6 +3890,72 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "referenceAudit",
           "status": "UNVERIFIED",
           "detail": "",
@@ -2494,74 +3968,8 @@
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PENDING_RETRY",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "clothSimulation",
           "status": "NOT_REQUIRED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
@@ -2580,14 +3988,126 @@
           "href": "downloads/siroino-lumen-atelier-apron/images-c59a7bc2599ff1e7.zip",
           "sha256": "bbe3f3ff8fa6c622a825ad55dfbc542b72fb898a5b76c22a92ab434f84cc1bd4"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "ndmf",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-lunar-tech-hoodie",
       "state": "WORKING",
-      "updated_at": "2026-09-20T09:45:58.682939+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "updated_at": "2026-10-18T11:41:00.401028+00:00",
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -2695,73 +4215,73 @@
       "gates": [
         {
           "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "visualAppearanceReview",
-          "status": "REVIEW_REQUIRED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "clothSimulation",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "unityImport",
           "status": "PASS",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "modularAvatar",
           "status": "PASS",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "ndmf",
           "status": "PASS",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "vrchatRuntime",
           "status": "DRY_RUN_PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -2780,14 +4300,126 @@
           "href": "downloads/siroino-lunar-tech-hoodie/images-1c4b46d0878ea225.zip",
           "sha256": "5f854a09df66b62d0ac072426df3abd7db1e69e43028febc261bc70d283e75c1"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "PASS"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "PASS"
+          },
+          {
+            "gate": "ndmf",
+            "status": "PASS"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "DRY_RUN_PASS"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-military-sheer-romper-large",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:56.028486+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -2887,6 +4519,78 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "actualTargetSourceImport",
           "status": "PASS",
           "detail": "",
@@ -2935,30 +4639,6 @@
           "href": null
         },
         {
-          "name": "unityImport",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabReload",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "vrchatBuildAndTest",
           "status": "PENDING",
           "detail": "",
@@ -2972,12 +4652,6 @@
         },
         {
           "name": "humanPoseReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "humanRuntimeReview",
           "status": "PENDING",
           "detail": "",
           "href": null
@@ -2997,14 +4671,130 @@
           "href": "downloads/siroino-military-sheer-romper-large/images-3617c2288f798452.zip",
           "sha256": "2a7a03a6c1cef0ccc5e8230a5e43af5aba397351b69df818acc95d348c58a484"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "PENDING"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "PENDING"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "PENDING"
+          },
+          {
+            "gate": "ndmf",
+            "status": "PENDING"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "PENDING"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-nocturnal-shrine-maiden-long-hakama-set",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:56.073110+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -3111,80 +4901,80 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "DRY_RUN_PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "referenceArtifact",
           "status": "FAIL_EXACT_ORIGINAL_MISSING",
           "detail": "",
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "REVIEW_REQUIRED",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "clothSimulation",
           "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "DRY_RUN_PASS",
           "detail": "",
           "href": null
         },
@@ -3203,14 +4993,126 @@
           "href": "downloads/siroino-nocturnal-shrine-maiden-long-hakama-set/images-9f1439b23e493bc6.zip",
           "sha256": "0c49e3c1f8f3c5ce720eecf69ba328ca493e042f4a2b55bc493a1abd7c621213"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "PASS"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "PASS"
+          },
+          {
+            "gate": "ndmf",
+            "status": "PASS"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "DRY_RUN_PASS"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-nocturne-angel-set",
       "state": "WORKING",
-      "updated_at": "2026-09-19T11:00:29.591120+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "updated_at": "2026-10-18T11:41:00.402033+00:00",
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -3311,44 +5213,92 @@
       "gates": [
         {
           "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "unitySaveReload",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatBuildTest",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
@@ -3364,56 +5314,8 @@
           "href": null
         },
         {
-          "name": "unityImport",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unitySaveReload",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabReload",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatBuildTest",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "humanRuntimeReview",
-          "status": "OUT_OF_SCOPE",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "poseRender",
-          "status": "PASS",
+          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
@@ -3432,14 +5334,142 @@
           "href": "downloads/siroino-nocturne-angel-set/images-041a42d5c6fc69ff.zip",
           "sha256": "5a15adbc7c46da2053f1a01fd7b7029d194bee3bf2ba9e701a8eef6d085cc34d"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "unitySaveReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "ndmf",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatBuildTest",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "OUT_OF_SCOPE"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-quiet-arc-panel-dress",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:56.117841+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -3532,6 +5562,72 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "referenceAudit",
           "status": "UNVERIFIED",
           "detail": "",
@@ -3544,74 +5640,8 @@
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PENDING_RETRY",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "clothSimulation",
           "status": "NOT_REQUIRED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
@@ -3630,14 +5660,126 @@
           "href": "downloads/siroino-quiet-arc-panel-dress/images-483510d907193ae5.zip",
           "sha256": "d33f4ded7c42e83ff38697d894350a8d45d2520772739a4a9696bc12181305b3"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "ndmf",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-sage-breeze-onepiece",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:56.157887+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -3745,73 +5887,73 @@
       "gates": [
         {
           "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "visualAppearanceReview",
-          "status": "REVIEW_REQUIRED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "clothSimulation",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "unityImport",
           "status": "UNVERIFIED",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "modularAvatar",
           "status": "UNVERIFIED",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "ndmf",
           "status": "UNVERIFIED",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "vrchatRuntime",
           "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -3830,14 +5972,126 @@
           "href": "downloads/siroino-sage-breeze-onepiece/images-4038a644f147df1b.zip",
           "sha256": "82fe725f01019d205d6f75b85300548a93a051f01fec3f96e1a3feb58825722a"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "ndmf",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-signal-fold-transit-tabard",
       "state": "WORKING",
       "updated_at": "2026-10-09T11:40:56.211039+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -3930,6 +6184,72 @@
       ],
       "gates": [
         {
+          "name": "blender",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "MISSING",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "vrchatRuntime",
+          "status": "UNVERIFIED",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
           "name": "referenceAudit",
           "status": "UNVERIFIED",
           "detail": "",
@@ -3942,74 +6262,8 @@
           "href": null
         },
         {
-          "name": "blender",
-          "status": "PENDING_RETRY",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "editableSource",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fbx",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "clothSimulation",
           "status": "NOT_REQUIRED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "fiveViewEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "poseEvidence",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "visualAppearanceReview",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "unityImport",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "UNVERIFIED",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "vrchatRuntime",
-          "status": "UNVERIFIED",
           "detail": "",
           "href": null
         },
@@ -4028,14 +6282,126 @@
           "href": "downloads/siroino-signal-fold-transit-tabard/images-53096b4052f50f68.zip",
           "sha256": "a60b1747172cd088b5013cc0f6a51ff83b2144cc550097a254cdba848edc62f8"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "ndmf",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "UNVERIFIED"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-tuxedo-halter-dress-large",
       "state": "WORKING",
-      "updated_at": "2026-09-19T10:51:06.273446+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "updated_at": "2026-10-18T11:41:00.403537+00:00",
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -4136,97 +6502,97 @@
       "gates": [
         {
           "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "researchTrial",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "unityImport",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "unitySaveReload",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "prefabReload",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "modularAvatar",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "ndmf",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "vrchatBuildTest",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "vrchatRuntime",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "humanRuntimeReview",
           "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "researchTrial",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -4245,14 +6611,142 @@
           "href": "downloads/siroino-tuxedo-halter-dress-large/images-40580595fca95920.zip",
           "sha256": "8b326260ef9061f9a67cca7c5e13143cdd06b767f6c33262ca70b495f55e0b9e"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "unitySaveReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "ndmf",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatBuildTest",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "OUT_OF_SCOPE"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-verdant-ranger-explorer-set",
       "state": "WORKING",
-      "updated_at": "2026-09-21T04:45:03.319543+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "updated_at": "2026-10-18T11:41:00.403537+00:00",
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -4360,73 +6854,73 @@
       "gates": [
         {
           "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "clothSimulation",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "unityImport",
           "status": "PASS",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "modularAvatar",
           "status": "PASS",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "ndmf",
           "status": "PASS",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "vrchatRuntime",
           "status": "DRY_RUN_PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "clothSimulation",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -4445,14 +6939,126 @@
           "href": "downloads/siroino-verdant-ranger-explorer-set/images-90f7f2599371d4f6.zip",
           "sha256": "3001723e7797978e64da0d4dbce7c88265465f997f483599c596cd2f8500b09e"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "PASS"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "PASS"
+          },
+          {
+            "gate": "ndmf",
+            "status": "PASS"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "DRY_RUN_PASS"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-white-ghost-gown",
       "state": "WORKING",
       "updated_at": "2026-09-16T01:54:15.903045+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "blocker_count": 7,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: prefabDeclared"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is MISSING: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -4574,97 +7180,97 @@
       "gates": [
         {
           "name": "blender",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "editableSource",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fbx",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "prefabDeclared",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "fiveViewEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "poseEvidence",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "visualAppearanceReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "researchTrial",
-          "status": "PASS",
-          "detail": "",
+          "status": "MISSING",
+          "detail": "required completion gate",
           "href": null
         },
         {
           "name": "unityImport",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "unitySaveReload",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "prefabReload",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "modularAvatar",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "ndmf",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "vrchatBuildTest",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "vrchatRuntime",
           "status": "OUT_OF_SCOPE",
-          "detail": "",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
           "name": "humanRuntimeReview",
           "status": "OUT_OF_SCOPE",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "researchTrial",
+          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -4683,14 +7289,138 @@
           "href": "downloads/siroino-white-ghost-gown/images-2b2d3d1ff196b6b3.zip",
           "sha256": "77d969c74edc5419b6c5cd942c2537685b72a2bcf8e92e7cd1066dad3a8ae092"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "MISSING"
+          },
+          {
+            "gate": "editableSource",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fbx",
+            "status": "MISSING"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "MISSING"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "MISSING"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "MISSING"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "unitySaveReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "ndmf",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatBuildTest",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "vrchatRuntime",
+            "status": "OUT_OF_SCOPE"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "OUT_OF_SCOPE"
+          }
+        ],
+        "errors": []
+      }
     },
     {
       "slug": "siroino-wide-cargo",
       "state": "WORKING",
-      "updated_at": "2026-09-19T07:19:44.063842+00:00",
-      "blocker_count": 0,
-      "blockers": [],
+      "updated_at": "2026-10-18T11:41:00.404543+00:00",
+      "blocker_count": 6,
+      "blockers": [
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: blender"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: editableSource"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: fbx"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: fiveViewEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is UNVERIFIED: poseEvidence"
+        },
+        {
+          "severity": "COMPLETION",
+          "message": "required completion gate is FAIL: visualAppearanceReview"
+        }
+      ],
       "resume_point": "未登録",
       "candidate_hash": "UNKNOWN",
       "human_review_url": "",
@@ -4791,8 +7521,74 @@
       "gates": [
         {
           "name": "blender",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "editableSource",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fbx",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "prefabDeclared",
           "status": "PASS",
-          "detail": "",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "fiveViewEvidence",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "poseEvidence",
+          "status": "UNVERIFIED",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "visualAppearanceReview",
+          "status": "FAIL",
+          "detail": "required completion gate",
+          "href": null
+        },
+        {
+          "name": "unityImport",
+          "status": "PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "prefabReload",
+          "status": "PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "modularAvatar",
+          "status": "PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "humanRuntimeReview",
+          "status": "PENDING",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
+          "href": null
+        },
+        {
+          "name": "ndmf",
+          "status": "PASS",
+          "detail": "runtime/release gate: outside repository completion, not a completion blocker",
           "href": null
         },
         {
@@ -4814,25 +7610,7 @@
           "href": null
         },
         {
-          "name": "unityImport",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
           "name": "prefabSerialized",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "prefabReload",
-          "status": "PASS",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "modularAvatar",
           "status": "PASS",
           "detail": "",
           "href": null
@@ -4840,18 +7618,6 @@
         {
           "name": "vrchatBuildAndTest",
           "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "humanRuntimeReview",
-          "status": "PENDING",
-          "detail": "",
-          "href": null
-        },
-        {
-          "name": "ndmf",
-          "status": "PASS",
           "detail": "",
           "href": null
         },
@@ -4876,7 +7642,90 @@
           "href": "downloads/siroino-wide-cargo/images-5abcb33c0509fc29.zip",
           "sha256": "60b8ba1d399e6eacad0977ed3ff0459699f3e6e9533e563ebf2374aec4bfa76f"
         }
-      ]
+      ],
+      "completion": {
+        "state": "WORKING",
+        "lifecycleIssue": null,
+        "completionGates": [
+          {
+            "gate": "blender",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "editableSource",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "fbx",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "prefabDeclared",
+            "status": "PASS"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "FAIL"
+          }
+        ],
+        "completionBlockers": [
+          {
+            "gate": "blender",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "editableSource",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "fbx",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "fiveViewEvidence",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "poseEvidence",
+            "status": "UNVERIFIED"
+          },
+          {
+            "gate": "visualAppearanceReview",
+            "status": "FAIL"
+          }
+        ],
+        "runtimeGates": [
+          {
+            "gate": "unityImport",
+            "status": "PASS"
+          },
+          {
+            "gate": "prefabReload",
+            "status": "PASS"
+          },
+          {
+            "gate": "modularAvatar",
+            "status": "PASS"
+          },
+          {
+            "gate": "humanRuntimeReview",
+            "status": "PENDING"
+          },
+          {
+            "gate": "ndmf",
+            "status": "PASS"
+          }
+        ],
+        "errors": []
+      }
     }
   ]
 }

@@ -2342,6 +2342,26 @@ def stage_finalize(
         "visualAppearanceReview": visual["decision"] == "PASS",
         "researchTrial": job.get("researchMethod", {}).get("trialStatus") == "DECLARED",
     }
+    manifest_path = repo_path(job["productManifestPath"], label="manifest")
+    manifest = read_object(manifest_path, "product manifest")
+    corrections = manifest.get("gateEvidenceCorrections", {})
+    if isinstance(corrections, Mapping):
+        for key, correction in corrections.items():
+            prefix = "completionGates."
+            if not isinstance(key, str) or not key.startswith(prefix):
+                continue
+            gate_name = key.removeprefix(prefix)
+            corrected_value = (
+                correction.get("value") if isinstance(correction, Mapping) else None
+            )
+            if gate_name in gates and isinstance(corrected_value, str):
+                if corrected_value not in {
+                    "PASS", "FAIL", "PENDING", "UNVERIFIED", "OUT_OF_SCOPE"
+                }:
+                    raise ValueError(
+                        f"unknown corrected completion gate state: {key}={corrected_value}"
+                    )
+                gates[gate_name] = corrected_value == "PASS"
     status = candidate_status(
         gates,
         geometry_decision=geometry["decision"],
@@ -2351,12 +2371,26 @@ def stage_finalize(
         f"{job['productRoot']}/Evidence/Candidate/candidate-state.json",
         label="candidate state",
     )
+    candidate_gates = {
+        name: "PASS" if passed else "FAIL" for name, passed in gates.items()
+    }
+    if isinstance(corrections, Mapping):
+        for key, correction in corrections.items():
+            prefix = "completionGates."
+            if not isinstance(key, str) or not key.startswith(prefix):
+                continue
+            gate_name = key.removeprefix(prefix)
+            corrected_value = (
+                correction.get("value") if isinstance(correction, Mapping) else None
+            )
+            if gate_name in candidate_gates and isinstance(corrected_value, str):
+                candidate_gates[gate_name] = corrected_value
     candidate = {
         "schemaVersion": 1,
         "productId": product_id,
         "status": status,
         "revision": revision_id,
-        "gates": {name: "PASS" if passed else "FAIL" for name, passed in gates.items()},
+        "gates": candidate_gates,
         "qualityDecisions": {
             "geometry": geometry["decision"],
             "visual": visual["decision"],
@@ -2371,9 +2405,8 @@ def stage_finalize(
         "decisionRecorded": True,
     }
     write_json(candidate_path, candidate)
-    manifest_path = repo_path(job["productManifestPath"], label="manifest")
-    manifest = read_object(manifest_path, "product manifest")
     manifest["status"] = status
+    manifest["state"] = status
     manifest["completionGates"] = candidate["gates"]
     manifest["candidateState"] = relative(candidate_path)
     manifest["visualAppearanceReview"] = {
