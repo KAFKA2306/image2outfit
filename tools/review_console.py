@@ -539,6 +539,7 @@ def collect_downloads(root, workspace, output_dir, manifest, assets):
         with zipfile.ZipFile(
             archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
         ) as bundle:
+
             def write_member(name: str, content: bytes) -> None:
                 info = zipfile.ZipInfo(name, date_time=CANONICAL_ZIP_TIMESTAMP)
                 info.compress_type = zipfile.ZIP_DEFLATED
@@ -692,8 +693,7 @@ def collect_product(
         ]
         if release_status not in {"PASS", "READY", "RELEASABLE", "RELEASED"}:
             blockers.extend(
-                {"severity": "RELEASE", "message": reason}
-                for reason in release_reasons
+                {"severity": "RELEASE", "message": reason} for reason in release_reasons
             )
         release_gate = Gate(
             name="releaseReadiness",

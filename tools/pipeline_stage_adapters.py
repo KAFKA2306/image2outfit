@@ -120,7 +120,8 @@ class CommandStageAdapter(PlannedStageAdapter):
         boundary = RepositoryWriteBoundary(
             ROOT,
             product_id=str(state["product_id"]),
-            product_workspace_output=self.stage.value in {
+            product_workspace_output=self.stage.value
+            in {
                 "build-blender",
                 "skin-and-export",
                 "finalize-candidate",

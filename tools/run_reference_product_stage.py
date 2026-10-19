@@ -1852,7 +1852,11 @@ def stage_build(
         and report_signature_after != report_signature_before
     )
     reject_report_matches_current_inputs = False
-    if quality is not None and quality["decision"] == QUALITY_REJECT and build_report is not None:
+    if (
+        quality is not None
+        and quality["decision"] == QUALITY_REJECT
+        and build_report is not None
+    ):
         expected_mesh = None
         if boxmesh_evidence is not None:
             boxmesh_audit = read_object(boxmesh_evidence[1], "BoxMesh audit")
@@ -1875,7 +1879,9 @@ def stage_build(
         # Keep the subprocess failure diagnosable after the surrounding stage
         # transaction rolls back its temporary log writes. Store only a bounded
         # tail in the durable checkpoint error.
-        output_tail = (completed.stdout + "\n--- STDERR ---\n" + completed.stderr)[-12000:]
+        output_tail = (completed.stdout + "\n--- STDERR ---\n" + completed.stderr)[
+            -12000:
+        ]
         raise RuntimeError(
             f"Blender build failed with exit code {completed.returncode}; "
             f"see {relative(log)}\n{output_tail}"

@@ -183,7 +183,9 @@ class RepositoryWriteBoundary:
             return "missing", 0, 0, 0, 0, 0
         if stat.S_ISLNK(stat_result.st_mode):
             kind = "symlink:" + os.readlink(path)
-        elif getattr(stat_result, "st_file_attributes", 0) & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0):
+        elif getattr(stat_result, "st_file_attributes", 0) & getattr(
+            stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0
+        ):
             # WSL links are opaque Windows reparse points. Observe the entry,
             # never traverse an unrelated target which Windows cannot open.
             kind = f"reparse:{getattr(stat_result, 'st_reparse_tag', 0):x}"
@@ -217,9 +219,9 @@ class RepositoryWriteBoundary:
     def _scoped_snapshots(self) -> list[WorkspaceSnapshot]:
         if self.product_id is None or self.product_runtime is None:
             return []
-        transaction_key = hashlib.sha256(
-            self.product_id.encode("utf-8")
-        ).hexdigest()[:10]
+        transaction_key = hashlib.sha256(self.product_id.encode("utf-8")).hexdigest()[
+            :10
+        ]
         transaction_root = self.root / ".image2outfit"
         runtime_backup = transaction_root / f".pwb-{transaction_key}"
         runtime_journal = self.products_root / f".{self.product_id}.pwb.json"
@@ -321,14 +323,12 @@ class RepositoryWriteBoundary:
                 # The products tree contains deeply nested OSS evidence. Keep
                 # this sibling backup short so Windows path limits do not make
                 # the snapshot itself longer than the protected files.
-                snapshot = WorkspaceSnapshot(
-                    self.products_root, backup_name=".pwb"
-                )
+                snapshot = WorkspaceSnapshot(self.products_root, backup_name=".pwb")
                 had_original = snapshot.begin()
                 self._scope_snapshots.append((snapshot, had_original))
-                self._scope_before[self.products_root.relative_to(self.root).as_posix()] = (
-                    _tree_state(snapshot.backup) if had_original else {}
-                )
+                self._scope_before[
+                    self.products_root.relative_to(self.root).as_posix()
+                ] = _tree_state(snapshot.backup) if had_original else {}
             else:
                 self._scope_before = {}
             self._begun = True
@@ -456,8 +456,7 @@ class RepositoryWriteBoundary:
         self._cleanup_snapshots()
         if restore_error is not None:
             raise RuntimeError(
-                "repository write-boundary rollback was incomplete: "
-                f"{restore_error}"
+                f"repository write-boundary rollback was incomplete: {restore_error}"
             ) from restore_error
 
     def commit(self) -> None:

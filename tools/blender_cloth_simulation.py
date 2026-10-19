@@ -345,7 +345,7 @@ def bind_canonical_row_rest_shape(obj, job, declaration):
     count, inset = declaration["sampleRowCount"], declaration["sectionBoundaryInsetM"]
     if isinstance(count, bool) or not isinstance(count, int) or not 8 <= count <= 128:
         raise ValueError("Rest row sample count must be bounded")
-    if not math.isfinite(inset) or not 0 < inset < .001:
+    if not math.isfinite(inset) or not 0 < inset < 0.001:
         raise ValueError("Rest section boundary inset is invalid")
     pipeline = job["garmentPipeline"]
     pose_path = repo_path(pipeline["assemblyPosePath"])
@@ -365,39 +365,57 @@ def bind_canonical_row_rest_shape(obj, job, declaration):
         side = next(e for e in panel["edges"] if e["edgeId"] == "side-right")
         a, b = [panel["boundary"][side[k]] for k in ["startVertex", "endVertex"]]
         u, v = side["curvature"]["params"][0]
-        dx, dy = b[0]-a[0], b[1]-a[1]
-        control = [a[0]+u*dx-v*dy, a[1]+u*dy+v*dx]
-        if (len(curve) != 3 or not all(math.isfinite(x) and x > 0 for x in curve)
-                or abs(a[0]-curve[0]) > 1e-8 or abs(b[0]-curve[2]) > 1e-8
-                or abs(control[0]-curve[1]) > 1e-8 or abs(control[1]-(hem-waist)/2) > 1e-8):
-            raise ValueError("Rest row quadratic controls differ from canonical pattern")
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        control = [a[0] + u * dx - v * dy, a[1] + u * dy + v * dx]
+        if (
+            len(curve) != 3
+            or not all(math.isfinite(x) and x > 0 for x in curve)
+            or abs(a[0] - curve[0]) > 1e-8
+            or abs(b[0] - curve[2]) > 1e-8
+            or abs(control[0] - curve[1]) > 1e-8
+            or abs(control[1] - (hem - waist) / 2) > 1e-8
+        ):
+            raise ValueError(
+                "Rest row quadratic controls differ from canonical pattern"
+            )
         curves.append(curve)
     points = [tuple(obj.matrix_world @ v.co) for v in obj.data.vertices]
     if any(len(f.vertices) != 3 for f in obj.data.polygons):
         raise ValueError("Rest row measurement requires triangles")
     rows = []
     for i in range(count):
-        z = hem+inset+(waist-hem-2*inset)*i/(count-1)
+        z = hem + inset + (waist - hem - 2 * inset) * i / (count - 1)
         circumference = 0.0
         segment_count = 0
         for face in obj.data.polygons:
             tri = [points[j] for j in face.vertices]
             hits = []
-            for a, b in zip(tri, tri[1:]+tri[:1]):
+            for a, b in zip(tri, tri[1:] + tri[:1]):
                 if (a[2] <= z < b[2]) or (b[2] <= z < a[2]):
-                    t = (z-a[2])/(b[2]-a[2])
-                    hits.append([a[j]+t*(b[j]-a[j]) for j in range(2)])
+                    t = (z - a[2]) / (b[2] - a[2])
+                    hits.append([a[j] + t * (b[j] - a[j]) for j in range(2)])
             if len(hits) == 2:
                 circumference += math.dist(*hits)
                 segment_count += 1
         if circumference <= 1e-6 or segment_count < 3:
             raise ValueError("Rest row source section is missing")
-        t = (waist-z)/(waist-hem)
-        rest = sum(2*((1-t)**2*c[0]+2*t*(1-t)*c[1]+t*t*c[2]) for c in curves)
-        rows.append({"zM": z, "sourceSectionCircumferenceM": circumference,
-                     "canonicalFlatCircumferenceM": rest, "radialRestScale": rest/circumference})
+        t = (waist - z) / (waist - hem)
+        rest = sum(
+            2 * ((1 - t) ** 2 * c[0] + 2 * t * (1 - t) * c[1] + t * t * c[2])
+            for c in curves
+        )
+        rows.append(
+            {
+                "zM": z,
+                "sourceSectionCircumferenceM": circumference,
+                "canonicalFlatCircumferenceM": rest,
+                "radialRestScale": rest / circumference,
+            }
+        )
     if obj.data.shape_keys:
-        raise ValueError("Prototype rest shape cannot replace existing garment Shape Keys")
+        raise ValueError(
+            "Prototype rest shape cannot replace existing garment Shape Keys"
+        )
     obj.shape_key_add(name="Basis")
     key = obj.shape_key_add(name="Canonical Fabric Rest Springs")
     key.value = 0.0
@@ -405,38 +423,63 @@ def bind_canonical_row_rest_shape(obj, job, declaration):
     moved = 0
     for vertex, point in zip(key.data, points):
         x, y, z = point
-        if abs(z-waist) <= 1e-6:
+        if abs(z - waist) <= 1e-6:
             continue
-        if not hem-1e-6 <= z <= waist+1e-6:
+        if not hem - 1e-6 <= z <= waist + 1e-6:
             raise ValueError("Rest shape vertex outside canonical skirt height")
-        lo = next((j for j in range(len(rows)-1) if rows[j]["zM"] <= z <= rows[j+1]["zM"]), None)
+        lo = next(
+            (
+                j
+                for j in range(len(rows) - 1)
+                if rows[j]["zM"] <= z <= rows[j + 1]["zM"]
+            ),
+            None,
+        )
         if lo is None:
             scale = rows[0 if z < rows[0]["zM"] else -1]["radialRestScale"]
         else:
             a, b = rows[lo], rows[lo + 1]
             t = (z - a["zM"]) / (b["zM"] - a["zM"])
-            scale = (1-t)*a["radialRestScale"]+t*b["radialRestScale"]
+            scale = (1 - t) * a["radialRestScale"] + t * b["radialRestScale"]
         from mathutils import Vector
-        vertex.co = inverse @ Vector((origin[0]+(x-origin[0])*scale,
-                                       origin[1]+(y-origin[1])*scale, z))
+
+        vertex.co = inverse @ Vector(
+            (
+                origin[0] + (x - origin[0]) * scale,
+                origin[1] + (y - origin[1]) * scale,
+                z,
+            )
+        )
         moved += 1
     ratios = []
     for edge in obj.data.edges:
         a, b = edge.vertices
-        initial = (obj.data.vertices[a].co-obj.data.vertices[b].co).length
-        rest = (key.data[a].co-key.data[b].co).length
+        initial = (obj.data.vertices[a].co - obj.data.vertices[b].co).length
+        rest = (key.data[a].co - key.data[b].co).length
         if initial <= 1e-10 or rest <= 1e-10:
             raise ValueError("Rest spring collapsed")
-        ratios.append(rest/initial)
-    return {"method": declaration["method"], "shapeKey": key.name, "shapeKeyValue": key.value,
-            "movedRestVertexCount": moved,
-            "sewnWaistRestDisplacementM": 0, "rows": rows,
-            "restToInitialEdgeRatio": {"minimum": min(ratios), "maximum": max(ratios),
-                                       "mean": sum(ratios)/len(ratios), "edgeCount": len(ratios)},
-            "restCoordinatesSha256": hashlib.sha256(json.dumps([list(v.co) for v in key.data]).encode()).hexdigest(),
-            "patternSha256": hashlib.sha256(pattern_path.read_bytes()).hexdigest(),
-            "assemblyPoseSha256": hashlib.sha256(pose_path.read_bytes()).hexdigest(),
-            "grantsFitAcceptance": False, "evidenceBoundary": declaration["evidenceBoundary"]}
+        ratios.append(rest / initial)
+    return {
+        "method": declaration["method"],
+        "shapeKey": key.name,
+        "shapeKeyValue": key.value,
+        "movedRestVertexCount": moved,
+        "sewnWaistRestDisplacementM": 0,
+        "rows": rows,
+        "restToInitialEdgeRatio": {
+            "minimum": min(ratios),
+            "maximum": max(ratios),
+            "mean": sum(ratios) / len(ratios),
+            "edgeCount": len(ratios),
+        },
+        "restCoordinatesSha256": hashlib.sha256(
+            json.dumps([list(v.co) for v in key.data]).encode()
+        ).hexdigest(),
+        "patternSha256": hashlib.sha256(pattern_path.read_bytes()).hexdigest(),
+        "assemblyPoseSha256": hashlib.sha256(pose_path.read_bytes()).hexdigest(),
+        "grantsFitAcceptance": False,
+        "evidenceBoundary": declaration["evidenceBoundary"],
+    }
 
 
 def bake_sewn_prototype(job: dict[str, object]) -> int:
@@ -464,21 +507,30 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     for name, group in groups.items():
         if not group or not set(group) <= set(pieces):
             raise ValueError("cloth panel group contains an unknown piece")
-        indices = [i for i, owner in enumerate(owners.data) if pieces[owner.value] in group]
+        indices = [
+            i for i, owner in enumerate(owners.data) if pieces[owner.value] in group
+        ]
         if not indices or claimed.intersection(indices):
             raise ValueError("cloth group is empty or overlaps another group")
         selected_faces[name] = indices
         claimed.update(indices)
-    selected_faces[str(job["id"]) + "-static"] = [i for i in range(len(faces)) if i not in claimed]
+    selected_faces[str(job["id"]) + "-static"] = [
+        i for i in range(len(faces)) if i not in claimed
+    ]
     objects = {}
     pin_methods = {}
-    vertex_sets = {name: {v for i in ids for v in faces[i]} for name, ids in selected_faces.items()}
+    vertex_sets = {
+        name: {v for i in ids for v in faces[i]} for name, ids in selected_faces.items()
+    }
     for name, indices in selected_faces.items():
         ids = sorted(vertex_sets[name])
         remap = {value: index for index, value in enumerate(ids)}
         data = bpy.data.meshes.new(name)
-        data.from_pydata([original.data.vertices[i].co[:] for i in ids], [],
-                         [[remap[v] for v in faces[i]] for i in indices])
+        data.from_pydata(
+            [original.data.vertices[i].co[:] for i in ids],
+            [],
+            [[remap[v] for v in faces[i]] for i in indices],
+        )
         data.update()
         obj = bpy.data.objects.new(name, data)
         bpy.context.collection.objects.link(obj)
@@ -493,12 +545,16 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             ownership.data[face_index].value = owner_index
             piece_id = pieces[owner_index]
             if piece_id in {"jacket-sleeve-left", "jacket-sleeve-right"}:
-                data.polygons[face_index].use_smooth = original.data.polygons[original_index].use_smooth
+                data.polygons[face_index].use_smooth = original.data.polygons[
+                    original_index
+                ].use_smooth
         for material in original.data.materials:
             obj.data.materials.append(material)
         objects[name] = obj
         if name in groups:
-            shared = vertex_sets[name].intersection(set().union(*(s for key, s in vertex_sets.items() if key != name)))
+            shared = vertex_sets[name].intersection(
+                set().union(*(s for key, s in vertex_sets.items() if key != name))
+            )
             pin_ids = [remap[v] for v in shared]
             pin_methods[name] = "canonical shared seam vertices"
             if not shared:
@@ -506,48 +562,96 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                     raise ValueError(f"cloth component has no sewn attachment: {name}")
                 boundary = policy.get("prototypeWaistPinBoundary")
                 if boundary is not None:
-                    if boundary["component"] != name or boundary["method"] != "open-boundary-at-declared-waist-height":
-                        raise ValueError("Explicit waist boundary does not match cloth component")
+                    if (
+                        boundary["component"] != name
+                        or boundary["method"]
+                        != "open-boundary-at-declared-waist-height"
+                    ):
+                        raise ValueError(
+                            "Explicit waist boundary does not match cloth component"
+                        )
                     from collections import Counter
-                    counts = Counter(tuple(sorted((a, b))) for face in data.polygons
-                                     for a, b in zip(face.vertices, list(face.vertices[1:])+[face.vertices[0]]))
+
+                    counts = Counter(
+                        tuple(sorted((a, b)))
+                        for face in data.polygons
+                        for a, b in zip(
+                            face.vertices, list(face.vertices[1:]) + [face.vertices[0]]
+                        )
+                    )
                     edges = [edge for edge, count in counts.items() if count == 1]
                     z, tolerance = boundary["heightM"], boundary["toleranceM"]
-                    waist_edges = [edge for edge in edges if all(abs(data.vertices[i].co.z-z) <= tolerance for i in edge)]
+                    waist_edges = [
+                        edge
+                        for edge in edges
+                        if all(
+                            abs(data.vertices[i].co.z - z) <= tolerance for i in edge
+                        )
+                    ]
                     pin_ids = sorted({i for edge in waist_edges for i in edge})
                     if len(pin_ids) < 3 or len(waist_edges) != len(pin_ids):
-                        raise ValueError("Declared waist boundary is not a closed open-edge loop")
-                    pattern = read_json(repo_path(job["garmentPipeline"]["patternContractPath"]))
+                        raise ValueError(
+                            "Declared waist boundary is not a closed open-edge loop"
+                        )
+                    pattern = read_json(
+                        repo_path(job["garmentPipeline"]["patternContractPath"])
+                    )
                     for piece in groups[name]:
-                        panel = next(p for p in pattern["pieces"] if p["pieceId"] == piece)
-                        edge = next(e for e in panel["edges"] if e["edgeId"] == boundary["edgeId"])
-                        if any(abs(panel["boundary"][edge[k]][1]) > tolerance for k in ["startVertex", "endVertex"]):
-                            raise ValueError("Waist edge is not at the declared local zero height")
-                    pin_methods[name] = "canonical open waist boundary; provisional static support only"
+                        panel = next(
+                            p for p in pattern["pieces"] if p["pieceId"] == piece
+                        )
+                        edge = next(
+                            e
+                            for e in panel["edges"]
+                            if e["edgeId"] == boundary["edgeId"]
+                        )
+                        if any(
+                            abs(panel["boundary"][edge[k]][1]) > tolerance
+                            for k in ["startVertex", "endVertex"]
+                        ):
+                            raise ValueError(
+                                "Waist edge is not at the declared local zero height"
+                            )
+                    pin_methods[name] = (
+                        "canonical open waist boundary; provisional static support only"
+                    )
                 else:
                     fraction = policy["prototypeWaistPinUpperFraction"]
                     if not isinstance(fraction, (int, float)) or not 0 < fraction < 1:
-                        raise ValueError("explicit provisional waist pin fraction is required")
+                        raise ValueError(
+                            "explicit provisional waist pin fraction is required"
+                        )
                     heights = [v.co.z for v in data.vertices]
                     threshold = max(heights) - (max(heights) - min(heights)) * fraction
                     pin_ids = [v.index for v in data.vertices if v.co.z >= threshold]
-                    pin_methods[name] = "unapproved upper-height-band waist attachment hypothesis"
+                    pin_methods[name] = (
+                        "unapproved upper-height-band waist attachment hypothesis"
+                    )
             pins = obj.vertex_groups.new(name="Image2Outfit Cloth Pin")
             pins.add(pin_ids, 1.0, "REPLACE")
     bpy.data.objects.remove(original, do_unlink=True)
-    bodies = [obj for obj in bpy.context.scene.objects if obj.type == "MESH"
-              and obj.get("prototypeRole") == "target-avatar-reference-only"]
+    bodies = [
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH"
+        and obj.get("prototypeRole") == "target-avatar-reference-only"
+    ]
     if not bodies:
         raise ValueError("real imported target collision meshes are missing")
     for body in bodies:
         ensure_collision(body)
     from mathutils.bvhtree import BVHTree
+
     if len(bodies) != 1:
         raise ValueError("Cloth surface diagnostics require one explicit body")
     body = bodies[0]
     body.data.calc_loop_triangles()
-    tree = BVHTree.FromPolygons([body.matrix_world @ v.co for v in body.data.vertices],
-                               [tuple(t.vertices) for t in body.data.loop_triangles], all_triangles=True)
+    tree = BVHTree.FromPolygons(
+        [body.matrix_world @ v.co for v in body.data.vertices],
+        [tuple(t.vertices) for t in body.data.loop_triangles],
+        all_triangles=True,
+    )
+
     def surface_diagnostics(obj):
         signed, heights = [], []
         for vertex in obj.data.vertices:
@@ -555,22 +659,32 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             nearest, normal, triangle, distance = tree.find_nearest(point)
             if triangle is None:
                 raise ValueError("Body surface diagnostic failed")
-            signed.append(float((point-nearest).dot(normal)))
+            signed.append(float((point - nearest).dot(normal)))
             heights.append(float(point.z))
-        return {"heightRangeM": [min(heights), max(heights)],
-                "nearestNormalSignedDistanceM": {"minimum": min(signed), "maximum": max(signed)},
-                "negativeSignedVertexCount": sum(v < -1e-6 for v in signed),
-                "belowCombinedCollisionMarginVertexCount": sum(v < .007 for v in signed),
-                "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"}
+        return {
+            "heightRangeM": [min(heights), max(heights)],
+            "nearestNormalSignedDistanceM": {
+                "minimum": min(signed),
+                "maximum": max(signed),
+            },
+            "negativeSignedVertexCount": sum(v < -1e-6 for v in signed),
+            "belowCombinedCollisionMarginVertexCount": sum(v < 0.007 for v in signed),
+            "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance",
+        }
 
     def smooth_sleeve_interior(obj, declaration):
         """Run a declared, boundary-preserving geometry fairing hypothesis."""
         iterations = declaration.get("iterations")
         factor = declaration.get("factor")
-        if (isinstance(iterations, bool) or not isinstance(iterations, int)
-                or not 1 <= iterations <= 8
-                or isinstance(factor, bool) or not isinstance(factor, (int, float))
-                or not math.isfinite(factor) or not 0 < factor <= 0.5):
+        if (
+            isinstance(iterations, bool)
+            or not isinstance(iterations, int)
+            or not 1 <= iterations <= 8
+            or isinstance(factor, bool)
+            or not isinstance(factor, (int, float))
+            or not math.isfinite(factor)
+            or not 0 < factor <= 0.5
+        ):
             raise ValueError("Invalid post-bake smoothing hypothesis")
         adjacency = [set() for _ in obj.data.vertices]
         edge_counts = {}
@@ -582,12 +696,20 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 adjacency[next_id].add(vertex_id)
                 edge = tuple(sorted((vertex_id, next_id)))
                 edge_counts[edge] = edge_counts.get(edge, 0) + 1
-        boundary = {vertex for edge, count in edge_counts.items() if count == 1 for vertex in edge}
+        boundary = {
+            vertex
+            for edge, count in edge_counts.items()
+            if count == 1
+            for vertex in edge
+        }
         pin_group = obj.vertex_groups.get("Image2Outfit Cloth Pin")
         pinned = set()
         if pin_group is not None:
             for vertex in obj.data.vertices:
-                if any(group.group == pin_group.index and group.weight > 0 for group in vertex.groups):
+                if any(
+                    group.group == pin_group.index and group.weight > 0
+                    for group in vertex.groups
+                ):
                     pinned.add(vertex.index)
         fixed = boundary | pinned
         initial = [vertex.co.copy() for vertex in obj.data.vertices]
@@ -597,14 +719,24 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             for vertex_id, neighbors in enumerate(adjacency):
                 if vertex_id in fixed or len(neighbors) < 3:
                     continue
-                average = sum((coordinates[neighbor] for neighbor in neighbors), Vector((0.0, 0.0, 0.0))) / len(neighbors)
+                average = sum(
+                    (coordinates[neighbor] for neighbor in neighbors),
+                    Vector((0.0, 0.0, 0.0)),
+                ) / len(neighbors)
                 updated[vertex_id] = coordinates[vertex_id].lerp(average, float(factor))
             coordinates = updated
-        displacements = [(coordinates[index] - initial[index]).length for index in range(len(initial))]
+        displacements = [
+            (coordinates[index] - initial[index]).length
+            for index in range(len(initial))
+        ]
         for vertex, coordinate in zip(obj.data.vertices, coordinates):
             vertex.co = coordinate
         obj.data.update()
-        changed = [value for index, value in enumerate(displacements) if index not in fixed and value > 1e-9]
+        changed = [
+            value
+            for index, value in enumerate(displacements)
+            if index not in fixed and value > 1e-9
+        ]
         return {
             "method": "uniform-laplacian-interior-only-boundaries-and-pins-fixed",
             "iterations": iterations,
@@ -613,21 +745,28 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             "boundaryVertexCount": len(boundary),
             "pinnedVertexCount": len(pinned),
             "fixedVertexCount": len(fixed),
-            "fixedVertexMaximumDisplacementM": max((displacements[index] for index in fixed), default=0.0),
+            "fixedVertexMaximumDisplacementM": max(
+                (displacements[index] for index in fixed), default=0.0
+            ),
             "changedInteriorVertexCount": len(changed),
             "maximumInteriorDisplacementM": max(changed, default=0.0),
-            "meanInteriorDisplacementM": sum(changed) / len(changed) if changed else 0.0,
+            "meanInteriorDisplacementM": sum(changed) / len(changed)
+            if changed
+            else 0.0,
             "reason": declaration["reason"],
             "evidenceBoundary": declaration["evidenceBoundary"],
             "grantsFitAcceptance": False,
             "grantsAppearanceAcceptance": False,
         }
+
     scene = bpy.context.scene
     scene.frame_start, scene.frame_end = 1, frame_end
     scene.gravity = (0, 0, -4.5)
     post_bake_smoothing = policy.get("prototypePostBakeLaplacianSmoothing", {})
     if not set(post_bake_smoothing).issubset(groups):
-        raise ValueError("Post-bake smoothing hypothesis references an unknown cloth component")
+        raise ValueError(
+            "Post-bake smoothing hypothesis references an unknown cloth component"
+        )
     before, contracts = {}, []
     rest_controls = {}
     for name in groups:
@@ -635,7 +774,9 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         pin_ids = [v.index for v in obj.data.vertices if v.groups]
         before[name] = mesh_hash(obj)
         rest = policy.get("prototypeRestShape", {}).get(name)
-        rest_contract = bind_canonical_row_rest_shape(obj, job, rest) if rest is not None else None
+        rest_contract = (
+            bind_canonical_row_rest_shape(obj, job, rest) if rest is not None else None
+        )
         bending_hypotheses = policy.get("prototypeComponentBendingHypotheses", {})
         if not set(bending_hypotheses).issubset(groups):
             raise ValueError("Bending hypothesis references an unknown cloth component")
@@ -645,7 +786,11 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         modifier = obj.modifiers["Image2Outfit Cloth"]
         if bending_hypothesis is not None:
             value = bending_hypothesis.get("stiffness")
-            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+            ):
                 raise ValueError("Finite numeric bending hypothesis is required")
             modifier_settings = modifier.settings
             modifier_type = modifier_settings.bl_rna.properties["bending_stiffness"]
@@ -663,39 +808,60 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             }
         bending = policy.get("prototypeComponentBending", {})
         if not set(bending).issubset(groups):
-            raise ValueError("Bending declaration references an unknown cloth component")
+            raise ValueError(
+                "Bending declaration references an unknown cloth component"
+            )
         if name in bending:
             declared = bending[name]
             value = declared["stiffness"]
-            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+            ):
                 raise ValueError("Finite numeric bending stiffness is required")
             modifier = obj.modifiers["Image2Outfit Cloth"]
             limits = modifier.settings.bl_rna.properties["bending_stiffness"]
             if not limits.hard_min <= value <= limits.hard_max:
-                raise ValueError("Declared bending stiffness exceeds native Blender limits")
+                raise ValueError(
+                    "Declared bending stiffness exceeds native Blender limits"
+                )
             evidence_path = repo_path(declared["evidencePath"])
-            if hashlib.sha256(evidence_path.read_bytes()).hexdigest() != declared["evidenceSha256"]:
+            if (
+                hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+                != declared["evidenceSha256"]
+            ):
                 raise ValueError("Bending comparison evidence hash mismatch")
             evidence = read_json(evidence_path)
-            if (evidence.get("productId") != job["id"]
-                    or evidence.get("blenderVersion") != bpy.app.version_string
-                    or evidence.get("bendingStiffness") != value
-                    or evidence.get("bendingModel") != modifier.settings.bending_model
-                    or evidence.get("frameEnd") != frame_end
-                    or evidence.get("cacheBaked") is not True):
+            if (
+                evidence.get("productId") != job["id"]
+                or evidence.get("blenderVersion") != bpy.app.version_string
+                or evidence.get("bendingStiffness") != value
+                or evidence.get("bendingModel") != modifier.settings.bending_model
+                or evidence.get("frameEnd") != frame_end
+                or evidence.get("cacheBaked") is not True
+            ):
                 raise ValueError("Bending comparison is incompatible with this solve")
-            for key, path in (("assemblyPoseSha256", job["garmentPipeline"]["assemblyPosePath"]),
-                              ("patternSha256", job["garmentPipeline"]["patternContractPath"]),
-                              ("targetSourceSha256", job["targetSourcePath"])):
-                if evidence.get(key) != hashlib.sha256(repo_path(path).read_bytes()).hexdigest():
+            for key, path in (
+                ("assemblyPoseSha256", job["garmentPipeline"]["assemblyPosePath"]),
+                ("patternSha256", job["garmentPipeline"]["patternContractPath"]),
+                ("targetSourceSha256", job["targetSourcePath"]),
+            ):
+                if (
+                    evidence.get(key)
+                    != hashlib.sha256(repo_path(path).read_bytes()).hexdigest()
+                ):
                     raise ValueError("Bending comparison inputs are stale: " + key)
             modifier.settings.bending_stiffness = value
             contract["componentBending"] = {
                 "stiffness": modifier.settings.bending_stiffness,
                 "maximum": modifier.settings.bending_stiffness_max,
                 "model": modifier.settings.bending_model,
-                "evidencePath": declared["evidencePath"], "evidenceSha256": declared["evidenceSha256"],
-                "evidenceBoundary": declared["evidenceBoundary"], "grantsFitAcceptance": False}
+                "evidencePath": declared["evidencePath"],
+                "evidenceSha256": declared["evidenceSha256"],
+                "evidenceBoundary": declared["evidenceBoundary"],
+                "grantsFitAcceptance": False,
+            }
         if rest is not None:
             key = obj.data.shape_keys.key_blocks[rest_contract["shapeKey"]]
             modifier = obj.modifiers["Image2Outfit Cloth"]
@@ -703,7 +869,9 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             if modifier.settings.rest_shape_key != key:
                 raise ValueError("Native cloth did not bind the declared rest key")
             rest_contract["nativeRestShapeKeyBound"] = True
-            rest_contract["initializationOrder"] = "rest key created before Cloth modifier"
+            rest_contract["initializationOrder"] = (
+                "rest key created before Cloth modifier"
+            )
             contract["canonicalRestShape"] = rest_contract
         pin = obj.vertex_groups["Image2Outfit Cloth Pin"]
         pin.remove(range(len(obj.data.vertices)))
@@ -721,8 +889,13 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             bpy.context.collection.objects.link(control)
             configure_cloth(control, frame_end, bending_stiffness)
             control_modifier = control.modifiers["Image2Outfit Cloth"]
-            control_modifier.settings.rest_shape_key = control.data.shape_keys.key_blocks[0]
-            if control_modifier.settings.rest_shape_key != control.data.shape_keys.key_blocks[0]:
+            control_modifier.settings.rest_shape_key = (
+                control.data.shape_keys.key_blocks[0]
+            )
+            if (
+                control_modifier.settings.rest_shape_key
+                != control.data.shape_keys.key_blocks[0]
+            ):
                 raise ValueError("Native cloth did not bind the Basis control key")
             control_pin = control.vertex_groups["Image2Outfit Cloth Pin"]
             control_pin.remove(range(len(control.data.vertices)))
@@ -740,28 +913,51 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             raise RuntimeError("Basis-rest response control did not bake")
         declared_hash = mesh_hash(objects[name], evaluated=True)
         control_hash = mesh_hash(control, evaluated=True)
-        response = {"method": "same-input-native-cloth-declared-vs-basis-rest",
-                    "declaredEvaluatedMeshSha256": declared_hash,
-                    "basisEvaluatedMeshSha256": control_hash,
-                    "coordinateRoundingDecimalPlaces": 7,
-                    "measurableResponse": declared_hash != control_hash,
-                    "controlCacheBakedActual": True,
-                    "useDynamicMesh": objects[name].modifiers["Image2Outfit Cloth"].settings.use_dynamic_mesh,
-                    "grantsFitAcceptance": False}
+        response = {
+            "method": "same-input-native-cloth-declared-vs-basis-rest",
+            "declaredEvaluatedMeshSha256": declared_hash,
+            "basisEvaluatedMeshSha256": control_hash,
+            "coordinateRoundingDecimalPlaces": 7,
+            "measurableResponse": declared_hash != control_hash,
+            "controlCacheBakedActual": True,
+            "useDynamicMesh": objects[name]
+            .modifiers["Image2Outfit Cloth"]
+            .settings.use_dynamic_mesh,
+            "grantsFitAcceptance": False,
+        }
         contract = next(item for item in contracts if item["object"] == name)
         contract["canonicalRestShape"]["solverResponse"] = response
         if not response["measurableResponse"]:
-            report = {"schemaVersion": 1, "productId": job["id"], "status": "FAIL",
-                      "engine": "Blender Cloth", "blenderVersion": bpy.app.version_string,
-                      "applicability": "REQUIRED", "frameStart": 1, "frameEnd": frame_end,
-                      "sourceBlendSha256": source_hash,
-                      "constructionSha256": hashlib.sha256(construction_path.read_bytes()).hexdigest(),
-                      "contracts": contracts, "qualityDecision": "UNVERIFIED",
-                      "grantsFitAcceptance": False,
-                      "failureCode": "REST_SHAPE_NO_MEASURABLE_SOLVER_RESPONSE",
-                      "evidenceBoundary": "Declared and Basis-rest controls produced identical evaluated coordinates; intended rest-spring linkage is unverified. Existing settled candidate is preserved."}
-            write_json(ROOT / ".image2outfit" / "products" / str(job["id"]) / "reports/cloth-rest-response-failure.json", report)
-            raise RuntimeError("Declared rest shape produced no measurable native Cloth response")
+            report = {
+                "schemaVersion": 1,
+                "productId": job["id"],
+                "status": "FAIL",
+                "engine": "Blender Cloth",
+                "blenderVersion": bpy.app.version_string,
+                "applicability": "REQUIRED",
+                "frameStart": 1,
+                "frameEnd": frame_end,
+                "sourceBlendSha256": source_hash,
+                "constructionSha256": hashlib.sha256(
+                    construction_path.read_bytes()
+                ).hexdigest(),
+                "contracts": contracts,
+                "qualityDecision": "UNVERIFIED",
+                "grantsFitAcceptance": False,
+                "failureCode": "REST_SHAPE_NO_MEASURABLE_SOLVER_RESPONSE",
+                "evidenceBoundary": "Declared and Basis-rest controls produced identical evaluated coordinates; intended rest-spring linkage is unverified. Existing settled candidate is preserved.",
+            }
+            write_json(
+                ROOT
+                / ".image2outfit"
+                / "products"
+                / str(job["id"])
+                / "reports/cloth-rest-response-failure.json",
+                report,
+            )
+            raise RuntimeError(
+                "Declared rest shape produced no measurable native Cloth response"
+            )
         bpy.data.objects.remove(control, do_unlink=True)
     for contract in contracts:
         obj = objects[contract["object"]]
@@ -776,44 +972,69 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             # Blender cannot apply Cloth to a mesh with Shape Keys. Capture the
             # actual evaluated solve, including canonical face attributes.
             depsgraph = bpy.context.evaluated_depsgraph_get()
-            settled_data = bpy.data.meshes.new_from_object(obj.evaluated_get(depsgraph),
-                                                         preserve_all_data_layers=True, depsgraph=depsgraph)
-            if len(settled_data.vertices) != len(obj.data.vertices) or len(settled_data.polygons) != len(obj.data.polygons):
+            settled_data = bpy.data.meshes.new_from_object(
+                obj.evaluated_get(depsgraph),
+                preserve_all_data_layers=True,
+                depsgraph=depsgraph,
+            )
+            if len(settled_data.vertices) != len(obj.data.vertices) or len(
+                settled_data.polygons
+            ) != len(obj.data.polygons):
                 raise ValueError("Rest-shape cloth changed canonical topology")
             if settled_data.attributes.get("canonical_piece_index") is None:
                 raise ValueError("Rest-shape cloth lost canonical face ownership")
             obj.modifiers.remove(modifier)
             obj.data = settled_data
-            contract["canonicalRestShape"]["settledCapture"] = "actual evaluated native Cloth mesh"
+            contract["canonicalRestShape"]["settledCapture"] = (
+                "actual evaluated native Cloth mesh"
+            )
         else:
             bpy.ops.object.modifier_apply(modifier=modifier.name)
         if obj.name in post_bake_smoothing:
             contract["postBakeGeometryHypothesis"] = smooth_sleeve_interior(
-                obj, post_bake_smoothing[obj.name])
+                obj, post_bake_smoothing[obj.name]
+            )
         settled = mesh_hash(obj)
         contract["postBakeBodySurfaceDiagnostic"] = surface_diagnostics(obj)
-        contract.update(cacheBakedActual=True, preBakeMeshSha256=before[obj.name],
-                        evaluatedFrameMeshSha256=evaluated, settledMeshSha256=settled,
-                        geometryChanged=settled != before[obj.name])
+        contract.update(
+            cacheBakedActual=True,
+            preBakeMeshSha256=before[obj.name],
+            evaluatedFrameMeshSha256=evaluated,
+            settledMeshSha256=settled,
+            geometryChanged=settled != before[obj.name],
+        )
     runtime = ROOT / ".image2outfit" / "products" / str(job["id"]) / "cloth"
     runtime.mkdir(parents=True, exist_ok=True)
     candidate = runtime / "settled-prototype.blend"
     bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=str(candidate), check_existing=False)
     report = {
-        "schemaVersion": 1, "productId": job["id"], "status": "PASS",
-        "engine": "Blender Cloth", "blenderVersion": bpy.app.version_string,
-        "applicability": "REQUIRED", "frameStart": 1, "frameEnd": frame_end,
-        "cacheBaked": True, "geometryChanged": all(c["geometryChanged"] for c in contracts),
-        "contracts": contracts, "sourceBlendSha256": source_hash,
-        "constructionSha256": hashlib.sha256(construction_path.read_bytes()).hexdigest(),
+        "schemaVersion": 1,
+        "productId": job["id"],
+        "status": "PASS",
+        "engine": "Blender Cloth",
+        "blenderVersion": bpy.app.version_string,
+        "applicability": "REQUIRED",
+        "frameStart": 1,
+        "frameEnd": frame_end,
+        "cacheBaked": True,
+        "geometryChanged": all(c["geometryChanged"] for c in contracts),
+        "contracts": contracts,
+        "sourceBlendSha256": source_hash,
+        "constructionSha256": hashlib.sha256(
+            construction_path.read_bytes()
+        ).hexdigest(),
         "candidatePath": str(candidate.relative_to(ROOT)).replace("\\", "/"),
         "candidateSha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
         "collisionObjects": [body.name for body in bodies],
-        "qualityDecision": "UNVERIFIED", "grantsFitAcceptance": False,
+        "qualityDecision": "UNVERIFIED",
+        "grantsFitAcceptance": False,
         "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance.",
     }
-    write_json(repo_path(str(job["productRoot"])) / "Evidence/Build/cloth-simulation.json", report)
+    write_json(
+        repo_path(str(job["productRoot"])) / "Evidence/Build/cloth-simulation.json",
+        report,
+    )
     return 0
 
 

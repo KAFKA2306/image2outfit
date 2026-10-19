@@ -114,7 +114,9 @@ def _mapped_stitch_ids(pattern: dict[str, Any], adapter: dict[str, Any]) -> list
     return stitch_ids
 
 
-def _stitch_diagnostics(mesh: Any, stitch_ids: list[str], same_panel: Any) -> dict[str, Any]:
+def _stitch_diagnostics(
+    mesh: Any, stitch_ids: list[str], same_panel: Any
+) -> dict[str, Any]:
     _valid, invalid_indices = mesh._is_stitching_valid(same_panel)
     invalid = []
     front_end_collapse_count = 0
@@ -130,8 +132,7 @@ def _stitch_diagnostics(mesh: Any, stitch_ids: list[str], same_panel: Any) -> di
             {
                 "stitchId": stitch_ids[index],
                 "edgeReferences": [
-                    {"panel": item["panel"], "edge": item["edge"]}
-                    for item in pair[:2]
+                    {"panel": item["panel"], "edge": item["edge"]} for item in pair[:2]
                 ],
                 "rightWrongTag": len(pair) == 3 and pair[2] == "right_wrong",
                 "frontEndCollapse": not front_valid,
@@ -179,7 +180,9 @@ def _endpoint_conflict_clusters(
                             {
                                 "panel": member_panel,
                                 "garmentPieceId": panel_key_map[member_panel],
-                                "localVertexIds": sorted(int(value) for value in member_ids),
+                                "localVertexIds": sorted(
+                                    int(value) for value in member_ids
+                                ),
                             }
                         )
                 if not panel_conflicts:
@@ -261,12 +264,10 @@ def _intentional_closed_loop_stitches(
 
         range_1, range_2 = mesh._swap_stitch_ranges(stitch)
         chain_1 = [
-            mesh.verts_loc_glob[(stitch.panel_1, local_id)]
-            for local_id in range_1
+            mesh.verts_loc_glob[(stitch.panel_1, local_id)] for local_id in range_1
         ]
         chain_2 = [
-            mesh.verts_loc_glob[(stitch.panel_2, local_id)]
-            for local_id in range_2
+            mesh.verts_loc_glob[(stitch.panel_2, local_id)] for local_id in range_2
         ]
         if len(chain_1) < 4 or len(chain_1) != len(chain_2):
             continue
@@ -301,12 +302,17 @@ def _intentional_closed_loop_stitches(
     return closed_loops
 
 
-def _finalized_mesh_topology(mesh: Any, panel_key_map: dict[str, str]) -> dict[str, Any]:
+def _finalized_mesh_topology(
+    mesh: Any, panel_key_map: dict[str, str]
+) -> dict[str, Any]:
     vertices = [tuple(float(value) for value in vertex) for vertex in mesh.vertices]
     faces = [[int(value) for value in face] for face in mesh.faces]
     if vertices:
         bounds = [
-            (min(vertex[axis] for vertex in vertices), max(vertex[axis] for vertex in vertices))
+            (
+                min(vertex[axis] for vertex in vertices),
+                max(vertex[axis] for vertex in vertices),
+            )
             for axis in range(3)
         ]
         bbox_diagonal = math.sqrt(
@@ -343,11 +349,14 @@ def _finalized_mesh_topology(mesh: Any, panel_key_map: dict[str, str]) -> dict[s
             if area <= area_tolerance:
                 degenerate_face_count += 1
         if degenerate_face_count != before_count:
-            degenerate_face_records.append({
-                "faceIndex": face_index, "pieceId": face_owners[face_index],
-                "vertexIds": face,
-                "positionsNativeUnits": [vertices[vertex_id] for vertex_id in face],
-            })
+            degenerate_face_records.append(
+                {
+                    "faceIndex": face_index,
+                    "pieceId": face_owners[face_index],
+                    "vertexIds": face,
+                    "positionsNativeUnits": [vertices[vertex_id] for vertex_id in face],
+                }
+            )
         for edge_index, vertex_id in enumerate(face):
             next_vertex_id = face[(edge_index + 1) % len(face)]
             edge = tuple(sorted((vertex_id, next_vertex_id)))
@@ -415,11 +424,14 @@ def _panel_pose_input_audit(pattern: dict[str, Any]) -> dict[str, Any]:
             values.append(tuple(round(float(value), 9) for value in raw))
 
     zero_rotation_count = sum(
-        int(all(abs(value) <= 1e-9 for value in rotation))
-        for rotation in rotations
+        int(all(abs(value) <= 1e-9 for value in rotation)) for rotation in rotations
     )
-    all_rotations_zero = len(rotations) == len(panels) and zero_rotation_count == len(panels)
-    status = "COMPLETE" if not missing_rotation and not missing_translation else "INCOMPLETE"
+    all_rotations_zero = len(rotations) == len(panels) and zero_rotation_count == len(
+        panels
+    )
+    status = (
+        "COMPLETE" if not missing_rotation and not missing_translation else "INCOMPLETE"
+    )
     return {
         "status": status,
         "panelCount": len(panels),
@@ -450,71 +462,154 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
     for name, source in pattern["panels"].items():
         collar = source.get("image2outfitCollarWrap")
         if collar is not None:
-            if collar["method"] != "pattern-length-standing-collar" or any(source.get(key) for key in ["image2outfitSkirtWrap", "image2outfitLegWrap", "image2outfitTorsoWrap", "image2outfitCylindricalWrap"]):
+            if collar["method"] != "pattern-length-standing-collar" or any(
+                source.get(key)
+                for key in [
+                    "image2outfitSkirtWrap",
+                    "image2outfitLegWrap",
+                    "image2outfitTorsoWrap",
+                    "image2outfitCylindricalWrap",
+                ]
+            ):
                 raise ValueError("Unknown or conflicting collar placement")
-            anchor = np.array(collar["axisAnchorGarmentCodeM"], dtype=float)*scale
-            length = float(collar["circumferenceLocalYM"])*scale
-            if anchor.shape != (3,) or not np.isfinite(anchor).all() or not math.isfinite(length) or length <= 0:
+            anchor = np.array(collar["axisAnchorGarmentCodeM"], dtype=float) * scale
+            length = float(collar["circumferenceLocalYM"]) * scale
+            if (
+                anchor.shape != (3,)
+                or not np.isfinite(anchor).all()
+                or not math.isfinite(length)
+                or length <= 0
+            ):
                 raise ValueError("Invalid collar placement bounds")
+
             def collar_transform(panel, vertex, anchor=anchor, length=length):
                 x, y = vertex
-                angle = 2*math.pi*y/length
-                radius = length/(2*math.pi)
+                angle = 2 * math.pi * y / length
+                radius = length / (2 * math.pi)
                 # Pattern -X is collar height; +Y traverses front-left,
                 # back-left, back-right, front-right sewn base quarters.
-                return anchor+np.array([radius*math.sin(angle), -x, radius*math.cos(angle)])
+                return anchor + np.array(
+                    [radius * math.sin(angle), -x, radius * math.cos(angle)]
+                )
+
             panel = mesh.panels[name]
             panel.rot_trans_vertex = MethodType(collar_transform, panel)
-            panel.rot_trans_panel = MethodType(lambda panel, vertices: np.array([panel.rot_trans_vertex(v) for v in vertices]), panel)
+            panel.rot_trans_panel = MethodType(
+                lambda panel, vertices: np.array(
+                    [panel.rot_trans_vertex(v) for v in vertices]
+                ),
+                panel,
+            )
             panel.image2outfit_cylindrical = True
             panel.image2outfit_reverse_winding = False
-            records.append({"panel":name,"specification":collar,"vertexCount":len(panel.panel_vertices),"changes2dRestLengths":False,"grantsFitAcceptance":False})
+            records.append(
+                {
+                    "panel": name,
+                    "specification": collar,
+                    "vertexCount": len(panel.panel_vertices),
+                    "changes2dRestLengths": False,
+                    "grantsFitAcceptance": False,
+                }
+            )
             continue
         skirt = source.get("image2outfitSkirtWrap")
         if skirt is not None:
-            if skirt["method"] != "pattern-half-circumference-skirt" or any(source.get(key) for key in ["image2outfitLegWrap", "image2outfitTorsoWrap", "image2outfitCylindricalWrap"]):
+            if skirt["method"] != "pattern-half-circumference-skirt" or any(
+                source.get(key)
+                for key in [
+                    "image2outfitLegWrap",
+                    "image2outfitTorsoWrap",
+                    "image2outfitCylindricalWrap",
+                ]
+            ):
                 raise ValueError("Unknown or conflicting skirt placement")
             depth = skirt["depthDirection"]
-            anchor = np.array(skirt["axisAnchorGarmentCodeM"], dtype=float)*scale
-            profile = np.array(skirt["widthRadiusProfileM"], dtype=float)*scale
+            anchor = np.array(skirt["axisAnchorGarmentCodeM"], dtype=float) * scale
+            profile = np.array(skirt["widthRadiusProfileM"], dtype=float) * scale
             if depth not in (-1, 1) or anchor.shape != (3,) or profile.shape != (2, 3):
                 raise ValueError("Invalid skirt placement specification")
-            if not np.isfinite(anchor).all() or not np.isfinite(profile).all() or np.any(np.diff(profile[:,0]) <= 0) or np.any(profile[:,1:] <= 0):
+            if (
+                not np.isfinite(anchor).all()
+                or not np.isfinite(profile).all()
+                or np.any(np.diff(profile[:, 0]) <= 0)
+                or np.any(profile[:, 1:] <= 0)
+            ):
                 raise ValueError("Invalid skirt placement bounds")
             width_curve = skirt.get("widthQuadraticControlM")
             if width_curve is not None:
-                width_curve = np.array(width_curve, dtype=float)*scale
-                if width_curve.shape != (3,) or not np.isfinite(width_curve).all() or np.any(width_curve <= 0):
+                width_curve = np.array(width_curve, dtype=float) * scale
+                if (
+                    width_curve.shape != (3,)
+                    or not np.isfinite(width_curve).all()
+                    or np.any(width_curve <= 0)
+                ):
                     raise ValueError("Invalid skirt quadratic half-width controls")
-                if abs(width_curve[0]-profile[-1,1]) > 1e-7 or abs(width_curve[2]-profile[0,1]) > 1e-7:
-                    raise ValueError("Skirt quadratic half-width endpoints differ from profile")
-            def skirt_transform(panel, vertex, depth=depth, anchor=anchor, profile=profile, width_curve=width_curve):
+                if (
+                    abs(width_curve[0] - profile[-1, 1]) > 1e-7
+                    or abs(width_curve[2] - profile[0, 1]) > 1e-7
+                ):
+                    raise ValueError(
+                        "Skirt quadratic half-width endpoints differ from profile"
+                    )
+
+            def skirt_transform(
+                panel,
+                vertex,
+                depth=depth,
+                anchor=anchor,
+                profile=profile,
+                width_curve=width_curve,
+            ):
                 x, y = vertex
-                width = np.interp(y, profile[:,0], profile[:,1])
+                width = np.interp(y, profile[:, 0], profile[:, 1])
                 if width_curve is not None:
-                    t = (profile[-1,0]-y)/(profile[-1,0]-profile[0,0])
-                    if not -1e-7 <= t <= 1+1e-7:
+                    t = (profile[-1, 0] - y) / (profile[-1, 0] - profile[0, 0])
+                    if not -1e-7 <= t <= 1 + 1e-7:
                         raise ValueError("Skirt vertex outside quadratic width bounds")
                     t = min(1.0, max(0.0, t))
-                    width = (1-t)**2*width_curve[0]+2*t*(1-t)*width_curve[1]+t*t*width_curve[2]
-                radius = np.interp(y, profile[:,0], profile[:,2])
-                angle = x/width*math.pi/2
-                return anchor+np.array([radius*math.sin(angle), y, depth*radius*math.cos(angle)])
+                    width = (
+                        (1 - t) ** 2 * width_curve[0]
+                        + 2 * t * (1 - t) * width_curve[1]
+                        + t * t * width_curve[2]
+                    )
+                radius = np.interp(y, profile[:, 0], profile[:, 2])
+                angle = x / width * math.pi / 2
+                return anchor + np.array(
+                    [radius * math.sin(angle), y, depth * radius * math.cos(angle)]
+                )
+
             panel = mesh.panels[name]
             panel.rot_trans_vertex = MethodType(skirt_transform, panel)
-            panel.rot_trans_panel = MethodType(lambda panel, vertices: np.array([panel.rot_trans_vertex(v) for v in vertices]), panel)
+            panel.rot_trans_panel = MethodType(
+                lambda panel, vertices: np.array(
+                    [panel.rot_trans_vertex(v) for v in vertices]
+                ),
+                panel,
+            )
             panel.image2outfit_cylindrical = True
             panel.image2outfit_reverse_winding = depth < 0
-            records.append({"panel":name,"specification":skirt,"vertexCount":len(panel.panel_vertices),"changes2dRestLengths":False,"grantsFitAcceptance":False})
+            records.append(
+                {
+                    "panel": name,
+                    "specification": skirt,
+                    "vertexCount": len(panel.panel_vertices),
+                    "changes2dRestLengths": False,
+                    "grantsFitAcceptance": False,
+                }
+            )
             continue
         leg = source.get("image2outfitLegWrap")
         if leg is not None:
-            if leg["method"] != "pattern-half-leg-to-quarter-pelvis" or source.get("image2outfitTorsoWrap") or source.get("image2outfitCylindricalWrap"):
+            if (
+                leg["method"] != "pattern-half-leg-to-quarter-pelvis"
+                or source.get("image2outfitTorsoWrap")
+                or source.get("image2outfitCylindricalWrap")
+            ):
                 raise ValueError("Unknown or conflicting shorts placement")
             side, depth = leg["sideDirection"], leg["depthDirection"]
-            anchor = np.array(leg["axisAnchorGarmentCodeM"], dtype=float)*scale
-            profile = np.array(leg["widthBoundsProfileM"], dtype=float)*scale
-            start, end = np.array(leg["pelvisBlendLocalYM"], dtype=float)*scale
+            anchor = np.array(leg["axisAnchorGarmentCodeM"], dtype=float) * scale
+            profile = np.array(leg["widthBoundsProfileM"], dtype=float) * scale
+            start, end = np.array(leg["pelvisBlendLocalYM"], dtype=float) * scale
             if (
                 side not in (-1, 1)
                 or depth not in (-1, 1)
@@ -524,64 +619,152 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
                 or profile.shape[0] < 2
             ):
                 raise ValueError("Invalid shorts placement specification")
-            if not np.isfinite(anchor).all() or not np.isfinite(profile).all() or not math.isfinite(start+end) or not start < end or np.any(np.diff(profile[:,0]) <= 0) or np.any(profile[:,2] <= profile[:,1]):
+            if (
+                not np.isfinite(anchor).all()
+                or not np.isfinite(profile).all()
+                or not math.isfinite(start + end)
+                or not start < end
+                or np.any(np.diff(profile[:, 0]) <= 0)
+                or np.any(profile[:, 2] <= profile[:, 1])
+            ):
                 raise ValueError("Invalid shorts placement bounds")
-            def leg_transform(panel, vertex, side=side, depth=depth, anchor=anchor, profile=profile, start=start, end=end):
+
+            def leg_transform(
+                panel,
+                vertex,
+                side=side,
+                depth=depth,
+                anchor=anchor,
+                profile=profile,
+                start=start,
+                end=end,
+            ):
                 x, y = vertex
-                inner = np.interp(y, profile[:,0], profile[:,1])
-                outer = np.interp(y, profile[:,0], profile[:,2])
-                width = outer-inner
-                fraction = (x-inner)/width
-                radius = width/math.pi
-                angle = fraction*math.pi
-                lower = np.array([side*(abs(anchor[0])-radius*math.cos(angle)), y+anchor[1], anchor[2]+depth*radius*math.sin(angle)])
+                inner = np.interp(y, profile[:, 0], profile[:, 1])
+                outer = np.interp(y, profile[:, 0], profile[:, 2])
+                width = outer - inner
+                fraction = (x - inner) / width
+                radius = width / math.pi
+                angle = fraction * math.pi
+                lower = np.array(
+                    [
+                        side * (abs(anchor[0]) - radius * math.cos(angle)),
+                        y + anchor[1],
+                        anchor[2] + depth * radius * math.sin(angle),
+                    ]
+                )
                 # At the waist, front/back become pelvis quarters. At the
                 # crotch tip each leg retains its half-cylinder inseam.
-                blend = min(1, max(0, (y-start)/(end-start)))
-                upper_radius = 2*width/math.pi
-                upper_angle = fraction*math.pi/2
-                upper = np.array([side*upper_radius*math.sin(upper_angle), y+anchor[1], anchor[2]+depth*upper_radius*math.cos(upper_angle)])
-                return lower*(1-blend)+upper*blend
+                blend = min(1, max(0, (y - start) / (end - start)))
+                upper_radius = 2 * width / math.pi
+                upper_angle = fraction * math.pi / 2
+                upper = np.array(
+                    [
+                        side * upper_radius * math.sin(upper_angle),
+                        y + anchor[1],
+                        anchor[2] + depth * upper_radius * math.cos(upper_angle),
+                    ]
+                )
+                return lower * (1 - blend) + upper * blend
+
             panel = mesh.panels[name]
             panel.rot_trans_vertex = MethodType(leg_transform, panel)
-            panel.rot_trans_panel = MethodType(lambda panel, vertices: np.array([panel.rot_trans_vertex(v) for v in vertices]), panel)
+            panel.rot_trans_panel = MethodType(
+                lambda panel, vertices: np.array(
+                    [panel.rot_trans_vertex(v) for v in vertices]
+                ),
+                panel,
+            )
             panel.image2outfit_cylindrical = True
-            panel.image2outfit_reverse_winding = side*depth < 0
-            records.append({"panel":name,"specification":leg,"vertexCount":len(panel.panel_vertices),"changes2dRestLengths":False,"grantsFitAcceptance":False})
+            panel.image2outfit_reverse_winding = side * depth < 0
+            records.append(
+                {
+                    "panel": name,
+                    "specification": leg,
+                    "vertexCount": len(panel.panel_vertices),
+                    "changes2dRestLengths": False,
+                    "grantsFitAcceptance": False,
+                }
+            )
             continue
         torso = source.get("image2outfitTorsoWrap")
         if torso is not None:
             if source.get("image2outfitCylindricalWrap") is not None:
                 raise ValueError("Panel cannot use two nonlinear placement methods")
-            if torso["method"] != "pattern-quarter-circumference-torso" or torso["upperProfileExtrapolation"] != "hold-final-quarter-width":
+            if (
+                torso["method"] != "pattern-quarter-circumference-torso"
+                or torso["upperProfileExtrapolation"] != "hold-final-quarter-width"
+            ):
                 raise ValueError("Unknown torso placement method")
             side, depth = torso["sideDirection"], torso["depthDirection"]
-            anchor = np.array(torso["axisAnchorGarmentCodeM"], dtype=float)*scale
-            profile = np.array(torso["quarterWidthProfileM"], dtype=float)*scale
-            if side not in (-1, 1) or depth not in (-1, 1) or anchor.shape != (3,) or profile.ndim != 2 or profile.shape[1] != 2 or len(profile) < 2:
+            anchor = np.array(torso["axisAnchorGarmentCodeM"], dtype=float) * scale
+            profile = np.array(torso["quarterWidthProfileM"], dtype=float) * scale
+            if (
+                side not in (-1, 1)
+                or depth not in (-1, 1)
+                or anchor.shape != (3,)
+                or profile.ndim != 2
+                or profile.shape[1] != 2
+                or len(profile) < 2
+            ):
                 raise ValueError("Invalid torso placement specification")
-            if not np.isfinite(anchor).all() or not np.isfinite(profile).all() or np.any(profile[:,1] <= 0) or np.any(np.diff(profile[:,0]) <= 0):
+            if (
+                not np.isfinite(anchor).all()
+                or not np.isfinite(profile).all()
+                or np.any(profile[:, 1] <= 0)
+                or np.any(np.diff(profile[:, 0]) <= 0)
+            ):
                 raise ValueError("Invalid torso quarter-width profile")
             neckline = torso.get("necklineWrap")
             if neckline is not None:
                 if neckline["method"] != "collar-base-quarter-ring-with-local-blend":
                     raise ValueError("Unknown neckline placement method")
-                edge = np.array(neckline["patternEdgeM"], dtype=float)*scale
-                ring = np.array(neckline["axisAnchorGarmentCodeM"], dtype=float)*scale
+                edge = np.array(neckline["patternEdgeM"], dtype=float) * scale
+                ring = np.array(neckline["axisAnchorGarmentCodeM"], dtype=float) * scale
                 angles = np.array(neckline["edgeAnglesRadians"], dtype=float)
-                ring_radius = float(neckline["circumferenceM"])*scale/(2*math.pi)
-                blend_distance = float(neckline["blendDistanceM"])*scale
-                if edge.shape != (2,2) or ring.shape != (3,) or angles.shape != (2,) or not np.isfinite(np.concatenate((edge.ravel(),ring,angles,[ring_radius,blend_distance]))).all() or ring_radius <= 0 or blend_distance <= 0 or np.linalg.norm(edge[1]-edge[0]) <= 0:
+                ring_radius = float(neckline["circumferenceM"]) * scale / (2 * math.pi)
+                blend_distance = float(neckline["blendDistanceM"]) * scale
+                if (
+                    edge.shape != (2, 2)
+                    or ring.shape != (3,)
+                    or angles.shape != (2,)
+                    or not np.isfinite(
+                        np.concatenate(
+                            (edge.ravel(), ring, angles, [ring_radius, blend_distance])
+                        )
+                    ).all()
+                    or ring_radius <= 0
+                    or blend_distance <= 0
+                    or np.linalg.norm(edge[1] - edge[0]) <= 0
+                ):
                     raise ValueError("Invalid neckline ring specification")
             shoulder = torso.get("shoulderPlacement")
             if shoulder is not None:
                 if shoulder["method"] != "measured-shoulder-to-collar-edge":
                     raise ValueError("Unknown shoulder placement method")
-                shoulder_edge = np.array(shoulder["patternEdgeM"], dtype=float)*scale
-                shoulder_targets = np.array(shoulder["edgeTargetsGarmentCodeM"], dtype=float)*scale
-                shoulder_fade = float(shoulder["blendDistanceM"])*scale
-                if shoulder_edge.shape != (2,2) or shoulder_targets.shape != (2,3) or not np.isfinite(np.concatenate((shoulder_edge.ravel(), shoulder_targets.ravel(), [shoulder_fade]))).all() or shoulder_fade <= 0 or np.linalg.norm(shoulder_edge[1]-shoulder_edge[0]) <= 0:
-                    raise ValueError("Invalid measured shoulder placement specification")
+                shoulder_edge = np.array(shoulder["patternEdgeM"], dtype=float) * scale
+                shoulder_targets = (
+                    np.array(shoulder["edgeTargetsGarmentCodeM"], dtype=float) * scale
+                )
+                shoulder_fade = float(shoulder["blendDistanceM"]) * scale
+                if (
+                    shoulder_edge.shape != (2, 2)
+                    or shoulder_targets.shape != (2, 3)
+                    or not np.isfinite(
+                        np.concatenate(
+                            (
+                                shoulder_edge.ravel(),
+                                shoulder_targets.ravel(),
+                                [shoulder_fade],
+                            )
+                        )
+                    ).all()
+                    or shoulder_fade <= 0
+                    or np.linalg.norm(shoulder_edge[1] - shoulder_edge[0]) <= 0
+                ):
+                    raise ValueError(
+                        "Invalid measured shoulder placement specification"
+                    )
             armhole = torso.get("armholePlacement")
             if armhole is not None:
                 if armhole["method"] != "measured-radial-section-paired-armscye":
@@ -592,65 +775,141 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
                 for item in armhole["edges"]:
                     edge = np.array(item["patternEdgeM"], dtype=float)
                     targets = np.array(item["targetPolylineGarmentCodeM"], dtype=float)
-                    if edge.shape != (2, 2) or targets.ndim != 2 or targets.shape[1] != 3 or len(targets) < 2 or not np.isfinite(np.concatenate((edge.ravel(), targets.ravel()))).all() or np.linalg.norm(edge[1]-edge[0]) <= 0:
+                    if (
+                        edge.shape != (2, 2)
+                        or targets.ndim != 2
+                        or targets.shape[1] != 3
+                        or len(targets) < 2
+                        or not np.isfinite(
+                            np.concatenate((edge.ravel(), targets.ravel()))
+                        ).all()
+                        or np.linalg.norm(edge[1] - edge[0]) <= 0
+                    ):
                         raise ValueError("Invalid armhole curve")
-                if not np.allclose(armhole["edges"][0]["targetPolylineGarmentCodeM"][-1], armhole["edges"][1]["targetPolylineGarmentCodeM"][0], atol=1e-9):
+                if not np.allclose(
+                    armhole["edges"][0]["targetPolylineGarmentCodeM"][-1],
+                    armhole["edges"][1]["targetPolylineGarmentCodeM"][0],
+                    atol=1e-9,
+                ):
                     raise ValueError("Disconnected armhole curves")
-            def torso_transform(panel, vertex, anchor=anchor, profile=profile, side=side, depth=depth, neckline=neckline, shoulder=shoulder, armhole=armhole):
+
+            def torso_transform(
+                panel,
+                vertex,
+                anchor=anchor,
+                profile=profile,
+                side=side,
+                depth=depth,
+                neckline=neckline,
+                shoulder=shoulder,
+                armhole=armhole,
+            ):
                 x, y = vertex
-                width = np.interp(y, profile[:,0], profile[:,1])
-                radius = width*2/math.pi
-                angle = x/radius
-                result = anchor + np.array([side*radius*math.sin(angle), y, depth*radius*math.cos(angle)])
+                width = np.interp(y, profile[:, 0], profile[:, 1])
+                radius = width * 2 / math.pi
+                angle = x / radius
+                result = anchor + np.array(
+                    [
+                        side * radius * math.sin(angle),
+                        y,
+                        depth * radius * math.cos(angle),
+                    ]
+                )
                 if shoulder is not None:
-                    edge = np.array(shoulder["patternEdgeM"], dtype=float)*scale
-                    targets = np.array(shoulder["edgeTargetsGarmentCodeM"], dtype=float)*scale
-                    delta = edge[1]-edge[0]
-                    fraction = min(1, max(0, np.dot(np.array(vertex)-edge[0],delta)/np.dot(delta,delta)))
-                    distance = np.linalg.norm(np.array(vertex)-(edge[0]+fraction*delta))
-                    influence = max(0, 1-distance/(shoulder["blendDistanceM"]*scale))
-                    influence = influence*influence*(3-2*influence)
-                    target = targets[0]*(1-fraction)+targets[1]*fraction
-                    result = result*(1-influence)+target*influence
+                    edge = np.array(shoulder["patternEdgeM"], dtype=float) * scale
+                    targets = (
+                        np.array(shoulder["edgeTargetsGarmentCodeM"], dtype=float)
+                        * scale
+                    )
+                    delta = edge[1] - edge[0]
+                    fraction = min(
+                        1,
+                        max(
+                            0,
+                            np.dot(np.array(vertex) - edge[0], delta)
+                            / np.dot(delta, delta),
+                        ),
+                    )
+                    distance = np.linalg.norm(
+                        np.array(vertex) - (edge[0] + fraction * delta)
+                    )
+                    influence = max(
+                        0, 1 - distance / (shoulder["blendDistanceM"] * scale)
+                    )
+                    influence = influence * influence * (3 - 2 * influence)
+                    target = targets[0] * (1 - fraction) + targets[1] * fraction
+                    result = result * (1 - influence) + target * influence
                 if neckline is not None:
                     # Bind captured per-panel data; closures must not reuse
                     # another quarter's edge or ring during sewn averaging.
-                    edge = np.array(neckline["patternEdgeM"])*scale
-                    ring = np.array(neckline["axisAnchorGarmentCodeM"])*scale
-                    delta = edge[1]-edge[0]
-                    fraction = min(1, max(0, np.dot(np.array(vertex)-edge[0],delta)/np.dot(delta,delta)))
-                    nearest = edge[0]+fraction*delta
-                    distance = np.linalg.norm(np.array(vertex)-nearest)
-                    blend = max(0, 1-distance/(neckline["blendDistanceM"]*scale))
-                    angle = np.interp(fraction,[0,1],neckline["edgeAnglesRadians"])
-                    radius = neckline["circumferenceM"]*scale/(2*math.pi)
-                    target = ring+np.array([radius*math.sin(angle),0,radius*math.cos(angle)])
-                    result = result*(1-blend)+target*blend
+                    edge = np.array(neckline["patternEdgeM"]) * scale
+                    ring = np.array(neckline["axisAnchorGarmentCodeM"]) * scale
+                    delta = edge[1] - edge[0]
+                    fraction = min(
+                        1,
+                        max(
+                            0,
+                            np.dot(np.array(vertex) - edge[0], delta)
+                            / np.dot(delta, delta),
+                        ),
+                    )
+                    nearest = edge[0] + fraction * delta
+                    distance = np.linalg.norm(np.array(vertex) - nearest)
+                    blend = max(0, 1 - distance / (neckline["blendDistanceM"] * scale))
+                    angle = np.interp(fraction, [0, 1], neckline["edgeAnglesRadians"])
+                    radius = neckline["circumferenceM"] * scale / (2 * math.pi)
+                    target = ring + np.array(
+                        [radius * math.sin(angle), 0, radius * math.cos(angle)]
+                    )
+                    result = result * (1 - blend) + target * blend
                 if armhole is not None:
                     candidates = []
                     for item in armhole["edges"]:
-                        edge = np.array(item["patternEdgeM"])*scale
-                        targets = np.array(item["targetPolylineGarmentCodeM"])*scale
-                        delta = edge[1]-edge[0]
-                        fraction = min(1, max(0, np.dot(np.array(vertex)-edge[0],delta)/np.dot(delta,delta)))
-                        distance = np.linalg.norm(np.array(vertex)-(edge[0]+fraction*delta))
-                        position = fraction*(len(targets)-1)
-                        index = min(len(targets)-2, int(position))
-                        mix = position-index
-                        target = targets[index]*(1-mix)+targets[index+1]*mix
+                        edge = np.array(item["patternEdgeM"]) * scale
+                        targets = np.array(item["targetPolylineGarmentCodeM"]) * scale
+                        delta = edge[1] - edge[0]
+                        fraction = min(
+                            1,
+                            max(
+                                0,
+                                np.dot(np.array(vertex) - edge[0], delta)
+                                / np.dot(delta, delta),
+                            ),
+                        )
+                        distance = np.linalg.norm(
+                            np.array(vertex) - (edge[0] + fraction * delta)
+                        )
+                        position = fraction * (len(targets) - 1)
+                        index = min(len(targets) - 2, int(position))
+                        mix = position - index
+                        target = targets[index] * (1 - mix) + targets[index + 1] * mix
                         candidates.append((distance, target))
                     distance, target = min(candidates, key=lambda row: row[0])
-                    weight = max(0, 1-distance/(armhole["blendDistanceM"]*scale))
-                    weight = weight*weight*(3-2*weight)
-                    result = result*(1-weight)+target*weight
+                    weight = max(0, 1 - distance / (armhole["blendDistanceM"] * scale))
+                    weight = weight * weight * (3 - 2 * weight)
+                    result = result * (1 - weight) + target * weight
                 return result
+
             panel = mesh.panels[name]
             panel.rot_trans_vertex = MethodType(torso_transform, panel)
-            panel.rot_trans_panel = MethodType(lambda panel, vertices: np.array([panel.rot_trans_vertex(v) for v in vertices]), panel)
+            panel.rot_trans_panel = MethodType(
+                lambda panel, vertices: np.array(
+                    [panel.rot_trans_vertex(v) for v in vertices]
+                ),
+                panel,
+            )
             panel.image2outfit_cylindrical = True
             # Outward winding differs for each quadrant.
-            panel.image2outfit_reverse_winding = side*depth < 0
-            records.append({"panel":name,"specification":torso,"vertexCount":len(panel.panel_vertices),"changes2dRestLengths":False,"grantsFitAcceptance":False})
+            panel.image2outfit_reverse_winding = side * depth < 0
+            records.append(
+                {
+                    "panel": name,
+                    "specification": torso,
+                    "vertexCount": len(panel.panel_vertices),
+                    "changes2dRestLengths": False,
+                    "grantsFitAcceptance": False,
+                }
+            )
             continue
         spec = source.get("image2outfitCylindricalWrap")
         if spec is None:
@@ -664,97 +923,177 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
         cap = float(spec["capLocalYM"]) * scale
         base = float(spec["tubeBaseLocalYM"]) * scale
         cuff = float(spec["cuffLocalYM"]) * scale
-        cap_depth = float(spec.get("capAxisDepthM", spec["capLocalYM"] - spec["tubeBaseLocalYM"])) * scale
+        cap_depth = (
+            float(
+                spec.get("capAxisDepthM", spec["capLocalYM"] - spec["tubeBaseLocalYM"])
+            )
+            * scale
+        )
         cuff_bounds = np.array(spec["cuffBoundsXM"], dtype=float) * scale
         base_bounds = np.array(spec["tubeBaseBoundsXM"], dtype=float) * scale
-        if not np.isfinite(np.concatenate((anchor, cuff_bounds, base_bounds, [cap, base, cuff]))).all():
+        if not np.isfinite(
+            np.concatenate((anchor, cuff_bounds, base_bounds, [cap, base, cuff]))
+        ).all():
             raise ValueError("Nonfinite cylindrical placement")
-        if not cap > base > cuff or not cuff_bounds[1] > cuff_bounds[0] or not base_bounds[1] > base_bounds[0]:
+        if (
+            not cap > base > cuff
+            or not cuff_bounds[1] > cuff_bounds[0]
+            or not base_bounds[1] > base_bounds[0]
+        ):
             raise ValueError("Invalid sleeve cylinder bounds")
-        if not math.isfinite(cap_depth) or not 0 < cap_depth <= cap-base:
+        if not math.isfinite(cap_depth) or not 0 < cap_depth <= cap - base:
             raise ValueError("Invalid sleeve cap axial depth")
-        cuff_axis = float(spec.get("cuffAxisDistanceM", spec["capLocalYM"]-spec["cuffLocalYM"])) * scale
+        cuff_axis = (
+            float(
+                spec.get("cuffAxisDistanceM", spec["capLocalYM"] - spec["cuffLocalYM"])
+            )
+            * scale
+        )
         if not math.isfinite(cuff_axis) or cuff_axis <= cap_depth:
             raise ValueError("Invalid explicit sleeve cuff distance")
-        orientation = spec.get("circumferenceOrientation", "apex-anterior-seam-posterior")
-        if orientation not in {"apex-anterior-seam-posterior", "apex-superior-seam-inferior-front-anterior"}:
+        orientation = spec.get(
+            "circumferenceOrientation", "apex-anterior-seam-posterior"
+        )
+        if orientation not in {
+            "apex-anterior-seam-posterior",
+            "apex-superior-seam-inferior-front-anterior",
+        }:
             raise ValueError("Unknown sleeve circumference orientation")
         apex_up = orientation == "apex-superior-seam-inferior-front-anterior"
         width_profile = None
         if "tubeWidthBoundsProfileM" in spec:
-            width_profile = np.array(spec["tubeWidthBoundsProfileM"], dtype=float) * scale
-            if (width_profile.ndim != 2 or width_profile.shape[1] != 3
-                    or len(width_profile) < 2 or not np.isfinite(width_profile).all()
-                    or not np.all(np.diff(width_profile[:, 0]) > 0)
-                    or not np.all(width_profile[:, 2] > width_profile[:, 1])
-                    or not np.allclose(width_profile[0], [cuff, *cuff_bounds], rtol=0, atol=1e-8*scale)
-                    or not np.allclose(width_profile[-1], [base, *base_bounds], rtol=0, atol=1e-8*scale)):
+            width_profile = (
+                np.array(spec["tubeWidthBoundsProfileM"], dtype=float) * scale
+            )
+            if (
+                width_profile.ndim != 2
+                or width_profile.shape[1] != 3
+                or len(width_profile) < 2
+                or not np.isfinite(width_profile).all()
+                or not np.all(np.diff(width_profile[:, 0]) > 0)
+                or not np.all(width_profile[:, 2] > width_profile[:, 1])
+                or not np.allclose(
+                    width_profile[0], [cuff, *cuff_bounds], rtol=0, atol=1e-8 * scale
+                )
+                or not np.allclose(
+                    width_profile[-1], [base, *base_bounds], rtol=0, atol=1e-8 * scale
+                )
+            ):
                 raise ValueError("Invalid explicit sleeve tube width profile")
         contour_rings = None
         if "tubeContourPlacement" in spec:
             contour_spec = spec["tubeContourPlacement"]
-            if (contour_spec["method"] != "measured-neutral-arclength-rings"
-                    or not apex_up or width_profile is None):
+            if (
+                contour_spec["method"] != "measured-neutral-arclength-rings"
+                or not apex_up
+                or width_profile is None
+            ):
                 raise ValueError("Incompatible sleeve contour placement")
             contour_rings = []
             for entry in contour_spec["rings"]:
                 local_y = float(entry["localYM"]) * scale
                 points = np.array(entry["supportGarmentCodeM"], dtype=float) * scale
-                if (points.ndim != 2 or points.shape[1] != 3 or len(points) < 4
-                        or not np.isfinite(points).all() or not math.isfinite(local_y)
-                        or not np.allclose(points[0], points[-1], rtol=0, atol=1e-8*scale)):
+                if (
+                    points.ndim != 2
+                    or points.shape[1] != 3
+                    or len(points) < 4
+                    or not np.isfinite(points).all()
+                    or not math.isfinite(local_y)
+                    or not np.allclose(points[0], points[-1], rtol=0, atol=1e-8 * scale)
+                ):
                     raise ValueError("Invalid closed sleeve support ring")
                 lengths = np.linalg.norm(np.diff(points, axis=0), axis=1)
-                if not np.all(lengths > 1e-8*scale):
+                if not np.all(lengths > 1e-8 * scale):
                     raise ValueError("Collapsed sleeve support ring segment")
                 parameter = np.concatenate(([0.0], np.cumsum(lengths)))
                 parameter /= parameter[-1]
                 contour_rings.append((local_y, parameter, points))
-            if (len(contour_rings) < 2
-                    or any(b[0] <= a[0] for a, b in zip(contour_rings, contour_rings[1:]))
-                    or abs(contour_rings[0][0]-cuff) > 1e-8*scale
-                    or abs(contour_rings[-1][0]-base) > 1e-8*scale):
+            if (
+                len(contour_rings) < 2
+                or any(b[0] <= a[0] for a, b in zip(contour_rings, contour_rings[1:]))
+                or abs(contour_rings[0][0] - cuff) > 1e-8 * scale
+                or abs(contour_rings[-1][0] - base) > 1e-8 * scale
+            ):
                 raise ValueError("Sleeve contours must span ordered cuff-to-base rows")
 
-        def transform(panel, vertex, anchor=anchor, cap=cap, base=base,
-                      cuff=cuff, cb=cuff_bounds, bb=base_bounds, sign=sign, cap_depth=cap_depth, cuff_axis=cuff_axis, apex_up=apex_up, width_profile=width_profile, contour_rings=contour_rings):
+        def transform(
+            panel,
+            vertex,
+            anchor=anchor,
+            cap=cap,
+            base=base,
+            cuff=cuff,
+            cb=cuff_bounds,
+            bb=base_bounds,
+            sign=sign,
+            cap_depth=cap_depth,
+            cuff_axis=cuff_axis,
+            apex_up=apex_up,
+            width_profile=width_profile,
+            contour_rings=contour_rings,
+        ):
             x, y = vertex
-            t = min(1.0, max(0.0, (y-cuff)/(base-cuff)))
-            lo, hi = cb * (1-t) + bb * t
+            t = min(1.0, max(0.0, (y - cuff) / (base - cuff)))
+            lo, hi = cb * (1 - t) + bb * t
             if width_profile is not None:
                 lo = np.interp(y, width_profile[:, 0], width_profile[:, 1])
                 hi = np.interp(y, width_profile[:, 0], width_profile[:, 2])
-            circumference = hi-lo
-            angle = 2 * math.pi * (x-lo)/circumference - math.pi
+            circumference = hi - lo
+            angle = 2 * math.pi * (x - lo) / circumference - math.pi
             if apex_up:
                 # GC Y is Blender Z, GC +Z is Blender anterior (-Y).
                 # The cap midpoint is superior; positive local X cap edges
                 # run anterior and both tube boundary edges meet inferiorly.
-                angle = math.pi/2 - angle
-            radius = circumference/(2*math.pi)
+                angle = math.pi / 2 - angle
+            radius = circumference / (2 * math.pi)
             # Cap height in the flat pattern is not its depth along the arm.
             # Compress the cap in 3D while retaining the shoulder anchor,
             # full tube circumference, cuff position and all 2D rest lengths.
-            axial = (cap-y)*cap_depth/(cap-base) if y >= base else cap_depth + (base-y)/(base-cuff)*(cuff_axis-cap_depth)
+            axial = (
+                (cap - y) * cap_depth / (cap - base)
+                if y >= base
+                else cap_depth + (base - y) / (base - cuff) * (cuff_axis - cap_depth)
+            )
             if contour_rings is not None and y <= base:
-                u = min(1.0, max(0.0, (x-lo)/circumference))
+                u = min(1.0, max(0.0, (x - lo) / circumference))
                 lower = 0
-                while lower < len(contour_rings)-2 and y > contour_rings[lower+1][0]:
+                while (
+                    lower < len(contour_rings) - 2 and y > contour_rings[lower + 1][0]
+                ):
                     lower += 1
                 low_y, low_u, low_points = contour_rings[lower]
-                high_y, high_u, high_points = contour_rings[lower+1]
-                blend = min(1.0, max(0.0, (y-low_y)/(high_y-low_y)))
-                low_point = np.array([np.interp(u, low_u, low_points[:, k]) for k in range(3)])
-                high_point = np.array([np.interp(u, high_u, high_points[:, k]) for k in range(3)])
-                return low_point*(1-blend) + high_point*blend
-            return anchor + np.array([sign*axial, radius*math.sin(angle), radius*math.cos(angle)])
+                high_y, high_u, high_points = contour_rings[lower + 1]
+                blend = min(1.0, max(0.0, (y - low_y) / (high_y - low_y)))
+                low_point = np.array(
+                    [np.interp(u, low_u, low_points[:, k]) for k in range(3)]
+                )
+                high_point = np.array(
+                    [np.interp(u, high_u, high_points[:, k]) for k in range(3)]
+                )
+                return low_point * (1 - blend) + high_point * blend
+            return anchor + np.array(
+                [sign * axial, radius * math.sin(angle), radius * math.cos(angle)]
+            )
 
         panel = mesh.panels[name]
         panel.rot_trans_vertex = MethodType(transform, panel)
-        panel.rot_trans_panel = MethodType(lambda panel, vertices: np.array([panel.rot_trans_vertex(v) for v in vertices]), panel)
+        panel.rot_trans_panel = MethodType(
+            lambda panel, vertices: np.array(
+                [panel.rot_trans_vertex(v) for v in vertices]
+            ),
+            panel,
+        )
         panel.image2outfit_cylindrical = True
         panel.image2outfit_reverse_winding = (sign > 0) if apex_up else (sign < 0)
-        records.append({"panel": name, "specification": spec, "vertexCount": len(panel.panel_vertices), "changes2dRestLengths": False, "grantsFitAcceptance": False})
+        records.append(
+            {
+                "panel": name,
+                "specification": spec,
+                "vertexCount": len(panel.panel_vertices),
+                "changes2dRestLengths": False,
+                "grantsFitAcceptance": False,
+            }
+        )
     # Resolve paired armholes only after every torso transform is installed.
     for name, source in pattern["panels"].items():
         cap_spec = source.get("image2outfitCylindricalWrap", {}).get("sewnCapPlacement")
@@ -762,38 +1101,65 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
             continue
         if cap_spec["method"] != "follow-paired-torso-armhole-placement":
             raise ValueError("Unknown sewn cap placement method")
-        fade = float(cap_spec["blendDistanceM"])*scale
+        fade = float(cap_spec["blendDistanceM"]) * scale
         if not math.isfinite(fade) or fade <= 0 or len(cap_spec["edges"]) != 4:
             raise ValueError("Invalid sewn cap blend specification")
         bindings = []
         for entry in cap_spec["edges"]:
-            edge = np.array(entry["patternEdgeM"], dtype=float)*scale
-            target = np.array(entry["targetPatternEdgeM"], dtype=float)*scale
+            edge = np.array(entry["patternEdgeM"], dtype=float) * scale
+            target = np.array(entry["targetPatternEdgeM"], dtype=float) * scale
             key = entry["targetPanelKey"]
-            if key not in mesh.panels or pattern["panels"][key].get("image2outfitTorsoWrap") is None:
+            if (
+                key not in mesh.panels
+                or pattern["panels"][key].get("image2outfitTorsoWrap") is None
+            ):
                 raise ValueError("Sewn cap target has no torso transform")
-            if edge.shape != (2,2) or target.shape != (2,2) or not np.isfinite(np.concatenate((edge.ravel(),target.ravel()))).all() or np.linalg.norm(edge[1]-edge[0]) <= 0:
+            if (
+                edge.shape != (2, 2)
+                or target.shape != (2, 2)
+                or not np.isfinite(np.concatenate((edge.ravel(), target.ravel()))).all()
+                or np.linalg.norm(edge[1] - edge[0]) <= 0
+            ):
                 raise ValueError("Invalid sewn cap edge binding")
             bindings.append((edge, target, mesh.panels[key]))
         panel = mesh.panels[name]
         original_transform = panel.rot_trans_vertex
-        def cap_transform(panel, vertex, original=original_transform, bindings=bindings, fade=fade):
+
+        def cap_transform(
+            panel, vertex, original=original_transform, bindings=bindings, fade=fade
+        ):
             result = original(vertex)
             candidates = []
             for edge, target, torso_panel in bindings:
-                delta = edge[1]-edge[0]
-                fraction = min(1, max(0, np.dot(np.array(vertex)-edge[0],delta)/np.dot(delta,delta)))
-                distance = np.linalg.norm(np.array(vertex)-(edge[0]+fraction*delta))
-                paired = target[0]*(1-fraction)+target[1]*fraction
+                delta = edge[1] - edge[0]
+                fraction = min(
+                    1,
+                    max(
+                        0,
+                        np.dot(np.array(vertex) - edge[0], delta)
+                        / np.dot(delta, delta),
+                    ),
+                )
+                distance = np.linalg.norm(
+                    np.array(vertex) - (edge[0] + fraction * delta)
+                )
+                paired = target[0] * (1 - fraction) + target[1] * fraction
                 candidates.append((distance, torso_panel.rot_trans_vertex(paired)))
             distance, target = min(candidates, key=lambda row: row[0])
-            weight = max(0, 1-distance/fade)
-            weight = weight*weight*(3-2*weight)
-            return result*(1-weight)+target*weight
+            weight = max(0, 1 - distance / fade)
+            weight = weight * weight * (3 - 2 * weight)
+            return result * (1 - weight) + target * weight
+
         panel.rot_trans_vertex = MethodType(cap_transform, panel)
-        panel.rot_trans_panel = MethodType(lambda panel, vertices: np.array([panel.rot_trans_vertex(v) for v in vertices]), panel)
+        panel.rot_trans_panel = MethodType(
+            lambda panel, vertices: np.array(
+                [panel.rot_trans_vertex(v) for v in vertices]
+            ),
+            panel,
+        )
     if records:
         original_order = mesh._order_face_vertices
+
         def order(panel, vertices):
             if not getattr(panel, "image2outfit_cylindrical", False):
                 return original_order(panel, vertices)
@@ -801,9 +1167,10 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
             # 2D winding rather than comparing them against the old flat normal.
             for face in panel.panel_faces:
                 a, b, c = [np.array(panel.panel_vertices[i]) for i in face]
-                cross = (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
+                cross = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
                 if (cross < 0) != getattr(panel, "image2outfit_reverse_winding", False):
                     face[1], face[2] = face[2], face[1]
+
         mesh._order_face_vertices = order
     return records
 
@@ -842,9 +1209,7 @@ def main() -> int:
         pattern = input_data.get("pattern")
         parameters = input_data.get("parameters")
         adapter = (
-            parameters.get("image2outfit")
-            if isinstance(parameters, dict)
-            else None
+            parameters.get("image2outfit") if isinstance(parameters, dict) else None
         )
         if not isinstance(pattern, dict) or not isinstance(adapter, dict):
             raise ValueError("BoxMesh input is missing the pattern or adapter metadata")
@@ -857,8 +1222,7 @@ def main() -> int:
             or not isinstance(raw_panel_key_map, dict)
             or set(pattern_panels) - set(raw_panel_key_map)
             or any(
-                not isinstance(panel_key, str)
-                or not isinstance(piece_id, str)
+                not isinstance(panel_key, str) or not isinstance(piece_id, str)
                 for panel_key, piece_id in raw_panel_key_map.items()
             )
         ):
@@ -867,7 +1231,9 @@ def main() -> int:
         mesh = BoxMesh(str(input_path), res=1.0)
         mesh.load_panels()
         mesh.gen_panel_meshes()
-        payload["cylindricalPlacement"] = _initialize_cylindrical_panels(mesh, pattern, input_data["properties"]["units_in_meter"])
+        payload["cylindricalPlacement"] = _initialize_cylindrical_panels(
+            mesh, pattern, input_data["properties"]["units_in_meter"]
+        )
         same_panel = mesh._stitch_vertices()
         _valid, invalid_indices = mesh._is_stitching_valid(same_panel)
         diagnostics = _stitch_diagnostics(mesh, stitch_ids, same_panel)
@@ -939,12 +1305,24 @@ def main() -> int:
         if not isinstance(scale, (int, float)) or scale <= 0:
             raise ValueError("Sewn mesh has no declared unit scale")
         exchange = {
-            "schemaVersion": 1, "productId": adapter["productId"], "units": "meter",
+            "schemaVersion": 1,
+            "productId": adapter["productId"],
+            "units": "meter",
             "coordinateSystem": "blender-z-up",
-            "canonicalInputs": {"patternSha256": adapter["patternContractSha256"],
-                                "stitchGraphSha256": adapter["stitchGraphSha256"]},
-            "inputSha256": sha256(input_path), "upstreamRevision": args.upstream_revision,
-            "vertices": [[float(vertex[0]) / scale, -float(vertex[2]) / scale, float(vertex[1]) / scale] for vertex in mesh.vertices],
+            "canonicalInputs": {
+                "patternSha256": adapter["patternContractSha256"],
+                "stitchGraphSha256": adapter["stitchGraphSha256"],
+            },
+            "inputSha256": sha256(input_path),
+            "upstreamRevision": args.upstream_revision,
+            "vertices": [
+                [
+                    float(vertex[0]) / scale,
+                    -float(vertex[2]) / scale,
+                    float(vertex[1]) / scale,
+                ]
+                for vertex in mesh.vertices
+            ],
             "faces": [[int(v) for v in face] for face in mesh.faces],
             "facePieceIds": topology["facePieceIds"],
             "topology": topology,
@@ -952,7 +1330,9 @@ def main() -> int:
         write_json(args.mesh_output.resolve(), exchange)
         payload["meshExchangePath"] = str(args.mesh_output.resolve())
         payload["meshExchangeSha256"] = sha256(args.mesh_output.resolve())
-        payload["meshExchangeBoundary"] = "Local unfit sewn surface; no product acceptance implied"
+        payload["meshExchangeBoundary"] = (
+            "Local unfit sewn surface; no product acceptance implied"
+        )
     write_json(output_path, payload)
     print(json.dumps(payload, ensure_ascii=False))
     return 0 if payload["status"] == "PASS" else 2 if payload["status"] == "FAIL" else 1

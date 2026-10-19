@@ -113,7 +113,9 @@ def main():
         diagrams = [("topology", topology, "Garment topology - front projection")]
         if uvlines:
             diagrams.append(("uv", uvlines, "Active UV layout - unit tile"))
-        report["uvStatus"] = "PRESENT_UNVERIFIED" if complete_uv_coverage and uvlines else "MISSING"
+        report["uvStatus"] = (
+            "PRESENT_UNVERIFIED" if complete_uv_coverage and uvlines else "MISSING"
+        )
         for name, lines, title in diagrams:
             path = out / f"{name}.svg"
             path.write_text(svg(lines, title), encoding="utf-8")
