@@ -9633,7 +9633,25 @@
     "foldCount": 8,
     "hemFoldDepthM": 0.006,
     "phaseRadians": 0,
-    "evidenceBoundary": "V21 trials the new center lap and flank sewn panel architecture using the existing overall hem and pleat parameters unchanged; no extra front-only length or forward projection is applied. All geometry remains unapproved pending pose and visual review.",
+    "forwardApron": {
+      "method": "front-panel-forward-scoop-v2",
+      "pieceIds": [
+        "overskirt-front-left",
+        "overskirt-front-right",
+        "overskirt-front-lap-left",
+        "overskirt-front-lap-right"
+      ],
+      "additionalExtensionM": 0.08,
+      "forwardProjectionM": 0.025,
+      "fullExtensionHalfAngleRadians": 0.55,
+      "zeroExtensionHalfAngleRadians": 1.25,
+      "axisOriginBlenderXYM": [
+        0,
+        -0.03788188099861145
+      ],
+      "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 25 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
+    },
+    "evidenceBoundary": "V23 retains the V22 sewn center-lap and flank panels and existing overall 100 mm hem extension, then adds a bounded front-only apron extension/projection to target the directly observed sit/crouch coverage failure. Geometry remains unapproved pending pose and visual review.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
