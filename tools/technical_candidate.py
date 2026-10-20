@@ -83,7 +83,9 @@ def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
     handoff = manifest.get("handoff")
     resume_from = handoff.get("resumeFrom") if isinstance(handoff, dict) else None
     if not isinstance(resume_from, str) or not resume_from:
-        raise ValueError("ProductManifest.handoff.resumeFrom is required for the sewn mesh")
+        raise ValueError(
+            "ProductManifest.handoff.resumeFrom is required for the sewn mesh"
+        )
     # The canonical product workline may be versioned (for example,
     # pipeline-v21d-state.json). Resolve it from ProductManifest instead of
     # assuming the obsolete pipeline-state.json filename.
@@ -152,14 +154,18 @@ def pipeline_skin_export_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
     handoff = manifest.get("handoff")
     resume_from = handoff.get("resumeFrom") if isinstance(handoff, dict) else None
     if not isinstance(resume_from, str) or not resume_from:
-        raise ValueError("ProductManifest.handoff.resumeFrom is required for the skin export")
+        raise ValueError(
+            "ProductManifest.handoff.resumeFrom is required for the skin export"
+        )
     state = candidate_contract.read(candidate_contract.path(resume_from))
     if (
         state.get("product_id") != job.get("id")
         or state.get("status") != "EXECUTED"
         or state.get("revision_id") != job.get("buildRevision")
     ):
-        raise ValueError("current executed product checkpoint is required for the skin export")
+        raise ValueError(
+            "current executed product checkpoint is required for the skin export"
+        )
 
     records = state.get("stage_records")
     skin_record = next(
@@ -187,7 +193,9 @@ def pipeline_skin_export_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
     if report_item is None:
         raise ValueError("skin-and-export stage has no report evidence")
     report_path = candidate_contract.path(report_item["path"])
-    if not report_path.is_file() or candidate_contract.digest(report_path) != report_item.get("sha256"):
+    if not report_path.is_file() or candidate_contract.digest(
+        report_path
+    ) != report_item.get("sha256"):
         raise ValueError("skin export report is stale against its checkpoint")
     report = candidate_contract.read(report_path)
 
@@ -209,16 +217,26 @@ def pipeline_skin_export_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
         or report.get("constructionSha256") != expected_construction
         or report.get("targetSourceSha256") != expected_target
         or not weighted_blend.is_file()
-        or candidate_contract.digest(weighted_blend) != report.get("weightedBlendSha256")
+        or candidate_contract.digest(weighted_blend)
+        != report.get("weightedBlendSha256")
         or not fbx.is_file()
         or candidate_contract.digest(fbx) != report.get("fbxSha256")
         or report.get("unweightedVertices") != 0
         or not isinstance(audits, dict)
         or not audits
-        or any(not isinstance(audit, dict) or audit.get("passed") is not True for audit in audits.values())
+        or any(
+            not isinstance(audit, dict) or audit.get("passed") is not True
+            for audit in audits.values()
+        )
     ):
-        raise ValueError("skin export is stale, unweighted, or bound to different inputs")
-    return weighted_blend, str(report.get("weightedBlendSha256")), int(skin_record.get("sequence", 0))
+        raise ValueError(
+            "skin export is stale, unweighted, or bound to different inputs"
+        )
+    return (
+        weighted_blend,
+        str(report.get("weightedBlendSha256")),
+        int(skin_record.get("sequence", 0)),
+    )
 
 
 def run_hosted_pose_render(

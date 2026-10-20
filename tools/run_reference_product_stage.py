@@ -2356,7 +2356,11 @@ def stage_finalize(
             )
             if gate_name in gates and isinstance(corrected_value, str):
                 if corrected_value not in {
-                    "PASS", "FAIL", "PENDING", "UNVERIFIED", "OUT_OF_SCOPE"
+                    "PASS",
+                    "FAIL",
+                    "PENDING",
+                    "UNVERIFIED",
+                    "OUT_OF_SCOPE",
                 }:
                     raise ValueError(
                         f"unknown corrected completion gate state: {key}={corrected_value}"
