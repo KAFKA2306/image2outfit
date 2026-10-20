@@ -121,6 +121,10 @@ tasks:
     desc: Show the selected construction method and required evidence.
     requires:
       vars: [PRODUCT]
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
