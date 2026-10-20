@@ -2,51 +2,51 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
-  "reviewedRevision": "v23-front-apron-coverage-trial-20261020",
+  "reviewedRevision": "v24-forward-lap-follow-trial-20261020",
   "reviewer": "chatgpt:direct-render-image-inspection",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "ed4f718ab08caf24cd5a176f6c422a7ef1decd2da2d9d788f9eea08379e9d9a8",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "055fbda9e0f80a646dc6068f08542c906b38688e669086bd075308c9410d9e9d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "df0c2f8f740ecd902aafb593b5c17f4346498019729919d6ea4a816990fec6a8",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "b090d4b286e4592e8d96a7b94b692906dec1a083987c1508667c38ce51a2e5ab",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "58178dff24bc98d23e83138d5e60f71dec37a60f25ad4dfd02004d12ae84f8fa",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "98a7acc8076ad74ab5a1504dd2eec7dcafec12bc6b00ca76fd571f8156a12822",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "a344b9c9d6abdc08a96e221128b2e1c368421e692be0a1f66d4ac0a00b4a4df7",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "42cf3cae0ec022687efd33ebf7c3948563238ba2359f8425eaced9830065745a",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "e37d100a75ddf335655debb62ca8ab49ff085e5b63f78f40624920add4db4431",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "b10b94456dc11c1fc2501d65fe4deed8f4a80a7a18032c34a58ec8e7f965d790",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "39cf4de5c91e8eeedeed6e6f051f543d2612fce334f7f5db8f873435792b55b1"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "6b8e8d56442290356593bdfdd85798940e00bd4b1fcd0946193a12ab92ab3cd6",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "411746a0887239385bbb7bc43ce0831f319f600431d9127d19910a9c58832d1c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "b6e0d83dce9f0d6daf7ff5ec676928bf3000fe1687c8f6a240ba06ec81c5f7ae",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "367c298497ba8360ec8caab036b46fbbfa97af73417286a60800229d5ffcfe35",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "998b6a2fcb003a7e4a459ca196172c11c6e4a8122457a26c84c72a79dd396721",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "0972fedb5c3c6a276eb19e648330ba3c5f3e78ac8fb3cedcf26757d726b39c11",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "afb18c03e7a13f1c173a626915688db51024f8746e9486db1e478d047cf86ffd",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "780f2409e10b98e7c2c98f073ced16d862bd3fa7dfabc68bcaad6148a746e032",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "f65bfed254160b2e0c9e2c08310af85976cf2e6d2a6b5fdcd665bb03a58e484a",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "87f055b0073ff427b8ec4dc698f6c6156a106d16e190a96bf9aa4da6a434f443",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "af0ef1ca3f3c3fe8716f03ed3d1eed60f366e76805d0ed1ff28062c14bf228ea"
   },
   "findings": [
     {
       "severity": "BLOCKER",
       "code": "SKIRT_POSE_COVERAGE",
-      "description": "Direct V23 sit view still exposes both fitted shorts and substantial upper thighs: the extended front apron falls behind the seated thighs instead of remaining across them. The crouch view covers more but shows the lap panels lifting off the bent legs. The bounded 80 mm extension and 25 mm projection did not resolve coverage."
+      "description": "Direct V24 inspection of all five views and six poses shows the extended front apron still breaks across the seated lap: both fitted shorts and substantial upper-thigh areas remain visible in sit, and the crouch lap panels lift off the bent thighs. The V24 forwardHemThighWeight increase from 0.18 to 0.72 did not improve measured upper-thigh overskirt coverage: sit is 35.9% left / 35.5% right (V23: 37.6% / 36.8%), and crouch is 47.0% / 45.9%. Do not infer fit acceptance from this ray-coverage diagnostic."
     },
     {
       "severity": "BLOCKER",
       "code": "SKIRT_FORM_AND_FACETING",
-      "description": "V23 front, side and rear views still show irregular planar corrugation, pinched folds and a lumpy side/rear mass rather than controlled skirt pleats."
+      "description": "V24 front, side, and rear renders retain irregular planar corrugation, pinched folds, and lumpy side/rear mass instead of deliberate continuous pleats."
     },
     {
       "severity": "BLOCKER",
       "code": "REAR_TAB_LEGIBILITY",
-      "description": "Direct back view still does not make the waist adjustment tab or buckle identifiable."
+      "description": "Direct V24 back view still does not make the waist adjustment tab or buckle identifiable against the jacket and skirt."
     },
     {
       "severity": "BLOCKER",
       "code": "UV_NOT_CREATED",
-      "description": "The V23 mesh showcase continues to record authored UV status MISSING; a topology illustration is not a UV layout."
+      "description": "The V24 source-bound mesh showcase records authored UV status MISSING. The topology SVG is not a UV layout."
     }
   ],
   "sourceEvidence": {
-    "currentPrototypeMotif": "V23 adds a front-only skirt apron extension and projection. Direct inspection of all five views and six poses shows that the sit pose still exposes the fitted shorts and substantial upper thighs; crouch coverage improves only partially, while skirt faceting and unreadable rear hardware remain. Authored UVs are still absent.",
+    "currentPrototypeMotif": "V24 changes only the forward lap-follow weight from 0.18 to 0.72 while keeping the V23 apron geometry, centerline balance, waist anchoring, and 0.75 cap. Direct review of the new five-view/six-pose renders and bound pose diagnostic finds the lap still discontinuous over seated and crouched thighs; measured overskirt coverage did not improve. Skirt faceting and unreadable rear adjustment hardware persist.",
     "uvMappingStatus": "NOT_CREATED",
     "fitAcceptance": "UNVERIFIED",
     "runtimeAcceptance": "UNVERIFIED",
     "releaseAcceptance": "BLOCKED"
   },
-  "nextAction": "REJECT. Replace the skirt panel/attachment or deformation approach so the front layer remains over the thighs during sit and crouch; revise the cloth/fold construction to remove faceting; make the rear adjustment tab and buckle legible from the back; author and verify real UVs on the current garment source. Rebuild as a new revision and directly inspect all five views and six poses. Fit, Shape Keys, Unity/VRChat runtime, package, and release remain unverified or blocked."
+  "nextAction": "REJECT. Discard the V24 stronger-thigh-follow hypothesis; do not add more apron length or forward thigh weight. Replace the front-lap panel attachment/deformation approach with a continuous, overlapping panel that stays above both raised thighs in sit and crouch, then address controlled skirt folds and a legible rear tab/buckle. Author and verify real UVs on the current source. Rebuild as a new revision and directly inspect all five views and six poses. Fit, Shape Keys, Unity/VRChat runtime, package, and release remain unverified or blocked."
 }
