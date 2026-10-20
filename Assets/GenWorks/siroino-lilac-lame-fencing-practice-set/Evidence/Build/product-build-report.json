@@ -19935,8 +19935,44 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "57f8056537ada0b487b778d740cf5c5187668da6c978362529038759b1bd09b0",
+  "sourceBlendSha256": "693567bb8f47dd20d1a690f0422385452bfd8eb356417d0e4753803b1a5420a8",
   "sewnMeshSha256": "9bc990e6ec861580b2356bac9383b426d6c1c19a969eb04246d8aec62f5bb498",
+  "microdegenerateTriangleCleanup": {
+    "method": "weld-closest-vertex-pair-on-subpixel-triangle",
+    "candidateDegenerateCrossProductSquaredThreshold": 1e-20,
+    "maximumWeldDistanceM": 1e-05,
+    "weldCount": 1,
+    "welds": [
+      {
+        "maximumInputEdgeDistanceM": 4.2950529280742756e-06,
+        "triangleCoordinatesM": [
+          [
+            0.10289250314235687,
+            0.04868221655488014,
+            0.5951337814331055
+          ],
+          [
+            0.10289488732814789,
+            0.04867864400148392,
+            0.5951337814331055
+          ],
+          [
+            0.10289409756660461,
+            0.048682864755392075,
+            0.5951266288757324
+          ]
+        ]
+      }
+    ],
+    "boundaryEdgesBefore": 573,
+    "boundaryEdgesAfter": 573,
+    "nonManifoldEdgesBefore": 573,
+    "nonManifoldEdgesAfter": 573,
+    "remainingDegenerateTriangles": 0,
+    "grantsFitAcceptance": false,
+    "grantsAppearanceAcceptance": false,
+    "evidenceBoundary": "Local topology cleanup bounded to edges no longer than 10 micrometres; does not establish fit, motion, UV, appearance, or release acceptance."
+  },
   "canonicalInputs": {
     "patternSha256": "f5547296b68b4a09781b3b1793e2b2679e1d7a8e05b83dd4ca17a0be5ea7d894",
     "stitchGraphSha256": "2be591075f5a2217400f645314bec2283c6991ba1dda64b7bf65b029ef739a26"
@@ -187297,9 +187333,9 @@
     "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."
   },
   "metrics": {
-    "vertices": 10739,
-    "triangles": 20903,
-    "unweightedVertices": 10739,
+    "vertices": 10738,
+    "triangles": 20901,
+    "unweightedVertices": 10738,
     "degenerateTriangles": 0
   },
   "surfaceShadingHypothesis": {

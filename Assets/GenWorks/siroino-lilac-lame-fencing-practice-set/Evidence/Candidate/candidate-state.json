@@ -20,23 +20,23 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "code": "SKIRT_POSE_COVERAGE",
-      "description": "Direct V24 inspection of all five views and six poses shows the extended front apron still breaks across the seated lap: both fitted shorts and substantial upper-thigh areas remain visible in sit, and the crouch lap panels lift off the bent thighs. The V24 forwardHemThighWeight increase from 0.18 to 0.72 did not improve measured upper-thigh overskirt coverage: sit is 35.9% left / 35.5% right (V23: 37.6% / 36.8%), and crouch is 47.0% / 45.9%. Do not infer fit acceptance from this ray-coverage diagnostic."
+      "description": "Direct inspection of the current sit and crouch renders shows both shorts thighs remain exposed while the front apron hangs behind or between the legs; the side hems curl upward. The front-panel attachment/deformation does not keep a continuous skirt layer over the raised thighs.",
+      "code": "SKIRT_POSE_COVERAGE"
     },
     {
       "severity": "BLOCKER",
-      "code": "SKIRT_FORM_AND_FACETING",
-      "description": "V24 front, side, and rear renders retain irregular planar corrugation, pinched folds, and lumpy side/rear mass instead of deliberate continuous pleats."
+      "description": "Current rear/right renders retain coarse triangular faceting and sharply bunched side folds; the front hem curls inward and appears disproportionately long. Fold construction and surface continuity remain unacceptable.",
+      "code": "SKIRT_FORM_AND_FACETING"
     },
     {
       "severity": "BLOCKER",
-      "code": "REAR_TAB_LEGIBILITY",
-      "description": "Direct V24 back view still does not make the waist adjustment tab or buckle identifiable against the jacket and skirt."
+      "description": "The rear adjustment tab blends into the jacket and the buckle has no distinct readable shape in the current back view.",
+      "code": "REAR_TAB_LEGIBILITY"
     },
     {
       "severity": "BLOCKER",
-      "code": "UV_NOT_CREATED",
-      "description": "The V24 source-bound mesh showcase records authored UV status MISSING. The topology SVG is not a UV layout."
+      "description": "Authored UV mapping is still missing. The mesh topology illustration is not a UV layout.",
+      "code": "UV_NOT_CREATED"
     }
   ],
   "failedGeometryChecks": [

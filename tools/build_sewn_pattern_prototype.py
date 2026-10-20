@@ -1620,6 +1620,95 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "grantsFitAcceptance": False, "grantsVisualAcceptance": False}
 
 
+def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
+    """Remove only sub-pixel, sub-10-micrometre triangular slivers.
+
+    The downstream Blender structure gate rejects triangles whose cross
+    product squared is <= 1e-20.  The sewn-pattern audit uses face area and
+    previously allowed a smaller sliver through, so this targeted weld keeps
+    the authoring and candidate checks aligned without weakening either gate.
+    """
+    import bmesh
+    threshold_squared = 1e-20
+    bm = bmesh.new()
+    try:
+        bm.from_mesh(mesh)
+        bm.verts.ensure_lookup_table()
+        bm.faces.ensure_lookup_table()
+        boundary_before = sum(edge.is_boundary for edge in bm.edges)
+        non_manifold_before = sum(not edge.is_manifold for edge in bm.edges)
+        welds = []
+        for _ in range(32):
+            bad_face = next((
+                face for face in bm.faces
+                if len(face.verts) == 3
+                and (face.verts[1].co - face.verts[0].co).cross(
+                    face.verts[2].co - face.verts[0].co
+                ).length_squared <= threshold_squared
+            ), None)
+            if bad_face is None:
+                break
+            pairs = [
+                (left, right, (left.co - right.co).length)
+                for index, left in enumerate(bad_face.verts)
+                for right in list(bad_face.verts)[index + 1:]
+            ]
+            left, right, distance = min(pairs, key=lambda item: item[2])
+            if distance > max_weld_distance_m:
+                raise ValueError(
+                    "Degenerate triangle needs a weld beyond the 10-micrometre "
+                    f"prototype cleanup bound: {distance:.9g} m"
+                )
+            before_coordinates = [list(vertex.co) for vertex in bad_face.verts]
+            bmesh.ops.weld_verts(bm, targetmap={right: left})
+            welds.append({
+                "maximumInputEdgeDistanceM": distance,
+                "triangleCoordinatesM": before_coordinates,
+            })
+            bm.verts.ensure_lookup_table()
+            bm.faces.ensure_lookup_table()
+        else:
+            raise ValueError("Subpixel triangle cleanup exceeded 32 bounded welds")
+
+        boundary_after = sum(edge.is_boundary for edge in bm.edges)
+        non_manifold_after = sum(not edge.is_manifold for edge in bm.edges)
+        if non_manifold_after > non_manifold_before:
+            raise ValueError("Subpixel triangle cleanup introduced non-manifold edges")
+        bm.to_mesh(mesh)
+        mesh.update(calc_edges=True)
+        mesh.calc_loop_triangles()
+        remaining = []
+        for triangle in mesh.loop_triangles:
+            a, b, c = (mesh.vertices[index].co for index in triangle.vertices)
+            if (b - a).cross(c - a).length_squared <= threshold_squared:
+                remaining.append(list(triangle.vertices))
+        if remaining:
+            raise ValueError(
+                "Subpixel triangle cleanup left candidate-gate degenerates: "
+                + json.dumps(remaining[:8])
+            )
+        return {
+            "method": "weld-closest-vertex-pair-on-subpixel-triangle",
+            "candidateDegenerateCrossProductSquaredThreshold": threshold_squared,
+            "maximumWeldDistanceM": max_weld_distance_m,
+            "weldCount": len(welds),
+            "welds": welds,
+            "boundaryEdgesBefore": boundary_before,
+            "boundaryEdgesAfter": boundary_after,
+            "nonManifoldEdgesBefore": non_manifold_before,
+            "nonManifoldEdgesAfter": non_manifold_after,
+            "remainingDegenerateTriangles": len(remaining),
+            "grantsFitAcceptance": False,
+            "grantsAppearanceAcceptance": False,
+            "evidenceBoundary": (
+                "Local topology cleanup bounded to edges no longer than 10 micrometres; "
+                "does not establish fit, motion, UV, appearance, or release acceptance."
+            ),
+        }
+    finally:
+        bm.free()
+
+
 def main():
     raw = sys.argv[sys.argv.index("--") + 1:]
     parser = argparse.ArgumentParser()
@@ -1744,10 +1833,13 @@ def main():
             tab_material["evidenceBoundary"] = entry["evidenceBoundary"]
             garment.data.materials.append(tab_material)
             tab_material_indices[material_id] = len(garment.data.materials) - 1
+        if len(mesh["faceMaterialIds"]) != len(garment.data.polygons):
+            raise ValueError("Sewn face material ownership is incomplete")
         for polygon, material_id in zip(garment.data.polygons, mesh["faceMaterialIds"]):
             if material_id not in tab_material_indices:
                 raise ValueError(f"Unknown prototype face material owner: {material_id}")
             polygon.material_index = tab_material_indices[material_id]
+    microdegenerate_cleanup = weld_subpixel_degenerate_triangles(garment.data)
     prototype_edge_trim = add_prototype_edge_trim(mesh, job, pieces, recipe)
     prototype_surface_motifs = add_prototype_surface_motifs(mesh, job, recipe)
     source = resolve(job["blendPath"])
@@ -1767,6 +1859,7 @@ def main():
         "shortsCoverageExtension": shorts_extension_evidence,
         "rearWaistAdjustmentTab": rear_waist_tab_evidence,
         "sourceBlendSha256": digest(source), "sewnMeshSha256": digest(mesh_path),
+        "microdegenerateTriangleCleanup": microdegenerate_cleanup,
         "canonicalInputs": expected,
         "measuredContourPlacement": contour_evidence,
         "measuredUpperSurfacePlacement": upper_surface_evidence,
@@ -1776,7 +1869,7 @@ def main():
         "necklinePlacementTrace": {"coordinateSystem": "blender-z-up", "selection": {"nativeMinimumZM": .98, "nativeMaximumAbsXM": .12}, "records": list(neck_trace.values()), "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."},
         "metrics": {"vertices": len(data.vertices), "triangles": len(data.polygons),
                     "unweightedVertices": len(data.vertices),
-                    "degenerateTriangles": mesh["topology"]["degenerateFaceCount"]},
+                    "degenerateTriangles": microdegenerate_cleanup["remainingDegenerateTriangles"]},
         "surfaceShadingHypothesis": {
             "components": sorted(smooth_surface_pieces),
             "method": "smooth-per-polygon normals on canonical sleeve faces",
