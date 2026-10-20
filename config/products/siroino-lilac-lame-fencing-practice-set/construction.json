@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V23 retains the V22 sewn center-lap and flanking panels, then trials a front-only 80 mm lower apron extension and 25 mm forward projection across the front panels. The change targets the measured sit/crouch lap-coverage failure; skirt fold quality, rear-tab legibility, authored UVs, fit, and motion remain unapproved.",
-  "designRevision": "v24-forward-lap-follow-trial-20261020",
+  "target": "V25 keeps V24 garment panels, hem dimensions, and thigh weights fixed, replacing only the panel-local radial knife-pleat field with crease-bound soft box pleats to reduce coarse triangular shading. This is a bounded geometry trial; sit/crouch coverage, side folds, rear-tab legibility, UVs, fit, and motion remain unapproved.",
+  "designRevision": "v25-crease-bound-soft-box-pleat-trial-20261021",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -146,7 +146,7 @@
       "pleated-overskirt": {
         "stiffness": 10,
         "reason": "V13 at stiffness 20 retained a broad fan and V14 at stiffness 4 collapsed into coarse uneven facets. Compare a middle stiffness value on the panel-local fold geometry; this is a local prototype hypothesis, not fabric calibration, fit, or appearance approval.",
-        "evidenceBoundary": "One native Blender 4.4.3 48-frame trial on sewn bilateral panels. The middle stiffness value is a geometric simulation hypothesis only and does not establish cloth material response, dynamic coverage, penetration, fit, motion, appearance, or release acceptance."
+        "evidenceBoundary": "V25 changes only the authored pleat displacement field and its valley profile while preserving the V24 sewn panels and weights. The single regenerated mesh and cloth result require direct pose and appearance inspection; they do not establish fit, motion, fabric calibration, or release acceptance."
       }
     },
     "prototypePostBakeLaplacianSmoothing": {

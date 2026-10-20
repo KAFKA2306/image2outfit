@@ -8880,7 +8880,7 @@
     "applied": true,
     "configuration": {
       "method": "bounded-panel-extension-v3-panel-local-hem",
-      "foldMethod": "panel-local-soft-knife-pleat-v1",
+      "foldMethod": "crease-bound-soft-box-pleat-v1",
       "foldsPerPanel": 2,
       "longitudinalSubdivisionCount": 8,
       "pieceIds": [
@@ -8920,7 +8920,7 @@
         ],
         "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 25 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
       },
-      "evidenceBoundary": "V23 retains the V22 sewn center-lap and flank panels and existing overall 100 mm hem extension, then adds a bounded front-only apron extension/projection to target the directly observed sit/crouch coverage failure. Geometry remains unapproved pending pose and visual review.",
+      "evidenceBoundary": "V25 keeps the V24 panels, hem, and weights fixed and trials an 8-fold crease-bound soft box-pleat field: 22% valley half-width and 24% valley-depth ratio on the existing 6 mm fold depth. These bounded displacement hypotheses do not establish garment ease, collision-free motion, appearance, fit, or release acceptance.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8928,7 +8928,9 @@
         "waistband-back-right",
         "waistband-front-lap-left",
         "waistband-front-lap-right"
-      ]
+      ],
+      "foldValleyHalfWidthFraction": 0.22,
+      "foldValleyDepthRatio": 0.24
     },
     "effectiveHeightRangeZM": [
       0.39957822084395633,
@@ -8937,38 +8939,13 @@
     "extensionBelowDeclaredPleatHemM": 0.08000002622604369,
     "selectedVertexCount": 4109,
     "movedVertexCount": 4045,
-    "maximumRadialDisplacementM": 0.005715926279736527,
-    "minimumTriangleAreaM2": 1.5781292276170758e-11,
+    "maximumRadialDisplacementM": 0.005875883371492658,
+    "minimumTriangleAreaM2": 1.5885306797911063e-11,
     "beforeVerticesSha256": "00f60a9ec7df88ecc522717020522e1e542d91ca216aea76c9582846a714668b",
-    "afterVerticesSha256": "a2ae2547ae811ff6624ef8dd0fbd80d51e2a65fb81f19f1642eb0c5c21a4d130",
+    "afterVerticesSha256": "8b8734adbd7027445fde4fcf9439c00eb1308566badddce624421706e4aaa9ec",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
-    "panelAngularRangesRadians": {
-      "overskirt-back-left": [
-        -3.141592653589793,
-        -1.1810225431274548
-      ],
-      "overskirt-back-right": [
-        1.1810225431274548,
-        3.141592653589793
-      ],
-      "overskirt-front-lap-left": [
-        -1.0165919105018564,
-        -5.551115123125783e-17
-      ],
-      "overskirt-front-lap-right": [
-        0.0,
-        1.0165919105018564
-      ],
-      "overskirt-front-left": [
-        -1.9605701209043844,
-        -0.7853981633974483
-      ],
-      "overskirt-front-right": [
-        0.7853981633974483,
-        1.9605701209043844
-      ]
-    },
+    "panelAngularRangesRadians": {},
     "grantsFitAcceptance": false,
     "grantsVisualAcceptance": false
   },
@@ -9025,7 +9002,7 @@
   "declaredSkirtCreaseTopology": {
     "applied": true,
     "method": "bounded-panel-extension-v3-panel-local-hem",
-    "foldMethod": "panel-local-soft-knife-pleat-v1",
+    "foldMethod": "crease-bound-soft-box-pleat-v1",
     "cuts": [
       {
         "planeAngleRadians": 0.0,
@@ -19935,7 +19912,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "693567bb8f47dd20d1a690f0422385452bfd8eb356417d0e4753803b1a5420a8",
+  "sourceBlendSha256": "21c497583f3be2af19006df82979d1cde960a98dd2ef756133a6b7cc42cdf415",
   "sewnMeshSha256": "9bc990e6ec861580b2356bac9383b426d6c1c19a969eb04246d8aec62f5bb498",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -19944,21 +19921,21 @@
     "weldCount": 1,
     "welds": [
       {
-        "maximumInputEdgeDistanceM": 4.2950529280742756e-06,
+        "maximumInputEdgeDistanceM": 4.313551584257928e-06,
         "triangleCoordinatesM": [
           [
-            0.10289250314235687,
-            0.04868221655488014,
+            0.10391862690448761,
+            0.04954550042748451,
             0.5951337814331055
           ],
           [
-            0.10289488732814789,
-            0.04867864400148392,
+            0.10392129421234131,
+            0.04954211041331291,
             0.5951337814331055
           ],
           [
-            0.10289409756660461,
-            0.048682864755392075,
+            0.10392030328512192,
+            0.04954621195793152,
             0.5951266288757324
           ]
         ]

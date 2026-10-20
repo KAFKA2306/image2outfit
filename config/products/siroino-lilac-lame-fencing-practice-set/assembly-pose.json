@@ -9611,7 +9611,7 @@
   },
   "skirtPleatPlacement": {
     "method": "bounded-panel-extension-v3-panel-local-hem",
-    "foldMethod": "panel-local-soft-knife-pleat-v1",
+    "foldMethod": "crease-bound-soft-box-pleat-v1",
     "foldsPerPanel": 2,
     "longitudinalSubdivisionCount": 8,
     "pieceIds": [
@@ -9651,7 +9651,7 @@
       ],
       "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 25 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
     },
-    "evidenceBoundary": "V23 retains the V22 sewn center-lap and flank panels and existing overall 100 mm hem extension, then adds a bounded front-only apron extension/projection to target the directly observed sit/crouch coverage failure. Geometry remains unapproved pending pose and visual review.",
+    "evidenceBoundary": "V25 keeps the V24 panels, hem, and weights fixed and trials an 8-fold crease-bound soft box-pleat field: 22% valley half-width and 24% valley-depth ratio on the existing 6 mm fold depth. These bounded displacement hypotheses do not establish garment ease, collision-free motion, appearance, fit, or release acceptance.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9659,12 +9659,14 @@
       "waistband-back-right",
       "waistband-front-lap-left",
       "waistband-front-lap-right"
-    ]
+    ],
+    "foldValleyHalfWidthFraction": 0.22,
+    "foldValleyDepthRatio": 0.24
   },
   "skirtFlareDesignEvidence": {
     "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "designRevision": "v21-sewn-center-lap-panel-20261019"
+  "designRevision": "v25-crease-bound-soft-box-pleat-trial-20261021"
 }
