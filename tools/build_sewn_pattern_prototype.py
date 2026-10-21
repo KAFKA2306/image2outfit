@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import sys
 from pathlib import Path
@@ -23,6 +24,82 @@ def read(path):
 
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def assign_authored_panel_uvs(mesh_data, sewn_mesh):
+    """Map sewn faces from explicit pattern or accessory source coordinates."""
+    face_coordinates = sewn_mesh.get("facePatternCoordinates")
+    panel_keys = sewn_mesh.get("facePatternPanelKeys")
+    source_kinds = sewn_mesh.get("faceUvSourceKinds")
+    faces = sewn_mesh.get("faces")
+    if (sewn_mesh.get("schemaVersion") != 2
+            or not isinstance(face_coordinates, list)
+            or not isinstance(panel_keys, list)
+            or not isinstance(source_kinds, list)
+            or not isinstance(faces, list) or len(face_coordinates) != len(faces)
+            or len(panel_keys) != len(faces) or len(source_kinds) != len(faces)
+            or len(mesh_data.polygons) != len(faces)):
+        raise ValueError("Sewn mesh lacks complete face-local pattern UV provenance")
+    supported_sources = {
+        "garmentcode-pattern-panel",
+        "declared-parametric-accessory",
+    }
+    if any(kind not in supported_sources for kind in source_kinds):
+        raise ValueError("Sewn mesh UV provenance includes an unsupported source kind")
+
+    panels = sorted(set(panel_keys))
+    if not panels or any(not isinstance(key, str) or not key for key in panels):
+        raise ValueError("Sewn mesh UV provenance has invalid panel keys")
+    grid_size = math.ceil(math.sqrt(len(panels)))
+    tile_size = 1.0 / grid_size
+    padding = tile_size * 0.06
+    panel_bounds = {}
+    for panel_key in panels:
+        points = [
+            point
+            for face_points, face_panel in zip(face_coordinates, panel_keys)
+            if face_panel == panel_key
+            for point in face_points
+        ]
+        if not points or any(len(point) != 2 for point in points):
+            raise ValueError(f"Pattern panel {panel_key} has invalid 2D UV coordinates")
+        panel_bounds[panel_key] = (
+            min(float(point[0]) for point in points),
+            min(float(point[1]) for point in points),
+            max(float(point[0]) for point in points),
+            max(float(point[1]) for point in points),
+        )
+
+    uv_layer = mesh_data.uv_layers.new(name="AuthoredPatternPanels")
+    panel_tiles = {key: index for index, key in enumerate(panels)}
+    for polygon, face_points, panel_key in zip(mesh_data.polygons, face_coordinates, panel_keys):
+        min_x, min_y, max_x, max_y = panel_bounds[panel_key]
+        width, height = max_x - min_x, max_y - min_y
+        if width <= 0 or height <= 0:
+            raise ValueError(f"Pattern panel {panel_key} has zero UV extent")
+        tile_index = panel_tiles[panel_key]
+        column, row = tile_index % grid_size, tile_index // grid_size
+        usable = tile_size - 2 * padding
+        scale = usable / max(width, height)
+        offset_x = column * tile_size + padding + (usable - width * scale) * 0.5
+        offset_y = row * tile_size + padding + (usable - height * scale) * 0.5
+        if len(face_points) != len(polygon.loop_indices):
+            raise ValueError("Pattern UV loop count does not match sewn polygon")
+        for loop_index, point in zip(polygon.loop_indices, face_points):
+            uv_layer.data[loop_index].uv = (
+                offset_x + (float(point[0]) - min_x) * scale,
+                offset_y + (float(point[1]) - min_y) * scale,
+            )
+    return {
+        "status": "AUTHORED_FROM_DECLARED_2D_SOURCE_COORDINATES",
+        "method": "face-local-source-coordinates-with-deterministic-panel-tiles",
+        "panelCount": len(panels),
+        "mappedFaceCount": len(faces),
+        "sourceKindFaceCounts": {
+            kind: source_kinds.count(kind) for kind in sorted(supported_sources)
+        },
+        "grantsQualityAcceptance": False,
+    }
 
 
 def resolve(value):
@@ -790,6 +867,36 @@ def append_declared_rear_waist_tab(mesh, body_objects, pose, recipe, target_path
 
     old_vertex_count = len(mesh["vertices"])
     old_face_count = len(mesh["faces"])
+    face_uv = mesh.get("facePatternCoordinates")
+    panel_uv_keys = mesh.get("facePatternPanelKeys")
+    face_uv_kinds = mesh.get("faceUvSourceKinds")
+    if (not isinstance(face_uv, list) or not isinstance(panel_uv_keys, list)
+            or not isinstance(face_uv_kinds, list)
+            or len(face_uv) != old_face_count
+            or len(panel_uv_keys) != old_face_count
+            or len(face_uv_kinds) != old_face_count):
+        raise ValueError("Pattern UV provenance must cover the sewn faces before accessory placement")
+    tab_uv_vertices = [
+        [((column / x_segments) - 0.5) * width,
+         ((row / z_segments) - 0.5) * height]
+        for row in range(z_segments + 1)
+        for column in range(x_segments + 1)
+    ]
+    buckle_uv_vertices = [
+        [((column / 2) - 0.5) * buckle_width,
+         ((row / 2) - 0.5) * buckle_height]
+        for row in range(3)
+        for column in range(3)
+    ]
+    accessory_uv = [
+        [tab_uv_vertices[index] for index in face] for face in tab_faces
+    ] + [
+        [buckle_uv_vertices[index] for index in face] for face in buckle_faces
+    ]
+    accessory_panel_keys = (
+        [f"accessory:{piece_id}:tab" for _ in tab_faces]
+        + [f"accessory:{piece_id}:buckle" for _ in buckle_faces]
+    )
     if "faceMaterialIds" not in mesh:
         mesh["faceMaterialIds"] = ["prototypeMaterial"] * old_face_count
     elif len(mesh["faceMaterialIds"]) != old_face_count:
@@ -803,8 +910,16 @@ def append_declared_rear_waist_tab(mesh, body_objects, pose, recipe, target_path
     mesh["faces"].extend([tuple(buckle_start + index for index in face) for face in buckle_faces])
     mesh["facePieceIds"].extend([piece_id] * len(buckle_faces))
     mesh["faceMaterialIds"].extend(["rearWaistBuckleMaterial"] * len(buckle_faces))
+    mesh["facePatternCoordinates"].extend(accessory_uv)
+    mesh["facePatternPanelKeys"].extend(accessory_panel_keys)
+    mesh["faceUvSourceKinds"].extend(
+        ["declared-parametric-accessory"] * len(accessory_uv)
+    )
     if len(mesh["faces"]) != len(mesh["facePieceIds"]) or len(mesh["faces"]) != len(mesh["faceMaterialIds"]):
         raise ValueError("Rear waist tab broke face ownership alignment")
+    if not (len(mesh["faces"]) == len(mesh["facePatternCoordinates"])
+            == len(mesh["facePatternPanelKeys"]) == len(mesh["faceUvSourceKinds"])):
+        raise ValueError("Rear waist tab broke authored UV provenance alignment")
     material_spec = recipe.get("prototypeRearWaistTabMaterials")
     if not isinstance(material_spec, dict):
         raise ValueError("Rear waist tab requires declared prototype materials")
@@ -1928,6 +2043,7 @@ def main():
     data = bpy.data.meshes.new(job["id"] + "-sewn-surface")
     data.from_pydata(mesh["vertices"], [], mesh["faces"])
     data.update()
+    uv_evidence = assign_authored_panel_uvs(data, mesh)
     owners = mesh["facePieceIds"]
     pieces = sorted(set(owners))
     if len(owners) != len(data.polygons):
@@ -1955,10 +2071,8 @@ def main():
     bpy.ops.object.select_all(action="DESELECT")
     garment.select_set(True)
     bpy.context.view_layer.objects.active = garment
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.uv.smart_project()
-    bpy.ops.object.mode_set(mode="OBJECT")
+    garment["uvStatus"] = uv_evidence["status"]
+    garment["uvProvenance"] = json.dumps(uv_evidence, sort_keys=True)
     spec = recipe["prototypeMaterial"]
     material = bpy.data.materials.new(spec["name"])
     material.use_nodes = True
@@ -2003,6 +2117,7 @@ def main():
         "declaredSkirtLengthening": skirt_lengthening_evidence,
         "declaredSkirtCreaseTopology": crease_evidence,
         "buildDisposition": "EDITABLE_SEWN_PROTOTYPE_ONLY",
+        "authoredPatternUvEvidence": uv_evidence,
         "prototypeEdgeTrim": prototype_edge_trim,
         "prototypeSurfaceMotifs": prototype_surface_motifs,
         "shortsCoverageExtension": shorts_extension_evidence,

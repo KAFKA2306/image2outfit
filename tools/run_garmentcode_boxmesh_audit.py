@@ -1304,8 +1304,34 @@ def main() -> int:
         scale = input_data["properties"]["units_in_meter"]
         if not isinstance(scale, (int, float)) or scale <= 0:
             raise ValueError("Sewn mesh has no declared unit scale")
+        # Retain each face's original two-dimensional panel coordinates.
+        # BoxMesh's final vertex buffer is 3D and sewn vertices are shared,
+        # so the face-local source coordinates are the lossless UV provenance.
+        face_pattern_coordinates = []
+        face_pattern_panel_keys = []
+        for panel_name, panel in mesh.panels.items():
+            panel_vertices_2d = panel.panel_vertices
+            for local_face in panel.panel_faces:
+                global_face = mesh._get_glob_ids(panel, local_face)
+                if len(set(global_face)) != 3:
+                    continue
+                if len(local_face) != 3:
+                    raise ValueError("BoxMesh panel face is not triangular")
+                face_pattern_coordinates.append(
+                    [
+                        [float(value) for value in panel_vertices_2d[int(local_id)]]
+                        for local_id in local_face
+                    ]
+                )
+                face_pattern_panel_keys.append(panel_name)
+        if len(face_pattern_coordinates) != len(mesh.faces):
+            raise ValueError("Pattern UV provenance does not match sewn face order")
+        if [panel_key_map[key] for key in face_pattern_panel_keys] != topology["facePieceIds"]:
+            # Ownership ordering is already audited separately; do not
+            # silently attach panel UVs to a differently ordered face list.
+            raise ValueError("Pattern UV provenance face ownership does not match")
         exchange = {
-            "schemaVersion": 1,
+            "schemaVersion": 2,
             "productId": adapter["productId"],
             "units": "meter",
             "coordinateSystem": "blender-z-up",
@@ -1325,6 +1351,12 @@ def main() -> int:
             ],
             "faces": [[int(v) for v in face] for face in mesh.faces],
             "facePieceIds": topology["facePieceIds"],
+            "facePatternCoordinates": face_pattern_coordinates,
+            "facePatternPanelKeys": face_pattern_panel_keys,
+            "faceUvSourceKinds": [
+                "garmentcode-pattern-panel" for _ in face_pattern_coordinates
+            ],
+            "patternCoordinateUnits": "native-pattern-units",
             "topology": topology,
         }
         write_json(args.mesh_output.resolve(), exchange)
