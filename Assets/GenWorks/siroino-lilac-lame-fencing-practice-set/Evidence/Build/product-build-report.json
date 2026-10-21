@@ -8866,13 +8866,13 @@
       }
     ],
     "placedVertexCount": 4167,
-    "heightBlendSkippedVertexCount": 3310,
+    "heightBlendSkippedVertexCount": 3491,
     "angularSourceVerticesSha256": "e56695ef5b390460999ad0da1912d2720008c6318eb6d5e05ac013013148f50e",
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "7ea858cf288caf259d11d4489ccb16bbe8deee769f90132452b53e04ea1c2d9a",
-    "afterVerticesSha256": "2fb91c1bba597fb2f2fb73c636f478ab8245b5f244e33e71c99541796281fd78",
+    "beforeVerticesSha256": "563cf16875d1edfdcaeb0db4fac5ce17a3922d80f4ec0cfd193eedf055c43969",
+    "afterVerticesSha256": "36fc3f6ffa3acc1da793bd5ddf2d89722a12fe6a8bce438eb8bb0db414bc0237",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -8897,10 +8897,10 @@
       ],
       "waistZM": 0.7395782470703125,
       "sourceHemZM": 0.5795782470703125,
-      "hemZM": 0.47957824707,
-      "hemExtensionM": 0.1,
+      "hemZM": 0.43957824707,
+      "hemExtensionM": 0.14,
       "foldCount": 8,
-      "hemFoldDepthM": 0.006,
+      "hemFoldDepthM": 0.003,
       "phaseRadians": 0,
       "forwardApron": {
         "method": "front-panel-forward-scoop-v2",
@@ -8910,8 +8910,8 @@
           "overskirt-front-lap-left",
           "overskirt-front-lap-right"
         ],
-        "additionalExtensionM": 0.08,
-        "forwardProjectionM": 0.025,
+        "additionalExtensionM": 0.1,
+        "forwardProjectionM": 0.04,
         "fullExtensionHalfAngleRadians": 0.55,
         "zeroExtensionHalfAngleRadians": 1.25,
         "axisOriginBlenderXYM": [
@@ -8920,7 +8920,7 @@
         ],
         "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 25 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
       },
-      "evidenceBoundary": "V28 retains V27 lengths, forward apron extension, fold and weight parameters. Front lap geometry now crosses the centerline by 80 mm per side at the hem; this unfastened overlap is a geometry hypothesis for seated and crouched coverage, not appearance or fit acceptance.",
+      "evidenceBoundary": "V30 parameter correction: lower the overskirt hem by 140 mm from source and add up to 100 mm downward plus 40 mm forward projection to front panels, totaling the existing 240 mm maximum. Reduce fold displacement to half of the prior V30 trial. This is a geometry-only correction; no fit, cloth, appearance, or release acceptance is implied.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8930,19 +8930,19 @@
         "waistband-front-lap-right"
       ],
       "foldValleyHalfWidthFraction": 0.22,
-      "foldValleyDepthRatio": 0.24
+      "foldValleyDepthRatio": 0.12
     },
     "effectiveHeightRangeZM": [
-      0.39957822084395633,
+      0.3395782208439563,
       0.7395782470703125
     ],
-    "extensionBelowDeclaredPleatHemM": 0.08000002622604369,
+    "extensionBelowDeclaredPleatHemM": 0.1000000262260437,
     "selectedVertexCount": 5561,
     "movedVertexCount": 5497,
-    "maximumRadialDisplacementM": 0.005952694563872991,
-    "minimumTriangleAreaM2": 1.9946055634194402e-10,
-    "beforeVerticesSha256": "2fb91c1bba597fb2f2fb73c636f478ab8245b5f244e33e71c99541796281fd78",
-    "afterVerticesSha256": "c16aa6183603a7e8fb60075c014a4f284c484408257cea59bbeab612a45c893b",
+    "maximumRadialDisplacementM": 0.0029778464255885745,
+    "minimumTriangleAreaM2": 2.1646889956751437e-10,
+    "beforeVerticesSha256": "36fc3f6ffa3acc1da793bd5ddf2d89722a12fe6a8bce438eb8bb0db414bc0237",
+    "afterVerticesSha256": "be537412e84b778da966420df74af4436ca91430f1d3ad74643735dfd7746d5c",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "panelAngularRangesRadians": {},
@@ -8965,14 +8965,14 @@
       "overskirt-front-right"
     ],
     "movedVertexCountByThigh": {
-      "left": 1086,
-      "right": 1037
+      "left": 1090,
+      "right": 1042
     },
-    "maximumNearestSurfaceDistanceM": 0.18313910067081451,
-    "maximumRestDisplacementM": 0.11986032904560678,
-    "minimumTriangleAreaM2": 1.1601667052416208e-10,
-    "beforeVerticesSha256": "c16aa6183603a7e8fb60075c014a4f284c484408257cea59bbeab612a45c893b",
-    "afterVerticesSha256": "d1e062cf1145b27be60e322d8535216d6a04d1b58dfa1941f070ccb996212767",
+    "maximumNearestSurfaceDistanceM": 0.21369780600070953,
+    "maximumRestDisplacementM": 0.14130626133138638,
+    "minimumTriangleAreaM2": 1.2874325883446866e-10,
+    "beforeVerticesSha256": "be537412e84b778da966420df74af4436ca91430f1d3ad74643735dfd7746d5c",
+    "afterVerticesSha256": "2ba507d007dec5036bda97647904af1a99d643a486880c638b14f1d317330c60",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false
@@ -8989,12 +8989,12 @@
       "overskirt-front-right"
     ],
     "sourceHemZM": 0.5795782470703125,
-    "targetHemZM": 0.47957824707,
+    "targetHemZM": 0.43957824707,
     "waistZM": 0.7395782470703125,
-    "extensionM": 0.10000000000031245,
+    "extensionM": 0.14000000000031249,
     "selectedVertexCount": 5561,
     "movedVertexCount": 5497,
-    "maximumVertexDisplacementM": 0.18000000000031247,
+    "maximumVertexDisplacementM": 0.2400000000003125,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
       "pieceIds": [
@@ -9003,8 +9003,8 @@
         "overskirt-front-lap-left",
         "overskirt-front-lap-right"
       ],
-      "additionalExtensionM": 0.08,
-      "forwardProjectionM": 0.025,
+      "additionalExtensionM": 0.1,
+      "forwardProjectionM": 0.04,
       "fullExtensionHalfAngleRadians": 0.55,
       "zeroExtensionHalfAngleRadians": 1.25,
       "axisOriginBlenderXYM": [
@@ -9013,14 +9013,14 @@
       ],
       "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 25 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
     },
-    "maximumAdditionalForwardApronDisplacementM": 0.08,
-    "maximumForwardApronProjectionM": 0.025,
+    "maximumAdditionalForwardApronDisplacementM": 0.1,
+    "maximumForwardApronProjectionM": 0.04,
     "beforeBoundsZM": [
       0.5795782208442688,
       0.7395782470703125
     ],
     "afterBoundsZM": [
-      0.39957822084395633,
+      0.3395782208439563,
       0.7395782470703125
     ],
     "grantsFitAcceptance": false,
@@ -19956,7 +19956,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "a81c67128972a08ae8300cad0652942d446d65325f040bc0a267ee528ab80aab",
+  "sourceBlendSha256": "cccd17cf263167790bea5ddcb75b99ee84e90c1d08516b93852d93134157ec26",
   "sewnMeshSha256": "3273050e3dca0b927b07f542254d0c998617d624d54493b598f2299f43b12520",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -151010,9 +151010,9 @@
     "angularSourceVerticesSha256": null,
     "layerOffsetVertexCount": 803,
     "sharedSeamVerticesLayerOffsetM": 0,
-    "heightExtrapolatedVertexCount": 1304,
-    "beforeVerticesSha256": "fd029cc339747915c753b029d67b64a44640b4823f807fbd7e606f2128df59d3",
-    "afterVerticesSha256": "7ea858cf288caf259d11d4489ccb16bbe8deee769f90132452b53e04ea1c2d9a",
+    "heightExtrapolatedVertexCount": 2135,
+    "beforeVerticesSha256": "7688966dd71c87b78e22d65421f7da96cbfcf96462fd06f4e86a081e06fc3846",
+    "afterVerticesSha256": "563cf16875d1edfdcaeb0db4fac5ce17a3922d80f4ec0cfd193eedf055c43969",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },

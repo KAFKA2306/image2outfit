@@ -83,6 +83,14 @@ def parse_args() -> argparse.Namespace:
         "--source-change-reuse-reason",
         help="Audited explanation for reusing the completed prefix after source changes.",
     )
+    parser.add_argument(
+        "--rerun-from-stage",
+        choices=tuple(stage.value for stage in PIPELINE_STAGES),
+        help=(
+            "Invalidate a completed checkpoint suffix and execute again from this "
+            "stage, reusing only the integrity-validated prefix."
+        ),
+    )
     parser.add_argument("--checkpoint-output", type=Path)
     parser.add_argument(
         "--audit-root",
@@ -264,6 +272,7 @@ def _resume_or_reset(
     expected: dict[str, str],
     mode: ExecutionMode,
     reuse_stale_prefix_reason: str | None = None,
+    rerun_from_stage: str | None = None,
 ) -> dict[str, Any]:
     _validate_persisted_pipeline_state(previous, label="resume state")
     mismatches = _identity_mismatches(previous, expected)
@@ -271,7 +280,68 @@ def _resume_or_reset(
         value for value in mismatches if value != "sourceFingerprint"
     ]
     if non_source_mismatches:
-        _assert_identity(previous, expected)
+        allowed_revision_change = (
+            rerun_from_stage is not None
+            and non_source_mismatches == ["revisionId"]
+        )
+        if not allowed_revision_change:
+            _assert_identity(previous, expected)
+
+    if rerun_from_stage is not None:
+        if mode is not ExecutionMode.EXECUTE:
+            raise ValueError("stage rerun is only valid in execute mode")
+        if reuse_stale_prefix_reason is None:
+            raise ValueError("stage rerun requires an explicit source-change reuse reason")
+        if previous.get("status") not in {"EXECUTED", "FAILED"}:
+            raise ValueError("stage rerun requires an executed or failed checkpoint")
+        _validate_resume_integrity(previous)
+        completed = list(previous.get("completed_stages", []))
+        rerun_index = next(
+            (index for index, stage in enumerate(PIPELINE_STAGES)
+             if stage.value == rerun_from_stage),
+            None,
+        )
+        if rerun_index is None or rerun_index >= len(completed):
+            raise ValueError(
+                "rerun stage must be present in the checkpoint's completed prefix"
+            )
+        prefix = completed[:rerun_index]
+        prefix_outputs = {
+            name: previous.get("outputs", {})[name]
+            for name in prefix
+        }
+        state = _new_state(request, expected, mode)
+        count = int(previous.get("resume_count", 0)) + 1
+        history = list(previous.get("resume_history", []))
+        history.append(
+            {
+                "resume": count,
+                "parent_run_id": str(previous["run_id"]),
+                "previous_status": str(previous.get("status", "")),
+                "next_stage": rerun_from_stage,
+                "completed_stage_count": len(prefix),
+                "reused_completed_stages": prefix,
+                "invalidated_completed_stages": completed[rerun_index:],
+                "previous_revision_id": str(previous.get("revision_id", "")),
+                "current_revision_id": expected["revisionId"],
+                "previous_source_fingerprint": str(
+                    previous.get("source_fingerprint", "")
+                ),
+                "current_source_fingerprint": expected["sourceFingerprint"],
+                "source_change_reuse_reason": reuse_stale_prefix_reason,
+                "integrity_validation": "passed",
+            }
+        )
+        return {
+            **state,
+            "parent_run_id": str(previous["run_id"]),
+            "current_stage": rerun_from_stage,
+            "completed_stages": prefix,
+            "outputs": prefix_outputs,
+            "resume_count": count,
+            "resume_history": history,
+        }
+
     if "sourceFingerprint" not in mismatches:
         _validate_resume_integrity(previous)
         return resume_pipeline_state(previous, execution_mode=mode)
@@ -425,6 +495,7 @@ def _main_unlocked() -> int:
                     if args.reuse_completed_prefix_after_source_change
                     else None
                 ),
+                rerun_from_stage=args.rerun_from_stage,
             )
             if state.get("checkpoint_reset"):
                 print(

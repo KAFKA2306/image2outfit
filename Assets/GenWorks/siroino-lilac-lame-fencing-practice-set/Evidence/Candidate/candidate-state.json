@@ -19,22 +19,22 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of the current V30 front, back, sit, and crouch renders confirms the separated overskirt panels do not create continuous lap coverage. In sit, the shorts remain plainly exposed across the raised thighs; in crouch, shorts remain visible beneath the lifted front panels. Pointed panel ends intersect and overlap around the thighs. This is an observed coverage failure, not accepted fit.",
-      "severity": "BLOCKER",
-      "code": "SKIRT_POSE_COVERAGE"
+      "code": "SKIRT_POSE_COVERAGE",
+      "description": "Direct inspection of the current V30 front, sit, and crouch renders shows the deeper hem improves neutral coverage, but the front panels still ride above substantial portions of the shorts on raised thighs. In sit the broad shorts front remains exposed; in crouch the short layer remains visible under the lifted front apron and panel ends still meet in acute intersections. This remains a visible coverage failure.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "The current neutral front and rear renders show dense coarse triangular facets and irregular folds across the skirt and jacket. The skirt hem is uneven, and panel boundaries end in sharp protruding corners. The resulting silhouette and surface transitions are visibly unfinished.",
-      "severity": "BLOCKER",
-      "code": "SKIRT_FORM_AND_FACETING"
+      "code": "SKIRT_FORM_AND_FACETING",
+      "description": "Current front and rear neutral renders still show coarse angular facets and irregular folds across the skirt. The extended hem remains uneven and asymmetric, with pointed panel ends and abrupt crease transitions. The surface and silhouette are still visibly unfinished.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "The current rear render does not show a clearly identifiable rear adjustment tab or buckle at the waist; no readable hardware silhouette is visible.",
-      "severity": "BLOCKER",
-      "code": "REAR_TAB_LEGIBILITY"
+      "code": "REAR_TAB_LEGIBILITY",
+      "description": "Direct inspection of the current rear render still does not reveal a clearly identifiable adjustment tab or buckle silhouette at the waist.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "The build report records source-coordinate UV attribution on 23,703 faces, but the current source-bound mesh showcase reports uvStatus MISSING and lists garment meshes without a UV layer, including the pleated overskirt and static garment mesh. No UV-layout image was reviewed. UV coverage and placement therefore remain unverified.",
+      "description": "The existing render-current mesh showcase was regenerated from the exact current weighted-prototype blend and reports uvStatus MISSING. No substitute UV map was generated; authored UV coverage remains incomplete for this source.",
       "severity": "BLOCKER",
       "code": "UV_MAPPING_INCOMPLETE"
     }

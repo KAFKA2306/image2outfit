@@ -1590,7 +1590,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
                 or not math.isfinite(apron.get("zeroExtensionHalfAngleRadians", math.nan))
                 or not 0 < apron["fullExtensionHalfAngleRadians"] < apron["zeroExtensionHalfAngleRadians"] <= math.pi):
             raise ValueError("Invalid forward apron extension profile")
-        if extension + apron["additionalExtensionM"] > 0.24:
+        if extension + apron["additionalExtensionM"] > 0.24 + 1e-9:
             raise ValueError("Combined rear hem and forward apron extension exceeds the 240 mm trial bound")
     moved = 0
     max_displacement = 0.0

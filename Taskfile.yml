@@ -57,8 +57,10 @@ tasks:
       vars: [PRODUCT]
     vars:
       CHECKPOINT: '{{.CHECKPOINT | default (printf ".image2outfit/products/%s/pipeline-state.json" .PRODUCT)}}'
+      RESUME_CHECKPOINT: '{{.RESUME_CHECKPOINT | default ""}}'
       REUSE_STALE_PREFIX: '{{.REUSE_STALE_PREFIX | default "false"}}'
       SOURCE_CHANGE_REUSE_REASON: '{{.SOURCE_CHANGE_REUSE_REASON | default ""}}'
+      RERUN_FROM_STAGE: '{{.RERUN_FROM_STAGE | default ""}}'
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
@@ -70,8 +72,10 @@ tasks:
         --request "config/pipeline/requests/{{.PRODUCT}}.json"
         --execute
         --checkpoint-output "{{.CHECKPOINT}}"
+        {{if .RESUME_CHECKPOINT}}--resume-state "{{.RESUME_CHECKPOINT}}"{{end}}
         {{if eq .REUSE_STALE_PREFIX "true"}}--reuse-completed-prefix-after-source-change
         --source-change-reuse-reason "{{.SOURCE_CHANGE_REUSE_REASON}}"{{end}}
+        {{if .RERUN_FROM_STAGE}}--rerun-from-stage "{{.RERUN_FROM_STAGE}}"{{end}}
 
   batch:status:
     desc: Summarize the existing per-product execution states for a tracked batch.

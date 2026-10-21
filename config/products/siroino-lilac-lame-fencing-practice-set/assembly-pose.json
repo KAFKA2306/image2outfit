@@ -9631,10 +9631,10 @@
     ],
     "waistZM": 0.7395782470703125,
     "sourceHemZM": 0.5795782470703125,
-    "hemZM": 0.47957824707,
-    "hemExtensionM": 0.1,
+    "hemZM": 0.43957824707,
+    "hemExtensionM": 0.14,
     "foldCount": 8,
-    "hemFoldDepthM": 0.006,
+    "hemFoldDepthM": 0.003,
     "phaseRadians": 0,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
@@ -9644,8 +9644,8 @@
         "overskirt-front-lap-left",
         "overskirt-front-lap-right"
       ],
-      "additionalExtensionM": 0.08,
-      "forwardProjectionM": 0.025,
+      "additionalExtensionM": 0.1,
+      "forwardProjectionM": 0.04,
       "fullExtensionHalfAngleRadians": 0.55,
       "zeroExtensionHalfAngleRadians": 1.25,
       "axisOriginBlenderXYM": [
@@ -9654,7 +9654,7 @@
       ],
       "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 25 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
     },
-    "evidenceBoundary": "V28 retains V27 lengths, forward apron extension, fold and weight parameters. Front lap geometry now crosses the centerline by 80 mm per side at the hem; this unfastened overlap is a geometry hypothesis for seated and crouched coverage, not appearance or fit acceptance.",
+    "evidenceBoundary": "V30 parameter correction: lower the overskirt hem by 140 mm from source and add up to 100 mm downward plus 40 mm forward projection to front panels, totaling the existing 240 mm maximum. Reduce fold displacement to half of the prior V30 trial. This is a geometry-only correction; no fit, cloth, appearance, or release acceptance is implied.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9664,7 +9664,7 @@
       "waistband-front-lap-right"
     ],
     "foldValleyHalfWidthFraction": 0.22,
-    "foldValleyDepthRatio": 0.24
+    "foldValleyDepthRatio": 0.12
   },
   "poseAwareThighAttachment": {
     "method": "bilateral-deform-bone-surface-placement-v1",
@@ -9691,5 +9691,5 @@
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "designRevision": "v29-bilateral-thigh-surface-attachment-trial-20261021"
+  "designRevision": "v30-authored-source-panel-uv-trial-20261021"
 }
