@@ -1504,7 +1504,10 @@ def stage_initialize(
         result,
         stage="initialize-3d",
         product_id=product_id,
-        paths=[manifest_path, *review_evidence_paths, report],
+        # The first evidence item is the typed arrangement-plan artifact for
+        # downstream stages. ProductManifest is mutable workflow state, so it
+        # must not be used as the content-addressed arrangement artifact.
+        paths=[report, manifest_path, *review_evidence_paths],
         extra={
             "visualAppearanceReview": gates.get("visualAppearanceReview", "PENDING"),
             "prototypeReadiness": {
@@ -1632,6 +1635,9 @@ def _run_garmentcode_boxmesh_preflight(
         stitch_graph_sha256=stitch_hash,
         stitch_export_mode="strict-boundary-edges",
     )
+    # Invalidate only the downstream mesh-exchange cache when its payload
+    # contract changes; pattern diagnosis and the 2D source remain unchanged.
+    native["properties"]["meshExchangeSchemaVersion"] = 2
     if pipeline.get("assemblyPosePath"):
         _pose_path, pose, _measured = validate_assembly_pose(job, pattern)
         for panel_key, piece_id in native["parameters"]["image2outfit"][
