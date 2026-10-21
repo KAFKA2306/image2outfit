@@ -8949,6 +8949,34 @@
     "grantsFitAcceptance": false,
     "grantsVisualAcceptance": false
   },
+  "poseAwareThighAttachment": {
+    "applied": true,
+    "method": "bilateral-deform-bone-surface-placement-v1",
+    "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "targetBodyObject": "SiroinoSotai_PC",
+    "targetTriangleCountByThigh": {
+      "left": 1226,
+      "right": 1226
+    },
+    "panelIds": [
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right",
+      "overskirt-front-left",
+      "overskirt-front-right"
+    ],
+    "movedVertexCountByThigh": {
+      "left": 1086,
+      "right": 1037
+    },
+    "maximumNearestSurfaceDistanceM": 0.18313910067081451,
+    "maximumRestDisplacementM": 0.11986032904560678,
+    "minimumTriangleAreaM2": 1.1601667052416208e-10,
+    "beforeVerticesSha256": "c16aa6183603a7e8fb60075c014a4f284c484408257cea59bbeab612a45c893b",
+    "afterVerticesSha256": "d1e062cf1145b27be60e322d8535216d6a04d1b58dfa1941f070ccb996212767",
+    "bodyFacesCopied": false,
+    "grantsFitAcceptance": false,
+    "grantsPoseAcceptance": false
+  },
   "declaredSkirtLengthening": {
     "applied": true,
     "method": "short-panelized-hem-with-forward-apron-and-faded-side-seams",
@@ -19912,7 +19940,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "5b0e66678a8221045f98cbc31df230e1da01cd18de5c3ba8eef37cd48646bd83",
+  "sourceBlendSha256": "7bdfb2a1b2c57c5409f5cfe2f3b0427456ec1f9432baa1cee581dafdc61d1a66",
   "sewnMeshSha256": "6afd0404a6eae8e69ac3401ddfad813ef8fddb203527f3d07af92faa9d40f552",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",

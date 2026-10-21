@@ -9666,10 +9666,30 @@
     "foldValleyHalfWidthFraction": 0.22,
     "foldValleyDepthRatio": 0.24
   },
+  "poseAwareThighAttachment": {
+    "method": "bilateral-deform-bone-surface-placement-v1",
+    "pieceIds": [
+      "overskirt-front-left",
+      "overskirt-front-right",
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right"
+    ],
+    "bodyMeshNamePrefix": "SiroinoSotai_PC",
+    "leftThighBone": "UpperLeg_L",
+    "rightThighBone": "UpperLeg_R",
+    "minimumTriangleBoneWeight": 0.12,
+    "maximumFrontYM": -0.04,
+    "fadeStartZM": 0.72,
+    "fullBlendZM": 0.52,
+    "maximumProjectionDistanceM": 0.22,
+    "normalClearanceM": 0.012,
+    "maximumBlendWeight": 0.7,
+    "evidenceBoundary": "V29 projects the anterior overskirt panels toward body triangles selected by bilateral UpperLeg deform weights, with a vertical fade from the waist and bounded neutral-rest clearance. The later skin transfer deforms this attachment with the thigh frames. This is a pose-aware placement hypothesis only; no fit, penetration, coverage, motion, Shape Key or appearance acceptance is implied."
+  },
   "skirtFlareDesignEvidence": {
     "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "designRevision": "v27-center-lap-thigh-follow-trial-20261021"
+  "designRevision": "v29-bilateral-thigh-surface-attachment-trial-20261021"
 }

@@ -1620,6 +1620,151 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "grantsFitAcceptance": False, "grantsVisualAcceptance": False}
 
 
+def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path):
+    """Transfer front apron panels onto measured deform-bone thigh surfaces.
+
+    The neutral skirt envelope is useful for the waist and side silhouette but
+    cannot follow thighs raised by the avatar rig. This bounded placement uses
+    only target-body triangles carrying the declared thigh deform weights,
+    leaving garment topology and panel ownership intact for the later skin
+    transfer. It is an attachment hypothesis, not fit or pose acceptance.
+    """
+    import math
+    from collections import defaultdict
+    from mathutils import Vector
+    from mathutils.bvhtree import BVHTree
+
+    spec = pose.get("poseAwareThighAttachment")
+    if spec is None:
+        return {"applied": False, "reason": "not-declared"}
+    if spec.get("method") != "bilateral-deform-bone-surface-placement-v1":
+        raise ValueError("Unknown pose-aware thigh attachment method")
+    if digest(target_path) != pose["targetSourceSha256"]:
+        raise ValueError("Thigh attachment target source is stale")
+    selected = set(spec["pieceIds"])
+    if not selected or not selected.issubset(set(mesh["facePieceIds"])):
+        raise ValueError("Thigh attachment panel ownership is incomplete")
+    fade_start, full_blend = spec["fadeStartZM"], spec["fullBlendZM"]
+    clearance = spec["normalClearanceM"]
+    projection_limit = spec["maximumProjectionDistanceM"]
+    max_blend = spec["maximumBlendWeight"]
+    min_bone_weight = spec["minimumTriangleBoneWeight"]
+    if (not all(math.isfinite(v) for v in (fade_start, full_blend, clearance,
+                                           projection_limit, max_blend, min_bone_weight))
+            or full_blend >= fade_start or clearance <= 0 or projection_limit <= 0
+            or not 0 < max_blend <= 1 or not 0 < min_bone_weight <= 1):
+        raise ValueError("Invalid thigh attachment bounds")
+    bodies = [obj for obj in body_objects if obj.type == "MESH"
+              and obj.name.startswith(spec["bodyMeshNamePrefix"])]
+    if len(bodies) != 1:
+        raise ValueError("Thigh attachment requires one explicit target body mesh")
+    body = bodies[0]
+    shape_values = {key.name: float(key.value) for key in body.data.shape_keys.key_blocks} if body.data.shape_keys else {}
+    if any(abs(value) > 1e-8 for value in shape_values.values()):
+        raise ValueError("Thigh attachment requires zero-valued target Shape Keys")
+    side_specs = {
+        "left": spec["leftThighBone"],
+        "right": spec["rightThighBone"],
+    }
+    group_indices = {}
+    for side, bone in side_specs.items():
+        group = body.vertex_groups.get(bone)
+        if group is None:
+            raise ValueError(f"Target body lacks declared deform group {bone}")
+        group_indices[side] = group.index
+    coords = [body.matrix_world @ vertex.co for vertex in body.data.vertices]
+    body.data.calc_loop_triangles()
+    triangles = [tuple(tri.vertices) for tri in body.data.loop_triangles]
+    side_trees = {}
+    side_triangle_counts = {}
+    for side, group_index in group_indices.items():
+        group_weights = []
+        for vertex in body.data.vertices:
+            group_weights.append(next((item.weight for item in vertex.groups
+                                       if item.group == group_index), 0.0))
+        eligible = [tri for tri in triangles
+                    if sum(group_weights[index] for index in tri) / 3.0 >= min_bone_weight]
+        if not eligible:
+            raise ValueError(f"No target surface triangles carry {side} thigh weights")
+        side_trees[side] = BVHTree.FromPolygons(coords, eligible, all_triangles=True)
+        side_triangle_counts[side] = len(eligible)
+    bones = [obj for obj in body_objects if obj.type == "ARMATURE"]
+    if len(bones) != 1:
+        raise ValueError("Thigh attachment requires one target armature")
+    left_x = (bones[0].matrix_world @ bones[0].data.bones[side_specs["left"]].head_local).x
+    right_x = (bones[0].matrix_world @ bones[0].data.bones[side_specs["right"]].head_local).x
+    if abs(left_x - right_x) <= 1e-6:
+        raise ValueError("Target thigh frames do not define a bilateral axis")
+    center_x = (left_x + right_x) * 0.5
+    left_positive = left_x > right_x
+    owners = defaultdict(set)
+    for face, piece_id in zip(mesh["faces"], mesh["facePieceIds"]):
+        for vertex_id in face:
+            owners[vertex_id].add(piece_id)
+    seam_factors = preserved_seam_factors(mesh, spec)
+    before = json.dumps(mesh["vertices"], separators=(",", ":"))
+    moved = {"left": 0, "right": 0}
+    max_distance = 0.0
+    max_displacement = 0.0
+    for index, point_values in enumerate(mesh["vertices"]):
+        if not owners[index].intersection(selected):
+            continue
+        point = Vector(point_values)
+        if point.z >= fade_start or point.y >= spec["maximumFrontYM"]:
+            continue
+        factor = max(0.0, min(1.0, (fade_start - point.z) / (fade_start - full_blend)))
+        factor = factor * factor * (3.0 - 2.0 * factor)
+        factor *= max_blend * seam_factors.get(index, 1.0)
+        if factor <= 1e-8:
+            continue
+        is_left = (point.x >= center_x) == left_positive
+        side = "left" if is_left else "right"
+        result = side_trees[side].find_nearest(point)
+        if result is None or result[0] is None or result[1] is None:
+            raise ValueError(f"Thigh surface lookup failed at sewn vertex {index}")
+        location, normal, _triangle, distance = result
+        if distance > projection_limit or normal.length < .99:
+            raise ValueError(f"Thigh projection exceeds declared range at sewn vertex {index}")
+        normal = normal.normalized()
+        # Orient the offset toward the garment's original exterior, rather than
+        # trusting arbitrary triangle winding in the imported avatar mesh.
+        if (point - location).dot(normal) < 0:
+            normal.negate()
+        target = location + normal * clearance
+        placed = point.lerp(target, factor)
+        displacement = (placed - point).length
+        mesh["vertices"][index] = list(placed)
+        moved[side] += 1
+        max_distance = max(max_distance, distance)
+        max_displacement = max(max_displacement, displacement)
+    if not sum(moved.values()):
+        raise ValueError("Thigh attachment selected no front panel vertices")
+    minimum_area = math.inf
+    for face in mesh["faces"]:
+        a, b, c = [Vector(mesh["vertices"][vertex_id]) for vertex_id in face]
+        area = (b - a).cross(c - a).length / 2
+        if area <= 1e-12:
+            raise ValueError("Thigh attachment collapsed a sewn triangle")
+        minimum_area = min(minimum_area, area)
+    return {
+        "applied": True,
+        "method": spec["method"],
+        "targetSourceSha256": digest(target_path),
+        "targetBodyObject": body.name,
+        "targetTriangleCountByThigh": side_triangle_counts,
+        "panelIds": sorted(selected),
+        "movedVertexCountByThigh": moved,
+        "maximumNearestSurfaceDistanceM": max_distance,
+        "maximumRestDisplacementM": max_displacement,
+        "minimumTriangleAreaM2": minimum_area,
+        "beforeVerticesSha256": hashlib.sha256(before.encode()).hexdigest(),
+        "afterVerticesSha256": hashlib.sha256(json.dumps(mesh["vertices"], separators=(",", ":")).encode()).hexdigest(),
+        "bodyFacesCopied": False,
+        "grantsFitAcceptance": False,
+        "grantsPoseAcceptance": False,
+    }
+
+
 def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
     """Remove only sub-pixel, sub-10-micrometre triangular slivers.
 
@@ -1773,6 +1918,9 @@ def main():
         waistband_pose = dict(pose, bodyContourPlacement=pose["waistbandContourPlacement"])
         waistband_evidence = place_on_measured_contours(mesh, body_objects, waistband_pose, resolve(job["targetSourcePath"]), angular_source_vertices=native_angular_vertices)
     fold_evidence = place_declared_skirt_folds(mesh, pose, native_angular_vertices)
+    thigh_attachment_evidence = place_skirt_front_on_thigh_surfaces(
+        mesh, body_objects, pose, resolve(job["targetSourcePath"])
+    )
     recipe = read(resolve(pipeline["materialRecipePath"]))
     rear_waist_tab_evidence = append_declared_rear_waist_tab(
         mesh, body_objects, pose, recipe, resolve(job["targetSourcePath"])
@@ -1851,6 +1999,7 @@ def main():
         "schemaVersion": 1, "productId": job["id"], "passed": False,
         "measuredWaistbandPlacement": waistband_evidence,
         "declaredSkirtFoldPlacement": fold_evidence,
+        "poseAwareThighAttachment": thigh_attachment_evidence,
         "declaredSkirtLengthening": skirt_lengthening_evidence,
         "declaredSkirtCreaseTopology": crease_evidence,
         "buildDisposition": "EDITABLE_SEWN_PROTOTYPE_ONLY",
