@@ -9517,7 +9517,10 @@
     ],
     "radialClearanceM": 0.01,
     "outsideSampleRange": "hold-nearest-contour",
-    "evidenceBoundary": "Neutral evaluated body horizontal sections; convex envelope encloses both legs where separate loops exist. Increase only radii below measured envelope plus explicit prototype 10 mm clearance; retain larger original flare. No body faces copied, original garment faces/seams retained. Sampled radial clearance does not prove continuous face penetration, cloth, Large or runtime fit."
+    "evidenceBoundary": "Neutral evaluated body sections define the skirt envelope. V28 adds a 4 mm radial offset to the exclusive left front-lap surface only; center-front edges are unfastened overlap edges and shared flank seams remain coincident. This is a prototype layer hypothesis, not fit, collision, cloth or appearance acceptance.",
+    "exclusivePieceLayerOffsetM": {
+      "overskirt-front-lap-left": 0.004
+    }
   },
   "collarContourPlacement": {
     "method": "measured-horizontal-body-contour-radial-placement",
@@ -9651,7 +9654,7 @@
       ],
       "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 25 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
     },
-    "evidenceBoundary": "V26 keeps V25 fold construction, length, forward projection and thigh weights fixed; it widens the six overskirt panel hem contours by 29.4% while keeping waist seam coordinates unchanged. This panel-shape hypothesis must be checked for pose coverage, side silhouette, seam correspondence, fit and motion; it grants no acceptance.",
+    "evidenceBoundary": "V28 retains V27 lengths, forward apron extension, fold and weight parameters. Front lap geometry now crosses the centerline by 80 mm per side at the hem; this unfastened overlap is a geometry hypothesis for seated and crouched coverage, not appearance or fit acceptance.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9670,4 +9673,3 @@
   },
   "designRevision": "v27-center-lap-thigh-follow-trial-20261021"
 }
-

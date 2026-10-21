@@ -2583,7 +2583,7 @@
     },
     {
       "cutCount": 1,
-      "constructionStatus": "UNAPPROVED_SEATED_LAP_PANEL_SEWN_TO_FRONT_FLANK",
+      "constructionStatus": "V28_UNFASTENED_OVERLAPPING_FRONT_APRON",
       "pieceId": "overskirt-front-lap-left",
       "partId": "short-pleated-overskirt",
       "edges": [
@@ -2607,7 +2607,7 @@
         },
         {
           "startVertex": 3,
-          "role": "seam",
+          "role": "open",
           "endVertex": 0,
           "edgeId": "center-front"
         }
@@ -2627,7 +2627,7 @@
           -0.16
         ],
         [
-          0,
+          0.08,
           -0.16
         ]
       ],
@@ -2637,7 +2637,7 @@
     },
     {
       "cutCount": 1,
-      "constructionStatus": "UNAPPROVED_SEATED_LAP_PANEL_SEWN_TO_FRONT_FLANK",
+      "constructionStatus": "V28_UNFASTENED_OVERLAPPING_FRONT_APRON",
       "pieceId": "overskirt-front-lap-right",
       "partId": "short-pleated-overskirt",
       "edges": [
@@ -2661,7 +2661,7 @@
         },
         {
           "startVertex": 3,
-          "role": "seam",
+          "role": "open",
           "endVertex": 0,
           "edgeId": "center-front"
         }
@@ -2681,7 +2681,7 @@
           -0.16
         ],
         [
-          0,
+          -0.08,
           -0.16
         ]
       ],
@@ -2799,7 +2799,7 @@
   "method": {
     "name": "avatar-profile-anchored 2D topology candidate",
     "status": "TRIAL",
-    "rationale": "Use measured neutral body sections as proportional anchors for jacket and overskirt shells, then author explicit edge correspondences for the pinned GarmentCode 2D preview and OpenSew endpoint audit. The shorts reuse measured avatar leg/hip placement anchors but now add a graduated multi-point outer-thigh contour and inner crotch-rise profile; garment ease, gusset geometry, stretch, opacity, seated coverage and Shape Key response remain unverified. This is a shaped construction hypothesis only. V26 manually widens the six existing overskirt hem contours by 29.4% at the outer hem vertices, leaves waist edges, length, front projection, and all bone weights unchanged, and rebuilds rendered sit/crouch coverage. This authored 2D panel-shape hypothesis is not a fit or visual acceptance."
+    "rationale": "V28 changes only the front-lap geometry and seam intent: mirrored lap panels now overlap across center by 80 mm per side at the hem, with center-front edges intentionally unfastened. The left panel is declared as a 4 mm outer radial layer on exclusive vertices. This is a geometry-level continuous overlap hypothesis; rendered coverage, collision, fit, cloth, folds, and appearance remain unverified."
   },
   "unresolved": [
     {
