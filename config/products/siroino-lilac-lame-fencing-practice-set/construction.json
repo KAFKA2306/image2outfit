@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V26 trials a 29.4% width increase at the overskirt hem vertices while preserving every waist edge, panel length, front projection, fold field, material, and thigh weight. This is an authored 2D panel-shape hypothesis to address measured sit/crouch upper-thigh coverage; fold continuity, rear-tab legibility, UV, fit, and motion remain unapproved.",
-  "designRevision": "v26-hem-flare-width-coverage-trial-20261021",
+  "target": "V27 keeps V26 sewn panel geometry and tests one continuous anterior thigh-follow field across the sewn front and lap panels. Centerline hem influence rises from 0.48 to 0.72 and smooth center-to-side transition half-widths change from 55/95 mm to 75/135 mm. Shared seam vertices retain one profile. This is a posed deformation hypothesis only; overlap, continuity, and rendered coverage still require direct review.",
+  "designRevision": "v27-center-lap-thigh-follow-trial-20261021",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -199,7 +199,7 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "V21 preserves existing prototype weights and extends their ownership to the new center lap panels. This does not claim pose coverage, fit, collision, opacity, or release acceptance.",
+      "evidenceBoundary": "V27 keeps a single explicit weight region across the connected overskirt, preserving one profile across shared front/lap seams. Panel-specific overlapping profile regions were rejected by the canonical seam-owner audit; this bounded alternative applies a continuous anterior center-to-side field. No fit or appearance acceptance.",
       "weightProfile": {
         "method": "panel-balanced-hem-thigh-follow-v5",
         "pieceIds": [
@@ -216,14 +216,15 @@
         "waistThighWeight": 0,
         "hemThighWeight": 0.72,
         "forwardHemThighWeight": 0.72,
-        "centerlineHemThighWeight": 0.48,
+        "centerlineHemThighWeight": 0.72,
         "maximumThighWeight": 0.75,
         "forwardCenterYM": -0.03788188099861145,
         "forwardFadeDistanceM": 0.14,
-        "centerlineHalfWidthM": 0.055,
-        "fullSideWeightWidthM": 0.095,
-        "evidenceBoundary": "V24 trial changes only forwardHemThighWeight from 0.18 to 0.72 to test whether stronger anterior lap-to-thigh following prevents the extended apron from lagging behind raised thighs. Waist anchoring, centerline balance, geometry, and the 0.75 cap remain unchanged. This is an unverified deformation hypothesis requiring new rendered coverage, seam inspection, collision review, and direct appearance review; it grants no fit or release acceptance."
+        "centerlineHalfWidthM": 0.075,
+        "fullSideWeightWidthM": 0.135,
+        "evidenceBoundary": "V27 increases the skirt anterior centerline hem thigh-follow influence from 0.48 to 0.72 and broadens its smooth lateral transition from 55/95 mm to 75/135 mm half-widths. One shared panel weight field spans the sewn front lap and adjacent overskirt pieces so shared seam vertices retain a continuous profile. Geometry and all other weight parameters stay fixed. This uncalibrated prototype setting is not fit, motion, collision, or appearance acceptance."
       }
     }
   ]
 }
+

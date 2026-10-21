@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v26-hem-flare-width-coverage-trial-20261021",
+  "revision": "v27-center-lap-thigh-follow-trial-20261021",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
+      "code": "SKIRT_POSE_COVERAGE",
       "severity": "BLOCKER",
-      "description": "Sit/crouch renders still show both shorts thighs exposed and the apron hanging behind or between the legs. Wider hem material accumulates in curled side layers; hash-bound coverage improved only marginally and remains far below adequate coverage.",
-      "code": "SKIRT_POSE_COVERAGE"
+      "description": "Direct inspection of V27 sit and crouch renders shows the center lap still fails to cover the raised thighs: broad shorts panels remain exposed, while overskirt fabric lifts and hangs behind/between the legs. The broader thigh-follow field does not create continuous lap coverage."
     },
     {
+      "code": "SKIRT_FORM_AND_FACETING",
       "severity": "BLOCKER",
-      "description": "Direct inspection of V26 images shows the wider silhouette has ladder-like triangular side creases, stacked hem edges, projecting corners, and persistent coarse faceting; surface continuity regressed from V25.",
-      "code": "SKIRT_FORM_AND_FACETING"
+      "description": "V27 front, three-quarter, and side views retain coarse triangular faceting across the skirt, uneven folded side edges, and a stiff segmented hem. The center field does not materially improve overall surface continuity."
     },
     {
+      "code": "REAR_TAB_LEGIBILITY",
       "severity": "BLOCKER",
-      "description": "The rear adjustment tab still blends into the jacket and the buckle has no distinct readable shape in the current back view.",
-      "code": "REAR_TAB_LEGIBILITY"
+      "description": "Direct back-view inspection still cannot distinguish the rear adjustment tab and buckle from the jacket/skirt silhouette."
     },
     {
+      "code": "UV_NOT_CREATED",
       "severity": "BLOCKER",
-      "description": "Authored UV mapping is still missing. The mesh topology illustration is not a UV layout.",
-      "code": "UV_NOT_CREATED"
+      "description": "Authored UV mapping remains missing; no inspected view constitutes a UV layout."
     }
   ],
   "failedGeometryChecks": [
