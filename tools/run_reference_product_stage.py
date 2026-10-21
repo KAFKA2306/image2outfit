@@ -1904,6 +1904,15 @@ def stage_build(
             blend,
             report,
             log,
+            *(
+                [
+                    runtime_root(product_id)
+                    / "initialization"
+                    / "prototype-readiness.json"
+                ]
+                if boxmesh_evidence is not None
+                else []
+            ),
             *([*boxmesh_evidence] if boxmesh_evidence is not None else []),
             *(
                 [

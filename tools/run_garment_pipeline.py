@@ -71,6 +71,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--resume-state", type=Path)
+    parser.add_argument(
+        "--reuse-completed-prefix-after-source-change",
+        action="store_true",
+        help=(
+            "Reuse a validated completed checkpoint prefix when the source fingerprint "
+            "changed. Requires an explicit reason and an identity-matching resume state."
+        ),
+    )
+    parser.add_argument(
+        "--source-change-reuse-reason",
+        help="Audited explanation for reusing the completed prefix after source changes.",
+    )
     parser.add_argument("--checkpoint-output", type=Path)
     parser.add_argument(
         "--audit-root",
@@ -251,6 +263,7 @@ def _resume_or_reset(
     request: dict[str, Any],
     expected: dict[str, str],
     mode: ExecutionMode,
+    reuse_stale_prefix_reason: str | None = None,
 ) -> dict[str, Any]:
     _validate_persisted_pipeline_state(previous, label="resume state")
     mismatches = _identity_mismatches(previous, expected)
@@ -262,6 +275,25 @@ def _resume_or_reset(
     if "sourceFingerprint" not in mismatches:
         _validate_resume_integrity(previous)
         return resume_pipeline_state(previous, execution_mode=mode)
+
+    if reuse_stale_prefix_reason is not None:
+        if mode is not ExecutionMode.EXECUTE:
+            raise ValueError("stale-prefix reuse is only valid in execute mode")
+        if not list(previous.get("completed_stages", [])):
+            raise ValueError("stale-prefix reuse requires a completed checkpoint prefix")
+        if previous.get("status") != "FAILED":
+            raise ValueError("stale-prefix reuse requires a failed checkpoint")
+        _validate_resume_integrity(previous)
+        resumed = resume_pipeline_state(previous, execution_mode=mode)
+        resumed["source_fingerprint"] = expected["sourceFingerprint"]
+        resumed["resume_history"][-1]["source_change_reuse"] = {
+            "previous_source_fingerprint": str(previous.get("source_fingerprint", "")),
+            "current_source_fingerprint": expected["sourceFingerprint"],
+            "reused_completed_stages": list(previous.get("completed_stages", [])),
+            "reason": reuse_stale_prefix_reason,
+            "integrity_validation": "passed",
+        }
+        return resumed
 
     state = _new_state(request, expected, mode)
     state["checkpoint_reset"] = {
@@ -303,6 +335,21 @@ def _emit_failure(
 
 def _main_unlocked() -> int:
     args = parse_args()
+    if args.reuse_completed_prefix_after_source_change:
+        if not args.source_change_reuse_reason or not args.source_change_reuse_reason.strip():
+            return _emit_failure(
+                args,
+                error_code="INVALID_RESUME_STATE",
+                phase="resume",
+                exc=ValueError("stale-prefix reuse requires --source-change-reuse-reason"),
+            )
+    elif args.source_change_reuse_reason is not None:
+        return _emit_failure(
+            args,
+            error_code="INVALID_RESUME_STATE",
+            phase="resume",
+            exc=ValueError("--source-change-reuse-reason requires stale-prefix reuse opt-in"),
+        )
     try:
         request_path = _repo_path(args.request, label="request")
         request = _read_object(request_path, label="request")
@@ -369,7 +416,15 @@ def _main_unlocked() -> int:
                 label="resume state",
             )
             state = _resume_or_reset(
-                previous, request=request, expected=expected, mode=mode
+                previous,
+                request=request,
+                expected=expected,
+                mode=mode,
+                reuse_stale_prefix_reason=(
+                    args.source_change_reuse_reason
+                    if args.reuse_completed_prefix_after_source_change
+                    else None
+                ),
             )
             if state.get("checkpoint_reset"):
                 print(

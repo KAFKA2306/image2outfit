@@ -875,7 +875,14 @@ def append_declared_rear_waist_tab(mesh, body_objects, pose, recipe, target_path
             or len(face_uv) != old_face_count
             or len(panel_uv_keys) != old_face_count
             or len(face_uv_kinds) != old_face_count):
-        raise ValueError("Pattern UV provenance must cover the sewn faces before accessory placement")
+        raise ValueError(
+            "Pattern UV provenance must cover the sewn faces before accessory "
+            f"placement (schema={mesh.get('schemaVersion')!r}, "
+            f"faces={old_face_count}, coordinates="
+            f"{len(face_uv) if isinstance(face_uv, list) else 'missing'}, "
+            f"panelKeys={len(panel_uv_keys) if isinstance(panel_uv_keys, list) else 'missing'}, "
+            f"sourceKinds={len(face_uv_kinds) if isinstance(face_uv_kinds, list) else 'missing'})"
+        )
     tab_uv_vertices = [
         [((column / x_segments) - 0.5) * width,
          ((row / z_segments) - 0.5) * height]
@@ -1379,14 +1386,42 @@ def split_declared_skirt_creases(mesh, pose):
     original_id = bm.verts.layers.int.new("original_vertex_id")
     initial_count = len(mesh["vertices"])
     initial_face_count = len(mesh["faces"])
+    uv_coordinates = mesh.get("facePatternCoordinates")
+    uv_panel_keys = mesh.get("facePatternPanelKeys")
+    uv_source_kinds = mesh.get("faceUvSourceKinds")
+    if (not isinstance(uv_coordinates, list)
+            or not isinstance(uv_panel_keys, list)
+            or not isinstance(uv_source_kinds, list)
+            or len(uv_coordinates) != initial_face_count
+            or len(uv_panel_keys) != initial_face_count
+            or len(uv_source_kinds) != initial_face_count):
+        raise ValueError("Crease subdivision requires complete source-face UV provenance")
+    panel_keys = sorted(set(uv_panel_keys))
+    source_kinds = sorted(set(uv_source_kinds))
+    if (not panel_keys or not source_kinds
+            or any(not isinstance(key, str) or not key for key in panel_keys)
+            or any(not isinstance(kind, str) or not kind for kind in source_kinds)):
+        raise ValueError("Crease subdivision found invalid UV panel/source provenance")
     vertices = []
+    uv_layer = bm.loops.layers.uv.new("image2outfit_source_pattern_uv")
     for index, point in enumerate(mesh["vertices"]):
         vertex = bm.verts.new(point)
         vertex[original_id] = index + 1
         vertices.append(vertex)
-    for indices, piece in zip(mesh["faces"], mesh["facePieceIds"]):
+    panel_layer = bm.faces.layers.int.new("image2outfit_uv_panel_index")
+    source_layer = bm.faces.layers.int.new("image2outfit_uv_source_index")
+    for face_index, (indices, piece) in enumerate(zip(mesh["faces"], mesh["facePieceIds"])):
         face = bm.faces.new([vertices[i] for i in indices])
         face[owner] = pieces.index(piece) + 1
+        face[panel_layer] = panel_keys.index(uv_panel_keys[face_index]) + 1
+        face[source_layer] = source_kinds.index(uv_source_kinds[face_index]) + 1
+        source_coordinates = uv_coordinates[face_index]
+        if len(source_coordinates) != len(face.loops):
+            raise ValueError("Crease subdivision source UV loop count does not match face")
+        for loop, coordinate in zip(face.loops, source_coordinates):
+            if len(coordinate) != 2:
+                raise ValueError("Crease subdivision source UV coordinate is malformed")
+            loop[uv_layer].uv = (float(coordinate[0]), float(coordinate[1]))
     cuts = []
     longitudinal_cuts = []
     try:
@@ -1439,6 +1474,7 @@ def split_declared_skirt_creases(mesh, pose):
         remap = {v: i for i, v in enumerate(ordered)}
         result_vertices = [list(v.co) for v in ordered]
         result_faces, result_owners = [], []
+        result_uv_coordinates, result_uv_panel_keys, result_uv_source_kinds = [], [], []
         for face in bm.faces:
             if not 1 <= face[owner] <= len(pieces):
                 raise ValueError("Crease cut lost canonical face ownership")
@@ -1446,6 +1482,16 @@ def split_declared_skirt_creases(mesh, pose):
                 raise ValueError("Crease cut produced a degenerate triangle")
             result_faces.append([remap[v] for v in face.verts])
             result_owners.append(pieces[face[owner]-1])
+            panel_index = face[panel_layer]
+            source_index = face[source_layer]
+            if not 1 <= panel_index <= len(panel_keys) or not 1 <= source_index <= len(source_kinds):
+                raise ValueError("Crease subdivision lost UV panel/source provenance")
+            result_uv_coordinates.append([
+                [float(loop[uv_layer].uv.x), float(loop[uv_layer].uv.y)]
+                for loop in face.loops
+            ])
+            result_uv_panel_keys.append(panel_keys[panel_index - 1])
+            result_uv_source_kinds.append(source_kinds[source_index - 1])
         edges_by_piece = {}
         for piece in spec["pieceIds"]:
             group_faces = [f for f in bm.faces if pieces[f[owner]-1] == piece]
@@ -1458,13 +1504,27 @@ def split_declared_skirt_creases(mesh, pose):
         non_manifold = sum(len(e.link_faces) > 2 for e in bm.edges)
         if non_manifold:
             raise ValueError("Crease cuts created non-manifold edges")
-        mesh.update(vertices=result_vertices, faces=result_faces, facePieceIds=result_owners)
+        mesh.update(
+            vertices=result_vertices,
+            faces=result_faces,
+            facePieceIds=result_owners,
+            facePatternCoordinates=result_uv_coordinates,
+            facePatternPanelKeys=result_uv_panel_keys,
+            faceUvSourceKinds=result_uv_source_kinds,
+        )
+        if not (len(result_faces) == len(result_uv_coordinates)
+                == len(result_uv_panel_keys) == len(result_uv_source_kinds)):
+            raise ValueError("Crease subdivision broke source-face UV alignment")
         return {"applied": True, "method": spec["method"], "foldMethod": fold_method,
                 "cuts": cuts, "longitudinalSubdivisionCuts": longitudinal_cuts,
                 "longitudinalSubdivisionCount": len(longitudinal_cuts),
                 "beforeVertexCount": initial_count, "afterVertexCount": len(ordered),
                 "beforeTriangleCount": initial_face_count, "afterTriangleCount": len(result_faces),
                 "sharedSkirtWaistbandEdgeCount": len(seam_edges),
+                "authoredUvFaceCount": len(result_uv_coordinates),
+                "authoredUvPanelCount": len(set(result_uv_panel_keys)),
+                "authoredUvSourceKinds": {kind: result_uv_source_kinds.count(kind)
+                                           for kind in sorted(set(result_uv_source_kinds))},
                 "degenerateTriangleCount": 0, "nonManifoldEdgeCount": non_manifold,
                 "originalVertexIdentityPreserved": True,
                 "grantsFitAcceptance": False, "grantsVisualAcceptance": False,

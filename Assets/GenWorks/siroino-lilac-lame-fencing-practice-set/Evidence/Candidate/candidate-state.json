@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v29-bilateral-thigh-surface-attachment-trial-20261021",
+  "revision": "v30-authored-source-panel-uv-trial-20261021",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
+      "description": "Direct inspection of the current V30 front, back, sit, and crouch renders confirms the separated overskirt panels do not create continuous lap coverage. In sit, the shorts remain plainly exposed across the raised thighs; in crouch, shorts remain visible beneath the lifted front panels. Pointed panel ends intersect and overlap around the thighs. This is an observed coverage failure, not accepted fit.",
       "severity": "BLOCKER",
-      "code": "SKIRT_POSE_COVERAGE",
-      "description": "Direct inspection of all five current views and six pose renders confirms V29 bilateral thigh-surface placement materially moves the front overskirt across the upper thighs in sit and crouch, addressing the V28 side-placement failure. It still does not form continuous controlled lap coverage: shorts remain exposed below/through the front opening, with separate pointed panels and raw angular edges around the seated thighs. This is a placement improvement, not accepted pose coverage."
+      "code": "SKIRT_POSE_COVERAGE"
     },
     {
+      "description": "The current neutral front and rear renders show dense coarse triangular facets and irregular folds across the skirt and jacket. The skirt hem is uneven, and panel boundaries end in sharp protruding corners. The resulting silhouette and surface transitions are visibly unfinished.",
       "severity": "BLOCKER",
-      "code": "SKIRT_FORM_AND_FACETING",
-      "description": "Direct front, back, left, right, three-quarter, neutral, arms-up, arm-cross, sit, crouch, and prone inspection still shows coarse triangular surface faceting, uneven hem lines, and layered or protruding panel corners. The current geometry transfer does not smooth the skirt silhouette or produce clean sewn transitions."
+      "code": "SKIRT_FORM_AND_FACETING"
     },
     {
+      "description": "The current rear render does not show a clearly identifiable rear adjustment tab or buckle at the waist; no readable hardware silhouette is visible.",
       "severity": "BLOCKER",
-      "code": "REAR_TAB_LEGIBILITY",
-      "description": "The current back render still does not present a distinct, readable rear adjustment tab or buckle."
+      "code": "REAR_TAB_LEGIBILITY"
     },
     {
+      "description": "The build report records source-coordinate UV attribution on 23,703 faces, but the current source-bound mesh showcase reports uvStatus MISSING and lists garment meshes without a UV layer, including the pleated overskirt and static garment mesh. No UV-layout image was reviewed. UV coverage and placement therefore remain unverified.",
       "severity": "BLOCKER",
-      "code": "UV_NOT_CREATED",
-      "description": "Authored UV mapping remains missing. The automatic prototype unwrap is not authored UV evidence, and the inspected images are not a UV layout."
+      "code": "UV_MAPPING_INCOMPLETE"
     }
   ],
   "failedGeometryChecks": [

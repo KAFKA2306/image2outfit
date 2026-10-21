@@ -9121,6 +9121,11 @@
     "beforeTriangleCount": 17111,
     "afterTriangleCount": 23663,
     "sharedSkirtWaistbandEdgeCount": 64,
+    "authoredUvFaceCount": 23663,
+    "authoredUvPanelCount": 24,
+    "authoredUvSourceKinds": {
+      "garmentcode-pattern-panel": 23663
+    },
     "degenerateTriangleCount": 0,
     "nonManifoldEdgeCount": 0,
     "originalVertexIdentityPreserved": true,
@@ -9129,6 +9134,17 @@
     "evidenceBoundary": "Native radial cuts align the declared fold profile to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."
   },
   "buildDisposition": "EDITABLE_SEWN_PROTOTYPE_ONLY",
+  "authoredPatternUvEvidence": {
+    "status": "AUTHORED_FROM_DECLARED_2D_SOURCE_COORDINATES",
+    "method": "face-local-source-coordinates-with-deterministic-panel-tiles",
+    "panelCount": 26,
+    "mappedFaceCount": 23703,
+    "sourceKindFaceCounts": {
+      "declared-parametric-accessory": 40,
+      "garmentcode-pattern-panel": 23663
+    },
+    "grantsQualityAcceptance": false
+  },
   "prototypeEdgeTrim": {
     "applied": true,
     "materialName": "lavender-piping-prototype-hypothesis",
@@ -19940,8 +19956,8 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "7bdfb2a1b2c57c5409f5cfe2f3b0427456ec1f9432baa1cee581dafdc61d1a66",
-  "sewnMeshSha256": "6afd0404a6eae8e69ac3401ddfad813ef8fddb203527f3d07af92faa9d40f552",
+  "sourceBlendSha256": "a81c67128972a08ae8300cad0652942d446d65325f040bc0a267ee528ab80aab",
+  "sewnMeshSha256": "3273050e3dca0b927b07f542254d0c998617d624d54493b598f2299f43b12520",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
     "candidateDegenerateCrossProductSquaredThreshold": 1e-20,
