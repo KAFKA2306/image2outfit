@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V32 tests stronger front-panel attachment to thigh-deforming surfaces after the V31 colored sit diagnostic found that 144 of 148 inter-panel boundary edges are Hips-dominant and anterior coverage regressed from 0.333 in V30 to 0.22 in V31. The first V32 build with a 0.30 triangle-weight threshold and 0.90 placement blend collapsed one triangle to a 12.85 micrometre weld requirement, beyond the unchanged 10 micrometre cleanup bound. Keep the same V32 hypothesis and weight field, moderate the attachment to a 0.20 triangle-weight threshold and 0.75 blend, and retain the 0.22 m projection cap and 0.012 m clearance. This tests attachment, not a new pattern dimension; topology, rendered coverage, fit, and appearance remain unverified.",
-  "designRevision": "v32-thigh-surface-anchor-20261022",
+  "target": "V33 replaces V32 neutral nearest-surface movement with one pose-constrained source-geometry solve. The V32 direct sit transects measured the lap 40–63 mm posterior to the shorts and sit coverage remained 0.22–0.23, while the current pelvis-dominant field and neutral body surface lookup cannot encode the seated trajectory. Fit the connected front skirt and lap to the evaluated sit shorts surface, inverse-map through the existing skin weights, pin the waist and shared external seams, and bound neutral/crouch displacement, surface residual, skin-map error, and triangle orientation. This is a geometry hypothesis; the authored UV, topology, rendered appearance, fit, and release gates remain independent.",
+  "designRevision": "v33-sit-pose-apron-geometry-20261022",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",

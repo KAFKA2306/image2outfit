@@ -10,7 +10,7 @@ import sys
 from pathlib import Path
 
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 from mathutils.bvhtree import BVHTree
 from mathutils.geometry import barycentric_transform
 
@@ -34,6 +34,332 @@ def digest(path):
 def _smoothstep(value):
     value = max(0.0, min(1.0, float(value)))
     return value * value * (3.0 - 2.0 * value)
+
+
+def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
+    """Fit the sewn front apron in sit pose and invert the frozen skin map.
+
+    This is a deterministic source-geometry solve, not a weight change: it
+    projects the front skirt/lap onto the evaluated under-shorts in the
+    declared sit pose, smooths the displacement through the connected front
+    panels, preserves shared external seams, then maps those target positions
+    back through each vertex's existing linear-blend skin transform.
+    """
+    spec = pose_spec.get("poseConstrainedApronGeometry")
+    if spec is None:
+        return {"applied": False, "reason": "not-declared"}
+    if spec.get("method") != "sit-shorts-surface-inverse-skin-v1":
+        raise ValueError("Unknown pose-constrained apron geometry method")
+    source_piece_ids = set(spec.get("sourcePieceIds", []))
+    left_targets = set(spec.get("leftTargetPieceIds", []))
+    right_targets = set(spec.get("rightTargetPieceIds", []))
+    if (not source_piece_ids or not left_targets or not right_targets
+            or left_targets & right_targets):
+        raise ValueError("Pose-constrained apron piece ownership is incomplete")
+    numeric = (
+        "minimumHeightZM", "fullBlendHeightZM", "fullBlendEndHeightZM", "waistLockHeightZM",
+        "clearanceM", "maximumTargetDistanceM", "maximumCorrectionM",
+        "maximumPoseCorrectionM", "maximumSkinMappingErrorM",
+        "maximumSurfaceResidualM", "smoothness", "maximumNormalTurnDot",
+    )
+    if not all(math.isfinite(spec.get(key, math.nan)) for key in numeric):
+        raise ValueError("Pose-constrained apron bounds must be finite")
+    if (spec["minimumHeightZM"] >= spec["fullBlendHeightZM"]
+            or spec["fullBlendHeightZM"] > spec["fullBlendEndHeightZM"]
+            or spec["fullBlendEndHeightZM"] >= spec["waistLockHeightZM"]
+            or spec["clearanceM"] <= 0
+            or spec["maximumTargetDistanceM"] <= 0
+            or spec["maximumCorrectionM"] <= 0
+            or spec["maximumPoseCorrectionM"] <= 0
+            or spec["maximumSkinMappingErrorM"] <= 0
+            or spec["maximumSurfaceResidualM"] <= 0
+            or spec["smoothness"] < 0
+            or not -1 < spec["maximumNormalTurnDot"] < 1
+            or not isinstance(spec.get("smoothingIterations"), int)
+            or not 1 <= spec["smoothingIterations"] <= 64):
+        raise ValueError("Invalid pose-constrained apron bounds")
+    owned_meshes = []
+    for candidate in objects:
+        if candidate.type != "MESH" or not candidate.data.attributes.get("canonical_piece_index"):
+            continue
+        candidate_attr = candidate.data.attributes["canonical_piece_index"]
+        if candidate_attr.domain != "FACE":
+            continue
+        candidate_pieces = json.loads(candidate["canonicalPieceIds"])
+        candidate_owners = [candidate_pieces[item.value] for item in candidate_attr.data]
+        owned_meshes.append((candidate, candidate_pieces, candidate_owners))
+    source_meshes = [item for item in owned_meshes if source_piece_ids.issubset(set(item[2]))]
+    target_meshes = [
+        item for item in owned_meshes
+        if set(item[2]).intersection(left_targets | right_targets)
+    ]
+    if len(source_meshes) != 1 or not target_meshes:
+        raise ValueError(
+            "Pose-constrained apron requires one source mesh and evaluated shorts target meshes"
+        )
+    obj, pieces, face_owners = source_meshes[0]
+    vertex_owners = [set() for _ in obj.data.vertices]
+    for polygon, owner in zip(obj.data.polygons, face_owners):
+        for index in polygon.vertices:
+            vertex_owners[index].add(owner)
+    selected = {
+        index for index, owners in enumerate(vertex_owners)
+        if owners.intersection(source_piece_ids)
+    }
+    if not selected:
+        raise ValueError("Pose-constrained apron selected no sewn vertices")
+    selected_indices = sorted(selected)
+
+    from genworks_product_common import reset_pose, set_pose
+
+    def evaluated_world_vertices():
+        bpy.context.view_layer.update()
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        evaluated_obj = obj.evaluated_get(depsgraph)
+        evaluated_mesh = evaluated_obj.to_mesh()
+        if len(evaluated_mesh.vertices) != len(obj.data.vertices):
+            evaluated_obj.to_mesh_clear()
+            raise ValueError("Evaluated garment changed vertex order before apron solve")
+        result = [evaluated_obj.matrix_world @ vertex.co for vertex in evaluated_mesh.vertices]
+        evaluated_obj.to_mesh_clear()
+        return result
+
+    # Record the current weighted surface in each required pose. These values
+    # bound the one sit-pose geometry solve in the other review poses.
+    pose_names = ("neutral", "sit", "crouch")
+    baseline = {}
+    for name in pose_names:
+        set_pose(armature, name)
+        baseline[name] = evaluated_world_vertices()
+
+    set_pose(armature, spec.get("referencePose", "sit"))
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    evaluated_obj = obj.evaluated_get(depsgraph)
+    evaluated_mesh = evaluated_obj.to_mesh()
+    if len(evaluated_mesh.vertices) != len(obj.data.vertices):
+        evaluated_obj.to_mesh_clear()
+        raise ValueError("Evaluated source garment changed vertex order")
+    world_vertices = [evaluated_obj.matrix_world @ v.co for v in evaluated_mesh.vertices]
+    evaluated_obj.to_mesh_clear()
+    side_triangles, target_world_vertices, target_offset = {"left": [], "right": []}, [], 0
+    for target_obj, target_pieces, target_face_owners in target_meshes:
+        target_eval = target_obj.evaluated_get(depsgraph)
+        target_mesh = target_eval.to_mesh()
+        if len(target_mesh.vertices) != len(target_obj.data.vertices):
+            target_eval.to_mesh_clear()
+            raise ValueError(f"Evaluated shorts target changed vertex order: {target_obj.name}")
+        target_world_vertices.extend(
+            target_eval.matrix_world @ vertex.co for vertex in target_mesh.vertices
+        )
+        target_attr = target_mesh.attributes.get("canonical_piece_index")
+        if target_attr is None or target_attr.domain != "FACE":
+            target_eval.to_mesh_clear()
+            raise ValueError(f"Evaluated shorts target lost piece ownership: {target_obj.name}")
+        target_mesh.calc_loop_triangles()
+        evaluated_targets = [target_pieces[item.value] for item in target_attr.data]
+        for triangle in target_mesh.loop_triangles:
+            owner = evaluated_targets[triangle.polygon_index]
+            if owner in left_targets:
+                side_triangles["left"].append(tuple(i + target_offset for i in triangle.vertices))
+            elif owner in right_targets:
+                side_triangles["right"].append(tuple(i + target_offset for i in triangle.vertices))
+        target_offset += len(target_mesh.vertices)
+        target_eval.to_mesh_clear()
+    if not side_triangles["left"] or not side_triangles["right"]:
+        raise ValueError("Pose-constrained apron requires evaluated shorts triangles on both sides")
+    side_trees = {
+        side: BVHTree.FromPolygons(target_world_vertices, triangles, all_triangles=True)
+        for side, triangles in side_triangles.items()
+    }
+
+    left_bone = spec["leftThighBone"]
+    right_bone = spec["rightThighBone"]
+    if left_bone not in armature.data.bones or right_bone not in armature.data.bones:
+        raise ValueError("Pose-constrained apron target thigh bones are missing")
+    left_x = (armature.matrix_world @ armature.data.bones[left_bone].head_local).x
+    right_x = (armature.matrix_world @ armature.data.bones[right_bone].head_local).x
+    if abs(left_x - right_x) <= 1e-6:
+        raise ValueError("Pose-constrained apron cannot establish bilateral thigh axis")
+    center_x, left_positive = (left_x + right_x) / 2.0, left_x > right_x
+    obj_inverse = obj.matrix_world.inverted()
+    maps = {}
+    for bone_name in armature.data.bones.keys():
+        pose_bone = armature.pose.bones.get(bone_name)
+        bone = armature.data.bones.get(bone_name)
+        if pose_bone is not None and bone is not None and bone.use_deform:
+            maps[bone_name] = (
+                armature.matrix_world @ pose_bone.matrix
+                @ bone.matrix_local.inverted()
+                @ armature.matrix_world.inverted() @ obj.matrix_world
+            )
+
+    targets, target_distances, skin_errors = {}, [], []
+    locked = set()
+    for index in selected_indices:
+        point = obj.data.vertices[index].co
+        if (point.z <= spec["minimumHeightZM"]
+                or point.z >= spec["waistLockHeightZM"]
+                or vertex_owners[index].difference(source_piece_ids)):
+            locked.add(index)
+            continue
+        side = "left" if ((obj.matrix_world @ point).x >= center_x) == left_positive else "right"
+        result = side_trees[side].find_nearest(world_vertices[index])
+        if result is None or result[0] is None or result[1] is None:
+            raise ValueError(f"Sit-pose shorts surface lookup failed at apron vertex {index}")
+        location, normal, _triangle, distance = result
+        if distance > spec["maximumTargetDistanceM"]:
+            raise ValueError(
+                f"Apron pose-space target exceeds bound at vertex {index}: {distance:.6f} m"
+            )
+        if normal.length < .99:
+            raise ValueError(f"Invalid sit-pose shorts normal at apron vertex {index}")
+        normal.normalize()
+        current_world = world_vertices[index]
+        if (current_world - location).dot(normal) < 0:
+            normal.negate()
+        target_world = location + normal * spec["clearanceM"]
+        if point.z < spec["fullBlendHeightZM"]:
+            blend = _smoothstep(
+                (point.z - spec["minimumHeightZM"])
+                / (spec["fullBlendHeightZM"] - spec["minimumHeightZM"])
+            )
+        elif point.z <= spec["fullBlendEndHeightZM"]:
+            blend = 1.0
+        else:
+            blend = 1.0 - _smoothstep(
+                (point.z - spec["fullBlendEndHeightZM"])
+                / (spec["waistLockHeightZM"] - spec["fullBlendEndHeightZM"])
+            )
+        targets[index] = (target_world - current_world) * blend
+        target_distances.append(float(distance))
+        groups_for_vertex = {
+            obj.vertex_groups[group.group].name: group.weight
+            for group in obj.data.vertices[index].groups
+            if group.group < len(obj.vertex_groups)
+        }
+        mapping = Matrix(((0.0, 0.0, 0.0, 0.0),) * 4)
+        for name, weight in groups_for_vertex.items():
+            if name not in maps or weight <= 0:
+                continue
+            mapping += maps[name] * weight
+        if abs(sum(groups_for_vertex.values()) - 1.0) > 1e-4 or abs(mapping.determinant()) < 1e-10:
+            raise ValueError(f"Frozen skin map is incomplete or singular at apron vertex {index}")
+        predicted = mapping @ Vector((*obj.data.vertices[index].co, 1.0))
+        map_error = (Vector(predicted[:3]) - current_world).length
+        skin_errors.append(map_error)
+        if map_error > spec["maximumSkinMappingErrorM"]:
+            raise ValueError(
+                f"Armature inverse map diverges from evaluated sit pose at vertex {index}: {map_error:.6f} m"
+            )
+        maps[index] = mapping.inverted()
+
+    if not targets:
+        raise ValueError("Pose-constrained apron produced no movable front-panel targets")
+    neighbors = [set() for _ in obj.data.vertices]
+    for edge in obj.data.edges:
+        first, second = edge.vertices
+        neighbors[first].add(second)
+        neighbors[second].add(first)
+    displacement = {index: Vector((0, 0, 0)) for index in selected_indices}
+    displacement.update(targets)
+    movable = set(targets)
+    strength = spec["smoothness"]
+    for _ in range(spec["smoothingIterations"]):
+        updated = dict(displacement)
+        for index in movable:
+            adjacent = [other for other in neighbors[index] if other in selected]
+            if not adjacent or strength == 0:
+                continue
+            mean = sum((displacement[other] for other in adjacent), Vector()) / len(adjacent)
+            updated[index] = (targets[index] + mean * strength) / (1.0 + strength)
+        displacement = updated
+
+    corrections = [value.length for value in displacement.values()]
+    maximum_correction = max(corrections, default=0.0)
+    if maximum_correction > spec["maximumCorrectionM"]:
+        raise ValueError(
+            f"Pose-constrained apron correction {maximum_correction:.6f} m exceeds declared geometry bound {spec['maximumCorrectionM']:.6f} m"
+        )
+    original_sit = {index: world_vertices[index].copy() for index in selected_indices}
+    for index in movable:
+        if displacement[index].length <= 1e-9:
+            continue
+        target_world = world_vertices[index] + displacement[index]
+        rest_h = maps[index] @ Vector((*target_world, 1.0))
+        if abs(rest_h.w) <= 1e-9:
+            raise ValueError(f"Apron inverse skin map returned a point at infinity: {index}")
+        rest_local = Vector(rest_h[:3]) / rest_h.w
+        obj.data.vertices[index].co = rest_local
+
+    # Evaluate the solved geometry in all three poses. Large changes or a
+    # folded triangle are treated as infeasible and are never silently kept.
+    maximum_pose_delta = {name: 0.0 for name in pose_names}
+    for name in pose_names:
+        set_pose(armature, name)
+        after = evaluated_world_vertices()
+        for index in selected_indices:
+            delta = (after[index] - baseline[name][index]).length
+            maximum_pose_delta[name] = max(maximum_pose_delta[name], delta)
+            if delta > spec["maximumPoseCorrectionM"]:
+                raise ValueError(
+                    f"Apron geometry solve exceeds {name} pose bound at vertex {index}: {delta:.6f} m"
+                )
+    set_pose(armature, "sit")
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    final_obj = obj.evaluated_get(depsgraph)
+    final_mesh = final_obj.to_mesh()
+    final_world = [final_obj.matrix_world @ vertex.co for vertex in final_mesh.vertices]
+    residuals = []
+    for index in movable:
+        result = side_trees[
+            "left" if ((obj.matrix_world @ obj.data.vertices[index].co).x >= center_x) == left_positive else "right"
+        ].find_nearest(final_world[index])
+        if result is None or result[0] is None:
+            final_obj.to_mesh_clear()
+            raise ValueError(f"Solved apron has no shorts residual at vertex {index}")
+        residuals.append(abs(float(result[3]) - spec["clearanceM"]))
+    final_mesh.calc_loop_triangles()
+    for triangle in final_mesh.loop_triangles:
+        if not set(triangle.vertices).issubset(selected):
+            continue
+        old = [original_sit[index] for index in triangle.vertices]
+        new = [final_world[index] for index in triangle.vertices]
+        old_normal = (old[1] - old[0]).cross(old[2] - old[0])
+        new_normal = (new[1] - new[0]).cross(new[2] - new[0])
+        if old_normal.length < 1e-10 or new_normal.length < 1e-10:
+            final_obj.to_mesh_clear()
+            raise ValueError("Pose-constrained apron solve collapsed a sewn triangle")
+        turn_dot = old_normal.normalized().dot(new_normal.normalized())
+        if turn_dot < spec["maximumNormalTurnDot"]:
+            final_obj.to_mesh_clear()
+            raise ValueError("Pose-constrained apron solve inverted a sewn triangle")
+    final_obj.to_mesh_clear()
+    reset_pose(armature)
+    bpy.context.view_layer.update()
+    if max(residuals, default=0.0) > spec["maximumSurfaceResidualM"]:
+        raise ValueError("Pose-constrained apron could not meet the shorts-surface residual bound")
+    return {
+        "applied": True,
+        "method": spec["method"],
+        "referencePose": spec.get("referencePose", "sit"),
+        "sourcePieceIds": sorted(source_piece_ids),
+        "targetPieceIdsBySide": {"left": sorted(left_targets), "right": sorted(right_targets)},
+        "movedVertexCount": sum(
+            displacement[index].length > 1e-9 for index in movable
+        ),
+        "lockedSharedOrWaistVertexCount": len(locked),
+        "maximumTargetDistanceM": max(target_distances, default=0.0),
+        "maximumSkinMapErrorM": max(skin_errors, default=0.0),
+        "maximumCorrectionM": max(corrections, default=0.0),
+        "maximumPoseDisplacementM": maximum_pose_delta,
+        "maximumSurfaceResidualM": max(residuals, default=0.0),
+        "minimumNormalTurnDot": spec["maximumNormalTurnDot"],
+        "skinWeightsChanged": False,
+        "sharedExternalSeamsMoved": False,
+        "grantsFitAcceptance": False,
+        "grantsPoseAcceptance": False,
+        "evidenceBoundary": "One bounded, sit-pose source-geometry hypothesis with frozen garment skin weights. Its target is the evaluated shorts surface; neutral/crouch displacement and triangle orientation are checked, but fit, motion, collision, appearance and release remain unverified.",
+    }
 
 
 def main():
@@ -494,6 +820,11 @@ def main():
                 }
                 for key, accumulator in profile_accumulators.items()
             ]
+    pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(
+        garment_objects,
+        armature,
+        read_json(repo_path(job["garmentPipeline"]["assemblyPosePath"])),
+    )
     # Bind trim to the settled garment and inherit its weights, including the
     # garment's explicit regional profile. No independent body lookup for trim.
     edge_sources = {}
@@ -609,6 +940,7 @@ def main():
             "vertexCount": sum(len(obj.data.vertices) for obj in objects),
             "unweightedVertices": 0,
             "prototypeTrimAttachment": trim_audits,
+            "poseConstrainedApronGeometry": pose_constrained_apron_evidence,
             "prototypeWeightProfiles": profile_audits,
             "bodyDistanceM": {
                 "minimum": min(distances),

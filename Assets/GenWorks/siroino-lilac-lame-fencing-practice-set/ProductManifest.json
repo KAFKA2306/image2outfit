@@ -42,16 +42,16 @@
     "resumable": true,
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
-    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v30-state.json",
-    "nextAction": "Do not start another parameter sweep. Use this cross-section evidence to change the source of the front-lap trajectory itself: draft the anterior lap panels to follow the seated thigh surface and connect them smoothly into the adjacent front skirt panels, then re-run the normal build, pose coverage and render gates. Inspect sit and crouch directly. Keep the rejection, UV, fit, runtime, Shape Key, package and release gates.",
+    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json",
+    "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json, resolve it, then resume from this checkpoint.",
     "lastAttempt": {
-      "runId": "11fc03f1c3f44b569bd41a49de06af4d",
-      "status": "EXECUTED",
-      "checkedAt": "2026-10-22T05:09:50Z",
+      "runId": "5abf73f6995c4c9e8c0d8b227e102cdb",
+      "status": "PARTIAL",
+      "checkedAt": "2026-10-22T07:10:49Z",
       "visualAppearanceReview": "FAIL",
-      "lastPassedStage": "finalize-candidate",
-      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "987e7c61e4d6342901bd1670384f9bfecb02433c3f823ba3ccdd7d426c59341e",
+      "lastPassedStage": "simulate-cloth",
+      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/simulate-cloth.json",
+      "stageEvidenceSha256": "f6ac2abeab14ebd929b68d36606bfa21a5e0c72b6ff1340898b65ae4bf1b4ef2",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -67,61 +67,43 @@
         },
         "draft-patterns": {
           "status": "REUSED",
-          "stageResultSha256": "052c53fe5872c052118877c38e4cb5b75c70124c37fe1f53f53683689df84c62"
+          "stageResultSha256": "a25c653582ba7da6e679ad61defbdd27b3db621fe000a9077d6bcc7547a3434b"
         },
         "infer-stitches": {
           "status": "REUSED",
-          "stageResultSha256": "0cb0993d80378b329189f1fe6150c6c1d10df11787638f64e9837202a64205b9"
+          "stageResultSha256": "3a640b55a5c282df2aafbee194e306022bd470489050d176695e2f4283442046"
         },
         "initialize-3d": {
           "status": "REUSED",
-          "stageResultSha256": "898ec12cde59ff1f3e67ec2593ed93a40caacdb672fbdd6600b807d2d349d835"
+          "stageResultSha256": "c59bf5bcfe0e4adc68c078aa7d1c96cc0f71f92c56209b7bddb65ae1b20a0261"
         },
         "build-blender": {
           "status": "REUSED",
-          "stageResultSha256": "bf48b610de01939e344fe9b076493e59eb1e7dafe39d2ae6e80ea931f1647fd7"
+          "stageResultSha256": "d75df4f1071d9bcd15418b38fe5d9ffc948283cad07a1341883d9effee1193fc"
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "b06d4b0268a1fcf4cbad2827f6b080e2fe8fe4d09175d94aee3c2c0c84ef8e4f"
-        },
-        "skin-and-export": {
-          "status": "REUSED",
-          "stageResultSha256": "1c2c1ab7593402eb4f14276fbf889977d5ad585853c745aeb66541a61e9c74af"
-        },
-        "render-evidence": {
-          "status": "REUSED",
-          "stageResultSha256": "49dd8c1c41d9fd8a788b0c240b37d74145e9387be79a8c6db015acb33ba1bef9"
-        },
-        "audit-geometry": {
-          "status": "REUSED",
-          "stageResultSha256": "1c6b77332002508347b4ae0a41ad4335a57966b10905c8a6dfc04c55eb306028"
-        },
-        "visual-review": {
-          "status": "PASS",
-          "stageResultSha256": "313a72660e6eebb3e34dcc702e8098e2d9ce5e4c2c22cdbf7f076fe063fb872b"
-        },
-        "finalize-candidate": {
-          "status": "PASS",
-          "stageResultSha256": "987e7c61e4d6342901bd1670384f9bfecb02433c3f823ba3ccdd7d426c59341e"
+          "stageResultSha256": "f6ac2abeab14ebd929b68d36606bfa21a5e0c72b6ff1340898b65ae4bf1b4ef2"
         }
       },
-      "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
-      "failedAttemptEvidencePaths": [],
-      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v30-state.json",
-      "checkpointSha256": "f8f7c7c7b6a21ceddcc864db083bd38356c54a381ebc6775c3a3ce1c279c2102",
-      "blockedStage": null,
-      "failure": null,
-      "nextAction": "Do not start another parameter sweep. Use this cross-section evidence to change the source of the front-lap trajectory itself: draft the anterior lap panels to follow the seated thigh surface and connect them smoothly into the adjacent front skirt panels, then re-run the normal build, pose coverage and render gates. Inspect sit and crouch directly. Keep the rejection, UV, fit, runtime, Shape Key, package and release gates."
+      "contractResult": "Workflow FAILED; completed 8 stage(s).",
+      "failedAttemptEvidencePaths": [
+        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json"
+      ],
+      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json",
+      "checkpointSha256": "1479b388d0f5c2b9e812daf72ae9b72f84b0a5d290b61223955e90bf0a9de7ac",
+      "blockedStage": "skin-and-export",
+      "failure": "stage command failed with exit code 1: M:\\win11projects\\unity\\image2outfit\\Assets\\_Local\\.venv\\Scripts\\python.exe tools/run_reference_product_stage.py --stage skin-and-export --job config/products/siroino-lilac-lame-fencing-practice-set/job.json --request config/pipeline/requests/siroino-lilac-lame-fencing-practice-set.json --result .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/skin-and-export.json\nTraceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2503, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2488, in main\n    stage_export(job, result_path)\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2130, in stage_export\n    raise RuntimeError(f\"Skin/export failed: {execution.stderr[-2500:]}\")\nRuntimeError: Skin/export failed: Traceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 971, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 823, in main\n    pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 280, in apply_pose_constrained_apron_geometry\n    raise ValueError(\nValueError: Pose-constrained apron correction 0.100045 m exceeds declared geometry bound 0.085000 m\n\nError: script failed, file: 'M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py', exiting.\n\n",
+      "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json, resolve it, then resume from this checkpoint."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "862adba7a52c1813a43e38aca2de64bc17847f73d0c34882634999e8ae6a5b36",
+      "sourceSha256": "e42b40b765237e17eb056a4f33edd1947b7fbcc979173447c1dc5ce097f06c7e",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "1c1df32c991cc03f4ddf32a767a682c18b1cf60d4a662e7fe85fb65ccdbb4937",
+      "reportSha256": "dfc4ff47113c04cf35271eac4dc856025b65b292967e83c1b692e134d3810d66",
       "metrics": {
         "vertices": 12191,
         "triangles": 23703,

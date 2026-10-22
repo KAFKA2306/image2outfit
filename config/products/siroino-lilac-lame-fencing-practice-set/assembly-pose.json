@@ -9666,30 +9666,45 @@
     "foldValleyHalfWidthFraction": 0.22,
     "foldValleyDepthRatio": 0.12
   },
-  "poseAwareThighAttachment": {
-    "method": "bilateral-deform-bone-surface-placement-v1",
-    "pieceIds": [
-      "overskirt-front-left",
-      "overskirt-front-right",
-      "overskirt-front-lap-left",
-      "overskirt-front-lap-right"
-    ],
-    "bodyMeshNamePrefix": "SiroinoSotai_PC",
-    "leftThighBone": "UpperLeg_L",
-    "rightThighBone": "UpperLeg_R",
-    "minimumTriangleBoneWeight": 0.2,
-    "maximumFrontYM": -0.04,
-    "fadeStartZM": 0.72,
-    "fullBlendZM": 0.52,
-    "maximumProjectionDistanceM": 0.22,
-    "normalClearanceM": 0.012,
-    "maximumBlendWeight": 0.75,
-    "evidenceBoundary": "V32 reduces its attachment strength after the 0.30 threshold / 0.90 blend build produced a 12.85 micrometre sliver requiring more than the existing 10 micrometre cleanup bound. It now targets bilateral UpperLeg surface triangles carrying at least 0.20 deform weight, with 0.75 placement blend, while retaining the 0.22 m projection cap, 0.012 m clearance, panel set and vertical fade. This bounded retry does not alter the skin-weight profile or any quality threshold; topology, fit, coverage, motion, Shape Key and appearance remain unaccepted."
-  },
   "skirtFlareDesignEvidence": {
     "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "designRevision": "v32-thigh-surface-anchor-20261022"
+  "poseConstrainedApronGeometry": {
+    "method": "sit-shorts-surface-inverse-skin-v1",
+    "referencePose": "sit",
+    "sourcePieceIds": [
+      "overskirt-front-left",
+      "overskirt-front-right",
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right"
+    ],
+    "leftTargetPieceIds": [
+      "shorts-front-left",
+      "shorts-back-left"
+    ],
+    "rightTargetPieceIds": [
+      "shorts-front-right",
+      "shorts-back-right"
+    ],
+    "leftThighBone": "UpperLeg_L",
+    "rightThighBone": "UpperLeg_R",
+    "minimumHeightZM": 0.44,
+    "fullBlendHeightZM": 0.52,
+    "fullBlendEndHeightZM": 0.62,
+    "waistLockHeightZM": 0.70,
+    "clearanceM": 0.012,
+    "maximumTargetDistanceM": 0.22,
+    "maximumCorrectionM": 0.085,
+    "maximumPoseCorrectionM": 0.10,
+    "maximumSkinMappingErrorM": 0.002,
+    "maximumSurfaceResidualM": 0.035,
+    "smoothingIterations": 24,
+    "smoothness": 0.65,
+    "maximumNormalTurnDot": 0.1,
+    "lockSharedExternalSeams": true,
+    "evidenceBoundary": "V33 uses the directly measured V32 sit offsets to solve the upper-front-skirt and lap trajectory against the evaluated sit shorts surface. Its vertical envelope has a 0.44 m free-hem lock, ramps to full correction at 0.52 m, holds through 0.62 m, and fades to the pinned waist at 0.70 m. The target is inverse-mapped through existing frozen skin weights; shared external seams remain fixed. Neutral/crouch displacement, skin-map error, residual clearance, and triangle orientation are bounded checks; this geometry hypothesis does not pass fit, pose, appearance, collision, Shape Key, or release gates."
+  },
+  "designRevision": "v33-sit-pose-apron-geometry-20261022"
 }
