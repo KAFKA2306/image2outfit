@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v31-anterior-hip-apron-follow-20261022",
+  "revision": "v32-thigh-surface-anchor-20261022",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct V31 sit/crouch renders show the forward overskirt panels falling behind the raised thighs. Pose-matched measurement reports skirt coverage 0.22 on both upper thighs in sit and 0.36/0.37 in crouch, while under-shorts are 0.95 on both sides in both poses. A diagnostic-only sit render colors canonical panels distinctly and overlays inter-panel seam edges by dominant Hips/UpperLeg weight: 148 owner-boundary edges were identified, 144 Hips-dominant and two per thigh group; the lap-to-front-panel seam accounts for 28 edges on each side. This supports investigating the hip-dominant panel attachment/drape but does not establish a fit pass.",
-      "code": "SKIRT_POSE_COVERAGE",
-      "severity": "BLOCKER"
+      "description": "V32 current sit/crouch images and sit thigh transects reject anterior coverage. At 52% along each evaluated UpperLeg bone, the current lap panels are posterior to the shorts (Blender anterior is negative Y): left lap median Y -0.0972 m vs left shorts -0.1606 m (63 mm posterior); right lap -0.1219 m vs right shorts -0.1616 m (40 mm posterior). Current measured coverage remains sit 0.2316/0.2237 and crouch 0.3514/0.3695 for the overskirt, versus 0.9548/0.9548 and 0.9537/0.9537 for shorts. The source-bound transect identifies the panel trajectory and nearest projections to the declared UpperLeg-weighted body triangle set; it does not establish fit acceptance.",
+      "severity": "BLOCKER",
+      "code": "SKIRT_POSE_COVERAGE"
     },
     {
-      "description": "V31 front and crouch renders still show coarse faceting, irregular folds, and uneven pointed panel edges. Surface/silhouette remain visibly unfinished.",
-      "code": "SKIRT_FORM_AND_FACETING",
-      "severity": "BLOCKER"
+      "description": "Direct V32 front, sit, crouch and side renders show coarse triangular faceting, uneven split front edges, abrupt hem transitions, and narrow pointed tips. The attachment change moves front edges slightly without resolving visual continuity.",
+      "severity": "BLOCKER",
+      "code": "SKIRT_FORM_AND_FACETING"
     },
     {
-      "description": "Direct inspection of the current rear render shows no clearly readable adjustment-tab or buckle silhouette; neither element separates visually from the garment. The preview set also has no dedicated rear close-up.",
-      "code": "REAR_TAB_LEGIBILITY",
-      "severity": "BLOCKER"
+      "description": "Direct inspection of current V32 rear render finds no clearly readable adjustment-tab or buckle silhouette; it remains visually merged with the garment and has no dedicated rear close-up.",
+      "severity": "BLOCKER",
+      "code": "REAR_TAB_LEGIBILITY"
     },
     {
-      "description": "The exact current weighted prototype still has no authored UV map. UV state remains MISSING; no substitute UV was generated.",
-      "code": "UV_MAPPING_INCOMPLETE",
-      "severity": "BLOCKER"
+      "description": "Current V32 weighted prototype still has no authored UV map. UV remains MISSING; no substitute UV has been generated.",
+      "severity": "BLOCKER",
+      "code": "UV_MAPPING_INCOMPLETE"
     }
   ],
   "failedGeometryChecks": [
