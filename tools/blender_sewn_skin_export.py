@@ -196,13 +196,23 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 @ armature.matrix_world.inverted() @ obj.matrix_world
             )
 
+    neighbors = [set() for _ in obj.data.vertices]
+    for edge in obj.data.edges:
+        first, second = edge.vertices
+        neighbors[first].add(second)
+        neighbors[second].add(first)
     targets, target_distances, skin_errors = {}, [], []
+    target_diagnostics = {}
     locked = set()
     for index in selected_indices:
         point = obj.data.vertices[index].co
         if (point.z <= spec["minimumHeightZM"]
                 or point.z >= spec["waistLockHeightZM"]
-                or vertex_owners[index].difference(source_piece_ids)):
+                or vertex_owners[index].difference(source_piece_ids)
+                or any(
+                    vertex_owners[neighbor].difference(source_piece_ids)
+                    for neighbor in neighbors[index]
+                )):
             locked.add(index)
             continue
         if point.z < spec["fullBlendHeightZM"]:
@@ -241,6 +251,15 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         target_world = location + normal * spec["clearanceM"]
         targets[index] = (target_world - current_world) * blend
         target_distances.append(float(distance))
+        target_diagnostics[index] = {
+            "blend": float(blend),
+            "targetDistanceM": float(distance),
+            "localPointM": tuple(float(value) for value in point),
+            "currentPosePointM": tuple(float(value) for value in current_world),
+            "surfaceTargetM": tuple(float(value) for value in target_world),
+            "ownerPieceIds": sorted(vertex_owners[index]),
+            "directCorrectionM": float(targets[index].length),
+        }
         groups_for_vertex = {
             obj.vertex_groups[group.group].name: group.weight
             for group in obj.data.vertices[index].groups
@@ -264,11 +283,6 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
 
     if not targets:
         raise ValueError("Pose-constrained apron produced no movable front-panel targets")
-    neighbors = [set() for _ in obj.data.vertices]
-    for edge in obj.data.edges:
-        first, second = edge.vertices
-        neighbors[first].add(second)
-        neighbors[second].add(first)
     displacement = {index: Vector((0, 0, 0)) for index in selected_indices}
     displacement.update(targets)
     movable = set(targets)
@@ -286,8 +300,14 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     corrections = [value.length for value in displacement.values()]
     maximum_correction = max(corrections, default=0.0)
     if maximum_correction > spec["maximumCorrectionM"]:
+        maximum_index = max(displacement, key=lambda index: displacement[index].length)
+        diagnostic = target_diagnostics.get(maximum_index, {})
         raise ValueError(
-            f"Pose-constrained apron correction {maximum_correction:.6f} m exceeds declared geometry bound {spec['maximumCorrectionM']:.6f} m"
+            f"Pose-constrained apron correction {maximum_correction:.6f} m exceeds declared geometry bound {spec['maximumCorrectionM']:.6f} m at vertex {maximum_index}; "
+            f"target={diagnostic.get('targetDistanceM', 'locked')} m, blend={diagnostic.get('blend', 'locked')}, "
+            f"directCorrection={diagnostic.get('directCorrectionM', 'locked')} m, localPoint={diagnostic.get('localPointM', 'locked')}, "
+            f"posePoint={diagnostic.get('currentPosePointM', 'locked')}, surfaceTarget={diagnostic.get('surfaceTargetM', 'locked')}, "
+            f"owners={diagnostic.get('ownerPieceIds', 'locked')}"
         )
     original_sit = {index: world_vertices[index].copy() for index in selected_indices}
     for index in movable:
@@ -328,7 +348,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             raise ValueError(f"Solved apron has no shorts residual at vertex {index}")
         residuals.append(abs(float(result[3]) - spec["clearanceM"]))
     final_mesh.calc_loop_triangles()
-    for triangle in final_mesh.loop_triangles:
+    for triangle_index, triangle in enumerate(final_mesh.loop_triangles):
         if not set(triangle.vertices).issubset(selected):
             continue
         old = [original_sit[index] for index in triangle.vertices]
@@ -340,8 +360,16 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             raise ValueError("Pose-constrained apron solve collapsed a sewn triangle")
         turn_dot = old_normal.normalized().dot(new_normal.normalized())
         if turn_dot < spec["maximumNormalTurnDot"]:
+            indices = tuple(int(index) for index in triangle.vertices)
+            diagnostic = (
+                f"Pose-constrained apron solve inverted sewn triangle {triangle_index} {indices}: "
+                f"normalDot={turn_dot:.6f}, owners={[sorted(vertex_owners[index]) for index in indices]}, "
+                f"corrections={[round(float(displacement[index].length), 6) for index in indices]}, "
+                f"old={[tuple(round(float(value), 6) for value in old[i]) for i in range(3)]}, "
+                f"new={[tuple(round(float(value), 6) for value in new[i]) for i in range(3)]}"
+            )
             final_obj.to_mesh_clear()
-            raise ValueError("Pose-constrained apron solve inverted a sewn triangle")
+            raise ValueError(diagnostic)
     final_obj.to_mesh_clear()
     reset_pose(armature)
     bpy.context.view_layer.update()

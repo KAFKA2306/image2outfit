@@ -9515,11 +9515,11 @@
       0.7295782470703125,
       0.7395782470703125
     ],
-    "radialClearanceM": 0.004,
+    "radialClearanceM": 0.01,
     "outsideSampleRange": "hold-nearest-contour",
-    "evidenceBoundary": "V33 geometry refinement reduces the evaluated neutral skirt envelope clearance to 4 mm across the front and removes the unilateral 4 mm left-lap layer offset, making left/right front-lap base placement symmetric. Sewn center-front overlap edges remain unfastened and shared flank seams remain coincident. This is a prototype layer hypothesis, not fit, collision, cloth or appearance acceptance.",
+    "evidenceBoundary": "Neutral evaluated body sections define the skirt envelope. V28 adds a 4 mm radial offset to the exclusive left front-lap surface only; center-front edges are unfastened overlap edges and shared flank seams remain coincident. This is a prototype layer hypothesis, not fit, collision, cloth or appearance acceptance.",
     "exclusivePieceLayerOffsetM": {
-      "overskirt-front-lap-left": 0.0
+      "overskirt-front-lap-left": 0.004
     }
   },
   "collarContourPlacement": {
@@ -9701,7 +9701,7 @@
     "smoothness": 0.65,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V33 fit targets are restricted to the two sewn front-lap panels over the thighs. Adjacent front-skirt vertices are excluded from direct projection; shared panel seams stay fixed through the existing mixed-owner lock. Anterior shorts faces only are targets. Vertices with a computed projection blend at or below 0.02 remain locked and do not require a target surface; all active targets retain the unchanged 0.22 m distance bound. Frozen skin weights and every declared correction, mapping, pose, clearance, residual, seam and orientation limit remain unchanged. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
+    "evidenceBoundary": "V33 front-lap projection remains restricted to the two sewn apron panels over the thighs. Adjacent front-skirt vertices and shared external seams plus their one-ring neighbors are fixed to preserve connected topology. Anterior shorts faces are targets; vertices at or below 0.02 projection blend remain locked and active targets retain the unchanged 0.22 m distance bound. Frozen skin weights and every correction, mapping, pose, clearance, residual, seam and orientation limit remain unchanged. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
   "designRevision": "v33-sit-pose-apron-geometry-20261022"
 }
