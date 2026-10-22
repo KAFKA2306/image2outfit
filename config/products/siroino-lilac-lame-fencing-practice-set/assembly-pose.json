@@ -9672,21 +9672,17 @@
     "grantsFitAcceptance": false
   },
   "poseConstrainedApronGeometry": {
-    "method": "sit-shorts-surface-inverse-skin-v1",
+    "method": "sit-anterior-shorts-surface-inverse-skin-v2",
     "referencePose": "sit",
     "sourcePieceIds": [
-      "overskirt-front-left",
-      "overskirt-front-right",
       "overskirt-front-lap-left",
       "overskirt-front-lap-right"
     ],
     "leftTargetPieceIds": [
-      "shorts-front-left",
-      "shorts-back-left"
+      "shorts-front-left"
     ],
     "rightTargetPieceIds": [
-      "shorts-front-right",
-      "shorts-back-right"
+      "shorts-front-right"
     ],
     "leftThighBone": "UpperLeg_L",
     "rightThighBone": "UpperLeg_R",
@@ -9704,7 +9700,7 @@
     "smoothness": 0.65,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V33 uses the directly measured V32 sit offsets to solve the upper-front-skirt and lap trajectory against the evaluated sit shorts surface. Its vertical envelope has a 0.44 m free-hem lock, ramps to full correction at 0.52 m, holds through 0.62 m, and fades to the pinned waist at 0.70 m. The target is inverse-mapped through existing frozen skin weights; shared external seams remain fixed. Neutral/crouch displacement, skin-map error, residual clearance, and triangle orientation are bounded checks; this geometry hypothesis does not pass fit, pose, appearance, collision, Shape Key, or release gates."
+    "evidenceBoundary": "V33 fit targets are restricted to the two sewn front-lap panels over the thighs. Adjacent front-skirt vertices are excluded from direct projection; shared panel seams stay fixed through the existing mixed-owner lock. Anterior shorts faces only are targets. Frozen skin weights and every declared correction, mapping, pose, clearance, residual, seam and orientation limit remain unchanged. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
   "designRevision": "v33-sit-pose-apron-geometry-20261022"
 }

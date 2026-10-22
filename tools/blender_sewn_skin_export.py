@@ -48,11 +48,13 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     spec = pose_spec.get("poseConstrainedApronGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "sit-shorts-surface-inverse-skin-v1":
+    if spec.get("method") != "sit-anterior-shorts-surface-inverse-skin-v2":
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
     left_targets = set(spec.get("leftTargetPieceIds", []))
     right_targets = set(spec.get("rightTargetPieceIds", []))
+    if any("front" not in piece for piece in left_targets | right_targets):
+        raise ValueError("Anterior apron target surfaces must be front shorts pieces only")
     if (not source_piece_ids or not left_targets or not right_targets
             or left_targets & right_targets):
         raise ValueError("Pose-constrained apron piece ownership is incomplete")

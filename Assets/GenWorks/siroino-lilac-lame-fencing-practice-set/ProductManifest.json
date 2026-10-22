@@ -42,12 +42,12 @@
     "resumable": true,
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
-    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json",
-    "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json, resolve it, then resume from this checkpoint.",
+    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-anterior-state.json",
+    "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-anterior-state.json, resolve it, then resume from this checkpoint.",
     "lastAttempt": {
-      "runId": "5abf73f6995c4c9e8c0d8b227e102cdb",
+      "runId": "3b16c00037ca4b54bd090b26b457cd66",
       "status": "PARTIAL",
-      "checkedAt": "2026-10-22T07:10:49Z",
+      "checkedAt": "2026-10-22T08:41:53Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "simulate-cloth",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/simulate-cloth.json",
@@ -88,13 +88,13 @@
       },
       "contractResult": "Workflow FAILED; completed 8 stage(s).",
       "failedAttemptEvidencePaths": [
-        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json"
+        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-anterior-state.json"
       ],
-      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json",
-      "checkpointSha256": "1479b388d0f5c2b9e812daf72ae9b72f84b0a5d290b61223955e90bf0a9de7ac",
+      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-anterior-state.json",
+      "checkpointSha256": "dc55d18b0bc6df192dbcb51c3b97f65ca07a9a3712eb4370939281bfff226c03",
       "blockedStage": "skin-and-export",
-      "failure": "stage command failed with exit code 1: M:\\win11projects\\unity\\image2outfit\\Assets\\_Local\\.venv\\Scripts\\python.exe tools/run_reference_product_stage.py --stage skin-and-export --job config/products/siroino-lilac-lame-fencing-practice-set/job.json --request config/pipeline/requests/siroino-lilac-lame-fencing-practice-set.json --result .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/skin-and-export.json\nTraceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2503, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2488, in main\n    stage_export(job, result_path)\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2130, in stage_export\n    raise RuntimeError(f\"Skin/export failed: {execution.stderr[-2500:]}\")\nRuntimeError: Skin/export failed: Traceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 971, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 823, in main\n    pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 280, in apply_pose_constrained_apron_geometry\n    raise ValueError(\nValueError: Pose-constrained apron correction 0.100045 m exceeds declared geometry bound 0.085000 m\n\nError: script failed, file: 'M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py', exiting.\n\n",
-      "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-state.json, resolve it, then resume from this checkpoint."
+      "failure": "stage command failed with exit code 1: M:\\win11projects\\unity\\image2outfit\\Assets\\_Local\\.venv\\Scripts\\python.exe tools/run_reference_product_stage.py --stage skin-and-export --job config/products/siroino-lilac-lame-fencing-practice-set/job.json --request config/pipeline/requests/siroino-lilac-lame-fencing-practice-set.json --result .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/skin-and-export.json\nTraceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2503, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2488, in main\n    stage_export(job, result_path)\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2130, in stage_export\n    raise RuntimeError(f\"Skin/export failed: {execution.stderr[-2500:]}\")\nRuntimeError: Skin/export failed: Traceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 973, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 825, in main\n    pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 213, in apply_pose_constrained_apron_geometry\n    raise ValueError(\nValueError: Apron pose-space target exceeds bound at vertex 1257: 0.228933 m\n\nError: script failed, file: 'M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py', exiting.\n\n",
+      "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v33-anterior-state.json, resolve it, then resume from this checkpoint."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
