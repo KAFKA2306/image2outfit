@@ -60,7 +60,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         raise ValueError("Pose-constrained apron piece ownership is incomplete")
     numeric = (
         "minimumHeightZM", "fullBlendHeightZM", "fullBlendEndHeightZM", "waistLockHeightZM",
-        "clearanceM", "maximumTargetDistanceM", "maximumCorrectionM",
+        "clearanceM", "minimumProjectionBlend", "maximumTargetDistanceM", "maximumCorrectionM",
         "maximumPoseCorrectionM", "maximumSkinMappingErrorM",
         "maximumSurfaceResidualM", "smoothness", "maximumNormalTurnDot",
     )
@@ -70,6 +70,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             or spec["fullBlendHeightZM"] > spec["fullBlendEndHeightZM"]
             or spec["fullBlendEndHeightZM"] >= spec["waistLockHeightZM"]
             or spec["clearanceM"] <= 0
+            or not 0 <= spec["minimumProjectionBlend"] < 1
             or spec["maximumTargetDistanceM"] <= 0
             or spec["maximumCorrectionM"] <= 0
             or spec["maximumPoseCorrectionM"] <= 0
@@ -204,6 +205,24 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 or vertex_owners[index].difference(source_piece_ids)):
             locked.add(index)
             continue
+        if point.z < spec["fullBlendHeightZM"]:
+            blend = _smoothstep(
+                (point.z - spec["minimumHeightZM"])
+                / (spec["fullBlendHeightZM"] - spec["minimumHeightZM"])
+            )
+        elif point.z <= spec["fullBlendEndHeightZM"]:
+            blend = 1.0
+        else:
+            blend = 1.0 - _smoothstep(
+                (point.z - spec["fullBlendEndHeightZM"])
+                / (spec["waistLockHeightZM"] - spec["fullBlendEndHeightZM"])
+            )
+        # Vertices outside the effective solve envelope receive no projection.
+        # Requiring an in-range surface target for these nearly stationary
+        # boundary vertices creates false failures without constraining geometry.
+        if blend <= spec["minimumProjectionBlend"]:
+            locked.add(index)
+            continue
         side = "left" if ((obj.matrix_world @ point).x >= center_x) == left_positive else "right"
         result = side_trees[side].find_nearest(world_vertices[index])
         if result is None or result[0] is None or result[1] is None:
@@ -220,18 +239,6 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         if (current_world - location).dot(normal) < 0:
             normal.negate()
         target_world = location + normal * spec["clearanceM"]
-        if point.z < spec["fullBlendHeightZM"]:
-            blend = _smoothstep(
-                (point.z - spec["minimumHeightZM"])
-                / (spec["fullBlendHeightZM"] - spec["minimumHeightZM"])
-            )
-        elif point.z <= spec["fullBlendEndHeightZM"]:
-            blend = 1.0
-        else:
-            blend = 1.0 - _smoothstep(
-                (point.z - spec["fullBlendEndHeightZM"])
-                / (spec["waistLockHeightZM"] - spec["fullBlendEndHeightZM"])
-            )
         targets[index] = (target_world - current_world) * blend
         target_distances.append(float(distance))
         groups_for_vertex = {
