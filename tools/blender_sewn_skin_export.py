@@ -51,6 +51,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     if spec.get("method") != "sit-anterior-shorts-surface-inverse-skin-v2":
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
+    transition_piece_ids = set(spec.get("transitionPieceIds", []))
     left_targets = set(spec.get("leftTargetPieceIds", []))
     right_targets = set(spec.get("rightTargetPieceIds", []))
     if any("front" not in piece for piece in left_targets | right_targets):
@@ -105,12 +106,52 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     for polygon, owner in zip(obj.data.polygons, face_owners):
         for index in polygon.vertices:
             vertex_owners[index].add(owner)
-    selected = {
+    neighbors = [set() for _ in obj.data.vertices]
+    for edge in obj.data.edges:
+        first, second = edge.vertices
+        neighbors[first].add(second)
+        neighbors[second].add(first)
+    apron_vertices = {
         index for index, owners in enumerate(vertex_owners)
         if owners.intersection(source_piece_ids)
     }
-    if not selected:
+    if not apron_vertices:
         raise ValueError("Pose-constrained apron selected no sewn vertices")
+
+    # Carry the seated thigh trajectory through the sewn lap seam and ease it
+    # into a narrow band of the neighboring front-skirt panels. Locking the
+    # whole shared seam and its one-ring neighbors left the lap moving as an
+    # isolated patch, which created a discontinuity exactly at the connection
+    # the visual review asked us to improve. Keep the transition graph-bound
+    # to the declared front panels; do not spread deformation around the skirt.
+    transition_vertices = set()
+    transition_ring_by_vertex = {}
+    if transition_piece_ids:
+        if any("front" not in piece for piece in transition_piece_ids):
+            raise ValueError("Apron trajectory transitions must stay on front-skirt panels")
+        seam_seeds = {
+            index for index in apron_vertices
+            if vertex_owners[index].intersection(transition_piece_ids)
+        }
+        frontier = set(seam_seeds)
+        visited = set(seam_seeds)
+        for ring in range(1, 3):
+            next_frontier = {
+                neighbor
+                for index in frontier
+                for neighbor in neighbors[index]
+                if neighbor not in visited
+                and vertex_owners[neighbor].intersection(transition_piece_ids)
+                and not vertex_owners[neighbor].difference(
+                    source_piece_ids | transition_piece_ids
+                )
+            }
+            for index in next_frontier:
+                transition_ring_by_vertex[index] = ring
+            visited.update(next_frontier)
+            frontier = next_frontier
+        transition_vertices = set(transition_ring_by_vertex)
+    selected = apron_vertices | transition_vertices
     selected_indices = sorted(selected)
 
     from genworks_product_common import reset_pose, set_pose
@@ -196,23 +237,19 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 @ armature.matrix_world.inverted() @ obj.matrix_world
             )
 
-    neighbors = [set() for _ in obj.data.vertices]
-    for edge in obj.data.edges:
-        first, second = edge.vertices
-        neighbors[first].add(second)
-        neighbors[second].add(first)
     targets, target_distances, skin_errors = {}, [], []
     target_diagnostics = {}
     locked = set()
+    transition_blend_by_vertex = {}
     for index in selected_indices:
         point = obj.data.vertices[index].co
         if (point.z <= spec["minimumHeightZM"]
                 or point.z >= spec["waistLockHeightZM"]
-                or vertex_owners[index].difference(source_piece_ids)
-                or any(
-                    vertex_owners[neighbor].difference(source_piece_ids)
+                or vertex_owners[index].difference(source_piece_ids | transition_piece_ids)
+                or (index not in transition_vertices and any(
+                    vertex_owners[neighbor].difference(source_piece_ids | transition_piece_ids)
                     for neighbor in neighbors[index]
-                )):
+                ))):
             locked.add(index)
             continue
         if point.z < spec["fullBlendHeightZM"]:
@@ -232,6 +269,9 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         # boundary vertices creates false failures without constraining geometry.
         if blend <= spec["minimumProjectionBlend"]:
             locked.add(index)
+            continue
+        if index in transition_ring_by_vertex:
+            transition_blend_by_vertex[index] = blend
             continue
         side = "left" if ((obj.matrix_world @ point).x >= center_x) == left_positive else "right"
         result = side_trees[side].find_nearest(world_vertices[index])
@@ -260,6 +300,47 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             "ownerPieceIds": sorted(vertex_owners[index]),
             "directCorrectionM": float(targets[index].length),
         }
+
+    if not targets:
+        raise ValueError("Pose-constrained apron produced no movable front-panel targets")
+    # Continue the authored lap displacement through the shared seam. The
+    # neighboring panel follows the lap's trajectory with a two-ring falloff;
+    # it is not independently projected to the shorts, because vertices on
+    # the rest of that panel are intentionally outside the thigh-projection
+    # envelope.
+    for ring in (1, 2):
+        fade = 1.0 / 3.0 if ring == 1 else 1.0 / 12.0
+        for index, vertex_ring in transition_ring_by_vertex.items():
+            if vertex_ring != ring or index not in transition_blend_by_vertex:
+                continue
+            adjacent_targets = [
+                targets[neighbor]
+                for neighbor in neighbors[index]
+                if neighbor in targets
+            ]
+            if not adjacent_targets:
+                locked.add(index)
+                continue
+            trajectory = sum(adjacent_targets, Vector()) / len(adjacent_targets)
+            targets[index] = trajectory * fade * transition_blend_by_vertex[index]
+            target_diagnostics[index] = {
+                "blend": float(fade * transition_blend_by_vertex[index]),
+                "trajectorySource": "adjacent-lap-displacement",
+                "trajectoryRing": ring,
+                "localPointM": tuple(float(value) for value in obj.data.vertices[index].co),
+                "currentPosePointM": tuple(float(value) for value in world_vertices[index]),
+                "ownerPieceIds": sorted(vertex_owners[index]),
+                "directCorrectionM": float(targets[index].length),
+            }
+
+    if not targets:
+        raise ValueError("Pose-constrained apron produced no movable front-panel targets")
+    # Freeze the existing skin map for every moved vertex. The transition
+    # geometry inherits a source trajectory but keeps the same weight map and
+    # strict mapping-error bound as the lap itself.
+    for index in sorted(targets):
+        point = obj.data.vertices[index].co
+        current_world = world_vertices[index]
         groups_for_vertex = {
             obj.vertex_groups[group.group].name: group.weight
             for group in obj.data.vertices[index].groups
@@ -280,9 +361,6 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 f"Armature inverse map diverges from evaluated sit pose at vertex {index}: {map_error:.6f} m"
             )
         maps[index] = mapping.inverted()
-
-    if not targets:
-        raise ValueError("Pose-constrained apron produced no movable front-panel targets")
     displacement = {index: Vector((0, 0, 0)) for index in selected_indices}
     displacement.update(targets)
     movable = set(targets)
@@ -340,6 +418,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     final_world = [final_obj.matrix_world @ vertex.co for vertex in final_mesh.vertices]
     residuals = []
     for index in movable:
+        if index not in apron_vertices:
+            continue
         result = side_trees[
             "left" if ((obj.matrix_world @ obj.data.vertices[index].co).x >= center_x) == left_positive else "right"
         ].find_nearest(final_world[index])
@@ -349,7 +429,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         residuals.append(abs(float(result[3]) - spec["clearanceM"]))
     final_mesh.calc_loop_triangles()
     for triangle_index, triangle in enumerate(final_mesh.loop_triangles):
-        if not set(triangle.vertices).issubset(selected):
+        if not set(triangle.vertices).intersection(movable):
             continue
         old = [original_sit[index] for index in triangle.vertices]
         new = [final_world[index] for index in triangle.vertices]
@@ -380,6 +460,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "method": spec["method"],
         "referencePose": spec.get("referencePose", "sit"),
         "sourcePieceIds": sorted(source_piece_ids),
+        "transitionPieceIds": sorted(transition_piece_ids),
+        "transitionVertexCountByRing": {
+            str(ring): sum(value == ring for value in transition_ring_by_vertex.values())
+            for ring in (1, 2)
+        },
         "targetPieceIdsBySide": {"left": sorted(left_targets), "right": sorted(right_targets)},
         "movedVertexCount": sum(
             displacement[index].length > 1e-9 for index in movable
@@ -392,7 +477,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "maximumSurfaceResidualM": max(residuals, default=0.0),
         "minimumNormalTurnDot": spec["maximumNormalTurnDot"],
         "skinWeightsChanged": False,
-        "sharedExternalSeamsMoved": False,
+        "sharedExternalSeamsMoved": bool(transition_vertices),
         "grantsFitAcceptance": False,
         "grantsPoseAcceptance": False,
         "evidenceBoundary": "One bounded, sit-pose source-geometry hypothesis with frozen garment skin weights. Its target is the evaluated shorts surface; neutral/crouch displacement and triangle orientation are checked, but fit, motion, collision, appearance and release remain unverified.",

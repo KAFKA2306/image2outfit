@@ -9678,6 +9678,10 @@
       "overskirt-front-lap-left",
       "overskirt-front-lap-right"
     ],
+    "transitionPieceIds": [
+      "overskirt-front-left",
+      "overskirt-front-right"
+    ],
     "leftTargetPieceIds": [
       "shorts-front-left"
     ],
@@ -9701,7 +9705,7 @@
     "smoothness": 0.65,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V33 front-lap projection remains restricted to the two sewn apron panels over the thighs. Adjacent front-skirt vertices and shared external seams plus their one-ring neighbors are fixed to preserve connected topology. Anterior shorts faces are targets; vertices at or below 0.02 projection blend remain locked and active targets retain the unchanged 0.22 m distance bound. Frozen skin weights and every correction, mapping, pose, clearance, residual, seam and orientation limit remain unchanged. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
+    "evidenceBoundary": "Source geometry continuation: carry the seated-thigh surface path through the sewn lap join and ease across two graph rings into adjacent front-skirt panels. Only those declared front pieces enter the transition; waistband, flank and rear seams remain fixed. The lap-to-shorts surface residual, skin-map accuracy, pose displacement and triangle orientation remain bounded by the existing unchanged gates. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
   "designRevision": "v33-sit-pose-apron-geometry-20261022"
 }
