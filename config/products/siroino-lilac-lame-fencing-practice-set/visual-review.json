@@ -21,7 +21,7 @@
   },
   "findings": [
     {
-      "description": "Direct inspection of the V31 front, seated, and crouched renders confirms a serious deformation failure: in the seated pose the forward skirt panels hang behind the raised thighs and leave the lap/shorts exposed; crouch coverage is better but the side panels break into pointed, intersecting strips. Pose-matched ray coverage records overskirt at 0.22 on both upper thighs in sit and 0.36/0.37 in crouch, while shorts are 0.95 in both.",
+      "description": "Direct V31 sit/crouch renders show the forward overskirt panels falling behind the raised thighs. Pose-matched measurement reports skirt coverage 0.22 on both upper thighs in sit and 0.36/0.37 in crouch, while under-shorts are 0.95 on both sides in both poses. A diagnostic-only sit render colors canonical panels distinctly and overlays inter-panel seam edges by dominant Hips/UpperLeg weight: 148 owner-boundary edges were identified, 144 Hips-dominant and two per thigh group; the lap-to-front-panel seam accounts for 28 edges on each side. This supports investigating the hip-dominant panel attachment/drape but does not establish a fit pass.",
       "code": "SKIRT_POSE_COVERAGE",
       "severity": "BLOCKER"
     },
@@ -43,7 +43,7 @@
   ],
   "sourceEvidence": {
     "runtimeAcceptance": "UNVERIFIED",
-    "currentPrototypeMotif": "V31 pelvis-dominant anterior hem-weight hypothesis regressed seated thigh coverage: skirt coverage is 0.22 on both upper thighs in sit and 0.36/0.37 in crouch. Direct renders show exposed shorts and hanging/rearward panels while coarse folds remain. Fit, Shape Keys, motion, Unity/VRChat runtime and release remain unverified.",
+    "currentPrototypeMotif": "V31 anterior hip-apron weight test regressed coverage: sit skirt coverage 0.22 left/right and crouch 0.36/0.37, against shorts coverage 0.95. A local diagnostic render confirms the canonical lap panels hang behind raised thighs and makes panel ownership and seam-weight influence visible; 144 of 148 owner-boundary edges are Hips-dominant. UV remains MISSING; fit, Shape Keys, Unity/VRChat runtime and release remain unverified.",
     "fitAcceptance": "UNVERIFIED",
     "releaseAcceptance": "BLOCKED",
     "uvMappingStatus": "INCOMPLETE",
@@ -57,5 +57,5 @@
       "boundary": "Base garment edges in neutral coordinates, not evaluated deformation or a topology/UV quality pass. Avatar meshes excluded by explicit garment role."
     }
   },
-  "nextAction": "Reject the V31 weight hypothesis. Use a distinct-color diagnostic render for front-lap panels in sit, with seam and weight ownership visible, to trace why they fall behind the raised thighs. Correct that attachment/deformation before another parameter sweep. Then regenerate the seven reviewed views and add a rear-tab close-up. Keep UV, fit, Shape Keys, runtime, packaging, and release gates open."
+  "nextAction": "Keep V30 and V31 as rejected comparisons. Redesign the front-lap panel attachment/shape so the anterior panels extend over raised thighs in sit and crouch, using the distinct-color seam/weight diagnostic to inspect the exact panel boundaries. Do not start another broad weight sweep until the target lap panel trajectory is explained; then rebuild, rerun measured pose coverage, inspect the full view/pose set, and retain the UV/runtime/release gates."
 }

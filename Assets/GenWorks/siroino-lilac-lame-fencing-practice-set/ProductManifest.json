@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v30-state.json",
-    "nextAction": "Reject the V31 weight hypothesis. Use a distinct-color diagnostic render for front-lap panels in sit, with seam and weight ownership visible, to trace why they fall behind the raised thighs. Correct that attachment/deformation before another parameter sweep. Then regenerate the seven reviewed views and add a rear-tab close-up. Keep UV, fit, Shape Keys, runtime, packaging, and release gates open.",
+    "nextAction": "Keep V30 and V31 as rejected comparisons. Redesign the front-lap panel attachment/shape so the anterior panels extend over raised thighs in sit and crouch, using the distinct-color seam/weight diagnostic to inspect the exact panel boundaries. Do not start another broad weight sweep until the target lap panel trajectory is explained; then rebuild, rerun measured pose coverage, inspect the full view/pose set, and retain the UV/runtime/release gates.",
     "lastAttempt": {
-      "runId": "84cdaffd8d2c462585774fa6f679a71b",
+      "runId": "ada29974f35941d8b9146453640c0316",
       "status": "EXECUTED",
-      "checkedAt": "2026-10-22T02:53:16Z",
+      "checkedAt": "2026-10-22T02:59:28Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "15cdd7d8272d3d826f5d142fdc8aeaf775a5e60c0c2f9051a46249fb68af5b23",
+      "stageEvidenceSha256": "4fad205fd343889a5b57b29a65dfcc85938a574396b9eb82b2577a64ebff02fe",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -99,20 +99,20 @@
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "393c1a28ad39a0e93b6797450cb3b4c6a3ca943722f82b6ce5ac85fc8d17f560"
+          "stageResultSha256": "c4c72ab8fb88bed757fb84d6f17ca7838f77f2779ecef433aa21743a159d4200"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "15cdd7d8272d3d826f5d142fdc8aeaf775a5e60c0c2f9051a46249fb68af5b23"
+          "stageResultSha256": "4fad205fd343889a5b57b29a65dfcc85938a574396b9eb82b2577a64ebff02fe"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v30-state.json",
-      "checkpointSha256": "dfb5b048814dbde11d4982d3a50d5aea1db74692b4ec4da02635d9b17e78ec76",
+      "checkpointSha256": "62a13526cfc78c6679028918d14675d87eb42f4d72f4b304eedf9b9085a27da8",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Reject the V31 weight hypothesis. Use a distinct-color diagnostic render for front-lap panels in sit, with seam and weight ownership visible, to trace why they fall behind the raised thighs. Correct that attachment/deformation before another parameter sweep. Then regenerate the seven reviewed views and add a rear-tab close-up. Keep UV, fit, Shape Keys, runtime, packaging, and release gates open."
+      "nextAction": "Keep V30 and V31 as rejected comparisons. Redesign the front-lap panel attachment/shape so the anterior panels extend over raised thighs in sit and crouch, using the distinct-color seam/weight diagnostic to inspect the exact panel boundaries. Do not start another broad weight sweep until the target lap panel trajectory is explained; then rebuild, rerun measured pose coverage, inspect the full view/pose set, and retain the UV/runtime/release gates."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
@@ -134,10 +134,10 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "f37111519791f8e43f5949983cede79a37116a7ebd5f51a854ce6bfa1208ca42",
+      "sha256": "087ca4a4bd903ca3dc53fe479a957575f196049bf2b92101f12a2530a5f41484",
       "findings": [
         {
-          "description": "Direct inspection of the V31 front, seated, and crouched renders confirms a serious deformation failure: in the seated pose the forward skirt panels hang behind the raised thighs and leave the lap/shorts exposed; crouch coverage is better but the side panels break into pointed, intersecting strips. Pose-matched ray coverage records overskirt at 0.22 on both upper thighs in sit and 0.36/0.37 in crouch, while shorts are 0.95 in both.",
+          "description": "Direct V31 sit/crouch renders show the forward overskirt panels falling behind the raised thighs. Pose-matched measurement reports skirt coverage 0.22 on both upper thighs in sit and 0.36/0.37 in crouch, while under-shorts are 0.95 on both sides in both poses. A diagnostic-only sit render colors canonical panels distinctly and overlays inter-panel seam edges by dominant Hips/UpperLeg weight: 148 owner-boundary edges were identified, 144 Hips-dominant and two per thigh group; the lap-to-front-panel seam accounts for 28 edges on each side. This supports investigating the hip-dominant panel attachment/drape but does not establish a fit pass.",
           "code": "SKIRT_POSE_COVERAGE",
           "severity": "BLOCKER"
         },
@@ -165,7 +165,7 @@
     "decision": "REJECT",
     "findings": [
       {
-        "description": "Direct inspection of the V31 front, seated, and crouched renders confirms a serious deformation failure: in the seated pose the forward skirt panels hang behind the raised thighs and leave the lap/shorts exposed; crouch coverage is better but the side panels break into pointed, intersecting strips. Pose-matched ray coverage records overskirt at 0.22 on both upper thighs in sit and 0.36/0.37 in crouch, while shorts are 0.95 in both.",
+        "description": "Direct V31 sit/crouch renders show the forward overskirt panels falling behind the raised thighs. Pose-matched measurement reports skirt coverage 0.22 on both upper thighs in sit and 0.36/0.37 in crouch, while under-shorts are 0.95 on both sides in both poses. A diagnostic-only sit render colors canonical panels distinctly and overlays inter-panel seam edges by dominant Hips/UpperLeg weight: 148 owner-boundary edges were identified, 144 Hips-dominant and two per thigh group; the lap-to-front-panel seam accounts for 28 edges on each side. This supports investigating the hip-dominant panel attachment/drape but does not establish a fit pass.",
         "code": "SKIRT_POSE_COVERAGE",
         "severity": "BLOCKER"
       },
