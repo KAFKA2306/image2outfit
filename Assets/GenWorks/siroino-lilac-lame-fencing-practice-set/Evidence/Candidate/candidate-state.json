@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v30-authored-source-panel-uv-trial-20261021",
+  "revision": "v31-anterior-hip-apron-follow-20261022",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
+      "description": "Direct inspection of the V31 front, seated, and crouched renders confirms a serious deformation failure: in the seated pose the forward skirt panels hang behind the raised thighs and leave the lap/shorts exposed; crouch coverage is better but the side panels break into pointed, intersecting strips. Pose-matched ray coverage records overskirt at 0.22 on both upper thighs in sit and 0.36/0.37 in crouch, while shorts are 0.95 in both.",
       "code": "SKIRT_POSE_COVERAGE",
-      "description": "Direct inspection of the current V30 front, sit, and crouch renders shows the deeper hem improves neutral coverage, but the front panels still ride above substantial portions of the shorts on raised thighs. In sit the broad shorts front remains exposed; in crouch the short layer remains visible under the lifted front apron and panel ends still meet in acute intersections. This remains a visible coverage failure.",
       "severity": "BLOCKER"
     },
     {
+      "description": "V31 front and crouch renders still show coarse faceting, irregular folds, and uneven pointed panel edges. Surface/silhouette remain visibly unfinished.",
       "code": "SKIRT_FORM_AND_FACETING",
-      "description": "Current front and rear neutral renders still show coarse angular facets and irregular folds across the skirt. The extended hem remains uneven and asymmetric, with pointed panel ends and abrupt crease transitions. The surface and silhouette are still visibly unfinished.",
       "severity": "BLOCKER"
     },
     {
+      "description": "Direct inspection of the current rear render shows no clearly readable adjustment-tab or buckle silhouette; neither element separates visually from the garment. The preview set also has no dedicated rear close-up.",
       "code": "REAR_TAB_LEGIBILITY",
-      "description": "Direct inspection of the current rear render still does not reveal a clearly identifiable adjustment tab or buckle silhouette at the waist.",
       "severity": "BLOCKER"
     },
     {
-      "description": "The existing render-current mesh showcase was regenerated from the exact current weighted-prototype blend and reports uvStatus MISSING. No substitute UV map was generated; authored UV coverage remains incomplete for this source.",
-      "severity": "BLOCKER",
-      "code": "UV_MAPPING_INCOMPLETE"
+      "description": "The exact current weighted prototype still has no authored UV map. UV state remains MISSING; no substitute UV was generated.",
+      "code": "UV_MAPPING_INCOMPLETE",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

@@ -89,6 +89,7 @@ def main():
                     "hip-anchored-anterior-bilateral-center-hem-fade-v3",
                     "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
                     "panel-balanced-hem-thigh-follow-v5",
+                    "panel-balanced-anterior-hip-apron-v6",
                 }
                 or not profile_piece_ids
                 or not profile_piece_ids.issubset(set(region["pieceIds"]))
@@ -105,6 +106,7 @@ def main():
                 "hip-anchored-anterior-bilateral-center-hem-fade-v3",
                 "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
                 "panel-balanced-hem-thigh-follow-v5",
+                "panel-balanced-anterior-hip-apron-v6",
             }:
                 if (
                     not math.isfinite(profile.get("forwardCenterYM", math.nan))
@@ -119,6 +121,7 @@ def main():
                         "hip-anchored-anterior-bilateral-center-hem-fade-v3",
                         "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
                         "panel-balanced-hem-thigh-follow-v5",
+                        "panel-balanced-anterior-hip-apron-v6",
                     }
                     and not 0 <= profile.get("centerlineHemThighWeight", math.nan) <= 1
                 ):
@@ -130,6 +133,7 @@ def main():
                     in {
                         "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
                         "panel-balanced-hem-thigh-follow-v5",
+                        "panel-balanced-anterior-hip-apron-v6",
                     }
                     and not 0 < profile.get("maximumThighWeight", math.nan) <= 0.75
                 ):
@@ -341,22 +345,36 @@ def main():
                     "hip-anchored-anterior-bilateral-center-hem-fade-v3",
                     "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
                     "panel-balanced-hem-thigh-follow-v5",
+                    "panel-balanced-anterior-hip-apron-v6",
                 }:
                     forward_fraction = _smoothstep(
                         (profile["forwardCenterYM"] - point.y)
                         / profile["forwardFadeDistanceM"]
                     )
-                    thigh_weight += (
-                        profile["forwardHemThighWeight"]
-                        * hem_fraction
-                        * forward_fraction
-                        * _smoothstep(lateral_fraction)
-                    )
+                    if profile["method"] == "panel-balanced-anterior-hip-apron-v6":
+                        # Keep the skirt's anterior apron with the pelvis while
+                        # the avatar's thighs lift in sit/crouch. The lateral
+                        # skirt still follows the thighs; the forward target is
+                        # an absolute hem weight, not an additive influence.
+                        anterior_target = (
+                            profile["forwardHemThighWeight"]
+                            * hem_fraction
+                            * _smoothstep(lateral_fraction)
+                        )
+                        thigh_weight += (anterior_target - thigh_weight) * forward_fraction
+                    else:
+                        thigh_weight += (
+                            profile["forwardHemThighWeight"]
+                            * hem_fraction
+                            * forward_fraction
+                            * _smoothstep(lateral_fraction)
+                        )
                     thigh_weight = min(1.0, thigh_weight)
                     if profile["method"] in {
                         "hip-anchored-anterior-bilateral-center-hem-fade-v3",
                         "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
                         "panel-balanced-hem-thigh-follow-v5",
+                        "panel-balanced-anterior-hip-apron-v6",
                     }:
                         center_width = profile["centerlineHalfWidthM"]
                         center_fraction = 1.0 - _smoothstep(
@@ -374,6 +392,7 @@ def main():
                     if profile["method"] in {
                         "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
                         "panel-balanced-hem-thigh-follow-v5",
+                        "panel-balanced-anterior-hip-apron-v6",
                     }:
                         maximum = profile["maximumThighWeight"]
                         if thigh_weight > maximum:
