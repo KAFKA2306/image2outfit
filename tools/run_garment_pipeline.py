@@ -405,15 +405,19 @@ def _emit_failure(
 
 def _main_unlocked() -> int:
     args = parse_args()
-    if args.reuse_completed_prefix_after_source_change:
-        if not args.source_change_reuse_reason or not args.source_change_reuse_reason.strip():
+    reuse_completed_prefix = getattr(
+        args, "reuse_completed_prefix_after_source_change", False
+    )
+    reuse_reason = getattr(args, "source_change_reuse_reason", None)
+    if reuse_completed_prefix:
+        if not reuse_reason or not reuse_reason.strip():
             return _emit_failure(
                 args,
                 error_code="INVALID_RESUME_STATE",
                 phase="resume",
                 exc=ValueError("stale-prefix reuse requires --source-change-reuse-reason"),
             )
-    elif args.source_change_reuse_reason is not None:
+    elif reuse_reason is not None:
         return _emit_failure(
             args,
             error_code="INVALID_RESUME_STATE",
