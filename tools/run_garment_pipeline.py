@@ -497,7 +497,7 @@ def _main_unlocked() -> int:
                 reuse_stale_prefix_reason=(
                     reuse_reason if reuse_completed_prefix else None
                 ),
-                rerun_from_stage=args.rerun_from_stage,
+                rerun_from_stage=getattr(args, "rerun_from_stage", None),
             )
             if state.get("checkpoint_reset"):
                 print(
@@ -662,3 +662,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
