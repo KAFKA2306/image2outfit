@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V33 replaces V32 neutral nearest-surface movement with one pose-constrained source-geometry solve. The V32 direct sit transects measured the lap 40–63 mm posterior to the shorts and sit coverage remained 0.22–0.23, while the current pelvis-dominant field and neutral body surface lookup cannot encode the seated trajectory. Fit the connected front skirt and lap to the evaluated sit shorts surface, inverse-map through the existing skin weights, pin the waist and shared external seams, and bound neutral/crouch displacement, surface residual, skin-map error, and triangle orientation. This is a geometry hypothesis; the authored UV, topology, rendered appearance, fit, and release gates remain independent.",
-  "designRevision": "v33-sit-pose-apron-geometry-20261022",
+  "target": "V36 restores the declared 0.12 anterior thigh-follow target and increases the existing longitudinal skirt-panel cuts to 12 so the sit-pose apron solve has shorter triangles. Keep the 0.75 weight cap and pose, residual, correction, skin-map, and orientation limits unchanged. This is a prototype hypothesis; fit, motion, visual, UV, topology, and release gates remain independent.",
+  "designRevision": "v36-apron-topology-weight-revision-20261023",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -199,9 +199,9 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "One profile remains shared across connected overskirt panels so sewn front/lap seam vertices receive a continuous field. V31 tests a pelvis-dominant anterior apron after pose-matched V30 coverage measured 0.333 at both seated upper thighs versus 0.955 for under-shorts. Side and rear hem follow remain unchanged; anterior hem thigh weight is reduced to 0.12. This uncalibrated prototype does not establish fit, motion, collision, or appearance acceptance.",
+      "evidenceBoundary": "One profile remains shared across connected overskirt panels so sewn front/lap seam vertices receive a continuous field. The anterior and centerline targets are 0.12 within the 0.75 cap; side and rear hem follow use the existing 0.72 target. This uncalibrated prototype does not establish fit, motion, collision, or appearance acceptance.",
       "weightProfile": {
-        "method": "panel-balanced-anterior-hip-apron-v6",
+      "method": "panel-balanced-hem-thigh-follow-v5",
         "pieceIds": [
           "overskirt-front-left",
           "overskirt-front-right",
@@ -215,14 +215,14 @@
         "rightThighBone": "UpperLeg_R",
         "waistThighWeight": 0,
         "hemThighWeight": 0.72,
-        "forwardHemThighWeight": 0.12,
-        "centerlineHemThighWeight": 0.12,
+      "forwardHemThighWeight": 0.12,
+      "centerlineHemThighWeight": 0.12,
         "maximumThighWeight": 0.75,
         "forwardCenterYM": -0.03788188099861145,
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.075,
         "fullSideWeightWidthM": 0.135,
-        "evidenceBoundary": "V31 uses one continuous connected-panel profile: rear and lateral hem follow remain 0.72, while the anterior hem blends toward 0.12 thigh weight over the existing 140 mm forward fade. This targets the measured seated lap coverage deficit while preserving the existing 0.75 cap and seam continuity. Geometry is unchanged. This uncalibrated prototype setting is not fit, motion, collision, or appearance acceptance."
+      "evidenceBoundary": "Continuous connected-panel v5 method with 0.12 anterior and centerline targets, fading over the existing 140 mm forward range and authored vertical and lateral fields; the 0.75 maximum remains unchanged. The declared field is a prototype hypothesis, not fit, pose, collision, or appearance acceptance."
       }
     }
   ]
