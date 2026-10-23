@@ -281,8 +281,7 @@ def _resume_or_reset(
     ]
     if non_source_mismatches:
         allowed_revision_change = (
-            rerun_from_stage is not None
-            and non_source_mismatches == ["revisionId"]
+            rerun_from_stage is not None and non_source_mismatches == ["revisionId"]
         )
         if not allowed_revision_change:
             _assert_identity(previous, expected)
@@ -291,14 +290,19 @@ def _resume_or_reset(
         if mode is not ExecutionMode.EXECUTE:
             raise ValueError("stage rerun is only valid in execute mode")
         if reuse_stale_prefix_reason is None:
-            raise ValueError("stage rerun requires an explicit source-change reuse reason")
+            raise ValueError(
+                "stage rerun requires an explicit source-change reuse reason"
+            )
         if previous.get("status") not in {"EXECUTED", "FAILED"}:
             raise ValueError("stage rerun requires an executed or failed checkpoint")
         _validate_resume_integrity(previous)
         completed = list(previous.get("completed_stages", []))
         rerun_index = next(
-            (index for index, stage in enumerate(PIPELINE_STAGES)
-             if stage.value == rerun_from_stage),
+            (
+                index
+                for index, stage in enumerate(PIPELINE_STAGES)
+                if stage.value == rerun_from_stage
+            ),
             None,
         )
         if rerun_index is None or rerun_index >= len(completed):
@@ -306,10 +310,7 @@ def _resume_or_reset(
                 "rerun stage must be present in the checkpoint's completed prefix"
             )
         prefix = completed[:rerun_index]
-        prefix_outputs = {
-            name: previous.get("outputs", {})[name]
-            for name in prefix
-        }
+        prefix_outputs = {name: previous.get("outputs", {})[name] for name in prefix}
         state = _new_state(request, expected, mode)
         count = int(previous.get("resume_count", 0)) + 1
         history = list(previous.get("resume_history", []))
@@ -350,7 +351,9 @@ def _resume_or_reset(
         if mode is not ExecutionMode.EXECUTE:
             raise ValueError("stale-prefix reuse is only valid in execute mode")
         if not list(previous.get("completed_stages", [])):
-            raise ValueError("stale-prefix reuse requires a completed checkpoint prefix")
+            raise ValueError(
+                "stale-prefix reuse requires a completed checkpoint prefix"
+            )
         if previous.get("status") != "FAILED":
             raise ValueError("stale-prefix reuse requires a failed checkpoint")
         _validate_resume_integrity(previous)
@@ -415,14 +418,18 @@ def _main_unlocked() -> int:
                 args,
                 error_code="INVALID_RESUME_STATE",
                 phase="resume",
-                exc=ValueError("stale-prefix reuse requires --source-change-reuse-reason"),
+                exc=ValueError(
+                    "stale-prefix reuse requires --source-change-reuse-reason"
+                ),
             )
     elif reuse_reason is not None:
         return _emit_failure(
             args,
             error_code="INVALID_RESUME_STATE",
             phase="resume",
-            exc=ValueError("--source-change-reuse-reason requires stale-prefix reuse opt-in"),
+            exc=ValueError(
+                "--source-change-reuse-reason requires stale-prefix reuse opt-in"
+            ),
         )
     try:
         request_path = _repo_path(args.request, label="request")
@@ -662,4 +669,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

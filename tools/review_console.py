@@ -757,8 +757,7 @@ def collect_product(
                 uv_status = mesh.get("uvStatus")
                 partial = record["name"] == "uv" and uv_status == "PARTIAL_UNVERIFIED"
                 unverified = (
-                    record["name"] == "uv"
-                    and uv_status == "UNVERIFIED_PROVENANCE"
+                    record["name"] == "uv" and uv_status == "UNVERIFIED_PROVENANCE"
                 )
                 assets.append(
                     Asset(

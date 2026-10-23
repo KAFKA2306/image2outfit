@@ -1326,7 +1326,9 @@ def main() -> int:
                 face_pattern_panel_keys.append(panel_name)
         if len(face_pattern_coordinates) != len(mesh.faces):
             raise ValueError("Pattern UV provenance does not match sewn face order")
-        if [panel_key_map[key] for key in face_pattern_panel_keys] != topology["facePieceIds"]:
+        if [panel_key_map[key] for key in face_pattern_panel_keys] != topology[
+            "facePieceIds"
+        ]:
             # Ownership ordering is already audited separately; do not
             # silently attach panel UVs to a differently ordered face list.
             raise ValueError("Pattern UV provenance face ownership does not match")

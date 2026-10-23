@@ -57,49 +57,76 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     left_targets = set(spec.get("leftTargetPieceIds", []))
     right_targets = set(spec.get("rightTargetPieceIds", []))
     if any("front" not in piece for piece in left_targets | right_targets):
-        raise ValueError("Anterior apron target surfaces must be front shorts pieces only")
-    if (not source_piece_ids or not left_targets or not right_targets
-            or left_targets & right_targets):
+        raise ValueError(
+            "Anterior apron target surfaces must be front shorts pieces only"
+        )
+    if (
+        not source_piece_ids
+        or not left_targets
+        or not right_targets
+        or left_targets & right_targets
+    ):
         raise ValueError("Pose-constrained apron piece ownership is incomplete")
     numeric = (
-        "minimumHeightZM", "fullBlendHeightZM", "fullBlendEndHeightZM", "waistLockHeightZM",
-        "clearanceM", "minimumProjectionBlend", "maximumTargetDistanceM", "maximumCorrectionM",
-        "maximumPoseCorrectionM", "maximumSkinMappingErrorM",
-        "maximumSurfaceResidualM", "targetSurfaceHeightBinM",
-        "maximumLocalSurfaceSupportDistanceM", "smoothness", "maximumNormalTurnDot",
+        "minimumHeightZM",
+        "fullBlendHeightZM",
+        "fullBlendEndHeightZM",
+        "waistLockHeightZM",
+        "clearanceM",
+        "minimumProjectionBlend",
+        "maximumTargetDistanceM",
+        "maximumCorrectionM",
+        "maximumPoseCorrectionM",
+        "maximumSkinMappingErrorM",
+        "maximumSurfaceResidualM",
+        "targetSurfaceHeightBinM",
+        "maximumLocalSurfaceSupportDistanceM",
+        "smoothness",
+        "maximumNormalTurnDot",
     )
     if not all(math.isfinite(spec.get(key, math.nan)) for key in numeric):
         raise ValueError("Pose-constrained apron bounds must be finite")
-    if (spec["minimumHeightZM"] >= spec["fullBlendHeightZM"]
-            or spec["fullBlendHeightZM"] > spec["fullBlendEndHeightZM"]
-            or spec["fullBlendEndHeightZM"] >= spec["waistLockHeightZM"]
-            or spec["clearanceM"] <= 0
-            or not 0 <= spec["minimumProjectionBlend"] < 1
-            or spec["maximumTargetDistanceM"] <= 0
-            or spec["maximumCorrectionM"] <= 0
-            or spec["maximumPoseCorrectionM"] <= 0
-            or spec["maximumSkinMappingErrorM"] <= 0
-            or spec["maximumSurfaceResidualM"] <= 0
-            or not 0 < spec["targetSurfaceHeightBinM"] <= spec["maximumSurfaceResidualM"]
-            or not 0 < spec["maximumLocalSurfaceSupportDistanceM"] < spec["maximumTargetDistanceM"]
-            or spec["smoothness"] < 0
-            or not -1 < spec["maximumNormalTurnDot"] < 1
-            or not isinstance(spec.get("smoothingIterations"), int)
-            or not 1 <= spec["smoothingIterations"] <= 64):
+    if (
+        spec["minimumHeightZM"] >= spec["fullBlendHeightZM"]
+        or spec["fullBlendHeightZM"] > spec["fullBlendEndHeightZM"]
+        or spec["fullBlendEndHeightZM"] >= spec["waistLockHeightZM"]
+        or spec["clearanceM"] <= 0
+        or not 0 <= spec["minimumProjectionBlend"] < 1
+        or spec["maximumTargetDistanceM"] <= 0
+        or spec["maximumCorrectionM"] <= 0
+        or spec["maximumPoseCorrectionM"] <= 0
+        or spec["maximumSkinMappingErrorM"] <= 0
+        or spec["maximumSurfaceResidualM"] <= 0
+        or not 0 < spec["targetSurfaceHeightBinM"] <= spec["maximumSurfaceResidualM"]
+        or not 0
+        < spec["maximumLocalSurfaceSupportDistanceM"]
+        < spec["maximumTargetDistanceM"]
+        or spec["smoothness"] < 0
+        or not -1 < spec["maximumNormalTurnDot"] < 1
+        or not isinstance(spec.get("smoothingIterations"), int)
+        or not 1 <= spec["smoothingIterations"] <= 64
+    ):
         raise ValueError("Invalid pose-constrained apron bounds")
     owned_meshes = []
     for candidate in objects:
-        if candidate.type != "MESH" or not candidate.data.attributes.get("canonical_piece_index"):
+        if candidate.type != "MESH" or not candidate.data.attributes.get(
+            "canonical_piece_index"
+        ):
             continue
         candidate_attr = candidate.data.attributes["canonical_piece_index"]
         if candidate_attr.domain != "FACE":
             continue
         candidate_pieces = json.loads(candidate["canonicalPieceIds"])
-        candidate_owners = [candidate_pieces[item.value] for item in candidate_attr.data]
+        candidate_owners = [
+            candidate_pieces[item.value] for item in candidate_attr.data
+        ]
         owned_meshes.append((candidate, candidate_pieces, candidate_owners))
-    source_meshes = [item for item in owned_meshes if source_piece_ids.issubset(set(item[2]))]
+    source_meshes = [
+        item for item in owned_meshes if source_piece_ids.issubset(set(item[2]))
+    ]
     target_meshes = [
-        item for item in owned_meshes
+        item
+        for item in owned_meshes
         if set(item[2]).intersection(left_targets | right_targets)
     ]
     if len(source_meshes) != 1 or not target_meshes:
@@ -117,7 +144,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         neighbors[first].add(second)
         neighbors[second].add(first)
     apron_vertices = {
-        index for index, owners in enumerate(vertex_owners)
+        index
+        for index, owners in enumerate(vertex_owners)
         if owners.intersection(source_piece_ids)
     }
     if not apron_vertices:
@@ -133,9 +161,12 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     transition_ring_by_vertex = {}
     if transition_piece_ids:
         if any("front" not in piece for piece in transition_piece_ids):
-            raise ValueError("Apron trajectory transitions must stay on front-skirt panels")
+            raise ValueError(
+                "Apron trajectory transitions must stay on front-skirt panels"
+            )
         seam_seeds = {
-            index for index in apron_vertices
+            index
+            for index in apron_vertices
             if vertex_owners[index].intersection(transition_piece_ids)
         }
         frontier = set(seam_seeds)
@@ -168,8 +199,12 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         evaluated_mesh = evaluated_obj.to_mesh()
         if len(evaluated_mesh.vertices) != len(obj.data.vertices):
             evaluated_obj.to_mesh_clear()
-            raise ValueError("Evaluated garment changed vertex order before apron solve")
-        result = [evaluated_obj.matrix_world @ vertex.co for vertex in evaluated_mesh.vertices]
+            raise ValueError(
+                "Evaluated garment changed vertex order before apron solve"
+            )
+        result = [
+            evaluated_obj.matrix_world @ vertex.co for vertex in evaluated_mesh.vertices
+        ]
         evaluated_obj.to_mesh_clear()
         return result
 
@@ -188,39 +223,55 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     if len(evaluated_mesh.vertices) != len(obj.data.vertices):
         evaluated_obj.to_mesh_clear()
         raise ValueError("Evaluated source garment changed vertex order")
-    world_vertices = [evaluated_obj.matrix_world @ v.co for v in evaluated_mesh.vertices]
+    world_vertices = [
+        evaluated_obj.matrix_world @ v.co for v in evaluated_mesh.vertices
+    ]
     evaluated_mesh.calc_loop_triangles()
     pose_triangles = tuple(
         tuple(int(index) for index in triangle.vertices)
         for triangle in evaluated_mesh.loop_triangles
     )
     evaluated_obj.to_mesh_clear()
-    side_triangles, target_world_vertices, target_offset = {"left": [], "right": []}, [], 0
+    side_triangles, target_world_vertices, target_offset = (
+        {"left": [], "right": []},
+        [],
+        0,
+    )
     for target_obj, target_pieces, target_face_owners in target_meshes:
         target_eval = target_obj.evaluated_get(depsgraph)
         target_mesh = target_eval.to_mesh()
         if len(target_mesh.vertices) != len(target_obj.data.vertices):
             target_eval.to_mesh_clear()
-            raise ValueError(f"Evaluated shorts target changed vertex order: {target_obj.name}")
+            raise ValueError(
+                f"Evaluated shorts target changed vertex order: {target_obj.name}"
+            )
         target_world_vertices.extend(
             target_eval.matrix_world @ vertex.co for vertex in target_mesh.vertices
         )
         target_attr = target_mesh.attributes.get("canonical_piece_index")
         if target_attr is None or target_attr.domain != "FACE":
             target_eval.to_mesh_clear()
-            raise ValueError(f"Evaluated shorts target lost piece ownership: {target_obj.name}")
+            raise ValueError(
+                f"Evaluated shorts target lost piece ownership: {target_obj.name}"
+            )
         target_mesh.calc_loop_triangles()
         evaluated_targets = [target_pieces[item.value] for item in target_attr.data]
         for triangle in target_mesh.loop_triangles:
             owner = evaluated_targets[triangle.polygon_index]
             if owner in left_targets:
-                side_triangles["left"].append(tuple(i + target_offset for i in triangle.vertices))
+                side_triangles["left"].append(
+                    tuple(i + target_offset for i in triangle.vertices)
+                )
             elif owner in right_targets:
-                side_triangles["right"].append(tuple(i + target_offset for i in triangle.vertices))
+                side_triangles["right"].append(
+                    tuple(i + target_offset for i in triangle.vertices)
+                )
         target_offset += len(target_mesh.vertices)
         target_eval.to_mesh_clear()
     if not side_triangles["left"] or not side_triangles["right"]:
-        raise ValueError("Pose-constrained apron requires evaluated shorts triangles on both sides")
+        raise ValueError(
+            "Pose-constrained apron requires evaluated shorts triangles on both sides"
+        )
     side_target_z_ranges = {}
     for side, triangles in side_triangles.items():
         support_indices = {index for triangle in triangles for index in triangle}
@@ -245,8 +296,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         if height_bin not in side_trees[side]:
             triangles = target_triangles_by_height_bin[side].get(height_bin, [])
             side_trees[side][height_bin] = (
-                BVHTree.FromPolygons(target_world_vertices, triangles, all_triangles=True)
-                if triangles else None
+                BVHTree.FromPolygons(
+                    target_world_vertices, triangles, all_triangles=True
+                )
+                if triangles
+                else None
             )
         return side_trees[side][height_bin]
 
@@ -265,9 +319,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         bone = armature.data.bones.get(bone_name)
         if pose_bone is not None and bone is not None and bone.use_deform:
             maps[bone_name] = (
-                armature.matrix_world @ pose_bone.matrix
+                armature.matrix_world
+                @ pose_bone.matrix
                 @ bone.matrix_local.inverted()
-                @ armature.matrix_world.inverted() @ obj.matrix_world
+                @ armature.matrix_world.inverted()
+                @ obj.matrix_world
             )
 
     targets, target_distances, skin_errors = {}, [], []
@@ -279,13 +335,20 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     transition_blend_by_vertex = {}
     for index in selected_indices:
         point = obj.data.vertices[index].co
-        if (point.z <= spec["minimumHeightZM"]
-                or point.z >= spec["waistLockHeightZM"]
-                or vertex_owners[index].difference(source_piece_ids | transition_piece_ids)
-                or (index not in transition_vertices and any(
-                    vertex_owners[neighbor].difference(source_piece_ids | transition_piece_ids)
+        if (
+            point.z <= spec["minimumHeightZM"]
+            or point.z >= spec["waistLockHeightZM"]
+            or vertex_owners[index].difference(source_piece_ids | transition_piece_ids)
+            or (
+                index not in transition_vertices
+                and any(
+                    vertex_owners[neighbor].difference(
+                        source_piece_ids | transition_piece_ids
+                    )
                     for neighbor in neighbors[index]
-                ))):
+                )
+            )
+        ):
             locked.add(index)
             continue
         if point.z < spec["fullBlendHeightZM"]:
@@ -309,7 +372,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         if index in transition_ring_by_vertex:
             transition_blend_by_vertex[index] = blend
             continue
-        side = "left" if ((obj.matrix_world @ point).x >= center_x) == left_positive else "right"
+        side = (
+            "left"
+            if ((obj.matrix_world @ point).x >= center_x) == left_positive
+            else "right"
+        )
         pose_point = world_vertices[index]
         target_min_z, target_max_z = side_target_z_ranges[side]
         if pose_point.z < target_min_z or pose_point.z > target_max_z:
@@ -327,7 +394,9 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             continue
         result = local_target_tree.find_nearest(pose_point)
         if result is None or result[0] is None or result[1] is None:
-            raise ValueError(f"Sit-pose shorts surface lookup failed at apron vertex {index}")
+            raise ValueError(
+                f"Sit-pose shorts surface lookup failed at apron vertex {index}"
+            )
         location, normal, _triangle, distance = result
         if distance > spec["maximumTargetDistanceM"]:
             current_world = world_vertices[index]
@@ -346,7 +415,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             locked.add(index)
             outside_target_local_surface_support_count += 1
             continue
-        if normal.length < .99:
+        if normal.length < 0.99:
             raise ValueError(f"Invalid sit-pose shorts normal at apron vertex {index}")
         normal.normalize()
         current_world = world_vertices[index]
@@ -366,7 +435,9 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         }
 
     if not targets:
-        raise ValueError("Pose-constrained apron produced no movable front-panel targets")
+        raise ValueError(
+            "Pose-constrained apron produced no movable front-panel targets"
+        )
     # Continue the authored lap displacement through the shared seam. The
     # neighboring panel follows the lap's trajectory with a two-ring falloff;
     # it is not independently projected to the shorts, because vertices on
@@ -391,14 +462,20 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 "blend": float(fade * transition_blend_by_vertex[index]),
                 "trajectorySource": "adjacent-lap-displacement",
                 "trajectoryRing": ring,
-                "localPointM": tuple(float(value) for value in obj.data.vertices[index].co),
-                "currentPosePointM": tuple(float(value) for value in world_vertices[index]),
+                "localPointM": tuple(
+                    float(value) for value in obj.data.vertices[index].co
+                ),
+                "currentPosePointM": tuple(
+                    float(value) for value in world_vertices[index]
+                ),
                 "ownerPieceIds": sorted(vertex_owners[index]),
                 "directCorrectionM": float(targets[index].length),
             }
 
     if not targets:
-        raise ValueError("Pose-constrained apron produced no movable front-panel targets")
+        raise ValueError(
+            "Pose-constrained apron produced no movable front-panel targets"
+        )
     # Freeze the existing skin map for every moved vertex. The transition
     # geometry inherits a source trajectory but keeps the same weight map and
     # strict mapping-error bound as the lap itself.
@@ -415,8 +492,13 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             if name not in maps or weight <= 0:
                 continue
             mapping += maps[name] * weight
-        if abs(sum(groups_for_vertex.values()) - 1.0) > 1e-4 or abs(mapping.determinant()) < 1e-10:
-            raise ValueError(f"Frozen skin map is incomplete or singular at apron vertex {index}")
+        if (
+            abs(sum(groups_for_vertex.values()) - 1.0) > 1e-4
+            or abs(mapping.determinant()) < 1e-10
+        ):
+            raise ValueError(
+                f"Frozen skin map is incomplete or singular at apron vertex {index}"
+            )
         predicted = mapping @ Vector((*obj.data.vertices[index].co, 1.0))
         map_error = (Vector(predicted[:3]) - current_world).length
         skin_errors.append(map_error)
@@ -435,7 +517,9 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             adjacent = [other for other in neighbors[index] if other in selected]
             if not adjacent or strength == 0:
                 continue
-            mean = sum((displacement[other] for other in adjacent), Vector()) / len(adjacent)
+            mean = sum((displacement[other] for other in adjacent), Vector()) / len(
+                adjacent
+            )
             updated[index] = (targets[index] + mean * strength) / (1.0 + strength)
         displacement = updated
 
@@ -452,15 +536,20 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 continue
             old = [world_vertices[index] for index in triangle]
             new = [
-                world_vertices[index]
-                + displacement.get(index, Vector())
+                world_vertices[index] + displacement.get(index, Vector())
                 for index in triangle
             ]
             old_normal = (old[1] - old[0]).cross(old[2] - old[0])
             new_normal = (new[1] - new[0]).cross(new[2] - new[0])
             if old_normal.length < 1e-10:
-                raise ValueError("Pose-constrained apron source contains a collapsed sewn triangle")
-            if new_normal.length < 1e-10 or old_normal.normalized().dot(new_normal.normalized()) < normal_turn_limit:
+                raise ValueError(
+                    "Pose-constrained apron source contains a collapsed sewn triangle"
+                )
+            if (
+                new_normal.length < 1e-10
+                or old_normal.normalized().dot(new_normal.normalized())
+                < normal_turn_limit
+            ):
                 vertices_to_reduce.update(set(triangle).intersection(movable))
         if not vertices_to_reduce:
             break
@@ -486,8 +575,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             f"owners={diagnostic.get('ownerPieceIds', 'locked')}"
         )
     original_sit = {
-        index: world_point.copy()
-        for index, world_point in enumerate(world_vertices)
+        index: world_point.copy() for index, world_point in enumerate(world_vertices)
     }
     for index in movable:
         if displacement[index].length <= 1e-9:
@@ -495,7 +583,9 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         target_world = world_vertices[index] + displacement[index]
         rest_h = maps[index] @ Vector((*target_world, 1.0))
         if abs(rest_h.w) <= 1e-9:
-            raise ValueError(f"Apron inverse skin map returned a point at infinity: {index}")
+            raise ValueError(
+                f"Apron inverse skin map returned a point at infinity: {index}"
+            )
         rest_local = Vector(rest_h[:3]) / rest_h.w
         obj.data.vertices[index].co = rest_local
 
@@ -523,7 +613,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             continue
         side = (
             "left"
-            if ((obj.matrix_world @ obj.data.vertices[index].co).x >= center_x) == left_positive
+            if ((obj.matrix_world @ obj.data.vertices[index].co).x >= center_x)
+            == left_positive
             else "right"
         )
         local_target_tree = target_tree_at_height(side, float(final_world[index].z))
@@ -536,17 +627,21 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         if result is None or result[0] is None:
             final_obj.to_mesh_clear()
             raise ValueError(f"Solved apron has no shorts residual at vertex {index}")
-        residual_records.append({
-            "vertex": int(index),
-            "side": side,
-            "surfaceDistanceM": float(result[3]),
-            "residualM": abs(float(result[3]) - spec["clearanceM"]),
-            "posePointM": tuple(float(value) for value in final_world[index]),
-            "nearestSurfacePointM": tuple(float(value) for value in result[0]),
-            "sourcePointM": tuple(float(value) for value in obj.data.vertices[index].co),
-            "ownerPieceIds": sorted(vertex_owners[index]),
-            "appliedDisplacementM": float(displacement[index].length),
-        })
+        residual_records.append(
+            {
+                "vertex": int(index),
+                "side": side,
+                "surfaceDistanceM": float(result[3]),
+                "residualM": abs(float(result[3]) - spec["clearanceM"]),
+                "posePointM": tuple(float(value) for value in final_world[index]),
+                "nearestSurfacePointM": tuple(float(value) for value in result[0]),
+                "sourcePointM": tuple(
+                    float(value) for value in obj.data.vertices[index].co
+                ),
+                "ownerPieceIds": sorted(vertex_owners[index]),
+                "appliedDisplacementM": float(displacement[index].length),
+            }
+        )
     final_mesh.calc_loop_triangles()
     for triangle_index, triangle in enumerate(final_mesh.loop_triangles):
         if not set(triangle.vertices).intersection(movable):
@@ -573,8 +668,13 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     final_obj.to_mesh_clear()
     reset_pose(armature)
     bpy.context.view_layer.update()
-    maximum_residual = max(residual_records, key=lambda record: record["residualM"], default=None)
-    if maximum_residual and maximum_residual["residualM"] > spec["maximumSurfaceResidualM"]:
+    maximum_residual = max(
+        residual_records, key=lambda record: record["residualM"], default=None
+    )
+    if (
+        maximum_residual
+        and maximum_residual["residualM"] > spec["maximumSurfaceResidualM"]
+    ):
         raise ValueError(
             "Pose-constrained apron could not meet the shorts-surface residual bound: "
             f"maximum={maximum_residual['residualM']:.6f} m, "
@@ -594,10 +694,15 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "sourcePieceIds": sorted(source_piece_ids),
         "transitionPieceIds": sorted(transition_piece_ids),
         "transitionVertexCountByRing": {
-            str(ring): sum(value == ring for value in transition_ring_by_vertex.values())
+            str(ring): sum(
+                value == ring for value in transition_ring_by_vertex.values()
+            )
             for ring in (1, 2)
         },
-        "targetPieceIdsBySide": {"left": sorted(left_targets), "right": sorted(right_targets)},
+        "targetPieceIdsBySide": {
+            "left": sorted(left_targets),
+            "right": sorted(right_targets),
+        },
         "targetSurfaceHeightRangeZM": {
             side: [float(value) for value in height_range]
             for side, height_range in side_target_z_ranges.items()
@@ -609,9 +714,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "maximumLocalSurfaceSupportDistanceM": float(
             spec["maximumLocalSurfaceSupportDistanceM"]
         ),
-        "movedVertexCount": sum(
-            displacement[index].length > 1e-9 for index in movable
-        ),
+        "movedVertexCount": sum(displacement[index].length > 1e-9 for index in movable),
         "lockedSharedOrWaistVertexCount": len(locked),
         "maximumTargetDistanceM": max(target_distances, default=0.0),
         "maximumSkinMapErrorM": max(skin_errors, default=0.0),
@@ -955,7 +1058,9 @@ def main():
                             * hem_fraction
                             * _smoothstep(lateral_fraction)
                         )
-                        thigh_weight += (anterior_target - thigh_weight) * forward_fraction
+                        thigh_weight += (
+                            anterior_target - thigh_weight
+                        ) * forward_fraction
                     else:
                         thigh_weight += (
                             profile["forwardHemThighWeight"]

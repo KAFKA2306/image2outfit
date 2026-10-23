@@ -501,13 +501,13 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         raise ValueError("canonical sewn prototype is missing")
     pieces = json.loads(original["canonicalPieceIds"])
     owners = original.data.attributes["canonical_piece_index"]
-    canonical_source_ids = original.data.attributes.get(
-        "canonical_sewn_vertex_index"
-    )
+    canonical_source_ids = original.data.attributes.get("canonical_sewn_vertex_index")
     if canonical_source_ids is None or len(canonical_source_ids.data) != len(
         original.data.vertices
     ):
-        raise ValueError("canonical sewn vertex provenance is missing before cloth splitting")
+        raise ValueError(
+            "canonical sewn vertex provenance is missing before cloth splitting"
+        )
     faces = [list(face.vertices) for face in original.data.polygons]
     selected_faces = {}
     claimed = set()
@@ -554,8 +554,12 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                     raise ValueError(
                         f"Authored UV loop count changed while splitting {name}"
                     )
-                source_vertices = [original.data.loops[i].vertex_index for i in source_loops]
-                target_vertices = [ids[data.loops[i].vertex_index] for i in target_loops]
+                source_vertices = [
+                    original.data.loops[i].vertex_index for i in source_loops
+                ]
+                target_vertices = [
+                    ids[data.loops[i].vertex_index] for i in target_loops
+                ]
                 if source_vertices != target_vertices:
                     raise ValueError(
                         f"Authored UV loop vertex order changed while splitting {name}"
@@ -1023,7 +1027,9 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             if settled_source_ids is None or len(settled_source_ids.data) != len(
                 settled_data.vertices
             ):
-                raise ValueError("Rest-shape cloth lost canonical sewn vertex provenance")
+                raise ValueError(
+                    "Rest-shape cloth lost canonical sewn vertex provenance"
+                )
             obj.modifiers.remove(modifier)
             obj.data = settled_data
             contract["canonicalRestShape"]["settledCapture"] = (

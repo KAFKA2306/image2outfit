@@ -72,8 +72,7 @@ def main():
         topology = []
         uvlines = []
         authored_uv_layers = {
-            obj.name: obj.data.uv_layers.get("AuthoredPatternPanels")
-            for obj in meshes
+            obj.name: obj.data.uv_layers.get("AuthoredPatternPanels") for obj in meshes
         }
         uv_mapped_objects = [
             obj for obj in meshes if authored_uv_layers[obj.name] is not None
@@ -81,8 +80,7 @@ def main():
         uv_unverified_objects = [
             obj.name
             for obj in meshes
-            if obj.data.uv_layers.active
-            and authored_uv_layers[obj.name] is None
+            if obj.data.uv_layers.active and authored_uv_layers[obj.name] is None
         ]
         uv_unmapped_objects = [
             obj.name for obj in meshes if not obj.data.uv_layers.active

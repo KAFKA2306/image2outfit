@@ -667,8 +667,8 @@ def record_workflow_attempt(
             )
 
             review_document = read_json(review_file)
-            review_is_current = (
-                review_document.get("reviewedRevision") == str(job["buildRevision"])
+            review_is_current = review_document.get("reviewedRevision") == str(
+                job["buildRevision"]
             )
             review = None
             if review_is_current:
@@ -678,7 +678,8 @@ def record_workflow_attempt(
                     revision_id=str(job["buildRevision"]),
                 )
                 image_paths = [
-                    *job["previewPaths"].values(), *job["posePaths"].values()
+                    *job["previewPaths"].values(),
+                    *job["posePaths"].values(),
                 ]
                 current_images = {
                     value: digest(repo_path(root, value)) for value in image_paths
