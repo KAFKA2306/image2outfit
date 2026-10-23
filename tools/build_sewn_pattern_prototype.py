@@ -26,6 +26,99 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def pack_panel_uv_bounds(panel_bounds, padding):
+    """Pack pattern-space panel bounds without rotating or reshaping panels."""
+    extents = {
+        key: (bounds[2] - bounds[0], bounds[3] - bounds[1])
+        for key, bounds in panel_bounds.items()
+    }
+    if any(width <= 0 or height <= 0 for width, height in extents.values()):
+        raise ValueError("Pattern panel has zero UV extent")
+
+    def attempt(scale):
+        rectangles = sorted(
+            (
+                (width * scale + padding * 2),
+                (height * scale + padding * 2),
+                key,
+            )
+            for key, (width, height) in extents.items()
+        )
+        rectangles.sort(key=lambda item: (-item[0] * item[1], -item[1], -item[0], item[2]))
+        free = [(0.0, 0.0, 1.0, 1.0)]
+        placed = {}
+        epsilon = 1e-12
+
+        for width, height, key in rectangles:
+            candidates = []
+            for free_index, (free_x, free_y, free_w, free_h) in enumerate(free):
+                if width <= free_w + epsilon and height <= free_h + epsilon:
+                    remaining_w, remaining_h = free_w - width, free_h - height
+                    candidates.append((
+                        min(remaining_w, remaining_h),
+                        max(remaining_w, remaining_h),
+                        free_y,
+                        free_x,
+                        free_index,
+                    ))
+            if not candidates:
+                return None
+            _, _, y, x, _ = min(candidates)
+            placed[key] = (x + padding, y + padding)
+            right, top = x + width, y + height
+            split = []
+            for free_x, free_y, free_w, free_h in free:
+                free_right, free_top = free_x + free_w, free_y + free_h
+                if right <= free_x + epsilon or x >= free_right - epsilon \
+                        or top <= free_y + epsilon or y >= free_top - epsilon:
+                    split.append((free_x, free_y, free_w, free_h))
+                    continue
+                if x > free_x + epsilon:
+                    split.append((free_x, free_y, x - free_x, free_h))
+                if right < free_right - epsilon:
+                    split.append((right, free_y, free_right - right, free_h))
+                if y > free_y + epsilon:
+                    split.append((free_x, free_y, free_w, y - free_y))
+                if top < free_top - epsilon:
+                    split.append((free_x, top, free_w, free_top - top))
+
+            pruned = []
+            for index, rect in enumerate(split):
+                rx, ry, rw, rh = rect
+                contained = False
+                for other_index, other in enumerate(split):
+                    if index == other_index:
+                        continue
+                    ox, oy, ow, oh = other
+                    if rx >= ox - epsilon and ry >= oy - epsilon \
+                            and rx + rw <= ox + ow + epsilon \
+                            and ry + rh <= oy + oh + epsilon:
+                        if (rw * rh < ow * oh - epsilon) or other_index < index:
+                            contained = True
+                            break
+                if not contained and rw > epsilon and rh > epsilon:
+                    pruned.append(rect)
+            free = pruned
+        return placed
+
+    maximum_extent = max(max(extents.values(), key=max))
+    low = 0.0
+    high = (1.0 - padding * 2) / maximum_extent
+    best = attempt(high)
+    if best is not None:
+        return high, best
+    for _ in range(40):
+        middle = (low + high) * 0.5
+        packed = attempt(middle)
+        if packed is None:
+            high = middle
+        else:
+            low, best = middle, packed
+    if best is None:
+        raise ValueError("Authored UV panel bounds cannot be packed in the unit tile")
+    return low, best
+
+
 def assign_authored_panel_uvs(mesh_data, sewn_mesh):
     """Map sewn faces from explicit pattern or accessory source coordinates."""
     face_coordinates = sewn_mesh.get("facePatternCoordinates")
@@ -50,9 +143,7 @@ def assign_authored_panel_uvs(mesh_data, sewn_mesh):
     panels = sorted(set(panel_keys))
     if not panels or any(not isinstance(key, str) or not key for key in panels):
         raise ValueError("Sewn mesh UV provenance has invalid panel keys")
-    grid_size = math.ceil(math.sqrt(len(panels)))
-    tile_size = 1.0 / grid_size
-    padding = tile_size * 0.06
+    padding = 0.006
     panel_bounds = {}
     for panel_key in panels:
         points = [
@@ -70,19 +161,11 @@ def assign_authored_panel_uvs(mesh_data, sewn_mesh):
             max(float(point[1]) for point in points),
         )
 
+    scale, placements = pack_panel_uv_bounds(panel_bounds, padding)
     uv_layer = mesh_data.uv_layers.new(name="AuthoredPatternPanels")
-    panel_tiles = {key: index for index, key in enumerate(panels)}
     for polygon, face_points, panel_key in zip(mesh_data.polygons, face_coordinates, panel_keys):
         min_x, min_y, max_x, max_y = panel_bounds[panel_key]
-        width, height = max_x - min_x, max_y - min_y
-        if width <= 0 or height <= 0:
-            raise ValueError(f"Pattern panel {panel_key} has zero UV extent")
-        tile_index = panel_tiles[panel_key]
-        column, row = tile_index % grid_size, tile_index // grid_size
-        usable = tile_size - 2 * padding
-        scale = usable / max(width, height)
-        offset_x = column * tile_size + padding + (usable - width * scale) * 0.5
-        offset_y = row * tile_size + padding + (usable - height * scale) * 0.5
+        offset_x, offset_y = placements[panel_key]
         if len(face_points) != len(polygon.loop_indices):
             raise ValueError("Pattern UV loop count does not match sewn polygon")
         for loop_index, point in zip(polygon.loop_indices, face_points):
@@ -92,9 +175,18 @@ def assign_authored_panel_uvs(mesh_data, sewn_mesh):
             )
     return {
         "status": "AUTHORED_FROM_DECLARED_2D_SOURCE_COORDINATES",
-        "method": "face-local-source-coordinates-with-deterministic-panel-tiles",
+        "method": "face-local-source-coordinates-with-uniform-scale-unrotated-maxrects-packing",
         "panelCount": len(panels),
         "mappedFaceCount": len(faces),
+        "uniformPatternToUvScale": scale,
+        "panelUvBounds": {
+            key: {
+                "sourceBounds": list(panel_bounds[key]),
+                "uvOrigin": list(placements[key]),
+                "rotationDegrees": 0,
+            }
+            for key in panels
+        },
         "sourceKindFaceCounts": {
             kind: source_kinds.count(kind) for kind in sorted(supported_sources)
         },

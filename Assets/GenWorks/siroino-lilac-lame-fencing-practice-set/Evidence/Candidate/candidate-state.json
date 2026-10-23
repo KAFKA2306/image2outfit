@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v40-trim-canonical-vertex-provenance-20261023",
+  "revision": "v41-unrotated-proportional-pattern-uv-pack-20261023",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
+      "severity": "BLOCKER",
       "code": "SKIRT_FORM_AND_FACETING",
-      "severity": "BLOCKER",
-      "description": "Direct inspection of the current front, back, side, three-quarter, and six pose renders shows strong angular faceting and wrinkled clumps across the skirt, with uneven, pointed split-front edges. The overall skirt silhouette is not visually continuous."
+      "description": "Direct inspection of all five current views and six pose renders shows strong angular faceting and irregular clumped folds across the skirt, with uneven pointed split-front edges. The overall skirt silhouette is not visually continuous."
     },
     {
+      "severity": "BLOCKER",
       "code": "SIT_CROUCH_FRONT_COVERAGE",
-      "severity": "BLOCKER",
-      "description": "Current sit and crouch renders expose large rounded shorts-like thigh shells through and ahead of the overskirt. The front lap/apron panels separate into narrow pointed flaps and leave the seated anterior thighs visibly uncovered; the current pose geometry is not acceptable."
+      "description": "Direct inspection of crouch and sit renders shows large rounded shorts-like thigh shells bulging ahead of the overskirt; the apron panels separate into sharp narrow flaps and leave visible gaps over the anterior thighs. The seated and crouched coverage and shell volume remain unacceptable."
     },
     {
+      "severity": "BLOCKER",
       "code": "REAR_TAB_LEGIBILITY",
-      "severity": "BLOCKER",
-      "description": "The rear waist adjustment tab is only a small, low-contrast shape in the full-body back view and is not visually legible as a distinct functional-looking detail. It needs a readable silhouette and close-up evidence."
+      "description": "The rear waist adjustment tab remains a small low-contrast shape in the full-body back render and cannot be read as a distinct functional detail; no close-up evidence shows improved legibility."
     },
     {
-      "code": "UV_LAYOUT_DENSITY_OVERLAP",
       "severity": "BLOCKER",
-      "description": "Direct raster inspection of the source-bound partial UV chart shows dense near-continuous vertical line stacks crossing the unit tile, with panel islands crowded and difficult to distinguish. This is not a reviewable production UV layout. The chart contains only authored UVs from 21/25 mesh objects; the plastron and three front fasteners are explicitly unmapped and omitted. No UV coordinates were generated or substituted."
+      "code": "UV_PROVENANCE_AND_COVERAGE_INCOMPLETE",
+      "description": "The direct raster inspection of the current source-bound chart shows readable, separated packed islands for the three objects carrying the explicit AuthoredPatternPanels layer. The showcase correctly omits 18 objects whose active UVMap provenance is unverified and reports four objects with no active UV layer as UV not created. These missing/unverified garment UVs block complete UV acceptance; no replacement UV coordinates were generated."
     }
   ],
   "failedGeometryChecks": [

@@ -756,12 +756,18 @@ def collect_product(
                 kind = "uv" if record["name"] == "uv" else "mesh"
                 uv_status = mesh.get("uvStatus")
                 partial = record["name"] == "uv" and uv_status == "PARTIAL_UNVERIFIED"
+                unverified = (
+                    record["name"] == "uv"
+                    and uv_status == "UNVERIFIED_PROVENANCE"
+                )
                 assets.append(
                     Asset(
                         kind=kind,
                         name=(
-                            "UV layout (partial; unmapped objects omitted)"
+                            "Source-authored UV layout (partial; other maps omitted)"
                             if partial
+                            else "UV layout (source provenance unverified; omitted)"
+                            if unverified
                             else record["name"]
                         ),
                         status="UNVERIFIED",
@@ -770,6 +776,37 @@ def collect_product(
                     )
                 )
             if mesh.get("uvStatus") == "PARTIAL_UNVERIFIED":
+                for object_name in mesh.get("uvUnverifiedObjects", []):
+                    assets.append(
+                        Asset(
+                            kind="uv",
+                            name=f"UV present; provenance unverified: {object_name}",
+                            status="UNVERIFIED",
+                            href=None,
+                            sha256=None,
+                        )
+                    )
+                for object_name in mesh.get("uvUnmappedObjects", []):
+                    assets.append(
+                        Asset(
+                            kind="uv",
+                            name=f"UV not created: {object_name}",
+                            status="MISSING",
+                            href=None,
+                            sha256=None,
+                        )
+                    )
+            elif mesh.get("uvStatus") == "UNVERIFIED_PROVENANCE":
+                for object_name in mesh.get("uvUnverifiedObjects", []):
+                    assets.append(
+                        Asset(
+                            kind="uv",
+                            name=f"UV present; provenance unverified: {object_name}",
+                            status="UNVERIFIED",
+                            href=None,
+                            sha256=None,
+                        )
+                    )
                 for object_name in mesh.get("uvUnmappedObjects", []):
                     assets.append(
                         Asset(
