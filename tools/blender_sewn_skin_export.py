@@ -724,10 +724,6 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "maximumSurfaceResidualM": max(
             (record["residualM"] for record in residual_records), default=0.0
         ),
-        "evidenceBoundary": (
-            "Vertices outside the declared target-distance or local-support bounds remain unchanged and are counted; "
-            "this prototype solve does not establish complete pose coverage or fit."
-        ),
         "minimumNormalTurnDot": spec["maximumNormalTurnDot"],
         "skinWeightsChanged": False,
         "sharedExternalSeamsMoved": bool(transition_vertices),
