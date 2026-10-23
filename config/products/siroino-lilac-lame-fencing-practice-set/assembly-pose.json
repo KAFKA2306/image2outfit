@@ -9672,16 +9672,15 @@
     "grantsFitAcceptance": false
   },
   "poseConstrainedApronGeometry": {
-    "method": "sit-anterior-shorts-surface-inverse-skin-v3",
+    "method": "sit-continuous-front-apron-inverse-skin-v4",
     "referencePose": "sit",
     "sourcePieceIds": [
+      "overskirt-front-left",
+      "overskirt-front-right",
       "overskirt-front-lap-left",
       "overskirt-front-lap-right"
     ],
-    "transitionPieceIds": [
-      "overskirt-front-left",
-      "overskirt-front-right"
-    ],
+    "transitionPieceIds": [],
     "leftTargetPieceIds": [
       "shorts-front-left"
     ],
@@ -9707,7 +9706,7 @@
     "smoothness": 0.65,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V39 constrains lap projection to shorts triangles in a 20 mm local height bin and a 50 mm local support radius; more distant same-height surfaces leave the vertex unchanged and are counted as unsupported. The 35 mm residual, 85 mm correction, 100 mm pose, 2 mm skin-map and triangle-orientation bounds remain unchanged. Waistband, flank and rear seams remain fixed. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
+    "evidenceBoundary": "V40 applies the same sit-pose evaluated-thigh projection and inverse-skin map to the continuous set of four front overskirt and lap panels. It retains the 20 mm local height bins, 50 mm local support radius, 35 mm residual, 85 mm source correction, 100 mm pose correction, 2 mm skin-map and triangle-orientation bounds; unsupported vertices remain unchanged and are counted. External flank, rear and waistband seams remain constrained. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
-  "designRevision": "v39-apron-local-support-radius-20261023"
+  "designRevision": "v41-report-out-of-envelope-apron-vertices-20261024"
 }

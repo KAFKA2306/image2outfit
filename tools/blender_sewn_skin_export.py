@@ -50,7 +50,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     spec = pose_spec.get("poseConstrainedApronGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "sit-anterior-shorts-surface-inverse-skin-v3":
+    if spec.get("method") != "sit-continuous-front-apron-inverse-skin-v4":
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
     transition_piece_ids = set(spec.get("transitionPieceIds", []))
@@ -332,6 +332,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     outside_target_height_range_count = 0
     outside_target_local_height_bin_count = 0
     outside_target_local_surface_support_count = 0
+    outside_target_distance_bound_count = 0
     transition_blend_by_vertex = {}
     for index in selected_indices:
         point = obj.data.vertices[index].co
@@ -399,15 +400,13 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             )
         location, normal, _triangle, distance = result
         if distance > spec["maximumTargetDistanceM"]:
-            current_world = world_vertices[index]
-            raise ValueError(
-                f"Apron pose-space target exceeds bound at vertex {index}: {distance:.6f} m; "
-                f"limit={spec['maximumTargetDistanceM']:.6f} m, side={side}, "
-                f"blend={blend:.6f}, localPoint={tuple(round(float(value), 6) for value in point)}, "
-                f"posePoint={tuple(round(float(value), 6) for value in current_world)}, "
-                f"nearestTarget={tuple(round(float(value), 6) for value in location)}, "
-                f"ownerPieceIds={sorted(vertex_owners[index])}"
-            )
+            # The same-height nearest triangle can still be on the wrong body
+            # segment when a front-panel point is outside the declared lookup
+            # envelope. Keep the sewn point unchanged and expose the count
+            # instead of pulling it across the body surface.
+            locked.add(index)
+            outside_target_distance_bound_count += 1
+            continue
         if distance > spec["maximumLocalSurfaceSupportDistanceM"]:
             # A distant triangle in the same height band is not a valid local
             # correspondence. Keep this point unchanged and disclose the
@@ -709,6 +708,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         },
         "outsideTargetHeightRangeVertexCount": outside_target_height_range_count,
         "outsideTargetLocalHeightBinVertexCount": outside_target_local_height_bin_count,
+        "outsideTargetDistanceBoundVertexCount": outside_target_distance_bound_count,
         "outsideTargetLocalSurfaceSupportVertexCount": outside_target_local_surface_support_count,
         "targetSurfaceHeightBinM": float(spec["targetSurfaceHeightBinM"]),
         "maximumLocalSurfaceSupportDistanceM": float(
@@ -723,6 +723,10 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "maximumPoseDisplacementM": maximum_pose_delta,
         "maximumSurfaceResidualM": max(
             (record["residualM"] for record in residual_records), default=0.0
+        ),
+        "evidenceBoundary": (
+            "Vertices outside the declared target-distance or local-support bounds remain unchanged and are counted; "
+            "this prototype solve does not establish complete pose coverage or fit."
         ),
         "minimumNormalTurnDot": spec["maximumNormalTurnDot"],
         "skinWeightsChanged": False,
