@@ -184,6 +184,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         evaluated_obj.to_mesh_clear()
         raise ValueError("Evaluated source garment changed vertex order")
     world_vertices = [evaluated_obj.matrix_world @ v.co for v in evaluated_mesh.vertices]
+    evaluated_mesh.calc_loop_triangles()
+    pose_triangles = tuple(
+        tuple(int(index) for index in triangle.vertices)
+        for triangle in evaluated_mesh.loop_triangles
+    )
     evaluated_obj.to_mesh_clear()
     side_triangles, target_world_vertices, target_offset = {"left": [], "right": []}, [], 0
     for target_obj, target_pieces, target_face_owners in target_meshes:
@@ -211,6 +216,13 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         target_eval.to_mesh_clear()
     if not side_triangles["left"] or not side_triangles["right"]:
         raise ValueError("Pose-constrained apron requires evaluated shorts triangles on both sides")
+    side_target_z_ranges = {}
+    for side, triangles in side_triangles.items():
+        support_indices = {index for triangle in triangles for index in triangle}
+        side_target_z_ranges[side] = (
+            min(float(target_world_vertices[index].z) for index in support_indices),
+            max(float(target_world_vertices[index].z) for index in support_indices),
+        )
     side_trees = {
         side: BVHTree.FromPolygons(target_world_vertices, triangles, all_triangles=True)
         for side, triangles in side_triangles.items()
@@ -240,6 +252,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     targets, target_distances, skin_errors = {}, [], []
     target_diagnostics = {}
     locked = set()
+    outside_target_height_range_count = 0
     transition_blend_by_vertex = {}
     for index in selected_indices:
         point = obj.data.vertices[index].co
@@ -274,13 +287,29 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             transition_blend_by_vertex[index] = blend
             continue
         side = "left" if ((obj.matrix_world @ point).x >= center_x) == left_positive else "right"
-        result = side_trees[side].find_nearest(world_vertices[index])
+        pose_point = world_vertices[index]
+        target_min_z, target_max_z = side_target_z_ranges[side]
+        if pose_point.z < target_min_z or pose_point.z > target_max_z:
+            # A lap hem can extend below the shorts. Outside the measured
+            # vertical support of the named target surface, nearest-point
+            # lookup would pull it toward an unrelated edge many centimeters
+            # away and falsely fail the correspondence bound.
+            locked.add(index)
+            outside_target_height_range_count += 1
+            continue
+        result = side_trees[side].find_nearest(pose_point)
         if result is None or result[0] is None or result[1] is None:
             raise ValueError(f"Sit-pose shorts surface lookup failed at apron vertex {index}")
         location, normal, _triangle, distance = result
         if distance > spec["maximumTargetDistanceM"]:
+            current_world = world_vertices[index]
             raise ValueError(
-                f"Apron pose-space target exceeds bound at vertex {index}: {distance:.6f} m"
+                f"Apron pose-space target exceeds bound at vertex {index}: {distance:.6f} m; "
+                f"limit={spec['maximumTargetDistanceM']:.6f} m, side={side}, "
+                f"blend={blend:.6f}, localPoint={tuple(round(float(value), 6) for value in point)}, "
+                f"posePoint={tuple(round(float(value), 6) for value in current_world)}, "
+                f"nearestTarget={tuple(round(float(value), 6) for value in location)}, "
+                f"ownerPieceIds={sorted(vertex_owners[index])}"
             )
         if normal.length < .99:
             raise ValueError(f"Invalid sit-pose shorts normal at apron vertex {index}")
@@ -375,6 +404,40 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             updated[index] = (targets[index] + mean * strength) / (1.0 + strength)
         displacement = updated
 
+    # Backtrack the whole correction field until every affected evaluated
+    # triangle retains the configured orientation bound. This is a feasibility
+    # step, not a gate change: the unchanged surface-residual and displacement
+    # limits below still reject an underpowered safe field.
+    normal_turn_limit = spec["maximumNormalTurnDot"]
+    orientation_limited_vertices = set()
+    for _ in range(32):
+        vertices_to_reduce = set()
+        for triangle in pose_triangles:
+            if not set(triangle).intersection(movable):
+                continue
+            old = [world_vertices[index] for index in triangle]
+            new = [
+                world_vertices[index]
+                + displacement.get(index, Vector())
+                for index in triangle
+            ]
+            old_normal = (old[1] - old[0]).cross(old[2] - old[0])
+            new_normal = (new[1] - new[0]).cross(new[2] - new[0])
+            if old_normal.length < 1e-10:
+                raise ValueError("Pose-constrained apron source contains a collapsed sewn triangle")
+            if new_normal.length < 1e-10 or old_normal.normalized().dot(new_normal.normalized()) < normal_turn_limit:
+                vertices_to_reduce.update(set(triangle).intersection(movable))
+        if not vertices_to_reduce:
+            break
+        for index in vertices_to_reduce:
+            displacement[index] *= 0.5
+        orientation_limited_vertices.update(vertices_to_reduce)
+    else:
+        raise ValueError(
+            "Pose-constrained apron cannot preserve sewn-triangle orientation "
+            "within the configured normal-turn bound"
+        )
+
     corrections = [value.length for value in displacement.values()]
     maximum_correction = max(corrections, default=0.0)
     if maximum_correction > spec["maximumCorrectionM"]:
@@ -387,7 +450,10 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             f"posePoint={diagnostic.get('currentPosePointM', 'locked')}, surfaceTarget={diagnostic.get('surfaceTargetM', 'locked')}, "
             f"owners={diagnostic.get('ownerPieceIds', 'locked')}"
         )
-    original_sit = {index: world_vertices[index].copy() for index in selected_indices}
+    original_sit = {
+        index: world_point.copy()
+        for index, world_point in enumerate(world_vertices)
+    }
     for index in movable:
         if displacement[index].length <= 1e-9:
             continue
@@ -416,17 +482,30 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     final_obj = obj.evaluated_get(depsgraph)
     final_mesh = final_obj.to_mesh()
     final_world = [final_obj.matrix_world @ vertex.co for vertex in final_mesh.vertices]
-    residuals = []
+    residual_records = []
     for index in movable:
         if index not in apron_vertices:
             continue
-        result = side_trees[
-            "left" if ((obj.matrix_world @ obj.data.vertices[index].co).x >= center_x) == left_positive else "right"
-        ].find_nearest(final_world[index])
+        side = (
+            "left"
+            if ((obj.matrix_world @ obj.data.vertices[index].co).x >= center_x) == left_positive
+            else "right"
+        )
+        result = side_trees[side].find_nearest(final_world[index])
         if result is None or result[0] is None:
             final_obj.to_mesh_clear()
             raise ValueError(f"Solved apron has no shorts residual at vertex {index}")
-        residuals.append(abs(float(result[3]) - spec["clearanceM"]))
+        residual_records.append({
+            "vertex": int(index),
+            "side": side,
+            "surfaceDistanceM": float(result[3]),
+            "residualM": abs(float(result[3]) - spec["clearanceM"]),
+            "posePointM": tuple(float(value) for value in final_world[index]),
+            "nearestSurfacePointM": tuple(float(value) for value in result[0]),
+            "sourcePointM": tuple(float(value) for value in obj.data.vertices[index].co),
+            "ownerPieceIds": sorted(vertex_owners[index]),
+            "appliedDisplacementM": float(displacement[index].length),
+        })
     final_mesh.calc_loop_triangles()
     for triangle_index, triangle in enumerate(final_mesh.loop_triangles):
         if not set(triangle.vertices).intersection(movable):
@@ -453,8 +532,20 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     final_obj.to_mesh_clear()
     reset_pose(armature)
     bpy.context.view_layer.update()
-    if max(residuals, default=0.0) > spec["maximumSurfaceResidualM"]:
-        raise ValueError("Pose-constrained apron could not meet the shorts-surface residual bound")
+    maximum_residual = max(residual_records, key=lambda record: record["residualM"], default=None)
+    if maximum_residual and maximum_residual["residualM"] > spec["maximumSurfaceResidualM"]:
+        raise ValueError(
+            "Pose-constrained apron could not meet the shorts-surface residual bound: "
+            f"maximum={maximum_residual['residualM']:.6f} m, "
+            f"limit={spec['maximumSurfaceResidualM']:.6f} m, "
+            f"vertex={maximum_residual['vertex']}, side={maximum_residual['side']}, "
+            f"surfaceDistance={maximum_residual['surfaceDistanceM']:.6f} m, "
+            f"displacement={maximum_residual['appliedDisplacementM']:.6f} m, "
+            f"posePoint={tuple(round(value, 6) for value in maximum_residual['posePointM'])}, "
+            f"surfacePoint={tuple(round(value, 6) for value in maximum_residual['nearestSurfacePointM'])}, "
+            f"owners={maximum_residual['ownerPieceIds']}, "
+            f"orientationLimitedVertices={len(orientation_limited_vertices)}"
+        )
     return {
         "applied": True,
         "method": spec["method"],
@@ -466,6 +557,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             for ring in (1, 2)
         },
         "targetPieceIdsBySide": {"left": sorted(left_targets), "right": sorted(right_targets)},
+        "targetSurfaceHeightRangeZM": {
+            side: [float(value) for value in height_range]
+            for side, height_range in side_target_z_ranges.items()
+        },
+        "outsideTargetHeightRangeVertexCount": outside_target_height_range_count,
         "movedVertexCount": sum(
             displacement[index].length > 1e-9 for index in movable
         ),
@@ -473,8 +569,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "maximumTargetDistanceM": max(target_distances, default=0.0),
         "maximumSkinMapErrorM": max(skin_errors, default=0.0),
         "maximumCorrectionM": max(corrections, default=0.0),
+        "orientationLimitedVertexCount": len(orientation_limited_vertices),
         "maximumPoseDisplacementM": maximum_pose_delta,
-        "maximumSurfaceResidualM": max(residuals, default=0.0),
+        "maximumSurfaceResidualM": max(
+            (record["residualM"] for record in residual_records), default=0.0
+        ),
         "minimumNormalTurnDot": spec["maximumNormalTurnDot"],
         "skinWeightsChanged": False,
         "sharedExternalSeamsMoved": bool(transition_vertices),
