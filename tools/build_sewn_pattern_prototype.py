@@ -343,7 +343,6 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
 
 def add_prototype_surface_motifs(mesh, job, recipe):
     """Place provisional plastron and elbow quilting on the sewn garment surface."""
-    import math
 
     spec = recipe.get("prototypeSurfaceMotifs")
     if spec is None:
@@ -834,7 +833,6 @@ def append_declared_rear_waist_tab(mesh, body_objects, pose, recipe, target_path
     export, and render stages process it with the rest of the candidate.
     Projection and offsets are prototype hypotheses only.
     """
-    import math
     from mathutils import Vector
     from mathutils.bvhtree import BVHTree
 
@@ -1051,7 +1049,6 @@ def append_declared_rear_waist_tab(mesh, body_objects, pose, recipe, target_path
 
 def lengthen_declared_shorts(mesh, pose):
     """Extend only the lower edge zone of the sewn shorts before body projection."""
-    import math
     from collections import defaultdict
     from mathutils import Vector
 
@@ -1120,7 +1117,6 @@ def preserved_seam_factors(mesh, spec):
     """Fade placement displacement continuously away from preserved seams."""
     from collections import defaultdict
     from mathutils import Vector
-    import math
     preserve = set(spec.get("preserveSharedPieceIds", []))
     if not preserve:
         return {}
@@ -1153,7 +1149,6 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
     Retain canonical faces, piece ownership and sewing vertices. The body only
     supplies coordinate measurements; no body faces are copied to the garment.
     """
-    import math
     from collections import defaultdict
     from bisect import bisect_right
     from mathutils import Vector
@@ -1359,7 +1354,6 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
     Shared sewn vertices move once. No body topology is copied and no garment
     faces are removed when a projection fails or collapses a triangle.
     """
-    import math
     from collections import defaultdict
     from mathutils import Vector
     from mathutils.bvhtree import BVHTree
@@ -1450,7 +1444,6 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
 def split_declared_skirt_creases(mesh, pose):
     """Cut canonical skirt/band faces at fold extrema before body placement."""
     import bmesh
-    import math
     from mathutils import Vector
 
     spec = pose.get("skirtPleatPlacement")
@@ -1627,7 +1620,6 @@ def split_declared_skirt_creases(mesh, pose):
 
 def lengthen_declared_skirt_panels(mesh, pose):
     """Extend the sewn overskirt downward while anchoring its waist seam."""
-    import math
 
     spec = pose.get("skirtPleatPlacement")
     if spec is None:
@@ -1748,7 +1740,6 @@ def lengthen_declared_skirt_panels(mesh, pose):
 
 def place_declared_skirt_folds(mesh, pose, native_vertices):
     """Seed explicit garment folds while retaining the sewn face topology."""
-    import math
     from mathutils import Vector
 
     spec = pose.get("skirtPleatPlacement")
@@ -1896,7 +1887,6 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path):
     leaving garment topology and panel ownership intact for the later skin
     transfer. It is an attachment hypothesis, not fit or pose acceptance.
     """
-    import math
     from collections import defaultdict
     from mathutils import Vector
     from mathutils.bvhtree import BVHTree

@@ -259,7 +259,6 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     if abs(left_x - right_x) <= 1e-6:
         raise ValueError("Pose-constrained apron cannot establish bilateral thigh axis")
     center_x, left_positive = (left_x + right_x) / 2.0, left_x > right_x
-    obj_inverse = obj.matrix_world.inverted()
     maps = {}
     for bone_name in armature.data.bones.keys():
         pose_bone = armature.pose.bones.get(bone_name)
