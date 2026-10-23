@@ -495,9 +495,7 @@ def _main_unlocked() -> int:
                 expected=expected,
                 mode=mode,
                 reuse_stale_prefix_reason=(
-                    args.source_change_reuse_reason
-                    if args.reuse_completed_prefix_after_source_change
-                    else None
+                    reuse_reason if reuse_completed_prefix else None
                 ),
                 rerun_from_stage=args.rerun_from_stage,
             )
