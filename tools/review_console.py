@@ -753,16 +753,34 @@ def collect_product(
                     raise ValueError("Mesh showcase image escapes product workspace")
                 if digest(target) != record["sha256"]:
                     raise ValueError("Mesh showcase diagram hash mismatch")
+                kind = "uv" if record["name"] == "uv" else "mesh"
+                uv_status = mesh.get("uvStatus")
+                partial = record["name"] == "uv" and uv_status == "PARTIAL_UNVERIFIED"
                 assets.append(
                     Asset(
-                        kind="mesh",
-                        name=record["name"],
+                        kind=kind,
+                        name=(
+                            "UV layout (partial; unmapped objects omitted)"
+                            if partial
+                            else record["name"]
+                        ),
                         status="UNVERIFIED",
                         href=relative_href(target, output_dir),
                         sha256=digest(target),
                     )
                 )
-            if mesh.get("uvStatus") == "MISSING":
+            if mesh.get("uvStatus") == "PARTIAL_UNVERIFIED":
+                for object_name in mesh.get("uvUnmappedObjects", []):
+                    assets.append(
+                        Asset(
+                            kind="uv",
+                            name=f"UV not created: {object_name}",
+                            status="MISSING",
+                            href=None,
+                            sha256=None,
+                        )
+                    )
+            elif mesh.get("uvStatus") == "MISSING":
                 assets.append(
                     Asset(
                         kind="uv",

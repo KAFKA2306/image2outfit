@@ -2304,7 +2304,7 @@ def stage_visual_review(
     decision = validate_visual_review(
         read_object(review, "visual review"),
         product_id=product_id,
-        revision_id=str(request.get("revisionId", "")),
+        revision_id=str(job.get("buildRevision", "")),
     )
     images = review_image_paths(job)
     current_hashes = {relative(path): sha256(path) for path in images}
@@ -2327,7 +2327,7 @@ def stage_finalize(
     job: Mapping[str, Any], request: Mapping[str, Any], result: Path
 ) -> None:
     product_id = str(job["id"])
-    revision_id = str(request.get("revisionId", ""))
+    revision_id = str(job.get("buildRevision", ""))
     review_path = repo_path(job["garmentPipeline"]["visualReviewPath"], label="review")
     visual = validate_visual_review(
         read_object(review_path, "visual review"),

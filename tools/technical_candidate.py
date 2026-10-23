@@ -593,6 +593,10 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                 )
             except (OSError, KeyError, TypeError, ValueError) as exc:
                 stages["sewnMeshInput"] = {"passed": False, "error": str(exc)}
+                stages["blenderBuild"] = {
+                    "passed": False,
+                    "error": f"not run because sewn-mesh input failed: {exc}",
+                }
                 build_exit = None
             else:
                 stages["sewnMeshInput"] = {

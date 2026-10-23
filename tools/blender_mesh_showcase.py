@@ -71,7 +71,9 @@ def main():
         scale = 900 / max(xmax - xmin, zmax - zmin)
         topology = []
         uvlines = []
-        complete_uv_coverage = all(obj.data.uv_layers.active for obj in meshes)
+        uv_mapped_objects = [obj for obj in meshes if obj.data.uv_layers.active]
+        uv_unmapped_objects = [obj.name for obj in meshes if not obj.data.uv_layers.active]
+        complete_uv_coverage = len(uv_mapped_objects) == len(meshes)
         for obj in meshes:
             uv = obj.data.uv_layers.active
             report["objects"].append(
@@ -95,9 +97,9 @@ def main():
                         962 - (b.z - zmin) * scale,
                     )
                 )
-            # A UV chart is an outfit-level claim. Do not emit a partial chart
-            # from whichever overlay objects happen to have a UV layer.
-            if complete_uv_coverage and uv:
+            # Draw only authored UVs. The report and diagram label disclose any
+            # omitted garment objects; no unwrap or substitute coordinates are made.
+            if uv:
                 for face in obj.data.polygons:
                     loops = list(face.loop_indices)
                     for i, j in zip(loops, loops[1:] + loops[:1]):
@@ -112,9 +114,25 @@ def main():
                         )
         diagrams = [("topology", topology, "Garment topology - front projection")]
         if uvlines:
-            diagrams.append(("uv", uvlines, "Active UV layout - unit tile"))
+            uv_title = (
+                "Authored UV layout - unit tile"
+                if complete_uv_coverage
+                else "PARTIAL authored UV layout - unmapped objects omitted"
+            )
+            diagrams.append(("uv", uvlines, uv_title))
+        report["uvMappedObjects"] = [obj.name for obj in uv_mapped_objects]
+        report["uvUnmappedObjects"] = uv_unmapped_objects
+        report["uvCoverage"] = {
+            "mappedObjectCount": len(uv_mapped_objects),
+            "unmappedObjectCount": len(uv_unmapped_objects),
+            "totalObjectCount": len(meshes),
+        }
         report["uvStatus"] = (
-            "PRESENT_UNVERIFIED" if complete_uv_coverage and uvlines else "MISSING"
+            "MISSING"
+            if not uvlines
+            else "PRESENT_UNVERIFIED"
+            if complete_uv_coverage
+            else "PARTIAL_UNVERIFIED"
         )
         for name, lines, title in diagrams:
             path = out / f"{name}.svg"

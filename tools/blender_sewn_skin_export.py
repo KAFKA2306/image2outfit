@@ -40,15 +40,17 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     """Fit the sewn front apron in sit pose and invert the frozen skin map.
 
     This is a deterministic source-geometry solve, not a weight change: it
-    projects the front skirt/lap onto the evaluated under-shorts in the
-    declared sit pose, smooths the displacement through the connected front
-    panels, preserves shared external seams, then maps those target positions
-    back through each vertex's existing linear-blend skin transform.
+    projects the front skirt/lap onto height-local evaluated under-shorts in
+    the declared sit pose, smooths displacement through connected front
+    panels, preserves shared external seams, then maps target positions back
+    through each vertex's existing linear-blend skin transform. Height-local
+    queries avoid treating a remote shorts edge as support for a lower apron
+    point just because the target mesh spans that height elsewhere.
     """
     spec = pose_spec.get("poseConstrainedApronGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "sit-anterior-shorts-surface-inverse-skin-v2":
+    if spec.get("method") != "sit-anterior-shorts-surface-inverse-skin-v3":
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
     transition_piece_ids = set(spec.get("transitionPieceIds", []))
@@ -63,7 +65,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "minimumHeightZM", "fullBlendHeightZM", "fullBlendEndHeightZM", "waistLockHeightZM",
         "clearanceM", "minimumProjectionBlend", "maximumTargetDistanceM", "maximumCorrectionM",
         "maximumPoseCorrectionM", "maximumSkinMappingErrorM",
-        "maximumSurfaceResidualM", "smoothness", "maximumNormalTurnDot",
+        "maximumSurfaceResidualM", "targetSurfaceHeightBinM",
+        "maximumLocalSurfaceSupportDistanceM", "smoothness", "maximumNormalTurnDot",
     )
     if not all(math.isfinite(spec.get(key, math.nan)) for key in numeric):
         raise ValueError("Pose-constrained apron bounds must be finite")
@@ -77,6 +80,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             or spec["maximumPoseCorrectionM"] <= 0
             or spec["maximumSkinMappingErrorM"] <= 0
             or spec["maximumSurfaceResidualM"] <= 0
+            or not 0 < spec["targetSurfaceHeightBinM"] <= spec["maximumSurfaceResidualM"]
+            or not 0 < spec["maximumLocalSurfaceSupportDistanceM"] < spec["maximumTargetDistanceM"]
             or spec["smoothness"] < 0
             or not -1 < spec["maximumNormalTurnDot"] < 1
             or not isinstance(spec.get("smoothingIterations"), int)
@@ -223,10 +228,27 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             min(float(target_world_vertices[index].z) for index in support_indices),
             max(float(target_world_vertices[index].z) for index in support_indices),
         )
-    side_trees = {
-        side: BVHTree.FromPolygons(target_world_vertices, triangles, all_triangles=True)
-        for side, triangles in side_triangles.items()
-    }
+    target_triangles_by_height_bin = {"left": {}, "right": {}}
+    for side, triangles in side_triangles.items():
+        bins = target_triangles_by_height_bin[side]
+        for triangle in triangles:
+            low = min(float(target_world_vertices[index].z) for index in triangle)
+            high = max(float(target_world_vertices[index].z) for index in triangle)
+            first_bin = math.floor(low / spec["targetSurfaceHeightBinM"])
+            last_bin = math.floor(high / spec["targetSurfaceHeightBinM"])
+            for height_bin in range(first_bin, last_bin + 1):
+                bins.setdefault(height_bin, []).append(triangle)
+    side_trees = {"left": {}, "right": {}}
+
+    def target_tree_at_height(side, height):
+        height_bin = math.floor(height / spec["targetSurfaceHeightBinM"])
+        if height_bin not in side_trees[side]:
+            triangles = target_triangles_by_height_bin[side].get(height_bin, [])
+            side_trees[side][height_bin] = (
+                BVHTree.FromPolygons(target_world_vertices, triangles, all_triangles=True)
+                if triangles else None
+            )
+        return side_trees[side][height_bin]
 
     left_bone = spec["leftThighBone"]
     right_bone = spec["rightThighBone"]
@@ -253,6 +275,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     target_diagnostics = {}
     locked = set()
     outside_target_height_range_count = 0
+    outside_target_local_height_bin_count = 0
+    outside_target_local_surface_support_count = 0
     transition_blend_by_vertex = {}
     for index in selected_indices:
         point = obj.data.vertices[index].co
@@ -297,7 +321,12 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             locked.add(index)
             outside_target_height_range_count += 1
             continue
-        result = side_trees[side].find_nearest(pose_point)
+        local_target_tree = target_tree_at_height(side, float(pose_point.z))
+        if local_target_tree is None:
+            locked.add(index)
+            outside_target_local_height_bin_count += 1
+            continue
+        result = local_target_tree.find_nearest(pose_point)
         if result is None or result[0] is None or result[1] is None:
             raise ValueError(f"Sit-pose shorts surface lookup failed at apron vertex {index}")
         location, normal, _triangle, distance = result
@@ -311,6 +340,13 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 f"nearestTarget={tuple(round(float(value), 6) for value in location)}, "
                 f"ownerPieceIds={sorted(vertex_owners[index])}"
             )
+        if distance > spec["maximumLocalSurfaceSupportDistanceM"]:
+            # A distant triangle in the same height band is not a valid local
+            # correspondence. Keep this point unchanged and disclose the
+            # unsupported count; pose and visual audits remain independent.
+            locked.add(index)
+            outside_target_local_surface_support_count += 1
+            continue
         if normal.length < .99:
             raise ValueError(f"Invalid sit-pose shorts normal at apron vertex {index}")
         normal.normalize()
@@ -491,7 +527,13 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             if ((obj.matrix_world @ obj.data.vertices[index].co).x >= center_x) == left_positive
             else "right"
         )
-        result = side_trees[side].find_nearest(final_world[index])
+        local_target_tree = target_tree_at_height(side, float(final_world[index].z))
+        if local_target_tree is None:
+            final_obj.to_mesh_clear()
+            raise ValueError(
+                f"Solved apron left the local shorts-surface height support at vertex {index}"
+            )
+        result = local_target_tree.find_nearest(final_world[index])
         if result is None or result[0] is None:
             final_obj.to_mesh_clear()
             raise ValueError(f"Solved apron has no shorts residual at vertex {index}")
@@ -562,6 +604,12 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             for side, height_range in side_target_z_ranges.items()
         },
         "outsideTargetHeightRangeVertexCount": outside_target_height_range_count,
+        "outsideTargetLocalHeightBinVertexCount": outside_target_local_height_bin_count,
+        "outsideTargetLocalSurfaceSupportVertexCount": outside_target_local_surface_support_count,
+        "targetSurfaceHeightBinM": float(spec["targetSurfaceHeightBinM"]),
+        "maximumLocalSurfaceSupportDistanceM": float(
+            spec["maximumLocalSurfaceSupportDistanceM"]
+        ),
         "movedVertexCount": sum(
             displacement[index].length > 1e-9 for index in movable
         ),

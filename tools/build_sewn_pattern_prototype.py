@@ -2103,6 +2103,15 @@ def main():
     data = bpy.data.meshes.new(job["id"] + "-sewn-surface")
     data.from_pydata(mesh["vertices"], [], mesh["faces"])
     data.update()
+    # Keep piping bindings stable if the bounded microdegenerate cleanup welds
+    # vertices and Blender compacts the resulting point table. Bindings name
+    # indices in the canonical sewn mesh, so the correspondence must travel
+    # with each surviving point through cleanup and cloth component splitting.
+    sewn_vertex_ids = data.attributes.new(
+        "canonical_sewn_vertex_index", "INT", "POINT"
+    )
+    for item, source_id in zip(sewn_vertex_ids.data, range(len(mesh["vertices"]))):
+        item.value = source_id
     uv_evidence = assign_authored_panel_uvs(data, mesh)
     owners = mesh["facePieceIds"]
     pieces = sorted(set(owners))
@@ -2162,6 +2171,11 @@ def main():
                 raise ValueError(f"Unknown prototype face material owner: {material_id}")
             polygon.material_index = tab_material_indices[material_id]
     microdegenerate_cleanup = weld_subpixel_degenerate_triangles(garment.data)
+    sewn_vertex_ids = garment.data.attributes.get("canonical_sewn_vertex_index")
+    if sewn_vertex_ids is None or len(sewn_vertex_ids.data) != len(garment.data.vertices):
+        raise ValueError("Microdegenerate cleanup lost canonical sewn vertex provenance")
+    if any(not 0 <= item.value < len(mesh["vertices"]) for item in sewn_vertex_ids.data):
+        raise ValueError("Microdegenerate cleanup produced an invalid sewn vertex source id")
     prototype_edge_trim = add_prototype_edge_trim(mesh, job, pieces, recipe)
     prototype_surface_motifs = add_prototype_surface_motifs(mesh, job, recipe)
     source = resolve(job["blendPath"])

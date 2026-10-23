@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "sourcePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend",
-  "sourceSha256": "217fbf6f32b2df7e6d3db87acfff4f3bfb050817050fb785d6ccdfd8a8b9c42c",
+  "sourceSha256": "381d62b4845781e019d899b5509afbfbd6ef1c521623e798ca6cd68f62199af9",
   "blenderVersion": "4.4.3",
   "objects": [
     {
@@ -91,16 +91,16 @@
     },
     {
       "name": "siroino-lilac-lame-fencing-practice-set-prototype-piping-ov.003",
-      "vertices": 416,
-      "edges": 818,
-      "faces": 404,
+      "vertices": 512,
+      "edges": 1010,
+      "faces": 500,
       "uvLayer": "UVMap"
     },
     {
       "name": "siroino-lilac-lame-fencing-practice-set-prototype-piping-ov.004",
-      "vertices": 416,
-      "edges": 818,
-      "faces": 404,
+      "vertices": 512,
+      "edges": 1010,
+      "faces": 500,
       "uvLayer": "UVMap"
     },
     {
@@ -164,32 +164,71 @@
       "vertices": 1742,
       "edges": 5146,
       "faces": 3404,
-      "uvLayer": null
+      "uvLayer": "AuthoredPatternPanels"
     },
     {
       "name": "pleated-overskirt",
-      "vertices": 5561,
-      "edges": 16387,
-      "faces": 10826,
-      "uvLayer": null
+      "vertices": 6679,
+      "edges": 19717,
+      "faces": 13038,
+      "uvLayer": "AuthoredPatternPanels"
     },
     {
       "name": "siroino-lilac-lame-fencing-practice-set-static",
       "vertices": 5002,
       "edges": 14474,
       "faces": 9473,
-      "uvLayer": null
+      "uvLayer": "AuthoredPatternPanels"
     }
   ],
   "records": [
     {
       "name": "topology",
       "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Mesh/topology.svg",
-      "sha256": "9595eb4c291ab80c553e62d805047674d45c3060c8a4aeb6b8e8773d4b06b7a9"
+      "sha256": "06427e64576acdb4a3b78fb951d582107ea8853424d010f9ee93f3878ca8bf6d"
+    },
+    {
+      "name": "uv",
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Mesh/uv.svg",
+      "sha256": "7a3fec9844220082f74770bfe27019b5c21f9769bc11e9c3a1024df38f6064f7"
     }
   ],
   "grantsQualityAcceptance": false,
   "boundary": "Base garment edges in neutral coordinates, not evaluated deformation or a topology/UV quality pass. Avatar meshes excluded by explicit garment role.",
-  "uvStatus": "MISSING",
+  "uvMappedObjects": [
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-jacket",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-ja",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-ja.001",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-stand-",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-oversk",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-ov",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-ov.001",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-ov.002",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-waistb",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-wa",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-wa.001",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-wa.002",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-ov.003",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-ov.004",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-wa.003",
+    "siroino-lilac-lame-fencing-practice-set-prototype-piping-wa.004",
+    "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-left-prot",
+    "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-right-pro",
+    "jacket-sleeves",
+    "pleated-overskirt",
+    "siroino-lilac-lame-fencing-practice-set-static"
+  ],
+  "uvUnmappedObjects": [
+    "siroino-lilac-lame-fencing-practice-set-prototype-plastron-hypo",
+    "siroino-lilac-lame-fencing-practice-set-front-fastener-1-hypoth",
+    "siroino-lilac-lame-fencing-practice-set-front-fastener-2-hypoth",
+    "siroino-lilac-lame-fencing-practice-set-front-fastener-3-hypoth"
+  ],
+  "uvCoverage": {
+    "mappedObjectCount": 21,
+    "unmappedObjectCount": 4,
+    "totalObjectCount": 25
+  },
+  "uvStatus": "PARTIAL_UNVERIFIED",
   "status": "GENERATED_UNVERIFIED"
 }

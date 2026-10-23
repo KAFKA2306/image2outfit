@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v32-thigh-surface-anchor-20261022",
+  "revision": "v40-trim-canonical-vertex-provenance-20261023",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
-      "description": "V32 current sit/crouch images and sit thigh transects reject anterior coverage. At 52% along each evaluated UpperLeg bone, the current lap panels are posterior to the shorts (Blender anterior is negative Y): left lap median Y -0.0972 m vs left shorts -0.1606 m (63 mm posterior); right lap -0.1219 m vs right shorts -0.1616 m (40 mm posterior). Current measured coverage remains sit 0.2316/0.2237 and crouch 0.3514/0.3695 for the overskirt, versus 0.9548/0.9548 and 0.9537/0.9537 for shorts. The source-bound transect identifies the panel trajectory and nearest projections to the declared UpperLeg-weighted body triangle set; it does not establish fit acceptance.",
+      "code": "SKIRT_FORM_AND_FACETING",
       "severity": "BLOCKER",
-      "code": "SKIRT_POSE_COVERAGE"
+      "description": "Direct inspection of the current front, back, side, three-quarter, and six pose renders shows strong angular faceting and wrinkled clumps across the skirt, with uneven, pointed split-front edges. The overall skirt silhouette is not visually continuous."
     },
     {
-      "description": "Direct V32 front, sit, crouch and side renders show coarse triangular faceting, uneven split front edges, abrupt hem transitions, and narrow pointed tips. The attachment change moves front edges slightly without resolving visual continuity.",
+      "code": "SIT_CROUCH_FRONT_COVERAGE",
       "severity": "BLOCKER",
-      "code": "SKIRT_FORM_AND_FACETING"
+      "description": "Current sit and crouch renders expose large rounded shorts-like thigh shells through and ahead of the overskirt. The front lap/apron panels separate into narrow pointed flaps and leave the seated anterior thighs visibly uncovered; the current pose geometry is not acceptable."
     },
     {
-      "description": "Direct inspection of current V32 rear render finds no clearly readable adjustment-tab or buckle silhouette; it remains visually merged with the garment and has no dedicated rear close-up.",
+      "code": "REAR_TAB_LEGIBILITY",
       "severity": "BLOCKER",
-      "code": "REAR_TAB_LEGIBILITY"
+      "description": "The rear waist adjustment tab is only a small, low-contrast shape in the full-body back view and is not visually legible as a distinct functional-looking detail. It needs a readable silhouette and close-up evidence."
     },
     {
-      "description": "Current V32 weighted prototype still has no authored UV map. UV remains MISSING; no substitute UV has been generated.",
+      "code": "UV_LAYOUT_DENSITY_OVERLAP",
       "severity": "BLOCKER",
-      "code": "UV_MAPPING_INCOMPLETE"
+      "description": "Direct raster inspection of the source-bound partial UV chart shows dense near-continuous vertical line stacks crossing the unit tile, with panel islands crowded and difficult to distinguish. This is not a reviewable production UV layout. The chart contains only authored UVs from 21/25 mesh objects; the plastron and three front fasteners are explicitly unmapped and omitted. No UV coordinates were generated or substituted."
     }
   ],
   "failedGeometryChecks": [

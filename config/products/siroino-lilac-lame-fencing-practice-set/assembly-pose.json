@@ -9672,7 +9672,7 @@
     "grantsFitAcceptance": false
   },
   "poseConstrainedApronGeometry": {
-    "method": "sit-anterior-shorts-surface-inverse-skin-v2",
+    "method": "sit-anterior-shorts-surface-inverse-skin-v3",
     "referencePose": "sit",
     "sourcePieceIds": [
       "overskirt-front-lap-left",
@@ -9701,11 +9701,13 @@
     "maximumPoseCorrectionM": 0.10,
     "maximumSkinMappingErrorM": 0.002,
     "maximumSurfaceResidualM": 0.035,
+    "targetSurfaceHeightBinM": 0.02,
+    "maximumLocalSurfaceSupportDistanceM": 0.05,
     "smoothingIterations": 24,
     "smoothness": 0.65,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "Source geometry continuation: carry the seated-thigh surface path through the sewn lap join and ease across two graph rings into adjacent front-skirt panels. Only those declared front pieces enter the transition; waistband, flank and rear seams remain fixed. The lap-to-shorts surface residual, skin-map accuracy, pose displacement and triangle orientation remain bounded by the existing unchanged gates. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
+    "evidenceBoundary": "V39 constrains lap projection to shorts triangles in a 20 mm local height bin and a 50 mm local support radius; more distant same-height surfaces leave the vertex unchanged and are counted as unsupported. The 35 mm residual, 85 mm correction, 100 mm pose, 2 mm skin-map and triangle-orientation bounds remain unchanged. Waistband, flank and rear seams remain fixed. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
-  "designRevision": "v36-apron-topology-weight-revision-20261023"
+  "designRevision": "v39-apron-local-support-radius-20261023"
 }

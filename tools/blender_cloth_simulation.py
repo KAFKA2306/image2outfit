@@ -501,6 +501,13 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         raise ValueError("canonical sewn prototype is missing")
     pieces = json.loads(original["canonicalPieceIds"])
     owners = original.data.attributes["canonical_piece_index"]
+    canonical_source_ids = original.data.attributes.get(
+        "canonical_sewn_vertex_index"
+    )
+    if canonical_source_ids is None or len(canonical_source_ids.data) != len(
+        original.data.vertices
+    ):
+        raise ValueError("canonical sewn vertex provenance is missing before cloth splitting")
     faces = [list(face.vertices) for face in original.data.polygons]
     selected_faces = {}
     claimed = set()
@@ -532,13 +539,40 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             [[remap[v] for v in faces[i]] for i in indices],
         )
         data.update()
+        # Preserve only the authored sewn-pattern UVs.  Cloth splitting creates
+        # new meshes and from_pydata does not copy loop-domain data, so map each
+        # new polygon back to its source polygon and copy its loop coordinates.
+        source_uv = original.data.uv_layers.active
+        if source_uv is not None:
+            target_uv = data.uv_layers.new(name=source_uv.name)
+            for face_index, original_index in enumerate(indices):
+                source_poly = original.data.polygons[original_index]
+                target_poly = data.polygons[face_index]
+                source_loops = list(source_poly.loop_indices)
+                target_loops = list(target_poly.loop_indices)
+                if len(source_loops) != len(target_loops):
+                    raise ValueError(
+                        f"Authored UV loop count changed while splitting {name}"
+                    )
+                source_vertices = [original.data.loops[i].vertex_index for i in source_loops]
+                target_vertices = [ids[data.loops[i].vertex_index] for i in target_loops]
+                if source_vertices != target_vertices:
+                    raise ValueError(
+                        f"Authored UV loop vertex order changed while splitting {name}"
+                    )
+                for source_loop, target_loop in zip(source_loops, target_loops):
+                    target_uv.data[target_loop].uv = source_uv.data[source_loop].uv
+        elif name in groups:
+            raise ValueError(
+                f"Authored sewn-pattern UV layer is missing before cloth splitting: {name}"
+            )
         obj = bpy.data.objects.new(name, data)
         bpy.context.collection.objects.link(obj)
         obj.matrix_world = original.matrix_world.copy()
         obj["canonicalPieceIds"] = json.dumps(pieces)
         source_ids = data.attributes.new("canonical_sewn_vertex_index", "INT", "POINT")
-        for item, source_id in zip(source_ids.data, ids):
-            item.value = source_id
+        for item, original_vertex_id in zip(source_ids.data, ids):
+            item.value = canonical_source_ids.data[original_vertex_id].value
         ownership = data.attributes.new("canonical_piece_index", "INT", "FACE")
         for face_index, original_index in enumerate(indices):
             owner_index = owners.data[original_index].value
@@ -983,6 +1017,13 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 raise ValueError("Rest-shape cloth changed canonical topology")
             if settled_data.attributes.get("canonical_piece_index") is None:
                 raise ValueError("Rest-shape cloth lost canonical face ownership")
+            settled_source_ids = settled_data.attributes.get(
+                "canonical_sewn_vertex_index"
+            )
+            if settled_source_ids is None or len(settled_source_ids.data) != len(
+                settled_data.vertices
+            ):
+                raise ValueError("Rest-shape cloth lost canonical sewn vertex provenance")
             obj.modifiers.remove(modifier)
             obj.data = settled_data
             contract["canonicalRestShape"]["settledCapture"] = (

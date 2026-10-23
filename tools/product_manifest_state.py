@@ -667,19 +667,26 @@ def record_workflow_attempt(
             )
 
             review_document = read_json(review_file)
-            review = validate_visual_review(
-                review_document,
-                product_id=product_id,
-                revision_id=str(job["buildRevision"]),
+            review_is_current = (
+                review_document.get("reviewedRevision") == str(job["buildRevision"])
             )
-            image_paths = [*job["previewPaths"].values(), *job["posePaths"].values()]
-            current_images = {
-                value: digest(repo_path(root, value)) for value in image_paths
-            }
-            review_is_current = dict(review["inspectedImages"]) == current_images
+            review = None
+            if review_is_current:
+                review = validate_visual_review(
+                    review_document,
+                    product_id=product_id,
+                    revision_id=str(job["buildRevision"]),
+                )
+                image_paths = [
+                    *job["previewPaths"].values(), *job["posePaths"].values()
+                ]
+                current_images = {
+                    value: digest(repo_path(root, value)) for value in image_paths
+                }
+                review_is_current = dict(review["inspectedImages"]) == current_images
             if not review_is_current:
                 updated_handoff["currentVisualReview"] = {
-                    "decision": review["decision"],
+                    "decision": review_document.get("decision", "REJECT"),
                     "status": "STALE",
                     "currentInputsMatch": False,
                     "evidencePath": relative(root, review_file),
