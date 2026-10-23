@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V41 packs the source-authored pattern-space UV islands with one shared scale, fixed gutters, and no island rotation so pattern proportions and grain direction stay consistent while the atlas becomes readable. No UVs are generated for unmapped objects. Keep all fit, motion, visual, topology, and release gates independent.",
-  "designRevision": "v41-unrotated-proportional-pattern-uv-pack-20261023",
+  "designRevision": "v42-shorts-thigh-follow-20261024",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -173,10 +173,6 @@
     {
       "pieceIds": [
         "back-waist-adjustment-tab",
-        "shorts-front-left",
-        "shorts-front-right",
-        "shorts-back-left",
-        "shorts-back-right",
         "overskirt-front-left",
         "overskirt-front-right",
         "overskirt-back-left",
@@ -201,7 +197,7 @@
       ],
       "evidenceBoundary": "One profile remains shared across connected overskirt panels so sewn front/lap seam vertices receive a continuous field. The anterior and centerline targets are 0.12 within the 0.75 cap; side and rear hem follow use the existing 0.72 target. This uncalibrated prototype does not establish fit, motion, collision, or appearance acceptance.",
       "weightProfile": {
-      "method": "panel-balanced-hem-thigh-follow-v5",
+        "method": "panel-balanced-hem-thigh-follow-v5",
         "pieceIds": [
           "overskirt-front-left",
           "overskirt-front-right",
@@ -215,14 +211,51 @@
         "rightThighBone": "UpperLeg_R",
         "waistThighWeight": 0,
         "hemThighWeight": 0.72,
-      "forwardHemThighWeight": 0.12,
-      "centerlineHemThighWeight": 0.12,
+        "forwardHemThighWeight": 0.12,
+        "centerlineHemThighWeight": 0.12,
         "maximumThighWeight": 0.75,
         "forwardCenterYM": -0.03788188099861145,
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.075,
         "fullSideWeightWidthM": 0.135,
-      "evidenceBoundary": "Continuous connected-panel v5 method with 0.12 anterior and centerline targets, fading over the existing 140 mm forward range and authored vertical and lateral fields; the 0.75 maximum remains unchanged. The declared field is a prototype hypothesis, not fit, pose, collision, or appearance acceptance."
+        "evidenceBoundary": "Continuous connected-panel v5 method with 0.12 anterior and centerline targets, fading over the existing 140 mm forward range and authored vertical and lateral fields; the 0.75 maximum remains unchanged. The declared field is a prototype hypothesis, not fit, pose, collision, or appearance acceptance."
+      }
+    },
+    {
+      "pieceIds": [
+        "shorts-front-left",
+        "shorts-front-right",
+        "shorts-back-left",
+        "shorts-back-right"
+      ],
+      "bodyTriangleZM": [
+        0.32,
+        0.87
+      ],
+      "excludedBoneNamePrefixes": [
+        "UpperArm",
+        "LowerArm",
+        "Hand",
+        "Finger",
+        "Shoulder"
+      ],
+      "evidenceBoundary": "V42 separates shorts from the shared overskirt weight region and applies an explicit pelvis-to-thigh follow profile to the fitted shorts. The increased lower-leg follow is a deformation hypothesis to reduce sitting/crouch volume artifacts; weight, fit, collision and appearance remain unaccepted.",
+      "weightProfile": {
+        "method": "hip-anchored-lateral-thigh-fade-v1",
+        "pieceIds": [
+          "shorts-front-left",
+          "shorts-front-right",
+          "shorts-back-left",
+          "shorts-back-right"
+        ],
+        "hipBone": "Hips",
+        "leftThighBone": "UpperLeg_L",
+        "rightThighBone": "UpperLeg_R",
+        "waistThighWeight": 0.12,
+        "hemThighWeight": 0.9,
+        "centerlineHalfWidthM": 0.075,
+        "fullSideWeightWidthM": 0.135,
+        "evidenceBoundary": "V42 prototype trial: shorts weight transitions from 12% thigh near waistband to 90% at the lower hem, while centerline areas remain pelvis-led and left/right lateral panels follow their corresponding thigh. No deformation, fit or appearance pass is implied."
       }
     }
   ]

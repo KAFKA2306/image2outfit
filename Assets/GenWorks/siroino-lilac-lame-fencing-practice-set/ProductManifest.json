@@ -42,16 +42,16 @@
     "resumable": true,
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
-    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v65-direct-v43-review.json",
-    "nextAction": "Revise the skirt construction to remove the sharply faceted clumps and pointed split hem, provide continuous anterior coverage without rounded shorts-like thigh shells in sit/crouch, and make the rear tab readable. Keep the current UV gaps disclosed; resolve them only from authored source coordinates. Build and inspect fresh evidence before any appearance decision.",
+    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v68-shorts-thigh-follow-finalized.json",
+    "nextAction": "Trace why the V44 shorts-specific weight profile does not alter the exported weighted prototype, implement the missing supported path or correct its configuration, then regenerate the garment and all five views plus six poses. Keep the appearance and UV blockers explicit; do not accept until fresh evidence directly resolves them.",
     "lastAttempt": {
-      "runId": "87f16ecc988447d5bbe9f687c5fc38d2",
+      "runId": "225eba1af26b47a5803b862896503dcb",
       "status": "EXECUTED",
-      "checkedAt": "2026-10-23T15:14:52Z",
+      "checkedAt": "2026-10-23T23:17:03Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "a42e0d0f102fe8337978f56cebd55b68326b8e4a4e6f94af82d8e56a902d2298",
+      "stageEvidenceSha256": "77252a385c7699431b2408461220b222f4f21bfecb423e4f46f648682ddb38c7",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -98,21 +98,21 @@
           "stageResultSha256": "0c27cd8ba227c1d5df01a3e0987d546a90a577e71166a52f0883bfbc924f1ae5"
         },
         "visual-review": {
-          "status": "PASS",
-          "stageResultSha256": "8edb7988eadbd93682988288a186c68b870a635b35b9366ba038089c9ef24dcf"
+          "status": "REUSED",
+          "stageResultSha256": "786c3b2f263ccb592546d4f8f61ce43b3247d214b5795545e6b4b1f76c1a71d6"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "a42e0d0f102fe8337978f56cebd55b68326b8e4a4e6f94af82d8e56a902d2298"
+          "stageResultSha256": "77252a385c7699431b2408461220b222f4f21bfecb423e4f46f648682ddb38c7"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
-      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v65-direct-v43-review.json",
-      "checkpointSha256": "f73f30dcf9ad8f27db5634e7b46a89a88dac723457e91a5b7ca78dfb70fd0848",
+      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v68-shorts-thigh-follow-finalized.json",
+      "checkpointSha256": "f65276e7083908c52d6eb6ab9b0debe76f136a32306cfadbb2e68cdf6a4cd3bd",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Revise the skirt construction to remove the sharply faceted clumps and pointed split hem, provide continuous anterior coverage without rounded shorts-like thigh shells in sit/crouch, and make the rear tab readable. Keep the current UV gaps disclosed; resolve them only from authored source coordinates. Build and inspect fresh evidence before any appearance decision."
+      "nextAction": "Trace why the V44 shorts-specific weight profile does not alter the exported weighted prototype, implement the missing supported path or correct its configuration, then regenerate the garment and all five views plus six poses. Keep the appearance and UV blockers explicit; do not accept until fresh evidence directly resolves them."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
@@ -134,26 +134,31 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "2e9a1010ba2faa64696693feade77e78f441605820d28e9b0f1d44d9f6e2362a",
+      "sha256": "1db17c2b6f2aec1142b2434454faa238d61ce0db07bd49b01ffb836d4ada9c19",
       "findings": [
         {
           "code": "SKIRT_FORM_AND_FACETING",
-          "description": "Directly inspected all five current views and six pose renders for V43. Angular, irregular clumped folds remain prominent across the overskirt and the split-front hem remains asymmetric and sharply pointed; the neutral skirt does not read as continuous, controlled fabric drape.",
+          "description": "Directly inspected all five current V44 views and six pose renders. Angular, irregular clumped folds remain prominent across the overskirt and the split-front hem remains asymmetric and sharply pointed; the neutral skirt does not read as continuous, controlled fabric drape.",
           "severity": "BLOCKER"
         },
         {
           "code": "SIT_CROUCH_FRONT_COVERAGE",
-          "description": "Direct inspection of current sit and crouch views shows large rounded shorts-like thigh shells protruding above and ahead of the overskirt. The front panels remain as separated narrow flaps below and beside the thigh shells, leaving the anterior thighs visibly uncovered. The V43 projection hypothesis has not corrected the coverage/volume defect.",
+          "description": "Direct inspection of current V44 sit and crouch views still shows large rounded shorts-like thigh shells protruding above and ahead of the overskirt. The front panels remain as separated narrow flaps below and beside the shells, leaving anterior thighs visibly uncovered. The V44 explicit shorts thigh-follow weight hypothesis did not correct coverage or volume.",
           "severity": "BLOCKER"
         },
         {
           "code": "REAR_TAB_LEGIBILITY",
-          "description": "The current full-body back view still shows only a small low-contrast waist detail; its intended adjustment-tab function cannot be read at this scale and there is no close-up evidence.",
+          "description": "The current V44 full-body back view still shows only a small low-contrast waist detail; its intended adjustment-tab function cannot be read at this scale and no close-up evidence exists.",
           "severity": "BLOCKER"
         },
         {
           "code": "UV_PROVENANCE_AND_COVERAGE_INCOMPLETE",
-          "description": "The current source-bound chart is unchanged and still proves authored UV coordinates for only three objects. Eighteen active UVMap layers remain provenance-unverified and omitted; four objects report UV not created. No replacement UVs were generated. Complete garment UV acceptance remains blocked.",
+          "description": "The current source-bound chart remains unchanged and proves authored UV coordinates for only three objects. Eighteen active UVMap layers remain provenance-unverified and omitted; four objects report UV not created. No replacement UVs were generated. Complete garment UV acceptance remains blocked.",
+          "severity": "BLOCKER"
+        },
+        {
+          "code": "SHORTS_WEIGHT_TRIAL_DID_NOT_CHANGE_EXPORTED_SOURCE",
+          "description": "The V44 skin export reports weightedPrototypeSha256 b337270449abf64e03403ad07f203ae68d5117c2b0670b01a8da157778d2fa81, identical to the prior reviewed source hash b337270449abf64e03403ad07f203ae68d5117c2b0670b01a8da157778d2fa81. The declared V44 shorts-specific weight profile therefore did not produce a distinct weighted source artifact; the recipe change is not evidenced in the exported prototype.",
           "severity": "BLOCKER"
         }
       ],
@@ -166,22 +171,27 @@
     "findings": [
       {
         "code": "SKIRT_FORM_AND_FACETING",
-        "description": "Directly inspected all five current views and six pose renders for V43. Angular, irregular clumped folds remain prominent across the overskirt and the split-front hem remains asymmetric and sharply pointed; the neutral skirt does not read as continuous, controlled fabric drape.",
+        "description": "Directly inspected all five current V44 views and six pose renders. Angular, irregular clumped folds remain prominent across the overskirt and the split-front hem remains asymmetric and sharply pointed; the neutral skirt does not read as continuous, controlled fabric drape.",
         "severity": "BLOCKER"
       },
       {
         "code": "SIT_CROUCH_FRONT_COVERAGE",
-        "description": "Direct inspection of current sit and crouch views shows large rounded shorts-like thigh shells protruding above and ahead of the overskirt. The front panels remain as separated narrow flaps below and beside the thigh shells, leaving the anterior thighs visibly uncovered. The V43 projection hypothesis has not corrected the coverage/volume defect.",
+        "description": "Direct inspection of current V44 sit and crouch views still shows large rounded shorts-like thigh shells protruding above and ahead of the overskirt. The front panels remain as separated narrow flaps below and beside the shells, leaving anterior thighs visibly uncovered. The V44 explicit shorts thigh-follow weight hypothesis did not correct coverage or volume.",
         "severity": "BLOCKER"
       },
       {
         "code": "REAR_TAB_LEGIBILITY",
-        "description": "The current full-body back view still shows only a small low-contrast waist detail; its intended adjustment-tab function cannot be read at this scale and there is no close-up evidence.",
+        "description": "The current V44 full-body back view still shows only a small low-contrast waist detail; its intended adjustment-tab function cannot be read at this scale and no close-up evidence exists.",
         "severity": "BLOCKER"
       },
       {
         "code": "UV_PROVENANCE_AND_COVERAGE_INCOMPLETE",
-        "description": "The current source-bound chart is unchanged and still proves authored UV coordinates for only three objects. Eighteen active UVMap layers remain provenance-unverified and omitted; four objects report UV not created. No replacement UVs were generated. Complete garment UV acceptance remains blocked.",
+        "description": "The current source-bound chart remains unchanged and proves authored UV coordinates for only three objects. Eighteen active UVMap layers remain provenance-unverified and omitted; four objects report UV not created. No replacement UVs were generated. Complete garment UV acceptance remains blocked.",
+        "severity": "BLOCKER"
+      },
+      {
+        "code": "SHORTS_WEIGHT_TRIAL_DID_NOT_CHANGE_EXPORTED_SOURCE",
+        "description": "The V44 skin export reports weightedPrototypeSha256 b337270449abf64e03403ad07f203ae68d5117c2b0670b01a8da157778d2fa81, identical to the prior reviewed source hash b337270449abf64e03403ad07f203ae68d5117c2b0670b01a8da157778d2fa81. The declared V44 shorts-specific weight profile therefore did not produce a distinct weighted source artifact; the recipe change is not evidenced in the exported prototype.",
         "severity": "BLOCKER"
       }
     ],
