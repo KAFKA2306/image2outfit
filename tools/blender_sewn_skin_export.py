@@ -50,7 +50,10 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     spec = pose_spec.get("poseConstrainedApronGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "sit-continuous-front-apron-inverse-skin-v7-evaluated-orientation-backtracking":
+    if (
+        spec.get("method")
+        != "sit-continuous-front-apron-inverse-skin-v7-evaluated-orientation-backtracking"
+    ):
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
     transition_piece_ids = set(spec.get("transitionPieceIds", []))
@@ -544,7 +547,9 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         points = []
         for vertex_index in triangle:
             delta = (
-                delta_overrides.get(vertex_index, displacement.get(vertex_index, Vector()))
+                delta_overrides.get(
+                    vertex_index, displacement.get(vertex_index, Vector())
+                )
                 if delta_overrides is not None
                 else displacement.get(vertex_index, Vector())
             )
@@ -574,16 +579,18 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 if original.length <= 1e-9:
                     continue
                 low, high = 0.0, 1.0
-                if triangle_orientation(
-                    triangle, {index: Vector((0, 0, 0))}
-                ) < repair_normal_turn_target:
+                if (
+                    triangle_orientation(triangle, {index: Vector((0, 0, 0))})
+                    < repair_normal_turn_target
+                ):
                     continue
                 for _search in range(14):
                     retained = (low + high) / 2.0
                     trial = original * retained
-                    if triangle_orientation(
-                        triangle, {index: trial}
-                    ) >= repair_normal_turn_target:
+                    if (
+                        triangle_orientation(triangle, {index: trial})
+                        >= repair_normal_turn_target
+                    ):
                         low = retained
                     else:
                         high = retained
@@ -662,9 +669,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     maximum_refinement_error = 0.0
     for refinement_iterations in range(5):
         achieved = evaluated_world_vertices()
-        errors = {
-            index: sit_targets[index] - achieved[index] for index in movable
-        }
+        errors = {index: sit_targets[index] - achieved[index] for index in movable}
         maximum_refinement_error = max(
             (error.length for error in errors.values()), default=0.0
         )
@@ -705,7 +710,9 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     evaluated_normal_turn_target = normal_turn_limit + 1e-4
     actual_sit = evaluated_world_vertices()
 
-    def evaluated_triangle_dot(triangle, points, replace_index=None, replace_point=None):
+    def evaluated_triangle_dot(
+        triangle, points, replace_index=None, replace_point=None
+    ):
         face_points = [
             replace_point if index == replace_index else points[index]
             for index in triangle
@@ -714,9 +721,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             face_points[2] - face_points[0]
         )
         original = [world_vertices[index] for index in triangle]
-        original_normal = (original[1] - original[0]).cross(
-            original[2] - original[0]
-        )
+        original_normal = (original[1] - original[0]).cross(original[2] - original[0])
         if normal.length < 1e-10 or original_normal.length < 1e-10:
             return -1.0
         return original_normal.normalized().dot(normal.normalized())
@@ -735,7 +740,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         changed = False
         for triangle in pose_triangles:
             affected = set(triangle).intersection(movable)
-            if not affected or evaluated_triangle_dot(triangle, actual_sit) >= evaluated_normal_turn_target:
+            if (
+                not affected
+                or evaluated_triangle_dot(triangle, actual_sit)
+                >= evaluated_normal_turn_target
+            ):
                 continue
             choices = []
             for index in affected:
@@ -744,24 +753,24 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                     continue
                 point_at_zero = actual_sit[index] - original_delta
                 low, high = 0.0, 1.0
-                if evaluated_triangle_dot(
-                    triangle, actual_sit, index, point_at_zero
-                ) < evaluated_normal_turn_target:
+                if (
+                    evaluated_triangle_dot(triangle, actual_sit, index, point_at_zero)
+                    < evaluated_normal_turn_target
+                ):
                     continue
                 for _search in range(14):
                     retained = (low + high) / 2.0
                     trial_point = point_at_zero + original_delta * retained
-                    if evaluated_triangle_dot(
-                        triangle, actual_sit, index, trial_point
-                    ) >= evaluated_normal_turn_target:
+                    if (
+                        evaluated_triangle_dot(triangle, actual_sit, index, trial_point)
+                        >= evaluated_normal_turn_target
+                    ):
                         low = retained
                     else:
                         high = retained
                 choices.append((low, index, original_delta))
             if choices:
-                retained, index, original_delta = max(
-                    choices, key=lambda item: item[0]
-                )
+                retained, index, original_delta = max(choices, key=lambda item: item[0])
                 displacement[index] = original_delta * retained
                 set_source_for_sit_target(index)
                 obj.data.update()
@@ -780,9 +789,11 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             evaluated_orientation_conservative_repairs += 1
             changed = True
         remaining = [
-            triangle for triangle in pose_triangles
+            triangle
+            for triangle in pose_triangles
             if set(triangle).intersection(movable)
-            and evaluated_triangle_dot(triangle, actual_sit) < evaluated_normal_turn_target
+            and evaluated_triangle_dot(triangle, actual_sit)
+            < evaluated_normal_turn_target
         ]
         if not remaining:
             actual_orientation_converged = True
@@ -794,7 +805,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             (tuple(triangle), round(evaluated_triangle_dot(triangle, actual_sit), 6))
             for triangle in pose_triangles
             if set(triangle).intersection(movable)
-            and evaluated_triangle_dot(triangle, actual_sit) < evaluated_normal_turn_target
+            and evaluated_triangle_dot(triangle, actual_sit)
+            < evaluated_normal_turn_target
         ]
         raise ValueError(
             "Evaluated sit-pose orientation repair did not satisfy the unchanged "
@@ -880,8 +892,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 else -1.0
             )
             evaluated_target_errors = [
-                round(float((new[i] - target_points[i]).length), 9)
-                for i in range(3)
+                round(float((new[i] - target_points[i]).length), 9) for i in range(3)
             ]
             initial_triangle = (
                 pose_triangles[triangle_index]
@@ -889,7 +900,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 else None
             )
             polygon_vertices = tuple(
-                int(index) for index in final_mesh.polygons[triangle.polygon_index].vertices
+                int(index)
+                for index in final_mesh.polygons[triangle.polygon_index].vertices
             )
             diagnostic = (
                 f"Pose-constrained apron solve inverted sewn triangle {triangle_index} {indices}: "
