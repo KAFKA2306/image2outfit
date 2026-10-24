@@ -2,11 +2,11 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
+  "revision": "v44-shorts-thigh-follow-20261024",
   "gates": {
     "blender": "FAIL",
-    "editableSource": "PASS",
-    "fbx": "PASS",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
     "prefabDeclared": "FAIL",
     "fiveViewEvidence": "PASS",
     "poseEvidence": "PASS",
@@ -19,29 +19,29 @@
   },
   "blockingFindings": [
     {
-      "severity": "BLOCKER",
-      "code": "DESIGN_DETAILS_NOT_RENDERED",
-      "description": "Directly inspected all five current views and six poses; hashes below bind this decision to these exact files. The diagonal front marking and diamond elbow outlines now appear only as thin lavender piping/contour lines. The fencing jacket still renders nearly featureless white: the intended broad plastron, elbow quilting, and rear waist adjustment detail are not visibly constructed."
+      "code": "SKIRT_FORM_AND_FACETING",
+      "description": "Directly inspected all five current V44 views and six pose renders. Angular, irregular clumped folds remain prominent across the overskirt and the split-front hem remains asymmetric and sharply pointed; the neutral skirt does not read as continuous, controlled fabric drape.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "code": "SLEEVE_SURFACE_QUALITY",
-      "description": "Pronounced irregular faceting and wrinkling remain across both sleeves and underarms in front, back, side, neutral, arms-up, arm-cross and prone views. Sleeve surface remains rejected."
+      "code": "SIT_CROUCH_FRONT_COVERAGE",
+      "description": "Direct inspection of current V44 sit and crouch views still shows large rounded shorts-like thigh shells protruding above and ahead of the overskirt. The front panels remain as separated narrow flaps below and beside the shells, leaving anterior thighs visibly uncovered. The V44 explicit shorts thigh-follow weight hypothesis did not correct coverage or volume.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "code": "SKIRT_CONSTRUCTION_UNRESOLVED",
-      "description": "The skirt remains irregularly folded, not a controlled pleated silhouette. The new shorts read as broad, blunt cylindrical upper-thigh shells. In crouch a large gray avatar gap is visible between skirt and shorts; in sit the shorts become oversized tubes with gray body gaps. Coverage and pose deformation are not acceptable."
+      "code": "REAR_TAB_LEGIBILITY",
+      "description": "The current V44 full-body back view still shows only a small low-contrast waist detail; its intended adjustment-tab function cannot be read at this scale and no close-up evidence exists.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "code": "COLLAR_AND_FRONT_CLOSURE",
-      "description": "The collar remains a tall narrow open tube. The new thin diagonal piping does not form the intended visible plastron/closure, and the back render lacks the waist adjustment detail. Neck clearance and garment retention remain unverified."
+      "code": "UV_PROVENANCE_AND_COVERAGE_INCOMPLETE",
+      "description": "The current source-bound chart remains unchanged and proves authored UV coordinates for only three objects. Eighteen active UVMap layers remain provenance-unverified and omitted; four objects report UV not created. No replacement UVs were generated. Complete garment UV acceptance remains blocked.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
-      "description": "These are Blender prototype renders only. Shape Key fit, continuous penetration, accepted weight deformation, Unity import, VRChat Build & Test, and SDK upload remain unverified."
+      "code": "SHORTS_WEIGHT_TRIAL_DID_NOT_CHANGE_EXPORTED_SOURCE",
+      "description": "The V44 skin export reports weightedPrototypeSha256 b337270449abf64e03403ad07f203ae68d5117c2b0670b01a8da157778d2fa81, identical to the prior reviewed source hash b337270449abf64e03403ad07f203ae68d5117c2b0670b01a8da157778d2fa81. The declared V44 shorts-specific weight profile therefore did not produce a distinct weighted source artifact; the recipe change is not evidenced in the exported prototype.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

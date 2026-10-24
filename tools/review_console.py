@@ -29,6 +29,8 @@ STATES = production_contract.LIFECYCLE_STATES
 DEFAULT_VIEWS = ("front", "back", "left", "right", "three-quarter")
 FEATURED_PRODUCT = "siroino-lilac-lame-fencing-practice-set"
 IMAGE_SUFFIXES = (".png", ".webp", ".jpg", ".jpeg")
+CANONICAL_ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+CANONICAL_ZIP_MODE = 0o100644
 
 
 def load_json(path: Path, default: Any) -> Any:
@@ -534,23 +536,41 @@ def collect_downloads(root, workspace, output_dir, manifest, assets):
             output_dir / "downloads" / workspace.name / f"images-{fingerprint[:16]}.zip"
         )
         archive.parent.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
-            bundle.writestr(
+        with zipfile.ZipFile(
+            archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9
+        ) as bundle:
+
+            def write_member(name: str, content: bytes) -> None:
+                info = zipfile.ZipInfo(name, date_time=CANONICAL_ZIP_TIMESTAMP)
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.create_system = 3
+                info.external_attr = CANONICAL_ZIP_MODE << 16
+                bundle.writestr(
+                    info,
+                    content,
+                    compress_type=zipfile.ZIP_DEFLATED,
+                    compresslevel=9,
+                )
+
+            write_member(
                 "README.txt",
-                "Render images only; no usable VRChat outfit or fit/runtime approval.\n"
-                + workspace.name
-                + "\n",
+                (
+                    "Render images only; no usable VRChat outfit or fit/runtime approval.\n"
+                    + workspace.name
+                    + "\n"
+                ).encode("utf-8"),
             )
             for i, asset in enumerate(images):
                 source = (output_dir / asset.href).resolve()
                 if workspace.resolve() not in source.parents:
                     raise ValueError("Render download escapes the product workspace")
-                bundle.write(
-                    source,
+                write_member(
                     f"{i:02d}-{asset.kind}-{Path(asset.name).stem}{source.suffix}",
+                    source.read_bytes(),
                 )
-            bundle.writestr(
-                "images.json", json.dumps([asdict(a) for a in images], indent=2)
+            write_member(
+                "images.json",
+                json.dumps([asdict(a) for a in images], indent=2).encode("utf-8"),
             )
         downloads.append(
             {
@@ -663,6 +683,26 @@ def collect_product(
     ) = parse_improvement_projection(root, workspace.name, output_dir)
     blockers.extend(quality_blockers)
     blockers.extend(improvement_blockers)
+    release_readiness = manifest.get("releaseReadiness", {})
+    if isinstance(release_readiness, dict):
+        release_status = status_text(release_readiness.get("status"))
+        release_reasons = [
+            str(reason)
+            for reason in as_list(release_readiness.get("reasons"))
+            if str(reason).strip()
+        ]
+        if release_status not in {"PASS", "READY", "RELEASABLE", "RELEASED"}:
+            blockers.extend(
+                {"severity": "RELEASE", "message": reason} for reason in release_reasons
+            )
+        release_gate = Gate(
+            name="releaseReadiness",
+            status=release_status,
+            detail="; ".join(release_reasons),
+            href=relative_href(manifest_path, output_dir),
+        )
+    else:
+        release_gate = None
 
     assets: list[Asset] = []
     previews, preview_origin = preview_directory(workspace)
@@ -713,13 +753,77 @@ def collect_product(
                     raise ValueError("Mesh showcase image escapes product workspace")
                 if digest(target) != record["sha256"]:
                     raise ValueError("Mesh showcase diagram hash mismatch")
+                kind = "uv" if record["name"] == "uv" else "mesh"
+                uv_status = mesh.get("uvStatus")
+                partial = record["name"] == "uv" and uv_status == "PARTIAL_UNVERIFIED"
+                unverified = (
+                    record["name"] == "uv" and uv_status == "UNVERIFIED_PROVENANCE"
+                )
                 assets.append(
                     Asset(
-                        kind="mesh",
-                        name=record["name"],
+                        kind=kind,
+                        name=(
+                            "Source-authored UV layout (partial; other maps omitted)"
+                            if partial
+                            else "UV layout (source provenance unverified; omitted)"
+                            if unverified
+                            else record["name"]
+                        ),
                         status="UNVERIFIED",
                         href=relative_href(target, output_dir),
                         sha256=digest(target),
+                    )
+                )
+            if mesh.get("uvStatus") == "PARTIAL_UNVERIFIED":
+                for object_name in mesh.get("uvUnverifiedObjects", []):
+                    assets.append(
+                        Asset(
+                            kind="uv",
+                            name=f"UV present; provenance unverified: {object_name}",
+                            status="UNVERIFIED",
+                            href=None,
+                            sha256=None,
+                        )
+                    )
+                for object_name in mesh.get("uvUnmappedObjects", []):
+                    assets.append(
+                        Asset(
+                            kind="uv",
+                            name=f"UV not created: {object_name}",
+                            status="MISSING",
+                            href=None,
+                            sha256=None,
+                        )
+                    )
+            elif mesh.get("uvStatus") == "UNVERIFIED_PROVENANCE":
+                for object_name in mesh.get("uvUnverifiedObjects", []):
+                    assets.append(
+                        Asset(
+                            kind="uv",
+                            name=f"UV present; provenance unverified: {object_name}",
+                            status="UNVERIFIED",
+                            href=None,
+                            sha256=None,
+                        )
+                    )
+                for object_name in mesh.get("uvUnmappedObjects", []):
+                    assets.append(
+                        Asset(
+                            kind="uv",
+                            name=f"UV not created: {object_name}",
+                            status="MISSING",
+                            href=None,
+                            sha256=None,
+                        )
+                    )
+            elif mesh.get("uvStatus") == "MISSING":
+                assets.append(
+                    Asset(
+                        kind="uv",
+                        name="UV layout (not created)",
+                        status="MISSING",
+                        href=None,
+                        sha256=None,
                     )
                 )
 
@@ -780,6 +884,7 @@ def collect_product(
             ),
             *quality_gates,
             *improvement_gates,
+            *([release_gate] if release_gate else []),
         ],
         evidence=[
             *parse_evidence_rows(manifest, workspace, output_dir),

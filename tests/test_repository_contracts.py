@@ -311,12 +311,17 @@ class RepositoryContractTest(unittest.TestCase):
                 self.assertEqual(handoff.get("canonicalWorkspace"), product_root)
                 self.assertTrue(handoff.get("doNotRebuildFromZero"), manifest_path)
 
-                gates = manifest.get("technicalGates")
-                self.assertIsInstance(gates, dict, manifest_path)
+                technical_gates = manifest.get("technicalGates")
+                self.assertIsInstance(technical_gates, dict, manifest_path)
+                completion_gate_states = manifest.get("completionGates")
+                if not isinstance(completion_gate_states, dict):
+                    # Older manifests predate the derived completion projection;
+                    # retain their existing technical-gate evidence contract.
+                    completion_gate_states = technical_gates
                 if status == completion_status:
                     for gate_name in completion_gates:
                         self.assertEqual(
-                            gates.get(gate_name),
+                            technical_gates.get(gate_name),
                             "PASS",
                             (manifest_path, gate_name),
                         )
@@ -338,7 +343,11 @@ class RepositoryContractTest(unittest.TestCase):
                     "poseEvidence": list(job.get("posePaths", {}).values()),
                 }
                 for gate_name, paths in gate_paths.items():
-                    if gates.get(gate_name) != "PASS":
+                    # Raw technical gates describe stage observations. The
+                    # completion projection additionally requires existing,
+                    # deliverable evidence; use it for repository asset checks
+                    # so ignored local-only files cannot satisfy CI.
+                    if completion_gate_states.get(gate_name) != "PASS":
                         continue
                     for value in paths:
                         with (

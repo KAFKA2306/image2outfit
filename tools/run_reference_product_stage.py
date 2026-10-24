@@ -1504,7 +1504,10 @@ def stage_initialize(
         result,
         stage="initialize-3d",
         product_id=product_id,
-        paths=[manifest_path, *review_evidence_paths, report],
+        # The first evidence item is the typed arrangement-plan artifact for
+        # downstream stages. ProductManifest is mutable workflow state, so it
+        # must not be used as the content-addressed arrangement artifact.
+        paths=[report, manifest_path, *review_evidence_paths],
         extra={
             "visualAppearanceReview": gates.get("visualAppearanceReview", "PENDING"),
             "prototypeReadiness": {
@@ -1632,6 +1635,9 @@ def _run_garmentcode_boxmesh_preflight(
         stitch_graph_sha256=stitch_hash,
         stitch_export_mode="strict-boundary-edges",
     )
+    # Invalidate only the downstream mesh-exchange cache when its payload
+    # contract changes; pattern diagnosis and the 2D source remain unchanged.
+    native["properties"]["meshExchangeSchemaVersion"] = 2
     if pipeline.get("assemblyPosePath"):
         _pose_path, pose, _measured = validate_assembly_pose(job, pattern)
         for panel_key, piece_id in native["parameters"]["image2outfit"][
@@ -1800,6 +1806,11 @@ def stage_build(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
         label="build report",
     )
+    report_signature_before = (
+        (report.stat().st_mtime_ns, report.stat().st_size, sha256(report))
+        if report.is_file()
+        else None
+    )
     command = [
         blender_executable(),
         "--python-use-system-env",
@@ -1833,17 +1844,53 @@ def stage_build(
     )
 
     quality: dict[str, Any] | None = None
+    build_report: dict[str, Any] | None = None
     if report.is_file():
-        quality = geometry_quality(read_object(report, "build report"))
+        build_report = read_object(report, "build report")
+        quality = geometry_quality(build_report)
+    report_signature_after = (
+        (report.stat().st_mtime_ns, report.stat().st_size, sha256(report))
+        if report.is_file()
+        else None
+    )
+    build_report_fresh = (
+        report_signature_after is not None
+        and report_signature_after != report_signature_before
+    )
+    reject_report_matches_current_inputs = False
+    if (
+        quality is not None
+        and quality["decision"] == QUALITY_REJECT
+        and build_report is not None
+    ):
+        expected_mesh = None
+        if boxmesh_evidence is not None:
+            boxmesh_audit = read_object(boxmesh_evidence[1], "BoxMesh audit")
+            expected_mesh = boxmesh_audit.get("meshExchangeSha256")
+        reject_report_matches_current_inputs = (
+            build_report.get("productId") == product_id
+            and isinstance(expected_mesh, str)
+            and build_report.get("sewnMeshSha256") == expected_mesh
+            and build_report.get("sourceBlendSha256")
+            == sha256(repo_path(job["blendPath"], label="blend"))
+        )
     accepted_quality_reject = (
-        completed.returncode == 2
+        completed.returncode in {1, 2}
+        and build_report_fresh
         and quality is not None
         and quality["decision"] == QUALITY_REJECT
+        and reject_report_matches_current_inputs
     )
     if completed.returncode != 0 and not accepted_quality_reject:
+        # Keep the subprocess failure diagnosable after the surrounding stage
+        # transaction rolls back its temporary log writes. Store only a bounded
+        # tail in the durable checkpoint error.
+        output_tail = (completed.stdout + "\n--- STDERR ---\n" + completed.stderr)[
+            -12000:
+        ]
         raise RuntimeError(
             f"Blender build failed with exit code {completed.returncode}; "
-            f"see {relative(log)}"
+            f"see {relative(log)}\n{output_tail}"
         )
     if quality is None:
         raise FileNotFoundError(f"build report was not created: {relative(report)}")
@@ -1857,6 +1904,15 @@ def stage_build(
             blend,
             report,
             log,
+            *(
+                [
+                    runtime_root(product_id)
+                    / "initialization"
+                    / "prototype-readiness.json"
+                ]
+                if boxmesh_evidence is not None
+                else []
+            ),
             *([*boxmesh_evidence] if boxmesh_evidence is not None else []),
             *(
                 [
@@ -1874,6 +1930,7 @@ def stage_build(
         ],
         extra={
             "blenderReturnCode": completed.returncode,
+            "buildReportFresh": build_report_fresh,
             "executionDisposition": (
                 "COMPLETED_WITH_QUALITY_REJECT"
                 if accepted_quality_reject
@@ -2139,6 +2196,10 @@ def stage_render(job: Mapping[str, Any], result: Path) -> None:
         render_artifacts = [
             log,
             runtime_root(product_id) / "reports/weighted-render.json",
+            repo_path(
+                f"{job['productRoot']}/Evidence/Build/pose-coverage-diagnostic.json",
+                label="pose coverage diagnostic",
+            ),
         ]
     images = review_image_paths(job)
     view_count = len(job["previewPaths"])
@@ -2243,7 +2304,7 @@ def stage_visual_review(
     decision = validate_visual_review(
         read_object(review, "visual review"),
         product_id=product_id,
-        revision_id=str(request.get("revisionId", "")),
+        revision_id=str(job.get("buildRevision", "")),
     )
     images = review_image_paths(job)
     current_hashes = {relative(path): sha256(path) for path in images}
@@ -2266,7 +2327,7 @@ def stage_finalize(
     job: Mapping[str, Any], request: Mapping[str, Any], result: Path
 ) -> None:
     product_id = str(job["id"])
-    revision_id = str(request.get("revisionId", ""))
+    revision_id = str(job.get("buildRevision", ""))
     review_path = repo_path(job["garmentPipeline"]["visualReviewPath"], label="review")
     visual = validate_visual_review(
         read_object(review_path, "visual review"),
@@ -2296,6 +2357,30 @@ def stage_finalize(
         "visualAppearanceReview": visual["decision"] == "PASS",
         "researchTrial": job.get("researchMethod", {}).get("trialStatus") == "DECLARED",
     }
+    manifest_path = repo_path(job["productManifestPath"], label="manifest")
+    manifest = read_object(manifest_path, "product manifest")
+    corrections = manifest.get("gateEvidenceCorrections", {})
+    if isinstance(corrections, Mapping):
+        for key, correction in corrections.items():
+            prefix = "completionGates."
+            if not isinstance(key, str) or not key.startswith(prefix):
+                continue
+            gate_name = key.removeprefix(prefix)
+            corrected_value = (
+                correction.get("value") if isinstance(correction, Mapping) else None
+            )
+            if gate_name in gates and isinstance(corrected_value, str):
+                if corrected_value not in {
+                    "PASS",
+                    "FAIL",
+                    "PENDING",
+                    "UNVERIFIED",
+                    "OUT_OF_SCOPE",
+                }:
+                    raise ValueError(
+                        f"unknown corrected completion gate state: {key}={corrected_value}"
+                    )
+                gates[gate_name] = corrected_value == "PASS"
     status = candidate_status(
         gates,
         geometry_decision=geometry["decision"],
@@ -2305,12 +2390,26 @@ def stage_finalize(
         f"{job['productRoot']}/Evidence/Candidate/candidate-state.json",
         label="candidate state",
     )
+    candidate_gates = {
+        name: "PASS" if passed else "FAIL" for name, passed in gates.items()
+    }
+    if isinstance(corrections, Mapping):
+        for key, correction in corrections.items():
+            prefix = "completionGates."
+            if not isinstance(key, str) or not key.startswith(prefix):
+                continue
+            gate_name = key.removeprefix(prefix)
+            corrected_value = (
+                correction.get("value") if isinstance(correction, Mapping) else None
+            )
+            if gate_name in candidate_gates and isinstance(corrected_value, str):
+                candidate_gates[gate_name] = corrected_value
     candidate = {
         "schemaVersion": 1,
         "productId": product_id,
         "status": status,
         "revision": revision_id,
-        "gates": {name: "PASS" if passed else "FAIL" for name, passed in gates.items()},
+        "gates": candidate_gates,
         "qualityDecisions": {
             "geometry": geometry["decision"],
             "visual": visual["decision"],
@@ -2325,11 +2424,18 @@ def stage_finalize(
         "decisionRecorded": True,
     }
     write_json(candidate_path, candidate)
-    manifest_path = repo_path(job["productManifestPath"], label="manifest")
-    manifest = read_object(manifest_path, "product manifest")
     manifest["status"] = status
+    manifest["state"] = status
     manifest["completionGates"] = candidate["gates"]
     manifest["candidateState"] = relative(candidate_path)
+    manifest["visualAppearanceReview"] = {
+        "result": "PASS" if visual["decision"] == "PASS" else "FAIL",
+        "decision": visual["decision"],
+        "findings": visual["findings"],
+        "inspectedImages": visual["inspectedImages"],
+        "status": visual["status"],
+        "reviewMethod": "direct-image-inspection",
+    }
     write_json(manifest_path, manifest)
     emit(
         result,

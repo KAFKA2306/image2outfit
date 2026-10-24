@@ -70,7 +70,14 @@
             ],
             "properties": {
               "method": {
-                "const": "hip-anchored-lateral-thigh-fade-v1"
+                "enum": [
+                  "hip-anchored-lateral-thigh-fade-v1",
+                  "hip-anchored-anterior-lateral-thigh-fade-v2",
+                  "hip-anchored-anterior-bilateral-center-hem-fade-v3",
+                  "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
+                  "panel-balanced-hem-thigh-follow-v5",
+                  "panel-balanced-anterior-hip-apron-v6"
+                ]
               },
               "pieceIds": {
                 "type": "array",
@@ -103,6 +110,28 @@
                 "minimum": 0,
                 "maximum": 1
               },
+              "forwardHemThighWeight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "centerlineHemThighWeight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "maximumThighWeight": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 0.75
+              },
+              "forwardCenterYM": {
+                "type": "number"
+              },
+              "forwardFadeDistanceM": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
               "centerlineHalfWidthM": {
                 "type": "number",
                 "minimum": 0
@@ -115,7 +144,66 @@
                 "type": "string",
                 "minLength": 1
               }
-            }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "method": {
+                      "const": "hip-anchored-anterior-lateral-thigh-fade-v2"
+                    }
+                  },
+                  "required": ["method"]
+                },
+                "then": {
+                  "required": [
+                    "forwardHemThighWeight",
+                    "forwardCenterYM",
+                    "forwardFadeDistanceM"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "method": {
+                      "enum": [
+                        "hip-anchored-anterior-bilateral-center-hem-fade-v3",
+                        "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
+                        "panel-balanced-hem-thigh-follow-v5",
+                        "panel-balanced-anterior-hip-apron-v6"
+                      ]
+                    }
+                  },
+                  "required": ["method"]
+                },
+                "then": {
+                  "required": [
+                    "forwardHemThighWeight",
+                    "forwardCenterYM",
+                    "forwardFadeDistanceM",
+                    "centerlineHemThighWeight"
+                  ]
+                }
+              }
+              ,{
+                "if": {
+                  "properties": {
+                    "method": {
+                      "enum": [
+                        "hip-anchored-anterior-bilateral-center-hem-fade-capped-v4",
+                        "panel-balanced-hem-thigh-follow-v5",
+                        "panel-balanced-anterior-hip-apron-v6"
+                      ]
+                    }
+                  },
+                  "required": ["method"]
+                },
+                "then": {
+                  "required": ["maximumThighWeight"]
+                }
+              }
+            ]
           }
         }
       }
@@ -365,6 +453,48 @@
                 "type": "string",
                 "minLength": 1
               }
+            }
+          }
+        },
+        "prototypeComponentBendingHypotheses": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "stiffness",
+              "reason",
+              "evidenceBoundary"
+            ],
+            "properties": {
+              "stiffness": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10000
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidenceBoundary": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "prototypePostBakeLaplacianSmoothing": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["iterations", "factor", "reason", "evidenceBoundary"],
+            "properties": {
+              "iterations": {"type": "integer", "minimum": 1, "maximum": 8},
+              "factor": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.5},
+              "reason": {"type": "string", "minLength": 1},
+              "evidenceBoundary": {"type": "string", "minLength": 1}
             }
           }
         }

@@ -61,7 +61,8 @@ class AuditSchemaRuntimeTests(unittest.TestCase):
     def test_profile_declared_schemas_resolve_inside_repository(self) -> None:
         record_schema, manifest_schema = self._schemas()
         self.assertEqual(
-            record_schema["properties"]["status"]["enum"], ["PLANNED", "PASS", "FAILED"]
+            record_schema["properties"]["status"]["enum"],
+            ["PLANNED", "PASS", "FAILED", "REUSED"],
         )
         self.assertEqual(
             manifest_schema["properties"]["finalStatus"]["enum"],

@@ -69,8 +69,13 @@ name = "image2outfit"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "attrs" },
     { name = "jsonschema" },
+    { name = "jsonschema-specifications" },
     { name = "pillow" },
+    { name = "referencing" },
+    { name = "rpds-py" },
+    { name = "typing-extensions" },
 ]
 
 [package.dev-dependencies]
@@ -86,8 +91,13 @@ snapshot = [
 
 [package.metadata]
 requires-dist = [
+    { name = "attrs", specifier = "==26.1.0" },
     { name = "jsonschema", specifier = "==4.26.0" },
+    { name = "jsonschema-specifications", specifier = "==2025.9.1" },
     { name = "pillow", specifier = "==12.3.0" },
+    { name = "referencing", specifier = "==0.37.0" },
+    { name = "rpds-py", specifier = "==2026.9.1" },
+    { name = "typing-extensions", specifier = "==4.16.0" },
 ]
 
 [package.metadata.requires-dev]
