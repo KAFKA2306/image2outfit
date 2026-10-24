@@ -741,12 +741,25 @@ def collect_product(
     mesh_report = workspace / "Previews/Mesh/mesh-showcase.json"
     if mesh_report.is_file():
         mesh = load_json(mesh_report, {})
-        source = (root / mesh.get("sourcePath", "")).resolve()
-        if (
-            root in source.parents
+        source_path = mesh.get("sourcePath")
+        source = (root / source_path).resolve() if source_path else None
+        source_verified = bool(
+            source
+            and root in source.parents
             and source.is_file()
             and digest(source) == mesh.get("sourceSha256")
-        ):
+        )
+        evidence_path = mesh.get("sourceEvidencePath")
+        evidence = (root / evidence_path).resolve() if evidence_path else None
+        evidence_verified = bool(
+            evidence
+            and root in evidence.parents
+            and evidence.is_file()
+            and digest(evidence) == mesh.get("sourceEvidenceSha256")
+            and load_json(evidence, {}).get("sourceBlendSha256")
+            == mesh.get("sourceSha256")
+        )
+        if source_verified or evidence_verified:
             for record in mesh.get("records", []):
                 target = (root / record["path"]).resolve()
                 if workspace.resolve() not in target.parents or target.suffix != ".svg":

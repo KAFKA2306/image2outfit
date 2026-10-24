@@ -134,14 +134,18 @@ def discard_preview_snapshot(backup: Path) -> None:
     shutil.rmtree(backup.parent, ignore_errors=True)
 
 
-def render_mesh_showcase(blender: str, job_path: Path, reports: Path) -> None:
+def render_mesh_showcase(
+    blender: str,
+    job_path: Path,
+    reports: Path,
+    source_path: str | None = None,
+) -> None:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     blend_path = job.get("blendPath")
     if not blend_path or not (ROOT / blend_path).is_file():
         return
     reports.mkdir(parents=True, exist_ok=True)
-    code = run_logged(
-        [
+    command = [
             blender,
             "--background",
             "--factory-startup",
@@ -152,7 +156,11 @@ def render_mesh_showcase(blender: str, job_path: Path, reports: Path) -> None:
             "--",
             "--job",
             job_path.relative_to(ROOT).as_posix(),
-        ],
+        ]
+    if source_path:
+        command.extend(["--source", source_path])
+    code = run_logged(
+        command,
         reports / "mesh-showcase.log",
         os.environ.copy(),
     )
@@ -568,6 +576,10 @@ def parse_args() -> argparse.Namespace:
         help="Regenerate one product's source-hash-bound mesh showcase without rebuilding the garment.",
     )
     parser.add_argument(
+        "--mesh-source",
+        help="Optional repository-relative source Blender file, hash-checked against the current build report.",
+    )
+    parser.add_argument(
         "--site-only",
         action="store_true",
         help="Build Pages from current manifests and renders without rerunning product renders.",
@@ -585,7 +597,7 @@ def main() -> int:
         if not job_path.is_file():
             raise SystemExit(f"product job not found: {args.mesh_only}")
         reports = ROOT / ".image2outfit" / "products" / args.mesh_only / "reports"
-        render_mesh_showcase(args.blender, job_path, reports)
+        render_mesh_showcase(args.blender, job_path, reports, args.mesh_source)
         report_path = (
             ROOT
             / "Assets"

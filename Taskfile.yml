@@ -32,12 +32,14 @@ tasks:
       UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     vars:
       BLENDER: '{{.BLENDER | default ".image2outfit/blender-4.4.3/blender.exe"}}'
+      SOURCE: '{{.SOURCE | default ""}}'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
         python tools/render_all_current.py
         --blender "{{.BLENDER}}"
         --mesh-only "{{.PRODUCT}}"
+        {{if .SOURCE}}--mesh-source "{{.SOURCE}}"{{end}}
 
   plan:
     desc: Resolve and print the selected modular toolchain without executing stages.

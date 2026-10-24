@@ -29,18 +29,98 @@ def svg(lines, title):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--job", required=True)
+    parser.add_argument("--source")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1 :])
     root = Path(__file__).resolve().parents[1]
     job = json.loads((root / args.job).read_text(encoding="utf-8"))
     source = root / job["blendPath"]
+    requested_source = None
+    if args.source:
+        requested_source = (root / args.source).resolve()
+        if root.resolve() not in requested_source.parents:
+            raise ValueError("Requested mesh showcase source escapes the repository")
+    build_report_path = (
+        root / job["productRoot"] / "Evidence/Build/product-build-report.json"
+    )
+    build_report = (
+        json.loads(build_report_path.read_text(encoding="utf-8"))
+        if build_report_path.is_file()
+        else {}
+    )
+    current_build_source_sha = build_report.get("sourceBlendSha256")
     skin_report = (
         root / ".image2outfit/products" / job["id"] / "skin/skin-export-report.json"
     )
-    if skin_report.is_file():
+    skin_input_sha = None
+    source_selection = {
+        "mode": "current-build-source",
+        "reason": "no-current-skin-export",
+        "buildSourceSha256": current_build_source_sha,
+        "skinInputCandidateSha256": None,
+    }
+    if requested_source is not None:
+        source = requested_source
+        source_selection = {
+            "mode": "explicit-current-build-source",
+            "reason": "requested-source-hash-checked-against-current-build",
+            "buildSourceSha256": current_build_source_sha,
+            "skinInputCandidateSha256": None,
+        }
+        if current_build_source_sha and digest(source) != current_build_source_sha:
+            raise ValueError(
+                "Requested mesh showcase source does not match current build evidence: "
+                f"expectedSha256={current_build_source_sha}, actualSha256={digest(source)}"
+            )
+    elif skin_report.is_file():
         skin = json.loads(skin_report.read_text(encoding="utf-8"))
-        source = root / skin["weightedBlendPath"]
-        if digest(source) != skin["weightedBlendSha256"]:
-            raise ValueError("Mesh showcase source is stale")
+        skin_input_sha = skin.get("inputCandidateSha256")
+        weighted_source = root / skin["weightedBlendPath"]
+        weighted_source_matches = (
+            weighted_source.is_file()
+            and digest(weighted_source) == skin.get("weightedBlendSha256")
+        )
+        if (
+            current_build_source_sha
+            and skin_input_sha == current_build_source_sha
+            and weighted_source_matches
+        ):
+            source = weighted_source
+            source_selection = {
+                "mode": "current-weighted-build-source",
+                "reason": "skin-export-input-matches-current-build",
+                "buildSourceSha256": current_build_source_sha,
+                "skinInputCandidateSha256": skin_input_sha,
+            }
+        else:
+            source_selection = {
+                "mode": "current-build-source",
+                "reason": (
+                    "stale-skin-export-input"
+                    if current_build_source_sha
+                    and skin_input_sha != current_build_source_sha
+                    else "skin-export-source-unavailable-or-unverified"
+                ),
+                "buildSourceSha256": current_build_source_sha,
+                "skinInputCandidateSha256": skin_input_sha,
+            }
+    if not source.is_file():
+        raise ValueError(f"Mesh showcase source is missing: {source}")
+    if (
+        current_build_source_sha
+        and source_selection["mode"] != "current-weighted-build-source"
+        and digest(source) != current_build_source_sha
+    ):
+        raise ValueError(
+            "Mesh showcase cannot prove the latest build source: "
+            f"selected={source.as_posix()}, expectedSha256={current_build_source_sha}, "
+            f"actualSha256={digest(source)}"
+        )
+    # A build candidate can live under the ignored local workflow directory.
+    # Keep that private path out of the generated/public report while retaining
+    # a verifiable link to canonical build evidence and the source digest.
+    source_selection["selectedSourceSha256"] = digest(source)
+    source_selection["sourceEvidencePath"] = build_report_path.relative_to(root).as_posix()
+    source_selection["sourceEvidenceSha256"] = digest(build_report_path)
     bpy.ops.wm.open_mainfile(filepath=str(source), load_ui=False)
     meshes = [
         o
@@ -54,8 +134,11 @@ def main():
     report = {
         "schemaVersion": 1,
         "productId": job["id"],
-        "sourcePath": source.relative_to(root).as_posix(),
+        "sourcePath": None,
+        "sourceEvidencePath": build_report_path.relative_to(root).as_posix(),
+        "sourceEvidenceSha256": digest(build_report_path),
         "sourceSha256": digest(source),
+        "sourceSelection": source_selection,
         "blenderVersion": bpy.app.version_string,
         "objects": [],
         "records": [],
