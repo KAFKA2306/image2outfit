@@ -50,7 +50,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     spec = pose_spec.get("poseConstrainedApronGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "sit-continuous-front-apron-inverse-skin-v4":
+    if spec.get("method") != "sit-continuous-front-apron-inverse-skin-v7-evaluated-orientation-backtracking":
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
     transition_piece_ids = set(spec.get("transitionPieceIds", []))
@@ -522,43 +522,98 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             updated[index] = (targets[index] + mean * strength) / (1.0 + strength)
         displacement = updated
 
-    # Backtrack the whole correction field until every affected evaluated
-    # triangle retains the configured orientation bound. This is a feasibility
-    # step, not a gate change: the unchanged surface-residual and displacement
-    # limits below still reject an underpowered safe field.
+    # Backtrack only a vertex that can repair each orientation-limited face.
+    # Halving every moved vertex in a failing triangle repeatedly attenuated
+    # broad areas of the apron, even when one vertex dominated the fold. For
+    # each invalid face, find the largest retained fraction for each candidate
+    # vertex that restores the same normal-turn bound, then choose the least
+    # restrictive repair. If no single-vertex repair is feasible, retain the
+    # previous conservative all-vertex backtrack for that face. This changes
+    # only the solver path; all fit, residual, displacement, skin-map and
+    # orientation acceptance bounds remain unchanged.
     normal_turn_limit = spec["maximumNormalTurnDot"]
+    # Keep the internal target just inside the unchanged public threshold.
+    # A later evaluated-pose refinement below ensures the actual armature
+    # result, rather than only this linear estimate, is what reaches the gate.
+    repair_normal_turn_target = normal_turn_limit + 0.008
     orientation_limited_vertices = set()
-    for _ in range(32):
-        vertices_to_reduce = set()
+    orientation_local_repairs = 0
+    orientation_conservative_repairs = 0
+
+    def triangle_orientation(triangle, delta_overrides=None):
+        points = []
+        for vertex_index in triangle:
+            delta = (
+                delta_overrides.get(vertex_index, displacement.get(vertex_index, Vector()))
+                if delta_overrides is not None
+                else displacement.get(vertex_index, Vector())
+            )
+            points.append(world_vertices[vertex_index] + delta)
+        normal = (points[1] - points[0]).cross(points[2] - points[0])
+        if normal.length < 1e-10:
+            return -1.0
+        old = [world_vertices[index] for index in triangle]
+        old_normal = (old[1] - old[0]).cross(old[2] - old[0])
+        if old_normal.length < 1e-10:
+            raise ValueError(
+                "Pose-constrained apron source contains a collapsed sewn triangle"
+            )
+        return old_normal.normalized().dot(normal.normalized())
+
+    orientation_converged = False
+    for _ in range(64):
+        changed = False
         for triangle in pose_triangles:
             if not set(triangle).intersection(movable):
                 continue
-            old = [world_vertices[index] for index in triangle]
-            new = [
-                world_vertices[index] + displacement.get(index, Vector())
-                for index in triangle
-            ]
-            old_normal = (old[1] - old[0]).cross(old[2] - old[0])
-            new_normal = (new[1] - new[0]).cross(new[2] - new[0])
-            if old_normal.length < 1e-10:
-                raise ValueError(
-                    "Pose-constrained apron source contains a collapsed sewn triangle"
-                )
-            if (
-                new_normal.length < 1e-10
-                or old_normal.normalized().dot(new_normal.normalized())
-                < normal_turn_limit
-            ):
-                vertices_to_reduce.update(set(triangle).intersection(movable))
-        if not vertices_to_reduce:
+            if triangle_orientation(triangle) >= repair_normal_turn_target:
+                continue
+            choices = []
+            for index in set(triangle).intersection(movable):
+                original = displacement[index].copy()
+                if original.length <= 1e-9:
+                    continue
+                low, high = 0.0, 1.0
+                if triangle_orientation(
+                    triangle, {index: Vector((0, 0, 0))}
+                ) < repair_normal_turn_target:
+                    continue
+                for _search in range(14):
+                    retained = (low + high) / 2.0
+                    trial = original * retained
+                    if triangle_orientation(
+                        triangle, {index: trial}
+                    ) >= repair_normal_turn_target:
+                        low = retained
+                    else:
+                        high = retained
+                choices.append((low, index, original))
+            if choices:
+                retained, index, original = max(choices, key=lambda item: item[0])
+                displacement[index] = original * retained
+                orientation_limited_vertices.add(index)
+                orientation_local_repairs += 1
+                changed = True
+                continue
+
+            # Some folded faces need coordinated attenuation of multiple
+            # moving vertices. Keep the existing conservative fallback, but
+            # localize it to this offending face rather than the whole pass.
+            affected = set(triangle).intersection(movable)
+            for index in affected:
+                displacement[index] *= 0.5
+            orientation_limited_vertices.update(affected)
+            orientation_conservative_repairs += 1
+            changed = True
+        if not changed:
+            orientation_converged = True
             break
-        for index in vertices_to_reduce:
-            displacement[index] *= 0.5
-        orientation_limited_vertices.update(vertices_to_reduce)
-    else:
+    if not orientation_converged:
         raise ValueError(
-            "Pose-constrained apron cannot preserve sewn-triangle orientation "
-            "within the configured normal-turn bound"
+            "Pose-constrained apron orientation solver did not converge within "
+            f"64 local repair passes; changedVertices={len(orientation_limited_vertices)}, "
+            f"localRepairs={orientation_local_repairs}, "
+            f"conservativeRepairs={orientation_conservative_repairs}"
         )
 
     corrections = [value.length for value in displacement.values()]
@@ -587,6 +642,166 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             )
         rest_local = Vector(rest_h[:3]) / rest_h.w
         obj.data.vertices[index].co = rest_local
+
+    # Weighted inverse matrices are a useful initial solve, but their result
+    # must be checked against Blender's evaluated Armature modifier. Small
+    # per-vertex mapping discrepancies can rotate a very thin sewn triangle
+    # enough to violate the orientation bound. Refine only those same moved
+    # vertices in the reference pose using the observed evaluated error. The
+    # inverse weighted map converts each world-space residual back to source
+    # space; the loop is bounded and fails closed if convergence is not real.
+    sit_targets = {
+        index: world_vertices[index] + displacement[index] for index in movable
+    }
+    # The offending sewn face is only about 0.4 mm across its narrow edge, so
+    # the 0.01 mm coarse stopping tolerance can still rotate its normal by
+    # several degrees. Keep the residual below one tenth of a micrometre.
+    refinement_tolerance = 1e-7
+    refinement_limit = spec["maximumSkinMappingErrorM"]
+    refinement_iterations = 0
+    maximum_refinement_error = 0.0
+    for refinement_iterations in range(5):
+        achieved = evaluated_world_vertices()
+        errors = {
+            index: sit_targets[index] - achieved[index] for index in movable
+        }
+        maximum_refinement_error = max(
+            (error.length for error in errors.values()), default=0.0
+        )
+        if maximum_refinement_error <= refinement_tolerance:
+            break
+        if maximum_refinement_error > refinement_limit:
+            raise ValueError(
+                "Evaluated sit-pose inverse-skin refinement exceeded the declared "
+                f"mapping bound: {maximum_refinement_error:.6f} m > "
+                f"{refinement_limit:.6f} m"
+            )
+        for index, error in errors.items():
+            if error.length <= refinement_tolerance:
+                continue
+            rest_error = maps[index] @ Vector((error.x, error.y, error.z, 0.0))
+            obj.data.vertices[index].co += Vector(rest_error[:3])
+        obj.data.update()
+        bpy.context.view_layer.update()
+    else:
+        achieved = evaluated_world_vertices()
+        maximum_refinement_error = max(
+            ((sit_targets[index] - achieved[index]).length for index in movable),
+            default=0.0,
+        )
+        if maximum_refinement_error > refinement_tolerance:
+            raise ValueError(
+                "Evaluated sit-pose inverse-skin refinement did not converge "
+                f"within five iterations: {maximum_refinement_error:.6f} m"
+            )
+
+    # Repair orientation in the actually evaluated sit mesh as well. The
+    # linearized target-space solver above can be numerically unstable on
+    # sub-millimetre sewn triangles even when every vertex maps back within
+    # the declared skin-map tolerance. Backtrack only vertices of the faces
+    # that fail on the evaluated mesh, then re-evaluate before accepting.
+    evaluated_orientation_repairs = 0
+    evaluated_orientation_conservative_repairs = 0
+    evaluated_normal_turn_target = normal_turn_limit + 1e-4
+    actual_sit = evaluated_world_vertices()
+
+    def evaluated_triangle_dot(triangle, points, replace_index=None, replace_point=None):
+        face_points = [
+            replace_point if index == replace_index else points[index]
+            for index in triangle
+        ]
+        normal = (face_points[1] - face_points[0]).cross(
+            face_points[2] - face_points[0]
+        )
+        original = [world_vertices[index] for index in triangle]
+        original_normal = (original[1] - original[0]).cross(
+            original[2] - original[0]
+        )
+        if normal.length < 1e-10 or original_normal.length < 1e-10:
+            return -1.0
+        return original_normal.normalized().dot(normal.normalized())
+
+    def set_source_for_sit_target(index):
+        target_world = world_vertices[index] + displacement[index]
+        rest_h = maps[index] @ Vector((*target_world, 1.0))
+        if abs(rest_h.w) <= 1e-9:
+            raise ValueError(
+                f"Evaluated orientation repair inverse map reached infinity: {index}"
+            )
+        obj.data.vertices[index].co = Vector(rest_h[:3]) / rest_h.w
+
+    actual_orientation_converged = False
+    for _repair_pass in range(64):
+        changed = False
+        for triangle in pose_triangles:
+            affected = set(triangle).intersection(movable)
+            if not affected or evaluated_triangle_dot(triangle, actual_sit) >= evaluated_normal_turn_target:
+                continue
+            choices = []
+            for index in affected:
+                original_delta = displacement[index].copy()
+                if original_delta.length <= 1e-9:
+                    continue
+                point_at_zero = actual_sit[index] - original_delta
+                low, high = 0.0, 1.0
+                if evaluated_triangle_dot(
+                    triangle, actual_sit, index, point_at_zero
+                ) < evaluated_normal_turn_target:
+                    continue
+                for _search in range(14):
+                    retained = (low + high) / 2.0
+                    trial_point = point_at_zero + original_delta * retained
+                    if evaluated_triangle_dot(
+                        triangle, actual_sit, index, trial_point
+                    ) >= evaluated_normal_turn_target:
+                        low = retained
+                    else:
+                        high = retained
+                choices.append((low, index, original_delta))
+            if choices:
+                retained, index, original_delta = max(
+                    choices, key=lambda item: item[0]
+                )
+                displacement[index] = original_delta * retained
+                set_source_for_sit_target(index)
+                obj.data.update()
+                actual_sit = evaluated_world_vertices()
+                orientation_limited_vertices.add(index)
+                evaluated_orientation_repairs += 1
+                changed = True
+                continue
+
+            for index in affected:
+                displacement[index] *= 0.5
+                set_source_for_sit_target(index)
+                orientation_limited_vertices.add(index)
+            obj.data.update()
+            actual_sit = evaluated_world_vertices()
+            evaluated_orientation_conservative_repairs += 1
+            changed = True
+        remaining = [
+            triangle for triangle in pose_triangles
+            if set(triangle).intersection(movable)
+            and evaluated_triangle_dot(triangle, actual_sit) < evaluated_normal_turn_target
+        ]
+        if not remaining:
+            actual_orientation_converged = True
+            break
+        if not changed:
+            break
+    if not actual_orientation_converged:
+        remaining = [
+            (tuple(triangle), round(evaluated_triangle_dot(triangle, actual_sit), 6))
+            for triangle in pose_triangles
+            if set(triangle).intersection(movable)
+            and evaluated_triangle_dot(triangle, actual_sit) < evaluated_normal_turn_target
+        ]
+        raise ValueError(
+            "Evaluated sit-pose orientation repair did not satisfy the unchanged "
+            f"normal-turn bound; remainingFaces={remaining[:8]}, "
+            f"localRepairs={evaluated_orientation_repairs}, "
+            f"conservativeRepairs={evaluated_orientation_conservative_repairs}"
+        )
 
     # Evaluate the solved geometry in all three poses. Large changes or a
     # folded triangle are treated as infeasible and are never silently kept.
@@ -655,9 +870,33 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         turn_dot = old_normal.normalized().dot(new_normal.normalized())
         if turn_dot < spec["maximumNormalTurnDot"]:
             indices = tuple(int(index) for index in triangle.vertices)
+            target_points = [sit_targets[index] for index in indices]
+            target_normal = (target_points[1] - target_points[0]).cross(
+                target_points[2] - target_points[0]
+            )
+            target_turn_dot = (
+                old_normal.normalized().dot(target_normal.normalized())
+                if target_normal.length >= 1e-10
+                else -1.0
+            )
+            evaluated_target_errors = [
+                round(float((new[i] - target_points[i]).length), 9)
+                for i in range(3)
+            ]
+            initial_triangle = (
+                pose_triangles[triangle_index]
+                if triangle_index < len(pose_triangles)
+                else None
+            )
+            polygon_vertices = tuple(
+                int(index) for index in final_mesh.polygons[triangle.polygon_index].vertices
+            )
             diagnostic = (
                 f"Pose-constrained apron solve inverted sewn triangle {triangle_index} {indices}: "
                 f"normalDot={turn_dot:.6f}, owners={[sorted(vertex_owners[index]) for index in indices]}, "
+                f"initialTriangleAtIndex={initial_triangle}, polygonVertices={polygon_vertices}, "
+                f"targetNormalDot={target_turn_dot:.6f}, "
+                f"evaluatedTargetErrorsM={evaluated_target_errors}, "
                 f"corrections={[round(float(displacement[index].length), 6) for index in indices]}, "
                 f"old={[tuple(round(float(value), 6) for value in old[i]) for i in range(3)]}, "
                 f"new={[tuple(round(float(value), 6) for value in new[i]) for i in range(3)]}"
@@ -720,6 +959,12 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "maximumSkinMapErrorM": max(skin_errors, default=0.0),
         "maximumCorrectionM": max(corrections, default=0.0),
         "orientationLimitedVertexCount": len(orientation_limited_vertices),
+        "evaluatedPoseOrientationRepairs": int(evaluated_orientation_repairs),
+        "evaluatedPoseConservativeRepairs": int(
+            evaluated_orientation_conservative_repairs
+        ),
+        "orientationLocalRepairCount": orientation_local_repairs,
+        "orientationConservativeRepairCount": orientation_conservative_repairs,
         "maximumPoseDisplacementM": maximum_pose_delta,
         "maximumSurfaceResidualM": max(
             (record["residualM"] for record in residual_records), default=0.0
