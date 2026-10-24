@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V41 packs the source-authored pattern-space UV islands with one shared scale, fixed gutters, and no island rotation so pattern proportions and grain direction stay consistent while the atlas becomes readable. No UVs are generated for unmapped objects. Keep all fit, motion, visual, topology, and release gates independent.",
-  "designRevision": "v44-calibrated-skirt-thigh-follow-20261024",
+  "designRevision": "v45-restored-skirt-thigh-follow-20261024",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -195,7 +195,7 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "One profile remains shared across connected overskirt panels so sewn front/lap seam vertices receive a continuous field. V44 raises hip and lateral-thigh follow on the skirt toward the already declared shorts profile to test whether lower-panel pose separation is reduced; the 0.75 maximum-thigh cap and all geometry gates remain unchanged. This uncalibrated prototype does not establish fit, motion, collision, or appearance acceptance.",
+      "evidenceBoundary": "One profile remains shared across connected overskirt panels so sewn front/lap seam vertices receive a continuous field. V45 restores the prior 0/0.72 hip-to-lateral-thigh profile after the V44 weight trial increased the sit residual; the 0.75 maximum-thigh cap and all geometry gates remain unchanged. This uncalibrated prototype does not establish fit, motion, collision, or appearance acceptance.",
       "weightProfile": {
         "method": "panel-balanced-hem-thigh-follow-v5",
         "pieceIds": [
@@ -209,8 +209,8 @@
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
-        "waistThighWeight": 0.12,
-        "hemThighWeight": 0.82,
+        "waistThighWeight": 0,
+        "hemThighWeight": 0.72,
         "forwardHemThighWeight": 0.12,
         "centerlineHemThighWeight": 0.12,
         "maximumThighWeight": 0.75,
@@ -218,7 +218,7 @@
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.075,
         "fullSideWeightWidthM": 0.135,
-        "evidenceBoundary": "Continuous connected-panel v5 method with 0.12 anterior and centerline targets, fading over the existing 140 mm forward range. V44 changes only the hip-to-lateral-thigh profile from 0/0.72 to 0.12/0.82, matching the declared shorts profile while retaining the 0.75 maximum cap; this tests lower-skirt pose following and does not assert fit, pose, collision, or appearance acceptance."
+        "evidenceBoundary": "Continuous connected-panel v5 method with 0.12 anterior and centerline targets, fading over the existing 140 mm forward range and authored vertical/lateral fields; the restored 0/0.72 hip-to-thigh profile is a prototype hypothesis, not fit, pose, collision, or appearance acceptance."
       }
     },
     {
