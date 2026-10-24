@@ -9646,16 +9646,16 @@
         "overskirt-front-lap-right"
       ],
       "additionalExtensionM": 0.1,
-      "forwardProjectionM": 0.04,
+      "forwardProjectionM": 0.02,
       "fullExtensionHalfAngleRadians": 0.55,
       "zeroExtensionHalfAngleRadians": 1.25,
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
-      "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 40 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
+      "evidenceBoundary": "V47 reduces the front-apron forward projection from 40 mm to 20 mm after V78's failed sit-pose solve left the right front lap 48.756 mm from its thigh-clearance surface predominantly along Blender Y; this tests whether excess neutral forward offset drives orientation-limited correction. The existing 100 mm downward extension and angular fade are unchanged. This remains a construction hypothesis; sit/crouch coverage, collision, folds, fit and appearance require fresh review."
     },
-    "evidenceBoundary": "V46 retains the authored radial topology after V44 subdivision increased orientation-limited vertices, and halves the soft-box crease-valley depth ratio from 0.12 to 0.06 to test whether pleat-valley curvature blocks the bounded sit-pose apron correction. The eight authored pleats, pose constraints, normal-turn limit and residual bound remain; this is not fit, visual or release acceptance.",
+    "evidenceBoundary": "V47 retains the authored radial topology and V78's reduced 0.06 soft-box crease-valley depth. It reduces only forward-apron neutral projection to 20 mm because V78 measured the failing front-lap point nearly 49 mm away from its target predominantly along the same axis, while the orientation-limited solve applied less than 1 mm. Pose constraints, normal-turn limit and residual bound remain unchanged; this is not fit, visual or release acceptance.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9709,5 +9709,5 @@
     "lockSharedExternalSeams": true,
     "evidenceBoundary": "V43 applies the same sit-pose evaluated-thigh projection and inverse-skin map to the continuous set of four front overskirt and lap panels. It retains the 20 mm local height bins, 50 mm local support radius, 35 mm residual, 85 mm source correction, 100 mm pose correction, 2 mm skin-map and triangle-orientation bounds; unsupported vertices remain unchanged and are counted. The displacement field uses 2.6 neighbor smoothness and 48 bounded iterations to test whether a more coherent correction reduces the remaining orientation-limited vertices; no gate is relaxed. External flank, rear and waistband seams remain constrained. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
-  "designRevision": "v46-shallow-pleat-valley-20261024"
+  "designRevision": "v47-reduced-forward-apron-projection-20261024"
 }

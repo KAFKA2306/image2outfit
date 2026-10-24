@@ -8871,8 +8871,8 @@
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "86c1eabad924476ea34f46c4dd447026113c6f84ba10955abae828efba63950d",
-    "afterVerticesSha256": "9d15ef11bf0c6e906cff24d3d06c8e0205c643513bcb63e961a47cb048c0dc45",
+    "beforeVerticesSha256": "6499326e3c004c26d33fe11af7887ae3c3c355c2566130e9ca15d5e76c406166",
+    "afterVerticesSha256": "01fc8629681866975081526917422616001227cdb802bee998ebaecc8b66f114",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -8912,16 +8912,16 @@
           "overskirt-front-lap-right"
         ],
         "additionalExtensionM": 0.1,
-        "forwardProjectionM": 0.04,
+        "forwardProjectionM": 0.02,
         "fullExtensionHalfAngleRadians": 0.55,
         "zeroExtensionHalfAngleRadians": 1.25,
         "axisOriginBlenderXYM": [
           0,
           -0.03788188099861145
         ],
-        "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 40 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
+        "evidenceBoundary": "V47 reduces the front-apron forward projection from 40 mm to 20 mm after V78's failed sit-pose solve left the right front lap 48.756 mm from its thigh-clearance surface predominantly along Blender Y; this tests whether excess neutral forward offset drives orientation-limited correction. The existing 100 mm downward extension and angular fade are unchanged. This remains a construction hypothesis; sit/crouch coverage, collision, folds, fit and appearance require fresh review."
       },
-      "evidenceBoundary": "V46 retains the authored radial topology after V44 subdivision increased orientation-limited vertices, and halves the soft-box crease-valley depth ratio from 0.12 to 0.06 to test whether pleat-valley curvature blocks the bounded sit-pose apron correction. The eight authored pleats, pose constraints, normal-turn limit and residual bound remain; this is not fit, visual or release acceptance.",
+      "evidenceBoundary": "V47 retains the authored radial topology and V78's reduced 0.06 soft-box crease-valley depth. It reduces only forward-apron neutral projection to 20 mm because V78 measured the failing front-lap point nearly 49 mm away from its target predominantly along the same axis, while the orientation-limited solve applied less than 1 mm. Pose constraints, normal-turn limit and residual bound remain unchanged; this is not fit, visual or release acceptance.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8941,9 +8941,9 @@
     "selectedVertexCount": 6682,
     "movedVertexCount": 6618,
     "maximumRadialDisplacementM": 0.0029787503384589202,
-    "minimumTriangleAreaM2": 2.101151431209879e-11,
-    "beforeVerticesSha256": "9d15ef11bf0c6e906cff24d3d06c8e0205c643513bcb63e961a47cb048c0dc45",
-    "afterVerticesSha256": "ed8f16ca22c5e94d00d63b560ad9d97d1c8f8845ffe12dbfd2a142dc355efcbe",
+    "minimumTriangleAreaM2": 2.0775178212689364e-11,
+    "beforeVerticesSha256": "01fc8629681866975081526917422616001227cdb802bee998ebaecc8b66f114",
+    "afterVerticesSha256": "3367ac658dcacf47cfa4f9e224f823e8bd93dfc604febfe17e061e096ec5c068",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "panelAngularRangesRadians": {},
@@ -8981,17 +8981,17 @@
         "overskirt-front-lap-right"
       ],
       "additionalExtensionM": 0.1,
-      "forwardProjectionM": 0.04,
+      "forwardProjectionM": 0.02,
       "fullExtensionHalfAngleRadians": 0.55,
       "zeroExtensionHalfAngleRadians": 1.25,
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
-      "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 40 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
+      "evidenceBoundary": "V47 reduces the front-apron forward projection from 40 mm to 20 mm after V78's failed sit-pose solve left the right front lap 48.756 mm from its thigh-clearance surface predominantly along Blender Y; this tests whether excess neutral forward offset drives orientation-limited correction. The existing 100 mm downward extension and angular fade are unchanged. This remains a construction hypothesis; sit/crouch coverage, collision, folds, fit and appearance require fresh review."
     },
     "maximumAdditionalForwardApronDisplacementM": 0.1,
-    "maximumForwardApronProjectionM": 0.04,
+    "maximumForwardApronProjectionM": 0.02,
     "beforeBoundsZM": [
       0.5795782208442688,
       0.7395782470703125
@@ -20297,7 +20297,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "ab0124506c2fe325e8c67641ad10243c47c20fb3b1bbeaba59edcd9e7d32a1bf",
+  "sourceBlendSha256": "a391f3756fe8cf110df4e1c1a7bc020a4a0f748a1441cb3a6aa52599a6294a21",
   "sewnMeshSha256": "3273050e3dca0b927b07f542254d0c998617d624d54493b598f2299f43b12520",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -20326,21 +20326,21 @@
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 2.1496674207176083e-06,
+        "maximumInputEdgeDistanceM": 2.1495882350377094e-06,
         "triangleCoordinatesM": [
           [
             0.0,
-            -0.18662577867507935,
+            -0.17739500105381012,
             0.5549628138542175
           ],
           [
-            -2.146359520338592e-06,
-            -0.1866258978843689,
+            -2.1462801669258624e-06,
+            -0.17739512026309967,
             0.5549628138542175
           ],
           [
             0.0,
-            -0.18663080036640167,
+            -0.17739908397197723,
             0.5549439191818237
           ]
         ]
@@ -151413,8 +151413,8 @@
     "layerOffsetVertexCount": 997,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 2593,
-    "beforeVerticesSha256": "1a01af4b663b32b5236363115df64c367f68d9336c484c536834fa34b8f542ed",
-    "afterVerticesSha256": "86c1eabad924476ea34f46c4dd447026113c6f84ba10955abae828efba63950d",
+    "beforeVerticesSha256": "86a2f370880fb2e1e1856283b21f7d399d189b7aa43e31dabb09bd4b4f41c815",
+    "afterVerticesSha256": "6499326e3c004c26d33fe11af7887ae3c3c355c2566130e9ca15d5e76c406166",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },

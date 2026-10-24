@@ -42,16 +42,16 @@
     "resumable": true,
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
-    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v78-shallow-pleat-valley.json",
-    "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v78-shallow-pleat-valley.json, resolve it, then resume from this checkpoint.",
+    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v79-reduced-apron-projection.json",
+    "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v79-reduced-apron-projection.json, resolve it, then resume from this checkpoint.",
     "lastAttempt": {
-      "runId": "5164f1f9806d46fa8cbbdf45152d7a1d",
+      "runId": "11314374389743e7942af1eb1873f96e",
       "status": "PARTIAL",
-      "checkedAt": "2026-10-24T13:13:35Z",
+      "checkedAt": "2026-10-24T19:20:37Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "simulate-cloth",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/simulate-cloth.json",
-      "stageEvidenceSha256": "1844f92421bc823b060838b2bd1014dd8bd0525f01655875a373bba1e53c7e46",
+      "stageEvidenceSha256": "b7c4d40eecb9663d1bc2cc116409f9bbcb009f7e043c82b66ddbc9e9b31e600d",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -79,31 +79,31 @@
         },
         "build-blender": {
           "status": "PASS",
-          "stageResultSha256": "24cb57e8c3b33997378c59594fe845112cd2c8633d9ba0613cf4c2afad7df5fe"
+          "stageResultSha256": "6623e6fb0d6673acfa5a12346a7e73362e5a277cc1e639246e2440a614c33d39"
         },
         "simulate-cloth": {
           "status": "PASS",
-          "stageResultSha256": "1844f92421bc823b060838b2bd1014dd8bd0525f01655875a373bba1e53c7e46"
+          "stageResultSha256": "b7c4d40eecb9663d1bc2cc116409f9bbcb009f7e043c82b66ddbc9e9b31e600d"
         }
       },
       "contractResult": "Workflow FAILED; completed 8 stage(s).",
       "failedAttemptEvidencePaths": [
-        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v78-shallow-pleat-valley.json"
+        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v79-reduced-apron-projection.json"
       ],
-      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v78-shallow-pleat-valley.json",
-      "checkpointSha256": "7c9917c1787c0280058b7524076a96b9b553bfae2dcd06946d2f1d90ae5c2709",
+      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v79-reduced-apron-projection.json",
+      "checkpointSha256": "a9a77e15c382bcc14ea80c03b3781cb327934538cc2e6a4505c9d48b8b7356cc",
       "blockedStage": "skin-and-export",
-      "failure": "stage command failed with exit code 1: M:\\win11projects\\unity\\image2outfit\\Assets\\_Local\\.venv\\Scripts\\python.exe tools/run_reference_product_stage.py --stage skin-and-export --job config/products/siroino-lilac-lame-fencing-practice-set/job.json --request config/pipeline/requests/siroino-lilac-lame-fencing-practice-set.json --result .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/skin-and-export.json\nTraceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2503, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2488, in main\n    stage_export(job, result_path)\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2130, in stage_export\n    raise RuntimeError(f\"Skin/export failed: {execution.stderr[-2500:]}\")\nRuntimeError: Skin/export failed: Traceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 1344, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 1196, in main\n    pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 677, in apply_pose_constrained_apron_geometry\n    raise ValueError(\nValueError: Pose-constrained apron could not meet the shorts-surface residual bound: maximum=0.036756 m, limit=0.035000 m, vertex=5171, side=right, surfaceDistance=0.048756 m, displacement=0.000383 m, posePoint=(-0.109255, -0.112909, 0.588699), surfacePoint=(-0.108169, -0.064172, 0.589504), owners=['overskirt-front-lap-left'], orientationLimitedVertices=968\n\nError: script failed, file: 'M:\\win11projects\\unity\\image2o",
-      "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v78-shallow-pleat-valley.json, resolve it, then resume from this checkpoint."
+      "failure": "stage command failed with exit code 1: M:\\win11projects\\unity\\image2outfit\\Assets\\_Local\\.venv\\Scripts\\python.exe tools/run_reference_product_stage.py --stage skin-and-export --job config/products/siroino-lilac-lame-fencing-practice-set/job.json --request config/pipeline/requests/siroino-lilac-lame-fencing-practice-set.json --result .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/skin-and-export.json\nTraceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2503, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2488, in main\n    stage_export(job, result_path)\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2130, in stage_export\n    raise RuntimeError(f\"Skin/export failed: {execution.stderr[-2500:]}\")\nRuntimeError: Skin/export failed: Traceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 1344, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 1196, in main\n    pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 677, in apply_pose_constrained_apron_geometry\n    raise ValueError(\nValueError: Pose-constrained apron could not meet the shorts-surface residual bound: maximum=0.036915 m, limit=0.035000 m, vertex=2158, side=left, surfaceDistance=0.048915 m, displacement=0.000638 m, posePoint=(0.151822, -0.025725, 0.571008), surfacePoint=(0.109857, -0.049232, 0.579898), owners=['overskirt-front-right'], orientationLimitedVertices=970\n\nError: script failed, file: 'M:\\win11projects\\unity\\image2outfit\\",
+      "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v79-reduced-apron-projection.json, resolve it, then resume from this checkpoint."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "ab0124506c2fe325e8c67641ad10243c47c20fb3b1bbeaba59edcd9e7d32a1bf",
+      "sourceSha256": "a391f3756fe8cf110df4e1c1a7bc020a4a0f748a1441cb3a6aa52599a6294a21",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "7e334bde530b50d27f973067cb18e834941597745dd8aa5c8ffeac5d9cf4e9a0",
+      "reportSha256": "0c6e80522745a8e2200004c8049352f2212558c119c4f66bc1790d83cdcea1e0",
       "metrics": {
         "vertices": 13309,
         "triangles": 25915,
