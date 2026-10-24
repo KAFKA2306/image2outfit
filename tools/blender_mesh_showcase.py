@@ -75,10 +75,9 @@ def main():
         skin = json.loads(skin_report.read_text(encoding="utf-8"))
         skin_input_sha = skin.get("inputCandidateSha256")
         weighted_source = root / skin["weightedBlendPath"]
-        weighted_source_matches = (
-            weighted_source.is_file()
-            and digest(weighted_source) == skin.get("weightedBlendSha256")
-        )
+        weighted_source_matches = weighted_source.is_file() and digest(
+            weighted_source
+        ) == skin.get("weightedBlendSha256")
         if (
             current_build_source_sha
             and skin_input_sha == current_build_source_sha
@@ -119,7 +118,9 @@ def main():
     # Keep that private path out of the generated/public report while retaining
     # a verifiable link to canonical build evidence and the source digest.
     source_selection["selectedSourceSha256"] = digest(source)
-    source_selection["sourceEvidencePath"] = build_report_path.relative_to(root).as_posix()
+    source_selection["sourceEvidencePath"] = build_report_path.relative_to(
+        root
+    ).as_posix()
     source_selection["sourceEvidenceSha256"] = digest(build_report_path)
     bpy.ops.wm.open_mainfile(filepath=str(source), load_ui=False)
     meshes = [
