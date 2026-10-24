@@ -9673,7 +9673,7 @@
     "grantsFitAcceptance": false
   },
   "poseConstrainedApronGeometry": {
-    "method": "sit-continuous-front-apron-inverse-skin-v4",
+    "method": "sit-continuous-front-apron-inverse-skin-v7-evaluated-orientation-backtracking",
     "referencePose": "sit",
     "sourcePieceIds": [
       "overskirt-front-left",
@@ -9707,7 +9707,7 @@
     "smoothness": 2.6,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V43 applies the same sit-pose evaluated-thigh projection and inverse-skin map to the continuous set of four front overskirt and lap panels. It retains the 20 mm local height bins, 50 mm local support radius, 35 mm residual, 85 mm source correction, 100 mm pose correction, 2 mm skin-map and triangle-orientation bounds; unsupported vertices remain unchanged and are counted. The displacement field uses 2.6 neighbor smoothness and 48 bounded iterations to test whether a more coherent correction reduces the remaining orientation-limited vertices; no gate is relaxed. External flank, rear and waistband seams remain constrained. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
+    "evidenceBoundary": "V49 replaces whole-field orientation backtracking with per-face local vertex repair. V80g confirmed the same triangle connectivity but final normalDot fell to 0.094748 after inverse-skin application. V51 adds a bounded five-iteration correction from evaluated sit-pose vertex residuals through the frozen inverse weighted skin map, converging within 0.0001 mm and the existing 2 mm mapping bound. V80i still measured targetNormalDot=0.101257 and evaluated normalDot=0.094748 despite vertex errors below 0.000000063 m. V80j passed orientation with 439 limited vertices but missed the unchanged 35 mm residual by 0.324 mm, so V53 reduced the internal target margin to 0.008. V80k then measured targetNormalDot=0.119356 and evaluated normalDot=0.095297 on a different thin face with vertex errors below 0.000000062 m, showing target-space backtracking alone is insufficient. V54 adds local backtracking driven by the actually evaluated sit mesh, with each applied vertex change re-evaluated and the final 0.1 normal-turn check retained. Target correspondence, 35 mm residual, 85 mm source correction, 100 mm pose correction, topology and all release gates remain unchanged. This is a solver hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
-  "designRevision": "v47-reduced-forward-apron-projection-20261024"
+  "designRevision": "v55-evaluated-orientation-backtracking-20261025"
 }
