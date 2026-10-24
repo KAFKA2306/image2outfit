@@ -9702,11 +9702,11 @@
     "maximumSurfaceResidualM": 0.035,
     "targetSurfaceHeightBinM": 0.02,
     "maximumLocalSurfaceSupportDistanceM": 0.05,
-    "smoothingIterations": 24,
-    "smoothness": 0.65,
+    "smoothingIterations": 48,
+    "smoothness": 2.6,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V40 applies the same sit-pose evaluated-thigh projection and inverse-skin map to the continuous set of four front overskirt and lap panels. It retains the 20 mm local height bins, 50 mm local support radius, 35 mm residual, 85 mm source correction, 100 mm pose correction, 2 mm skin-map and triangle-orientation bounds; unsupported vertices remain unchanged and are counted. External flank, rear and waistband seams remain constrained. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
+    "evidenceBoundary": "V43 applies the same sit-pose evaluated-thigh projection and inverse-skin map to the continuous set of four front overskirt and lap panels. It retains the 20 mm local height bins, 50 mm local support radius, 35 mm residual, 85 mm source correction, 100 mm pose correction, 2 mm skin-map and triangle-orientation bounds; unsupported vertices remain unchanged and are counted. The displacement field uses 2.6 neighbor smoothness and 48 bounded iterations to test whether a more coherent correction reduces the remaining orientation-limited vertices; no gate is relaxed. External flank, rear and waistband seams remain constrained. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
-  "designRevision": "v41-report-out-of-envelope-apron-vertices-20261024"
+  "designRevision": "v43-coherent-apron-displacement-20261024"
 }
