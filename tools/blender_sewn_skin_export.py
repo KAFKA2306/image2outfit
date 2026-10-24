@@ -50,7 +50,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     spec = pose_spec.get("poseConstrainedApronGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "sit-continuous-front-apron-inverse-skin-v7-evaluated-orientation-backtracking":
+    if spec.get("method") != "sit-continuous-front-apron-inverse-skin-v11-lower-coverage-onset":
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
     transition_piece_ids = set(spec.get("transitionPieceIds", []))
@@ -653,14 +653,15 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     sit_targets = {
         index: world_vertices[index] + displacement[index] for index in movable
     }
-    # The offending sewn face is only about 0.4 mm across its narrow edge, so
-    # the 0.01 mm coarse stopping tolerance can still rotate its normal by
-    # several degrees. Keep the residual below one tenth of a micrometre.
-    refinement_tolerance = 1e-7
+    # Thin sewn faces make the refinement accuracy important, but float and
+    # modifier evaluation do not converge monotonically to sub-0.1-micrometre
+    # residuals. Keep this solver tolerance at 0.2 micrometre, still four
+    # orders smaller than the separately enforced skin-map error bound.
+    refinement_tolerance = 2e-7
     refinement_limit = spec["maximumSkinMappingErrorM"]
     refinement_iterations = 0
     maximum_refinement_error = 0.0
-    for refinement_iterations in range(5):
+    for refinement_iterations in range(12):
         achieved = evaluated_world_vertices()
         errors = {
             index: sit_targets[index] - achieved[index] for index in movable
@@ -673,7 +674,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         if maximum_refinement_error > refinement_limit:
             raise ValueError(
                 "Evaluated sit-pose inverse-skin refinement exceeded the declared "
-                f"mapping bound: {maximum_refinement_error:.6f} m > "
+                f"mapping bound: {maximum_refinement_error:.12g} m > "
                 f"{refinement_limit:.6f} m"
             )
         for index, error in errors.items():
@@ -692,7 +693,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         if maximum_refinement_error > refinement_tolerance:
             raise ValueError(
                 "Evaluated sit-pose inverse-skin refinement did not converge "
-                f"within five iterations: {maximum_refinement_error:.6f} m"
+                f"within twelve iterations: {maximum_refinement_error:.12g} m"
             )
 
     # Repair orientation in the actually evaluated sit mesh as well. The
@@ -857,6 +858,50 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             }
         )
     final_mesh.calc_loop_triangles()
+    maximum_residual = max(
+        residual_records, key=lambda record: record["residualM"], default=None
+    )
+    residual_incident_faces = []
+    if (
+        maximum_residual
+        and maximum_residual["residualM"] > spec["maximumSurfaceResidualM"]
+    ):
+        residual_vertex = int(maximum_residual["vertex"])
+        for triangle in final_mesh.loop_triangles:
+            indices = tuple(int(index) for index in triangle.vertices)
+            if residual_vertex not in indices:
+                continue
+            points = [final_world[index] for index in indices]
+            normal = (points[1] - points[0]).cross(points[2] - points[0])
+            baseline_points = [original_sit[index] for index in indices]
+            baseline_normal = (baseline_points[1] - baseline_points[0]).cross(
+                baseline_points[2] - baseline_points[0]
+            )
+            edge_lengths = tuple(
+                round(float((points[(offset + 1) % 3] - points[offset]).length), 6)
+                for offset in range(3)
+            )
+            residual_incident_faces.append(
+                {
+                    "vertices": indices,
+                    "normalTurnDot": (
+                        float(baseline_normal.normalized().dot(normal.normalized()))
+                        if normal.length >= 1e-10 and baseline_normal.length >= 1e-10
+                        else -1.0
+                    ),
+                    "edgeLengthsM": edge_lengths,
+                    "displacementM": tuple(
+                        round(float(displacement[index].length), 6)
+                        for index in indices
+                    ),
+                    "owners": [sorted(vertex_owners[index]) for index in indices],
+                }
+            )
+        residual_incident_faces.sort(
+            key=lambda item: (
+                item["normalTurnDot"], min(item["edgeLengthsM"]), item["vertices"]
+            )
+        )
     for triangle_index, triangle in enumerate(final_mesh.loop_triangles):
         if not set(triangle.vertices).intersection(movable):
             continue
@@ -906,13 +951,12 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     final_obj.to_mesh_clear()
     reset_pose(armature)
     bpy.context.view_layer.update()
-    maximum_residual = max(
-        residual_records, key=lambda record: record["residualM"], default=None
-    )
     if (
         maximum_residual
         and maximum_residual["residualM"] > spec["maximumSurfaceResidualM"]
     ):
+        residual_vertex = int(maximum_residual["vertex"])
+        target_diagnostic = target_diagnostics.get(residual_vertex)
         raise ValueError(
             "Pose-constrained apron could not meet the shorts-surface residual bound: "
             f"maximum={maximum_residual['residualM']:.6f} m, "
@@ -923,7 +967,9 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             f"posePoint={tuple(round(value, 6) for value in maximum_residual['posePointM'])}, "
             f"surfacePoint={tuple(round(value, 6) for value in maximum_residual['nearestSurfacePointM'])}, "
             f"owners={maximum_residual['ownerPieceIds']}, "
-            f"orientationLimitedVertices={len(orientation_limited_vertices)}"
+            f"orientationLimitedVertices={len(orientation_limited_vertices)}, "
+            f"targetDiagnostic={target_diagnostic}, "
+            f"incidentFaces={residual_incident_faces[:8]}"
         )
     return {
         "applied": True,
