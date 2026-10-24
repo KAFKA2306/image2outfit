@@ -9634,6 +9634,7 @@
     "hemZM": 0.43957824707,
     "hemExtensionM": 0.14,
     "foldCount": 8,
+    "topologySubdivisionFactor": 2,
     "hemFoldDepthM": 0.003,
     "phaseRadians": 0,
     "forwardApron": {
@@ -9654,7 +9655,7 @@
       ],
       "evidenceBoundary": "V23 geometry-only trial: add up to 80 mm downward length and 40 mm forward projection to the sewn front panels, fading smoothly toward the side. Parameters are bounded construction hypotheses; sit/crouch rendered coverage, collision, folds, fit and appearance still require direct review."
     },
-    "evidenceBoundary": "V36 uses the builder-supported 12 longitudinal panel cuts to give the anterior apron shorter triangles for pose-constrained shaping, with the unchanged forward-projection geometry and unchanged pose, residual, and orientation gates. This is a prototype hypothesis and does not establish pose coverage, fit, cloth, appearance, or release acceptance.",
+    "evidenceBoundary": "V44 doubles radial mesh cuts between the unchanged eight authored soft-box pleats; crease shape, pose constraints, normal-turn limit and residual bound remain unchanged. This tests whether denser triangles let the sit-pose apron displacement satisfy the existing orientation constraint; it is a topology hypothesis, not fit, visual or release acceptance.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9708,5 +9709,5 @@
     "lockSharedExternalSeams": true,
     "evidenceBoundary": "V43 applies the same sit-pose evaluated-thigh projection and inverse-skin map to the continuous set of four front overskirt and lap panels. It retains the 20 mm local height bins, 50 mm local support radius, 35 mm residual, 85 mm source correction, 100 mm pose correction, 2 mm skin-map and triangle-orientation bounds; unsupported vertices remain unchanged and are counted. The displacement field uses 2.6 neighbor smoothness and 48 bounded iterations to test whether a more coherent correction reduces the remaining orientation-limited vertices; no gate is relaxed. External flank, rear and waistband seams remain constrained. This is a geometry hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
   },
-  "designRevision": "v43-coherent-apron-displacement-20261024"
+  "designRevision": "v44-radial-topology-20261024"
 }

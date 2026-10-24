@@ -42,16 +42,16 @@
     "resumable": true,
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
-    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v75-apron-smoothing-26.json",
-    "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v75-apron-smoothing-26.json, resolve it, then resume from this checkpoint.",
+    "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v76-radial-topology.json",
+    "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v76-radial-topology.json, resolve it, then resume from this checkpoint.",
     "lastAttempt": {
-      "runId": "2d363fe6474b44d9a47e7af7f14b5e4f",
+      "runId": "3a16e7feb63440b7b388a327725afa4f",
       "status": "PARTIAL",
-      "checkedAt": "2026-10-24T03:22:30Z",
+      "checkedAt": "2026-10-24T05:12:25Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "simulate-cloth",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/simulate-cloth.json",
-      "stageEvidenceSha256": "ee8ac47d58325b27dbae6b23d39e9d3b7df55d0054da9d12cb76da1fa599ea5f",
+      "stageEvidenceSha256": "32ee67cb8bd9ee635a00a9a7304504ef85101c40d74a604dffa8ee85b448aacc",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -78,36 +78,36 @@
           "stageResultSha256": "08eade6e9ba6a1255e0ade23e9218d297ba9f0bf93f04597b3a2ad3a7685ca4c"
         },
         "build-blender": {
-          "status": "REUSED",
-          "stageResultSha256": "8ff36db1ebbdb20f2ea4c7922ae179d8003209e86cd8370ed45cc04cd207c088"
+          "status": "PASS",
+          "stageResultSha256": "33b732d70433c668feaae903d840f8082ffa809ea2b8d73b72612791035fccb4"
         },
         "simulate-cloth": {
-          "status": "REUSED",
-          "stageResultSha256": "ee8ac47d58325b27dbae6b23d39e9d3b7df55d0054da9d12cb76da1fa599ea5f"
+          "status": "PASS",
+          "stageResultSha256": "32ee67cb8bd9ee635a00a9a7304504ef85101c40d74a604dffa8ee85b448aacc"
         }
       },
       "contractResult": "Workflow FAILED; completed 8 stage(s).",
       "failedAttemptEvidencePaths": [
-        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v75-apron-smoothing-26.json"
+        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v76-radial-topology.json"
       ],
-      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v75-apron-smoothing-26.json",
-      "checkpointSha256": "73425e8db8c9084286bb643a41af05f95292474285adab4b84fe6fbc85a305be",
+      "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v76-radial-topology.json",
+      "checkpointSha256": "e9ee21bc10b08a6d3df8212b4fb36977398c162e464cf8e80f55a2699c6d15ca",
       "blockedStage": "skin-and-export",
-      "failure": "stage command failed with exit code 1: M:\\win11projects\\unity\\image2outfit\\Assets\\_Local\\.venv\\Scripts\\python.exe tools/run_reference_product_stage.py --stage skin-and-export --job config/products/siroino-lilac-lame-fencing-practice-set/job.json --request config/pipeline/requests/siroino-lilac-lame-fencing-practice-set.json --result .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/skin-and-export.json\nTraceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2503, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2488, in main\n    stage_export(job, result_path)\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2130, in stage_export\n    raise RuntimeError(f\"Skin/export failed: {execution.stderr[-2500:]}\")\nRuntimeError: Skin/export failed: Traceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 1344, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 1196, in main\n    pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 677, in apply_pose_constrained_apron_geometry\n    raise ValueError(\nValueError: Pose-constrained apron could not meet the shorts-surface residual bound: maximum=0.036544 m, limit=0.035000 m, vertex=5171, side=right, surfaceDistance=0.048544 m, displacement=0.000380 m, posePoint=(-0.108983, -0.112694, 0.588143), surfacePoint=(-0.108059, -0.064165, 0.588915), owners=['overskirt-front-lap-left'], orientationLimitedVertices=967\n\nError: script failed, file: 'M:\\win11projects\\unity\\image2o",
-      "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v75-apron-smoothing-26.json, resolve it, then resume from this checkpoint."
+      "failure": "stage command failed with exit code 1: M:\\win11projects\\unity\\image2outfit\\Assets\\_Local\\.venv\\Scripts\\python.exe tools/run_reference_product_stage.py --stage skin-and-export --job config/products/siroino-lilac-lame-fencing-practice-set/job.json --request config/pipeline/requests/siroino-lilac-lame-fencing-practice-set.json --result .image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/skin-and-export.json\nTraceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2503, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2488, in main\n    stage_export(job, result_path)\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\run_reference_product_stage.py\", line 2130, in stage_export\n    raise RuntimeError(f\"Skin/export failed: {execution.stderr[-2500:]}\")\nRuntimeError: Skin/export failed: Traceback (most recent call last):\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 1344, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 1196, in main\n    pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"M:\\win11projects\\unity\\image2outfit\\tools\\blender_sewn_skin_export.py\", line 677, in apply_pose_constrained_apron_geometry\n    raise ValueError(\nValueError: Pose-constrained apron could not meet the shorts-surface residual bound: maximum=0.036556 m, limit=0.035000 m, vertex=2744, side=right, surfaceDistance=0.048556 m, displacement=0.001339 m, posePoint=(-0.145982, -0.066164, 0.522864), surfacePoint=(-0.101175, -0.050265, 0.532724), owners=['overskirt-front-left'], orientationLimitedVertices=1244\n\nError: script failed, file: 'M:\\win11projects\\unity\\image2outf",
+      "nextAction": "Inspect the skin-and-export failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-v76-radial-topology.json, resolve it, then resume from this checkpoint."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "ddd18ce4d6237d17b4d8b77313caecc20a2bd639588ad97a17d18d282b965f39",
+      "sourceSha256": "91044b8ab59fda0649da946d8a91cdbe5b0a5ed0c502bf8b8dd274c8fb39fbd9",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "63c66d00c0950166ede9fdbf2624e6db275183b241a8d7c7e6b6cca64a7f4a1f",
+      "reportSha256": "0c0aaec7ce2539c88a455f2d8382aedb589c525f0c8f7fda8ec819197eca67a0",
       "metrics": {
-        "vertices": 13309,
-        "triangles": 25915,
-        "unweightedVertices": 13309,
+        "vertices": 14804,
+        "triangles": 28853,
+        "unweightedVertices": 14804,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false

@@ -1457,11 +1457,19 @@ def split_declared_skirt_creases(mesh, pose):
             "crease-bound-soft-box-pleat-v1",
             "panel-local-soft-knife-pleat-v1"}:
         return {"applied": False}
-    count = spec["foldCount"]
+    fold_count = spec["foldCount"]
+    topology_subdivision_factor = spec.get("topologySubdivisionFactor", 1)
+    if not isinstance(fold_count, int) or isinstance(fold_count, bool) or not 2 <= fold_count <= 64:
+        raise ValueError("Invalid authored skirt fold count")
+    if (not isinstance(topology_subdivision_factor, int)
+            or isinstance(topology_subdivision_factor, bool)
+            or not 1 <= topology_subdivision_factor <= 4):
+        raise ValueError("Invalid radial skirt topology subdivision factor")
+    radial_cut_count = fold_count * topology_subdivision_factor
     origin = spec["axisOriginBlenderXYM"]
     phase = spec["phaseRadians"]
     selected = set(spec["pieceIds"]) | set(spec["seamContinuationPieceIds"])
-    if (not isinstance(count, int) or isinstance(count, bool) or not 2 <= count <= 64
+    if (radial_cut_count > 256
             or len(origin) != 2 or not all(math.isfinite(v) for v in [*origin, phase])
             or not selected.issubset(set(mesh["facePieceIds"]))):
         raise ValueError("Invalid explicit crease topology declaration")
@@ -1510,8 +1518,8 @@ def split_declared_skirt_creases(mesh, pose):
     cuts = []
     longitudinal_cuts = []
     try:
-        for i in range(count):
-            angle = phase + i * math.pi / count
+        for i in range(radial_cut_count):
+            angle = phase + i * math.pi / radial_cut_count
             faces = [f for f in bm.faces if pieces[f[owner]-1] in selected]
             edges = {e for f in faces for e in f.edges}
             verts = {v for f in faces for v in f.verts}
@@ -1601,6 +1609,9 @@ def split_declared_skirt_creases(mesh, pose):
                 == len(result_uv_panel_keys) == len(result_uv_source_kinds)):
             raise ValueError("Crease subdivision broke source-face UV alignment")
         return {"applied": True, "method": spec["method"], "foldMethod": fold_method,
+                "foldCount": fold_count,
+                "topologySubdivisionFactor": topology_subdivision_factor,
+                "radialTopologyCutCount": len(cuts),
                 "cuts": cuts, "longitudinalSubdivisionCuts": longitudinal_cuts,
                 "longitudinalSubdivisionCount": len(longitudinal_cuts),
                 "beforeVertexCount": initial_count, "afterVertexCount": len(ordered),
