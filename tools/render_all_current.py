@@ -146,17 +146,17 @@ def render_mesh_showcase(
         return
     reports.mkdir(parents=True, exist_ok=True)
     command = [
-            blender,
-            "--background",
-            "--factory-startup",
-            "--python-exit-code",
-            "1",
-            "--python",
-            str(ROOT / "tools/blender_mesh_showcase.py"),
-            "--",
-            "--job",
-            job_path.relative_to(ROOT).as_posix(),
-        ]
+        blender,
+        "--background",
+        "--factory-startup",
+        "--python-exit-code",
+        "1",
+        "--python",
+        str(ROOT / "tools/blender_mesh_showcase.py"),
+        "--",
+        "--job",
+        job_path.relative_to(ROOT).as_posix(),
+    ]
     if source_path:
         command.extend(["--source", source_path])
     code = run_logged(
