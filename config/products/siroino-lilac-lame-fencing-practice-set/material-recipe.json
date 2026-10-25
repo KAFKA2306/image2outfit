@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "PROTOTYPE_HYPOTHESIS",
-  "evidenceBoundary": "Explicit preview hypotheses only; ivory/lavender material appearance, lam\u00e9 response, trims and quilting require direct rendered review. No measured PBR approval.",
+  "evidenceBoundary": "Explicit preview hypotheses only; ivory/lavender material appearance, lamé response, trims and quilting require direct rendered review. No measured PBR approval.",
   "prototypeMaterial": {
     "name": "ivory-prototype-hypothesis",
     "baseColorLinearRgb": [
@@ -13,34 +13,66 @@
     "roughness": 0.65
   },
   "prototypeEdgeTrim": {
-    "enabled": false,
+    "enabled": true,
     "name": "lavender-piping-prototype-hypothesis",
     "pieceIds": [
       "jacket-overlap-front",
       "jacket-sleeve-left",
       "jacket-sleeve-right",
       "stand-collar",
-      "overskirt-front",
-      "overskirt-back",
-      "waistband-front",
-      "waistband-back"
+      "overskirt-front-left",
+      "overskirt-front-right",
+      "overskirt-back-left",
+      "overskirt-back-right",
+      "waistband-front-left",
+      "waistband-front-right",
+      "waistband-back-left",
+      "waistband-back-right",
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right",
+      "waistband-front-lap-left",
+      "waistband-front-lap-right"
     ],
     "baseColorLinearRgb": [
+      0.48,
       0.32,
-      0.23,
-      0.52
+      0.72
     ],
     "roughness": 0.48,
     "metallic": 0.08,
-    "bevelRadiusM": 0.0012,
-    "evidenceBoundary": "Disabled because unclassified panel boundaries produced floating loops. Trim remains unimplemented until canonical 3D stitch-edge mappings exist."
+    "bevelRadiusM": 0.0028,
+    "evidenceBoundary": "V22 increases the prototype piping radius and lavender contrast on the V21 declared jacket and skirt boundaries for direct review; intersections and appearance remain unapproved."
+  },
+  "prototypeRearWaistTabMaterials": {
+    "tab": {
+      "name": "rear-waist-adjustment-tab-v18-prototype",
+      "baseColorLinearRgb": [
+        0.28,
+        0.16,
+        0.47
+      ],
+      "roughness": 0.48,
+      "metallic": 0.08,
+      "evidenceBoundary": "V18 higher-contrast lavender surface color for direct review; not approved material or final styling."
+    },
+    "buckle": {
+      "name": "rear-waist-adjustment-buckle-v18-prototype",
+      "baseColorLinearRgb": [
+        0.66,
+        0.48,
+        0.19
+      ],
+      "roughness": 0.3,
+      "metallic": 0.55,
+      "evidenceBoundary": "Provisional low-profile buckle material for direct appearance review; decorative geometry only, not structural closure or accepted fit."
+    }
   },
   "prototypeSurfaceMotifs": {
     "materialName": "lilac-surface-motif-hypothesis",
     "baseColorLinearRgb": [
-      0.55,
-      0.42,
-      0.72
+      0.18,
+      0.07,
+      0.34
     ],
     "roughness": 0.52,
     "metallic": 0.12,
@@ -59,22 +91,56 @@
         0.78
       ],
       "sampleCount": 96,
-      "halfWidthM": 0.0022,
-      "surfaceOffsetM": 0.0025,
+      "acrossSampleCount": 8,
+      "halfWidthStartM": 0.024,
+      "halfWidthEndM": 0.02,
+      "surfaceOffsetM": 0.0045,
+      "surfaceOffsetMode": "front-depth",
       "frontQueryYM": -0.16
+    },
+    "frontFastenerHypothesis": {
+      "pathFractions": [
+        0.24,
+        0.5,
+        0.76
+      ],
+      "radiusM": 0.007,
+      "reliefM": 0.0015,
+      "segments": 16,
+      "materialName": "front-fastener-metal-prototype-hypothesis",
+      "baseColorLinearRgb": [
+        0.66,
+        0.48,
+        0.19
+      ],
+      "roughness": 0.3,
+      "metallic": 0.55,
+      "evidenceBoundary": "Three 14 mm diameter low-profile metal-disc prototypes ray-bound to the declared diagonal plastron path and layered 1.5 mm above its fabric surface. Decorative geometry only; no true fastening, closure retention, fit, appearance, or release is claimed."
     },
     "elbowQuilting": {
       "hostPieceIds": [
         "jacket-sleeve-left",
         "jacket-sleeve-right"
       ],
+      "pathLayout": "integrated-panel-seams-v1",
       "centerAbsXM": 0.275,
       "centerZM": 1.012,
-      "halfLengthM": 0.035,
-      "halfHeightM": 0.024,
-      "threadRadiusM": 0.001,
-      "surfaceOffsetM": 0.0015,
-      "frontQueryYM": -0.08
+      "halfLengthM": 0.024,
+      "halfHeightM": 0.016,
+      "threadRadiusM": 0.0014,
+      "surfaceOffsetM": 0.0008,
+      "stitchMaterialName": "elbow-seam-muted-lilac-prototype",
+      "stitchColorLinearRgb": [
+        0.52,
+        0.36,
+        0.76
+      ],
+      "stitchRoughness": 0.62,
+      "stitchMetallic": 0.06,
+      "filledPatchEnabled": false,
+      "patchSegmentsPerSide": 8,
+      "frontQueryYM": -0.08,
+      "evidenceBoundary": "V22 increases the surface-bound elbow channel radius and lilac contrast for direct review. Stitch attachment, fabric behavior, fit, appearance, and release remain unverified."
     }
   }
 }

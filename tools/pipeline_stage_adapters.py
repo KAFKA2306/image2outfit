@@ -121,7 +121,11 @@ class CommandStageAdapter(PlannedStageAdapter):
             ROOT,
             product_id=str(state["product_id"]),
             product_workspace_output=self.stage.value
-            in {"build-blender", "finalize-candidate"},
+            in {
+                "build-blender",
+                "skin-and-export",
+                "finalize-candidate",
+            },
         )
         boundary.begin()
         if result_path.exists():

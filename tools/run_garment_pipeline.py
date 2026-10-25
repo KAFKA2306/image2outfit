@@ -4,10 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
+import hashlib
 import json
+import os
 import sys
+import time
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Iterator
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -67,6 +71,26 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--resume-state", type=Path)
+    parser.add_argument(
+        "--reuse-completed-prefix-after-source-change",
+        action="store_true",
+        help=(
+            "Reuse a validated completed checkpoint prefix when the source fingerprint "
+            "changed. Requires an explicit reason and an identity-matching resume state."
+        ),
+    )
+    parser.add_argument(
+        "--source-change-reuse-reason",
+        help="Audited explanation for reusing the completed prefix after source changes.",
+    )
+    parser.add_argument(
+        "--rerun-from-stage",
+        choices=tuple(stage.value for stage in PIPELINE_STAGES),
+        help=(
+            "Invalidate a completed checkpoint suffix and execute again from this "
+            "stage, reusing only the integrity-validated prefix."
+        ),
+    )
     parser.add_argument("--checkpoint-output", type=Path)
     parser.add_argument(
         "--audit-root",
@@ -247,6 +271,8 @@ def _resume_or_reset(
     request: dict[str, Any],
     expected: dict[str, str],
     mode: ExecutionMode,
+    reuse_stale_prefix_reason: str | None = None,
+    rerun_from_stage: str | None = None,
 ) -> dict[str, Any]:
     _validate_persisted_pipeline_state(previous, label="resume state")
     mismatches = _identity_mismatches(previous, expected)
@@ -254,10 +280,93 @@ def _resume_or_reset(
         value for value in mismatches if value != "sourceFingerprint"
     ]
     if non_source_mismatches:
-        _assert_identity(previous, expected)
+        allowed_revision_change = (
+            rerun_from_stage is not None and non_source_mismatches == ["revisionId"]
+        )
+        if not allowed_revision_change:
+            _assert_identity(previous, expected)
+
+    if rerun_from_stage is not None:
+        if mode is not ExecutionMode.EXECUTE:
+            raise ValueError("stage rerun is only valid in execute mode")
+        if reuse_stale_prefix_reason is None:
+            raise ValueError(
+                "stage rerun requires an explicit source-change reuse reason"
+            )
+        if previous.get("status") not in {"EXECUTED", "FAILED"}:
+            raise ValueError("stage rerun requires an executed or failed checkpoint")
+        _validate_resume_integrity(previous)
+        completed = list(previous.get("completed_stages", []))
+        rerun_index = next(
+            (
+                index
+                for index, stage in enumerate(PIPELINE_STAGES)
+                if stage.value == rerun_from_stage
+            ),
+            None,
+        )
+        if rerun_index is None or rerun_index >= len(completed):
+            raise ValueError(
+                "rerun stage must be present in the checkpoint's completed prefix"
+            )
+        prefix = completed[:rerun_index]
+        prefix_outputs = {name: previous.get("outputs", {})[name] for name in prefix}
+        state = _new_state(request, expected, mode)
+        count = int(previous.get("resume_count", 0)) + 1
+        history = list(previous.get("resume_history", []))
+        history.append(
+            {
+                "resume": count,
+                "parent_run_id": str(previous["run_id"]),
+                "previous_status": str(previous.get("status", "")),
+                "next_stage": rerun_from_stage,
+                "completed_stage_count": len(prefix),
+                "reused_completed_stages": prefix,
+                "invalidated_completed_stages": completed[rerun_index:],
+                "previous_revision_id": str(previous.get("revision_id", "")),
+                "current_revision_id": expected["revisionId"],
+                "previous_source_fingerprint": str(
+                    previous.get("source_fingerprint", "")
+                ),
+                "current_source_fingerprint": expected["sourceFingerprint"],
+                "source_change_reuse_reason": reuse_stale_prefix_reason,
+                "integrity_validation": "passed",
+            }
+        )
+        return {
+            **state,
+            "parent_run_id": str(previous["run_id"]),
+            "current_stage": rerun_from_stage,
+            "completed_stages": prefix,
+            "outputs": prefix_outputs,
+            "resume_count": count,
+            "resume_history": history,
+        }
+
     if "sourceFingerprint" not in mismatches:
         _validate_resume_integrity(previous)
         return resume_pipeline_state(previous, execution_mode=mode)
+
+    if reuse_stale_prefix_reason is not None:
+        if mode is not ExecutionMode.EXECUTE:
+            raise ValueError("stale-prefix reuse is only valid in execute mode")
+        if not list(previous.get("completed_stages", [])):
+            raise ValueError(
+                "stale-prefix reuse requires a completed checkpoint prefix"
+            )
+        if previous.get("status") != "FAILED":
+            raise ValueError("stale-prefix reuse requires a failed checkpoint")
+        _validate_resume_integrity(previous)
+        resumed = resume_pipeline_state(previous, execution_mode=mode)
+        resumed["source_fingerprint"] = expected["sourceFingerprint"]
+        resumed["resume_history"][-1]["source_change_reuse"] = {
+            "previous_source_fingerprint": str(previous.get("source_fingerprint", "")),
+            "current_source_fingerprint": expected["sourceFingerprint"],
+            "reused_completed_stages": list(previous.get("completed_stages", [])),
+            "reason": reuse_stale_prefix_reason,
+            "integrity_validation": "passed",
+        }
+        return resumed
 
     state = _new_state(request, expected, mode)
     state["checkpoint_reset"] = {
@@ -297,8 +406,31 @@ def _emit_failure(
     return _emit(args, {"status": "FAILED", "failure": failure})
 
 
-def main() -> int:
+def _main_unlocked() -> int:
     args = parse_args()
+    reuse_completed_prefix = getattr(
+        args, "reuse_completed_prefix_after_source_change", False
+    )
+    reuse_reason = getattr(args, "source_change_reuse_reason", None)
+    if reuse_completed_prefix:
+        if not reuse_reason or not reuse_reason.strip():
+            return _emit_failure(
+                args,
+                error_code="INVALID_RESUME_STATE",
+                phase="resume",
+                exc=ValueError(
+                    "stale-prefix reuse requires --source-change-reuse-reason"
+                ),
+            )
+    elif reuse_reason is not None:
+        return _emit_failure(
+            args,
+            error_code="INVALID_RESUME_STATE",
+            phase="resume",
+            exc=ValueError(
+                "--source-change-reuse-reason requires stale-prefix reuse opt-in"
+            ),
+        )
     try:
         request_path = _repo_path(args.request, label="request")
         request = _read_object(request_path, label="request")
@@ -365,7 +497,14 @@ def main() -> int:
                 label="resume state",
             )
             state = _resume_or_reset(
-                previous, request=request, expected=expected, mode=mode
+                previous,
+                request=request,
+                expected=expected,
+                mode=mode,
+                reuse_stale_prefix_reason=(
+                    reuse_reason if reuse_completed_prefix else None
+                ),
+                rerun_from_stage=getattr(args, "rerun_from_stage", None),
             )
             if state.get("checkpoint_reset"):
                 print(
@@ -467,6 +606,65 @@ def main() -> int:
                 args, error_code="PRODUCT_HANDOFF_FAILED", phase="handoff", exc=exc
             )
     return _emit(args, result)
+
+
+@contextlib.contextmanager
+def _product_pipeline_lock(product_id: str) -> Iterator[None]:
+    """Serialize writers that share a product's runtime and transaction journals."""
+    lock_root = ROOT / ".image2outfit" / "locks"
+    lock_root.mkdir(parents=True, exist_ok=True)
+    lock_name = hashlib.sha256(product_id.encode("utf-8")).hexdigest() + ".lock"
+    descriptor = os.open(lock_root / lock_name, os.O_CREAT | os.O_RDWR, 0o600)
+    locked = False
+    try:
+        if os.name == "nt":
+            import msvcrt
+
+            if os.fstat(descriptor).st_size == 0:
+                os.write(descriptor, b"\0")
+            while not locked:
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                try:
+                    msvcrt.locking(descriptor, msvcrt.LK_NBLCK, 1)
+                    locked = True
+                except OSError:
+                    time.sleep(0.25)
+        else:
+            import fcntl
+
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+            locked = True
+        yield
+    finally:
+        if locked:
+            if os.name == "nt":
+                import msvcrt
+
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+        os.close(descriptor)
+
+
+def main() -> int:
+    args = parse_args()
+    if not args.execute:
+        return _main_unlocked()
+    try:
+        request_path = _repo_path(args.request, label="request")
+        request = _read_object(request_path, label="request")
+        product_id = str(request["productId"])
+        if not product_id:
+            return _main_unlocked()
+    except Exception:
+        # Keep the normal request validator as the sole owner of user-facing
+        # malformed-request diagnostics.
+        return _main_unlocked()
+    with _product_pipeline_lock(product_id):
+        return _main_unlocked()
 
 
 if __name__ == "__main__":

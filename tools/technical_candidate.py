@@ -74,9 +74,22 @@ def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
     ):
         raise ValueError("job does not declare the GarmentCode BoxMesh source")
 
-    state_path = (
-        ROOT / ".image2outfit" / "products" / str(job["id"]) / "pipeline-state.json"
-    )
+    manifest_path_value = job.get("productManifestPath")
+    if not isinstance(manifest_path_value, str) or not manifest_path_value:
+        raise ValueError("job.productManifestPath is required for the sewn mesh")
+    manifest = candidate_contract.read(candidate_contract.path(manifest_path_value))
+    if manifest.get("productId") != job.get("id"):
+        raise ValueError("ProductManifest identity does not match the sewn-mesh job")
+    handoff = manifest.get("handoff")
+    resume_from = handoff.get("resumeFrom") if isinstance(handoff, dict) else None
+    if not isinstance(resume_from, str) or not resume_from:
+        raise ValueError(
+            "ProductManifest.handoff.resumeFrom is required for the sewn mesh"
+        )
+    # The canonical product workline may be versioned (for example,
+    # pipeline-v21d-state.json). Resolve it from ProductManifest instead of
+    # assuming the obsolete pipeline-state.json filename.
+    state_path = candidate_contract.path(resume_from)
     state = candidate_contract.read(state_path)
     if state.get("product_id") != job.get("id") or state.get("status") != "EXECUTED":
         raise ValueError("an executed product checkpoint is required for the sewn mesh")
@@ -127,6 +140,102 @@ def sewn_mesh_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
 
     raise ValueError(
         "checkpoint has no hash-current, topology-valid sewn-mesh exchange"
+    )
+
+
+def pipeline_skin_export_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
+    """Resolve the weighted garment produced by the current canonical pipeline."""
+    manifest_path_value = job.get("productManifestPath")
+    if not isinstance(manifest_path_value, str) or not manifest_path_value:
+        raise ValueError("job.productManifestPath is required for the skin export")
+    manifest = candidate_contract.read(candidate_contract.path(manifest_path_value))
+    if manifest.get("productId") != job.get("id"):
+        raise ValueError("ProductManifest identity does not match the skin export job")
+    handoff = manifest.get("handoff")
+    resume_from = handoff.get("resumeFrom") if isinstance(handoff, dict) else None
+    if not isinstance(resume_from, str) or not resume_from:
+        raise ValueError(
+            "ProductManifest.handoff.resumeFrom is required for the skin export"
+        )
+    state = candidate_contract.read(candidate_contract.path(resume_from))
+    if (
+        state.get("product_id") != job.get("id")
+        or state.get("status") != "EXECUTED"
+        or state.get("revision_id") != job.get("buildRevision")
+    ):
+        raise ValueError(
+            "current executed product checkpoint is required for the skin export"
+        )
+
+    records = state.get("stage_records")
+    skin_record = next(
+        (
+            record
+            for record in reversed(records if isinstance(records, list) else [])
+            if isinstance(record, dict)
+            and record.get("stage") == "skin-and-export"
+            and record.get("status") in {"PASS", "REUSED"}
+        ),
+        None,
+    )
+    if skin_record is None or not isinstance(skin_record.get("evidence"), list):
+        raise ValueError("checkpoint has no successful skin-and-export stage")
+
+    report_item = next(
+        (
+            item
+            for item in skin_record["evidence"]
+            if isinstance(item, dict)
+            and str(item.get("path", "")).endswith("/skin-export-report.json")
+        ),
+        None,
+    )
+    if report_item is None:
+        raise ValueError("skin-and-export stage has no report evidence")
+    report_path = candidate_contract.path(report_item["path"])
+    if not report_path.is_file() or candidate_contract.digest(
+        report_path
+    ) != report_item.get("sha256"):
+        raise ValueError("skin export report is stale against its checkpoint")
+    report = candidate_contract.read(report_path)
+
+    pipeline = job.get("garmentPipeline")
+    if not isinstance(pipeline, dict):
+        raise ValueError("job.garmentPipeline is required for the skin export")
+    weighted_blend = candidate_contract.path(report.get("weightedBlendPath", ""))
+    fbx = candidate_contract.path(job["fbxAssetPath"])
+    expected_construction = candidate_contract.digest(
+        candidate_contract.path(pipeline["constructionPath"])
+    )
+    expected_target = candidate_contract.digest(
+        candidate_contract.path(job["targetSourcePath"])
+    )
+    audits = report.get("audits")
+    if (
+        report.get("productId") != job.get("id")
+        or report.get("executionStatus") != "PASS"
+        or report.get("constructionSha256") != expected_construction
+        or report.get("targetSourceSha256") != expected_target
+        or not weighted_blend.is_file()
+        or candidate_contract.digest(weighted_blend)
+        != report.get("weightedBlendSha256")
+        or not fbx.is_file()
+        or candidate_contract.digest(fbx) != report.get("fbxSha256")
+        or report.get("unweightedVertices") != 0
+        or not isinstance(audits, dict)
+        or not audits
+        or any(
+            not isinstance(audit, dict) or audit.get("passed") is not True
+            for audit in audits.values()
+        )
+    ):
+        raise ValueError(
+            "skin export is stale, unweighted, or bound to different inputs"
+        )
+    return (
+        weighted_blend,
+        str(report.get("weightedBlendSha256")),
+        int(skin_record.get("sequence", 0)),
     )
 
 
@@ -466,6 +575,7 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
         stages["blenderStructure"] = {"passed": False, "error": "not run"}
         prepared = None
 
+    candidate_blend_path = candidate_contract.path(job["blendPath"])
     if prepared is None:
         build_exit = None
         stages["sewnMeshInput"] = {
@@ -478,34 +588,31 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
         if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
             try:
                 mesh_path, mesh_sha256, source_sequence = sewn_mesh_exchange(job)
+                candidate_blend_path, weighted_sha256, skin_sequence = (
+                    pipeline_skin_export_exchange(job)
+                )
             except (OSError, KeyError, TypeError, ValueError) as exc:
                 stages["sewnMeshInput"] = {"passed": False, "error": str(exc)}
+                stages["blenderBuild"] = {
+                    "passed": False,
+                    "error": f"not run because sewn-mesh input failed: {exc}",
+                }
                 build_exit = None
             else:
-                build_environment["IMAGE2OUTFIT_SEWN_MESH_PATH"] = str(mesh_path)
                 stages["sewnMeshInput"] = {
                     "passed": True,
                     "path": candidate_contract.rel(mesh_path),
                     "sha256": mesh_sha256,
                     "pipelineStageSequence": source_sequence,
                 }
-                build_exit = run_command(
-                    [
-                        *prepared.command_prefix,
-                        "--background",
-                        "--python-exit-code",
-                        "1",
-                        "--python",
-                        str(ROOT / "tools" / "render_evidence_bootstrap.py"),
-                        "--python",
-                        str(candidate_contract.path(job["buildScript"])),
-                        "--",
-                        "--job",
-                        str(job_path),
-                    ],
-                    artifact / "blender-build.log",
-                    build_environment,
-                )
+                stages["blenderBuild"] = {
+                    "passed": True,
+                    "status": "REUSED_PIPELINE_SKIN_EXPORT",
+                    "weightedBlendPath": candidate_contract.rel(candidate_blend_path),
+                    "weightedBlendSha256": weighted_sha256,
+                    "pipelineStageSequence": skin_sequence,
+                }
+                build_exit = 0
         else:
             stages["sewnMeshInput"] = {"passed": True, "status": "NOT_REQUIRED"}
             build_exit = run_command(
@@ -525,14 +632,24 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
                 artifact / "blender-build.log",
                 build_environment,
             )
-    stages["blenderBuild"] = {
-        "passed": prepared is not None
-        and stages["sewnMeshInput"].get("passed") is True
-        and build_exit == 0
-        and candidate_contract.path(job["blendPath"]).is_file()
-        and candidate_contract.path(job["fbxAssetPath"]).is_file(),
-        "exitCode": build_exit,
-    }
+    if job.get("garmentPipeline", {}).get("meshSource") != "garmentcode-boxmesh":
+        stages["blenderBuild"] = {
+            "passed": prepared is not None
+            and stages["sewnMeshInput"].get("passed") is True
+            and build_exit == 0
+            and candidate_contract.path(job["blendPath"]).is_file()
+            and candidate_contract.path(job["fbxAssetPath"]).is_file(),
+            "exitCode": build_exit,
+        }
+    elif stages.get("blenderBuild", {}).get("passed") is True:
+        stages["blenderBuild"]["editableSourceExists"] = candidate_blend_path.is_file()
+        stages["blenderBuild"]["fbxExists"] = candidate_contract.path(
+            job["fbxAssetPath"]
+        ).is_file()
+        stages["blenderBuild"]["passed"] = (
+            stages["blenderBuild"]["editableSourceExists"]
+            and stages["blenderBuild"]["fbxExists"]
+        )
 
     if stages["blenderBuild"]["passed"]:
         stages["hostedPose"] = run_hosted_pose_render(
@@ -550,7 +667,7 @@ def run_candidate(job_path: Path, job: dict[str, Any], policy: dict[str, Any]) -
             [
                 *prepared.command_prefix,
                 "--background",
-                str(candidate_contract.path(job["blendPath"])),
+                str(candidate_blend_path),
                 "--python-exit-code",
                 "1",
                 "--python",

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "SiroinoSotai v1.0 PC; pattern dimensions, ease, shape-key fit, and motion are unverified.",
-  "designRevision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
+  "target": "V41 packs the source-authored pattern-space UV islands with one shared scale, fixed gutters, and no island rotation so pattern proportions and grain direction stay consistent while the atlas becomes readable. No UVs are generated for unmapped objects. Keep all fit, motion, visual, topology, and release gates independent.",
+  "designRevision": "v59-lower-apron-coverage-onset-20261025",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -12,15 +12,23 @@
     "jacket-sleeve-left",
     "jacket-sleeve-right",
     "stand-collar",
-    "overskirt-front",
-    "overskirt-back",
     "shorts-front-left",
     "shorts-front-right",
     "shorts-back-left",
     "shorts-back-right",
     "jacket-elbow-quilt-overlay",
-    "waistband-front",
-    "waistband-back"
+    "overskirt-front-left",
+    "overskirt-front-right",
+    "overskirt-back-left",
+    "overskirt-back-right",
+    "waistband-front-left",
+    "waistband-front-right",
+    "waistband-back-left",
+    "waistband-back-right",
+    "overskirt-front-lap-left",
+    "overskirt-front-lap-right",
+    "waistband-front-lap-left",
+    "waistband-front-lap-right"
   ],
   "requiredPatternComponents": [
     {
@@ -41,10 +49,18 @@
       "componentId": "pleated-overskirt",
       "partId": "short-pleated-overskirt",
       "requiredPieceIds": [
-        "overskirt-front",
-        "overskirt-back",
-        "waistband-front",
-        "waistband-back"
+        "overskirt-front-left",
+        "overskirt-front-right",
+        "overskirt-back-left",
+        "overskirt-back-right",
+        "waistband-front-left",
+        "waistband-front-right",
+        "waistband-back-left",
+        "waistband-back-right",
+        "overskirt-front-lap-left",
+        "overskirt-front-lap-right",
+        "waistband-front-lap-left",
+        "waistband-front-lap-right"
       ],
       "reason": "Directly observed as a short pleated layer over fitted shorts; pleat count, panelization, and attachment remain hypotheses."
     },
@@ -97,7 +113,7 @@
     "sourceAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
     "evidenceBoundary": "Neutral and repository-defined Large body cross-sections only. Reuse is bound to the same byte-identical SiroinoSotai PC FBX; waistline selection, garment ease, collar circumference, shape-key coverage, fit, and motion remain unapproved."
   },
-  "releaseBoundary": "3D prototypes require prototypeReadiness. Rendered visualAppearanceReview, fit, runtime, and customer release evidence remain unverified and mandatory before release.",
+  "releaseBoundary": "Prototype geometry only. Rendered visualAppearanceReview, fit, runtime, and customer release evidence remain unverified and mandatory before release.",
   "clothSimulation": {
     "applicability": "REQUIRED",
     "components": [
@@ -110,19 +126,35 @@
         "jacket-sleeve-right"
       ],
       "pleated-overskirt": [
-        "overskirt-front",
-        "overskirt-back"
+        "overskirt-front-left",
+        "overskirt-front-right",
+        "overskirt-back-left",
+        "overskirt-back-right",
+        "overskirt-front-lap-left",
+        "overskirt-front-lap-right"
       ]
     },
-    "prototypeFrameEnd": 16,
-    "evidence": "Bounded neutral cloth experiment on canonical sewn panels; fit and motion acceptance remain unverified.",
+    "prototypeFrameEnd": 48,
+    "evidence": "V18 reruns the bounded neutral cloth trial on the newly revised sewn panels; fit, shape-key response, motion, and material calibration remain unverified.",
     "reason": "The shorts now use a provisional segmented thigh and crotch-rise outline; bending evidence is remeasured for the current pattern, target and assembly pose. Fit, gusset, Shape Key and motion acceptance remain open.",
-    "prototypeComponentBending": {
+    "prototypeComponentBendingHypotheses": {
+      "jacket-sleeves": {
+        "stiffness": 2.2,
+        "reason": "Direct review shows excessive sleeve wrinkling in the neutral render. Compare a structured sleeve cloth setting with the existing 0.45 baseline; 2.2 is a local prototype trial value, not a Lilac fabric calibration.",
+        "evidenceBoundary": "One neutral 48-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness."
+      },
       "pleated-overskirt": {
-        "stiffness": 20,
-        "evidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-bending-fb785348c03ef0a1.json",
-        "evidenceSha256": "fb785348c03ef0a117e723f837c3a07bc0999557bfbcbfdb6c1c74052732d920",
-        "evidenceBoundary": "Pattern-bound native Blender 4.4.3, 16-frame isolated overskirt bending comparison at stiffness 20 for the current shaped-shorts pattern and measured Neutral contour anchors. Diagnostic geometry only; no fit, pose, or visual acceptance."
+        "stiffness": 10,
+        "reason": "V13 at stiffness 20 retained a broad fan and V14 at stiffness 4 collapsed into coarse uneven facets. Compare a middle stiffness value on the panel-local fold geometry; this is a local prototype hypothesis, not fabric calibration, fit, or appearance approval.",
+        "evidenceBoundary": "V25 changes only the authored pleat displacement field and its valley profile while preserving the V24 sewn panels and weights. The single regenerated mesh and cloth result require direct pose and appearance inspection; they do not establish fit, motion, fabric calibration, or release acceptance."
+      }
+    },
+    "prototypePostBakeLaplacianSmoothing": {
+      "jacket-sleeves": {
+        "iterations": 3,
+        "factor": 0.18,
+        "reason": "Direct neutral and pose renders still show physical sleeve corrugation after the bounded cloth solve. Compare a low-strength interior-only fairing pass while locking all open garment boundaries and sewn pins.",
+        "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.18 on non-boundary sleeve vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes are recorded by this run. This is a geometry hypothesis only; it does not establish fit, fold quality, motion, appearance approval, or release readiness."
       }
     }
   },
@@ -140,17 +172,20 @@
   "prototypeWeightRegions": [
     {
       "pieceIds": [
-        "overskirt-front",
-        "overskirt-back",
-        "shorts-front-left",
-        "shorts-front-right",
-        "shorts-back-left",
-        "shorts-back-right",
-        "waistband-front",
-        "waistband-back"
+        "back-waist-adjustment-tab",
+        "overskirt-front-left",
+        "overskirt-front-right",
+        "overskirt-back-left",
+        "overskirt-back-right",
+        "waistband-front-left",
+        "waistband-front-right",
+        "waistband-back-left",
+        "waistband-back-right",
+        "overskirt-front-lap-left",
+        "overskirt-front-lap-right"
       ],
       "bodyTriangleZM": [
-        0.45,
+        0.32,
         0.87
       ],
       "excludedBoneNamePrefixes": [
@@ -160,21 +195,67 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "Explicit provisional pelvis/leg surface window in rest coordinates. Prevent arm/hand nearest-surface transfer to displaced lower garment panels; no approved fit or runtime motion.",
+      "evidenceBoundary": "One profile remains shared across connected overskirt panels so sewn front/lap seam vertices receive a continuous field. V45 restores the prior 0/0.72 hip-to-lateral-thigh profile after the V44 weight trial increased the sit residual; the 0.75 maximum-thigh cap and all geometry gates remain unchanged. This uncalibrated prototype does not establish fit, motion, collision, or appearance acceptance.",
       "weightProfile": {
-        "method": "hip-anchored-lateral-thigh-fade-v1",
+        "method": "panel-balanced-hem-thigh-follow-v5",
         "pieceIds": [
-          "overskirt-front",
-          "overskirt-back"
+          "overskirt-front-left",
+          "overskirt-front-right",
+          "overskirt-back-left",
+          "overskirt-back-right",
+          "overskirt-front-lap-left",
+          "overskirt-front-lap-right"
         ],
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
-        "waistThighWeight": 0.15,
-        "hemThighWeight": 0.65,
-        "centerlineHalfWidthM": 0.02,
-        "fullSideWeightWidthM": 0.06,
-        "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh: current side hem vertices average 0.963 ipsilateral thigh weight, while 67 centerline hem vertices average 0.970 combined thigh weight and 0.030 Hips. Fade centerline influence to Hips and cap lateral hem thigh influence at 0.65; retain 0.15 thigh weight at the waistband. Intended to reduce opposing thigh pull and raised/curling flaps; no pose, fit, penetration or runtime acceptance is granted."
+        "waistThighWeight": 0,
+        "hemThighWeight": 0.72,
+        "forwardHemThighWeight": 0.12,
+        "centerlineHemThighWeight": 0.12,
+        "maximumThighWeight": 0.75,
+        "forwardCenterYM": -0.03788188099861145,
+        "forwardFadeDistanceM": 0.14,
+        "centerlineHalfWidthM": 0.075,
+        "fullSideWeightWidthM": 0.135,
+        "evidenceBoundary": "Continuous connected-panel v5 method with 0.12 anterior and centerline targets, fading over the existing 140 mm forward range and authored vertical/lateral fields; the restored 0/0.72 hip-to-thigh profile is a prototype hypothesis, not fit, pose, collision, or appearance acceptance."
+      }
+    },
+    {
+      "pieceIds": [
+        "shorts-front-left",
+        "shorts-front-right",
+        "shorts-back-left",
+        "shorts-back-right"
+      ],
+      "bodyTriangleZM": [
+        0.32,
+        0.87
+      ],
+      "excludedBoneNamePrefixes": [
+        "UpperArm",
+        "LowerArm",
+        "Hand",
+        "Finger",
+        "Shoulder"
+      ],
+      "evidenceBoundary": "V42 separates shorts from the shared overskirt weight region and applies an explicit pelvis-to-thigh follow profile to the fitted shorts. The increased lower-leg follow is a deformation hypothesis to reduce sitting/crouch volume artifacts; weight, fit, collision and appearance remain unaccepted.",
+      "weightProfile": {
+        "method": "hip-anchored-lateral-thigh-fade-v1",
+        "pieceIds": [
+          "shorts-front-left",
+          "shorts-front-right",
+          "shorts-back-left",
+          "shorts-back-right"
+        ],
+        "hipBone": "Hips",
+        "leftThighBone": "UpperLeg_L",
+        "rightThighBone": "UpperLeg_R",
+        "waistThighWeight": 0.12,
+        "hemThighWeight": 0.82,
+        "centerlineHalfWidthM": 0.075,
+        "fullSideWeightWidthM": 0.135,
+        "evidenceBoundary": "V43 prototype trial: shorts weight transitions from 12% thigh near waistband to 82% at the lower hem, while centerline areas remain pelvis-led and left/right lateral panels follow their corresponding thigh. The lower hem follow is moderated from V42 after fresh skin solving showed the 90% trial left an apron residual outside the unchanged bound. No deformation, fit or appearance pass is implied."
       }
     }
   ]

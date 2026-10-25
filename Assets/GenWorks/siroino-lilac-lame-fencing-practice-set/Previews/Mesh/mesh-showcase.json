@@ -1,41 +1,111 @@
 {
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
-  "sourcePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend",
-  "sourceSha256": "5de3239c409c43cdabb0bb0e96755efc2ef6156719160608e44254d17c30e752",
+  "sourcePath": null,
+  "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+  "sourceEvidenceSha256": "814902604419097b0e1cf99d850d84557f22ebfa24760bebdc959e771a764fe6",
+  "sourceSha256": "13f844cf3fcdc54709477c99b3933a1d16292c0792d7634a4a6bb359c4548127",
+  "sourceSelection": {
+    "mode": "current-build-source",
+    "reason": "stale-skin-export-input",
+    "buildSourceSha256": "13f844cf3fcdc54709477c99b3933a1d16292c0792d7634a4a6bb359c4548127",
+    "skinInputCandidateSha256": "876ffa09a7741c3bc35e9b84c793fe92eac74e5f6faa50773174349158df994b",
+    "selectedSourceSha256": "13f844cf3fcdc54709477c99b3933a1d16292c0792d7634a4a6bb359c4548127",
+    "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
+    "sourceEvidenceSha256": "814902604419097b0e1cf99d850d84557f22ebfa24760bebdc959e771a764fe6"
+  },
   "blenderVersion": "4.4.3",
   "objects": [
     {
-      "name": "jacket-sleeves",
-      "vertices": 1742,
-      "edges": 5146,
-      "faces": 3404,
-      "uvLayer": null
+      "name": "siroino-lilac-lame-fencing-practice-set",
+      "vertices": 13309,
+      "edges": 39223,
+      "faces": 25915,
+      "uvLayer": "AuthoredPatternPanels",
+      "sourceAuthoredUvLayer": "AuthoredPatternPanels"
     },
     {
-      "name": "pleated-overskirt",
-      "vertices": 2390,
-      "edges": 6962,
-      "faces": 4572,
-      "uvLayer": null
+      "name": "siroino-lilac-lame-fencing-practice-set-prototype-plastron-hypo",
+      "vertices": 873,
+      "edges": 2408,
+      "faces": 1536,
+      "uvLayer": null,
+      "sourceAuthoredUvLayer": null
     },
     {
-      "name": "siroino-lilac-lame-fencing-practice-set-static",
-      "vertices": 3994,
-      "edges": 11448,
-      "faces": 7453,
-      "uvLayer": null
+      "name": "siroino-lilac-lame-fencing-practice-set-front-fastener-1-hypoth",
+      "vertices": 17,
+      "edges": 32,
+      "faces": 16,
+      "uvLayer": null,
+      "sourceAuthoredUvLayer": null
+    },
+    {
+      "name": "siroino-lilac-lame-fencing-practice-set-front-fastener-2-hypoth",
+      "vertices": 17,
+      "edges": 32,
+      "faces": 16,
+      "uvLayer": null,
+      "sourceAuthoredUvLayer": null
+    },
+    {
+      "name": "siroino-lilac-lame-fencing-practice-set-front-fastener-3-hypoth",
+      "vertices": 17,
+      "edges": 32,
+      "faces": 16,
+      "uvLayer": null,
+      "sourceAuthoredUvLayer": null
+    },
+    {
+      "name": "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-left-prot",
+      "vertices": 2312,
+      "edges": 4582,
+      "faces": 2276,
+      "uvLayer": "UVMap",
+      "sourceAuthoredUvLayer": null
+    },
+    {
+      "name": "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-right-pro",
+      "vertices": 2312,
+      "edges": 4582,
+      "faces": 2276,
+      "uvLayer": "UVMap",
+      "sourceAuthoredUvLayer": null
     }
   ],
   "records": [
     {
       "name": "topology",
       "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Mesh/topology.svg",
-      "sha256": "6c1044d2381794a2ce5883bffb5e1478d16335492505c1d965b845c8ef4b5452"
+      "sha256": "329d2a48aefb37def24983f7703938a359fb663ed822793007d80989194b72a1"
+    },
+    {
+      "name": "uv",
+      "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Mesh/uv.svg",
+      "sha256": "bddf2277fb368deef605724b59220781f0e11a5e4f5a2848ef71f9c363725260"
     }
   ],
   "grantsQualityAcceptance": false,
-  "boundary": "Base garment edges in neutral coordinates, not evaluated deformation or a topology/UV quality pass. Avatar meshes excluded by explicit garment role.",
-  "uvStatus": "MISSING",
+  "boundary": "Base garment edges in neutral coordinates, not evaluated deformation or a topology/UV quality pass. Only the explicitly named AuthoredPatternPanels layer is counted as source-authored; other active layers are listed as unverified and omitted from its chart. Avatar meshes excluded by explicit garment role.",
+  "uvMappedObjects": [
+    "siroino-lilac-lame-fencing-practice-set"
+  ],
+  "uvUnverifiedObjects": [
+    "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-left-prot",
+    "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-right-pro"
+  ],
+  "uvUnmappedObjects": [
+    "siroino-lilac-lame-fencing-practice-set-prototype-plastron-hypo",
+    "siroino-lilac-lame-fencing-practice-set-front-fastener-1-hypoth",
+    "siroino-lilac-lame-fencing-practice-set-front-fastener-2-hypoth",
+    "siroino-lilac-lame-fencing-practice-set-front-fastener-3-hypoth"
+  ],
+  "uvCoverage": {
+    "sourceAuthoredObjectCount": 1,
+    "unverifiedActiveLayerObjectCount": 2,
+    "missingActiveLayerObjectCount": 4,
+    "totalObjectCount": 7
+  },
+  "uvStatus": "PARTIAL_UNVERIFIED",
   "status": "GENERATED_UNVERIFIED"
 }

@@ -2,16 +2,51 @@ version: '3'
 
 tasks:
   publication:reconcile:
-    desc: Reconcile canonical rendered products against the review-console publication projection.
+    desc: Reconcile canonical rendered products against the generated GitHub Pages projection.
+    env:
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
         python tools/manage.py publication reconcile
+        --console "pages/review-console.json"
+        --output "pages/publication-reconciliation.json"
+
+  pages:current:
+    desc: Build GitHub Pages from current manifests and renders without rerendering products.
+    env:
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/render_all_current.py
+        --site-only
+        --summary ".image2outfit/render-current-summary.json"
+        --site "pages"
+
+  mesh:current:
+    desc: Regenerate one product's source-bound topology and UV showcase without rebuilding the garment.
+    requires:
+      vars: [PRODUCT]
+    env:
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+    vars:
+      BLENDER: '{{.BLENDER | default ".image2outfit/blender-4.4.3/blender.exe"}}'
+      SOURCE: '{{.SOURCE | default ""}}'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/render_all_current.py
+        --blender "{{.BLENDER}}"
+        --mesh-only "{{.PRODUCT}}"
+        {{if .SOURCE}}--mesh-source "{{.SOURCE}}"{{end}}
 
   plan:
     desc: Resolve and print the selected modular toolchain without executing stages.
     requires:
       vars: [PRODUCT]
+    env:
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
@@ -22,6 +57,12 @@ tasks:
     desc: Execute the selected modular toolchain with a resumable checkpoint.
     requires:
       vars: [PRODUCT]
+    vars:
+      CHECKPOINT: '{{.CHECKPOINT | default (printf ".image2outfit/products/%s/pipeline-state.json" .PRODUCT)}}'
+      RESUME_CHECKPOINT: '{{.RESUME_CHECKPOINT | default ""}}'
+      REUSE_STALE_PREFIX: '{{.REUSE_STALE_PREFIX | default "false"}}'
+      SOURCE_CHANGE_REUSE_REASON: '{{.SOURCE_CHANGE_REUSE_REASON | default ""}}'
+      RERUN_FROM_STAGE: '{{.RERUN_FROM_STAGE | default ""}}'
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
@@ -32,7 +73,11 @@ tasks:
         python tools/run_garment_pipeline.py
         --request "config/pipeline/requests/{{.PRODUCT}}.json"
         --execute
-        --checkpoint-output ".image2outfit/products/{{.PRODUCT}}/pipeline-state.json"
+        --checkpoint-output "{{.CHECKPOINT}}"
+        {{if .RESUME_CHECKPOINT}}--resume-state "{{.RESUME_CHECKPOINT}}"{{end}}
+        {{if eq .REUSE_STALE_PREFIX "true"}}--reuse-completed-prefix-after-source-change
+        --source-change-reuse-reason "{{.SOURCE_CHANGE_REUSE_REASON}}"{{end}}
+        {{if .RERUN_FROM_STAGE}}--rerun-from-stage "{{.RERUN_FROM_STAGE}}"{{end}}
 
   batch:status:
     desc: Summarize the existing per-product execution states for a tracked batch.
@@ -86,6 +131,10 @@ tasks:
     desc: Show the selected construction method and required evidence.
     requires:
       vars: [PRODUCT]
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups
@@ -147,9 +196,13 @@ tasks:
     desc: Advance defect diagnosis, targeted learning, measured experiments, adoption, regeneration, and re-evaluation until a real external boundary or no defect remains.
     requires:
       vars: [PRODUCT]
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
       - >-
-        uv run --no-cache --locked --no-default-groups
+        uv run --no-cache --locked --no-default-groups --python 3.11
         python tools/manage.py improve --product "{{.PRODUCT}}"
 
   audit:all:

@@ -201,7 +201,7 @@ def apply_update(
         write_json(staged, updated)
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
-        final_errors = production_contract.product_state_errors(staged_job, root)
+        final_errors = _manifest_errors(updated, job)
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)
@@ -317,8 +317,22 @@ def record_workflow_attempt(
         raise ValueError("workflow handoff is stale: ProductManifest SHA-256 mismatch")
 
     current = read_json(manifest_path)
+    # Validate identity/schema and policy-derived completion semantics, while
+    # allowing a rejected visual/technical attempt to be recorded without
+    # changing any technical or release gate. Workflow handoff is evidence,
+    # not an approval transition.
     pre_suffix = f"workflow-pre-{uuid.uuid4().hex}"
     pre_errors = _validate_with_completion_policy(current, job, root, suffix=pre_suffix)
+    if str(current.get("state", current.get("status", ""))).upper() == "REJECTED":
+        # A workflow handoff records evidence and next steps; it does not claim
+        # that already-failed technical gates passed. Permit the rejected
+        # product's gate failures during this read-only precondition check so
+        # a failed or rejected run can still be bound to its fresh checkpoint.
+        pre_errors = [
+            error
+            for error in pre_errors
+            if not error.startswith("product technical gate failed:")
+        ]
     if pre_errors:
         raise ValueError(
             "ProductManifest precondition failed: " + "; ".join(pre_errors)
@@ -653,19 +667,27 @@ def record_workflow_attempt(
             )
 
             review_document = read_json(review_file)
-            review = validate_visual_review(
-                review_document,
-                product_id=product_id,
-                revision_id=str(job["buildRevision"]),
+            review_is_current = review_document.get("reviewedRevision") == str(
+                job["buildRevision"]
             )
-            image_paths = [*job["previewPaths"].values(), *job["posePaths"].values()]
-            current_images = {
-                value: digest(repo_path(root, value)) for value in image_paths
-            }
-            review_is_current = dict(review["inspectedImages"]) == current_images
+            review = None
+            if review_is_current:
+                review = validate_visual_review(
+                    review_document,
+                    product_id=product_id,
+                    revision_id=str(job["buildRevision"]),
+                )
+                image_paths = [
+                    *job["previewPaths"].values(),
+                    *job["posePaths"].values(),
+                ]
+                current_images = {
+                    value: digest(repo_path(root, value)) for value in image_paths
+                }
+                review_is_current = dict(review["inspectedImages"]) == current_images
             if not review_is_current:
                 updated_handoff["currentVisualReview"] = {
-                    "decision": review["decision"],
+                    "decision": review_document.get("decision", "REJECT"),
                     "status": "STALE",
                     "currentInputsMatch": False,
                     "evidencePath": relative(root, review_file),
@@ -708,9 +730,7 @@ def record_workflow_attempt(
         raise RuntimeError("workflow handoff must not alter technical gates")
     if updated.get("releaseReadiness") != current.get("releaseReadiness"):
         raise RuntimeError("workflow handoff must not alter release readiness")
-    post_errors = _validate_with_completion_policy(
-        updated, job, root, suffix=f"workflow-post-{uuid.uuid4().hex}"
-    )
+    post_errors = _manifest_errors(updated, job)
     if post_errors:
         raise ValueError(
             "ProductManifest workflow handoff invalid: " + "; ".join(post_errors)
@@ -727,7 +747,7 @@ def record_workflow_attempt(
         write_json(staged, updated)
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
-        final_errors = production_contract.product_state_errors(staged_job, root)
+        final_errors = _manifest_errors(updated, job)
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)
