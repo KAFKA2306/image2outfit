@@ -42,5 +42,59 @@ class BlenderPythonEnvironmentTest(unittest.TestCase):
             blender_python_env.bundled_python(directory, "3.11.11")
 
 
+    def test_prepare_installs_locked_transitive_dependencies(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "config").mkdir()
+            (root / "pyproject.toml").write_text(
+                '[project]\ndependencies = ["jsonschema==4.26.0", "Pillow==12.3.0"]\n',
+                encoding="utf-8",
+            )
+            (root / "uv.lock").write_text("locked dependency graph", encoding="utf-8")
+            (root / "config" / "toolchain-lock.json").write_text(
+                '{"blender":{"version":"4.4.3","python":{"version":"3.11.11",'
+                '"dependencyGroup":"project","packages":{"jsonschema":'
+                '{"version":"4.26.0","importName":"jsonschema"},'
+                '"Pillow":{"version":"12.3.0","importName":"PIL"}}}}}',
+                encoding="utf-8",
+            )
+            runtime = {
+                "blenderVersion": "4.4.3",
+                "pythonVersion": "3.11.11",
+                "pythonPrefix": directory,
+            }
+            with (
+                patch.object(blender_python_env, "probe_runtime", return_value=runtime),
+                patch.object(
+                    blender_python_env,
+                    "bundled_python",
+                    return_value=root / "python",
+                ),
+                patch.object(
+                    blender_python_env,
+                    "_verify_packages",
+                    return_value={"jsonschema": "4.26.0", "Pillow": "12.3.0"},
+                ),
+                patch.object(blender_python_env.shutil, "which", return_value="uv"),
+                patch.object(blender_python_env, "_run") as run,
+            ):
+                blender_python_env.prepare("blender", root=root)
+            commands = [call.args[0] for call in run.call_args_list]
+            export, install = commands
+            self.assertEqual(export[:3], ["uv", "export", "--frozen"])
+            self.assertIn("--no-default-groups", export)
+            self.assertIn("--no-emit-project", export)
+            self.assertIn("--require-hashes", install)
+            self.assertIn("--no-deps", install)
+            self.assertEqual(install[install.index("-r") + 1], export[-1])
+            self.assertNotIn("jsonschema==4.26.0", install)
+            stamp = blender_python_env.read_json(
+                root / ".image2outfit" / "blender-python"
+                / "image2outfit-environment.json"
+            )
+            self.assertEqual(
+                stamp["uvLockSha256"], blender_python_env.sha256(root / "uv.lock")
+            )
+
 if __name__ == "__main__":
     unittest.main()
