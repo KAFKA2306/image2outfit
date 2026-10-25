@@ -254,6 +254,24 @@ class PipelineSourceFingerprintTests(unittest.TestCase):
         self.assertEqual(state["resume_count"], 1)
         self.assertNotIn("checkpoint_reset", state)
 
+    def test_second_resume_does_not_report_an_old_source_reset(self) -> None:
+        expected = expected_identity()
+        previous = pipeline_state(source_fingerprint=expected["sourceFingerprint"])
+        previous["checkpoint_reset"] = {
+            "reason": "source-fingerprint-changed",
+            "previousRunId": "older-run",
+            "previousSourceFingerprint": "old-source",
+            "sourceFingerprint": expected["sourceFingerprint"],
+        }
+        resumed = _resume_or_reset(
+            previous,
+            request={},
+            expected=expected,
+            mode=ExecutionMode.PLAN,
+        )
+        self.assertEqual(resumed["parent_run_id"], "previous-run")
+        self.assertNotIn("checkpoint_reset", resumed)
+
     def test_non_source_identity_mismatch_is_rejected(self) -> None:
         expected = expected_identity()
         previous = pipeline_state(source_fingerprint=expected["sourceFingerprint"])
