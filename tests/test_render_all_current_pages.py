@@ -247,6 +247,28 @@ class IoPagesGalleryTests(unittest.TestCase):
             self.assertIn("restored previous render evidence", result["detail"])
             self.assertTrue((previews / "front.png").is_file())
 
+    def test_run_logged_emits_heartbeat_for_long_running_child(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            process = mock.MagicMock()
+            process.__enter__.return_value = process
+            process.wait.side_effect = [
+                MODULE.subprocess.TimeoutExpired(["python"], 120),
+                0,
+            ]
+            with (
+                mock.patch.object(MODULE.subprocess, "Popen", return_value=process),
+                mock.patch("builtins.print") as report,
+            ):
+                code = MODULE.run_logged(
+                    ["python", "-c", "print('private subprocess output')"],
+                    Path(temp_dir) / "render.log",
+                    {},
+                )
+            self.assertEqual(code, 0)
+            self.assertEqual(process.wait.call_count, 2)
+            self.assertIn("still running", report.call_args.args[0])
+            self.assertNotIn("private subprocess output", report.call_args.args[0])
+
     def test_pages_workflow_requires_webp_for_every_canonical_product(self) -> None:
         workflow = (
             ROOT / ".github" / "workflows" / "render-all-current.yml"
