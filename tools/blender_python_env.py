@@ -207,6 +207,7 @@ def prepare(
         "blenderVersion": expected_blender,
         "pythonVersion": expected_python,
         "requirementsSha256": requirements_sha,
+        "uvLockSha256": sha256(root / "uv.lock"),
     }
     try:
         stamp = read_json(stamp_path)
@@ -221,6 +222,23 @@ def prepare(
         if not uv:
             raise FileNotFoundError("uv is required to restore Blender Python packages")
         python_executable = bundled_python(runtime["pythonPrefix"], expected_python)
+        # Export the complete pinned dependency graph, not just direct requirements.
+        # jsonschema imports attrs, referencing and rpds-py at runtime.
+        requirements_path = dependency_target / "blender-requirements.txt"
+        _run(
+            [
+                uv,
+                "export",
+                "--frozen",
+                "--no-default-groups",
+                "--no-dev",
+                "--no-emit-project",
+                "--format",
+                "requirements.txt",
+                "--output-file",
+                str(requirements_path),
+            ]
+        )
         _run(
             [
                 uv,
@@ -233,7 +251,9 @@ def prepare(
                 "--only-binary",
                 ":all:",
                 "--no-deps",
-                *requirements,
+                "--require-hashes",
+                "-r",
+                str(requirements_path),
             ]
         )
 
