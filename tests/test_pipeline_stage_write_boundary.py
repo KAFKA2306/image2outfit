@@ -95,6 +95,59 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
                 [".image2outfit/products/test-garment/evidence.txt"],
             )
 
+    def test_skin_export_writes_declared_asset_in_own_product_workspace(self) -> None:
+        with self._repo() as name:
+            root = Path(name)
+            script = root / "skin_export.py"
+            script.write_text(
+                textwrap.dedent(
+                    """
+                    import hashlib
+                    import json
+                    from pathlib import Path
+
+                    root = Path.cwd()
+                    asset = root / "Assets/GenWorks/test-garment/Models/outfit.fbx"
+                    asset.parent.mkdir(parents=True, exist_ok=True)
+                    asset.write_bytes(b"fbx fixture")
+                    result = root / ".image2outfit/results/skin.json"
+                    result.parent.mkdir(parents=True, exist_ok=True)
+                    result.write_text(json.dumps({
+                        "schemaVersion": 1,
+                        "stage": "skin-and-export",
+                        "productId": "test-garment",
+                        "status": "PASS",
+                        "evidence": [{
+                            "path": "Assets/GenWorks/test-garment/Models/outfit.fbx",
+                            "sha256": hashlib.sha256(asset.read_bytes()).hexdigest(),
+                        }],
+                    }), encoding="utf-8")
+                    """
+                ),
+                encoding="utf-8",
+            )
+            adapter = CommandStageAdapter(
+                stage=PipelineStage.SKIN_AND_EXPORT,
+                tool_name="fixture-skin-export",
+                purpose="fixture",
+                command=(sys.executable, str(script)),
+                result_path=".image2outfit/results/skin.json",
+                execute=True,
+                required_in_execute=True,
+                result_requirement=StageResultRequirement(minimum_evidence_count=1),
+            )
+            with patch("pipeline_stage_adapters.ROOT", root):
+                result = adapter({"product_id": "test-garment"})
+            self.assertEqual(result["mode"], "executed")
+            self.assertEqual(
+                result["changedPaths"],
+                ["Assets/GenWorks/test-garment/Models/outfit.fbx"],
+            )
+            self.assertEqual(
+                (root / "Assets/GenWorks/test-garment/Models/outfit.fbx").read_bytes(),
+                b"fbx fixture",
+            )
+
     def test_tracked_undeclared_write_fails_and_rolls_back(self) -> None:
         with self._repo() as name:
             root = Path(name)
