@@ -204,6 +204,7 @@ def resume_pipeline_state(
         }
     )
     current.pop("audit", None)
+    current.pop("checkpoint_reset", None)
     return {
         **current,
         "run_id": new_run,
