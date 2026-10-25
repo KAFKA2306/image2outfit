@@ -1289,7 +1289,7 @@
                 [
                   0.46602588331699374,
                   1.0327540437579155,
-                  2.832724526524548E-05
+                  0.00002832724526524548
                 ],
                 [
                   0.4660173002481461,
@@ -1619,7 +1619,7 @@
                 [
                   0.4549138116054237,
                   1.034465266942978,
-                  -5.813505500555042E-05
+                  -0.00005813505500555042
                 ],
                 [
                   0.4549046622924507,
@@ -2599,7 +2599,7 @@
                 [
                   0.3430677967816591,
                   1.0409463762044906,
-                  9.349594637751571E-05
+                  0.00009349594637751571
                 ],
                 [
                   0.34305510099232195,
@@ -2734,7 +2734,7 @@
                 [
                   0.3438138972073793,
                   0.9865169734954834,
-                  2.3979127407073968E-05
+                  0.000023979127407073968
                 ],
                 [
                   0.3436575804427266,
@@ -5124,7 +5124,7 @@
                 [
                   -0.46602618220448494,
                   1.03275362855196,
-                  2.821132168173788E-05
+                  0.00002821132168173788
                 ],
                 [
                   -0.4660175991356373,
@@ -5454,7 +5454,7 @@
                 [
                   -0.4549138711579144,
                   1.0344650289416313,
-                  -5.818757042288787E-05
+                  -0.00005818757042288787
                 ],
                 [
                   -0.45490475164726374,
@@ -6434,7 +6434,7 @@
                 [
                   -0.34306788608431815,
                   1.0409460189938544,
-                  9.340183436870597E-05
+                  0.00009340183436870597
                 ],
                 [
                   -0.343055190294981,
@@ -6569,7 +6569,7 @@
                 [
                   -0.3438139269053936,
                   0.9865167346596718,
-                  2.4023622274398863E-05
+                  0.000024023622274398863
                 ],
                 [
                   -0.3436576402038336,
@@ -9435,7 +9435,7 @@
     "pieceId": "back-waist-adjustment-tab",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "centerXZ": [
-      0.0,
+      0,
       0.775
     ],
     "widthM": 0.16,
@@ -9552,7 +9552,7 @@
     "blenderVersion": "4.4.3",
     "bone": "Neck",
     "headBlenderM": [
-      -2.053701209092651E-09,
+      -2.053701209092651e-9,
       -0.0093428585678339,
       1.0351301431655884
     ],
@@ -9693,12 +9693,12 @@
     "minimumHeightZM": 0.42,
     "fullBlendHeightZM": 0.52,
     "fullBlendEndHeightZM": 0.62,
-    "waistLockHeightZM": 0.70,
+    "waistLockHeightZM": 0.7,
     "clearanceM": 0.012,
     "minimumProjectionBlend": 0.02,
     "maximumTargetDistanceM": 0.22,
     "maximumCorrectionM": 0.085,
-    "maximumPoseCorrectionM": 0.10,
+    "maximumPoseCorrectionM": 0.1,
     "maximumSkinMappingErrorM": 0.002,
     "maximumSurfaceResidualM": 0.035,
     "targetSurfaceHeightBinM": 0.02,
@@ -9708,7 +9708,7 @@
     "smoothness": 2.4,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V15 retains V14 dual-pose rest-space reconciliation and its bounded crouch residual refinement, while doubling the shared sewn-skirt longitudinal mesh sampling from 12 to 24 subdivisions. The denser shared topology is intended to let the existing front-lap placement and pleat field follow both evaluated thigh envelopes with smaller facets; it adds no garment length and changes no projection, residual, orientation, correction, seam, pose, or release bound. This is a mesh-resolution hypothesis only, not fit, pose acceptance, visual approval, UV, collision, Shape Key or release acceptance."
+    "evidenceBoundary": "V16 changes only the matched 2D outer hem endpoints of front skirt/lap-side sewn partners by 40 mm per side to broaden the front-lap flank coverage hypothesis. The V15 dual-pose solver, 12 mm surface clearance, 35 mm residual, orientation, projection and correction limits are unchanged; this geometry trial grants no fit, appearance or release acceptance."
   },
-  "designRevision": "v59-v15-dense-sewn-panel-sampling-20261025"
+  "designRevision": "v60-v16-front-lap-flank-extension-20261025"
 }

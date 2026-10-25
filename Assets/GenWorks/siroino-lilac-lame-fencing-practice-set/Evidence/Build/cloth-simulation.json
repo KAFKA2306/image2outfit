@@ -99,21 +99,21 @@
           "maximum": 0.19411327876150608
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 23,
+        "belowCombinedCollisionMarginVertexCount": 25,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "postBakeGeometryHypothesis": {
         "method": "uniform-laplacian-interior-only-boundaries-and-pins-fixed",
         "iterations": 3,
         "factor": 0.12,
-        "vertexCount": 10068,
+        "vertexCount": 10136,
         "boundaryVertexCount": 260,
         "pinnedVertexCount": 64,
         "fixedVertexCount": 260,
         "fixedVertexMaximumDisplacementM": 0.0,
-        "changedInteriorVertexCount": 9808,
-        "maximumInteriorDisplacementM": 0.009669502440902103,
-        "meanInteriorDisplacementM": 0.0012072466522708612,
+        "changedInteriorVertexCount": 9876,
+        "maximumInteriorDisplacementM": 0.00918897930462193,
+        "meanInteriorDisplacementM": 0.001215499175526273,
         "reason": "Direct review of the current five-view and six-pose set shows broad angular, clumped overskirt facets. Trial low-strength post-bake fairing on interior cloth vertices only while every open hem, waist, seam boundary, and declared pin stays fixed.",
         "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.12 on non-boundary overskirt vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes must be recorded by this run. This geometry hypothesis does not establish fit, fold quality, motion, visual acceptance, fabric calibration, or release readiness; the 35 mm residual and orientation limits remain unchanged.",
         "grantsFitAcceptance": false,
@@ -121,28 +121,28 @@
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.2911922037601471,
+          0.2904113829135895,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.006182944954616687,
-          "maximum": 0.1253799011465162
+          "minimum": 0.006196156630494443,
+          "maximum": 0.1192635428160429
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 233,
+        "belowCombinedCollisionMarginVertexCount": 291,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "9c290f604e653b7e4136d09a3f037df61088df22019a75ef4d4e6a010c414d91",
-      "evaluatedFrameMeshSha256": "3188aa3958f3f4f8f5c973ae4845271b28224297f1ea37449094cb66fdf53fc9",
-      "settledMeshSha256": "e0053c434fbc0c9270e7045d2905860f149ae697bafae78cd2a0cdda0e4e5602",
+      "preBakeMeshSha256": "2c70ac1623df8b5bfd99eed772860525f3655ff2a18d31c46c8186cba1a54ca3",
+      "evaluatedFrameMeshSha256": "51f54fbb6d438c45513f391ce1facd08125f0ad6f58fecacc4fef646023a5e7d",
+      "settledMeshSha256": "16da0f966de0192ea1a2225554141a83c0a0a46896070ee2540509ab6b6beef4",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "4c9ec8aca912874ed8060c7255b852c2c43a416050406f76f317d2a22c6d7656",
-  "constructionSha256": "c506deb15fe91ee5c9767e4f4078e3ccfb12dc1ecacc3ae875e123451643710e",
+  "sourceBlendSha256": "3a76540ef7ad47183571abffcdc3b1e86bef62ab7f9b12f68856570038030b4e",
+  "constructionSha256": "becdaeb2972b696281e93fe55733e5f5e9f55c0652209be6298c2370bc2fc499",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "fcbe33a5b829979fd7d2712bcf07d941a5a7a53a85128a04741c13273c43efc6",
+  "candidateSha256": "0b705252a8ae0d5cad41c4cdbe18f5839c7b8eb65c1b1028d8cba87863f8b995",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

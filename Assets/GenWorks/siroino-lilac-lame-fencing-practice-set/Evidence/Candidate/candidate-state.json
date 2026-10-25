@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v70-v15-dense-sewn-panel-sampling-20261025",
+  "revision": "v71-v16-front-lap-flank-extension-20261025",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,22 +21,22 @@
     {
       "severity": "BLOCKER",
       "code": "SKIRT_FORM_AND_FACETING",
-      "description": "V70 direct inspection of the current five views and six pose renders, corroborated by Astra, still shows repetitive angular accordion folds and facets along the side and rear panels; additional longitudinal sampling softened only part of the center front and did not produce a coherent controlled sewn drape."
+      "description": "V71 direct inspection of all five views and six pose renders, corroborated by Astra, still shows conspicuous angular faceting and accordion-like folds along side and rear skirt panels. The widened matched front/lap-side hem endpoints do not resolve the overall drape."
     },
     {
       "severity": "BLOCKER",
       "code": "SIT_CROUCH_FRONT_COVERAGE",
-      "description": "V70 sit and crouch renders still expose most anterior/top thigh areas; front panels pull laterally and bunch sharply around the hip and knee rather than maintaining continuous lap coverage. Astra independently confirmed this blocker."
+      "description": "V71 sit and crouch renders still expose substantial anterior and upper thigh areas as the front panels pull aside and bunch laterally. The 40 mm matched flank extension has not established continuous lap coverage."
     },
     {
       "severity": "BLOCKER",
       "code": "REAR_TAB_LEGIBILITY",
-      "description": "The rear waist adjustment tab remains too small/indistinct in the full-body rear view; no close-up evidence demonstrates its function."
+      "description": "The rear waist adjustment tab remains small and indistinct at full-body scale; the back view does not make its function legible."
     },
     {
       "severity": "BLOCKER",
-      "code": "UV_PROVENANCE_AND_COVERAGE_INCOMPLETE",
-      "description": "The current source-bound V70 UV/mesh showcase is regenerated from the V70 Blender source (source hash 4c9ec8aca912874ed8060c7255b852c2c43a416050406f76f317d2a22c6d7656). UV status remains PARTIAL_UNVERIFIED: one of seven objects is source-authored, two active UVMap layers are provenance-unverified, and four objects are unmapped. No replacement or automatic UVs were generated."
+      "code": "UV_SHOWCASE_STALE",
+      "description": "The existing render-current path regenerated topology and UV showcase from the V71 Blender source (source SHA-256 3a76540ef7ad47183571abffcdc3b1e86bef62ab7f9b12f68856570038030b4e). UV status is PARTIAL_UNVERIFIED: 1 of 7 objects has source-authored UVs, 2 active UVMap layers are provenance-unverified, and 4 objects are unmapped. No fallback or automatic UVs were generated."
     }
   ],
   "failedGeometryChecks": [
