@@ -9681,7 +9681,10 @@
       "overskirt-front-lap-left",
       "overskirt-front-lap-right"
     ],
-    "transitionPieceIds": [],
+    "transitionPieceIds": [
+      "overskirt-front-left",
+      "overskirt-front-right"
+    ],
     "leftTargetPieceIds": [
       "shorts-front-left"
     ],
@@ -9708,7 +9711,7 @@
     "smoothness": 2.4,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V16 changes only the matched 2D outer hem endpoints of front skirt/lap-side sewn partners by 40 mm per side to broaden the front-lap flank coverage hypothesis. The V15 dual-pose solver, 12 mm surface clearance, 35 mm residual, orientation, projection and correction limits are unchanged; this geometry trial grants no fit, appearance or release acceptance."
+    "evidenceBoundary": "V17 activates the existing two-ring, connected-front-panel transition for the V15 dual-pose inverse-skin apron solve. It carries a bounded sit/crouch lap trajectory into the adjacent sewn front-skirt partners and stops at ownership boundaries. The V71 2D matched 40 mm hem extension remains; 12 mm clearance, 35 mm residual, projection/correction/pose/orientation limits, frozen skin maps, and release gates are unchanged. No fit, appearance, UV, runtime or customer acceptance is implied."
   },
-  "designRevision": "v60-v16-front-lap-flank-extension-20261025"
+  "designRevision": "v61-v17-front-apron-seam-transition-20261026"
 }

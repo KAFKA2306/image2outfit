@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v71-v16-front-lap-flank-extension-20261025",
+  "revision": "v72-v17-front-apron-seam-transition-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,23 +20,28 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "code": "SKIRT_FORM_AND_FACETING",
-      "description": "V71 direct inspection of all five views and six pose renders, corroborated by Astra, still shows conspicuous angular faceting and accordion-like folds along side and rear skirt panels. The widened matched front/lap-side hem endpoints do not resolve the overall drape."
+      "description": "V72 direct inspection of all five views and six pose renders, corroborated by Astra, still shows substantial anterior thigh exposure in sit and crouch as the overskirt panels lift and separate laterally. The front apron transition has not established continuous coverage.",
+      "code": "SIT_CROUCH_FRONT_COVERAGE"
     },
     {
       "severity": "BLOCKER",
-      "code": "SIT_CROUCH_FRONT_COVERAGE",
-      "description": "V71 sit and crouch renders still expose substantial anterior and upper thigh areas as the front panels pull aside and bunch laterally. The 40 mm matched flank extension has not established continuous lap coverage."
+      "description": "Neutral front view retains a pronounced center-front split and pointed, uneven hem; the transition leaves the front silhouette visibly discontinuous.",
+      "code": "FRONT_SPLIT_AND_HEM"
     },
     {
       "severity": "BLOCKER",
-      "code": "REAR_TAB_LEGIBILITY",
-      "description": "The rear waist adjustment tab remains small and indistinct at full-body scale; the back view does not make its function legible."
+      "description": "Side and rear views retain strong accordion-like corrugation and rough seam transitions. The two-ring transition hypothesis did not resolve the drape.",
+      "code": "SKIRT_FORM_AND_FACETING"
     },
     {
       "severity": "BLOCKER",
-      "code": "UV_SHOWCASE_STALE",
-      "description": "The existing render-current path regenerated topology and UV showcase from the V71 Blender source (source SHA-256 3a76540ef7ad47183571abffcdc3b1e86bef62ab7f9b12f68856570038030b4e). UV status is PARTIAL_UNVERIFIED: 1 of 7 objects has source-authored UVs, 2 active UVMap layers are provenance-unverified, and 4 objects are unmapped. No fallback or automatic UVs were generated."
+      "description": "The rear waist adjustment tab remains too small and faint to read at full-body scale.",
+      "code": "REAR_TAB_LEGIBILITY"
+    },
+    {
+      "severity": "BLOCKER",
+      "description": "The current topology/UV showcase is regenerated from the V72 build-source hash and reports PARTIAL_UNVERIFIED: 1/7 source-authored UV objects, 2 active layers with unverified provenance, and 4 unmapped objects. The showcase displays that state; no fallback or automatic UVs were generated.",
+      "code": "UV_PARTIAL_UNVERIFIED"
     }
   ],
   "failedGeometryChecks": [
