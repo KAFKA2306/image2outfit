@@ -1902,6 +1902,7 @@ def stage_build(
         product_id=product_id,
         paths=[
             blend,
+            runtime_root(product_id) / "private-source" / "working-source.blend",
             report,
             log,
             *(
