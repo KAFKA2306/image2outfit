@@ -41,7 +41,6 @@ class BlenderPythonEnvironmentTest(unittest.TestCase):
         ):
             blender_python_env.bundled_python(directory, "3.11.11")
 
-
     def test_prepare_installs_locked_transitive_dependencies(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -89,12 +88,15 @@ class BlenderPythonEnvironmentTest(unittest.TestCase):
             self.assertEqual(install[install.index("-r") + 1], export[-1])
             self.assertNotIn("jsonschema==4.26.0", install)
             stamp = blender_python_env.read_json(
-                root / ".image2outfit" / "blender-python"
+                root
+                / ".image2outfit"
+                / "blender-python"
                 / "image2outfit-environment.json"
             )
             self.assertEqual(
                 stamp["uvLockSha256"], blender_python_env.sha256(root / "uv.lock")
             )
+
 
 if __name__ == "__main__":
     unittest.main()
