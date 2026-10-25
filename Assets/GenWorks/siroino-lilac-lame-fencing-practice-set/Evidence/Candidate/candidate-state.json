@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v64-lower-apron-coverage-onset-20261025",
+  "revision": "v70-v15-dense-sewn-panel-sampling-20261025",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of the current five-view and six-pose V64 render set shows angular, irregular clumped folds across the overskirt and an asymmetric pointed split-front hem. The skirt does not read as controlled continuous fabric drape.",
+      "severity": "BLOCKER",
       "code": "SKIRT_FORM_AND_FACETING",
-      "severity": "BLOCKER"
+      "description": "V70 direct inspection of the current five views and six pose renders, corroborated by Astra, still shows repetitive angular accordion folds and facets along the side and rear panels; additional longitudinal sampling softened only part of the center front and did not produce a coherent controlled sewn drape."
     },
     {
-      "description": "Direct inspection of the current sit and crouch renders shows rounded shorts-like thigh shells protruding above and ahead of the overskirt. Narrow separated front panels leave anterior thighs visibly uncovered; motion and coverage remain unacceptable.",
+      "severity": "BLOCKER",
       "code": "SIT_CROUCH_FRONT_COVERAGE",
-      "severity": "BLOCKER"
+      "description": "V70 sit and crouch renders still expose most anterior/top thigh areas; front panels pull laterally and bunch sharply around the hip and knee rather than maintaining continuous lap coverage. Astra independently confirmed this blocker."
     },
     {
-      "description": "The current full-body back render shows only a small low-contrast waist detail; the adjustment tab function is not readable at this scale and no close-up evidence exists.",
+      "severity": "BLOCKER",
       "code": "REAR_TAB_LEGIBILITY",
-      "severity": "BLOCKER"
+      "description": "The rear waist adjustment tab remains too small/indistinct in the full-body rear view; no close-up evidence demonstrates its function."
     },
     {
-      "description": "Current source-bound mesh showcase reports UV status PARTIAL_UNVERIFIED: 1 of 7 objects has source-authored UV coordinates, 2 active UVMap layers are provenance-unverified, and 4 objects report UV not created. No replacement or automatic UVs were generated.",
+      "severity": "BLOCKER",
       "code": "UV_PROVENANCE_AND_COVERAGE_INCOMPLETE",
-      "severity": "BLOCKER"
+      "description": "The current source-bound V70 UV/mesh showcase is regenerated from the V70 Blender source (source hash 4c9ec8aca912874ed8060c7255b852c2c43a416050406f76f317d2a22c6d7656). UV status remains PARTIAL_UNVERIFIED: one of seven objects is source-authored, two active UVMap layers are provenance-unverified, and four objects are unmapped. No replacement or automatic UVs were generated."
     }
   ],
   "failedGeometryChecks": [

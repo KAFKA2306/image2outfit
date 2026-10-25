@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V41 packs the source-authored pattern-space UV islands with one shared scale, fixed gutters, and no island rotation so pattern proportions and grain direction stay consistent while the atlas becomes readable. No UVs are generated for unmapped objects. Keep all fit, motion, visual, topology, and release gates independent.",
-  "designRevision": "v59-lower-apron-coverage-onset-20261025",
+  "designRevision": "v65-v15-dense-sewn-panel-sampling-20261025",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -155,6 +155,12 @@
         "factor": 0.18,
         "reason": "Direct neutral and pose renders still show physical sleeve corrugation after the bounded cloth solve. Compare a low-strength interior-only fairing pass while locking all open garment boundaries and sewn pins.",
         "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.18 on non-boundary sleeve vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes are recorded by this run. This is a geometry hypothesis only; it does not establish fit, fold quality, motion, appearance approval, or release readiness."
+      },
+      "pleated-overskirt": {
+        "iterations": 3,
+        "factor": 0.12,
+        "reason": "Direct review of the current five-view and six-pose set shows broad angular, clumped overskirt facets. Trial low-strength post-bake fairing on interior cloth vertices only while every open hem, waist, seam boundary, and declared pin stays fixed.",
+        "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.12 on non-boundary overskirt vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes must be recorded by this run. This geometry hypothesis does not establish fit, fold quality, motion, visual acceptance, fabric calibration, or release readiness; the 35 mm residual and orientation limits remain unchanged."
       }
     }
   },

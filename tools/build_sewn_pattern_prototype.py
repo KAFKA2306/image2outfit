@@ -1538,7 +1538,7 @@ def split_declared_skirt_creases(mesh, pose):
         waist = spec["waistZM"]
         hem = spec["sourceHemZM"]
         if (not isinstance(row_count, int) or isinstance(row_count, bool)
-                or not 0 <= row_count <= 12 or not math.isfinite(waist + hem)
+                or not 0 <= row_count <= 32 or not math.isfinite(waist + hem)
                 or waist <= hem):
             raise ValueError("Invalid declared longitudinal skirt subdivision count")
         skirt_piece_ids = set(spec["pieceIds"])

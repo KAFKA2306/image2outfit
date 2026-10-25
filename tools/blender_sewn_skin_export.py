@@ -37,20 +37,20 @@ def _smoothstep(value):
 
 
 def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
-    """Fit the sewn front apron in sit pose and invert the frozen skin map.
+    """Reconcile the sewn front apron against evaluated sit and crouch poses.
 
     This is a deterministic source-geometry solve, not a weight change: it
     projects the front skirt/lap onto height-local evaluated under-shorts in
-    the declared sit pose, smooths displacement through connected front
-    panels, preserves shared external seams, then maps target positions back
-    through each vertex's existing linear-blend skin transform. Height-local
-    queries avoid treating a remote shorts edge as support for a lower apron
-    point just because the target mesh spans that height elsewhere.
+    sit and crouch, averages those target positions in rest space through each
+    vertex's frozen linear-blend skin map, and then smooths that correction
+    through connected front panels. Height-local queries avoid treating a
+    remote shorts edge as support for a lower apron point just because the
+    target mesh spans that height elsewhere.
     """
     spec = pose_spec.get("poseConstrainedApronGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "sit-continuous-front-apron-inverse-skin-v11-lower-coverage-onset":
+    if spec.get("method") != "sit-crouch-continuous-front-apron-inverse-skin-v15-dense-sewn-panel-sampling":
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
     transition_piece_ids = set(spec.get("transitionPieceIds", []))
@@ -81,6 +81,7 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "maximumSurfaceResidualM",
         "targetSurfaceHeightBinM",
         "maximumLocalSurfaceSupportDistanceM",
+        "centerBlendHalfWidthM",
         "smoothness",
         "maximumNormalTurnDot",
     )
@@ -101,6 +102,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         or not 0
         < spec["maximumLocalSurfaceSupportDistanceM"]
         < spec["maximumTargetDistanceM"]
+        or not 0 < spec["centerBlendHalfWidthM"]
+        < spec["maximumLocalSurfaceSupportDistanceM"]
         or spec["smoothness"] < 0
         or not -1 < spec["maximumNormalTurnDot"] < 1
         or not isinstance(spec.get("smoothingIterations"), int)
@@ -208,8 +211,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         evaluated_obj.to_mesh_clear()
         return result
 
-    # Record the current weighted surface in each required pose. These values
-    # bound the one sit-pose geometry solve in the other review poses.
+    # Record the weighted garment in every review pose. The sit and crouch
+    # surfaces both contribute to the one rest-space geometry solve.
     pose_names = ("neutral", "sit", "crouch")
     baseline = {}
     for name in pose_names:
@@ -232,77 +235,94 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         for triangle in evaluated_mesh.loop_triangles
     )
     evaluated_obj.to_mesh_clear()
-    side_triangles, target_world_vertices, target_offset = (
-        {"left": [], "right": []},
-        [],
-        0,
-    )
-    for target_obj, target_pieces, target_face_owners in target_meshes:
-        target_eval = target_obj.evaluated_get(depsgraph)
-        target_mesh = target_eval.to_mesh()
-        if len(target_mesh.vertices) != len(target_obj.data.vertices):
-            target_eval.to_mesh_clear()
-            raise ValueError(
-                f"Evaluated shorts target changed vertex order: {target_obj.name}"
-            )
-        target_world_vertices.extend(
-            target_eval.matrix_world @ vertex.co for vertex in target_mesh.vertices
-        )
-        target_attr = target_mesh.attributes.get("canonical_piece_index")
-        if target_attr is None or target_attr.domain != "FACE":
-            target_eval.to_mesh_clear()
-            raise ValueError(
-                f"Evaluated shorts target lost piece ownership: {target_obj.name}"
-            )
-        target_mesh.calc_loop_triangles()
-        evaluated_targets = [target_pieces[item.value] for item in target_attr.data]
-        for triangle in target_mesh.loop_triangles:
-            owner = evaluated_targets[triangle.polygon_index]
-            if owner in left_targets:
-                side_triangles["left"].append(
-                    tuple(i + target_offset for i in triangle.vertices)
+    def evaluated_short_surface(pose_name):
+        set_pose(armature, pose_name)
+        pose_depsgraph = bpy.context.evaluated_depsgraph_get()
+        side_triangles = {"left": [], "right": []}
+        target_world_vertices = []
+        target_offset = 0
+        for target_obj, target_pieces, _target_face_owners in target_meshes:
+            target_eval = target_obj.evaluated_get(pose_depsgraph)
+            target_mesh = target_eval.to_mesh()
+            if len(target_mesh.vertices) != len(target_obj.data.vertices):
+                target_eval.to_mesh_clear()
+                raise ValueError(
+                    f"Evaluated {pose_name} shorts target changed vertex order: {target_obj.name}"
                 )
-            elif owner in right_targets:
-                side_triangles["right"].append(
-                    tuple(i + target_offset for i in triangle.vertices)
+            target_world_vertices.extend(
+                target_eval.matrix_world @ vertex.co for vertex in target_mesh.vertices
+            )
+            target_attr = target_mesh.attributes.get("canonical_piece_index")
+            if target_attr is None or target_attr.domain != "FACE":
+                target_eval.to_mesh_clear()
+                raise ValueError(
+                    f"Evaluated {pose_name} shorts target lost piece ownership: {target_obj.name}"
                 )
-        target_offset += len(target_mesh.vertices)
-        target_eval.to_mesh_clear()
-    if not side_triangles["left"] or not side_triangles["right"]:
-        raise ValueError(
-            "Pose-constrained apron requires evaluated shorts triangles on both sides"
-        )
-    side_target_z_ranges = {}
-    for side, triangles in side_triangles.items():
-        support_indices = {index for triangle in triangles for index in triangle}
-        side_target_z_ranges[side] = (
-            min(float(target_world_vertices[index].z) for index in support_indices),
-            max(float(target_world_vertices[index].z) for index in support_indices),
-        )
-    target_triangles_by_height_bin = {"left": {}, "right": {}}
-    for side, triangles in side_triangles.items():
-        bins = target_triangles_by_height_bin[side]
-        for triangle in triangles:
-            low = min(float(target_world_vertices[index].z) for index in triangle)
-            high = max(float(target_world_vertices[index].z) for index in triangle)
-            first_bin = math.floor(low / spec["targetSurfaceHeightBinM"])
-            last_bin = math.floor(high / spec["targetSurfaceHeightBinM"])
-            for height_bin in range(first_bin, last_bin + 1):
-                bins.setdefault(height_bin, []).append(triangle)
-    side_trees = {"left": {}, "right": {}}
+            target_mesh.calc_loop_triangles()
+            evaluated_targets = [target_pieces[item.value] for item in target_attr.data]
+            for triangle in target_mesh.loop_triangles:
+                owner = evaluated_targets[triangle.polygon_index]
+                if owner in left_targets:
+                    side_triangles["left"].append(
+                        tuple(i + target_offset for i in triangle.vertices)
+                    )
+                elif owner in right_targets:
+                    side_triangles["right"].append(
+                        tuple(i + target_offset for i in triangle.vertices)
+                    )
+            target_offset += len(target_mesh.vertices)
+            target_eval.to_mesh_clear()
+        if not side_triangles["left"] or not side_triangles["right"]:
+            raise ValueError(
+                f"Pose-constrained apron requires evaluated {pose_name} shorts triangles on both sides"
+            )
+        z_ranges = {}
+        triangles_by_height_bin = {"left": {}, "right": {}}
+        for side, triangles in side_triangles.items():
+            support_indices = {index for triangle in triangles for index in triangle}
+            z_ranges[side] = (
+                min(float(target_world_vertices[index].z) for index in support_indices),
+                max(float(target_world_vertices[index].z) for index in support_indices),
+            )
+            bins = triangles_by_height_bin[side]
+            for triangle in triangles:
+                low = min(float(target_world_vertices[index].z) for index in triangle)
+                high = max(float(target_world_vertices[index].z) for index in triangle)
+                first_bin = math.floor(low / spec["targetSurfaceHeightBinM"])
+                last_bin = math.floor(high / spec["targetSurfaceHeightBinM"])
+                for height_bin in range(first_bin, last_bin + 1):
+                    bins.setdefault(height_bin, []).append(triangle)
+        trees = {"left": {}, "right": {}}
 
-    def target_tree_at_height(side, height):
-        height_bin = math.floor(height / spec["targetSurfaceHeightBinM"])
-        if height_bin not in side_trees[side]:
-            triangles = target_triangles_by_height_bin[side].get(height_bin, [])
-            side_trees[side][height_bin] = (
-                BVHTree.FromPolygons(
-                    target_world_vertices, triangles, all_triangles=True
+        def tree_at_height(side, height):
+            height_bin = math.floor(height / spec["targetSurfaceHeightBinM"])
+            if height_bin not in trees[side]:
+                triangles = triangles_by_height_bin[side].get(height_bin, [])
+                trees[side][height_bin] = (
+                    BVHTree.FromPolygons(
+                        target_world_vertices, triangles, all_triangles=True
+                    )
+                    if triangles
+                    else None
                 )
-                if triangles
-                else None
-            )
-        return side_trees[side][height_bin]
+            return trees[side][height_bin]
+
+        return {
+            "triangles": side_triangles,
+            "vertices": target_world_vertices,
+            "zRanges": z_ranges,
+            "treeAtHeight": tree_at_height,
+        }
+
+    target_surfaces = {
+        pose_name: evaluated_short_surface(pose_name)
+        for pose_name in ("sit", "crouch")
+    }
+    set_pose(armature, spec.get("referencePose", "sit"))
+    side_target_z_ranges = target_surfaces["sit"]["zRanges"]
+
+    def target_tree_at_height(side, height, pose_name="sit"):
+        return target_surfaces[pose_name]["treeAtHeight"](side, height)
 
     left_bone = spec["leftThighBone"]
     right_bone = spec["rightThighBone"]
@@ -313,18 +333,25 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     if abs(left_x - right_x) <= 1e-6:
         raise ValueError("Pose-constrained apron cannot establish bilateral thigh axis")
     center_x, left_positive = (left_x + right_x) / 2.0, left_x > right_x
-    maps = {}
-    for bone_name in armature.data.bones.keys():
-        pose_bone = armature.pose.bones.get(bone_name)
-        bone = armature.data.bones.get(bone_name)
-        if pose_bone is not None and bone is not None and bone.use_deform:
-            maps[bone_name] = (
-                armature.matrix_world
-                @ pose_bone.matrix
-                @ bone.matrix_local.inverted()
-                @ armature.matrix_world.inverted()
-                @ obj.matrix_world
-            )
+    def bone_maps_for_pose(pose_name):
+        set_pose(armature, pose_name)
+        pose_maps = {}
+        for bone_name in armature.data.bones.keys():
+            pose_bone = armature.pose.bones.get(bone_name)
+            bone = armature.data.bones.get(bone_name)
+            if pose_bone is not None and bone is not None and bone.use_deform:
+                pose_maps[bone_name] = (
+                    armature.matrix_world
+                    @ pose_bone.matrix
+                    @ bone.matrix_local.inverted()
+                    @ armature.matrix_world.inverted()
+                    @ obj.matrix_world
+                )
+        return pose_maps
+
+    pose_maps = {name: bone_maps_for_pose(name) for name in ("sit", "crouch")}
+    set_pose(armature, spec.get("referencePose", "sit"))
+    maps = pose_maps["sit"]
 
     targets, target_distances, skin_errors = {}, [], []
     target_diagnostics = {}
@@ -333,6 +360,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     outside_target_local_height_bin_count = 0
     outside_target_local_surface_support_count = 0
     outside_target_distance_bound_count = 0
+    continuous_center_blend_count = 0
+    continuous_center_unsupported_count = 0
     transition_blend_by_vertex = {}
     for index in selected_indices:
         point = obj.data.vertices[index].co
@@ -379,56 +408,187 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
             else "right"
         )
         pose_point = world_vertices[index]
-        target_min_z, target_max_z = side_target_z_ranges[side]
-        if pose_point.z < target_min_z or pose_point.z > target_max_z:
-            # A lap hem can extend below the shorts. Outside the measured
-            # vertical support of the named target surface, nearest-point
-            # lookup would pull it toward an unrelated edge many centimeters
-            # away and falsely fail the correspondence bound.
-            locked.add(index)
-            outside_target_height_range_count += 1
-            continue
-        local_target_tree = target_tree_at_height(side, float(pose_point.z))
-        if local_target_tree is None:
-            locked.add(index)
-            outside_target_local_height_bin_count += 1
-            continue
-        result = local_target_tree.find_nearest(pose_point)
-        if result is None or result[0] is None or result[1] is None:
-            raise ValueError(
-                f"Sit-pose shorts surface lookup failed at apron vertex {index}"
+        source_world = obj.matrix_world @ point
+        in_center_blend = (
+            abs(source_world.x - center_x) < spec["centerBlendHalfWidthM"]
+        )
+        sample_sides = ("left", "right") if in_center_blend else (side,)
+        surface_samples = []
+        sample_failed = False
+        for sample_side in sample_sides:
+            target_min_z, target_max_z = side_target_z_ranges[sample_side]
+            if pose_point.z < target_min_z or pose_point.z > target_max_z:
+                outside_target_height_range_count += 1
+                sample_failed = True
+                break
+            local_target_tree = target_tree_at_height(
+                sample_side, float(pose_point.z)
             )
-        location, normal, _triangle, distance = result
-        if distance > spec["maximumTargetDistanceM"]:
-            # The same-height nearest triangle can still be on the wrong body
-            # segment when a front-panel point is outside the declared lookup
-            # envelope. Keep the sewn point unchanged and expose the count
-            # instead of pulling it across the body surface.
+            if local_target_tree is None:
+                outside_target_local_height_bin_count += 1
+                sample_failed = True
+                break
+            result = local_target_tree.find_nearest(pose_point)
+            if result is None or result[0] is None or result[1] is None:
+                raise ValueError(
+                    "Sit-pose shorts surface lookup failed at apron vertex "
+                    f"{index} on {sample_side}"
+                )
+            location, normal, _triangle, distance = result
+            if distance > spec["maximumTargetDistanceM"]:
+                outside_target_distance_bound_count += 1
+                sample_failed = True
+                break
+            if distance > spec["maximumLocalSurfaceSupportDistanceM"]:
+                outside_target_local_surface_support_count += 1
+                sample_failed = True
+                break
+            if normal.length < 0.99:
+                raise ValueError(
+                    f"Invalid sit-pose shorts normal at apron vertex {index}"
+                )
+            normal.normalize()
+            if (pose_point - location).dot(normal) < 0:
+                normal.negate()
+            surface_samples.append(
+                (sample_side, location + normal * spec["clearanceM"], float(distance))
+            )
+        if sample_failed:
             locked.add(index)
-            outside_target_distance_bound_count += 1
+            if in_center_blend:
+                continuous_center_unsupported_count += 1
             continue
-        if distance > spec["maximumLocalSurfaceSupportDistanceM"]:
-            # A distant triangle in the same height band is not a valid local
-            # correspondence. Keep this point unchanged and disclose the
-            # unsupported count; pose and visual audits remain independent.
-            locked.add(index)
-            outside_target_local_surface_support_count += 1
-            continue
-        if normal.length < 0.99:
-            raise ValueError(f"Invalid sit-pose shorts normal at apron vertex {index}")
-        normal.normalize()
+        if len(surface_samples) == 2:
+            left_target = next(row[1] for row in surface_samples if row[0] == "left")
+            right_target = next(row[1] for row in surface_samples if row[0] == "right")
+            lateral = (source_world.x - (center_x - spec["centerBlendHalfWidthM"])) / (
+                2.0 * spec["centerBlendHalfWidthM"]
+            )
+            target_world = left_target.lerp(right_target, _smoothstep(lateral))
+            distance = max(row[2] for row in surface_samples)
+            continuous_center_blend_count += 1
+        else:
+            target_world, distance = surface_samples[0][1], surface_samples[0][2]
         current_world = world_vertices[index]
-        if (current_world - location).dot(normal) < 0:
-            normal.negate()
-        target_world = location + normal * spec["clearanceM"]
-        targets[index] = (target_world - current_world) * blend
-        target_distances.append(float(distance))
+        crouch_world = baseline["crouch"][index]
+        crouch_samples = []
+        crouch_failed = False
+        for sample_side in sample_sides:
+            target_min_z, target_max_z = target_surfaces["crouch"]["zRanges"][sample_side]
+            if crouch_world.z < target_min_z or crouch_world.z > target_max_z:
+                outside_target_height_range_count += 1
+                crouch_failed = True
+                break
+            crouch_tree = target_tree_at_height(
+                sample_side, float(crouch_world.z), "crouch"
+            )
+            if crouch_tree is None:
+                outside_target_local_height_bin_count += 1
+                crouch_failed = True
+                break
+            result = crouch_tree.find_nearest(crouch_world)
+            if result is None or result[0] is None or result[1] is None:
+                raise ValueError(
+                    "Crouch-pose shorts surface lookup failed at apron vertex "
+                    f"{index} on {sample_side}"
+                )
+            location, normal, _triangle, crouch_distance = result
+            if crouch_distance > spec["maximumTargetDistanceM"]:
+                outside_target_distance_bound_count += 1
+                crouch_failed = True
+                break
+            if crouch_distance > spec["maximumLocalSurfaceSupportDistanceM"]:
+                outside_target_local_surface_support_count += 1
+                crouch_failed = True
+                break
+            if normal.length < 0.99:
+                raise ValueError(
+                    f"Invalid crouch-pose shorts normal at apron vertex {index}"
+                )
+            normal.normalize()
+            if (crouch_world - location).dot(normal) < 0:
+                normal.negate()
+            crouch_samples.append(
+                (sample_side, location + normal * spec["clearanceM"], float(crouch_distance))
+            )
+        if crouch_failed:
+            locked.add(index)
+            if in_center_blend:
+                continuous_center_unsupported_count += 1
+            continue
+        if len(crouch_samples) == 2:
+            crouch_left = next(row[1] for row in crouch_samples if row[0] == "left")
+            crouch_right = next(row[1] for row in crouch_samples if row[0] == "right")
+            lateral = (source_world.x - (center_x - spec["centerBlendHalfWidthM"])) / (
+                2.0 * spec["centerBlendHalfWidthM"]
+            )
+            crouch_target_world = crouch_left.lerp(crouch_right, _smoothstep(lateral))
+            crouch_distance = max(row[2] for row in crouch_samples)
+        else:
+            crouch_target_world, crouch_distance = crouch_samples[0][1], crouch_samples[0][2]
+
+        # Reconcile the same neutral sewn point against both evaluated thigh
+        # envelopes in rest space; averaging posed-space offsets would bias the
+        # apron because sit and crouch have different bone transforms.
+        groups_for_vertex = {
+            obj.vertex_groups[group.group].name: group.weight
+            for group in obj.data.vertices[index].groups
+            if group.group < len(obj.vertex_groups)
+        }
+        rest_corrections = []
+        for pose_name, pose_target in (
+            ("sit", target_world),
+            ("crouch", crouch_target_world),
+        ):
+            mapping = Matrix(((0.0, 0.0, 0.0, 0.0),) * 4)
+            for name, weight in groups_for_vertex.items():
+                if name in pose_maps[pose_name] and weight > 0:
+                    mapping += pose_maps[pose_name][name] * weight
+            if (
+                abs(sum(groups_for_vertex.values()) - 1.0) > 1e-4
+                or abs(mapping.determinant()) < 1e-10
+            ):
+                raise ValueError(
+                    f"Frozen {pose_name} skin map is incomplete or singular at apron vertex {index}"
+                )
+            predicted = mapping @ Vector((*point, 1.0))
+            mapping_error = (
+                Vector(predicted[:3]) - baseline[pose_name][index]
+            ).length
+            if mapping_error > spec["maximumSkinMappingErrorM"]:
+                raise ValueError(
+                    f"Armature inverse map diverges from evaluated {pose_name} pose at vertex {index}: {mapping_error:.6f} m"
+                )
+            inverse = mapping.inverted()
+            rest_target_h = inverse @ Vector((*pose_target, 1.0))
+            if abs(rest_target_h.w) <= 1e-9:
+                raise ValueError(
+                    f"{pose_name} inverse skin map returned a point at infinity: {index}"
+                )
+            rest_corrections.append(Vector(rest_target_h[:3]) / rest_target_h.w - point)
+        rest_delta = (rest_corrections[0] + rest_corrections[1]) * (0.5 * blend)
+        sit_mapping = Matrix(((0.0, 0.0, 0.0, 0.0),) * 4)
+        for name, weight in groups_for_vertex.items():
+            if name in pose_maps["sit"] and weight > 0:
+                sit_mapping += pose_maps["sit"][name] * weight
+        reference_delta = sit_mapping @ Vector(
+            (rest_delta.x, rest_delta.y, rest_delta.z, 0.0)
+        )
+        targets[index] = Vector(reference_delta[:3])
+        pose_distances = {"sit": float(distance), "crouch": float(crouch_distance)}
+        distance = max(pose_distances.values())
+        target_distances.append(distance)
         target_diagnostics[index] = {
             "blend": float(blend),
             "targetDistanceM": float(distance),
+            "reconciledPoses": ["sit", "crouch"],
+            "poseTargetDistancesM": pose_distances,
+            "continuousCenterBlend": len(surface_samples) == 2,
+            "sampledTargetSides": [row[0] for row in surface_samples],
             "localPointM": tuple(float(value) for value in point),
             "currentPosePointM": tuple(float(value) for value in current_world),
-            "surfaceTargetM": tuple(float(value) for value in target_world),
+            "sitSurfaceTargetM": tuple(float(value) for value in target_world),
+            "crouchSurfaceTargetM": tuple(float(value) for value in crouch_target_world),
             "ownerPieceIds": sorted(vertex_owners[index]),
             "directCorrectionM": float(targets[index].length),
         }
@@ -817,6 +977,199 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
                 raise ValueError(
                     f"Apron geometry solve exceeds {name} pose bound at vertex {index}: {delta:.6f} m"
                 )
+    crouch_residual_records = []
+    set_pose(armature, "crouch")
+    crouch_depsgraph = bpy.context.evaluated_depsgraph_get()
+    crouch_obj = obj.evaluated_get(crouch_depsgraph)
+    crouch_mesh = crouch_obj.to_mesh()
+    if len(crouch_mesh.vertices) != len(obj.data.vertices):
+        crouch_obj.to_mesh_clear()
+        raise ValueError("Evaluated crouch garment changed vertex order after solve")
+    crouch_world = [
+        crouch_obj.matrix_world @ vertex.co for vertex in crouch_mesh.vertices
+    ]
+    for index in movable:
+        if index not in apron_vertices:
+            continue
+        side = (
+            "left"
+            if ((obj.matrix_world @ obj.data.vertices[index].co).x >= center_x)
+            == left_positive
+            else "right"
+        )
+        local_target_tree = target_tree_at_height(
+            side, float(crouch_world[index].z), "crouch"
+        )
+        if local_target_tree is None:
+            crouch_obj.to_mesh_clear()
+            raise ValueError(
+                f"Solved apron left crouch shorts-surface height support at vertex {index}"
+            )
+        result = local_target_tree.find_nearest(crouch_world[index])
+        if result is None or result[0] is None:
+            crouch_obj.to_mesh_clear()
+            raise ValueError(f"Solved apron has no crouch shorts residual at vertex {index}")
+        crouch_residual_records.append(
+            {
+                "vertex": int(index),
+                "side": side,
+                "surfaceDistanceM": float(result[3]),
+                "residualM": abs(float(result[3]) - spec["clearanceM"]),
+                "posePointM": tuple(float(value) for value in crouch_world[index]),
+                "nearestSurfacePointM": tuple(float(value) for value in result[0]),
+                "sourcePointM": tuple(
+                    float(value) for value in obj.data.vertices[index].co
+                ),
+                "ownerPieceIds": sorted(vertex_owners[index]),
+                "appliedDisplacementM": float(displacement[index].length),
+            }
+        )
+    crouch_obj.to_mesh_clear()
+
+    # The sit/crouch inverse targets are reconciled in rest space, but local
+    # orientation repairs can attenuate a vertex after that solve. If the
+    # evaluated crouch surface residual is consequently outside the existing
+    # bound, make a bounded per-vertex correction through the frozen crouch
+    # skin map. The correction only moves that vertex toward the valid residual
+    # interval; all unchanged correction, pose, and orientation limits are
+    # checked again below. This is not permission to widen the gate.
+    residual_margin = min(0.001, spec["maximumSurfaceResidualM"] * 0.05)
+    crouch_refinements = 0
+    crouch_refined_vertices = set()
+    for crouch_refinements in range(8):
+        set_pose(armature, "crouch")
+        crouch_depsgraph = bpy.context.evaluated_depsgraph_get()
+        crouch_obj = obj.evaluated_get(crouch_depsgraph)
+        crouch_mesh = crouch_obj.to_mesh()
+        crouch_world = [
+            crouch_obj.matrix_world @ vertex.co for vertex in crouch_mesh.vertices
+        ]
+        corrections_made = 0
+        for record in crouch_residual_records:
+            if record["residualM"] <= spec["maximumSurfaceResidualM"] - residual_margin:
+                continue
+            index = record["vertex"]
+            point = crouch_world[index]
+            tree = target_tree_at_height(record["side"], float(point.z), "crouch")
+            result = tree.find_nearest(point) if tree is not None else None
+            if result is None or result[0] is None:
+                crouch_obj.to_mesh_clear()
+                raise ValueError(
+                    f"Crouch residual refinement lost local shorts support at apron vertex {index}"
+                )
+            location, _normal, _triangle, distance = result
+            if distance <= 1e-9:
+                crouch_obj.to_mesh_clear()
+                raise ValueError(
+                    f"Crouch residual refinement has no stable direction at apron vertex {index}"
+                )
+            current_residual = abs(float(distance) - spec["clearanceM"])
+            if current_residual <= spec["maximumSurfaceResidualM"] - residual_margin:
+                record["surfaceDistanceM"] = float(distance)
+                record["residualM"] = current_residual
+                record["posePointM"] = tuple(float(value) for value in point)
+                continue
+            direction = (point - location).normalized()
+            target_distance = min(
+                max(float(distance), spec["clearanceM"]),
+                spec["clearanceM"]
+                + spec["maximumSurfaceResidualM"]
+                - residual_margin,
+            )
+            target_point = location + direction * target_distance
+            groups_for_vertex = {
+                obj.vertex_groups[group.group].name: group.weight
+                for group in obj.data.vertices[index].groups
+                if group.group < len(obj.vertex_groups)
+            }
+            mapping = Matrix(((0.0, 0.0, 0.0, 0.0),) * 4)
+            for name, weight in groups_for_vertex.items():
+                if name in pose_maps["crouch"] and weight > 0:
+                    mapping += pose_maps["crouch"][name] * weight
+            if (
+                abs(sum(groups_for_vertex.values()) - 1.0) > 1e-4
+                or abs(mapping.determinant()) < 1e-10
+            ):
+                crouch_obj.to_mesh_clear()
+                raise ValueError(
+                    f"Frozen crouch skin map is incomplete or singular during residual refinement at apron vertex {index}"
+                )
+            rest_h = mapping.inverted() @ Vector((*target_point, 1.0))
+            if abs(rest_h.w) <= 1e-9:
+                crouch_obj.to_mesh_clear()
+                raise ValueError(
+                    f"Crouch residual inverse skin map returned a point at infinity: {index}"
+                )
+            obj.data.vertices[index].co = Vector(rest_h[:3]) / rest_h.w
+            crouch_refined_vertices.add(index)
+            corrections_made += 1
+            obj.data.update()
+            bpy.context.view_layer.update()
+            crouch_obj.to_mesh_clear()
+            break
+        else:
+            crouch_obj.to_mesh_clear()
+        if corrections_made == 0:
+            break
+        # Re-evaluate the edited vertex before deciding whether another
+        # iteration is needed. The loop deliberately repairs only one vertex
+        # per pass so the nearest-surface measurement stays current.
+        set_pose(armature, "crouch")
+        crouch_current = evaluated_world_vertices()
+        record_by_vertex = {item["vertex"]: item for item in crouch_residual_records}
+        for index in record_by_vertex:
+            point = crouch_current[index]
+            side = record_by_vertex[index]["side"]
+            tree = target_tree_at_height(side, float(point.z), "crouch")
+            result = tree.find_nearest(point) if tree is not None else None
+            if result is None or result[0] is None:
+                raise ValueError(
+                    f"Refined crouch apron lost local shorts support at vertex {index}"
+                )
+            record = record_by_vertex[index]
+            record["surfaceDistanceM"] = float(result[3])
+            record["residualM"] = abs(float(result[3]) - spec["clearanceM"])
+            record["posePointM"] = tuple(float(value) for value in point)
+            record["nearestSurfacePointM"] = tuple(float(value) for value in result[0])
+            record["sourcePointM"] = tuple(
+                float(value) for value in obj.data.vertices[index].co
+            )
+            record["appliedDisplacementM"] = float(displacement[index].length)
+    else:
+        raise ValueError("Crouch apron residual refinement exceeded eight bounded passes")
+
+    set_pose(armature, "sit")
+    refined_sit = evaluated_world_vertices()
+    for triangle in pose_triangles:
+        if set(triangle).intersection(movable) and evaluated_triangle_dot(
+            triangle, refined_sit
+        ) < evaluated_normal_turn_target:
+            raise ValueError(
+                "Crouch residual refinement violated the unchanged sit triangle-orientation bound: "
+                f"triangle={tuple(triangle)}"
+            )
+    for index in movable:
+        displacement[index] = refined_sit[index] - original_sit[index]
+    maximum_pose_delta = {name: 0.0 for name in pose_names}
+    for name in pose_names:
+        set_pose(armature, name)
+        after = evaluated_world_vertices()
+        for index in selected_indices:
+            delta = (after[index] - baseline[name][index]).length
+            maximum_pose_delta[name] = max(maximum_pose_delta[name], delta)
+            if delta > spec["maximumPoseCorrectionM"]:
+                raise ValueError(
+                    f"Crouch residual refinement exceeds the unchanged {name} pose bound at vertex {index}: {delta:.6f} m"
+                )
+    maximum_correction = max(
+        (value.length for value in displacement.values()), default=0.0
+    )
+    if maximum_correction > spec["maximumCorrectionM"]:
+        raise ValueError(
+            "Crouch residual refinement exceeds the unchanged correction bound: "
+            f"maximum={maximum_correction:.6f} m, limit={spec['maximumCorrectionM']:.6f} m"
+        )
+
     set_pose(armature, "sit")
     depsgraph = bpy.context.evaluated_depsgraph_get()
     final_obj = obj.evaluated_get(depsgraph)
@@ -861,6 +1214,25 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     maximum_residual = max(
         residual_records, key=lambda record: record["residualM"], default=None
     )
+    maximum_crouch_residual = max(
+        crouch_residual_records,
+        key=lambda record: record["residualM"],
+        default=None,
+    )
+    if (
+        maximum_crouch_residual
+        and maximum_crouch_residual["residualM"] > spec["maximumSurfaceResidualM"]
+    ):
+        final_obj.to_mesh_clear()
+        raise ValueError(
+            "Pose-reconciled apron could not meet the crouch shorts-surface residual bound: "
+            f"maximum={maximum_crouch_residual['residualM']:.6f} m, "
+            f"limit={spec['maximumSurfaceResidualM']:.6f} m, "
+            f"vertex={maximum_crouch_residual['vertex']}, "
+            f"side={maximum_crouch_residual['side']}, "
+            f"surfaceDistance={maximum_crouch_residual['surfaceDistanceM']:.6f} m, "
+            f"posePoint={tuple(round(value, 6) for value in maximum_crouch_residual['posePointM'])}"
+        )
     residual_incident_faces = []
     if (
         maximum_residual
@@ -995,6 +1367,8 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "outsideTargetLocalHeightBinVertexCount": outside_target_local_height_bin_count,
         "outsideTargetDistanceBoundVertexCount": outside_target_distance_bound_count,
         "outsideTargetLocalSurfaceSupportVertexCount": outside_target_local_surface_support_count,
+        "continuousCenterBlendVertexCount": continuous_center_blend_count,
+        "continuousCenterUnsupportedVertexCount": continuous_center_unsupported_count,
         "targetSurfaceHeightBinM": float(spec["targetSurfaceHeightBinM"]),
         "maximumLocalSurfaceSupportDistanceM": float(
             spec["maximumLocalSurfaceSupportDistanceM"]
@@ -1015,12 +1389,26 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
         "maximumSurfaceResidualM": max(
             (record["residualM"] for record in residual_records), default=0.0
         ),
+        "maximumCrouchSurfaceResidualM": max(
+            (record["residualM"] for record in crouch_residual_records), default=0.0
+        ),
+        "crouchResidualRefinementPasses": int(crouch_refinements + 1),
+        "crouchResidualRefinementVertexCount": len(crouch_refined_vertices),
+        "surfaceResidualMByPose": {
+            "sit": max(
+                (record["residualM"] for record in residual_records), default=0.0
+            ),
+            "crouch": max(
+                (record["residualM"] for record in crouch_residual_records), default=0.0
+            ),
+        },
+        "reconciledTargetPoseNames": ["sit", "crouch"],
         "minimumNormalTurnDot": spec["maximumNormalTurnDot"],
         "skinWeightsChanged": False,
         "sharedExternalSeamsMoved": bool(transition_vertices),
         "grantsFitAcceptance": False,
         "grantsPoseAcceptance": False,
-        "evidenceBoundary": "One bounded, sit-pose source-geometry hypothesis with frozen garment skin weights. Its target is the evaluated shorts surface; neutral/crouch displacement and triangle orientation are checked, but fit, motion, collision, appearance and release remain unverified.",
+        "evidenceBoundary": "One bounded rest-space source-geometry hypothesis reconciled against evaluated sit and crouch shorts surfaces using frozen garment skin weights. Sit and crouch target residuals, neutral hem/seam ownership, correction, displacement and evaluated sit triangle orientation are checked; fit, motion, collision, appearance, UV and release remain unverified.",
     }
 
 

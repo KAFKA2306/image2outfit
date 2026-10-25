@@ -9616,7 +9616,7 @@
     "method": "bounded-panel-extension-v3-panel-local-hem",
     "foldMethod": "crease-bound-soft-box-pleat-v1",
     "foldsPerPanel": 2,
-    "longitudinalSubdivisionCount": 12,
+    "longitudinalSubdivisionCount": 24,
     "pieceIds": [
       "overskirt-front-left",
       "overskirt-front-right",
@@ -9673,7 +9673,7 @@
     "grantsFitAcceptance": false
   },
   "poseConstrainedApronGeometry": {
-    "method": "sit-continuous-front-apron-inverse-skin-v11-lower-coverage-onset",
+    "method": "sit-crouch-continuous-front-apron-inverse-skin-v15-dense-sewn-panel-sampling",
     "referencePose": "sit",
     "sourcePieceIds": [
       "overskirt-front-left",
@@ -9703,11 +9703,12 @@
     "maximumSurfaceResidualM": 0.035,
     "targetSurfaceHeightBinM": 0.02,
     "maximumLocalSurfaceSupportDistanceM": 0.05,
+    "centerBlendHalfWidthM": 0.04,
     "smoothingIterations": 48,
     "smoothness": 2.4,
     "maximumNormalTurnDot": 0.1,
     "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V49 replaces whole-field orientation backtracking with per-face local vertex repair. V80g confirmed the same triangle connectivity but final normalDot fell to 0.094748 after inverse-skin application. V51 adds a bounded five-iteration correction from evaluated sit-pose vertex residuals through the frozen inverse weighted skin map, converging within 0.0001 mm and the existing 2 mm mapping bound. V80i still measured targetNormalDot=0.101257 and evaluated normalDot=0.094748 despite vertex errors below 0.000000063 m. V80j passed orientation with 439 limited vertices but missed the unchanged 35 mm residual by 0.324 mm, so V53 reduced the internal target margin to 0.008. V80k then measured targetNormalDot=0.119356 and evaluated normalDot=0.095297 on a different thin face with vertex errors below 0.000000062 m, showing target-space backtracking alone is insufficient. V54 adds local backtracking driven by the actually evaluated sit mesh, with each applied vertex change re-evaluated and the final 0.1 normal-turn check retained. Target correspondence, 35 mm residual, 85 mm source correction, 100 mm pose correction, topology and all release gates remain unchanged. This is a solver hypothesis, not fit, visual-appearance, UV, collision, Shape Key or release acceptance."
+    "evidenceBoundary": "V15 retains V14 dual-pose rest-space reconciliation and its bounded crouch residual refinement, while doubling the shared sewn-skirt longitudinal mesh sampling from 12 to 24 subdivisions. The denser shared topology is intended to let the existing front-lap placement and pleat field follow both evaluated thigh envelopes with smaller facets; it adds no garment length and changes no projection, residual, orientation, correction, seam, pose, or release bound. This is a mesh-resolution hypothesis only, not fit, pose acceptance, visual approval, UV, collision, Shape Key or release acceptance."
   },
-  "designRevision": "v55-evaluated-orientation-backtracking-20261025"
+  "designRevision": "v59-v15-dense-sewn-panel-sampling-20261025"
 }
