@@ -98,6 +98,8 @@ class PipelineStageWriteBoundaryTests(unittest.TestCase):
     def test_skin_export_writes_declared_asset_in_own_product_workspace(self) -> None:
         with self._repo() as name:
             root = Path(name)
+            # Skin/export follows earlier stages, so its runtime workspace exists.
+            (root / ".image2outfit/products/test-garment").mkdir(parents=True)
             script = root / "skin_export.py"
             script.write_text(
                 textwrap.dedent(
