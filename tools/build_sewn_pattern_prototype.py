@@ -932,15 +932,48 @@ def main():
     prototype_surface_motifs = add_prototype_surface_motifs(mesh, job, recipe)
     source = resolve(job["blendPath"])
     source.parent.mkdir(parents=True, exist_ok=True)
-    # The workflow transaction owns rollback; avoid undeclared .blend1 writes.
+    # Keep the target avatar available to local cloth/skin stages, but never
+    # serialize it into the tracked, distributable garment source.
+    private_source = (
+        ROOT
+        / ".image2outfit"
+        / "products"
+        / str(job["id"])
+        / "private-source"
+        / "working-source.blend"
+    )
+    private_source.parent.mkdir(parents=True, exist_ok=True)
     bpy.context.preferences.filepaths.save_version = 0
-    bpy.ops.wm.save_as_mainfile(filepath=str(source))
+    bpy.ops.wm.save_as_mainfile(filepath=str(private_source), check_existing=False)
+    reference_objects = [
+        obj for obj in bpy.data.objects
+        if obj.get("prototypeRole") == "target-avatar-reference-only"
+    ]
+    if not reference_objects:
+        raise ValueError("Private target-avatar reference objects are missing before source sanitization")
+    for obj in reference_objects:
+        bpy.data.objects.remove(obj, do_unlink=True)
+    bpy.data.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
+    remaining_private = [
+        obj.name for obj in bpy.data.objects
+        if obj.get("prototypeRole") == "target-avatar-reference-only"
+    ]
+    if remaining_private:
+        raise ValueError("Target-avatar reference objects remain in the distributable Blender source")
+    bpy.ops.wm.save_as_mainfile(filepath=str(source), check_existing=False)
     report = {
         "schemaVersion": 1, "productId": job["id"], "passed": False,
         "measuredWaistbandPlacement": waistband_evidence,
         "declaredSkirtFoldPlacement": fold_evidence,
         "declaredSkirtCreaseTopology": crease_evidence,
         "buildDisposition": "EDITABLE_SEWN_PROTOTYPE_ONLY",
+        "publicEditableSourceSanitization": {
+            "targetAvatarReferenceObjectsRemoved": len(reference_objects),
+            "remainingTargetAvatarReferenceObjects": len(remaining_private),
+            "privateSimulationSourceSha256": digest(private_source),
+            "grantsFitAcceptance": False,
+        },
+        "authoredPatternUvEvidence": uv_evidence,
         "prototypeEdgeTrim": prototype_edge_trim,
         "prototypeSurfaceMotifs": prototype_surface_motifs,
         "sourceBlendSha256": digest(source), "sewnMeshSha256": digest(mesh_path),

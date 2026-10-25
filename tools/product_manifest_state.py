@@ -495,7 +495,13 @@ def record_workflow_attempt(
         for artifact in artifacts:
             if digest(repo_path(root, artifact["path"])) != artifact["sha256"]:
                 raise ValueError("manufacturing execution artifact is stale")
-        sources = [item for item in artifacts if item["path"].endswith(".blend")]
+        # A sewn garment's tracked editable source is the only public source.
+        # The build stage may also declare an ignored local Blender scene that
+        # retains the target avatar for cloth collision and skin transfer.
+        sources = [
+            item for item in artifacts
+            if item["path"] == job.get("blendPath")
+        ]
         reports = [
             item
             for item in artifacts

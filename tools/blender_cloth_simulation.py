@@ -448,7 +448,16 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     frame_end = policy["prototypeFrameEnd"]
     if not isinstance(frame_end, int) or not 2 <= frame_end <= 120:
         raise ValueError("bounded prototype frame range is required")
-    bpy.ops.wm.open_mainfile(filepath=str(blend), load_ui=False)
+    private_blend = (
+        ROOT / ".image2outfit" / "products" / str(job["id"])
+        / "private-source" / "working-source.blend"
+    )
+    if not private_blend.is_file():
+        raise FileNotFoundError(
+            "Private working Blender scene is required for avatar collision; "
+            "the distributable source intentionally contains garment objects only"
+        )
+    bpy.ops.wm.open_mainfile(filepath=str(private_blend), load_ui=False)
     original = bpy.data.objects.get(str(job["id"]))
     if original is None or original.type != "MESH":
         raise ValueError("canonical sewn prototype is missing")
