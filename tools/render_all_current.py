@@ -9,6 +9,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -29,16 +30,27 @@ IMAGE_SUFFIXES = {".png", ".webp", ".jpg", ".jpeg"}
 def run_logged(command: list[str], log_path: Path, env: dict[str, str]) -> int:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("w", encoding="utf-8") as stream:
-        proc = subprocess.run(
+        with subprocess.Popen(
             command,
             cwd=ROOT,
             env=env,
             stdout=stream,
             stderr=subprocess.STDOUT,
             text=True,
-            check=False,
-        )
-    return proc.returncode
+        ) as proc:
+            started = time.monotonic()
+            while True:
+                try:
+                    return proc.wait(timeout=120)
+                except subprocess.TimeoutExpired:
+                    # Subprocess output stays in the per-product report; emit only
+                    # a safe heartbeat so long hosted renders remain observable.
+                    elapsed = int(time.monotonic() - started)
+                    print(
+                        f"render-current subprocess still running: "
+                        f"elapsed={elapsed}s log={log_path.name}",
+                        flush=True,
+                    )
 
 
 def mark_attempt(
