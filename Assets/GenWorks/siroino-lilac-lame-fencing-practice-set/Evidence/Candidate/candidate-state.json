@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v73-v18-lap-source-seam-transition-20261026",
+  "revision": "v74-v19-full-front-rear-transition-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,19 @@
   },
   "blockingFindings": [
     {
+      "code": "SIT_CROUCH_FRONT_COVERAGE",
       "severity": "BLOCKER",
-      "description": "V73 crouch and sit renders show both thighs passing through the front overskirt/apron, leaving large uncovered areas while fabric hangs below and behind the knees.",
-      "code": "SIT_CROUCH_FRONT_COVERAGE"
+      "description": "V74 sit and crouch renders still expose both upper thighs broadly while the front panels hang below or beside the knees; the lap does not maintain continuous front coverage."
     },
     {
+      "code": "SIDE_TRANSITION_FOLD_COLLAPSE",
       "severity": "BLOCKER",
-      "description": "Front, neutral, and three-quarter views retain a deeply pinched center seam, irregular overlapping panels, and abrupt hem steps; the apron does not read as a coherent finished garment.",
-      "code": "FRONT_SPLIT_AND_HEM"
+      "description": "Sit and crouch show sharp triangular folds and overlapping purple hems clustered beside the knees, indicating a failed side transition between front and rear skirt panels."
     },
     {
+      "code": "STANDING_SKIRT_SILHOUETTE",
       "severity": "BLOCKER",
-      "description": "Side and rear views show coarse accordion folds, sharp intersecting points, and inner panels hanging below the rear hem; the skirt drape remains visibly unresolved.",
-      "code": "SKIRT_FORM_AND_FACETING"
-    },
-    {
-      "severity": "BLOCKER",
-      "description": "The rear adjustment tab projects away from the garment as a rigid flap instead of sitting against the back.",
-      "code": "REAR_TAB_PROJECTION"
+      "description": "Neutral, front and side views retain jagged vertical creases, stepped side ridges and an irregular elongated hem; the standing silhouette and panel surfaces remain visibly damaged."
     }
   ],
   "failedGeometryChecks": [

@@ -40,17 +40,17 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     """Reconcile the sewn front apron against evaluated sit and crouch poses.
 
     This is a deterministic source-geometry solve, not a weight change: it
-    projects the front skirt/lap onto height-local evaluated under-shorts in
-    sit and crouch, averages those target positions in rest space through each
-    vertex's frozen linear-blend skin map, and then smooths that correction
-    through connected front panels. Height-local queries avoid treating a
+    projects the full front skirt/lap onto height-local evaluated under-shorts
+    in sit and crouch, averages those target positions in rest space through
+    each vertex's frozen linear-blend skin map, and then fades that correction
+    through graph-connected rear skirt panels. Height-local queries avoid treating a
     remote shorts edge as support for a lower apron point just because the
     target mesh spans that height elsewhere.
     """
     spec = pose_spec.get("poseConstrainedApronGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "sit-crouch-continuous-front-apron-inverse-skin-v15-dense-sewn-panel-sampling":
+    if spec.get("method") != "sit-crouch-continuous-overskirt-inverse-skin-v16-full-front-rear-transition":
         raise ValueError("Unknown pose-constrained apron geometry method")
     source_piece_ids = set(spec.get("sourcePieceIds", []))
     transition_piece_ids = set(spec.get("transitionPieceIds", []))
@@ -154,18 +154,21 @@ def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
     if not apron_vertices:
         raise ValueError("Pose-constrained apron selected no sewn vertices")
 
-    # Carry the seated thigh trajectory through the sewn lap seam and ease it
-    # into a narrow band of the neighboring front-skirt panels. Locking the
-    # whole shared seam and its one-ring neighbors left the lap moving as an
-    # isolated patch, which created a discontinuity exactly at the connection
-    # the visual review asked us to improve. Keep the transition graph-bound
-    # to the declared front panels; do not spread deformation around the skirt.
+    # Reconcile every declared front skirt panel against the posed shorts, then
+    # ease the trajectory across the sewn side seams into a narrow band of the
+    # rear panels. The earlier lap-only patch left most front cloth untouched;
+    # V73 direct review showed that small source region did not cover the thighs
+    # in sit/crouch. Keep the transition graph-bound and limited to declared
+    # overskirt pieces; never spread the correction into waistbands or jacket.
     transition_vertices = set()
     transition_ring_by_vertex = {}
     if transition_piece_ids:
-        if any("front" not in piece for piece in transition_piece_ids):
+        if any(
+            not piece.startswith(("overskirt-front-", "overskirt-back-"))
+            for piece in transition_piece_ids
+        ):
             raise ValueError(
-                "Apron trajectory transitions must stay on front-skirt panels"
+                "Apron trajectory transitions must stay on sewn overskirt panels"
             )
         seam_seeds = {
             index
