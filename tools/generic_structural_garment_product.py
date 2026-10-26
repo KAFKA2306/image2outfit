@@ -163,7 +163,9 @@ def main() -> int:
     if job.get("schemaVersion") != 2:
         raise ValueError("generic structural garment builder requires schemaVersion 2")
     product = job["id"]
-    contract_dir = job_path.parent
+    # The candidate gate passes a materialized runtime job.json; the two
+    # manufacturing contracts remain owned by config/products/<id>/.
+    contract_dir = ROOT / "config" / "products" / product
     construction = load(contract_dir / "construction.json")
     decomposition = load(contract_dir / "pattern-draft.json")
     if construction.get("profile") != "panel-sewn":
