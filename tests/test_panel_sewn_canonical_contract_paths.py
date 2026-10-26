@@ -13,7 +13,9 @@ from unittest.mock import patch
 
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 SCRIPT = TOOLS / "generic_structural_garment_product.py"
-SPEC = importlib.util.spec_from_file_location("generic_structural_garment_product", SCRIPT)
+SPEC = importlib.util.spec_from_file_location(
+    "generic_structural_garment_product", SCRIPT
+)
 assert SPEC is not None and SPEC.loader is not None
 FAKE_BPY = types.ModuleType("bpy")
 FAKE_BPY.ops = types.SimpleNamespace(
@@ -29,7 +31,9 @@ class _ReachedBlenderStage(Exception):
 
 
 class PanelSewnContractPathTests(unittest.TestCase):
-    def test_materialized_runtime_job_uses_canonical_construction_and_pattern(self) -> None:
+    def test_materialized_runtime_job_uses_canonical_construction_and_pattern(
+        self,
+    ) -> None:
         product = "siroino-arc-latch-cocoon-bomber-set"
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
