@@ -11,7 +11,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-SCRIPT = Path(__file__).resolve().parents[1] / "tools" / "generic_structural_garment_product.py"
+TOOLS = Path(__file__).resolve().parents[1] / "tools"
+SCRIPT = TOOLS / "generic_structural_garment_product.py"
 SPEC = importlib.util.spec_from_file_location("generic_structural_garment_product", SCRIPT)
 assert SPEC is not None and SPEC.loader is not None
 FAKE_BPY = types.ModuleType("bpy")
