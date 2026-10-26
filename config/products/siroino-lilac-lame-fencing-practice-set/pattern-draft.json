@@ -2583,7 +2583,7 @@
     },
     {
       "cutCount": 1,
-      "constructionStatus": "V28_UNFASTENED_OVERLAPPING_FRONT_APRON",
+      "constructionStatus": "V75_EQUAL_LENGTH_CLOSED_CENTER_FRONT_TOPOLOGY",
       "pieceId": "overskirt-front-lap-left",
       "partId": "short-pleated-overskirt",
       "edges": [
@@ -2607,7 +2607,7 @@
         },
         {
           "startVertex": 3,
-          "role": "open",
+          "role": "seam",
           "endVertex": 0,
           "edgeId": "center-front"
         }
@@ -2627,7 +2627,7 @@
           -0.16
         ],
         [
-          0.08,
+          0,
           -0.16
         ]
       ],
@@ -2637,7 +2637,7 @@
     },
     {
       "cutCount": 1,
-      "constructionStatus": "V28_UNFASTENED_OVERLAPPING_FRONT_APRON",
+      "constructionStatus": "V75_EQUAL_LENGTH_CLOSED_CENTER_FRONT_TOPOLOGY",
       "pieceId": "overskirt-front-lap-right",
       "partId": "short-pleated-overskirt",
       "edges": [
@@ -2661,7 +2661,7 @@
         },
         {
           "startVertex": 3,
-          "role": "open",
+          "role": "seam",
           "endVertex": 0,
           "edgeId": "center-front"
         }
@@ -2681,7 +2681,7 @@
           -0.16
         ],
         [
-          -0.08,
+          0,
           -0.16
         ]
       ],
@@ -2799,7 +2799,7 @@
   "method": {
     "name": "avatar-profile-anchored 2D topology candidate",
     "status": "TRIAL",
-    "rationale": "V71 widens only the matched outer hem endpoints of the two front skirt panels and their sewn lap-side partners by 40 mm per side, keeping hem height, lap overlap, waist and all projection/residual/orientation limits unchanged. This front-lap flank-coverage hypothesis targets the lateral pull seen in sit/crouch renders; the rendered result still requires direct review and does not establish fit or acceptance."
+    "rationale": "V75 removes the crossed 80 mm lap overlap and defines a straight, equal-length sewn center-front edge on both panels. It removes the V74 pose-projection correction so the new seam topology can be inspected without the failed inverse-skin deformation. Existing hem height, outer widths, pleat seed, waistband and all fit/release gates remain unchanged. This is a disposable construction hypothesis; seated coverage and appearance require fresh direct review."
   },
   "unresolved": [
     {

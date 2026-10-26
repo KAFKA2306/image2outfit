@@ -9672,46 +9672,5 @@
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "poseConstrainedApronGeometry": {
-    "method": "sit-crouch-continuous-overskirt-inverse-skin-v16-full-front-rear-transition",
-    "referencePose": "sit",
-    "sourcePieceIds": [
-      "overskirt-front-left",
-      "overskirt-front-right",
-      "overskirt-front-lap-left",
-      "overskirt-front-lap-right"
-    ],
-    "transitionPieceIds": [
-      "overskirt-back-left",
-      "overskirt-back-right"
-    ],
-    "leftTargetPieceIds": [
-      "shorts-front-left"
-    ],
-    "rightTargetPieceIds": [
-      "shorts-front-right"
-    ],
-    "leftThighBone": "UpperLeg_L",
-    "rightThighBone": "UpperLeg_R",
-    "minimumHeightZM": 0.42,
-    "fullBlendHeightZM": 0.52,
-    "fullBlendEndHeightZM": 0.62,
-    "waistLockHeightZM": 0.7,
-    "clearanceM": 0.012,
-    "minimumProjectionBlend": 0.02,
-    "maximumTargetDistanceM": 0.22,
-    "maximumCorrectionM": 0.085,
-    "maximumPoseCorrectionM": 0.1,
-    "maximumSkinMappingErrorM": 0.002,
-    "maximumSurfaceResidualM": 0.035,
-    "targetSurfaceHeightBinM": 0.02,
-    "maximumLocalSurfaceSupportDistanceM": 0.05,
-    "centerBlendHalfWidthM": 0.04,
-    "smoothingIterations": 48,
-    "smoothness": 2.4,
-    "maximumNormalTurnDot": 0.1,
-    "lockSharedExternalSeams": true,
-    "evidenceBoundary": "V19 projects all four sewn main-front and lap overskirt panels to the existing bounded sit/crouch shorts targets, then fades the correction across two graph-connected rings into the rear skirt panels. This changes correction ownership after V73 direct appearance review showed the lap-only patch left broad front areas and exposed both thighs. 50 mm local surface support, 12 mm clearance, 35 mm residual, projection/correction/pose/orientation limits, frozen skin maps, and release gates remain unchanged. It is a deformation hypothesis only; no fit, appearance, UV, runtime or customer acceptance is implied."
-  },
-  "designRevision": "v63-v19-full-front-rear-transition-20261026"
+  "designRevision": "v64-v20-closed-center-front-pattern-20261026"
 }
