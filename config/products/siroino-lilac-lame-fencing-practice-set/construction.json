@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V78 keeps the V77 panel geometry and tests a weight-field change only: increase shorts hem follow to 0.98, lower waist follow to 0.08, and narrow the unweighted inner-thigh band. The V77 neutral 100% versus sit 16% diagnostic exposes a severe pose-following deficit in the existing shorts field; this trial tests whether closer per-leg skin weighting improves seated coverage. It does not validate fit, collision, appearance, Shape Keys or release.",
-  "designRevision": "v78-v23-inner-thigh-follow-weight-trial-20261026",
+  "designRevision": "v79-v3-bilateral-shorts-hem-weight-trial-20261026",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -247,7 +247,7 @@
       ],
       "evidenceBoundary": "V42 separates shorts from the shared overskirt weight region and applies an explicit pelvis-to-thigh follow profile to the fitted shorts. The increased lower-leg follow is a deformation hypothesis to reduce sitting/crouch volume artifacts; weight, fit, collision and appearance remain unaccepted.",
       "weightProfile": {
-        "method": "hip-anchored-lateral-thigh-fade-v1",
+        "method": "hip-anchored-anterior-bilateral-center-hem-fade-v3",
         "pieceIds": [
           "shorts-front-left",
           "shorts-front-right",
@@ -258,10 +258,14 @@
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
         "waistThighWeight": 0.08,
-        "hemThighWeight": 0.98,
-        "centerlineHalfWidthM": 0.015,
-        "fullSideWeightWidthM": 0.055,
-        "evidenceBoundary": "V78 keeps all V77 shorts-panel outlines and tests a weight field only: 8% thigh at the waistband, rising to 98% at the leg hem, with the pelvis-led inner-thigh band narrowed from 75 mm to 15 mm and the full lateral follow reached by 55 mm. This hypothesis responds to the measured diagnostic change from 100% neutral to 16% sit upper-thigh coverage. It may cause crotch/seam stress, side-to-side discontinuity or pose artifacts; no fit, motion, visual or release acceptance is implied."
+        "hemThighWeight": 0.82,
+        "forwardHemThighWeight": 0.08,
+        "centerlineHemThighWeight": 0.12,
+        "forwardCenterYM": -0.03788188099861145,
+        "forwardFadeDistanceM": 0.14,
+        "centerlineHalfWidthM": 0.075,
+        "fullSideWeightWidthM": 0.135,
+        "evidenceBoundary": "V79 keeps V78 shorts-panel outlines and restores the moderate 8%-to-82% pelvis-to-hem field and 75 mm pelvis-led center band; it adds the existing v3 bilateral centerline blend (12% hem target) and an 8% anterior target fading over 140 mm, with full lateral follow reached by 135 mm. This isolates smooth left/right thigh distribution near the crotch from hem over-follow. The diagnostic will check knee deformation and seated coverage; no fit, motion, visual or release acceptance is implied."
       }
     }
   ]

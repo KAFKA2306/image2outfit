@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v78-v23-inner-thigh-follow-weight-trial-20261026",
+  "revision": "v79-v3-bilateral-shorts-hem-weight-trial-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,17 +20,17 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "description": "Sit and crouch show large, sharp white shorts flares at the knees after increasing hem thigh weight. The higher weight improves measured upper-thigh ray coverage from 15.6% to 42.6% in sit, but the actual garment deformation is visibly worse and still leaves broad anterior thigh areas exposed.",
-      "code": "SHORTS_HEM_WEIGHT_DEFORMATION"
+      "description": "The sharp shorts knee flares recorded for V78 are no longer visible in sit.png or crouch.png after restoring the moderate 8%-to-82% weight field and adding the bilateral centerline blend. This only resolves that observed artifact; upper-thigh coverage and avatar fit remain unaccepted.",
+      "code": "V78_SHORTS_KNEE_FLARE_RESOLVED"
     },
     {
       "severity": "BLOCKER",
-      "description": "In seated and crouched views the overskirt lifts away from the thighs, leaving pointed separated front/side panels and dense accordion ridges. The skirt still does not provide continuous front coverage through the poses.",
+      "description": "The sit and crouch renders still show broad anterior-thigh exposure. A side panel lifts into a dense accordion strip with pointed, separated tabs in both poses, so the overskirt does not maintain continuous front coverage.",
       "code": "POSE_COVERAGE_AND_PANEL_COLLISION"
     },
     {
       "severity": "BLOCKER",
-      "description": "Neutral and standing views retain pronounced ribbed side folds and an uneven front/side hem; the V78 weight-only trial does not produce a coherent finished silhouette.",
+      "description": "Front, left and back standing views retain pronounced side ridges and an uneven, long center drop rather than a coherent short overskirt silhouette. Astra independently confirmed that the skirt panel/lift behavior and hem silhouette remain release-blocking.",
       "code": "STANDING_SILHOUETTE_AND_FOLDING"
     }
   ],
