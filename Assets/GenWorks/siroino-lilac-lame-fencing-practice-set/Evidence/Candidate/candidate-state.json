@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v79-v3-bilateral-shorts-hem-weight-trial-20261026",
+  "revision": "v80-shorter-anchored-overskirt-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "severity": "BLOCKER",
-      "description": "The sharp shorts knee flares recorded for V78 are no longer visible in sit.png or crouch.png after restoring the moderate 8%-to-82% weight field and adding the bilateral centerline blend. This only resolves that observed artifact; upper-thigh coverage and avatar fit remain unaccepted.",
-      "code": "V78_SHORTS_KNEE_FLARE_RESOLVED"
+      "code": "POSE_COVERAGE_AND_PANEL_COLLISION",
+      "description": "V80 still shows broad anterior-thigh exposure in sit.png and crouch.png. The side panels lift and terminate in separated, pointed triangular tabs, so continuous front/side coverage fails. Astra independently confirmed the same seated and crouch failures.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "description": "The sit and crouch renders still show broad anterior-thigh exposure. A side panel lifts into a dense accordion strip with pointed, separated tabs in both poses, so the overskirt does not maintain continuous front coverage.",
-      "code": "POSE_COVERAGE_AND_PANEL_COLLISION"
+      "code": "SIDE_PANEL_FOLDING",
+      "description": "left.png and back.png retain dense, narrow accordion ridges along the overskirt sides. Shortening the hem extension by 20 mm and lowering thigh-follow from 0.72 to 0.42 did not remove the side-panel lift or corrugation.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "description": "Front, left and back standing views retain pronounced side ridges and an uneven, long center drop rather than a coherent short overskirt silhouette. Astra independently confirmed that the skirt panel/lift behavior and hem silhouette remain release-blocking.",
-      "code": "STANDING_SILHOUETTE_AND_FOLDING"
+      "code": "STANDING_HEM_SILHOUETTE",
+      "description": "front.png and three-quarter.png continue to show a center-dipping hem with side flare. The V80 weight and hem adjustments do not establish a coherent standing hem. Astra independently requested revised front coverage, side-panel drape, and hem equalization.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [
