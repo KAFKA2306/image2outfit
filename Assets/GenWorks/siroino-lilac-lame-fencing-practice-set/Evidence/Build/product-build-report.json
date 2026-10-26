@@ -8871,8 +8871,8 @@
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "1d27ab4980e1e068036e6add6aece0c990d9f4d458ccccb8db41db1faa8f7165",
-    "afterVerticesSha256": "d34546bf75ad6a79c172b345dc949df25f00af8df35fb1f97207be2010884776",
+    "beforeVerticesSha256": "a5f07be7f5b3b3c28d4d5fc55b5ec77fadc80b4dc63a16da3ed23d3116820fb8",
+    "afterVerticesSha256": "285ac4cac1c0ecaf316496bd6f1bedab14bb2d1f706baea75dcc59dad51aa745",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -8912,16 +8912,16 @@
           "overskirt-front-lap-right"
         ],
         "additionalExtensionM": 0,
-        "forwardProjectionM": 0,
+        "forwardProjectionM": 0.04,
         "fullExtensionHalfAngleRadians": 0.55,
         "zeroExtensionHalfAngleRadians": 1.25,
         "axisOriginBlenderXYM": [
           0,
           -0.03788188099861145
         ],
-        "evidenceBoundary": "V77 removes the front-only apron hem drop and forward scoop to test a level continuous skirt hem after V76 showed a long dropped center panel. No fit, drape, pose, collision or visual acceptance is implied."
+        "evidenceBoundary": "V81 restores the maximum supported 40 mm of front-half forward projection on the four sewn front/lap panels while keeping the 120 mm common skirt extension and all hem Z values unchanged. This isolates anterior thigh coverage from skirt length; pose drape, seam behavior, collision and fit remain unapproved."
       },
-      "evidenceBoundary": "V80 shortens the shared skirt extension from 140 mm to 120 mm while preserving the closed front, panel seams, fold topology and no-scoop hem. Combined with the reduced thigh-follow profile, this tests whether less hem sweep and leg pull reduce lifted pointed tabs and side ridges; construction and fit remain unapproved.",
+      "evidenceBoundary": "V81 changes only the forward reach of the front/lap panels to address anterior thigh exposure. Shared length, hem, stitch graph, folds and V80 weight fields are held constant for comparison; no visual, fit or release acceptance is implied.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8942,8 +8942,8 @@
     "movedVertexCount": 8843,
     "maximumRadialDisplacementM": 0.0007957341052216983,
     "minimumTriangleAreaM2": 4.406125633839106e-12,
-    "beforeVerticesSha256": "d34546bf75ad6a79c172b345dc949df25f00af8df35fb1f97207be2010884776",
-    "afterVerticesSha256": "87aa322e5ea890ed62da31ca9805ccb9dfa4b8a3440997391747dfe210c65a1c",
+    "beforeVerticesSha256": "285ac4cac1c0ecaf316496bd6f1bedab14bb2d1f706baea75dcc59dad51aa745",
+    "afterVerticesSha256": "4e0ebc9f3b9625a25ae0b0fd0f850f929c37c47122e086135b64348e3fd0fcbb",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "panelAngularRangesRadians": {},
@@ -8981,17 +8981,17 @@
         "overskirt-front-lap-right"
       ],
       "additionalExtensionM": 0,
-      "forwardProjectionM": 0,
+      "forwardProjectionM": 0.04,
       "fullExtensionHalfAngleRadians": 0.55,
       "zeroExtensionHalfAngleRadians": 1.25,
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
-      "evidenceBoundary": "V77 removes the front-only apron hem drop and forward scoop to test a level continuous skirt hem after V76 showed a long dropped center panel. No fit, drape, pose, collision or visual acceptance is implied."
+      "evidenceBoundary": "V81 restores the maximum supported 40 mm of front-half forward projection on the four sewn front/lap panels while keeping the 120 mm common skirt extension and all hem Z values unchanged. This isolates anterior thigh coverage from skirt length; pose drape, seam behavior, collision and fit remain unapproved."
     },
     "maximumAdditionalForwardApronDisplacementM": 0.0,
-    "maximumForwardApronProjectionM": 0.0,
+    "maximumForwardApronProjectionM": 0.04,
     "beforeBoundsZM": [
       0.5795782208442688,
       0.7395782470703125
@@ -9187,7 +9187,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "6c576d501235d7ef9f0b6c7362a3fb13a249e0c41cb4a8ac8f0ca2efec02a13b",
+    "privateSimulationSourceSha256": "0ebbd3621bf511188381aeb693e4943f95703eeaaa16d745dade0c92a4e8dc4e",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -20317,7 +20317,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "01265d8645712e8979184046880c0f02a93d02077a7b21af5d3a32a8b06db5cb",
+  "sourceBlendSha256": "f81d63e2b864ba8068c5a9ec7770ff15a7220417ed3e01ebf777678b88846e1a",
   "sewnMeshSha256": "dbdffdb38363d9ab3e4c5939307e55969d731569f1e812d41ced4098b562ee7c",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -159237,8 +159237,8 @@
     "layerOffsetVertexCount": 1217,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 1981,
-    "beforeVerticesSha256": "31fdc3ecb2179ea87be516a5d141e4f3b01321810ce930d4bd16037533d934d9",
-    "afterVerticesSha256": "1d27ab4980e1e068036e6add6aece0c990d9f4d458ccccb8db41db1faa8f7165",
+    "beforeVerticesSha256": "becb42fece12584440551946180eb35a70fe4a676095415dd58caf9878e45827",
+    "afterVerticesSha256": "a5f07be7f5b3b3c28d4d5fc55b5ec77fadc80b4dc63a16da3ed23d3116820fb8",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },

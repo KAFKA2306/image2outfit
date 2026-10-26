@@ -9646,16 +9646,16 @@
         "overskirt-front-lap-right"
       ],
       "additionalExtensionM": 0,
-      "forwardProjectionM": 0,
+      "forwardProjectionM": 0.04,
       "fullExtensionHalfAngleRadians": 0.55,
       "zeroExtensionHalfAngleRadians": 1.25,
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
-      "evidenceBoundary": "V77 removes the front-only apron hem drop and forward scoop to test a level continuous skirt hem after V76 showed a long dropped center panel. No fit, drape, pose, collision or visual acceptance is implied."
+      "evidenceBoundary": "V81 restores the maximum supported 40 mm of front-half forward projection on the four sewn front/lap panels while keeping the 120 mm common skirt extension and all hem Z values unchanged. This isolates anterior thigh coverage from skirt length; pose drape, seam behavior, collision and fit remain unapproved."
     },
-    "evidenceBoundary": "V80 shortens the shared skirt extension from 140 mm to 120 mm while preserving the closed front, panel seams, fold topology and no-scoop hem. Combined with the reduced thigh-follow profile, this tests whether less hem sweep and leg pull reduce lifted pointed tabs and side ridges; construction and fit remain unapproved.",
+    "evidenceBoundary": "V81 changes only the forward reach of the front/lap panels to address anterior thigh exposure. Shared length, hem, stitch graph, folds and V80 weight fields are held constant for comparison; no visual, fit or release acceptance is implied.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9672,5 +9672,5 @@
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "designRevision": "v80-shorter-anchored-overskirt-20261026"
+  "designRevision": "v81-forward-apron-coverage-20261026"
 }
