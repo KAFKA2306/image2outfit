@@ -32,7 +32,7 @@
     "stage": {"type": "string", "minLength": 1},
     "requestedMode": {"enum": ["plan", "execute"]},
     "outcomeMode": {"enum": ["planned", "executed", "failed"]},
-    "status": {"enum": ["PLANNED", "PASS", "FAILED"]},
+    "status": {"enum": ["PLANNED", "PASS", "FAILED", "REUSED"]},
     "startedAt": {"type": "string", "format": "date-time"},
     "finishedAt": {"type": "string", "format": "date-time"},
     "tool": {
