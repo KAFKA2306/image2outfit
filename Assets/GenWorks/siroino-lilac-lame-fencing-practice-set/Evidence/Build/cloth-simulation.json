@@ -91,12 +91,12 @@
       "pinMethod": "canonical shared seam vertices",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.4595782160758972,
+          0.3995782136917114,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
           "minimum": 0.006258426310523646,
-          "maximum": 0.18219775799661875
+          "maximum": 0.19702451676130295
         },
         "negativeSignedVertexCount": 0,
         "belowCombinedCollisionMarginVertexCount": 28,
@@ -104,45 +104,45 @@
       },
       "postBakeGeometryHypothesis": {
         "method": "uniform-laplacian-interior-only-boundaries-and-pins-fixed",
-        "iterations": 3,
-        "factor": 0.12,
+        "iterations": 4,
+        "factor": 0.22,
         "vertexCount": 8909,
         "boundaryVertexCount": 236,
         "pinnedVertexCount": 72,
         "fixedVertexCount": 236,
         "fixedVertexMaximumDisplacementM": 0.0,
         "changedInteriorVertexCount": 8673,
-        "maximumInteriorDisplacementM": 0.010866276648553634,
-        "meanInteriorDisplacementM": 0.0011562804366976088,
-        "reason": "Direct review of the current five-view and six-pose set shows broad angular, clumped overskirt facets. Trial low-strength post-bake fairing on interior cloth vertices only while every open hem, waist, seam boundary, and declared pin stays fixed.",
-        "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.12 on non-boundary overskirt vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes must be recorded by this run. This geometry hypothesis does not establish fit, fold quality, motion, visual acceptance, fabric calibration, or release readiness; the 35 mm residual and orientation limits remain unchanged.",
+        "maximumInteriorDisplacementM": 0.020906604017665423,
+        "meanInteriorDisplacementM": 0.00229259076202823,
+        "reason": "V81 direct inspection still shows pronounced side and back accordion ridges after the bounded cloth solve. Trial stronger interior fairing on the settled overskirt while all open hems, waist, panel seams and cloth pins remain fixed; preserve the authored pleat count and seam geometry.",
+        "evidenceBoundary": "Four post-bake uniform Laplacian iterations at factor 0.22 on non-boundary overskirt vertices only. This bounded geometry trial records displacement statistics, fixed-boundary count and resulting mesh hashes; it does not establish fit, fold quality, motion, visual acceptance, fabric calibration or release readiness. Existing 35 mm residual and orientation limits remain unchanged.",
         "grantsFitAcceptance": false,
         "grantsAppearanceAcceptance": false
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.41025713086128235,
+          0.3564552366733551,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.006202558386576129,
-          "maximum": 0.10934110404923558
+          "minimum": 0.006069104914786294,
+          "maximum": 0.1078474665991962
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 177,
+        "belowCombinedCollisionMarginVertexCount": 228,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "406ee0d92331332b0fabcfaded6b99f6090963f8431cc202a06f0ac39fbdaa8c",
-      "evaluatedFrameMeshSha256": "d1ddb45e9d261ad5cd1e4b3ce53479a05b5b56e405931645f8853e361532f906",
-      "settledMeshSha256": "6435e58ca36ce61f56fce32065465201ef548caa47554a78395e87b17d6c338e",
+      "preBakeMeshSha256": "c479d0058122c9a6e2def8b52e925690ef0f22a71cc53a6bc67d0378efc644d3",
+      "evaluatedFrameMeshSha256": "03cbaec63780136c8df9bdfd86963733d102ef4a6447a97c263a5b1bc0a26d68",
+      "settledMeshSha256": "cd496c3505455c526d5eb465b3030c6c2d5bcd6685313c487e8d901ac713194b",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "f81d63e2b864ba8068c5a9ec7770ff15a7220417ed3e01ebf777678b88846e1a",
-  "constructionSha256": "c7a35572c2d5da1da6c775dfce4381ddc662033096e31c990b861dbefa4371b0",
+  "sourceBlendSha256": "e7c40851472f52d66b66bee874ca48d09de841bf40dc1abb2313e836f2bf61c2",
+  "constructionSha256": "7dd44bf07ce473eacc99ad62ec38d8a2f63bd254b1edbf3402c253e14f0b0ced",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "ab62906ee96753c8a8fbbf9c7f29e9af62ce5bab7e14646f94fa591056ee618b",
+  "candidateSha256": "bf7a207ed1f29564b466560ca174816112e55a2ccf6346f94e1030d5a0c8c3cb",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

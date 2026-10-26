@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v81-forward-apron-coverage-20261026",
+  "revision": "v82-front-apron-and-side-drape-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,18 +19,18 @@
   },
   "blockingFindings": [
     {
-      "description": "V81 restores 40 mm forward projection on the front/lap panels. The current pose coverage diagnostic improves sit overskirt coverage only from 18.3/20.1% to 19.5/19.8% on the thighs and crouch from 33.3/32.9% to 33.7/32.9%; direct sit/crouch renders still show broad anterior-thigh exposure and a pointed side tab. Astra independently confirmed the coverage failure.",
+      "description": "The 60 mm front/lap continuation improves the standing apron, but sit still exposes 18.64/18.53% of upper thighs and crouch 32.77/32.88%; direct sit/crouch renders show broad exposure and panel/leg interference. Astra independently confirmed this pose-coverage blocker.",
       "code": "POSE_COVERAGE_AND_PANEL_COLLISION",
       "severity": "BLOCKER"
     },
     {
-      "description": "left.png and back.png retain pronounced accordion ridges that dominate the side/back drape. The front projection trial does not change side-panel fold quality.",
+      "description": "left.png, right.png and three-quarter.png retain prominent stair-step/accordion side relief and pointed side hem extensions despite the stronger boundary-preserving fairing.",
       "code": "SIDE_PANEL_FOLDING",
       "severity": "BLOCKER"
     },
     {
-      "description": "front.png and three-quarter.png still show an uneven hem dipping at the center. Astra independently requested revising pose-responsive front coverage and smoothing side drape, then reviewing the hem.",
-      "code": "STANDING_HEM_SILHOUETTE",
+      "description": "back.png and sit.png show an irregular inner panel protruding below the outer hem with sharp lavender-edged folds; layered hem intersection remains visually unresolved.",
+      "code": "LAYERED_HEM_INTERSECTION",
       "severity": "BLOCKER"
     }
   ],

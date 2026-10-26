@@ -8866,13 +8866,13 @@
       }
     ],
     "placedVertexCount": 6671,
-    "heightBlendSkippedVertexCount": 5439,
+    "heightBlendSkippedVertexCount": 5447,
     "angularSourceVerticesSha256": "422d912787799f3d85662d92b96e868aa5d4ca14d2b04d6f74e94d69fdec487c",
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "a5f07be7f5b3b3c28d4d5fc55b5ec77fadc80b4dc63a16da3ed23d3116820fb8",
-    "afterVerticesSha256": "285ac4cac1c0ecaf316496bd6f1bedab14bb2d1f706baea75dcc59dad51aa745",
+    "beforeVerticesSha256": "c92728f159e0af0de3be3ef6f26660d9a4dfdb764ccb4d62e3149b35334347bb",
+    "afterVerticesSha256": "8b3305f3b34d167c75d08687ee4117dd5685ac06a4a8f276e3508df8ba040437",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -8911,17 +8911,17 @@
           "overskirt-front-lap-left",
           "overskirt-front-lap-right"
         ],
-        "additionalExtensionM": 0,
+        "additionalExtensionM": 0.06,
         "forwardProjectionM": 0.04,
-        "fullExtensionHalfAngleRadians": 0.55,
-        "zeroExtensionHalfAngleRadians": 1.25,
+        "fullExtensionHalfAngleRadians": 0.65,
+        "zeroExtensionHalfAngleRadians": 1.3,
         "axisOriginBlenderXYM": [
           0,
           -0.03788188099861145
         ],
-        "evidenceBoundary": "V81 restores the maximum supported 40 mm of front-half forward projection on the four sewn front/lap panels while keeping the 120 mm common skirt extension and all hem Z values unchanged. This isolates anterior thigh coverage from skirt length; pose drape, seam behavior, collision and fit remain unapproved."
+        "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
       },
-      "evidenceBoundary": "V81 changes only the forward reach of the front/lap panels to address anterior thigh exposure. Shared length, hem, stitch graph, folds and V80 weight fields are held constant for comparison; no visual, fit or release acceptance is implied.",
+      "evidenceBoundary": "V82 increases only the front/lap panel continuation and its side fade for seated anterior coverage. Fitted shorts, shared rear length, stitch graph, folds and weight fields remain unchanged; no visual, fit or release acceptance is implied.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8934,16 +8934,16 @@
       "foldValleyDepthRatio": 0.06
     },
     "effectiveHeightRangeZM": [
-      0.45957822084395633,
+      0.39957822084395633,
       0.7395782470703125
     ],
-    "extensionBelowDeclaredPleatHemM": 2.622604367008563e-08,
+    "extensionBelowDeclaredPleatHemM": 0.06000002622604367,
     "selectedVertexCount": 8915,
     "movedVertexCount": 8843,
-    "maximumRadialDisplacementM": 0.0007957341052216983,
+    "maximumRadialDisplacementM": 0.0007664112658111353,
     "minimumTriangleAreaM2": 4.406125633839106e-12,
-    "beforeVerticesSha256": "285ac4cac1c0ecaf316496bd6f1bedab14bb2d1f706baea75dcc59dad51aa745",
-    "afterVerticesSha256": "4e0ebc9f3b9625a25ae0b0fd0f850f929c37c47122e086135b64348e3fd0fcbb",
+    "beforeVerticesSha256": "8b3305f3b34d167c75d08687ee4117dd5685ac06a4a8f276e3508df8ba040437",
+    "afterVerticesSha256": "c81fab7387c666adada567c0da8a7f9f1004c551889a7896359558a8bcb2e404",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "panelAngularRangesRadians": {},
@@ -8971,7 +8971,7 @@
     "extensionM": 0.12000000000031247,
     "selectedVertexCount": 8915,
     "movedVertexCount": 8843,
-    "maximumVertexDisplacementM": 0.12000000000031247,
+    "maximumVertexDisplacementM": 0.18000000000031247,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
       "pieceIds": [
@@ -8980,24 +8980,24 @@
         "overskirt-front-lap-left",
         "overskirt-front-lap-right"
       ],
-      "additionalExtensionM": 0,
+      "additionalExtensionM": 0.06,
       "forwardProjectionM": 0.04,
-      "fullExtensionHalfAngleRadians": 0.55,
-      "zeroExtensionHalfAngleRadians": 1.25,
+      "fullExtensionHalfAngleRadians": 0.65,
+      "zeroExtensionHalfAngleRadians": 1.3,
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
-      "evidenceBoundary": "V81 restores the maximum supported 40 mm of front-half forward projection on the four sewn front/lap panels while keeping the 120 mm common skirt extension and all hem Z values unchanged. This isolates anterior thigh coverage from skirt length; pose drape, seam behavior, collision and fit remain unapproved."
+      "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
     },
-    "maximumAdditionalForwardApronDisplacementM": 0.0,
+    "maximumAdditionalForwardApronDisplacementM": 0.06,
     "maximumForwardApronProjectionM": 0.04,
     "beforeBoundsZM": [
       0.5795782208442688,
       0.7395782470703125
     ],
     "afterBoundsZM": [
-      0.45957822084395633,
+      0.39957822084395633,
       0.7395782470703125
     ],
     "grantsFitAcceptance": false,
@@ -9187,7 +9187,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "0ebbd3621bf511188381aeb693e4943f95703eeaaa16d745dade0c92a4e8dc4e",
+    "privateSimulationSourceSha256": "7dddb7077669b14b6ae53308976af53990fef806ed44447da9e0808f7f155daa",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -20317,7 +20317,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "f81d63e2b864ba8068c5a9ec7770ff15a7220417ed3e01ebf777678b88846e1a",
+  "sourceBlendSha256": "e7c40851472f52d66b66bee874ca48d09de841bf40dc1abb2313e836f2bf61c2",
   "sewnMeshSha256": "dbdffdb38363d9ab3e4c5939307e55969d731569f1e812d41ced4098b562ee7c",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -20326,41 +20326,41 @@
     "weldCount": 6,
     "welds": [
       {
-        "maximumInputEdgeDistanceM": 8.50671405945926e-06,
+        "maximumInputEdgeDistanceM": 8.49778239187337e-06,
         "triangleCoordinatesM": [
           [
-            -0.09158710390329361,
-            0.05601463094353676,
+            -0.09157134592533112,
+            0.05599847808480263,
             0.6835782527923584
           ],
           [
-            -0.09157980978488922,
-            0.05601900815963745,
+            -0.09156406670808792,
+            0.05600286275148392,
             0.6835782527923584
           ],
           [
-            -0.09158634394407272,
-            0.05601532384753227,
+            -0.09157058596611023,
+            0.05599916726350784,
             0.6835684180259705
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 2.68427782277045e-06,
+        "maximumInputEdgeDistanceM": 2.681598411703059e-06,
         "triangleCoordinatesM": [
           [
-            0.10046545416116714,
-            0.08658620715141296,
+            0.10045433789491653,
+            0.08657243847846985,
             0.48197826743125916
           ],
           [
-            0.10046208649873734,
-            0.08658859133720398,
+            0.10045098513364792,
+            0.08657484501600266,
             0.48197826743125916
           ],
           [
-            0.10046448558568954,
-            0.08658622205257416,
+            0.10045337677001953,
+            0.08657245337963104,
             0.4819807708263397
           ]
         ]
@@ -20369,18 +20369,18 @@
         "maximumInputEdgeDistanceM": 2.9947186778658513e-06,
         "triangleCoordinatesM": [
           [
-            0.05986753851175308,
-            0.0650535300374031,
+            0.05986804887652397,
+            0.06505440920591354,
             0.7059782147407532
           ],
           [
-            0.0598662793636322,
-            0.06505432724952698,
+            0.05986679345369339,
+            0.06505520641803741,
             0.7059749364852905
           ],
           [
-            0.059864599257707596,
-            0.06505410373210907,
+            0.059865109622478485,
+            0.0650549829006195,
             0.7059782147407532
           ]
         ]
@@ -20389,18 +20389,18 @@
         "maximumInputEdgeDistanceM": 2.8459486835387094e-06,
         "triangleCoordinatesM": [
           [
-            0.12879540026187897,
-            0.03647817671298981,
+            0.1288008838891983,
+            0.0364813394844532,
             0.530297040939331
           ],
           [
-            0.12879596650600433,
-            0.03647850081324577,
+            0.12880145013332367,
+            0.03648166358470917,
             0.5302940011024475
           ],
           [
-            0.1287940889596939,
-            0.03648069128394127,
+            0.12879957258701324,
+            0.03648385405540466,
             0.530296802520752
           ]
         ]
@@ -20409,38 +20409,38 @@
         "maximumInputEdgeDistanceM": 3.1090644354836383e-06,
         "triangleCoordinatesM": [
           [
-            0.12879596650600433,
-            0.03647850081324577,
+            0.12880145013332367,
+            0.03648166358470917,
             0.5302940011024475
           ],
           [
-            0.12879692018032074,
-            0.03647905960679054,
+            0.12880240380764008,
+            0.03648222237825394,
             0.5302892923355103
           ],
           [
-            0.12879540026187897,
-            0.03647817671298981,
+            0.1288008838891983,
+            0.0364813394844532,
             0.530297040939331
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 3.6011053912839236e-06,
+        "maximumInputEdgeDistanceM": 3.599804513076212e-06,
         "triangleCoordinatesM": [
           [
-            0.0598662793636322,
-            0.06505432724952698,
+            0.05986679345369339,
+            0.06505520641803741,
             0.7059749364852905
           ],
           [
-            0.059861920773983,
-            0.06505461782217026,
+            0.05986243113875389,
+            0.0650554969906807,
             0.7059782147407532
           ],
           [
-            0.05986753851175308,
-            0.0650535300374031,
+            0.05986804887652397,
+            0.06505440920591354,
             0.7059782147407532
           ]
         ]
@@ -159236,9 +159236,9 @@
     "angularSourceVerticesSha256": null,
     "layerOffsetVertexCount": 1217,
     "sharedSeamVerticesLayerOffsetM": 0,
-    "heightExtrapolatedVertexCount": 1981,
-    "beforeVerticesSha256": "becb42fece12584440551946180eb35a70fe4a676095415dd58caf9878e45827",
-    "afterVerticesSha256": "a5f07be7f5b3b3c28d4d5fc55b5ec77fadc80b4dc63a16da3ed23d3116820fb8",
+    "heightExtrapolatedVertexCount": 2310,
+    "beforeVerticesSha256": "7ad52815d4da15d3eae914e24821c1dff3842313820dd611f718998939d7428d",
+    "afterVerticesSha256": "c92728f159e0af0de3be3ef6f26660d9a4dfdb764ccb4d62e3149b35334347bb",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
