@@ -77,7 +77,7 @@
     {
       "object": "pleated-overskirt",
       "modifier": "Image2Outfit Cloth",
-      "pinVertexCount": 64,
+      "pinVertexCount": 72,
       "frameStart": 1,
       "frameEnd": 48,
       "componentBendingHypothesis": {
@@ -91,29 +91,29 @@
       "pinMethod": "canonical shared seam vertices",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.3895782232284546,
+          0.43957823514938354,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
           "minimum": 0.006258426310523646,
-          "maximum": 0.17775828018784523
+          "maximum": 0.15376056637614965
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 27,
+        "belowCombinedCollisionMarginVertexCount": 32,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "postBakeGeometryHypothesis": {
         "method": "uniform-laplacian-interior-only-boundaries-and-pins-fixed",
         "iterations": 3,
         "factor": 0.12,
-        "vertexCount": 9327,
-        "boundaryVertexCount": 240,
-        "pinnedVertexCount": 64,
-        "fixedVertexCount": 240,
+        "vertexCount": 8909,
+        "boundaryVertexCount": 236,
+        "pinnedVertexCount": 72,
+        "fixedVertexCount": 236,
         "fixedVertexMaximumDisplacementM": 0.0,
-        "changedInteriorVertexCount": 9087,
-        "maximumInteriorDisplacementM": 0.009191000625402873,
-        "meanInteriorDisplacementM": 0.0011681999151408639,
+        "changedInteriorVertexCount": 8673,
+        "maximumInteriorDisplacementM": 0.010296052319450221,
+        "meanInteriorDisplacementM": 0.0011672267580427821,
         "reason": "Direct review of the current five-view and six-pose set shows broad angular, clumped overskirt facets. Trial low-strength post-bake fairing on interior cloth vertices only while every open hem, waist, seam boundary, and declared pin stays fixed.",
         "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.12 on non-boundary overskirt vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes must be recorded by this run. This geometry hypothesis does not establish fit, fold quality, motion, visual acceptance, fabric calibration, or release readiness; the 35 mm residual and orientation limits remain unchanged.",
         "grantsFitAcceptance": false,
@@ -121,28 +121,28 @@
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.35701024532318115,
+          0.4090777635574341,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.006200393815333882,
-          "maximum": 0.11127555882558227
+          "minimum": 0.006258426310523646,
+          "maximum": 0.11202425044029951
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 192,
+        "belowCombinedCollisionMarginVertexCount": 142,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "9590ea66d1569b669966534ba60ac792749f268adff1485cfeeba5491c48baef",
-      "evaluatedFrameMeshSha256": "c9a9e403cae161a23d55bb2dca00182681e1a72d6bd15041dfbb392f86a90057",
-      "settledMeshSha256": "7c5af7277cc5e3bedd7544a5e401873187ec99e1dc325114ff9432dbdd36022d",
+      "preBakeMeshSha256": "bb24d93597022b72cb10b0e4e907680d6349be78bda8ee92e59a76f93f81219b",
+      "evaluatedFrameMeshSha256": "65ae23f05e3bed0ad488614809d7a2e5a9543faab83e84db10727f92590cca73",
+      "settledMeshSha256": "eba91e269132eebfffd1ddf96f615b3f4c66b9661b5242ff34e0d48034ad09b9",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "868d76d2d94755005db3266453bcc221a3ad3b23af0a21ac1f6fdde0887d639e",
-  "constructionSha256": "438a6d45206f23e765621fd67100482443fa4b80285551830c0ed70ebada4965",
+  "sourceBlendSha256": "9ba9c1be0474e616799ac82e8db546f0347cecaad644721023569794619a4a19",
+  "constructionSha256": "3dbcb03401f9a6dbd40c8ddabba29f166fa86bc7d41409b97c6e666d49a6d89f",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "c5fd9c112f820a133c797c5349df81dc25e8c99b60d10f8a569399df77898062",
+  "candidateSha256": "fcfec9143ccf58ff73eea60a252e76cdeea70e6271e4f7fb001047dbecc712fa",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

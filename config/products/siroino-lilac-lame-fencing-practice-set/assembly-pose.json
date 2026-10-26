@@ -1289,7 +1289,7 @@
                 [
                   0.46602588331699374,
                   1.0327540437579155,
-                  0.00002832724526524548
+                  2.832724526524548E-05
                 ],
                 [
                   0.4660173002481461,
@@ -1619,7 +1619,7 @@
                 [
                   0.4549138116054237,
                   1.034465266942978,
-                  -0.00005813505500555042
+                  -5.813505500555042E-05
                 ],
                 [
                   0.4549046622924507,
@@ -2599,7 +2599,7 @@
                 [
                   0.3430677967816591,
                   1.0409463762044906,
-                  0.00009349594637751571
+                  9.349594637751571E-05
                 ],
                 [
                   0.34305510099232195,
@@ -2734,7 +2734,7 @@
                 [
                   0.3438138972073793,
                   0.9865169734954834,
-                  0.000023979127407073968
+                  2.3979127407073968E-05
                 ],
                 [
                   0.3436575804427266,
@@ -5124,7 +5124,7 @@
                 [
                   -0.46602618220448494,
                   1.03275362855196,
-                  0.00002821132168173788
+                  2.821132168173788E-05
                 ],
                 [
                   -0.4660175991356373,
@@ -5454,7 +5454,7 @@
                 [
                   -0.4549138711579144,
                   1.0344650289416313,
-                  -0.00005818757042288787
+                  -5.818757042288787E-05
                 ],
                 [
                   -0.45490475164726374,
@@ -6434,7 +6434,7 @@
                 [
                   -0.34306788608431815,
                   1.0409460189938544,
-                  0.00009340183436870597
+                  9.340183436870597E-05
                 ],
                 [
                   -0.343055190294981,
@@ -6569,7 +6569,7 @@
                 [
                   -0.3438139269053936,
                   0.9865167346596718,
-                  0.000024023622274398863
+                  2.4023622274398863E-05
                 ],
                 [
                   -0.3436576402038336,
@@ -9428,7 +9428,7 @@
     ],
     "extensionM": 0.08,
     "fadeHeightM": 0.075,
-    "evidenceBoundary": "V21 extends each fitted undershort panel 80 mm below its drafted hem, at the supported upper trial bound and equal to the shortened nominal overskirt extension. The front apron remains 50 mm longer in its declared zone. This is a motion-coverage hypothesis; inspect possible hem reveal in all views, sit/crouch coverage, fit, collision and shape-key response before any appearance or customer acceptance."
+    "evidenceBoundary": "V77 adds 40 mm to each matched drafted shorts leg-opening panel and retains the existing bounded 80 mm smooth lower-hem extension; panel geometry plus extension are a coverage hypothesis, not measured fit. The previous V76 sit/crouch renders retained substantial bare anterior thigh. The front apron-only length increase is removed to level the hem; inspect folds, coverage, collisions, shape keys and fit before any appearance or customer acceptance."
   },
   "rearWaistAdjustmentTab": {
     "method": "avatar-back-surface-projected-tab-v1",
@@ -9552,7 +9552,7 @@
     "blenderVersion": "4.4.3",
     "bone": "Neck",
     "headBlenderM": [
-      -2.053701209092651e-9,
+      -2.053701209092651E-09,
       -0.0093428585678339,
       1.0351301431655884
     ],
@@ -9633,9 +9633,9 @@
     "sourceHemZM": 0.5795782470703125,
     "hemZM": 0.43957824707,
     "hemExtensionM": 0.08,
-    "foldCount": 8,
+    "foldCount": 6,
     "topologySubdivisionFactor": 1,
-    "hemFoldDepthM": 0.0015,
+    "hemFoldDepthM": 0.0008,
     "phaseRadians": 0,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
@@ -9645,17 +9645,17 @@
         "overskirt-front-lap-left",
         "overskirt-front-lap-right"
       ],
-      "additionalExtensionM": 0.05,
-      "forwardProjectionM": 0.02,
+      "additionalExtensionM": 0,
+      "forwardProjectionM": 0,
       "fullExtensionHalfAngleRadians": 0.55,
       "zeroExtensionHalfAngleRadians": 1.25,
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
-      "evidenceBoundary": "V47 reduces the front-apron forward projection from 40 mm to 20 mm after V78's failed sit-pose solve left the right front lap 48.756 mm from its thigh-clearance surface predominantly along Blender Y; this tests whether excess neutral forward offset drives orientation-limited correction. The existing 100 mm downward extension and angular fade are unchanged. This remains a construction hypothesis; sit/crouch coverage, collision, folds, fit and appearance require fresh review."
+      "evidenceBoundary": "V77 removes the front-only apron hem drop and forward scoop to test a level continuous skirt hem after V76 showed a long dropped center panel. No fit, drape, pose, collision or visual acceptance is implied."
     },
-    "evidenceBoundary": "V21 retains the closed center-front while shortening the overskirt extension to 80 mm, the forward apron add-on to 50 mm, and the crease seed to one 1.5 mm soft pleat per panel. These are geometry hypotheses only; inspect all views/poses, and do not infer fit, material response, appearance acceptance or release readiness.",
+    "evidenceBoundary": "V77 retains the closed center-front and 80 mm common skirt extension, removes the front-only additional drop, and reduces radial fold count/depth. These are geometry hypotheses only; inspect all required views and poses and do not infer fit, material response, appearance acceptance or release readiness.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9672,5 +9672,5 @@
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "designRevision": "v76-v21-thigh-coverage-shorter-soft-pleats-20261026"
+  "designRevision": "v77-v22-mid-thigh-shorts-level-apron-soft-hem-20261026"
 }

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v76-v21-thigh-coverage-shorter-soft-pleats-20261026",
+  "revision": "v77-v22-mid-thigh-shorts-level-apron-soft-hem-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,18 +20,18 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "description": "V76 increases the fitted undershorts hem extension to the supported 80 mm limit, but direct sit and crouch renders still show substantial uncovered anterior thigh above the shorts edge.",
+      "description": "V77 makes the shorts longer in neutral standing, but sit and crouch still expose broad anterior thigh areas while the garment panels lift away from the legs.",
       "code": "SIT_CROUCH_FRONT_COVERAGE"
     },
     {
       "severity": "BLOCKER",
-      "description": "The shallow single pleat trial does not resolve the pronounced accordion-like side and rear folds in the standing and seated renders.",
-      "code": "SIDE_TRANSITION_FOLD_COLLAPSE"
+      "description": "Sit and crouch renders show sharp triangular overlapping panel/hem intersections at the side and apron transition; side and rear folds remain strongly corrugated.",
+      "code": "SIDE_APRON_COLLISION_AND_FOLDING"
     },
     {
       "severity": "BLOCKER",
-      "description": "The shorter skirt still has an uneven standing hem with a long dropped center-front panel; silhouette remains unresolved.",
-      "code": "STANDING_SKIRT_SILHOUETTE"
+      "description": "The longer matched shorts and leveled apron trial do not produce a smooth, even standing skirt: side panels retain ribbed ridges and the front hem remains visibly irregular.",
+      "code": "STANDING_SURFACE_AND_HEM"
     }
   ],
   "failedGeometryChecks": [
