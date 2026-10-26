@@ -55,7 +55,7 @@
         "properties": {
           "sequence": {"type": "integer", "minimum": 1, "maximum": 13},
           "stage": {"type": "string", "minLength": 1},
-          "status": {"enum": ["PLANNED", "PASS", "FAILED"]},
+          "status": {"enum": ["PLANNED", "PASS", "FAILED", "REUSED"]},
           "path": {"type": "string", "minLength": 1},
           "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
           "recordDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
