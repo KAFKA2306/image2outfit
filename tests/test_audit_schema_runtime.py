@@ -15,7 +15,12 @@ from image2outfit.audit_schema import (
     load_schema,
     resolve_schema_path,
 )
-from image2outfit.pipeline import PIPELINE_STAGES, new_pipeline_state, run_pipeline
+from image2outfit.pipeline import (
+    PIPELINE_STAGES,
+    new_pipeline_state,
+    resume_pipeline_state,
+    run_pipeline,
+)
 from image2outfit.tooling import ToolDescriptor, ToolRegistry
 
 PROFILE = ROOT / "config/pipeline-profiles/garment-reconstruction-v1.json"
@@ -61,7 +66,7 @@ class AuditSchemaRuntimeTests(unittest.TestCase):
     def test_profile_declared_schemas_resolve_inside_repository(self) -> None:
         record_schema, manifest_schema = self._schemas()
         self.assertEqual(
-            record_schema["properties"]["status"]["enum"], ["PLANNED", "PASS", "FAILED"]
+            record_schema["properties"]["status"]["enum"], ["PLANNED", "PASS", "FAILED", "REUSED"]
         )
         self.assertEqual(
             manifest_schema["properties"]["finalStatus"]["enum"],
@@ -72,6 +77,66 @@ class AuditSchemaRuntimeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "does not exist"):
             resolve_schema_path(
                 ROOT, "config/pipeline/missing.schema.json", label="audit schema"
+            )
+
+    def test_resumed_run_audit_bundle_accepts_reused_stage_records(self) -> None:
+        record_schema, manifest_schema = self._schemas()
+        registry = ToolRegistry()
+        for stage in PIPELINE_STAGES:
+
+            def handler(state, stage_name=stage.value):
+                if (
+                    state["run_id"] == "audit-resume-initial"
+                    and stage_name == PIPELINE_STAGES[3].value
+                ):
+                    raise RuntimeError("expected initial failure")
+                return {"mode": "planned", "stage": stage_name}
+
+            registry.register(
+                stage,
+                handler,
+                ToolDescriptor(
+                    tool_name=f"test-{stage.value}",
+                    purpose=f"test {stage.value}",
+                    output_contract=f"pipeline-output/{stage.value}.json",
+                ),
+            )
+        failed = run_pipeline(
+            new_pipeline_state(
+                product_id="audit-resume-garment",
+                target_avatar="SiroinoSotai_PC",
+                source_reference="private-reference://sha256/audit-resume",
+                run_id="audit-resume-initial",
+            ),
+            registry,
+        )
+        self.assertEqual(failed["status"], "FAILED")
+        resumed = run_pipeline(
+            resume_pipeline_state(failed, run_id="audit-resume-final"),
+            registry,
+        )
+        self.assertEqual(resumed["status"], "PLANNED")
+        self.assertEqual(
+            [record["status"] for record in resumed["stage_records"][:3]],
+            ["REUSED", "REUSED", "REUSED"],
+        )
+        with TemporaryDirectory() as temporary:
+            bundle = write_audit_bundle(
+                resumed,
+                audit_root=Path(temporary) / "audit",
+                canonical_stages=CANONICAL_STAGES,
+                record_schema=record_schema,
+                manifest_schema=manifest_schema,
+            )
+            verified = verify_audit_bundle(
+                Path(bundle["root"]),
+                record_schema=record_schema,
+                manifest_schema=manifest_schema,
+            )
+            self.assertEqual(verified["runId"], "audit-resume-final")
+            self.assertEqual(
+                [entry["status"] for entry in verified["stages"][:3]],
+                ["REUSED", "REUSED", "REUSED"],
             )
 
     def test_unsupported_schema_version_fails_closed(self) -> None:
