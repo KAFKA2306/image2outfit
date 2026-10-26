@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v77-v22-mid-thigh-shorts-level-apron-soft-hem-20261026",
+  "revision": "v78-v23-inner-thigh-follow-weight-trial-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,18 +20,18 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "description": "V77 makes the shorts longer in neutral standing, but sit and crouch still expose broad anterior thigh areas while the garment panels lift away from the legs.",
-      "code": "SIT_CROUCH_FRONT_COVERAGE"
+      "description": "Sit and crouch show large, sharp white shorts flares at the knees after increasing hem thigh weight. The higher weight improves measured upper-thigh ray coverage from 15.6% to 42.6% in sit, but the actual garment deformation is visibly worse and still leaves broad anterior thigh areas exposed.",
+      "code": "SHORTS_HEM_WEIGHT_DEFORMATION"
     },
     {
       "severity": "BLOCKER",
-      "description": "Sit and crouch renders show sharp triangular overlapping panel/hem intersections at the side and apron transition; side and rear folds remain strongly corrugated.",
-      "code": "SIDE_APRON_COLLISION_AND_FOLDING"
+      "description": "In seated and crouched views the overskirt lifts away from the thighs, leaving pointed separated front/side panels and dense accordion ridges. The skirt still does not provide continuous front coverage through the poses.",
+      "code": "POSE_COVERAGE_AND_PANEL_COLLISION"
     },
     {
       "severity": "BLOCKER",
-      "description": "The longer matched shorts and leveled apron trial do not produce a smooth, even standing skirt: side panels retain ribbed ridges and the front hem remains visibly irregular.",
-      "code": "STANDING_SURFACE_AND_HEM"
+      "description": "Neutral and standing views retain pronounced ribbed side folds and an uneven front/side hem; the V78 weight-only trial does not produce a coherent finished silhouette.",
+      "code": "STANDING_SILHOUETTE_AND_FOLDING"
     }
   ],
   "failedGeometryChecks": [

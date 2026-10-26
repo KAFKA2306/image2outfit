@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V77 retains the closed center-front seam, extends the four drafted fitted-short panels by 40 mm at their leg openings, keeps the existing supported 80 mm hem-extension trial, removes the 50 mm front-apron-only drop, and reduces the skirt fold seed and count. The longer matched panels test durable thigh coverage while the leveled hem and softer folds address the V76 defects. All dimensions remain unmeasured hypotheses; fit, pose coverage, appearance and release remain unapproved.",
-  "designRevision": "v72-v22-mid-thigh-shorts-level-apron-soft-hem-20261026",
+  "target": "V78 keeps the V77 panel geometry and tests a weight-field change only: increase shorts hem follow to 0.98, lower waist follow to 0.08, and narrow the unweighted inner-thigh band. The V77 neutral 100% versus sit 16% diagnostic exposes a severe pose-following deficit in the existing shorts field; this trial tests whether closer per-leg skin weighting improves seated coverage. It does not validate fit, collision, appearance, Shape Keys or release.",
+  "designRevision": "v78-v23-inner-thigh-follow-weight-trial-20261026",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -136,7 +136,7 @@
     },
     "prototypeFrameEnd": 48,
     "evidence": "V26 runs the same bounded neutral cloth trial on V76 revised skirt panels; fitted-shorts coverage, seated behavior, fit, shape-key response, motion and fabric calibration remain unverified.",
-    "reason": "V77 compares the same bounded neutral cloth trial against a longer matched short-panel draft and reduced skirt pleat geometry. It is a prototype comparison only; seated coverage, fit, garment motion, material calibration and visual acceptance require direct evidence.",
+    "reason": "V78 holds the V77 mesh and cloth inputs constant while testing a higher shorts hem-to-thigh weight and narrower inner-thigh transition. The V77 pose diagnostic measured 100% upper-thigh coverage in neutral but 16% in sit for the under-shorts layer. This is a controlled prototype weight hypothesis only; direct pose renders and review must determine whether it reduces exposed thigh without creating collisions or deformation artifacts.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
@@ -257,11 +257,11 @@
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
-        "waistThighWeight": 0.12,
-        "hemThighWeight": 0.82,
-        "centerlineHalfWidthM": 0.075,
-        "fullSideWeightWidthM": 0.135,
-        "evidenceBoundary": "V43 prototype trial: shorts weight transitions from 12% thigh near waistband to 82% at the lower hem, while centerline areas remain pelvis-led and left/right lateral panels follow their corresponding thigh. The lower hem follow is moderated from V42 after fresh skin solving showed the 90% trial left an apron residual outside the unchanged bound. No deformation, fit or appearance pass is implied."
+        "waistThighWeight": 0.08,
+        "hemThighWeight": 0.98,
+        "centerlineHalfWidthM": 0.015,
+        "fullSideWeightWidthM": 0.055,
+        "evidenceBoundary": "V78 keeps all V77 shorts-panel outlines and tests a weight field only: 8% thigh at the waistband, rising to 98% at the leg hem, with the pelvis-led inner-thigh band narrowed from 75 mm to 15 mm and the full lateral follow reached by 55 mm. This hypothesis responds to the measured diagnostic change from 100% neutral to 16% sit upper-thigh coverage. It may cause crotch/seam stress, side-to-side discontinuity or pose artifacts; no fit, motion, visual or release acceptance is implied."
       }
     }
   ]

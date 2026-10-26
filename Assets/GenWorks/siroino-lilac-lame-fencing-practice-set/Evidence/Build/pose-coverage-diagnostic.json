@@ -4,13 +4,13 @@
   "method": "same-pose-body-surface-ray-coverage-v1",
   "source": {
     "weightedBlendPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend",
-    "weightedBlendSha256": "b8e8e74bd112e746e519fdf75c4429b82bddeadf1fa727ccdec0a7242deb93f1",
+    "weightedBlendSha256": "c619500bc492ca6a97194268611384342a7e303c94c2bac630d3f764c0312137",
     "targetAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0"
   },
   "poses": {
     "neutral": {
       "renderPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png",
-      "renderSha256": "edb644696719c82d27559d1e2221faaa3d9ed711419717fa8f536f735d8ed819",
+      "renderSha256": "920cceefc1ec5ecd8da7f7125132f2ae4e9f1c4227d9fb7c636f4017572e6cee",
       "boneRotationsRadians": {
         "UpperArm_L": [
           -1.0122909545898438,
@@ -27,7 +27,7 @@
         "surfaceCoordinateMethod": "posed-avatar-triangle-centroids; deformation-weight anatomical zones; outward-normal ray into matching-pose canonical garment faces",
         "pieceGroupSource": {
           "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
-          "constructionSha256": "3dbcb03401f9a6dbd40c8ddabba29f166fa86bc7d41409b97c6e666d49a6d89f",
+          "constructionSha256": "37da84ca3c6977037621d904a85820be138cd22cfb1a64da979460092371f28b",
           "shortsComponentId": "fitted-under-shorts",
           "shortsPieceIds": [
             "shorts-back-left",
@@ -116,7 +116,7 @@
                 "coverageFraction": 1.0,
                 "surfaceGapM": {
                   "minimum": 8.700737816980109e-05,
-                  "median": 0.004495532717555761,
+                  "median": 0.004495541099458933,
                   "p95": 0.008893589489161968,
                   "maximum": 0.014573393389582634
                 },
@@ -171,7 +171,7 @@
     },
     "crouch": {
       "renderPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png",
-      "renderSha256": "7c137af1c5a40d9e35cc97f5e5b21c7c5b1a90d13e4d61aa3676908d291f3d9b",
+      "renderSha256": "0f4420ed23637675d747f580f799a8c1b3c375a3e789aacb0dd0797cd42688c2",
       "boneRotationsRadians": {
         "Hips": [
           0.22689279913902283,
@@ -213,7 +213,7 @@
         "surfaceCoordinateMethod": "posed-avatar-triangle-centroids; deformation-weight anatomical zones; outward-normal ray into matching-pose canonical garment faces",
         "pieceGroupSource": {
           "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
-          "constructionSha256": "3dbcb03401f9a6dbd40c8ddabba29f166fa86bc7d41409b97c6e666d49a6d89f",
+          "constructionSha256": "37da84ca3c6977037621d904a85820be138cd22cfb1a64da979460092371f28b",
           "shortsComponentId": "fitted-under-shorts",
           "shortsPieceIds": [
             "shorts-back-left",
@@ -269,16 +269,16 @@
             "sampleCount": 654,
             "layers": {
               "under-shorts": {
-                "coveredSampleCount": 460,
-                "coverageFraction": 0.7033639143730887,
+                "coveredSampleCount": 441,
+                "coverageFraction": 0.6743119266055045,
                 "surfaceGapM": {
                   "minimum": 6.839963316451758e-05,
-                  "median": 0.006214453373104334,
-                  "p95": 0.04139085114002228,
+                  "median": 0.004396480042487383,
+                  "p95": 0.03906654939055443,
                   "maximum": 0.18124733865261078
                 },
                 "sampleTriangleIdsSha256": "ada1bde1dd14d063a96881cb49085195082c0020a9dd35553fc8c6a55b4562b7",
-                "coveredTriangleIdsSha256": "69c10a06040ce0160276969e8e8298aa434d35c744f7e969186133191058196f"
+                "coveredTriangleIdsSha256": "c6e95dcc396dd48614f4b3418f719894fae6221a221320a8204333bb0e437062"
               },
               "overskirt": {
                 "coveredSampleCount": 441,
@@ -298,16 +298,16 @@
             "sampleCount": 885,
             "layers": {
               "under-shorts": {
-                "coveredSampleCount": 236,
-                "coverageFraction": 0.26666666666666666,
+                "coveredSampleCount": 425,
+                "coverageFraction": 0.480225988700565,
                 "surfaceGapM": {
-                  "minimum": 0.0007292212103493512,
-                  "median": 0.047424592077732086,
-                  "p95": 0.19228006899356842,
-                  "maximum": 0.24564866721630096
+                  "minimum": 9.712094470160082e-05,
+                  "median": 0.043759509921073914,
+                  "p95": 0.08975234627723694,
+                  "maximum": 0.20940753817558289
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "7a8959c2ee75b91e87f930265ab2ea0827c9a3a99c3c8739cd99043db5de1b4a"
+                "coveredTriangleIdsSha256": "7d02f56b8d66295b6890893f2cdeab5d1ee7a64e7471c1551ab0246d2a8e8ed6"
               },
               "overskirt": {
                 "coveredSampleCount": 373,
@@ -327,16 +327,16 @@
             "sampleCount": 885,
             "layers": {
               "under-shorts": {
-                "coveredSampleCount": 236,
-                "coverageFraction": 0.26666666666666666,
+                "coveredSampleCount": 425,
+                "coverageFraction": 0.480225988700565,
                 "surfaceGapM": {
-                  "minimum": 0.0007291994988918304,
-                  "median": 0.047424569725990295,
-                  "p95": 0.19228021800518036,
-                  "maximum": 0.245648592710495
+                  "minimum": 9.707278513815254e-05,
+                  "median": 0.0437740758061409,
+                  "p95": 0.08976659178733826,
+                  "maximum": 0.20954668521881104
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "5a1ac59d8ea3164ef20ce56470d7301232f26ff05f700ebf74cfb16b27fac8b8"
+                "coveredTriangleIdsSha256": "c588ac1171d770ee6d10127c2ab36b468e8111e4fd201b543788b096ea33d40f"
               },
               "overskirt": {
                 "coveredSampleCount": 358,
@@ -357,7 +357,7 @@
     },
     "sit": {
       "renderPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png",
-      "renderSha256": "b612a37ebb5ae4d931ae0ae60e376df0165993b54f2e5b0406b317e3bad052f5",
+      "renderSha256": "0c82d59029c8d10d5e9fa8d6ac52dbd96f104421cdbc2468cb53028d28edec6c",
       "boneRotationsRadians": {
         "Hips": [
           0.13962633907794952,
@@ -399,7 +399,7 @@
         "surfaceCoordinateMethod": "posed-avatar-triangle-centroids; deformation-weight anatomical zones; outward-normal ray into matching-pose canonical garment faces",
         "pieceGroupSource": {
           "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
-          "constructionSha256": "3dbcb03401f9a6dbd40c8ddabba29f166fa86bc7d41409b97c6e666d49a6d89f",
+          "constructionSha256": "37da84ca3c6977037621d904a85820be138cd22cfb1a64da979460092371f28b",
           "shortsComponentId": "fitted-under-shorts",
           "shortsPieceIds": [
             "shorts-back-left",
@@ -455,16 +455,16 @@
             "sampleCount": 672,
             "layers": {
               "under-shorts": {
-                "coveredSampleCount": 482,
-                "coverageFraction": 0.7172619047619048,
+                "coveredSampleCount": 456,
+                "coverageFraction": 0.6785714285714286,
                 "surfaceGapM": {
-                  "minimum": 7.257613560796017e-06,
-                  "median": 0.008214154280722141,
-                  "p95": 0.11804241687059402,
-                  "maximum": 0.2232654094696045
+                  "minimum": 1.981947207241319e-06,
+                  "median": 0.0054364376701414585,
+                  "p95": 0.10432381927967072,
+                  "maximum": 0.13703462481498718
                 },
                 "sampleTriangleIdsSha256": "2c67353c1b6577d52be1f6a240c9381352ac2c56868b7355ce3950ced32b71cf",
-                "coveredTriangleIdsSha256": "09002f5837f944ff649413f67811294b8055937ee6947f84495440aba8370b4a"
+                "coveredTriangleIdsSha256": "fd3d855678adf1f03dff16a89cc7bbd79f1a9ed5f5def7c5460396543d5a0c29"
               },
               "overskirt": {
                 "coveredSampleCount": 454,
@@ -484,16 +484,16 @@
             "sampleCount": 885,
             "layers": {
               "under-shorts": {
-                "coveredSampleCount": 138,
-                "coverageFraction": 0.15593220338983052,
+                "coveredSampleCount": 377,
+                "coverageFraction": 0.42598870056497173,
                 "surfaceGapM": {
-                  "minimum": 0.0001935539039550349,
-                  "median": 0.03728824853897095,
-                  "p95": 0.17345726490020752,
-                  "maximum": 0.20990604162216187
+                  "minimum": 0.0004414751601871103,
+                  "median": 0.04758699983358383,
+                  "p95": 0.13828684389591217,
+                  "maximum": 0.21204209327697754
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "86a8e86cd41276dae58e791fab291c8de6fe2e1caff407c5b169a4cae2a5b9d6"
+                "coveredTriangleIdsSha256": "1411a6e1f9c68a39a1cc6a26630f6dd15cf7139d35fa428eb520669ee93415bf"
               },
               "overskirt": {
                 "coveredSampleCount": 243,
@@ -513,16 +513,16 @@
             "sampleCount": 885,
             "layers": {
               "under-shorts": {
-                "coveredSampleCount": 138,
-                "coverageFraction": 0.15593220338983052,
+                "coveredSampleCount": 377,
+                "coverageFraction": 0.42598870056497173,
                 "surfaceGapM": {
-                  "minimum": 0.00019354140385985374,
-                  "median": 0.03728799149394035,
-                  "p95": 0.173456072807312,
-                  "maximum": 0.2099057286977768
+                  "minimum": 0.00044146718573756516,
+                  "median": 0.04760202765464783,
+                  "p95": 0.13829141855239868,
+                  "maximum": 0.21203263103961945
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "b0964a7b5abdda87d84b92359184b3dbf8cd36d4293591944622816647bfba88"
+                "coveredTriangleIdsSha256": "e669ff200317cef49e9b86432c79bed2189cbf2e4543c81b27136a5df56e1a1f"
               },
               "overskirt": {
                 "coveredSampleCount": 232,
