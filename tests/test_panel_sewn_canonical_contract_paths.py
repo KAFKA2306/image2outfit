@@ -51,16 +51,13 @@ class PanelSewnContractPathTests(unittest.TestCase):
             self.assertFalse((runtime / "construction.json").exists())
             self.assertFalse((runtime / "pattern-draft.json").exists())
 
+            argv = ["blender", "--", "--job", str(job_path)]
             with (
                 patch.object(BUILDER, "ROOT", root),
                 patch.object(
-                    BUILDER,
-                    "import_target_armature",
-                    side_effect=_ReachedBlenderStage,
+                    BUILDER, "import_target_armature", side_effect=_ReachedBlenderStage
                 ),
-                patch.object(
-                    sys, "argv", ["blender", "--", "--job", str(job_path)]
-                ),
+                patch.object(sys, "argv", argv),
             ):
                 with self.assertRaises(_ReachedBlenderStage):
                     BUILDER.main()
