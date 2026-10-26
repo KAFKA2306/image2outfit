@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v82-front-apron-and-side-drape-20261026",
+  "revision": "v83-mid-thigh-under-short-coverage-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "The 60 mm front/lap continuation improves the standing apron, but sit still exposes 18.64/18.53% of upper thighs and crouch 32.77/32.88%; direct sit/crouch renders show broad exposure and panel/leg interference. Astra independently confirmed this pose-coverage blocker.",
-      "code": "POSE_COVERAGE_AND_PANEL_COLLISION",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "code": "POSE_COVERAGE_UNCHANGED",
+      "description": "V83 increased the declared under-shorts hem extension to 160 mm, but measured upper-thigh coverage is unchanged from V82: sit 15.37% covered by under-shorts per thigh and crouch 26.67%; the overskirt covers only 18.53-18.64% seated and 32.77-32.88% crouched. Direct sit/crouch images show extensive exposed thighs. This extension-only method does not address posed coverage."
     },
     {
-      "description": "left.png, right.png and three-quarter.png retain prominent stair-step/accordion side relief and pointed side hem extensions despite the stronger boundary-preserving fairing.",
-      "code": "SIDE_PANEL_FOLDING",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "code": "POSED_PANEL_INTERFERENCE",
+      "description": "Sit and crouch images retain folded lavender edging, overlapping angular white panels, and visible panel/leg interference around the knees and calves."
     },
     {
-      "description": "back.png and sit.png show an irregular inner panel protruding below the outer hem with sharp lavender-edged folds; layered hem intersection remains visually unresolved.",
-      "code": "LAYERED_HEM_INTERSECTION",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "code": "SIDE_DRAPE_AND_HEM_DEFECTS",
+      "description": "Front/side/neutral and back views retain corrugated side panels, projecting hem corners, angular surface shading, and irregular inner-layer hem protrusion; buyer-facing drape and layering remain unresolved."
     }
   ],
   "failedGeometryChecks": [

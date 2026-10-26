@@ -1055,15 +1055,18 @@ def lengthen_declared_shorts(mesh, pose):
     spec = pose.get("shortsCoverageExtension")
     if spec is None:
         return {"applied": False, "grantsFitAcceptance": False}
-    if not isinstance(spec, dict) or spec.get("method") != "shorts-lower-hem-skirt-coverage-v1":
+    if not isinstance(spec, dict) or spec.get("method") not in {
+            "shorts-lower-hem-skirt-coverage-v1",
+            "shorts-mid-thigh-coverage-v2"}:
         raise ValueError("Invalid shorts coverage extension method")
     pieces = set(spec.get("pieceIds", []))
     extension = spec.get("extensionM")
     fade_height = spec.get("fadeHeightM")
+    maximum_extension = 0.16 if spec["method"] == "shorts-mid-thigh-coverage-v2" else 0.08
     if (not pieces or not pieces.issubset(set(mesh["facePieceIds"]))
             or not all(isinstance(value, (int, float)) and math.isfinite(value)
                        for value in (extension, fade_height))
-            or not 0.015 <= extension <= 0.08 or not 0.025 <= fade_height <= 0.12):
+            or not 0.015 <= extension <= maximum_extension or not 0.025 <= fade_height <= 0.12):
         raise ValueError("Invalid shorts lower hem extension bounds or panel selection")
     vertex_owners = defaultdict(set)
     for face, owner in zip(mesh["faces"], mesh["facePieceIds"]):

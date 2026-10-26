@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Reject V82. Revise pose-responsive apron/thigh coverage and eliminate panel-to-leg interference in sit/crouch; replace the persistent side stair-step relief with a smoother cloth transition and resolve inner/outer hem overlap. Reinspect the same 11 direct-render views. Keep fit, UV, Unity/VRChat, package and release blocked until separately evidenced.",
+    "nextAction": "Correct the actual rendered defects recorded in currentVisualReview, starting with panel assembly and target-body fit; then regenerate the weighted candidate and directly inspect its new renders.",
     "lastAttempt": {
-      "runId": "0e76c7c5e5de4faea1afea17b7e46c1f",
+      "runId": "d2b1e25c4a0d40378157dd67971f629f",
       "status": "EXECUTED",
-      "checkedAt": "2026-10-26T17:58:05Z",
+      "checkedAt": "2026-10-26T20:04:13Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "265df76a30815c325512555b5f0f0153db7a79c10ab0b8b7dbda2f7f88ad4364",
+      "stageEvidenceSha256": "d764137a5a54a19139a4a84b6e097fe3ad08ff0581bb9fac68e2928ae9c8afa9",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -79,49 +79,49 @@
         },
         "build-blender": {
           "status": "REUSED",
-          "stageResultSha256": "8605e61f1410380771b20d8da8361e3629beca91aa9a16512237c638f9d95526"
+          "stageResultSha256": "cd4308f12b6a164163c226d5d042c5ce451c5692bba1ca467979be2aafb38dad"
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "53ebdc39ac979330886a53b43aef56b3774efffa726bf7cfa9e67c465e98c8ef"
+          "stageResultSha256": "bdc4fabf5a1e868ccd162caac3b982353f9a4fc2829af2abe6d85e19a17ab10b"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "01600ce606f92e54d32c6501d9dabbb5f9aa67eb1376281bce242a8b701fe5f4"
+          "stageResultSha256": "93f0cce112a683d1454cc80724aa68fbdab86f2e4557b5bbd9660928aa2dda97"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "d770df01dcd47fb984a4bc7376939415d5073ee326a181008cb3c59f51035a1a"
+          "stageResultSha256": "f7f01ca4398213f2464cba2b19f3f145ab8dd111861ffc337009a9dc9e39dcf5"
         },
         "audit-geometry": {
           "status": "PASS",
-          "stageResultSha256": "2f0056073a2a75211d93d7fdf9efb8a9c7bf72c7a8a8b887ddfb66917571dfdb"
+          "stageResultSha256": "7fc598ca196046c483c6d2163ce899d21fd8b4977f4cdb4345ba5ac8d0ab33eb"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "8f94d56ee2157e434a4272e29a3dd5aeb65086496fd3e537d1254a8a961a634b"
+          "stageResultSha256": "e3fc3e2202a250d21dbd57f872d745b5c3e18e410b64bd85bc4530b507b34457"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "265df76a30815c325512555b5f0f0153db7a79c10ab0b8b7dbda2f7f88ad4364"
+          "stageResultSha256": "d764137a5a54a19139a4a84b6e097fe3ad08ff0581bb9fac68e2928ae9c8afa9"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "02f5ab611bc4254204e45e0a33d9cd7cad0fe764dd95e43849ae9d19eaf2764e",
+      "checkpointSha256": "ab265b376aa9c84beb30baa02911c06b29575ebcedd1a15741ab034b8af08f4e",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Reject V82. Revise pose-responsive apron/thigh coverage and eliminate panel-to-leg interference in sit/crouch; replace the persistent side stair-step relief with a smoother cloth transition and resolve inner/outer hem overlap. Reinspect the same 11 direct-render views. Keep fit, UV, Unity/VRChat, package and release blocked until separately evidenced."
+      "nextAction": "Correct the actual rendered defects recorded in currentVisualReview, starting with panel assembly and target-body fit; then regenerate the weighted candidate and directly inspect its new renders."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "e7c40851472f52d66b66bee874ca48d09de841bf40dc1abb2313e836f2bf61c2",
+      "sourceSha256": "25a986f0ebd1634bc932aaef55c907c48b5d727a11365c8514258110cdf4b7e3",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "0fa8f8db9a998aeb26eaeb70d8eefccaab5a6698d4a17feae186ca0d2a0738c6",
+      "reportSha256": "c13a172bf5da47ac40312d7e6e4153a2cfb31a58e5e5604eeab1c3ac8f763bc3",
       "metrics": {
         "vertices": 15814,
         "triangles": 31019,
@@ -134,22 +134,22 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "f990bd401ae18b4dc0661a468969ce9bae52a7d22cfc60921f548e1879657470",
+      "sha256": "7e22faacd4cf08f2d2ed0ff25c62beda1be7cd12c4979e7e4358312c592ecc3e",
       "findings": [
         {
-          "description": "The 60 mm front/lap continuation improves the standing apron, but sit still exposes 18.64/18.53% of upper thighs and crouch 32.77/32.88%; direct sit/crouch renders show broad exposure and panel/leg interference. Astra independently confirmed this pose-coverage blocker.",
-          "code": "POSE_COVERAGE_AND_PANEL_COLLISION",
-          "severity": "BLOCKER"
+          "severity": "BLOCKER",
+          "code": "POSE_COVERAGE_UNCHANGED",
+          "description": "V83 increased the declared under-shorts hem extension to 160 mm, but measured upper-thigh coverage is unchanged from V82: sit 15.37% covered by under-shorts per thigh and crouch 26.67%; the overskirt covers only 18.53-18.64% seated and 32.77-32.88% crouched. Direct sit/crouch images show extensive exposed thighs. This extension-only method does not address posed coverage."
         },
         {
-          "description": "left.png, right.png and three-quarter.png retain prominent stair-step/accordion side relief and pointed side hem extensions despite the stronger boundary-preserving fairing.",
-          "code": "SIDE_PANEL_FOLDING",
-          "severity": "BLOCKER"
+          "severity": "BLOCKER",
+          "code": "POSED_PANEL_INTERFERENCE",
+          "description": "Sit and crouch images retain folded lavender edging, overlapping angular white panels, and visible panel/leg interference around the knees and calves."
         },
         {
-          "description": "back.png and sit.png show an irregular inner panel protruding below the outer hem with sharp lavender-edged folds; layered hem intersection remains visually unresolved.",
-          "code": "LAYERED_HEM_INTERSECTION",
-          "severity": "BLOCKER"
+          "severity": "BLOCKER",
+          "code": "SIDE_DRAPE_AND_HEM_DEFECTS",
+          "description": "Front/side/neutral and back views retain corrugated side panels, projecting hem corners, angular surface shading, and irregular inner-layer hem protrusion; buyer-facing drape and layering remain unresolved."
         }
       ],
       "grantsQualityAcceptance": false
@@ -160,33 +160,33 @@
     "decision": "REJECT",
     "findings": [
       {
-        "description": "The 60 mm front/lap continuation improves the standing apron, but sit still exposes 18.64/18.53% of upper thighs and crouch 32.77/32.88%; direct sit/crouch renders show broad exposure and panel/leg interference. Astra independently confirmed this pose-coverage blocker.",
-        "code": "POSE_COVERAGE_AND_PANEL_COLLISION",
-        "severity": "BLOCKER"
+        "severity": "BLOCKER",
+        "code": "POSE_COVERAGE_UNCHANGED",
+        "description": "V83 increased the declared under-shorts hem extension to 160 mm, but measured upper-thigh coverage is unchanged from V82: sit 15.37% covered by under-shorts per thigh and crouch 26.67%; the overskirt covers only 18.53-18.64% seated and 32.77-32.88% crouched. Direct sit/crouch images show extensive exposed thighs. This extension-only method does not address posed coverage."
       },
       {
-        "description": "left.png, right.png and three-quarter.png retain prominent stair-step/accordion side relief and pointed side hem extensions despite the stronger boundary-preserving fairing.",
-        "code": "SIDE_PANEL_FOLDING",
-        "severity": "BLOCKER"
+        "severity": "BLOCKER",
+        "code": "POSED_PANEL_INTERFERENCE",
+        "description": "Sit and crouch images retain folded lavender edging, overlapping angular white panels, and visible panel/leg interference around the knees and calves."
       },
       {
-        "description": "back.png and sit.png show an irregular inner panel protruding below the outer hem with sharp lavender-edged folds; layered hem intersection remains visually unresolved.",
-        "code": "LAYERED_HEM_INTERSECTION",
-        "severity": "BLOCKER"
+        "severity": "BLOCKER",
+        "code": "SIDE_DRAPE_AND_HEM_DEFECTS",
+        "description": "Front/side/neutral and back views retain corrugated side panels, projecting hem corners, angular surface shading, and irregular inner-layer hem protrusion; buyer-facing drape and layering remain unresolved."
       }
     ],
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "dc9fc45506a2033c73b08b471c25bb786da0ae5176227f50a31b2d695dba8dd9",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "6bd075e5b67f55c1c448245162da53662cc8e8019500394d16ab7231fa81ded7",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "75cae7499dc7889b27c3147be1cb17864bfeeea6c043d3a5db640825706538aa",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "bca3783c7861e87ff992f8203a1a006f038cb52ed1f7b2075f87e31d1e6b9b13",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "617162a7483a788469f27c3793df951db2a7cdfef9de5fb202d5f8b21a39eeb1",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "e8a3b9ac9911d10db65b1883fd75e275a1bf3fecf47a3c0f95b100dfdd1becf8",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "d0ee96a5124aeb4df90a1226808059b521afeb66ce3e52ec6ad4bf31c8245737",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "6e2f006e90718aa49cf618bbb8e0d3b49e80e133dcd4f1bdcefb697f4b47f12a",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "f0f8c32cfdb797c987ab919e2f5c3b22995511a7d5ac75a1705a04e492264726",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "1b61bf93afcd26a74c19ebc456f2512b26112edc7ad880fe497bba8035c028c4",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "adfb07e5546136cc436f6039e8f1c90fb906c28aeb0021cb90b717c9c74759fe"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "b919ebd676471db3b775b959f1b1414f8700698cba181646f7f56ac652477bec",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "46aab9555a88f8a2188074b4f21c0e3ed12471218f53e2980a19909f638de160",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "8af66e591657b9ae7749a9ff505027c747b749d5a4c7284253059d450850ff1f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "c43eb03300036779b6443aaca371bdc9ec23435b27614f0ff076d321a1f2dbd2",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "ecec2ad36f4441bd9b04407ee561b3367f18798d4b95e5e845608d53e300ee53",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "96b6a2713c4d8444a8343c81e483ec884a3da4307a8923ac02258f7c80fefd13",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "cb4f747315521ea8fa899ad458430a4c5f3b68f63007ca4cfe018347afaf532f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "0a7a74a1fda5a4eff6248f9f3b4cd9b605dfa303ada704d7c1c17d52c77ab7c3",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "e1da4fd862fe4f89141d3053cc46412a504417207b080c0f24fa44ee755a63c3",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "ed7e6188c2a27c335a9b708be86f089fef0daef3ca206ba870b7938b9932d8c5",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "c98cc72b4f8dc2dd546df780535d3ebe633305a91ae6f65515d1b6393bb53f41"
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"
