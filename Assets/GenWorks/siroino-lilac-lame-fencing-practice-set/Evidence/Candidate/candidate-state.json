@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v75-v20-closed-center-front-pattern-20261026",
+  "revision": "v76-v21-thigh-coverage-shorter-soft-pleats-20261026",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "SIT_CROUCH_FRONT_COVERAGE",
       "severity": "BLOCKER",
-      "description": "V75 closes the standing center-front gap, but sit and crouch still expose most of the anterior thighs as the skirt lifts and shifts aside."
+      "description": "V76 increases the fitted undershorts hem extension to the supported 80 mm limit, but direct sit and crouch renders still show substantial uncovered anterior thigh above the shorts edge.",
+      "code": "SIT_CROUCH_FRONT_COVERAGE"
     },
     {
-      "code": "SIDE_TRANSITION_FOLD_COLLAPSE",
       "severity": "BLOCKER",
-      "description": "Side and rear panels retain pronounced accordion-like corrugation; the seated and crouched folds remain sharp and visually distracting."
+      "description": "The shallow single pleat trial does not resolve the pronounced accordion-like side and rear folds in the standing and seated renders.",
+      "code": "SIDE_TRANSITION_FOLD_COLLAPSE"
     },
     {
-      "code": "STANDING_SKIRT_SILHOUETTE",
       "severity": "BLOCKER",
-      "description": "Neutral and side views retain an uneven silhouette, a long dropped center panel, and visibly ribbed side panels."
+      "description": "The shorter skirt still has an uneven standing hem with a long dropped center-front panel; silhouette remains unresolved.",
+      "code": "STANDING_SKIRT_SILHOUETTE"
     }
   ],
   "failedGeometryChecks": [

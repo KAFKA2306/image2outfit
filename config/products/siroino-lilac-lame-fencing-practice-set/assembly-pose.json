@@ -9426,9 +9426,9 @@
       "shorts-back-left",
       "shorts-back-right"
     ],
-    "extensionM": 0.06,
+    "extensionM": 0.08,
     "fadeHeightM": 0.075,
-    "evidenceBoundary": "V18 lengthens the under-shorts hem to a 60 mm total extension while retaining the 20 mm longer sewn overskirt; seated/crouched coverage, neutral hem concealment, collision, fit, shape-key response, and appearance remain unverified."
+    "evidenceBoundary": "V21 extends each fitted undershort panel 80 mm below its drafted hem, at the supported upper trial bound and equal to the shortened nominal overskirt extension. The front apron remains 50 mm longer in its declared zone. This is a motion-coverage hypothesis; inspect possible hem reveal in all views, sit/crouch coverage, fit, collision and shape-key response before any appearance or customer acceptance."
   },
   "rearWaistAdjustmentTab": {
     "method": "avatar-back-surface-projected-tab-v1",
@@ -9615,7 +9615,7 @@
   "skirtPleatPlacement": {
     "method": "bounded-panel-extension-v3-panel-local-hem",
     "foldMethod": "crease-bound-soft-box-pleat-v1",
-    "foldsPerPanel": 2,
+    "foldsPerPanel": 1,
     "longitudinalSubdivisionCount": 24,
     "pieceIds": [
       "overskirt-front-left",
@@ -9632,10 +9632,10 @@
     "waistZM": 0.7395782470703125,
     "sourceHemZM": 0.5795782470703125,
     "hemZM": 0.43957824707,
-    "hemExtensionM": 0.14,
+    "hemExtensionM": 0.08,
     "foldCount": 8,
     "topologySubdivisionFactor": 1,
-    "hemFoldDepthM": 0.003,
+    "hemFoldDepthM": 0.0015,
     "phaseRadians": 0,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
@@ -9645,7 +9645,7 @@
         "overskirt-front-lap-left",
         "overskirt-front-lap-right"
       ],
-      "additionalExtensionM": 0.1,
+      "additionalExtensionM": 0.05,
       "forwardProjectionM": 0.02,
       "fullExtensionHalfAngleRadians": 0.55,
       "zeroExtensionHalfAngleRadians": 1.25,
@@ -9655,7 +9655,7 @@
       ],
       "evidenceBoundary": "V47 reduces the front-apron forward projection from 40 mm to 20 mm after V78's failed sit-pose solve left the right front lap 48.756 mm from its thigh-clearance surface predominantly along Blender Y; this tests whether excess neutral forward offset drives orientation-limited correction. The existing 100 mm downward extension and angular fade are unchanged. This remains a construction hypothesis; sit/crouch coverage, collision, folds, fit and appearance require fresh review."
     },
-    "evidenceBoundary": "V47 retains the authored radial topology and V78's reduced 0.06 soft-box crease-valley depth. It reduces only forward-apron neutral projection to 20 mm because V78 measured the failing front-lap point nearly 49 mm away from its target predominantly along the same axis, while the orientation-limited solve applied less than 1 mm. Pose constraints, normal-turn limit and residual bound remain unchanged; this is not fit, visual or release acceptance.",
+    "evidenceBoundary": "V21 retains the closed center-front while shortening the overskirt extension to 80 mm, the forward apron add-on to 50 mm, and the crease seed to one 1.5 mm soft pleat per panel. These are geometry hypotheses only; inspect all views/poses, and do not infer fit, material response, appearance acceptance or release readiness.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9672,5 +9672,5 @@
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "designRevision": "v64-v20-closed-center-front-pattern-20261026"
+  "designRevision": "v76-v21-thigh-coverage-shorter-soft-pleats-20261026"
 }
