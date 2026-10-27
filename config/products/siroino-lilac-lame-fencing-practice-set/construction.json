@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V89 keeps the V88 measured mid-thigh outline and adds a bounded bilateral UpperLeg surface-attachment trial to the four shorts shell panels. Shared gusset-attachment vertices fade to zero movement; the remaining panel vertices blend toward the corresponding measured thigh surface with an explicit 8 mm clearance hypothesis. This changes the attachment method rather than extending the hem again. Pose deformation, continuity, fit, appearance, UV, Unity/VRChat, and release remain unapproved.",
-  "designRevision": "v89-bilateral-thigh-surface-shell-20261028",
+  "target": "V90 retains the V89 four-panel pattern experiment and adds a separate bilateral thigh-cover surface copied from the target avatar's weighted thigh triangles with 8 mm normal clearance. This creates cover geometry instead of treating vertex motion as coverage. The added surface has no UV mapping yet; pose deformation, seam continuity, fit, appearance, UV, Unity/VRChat, and release remain unapproved.",
+  "designRevision": "v90-thigh-surface-cover-shell-20261028",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -256,7 +256,9 @@
         "shorts-front-right",
         "shorts-back-left",
         "shorts-back-right",
-        "shorts-gusset"
+        "shorts-gusset",
+        "shorts-leg-cover-left",
+        "shorts-leg-cover-right"
       ],
       "bodyTriangleZM": [
         0.32,
@@ -269,7 +271,7 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "V87 applies the unchanged V85 prototype pelvis-to-thigh field to four shorts panels plus the explicit gusset so every new panel receives a declared weight region. Weights remain uncalibrated and do not imply fit or appearance acceptance.",
+      "evidenceBoundary": "V90 declares the generated thigh cover pieces in the same explicit prototype skin-transfer region as the four shorts panels and gusset. Weight transfer remains uncalibrated and does not imply fit or appearance acceptance.",
       "weightProfile": {
         "method": "hip-anchored-anterior-bilateral-center-hem-fade-v3",
         "pieceIds": [
@@ -277,7 +279,9 @@
           "shorts-front-right",
           "shorts-back-left",
           "shorts-back-right",
-          "shorts-gusset"
+          "shorts-gusset",
+          "shorts-leg-cover-left",
+          "shorts-leg-cover-right"
         ],
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",

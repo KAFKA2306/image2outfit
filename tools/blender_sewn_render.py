@@ -247,11 +247,27 @@ def main():
             "pose coverage requires canonical fitted-under-shorts and pleated-overskirt piece groups"
         )
     shorts_ids = set(shorts_components[0]["requiredPieceIds"])
+    assembly_pose = read_json(
+        repo_path(job["garmentPipeline"]["assemblyPosePath"])
+    )
+    thigh_shell = assembly_pose.get("thighSurfaceShell", {})
+    thigh_shell_piece_ids = thigh_shell.get("pieceIds", {})
+    if thigh_shell_piece_ids:
+        shell_piece_ids = set(thigh_shell_piece_ids.values())
+        if len(shell_piece_ids) != len(thigh_shell_piece_ids) or not all(
+            isinstance(piece_id, str) and piece_id for piece_id in shell_piece_ids
+        ):
+            raise ValueError("thigh surface shell piece IDs must be unique non-empty strings")
+        shorts_ids.update(shell_piece_ids)
     piece_group_source = {
         "constructionPath": construction_path,
         "constructionSha256": digest(repo_path(construction_path)),
         "shortsComponentId": "fitted-under-shorts",
         "shortsPieceIds": sorted(shorts_ids),
+        "thighSurfaceShellPieceIds": sorted(thigh_shell_piece_ids.values()),
+        "assemblyPoseSha256": digest(
+            repo_path(job["garmentPipeline"]["assemblyPosePath"])
+        ),
         "skirtClothGroupId": "pleated-overskirt",
         "skirtPieceIds": sorted(skirt_ids),
     }

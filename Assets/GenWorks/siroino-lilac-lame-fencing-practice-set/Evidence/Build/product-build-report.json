@@ -8978,6 +8978,35 @@
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false
   },
+  "thighSurfaceShell": {
+    "applied": true,
+    "method": "weighted-thigh-surface-copy-v1",
+    "sourceBodyObject": "SiroinoSotai_PC",
+    "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "pieceIdsBySide": {
+      "left": "shorts-leg-cover-left",
+      "right": "shorts-leg-cover-right"
+    },
+    "triangleCountByThigh": {
+      "left": 610,
+      "right": 610
+    },
+    "sourceVertexCountByThigh": {
+      "left": 336,
+      "right": 336
+    },
+    "heightRangeZM": [
+      0.52,
+      0.72
+    ],
+    "normalClearanceM": 0.008,
+    "minimumTriangleAreaM2": 1.783675451401985e-06,
+    "uvStatus": "NOT_CREATED",
+    "grantsFitAcceptance": false,
+    "grantsPoseAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "evidenceBoundary": "V90 creates garment cover faces from only target-avatar triangles whose vertices remain on one thigh side, within the declared 0.52\u20130.72 m height band, and carry at least the stated UpperLeg bone weight. Faces are offset 8 mm along outward surface normals. The construction is an unwrapped prototype shell with UV explicitly NOT_CREATED; it does not prove seaming, fit, clearance in motion, skin-weight transfer, shape-key fit, visual acceptance, Unity/VRChat behavior or release."
+  },
   "declaredSkirtLengthening": {
     "applied": true,
     "method": "short-panelized-hem-with-forward-apron-and-faded-side-seams",
@@ -9211,14 +9240,15 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "afaad46046994f21e1e2017fa18d3dd3dcf7a6b80366dc8c2b6f35cd87dc156d",
+    "privateSimulationSourceSha256": "2a70ccf7887c5013130015f1369c0d0c8bd17ff654fde4ad68be29d08c4c3ded",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
-    "status": "AUTHORED_FROM_DECLARED_2D_SOURCE_COORDINATES",
-    "method": "face-local-source-coordinates-with-uniform-scale-unrotated-maxrects-packing",
+    "status": "PARTIAL_UNVERIFIED",
+    "method": "face-local-declared-source-coordinates; unmapped surface-shell faces remain without UVs",
     "panelCount": 27,
     "mappedFaceCount": 30277,
+    "unmappedFaceCount": 1220,
     "uniformPatternToUvScale": 0.008629850966878492,
     "panelUvBounds": {
       "P01": {
@@ -9575,7 +9605,8 @@
     },
     "sourceKindFaceCounts": {
       "declared-parametric-accessory": 40,
-      "garmentcode-pattern-panel": 30237
+      "garmentcode-pattern-panel": 30237,
+      "unmapped-surface-derived-shell": 1220
     },
     "grantsQualityAcceptance": false
   },
@@ -10377,7 +10408,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "a5c424bc017cd4fd8043b44d4f5da6aa58110d240c494dc78f30f43c30537a7f",
+  "sourceBlendSha256": "c26e48334d8f543e296b12dccb845fab89859cd6c0d688df8fb94ce35e76e201",
   "sewnMeshSha256": "ae49aa73a59507bdf0a7897e83c8fe8b04a521f46cefafe688dcf82a4fa7e1cd",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -10506,10 +10537,10 @@
         ]
       }
     ],
-    "boundaryEdgesBefore": 607,
-    "boundaryEdgesAfter": 607,
-    "nonManifoldEdgesBefore": 607,
-    "nonManifoldEdgesAfter": 607,
+    "boundaryEdgesBefore": 731,
+    "boundaryEdgesAfter": 731,
+    "nonManifoldEdgesBefore": 731,
+    "nonManifoldEdgesAfter": 731,
     "remainingDegenerateTriangles": 0,
     "grantsFitAcceptance": false,
     "grantsAppearanceAcceptance": false,
@@ -171066,9 +171097,9 @@
     "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."
   },
   "metrics": {
-    "vertices": 15437,
-    "triangles": 30265,
-    "unweightedVertices": 15437,
+    "vertices": 16109,
+    "triangles": 31485,
+    "unweightedVertices": 16109,
     "degenerateTriangles": 0
   },
   "surfaceShadingHypothesis": {

@@ -47,6 +47,10 @@ def main():
         if build_report_path.is_file()
         else {}
     )
+    thigh_shell = build_report.get("thighSurfaceShell", {})
+    uv_not_created_piece_ids = sorted(
+        set(thigh_shell.get("pieceIdsBySide", {}).values())
+    ) if thigh_shell.get("uvStatus") == "NOT_CREATED" else []
     current_build_source_sha = build_report.get("sourceBlendSha256")
     skin_report = (
         root / ".image2outfit/products" / job["id"] / "skin/skin-export-report.json"
@@ -222,10 +226,17 @@ def main():
                     f"{len(uv_unmapped_objects)} missing; omitted)"
                 )
             )
+            if uv_not_created_piece_ids:
+                uv_title += (
+                    "; UV NOT CREATED for "
+                    + ", ".join(uv_not_created_piece_ids)
+                    + " (omitted)"
+                )
             diagrams.append(("uv", uvlines, uv_title))
         report["uvMappedObjects"] = [obj.name for obj in uv_mapped_objects]
         report["uvUnverifiedObjects"] = uv_unverified_objects
         report["uvUnmappedObjects"] = uv_unmapped_objects
+        report["uvNotCreatedPieceIds"] = uv_not_created_piece_ids
         report["uvCoverage"] = {
             "sourceAuthoredObjectCount": len(uv_mapped_objects),
             "unverifiedActiveLayerObjectCount": len(uv_unverified_objects),

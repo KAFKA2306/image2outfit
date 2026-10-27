@@ -839,6 +839,16 @@ def collect_product(
                         sha256=None,
                     )
                 )
+            for piece_id in mesh.get("uvNotCreatedPieceIds", []):
+                assets.append(
+                    Asset(
+                        kind="uv",
+                        name=f"UV not created: {piece_id}",
+                        status="MISSING",
+                        href=None,
+                        sha256=None,
+                    )
+                )
 
     candidate = pick(manifest, "candidate", "candidate_manifest", default={})
     review = pick(manifest, "human_review", "review", default={})

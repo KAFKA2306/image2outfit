@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v89-bilateral-thigh-surface-shell-20261028",
+  "revision": "v90-thigh-surface-cover-shell-20261028",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,23 +20,18 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "description": "Direct inspection of the V89 sit and crouch renders shows both upper thighs remain largely exposed; the remaining white crotch panel reads as a brief-like patch rather than continuous fitted shorts. Current posed surface-ray diagnostics report only 16.27% under-shorts thigh coverage in sit and 24.07% in crouch on each side. The bilateral surface-placement step moved 545 vertices per thigh but did not create a continuous wearable shorts shell.",
-      "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE"
+      "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE",
+      "description": "Direct inspection of the current neutral, sit and crouch renders shows gray upper-thigh skin exposed below the skirt; the added white geometry still reads as a crotch patch rather than continuous wearable shorts with leg hems. The pose-matched surface-ray diagnostic now includes shorts-leg-cover-left/right and records only 17.29% under-shorts thigh coverage in sit and 25.54% in crouch on each side. No thigh coverage or fit acceptance is granted."
     },
     {
       "severity": "BLOCKER",
-      "description": "Neutral, sit, and crouch renders show the under-shorts fail to cover the thighs continuously and do not form a coherent crotch join. In sit and crouch, the front patch hangs between the legs and the body surfaces remain visible; no fit or deformation acceptance is granted.",
-      "code": "SHORTS_SHELL_AND_GUSSET_CONTINUITY_UNUSABLE"
+      "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN",
+      "description": "Direct inspection of the current front, back, left, right and three-quarter views shows dense rigid stepped side ridges and projecting hem corners. In sit and crouch, the front panel hangs between or behind the legs while the side panels splay into sharp triangular flaps."
     },
     {
       "severity": "BLOCKER",
-      "description": "Direct front, back, left, right, and three-quarter inspection shows strong accordion-like side corrugation, projecting corners, and a much lower front panel. Sit and crouch add sharp triangular splay and the skirt opens around the thighs instead of deforming coherently.",
-      "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN"
-    },
-    {
-      "severity": "BLOCKER",
-      "description": "The V89 geometry/build audit still does not verify avatar fit. The bilaterally projected rest-pose surface shell is a construction experiment only; skin weights, shape-key response, UV, Unity prefab, and VRChat execution remain unverified and cannot be inferred from these renders.",
-      "code": "BUILD_FIT_GATE_REJECTED"
+      "code": "FIT_AND_RELEASE_GATES_UNVERIFIED",
+      "description": "The geometry audit and renders do not establish usable fit, calibrated weights, Shape Key response, UV completion, Unity/VRChat execution or release readiness. This prototype is rejected and remains non-releaseable."
     }
   ],
   "failedGeometryChecks": [

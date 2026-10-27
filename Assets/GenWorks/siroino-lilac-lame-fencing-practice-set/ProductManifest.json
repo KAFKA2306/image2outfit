@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Keep V89 rejected. Replace the current narrow patch panels with a continuous shorts shell generated around each posed thigh surface and connected through an integrated crotch gusset; validate the assembled silhouette rather than only moving existing panel vertices. Rework the overskirt side folds and hem transitions, then rerun the canonical build, post-skin audit, all required pose renders, and direct review. Do not publish or release this prototype.",
+    "nextAction": "Replace the surface-copied thigh patches with a continuous assembled shorts shell that closes around both legs and through a crotch gusset. Rework overskirt side pleats and hem deformation. Rebuild from the canonical checkpoint, then inspect new pose-matched evidence and retain the rejection until all quality gates are independently met.",
     "lastAttempt": {
-      "runId": "a17d509c1ba74120ac8bf259e5726622",
+      "runId": "7b7757b0c3a64c62a3506fa90549aff5",
       "status": "EXECUTED",
-      "checkedAt": "2026-10-27T18:19:24Z",
+      "checkedAt": "2026-10-27T20:11:48Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "c482ab49559e8a94405f85cb22013e3770cf8e67891b780d21095f7164a70224",
+      "stageEvidenceSha256": "9b83b4eec4472b003579eb45d09902e3479d60f87122f745b7092652ca1f9367",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -79,53 +79,53 @@
         },
         "build-blender": {
           "status": "REUSED",
-          "stageResultSha256": "34f6a11f150d9564b2b51dbb06e84849617673d78ccfa9d625004ffdb4f92061"
+          "stageResultSha256": "9eeda34586ba62273aefe07af0c95454215eb6a13d629ba3fdf52b8784d2558c"
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "2e40030d18e8250f0692332b2335e500a760368c3148964d2ea45f8ddcb7f4d2"
+          "stageResultSha256": "f7d6c7942f5bf87ee58c079406c94e60b51c4adb955391d85ba010b0acd4c626"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "1164903472f680983dbbd38fe859ebce3c850c1175598baf3ad86aa461ccef46"
+          "stageResultSha256": "d5afae5a9014c28b9004eafabad84834a4beebda4c4fc8033a99b15979859a53"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "3632da3e1fdbea28db6704c961d7b4afdf76578c778b6059986fe15801459744"
+          "stageResultSha256": "01dc8677cbaba57431f2f84745aec1c49fc6f52f6300d3c6311b388b9178defe"
         },
         "audit-geometry": {
-          "status": "REUSED",
-          "stageResultSha256": "64e4d10461d461aec831da86f6d527b0dda63763bbe4dd6bca2bb5e2a05c96b9"
+          "status": "PASS",
+          "stageResultSha256": "a7c29298ecbf3e22b5af406911f32a195686ed71b60fbe5757f6824a8a1c01d4"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "e6a1a18e8fdf75931e7b06c66c9a038771a1a0f31ddad63c36cda4f0e02741d2"
+          "stageResultSha256": "12a02970d53f19864de0872ef1a530a2bfa11a9bb279616b5ce76d1a0d6dc081"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "c482ab49559e8a94405f85cb22013e3770cf8e67891b780d21095f7164a70224"
+          "stageResultSha256": "9b83b4eec4472b003579eb45d09902e3479d60f87122f745b7092652ca1f9367"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "fcfd9ead4c8ecb2c8ddb28be69996b6517658f5e9e8bd46cfe78a322110df6a9",
+      "checkpointSha256": "05120f740abc966850b5a48fe0108d056b7cb0701bcaef0cc3ee1eedfa2008f4",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Keep V89 rejected. Replace the current narrow patch panels with a continuous shorts shell generated around each posed thigh surface and connected through an integrated crotch gusset; validate the assembled silhouette rather than only moving existing panel vertices. Rework the overskirt side folds and hem transitions, then rerun the canonical build, post-skin audit, all required pose renders, and direct review. Do not publish or release this prototype."
+      "nextAction": "Replace the surface-copied thigh patches with a continuous assembled shorts shell that closes around both legs and through a crotch gusset. Rework overskirt side pleats and hem deformation. Rebuild from the canonical checkpoint, then inspect new pose-matched evidence and retain the rejection until all quality gates are independently met."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "a5c424bc017cd4fd8043b44d4f5da6aa58110d240c494dc78f30f43c30537a7f",
+      "sourceSha256": "c26e48334d8f543e296b12dccb845fab89859cd6c0d688df8fb94ce35e76e201",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "79800c97e6bf5053800264b2775029dda5a6739d4fe2015900a8e39769dfea67",
+      "reportSha256": "4fa8a7393e31e4d7fa63768f67b4ddaf853460a255095f456f7b2d379cf7d72a",
       "metrics": {
-        "vertices": 15437,
-        "triangles": 30265,
-        "unweightedVertices": 15437,
+        "vertices": 16109,
+        "triangles": 31485,
+        "unweightedVertices": 16109,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false
@@ -134,27 +134,22 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "7cf1034effb008f1191d40a8740eaacbea127900f479d4d3357e0c9c62979433",
+      "sha256": "a5be6c122f2a1170674677b67f2748b0fe0f2c63993ade2b324232197d98a033",
       "findings": [
         {
           "severity": "BLOCKER",
-          "description": "Direct inspection of the V89 sit and crouch renders shows both upper thighs remain largely exposed; the remaining white crotch panel reads as a brief-like patch rather than continuous fitted shorts. Current posed surface-ray diagnostics report only 16.27% under-shorts thigh coverage in sit and 24.07% in crouch on each side. The bilateral surface-placement step moved 545 vertices per thigh but did not create a continuous wearable shorts shell.",
-          "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE"
+          "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE",
+          "description": "Direct inspection of the current neutral, sit and crouch renders shows gray upper-thigh skin exposed below the skirt; the added white geometry still reads as a crotch patch rather than continuous wearable shorts with leg hems. The pose-matched surface-ray diagnostic now includes shorts-leg-cover-left/right and records only 17.29% under-shorts thigh coverage in sit and 25.54% in crouch on each side. No thigh coverage or fit acceptance is granted."
         },
         {
           "severity": "BLOCKER",
-          "description": "Neutral, sit, and crouch renders show the under-shorts fail to cover the thighs continuously and do not form a coherent crotch join. In sit and crouch, the front patch hangs between the legs and the body surfaces remain visible; no fit or deformation acceptance is granted.",
-          "code": "SHORTS_SHELL_AND_GUSSET_CONTINUITY_UNUSABLE"
+          "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN",
+          "description": "Direct inspection of the current front, back, left, right and three-quarter views shows dense rigid stepped side ridges and projecting hem corners. In sit and crouch, the front panel hangs between or behind the legs while the side panels splay into sharp triangular flaps."
         },
         {
           "severity": "BLOCKER",
-          "description": "Direct front, back, left, right, and three-quarter inspection shows strong accordion-like side corrugation, projecting corners, and a much lower front panel. Sit and crouch add sharp triangular splay and the skirt opens around the thighs instead of deforming coherently.",
-          "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN"
-        },
-        {
-          "severity": "BLOCKER",
-          "description": "The V89 geometry/build audit still does not verify avatar fit. The bilaterally projected rest-pose surface shell is a construction experiment only; skin weights, shape-key response, UV, Unity prefab, and VRChat execution remain unverified and cannot be inferred from these renders.",
-          "code": "BUILD_FIT_GATE_REJECTED"
+          "code": "FIT_AND_RELEASE_GATES_UNVERIFIED",
+          "description": "The geometry audit and renders do not establish usable fit, calibrated weights, Shape Key response, UV completion, Unity/VRChat execution or release readiness. This prototype is rejected and remains non-releaseable."
         }
       ],
       "grantsQualityAcceptance": false
@@ -166,37 +161,32 @@
     "findings": [
       {
         "severity": "BLOCKER",
-        "description": "Direct inspection of the V89 sit and crouch renders shows both upper thighs remain largely exposed; the remaining white crotch panel reads as a brief-like patch rather than continuous fitted shorts. Current posed surface-ray diagnostics report only 16.27% under-shorts thigh coverage in sit and 24.07% in crouch on each side. The bilateral surface-placement step moved 545 vertices per thigh but did not create a continuous wearable shorts shell.",
-        "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE"
+        "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE",
+        "description": "Direct inspection of the current neutral, sit and crouch renders shows gray upper-thigh skin exposed below the skirt; the added white geometry still reads as a crotch patch rather than continuous wearable shorts with leg hems. The pose-matched surface-ray diagnostic now includes shorts-leg-cover-left/right and records only 17.29% under-shorts thigh coverage in sit and 25.54% in crouch on each side. No thigh coverage or fit acceptance is granted."
       },
       {
         "severity": "BLOCKER",
-        "description": "Neutral, sit, and crouch renders show the under-shorts fail to cover the thighs continuously and do not form a coherent crotch join. In sit and crouch, the front patch hangs between the legs and the body surfaces remain visible; no fit or deformation acceptance is granted.",
-        "code": "SHORTS_SHELL_AND_GUSSET_CONTINUITY_UNUSABLE"
+        "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN",
+        "description": "Direct inspection of the current front, back, left, right and three-quarter views shows dense rigid stepped side ridges and projecting hem corners. In sit and crouch, the front panel hangs between or behind the legs while the side panels splay into sharp triangular flaps."
       },
       {
         "severity": "BLOCKER",
-        "description": "Direct front, back, left, right, and three-quarter inspection shows strong accordion-like side corrugation, projecting corners, and a much lower front panel. Sit and crouch add sharp triangular splay and the skirt opens around the thighs instead of deforming coherently.",
-        "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN"
-      },
-      {
-        "severity": "BLOCKER",
-        "description": "The V89 geometry/build audit still does not verify avatar fit. The bilaterally projected rest-pose surface shell is a construction experiment only; skin weights, shape-key response, UV, Unity prefab, and VRChat execution remain unverified and cannot be inferred from these renders.",
-        "code": "BUILD_FIT_GATE_REJECTED"
+        "code": "FIT_AND_RELEASE_GATES_UNVERIFIED",
+        "description": "The geometry audit and renders do not establish usable fit, calibrated weights, Shape Key response, UV completion, Unity/VRChat execution or release readiness. This prototype is rejected and remains non-releaseable."
       }
     ],
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "5be32dbf64b1772111ac0b664878b25dbd41700e2d107ea46119603498617dcd",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "cf20fe053686ee14653e43ea7432b1f97232710623b59e973a2dbc63a932bf77",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "0d4937b1770ea304c3153aa4bcaec071abf842afe64ee60d11375064cc7960c5",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "20b9c8ade9b890dc28cc9375676baf64c6f455f304bdcb13a07298b2a1d18f2f",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "124c06d51f71b0ad4102068368145f462f08f236cee19b96c0c755a46a8d49ed",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "ca7c03bf9118882f1e09c1cfc282724db6a1e5f5de3d392e415867d1f6623ee2",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "eba6c138b1d73f9bca1fda96ef9c490901e1e645439f811dcae4931aa6f2c8a7",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "1cf35811d19b11c29a96e7c61c15b3671310135a6ff9f60f13bc1f6026144726",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "edd27ab738194d1f9f51240d14b6f56a791f1a422bcc00fe5ba03b3845be5da4",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "f24d74f61ffb2dc91ceb7b0bc5f8766d03414794dfcad407a25a8637fa36c93e",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "404ca24cb3233deacc2601b10b2bd35d175ab10ba53984f3e8403ce6d1ed3394"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "16e07f8e009a08fade415c4a220d967bec4ba83db2712abb7b45d1ce3cb91ba4",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "6fccfa6e2a46c7982498cdbbaaac1135da33bf538ccf3d816c104bfaa20e5358",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "87589c326b5b5d8976e4279ef7c5f6962c8c86a129769b39682a8c1fc8ef6349",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "91ec435d8baf95a96cc99d81527212dab2d2e4d0578e019686d0d4fde4db88a4",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "bb1d12fae4e5f798d5f428293c220b101d8854437468580f9c070cadd4a9555c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "a47b4debf41c6c289cc87661b3ffaca4294cdac352d90e9fff6f1a71c6504dca",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "0ad44fb242ec00738556d189162a47626b89e5bdc806807d0011d4d79e3cc5c4",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "e3023ba4c99adc186b0edfd8839ae7df64c7a305cde23ce989a482815e83b7a6",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "3d07d582ea8fe8ca8b67bcb2523e6eb5ca51578af57f34d8e4d9e874f18de6f5",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "a3ed728065bad3b97180881225fe683f5c2c7b2f94ff68eb9d4a15a38ed174ee",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "50d56a5160523de154dca11bffcd58162db5589651d42146aae9dad3321a6e64"
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"
