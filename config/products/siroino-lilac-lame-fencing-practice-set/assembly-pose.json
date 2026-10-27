@@ -9704,7 +9704,31 @@
     "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
     "grantsFitAcceptance": false
   },
-  "designRevision": "v88-measured-mid-thigh-shorts-shell-20261027",
+  "poseAwareThighAttachment": {
+    "method": "bilateral-deform-bone-surface-placement-v1",
+    "pieceIds": [
+      "shorts-front-left",
+      "shorts-front-right",
+      "shorts-back-left",
+      "shorts-back-right"
+    ],
+    "bodyMeshNamePrefix": "SiroinoSotai_PC",
+    "leftThighBone": "UpperLeg_L",
+    "rightThighBone": "UpperLeg_R",
+    "fadeStartZM": 0.62,
+    "fullBlendZM": 0.50,
+    "maximumFrontYM": 2.0,
+    "normalClearanceM": 0.008,
+    "maximumProjectionDistanceM": 0.22,
+    "maximumBlendWeight": 0.9,
+    "minimumTriangleBoneWeight": 0.2,
+    "preserveSharedPieceIds": [
+      "shorts-gusset"
+    ],
+    "preservedSeamFadeDistanceM": 0.05,
+    "evidenceBoundary": "V89 prototype-only bilateral placement uses the measured neutral avatar thigh triangles carrying UpperLeg_L or UpperLeg_R weights to move shorts panel vertices toward an 8 mm normal-clearance shell. Shared gusset-attachment vertices are preserved through a 50 mm fade. The attachment geometry is rest-pose evidence; skin deformation, posed coverage, seam continuity, pressure, collision, shape-key response, fit, appearance and release remain unverified."
+  },
+  "designRevision": "v89-bilateral-thigh-surface-shell-20261028",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

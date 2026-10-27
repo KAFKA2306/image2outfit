@@ -8951,8 +8951,32 @@
     "grantsVisualAcceptance": false
   },
   "poseAwareThighAttachment": {
-    "applied": false,
-    "reason": "not-declared"
+    "applied": true,
+    "method": "bilateral-deform-bone-surface-placement-v1",
+    "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+    "targetBodyObject": "SiroinoSotai_PC",
+    "targetTriangleCountByThigh": {
+      "left": 1135,
+      "right": 1135
+    },
+    "panelIds": [
+      "shorts-back-left",
+      "shorts-back-right",
+      "shorts-front-left",
+      "shorts-front-right"
+    ],
+    "movedVertexCountByThigh": {
+      "left": 545,
+      "right": 545
+    },
+    "maximumNearestSurfaceDistanceM": 0.007790741045027971,
+    "maximumRestDisplacementM": 0.0045482595427490755,
+    "minimumTriangleAreaM2": 4.406125633839106e-12,
+    "beforeVerticesSha256": "988939b6dd942f68b9cb734e268a7b683383f50150759c2eddc783393f089513",
+    "afterVerticesSha256": "23199af01dd9e89425546a212719ce1230050514204b6ee719981a52bd8434e3",
+    "bodyFacesCopied": false,
+    "grantsFitAcceptance": false,
+    "grantsPoseAcceptance": false
   },
   "declaredSkirtLengthening": {
     "applied": true,
@@ -9187,7 +9211,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "9367dbe60c471b0afbce5475c90edd5bb9a25aba7b437b76e0215a2ff14e66af",
+    "privateSimulationSourceSha256": "afaad46046994f21e1e2017fa18d3dd3dcf7a6b80366dc8c2b6f35cd87dc156d",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -10353,7 +10377,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "152968aa5fcf1d1c5dbda137d5e50725d72a45317dba93d5955af13ee8f6f1bf",
+  "sourceBlendSha256": "a5c424bc017cd4fd8043b44d4f5da6aa58110d240c494dc78f30f43c30537a7f",
   "sewnMeshSha256": "ae49aa73a59507bdf0a7897e83c8fe8b04a521f46cefafe688dcf82a4fa7e1cd",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
