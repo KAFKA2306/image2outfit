@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v87-measured-thigh-shorts-gusset-20261027",
+  "revision": "v88-measured-mid-thigh-shorts-shell-20261027",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,22 +21,22 @@
     {
       "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of the fresh V87 sit and crouch renders shows substantial thigh exposure. The matching-pose surface-ray audit measures shorts coverage at sit L/R 13.11%/13.11% and crouch L/R 16.72%/16.72%. Overskirt coverage remains sit 18.64%/18.53% and crouch 32.77%/32.88%. These readings do not establish fit or usable coverage."
+      "description": "Direct inspection of all six pose renders shows exposed upper thighs remain prominent in sit and crouch. The current surface-ray measurements show shorts coverage of 15.59% per thigh in sit and 22.82% per thigh in crouch, up from V87's 13.11% and 16.72% respectively, but still far from a continuous usable covering surface. Overskirt thigh coverage is 18.64%/18.53% in sit and 32.77%/32.88% in crouch. These prototype measurements do not establish fit or buyer usability."
     },
     {
-      "code": "SHORTS_GUSSET_AND_POSE_DRAPE_UNUSABLE",
+      "code": "SHORTS_SHELL_AND_GUSSET_CONTINUITY_UNUSABLE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of the V87 neutral, sit, and crouch renders shows the under-shorts do not form a continuous, leg-following covering surface in the posed images; exposed upper thighs remain prominent and the gusset/hem is not visually validated for use."
+      "description": "Direct inspection of neutral, sit, and crouch renders shows the four-panel under-shorts plus gusset remain visually discontinuous around the moving thighs; the sit/crouch pose produces large uncovered areas and fragmented triangular crotch/side openings. The hem extension gave only a small measured coverage increase and does not validate drape, seam integrity, collision, or fit."
     },
     {
       "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN",
       "severity": "BLOCKER",
-      "description": "Direct inspection of front, back, left, right, and three-quarter views shows pronounced accordion-like side corrugation and projecting, irregular hem corners. The fabric silhouette reads as a prototype with uneven drape."
+      "description": "Front, back, left, right, three-quarter, sit, and crouch views still show pronounced side corrugation, projecting irregular hem corners, and sharp unsupported panel splay. The silhouette remains an unapproved prototype."
     },
     {
-      "code": "BUILD_AND_FIT_QUALITY_REJECTED",
+      "code": "BUILD_FIT_GATE_REJECTED",
       "severity": "BLOCKER",
-      "description": "The actual V87 Blender build report records passed=false and REJECT: avatar fit, deformation weights, and zero-unweighted-vertex checks fail. The rendered appearance does not override those geometry gates; UV, shape-key, Unity, and VRChat behavior remain unverified."
+      "description": "The V88 product build report and geometry audit still reject avatarFitVerified and buildReportPassed. The hash-bound skin export independently records 0 unweighted vertices and passing per-object weight audits; that does not prove fit, shape-key response, or acceptable deformation. UV, Unity prefab, and VRChat runtime evidence remain unverified."
     }
   ],
   "failedGeometryChecks": [

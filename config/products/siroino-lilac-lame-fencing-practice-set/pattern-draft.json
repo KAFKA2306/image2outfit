@@ -17,7 +17,7 @@
     "limitations": [
       "Body-only measurements are from an identical target-avatar FBX; no ease or pattern placement is approved.",
       "Zero seam allowance records stitch-line geometry only; these are not fabric cut patterns.",
-      "The V87 shorts lower widths use measured Neutral per-leg section circumferences at local y -0.02 m and 0 m plus a 4 mm radial clearance hypothesis. Front/back arc allocation, upper taper, waist, rise, gusset, fabric ease, and pose response are unmeasured and unapproved."
+      "V88 extends the V87 shorts hem to local y -0.11 m. Lower widths interpolate measured Neutral UpperLeg circumferences at bone fractions 0.60 and 0.75, with pi times 4 mm added as a radial-clearance hypothesis. Front/back arc allocation, upper taper, waist, rise, gusset, fabric ease, and pose response remain unmeasured and unapproved."
     ],
     "armholeDimensionEvidence": {
       "status": "MEASURED_NEUTRAL_REST_LENGTH_PROTOTYPE",
@@ -1790,18 +1790,18 @@
       "pieceId": "shorts-front-left",
       "partId": "fitted-short",
       "boundary": [
-        [
-          0,
-          -0.02
-        ],
-        [
-          0.0913,
-          -0.02
-        ],
-        [
-          0.1826,
-          -0.02
-        ],
+          [
+            0,
+            -0.11
+          ],
+          [
+            0.0749,
+            -0.11
+          ],
+          [
+            0.1498,
+            -0.11
+          ],
         [
           0.1886,
           0
@@ -1890,24 +1890,24 @@
       "garmentFacing": "front",
       "wearerSide": "left",
       "measurementStatus": "MEASURED_NEUTRAL_SECTION_WIDTHS_WITH_UNMEASURED_FRONT_BACK_SPLIT",
-      "constructionStatus": "v87-measured-thigh-shorts-gusset-20261027; provisional section-derived lower-leg widths; front/back arc allocation and rise remain hypotheses"
+      "constructionStatus": "v88-measured-mid-thigh-shorts-shell-20261027; hem follows interpolated measured thigh sections with 4 mm radial-clearance hypothesis; ease, front/back arc allocation and rise remain hypotheses"
     },
     {
       "pieceId": "shorts-front-right",
       "partId": "fitted-short",
       "boundary": [
-        [
-          0,
-          -0.02
-        ],
-        [
-          0.0913,
-          -0.02
-        ],
-        [
-          0.1826,
-          -0.02
-        ],
+          [
+            0,
+            -0.11
+          ],
+          [
+            0.0749,
+            -0.11
+          ],
+          [
+            0.1498,
+            -0.11
+          ],
         [
           0.1886,
           0
@@ -1996,24 +1996,24 @@
       "garmentFacing": "front",
       "wearerSide": "right",
       "measurementStatus": "MEASURED_NEUTRAL_SECTION_WIDTHS_WITH_UNMEASURED_FRONT_BACK_SPLIT",
-      "constructionStatus": "v87-measured-thigh-shorts-gusset-20261027; provisional section-derived lower-leg widths; front/back arc allocation and rise remain hypotheses"
+      "constructionStatus": "v88-measured-mid-thigh-shorts-shell-20261027; hem follows interpolated measured thigh sections with 4 mm radial-clearance hypothesis; ease, front/back arc allocation and rise remain hypotheses"
     },
     {
       "pieceId": "shorts-back-left",
       "partId": "fitted-short",
       "boundary": [
-        [
-          0,
-          -0.02
-        ],
-        [
-          0.0913,
-          -0.02
-        ],
-        [
-          0.1826,
-          -0.02
-        ],
+          [
+            0,
+            -0.11
+          ],
+          [
+            0.0749,
+            -0.11
+          ],
+          [
+            0.1498,
+            -0.11
+          ],
         [
           0.1886,
           0
@@ -2102,24 +2102,24 @@
       "garmentFacing": "back",
       "wearerSide": "left",
       "measurementStatus": "MEASURED_NEUTRAL_SECTION_WIDTHS_WITH_UNMEASURED_FRONT_BACK_SPLIT",
-      "constructionStatus": "v87-measured-thigh-shorts-gusset-20261027; provisional section-derived lower-leg widths; front/back arc allocation and rise remain hypotheses"
+      "constructionStatus": "v88-measured-mid-thigh-shorts-shell-20261027; hem follows interpolated measured thigh sections with 4 mm radial-clearance hypothesis; ease, front/back arc allocation and rise remain hypotheses"
     },
     {
       "pieceId": "shorts-back-right",
       "partId": "fitted-short",
       "boundary": [
-        [
-          0,
-          -0.02
-        ],
-        [
-          0.0913,
-          -0.02
-        ],
-        [
-          0.1826,
-          -0.02
-        ],
+          [
+            0,
+            -0.11
+          ],
+          [
+            0.0749,
+            -0.11
+          ],
+          [
+            0.1498,
+            -0.11
+          ],
         [
           0.1886,
           0
@@ -2208,7 +2208,7 @@
       "garmentFacing": "back",
       "wearerSide": "right",
       "measurementStatus": "MEASURED_NEUTRAL_SECTION_WIDTHS_WITH_UNMEASURED_FRONT_BACK_SPLIT",
-      "constructionStatus": "v87-measured-thigh-shorts-gusset-20261027; provisional section-derived lower-leg widths; front/back arc allocation and rise remain hypotheses"
+      "constructionStatus": "v88-measured-mid-thigh-shorts-shell-20261027; hem follows interpolated measured thigh sections with 4 mm radial-clearance hypothesis; ease, front/back arc allocation and rise remain hypotheses"
     },
     {
       "pieceId": "jacket-elbow-quilt-overlay",
@@ -2792,9 +2792,9 @@
     }
   ],
   "method": {
-    "name": "V87 measured-section shorts pattern with explicit four-edge gusset",
+    "name": "V88 measured mid-thigh shorts shell with explicit four-edge gusset",
     "status": "TRIAL",
-    "rationale": "Measured Neutral per-leg sections set two lower opening widths; separate front/back rise geometry and a connected gusset are construction hypotheses. This trial is not approved for fit, appearance, motion, or release."
+    "rationale": "The V87 sit/crouch diagnostic and direct renders showed that the connected four-edge crotch piece did not make enough continuous thigh coverage. V88 extends the four sewn shorts panels to a mid-thigh hem using interpolated measured Neutral thigh circumferences at bone fractions 0.60 and 0.75, plus a declared 4 mm radial-clearance hypothesis. The four-panel seams and integrated gusset remain provisional; pose, fit, ease, and appearance are unapproved."
   },
   "unresolved": [
     {
@@ -2808,9 +2808,9 @@
       "decision": "The silhouette shell is drafted, but pleat folds are not represented as sewn pleat construction. Resolve this before appearance approval."
     },
     {
-      "item": "shorts rise, crotch, thigh sections, and shape-key response",
+      "item": "shorts rise, crotch, front/back section split, ease, and shape-key response",
       "status": "prototype-unverified",
-      "decision": "V87 replaces the V86 extension/row trial with section-derived lower shorts widths, distinct provisional front/back panel outlines, and a four-edge gusset. Front/back section split, upper taper, rise, gusset geometry/ease, skinning, opacity, pose coverage, fit and shape-key response remain unmeasured and unapproved."
+      "decision": "V88 extends the V87 four-panel shell to a measured-section-derived mid-thigh hem and keeps the four-edge gusset. The hem circumference uses measured Neutral body sections and an explicit 4 mm radial-clearance hypothesis; pattern ease, front/back arc split, upper taper, rise, gusset geometry, skinning continuity, pose coverage, fit and shape-key response remain unmeasured and unapproved."
     },
     {
       "item": "jacket plastron, elbow quilting, piping, and back tab",
