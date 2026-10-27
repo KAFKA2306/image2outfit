@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v86-shorts-hem-topology-20261027",
+  "revision": "v87-measured-thigh-shorts-gusset-20261027",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,24 @@
   },
   "blockingFindings": [
     {
-      "code": "POSE_COVERAGE_UNCHANGED",
+      "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all V86 views and poses shows the shorts still fail to cover the upper thighs when seated or crouched. The pose-matched surface-ray diagnostic remains 16.16% upper-thigh coverage for the shorts in sit and 27.80% in crouch; the overskirt remains about 18.5-18.6% seated and 32.8-32.9% crouched. The two new hem rows preserved topology/UV provenance but did not improve these pose coverage results."
+      "description": "Direct inspection of the fresh V87 sit and crouch renders shows substantial thigh exposure. The matching-pose surface-ray audit measures shorts coverage at sit L/R 13.11%/13.11% and crouch L/R 16.72%/16.72%. Overskirt coverage remains sit 18.64%/18.53% and crouch 32.77%/32.88%. These readings do not establish fit or usable coverage."
     },
     {
-      "code": "POSED_PANEL_INTERFERENCE",
+      "code": "SHORTS_GUSSET_AND_POSE_DRAPE_UNUSABLE",
       "severity": "BLOCKER",
-      "description": "The sit render still shows large exposed thighs and pointed folded panel corners around the lower legs; the crouch render likewise shows exposed thighs and angular panel intersections. The new hem subdivisions have not established a usable leg-following deformation."
+      "description": "Direct inspection of the V87 neutral, sit, and crouch renders shows the under-shorts do not form a continuous, leg-following covering surface in the posed images; exposed upper thighs remain prominent and the gusset/hem is not visually validated for use."
     },
     {
-      "code": "SIDE_DRAPE_AND_HEM_DEFECTS",
+      "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN",
       "severity": "BLOCKER",
-      "description": "Direct left/right and three-quarter views retain strong accordion-like corrugation and an uneven projecting overskirt hem. The base-layer shorts hang as a blunt rectangular shell in neutral. Surface appearance and construction remain prototype quality."
+      "description": "Direct inspection of front, back, left, right, and three-quarter views shows pronounced accordion-like side corrugation and projecting, irregular hem corners. The fabric silhouette reads as a prototype with uneven drape."
+    },
+    {
+      "code": "BUILD_AND_FIT_QUALITY_REJECTED",
+      "severity": "BLOCKER",
+      "description": "The actual V87 Blender build report records passed=false and REJECT: avatar fit, deformation weights, and zero-unweighted-vertex checks fail. The rendered appearance does not override those geometry gates; UV, shape-key, Unity, and VRChat behavior remain unverified."
     }
   ],
   "failedGeometryChecks": [

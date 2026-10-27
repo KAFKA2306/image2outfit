@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V83 holds the V82 overskirt/apron geometry, side relief, materials, and skinning inputs constant while extending the four sewn under-short panels from 80 mm to 160 mm as a mid-thigh coverage hypothesis for the measured sit/crouch upper-thigh exposure. This extension-only trial did not improve measured pose coverage; hem visibility, seams, skinning, collision, appearance, fit, UV, Unity/VRChat, and release remain unapproved.",
-  "designRevision": "v86-shorts-hem-topology-20261027",
+  "designRevision": "v87-measured-thigh-shorts-gusset-20261027",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -28,7 +28,8 @@
     "overskirt-front-lap-left",
     "overskirt-front-lap-right",
     "waistband-front-lap-left",
-    "waistband-front-lap-right"
+    "waistband-front-lap-right",
+    "shorts-gusset"
   ],
   "requiredPatternComponents": [
     {
@@ -254,7 +255,8 @@
         "shorts-front-left",
         "shorts-front-right",
         "shorts-back-left",
-        "shorts-back-right"
+        "shorts-back-right",
+        "shorts-gusset"
       ],
       "bodyTriangleZM": [
         0.32,
@@ -267,14 +269,15 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "V85 isolates one bounded posed-coverage hypothesis: raise only the shorts hem thigh-follow target from V79 0.82 to 0.98 while preserving waist, centerline, anterior fade, geometry and panel placement. V84 pose-matched diagnostics measured 15.37% upper-thigh shorts coverage seated and 26.67% crouched despite 100% neutral coverage; stronger hem follow tests whether the coverage layer follows rotated thighs. Inspect neutral, sit and crouch for waist/crotch distortion and intersections. This remains a prototype weight hypothesis; it is not fit or visual acceptance.",
+      "evidenceBoundary": "V87 applies the unchanged V85 prototype pelvis-to-thigh field to four shorts panels plus the explicit gusset so every new panel receives a declared weight region. Weights remain uncalibrated and do not imply fit or appearance acceptance.",
       "weightProfile": {
         "method": "hip-anchored-anterior-bilateral-center-hem-fade-v3",
         "pieceIds": [
           "shorts-front-left",
           "shorts-front-right",
           "shorts-back-left",
-          "shorts-back-right"
+          "shorts-back-right",
+          "shorts-gusset"
         ],
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
@@ -287,7 +290,7 @@
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.075,
         "fullSideWeightWidthM": 0.135,
-        "evidenceBoundary": "V79 keeps V78 shorts-panel outlines and restores the moderate 8%-to-82% pelvis-to-hem field and 75 mm pelvis-led center band; it adds the existing v3 bilateral centerline blend (12% hem target) and an 8% anterior target fading over 140 mm, with full lateral follow reached by 135 mm. This isolates smooth left/right thigh distribution near the crotch from hem over-follow. The diagnostic will check knee deformation and seated coverage; no fit, motion, visual or release acceptance is implied."
+        "evidenceBoundary": "Existing V85 prototype distribution is carried onto the V87 gusset for skinning coverage only; no change to measured behavior is claimed. Seam strain, crotch deformation, weight continuity and pose response remain unverified."
       }
     }
   ]

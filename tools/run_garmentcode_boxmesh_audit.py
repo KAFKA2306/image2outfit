@@ -449,7 +449,7 @@ def _panel_pose_input_audit(pattern: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _initialize_cylindrical_panels(mesh, pattern, scale):
+def _initialize_cylindrical_panels(mesh, pattern, scale, adapter):
     """Wrap explicit sleeve panels before BoxMesh averages the sewn vertices.
 
     Keep the upstream 2D panel vertices and edge rest lengths unchanged. Only
@@ -459,7 +459,14 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
     from types import MethodType
 
     records = []
+    deferred_gussets = []
     for name, source in pattern["panels"].items():
+        gusset = source.get("image2outfitGussetPlacement")
+        if gusset is not None:
+            if gusset.get("method") != "four-seam-corner-triangulated-v1":
+                raise ValueError("Unknown gusset placement method")
+            deferred_gussets.append((name, source, gusset))
+            continue
         collar = source.get("image2outfitCollarWrap")
         if collar is not None:
             if collar["method"] != "pattern-length-standing-collar" or any(
@@ -1157,6 +1164,170 @@ def _initialize_cylindrical_panels(mesh, pattern, scale):
             ),
             panel,
         )
+    # Resolve gussets only after neighboring panel transforms exist. Each
+    # pattern corner binds to a sewn endpoint on a measured-body-placed shorts
+    # panel, so the bridge follows the exact endpoints that BoxMesh will weld.
+    panel_key_map = adapter.get("panelKeyMap")
+    named_edges = adapter.get("namedEdges")
+    if deferred_gussets:
+        if not isinstance(panel_key_map, dict) or not isinstance(named_edges, dict):
+            raise ValueError("Gusset placement requires canonical panel and edge maps")
+        piece_to_panel = {piece: panel for panel, piece in panel_key_map.items()}
+        for name, source, gusset in deferred_gussets:
+            corners = gusset.get("corners")
+            if not isinstance(corners, list) or len(corners) != 4:
+                raise ValueError("Gusset placement must bind four pattern corners")
+            pattern_vertices = source.get("vertices")
+            if not isinstance(pattern_vertices, list):
+                raise ValueError("Gusset placement panel has no pattern vertices")
+            targets = []
+            pattern_corners = []
+            target_binding_evidence = []
+            for binding in corners:
+                pattern_index = binding.get("patternVertexIndex")
+                endpoint = binding.get("targetEndpoint")
+                target_piece = binding.get("targetPieceId")
+                target_edge = binding.get("targetEdgeId")
+                if (
+                    isinstance(pattern_index, bool)
+                    or not isinstance(pattern_index, int)
+                    or pattern_index < 0
+                    or pattern_index >= len(pattern_vertices)
+                    or endpoint not in {"start", "end"}
+                    or target_piece not in piece_to_panel
+                ):
+                    raise ValueError("Invalid gusset corner binding")
+                target_panel_key = piece_to_panel[target_piece]
+                target_panel = mesh.panels[target_panel_key]
+                edge_record = next(
+                    (
+                        item
+                        for item in named_edges.get(target_panel_key, [])
+                        if item.get("edgeId") == target_edge
+                    ),
+                    None,
+                )
+                if edge_record is None:
+                    raise ValueError("Gusset target edge is missing from canonical map")
+                edge_index = next(
+                    index
+                    for index, item in enumerate(named_edges[target_panel_key])
+                    if item.get("edgeId") == target_edge
+                )
+                if edge_index >= len(target_panel.edges):
+                    raise ValueError("Gusset target edge is outside the loaded panel")
+                # Named-edge endpoint indices refer to the source polygon. BoxMesh
+                # reorders boundary vertices while it builds stitch ranges, so use
+                # the loaded edge's vertex range to address panel.panel_vertices.
+                # Directly indexing by the source endpoint had silently selected
+                # interior points and collapsed front/back gusset corners.
+                edge_vertex_range = target_panel.edges[edge_index].vertex_range
+                vertex_index = edge_vertex_range[0 if endpoint == "start" else -1]
+                if vertex_index < 0 or vertex_index >= len(target_panel.panel_vertices):
+                    raise ValueError("Gusset target vertex is outside its panel")
+                target_vertex = target_panel.panel_vertices[vertex_index]
+                transformed_target = np.asarray(
+                    target_panel.rot_trans_vertex(target_vertex), dtype=float
+                )
+                targets.append(transformed_target)
+                target_binding_evidence.append(
+                    {
+                        "pieceId": target_piece,
+                        "panelKey": target_panel_key,
+                        "edgeId": target_edge,
+                        "endpoint": endpoint,
+                        "vertexIndex": int(vertex_index),
+                        "edgeVertexRange": [int(index) for index in edge_vertex_range],
+                        "panelVertex": np.asarray(target_vertex, dtype=float).tolist(),
+                        "transformedGarmentCodeM": transformed_target.tolist(),
+                        "placement": pattern["panels"][target_panel_key].get(
+                            "image2outfitLegWrap"
+                        ),
+                    }
+                )
+                pattern_corners.append(np.asarray(pattern_vertices[pattern_index], dtype=float))
+
+            if not np.isfinite(np.asarray(targets)).all() or not np.isfinite(np.asarray(pattern_corners)).all():
+                raise ValueError("Gusset corner mapping contains non-finite coordinates")
+            adjacent_corners = pattern_corners[1:] + pattern_corners[:1]
+            if any(
+                np.linalg.norm(a - b) <= 1e-9
+                for a, b in zip(pattern_corners, adjacent_corners)
+            ):
+                raise ValueError("Gusset pattern has a collapsed edge")
+
+            triangles_2d = ((0, 1, 2), (0, 2, 3))
+            target_triangle_areas = []
+            for triangle in triangles_2d:
+                a, b, c = (targets[i] for i in triangle)
+                target_triangle_areas.append(
+                    float(np.linalg.norm(np.cross(b - a, c - a)) / 2)
+                )
+            if min(target_triangle_areas) <= 1e-8 * scale * scale:
+                raise ValueError(
+                    "Gusset target endpoints do not span a stable 3D surface: "
+                    + json.dumps(
+                        {
+                            "piece": name,
+                            "targetCornerCoordinatesGarmentCodeM": [
+                                point.tolist() for point in targets
+                            ],
+                            "targetTriangleAreasM2": target_triangle_areas,
+                            "bindings": corners,
+                            "targetBindingEvidence": target_binding_evidence,
+                        },
+                        sort_keys=True,
+                    )
+                )
+
+            def gusset_transform(
+                panel,
+                vertex,
+                pattern_corners=pattern_corners,
+                targets=targets,
+                triangles=triangles_2d,
+            ):
+                point = np.asarray(vertex, dtype=float)
+                for indices in triangles:
+                    a, b, c = (pattern_corners[i] for i in indices)
+                    matrix = np.column_stack((b - a, c - a))
+                    determinant = float(np.linalg.det(matrix))
+                    if abs(determinant) <= 1e-12:
+                        raise ValueError("Gusset placement triangle is degenerate")
+                    weights_bc = np.linalg.solve(matrix, point - a)
+                    weights = np.array([1.0 - weights_bc.sum(), *weights_bc])
+                    if np.min(weights) >= -1e-7:
+                        return sum(
+                            weight * targets[i]
+                            for weight, i in zip(weights, indices)
+                        )
+                raise ValueError("Gusset mesh vertex lies outside its declared four-corner surface")
+
+            panel = mesh.panels[name]
+            panel.rot_trans_vertex = MethodType(gusset_transform, panel)
+            panel.rot_trans_panel = MethodType(
+                lambda panel, vertices: np.array(
+                    [panel.rot_trans_vertex(v) for v in vertices]
+                ),
+                panel,
+            )
+            panel.image2outfit_cylindrical = True
+            panel.image2outfit_reverse_winding = False
+            records.append(
+                {
+                    "panel": name,
+                    "specification": gusset,
+                    "vertexCount": len(panel.panel_vertices),
+                    "targetCornerCoordinatesGarmentCodeM": [
+                        point.tolist() for point in targets
+                    ],
+                    "targetTriangleAreasM2": target_triangle_areas,
+                    "targetBindingEvidence": target_binding_evidence,
+                    "changes2dRestLengths": False,
+                    "grantsFitAcceptance": False,
+                }
+            )
+
     if records:
         original_order = mesh._order_face_vertices
 
@@ -1232,7 +1403,7 @@ def main() -> int:
         mesh.load_panels()
         mesh.gen_panel_meshes()
         payload["cylindricalPlacement"] = _initialize_cylindrical_panels(
-            mesh, pattern, input_data["properties"]["units_in_meter"]
+            mesh, pattern, input_data["properties"]["units_in_meter"], adapter
         )
         same_panel = mesh._stitch_vertices()
         _valid, invalid_indices = mesh._is_stitching_valid(same_panel)

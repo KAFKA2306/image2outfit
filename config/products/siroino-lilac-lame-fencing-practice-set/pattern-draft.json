@@ -16,8 +16,8 @@
     },
     "limitations": [
       "Body-only measurements are from an identical target-avatar FBX; no ease or pattern placement is approved.",
-      "Waist section mapping, collar size, sleeve cap curvature, overskirt pleat intake, shorts rise and leg-opening circumference are not measured.",
-      "Zero seam allowance records stitch-line geometry only; these are not fabric cut patterns."
+      "Zero seam allowance records stitch-line geometry only; these are not fabric cut patterns.",
+      "The V87 shorts lower widths use measured Neutral per-leg section circumferences at local y -0.02 m and 0 m plus a 4 mm radial clearance hypothesis. Front/back arc allocation, upper taper, waist, rise, gusset, fabric ease, and pose response are unmeasured and unapproved."
     ],
     "armholeDimensionEvidence": {
       "status": "MEASURED_NEUTRAL_REST_LENGTH_PROTOTYPE",
@@ -509,6 +509,24 @@
       "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
       "sha256": "2a3279f47f975137ad6bd55c6f7c2f5b35a05fba84196f606d03236ccd630f97",
       "grantsFitAcceptance": false
+    },
+    "thighSectionEvidence": {
+      "status": "MEASURED_NEUTRAL_PER_LEG_CIRCUMFERENCE_PROTOTYPE",
+      "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
+      "sourceEvidenceSha256": "5fef1c11dfd75e546c7054d6055fafc6728128f94a3d5170d41afdb3a12191ba",
+      "sourceAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+      "derivedNeutralHalfWidthsM": [
+        [
+          -0.02,
+          0.1826
+        ],
+        [
+          0,
+          0.1886
+        ]
+      ],
+      "radialClearanceHypothesisM": 0.004,
+      "unmeasuredRowsAndAllocation": "Width taper above local y=0, front/back arc allocation, rise, crotch shape, gusset ease, and all pose deformation remain design hypotheses. The joined hip section is excluded."
     }
   },
   "pieces": [
@@ -1774,26 +1792,22 @@
       "boundary": [
         [
           0,
-          -0.16
+          -0.02
         ],
         [
-          0.0736,
-          -0.16
-        ],
-        [
-          0.1472,
-          -0.16
-        ],
-        [
-          0.1603,
-          -0.12
+          0.0913,
+          -0.02
         ],
         [
           0.1826,
           -0.02
         ],
         [
-          0.26,
+          0.1886,
+          0
+        ],
+        [
+          0.252,
           0.05
         ],
         [
@@ -1805,16 +1819,12 @@
           0.14
         ],
         [
-          0.08,
+          0.095,
           0.09
         ],
         [
-          0.04,
-          0.105
-        ],
-        [
-          0.02,
-          -0.08
+          0.016,
+          0.02
         ]
       ],
       "cutCount": 1,
@@ -1853,45 +1863,34 @@
           "role": "seam"
         },
         {
-          "edgeId": "outseam-waist",
+          "edgeId": "waist-opening",
           "startVertex": 5,
           "endVertex": 6,
-          "role": "seam"
-        },
-        {
-          "edgeId": "waist-opening",
-          "startVertex": 6,
-          "endVertex": 7,
           "role": "open"
         },
         {
           "edgeId": "crotch-rise-upper",
+          "startVertex": 6,
+          "endVertex": 7,
+          "role": "seam"
+        },
+        {
+          "edgeId": "gusset-attachment",
           "startVertex": 7,
           "endVertex": 8,
           "role": "seam"
         },
         {
-          "edgeId": "crotch-rise-lower",
-          "startVertex": 8,
-          "endVertex": 9,
-          "role": "seam"
-        },
-        {
-          "edgeId": "inseam-upper",
-          "startVertex": 9,
-          "endVertex": 10,
-          "role": "seam"
-        },
-        {
           "edgeId": "inseam-lower",
-          "startVertex": 10,
+          "startVertex": 8,
           "endVertex": 0,
           "role": "seam"
         }
       ],
       "garmentFacing": "front",
       "wearerSide": "left",
-      "measurementStatus": "VISUAL_ESTIMATE_UNMEASURED"
+      "measurementStatus": "MEASURED_NEUTRAL_SECTION_WIDTHS_WITH_UNMEASURED_FRONT_BACK_SPLIT",
+      "constructionStatus": "v87-measured-thigh-shorts-gusset-20261027; provisional section-derived lower-leg widths; front/back arc allocation and rise remain hypotheses"
     },
     {
       "pieceId": "shorts-front-right",
@@ -1899,26 +1898,22 @@
       "boundary": [
         [
           0,
-          -0.16
+          -0.02
         ],
         [
-          0.0736,
-          -0.16
-        ],
-        [
-          0.1472,
-          -0.16
-        ],
-        [
-          0.1603,
-          -0.12
+          0.0913,
+          -0.02
         ],
         [
           0.1826,
           -0.02
         ],
         [
-          0.26,
+          0.1886,
+          0
+        ],
+        [
+          0.252,
           0.05
         ],
         [
@@ -1930,16 +1925,12 @@
           0.14
         ],
         [
-          0.08,
+          0.095,
           0.09
         ],
         [
-          0.04,
-          0.105
-        ],
-        [
-          0.02,
-          -0.08
+          0.016,
+          0.02
         ]
       ],
       "cutCount": 1,
@@ -1978,45 +1969,34 @@
           "role": "seam"
         },
         {
-          "edgeId": "outseam-waist",
+          "edgeId": "waist-opening",
           "startVertex": 5,
           "endVertex": 6,
-          "role": "seam"
-        },
-        {
-          "edgeId": "waist-opening",
-          "startVertex": 6,
-          "endVertex": 7,
           "role": "open"
         },
         {
           "edgeId": "crotch-rise-upper",
+          "startVertex": 6,
+          "endVertex": 7,
+          "role": "seam"
+        },
+        {
+          "edgeId": "gusset-attachment",
           "startVertex": 7,
           "endVertex": 8,
           "role": "seam"
         },
         {
-          "edgeId": "crotch-rise-lower",
-          "startVertex": 8,
-          "endVertex": 9,
-          "role": "seam"
-        },
-        {
-          "edgeId": "inseam-upper",
-          "startVertex": 9,
-          "endVertex": 10,
-          "role": "seam"
-        },
-        {
           "edgeId": "inseam-lower",
-          "startVertex": 10,
+          "startVertex": 8,
           "endVertex": 0,
           "role": "seam"
         }
       ],
       "garmentFacing": "front",
       "wearerSide": "right",
-      "measurementStatus": "VISUAL_ESTIMATE_UNMEASURED"
+      "measurementStatus": "MEASURED_NEUTRAL_SECTION_WIDTHS_WITH_UNMEASURED_FRONT_BACK_SPLIT",
+      "constructionStatus": "v87-measured-thigh-shorts-gusset-20261027; provisional section-derived lower-leg widths; front/back arc allocation and rise remain hypotheses"
     },
     {
       "pieceId": "shorts-back-left",
@@ -2024,26 +2004,22 @@
       "boundary": [
         [
           0,
-          -0.16
+          -0.02
         ],
         [
-          0.0736,
-          -0.16
-        ],
-        [
-          0.1472,
-          -0.16
-        ],
-        [
-          0.1603,
-          -0.12
+          0.0913,
+          -0.02
         ],
         [
           0.1826,
           -0.02
         ],
         [
-          0.26,
+          0.1886,
+          0
+        ],
+        [
+          0.252,
           0.05
         ],
         [
@@ -2055,16 +2031,12 @@
           0.14
         ],
         [
-          0.08,
-          0.09
+          0.095,
+          0.075
         ],
         [
-          0.04,
-          0.105
-        ],
-        [
-          0.02,
-          -0.08
+          0.016,
+          0.02
         ]
       ],
       "cutCount": 1,
@@ -2103,45 +2075,34 @@
           "role": "seam"
         },
         {
-          "edgeId": "outseam-waist",
+          "edgeId": "waist-opening",
           "startVertex": 5,
           "endVertex": 6,
-          "role": "seam"
-        },
-        {
-          "edgeId": "waist-opening",
-          "startVertex": 6,
-          "endVertex": 7,
           "role": "open"
         },
         {
           "edgeId": "crotch-rise-upper",
+          "startVertex": 6,
+          "endVertex": 7,
+          "role": "seam"
+        },
+        {
+          "edgeId": "gusset-attachment",
           "startVertex": 7,
           "endVertex": 8,
           "role": "seam"
         },
         {
-          "edgeId": "crotch-rise-lower",
-          "startVertex": 8,
-          "endVertex": 9,
-          "role": "seam"
-        },
-        {
-          "edgeId": "inseam-upper",
-          "startVertex": 9,
-          "endVertex": 10,
-          "role": "seam"
-        },
-        {
           "edgeId": "inseam-lower",
-          "startVertex": 10,
+          "startVertex": 8,
           "endVertex": 0,
           "role": "seam"
         }
       ],
       "garmentFacing": "back",
       "wearerSide": "left",
-      "measurementStatus": "VISUAL_ESTIMATE_UNMEASURED"
+      "measurementStatus": "MEASURED_NEUTRAL_SECTION_WIDTHS_WITH_UNMEASURED_FRONT_BACK_SPLIT",
+      "constructionStatus": "v87-measured-thigh-shorts-gusset-20261027; provisional section-derived lower-leg widths; front/back arc allocation and rise remain hypotheses"
     },
     {
       "pieceId": "shorts-back-right",
@@ -2149,26 +2110,22 @@
       "boundary": [
         [
           0,
-          -0.16
+          -0.02
         ],
         [
-          0.0736,
-          -0.16
-        ],
-        [
-          0.1472,
-          -0.16
-        ],
-        [
-          0.1603,
-          -0.12
+          0.0913,
+          -0.02
         ],
         [
           0.1826,
           -0.02
         ],
         [
-          0.26,
+          0.1886,
+          0
+        ],
+        [
+          0.252,
           0.05
         ],
         [
@@ -2180,16 +2137,12 @@
           0.14
         ],
         [
-          0.08,
-          0.09
+          0.095,
+          0.075
         ],
         [
-          0.04,
-          0.105
-        ],
-        [
-          0.02,
-          -0.08
+          0.016,
+          0.02
         ]
       ],
       "cutCount": 1,
@@ -2228,45 +2181,34 @@
           "role": "seam"
         },
         {
-          "edgeId": "outseam-waist",
+          "edgeId": "waist-opening",
           "startVertex": 5,
           "endVertex": 6,
-          "role": "seam"
-        },
-        {
-          "edgeId": "waist-opening",
-          "startVertex": 6,
-          "endVertex": 7,
           "role": "open"
         },
         {
           "edgeId": "crotch-rise-upper",
+          "startVertex": 6,
+          "endVertex": 7,
+          "role": "seam"
+        },
+        {
+          "edgeId": "gusset-attachment",
           "startVertex": 7,
           "endVertex": 8,
           "role": "seam"
         },
         {
-          "edgeId": "crotch-rise-lower",
-          "startVertex": 8,
-          "endVertex": 9,
-          "role": "seam"
-        },
-        {
-          "edgeId": "inseam-upper",
-          "startVertex": 9,
-          "endVertex": 10,
-          "role": "seam"
-        },
-        {
           "edgeId": "inseam-lower",
-          "startVertex": 10,
+          "startVertex": 8,
           "endVertex": 0,
           "role": "seam"
         }
       ],
       "garmentFacing": "back",
       "wearerSide": "right",
-      "measurementStatus": "VISUAL_ESTIMATE_UNMEASURED"
+      "measurementStatus": "MEASURED_NEUTRAL_SECTION_WIDTHS_WITH_UNMEASURED_FRONT_BACK_SPLIT",
+      "constructionStatus": "v87-measured-thigh-shorts-gusset-20261027; provisional section-derived lower-leg widths; front/back arc allocation and rise remain hypotheses"
     },
     {
       "pieceId": "jacket-elbow-quilt-overlay",
@@ -2794,12 +2736,65 @@
       ],
       "onFold": false,
       "seamAllowanceM": 0
+    },
+    {
+      "pieceId": "shorts-gusset",
+      "partId": "fitted-short",
+      "boundary": [
+        [
+          0,
+          0.085
+        ],
+        [
+          0.06,
+          0
+        ],
+        [
+          0,
+          -0.075
+        ],
+        [
+          -0.06,
+          0
+        ]
+      ],
+      "cutCount": 1,
+      "onFold": false,
+      "grainAngleDegrees": 0,
+      "seamAllowanceM": 0,
+      "edges": [
+        {
+          "edgeId": "gusset-front-left",
+          "startVertex": 0,
+          "endVertex": 1,
+          "role": "seam"
+        },
+        {
+          "edgeId": "gusset-back-left",
+          "startVertex": 1,
+          "endVertex": 2,
+          "role": "seam"
+        },
+        {
+          "edgeId": "gusset-back-right",
+          "startVertex": 2,
+          "endVertex": 3,
+          "role": "seam"
+        },
+        {
+          "edgeId": "gusset-front-right",
+          "startVertex": 3,
+          "endVertex": 0,
+          "role": "seam"
+        }
+      ],
+      "constructionStatus": "EXPERIMENTAL_CONNECTED_FOUR_EDGE_CROTCH_GUSSET; seam lengths are provisional and must be checked after sewn mesh generation"
     }
   ],
   "method": {
-    "name": "avatar-profile-anchored 2D topology candidate",
+    "name": "V87 measured-section shorts pattern with explicit four-edge gusset",
     "status": "TRIAL",
-    "rationale": "V78 retains the exact V77 panel geometry; no pattern vertices, seam edges, or panel lengths change in this controlled shorts-weight trial. The construction hypothesis and all pose behavior remain unapproved until direct render review."
+    "rationale": "Measured Neutral per-leg sections set two lower opening widths; separate front/back rise geometry and a connected gusset are construction hypotheses. This trial is not approved for fit, appearance, motion, or release."
   },
   "unresolved": [
     {
@@ -2814,8 +2809,8 @@
     },
     {
       "item": "shorts rise, crotch, thigh sections, and shape-key response",
-      "status": "shaped-prototype-unverified",
-      "decision": "V78 leaves all four matched shorts panel outlines unchanged from V77 and changes only their prototype thigh-follow weight field in construction.json. The 0.98 hem weight and 15 mm inner-thigh fade are hypotheses motivated by the V77 sit diagnostic, not fit measurements. Crotch/gusset response, seam continuity, opacity, pose coverage and Shape Keys remain unverified."
+      "status": "prototype-unverified",
+      "decision": "V87 replaces the V86 extension/row trial with section-derived lower shorts widths, distinct provisional front/back panel outlines, and a four-edge gusset. Front/back section split, upper taper, rise, gusset geometry/ease, skinning, opacity, pose coverage, fit and shape-key response remain unmeasured and unapproved."
     },
     {
       "item": "jacket plastron, elbow quilting, piping, and back tab",

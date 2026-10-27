@@ -1673,6 +1673,10 @@ def _run_garmentcode_boxmesh_preflight(
                 native["pattern"]["panels"][panel_key]["image2outfitLegWrap"] = (
                     transform["legWrap"]
                 )
+            if "gussetPlacement" in transform:
+                native["pattern"]["panels"][panel_key][
+                    "image2outfitGussetPlacement"
+                ] = transform["gussetPlacement"]
             if "collarWrap" in transform:
                 native["pattern"]["panels"][panel_key]["image2outfitCollarWrap"] = (
                     transform["collarWrap"]
