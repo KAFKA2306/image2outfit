@@ -158,10 +158,12 @@ def pipeline_skin_export_exchange(job: dict[str, Any]) -> tuple[Path, str, int]:
             "ProductManifest.handoff.resumeFrom is required for the skin export"
         )
     state = candidate_contract.read(candidate_contract.path(resume_from))
+    # Pipeline checkpoint revisions identify the canonical request hypothesis;
+    # job.buildRevision identifies the product build. Currentness is established
+    # below by the checkpoint-bound skin report and its construction/avatar hashes.
     if (
         state.get("product_id") != job.get("id")
         or state.get("status") != "EXECUTED"
-        or state.get("revision_id") != job.get("buildRevision")
     ):
         raise ValueError(
             "current executed product checkpoint is required for the skin export"

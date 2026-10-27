@@ -9741,9 +9741,9 @@
     "waistZM": 0.72,
     "normalClearanceM": 0.008,
     "minimumTriangleBoneWeight": 0.2,
-    "evidenceBoundary": "V90 creates garment cover faces from only target-avatar triangles whose vertices remain on one thigh side, within the declared 0.52–0.72 m height band, and carry at least the stated UpperLeg bone weight. Faces are offset 8 mm along outward surface normals. The construction is an unwrapped prototype shell with UV explicitly NOT_CREATED; it does not prove seaming, fit, clearance in motion, skin-weight transfer, shape-key fit, visual acceptance, Unity/VRChat behavior or release."
+    "evidenceBoundary": "V91 keeps the cover geometry as an 8 mm offset of target-avatar thigh triangles. Skin export uses the copied surface vertices' barycentric target-body weights instead of the separate shorts-panel weight profile to test same-surface deformation. UV is explicitly NOT_CREATED. This does not prove seaming, fit, motion clearance, shape-key fit, appearance, Unity/VRChat behavior or release."
   },
-  "designRevision": "v90-thigh-surface-cover-shell-20261028",
+  "designRevision": "v91-thigh-shell-source-skin-weights-20261029",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

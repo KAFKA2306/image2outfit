@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v90-thigh-surface-cover-shell-20261028",
+  "revision": "v91-thigh-shell-source-skin-weights-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "severity": "BLOCKER",
       "code": "POSED_UPPER_THIGH_COVERAGE_INADEQUATE",
-      "description": "Direct inspection of the current neutral, sit and crouch renders shows gray upper-thigh skin exposed below the skirt; the added white geometry still reads as a crotch patch rather than continuous wearable shorts with leg hems. The pose-matched surface-ray diagnostic now includes shorts-leg-cover-left/right and records only 17.29% under-shorts thigh coverage in sit and 25.54% in crouch on each side. No thigh coverage or fit acceptance is granted."
+      "description": "Direct inspection of the current neutral, sit and crouch renders shows exposed gray upper-thigh/body surface and incomplete shorts coverage. The source-skin-weight shell improves the measured diagnostic relative to V90 but still covers only 55.03% of each evaluated upper thigh in crouch and sit; neutral is 68.59%. These prototype ray-coverage measurements are not fit acceptance.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
       "code": "OVERSKIRT_SIDE_FOLDS_AND_HEM_UNEVEN",
-      "description": "Direct inspection of the current front, back, left, right and three-quarter views shows dense rigid stepped side ridges and projecting hem corners. In sit and crouch, the front panel hangs between or behind the legs while the side panels splay into sharp triangular flaps."
+      "description": "Direct inspection of front, back, left, right and three-quarter views shows dense stepped side ridges and projecting hem corners. In sit and crouch, the overskirt splays into sharp triangular flaps and the front panel hangs between or behind the legs.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
       "code": "FIT_AND_RELEASE_GATES_UNVERIFIED",
-      "description": "The geometry audit and renders do not establish usable fit, calibrated weights, Shape Key response, UV completion, Unity/VRChat execution or release readiness. This prototype is rejected and remains non-releaseable."
+      "description": "Geometry audit reports avatarFitVerified and buildReportPassed failed. The renders do not establish usable fit, calibrated weights, Shape Key response, UV completion, Unity/VRChat execution or release readiness. This prototype is rejected and remains non-releaseable.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

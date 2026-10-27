@@ -9005,7 +9005,7 @@
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false,
     "grantsVisualAcceptance": false,
-    "evidenceBoundary": "V90 creates garment cover faces from only target-avatar triangles whose vertices remain on one thigh side, within the declared 0.52\u20130.72 m height band, and carry at least the stated UpperLeg bone weight. Faces are offset 8 mm along outward surface normals. The construction is an unwrapped prototype shell with UV explicitly NOT_CREATED; it does not prove seaming, fit, clearance in motion, skin-weight transfer, shape-key fit, visual acceptance, Unity/VRChat behavior or release."
+    "evidenceBoundary": "V91 keeps the cover geometry as an 8 mm offset of target-avatar thigh triangles. Skin export uses the copied surface vertices' barycentric target-body weights instead of the separate shorts-panel weight profile to test same-surface deformation. UV is explicitly NOT_CREATED. This does not prove seaming, fit, motion clearance, shape-key fit, appearance, Unity/VRChat behavior or release."
   },
   "declaredSkirtLengthening": {
     "applied": true,
@@ -9240,7 +9240,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "2a70ccf7887c5013130015f1369c0d0c8bd17ff654fde4ad68be29d08c4c3ded",
+    "privateSimulationSourceSha256": "ffefcdf32b9d94ef257e8b87275d0e9bdf70406fcb4562f641c882d531223d0a",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -10408,7 +10408,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "c26e48334d8f543e296b12dccb845fab89859cd6c0d688df8fb94ce35e76e201",
+  "sourceBlendSha256": "b4ae93f5d2b9e70d8a653677a30755ff6553354818509b95ff88578c415b7109",
   "sewnMeshSha256": "ae49aa73a59507bdf0a7897e83c8fe8b04a521f46cefafe688dcf82a4fa7e1cd",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",

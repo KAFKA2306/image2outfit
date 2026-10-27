@@ -137,10 +137,15 @@ def assign_authored_panel_uvs(mesh_data, sewn_mesh):
         "garmentcode-pattern-panel",
         "declared-parametric-accessory",
     }
-    if any(kind not in supported_sources for kind in source_kinds):
+    unmapped_sources = {"unmapped-surface-derived-shell"}
+    if any(kind not in supported_sources | unmapped_sources for kind in source_kinds):
         raise ValueError("Sewn mesh UV provenance includes an unsupported source kind")
 
-    panels = sorted(set(panel_keys))
+    mapped_face_indices = [
+        index for index, kind in enumerate(source_kinds) if kind in supported_sources
+    ]
+    mapped_face_set = set(mapped_face_indices)
+    panels = sorted({panel_keys[index] for index in mapped_face_indices})
     if not panels or any(not isinstance(key, str) or not key for key in panels):
         raise ValueError("Sewn mesh UV provenance has invalid panel keys")
     padding = 0.006
@@ -148,8 +153,8 @@ def assign_authored_panel_uvs(mesh_data, sewn_mesh):
     for panel_key in panels:
         points = [
             point
-            for face_points, face_panel in zip(face_coordinates, panel_keys)
-            if face_panel == panel_key
+            for index, (face_points, face_panel) in enumerate(zip(face_coordinates, panel_keys))
+            if index in mapped_face_set and face_panel == panel_key
             for point in face_points
         ]
         if not points or any(len(point) != 2 for point in points):
@@ -163,7 +168,12 @@ def assign_authored_panel_uvs(mesh_data, sewn_mesh):
 
     scale, placements = pack_panel_uv_bounds(panel_bounds, padding)
     uv_layer = mesh_data.uv_layers.new(name="AuthoredPatternPanels")
-    for polygon, face_points, panel_key in zip(mesh_data.polygons, face_coordinates, panel_keys):
+    for face_index, (polygon, face_points, panel_key) in enumerate(
+            zip(mesh_data.polygons, face_coordinates, panel_keys)):
+        if source_kinds[face_index] in unmapped_sources:
+            if face_points:
+                raise ValueError("Unmapped surface shell must not carry invented UV coordinates")
+            continue
         min_x, min_y, max_x, max_y = panel_bounds[panel_key]
         offset_x, offset_y = placements[panel_key]
         if len(face_points) != len(polygon.loop_indices):
@@ -174,10 +184,12 @@ def assign_authored_panel_uvs(mesh_data, sewn_mesh):
                 offset_y + (float(point[1]) - min_y) * scale,
             )
     return {
-        "status": "AUTHORED_FROM_DECLARED_2D_SOURCE_COORDINATES",
-        "method": "face-local-source-coordinates-with-uniform-scale-unrotated-maxrects-packing",
+        "status": ("PARTIAL_UNVERIFIED" if any(kind in unmapped_sources for kind in source_kinds)
+                   else "AUTHORED_FROM_DECLARED_2D_SOURCE_COORDINATES"),
+        "method": "face-local-declared-source-coordinates; unmapped surface-shell faces remain without UVs",
         "panelCount": len(panels),
-        "mappedFaceCount": len(faces),
+        "mappedFaceCount": len(mapped_face_indices),
+        "unmappedFaceCount": len(faces) - len(mapped_face_indices),
         "uniformPatternToUvScale": scale,
         "panelUvBounds": {
             key: {
@@ -188,7 +200,7 @@ def assign_authored_panel_uvs(mesh_data, sewn_mesh):
             for key in panels
         },
         "sourceKindFaceCounts": {
-            kind: source_kinds.count(kind) for kind in sorted(supported_sources)
+            kind: source_kinds.count(kind) for kind in sorted(supported_sources | unmapped_sources)
         },
         "grantsQualityAcceptance": False,
     }
@@ -2201,6 +2213,153 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path):
     }
 
 
+def append_declared_thigh_surface_shell(mesh, body_objects, pose, target_path):
+    """Add a real, unwrapped body-surface cover to the declared shorts region.
+
+    Faces are copied from the selected target avatar's thigh surface and offset
+    along its outward normals. They are garment geometry for the prototype, not
+    a substitute body reference. UVs are deliberately left absent and recorded
+    as such until a pattern author supplies a real mapping.
+    """
+    from mathutils import Vector
+
+    spec = pose.get("thighSurfaceShell")
+    if spec is None:
+        return {"applied": False, "reason": "not-declared", "grantsFitAcceptance": False}
+    if spec.get("method") != "weighted-thigh-surface-copy-v1":
+        raise ValueError("Unknown thigh surface shell method")
+    if digest(target_path) != pose["targetSourceSha256"]:
+        raise ValueError("Thigh surface shell target source is stale")
+    bodies = [obj for obj in body_objects if obj.type == "MESH"
+              and obj.name.startswith(spec["bodyMeshNamePrefix"])]
+    armatures = [obj for obj in body_objects if obj.type == "ARMATURE"]
+    if len(bodies) != 1 or len(armatures) != 1:
+        raise ValueError("Thigh surface shell requires one target body and armature")
+    body, armature = bodies[0], armatures[0]
+    shape_values = {key.name: float(key.value) for key in body.data.shape_keys.key_blocks} if body.data.shape_keys else {}
+    if any(abs(value) > 1e-8 for value in shape_values.values()):
+        raise ValueError("Thigh surface shell requires zero-valued target Shape Keys")
+    hem_z = float(spec["hemZM"])
+    waist_z = float(spec["waistZM"])
+    clearance = float(spec["normalClearanceM"])
+    minimum_weight = float(spec["minimumTriangleBoneWeight"])
+    if not (all(math.isfinite(value) for value in (hem_z, waist_z, clearance, minimum_weight))
+            and hem_z < waist_z and clearance > 0 and 0 < minimum_weight <= 1):
+        raise ValueError("Invalid thigh surface shell bounds")
+
+    centerline = {}
+    side_groups = {}
+    side_bones = {"left": spec["leftThighBone"], "right": spec["rightThighBone"]}
+    for side, bone_name in side_bones.items():
+        group = body.vertex_groups.get(bone_name)
+        bone = armature.data.bones.get(bone_name)
+        if group is None or bone is None:
+            raise ValueError(f"Target body/armature lacks declared thigh bone {bone_name}")
+        side_groups[side] = group.index
+        centerline[side] = (
+            armature.matrix_world @ bone.head_local,
+            armature.matrix_world @ bone.tail_local,
+        )
+    center_x = (centerline["left"][0].x + centerline["right"][0].x) * 0.5
+    left_is_positive = centerline["left"][0].x > centerline["right"][0].x
+    matrix = body.matrix_world
+    normal_matrix = matrix.to_3x3().inverted_safe().transposed()
+    world_vertices = [matrix @ vertex.co for vertex in body.data.vertices]
+    world_normals = [(normal_matrix @ vertex.normal).normalized() for vertex in body.data.vertices]
+    weights = {}
+    for side, group_index in side_groups.items():
+        weights[side] = [
+            next((item.weight for item in vertex.groups if item.group == group_index), 0.0)
+            for vertex in body.data.vertices
+        ]
+    body.data.calc_loop_triangles()
+    shell_vertices = {"left": {}, "right": {}}
+    shell_faces = {"left": [], "right": []}
+    selected_triangles = {"left": 0, "right": 0}
+    minimum_area = math.inf
+    for triangle in body.data.loop_triangles:
+        source_ids = tuple(triangle.vertices)
+        points = [world_vertices[index] for index in source_ids]
+        center = (points[0] + points[1] + points[2]) / 3
+        if not hem_z <= center.z <= waist_z:
+            continue
+        is_left = (center.x >= center_x) == left_is_positive
+        side = "left" if is_left else "right"
+        if sum(weights[side][index] for index in source_ids) / 3 < minimum_weight:
+            continue
+        # Keep each component on its own side of the pelvis centerline.
+        if any(((world_vertices[index].x >= center_x) == left_is_positive) != is_left
+               for index in source_ids):
+            continue
+        if any(not hem_z <= world_vertices[index].z <= waist_z for index in source_ids):
+            continue
+        axis_head, axis_tail = centerline[side]
+        axis = axis_tail - axis_head
+        t = max(0.0, min(1.0, (center - axis_head).dot(axis) / max(axis.length_squared, 1e-12)))
+        radial = (center - (axis_head + axis * t)).normalized()
+        normal = (points[1] - points[0]).cross(points[2] - points[0])
+        if normal.length_squared <= 1e-16:
+            continue
+        if normal.dot(radial) < 0:
+            source_ids = tuple(reversed(source_ids))
+        mapped_face = []
+        for source_id in source_ids:
+            if source_id not in shell_vertices[side]:
+                garment_id = len(mesh["vertices"])
+                shell_vertices[side][source_id] = garment_id
+                offset_normal = world_normals[source_id]
+                if offset_normal.dot(radial) < 0:
+                    offset_normal.negate()
+                mesh["vertices"].append(list(world_vertices[source_id] + offset_normal * clearance))
+            mapped_face.append(shell_vertices[side][source_id])
+        a, b, c = (Vector(mesh["vertices"][index]) for index in mapped_face)
+        area = (b - a).cross(c - a).length / 2
+        if area <= 1e-12:
+            raise ValueError("Thigh surface shell produced a degenerate triangle")
+        minimum_area = min(minimum_area, area)
+        selected_triangles[side] += 1
+        shell_faces[side].append(tuple(mapped_face))
+    if not all(selected_triangles.values()):
+        raise ValueError(f"Thigh surface shell has no eligible faces on both sides: {selected_triangles}")
+
+    old_face_count = len(mesh["faces"])
+    for key in ("facePieceIds", "faceMaterialIds", "facePatternCoordinates",
+                "facePatternPanelKeys", "faceUvSourceKinds"):
+        if key not in mesh:
+            if key == "faceMaterialIds":
+                mesh[key] = ["prototypeMaterial"] * old_face_count
+            else:
+                raise ValueError(f"Thigh shell requires complete sewn-mesh provenance: {key}")
+        if len(mesh[key]) != old_face_count:
+            raise ValueError(f"Thigh shell input provenance is misaligned: {key}")
+    shell_piece_by_side = {side: spec["pieceIds"][side] for side in ("left", "right")}
+    for side in ("left", "right"):
+        faces = shell_faces[side]
+        mesh["faces"].extend(faces)
+        mesh["facePieceIds"].extend([shell_piece_by_side[side]] * len(faces))
+        mesh["faceMaterialIds"].extend(["prototypeMaterial"] * len(faces))
+        mesh["facePatternCoordinates"].extend([[] for _ in faces])
+        mesh["facePatternPanelKeys"].extend([shell_piece_by_side[side]] * len(faces))
+        mesh["faceUvSourceKinds"].extend(["unmapped-surface-derived-shell"] * len(faces))
+    return {
+        "applied": True,
+        "method": spec["method"],
+        "sourceBodyObject": body.name,
+        "targetSourceSha256": digest(target_path),
+        "pieceIdsBySide": shell_piece_by_side,
+        "triangleCountByThigh": selected_triangles,
+        "sourceVertexCountByThigh": {side: len(values) for side, values in shell_vertices.items()},
+        "heightRangeZM": [hem_z, waist_z],
+        "normalClearanceM": clearance,
+        "minimumTriangleAreaM2": minimum_area,
+        "uvStatus": "NOT_CREATED",
+        "grantsFitAcceptance": False,
+        "grantsPoseAcceptance": False,
+        "grantsVisualAcceptance": False,
+        "evidenceBoundary": spec["evidenceBoundary"],
+    }
+
+
 def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
     """Remove only sub-pixel, sub-10-micrometre triangular slivers.
 
@@ -2358,6 +2517,9 @@ def main():
     thigh_attachment_evidence = place_skirt_front_on_thigh_surfaces(
         mesh, body_objects, pose, resolve(job["targetSourcePath"])
     )
+    thigh_surface_shell_evidence = append_declared_thigh_surface_shell(
+        mesh, body_objects, pose, resolve(job["targetSourcePath"])
+    )
     recipe = read(resolve(pipeline["materialRecipePath"]))
     rear_waist_tab_evidence = append_declared_rear_waist_tab(
         mesh, body_objects, pose, recipe, resolve(job["targetSourcePath"])
@@ -2476,6 +2638,7 @@ def main():
         "measuredWaistbandPlacement": waistband_evidence,
         "declaredSkirtFoldPlacement": fold_evidence,
         "poseAwareThighAttachment": thigh_attachment_evidence,
+        "thighSurfaceShell": thigh_surface_shell_evidence,
         "declaredSkirtLengthening": skirt_lengthening_evidence,
         "declaredSkirtCreaseTopology": crease_evidence,
         "buildDisposition": "EDITABLE_SEWN_PROTOTYPE_ONLY",

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V90 retains the V89 four-panel pattern experiment and adds a separate bilateral thigh-cover surface copied from the target avatar's weighted thigh triangles with 8 mm normal clearance. This creates cover geometry instead of treating vertex motion as coverage. The added surface has no UV mapping yet; pose deformation, seam continuity, fit, appearance, UV, Unity/VRChat, and release remain unapproved.",
-  "designRevision": "v90-thigh-surface-cover-shell-20261028",
+  "target": "V91 retains the existing prototype geometry and transfers copied thigh-cover vertices with barycentric target-body skin weights, separately from the shorts-panel weight profile, to test whether same-surface weights improve posed coverage. The offset shell still has no UV mapping; pose deformation, seam continuity, fit, appearance, Unity/VRChat, and release remain unapproved.",
+  "designRevision": "v91-thigh-shell-source-skin-weights-20261029",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -256,9 +256,7 @@
         "shorts-front-right",
         "shorts-back-left",
         "shorts-back-right",
-        "shorts-gusset",
-        "shorts-leg-cover-left",
-        "shorts-leg-cover-right"
+        "shorts-gusset"
       ],
       "bodyTriangleZM": [
         0.32,
@@ -271,7 +269,7 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "V90 declares the generated thigh cover pieces in the same explicit prototype skin-transfer region as the four shorts panels and gusset. Weight transfer remains uncalibrated and does not imply fit or appearance acceptance.",
+      "evidenceBoundary": "V91 keeps the four shorts panels and gusset on the existing experimental weight profile. The generated surface-copy thigh covers are excluded from that profile so their vertices retain barycentric source-body skin weights. This is an uncalibrated prototype hypothesis and grants no fit or appearance acceptance.",
       "weightProfile": {
         "method": "hip-anchored-anterior-bilateral-center-hem-fade-v3",
         "pieceIds": [
@@ -279,9 +277,7 @@
           "shorts-front-right",
           "shorts-back-left",
           "shorts-back-right",
-          "shorts-gusset",
-          "shorts-leg-cover-left",
-          "shorts-leg-cover-right"
+          "shorts-gusset"
         ],
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
@@ -296,6 +292,24 @@
         "fullSideWeightWidthM": 0.135,
         "evidenceBoundary": "Existing V85 prototype distribution is carried onto the V87 gusset for skinning coverage only; no change to measured behavior is claimed. Seam strain, crotch deformation, weight continuity and pose response remain unverified."
       }
+    },
+    {
+      "pieceIds": [
+        "shorts-leg-cover-left",
+        "shorts-leg-cover-right"
+      ],
+      "bodyTriangleZM": [
+        0.32,
+        0.87
+      ],
+      "excludedBoneNamePrefixes": [
+        "UpperArm",
+        "LowerArm",
+        "Hand",
+        "Finger",
+        "Shoulder"
+      ],
+      "evidenceBoundary": "V91 transfers each copied thigh-cover vertex from the nearest eligible target-avatar body triangle with barycentric source skin weights, without the shorts-panel weight profile. The shell is only an offset copy of neutral body surface; transfer accuracy in motion, seam continuity, fit and shape-key response remain unverified."
     }
   ]
 }
