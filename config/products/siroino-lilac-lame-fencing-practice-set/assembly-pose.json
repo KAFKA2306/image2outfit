@@ -9478,6 +9478,17 @@
     "preservedSeamFadeDistanceM": 0.04,
     "evidenceBoundary": "Prototype-only, bounded nearest-surface relaxation for four sewn shorts panels, based on evaluated Neutral Siroino body geometry. Preserves vertices shared by the shorts panels themselves and keeps face ownership. The waistband is attached to the overskirt, not the shorts, so it is not a shorts preservation target. 4 mm body clearance, uniform 1 mm layer separation, 90% blend and spatial bounds are hypotheses; the prior 65% blend left visibly detached cylindrical panels in crouch/sit renders. No pose deformation, continuous penetration, opacity, strain, shape-key, appearance, or fit acceptance is implied."
   },
+  "shortsHemTopology": {
+    "method": "measured-hem-parallel-subdivision-v1",
+    "pieceIds": [
+      "shorts-front-left",
+      "shorts-front-right",
+      "shorts-back-left",
+      "shorts-back-right"
+    ],
+    "rowsAboveHemM": [0.025, 0.055],
+    "evidenceBoundary": "V86 adds two horizontal topology rows 25 mm and 55 mm above the lowest hem of the evaluated-neutral, measured-body-placed four-panel shorts shell. Rows preserve face ownership and per-corner pattern UV provenance and are intended to give the exported hem more skin-weight interpolation resolution. The offsets are prototype hypotheses; no leg coverage, seated/crouch deformation, gusset construction, collision, fit, appearance, shape-key, Unity, or release acceptance is implied."
+  },
   "skirtEnvelopePlacement": {
     "method": "measured-horizontal-body-envelope-minimum-clearance",
     "pieceIds": [

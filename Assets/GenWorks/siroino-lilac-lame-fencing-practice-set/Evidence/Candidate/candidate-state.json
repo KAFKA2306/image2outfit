@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v83-mid-thigh-under-short-coverage-20261026",
+  "revision": "v86-shorts-hem-topology-20261027",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "severity": "BLOCKER",
       "code": "POSE_COVERAGE_UNCHANGED",
-      "description": "V83 increased the declared under-shorts hem extension to 160 mm, but measured upper-thigh coverage is unchanged from V82: sit 15.37% covered by under-shorts per thigh and crouch 26.67%; the overskirt covers only 18.53-18.64% seated and 32.77-32.88% crouched. Direct sit/crouch images show extensive exposed thighs. This extension-only method does not address posed coverage."
+      "severity": "BLOCKER",
+      "description": "Direct inspection of all V86 views and poses shows the shorts still fail to cover the upper thighs when seated or crouched. The pose-matched surface-ray diagnostic remains 16.16% upper-thigh coverage for the shorts in sit and 27.80% in crouch; the overskirt remains about 18.5-18.6% seated and 32.8-32.9% crouched. The two new hem rows preserved topology/UV provenance but did not improve these pose coverage results."
     },
     {
-      "severity": "BLOCKER",
       "code": "POSED_PANEL_INTERFERENCE",
-      "description": "Sit and crouch images retain folded lavender edging, overlapping angular white panels, and visible panel/leg interference around the knees and calves."
+      "severity": "BLOCKER",
+      "description": "The sit render still shows large exposed thighs and pointed folded panel corners around the lower legs; the crouch render likewise shows exposed thighs and angular panel intersections. The new hem subdivisions have not established a usable leg-following deformation."
     },
     {
-      "severity": "BLOCKER",
       "code": "SIDE_DRAPE_AND_HEM_DEFECTS",
-      "description": "Front/side/neutral and back views retain corrugated side panels, projecting hem corners, angular surface shading, and irregular inner-layer hem protrusion; buyer-facing drape and layering remain unresolved."
+      "severity": "BLOCKER",
+      "description": "Direct left/right and three-quarter views retain strong accordion-like corrugation and an uneven projecting overskirt hem. The base-layer shorts hang as a blunt rectangular shell in neutral. Surface appearance and construction remain prototype quality."
     }
   ],
   "failedGeometryChecks": [

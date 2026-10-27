@@ -8867,12 +8867,12 @@
     ],
     "placedVertexCount": 6671,
     "heightBlendSkippedVertexCount": 5447,
-    "angularSourceVerticesSha256": "43c54e3867a79e40ea7e8f6cccb94fbc72358b3d936aa6e8cb42b0e23d7a0cbf",
+    "angularSourceVerticesSha256": "725b1502dda40796d4c398a5340ab335ea83c31d3ff0e49134803122b7039d56",
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "beforeVerticesSha256": "2730ff30f3cf051431818d8a7432db1a347f235351dd93ef0e201c9e2e72603d",
-    "afterVerticesSha256": "ec4a8c68c75bbcc5820d34b33f2f8beb3a3e24f8a92914196addba6d3f941b51",
+    "beforeVerticesSha256": "e83ebbac374b83818a6871935dc881d6a0c4fe5397a2e6da1abed6074b9d09d5",
+    "afterVerticesSha256": "bb29baf7958b4c0b2a83dd9d56b43ae330302631273fe084f59ef4616311a7e2",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -8942,8 +8942,8 @@
     "movedVertexCount": 8843,
     "maximumRadialDisplacementM": 0.0007664112658111353,
     "minimumTriangleAreaM2": 4.406125633839106e-12,
-    "beforeVerticesSha256": "ec4a8c68c75bbcc5820d34b33f2f8beb3a3e24f8a92914196addba6d3f941b51",
-    "afterVerticesSha256": "b45b98f88b1d12974c7e46c9c8896605614990e8706c2d3d0db0b16f1f6fbc03",
+    "beforeVerticesSha256": "bb29baf7958b4c0b2a83dd9d56b43ae330302631273fe084f59ef4616311a7e2",
+    "afterVerticesSha256": "1d3e61939a8ff3791679984aab0e3d8c398620b7ecc870317e01551d183572cd",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "panelAngularRangesRadians": {},
@@ -9187,14 +9187,14 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "a3269f52fe39a4736754ed4f0993c9e61d2ef0d01344d4432ff3831e67492191",
+    "privateSimulationSourceSha256": "02716f817a3680718d60ff8fbe1d9c61f48430f5e15111162ef9b4998a41f6c1",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
     "status": "AUTHORED_FROM_DECLARED_2D_SOURCE_COORDINATES",
     "method": "face-local-source-coordinates-with-uniform-scale-unrotated-maxrects-packing",
     "panelCount": 26,
-    "mappedFaceCount": 31031,
+    "mappedFaceCount": 31543,
     "uniformPatternToUvScale": 0.008924975236473967,
     "panelUvBounds": {
       "P01": {
@@ -9538,7 +9538,7 @@
     },
     "sourceKindFaceCounts": {
       "declared-parametric-accessory": 40,
-      "garmentcode-pattern-panel": 30991
+      "garmentcode-pattern-panel": 31503
     },
     "grantsQualityAcceptance": false
   },
@@ -19759,6 +19759,41 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V83 extends the four sewn under-short panels to a bounded 160 mm mid-thigh coverage prototype after V82 measurements still found 15.6% sit and 26.7% crouch upper-thigh exposure with the 80 mm extension. The extension targets concealed under-skirt coverage; any hem visibility, seams, skinning, collision, appearance and fit remain unverified."
   },
+  "shortsHemTopology": {
+    "applied": true,
+    "method": "measured-hem-parallel-subdivision-v1",
+    "pieceIds": [
+      "shorts-back-left",
+      "shorts-back-right",
+      "shorts-front-left",
+      "shorts-front-right"
+    ],
+    "lowestHemZM": 0.2795782351493835,
+    "upperPanelZM": 0.7465894222259521,
+    "rows": [
+      {
+        "heightAboveLowestHemM": 0.025000000000000022,
+        "planeZM": 0.30457823514938354,
+        "newVertexCount": 132,
+        "cutEdgeCount": 132
+      },
+      {
+        "heightAboveLowestHemM": 0.05499999999999999,
+        "planeZM": 0.3345782351493835,
+        "newVertexCount": 124,
+        "cutEdgeCount": 124
+      }
+    ],
+    "beforeVertexCount": 15784,
+    "afterVertexCount": 16040,
+    "beforeTriangleCount": 30991,
+    "afterTriangleCount": 31503,
+    "authoredUvFaceCount": 31503,
+    "faceOwnershipPreserved": true,
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false,
+    "evidenceBoundary": "V86 adds two horizontal topology rows 25 mm and 55 mm above the lowest hem of the evaluated-neutral, measured-body-placed four-panel shorts shell. Rows preserve face ownership and per-corner pattern UV provenance and are intended to give the exported hem more skin-weight interpolation resolution. The offsets are prototype hypotheses; no leg coverage, seated/crouch deformation, gusset construction, collision, fit, appearance, shape-key, Unity, or release acceptance is implied."
+  },
   "rearWaistAdjustmentTab": {
     "applied": true,
     "method": "avatar-back-surface-projected-tab-v1",
@@ -20317,7 +20352,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "5053e2d7d38642f2cd91bb2555b3c8edbdc10e176cb2cc06ae512089164a14dd",
+  "sourceBlendSha256": "f49c3fa2c879b2c48b152273a932d69624cfaf97440476097cfaec285d0e0f39",
   "sewnMeshSha256": "dbdffdb38363d9ab3e4c5939307e55969d731569f1e812d41ced4098b562ee7c",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -154691,8 +154726,8 @@
     "layerOffsetVertexCount": 1217,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 2310,
-    "beforeVerticesSha256": "1a27b80d2a25fdf96f9cfe3b63c95dbc4a702d02bb381a0c18bb79ec4709d5ab",
-    "afterVerticesSha256": "2730ff30f3cf051431818d8a7432db1a347f235351dd93ef0e201c9e2e72603d",
+    "beforeVerticesSha256": "cdef4f2457844c1695209f1095d79a1a967768e67f457df3aa7af6b8b8b26df6",
+    "afterVerticesSha256": "e83ebbac374b83818a6871935dc881d6a0c4fe5397a2e6da1abed6074b9d09d5",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -191016,9 +191051,9 @@
     "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."
   },
   "metrics": {
-    "vertices": 15814,
-    "triangles": 31019,
-    "unweightedVertices": 15814,
+    "vertices": 16070,
+    "triangles": 31531,
+    "unweightedVertices": 16070,
     "degenerateTriangles": 0
   },
   "surfaceShadingHypothesis": {

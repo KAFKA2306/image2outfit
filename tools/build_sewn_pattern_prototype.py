@@ -1116,6 +1116,171 @@ def lengthen_declared_shorts(mesh, pose):
     }
 
 
+def add_declared_shorts_hem_rows(mesh, pose):
+    """Add measured-height topology rows above the sewn shorts leg openings.
+
+    Rows stay in the garment-owned surface and preserve corner UV provenance.
+    They add deformation resolution only; they do not lengthen the shorts or
+    establish pose coverage, fit, or release readiness.
+    """
+    import bmesh
+
+    spec = pose.get("shortsHemTopology")
+    if spec is None:
+        return {"applied": False, "grantsFitAcceptance": False}
+    if spec.get("method") != "measured-hem-parallel-subdivision-v1":
+        raise ValueError("Invalid declared shorts hem topology method")
+    piece_ids = set(spec.get("pieceIds", []))
+    offsets = spec.get("rowsAboveHemM")
+    owners = mesh.get("facePieceIds", [])
+    face_material_ids = mesh.get("faceMaterialIds")
+    if face_material_ids is None:
+        face_material_ids = ["prototypeMaterial"] * len(owners)
+    provenance = (
+        mesh.get("facePatternCoordinates", []),
+        mesh.get("facePatternPanelKeys", []),
+        mesh.get("faceUvSourceKinds", []),
+        face_material_ids,
+    )
+    if (not piece_ids or not piece_ids.issubset(set(owners))
+            or not isinstance(offsets, list) or not offsets
+            or any(isinstance(value, bool) or not isinstance(value, (int, float))
+                   or not math.isfinite(value) or not 0.01 <= value <= 0.09
+                   for value in offsets)
+            or offsets != sorted(set(offsets))
+            or any(len(values) != len(owners) for values in provenance)):
+        raise ValueError("Shorts hem rows require valid offsets and complete face provenance")
+
+    selected_vertex_ids = {
+        vertex for face, owner in zip(mesh["faces"], owners) if owner in piece_ids
+        for vertex in face
+    }
+    if not selected_vertex_ids:
+        raise ValueError("Shorts hem subdivision selected no vertices")
+    lower_z = min(mesh["vertices"][index][2] for index in selected_vertex_ids)
+    upper_z = max(mesh["vertices"][index][2] for index in selected_vertex_ids)
+    planes = [lower_z + float(offset) for offset in offsets]
+    if any(level >= upper_z - 0.01 for level in planes):
+        raise ValueError("Shorts hem subdivision row must remain below the waist/crotch area")
+
+    piece_keys = sorted(set(owners))
+    material_keys = sorted(set(face_material_ids))
+    uv_panel_keys = sorted(set(mesh["facePatternPanelKeys"]))
+    uv_source_kinds = sorted(set(mesh["faceUvSourceKinds"]))
+    bm = bmesh.new()
+    owner_layer = bm.faces.layers.int.new("image2outfit_piece")
+    material_layer = bm.faces.layers.int.new("image2outfit_material")
+    uv_panel_layer = bm.faces.layers.int.new("image2outfit_uv_panel")
+    uv_source_layer = bm.faces.layers.int.new("image2outfit_uv_source")
+    original_id_layer = bm.verts.layers.int.new("image2outfit_original_vertex")
+    uv_layer = bm.loops.layers.uv.new("image2outfit_source_pattern_uv")
+    original_vertices = [bm.verts.new(point) for point in mesh["vertices"]]
+    for index, vertex in enumerate(original_vertices):
+        vertex[original_id_layer] = index + 1
+    try:
+        for face_index, (indices, piece_id) in enumerate(zip(mesh["faces"], owners)):
+            face = bm.faces.new([original_vertices[index] for index in indices])
+            face[owner_layer] = piece_keys.index(piece_id) + 1
+            face[material_layer] = material_keys.index(face_material_ids[face_index]) + 1
+            face[uv_panel_layer] = uv_panel_keys.index(mesh["facePatternPanelKeys"][face_index]) + 1
+            face[uv_source_layer] = uv_source_kinds.index(mesh["faceUvSourceKinds"][face_index]) + 1
+            coordinates = mesh["facePatternCoordinates"][face_index]
+            if len(coordinates) != len(face.loops):
+                raise ValueError("Shorts hem subdivision found malformed face UV provenance")
+            for loop, coordinate in zip(face.loops, coordinates):
+                loop[uv_layer].uv = (float(coordinate[0]), float(coordinate[1]))
+
+        cut_records = []
+        selected_indices = {piece_keys.index(piece_id) + 1 for piece_id in piece_ids}
+        for level in planes:
+            faces = [face for face in bm.faces if face[owner_layer] in selected_indices]
+            edges = {edge for face in faces for edge in face.edges}
+            vertices = {vertex for face in faces for vertex in face.verts}
+            previous_vertices = set(bm.verts)
+            result = bmesh.ops.bisect_plane(
+                bm, geom=[*vertices, *edges, *faces], dist=1e-7,
+                plane_co=(0.0, 0.0, level), plane_no=(0.0, 0.0, 1.0),
+                clear_inner=False, clear_outer=False,
+            )
+            added = [vertex for vertex in bm.verts if vertex not in previous_vertices]
+            for vertex in added:
+                vertex[original_id_layer] = 0
+            cut_records.append({
+                "heightAboveLowestHemM": level - lower_z,
+                "planeZM": level,
+                "newVertexCount": len(added),
+                "cutEdgeCount": sum(
+                    isinstance(geometry, bmesh.types.BMEdge)
+                    for geometry in result["geom_cut"]
+                ),
+            })
+        bmesh.ops.triangulate(bm, faces=list(bm.faces))
+        original = {vertex[original_id_layer] - 1: vertex for vertex in bm.verts
+                    if vertex[original_id_layer] > 0}
+        if set(original) != set(range(len(mesh["vertices"]))):
+            raise ValueError("Shorts hem subdivision lost source vertex identity")
+        ordered = [original[index] for index in range(len(mesh["vertices"]))]
+        ordered.extend(vertex for vertex in bm.verts if vertex[original_id_layer] == 0)
+        remap = {vertex: index for index, vertex in enumerate(ordered)}
+        result_vertices = [list(vertex.co) for vertex in ordered]
+        result_faces, result_owners, result_materials = [], [], []
+        result_uv_coordinates, result_uv_panels, result_uv_sources = [], [], []
+        for face in bm.faces:
+            if len(face.verts) != 3 or face.calc_area() <= 1e-12:
+                raise ValueError("Shorts hem subdivision produced a degenerate face")
+            indices = (
+                face[owner_layer] - 1,
+                face[material_layer] - 1,
+                face[uv_panel_layer] - 1,
+                face[uv_source_layer] - 1,
+            )
+            if not (0 <= indices[0] < len(piece_keys)
+                    and 0 <= indices[1] < len(material_keys)
+                    and 0 <= indices[2] < len(uv_panel_keys)
+                    and 0 <= indices[3] < len(uv_source_kinds)):
+                raise ValueError("Shorts hem subdivision lost face provenance")
+            result_faces.append([remap[vertex] for vertex in face.verts])
+            result_owners.append(piece_keys[indices[0]])
+            result_materials.append(material_keys[indices[1]])
+            result_uv_coordinates.append([
+                [float(loop[uv_layer].uv.x), float(loop[uv_layer].uv.y)]
+                for loop in face.loops
+            ])
+            result_uv_panels.append(uv_panel_keys[indices[2]])
+            result_uv_sources.append(uv_source_kinds[indices[3]])
+        mesh.update(
+            vertices=result_vertices,
+            faces=result_faces,
+            facePieceIds=result_owners,
+            faceMaterialIds=result_materials,
+            facePatternCoordinates=result_uv_coordinates,
+            facePatternPanelKeys=result_uv_panels,
+            faceUvSourceKinds=result_uv_sources,
+        )
+        if not (len(result_faces) == len(result_owners) == len(result_materials)
+                == len(result_uv_coordinates) == len(result_uv_panels) == len(result_uv_sources)):
+            raise ValueError("Shorts hem subdivision broke face provenance alignment")
+        return {
+            "applied": True,
+            "method": spec["method"],
+            "pieceIds": sorted(piece_ids),
+            "lowestHemZM": lower_z,
+            "upperPanelZM": upper_z,
+            "rows": cut_records,
+            "beforeVertexCount": len(original_vertices),
+            "afterVertexCount": len(result_vertices),
+            "beforeTriangleCount": len(owners),
+            "afterTriangleCount": len(result_faces),
+            "authoredUvFaceCount": len(result_uv_coordinates),
+            "faceOwnershipPreserved": True,
+            "grantsFitAcceptance": False,
+            "grantsVisualAcceptance": False,
+            "evidenceBoundary": spec["evidenceBoundary"],
+        }
+    finally:
+        bm.free()
+
+
 def preserved_seam_factors(mesh, spec):
     """Fade placement displacement continuously away from preserved seams."""
     from collections import defaultdict
@@ -2177,6 +2342,7 @@ def main():
     shorts_extension_evidence = lengthen_declared_shorts(mesh, pose)
     shorts_pose = dict(pose, upperSurfacePlacement=pose.get("shortsUpperSurfacePlacement"))
     shorts_surface_evidence = place_on_measured_upper_surface(mesh, body_objects, shorts_pose, resolve(job["targetSourcePath"]))
+    shorts_hem_topology_evidence = add_declared_shorts_hem_rows(mesh, pose)
     trace_stage("shorts-surface")
     native_angular_vertices = [list(point) for point in mesh["vertices"]]
     skirt_lengthening_evidence = lengthen_declared_skirt_panels(mesh, pose)
@@ -2323,6 +2489,7 @@ def main():
         "prototypeEdgeTrim": prototype_edge_trim,
         "prototypeSurfaceMotifs": prototype_surface_motifs,
         "shortsCoverageExtension": shorts_extension_evidence,
+        "shortsHemTopology": shorts_hem_topology_evidence,
         "rearWaistAdjustmentTab": rear_waist_tab_evidence,
         "sourceBlendSha256": digest(source), "sewnMeshSha256": digest(mesh_path),
         "microdegenerateTriangleCleanup": microdegenerate_cleanup,
