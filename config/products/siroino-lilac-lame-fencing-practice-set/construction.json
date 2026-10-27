@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V83 holds the V82 overskirt/apron geometry, side relief, materials, and skinning inputs constant while extending the four sewn under-short panels from 80 mm to 160 mm as a mid-thigh coverage hypothesis for the measured sit/crouch upper-thigh exposure. This extension-only trial did not improve measured pose coverage; hem visibility, seams, skinning, collision, appearance, fit, UV, Unity/VRChat, and release remain unapproved.",
-  "designRevision": "v83-mid-thigh-under-short-coverage-20261026",
+  "designRevision": "v85-shorts-leg-follow-20261027",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -114,6 +114,28 @@
     "evidenceBoundary": "Neutral and repository-defined Large body cross-sections only. Reuse is bound to the same byte-identical SiroinoSotai PC FBX; waistline selection, garment ease, collar circumference, shape-key coverage, fit, and motion remain unapproved."
   },
   "releaseBoundary": "Prototype geometry only. Rendered visualAppearanceReview, fit, runtime, and customer release evidence remain unverified and mandatory before release.",
+  "shapeKeyTransfer": {
+    "applicability": "REQUIRED",
+    "method": "nearest-body-triangle-barycentric-delta-transfer",
+    "sourceKeys": [
+      "All_Slim",
+      "Chest_Slim",
+      "Hips_Slim",
+      "UpperLeg_Slim",
+      "Breasts_flat",
+      "All_M",
+      "Chest_M",
+      "All_L",
+      "Chest_L",
+      "Hips_01_L",
+      "UpperLeg_L",
+      "Breasts_L",
+      "Breasts_LL",
+      "Breasts_LLL",
+      "Breasts_In"
+    ],
+    "evidenceBoundary": "Transfers only the declared body-size keys from the exact source triangle used for weight mapping. It records source and output mesh evidence; it does not claim smoothness, evaluated fit, Unity import compatibility, or release acceptance."
+  },
   "clothSimulation": {
     "applicability": "REQUIRED",
     "components": [
@@ -245,7 +267,7 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "V42 separates shorts from the shared overskirt weight region and applies an explicit pelvis-to-thigh follow profile to the fitted shorts. The increased lower-leg follow is a deformation hypothesis to reduce sitting/crouch volume artifacts; weight, fit, collision and appearance remain unaccepted.",
+      "evidenceBoundary": "V85 isolates one bounded posed-coverage hypothesis: raise only the shorts hem thigh-follow target from V79 0.82 to 0.98 while preserving waist, centerline, anterior fade, geometry and panel placement. V84 pose-matched diagnostics measured 15.37% upper-thigh shorts coverage seated and 26.67% crouched despite 100% neutral coverage; stronger hem follow tests whether the coverage layer follows rotated thighs. Inspect neutral, sit and crouch for waist/crotch distortion and intersections. This remains a prototype weight hypothesis; it is not fit or visual acceptance.",
       "weightProfile": {
         "method": "hip-anchored-anterior-bilateral-center-hem-fade-v3",
         "pieceIds": [
@@ -258,7 +280,7 @@
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
         "waistThighWeight": 0.08,
-        "hemThighWeight": 0.82,
+        "hemThighWeight": 0.98,
         "forwardHemThighWeight": 0.08,
         "centerlineHemThighWeight": 0.12,
         "forwardCenterYM": -0.03788188099861145,

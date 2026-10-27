@@ -31,6 +31,34 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def create_shape_key_targets(obj, shape_key_names):
+    if obj.data.shape_keys is not None:
+        raise ValueError(f"refusing to overwrite existing garment Shape Keys on {obj.name}")
+    basis = obj.shape_key_add(name="Basis", from_mix=False)
+    targets = {
+        name: obj.shape_key_add(name=name, from_mix=False)
+        for name in shape_key_names
+    }
+    return basis, targets
+
+
+def transfer_shape_key_vertex(
+    obj, body, vertex, target_basis, target_keys, source_basis, source_keys, triangle, bary
+):
+    displacement = {}
+    inverse = obj.matrix_world.inverted().to_3x3()
+    for name, target in target_keys.items():
+        delta_world = Vector((0.0, 0.0, 0.0))
+        source_key = source_keys[name]
+        for index, coefficient in zip(triangle, bary):
+            basis_world = body.matrix_world @ source_basis.data[index].co
+            key_world = body.matrix_world @ source_key.data[index].co
+            delta_world += (key_world - basis_world) * max(0.0, coefficient)
+        target.data[vertex.index].co = target_basis + inverse @ delta_world
+        displacement[name] = float(delta_world.length)
+    return displacement
+
+
 def _smoothstep(value):
     value = max(0.0, min(1.0, float(value)))
     return value * value * (3.0 - 2.0 * value)
@@ -1450,6 +1478,37 @@ def main():
         for v in body.data.vertices
     ]
     construction = read_json(repo_path(job["garmentPipeline"]["constructionPath"]))
+    shape_key_contract = construction.get("shapeKeyTransfer")
+    if (
+        not isinstance(shape_key_contract, dict)
+        or shape_key_contract.get("applicability") != "REQUIRED"
+        or shape_key_contract.get("method")
+        != "nearest-body-triangle-barycentric-delta-transfer"
+        or not isinstance(shape_key_contract.get("evidenceBoundary"), str)
+        or not shape_key_contract["evidenceBoundary"].strip()
+    ):
+        raise ValueError("construction.shapeKeyTransfer must declare measured morph transfer")
+    requested_shape_keys = shape_key_contract.get("sourceKeys")
+    if (
+        not isinstance(requested_shape_keys, list)
+        or not requested_shape_keys
+        or not all(isinstance(name, str) and name for name in requested_shape_keys)
+        or len(set(requested_shape_keys)) != len(requested_shape_keys)
+    ):
+        raise ValueError("shapeKeyTransfer.sourceKeys must be a unique non-empty list")
+    source_shape_keys = body.data.shape_keys
+    if source_shape_keys is None or source_shape_keys.key_blocks.get("Basis") is None:
+        raise ValueError("target body has no measured Basis shape key")
+    source_key_blocks = source_shape_keys.key_blocks
+    missing_shape_keys = [name for name in requested_shape_keys if source_key_blocks.get(name) is None]
+    if missing_shape_keys:
+        raise ValueError("target body is missing declared Shape Keys: " + ", ".join(missing_shape_keys))
+    source_basis = source_key_blocks["Basis"]
+    if any(
+        len(source_key_blocks[name].data) != len(body.data.vertices)
+        for name in ["Basis", *requested_shape_keys]
+    ):
+        raise ValueError("target body Shape Key vertex counts do not match the source mesh")
     regions = construction.get("prototypeWeightRegions", [])
     region_trees = []
     profiles_by_piece = {}
@@ -1568,6 +1627,7 @@ def main():
     if not objects:
         raise ValueError("cloth candidate contains no garment meshes")
     audits, distances, region_records, profile_audits = {}, [], [], {}
+    shape_key_records = {}
     trim_objects = [
         obj
         for obj in objects
@@ -1966,6 +2026,58 @@ def main():
             "meanSettlingDisplacementM": sum(displacements) / len(displacements),
             "grantsFitAcceptance": False,
         }
+    shape_key_source_distances = []
+    for obj in objects:
+        target_basis, target_keys = create_shape_key_targets(obj, requested_shape_keys)
+        displacement_by_key = {name: [] for name in requested_shape_keys}
+        for vertex in obj.data.vertices:
+            point = obj.matrix_world @ vertex.co
+            nearest, _normal, triangle_id, distance = tree.find_nearest(point)
+            if triangle_id is None:
+                raise ValueError(f"Shape Key body correspondence failed: {obj.name}:{vertex.index}")
+            triangle = triangles[triangle_id]
+            a, b, c = [coordinates[index] for index in triangle]
+            bary = barycentric_transform(
+                nearest,
+                a,
+                b,
+                c,
+                Vector((1, 0, 0)),
+                Vector((0, 1, 0)),
+                Vector((0, 0, 1)),
+            )
+            if min(bary) < -1e-4:
+                raise ValueError(
+                    f"Shape Key closest body point is outside its triangle: {obj.name}:{vertex.index}"
+                )
+            deltas = transfer_shape_key_vertex(
+                obj,
+                body,
+                vertex,
+                target_basis.data[vertex.index].co.copy(),
+                target_keys,
+                source_basis,
+                source_key_blocks,
+                triangle,
+                bary,
+            )
+            for name, amount in deltas.items():
+                displacement_by_key[name].append(amount)
+            shape_key_source_distances.append(float(distance))
+        shape_key_records[obj.name] = {
+            "vertexCount": len(obj.data.vertices),
+            "shapeKeyCount": len(target_keys),
+            "shapeKeys": {
+                name: {
+                    "sourceKey": name,
+                    "nonZeroDeltaVertexCount": sum(value > 1e-8 for value in values),
+                    "maximumDeltaM": max(values, default=0.0),
+                    "meanDeltaM": sum(values) / len(values) if values else 0.0,
+                }
+                for name, values in displacement_by_key.items()
+            },
+            "evidenceBoundary": shape_key_contract["evidenceBoundary"],
+        }
     runtime = ROOT / ".image2outfit/products" / job["id"] / "skin"
     runtime.mkdir(parents=True, exist_ok=True)
     source = runtime / "weighted-prototype.blend"
@@ -1995,6 +2107,22 @@ def main():
             "vertexCount": sum(len(obj.data.vertices) for obj in objects),
             "unweightedVertices": 0,
             "prototypeTrimAttachment": trim_audits,
+            "shapeKeyTransfer": {
+                "status": "MEASURED_PROTOTYPE_TRANSFER",
+                "method": shape_key_contract["method"],
+                "sourceBodyMeshHash": mesh_hash(body),
+                "sourceKeys": requested_shape_keys,
+                "sourceKeyCount": len(requested_shape_keys),
+                "targetMeshCount": len(shape_key_records),
+                "targetMeshes": shape_key_records,
+                "maximumBodyCorrespondenceDistanceM": max(shape_key_source_distances, default=0.0),
+                "meanBodyCorrespondenceDistanceM": (
+                    sum(shape_key_source_distances) / len(shape_key_source_distances)
+                    if shape_key_source_distances else 0.0
+                ),
+                "fbxContainsShapeKeys": "UNVERIFIED",
+                "grantsShapeKeyAcceptance": False,
+            },
             "poseConstrainedApronGeometry": pose_constrained_apron_evidence,
             "prototypeWeightProfiles": profile_audits,
             "bodyDistanceM": {
@@ -2012,7 +2140,7 @@ def main():
             "pending": [
                 "fit",
                 "deformation and laterality",
-                "Shape Keys",
+                "Shape Key smoothing and FBX/Unity import validation",
                 "appearance",
                 "Unity Prefabs",
                 "VRChat runtime",
