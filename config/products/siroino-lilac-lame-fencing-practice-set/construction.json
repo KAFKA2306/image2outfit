@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V91 retains the existing prototype geometry and transfers copied thigh-cover vertices with barycentric target-body skin weights, separately from the shorts-panel weight profile, to test whether same-surface weights improve posed coverage. The offset shell still has no UV mapping; pose deformation, seam continuity, fit, appearance, Unity/VRChat, and release remain unapproved.",
-  "designRevision": "v91-thigh-shell-source-skin-weights-20261029",
+  "target": "V92 extends the unwrapped target-avatar thigh-surface shell from Z 0.52–0.72 to Z 0.32–0.87 and lowers the triangle thigh-weight eligibility threshold from 0.20 to 0.05. This tests whether broader target-surface inclusion improves the measured sit/crouch coverage. Copied vertices retain barycentric source-body skin weights; UV, seaming, fit, appearance, Unity/VRChat, and release remain unapproved.",
+  "designRevision": "v92-thigh-shell-extended-source-surface-20261029",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",

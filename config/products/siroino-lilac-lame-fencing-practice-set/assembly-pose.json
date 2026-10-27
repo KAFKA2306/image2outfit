@@ -9737,13 +9737,13 @@
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "leftThighBone": "UpperLeg_L",
     "rightThighBone": "UpperLeg_R",
-    "hemZM": 0.52,
-    "waistZM": 0.72,
+    "hemZM": 0.32,
+    "waistZM": 0.87,
     "normalClearanceM": 0.008,
-    "minimumTriangleBoneWeight": 0.2,
-    "evidenceBoundary": "V91 keeps the cover geometry as an 8 mm offset of target-avatar thigh triangles. Skin export uses the copied surface vertices' barycentric target-body weights instead of the separate shorts-panel weight profile to test same-surface deformation. UV is explicitly NOT_CREATED. This does not prove seaming, fit, motion clearance, shape-key fit, appearance, Unity/VRChat behavior or release."
+    "minimumTriangleBoneWeight": 0.05,
+    "evidenceBoundary": "V92 widens the copied target-avatar shell selection to Z 0.32–0.87 and includes source triangles with mean thigh-bone weight at least 0.05, testing whether broader surface inclusion improves measured sit/crouch coverage. The shell remains an unwrapped 8 mm offset surface; source-skin weights do not establish pose coverage, seaming, fit, motion clearance, shape-key response, appearance, Unity/VRChat behavior or release. UV is explicitly NOT_CREATED."
   },
-  "designRevision": "v91-thigh-shell-source-skin-weights-20261029",
+  "designRevision": "v92-thigh-shell-extended-source-surface-20261029",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

@@ -8988,24 +8988,24 @@
       "right": "shorts-leg-cover-right"
     },
     "triangleCountByThigh": {
-      "left": 610,
-      "right": 610
+      "left": 1321,
+      "right": 1334
     },
     "sourceVertexCountByThigh": {
-      "left": 336,
-      "right": 336
+      "left": 698,
+      "right": 704
     },
     "heightRangeZM": [
-      0.52,
-      0.72
+      0.32,
+      0.87
     ],
     "normalClearanceM": 0.008,
-    "minimumTriangleAreaM2": 1.783675451401985e-06,
+    "minimumTriangleAreaM2": 1.3042542730339256e-06,
     "uvStatus": "NOT_CREATED",
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false,
     "grantsVisualAcceptance": false,
-    "evidenceBoundary": "V91 keeps the cover geometry as an 8 mm offset of target-avatar thigh triangles. Skin export uses the copied surface vertices' barycentric target-body weights instead of the separate shorts-panel weight profile to test same-surface deformation. UV is explicitly NOT_CREATED. This does not prove seaming, fit, motion clearance, shape-key fit, appearance, Unity/VRChat behavior or release."
+    "evidenceBoundary": "V92 widens the copied target-avatar shell selection to Z 0.32\u20130.87 and includes source triangles with mean thigh-bone weight at least 0.05, testing whether broader surface inclusion improves measured sit/crouch coverage. The shell remains an unwrapped 8 mm offset surface; source-skin weights do not establish pose coverage, seaming, fit, motion clearance, shape-key response, appearance, Unity/VRChat behavior or release. UV is explicitly NOT_CREATED."
   },
   "declaredSkirtLengthening": {
     "applied": true,
@@ -9240,7 +9240,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "ffefcdf32b9d94ef257e8b87275d0e9bdf70406fcb4562f641c882d531223d0a",
+    "privateSimulationSourceSha256": "4ab78f783626ad5f4bc5c7d889a5cafd4fcdd84c944d4be814fc643b1950b991",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -9248,7 +9248,7 @@
     "method": "face-local-declared-source-coordinates; unmapped surface-shell faces remain without UVs",
     "panelCount": 27,
     "mappedFaceCount": 30277,
-    "unmappedFaceCount": 1220,
+    "unmappedFaceCount": 2655,
     "uniformPatternToUvScale": 0.008629850966878492,
     "panelUvBounds": {
       "P01": {
@@ -9606,7 +9606,7 @@
     "sourceKindFaceCounts": {
       "declared-parametric-accessory": 40,
       "garmentcode-pattern-panel": 30237,
-      "unmapped-surface-derived-shell": 1220
+      "unmapped-surface-derived-shell": 2655
     },
     "grantsQualityAcceptance": false
   },
@@ -10408,7 +10408,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "b4ae93f5d2b9e70d8a653677a30755ff6553354818509b95ff88578c415b7109",
+  "sourceBlendSha256": "53d8b3131a93dc53acc6fe11230e08b56a5a6c9f9bbd024452f934ecd082ab77",
   "sewnMeshSha256": "ae49aa73a59507bdf0a7897e83c8fe8b04a521f46cefafe688dcf82a4fa7e1cd",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -10537,10 +10537,10 @@
         ]
       }
     ],
-    "boundaryEdgesBefore": 731,
-    "boundaryEdgesAfter": 731,
-    "nonManifoldEdgesBefore": 731,
-    "nonManifoldEdgesAfter": 731,
+    "boundaryEdgesBefore": 756,
+    "boundaryEdgesAfter": 756,
+    "nonManifoldEdgesBefore": 756,
+    "nonManifoldEdgesAfter": 756,
     "remainingDegenerateTriangles": 0,
     "grantsFitAcceptance": false,
     "grantsAppearanceAcceptance": false,
@@ -171097,9 +171097,9 @@
     "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."
   },
   "metrics": {
-    "vertices": 16109,
-    "triangles": 31485,
-    "unweightedVertices": 16109,
+    "vertices": 16839,
+    "triangles": 32920,
+    "unweightedVertices": 16839,
     "degenerateTriangles": 0
   },
   "surfaceShadingHypothesis": {
