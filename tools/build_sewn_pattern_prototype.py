@@ -2226,7 +2226,7 @@ def append_declared_thigh_surface_shell(mesh, body_objects, pose, target_path):
     spec = pose.get("thighSurfaceShell")
     if spec is None:
         return {"applied": False, "reason": "not-declared", "grantsFitAcceptance": False}
-    if spec.get("method") != "weighted-thigh-surface-copy-v1":
+    if spec.get("method") != "weighted-thigh-surface-clip-v2":
         raise ValueError("Unknown thigh surface shell method")
     if digest(target_path) != pose["targetSourceSha256"]:
         raise ValueError("Thigh surface shell target source is stale")
@@ -2276,49 +2276,127 @@ def append_declared_thigh_surface_shell(mesh, body_objects, pose, target_path):
     shell_vertices = {"left": {}, "right": {}}
     shell_faces = {"left": [], "right": []}
     selected_triangles = {"left": 0, "right": 0}
+    clipped_source_triangles = {"left": 0, "right": 0}
     minimum_area = math.inf
+
+    def point_from_barycentric(source_ids, barycentric):
+        return sum((world_vertices[source_id] * amount
+                    for source_id, amount in zip(source_ids, barycentric)), Vector())
+
+    def clip_polygon(source_ids, polygon, axis, bound, keep_greater):
+        if not polygon:
+            return []
+
+        def coordinate(barycentric):
+            return point_from_barycentric(source_ids, barycentric)[axis]
+
+        result = []
+        previous = polygon[-1]
+        previous_value = coordinate(previous)
+        previous_inside = (previous_value >= bound - 1e-9 if keep_greater
+                           else previous_value <= bound + 1e-9)
+        for current in polygon:
+            current_value = coordinate(current)
+            current_inside = (current_value >= bound - 1e-9 if keep_greater
+                              else current_value <= bound + 1e-9)
+            if current_inside != previous_inside:
+                denominator = current_value - previous_value
+                if abs(denominator) > 1e-12:
+                    amount = max(0.0, min(1.0, (bound - previous_value) / denominator))
+                    intersection = tuple(a + (b - a) * amount
+                                         for a, b in zip(previous, current))
+                    result.append(intersection)
+            if current_inside:
+                result.append(current)
+            previous = current
+            previous_value = current_value
+            previous_inside = current_inside
+
+        deduplicated = []
+        for barycentric in result:
+            point = point_from_barycentric(source_ids, barycentric)
+            if (not deduplicated
+                    or (point - point_from_barycentric(source_ids, deduplicated[-1])).length > 1e-8):
+                deduplicated.append(barycentric)
+        if (len(deduplicated) > 1
+                and (point_from_barycentric(source_ids, deduplicated[0])
+                     - point_from_barycentric(source_ids, deduplicated[-1])).length <= 1e-8):
+            deduplicated.pop()
+        return deduplicated
+
     for triangle in body.data.loop_triangles:
         source_ids = tuple(triangle.vertices)
         points = [world_vertices[index] for index in source_ids]
-        center = (points[0] + points[1] + points[2]) / 3
-        if not hem_z <= center.z <= waist_z:
-            continue
-        is_left = (center.x >= center_x) == left_is_positive
-        side = "left" if is_left else "right"
-        if sum(weights[side][index] for index in source_ids) / 3 < minimum_weight:
-            continue
-        # Keep each component on its own side of the pelvis centerline.
-        if any(((world_vertices[index].x >= center_x) == left_is_positive) != is_left
-               for index in source_ids):
-            continue
-        if any(not hem_z <= world_vertices[index].z <= waist_z for index in source_ids):
-            continue
-        axis_head, axis_tail = centerline[side]
-        axis = axis_tail - axis_head
-        t = max(0.0, min(1.0, (center - axis_head).dot(axis) / max(axis.length_squared, 1e-12)))
-        radial = (center - (axis_head + axis * t)).normalized()
         normal = (points[1] - points[0]).cross(points[2] - points[0])
         if normal.length_squared <= 1e-16:
             continue
-        if normal.dot(radial) < 0:
-            source_ids = tuple(reversed(source_ids))
-        mapped_face = []
-        for source_id in source_ids:
-            if source_id not in shell_vertices[side]:
-                garment_id = len(mesh["vertices"])
-                shell_vertices[side][source_id] = garment_id
-                offset_normal = world_normals[source_id]
-                if offset_normal.dot(radial) < 0:
-                    offset_normal.negate()
-                mesh["vertices"].append(list(world_vertices[source_id] + offset_normal * clearance))
-            mapped_face.append(shell_vertices[side][source_id])
-        a, b, c = (Vector(mesh["vertices"][index]) for index in mapped_face)
-        area = (b - a).cross(c - a).length / 2
-        if area <= 1e-12:
-            raise ValueError("Thigh surface shell produced a degenerate triangle")
-        minimum_area = min(minimum_area, area)
-        selected_triangles[side] += 1
-        shell_faces[side].append(tuple(mapped_face))
+        original_center = sum(points, Vector()) / 3
+        for side, bone_name in side_bones.items():
+            if sum(weights[side][index] for index in source_ids) / 3 < minimum_weight:
+                continue
+            axis_head, axis_tail = centerline[side]
+            axis = axis_tail - axis_head
+            t = max(0.0, min(1.0, (original_center - axis_head).dot(axis)
+                                 / max(axis.length_squared, 1e-12)))
+            radial = original_center - (axis_head + axis * t)
+            if radial.length_squared <= 1e-16:
+                continue
+            if normal.dot(radial) < 0:
+                source_ids = tuple(reversed(source_ids))
+
+            polygon = [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)]
+            polygon = clip_polygon(source_ids, polygon, 2, hem_z, True)
+            polygon = clip_polygon(source_ids, polygon, 2, waist_z, False)
+            keep_positive_x = left_is_positive if side == "left" else not left_is_positive
+            polygon = clip_polygon(source_ids, polygon, 0, center_x, keep_positive_x)
+            if len(polygon) < 3:
+                continue
+
+            clipped_source_triangles[side] += 1
+            center = sum((point_from_barycentric(source_ids, barycentric)
+                          for barycentric in polygon), Vector()) / len(polygon)
+            t = max(0.0, min(1.0, (center - axis_head).dot(axis)
+                             / max(axis.length_squared, 1e-12)))
+            radial = center - (axis_head + axis * t)
+            if radial.length_squared <= 1e-16:
+                continue
+            polygon_normal = (point_from_barycentric(source_ids, polygon[1])
+                              - point_from_barycentric(source_ids, polygon[0])).cross(
+                                  point_from_barycentric(source_ids, polygon[2])
+                                  - point_from_barycentric(source_ids, polygon[0]))
+            if polygon_normal.length_squared <= 1e-16:
+                continue
+            if polygon_normal.dot(radial) < 0:
+                polygon.reverse()
+
+            mapped_polygon = []
+            for barycentric in polygon:
+                position = point_from_barycentric(source_ids, barycentric)
+                key = tuple(round(float(component), 7) for component in position)
+                if key not in shell_vertices[side]:
+                    source_normal = sum((world_normals[source_id] * amount
+                                         for source_id, amount in zip(source_ids, barycentric)), Vector())
+                    if source_normal.length_squared <= 1e-16:
+                        source_normal = polygon_normal.copy()
+                    source_normal.normalize()
+                    point_t = max(0.0, min(1.0, (position - axis_head).dot(axis)
+                                           / max(axis.length_squared, 1e-12)))
+                    point_radial = position - (axis_head + axis * point_t)
+                    if point_radial.length_squared > 1e-16 and source_normal.dot(point_radial) < 0:
+                        source_normal.negate()
+                    shell_vertices[side][key] = len(mesh["vertices"])
+                    mesh["vertices"].append(list(position + source_normal * clearance))
+                mapped_polygon.append(shell_vertices[side][key])
+
+            for index in range(1, len(mapped_polygon) - 1):
+                mapped_face = (mapped_polygon[0], mapped_polygon[index], mapped_polygon[index + 1])
+                a, b, c = (Vector(mesh["vertices"][vertex_id]) for vertex_id in mapped_face)
+                area = (b - a).cross(c - a).length / 2
+                if area <= 1e-12:
+                    continue
+                minimum_area = min(minimum_area, area)
+                selected_triangles[side] += 1
+                shell_faces[side].append(mapped_face)
     if not all(selected_triangles.values()):
         raise ValueError(f"Thigh surface shell has no eligible faces on both sides: {selected_triangles}")
 
@@ -2348,6 +2426,7 @@ def append_declared_thigh_surface_shell(mesh, body_objects, pose, target_path):
         "targetSourceSha256": digest(target_path),
         "pieceIdsBySide": shell_piece_by_side,
         "triangleCountByThigh": selected_triangles,
+        "clippedSourceTriangleCountByThigh": clipped_source_triangles,
         "sourceVertexCountByThigh": {side: len(values) for side, values in shell_vertices.items()},
         "heightRangeZM": [hem_z, waist_z],
         "normalClearanceM": clearance,

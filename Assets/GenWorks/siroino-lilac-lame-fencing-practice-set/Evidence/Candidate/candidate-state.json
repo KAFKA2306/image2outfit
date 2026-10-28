@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v92-thigh-shell-extended-source-surface-20261029",
+  "revision": "v93-clipped-shell-boundary-loops-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "code": "OVERSKIRT_POSED_FLAPS_AND_SIDE_RIDGES",
       "severity": "BLOCKER",
-      "description": "V92 measured under-shorts upper-thigh coverage at 100.0% neutral, 97.2% crouch and 97.3% sit, but direct inspection of front, back, side, three-quarter and all pose renders shows the extended copied shell ending in a clearly jagged/sawtooth edge below the overskirt. In crouch and sit, the shell boundary is visibly discontinuous and reads as protruding unfinished garment geometry. The measurement does not establish acceptable hem or fit.",
-      "code": "THIGH_SHELL_EDGE_IS_VISIBLY_RAGGED"
+      "description": "Direct inspection of all eleven current renders shows the overskirt side panels forming sharp triangular flaps in sit and crouch, with front/back fabric hanging between the legs. Standing front, back, left, right and three-quarter views retain repeated narrow side ridges and pointed outward hem corners. The V93 shorts shell has a more regular clipped leg opening, but its broad faceted surface remains prototype-quality."
     },
     {
+      "code": "POSED_THIGH_COVERAGE_REMAINS_INCOMPLETE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of sit, crouch and prone renders shows the overskirt side panels forming deep narrow ridges and pointed triangular flaps with an uneven hanging front/back hem. These defects remain visible across posed renders.",
-      "code": "OVERSKIRT_POSED_HEM_AND_SIDE_FOLDS_UNRESOLVED"
+      "description": "The measured under-shorts upper-thigh coverage is 68.6% neutral, 64.2% crouch and 63.8% sit. These geometric coverage measurements do not establish a sewn garment, fit, collision clearance, or acceptable visual coverage."
     },
     {
+      "code": "FIT_AND_RELEASE_GATES_UNVERIFIED",
       "severity": "BLOCKER",
-      "description": "Candidate geometry audit remains NO-GO and explicitly marks avatar fit unverified. The pipeline also reports missing smooth-shape-keys evidence. Renders do not establish garment fit, shape-key behavior, UV completion, Unity/VRChat runtime, or release readiness.",
-      "code": "FIT_AND_RELEASE_GATES_UNVERIFIED"
+      "description": "The direct render set does not establish avatar fit, shape-key response, UV completion, Unity/VRChat runtime or customer release readiness. Keep all independent quality gates unchanged."
     }
   ],
   "failedGeometryChecks": [

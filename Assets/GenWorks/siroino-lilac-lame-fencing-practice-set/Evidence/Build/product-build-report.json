@@ -8980,7 +8980,7 @@
   },
   "thighSurfaceShell": {
     "applied": true,
-    "method": "weighted-thigh-surface-copy-v1",
+    "method": "weighted-thigh-surface-clip-v2",
     "sourceBodyObject": "SiroinoSotai_PC",
     "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
     "pieceIdsBySide": {
@@ -8988,24 +8988,28 @@
       "right": "shorts-leg-cover-right"
     },
     "triangleCountByThigh": {
-      "left": 1321,
-      "right": 1334
+      "left": 943,
+      "right": 943
+    },
+    "clippedSourceTriangleCountByThigh": {
+      "left": 922,
+      "right": 924
     },
     "sourceVertexCountByThigh": {
-      "left": 698,
-      "right": 704
+      "left": 516,
+      "right": 516
     },
     "heightRangeZM": [
-      0.32,
+      0.5,
       0.87
     ],
     "normalClearanceM": 0.008,
-    "minimumTriangleAreaM2": 1.3042542730339256e-06,
+    "minimumTriangleAreaM2": 8.419706590008359e-09,
     "uvStatus": "NOT_CREATED",
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false,
     "grantsVisualAcceptance": false,
-    "evidenceBoundary": "V92 widens the copied target-avatar shell selection to Z 0.32\u20130.87 and includes source triangles with mean thigh-bone weight at least 0.05, testing whether broader surface inclusion improves measured sit/crouch coverage. The shell remains an unwrapped 8 mm offset surface; source-skin weights do not establish pose coverage, seaming, fit, motion clearance, shape-key response, appearance, Unity/VRChat behavior or release. UV is explicitly NOT_CREATED."
+    "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50\u20130.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "declaredSkirtLengthening": {
     "applied": true,
@@ -9240,7 +9244,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "4ab78f783626ad5f4bc5c7d889a5cafd4fcdd84c944d4be814fc643b1950b991",
+    "privateSimulationSourceSha256": "00f92d9d12386754b27eb8febf5ec3c1d9778e9536fc70ed8c365bdfe84524c4",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -9248,7 +9252,7 @@
     "method": "face-local-declared-source-coordinates; unmapped surface-shell faces remain without UVs",
     "panelCount": 27,
     "mappedFaceCount": 30277,
-    "unmappedFaceCount": 2655,
+    "unmappedFaceCount": 1886,
     "uniformPatternToUvScale": 0.008629850966878492,
     "panelUvBounds": {
       "P01": {
@@ -9606,7 +9610,7 @@
     "sourceKindFaceCounts": {
       "declared-parametric-accessory": 40,
       "garmentcode-pattern-panel": 30237,
-      "unmapped-surface-derived-shell": 2655
+      "unmapped-surface-derived-shell": 1886
     },
     "grantsQualityAcceptance": false
   },
@@ -10408,7 +10412,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "53d8b3131a93dc53acc6fe11230e08b56a5a6c9f9bbd024452f934ecd082ab77",
+  "sourceBlendSha256": "be0f63bafecb5e0696e11990c3cd0168d7250a42743537d23c5dce02cbcc104f",
   "sewnMeshSha256": "ae49aa73a59507bdf0a7897e83c8fe8b04a521f46cefafe688dcf82a4fa7e1cd",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -10537,10 +10541,10 @@
         ]
       }
     ],
-    "boundaryEdgesBefore": 756,
-    "boundaryEdgesAfter": 756,
-    "nonManifoldEdgesBefore": 756,
-    "nonManifoldEdgesAfter": 756,
+    "boundaryEdgesBefore": 785,
+    "boundaryEdgesAfter": 785,
+    "nonManifoldEdgesBefore": 785,
+    "nonManifoldEdgesAfter": 785,
     "remainingDegenerateTriangles": 0,
     "grantsFitAcceptance": false,
     "grantsAppearanceAcceptance": false,
@@ -171097,9 +171101,9 @@
     "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."
   },
   "metrics": {
-    "vertices": 16839,
-    "triangles": 32920,
-    "unweightedVertices": 16839,
+    "vertices": 16469,
+    "triangles": 32151,
+    "unweightedVertices": 16469,
     "degenerateTriangles": 0
   },
   "surfaceShadingHypothesis": {
