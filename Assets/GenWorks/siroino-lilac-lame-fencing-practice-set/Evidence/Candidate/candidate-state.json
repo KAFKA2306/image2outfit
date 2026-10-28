@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v95-hip-anchored-side-and-underseat-panels-20261029",
+  "revision": "v96-front-lap-hem-only-piping-20261028",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,17 +19,17 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of all eleven current renders and Astra review: left/right side views retain tightly bunched folds; integrated purple hem trim kinks and protrudes in broken pointed segments. Sit and crouch still show lifted panels bunching into angular overlaps beside and behind the thighs, with trim visibly folding out of alignment. Lowering side and under-seat thigh weight did not resolve the deformation.",
+      "description": "Direct inspection of all eleven current V96 renders and Astra review: piping at both front-lap hem ends still kinks outward into short protruding tips; the hem-only edge filter has not materially improved those terminations.",
       "severity": "BLOCKER",
-      "code": "OVERSKIRT_SIDE_AND_UNDERSEAT_DRAPE_REMAINS_ANGULAR"
+      "code": "FRONT_LAP_PIPING_TERMINATIONS_REMAIN_PROTRUDING"
     },
     {
-      "description": "The current same-pose geometric diagnostic continues to show incomplete overskirt upper-thigh coverage in the seated pose; the measurement does not establish fit or acceptable coverage. Under-shorts sit/crouch coverage remains 63.8%/64.2%, prototype diagnostic only.",
+      "description": "Neutral, side, rear and three-quarter views retain dense horizontal ridging along the overskirt sides. Crouch and sit retain angular panel overlaps and bunching around and behind the raised thighs; the skirt silhouette is still visibly stiff and broken rather than a continuous drape.",
       "severity": "BLOCKER",
-      "code": "POSED_THIGH_COVERAGE_REMAINS_INCOMPLETE"
+      "code": "OVERSKIRT_SIDE_AND_POSE_DRAPE_REMAINS_ANGULAR"
     },
     {
-      "description": "Avatar fit and Shape Key response, complete UVs, Unity/VRChat runtime, and release package readiness remain unverified. Keep all quality gates unchanged.",
+      "description": "The garment remains a prototype. Avatar fit, Shape Key response, complete UVs, Unity/VRChat runtime, and release package readiness are unverified; no release gate is satisfied by this visual review.",
       "severity": "BLOCKER",
       "code": "FIT_AND_RELEASE_GATES_UNVERIFIED"
     }

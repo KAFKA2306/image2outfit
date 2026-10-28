@@ -9229,7 +9229,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "c58ffc851377fef68a161b45f9fe897e366cc0dfef1317cad9ef451d491fa7c5",
+    "privateSimulationSourceSha256": "7097764ba95eb63826fabfc6f00f4651c4b3ce4f244aef834253706168ea734c",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -9609,6 +9609,7 @@
         "polylineCount": 1,
         "meshVertexCount": 424,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "jacket-sleeve-left": {
@@ -9616,6 +9617,7 @@
         "polylineCount": 1,
         "meshVertexCount": 144,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "jacket-sleeve-right": {
@@ -9623,6 +9625,7 @@
         "polylineCount": 1,
         "meshVertexCount": 144,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "stand-collar": {
@@ -9630,6 +9633,7 @@
         "polylineCount": 1,
         "meshVertexCount": 312,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "overskirt-front-left": {
@@ -9637,6 +9641,7 @@
         "polylineCount": 1,
         "meshVertexCount": 152,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "overskirt-front-right": {
@@ -9644,6 +9649,7 @@
         "polylineCount": 1,
         "meshVertexCount": 152,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "overskirt-back-left": {
@@ -9651,6 +9657,7 @@
         "polylineCount": 1,
         "meshVertexCount": 336,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "overskirt-back-right": {
@@ -9658,6 +9665,7 @@
         "polylineCount": 1,
         "meshVertexCount": 336,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "waistband-front-left": {
@@ -9665,6 +9673,7 @@
         "polylineCount": 1,
         "meshVertexCount": 96,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "waistband-front-right": {
@@ -9672,6 +9681,7 @@
         "polylineCount": 1,
         "meshVertexCount": 96,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "waistband-back-left": {
@@ -9679,6 +9689,7 @@
         "polylineCount": 1,
         "meshVertexCount": 144,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "waistband-back-right": {
@@ -9686,6 +9697,7 @@
         "polylineCount": 1,
         "meshVertexCount": 144,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "overskirt-front-lap-left": {
@@ -9693,6 +9705,15 @@
         "polylineCount": 1,
         "meshVertexCount": 208,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": {
+          "method": "lower-contour-height-band",
+          "pieceMinimumZM": 0.5245782208442687,
+          "maximumRiseM": 0.016,
+          "availableBoundaryEdgeCount": 23,
+          "selectedBoundaryEdgeCount": 23,
+          "excludedBoundaryEdgeCount": 0,
+          "grantsVisualAcceptance": false
+        },
         "grantsFitAcceptance": false
       },
       "overskirt-front-lap-right": {
@@ -9700,6 +9721,15 @@
         "polylineCount": 1,
         "meshVertexCount": 208,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": {
+          "method": "lower-contour-height-band",
+          "pieceMinimumZM": 0.5245782208442687,
+          "maximumRiseM": 0.016,
+          "availableBoundaryEdgeCount": 23,
+          "selectedBoundaryEdgeCount": 23,
+          "excludedBoundaryEdgeCount": 0,
+          "grantsVisualAcceptance": false
+        },
         "grantsFitAcceptance": false
       },
       "waistband-front-lap-left": {
@@ -9707,6 +9737,7 @@
         "polylineCount": 1,
         "meshVertexCount": 88,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       },
       "waistband-front-lap-right": {
@@ -9714,11 +9745,12 @@
         "polylineCount": 1,
         "meshVertexCount": 88,
         "bindingMethod": "canonical-sewn-edge-interpolation",
+        "hemOnlySelection": null,
         "grantsFitAcceptance": false
       }
     },
     "grantsFitAcceptance": false,
-    "evidenceBoundary": "V22 increases the prototype piping radius and lavender contrast on the V21 declared jacket and skirt boundaries for direct review; intersections and appearance remain unapproved."
+    "evidenceBoundary": "V96 attempted a 16 mm lower-contour filter on the overlapping front-lap panels, based on the declared 15 mm front scoop. The actual build report measured 23 available and 23 selected boundary edges on both pieces, with 0 excluded; this height criterion did not reduce piping there. The direct V96 review still observes protruding endpoints. This rejected prototype grants no appearance, fit or release acceptance."
   },
   "prototypeSurfaceMotifs": {
     "applied": true,
@@ -10397,7 +10429,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "c9e6ac0fa38f1a012b6c564eb20c59c3291a5d8d1eee544e6324d99239931eb9",
+  "sourceBlendSha256": "2cd084e769066aa186338fa9a2e02c594c7e0ff49f432adee8e3fc20487febd6",
   "sewnMeshSha256": "ae49aa73a59507bdf0a7897e83c8fe8b04a521f46cefafe688dcf82a4fa7e1cd",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",

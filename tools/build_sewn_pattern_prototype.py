@@ -249,6 +249,45 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         if len(adjacent_owners) == 1 and adjacent_owners[0] in boundaries:
             boundaries[adjacent_owners[0]].add(edge)
 
+    # Some overlapping skirt panels expose both a bottom hem and long open
+    # side edges. Their prototype piping is a hem detail, so keep it on the
+    # lower contour instead of outlining the entire flap. The per-piece band
+    # is measured from that panel's actual lowest vertex; it tolerates the
+    # declared front scoop while excluding the rising opening edges.
+    hem_bands = spec.get("hemOnlyBoundaryRiseMByPiece", {})
+    if not isinstance(hem_bands, dict) or not set(hem_bands).issubset(boundaries):
+        raise ValueError("hemOnlyBoundaryRiseMByPiece must reference trimmed pieces")
+    hem_selection = {}
+    for piece_id, rise in hem_bands.items():
+        if not isinstance(rise, (int, float)) or isinstance(rise, bool) or not math.isfinite(rise) or not 0 < rise <= 0.05:
+            raise ValueError(f"Invalid hem-only boundary rise for {piece_id}")
+        piece_vertices = {
+            vertex
+            for face, owner in zip(mesh["faces"], mesh["facePieceIds"])
+            if owner == piece_id
+            for vertex in face
+        }
+        if not piece_vertices:
+            raise ValueError(f"Hem-only trim piece has no source vertices: {piece_id}")
+        low_z = min(mesh["vertices"][vertex][2] for vertex in piece_vertices)
+        all_boundary_edges = boundaries[piece_id]
+        boundaries[piece_id] = {
+            edge
+            for edge in all_boundary_edges
+            if max(mesh["vertices"][vertex][2] for vertex in edge) <= low_z + rise
+        }
+        if not boundaries[piece_id]:
+            raise ValueError(f"Hem-only trim selection removed every boundary edge: {piece_id}")
+        hem_selection[piece_id] = {
+            "method": "lower-contour-height-band",
+            "pieceMinimumZM": low_z,
+            "maximumRiseM": float(rise),
+            "availableBoundaryEdgeCount": len(all_boundary_edges),
+            "selectedBoundaryEdgeCount": len(boundaries[piece_id]),
+            "excludedBoundaryEdgeCount": len(all_boundary_edges) - len(boundaries[piece_id]),
+            "grantsVisualAcceptance": False,
+        }
+
     material = bpy.data.materials.new(str(spec.get("name", "lilac-edge-trim-prototype")))
     material.use_nodes = True
     shader = material.node_tree.nodes.get("Principled BSDF")
@@ -341,6 +380,7 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
             "polylineCount": len(chains),
             "meshVertexCount": len(trim.data.vertices),
             "bindingMethod": "canonical-sewn-edge-interpolation",
+            "hemOnlySelection": hem_selection.get(piece_id),
             "grantsFitAcceptance": False,
         }
     return {
