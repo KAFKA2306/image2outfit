@@ -388,66 +388,100 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
     shader.inputs["Metallic"].default_value = float(spec.get("metallic", 0.0))
     material["evidenceBoundary"] = spec.get("evidenceBoundary", "Prototype visual hypothesis; not approved trim or fit.")
 
-    audits = {}
+    # Build one graph over all selected skirt hem edges. The old per-piece
+    # curves ended at each panel seam, leaving six capped/tapered endpoints at
+    # what should read as one continuous hem. Canonical sewn vertex IDs join
+    # adjacent panel endpoints without spatially guessing or welding nearby
+    # but unrelated surfaces.
+    edge_owners = {}
     for piece_id, edges in boundaries.items():
-        if not edges:
-            audits[piece_id] = {"boundaryEdgeCount": 0, "polylineCount": 0}
-            continue
-        adjacency = {}
-        remaining = set(edges)
-        for first, second in edges:
-            adjacency.setdefault(first, set()).add(second)
-            adjacency.setdefault(second, set()).add(first)
-        chains = []
-        while remaining:
-            degrees = {vertex: sum(tuple(sorted((vertex, other))) in remaining for other in neighbors)
-                       for vertex, neighbors in adjacency.items()}
-            endpoints = sorted(vertex for vertex, degree in degrees.items() if degree == 1)
-            start = endpoints[0] if endpoints else min(min(edge) for edge in remaining)
-            chain = [start]
-            current = start
-            while True:
-                choices = sorted(other for other in adjacency.get(current, ())
-                                 if tuple(sorted((current, other))) in remaining)
-                if not choices:
-                    break
-                following = choices[0]
-                remaining.remove(tuple(sorted((current, following))))
-                chain.append(following)
-                current = following
-                if current == start:
-                    break
-            if len(chain) >= 2:
-                chains.append(chain)
+        for edge in edges:
+            edge_owners.setdefault(tuple(sorted(edge)), set()).add(piece_id)
+    adjacency = {}
+    for first, second in edge_owners:
+        adjacency.setdefault(first, set()).add(second)
+        adjacency.setdefault(second, set()).add(first)
+    remaining = set(edge_owners)
+    chains = []
+    while remaining:
+        degrees = {
+            vertex: sum(tuple(sorted((vertex, other))) in remaining for other in neighbors)
+            for vertex, neighbors in adjacency.items()
+        }
+        endpoints = sorted(vertex for vertex, degree in degrees.items() if degree == 1)
+        start = endpoints[0] if endpoints else min(min(edge) for edge in remaining)
+        chain = [start]
+        chain_edges = []
+        current = start
+        while True:
+            choices = sorted(
+                other for other in adjacency.get(current, ())
+                if tuple(sorted((current, other))) in remaining
+            )
+            if not choices:
+                break
+            following = choices[0]
+            edge = tuple(sorted((current, following)))
+            remaining.remove(edge)
+            chain_edges.append(edge)
+            chain.append(following)
+            current = following
+            if current == start:
+                break
+        if len(chain) >= 2:
+            chains.append((chain, chain_edges))
 
-        curve = bpy.data.curves.new(f"{job['id']}-{piece_id}-prototype-piping", "CURVE")
+    audits = {
+        piece_id: {
+            "boundaryEdgeCount": len(edges),
+            "selectedBoundaryEdgeCount": len(edges),
+            "polylineCount": 0,
+            "joinedHemCornerEndpointCount": 0,
+            "meshVertexCount": 0,
+            "bindingMethod": "canonical-sewn-edge-interpolation",
+            "canonicalEdgeRole": edge_roles.get(piece_id),
+            "endpointInsetM": float(endpoint_insets.get(piece_id, 0.0)),
+            "endpointTaperM": float(endpoint_tapers.get(piece_id, 0.0)),
+            "grantsFitAcceptance": False,
+        }
+        for piece_id, edges in boundaries.items()
+    }
+    for chain, chain_edges in chains:
+        chain_piece_ids = sorted({
+            piece_id for edge in chain_edges for piece_id in edge_owners[edge]
+        })
+        piece_id = chain_piece_ids[0]
+        curve = bpy.data.curves.new(
+            f"{job['id']}-{'-'.join(chain_piece_ids)}-joined-prototype-piping", "CURVE"
+        )
         curve.dimensions = "3D"
         curve.resolution_u = 1
         curve.bevel_depth = radius
         curve.bevel_resolution = 2
         curve.use_fill_caps = True
-        endpoint_inset = float(endpoint_insets.get(piece_id, 0.0))
+        from mathutils import Vector
+        points = [Vector(mesh["vertices"][vertex_index]) for vertex_index in chain]
+        endpoint_inset = max(float(endpoint_insets.get(owner, 0.0)) for owner in chain_piece_ids)
+        endpoint_taper = max(float(endpoint_tapers.get(owner, 0.0)) for owner in chain_piece_ids)
         if not math.isfinite(endpoint_inset) or not 0 <= endpoint_inset <= 0.02:
-            raise ValueError(f"Invalid prototype trim endpoint inset for {piece_id}")
-        endpoint_taper = float(endpoint_tapers.get(piece_id, 0.0))
+            raise ValueError(f"Invalid prototype trim endpoint inset for {chain_piece_ids}")
         if not math.isfinite(endpoint_taper) or not 0 <= endpoint_taper <= 0.05:
-            raise ValueError(f"Invalid prototype trim endpoint taper for {piece_id}")
-        for chain in chains:
-            from mathutils import Vector
-            points = [Vector(mesh["vertices"][vertex_index]) for vertex_index in chain]
-            points = inset_polyline(points, endpoint_inset)
-            spline = curve.splines.new("POLY")
-            spline.points.add(len(points) - 1)
-            chain_distances = [0.0]
-            for first, second in zip(points, points[1:]):
-                chain_distances.append(chain_distances[-1] + (second - first).length)
-            chain_length = chain_distances[-1]
-            for point, coordinate in zip(spline.points, points):
-                point.co = (*coordinate, 1)
-            if endpoint_taper > 0:
-                for point, distance in zip(spline.points, chain_distances):
-                    point.radius = min(1.0, distance / endpoint_taper,
-                                       (chain_length - distance) / endpoint_taper)
+            raise ValueError(f"Invalid prototype trim endpoint taper for {chain_piece_ids}")
+        points = inset_polyline(points, endpoint_inset)
+        spline = curve.splines.new("POLY")
+        spline.points.add(len(points) - 1)
+        chain_distances = [0.0]
+        for first, second in zip(points, points[1:]):
+            chain_distances.append(chain_distances[-1] + (second - first).length)
+        chain_length = chain_distances[-1]
+        for point, coordinate in zip(spline.points, points):
+            point.co = (*coordinate, 1)
+        closed_chain = chain[0] == chain[-1]
+        spline.use_cyclic_u = False  # repeated canonical endpoint closes the polyline exactly
+        if endpoint_taper > 0 and not closed_chain:
+            for point, distance in zip(spline.points, chain_distances):
+                point.radius = min(1.0, distance / endpoint_taper,
+                                   (chain_length - distance) / endpoint_taper)
         trim = bpy.data.objects.new(f"{job['id']}-prototype-piping-{piece_id}", curve)
         bpy.context.collection.objects.link(trim)
         trim.data.materials.append(material)
@@ -466,35 +500,43 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         # Independent nearest-body weights can detach trim from its cloth surface.
         from mathutils import Vector
         bindings = []
-        segments = [(a, b, Vector(mesh["vertices"][a]), Vector(mesh["vertices"][b]))
-                    for a, b in sorted(edges)]
+        segments = [
+            (a, b, owner, Vector(mesh["vertices"][a]), Vector(mesh["vertices"][b]))
+            for a, b in chain_edges
+            for owner in sorted(edge_owners[(a, b)])
+        ]
         for vertex in trim.data.vertices:
             best = None
-            for a, b, first, second in segments:
+            for a, b, owner, first, second in segments:
                 direction = second - first
                 if direction.length_squared <= 1e-16:
                     raise ValueError("Prototype piping contains a zero-length source edge")
                 fraction = max(0.0, min(1.0, (vertex.co-first).dot(direction)/direction.length_squared))
                 offset = vertex.co - first.lerp(second, fraction)
-                record = (offset.length_squared, a, b, fraction, list(offset), list(direction))
+                record = (offset.length_squared, a, b, owner, fraction, list(offset), list(direction))
                 if best is None or record[0] < best[0]:
                     best = record
-            bindings.append({"first": best[1], "second": best[2], "fraction": best[3],
-                             "restOffset": best[4], "restDirection": best[5]})
+            bindings.append({"first": best[1], "second": best[2], "pieceId": best[3],
+                             "fraction": best[4], "restOffset": best[5],
+                             "restDirection": best[6]})
         trim["prototypeTrimBindings"] = json.dumps(bindings)
         trim["prototypeTrimPieceId"] = piece_id
+        trim["prototypeTrimPieceIds"] = json.dumps(chain_piece_ids)
         trim.select_set(False)
-        audits[piece_id] = {
-            "boundaryEdgeCount": len(edges),
-            "selectedBoundaryEdgeCount": len(boundaries[piece_id]),
-            "polylineCount": len(chains),
-            "meshVertexCount": len(trim.data.vertices),
-            "bindingMethod": "canonical-sewn-edge-interpolation",
-            "canonicalEdgeRole": edge_roles.get(piece_id),
-            "endpointInsetM": endpoint_inset,
-            "endpointTaperM": endpoint_taper,
-            "grantsFitAcceptance": False,
-        }
+        for owner in chain_piece_ids:
+            audits[owner]["polylineCount"] += 1
+            audits[owner]["meshVertexCount"] += len(trim.data.vertices)
+        joined_corner_count = sum(
+            1 for first_owners, second_owners in zip(
+                [edge_owners[edge] for edge in chain_edges],
+                [edge_owners[edge] for edge in chain_edges[1:]]
+            ) if first_owners != second_owners
+        )
+        if closed_chain and len(chain_edges) > 1:
+            joined_corner_count += int(edge_owners[chain_edges[-1]] != edge_owners[chain_edges[0]])
+        if joined_corner_count:
+            for owner in chain_piece_ids:
+                audits[owner]["joinedHemCornerEndpointCount"] += joined_corner_count
     return {
         "applied": True,
         "materialName": material.name,

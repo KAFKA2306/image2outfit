@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V103 retains canonical hem-role selection and removes the blunt pipe endpoint at each skirt corner by tapering the trim to zero radius at the original hem endpoints. It is a disposable appearance hypothesis only.",
-  "designRevision": "v103-tapered-skirt-hem-trim-20261029",
+  "target": "V104 joins canonical sewn hem edges across adjacent skirt panels into continuous piping chains and raises the overskirt cloth bending stiffness from 10 to 20 to test whether the visible side/rear corrugation is simulation-driven. These are disposable appearance hypotheses only.",
+  "designRevision": "v104-joined-hem-stiffer-overskirt-20261029",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -158,8 +158,8 @@
       ]
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V26 runs the same bounded neutral cloth trial on V76 revised skirt panels; fitted-shorts coverage, seated behavior, fit, shape-key response, motion and fabric calibration remain unverified.",
-    "reason": "V78 holds the V77 mesh and cloth inputs constant while testing a higher shorts hem-to-thigh weight and narrower inner-thigh transition. The V77 pose diagnostic measured 100% upper-thigh coverage in neutral but 16% in sit for the under-shorts layer. This is a controlled prototype weight hypothesis only; direct pose renders and review must determine whether it reduces exposed thigh without creating collisions or deformation artifacts.",
+      "evidence": "V104 compares a stiffer pleated-overskirt cloth solve against the V103 sewn panels and authored folds. The generated surface remains an unfit prototype; shorts coverage, seated behavior, fit, shape-key response, motion and fabric calibration remain unverified.",
+    "reason": "V103 direct inspection still showed dense side/rear corrugation after the V101 six-iteration, 0.32 interior fairing pass with bending stiffness 10. Test stiffness 20 as a source-level change to reduce cloth-driven transverse wrinkling while leaving the panel mesh, pins, gravity and fairing constant. This is a controlled prototype material/geometry hypothesis, not calibrated fabric behavior or appearance acceptance.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
@@ -167,9 +167,9 @@
         "evidenceBoundary": "One neutral 48-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness."
       },
       "pleated-overskirt": {
-        "stiffness": 10,
-        "reason": "V13 at stiffness 20 retained a broad fan and V14 at stiffness 4 collapsed into coarse uneven facets. Compare a middle stiffness value on the panel-local fold geometry; this is a local prototype hypothesis, not fabric calibration, fit, or appearance approval.",
-        "evidenceBoundary": "One neutral 48-frame trial on the V76 shallow single-pleat panel hypothesis. This parameter trial does not establish garment fit, pose coverage, motion, material behavior, appearance approval or release readiness."
+        "stiffness": 20,
+        "reason": "V103 direct inspection shows repeated narrow corrugation despite stiffness 10 and stronger fairing. Re-test the previously observed stiffness-20 broad-fan response on the current V103 panel geometry to compare whether the real cloth solve suppresses narrow ridges; this is a local prototype hypothesis, not fabric calibration, fit, or appearance approval.",
+        "evidenceBoundary": "One neutral 48-frame trial at bending stiffness 20 on the current V103 sewn overskirt panels, with panel mesh, pins, gravity and post-bake fairing held fixed. It does not establish garment fit, pose coverage, motion, material behavior, appearance approval or release readiness."
       }
     },
     "prototypePostBakeLaplacianSmoothing": {

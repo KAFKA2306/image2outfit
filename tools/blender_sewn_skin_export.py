@@ -1971,12 +1971,14 @@ def main():
     trim_audits = {}
     for obj in trim_objects:
         bindings = json.loads(obj["prototypeTrimBindings"])
-        piece = obj["prototypeTrimPieceId"]
         if len(bindings) != len(obj.data.vertices):
             raise ValueError(f"Trim binding count changed: {obj.name}")
         raw, displacements = {}, []
         inverse = obj.matrix_world.inverted()
         for vertex, binding in zip(obj.data.vertices, bindings):
+            piece = binding.get("pieceId")
+            if not isinstance(piece, str) or not piece:
+                raise ValueError(f"Trim binding is missing its canonical piece owner: {obj.name}")
             first_key = (binding["first"], piece)
             second_key = (binding["second"], piece)
             if first_key not in edge_sources or second_key not in edge_sources:
