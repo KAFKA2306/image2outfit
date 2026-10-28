@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V94 keeps the clipped V93 thigh shell and tests a shorter overskirt: hem extension 0.04 m instead of 0.08 m, forward apron extension 0.015 m instead of 0.06 m, forward projection 0.01 m instead of 0.04 m, and 3 radial crease cuts instead of 6. This tests the observed sharp flaps and hanging fabric while reducing repeated side ridges. No skin-weight or release acceptance is implied; UV, fit and runtime remain unapproved.",
-  "designRevision": "v94-shorter-apron-fewer-side-creases-20261029",
+  "target": "V95 keeps the V94 skirt geometry but reduces the overskirt lateral hem thigh-weight maximum from 0.45 to 0.25, keeping the hips dominant across side and under-seat panels; edge trim inherits the settled panel weights. This directly tests whether excessive thigh follow drives angular pose flaps. It is prototype evidence only; UV, fit, appearance, collision and runtime remain unapproved.",
+  "designRevision": "v95-hip-anchored-side-and-underseat-panels-20261029",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -239,15 +239,15 @@
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
         "waistThighWeight": 0,
-        "hemThighWeight": 0.42,
+        "hemThighWeight": 0.22,
         "forwardHemThighWeight": 0.06,
         "centerlineHemThighWeight": 0.08,
-        "maximumThighWeight": 0.45,
+        "maximumThighWeight": 0.25,
         "forwardCenterYM": -0.03788188099861145,
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.075,
         "fullSideWeightWidthM": 0.135,
-        "evidenceBoundary": "V80 reduces lateral thigh follow from 0.72 to 0.42 (0.45 cap) with 0.06 anterior and 0.08 centerline targets so the overskirt stays more pelvis-led as the legs raise. It tests skirt panel lift and side-fold behavior only; no fit, collision, cloth calibration, appearance or release acceptance is implied."
+        "evidenceBoundary": "V95 preserves the panel-balanced hem weight profile but lowers the overskirt hem thigh influence to 0.22 with a 0.25 cap; the anterior target remains 0.06 and the bilateral centerline target 0.08. Edge trim inherits these settled panel weights. This tests side/under-seat pose behavior, with no fit, collision, cloth calibration, appearance or release acceptance implied."
       }
     },
     {
