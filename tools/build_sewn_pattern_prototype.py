@@ -249,44 +249,33 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         if len(adjacent_owners) == 1 and adjacent_owners[0] in boundaries:
             boundaries[adjacent_owners[0]].add(edge)
 
-    # Some overlapping skirt panels expose both a bottom hem and long open
-    # side edges. Their prototype piping is a hem detail, so keep it on the
-    # lower contour instead of outlining the entire flap. The per-piece band
-    # is measured from that panel's actual lowest vertex; it tolerates the
-    # declared front scoop while excluding the rising opening edges.
-    hem_bands = spec.get("hemOnlyBoundaryRiseMByPiece", {})
-    if not isinstance(hem_bands, dict) or not set(hem_bands).issubset(boundaries):
-        raise ValueError("hemOnlyBoundaryRiseMByPiece must reference trimmed pieces")
-    hem_selection = {}
-    for piece_id, rise in hem_bands.items():
-        if not isinstance(rise, (int, float)) or isinstance(rise, bool) or not math.isfinite(rise) or not 0 < rise <= 0.05:
-            raise ValueError(f"Invalid hem-only boundary rise for {piece_id}")
-        piece_vertices = {
-            vertex
-            for face, owner in zip(mesh["faces"], mesh["facePieceIds"])
-            if owner == piece_id
-            for vertex in face
-        }
-        if not piece_vertices:
-            raise ValueError(f"Hem-only trim piece has no source vertices: {piece_id}")
-        low_z = min(mesh["vertices"][vertex][2] for vertex in piece_vertices)
-        all_boundary_edges = boundaries[piece_id]
-        boundaries[piece_id] = {
-            edge
-            for edge in all_boundary_edges
-            if max(mesh["vertices"][vertex][2] for vertex in edge) <= low_z + rise
-        }
-        if not boundaries[piece_id]:
-            raise ValueError(f"Hem-only trim selection removed every boundary edge: {piece_id}")
-        hem_selection[piece_id] = {
-            "method": "lower-contour-height-band",
-            "pieceMinimumZM": low_z,
-            "maximumRiseM": float(rise),
-            "availableBoundaryEdgeCount": len(all_boundary_edges),
-            "selectedBoundaryEdgeCount": len(boundaries[piece_id]),
-            "excludedBoundaryEdgeCount": len(all_boundary_edges) - len(boundaries[piece_id]),
-            "grantsVisualAcceptance": False,
-        }
+    endpoint_insets = spec.get("endpointInsetMByPiece", {})
+    if not isinstance(endpoint_insets, dict) or not set(endpoint_insets).issubset(boundaries):
+        raise ValueError("endpointInsetMByPiece must reference trimmed pieces")
+    def inset_polyline(points, distance):
+        if distance <= 0:
+            return points
+        lengths = [(second - first).length for first, second in zip(points, points[1:])]
+        total = sum(lengths)
+        if len(points) < 2 or total <= 2 * distance:
+            raise ValueError("Prototype trim endpoint inset consumes the source hem")
+
+        def sample(target):
+            for index, length in enumerate(lengths):
+                if target <= length or index == len(lengths) - 1:
+                    fraction = target / length if length > 0 else 0
+                    return points[index].lerp(points[index + 1], fraction)
+                target -= length
+            return points[-1]
+
+        kept = [sample(distance)]
+        traversed = 0.0
+        for index, length in enumerate(lengths):
+            traversed += length
+            if distance < traversed < total - distance:
+                kept.append(points[index + 1])
+        kept.append(sample(total - distance))
+        return kept
 
     material = bpy.data.materials.new(str(spec.get("name", "lilac-edge-trim-prototype")))
     material.use_nodes = True
@@ -334,11 +323,17 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         curve.bevel_depth = radius
         curve.bevel_resolution = 2
         curve.use_fill_caps = True
+        endpoint_inset = float(endpoint_insets.get(piece_id, 0.0))
+        if not math.isfinite(endpoint_inset) or not 0 <= endpoint_inset <= 0.02:
+            raise ValueError(f"Invalid prototype trim endpoint inset for {piece_id}")
         for chain in chains:
+            from mathutils import Vector
+            points = [Vector(mesh["vertices"][vertex_index]) for vertex_index in chain]
+            points = inset_polyline(points, endpoint_inset)
             spline = curve.splines.new("POLY")
-            spline.points.add(len(chain) - 1)
-            for point, vertex_index in zip(spline.points, chain):
-                point.co = (*mesh["vertices"][vertex_index], 1)
+            spline.points.add(len(points) - 1)
+            for point, coordinate in zip(spline.points, points):
+                point.co = (*coordinate, 1)
         trim = bpy.data.objects.new(f"{job['id']}-prototype-piping-{piece_id}", curve)
         bpy.context.collection.objects.link(trim)
         trim.data.materials.append(material)
@@ -380,7 +375,7 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
             "polylineCount": len(chains),
             "meshVertexCount": len(trim.data.vertices),
             "bindingMethod": "canonical-sewn-edge-interpolation",
-            "hemOnlySelection": hem_selection.get(piece_id),
+            "endpointInsetM": endpoint_inset,
             "grantsFitAcceptance": False,
         }
     return {

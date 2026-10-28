@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v96-front-lap-hem-only-piping-20261028",
+  "revision": "v98-front-lap-piping-endpoint-recess-20261028",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,18 +19,18 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of all eleven current V96 renders and Astra review: piping at both front-lap hem ends still kinks outward into short protruding tips; the hem-only edge filter has not materially improved those terminations.",
       "severity": "BLOCKER",
+      "description": "Direct inspection of all eleven current V98 renders: both front-lap piping terminations still turn outward beyond the hem at the lower corners, including front and side views. The 12 mm endpoint recess has not produced flush endpoints.",
       "code": "FRONT_LAP_PIPING_TERMINATIONS_REMAIN_PROTRUDING"
     },
     {
-      "description": "Neutral, side, rear and three-quarter views retain dense horizontal ridging along the overskirt sides. Crouch and sit retain angular panel overlaps and bunching around and behind the raised thighs; the skirt silhouette is still visibly stiff and broken rather than a continuous drape.",
       "severity": "BLOCKER",
+      "description": "Neutral, rear, side and three-quarter renders still show dense transverse ridges and pinching along both overskirt sides. Crouch and sit retain stiff angular panel overlap near the hips and raised thighs; the new endpoint inset does not address this independent drape issue.",
       "code": "OVERSKIRT_SIDE_AND_POSE_DRAPE_REMAINS_ANGULAR"
     },
     {
-      "description": "The garment remains a prototype. Avatar fit, Shape Key response, complete UVs, Unity/VRChat runtime, and release package readiness are unverified; no release gate is satisfied by this visual review.",
       "severity": "BLOCKER",
+      "description": "The previews are prototype render evidence only. Geometry audit reports avatarFitVerified and buildReportPassed false; weight assignment/verification, Shape Key response, complete UV coverage, Unity/VRChat runtime, and release-package readiness remain unverified. No release gate passes.",
       "code": "FIT_AND_RELEASE_GATES_UNVERIFIED"
     }
   ],

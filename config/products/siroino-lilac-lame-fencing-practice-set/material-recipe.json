@@ -33,10 +33,6 @@
       "waistband-front-lap-left",
       "waistband-front-lap-right"
     ],
-    "hemOnlyBoundaryRiseMByPiece": {
-      "overskirt-front-lap-left": 0.016,
-      "overskirt-front-lap-right": 0.016
-    },
     "baseColorLinearRgb": [
       0.48,
       0.32,
@@ -45,7 +41,11 @@
     "roughness": 0.48,
     "metallic": 0.08,
     "bevelRadiusM": 0.0028,
-    "evidenceBoundary": "V96 attempted a 16 mm lower-contour filter on the overlapping front-lap panels, based on the declared 15 mm front scoop. The actual build report measured 23 available and 23 selected boundary edges on both pieces, with 0 excluded; this height criterion did not reduce piping there. The direct V96 review still observes protruding endpoints. This rejected prototype grants no appearance, fit or release acceptance."
+    "evidenceBoundary": "V98 removes V96/V97 boundary filters after both selected all 23 measured edges per front-lap panel. V97s 6 mm setback reduced but did not eliminate protruding piping tips in direct review; this trial retracts both capped piping endpoints 12 mm from their hem corners. Side-panel overlap, fit, pose behavior, appearance and release remain unapproved.",
+    "endpointInsetMByPiece": {
+      "overskirt-front-lap-left": 0.012,
+      "overskirt-front-lap-right": 0.012
+    }
   },
   "prototypeRearWaistTabMaterials": {
     "tab": {
