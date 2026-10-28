@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v102-hem-only-skirt-trim-and-fairing-20261028",
+  "revision": "v103-tapered-skirt-hem-trim-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "OVERSKIRT_SIDE_RIDGING_REMAINS_VISIBLE",
+      "code": "SKIRT_HEM_CORNER_PROJECTIONS_REMAIN_VISIBLE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven V102 renders: six stronger boundary-preserving fairing passes did not remove the repeated transverse corrugation and waist-to-hem pinching visible on both side views and the rear. The overskirt surface remains visibly below acceptance."
+      "description": "Direct inspection of all five neutral views and six pose renders after the V103 hem endpoint taper: angular lavender projections remain at skirt hem corners in the rear and side views. The build report confirms the 12 mm zero-radius taper was applied to all six canonical hem chains, but the rendered corner transitions remain visibly unresolved."
     },
     {
-      "code": "SKIRT_HEM_TRIM_CORNER_TRANSITIONS_UNRESOLVED",
+      "code": "OVERSKIRT_SIDE_AND_REAR_RIDGING_REMAINS_VISIBLE",
       "severity": "BLOCKER",
-      "description": "Restricting trim to canonical hem-role chains and reducing bevel bulk did not eliminate lavender spikes and uneven angular joins at shared hem corners across front, rear, and side views. Endpoint transitions remain visually unresolved."
+      "description": "The left and right silhouettes and rear render retain repeated vertical corrugation and localized pinching from waist to hem. The overskirt surface remains visibly uneven and below appearance acceptance."
     },
     {
       "code": "POSE_DRAPE_AND_RELEASE_GATES_UNVERIFIED",
       "severity": "BLOCKER",
-      "description": "Crouch, sit, and prone renders show the overskirt lifting/folding behind the raised thighs with angular overlaps; the shorts become exposed in crouch/sit. The prototype does not verify avatar fit, calibrated cloth/material response, final skinning/weights, shape-key coverage, Unity/VRChat runtime, or package eligibility."
+      "description": "Crouch, sit, and prone renders show lifted/folded overskirt panels and angular overlaps; shorts are exposed in crouch and sit. Avatar fit, final rig weights and shape-key coverage, Unity/VRChat runtime, and package eligibility remain unverified."
     }
   ],
   "failedGeometryChecks": [

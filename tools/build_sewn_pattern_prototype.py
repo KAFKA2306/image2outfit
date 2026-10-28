@@ -252,6 +252,9 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
     endpoint_insets = spec.get("endpointInsetMByPiece", {})
     if not isinstance(endpoint_insets, dict) or not set(endpoint_insets).issubset(boundaries):
         raise ValueError("endpointInsetMByPiece must reference trimmed pieces")
+    endpoint_tapers = spec.get("endpointTaperMByPiece", {})
+    if not isinstance(endpoint_tapers, dict) or not set(endpoint_tapers).issubset(boundaries):
+        raise ValueError("endpointTaperMByPiece must reference trimmed pieces")
     edge_roles = spec.get("edgeRoleByPiece", {})
     if not isinstance(edge_roles, dict) or not set(edge_roles).issubset(boundaries):
         raise ValueError("edgeRoleByPiece must reference trimmed pieces")
@@ -426,14 +429,25 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         endpoint_inset = float(endpoint_insets.get(piece_id, 0.0))
         if not math.isfinite(endpoint_inset) or not 0 <= endpoint_inset <= 0.02:
             raise ValueError(f"Invalid prototype trim endpoint inset for {piece_id}")
+        endpoint_taper = float(endpoint_tapers.get(piece_id, 0.0))
+        if not math.isfinite(endpoint_taper) or not 0 <= endpoint_taper <= 0.05:
+            raise ValueError(f"Invalid prototype trim endpoint taper for {piece_id}")
         for chain in chains:
             from mathutils import Vector
             points = [Vector(mesh["vertices"][vertex_index]) for vertex_index in chain]
             points = inset_polyline(points, endpoint_inset)
             spline = curve.splines.new("POLY")
             spline.points.add(len(points) - 1)
+            chain_distances = [0.0]
+            for first, second in zip(points, points[1:]):
+                chain_distances.append(chain_distances[-1] + (second - first).length)
+            chain_length = chain_distances[-1]
             for point, coordinate in zip(spline.points, points):
                 point.co = (*coordinate, 1)
+            if endpoint_taper > 0:
+                for point, distance in zip(spline.points, chain_distances):
+                    point.radius = min(1.0, distance / endpoint_taper,
+                                       (chain_length - distance) / endpoint_taper)
         trim = bpy.data.objects.new(f"{job['id']}-prototype-piping-{piece_id}", curve)
         bpy.context.collection.objects.link(trim)
         trim.data.materials.append(material)
@@ -478,6 +492,7 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
             "bindingMethod": "canonical-sewn-edge-interpolation",
             "canonicalEdgeRole": edge_roles.get(piece_id),
             "endpointInsetM": endpoint_inset,
+            "endpointTaperM": endpoint_taper,
             "grantsFitAcceptance": False,
         }
     return {
