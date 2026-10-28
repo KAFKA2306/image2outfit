@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v93-clipped-shell-boundary-loops-20261029",
+  "revision": "v94-shorter-apron-fewer-side-creases-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "OVERSKIRT_POSED_FLAPS_AND_SIDE_RIDGES",
+      "description": "Direct review of the current eleven renders and Astra visual review: shortening reduced the oversized panels, but sit/crouch still show angular side flaps and sharply folded trim with panels hanging below/behind the thighs. Standing side views retain dense horizontal ridges and overlapping pointed hem corners; the hem remains irregular.",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven current renders shows the overskirt side panels forming sharp triangular flaps in sit and crouch, with front/back fabric hanging between the legs. Standing front, back, left, right and three-quarter views retain repeated narrow side ridges and pointed outward hem corners. The V93 shorts shell has a more regular clipped leg opening, but its broad faceted surface remains prototype-quality."
+      "code": "OVERSKIRT_POSED_FLAPS_AND_SIDE_RIDGES"
     },
     {
-      "code": "POSED_THIGH_COVERAGE_REMAINS_INCOMPLETE",
+      "description": "Prototype geometric under-shorts upper-thigh coverage remains 68.6% neutral, 64.2% crouch and 63.8% sit. These values are diagnostic only and do not establish fit or acceptable coverage.",
       "severity": "BLOCKER",
-      "description": "The measured under-shorts upper-thigh coverage is 68.6% neutral, 64.2% crouch and 63.8% sit. These geometric coverage measurements do not establish a sewn garment, fit, collision clearance, or acceptable visual coverage."
+      "code": "POSED_THIGH_COVERAGE_REMAINS_INCOMPLETE"
     },
     {
-      "code": "FIT_AND_RELEASE_GATES_UNVERIFIED",
+      "description": "Avatar fit and Shape Key response, complete UVs, Unity/VRChat runtime, and release package readiness remain unverified. Keep all quality gates unchanged.",
       "severity": "BLOCKER",
-      "description": "The direct render set does not establish avatar fit, shape-key response, UV completion, Unity/VRChat runtime or customer release readiness. Keep all independent quality gates unchanged."
+      "code": "FIT_AND_RELEASE_GATES_UNVERIFIED"
     }
   ],
   "failedGeometryChecks": [

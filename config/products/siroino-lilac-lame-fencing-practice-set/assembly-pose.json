@@ -9663,9 +9663,9 @@
     ],
     "waistZM": 0.7395782470703125,
     "sourceHemZM": 0.5795782470703125,
-    "hemZM": 0.45957824707,
-    "hemExtensionM": 0.08,
-    "foldCount": 6,
+    "hemZM": 0.5395782470703124,
+    "hemExtensionM": 0.04,
+    "foldCount": 3,
     "topologySubdivisionFactor": 1,
     "hemFoldDepthM": 0.0008,
     "phaseRadians": 0,
@@ -9677,8 +9677,8 @@
         "overskirt-front-lap-left",
         "overskirt-front-lap-right"
       ],
-      "additionalExtensionM": 0.06,
-      "forwardProjectionM": 0.04,
+      "additionalExtensionM": 0.015,
+      "forwardProjectionM": 0.01,
       "fullExtensionHalfAngleRadians": 0.65,
       "zeroExtensionHalfAngleRadians": 1.3,
       "axisOriginBlenderXYM": [
@@ -9687,7 +9687,7 @@
       ],
       "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
     },
-    "evidenceBoundary": "V82 increases only the front/lap panel continuation and its side fade for seated anterior coverage. Fitted shorts, shared rear length, stitch graph, folds and weight fields remain unchanged; no visual, fit or release acceptance is implied.",
+    "evidenceBoundary": "V94 shortens the sewn overskirt to a 40 mm extension, limits the front apron addition to 15 mm and projection to 10 mm, and reduces crease planes to three. It tests the observed angular side ridges and pointed pose flaps. Panel skin weights, pose deformation, fit, collision, appearance, UV and release remain unapproved.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9743,7 +9743,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v93-clipped-shell-boundary-loops-20261029",
+  "designRevision": "v94-shorter-apron-fewer-side-creases-20261029",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
