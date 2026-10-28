@@ -8921,7 +8921,7 @@
         ],
         "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
       },
-      "evidenceBoundary": "V95 retains the shortened V94 overskirt geometry and changes only the construction weight profile: side/back hem thigh influence is lowered to 0.22 and capped at 0.25, while integrated trim inherits panel weights. Pose behavior remains a prototype hypothesis; fit, collision, appearance, UV and release remain unapproved.",
+      "evidenceBoundary": "V101 retains the V100 sewn panel layout and tests a broader, shallower box-pleat surface profile: valley half-width fraction 0.30 (from 0.22) and recessed depth ratio 0.02 (from 0.06), with authored fold count and panel boundaries unchanged. This changes actual panel displacement before cloth simulation; it is an uncalibrated geometry hypothesis, not fit, fabric, or visual acceptance.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8930,8 +8930,8 @@
         "waistband-front-lap-left",
         "waistband-front-lap-right"
       ],
-      "foldValleyHalfWidthFraction": 0.22,
-      "foldValleyDepthRatio": 0.06
+      "foldValleyHalfWidthFraction": 0.3,
+      "foldValleyDepthRatio": 0.02
     },
     "effectiveHeightRangeZM": [
       0.5245782208442687,
@@ -8940,10 +8940,10 @@
     "extensionBelowDeclaredPleatHemM": 0.015000026226043683,
     "selectedVertexCount": 8422,
     "movedVertexCount": 8354,
-    "maximumRadialDisplacementM": 0.0007957341110432369,
-    "minimumTriangleAreaM2": 2.887784290135361e-12,
+    "maximumRadialDisplacementM": 0.0007920460081498745,
+    "minimumTriangleAreaM2": 2.887646420508644e-12,
     "beforeVerticesSha256": "0d4b4ce7eb6dac2defceeab06af23da2831bd8369dfac614af63f0ff1ab9c8b9",
-    "afterVerticesSha256": "811f984329547e7f3a1dde0996b5a8430a76278708d5869f154f19c1c56c3aea",
+    "afterVerticesSha256": "279469f9c03e523f1e26ba1814ecea80606882355e3161902642d23cb61459c1",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "panelAngularRangesRadians": {},
@@ -8971,9 +8971,9 @@
     },
     "maximumNearestSurfaceDistanceM": 0.007790741045027971,
     "maximumRestDisplacementM": 0.0045482595427490755,
-    "minimumTriangleAreaM2": 2.887784290135361e-12,
-    "beforeVerticesSha256": "811f984329547e7f3a1dde0996b5a8430a76278708d5869f154f19c1c56c3aea",
-    "afterVerticesSha256": "742d3f0c4b7a0e1632891d402b0cfe8a0d1dbc781075c5930200f028d8a85231",
+    "minimumTriangleAreaM2": 2.887646420508644e-12,
+    "beforeVerticesSha256": "279469f9c03e523f1e26ba1814ecea80606882355e3161902642d23cb61459c1",
+    "afterVerticesSha256": "aaf7ba4b4151ae4074133baa421eb964d113b1864257a964a2bb68ad3a3b82eb",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false
@@ -9229,7 +9229,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "3c6ef8fba4c55add9b85c4f48b7ebcab8f9910a4b2aead06708d5eceaf457c92",
+    "privateSimulationSourceSha256": "ed504301b6e5a09aaf9e5615ad5e1fec9e9d672ffe299646145e8b793ea3c233",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -10445,7 +10445,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "e642621dd3eabcbcb4b988fdddf716faf3a78f33324cfd1d73b6becfb96d9cdd",
+  "sourceBlendSha256": "5b7a87e5c148b9e292a595502449d2efceb8599bff352ef501e8406ebe551ad0",
   "sewnMeshSha256": "cd2f6c90478f0e7c2ed3dab6072de9f9a9a9f4b424e4ab6a3d3234c401c8fdf9",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -10454,81 +10454,81 @@
     "weldCount": 8,
     "welds": [
       {
-        "maximumInputEdgeDistanceM": 7.5023943090851e-06,
+        "maximumInputEdgeDistanceM": 7.502746684124906e-06,
         "triangleCoordinatesM": [
           [
-            -0.08462335169315338,
-            0.05787478759884834,
+            -0.08461139351129532,
+            0.05786126106977463,
             0.6995782256126404
           ],
           [
-            -0.08461656421422958,
-            0.05787865072488785,
+            -0.08460459113121033,
+            0.057865094393491745,
             0.6995782256126404
           ],
           [
-            -0.08462610840797424,
-            0.05787455663084984,
+            -0.08461415022611618,
+            0.05786101892590523,
             0.6995712518692017
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 7.809840775463886e-06,
+        "maximumInputEdgeDistanceM": 7.808120487089222e-06,
         "triangleCoordinatesM": [
           [
-            -0.08453965187072754,
-            0.057922352105379105,
+            -0.08452741801738739,
+            0.05790848284959793,
             0.6995782256126404
           ],
           [
-            -0.08462335169315338,
-            0.05787478759884834,
+            -0.08461139351129532,
+            0.05786126106977463,
             0.6995782256126404
           ],
           [
-            -0.08461656421422958,
-            0.05787865072488785,
+            -0.08460459113121033,
+            0.057865094393491745,
             0.6995782256126404
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 2.0202617143029343e-06,
+        "maximumInputEdgeDistanceM": 2.0168103766391095e-06,
         "triangleCoordinatesM": [
           [
-            0.10058388859033585,
-            0.08673293888568878,
+            0.10046617686748505,
+            0.08658710867166519,
             0.5555782318115234
           ],
           [
-            0.10058067739009857,
-            0.08673553168773651,
+            0.10046297311782837,
+            0.08658970147371292,
             0.5555782318115234
           ],
           [
-            0.10058294981718063,
-            0.08673299103975296,
+            0.10046524554491043,
+            0.08658716082572937,
             0.5555800199508667
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 2.5591524248108064e-06,
+        "maximumInputEdgeDistanceM": 2.557538631119651e-06,
         "triangleCoordinatesM": [
           [
-            0.05343826487660408,
-            0.06410063803195953,
+            0.05343571677803993,
+            0.06409577280282974,
             0.7155781984329224
           ],
           [
-            0.05343668907880783,
-            0.06410139799118042,
+            0.05343414098024368,
+            0.06409654021263123,
             0.7155759334564209
           ],
           [
-            0.05343557894229889,
-            0.0641009658575058,
+            0.05343303456902504,
+            0.0640961080789566,
             0.7155781984329224
           ]
         ]
@@ -10537,78 +10537,78 @@
         "maximumInputEdgeDistanceM": 2.2427639896240846e-06,
         "triangleCoordinatesM": [
           [
-            0.12879756093025208,
-            0.03647942841053009,
+            0.12881682813167572,
+            0.0364905521273613,
             0.5900916457176208
           ],
           [
-            0.12879812717437744,
-            0.036479752510786057,
+            0.1288173943758011,
+            0.036490876227617264,
             0.5900894999504089
           ],
           [
-            0.12879624962806702,
-            0.036481939256191254,
+            0.12881551682949066,
+            0.03649306669831276,
             0.5900915265083313
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 2.835149063001338e-06,
+        "maximumInputEdgeDistanceM": 2.838448756837105e-06,
         "triangleCoordinatesM": [
           [
-            0.12879756093025208,
-            0.03647942841053009,
+            0.12881682813167572,
+            0.0364905521273613,
             0.5900916457176208
           ],
           [
-            0.12879624962806702,
-            0.036481939256191254,
+            0.12881551682949066,
+            0.03649306669831276,
             0.5900915265083313
           ],
           [
-            0.12879550457000732,
-            0.03647824376821518,
+            0.12881477177143097,
+            0.03648936748504639,
             0.5900992155075073
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 9.166636767034842e-06,
+        "maximumInputEdgeDistanceM": 9.170600176297323e-06,
         "triangleCoordinatesM": [
           [
-            0.12119031697511673,
-            -0.03933074325323105,
+            0.1211620345711708,
+            -0.03933040425181389,
             0.7075782418251038
           ],
           [
-            0.1211906373500824,
-            -0.03933877870440483,
+            0.12116234749555588,
+            -0.03933843970298767,
             0.7075698971748352
           ],
           [
-            0.12119337171316147,
-            -0.03932210057973862,
+            0.12116511166095734,
+            -0.039321765303611755,
             0.7075782418251038
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 7.698991766317828e-06,
+        "maximumInputEdgeDistanceM": 7.699377501526436e-06,
         "triangleCoordinatesM": [
           [
-            0.039066217839717865,
-            0.0665513351559639,
+            0.039056774228811264,
+            0.06652609258890152,
             0.7075854539871216
           ],
           [
-            0.03907424956560135,
-            0.0665527731180191,
+            0.03906480595469475,
+            0.06652753055095673,
             0.7075782418251038
           ],
           [
-            0.03906373679637909,
-            0.06655238568782806,
+            0.03905428573489189,
+            0.06652712821960449,
             0.7075782418251038
           ]
         ]

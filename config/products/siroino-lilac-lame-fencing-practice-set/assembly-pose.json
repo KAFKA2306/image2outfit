@@ -9687,7 +9687,7 @@
       ],
       "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
     },
-    "evidenceBoundary": "V95 retains the shortened V94 overskirt geometry and changes only the construction weight profile: side/back hem thigh influence is lowered to 0.22 and capped at 0.25, while integrated trim inherits panel weights. Pose behavior remains a prototype hypothesis; fit, collision, appearance, UV and release remain unapproved.",
+    "evidenceBoundary": "V101 retains the V100 sewn panel layout and tests a broader, shallower box-pleat surface profile: valley half-width fraction 0.30 (from 0.22) and recessed depth ratio 0.02 (from 0.06), with authored fold count and panel boundaries unchanged. This changes actual panel displacement before cloth simulation; it is an uncalibrated geometry hypothesis, not fit, fabric, or visual acceptance.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9696,8 +9696,8 @@
       "waistband-front-lap-left",
       "waistband-front-lap-right"
     ],
-    "foldValleyHalfWidthFraction": 0.22,
-    "foldValleyDepthRatio": 0.06
+    "foldValleyHalfWidthFraction": 0.30,
+    "foldValleyDepthRatio": 0.02
   },
   "skirtFlareDesignEvidence": {
     "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
@@ -9743,7 +9743,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v95-hip-anchored-side-and-underseat-panels-20261029",
+  "designRevision": "v101-softened-overskirt-box-pleat-profile-20261028",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

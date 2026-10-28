@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Stop adjusting only the front-lap piping. Change the overskirt panel geometry/deformation source so its side surface no longer collapses into stacked transverse ridges, and redesign panel-edge trim joins so all adjacent hem paths terminate flush at shared corners. Then regenerate the 3D source and all eleven views; inspect side, crouch, sit, and front/rear corners directly. Keep the candidate rejected until visual quality and all required fit, skinning, shape-key, UV, runtime, and package evidence pass.",
+    "nextAction": "V102 must resolve the shared hem-corner endpoints across adjacent panel paths and reduce the remaining side/rear surface corrugation in the actual overskirt geometry or deformation input. Rebuild from the canonical checkpoint, inspect all five views and six poses directly, and keep the candidate rejected until visual quality and the unverified fit, rig/weight, shape-key, UV, runtime, and release gates are evidenced.",
     "lastAttempt": {
-      "runId": "f804f7ed3f014f1a84986fad960220ea",
+      "runId": "ee83f980527b468a8aa2950bc3e1fa28",
       "status": "EXECUTED",
-      "checkedAt": "2026-10-28T12:27:13Z",
+      "checkedAt": "2026-10-28T16:11:41Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "7022fc62bb7a6505fbadae535c7698bc99e41b4164de70b77f6496a2f5339afd",
+      "stageEvidenceSha256": "d19ca0b9c93512788bde318e164c7e1f6762f8f5540cd3ae3f231f6a396f7099",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -75,53 +75,53 @@
         },
         "initialize-3d": {
           "status": "REUSED",
-          "stageResultSha256": "3c95aa94d55bb60d55718795780cdbe75d486370cf3a147fb6216e8b5ab842e5"
+          "stageResultSha256": "97d57723faa4b88a9fbeb3d64c1ad287def83daadd4bbb77945f0ee47b5d9454"
         },
         "build-blender": {
           "status": "REUSED",
-          "stageResultSha256": "e56969c9ca6ba50b32562ac312812a26b32576a702526ba7dc6866e647aaab71"
+          "stageResultSha256": "3b2e6dbb84cd3786627fb5a3dbef7269c05adc7510c5b773549fc5e73b714963"
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "1bd1d719d9eab9288196fb1e56c3415a0ff2ed87a494750d1ef891eb0c7d73d2"
+          "stageResultSha256": "0706a95a5495f728d4a4f0c3cfcf28ffb8de65a0ec38dd2b69a6d1e195116e21"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "3169fcf7dc863b69c3b05c21a237ba5229eab029da491c92bfa8ceb2e01be14a"
+          "stageResultSha256": "8d0dc51ccfc4f4999077281fdea0c3db3d8d89e1a9ab165524dbb0aca533886a"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "d7b963a77a835d042fc6e54da2de6d6abdc8c95837add68447c7c2b05a294fc1"
+          "stageResultSha256": "1e1c2334b650cc1cff4d26b3d10a1bdcc929c2445d295c93581440bd71e3815e"
         },
         "audit-geometry": {
           "status": "REUSED",
-          "stageResultSha256": "f56d242d46c37d55c8e9d2a5229a4c5dcff0a0139b29cc6d96b0d6f5093f8768"
+          "stageResultSha256": "845e8e6c5070a5771ae15a49a6d57ddf2cb162dcf33653a6b59916bdc5aef274"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "c2edf0a2a5d9ab22f6e276525464f4e66ed07a4cef1dc6789909b952a517fced"
+          "stageResultSha256": "98d9e98f18b26a7477ebcd234ed499eb55402f9eebd83748eb9931887a0d7138"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "7022fc62bb7a6505fbadae535c7698bc99e41b4164de70b77f6496a2f5339afd"
+          "stageResultSha256": "d19ca0b9c93512788bde318e164c7e1f6762f8f5540cd3ae3f231f6a396f7099"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "67d3fd709c72ceac26d376da1c761c8e3afc570420246d52c1ae517501be7d52",
+      "checkpointSha256": "385887c2a1ead22278bd0d8fbf1c27df6f88a090f977a1e828e919d28cf55224",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Stop adjusting only the front-lap piping. Change the overskirt panel geometry/deformation source so its side surface no longer collapses into stacked transverse ridges, and redesign panel-edge trim joins so all adjacent hem paths terminate flush at shared corners. Then regenerate the 3D source and all eleven views; inspect side, crouch, sit, and front/rear corners directly. Keep the candidate rejected until visual quality and all required fit, skinning, shape-key, UV, runtime, and package evidence pass."
+      "nextAction": "V102 must resolve the shared hem-corner endpoints across adjacent panel paths and reduce the remaining side/rear surface corrugation in the actual overskirt geometry or deformation input. Rebuild from the canonical checkpoint, inspect all five views and six poses directly, and keep the candidate rejected until visual quality and the unverified fit, rig/weight, shape-key, UV, runtime, and release gates are evidenced."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "e642621dd3eabcbcb4b988fdddf716faf3a78f33324cfd1d73b6becfb96d9cdd",
+      "sourceSha256": "5b7a87e5c148b9e292a595502449d2efceb8599bff352ef501e8406ebe551ad0",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "fdea331443bf52b2f0085952b6586658fcf1034933a30264cd3b582988a5e160",
+      "reportSha256": "46f01b2a9670944a5a0f0a4841dd8c5322855871743903732da4b231c5d65a06",
       "metrics": {
         "vertices": 15957,
         "triangles": 31137,
@@ -134,22 +134,22 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "49f3e4145f5513236341b41149e547242420751c86fe00527025a95e11972218",
+      "sha256": "6c6447c08f76332d5c243bbfe3e2460a11e4c4e6d37c2c243c037a77a71c0ac0",
       "findings": [
         {
           "code": "OVERSKIRT_SIDE_RIDGING_REMAINS_VISIBLE",
           "severity": "BLOCKER",
-          "description": "Direct inspection of all eleven V100 renders: both overskirt sides still show dense repeated transverse ridges and narrow pinching from waist to hem. This dominates front, rear, and side silhouettes; the canonical hem-role piping change did not resolve the independent cloth-surface defect."
+          "description": "Direct inspection of all eleven V101 renders: the broader, shallower panel pleat eased the front surface, but both side panels and the rear still retain repeated transverse corrugation and waist-to-hem pinching. Surface quality remains visibly below acceptance."
         },
         {
           "code": "SKIRT_HEM_TRIM_CORNER_TRANSITIONS_UNRESOLVED",
           "severity": "BLOCKER",
-          "description": "The front and back views show the skirt hem trim projecting past the panel corners, and the side views show uneven, angular hem/corner transitions. The selected front-lap hem chain therefore still lacks a visually flush join with adjacent panel trim."
+          "description": "Front, rear, and side views still show lavender hem trim extending beyond shared panel corners and breaking into angular, uneven joins. Adjacent panel trim does not terminate flush."
         },
         {
           "code": "POSE_DRAPE_AND_RELEASE_GATES_UNVERIFIED",
           "severity": "BLOCKER",
-          "description": "Crouch and sit previews show angular, stiff overlap at the hips and raised thighs, with the skirt panels folding into the legs rather than following a believable garment drape. The renders remain an unaccepted construction prototype; avatar fit, cloth calibration, weight/pose, UV, Unity/VRChat, and release gates are not established."
+          "description": "Crouch and sit views show the skirt folding into and overlapping raised thighs with a stiff, angular profile. These neutral-pose prototypes do not verify avatar fit, cloth calibration, skinning, shape-key response, Unity/VRChat runtime, or package eligibility."
         }
       ],
       "grantsQualityAcceptance": false
@@ -162,31 +162,31 @@
       {
         "code": "OVERSKIRT_SIDE_RIDGING_REMAINS_VISIBLE",
         "severity": "BLOCKER",
-        "description": "Direct inspection of all eleven V100 renders: both overskirt sides still show dense repeated transverse ridges and narrow pinching from waist to hem. This dominates front, rear, and side silhouettes; the canonical hem-role piping change did not resolve the independent cloth-surface defect."
+        "description": "Direct inspection of all eleven V101 renders: the broader, shallower panel pleat eased the front surface, but both side panels and the rear still retain repeated transverse corrugation and waist-to-hem pinching. Surface quality remains visibly below acceptance."
       },
       {
         "code": "SKIRT_HEM_TRIM_CORNER_TRANSITIONS_UNRESOLVED",
         "severity": "BLOCKER",
-        "description": "The front and back views show the skirt hem trim projecting past the panel corners, and the side views show uneven, angular hem/corner transitions. The selected front-lap hem chain therefore still lacks a visually flush join with adjacent panel trim."
+        "description": "Front, rear, and side views still show lavender hem trim extending beyond shared panel corners and breaking into angular, uneven joins. Adjacent panel trim does not terminate flush."
       },
       {
         "code": "POSE_DRAPE_AND_RELEASE_GATES_UNVERIFIED",
         "severity": "BLOCKER",
-        "description": "Crouch and sit previews show angular, stiff overlap at the hips and raised thighs, with the skirt panels folding into the legs rather than following a believable garment drape. The renders remain an unaccepted construction prototype; avatar fit, cloth calibration, weight/pose, UV, Unity/VRChat, and release gates are not established."
+        "description": "Crouch and sit views show the skirt folding into and overlapping raised thighs with a stiff, angular profile. These neutral-pose prototypes do not verify avatar fit, cloth calibration, skinning, shape-key response, Unity/VRChat runtime, or package eligibility."
       }
     ],
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "83560cf3d6474fcf5594b23b2ca26ad6061a83c564317bd5bc06652cac7d14c3",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "e57e0f8057937ef8ccbf06e18c212f3be24794dfd85268f9d38dc448ce73c13e",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "75f509562bcf2b9b32264c516135fdf892bf1751512b5a265085d228ac038f2a",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "c0b36b302c6e8d8535fce751849b4837cb61f65cf50d6ed5d5caccde9d024c90",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "e2f4811b8bd4bb954fec10f90f4d001c8cbaefc2c6fbe3bdf3fd1026f7c448a8",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "ce6444dfd375728f3a161348347449c43513bd3d2a8f6fc615ba81139a10a703",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "7e0744e76a6e7c51f882e5050a7f5f1dce1717d98ae5f6087e9a14ce5d5c8b4d",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "6f826addb888094b72f299a9fc615618fbde654e5ebbdb5cc6f75e9d96768843",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "f49a46f8c0ba22209648714ed3a833715e0d5600afb0e4bffe0aa4fb6e90f594",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "da444d7cd9a3f2783ef19f0fede17df221038ff9b0ce1235bc9ca10ff34af3ea",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "acf5475c7f683e51799aa14281e66a95bf20861ec11d39f8689236f0b5c2eb03"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "f757e6b8adbe83a9716e58a6225a9c8e7a0f0afe087044f088668e28bbd0b643",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "e07c64159bcf55e2223277a9564e64eac9f641bc2383cbb3de66d748f66f1141",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "ee4a0a75b55e22a1ce519edb30479c256ffa9edb0209f2928225bafbc3036e25",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "7abd7734a6c72838f287d59af571f560bcebc3276b9aa181eee340f645f97dab",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "ea65b99bf841d55fa78fa61de55d72ba3ec50c7fabe32fef6e82d116473d7010",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "1d4ddf54e5e29aa02a0aef8670e6129d3a9576cc13d161552bec56dd195985b5",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "a56f01cca8cfb87d2e336456aef1d4879f309f9afb041189a18fcc4cc9856c1d",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "cb269c2027f4604bcb37fc43edb085ba2e7b0e91a12150155c5c55c110cae588",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "124fdc33d52879185a1cd56c1c4c7d8d64eb906dd2bff1d8062e0418de627236",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "faab63a3be349941c6f6c786d15a755111346957c77c42592a730afb760e055f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "eef8c63a7195f6918f1db8a8d9d1b146b123907c0d2059a7cb5be23d261384cd"
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"
