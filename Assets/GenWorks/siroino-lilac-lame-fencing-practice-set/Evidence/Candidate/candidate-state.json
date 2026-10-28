@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v98-front-lap-piping-endpoint-recess-20261028",
+  "revision": "v100-canonical-hem-role-unit-mapping-20261028",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "code": "OVERSKIRT_SIDE_RIDGING_REMAINS_VISIBLE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven current V98 renders: both front-lap piping terminations still turn outward beyond the hem at the lower corners, including front and side views. The 12 mm endpoint recess has not produced flush endpoints.",
-      "code": "FRONT_LAP_PIPING_TERMINATIONS_REMAIN_PROTRUDING"
+      "description": "Direct inspection of all eleven V100 renders: both overskirt sides still show dense repeated transverse ridges and narrow pinching from waist to hem. This dominates front, rear, and side silhouettes; the canonical hem-role piping change did not resolve the independent cloth-surface defect."
     },
     {
+      "code": "SKIRT_HEM_TRIM_CORNER_TRANSITIONS_UNRESOLVED",
       "severity": "BLOCKER",
-      "description": "Neutral, rear, side and three-quarter renders still show dense transverse ridges and pinching along both overskirt sides. Crouch and sit retain stiff angular panel overlap near the hips and raised thighs; the new endpoint inset does not address this independent drape issue.",
-      "code": "OVERSKIRT_SIDE_AND_POSE_DRAPE_REMAINS_ANGULAR"
+      "description": "The front and back views show the skirt hem trim projecting past the panel corners, and the side views show uneven, angular hem/corner transitions. The selected front-lap hem chain therefore still lacks a visually flush join with adjacent panel trim."
     },
     {
+      "code": "POSE_DRAPE_AND_RELEASE_GATES_UNVERIFIED",
       "severity": "BLOCKER",
-      "description": "The previews are prototype render evidence only. Geometry audit reports avatarFitVerified and buildReportPassed false; weight assignment/verification, Shape Key response, complete UV coverage, Unity/VRChat runtime, and release-package readiness remain unverified. No release gate passes.",
-      "code": "FIT_AND_RELEASE_GATES_UNVERIFIED"
+      "description": "Crouch and sit previews show angular, stiff overlap at the hips and raised thighs, with the skirt panels folding into the legs rather than following a believable garment drape. The renders remain an unaccepted construction prototype; avatar fit, cloth calibration, weight/pose, UV, Unity/VRChat, and release gates are not established."
     }
   ],
   "failedGeometryChecks": [

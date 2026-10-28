@@ -252,6 +252,106 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
     endpoint_insets = spec.get("endpointInsetMByPiece", {})
     if not isinstance(endpoint_insets, dict) or not set(endpoint_insets).issubset(boundaries):
         raise ValueError("endpointInsetMByPiece must reference trimmed pieces")
+    edge_roles = spec.get("edgeRoleByPiece", {})
+    if not isinstance(edge_roles, dict) or not set(edge_roles).issubset(boundaries):
+        raise ValueError("edgeRoleByPiece must reference trimmed pieces")
+    role_segments = {}
+    if edge_roles:
+        pattern_path = job.get("garmentPipeline", {}).get("patternContractPath")
+        if not isinstance(pattern_path, str) or not pattern_path:
+            raise ValueError("edgeRoleByPiece requires a declared pattern contract")
+        pattern_contract = read(resolve(pattern_path))
+        pattern_pieces = {
+            item.get("pieceId"): item
+            for item in pattern_contract.get("pieces", [])
+            if isinstance(item, dict) and isinstance(item.get("pieceId"), str)
+        }
+        for piece_id, role in edge_roles.items():
+            piece = pattern_pieces.get(piece_id)
+            if piece is None or not isinstance(role, str) or not role:
+                raise ValueError(f"No canonical pattern piece or edge role for trim: {piece_id}")
+            boundary = piece.get("boundary")
+            if not isinstance(boundary, list) or not boundary:
+                raise ValueError(f"Canonical pattern boundary is missing for trim: {piece_id}")
+            segments = []
+            for edge in piece.get("edges", []):
+                if not isinstance(edge, dict) or edge.get("role") != role:
+                    continue
+                first, second = edge.get("startVertex"), edge.get("endVertex")
+                if (not isinstance(first, int) or isinstance(first, bool)
+                        or not isinstance(second, int) or isinstance(second, bool)
+                        or not 0 <= first < len(boundary) or not 0 <= second < len(boundary)
+                        or first == second):
+                    raise ValueError(f"Canonical role edge has invalid vertices: {piece_id}/{role}")
+                segments.append((boundary[first], boundary[second]))
+            if not segments:
+                raise ValueError(f"Canonical pattern has no {role!r} edge for trim: {piece_id}")
+            pattern_units_per_meter = mesh.get("patternCoordinateUnitsPerMeter")
+            if (not isinstance(pattern_units_per_meter, (int, float))
+                    or isinstance(pattern_units_per_meter, bool)
+                    or pattern_units_per_meter <= 0):
+                raise ValueError("Canonical role-edge mapping requires the mesh's declared pattern unit scale")
+            role_segments[piece_id] = [
+                ([float(first[0]) * pattern_units_per_meter,
+                  float(first[1]) * pattern_units_per_meter],
+                 [float(second[0]) * pattern_units_per_meter,
+                  float(second[1]) * pattern_units_per_meter])
+                for first, second in segments
+            ]
+
+    def lies_on_segment(point, segment):
+        first, second = segment
+        dx, dy = float(second[0]) - float(first[0]), float(second[1]) - float(first[1])
+        px, py = float(point[0]) - float(first[0]), float(point[1]) - float(first[1])
+        length_squared = dx * dx + dy * dy
+        if length_squared <= 1e-16:
+            raise ValueError("Canonical pattern role edge has zero length")
+        fraction = (px * dx + py * dy) / length_squared
+        tolerance = 1e-4
+        if not -tolerance <= fraction <= 1.0 + tolerance:
+            return False
+        nearest_x = float(first[0]) + min(1.0, max(0.0, fraction)) * dx
+        nearest_y = float(first[1]) + min(1.0, max(0.0, fraction)) * dy
+        return math.hypot(float(point[0]) - nearest_x, float(point[1]) - nearest_y) <= tolerance
+
+    if role_segments:
+        face_pattern_coordinates = mesh.get("facePatternCoordinates")
+        face_uv_source_kinds = mesh.get("faceUvSourceKinds")
+        if (not isinstance(face_pattern_coordinates, list)
+                or len(face_pattern_coordinates) != len(mesh["faces"])
+                or not isinstance(face_uv_source_kinds, list)
+                or len(face_uv_source_kinds) != len(mesh["faces"])):
+            raise ValueError("Canonical pattern edge selection requires face-local pattern coordinates")
+        for piece_id, segments in role_segments.items():
+            boundary_coordinates = {}
+            for face, owner, coordinates, source_kind in zip(
+                    mesh["faces"], mesh["facePieceIds"], face_pattern_coordinates,
+                    face_uv_source_kinds):
+                if owner != piece_id or source_kind != "garmentcode-pattern-panel":
+                    continue
+                if len(coordinates) != len(face):
+                    raise ValueError(f"Pattern coordinate loop mismatch on {piece_id}")
+                for index, first in enumerate(face):
+                    second = face[(index + 1) % len(face)]
+                    edge = tuple(sorted((int(first), int(second))))
+                    if edge not in boundaries[piece_id]:
+                        continue
+                    pair = (coordinates[index], coordinates[(index + 1) % len(face)])
+                    previous = boundary_coordinates.setdefault(edge, pair)
+                    if previous != pair and previous != pair[::-1]:
+                        raise ValueError(f"Boundary edge has conflicting pattern provenance: {piece_id}")
+            selected = {
+                edge for edge in boundaries[piece_id]
+                if edge in boundary_coordinates
+                and any(lies_on_segment(point, segment)
+                        for point in boundary_coordinates[edge] for segment in segments)
+                and any(all(lies_on_segment(point, segment)
+                            for point in boundary_coordinates[edge]) for segment in segments)
+            }
+            if not selected:
+                raise ValueError(f"Canonical {edge_roles[piece_id]!r} role selected no sewn boundary edges: {piece_id}")
+            boundaries[piece_id] = selected
+
     def inset_polyline(points, distance):
         if distance <= 0:
             return points
@@ -372,9 +472,11 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         trim.select_set(False)
         audits[piece_id] = {
             "boundaryEdgeCount": len(edges),
+            "selectedBoundaryEdgeCount": len(boundaries[piece_id]),
             "polylineCount": len(chains),
             "meshVertexCount": len(trim.data.vertices),
             "bindingMethod": "canonical-sewn-edge-interpolation",
+            "canonicalEdgeRole": edge_roles.get(piece_id),
             "endpointInsetM": endpoint_inset,
             "grantsFitAcceptance": False,
         }

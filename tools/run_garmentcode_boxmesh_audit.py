@@ -1530,6 +1530,7 @@ def main() -> int:
                 "garmentcode-pattern-panel" for _ in face_pattern_coordinates
             ],
             "patternCoordinateUnits": "native-pattern-units",
+            "patternCoordinateUnitsPerMeter": float(scale),
             "topology": topology,
         }
         write_json(args.mesh_output.resolve(), exchange)
