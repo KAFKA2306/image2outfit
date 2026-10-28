@@ -104,18 +104,18 @@
       },
       "postBakeGeometryHypothesis": {
         "method": "uniform-laplacian-interior-only-boundaries-and-pins-fixed",
-        "iterations": 4,
-        "factor": 0.22,
+        "iterations": 6,
+        "factor": 0.32,
         "vertexCount": 8414,
         "boundaryVertexCount": 224,
         "pinnedVertexCount": 68,
         "fixedVertexCount": 224,
         "fixedVertexMaximumDisplacementM": 0.0,
         "changedInteriorVertexCount": 8190,
-        "maximumInteriorDisplacementM": 0.025737278895445703,
-        "meanInteriorDisplacementM": 0.002052771371286709,
-        "reason": "V81 direct inspection still shows pronounced side and back accordion ridges after the bounded cloth solve. Trial stronger interior fairing on the settled overskirt while all open hems, waist, panel seams and cloth pins remain fixed; preserve the authored pleat count and seam geometry.",
-        "evidenceBoundary": "Four post-bake uniform Laplacian iterations at factor 0.22 on non-boundary overskirt vertices only. This bounded geometry trial records displacement statistics, fixed-boundary count and resulting mesh hashes; it does not establish fit, fold quality, motion, visual acceptance, fabric calibration or release readiness. Existing 35 mm residual and orientation limits remain unchanged.",
+        "maximumInteriorDisplacementM": 0.038749541792893166,
+        "meanInteriorDisplacementM": 0.003040740311246776,
+        "reason": "V101 direct inspection showed repeated transverse corrugation and waist-to-hem pinching on side and rear surfaces despite the prior 4-iteration, 0.22 fairing pass. Compare six stronger interior-only iterations while keeping open hems, waistband, panel seams and cloth pins fixed; evaluate whether it smooths without erasing authored pleats.",
+        "evidenceBoundary": "Six post-bake uniform Laplacian iterations at factor 0.32 on non-boundary overskirt vertices only. Exact displacements, fixed-boundary count and mesh hashes are recorded; smoothing may soften authored pleats and remains an uncalibrated geometry hypothesis, not fit, fabric, appearance, motion or release acceptance. Existing displacement and orientation limits remain enforced.",
         "grantsFitAcceptance": false,
         "grantsAppearanceAcceptance": false
       },
@@ -125,24 +125,24 @@
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.006258426310523646,
+          "minimum": 0.0061674857242906,
           "maximum": 0.09353423468019173
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 127,
+        "belowCombinedCollisionMarginVertexCount": 202,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
       "preBakeMeshSha256": "8f4bc13cb2ad0a8e855680497402b2c0f1c66200423ed3d207d5ba13b5138504",
       "evaluatedFrameMeshSha256": "5b8e2d9fe5d74b8b1280e1792732f856b10b388874d8539c5fd3e2d8df741b80",
-      "settledMeshSha256": "c5cddd708288657adad803cc010157177644e90910dd9efcba9c544e7fd95619",
+      "settledMeshSha256": "20c52b7fab1d702d238de21bd3dac4133622bfdbb027e1d245f10f17759fdddc",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "5b7a87e5c148b9e292a595502449d2efceb8599bff352ef501e8406ebe551ad0",
-  "constructionSha256": "89e88605452b4494616e9d583f45057a545cdd84fdb944f3386fcf5699689189",
+  "sourceBlendSha256": "08fa8ad9ec465531372d8b040e9ce834d41e4c3fdf585d9ac7c263267b4b4247",
+  "constructionSha256": "12eba7e0f5656b8bf78c4b9070138e29cb9ee1f5c779ff219f33c7dd8de9c9c2",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "29bda1e2c6b5f5aff1e520b9d7e2f07f1102711f9a0cdb6b99d34cff39f79b87",
+  "candidateSha256": "22ea4cf7dbec795e4cb2205051a450a8ec53ae1e015fff4f66a037742e92437b",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

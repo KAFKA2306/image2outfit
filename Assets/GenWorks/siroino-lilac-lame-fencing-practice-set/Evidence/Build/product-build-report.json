@@ -8921,7 +8921,7 @@
         ],
         "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
       },
-      "evidenceBoundary": "V101 retains the V100 sewn panel layout and tests a broader, shallower box-pleat surface profile: valley half-width fraction 0.30 (from 0.22) and recessed depth ratio 0.02 (from 0.06), with authored fold count and panel boundaries unchanged. This changes actual panel displacement before cloth simulation; it is an uncalibrated geometry hypothesis, not fit, fabric, or visual acceptance.",
+      "evidenceBoundary": "V102 retains the V101 actual broad, shallow sewn box-pleat displacement and tests stronger post-cloth fairing separately; authored fold count and panel boundaries stay unchanged. It is an uncalibrated geometry hypothesis, not fit, fabric, or visual acceptance.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -9229,7 +9229,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "ed504301b6e5a09aaf9e5615ad5e1fec9e9d672ffe299646145e8b793ea3c233",
+    "privateSimulationSourceSha256": "48093d4307eb5e00780a7a612079a44d3e889af7f05d232812724987dd45a6fe",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -9602,7 +9602,7 @@
   "prototypeEdgeTrim": {
     "applied": true,
     "materialName": "lavender-piping-prototype-hypothesis",
-    "bevelRadiusM": 0.0028,
+    "bevelRadiusM": 0.0018,
     "pieceAudits": {
       "jacket-overlap-front": {
         "boundaryEdgeCount": 50,
@@ -9650,8 +9650,8 @@
         "polylineCount": 1,
         "meshVertexCount": 152,
         "bindingMethod": "canonical-sewn-edge-interpolation",
-        "canonicalEdgeRole": null,
-        "endpointInsetM": 0.0,
+        "canonicalEdgeRole": "hem",
+        "endpointInsetM": 0.004,
         "grantsFitAcceptance": false
       },
       "overskirt-front-right": {
@@ -9660,8 +9660,8 @@
         "polylineCount": 1,
         "meshVertexCount": 152,
         "bindingMethod": "canonical-sewn-edge-interpolation",
-        "canonicalEdgeRole": null,
-        "endpointInsetM": 0.0,
+        "canonicalEdgeRole": "hem",
+        "endpointInsetM": 0.004,
         "grantsFitAcceptance": false
       },
       "overskirt-back-left": {
@@ -9670,8 +9670,8 @@
         "polylineCount": 1,
         "meshVertexCount": 336,
         "bindingMethod": "canonical-sewn-edge-interpolation",
-        "canonicalEdgeRole": null,
-        "endpointInsetM": 0.0,
+        "canonicalEdgeRole": "hem",
+        "endpointInsetM": 0.004,
         "grantsFitAcceptance": false
       },
       "overskirt-back-right": {
@@ -9680,8 +9680,8 @@
         "polylineCount": 1,
         "meshVertexCount": 336,
         "bindingMethod": "canonical-sewn-edge-interpolation",
-        "canonicalEdgeRole": null,
-        "endpointInsetM": 0.0,
+        "canonicalEdgeRole": "hem",
+        "endpointInsetM": 0.004,
         "grantsFitAcceptance": false
       },
       "waistband-front-left": {
@@ -9731,7 +9731,7 @@
         "meshVertexCount": 208,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": "hem",
-        "endpointInsetM": 0.003,
+        "endpointInsetM": 0.004,
         "grantsFitAcceptance": false
       },
       "overskirt-front-lap-right": {
@@ -9741,7 +9741,7 @@
         "meshVertexCount": 208,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": "hem",
-        "endpointInsetM": 0.003,
+        "endpointInsetM": 0.004,
         "grantsFitAcceptance": false
       },
       "waistband-front-lap-left": {
@@ -9766,7 +9766,7 @@
       }
     },
     "grantsFitAcceptance": false,
-    "evidenceBoundary": "V100 selects the explicit hem-role segment from the hash-bound canonical pattern contract instead of piping every front-lap boundary edge. Canonical meter coordinates are mapped using the mesh exchange's audited units-per-meter value before authored sewn-edge matching; a 3 mm end setback applies only to the selected hem chain. This prototype detail grants no appearance, fit, pose or release acceptance."
+    "evidenceBoundary": "V102 selects only the explicit hem-role chain from the hash-bound canonical pattern contract for all six overskirt panels, eliminating piping along sewn side and center boundaries. Canonical meter coordinates are mapped using the mesh exchange's audited units-per-meter value before authored sewn-edge matching; each hem chain receives a 4 mm end setback and a reduced 1.8 mm bevel. This is a prototype trim hypothesis and grants no appearance, fit, pose or release acceptance."
   },
   "prototypeSurfaceMotifs": {
     "applied": true,
@@ -10445,7 +10445,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "5b7a87e5c148b9e292a595502449d2efceb8599bff352ef501e8406ebe551ad0",
+  "sourceBlendSha256": "08fa8ad9ec465531372d8b040e9ce834d41e4c3fdf585d9ac7c263267b4b4247",
   "sewnMeshSha256": "cd2f6c90478f0e7c2ed3dab6072de9f9a9a9f4b424e4ab6a3d3234c401c8fdf9",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",

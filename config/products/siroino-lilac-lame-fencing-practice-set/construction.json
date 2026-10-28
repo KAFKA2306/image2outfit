@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V100 replaces whole-panel boundary piping on both front laps with the canonical pattern contract's explicit hem-role edge chain. The role segment is converted from canonical meters to the GarmentCode mesh's declared native pattern units before matching subdivided sewn edges; the selected hem ends retract 3 mm. Side-panel hip overlap and ridging remain a separate unresolved prototype defect.",
-  "designRevision": "v101-softened-overskirt-box-pleat-profile-20261028",
+  "target": "V102 restricts overskirt trim to canonical hem-role chains on all six skirt panels, reduces bevel bulk, and extends the endpoint setback; it also tests stronger boundary-preserving fairing on the settled overskirt. These are disposable appearance hypotheses only.",
+  "designRevision": "v102-hem-only-skirt-trim-and-fairing-20261028",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -180,10 +180,10 @@
         "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.18 on non-boundary sleeve vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes are recorded by this run. This is a geometry hypothesis only; it does not establish fit, fold quality, motion, appearance approval, or release readiness."
       },
       "pleated-overskirt": {
-        "iterations": 4,
-        "factor": 0.22,
-        "reason": "V81 direct inspection still shows pronounced side and back accordion ridges after the bounded cloth solve. Trial stronger interior fairing on the settled overskirt while all open hems, waist, panel seams and cloth pins remain fixed; preserve the authored pleat count and seam geometry.",
-        "evidenceBoundary": "Four post-bake uniform Laplacian iterations at factor 0.22 on non-boundary overskirt vertices only. This bounded geometry trial records displacement statistics, fixed-boundary count and resulting mesh hashes; it does not establish fit, fold quality, motion, visual acceptance, fabric calibration or release readiness. Existing 35 mm residual and orientation limits remain unchanged."
+        "iterations": 6,
+        "factor": 0.32,
+        "reason": "V101 direct inspection showed repeated transverse corrugation and waist-to-hem pinching on side and rear surfaces despite the prior 4-iteration, 0.22 fairing pass. Compare six stronger interior-only iterations while keeping open hems, waistband, panel seams and cloth pins fixed; evaluate whether it smooths without erasing authored pleats.",
+        "evidenceBoundary": "Six post-bake uniform Laplacian iterations at factor 0.32 on non-boundary overskirt vertices only. Exact displacements, fixed-boundary count and mesh hashes are recorded; smoothing may soften authored pleats and remains an uncalibrated geometry hypothesis, not fit, fabric, appearance, motion or release acceptance. Existing displacement and orientation limits remain enforced."
       }
     }
   },

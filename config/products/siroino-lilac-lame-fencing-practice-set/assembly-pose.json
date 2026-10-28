@@ -9687,7 +9687,7 @@
       ],
       "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
     },
-    "evidenceBoundary": "V101 retains the V100 sewn panel layout and tests a broader, shallower box-pleat surface profile: valley half-width fraction 0.30 (from 0.22) and recessed depth ratio 0.02 (from 0.06), with authored fold count and panel boundaries unchanged. This changes actual panel displacement before cloth simulation; it is an uncalibrated geometry hypothesis, not fit, fabric, or visual acceptance.",
+    "evidenceBoundary": "V102 retains the V101 actual broad, shallow sewn box-pleat displacement and tests stronger post-cloth fairing separately; authored fold count and panel boundaries stay unchanged. It is an uncalibrated geometry hypothesis, not fit, fabric, or visual acceptance.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9743,7 +9743,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v101-softened-overskirt-box-pleat-profile-20261028",
+  "designRevision": "v102-hem-only-skirt-trim-and-fairing-20261028",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
