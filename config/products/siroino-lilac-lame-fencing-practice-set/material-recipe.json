@@ -14,7 +14,7 @@
   },
   "prototypeEdgeTrim": {
     "enabled": true,
-    "name": "lavender-piping-prototype-hypothesis",
+    "name": "lavender-hem-band-prototype-hypothesis",
     "pieceIds": [
       "jacket-overlap-front",
       "jacket-sleeve-left",
@@ -40,8 +40,9 @@
     ],
     "roughness": 0.48,
     "metallic": 0.08,
-    "bevelRadiusM": 0.0018,
-    "evidenceBoundary": "V104 selects only the explicit hem-role edges from the hash-bound canonical pattern contract, then chains adjacent panel edges through their shared canonical sewn vertex IDs. No spatial weld or appearance pass is inferred; trim positions and weights still require manufacturing and direct review.",
+    "bandWidthM": 0.006,
+    "edgeOffsetM": 0.0012,
+    "evidenceBoundary": "V105 builds explicit miter-joined quad bands along selected canonical hem edges, with no curve bevel caps. Bound trim positions and weights still require manufacturing and direct review.",
     "edgeRoleByPiece": {
       "overskirt-front-left": "hem",
       "overskirt-front-right": "hem",
@@ -58,14 +59,7 @@
       "overskirt-front-lap-left": 0.0,
       "overskirt-front-lap-right": 0.0
     },
-    "endpointTaperMByPiece": {
-      "overskirt-front-left": 0.012,
-      "overskirt-front-right": 0.012,
-      "overskirt-back-left": 0.012,
-      "overskirt-back-right": 0.012,
-      "overskirt-front-lap-left": 0.012,
-      "overskirt-front-lap-right": 0.012
-    }
+    "endpointTaperMByPiece": {}
   },
   "prototypeRearWaistTabMaterials": {
     "tab": {

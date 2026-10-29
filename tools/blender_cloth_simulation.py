@@ -490,8 +490,10 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     construction = read_json(construction_path)
     policy = construction["clothSimulation"]
     groups = policy["prototypePanelGroups"]
-    if set(groups) != set(policy["components"]):
-        raise ValueError("prototype panel groups must cover the cloth policy")
+    simulated_components = policy["components"]
+    if (not set(simulated_components).issubset(groups)
+            or set(groups) != set(policy["components"]) | set(policy.get("nonClothDeformationPaths", {}))):
+        raise ValueError("prototype panel groups must declare every cloth and non-cloth deformation path")
     frame_end = policy["prototypeFrameEnd"]
     if not isinstance(frame_end, int) or not 2 <= frame_end <= 120:
         raise ValueError("bounded prototype frame range is required")
@@ -583,6 +585,11 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         bpy.context.collection.objects.link(obj)
         obj.matrix_world = original.matrix_world.copy()
         obj["canonicalPieceIds"] = json.dumps(pieces)
+        if name in policy.get("nonClothDeformationPaths", {}):
+            path = policy["nonClothDeformationPaths"][name]
+            if path != "authored-panel-shape-preserving-armature-skinning":
+                raise ValueError(f"Unsupported non-cloth deformation path for {name}")
+            obj["prototypeDeformationPath"] = path
         source_ids = data.attributes.new("canonical_sewn_vertex_index", "INT", "POINT")
         for item, original_vertex_id in zip(source_ids.data, ids):
             item.value = canonical_source_ids.data[original_vertex_id].value
@@ -816,7 +823,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         )
     before, contracts = {}, []
     rest_controls = {}
-    for name in groups:
+    for name in simulated_components:
         obj = objects[name]
         pin_ids = [v.index for v in obj.data.vertices if v.groups]
         before[name] = mesh_hash(obj)

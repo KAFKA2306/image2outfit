@@ -214,7 +214,7 @@ def resolve(value):
 
 
 def add_prototype_edge_trim(mesh, job, pieces, recipe):
-    """Build explicit bevelled trim on declared open panel edges only.
+    """Build explicit corner-joined hem bands on declared open panel edges only.
 
     This is a visual prototype aid. It does not add seam allowance or establish
     collision, fit, construction, or runtime acceptance.
@@ -229,10 +229,11 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
     piece_ids = spec.get("pieceIds")
     if not isinstance(piece_ids, list) or not piece_ids or not set(piece_ids) <= set(pieces):
         raise ValueError("prototypeEdgeTrim pieceIds must name existing canonical pieces")
-    radius = float(spec.get("bevelRadiusM", 0.0))
+    band_width = float(spec.get("bandWidthM", 0.0))
+    edge_offset = float(spec.get("edgeOffsetM", 0.0))
     color = spec.get("baseColorLinearRgb")
-    if not (0.0001 <= radius <= 0.005):
-        raise ValueError("prototypeEdgeTrim bevelRadiusM must be between 0.1 and 5 mm")
+    if not (0.001 <= band_width <= 0.02 and 0 <= edge_offset <= 0.005):
+        raise ValueError("prototypeEdgeTrim bandWidthM/edgeOffsetM are outside the bounded mesh-band range")
     if (not isinstance(color, list) or len(color) != 3
             or any(not isinstance(channel, (int, float)) or not 0 <= channel <= 1 for channel in color)):
         raise ValueError("prototypeEdgeTrim baseColorLinearRgb must be three channels in [0, 1]")
@@ -438,7 +439,7 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
             "polylineCount": 0,
             "joinedHemCornerEndpointCount": 0,
             "meshVertexCount": 0,
-            "bindingMethod": "canonical-sewn-edge-interpolation",
+        "bindingMethod": "canonical-sewn-edge-interpolation",
             "canonicalEdgeRole": edge_roles.get(piece_id),
             "endpointInsetM": float(endpoint_insets.get(piece_id, 0.0)),
             "endpointTaperM": float(endpoint_tapers.get(piece_id, 0.0)),
@@ -447,49 +448,38 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         for piece_id, edges in boundaries.items()
     }
     for chain, chain_edges in chains:
-        chain_piece_ids = sorted({
-            piece_id for edge in chain_edges for piece_id in edge_owners[edge]
-        })
+        chain_piece_ids = sorted({piece_id for edge in chain_edges for piece_id in edge_owners[edge]})
         piece_id = chain_piece_ids[0]
-        curve = bpy.data.curves.new(
-            f"{job['id']}-{'-'.join(chain_piece_ids)}-joined-prototype-piping", "CURVE"
-        )
-        curve.dimensions = "3D"
-        curve.resolution_u = 1
-        curve.bevel_depth = radius
-        curve.bevel_resolution = 2
-        curve.use_fill_caps = True
         from mathutils import Vector
+        closed_chain = chain[0] == chain[-1]
         points = [Vector(mesh["vertices"][vertex_index]) for vertex_index in chain]
         endpoint_inset = max(float(endpoint_insets.get(owner, 0.0)) for owner in chain_piece_ids)
-        endpoint_taper = max(float(endpoint_tapers.get(owner, 0.0)) for owner in chain_piece_ids)
         if not math.isfinite(endpoint_inset) or not 0 <= endpoint_inset <= 0.02:
             raise ValueError(f"Invalid prototype trim endpoint inset for {chain_piece_ids}")
-        if not math.isfinite(endpoint_taper) or not 0 <= endpoint_taper <= 0.05:
-            raise ValueError(f"Invalid prototype trim endpoint taper for {chain_piece_ids}")
         points = inset_polyline(points, endpoint_inset)
-        spline = curve.splines.new("POLY")
-        spline.points.add(len(points) - 1)
-        chain_distances = [0.0]
-        for first, second in zip(points, points[1:]):
-            chain_distances.append(chain_distances[-1] + (second - first).length)
-        chain_length = chain_distances[-1]
-        for point, coordinate in zip(spline.points, points):
-            point.co = (*coordinate, 1)
-        closed_chain = chain[0] == chain[-1]
-        spline.use_cyclic_u = False  # repeated canonical endpoint closes the polyline exactly
-        if endpoint_taper > 0 and not closed_chain:
-            for point, distance in zip(spline.points, chain_distances):
-                point.radius = min(1.0, distance / endpoint_taper,
-                                   (chain_length - distance) / endpoint_taper)
-        trim = bpy.data.objects.new(f"{job['id']}-prototype-piping-{piece_id}", curve)
+        # Explicit two-rail band with bounded miter joins: no curve bevel,
+        # independent caps, or endpoint taper can create corner projections.
+        half = band_width * 0.5
+        sections = []
+        for index, point in enumerate(points):
+            before = (point - points[index - 1]).normalized() if index else (points[1] - point).normalized()
+            after = (points[index + 1] - point).normalized() if index < len(points) - 1 else before
+            n0, n1 = Vector((-before.y, before.x, 0)), Vector((-after.y, after.x, 0))
+            bisector = n0 + n1
+            if bisector.length_squared < 1e-10:
+                bisector = n1
+            bisector.normalize()
+            miter = min(half * 2.5, half / max(0.35, abs(bisector.dot(n1))))
+            center = point + Vector((0, 0, edge_offset))
+            sections.append((center - bisector * miter, center + bisector * miter))
+        band_vertices = [list(v) for section in sections for v in section]
+        band_faces = [(2*i, 2*i+1, 2*i+3, 2*i+2) for i in range(len(sections)-1)]
+        data = bpy.data.meshes.new(f"{job['id']}-{'-'.join(chain_piece_ids)}-explicit-hem-band")
+        data.from_pydata(band_vertices, [], band_faces)
+        data.update()
+        trim = bpy.data.objects.new(f"{job['id']}-prototype-hem-band-{piece_id}", data)
         bpy.context.collection.objects.link(trim)
         trim.data.materials.append(material)
-        bpy.ops.object.select_all(action="DESELECT")
-        bpy.context.view_layer.objects.active = trim
-        trim.select_set(True)
-        bpy.ops.object.convert(target="MESH")
-        trim = bpy.context.view_layer.objects.active
         trim["prototypeRole"] = "unfitted-prototype-edge-trim"
         trim["canonicalPieceIds"] = json.dumps(pieces)
         ownership = trim.data.attributes.new("canonical_piece_index", "INT", "FACE")
@@ -540,7 +530,8 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
     return {
         "applied": True,
         "materialName": material.name,
-        "bevelRadiusM": radius,
+        "bandWidthM": band_width,
+        "edgeOffsetM": edge_offset,
         "pieceAudits": audits,
         "grantsFitAcceptance": False,
         "evidenceBoundary": spec.get("evidenceBoundary", "Prototype visual hypothesis; not approved trim or fit."),
