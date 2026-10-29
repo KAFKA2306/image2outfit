@@ -705,6 +705,7 @@ def collect_product(
         release_gate = None
 
     assets: list[Asset] = []
+    mesh_evidence: list[Evidence] = []
     previews, preview_origin = preview_directory(workspace)
     selected: set[Path] = set()
     for kind, directory, names in (
@@ -760,6 +761,15 @@ def collect_product(
             == mesh.get("sourceSha256")
         )
         if source_verified or evidence_verified:
+            if evidence_verified:
+                mesh_evidence.append(
+                    Evidence(
+                        label="Source-bound topology and UV record (not a quality pass)",
+                        status="UNVERIFIED",
+                        href=relative_href(mesh_report, output_dir),
+                        sha256=digest(mesh_report),
+                    )
+                )
             for record in mesh.get("records", []):
                 target = (root / record["path"]).resolve()
                 if workspace.resolve() not in target.parents or target.suffix != ".svg":
@@ -913,6 +923,7 @@ def collect_product(
             *parse_evidence_rows(manifest, workspace, output_dir),
             *quality_evidence,
             *improvement_evidence,
+            *mesh_evidence,
         ],
     )
 
