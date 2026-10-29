@@ -37,6 +37,11 @@
     ],
     "iterations": 3,
     "factor": 0.12,
+    "continuityPieceIds": [
+      "jacket-back-left",
+      "jacket-back-right"
+    ],
+    "maximumDihedralDegrees": 60.0,
     "preserveCanonicalPanelSeams": true,
     "evidenceBoundary": "Three bounded 0.12 Laplacian fairing passes move only interior vertices of the directly reviewed torso panels; all canonical boundary vertices remain fixed. This is a local geometry hypothesis, not avatar fit, material quality, appearance approval, or release acceptance."
   },
@@ -9389,6 +9394,11 @@
   },
   "bodyContourPlacement": {
     "method": "measured-horizontal-body-contour-radial-placement",
+    "continuityPieceIds": [
+      "jacket-back-left",
+      "jacket-back-right"
+    ],
+    "maximumDihedralDegrees": 60.0,
     "pieceIds": [
       "jacket-front-left",
       "jacket-overlap-front",

@@ -2,38 +2,38 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
-  "reviewedRevision": "v113-orientation-preserving-contour-and-fairing-20261029",
+  "reviewedRevision": "v117-bound-plastron-to-jacket-hem-20261029",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "5a6e6921956799cfc946088b83a05edc114668b9684bcdb54c93c37a3f0b8303",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "83b53a7fe1da4b4826c3d936b24f21e5452c7d540cd145dab6a338ad64cb6b7f",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "b21a2e4aa764fef3cc0dbbda903cbdf0c350fc5e22f38c71dd2ff495977f8e8d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "5c821d9590f4e2e9445dc531561a94f7b511da31975feef2a388fe4311a6d497",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "2cfaf6b40fced5c87a32df8cc9ba0ba09f8bbe250be2f693b92f8f0fad647424",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "5ca793ffd13f8a4ef101a38735d4228b4d45d22774e5574a07f972d67d6521e3",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "95561f9ee140b0fb42878e0d821d7ee624af6b5c90616519bb6329112da2da89",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "fa7ac26e833eb0d9276d13da28b698d0c709d55bbffe3512248b2dc42c2dd1a8",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "a0fe8531c9ffdf0671aff00c4d36aae672d48233bf329d5f73d8c7572d229ac8",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "7fb391df2cd65eaa2368cba6eb20ead88e688c8e476959dd04648e0e0528da79",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "eb749aef8675f06b3b7b7f9dd611a136c00e99ca0bf5e0c8b19babbfea26447a"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "b01ad909966575bffe7684234d8d78a8bf64fb6f784887072b428ec5c4d3a697",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "42029dfcd38954aafe1ec94981e0628000b4550c1a281cce5bddace827551ce5",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "35b1ae6b83afd5d4ba41ef8c1e7042643daea566503010deac539fbb3559a14c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "b1c5869af6ef2e58d361142b3f51cfc44b08349499357ace317aa33a2742e4c4",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "f9ac834450cbedebf56db5aedceae52777a250e7dce3e88cb12c1efe60969b21",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "eb2a28cc7b6c6f8cd6bc5ee5f8b58393fd4d908f00c26be7ba1b307938393ea5",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "a7576a7c63ff7fa5d270256f747616ad6b234f03d5a85d421b54433315666cce",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "90d81d6a580ba1a084277be5cf8b8892ee3a844f419d63e1e1584bb338143c44",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "77ab6eb240fcba16c225e7fcc58b45be797a2bb6fd071823d1946a57cec46bcb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "7f041b1d7601fa7b51975dc793c2a0cca4e1768b6c13a37619ee30a00825d7c5",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "b05198f13c242cf915d940c8e9bf6a79d5e8ccafa9098a6c4422d0d8363e261e"
   },
   "findings": [
     {
-      "description": "Directly inspected all five current V113 views and six poses. The mesh builder now enforces positive per-triangle normal agreement during contour placement and torso fairing, but the posterior folds remain severe: edge 759-860 goes from 8.01511 degrees native to 98.07205 after torso contour and 138.90642 after fairing; edge 759-1003 goes from 5.13763 to 93.99092 and 136.88985. Shared-edge direction signs are opposite for both adjacent face pairs, so winding is consistent; displacement scales were clamped to 0.24065465 for measured contour and 0.08442574 for fairing. The safeguard prevents reversal, but does not produce an acceptable smooth surface.",
-      "severity": "BLOCKER",
-      "code": "POSTERIOR_FOLD_REMAINS_AFTER_ORIENTATION_CLAMP"
+      "code": "POSTERIOR_SURFACE_DISCONTINUITY_UNRESOLVED",
+      "description": "Directly inspected all five V117 views and six current poses. The build report records 2,718 within-panel posterior edges; 26 have baseline dihedral over 60 degrees and the maximum is 179.10 degrees. Contour placement is clamped to 0.00000340, so the continuity constraint preserves the severe existing folds by effectively preventing placement instead of resolving the surface.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Current V113 renders remain almost entirely white with a narrow lavender diagonal band and sparse piping. Lamé response and the fencing-practice identity are not legible in the five views.",
-      "severity": "BLOCKER",
-      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE"
+      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE",
+      "description": "The current render remains almost entirely white with a narrow lilac diagonal chest strip and sparse piping. The lamé material response and fencing-practice identity are not legible in the required views.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Current crouch and sit images retain skirt/shorts intersections and abrupt hem folds; prone retains a broad disk-like flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
-      "severity": "BLOCKER",
-      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED"
+      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED",
+      "description": "Crouch and sit retain skirt/shorts intersections and abrupt folds; prone retains a broad disk-like skirt flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
+      "severity": "BLOCKER"
     }
   ],
-  "nextAction": "Keep REJECT. Replace the posterior contour/fairing field with a continuity-constrained surface solution and redesign the skirt/shorts pose envelope; resolve the material identity. Re-render and directly inspect the complete current evidence set. Keep fit, skin weights, Shape Keys, Unity/VRChat and release gates closed until measured."
+  "nextAction": "Keep REJECT. Replace the posterior garment geometry from panel construction/placement inputs rather than increasing the continuity clamp; separately correct the skirt pose envelope and material identity. Rebuild and directly inspect the full current evidence set. Keep fit, weights, Shape Keys, Unity/VRChat and release gates closed."
 }

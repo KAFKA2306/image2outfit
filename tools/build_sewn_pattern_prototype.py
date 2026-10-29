@@ -119,7 +119,9 @@ def pack_panel_uv_bounds(panel_bounds, padding):
     return low, best
 
 
-def preserve_face_orientation_during_displacement(faces, before, proposed):
+def preserve_face_orientation_during_displacement(
+    faces, before, proposed, continuity_edges=None, maximum_dihedral_degrees=60.0
+):
     """Bound a positional update so no existing triangle reverses or collapses.
 
     This is a local geometric safeguard only. It does not establish body fit,
@@ -131,6 +133,44 @@ def preserve_face_orientation_during_displacement(faces, before, proposed):
             raise ValueError("Orientation safeguard encountered a face with fewer than three vertices")
         for corner in range(1, len(face) - 1):
             triangles.append((face_index, (int(face[0]), int(face[corner]), int(face[corner + 1]))))
+
+    continuity_edges = list(continuity_edges or [])
+    if (not math.isfinite(maximum_dihedral_degrees)
+            or not 0 < maximum_dihedral_degrees < 180):
+        raise ValueError("Invalid intra-panel normal-continuity bound")
+
+    def face_normals(points):
+        normals = [[0.0, 0.0, 0.0] for _ in faces]
+        for face_index, (a, b, c) in triangles:
+            pa, pb, pc = points[a], points[b], points[c]
+            ab = [pb[axis] - pa[axis] for axis in range(3)]
+            ac = [pc[axis] - pa[axis] for axis in range(3)]
+            cross = [
+                ab[1] * ac[2] - ab[2] * ac[1],
+                ab[2] * ac[0] - ab[0] * ac[2],
+                ab[0] * ac[1] - ab[1] * ac[0],
+            ]
+            for axis in range(3):
+                normals[face_index][axis] += cross[axis]
+        for normal in normals:
+            length = math.sqrt(sum(value * value for value in normal))
+            if length <= 2e-12:
+                raise ValueError("Normal-continuity guard encountered a degenerate panel")
+            for axis in range(3):
+                normal[axis] /= length
+        return normals
+
+    baseline_normals = face_normals(before) if continuity_edges else []
+    continuity_limits = []
+    for first_face, second_face in continuity_edges:
+        cosine = max(-1.0, min(1.0, sum(
+            baseline_normals[first_face][axis] * baseline_normals[second_face][axis]
+            for axis in range(3)
+        )))
+        baseline_angle = math.degrees(math.acos(cosine))
+        # Existing sharpness is preserved without allowing a new fold. Edges
+        # already over the cap receive only numerical tolerance, not a pass.
+        continuity_limits.append(max(maximum_dihedral_degrees, baseline_angle + 1e-4))
 
     def valid(scale):
         points = [
@@ -160,6 +200,15 @@ def preserve_face_orientation_during_displacement(faces, before, proposed):
                 return False
             if sum(old_normal[axis] * new_normal[axis] for axis in range(3)) <= 0:
                 return False
+        if continuity_edges:
+            normals = face_normals(points)
+            for edge_index, (first_face, second_face) in enumerate(continuity_edges):
+                cosine = max(-1.0, min(1.0, sum(
+                    normals[first_face][axis] * normals[second_face][axis]
+                    for axis in range(3)
+                )))
+                if math.degrees(math.acos(cosine)) > continuity_limits[edge_index]:
+                    return False
         return True
 
     if valid(1.0):
@@ -179,7 +228,51 @@ def preserve_face_orientation_during_displacement(faces, before, proposed):
         [before[i][axis] + scale * (proposed[i][axis] - before[i][axis]) for axis in range(3)]
         for i in range(len(before))
     ]
-    return bounded, scale, len(triangles)
+    result_normals = face_normals(bounded) if continuity_edges else []
+    maximum_result_dihedral = 0.0
+    maximum_baseline_dihedral = 0.0
+    baseline_over_cap_count = 0
+    for first_face, second_face in continuity_edges:
+        cosine = max(-1.0, min(1.0, sum(
+            result_normals[first_face][axis] * result_normals[second_face][axis]
+            for axis in range(3)
+        )))
+        maximum_result_dihedral = max(maximum_result_dihedral, math.degrees(math.acos(cosine)))
+    for index, (first_face, second_face) in enumerate(continuity_edges):
+        cosine = max(-1.0, min(1.0, sum(
+            baseline_normals[first_face][axis] * baseline_normals[second_face][axis]
+            for axis in range(3)
+        )))
+        baseline_angle = math.degrees(math.acos(cosine))
+        maximum_baseline_dihedral = max(maximum_baseline_dihedral, baseline_angle)
+        baseline_over_cap_count += baseline_angle > maximum_dihedral_degrees
+    continuity_evidence = {
+        "guardedEdgeCount": len(continuity_edges),
+        "maximumDihedralDegrees": maximum_dihedral_degrees,
+        "maximumBaselineDihedralDegrees": maximum_baseline_dihedral,
+        "baselineEdgesOverCap": baseline_over_cap_count,
+        "maximumResultDihedralDegrees": maximum_result_dihedral,
+    }
+    return bounded, scale, len(triangles), continuity_evidence
+
+
+def intra_panel_continuity_edges(faces, owners, piece_ids):
+    """Return shared edges between faces owned by the same declared panel."""
+    if len(faces) != len(owners) or not piece_ids:
+        raise ValueError("Normal-continuity guard requires complete panel ownership")
+    edge_faces = {}
+    for face_index, face in enumerate(faces):
+        for first, second in zip(face, face[1:] + face[:1]):
+            edge = tuple(sorted((int(first), int(second))))
+            edge_faces.setdefault(edge, []).append(face_index)
+    selected = set(piece_ids)
+    guarded = []
+    for adjacent in edge_faces.values():
+        if len(adjacent) == 2 and owners[adjacent[0]] == owners[adjacent[1]] and owners[adjacent[0]] in selected:
+            guarded.append(tuple(adjacent))
+    if not guarded:
+        raise ValueError("Normal-continuity guard selected no within-panel edges")
+    return guarded
 
 
 def fair_panel_interiors(mesh, declaration):
@@ -202,6 +295,13 @@ def fair_panel_interiors(mesh, declaration):
     owners = mesh["facePieceIds"]
     if len(faces) != len(owners) or not set(piece_ids) <= set(owners):
         raise ValueError("Panel-interior fairing references incomplete canonical faces")
+    continuity_piece_ids = declaration.get("continuityPieceIds", [])
+    if (not isinstance(continuity_piece_ids, list)
+            or not set(continuity_piece_ids) <= set(piece_ids)):
+        raise ValueError("Invalid panel normal-continuity piece selection")
+    smoothing_piece_ids = set(piece_ids) - set(continuity_piece_ids)
+    if not smoothing_piece_ids:
+        raise ValueError("Panel fairing has no panels after continuity-protected pieces are excluded")
 
     edge_faces = {}
     for face_index, face in enumerate(faces):
@@ -217,7 +317,7 @@ def fair_panel_interiors(mesh, declaration):
         if len(adjacent) != 2 or len(edge_owners[edge]) != 1:
             boundary_vertices.update(edge)
 
-    neighbors_by_piece = {piece_id: {} for piece_id in piece_ids}
+    neighbors_by_piece = {piece_id: {} for piece_id in smoothing_piece_ids}
     for face, owner in zip(faces, owners):
         if owner not in neighbors_by_piece:
             continue
@@ -258,9 +358,10 @@ def fair_panel_interiors(mesh, declaration):
                     for axis in range(3)
                 ]
         vertices = updated
-    proposed = vertices
-    vertices, displacement_scale, orientation_checked = preserve_face_orientation_during_displacement(
-        faces, original, proposed
+    continuity_edges = intra_panel_continuity_edges(faces, owners, continuity_piece_ids) if continuity_piece_ids else []
+    continuity_degrees = float(declaration.get("maximumDihedralDegrees", 60.0))
+    vertices, displacement_scale, orientation_checked, continuity_evidence = preserve_face_orientation_during_displacement(
+        faces, original, vertices, continuity_edges, continuity_degrees
     )
     distances = [
         math.sqrt(sum((vertices[index][axis] - original[index][axis]) ** 2 for axis in range(3)))
@@ -270,6 +371,8 @@ def fair_panel_interiors(mesh, declaration):
     return {
         "method": "bounded-panel-interior-laplacian-fairing",
         "pieceIds": sorted(piece_ids),
+        "continuityProtectedFromFairingPieceIds": sorted(continuity_piece_ids),
+        "geometryFairingPieceIds": sorted(smoothing_piece_ids),
         "iterations": iterations,
         "factor": float(factor),
         "movedVertexCount": len(moved),
@@ -279,6 +382,7 @@ def fair_panel_interiors(mesh, declaration):
         "meanVertexDisplacementM": sum(distances) / len(distances) if distances else 0.0,
         "orientationPreservingDisplacementScale": displacement_scale,
         "orientationCheckedTriangleCount": orientation_checked,
+        "normalContinuity": continuity_evidence,
         "preservesCanonicalPanelSeams": True,
         "grantsFitAcceptance": False,
         "grantsAppearanceAcceptance": False,
@@ -1909,10 +2013,18 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             continue
         weight = seam_factors.get(i, 1.0)*height_weight
         mesh["vertices"][i]=[x+(float(q.x)-x)*weight,y+(float(q.y)-y)*weight,z]
-    mesh["vertices"], displacement_scale, orientation_checked = preserve_face_orientation_during_displacement(
-        mesh["faces"], before_vertices, mesh["vertices"]
+    continuity_piece_ids = spec.get("continuityPieceIds", [])
+    if (not isinstance(continuity_piece_ids, list)
+            or not set(continuity_piece_ids) <= ids):
+        raise ValueError("Invalid contour normal-continuity piece selection")
+    continuity_edges = intra_panel_continuity_edges(
+        mesh["faces"], mesh["facePieceIds"], continuity_piece_ids
+    ) if continuity_piece_ids else []
+    continuity_degrees = float(spec.get("maximumDihedralDegrees", 60.0))
+    mesh["vertices"], displacement_scale, orientation_checked, continuity_evidence = preserve_face_orientation_during_displacement(
+        mesh["faces"], before_vertices, mesh["vertices"], continuity_edges, continuity_degrees
     )
-    return {"applied":True,"targetSourceSha256":digest(target_path),"bodyObject":body.name,"configuration":spec,"sections":sections,"placedVertexCount":len(vertex_ids),"heightBlendSkippedVertexCount":height_blend_skipped,"angularSourceVerticesSha256":hashlib.sha256(json.dumps(angular_source_vertices,separators=(",",":")).encode()).hexdigest() if angular_source_vertices is not None else None,"layerOffsetVertexCount":layered,"sharedSeamVerticesLayerOffsetM":0,"heightExtrapolatedVertexCount":extrapolated,"orientationPreservingDisplacementScale":displacement_scale,"orientationCheckedTriangleCount":orientation_checked,"beforeVerticesSha256":hashlib.sha256(before.encode()).hexdigest(),"afterVerticesSha256":hashlib.sha256(json.dumps(mesh["vertices"],separators=(",",":")).encode()).hexdigest(),"bodyFacesCopied":False,"grantsFitAcceptance":False}
+    return {"applied":True,"targetSourceSha256":digest(target_path),"bodyObject":body.name,"configuration":spec,"sections":sections,"placedVertexCount":len(vertex_ids),"heightBlendSkippedVertexCount":height_blend_skipped,"angularSourceVerticesSha256":hashlib.sha256(json.dumps(angular_source_vertices,separators=(",",":")).encode()).hexdigest() if angular_source_vertices is not None else None,"layerOffsetVertexCount":layered,"sharedSeamVerticesLayerOffsetM":0,"heightExtrapolatedVertexCount":extrapolated,"orientationPreservingDisplacementScale":displacement_scale,"orientationCheckedTriangleCount":orientation_checked,"normalContinuity":continuity_evidence,"beforeVerticesSha256":hashlib.sha256(before.encode()).hexdigest(),"afterVerticesSha256":hashlib.sha256(json.dumps(mesh["vertices"],separators=(",",":")).encode()).hexdigest(),"bodyFacesCopied":False,"grantsFitAcceptance":False}
 
 
 def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):

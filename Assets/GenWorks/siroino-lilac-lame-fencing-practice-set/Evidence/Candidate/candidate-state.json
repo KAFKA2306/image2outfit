@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v113-orientation-preserving-contour-and-fairing-20261029",
+  "revision": "v117-bound-plastron-to-jacket-hem-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "Directly inspected all five current V113 views and six poses. The mesh builder now enforces positive per-triangle normal agreement during contour placement and torso fairing, but the posterior folds remain severe: edge 759-860 goes from 8.01511 degrees native to 98.07205 after torso contour and 138.90642 after fairing; edge 759-1003 goes from 5.13763 to 93.99092 and 136.88985. Shared-edge direction signs are opposite for both adjacent face pairs, so winding is consistent; displacement scales were clamped to 0.24065465 for measured contour and 0.08442574 for fairing. The safeguard prevents reversal, but does not produce an acceptable smooth surface.",
-      "severity": "BLOCKER",
-      "code": "POSTERIOR_FOLD_REMAINS_AFTER_ORIENTATION_CLAMP"
+      "code": "POSTERIOR_SURFACE_DISCONTINUITY_UNRESOLVED",
+      "description": "Directly inspected all five V117 views and six current poses. The build report records 2,718 within-panel posterior edges; 26 have baseline dihedral over 60 degrees and the maximum is 179.10 degrees. Contour placement is clamped to 0.00000340, so the continuity constraint preserves the severe existing folds by effectively preventing placement instead of resolving the surface.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Current V113 renders remain almost entirely white with a narrow lavender diagonal band and sparse piping. Lamé response and the fencing-practice identity are not legible in the five views.",
-      "severity": "BLOCKER",
-      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE"
+      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE",
+      "description": "The current render remains almost entirely white with a narrow lilac diagonal chest strip and sparse piping. The lamé material response and fencing-practice identity are not legible in the required views.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Current crouch and sit images retain skirt/shorts intersections and abrupt hem folds; prone retains a broad disk-like flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
-      "severity": "BLOCKER",
-      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED"
+      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED",
+      "description": "Crouch and sit retain skirt/shorts intersections and abrupt folds; prone retains a broad disk-like skirt flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [
