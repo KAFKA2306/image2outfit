@@ -2,27 +2,27 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
-  "reviewedRevision": "v110-neckline-shared-seam-preservation-20261029",
+  "reviewedRevision": "v111-posterior-normal-trace-20261029",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "a842bb6dec7e7b8d3f63a90233f233d06451243c3bf2d4afc6b328e3bca10cfc",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "1cf053743896bf8c5e2680e975aa5197e2b222d6380d27f5f3d0c668cb0bafd3",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "d7ed534fb5dcf78bc16e108d29ca5c392cf19a2f20cae204c0ae6b8dc31861ea",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "901477861b699040587c6201e1ef7b561c232bc8fc2049b41ddc1d499b4970f8",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "b09f94122b9ec5fc973f75636f472c7faf9630c4201861619faedef5ad2ef707",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "bed82ece2415ac18c7bfe060938cc4461e3ca5da02a20e8487c64293f4378216",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "2350060127cd703db3ef656ba367337c3732b5291bd680e84d5cd8c651989280",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "104cee5d522cbaf7c8ee2ad78c6127164b73c0174ff3184d1789e626382132b0",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "1a3731e54cb23fe0dc40ab0296c1edb1c235fec7ebbd1bffb868570101433980",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "15d849a4c2bde953d70c2ed77f5bd32dcf1161af1b14de8f3c710390fe03c9b4",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "a2e2b5fe89549af0f0e9209faf22a8718d0ec5136514928410c3a48f2b2ff568"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "d0d93ab85b92628c163712038a2222a6e5ada05c4ea9b142f83b7e3afa952a51",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "8abb463766dee8cc6a84502ba1308e6a1ae333cffeb7bc5f4221f616841db7f9",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "381b9340fa4369c26db2578386b334ea466686ba703cb8cc40b0e99199422372",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "35034e58c77dc241e684755c3da63b2b9c3e2876e4f6d18b199db24bd6b165de",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "f4c12f0e7e3f2b1275f85a817bb22263b082a6f45addc8690db70a59ba529b8e",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "1219905fc1e0da5dc8c6c2d3c52beb4e95e4749dd82e836d102215904cf5777a",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "3e6b164a46dcd87d3cced84618095bb039be7653fca191da547a68b5462d28f4",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "9e87c598a5441c87305f2bdef76df7ca69279bb3e5b053118dc6a9c501c904aa",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "38804219d63b4244b79efb66d39d2b97a9d1cfde2540500b1621fe638cb1d902",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "63d9693b89e560a68cadd2d0027d20a2f1b6cbfd6718c75cee9316fe4e65a7ad",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "212fc1ec1e217cb94cc9aa906bc1b949f685cedc46ca57b620b1142ad08cc91a"
   },
   "findings": [
     {
       "code": "TORSO_FACETING_REQUIRES_TRANSFORM_LOCALIZATION",
       "severity": "BLOCKER",
-      "description": "Directly inspected all five regenerated V110 views and six poses. The traced shared collar/back seam vertex 205 now remains unchanged through collar and torso contour passes, but a distinct severe posterior neck/shoulder facet remains (internal discontinuity 178.52 degrees on a 4.78 mm edge near Blender Z 1.055 m). The local transform correction did not visibly resolve the broader torso faceting or establish appearance acceptance."
+      "description": "Directly inspected all five regenerated V111 views and six poses. Stagewise edge tracing isolates the rear-neckline facets: edge 759-860 changes from 8.01511° after native sewing to 176.62925° at torso-contour; edge 759-1003 stays 3.21893° through upper-surface, then flips to 177.13795° at panel-interior-fairing. V111 is diagnostic-only; broad torso faceting remains visible and appearance is not accepted."
     },
     {
       "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE",
@@ -35,5 +35,5 @@
       "description": "Crouch/sit retain skirt and shorts overlap and abrupt hem deformation; prone remains a broad disk-like flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified."
     }
   ],
-  "nextAction": "Trace the new V110 posterior hot-edge source vertices and adjacent face ownership through native, collar-contour, torso-contour, upper-surface and fairing stages. Identify the first stage that creates the remaining local discontinuity before making another bounded correction. Keep REJECT and downstream fit/runtime/release gates closed."
+  "nextAction": "Keep REJECT. Isolate the torso-contour displacement field and panel-interior fairing as separate causes for edges 759-860 and 759-1003; inspect their adjacent face ownership and per-face winding before changing geometry. Re-render and directly review any later correction. Fit, weights, Shape Keys, Unity/VRChat and release gates remain closed."
 }

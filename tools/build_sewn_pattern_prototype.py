@@ -2864,6 +2864,8 @@ def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
 
 
 def main():
+    from mathutils import Vector
+
     raw = sys.argv[sys.argv.index("--") + 1:]
     parser = argparse.ArgumentParser()
     parser.add_argument("--job", required=True)
@@ -2900,9 +2902,39 @@ def main():
             trace_owners[vertex].add(owner)
     trace_ids = [i for i, point in enumerate(mesh["vertices"]) if point[2] >= .98 and abs(point[0]) <= .12 and any(p.startswith("jacket-") or p == "stand-collar" for p in trace_owners[i])]
     neck_trace = {i: {"vertexIndex": i, "pieceIds": sorted(trace_owners[i]), "coordinatesByStageM": {"native-sewn": list(mesh["vertices"][i])}} for i in trace_ids}
+    trace_vertex_set = set(trace_ids)
+    neck_edges = {}
+    for face_index, face in enumerate(mesh["faces"]):
+        for first, second in zip(face, face[1:] + face[:1]):
+            edge = tuple(sorted((int(first), int(second))))
+            if edge[0] in trace_vertex_set and edge[1] in trace_vertex_set:
+                neck_edges.setdefault(edge, []).append(face_index)
+    neck_edge_angles = {
+        edge: {"edgeVertexIndices": list(edge), "adjacentFaceIndices": faces,
+               "normalDiscontinuityDegreesByStage": {}}
+        for edge, faces in neck_edges.items() if len(faces) == 2
+    }
     def trace_stage(name):
         for i in trace_ids:
             neck_trace[i]["coordinatesByStageM"][name] = list(mesh["vertices"][i])
+        for edge, evidence in neck_edge_angles.items():
+            normals = []
+            for face_index in evidence["adjacentFaceIndices"]:
+                face = mesh["faces"][face_index]
+                if len(face) < 3:
+                    normals = []
+                    break
+                a, b, c = (Vector(mesh["vertices"][int(index)]) for index in face[:3])
+                normal = (b - a).cross(c - a)
+                if normal.length <= 1e-12:
+                    normals = []
+                    break
+                normals.append(normal.normalized())
+            if len(normals) == 2:
+                neck_edge_angles[edge]["normalDiscontinuityDegreesByStage"][name] = round(
+                    math.degrees(normals[0].angle(normals[1])), 5
+                )
+    trace_stage("native-sewn")
     collar_evidence = {"applied": False}
     if "collarContourPlacement" in pose:
         collar_pose = dict(pose, bodyContourPlacement=pose["collarContourPlacement"])
@@ -2941,6 +2973,7 @@ def main():
     geometry_fairing_evidence = fair_panel_interiors(
         mesh, pose.get("panelInteriorGeometryFairing", {})
     )
+    trace_stage("panel-interior-fairing")
     data = bpy.data.meshes.new(job["id"] + "-sewn-surface")
     data.from_pydata(mesh["vertices"], [], mesh["faces"])
     data.update()
@@ -3150,7 +3183,7 @@ def main():
         "measuredShortsUpperSurfacePlacement": shorts_surface_evidence,
         "measuredSkirtEnvelopePlacement": skirt_envelope_evidence,
         "measuredCollarPlacement": collar_evidence,
-        "necklinePlacementTrace": {"coordinateSystem": "blender-z-up", "selection": {"nativeMinimumZM": .98, "nativeMaximumAbsXM": .12}, "records": list(neck_trace.values()), "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."},
+        "necklinePlacementTrace": {"coordinateSystem": "blender-z-up", "selection": {"nativeMinimumZM": .98, "nativeMaximumAbsXM": .12}, "records": list(neck_trace.values()), "internalEdgeNormalTrace": list(neck_edge_angles.values()), "evidenceBoundary": "Original sewn vertex IDs/face ownership, per-stage coordinates, and internal edge normal angles through panel fairing; diagnostic only, not fit or appearance acceptance."},
         "metrics": {"vertices": len(data.vertices), "triangles": len(data.polygons),
                     "unweightedVertices": len(data.vertices),
                     "degenerateTriangles": microdegenerate_cleanup["remainingDegenerateTriangles"]},
