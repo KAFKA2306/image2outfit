@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v111-posterior-normal-trace-20261029",
+  "revision": "v113-orientation-preserving-contour-and-fairing-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "TORSO_FACETING_REQUIRES_TRANSFORM_LOCALIZATION",
+      "description": "Directly inspected all five current V113 views and six poses. The mesh builder now enforces positive per-triangle normal agreement during contour placement and torso fairing, but the posterior folds remain severe: edge 759-860 goes from 8.01511 degrees native to 98.07205 after torso contour and 138.90642 after fairing; edge 759-1003 goes from 5.13763 to 93.99092 and 136.88985. Shared-edge direction signs are opposite for both adjacent face pairs, so winding is consistent; displacement scales were clamped to 0.24065465 for measured contour and 0.08442574 for fairing. The safeguard prevents reversal, but does not produce an acceptable smooth surface.",
       "severity": "BLOCKER",
-      "description": "Directly inspected all five regenerated V111 views and six poses. Stagewise edge tracing isolates the rear-neckline facets: edge 759-860 changes from 8.01511° after native sewing to 176.62925° at torso-contour; edge 759-1003 stays 3.21893° through upper-surface, then flips to 177.13795° at panel-interior-fairing. V111 is diagnostic-only; broad torso faceting remains visible and appearance is not accepted."
+      "code": "POSTERIOR_FOLD_REMAINS_AFTER_ORIENTATION_CLAMP"
     },
     {
-      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE",
+      "description": "Current V113 renders remain almost entirely white with a narrow lavender diagonal band and sparse piping. Lamé response and the fencing-practice identity are not legible in the five views.",
       "severity": "BLOCKER",
-      "description": "The garment remains almost entirely white with a narrow lavender diagonal band and sparse edge piping. Lamé material response is not visible in these current renders, and the intended fencing-practice identity is still weak."
+      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE"
     },
     {
-      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED",
+      "description": "Current crouch and sit images retain skirt/shorts intersections and abrupt hem folds; prone retains a broad disk-like flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
       "severity": "BLOCKER",
-      "description": "Crouch/sit retain skirt and shorts overlap and abrupt hem deformation; prone remains a broad disk-like flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified."
+      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED"
     }
   ],
   "failedGeometryChecks": [

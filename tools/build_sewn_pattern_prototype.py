@@ -119,6 +119,69 @@ def pack_panel_uv_bounds(panel_bounds, padding):
     return low, best
 
 
+def preserve_face_orientation_during_displacement(faces, before, proposed):
+    """Bound a positional update so no existing triangle reverses or collapses.
+
+    This is a local geometric safeguard only. It does not establish body fit,
+    appearance, or acceptable surface smoothness.
+    """
+    triangles = []
+    for face_index, face in enumerate(faces):
+        if len(face) < 3:
+            raise ValueError("Orientation safeguard encountered a face with fewer than three vertices")
+        for corner in range(1, len(face) - 1):
+            triangles.append((face_index, (int(face[0]), int(face[corner]), int(face[corner + 1]))))
+
+    def valid(scale):
+        points = [
+            [before[i][axis] + scale * (proposed[i][axis] - before[i][axis]) for axis in range(3)]
+            for i in range(len(before))
+        ]
+        old_normals = []
+        for _, (a, b, c) in triangles:
+            old_a, old_b, old_c = before[a], before[b], before[c]
+            old_normal = (
+                (old_b[1] - old_a[1]) * (old_c[2] - old_a[2]) - (old_b[2] - old_a[2]) * (old_c[1] - old_a[1]),
+                (old_b[2] - old_a[2]) * (old_c[0] - old_a[0]) - (old_b[0] - old_a[0]) * (old_c[2] - old_a[2]),
+                (old_b[0] - old_a[0]) * (old_c[1] - old_a[1]) - (old_b[1] - old_a[1]) * (old_c[0] - old_a[0]),
+            )
+            if math.sqrt(sum(value * value for value in old_normal)) <= 2e-12:
+                raise ValueError("Orientation safeguard cannot preserve an already degenerate triangle")
+            old_normals.append(old_normal)
+        for triangle_index, (_, (a, b, c)) in enumerate(triangles):
+            old_normal = old_normals[triangle_index]
+            pa, pb, pc = points[a], points[b], points[c]
+            new_normal = (
+                (pb[1] - pa[1]) * (pc[2] - pa[2]) - (pb[2] - pa[2]) * (pc[1] - pa[1]),
+                (pb[2] - pa[2]) * (pc[0] - pa[0]) - (pb[0] - pa[0]) * (pc[2] - pa[2]),
+                (pb[0] - pa[0]) * (pc[1] - pa[1]) - (pb[1] - pa[1]) * (pc[0] - pa[0]),
+            )
+            if math.sqrt(sum(value * value for value in new_normal)) <= 2e-12:
+                return False
+            if sum(old_normal[axis] * new_normal[axis] for axis in range(3)) <= 0:
+                return False
+        return True
+
+    if valid(1.0):
+        scale = 1.0
+    else:
+        low, high = 0.0, 1.0
+        for _ in range(32):
+            middle = (low + high) * 0.5
+            if valid(middle):
+                low = middle
+            else:
+                high = middle
+        scale = low
+    if scale <= 1e-6:
+        raise ValueError("Requested displacement has no useful orientation-preserving step")
+    bounded = [
+        [before[i][axis] + scale * (proposed[i][axis] - before[i][axis]) for axis in range(3)]
+        for i in range(len(before))
+    ]
+    return bounded, scale, len(triangles)
+
+
 def fair_panel_interiors(mesh, declaration):
     """Apply bounded positional fairing while locking canonical panel seams."""
     piece_ids = declaration.get("pieceIds")
@@ -195,6 +258,10 @@ def fair_panel_interiors(mesh, declaration):
                     for axis in range(3)
                 ]
         vertices = updated
+    proposed = vertices
+    vertices, displacement_scale, orientation_checked = preserve_face_orientation_during_displacement(
+        faces, original, proposed
+    )
     distances = [
         math.sqrt(sum((vertices[index][axis] - original[index][axis]) ** 2 for axis in range(3)))
         for index in moved
@@ -210,6 +277,8 @@ def fair_panel_interiors(mesh, declaration):
         "lockedCanonicalBoundaryVertexCount": len(boundary_vertices),
         "maximumVertexDisplacementM": max(distances, default=0.0),
         "meanVertexDisplacementM": sum(distances) / len(distances) if distances else 0.0,
+        "orientationPreservingDisplacementScale": displacement_scale,
+        "orientationCheckedTriangleCount": orientation_checked,
         "preservesCanonicalPanelSeams": True,
         "grantsFitAcceptance": False,
         "grantsAppearanceAcceptance": False,
@@ -1790,7 +1859,8 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             vertex_owners[vertex].add(piece)
     vertex_ids={v for face,piece in zip(mesh["faces"],mesh["facePieceIds"]) if piece in ids for v in face}
     seam_factors = preserved_seam_factors(mesh, spec)
-    before=json.dumps(mesh["vertices"],separators=(",",":"))
+    before_vertices = [point[:] for point in mesh["vertices"]]
+    before=json.dumps(before_vertices,separators=(",",":"))
     extrapolated=0
     layered=0
     height_blend_skipped = 0
@@ -1839,12 +1909,10 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             continue
         weight = seam_factors.get(i, 1.0)*height_weight
         mesh["vertices"][i]=[x+(float(q.x)-x)*weight,y+(float(q.y)-y)*weight,z]
-    # Reject newly collapsed geometry instead of deleting or repairing faces.
-    for face in mesh["faces"]:
-        a,b,c=[Vector(mesh["vertices"][v]) for v in face]
-        if (b - a).cross(c - a).length / 2 <= 1e-12:
-            raise ValueError("Body contour placement collapsed a triangle")
-    return {"applied":True,"targetSourceSha256":digest(target_path),"bodyObject":body.name,"configuration":spec,"sections":sections,"placedVertexCount":len(vertex_ids),"heightBlendSkippedVertexCount":height_blend_skipped,"angularSourceVerticesSha256":hashlib.sha256(json.dumps(angular_source_vertices,separators=(",",":")).encode()).hexdigest() if angular_source_vertices is not None else None,"layerOffsetVertexCount":layered,"sharedSeamVerticesLayerOffsetM":0,"heightExtrapolatedVertexCount":extrapolated,"beforeVerticesSha256":hashlib.sha256(before.encode()).hexdigest(),"afterVerticesSha256":hashlib.sha256(json.dumps(mesh["vertices"],separators=(",",":")).encode()).hexdigest(),"bodyFacesCopied":False,"grantsFitAcceptance":False}
+    mesh["vertices"], displacement_scale, orientation_checked = preserve_face_orientation_during_displacement(
+        mesh["faces"], before_vertices, mesh["vertices"]
+    )
+    return {"applied":True,"targetSourceSha256":digest(target_path),"bodyObject":body.name,"configuration":spec,"sections":sections,"placedVertexCount":len(vertex_ids),"heightBlendSkippedVertexCount":height_blend_skipped,"angularSourceVerticesSha256":hashlib.sha256(json.dumps(angular_source_vertices,separators=(",",":")).encode()).hexdigest() if angular_source_vertices is not None else None,"layerOffsetVertexCount":layered,"sharedSeamVerticesLayerOffsetM":0,"heightExtrapolatedVertexCount":extrapolated,"orientationPreservingDisplacementScale":displacement_scale,"orientationCheckedTriangleCount":orientation_checked,"beforeVerticesSha256":hashlib.sha256(before.encode()).hexdigest(),"afterVerticesSha256":hashlib.sha256(json.dumps(mesh["vertices"],separators=(",",":")).encode()).hexdigest(),"bodyFacesCopied":False,"grantsFitAcceptance":False}
 
 
 def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
@@ -2911,7 +2979,24 @@ def main():
                 neck_edges.setdefault(edge, []).append(face_index)
     neck_edge_angles = {
         edge: {"edgeVertexIndices": list(edge), "adjacentFaceIndices": faces,
-               "normalDiscontinuityDegreesByStage": {}}
+               "adjacentFaceOwnershipAndWinding": [
+                   {
+                       "faceIndex": face_index,
+                       "pieceId": mesh["facePieceIds"][face_index],
+                       "faceVertexOrder": [int(index) for index in mesh["faces"][face_index]],
+                       "sharedEdgeDirectionSign": next(
+                           1 if (int(first), int(second)) == edge else -1
+                           for first, second in zip(
+                               mesh["faces"][face_index],
+                               mesh["faces"][face_index][1:] + mesh["faces"][face_index][:1],
+                           )
+                           if {int(first), int(second)} == set(edge)
+                       ),
+                   }
+                   for face_index in faces
+               ],
+               "normalDiscontinuityDegreesByStage": {},
+               "perFaceUnitNormalsByStage": {}}
         for edge, faces in neck_edges.items() if len(faces) == 2
     }
     def trace_stage(name):
@@ -2930,6 +3015,10 @@ def main():
                     normals = []
                     break
                 normals.append(normal.normalized())
+            evidence["perFaceUnitNormalsByStage"][name] = [
+                [round(value, 8) for value in normal]
+                for normal in normals
+            ] if len(normals) == 2 else []
             if len(normals) == 2:
                 neck_edge_angles[edge]["normalDiscontinuityDegreesByStage"][name] = round(
                     math.degrees(normals[0].angle(normals[1])), 5
