@@ -9434,7 +9434,13 @@
     ],
     "radialClearanceM": 0.004,
     "outsideSampleRange": "hold-nearest-contour",
-    "evidenceBoundary": "Neutral evaluated body contours only. 4 mm radial clearance and height extrapolation are explicit prototype hypotheses; seams, shoulder/neck fit, fabric ease, Large shape keys and motion remain unapproved. The outer right-front panel has 2 mm additional radial offset on exclusive vertices only; shared sewn vertices remain coincident. Layer spacing is an unapproved prototype hypothesis.",
+    "placementFadeOutZM": [
+      0.975,
+      1.0551301431655884
+    ],
+    "placementFadeOutEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/shoulder-surface-dd2b66fd4a9b407aa3fc2d3073f22fc90c7e89d3d96a2d8447d2172b0eac1853.json",
+    "placementFadeOutEvidenceSha256": "dd2b66fd4a9b407aa3fc2d3073f22fc90c7e89d3d96a2d8447d2172b0eac1853",
+    "evidenceBoundary": "Neutral evaluated body contours only, measured through Z=0.975 m. Radial contour displacement smoothly fades from the last supported torso section to the directly measured shoulder endpoint, avoiding hold-nearest extrapolation across the shoulder. 4 mm radial clearance and the transition remain prototype hypotheses; seams, shoulder/neck fit, fabric ease, Large shape keys and motion remain unapproved. The outer right-front panel has 2 mm additional radial offset on exclusive vertices only; shared sewn vertices remain coincident. Layer spacing is an unapproved prototype hypothesis.",
     "anatomicalOrientation": "Avatar front = Blender -Y, back = Blender +Y; GC depth +Z maps to Blender -Y. Front closure must remain on the front.",
     "exclusivePieceLayerOffsetM": {
       "jacket-overlap-front": 0.002

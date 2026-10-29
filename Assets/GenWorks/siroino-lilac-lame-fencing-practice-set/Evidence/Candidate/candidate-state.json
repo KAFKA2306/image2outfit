@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v117-bound-plastron-to-jacket-hem-20261029",
+  "revision": "v118-fade-torso-placement-to-measured-shoulder-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,17 +20,17 @@
   "blockingFindings": [
     {
       "code": "POSTERIOR_SURFACE_DISCONTINUITY_UNRESOLVED",
-      "description": "Directly inspected all five V117 views and six current poses. The build report records 2,718 within-panel posterior edges; 26 have baseline dihedral over 60 degrees and the maximum is 179.10 degrees. Contour placement is clamped to 0.00000340, so the continuity constraint preserves the severe existing folds by effectively preventing placement instead of resolving the surface.",
+      "description": "Directly inspected all five V118 views and six current poses. The torso placement fade from the last body contour at 0.975 m to the measured shoulder endpoint raised the applied displacement scale only from 0.00000340 to 0.00013773. The report still records 2,718 within-panel posterior edges, 26 baseline edges above 60 degrees, and a 179.10-degree maximum. The back remains visibly faceted; this transition is insufficient and the posterior geometry must be replaced or rebuilt from its panel source.",
       "severity": "BLOCKER"
     },
     {
       "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE",
-      "description": "The current render remains almost entirely white with a narrow lilac diagonal chest strip and sparse piping. The lamé material response and fencing-practice identity are not legible in the required views.",
+      "description": "Directly inspected V118 views: the outfit remains almost entirely white with a narrow lilac diagonal chest strip and sparse piping. Lamé response and fencing-practice identity are still not legible.",
       "severity": "BLOCKER"
     },
     {
       "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED",
-      "description": "Crouch and sit retain skirt/shorts intersections and abrupt folds; prone retains a broad disk-like skirt flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
+      "description": "Directly inspected V118 poses: crouch and sit retain skirt/shorts intersections and abrupt folds; prone retains a broad disk-like skirt flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
       "severity": "BLOCKER"
     }
   ],

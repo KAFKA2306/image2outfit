@@ -1844,6 +1844,12 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             raise ValueError("Contour transition target hash mismatch")
         if angular_source_vertices is None or len(angular_source_vertices) != len(mesh["vertices"]):
             raise ValueError("Contour transition requires common native angular coordinates")
+    placement_fade_out = spec.get("placementFadeOutZM")
+    if placement_fade_out is not None:
+        if (not isinstance(placement_fade_out, list) or len(placement_fade_out) != 2
+                or not all(math.isfinite(z) for z in placement_fade_out)
+                or placement_fade_out[0] < zs[-1] or placement_fade_out[0] >= placement_fade_out[1]):
+            raise ValueError("Invalid measured-contour placement fade-out range")
     bodies = [o for o in body_objects if o.type == "MESH" and o.name.startswith(spec["bodyMeshNamePrefix"])]
     if len(bodies) != 1:
         raise ValueError("Measured contour placement requires one explicit body mesh")
@@ -1968,6 +1974,8 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
     extrapolated=0
     layered=0
     height_blend_skipped = 0
+    placement_fade_blended = 0
+    placement_fade_skipped = 0
     for i in sorted(vertex_ids):
         if seam_factors.get(i, 1.0) == 0:
             continue
@@ -2002,6 +2010,14 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             direction = ((x-center[0])/length,(y-center[1])/length)
         if z < zs[0] or z > zs[-1]:
             extrapolated += 1
+        placement_weight = 1.0
+        if placement_fade_out is not None and z > placement_fade_out[0]:
+            t = min(1.0, (z - placement_fade_out[0]) / (placement_fade_out[1] - placement_fade_out[0]))
+            placement_weight = 1.0 - t * t * (3.0 - 2.0 * t)
+            if placement_weight <= 0.0:
+                placement_fade_skipped += 1
+                continue
+            placement_fade_blended += 1
         # Keep shared sewing vertices on their common surface. Only the
         # exclusive vertices of an explicitly declared outer panel move out.
         owners = vertex_owners[i]
@@ -2011,7 +2027,7 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
         q=radial_point(sections[j],direction,offset).lerp(radial_point(sections[j+1],direction,offset),f)
         if envelope and length >= math.hypot(q.x-center[0],q.y-center[1]):
             continue
-        weight = seam_factors.get(i, 1.0)*height_weight
+        weight = seam_factors.get(i, 1.0)*height_weight*placement_weight
         mesh["vertices"][i]=[x+(float(q.x)-x)*weight,y+(float(q.y)-y)*weight,z]
     continuity_piece_ids = spec.get("continuityPieceIds", [])
     if (not isinstance(continuity_piece_ids, list)
@@ -2024,7 +2040,7 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
     mesh["vertices"], displacement_scale, orientation_checked, continuity_evidence = preserve_face_orientation_during_displacement(
         mesh["faces"], before_vertices, mesh["vertices"], continuity_edges, continuity_degrees
     )
-    return {"applied":True,"targetSourceSha256":digest(target_path),"bodyObject":body.name,"configuration":spec,"sections":sections,"placedVertexCount":len(vertex_ids),"heightBlendSkippedVertexCount":height_blend_skipped,"angularSourceVerticesSha256":hashlib.sha256(json.dumps(angular_source_vertices,separators=(",",":")).encode()).hexdigest() if angular_source_vertices is not None else None,"layerOffsetVertexCount":layered,"sharedSeamVerticesLayerOffsetM":0,"heightExtrapolatedVertexCount":extrapolated,"orientationPreservingDisplacementScale":displacement_scale,"orientationCheckedTriangleCount":orientation_checked,"normalContinuity":continuity_evidence,"beforeVerticesSha256":hashlib.sha256(before.encode()).hexdigest(),"afterVerticesSha256":hashlib.sha256(json.dumps(mesh["vertices"],separators=(",",":")).encode()).hexdigest(),"bodyFacesCopied":False,"grantsFitAcceptance":False}
+    return {"applied":True,"targetSourceSha256":digest(target_path),"bodyObject":body.name,"configuration":spec,"sections":sections,"placedVertexCount":len(vertex_ids),"heightBlendSkippedVertexCount":height_blend_skipped,"placementFadeOutBlendedVertexCount":placement_fade_blended,"placementFadeOutSkippedVertexCount":placement_fade_skipped,"angularSourceVerticesSha256":hashlib.sha256(json.dumps(angular_source_vertices,separators=(",",":")).encode()).hexdigest() if angular_source_vertices is not None else None,"layerOffsetVertexCount":layered,"sharedSeamVerticesLayerOffsetM":0,"heightExtrapolatedVertexCount":extrapolated,"orientationPreservingDisplacementScale":displacement_scale,"orientationCheckedTriangleCount":orientation_checked,"normalContinuity":continuity_evidence,"beforeVerticesSha256":hashlib.sha256(before.encode()).hexdigest(),"afterVerticesSha256":hashlib.sha256(json.dumps(mesh["vertices"],separators=(",",":")).encode()).hexdigest(),"bodyFacesCopied":False,"grantsFitAcceptance":False}
 
 
 def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
