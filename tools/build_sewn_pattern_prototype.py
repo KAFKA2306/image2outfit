@@ -2861,17 +2861,72 @@ def main():
     ownership = data.attributes.new("canonical_piece_index", "INT", "FACE")
     for face, owner in zip(ownership.data, owners):
         face.value = pieces.index(owner)
-    # The sleeves and the sewn overskirt are continuous cloth surfaces.
-    # Smooth shading complements the explicit crease and longitudinal cuts;
-    # those cuts remain real mesh topology, not a normal-map substitute.
-    smooth_surface_pieces = {
-        "jacket-sleeve-left", "jacket-sleeve-right",
-        "overskirt-front-left", "overskirt-front-right",
-        "overskirt-front-lap-left", "overskirt-front-lap-right",
-        "overskirt-back-left", "overskirt-back-right",
-    }
+    shading_spec = pose.get("surfaceShadingHypothesis")
+    if not isinstance(shading_spec, dict):
+        raise ValueError("Assembly pose must declare the surface shading hypothesis")
+    smooth_surface_pieces = set(shading_spec.get("smoothPanelPieceIds", []))
+    if not smooth_surface_pieces or not smooth_surface_pieces.issubset(set(owners)):
+        raise ValueError("Surface shading hypothesis names missing canonical panel pieces")
+    if shading_spec.get("preserveCanonicalPanelSeams") is not True:
+        raise ValueError("Panel-local smooth shading must preserve canonical panel seams")
     for polygon, owner in zip(data.polygons, owners):
         polygon.use_smooth = owner in smooth_surface_pieces
+
+    # Split smooth normals at edges shared by distinct sewn panel owners. This
+    # keeps the panel interiors smooth without blending shading across seams.
+    edge_panel_owners = {}
+    edge_face_indices = {}
+    for polygon, owner in zip(data.polygons, owners):
+        for edge_key in polygon.edge_keys:
+            edge = tuple(sorted(int(vertex_id) for vertex_id in edge_key))
+            edge_panel_owners.setdefault(edge, set()).add(owner)
+            edge_face_indices.setdefault(edge, []).append(polygon.index)
+    seam_edges = set()
+    internal_normal_angles = {piece_id: [] for piece_id in smooth_surface_pieces}
+    for edge, adjacent_owners in edge_panel_owners.items():
+        if len(adjacent_owners) > 1:
+            seam_edges.add(edge)
+        if len(adjacent_owners) == 1 and len(edge_face_indices[edge]) == 2:
+            owner = next(iter(adjacent_owners))
+            if owner in internal_normal_angles:
+                first, second = edge_face_indices[edge]
+                first_normal = data.polygons[first].normal
+                second_normal = data.polygons[second].normal
+                if first_normal.length > 1e-12 and second_normal.length > 1e-12:
+                    internal_normal_angles[owner].append(
+                        math.degrees(first_normal.angle(second_normal))
+                    )
+    sharp_edge_count = 0
+    for edge in data.edges:
+        key = tuple(sorted(int(vertex_id) for vertex_id in edge.vertices))
+        if key in seam_edges:
+            edge.use_edge_sharp = True
+            sharp_edge_count += 1
+    def percentile(values, fraction):
+        ordered = sorted(values)
+        if not ordered:
+            return 0.0
+        return ordered[min(len(ordered) - 1, int(math.ceil(len(ordered) * fraction)) - 1)]
+    shading_normal_audit = {
+        "method": "panel-local-smooth-shading-with-canonical-seam-normal-splits",
+        "smoothPanelPieceIds": sorted(smooth_surface_pieces),
+        "smoothFaceCount": sum(polygon.use_smooth for polygon in data.polygons),
+        "canonicalSeamEdgeCount": len(seam_edges),
+        "sharpCanonicalSeamEdgeCount": sharp_edge_count,
+        "seamNormalsSplit": sharp_edge_count == len(seam_edges),
+        "internalFaceNormalDiscontinuityDegreesByPanel": {
+            piece_id: {
+                "sharedInternalEdgeCount": len(values),
+                "maximum": round(max(values), 5) if values else 0.0,
+                "p95": round(percentile(values, .95), 5),
+            }
+            for piece_id, values in sorted(internal_normal_angles.items())
+        },
+        "grantsAppearanceAcceptance": False,
+        "grantsFitAcceptance": False,
+    }
+    if not shading_normal_audit["seamNormalsSplit"]:
+        raise ValueError("Canonical sewn panel seam normals were not fully split")
     garment = bpy.data.objects.new(job["id"], data)
     bpy.context.collection.objects.link(garment)
     garment["prototypeRole"] = "unfitted-unweighted-sewn-pattern"
@@ -2984,9 +3039,8 @@ def main():
                     "unweightedVertices": len(data.vertices),
                     "degenerateTriangles": microdegenerate_cleanup["remainingDegenerateTriangles"]},
         "surfaceShadingHypothesis": {
-            "components": sorted(smooth_surface_pieces),
-            "method": "smooth-per-polygon normals on canonical sleeve faces",
-            "reason": "Direct inspection showed strong triangle faceting on the coarse sleeve prototype.",
+            **shading_normal_audit,
+            "reason": "Direct review showed broad faceting across jacket torso and waist/hip surfaces. Smooth only the declared panel interiors and split normals at all canonical panel seams.",
             "grantsAppearanceAcceptance": False,
             "grantsFitAcceptance": False,
         },

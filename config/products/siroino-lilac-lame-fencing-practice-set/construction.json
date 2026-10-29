@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V106 measures per-panel authored fold displacement and replaces the hem-band XY offset frame with an adjacent-face-normal surface corner join. These are disposable appearance hypotheses only.",
-  "designRevision": "v106-surface-normal-hem-frame-fold-displacement-audit-20261029",
+  "target": "V107 measures within-panel face-normal discontinuity on the faceted jacket and hip surfaces, applies smooth shading only inside declared panels, and preserves normal splits at canonical sewn-panel seams. This is a disposable rendering hypothesis only.",
+  "designRevision": "v107-panel-local-surface-shading-seam-normal-audit-20261029",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -163,8 +163,8 @@
       "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V106 retains the V105 armature-only overskirt path and records per-panel authored fold displacement statistics. Hem bands now use adjacent surface normals for corner framing. The regenerated previews remain visual evidence only; fit, shorts coverage, shape-key response, motion and fabric calibration remain unverified.",
-    "reason": "V106 measures authored overskirt displacement per sewn panel to separate the sub-millimeter fold field from the visible back corrugation, then replaces the hem-band XY offset frame with a corner join driven by adjacent sewn-face normals. This is a prototype geometry investigation only; appearance and downstream fit/runtime/release remain unapproved.",
+    "evidence": "V107 measures internal face-normal discontinuity by sewn panel, enables panel-interior smooth shading on jacket torso, sleeves, shorts, and overskirt, and sets sharp-normal boundaries wherever canonical panel ownership changes. The regenerated previews remain visual evidence only; geometry, fit, shorts coverage, shape-key response, motion and fabric calibration remain unverified.",
+    "reason": "V106's direct renders showed broad jacket and hip faceting that was not explained by the measured sub-millimeter pleat field. V107 tests smooth shading within the corresponding sewn panels while preserving face-normal splits at canonical seams. This is a rendering hypothesis only; appearance and downstream fit/runtime/release remain unapproved.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,

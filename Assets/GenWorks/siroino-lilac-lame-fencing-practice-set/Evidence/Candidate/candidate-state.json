@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v106-surface-normal-hem-frame-fold-displacement-audit-20261029",
+  "revision": "v107-panel-local-surface-shading-seam-normal-audit-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "JACKET_AND_HIP_SURFACE_FACETING_PERSISTS",
+      "code": "PANEL_LOCAL_SHADING_DID_NOT_RESOLVE_FACETING",
       "severity": "BLOCKER",
-      "description": "Direct review of all five views shows severe faceting/rippling across jacket and waist/hip surfaces, strongest in rear and side views. This remains visually broken shading/geometry. The V106 authored pleat audit reports sub-millimeter radial displacement (per panel maxima below 0.8 mm), so that fold field alone does not explain the large visible surface distortion."
+      "description": "Direct V107 review and side-by-side comparison with V106 show no clear visible reduction in broad faceted patches on the jacket torso, side/underarm, waist and hip surfaces. The declared panel-local smooth shading and canonical seam split are present in the build audit, but appearance remains visibly faceted. The measured within-panel face-normal discontinuity p95 is 32.09 degrees on jacket back panels and 61.98–69.09 degrees on front torso panels; investigate face winding/orientation and surface geometry before another shading-only change."
     },
     {
-      "code": "GARMENT_MATERIAL_AND_IDENTITY_NOT_LEGIBLE",
+      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE",
       "severity": "BLOCKER",
-      "description": "The outfit still renders almost entirely plain white; the narrow lavender sash and piping do not read as a lilac lamé fencing practice set."
+      "description": "The garment still reads almost entirely as plain white cloth with a narrow lavender chest sash and sparse piping; lamé surface character and fencing-practice identity are not legible."
     },
     {
       "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED",
       "severity": "BLOCKER",
-      "description": "Crouch, sit and prone show unnatural skirt/underlayer bunching, intersection and flare. Fit, final weights, shape-key response, UV validation, Unity/VRChat runtime and package eligibility remain unverified."
+      "description": "Crouch, sit and prone retain severe skirt/underlayer bunching, flare or inversion. Avatar fit, final weights, shape-key response, validated UVs, Unity/VRChat runtime and package eligibility remain unverified."
     }
   ],
   "failedGeometryChecks": [

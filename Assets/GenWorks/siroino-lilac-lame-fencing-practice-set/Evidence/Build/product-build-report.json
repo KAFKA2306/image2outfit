@@ -9267,7 +9267,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "a7edd41f12c0d688316cc61b90067911df157b83bd692612c44826572c340bc3",
+    "privateSimulationSourceSha256": "68af9c8a7a57bac362e837984dbaedbcc92d92631861426516549daf680ec629",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -10517,7 +10517,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "7576b794b9167d5de2f01963d138f56f479749d304c059aa87d905afcb9025ac",
+  "sourceBlendSha256": "14cc9cc880c0a9bada23e02455703f2d13f466449b1ed33119bff00fed71edeb",
   "sewnMeshSha256": "cd2f6c90478f0e7c2ed3dab6072de9f9a9a9f4b424e4ab6a3d3234c401c8fdf9",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -171252,7 +171252,12 @@
     "degenerateTriangles": 0
   },
   "surfaceShadingHypothesis": {
-    "components": [
+    "method": "panel-local-smooth-shading-with-canonical-seam-normal-splits",
+    "smoothPanelPieceIds": [
+      "jacket-back-left",
+      "jacket-back-right",
+      "jacket-front-left",
+      "jacket-overlap-front",
       "jacket-sleeve-left",
       "jacket-sleeve-right",
       "overskirt-back-left",
@@ -171260,12 +171265,101 @@
       "overskirt-front-lap-left",
       "overskirt-front-lap-right",
       "overskirt-front-left",
-      "overskirt-front-right"
+      "overskirt-front-right",
+      "shorts-back-left",
+      "shorts-back-right",
+      "shorts-front-left",
+      "shorts-front-right"
     ],
-    "method": "smooth-per-polygon normals on canonical sleeve faces",
-    "reason": "Direct inspection showed strong triangle faceting on the coarse sleeve prototype.",
+    "smoothFaceCount": 28093,
+    "canonicalSeamEdgeCount": 677,
+    "sharpCanonicalSeamEdgeCount": 677,
+    "seamNormalsSplit": true,
+    "internalFaceNormalDiscontinuityDegreesByPanel": {
+      "jacket-back-left": {
+        "sharedInternalEdgeCount": 1359,
+        "maximum": 178.68463,
+        "p95": 32.08929
+      },
+      "jacket-back-right": {
+        "sharedInternalEdgeCount": 1359,
+        "maximum": 178.68107,
+        "p95": 32.08888
+      },
+      "jacket-front-left": {
+        "sharedInternalEdgeCount": 1389,
+        "maximum": 178.78937,
+        "p95": 69.089
+      },
+      "jacket-overlap-front": {
+        "sharedInternalEdgeCount": 1619,
+        "maximum": 179.45177,
+        "p95": 61.97828
+      },
+      "jacket-sleeve-left": {
+        "sharedInternalEdgeCount": 2548,
+        "maximum": 147.50192,
+        "p95": 28.09234
+      },
+      "jacket-sleeve-right": {
+        "sharedInternalEdgeCount": 2518,
+        "maximum": 147.50623,
+        "p95": 29.70221
+      },
+      "overskirt-back-left": {
+        "sharedInternalEdgeCount": 6110,
+        "maximum": 179.90934,
+        "p95": 13.39537
+      },
+      "overskirt-back-right": {
+        "sharedInternalEdgeCount": 6203,
+        "maximum": 179.77272,
+        "p95": 13.19868
+      },
+      "overskirt-front-lap-left": {
+        "sharedInternalEdgeCount": 3508,
+        "maximum": 62.24779,
+        "p95": 4.06905
+      },
+      "overskirt-front-lap-right": {
+        "sharedInternalEdgeCount": 3439,
+        "maximum": 62.17624,
+        "p95": 4.13844
+      },
+      "overskirt-front-left": {
+        "sharedInternalEdgeCount": 2630,
+        "maximum": 179.96043,
+        "p95": 53.69646
+      },
+      "overskirt-front-right": {
+        "sharedInternalEdgeCount": 2654,
+        "maximum": 179.90308,
+        "p95": 53.13936
+      },
+      "shorts-back-left": {
+        "sharedInternalEdgeCount": 1485,
+        "maximum": 99.57629,
+        "p95": 21.32003
+      },
+      "shorts-back-right": {
+        "sharedInternalEdgeCount": 1485,
+        "maximum": 99.70315,
+        "p95": 21.65489
+      },
+      "shorts-front-left": {
+        "sharedInternalEdgeCount": 1512,
+        "maximum": 91.57345,
+        "p95": 21.77814
+      },
+      "shorts-front-right": {
+        "sharedInternalEdgeCount": 1512,
+        "maximum": 92.87819,
+        "p95": 21.6128
+      }
+    },
     "grantsAppearanceAcceptance": false,
-    "grantsFitAcceptance": false
+    "grantsFitAcceptance": false,
+    "reason": "Direct review showed broad faceting across jacket torso and waist/hip surfaces. Smooth only the declared panel interiors and split normals at all canonical panel seams."
   },
   "geometryGate": {
     "checks": {

@@ -6,7 +6,29 @@
   "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
   "measurementEvidencePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/avatar-profile-reuse.json",
   "measurementEvidenceSha256": "6d2c3e250e50468d95326f7a5f47f023c156dbff2c25f49588a385ad1724fdc1",
-  "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
+  "surfaceShadingHypothesis": {
+    "smoothPanelPieceIds": [
+      "jacket-front-left",
+      "jacket-overlap-front",
+      "jacket-back-left",
+      "jacket-back-right",
+      "jacket-sleeve-left",
+      "jacket-sleeve-right",
+      "shorts-front-left",
+      "shorts-front-right",
+      "shorts-back-left",
+      "shorts-back-right",
+      "overskirt-front-left",
+      "overskirt-front-right",
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right",
+      "overskirt-back-left",
+      "overskirt-back-right"
+    ],
+    "preserveCanonicalPanelSeams": true,
+    "evidenceBoundary": "Panel-interior smooth shading with sharp normal splits at canonical sewn-panel boundaries is a rendering hypothesis only. It does not establish surface geometry, fit, materials, appearance acceptance, or release readiness."
+  },
+  "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. V107 panel-local smooth shading preserves canonical seam-normal splits but is only a rendered-surface hypothesis. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
   "poses": {
     "jacket-front-left": {
       "rotationDegreesXYZ": [
