@@ -119,6 +119,103 @@ def pack_panel_uv_bounds(panel_bounds, padding):
     return low, best
 
 
+def fair_panel_interiors(mesh, declaration):
+    """Apply bounded positional fairing while locking canonical panel seams."""
+    piece_ids = declaration.get("pieceIds")
+    iterations = declaration.get("iterations")
+    factor = declaration.get("factor")
+    if (
+        not isinstance(piece_ids, list)
+        or not piece_ids
+        or not isinstance(iterations, int)
+        or not 1 <= iterations <= 8
+        or not isinstance(factor, (int, float))
+        or not 0 < factor <= 0.2
+        or declaration.get("preserveCanonicalPanelSeams") is not True
+    ):
+        raise ValueError("Invalid panel-interior fairing hypothesis")
+    vertices = [list(map(float, point)) for point in mesh["vertices"]]
+    faces = mesh["faces"]
+    owners = mesh["facePieceIds"]
+    if len(faces) != len(owners) or not set(piece_ids) <= set(owners):
+        raise ValueError("Panel-interior fairing references incomplete canonical faces")
+
+    edge_faces = {}
+    for face_index, face in enumerate(faces):
+        for first, second in zip(face, face[1:] + face[:1]):
+            edge = tuple(sorted((int(first), int(second))))
+            edge_faces.setdefault(edge, []).append(face_index)
+    edge_owners = {
+        edge: {owners[index] for index in adjacent}
+        for edge, adjacent in edge_faces.items()
+    }
+    boundary_vertices = set()
+    for edge, adjacent in edge_faces.items():
+        if len(adjacent) != 2 or len(edge_owners[edge]) != 1:
+            boundary_vertices.update(edge)
+
+    neighbors_by_piece = {piece_id: {} for piece_id in piece_ids}
+    for face, owner in zip(faces, owners):
+        if owner not in neighbors_by_piece:
+            continue
+        neighbors = neighbors_by_piece[owner]
+        for vertex in face:
+            neighbors.setdefault(int(vertex), set())
+        for first, second in zip(face, face[1:] + face[:1]):
+            edge = tuple(sorted((int(first), int(second))))
+            if len(edge_faces[edge]) == 2 and edge_owners[edge] == {owner}:
+                neighbors[int(first)].add(int(second))
+                neighbors[int(second)].add(int(first))
+
+    moved = set()
+    panel_counts = {}
+    for piece_id, neighbors in neighbors_by_piece.items():
+        eligible = {
+            vertex for vertex, adjacent in neighbors.items()
+            if vertex not in boundary_vertices and adjacent
+        }
+        if not eligible:
+            raise ValueError(f"Panel has no seam-safe fairing vertices: {piece_id}")
+        panel_counts[piece_id] = len(eligible)
+        moved.update(eligible)
+    original = [point[:] for point in vertices]
+    for _ in range(iterations):
+        updated = [point[:] for point in vertices]
+        for neighbors in neighbors_by_piece.values():
+            for vertex, adjacent in neighbors.items():
+                if vertex not in moved or not adjacent:
+                    continue
+                mean = [
+                    sum(vertices[neighbor][axis] for neighbor in adjacent) / len(adjacent)
+                    for axis in range(3)
+                ]
+                updated[vertex] = [
+                    vertices[vertex][axis]
+                    + float(factor) * (mean[axis] - vertices[vertex][axis])
+                    for axis in range(3)
+                ]
+        vertices = updated
+    distances = [
+        math.sqrt(sum((vertices[index][axis] - original[index][axis]) ** 2 for axis in range(3)))
+        for index in moved
+    ]
+    mesh["vertices"] = vertices
+    return {
+        "method": "bounded-panel-interior-laplacian-fairing",
+        "pieceIds": sorted(piece_ids),
+        "iterations": iterations,
+        "factor": float(factor),
+        "movedVertexCount": len(moved),
+        "movedVertexCountByPiece": dict(sorted(panel_counts.items())),
+        "lockedCanonicalBoundaryVertexCount": len(boundary_vertices),
+        "maximumVertexDisplacementM": max(distances, default=0.0),
+        "meanVertexDisplacementM": sum(distances) / len(distances) if distances else 0.0,
+        "preservesCanonicalPanelSeams": True,
+        "grantsFitAcceptance": False,
+        "grantsAppearanceAcceptance": False,
+    }
+
+
 def assign_authored_panel_uvs(mesh_data, sewn_mesh):
     """Map sewn faces from explicit pattern or accessory source coordinates."""
     face_coordinates = sewn_mesh.get("facePatternCoordinates")
@@ -2841,6 +2938,9 @@ def main():
     rear_waist_tab_evidence = append_declared_rear_waist_tab(
         mesh, body_objects, pose, recipe, resolve(job["targetSourcePath"])
     )
+    geometry_fairing_evidence = fair_panel_interiors(
+        mesh, pose.get("panelInteriorGeometryFairing", {})
+    )
     data = bpy.data.meshes.new(job["id"] + "-sewn-surface")
     data.from_pydata(mesh["vertices"], [], mesh["faces"])
     data.update()
@@ -2883,6 +2983,7 @@ def main():
             edge_face_indices.setdefault(edge, []).append(polygon.index)
     seam_edges = set()
     internal_normal_angles = {piece_id: [] for piece_id in smooth_surface_pieces}
+    internal_normal_hotspots = {piece_id: [] for piece_id in smooth_surface_pieces}
     for edge, adjacent_owners in edge_panel_owners.items():
         if len(adjacent_owners) > 1:
             seam_edges.add(edge)
@@ -2893,9 +2994,19 @@ def main():
                 first_normal = data.polygons[first].normal
                 second_normal = data.polygons[second].normal
                 if first_normal.length > 1e-12 and second_normal.length > 1e-12:
-                    internal_normal_angles[owner].append(
-                        math.degrees(first_normal.angle(second_normal))
-                    )
+                    angle_degrees = math.degrees(first_normal.angle(second_normal))
+                    internal_normal_angles[owner].append(angle_degrees)
+                    first_vertex, second_vertex = edge
+                    first_point = data.vertices[first_vertex].co
+                    second_point = data.vertices[second_vertex].co
+                    midpoint = (first_point + second_point) * 0.5
+                    internal_normal_hotspots[owner].append({
+                        "normalDiscontinuityDegrees": round(angle_degrees, 5),
+                        "edgeVertexIndices": [first_vertex, second_vertex],
+                        "edgeLengthM": round((second_point - first_point).length, 7),
+                        "midpointBlenderM": [round(float(value), 7) for value in midpoint],
+                        "adjacentFaceIndices": [first, second],
+                    })
     sharp_edge_count = 0
     for edge in data.edges:
         key = tuple(sorted(int(vertex_id) for vertex_id in edge.vertices))
@@ -2919,6 +3030,11 @@ def main():
                 "sharedInternalEdgeCount": len(values),
                 "maximum": round(max(values), 5) if values else 0.0,
                 "p95": round(percentile(values, .95), 5),
+                "worstEdges": sorted(
+                    internal_normal_hotspots[piece_id],
+                    key=lambda record: record["normalDiscontinuityDegrees"],
+                    reverse=True,
+                )[:5],
             }
             for piece_id, values in sorted(internal_normal_angles.items())
         },
@@ -3040,10 +3156,11 @@ def main():
                     "degenerateTriangles": microdegenerate_cleanup["remainingDegenerateTriangles"]},
         "surfaceShadingHypothesis": {
             **shading_normal_audit,
-            "reason": "Direct review showed broad faceting across jacket torso and waist/hip surfaces. Smooth only the declared panel interiors and split normals at all canonical panel seams.",
+            "reason": "V107 shading-only comparison did not visibly resolve broad torso faceting. V108 separately fairs only the declared jacket torso panel interiors and locks canonical boundaries; this geometry hypothesis remains unapproved.",
             "grantsAppearanceAcceptance": False,
             "grantsFitAcceptance": False,
         },
+        "panelInteriorGeometryFairing": geometry_fairing_evidence,
         "geometryGate": {"checks": {"sewnTopologyValid": True,
             "avatarFitVerified": False, "deformWeightsVerified": False}},
         "pending": ["panel placement and physical cloth settling", "avatar fit",

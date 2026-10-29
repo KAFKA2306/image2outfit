@@ -28,7 +28,19 @@
     "preserveCanonicalPanelSeams": true,
     "evidenceBoundary": "Panel-interior smooth shading with sharp normal splits at canonical sewn-panel boundaries is a rendering hypothesis only. It does not establish surface geometry, fit, materials, appearance acceptance, or release readiness."
   },
-  "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. V107 panel-local smooth shading preserves canonical seam-normal splits but is only a rendered-surface hypothesis. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
+  "panelInteriorGeometryFairing": {
+    "pieceIds": [
+      "jacket-front-left",
+      "jacket-overlap-front",
+      "jacket-back-left",
+      "jacket-back-right"
+    ],
+    "iterations": 3,
+    "factor": 0.12,
+    "preserveCanonicalPanelSeams": true,
+    "evidenceBoundary": "Three bounded 0.12 Laplacian fairing passes move only interior vertices of the directly reviewed torso panels; all canonical boundary vertices remain fixed. This is a local geometry hypothesis, not avatar fit, material quality, appearance approval, or release acceptance."
+  },
+  "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. V108 tests bounded position fairing on jacket torso panel interiors after V107 shading-only renders did not visibly resolve faceting. Canonical seam vertices remain fixed. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
   "poses": {
     "jacket-front-left": {
       "rotationDegreesXYZ": [
@@ -9597,6 +9609,13 @@
     "outsideSampleRange": "hold-nearest-contour",
     "evidenceBoundary": "Neutral measured neck sections start 20 mm above Neck head. Lower bone-head section includes shoulders/arms (circumference 1.4319 m) and is rejected as a collar profile. Start contour 0.1968 m; maximum admissible contour circumference 0.30 m is an explicit prototype guard. Upper heights hold nearest neck contour; original 60 mm collar height reaches above Neck tail and head clearance remains unapproved. No fit or strain acceptance.",
     "maximumSectionCircumferenceM": 0.3,
+    "preserveSharedPieceIds": [
+      "jacket-front-left",
+      "jacket-overlap-front",
+      "jacket-back-left",
+      "jacket-back-right"
+    ],
+    "preservedSeamFadeDistanceM": 0.04,
     "angularOriginBlenderXYM": [
       0,
       -0.0093428585678339
