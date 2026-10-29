@@ -239,12 +239,24 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         raise ValueError("prototypeEdgeTrim baseColorLinearRgb must be three channels in [0, 1]")
 
     edge_faces = {}
+    edge_face_normals = {}
     for face_index, face in enumerate(mesh["faces"]):
         owner = mesh["facePieceIds"][face_index]
+        from mathutils import Vector
+        face_points = [Vector(mesh["vertices"][index]) for index in face]
+        face_normal = Vector((0.0, 0.0, 0.0))
+        for corner in range(1, len(face_points) - 1):
+            candidate = (face_points[corner] - face_points[0]).cross(
+                face_points[corner + 1] - face_points[0])
+            if candidate.length_squared > 1e-16:
+                face_normal = candidate.normalized()
+                break
         for offset, first in enumerate(face):
             second = face[(offset + 1) % len(face)]
             edge = tuple(sorted((int(first), int(second))))
             edge_faces.setdefault(edge, []).append(owner)
+            if face_normal.length_squared > 0:
+                edge_face_normals.setdefault(edge, []).append(face_normal.copy())
     boundaries = {piece_id: set() for piece_id in piece_ids}
     for edge, adjacent_owners in edge_faces.items():
         if len(adjacent_owners) == 1 and adjacent_owners[0] in boundaries:
@@ -457,21 +469,45 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         if not math.isfinite(endpoint_inset) or not 0 <= endpoint_inset <= 0.02:
             raise ValueError(f"Invalid prototype trim endpoint inset for {chain_piece_ids}")
         points = inset_polyline(points, endpoint_inset)
-        # Explicit two-rail band with bounded miter joins: no curve bevel,
-        # independent caps, or endpoint taper can create corner projections.
+        # Derive the rail frame from the adjacent sewn face normals. The prior
+        # XY-only miter assumed a horizontal surface and projected at curved
+        # corners; this local surface frame follows the actual panel.
         half = band_width * 0.5
+        segment_frames = []
+        for edge, first, second in zip(chain_edges, points, points[1:]):
+            tangent = (second - first).normalized()
+            normals = edge_face_normals.get(edge, [])
+            if not normals:
+                raise ValueError(f"Prototype hem edge has no adjacent face normal: {edge}")
+            surface_normal = sum(normals, Vector((0.0, 0.0, 0.0)))
+            if surface_normal.length_squared <= 1e-12:
+                surface_normal = normals[0].copy()
+            surface_normal.normalize()
+            transverse = surface_normal.cross(tangent)
+            if transverse.length_squared <= 1e-12:
+                raise ValueError(f"Prototype hem surface frame is degenerate: {edge}")
+            transverse.normalize()
+            segment_frames.append((tangent, surface_normal, transverse))
         sections = []
         for index, point in enumerate(points):
-            before = (point - points[index - 1]).normalized() if index else (points[1] - point).normalized()
-            after = (points[index + 1] - point).normalized() if index < len(points) - 1 else before
-            n0, n1 = Vector((-before.y, before.x, 0)), Vector((-after.y, after.x, 0))
-            bisector = n0 + n1
-            if bisector.length_squared < 1e-10:
-                bisector = n1
+            before_frame = segment_frames[index - 1] if index > 0 else segment_frames[0]
+            after_frame = segment_frames[index] if index < len(segment_frames) else segment_frames[-1]
+            before_transverse = before_frame[2].copy()
+            after_transverse = after_frame[2].copy()
+            if before_transverse.dot(after_transverse) < 0:
+                after_transverse.negate()
+            bisector = before_transverse + after_transverse
+            if bisector.length_squared <= 1e-12:
+                bisector = after_transverse
             bisector.normalize()
-            miter = min(half * 2.5, half / max(0.35, abs(bisector.dot(n1))))
-            center = point + Vector((0, 0, edge_offset))
-            sections.append((center - bisector * miter, center + bisector * miter))
+            correction = min(2.5, 1.0 / max(0.4, abs(bisector.dot(after_transverse))))
+            surface_normal = before_frame[1] + after_frame[1]
+            if surface_normal.length_squared <= 1e-12:
+                surface_normal = after_frame[1].copy()
+            surface_normal.normalize()
+            center = point + surface_normal * edge_offset
+            offset = bisector * half * correction
+            sections.append((center - offset, center + offset))
         band_vertices = [list(v) for section in sections for v in section]
         band_faces = [(2*i, 2*i+1, 2*i+3, 2*i+2) for i in range(len(sections)-1)]
         data = bpy.data.meshes.new(f"{job['id']}-{'-'.join(chain_piece_ids)}-explicit-hem-band")
@@ -532,6 +568,7 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         "materialName": material.name,
         "bandWidthM": band_width,
         "edgeOffsetM": edge_offset,
+        "offsetFrameMethod": "adjacent-face-normal-surface-bisector",
         "pieceAudits": audits,
         "grantsFitAcceptance": False,
         "evidenceBoundary": spec.get("evidenceBoundary", "Prototype visual hypothesis; not approved trim or fit."),
@@ -2142,18 +2179,20 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         raise ValueError("Skirt fold pieces missing")
     panel_local = fold_method == "panel-local-soft-knife-pleat-v1"
     panel_ranges = {}
+    from collections import defaultdict
+    vertex_piece_owners = defaultdict(set)
+    for face, piece in zip(mesh["faces"], mesh["facePieceIds"]):
+        if piece in ids:
+            for vertex_id in face:
+                vertex_piece_owners[vertex_id].add(piece)
     if panel_local:
-        from collections import defaultdict
         folds_per_panel = spec.get("foldsPerPanel")
         if isinstance(folds_per_panel, bool) or not isinstance(folds_per_panel, int) or not 1 <= folds_per_panel <= 6:
             raise ValueError("Panel-local pleats require 1-6 folds per sewn panel")
         by_piece = {piece: set() for piece in ids}
-        vertex_piece_owners = defaultdict(set)
         for face, piece in zip(mesh["faces"], mesh["facePieceIds"]):
             if piece in by_piece:
                 by_piece[piece].update(face)
-                for vertex_id in face:
-                    vertex_piece_owners[vertex_id].add(piece)
         for piece, indices in by_piece.items():
             angles = [math.atan2(native_vertices[i][0]-origin[0], -(native_vertices[i][1]-origin[1])) for i in indices]
             center = math.atan2(sum(math.sin(value) for value in angles), sum(math.cos(value) for value in angles))
@@ -2163,6 +2202,8 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
                 raise ValueError(f"Panel angular span is too small for local pleats: {piece}")
             panel_ranges[piece] = [low, high]
     vertices = {i for face, owner in zip(mesh["faces"], mesh["facePieceIds"]) if owner in ids for i in face}
+    from collections import defaultdict
+    displacement_samples_by_piece = defaultdict(list)
     # A preceding, separately bounded skirt-lengthening step can lower the
     # panel hem below the original pleat-layout hem. Seed folds against the
     # actual post-placement geometry while retaining the authored hem in the
@@ -2232,6 +2273,8 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             raise ValueError("Skirt fold radial coordinate collapsed")
         mesh["vertices"][i] = [x+(x-origin[0])*displacement/radius,
                                 y+(y-origin[1])*displacement/radius, z]
+        for owner in vertex_piece_owners.get(i, ()):
+            displacement_samples_by_piece[owner].append(abs(displacement))
         moved += 1
         displacement_max = max(displacement_max, displacement)
     minimum_area = math.inf
@@ -2241,12 +2284,22 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         if area <= 1e-12:
             raise ValueError("Skirt fold placement collapsed a triangle")
         minimum_area = min(minimum_area, area)
+    fold_displacement_by_piece = {}
+    for owner in sorted(ids):
+        samples = sorted(displacement_samples_by_piece.get(owner, ()))
+        fold_displacement_by_piece[owner] = {
+            "vertexCount": len(samples),
+            "maximumAbsoluteRadialDisplacementM": max(samples, default=0.0),
+            "meanAbsoluteRadialDisplacementM": sum(samples) / len(samples) if samples else 0.0,
+            "p95AbsoluteRadialDisplacementM": samples[min(len(samples) - 1, int(0.95 * len(samples))) ] if samples else 0.0,
+        }
     return {"applied": True, "configuration": spec,
             "effectiveHeightRangeZM": [effective_hem, waist],
             "extensionBelowDeclaredPleatHemM": max(0.0, declared_hem - effective_hem),
             "selectedVertexCount": len(vertices),
             "movedVertexCount": moved, "maximumRadialDisplacementM": displacement_max,
             "minimumTriangleAreaM2": minimum_area,
+            "authoredFoldDisplacementByPiece": fold_displacement_by_piece,
             "beforeVerticesSha256": hashlib.sha256(before.encode()).hexdigest(),
             "afterVerticesSha256": hashlib.sha256(json.dumps(mesh["vertices"], separators=(",", ":")).encode()).hexdigest(),
             "canonicalFacesChanged": False, "sewnWaistDisplacementM": 0,

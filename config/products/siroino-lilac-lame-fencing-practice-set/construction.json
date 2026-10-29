@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V105 replaces curve-bevel piping with explicit corner-mitered hem-band meshes and compares authored overskirt pleat panels under skinning without cloth deformation. These are disposable appearance hypotheses only.",
-  "designRevision": "v105-explicit-hem-band-authored-pleat-skin-20261029",
+  "target": "V106 measures per-panel authored fold displacement and replaces the hem-band XY offset frame with an adjacent-face-normal surface corner join. These are disposable appearance hypotheses only.",
+  "designRevision": "v106-surface-normal-hem-frame-fold-displacement-audit-20261029",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -163,8 +163,8 @@
       "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V105 leaves authored overskirt panel folds unchanged: only jacket sleeves enter cloth bake, while skirt shape is intended for later armature skinning. Overskirt dynamics are not tested. The generated surface remains an unfit prototype; shorts coverage, seated behavior, fit, shape-key response, motion and fabric calibration remain unverified.",
-    "reason": "V104 bending stiffness 20 retained visible corrugation. Compare authored pleat panel geometry with the overskirt excluded from cloth bake, retaining jacket-sleeve cloth, to distinguish solver-generated folds. The static skirt mesh remains available for later armature skinning; this does not establish motion drape or appearance acceptance.",
+    "evidence": "V106 retains the V105 armature-only overskirt path and records per-panel authored fold displacement statistics. Hem bands now use adjacent surface normals for corner framing. The regenerated previews remain visual evidence only; fit, shorts coverage, shape-key response, motion and fabric calibration remain unverified.",
+    "reason": "V106 measures authored overskirt displacement per sewn panel to separate the sub-millimeter fold field from the visible back corrugation, then replaces the hem-band XY offset frame with a corner join driven by adjacent sewn-face normals. This is a prototype geometry investigation only; appearance and downstream fit/runtime/release remain unapproved.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,

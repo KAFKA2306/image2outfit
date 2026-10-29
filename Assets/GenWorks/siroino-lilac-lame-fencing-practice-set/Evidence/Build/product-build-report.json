@@ -8921,7 +8921,7 @@
         ],
         "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
       },
-      "evidenceBoundary": "V102 retains the V101 actual broad, shallow sewn box-pleat displacement and tests stronger post-cloth fairing separately; authored fold count and panel boundaries stay unchanged. It is an uncalibrated geometry hypothesis, not fit, fabric, or visual acceptance.",
+      "evidenceBoundary": "V106 retains the authored V102 broad shallow box-pleat field and records actual per-panel displacement to localize visible ridges. The configured maximum is below one millimeter; measured output remains prototype-only and does not establish appearance, fit, or fabric behavior.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8942,6 +8942,44 @@
     "movedVertexCount": 8354,
     "maximumRadialDisplacementM": 0.0007920460081498745,
     "minimumTriangleAreaM2": 2.887646420508644e-12,
+    "authoredFoldDisplacementByPiece": {
+      "overskirt-back-left": {
+        "vertexCount": 2117,
+        "maximumAbsoluteRadialDisplacementM": 0.0007441860533199023,
+        "meanAbsoluteRadialDisplacementM": 8.53171120915813e-05,
+        "p95AbsoluteRadialDisplacementM": 0.00047135130219592476
+      },
+      "overskirt-back-right": {
+        "vertexCount": 2148,
+        "maximumAbsoluteRadialDisplacementM": 0.0007441860533199023,
+        "meanAbsoluteRadialDisplacementM": 8.401084709686724e-05,
+        "p95AbsoluteRadialDisplacementM": 0.00046482578581110616
+      },
+      "overskirt-front-lap-left": {
+        "vertexCount": 1240,
+        "maximumAbsoluteRadialDisplacementM": 0.0007920460081498745,
+        "meanAbsoluteRadialDisplacementM": 7.956623541719464e-05,
+        "p95AbsoluteRadialDisplacementM": 0.0005001886233051001
+      },
+      "overskirt-front-lap-right": {
+        "vertexCount": 1217,
+        "maximumAbsoluteRadialDisplacementM": 0.0007920460081498745,
+        "meanAbsoluteRadialDisplacementM": 7.738582121201327e-05,
+        "p95AbsoluteRadialDisplacementM": 0.000445411258946445
+      },
+      "overskirt-front-left": {
+        "vertexCount": 949,
+        "maximumAbsoluteRadialDisplacementM": 0.0007441860533199023,
+        "meanAbsoluteRadialDisplacementM": 9.752126095384159e-05,
+        "p95AbsoluteRadialDisplacementM": 0.0004865831513469754
+      },
+      "overskirt-front-right": {
+        "vertexCount": 957,
+        "maximumAbsoluteRadialDisplacementM": 0.0007441860533199023,
+        "meanAbsoluteRadialDisplacementM": 9.125186704966203e-05,
+        "p95AbsoluteRadialDisplacementM": 0.0004873938005087325
+      }
+    },
     "beforeVerticesSha256": "0d4b4ce7eb6dac2defceeab06af23da2831bd8369dfac614af63f0ff1ab9c8b9",
     "afterVerticesSha256": "279469f9c03e523f1e26ba1814ecea80606882355e3161902642d23cb61459c1",
     "canonicalFacesChanged": false,
@@ -9229,7 +9267,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "0e91b45cdbd3fae89b0e64ac9040a12352641924aa982ca2c0834e41c23174bd",
+    "privateSimulationSourceSha256": "a7edd41f12c0d688316cc61b90067911df157b83bd692612c44826572c340bc3",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -9604,6 +9642,7 @@
     "materialName": "lavender-hem-band-prototype-hypothesis",
     "bandWidthM": 0.006,
     "edgeOffsetM": 0.0012,
+    "offsetFrameMethod": "adjacent-face-normal-surface-bisector",
     "pieceAudits": {
       "jacket-overlap-front": {
         "boundaryEdgeCount": 50,
@@ -9799,7 +9838,7 @@
       }
     },
     "grantsFitAcceptance": false,
-    "evidenceBoundary": "V105 builds explicit miter-joined quad bands along selected canonical hem edges, with no curve bevel caps. Bound trim positions and weights still require manufacturing and direct review."
+    "evidenceBoundary": "V106 frames hem-band offsets from adjacent sewn-face normals and their surface bisector at panel corners; rebuilt trim geometry and direct previews remain an unfitted visual hypothesis only."
   },
   "prototypeSurfaceMotifs": {
     "applied": true,
@@ -10478,7 +10517,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "eb90b4cc783b6a2d017a92560e1b968691d8ddf229a5d9f03e91ec34d1dd753e",
+  "sourceBlendSha256": "7576b794b9167d5de2f01963d138f56f479749d304c059aa87d905afcb9025ac",
   "sewnMeshSha256": "cd2f6c90478f0e7c2ed3dab6072de9f9a9a9f4b424e4ab6a3d3234c401c8fdf9",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v105-explicit-hem-band-authored-pleat-skin-20261029",
+  "revision": "v106-surface-normal-hem-frame-fold-displacement-audit-20261029",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "SKIRT_HEM_BAND_CORNER_PROJECTIONS_PERSIST",
+      "code": "JACKET_AND_HIP_SURFACE_FACETING_PERSISTS",
       "severity": "BLOCKER",
-      "description": "Direct review of all five regenerated views shows pointed lavender band ends/projections still visible at hem corners although the trim is now an explicit miter-joined quad mesh. The geometric band change did not resolve the silhouette."
+      "description": "Direct review of all five views shows severe faceting/rippling across jacket and waist/hip surfaces, strongest in rear and side views. This remains visually broken shading/geometry. The V106 authored pleat audit reports sub-millimeter radial displacement (per panel maxima below 0.8 mm), so that fold field alone does not explain the large visible surface distortion."
     },
     {
-      "code": "AUTHORED_OVERSKIRT_CORRUGATION_PERSISTS",
+      "code": "GARMENT_MATERIAL_AND_IDENTITY_NOT_LEGIBLE",
       "severity": "BLOCKER",
-      "description": "Direct review of the armature-path trial, with overskirt excluded from cloth bake, still shows repeated narrow ridges and uneven side/rear surfaces. This localizes the corrugation to authored/rest mesh or pose rendering rather than the cloth solver."
+      "description": "The outfit still renders almost entirely plain white; the narrow lavender sash and piping do not read as a lilac lamé fencing practice set."
     },
     {
-      "code": "POSE_DRAPE_AND_RELEASE_GATES_UNVERIFIED",
+      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED",
       "severity": "BLOCKER",
-      "description": "Crouch and sit retain lifted/folded overskirt with under-shorts exposed; prone is visibly distorted. Avatar fit, final rig weights and shape-key coverage, Unity/VRChat runtime, UV validation, and package eligibility remain unverified."
+      "description": "Crouch, sit and prone show unnatural skirt/underlayer bunching, intersection and flare. Fit, final weights, shape-key response, UV validation, Unity/VRChat runtime and package eligibility remain unverified."
     }
   ],
   "failedGeometryChecks": [
