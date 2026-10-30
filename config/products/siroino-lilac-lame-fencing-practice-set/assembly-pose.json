@@ -9479,6 +9479,24 @@
     ],
     "preservedSeamFadeDistanceM": 0.04
   },
+  "frontBodiceSurfaceRefinement": {
+    "method": "evaluated-body-nearest-surface-blended-placement",
+    "pieceIds": ["jacket-front-left", "jacket-overlap-front"],
+    "bodyMeshNamePrefix": "SiroinoSotai_PC",
+    "fadeStartZM": 0.735,
+    "fullWeightStartZM": 0.780,
+    "maximumZM": 1.12,
+    "fullWeightAbsXM": 0.14,
+    "fadeEndAbsXM": 0.17,
+    "normalClearanceM": 0.004,
+    "maximumProjectionDistanceM": 0.12,
+    "outerPieceId": "jacket-overlap-front",
+    "outerLayerOffsetM": 0.002,
+    "maximumBlendWeight": 0.98,
+    "preserveSharedPieceIds": ["stand-collar"],
+    "preservedSeamFadeDistanceM": 0.04,
+    "evidenceBoundary": "Second bounded pass after general V121 placement, restricted to the two jacket front panels and capped at 0.98 to correct measured residual bust intrusion without full projection. Original faces/shared sewn vertices remain and face-collapse checks stay active. This is a prototype placement hypothesis; visible coverage, strain, shape-key fit, motion and release remain unapproved."
+  },
   "shortsOrientationEvidence": {
     "frontAxis": "GarmentCode +Z = Blender -Y",
     "leftAxis": "GarmentCode +X = Blender +X",
@@ -9800,7 +9818,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v121-front-torso-surface-clearance-20261030",
+  "designRevision": "v122-front-bodice-local-refinement-20261030",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

@@ -3160,6 +3160,8 @@ def main():
     contour_evidence = place_on_measured_contours(mesh, body_objects, pose, resolve(job["targetSourcePath"]))
     trace_stage("torso-contour")
     upper_surface_evidence = place_on_measured_upper_surface(mesh, body_objects, pose, resolve(job["targetSourcePath"]))
+    front_refinement_pose = dict(pose, upperSurfacePlacement=pose.get("frontBodiceSurfaceRefinement"))
+    front_refinement_evidence = place_on_measured_upper_surface(mesh, body_objects, front_refinement_pose, resolve(job["targetSourcePath"]))
     trace_stage("upper-surface")
     shorts_extension_evidence = lengthen_declared_shorts(mesh, pose)
     shorts_pose = dict(pose, upperSurfacePlacement=pose.get("shortsUpperSurfacePlacement"))
@@ -3397,6 +3399,7 @@ def main():
         "canonicalInputs": expected,
         "measuredContourPlacement": contour_evidence,
         "measuredUpperSurfacePlacement": upper_surface_evidence,
+        "measuredFrontBodiceSurfaceRefinement": front_refinement_evidence,
         "measuredShortsUpperSurfacePlacement": shorts_surface_evidence,
         "measuredSkirtEnvelopePlacement": skirt_envelope_evidence,
         "measuredCollarPlacement": collar_evidence,

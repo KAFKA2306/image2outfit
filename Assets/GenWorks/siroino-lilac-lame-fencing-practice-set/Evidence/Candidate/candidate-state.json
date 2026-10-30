@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v121-front-torso-surface-clearance-20261030",
+  "revision": "v122-front-bodice-local-refinement-20261030",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,22 +19,22 @@
   },
   "blockingFindings": [
     {
-      "description": "Directly inspected current five-view and six-pose renders. V121 now shows the ivory jacket front extending from collar to waistband in the neutral front view, but body-color breast surfaces still protrude through the bodice and the three-quarter and side views show broken/pinched torso transitions. Surface coverage improved, but the jacket is not visually fitted.",
+      "description": "Directly inspected the current five views and six poses after V122. The front jacket covers the bust in the neutral view, but the front and three-quarter views still show uneven dark/body-colored intrusions along the bust-side transition, and both side views retain pinched, faceted torso transitions. The local front-only refinement reduced measured inward surface offsets, but the rendered fit remains visibly broken.",
       "severity": "BLOCKER",
       "code": "BUST_AND_SIDE_SURFACE_PENETRATION_REMAINS"
     },
     {
-      "description": "The current back view still shows broad faceted/folded shading over the posterior shoulder and upper back; the torso surface remains visibly uneven.",
+      "description": "The current back render still has broad faceted/folded shading across the posterior shoulder and upper back.",
       "severity": "BLOCKER",
       "code": "POSTERIOR_SHOULDER_FACETING_PERSISTS"
     },
     {
-      "description": "The outfit remains almost entirely white with a narrow lilac diagonal chest strip and sparse piping. Metallic lamé response and fencing-practice details are not visually legible.",
+      "description": "The outfit remains almost entirely white with a narrow lilac diagonal chest strip and sparse details; metallic lamé response and fencing-practice styling are not visually legible.",
       "severity": "BLOCKER",
       "code": "LAMÉ_AND_FENCING_IDENTITY_NOT_LEGIBLE"
     },
     {
-      "description": "Current sit and crouch poses show skirt/shorts lift and thigh intersections; prone still presents a broad disk-like skirt flare. Final fit, deform weights, Shape Key response, Unity/VRChat execution, and release packaging remain unverified.",
+      "description": "Current sit and crouch renders show skirt/shorts lift and thigh intersections; prone shows a broad disk-like skirt flare. Final fit, deform weights, Shape Key response, Unity/VRChat execution, and release packaging remain unverified.",
       "severity": "BLOCKER",
       "code": "POSE_INTERSECTIONS_AND_SHAPE_FAILURE"
     }

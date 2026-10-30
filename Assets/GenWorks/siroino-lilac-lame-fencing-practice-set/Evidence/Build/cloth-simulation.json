@@ -48,8 +48,8 @@
         "fixedVertexCount": 80,
         "fixedVertexMaximumDisplacementM": 0.0,
         "changedInteriorVertexCount": 1662,
-        "maximumInteriorDisplacementM": 0.006239240285308063,
-        "meanInteriorDisplacementM": 0.0011076180352737055,
+        "maximumInteriorDisplacementM": 0.006145869383092413,
+        "meanInteriorDisplacementM": 0.001115228627913907,
         "reason": "Direct neutral and pose renders still show physical sleeve corrugation after the bounded cloth solve. Compare a low-strength interior-only fairing pass while locking all open garment boundaries and sewn pins.",
         "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.18 on non-boundary sleeve vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes are recorded by this run. This is a geometry hypothesis only; it does not establish fit, fold quality, motion, appearance approval, or release readiness.",
         "grantsFitAcceptance": false,
@@ -58,27 +58,27 @@
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
           0.9734007716178894,
-          1.0545789003372192
+          1.0552572011947632
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.0035138113671564497,
-          "maximum": 0.011812813869255478
+          "minimum": 0.003955250413127942,
+          "maximum": 0.01265474661886401
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 978,
+        "belowCombinedCollisionMarginVertexCount": 946,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "ecdd153ffadd5e01facf2eb49a592bbba6f72473a519794da561b28d87b04492",
-      "evaluatedFrameMeshSha256": "8a95c6ee37329cdf1a83778fb7ba5e0f8f19a653faf5740cef03aeb061968bd4",
-      "settledMeshSha256": "165c29869dfabb4b74a310eb2b7220d1c48d88ae9c8ea6fa4fdb1f91d9db83e6",
+      "preBakeMeshSha256": "f1486941041058848cd8148461c3cbe51929ba8a28d8dce24edf6703053912db",
+      "evaluatedFrameMeshSha256": "0e1d123aa4f201e8c79e5e78ca3d59184e68e4d14bcaeae2c99bdaeac0c5dfb4",
+      "settledMeshSha256": "d5f4a77ba206ae33fd96d4e180d2697fbba649373090f74b54d51473e6778cd0",
       "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "0f4e036b065e19662b668269b4877f90c07e7b9c8128a2264be873115ff9156a",
-  "constructionSha256": "86ad5d592f8be83c4e4804ad3b4d8c1a2784dac8a84a6dc589829664560722ad",
+  "sourceBlendSha256": "9867a4b39d742bc28e9f759dfa5cff2ea952223dca02241a80ddec22a18e12b2",
+  "constructionSha256": "b3c6d796bd298279587848f198f160cd281427de12acadb19064b79a9707b41b",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "b06067a1043c5c50a51dd1eac24963ebf3905647f828c1874052c5491bfa3262",
+  "candidateSha256": "ba7d51a0a6426ece4b4a41487ae86b3b2e392b7db95ae5d75104ce239976ef23",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
