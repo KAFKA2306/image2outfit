@@ -9463,8 +9463,8 @@
       "jacket-sleeve-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
-    "fadeStartZM": 0.955,
-    "fullWeightStartZM": 0.975,
+    "fadeStartZM": 0.735,
+    "fullWeightStartZM": 0.780,
     "maximumZM": 1.12,
     "fullWeightAbsXM": 0.14,
     "fadeEndAbsXM": 0.17,
@@ -9472,7 +9472,7 @@
     "maximumProjectionDistanceM": 0.12,
     "outerPieceId": "jacket-overlap-front",
     "outerLayerOffsetM": 0.002,
-    "evidenceBoundary": "Actual evaluated body points and normals with zero-valued Shape Keys; original garment faces and shared seam vertices preserved. Spatial blend bounds and 4 mm clearance are prototype design hypotheses. Nearest-surface projection does not prove face penetration, strain, Large, deformation or final fit. Maximum displacement fraction 0.9 is explicit bounded relaxation retaining 10 percent of the original geometry. Full projection collapsed triangles on actual input and is rejected; face collapse checks remain unchanged.",
+    "evidenceBoundary": "Actual evaluated body points and normals with zero-valued Shape Keys; original garment faces and shared seam vertices preserved. Jacket panels blend from no projection at Z=0.735 m to maximum 0.9 weight by Z=0.780 m, applying the same measured-surface clearance through the bodice instead of only at the shoulders. The bounded blend, 4 mm clearance, and 2 mm overlap offset are prototype placement hypotheses. Face-collapse checks remain active. Surface proximity does not prove face penetration, strain, Large, deformation or final fit.",
     "maximumBlendWeight": 0.9,
     "preserveSharedPieceIds": [
       "stand-collar"
@@ -9800,7 +9800,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v102-hem-only-skirt-trim-and-fairing-20261028",
+  "designRevision": "v121-front-torso-surface-clearance-20261030",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

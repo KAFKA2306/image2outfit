@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v120-back-only-overlap-shoulder-placement-20261030",
+  "revision": "v121-front-torso-surface-clearance-20261030",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
-      "code": "POSTERIOR_SHOULDER_FACETING_PERSISTS",
+      "description": "Directly inspected current five-view and six-pose renders. V121 now shows the ivory jacket front extending from collar to waistband in the neutral front view, but body-color breast surfaces still protrude through the bodice and the three-quarter and side views show broken/pinched torso transitions. Surface coverage improved, but the jacket is not visually fitted.",
       "severity": "BLOCKER",
-      "description": "Directly inspected the current five views and six pose renders. Back view still shows a broad faceted/folded patch across the upper posterior shoulder and a slab-like back panel; left/right views show abrupt planar transitions at the shoulder and torso. V120 cleared the sewn-topology preflight but did not resolve the visible posterior surface defect."
+      "code": "BUST_AND_SIDE_SURFACE_PENETRATION_REMAINS"
     },
     {
-      "code": "LAMÉ_AND_FENCING_IDENTITY_NOT_LEGIBLE",
+      "description": "The current back view still shows broad faceted/folded shading over the posterior shoulder and upper back; the torso surface remains visibly uneven.",
       "severity": "BLOCKER",
-      "description": "Direct inspection shows an almost entirely white outfit with a narrow lilac diagonal chest strip and sparse piping. Metallic lamé response and fencing-practice details are not visually legible in the current views."
+      "code": "POSTERIOR_SHOULDER_FACETING_PERSISTS"
     },
     {
-      "code": "POSE_INTERSECTIONS_AND_SHAPE_FAILURE",
+      "description": "The outfit remains almost entirely white with a narrow lilac diagonal chest strip and sparse piping. Metallic lamé response and fencing-practice details are not visually legible.",
       "severity": "BLOCKER",
-      "description": "Direct inspection of sit and crouch shows shorts/thigh intersections and abrupt skirt folds; prone retains a broad disk-like flare. Fit, final deform weights, Shape Key response, Unity/VRChat execution, and release packaging remain unverified."
+      "code": "LAMÉ_AND_FENCING_IDENTITY_NOT_LEGIBLE"
     },
     {
-      "code": "JACKET_FRONT_COVERAGE_ABSENT",
+      "description": "Current sit and crouch poses show skirt/shorts lift and thigh intersections; prone still presents a broad disk-like skirt flare. Final fit, deform weights, Shape Key response, Unity/VRChat execution, and release packaging remain unverified.",
       "severity": "BLOCKER",
-      "description": "Directly inspected the current front and three-quarter renders. The intended fitted jacket does not cover the chest and midriff: avatar breasts and abdomen remain visibly exposed from below the small diagonal plastron down to the waistband. This is a garment panel assembly/placement failure, not accepted styling. The candidate remains rejected until the jacket front visibly covers the intended torso region and new fit/pose evidence is reviewed."
+      "code": "POSE_INTERSECTIONS_AND_SHAPE_FAILURE"
     }
   ],
   "failedGeometryChecks": [
