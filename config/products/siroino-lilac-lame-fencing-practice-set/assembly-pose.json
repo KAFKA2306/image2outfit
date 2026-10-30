@@ -9758,7 +9758,7 @@
         "overskirt-front-lap-right"
       ],
       "additionalExtensionM": 0.015,
-      "forwardProjectionM": 0.01,
+      "forwardProjectionM": 0.004,
       "fullExtensionHalfAngleRadians": 0.65,
       "zeroExtensionHalfAngleRadians": 1.3,
       "axisOriginBlenderXYM": [
@@ -9767,7 +9767,7 @@
       ],
       "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
     },
-    "evidenceBoundary": "V126 tests 24 mm radial pleat relief while retaining the existing twelve-fold, two-per-panel sewn knife-pleat hypothesis and 30% recessed valleys. V125's 8 mm relief remained visually unreadable at product-view scale. The larger relief is an uncalibrated prototype geometry change that may worsen flare and pose tangling; it does not establish cloth behavior, fit, appearance acceptance or release.",
+    "evidenceBoundary": "V127 holds the V126 pleat relief constant and reduces the front apron maximum forward projection from 10 mm to 4 mm to test whether the observed projecting front profile and waist ledge are driven by that projection. Seated/crouch panel tangling and rear-hem deformation remain unverified; this isolated prototype change grants no appearance, fit or release acceptance.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9823,7 +9823,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v126-expanded-skirt-pleat-amplitude-20261030",
+  "designRevision": "v127-reduced-forward-apron-projection-20261031",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
