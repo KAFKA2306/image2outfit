@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v123-front-bodice-lower-clearance-20261030",
+  "revision": "v124-jacket-bodice-lower-transition-20261030",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "V123 resolves the measured negative signed-clearance samples on the front bodice in the 0.735–1.120 m range, but the neutral, arms-up and three-quarter renders still show irregular gray triangular facets at the lower front/side waist. A positive sampled distance does not establish continuous visible fabric or fit.",
-      "severity": "BLOCKER",
-      "code": "LOWER_BODICE_SURFACE_FACETING_REMAINS"
+      "code": "LOWER_BODICE_SURFACE_FACETING_REMAINS",
+      "description": "Across the V124 direct renders, the lower bodice still shows visible triangular faceting around the front and side waist; the lowered all-jacket surface-placement ramp did not make a visible improvement.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Both side views show the jacket hem projecting outward above the skirt; the back view shows an uneven layered rear-waist transition.",
-      "severity": "BLOCKER",
-      "code": "REAR_WAIST_JACKET_HEM_PROJECTION"
+      "code": "REAR_WAIST_JACKET_HEM_PROJECTION",
+      "description": "Side and rear views still show the jacket hem projecting outward at the waist, with a pinched and uneven layered transition.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Crouch and sit views expose folded strips and tangled geometry below and behind the skirt; prone has a broad disk-like flare. The skirt remains cone-like rather than visibly pleated, and lamé/fencing-practice identity is not legible.",
-      "severity": "BLOCKER",
-      "code": "SKIRT_POSE_DEFORMATION_AND_PRODUCT_IDENTITY"
+      "code": "SKIRT_POSE_DEFORMATION_AND_PRODUCT_IDENTITY",
+      "description": "Crouch, sit, and prone views still show folded or tangled skirt strips and a cone/disk-like silhouette. Pleats and lamé/fencing-practice identity are not clear in the rendered garment.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

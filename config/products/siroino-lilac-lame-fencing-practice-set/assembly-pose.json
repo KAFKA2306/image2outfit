@@ -9463,8 +9463,8 @@
       "jacket-sleeve-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
-    "fadeStartZM": 0.735,
-    "fullWeightStartZM": 0.780,
+    "fadeStartZM": 0.710,
+    "fullWeightStartZM": 0.735,
     "maximumZM": 1.12,
     "fullWeightAbsXM": 0.14,
     "fadeEndAbsXM": 0.17,
@@ -9472,7 +9472,7 @@
     "maximumProjectionDistanceM": 0.12,
     "outerPieceId": "jacket-overlap-front",
     "outerLayerOffsetM": 0.002,
-    "evidenceBoundary": "Actual evaluated body points and normals with zero-valued Shape Keys; original garment faces and shared seam vertices preserved. Jacket panels blend from no projection at Z=0.735 m to maximum 0.9 weight by Z=0.780 m, applying the same measured-surface clearance through the bodice instead of only at the shoulders. The bounded blend, 4 mm clearance, and 2 mm overlap offset are prototype placement hypotheses. Face-collapse checks remain active. Surface proximity does not prove face penetration, strain, Large, deformation or final fit.",
+    "evidenceBoundary": "V124 lowers the jacket-wide measured-surface blend ramp to fade at Z=0.710 m and reach its unchanged 0.9 cap by Z=0.735 m. V123 output recorded up to 60.6 mm nearest-body-surface distances on posterior torso vertices around Z=0.738 m while this ramp gave only about 9% influence there. The change preserves 4 mm body clearance, 2 mm overlap offset, shared seams and face-collapse checks; it is a prototype hypothesis and does not establish visible continuity, face penetration absence, strain, Large, deformation, or final fit.",
     "maximumBlendWeight": 0.9,
     "preserveSharedPieceIds": [
       "stand-collar"
@@ -9818,7 +9818,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v123-front-bodice-lower-clearance-20261030",
+  "designRevision": "v124-jacket-bodice-lower-transition-20261030",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
