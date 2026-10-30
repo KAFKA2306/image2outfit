@@ -822,6 +822,11 @@ def _initialize_cylindrical_panels(mesh, pattern, scale, adapter):
                         depth * radius * math.cos(angle),
                     ]
                 )
+                # These are overlapping placement fields over the same 2D
+                # neighborhood. Compose their displacements from the original
+                # cylindrical point; sequential interpolation makes the result
+                # depend on field order and can fold adjacent panel triangles.
+                placement_targets = []
                 if shoulder is not None:
                     edge = np.array(shoulder["patternEdgeM"], dtype=float) * scale
                     targets = (
@@ -845,7 +850,7 @@ def _initialize_cylindrical_panels(mesh, pattern, scale, adapter):
                     )
                     influence = influence * influence * (3 - 2 * influence)
                     target = targets[0] * (1 - fraction) + targets[1] * fraction
-                    result = result * (1 - influence) + target * influence
+                    placement_targets.append((influence, target))
                 if neckline is not None:
                     # Bind captured per-panel data; closures must not reuse
                     # another quarter's edge or ring during sewn averaging.
@@ -868,7 +873,7 @@ def _initialize_cylindrical_panels(mesh, pattern, scale, adapter):
                     target = ring + np.array(
                         [radius * math.sin(angle), 0, radius * math.cos(angle)]
                     )
-                    result = result * (1 - blend) + target * blend
+                    placement_targets.append((blend, target))
                 if armhole is not None:
                     candidates = []
                     for item in armhole["edges"]:
@@ -894,7 +899,23 @@ def _initialize_cylindrical_panels(mesh, pattern, scale, adapter):
                     distance, target = min(candidates, key=lambda row: row[0])
                     weight = max(0, 1 - distance / (armhole["blendDistanceM"] * scale))
                     weight = weight * weight * (3 - 2 * weight)
-                    result = result * (1 - weight) + target * weight
+                    placement_targets.append((weight, target))
+                if name in {"jacket-back-left", "jacket-back-right"}:
+                    total_weight = sum(weight for weight, _ in placement_targets)
+                    if total_weight > 0:
+                        applied_weight = min(1.0, total_weight)
+                        target = sum(
+                            (weight * point for weight, point in placement_targets),
+                            np.zeros(3, dtype=float),
+                        ) / total_weight
+                        result = result * (1 - applied_weight) + target * applied_weight
+                else:
+                    # Keep the measured-overlap experiment scoped to the back
+                    # panels. The first full-product preflight found a collapsed
+                    # front-left face when all jacket placement fields were
+                    # blended together, so preserve their established ordering.
+                    for weight, target in placement_targets:
+                        result = result * (1 - weight) + target * weight
                 return result
 
             panel = mesh.panels[name]
@@ -914,6 +935,11 @@ def _initialize_cylindrical_panels(mesh, pattern, scale, adapter):
                     "specification": torso,
                     "vertexCount": len(panel.panel_vertices),
                     "changes2dRestLengths": False,
+                    "overlapBlendMethod": (
+                        "normalized-convex-displacement-v1"
+                        if name in {"jacket-back-left", "jacket-back-right"}
+                        else "ordered-existing-displacement-v1"
+                    ),
                     "grantsFitAcceptance": False,
                 }
             )
