@@ -2,38 +2,43 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
-  "reviewedRevision": "v118-fade-torso-placement-to-measured-shoulder-20261029",
+  "reviewedRevision": "v120-back-only-overlap-shoulder-placement-20261030",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "762146b99f693504bb76f7b4b3c42fafdd6c85e8c0056d08e71a9274fa26a8d3",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "74d9c6fefeba303435e7f4548b1f02ef0ebf391e71f479412ffc76dd088e6361",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "eecef9af3269267823908ca46d21eeed43d6b1a9b1b3c02dd357453e77e9b025",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "982e98faf11c5d89b67046bc4f74f21806cd1e409a3131ad0c51056d2f49909f",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "0b9557cbcd2134d7ce1c50a7b56bfbd91aa3317fb33c195de506d7b114b4e25d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "cdabbb1d0a4f34331adbc6bd20c60b0e6cf1dc86ab8a2f440250eeaf7b7d8918",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "4fd40bc617f0aa85f6908ff3cf050e75b445f9ddbe0d2e0e008a3dd0878d13f7",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "37519b36d945d788e690f786e9f72ba0e8b5680ff518cf2ea36f92bdc844d2f8",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "031e8750271ea311fc860f59b76ac3f2f9c5de64968405106975600c29ef4dcc",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "5693ca8bc96bf0a80be908f279611830ee1179fbd9a35d746d67bf39ef7df25d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "da69c1dc1b68c67337ce10b38573529041c14776d0489f56dd58c0b40a0247cb"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "6a13263138f888c17daccd5611a32ed3fe7f1e20dd65e3437c4e099715886245",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "8e792373d9653a4e194f9b30cc8c1d36595543188fdea51bb144b0f8f8bfadcf",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "9a2c1dccfd6046084dbf226c2c5a3f1ec7047f1e918f8b8c9a5545e08c7ffc9c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "673514122a26ec2e885c39013f5ccc2c93f63b04d1ba1047647bd868fa62da15",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "c44c299251b54e3bdc70001655f5b73e10f2be310817a6e9dcf60276ce5cc80b",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "36394dbbf988ce0f3318c6c3aa826a13316c1277884d038fe184f33460b71523",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "069c41d73fdf4c3782616c030a30dd2d8d0fec809f1d40e43528cafa6aca8aca",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "66bdddb5ad2a338331b2c51ea16f76bd2c93b1ca8c94182d2ed8b14c6a3c8ad9",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "d3ab8fd856346e67d46b27bc7f17b49becba09fa70a89ced673914902535ea64",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "af4f94bc3c80b4d68a970cebc8b57a4994e305ab7ec622fb9dec0daeca1fb92e",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "358fb80a40fe915c93d8b943b8bdc83e8c2ae185a69aefeed26d0d2a20f25829"
   },
   "findings": [
     {
-      "code": "POSTERIOR_SURFACE_DISCONTINUITY_UNRESOLVED",
-      "description": "Directly inspected all five V118 views and six current poses. The torso placement fade from the last body contour at 0.975 m to the measured shoulder endpoint raised the applied displacement scale only from 0.00000340 to 0.00013773. The report still records 2,718 within-panel posterior edges, 26 baseline edges above 60 degrees, and a 179.10-degree maximum. The back remains visibly faceted; this transition is insufficient and the posterior geometry must be replaced or rebuilt from its panel source.",
-      "severity": "BLOCKER"
+      "code": "POSTERIOR_SHOULDER_FACETING_PERSISTS",
+      "severity": "BLOCKER",
+      "description": "Directly inspected the current five views and six pose renders. Back view still shows a broad faceted/folded patch across the upper posterior shoulder and a slab-like back panel; left/right views show abrupt planar transitions at the shoulder and torso. V120 cleared the sewn-topology preflight but did not resolve the visible posterior surface defect."
     },
     {
-      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE",
-      "description": "Directly inspected V118 views: the outfit remains almost entirely white with a narrow lilac diagonal chest strip and sparse piping. Lamé response and fencing-practice identity are still not legible.",
-      "severity": "BLOCKER"
+      "code": "LAMÉ_AND_FENCING_IDENTITY_NOT_LEGIBLE",
+      "severity": "BLOCKER",
+      "description": "Direct inspection shows an almost entirely white outfit with a narrow lilac diagonal chest strip and sparse piping. Metallic lamé response and fencing-practice details are not visually legible in the current views."
     },
     {
-      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED",
-      "description": "Directly inspected V118 poses: crouch and sit retain skirt/shorts intersections and abrupt folds; prone retains a broad disk-like skirt flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
-      "severity": "BLOCKER"
+      "code": "POSE_INTERSECTIONS_AND_SHAPE_FAILURE",
+      "severity": "BLOCKER",
+      "description": "Direct inspection of sit and crouch shows shorts/thigh intersections and abrupt skirt folds; prone retains a broad disk-like flare. Fit, final deform weights, Shape Key response, Unity/VRChat execution, and release packaging remain unverified."
+    },
+    {
+      "code": "JACKET_FRONT_COVERAGE_ABSENT",
+      "severity": "BLOCKER",
+      "description": "Directly inspected the current front and three-quarter renders. The intended fitted jacket does not cover the chest and midriff: avatar breasts and abdomen remain visibly exposed from below the small diagonal plastron down to the waistband. This is a garment panel assembly/placement failure, not accepted styling. The candidate remains rejected until the jacket front visibly covers the intended torso region and new fit/pose evidence is reviewed."
     }
   ],
-  "nextAction": "Keep REJECT. Replace or rebuild the posterior panel geometry using its authored panel/placement inputs; do not raise the continuity cap or repeat this ineffective shoulder fade. Separately resolve skirt pose-envelope collisions and the unlegible lamé/fencing identity. Rebuild and directly inspect all required views and poses. Keep fit, weights, Shape Keys, Unity/VRChat and release gates closed."
+  "nextAction": "Replace or rebuild jacket-front-left and jacket-overlap-front placement so the jacket visibly covers the chest and midriff from collar to waistband. Resolve this assembly defect before separately revisiting posterior faceting, skirt pose collisions, and lamé/fencing identity; rebuild and directly inspect all required views and poses. Preserve REJECT and keep fit, weights, Shape Keys, Unity/VRChat, and release gates closed."
 }

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v118-fade-torso-placement-to-measured-shoulder-20261029",
+  "revision": "v120-back-only-overlap-shoulder-placement-20261030",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,24 @@
   },
   "blockingFindings": [
     {
-      "code": "POSTERIOR_SURFACE_DISCONTINUITY_UNRESOLVED",
-      "description": "Directly inspected all five V118 views and six current poses. The torso placement fade from the last body contour at 0.975 m to the measured shoulder endpoint raised the applied displacement scale only from 0.00000340 to 0.00013773. The report still records 2,718 within-panel posterior edges, 26 baseline edges above 60 degrees, and a 179.10-degree maximum. The back remains visibly faceted; this transition is insufficient and the posterior geometry must be replaced or rebuilt from its panel source.",
-      "severity": "BLOCKER"
+      "code": "POSTERIOR_SHOULDER_FACETING_PERSISTS",
+      "severity": "BLOCKER",
+      "description": "Directly inspected the current five views and six pose renders. Back view still shows a broad faceted/folded patch across the upper posterior shoulder and a slab-like back panel; left/right views show abrupt planar transitions at the shoulder and torso. V120 cleared the sewn-topology preflight but did not resolve the visible posterior surface defect."
     },
     {
-      "code": "GARMENT_MATERIAL_AND_FENCING_IDENTITY_NOT_LEGIBLE",
-      "description": "Directly inspected V118 views: the outfit remains almost entirely white with a narrow lilac diagonal chest strip and sparse piping. Lamé response and fencing-practice identity are still not legible.",
-      "severity": "BLOCKER"
+      "code": "LAMÉ_AND_FENCING_IDENTITY_NOT_LEGIBLE",
+      "severity": "BLOCKER",
+      "description": "Direct inspection shows an almost entirely white outfit with a narrow lilac diagonal chest strip and sparse piping. Metallic lamé response and fencing-practice details are not visually legible in the current views."
     },
     {
-      "code": "POSE_DEFORMATION_AND_RELEASE_GATES_UNVERIFIED",
-      "description": "Directly inspected V118 poses: crouch and sit retain skirt/shorts intersections and abrupt folds; prone retains a broad disk-like skirt flare. Avatar fit, final skin weights, Shape Key response, validated UVs, Unity/VRChat execution and package eligibility remain unverified.",
-      "severity": "BLOCKER"
+      "code": "POSE_INTERSECTIONS_AND_SHAPE_FAILURE",
+      "severity": "BLOCKER",
+      "description": "Direct inspection of sit and crouch shows shorts/thigh intersections and abrupt skirt folds; prone retains a broad disk-like flare. Fit, final deform weights, Shape Key response, Unity/VRChat execution, and release packaging remain unverified."
+    },
+    {
+      "code": "JACKET_FRONT_COVERAGE_ABSENT",
+      "severity": "BLOCKER",
+      "description": "Directly inspected the current front and three-quarter renders. The intended fitted jacket does not cover the chest and midriff: avatar breasts and abdomen remain visibly exposed from below the small diagonal plastron down to the waistband. This is a garment panel assembly/placement failure, not accepted styling. The candidate remains rejected until the jacket front visibly covers the intended torso region and new fit/pose evidence is reviewed."
     }
   ],
   "failedGeometryChecks": [
