@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v124-jacket-bodice-lower-transition-20261030",
+  "revision": "v125-authored-skirt-pleat-relief-20261030",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,18 +19,18 @@
   },
   "blockingFindings": [
     {
-      "code": "LOWER_BODICE_SURFACE_FACETING_REMAINS",
-      "description": "Across the V124 direct renders, the lower bodice still shows visible triangular faceting around the front and side waist; the lowered all-jacket surface-placement ramp did not make a visible improvement.",
+      "code": "SKIRT_PLEATS_AND_LAME_IDENTITY_UNREADABLE",
+      "description": "In the five neutral views the overskirt still reads as a plain cone, with no clearly visible repeated knife pleats or readable lamé surface. The larger panel-local relief did not make the skirt construction legible at product-view scale.",
       "severity": "BLOCKER"
     },
     {
-      "code": "REAR_WAIST_JACKET_HEM_PROJECTION",
-      "description": "Side and rear views still show the jacket hem projecting outward at the waist, with a pinched and uneven layered transition.",
+      "code": "SKIRT_POSE_DEFORMATION_REMAINS",
+      "description": "Crouch and sit views show the flared skirt panels lifting and overlapping across the thighs and behind the body; prone remains a broad disk-like flare. The new pleat relief has not resolved the pose deformation and adds no convincing drape.",
       "severity": "BLOCKER"
     },
     {
-      "code": "SKIRT_POSE_DEFORMATION_AND_PRODUCT_IDENTITY",
-      "description": "Crouch, sit, and prone views still show folded or tangled skirt strips and a cone/disk-like silhouette. Pleats and lamé/fencing-practice identity are not clear in the rendered garment.",
+      "code": "LOWER_BODICE_AND_REAR_WAIST_ARTIFACTS",
+      "description": "The neutral front, back, and side renders still show triangular faceting across the lower bodice/waist and an uneven projecting jacket-to-skirt transition at the rear and sides.",
       "severity": "BLOCKER"
     }
   ],

@@ -9463,7 +9463,7 @@
       "jacket-sleeve-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
-    "fadeStartZM": 0.710,
+    "fadeStartZM": 0.71,
     "fullWeightStartZM": 0.735,
     "maximumZM": 1.12,
     "fullWeightAbsXM": 0.14,
@@ -9481,9 +9481,12 @@
   },
   "frontBodiceSurfaceRefinement": {
     "method": "evaluated-body-nearest-surface-blended-placement",
-    "pieceIds": ["jacket-front-left", "jacket-overlap-front"],
+    "pieceIds": [
+      "jacket-front-left",
+      "jacket-overlap-front"
+    ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
-    "fadeStartZM": 0.710,
+    "fadeStartZM": 0.71,
     "fullWeightStartZM": 0.735,
     "maximumZM": 1.12,
     "fullWeightAbsXM": 0.14,
@@ -9493,7 +9496,9 @@
     "outerPieceId": "jacket-overlap-front",
     "outerLayerOffsetM": 0.002,
     "maximumBlendWeight": 0.98,
-    "preserveSharedPieceIds": ["stand-collar"],
+    "preserveSharedPieceIds": [
+      "stand-collar"
+    ],
     "preservedSeamFadeDistanceM": 0.04,
     "evidenceBoundary": "Second bounded pass after general V121 placement, restricted to the two jacket front panels and capped at 0.98 to correct measured residual bust intrusion without full projection. Original faces/shared sewn vertices remain and face-collapse checks stay active. This is a prototype placement hypothesis; visible coverage, strain, shape-key fit, motion and release remain unapproved."
   },
@@ -9721,8 +9726,8 @@
   },
   "skirtPleatPlacement": {
     "method": "bounded-panel-extension-v3-panel-local-hem",
-    "foldMethod": "crease-bound-soft-box-pleat-v1",
-    "foldsPerPanel": 1,
+    "foldMethod": "panel-local-soft-knife-pleat-v1",
+    "foldsPerPanel": 2,
     "longitudinalSubdivisionCount": 24,
     "pieceIds": [
       "overskirt-front-left",
@@ -9740,9 +9745,9 @@
     "sourceHemZM": 0.5795782470703125,
     "hemZM": 0.5395782470703124,
     "hemExtensionM": 0.04,
-    "foldCount": 3,
+    "foldCount": 12,
     "topologySubdivisionFactor": 1,
-    "hemFoldDepthM": 0.0008,
+    "hemFoldDepthM": 0.008,
     "phaseRadians": 0,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
@@ -9762,7 +9767,7 @@
       ],
       "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
     },
-    "evidenceBoundary": "V106 retains the authored V102 broad shallow box-pleat field and records actual per-panel displacement to localize visible ridges. The configured maximum is below one millimeter; measured output remains prototype-only and does not establish appearance, fit, or fabric behavior.",
+    "evidenceBoundary": "V125 activates the existing authored 12-fold, 8 mm prototype intent with two panel-local soft knife pleats per canonical overskirt panel and a 30% recessed valley. This targets the direct-review cone/no-visible-pleats finding; it remains uncalibrated prototype geometry and may worsen pose tangling. It does not establish cloth behavior, fit, appearance acceptance or release.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9771,8 +9776,8 @@
       "waistband-front-lap-left",
       "waistband-front-lap-right"
     ],
-    "foldValleyHalfWidthFraction": 0.30,
-    "foldValleyDepthRatio": 0.02
+    "foldValleyHalfWidthFraction": 0.3,
+    "foldValleyDepthRatio": 0.3
   },
   "skirtFlareDesignEvidence": {
     "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
@@ -9818,7 +9823,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v124-jacket-bodice-lower-transition-20261030",
+  "designRevision": "v125-authored-skirt-pleat-relief-20261030",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

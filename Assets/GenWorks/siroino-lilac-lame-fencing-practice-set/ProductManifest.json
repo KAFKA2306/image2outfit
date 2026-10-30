@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "V124 changes the lower height transition used by the existing measured-surface placement on all jacket panels. Direct inspection of all five views and six poses still shows the same major silhouette and shading blockers, so this hypothesis is rejected. Keep the product rejected. The next bounded prototype should change the implicated panel geometry and skirt panel/deformation behavior; rebuild and inspect every required view and pose before any acceptance. Fit, material identity, shape keys, Unity/VRChat execution, package, and release remain unapproved.",
+    "nextAction": "V125 applied a stronger panel-local pleat hypothesis, but direct inspection of all five views and six poses still shows an unreadable cone-like skirt, pose panel overlap, and lower bodice/rear-waist artifacts. Keep REJECT. The next prototype should address garment identity and the actual skirt silhouette/pose envelope, with a direct render loop; do not treat the pattern-declared pleat dimensions as acceptance. Fit, deformation/weights, shape keys, Unity/VRChat execution, package and release remain unapproved.",
     "lastAttempt": {
-      "runId": "37deee116e324cb09ba6a336a6a43f40",
+      "runId": "d0e28cf4d6954e89a809f942fd1b32d0",
       "status": "EXECUTED",
-      "checkedAt": "2026-10-30T14:34:14Z",
+      "checkedAt": "2026-10-30T16:38:33Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "2027c3dc1279ea8a060ecbbaf50a233c015e50299c7e29766ea4ad2f4750fb8c",
+      "stageEvidenceSha256": "b5c040856e70ecbd02f05e92eefa01cc3cb0853eab538f544eeff5029c07558c",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -79,53 +79,53 @@
         },
         "build-blender": {
           "status": "REUSED",
-          "stageResultSha256": "d78ebb3939103e1fc1120c6805dd63416d107da34239c9bc89e30a13f6d8e88b"
+          "stageResultSha256": "60480306ad59144cb61515cfd9f09663ce4b4d26b8327507bdf1eb4120a9f6e7"
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "28ca908c431709a99b171070ed59cfec0eb9688e7410d14e7e608d2085f5c43c"
+          "stageResultSha256": "d4998c7af4a8df115b638664d2f695e7f04ecfc750f2898f510ce62f959d59e5"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "7663073200ab9ca54b813471f38ab9156bcd1d1573dcb6f24b2f5daefc380fb4"
+          "stageResultSha256": "a2e7dd5eade44d61a879fa5ddfcf224a1f8af19982adce09119921603efad554"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "99aa4cc57d52031cf26e66f604383db97734739d3b36d788a3edd6a59a45de31"
+          "stageResultSha256": "d4e59aab5783c915311e21ebf0fdeb9274e3f0eb688ebe647d7a45c552af611b"
         },
         "audit-geometry": {
           "status": "REUSED",
-          "stageResultSha256": "cf581bacd38cf4fe9fc2386fd2eaa7e63717bdebbf410e845c3e33fae84f8efb"
+          "stageResultSha256": "4a4e7174766e8fc8be98c51bc8584276ed2769f6dec9728e06784507fe602b49"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "d0c1d10217d93a302f5d35d282a5fd1b3361140361a06917317aed1edd81e6be"
+          "stageResultSha256": "2d2a812432139409d2706de580e3fdb0f1081546f923f742a1c21432d17582d2"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "2027c3dc1279ea8a060ecbbaf50a233c015e50299c7e29766ea4ad2f4750fb8c"
+          "stageResultSha256": "b5c040856e70ecbd02f05e92eefa01cc3cb0853eab538f544eeff5029c07558c"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "ea800f9b4c8859fa44860f9c7934fee8f82204b0ca9aa1117ac3838f28fdd945",
+      "checkpointSha256": "e93a1165593dcc73737a01149e516cbb649a70c5594092202756ba22e6503e56",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "V124 changes the lower height transition used by the existing measured-surface placement on all jacket panels. Direct inspection of all five views and six poses still shows the same major silhouette and shading blockers, so this hypothesis is rejected. Keep the product rejected. The next bounded prototype should change the implicated panel geometry and skirt panel/deformation behavior; rebuild and inspect every required view and pose before any acceptance. Fit, material identity, shape keys, Unity/VRChat execution, package, and release remain unapproved."
+      "nextAction": "V125 applied a stronger panel-local pleat hypothesis, but direct inspection of all five views and six poses still shows an unreadable cone-like skirt, pose panel overlap, and lower bodice/rear-waist artifacts. Keep REJECT. The next prototype should address garment identity and the actual skirt silhouette/pose envelope, with a direct render loop; do not treat the pattern-declared pleat dimensions as acceptance. Fit, deformation/weights, shape keys, Unity/VRChat execution, package and release remain unapproved."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "673af7b65ec96fad7a97253fc6c530868e35289abdae4d9f4e78c4dda6364706",
+      "sourceSha256": "bbe92b9f4ec8eb7b164b6d69b485cb0c3b12df60a7dedd2474635a09e287c0df",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "aacf6f43a1adb44374254424fce76e04207c67f2c77dff38ba5b4552548f5933",
+      "reportSha256": "f973e2068ae675677f90970e5b70c28b3751e29114ae8f7af0964cc7c9d6915c",
       "metrics": {
-        "vertices": 15958,
-        "triangles": 31139,
-        "unweightedVertices": 15958,
+        "vertices": 17802,
+        "triangles": 34779,
+        "unweightedVertices": 17802,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false
@@ -134,21 +134,21 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "ac2fb4bad9a040ad19c195e8924e8fb9ebc7efc6cb632ea55284cdb235f10acf",
+      "sha256": "719b7706b052c06e1f5f6fa645ca178c4d252fe6b3e166f61fc3a3d297ed1af8",
       "findings": [
         {
-          "code": "LOWER_BODICE_SURFACE_FACETING_REMAINS",
-          "description": "Across the V124 direct renders, the lower bodice still shows visible triangular faceting around the front and side waist; the lowered all-jacket surface-placement ramp did not make a visible improvement.",
+          "code": "SKIRT_PLEATS_AND_LAME_IDENTITY_UNREADABLE",
+          "description": "In the five neutral views the overskirt still reads as a plain cone, with no clearly visible repeated knife pleats or readable lamé surface. The larger panel-local relief did not make the skirt construction legible at product-view scale.",
           "severity": "BLOCKER"
         },
         {
-          "code": "REAR_WAIST_JACKET_HEM_PROJECTION",
-          "description": "Side and rear views still show the jacket hem projecting outward at the waist, with a pinched and uneven layered transition.",
+          "code": "SKIRT_POSE_DEFORMATION_REMAINS",
+          "description": "Crouch and sit views show the flared skirt panels lifting and overlapping across the thighs and behind the body; prone remains a broad disk-like flare. The new pleat relief has not resolved the pose deformation and adds no convincing drape.",
           "severity": "BLOCKER"
         },
         {
-          "code": "SKIRT_POSE_DEFORMATION_AND_PRODUCT_IDENTITY",
-          "description": "Crouch, sit, and prone views still show folded or tangled skirt strips and a cone/disk-like silhouette. Pleats and lamé/fencing-practice identity are not clear in the rendered garment.",
+          "code": "LOWER_BODICE_AND_REAR_WAIST_ARTIFACTS",
+          "description": "The neutral front, back, and side renders still show triangular faceting across the lower bodice/waist and an uneven projecting jacket-to-skirt transition at the rear and sides.",
           "severity": "BLOCKER"
         }
       ],
@@ -160,33 +160,33 @@
     "decision": "REJECT",
     "findings": [
       {
-        "code": "LOWER_BODICE_SURFACE_FACETING_REMAINS",
-        "description": "Across the V124 direct renders, the lower bodice still shows visible triangular faceting around the front and side waist; the lowered all-jacket surface-placement ramp did not make a visible improvement.",
+        "code": "SKIRT_PLEATS_AND_LAME_IDENTITY_UNREADABLE",
+        "description": "In the five neutral views the overskirt still reads as a plain cone, with no clearly visible repeated knife pleats or readable lamé surface. The larger panel-local relief did not make the skirt construction legible at product-view scale.",
         "severity": "BLOCKER"
       },
       {
-        "code": "REAR_WAIST_JACKET_HEM_PROJECTION",
-        "description": "Side and rear views still show the jacket hem projecting outward at the waist, with a pinched and uneven layered transition.",
+        "code": "SKIRT_POSE_DEFORMATION_REMAINS",
+        "description": "Crouch and sit views show the flared skirt panels lifting and overlapping across the thighs and behind the body; prone remains a broad disk-like flare. The new pleat relief has not resolved the pose deformation and adds no convincing drape.",
         "severity": "BLOCKER"
       },
       {
-        "code": "SKIRT_POSE_DEFORMATION_AND_PRODUCT_IDENTITY",
-        "description": "Crouch, sit, and prone views still show folded or tangled skirt strips and a cone/disk-like silhouette. Pleats and lamé/fencing-practice identity are not clear in the rendered garment.",
+        "code": "LOWER_BODICE_AND_REAR_WAIST_ARTIFACTS",
+        "description": "The neutral front, back, and side renders still show triangular faceting across the lower bodice/waist and an uneven projecting jacket-to-skirt transition at the rear and sides.",
         "severity": "BLOCKER"
       }
     ],
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "1ee22ed068037e4d0fded00c7355b7797bcac21dd2d9af051e7e737316516b53",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "f3854b1bf770a15b6deeba25737ef1dbdf73613d678c30f857f382ebf624bcc6",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "a2468200671fa01c55e6849a9a097b339dc395971f122a840bc94f81591ee41c",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "5671f1d8bcbc8583434bf8b7b88878e16ce357e7f713af336c4e36681a4a7cee",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "e649d474f9f155e9ab0fa4168d75fb3c2db12ce5040c0dd0b04716bedc98dbee",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "f014c722fb4c4d92defc78aa8149d1089de595ce1da7219c7fd46518febf3aaf",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "36a6be4370eab84a907ec85aa61a92da0cde27dd16e47d0f90518e805e364a5e",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "8afb4f32b23fc23dfdafe4dc7871268d2b49076c1f197e1a0ba70f4fd47d8141",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "16742739632ff885ac5d64e4f3622a9abc67b1e0937949c514c6b6e53388b382",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "ca736b3f9c437d678ed669c823a4824ded2686f1e8d888b2366ff78b814e93c3",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "c9b164591d2a4381c123dfd2b8d3631e55747d5696582a1b2aa5aac387ab9bda"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "b8fc051238ceb0f2ad40b7c652a46c02895b2e28c2dff00233a42aecaa14315f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "579ca3f081cfbefb26d283e56e587159baaee26736edae032c7dbaecd9db527e",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "f31db63fa9c784fcf78439a935aff0b55f8b7f149fc596db97fcd108db25de10",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "fd69583127dbf4c9810fd0ddb63b5712ae8f29789e34f5a0771c3ba8578f8877",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "ceb36ca5d03aafd825bd48efab965da95809055e1cb303e1311bde61702f845e",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "237400e6578c4ebc9508a82e424b33162badfca696f333ff930a4cefe0a98112",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "73e5ebc5d38dc4cab69e41d08bfd1a046c43f5d3d021f177b811a76b3853adf7",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "ced25827340c7ba2cc2f4f5ec58434bca6dc92c395efbcafb6ea940e8c53c5e2",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "dd545d92db0cf45ce4fe33cbfb30878e091d88c161f91f30cb8b5f024e4113be",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "b1d5ab90e017cd6571dc9e1004b9805685b0a1945df4deabfd7a06d6cde6ff59",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "1c42a1a93565431ea6e0841e9d0962ae8a5b66398768e0448ee1f1170a5fdeca"
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"
