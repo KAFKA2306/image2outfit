@@ -33,15 +33,15 @@
         0.7645782470703125
       ],
       "radialClearanceM": 0.004,
-      "heightBlendM": [
-        0.6795782470703124,
-        0.7395782470703125
-      ],
       "outsideSampleRange": "hold-nearest-contour",
       "evidenceBoundary": "V130 adds a 60 mm smooth contour-placement blend over the 0.679578-0.739578 m shared waistband/skirt range. At the lower bound the skirt retains its envelope placement; the blend reaches full waistband contour placement at the shared upper seam. This tests geometric profile continuity only; pleat readability, fit, layering, shape-key response, pose motion and appearance remain unapproved.",
       "angularOriginBlenderXYM": [
         0,
         -0.03788188099861145
+      ],
+      "heightBlendM": [
+        0.6795782470703124,
+        0.7395782470703125
       ]
     },
     "sections": [
@@ -8865,16 +8865,16 @@
         "closed": true
       }
     ],
-    "placedVertexCount": 6671,
-    "heightBlendSkippedVertexCount": 5006,
+    "placedVertexCount": 7709,
+    "heightBlendSkippedVertexCount": 5838,
     "placementFadeOutBlendedVertexCount": 0,
     "placementFadeOutSkippedVertexCount": 0,
-    "angularSourceVerticesSha256": "a039ead46780eb3879c302ce817514298f680c7e56aa51277b2663af2659b957",
+    "angularSourceVerticesSha256": "3b3c531256b24060cc7faab3e30cd485d4da5d8d6348c722ead0997a3c090ac6",
     "layerOffsetVertexCount": 0,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
     "orientationPreservingDisplacementScale": 1.0,
-    "orientationCheckedTriangleCount": 30237,
+    "orientationCheckedTriangleCount": 32871,
     "normalContinuity": {
       "guardedEdgeCount": 0,
       "maximumDihedralDegrees": 60.0,
@@ -8882,8 +8882,8 @@
       "baselineEdgesOverCap": 0,
       "maximumResultDihedralDegrees": 0.0
     },
-    "beforeVerticesSha256": "5e4b399f678ea684a6d9a0514fe6cb0802e1d51f41e363cddca6a097f9daffb7",
-    "afterVerticesSha256": "9818d15bdf98556c5fb3870ca855d4a105dedb0dd8ad9383fe670d0e2145eaed",
+    "beforeVerticesSha256": "909d13ef251e4a2e741086889686052b44e62278edc25998a21b762e7ca6d1f9",
+    "afterVerticesSha256": "4b6aa538cb3ccad5f7a91f58eebba184e65a5571f597cb6e82256c75f843f70b",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -8892,7 +8892,7 @@
     "configuration": {
       "method": "bounded-panel-extension-v3-panel-local-hem",
       "foldMethod": "panel-local-box-pleat-relief-v2",
-      "foldsPerPanel": 1,
+      "foldsPerPanel": 2,
       "longitudinalSubdivisionCount": 24,
       "pieceIds": [
         "overskirt-front-left",
@@ -8911,7 +8911,7 @@
       "hemZM": 0.5395782470703124,
       "hemExtensionM": 0.04,
       "foldCount": 6,
-      "topologySubdivisionFactor": 1,
+      "topologySubdivisionFactor": 2,
       "hemFoldDepthM": 0.036,
       "phaseRadians": 0,
       "forwardApron": {
@@ -8932,7 +8932,7 @@
         ],
         "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
       },
-      "evidenceBoundary": "V131 tests one broad panel-local pleat on each of the six sewn overskirt pieces and 36 mm hem relief, changed from two cycles per panel and 24 mm relief, to make the six-panel pleated identity legible. V130 60 mm contour blend and V129 4 mm clearances are preserved. This geometry hypothesis grants no visual, fit, pose, fabric, shape-key, Unity, VRChat or release acceptance.",
+      "evidenceBoundary": "V134 replaces one broad raised face per sewn panel with two panel-local cycles and doubles radial mesh subdivision so each fold is explicit geometry. The 0.50 valley depth, 36 mm hem relief, 60 mm waistband contour blend and existing clearances are retained. This responds to V133 direct review where the six-panel shell still read as broadly smooth. Waist shelf, pose coverage, fit, weights and release remain rejected until regenerated evidence passes.",
       "seamContinuationPieceIds": [
         "waistband-front-left",
         "waistband-front-right",
@@ -8949,50 +8949,50 @@
       0.7395782470703125
     ],
     "extensionBelowDeclaredPleatHemM": 0.015000026226043683,
-    "selectedVertexCount": 8915,
-    "movedVertexCount": 8843,
-    "maximumRadialDisplacementM": 0.035999999999999255,
-    "minimumTriangleAreaM2": 2.647238524164765e-12,
+    "selectedVertexCount": 10201,
+    "movedVertexCount": 10121,
+    "maximumRadialDisplacementM": 0.03599999548526452,
+    "minimumTriangleAreaM2": 3.1555859947300646e-12,
     "authoredFoldDisplacementByPiece": {
       "overskirt-back-left": {
-        "vertexCount": 2239,
-        "maximumAbsoluteRadialDisplacementM": 0.03599981946960835,
-        "meanAbsoluteRadialDisplacementM": 0.014437452580519311,
-        "p95AbsoluteRadialDisplacementM": 0.033693164419752605
+        "vertexCount": 2563,
+        "maximumAbsoluteRadialDisplacementM": 0.03599995838073878,
+        "meanAbsoluteRadialDisplacementM": 0.014445143741445765,
+        "p95AbsoluteRadialDisplacementM": 0.032508562027932765
       },
       "overskirt-back-right": {
-        "vertexCount": 2270,
-        "maximumAbsoluteRadialDisplacementM": 0.03599963044904051,
-        "meanAbsoluteRadialDisplacementM": 0.014254303455743403,
-        "p95AbsoluteRadialDisplacementM": 0.03322930427557981
+        "vertexCount": 2595,
+        "maximumAbsoluteRadialDisplacementM": 0.03599972765031418,
+        "meanAbsoluteRadialDisplacementM": 0.014593819955336594,
+        "p95AbsoluteRadialDisplacementM": 0.032704450399805136
       },
       "overskirt-front-lap-left": {
-        "vertexCount": 1305,
-        "maximumAbsoluteRadialDisplacementM": 0.035999999999999255,
-        "meanAbsoluteRadialDisplacementM": 0.014207652283932623,
-        "p95AbsoluteRadialDisplacementM": 0.03391712363956684
+        "vertexCount": 1455,
+        "maximumAbsoluteRadialDisplacementM": 0.035999484718558156,
+        "meanAbsoluteRadialDisplacementM": 0.01405188800779218,
+        "p95AbsoluteRadialDisplacementM": 0.03338469494977141
       },
       "overskirt-front-lap-right": {
-        "vertexCount": 1280,
-        "maximumAbsoluteRadialDisplacementM": 0.035999999999999255,
-        "meanAbsoluteRadialDisplacementM": 0.01427497068209772,
-        "p95AbsoluteRadialDisplacementM": 0.0338568211146048
+        "vertexCount": 1430,
+        "maximumAbsoluteRadialDisplacementM": 0.035998316467884546,
+        "meanAbsoluteRadialDisplacementM": 0.014036804445986045,
+        "p95AbsoluteRadialDisplacementM": 0.03354346991241295
       },
       "overskirt-front-left": {
-        "vertexCount": 1006,
-        "maximumAbsoluteRadialDisplacementM": 0.03599732566257326,
-        "meanAbsoluteRadialDisplacementM": 0.014999157080248281,
-        "p95AbsoluteRadialDisplacementM": 0.034611202353494075
+        "vertexCount": 1170,
+        "maximumAbsoluteRadialDisplacementM": 0.03599655881302397,
+        "meanAbsoluteRadialDisplacementM": 0.014178933366298552,
+        "p95AbsoluteRadialDisplacementM": 0.035462191824071086
       },
       "overskirt-front-right": {
-        "vertexCount": 1019,
-        "maximumAbsoluteRadialDisplacementM": 0.03599987014227819,
-        "meanAbsoluteRadialDisplacementM": 0.014734456124738263,
-        "p95AbsoluteRadialDisplacementM": 0.034071114335963756
+        "vertexCount": 1186,
+        "maximumAbsoluteRadialDisplacementM": 0.03599999548526452,
+        "meanAbsoluteRadialDisplacementM": 0.014303721666923577,
+        "p95AbsoluteRadialDisplacementM": 0.035462191425221126
       }
     },
-    "beforeVerticesSha256": "9818d15bdf98556c5fb3870ca855d4a105dedb0dd8ad9383fe670d0e2145eaed",
-    "afterVerticesSha256": "a8fd0ec42b17d202e2689f6f859917d3b69906cbacfd889a0bcfc88bb1f083af",
+    "beforeVerticesSha256": "4b6aa538cb3ccad5f7a91f58eebba184e65a5571f597cb6e82256c75f843f70b",
+    "afterVerticesSha256": "d2bee01941514f4376a321b542819716115da961c47aa901bfb8b47b307d7ba0",
     "canonicalFacesChanged": false,
     "sewnWaistDisplacementM": 0,
     "panelAngularRangesRadians": {
@@ -9006,7 +9006,7 @@
       ],
       "overskirt-front-lap-left": [
         -1.607326475186291,
-        0.0
+        -1.1102230246251565e-16
       ],
       "overskirt-front-lap-right": [
         0.0,
@@ -9045,9 +9045,9 @@
     },
     "maximumNearestSurfaceDistanceM": 0.007790741045027971,
     "maximumRestDisplacementM": 0.0045482595427490755,
-    "minimumTriangleAreaM2": 2.647238524164765e-12,
-    "beforeVerticesSha256": "a8fd0ec42b17d202e2689f6f859917d3b69906cbacfd889a0bcfc88bb1f083af",
-    "afterVerticesSha256": "1adad33177bf6b7fcd6d5c7e2579cc9f4a6b4835261c304abd01c3bbb8d40b3a",
+    "minimumTriangleAreaM2": 3.1555859947300646e-12,
+    "beforeVerticesSha256": "d2bee01941514f4376a321b542819716115da961c47aa901bfb8b47b307d7ba0",
+    "afterVerticesSha256": "a5bb71ed38465bfad5c7a730a1dee6001f9d2767977d3d71941e7b75596ebde1",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false
@@ -9100,8 +9100,8 @@
     "targetHemZM": 0.5395782470703124,
     "waistZM": 0.7395782470703125,
     "extensionM": 0.040000000000000036,
-    "selectedVertexCount": 8915,
-    "movedVertexCount": 8843,
+    "selectedVertexCount": 10201,
+    "movedVertexCount": 10121,
     "maximumVertexDisplacementM": 0.055000000000000035,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
@@ -9140,8 +9140,8 @@
     "method": "bounded-panel-extension-v3-panel-local-hem",
     "foldMethod": "panel-local-box-pleat-relief-v2",
     "foldCount": 6,
-    "topologySubdivisionFactor": 1,
-    "radialTopologyCutCount": 6,
+    "topologySubdivisionFactor": 2,
+    "radialTopologyCutCount": 12,
     "cuts": [
       {
         "planeAngleRadians": 0.0,
@@ -9149,9 +9149,19 @@
         "cutEdgeCount": 38
       },
       {
+        "planeAngleRadians": 0.2617993877991494,
+        "newVertexCount": 87,
+        "cutEdgeCount": 85
+      },
+      {
         "planeAngleRadians": 0.5235987755982988,
         "newVertexCount": 82,
         "cutEdgeCount": 81
+      },
+      {
+        "planeAngleRadians": 0.7853981633974483,
+        "newVertexCount": 125,
+        "cutEdgeCount": 126
       },
       {
         "planeAngleRadians": 1.0471975511965976,
@@ -9159,9 +9169,19 @@
         "cutEdgeCount": 178
       },
       {
+        "planeAngleRadians": 1.3089969389957472,
+        "newVertexCount": 235,
+        "cutEdgeCount": 231
+      },
+      {
         "planeAngleRadians": 1.5707963267948966,
         "newVertexCount": 154,
         "cutEdgeCount": 212
+      },
+      {
+        "planeAngleRadians": 1.832595714594046,
+        "newVertexCount": 226,
+        "cutEdgeCount": 222
       },
       {
         "planeAngleRadians": 2.0943951023931953,
@@ -9169,143 +9189,153 @@
         "cutEdgeCount": 179
       },
       {
+        "planeAngleRadians": 2.356194490192345,
+        "newVertexCount": 118,
+        "cutEdgeCount": 119
+      },
+      {
         "planeAngleRadians": 2.6179938779914944,
         "newVertexCount": 83,
         "cutEdgeCount": 82
+      },
+      {
+        "planeAngleRadians": 2.8797932657906435,
+        "newVertexCount": 91,
+        "cutEdgeCount": 89
       }
     ],
     "longitudinalSubdivisionCuts": [
       {
         "heightZM": 0.5859782470703124,
-        "newVertexCount": 320,
-        "cutEdgeCount": 320
+        "newVertexCount": 348,
+        "cutEdgeCount": 348
       },
       {
         "heightZM": 0.5923782470703125,
-        "newVertexCount": 328,
-        "cutEdgeCount": 328
+        "newVertexCount": 354,
+        "cutEdgeCount": 355
       },
       {
         "heightZM": 0.5987782470703125,
-        "newVertexCount": 325,
-        "cutEdgeCount": 325
+        "newVertexCount": 353,
+        "cutEdgeCount": 353
       },
       {
         "heightZM": 0.6051782470703124,
-        "newVertexCount": 324,
-        "cutEdgeCount": 324
+        "newVertexCount": 352,
+        "cutEdgeCount": 352
       },
       {
         "heightZM": 0.6115782470703125,
-        "newVertexCount": 318,
-        "cutEdgeCount": 318
+        "newVertexCount": 338,
+        "cutEdgeCount": 338
       },
       {
         "heightZM": 0.6179782470703125,
+        "newVertexCount": 332,
+        "cutEdgeCount": 332
+      },
+      {
+        "heightZM": 0.6243782470703125,
+        "newVertexCount": 314,
+        "cutEdgeCount": 314
+      },
+      {
+        "heightZM": 0.6307782470703125,
+        "newVertexCount": 316,
+        "cutEdgeCount": 316
+      },
+      {
+        "heightZM": 0.6371782470703125,
         "newVertexCount": 312,
         "cutEdgeCount": 312
       },
       {
-        "heightZM": 0.6243782470703125,
-        "newVertexCount": 294,
-        "cutEdgeCount": 294
+        "heightZM": 0.6435782470703125,
+        "newVertexCount": 310,
+        "cutEdgeCount": 310
       },
       {
-        "heightZM": 0.6307782470703125,
-        "newVertexCount": 296,
-        "cutEdgeCount": 296
-      },
-      {
-        "heightZM": 0.6371782470703125,
+        "heightZM": 0.6499782470703125,
         "newVertexCount": 292,
         "cutEdgeCount": 292
       },
       {
-        "heightZM": 0.6435782470703125,
-        "newVertexCount": 290,
-        "cutEdgeCount": 290
-      },
-      {
-        "heightZM": 0.6499782470703125,
-        "newVertexCount": 272,
-        "cutEdgeCount": 272
-      },
-      {
         "heightZM": 0.6563782470703124,
-        "newVertexCount": 256,
-        "cutEdgeCount": 256
+        "newVertexCount": 276,
+        "cutEdgeCount": 276
       },
       {
         "heightZM": 0.6627782470703125,
-        "newVertexCount": 250,
-        "cutEdgeCount": 250
+        "newVertexCount": 270,
+        "cutEdgeCount": 270
       },
       {
         "heightZM": 0.6691782470703125,
-        "newVertexCount": 247,
-        "cutEdgeCount": 247
+        "newVertexCount": 267,
+        "cutEdgeCount": 267
       },
       {
         "heightZM": 0.6755782470703124,
-        "newVertexCount": 235,
-        "cutEdgeCount": 235
+        "newVertexCount": 255,
+        "cutEdgeCount": 255
       },
       {
         "heightZM": 0.6819782470703125,
-        "newVertexCount": 232,
-        "cutEdgeCount": 232
+        "newVertexCount": 252,
+        "cutEdgeCount": 252
       },
       {
         "heightZM": 0.6883782470703125,
-        "newVertexCount": 222,
-        "cutEdgeCount": 223
+        "newVertexCount": 242,
+        "cutEdgeCount": 243
       },
       {
         "heightZM": 0.6947782470703125,
-        "newVertexCount": 216,
-        "cutEdgeCount": 216
+        "newVertexCount": 228,
+        "cutEdgeCount": 228
       },
       {
         "heightZM": 0.7011782470703125,
-        "newVertexCount": 205,
-        "cutEdgeCount": 205
+        "newVertexCount": 217,
+        "cutEdgeCount": 217
       },
       {
         "heightZM": 0.7075782470703125,
-        "newVertexCount": 194,
-        "cutEdgeCount": 194
+        "newVertexCount": 206,
+        "cutEdgeCount": 206
       },
       {
         "heightZM": 0.7139782470703124,
-        "newVertexCount": 190,
-        "cutEdgeCount": 190
+        "newVertexCount": 202,
+        "cutEdgeCount": 202
       },
       {
         "heightZM": 0.7203782470703125,
-        "newVertexCount": 188,
-        "cutEdgeCount": 188
+        "newVertexCount": 200,
+        "cutEdgeCount": 200
       },
       {
         "heightZM": 0.7267782470703125,
-        "newVertexCount": 175,
-        "cutEdgeCount": 175
+        "newVertexCount": 187,
+        "cutEdgeCount": 187
       },
       {
         "heightZM": 0.7331782470703125,
-        "newVertexCount": 161,
-        "cutEdgeCount": 161
+        "newVertexCount": 173,
+        "cutEdgeCount": 173
       }
     ],
     "longitudinalSubdivisionCount": 24,
     "beforeVertexCount": 8583,
-    "afterVertexCount": 15407,
+    "afterVertexCount": 16743,
     "beforeTriangleCount": 16613,
-    "afterTriangleCount": 30237,
-    "sharedSkirtWaistbandEdgeCount": 72,
-    "authoredUvFaceCount": 30237,
+    "afterTriangleCount": 32871,
+    "sharedSkirtWaistbandEdgeCount": 80,
+    "authoredUvFaceCount": 32871,
     "authoredUvPanelCount": 25,
     "authoredUvSourceKinds": {
-      "garmentcode-pattern-panel": 30237
+      "garmentcode-pattern-panel": 32871
     },
     "degenerateTriangleCount": 0,
     "nonManifoldEdgeCount": 0,
@@ -9318,14 +9348,14 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "9973c150b9897ff5945bc3b464ac408ffa881fc7284e5ee507c00c7a0cbfac05",
+    "privateSimulationSourceSha256": "323acef2fefa676a47280afd8e945895d487ab01b977074bbd5f02f5a7350898",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
     "status": "PARTIAL_UNVERIFIED",
     "method": "face-local-declared-source-coordinates; unmapped surface-shell faces remain without UVs",
     "panelCount": 27,
-    "mappedFaceCount": 30277,
+    "mappedFaceCount": 32911,
     "unmappedFaceCount": 1886,
     "uniformPatternToUvScale": 0.008629850966878492,
     "panelUvBounds": {
@@ -9683,7 +9713,7 @@
     },
     "sourceKindFaceCounts": {
       "declared-parametric-accessory": 40,
-      "garmentcode-pattern-panel": 30237,
+      "garmentcode-pattern-panel": 32871,
       "unmapped-surface-derived-shell": 1886
     },
     "grantsQualityAcceptance": false
@@ -9744,11 +9774,11 @@
         "grantsFitAcceptance": false
       },
       "overskirt-front-left": {
-        "boundaryEdgeCount": 16,
-        "selectedBoundaryEdgeCount": 16,
+        "boundaryEdgeCount": 20,
+        "selectedBoundaryEdgeCount": 20,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 330,
+        "meshVertexCount": 386,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": "hem",
         "endpointInsetM": 0.0,
@@ -9756,11 +9786,11 @@
         "grantsFitAcceptance": false
       },
       "overskirt-front-right": {
-        "boundaryEdgeCount": 16,
-        "selectedBoundaryEdgeCount": 16,
+        "boundaryEdgeCount": 20,
+        "selectedBoundaryEdgeCount": 20,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 330,
+        "meshVertexCount": 386,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": "hem",
         "endpointInsetM": 0.0,
@@ -9768,11 +9798,11 @@
         "grantsFitAcceptance": false
       },
       "overskirt-back-left": {
-        "boundaryEdgeCount": 41,
-        "selectedBoundaryEdgeCount": 41,
+        "boundaryEdgeCount": 48,
+        "selectedBoundaryEdgeCount": 48,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 330,
+        "meshVertexCount": 386,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": "hem",
         "endpointInsetM": 0.0,
@@ -9780,11 +9810,11 @@
         "grantsFitAcceptance": false
       },
       "overskirt-back-right": {
-        "boundaryEdgeCount": 41,
-        "selectedBoundaryEdgeCount": 41,
+        "boundaryEdgeCount": 48,
+        "selectedBoundaryEdgeCount": 48,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 330,
+        "meshVertexCount": 386,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": "hem",
         "endpointInsetM": 0.0,
@@ -9792,11 +9822,11 @@
         "grantsFitAcceptance": false
       },
       "waistband-front-left": {
-        "boundaryEdgeCount": 9,
-        "selectedBoundaryEdgeCount": 9,
+        "boundaryEdgeCount": 10,
+        "selectedBoundaryEdgeCount": 10,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 134,
+        "meshVertexCount": 154,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": null,
         "endpointInsetM": 0.0,
@@ -9804,11 +9834,11 @@
         "grantsFitAcceptance": false
       },
       "waistband-front-right": {
-        "boundaryEdgeCount": 9,
-        "selectedBoundaryEdgeCount": 9,
+        "boundaryEdgeCount": 10,
+        "selectedBoundaryEdgeCount": 10,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 134,
+        "meshVertexCount": 154,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": null,
         "endpointInsetM": 0.0,
@@ -9816,11 +9846,11 @@
         "grantsFitAcceptance": false
       },
       "waistband-back-left": {
-        "boundaryEdgeCount": 15,
-        "selectedBoundaryEdgeCount": 15,
+        "boundaryEdgeCount": 18,
+        "selectedBoundaryEdgeCount": 18,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 134,
+        "meshVertexCount": 154,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": null,
         "endpointInsetM": 0.0,
@@ -9828,11 +9858,11 @@
         "grantsFitAcceptance": false
       },
       "waistband-back-right": {
-        "boundaryEdgeCount": 15,
-        "selectedBoundaryEdgeCount": 15,
+        "boundaryEdgeCount": 18,
+        "selectedBoundaryEdgeCount": 18,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 134,
+        "meshVertexCount": 154,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": null,
         "endpointInsetM": 0.0,
@@ -9840,11 +9870,11 @@
         "grantsFitAcceptance": false
       },
       "overskirt-front-lap-left": {
-        "boundaryEdgeCount": 25,
-        "selectedBoundaryEdgeCount": 25,
+        "boundaryEdgeCount": 28,
+        "selectedBoundaryEdgeCount": 28,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 330,
+        "meshVertexCount": 386,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": "hem",
         "endpointInsetM": 0.0,
@@ -9852,11 +9882,11 @@
         "grantsFitAcceptance": false
       },
       "overskirt-front-lap-right": {
-        "boundaryEdgeCount": 25,
-        "selectedBoundaryEdgeCount": 25,
+        "boundaryEdgeCount": 28,
+        "selectedBoundaryEdgeCount": 28,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 330,
+        "meshVertexCount": 386,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": "hem",
         "endpointInsetM": 0.0,
@@ -9864,11 +9894,11 @@
         "grantsFitAcceptance": false
       },
       "waistband-front-lap-left": {
-        "boundaryEdgeCount": 9,
-        "selectedBoundaryEdgeCount": 9,
+        "boundaryEdgeCount": 10,
+        "selectedBoundaryEdgeCount": 10,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 134,
+        "meshVertexCount": 154,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": null,
         "endpointInsetM": 0.0,
@@ -9876,11 +9906,11 @@
         "grantsFitAcceptance": false
       },
       "waistband-front-lap-right": {
-        "boundaryEdgeCount": 9,
-        "selectedBoundaryEdgeCount": 9,
+        "boundaryEdgeCount": 10,
+        "selectedBoundaryEdgeCount": 10,
         "polylineCount": 1,
         "joinedHemCornerEndpointCount": 6,
-        "meshVertexCount": 134,
+        "meshVertexCount": 154,
         "bindingMethod": "canonical-sewn-edge-interpolation",
         "canonicalEdgeRole": null,
         "endpointInsetM": 0.0,
@@ -10568,159 +10598,179 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "a61070d470aba06a77cce77830f65aa6b998774f025cb582f00090f6e956b073",
+  "sourceBlendSha256": "c43ad2be8a9d38a503aea6638b872efe2223e4bcf86a4f6329eb5f40198b1c1e",
   "sewnMeshSha256": "cd2f6c90478f0e7c2ed3dab6072de9f9a9a9f4b424e4ab6a3d3234c401c8fdf9",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
     "candidateDegenerateCrossProductSquaredThreshold": 1e-20,
     "maximumWeldDistanceM": 1e-05,
-    "weldCount": 7,
+    "weldCount": 8,
     "welds": [
       {
-        "maximumInputEdgeDistanceM": 7.474778970575398e-06,
+        "maximumInputEdgeDistanceM": 7.740458526648639e-06,
         "triangleCoordinatesM": [
           [
-            -0.07759250700473785,
-            0.05331644043326378,
+            -0.08506002277135849,
+            0.060955025255680084,
             0.6995782256126404
           ],
           [
-            -0.07758542895317078,
-            0.05331884324550629,
+            -0.08505472540855408,
+            0.060960669070482254,
             0.6995782256126404
           ],
           [
-            -0.07759518176317215,
-            0.05331610143184662,
+            -0.08506426215171814,
+            0.06095635145902634,
             0.6995712518692017
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 2.1598589342874256e-06,
+        "maximumInputEdgeDistanceM": 2.039228128737927e-06,
         "triangleCoordinatesM": [
           [
-            0.10021524876356125,
-            0.08627622574567795,
+            0.12236762791872025,
+            0.11372113227844238,
             0.5555782318115234
           ],
           [
-            0.10021071881055832,
-            0.08627715706825256,
+            0.12236447632312775,
+            0.1137252151966095,
             0.5555782318115234
           ],
           [
-            0.10021406412124634,
-            0.08627597242593765,
+            0.12236670404672623,
+            0.11372146010398865,
             0.5555800199508667
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 2.4362885891918935e-06,
+        "maximumInputEdgeDistanceM": 2.7989328493729656e-06,
         "triangleCoordinatesM": [
           [
-            0.04831507429480553,
-            0.05703473463654518,
+            0.05258658528327942,
+            0.0649634376168251,
             0.7155781984329224
           ],
           [
-            0.04831342399120331,
-            0.057034965604543686,
+            0.052585117518901825,
+            0.06496436893939972,
             0.7155759334564209
           ],
           [
-            0.04831254854798317,
-            0.05703476816415787,
+            0.05258377268910408,
+            0.06496342271566391,
             0.7155781984329224
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 2.2427639896240846e-06,
+        "maximumInputEdgeDistanceM": 2.2422286805461636e-06,
         "triangleCoordinatesM": [
           [
-            0.12780484557151794,
-            0.03590628132224083,
+            0.15953762829303741,
+            0.05422721058130264,
             0.5900916457176208
           ],
           [
-            0.1278054118156433,
-            0.035906605422496796,
+            0.15953819453716278,
+            0.05422753095626831,
             0.5900894999504089
           ],
           [
-            0.12780170142650604,
-            0.03590770810842514,
+            0.15953685343265533,
+            0.054230816662311554,
             0.5900915265083313
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 3.4547905184429077e-06,
+        "maximumInputEdgeDistanceM": 3.690317020157214e-06,
         "triangleCoordinatesM": [
           [
-            0.12780484557151794,
-            0.03590628132224083,
+            0.15953762829303741,
+            0.05422721058130264,
             0.5900916457176208
           ],
           [
-            0.12780170142650604,
-            0.03590770810842514,
+            0.15953685343265533,
+            0.054230816662311554,
             0.5900915265083313
           ],
           [
-            0.1278027892112732,
-            0.03590509667992592,
+            0.15953557193279266,
+            0.05422602593898773,
             0.5900992155075073
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 9.954748031816688e-06,
+        "maximumInputEdgeDistanceM": 8.60257938497703e-06,
         "triangleCoordinatesM": [
           [
-            0.12080924212932587,
-            -0.037457022815942764,
+            0.11432114988565445,
+            -0.037631746381521225,
             0.7075782418251038
           ],
           [
-            0.12081105262041092,
-            -0.03746514022350311,
+            0.1143217459321022,
+            -0.03763939067721367,
             0.7075698971748352
           ],
           [
-            0.12081325054168701,
-            -0.037447910755872726,
+            0.11431892961263657,
+            -0.037623435258865356,
             0.7075782418251038
           ]
         ]
       },
       {
-        "maximumInputEdgeDistanceM": 7.55220082123408e-06,
+        "maximumInputEdgeDistanceM": 3.374068451707644e-06,
         "triangleCoordinatesM": [
           [
-            0.03531539812684059,
-            0.05806891992688179,
+            0.10993790626525879,
+            0.07205602526664734,
+            0.6355867385864258
+          ],
+          [
+            0.10994099825620651,
+            0.07205911725759506,
+            0.6355782747268677
+          ],
+          [
+            0.10994069278240204,
+            0.07206247746944427,
+            0.6355782747268677
+          ]
+        ]
+      },
+      {
+        "maximumInputEdgeDistanceM": 7.5730524790185564e-06,
+        "triangleCoordinatesM": [
+          [
+            0.03785741329193115,
+            0.06497550010681152,
             0.7075854539871216
           ],
           [
-            0.035322584211826324,
-            0.05807000398635864,
+            0.03786615654826164,
+            0.06497947871685028,
             0.7075782418251038
           ],
           [
-            0.03531387448310852,
-            0.05807056277990341,
+            0.03785570710897446,
+            0.06497705727815628,
             0.7075782418251038
           ]
         ]
       }
     ],
-    "boundaryEdgesBefore": 785,
-    "boundaryEdgesAfter": 785,
-    "nonManifoldEdgesBefore": 785,
-    "nonManifoldEdgesAfter": 785,
+    "boundaryEdgesBefore": 823,
+    "boundaryEdgesAfter": 823,
+    "nonManifoldEdgesBefore": 823,
+    "nonManifoldEdgesAfter": 823,
     "remainingDegenerateTriangles": 0,
     "grantsFitAcceptance": false,
     "grantsAppearanceAcceptance": false,
@@ -34489,7 +34539,7 @@
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 580,
     "orientationPreservingDisplacementScale": 0.00013772840611636639,
-    "orientationCheckedTriangleCount": 30237,
+    "orientationCheckedTriangleCount": 32871,
     "normalContinuity": {
       "guardedEdgeCount": 2718,
       "maximumDihedralDegrees": 60.0,
@@ -34497,8 +34547,8 @@
       "baselineEdgesOverCap": 26,
       "maximumResultDihedralDegrees": 179.10252136375186
     },
-    "beforeVerticesSha256": "1292c596672eba1d89a38fd033b584a00f3d37852b2fc05b37db7b704b4aa9ba",
-    "afterVerticesSha256": "d69d25a29a673ea136471c2c279cfbb324bc97870bf4455c39b7c62994b3a6fb",
+    "beforeVerticesSha256": "52a47e4aedd66a39ef13d09965f31f7f9a0ff211d679231c637d7fd6384a64f9",
+    "afterVerticesSha256": "ce1ead7a85aaea7b050b104aaeeed9069fac372596c47230b94a311662d23e06",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -204735,16 +204785,16 @@
         "closed": true
       }
     ],
-    "placedVertexCount": 8915,
+    "placedVertexCount": 10201,
     "heightBlendSkippedVertexCount": 0,
     "placementFadeOutBlendedVertexCount": 0,
     "placementFadeOutSkippedVertexCount": 0,
     "angularSourceVerticesSha256": null,
-    "layerOffsetVertexCount": 1217,
+    "layerOffsetVertexCount": 1366,
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 0,
-    "orientationPreservingDisplacementScale": 0.5141713789198548,
-    "orientationCheckedTriangleCount": 30237,
+    "orientationPreservingDisplacementScale": 0.8115027705207467,
+    "orientationCheckedTriangleCount": 32871,
     "normalContinuity": {
       "guardedEdgeCount": 0,
       "maximumDihedralDegrees": 60.0,
@@ -204752,8 +204802,8 @@
       "baselineEdgesOverCap": 0,
       "maximumResultDihedralDegrees": 0.0
     },
-    "beforeVerticesSha256": "0d2e3a8c6e6ded357bc14e74c23221a24b971cf5e3dc1d299b2dd3f9f321135c",
-    "afterVerticesSha256": "5e4b399f678ea684a6d9a0514fe6cb0802e1d51f41e363cddca6a097f9daffb7",
+    "beforeVerticesSha256": "49f6b928c402ba092191329f9815a393dd90f890b8bdbd204ea3ad9efd8ca865",
+    "afterVerticesSha256": "909d13ef251e4a2e741086889686052b44e62278edc25998a21b762e7ca6d1f9",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -208104,7 +208154,7 @@
     "sharedSeamVerticesLayerOffsetM": 0,
     "heightExtrapolatedVertexCount": 75,
     "orientationPreservingDisplacementScale": 1.0,
-    "orientationCheckedTriangleCount": 30237,
+    "orientationCheckedTriangleCount": 32871,
     "normalContinuity": {
       "guardedEdgeCount": 0,
       "maximumDihedralDegrees": 60.0,
@@ -208112,8 +208162,8 @@
       "baselineEdgesOverCap": 0,
       "maximumResultDihedralDegrees": 0.0
     },
-    "beforeVerticesSha256": "1ecd9bc1a0fca8cd01eb24e9c4ed3bed79d72faa6f7cc2a8f8a0ec1c514595f6",
-    "afterVerticesSha256": "1292c596672eba1d89a38fd033b584a00f3d37852b2fc05b37db7b704b4aa9ba",
+    "beforeVerticesSha256": "d4d6f93f380ba75770fee60998ac0954b9936a780538041c6395ea4190be03d5",
+    "afterVerticesSha256": "52a47e4aedd66a39ef13d09965f31f7f9a0ff211d679231c637d7fd6384a64f9",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false
   },
@@ -557183,9 +557233,9 @@
     "evidenceBoundary": "Original sewn vertex IDs/face ownership, per-stage coordinates, and internal edge normal angles through panel fairing; diagnostic only, not fit or appearance acceptance."
   },
   "metrics": {
-    "vertices": 16468,
-    "triangles": 32149,
-    "unweightedVertices": 16468,
+    "vertices": 17803,
+    "triangles": 34781,
+    "unweightedVertices": 17803,
     "degenerateTriangles": 0
   },
   "surfaceShadingHypothesis": {
@@ -557208,9 +557258,9 @@
       "shorts-front-left",
       "shorts-front-right"
     ],
-    "smoothFaceCount": 29067,
-    "canonicalSeamEdgeCount": 683,
-    "sharpCanonicalSeamEdgeCount": 683,
+    "smoothFaceCount": 31603,
+    "canonicalSeamEdgeCount": 693,
+    "sharpCanonicalSeamEdgeCount": 693,
     "seamNormalsSplit": true,
     "internalFaceNormalDiscontinuityDegreesByPanel": {
       "jacket-back-left": {
@@ -557766,54 +557816,37 @@
         ]
       },
       "overskirt-back-left": {
-        "sharedInternalEdgeCount": 6473,
-        "maximum": 177.98753,
-        "p95": 9.42473,
+        "sharedInternalEdgeCount": 7433,
+        "maximum": 178.25685,
+        "p95": 21.52999,
         "worstEdges": [
           {
-            "normalDiscontinuityDegrees": 177.98753,
-            "edgeVertexIndices": [
-              14908,
-              15224
-            ],
-            "edgeLengthM": 0.014476,
-            "midpointBlenderM": [
-              -0.1171399,
-              -0.0193486,
-              0.7195783
-            ],
-            "adjacentFaceIndices": [
-              29946,
-              30087
-            ]
-          },
-          {
-            "normalDiscontinuityDegrees": 177.70885,
+            "normalDiscontinuityDegrees": 178.25685,
             "edgeVertexIndices": [
               4673,
-              14701
+              15989
             ],
-            "edgeLengthM": 0.0079554,
+            "edgeLengthM": 0.0077695,
             "midpointBlenderM": [
-              -0.1196654,
-              -0.0297523,
+              -0.1168737,
+              -0.0301845,
               0.7108401
             ],
             "adjacentFaceIndices": [
-              29798,
-              29944
+              32374,
+              32535
             ]
           },
           {
-            "normalDiscontinuityDegrees": 177.68827,
+            "normalDiscontinuityDegrees": 178.22007,
             "edgeVertexIndices": [
               4457,
-              14701
+              15989
             ],
-            "edgeLengthM": 0.0035376,
+            "edgeLengthM": 0.0034198,
             "midpointBlenderM": [
-              -0.1210655,
-              -0.0328036,
+              -0.1174213,
+              -0.0332267,
               0.7061779
             ],
             "adjacentFaceIndices": [
@@ -557822,497 +557855,514 @@
             ]
           },
           {
-            "normalDiscontinuityDegrees": 175.41243,
+            "normalDiscontinuityDegrees": 178.15411,
             "edgeVertexIndices": [
               4673,
-              14908
+              16208
             ],
-            "edgeLengthM": 0.002872,
+            "edgeLengthM": 0.0028543,
             "midpointBlenderM": [
-              -0.1185824,
-              -0.026461,
+              -0.1161583,
+              -0.0269339,
               0.7148401
             ],
             "adjacentFaceIndices": [
               8012,
-              29934
+              32525
             ]
           },
           {
-            "normalDiscontinuityDegrees": 174.52969,
+            "normalDiscontinuityDegrees": 177.78018,
+            "edgeVertexIndices": [
+              16208,
+              16550
+            ],
+            "edgeLengthM": 0.0143441,
+            "midpointBlenderM": [
+              -0.1140054,
+              -0.0200911,
+              0.7195783
+            ],
+            "adjacentFaceIndices": [
+              32537,
+              32705
+            ]
+          },
+          {
+            "normalDiscontinuityDegrees": 176.24501,
             "edgeVertexIndices": [
               4404,
-              14301
+              15565
             ],
-            "edgeLengthM": 0.0065399,
+            "edgeLengthM": 0.0071135,
             "midpointBlenderM": [
-              -0.1197979,
-              -0.0576119,
+              -0.1246705,
+              -0.0584246,
               0.6889222
             ],
             "adjacentFaceIndices": [
               8134,
-              29253
+              31769
             ]
           }
         ]
       },
       "overskirt-back-right": {
-        "sharedInternalEdgeCount": 6566,
-        "maximum": 179.76016,
-        "p95": 9.96095,
+        "sharedInternalEdgeCount": 7529,
+        "maximum": 177.47091,
+        "p95": 19.91485,
         "worstEdges": [
           {
-            "normalDiscontinuityDegrees": 179.76016,
+            "normalDiscontinuityDegrees": 177.47091,
             "edgeVertexIndices": [
               5217,
-              14685
+              15973
             ],
-            "edgeLengthM": 0.0004086,
+            "edgeLengthM": 0.0004111,
             "midpointBlenderM": [
-              0.1182608,
-              -0.0483317,
+              0.120509,
+              -0.0485303,
               0.6997424
             ],
             "adjacentFaceIndices": [
               8987,
-              29570
+              32124
             ]
           },
           {
-            "normalDiscontinuityDegrees": 176.63804,
+            "normalDiscontinuityDegrees": 177.42162,
             "edgeVertexIndices": [
-              14939,
-              15228
+              355,
+              16552
             ],
-            "edgeLengthM": 0.0125591,
+            "edgeLengthM": 0.0010487,
             "midpointBlenderM": [
-              0.1172601,
-              -0.0178845,
+              0.1116184,
+              -0.0138791,
+              0.723886
+            ],
+            "adjacentFaceIndices": [
+              24393,
+              32817
+            ]
+          },
+          {
+            "normalDiscontinuityDegrees": 177.32248,
+            "edgeVertexIndices": [
+              16237,
+              16554
+            ],
+            "edgeLengthM": 0.0124004,
+            "midpointBlenderM": [
+              0.1135981,
+              -0.0187478,
               0.7195783
             ],
             "adjacentFaceIndices": [
-              23184,
-              29914
+              24491,
+              32505
             ]
           },
           {
-            "normalDiscontinuityDegrees": 175.08734,
+            "normalDiscontinuityDegrees": 177.32014,
             "edgeVertexIndices": [
               5097,
-              14764
+              16237
             ],
-            "edgeLengthM": 0.0047029,
+            "edgeLengthM": 0.0084957,
             "midpointBlenderM": [
-              0.1200705,
-              -0.0312044,
-              0.7090688
-            ],
-            "adjacentFaceIndices": [
-              9090,
-              29729
-            ]
-          },
-          {
-            "normalDiscontinuityDegrees": 174.94472,
-            "edgeVertexIndices": [
-              4935,
-              14764
-            ],
-            "edgeLengthM": 0.0086031,
-            "midpointBlenderM": [
-              0.1207362,
-              -0.0362894,
-              0.704832
-            ],
-            "adjacentFaceIndices": [
-              9311,
-              29725
-            ]
-          },
-          {
-            "normalDiscontinuityDegrees": 173.8239,
-            "edgeVertexIndices": [
-              5097,
-              14939
-            ],
-            "edgeLengthM": 0.0086033,
-            "midpointBlenderM": [
-              0.119244,
-              -0.0259565,
+              0.1159337,
+              -0.0265676,
               0.7130687
             ],
             "adjacentFaceIndices": [
               9312,
-              23760
+              25104
+            ]
+          },
+          {
+            "normalDiscontinuityDegrees": 176.10002,
+            "edgeVertexIndices": [
+              4935,
+              16047
+            ],
+            "edgeLengthM": 0.0085447,
+            "midpointBlenderM": [
+              0.1183073,
+              -0.0365644,
+              0.704832
+            ],
+            "adjacentFaceIndices": [
+              9311,
+              32297
             ]
           }
         ]
       },
       "overskirt-front-lap-left": {
-        "sharedInternalEdgeCount": 3698,
-        "maximum": 112.40838,
-        "p95": 12.17243,
+        "sharedInternalEdgeCount": 4141,
+        "maximum": 128.4839,
+        "p95": 27.76282,
         "worstEdges": [
           {
-            "normalDiscontinuityDegrees": 112.40838,
+            "normalDiscontinuityDegrees": 128.4839,
             "edgeVertexIndices": [
-              11892,
-              12189
+              12674,
+              13155
             ],
-            "edgeLengthM": 0.0089114,
+            "edgeLengthM": 0.0097337,
             "midpointBlenderM": [
-              -0.1215824,
-              -0.0670584,
-              0.6155782
+              -0.1466159,
+              -0.0664822,
+              0.6075783
             ],
             "adjacentFaceIndices": [
-              19962,
-              27158
+              20688,
+              29040
             ]
           },
           {
-            "normalDiscontinuityDegrees": 109.65699,
+            "normalDiscontinuityDegrees": 101.56826,
             "edgeVertexIndices": [
-              287,
-              10071
+              14942,
+              15187
             ],
-            "edgeLengthM": 0.0246344,
+            "edgeLengthM": 0.0089646,
             "midpointBlenderM": [
-              -0.1500161,
-              -0.0495567,
-              0.5652146
+              -0.1185879,
+              -0.0997961,
+              0.6703377
             ],
             "adjacentFaceIndices": [
-              18097,
-              25717
+              31445,
+              31446
             ]
           },
           {
-            "normalDiscontinuityDegrees": 107.66951,
+            "normalDiscontinuityDegrees": 95.26087,
             "edgeVertexIndices": [
-              11892,
-              12062
+              14942,
+              15315
             ],
-            "edgeLengthM": 0.0012814,
+            "edgeLengthM": 0.0091604,
             "midpointBlenderM": [
-              -0.1223157,
-              -0.0646183,
-              0.6115782
+              -0.1184843,
+              -0.0995386,
+              0.6703503
             ],
             "adjacentFaceIndices": [
-              19961,
-              26828
+              23206,
+              31446
             ]
           },
           {
-            "normalDiscontinuityDegrees": 103.96331,
+            "normalDiscontinuityDegrees": 84.3117,
             "edgeVertexIndices": [
-              9740,
-              9741
+              13277,
+              13278
             ],
-            "edgeLengthM": 0.0049539,
+            "edgeLengthM": 0.0027219,
             "midpointBlenderM": [
-              -0.1415579,
-              -0.0448553,
-              0.5555782
+              -0.1534418,
+              -0.0758314,
+              0.6195782
             ],
             "adjacentFaceIndices": [
-              10018,
-              25165
+              21341,
+              29234
             ]
           },
           {
-            "normalDiscontinuityDegrees": 100.5273,
+            "normalDiscontinuityDegrees": 80.44261,
             "edgeVertexIndices": [
-              294,
-              5412
+              9554,
+              13278
             ],
-            "edgeLengthM": 0.0098478,
+            "edgeLengthM": 0.0059601,
             "midpointBlenderM": [
-              -0.1251267,
-              -0.0783193,
-              0.6296723
+              -0.1547723,
+              -0.0770703,
+              0.6186116
             ],
             "adjacentFaceIndices": [
-              20501,
-              27866
+              20883,
+              29234
             ]
           }
         ]
       },
       "overskirt-front-lap-right": {
-        "sharedInternalEdgeCount": 3623,
-        "maximum": 132.75045,
-        "p95": 13.06699,
+        "sharedInternalEdgeCount": 4066,
+        "maximum": 119.69901,
+        "p95": 28.10709,
         "worstEdges": [
           {
-            "normalDiscontinuityDegrees": 132.75045,
+            "normalDiscontinuityDegrees": 119.69901,
             "edgeVertexIndices": [
-              314,
-              5730
+              12685,
+              13086
             ],
-            "edgeLengthM": 0.0145179,
+            "edgeLengthM": 0.0100555,
             "midpointBlenderM": [
-              0.1307,
-              -0.0709434,
-              0.6121457
+              0.1468774,
+              -0.0667204,
+              0.6075783
             ],
             "adjacentFaceIndices": [
-              19918,
-              24186
+              21000,
+              29371
             ]
           },
           {
-            "normalDiscontinuityDegrees": 115.09104,
+            "normalDiscontinuityDegrees": 99.15892,
             "edgeVertexIndices": [
-              315,
-              5722
+              14966,
+              15206
             ],
-            "edgeLengthM": 0.0107961,
+            "edgeLengthM": 0.0089349,
             "midpointBlenderM": [
-              0.1273007,
-              -0.0736237,
-              0.6209705
+              0.1186695,
+              -0.0997806,
+              0.670342
             ],
             "adjacentFaceIndices": [
-              20210,
-              24225
+              22927,
+              31422
             ]
           },
           {
-            "normalDiscontinuityDegrees": 109.773,
+            "normalDiscontinuityDegrees": 95.44153,
             "edgeVertexIndices": [
-              309,
-              10080
+              14966,
+              15218
             ],
-            "edgeLengthM": 0.0246425,
+            "edgeLengthM": 0.0091318,
             "midpointBlenderM": [
-              0.1500153,
-              -0.0495674,
-              0.5652146
+              0.1185629,
+              -0.099524,
+              0.6703544
             ],
             "adjacentFaceIndices": [
-              10189,
-              25673
+              22927,
+              31182
             ]
           },
           {
-            "normalDiscontinuityDegrees": 103.96864,
+            "normalDiscontinuityDegrees": 84.5169,
             "edgeVertexIndices": [
-              9780,
-              9782
+              13333,
+              13403
             ],
-            "edgeLengthM": 0.00496,
+            "edgeLengthM": 0.0026863,
             "midpointBlenderM": [
-              0.1415571,
-              -0.044863,
-              0.5555782
+              0.1534328,
+              -0.0758119,
+              0.6195782
             ],
             "adjacentFaceIndices": [
-              10402,
-              25132
+              21270,
+              26194
             ]
           },
           {
-            "normalDiscontinuityDegrees": 102.91941,
+            "normalDiscontinuityDegrees": 83.71565,
             "edgeVertexIndices": [
-              310,
-              10414
+              9176,
+              13086
             ],
-            "edgeLengthM": 0.0229417,
+            "edgeLengthM": 0.0145457,
             "midpointBlenderM": [
-              0.1462462,
-              -0.0533643,
-              0.5737601
+              0.1525136,
+              -0.0749123,
+              0.6118474
             ],
             "adjacentFaceIndices": [
-              10614,
-              26005
+              20891,
+              29246
             ]
           }
         ]
       },
       "overskirt-front-left": {
-        "sharedInternalEdgeCount": 2799,
-        "maximum": 179.75135,
-        "p95": 68.62036,
+        "sharedInternalEdgeCount": 3282,
+        "maximum": 179.79825,
+        "p95": 51.98933,
         "worstEdges": [
           {
-            "normalDiscontinuityDegrees": 179.75135,
+            "normalDiscontinuityDegrees": 179.79825,
             "edgeVertexIndices": [
-              5916,
-              14819
+              5892,
+              9209
             ],
-            "edgeLengthM": 0.0079031,
+            "edgeLengthM": 0.0005416,
             "midpointBlenderM": [
-              -0.1235914,
-              -0.012616,
-              0.7106111
+              -0.1152824,
+              -0.0087618,
+              0.6812857
             ],
             "adjacentFaceIndices": [
-              29676,
-              29834
+              23150,
+              31617
             ]
           },
           {
-            "normalDiscontinuityDegrees": 178.59193,
+            "normalDiscontinuityDegrees": 179.01504,
             "edgeVertexIndices": [
-              5853,
-              14819
+              9209,
+              15264
             ],
-            "edgeLengthM": 0.0048267,
+            "edgeLengthM": 0.0080678,
             "midpointBlenderM": [
-              -0.1261884,
-              -0.0158383,
-              0.7057772
+              -0.1166603,
+              -0.0059517,
+              0.6783317
             ],
             "adjacentFaceIndices": [
-              22758,
-              24317
+              23114,
+              23115
             ]
           },
           {
-            "normalDiscontinuityDegrees": 177.48426,
+            "normalDiscontinuityDegrees": 178.95376,
+            "edgeVertexIndices": [
+              5824,
+              14985
+            ],
+            "edgeLengthM": 0.0060451,
+            "midpointBlenderM": [
+              -0.120357,
+              0.000374,
+              0.6645812
+            ],
+            "adjacentFaceIndices": [
+              17164,
+              17177
+            ]
+          },
+          {
+            "normalDiscontinuityDegrees": 178.89271,
             "edgeVertexIndices": [
               5885,
-              15188
+              16496
             ],
-            "edgeLengthM": 0.0043475,
+            "edgeLengthM": 0.0039821,
             "midpointBlenderM": [
-              -0.1179267,
-              -0.0124023,
+              -0.1108291,
+              -0.0141563,
               0.7217003
             ],
             "adjacentFaceIndices": [
               10977,
-              23125
+              24429
             ]
           },
           {
-            "normalDiscontinuityDegrees": 176.50963,
+            "normalDiscontinuityDegrees": 178.82564,
             "edgeVertexIndices": [
-              329,
-              15192
+              5934,
+              14985
             ],
-            "edgeLengthM": 0.0010647,
+            "edgeLengthM": 0.0038605,
             "midpointBlenderM": [
-              -0.1164846,
-              -0.0125314,
-              0.723886
+              -0.1206283,
+              0.0009051,
+              0.6694971
             ],
             "adjacentFaceIndices": [
-              22952,
-              30201
-            ]
-          },
-          {
-            "normalDiscontinuityDegrees": 175.144,
-            "edgeVertexIndices": [
-              5916,
-              15012
-            ],
-            "edgeLengthM": 0.0021763,
-            "midpointBlenderM": [
-              -0.1214711,
-              -0.0106477,
-              0.7146111
-            ],
-            "adjacentFaceIndices": [
-              11040,
-              22943
+              22905,
+              31159
             ]
           }
         ]
       },
       "overskirt-front-right": {
-        "sharedInternalEdgeCount": 2838,
-        "maximum": 179.06309,
-        "p95": 72.96181,
+        "sharedInternalEdgeCount": 3330,
+        "maximum": 179.49333,
+        "p95": 54.03154,
         "worstEdges": [
           {
-            "normalDiscontinuityDegrees": 179.06309,
+            "normalDiscontinuityDegrees": 179.49333,
             "edgeVertexIndices": [
-              367,
-              12635
+              6015,
+              15007
             ],
-            "edgeLengthM": 0.0303685,
+            "edgeLengthM": 0.0063365,
             "midpointBlenderM": [
-              0.1456346,
-              -0.0251016,
-              0.629732
+              0.1202995,
+              0.0002802,
+              0.664419
             ],
             "adjacentFaceIndices": [
-              11198,
-              20394
+              22873,
+              31126
             ]
           },
           {
-            "normalDiscontinuityDegrees": 175.91783,
+            "normalDiscontinuityDegrees": 179.20524,
             "edgeVertexIndices": [
-              6070,
-              14443
+              15007,
+              15323
             ],
-            "edgeLengthM": 0.002971,
+            "edgeLengthM": 0.0080122,
             "midpointBlenderM": [
-              0.131825,
-              -0.0086869,
-              0.6902323
+              0.1203752,
+              0.0006964,
+              0.6715783
             ],
             "adjacentFaceIndices": [
-              11151,
-              29297
+              23103,
+              31342
             ]
           },
           {
-            "normalDiscontinuityDegrees": 175.77256,
+            "normalDiscontinuityDegrees": 178.63069,
             "edgeVertexIndices": [
-              6062,
-              14836
+              9615,
+              13429
             ],
-            "edgeLengthM": 0.0043981,
+            "edgeLengthM": 0.0594463,
             "midpointBlenderM": [
-              0.1241768,
-              -0.0127541,
-              0.7094819
+              0.1271644,
+              0.0135492,
+              0.6226811
             ],
             "adjacentFaceIndices": [
-              11268,
-              29818
+              17513,
+              21187
             ]
           },
           {
-            "normalDiscontinuityDegrees": 175.75817,
+            "normalDiscontinuityDegrees": 178.37467,
             "edgeVertexIndices": [
-              6044,
-              14836
+              6015,
+              14752
             ],
-            "edgeLengthM": 0.006005,
+            "edgeLengthM": 0.0074806,
             "midpointBlenderM": [
-              0.1265352,
-              -0.0139229,
-              0.7049959
+              0.1222268,
+              0.0030885,
+              0.660419
             ],
             "adjacentFaceIndices": [
-              22736,
-              29652
+              22369,
+              22630
             ]
           },
           {
-            "normalDiscontinuityDegrees": 175.72153,
+            "normalDiscontinuityDegrees": 178.36195,
             "edgeVertexIndices": [
-              6145,
-              14443
+              6110,
+              9594
             ],
-            "edgeLengthM": 0.0088907,
+            "edgeLengthM": 0.0008342,
             "midpointBlenderM": [
-              0.1293722,
-              -0.0073891,
-              0.6954576
+              0.1151114,
+              -0.0088336,
+              0.6828967
             ],
             "adjacentFaceIndices": [
-              11539,
-              29474
+              23143,
+              31598
             ]
           }
         ]
@@ -558713,11 +558763,11 @@
       "jacket-front-left": 431,
       "jacket-overlap-front": 506
     },
-    "lockedCanonicalBoundaryVertexCount": 1444,
+    "lockedCanonicalBoundaryVertexCount": 1492,
     "maximumVertexDisplacementM": 0.0006919570692237635,
     "meanVertexDisplacementM": 0.00011249161675403531,
     "orientationPreservingDisplacementScale": 0.10683777718804777,
-    "orientationCheckedTriangleCount": 32163,
+    "orientationCheckedTriangleCount": 34797,
     "normalContinuity": {
       "guardedEdgeCount": 2718,
       "maximumDihedralDegrees": 60.0,

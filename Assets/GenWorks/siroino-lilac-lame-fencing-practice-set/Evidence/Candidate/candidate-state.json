@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v133-moderate-box-pleat-valley-20261031",
+  "revision": "v134-two-cycle-panel-pleats-20261031",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "AUTHORED_PLEATS_STILL_UNREADABLE",
+      "description": "Direct inspection of all five V134 views and six poses: repeated pleats remain weak at viewing scale; the skirt reads as a smooth flared shell with irregular triangular/faceted patches and side lobing. Required action: refine sewn-panel geometry and resolve visible intersections/shading discontinuities, then regenerate all required views and poses.",
       "severity": "BLOCKER",
-      "description": "Direct inspection of the fresh V133 front, back, side, three-quarter and neutral images shows a smooth flared shell with jagged panel ridges, not a clearly readable repeated pleat pattern. Required action: revise sewn-panel geometry so folds read consistently in all required views."
+      "code": "PLEAT_READABILITY_AND_SURFACE_DEFECTS"
     },
     {
-      "code": "WAIST_ATTACHMENT_LEDGE_REMAINS",
+      "description": "V134 front/side/rear views retain an uneven projecting waist attachment/interface. Required action: blend the upper skirt boundary into the waist contour without a shelf and verify front, back, and side views.",
       "severity": "BLOCKER",
-      "description": "Fresh V133 front and side views retain a projecting waist-level shelf at the skirt attachment; rear views also show uneven overlap. Required action: remove the shelf and make the upper skirt edge follow the torso/waist contour continuously."
+      "code": "WAIST_INTERFACE_LEDGE_REMAINS"
     },
     {
-      "code": "POSE_INTERSECTION_AND_LOBING_REMAINS",
+      "description": "V134 crouch and sit show thigh/shorts exposure through or below the skirt and overlapping/bunched panels; prone shows a broad crumpled fan. Required action: correct panel coverage, clearance, and deformation for these poses, then directly inspect all eleven required renders.",
       "severity": "BLOCKER",
-      "description": "Fresh V133 crouch and sit images show exposed shorts/thigh regions and bunching or dangling skirt panels; prone remains a broad rigid-looking mass. Patchy torso/back interference is also visible. Required action: correct clearance and deformation at sewn-panel level, then regenerate and inspect all eleven views."
+      "code": "POSE_COVERAGE_AND_DEFORMATION_FAIL"
     }
   ],
   "failedGeometryChecks": [

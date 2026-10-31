@@ -9713,10 +9713,6 @@
       0.7645782470703125
     ],
     "radialClearanceM": 0.004,
-    "heightBlendM": [
-      0.6795782470703124,
-      0.7395782470703125
-    ],
     "outsideSampleRange": "hold-nearest-contour",
     "evidenceBoundary": "V130 adds a 60 mm smooth contour-placement blend over the 0.679578-0.739578 m shared waistband/skirt range. At the lower bound the skirt retains its envelope placement; the blend reaches full waistband contour placement at the shared upper seam. This tests geometric profile continuity only; pleat readability, fit, layering, shape-key response, pose motion and appearance remain unapproved.",
     "angularOriginBlenderXYM": [
@@ -9731,7 +9727,7 @@
   "skirtPleatPlacement": {
     "method": "bounded-panel-extension-v3-panel-local-hem",
     "foldMethod": "panel-local-box-pleat-relief-v2",
-    "foldsPerPanel": 1,
+    "foldsPerPanel": 2,
     "longitudinalSubdivisionCount": 24,
     "pieceIds": [
       "overskirt-front-left",
@@ -9750,7 +9746,7 @@
     "hemZM": 0.5395782470703124,
     "hemExtensionM": 0.04,
     "foldCount": 6,
-    "topologySubdivisionFactor": 1,
+    "topologySubdivisionFactor": 2,
     "hemFoldDepthM": 0.036,
     "phaseRadians": 0,
     "forwardApron": {
@@ -9771,7 +9767,7 @@
       ],
       "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
     },
-    "evidenceBoundary": "V131 tests one broad panel-local pleat on each of the six sewn overskirt pieces and 36 mm hem relief, changed from two cycles per panel and 24 mm relief, to make the six-panel pleated identity legible. V130 60 mm contour blend and V129 4 mm clearances are preserved. This geometry hypothesis grants no visual, fit, pose, fabric, shape-key, Unity, VRChat or release acceptance.",
+    "evidenceBoundary": "V134 replaces one broad raised face per sewn panel with two panel-local cycles and doubles radial mesh subdivision so each fold is explicit geometry. The 0.50 valley depth, 36 mm hem relief, 60 mm waistband contour blend and existing clearances are retained. This responds to V133 direct review where the six-panel shell still read as broadly smooth. Waist shelf, pose coverage, fit, weights and release remain rejected until regenerated evidence passes.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9827,7 +9823,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v133-moderate-box-pleat-valley-20261031",
+  "designRevision": "v134-two-cycle-panel-pleats-20261031",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
