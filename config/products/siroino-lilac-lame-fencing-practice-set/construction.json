@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V134 changes the six sewn overskirt panels from one broad cycle each to two panel-local cycles each and doubles radial topology subdivision so the pleat relief is represented by mesh geometry. Keep 0.50 valley depth, 36 mm hem relief, V130 waistband blend and V129 clearances. Rebuild and inspect all required views and poses; V133 waist shelf, pose coverage, fit and deformation weights remain blockers. Keep REJECT unless fresh render and every required gate pass.",
-  "designRevision": "v134-two-cycle-panel-pleats-20261031",
+  "target": "V135 retains two panel-local pleat cycles, 0.50 valley depth, 36 mm hem relief, the V130 waistband blend, and V129 clearances, while raising angular crease topology subdivision from 2 to 4 so each pleat crest has explicit mesh support rather than being interpolated across one broad face. Rebuild and inspect every required view and pose. Waist interface, pose coverage, fit, and deformation weights remain blockers; keep REJECT unless fresh evidence passes every required gate.",
+  "designRevision": "v135-pleat-crest-topology-20261101",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",

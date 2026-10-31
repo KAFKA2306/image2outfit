@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v134-two-cycle-panel-pleats-20261031",
+  "revision": "v135-pleat-crest-topology-20261101",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,17 +19,17 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of all five V134 views and six poses: repeated pleats remain weak at viewing scale; the skirt reads as a smooth flared shell with irregular triangular/faceted patches and side lobing. Required action: refine sewn-panel geometry and resolve visible intersections/shading discontinuities, then regenerate all required views and poses.",
+      "description": "Direct inspection of all five V135 views and six poses: added crest topology produces no material visual improvement; pleats remain weak at viewing scale and the skirt reads as a smooth flared shell with angular surface patches and side lobing. Change the sewn-panel pleat construction and resolve intersections and shading discontinuities, then regenerate all required views and poses.",
       "severity": "BLOCKER",
       "code": "PLEAT_READABILITY_AND_SURFACE_DEFECTS"
     },
     {
-      "description": "V134 front/side/rear views retain an uneven projecting waist attachment/interface. Required action: blend the upper skirt boundary into the waist contour without a shelf and verify front, back, and side views.",
+      "description": "V135 front, side, and rear views retain an abrupt projecting skirt-to-waist edge, most visible in profile, with the upper boundary forming a shelf. Reconcile the upper edge and waist contour, then verify front, back, and both sides.",
       "severity": "BLOCKER",
       "code": "WAIST_INTERFACE_LEDGE_REMAINS"
     },
     {
-      "description": "V134 crouch and sit show thigh/shorts exposure through or below the skirt and overlapping/bunched panels; prone shows a broad crumpled fan. Required action: correct panel coverage, clearance, and deformation for these poses, then directly inspect all eleven required renders.",
+      "description": "V135 crouch and sit still show shorts and thighs above the skirt front while panels bunch below and behind the legs; prone retains a broad crumpled fan with overlapping folds. Correct panel coverage and deformation, then directly inspect all eleven required renders.",
       "severity": "BLOCKER",
       "code": "POSE_COVERAGE_AND_DEFORMATION_FAIL"
     }

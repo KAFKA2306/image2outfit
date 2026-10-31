@@ -9746,7 +9746,7 @@
     "hemZM": 0.5395782470703124,
     "hemExtensionM": 0.04,
     "foldCount": 6,
-    "topologySubdivisionFactor": 2,
+    "topologySubdivisionFactor": 4,
     "hemFoldDepthM": 0.036,
     "phaseRadians": 0,
     "forwardApron": {
@@ -9767,7 +9767,7 @@
       ],
       "evidenceBoundary": "V82 adds a bounded 60 mm extension to the four sewn front/lap panels with the existing 40 mm forward projection and widens the angular fade from 0.65 to 1.30 radians to transition into side seams. The common panel length and waist seam stay fixed; hem balance, drape, collision and fit remain unapproved."
     },
-    "evidenceBoundary": "V134 replaces one broad raised face per sewn panel with two panel-local cycles and doubles radial mesh subdivision so each fold is explicit geometry. The 0.50 valley depth, 36 mm hem relief, 60 mm waistband contour blend and existing clearances are retained. This responds to V133 direct review where the six-panel shell still read as broadly smooth. Waist shelf, pose coverage, fit, weights and release remain rejected until regenerated evidence passes.",
+    "evidenceBoundary": "V135 retains two panel-local cycles, 0.50 valley depth, 36 mm hem relief, V130 waistband blend and V129 clearances. Angular crease topology subdivision is increased from 2 to 4, producing explicit mesh support at both pleat valleys and crests instead of spanning crests across broad faces. This is a geometry hypothesis only; waist interface, pose coverage, fit, weights and release remain rejected until regenerated evidence passes.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9823,7 +9823,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v134-two-cycle-panel-pleats-20261031",
+  "designRevision": "v135-pleat-crest-topology-20261101",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
