@@ -4,12 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -25,6 +27,11 @@ import review_console
 from resolve_product_build_scope import resolve
 
 IMAGE_SUFFIXES = {".png", ".webp", ".jpg", ".jpeg"}
+MESH_SVG_TAGS = {"svg", "g", "path", "rect", "text"}
+MESH_SVG_ATTRIBUTES = {
+    "d", "fill", "font-size", "height", "stroke", "stroke-width",
+    "viewBox", "width", "x", "y",
+}
 
 
 def run_logged(command: list[str], log_path: Path, env: dict[str, str]) -> int:
@@ -382,6 +389,90 @@ def write_webp(source: Path, destination: Path) -> None:
         image.save(destination, format="WEBP", quality=90, method=6)
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_mesh_svg(path: Path) -> None:
+    """Accept only the static SVG subset emitted by the canonical mesh renderer."""
+    if path.stat().st_size > 10 * 1024 * 1024:
+        raise RuntimeError(f"mesh showcase SVG is too large: {path}")
+    try:
+        root = ET.parse(path).getroot()
+    except ET.ParseError as error:
+        raise RuntimeError(f"invalid mesh showcase SVG: {path}") from error
+    if root.tag.rsplit("}", 1)[-1] != "svg":
+        raise RuntimeError(f"mesh showcase root is not SVG: {path}")
+    for element in root.iter():
+        if element.tag.rsplit("}", 1)[-1] not in MESH_SVG_TAGS:
+            raise RuntimeError(f"unsafe SVG element in mesh showcase: {element.tag}")
+        for attribute in element.attrib:
+            if attribute.rsplit("}", 1)[-1] not in MESH_SVG_ATTRIBUTES:
+                raise RuntimeError(f"unsafe SVG attribute in mesh showcase: {attribute}")
+
+
+def build_mesh_showcase(workspace: Path, io_root: Path) -> dict[str, Any] | None:
+    report_path = workspace / "Previews" / "Mesh" / "mesh-showcase.json"
+    if not report_path.is_file():
+        return None
+    report = review_console.load_json(report_path, {})
+    source_hash = report.get("sourceSha256")
+    evidence_hash = report.get("sourceEvidenceSha256")
+    if not isinstance(source_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", source_hash):
+        return None
+    source_evidence_path = report.get("sourceEvidencePath")
+    evidence = (ROOT / source_evidence_path).resolve() if isinstance(source_evidence_path, str) else None
+    if not evidence or ROOT.resolve() not in evidence.parents or not evidence.is_file():
+        return None
+    if sha256_file(evidence) != evidence_hash:
+        return None
+    evidence_report = review_console.load_json(evidence, {})
+    if evidence_report.get("sourceBlendSha256") != source_hash:
+        return None
+
+    records: list[dict[str, str]] = []
+    for name in ("topology", "uv"):
+        matching = [record for record in report.get("records", []) if record.get("name") == name]
+        if len(matching) != 1:
+            raise RuntimeError(f"mesh showcase must contain exactly one {name} diagram")
+        record = matching[0]
+        expected = f"Assets/GenWorks/{workspace.name}/Previews/Mesh/{name}.svg"
+        if record.get("path") != expected or not re.fullmatch(r"[0-9a-f]{64}", str(record.get("sha256", ""))):
+            raise RuntimeError(f"unexpected mesh showcase record: {record}")
+        source = ROOT / expected
+        if not source.is_file() or sha256_file(source) != record["sha256"]:
+            raise RuntimeError(f"mesh showcase diagram hash mismatch: {source}")
+        validate_mesh_svg(source)
+        destination = io_root / workspace.name / "Mesh" / f"{name}.svg"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        records.append({
+            "name": name,
+            "href": destination.relative_to(io_root.parent).as_posix(),
+            "source": expected,
+            "sha256": record["sha256"],
+        })
+    uv_status = report.get("uvStatus", "UNKNOWN")
+    uv_labels = {
+        "PARTIAL_UNVERIFIED": "UV配置: 一部の衣装メッシュのみ。その他のパーツは未作成または未検証です",
+        "UNVERIFIED_PROVENANCE": "UV配置: 由来が未検証です",
+        "NOT_CREATED": "UV配置: 未作成です",
+        "CREATED": "UV配置: 作成済みです",
+        "VERIFIED": "UV配置: 検証済みです",
+    }
+    return {
+        "sourceSha256": source_hash,
+        "sourceEvidenceSha256": evidence_hash,
+        "uvStatus": uv_status,
+        "uvStatusLabel": uv_labels.get(uv_status, "UV配置: 状態不明です"),
+        "assets": records,
+    }
+
+
 def build_io_gallery(site: Path) -> dict[str, Any]:
     io_root = site / "io"
     io_root.mkdir(parents=True, exist_ok=True)
@@ -423,6 +514,7 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
             if isinstance(gates, dict)
             else "UNKNOWN"
         )
+        mesh_showcase = build_mesh_showcase(workspace, io_root)
         products.append(
             {
                 "productId": workspace.name,
@@ -431,6 +523,7 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
                 "sourceKind": origin,
                 "webpCount": len(assets),
                 "assets": assets,
+                **({"meshShowcase": mesh_showcase} if mesh_showcase else {}),
             }
         )
 
@@ -462,6 +555,20 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
         )
         if not images:
             images = "<p>現時点で追跡済みレンダーなし</p>"
+        mesh = product.get("meshShowcase")
+        mesh_html = ""
+        if mesh:
+            diagrams = "".join(
+                f'<figure><img loading="lazy" src="../{asset["href"]}" '
+                f'alt="{product["productId"]} {asset["name"]} mesh diagram">'
+                f'<figcaption>{asset["name"]}</figcaption></figure>'
+                for asset in mesh["assets"]
+            )
+            mesh_html = (
+                '<h3>衣装メッシュの形状とUV配置</h3>'
+                f'<p>{mesh["uvStatusLabel"]}。図は現在の衣装メッシュを示します。</p>'
+                f'<div class="grid">{diagrams}</div>'
+            )
         cards.append(
             "<section>"
             f'<h2 id="{product["productId"]}">{product["productId"]}</h2>'
@@ -469,6 +576,7 @@ def build_io_gallery(site: Path) -> dict[str, Any]:
             f"visualAppearanceReview={product['visualAppearanceReview']} · "
             f"source={product['sourceKind']} · WebP={product['webpCount']}</p>"
             f'<div class="grid">{images}</div>'
+            f"{mesh_html}"
             "</section>"
         )
 
@@ -499,6 +607,16 @@ def validate_io_gallery(catalog: dict[str, Any], site: Path) -> None:
                 raise RuntimeError(f"non-WebP io asset: {asset}")
             if not (site / href).is_file():
                 raise RuntimeError(f"missing io asset: {href}")
+        mesh = product.get("meshShowcase")
+        if mesh:
+            for asset in mesh.get("assets", []):
+                href = str(asset.get("href", ""))
+                target = (site / href).resolve()
+                if target.suffix.lower() != ".svg" or site.resolve() not in target.parents or not target.is_file():
+                    raise RuntimeError(f"invalid mesh showcase Pages asset: {href}")
+                validate_mesh_svg(target)
+                if sha256_file(target) != asset.get("sha256"):
+                    raise RuntimeError(f"mesh showcase Pages hash mismatch: {href}")
 
 
 def public_manifest_value(value: Any) -> Any:
