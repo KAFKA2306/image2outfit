@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v129-aligned-skirt-waist-clearance-20261031",
+  "revision": "v131-six-panel-pleat-relief-20261031",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,18 +20,18 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "description": "Direct inspection of all five views and six poses shows the overskirt remains a smooth flared shell; the six sewn pleats are not legible at product-view scale.",
-      "code": "SKIRT_PLEATS_AND_LAME_IDENTITY_UNREADABLE"
-    },
-    {
-      "severity": "BLOCKER",
-      "description": "Reducing skirt-envelope clearance from 10 mm to 4 mm aligns it with the bodice and waistband settings, but left/right views still show an abrupt projecting shelf where the overskirt joins the bodice.",
+      "description": "Direct inspection of fresh V131 front and side views shows the sharp skirt-to-waist ledge persists despite the prior 60 mm height blend.",
       "code": "WAIST_ATTACHMENT_LEDGE_REMAINS"
     },
     {
       "severity": "BLOCKER",
-      "description": "Crouch and sit show stiff panels intersecting the thighs and hanging unevenly; prone compresses the skirt into broad lobes. Pose response remains incoherent.",
-      "code": "SKIRT_POSE_DEFORMATION_REMAINS"
+      "description": "Reducing to one 36 mm fold per panel did not produce legible alternating valleys; front and three-quarter views still read as a smooth triangular flare.",
+      "code": "AUTHORED_PLEATS_STILL_UNREADABLE"
+    },
+    {
+      "severity": "BLOCKER",
+      "description": "Fresh V131 crouch and sit views show the skirt crossing the thighs; prone folds into a broad smooth mass without separated panels.",
+      "code": "POSE_INTERSECTION_AND_LOBING_REMAINS"
     }
   ],
   "failedGeometryChecks": [
