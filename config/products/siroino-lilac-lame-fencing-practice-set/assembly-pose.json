@@ -9620,9 +9620,9 @@
       0.7295782470703125,
       0.7395782470703125
     ],
-    "radialClearanceM": 0.01,
+    "radialClearanceM": 0.004,
     "outsideSampleRange": "hold-nearest-contour",
-    "evidenceBoundary": "Neutral evaluated body sections define the skirt envelope. V28 adds a 4 mm radial offset to the exclusive left front-lap surface only; center-front edges are unfastened overlap edges and shared flank seams remain coincident. This is a prototype layer hypothesis, not fit, collision, cloth or appearance acceptance.",
+    "evidenceBoundary": "V129 aligns skirt-envelope radial clearance at 4 mm with waistband and bodice after V128 changed only the waistband setting and fresh side views retained the same 6 mm offset on the skirt shell. The exclusive front-lap layer offset remains separate. Neutral body sections define coordinates only; fit, collision, cloth, appearance and pose response remain unapproved.",
     "exclusivePieceLayerOffsetM": {
       "overskirt-front-lap-left": 0.004
     }
@@ -9714,7 +9714,7 @@
     ],
     "radialClearanceM": 0.004,
     "outsideSampleRange": "hold-nearest-contour",
-    "evidenceBoundary": "V128 aligns waistband and upper-skirt radial clearance at 4 mm with the adjacent bodice contour while retaining shared native Hips angular coordinates and the 60 mm height blend. This isolates the former 6 mm contour offset mismatch; the 25 mm band and clearance remain prototype hypotheses, not fit or rest-strain acceptance. No body faces copied. Shape Keys, continuous clearance and motion remain unapproved.",
+    "evidenceBoundary": "V129 keeps the waistband contour at 4 mm, matched to both the bodice and skirt envelope; shared native Hips angular coordinates and 60 mm height blend are unchanged. This isolates the skirt-envelope clearance mismatch; layer spacing, shape-key response and motion remain unapproved.",
     "angularOriginBlenderXYM": [
       0,
       -0.03788188099861145
@@ -9823,7 +9823,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v128-aligned-waist-contour-clearance-20261030",
+  "designRevision": "v129-aligned-skirt-waist-clearance-20261031",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
