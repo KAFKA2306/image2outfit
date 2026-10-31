@@ -9730,7 +9730,7 @@
   },
   "skirtPleatPlacement": {
     "method": "bounded-panel-extension-v3-panel-local-hem",
-    "foldMethod": "panel-local-soft-knife-pleat-v1",
+    "foldMethod": "panel-local-box-pleat-relief-v2",
     "foldsPerPanel": 1,
     "longitudinalSubdivisionCount": 24,
     "pieceIds": [
@@ -9780,8 +9780,8 @@
       "waistband-front-lap-left",
       "waistband-front-lap-right"
     ],
-    "foldValleyHalfWidthFraction": 0.3,
-    "foldValleyDepthRatio": 0.3
+    "foldValleyHalfWidthFraction": 0.12,
+    "foldValleyDepthRatio": 0.5
   },
   "skirtFlareDesignEvidence": {
     "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/evidence/skirt-flare-design-2a3279f47f975137.json",
@@ -9827,7 +9827,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v131-six-panel-pleat-relief-20261031",
+  "designRevision": "v133-moderate-box-pleat-valley-20261031",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

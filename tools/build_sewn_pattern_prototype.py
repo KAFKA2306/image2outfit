@@ -2150,7 +2150,8 @@ def split_declared_skirt_creases(mesh, pose):
             "crease-aligned-alternating-triangular-radial-pleat",
             "crease-aligned-smooth-radial-pleat",
             "crease-bound-soft-box-pleat-v1",
-            "panel-local-soft-knife-pleat-v1"}:
+            "panel-local-soft-knife-pleat-v1",
+            "panel-local-box-pleat-relief-v2"}:
         return {"applied": False}
     fold_count = spec["foldCount"]
     topology_subdivision_factor = spec.get("topologySubdivisionFactor", 1)
@@ -2458,7 +2459,8 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "crease-aligned-alternating-triangular-radial-pleat",
             "crease-aligned-smooth-radial-pleat",
             "crease-bound-soft-box-pleat-v1",
-            "panel-local-soft-knife-pleat-v1"}:
+            "panel-local-soft-knife-pleat-v1",
+            "panel-local-box-pleat-relief-v2"}:
         raise ValueError("Unknown skirt fold placement")
     origin = spec["axisOriginBlenderXYM"]
     waist, declared_hem = spec["waistZM"], spec["hemZM"]
@@ -2470,7 +2472,10 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
     ids = set(spec["pieceIds"])
     if not ids or not ids.issubset(set(mesh["facePieceIds"])):
         raise ValueError("Skirt fold pieces missing")
-    panel_local = fold_method == "panel-local-soft-knife-pleat-v1"
+    panel_local = fold_method in {
+        "panel-local-soft-knife-pleat-v1",
+        "panel-local-box-pleat-relief-v2",
+    }
     panel_ranges = {}
     from collections import defaultdict
     vertex_piece_owners = defaultdict(set)
@@ -2515,6 +2520,12 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
         if z > waist+1e-6 or z < hem-1e-6:
             raise ValueError("Skirt fold vertex outside declared height range")
         blend = min(1.0, max(0.0, (waist-z)/(waist-hem)))
+        if fold_method == "panel-local-box-pleat-relief-v2":
+            # Concentrate fold relief below the waist transition: the upper
+            # panel remains seam-continuous while the skirt body reaches its
+            # full sculpted relief before the hem instead of reading as a
+            # uniformly smooth flare.
+            blend = min(1.0, blend / 0.55)
         if blend == 0:
             continue
         native = native_vertices[i]
@@ -2535,7 +2546,23 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
                 unwrapped_angle = center + math.atan2(math.sin(angle-center), math.cos(angle-center))
                 panel_fraction = min(1.0, max(0.0, (unwrapped_angle-low)/(high-low)))
                 local_phase = (panel_fraction * spec["foldsPerPanel"]) % 1.0
-                waves.append(-math.cos(2.0 * math.pi * local_phase))
+                if fold_method == "panel-local-box-pleat-relief-v2":
+                    # Keep the authored sewn panel boundaries in a narrow,
+                    # recessed valley, with one broad raised cloth face per
+                    # local cycle. Unlike the soft cosine, the steeper
+                    # shoulders make the panel relief survive product-view
+                    # scale and smooth shading without changing seam topology.
+                    valley_width = float(spec.get("foldValleyHalfWidthFraction", math.nan))
+                    valley_depth_ratio = float(spec.get("foldValleyDepthRatio", math.nan))
+                    if not (0.03 <= valley_width < 0.35 and 0.0 < valley_depth_ratio <= 1.0):
+                        raise ValueError("Invalid panel-local box-pleat profile")
+                    distance_from_seam = min(local_phase, 1.0 - local_phase)
+                    eased = max(0.0, min(1.0,
+                        (distance_from_seam - valley_width) / (0.5 - valley_width)))
+                    eased = eased * eased * (3.0 - 2.0 * eased)
+                    waves.append(-valley_depth_ratio + (1.0 + valley_depth_ratio) * eased)
+                else:
+                    waves.append(-math.cos(2.0 * math.pi * local_phase))
             wave = sum(waves)/len(waves)
         elif fold_method == "crease-aligned-smooth-radial-pleat":
             # Crease cuts align with cosine extrema; the smooth field avoids
@@ -3005,9 +3032,19 @@ def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
             ]
             left, right, distance = min(pairs, key=lambda item: item[2])
             if distance > max_weld_distance_m:
+                triangle = [
+                    {
+                        "vertexIndex": vertex.index,
+                        "coordinateM": [float(component) for component in vertex.co],
+                    }
+                    for vertex in bad_face.verts
+                ]
                 raise ValueError(
                     "Degenerate triangle needs a weld beyond the 10-micrometre "
-                    f"prototype cleanup bound: {distance:.9g} m"
+                    f"prototype cleanup bound: {distance:.9g} m; "
+                    f"face={bad_face.index}, closestVertices="
+                    f"({left.index}, {right.index}), triangle="
+                    f"{json.dumps(triangle, separators=(',', ':'))}"
                 )
             before_coordinates = [list(vertex.co) for vertex in bad_face.verts]
             bmesh.ops.weld_verts(bm, targetmap={right: left})
