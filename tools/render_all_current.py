@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -500,12 +501,51 @@ def validate_io_gallery(catalog: dict[str, Any], site: Path) -> None:
                 raise RuntimeError(f"missing io asset: {href}")
 
 
+def public_manifest_value(value: Any) -> Any:
+    """Remove local-only filesystem references from the Pages projection."""
+    def is_local_path(text: str) -> bool:
+        normalized = text.replace("\\", "/")
+        return ".image2outfit/" in normalized or bool(
+            re.match(r"^[A-Za-z]:/", normalized)
+            or normalized.startswith(
+                ("/home/", "/tmp/", "/var/", "/mnt/", "/opt/", "/root/")
+            )
+        )
+
+    if isinstance(value, dict):
+        result: dict[str, Any] = {}
+        for key, item in value.items():
+            if isinstance(item, str) and is_local_path(item):
+                continue
+            result[key] = public_manifest_value(item)
+        return result
+    if isinstance(value, list):
+        return [
+            clean_item
+            for item in value
+            if (clean_item := public_manifest_value(item)) is not None
+        ]
+    if isinstance(value, str):
+        if is_local_path(value):
+            return None
+    return value
+
+
 def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
-    data = review_console.build(ROOT, ROOT)
+    data = public_manifest_value(review_console.build(ROOT, ROOT))
     site.mkdir(parents=True, exist_ok=True)
+    (site / ".image2outfit" / "render-current-summary.json").unlink(missing_ok=True)
 
     for name in ("index.html", "review-console.json"):
-        shutil.copy2(ROOT / name, site / name)
+        if name == "index.html":
+            (site / name).write_text(
+                review_console.render_html(data), encoding="utf-8"
+            )
+        else:
+            (site / name).write_text(
+                json.dumps(data, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
     for name in ("review-showcase.css", "review-showcase.js"):
         shutil.copy2(ROOT / "site" / name, site / name)
 
@@ -540,12 +580,14 @@ def build_site(site: Path, summary_path: Path) -> dict[str, Any]:
             continue
         destination = site / href
         destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, destination)
-
-    if summary_path.is_file():
-        destination = site / ".image2outfit" / "render-current-summary.json"
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(summary_path, destination)
+        if source.suffix.lower() == ".json":
+            manifest = review_console.load_json(source, {})
+            destination.write_text(
+                json.dumps(public_manifest_value(manifest), ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+        else:
+            shutil.copy2(source, destination)
 
     gallery = build_io_gallery(site)
     validate_io_gallery(gallery, site)
