@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v139-two-fold-each-pleated-panel-20261101",
+  "revision": "v140-flat-crest-panel-pleats-20261102",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "severity": "BLOCKER",
       "code": "TORSO_HIP_SURFACE_ARTIFACTS",
-      "description": "Directly inspected V139 front, back, three-quarter, left, right, neutral, arms-up, arm-cross, crouch, sit, and prone renders. Chest, waist, side seams, and hip/skirt junction retain conspicuous faceted triangular patches and overlapping surfaces; the garment surface is visibly discontinuous."
+      "description": "Direct inspection of all eleven V140 renders shows the chest, side seams, waist, and hip/skirt junction still contain visibly faceted triangular patches, gaps, and overlapping surfaces. The torso-to-skirt transition is discontinuous.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
       "code": "SKIRT_SILHOUETTE_AND_WAIST_JOIN_FAIL",
-      "description": "V139 front, back, and both profile renders still read as a broad smooth cone with a sharp projecting waist shelf. Two folds per drafted panel are not legible at the rendered viewing scale, so the skirt does not read as the specified sewn pleated panels."
+      "description": "The V140 mesh now shows more distinct long panel faces and narrow pleat relief than V139, but the front, rear, and profiles still read primarily as a broad conical flare. A sharp projecting shelf remains at the waist join; flat crest geometry alone does not resolve the sewn-panel silhouette.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
       "code": "POSE_COVERAGE_AND_DRAPE_FAIL",
-      "description": "Direct pose review shows the crouch and sit views bunch the front panels against the thighs and expose the underlying shorts; rear layers protrude below the hem. Prone shows a broad rigid-looking fan of overlapping angular panels. Coverage, drape, and pose deformation are unacceptable."
+      "description": "Crouch and sit views remain irregular, with the skirt bunching against the thighs and exposing underlying shorts; rear panels and tabs protrude below the hem. The prone view remains a stiff fan of overlapping panels. Pose coverage and cloth response remain unacceptable.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

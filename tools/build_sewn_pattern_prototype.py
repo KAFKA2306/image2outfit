@@ -2569,9 +2569,18 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
                     if not (0.03 <= valley_width < 0.35 and 0.0 < valley_depth_ratio <= 1.0):
                         raise ValueError("Invalid panel-local box-pleat profile")
                     distance_from_seam = min(local_phase, 1.0 - local_phase)
-                    eased = max(0.0, min(1.0,
+                    ramp_fraction = float(spec.get("foldCrestRampFraction", math.nan))
+                    if not 0.35 <= ramp_fraction <= 0.9:
+                        raise ValueError("Invalid panel-local flat-crest pleat ramp fraction")
+                    ramp = max(0.0, min(1.0,
                         (distance_from_seam - valley_width) / (0.5 - valley_width)))
-                    eased = eased * eased * (3.0 - 2.0 * eased)
+                    # The prior cubic ease rounded the entire raised panel into
+                    # a continuous cone. Use a bounded linear shoulder followed
+                    # by a flat crest so each authored panel reads as a folded
+                    # face in the rendered silhouette. This changes geometry,
+                    # not shading or material, while keeping the declared radial
+                    # displacement and seam valley bounds intact.
+                    eased = min(1.0, ramp / ramp_fraction)
                     waves.append(-valley_depth_ratio + (1.0 + valley_depth_ratio) * eased)
                 else:
                     waves.append(-math.cos(2.0 * math.pi * local_phase))
