@@ -305,11 +305,18 @@ def _resume_or_reset(
             ),
             None,
         )
-        if rerun_index is None or rerun_index >= len(completed):
+        retry_failed_current = (
+            previous.get("status") == "FAILED"
+            and previous.get("current_stage") == rerun_from_stage
+            and rerun_index == len(completed)
+        )
+        if rerun_index is None or (
+            rerun_index >= len(completed) and not retry_failed_current
+        ):
             raise ValueError(
-                "rerun stage must be present in the checkpoint's completed prefix"
+                "rerun stage must be in the completed prefix or be the failed current stage"
             )
-        prefix = completed[:rerun_index]
+        prefix = completed if retry_failed_current else completed[:rerun_index]
         prefix_outputs = {name: previous.get("outputs", {})[name] for name in prefix}
         state = _new_state(request, expected, mode)
         count = int(previous.get("resume_count", 0)) + 1
@@ -323,6 +330,7 @@ def _resume_or_reset(
                 "completed_stage_count": len(prefix),
                 "reused_completed_stages": prefix,
                 "invalidated_completed_stages": completed[rerun_index:],
+                "retried_failed_current_stage": retry_failed_current,
                 "previous_revision_id": str(previous.get("revision_id", "")),
                 "current_revision_id": expected["revisionId"],
                 "previous_source_fingerprint": str(
@@ -422,13 +430,13 @@ def _main_unlocked() -> int:
                     "stale-prefix reuse requires --source-change-reuse-reason"
                 ),
             )
-    elif reuse_reason is not None:
+    elif reuse_reason is not None and getattr(args, "rerun_from_stage", None) is None:
         return _emit_failure(
             args,
             error_code="INVALID_RESUME_STATE",
             phase="resume",
             exc=ValueError(
-                "--source-change-reuse-reason requires stale-prefix reuse opt-in"
+                "--source-change-reuse-reason requires stale-prefix reuse or a named stage rerun"
             ),
         )
     try:
@@ -502,7 +510,9 @@ def _main_unlocked() -> int:
                 expected=expected,
                 mode=mode,
                 reuse_stale_prefix_reason=(
-                    reuse_reason if reuse_completed_prefix else None
+                    reuse_reason
+                    if reuse_completed_prefix or args.rerun_from_stage is not None
+                    else None
                 ),
                 rerun_from_stage=getattr(args, "rerun_from_stage", None),
             )

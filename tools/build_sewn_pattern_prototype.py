@@ -2151,7 +2151,8 @@ def split_declared_skirt_creases(mesh, pose):
             "crease-aligned-smooth-radial-pleat",
             "crease-bound-soft-box-pleat-v1",
             "panel-local-soft-knife-pleat-v1",
-            "panel-local-box-pleat-relief-v2"}:
+            "panel-local-box-pleat-relief-v2",
+            "panel-width-intake-box-pleat-v1"}:
         return {"applied": False}
     fold_count = spec["foldCount"]
     topology_subdivision_factor = spec.get("topologySubdivisionFactor", 1)
@@ -2460,7 +2461,8 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "crease-aligned-smooth-radial-pleat",
             "crease-bound-soft-box-pleat-v1",
             "panel-local-soft-knife-pleat-v1",
-            "panel-local-box-pleat-relief-v2"}:
+            "panel-local-box-pleat-relief-v2",
+            "panel-width-intake-box-pleat-v1"}:
         raise ValueError("Unknown skirt fold placement")
     origin = spec["axisOriginBlenderXYM"]
     waist, declared_hem = spec["waistZM"], spec["hemZM"]
@@ -2475,6 +2477,7 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
     panel_local = fold_method in {
         "panel-local-soft-knife-pleat-v1",
         "panel-local-box-pleat-relief-v2",
+        "panel-width-intake-box-pleat-v1",
     }
     panel_ranges = {}
     from collections import defaultdict
@@ -2485,8 +2488,16 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
                 vertex_piece_owners[vertex_id].add(piece)
     if panel_local:
         folds_per_panel = spec.get("foldsPerPanel")
-        if isinstance(folds_per_panel, bool) or not isinstance(folds_per_panel, int) or not 1 <= folds_per_panel <= 6:
+        folds_by_piece = spec.get("foldsPerPanelByPiece", {})
+        if (isinstance(folds_per_panel, bool) or not isinstance(folds_per_panel, int)
+                or not 1 <= folds_per_panel <= 6
+                or not isinstance(folds_by_piece, dict)
+                or not set(folds_by_piece).issubset(ids)
+                or any(isinstance(value, bool) or not isinstance(value, int)
+                       or not 1 <= value <= 6 for value in folds_by_piece.values())):
             raise ValueError("Panel-local pleats require 1-6 folds per sewn panel")
+        if fold_method == "panel-width-intake-box-pleat-v1" and set(folds_by_piece) != ids:
+            raise ValueError("Panel-width intake pleats require an authored fold count for every sewn panel")
         by_piece = {piece: set() for piece in ids}
         for face, piece in zip(mesh["faces"], mesh["facePieceIds"]):
             if piece in by_piece:
@@ -2545,8 +2556,9 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
                 center = (low+high)/2
                 unwrapped_angle = center + math.atan2(math.sin(angle-center), math.cos(angle-center))
                 panel_fraction = min(1.0, max(0.0, (unwrapped_angle-low)/(high-low)))
-                local_phase = (panel_fraction * spec["foldsPerPanel"]) % 1.0
-                if fold_method == "panel-local-box-pleat-relief-v2":
+                local_fold_count = folds_by_piece.get(owner, folds_per_panel)
+                local_phase = (panel_fraction * local_fold_count) % 1.0
+                if fold_method in {"panel-local-box-pleat-relief-v2", "panel-width-intake-box-pleat-v1"}:
                     # Keep the authored sewn panel boundaries in a narrow,
                     # recessed valley, with one broad raised cloth face per
                     # local cycle. Unlike the soft cosine, the steeper
