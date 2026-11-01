@@ -63,10 +63,11 @@ tasks:
       REUSE_STALE_PREFIX: '{{.REUSE_STALE_PREFIX | default "false"}}'
       SOURCE_CHANGE_REUSE_REASON: '{{.SOURCE_CHANGE_REUSE_REASON | default ""}}'
       RERUN_FROM_STAGE: '{{.RERUN_FROM_STAGE | default ""}}'
+      UV_ENV: '{{.UV_ENV | default (printf "%s/Assets/_Local/.venv" .ROOT_DIR)}}'
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
-      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+      UV_PROJECT_ENVIRONMENT: '{{.UV_ENV}}'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11

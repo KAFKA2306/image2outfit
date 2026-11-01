@@ -3010,15 +3010,33 @@ def append_declared_thigh_surface_shell(mesh, body_objects, pose, target_path):
 
 
 def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
-    """Remove only sub-pixel, sub-10-micrometre triangular slivers.
+    """Remove only sub-pixel, 10-micrometre triangular slivers.
 
     The downstream Blender structure gate rejects triangles whose cross
     product squared is <= 1e-20.  The sewn-pattern audit uses face area and
     previously allowed a smaller sliver through, so this targeted weld keeps
     the authoring and candidate checks aligned without weakening either gate.
+    BMesh stores coordinates as float32; account for that representation's
+    bounded ULP error when comparing the measured weld distance with the
+    geometric bound.
     """
     import bmesh
     threshold_squared = 1e-20
+
+    def float32_ulp(value):
+        magnitude = abs(float(value))
+        if magnitude < 2.0 ** -126:
+            return 2.0 ** -149
+        _, exponent = math.frexp(magnitude)
+        return math.ldexp(1.0, exponent - 24)
+
+    def quantization_margin(left, right):
+        component_ulps = [
+            max(float32_ulp(left.co[index]), float32_ulp(right.co[index]))
+            for index in range(3)
+        ]
+        return 2.0 * math.sqrt(sum(value * value for value in component_ulps))
+
     bm = bmesh.new()
     try:
         bm.from_mesh(mesh)
@@ -3043,7 +3061,8 @@ def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
                 for right in list(bad_face.verts)[index + 1:]
             ]
             left, right, distance = min(pairs, key=lambda item: item[2])
-            if distance > max_weld_distance_m:
+            precision_margin = quantization_margin(left, right)
+            if distance > max_weld_distance_m + precision_margin:
                 triangle = [
                     {
                         "vertexIndex": vertex.index,
@@ -3053,7 +3072,8 @@ def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
                 ]
                 raise ValueError(
                     "Degenerate triangle needs a weld beyond the 10-micrometre "
-                    f"prototype cleanup bound: {distance:.9g} m; "
+                    "prototype cleanup bound plus float32 coordinate uncertainty: "
+                    f"{distance:.9g} m (uncertainty={precision_margin:.9g} m); "
                     f"face={bad_face.index}, closestVertices="
                     f"({left.index}, {right.index}), triangle="
                     f"{json.dumps(triangle, separators=(',', ':'))}"
@@ -3062,6 +3082,7 @@ def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
             bmesh.ops.weld_verts(bm, targetmap={right: left})
             welds.append({
                 "maximumInputEdgeDistanceM": distance,
+                "float32QuantizationMarginM": precision_margin,
                 "triangleCoordinatesM": before_coordinates,
             })
             bm.verts.ensure_lookup_table()
@@ -3090,6 +3111,7 @@ def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
             "method": "weld-closest-vertex-pair-on-subpixel-triangle",
             "candidateDegenerateCrossProductSquaredThreshold": threshold_squared,
             "maximumWeldDistanceM": max_weld_distance_m,
+            "float32DistanceUncertaintyAllowance": "two-euclidean-ULPs-per-vertex-pair",
             "weldCount": len(welds),
             "welds": welds,
             "boundaryEdgesBefore": boundary_before,
