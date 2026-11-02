@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v144-stiffer-overskirt-cloth-prototype-20261102",
+  "revision": "v145-authored-overskirt-hem-follow-prototype-20261102",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of all eleven V144 renders shows the overskirt remains severely irregular and creased despite the isolated bending-stiffness increase to 2.2. The neutral surface has busy crumpled folds and an uneven, jagged hem across front, back, and side views; the isolated cloth parameter change did not produce a controlled pleated silhouette.",
-      "severity": "BLOCKER",
-      "code": "OVERSKIRT_SURFACE_AND_DRAPE_FAIL"
+      "code": "OVERSKIRT_POSE_DEFORMATION_FAIL",
+      "description": "Direct inspection of all eleven V145 renders shows the authored overskirt surface is smoother than the V144 cloth-baked surface, but its armature-only deformation still breaks the intended skirt silhouette. In crouch the front shell opens and exposes the shorts/upper thighs; in sit it forms stiff angular flaps around the knees, and in prone it lifts into a broad rigid sheet.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Crouch exposes the upper thighs and folds the overskirt away from the legs; sit collapses it into a bunched bundle, while prone spreads it into a broad irregular sheet. Static cloth settling plus the stiffer bending hypothesis does not provide acceptable pose-dependent garment behavior.",
-      "severity": "BLOCKER",
-      "code": "POSE_COVERAGE_AND_BUNCHING_FAIL"
+      "code": "SKIRT_PANEL_SILHOUETTE_FAIL",
+      "description": "Neutral front/back views show a broad, nearly conical skirt with weakly readable panel pleats and an uneven hard hem transition; side views show the skirt depth and panel edges do not resolve into a controlled garment drape. The stronger hem-follow weights did not produce an acceptable continuous silhouette.",
+      "severity": "BLOCKER"
     },
     {
-      "description": "The abrupt waist-to-hip transition and angular torso/skirt-side surface artifacts remain visible in the current render set.",
-      "severity": "BLOCKER",
-      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS"
+      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
+      "description": "The abrupt horizontal shelf at the waist-to-hip join and angular triangular surface artifacts along the torso sides remain visible in neutral and posed views.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

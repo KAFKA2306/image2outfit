@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V143 rendered the sewn overskirt through Blender Cloth but direct inspection found severe crumpling and uneven hem shape. Keep the garment panel and seam inputs unchanged; compare a stiffer overskirt bending setting in the existing cloth stage, then inspect all eleven current renders. This isolated cloth parameter is experimental and does not establish material calibration, fit, motion, appearance acceptance, or release.",
-  "designRevision": "v144-stiffer-overskirt-cloth-prototype-20261102",
+  "target": "V144 direct inspection rejected the overskirt: the stiffened Cloth solve still produced severe crumpling, an irregular hem, and unacceptable crouch/sit/prone behavior. V145 bypasses Cloth for the skirt so the authored panel folds remain intact, returns it to armature skinning, and tests stronger hem-follow weights while keeping the waist unweighted. This is a bounded construction/weight hypothesis only; all eleven renders and numeric gates must be rechecked.",
+  "designRevision": "v145-authored-overskirt-hem-follow-prototype-20261102",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -140,8 +140,7 @@
   "clothSimulation": {
     "applicability": "REQUIRED",
     "components": [
-      "jacket-sleeves",
-      "pleated-overskirt"
+      "jacket-sleeves"
     ],
     "prototypePanelGroups": {
       "jacket-sleeves": [
@@ -157,19 +156,17 @@
         "overskirt-front-lap-right"
       ]
     },
+    "nonClothDeformationPaths": {
+      "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
+    },
     "prototypeFrameEnd": 48,
-    "evidence": "V143 replaces the overskirt's authored panel-shape-preserving armature-only motion path with the existing Blender Cloth stage. The grouped panels are anchored at their shared sewn waist boundary; neutral rest-pose gravity settling is an experimental deformation input, not motion or fit acceptance. Direct renders remain required.",
-    "reason": "V142 rendered a longer skirt but crouch still exposed thighs and sit/prone lifted the shell into rigid angular shapes. The reviewed source showed the overskirt bypassed cloth simulation. V143 routes the existing sewn panel group through Blender Cloth with its canonical shared waistband seam pinned, to create a settled rest surface for subsequent armature skinning. This is an uncalibrated cloth hypothesis; appearance, motion, fit and release remain unapproved.",
+    "evidence": "V145 keeps the overskirt on its authored panel-shape-preserving armature-skinning path and limits native cloth settling to the jacket sleeves, because direct V144 review found the skirt Cloth bake visibly crumpled. Current poses still require direct inspection; neither authored folds nor a baked sleeve solve establish fit, motion, appearance, or release acceptance.",
+    "reason": "V144 showed that raising skirt cloth bending stiffness to 2.2 did not resolve crumpling or pose failures. V145 returns the sewn overskirt to its authored panel surface and changes its armature hem-follow weighting: side hem 0.40, forward hem 0.16, centerline hem 0.20, capped at 0.45 while waist thigh weight remains zero. This tests whether stronger lower-panel following reduces thigh exposure without applying cloth-bake deformation to the skirt. It is uncalibrated; fit, cloth response, appearance, and release remain unapproved.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
         "reason": "Direct review shows excessive sleeve wrinkling in the neutral render. Compare a structured sleeve cloth setting with the existing 0.45 baseline; 2.2 is a local prototype trial value, not a Lilac fabric calibration.",
         "evidenceBoundary": "One neutral 48-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness."
-      },
-      "pleated-overskirt": {
-        "stiffness": 2.2,
-        "reason": "V143 used Blender Cloth default bending stiffness 0.45 on the overskirt and the resulting neutral render became severely crumpled. Compare 2.2, the existing local experimental jacket-sleeve trial value, to test whether greater panel resistance preserves a cleaner skirt surface. This is an uncalibrated parameter comparison and not a material property claim.",
-        "evidenceBoundary": "One neutral 48-frame cloth solve on the existing sewn overskirt mesh. The value is a prototype hypothesis only; it does not establish fabric calibration, seam stability, pose behavior, fit, appearance, or release readiness."
       }
     },
     "prototypePostBakeLaplacianSmoothing": {
@@ -233,15 +230,15 @@
         "leftThighBone": "UpperLeg_L",
         "rightThighBone": "UpperLeg_R",
         "waistThighWeight": 0,
-        "hemThighWeight": 0.22,
-        "forwardHemThighWeight": 0.06,
-        "centerlineHemThighWeight": 0.08,
-        "maximumThighWeight": 0.25,
+        "hemThighWeight": 0.4,
+        "forwardHemThighWeight": 0.16,
+        "centerlineHemThighWeight": 0.2,
+        "maximumThighWeight": 0.45,
         "forwardCenterYM": -0.03788188099861145,
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.075,
         "fullSideWeightWidthM": 0.135,
-        "evidenceBoundary": "V95 preserves the panel-balanced hem weight profile but lowers the overskirt hem thigh influence to 0.22 with a 0.25 cap; the anterior target remains 0.06 and the bilateral centerline target 0.08. Edge trim inherits these settled panel weights. This tests side/under-seat pose behavior, with no fit, collision, cloth calibration, appearance or release acceptance implied."
+        "evidenceBoundary": "V145 raises side hem thigh influence to 0.40, anterior target to 0.16, bilateral centerline target to 0.20, and the cap to 0.45 while retaining zero waist thigh influence. Edge trim inherits the panel weights. The coupled hem-follow trial is uncalibrated and tests only whether the preserved authored skirt surface deforms with crouch/sit leg motion; it proves no fit, collision, cloth/material behavior, appearance acceptance, or release readiness."
       }
     },
     {
