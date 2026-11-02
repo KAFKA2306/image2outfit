@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v140-flat-crest-panel-pleats-20261102",
+  "revision": "v141-section-centered-waist-radials-20261102",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,17 +20,17 @@
   "blockingFindings": [
     {
       "code": "TORSO_HIP_SURFACE_ARTIFACTS",
-      "description": "Direct inspection of all eleven V140 renders shows the chest, side seams, waist, and hip/skirt junction still contain visibly faceted triangular patches, gaps, and overlapping surfaces. The torso-to-skirt transition is discontinuous.",
+      "description": "Direct inspection of all eleven V141 renders shows visible faceted torso triangles and breaks at the side, waist, and hip/skirt junction. The torso-to-skirt transition remains discontinuous despite the section-centered contour direction.",
       "severity": "BLOCKER"
     },
     {
       "code": "SKIRT_SILHOUETTE_AND_WAIST_JOIN_FAIL",
-      "description": "The V140 mesh now shows more distinct long panel faces and narrow pleat relief than V139, but the front, rear, and profiles still read primarily as a broad conical flare. A sharp projecting shelf remains at the waist join; flat crest geometry alone does not resolve the sewn-panel silhouette.",
+      "description": "The skirt still reads as a stiff, uniformly flared cone with only faint vertical panel divisions. The waist join retains a hard projecting shelf and jagged side intersections; section-centered radial placement did not resolve the visual continuity defect.",
       "severity": "BLOCKER"
     },
     {
       "code": "POSE_COVERAGE_AND_DRAPE_FAIL",
-      "description": "Crouch and sit views remain irregular, with the skirt bunching against the thighs and exposing underlying shorts; rear panels and tabs protrude below the hem. The prone view remains a stiff fan of overlapping panels. Pose coverage and cloth response remain unacceptable.",
+      "description": "Crouch exposes thighs, sitting collapses the skirt into a rigid billow, and prone lifts it into a broad boxy/fan-like drape. Pose coverage remains unacceptable.",
       "severity": "BLOCKER"
     }
   ],

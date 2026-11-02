@@ -1831,6 +1831,9 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
     envelope = spec["method"] == "measured-horizontal-body-envelope-minimum-clearance"
     if spec["method"] not in {"measured-horizontal-body-contour-radial-placement", "measured-horizontal-body-envelope-minimum-clearance"} or spec["outsideSampleRange"] != "hold-nearest-contour":
         raise ValueError("Unknown body contour placement method")
+    angular_reference = spec.get("angularReference", "declared-origin")
+    if angular_reference not in {"declared-origin", "interpolated-section-center"}:
+        raise ValueError("Unknown contour angular reference")
     zs = spec["sampleZM"]
     clearance = spec["radialClearanceM"]
     if len(zs) < 2 or any(not math.isfinite(z) for z in zs) or any(a >= b for a,b in zip(zs,zs[1:])) or not math.isfinite(clearance) or clearance < 0:
@@ -1991,8 +1994,19 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
         if length < 1e-9:
             raise ValueError("Torso angular coordinate collapsed")
         direction = (x / length, y / length)
+        j=max(0,min(len(zs)-2,bisect_right(zs,z)-1))
+        f=min(1,max(0,(z-zs[j])/(zs[j+1]-zs[j])))
         origin = spec.get("angularOriginBlenderXYM")
-        if origin is not None:
+        if angular_reference == "interpolated-section-center":
+            if angular_source_vertices is None or len(angular_source_vertices) != len(mesh["vertices"]):
+                raise ValueError("Interpolated contour angular reference requires common native coordinates")
+            center = [sections[j]["centerM"][k] * (1-f) + sections[j+1]["centerM"][k] * f for k in range(2)]
+            angular_x, angular_y = angular_source_vertices[i][:2]
+            angular_length = math.hypot(angular_x-center[0], angular_y-center[1])
+            if angular_length < 1e-9:
+                raise ValueError("Interpolated contour angular coordinate collapsed")
+            direction = ((angular_x-center[0])/angular_length, (angular_y-center[1])/angular_length)
+        elif origin is not None:
             if len(origin) != 2 or any(not math.isfinite(v) for v in origin):
                 raise ValueError("Invalid contour angular origin")
             angular_x, angular_y = (angular_source_vertices[i][:2] if angular_source_vertices is not None else (x,y))
@@ -2000,8 +2014,6 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
             if angular_length < 1e-9:
                 raise ValueError("Contour angular origin collapsed")
             direction = ((angular_x-origin[0])/angular_length, (angular_y-origin[1])/angular_length)
-        j=max(0,min(len(zs)-2,bisect_right(zs,z)-1))
-        f=min(1,max(0,(z-zs[j])/(zs[j+1]-zs[j])))
         if envelope:
             center = [sections[j]["centerM"][k]*(1-f)+sections[j+1]["centerM"][k]*f for k in range(2)]
             length = math.hypot(x-center[0],y-center[1])
