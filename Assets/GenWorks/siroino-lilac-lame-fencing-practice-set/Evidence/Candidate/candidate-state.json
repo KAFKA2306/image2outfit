@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v142-longer-pose-coverage-hem-20261102",
+  "revision": "v143-cloth-settled-overskirt-prototype-20261102",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "POSE_COVERAGE_AND_DRAPE_FAIL",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven V142 renders shows the longer hem adds modest neutral coverage only; crouch still lifts the skirt and exposes upper thighs, while sitting and prone bunch or lift the shell into rigid angular shapes."
+      "code": "OVERSKIRT_SURFACE_AND_DRAPE_FAIL",
+      "description": "Direct inspection of all eleven V143 renders shows the overskirt is substantially more crumpled and faceted after cloth settling, with jagged, uneven hem contours across front, back, and side views. The neutral silhouette is not a controlled pleated garment surface."
     },
     {
-      "code": "SKIRT_SILHOUETTE_AND_WAIST_JOIN_FAIL",
       "severity": "BLOCKER",
-      "description": "The skirt remains a uniformly flared shell with faint panel folds. The waist-to-hip join is abrupt, with a projecting shelf and visible side intersections."
+      "code": "POSE_COVERAGE_AND_BUNCHING_FAIL",
+      "description": "Crouch continues to expose the upper thighs and collapses the skirt around the leg forms; sit lifts and bunches the skirt into angular folded panels, while prone spreads it into a broad stiff sheet. Routing the overskirt through the static neutral cloth stage has not fixed pose-dependent deformation."
     },
     {
-      "code": "TORSO_HIP_SURFACE_ARTIFACTS",
       "severity": "BLOCKER",
-      "description": "Torso faceting and discontinuities around the side, waist, and hip remain visible in front, side, back, and pose evidence."
+      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
+      "description": "A projecting ledge and abrupt transition remain at the waist-to-hip join. Angular surface artifacts remain visible over the torso and skirt sides in the inspected views."
     }
   ],
   "failedGeometryChecks": [

@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V142 extends the sewn overskirt hem 30 mm to the lowest currently sampled neutral thigh contour, based on directly observed V141 thigh exposure during crouch and skirt lift during sit/prone. Keep the waist seam fixed; rebuild through the canonical workflow, directly inspect all eleven views and poses, and retain REJECT unless visual and numeric gates pass. A longer rest-pose hem does not establish posed coverage, waist-join continuity, fit, or drape.",
-  "designRevision": "v142-longer-pose-coverage-hem-20261102",
+  "designRevision": "v143-cloth-settled-overskirt-prototype-20261102",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -140,7 +140,8 @@
   "clothSimulation": {
     "applicability": "REQUIRED",
     "components": [
-      "jacket-sleeves"
+      "jacket-sleeves",
+      "pleated-overskirt"
     ],
     "prototypePanelGroups": {
       "jacket-sleeves": [
@@ -156,12 +157,9 @@
         "overskirt-front-lap-right"
       ]
     },
-    "nonClothDeformationPaths": {
-      "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
-    },
     "prototypeFrameEnd": 48,
-    "evidence": "V107 measures internal face-normal discontinuity by sewn panel, enables panel-interior smooth shading on jacket torso, sleeves, shorts, and overskirt, and sets sharp-normal boundaries wherever canonical panel ownership changes. The regenerated previews remain visual evidence only; geometry, fit, shorts coverage, shape-key response, motion and fabric calibration remain unverified.",
-    "reason": "V106's direct renders showed broad jacket and hip faceting that was not explained by the measured sub-millimeter pleat field. V107 tests smooth shading within the corresponding sewn panels while preserving face-normal splits at canonical seams. This is a rendering hypothesis only; appearance and downstream fit/runtime/release remain unapproved.",
+    "evidence": "V143 replaces the overskirt's authored panel-shape-preserving armature-only motion path with the existing Blender Cloth stage. The grouped panels are anchored at their shared sewn waist boundary; neutral rest-pose gravity settling is an experimental deformation input, not motion or fit acceptance. Direct renders remain required.",
+    "reason": "V142 rendered a longer skirt but crouch still exposed thighs and sit/prone lifted the shell into rigid angular shapes. The reviewed source showed the overskirt bypassed cloth simulation. V143 routes the existing sewn panel group through Blender Cloth with its canonical shared waistband seam pinned, to create a settled rest surface for subsequent armature skinning. This is an uncalibrated cloth hypothesis; appearance, motion, fit and release remain unapproved.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
