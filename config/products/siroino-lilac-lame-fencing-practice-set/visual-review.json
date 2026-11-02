@@ -3,38 +3,38 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewer": "chatgpt:Codex",
-  "reviewedRevision": "v143-cloth-settled-overskirt-prototype-20261102",
+  "reviewedRevision": "v144-stiffer-overskirt-cloth-prototype-20261102",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "fc031a289a1f7fdb94f43b0a851e5377ab38f5c83141fd415993673cad3a363d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "e6323d35ec9f118670fc918bd7786147d003eb5970ebb4a40cd7174b64a11a1e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "f4fe1b01c5fedc717e859ae724822667cda979d468200f70d7a015c2edefc110",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "2089c8c08f6b520b2bee0c3293dcc23c46da8f260594b42f630a0d799bd19c74",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "5fc941ba2291e2c036fe1d5157ab3cf51106c1421e455dfcdd10cdc1ba17d358",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "21ea81c9c4f2a50050f92ccd1732e6039ba616f74c490ca220e830a636a7860e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "96bea640f0d372d5180c1eb5152013db52a37bbaaaf1647b45e9499225d519be",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "4f11cab0e47e7ee267b6184de9cee1e189a8b8b6038d9825f466f18431051ff5",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "2f09d5c2db6d48d479df61ecde2bf4da5d37b06342974d7048cc90723ccd3b65",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "d62d1492f3d5c2e8e286b04610145e28bfaa71f48ddc5bf8246a176852a8efeb",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "d5413c4bf58d1152660ddc25aa69343c7cea4f838a9c8e1cb635376cf3f01159"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "706359dda679c003d8364f4c42583a1cfd4eda1f44c02b8f3c9dc3b116bac360",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "278bdedafee6f123dddaf07f1ffe9cd241be45db2a3f528eb73ef946f1370857",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "e1e2925ab22dfafdb60193b130dc20d08cdb8cc37fe4bdd648d25ae52f9e04be",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "486aaf021d684a1bbccbe7adb57115ce5e0eaf0f13f08e076bd0091d54149fa4",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "1e440182b6bd3c9bd8d5fab2bf5c9d3b7ef09dabc72439f17607cea3a1f1ae41",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "66bdc82510c5b8ef81195956256c6bd454a3357446fa7da3b949400506d135fa",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "f3e61cf978a35f6252703c978fc9dabef0ba74a309960acfe257bf847328c6ef",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "54d4f9159b82c1d999ecf324ca8238ad7bb5497e7d8ae387a246eb1b34e88edf",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "4c672c5b3d30e39770b9e06624ad3aae029ec603df649c9ff961c6d216d59fdb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "55b5cee5d631d1d8a6acb8985bc6dfb466b54d18e9be5ca87842d1994845b9f8",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "c7ff549537cce46bea2b250fd5433511c05916a77c74f28db25e61b31b669c8d"
   },
   "findings": [
     {
+      "description": "Direct inspection of all eleven V144 renders shows the overskirt remains severely irregular and creased despite the isolated bending-stiffness increase to 2.2. The neutral surface has busy crumpled folds and an uneven, jagged hem across front, back, and side views; the isolated cloth parameter change did not produce a controlled pleated silhouette.",
       "severity": "BLOCKER",
-      "code": "OVERSKIRT_SURFACE_AND_DRAPE_FAIL",
-      "description": "Direct inspection of all eleven V143 renders shows the overskirt is substantially more crumpled and faceted after cloth settling, with jagged, uneven hem contours across front, back, and side views. The neutral silhouette is not a controlled pleated garment surface."
+      "code": "OVERSKIRT_SURFACE_AND_DRAPE_FAIL"
     },
     {
+      "description": "Crouch exposes the upper thighs and folds the overskirt away from the legs; sit collapses it into a bunched bundle, while prone spreads it into a broad irregular sheet. Static cloth settling plus the stiffer bending hypothesis does not provide acceptable pose-dependent garment behavior.",
       "severity": "BLOCKER",
-      "code": "POSE_COVERAGE_AND_BUNCHING_FAIL",
-      "description": "Crouch continues to expose the upper thighs and collapses the skirt around the leg forms; sit lifts and bunches the skirt into angular folded panels, while prone spreads it into a broad stiff sheet. Routing the overskirt through the static neutral cloth stage has not fixed pose-dependent deformation."
+      "code": "POSE_COVERAGE_AND_BUNCHING_FAIL"
     },
     {
+      "description": "The abrupt waist-to-hip transition and angular torso/skirt-side surface artifacts remain visible in the current render set.",
       "severity": "BLOCKER",
-      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "description": "A projecting ledge and abrupt transition remain at the waist-to-hip join. Angular surface artifacts remain visible over the torso and skirt sides in the inspected views."
+      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS"
     }
   ],
-  "nextAction": "Keep candidate REJECTED and prototype-only. Do not treat neutral cloth settling as motion or fit evidence. Rework skirt panel silhouette and rigged pose behavior, resolve the waist/hip discontinuity and torso surface artifacts, then regenerate and directly inspect all eleven views. Fit, weights, UV, Unity, and VRChat remain independent unverified gates."
+  "nextAction": "Keep candidate REJECTED and prototype-only. Stop tuning this cloth stiffness parameter: V144 renders show no adequate visual improvement over V143. Change the garment construction method by revising the overskirt panel geometry and pose deformation strategy, resolve the waist/hip transition and torso artifacts, then regenerate and directly inspect all eleven views. Fit, weights, UV, Unity, and VRChat remain independent unverified gates."
 }

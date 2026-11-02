@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V142 extends the sewn overskirt hem 30 mm to the lowest currently sampled neutral thigh contour, based on directly observed V141 thigh exposure during crouch and skirt lift during sit/prone. Keep the waist seam fixed; rebuild through the canonical workflow, directly inspect all eleven views and poses, and retain REJECT unless visual and numeric gates pass. A longer rest-pose hem does not establish posed coverage, waist-join continuity, fit, or drape.",
-  "designRevision": "v143-cloth-settled-overskirt-prototype-20261102",
+  "target": "V143 rendered the sewn overskirt through Blender Cloth but direct inspection found severe crumpling and uneven hem shape. Keep the garment panel and seam inputs unchanged; compare a stiffer overskirt bending setting in the existing cloth stage, then inspect all eleven current renders. This isolated cloth parameter is experimental and does not establish material calibration, fit, motion, appearance acceptance, or release.",
+  "designRevision": "v144-stiffer-overskirt-cloth-prototype-20261102",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -165,6 +165,11 @@
         "stiffness": 2.2,
         "reason": "Direct review shows excessive sleeve wrinkling in the neutral render. Compare a structured sleeve cloth setting with the existing 0.45 baseline; 2.2 is a local prototype trial value, not a Lilac fabric calibration.",
         "evidenceBoundary": "One neutral 48-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness."
+      },
+      "pleated-overskirt": {
+        "stiffness": 2.2,
+        "reason": "V143 used Blender Cloth default bending stiffness 0.45 on the overskirt and the resulting neutral render became severely crumpled. Compare 2.2, the existing local experimental jacket-sleeve trial value, to test whether greater panel resistance preserves a cleaner skirt surface. This is an uncalibrated parameter comparison and not a material property claim.",
+        "evidenceBoundary": "One neutral 48-frame cloth solve on the existing sewn overskirt mesh. The value is a prototype hypothesis only; it does not establish fabric calibration, seam stability, pose behavior, fit, appearance, or release readiness."
       }
     },
     "prototypePostBakeLaplacianSmoothing": {

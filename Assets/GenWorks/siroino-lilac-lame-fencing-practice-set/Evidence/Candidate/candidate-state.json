@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v143-cloth-settled-overskirt-prototype-20261102",
+  "revision": "v144-stiffer-overskirt-cloth-prototype-20261102",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "description": "Direct inspection of all eleven V144 renders shows the overskirt remains severely irregular and creased despite the isolated bending-stiffness increase to 2.2. The neutral surface has busy crumpled folds and an uneven, jagged hem across front, back, and side views; the isolated cloth parameter change did not produce a controlled pleated silhouette.",
       "severity": "BLOCKER",
-      "code": "OVERSKIRT_SURFACE_AND_DRAPE_FAIL",
-      "description": "Direct inspection of all eleven V143 renders shows the overskirt is substantially more crumpled and faceted after cloth settling, with jagged, uneven hem contours across front, back, and side views. The neutral silhouette is not a controlled pleated garment surface."
+      "code": "OVERSKIRT_SURFACE_AND_DRAPE_FAIL"
     },
     {
+      "description": "Crouch exposes the upper thighs and folds the overskirt away from the legs; sit collapses it into a bunched bundle, while prone spreads it into a broad irregular sheet. Static cloth settling plus the stiffer bending hypothesis does not provide acceptable pose-dependent garment behavior.",
       "severity": "BLOCKER",
-      "code": "POSE_COVERAGE_AND_BUNCHING_FAIL",
-      "description": "Crouch continues to expose the upper thighs and collapses the skirt around the leg forms; sit lifts and bunches the skirt into angular folded panels, while prone spreads it into a broad stiff sheet. Routing the overskirt through the static neutral cloth stage has not fixed pose-dependent deformation."
+      "code": "POSE_COVERAGE_AND_BUNCHING_FAIL"
     },
     {
+      "description": "The abrupt waist-to-hip transition and angular torso/skirt-side surface artifacts remain visible in the current render set.",
       "severity": "BLOCKER",
-      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "description": "A projecting ledge and abrupt transition remain at the waist-to-hip join. Angular surface artifacts remain visible over the torso and skirt sides in the inspected views."
+      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS"
     }
   ],
   "failedGeometryChecks": [

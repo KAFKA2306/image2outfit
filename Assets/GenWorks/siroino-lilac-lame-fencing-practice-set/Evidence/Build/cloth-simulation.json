@@ -80,6 +80,14 @@
       "pinVertexCount": 64,
       "frameStart": 1,
       "frameEnd": 48,
+      "componentBendingHypothesis": {
+        "stiffness": 2.200000047683716,
+        "maximum": 2.200000047683716,
+        "model": "ANGULAR",
+        "reason": "V143 used Blender Cloth default bending stiffness 0.45 on the overskirt and the resulting neutral render became severely crumpled. Compare 2.2, the existing local experimental jacket-sleeve trial value, to test whether greater panel resistance preserves a cleaner skirt surface. This is an uncalibrated parameter comparison and not a material property claim.",
+        "evidenceBoundary": "One neutral 48-frame cloth solve on the existing sewn overskirt mesh. The value is a prototype hypothesis only; it does not establish fabric calibration, seam stability, pose behavior, fit, appearance, or release readiness.",
+        "grantsFitAcceptance": false
+      },
       "pinMethod": "canonical shared seam vertices",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
@@ -96,28 +104,28 @@
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.47120460867881775,
-          0.7470877170562744
+          0.47166845202445984,
+          0.7470769286155701
         ],
         "nearestNormalSignedDistanceM": {
           "minimum": 0.002411078304703551,
-          "maximum": 0.16739848791621625
+          "maximum": 0.17277502838987857
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 133,
+        "belowCombinedCollisionMarginVertexCount": 124,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
       "preBakeMeshSha256": "afe7eee7e018595ece132a1d54ab6386120bb34383d7d9dddd9cdf5e80235707",
-      "evaluatedFrameMeshSha256": "1881e9b498906e4758370e061c88cff4e25dd7948eefaaf0fcd1d9eee57fd063",
-      "settledMeshSha256": "1881e9b498906e4758370e061c88cff4e25dd7948eefaaf0fcd1d9eee57fd063",
+      "evaluatedFrameMeshSha256": "95d2f5342ba79adadeca031c0e72d81ab0d72734fa1402990e6199eb1373c177",
+      "settledMeshSha256": "95d2f5342ba79adadeca031c0e72d81ab0d72734fa1402990e6199eb1373c177",
       "geometryChanged": true
     }
   ],
   "sourceBlendSha256": "69e9dbf7b85098ff9efaa1e1207085501202bd37f2d47123c45edaf7173cf862",
-  "constructionSha256": "30dca06f905d18eacaf4adeeb96e72f3726e9a1b2a8c344c66d7892d0ece6426",
+  "constructionSha256": "3df03101055943855cc45d7bf1b4b154cb845561f65a33074a195a8b0ff46f79",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "96ea1291c4bd07705bea9f5d141c187c7329276180c5c519e74d52521131fad2",
+  "candidateSha256": "96e1401777a2d16c8b257f65fc9bec0f2b11b22ec97086e242c70deed95c66e3",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
