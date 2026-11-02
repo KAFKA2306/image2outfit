@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v141-section-centered-waist-radials-20261102",
+  "revision": "v142-longer-pose-coverage-hem-20261102",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "TORSO_HIP_SURFACE_ARTIFACTS",
-      "description": "Direct inspection of all eleven V141 renders shows visible faceted torso triangles and breaks at the side, waist, and hip/skirt junction. The torso-to-skirt transition remains discontinuous despite the section-centered contour direction.",
-      "severity": "BLOCKER"
+      "code": "POSE_COVERAGE_AND_DRAPE_FAIL",
+      "severity": "BLOCKER",
+      "description": "Direct inspection of all eleven V142 renders shows the longer hem adds modest neutral coverage only; crouch still lifts the skirt and exposes upper thighs, while sitting and prone bunch or lift the shell into rigid angular shapes."
     },
     {
       "code": "SKIRT_SILHOUETTE_AND_WAIST_JOIN_FAIL",
-      "description": "The skirt still reads as a stiff, uniformly flared cone with only faint vertical panel divisions. The waist join retains a hard projecting shelf and jagged side intersections; section-centered radial placement did not resolve the visual continuity defect.",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "The skirt remains a uniformly flared shell with faint panel folds. The waist-to-hip join is abrupt, with a projecting shelf and visible side intersections."
     },
     {
-      "code": "POSE_COVERAGE_AND_DRAPE_FAIL",
-      "description": "Crouch exposes thighs, sitting collapses the skirt into a rigid billow, and prone lifts it into a broad boxy/fan-like drape. Pose coverage remains unacceptable.",
-      "severity": "BLOCKER"
+      "code": "TORSO_HIP_SURFACE_ARTIFACTS",
+      "severity": "BLOCKER",
+      "description": "Torso faceting and discontinuities around the side, waist, and hip remain visible in front, side, back, and pose evidence."
     }
   ],
   "failedGeometryChecks": [
