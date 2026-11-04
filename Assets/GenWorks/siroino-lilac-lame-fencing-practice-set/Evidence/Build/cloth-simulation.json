@@ -75,9 +75,9 @@
       "geometryChanged": true
     },
     {
-      "object": "front-articulated-coverage",
+      "object": "pleated-overskirt",
       "modifier": "Image2Outfit Cloth",
-      "pinVertexCount": 125,
+      "pinVertexCount": 64,
       "frameStart": 1,
       "frameEnd": 48,
       "pinMethod": "canonical shared seam vertices",
@@ -87,30 +87,30 @@
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.003447715556831099,
+          "minimum": -0.007954537375553627,
           "maximum": 0.14966464811004698
         },
-        "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 27,
+        "negativeSignedVertexCount": 568,
+        "belowCombinedCollisionMarginVertexCount": 2685,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.47346383333206177,
-          0.7395782470703125
+          0.47120460867881775,
+          0.7470877170562744
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.003447715556831099,
-          "maximum": 0.12141603580676019
+          "minimum": 0.002411078304703551,
+          "maximum": 0.16739848791621625
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 27,
+        "belowCombinedCollisionMarginVertexCount": 133,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "b4fea48aa5a38d615ea5b59b0066b5f0329079a11dd02757ef5f89aa98bfd276",
-      "evaluatedFrameMeshSha256": "edb5d8ad5d75e3c121e3e25a24f2f75e7a8aee47fe4e0072593835a31e93a112",
-      "settledMeshSha256": "edb5d8ad5d75e3c121e3e25a24f2f75e7a8aee47fe4e0072593835a31e93a112",
+      "preBakeMeshSha256": "afe7eee7e018595ece132a1d54ab6386120bb34383d7d9dddd9cdf5e80235707",
+      "evaluatedFrameMeshSha256": "1881e9b498906e4758370e061c88cff4e25dd7948eefaaf0fcd1d9eee57fd063",
+      "settledMeshSha256": "1881e9b498906e4758370e061c88cff4e25dd7948eefaaf0fcd1d9eee57fd063",
       "geometryChanged": true
     }
   ],
@@ -118,23 +118,23 @@
     "afterSplit": {
       "stage": "component-split",
       "method": "canonical-sewn-vertex-world-position-gap-v1",
-      "sharedCanonicalVertexCount": 222,
+      "sharedCanonicalVertexCount": 114,
       "maximumGapM": 0.0,
       "grantsFitAcceptance": false
     },
     "afterBake": {
       "stage": "cloth-bake",
       "method": "canonical-sewn-vertex-world-position-gap-v1",
-      "sharedCanonicalVertexCount": 222,
+      "sharedCanonicalVertexCount": 114,
       "maximumGapM": 0.0,
       "grantsFitAcceptance": false
     },
     "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split and after cloth bake. The comparison does not prove pose-deformed seam continuity or fit."
   },
   "sourceBlendSha256": "6e0422b78aee7c248fc9c30de1bbef5d92bfe5b9154348fe932b2dc09d216e46",
-  "constructionSha256": "c68117b650b3a43481e135de2a2e72fc98aeddc369a1266384ee2b6b25078d6a",
+  "constructionSha256": "01f1ea8abf1536071ada90f7a1de9affcfc10eb229d2378ad06400f91f9bc7bc",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "4a35091e45a22e574e9893872eb3f0bc396d22f28a44574ba291401f8a0918cf",
+  "candidateSha256": "a99a2c05a49de43db5b5dfa2abe78eb07bce349c4ed1d3f6c15d742db7aed1e3",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

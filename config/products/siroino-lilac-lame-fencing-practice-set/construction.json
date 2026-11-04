@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V147 direct inspection showed that the separately simulated front panels crumpled and separated from the main shell in posed views. Trace evidence identified two gaps: split canonical seam copies are independently weighted by object-local profiles after cloth baking, and the pose coverage diagnostic omits the front-coverage pieces. V148 records and reconciles canonical shared seam positions/weights after transfer, and includes those pieces in pose-matched skirt coverage measurements. Rebuild and inspect the hash-bound eleven views; this is a prototype continuity hypothesis only.",
-  "designRevision": "v148-canonical-seam-weight-continuity-and-coverage-20261105",
+  "designRevision": "v149-unified-six-panel-skirt-cloth-solve-20261105",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -141,7 +141,7 @@
     "applicability": "REQUIRED",
     "components": [
       "jacket-sleeves",
-      "front-articulated-coverage"
+      "pleated-overskirt"
     ],
     "prototypePanelGroups": {
       "jacket-sleeves": [
@@ -152,19 +152,15 @@
         "overskirt-front-left",
         "overskirt-front-right",
         "overskirt-back-left",
-        "overskirt-back-right"
-      ],
-      "front-articulated-coverage": [
+        "overskirt-back-right",
         "overskirt-front-lap-left",
         "overskirt-front-lap-right"
       ]
     },
-    "nonClothDeformationPaths": {
-      "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
-    },
+    "nonClothDeformationPaths": {},
     "prototypeFrameEnd": 48,
-    "evidence": "V147 divides the six sewn skirt panels into the authored armature-following main shell and a separate native-cloth front-coverage component. The cloth pipeline pins canonical vertices shared across component boundaries, so the two front panels keep a controlled common seam/hem with the main shell; they receive target-avatar weights only in the later hash-bound skin/export stage. The bounded neutral cloth solve, seam stability, pose coverage, folds, fit and appearance require direct inspection and remain unapproved.",
-    "reason": "V146's front-lap-to-thigh projection failed in all reviewed poses and left the skirt silhouette unchanged. V147 changes the assembly path: the sewn front-lap panels are simulated as a distinct cloth component and their shared boundary vertices are pinned against the authored main shell, whose deformation path remains shape-preserving armature skinning. This is a component/topology workflow change, not a cloth-setting or weight-tuning retry. Fit, motion, seam quality, appearance and release remain unapproved.",
+    "evidence": "V149 places all six sewn overskirt panels, including both front laps, in one native-cloth mesh solve. Internal front-lap seams therefore share the same simulated mesh vertices and solver instead of crossing between separately simulated and armature-only components. The waist remains provisionally pinned; the generated neutral/pose solve is a topology and deformation hypothesis only. Seam shape, coverage, fit, folds, appearance and release remain unapproved.",
+    "reason": "V148 confirmed duplicated seam positions and weights but direct images still show the separate front cloth component crumpled/opening away from the authored armature shell. V149 changes the skirt deformation topology: simulate the complete six-panel sewn skirt as one continuous cloth component, retaining the declared waist pin, so front-lap-to-shell connections are within one evaluated mesh/cloth solve. This is not another shared-weight or coverage-diagnostic retry. Fit, motion, seam quality, appearance and release remain unapproved.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,

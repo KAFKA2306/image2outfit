@@ -300,8 +300,12 @@ def main():
     cloth = construction.get("clothSimulation", {})
     groups = cloth.get("prototypePanelGroups", {})
     skirt_ids = set(groups.get("pleated-overskirt", []))
-    coverage_component = "front-articulated-coverage"
-    coverage_ids = set(groups.get(coverage_component, []))
+    coverage_component = (
+        "front-articulated-coverage"
+        if "front-articulated-coverage" in groups
+        else None
+    )
+    coverage_ids = set(groups.get(coverage_component, [])) if coverage_component else set()
     skirt_ids.update(coverage_ids)
     if (
         len(shorts_components) != 1

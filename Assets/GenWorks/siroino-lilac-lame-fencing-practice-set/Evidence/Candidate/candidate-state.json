@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v148-canonical-seam-weight-continuity-and-coverage-20261105",
+  "revision": "v149-unified-six-panel-skirt-cloth-solve-20261105",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "code": "UNIFIED_SKIRT_CLOTH_OVERDRAPE_FAIL",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven V148 views shows the skirt front remains severely crumpled in neutral/front/three-quarter and arm poses. In crouch and sit the overskirt lifts/opening exposes large block-like thigh-cover surfaces and the front panels do not form a controlled hem transition. Pose-matched coverage remains low: overskirt upper-thigh coverage is 0.356 per side in crouch and 0.240/0.243 in sit. Duplicate canonical seam positions now remain coincident at 0 m in neutral/crouch/sit, but this does not resolve the visible panel silhouette, coverage gaps, or fit.",
-      "code": "OVERSKIRT_POSE_DEFORMATION_FAIL"
+      "description": "Direct inspection of all eleven V149 images shows that grouping all six overskirt panels into one native-cloth solve removes the prior separately simulated shell, but produces extreme ballooning and dense, irregular folds in front, back, three-quarter and pose views. The skirt hem is jagged and its authored pleat silhouette is not readable. This is a visible failure of the unified cloth hypothesis, not a seam-continuity issue."
     },
     {
+      "code": "SKIRT_POSE_COVERAGE_FAIL",
       "severity": "BLOCKER",
-      "description": "Neutral front and three-quarter views still show the separate front panels heavily wrinkled and visually obscure the pleat design. The back/side read as a broad conical shell with a hard straight hem; front/side views retain uneven folds and a broken hem outline. Do not accept silhouette based solely on duplicate-seam continuity.",
-      "code": "SKIRT_PANEL_SILHOUETTE_FAIL"
+      "description": "Pose-matched geometry remains inadequate. Overskirt upper-thigh coverage is 0.263 left / 0.268 right in crouch and 0.169 / 0.173 in sit; the fitted under-shorts cover only 0.642 per side in crouch and 0.638 per side in sit. Direct crouch and sit views expose large block-like thigh-cover surfaces as the skirt lifts and folds away. These measurements are diagnostic only and are not a fit pass."
     },
     {
+      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
       "severity": "BLOCKER",
-      "description": "Front, side, three-quarter, arm-cross, and crouch renders continue to show angular/sharp triangular surface artifacts along the torso and an abrupt waist-to-hip shelf. This is still a visible appearance blocker independent of the improved shared seam weights.",
-      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS"
+      "description": "Angular triangular surface artifacts across the torso and an abrupt waist-to-hip shelf remain visible in front, side, three-quarter, arm-cross and crouch views. This independent appearance defect remains unresolved."
     }
   ],
   "failedGeometryChecks": [
