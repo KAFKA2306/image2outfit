@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v145-authored-overskirt-hem-follow-prototype-20261102",
+  "revision": "v146-front-apron-thigh-surface-follow-20261104",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,17 +20,17 @@
   "blockingFindings": [
     {
       "code": "OVERSKIRT_POSE_DEFORMATION_FAIL",
-      "description": "Direct inspection of all eleven V145 renders shows the authored overskirt surface is smoother than the V144 cloth-baked surface, but its armature-only deformation still breaks the intended skirt silhouette. In crouch the front shell opens and exposes the shorts/upper thighs; in sit it forms stiff angular flaps around the knees, and in prone it lifts into a broad rigid sheet.",
+      "description": "Direct inspection of the eleven V146 renders shows the thigh-surface placement on the front-lap panels does not resolve posed skirt behavior. Crouch and sit still expose large areas of the shorts/upper thighs as the main overskirt shell holds a rearward, rigid shape; prone still lifts the skirt into a broad sheet. Reject the pose coverage and deformation.",
       "severity": "BLOCKER"
     },
     {
       "code": "SKIRT_PANEL_SILHOUETTE_FAIL",
-      "description": "Neutral front/back views show a broad, nearly conical skirt with weakly readable panel pleats and an uneven hard hem transition; side views show the skirt depth and panel edges do not resolve into a controlled garment drape. The stronger hem-follow weights did not produce an acceptable continuous silhouette.",
+      "description": "Neutral front/back and three-quarter views remain a broad, near-conical skirt with weakly legible panel pleats and a hard, uneven hem. Side views show a wedge-like shell and visible separated lap/fold layers; the front-lap thigh placement did not create a continuous drape or controlled silhouette.",
       "severity": "BLOCKER"
     },
     {
       "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "description": "The abrupt horizontal shelf at the waist-to-hip join and angular triangular surface artifacts along the torso sides remain visible in neutral and posed views.",
+      "description": "The horizontal shelf at the waist-to-hip join and angular triangular artifacts along both torso sides remain visible in front, side, three-quarter, and posed views. These defects are independent of the front-lap placement and still block appearance acceptance.",
       "severity": "BLOCKER"
     }
   ],

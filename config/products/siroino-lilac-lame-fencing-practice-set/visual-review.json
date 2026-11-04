@@ -3,38 +3,38 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewer": "chatgpt:Codex",
-  "reviewedRevision": "v145-authored-overskirt-hem-follow-prototype-20261102",
+  "reviewedRevision": "v146-front-apron-thigh-surface-follow-20261104",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "39b5c649370ad73d3195d78fd20588a783392dfe78c0e78f4a4d1bf1e8534f44",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "680382e3a96c46e0b4fe6311cc21f12c967bb8b9640dae7e7366e897f8878267",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "13266f9e66e1fb6ad5a7bf0684ddd4110f949b2085baa2241212ab782017c889",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "ed6c747f65cf8c4bbef1d8c3f132292dd3c5e6e7886b374141408f7e0fc42d48",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "55ce6ecbe32f5395f85485dad7d7da495ab1c904e95b5bc8a77c46fc5b53d364",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "f97ed9c0019cf66e37dd6e90914d5cb1c5ac3544a1eb06e5be0f9bb63395dc2e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "5d57900d5cfa7e73f525fedc50d1982a4cd5dafbc86687b9a7172c031c1ceeaf",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "68300cdc248e70707bd740c234bdfd489d16cab1d2faf9d4d76ff4cd022eb9b4",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "0106aa0e8072a95961277adb6d95df55e725b28f7aa201608c1d0453de085972",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "7150d573fb5294f0e70221b1bcea9beaaa24384c18f33b605e41c1b4bf20982b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "c160d3c25afba64dedd5aef53ba5b035e8021da1530af8b32d6a6766af160e82"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "35eaf91b4906a9ab33dfbfdf328dc8f951fa17976e449dd5731308b5e6e1cf64",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "bbc9ff67bf730e99978e02fd346638b11ee5a9e97ffe5cb8a2a2cfa2dd7b60dc",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "57566208d0224e6ee897e8cdbfe23e60b69af6f79a8fb3a19c121e803a16abe0",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "b4b254e42ecf172efb8ac87f758167a642e505ad102ae88d8651513add0df60d",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "2edf9e47bd7d1b3f08d58b589c77c317b255fc43ee2390fd1250a9f3a078bf5b",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "90feb0e9ee4eb33f6e490b8d62178a45a9b11caad7f9d477074e3ec5a583bbdb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "699f6b4717e655d48a051a82bbc2d9838e65876cb0fa7e285c60393cb131a659",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "429dcb465b8d67100c11201fed7123b0644ea2bf441e1de81dc355c86f8d20a7",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "64101d2ea3fdd1bf771e6046092da779307dd4c83f7f3afa0889dbabb4db0f79",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "591ac6ff36cdd0d92ff60919b4651ece3e54db8ac649fa112d60c8d545181f08",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "e5a8e571df7b4991b55c31ac1f9683f106e5d9b450b9225d0031e18ba87a5b4c"
   },
   "findings": [
     {
       "code": "OVERSKIRT_POSE_DEFORMATION_FAIL",
-      "description": "Direct inspection of all eleven V145 renders shows the authored overskirt surface is smoother than the V144 cloth-baked surface, but its armature-only deformation still breaks the intended skirt silhouette. In crouch the front shell opens and exposes the shorts/upper thighs; in sit it forms stiff angular flaps around the knees, and in prone it lifts into a broad rigid sheet.",
+      "description": "Direct inspection of the eleven V146 renders shows the thigh-surface placement on the front-lap panels does not resolve posed skirt behavior. Crouch and sit still expose large areas of the shorts/upper thighs as the main overskirt shell holds a rearward, rigid shape; prone still lifts the skirt into a broad sheet. Reject the pose coverage and deformation.",
       "severity": "BLOCKER"
     },
     {
       "code": "SKIRT_PANEL_SILHOUETTE_FAIL",
-      "description": "Neutral front/back views show a broad, nearly conical skirt with weakly readable panel pleats and an uneven hard hem transition; side views show the skirt depth and panel edges do not resolve into a controlled garment drape. The stronger hem-follow weights did not produce an acceptable continuous silhouette.",
+      "description": "Neutral front/back and three-quarter views remain a broad, near-conical skirt with weakly legible panel pleats and a hard, uneven hem. Side views show a wedge-like shell and visible separated lap/fold layers; the front-lap thigh placement did not create a continuous drape or controlled silhouette.",
       "severity": "BLOCKER"
     },
     {
       "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "description": "The abrupt horizontal shelf at the waist-to-hip join and angular triangular surface artifacts along the torso sides remain visible in neutral and posed views.",
+      "description": "The horizontal shelf at the waist-to-hip join and angular triangular artifacts along both torso sides remain visible in front, side, three-quarter, and posed views. These defects are independent of the front-lap placement and still block appearance acceptance.",
       "severity": "BLOCKER"
     }
   ],
-  "nextAction": "Keep candidate REJECTED and prototype-only. V145 improves the neutral skirt surface by preserving authored panels, but the armature hem-follow strategy still fails crouch, sit, and prone coverage and silhouette. Stop parameter-only cloth/weight tuning; revise the overskirt panel geometry and pose construction to maintain coverage through bent-leg poses, and resolve the waist/hip/torso discontinuities before another 11-view review. Fit, weights, UV, Unity, VRChat, and release remain independent gates."
+  "nextAction": "Keep candidate REJECTED and prototype-only. V146's front-lap placement fails to keep a coherent skirt silhouette through crouch, sit, and prone; neutral pleats remain obscured by the broad shell, and the waist/hip/torso discontinuities persist. Stop reusing local front-lap-to-thigh projection. Revise the sewn overskirt as a pose-compatible panel assembly with separate articulated front coverage and a controlled shared hem, and repair the waist/hip/torso joins before another 11-view review. Fit, weights, UV, Unity, VRChat, and release remain independent gates."
 }

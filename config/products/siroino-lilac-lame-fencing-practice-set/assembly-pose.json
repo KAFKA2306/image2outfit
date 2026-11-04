@@ -9797,10 +9797,8 @@
   "poseAwareThighAttachment": {
     "method": "bilateral-deform-bone-surface-placement-v1",
     "pieceIds": [
-      "shorts-front-left",
-      "shorts-front-right",
-      "shorts-back-left",
-      "shorts-back-right"
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "leftThighBone": "UpperLeg_L",
@@ -9813,10 +9811,11 @@
     "maximumBlendWeight": 0.9,
     "minimumTriangleBoneWeight": 0.2,
     "preserveSharedPieceIds": [
-      "shorts-gusset"
+      "overskirt-front-left",
+      "overskirt-front-right"
     ],
     "preservedSeamFadeDistanceM": 0.05,
-    "evidenceBoundary": "V89 prototype-only bilateral placement uses the measured neutral avatar thigh triangles carrying UpperLeg_L or UpperLeg_R weights to move shorts panel vertices toward an 8 mm normal-clearance shell. Shared gusset-attachment vertices are preserved through a 50 mm fade. The attachment geometry is rest-pose evidence; skin deformation, posed coverage, seam continuity, pressure, collision, shape-key response, fit, appearance and release remain unverified."
+    "evidenceBoundary": "V146 prototype-only bilateral placement uses measured neutral avatar thigh triangles carrying UpperLeg_L or UpperLeg_R weights to move the two sewn front-lap panel vertices toward an 8 mm normal-clearance shell. Shared edges with the main front skirt panels fade over 50 mm. This is an authored geometry placement hypothesis; resulting seam continuity, folds, posed coverage, skin deformation, pressure, collision, fit, appearance and release remain unverified."
   },
   "thighSurfaceShell": {
     "method": "weighted-thigh-surface-clip-v2",
@@ -9833,7 +9832,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V93 clips source body triangles against explicit Z 0.50–0.87 m planes and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v145-authored-overskirt-hem-follow-prototype-20261102",
+  "designRevision": "v146-front-apron-thigh-surface-follow-20261104",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

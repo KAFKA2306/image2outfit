@@ -518,7 +518,10 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         for corner in range(1, len(face_points) - 1):
             candidate = (face_points[corner] - face_points[0]).cross(
                 face_points[corner + 1] - face_points[0])
-            if candidate.length_squared > 1e-16:
+            # Match the sewn-mesh degeneracy floor below: the build rejects
+            # faces with area <= 1e-12 m^2, so smaller normal thresholds here
+            # incorrectly classify valid small skirt triangles as faceless.
+            if candidate.length_squared > 1e-24:
                 face_normal = candidate.normalized()
                 break
         for offset, first in enumerate(face):

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V144 direct inspection rejected the overskirt: the stiffened Cloth solve still produced severe crumpling, an irregular hem, and unacceptable crouch/sit/prone behavior. V145 bypasses Cloth for the skirt so the authored panel folds remain intact, returns it to armature skinning, and tests stronger hem-follow weights while keeping the waist unweighted. This is a bounded construction/weight hypothesis only; all eleven renders and numeric gates must be rechecked.",
-  "designRevision": "v145-authored-overskirt-hem-follow-prototype-20261102",
+  "target": "V145 direct inspection rejected the overskirt: its armature-only surface still opens over the thighs in crouch, forms rigid knee flaps in sit, and lifts into a sheet in prone. V146 retains the authored panel surface and applies the existing bilateral deform-bone surface placement to the two front-lap panels, fading displacement at their shared seams with the main front panels. This changes which sewn geometry follows the measured upper-leg surfaces; it is a prototype hypothesis only. Rebuild and directly inspect all eleven views, including fold readability, shared seams, and remaining waist/hip/torso artifacts.",
+  "designRevision": "v146-front-apron-thigh-surface-follow-20261104",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -160,8 +160,8 @@
       "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V145 keeps the overskirt on its authored panel-shape-preserving armature-skinning path and limits native cloth settling to the jacket sleeves, because direct V144 review found the skirt Cloth bake visibly crumpled. Current poses still require direct inspection; neither authored folds nor a baked sleeve solve establish fit, motion, appearance, or release acceptance.",
-    "reason": "V144 showed that raising skirt cloth bending stiffness to 2.2 did not resolve crumpling or pose failures. V145 returns the sewn overskirt to its authored panel surface and changes its armature hem-follow weighting: side hem 0.40, forward hem 0.16, centerline hem 0.20, capped at 0.45 while waist thigh weight remains zero. This tests whether stronger lower-panel following reduces thigh exposure without applying cloth-bake deformation to the skirt. It is uncalibrated; fit, cloth response, appearance, and release remain unapproved.",
+    "evidence": "V146 leaves the complete overskirt surface on its authored panel-shape-preserving armature-skinning path and applies the existing bilateral UpperLeg surface placement only to overskirt-front-lap-left/right. The placement uses the same measured neutral avatar thigh surfaces and 8 mm clearance as the previously declared shorts attachment; 50 mm seam fades preserve the shared edges with overskirt-front-left/right. Resulting posed coverage, fold readability, seam continuity, and intersections require direct inspection. This placement is not fit, pose, appearance, or release acceptance.",
+    "reason": "V145's hem-follow weighting did not keep the front apron over bent thighs. V146 reuses the existing bounded deform-bone surface-placement method on the sewn front-lap panels, fading movement at the shared main-panel seams, while the shorts retain their separate upper-surface placement and the rest of the skirt keeps authored folds. This is a geometric attachment-path change, not another cloth/weight tuning trial. Fit, motion, seam quality, appearance, and release remain unapproved.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
@@ -238,7 +238,7 @@
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.075,
         "fullSideWeightWidthM": 0.135,
-        "evidenceBoundary": "V145 raises side hem thigh influence to 0.40, anterior target to 0.16, bilateral centerline target to 0.20, and the cap to 0.45 while retaining zero waist thigh influence. Edge trim inherits the panel weights. The coupled hem-follow trial is uncalibrated and tests only whether the preserved authored skirt surface deforms with crouch/sit leg motion; it proves no fit, collision, cloth/material behavior, appearance acceptance, or release readiness."
+        "evidenceBoundary": "V146 changes the rest-pose geometry path for the sewn front-lap panels by placing them against measured UpperLeg_L/UpperLeg_R deform surfaces with seam fades. The placement is not shape-key fit, motion, collision, seam, visual, or release evidence."
       }
     },
     {
