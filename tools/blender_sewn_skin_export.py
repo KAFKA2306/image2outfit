@@ -31,6 +31,100 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def synchronize_shared_seam_weights(objects, deform_bones):
+    """Keep split copies of a sewn vertex on one deformation trajectory.
+
+    Cloth components retain canonical sewn vertex IDs when split into separate
+    objects. The nearest-body transfer is object-local, so profile bounds can
+    otherwise assign different armature weights to the two copies of one seam.
+    This bounded reconciliation preserves those canonical seam identities.
+    """
+    shared = {}
+    for obj in objects:
+        source_ids = obj.data.attributes.get("canonical_sewn_vertex_index")
+        if source_ids is None or len(source_ids.data) != len(obj.data.vertices):
+            continue
+        for vertex, source in zip(obj.data.vertices, source_ids.data):
+            shared.setdefault(int(source.value), []).append((obj, vertex.index))
+
+    shared = {
+        source_id: refs
+        for source_id, refs in shared.items()
+        if len({obj.name for obj, _index in refs}) > 1
+    }
+    max_position_gap = 0.0
+    max_weight_delta_before = 0.0
+    synced_vertex_copies = 0
+    for source_id, refs in shared.items():
+        world_points = [obj.matrix_world @ obj.data.vertices[index].co for obj, index in refs]
+        point = sum(world_points, Vector((0.0, 0.0, 0.0))) / len(world_points)
+        gap = max((value - point).length for value in world_points)
+        max_position_gap = max(max_position_gap, float(gap))
+        if gap > 1e-4:
+            raise ValueError(
+                "Shared canonical seam geometry diverged before skin transfer: "
+                f"sourceVertex={source_id}, maximumGapM={gap:.9f}"
+            )
+
+        maps = []
+        for obj, index in refs:
+            groups = {
+                obj.vertex_groups[item.group].name: float(item.weight)
+                for item in obj.data.vertices[index].groups
+                if item.group < len(obj.vertex_groups)
+                and obj.vertex_groups[item.group].name in deform_bones
+            }
+            maps.append(groups)
+        names = set().union(*(item.keys() for item in maps))
+        max_weight_delta_before = max(
+            max_weight_delta_before,
+            max(
+                abs(first.get(name, 0.0) - second.get(name, 0.0))
+                for first in maps
+                for second in maps
+                for name in names
+            ) if names else 0.0,
+        )
+        averaged = {
+            name: sum(item.get(name, 0.0) for item in maps) / len(maps)
+            for name in names
+        }
+        constrained = constrain_vertex_weights(
+            {0: list(averaged.items())}, deform_bones=deform_bones
+        )
+        if constrained.audit.zero_weight_vertices:
+            raise ValueError(
+                f"Canonical seam weight reconciliation produced zero weights: {source_id}"
+            )
+        weights = {
+            item.bone: float(item.weight)
+            for item in constrained.weights[0]
+        }
+        for obj, index in refs:
+            for group in obj.vertex_groups:
+                try:
+                    group.remove([index])
+                except RuntimeError:
+                    pass
+            for bone, weight in weights.items():
+                if weight > 0.0:
+                    obj.vertex_groups[bone].add([index], weight, "REPLACE")
+            synced_vertex_copies += 1
+
+    return {
+        "method": "canonical-sewn-vertex-averaged-skin-weights-v1",
+        "sharedCanonicalVertexCount": len(shared),
+        "synchronizedVertexCopyCount": synced_vertex_copies,
+        "maximumPreTransferPositionGapM": max_position_gap,
+        "maximumWeightDeltaBefore": max_weight_delta_before,
+        "maximumWeightDeltaAfter": 0.0,
+        "positionToleranceM": 0.0001,
+        "grantsWeightAcceptance": False,
+        "grantsFitAcceptance": False,
+        "evidenceBoundary": "Canonical split seam copies receive one normalized common armature weight vector; neutral duplicate positions are bounded and recorded. This does not establish fit, posed continuity, collision, appearance, Shape Key response, or release.",
+    }
+
+
 def create_shape_key_targets(obj, shape_key_names):
     if obj.data.shape_keys is not None:
         raise ValueError(f"refusing to overwrite existing garment Shape Keys on {obj.name}")
@@ -1942,6 +2036,9 @@ def main():
     )
     # Bind trim to the settled garment and inherit its weights, including the
     # garment's explicit regional profile. No independent body lookup for trim.
+    shared_seam_weight_continuity = synchronize_shared_seam_weights(
+        garment_objects, bones
+    )
     edge_sources = {}
     for obj in garment_objects:
         source_ids = obj.data.attributes.get("canonical_sewn_vertex_index")
@@ -2127,6 +2224,7 @@ def main():
             },
             "poseConstrainedApronGeometry": pose_constrained_apron_evidence,
             "prototypeWeightProfiles": profile_audits,
+            "sharedSeamWeightContinuity": shared_seam_weight_continuity,
             "bodyDistanceM": {
                 "minimum": min(distances),
                 "maximum": max(distances),

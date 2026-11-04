@@ -537,6 +537,44 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     ]
     objects = {}
     pin_methods = {}
+
+    def shared_seam_position_diagnostic(stage):
+        references = {}
+        for mesh_object in objects.values():
+            attribute = mesh_object.data.attributes.get(
+                "canonical_sewn_vertex_index"
+            )
+            if attribute is None or len(attribute.data) != len(mesh_object.data.vertices):
+                raise ValueError(
+                    f"Canonical seam provenance is missing after {stage}: {mesh_object.name}"
+                )
+            for vertex, source in zip(mesh_object.data.vertices, attribute.data):
+                references.setdefault(int(source.value), []).append(
+                    (mesh_object, mesh_object.matrix_world @ vertex.co)
+                )
+        seam_groups = [
+            refs
+            for refs in references.values()
+            if len({obj.name for obj, _point in refs}) > 1
+        ]
+        return {
+            "stage": stage,
+            "method": "canonical-sewn-vertex-world-position-gap-v1",
+            "sharedCanonicalVertexCount": len(seam_groups),
+            "maximumGapM": max(
+                (
+                    max(
+                        (refs[first][1] - refs[second][1]).length
+                        for first in range(len(refs))
+                        for second in range(first + 1, len(refs))
+                    )
+                    for refs in seam_groups
+                ),
+                default=0.0,
+            ),
+            "grantsFitAcceptance": False,
+        }
+
     vertex_sets = {
         name: {v for i in ids for v in faces[i]} for name, ids in selected_faces.items()
     }
@@ -683,6 +721,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                     )
             pins = obj.vertex_groups.new(name="Image2Outfit Cloth Pin")
             pins.add(pin_ids, 1.0, "REPLACE")
+    seam_positions_after_split = shared_seam_position_diagnostic("component-split")
     bpy.data.objects.remove(original, do_unlink=True)
     bodies = [
         obj
@@ -1066,6 +1105,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             settledMeshSha256=settled,
             geometryChanged=settled != before[obj.name],
         )
+    seam_positions_after_bake = shared_seam_position_diagnostic("cloth-bake")
     runtime = ROOT / ".image2outfit" / "products" / str(job["id"]) / "cloth"
     runtime.mkdir(parents=True, exist_ok=True)
     candidate = runtime / "settled-prototype.blend"
@@ -1083,6 +1123,11 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         "cacheBaked": True,
         "geometryChanged": all(c["geometryChanged"] for c in contracts),
         "contracts": contracts,
+        "sharedSeamPositionContinuity": {
+            "afterSplit": seam_positions_after_split,
+            "afterBake": seam_positions_after_bake,
+            "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split and after cloth bake. The comparison does not prove pose-deformed seam continuity or fit.",
+        },
         "sourceBlendSha256": source_hash,
         "constructionSha256": hashlib.sha256(
             construction_path.read_bytes()

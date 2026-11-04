@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V146 direct inspection rejected the skirt silhouette and posed coverage. V147 removes the failed front-lap-to-thigh projection and simulates the two sewn front coverage panels as their own cloth component, while pinning their canonical shared seam vertices to the authored armature-following skirt shell. This is a distinct panel assembly path, not a weight-tuning retry. Rebuild and directly inspect all eleven views for stable shared hem/seams, preserved neutral pleats, crouch/sit/prone coverage, and remaining waist/hip/torso artifacts.",
-  "designRevision": "v147-front-coverage-panel-cloth-seam-assembly-20261104",
+  "target": "V147 direct inspection showed that the separately simulated front panels crumpled and separated from the main shell in posed views. Trace evidence identified two gaps: split canonical seam copies are independently weighted by object-local profiles after cloth baking, and the pose coverage diagnostic omits the front-coverage pieces. V148 records and reconciles canonical shared seam positions/weights after transfer, and includes those pieces in pose-matched skirt coverage measurements. Rebuild and inspect the hash-bound eleven views; this is a prototype continuity hypothesis only.",
+  "designRevision": "v148-canonical-seam-weight-continuity-and-coverage-20261105",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",

@@ -114,10 +114,27 @@
       "geometryChanged": true
     }
   ],
+  "sharedSeamPositionContinuity": {
+    "afterSplit": {
+      "stage": "component-split",
+      "method": "canonical-sewn-vertex-world-position-gap-v1",
+      "sharedCanonicalVertexCount": 222,
+      "maximumGapM": 0.0,
+      "grantsFitAcceptance": false
+    },
+    "afterBake": {
+      "stage": "cloth-bake",
+      "method": "canonical-sewn-vertex-world-position-gap-v1",
+      "sharedCanonicalVertexCount": 222,
+      "maximumGapM": 0.0,
+      "grantsFitAcceptance": false
+    },
+    "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split and after cloth bake. The comparison does not prove pose-deformed seam continuity or fit."
+  },
   "sourceBlendSha256": "6e0422b78aee7c248fc9c30de1bbef5d92bfe5b9154348fe932b2dc09d216e46",
-  "constructionSha256": "8cb291b2edc7b9fa855de4a8b5c2d259dc40006583d3dd0b4de021279fe6c671",
+  "constructionSha256": "c68117b650b3a43481e135de2a2e72fc98aeddc369a1266384ee2b6b25078d6a",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "26ea956ddb972c0de21dd943c2030232262993c39aaf5e558a7da0c7d211742c",
+  "candidateSha256": "4a35091e45a22e574e9893872eb3f0bc396d22f28a44574ba291401f8a0918cf",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

@@ -146,6 +146,68 @@ def _body_surface_samples(body, depsgraph, armature):
         evaluated.to_mesh_clear()
 
 
+def measure_shared_seam_pose_continuity(objects, depsgraph, expected_sewn_objects):
+    """Measure evaluated gaps between skinned copies of canonical seam points."""
+    references = {}
+    missing_expected = set(expected_sewn_objects)
+    excluded_noncanonical = 0
+    for obj in objects:
+        if (
+            obj.type != "MESH"
+            or obj.get("prototypeRole") != "weighted-unfit-sewn-prototype"
+        ):
+            continue
+        evaluated = obj.evaluated_get(depsgraph)
+        mesh = evaluated.to_mesh(preserve_all_data_layers=True, depsgraph=depsgraph)
+        try:
+            attribute = mesh.attributes.get("canonical_sewn_vertex_index")
+            if attribute is None:
+                if obj.name in missing_expected:
+                    raise ValueError(
+                        f"Expected canonical sewn object lost seam provenance: {obj.name}"
+                    )
+                excluded_noncanonical += 1
+                continue
+            if len(attribute.data) != len(mesh.vertices):
+                raise ValueError(
+                    f"Evaluated garment lost canonical seam provenance: {obj.name}"
+                )
+            missing_expected.discard(obj.name)
+            for vertex, source in zip(mesh.vertices, attribute.data):
+                references.setdefault(int(source.value), []).append(
+                    (obj.name, evaluated.matrix_world @ vertex.co)
+                )
+        finally:
+            evaluated.to_mesh_clear()
+    if missing_expected:
+        raise ValueError(
+            "Required canonical sewn objects are absent from pose seam audit: "
+            + ", ".join(sorted(missing_expected))
+        )
+    seams = [
+        copies
+        for copies in references.values()
+        if len({name for name, _point in copies}) > 1
+    ]
+    return {
+        "method": "evaluated-canonical-seam-position-gap-v1",
+        "sharedCanonicalVertexCount": len(seams),
+        "excludedNoncanonicalObjectCount": excluded_noncanonical,
+        "maximumPairwiseGapM": max(
+            (
+                max(
+                    (copies[first][1] - copies[second][1]).length
+                    for first in range(len(copies))
+                    for second in range(first + 1, len(copies))
+                )
+                for copies in seams
+            ),
+            default=0.0,
+        ),
+        "grantsFitAcceptance": False,
+    }
+
+
 def measure_pose_coverage(
     body, objects, depsgraph, armature, shorts_ids, skirt_ids, piece_group_source
 ):
@@ -238,6 +300,9 @@ def main():
     cloth = construction.get("clothSimulation", {})
     groups = cloth.get("prototypePanelGroups", {})
     skirt_ids = set(groups.get("pleated-overskirt", []))
+    coverage_component = "front-articulated-coverage"
+    coverage_ids = set(groups.get(coverage_component, []))
+    skirt_ids.update(coverage_ids)
     if (
         len(shorts_components) != 1
         or not shorts_components[0].get("requiredPieceIds")
@@ -270,6 +335,8 @@ def main():
         ),
         "skirtClothGroupId": "pleated-overskirt",
         "skirtPieceIds": sorted(skirt_ids),
+        "separatelySimulatedCoverageComponentId": coverage_component,
+        "separatelySimulatedCoveragePieceIds": sorted(coverage_ids),
     }
     runtime = ROOT / ".image2outfit/products" / job["id"]
     skin = read_json(runtime / "skin/skin-export-report.json")
@@ -345,6 +412,14 @@ def main():
                 if kind == "pose" and name in {"neutral", "crouch", "sit"}
                 else None
             )
+            if pose_coverage is not None:
+                pose_coverage["sharedSeamContinuity"] = (
+                    measure_shared_seam_pose_continuity(
+                        bpy.context.scene.objects,
+                        deps,
+                        set(groups) | {job["id"] + "-static"},
+                    )
+                )
             points = [
                 obj.evaluated_get(deps).matrix_world @ Vector(corner)
                 for obj in bpy.context.scene.objects

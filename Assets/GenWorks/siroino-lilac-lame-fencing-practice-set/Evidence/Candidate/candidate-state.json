@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v147-front-coverage-panel-cloth-seam-assembly-20261104",
+  "revision": "v148-canonical-seam-weight-continuity-and-coverage-20261105",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "OVERSKIRT_POSE_DEFORMATION_FAIL",
-      "description": "Direct inspection of the eleven V147 renders shows the new front-coverage cloth component still loses coverage in crouch/sit and lifts away in prone. The shared edges remain visibly discontinuous in the posed renders, so the panel solve does not provide a controlled skirt/coverage transition. Reject pose coverage and deformation.",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "Direct inspection of all eleven V148 views shows the skirt front remains severely crumpled in neutral/front/three-quarter and arm poses. In crouch and sit the overskirt lifts/opening exposes large block-like thigh-cover surfaces and the front panels do not form a controlled hem transition. Pose-matched coverage remains low: overskirt upper-thigh coverage is 0.356 per side in crouch and 0.240/0.243 in sit. Duplicate canonical seam positions now remain coincident at 0 m in neutral/crouch/sit, but this does not resolve the visible panel silhouette, coverage gaps, or fit.",
+      "code": "OVERSKIRT_POSE_DEFORMATION_FAIL"
     },
     {
-      "code": "SKIRT_PANEL_SILHOUETTE_FAIL",
-      "description": "Neutral front and three-quarter renders show the separate front panels badly crumpled and obscure their intended pleats; the back and side remain a broad, near-conical/wedge shell with a straight, hard hem. The split component makes the skirt silhouette less coherent rather than controlling the shared hem.",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "Neutral front and three-quarter views still show the separate front panels heavily wrinkled and visually obscure the pleat design. The back/side read as a broad conical shell with a hard straight hem; front/side views retain uneven folds and a broken hem outline. Do not accept silhouette based solely on duplicate-seam continuity.",
+      "code": "SKIRT_PANEL_SILHOUETTE_FAIL"
     },
     {
-      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "description": "The horizontal shelf at the waist-to-hip join and angular triangular artifacts along both torso sides remain visible in front, side, three-quarter, and posed views. These defects are independent of the skirt panel solve and still block appearance acceptance.",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "Front, side, three-quarter, arm-cross, and crouch renders continue to show angular/sharp triangular surface artifacts along the torso and an abrupt waist-to-hip shelf. This is still a visible appearance blocker independent of the improved shared seam weights.",
+      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS"
     }
   ],
   "failedGeometryChecks": [

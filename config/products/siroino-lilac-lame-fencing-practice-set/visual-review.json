@@ -3,38 +3,38 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewer": "chatgpt:Codex",
-  "reviewedRevision": "v147-front-coverage-panel-cloth-seam-assembly-20261104",
+  "reviewedRevision": "v148-canonical-seam-weight-continuity-and-coverage-20261105",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "5ce94ff4412059ad6bc84d50b934f1b5643a1ee9f2b6bb938ea1f82c81100425",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "a9d1d1ea3a9b09c1cc6c2615666d4e4360e5abf0ff4151c1e9e11fddbaed9579",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "64e93ea86b9b73f8f5758df6cfb9d29b02714346a902d8ce0f84bb846e32277f",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "9ca72a0bfe2dcc64fc525f1c26048000b62997ccb43d04de48db6d6c5e68b493",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "441477158d38693fcc0b3470bf31035d1ab529e345049202c2f8a86577f6a906",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "3ac0405f8a5618d92261aa426e37dc22d031bdb0f774fd10e3f2d0da272baa36",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "0ca705760fb4df2803ce45c621e4217236426a27517d0d8d34e63d9f295bfc9f",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "3e3b5df9b90ffef5a0e1cf6d0cca3082df2e324674e9e7e6600353a3b1292972",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "7099a68ffa822913d064356b73f7343d6d9807cd453c9c7d35fb56ab8a01a07c",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "e851d03c48821c459d6d37a149dce0524bd99e2d4da58bb6ab752e2b365aefb3",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "951740a025e309d9642e5c2271da6bab1cf7f9c5f710625aa73fd829da6c3997"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "120c24eb0b7707f2aab27fb312124894f263c3babc8c7147b754053c7aac7202",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "58f212b12e17faf09703138a9193e297cc0f837513543d35146b6bd6c90d1281",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "5990bf11ec338401f52d3b18a45d69339fca19b8a1f53bd1e8676e9941feb5ce",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "3c57de377e4fea26f85cd9b4c9277682831999749dad1d3244cd2c9c6b768260",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "420bf5f4b02e88780fe418038fc02176d6c7d253870febcf3558f8dae493cd07",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "6a08510960c062e0e3e6ca552cb971ae30df5a232e72bd73615f22a331a99442",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "b8eab599be54e076354e276f796c3c35bc521201297ddcf8a7ea21d1c7a51422",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "fc79e4a228f2d536391b11cddb396b50450f8d69a9a09c93e6ff75fdeefe36dc",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "7a882928583dadc2f7956e7a5511f9faf28f7faeac13df7ee352e87258ae6adf",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "7ed7e52ccc91146948fd837efc18f2f4b029bc9e53e709628b65ef8754888e62",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "3b86a5626695e3cc19fb932b2040775d634f9eca582dba140bf018ddf1f72699"
   },
   "findings": [
     {
-      "code": "OVERSKIRT_POSE_DEFORMATION_FAIL",
-      "description": "Direct inspection of the eleven V147 renders shows the new front-coverage cloth component still loses coverage in crouch/sit and lifts away in prone. The shared edges remain visibly discontinuous in the posed renders, so the panel solve does not provide a controlled skirt/coverage transition. Reject pose coverage and deformation.",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "Direct inspection of all eleven V148 views shows the skirt front remains severely crumpled in neutral/front/three-quarter and arm poses. In crouch and sit the overskirt lifts/opening exposes large block-like thigh-cover surfaces and the front panels do not form a controlled hem transition. Pose-matched coverage remains low: overskirt upper-thigh coverage is 0.356 per side in crouch and 0.240/0.243 in sit. Duplicate canonical seam positions now remain coincident at 0 m in neutral/crouch/sit, but this does not resolve the visible panel silhouette, coverage gaps, or fit.",
+      "code": "OVERSKIRT_POSE_DEFORMATION_FAIL"
     },
     {
-      "code": "SKIRT_PANEL_SILHOUETTE_FAIL",
-      "description": "Neutral front and three-quarter renders show the separate front panels badly crumpled and obscure their intended pleats; the back and side remain a broad, near-conical/wedge shell with a straight, hard hem. The split component makes the skirt silhouette less coherent rather than controlling the shared hem.",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "Neutral front and three-quarter views still show the separate front panels heavily wrinkled and visually obscure the pleat design. The back/side read as a broad conical shell with a hard straight hem; front/side views retain uneven folds and a broken hem outline. Do not accept silhouette based solely on duplicate-seam continuity.",
+      "code": "SKIRT_PANEL_SILHOUETTE_FAIL"
     },
     {
-      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "description": "The horizontal shelf at the waist-to-hip join and angular triangular artifacts along both torso sides remain visible in front, side, three-quarter, and posed views. These defects are independent of the skirt panel solve and still block appearance acceptance.",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "description": "Front, side, three-quarter, arm-cross, and crouch renders continue to show angular/sharp triangular surface artifacts along the torso and an abrupt waist-to-hip shelf. This is still a visible appearance blocker independent of the improved shared seam weights.",
+      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS"
     }
   ],
-  "nextAction": "Keep candidate REJECTED and prototype-only. V147's separately simulated front panels crumple in neutral poses while crouch/sit coverage and prone continuity still fail. Before another review, trace the shared seam vertices through the cloth split, skin transfer and posed render, then repair the front-panel-to-shell joining path so coverage follows the thigh motion without losing the controlled hem. Fit, weights, UV, Unity, VRChat and release remain independent gates."
+  "nextAction": "Keep candidate REJECTED and prototype-only. V148 synchronizes skin weights and evaluated positions across 222 duplicated canonical seam identities; measured pairwise seam gap is 0 m in neutral, crouch, and sit. That continuity check is diagnostic only. Do not repeat the same seam repair. The current posed images and coverage measurements still show a crumpled overskirt, exposed block-like thigh covers, and poor thigh coverage (overskirt 0.356 per side in crouch; 0.240/0.243 in sit), plus torso/waist artifacts. Change the garment pattern/deformation method so front panels follow posed thighs and join the hem coherently, and resolve torso/hip surface artifacts before another visual acceptance. Fit, materials, Shape Keys, UV, Unity, VRChat and release remain independent gates."
 }
