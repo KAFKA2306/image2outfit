@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V145 direct inspection rejected the overskirt: its armature-only surface still opens over the thighs in crouch, forms rigid knee flaps in sit, and lifts into a sheet in prone. V146 retains the authored panel surface and applies the existing bilateral deform-bone surface placement to the two front-lap panels, fading displacement at their shared seams with the main front panels. This changes which sewn geometry follows the measured upper-leg surfaces; it is a prototype hypothesis only. Rebuild and directly inspect all eleven views, including fold readability, shared seams, and remaining waist/hip/torso artifacts.",
-  "designRevision": "v146-front-apron-thigh-surface-follow-20261104",
+  "target": "V146 direct inspection rejected the skirt silhouette and posed coverage. V147 removes the failed front-lap-to-thigh projection and simulates the two sewn front coverage panels as their own cloth component, while pinning their canonical shared seam vertices to the authored armature-following skirt shell. This is a distinct panel assembly path, not a weight-tuning retry. Rebuild and directly inspect all eleven views for stable shared hem/seams, preserved neutral pleats, crouch/sit/prone coverage, and remaining waist/hip/torso artifacts.",
+  "designRevision": "v147-front-coverage-panel-cloth-seam-assembly-20261104",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -140,7 +140,8 @@
   "clothSimulation": {
     "applicability": "REQUIRED",
     "components": [
-      "jacket-sleeves"
+      "jacket-sleeves",
+      "front-articulated-coverage"
     ],
     "prototypePanelGroups": {
       "jacket-sleeves": [
@@ -151,7 +152,9 @@
         "overskirt-front-left",
         "overskirt-front-right",
         "overskirt-back-left",
-        "overskirt-back-right",
+        "overskirt-back-right"
+      ],
+      "front-articulated-coverage": [
         "overskirt-front-lap-left",
         "overskirt-front-lap-right"
       ]
@@ -160,8 +163,8 @@
       "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V146 leaves the complete overskirt surface on its authored panel-shape-preserving armature-skinning path and applies the existing bilateral UpperLeg surface placement only to overskirt-front-lap-left/right. The placement uses the same measured neutral avatar thigh surfaces and 8 mm clearance as the previously declared shorts attachment; 50 mm seam fades preserve the shared edges with overskirt-front-left/right. Resulting posed coverage, fold readability, seam continuity, and intersections require direct inspection. This placement is not fit, pose, appearance, or release acceptance.",
-    "reason": "V145's hem-follow weighting did not keep the front apron over bent thighs. V146 reuses the existing bounded deform-bone surface-placement method on the sewn front-lap panels, fading movement at the shared main-panel seams, while the shorts retain their separate upper-surface placement and the rest of the skirt keeps authored folds. This is a geometric attachment-path change, not another cloth/weight tuning trial. Fit, motion, seam quality, appearance, and release remain unapproved.",
+    "evidence": "V147 divides the six sewn skirt panels into the authored armature-following main shell and a separate native-cloth front-coverage component. The cloth pipeline pins canonical vertices shared across component boundaries, so the two front panels keep a controlled common seam/hem with the main shell; they receive target-avatar weights only in the later hash-bound skin/export stage. The bounded neutral cloth solve, seam stability, pose coverage, folds, fit and appearance require direct inspection and remain unapproved.",
+    "reason": "V146's front-lap-to-thigh projection failed in all reviewed poses and left the skirt silhouette unchanged. V147 changes the assembly path: the sewn front-lap panels are simulated as a distinct cloth component and their shared boundary vertices are pinned against the authored main shell, whose deformation path remains shape-preserving armature skinning. This is a component/topology workflow change, not a cloth-setting or weight-tuning retry. Fit, motion, seam quality, appearance and release remain unapproved.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,

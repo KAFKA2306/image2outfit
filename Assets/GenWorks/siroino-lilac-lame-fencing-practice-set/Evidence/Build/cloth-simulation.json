@@ -73,12 +73,51 @@
       "evaluatedFrameMeshSha256": "0e1d123aa4f201e8c79e5e78ca3d59184e68e4d14bcaeae2c99bdaeac0c5dfb4",
       "settledMeshSha256": "d5f4a77ba206ae33fd96d4e180d2697fbba649373090f74b54d51473e6778cd0",
       "geometryChanged": true
+    },
+    {
+      "object": "front-articulated-coverage",
+      "modifier": "Image2Outfit Cloth",
+      "pinVertexCount": 125,
+      "frameStart": 1,
+      "frameEnd": 48,
+      "pinMethod": "canonical shared seam vertices",
+      "preBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.49457821249961853,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.003447715556831099,
+          "maximum": 0.14966464811004698
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 27,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "postBakeBodySurfaceDiagnostic": {
+        "heightRangeM": [
+          0.47346383333206177,
+          0.7395782470703125
+        ],
+        "nearestNormalSignedDistanceM": {
+          "minimum": 0.003447715556831099,
+          "maximum": 0.12141603580676019
+        },
+        "negativeSignedVertexCount": 0,
+        "belowCombinedCollisionMarginVertexCount": 27,
+        "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
+      },
+      "cacheBakedActual": true,
+      "preBakeMeshSha256": "b4fea48aa5a38d615ea5b59b0066b5f0329079a11dd02757ef5f89aa98bfd276",
+      "evaluatedFrameMeshSha256": "edb5d8ad5d75e3c121e3e25a24f2f75e7a8aee47fe4e0072593835a31e93a112",
+      "settledMeshSha256": "edb5d8ad5d75e3c121e3e25a24f2f75e7a8aee47fe4e0072593835a31e93a112",
+      "geometryChanged": true
     }
   ],
-  "sourceBlendSha256": "0caa08d9bcf80f9bdb05097f0f729f9e102e75151a778ff55c90ccb0040aa902",
-  "constructionSha256": "856ab81f16173c1f382c5a452e1d3ce75ca6cf5b8cb138de8265cd357033f999",
+  "sourceBlendSha256": "6e0422b78aee7c248fc9c30de1bbef5d92bfe5b9154348fe932b2dc09d216e46",
+  "constructionSha256": "8cb291b2edc7b9fa855de4a8b5c2d259dc40006583d3dd0b4de021279fe6c671",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "6c1943e860ddf30d0d1d54a5b9885855d280a7202aecbc6e725bf17b11ac575e",
+  "candidateSha256": "26ea956ddb972c0de21dd943c2030232262993c39aaf5e558a7da0c7d211742c",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
