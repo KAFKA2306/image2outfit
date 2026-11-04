@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V149 direct inspection rejects the unified six-panel native-cloth solve for extreme over-drape and broken hem, while crouch/sit coverage remains low. V150 tests the existing authored pleat-panel surface under shape-preserving armature skinning instead of cloth simulation for the broad overskirt. This is a deformation-method experiment only; shorts coverage and torso/hip artifacts remain blockers.",
-  "designRevision": "v150-authored-armature-preserved-overskirt-20261105",
+  "target": "V150 direct inspection rejects a plain, faceted A-line skirt with weak pleat readability; shorts shells and torso/prone artifacts also remain. V151 retains V150 authored armature deformation, increasing only panel-local sewn pleat relief from 30 mm to 40 mm to test whether folds read clearly without returning to unconstrained cloth simulation. Other blockers remain.",
+  "designRevision": "v151-increased-authored-panel-pleat-relief-20261105",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -160,8 +160,8 @@
       "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V150 leaves the complete six-panel authored overskirt in one canonical geometry group, but removes the broad panels from native-cloth solving. The authored pleat shape is preserved as rest geometry and is evaluated through the existing armature-skinning path. Jacket sleeves remain in required cloth processing. This tests whether unconstrained cloth was the source of V149 ballooning; appearance, fit, poses, hem, weights and release remain unapproved.",
-    "reason": "V149 unified native cloth across all six overskirt panels to remove inter-component seam separation, but direct images show severe ballooning and a broken hem. V150 changes the deformation method rather than tuning the failed solve: keep the six-panel pattern geometry unified and use the declared authored-panel-shape-preserving-armature-skinning path for the overskirt. Do not add a cloth modifier to pleated-overskirt. Regenerate all garment evidence and directly inspect current poses. Shorts coverage, torso/hip artifacts, fit and release remain independent blockers.",
+    "evidence": "V151 retains the V150 armature-skinned six-panel skirt and sleeve cloth solve, while the canonical assembly-pose input raises authored panel-local fold relief to 40 mm. The geometry change is regenerated and checked against required views; it is not fit or appearance acceptance.",
+    "reason": "V150 removed native-cloth ballooning but the directly reviewed skirt read as a plain, faceted shell with weak pleat character. V151 tests a bounded increase in sewn panel-local radial pleat relief from 30 mm to 40 mm, leaving the non-cloth armature deformation method, seam valleys, fold count, waist, and other cloth settings unchanged. Shorts coverage, torso/hip defects and prone deformation remain independent blockers.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v150-authored-armature-preserved-overskirt-20261105",
+  "revision": "v151-increased-authored-panel-pleat-relief-20261105",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,22 +20,22 @@
   "blockingFindings": [
     {
       "code": "AUTHORED_SKIRT_PLEAT_SILHOUETTE_FAIL",
-      "description": "Direct inspection of all eleven V150 views shows the broad cloth ballooning from V149 is removed, but the neutral/front/back/side and arm-pose skirt reads as a plain, smooth A-line shell with no legible pleat rhythm. Side views show large faceted folds and a hard, uneven hem junction; the authored-panel skinning hypothesis does not yet preserve a convincing pleated garment appearance.",
+      "description": "Direct inspection of all eleven current V151 images shows no legible pleat rhythm in the neutral/front/back/side/arm views after the declared hem fold relief increase from 30 mm to 40 mm. The skirt still reads as a broad, smooth/faceted A-line shell, with rigid apron-like side transitions and an uneven hard hem; the parameter-only change did not visibly resolve the garment-surface defect.",
       "severity": "BLOCKER"
     },
     {
       "code": "SHORTS_POSE_COVERAGE_FAIL",
-      "description": "Crouch and sit views expose oversized hard-edged shorts/thigh-cover shells across the upper legs while the skirt lifts and falls away behind the thighs. Pose-matched upper-thigh coverage is still only 0.371 per side in crouch and 0.271 per side in sit for the overskirt; shorts cover 0.642 and 0.638 per side respectively. These are geometry diagnostics only and do not establish fit.",
+      "description": "Crouch and sit still expose hard-edged shorts/thigh-cover shells across the upper legs while the skirt lifts away behind the thighs. Current pose-matched coverage is overskirt 0.267 per side in sit and 0.371 per side in crouch; shorts cover 0.638 in sit and 0.642 in crouch per side. These geometric diagnostics do not establish fit.",
       "severity": "BLOCKER"
     },
     {
       "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "description": "Angular triangular patches and abrupt surface transitions remain visible across the torso and waist/hip in front, three-quarter, side, neutral and arm-cross views. This independent surface-quality blocker persists.",
+      "description": "Angular triangular patches and abrupt surface transitions remain visible across the torso and waist/hip in the current V151 front, three-quarter, side, neutral and arm-cross views.",
       "severity": "BLOCKER"
     },
     {
       "code": "PRONE_DEFORMATION_FAIL",
-      "description": "The prone render shows the garment and limbs intersecting/overlapping into a compact pile around the pelvis and chest; silhouette and surface continuity are not acceptable in this required pose.",
+      "description": "The current V151 prone image still shows garment and limbs intersecting/overlapping into a compact pile around pelvis and chest; silhouette and surface continuity are unacceptable in this required pose.",
       "severity": "BLOCKER"
     }
   ],
