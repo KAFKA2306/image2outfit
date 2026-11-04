@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Keep candidate REJECTED and prototype-only. V149 tested one continuous native-cloth solve for all six skirt panels. The prior separate-shell split is no longer visible, but the unified solve creates severe over-draping, ballooning and a broken hem, while crouch/sit thigh coverage remains low and thigh-cover shells are visibly exposed. Do not repeat seam synchronization or treat unity of the cloth object as success. Replace the skirt deformation approach with a controlled authored pleat/panel surface that preserves the designed hem through pose deformation; reduce dependence on unconstrained cloth simulation for the broad skirt panels. Separately revise the shorts/thigh-cover cut to improve crouch/sit coverage, and resolve torso/hip surface artifacts before another appearance review. All changes remain prototype-only; fit, UV, materials, Shape Keys, Unity, VRChat, package and release are independent unverified gates.",
+    "nextAction": "Keep candidate REJECTED and prototype-only. V150 removes severe native-cloth ballooning by evaluating the authored six-panel overskirt through armature skinning, but the result loses visible pleat character and still has side faceting/hem irregularity. Keep this method as a diagnostic candidate only; next improve the authored panel geometry and targeted weights so pleats remain readable without returning to broad unconstrained cloth. Separately redesign the shorts/thigh-cover shell cut and coverage for crouch and sit, and correct torso/waist surface artifacts and prone intersections. Rebuild and directly review all eleven poses after changes. Fit, UV, materials, Shape Keys, Unity, VRChat, package and release remain independent unverified gates.",
     "lastAttempt": {
-      "runId": "8110bfb1ab604ea8905c71708ccac0ec",
+      "runId": "44560420a4df4cda8b0782f888257838",
       "status": "EXECUTED",
-      "checkedAt": "2026-11-04T17:28:27Z",
+      "checkedAt": "2026-11-04T19:32:01Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "04ec0270215c27f9a4a9d9308b156ce65de8174d5554a0d64907d4f7dc2fd554",
+      "stageEvidenceSha256": "f0fb0f58ed0a086de17e83d56b5d74c388ba38af8a453c5b5b1a3648c8608061",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -83,36 +83,36 @@
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "338db70b67289055884dbce62f4d0a0d2c29dca1f304878074aa285233f72e24"
+          "stageResultSha256": "9a2ae78eb5f4f0f9f478702c4d5c3a013ed523a6036efb59a76ffb85f9b49a88"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "d5b39b949edc7641ffcb39bde66d5add2d8ec99598e2e1883739f6ff956661a6"
+          "stageResultSha256": "75554720f4bb14b86f1893f6bad4dc3f01f5b3fcdf2d2f1325a9ebeae40120c9"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "77c9fe16c9565123097335bb4a2559abb00bd243e03fa73b01b1f1b90e12855e"
+          "stageResultSha256": "0cc2f062a7af4ad3177407f56e477ef5b9c5fdf6baa0cca32c423d993fe168a5"
         },
         "audit-geometry": {
           "status": "REUSED",
-          "stageResultSha256": "805a6bdb906e5f01e3cadca77e5a2284a7e13ecd9aca61e44e1eeb43d5961b61"
+          "stageResultSha256": "65ba4f9a2d603ec687e7d1dccba6e7419d12904d08f0de773ecf50b4878506a5"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "276fd93059d9e6398756432a551b77b8cbc711ec40f38ab0b511ffe5ad8742bf"
+          "stageResultSha256": "e1471cb8f8082cefaedfa3e4ea8a6f2850b5dd9e88e8a844229471204a37b5a9"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "04ec0270215c27f9a4a9d9308b156ce65de8174d5554a0d64907d4f7dc2fd554"
+          "stageResultSha256": "f0fb0f58ed0a086de17e83d56b5d74c388ba38af8a453c5b5b1a3648c8608061"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "f4c0b39da7b786427a9317430a1b29cc0fe7bcce8209fc5aa7c66d077b80991b",
+      "checkpointSha256": "e5a3f5b4d13b7158ff4e71c0757cc5fd6ad303d035b81bf631f5b388b73cd7e7",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Keep candidate REJECTED and prototype-only. V149 tested one continuous native-cloth solve for all six skirt panels. The prior separate-shell split is no longer visible, but the unified solve creates severe over-draping, ballooning and a broken hem, while crouch/sit thigh coverage remains low and thigh-cover shells are visibly exposed. Do not repeat seam synchronization or treat unity of the cloth object as success. Replace the skirt deformation approach with a controlled authored pleat/panel surface that preserves the designed hem through pose deformation; reduce dependence on unconstrained cloth simulation for the broad skirt panels. Separately revise the shorts/thigh-cover cut to improve crouch/sit coverage, and resolve torso/hip surface artifacts before another appearance review. All changes remain prototype-only; fit, UV, materials, Shape Keys, Unity, VRChat, package and release are independent unverified gates."
+      "nextAction": "Keep candidate REJECTED and prototype-only. V150 removes severe native-cloth ballooning by evaluating the authored six-panel overskirt through armature skinning, but the result loses visible pleat character and still has side faceting/hem irregularity. Keep this method as a diagnostic candidate only; next improve the authored panel geometry and targeted weights so pleats remain readable without returning to broad unconstrained cloth. Separately redesign the shorts/thigh-cover shell cut and coverage for crouch and sit, and correct torso/waist surface artifacts and prone intersections. Rebuild and directly review all eleven poses after changes. Fit, UV, materials, Shape Keys, Unity, VRChat, package and release remain independent unverified gates."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
@@ -134,22 +134,27 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "53910fa0723ba21736555b4e4f24f520e1719286d2011f124e03448f912d0d61",
+      "sha256": "6de9e3d1358d1d360f2656ce46fead7e60fbd2b444756772881432ad67cc5e69",
       "findings": [
         {
-          "code": "UNIFIED_SKIRT_CLOTH_OVERDRAPE_FAIL",
-          "severity": "BLOCKER",
-          "description": "Direct inspection of all eleven V149 images shows that grouping all six overskirt panels into one native-cloth solve removes the prior separately simulated shell, but produces extreme ballooning and dense, irregular folds in front, back, three-quarter and pose views. The skirt hem is jagged and its authored pleat silhouette is not readable. This is a visible failure of the unified cloth hypothesis, not a seam-continuity issue."
+          "code": "AUTHORED_SKIRT_PLEAT_SILHOUETTE_FAIL",
+          "description": "Direct inspection of all eleven V150 views shows the broad cloth ballooning from V149 is removed, but the neutral/front/back/side and arm-pose skirt reads as a plain, smooth A-line shell with no legible pleat rhythm. Side views show large faceted folds and a hard, uneven hem junction; the authored-panel skinning hypothesis does not yet preserve a convincing pleated garment appearance.",
+          "severity": "BLOCKER"
         },
         {
-          "code": "SKIRT_POSE_COVERAGE_FAIL",
-          "severity": "BLOCKER",
-          "description": "Pose-matched geometry remains inadequate. Overskirt upper-thigh coverage is 0.263 left / 0.268 right in crouch and 0.169 / 0.173 in sit; the fitted under-shorts cover only 0.642 per side in crouch and 0.638 per side in sit. Direct crouch and sit views expose large block-like thigh-cover surfaces as the skirt lifts and folds away. These measurements are diagnostic only and are not a fit pass."
+          "code": "SHORTS_POSE_COVERAGE_FAIL",
+          "description": "Crouch and sit views expose oversized hard-edged shorts/thigh-cover shells across the upper legs while the skirt lifts and falls away behind the thighs. Pose-matched upper-thigh coverage is still only 0.371 per side in crouch and 0.271 per side in sit for the overskirt; shorts cover 0.642 and 0.638 per side respectively. These are geometry diagnostics only and do not establish fit.",
+          "severity": "BLOCKER"
         },
         {
           "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-          "severity": "BLOCKER",
-          "description": "Angular triangular surface artifacts across the torso and an abrupt waist-to-hip shelf remain visible in front, side, three-quarter, arm-cross and crouch views. This independent appearance defect remains unresolved."
+          "description": "Angular triangular patches and abrupt surface transitions remain visible across the torso and waist/hip in front, three-quarter, side, neutral and arm-cross views. This independent surface-quality blocker persists.",
+          "severity": "BLOCKER"
+        },
+        {
+          "code": "PRONE_DEFORMATION_FAIL",
+          "description": "The prone render shows the garment and limbs intersecting/overlapping into a compact pile around the pelvis and chest; silhouette and surface continuity are not acceptable in this required pose.",
+          "severity": "BLOCKER"
         }
       ],
       "grantsQualityAcceptance": false
@@ -160,33 +165,38 @@
     "decision": "REJECT",
     "findings": [
       {
-        "code": "UNIFIED_SKIRT_CLOTH_OVERDRAPE_FAIL",
-        "severity": "BLOCKER",
-        "description": "Direct inspection of all eleven V149 images shows that grouping all six overskirt panels into one native-cloth solve removes the prior separately simulated shell, but produces extreme ballooning and dense, irregular folds in front, back, three-quarter and pose views. The skirt hem is jagged and its authored pleat silhouette is not readable. This is a visible failure of the unified cloth hypothesis, not a seam-continuity issue."
+        "code": "AUTHORED_SKIRT_PLEAT_SILHOUETTE_FAIL",
+        "description": "Direct inspection of all eleven V150 views shows the broad cloth ballooning from V149 is removed, but the neutral/front/back/side and arm-pose skirt reads as a plain, smooth A-line shell with no legible pleat rhythm. Side views show large faceted folds and a hard, uneven hem junction; the authored-panel skinning hypothesis does not yet preserve a convincing pleated garment appearance.",
+        "severity": "BLOCKER"
       },
       {
-        "code": "SKIRT_POSE_COVERAGE_FAIL",
-        "severity": "BLOCKER",
-        "description": "Pose-matched geometry remains inadequate. Overskirt upper-thigh coverage is 0.263 left / 0.268 right in crouch and 0.169 / 0.173 in sit; the fitted under-shorts cover only 0.642 per side in crouch and 0.638 per side in sit. Direct crouch and sit views expose large block-like thigh-cover surfaces as the skirt lifts and folds away. These measurements are diagnostic only and are not a fit pass."
+        "code": "SHORTS_POSE_COVERAGE_FAIL",
+        "description": "Crouch and sit views expose oversized hard-edged shorts/thigh-cover shells across the upper legs while the skirt lifts and falls away behind the thighs. Pose-matched upper-thigh coverage is still only 0.371 per side in crouch and 0.271 per side in sit for the overskirt; shorts cover 0.642 and 0.638 per side respectively. These are geometry diagnostics only and do not establish fit.",
+        "severity": "BLOCKER"
       },
       {
         "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-        "severity": "BLOCKER",
-        "description": "Angular triangular surface artifacts across the torso and an abrupt waist-to-hip shelf remain visible in front, side, three-quarter, arm-cross and crouch views. This independent appearance defect remains unresolved."
+        "description": "Angular triangular patches and abrupt surface transitions remain visible across the torso and waist/hip in front, three-quarter, side, neutral and arm-cross views. This independent surface-quality blocker persists.",
+        "severity": "BLOCKER"
+      },
+      {
+        "code": "PRONE_DEFORMATION_FAIL",
+        "description": "The prone render shows the garment and limbs intersecting/overlapping into a compact pile around the pelvis and chest; silhouette and surface continuity are not acceptable in this required pose.",
+        "severity": "BLOCKER"
       }
     ],
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "eb5cdde9882ef8489a0dcef0d0e2a77719f1452899c06d33b65b93b267358f5e",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "9c68cfe2b416a68dcf0b90d2a48b687e3e781809adad28e6c221f18614ef38bb",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "42b0f435cb16a7307af940443f76b24fea1fdd9a00aef8c9f21c8f35a75e7155",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "c2dc467b26a277ce6d568a99d530bee1c37906a48b30cae38b703637555985b7",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "3c7a06336cbde223cddab4e57c69535a4b3299d8db60f8fefc67dc4fe0ece05a",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "719bd153febcad15ceec3803664c96e699ff6efe2a57f5aecaf0c9d83eb08f48",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "883327faa4f7e14491da25609a567869498d2241eee6f84ff0d0d78690722bd0",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "a5772be17c583f211fb8250233eae0bf3c9bfc71dd60d528e3fadb90809f7c5b",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "95c41515a30ea625a6c8c4267f2bf5029d6836b27c585b465f6eda92964d1c2a",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "dd493311ff1fb5699a75503191c7eb077fd5ee0cb04b9ce2d0d7e3457045688f",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "8ce3c5b25016a0d713a53c0cd69a456b27093ad8384239da7870277ebde57b2d"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "793dd3d8173f6395c462cac4b02173dde84c109237ded6a1c1c130c2f9bdd66d",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "bb9c61d667e402f07e05704c2c562008c294ddeb7bb90071bee9e592760ff850",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "a0ce1157a478ef0b07e0ab052c3e2e08c08949b658dfe0428c8322c4fd235728",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "bdcd2a83a9dc6de05b024c6090ebd90e0571ca7168c9727caa2b2b044cb2b57a",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "a274bcd971d6d67039a687f77df68794436b9306293f49d7f62cde39ae450d7f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "2016fd4001e0e523ac55913adbb92536acc54770512b6209b55d424afc931f4e",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "907bb9d6c4fef89e49808611b16ce1c7fa288426b651e7c268a802e9cdf7b96c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "667e3bceaf04cafdccec6fab61335565d25d33fadef40d872cb639f6163d3c27",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "2f7101213dc4a4c14a59d46e724b3b5b50585226a67a8bcee8a5043d93590354",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "9a2dfc8f2dd00b852718176ab1a6581495766c9f387fed0a4f327a3e30979a54",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "bacd3e1176f19ca3de81048f604a0872722eb99e740af782e2351e0f193394dd"
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"

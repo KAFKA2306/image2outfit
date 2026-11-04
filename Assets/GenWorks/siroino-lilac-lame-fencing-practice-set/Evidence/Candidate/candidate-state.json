@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v149-unified-six-panel-skirt-cloth-solve-20261105",
+  "revision": "v150-authored-armature-preserved-overskirt-20261105",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,24 @@
   },
   "blockingFindings": [
     {
-      "code": "UNIFIED_SKIRT_CLOTH_OVERDRAPE_FAIL",
-      "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven V149 images shows that grouping all six overskirt panels into one native-cloth solve removes the prior separately simulated shell, but produces extreme ballooning and dense, irregular folds in front, back, three-quarter and pose views. The skirt hem is jagged and its authored pleat silhouette is not readable. This is a visible failure of the unified cloth hypothesis, not a seam-continuity issue."
+      "code": "AUTHORED_SKIRT_PLEAT_SILHOUETTE_FAIL",
+      "description": "Direct inspection of all eleven V150 views shows the broad cloth ballooning from V149 is removed, but the neutral/front/back/side and arm-pose skirt reads as a plain, smooth A-line shell with no legible pleat rhythm. Side views show large faceted folds and a hard, uneven hem junction; the authored-panel skinning hypothesis does not yet preserve a convincing pleated garment appearance.",
+      "severity": "BLOCKER"
     },
     {
-      "code": "SKIRT_POSE_COVERAGE_FAIL",
-      "severity": "BLOCKER",
-      "description": "Pose-matched geometry remains inadequate. Overskirt upper-thigh coverage is 0.263 left / 0.268 right in crouch and 0.169 / 0.173 in sit; the fitted under-shorts cover only 0.642 per side in crouch and 0.638 per side in sit. Direct crouch and sit views expose large block-like thigh-cover surfaces as the skirt lifts and folds away. These measurements are diagnostic only and are not a fit pass."
+      "code": "SHORTS_POSE_COVERAGE_FAIL",
+      "description": "Crouch and sit views expose oversized hard-edged shorts/thigh-cover shells across the upper legs while the skirt lifts and falls away behind the thighs. Pose-matched upper-thigh coverage is still only 0.371 per side in crouch and 0.271 per side in sit for the overskirt; shorts cover 0.642 and 0.638 per side respectively. These are geometry diagnostics only and do not establish fit.",
+      "severity": "BLOCKER"
     },
     {
       "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "severity": "BLOCKER",
-      "description": "Angular triangular surface artifacts across the torso and an abrupt waist-to-hip shelf remain visible in front, side, three-quarter, arm-cross and crouch views. This independent appearance defect remains unresolved."
+      "description": "Angular triangular patches and abrupt surface transitions remain visible across the torso and waist/hip in front, three-quarter, side, neutral and arm-cross views. This independent surface-quality blocker persists.",
+      "severity": "BLOCKER"
+    },
+    {
+      "code": "PRONE_DEFORMATION_FAIL",
+      "description": "The prone render shows the garment and limbs intersecting/overlapping into a compact pile around the pelvis and chest; silhouette and surface continuity are not acceptable in this required pose.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V147 direct inspection showed that the separately simulated front panels crumpled and separated from the main shell in posed views. Trace evidence identified two gaps: split canonical seam copies are independently weighted by object-local profiles after cloth baking, and the pose coverage diagnostic omits the front-coverage pieces. V148 records and reconciles canonical shared seam positions/weights after transfer, and includes those pieces in pose-matched skirt coverage measurements. Rebuild and inspect the hash-bound eleven views; this is a prototype continuity hypothesis only.",
-  "designRevision": "v149-unified-six-panel-skirt-cloth-solve-20261105",
+  "target": "V149 direct inspection rejects the unified six-panel native-cloth solve for extreme over-drape and broken hem, while crouch/sit coverage remains low. V150 tests the existing authored pleat-panel surface under shape-preserving armature skinning instead of cloth simulation for the broad overskirt. This is a deformation-method experiment only; shorts coverage and torso/hip artifacts remain blockers.",
+  "designRevision": "v150-authored-armature-preserved-overskirt-20261105",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -140,8 +140,7 @@
   "clothSimulation": {
     "applicability": "REQUIRED",
     "components": [
-      "jacket-sleeves",
-      "pleated-overskirt"
+      "jacket-sleeves"
     ],
     "prototypePanelGroups": {
       "jacket-sleeves": [
@@ -157,10 +156,12 @@
         "overskirt-front-lap-right"
       ]
     },
-    "nonClothDeformationPaths": {},
+    "nonClothDeformationPaths": {
+      "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
+    },
     "prototypeFrameEnd": 48,
-    "evidence": "V149 places all six sewn overskirt panels, including both front laps, in one native-cloth mesh solve. Internal front-lap seams therefore share the same simulated mesh vertices and solver instead of crossing between separately simulated and armature-only components. The waist remains provisionally pinned; the generated neutral/pose solve is a topology and deformation hypothesis only. Seam shape, coverage, fit, folds, appearance and release remain unapproved.",
-    "reason": "V148 confirmed duplicated seam positions and weights but direct images still show the separate front cloth component crumpled/opening away from the authored armature shell. V149 changes the skirt deformation topology: simulate the complete six-panel sewn skirt as one continuous cloth component, retaining the declared waist pin, so front-lap-to-shell connections are within one evaluated mesh/cloth solve. This is not another shared-weight or coverage-diagnostic retry. Fit, motion, seam quality, appearance and release remain unapproved.",
+    "evidence": "V150 leaves the complete six-panel authored overskirt in one canonical geometry group, but removes the broad panels from native-cloth solving. The authored pleat shape is preserved as rest geometry and is evaluated through the existing armature-skinning path. Jacket sleeves remain in required cloth processing. This tests whether unconstrained cloth was the source of V149 ballooning; appearance, fit, poses, hem, weights and release remain unapproved.",
+    "reason": "V149 unified native cloth across all six overskirt panels to remove inter-component seam separation, but direct images show severe ballooning and a broken hem. V150 changes the deformation method rather than tuning the failed solve: keep the six-panel pattern geometry unified and use the declared authored-panel-shape-preserving-armature-skinning path for the overskirt. Do not add a cloth modifier to pleated-overskirt. Regenerate all garment evidence and directly inspect current poses. Shorts coverage, torso/hip artifacts, fit and release remain independent blockers.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
