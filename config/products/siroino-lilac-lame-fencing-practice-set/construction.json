@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V150 direct inspection rejects a plain, faceted A-line skirt with weak pleat readability; shorts shells and torso/prone artifacts also remain. V151 retains V150 authored armature deformation, increasing only panel-local sewn pleat relief from 30 mm to 40 mm to test whether folds read clearly without returning to unconstrained cloth simulation. Other blockers remain.",
-  "designRevision": "v151-increased-authored-panel-pleat-relief-20261105",
+  "target": "V151 direct review showed that 40 mm radial relief still renders as a smooth A-line. V152 keeps relief magnitude fixed and changes the sewn panel fold profile only: narrow the recessed seam valley, increase valley contrast, and extend the sloped shoulder so the fold reads as a crease rather than a broad flat face. Existing coverage, torso, and prone blockers remain.",
+  "designRevision": "v152-creased-panel-pleat-profile-20261105",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -160,8 +160,8 @@
       "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V151 retains the V150 armature-skinned six-panel skirt and sleeve cloth solve, while the canonical assembly-pose input raises authored panel-local fold relief to 40 mm. The geometry change is regenerated and checked against required views; it is not fit or appearance acceptance.",
-    "reason": "V150 removed native-cloth ballooning but the directly reviewed skirt read as a plain, faceted shell with weak pleat character. V151 tests a bounded increase in sewn panel-local radial pleat relief from 30 mm to 40 mm, leaving the non-cloth armature deformation method, seam valleys, fold count, waist, and other cloth settings unchanged. Shorts coverage, torso/hip defects and prone deformation remain independent blockers.",
+    "evidence": "V152 reuses the V151 six-panel armature-skinned overskirt and sleeve cloth solve. It tests a sharper authored panel-local crease profile at the existing 40 mm maximum radial relief; it does not establish appearance, fit, collision or release acceptance.",
+    "reason": "V152 isolates a pleat-shape profile experiment after V151 amplitude increase did not make folds readable. Preserve the V150 armature-skinned skirt and sleeve cloth method; keep 40 mm radial relief fixed while changing valley width, valley-depth ratio and crest ramp in the canonical assembly input. Other pose and surface blockers remain independent.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
