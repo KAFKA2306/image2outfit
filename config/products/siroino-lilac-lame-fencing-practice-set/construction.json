@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V160 changes only six overskirt hem endpoints, contracting each hem spread 18% from fixed waist/side-seam correspondences. It preserves waist widths, sewn joins, 160 mm panel drop, pleat count/profile, weight setup, and pose inputs. The trial tests whether narrower hem flare improves product-scale pleat readability; appearance, fit and release remain unapproved.",
-  "designRevision": "v161-overskirt-cloth-drape-pose-response-20261106",
+  "target": "V162 keeps V161 panel construction but adds a bounded neutral-crouch-sit-prone-neutral native Cloth sweep, an animated target-body collider, and Hips-weighted shared waist-seam pins. The rest frame remains neutral; this tests whether the solver receives moving-body and moving-waist inputs. Pose fit, appearance, and release remain unapproved.",
+  "designRevision": "v162-moving-waist-cloth-pose-sweep-20261106",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -158,8 +158,21 @@
       ]
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V161 changes only the overskirt deformation path from authored panel-preserving armature skinning to a bounded native Cloth solve. Existing sewn waist vertices shared with the static waistband remain pinned; the neutral target body is the collision surface. Crouch, sit and prone are rendered after the settled rest-shape solve through existing armature skinning. The solve does not animate the body collider through those poses and is not fit, collision-safety, appearance or release acceptance.",
-    "reason": "V161 isolates the skirt pose-response dependency after direct review showed a rigid radial fan in prone and skirt separation around bent thighs in crouch/sit. Preserve V160 panel geometry, waist seam, folds, skirt weights, jacket construction and sleeve-cloth settings; send only the six-panel overskirt through native cloth with the sewn waistband seam as its fixed attachment and the neutral avatar as collision surface. Inspect fresh neutral, crouch, sit and prone renders; this neutral-rest solve plus skinned pose snapshots does not prove a continuous moving-body collision solve.",
+    "poseResponseTrial": {
+      "component": "pleated-overskirt",
+      "attachmentBone": "Hips",
+      "collisionBody": "SiroinoSotai_PC",
+      "poseSweep": [
+        { "frame": 1, "pose": "neutral" },
+        { "frame": 16, "pose": "crouch" },
+        { "frame": 32, "pose": "sit" },
+        { "frame": 40, "pose": "prone" },
+        { "frame": 48, "pose": "neutral" }
+      ],
+      "evidenceBoundary": "Prototype-only Blender Cloth timeline with the actual target armature driving the collision body and the shared overskirt waist pins before Cloth evaluation. Posed customer renders continue to use the exported rest-shape skinning path; this trial does not create runtime cloth, and does not prove fit or collision safety."
+    },
+    "evidence": "V162 adds an animated target-body collider and Hips-weighted shared waistband pins before Cloth evaluation for a bounded neutral-crouch-sit-prone-neutral sweep. The saved garment remains the neutral end frame after the solve. Pose samples bind evaluated avatar, garment, and pin coordinates. Posed product renders still use armature skinning; this does not export runtime cloth or grant fit, appearance, or release acceptance.",
+    "reason": "V161's direct review rejected severe skirt pleat collapse and identified that its target collision body was static while the garment waist pins were fixed in world space. V162 isolates those missing inputs without changing the jacket, shorts, pattern seams, panel count, or authored pleat layout. Check real body-pose and Hips-pin motion across a continuous native Cloth cache, then directly inspect the fresh neutral and posed product renders. The sweep is prototype diagnostics only, not a fit, coverage, collision-safety, appearance, or release pass.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,

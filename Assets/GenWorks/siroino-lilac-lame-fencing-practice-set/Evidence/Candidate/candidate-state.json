@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v161-overskirt-cloth-drape-pose-response-20261106",
+  "revision": "v162-moving-waist-cloth-pose-sweep-20261106",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of all eleven fresh V161 renders: native cloth settling replaces the authored broad radial fan with severe, irregular crumpling. Neutral, three-quarter, front, back and side views show sharp uneven folds and a rumpled hem instead of a clean structured pleated silhouette; prone remains a bunched blanket-like sheet. Appearance remains rejected.",
+      "description": "Directly inspected all eleven fresh V162 renders. The overskirt remains severely crumpled with irregular sharp folds and a lumpy hem; the authored pleat silhouette is not preserved, and the back/side views show the skirt lifting to expose much of the shorts.",
       "severity": "BLOCKER",
-      "code": "OVERSKIRT_CLOTH_SETTLE_LOSES_AUTHORED_PLEAT_SILHOUETTE"
+      "code": "OVERSKIRT_CLOTH_SOLVE_STILL_DESTROYS_PLEAT_SILHOUETTE"
     },
     {
-      "description": "Crouch, sit and prone are armature-skinned snapshots after a neutral-rest cloth bake. The avatar collision body did not move through these poses during the cloth solve. Fresh crouch and sit renders still show abrupt upper-thigh cover edges and separated skirt faces around bent legs, so continuous body collision, coverage and fit remain unverified.",
+      "description": "Crouch, sit, prone and arm-cross renders still read as upright or otherwise fail to show the named pose. Cloth evidence records an actual five-frame animated body/waist-pin cache and distinct body hashes, but current renders are the neutral end shape followed by the separate skinning path; they do not show cache-frame drape or collision safety.",
       "severity": "BLOCKER",
-      "code": "POSE_COLLISION_AND_COVERAGE_NOT_PROVEN"
+      "code": "POSE_CACHE_RESPONSE_NOT_REPRESENTED_IN_POSE_RENDERS"
     },
     {
-      "description": "Fresh neutral and three-quarter views retain gray/pinched patches on the lower jacket and a rough, uneven jacket-to-waistband transition. This experiment changed the skirt deformation path only and did not address torso/waist surface artifacts.",
+      "description": "Fresh renders show sleeves detached or hanging away from the arms in some views, together with gray/pinched lower-jacket patches and an uneven jacket-to-waistband transition.",
       "severity": "BLOCKER",
-      "code": "TORSO_WAIST_ARTIFACTS_REMAIN"
+      "code": "LOWER_JACKET_WAIST_ARTIFACTS_REMAIN"
     }
   ],
   "failedGeometryChecks": [

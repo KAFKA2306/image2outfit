@@ -340,6 +340,52 @@
           "minimum": 2,
           "maximum": 120
         },
+        "poseResponseTrial": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "component",
+            "attachmentBone",
+            "collisionBody",
+            "poseSweep",
+            "evidenceBoundary"
+          ],
+          "properties": {
+            "component": {
+              "const": "pleated-overskirt"
+            },
+            "attachmentBone": {
+              "const": "Hips"
+            },
+            "collisionBody": {
+              "const": "SiroinoSotai_PC"
+            },
+            "poseSweep": {
+              "type": "array",
+              "minItems": 3,
+              "uniqueItems": true,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["frame", "pose"],
+                "properties": {
+                  "frame": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 120
+                  },
+                  "pose": {
+                    "enum": ["neutral", "crouch", "sit", "prone"]
+                  }
+                }
+              }
+            },
+            "evidenceBoundary": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
         "prototypeWaistPinUpperFraction": {
           "type": "number",
           "minimum": 0.01,

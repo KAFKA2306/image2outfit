@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import json
 import math
+import struct
 import sys
 from pathlib import Path
 
@@ -181,7 +182,10 @@ def ensure_collision(body: bpy.types.Object) -> None:
 
 
 def configure_cloth(
-    obj: bpy.types.Object, frame_end: int, bending_stiffness: float = 0.45
+    obj: bpy.types.Object,
+    frame_end: int,
+    bending_stiffness: float = 0.45,
+    dynamic_mesh: bool = False,
 ) -> dict[str, object]:
     for modifier in list(obj.modifiers):
         if modifier.name.startswith("Image2Outfit Cloth"):
@@ -203,6 +207,7 @@ def configure_cloth(
     cloth.settings.air_damping = 3.0
     cloth.settings.vertex_group_mass = pin.name
     cloth.settings.pin_stiffness = 1.0
+    cloth.settings.use_dynamic_mesh = dynamic_mesh
     cloth.collision_settings.use_collision = True
     cloth.collision_settings.collision_quality = 5
     cloth.collision_settings.distance_min = 0.003
@@ -216,7 +221,58 @@ def configure_cloth(
         "pinVertexCount": len(vertices),
         "frameStart": 1,
         "frameEnd": frame_end,
+        "dynamicMesh": dynamic_mesh,
     }
+
+
+def keyframe_pose_sweep(
+    armature: bpy.types.Object,
+    sweep: list[dict[str, object]],
+    frame_end: int,
+) -> list[dict[str, object]]:
+    """Animate the collision body through a bounded pose sweep and return samples."""
+    tool_path = str(ROOT / "tools")
+    if tool_path not in sys.path:
+        sys.path.insert(0, tool_path)
+    from genworks_product_common import reset_pose, set_pose
+
+    if (
+        len(sweep) < 3
+        or sweep[0] != {"frame": 1, "pose": "neutral"}
+        or sweep[-1] != {"frame": frame_end, "pose": "neutral"}
+        or any(
+            not isinstance(sample.get("frame"), int)
+            or sample["frame"] < 1
+            or sample["frame"] > frame_end
+            or sample.get("pose") not in {"neutral", "crouch", "sit", "prone"}
+            for sample in sweep
+        )
+        or any(sweep[index]["frame"] >= sweep[index + 1]["frame"] for index in range(len(sweep) - 1))
+    ):
+        raise ValueError("pose sweep must be ordered, bounded, and neutral at both ends")
+    armature.animation_data_clear()
+    for sample in sweep:
+        frame, pose_name = sample["frame"], sample["pose"]
+        bpy.context.scene.frame_set(frame)
+        if pose_name == "prone":
+            reset_pose(armature)
+            armature.pose.bones["Hips"].rotation_euler.x = math.pi / 2
+            bpy.context.view_layer.update()
+        else:
+            set_pose(armature, pose_name)
+        for bone in armature.pose.bones:
+            bone.keyframe_insert(data_path="rotation_euler", frame=frame, group=bone.name)
+            bone.keyframe_insert(data_path="location", frame=frame, group=bone.name)
+            bone.keyframe_insert(data_path="scale", frame=frame, group=bone.name)
+    action = armature.animation_data.action if armature.animation_data else None
+    if action is None:
+        raise RuntimeError("pose sweep did not create an armature action")
+    for curve in action.fcurves:
+        for point in curve.keyframe_points:
+            point.interpolation = "LINEAR"
+    bpy.context.scene.frame_set(1)
+    bpy.context.view_layer.update()
+    return [dict(sample) for sample in sweep]
 
 
 def bake_components(
@@ -578,6 +634,24 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     vertex_sets = {
         name: {v for i in ids for v in faces[i]} for name, ids in selected_faces.items()
     }
+    pose_response = policy.get("poseResponseTrial")
+    pose_armature = None
+    if pose_response is not None:
+        if (
+            pose_response.get("component") != "pleated-overskirt"
+            or pose_response.get("attachmentBone") != "Hips"
+            or pose_response.get("collisionBody") != "SiroinoSotai_PC"
+        ):
+            raise ValueError(
+                "pose-response trial must name the measured skirt, Hips, and target body"
+            )
+        pose_armature = bpy.data.objects.get("Armature")
+        if pose_armature is None or pose_armature.type != "ARMATURE":
+            raise ValueError("pose-response trial requires the target Siroino armature")
+        if pose_response.get("evidenceBoundary") != construction["clothSimulation"][
+            "poseResponseTrial"
+        ]["evidenceBoundary"]:
+            raise ValueError("pose-response evidence boundary did not survive policy load")
     for name, indices in selected_faces.items():
         ids = sorted(vertex_sets[name])
         remap = {value: index for index, value in enumerate(ids)}
@@ -721,6 +795,30 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                     )
             pins = obj.vertex_groups.new(name="Image2Outfit Cloth Pin")
             pins.add(pin_ids, 1.0, "REPLACE")
+            if pose_response is not None and name == pose_response["component"]:
+                if not pin_ids:
+                    raise ValueError("moving waistband attachment has no pin vertices")
+                attachment = obj.vertex_groups.new(name="Image2Outfit Waist Attachment")
+                attachment.add(pin_ids, 1.0, "REPLACE")
+                hips = obj.vertex_groups.new(name=pose_response["attachmentBone"])
+                hips.add(pin_ids, 1.0, "REPLACE")
+                armature_modifier = obj.modifiers.new(
+                    "Image2Outfit Moving Waist Attachment", "ARMATURE"
+                )
+                armature_modifier.object = pose_armature
+                armature_modifier.use_vertex_groups = True
+                obj["poseResponseAttachment"] = json.dumps(
+                    {
+                        "method": "shared-waist-seam-pins-skinned-to-Hips-before-Cloth",
+                        "attachmentBone": pose_response["attachmentBone"],
+                        "pinVertexCount": len(pin_ids),
+                        "armatureModifierPrecedesCloth": True,
+                        "grantsFitAcceptance": False,
+                    }
+                )
+                pose_response["attachmentContract"] = json.loads(
+                    obj["poseResponseAttachment"]
+                )
     seam_positions_after_split = shared_seam_position_diagnostic("component-split")
     bpy.data.objects.remove(original, do_unlink=True)
     bodies = [
@@ -855,6 +953,10 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     scene = bpy.context.scene
     scene.frame_start, scene.frame_end = 1, frame_end
     scene.gravity = (0, 0, -4.5)
+    if pose_response is not None:
+        pose_sweep = keyframe_pose_sweep(
+            pose_armature, pose_response["poseSweep"], frame_end
+        )
     post_bake_smoothing = policy.get("prototypePostBakeLaplacianSmoothing", {})
     if not set(post_bake_smoothing).issubset(groups):
         raise ValueError(
@@ -875,7 +977,10 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             raise ValueError("Bending hypothesis references an unknown cloth component")
         bending_hypothesis = bending_hypotheses.get(name)
         bending_stiffness = 0.45
-        contract = configure_cloth(obj, frame_end)
+        dynamic_component = (
+            pose_response is not None and name == pose_response["component"]
+        )
+        contract = configure_cloth(obj, frame_end, dynamic_mesh=dynamic_component)
         modifier = obj.modifiers["Image2Outfit Cloth"]
         if bending_hypothesis is not None:
             value = bending_hypothesis.get("stiffness")
@@ -980,7 +1085,12 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             control.data = obj.data.copy()
             control.name = name + "-basis-rest-control"
             bpy.context.collection.objects.link(control)
-            configure_cloth(control, frame_end, bending_stiffness)
+            configure_cloth(
+                control,
+                frame_end,
+                bending_stiffness,
+                dynamic_mesh=dynamic_component,
+            )
             control_modifier = control.modifiers["Image2Outfit Cloth"]
             control_modifier.settings.rest_shape_key = (
                 control.data.shape_keys.key_blocks[0]
@@ -998,6 +1108,52 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     scene.frame_set(1)
     bpy.context.view_layer.update()
     bpy.ops.ptcache.bake_all(bake=True)
+    pose_samples = []
+    if pose_response is not None:
+        skirt = objects[pose_response["component"]]
+        pin_group = skirt.vertex_groups["Image2Outfit Cloth Pin"]
+        pin_ids = [
+            vertex.index
+            for vertex in skirt.data.vertices
+            if any(group.group == pin_group.index and group.weight > 0 for group in vertex.groups)
+        ]
+        neutral_pin_positions = None
+        for sample in pose_sweep:
+            scene.frame_set(sample["frame"])
+            bpy.context.view_layer.update()
+            evaluated_skirt = skirt.evaluated_get(bpy.context.evaluated_depsgraph_get())
+            evaluated_mesh = evaluated_skirt.to_mesh()
+            pin_positions = [
+                evaluated_skirt.matrix_world @ evaluated_mesh.vertices[index].co
+                for index in pin_ids
+            ]
+            if neutral_pin_positions is None:
+                neutral_pin_positions = pin_positions
+            pin_displacements = [
+                (current - neutral).length
+                for current, neutral in zip(pin_positions, neutral_pin_positions)
+            ]
+            pin_bytes = b"".join(
+                struct.pack("<3d", point.x, point.y, point.z)
+                for point in pin_positions
+            )
+            evaluated_skirt.to_mesh_clear()
+            pose_samples.append(
+                {
+                    **sample,
+                    "targetBodyEvaluatedMeshSha256": mesh_hash(body, evaluated=True),
+                    "overskirtEvaluatedMeshSha256": mesh_hash(skirt, evaluated=True),
+                    "waistPinWorldCoordinatesSha256": hashlib.sha256(pin_bytes).hexdigest(),
+                    "waistPinMaxDisplacementFromNeutralM": max(pin_displacements, default=0.0),
+                    "targetBodyDynamicMesh": skirt.modifiers[
+                        "Image2Outfit Cloth"
+                    ].settings.use_dynamic_mesh,
+                }
+            )
+        if len({sample["targetBodyEvaluatedMeshSha256"] for sample in pose_samples}) < 4:
+            raise RuntimeError("animated target body did not produce all declared pose states")
+        if max(sample["waistPinMaxDisplacementFromNeutralM"] for sample in pose_samples) < 0.01:
+            raise RuntimeError("Hips-weighted Cloth pins did not follow the animated waist")
     scene.frame_set(frame_end)
     bpy.context.view_layer.update()
     for name, control in rest_controls.items():
@@ -1058,6 +1214,11 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         if not modifier.point_cache.is_baked:
             raise RuntimeError("native cloth cache did not bake")
         evaluated = mesh_hash(obj, evaluated=True)
+        if pose_response is not None and obj.name == pose_response["component"]:
+            contract["poseResponseSamples"] = pose_samples
+            contract["poseResponseEvidenceBoundary"] = (
+                "Animated collision body and Hips-following shared waist pins were sampled from an actual native Cloth cache. The prototype exports its neutral end frame after a neutral-crouch-sit-prone-neutral sweep; posed customer renders still use armature skinning and do not export runtime Cloth. This is not fit or collision-safety acceptance."
+            )
         bpy.ops.object.select_all(action="DESELECT")
         obj.select_set(True)
         bpy.context.view_layer.objects.active = obj
@@ -1135,6 +1296,26 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         "candidatePath": str(candidate.relative_to(ROOT)).replace("\\", "/"),
         "candidateSha256": hashlib.sha256(candidate.read_bytes()).hexdigest(),
         "collisionObjects": [body.name for body in bodies],
+        "poseResponseTrial": (
+            {
+                **pose_response,
+                "sampleCount": len(pose_samples),
+                "uniqueTargetBodyPoseStates": len(
+                    {sample["targetBodyEvaluatedMeshSha256"] for sample in pose_samples}
+                ),
+                "maximumWaistPinDisplacementM": max(
+                    (
+                        sample["waistPinMaxDisplacementFromNeutralM"]
+                        for sample in pose_samples
+                    ),
+                    default=0.0,
+                ),
+                "grantsFitAcceptance": False,
+                "grantsCollisionSafetyAcceptance": False,
+            }
+            if pose_response is not None
+            else None
+        ),
         "qualityDecision": "UNVERIFIED",
         "grantsFitAcceptance": False,
         "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance.",
