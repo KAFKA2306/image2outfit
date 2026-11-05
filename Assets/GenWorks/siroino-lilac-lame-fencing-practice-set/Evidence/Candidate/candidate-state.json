@@ -19,17 +19,17 @@
   },
   "blockingFindings": [
     {
-      "description": "Directly inspected all eleven fresh V162 renders. The overskirt remains severely crumpled with irregular sharp folds and a lumpy hem; the authored pleat silhouette is not preserved, and the back/side views show the skirt lifting to expose much of the shorts.",
+      "description": "The five actual cache frames show the authored pleat silhouette collapsing into dense irregular crumpling by frame 16. The skirt remains uneven and distorted through frame 48 instead of recovering; the hem also exposes underlayers unevenly. This fails appearance and fit.",
       "severity": "BLOCKER",
       "code": "OVERSKIRT_CLOTH_SOLVE_STILL_DESTROYS_PLEAT_SILHOUETTE"
     },
     {
-      "description": "Crouch, sit, prone and arm-cross renders still read as upright or otherwise fail to show the named pose. Cloth evidence records an actual five-frame animated body/waist-pin cache and distinct body hashes, but current renders are the neutral end shape followed by the separate skinning path; they do not show cache-frame drape or collision safety.",
+      "description": "Directly inspected five native cloth-cache frame renders (1 neutral, 16 crouch, 32 sit, 40 prone, 48 neutral) with evaluated body and garment together. Frame 1 has a garment T-pose while body arms angle down. In frames 16 and 32 the body remains upright instead of matching crouch/sit and the jacket coverage is absent or displaced, exposing the torso. In frame 40 the body is horizontal while jacket remains upright and separated. This is a pose/bind or cache ordering defect, not evidence of safe pose fit.",
       "severity": "BLOCKER",
-      "code": "POSE_CACHE_RESPONSE_NOT_REPRESENTED_IN_POSE_RENDERS"
+      "code": "CLOTH_CACHE_RENDERS_CONFIRM_POSE_BIND_MISMATCH"
     },
     {
-      "description": "Fresh renders show sleeves detached or hanging away from the arms in some views, together with gray/pinched lower-jacket patches and an uneven jacket-to-waistband transition.",
+      "description": "Cache renders show garment details floating free around the body, with jacket sleeves and shoulder edges not following the posed arms, plus gray/pinched torso and lower-jacket artifacts. Rigid trim and non-cloth parts do not track the body/garment.",
       "severity": "BLOCKER",
       "code": "LOWER_JACKET_WAIST_ARTIFACTS_REMAIN"
     }

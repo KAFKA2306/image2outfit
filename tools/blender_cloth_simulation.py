@@ -22,6 +22,9 @@ from mathutils import Vector
 
 
 ROOT = Path(__file__).resolve().parents[1]
+TOOLS = ROOT / "tools"
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
 
 COMPONENTS: dict[str, tuple[str, ...]] = {
     "siroino-cyber-kawaii-large": (
@@ -273,6 +276,58 @@ def keyframe_pose_sweep(
     bpy.context.scene.frame_set(1)
     bpy.context.view_layer.update()
     return [dict(sample) for sample in sweep]
+
+
+def render_pose_response_frame(scene, product_id, sample, body, floor, camera):
+    """Render live native-cloth cache with its evaluated animated avatar body."""
+    from genworks_product_common import point_camera
+
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    render_objects = [
+        obj
+        for obj in scene.objects
+        if obj.type == "MESH" and obj != floor and obj.visible_get()
+    ]
+    if body not in render_objects:
+        raise RuntimeError("pose-cache render is missing the evaluated collision body")
+    points = [
+        obj.evaluated_get(depsgraph).matrix_world @ Vector(corner)
+        for obj in render_objects
+        for corner in obj.evaluated_get(depsgraph).bound_box
+    ]
+    if not points:
+        raise RuntimeError("pose-cache render has no evaluated mesh bounds")
+    lower = Vector(tuple(min(point[axis] for point in points) for axis in range(3)))
+    upper = Vector(tuple(max(point[axis] for point in points) for axis in range(3)))
+    center = (lower + upper) / 2
+    span = max((upper - lower).length, 0.5)
+    camera.data.ortho_scale = span * 1.12
+    direction = Vector((0.55, -1.0, 0.22)).normalized()
+    point_camera(camera, tuple(center + direction * span * 1.6), tuple(center))
+
+    cache_dir = (
+        ROOT
+        / ".image2outfit"
+        / "products"
+        / product_id
+        / "cloth"
+        / "pose-cache-frames"
+    )
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    output = cache_dir / f"frame-{int(sample['frame']):02d}-{sample['pose']}.png"
+    scene.render.filepath = str(output)
+    bpy.ops.render.render(write_still=True)
+    return {
+        "path": output.relative_to(ROOT).as_posix(),
+        "sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
+        "renderedFrame": int(scene.frame_current),
+        "renderedPose": str(sample["pose"]),
+        "renderedBodyObject": body.name,
+        "renderedBodyMeshSha256": mesh_hash(body, evaluated=True),
+        "renderedGarmentObjects": [obj.name for obj in render_objects if obj != body],
+        "grantsFitAcceptance": False,
+        "grantsCollisionSafetyAcceptance": False,
+    }
 
 
 def bake_components(
@@ -1111,6 +1166,13 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     pose_samples = []
     if pose_response is not None:
         skirt = objects[pose_response["component"]]
+        from genworks_product_common import configure_render, pastel_studio
+
+        pre_render_scene_objects = set(scene.objects.keys())
+        cache_floor, cache_camera = pastel_studio()
+        cache_floor.hide_render = True
+        configure_render(768)
+        scene.render.engine = "BLENDER_EEVEE_NEXT"
         pin_group = skirt.vertex_groups["Image2Outfit Cloth Pin"]
         pin_ids = [
             vertex.index
@@ -1121,6 +1183,14 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         for sample in pose_sweep:
             scene.frame_set(sample["frame"])
             bpy.context.view_layer.update()
+            cache_render = render_pose_response_frame(
+                scene,
+                str(job["id"]),
+                sample,
+                body,
+                cache_floor,
+                cache_camera,
+            )
             evaluated_skirt = skirt.evaluated_get(bpy.context.evaluated_depsgraph_get())
             evaluated_mesh = evaluated_skirt.to_mesh()
             pin_positions = [
@@ -1148,8 +1218,12 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                     "targetBodyDynamicMesh": skirt.modifiers[
                         "Image2Outfit Cloth"
                     ].settings.use_dynamic_mesh,
+                    "directPoseCacheRender": cache_render,
                 }
             )
+        for debug_object in list(scene.objects):
+            if debug_object.name not in pre_render_scene_objects:
+                bpy.data.objects.remove(debug_object, do_unlink=True)
         if len({sample["targetBodyEvaluatedMeshSha256"] for sample in pose_samples}) < 4:
             raise RuntimeError("animated target body did not produce all declared pose states")
         if max(sample["waistPinMaxDisplacementFromNeutralM"] for sample in pose_samples) < 0.01:

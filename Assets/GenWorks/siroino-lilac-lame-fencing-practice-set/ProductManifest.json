@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Keep V162 rejected and prototype-only. Before any more shape tuning, directly render cloth-cache frames 1, 16, 32, 40 and 48 with the corresponding evaluated avatar and garment together. Inspect why the normal pose-render path leaves crouch, sit, prone and arm-cross looking upright or invalid; fix cache/bind/rest-pose or pose-ordering only after locating the cause. Reassess the skirt pleat collapse, back coverage, sleeve placement and torso patches from those renders. Fit, collision safety, weights, complete UVs, Shape Key response, Unity/VRChat execution, packaging and release remain unverified.",
+    "nextAction": "Keep V162 rejected and prototype-only. Fix the garment/avatar rest-pose and bind/cache ordering mismatch first. Ensure non-cloth garment pieces, sleeve cuffs, rigid trims and waist pins follow their intended body or garment deformation. Then regenerate the same five native cache frames and directly inspect pose alignment, torso coverage, pleat recovery, hem and collision. Do not tune cloth shape parameters until the pose mapping is corrected. Fit, collision safety, weights, complete UVs, Shape Key response, Unity/VRChat execution, packaging and release remain unverified.",
     "lastAttempt": {
-      "runId": "fa3c255c8a784b1eb41c58dd4b6d22d0",
+      "runId": "0048322aa5094426b8e6f1b3ade1ed3b",
       "status": "EXECUTED",
-      "checkedAt": "2026-11-05T18:17:53Z",
+      "checkedAt": "2026-11-05T20:08:07Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "2f3765acacc5683d31fbd5476a4ba510782185a37711a972ef41b848a054274f",
+      "stageEvidenceSha256": "2d370a10d7870826af4d139b6985e24210c3c4a1b086333ab1e8d35d306d65b7",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -83,36 +83,36 @@
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "62e245334f71f0e24775b6e1a3fb81f49c8ba8df69b9f5a5ddbd35dc7a7e058f"
+          "stageResultSha256": "16337db0bf4445a3d544c9b8d9f00c623e38745225563181f2cfe885927c9939"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "cb4e3fc80aedd4407479b39b04d8404deba5792b1747d66007d5cd634fd1172a"
+          "stageResultSha256": "a122b657b13a70bf226514c7beae2647ab5bd5229678bb138c277ed00ad0e244"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "9ae9c814359565d58bf94177cd65f9d90fa0e4c32cbfabd62f2e5f6a157e248e"
+          "stageResultSha256": "8f47830137f1982aaa4b30ea8fa0501f0a014808fe2f2000e8ce6cbd9c6d9cf4"
         },
         "audit-geometry": {
           "status": "REUSED",
-          "stageResultSha256": "79ddd082c9d3b62d0a83dd0a09c3ae69466f46f6b7f86a4278c09091b70d422d"
+          "stageResultSha256": "c6cf8f6dcde7b622094785681d125aeadc8ee1c3ba0ab93d290bd283f1de3f1e"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "0dafc482a3dbb490ff684481b2cfeb67861eee1fcbea7ec1bf463f1ce3b1f4ae"
+          "stageResultSha256": "42f73d273abe75596a5b3d24afadebce59fa96fd85b96062d2a4e918bac3bf49"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "2f3765acacc5683d31fbd5476a4ba510782185a37711a972ef41b848a054274f"
+          "stageResultSha256": "2d370a10d7870826af4d139b6985e24210c3c4a1b086333ab1e8d35d306d65b7"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "08e887e1d8935d50f2d695ea31991307ea5c582571fbde098d20e942428e23bd",
+      "checkpointSha256": "c2f9f65a2f31b57bcfc6f2f7561cdd0fa3b9bd2965772c99ab8f268af561364d",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Keep V162 rejected and prototype-only. Before any more shape tuning, directly render cloth-cache frames 1, 16, 32, 40 and 48 with the corresponding evaluated avatar and garment together. Inspect why the normal pose-render path leaves crouch, sit, prone and arm-cross looking upright or invalid; fix cache/bind/rest-pose or pose-ordering only after locating the cause. Reassess the skirt pleat collapse, back coverage, sleeve placement and torso patches from those renders. Fit, collision safety, weights, complete UVs, Shape Key response, Unity/VRChat execution, packaging and release remain unverified."
+      "nextAction": "Keep V162 rejected and prototype-only. Fix the garment/avatar rest-pose and bind/cache ordering mismatch first. Ensure non-cloth garment pieces, sleeve cuffs, rigid trims and waist pins follow their intended body or garment deformation. Then regenerate the same five native cache frames and directly inspect pose alignment, torso coverage, pleat recovery, hem and collision. Do not tune cloth shape parameters until the pose mapping is corrected. Fit, collision safety, weights, complete UVs, Shape Key response, Unity/VRChat execution, packaging and release remain unverified."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
@@ -135,20 +135,20 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "f9713cee57d5b6d6f5206d272a450e8700ed665abebccfbf2ba0e524b9927771",
+      "sha256": "25630e5f4b2087608c03820c7695afd1be1d6a47c403c406d3bfaf2f842a3cf9",
       "findings": [
         {
-          "description": "Directly inspected all eleven fresh V162 renders. The overskirt remains severely crumpled with irregular sharp folds and a lumpy hem; the authored pleat silhouette is not preserved, and the back/side views show the skirt lifting to expose much of the shorts.",
+          "description": "The five actual cache frames show the authored pleat silhouette collapsing into dense irregular crumpling by frame 16. The skirt remains uneven and distorted through frame 48 instead of recovering; the hem also exposes underlayers unevenly. This fails appearance and fit.",
           "severity": "BLOCKER",
           "code": "OVERSKIRT_CLOTH_SOLVE_STILL_DESTROYS_PLEAT_SILHOUETTE"
         },
         {
-          "description": "Crouch, sit, prone and arm-cross renders still read as upright or otherwise fail to show the named pose. Cloth evidence records an actual five-frame animated body/waist-pin cache and distinct body hashes, but current renders are the neutral end shape followed by the separate skinning path; they do not show cache-frame drape or collision safety.",
+          "description": "Directly inspected five native cloth-cache frame renders (1 neutral, 16 crouch, 32 sit, 40 prone, 48 neutral) with evaluated body and garment together. Frame 1 has a garment T-pose while body arms angle down. In frames 16 and 32 the body remains upright instead of matching crouch/sit and the jacket coverage is absent or displaced, exposing the torso. In frame 40 the body is horizontal while jacket remains upright and separated. This is a pose/bind or cache ordering defect, not evidence of safe pose fit.",
           "severity": "BLOCKER",
-          "code": "POSE_CACHE_RESPONSE_NOT_REPRESENTED_IN_POSE_RENDERS"
+          "code": "CLOTH_CACHE_RENDERS_CONFIRM_POSE_BIND_MISMATCH"
         },
         {
-          "description": "Fresh renders show sleeves detached or hanging away from the arms in some views, together with gray/pinched lower-jacket patches and an uneven jacket-to-waistband transition.",
+          "description": "Cache renders show garment details floating free around the body, with jacket sleeves and shoulder edges not following the posed arms, plus gray/pinched torso and lower-jacket artifacts. Rigid trim and non-cloth parts do not track the body/garment.",
           "severity": "BLOCKER",
           "code": "LOWER_JACKET_WAIST_ARTIFACTS_REMAIN"
         }
@@ -161,33 +161,33 @@
     "decision": "REJECT",
     "findings": [
       {
-        "description": "Directly inspected all eleven fresh V162 renders. The overskirt remains severely crumpled with irregular sharp folds and a lumpy hem; the authored pleat silhouette is not preserved, and the back/side views show the skirt lifting to expose much of the shorts.",
+        "description": "The five actual cache frames show the authored pleat silhouette collapsing into dense irregular crumpling by frame 16. The skirt remains uneven and distorted through frame 48 instead of recovering; the hem also exposes underlayers unevenly. This fails appearance and fit.",
         "severity": "BLOCKER",
         "code": "OVERSKIRT_CLOTH_SOLVE_STILL_DESTROYS_PLEAT_SILHOUETTE"
       },
       {
-        "description": "Crouch, sit, prone and arm-cross renders still read as upright or otherwise fail to show the named pose. Cloth evidence records an actual five-frame animated body/waist-pin cache and distinct body hashes, but current renders are the neutral end shape followed by the separate skinning path; they do not show cache-frame drape or collision safety.",
+        "description": "Directly inspected five native cloth-cache frame renders (1 neutral, 16 crouch, 32 sit, 40 prone, 48 neutral) with evaluated body and garment together. Frame 1 has a garment T-pose while body arms angle down. In frames 16 and 32 the body remains upright instead of matching crouch/sit and the jacket coverage is absent or displaced, exposing the torso. In frame 40 the body is horizontal while jacket remains upright and separated. This is a pose/bind or cache ordering defect, not evidence of safe pose fit.",
         "severity": "BLOCKER",
-        "code": "POSE_CACHE_RESPONSE_NOT_REPRESENTED_IN_POSE_RENDERS"
+        "code": "CLOTH_CACHE_RENDERS_CONFIRM_POSE_BIND_MISMATCH"
       },
       {
-        "description": "Fresh renders show sleeves detached or hanging away from the arms in some views, together with gray/pinched lower-jacket patches and an uneven jacket-to-waistband transition.",
+        "description": "Cache renders show garment details floating free around the body, with jacket sleeves and shoulder edges not following the posed arms, plus gray/pinched torso and lower-jacket artifacts. Rigid trim and non-cloth parts do not track the body/garment.",
         "severity": "BLOCKER",
         "code": "LOWER_JACKET_WAIST_ARTIFACTS_REMAIN"
       }
     ],
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "6751ad007063189322efb66734d2b7ddbd5b18611ce264b5519913f6c0b16080",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "b8c2b433af2fd19ffb3a3e4ce09edcd8a271f20a9cf463d4f98272de3e3e5fcb",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "977cf1f941be834d86c0fc3d63889b6bc78abd7bef271e4d913b0c7fcd9ae619",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "f3421bfc83c58b0c3ed61cf936501bf64e3c7c8f46872778861b2272061d2ed9",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "dd82330cd400e65e33ced0ba16e930a8b3f90dff4ee330bb884e823d7362621e",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "890fb119f8e463c8d6885f620e1a4a2e782223e59857367b0e194fe1fccb64a6",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "ecb5ac6fc4345c6bd1f02d1246acb49a5152bdde7ec12bd1abefccd4fb7bca69",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "d0e7c9ac4608516256fabc8bbb4da08fe1ddf83214075d84cb8cc823c6c6aea2",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "bfb1c5d450ac4786e183fbd572149638fb731fe5140f8e343e190d12027a8b46",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "572ee1dfb12895ec614ee9cf11b4260953d86ff4fee8e4470ef0e868936dabcb",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "38e107e443a408fc301a22d1d6f0c513cbafefd8f1be92199f1e258e509b0d18"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "39ca8ed3fa5081c1baa099abb46fa5d054b0b17145b8d16384f88a241697ace2",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "92b33ab2863b345f428ef4e7dc4419f2548e11ba32af61b116b4fd1510bfe182",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "8be023c78f31d8615da25caa84408858d7837cf5e7c9e33aa656af43fe892a71",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "3930a1801430f9c269ea7529eb0d91fa096b21301a6b0e77ba21c0aa628c706c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "cff13ef398cb6e384241edd6d57e11e834e55747ed73b9bc1c810a7634daaca4",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "21cdf01cf19c2a32281be0be17887e08efc8770e3038e3ee9878a73e2a543c31",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "6729e8c9eac38c70301d8cfabdfb99a707ca1f56c789004abff938da492b7895",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "ecac5f1a4d5d278d10cd2be402a39e616b0404bb84c28880739f758aae7cba5a",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "98890d388c31e7eab5d89f6bc7b90cff61b0a5704bde2939e1fa01ee57273e8c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "854ff6c12d6f531e6bd24534d345d5184ff415ea3a728c41e53999f23553cafa",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "bb78ffdc1d376485b98acac0c11e1c8dafc910d1539d3089ddbf6363ff84d2b5"
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"

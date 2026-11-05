@@ -2003,6 +2003,41 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
         if sha256(candidate) != payload["candidateSha256"]:
             raise ValueError("cloth candidate hash mismatch")
         candidate_paths = [candidate, simulation_log]
+        for contract in payload.get("contracts", []):
+            if (
+                not isinstance(contract, Mapping)
+                or contract.get("object") != "pleated-overskirt"
+            ):
+                continue
+            samples = contract.get("poseResponseSamples", [])
+            if samples:
+                if len(samples) != 5:
+                    raise ValueError(
+                        "pose-cache render evidence must cover all five declared sweep frames"
+                    )
+                for sample in samples:
+                    if not isinstance(sample, Mapping):
+                        raise ValueError("pose-cache render sample must be an object")
+                    render = sample.get("directPoseCacheRender")
+                    if not isinstance(render, Mapping):
+                        raise ValueError("pose-cache sweep sample is missing its direct render")
+                    render_path = repo_path(
+                        render.get("path"), label="pose-cache render"
+                    )
+                    if (
+                        render_path.parent
+                        != runtime_root(product_id) / "cloth" / "pose-cache-frames"
+                        or not render_path.is_file()
+                        or sha256(render_path) != render.get("sha256")
+                        or render.get("renderedFrame") != sample.get("frame")
+                        or render.get("renderedPose") != sample.get("pose")
+                        or render.get("renderedBodyMeshSha256")
+                        != sample.get("targetBodyEvaluatedMeshSha256")
+                    ):
+                        raise ValueError(
+                            "pose-cache direct render is stale or mismatched to its evaluated body sample"
+                        )
+                    candidate_paths.append(render_path)
     pipeline = job.get("garmentPipeline", {})
     contract_version = (
         int(pipeline.get("stageContractVersion", 1))
