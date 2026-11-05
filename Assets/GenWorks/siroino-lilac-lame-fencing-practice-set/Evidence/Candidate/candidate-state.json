@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v157-panel-local-crease-topology-20261105",
+  "revision": "v159-sharper-pleat-crest-20261105",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
-      "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven V157 renders: the skirt still reads as broad, flared panel faces with shallow, irregular ridges; three repeated pleat cycles per panel and a deliberate hem cadence are not legible at product scale.",
-      "code": "PLEAT_RHYTHM_UNREADABLE"
+      "code": "PLEAT_RHYTHM_UNREADABLE",
+      "description": "Direct inspection of all eleven V159 renders: shortening the crest ramp does not make the repeated pleat cadence legible at product scale; broad flared skirt faces still dominate front, rear and side views.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "description": "The crouch and sit renders retain an angular, uneven upper-thigh shell edge visible through the front skirt opening; the shell does not follow the bent thighs closely enough to claim fit or adequate coverage.",
-      "code": "THIGH_SHELL_HARD_EDGE_REMAINS"
+      "code": "THIGH_SHELL_HARD_EDGE_REMAINS",
+      "description": "Crouch and sit retain the angular upper-thigh shell edge and separated under-skirt faces; the shell does not follow bent thighs closely enough to establish coverage or fit.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "description": "Front, side, back and arm-cross renders continue to show pinched torso/waist facets and a discontinuous jacket-to-skirt junction, especially around the lower front panels.",
-      "code": "TORSO_WAIST_SURFACE_ARTIFACTS"
+      "code": "TORSO_WAIST_SURFACE_ARTIFACTS",
+      "description": "Front and three-quarter views retain pinched/faceted lower torso patches and an uneven jacket-to-skirt join around the waist.",
+      "severity": "BLOCKER"
     },
     {
-      "severity": "BLOCKER",
-      "description": "The prone render remains a rigid horizontal spread of skirt panels over intersecting limbs without plausible cloth drape; the required pose evidence is visually unacceptable.",
-      "code": "PRONE_DEFORMATION_UNACCEPTABLE"
+      "code": "PRONE_DEFORMATION_UNACCEPTABLE",
+      "description": "The prone render still shows the skirt as a rigid radial fan across the body and intersecting limbs, without plausible cloth drape.",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [
