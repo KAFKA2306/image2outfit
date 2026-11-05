@@ -352,6 +352,10 @@ def main():
     if len(armatures) != 1:
         raise ValueError("render requires one target armature")
     armature = armatures[0]
+    # Cloth cache prototypes can save their collider pose sweep on this armature.
+    # These product renders are explicit pose snapshots; a retained action would
+    # override set_pose() and make every requested pose render at the cached pose.
+    armature.animation_data_clear()
     required = {
         "Hips",
         "UpperArm_L",
