@@ -2328,14 +2328,124 @@ def split_declared_skirt_creases(mesh, pose):
             or isinstance(topology_subdivision_factor, bool)
             or not 1 <= topology_subdivision_factor <= 4):
         raise ValueError("Invalid radial skirt topology subdivision factor")
-    radial_cut_count = fold_count * topology_subdivision_factor
     origin = spec["axisOriginBlenderXYM"]
     phase = spec["phaseRadians"]
     selected = set(spec["pieceIds"]) | set(spec["seamContinuationPieceIds"])
-    if (radial_cut_count > 256
-            or len(origin) != 2 or not all(math.isfinite(v) for v in [*origin, phase])
+    if (len(origin) != 2 or not all(math.isfinite(v) for v in [*origin, phase])
             or not selected.issubset(set(mesh["facePieceIds"]))):
         raise ValueError("Invalid explicit crease topology declaration")
+    if fold_method == "panel-width-intake-box-pleat-v1":
+        piece_folds = spec.get("foldsPerPanelByPiece")
+        valley_width = float(spec.get("foldValleyHalfWidthFraction", math.nan))
+        crest_ramp = float(spec.get("foldCrestRampFraction", math.nan))
+        # Keep a profile plane farther from pre-existing radial vertices than
+        # the downstream prototype weld bound (10 um) at the smallest skirt
+        # radius used by the source mesh. Closer planes create subpixel slivers
+        # during BMesh bisect and must be represented by the existing section.
+        crease_vertex_clearance = 2e-4
+        if (not isinstance(piece_folds, dict) or set(piece_folds) != set(spec["pieceIds"])
+                or any(isinstance(value, bool) or not isinstance(value, int)
+                       or not 1 <= value <= 6 for value in piece_folds.values())
+                or not 0.03 <= valley_width < 0.35
+                or not 0.35 <= crest_ramp <= 0.9):
+            raise ValueError("Panel-width pleat topology needs bounded per-panel folds and profile")
+        by_piece = {piece: set() for piece in spec["pieceIds"]}
+        for face, piece in zip(mesh["faces"], mesh["facePieceIds"]):
+            if piece in by_piece:
+                by_piece[piece].update(face)
+        requested_planes = {piece: set() for piece in spec["pieceIds"]}
+        profile_crease_angles = {}
+        crest_start = valley_width + crest_ramp * (0.5 - valley_width)
+        for piece, indices in by_piece.items():
+            angles = [math.atan2(mesh["vertices"][index][0] - origin[0],
+                                 -(mesh["vertices"][index][1] - origin[1]))
+                      for index in indices]
+            center = math.atan2(sum(math.sin(value) for value in angles),
+                                sum(math.cos(value) for value in angles))
+            unwrapped = [center + math.atan2(math.sin(value - center),
+                                             math.cos(value - center))
+                         for value in angles]
+            low, high = min(unwrapped), max(unwrapped)
+            if high - low < 0.08:
+                raise ValueError(f"Panel angular span is too small for fold topology: {piece}")
+            folds = piece_folds[piece]
+            fractions = set()
+            for cycle in range(folds):
+                base = cycle / folds
+                if cycle:
+                    fractions.add(base)
+                knots = [valley_width, crest_start, 0.5,
+                         1.0 - crest_start, 1.0 - valley_width]
+                fractions.update(base + knot / folds for knot in knots)
+                # The relief function is linear on its two shoulders. Sample
+                # those actual intervals so each intended crease/ramp is
+                # represented by panel-aligned mesh edges, rather than the
+                # unrelated whole-garment radial grid.
+                for start, end in ((valley_width, crest_start),
+                                   (1.0 - crest_start, 1.0 - valley_width)):
+                    fractions.update(
+                        base + (start + (end - start) * step / topology_subdivision_factor) / folds
+                        for step in range(1, topology_subdivision_factor)
+                    )
+            for fraction in fractions:
+                if 1e-8 < fraction < 1.0 - 1e-8:
+                    angle = low + (high - low) * fraction
+                    plane_angle = angle % math.pi
+                    requested_planes[piece].add(round(plane_angle, 10))
+            existing_radial_angles = [
+                math.atan2(
+                    mesh["vertices"][index][0] - origin[0],
+                    -(mesh["vertices"][index][1] - origin[1]),
+                ) % math.pi
+                for index in indices
+                if math.hypot(
+                    mesh["vertices"][index][0] - origin[0],
+                    mesh["vertices"][index][1] - origin[1],
+                ) > 0.02
+            ]
+            skipped_near_vertex_angles = []
+            filtered_planes = set()
+            for candidate in requested_planes[piece]:
+                nearest_existing = min(
+                    existing_radial_angles,
+                    key=lambda existing: abs(
+                        (candidate - existing + math.pi / 2) % math.pi
+                        - math.pi / 2
+                    ),
+                    default=candidate,
+                )
+                clearance = abs(
+                    (candidate - nearest_existing + math.pi / 2) % math.pi
+                    - math.pi / 2
+                )
+                if clearance <= crease_vertex_clearance:
+                    skipped_near_vertex_angles.append({
+                        "planeAngleRadians": candidate,
+                        "nearestExistingVertexAngleRadians": nearest_existing,
+                        "angularClearanceRadians": clearance,
+                    })
+                else:
+                    filtered_planes.add(candidate)
+            requested_planes[piece] = filtered_planes
+            profile_crease_angles[piece] = {
+                "angularRangeRadians": [low, high],
+                "foldsPerPanel": folds,
+                "profileKnotFractions": sorted(fractions),
+                "minimumCutAngleClearanceRadians": crease_vertex_clearance,
+                "skippedPlanesNearExistingVertices": skipped_near_vertex_angles,
+            }
+        plane_angles_by_piece = {
+            piece: sorted(angles) for piece, angles in requested_planes.items()
+        }
+        total_plane_count = sum(len(angles) for angles in plane_angles_by_piece.values())
+        if not total_plane_count or total_plane_count > 256:
+            raise ValueError("Panel-aligned fold topology cut count is outside the bounded range")
+    else:
+        radial_cut_count = fold_count * topology_subdivision_factor
+        if radial_cut_count > 256:
+            raise ValueError("Radial crease subdivision exceeds the bounded range")
+        plane_angles = [phase + i * math.pi / radial_cut_count
+                        for i in range(radial_cut_count)]
     pieces = sorted(set(mesh["facePieceIds"]))
     bm = bmesh.new()
     owner = bm.faces.layers.int.new("canonical_owner")
@@ -2379,25 +2489,116 @@ def split_declared_skirt_creases(mesh, pose):
                 raise ValueError("Crease subdivision source UV coordinate is malformed")
             loop[uv_layer].uv = (float(coordinate[0]), float(coordinate[1]))
     cuts = []
+    skipped_quality_cuts = []
     longitudinal_cuts = []
     try:
-        for i in range(radial_cut_count):
-            angle = phase + i * math.pi / radial_cut_count
-            faces = [f for f in bm.faces if pieces[f[owner]-1] in selected]
-            edges = {e for f in faces for e in f.edges}
-            verts = {v for f in faces for v in f.verts}
-            old_vertices = set(bm.verts)
-            result = bmesh.ops.bisect_plane(
-                bm, geom=[*verts, *edges, *faces], dist=1e-6,
-                plane_co=Vector((origin[0], origin[1], 0)),
-                plane_no=Vector((math.cos(angle), math.sin(angle), 0)),
-                clear_inner=False, clear_outer=False)
-            added = [v for v in bm.verts if v not in old_vertices]
-            for vertex in added:
-                vertex[original_id] = 0
-            cuts.append({"planeAngleRadians": angle, "newVertexCount": len(added),
-                         "cutEdgeCount": sum(isinstance(g, bmesh.types.BMEdge) for g in result["geom_cut"])})
+        if fold_method == "panel-width-intake-box-pleat-v1":
+            for piece, angles in plane_angles_by_piece.items():
+                for angle in angles:
+                    # Trial each local profile cut on a disposable BMesh before
+                    # accepting it. Panel placement can make a nominally valid
+                    # radial cut clip a very short corner from an existing
+                    # triangle; reject that individual plane while retaining
+                    # the sewn panel and the remaining profile topology.
+                    trial = bm.copy()
+                    trial_owner = trial.faces.layers.int.get("canonical_owner")
+                    trial_vertices = {v for f in trial.faces
+                                      if pieces[f[trial_owner]-1] == piece
+                                      for v in f.verts}
+                    trial_edges = {e for v in trial_vertices for e in v.link_edges
+                                   if any(f[trial_owner] == pieces.index(piece)+1
+                                          for f in e.link_faces)}
+                    trial_faces = [f for f in trial.faces
+                                   if pieces[f[trial_owner]-1] == piece]
+                    bmesh.ops.bisect_plane(
+                        trial, geom=[*trial_vertices, *trial_edges, *trial_faces],
+                        dist=1e-6, plane_co=Vector((origin[0], origin[1], 0)),
+                        plane_no=Vector((math.cos(angle), math.sin(angle), 0)),
+                        clear_inner=False, clear_outer=False)
+                    bmesh.ops.triangulate(trial, faces=list(trial.faces))
+                    invalid_triangles = []
+                    for face in trial.faces:
+                        if len(face.verts) != 3 or face.calc_area() <= 5e-11:
+                            invalid_triangles.append({
+                                "areaM2": face.calc_area(),
+                                "pieceId": pieces[face[trial_owner]-1],
+                                "coordinatesM": [list(vertex.co) for vertex in face.verts],
+                            })
+                            if len(invalid_triangles) == 3:
+                                break
+                    trial.free()
+                    if invalid_triangles:
+                        skipped_quality_cuts.append({
+                            "pieceId": piece,
+                            "planeAngleRadians": angle,
+                            "reason": "would-create-triangle-at-or-below-cleanup-area-bound",
+                            "cleanupAreaBoundM2": 5e-11,
+                            "rejectedTriangles": invalid_triangles,
+                        })
+                        continue
+                    faces = [f for f in bm.faces if pieces[f[owner]-1] == piece]
+                    edges = {e for f in faces for e in f.edges}
+                    verts = {v for f in faces for v in f.verts}
+                    old_vertices = set(bm.verts)
+                    result = bmesh.ops.bisect_plane(
+                        bm, geom=[*verts, *edges, *faces], dist=1e-6,
+                        plane_co=Vector((origin[0], origin[1], 0)),
+                        plane_no=Vector((math.cos(angle), math.sin(angle), 0)),
+                        clear_inner=False, clear_outer=False)
+                    added = [v for v in bm.verts if v not in old_vertices]
+                    for vertex in added:
+                        vertex[original_id] = 0
+                    cuts.append({
+                        "pieceId": piece,
+                        "planeAngleRadians": angle,
+                        "newVertexCount": len(added),
+                        "cutEdgeCount": sum(
+                            isinstance(g, bmesh.types.BMEdge)
+                            for g in result["geom_cut"]
+                        ),
+                    })
+            skipped_by_piece = {}
+            for piece in plane_angles_by_piece:
+                skipped_count = sum(item["pieceId"] == piece
+                                    for item in skipped_quality_cuts)
+                skipped_by_piece[piece] = skipped_count
+                maximum_skipped = max(1, math.ceil(
+                    len(plane_angles_by_piece[piece]) * 0.1))
+                if skipped_count > maximum_skipped:
+                    rejected_for_piece = [
+                        item for item in skipped_quality_cuts
+                        if item["pieceId"] == piece
+                    ]
+                    raise ValueError(
+                        "Panel-local fold topology would require dropping too many "
+                        f"profile cuts for {piece}: {skipped_count} > "
+                        f"{maximum_skipped} permitted; rejected="
+                        f"{json.dumps(rejected_for_piece, separators=(',', ':'))}"
+                    )
+        else:
+            for angle in plane_angles:
+                faces = [f for f in bm.faces if pieces[f[owner]-1] in selected]
+                edges = {e for f in faces for e in f.edges}
+                verts = {v for f in faces for v in f.verts}
+                old_vertices = set(bm.verts)
+                result = bmesh.ops.bisect_plane(
+                    bm, geom=[*verts, *edges, *faces], dist=1e-6,
+                    plane_co=Vector((origin[0], origin[1], 0)),
+                    plane_no=Vector((math.cos(angle), math.sin(angle), 0)),
+                    clear_inner=False, clear_outer=False)
+                added = [v for v in bm.verts if v not in old_vertices]
+                for vertex in added:
+                    vertex[original_id] = 0
+                cuts.append({
+                    "planeAngleRadians": angle,
+                    "newVertexCount": len(added),
+                    "cutEdgeCount": sum(
+                        isinstance(g, bmesh.types.BMEdge)
+                        for g in result["geom_cut"]
+                    ),
+                })
         row_count = spec.get("longitudinalSubdivisionCount", 0)
+        requested_longitudinal_row_count = row_count
         waist = spec["waistZM"]
         hem = spec["sourceHemZM"]
         if (not isinstance(row_count, int) or isinstance(row_count, bool)
@@ -2405,8 +2606,93 @@ def split_declared_skirt_creases(mesh, pose):
                 or waist <= hem):
             raise ValueError("Invalid declared longitudinal skirt subdivision count")
         skirt_piece_ids = set(spec["pieceIds"])
+        skirt_vertex_ids = {
+            vertex_id
+            for face, piece in zip(mesh["faces"], mesh["facePieceIds"])
+            if piece in skirt_piece_ids
+            for vertex_id in face
+        }
+        existing_row_heights = sorted({
+            round(float(mesh["vertices"][vertex_id][2]), 9)
+            for vertex_id in skirt_vertex_ids
+            if hem <= mesh["vertices"][vertex_id][2] <= waist
+        })
+        nominal_row_spacing = ((waist - hem) / (requested_longitudinal_row_count + 1)
+                               if requested_longitudinal_row_count else 0.0)
+        existing_maximum_vertical_gap = max(
+            (right - left for left, right in zip(
+                existing_row_heights, existing_row_heights[1:])),
+            default=math.inf,
+        )
+        existing_topology_sufficient = (
+            requested_longitudinal_row_count > 0
+            and len(existing_row_heights) >= requested_longitudinal_row_count + 1
+            and existing_maximum_vertical_gap <= 1.5 * nominal_row_spacing
+        )
+        if existing_topology_sufficient:
+            # The sewn source already has closely spaced, nonuniform panel
+            # rows. Adding evenly spaced global Z cuts through those curved
+            # triangles repeatedly creates slivers without useful new density.
+            row_count = 0
+        longitudinal_spacing = (waist - hem) / (row_count + 1) if row_count else 0.0
+        # Pleat relief is applied after these cuts and can shrink a sliver.
+        # Require a 4x area margin at the unrelieved row geometry so the
+        # unchanged downstream cleanup bound still holds after that transform.
+        longitudinal_pre_fold_area_floor_m2 = 2e-10
         for i in range(1, row_count + 1):
-            z = hem + (waist - hem) * i / (row_count + 1)
+            requested_z = hem + longitudinal_spacing * i
+            remaining_rows = row_count - i
+            offset_fractions = (0.0, -0.1, 0.1, -0.2, 0.2, -0.3, 0.3, -0.4, 0.4)
+            candidate_heights = [requested_z + longitudinal_spacing * offset
+                                 for offset in offset_fractions]
+            selected_z = None
+            rejected_candidates = []
+            for candidate_z in candidate_heights:
+                if longitudinal_cuts:
+                    previous_z = longitudinal_cuts[-1]["heightZM"]
+                    if candidate_z - previous_z < 0.5 * longitudinal_spacing:
+                        continue
+                if waist - candidate_z < 0.5 * longitudinal_spacing * remaining_rows:
+                    continue
+                trial = bm.copy()
+                trial_owner = trial.faces.layers.int.get("canonical_owner")
+                trial_faces = [f for f in trial.faces
+                               if pieces[f[trial_owner]-1] in skirt_piece_ids]
+                trial_edges = {e for f in trial_faces for e in f.edges}
+                trial_verts = {v for f in trial_faces for v in f.verts}
+                bmesh.ops.bisect_plane(
+                    trial, geom=[*trial_verts, *trial_edges, *trial_faces],
+                    dist=1e-6, plane_co=Vector((0, 0, candidate_z)),
+                    plane_no=Vector((0, 0, 1)), clear_inner=False, clear_outer=False)
+                bmesh.ops.triangulate(trial, faces=list(trial.faces))
+                invalid_triangles = []
+                for face in trial.faces:
+                    if (len(face.verts) != 3
+                            or face.calc_area() <= longitudinal_pre_fold_area_floor_m2):
+                        invalid_triangles.append({
+                            "areaM2": face.calc_area(),
+                            "pieceId": pieces[face[trial_owner]-1],
+                            "coordinatesM": [list(vertex.co) for vertex in face.verts],
+                        })
+                        if len(invalid_triangles) == 3:
+                            break
+                trial.free()
+                if not invalid_triangles:
+                    selected_z = candidate_z
+                    break
+                rejected_candidates.append({
+                    "heightZM": candidate_z,
+                    "minimumPreFoldAreaM2": longitudinal_pre_fold_area_floor_m2,
+                    "rejectedTriangles": invalid_triangles,
+                })
+            if selected_z is None:
+                raise ValueError(
+                    "Longitudinal skirt row could not be moved clear of existing "
+                    f"vertices within the bounded 40%-spacing search: requested="
+                    f"{requested_z}, rejected="
+                    f"{json.dumps(rejected_candidates, separators=(',', ':'))}"
+                )
+            z = selected_z
             faces = [f for f in bm.faces if pieces[f[owner]-1] in skirt_piece_ids]
             edges = {e for f in faces for e in f.edges}
             verts = {v for f in faces for v in f.verts}
@@ -2419,7 +2705,10 @@ def split_declared_skirt_creases(mesh, pose):
             for vertex in added:
                 vertex[original_id] = 0
             longitudinal_cuts.append({
-                "heightZM": z, "newVertexCount": len(added),
+                "heightZM": z, "requestedHeightZM": requested_z,
+                "heightAdjustmentM": z - requested_z,
+                "rejectedNearbyHeights": rejected_candidates,
+                "newVertexCount": len(added),
                 "cutEdgeCount": sum(isinstance(g, bmesh.types.BMEdge)
                                     for g in result["geom_cut"])})
         bmesh.ops.triangulate(bm, faces=list(bm.faces))
@@ -2431,11 +2720,17 @@ def split_declared_skirt_creases(mesh, pose):
         result_vertices = [list(v.co) for v in ordered]
         result_faces, result_owners = [], []
         result_uv_coordinates, result_uv_panel_keys, result_uv_source_kinds = [], [], []
-        for face in bm.faces:
+        for face_index, face in enumerate(bm.faces):
             if not 1 <= face[owner] <= len(pieces):
                 raise ValueError("Crease cut lost canonical face ownership")
-            if len(face.verts) != 3 or face.calc_area() <= 1e-12:
-                raise ValueError("Crease cut produced a degenerate triangle")
+            face_area = face.calc_area()
+            if len(face.verts) != 3 or face_area <= 1e-12:
+                vertices_for_error = [list(vertex.co) for vertex in face.verts]
+                raise ValueError(
+                    "Crease cut produced a degenerate triangle: "
+                    f"faceIndex={face_index}, area={face_area:.12g}, "
+                    f"piece={pieces[face[owner]-1]}, vertices={vertices_for_error}"
+                )
             result_faces.append([remap[v] for v in face.verts])
             result_owners.append(pieces[face[owner]-1])
             panel_index = face[panel_layer]
@@ -2475,8 +2770,27 @@ def split_declared_skirt_creases(mesh, pose):
                 "foldCount": fold_count,
                 "topologySubdivisionFactor": topology_subdivision_factor,
                 "radialTopologyCutCount": len(cuts),
+                **({"panelProfileCreaseAngles": profile_crease_angles}
+                   if fold_method == "panel-width-intake-box-pleat-v1" else {}),
                 "cuts": cuts, "longitudinalSubdivisionCuts": longitudinal_cuts,
+                "skippedQualityCuts": skipped_quality_cuts,
+                "longitudinalPreFoldAreaFloorM2": longitudinal_pre_fold_area_floor_m2,
+                "skippedQualityCutCountByPiece": skipped_by_piece
+                    if fold_method == "panel-width-intake-box-pleat-v1" else {},
                 "longitudinalSubdivisionCount": len(longitudinal_cuts),
+                "requestedLongitudinalSubdivisionCount": requested_longitudinal_row_count,
+                "longitudinalSubdivisionDecision": {
+                    "method": "retain-existing-panel-vertical-sampling-when-sufficient",
+                    "existingDistinctHeightCount": len(existing_row_heights),
+                    "existingMaximumVerticalGapM": existing_maximum_vertical_gap,
+                    "nominalRequestedRowSpacingM": nominal_row_spacing,
+                    "maximumAcceptedGapM": 1.5 * nominal_row_spacing,
+                    "addedRows": len(longitudinal_cuts),
+                    "decision": ("REUSED_EXISTING_TOPOLOGY"
+                                if existing_topology_sufficient
+                                else "ADDED_BOUNDED_LONGITUDINAL_ROWS"),
+                    "grantsAppearanceAcceptance": False,
+                },
                 "beforeVertexCount": initial_count, "afterVertexCount": len(ordered),
                 "beforeTriangleCount": initial_face_count, "afterTriangleCount": len(result_faces),
                 "sharedSkirtWaistbandEdgeCount": len(seam_edges),
@@ -2487,7 +2801,9 @@ def split_declared_skirt_creases(mesh, pose):
                 "degenerateTriangleCount": 0, "nonManifoldEdgeCount": non_manifold,
                 "originalVertexIdentityPreserved": True,
                 "grantsFitAcceptance": False, "grantsVisualAcceptance": False,
-                "evidenceBoundary": "Native radial cuts align the declared fold profile to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance."}
+                "evidenceBoundary": ("Panel-local cuts now align the authored intake-box valley, ramp and crest knots to actual mesh edges while preserving canonical ownership and sewn waist adjacency. Fold profile and panel widths remain uncalibrated hypotheses; no exact fabric isometry or fit acceptance."
+                                     if fold_method == "panel-width-intake-box-pleat-v1"
+                                     else "Native radial cuts align the declared fold profile to actual mesh edges; canonical ownership and sewn waist adjacency survive. Fold count/depth remain design hypotheses; no exact fabric isometry or fit acceptance.")}
     finally:
         bm.free()
 
@@ -3023,6 +3339,10 @@ def append_declared_thigh_surface_shell(mesh, body_objects, pose, target_path):
     selected_triangles = {"left": 0, "right": 0}
     clipped_source_triangles = {"left": 0, "right": 0}
     minimum_area = math.inf
+    omitted_subpixel_triangles = {"left": 0, "right": 0}
+    minimum_omitted_area = math.inf
+    # Leave a 2x cross-product margin before Blender's float32 mesh storage.
+    minimum_mesh_triangle_area_m2 = 1e-10
 
     def point_from_barycentric(source_ids, barycentric):
         return sum((world_vertices[source_id] * amount
@@ -3137,7 +3457,9 @@ def append_declared_thigh_surface_shell(mesh, body_objects, pose, target_path):
                 mapped_face = (mapped_polygon[0], mapped_polygon[index], mapped_polygon[index + 1])
                 a, b, c = (Vector(mesh["vertices"][vertex_id]) for vertex_id in mapped_face)
                 area = (b - a).cross(c - a).length / 2
-                if area <= 1e-12:
+                if area <= minimum_mesh_triangle_area_m2:
+                    omitted_subpixel_triangles[side] += 1
+                    minimum_omitted_area = min(minimum_omitted_area, area)
                     continue
                 minimum_area = min(minimum_area, area)
                 selected_triangles[side] += 1
@@ -3172,10 +3494,16 @@ def append_declared_thigh_surface_shell(mesh, body_objects, pose, target_path):
         "pieceIdsBySide": shell_piece_by_side,
         "triangleCountByThigh": selected_triangles,
         "clippedSourceTriangleCountByThigh": clipped_source_triangles,
+        "omittedSubpixelTriangleCountByThigh": omitted_subpixel_triangles,
+        "minimumOmittedTriangleAreaM2": (
+            minimum_omitted_area if math.isfinite(minimum_omitted_area) else None
+        ),
         "sourceVertexCountByThigh": {side: len(values) for side, values in shell_vertices.items()},
         "heightRangeZM": [hem_z, waist_z],
         "normalClearanceM": clearance,
         "minimumTriangleAreaM2": minimum_area,
+        "minimumEmittedTriangleAreaM2": minimum_area,
+        "minimumMeshTriangleAreaM2": minimum_mesh_triangle_area_m2,
         "uvStatus": "NOT_CREATED",
         "grantsFitAcceptance": False,
         "grantsPoseAcceptance": False,
@@ -3245,13 +3573,32 @@ def weld_subpixel_degenerate_triangles(mesh, *, max_weld_distance_m=1e-5):
                     }
                     for vertex in bad_face.verts
                 ]
+                piece_attribute = mesh.attributes.get("canonical_piece_index")
+                sewn_vertex_attribute = mesh.attributes.get(
+                    "canonical_sewn_vertex_index"
+                )
+                piece_index = (
+                    int(piece_attribute.data[bad_face.index].value)
+                    if piece_attribute is not None
+                    and bad_face.index < len(piece_attribute.data)
+                    else None
+                )
+                sewn_vertex_indices = [
+                    int(sewn_vertex_attribute.data[vertex.index].value)
+                    if sewn_vertex_attribute is not None
+                    and vertex.index < len(sewn_vertex_attribute.data)
+                    else None
+                    for vertex in bad_face.verts
+                ]
                 raise ValueError(
                     "Degenerate triangle needs a weld beyond the 10-micrometre "
                     "prototype cleanup bound plus float32 coordinate uncertainty: "
                     f"{distance:.9g} m (uncertainty={precision_margin:.9g} m); "
                     f"face={bad_face.index}, closestVertices="
                     f"({left.index}, {right.index}), triangle="
-                    f"{json.dumps(triangle, separators=(',', ':'))}"
+                    f"{json.dumps(triangle, separators=(',', ':'))}, "
+                    f"canonicalPieceIndex={piece_index}, "
+                    f"canonicalSewnVertexIndices={sewn_vertex_indices}"
                 )
             before_coordinates = [list(vertex.co) for vertex in bad_face.verts]
             bmesh.ops.weld_verts(bm, targetmap={right: left})
@@ -3335,7 +3682,31 @@ def main():
     for obj in body_objects:
         obj["prototypeRole"] = "target-avatar-reference-only"
     pose = read(resolve(pipeline["assemblyPosePath"]))
-    crease_evidence = split_declared_skirt_creases(mesh, pose)
+    def assert_mesh_triangle_area(stage_name):
+        minimum_area = math.inf
+        worst = None
+        for face_index, (face, piece_id) in enumerate(
+                zip(mesh["faces"], mesh["facePieceIds"])):
+            for index in range(1, len(face) - 1):
+                vertex_ids = (int(face[0]), int(face[index]), int(face[index + 1]))
+                a, b, c = (Vector(mesh["vertices"][vertex_id])
+                           for vertex_id in vertex_ids)
+                area = (b-a).cross(c-a).length / 2
+                if area < minimum_area:
+                    minimum_area = area
+                    worst = {
+                        "faceIndex": face_index,
+                        "pieceId": piece_id,
+                        "vertexIndices": list(vertex_ids),
+                        "coordinatesM": [list(mesh["vertices"][vertex_id])
+                                         for vertex_id in vertex_ids],
+                    }
+        if minimum_area <= 5e-11:
+            raise ValueError(
+                f"Mesh geometry crossed the Blender cleanup area bound after "
+                f"{stage_name}: area={minimum_area:.9g} m^2, "
+                f"triangle={json.dumps(worst, separators=(',', ':'))}"
+            )
     # Preserve bounded, stable vertex trajectories in the existing build report.
     from collections import defaultdict
     trace_owners = defaultdict(set)
@@ -3424,20 +3795,33 @@ def main():
     if "waistbandContourPlacement" in pose:
         waistband_pose = dict(pose, bodyContourPlacement=pose["waistbandContourPlacement"])
         waistband_evidence = place_on_measured_contours(mesh, body_objects, waistband_pose, resolve(job["targetSourcePath"]), angular_source_vertices=native_angular_vertices)
-    fold_evidence = place_declared_skirt_folds(mesh, pose, native_angular_vertices)
+    # Place panel-local crease cuts only after the declared skirt extension,
+    # forward-apron projection, envelope and waistband contour transforms. The
+    # relief field is evaluated from these final panel-local coordinates; cuts
+    # made on the pre-placement mesh could otherwise drift away from their
+    # relief knots and form narrow sliver triangles after those transforms.
+    crease_evidence = split_declared_skirt_creases(mesh, pose)
+    assert_mesh_triangle_area("panel-local crease subdivision")
+    skirt_fold_native_vertices = [list(point) for point in mesh["vertices"]]
+    fold_evidence = place_declared_skirt_folds(mesh, pose, skirt_fold_native_vertices)
+    assert_mesh_triangle_area("declared skirt fold placement")
     thigh_attachment_evidence = place_skirt_front_on_thigh_surfaces(
         mesh, body_objects, pose, resolve(job["targetSourcePath"])
     )
+    assert_mesh_triangle_area("thigh-surface front attachment")
     thigh_surface_shell_evidence = append_declared_thigh_surface_shell(
         mesh, body_objects, pose, resolve(job["targetSourcePath"])
     )
+    assert_mesh_triangle_area("thigh-surface shell generation")
     recipe = read(resolve(pipeline["materialRecipePath"]))
     rear_waist_tab_evidence = append_declared_rear_waist_tab(
         mesh, body_objects, pose, recipe, resolve(job["targetSourcePath"])
     )
+    assert_mesh_triangle_area("rear waistband tab generation")
     geometry_fairing_evidence = fair_panel_interiors(
         mesh, pose.get("panelInteriorGeometryFairing", {})
     )
+    assert_mesh_triangle_area("panel-interior geometry fairing")
     trace_stage("panel-interior-fairing")
     data = bpy.data.meshes.new(job["id"] + "-sewn-surface")
     data.from_pydata(mesh["vertices"], [], mesh["faces"])
