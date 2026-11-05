@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v153-shorter-thigh-shell-20261105",
+  "revision": "v154-correct-preskin-weight-metric-20261105",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,22 +21,22 @@
     {
       "code": "PLEAT_RHYTHM_UNREADABLE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven V153 images: front, back and side still read as broad flared panels with only weak isolated ridges; the pleat rhythm is not clearly legible at product scale and the hem remains rigid."
+      "description": "Direct inspection of all eleven V154 renders: front, back and side still read as broad flared panels with only weak isolated ridges; the pleat rhythm is not clearly legible at product scale and the hem remains rigid."
     },
     {
       "code": "THIGH_SHELL_HARD_EDGE_REMAINS",
       "severity": "BLOCKER",
-      "description": "The 60 mm thigh-shell cutback is present in the generated geometry, but crouch and sit still show broad, hard-edged upper-thigh panels at the front opening. This iteration did not resolve the shorts silhouette or demonstrate pose coverage."
+      "description": "The 60 mm thigh-shell cutback remains in the generated geometry; direct crouch and sit renders still show broad, hard-edged upper-thigh panels at the front opening. Pose coverage is not demonstrated."
     },
     {
       "code": "TORSO_WAIST_SURFACE_ARTIFACTS",
       "severity": "BLOCKER",
-      "description": "Front, side, back and arm-cross views retain pinched triangular facets and abrupt surface transitions over the torso/hip/waist panels; these are visible garment geometry defects."
+      "description": "Front, side, back and arm-cross renders retain pinched triangular facets and abrupt surface transitions over torso, hip and waist panels; these remain visible garment geometry defects."
     },
     {
       "code": "PRONE_DEFORMATION_UNACCEPTABLE",
       "severity": "BLOCKER",
-      "description": "The prone render remains a collapsed overlap of limbs and garment panels, with the skirt presenting rigid lobes rather than a plausible drape. This required pose remains visually unacceptable."
+      "description": "The prone render remains a collapsed overlap of limbs and garment panels, with the skirt presenting rigid lobes rather than plausible drape. This required pose remains visually unacceptable."
     }
   ],
   "failedGeometryChecks": [

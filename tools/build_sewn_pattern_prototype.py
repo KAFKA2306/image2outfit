@@ -3500,7 +3500,11 @@ def main():
         "measuredCollarPlacement": collar_evidence,
         "necklinePlacementTrace": {"coordinateSystem": "blender-z-up", "selection": {"nativeMinimumZM": .98, "nativeMaximumAbsXM": .12}, "records": list(neck_trace.values()), "internalEdgeNormalTrace": list(neck_edge_angles.values()), "evidenceBoundary": "Original sewn vertex IDs/face ownership, per-stage coordinates, and internal edge normal angles through panel fairing; diagnostic only, not fit or appearance acceptance."},
         "metrics": {"vertices": len(data.vertices), "triangles": len(data.polygons),
-                    "unweightedVertices": len(data.vertices),
+                    # This source is intentionally unskinned. Weight coverage is
+                    # measured later from the bound skin/export artifact; counting
+                    # every source vertex here mislabeled all geometry unweighted.
+                    "unweightedVertices": None,
+                    "unweightedVerticesStatus": "NOT_MEASURED_PRE_SKINNING",
                     "degenerateTriangles": microdegenerate_cleanup["remainingDegenerateTriangles"]},
         "surfaceShadingHypothesis": {
             **shading_normal_audit,
