@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v152-creased-panel-pleat-profile-20261105",
+  "revision": "v153-shorter-thigh-shell-20261105",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,24 @@
   },
   "blockingFindings": [
     {
-      "code": "AUTHORED_SKIRT_PLEAT_SILHOUETTE_FAIL",
-      "description": "Direct inspection of all eleven current V152 images shows that the narrower recessed valley and stronger crease profile do not make a clearly readable pleat rhythm at product scale. Front and back still read as broad smooth/faceted flared panels, with a rigid apron-like center/side transition and hard hem; the 40 mm relief is visible only as weak panel shading.",
-      "severity": "BLOCKER"
+      "code": "PLEAT_RHYTHM_UNREADABLE",
+      "severity": "BLOCKER",
+      "description": "Direct inspection of all eleven V153 images: front, back and side still read as broad flared panels with only weak isolated ridges; the pleat rhythm is not clearly legible at product scale and the hem remains rigid."
     },
     {
-      "code": "SHORTS_POSE_COVERAGE_FAIL",
-      "description": "Crouch and sit still expose oversized hard-edged shorts/thigh-cover panels while the skirt lifts away behind the thighs. Current pose-matched coverage is overskirt left/right 0.365/0.365 in crouch and 0.272/0.270 in sit; shorts cover 0.642 per side in crouch and 0.638 per side in sit. These geometric diagnostics do not establish fit.",
-      "severity": "BLOCKER"
+      "code": "THIGH_SHELL_HARD_EDGE_REMAINS",
+      "severity": "BLOCKER",
+      "description": "The 60 mm thigh-shell cutback is present in the generated geometry, but crouch and sit still show broad, hard-edged upper-thigh panels at the front opening. This iteration did not resolve the shorts silhouette or demonstrate pose coverage."
     },
     {
-      "code": "WAIST_HIP_AND_TORSO_SURFACE_ARTIFACTS",
-      "description": "Angular triangular surface patches and abrupt transitions remain visible across the torso/waist in front, three-quarter, side and arm-cross views. The prone view continues to collapse garment and limbs into a compact overlapping pile; appearance and pose behavior remain unacceptable.",
-      "severity": "BLOCKER"
+      "code": "TORSO_WAIST_SURFACE_ARTIFACTS",
+      "severity": "BLOCKER",
+      "description": "Front, side, back and arm-cross views retain pinched triangular facets and abrupt surface transitions over the torso/hip/waist panels; these are visible garment geometry defects."
+    },
+    {
+      "code": "PRONE_DEFORMATION_UNACCEPTABLE",
+      "severity": "BLOCKER",
+      "description": "The prone render remains a collapsed overlap of limbs and garment panels, with the skirt presenting rigid lobes rather than a plausible drape. This required pose remains visually unacceptable."
     }
   ],
   "failedGeometryChecks": [

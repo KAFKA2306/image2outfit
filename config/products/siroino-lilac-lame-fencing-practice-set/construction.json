@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V151 direct review showed that 40 mm radial relief still renders as a smooth A-line. V152 keeps relief magnitude fixed and changes the sewn panel fold profile only: narrow the recessed seam valley, increase valley contrast, and extend the sloped shoulder so the fold reads as a crease rather than a broad flat face. Existing coverage, torso, and prone blockers remain.",
-  "designRevision": "v152-creased-panel-pleat-profile-20261105",
+  "target": "V153 changes only the measured-body thigh-cover cut line from Z 0.50 m to 0.56 m after direct crouch/sit renders showed a long, hard-edged shell. The 0.56 m hem sits 50 mm above the 0.51 m overskirt hem; this tests a shorter upper-thigh underlayer. Pleat readability, torso/waist facets, prone deformation and fit remain unresolved.",
+  "designRevision": "v153-shorter-thigh-shell-20261105",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -160,8 +160,8 @@
       "pleated-overskirt": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypeFrameEnd": 48,
-    "evidence": "V152 reuses the V151 six-panel armature-skinned overskirt and sleeve cloth solve. It tests a sharper authored panel-local crease profile at the existing 40 mm maximum radial relief; it does not establish appearance, fit, collision or release acceptance.",
-    "reason": "V152 isolates a pleat-shape profile experiment after V151 amplitude increase did not make folds readable. Preserve the V150 armature-skinned skirt and sleeve cloth method; keep 40 mm radial relief fixed while changing valley width, valley-depth ratio and crest ramp in the canonical assembly input. Other pose and surface blockers remain independent.",
+    "evidence": "V153 changes only the thigh-cover clipping hem to 0.56 m, 60 mm above the V152 cut, while preserving the measured-body source, sewn waist/skirt construction and armature/cloth paths. It tests hard-edge exposure at crouch/sit; it does not establish appearance, fit, collision or release acceptance.",
+    "reason": "V153 isolates a shorter thigh-cover geometry experiment after direct crouch/sit review found the current long shell conspicuous and hard-edged. Preserve pleat, torso, armature and sleeve cloth inputs so the hem cutback can be judged independently. Pleat readability, torso/waist facets, prone deformation and fit remain unresolved.",
     "prototypeComponentBendingHypotheses": {
       "jacket-sleeves": {
         "stiffness": 2.2,
