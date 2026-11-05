@@ -43,7 +43,7 @@
     ],
     "maximumDihedralDegrees": 60.0,
     "preserveCanonicalPanelSeams": true,
-    "evidenceBoundary": "Three bounded 0.12 Laplacian fairing passes move only interior vertices of the directly reviewed torso panels; all canonical boundary vertices remain fixed. This is a local geometry hypothesis, not avatar fit, material quality, appearance approval, or release acceptance."
+    "evidenceBoundary": "V155 applies three bounded 0.12 Laplacian passes to torso panel interiors, then locally backtracks only vertices implicated in face flips or new crease spikes; canonical panel boundaries stay locked. This tests fairing after the prior global guard reduced the requested displacement to 10.7%. It does not establish avatar fit, material quality, appearance approval, or release acceptance."
   },
   "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. V108 tests bounded position fairing on jacket torso panel interiors after V107 shading-only renders did not visibly resolve faceting. Canonical seam vertices remain fixed. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
   "poses": {
@@ -9809,7 +9809,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v154-correct-preskin-weight-metric-20261105",
+  "designRevision": "v155-local-torso-fairing-clamp-20261105",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v154-correct-preskin-weight-metric-20261105",
+  "revision": "v155-local-torso-fairing-clamp-20261105",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,24 +19,24 @@
   },
   "blockingFindings": [
     {
-      "code": "PLEAT_RHYTHM_UNREADABLE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all eleven V154 renders: front, back and side still read as broad flared panels with only weak isolated ridges; the pleat rhythm is not clearly legible at product scale and the hem remains rigid."
+      "description": "Direct inspection of all eleven V155 renders: front, back, side and neutral/arms-up/arm-cross remain broad flared panels with shallow isolated ridges; distinct repeatable pleats and a soft hem rhythm are still not legible at product scale.",
+      "code": "PLEAT_RHYTHM_UNREADABLE"
     },
     {
-      "code": "THIGH_SHELL_HARD_EDGE_REMAINS",
       "severity": "BLOCKER",
-      "description": "The 60 mm thigh-shell cutback remains in the generated geometry; direct crouch and sit renders still show broad, hard-edged upper-thigh panels at the front opening. Pose coverage is not demonstrated."
+      "description": "Crouch and sit renders still show broad, planar upper-thigh shell cut edges across the front opening; panel shape does not follow the bent thighs and visible coverage is insufficient to claim fit.",
+      "code": "THIGH_SHELL_HARD_EDGE_REMAINS"
     },
     {
-      "code": "TORSO_WAIST_SURFACE_ARTIFACTS",
       "severity": "BLOCKER",
-      "description": "Front, side, back and arm-cross renders retain pinched triangular facets and abrupt surface transitions over torso, hip and waist panels; these remain visible garment geometry defects."
+      "description": "Front, side, back, three-quarter and arm-cross views retain pinched triangular facets and abrupt transitions across the torso, hip and waist. Local fairing moved farther than the prior global clamp, but the garment surface remains visibly uneven.",
+      "code": "TORSO_WAIST_SURFACE_ARTIFACTS"
     },
     {
-      "code": "PRONE_DEFORMATION_UNACCEPTABLE",
       "severity": "BLOCKER",
-      "description": "The prone render remains a collapsed overlap of limbs and garment panels, with the skirt presenting rigid lobes rather than plausible drape. This required pose remains visually unacceptable."
+      "description": "The prone pose is rendered horizontally with limbs and garment panels overlapping in a rigid, angular mass; the skirt does not show plausible drape around the pose. Required pose coverage remains visually unacceptable.",
+      "code": "PRONE_DEFORMATION_UNACCEPTABLE"
     }
   ],
   "failedGeometryChecks": [

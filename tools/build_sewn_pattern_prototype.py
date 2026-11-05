@@ -256,6 +256,157 @@ def preserve_face_orientation_during_displacement(
     return bounded, scale, len(triangles), continuity_evidence
 
 
+def preserve_panel_interior_orientation_locally(
+    faces, before, proposed, adjustable_vertices, continuity_edges, maximum_dihedral_degrees
+):
+    """Clamp only fairing vertices that cause a face flip or a new crease spike.
+
+    A single locally constrained triangle must not scale down every interior
+    displacement on every garment panel. Canonical seams remain excluded by the
+    caller; this solver backtracks implicated interior vertices independently
+    and verifies the complete surface before returning.
+    """
+    if len(before) != len(proposed) or not before:
+        raise ValueError("Local panel safeguard requires corresponding non-empty point tables")
+    if not math.isfinite(maximum_dihedral_degrees) or not 0 < maximum_dihedral_degrees < 180:
+        raise ValueError("Invalid local panel normal-continuity bound")
+    adjustable = set(adjustable_vertices)
+    if not adjustable or min(adjustable) < 0 or max(adjustable) >= len(before):
+        raise ValueError("Local panel safeguard requires valid adjustable vertices")
+
+    triangles = []
+    face_vertices = []
+    for face_index, face in enumerate(faces):
+        if len(face) < 3:
+            raise ValueError("Local panel safeguard encountered a face with fewer than three vertices")
+        face_vertices.append(set(map(int, face)))
+        for corner in range(1, len(face) - 1):
+            triangles.append((face_index, (int(face[0]), int(face[corner]), int(face[corner + 1]))))
+
+    def cross_normal(points, triangle):
+        a, b, c = (points[index] for index in triangle)
+        ab = [b[axis] - a[axis] for axis in range(3)]
+        ac = [c[axis] - a[axis] for axis in range(3)]
+        return [
+            ab[1] * ac[2] - ab[2] * ac[1],
+            ab[2] * ac[0] - ab[0] * ac[2],
+            ab[0] * ac[1] - ab[1] * ac[0],
+        ]
+
+    def normalized_face_normals(points):
+        normals = [[0.0, 0.0, 0.0] for _ in faces]
+        for face_index, triangle in triangles:
+            normal = cross_normal(points, triangle)
+            for axis in range(3):
+                normals[face_index][axis] += normal[axis]
+        degenerate_faces = set()
+        for face_index, normal in enumerate(normals):
+            length = math.sqrt(sum(value * value for value in normal))
+            if length <= 2e-12:
+                degenerate_faces.add(face_index)
+            else:
+                for axis in range(3):
+                    normal[axis] /= length
+        return normals, degenerate_faces
+
+    baseline_normals, baseline_degenerate_faces = normalized_face_normals(before)
+    if baseline_degenerate_faces:
+        raise ValueError("Local panel safeguard encountered a degenerate baseline face")
+    continuity_limits = []
+    for first_face, second_face in continuity_edges:
+        cosine = max(-1.0, min(1.0, sum(
+            baseline_normals[first_face][axis] * baseline_normals[second_face][axis]
+            for axis in range(3)
+        )))
+        baseline_angle = math.degrees(math.acos(cosine))
+        continuity_limits.append(max(maximum_dihedral_degrees, baseline_angle + 1e-4))
+
+    scales = [1.0 if index in adjustable else 0.0 for index in range(len(before))]
+    old_normals = [cross_normal(before, triangle) for _, triangle in triangles]
+    if any(math.sqrt(sum(value * value for value in normal)) <= 2e-12 for normal in old_normals):
+        raise ValueError("Local panel safeguard encountered a degenerate baseline triangle")
+
+    def points_at_current_scales():
+        return [
+            [before[index][axis] + scales[index] * (proposed[index][axis] - before[index][axis])
+             for axis in range(3)]
+            for index in range(len(before))
+        ]
+
+    checks = 0
+    for iteration in range(1, 33):
+        points = points_at_current_scales()
+        implicated = set()
+        for triangle_index, (_, triangle) in enumerate(triangles):
+            new_normal = cross_normal(points, triangle)
+            old_normal = old_normals[triangle_index]
+            if (math.sqrt(sum(value * value for value in new_normal)) <= 2e-12
+                    or sum(old_normal[axis] * new_normal[axis] for axis in range(3)) <= 0):
+                implicated.update(index for index in triangle if index in adjustable)
+        normals, degenerate_faces = normalized_face_normals(points)
+        for edge_index, (first_face, second_face) in enumerate(continuity_edges):
+            if first_face in degenerate_faces or second_face in degenerate_faces:
+                continue
+            cosine = max(-1.0, min(1.0, sum(
+                normals[first_face][axis] * normals[second_face][axis]
+                for axis in range(3)
+            )))
+            if math.degrees(math.acos(cosine)) > continuity_limits[edge_index]:
+                implicated.update(
+                    index for index in face_vertices[first_face] | face_vertices[second_face]
+                    if index in adjustable
+                )
+        checks += len(triangles) + len(continuity_edges)
+        if not implicated:
+            break
+        changed = False
+        for index in implicated:
+            if scales[index] > 1e-5:
+                scales[index] *= 0.5
+                changed = True
+            else:
+                scales[index] = 0.0
+        if not changed:
+            raise ValueError("Local panel safeguard could not resolve a constrained fairing vertex")
+    else:
+        raise ValueError("Local panel safeguard did not converge within 32 backtracking passes")
+
+    bounded = points_at_current_scales()
+    result_normals, result_degenerate_faces = normalized_face_normals(bounded)
+    if result_degenerate_faces:
+        raise ValueError("Local panel safeguard final surface contains a degenerate face")
+    maximum_baseline_dihedral = 0.0
+    maximum_result_dihedral = 0.0
+    baseline_edges_over_cap = 0
+    for edge_index, (first_face, second_face) in enumerate(continuity_edges):
+        baseline_cosine = max(-1.0, min(1.0, sum(
+            baseline_normals[first_face][axis] * baseline_normals[second_face][axis]
+            for axis in range(3)
+        )))
+        result_cosine = max(-1.0, min(1.0, sum(
+            result_normals[first_face][axis] * result_normals[second_face][axis]
+            for axis in range(3)
+        )))
+        baseline_angle = math.degrees(math.acos(baseline_cosine))
+        result_angle = math.degrees(math.acos(result_cosine))
+        maximum_baseline_dihedral = max(maximum_baseline_dihedral, baseline_angle)
+        maximum_result_dihedral = max(maximum_result_dihedral, result_angle)
+        baseline_edges_over_cap += baseline_angle > maximum_dihedral_degrees
+
+    return bounded, {
+        "method": "local-panel-vertex-backtracking-v1",
+        "orientationCheckedTriangleCount": len(triangles),
+        "continuityEdgeCount": len(continuity_edges),
+        "constraintChecks": checks,
+        "backtrackingPasses": iteration,
+        "clampedVertexCount": sum(scales[index] < 1.0 for index in adjustable),
+        "minimumRetainedDisplacementScale": min(scales[index] for index in adjustable),
+        "maximumBaselineDihedralDegrees": maximum_baseline_dihedral,
+        "baselineEdgesOverCap": baseline_edges_over_cap,
+        "maximumResultDihedralDegrees": maximum_result_dihedral,
+    }
+
+
 def intra_panel_continuity_edges(faces, owners, piece_ids):
     """Return shared edges between faces owned by the same declared panel."""
     if len(faces) != len(owners) or not piece_ids:
@@ -360,8 +511,8 @@ def fair_panel_interiors(mesh, declaration):
         vertices = updated
     continuity_edges = intra_panel_continuity_edges(faces, owners, continuity_piece_ids) if continuity_piece_ids else []
     continuity_degrees = float(declaration.get("maximumDihedralDegrees", 60.0))
-    vertices, displacement_scale, orientation_checked, continuity_evidence = preserve_face_orientation_during_displacement(
-        faces, original, vertices, continuity_edges, continuity_degrees
+    vertices, continuity_evidence = preserve_panel_interior_orientation_locally(
+        faces, original, vertices, moved, continuity_edges, continuity_degrees
     )
     distances = [
         math.sqrt(sum((vertices[index][axis] - original[index][axis]) ** 2 for axis in range(3)))
@@ -369,7 +520,7 @@ def fair_panel_interiors(mesh, declaration):
     ]
     mesh["vertices"] = vertices
     return {
-        "method": "bounded-panel-interior-laplacian-fairing",
+        "method": "bounded-panel-interior-laplacian-fairing-with-local-constraint-backtracking",
         "pieceIds": sorted(piece_ids),
         "continuityProtectedFromFairingPieceIds": sorted(continuity_piece_ids),
         "geometryFairingPieceIds": sorted(smoothing_piece_ids),
@@ -380,8 +531,8 @@ def fair_panel_interiors(mesh, declaration):
         "lockedCanonicalBoundaryVertexCount": len(boundary_vertices),
         "maximumVertexDisplacementM": max(distances, default=0.0),
         "meanVertexDisplacementM": sum(distances) / len(distances) if distances else 0.0,
-        "orientationPreservingDisplacementScale": displacement_scale,
-        "orientationCheckedTriangleCount": orientation_checked,
+        "orientationPreservingDisplacementScale": continuity_evidence["minimumRetainedDisplacementScale"],
+        "orientationCheckedTriangleCount": continuity_evidence["orientationCheckedTriangleCount"],
         "normalContinuity": continuity_evidence,
         "preservesCanonicalPanelSeams": True,
         "grantsFitAcceptance": False,
