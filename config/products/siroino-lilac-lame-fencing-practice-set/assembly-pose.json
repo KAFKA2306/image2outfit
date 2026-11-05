@@ -9767,7 +9767,7 @@
       ],
       "evidenceBoundary": "V138 restores 15 mm additional front hem extension and 4 mm forward projection after the larger V137 extension formed a shield and side wedge. Common host/lap panel boundaries remain. Pose coverage, fit, drape, and appearance remain unapproved."
     },
-    "evidenceBoundary": "V152 holds 40 mm relief constant and changes only panel-local pleat cross-section: 8% half-width recessed valleys, 55% valley-depth contrast, and an 85% crest ramp to narrow the flat top. This tests crease legibility through geometry while preserving sewn boundaries and armature deformation; fit and appearance remain unapproved.",
+    "evidenceBoundary": "V156 holds the V155 relief profile and panel topology settings fixed while increasing the local pleat cycles from two to three on all six sewn overskirt panels. This increases the repeated crease rhythm without changing sewn boundaries, hem placement, or the torso fairing trial; fit, motion and appearance remain unapproved.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9779,14 +9779,14 @@
     "foldValleyHalfWidthFraction": 0.08,
     "foldValleyDepthRatio": 0.55,
     "foldCrestRampFraction": 0.85,
-    "foldsPerPanel": 1,
+    "foldsPerPanel": 3,
     "foldsPerPanelByPiece": {
-      "overskirt-front-lap-right": 2,
-      "overskirt-front-right": 2,
-      "overskirt-front-left": 2,
-      "overskirt-back-right": 2,
-      "overskirt-back-left": 2,
-      "overskirt-front-lap-left": 2
+      "overskirt-front-lap-right": 3,
+      "overskirt-front-right": 3,
+      "overskirt-front-left": 3,
+      "overskirt-back-right": 3,
+      "overskirt-back-left": 3,
+      "overskirt-front-lap-left": 3
     }
   },
   "skirtFlareDesignEvidence": {
@@ -9809,7 +9809,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v155-local-torso-fairing-clamp-20261105",
+  "designRevision": "v156-three-pleats-per-panel-20261105",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
