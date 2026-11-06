@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v167-capped-neutral-seam-rest-anchor-20261106",
+  "revision": "v168-armature-only-jacket-sleeves-20261106",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "description": "Direct inspection of the V168 arms-up and arm-cross previews shows the sleeve tubes remain extended sideways from the shoulders instead of following the raised or crossed arms; the clothing no longer forms an integrated sleeve silhouette.",
       "severity": "BLOCKER",
-      "code": "SLEEVES_DO_NOT_FOLLOW_ARM_POSES",
-      "description": "Direct review of all current V167 previews confirms the sleeve surfaces remain detached from the posed arms and stretch across the chest in neutral and arms-up views."
+      "code": "SLEEVES_DO_NOT_FOLLOW_ARM_POSES"
     },
     {
+      "description": "Direct inspection of the V168 crouch, sit, and prone previews shows the jacket collar and torso displaced from the visible body, including a large separated jacket section in prone.",
       "severity": "BLOCKER",
-      "code": "SKIRT_SHAPE_AND_HEM_COLLAPSED",
-      "description": "The overskirt still collapses into sharply crumpled masses around the hips and back, with projecting panels and a broken hem silhouette."
+      "code": "TORSO_SEPARATES_FROM_BODY"
     },
     {
+      "description": "Across the V168 five-view and neutral previews, the overskirt remains heavily crumpled with raised rear sections; crouch, sit, and prone show projecting strips and separated lavender trim.",
       "severity": "BLOCKER",
-      "code": "GARMENT_POSITION_AND_TRIM_DISCONTINUITY",
-      "description": "Crouch and sit show the collar and torso garment displaced from the mannequin; prone shows the torso garment hanging below it with detached-looking trim. The pose surfaces remain visibly discontinuous."
+      "code": "SKIRT_SHAPE_AND_TRIM_COLLAPSED"
     }
   ],
   "failedGeometryChecks": [

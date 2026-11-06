@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V167 transfers exact target-body authored weights onto connected jacket sleeves, bodice, and collar in one neutral rest-pose basis. It averages weights across shared canonical sewn vertices, constrains Cloth only to declared shared seams, and restores sewn boundary positions to the captured neutral rest coordinates after baking under a 15 mm per-vertex correction cap. This is a disposable construction hypothesis; fit, appearance, and release stay unapproved.",
-  "designRevision": "v167-capped-neutral-seam-rest-anchor-20261106",
+  "target": "V168 keeps jacket sleeves and connected bodice on the target body's authored armature weights in one neutral rest-pose basis but removes sleeves from the Cloth solver. The overskirt retains Cloth and its capped neutral-rest sewn-boundary anchor. This is a disposable construction hypothesis; fit, appearance, and release stay unapproved.",
+  "designRevision": "v168-armature-only-jacket-sleeves-20261106",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -140,7 +140,6 @@
   "clothSimulation": {
     "applicability": "REQUIRED",
     "components": [
-      "jacket-sleeves",
       "pleated-overskirt"
     ],
     "prototypePanelGroups": {
@@ -166,6 +165,7 @@
     },
     "prototypeFrameEnd": 48,
     "nonClothDeformationPaths": {
+      "jacket-sleeves": "authored-panel-shape-preserving-armature-skinning",
       "jacket-bodice": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypePreClothSkinning": {
@@ -182,8 +182,8 @@
           "UpperArm_R",
           "LowerArm_R"
         ],
-        "reason": "The V163 direct pose review found jacket sleeves hanging away from T-pose, raised and crossed arms. The body collider was armature-animated while sleeve panels entered Cloth without that armature deformation, so the simulated body and garment did not share a moving rest-space basis. V164 measured 7.06 mm divergence at a shared sleeve/bodice seam after transferring only sleeve weights. V165 exposed a pin-selection defect: all sleeve vertices received Cloth Pin because armature weight groups already existed.",
-        "evidenceBoundary": "For the disposable 48-frame native Cloth pose sweep only, interpolate the exact imported target body's authored vertex-group weights over its nearest surface triangle, add the target armature modifier before Cloth, and enable dynamic mesh evaluation. Cloth pin IDs are restricted to Image2Outfit Cloth Pin seam membership. Stage 09 independently recalculates and audits production garment weights. This does not prove sleeve fit, collision safety, motion acceptance, appearance, or release readiness."
+        "reason": "Direct review of the V167 renders still showed jacket sleeves pulled away from the arms after cloth baking. The current hypothesis is to use the already measured target-body authored weights and armature-only sleeve deformation, while retaining Cloth solely for the overskirt.",
+        "evidenceBoundary": "For the disposable pose hypothesis, interpolate exact imported target-body authored weights over nearest surface triangles and deform sleeves with the target armature only; jacket sleeves are deliberately excluded from native Cloth. Stage 09 independently recalculates and audits production garment weights. This does not prove sleeve fit, collision safety, motion acceptance, appearance, or release readiness."
       },
       "jacket-bodice": {
         "sourceObject": "SiroinoSotai_PC",
@@ -198,7 +198,7 @@
     "prototypeSharedSeamAnchor": {
       "method": "restore-shared-canonical-sewn-vertex-coordinates-to-captured-neutral-rest-positions-after-cloth-bake",
       "maximumCorrectionM": 0.015,
-      "reason": "V166 Cloth baking moved shared sleeve/bodice boundary points and the canonical skin exporter rejected a 7.06 mm divergence. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
+      "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
     "poseResponseTrial": {
@@ -229,23 +229,10 @@
       ],
       "evidenceBoundary": "Prototype-only Blender Cloth timeline with the actual target armature driving the collision body and the shared overskirt waist pins before Cloth evaluation. Posed customer renders continue to use the exported rest-shape skinning path; this trial does not create runtime cloth, and does not prove fit or collision safety."
     },
-    "evidence": "V167 transfers authored target-body bone groups onto connected jacket sleeves, bodice and collar before pose simulation, averages weights at shared canonical seam vertices, and applies the shared armature in one neutral rest basis before Cloth. Cloth pins use only declared attachment seam vertices; sleeves are evaluated as a dynamic mesh against the moving collision body. After baking, only shared sewn boundary coordinates are restored to their captured neutral positions under the declared 15 mm per-vertex cap, with before/after gaps and correction statistics recorded. It records mapped coverage, pin counts, surface distances, seam-gap diagnostics, pose hashes and regenerated renders. The saved garment remains prototype-only; this does not export runtime Cloth or grant fit, collision safety, appearance, or release acceptance.",
-    "reason": "V163 directly showed moving avatar poses but sleeves displaced from T-pose, raised, and crossed arms; V164's sleeve-only weight transfer created a measured 7.06 mm seam gap. V165 mapped connected jacket panels through the target-body skeleton but accidentally treated every newly weighted sleeve vertex as a Cloth pin. V166 restricted pin membership to the named Cloth Pin group, but actual neutral Cloth bake still produced a measured 14.1 mm shared seam gap and skin/export rejected it. V167 applies a measured, explicitly capped correction only to shared sewn boundary vertices before downstream skin transfer. Inspect freshly regenerated current pose renders if the pipeline advances; skirt poses remain a separate review. This sweep is prototype diagnostics only, not a fit, coverage, collision-safety, appearance, or release pass.",
-    "prototypeComponentBendingHypotheses": {
-      "jacket-sleeves": {
-        "stiffness": 2.2,
-        "reason": "Direct review shows excessive sleeve wrinkling in the neutral render. Compare a structured sleeve cloth setting with the existing 0.45 baseline; 2.2 is a local prototype trial value, not a Lilac fabric calibration.",
-        "evidenceBoundary": "One neutral 48-frame trial against the current jacket sleeve panels; this parameter experiment does not establish fit, motion, material behavior, appearance approval, or release readiness."
-      }
-    },
-    "prototypePostBakeLaplacianSmoothing": {
-      "jacket-sleeves": {
-        "iterations": 3,
-        "factor": 0.18,
-        "reason": "Direct neutral and pose renders still show physical sleeve corrugation after the bounded cloth solve. Compare a low-strength interior-only fairing pass while locking all open garment boundaries and sewn pins.",
-        "evidenceBoundary": "Three post-bake uniform Laplacian iterations at factor 0.18 on non-boundary sleeve vertices only. Exact source, displacement statistics, fixed-boundary count, and resulting mesh hashes are recorded by this run. This is a geometry hypothesis only; it does not establish fit, fold quality, motion, appearance approval, or release readiness."
-      }
-    }
+    "evidence": "V168 transfers authored target-body bone groups onto connected jacket sleeves, bodice and collar, averages weights at shared canonical sewn vertices, and keeps all jacket panels on the same armature. Only the overskirt enters native Cloth; jacket sleeves use the armature-only deformation path. Shared sewn boundaries are restored after Cloth baking under the declared 15 mm per-vertex cap, with before/after gaps and correction statistics recorded. It records target-body mapping, surface distances, seam-gap diagnostics, pose hashes and regenerated renders. The saved garment remains prototype-only; this does not export runtime Cloth or grant fit, collision safety, appearance, or release acceptance.",
+    "reason": "V167 direct renders still showed detached and displaced sleeves after the native Cloth pose sweep, despite passing seam continuity. V168 removes the sleeve panels from Cloth and compares actual armature-only sleeve deformations against the same mannequin poses while leaving the skirt experiment unchanged. Inspect arms-up and arm-cross first, then review all remaining garment surfaces. This is prototype diagnostics only, not a fit, coverage, collision-safety, appearance, or release pass.",
+    "prototypeComponentBendingHypotheses": {},
+    "prototypePostBakeLaplacianSmoothing": {}
   },
   "frontClosure": {
     "status": "PROTOTYPE_OVERLAP_UNFASTENED",
