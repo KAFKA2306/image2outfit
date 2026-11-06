@@ -2086,6 +2086,7 @@ def main():
         garment_objects, bones
     )
     edge_sources = {}
+    edge_source_normals = {}
     for obj in garment_objects:
         source_ids = obj.data.attributes.get("canonical_sewn_vertex_index")
         # Surface motifs are skinned with the garment but are not split from
@@ -2100,6 +2101,23 @@ def main():
         ):
             for index in face.vertices:
                 owners[index].add(pieces[owner.value])
+        normal_matrix = obj.matrix_world.to_3x3().inverted().transposed()
+        for face, owner in zip(
+            obj.data.polygons, obj.data.attributes["canonical_piece_index"].data
+        ):
+            piece = pieces[owner.value]
+            source_vertices = [source_ids.data[index].value for index in face.vertices]
+            if any(source_id < 0 for source_id in source_vertices):
+                continue
+            world_normal = normal_matrix @ face.normal
+            if world_normal.length_squared <= 1e-12:
+                raise ValueError(f"Settled trim source face has a degenerate normal: {obj.name}:{face.index}")
+            world_normal.normalize()
+            for first, second in zip(source_vertices, source_vertices[1:] + source_vertices[:1]):
+                if first == second:
+                    continue
+                key = (min(first, second), max(first, second), piece)
+                edge_source_normals.setdefault(key, []).append(world_normal.copy())
         for vertex, source_id in zip(obj.data.vertices, source_ids.data):
             weights = {
                 obj.vertex_groups[g.group].name: g.weight
@@ -2138,10 +2156,36 @@ def main():
             rest_direction = Vector(binding["restDirection"])
             if min(direction.length_squared, rest_direction.length_squared) <= 1e-16:
                 raise ValueError(f"Collapsed trim source edge: {obj.name}")
-            fraction = binding["fraction"]
-            offset = rest_direction.rotation_difference(direction) @ Vector(
-                binding["restOffset"]
+            edge_key = (
+                min(binding["first"], binding["second"]),
+                max(binding["first"], binding["second"]),
+                piece,
             )
+            normals = edge_source_normals.get(edge_key, [])
+            if not normals:
+                raise ValueError(f"Settled trim edge has no canonical source face normal: {obj.name} {edge_key}")
+            current_normal = sum(normals, Vector((0.0, 0.0, 0.0)))
+            if current_normal.length_squared <= 1e-12:
+                current_normal = normals[0].copy()
+            current_normal.normalize()
+            rest_normal = Vector(binding["restSurfaceNormal"])
+            if rest_normal.length_squared <= 1e-12:
+                raise ValueError(f"Trim binding has a degenerate rest surface normal: {obj.name}")
+            rest_normal.normalize()
+            fraction = binding["fraction"]
+            rest_tangent = rest_direction.normalized()
+            current_tangent = direction.normalized()
+            rest_transverse = rest_normal.cross(rest_tangent)
+            current_transverse = current_normal.cross(current_tangent)
+            if min(rest_transverse.length_squared, current_transverse.length_squared) <= 1e-12:
+                raise ValueError(f"Trim surface frame is degenerate: {obj.name} {edge_key}")
+            rest_transverse.normalize()
+            current_transverse.normalize()
+            rest_tangent = rest_transverse.cross(rest_normal).normalized()
+            current_tangent = current_transverse.cross(current_normal).normalized()
+            rest_frame = Matrix((rest_tangent, rest_transverse, rest_normal)).transposed()
+            current_frame = Matrix((current_tangent, current_transverse, current_normal)).transposed()
+            offset = current_frame @ rest_frame.inverted() @ Vector(binding["restOffset"])
             point = first.lerp(second, fraction) + offset
             displacements.append((point - obj.matrix_world @ vertex.co).length)
             vertex.co = inverse @ point
@@ -2166,7 +2210,7 @@ def main():
         obj["prototypeRole"] = "weighted-unfit-sewn-prototype"
         audits[obj.name] = constrained.audit.to_dict()
         trim_audits[obj.name] = {
-            "method": "settled-sewn-edge-position-and-weight-interpolation",
+            "method": "settled-sewn-edge-position-weight-and-surface-frame-interpolation",
             "vertexCount": len(bindings),
             "maximumSettlingDisplacementM": max(displacements),
             "meanSettlingDisplacementM": sum(displacements) / len(displacements),

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v169-single-target-armature-deform-20261106",
+  "revision": "v170-settled-skirt-surface-frame-trim-20261106",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "description": "Direct inspection of all current neutral, back, side, three-quarter, crouch, sit and prone renders shows the overskirt remains severely crumpled and asymmetric, with large rear-side masses and openings. Lavender strips still bridge empty space and cross folded skirt surfaces instead of following a continuous hem. Crouch and sit show thighs emerging through the skirt and stretched plate-like fabric below it; prone has projecting hip folds.",
+      "severity": "BLOCKER",
+      "code": "SKIRT_SILHOUETTE_AND_TRIM_COLLAPSED"
+    },
+    {
+      "description": "Irregular gray patches and angular surface changes remain visible across the chest and waist in front, three-quarter, side and posed renders. The images do not establish whether these are intersections, exposed surfaces or shading defects; the current visible appearance is unacceptable.",
+      "severity": "BLOCKER",
+      "code": "BODICE_SURFACE_ARTIFACTS"
+    },
+    {
+      "description": "The current arms-up and arm-cross renders show sleeve tubes following the observed arm silhouettes; this does not establish numeric fit or runtime behavior.",
       "severity": "INFO",
-      "code": "SLEEVES_FOLLOW_CURRENT_ARM_POSES",
-      "description": "In the current arms-up and arm-cross previews, the sleeve tubes follow the observed arm silhouettes; the horizontal side projection is not visible in these regenerated poses."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "SKIRT_SILHOUETTE_AND_TRIM_COLLAPSED",
-      "description": "Direct inspection of the neutral, back, side and prone previews shows the overskirt remains severely crumpled and asymmetric, with large rear-side fabric masses. The sit and crouch poses show large openings around the thighs and plate-like fabric sections hanging below the skirt. Narrow lavender trim sections read as detached straight bars across the side/back silhouette."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "BODICE_SURFACE_ARTIFACTS",
-      "description": "Across the regenerated front, side, neutral and seated previews, the bodice has visible irregular gray/pale patches and angular surface changes at the chest, side and waist. Images alone do not establish whether these are body penetration, missing faces, or overlapping geometry; the current appearance is not acceptable."
+      "code": "SLEEVES_FOLLOW_CURRENT_ARM_POSES"
     }
   ],
   "failedGeometryChecks": [

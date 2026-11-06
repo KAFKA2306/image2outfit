@@ -950,25 +950,50 @@ def add_prototype_edge_trim(mesh, job, pieces, recipe):
         # Independent nearest-body weights can detach trim from its cloth surface.
         from mathutils import Vector
         bindings = []
-        segments = [
-            (a, b, owner, Vector(mesh["vertices"][a]), Vector(mesh["vertices"][b]))
-            for a, b in chain_edges
-            for owner in sorted(edge_owners[(a, b)])
-        ]
+        segments = []
+        for a, b in chain_edges:
+            edge = tuple(sorted((a, b)))
+            normals = edge_face_normals.get(edge, [])
+            if not normals:
+                raise ValueError(f"Prototype hem binding has no source face normal: {edge}")
+            rest_normal = sum(normals, Vector((0.0, 0.0, 0.0)))
+            if rest_normal.length_squared <= 1e-12:
+                rest_normal = normals[0].copy()
+            rest_normal.normalize()
+            segments.extend(
+                (
+                    a,
+                    b,
+                    owner,
+                    Vector(mesh["vertices"][a]),
+                    Vector(mesh["vertices"][b]),
+                    rest_normal.copy(),
+                )
+                for owner in sorted(edge_owners[edge])
+            )
         for vertex in trim.data.vertices:
             best = None
-            for a, b, owner, first, second in segments:
+            for a, b, owner, first, second, rest_normal in segments:
                 direction = second - first
                 if direction.length_squared <= 1e-16:
                     raise ValueError("Prototype piping contains a zero-length source edge")
                 fraction = max(0.0, min(1.0, (vertex.co-first).dot(direction)/direction.length_squared))
                 offset = vertex.co - first.lerp(second, fraction)
-                record = (offset.length_squared, a, b, owner, fraction, list(offset), list(direction))
+                record = (
+                    offset.length_squared,
+                    a,
+                    b,
+                    owner,
+                    fraction,
+                    list(offset),
+                    list(direction),
+                    list(rest_normal),
+                )
                 if best is None or record[0] < best[0]:
                     best = record
             bindings.append({"first": best[1], "second": best[2], "pieceId": best[3],
                              "fraction": best[4], "restOffset": best[5],
-                             "restDirection": best[6]})
+                             "restDirection": best[6], "restSurfaceNormal": best[7]})
         trim["prototypeTrimBindings"] = json.dumps(bindings)
         trim["prototypeTrimPieceId"] = piece_id
         trim["prototypeTrimPieceIds"] = json.dumps(chain_piece_ids)
