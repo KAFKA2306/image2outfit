@@ -2,39 +2,39 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
-  "reviewer": "chatgpt:Codex + gpt-6-astra",
-  "reviewedRevision": "v168-armature-only-jacket-sleeves-20261106",
+  "reviewer": "Codex direct review + independent Astra review",
+  "reviewedRevision": "v169-single-target-armature-deform-20261106",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "4e7d5bdcb03cdf272a6e48dfb2ac092eb43ad54855d5fa6a226d24d4c70a3b26",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "ea095e5f1e9db0327a3d62ad58aa99b0ce3ca162cb6cb99b63d53e670a3e0431",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "cced48ad4e51cb8fa54d4fa5b26c2ca6a0d9a0a6a912c1bc7acc2938be77be1d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "dca35fa00d7b8af8166ef6c18a2a0cbfc5f9b2dd1d7976f98ab4b5884315ab43",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "3c0b1342185be7023ac2826264a878d5275820307183206c3e8fa736531a9f6e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "008be53e00b3c5de37f42bbba8b4936bc6f1bcc01fcf15685fd9e8ca7d6148c3",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "452eff63beaf419511a59fa69e9e7c620d4e37b27394d793060a025f00640dbc",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "28996ecbf24ffadb563efe67f76254380bc96899f81422e6a9bcbb26b7ce90c6",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "a28ebf36fdc84aafecc36b2ad699b81d4b4cb5d2cd22bea8583bdfd8c18c9bdd",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "9eaefbef803f85f9956d120f26d08e81a94c717ebce81f62356969abf280200b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "b35a3fb9067973b92e5bd73a145c08743e4972fa39b95198b294d04a3d47f39f"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "31877e84fb9bdfbcf0825e7417126caccb1458530dd8aa5633e7c9c37d8a3ed6",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "123f8505f9e03fdf4f5e9581da0246d61623e6e0aebacb9a4c872541195ed43b",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "6fdd48ed9ad8387bdd042ea9d27f79029b08b66e97dc377b4ab1de7a3e9fae2f",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "6338bc60e7e58ebf24fc7fc50f196a06d317842659e55bc36e625c5ee40526af",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "ba02f8a6baa4847390f830937e88a32d6d8732489b015be770eb0a3fbbbdaefe",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "213e8e48ec4158a1188c91dd2c0aee9bde86072cb7dd556796b2c941b3b47e0d",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "bf7f4937a43ae28a8f40b903b73d72c8b6725eeb8081a9bff05c1afef57c0b16",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "dd99e437a84244837c569517049952cb7ca54721abac4dfe8ccf4879428833fe",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "8e212354c1cc897420bf897c64301fd4de4c26cb428547e2ad5bdda79691f0b7",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "13d83abe4a441687b73e2cf874e4965d3a7f42ac928dfa3ac6693647a5aa340f",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "bf71fff210a23f165b0bc64ae3b90b2f8b240b2841f6e4ff18dfe42daa90b9a3"
   },
   "findings": [
     {
-      "description": "Direct inspection of the V168 arms-up and arm-cross previews shows the sleeve tubes remain extended sideways from the shoulders instead of following the raised or crossed arms; the clothing no longer forms an integrated sleeve silhouette.",
-      "severity": "BLOCKER",
-      "code": "SLEEVES_DO_NOT_FOLLOW_ARM_POSES"
+      "severity": "INFO",
+      "code": "SLEEVES_FOLLOW_CURRENT_ARM_POSES",
+      "description": "In the current arms-up and arm-cross previews, the sleeve tubes follow the observed arm silhouettes; the horizontal side projection is not visible in these regenerated poses."
     },
     {
-      "description": "Direct inspection of the V168 crouch, sit, and prone previews shows the jacket collar and torso displaced from the visible body, including a large separated jacket section in prone.",
       "severity": "BLOCKER",
-      "code": "TORSO_SEPARATES_FROM_BODY"
+      "code": "SKIRT_SILHOUETTE_AND_TRIM_COLLAPSED",
+      "description": "Direct inspection of the neutral, back, side and prone previews shows the overskirt remains severely crumpled and asymmetric, with large rear-side fabric masses. The sit and crouch poses show large openings around the thighs and plate-like fabric sections hanging below the skirt. Narrow lavender trim sections read as detached straight bars across the side/back silhouette."
     },
     {
-      "description": "Across the V168 five-view and neutral previews, the overskirt remains heavily crumpled with raised rear sections; crouch, sit, and prone show projecting strips and separated lavender trim.",
       "severity": "BLOCKER",
-      "code": "SKIRT_SHAPE_AND_TRIM_COLLAPSED"
+      "code": "BODICE_SURFACE_ARTIFACTS",
+      "description": "Across the regenerated front, side, neutral and seated previews, the bodice has visible irregular gray/pale patches and angular surface changes at the chest, side and waist. Images alone do not establish whether these are body penetration, missing faces, or overlapping geometry; the current appearance is not acceptable."
     }
   ],
-  "nextAction": "Keep V168 rejected. Repair jacket sleeve armature binding and torso alignment, restore skirt panel silhouette and trim attachment, then regenerate and directly inspect all 11 current previews. Appearance fails; runtime, numeric fit, Shape Key response, Unity/VRChat execution, packaging, and release remain unverified."
+  "nextAction": "Keep V169 rejected. Repair skirt panel placement and settling, align lavender trim with the deformed cloth surface, and inspect the bodice chest/side/waist geometry to identify the source of visible surface artifacts. Regenerate and directly inspect all eleven previews after changes. Numeric fit and Shape Key response, Unity/VRChat runtime, packaging, and release remain unverified."
 }

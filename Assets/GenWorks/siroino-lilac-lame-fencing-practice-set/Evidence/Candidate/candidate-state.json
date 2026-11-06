@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v168-armature-only-jacket-sleeves-20261106",
+  "revision": "v169-single-target-armature-deform-20261106",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of the V168 arms-up and arm-cross previews shows the sleeve tubes remain extended sideways from the shoulders instead of following the raised or crossed arms; the clothing no longer forms an integrated sleeve silhouette.",
-      "severity": "BLOCKER",
-      "code": "SLEEVES_DO_NOT_FOLLOW_ARM_POSES"
+      "severity": "INFO",
+      "code": "SLEEVES_FOLLOW_CURRENT_ARM_POSES",
+      "description": "In the current arms-up and arm-cross previews, the sleeve tubes follow the observed arm silhouettes; the horizontal side projection is not visible in these regenerated poses."
     },
     {
-      "description": "Direct inspection of the V168 crouch, sit, and prone previews shows the jacket collar and torso displaced from the visible body, including a large separated jacket section in prone.",
       "severity": "BLOCKER",
-      "code": "TORSO_SEPARATES_FROM_BODY"
+      "code": "SKIRT_SILHOUETTE_AND_TRIM_COLLAPSED",
+      "description": "Direct inspection of the neutral, back, side and prone previews shows the overskirt remains severely crumpled and asymmetric, with large rear-side fabric masses. The sit and crouch poses show large openings around the thighs and plate-like fabric sections hanging below the skirt. Narrow lavender trim sections read as detached straight bars across the side/back silhouette."
     },
     {
-      "description": "Across the V168 five-view and neutral previews, the overskirt remains heavily crumpled with raised rear sections; crouch, sit, and prone show projecting strips and separated lavender trim.",
       "severity": "BLOCKER",
-      "code": "SKIRT_SHAPE_AND_TRIM_COLLAPSED"
+      "code": "BODICE_SURFACE_ARTIFACTS",
+      "description": "Across the regenerated front, side, neutral and seated previews, the bodice has visible irregular gray/pale patches and angular surface changes at the chest, side and waist. Images alone do not establish whether these are body penetration, missing faces, or overlapping geometry; the current appearance is not acceptable."
     }
   ],
   "failedGeometryChecks": [

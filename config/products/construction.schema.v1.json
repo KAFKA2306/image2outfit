@@ -329,10 +329,62 @@
             "const": "authored-panel-shape-preserving-armature-skinning"
           }
         },
-        "nonClothDeformationPaths": {
+        "prototypePreClothSkinning": {
           "type": "object",
           "additionalProperties": {
-            "const": "authored-panel-shape-preserving-armature-skinning"
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sourceObject",
+              "armatureObject",
+              "method",
+              "maximumSurfaceDistanceM",
+              "requiredBoneGroups",
+              "reason",
+              "evidenceBoundary"
+            ],
+            "properties": {
+              "sourceObject": { "type": "string", "minLength": 1 },
+              "armatureObject": { "type": "string", "minLength": 1 },
+              "method": {
+                "const": "nearest-target-body-triangle-barycentric-authored-weights"
+              },
+              "maximumSurfaceDistanceM": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 0.05
+              },
+              "requiredBoneGroups": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "type": "string", "minLength": 1 }
+              },
+              "reason": { "type": "string", "minLength": 1 },
+              "evidenceBoundary": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "prototypeSharedSeamAnchor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "maximumCorrectionM",
+            "reason",
+            "evidenceBoundary"
+          ],
+          "properties": {
+            "method": {
+              "const": "restore-shared-canonical-sewn-vertex-coordinates-to-captured-neutral-rest-positions-after-cloth-bake"
+            },
+            "maximumCorrectionM": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.015
+            },
+            "reason": { "type": "string", "minLength": 1 },
+            "evidenceBoundary": { "type": "string", "minLength": 1 }
           }
         },
         "prototypeFrameEnd": {

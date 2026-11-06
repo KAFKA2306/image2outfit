@@ -32,6 +32,37 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def replace_armature_deform_modifier(obj, armature):
+    """Leave the final exported mesh with exactly one target-armature modifier.
+
+    Earlier prototype stages may add a temporary armature modifier to drive a
+    pose or cloth bake. Stage 09 rebuilds the garment's final target weights,
+    so retaining those earlier modifiers would apply the same deformation
+    twice in every evaluated pose.
+    """
+    removed = []
+    for modifier in list(obj.modifiers):
+        if modifier.type == "ARMATURE":
+            removed.append(modifier.name)
+            obj.modifiers.remove(modifier)
+    modifier = obj.modifiers.new("Target Avatar Deform", "ARMATURE")
+    modifier.object = armature
+    armature_modifiers = [item for item in obj.modifiers if item.type == "ARMATURE"]
+    if (
+        len(armature_modifiers) != 1
+        or armature_modifiers[0].name != modifier.name
+    ):
+        raise ValueError(f"expected exactly one final armature modifier: {obj.name}")
+    if modifier.object is not armature:
+        raise ValueError(f"final armature modifier targets wrong rig: {obj.name}")
+    return {
+        "removedPriorArmatureModifiers": removed,
+        "finalArmatureModifierCount": len(armature_modifiers),
+        "finalArmatureObject": armature.name,
+        "grantsFitAcceptance": False,
+    }
+
+
 def synchronize_shared_seam_weights(objects, deform_bones):
     """Keep split copies of a sewn vertex on one deformation trajectory.
 
@@ -1734,6 +1765,7 @@ def main():
     if not objects:
         raise ValueError("cloth candidate contains no garment meshes")
     audits, distances, region_records, profile_audits = {}, [], [], {}
+    deform_modifier_audits = {}
     shape_key_records = {}
     trim_objects = [
         obj
@@ -2003,8 +2035,9 @@ def main():
         for index, influences in constrained.weights.items():
             for influence in influences:
                 groups[influence.bone].add([index], influence.weight, "REPLACE")
-        modifier = obj.modifiers.new("Target Avatar Deform", "ARMATURE")
-        modifier.object = armature
+        deform_modifier_audits[obj.name] = replace_armature_deform_modifier(
+            obj, armature
+        )
         obj["prototypeRole"] = "weighted-unfit-sewn-prototype"
         audits[obj.name] = constrained.audit.to_dict()
         if profile_accumulators:
@@ -2127,8 +2160,9 @@ def main():
         for index, influences in constrained.weights.items():
             for influence in influences:
                 groups[influence.bone].add([index], influence.weight, "REPLACE")
-        modifier = obj.modifiers.new("Target Avatar Deform", "ARMATURE")
-        modifier.object = armature
+        deform_modifier_audits[obj.name] = replace_armature_deform_modifier(
+            obj, armature
+        )
         obj["prototypeRole"] = "weighted-unfit-sewn-prototype"
         audits[obj.name] = constrained.audit.to_dict()
         trim_audits[obj.name] = {
@@ -2225,6 +2259,13 @@ def main():
             "vertexCount": sum(len(obj.data.vertices) for obj in objects),
             "unweightedVertices": 0,
             "prototypeTrimAttachment": trim_audits,
+            "armatureDeformModifierNormalization": {
+                "method": "remove-prior-armature-modifiers-after-final-weight-rebuild",
+                "objects": deform_modifier_audits,
+                "expectedFinalArmatureModifierCountPerMesh": 1,
+                "grantsPoseFitAcceptance": False,
+                "evidenceBoundary": "This guarantees one target-rig deformation stage in the exported Blender objects after final weight transfer; it does not establish body fit, pose quality, collision safety, or release acceptance.",
+            },
             "shapeKeyTransfer": {
                 "status": "MEASURED_PROTOTYPE_TRANSFER",
                 "method": shape_key_contract["method"],
