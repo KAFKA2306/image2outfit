@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V162 keeps V161 panel construction but adds a bounded neutral-crouch-sit-prone-neutral native Cloth sweep, an animated target-body collider, and Hips-weighted shared waist-seam pins. The rest frame remains neutral; this tests whether the solver receives moving-body and moving-waist inputs. Pose fit, appearance, and release remain unapproved.",
-  "designRevision": "v162-moving-waist-cloth-pose-sweep-20261106",
+  "target": "V163 reuses the V162 cloth cache but clears its baked collider pose action and resets the target armature to rest before downstream sit/crouch garment geometry solves. Static product pose evidence remains prototype-only; fit, appearance, and release stay unapproved.",
+  "designRevision": "v163-neutral-pose-evaluation-after-cloth-bake-20261106",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -163,11 +163,26 @@
       "attachmentBone": "Hips",
       "collisionBody": "SiroinoSotai_PC",
       "poseSweep": [
-        { "frame": 1, "pose": "neutral" },
-        { "frame": 16, "pose": "crouch" },
-        { "frame": 32, "pose": "sit" },
-        { "frame": 40, "pose": "prone" },
-        { "frame": 48, "pose": "neutral" }
+        {
+          "frame": 1,
+          "pose": "neutral"
+        },
+        {
+          "frame": 16,
+          "pose": "crouch"
+        },
+        {
+          "frame": 32,
+          "pose": "sit"
+        },
+        {
+          "frame": 40,
+          "pose": "prone"
+        },
+        {
+          "frame": 48,
+          "pose": "neutral"
+        }
       ],
       "evidenceBoundary": "Prototype-only Blender Cloth timeline with the actual target armature driving the collision body and the shared overskirt waist pins before Cloth evaluation. Posed customer renders continue to use the exported rest-shape skinning path; this trial does not create runtime cloth, and does not prove fit or collision safety."
     },

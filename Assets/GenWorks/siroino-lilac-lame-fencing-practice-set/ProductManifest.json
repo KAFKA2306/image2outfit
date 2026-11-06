@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Keep this prototype rejected. Correct the garment/avatar rest-pose and skinning basis so sleeves, rigid trims and pins follow the intended body or garment after cloth simulation; inspect neutral and arms-up first. Then reassess sit/crouch/prone and restore the authored pleat silhouette. Do not tune cloth shape before the deformation mapping is corrected. Dynamic cloth response, fit, collision safety, weights, complete UVs, Shape Key response, Unity/VRChat execution, packaging and release remain unverified.",
+    "nextAction": "Keep V163 rejected. The baked collider pose action was removed and the armature reset before skin/export, but current direct renders confirm sleeve/body mismatch remains. Investigate the cloth simulation stage: align body, sleeve meshes and fixed points in one rest pose before simulation, and export the settled garment and rigid trim from that same reference basis. Check T-pose and arms-up first; then repeat skirt poses only after sleeves and attachments track. Fit, collision safety, weights, complete UVs, Shape Key response, Unity/VRChat execution, packaging and release remain unverified.",
     "lastAttempt": {
-      "runId": "0413a774664d4cc09a8de2390c32604d",
+      "runId": "7ea13885a8d846308144c890bb5fa29a",
       "status": "EXECUTED",
-      "checkedAt": "2026-11-05T22:03:15Z",
+      "checkedAt": "2026-11-06T00:07:05Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "09cbda7410aa101b0e0476fb8ad1b2119c36600974fa8cb60a952673307d8b95",
+      "stageEvidenceSha256": "eb9054705d3f91e458895920ca0f24cbaf6f85faf3d1077d5edc07b3500aca27",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -83,36 +83,36 @@
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "16337db0bf4445a3d544c9b8d9f00c623e38745225563181f2cfe885927c9939"
+          "stageResultSha256": "ca3f121082737b228e377eace7db93fe1008ac6095ccbdfd39add00e2316b466"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "a122b657b13a70bf226514c7beae2647ab5bd5229678bb138c277ed00ad0e244"
+          "stageResultSha256": "347497ed8c784cbdca40f0997dc460d511e8e28f969260168432fa238d1a24eb"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "5bfae7b892d0564596f88d4678d9a1d9cf3e031611770006027e1df965a0cf7a"
+          "stageResultSha256": "17406baaf38e9c500ecbb46d757417a73cdbfb909ec4227729d7bf33e15ec18a"
         },
         "audit-geometry": {
           "status": "REUSED",
-          "stageResultSha256": "c6cf8f6dcde7b622094785681d125aeadc8ee1c3ba0ab93d290bd283f1de3f1e"
+          "stageResultSha256": "de0665cad2d686fa60bbee90772e4259a4b74bdcbcbdf864f71962f3757cda31"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "aef2131670ac813a13146c2985ab4e2aa67e9697722bb3ba1a1be47cab5dccb8"
+          "stageResultSha256": "31383cd37f7ed588974fdf2c1d503eb14db9bca0d49e737e73ea974f4c9c8bab"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "09cbda7410aa101b0e0476fb8ad1b2119c36600974fa8cb60a952673307d8b95"
+          "stageResultSha256": "eb9054705d3f91e458895920ca0f24cbaf6f85faf3d1077d5edc07b3500aca27"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "f0198cd20307186f7ad9ebbaf383c6ab0fd9e84d3ee3f134c7941c18f4d9da0f",
+      "checkpointSha256": "9c269d5812e7e8661d2adcf5f2fb0958a4cbe7b6dfaf72d36d34aedf393eeb5b",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Keep this prototype rejected. Correct the garment/avatar rest-pose and skinning basis so sleeves, rigid trims and pins follow the intended body or garment after cloth simulation; inspect neutral and arms-up first. Then reassess sit/crouch/prone and restore the authored pleat silhouette. Do not tune cloth shape before the deformation mapping is corrected. Dynamic cloth response, fit, collision safety, weights, complete UVs, Shape Key response, Unity/VRChat execution, packaging and release remain unverified."
+      "nextAction": "Keep V163 rejected. The baked collider pose action was removed and the armature reset before skin/export, but current direct renders confirm sleeve/body mismatch remains. Investigate the cloth simulation stage: align body, sleeve meshes and fixed points in one rest pose before simulation, and export the settled garment and rigid trim from that same reference basis. Check T-pose and arms-up first; then repeat skirt poses only after sleeves and attachments track. Fit, collision safety, weights, complete UVs, Shape Key response, Unity/VRChat execution, packaging and release remain unverified."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
@@ -135,22 +135,22 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "226d016486d0cb0e6e775b2bc4f2451c8856d3af6842407e8e6ef41be295fd38",
+      "sha256": "f9a09ed122a2ba3fb40d2b1556721d0083e54c17cd4ede47449a552b8d8299fe",
       "findings": [
         {
-          "code": "GARMENT_SLEEVES_AND_TRIMS_DO_NOT_FOLLOW_POSED_BODY",
-          "severity": "BLOCKER",
-          "description": "Direct inspection of the current regenerated pose previews confirms the static body poses now change correctly. Garment sleeves remain displaced from the raised and crossed arms, and the purple hem trim detaches far from the cloth in prone. The pose-render correction does not establish garment deformation or fit."
+          "description": "Direct review of the current V163 previews confirms T-pose and arms-up poses render distinctly, but the sleeve-like garment surfaces still hang away from the posed arms in T-pose and remain displaced in arms-up and arm-cross. Clearing the baked action and resetting the pose did not resolve the sleeve/body mismatch.",
+          "code": "GARMENT_SLEEVES_DO_NOT_FOLLOW_POSED_ARMS",
+          "severity": "BLOCKER"
         },
         {
-          "code": "OVERSKIRT_SILHOUETTE_COLLAPSES_IN_STATIC_POSES",
-          "severity": "BLOCKER",
-          "description": "The overskirt is already irregularly collapsed in neutral, and sit/crouch expose underlayers and thighs as the front opens. Prone turns the skirt into a dense crumpled mass. This fails visual appearance and fit."
+          "description": "The neutral overskirt is irregularly collapsed and the rear shorts are broadly exposed. Sit/crouch open the front cover and expose the underlayer; prone pulls purple trim far away from the cloth. Shape and hem remain broken.",
+          "code": "OVERSKIRT_AND_TRIM_DEFORMATION_REMAINS_UNSAFE",
+          "severity": "BLOCKER"
         },
         {
-          "code": "TORSO_SURFACE_ARTIFACTS_REMAIN",
-          "severity": "BLOCKER",
-          "description": "Current previews show gray patch-like torso areas and discontinuous shoulder/side surfaces. Images alone do not distinguish surface material defects from mesh gaps, so treat the defect as unresolved and blocking."
+          "description": "Gray patch-like areas remain visible on chest and waist, with discontinuous-looking shoulder/side surfaces. Renders cannot determine whether these are material artifacts or mesh gaps, so geometry inspection is required.",
+          "code": "TORSO_SHOULDER_SURFACE_DEFECTS_UNRESOLVED",
+          "severity": "BLOCKER"
         }
       ],
       "grantsQualityAcceptance": false
@@ -161,33 +161,33 @@
     "decision": "REJECT",
     "findings": [
       {
-        "code": "GARMENT_SLEEVES_AND_TRIMS_DO_NOT_FOLLOW_POSED_BODY",
-        "severity": "BLOCKER",
-        "description": "Direct inspection of the current regenerated pose previews confirms the static body poses now change correctly. Garment sleeves remain displaced from the raised and crossed arms, and the purple hem trim detaches far from the cloth in prone. The pose-render correction does not establish garment deformation or fit."
+        "description": "Direct review of the current V163 previews confirms T-pose and arms-up poses render distinctly, but the sleeve-like garment surfaces still hang away from the posed arms in T-pose and remain displaced in arms-up and arm-cross. Clearing the baked action and resetting the pose did not resolve the sleeve/body mismatch.",
+        "code": "GARMENT_SLEEVES_DO_NOT_FOLLOW_POSED_ARMS",
+        "severity": "BLOCKER"
       },
       {
-        "code": "OVERSKIRT_SILHOUETTE_COLLAPSES_IN_STATIC_POSES",
-        "severity": "BLOCKER",
-        "description": "The overskirt is already irregularly collapsed in neutral, and sit/crouch expose underlayers and thighs as the front opens. Prone turns the skirt into a dense crumpled mass. This fails visual appearance and fit."
+        "description": "The neutral overskirt is irregularly collapsed and the rear shorts are broadly exposed. Sit/crouch open the front cover and expose the underlayer; prone pulls purple trim far away from the cloth. Shape and hem remain broken.",
+        "code": "OVERSKIRT_AND_TRIM_DEFORMATION_REMAINS_UNSAFE",
+        "severity": "BLOCKER"
       },
       {
-        "code": "TORSO_SURFACE_ARTIFACTS_REMAIN",
-        "severity": "BLOCKER",
-        "description": "Current previews show gray patch-like torso areas and discontinuous shoulder/side surfaces. Images alone do not distinguish surface material defects from mesh gaps, so treat the defect as unresolved and blocking."
+        "description": "Gray patch-like areas remain visible on chest and waist, with discontinuous-looking shoulder/side surfaces. Renders cannot determine whether these are material artifacts or mesh gaps, so geometry inspection is required.",
+        "code": "TORSO_SHOULDER_SURFACE_DEFECTS_UNRESOLVED",
+        "severity": "BLOCKER"
       }
     ],
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "66c33e33dc8ef279c12a49e99de1e1ae1a08deae8035d18855c82d9938312a8e",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "51715ddcd3b53260fa1874bd10c021e2e12ed315c38aea16ef22ea449463a1b0",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "e163afb7a0e2bc1f68876456fdb90d8ecbf6ffbe0a96508dd35e4c6713c819cb",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "f4db431b19029c23a2b8e1add38344017ed58505204060c41f40769868a03038",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "d21d9364ae6838c4d7783689c7039cda7202deeec0f793f8406b9763c218228c",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "47891215de590ad71ff461186f4cc1608b0d79005c6f7867572a63f5fad733d2",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "8b94d83d9fc6e1eb2565d1ca225d1d9f64f15b3c09ac921d592ba5d2e58a124a",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "f4c935b2dd65f63b36cde04a641283fe7b3143ec472c70ce68fbb7b7dc82a02e",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "f7147b03c760b12f23e0e53fa4fb58d779814ae8ec2322410dc979cf0f7d48ad",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "250d84a2d200536855892a5383dae6cab8b8c43f02380ce9b14de09f40dc51b0",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "5dc81907e95275c9986c420b10a816546be131c887df2a161d1e496d90fa0449"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "4e3efdaac472e2cf93f94eb3d5137e98c8ecde1c7d4729d4ef031be109902af2",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "d87c1275f58b4c4fa55e55dd6fb65d396f49a10c62877d099299925ee14a3a0f",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "5dae8b92ab5f528109cf6393b6a8fe8e4a2f1a0c93269158666f36beae1f46e6",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "308ddf2c98d84b6b5672fe0ee062cb911b0325b9074105d40a0ec1b887ab4bf8",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "9a141631adb572707d6ed62bfb1462c8afbfcf88f0cd58bd6c36a8ef2edd78e9",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "fac63a6cbc7acb2a42a8d0ee8b54895764a23d2a84b6c71c629f16867239e159",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "a0679359ab85d2ba50abed140666424456ca3b26b53ef3604d767184e83b0a47",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "b7ae2012c762ee39d0d5e2d31a7ab26998e1a067ac960dd7129d1ce8cf2d2936",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "7e1682eadeec1d7225c8cbec4f3c249480ae5d885b5ee4c663c21e20646c6681",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "45705a03dcb1a144affc67c40b3167bd3eae78e60042130cc1c1e803ddd1514b",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "a8f3d03f7713fa900ea6d665afede2dbdbb1a74e1c5aa70f9f3a965509990643"
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"

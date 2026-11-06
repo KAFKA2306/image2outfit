@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v162-moving-waist-cloth-pose-sweep-20261106",
+  "revision": "v163-neutral-pose-evaluation-after-cloth-bake-20261106",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "GARMENT_SLEEVES_AND_TRIMS_DO_NOT_FOLLOW_POSED_BODY",
-      "severity": "BLOCKER",
-      "description": "Direct inspection of the current regenerated pose previews confirms the static body poses now change correctly. Garment sleeves remain displaced from the raised and crossed arms, and the purple hem trim detaches far from the cloth in prone. The pose-render correction does not establish garment deformation or fit."
+      "description": "Direct review of the current V163 previews confirms T-pose and arms-up poses render distinctly, but the sleeve-like garment surfaces still hang away from the posed arms in T-pose and remain displaced in arms-up and arm-cross. Clearing the baked action and resetting the pose did not resolve the sleeve/body mismatch.",
+      "code": "GARMENT_SLEEVES_DO_NOT_FOLLOW_POSED_ARMS",
+      "severity": "BLOCKER"
     },
     {
-      "code": "OVERSKIRT_SILHOUETTE_COLLAPSES_IN_STATIC_POSES",
-      "severity": "BLOCKER",
-      "description": "The overskirt is already irregularly collapsed in neutral, and sit/crouch expose underlayers and thighs as the front opens. Prone turns the skirt into a dense crumpled mass. This fails visual appearance and fit."
+      "description": "The neutral overskirt is irregularly collapsed and the rear shorts are broadly exposed. Sit/crouch open the front cover and expose the underlayer; prone pulls purple trim far away from the cloth. Shape and hem remain broken.",
+      "code": "OVERSKIRT_AND_TRIM_DEFORMATION_REMAINS_UNSAFE",
+      "severity": "BLOCKER"
     },
     {
-      "code": "TORSO_SURFACE_ARTIFACTS_REMAIN",
-      "severity": "BLOCKER",
-      "description": "Current previews show gray patch-like torso areas and discontinuous shoulder/side surfaces. Images alone do not distinguish surface material defects from mesh gaps, so treat the defect as unresolved and blocking."
+      "description": "Gray patch-like areas remain visible on chest and waist, with discontinuous-looking shoulder/side surfaces. Renders cannot determine whether these are material artifacts or mesh gaps, so geometry inspection is required.",
+      "code": "TORSO_SHOULDER_SURFACE_DEFECTS_UNRESOLVED",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [

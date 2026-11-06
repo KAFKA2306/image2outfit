@@ -25,6 +25,7 @@ from blender_cloth_simulation import (
     write_json,
 )
 from image2outfit.weight_transfer import constrain_vertex_weights
+from genworks_product_common import reset_pose
 
 
 def digest(path):
@@ -1558,6 +1559,18 @@ def main():
     if len(armatures) != 1:
         raise ValueError("weight transfer requires one imported target armature")
     armature = armatures[0]
+    # The cloth prototype stores its body-pose sweep on this armature. Once the
+    # cache has been baked, downstream source geometry and pose-constrained
+    # solves must start from the neutral rest state; otherwise animation F-curves
+    # override reset_pose()/set_pose() and corrupt the evaluated sit/crouch
+    # surfaces used to place the garment. Keep cache evidence in its own report.
+    pose_sweep_action = (
+        armature.animation_data.action.name
+        if armature.animation_data and armature.animation_data.action
+        else None
+    )
+    armature.animation_data_clear()
+    reset_pose(armature)
     bones = {b.name for b in armature.data.bones if b.use_deform}
     body.data.calc_loop_triangles()
     triangles = [tuple(t.vertices) for t in body.data.loop_triangles]
@@ -2200,6 +2213,12 @@ def main():
             "fbxSha256": digest(fbx),
             "sourceBodyMeshHash": mesh_hash(body),
             "boneCount": len(bones),
+            "poseEvaluation": {
+                "discardedBakedColliderAction": pose_sweep_action,
+                "actionClearedBeforePoseGeometrySolve": True,
+                "restPoseReset": True,
+                "grantsFitAcceptance": False,
+            },
             "exportedGarmentObjects": [o.name for o in objects],
             "bodyGeometryExported": False,
             "audits": audits,
