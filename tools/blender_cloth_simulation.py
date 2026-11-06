@@ -228,6 +228,210 @@ def configure_cloth(
     }
 
 
+def transfer_nearest_surface_weights(
+    garment: bpy.types.Object,
+    body: bpy.types.Object,
+    *,
+    maximum_distance_m: float,
+    required_bones: tuple[str, ...],
+) -> dict[str, object]:
+    """Interpolate the target body's authored bone weights onto a garment panel.
+
+    The transfer is used only for the disposable pose-sweep simulation. It
+    ensures a sleeve collider trial deforms in the same armature rest space as
+    the animated body instead of remaining a static surface while the arms
+    move. Stage 09 still performs and audits its independent production weight
+    transfer.
+    """
+    if not math.isfinite(maximum_distance_m) or maximum_distance_m <= 0:
+        raise ValueError("A positive bounded garment-to-body distance is required")
+    body.data.calc_loop_triangles()
+    triangles = [tuple(int(i) for i in tri.vertices) for tri in body.data.loop_triangles]
+    world_vertices = [body.matrix_world @ vertex.co for vertex in body.data.vertices]
+    if not triangles or not body.vertex_groups:
+        raise ValueError("Target body triangles and authored bone groups are required")
+    from mathutils.bvhtree import BVHTree
+
+    tree = BVHTree.FromPolygons(world_vertices, triangles, all_triangles=True)
+    source_groups = {group.index: group.name for group in body.vertex_groups}
+    garment_groups = {
+        name: garment.vertex_groups.get(name) or garment.vertex_groups.new(name=name)
+        for name in source_groups.values()
+    }
+    per_vertex_groups = []
+    distances = []
+    for vertex in garment.data.vertices:
+        world = garment.matrix_world @ vertex.co
+        nearest = tree.find_nearest(world)
+        if nearest is None:
+            raise RuntimeError(f"No target body surface found for {garment.name}")
+        _point, _normal, triangle_index, distance = nearest
+        if triangle_index is None or triangle_index < 0 or triangle_index >= len(triangles):
+            raise RuntimeError(f"Target surface mapping is invalid for {garment.name}")
+        if distance > maximum_distance_m:
+            raise ValueError(
+                f"{garment.name} vertex {vertex.index} is {distance:.6f} m from the target body; "
+                f"limit is {maximum_distance_m:.6f} m"
+            )
+        a, b, c = (world_vertices[index] for index in triangles[triangle_index])
+        p = _point
+        ab, ac, ap = b - a, c - a, p - a
+        d00, d01, d11 = ab.dot(ab), ab.dot(ac), ac.dot(ac)
+        d20, d21 = ap.dot(ab), ap.dot(ac)
+        denominator = d00 * d11 - d01 * d01
+        if abs(denominator) <= 1e-18:
+            raise ValueError(f"Degenerate target triangle selected for {garment.name}")
+        wb = (d11 * d20 - d01 * d21) / denominator
+        wc = (d00 * d21 - d01 * d20) / denominator
+        barycentric = (1.0 - wb - wc, wb, wc)
+        source_indices = triangles[triangle_index]
+        values: dict[str, float] = {}
+        for source_index, bary in zip(source_indices, barycentric):
+            for assignment in body.data.vertices[source_index].groups:
+                bone_name = source_groups.get(assignment.group)
+                if bone_name is not None and assignment.weight > 0:
+                    values[bone_name] = values.get(bone_name, 0.0) + max(0.0, bary) * assignment.weight
+        total = sum(values.values())
+        if total <= 1e-12:
+            raise ValueError(f"Target body surface has no deform weight for {garment.name} vertex {vertex.index}")
+        normalized = {name: value / total for name, value in values.items() if value > 1e-8}
+        for name, value in normalized.items():
+            garment_groups[name].add([vertex.index], value, "REPLACE")
+        per_vertex_groups.append(normalized)
+        distances.append(float(distance))
+    coverage = {
+        bone: sum(groups.get(bone, 0.0) for groups in per_vertex_groups)
+        for bone in required_bones
+    }
+    missing = [bone for bone, weight in coverage.items() if weight <= 1e-6]
+    if missing:
+        raise ValueError(f"Mapped sleeve does not receive required arm groups: {missing}")
+    return {
+        "method": "nearest-target-body-triangle-barycentric-authored-weights",
+        "sourceObject": body.name,
+        "vertexCount": len(garment.data.vertices),
+        "sourceBoneGroupCount": len(source_groups),
+        "requiredBoneWeightSums": coverage,
+        "maximumSurfaceDistanceM": max(distances, default=0.0),
+        "meanSurfaceDistanceM": sum(distances) / len(distances) if distances else 0.0,
+        "armatureModifierBeforeCloth": True,
+        "grantsFitAcceptance": False,
+    }
+
+
+def synchronize_precloth_shared_weights(
+    objects: dict[str, bpy.types.Object], component_names: set[str]
+) -> dict[str, object]:
+    """Give every duplicate of a sewn boundary vertex identical skin weights."""
+    references: dict[int, list[tuple[bpy.types.Object, int]]] = {}
+    for name in component_names:
+        obj = objects[name]
+        provenance = obj.data.attributes.get("canonical_sewn_vertex_index")
+        if provenance is None or len(provenance.data) != len(obj.data.vertices):
+            raise ValueError(f"Pre-cloth skinning lacks seam provenance: {name}")
+        for vertex, source in zip(obj.data.vertices, provenance.data):
+            references.setdefault(int(source.value), []).append((obj, vertex.index))
+    seam_groups = [refs for refs in references.values() if len(refs) > 1]
+    shared_bone_count = 0
+    for refs in seam_groups:
+        names = set.intersection(*(set(obj.vertex_groups.keys()) for obj, _ in refs))
+        if not names:
+            raise ValueError("Shared pre-cloth seam has no common deform groups")
+        per_vertex = []
+        for obj, vertex_index in refs:
+            vertex = obj.data.vertices[vertex_index]
+            by_index = {assignment.group: assignment.weight for assignment in vertex.groups}
+            per_vertex.append({
+                group_name: by_index.get(obj.vertex_groups[group_name].index, 0.0)
+                for group_name in names
+            })
+        averaged = {
+            group_name: sum(weights[group_name] for weights in per_vertex) / len(per_vertex)
+            for group_name in names
+        }
+        total = sum(averaged.values())
+        if total <= 1e-12:
+            raise ValueError("Shared pre-cloth seam has no transferable deform weight")
+        averaged = {name: weight / total for name, weight in averaged.items() if weight > 1e-8}
+        for obj, vertex_index in refs:
+            for group_name in names:
+                group = obj.vertex_groups[group_name]
+                if group_name in averaged:
+                    group.add([vertex_index], averaged[group_name], "REPLACE")
+                else:
+                    try:
+                        group.remove([vertex_index])
+                    except RuntimeError:
+                        pass
+        shared_bone_count += len(averaged)
+    return {
+        "method": "mean-of-nearest-body-barycentric-weights-per-canonical-sewn-vertex",
+        "transferredComponentNames": sorted(component_names),
+        "sharedCanonicalVertexCount": len(seam_groups),
+        "sharedBoneInfluenceAssignments": shared_bone_count,
+        "grantsFitAcceptance": False,
+    }
+
+
+def capture_shared_seam_rest_positions(
+    objects: dict[str, bpy.types.Object]
+) -> dict[int, Vector]:
+    """Capture canonical seam coordinates from the identical pre-solve basis."""
+    references: dict[int, list[Vector]] = {}
+    for obj in objects.values():
+        provenance = obj.data.attributes.get("canonical_sewn_vertex_index")
+        if provenance is None or len(provenance.data) != len(obj.data.vertices):
+            raise ValueError(f"Cannot capture missing sewn provenance: {obj.name}")
+        for vertex, source in zip(obj.data.vertices, provenance.data):
+            references.setdefault(int(source.value), []).append(
+                obj.matrix_world @ vertex.co
+            )
+    return {
+        source: positions[0].copy()
+        for source, positions in references.items()
+        if len(positions) > 1
+    }
+
+
+def restore_shared_seam_rest_positions(
+    objects: dict[str, bpy.types.Object],
+    rest_positions: dict[int, Vector],
+    *,
+    maximum_correction_m: float,
+) -> dict[str, object]:
+    """Re-anchor only sewn seam vertices after cloth, with a hard correction cap."""
+    if not math.isfinite(maximum_correction_m) or maximum_correction_m <= 0:
+        raise ValueError("A positive maximum seam correction is required")
+    corrections = []
+    for obj in objects.values():
+        provenance = obj.data.attributes["canonical_sewn_vertex_index"]
+        inverse_world = obj.matrix_world.inverted()
+        for vertex, source in zip(obj.data.vertices, provenance.data):
+            target = rest_positions.get(int(source.value))
+            if target is None:
+                continue
+            current = obj.matrix_world @ vertex.co
+            correction = (target - current).length
+            if correction > maximum_correction_m:
+                raise ValueError(
+                    f"Sewn seam correction for {obj.name} vertex {vertex.index} is "
+                    f"{correction:.6f} m; declared cap is {maximum_correction_m:.6f} m"
+                )
+            if correction > 1e-10:
+                vertex.co = inverse_world @ target
+            corrections.append(correction)
+        obj.data.update()
+    return {
+        "method": "restore-canonical-sewn-vertices-to-pre-solve-neutral-rest-coordinates",
+        "sharedCanonicalVertexCount": len(rest_positions),
+        "correctedReferenceCount": sum(value > 1e-10 for value in corrections),
+        "maximumCorrectionM": max(corrections, default=0.0),
+        "meanCorrectionM": sum(corrections) / len(corrections) if corrections else 0.0,
+        "maximumCorrectionCapM": maximum_correction_m,
+        "grantsFitAcceptance": False,
+    }
+
+
 def keyframe_pose_sweep(
     armature: bpy.types.Object,
     sweep: list[dict[str, object]],
@@ -690,7 +894,9 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         name: {v for i in ids for v in faces[i]} for name, ids in selected_faces.items()
     }
     pose_response = policy.get("poseResponseTrial")
+    pre_cloth_skinning = policy.get("prototypePreClothSkinning", {})
     pose_armature = None
+    pose_body = None
     if pose_response is not None:
         if (
             pose_response.get("component") != "pleated-overskirt"
@@ -703,10 +909,15 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         pose_armature = bpy.data.objects.get("Armature")
         if pose_armature is None or pose_armature.type != "ARMATURE":
             raise ValueError("pose-response trial requires the target Siroino armature")
+        pose_body = bpy.data.objects.get(str(pose_response["collisionBody"]))
+        if pose_body is None or pose_body.type != "MESH":
+            raise ValueError("pose-response trial requires its exact target body mesh")
         if pose_response.get("evidenceBoundary") != construction["clothSimulation"][
             "poseResponseTrial"
         ]["evidenceBoundary"]:
             raise ValueError("pose-response evidence boundary did not survive policy load")
+    if not set(pre_cloth_skinning).issubset(groups):
+        raise ValueError("Pre-cloth skinning must reference declared prototype panels")
     for name, indices in selected_faces.items():
         ids = sorted(vertex_sets[name])
         remap = {value: index for index, value in enumerate(ids)}
@@ -772,6 +983,36 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         for material in original.data.materials:
             obj.data.materials.append(material)
         objects[name] = obj
+        skinning_declaration = pre_cloth_skinning.get(name)
+        if skinning_declaration is not None:
+            if (
+                pose_response is None
+                or pose_body is None
+                or skinning_declaration.get("sourceObject") != pose_body.name
+                or skinning_declaration.get("armatureObject") != pose_armature.name
+                or skinning_declaration.get("method")
+                != "nearest-target-body-triangle-barycentric-authored-weights"
+            ):
+                raise ValueError(f"Invalid pre-cloth skinning contract for {name}")
+            skinning_evidence = transfer_nearest_surface_weights(
+                obj,
+                pose_body,
+                maximum_distance_m=float(skinning_declaration["maximumSurfaceDistanceM"]),
+                required_bones=tuple(skinning_declaration["requiredBoneGroups"]),
+            )
+            armature_modifier = obj.modifiers.new(
+                "Image2Outfit Target Rest-Space Skinning", "ARMATURE"
+            )
+            armature_modifier.object = pose_armature
+            armature_modifier.use_vertex_groups = True
+            obj["prototypePreClothSkinning"] = json.dumps(
+                {
+                    **skinning_evidence,
+                    "reason": skinning_declaration["reason"],
+                    "evidenceBoundary": skinning_declaration["evidenceBoundary"],
+                },
+                sort_keys=True,
+            )
         if name in groups:
             shared = vertex_sets[name].intersection(
                 set().union(*(s for key, s in vertex_sets.items() if key != name))
@@ -874,7 +1115,19 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 pose_response["attachmentContract"] = json.loads(
                     obj["poseResponseAttachment"]
                 )
+    precloth_components = set(pre_cloth_skinning)
+    precloth_seam_weights = None
+    if precloth_components:
+        precloth_seam_weights = synchronize_precloth_shared_weights(
+            objects, precloth_components
+        )
+        for name in precloth_components:
+            obj = objects[name]
+            contract = json.loads(obj["prototypePreClothSkinning"])
+            contract["sharedSeamWeights"] = precloth_seam_weights
+            obj["prototypePreClothSkinning"] = json.dumps(contract, sort_keys=True)
     seam_positions_after_split = shared_seam_position_diagnostic("component-split")
+    seam_rest_positions = capture_shared_seam_rest_positions(objects)
     bpy.data.objects.remove(original, do_unlink=True)
     bodies = [
         obj
@@ -1021,7 +1274,17 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     rest_controls = {}
     for name in simulated_components:
         obj = objects[name]
-        pin_ids = [v.index for v in obj.data.vertices if v.groups]
+        pin_group = obj.vertex_groups.get("Image2Outfit Cloth Pin")
+        if pin_group is None:
+            raise ValueError(f"Cloth attachment group is missing: {name}")
+        pin_ids = [
+            vertex.index
+            for vertex in obj.data.vertices
+            if any(
+                assignment.group == pin_group.index and assignment.weight > 0
+                for assignment in vertex.groups
+            )
+        ]
         before[name] = mesh_hash(obj)
         rest = policy.get("prototypeRestShape", {}).get(name)
         rest_contract = (
@@ -1032,10 +1295,14 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             raise ValueError("Bending hypothesis references an unknown cloth component")
         bending_hypothesis = bending_hypotheses.get(name)
         bending_stiffness = 0.45
-        dynamic_component = (
-            pose_response is not None and name == pose_response["component"]
+        dynamic_component = pose_response is not None and (
+            name == pose_response["component"] or name in pre_cloth_skinning
         )
         contract = configure_cloth(obj, frame_end, dynamic_mesh=dynamic_component)
+        if name in pre_cloth_skinning:
+            contract["preClothSkinning"] = json.loads(
+                obj["prototypePreClothSkinning"]
+            )
         modifier = obj.modifiers["Image2Outfit Cloth"]
         if bending_hypothesis is not None:
             value = bending_hypothesis.get("stiffness")
@@ -1340,7 +1607,30 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             settledMeshSha256=settled,
             geometryChanged=settled != before[obj.name],
         )
-    seam_positions_after_bake = shared_seam_position_diagnostic("cloth-bake")
+    seam_positions_before_restore = shared_seam_position_diagnostic(
+        "cloth-bake-before-seam-restore"
+    )
+    seam_restore = restore_shared_seam_rest_positions(
+        objects,
+        seam_rest_positions,
+        maximum_correction_m=float(
+            construction.get("clothSimulation", {}).get(
+                "prototypeSharedSeamAnchor", {}
+            ).get(
+                "maximumCorrectionM", 0.015
+            )
+        ),
+    )
+    for contract in contracts:
+        obj = objects[contract["object"]]
+        final_hash = mesh_hash(obj)
+        contract["postSeamAnchorMeshSha256"] = final_hash
+        contract["settledMeshSha256"] = final_hash
+        contract["geometryChanged"] = final_hash != before[obj.name]
+        contract["neutralRestSeamAnchor"] = seam_restore
+    seam_positions_after_bake = shared_seam_position_diagnostic(
+        "cloth-bake-after-seam-restore"
+    )
     runtime = ROOT / ".image2outfit" / "products" / str(job["id"]) / "cloth"
     runtime.mkdir(parents=True, exist_ok=True)
     candidate = runtime / "settled-prototype.blend"
@@ -1360,8 +1650,10 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         "contracts": contracts,
         "sharedSeamPositionContinuity": {
             "afterSplit": seam_positions_after_split,
+            "afterBakeBeforeRestore": seam_positions_before_restore,
+            "neutralRestSeamRestore": seam_restore,
             "afterBake": seam_positions_after_bake,
-            "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split and after cloth bake. The comparison does not prove pose-deformed seam continuity or fit.",
+            "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split, cloth bake before correction, and after the explicitly capped neutral-rest seam anchor. This restores only sewn boundary vertices at the neutral export frame; it does not prove pose-deformed seam continuity, fit, appearance, or release acceptance.",
         },
         "sourceBlendSha256": source_hash,
         "constructionSha256": hashlib.sha256(

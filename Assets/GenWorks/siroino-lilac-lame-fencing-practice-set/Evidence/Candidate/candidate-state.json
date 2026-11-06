@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v163-neutral-pose-evaluation-after-cloth-bake-20261106",
+  "revision": "v167-capped-neutral-seam-rest-anchor-20261106",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct review of the current V163 previews confirms T-pose and arms-up poses render distinctly, but the sleeve-like garment surfaces still hang away from the posed arms in T-pose and remain displaced in arms-up and arm-cross. Clearing the baked action and resetting the pose did not resolve the sleeve/body mismatch.",
-      "code": "GARMENT_SLEEVES_DO_NOT_FOLLOW_POSED_ARMS",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "code": "SLEEVES_DO_NOT_FOLLOW_ARM_POSES",
+      "description": "Direct review of all current V167 previews confirms the sleeve surfaces remain detached from the posed arms and stretch across the chest in neutral and arms-up views."
     },
     {
-      "description": "The neutral overskirt is irregularly collapsed and the rear shorts are broadly exposed. Sit/crouch open the front cover and expose the underlayer; prone pulls purple trim far away from the cloth. Shape and hem remain broken.",
-      "code": "OVERSKIRT_AND_TRIM_DEFORMATION_REMAINS_UNSAFE",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "code": "SKIRT_SHAPE_AND_HEM_COLLAPSED",
+      "description": "The overskirt still collapses into sharply crumpled masses around the hips and back, with projecting panels and a broken hem silhouette."
     },
     {
-      "description": "Gray patch-like areas remain visible on chest and waist, with discontinuous-looking shoulder/side surfaces. Renders cannot determine whether these are material artifacts or mesh gaps, so geometry inspection is required.",
-      "code": "TORSO_SHOULDER_SURFACE_DEFECTS_UNRESOLVED",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "code": "GARMENT_POSITION_AND_TRIM_DISCONTINUITY",
+      "description": "Crouch and sit show the collar and torso garment displaced from the mannequin; prone shows the torso garment hanging below it with detached-looking trim. The pose surfaces remain visibly discontinuous."
     }
   ],
   "failedGeometryChecks": [
