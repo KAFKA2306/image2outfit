@@ -109,6 +109,14 @@ task check:python
 
 個別監査は `task --list` または `Taskfile.yml` を正本として確認してください。Markdown にコマンド一覧を複製しません。
 
+## CI と GitHub Actions
+
+PR・pushごとの自動テストと毎時のブランチ管理ワークフローは廃止しました。マージ前に担当エージェントがローカルで `task audit:all` と `task check:python` を実行し、結果をPRに記録してください。失敗や未実行の検証を成功扱いしてはいけません。
+
+GitHub Actionsは必要時に手動実行する製品ビルド（hosted / self-hosted）、製品のrelease、全体品質検証（`Production contract quality`）として残しています。公開サイトの更新だけは、製品job、ProductManifest、preview、site、公開用ツールの変更時に自動実行します。その他のソース・設定変更後に再公開が必要な場合は、`Render all current products to Pages` を手動起動してください。
+
+PRの自動マージ・ブランチ自動削除も廃止したため、マージと不要ブランチの整理は担当エージェントが実施し、結果を確認してください。製品のvisual / pose / 権利確認などのrelease gateは従来どおりです。
+
 ## Blender / Unity MCP
 
 OpenAI CodexからローカルのBlenderとUnityをMCP経由で操作する開発支援を用意しています。これは任意のauthoring adapterであり、製品の`COMPLETE`条件は変更しません。

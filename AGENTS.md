@@ -97,6 +97,13 @@ Keep the thirteen manufacturing stages and existing quality gates authoritative.
 - Agents merge verified work into `main`, push, upload, and publish as obligations. If a tool-side permission check denies an operation, the agent reports the denial and does not work around it.
 - Agents do not delete user data without confirmation. Visual, pose-penetration, runtime review evidence, and rights confirmation remain required release gates.
 
+## CI execution budget
+
+- Do not recreate hourly GitHub Actions governance or per-PR CI workflows. The repository defaults to local validation before merge: run `task audit:all` and `task check:python` and report actual pass/fail results in the PR or workline.
+- Keep `Production contract quality` and product build/release workflows operator-triggered via `workflow_dispatch`. Only path-scoped GitHub Pages publication runs automatically; changes outside its paths require a deliberate dispatch to republish.
+- PR merge and branch deletion are agent responsibilities, not Actions jobs. Respect merge safety and release/visual/rights gates independently of CI removal.
+- Any proposed automatic CI must first show a measured need and fit a 90% reduction in automatic Actions run count compared with the pre-simplification baseline. Do not add redundant test entry points when existing Taskfile commands own them.
+
 ## One-time migration cleanup
 
 One-time migration workflows and their scripts must be deleted in the same change that completes the migration. A tracked one-time workflow that pushes to `main` is a hygiene finding, not a retained tool.

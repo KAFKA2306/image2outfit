@@ -4,18 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - .github/workflows/render-all-current.yml
-      - config/products/**
-      - config/pipeline/**
-      - config/toolchain-lock.json
-      - Assets/GenWorks/**/ProductManifest.json
-      - Assets/GenWorks/**/Source/**
-      - Assets/GenWorks/**/Previews/**
-      - Assets/GenWorks/**/Evidence/Rejected/**/Previews/**
-      - src/image2outfit/**
-      - tools/**
-      - pyproject.toml
-      - uv.lock
+      - '.github/workflows/render-all-current.yml'
+      - 'config/products/**/job.json'
+      - 'Assets/GenWorks/**/ProductManifest.json'
+      - 'Assets/GenWorks/**/Previews/**'
+      - 'Assets/GenWorks/**/Evidence/Rejected/**/Previews/**'
+      - 'site/**'
+      - 'tools/review_console.py'
   workflow_dispatch:
 
 permissions:
