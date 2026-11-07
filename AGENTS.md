@@ -64,7 +64,8 @@ One-time migration workflows and their scripts must be deleted in the same chang
 - Every subagent receives the documents to read, the files it may edit, and the verification command. The main agent reads the result and verifies it before accepting it.
 - Completion is judged by command output or artifacts, not by an agent's self-report.
 - Harness or procedure changes are accepted only after comparing the old and new versions on a fixed check set, judged by score and stability (downside and spread across items), not by a single run.
-- Agents do not push, merge into `main`, delete user data, or perform first uploads or publishing-setting changes. Those remain with the user.
+- Agents commit completed and verified changes on a working branch without asking. Caches, `__pycache__`, generated candidates, and local evidence are never committed.
+- Agents do not push, merge into `main`, delete user data, perform external publishing or uploads, or make first uploads or publishing-setting changes. Those remain with the user.
 - Automation may skip human review only where this file does not require it. Visual, pose-penetration, and runtime review evidence, and rights confirmation, remain required gates for release.
 
 Do not claim completion for work that was not built, rendered, validated, committed, and pushed.
