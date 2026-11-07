@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "status": "REJECTED",
+  "sourceCommit": "153c24996795e0363343a17f1e7c48c0992049c7",
+  "sourceWorkflowRun": 31092626753,
+  "sourceArtifactId": 8964130652,
+  "sourceArtifactDigest": "sha256:57b4dd1785d5e960c2aaa34998f1c5f879c5920cd673e279bb7ce05706a62e69",
+  "reviewedAt": "2026-08-06T14:36:00Z",
+  "reviewResult": "FAIL",
+  "reasons": [
+    "The body clearance is excessive and reads as a rigid rectangular box.",
+    "The sleeves separate and fold incorrectly around the shoulders and arm poses.",
+    "The collar and shoulder construction float away from the body.",
+    "This evidence is retained as a rejected render checkpoint and is not a release candidate."
+  ],
+  "evidence": {
+    "fiveViews": [
+      "Previews/front.png",
+      "Previews/back.png",
+      "Previews/left.png",
+      "Previews/right.png",
+      "Previews/three-quarter.png"
+    ],
+    "sixPoses": [
+      "Previews/Poses/neutral.png",
+      "Previews/Poses/arms-up.png",
+      "Previews/Poses/arm-cross.png",
+      "Previews/Poses/crouch.png",
+      "Previews/Poses/sit.png",
+      "Previews/Poses/prone.png"
+    ],
+    "contactSheets": [
+      "Previews/siroino-blue-happi-multiview.webp",
+      "Previews/siroino-blue-happi-pose-review.webp"
+    ],
+    "reports": [
+      "Build/product-build-report.json",
+      "Build/cloth-simulation.json",
+      "Build/quality-audit.json"
+    ]
+  }
+}

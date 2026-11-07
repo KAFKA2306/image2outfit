@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-arc-latch-cocoon-bomber-set",
+  "designRevision": "v1-arc-latch-side-bridges",
+  "parts": [
+    "bomber_front_L", "bomber_front_R", "bomber_back", "sleeve_L", "sleeve_R", "cuff_L", "cuff_R",
+    "inner_front", "inner_back", "short_front_L", "short_front_R", "short_back_L", "short_back_R",
+    "waistband_outer", "waistband_inner", "side_placket_front_L", "side_placket_front_R",
+    "side_placket_back_L", "side_placket_back_R",
+    "arc_latch_L_A", "arc_latch_L_B", "arc_latch_L_C", "arc_latch_R_A", "arc_latch_R_B", "arc_latch_R_C",
+    "arc_latch_root_L_A", "arc_latch_root_L_B", "arc_latch_root_L_C",
+    "arc_latch_root_R_A", "arc_latch_root_R_B", "arc_latch_root_R_C"
+  ],
+  "heroDetail": {
+    "name": "paired-arc-latch-side-bridges",
+    "leftBridges": ["arc_latch_L_A", "arc_latch_L_B", "arc_latch_L_C"],
+    "rightBridges": ["arc_latch_R_A", "arc_latch_R_B", "arc_latch_R_C"],
+    "requirements": [
+      "three separately readable raised bridges per side waist",
+      "visible depth spacing and attachment roots",
+      "bridge only short bounded side-waist openings",
+      "remain side-local",
+      "read in side and three-quarter evidence"
+    ]
+  },
+  "materials": {
+    "shell": "warm-ivory-matte-compact-twill",
+    "secondary": "slate-blue-woven",
+    "bottom": "charcoal-matte-twill",
+    "hero": "muted-copper-shell-facing",
+    "hardware": "dark-nickel-low-gloss"
+  },
+  "uvPolicy": {
+    "set": "UV0",
+    "range": "0..1",
+    "heroIslandsUnique": true,
+    "mirrorHero": false
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "sourceReference": "private-reference://sha256/d7c91d92c45598c13ff2b7673c71672cefe5f41a16361ca1b4267fcf6b927ef3",
+  "parts": [
+    {"partId":"dress-front","kind":"front-dress-panel","regions":["chest","abdomen","waist","pelvis","legs"],"role":"structural-panel","layer":"base","material":"stretch-woven","fit":"fitted","evidence":"Front view shows a continuous fitted white gown with a narrow lower body and flared hem."},
+    {"partId":"dress-back-left","kind":"back-dress-panel","regions":["upper-back","waist","pelvis","legs"],"role":"structural-panel","layer":"base","material":"stretch-woven","fit":"fitted","evidence":"Back view shows fabric at both sides of a large open-back cutout."},
+    {"partId":"dress-back-right","kind":"back-dress-panel","regions":["upper-back","waist","pelvis","legs"],"role":"structural-panel","layer":"base","material":"stretch-woven","fit":"fitted","mirrorOf":"dress-back-left","evidence":"Mirrored right side of open-back construction."},
+    {"partId":"sleeve-left","kind":"sleeve","regions":["left-arm"],"role":"structural-panel","layer":"base","material":"stretch-woven","fit":"fitted","evidence":"Long fitted left sleeve."},
+    {"partId":"sleeve-right","kind":"sleeve","regions":["right-arm"],"role":"structural-panel","layer":"base","material":"stretch-woven","fit":"fitted","mirrorOf":"sleeve-left","evidence":"Long fitted right sleeve."},
+    {"partId":"wrist-drape-left","kind":"drape-panel","regions":["left-wrist"],"role":"attached-panel","layer":"outer","material":"light-woven","fit":"relaxed","evidence":"Oversized hanging sheet-like panel at left wrist."},
+    {"partId":"wrist-drape-right","kind":"drape-panel","regions":["right-wrist"],"role":"attached-panel","layer":"outer","material":"light-woven","fit":"relaxed","mirrorOf":"wrist-drape-left","evidence":"Oversized hanging sheet-like panel at right wrist."},
+    {"partId":"hood-front","kind":"hood-panel","regions":["head","face","shoulders"],"role":"structural-panel","layer":"outer","material":"light-woven","fit":"relaxed","evidence":"Front half of draped ghost hood."},
+    {"partId":"hood-back","kind":"hood-panel","regions":["head","neck","shoulders"],"role":"structural-panel","layer":"outer","material":"light-woven","fit":"relaxed","evidence":"Back half of draped ghost hood."},
+    {"partId":"eye-appliques","kind":"applique","regions":["face"],"role":"surface-decoration","layer":"attached","material":"felt-like","fit":"regular","evidence":"Two black vertical oval eyes."},
+    {"partId":"cheek-appliques","kind":"applique","regions":["face"],"role":"surface-decoration","layer":"attached","material":"felt-like","fit":"regular","evidence":"Two small pink cheek marks."},
+    {"partId":"back-lacing","kind":"tie","regions":["back","waist"],"role":"closure","layer":"outer","material":"stretch-woven","fit":"fitted","evidence":"Crossed white ties below the back cutout."}
+  ],
+  "uncertainties": [
+    {"field":"dress side seam location","status":"estimated","assumption":"conventional left/right side seams"},
+    {"field":"hood crown seam","status":"occluded","assumption":"front/back symmetric seam around crown"},
+    {"field":"wrist drape attachment width","status":"estimated","assumption":"attached over a short wrist edge"}
+  ]
+}

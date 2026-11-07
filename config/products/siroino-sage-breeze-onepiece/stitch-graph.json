@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-sage-breeze-onepiece",
+  "nodes": ["breeze-front-L", "breeze-front-R", "breeze-back", "breeze-side-L", "breeze-side-R", "wind-tunnel-L", "wind-tunnel-R", "leaf-clasp"],
+  "edges": [{"from": "breeze-front-L", "to": "breeze-side-L", "seam": "left-front-side"}, {"from": "breeze-front-R", "to": "breeze-side-R", "seam": "right-front-side"}, {"from": "breeze-back", "to": "breeze-side-L", "seam": "left-back-side"}, {"from": "breeze-back", "to": "breeze-side-R", "seam": "right-back-side"}, {"from": "wind-tunnel-L", "to": "breeze-side-L", "seam": "left-channel-facing"}, {"from": "wind-tunnel-R", "to": "breeze-side-R", "seam": "right-channel-facing"}],
+  "physicalSewing": {"enabled": true, "clothSettledComponents": ["Sage_Breeze_Front", "Sage_Breeze_Back", "Sage_Breeze_Side_L", "Sage_Breeze_Side_R"]}
+}

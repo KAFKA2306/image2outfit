@@ -1,0 +1,45 @@
+name: Render evidence metadata
+
+on:
+  pull_request:
+    paths:
+      - 'Assets/GenWorks/**/Previews/**'
+      - 'config/products/**/job.json'
+      - 'tools/render_evidence_bootstrap.py'
+      - 'tools/audit_render_evidence_metadata.py'
+      - 'tools/technical_candidate.py'
+      - 'tests/test_render_evidence_metadata.py'
+      - 'AGENTS.md'
+      - '.github/workflows/render-evidence-metadata.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'Assets/GenWorks/**/Previews/**'
+      - 'config/products/**/job.json'
+      - 'tools/render_evidence_bootstrap.py'
+      - 'tools/audit_render_evidence_metadata.py'
+      - 'tools/technical_candidate.py'
+      - 'tests/test_render_evidence_metadata.py'
+      - 'AGENTS.md'
+      - '.github/workflows/render-evidence-metadata.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Compile metadata tools
+        run: python -m py_compile tools/render_evidence_bootstrap.py tools/audit_render_evidence_metadata.py
+      - name: Test metadata contract
+        run: python -m unittest tests.test_render_evidence_metadata -v
+      - name: Audit repository render evidence
+        run: python tools/audit_render_evidence_metadata.py
+      - name: Verify clean checkout
+        if: always()
+        run: test -z "$(git status --porcelain)"

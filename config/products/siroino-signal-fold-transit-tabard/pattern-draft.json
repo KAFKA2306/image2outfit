@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-signal-fold-transit-tabard",
+  "designRevision": "v1-closed-tabard-two-side-wedges-signal-fold",
+  "parts": [
+    "tabard_front_under", "tabard_front_over", "tabard_back", "underlayer_front", "underlayer_back",
+    "underlayer_sleeve_L", "underlayer_sleeve_R", "underlayer_cuff_L", "underlayer_cuff_R",
+    "neck_facing", "armhole_facing_L", "armhole_facing_R", "center_back_vent",
+    "side_wedge_root_L", "side_wedge_root_R", "side_wedge_L", "side_wedge_R",
+    "side_wedge_fold_A_L", "side_wedge_fold_A_R", "side_wedge_fold_B_L", "side_wedge_fold_B_R",
+    "signal_fold_root", "signal_fold_outer", "signal_fold_inner", "signal_fold_lock"
+  ],
+  "heroDetail": {
+    "name": "signal-fold-closure",
+    "assemblies": ["signal_fold_root", "signal_fold_outer", "signal_fold_inner", "signal_fold_lock"],
+    "facings": ["side_wedge_fold_B_L", "side_wedge_fold_B_R"],
+    "requirements": [
+      "short bounded diagonal closure with separately named outer and inner plates",
+      "real depth and readable overlap above the continuous tabard shell",
+      "exactly two side-fold wedge assemblies with three depth plates per side",
+      "no cape, apron bib, skirt, shorts, pouch, bow or ribbon groups"
+    ]
+  },
+  "materials": {
+    "tabard": "matte-graphite-compact-woven",
+    "underlayer": "cool-off-white-low-sheen",
+    "signal": "muted-amber-bounded-accent",
+    "hardware": "dark-nickel-low-gloss"
+  },
+  "uvPolicy": {"set": "UV0", "range": "0..1", "heroIslandsUnique": true, "mirrorHero": false}
+}

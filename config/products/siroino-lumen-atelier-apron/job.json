@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-lumen-atelier-maker-coat-dress",
+  "id": "siroino-lumen-atelier-apron",
+  "productName": "Lumen Atelier Apron for Siroino",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4.3-panel-structural",
+  "buildRevision": "v1-closed-maker-coat-dress-twin-work-trays",
+  "productRoot": "Assets/GenWorks/siroino-lumen-atelier-apron",
+  "productManifestPath": "Assets/GenWorks/siroino-lumen-atelier-apron/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/siroino_lumen_atelier_apron_build.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-lumen-atelier-apron/Source/Blender/SiroinoLumenAtelierApron.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-lumen-atelier-apron/Models/SiroinoLumenAtelierApron.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoLumenAtelierApron.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoSotai_LumenAtelierApron.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-lumen-atelier-apron/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-lumen-atelier-apron/ProductManifest.json",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/README.md",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Source/Blender/SiroinoLumenAtelierApron.blend",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Models/SiroinoLumenAtelierApron.fbx",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoLumenAtelierApron.prefab",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Prefab/SiroinoSotai_LumenAtelierApron.prefab",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/front.png",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/back.png",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/left.png",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/right.png",
+    "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-lumen-atelier-apron/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-lumen-atelier-apron/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-lumen-atelier-apron/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-lumen-atelier-apron/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_MakerShell", "role": "fabric"},
+      {"material": "MAT_MakerFacing", "role": "trim"},
+      {"material": "MAT_TrayReinforcement", "role": "other"},
+      {"material": "MAT_TrayInner", "role": "fabric"},
+      {"material": "MAT_Hardware", "role": "trim"}
+    ]
+  }
+}

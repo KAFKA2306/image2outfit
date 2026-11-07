@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "designRevision": "v2-open-multiring-reference-silhouette",
+  "checkedAt": "2026-08-05T03:21:00+09:00",
+  "productId": "siroino-nocturne-angel-set",
+  "target": "SiroinoSotai_PC",
+  "result": "FAIL",
+  "visualAppearanceReview": "FAIL",
+  "releaseDecision": "REJECTED_REVISION_RETAINED_FOR_AUDIT",
+  "reviewer": "ChatGPT direct artifact image review",
+  "evidence": {
+    "hostedWorkflowRun": 30937377321,
+    "artifactId": 8904078622,
+    "artifactSha256": "5f3465dc50486b627df520142a7a74fa2b5b98d22089a509d124a5d1936be3fc",
+    "multiview": "Previews/siroino-nocturne-angel-set-multiview.webp",
+    "poseReview": "Previews/siroino-nocturne-angel-set-pose-review.webp",
+    "fitAudit": "Tests/fit-audit.json"
+  },
+  "execution": {
+    "blender": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "clothSimulation": "PASS",
+    "researchTrial": "PASS"
+  },
+  "improvementsFromV1": [
+    "Five-view and pose evidence includes substantially more of the complete body and outfit.",
+    "Sleeves, cuffs and leg warmers use open shells instead of capped cylinders.",
+    "The skirt uses eight deformation rings and 32 Blender Cloth frames.",
+    "All garment vertices are weighted, weight sums are normalized and bone influences are limited to four."
+  ],
+  "blockingFindings": [
+    {
+      "zone": "bodice and neckline",
+      "finding": "The bodice remains a continuous neck-high elliptical tube without the reference V neckline, cropped sailor opening or explicit armholes."
+    },
+    {
+      "zone": "sailor collar",
+      "finding": "The beige collar is still rendered as large rigid polygon plates rather than a narrow collar integrated with the neckline and shoulders."
+    },
+    {
+      "zone": "wings",
+      "finding": "The planar diamond feathers form a jagged sawtooth silhouette instead of layered rounded white feathers."
+    },
+    {
+      "zone": "reference fidelity",
+      "finding": "The generated outfit lacks the reference crop-top proportion, open upper chest, tailored sailor construction, layered lace skirt and refined accessory shapes."
+    },
+    {
+      "zone": "pose deformation",
+      "finding": "The skirt, waistband and lower layers visibly collapse, invert or intersect around the hips and legs in crouch, sit and prone poses."
+    },
+    {
+      "zone": "target presentation",
+      "finding": "The available SiroinoSotai_PC source is a body-focused target without a rendered head, so the beret and ears appear above the neck; the evidence must not imply a complete avatar head."
+    }
+  ],
+  "metrics": {
+    "meshObjects": 37,
+    "vertices": 9016,
+    "triangles": 17152,
+    "maxBoneInfluences": 4,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "clothSimulationFrames": 32,
+    "clothPinVertices": 72
+  },
+  "fitAuditSummary": {
+    "posesWithIntersections": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+    "triangleOverlapPairsByPose": {
+      "neutral": 2505,
+      "arms-up": 2030,
+      "arm-cross": 1720,
+      "crouch": 1327,
+      "sit": 1325,
+      "prone": 1168
+    },
+    "totalTriangleOverlapPairs": 10075,
+    "completionBlockingByItself": false
+  },
+  "nextAction": "Replace the continuous bodice tube with explicit front, back and side pattern panels containing a V neckline and armholes; replace diamond feathers with rounded layered feathers; bind skirt layers to stable hip deformation and shoes to foot bones before the next render."
+}

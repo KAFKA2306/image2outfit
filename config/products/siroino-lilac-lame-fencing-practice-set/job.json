@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-lilac-lame-fencing-practice-set",
+  "productName": "Lilac Lam\u00e9 Fencing Practice Set for SiroinoSotai PC",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": false,
+  "buildCapability": "canonical-resumable-reference-pipeline",
+  "buildRevision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
+  "renderLoopRevision": "v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
+  "productManifestPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "blendPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Models/SiroinoLilacLameFencingPracticeSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Prefab/SiroinoLilacLameFencingPracticeSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Prefab/SiroinoSotai_SiroinoLilacLameFencingPracticeSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "SiroinoSotai_PC; this outfit fit has not been measured.",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": [
+      "Assets"
+    ],
+    "excludePrefixes": [
+      "Assets/GenWorks",
+      "Assets/_Local/Jobs"
+    ]
+  },
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "identityManifestPath": "config/products/siroino-lilac-lame-fencing-practice-set/reference-identity.json",
+    "referenceAuditPath": "config/products/siroino-lilac-lame-fencing-practice-set/reference-audit.json",
+    "privateReferencePath": "Assets/_Local/ReferenceImages/siroino-lilac-lame-fencing-practice-set-20261004.png",
+    "decompositionPath": "config/products/siroino-lilac-lame-fencing-practice-set/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-lilac-lame-fencing-practice-set/stitch-graph.json",
+    "surfaceAttachmentGraphPath": "config/products/siroino-lilac-lame-fencing-practice-set/surface-attachment-graph.json",
+    "visualReviewPath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
+    "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
+    "materialRecipePath": "config/products/siroino-lilac-lame-fencing-practice-set/material-recipe.json",
+    "garmentcodeStitchExport": "strict-boundary-edges",
+    "openSew2dPreview": true,
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true,
+    "meshSource": "garmentcode-boxmesh",
+    "assemblyPosePath": "config/products/siroino-lilac-lame-fencing-practice-set/assembly-pose.json"
+  },
+  "researchMethod": {
+    "name": "Built-in image_gen four-view fencing-practice concept board; validate executable construction inputs, build a 3D prototype, then inspect rendered appearance before completion.",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-lilac-lame-fencing-practice-set/reference-audit.json",
+    "secondaryEvidence": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json"
+  },
+  "licenseEvidence": "config/products/siroino-lilac-lame-fencing-practice-set/license.json",
+  "privateSourceRoots": [
+    "Assets/_Local"
+  ],
+  "patternLayoutPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-lilac-lame-fencing-practice-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-lilac-lame-fencing-practice-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-lilac-lame-fencing-practice-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/README.md",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Patterns/lilac-lame-fencing-practice-set.pattern.json",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Patterns/lilac-lame-fencing-practice-set.stitches.json",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Models/SiroinoLilacLameFencingPracticeSet.fbx",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Prefab/SiroinoLilacLameFencingPracticeSet.prefab",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Prefab/SiroinoSotai_SiroinoLilacLameFencingPracticeSet.prefab",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png"
+  ],
+  "productBuildScript": "tools/build_sewn_pattern_prototype.py"
+}

@@ -1,17 +1,5 @@
 {
   "dependencies": {
-    "com.ajisaiflow.unityagent": {
-      "version": "file:com.ajisaiflow.unityagent",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "com.ajisaiflow.unityagent.sdk": {
-      "version": "file:com.ajisaiflow.unityagent.sdk",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
     "com.anatawa12.avatar-optimizer": {
       "version": "file:com.anatawa12.avatar-optimizer",
       "depth": 0,
@@ -20,6 +8,21 @@
         "com.unity.nuget.newtonsoft-json": "3.2.1",
         "com.unity.burst": "1.8.7"
       }
+    },
+    "com.anatawa12.continuous-avatar-uploader": {
+      "version": "file:com.anatawa12.continuous-avatar-uploader",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.tunasync.unity-mcp": {
+      "version": "https://github.com/TunaSync-Studio/UnityMCP-VCC.git?path=/package/com.tunasync.unity-mcp#50597089589137c5186f5badbde1d72f5d335243",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "hash": "50597089589137c5186f5badbde1d72f5d335243"
     },
     "com.unity.burst": {
       "version": "1.8.12",
@@ -227,12 +230,6 @@
       "dependencies": {
         "com.unity.modules.animation": "1.0.0"
       }
-    },
-    "net.ajisaiflow.md3sdk": {
-      "version": "file:net.ajisaiflow.md3sdk",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
     },
     "vrchat.blackstartx.gesture-manager": {
       "version": "file:vrchat.blackstartx.gesture-manager",

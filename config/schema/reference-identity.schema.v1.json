@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/config/schema/reference-identity.schema.v1.json",
+  "title": "Reference identity manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "productId", "sourceReference", "claims", "evidence", "history"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "productId": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "sourceReference": {"type": "string", "minLength": 1},
+    "claims": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": {"$ref": "#/$defs/claim"}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence"}
+    },
+    "history": {
+      "type": "array",
+      "minItems": 12,
+      "items": {"$ref": "#/$defs/historyEvent"}
+    }
+  },
+  "$defs": {
+    "field": {
+      "enum": [
+        "manufacturer",
+        "brand",
+        "seller",
+        "officialProductName",
+        "modelNumber",
+        "sellerSku",
+        "gtin",
+        "jan",
+        "colorCode",
+        "sizeCode",
+        "season",
+        "revision"
+      ]
+    },
+    "status": {
+      "enum": ["VERIFIED", "CANDIDATE", "UNVERIFIED", "REJECTED"]
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "status", "value", "reason", "evidenceIds"],
+      "properties": {
+        "field": {"$ref": "#/$defs/field"},
+        "status": {"$ref": "#/$defs/status"},
+        "value": {"type": ["string", "null"]},
+        "reason": {"type": "string", "minLength": 1},
+        "evidenceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidenceId",
+        "evidenceType",
+        "sourceReference",
+        "capturedAt",
+        "extractionMethod",
+        "reviewerRole",
+        "imageRegionPx",
+        "note"
+      ],
+      "properties": {
+        "evidenceId": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+        "evidenceType": {"type": "string", "minLength": 1},
+        "sourceReference": {"type": "string", "minLength": 1},
+        "capturedAt": {"type": "string", "format": "date-time"},
+        "extractionMethod": {"type": "string", "minLength": 1},
+        "reviewerRole": {"type": "string", "minLength": 1},
+        "imageRegionPx": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "array",
+              "prefixItems": [
+                {"type": "integer", "minimum": 0},
+                {"type": "integer", "minimum": 0},
+                {"type": "integer", "minimum": 1},
+                {"type": "integer", "minimum": 1}
+              ],
+              "items": false,
+              "minItems": 4,
+              "maxItems": 4
+            }
+          ]
+        },
+        "note": {"type": "string"}
+      }
+    },
+    "historyEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "field",
+        "status",
+        "value",
+        "reason",
+        "evidenceIds",
+        "actorRole",
+        "recordedAt",
+        "previousDigest",
+        "eventDigest"
+      ],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1},
+        "field": {"$ref": "#/$defs/field"},
+        "status": {"$ref": "#/$defs/status"},
+        "value": {"type": ["string", "null"]},
+        "reason": {"type": "string", "minLength": 1},
+        "evidenceIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}
+        },
+        "actorRole": {"type": "string", "minLength": 1},
+        "recordedAt": {"type": "string", "format": "date-time"},
+        "previousDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "eventDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}

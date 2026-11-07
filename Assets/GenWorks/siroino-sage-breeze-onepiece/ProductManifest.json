@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-sage-breeze-onepiece",
+  "productName": "Sage Breeze Onepiece for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0-large",
+  "productRoot": "Assets/GenWorks/siroino-sage-breeze-onepiece",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSageBreezeOnepiece.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSotai_SageBreezeOnepiece.prefab",
+  "previewPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/README.md",
+  "sourceJobPath": "config/products/siroino-sage-breeze-onepiece/job.json",
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-sage-breeze-onepiece/Source/Blender/SiroinoSageBreezeOnepiece.blend",
+    "fbx": "Assets/GenWorks/siroino-sage-breeze-onepiece/Models/SiroinoSageBreezeOnepiece.fbx",
+    "prefab": "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSageBreezeOnepiece.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSotai_SageBreezeOnepiece.prefab",
+    "multiview": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/siroino-sage-breeze-onepiece-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/siroino-sage-breeze-onepiece-pose-review.webp",
+    "clothSimulation": "Assets/GenWorks/siroino-sage-breeze-onepiece/Evidence/Build/cloth-simulation.json"
+  },
+  "technicalGates": {
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "visualAppearanceReview": "REVIEW_REQUIRED",
+    "clothSimulation": "PASS",
+    "unityImport": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "metrics": {
+    "meshObjects": 19,
+    "vertices": 27558,
+    "triangles": 54388,
+    "degenerateTriangles": 0,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "maxBoneInfluences": 5
+  },
+  "reference": {
+    "status": "REPAIRED_REPLACEMENT_BOARD_GENERATED",
+    "exactIssueImageAvailable": false,
+    "replacementPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/References/sage-breeze-onepiece-manufacturing-board-replacement.png"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-sage-breeze-onepiece",
+    "resumeFrom": "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSageBreezeOnepiece.prefab",
+    "doNotRebuildFromZero": true,
+    "blockers": [
+      "exact original Issue PNG was unavailable in this Windows workspace; replacement board is persisted",
+      "visual review and shoulder/pleat deformation review remain required",
+      "Unity CLI toolchain compilation passed, but the isolated run could not register ModelImporter for FBX assets; Unity integration, Modular Avatar, NDMF and VRChat SDK dry-run remain unverified (see Evidence/Unity/unity.json)"
+    ]
+  },
+  "clothSimulation": "Assets/GenWorks/siroino-sage-breeze-onepiece/Evidence/Build/cloth-simulation.json"
+}

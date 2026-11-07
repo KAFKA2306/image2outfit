@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-quiet-arc-panel-dress",
+  "profile": "panel-sewn",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v1-closed-panel-twin-crescent-arch",
+  "panels": [
+    "arc_front_L", "arc_front_R", "arc_center_front", "arc_back", "shoulder_L", "shoulder_R", "sleeve_L", "sleeve_R", "cuff_L", "cuff_R",
+    "stand_collar", "front_facing_L", "front_facing_R", "center_vent_L", "center_vent_R",
+    "inner_front", "inner_back", "placket_hardware"
+  ],
+  "separateGeometry": [
+    "crescent_root_L", "crescent_root_R", "crescent_base_L", "crescent_base_R", "crescent_outer_L", "crescent_outer_R",
+    "crescent_inner_L", "crescent_inner_R", "crescent_facing_L", "crescent_facing_R"
+  ],
+  "priorityFitZones": ["neck", "shoulder", "elbow", "waist", "hip", "upper-leg", "knee-hem", "side-arch-window"],
+  "clothSimulation": {
+    "applicability": "NOT_REQUIRED",
+    "components": [],
+    "evidence": "weight-driven first technical pass",
+    "reason": "The closed panel shell and bounded crescent arches are structural skinned geometry; cloth simulation is not required for this first contract pass."
+  },
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "No product-specific corrective shape-key stage is required for the first structural candidate."
+  },
+  "releaseBoundary": "Keep WORKING until current Blender source, FBX, five views, six poses, and direct visual review are available."
+}

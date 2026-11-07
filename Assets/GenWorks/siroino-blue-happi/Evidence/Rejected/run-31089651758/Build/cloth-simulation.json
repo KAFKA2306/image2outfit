@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "status": "PASS",
+  "engine": "Blender Cloth",
+  "frameStart": 1,
+  "frameEnd": 18,
+  "cacheBaked": true,
+  "gravity": [
+    0.0,
+    0.0,
+    -3.5
+  ],
+  "contracts": [
+    {
+      "object": "Happi_Back_Body",
+      "modifier": "Happi Cloth",
+      "pinVertexCount": 938,
+      "frameStart": 1,
+      "frameEnd": 18
+    },
+    {
+      "object": "Happi_Front_Left",
+      "modifier": "Happi Cloth",
+      "pinVertexCount": 1054,
+      "frameStart": 1,
+      "frameEnd": 18
+    },
+    {
+      "object": "Happi_Front_Right",
+      "modifier": "Happi Cloth",
+      "pinVertexCount": 1055,
+      "frameStart": 1,
+      "frameEnd": 18
+    },
+    {
+      "object": "Happi_Sleeve_Left",
+      "modifier": "Happi Cloth",
+      "pinVertexCount": 304,
+      "frameStart": 1,
+      "frameEnd": 18
+    },
+    {
+      "object": "Happi_Sleeve_Right",
+      "modifier": "Happi Cloth",
+      "pinVertexCount": 304,
+      "frameStart": 1,
+      "frameEnd": 18
+    }
+  ],
+  "bodyCollisionThicknessM": 0.004,
+  "structuralObjectsExcludedFromSolve": [
+    "Happi_Collar_Front_Left",
+    "Happi_Collar_Front_Right",
+    "Happi_Collar_Back"
+  ]
+}

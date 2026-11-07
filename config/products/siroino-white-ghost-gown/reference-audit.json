@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "auditStatus": "PASS_WITH_UNVERIFIED_MODEL",
+  "source": {
+    "kind": "user-uploaded-reference-image",
+    "view": "front",
+    "originalFileName": "user-upload-front.png",
+    "originalSha256": "d7c91d92c45598c13ff2b7673c71672cefe5f41a16361ca1b4267fcf6b927ef3",
+    "widthPx": 773,
+    "heightPx": 1000,
+    "colorMode": "RGB",
+    "sourceRetention": {
+      "repositoryContainsSourceImage": false,
+      "reason": "The uploaded image is private reference input; the public repository stores only hashes and structured observations.",
+      "reconstructionInput": "front/back structured observations, explicit pattern data, stitch graph, and deterministic Blender construction"
+    },
+    "additionalViews": [
+      {
+        "view": "back",
+        "originalFileName": "user-upload-back.png",
+        "originalSha256": "22436f4a83a3528d1f80fdf3c7fa737024cf622b4b050547329f44b6f05f9a2d",
+        "widthPx": 773,
+        "heightPx": 1000,
+        "colorMode": "RGB"
+      }
+    ]
+  },
+  "visibleText": [],
+  "variants": [
+    {
+      "variantId": "white-ghost-gown",
+      "label": "white ghost gown",
+      "boundingBoxPx": [84, 23, 683, 976],
+      "dominantColors": [
+        {"name": "white", "rgb": [238, 239, 241]},
+        {"name": "near-black", "rgb": [31, 29, 30]},
+        {"name": "pink", "rgb": [233, 124, 147]}
+      ]
+    }
+  ],
+  "modelIdentification": {
+    "status": "UNVERIFIED",
+    "manufacturer": null,
+    "brand": null,
+    "modelName": null,
+    "modelNumber": null,
+    "jan": null,
+    "sku": null,
+    "reason": "The supplied images do not contain a brand, seller, catalog number, barcode, or model identifier. A repository product ID is used without claiming a commercial SKU."
+  },
+  "observations": [
+    "Full-length fitted white gown with a modest mermaid flare at the hem.",
+    "Long fitted sleeves end in oversized hanging white sheet-like wrist drapes.",
+    "A white ghost hood covers the head and upper shoulders and has two black oval eye appliques and two small pink cheek appliques.",
+    "The back view shows a large upper-back cutout and crossed white ties below it.",
+    "No visible print, logo, zipper, button, or branded hardware is observable in the supplied views."
+  ],
+  "uncertainties": [
+    {
+      "field": "fiber composition",
+      "status": "not-visible",
+      "decision": "use a matte stretch-fabric approximation for rendering"
+    },
+    {
+      "field": "exact seam placement under the hood",
+      "status": "occluded",
+      "decision": "use symmetric front/back hood panels"
+    },
+    {
+      "field": "commercial identity",
+      "status": "unverified",
+      "decision": "do not claim a model number or SKU"
+    }
+  ],
+  "designUsePolicy": {
+    "interpretation": "Use the visible garment construction as reference evidence without claiming a named commercial product.",
+    "logosObserved": false,
+    "textilePrintObserved": false,
+    "primaryVariant": "white-ghost-gown"
+  },
+  "webAudit": {
+    "checkedAt": "2026-08-21T09:34:00Z",
+    "result": "NOT_USED_FOR_COMMERCIAL_IDENTIFICATION",
+    "evidenceUrls": [
+      "https://booth.pm/ja/items/8268676",
+      "https://docs.blender.org/manual/en/4.4/physics/cloth/settings/index.html",
+      "https://developer.blender.org/docs/release_notes/4.4/corrective_releases/"
+    ],
+    "note": "Web evidence is used only for the SiroinoSotai license/toolchain and Blender cloth workflow; the costume identity remains unverified."
+  }
+}

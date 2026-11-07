@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lily-vapor-yukata",
+  "status": "WORKING",
+  "checkedAt": "2026-09-22T09:50:12.701706Z",
+  "blenderVersion": "4.2.23 LTS",
+  "targetSource": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetSourceSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0",
+  "shapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
+  "metrics": {
+    "meshObjects": 21,
+    "vertices": 31279,
+    "triangles": 60764,
+    "degenerateTriangles": 0,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "maxBoneInfluences": 5
+  },
+  "clothComponents": [
+    "Lily_Summer_Front_Under",
+    "Lily_Summer_Front_Over",
+    "Lily_Summer_Back",
+    "Lily_Sleeve_Rail_Outer_L",
+    "Lily_Sleeve_Rail_Inner_L",
+    "Lily_Sleeve_Rail_Inner_R",
+    "Lily_Sleeve_Rail_Outer_R"
+  ],
+  "clothSimulation": "Assets/GenWorks/siroino-lily-vapor-yukata/Evidence/Build/cloth-simulation.json",
+  "referenceArtifact": "REPAIRED_REPLACEMENT_GENERATED",
+  "previews": {
+    "front": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/front.png",
+      "sha256": "dc3b249d221c8b6e1591a8d90a83d81fafa8562bb0d87cf63c0eccdfc71c1d41",
+      "width": 1024,
+      "height": 1024
+    },
+    "back": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/back.png",
+      "sha256": "63cbfcaf259ffd87512c55472e6966280b63ddfb1aa0ff249e0ff285af90a089",
+      "width": 1024,
+      "height": 1024
+    },
+    "left": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/left.png",
+      "sha256": "3d1029a4e853cae41bd93825545f6760bf40f5aef59544934de60efc0c8599b7",
+      "width": 1024,
+      "height": 1024
+    },
+    "right": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/right.png",
+      "sha256": "9387e0d79d65c2fdbbf192f53fdd9271b09e9b5db4beb9a92cc4b224546d98e1",
+      "width": 1024,
+      "height": 1024
+    },
+    "three-quarter": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/three-quarter.png",
+      "sha256": "e006d1605863e2f95c3d43a1d32d0b2e3911a6a1791baf4107df9ad132cfb647",
+      "width": 1024,
+      "height": 1024
+    }
+  },
+  "poses": {
+    "neutral": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/neutral.png",
+      "sha256": "92f4f01da70c1254d1afe093bfd469eec6b666347a098daf4fe791d9b020c386",
+      "width": 1024,
+      "height": 1024
+    },
+    "arms-up": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arms-up.png",
+      "sha256": "c294b6d35583bc752fb1c56ff7d8a9dd263bf40f8eecebe959c91831098c0826",
+      "width": 1024,
+      "height": 1024
+    },
+    "arm-cross": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arm-cross.png",
+      "sha256": "6b43ecf231dc281549ea4bb8855d0691ba54699002e8f42f1296d6e4ae35768f",
+      "width": 1024,
+      "height": 1024
+    },
+    "crouch": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/crouch.png",
+      "sha256": "c9a66ef8795962a15551692633bb4cc55c2e9cef358112868ed640dbe7e4b6b3",
+      "width": 1024,
+      "height": 1024
+    },
+    "sit": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/sit.png",
+      "sha256": "d661948f8aa9609b965106bd08abe6c8f3e33cfb2761598e40f796ea0860dab2",
+      "width": 1024,
+      "height": 1024
+    },
+    "prone": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/prone.png",
+      "sha256": "44c1edf6a1577d2a58031e851cb04c4192d4d6f5c2ee57d4daec623844682670",
+      "width": 1024,
+      "height": 1024
+    }
+  },
+  "design": {
+    "construction": "closed calf-length summer column shell with two split-rail sleeves, center back walking vent, flat waist stay, and three-plate Petal Lock",
+    "excludedOverlap": [
+      "broad obi",
+      "rear bow",
+      "detached waterfall panels",
+      "conventional wide kimono sleeves",
+      "lantern bag",
+      "hanging tassel field",
+      "cape",
+      "thigh straps"
+    ]
+  },
+  "artifacts": {
+    "blend": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Source/Blender/SiroinoLilyVaporYukata.blend",
+      "sha256": "4714e0892fd3d8f7f8d72d1ee0bee5ceddaaef81ded04eacf1ca9fabce5c7b90"
+    },
+    "settledFbx": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Models/SiroinoLilyVaporYukata.fbx",
+      "sha256": "68eacbd5ad5dee866d0b20391c6d848700a5516d31f37bed04350037f5d966e3"
+    }
+  },
+  "evidenceRenderFrame": 32,
+  "preClothPreviews": {
+    "front": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/front.png",
+      "sha256": "dc3b249d221c8b6e1591a8d90a83d81fafa8562bb0d87cf63c0eccdfc71c1d41",
+      "width": 1024,
+      "height": 1024
+    },
+    "back": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/back.png",
+      "sha256": "63cbfcaf259ffd87512c55472e6966280b63ddfb1aa0ff249e0ff285af90a089",
+      "width": 1024,
+      "height": 1024
+    },
+    "left": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/left.png",
+      "sha256": "3d1029a4e853cae41bd93825545f6760bf40f5aef59544934de60efc0c8599b7",
+      "width": 1024,
+      "height": 1024
+    },
+    "right": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/right.png",
+      "sha256": "9387e0d79d65c2fdbbf192f53fdd9271b09e9b5db4beb9a92cc4b224546d98e1",
+      "width": 1024,
+      "height": 1024
+    },
+    "three-quarter": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/three-quarter.png",
+      "sha256": "e006d1605863e2f95c3d43a1d32d0b2e3911a6a1791baf4107df9ad132cfb647",
+      "width": 1024,
+      "height": 1024
+    }
+  },
+  "preClothPoses": {
+    "neutral": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/neutral.png",
+      "sha256": "92f4f01da70c1254d1afe093bfd469eec6b666347a098daf4fe791d9b020c386",
+      "width": 1024,
+      "height": 1024
+    },
+    "arms-up": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arms-up.png",
+      "sha256": "c294b6d35583bc752fb1c56ff7d8a9dd263bf40f8eecebe959c91831098c0826",
+      "width": 1024,
+      "height": 1024
+    },
+    "arm-cross": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/arm-cross.png",
+      "sha256": "6b43ecf231dc281549ea4bb8855d0691ba54699002e8f42f1296d6e4ae35768f",
+      "width": 1024,
+      "height": 1024
+    },
+    "crouch": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/crouch.png",
+      "sha256": "c9a66ef8795962a15551692633bb4cc55c2e9cef358112868ed640dbe7e4b6b3",
+      "width": 1024,
+      "height": 1024
+    },
+    "sit": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/sit.png",
+      "sha256": "d661948f8aa9609b965106bd08abe6c8f3e33cfb2761598e40f796ea0860dab2",
+      "width": 1024,
+      "height": 1024
+    },
+    "prone": {
+      "path": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews/Poses/prone.png",
+      "sha256": "44c1edf6a1577d2a58031e851cb04c4192d4d6f5c2ee57d4daec623844682670",
+      "width": 1024,
+      "height": 1024
+    }
+  },
+  "renderEvidenceFrame": 32
+}

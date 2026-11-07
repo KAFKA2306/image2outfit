@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-sage-breeze-onepiece",
+  "productName": "Sage Breeze Onepiece for Siroino",
+  "adapterId": "siroino-v1.0-large",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4.3-panel-cloth-modular",
+  "buildRevision": "v1-closed-breeze-column-twin-wind-tunnel",
+  "renderLoopRevision": "sage-breeze-onepiece-v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-sage-breeze-onepiece",
+  "productManifestPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/ProductManifest.json",
+  "buildScript": "tools/siroino_sage_breeze_onepiece_build.py",
+  "productBuildScript": "tools/siroino_sage_breeze_onepiece_build.py",
+  "hostedPoseScript": "tools/siroino_sage_breeze_onepiece_render_settled.py",
+  "blendPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/Source/Blender/SiroinoSageBreezeOnepiece.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/Models/SiroinoSageBreezeOnepiece.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSageBreezeOnepiece.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSotai_SageBreezeOnepiece.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"]
+  },
+  "bodyShapeProfile": {"All_L": 1.0, "Chest_L": 1.0, "Hips_01_L": 1.0, "UpperLeg_L": 1.0, "Breasts_L": 0.65},
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "referenceAuditPath": "config/products/siroino-sage-breeze-onepiece/reference-audit.json",
+    "referenceIdentityPath": "config/products/siroino-sage-breeze-onepiece/reference-identity.json",
+    "decompositionPath": "config/products/siroino-sage-breeze-onepiece/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-sage-breeze-onepiece/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-sage-breeze-onepiece/stitch-graph.json",
+    "visualReviewPath": "config/products/siroino-sage-breeze-onepiece/visual-review.json",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "researchTrial": "closed onepiece panel layout + native Blender Cloth on four shell panels + nearest-body weights",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true,
+    "clothSimulation": {
+      "applicability": "REQUIRED",
+      "components": ["Sage_Breeze_Front", "Sage_Breeze_Back", "Sage_Breeze_Side_L", "Sage_Breeze_Side_R"],
+      "frameEnd": 30,
+      "evidence": "Assets/GenWorks/siroino-sage-breeze-onepiece/Evidence/Build/cloth-simulation.json",
+      "reason": "The closed onepiece shell panels are fabric and must be settled against the Siroino body with native Blender Cloth before export."
+    }
+  },
+  "researchMethod": {
+    "name": "panel-first closed garment reconstruction with native Blender Cloth",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-sage-breeze-onepiece/pattern-draft.json",
+    "secondaryEvidence": "config/products/siroino-sage-breeze-onepiece/stitch-graph.json"
+  },
+  "licenseEvidence": "config/products/siroino-sage-breeze-onepiece/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "patternLayoutPath": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-sage-breeze-onepiece/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-sage-breeze-onepiece/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-sage-breeze-onepiece/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 3,
+    "materialRoles": [
+      {"material": "MAT_BreezeShell", "role": "fabric"},
+      {"material": "MAT_WindFacing", "role": "trim"},
+      {"material": "MAT_LeafClasp", "role": "accent"},
+      {"material": "MAT_BreezeHardware", "role": "metal"}
+    ]
+  },
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/ProductManifest.json",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/README.md",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/References/sage-breeze-onepiece-manufacturing-board-replacement.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Source/Blender/SiroinoSageBreezeOnepiece.blend",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Models/SiroinoSageBreezeOnepiece.fbx",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSageBreezeOnepiece.prefab",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Prefab/SiroinoSotai_SageBreezeOnepiece.prefab",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/front.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/back.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/left.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/right.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Previews/Poses/prone.png",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Evidence/Build/product-build-report.json",
+    "Assets/GenWorks/siroino-sage-breeze-onepiece/Evidence/Build/cloth-simulation.json"
+  ]
+}

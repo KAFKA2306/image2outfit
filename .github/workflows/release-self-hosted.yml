@@ -9,7 +9,9 @@ on:
         type: string
 
 permissions:
+  actions: write
   contents: read
+  pull-requests: read
 
 concurrency:
   group: image2outfit-release-${{ github.repository }}
@@ -43,30 +45,47 @@ jobs:
           if (-not (Test-Path -LiteralPath $jobPath -PathType Leaf)) { throw "Job file was not found: $jobPath" }
           $job = Get-Content -LiteralPath $jobPath -Raw | ConvertFrom-Json
           if ([int]$job.schemaVersion -ne 2) { throw 'Only schemaVersion 2 jobs are accepted' }
-          $candidateManifest = Join-Path ([string]$job.candidateDir) 'candidate-manifest.json'
+          if ([string]::IsNullOrWhiteSpace([string]$job.id)) { throw 'job.id is required' }
+          $runtimeRoot = ".image2outfit/products/$($job.id)"
+          $candidateManifest = Join-Path "$runtimeRoot/candidate" 'candidate-manifest.json'
           if (-not (Test-Path -LiteralPath $candidateManifest -PathType Leaf)) { throw 'Reviewed candidate-manifest.json is missing' }
           "JOB_PATH=$jobPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "JOB_ID=$($job.id)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "ARTIFACT_DIR=$($job.artifactDir)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "RELEASE_DIR=$($job.releaseDir)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "REPORT_DIR=$runtimeRoot/reports" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "RELEASE_DIR=$runtimeRoot/release" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Promote unchanged reviewed candidate
+      - name: Evaluate product release gate
         shell: pwsh
-        run: task release JOB="$env:JOB_PATH"
+        run: uv run --no-cache --locked --no-default-groups --python 3.11 python tools/production_gate.py --mode release --job "$env:JOB_PATH"
 
-      - name: Assert GO decision
+      - name: Assert product release GO decision
         shell: pwsh
         run: |
-          $audit = Get-Content -LiteralPath (Join-Path $env:ARTIFACT_DIR 'audit.json') -Raw | ConvertFrom-Json
+          $audit = Get-Content -LiteralPath (Join-Path $env:REPORT_DIR 'audit.json') -Raw | ConvertFrom-Json
           if ([string]$audit.decision -ne 'GO') { throw "Release gate did not return GO: $($audit.decision)" }
+
+      - name: Delete previous release artifact
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run --no-cache --locked --no-default-groups --python 3.11 python tools/delete_previous_artifacts.py "image2outfit-release-$env:JOB_ID"
 
       - name: Upload customer release
         uses: actions/upload-artifact@v4
         with:
-          name: image2outfit-release-${{ env.JOB_ID }}-${{ github.run_id }}
+          name: image2outfit-release-${{ env.JOB_ID }}
           path: |
-            ${{ env.ARTIFACT_DIR }}/audit.json
-            ${{ env.RELEASE_DIR }}
+            ${{ env.REPORT_DIR }}/audit.json
+            ${{ env.RELEASE_DIR }}/**/*.json
+            ${{ env.RELEASE_DIR }}/**/*.zip
+            ${{ env.RELEASE_DIR }}/**/*.unitypackage
+            ${{ env.RELEASE_DIR }}/**/*.fbx
+            ${{ env.RELEASE_DIR }}/**/*.prefab
+            ${{ env.RELEASE_DIR }}/**/*.webp
+            ${{ env.RELEASE_DIR }}/**/*.blend
+            ${{ env.RELEASE_DIR }}/**/*.txt
+            ${{ env.RELEASE_DIR }}/**/*.md
           if-no-files-found: error
-          retention-days: 30
+          overwrite: true
+          retention-days: 1
           compression-level: 0

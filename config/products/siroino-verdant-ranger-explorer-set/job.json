@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "id": "siroino-verdant-ranger-explorer-set",
+  "productName": "Verdant Ranger Explorer Set for Siroino",
+  "adapterId": "siroino-v1.0-large",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4.3-panel-cloth-modular",
+  "buildRevision": "v1-longline-tunic-articulated-trouser",
+  "renderLoopRevision": "verdant-ranger-explorer-v1-five-view-six-pose",
+  "productRoot": "Assets/GenWorks/siroino-verdant-ranger-explorer-set",
+  "productManifestPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/ProductManifest.json",
+  "buildScript": "tools/siroino_verdant_ranger_explorer_build.py",
+  "productBuildScript": "tools/siroino_verdant_ranger_explorer_build.py",
+  "hostedPoseScript": "tools/siroino_verdant_ranger_explorer_render_settled.py",
+  "blendPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Source/Blender/SiroinoVerdantRangerExplorer.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Models/SiroinoVerdantRangerExplorer.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoVerdantRangerExplorer.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoSotai_VerdantRangerExplorer.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "targetResolution": {
+    "strategy": "repository-search",
+    "profile": "Siroino _Large via official shape keys on SiroinoSotai_PC",
+    "normalSizeFallbackAllowed": false,
+    "searchRoots": ["Assets"],
+    "excludePrefixes": ["Assets/GenWorks", "Assets/_Local/Jobs"]
+  },
+  "bodyShapeProfile": {
+    "All_L": 1.0,
+    "Chest_L": 1.0,
+    "Hips_01_L": 1.0,
+    "UpperLeg_L": 1.0,
+    "Breasts_L": 0.65
+  },
+  "garmentPipeline": {
+    "stageContractVersion": 2,
+    "referenceAuditPath": "config/products/siroino-verdant-ranger-explorer-set/reference-audit.json",
+    "referenceIdentityPath": "config/products/siroino-verdant-ranger-explorer-set/reference-identity.json",
+    "decompositionPath": "config/products/siroino-verdant-ranger-explorer-set/garment-decomposition.json",
+    "patternContractPath": "config/products/siroino-verdant-ranger-explorer-set/pattern-draft.json",
+    "stitchGraphPath": "config/products/siroino-verdant-ranger-explorer-set/stitch-graph.json",
+    "visualReviewPath": "config/products/siroino-verdant-ranger-explorer-set/visual-review.json",
+    "blenderVerification": "neutral, arms-up, arm-cross, crouch, sit, prone",
+    "researchTrial": "explicit tunic/trouser panel layout + Blender 4.4.3 native Cloth on four tunic panels + four-influence nearest-body weights",
+    "releaseRequiresEditableSource": true,
+    "releaseRequiresFiveViews": true,
+    "releaseRequiresPoseEvidence": true,
+    "clothSimulation": {
+      "applicability": "REQUIRED",
+      "components": ["Verdant_Tunic_Front", "Verdant_Tunic_Back", "Verdant_Tunic_Side_L", "Verdant_Tunic_Side_R"],
+      "evidence": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Build/cloth-simulation.json",
+      "reason": "The longline tunic panels are loose outer cloth and must be settled against the Siroino body with native Blender Cloth before export."
+    }
+  },
+  "researchMethod": {
+    "name": "panel-first structured reconstruction with native Blender Cloth",
+    "trialStatus": "DECLARED",
+    "primaryEvidence": "config/products/siroino-verdant-ranger-explorer-set/pattern-draft.json",
+    "secondaryEvidence": "config/products/siroino-verdant-ranger-explorer-set/stitch-graph.json"
+  },
+  "licenseEvidence": "config/products/siroino-verdant-ranger-explorer-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "patternLayoutPath": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/pattern-layout.png",
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/three-quarter.png"
+  },
+  "posePaths": {
+    "neutral": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/neutral.png",
+    "arms-up": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/arms-up.png",
+    "arm-cross": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/arm-cross.png",
+    "crouch": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/crouch.png",
+    "sit": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/sit.png",
+    "prone": "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/prone.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-verdant-ranger-explorer-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-verdant-ranger-explorer-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-verdant-ranger-explorer-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 3,
+    "materialRoles": [
+      {"material": "MAT_Verdant_Sage_Tunic", "role": "fabric"},
+      {"material": "MAT_Verdant_Olive_Trousers", "role": "fabric"},
+      {"material": "MAT_Verdant_Cream_Underlayer", "role": "accent"},
+      {"material": "MAT_Verdant_Brushed_Brass", "role": "metal"}
+    ]
+  },
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/README.md",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/SOURCE_HASHES.txt",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/References/verdant-ranger-manufacturing-sheet-replacement.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Source/Blender/SiroinoVerdantRangerExplorer.blend",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Models/SiroinoVerdantRangerExplorer.fbx",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Models/SiroinoVerdantRangerExplorer.fbx.meta",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoVerdantRangerExplorer.prefab",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoVerdantRangerExplorer.prefab.meta",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoSotai_VerdantRangerExplorer.prefab",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/NDMF-Bake/SiroinoSotai_VerdantRangerExplorer_baked 1.prefab",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/verdant-ranger-explorer-unity-validation.json",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/verdant-ranger-explorer-vrc-dry-run.json",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Unity/verdant-ranger-explorer-vrc-avatar-audit.json",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Prefab/SiroinoSotai_VerdantRangerExplorer.prefab.meta",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/pattern-layout.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/front.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/back.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/left.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/right.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/neutral.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/arms-up.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/arm-cross.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/crouch.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/sit.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Previews/Poses/prone.png",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Build/product-build-report.json",
+    "Assets/GenWorks/siroino-verdant-ranger-explorer-set/Evidence/Build/cloth-simulation.json"
+  ]
+}
+

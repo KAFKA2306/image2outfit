@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "revision": "v2-blue-happi-shaped-shell-attempt",
+  "workflowRun": 31092626753,
+  "headSha": "153c24996795e0363343a17f1e7c48c0992049c7",
+  "decision": "FAIL",
+  "reviewType": "DIRECT_RENDER_AND_EXECUTION_PROVENANCE",
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "code": "V2_EXECUTION_NOT_EVIDENCED",
+      "message": "The generated report retains v1 notes and does not contain the v2 fitEnvelope or silhouetteRevision markers. The artifact therefore does not prove that the v2 generator executed."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "OVERSIZED_RECTANGULAR_TORSO",
+      "message": "The front, side, and back renders show a rigid rectangular shell with excessive clearance rather than a body-following happi silhouette."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "HORIZONTAL_SHOULDER_PLATES",
+      "message": "The shoulder region remains a nearly horizontal plate and forms detached wing-like folds."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "SHORT_FOLDED_SLEEVES",
+      "message": "The sleeves terminate near the upper arm and fold into the shoulder instead of extending along the upper-arm/lower-arm chain."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "FLOATING_COLLAR",
+      "message": "The collar bridge and front bands visibly float above or outside the neckline and do not read as a continuous sewn route."
+    }
+  ],
+  "evidence": {
+    "multiview": "Assets/GenWorks/siroino-blue-happi/Evidence/Rejected/v2-attempt-31092626753/siroino-blue-happi-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-blue-happi/Evidence/Rejected/v2-attempt-31092626753/siroino-blue-happi-pose-review.webp",
+    "renderManifest": "Assets/GenWorks/siroino-blue-happi/Evidence/Rejected/v2-attempt-31092626753/render-manifest.json"
+  },
+  "nextRequiredChanges": [
+    "Use a stable, unversioned product build entrypoint.",
+    "Delete or quarantine stale generated outputs before each Blender execution.",
+    "Write an execution revision marker and reject artifacts whose marker does not match the requested revision.",
+    "Rebuild the shoulder, sleeve-cap, and collar geometry before another direct review."
+  ]
+}

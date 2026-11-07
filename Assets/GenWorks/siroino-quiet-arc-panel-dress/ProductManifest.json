@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-quiet-arc-panel-dress",
+  "productName": "Quiet Arc Panel Dress for Siroino",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-quiet-arc-panel-dress",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoQuietArcPanelDress.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoSotai_QuietArcPanelDress.prefab",
+  "previewPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-quiet-arc-panel-dress/README.md",
+  "sourceJobPath": "config/products/siroino-quiet-arc-panel-dress/job.json",
+  "productBuildScript": "tools/siroino_quiet_arc_panel_dress_build.py",
+  "designRevision": "v1-closed-panel-twin-crescent-arch",
+  "reference": {
+    "status": "ISSUE_VISIBLE_CONSTRUCTION_RECORDED_SOURCE_IMAGE_UNAVAILABLE",
+    "issue": 677,
+    "sourcePath": "/mnt/data/a_detailed_poster_style_character_garment_design.png",
+    "exactIssueImageAvailable": false,
+    "repositoryContainsSourceImage": false,
+    "note": "The Issue records the exact generated board path but neither the local attachment nor a GitHub-visible binary is available in this workspace."
+  },
+  "technicalGates": {
+    "referenceAudit": "UNVERIFIED",
+    "patternContract": "PASS",
+    "blender": "PENDING_RETRY",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "PASS",
+    "clothSimulation": "NOT_REQUIRED",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "UNVERIFIED",
+    "unityImport": "UNVERIFIED",
+    "modularAvatar": "UNVERIFIED",
+    "ndmf": "UNVERIFIED",
+    "vrchatRuntime": "UNVERIFIED"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Source/Blender/SiroinoQuietArcPanelDress.blend",
+    "fbx": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Models/SiroinoQuietArcPanelDress.fbx",
+    "prefab": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoQuietArcPanelDress.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoSotai_QuietArcPanelDress.prefab"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-quiet-arc-panel-dress",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "Assets/GenWorks/siroino-quiet-arc-panel-dress/Prefab/SiroinoQuietArcPanelDress.prefab",
+    "blockers": [
+      "Issue #677 exact generated board is not GitHub-visible in this workspace",
+      "Unity/Modular Avatar/NDMF/VRChat runtime evidence is not executed in the isolated Blender workflow",
+      "direct visual review remains required"
+    ]
+  }
+}

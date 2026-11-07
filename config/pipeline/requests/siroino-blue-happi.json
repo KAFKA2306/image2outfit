@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "targetAvatar": "SiroinoSotai_PC",
+  "sourceReference": "private-reference://sha256/9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423",
+  "revisionId": "v2-blue-happi-shaped-shell",
+  "variables": {},
+  "stageBindings": {
+    "ingest-reference": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "ingest-reference",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/ingest-reference.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/ingest-reference.json"
+    },
+    "normalize-view": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "normalize-view",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/normalize-view.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/normalize-view.json"
+    },
+    "decompose-garment": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "decompose-garment",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/decompose-garment.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/decompose-garment.json"
+    },
+    "draft-patterns": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "draft-patterns",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/draft-patterns.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/draft-patterns.json"
+    },
+    "infer-stitches": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "infer-stitches",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/infer-stitches.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/infer-stitches.json"
+    },
+    "initialize-3d": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "initialize-3d",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/initialize-3d.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/initialize-3d.json"
+    },
+    "build-blender": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "build-blender",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/build-blender.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/build-blender.json"
+    },
+    "simulate-cloth": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "simulate-cloth",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/simulate-cloth.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/simulate-cloth.json"
+    },
+    "skin-and-export": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "skin-and-export",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/skin-and-export.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/skin-and-export.json"
+    },
+    "render-evidence": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "render-evidence",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/render-evidence.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/render-evidence.json"
+    },
+    "audit-geometry": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "audit-geometry",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/audit-geometry.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/audit-geometry.json"
+    },
+    "visual-review": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "visual-review",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/visual-review.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/visual-review.json"
+    },
+    "finalize-candidate": {
+      "command": [
+        "python",
+        "tools/run_blue_happi_stage.py",
+        "--stage",
+        "finalize-candidate",
+        "--job",
+        "config/products/siroino-blue-happi/job.json",
+        "--request",
+        "config/pipeline/requests/siroino-blue-happi.json",
+        "--result",
+        ".image2outfit/products/{productId}/stages/finalize-candidate.json"
+      ],
+      "resultPath": ".image2outfit/products/{productId}/stages/finalize-candidate.json"
+    }
+  }
+}

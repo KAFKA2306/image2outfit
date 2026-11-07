@@ -90,7 +90,7 @@ Thumbs.db
 /.github/run/
 /.github/status/
 
-# Local licensed source and generated artifacts
+# Local licensed source and machine-specific Unity state
 /Assets/_Local/
 /Assets/_Local.meta
 /Assets/_Vendor/
@@ -109,9 +109,39 @@ Thumbs.db
 /Assets/RyukuLab.meta
 /ProjectSettings/Packages/
 /ProjectSettings/XRPackageSettings.asset
-/Artifacts/
-/Candidates/
-/Release/
+
+# OSS model downloads and isolated benchmark runtimes are local machine state
+/OSSBenchmarks/**/hf-cache/
+/OSSBenchmarks/**/cache/huggingface/
+/OSSBenchmarks/TRELLIS2/venv/
+/OSSBenchmarks/TRELLIS2/venv-512/
+
+# Per-method benchmark checkouts, venvs, uv/torch caches, and generated model
+# outputs are machine-specific. Only the top-level comparison files in
+# OSSBenchmarks/ are source. Assets/OSSBenchmarks/ outputs are large local binaries.
+/OSSBenchmarks/*/
+/Assets/OSSBenchmarks/
+**/.venv/
+**/venv/
+**/venv-*/
+**/_uv-cache/
+
+# Local download staging for product images is machine state, not product source
+/downloads/
+
+# Generated GitHub Pages projection and reconciliation report are local build outputs
+/pages/
+/publication-reconciliation.json
+
+# All reports, candidate snapshots, and release packages are internal runtime state
+/.image2outfit/
+/analytics/dbt/logs/
+/analytics/dbt/target/
+
+# Historical generated roots are intentionally not ignored. If they reappear,
+# git status and repository audits must expose them for removal.
 /Delivery/
 /Preview/
-/.image2outfit/
+
+__pycache__/
+*.py[cod]

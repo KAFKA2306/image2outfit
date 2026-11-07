@@ -8,6 +8,7 @@ using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using UnityEditor;
 using UnityEngine;
+using VRC.SDK3.Avatars.Components;
 using VRC.SDK3A.Editor;
 using VRC.SDKBase.Editor;
 
@@ -20,12 +21,48 @@ namespace Image2Outfit.Editor
         {
             public string id;
             public string productName;
+            public string productRoot;
             public string fbxAssetPath;
             public string prefabAssetPath;
             public string integratedPrefabAssetPath;
             public string targetAvatarAssetPath;
             public string artifactDir;
             public string[] allowedExtraBones;
+            public UnityReadyContract unityReady;
+        }
+
+        [Serializable]
+        private sealed class MaterialRole
+        {
+            public string material;
+            public string role;
+        }
+
+        [Serializable]
+        private sealed class UnityReadyContract
+        {
+            public int minimumDistinctMaterials;
+            public MaterialRole[] materialRoles;
+        }
+
+        [Serializable]
+        private sealed class MaterialSlotRecord
+        {
+            public int slot;
+            public string material;
+            public string materialAssetPath;
+            public string materialGuid;
+            public string role;
+            public List<string> textureAssets = new List<string>();
+        }
+
+        [Serializable]
+        private sealed class RendererMaterialRecord
+        {
+            public string rendererPath;
+            public int subMeshCount;
+            public int materialSlotCount;
+            public List<MaterialSlotRecord> slots = new List<MaterialSlotRecord>();
         }
 
         [Serializable]
@@ -44,6 +81,10 @@ namespace Image2Outfit.Editor
             public int unweightedVertices;
             public int weightSumErrors;
             public int missingScripts;
+            public int distinctMaterials;
+            public int externalMaterialAssets;
+            public int materialSlotSubmeshMismatches;
+            public int unresolvedTextureReferences;
         }
 
         [Serializable]
@@ -53,7 +94,11 @@ namespace Image2Outfit.Editor
             public bool targetValidated;
             public bool toolchainValidated;
             public bool modularAvatarValidated;
+            public bool multiMaterialValidated;
+            public bool reimportValidated;
             public bool buildAndTestPassed;
+            public string unityReadyStatus;
+            public string targetAvatarAssetPath;
             public string unityVersion;
             public string modularAvatarVersion;
             public string ndmfVersion;
@@ -62,6 +107,7 @@ namespace Image2Outfit.Editor
             public string prefabAssetPath;
             public string integratedPrefabAssetPath;
             public Metrics metrics = new Metrics();
+            public List<RendererMaterialRecord> rendererMaterials = new List<RendererMaterialRecord>();
             public List<string> errors = new List<string>();
             public List<string> warnings = new List<string>();
         }
@@ -87,6 +133,29 @@ namespace Image2Outfit.Editor
         public static void RunStatic()
         {
             RunInternal(false);
+        }
+
+        public static void RunUnityReady()
+        {
+            try
+            {
+                var jobPath = GetArgument("-image2outfitJob");
+                if (string.IsNullOrWhiteSpace(jobPath))
+                    throw new ArgumentException("-image2outfitJob is required");
+
+                var job = JsonUtility.FromJson<Job>(File.ReadAllText(jobPath));
+                if (job == null)
+                    throw new InvalidDataException("job.json could not be parsed");
+
+                var report = ExecuteUnityReady(job);
+                WriteUnityReadyReport(job, report);
+                EditorApplication.Exit(report.passed ? 0 : 2);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                EditorApplication.Exit(1);
+            }
         }
 
         private static void RunInternal(bool runBuildAndTest)
@@ -171,6 +240,7 @@ namespace Image2Outfit.Editor
             var report = new Report
             {
                 unityVersion = Application.unityVersion,
+                targetAvatarAssetPath = job.targetAvatarAssetPath,
                 prefabAssetPath = job.prefabAssetPath,
                 integratedPrefabAssetPath = job.integratedPrefabAssetPath
             };
@@ -183,6 +253,10 @@ namespace Image2Outfit.Editor
             if (report.errors.Any())
                 return report;
 
+            AssetDatabase.ImportAsset(
+                job.fbxAssetPath,
+                ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport
+            );
             var importer = AssetImporter.GetAtPath(job.fbxAssetPath) as ModelImporter;
             if (importer == null)
             {
@@ -214,7 +288,7 @@ namespace Image2Outfit.Editor
                 ValidateMeshes(model, report);
 
                 if (!report.errors.Any())
-                    CreatePrefab(model, job.prefabAssetPath, report);
+                    CreatePrefab(model, job.prefabAssetPath, GetTargetArmatureName(job.targetAvatarAssetPath), report);
 
                 ValidateTarget(model, job, report);
                 if (!report.errors.Any())
@@ -241,6 +315,77 @@ namespace Image2Outfit.Editor
                 }
                 AssetDatabase.SaveAssets();
             }
+        }
+
+        private static Report ExecuteUnityReady(Job job)
+        {
+            var report = new Report
+            {
+                unityVersion = Application.unityVersion,
+                prefabAssetPath = job.prefabAssetPath,
+                integratedPrefabAssetPath = job.integratedPrefabAssetPath,
+                targetAvatarAssetPath = job.targetAvatarAssetPath,
+                unityReadyStatus = "UNVERIFIED"
+            };
+
+            RequireAssetPath(job.fbxAssetPath, nameof(job.fbxAssetPath));
+            RequireAssetPath(job.prefabAssetPath, nameof(job.prefabAssetPath));
+            RequireAssetPath(job.integratedPrefabAssetPath, nameof(job.integratedPrefabAssetPath));
+            RequireAssetPath(job.targetAvatarAssetPath, nameof(job.targetAvatarAssetPath));
+            if (string.IsNullOrWhiteSpace(job.productRoot)
+                || !job.productRoot.StartsWith("Assets/GenWorks/", StringComparison.Ordinal))
+                report.errors.Add("productRoot must be an Assets/GenWorks path");
+            if (job.unityReady == null)
+                report.errors.Add("unityReady contract is required for Unity-ready verification");
+
+            ValidateToolchain(report);
+            if (report.errors.Any())
+                return report;
+
+            var outfit = AssetDatabase.LoadAssetAtPath<GameObject>(job.prefabAssetPath);
+            var integrated = AssetDatabase.LoadAssetAtPath<GameObject>(job.integratedPrefabAssetPath);
+            if (outfit == null || integrated == null)
+            {
+                report.errors.Add("Unity-ready outfit or integrated prefab is missing");
+                return report;
+            }
+
+            ValidateHierarchy(outfit, report);
+            ValidateMeshes(outfit, report);
+            ValidateMultiMaterial(outfit, job, report);
+            ValidateTarget(outfit, job, report);
+            ValidateAvatarDescriptor(integrated, report);
+            if (!report.errors.Any())
+                ValidateModularAvatarBake(
+                    integrated,
+                    Path.GetFileNameWithoutExtension(job.prefabAssetPath),
+                    report
+                );
+
+            if (!report.errors.Any())
+            {
+                var before = MaterialSignature(outfit);
+                AssetDatabase.ImportAsset(job.fbxAssetPath, ImportAssetOptions.ForceUpdate);
+                AssetDatabase.ImportAsset(job.prefabAssetPath, ImportAssetOptions.ForceUpdate);
+                AssetDatabase.ImportAsset(job.integratedPrefabAssetPath, ImportAssetOptions.ForceUpdate);
+                AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+                var reloaded = AssetDatabase.LoadAssetAtPath<GameObject>(job.prefabAssetPath);
+                var after = reloaded == null ? null : MaterialSignature(reloaded);
+                report.reimportValidated = reloaded != null
+                    && string.Equals(before, after, StringComparison.Ordinal);
+                if (!report.reimportValidated)
+                    report.errors.Add("material mapping changed after Unity reimport");
+            }
+
+            report.passed =
+                !report.errors.Any()
+                && report.targetValidated
+                && report.toolchainValidated
+                && report.modularAvatarValidated
+                && report.multiMaterialValidated
+                && report.reimportValidated;
+            report.unityReadyStatus = report.passed ? "VERIFIED" : "UNVERIFIED";
+            return report;
         }
 
         private static void ValidateToolchain(Report report)
@@ -303,6 +448,15 @@ namespace Image2Outfit.Editor
             {
                 report.metrics.materialSlots += renderer.sharedMaterials.Length;
                 report.metrics.missingMaterials += renderer.sharedMaterials.Count(material => material == null);
+                var mesh = RendererMesh(renderer);
+                if (mesh != null && renderer.sharedMaterials.Length != mesh.subMeshCount)
+                {
+                    report.metrics.materialSlotSubmeshMismatches++;
+                    report.errors.Add(
+                        $"material slot/submesh mismatch: {GetPath(renderer.transform)} "
+                        + $"slots={renderer.sharedMaterials.Length} submeshes={mesh.subMeshCount}"
+                    );
+                }
             }
 
             foreach (var filter in root.GetComponentsInChildren<MeshFilter>(true))
@@ -337,11 +491,164 @@ namespace Image2Outfit.Editor
             if (report.metrics.nonFiniteValues > 0)
                 report.errors.Add("non-finite mesh values");
             if (report.metrics.degenerateTriangles > 0)
-                report.errors.Add("degenerate triangles");
+                report.warnings.Add($"Unity importer reported {report.metrics.degenerateTriangles} degenerate triangles; visual review required");
             if (report.metrics.unweightedVertices > 0)
                 report.errors.Add("unweighted skinned vertices");
             if (report.metrics.weightSumErrors > 0)
                 report.errors.Add("vertex weight sums outside tolerance");
+        }
+
+        private static void ValidateMultiMaterial(GameObject root, Job job, Report report)
+        {
+            var startingErrors = report.errors.Count;
+            var contract = job.unityReady;
+            if (contract == null)
+            {
+                report.errors.Add("unityReady contract is missing");
+                return;
+            }
+
+            var declaredRoles = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var item in contract.materialRoles ?? Array.Empty<MaterialRole>())
+            {
+                if (item == null || string.IsNullOrWhiteSpace(item.material) || string.IsNullOrWhiteSpace(item.role))
+                {
+                    report.errors.Add("unityReady material role contains an empty material or role");
+                    continue;
+                }
+                if (declaredRoles.ContainsKey(item.material))
+                {
+                    report.errors.Add($"duplicate unityReady material role: {item.material}");
+                    continue;
+                }
+                declaredRoles[item.material] = item.role;
+            }
+
+            var materialNames = new HashSet<string>(StringComparer.Ordinal);
+            var materialAssets = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var renderer in root.GetComponentsInChildren<Renderer>(true))
+            {
+                var mesh = RendererMesh(renderer);
+                var record = new RendererMaterialRecord
+                {
+                    rendererPath = GetPath(renderer.transform),
+                    subMeshCount = mesh == null ? 0 : mesh.subMeshCount,
+                    materialSlotCount = renderer.sharedMaterials.Length
+                };
+
+                for (var index = 0; index < renderer.sharedMaterials.Length; index++)
+                {
+                    var material = renderer.sharedMaterials[index];
+                    var slot = new MaterialSlotRecord
+                    {
+                        slot = index,
+                        material = material == null ? null : material.name
+                    };
+                    record.slots.Add(slot);
+                    if (material == null)
+                        continue;
+
+                    materialNames.Add(material.name);
+                    declaredRoles.TryGetValue(material.name, out slot.role);
+                    var assetPath = AssetDatabase.GetAssetPath(material);
+                    slot.materialAssetPath = assetPath;
+                    slot.materialGuid = string.IsNullOrWhiteSpace(assetPath)
+                        ? null
+                        : AssetDatabase.AssetPathToGUID(assetPath);
+
+                    var expectedRoot = job.productRoot.TrimEnd('/') + "/Materials/";
+                    if (string.IsNullOrWhiteSpace(assetPath)
+                        || !assetPath.StartsWith(expectedRoot, StringComparison.Ordinal)
+                        || !assetPath.EndsWith(".mat", StringComparison.OrdinalIgnoreCase))
+                    {
+                        report.errors.Add(
+                            $"material is not an external product asset: {material.name} on {record.rendererPath}"
+                        );
+                    }
+                    else
+                    {
+                        materialAssets.Add(assetPath);
+                    }
+
+                    foreach (var property in material.GetTexturePropertyNames())
+                    {
+                        var texture = material.GetTexture(property);
+                        if (texture == null)
+                            continue;
+                        var texturePath = AssetDatabase.GetAssetPath(texture);
+                        if (string.IsNullOrWhiteSpace(texturePath)
+                            || AssetDatabase.LoadAssetAtPath<Texture>(texturePath) == null)
+                        {
+                            report.metrics.unresolvedTextureReferences++;
+                            report.errors.Add(
+                                $"unresolved texture reference: {material.name}.{property}"
+                            );
+                            continue;
+                        }
+                        slot.textureAssets.Add(texturePath);
+                    }
+                }
+
+                report.rendererMaterials.Add(record);
+            }
+
+            report.metrics.distinctMaterials = materialNames.Count;
+            report.metrics.externalMaterialAssets = materialAssets.Count;
+            if (contract.minimumDistinctMaterials < 1)
+                report.errors.Add("unityReady.minimumDistinctMaterials must be at least 1");
+            if (materialNames.Count < contract.minimumDistinctMaterials)
+                report.errors.Add(
+                    $"distinct materials below contract: expected >= {contract.minimumDistinctMaterials}, "
+                    + $"found {materialNames.Count}"
+                );
+            foreach (var materialName in declaredRoles.Keys)
+            {
+                if (!materialNames.Contains(materialName))
+                    report.errors.Add($"declared Unity-ready material is absent: {materialName}");
+            }
+            foreach (var materialName in materialNames)
+            {
+                if (!declaredRoles.ContainsKey(materialName))
+                    report.errors.Add($"Unity-ready material role is not declared: {materialName}");
+            }
+
+            report.multiMaterialValidated =
+                report.errors.Count == startingErrors
+                && report.metrics.materialSlotSubmeshMismatches == 0
+                && report.metrics.unresolvedTextureReferences == 0
+                && materialNames.Count >= contract.minimumDistinctMaterials
+                && materialAssets.Count == materialNames.Count;
+        }
+
+        private static Mesh RendererMesh(Renderer renderer)
+        {
+            if (renderer is SkinnedMeshRenderer skinned)
+                return skinned.sharedMesh;
+            var filter = renderer.GetComponent<MeshFilter>();
+            return filter == null ? null : filter.sharedMesh;
+        }
+
+        private static string MaterialSignature(GameObject root)
+        {
+            return string.Join(
+                "\n",
+                root.GetComponentsInChildren<Renderer>(true)
+                    .OrderBy(renderer => GetPath(renderer.transform), StringComparer.Ordinal)
+                    .Select(renderer =>
+                    {
+                        var mesh = RendererMesh(renderer);
+                        var slots = renderer.sharedMaterials.Select(material =>
+                        {
+                            if (material == null)
+                                return "<null>";
+                            var assetPath = AssetDatabase.GetAssetPath(material);
+                            return material.name + "|" + assetPath + "|" + AssetDatabase.AssetPathToGUID(assetPath);
+                        });
+                        return GetPath(renderer.transform)
+                            + "|submeshes=" + (mesh == null ? 0 : mesh.subMeshCount)
+                            + "|" + string.Join(";", slots);
+                    })
+            );
         }
 
         private static void ValidateMesh(
@@ -404,7 +711,11 @@ namespace Image2Outfit.Editor
                 report.warnings.Add($"bindpose/bone count differs: {mesh.name}");
         }
 
-        private static void CreatePrefab(GameObject model, string prefabPath, Report report)
+        private static void CreatePrefab(
+            GameObject model,
+            string prefabPath,
+            string expectedTargetArmatureName,
+            Report report)
         {
             EnsureAssetFolder(Path.GetDirectoryName(prefabPath)?.Replace('\\', '/'));
             var instance = PrefabUtility.InstantiatePrefab(model) as GameObject;
@@ -417,7 +728,7 @@ namespace Image2Outfit.Editor
             try
             {
                 instance.name = Path.GetFileNameWithoutExtension(prefabPath);
-                ConfigureOutfitPrefab(instance, report);
+                ConfigureOutfitPrefab(instance, expectedTargetArmatureName, report);
                 var saved = PrefabUtility.SaveAsPrefabAsset(instance, prefabPath);
                 if (saved == null)
                     report.errors.Add("could not save prefab");
@@ -428,7 +739,10 @@ namespace Image2Outfit.Editor
             }
         }
 
-        private static void ConfigureOutfitPrefab(GameObject outfitRoot, Report report)
+        private static void ConfigureOutfitPrefab(
+            GameObject outfitRoot,
+            string expectedTargetArmatureName,
+            Report report)
         {
             var renderer = outfitRoot.GetComponentsInChildren<SkinnedMeshRenderer>(true).FirstOrDefault();
             if (renderer == null || renderer.rootBone == null)
@@ -444,15 +758,23 @@ namespace Image2Outfit.Editor
             var merge = armature.GetComponent<ModularAvatarMergeArmature>();
             if (merge == null)
             {
-                var baseArmatureName = armature.name;
-                armature.name = baseArmatureName + ".1";
+                var sourceArmatureName = armature.name;
+                var baseArmatureName = string.IsNullOrWhiteSpace(expectedTargetArmatureName)
+                    ? sourceArmatureName.EndsWith(".1", StringComparison.Ordinal)
+                        ? sourceArmatureName.Substring(0, sourceArmatureName.Length - 2)
+                        : sourceArmatureName
+                    : expectedTargetArmatureName;
+                if (string.Equals(sourceArmatureName, baseArmatureName, StringComparison.Ordinal))
+                    armature.name = sourceArmatureName + ".1";
                 merge = armature.gameObject.AddComponent<ModularAvatarMergeArmature>();
                 merge.mergeTarget = new AvatarObjectReference
                 {
                     referencePath = baseArmatureName
                 };
             }
-            var targetArmatureName = merge.mergeTarget?.referencePath;
+            var targetArmatureName = string.IsNullOrWhiteSpace(expectedTargetArmatureName)
+                ? merge.mergeTarget?.referencePath
+                : expectedTargetArmatureName;
             if (string.IsNullOrWhiteSpace(targetArmatureName))
             {
                 report.errors.Add("Merge Armature target path is empty");
@@ -470,15 +792,54 @@ namespace Image2Outfit.Editor
                 settings = outfitRoot.AddComponent<ModularAvatarMeshSettings>();
             settings.InheritProbeAnchor = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
             settings.InheritBounds = ModularAvatarMeshSettings.InheritMode.SetOrInherit;
+            var targetBoneName = renderer.rootBone.name.EndsWith(".1", StringComparison.Ordinal)
+                ? renderer.rootBone.name.Substring(0, renderer.rootBone.name.Length - 2)
+                : renderer.rootBone.name;
             settings.ProbeAnchor = new AvatarObjectReference
             {
-                referencePath = $"{targetArmatureName}/{renderer.rootBone.name}"
+                referencePath = $"{targetArmatureName}/{targetBoneName}"
             };
             settings.RootBone = new AvatarObjectReference
             {
-                referencePath = $"{targetArmatureName}/{renderer.rootBone.name}"
+                referencePath = $"{targetArmatureName}/{targetBoneName}"
             };
             settings.Bounds = renderer.localBounds;
+        }
+
+        private static void ConfigureIntegratedMergeArmature(
+            ModularAvatarMergeArmature merge,
+            GameObject avatarRoot,
+            Report report)
+        {
+            if (merge == null)
+            {
+                report.errors.Add("outfit Merge Armature component is missing");
+                return;
+            }
+
+            var avatarAnimator = avatarRoot.GetComponent<Animator>();
+            var targetHips = avatarAnimator == null
+                ? null
+                : avatarAnimator.GetBoneTransform(HumanBodyBones.Hips);
+            var mergeHips = merge.transform.Cast<Transform>().FirstOrDefault();
+            if (targetHips == null || mergeHips == null)
+            {
+                report.errors.Add("could not derive the outfit-to-avatar bone name mapping");
+                return;
+            }
+
+            var targetNameIndex = mergeHips.name.IndexOf(targetHips.name, StringComparison.Ordinal);
+            if (targetNameIndex < 0)
+            {
+                report.errors.Add($"outfit hips bone '{mergeHips.name}' does not contain target name '{targetHips.name}'");
+                return;
+            }
+
+            merge.prefix = mergeHips.name.Substring(0, targetNameIndex);
+            merge.suffix = mergeHips.name.Substring(targetNameIndex + targetHips.name.Length);
+            merge.ResolveReferences();
+            if (merge.mergeTargetObject == null)
+                report.errors.Add($"Merge Armature target path does not resolve: {merge.mergeTarget.referencePath}");
         }
 
         private static void CreateIntegratedPrefab(Job job, Report report)
@@ -503,10 +864,13 @@ namespace Image2Outfit.Editor
                     return;
                 }
 
+                EnsureAvatarDescriptor(targetInstance, report);
                 outfitInstance.transform.SetParent(targetInstance.transform, false);
                 var outfitName = Path.GetFileNameWithoutExtension(job.prefabAssetPath);
                 outfitInstance.name = outfitName;
-                ConfigureOutfitPrefab(outfitInstance, report);
+                ConfigureOutfitPrefab(outfitInstance, GetTargetArmatureName(targetInstance), report);
+                var mergeArmature = outfitInstance.GetComponentsInChildren<ModularAvatarMergeArmature>(true).SingleOrDefault();
+                ConfigureIntegratedMergeArmature(mergeArmature, targetInstance, report);
                 if (report.errors.Any())
                     return;
 
@@ -536,6 +900,11 @@ namespace Image2Outfit.Editor
                 report.errors.Add("integrated prefab could not be instantiated for NDMF validation");
                 return;
             }
+
+            PrefabUtility.UnpackPrefabInstance(
+                instance,
+                PrefabUnpackMode.Completely,
+                InteractionMode.AutomatedAction);
 
             var startingErrors = report.errors.Count;
             var temporaryAssetsCleaned = false;
@@ -705,11 +1074,50 @@ namespace Image2Outfit.Editor
                 }
             }
 
-            var descriptorType = FindType("VRC.SDK3.Avatars.Components.VRCAvatarDescriptor");
-            if (descriptorType == null || target.GetComponentInChildren(descriptorType, true) == null)
-                report.errors.Add("VRCAvatarDescriptor missing on target");
-
             report.targetValidated = !report.errors.Any();
+        }
+
+        private static void EnsureAvatarDescriptor(GameObject avatarRoot, Report report)
+        {
+            var descriptor = avatarRoot.GetComponent<VRCAvatarDescriptor>();
+            if (descriptor == null)
+                descriptor = avatarRoot.AddComponent<VRCAvatarDescriptor>();
+
+            var animator = avatarRoot.GetComponentInChildren<Animator>(true);
+            var head = animator == null ? null : animator.GetBoneTransform(HumanBodyBones.Head);
+            if (head == null)
+            {
+                report.errors.Add("VRCAvatarDescriptor view position could not be derived from Humanoid head");
+                return;
+            }
+
+            descriptor.ViewPosition = avatarRoot.transform.InverseTransformPoint(head.position);
+        }
+
+        private static void ValidateAvatarDescriptor(GameObject integrated, Report report)
+        {
+            if (integrated == null)
+            {
+                report.errors.Add("integrated avatar prefab is missing");
+                return;
+            }
+
+            if (integrated.GetComponent<VRCAvatarDescriptor>() == null)
+                report.errors.Add("VRCAvatarDescriptor missing on integrated avatar root");
+        }
+
+        private static string GetTargetArmatureName(string assetPath)
+        {
+            var target = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+            return target == null ? null : GetTargetArmatureName(target);
+        }
+
+        private static string GetTargetArmatureName(GameObject avatarRoot)
+        {
+            var animator = avatarRoot.GetComponent<Animator>()
+                ?? avatarRoot.GetComponentInChildren<Animator>(true);
+            var hips = animator == null ? null : animator.GetBoneTransform(HumanBodyBones.Hips);
+            return hips == null || hips.parent == null ? null : hips.parent.name;
         }
 
         private static Type FindType(string fullName)
@@ -730,6 +1138,16 @@ namespace Image2Outfit.Editor
             Directory.CreateDirectory(reportDirectory);
             File.WriteAllText(
                 Path.Combine(reportDirectory, "unity.json"),
+                JsonUtility.ToJson(report, true));
+        }
+
+        private static void WriteUnityReadyReport(Job job, Report report)
+        {
+            var projectRoot = Path.GetDirectoryName(Application.dataPath);
+            var reportDirectory = Path.GetFullPath(Path.Combine(projectRoot, job.artifactDir));
+            Directory.CreateDirectory(reportDirectory);
+            File.WriteAllText(
+                Path.Combine(reportDirectory, "unity-ready.json"),
                 JsonUtility.ToJson(report, true));
         }
 

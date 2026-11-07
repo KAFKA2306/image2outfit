@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "runtimeId": "garmentcode-pygarment",
+  "upstreamRepository": "https://github.com/maria-korosteleva/GarmentCode",
+  "upstreamLicense": "MIT",
+  "upstreamRevision": "d449629979028123a5c4dc9e732a2ec19b7fce31",
+  "runtimePath": ".image2outfit/oss-runtimes/GarmentCode",
+  "pythonVersion": "3.9.25",
+  "pygarmentVersion": "2.0.2",
+  "requirementsLockPath": "config/oss-runtimes/garmentcode-pygarment-requirements.lock.txt",
+  "executionMode": "external-isolated",
+  "outputMode": "2d-panel-layout-only",
+  "threeDEnabled": false,
+  "postReviewMeshAudit": {
+    "executionStage": "build-blender",
+    "api": "pygarment.meshgen.boxmeshgen.BoxMesh",
+    "outputMode": "in-memory-sewn-mesh-preflight",
+    "threeDEnabled": true,
+    "productMeshArtifactWritten": false
+  }
+}

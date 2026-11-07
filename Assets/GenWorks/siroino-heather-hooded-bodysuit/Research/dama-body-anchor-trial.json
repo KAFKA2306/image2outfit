@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "status": "EXECUTED",
+  "executedAt": "2026-08-05",
+  "method": "DAMA-inspired body-anchored triangle projection",
+  "paper": {
+    "title": "DAMA: Disentangled Body-Anchored Gaussians for Controllable Multi-Layered Avatars",
+    "url": "https://arxiv.org/abs/2605.21001",
+    "projectUrl": "https://danieleskandar.github.io/dama/",
+    "officialCodeUrl": "https://github.com/danieleskandar/DAMA-code",
+    "publication": "CVPR 2026 PhysHuman Workshop"
+  },
+  "implementation": {
+    "kind": "independent Blender mesh adaptation",
+    "authorsImplementationExecuted": false,
+    "copiedFromOfficialCode": false,
+    "representation": [
+      "body triangle index",
+      "barycentric in-plane coordinates",
+      "strictly positive body-normal offset"
+    ],
+    "scope": "one-time neutral-mesh correction before inherited Siroino skinning; actual pose renders remain the acceptance evidence"
+  },
+  "parameters": {
+    "minimumOffsetM": 0.018,
+    "maximumOffsetM": 0.026,
+    "offsetSmoothingFactor": 0.35,
+    "offsetSmoothingIterations": 4
+  },
+  "metrics": {
+    "object": "Heather_Body_Shell",
+    "vertexCount": 68729,
+    "sourceTriangleCount": 400896,
+    "correctedVertexCount": 68724,
+    "minimumFinalOffsetM": 0.018,
+    "maximumFinalOffsetM": 0.02202311582992587,
+    "meanCorrectionM": 0.0010039261077458182,
+    "maximumCorrectionM": 0.02086707435297404,
+    "allOffsetsStrictlyPositive": true
+  },
+  "acceptance": {
+    "researchTrial": "PASS",
+    "visualAppearanceReview": "PENDING until current five-view and required-pose images are opened"
+  }
+}

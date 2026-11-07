@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "snapshotDate": "2026-10-04",
+  "comparisonIssue": "https://github.com/KAFKA2306/image2outfit/issues/683",
+  "issueLastUpdated": "2026-09-22T16:56:16Z",
+  "canonicalSheet": "https://docs.google.com/spreadsheets/d/1iAHGdCUOy2pQYIJ92feqc0s28i-6VSdJ6bRTqjfdmkE/edit",
+  "productId": "siroino-lily-vapor-yukata",
+  "fixture": {
+    "inputRoot": "Assets/GenWorks/siroino-lily-vapor-yukata/Previews",
+    "cameraMetadata": {
+      "status": "explicit_for_four_view_subset",
+      "path": "OSSBenchmarks/Pixal3D/inputs/views/transforms.json",
+      "convention": "Blender/NeRF camera-to-world, Z-up, camera looks along -Z, +Y up",
+      "cameraAngleXDegrees": 20.0,
+      "cameraDistance": 3.1192049980163574,
+      "meshScale": 1.0,
+      "frames": [
+        {"name": "front.png", "azimuthDegrees": 0, "elevationDegrees": 0, "canonical": true},
+        {"name": "left.png", "azimuthDegrees": 90, "elevationDegrees": 0},
+        {"name": "back.png", "azimuthDegrees": 180, "elevationDegrees": 0},
+        {"name": "right.png", "azimuthDegrees": 270, "elevationDegrees": 0}
+      ],
+      "threeQuarter": "three-quarter.png has a product preview hash but no calibrated transform and is not used in the Pixal3D four-view run."
+    },
+    "views": [
+      {"name": "front.png", "sha256": "487b6fcf485440aa0a24ceda2961d87ec1949b25aa2a65c3b8efade6fcc4cfa7"},
+      {"name": "left.png", "sha256": "90a954c66b0c87effd747d11a8604fa5d224fb19ef04bbdaf644141060750c99"},
+      {"name": "back.png", "sha256": "707027f3da4ed16fe17af4e29117b9a90ee99f993ed48c3cfda50570b0c59d26"},
+      {"name": "right.png", "sha256": "e0c2978b5a3874cb43cff925f2bb8df3b2e36979e03239c03be16969a5f1e2c8"},
+      {"name": "three-quarter.png", "sha256": "173e5e881342816fe5714e986cdfc40f4aeb2188ff8930fb916e690f4d639a76"}
+    ]
+  },
+  "host": {
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "vramMiB": 12288,
+    "driver": "610.47",
+    "blender": "4.2.23 LTS"
+  },
+  "sourceAudit": {
+    "checkedDate": "2026-10-04",
+    "method": "Official repository metadata, README, and repository license files checked at the source URLs recorded per candidate.",
+    "commitPinnedCount": 14,
+    "declaredLicenseCount": 12,
+    "notDeclaredLicenseCount": 2
+  },
+  "coverage": {
+    "activeCandidates": 14,
+    "preflightBlockedCandidates": 11,
+    "notRunCandidates": 0,
+    "withLocalEvidence": 4,
+    "completedActiveRuns": 2,
+    "rankableActiveCandidates": 0,
+    "rankingStatus": "not_ready",
+    "reason": "Pixal3D exported a mesh that failed topology/visual quality gates; TripoSplat exported a Gaussian artifact but has no direct Unity/VRM handoff and no within-category comparison yet; TRELLIS.2 has only a low-VRAM experimental artifact and no rankable standard run; FastAvatar's official model/assets and runtime loaded, but the canonical fixture failed the required face/FLAME tracking input contract; Wonder3D++, TIGON, MeshFlow, HumanNOVA, DiGS-Avatar, STREAM3D, and the PhysX candidates remain blocked by documented dependency, asset, input-contract, or hardware preflight; CUPID and AniGen are blocked by documented GPU-memory floors."
+  },
+  "candidates": [
+    {
+      "name": "Pixal3D", "category": "Mesh / PBR", "class": "A",
+      "status": "completed_quality_blocked",
+      "source": {"repository": "https://github.com/TencentARC/Pixal3D", "commit": "f7cf38429b0bd264f1995f0f8743a88b1c728b94", "modelRevision": "b0cb2e1b794cab9aa0ac38a95d794a4d9337437f", "license": "MIT", "licenseStatus": "declared", "licenseEvidence": "https://github.com/TencentARC/Pixal3D/blob/master/LICENSE"},
+      "evidence": ["Pixal3D/report.json", "Pixal3D/report.md", "Pixal3D/runs/mv_20260923_seed42_lowvram_1024_torchnaf_tex512_projchunk/mesh_inspection.json"],
+      "artifact": {"path": "Pixal3D/runs/mv_20260923_seed42_lowvram_1024_torchnaf_tex512_projchunk/pixal3d_mv_torchnaf_tex512.glb", "sha256": "b103f9acf9712b76a9fe2c30445d542004b442a39147344f405922dd6cb4cdb1", "vertices": 714696, "faces": 971772, "components": 37338, "boundaryEdges": 432830, "uv": true, "pbr": true},
+      "decision": "Do not hand off to Unity/VRChat. Preserve as a textured blockout and investigate topology-aware remeshing/body-garment separation."
+    },
+    {
+      "name": "TRELLIS.2", "category": "Mesh / PBR", "class": "B",
+      "status": "experimental_low_vram_quality_blocked",
+      "source": {"repository": "https://github.com/microsoft/TRELLIS.2", "commit": "75fbf0183001ed9876c8dbb35de6b68552ee08bd", "license": "MIT", "licenseStatus": "declared", "licenseEvidence": "https://github.com/microsoft/TRELLIS.2/blob/main/LICENSE"},
+      "evidence": ["TRELLIS2/REPORT.md", "TRELLIS2/preflight.json", "UniformFrontBack20260923/comparison-report.md"],
+      "artifact": {"path": "UniformFrontBack20260923/runs/TRELLIS2/shape-256/uniform-front-trellis2-shape-256.glb", "vertices": 895325, "faces": 17528, "components": 7279, "vramPeakAllocatedGiB": 8.722, "officialGateVramGiB": 24},
+      "decision": "The low-VRAM artifact is a bring-up result, not a quality ranking result. Do not treat it as an acceptable Mesh/PBR candidate on this host."
+    },
+    {"name": "Wonder3D++", "category": "Mesh / Texture", "class": "A", "status": "preflight_blocked_dependencies", "source": {"repository": "https://github.com/xxlong0/Wonder3D/tree/Wonder3D_Plus", "commit": "fdb095a247f3b75fe7dc6fc3a16b8d871fdc3c77", "license": "AGPL-3.0", "licenseStatus": "declared_in_branch_readme", "licenseEvidence": "https://github.com/xxlong0/Wonder3D/blob/Wonder3D_Plus/README.md#license", "runtimeNotes": "Official Wonder3D_Plus branch; Linux setup documented; single-image mesh/texture path."}, "evidence": ["Wonder3DPlus/preflight.json"]},
+    {"name": "STREAM3D", "category": "Multi-view Mesh / Gaussian", "class": "A", "status": "preflight_blocked_input_and_backbone", "source": {"repository": "https://github.com/kaichen-z/STREAM3D", "commit": "be551cc756f5710875ec1c6a4c0fa545b56d2c4f", "license": null, "licenseStatus": "not_declared", "licenseEvidence": "https://github.com/kaichen-z/STREAM3D", "runtimeNotes": "Official inference code; posed view stream required; SAM3D or TRELLIS.2 reconstruction backbones; outputs Gaussians and mesh."}, "evidence": ["STREAM3D/preflight.json"]},
+    {"name": "TripoSplat", "category": "Gaussian", "class": "A", "status": "completed_gaussian_export_handoff_pending", "source": {"repository": "https://github.com/VAST-AI-Research/TripoSplat", "commit": "d8db9e018b413dd9c4a9fe22463781bf98e8e68d", "license": "MIT", "licenseStatus": "declared", "licenseEvidence": "https://github.com/VAST-AI-Research/TripoSplat/blob/main/LICENSE", "runtimeNotes": "Single-image Gaussian output; exported PLY/SPLAT requires a separate mesh or Unity/VRM handoff path."}, "evidence": ["TripoSplat/run_benchmark.py", "TripoSplat/render_point_preview.py", "TripoSplat/runs/front_20261004_seed42_g65536/report.json", "TripoSplat/runs/front_20261004_seed42_g65536/point-preview.png"], "artifact": {"input": "front.png", "inputSha256": "487b6fcf485440aa0a24ceda2961d87ec1949b25aa2a65c3b8efade6fcc4cfa7", "gaussianCount": 65536, "plyPath": "TripoSplat/runs/front_20261004_seed42_g65536/output.ply", "plySha256": "54a320b3e9cd4b67664e6a8b650bf54b338bc345a0c89482d46ede43fd52c8d2", "plyBytes": 4456863, "splatPath": "TripoSplat/runs/front_20261004_seed42_g65536/output.splat", "splatSha256": "7479dffa242ccf0dda280b43e353e41a2112bfd3de59bf2314702f5707e45239", "splatBytes": 2097152, "pointPreviewPath": "TripoSplat/runs/front_20261004_seed42_g65536/point-preview.png", "pointPreviewSha256": "179eb51a3a9a4d7592db3ef277c35a0b26a5d535a81508edf34059339eccbcd6", "inferencePeakMemoryGiB": 4.591, "inferenceSeconds": 51.439}, "decision": "Keep as a Gaussian candidate artifact, but the deterministic point-center sanity preview is fragmented into separate body/plate-like islands. Do not treat it as a Unity/VRM/VRChat-ready asset until an official renderer, mesh conversion, or avatar handoff path is measured."},
+    {"name": "CUPID", "category": "Reconstruction + Camera", "class": "A", "status": "preflight_blocked_hardware", "source": {"repository": "https://github.com/cupid3d/Cupid", "commit": "10af9b26f9e1b55c54892dc35acb997b1c6b6bf2", "license": "MIT", "licenseStatus": "declared", "licenseEvidence": "https://github.com/cupid3d/Cupid/blob/main/LICENSE", "runtimeNotes": "Linux-only tested path; at least 16 GiB GPU memory documented; reconstruction includes pose/camera-aware outputs and mesh export."}, "evidence": ["CUPID/preflight.json"]},
+    {"name": "AniGen", "category": "Rigged Mesh", "class": "A", "status": "preflight_blocked_hardware", "source": {"repository": "https://github.com/VAST-AI-Research/AniGen", "commit": "c49db3d6b466537a02ccf2286688903d77af7e4f", "license": "MIT + third-party restrictions", "licenseStatus": "qualified", "licenseEvidence": "https://github.com/VAST-AI-Research/AniGen/blob/main/LICENSE", "thirdPartyLicenseEvidence": "https://github.com/VAST-AI-Research/AniGen/blob/main/THIRD_PARTY_LICENSES.md", "runtimeNotes": "Linux-only tested path; at least 18 GiB GPU memory documented; single-image/video input and rigged mesh output."}, "evidence": ["AniGen/preflight.json"]},
+    {"name": "TIGON", "category": "Text / Image-conditioned 3D", "class": "A", "status": "preflight_blocked_dependencies_and_assets", "source": {"repository": "https://github.com/Jumpat/tigon", "commit": "456660ebb80e11428e1a800b5905083608e65170", "license": "Apache-2.0", "licenseStatus": "declared", "licenseEvidence": "https://github.com/Jumpat/tigon/blob/main/LICENSE", "runtimeNotes": "Inference pipeline requires DINOv3, CUDA extensions, and the JumpCat/TIGON checkpoint; image-conditioned path is blocked before execution."}, "evidence": ["TIGON/preflight.json"]},
+    {"name": "MeshFlow", "category": "Mesh post-process / generation", "class": "A", "status": "preflight_blocked_dependencies_and_assets", "source": {"repository": "https://github.com/facebookresearch/meshflow", "commit": "55f56f60e1bbf98d1c1991670ac998094d5f59ae", "license": "FAIR Noncommercial Research License v1", "licenseStatus": "restricted_noncommercial_research", "licenseEvidence": "https://github.com/facebookresearch/meshflow/blob/main/LICENSE", "runtimeNotes": "Takes input geometry plus optional reference image; indirect post-process candidate, not a direct single-image baseline."}, "evidence": ["MeshFlow/preflight.json"]},
+    {"name": "FastAvatar", "category": "Gaussian Avatar", "class": "A", "status": "preflight_blocked_input_contract", "source": {"repository": "https://github.com/TyrionWuYue/FastAvatar", "commit": "bc115c761c542ad7ec1a44c232c57d94b0184961", "license": "Apache-2.0", "licenseStatus": "declared", "licenseEvidence": "https://github.com/TyrionWuYue/FastAvatar/blob/main/LICENSE", "runtimeNotes": "Official model/assets and dedicated runtime loaded; canonical fixture has no detectable face, so the official single-image FLAME tracking path stops before Gaussian inference."}, "evidence": ["FastAvatar/preflight.json", "FastAvatar/runs/monocular_common_front_20261004/report.json", "FastAvatar/runs/monocular_common_front_20261004/report.md"]},
+    {"name": "HumanNOVA", "category": "Human Avatar", "class": "A", "status": "preflight_blocked_dependencies_and_assets", "source": {"repository": "https://github.com/HumanNOVA/HumanNOVA", "commit": "0ebb45df61f5a12801af31e2de2a3b75a2aa835a", "license": null, "licenseStatus": "not_declared", "licenseEvidence": "https://github.com/HumanNOVA/HumanNOVA", "runtimeNotes": "Single-image human avatar inference repository; no repository license file was found in the source audit."}, "evidence": ["HumanNOVA/preflight.json"]},
+    {"name": "DiGS-Avatar", "category": "Gaussian Avatar", "class": "A", "status": "preflight_blocked_assets", "source": {"repository": "https://github.com/KLMAV-CUC/DiGS-Avatar", "commit": "87573e4e522090c402a99a58e95b114ecb655f5f", "license": "MIT", "licenseStatus": "declared", "licenseEvidence": "https://github.com/KLMAV-CUC/DiGS-Avatar/blob/main/LICENSE", "runtimeNotes": "Single-image human reconstruction to canonical Gaussian primitives; SMPL-X/SANA and project checkpoints must be supplied separately."}, "evidence": ["DiGS-Avatar/preflight.json"]},
+    {"name": "PhysX-Anything", "category": "Simulation-ready 3D", "class": "A", "status": "preflight_blocked_input_and_assets", "source": {"repository": "https://github.com/ziangcao0312/PhysX-Anything", "commit": "e221826e6176d940905126d1894f9c1c933b70a8", "license": "S-Lab License 1.0", "licenseStatus": "restricted_noncommercial", "licenseEvidence": "https://github.com/ziangcao0312/PhysX-Anything/blob/main/LICENSE", "runtimeNotes": "Simulation-oriented pipeline; official README uses 25 conditioning images and a dedicated checkpoint/decoder stack."}, "evidence": ["PhysX-Anything/preflight.json"]},
+    {"name": "PhysX-Omni", "category": "Simulation-ready 3D", "class": "A", "status": "preflight_blocked_input_and_assets", "source": {"repository": "https://github.com/ziangcao0312/PhysX-Omni", "commit": "46fa1cd0b6883d4d14431d51c3326ef80a85ef64", "license": "S-Lab License 1.0", "licenseStatus": "restricted_noncommercial", "licenseEvidence": "https://github.com/ziangcao0312/PhysX-Omni", "runtimeNotes": "Simulation-oriented pipeline; official contract uses 25 conditioning images and a TRELLIS decoder before URDF/XML conversion."}, "evidence": ["PhysX-Omni/preflight.json"]}
+  ],
+  "excludedReferenceEvidence": [
+    {"name": "Hunyuan3D-2 / 2mv", "status": "reference_only", "evidence": ["Hunyuan3D/reports/hunyuan3d_oss_benchmark.md", "UniformFrontBack20260923/comparison-report.md"]},
+    {"name": "Hunyuan3D-2.1", "status": "reference_only", "evidence": ["Hunyuan3D/reports/hunyuan3d_oss_benchmark.md", "UniformFrontBack20260923/comparison-report.md"]},
+    {"name": "Step1X-3D", "status": "reference_only", "evidence": ["Step1X-3D/compatibility-report.md"]},
+    {"name": "TripoSG", "status": "reference_only", "evidence": ["LightBaselines/benchmark-report.md", "UniformFrontBack20260923/comparison-report.md"]},
+    {"name": "Direct3D-S2", "status": "reference_only", "evidence": ["LightBaselines/benchmark-report.md"]}
+  ]
+}

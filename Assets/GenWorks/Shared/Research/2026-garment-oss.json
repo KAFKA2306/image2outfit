@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "surveyId": "garment-oss-2026-08-02",
+  "reviewedAt": "2026-08-02T17:11:00+09:00",
+  "goal": "Replace visually rejected body-derived garment shells with an editable panel-and-seam workflow capable of producing customer-buyable VRChat outfits.",
+  "sourcePolicy": {
+    "required": [
+      "Official project or repository URL",
+      "Publicly inspectable source code for ADOPT or PROTOTYPE decisions",
+      "Explicit software license before vendoring or commercial use",
+      "Separate review of code, model-weight, dataset, and asset licenses"
+    ],
+    "decisionValues": [
+      "ADOPT_NOW",
+      "PROTOTYPE",
+      "REFERENCE_ONLY",
+      "WATCH_RELEASE",
+      "REJECT_FOR_CURRENT_PIPELINE"
+    ]
+  },
+  "implementationCandidates": [
+    {
+      "id": "garmentcode",
+      "name": "GarmentCode",
+      "category": "PARAMETRIC_SEWING_PATTERN",
+      "officialUrl": "https://github.com/maria-korosteleva/GarmentCode",
+      "codeAvailability": "VERIFIED",
+      "codeLicense": "MIT",
+      "decision": "ADOPT_NOW",
+      "productionRole": "Canonical editable representation for panels, edges, interfaces, seams, body measurements, and design parameters.",
+      "whyItSolvesCurrentFailure": [
+        "Prevents a halter dress from being represented as disconnected body-surface bands.",
+        "Makes front, back, side, skirt, neckline, and halter straps explicit design components.",
+        "Allows silhouette edits at the pattern level instead of repeatedly distorting a finished mesh."
+      ],
+      "integrationBoundary": "Add an adapter that converts product pattern specifications into GarmentCode/PyGarment data and imports the simulated result into the existing Blender checkpoint flow.",
+      "licenseCaveat": "The MIT statement applies to repository code; datasets, body models, and third-party simulation dependencies require separate checks."
+    },
+    {
+      "id": "zozo-ppf-contact-solver",
+      "name": "ZOZO's Contact Solver",
+      "category": "GARMENT_DRAPE_AND_COLLISION",
+      "officialUrl": "https://github.com/st-tech/ppf-contact-solver",
+      "documentationUrl": "https://st-tech.github.io/ppf-contact-solver/",
+      "codeAvailability": "VERIFIED",
+      "codeLicense": "Apache-2.0",
+      "decision": "ADOPT_NOW",
+      "productionRole": "Offline draping, strain limiting, friction, self-contact, body contact, and penetration-resistant cloth simulation.",
+      "requirements": {
+        "blender": ">=5.0 for the official add-on",
+        "gpu": "NVIDIA GPU with CUDA 12.8 or newer support for the solver backend",
+        "architecture": "x86"
+      },
+      "whyItSolvesCurrentFailure": [
+        "Produces cloth volume and folds from panels instead of inflating body-derived geometry.",
+        "Provides a stronger collision baseline for skirts, straps, lace overlays, and layered pieces.",
+        "Separates design geometry from the final draped state."
+      ],
+      "integrationBoundary": "Run in an isolated Blender 5 simulation environment and import the baked mesh into the repository's pinned production Blender environment until the main toolchain is deliberately upgraded.",
+      "licenseCaveat": "Preserve Apache-2.0 notices. Do not assume bundled examples or externally downloaded assets share the same license."
+    },
+    {
+      "id": "material-maker",
+      "name": "Material Maker",
+      "category": "PBR_MATERIAL_AUTHORING",
+      "officialUrl": "https://github.com/RodZill4/material-maker",
+      "codeAvailability": "VERIFIED",
+      "codeLicense": "MIT",
+      "decision": "ADOPT_NOW",
+      "productionRole": "Procedural fabric albedo, roughness, normal, height, opacity, and mask authoring independent of garment geometry.",
+      "whyItSolvesCurrentFailure": [
+        "Replaces the current uniform plastic-like response with fabric-specific microstructure.",
+        "Supports separate satin, lace, elastic trim, and metal hardware material identities.",
+        "Makes material variants reproducible rather than hand-tuned per render."
+      ],
+      "integrationBoundary": "Export deterministic PBR channel sets into Assets/GenWorks/<slug>/Textures and bind them through the existing material manifest.",
+      "licenseCaveat": "Generated or imported third-party texture resources retain their own licenses."
+    },
+    {
+      "id": "chatgarment",
+      "name": "ChatGarment",
+      "category": "IMAGE_OR_TEXT_TO_SEWING_PATTERN",
+      "officialUrl": "https://github.com/biansy000/ChatGarment",
+      "codeAvailability": "VERIFIED",
+      "codeLicense": "Apache-2.0",
+      "decision": "PROTOTYPE",
+      "productionRole": "Generate candidate GarmentCode patterns from an image or text description, then refine them through deterministic pattern validation.",
+      "whyItSolvesCurrentFailure": [
+        "Can propose recognizable garment structure instead of producing an unstructured surface shell.",
+        "Its output can enter the GarmentCode representation selected as the canonical pattern layer.",
+        "Includes a postprocessing path for incorrect garment dimensions."
+      ],
+      "integrationBoundary": "Use only as a proposal generator. Every output must pass panel validity, seam graph, dimensional, licensing, simulation, and human design review before becoming canonical.",
+      "licenseCaveat": "Repository code is Apache-2.0, but model weights, training data, LLaVA/LISA dependencies, and any GPT-4o-assisted path require separate commercial and privacy review."
+    },
+    {
+      "id": "makeclothes",
+      "name": "MakeClothes",
+      "category": "BODY_FIT_AND_ASSET_TRANSFER_REFERENCE",
+      "officialUrl": "https://github.com/makehumancommunity/community-plugins-makeclothes",
+      "codeAvailability": "VERIFIED",
+      "codeLicense": "MIT",
+      "decision": "REFERENCE_ONLY",
+      "productionRole": "Reference implementation for fitting clothing assets to parameterized bodies and preserving reusable clothing metadata.",
+      "whyItIsNotPrimary": [
+        "It targets the MakeHuman ecosystem rather than the Siroino avatar contract.",
+        "It does not replace the need for explicit pattern design or production cloth simulation."
+      ],
+      "integrationBoundary": "Study transfer, body-zone, and fitting concepts; do not introduce a MakeHuman body dependency into Siroino products."
+    }
+  ],
+  "researchWatchlist": [
+    {
+      "id": "reweaver-2026",
+      "name": "ReWeaver",
+      "officialUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Li_ReWeaver_Towards_Simulation-Ready_and_Topology-Accurate_Garment_Reconstruction_CVPR_2026_paper.html",
+      "announcedCodeUrl": "https://sii-liming.github.io/ReWeaver",
+      "decision": "WATCH_RELEASE",
+      "reason": "The publication says code and data will be available; a commercially reviewable licensed repository was not verified during this survey."
+    },
+    {
+      "id": "patterngsl-2026",
+      "name": "PatternGSL",
+      "officialUrl": "https://arxiv.org/abs/2606.24564",
+      "announcedCodeUrl": "https://github.com/PatternGSL/PatternGSL",
+      "decision": "WATCH_RELEASE",
+      "reason": "The paper announces a future code and data release. Do not depend on an unreleased or unlicensed implementation."
+    },
+    {
+      "id": "swifttailor-2026",
+      "name": "SwiftTailor",
+      "officialUrl": "https://qualcomm-ai-research.github.io/SwiftTailor/",
+      "decision": "WATCH_RELEASE",
+      "reason": "The official project page lists code as TBD. Its geometry-image and dynamic-stitching ideas remain benchmark targets only."
+    },
+    {
+      "id": "autosew-2026",
+      "name": "AutoSew",
+      "officialUrl": "https://openaccess.thecvf.com/content/WACV2026/html/Rios-Navarro_AutoSew_A_Geometric_Approach_to_Stitching_Prediction_with_Graph_Neural_WACV_2026_paper.html",
+      "projectUrl": "https://mslab.es/projects/autosew/",
+      "decision": "WATCH_RELEASE",
+      "reason": "The paper states that code and data are available, but this survey did not verify a canonical repository URL and explicit license. Implement the seam-graph principle independently until those are verified."
+    },
+    {
+      "id": "ni-tex-2026",
+      "name": "NI-Tex",
+      "officialUrl": "https://openaccess.thecvf.com/content/CVPR2026/html/Shan_NI-Tex_Non-isometric_Image-based_Garment_Texture_Generation_CVPR_2026_paper.html",
+      "decision": "WATCH_RELEASE",
+      "reason": "Use uncertainty-guided multi-view PBR baking as a quality benchmark; no licensed implementation was verified for vendoring."
+    },
+    {
+      "id": "natex-2026",
+      "name": "NaTex",
+      "officialUrl": "https://natex-ldm.github.io/",
+      "decision": "WATCH_RELEASE",
+      "reason": "Use native 3D texture coherence and occlusion handling as a benchmark; no licensed source repository was verified for integration."
+    }
+  ],
+  "recommendedArchitecture": {
+    "canonicalStages": [
+      "reference analysis",
+      "explicit 2D panel and seam graph",
+      "body-measurement parameterization",
+      "cloth drape and contact simulation",
+      "simulation result cleanup while preserving panel identity",
+      "UV and PBR material authoring",
+      "rigging and runtime deformation",
+      "five-view, dynamic-pose, Unity, and customer-merchandising review"
+    ],
+    "firstImplementationSlice": [
+      "Create a GarmentCode halter mini-dress with explicit front bodice, back bodice, halter straps, fitted waist, front skirt, and back skirt panels.",
+      "Keep lace as a separate overlay panel or material mask rather than a solid inflated band.",
+      "Simulate the garment around the Siroino Large-profile body in ZOZO Contact Solver.",
+      "Author fabric-specific PBR channels in Material Maker.",
+      "Reject the candidate unless customers can identify the product as a halter dress from front, back, and three-quarter views without reading its name."
+    ],
+    "prohibitedShortcuts": [
+      "Do not use body-surface vertex selection as the primary garment design representation.",
+      "Do not accept penetration-free geometry when the silhouette or garment construction is commercially unattractive.",
+      "Do not call a single dark glossy material lace, satin, and trim simultaneously.",
+      "Do not vendor code, models, datasets, or assets whose applicable license has not been verified."
+    ]
+  },
+  "productDecision": {
+    "productId": "siroino-lace-halter-large",
+    "currentRevision": "v1-large-lace-pass-8-continuous-bodycon",
+    "decision": "REJECT_FOR_CURRENT_PIPELINE",
+    "customerFinding": "The current result reads as an inflated plastic body covering rather than a desirable lace halter dress.",
+    "continuation": "Preserve the checkpoint as rejection evidence, then rebuild from an explicit GarmentCode pattern and simulated cloth workflow instead of incrementally modifying the rejected mesh."
+  }
+}

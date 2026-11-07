@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "kind": "direct-render-image-review",
+  "productId": "siroino-bellflower-lantern-trouser-set",
+  "status": "FAIL",
+  "reviewMethod": "direct-image-inspection",
+  "reviewedAssets": [
+    "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/front.png",
+    "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/back.png",
+    "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/left.png",
+    "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/right.png",
+    "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/three-quarter.png",
+    "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/siroino-bellflower-lantern-trouser-set-pose-review.webp"
+  ],
+  "findings": [
+    {"severity": "major", "area": "shoulder-fit", "finding": "Sleeve cylinders do not visually close the shoulder-to-sleeve seam in the canonical neutral render."},
+    {"severity": "major", "area": "side-fit", "finding": "Side and three-quarter views expose body clearance gaps and slab-like panel depth instead of a body-conforming trouser shell."},
+    {"severity": "major", "area": "silhouette", "finding": "The lantern-leg volume and blouse shaping are still represented by planar primitives and do not yet meet the manufacturing board's tailored cloth silhouette."},
+    {"severity": "pass", "area": "hero-detail", "finding": "The nested outer-leg panel order and bounded coral tab detail are readable in the five rendered views."}
+  ],
+  "resumeCondition": "Rebuild the same product from the existing panel source after correcting shoulder/side fit and curved trouser shell shaping; rerun the same five-view and six-pose render set, then inspect directly again."
+}

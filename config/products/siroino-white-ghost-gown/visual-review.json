@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "status": "REJECTED",
+  "reviewMethod": "direct-image-inspection",
+  "reviewedRevision": "v1-two-view-pattern-and-sewing",
+  "decision": "REJECT",
+  "inspectedImages": {
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/front.png": "404d660f9f7b874e59ea230d5bd657e1e236184e5029e2646af725618f700fd8",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/back.png": "4a33f88b0220f9fe35a1bdeef4654e9f06adcb5aaa50c045bb1874bcb3bc277c",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/left.png": "485c4937418c457d45482172abbcf890aca16bdbacd2bfb2d02f0018d1a0938c",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/right.png": "abdd7ecdc83220a90c3deab4ddf2e35f492397d994f1a107864999e576826777",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/three-quarter.png": "6d3510bd7985c6344eebb8f1a3e4910b5097d9cb0bde11e54f5a5b7ba09ae086",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/neutral.png": "fd3eb75101dc7ab71e8ff1984889c238cc8db6d0c7e0bc2c5700796b63ca2ed2",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arms-up.png": "2ac9dae909af09448a3b72528f3ce37be29dad1ac3a598a82dabf7be2fafe114",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/arm-cross.png": "4410f33dd726878a035b096a42e28d25be594ea7cd2c7f404e4fdcd3564e2abc",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/crouch.png": "6c8a2ab7308dbd8acfd7eb959b41dc81ed23a453d7f8125419284f0d0085c721",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/sit.png": "c4d5dc53cf2651cc0ab30ec312203101670e782066da9e0ecfa1e6145998a693",
+    "Assets/GenWorks/siroino-white-ghost-gown/Previews/Poses/prone.png": "0cf0209d3365065a0db6948b408e13c1f9ae39b4de4ec4d443585f56f04df303"
+  },
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "code": "side-view-wrist-spikes",
+      "detail": "Left and right side views retain long edge-on spike/line silhouettes around the wrist panels."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "arms-up-wing-drape",
+      "detail": "Arms-up rotates the large wrist panels into broad wing-like silhouettes instead of gravity-like hanging drapes."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "arm-cross-overlap",
+      "detail": "Arm-cross retains major wrist-drape and forearm overlap across the torso."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "crouch-sit-exposure",
+      "detail": "Crouch and sit show exposed body regions and distorted drape silhouettes inconsistent with a clean fitted result."
+    }
+  ],
+  "geometryAuditContext": {
+    "degenerateTriangles": 0,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "buildReportSha256": "f9fed5f582070fcdcab1cd04415337825ddd0481ba00ff13ebc25510c4bedc35"
+  },
+  "evidenceSource": {
+    "workflowRun": "https://github.com/KAFKA2306/image2outfit/actions/runs/32513982152",
+    "sourceCommit": "8e3067dc90b9cabbe0ee912bb5152a5c90243787",
+    "artifactId": 9458085081,
+    "artifactDigest": "sha256:d5eb96f6d003688853d7f2c7dd8db0afb4b1dc9699439eb51d01ce0cb487b90e"
+  }
+}

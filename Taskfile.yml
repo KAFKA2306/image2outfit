@@ -1,112 +1,282 @@
 version: '3'
 
 tasks:
-  candidate:
-    desc: Build a technically valid candidate. Never creates a customer release.
+  publication:reconcile:
+    desc: Reconcile canonical rendered products against the review-console publication projection.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py publication reconcile
+
+  plan:
+    desc: Resolve and print the selected modular toolchain without executing stages.
     requires:
-      vars: [JOB]
+      vars: [PRODUCT]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/run_garment_pipeline.py
+        --request "config/pipeline/requests/{{.PRODUCT}}.json"
+
+  workflow:
+    desc: Execute the selected modular toolchain with a resumable checkpoint.
+    requires:
+      vars: [PRODUCT]
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
       UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
-      - uv run --no-cache --python 3.11 python tools/release_gate.py --mode candidate --job "{{.JOB}}"
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/run_garment_pipeline.py
+        --request "config/pipeline/requests/{{.PRODUCT}}.json"
+        --execute
+        --checkpoint-output ".image2outfit/products/{{.PRODUCT}}/pipeline-state.json"
+
+  batch:status:
+    desc: Summarize the existing per-product execution states for a tracked batch.
+    vars:
+      BATCH: '{{.BATCH | default "config/batch/tracked-requests.json"}}'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py batch status --manifest "{{.BATCH}}"
+
+  batch:run:
+    desc: Serially execute or resume every canonical request in a tracked batch.
+    vars:
+      BATCH: '{{.BATCH | default "config/batch/tracked-requests.json"}}'
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py batch run --manifest "{{.BATCH}}"
+
+  candidate:
+    desc: Build a candidate after validating its construction contract.
+    requires:
+      vars: [PRODUCT]
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py candidate --product "{{.PRODUCT}}"
 
   release:
-    desc: Promote an unchanged reviewed candidate to Release/ after every mandatory evidence gate passes.
+    desc: Package the unchanged reviewed candidate through the release validator.
     requires:
-      vars: [JOB]
+      vars: [PRODUCT]
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
       UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
     cmds:
-      - uv run --no-cache --python 3.11 python tools/release_gate.py --mode release --job "{{.JOB}}"
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py release --product "{{.PRODUCT}}"
+
+  explain:
+    desc: Show the selected construction method and required evidence.
+    requires:
+      vars: [PRODUCT]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py explain --product "{{.PRODUCT}}"
+
+  dbt:extract:
+    desc: Project canonical product evidence into generated dbt inputs.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py dbt extract
+
+  dbt:build:
+    desc: Extract canonical evidence and build dbt manufacturing models.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py dbt build
+
+  dbt:test:
+    desc: Rebuild dbt manufacturing models and execute dbt data tests.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py dbt test
+
+  check:dbt:
+    desc: Run the complete dbt manufacturing evidence build and test gate.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py dbt check
+
+  mcp:setup:
+    desc: Prepare pinned Blender MCP and register Blender + Unity MCP with Codex on Windows.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_mcp.ps1
+
+  mcp:doctor:
+    desc: Read-only report for Codex, Blender MCP, and Unity MCP local connectivity.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_mcp.ps1 -DoctorOnly
+
+  oss:garmentcode:setup:
+    desc: Prepare the isolated, pinned GarmentCode/PyGarment 2D runtime.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_garmentcode_runtime.ps1
+
+  oss:opensew:setup:
+    desc: Prepare pinned OpenSew and Blender for 2D-only panel mesh comparisons.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_opensew_runtime.ps1
+
+  improve:
+    desc: Advance defect diagnosis, targeted learning, measured experiments, adoption, regeneration, and re-evaluation until a real external boundary or no defect remains.
+    requires:
+      vars: [PRODUCT]
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py improve --product "{{.PRODUCT}}"
+
+  audit:all:
+    desc: Run every repository, runtime, toolchain, research, and method audit.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit all
+
+  audit:toolchain:
+    desc: Audit pinned Python, Blender, Unity, VPM, and package contracts.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit toolchain
 
   audit:repo:
-    desc: Reject committed runtime state, product-specific global config, and self-mutating workflows.
+    desc: Reject runtime residue, global product config, and mutating workflows.
     cmds:
-      - uv run --no-cache --no-project python tools/audit_repository_hygiene.py
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit repository
+
+  audit:runtime:
+    desc: Reject obsolete output roots and product-configured runtime paths.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit runtime
 
   audit:genworks:
-    desc: Audit the canonical Assets/GenWorks product catalog and path containment.
-    cmds:
-      - uv run --no-cache --no-project python tools/audit_genworks_layout.py
-
-  audit:snapshot:
-    desc: Verify any preserved legacy snapshot against its original local source.
-    requires:
-      vars: [SNAPSHOT, SOURCE]
+    desc: Audit the canonical GenWorks catalog and product path containment.
     cmds:
       - >-
-        uv run --no-cache --no-project
-        --with numpy --with pillow --with trimesh --with scipy --with matplotlib
-        python tools/audit_snapshot.py
-        --candidate "{{.SNAPSHOT}}"
-        --source "{{.SOURCE}}"
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit genworks
 
-  package:snapshot:
-    desc: Rebuild a deterministic archive and source hash manifest for any legacy snapshot.
-    requires:
-      vars: [SNAPSHOT]
+  audit:tools:
+    desc: Reject unowned, duplicate, cyclic, or excessively layered tools.
     cmds:
-      - uv run --no-cache --no-project python tools/package_snapshot.py --root "{{.SNAPSHOT}}"
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit tools
 
-  maintenance:migrate:genworks:
-    desc: Show the migration plan for legacy local image2outfit jobs.
+  audit:methods:
+    desc: Validate every declared construction contract and research coverage.
     cmds:
-      - uv run --no-cache --no-project python tools/migrate_jobs_to_genworks.py
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit methods
 
-  maintenance:migrate:genworks:apply:
-    desc: Move legacy local job outputs and their Unity meta files into Assets/GenWorks.
+  avatar:plan:
+    desc: Write the generated avatar workflow plan and CAU handoff boundary.
     cmds:
-      - uv run --no-cache --no-project python tools/migrate_jobs_to_genworks.py --apply
-      - uv run --no-cache --no-project python tools/audit_genworks_layout.py
-      - uv run --no-cache --no-project python tools/audit_repository_hygiene.py
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar plan
+
+  avatar:preflight:
+    desc: Validate the nine baked Prefabs, CAU settings, cloth evidence, scenes, packages, and visual evidence paths.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar preflight
+
+  avatar:visual:
+    desc: Compare required outfit views and poses against the local visual baselines.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar visual
+
+  avatar:visual-diff:
+    desc: Write before/after image comparisons and per-outfit visual evidence.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar visual-diff
+
+  avatar:ledger:
+    desc: Initialize the local CAU upload ledger without storing credentials.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar ledger init
+
+  avatar:run:
+    desc: Run the local avatar workflow and emit the Unity MCP/CAU handoff status.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar run
+
+  avatar:cloth:
+    desc: Bake native Blender Cloth and export the settled garment meshes for the avatar set.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py avatar cloth
+
+  audit:research:
+    desc: Reject stale, incomplete, non-primary, or license-unsafe research.
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit research
 
   check:python:
-    desc: Check repository contracts and generic reproducibility tooling.
+    desc: Run the complete reusable Python verification suite.
     cmds:
-      - uv run --no-cache --no-project python -m compileall -q tools tests
-      - uv run --no-cache --no-project python tools/audit_repository_hygiene.py
-      - uv run --no-cache --no-project python tools/audit_genworks_layout.py
+      - uv lock --check
       - >-
-        uv run --no-cache --no-project --with ruff
-        ruff check --ignore S102
-        tools/audit_repository_hygiene.py
-        tools/audit_genworks_layout.py
-        tools/migrate_jobs_to_genworks.py
-        tools/audit_snapshot.py
-        tools/package_snapshot.py
-        tests/test_repository_hygiene.py
-        tests/test_config_contracts.py
-        tests/test_genworks_layout.py
-        tests/test_snapshot_paths.py
+        uv run --no-cache --locked --no-default-groups
+        python -m compileall -q src tools tests
       - >-
-        uv run --no-cache --no-project --with ruff
-        ruff format --check
-        tools/audit_repository_hygiene.py
-        tools/audit_genworks_layout.py
-        tools/migrate_jobs_to_genworks.py
-        tools/audit_snapshot.py
-        tools/package_snapshot.py
-        tests/test_repository_hygiene.py
-        tests/test_config_contracts.py
-        tests/test_genworks_layout.py
-        tests/test_snapshot_paths.py
+        uv run --no-cache --locked --no-default-groups
+        python tools/manage.py audit all
+      - >-
+        uv run --no-cache --locked --no-default-groups
+        python -m unittest discover -s tests -v
+      - >-
+        uv run --no-cache --locked --no-default-groups --group dev
+        ruff check --ignore S102 src tools tests
 
   format:python:
-    desc: Format generic repository and GenWorks tooling.
+    desc: Format reusable source, tools, and tests discovered in the repository.
     cmds:
       - >-
-        uv run --no-cache --no-project --with ruff
-        ruff format
-        tools/audit_repository_hygiene.py
-        tools/audit_genworks_layout.py
-        tools/migrate_jobs_to_genworks.py
-        tools/audit_snapshot.py
-        tools/package_snapshot.py
-        tests/test_repository_hygiene.py
-        tests/test_config_contracts.py
-        tests/test_genworks_layout.py
-        tests/test_snapshot_paths.py
+        uv run --no-cache --locked --no-default-groups --group dev
+        ruff format src tools tests

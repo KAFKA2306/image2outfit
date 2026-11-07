@@ -1,0 +1,401 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+TOOLS = Path(__file__).resolve().parents[1] / "tools"
+sys.path.insert(0, str(TOOLS))
+
+import production_contract as contract  # noqa: E402
+from runtime_transaction import WorkspaceSnapshot  # noqa: E402
+
+
+class ProductionContractTest(unittest.TestCase):
+    def test_job_schema_rejects_unknown_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            schema = {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["schemaVersion"],
+                "properties": {"schemaVersion": {"const": 2}},
+            }
+            path = root / "schema.json"
+            path.write_text(json.dumps(schema), encoding="utf-8")
+            errors = contract.validate_schema_file(
+                {"schemaVersion": 2, "typoField": True}, path, "job"
+            )
+        self.assertIn("job.typoField is not allowed", errors)
+
+    def test_workspace_failure_restores_canonical_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "Assets" / "GenWorks" / "demo"
+            target.mkdir(parents=True)
+            marker = target / "marker.txt"
+            marker.write_text("last-good", encoding="utf-8")
+            transaction = WorkspaceSnapshot(target)
+            had_original = transaction.begin()
+            marker.write_text("broken", encoding="utf-8")
+            (target / "partial.fbx").write_text("partial", encoding="utf-8")
+            transaction.rollback(had_original)
+            self.assertEqual(marker.read_text(encoding="utf-8"), "last-good")
+            self.assertFalse((target / "partial.fbx").exists())
+            self.assertFalse(transaction.backup.exists())
+            self.assertFalse(transaction.journal.exists())
+
+    def test_commercial_source_artifacts_require_hashes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "Assets" / "result.json"
+            source.parent.mkdir(parents=True)
+            source.write_text("{}\n", encoding="utf-8")
+            sha = hashlib.sha256(source.read_bytes()).hexdigest()
+            normalized, errors = contract.validate_hashed_artifacts(
+                [{"path": "Assets/result.json", "sha256": sha}], root=root
+            )
+            self.assertEqual(errors, [])
+            self.assertEqual(normalized[0]["sha256"], sha)
+            _, errors = contract.validate_hashed_artifacts(
+                [{"path": "Assets/result.json", "sha256": "0" * 64}], root=root
+            )
+            self.assertIn(
+                "sourceArtifacts[0].sha256 mismatch: Assets/result.json", errors
+            )
+
+    def test_known_fit_failure_blocks_candidate_promotion_without_scope_policy(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schemaVersion": 1,
+                        "productId": "demo",
+                        "productRoot": "Assets/GenWorks/demo",
+                        "technicalGates": {
+                            "fitPenetration": "FAIL",
+                            "humanVisualReview": "FAIL",
+                        },
+                        "fitAuditSummary": {"pass": False},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            errors = contract.product_state_errors(
+                {
+                    "id": "demo",
+                    "productRoot": "Assets/GenWorks/demo",
+                    "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+                },
+                root,
+            )
+            self.assertIn("product technical gate failed: fitPenetration", errors)
+            self.assertIn("product fit audit is explicitly failing", errors)
+            self.assertFalse(any("humanVisualReview" in value for value in errors))
+
+    def test_runtime_failures_are_out_of_scope_for_complete_products(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "config").mkdir(parents=True)
+            (root / "config" / "genworks-handoff-policy.json").write_text(
+                json.dumps(
+                    {
+                        "completionStatus": "COMPLETE",
+                        "requiredCompletionGates": [
+                            "blender",
+                            "fiveViewEvidence",
+                            "poseEvidence",
+                            "visualAppearanceReview",
+                        ],
+                        "outOfScopeGates": [
+                            "unityImport",
+                            "modularAvatar",
+                            "vrchatBuildTest",
+                            "humanRuntimeReview",
+                        ],
+                        "rules": {"fitAuditFailureBlocksCompletion": False},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            manifest = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schemaVersion": 1,
+                        "productId": "demo",
+                        "productRoot": "Assets/GenWorks/demo",
+                        "state": "COMPLETE",
+                        "completionGates": {
+                            "blender": "PASS",
+                            "fiveViewEvidence": "PASS",
+                            "poseEvidence": "PASS",
+                            "visualAppearanceReview": "PASS",
+                        },
+                        "technicalGates": {
+                            "unityImport": "FAIL",
+                            "modularAvatar": "FAIL",
+                            "vrchatBuildTest": "NOT_RUN",
+                        },
+                        "fitAuditSummary": {"pass": False},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            errors = contract.product_state_errors(
+                {
+                    "id": "demo",
+                    "productRoot": "Assets/GenWorks/demo",
+                    "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+                },
+                root,
+            )
+        self.assertEqual(errors, [])
+
+    def test_complete_product_requires_completion_gates(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "config").mkdir(parents=True)
+            (root / "config" / "genworks-handoff-policy.json").write_text(
+                json.dumps(
+                    {
+                        "completionStatus": "COMPLETE",
+                        "requiredCompletionGates": ["visualAppearanceReview"],
+                        "outOfScopeGates": [],
+                        "rules": {"fitAuditFailureBlocksCompletion": False},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            manifest = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schemaVersion": 1,
+                        "productId": "demo",
+                        "productRoot": "Assets/GenWorks/demo",
+                        "state": "COMPLETE",
+                        "technicalGates": {"visualAppearanceReview": "PASS"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            errors = contract.product_state_errors(
+                {
+                    "id": "demo",
+                    "productRoot": "Assets/GenWorks/demo",
+                    "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+                },
+                root,
+            )
+        self.assertIn("complete product requires completionGates", errors)
+
+    def test_complete_product_requires_render_visual_gates(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "config").mkdir(parents=True)
+            (root / "config" / "genworks-handoff-policy.json").write_text(
+                json.dumps(
+                    {
+                        "completionStatus": "COMPLETE",
+                        "requiredCompletionGates": ["visualAppearanceReview"],
+                        "outOfScopeGates": [],
+                        "rules": {"fitAuditFailureBlocksCompletion": False},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            manifest = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"
+            manifest.parent.mkdir(parents=True)
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "schemaVersion": 1,
+                        "productId": "demo",
+                        "productRoot": "Assets/GenWorks/demo",
+                        "state": "COMPLETE",
+                        "completionGates": {"visualAppearanceReview": "FAIL"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            errors = contract.product_state_errors(
+                {
+                    "id": "demo",
+                    "productRoot": "Assets/GenWorks/demo",
+                    "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+                },
+                root,
+            )
+        self.assertIn(
+            "complete product gate is not PASS: visualAppearanceReview", errors
+        )
+
+
+class CompletionProjectionTest(unittest.TestCase):
+    POLICY = {
+        "statuses": ["WORKING", "COMPLETE", "REJECTED"],
+        "completionStatus": "COMPLETE",
+        "requiredCompletionGates": ["blender", "visualAppearanceReview"],
+        "outOfScopeGates": ["unityImport", "modularAvatar"],
+        "canonicalGateStates": [
+            "PASS",
+            "FAIL",
+            "PENDING",
+            "UNVERIFIED",
+            "OUT_OF_SCOPE",
+        ],
+        "gateStateNormalization": {
+            "PASS": "PASS",
+            "FAIL": "FAIL",
+            "PENDING": "PENDING",
+        },
+        "rules": {"fitAuditFailureBlocksCompletion": False},
+    }
+
+    def _project(self, manifest: dict) -> tuple[dict, list[str]]:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "config").mkdir(parents=True)
+            (root / "config" / "genworks-handoff-policy.json").write_text(
+                json.dumps(self.POLICY), encoding="utf-8"
+            )
+            path = root / "Assets" / "GenWorks" / "demo" / "ProductManifest.json"
+            path.parent.mkdir(parents=True)
+            base = {
+                "schemaVersion": 1,
+                "productId": "demo",
+                "productRoot": "Assets/GenWorks/demo",
+            }
+            path.write_text(json.dumps({**base, **manifest}), encoding="utf-8")
+            job = {
+                "id": "demo",
+                "productRoot": "Assets/GenWorks/demo",
+                "productManifestPath": "Assets/GenWorks/demo/ProductManifest.json",
+            }
+            projection = contract.completion_projection(
+                json.loads(path.read_text(encoding="utf-8")), root
+            )
+            errors = contract.product_state_errors(job, root)
+        return projection, errors
+
+    def test_failed_visual_review_keeps_product_working_with_one_completion_blocker(
+        self,
+    ) -> None:
+        projection, errors = self._project(
+            {
+                "state": "WORKING",
+                "completionGates": {
+                    "blender": "PASS",
+                    "visualAppearanceReview": "FAIL",
+                },
+                "technicalGates": {"unityImport": "PENDING"},
+            }
+        )
+        self.assertEqual(projection["state"], "WORKING")
+        self.assertEqual(
+            projection["completionBlockers"],
+            [{"gate": "visualAppearanceReview", "status": "FAIL"}],
+        )
+        self.assertEqual(
+            projection["runtimeGates"], [{"gate": "unityImport", "status": "PENDING"}]
+        )
+        self.assertEqual(projection["errors"], [])
+        self.assertEqual(errors, [])
+
+    def test_complete_requires_every_required_gate_pass_and_runtime_stays_pending(
+        self,
+    ) -> None:
+        projection, errors = self._project(
+            {
+                "state": "COMPLETE",
+                "completionGates": {
+                    "blender": "PASS",
+                    "visualAppearanceReview": "PASS",
+                },
+                "technicalGates": {
+                    "unityImport": "PENDING",
+                    "modularAvatar": "PENDING",
+                },
+            }
+        )
+        self.assertEqual(projection["completionBlockers"], [])
+        self.assertEqual(errors, [])
+
+    def test_missing_required_gate_is_visible_and_not_complete(self) -> None:
+        projection, errors = self._project(
+            {
+                "state": "COMPLETE",
+                "completionGates": {"blender": "PASS"},
+            }
+        )
+        self.assertEqual(
+            projection["completionBlockers"],
+            [{"gate": "visualAppearanceReview", "status": "MISSING"}],
+        )
+        self.assertIn(
+            "complete product gate is not PASS: visualAppearanceReview", errors
+        )
+
+    def test_out_of_scope_runtime_failure_is_not_a_completion_blocker(self) -> None:
+        projection, errors = self._project(
+            {
+                "state": "WORKING",
+                "completionGates": {
+                    "blender": "PASS",
+                    "visualAppearanceReview": "PASS",
+                },
+                "technicalGates": {"modularAvatar": "FAIL"},
+            }
+        )
+        self.assertEqual(projection["completionBlockers"], [])
+        self.assertEqual(
+            projection["runtimeGates"], [{"gate": "modularAvatar", "status": "FAIL"}]
+        )
+        self.assertEqual(errors, [])
+
+    def test_unknown_lifecycle_and_gate_values_fail_visibly(self) -> None:
+        projection, errors = self._project(
+            {
+                "state": "DONE",
+                "completionGates": {
+                    "blender": "MAYBE",
+                    "visualAppearanceReview": "PASS",
+                },
+            }
+        )
+        self.assertIsNone(projection["state"])
+        self.assertIn("unknown product lifecycle state: DONE", projection["errors"])
+        self.assertIn(
+            "unknown completion gate state: blender=MAYBE", projection["errors"]
+        )
+        self.assertIn("unknown product lifecycle state: DONE", errors)
+
+    def test_contradictory_state_and_status_fail_visibly(self) -> None:
+        projection, _ = self._project(
+            {
+                "state": "WORKING",
+                "status": "REJECTED",
+                "completionGates": {
+                    "blender": "PASS",
+                    "visualAppearanceReview": "PASS",
+                },
+            }
+        )
+        self.assertIsNone(projection["state"])
+        self.assertTrue(
+            any("contradicts status" in message for message in projection["errors"])
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "sourceReference": "private-reference://sha256/66cd898014d3f503da8015207a0240d946aac72b596f28bef8d6574a0afb678b",
+  "parts": [
+    {"partId":"white-bib-front","kind":"front-bodice-panel","regions":["chest","abdomen"],"role":"structural-panel","layer":"base","material":"woven","fit":"fitted","evidence":"White halter bib from neckline to pointed lower edge."},
+    {"partId":"white-bib-ruffle-center","kind":"trim","regions":["chest","abdomen"],"role":"trim","layer":"attached","material":"woven","fit":"regular","evidence":"Vertical layered white ruffles."},
+    {"partId":"black-neck-band","kind":"collar","regions":["neck"],"role":"closure","layer":"outer","material":"woven","fit":"fitted","evidence":"Black halter neck band."},
+    {"partId":"black-bow-tie","kind":"trim","regions":["neck","chest"],"role":"accessory","layer":"floating","material":"woven","fit":"regular","evidence":"Black bow at center neck."},
+    {"partId":"waistcoat-front-left","kind":"front-bodice-panel","regions":["chest","abdomen","waist"],"role":"structural-panel","layer":"outer","material":"woven","fit":"fitted","evidence":"Colored/black tuxedo waistcoat left panel with deep V."},
+    {"partId":"waistcoat-front-right","kind":"front-bodice-panel","regions":["chest","abdomen","waist"],"role":"structural-panel","layer":"outer","material":"woven","fit":"fitted","mirrorOf":"waistcoat-front-left","evidence":"Mirrored right panel."},
+    {"partId":"waistcoat-back","kind":"back-bodice-panel","regions":["upper-back","abdomen","waist"],"role":"structural-panel","layer":"outer","material":"woven","fit":"fitted","evidence":"Halter-back waistcoat support."},
+    {"partId":"waistcoat-tail-left","kind":"wing-panel","regions":["waist","pelvis"],"role":"structural-panel","layer":"outer","material":"woven","fit":"regular","evidence":"Pointed front/side tail below waist."},
+    {"partId":"waistcoat-tail-right","kind":"wing-panel","regions":["waist","pelvis"],"role":"structural-panel","layer":"outer","material":"woven","fit":"regular","mirrorOf":"waistcoat-tail-left","evidence":"Mirrored pointed tail."},
+    {"partId":"button-placket","kind":"placket","regions":["abdomen"],"role":"closure","layer":"attached","material":"rigid-trim","fit":"regular","evidence":"Four small black buttons on white bib."},
+    {"partId":"waist-chain","kind":"cord","regions":["waist"],"role":"accessory","layer":"floating","material":"rigid-trim","fit":"regular","evidence":"Silver double-drape chain between two waist anchors."},
+    {"partId":"upper-skirt","kind":"skirt-panel","regions":["waist","pelvis","upper-leg"],"role":"structural-panel","layer":"mid","material":"woven","fit":"relaxed","evidence":"Opaque black flared upper skirt."},
+    {"partId":"lower-skirt","kind":"skirt-panel","regions":["pelvis","upper-leg"],"role":"structural-panel","layer":"outer","material":"sheer","fit":"relaxed","evidence":"Longer black translucent circular layer."},
+    {"partId":"lace-hem","kind":"trim","regions":["upper-leg"],"role":"edge-finish","layer":"attached","material":"sheer","fit":"regular","evidence":"Scalloped lace-like hem visible at lower edge."}
+  ],
+  "uncertainties": [
+    {"field":"rear closure","status":"not-visible","assumption":"center-back concealed zipper or hook closure; builder uses non-visible seam topology only."},
+    {"field":"exact textile fiber","status":"not-visible","assumption":"synthetic satin/woven approximation for rendering."},
+    {"field":"skirt layer count","status":"estimated","assumption":"two structural layers plus hem trim."}
+  ]
+}

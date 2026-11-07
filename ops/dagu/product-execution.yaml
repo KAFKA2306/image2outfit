@@ -1,0 +1,27 @@
+name: image2outfit-product-execution
+description: Queue one tracked image2outfit product request without owning pipeline truth.
+group: image2outfit
+queue: product-execution
+type: chain
+timeout_sec: 14400
+dotenv: []
+
+params:
+  - name: repository_root
+    type: string
+    required: true
+    min_length: 1
+    description: Absolute path to the checked-out image2outfit repository on the worker.
+  - name: request
+    type: string
+    required: true
+    pattern: '^config/pipeline/requests/[a-z0-9._-]+\.json$'
+    description: Tracked canonical pipeline request to execute.
+
+working_dir: "${params.repository_root}"
+
+steps:
+  - id: execute_product
+    run: >-
+      uv run --locked --no-default-groups python tools/run_product_execution.py
+      --request "${params.request}"

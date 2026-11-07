@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 2,
+  "designRevision": "v6-welded-projected-pleats",
+  "productId": "siroino-nocturne-angel-set",
+  "result": "VISUAL_REJECTED",
+  "visualAppearanceReview": "FAIL",
+  "reviewedAt": "2026-08-14T17:29:00+09:00",
+  "reviewer": "ChatGPT direct artifact image inspection",
+  "hostedWorkflowRun": 30970804577,
+  "artifactId": 8916587583,
+  "artifactSha256": "305ec06a8600d652191e0cce28d155a29abd1e452a321f858a9c4ce54650b7f0",
+  "evidence": {
+    "multiview": {
+      "path": "Previews/siroino-nocturne-angel-set-multiview.webp",
+      "sha256": "179b9d79607633f1960fe8c7be4f0a9055dcf767df92138d27a18e6fbbef7bbb"
+    },
+    "poseReview": {
+      "path": "Previews/siroino-nocturne-angel-set-pose-review.webp",
+      "sha256": "923a005a742cca75eac3463861744cfe576e3eeea945d04e858acc6e7cecf94b"
+    }
+  },
+  "generatedMetrics": {
+    "meshObjects": 28,
+    "vertices": 9672,
+    "triangles": 18176,
+    "maxBoneInfluences": 4,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "removedDegeneratePolygons": 12
+  },
+  "fitAudit": {
+    "neutral": 466,
+    "arms-up": 1100,
+    "arm-cross": 508,
+    "crouch": 843,
+    "sit": 1122,
+    "prone": 774
+  },
+  "blockingFindings": [
+    "The front torso still reads as exposed body bounded by narrow dark side panels instead of a coherent cropped sailor bodice.",
+    "The short skirt remains a thick barrel/tube silhouette rather than the flared layered mini-skirt required by the reference contract.",
+    "The six back feather elements still read as a radial flower/petal cluster instead of paired layered wings.",
+    "Crouch, sit and prone retain visibly rigid or floating lower-garment deformation around the thighs and hips.",
+    "Neutral fit audit still reports 136 triangle-overlap pairs on Nocturne_Sewn_Bodice; all six required poses remain nonzero overall.",
+    "Body-following arm and leg accessories remain simple tubes and continue to intersect the target in articulated poses."
+  ],
+  "acceptedImprovements": [
+    "Release policy tests, production contract quality and Hosted Blender generation succeeded for the exact v6 head.",
+    "Editable blend, FBX, prefab declarations, five views and six required pose images were generated.",
+    "The generated candidate has zero unweighted vertices, zero weight-sum errors and zero degenerate triangles.",
+    "Unsupported head modules were omitted from the visual review set instead of being claimed as validated."
+  ],
+  "nextAction": "Proceed on the same canonical branch to v7: close the bodice front into a readable cropped sailor silhouette, flatten and flare the skirt profile, and fan paired feathers laterally rather than radially; keep WORKING until new hosted evidence is directly reviewed."
+}

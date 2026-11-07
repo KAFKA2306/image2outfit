@@ -5,6 +5,7 @@ import argparse
 import json
 import re
 import tempfile
+import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -44,20 +45,22 @@ def project_unity_version(root: Path) -> str:
     return ""
 
 
-def exact_requirements(path: Path) -> dict[str, str]:
+def exact_project_dependencies(path: Path) -> dict[str, str]:
     result: dict[str, str] = {}
     try:
-        lines = path.read_text(encoding="utf-8-sig").splitlines()
-    except OSError:
+        with path.open("rb") as stream:
+            dependencies = tomllib.load(stream).get("project", {}).get("dependencies", [])
+    except (OSError, tomllib.TOMLDecodeError):
         return result
-    for raw in lines:
-        line = raw.strip()
-        if not line or line.startswith("#"):
+    if not isinstance(dependencies, list):
+        return result
+    for value in dependencies:
+        if not isinstance(value, str):
             continue
-        if "==" not in line:
-            result[line] = ""
+        if "==" not in value:
+            result[value.strip()] = ""
             continue
-        name, version = line.split("==", 1)
+        name, version = value.split("==", 1)
         result[name.strip()] = version.strip()
     return result
 
@@ -137,13 +140,13 @@ def audit(root: Path = ROOT, require_unity_lock: bool = False) -> dict[str, Any]
             "Blender Python must be pinned to an exact 3.11 patch, "
             f"found {blender_python_version or 'missing'}"
         )
-    requirements_value = str(blender_python.get("requirements", ""))
-    requirements_path = (root / requirements_value).resolve()
-    if not requirements_value.startswith("config/") or not requirements_path.is_file():
+    dependency_group = str(blender_python.get("dependencyGroup", ""))
+    pyproject_path = root / "pyproject.toml"
+    if dependency_group != "project" or not pyproject_path.is_file():
         errors.append(
-            "Blender Python requirements must be a tracked file under config/"
+            "Blender Python dependencies must use the project dependency set in pyproject.toml"
         )
-    actual_python_packages = exact_requirements(requirements_path)
+    actual_python_packages = exact_project_dependencies(pyproject_path)
     expected_python_packages: dict[str, str] = {}
     for distribution, package in blender_python.get("packages", {}).items():
         version = str(package.get("version", ""))
@@ -161,7 +164,7 @@ def audit(root: Path = ROOT, require_unity_lock: bool = False) -> dict[str, Any]
             errors.append(f"Blender Python source must use https: {distribution}")
     if actual_python_packages != expected_python_packages:
         errors.append(
-            "Blender Python requirements mismatch: "
+            "Blender Python dependency mismatch: "
             f"expected {expected_python_packages}, found {actual_python_packages}"
         )
 
@@ -184,7 +187,8 @@ def audit(root: Path = ROOT, require_unity_lock: bool = False) -> dict[str, Any]
         "blender": {
             "expected": blender_version,
             "pythonExpected": blender_python_version,
-            "requirements": requirements_value,
+            "dependencySource": "pyproject.toml",
+            "dependencyGroup": dependency_group,
             "packages": actual_python_packages,
         },
         "packages": package_results,

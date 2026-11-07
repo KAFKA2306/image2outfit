@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/contracts/quality/geometry-report.schema.v1.json",
+  "title": "Geometry build report (candidate_quality.geometry_quality input)",
+  "type": "object",
+  "required": ["metrics"],
+  "properties": {
+    "metrics": {"type": "object"}
+  }
+}

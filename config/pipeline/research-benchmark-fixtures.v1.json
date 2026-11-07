@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "issue": 269,
+  "baselineMethodId": "current-image2outfit",
+  "baselineStatus": "NOT_MEASURED",
+  "fixtures": [
+    {
+      "fixtureId": "tight-fitted-top",
+      "productId": "siroino-heather-hooded-bodysuit",
+      "jobPath": "config/products/siroino-heather-hooded-bodysuit/job.json",
+      "reason": "Closed fitted bodysuit fixture with body-conforming torso geometry and fit-sensitive seams."
+    },
+    {
+      "fixtureId": "loose-pleated-skirt",
+      "productId": "siroino-cyber-kawaii-large",
+      "jobPath": "config/products/siroino-cyber-kawaii-large/job.json",
+      "reason": "Existing layered skirt workstream already declares GarmentCode output and external cloth-solver evidence."
+    },
+    {
+      "fixtureId": "layered-outfit-with-trim",
+      "productId": "siroino-tuxedo-halter-dress-large",
+      "jobPath": "config/products/siroino-tuxedo-halter-dress-large/job.json",
+      "reason": "Layered dress fixture with trim, multi-layer contact, pattern, stitch, pose, and visual-review evidence paths."
+    }
+  ],
+  "requiredMetricIds": [
+    "pattern-geometry-defects",
+    "seam-mismatch-ratio",
+    "silhouette-error",
+    "body-penetration-count",
+    "self-intersection-count",
+    "inter-layer-intersection-count",
+    "stage-runtime-seconds",
+    "manual-intervention-count"
+  ]
+}

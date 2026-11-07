@@ -10,7 +10,7 @@ namespace GenWorks.Editor
 {
     internal sealed class GenWorksCatalogWindow : EditorWindow
     {
-        private const string ProductRoot = "Assets/GenWorks/Products";
+        private const string ProductRoot = "Assets/GenWorks";
         private const string ManifestName = "ProductManifest.json";
 
         [Serializable]

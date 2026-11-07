@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "profileId": "garment-reconstruction-modular-v1",
+  "auditContract": {
+    "recordSchema": "config/pipeline/stage-audit-record.schema.v1.json",
+    "manifestSchema": "config/pipeline/run-audit-manifest.schema.v1.json",
+    "storageRoot": ".image2outfit/audit/{productId}/{runId}",
+    "hashAlgorithm": "SHA-256",
+    "chain": "previousRecordDigest"
+  },
+  "selectionPolicy": {
+    "mode": "capability-contract-then-stable-priority",
+    "agentCanProposeRequirements": true,
+    "agentCanBypassContracts": false,
+    "tieBreaker": ["priority", "toolName"]
+  },
+  "researchPrinciples": [
+    "pattern-first-structured-garment",
+    "geometry-first-stitch-graph",
+    "pose-normalized-pattern-recovery",
+    "pattern-coordinate-mapping",
+    "external-generators-are-bounded-hypotheses"
+  ],
+  "stages": [
+    {
+      "stage": "ingest-reference",
+      "toolName": "reference.ingest.bound-source",
+      "purpose": "Bind source images, hashes, provenance, and target avatar.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "capabilities": ["reference.ingest"],
+      "requires": [],
+      "provides": ["reference.bound"],
+      "runtime": "python",
+      "managedOutputs": ["referenceManifest", "sourceSha256", "provenance", "targetAvatarBinding"]
+    },
+    {
+      "stage": "normalize-view",
+      "toolName": "reference.normalize.pose-view",
+      "purpose": "Separate pose and viewpoint effects from garment evidence while preserving observed/inferred/unknown boundaries.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "capabilities": ["reference.normalize"],
+      "requires": ["reference.bound"],
+      "provides": ["reference.normalized"],
+      "runtime": "python",
+      "managedOutputs": ["normalizedReference", "cameraPose", "bodyLandmarks", "normalizationMetrics", "initialBlueprint"]
+    },
+    {
+      "stage": "decompose-garment",
+      "toolName": "garment.decompose.semantic-parts",
+      "purpose": "Name garment parts by construction role and body region, keeping semantic role separate from generation method.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "capabilities": ["garment.decompose"],
+      "requires": ["reference.normalized"],
+      "provides": ["garment.decomposed"],
+      "runtime": "python",
+      "managedOutputs": ["garmentPartGraph", "spatialAssignments", "materialRegions", "ambiguityLog", "generationAssignments"]
+    },
+    {
+      "stage": "draft-patterns",
+      "purpose": "Select a construction-compatible pattern representation.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["patternSpecification", "patternEdges", "seamAllowances", "notchesAndDarts", "correspondenceMap"],
+      "tools": [
+        {
+          "toolName": "pattern.explicit-2d",
+          "purpose": "Draft explicit two-dimensional panels for physically sewn garments.",
+          "capabilities": ["pattern.explicit-2d", "garment.panel-sewn"],
+          "requires": ["garment.decomposed"],
+          "provides": ["pattern.drafted", "pattern.explicit-2d", "garment.panel-sewn"],
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "pattern.closed-components",
+          "purpose": "Generate a parametric closed-component representation for garments that do not require physical panel sewing.",
+          "capabilities": ["pattern.closed-components", "garment.closed-components"],
+          "requires": ["garment.decomposed"],
+          "provides": ["pattern.drafted", "pattern.closed-components", "garment.closed-components"],
+          "runtime": "python",
+          "priority": 20,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "infer-stitches",
+      "purpose": "Select the topology contract that joins the chosen garment representation.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["stitchGraph", "edgePairings", "stitchDirections", "topologyValidation"],
+      "tools": [
+        {
+          "toolName": "stitch.explicit-graph",
+          "purpose": "Create explicit edge-to-edge and multi-edge sewing topology.",
+          "capabilities": ["stitch.explicit-graph", "assembly.sewing-springs"],
+          "requires": ["pattern.explicit-2d"],
+          "provides": ["stitch.graph"],
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "stitch.closed-components",
+          "purpose": "Describe deterministic joins for already-closed garment-native components.",
+          "capabilities": ["stitch.closed-components"],
+          "requires": ["pattern.closed-components"],
+          "provides": ["stitch.graph"],
+          "runtime": "python",
+          "priority": 20,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "initialize-3d",
+      "purpose": "Select a target-avatar-bound initial geometry hypothesis without changing canonical pattern/seam authority.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["initializedMesh", "panelTransforms", "initialClearanceAudit", "hypothesisSet", "selectedHypothesis", "targetAvatarAuthority"],
+      "tools": [
+        {
+          "toolName": "initialize.pattern-around-avatar",
+          "purpose": "Place the selected canonical garment representation around the target avatar without initial intersections.",
+          "capabilities": ["initialize.3d", "initialize.pattern-first", "target-avatar-bound"],
+          "requires": ["pattern.drafted", "stitch.graph"],
+          "provides": ["geometry.initialized"],
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "initialize.external-hypothesis",
+          "purpose": "Accept Astra-guided/Tripo or other external 3D drafts only as hash-bound hypotheses under the same target-avatar and canonical quality contracts.",
+          "requiredResultFields": {
+            "hypothesisContractValidated": true,
+            "blueprintBound": true,
+            "targetAvatarAuthorityValidated": true,
+            "externalDraftCanonicalSource": false,
+            "silentFallbackUsed": false
+          },
+          "capabilities": ["initialize.3d", "initialize.multi-hypothesis", "generator.tripo", "assistant.astra", "target-avatar-bound"],
+          "requires": ["pattern.drafted", "stitch.graph"],
+          "provides": ["geometry.initialized", "hypothesis.external-selected"],
+          "runtime": "external",
+          "priority": 100,
+          "deterministic": false
+        }
+      ]
+    },
+    {
+      "stage": "build-blender",
+      "purpose": "Select a Blender construction/reconciliation implementation compatible with the chosen representation.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 2,
+      "requiredResultFields": {},
+      "managedOutputs": ["editableBlend", "buildReport", "geometryMetrics", "reconciliationContract"],
+      "tools": [
+        {
+          "toolName": "build.blender.pattern-sewn",
+          "purpose": "Build explicit panels and sewing-ready geometry in Blender.",
+          "capabilities": ["build.blender", "garment.panel-sewn"],
+          "requires": ["geometry.initialized", "pattern.explicit-2d"],
+          "provides": ["garment.blend"],
+          "runtime": "blender",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "build.blender.closed-components",
+          "purpose": "Build garment-native closed components in Blender.",
+          "capabilities": ["build.blender", "garment.closed-components"],
+          "requires": ["geometry.initialized", "pattern.closed-components"],
+          "provides": ["garment.blend"],
+          "runtime": "blender",
+          "priority": 20,
+          "deterministic": true
+        },
+        {
+          "toolName": "build.blender.reconcile-hypothesis",
+          "purpose": "Reconcile a selected external 3D hypothesis against canonical garment structure while bounding changed and preserved regions.",
+          "requiredResultFields": {
+            "reconciliationContractValidated": true,
+            "mustPreserveRegionsValidated": true,
+            "targetAvatarAuthorityValidated": true
+          },
+          "capabilities": ["build.blender", "build.reconcile-hypothesis"],
+          "requires": ["geometry.initialized", "hypothesis.external-selected"],
+          "provides": ["garment.blend"],
+          "runtime": "blender",
+          "priority": 100,
+          "deterministic": false
+        }
+      ]
+    },
+    {
+      "stage": "simulate-cloth",
+      "purpose": "Select an assembly/settling method compatible with the constructed garment.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["clothCache", "simulationConfig", "collisionReport", "simulatedMesh"],
+      "tools": [
+        {
+          "toolName": "simulate.blender.sewing-springs",
+          "purpose": "Physically close declared seams using Blender Cloth sewing springs and collision.",
+          "capabilities": ["simulate.sewing-springs", "assembly.sewing-springs"],
+          "requires": ["garment.blend", "pattern.explicit-2d", "stitch.graph"],
+          "provides": ["garment.simulated"],
+          "runtime": "blender",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "simulate.closed-components-clearance",
+          "purpose": "Settle closed components with bounded deterministic body-clearance refinement.",
+          "capabilities": ["simulate.bounded-clearance"],
+          "requires": ["garment.blend", "pattern.closed-components"],
+          "provides": ["garment.simulated"],
+          "runtime": "blender",
+          "priority": 20,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "skin-and-export",
+      "toolName": "export.skin-fbx",
+      "purpose": "Bind semantic body regions to bones and export editable source and FBX.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 2,
+      "requiredResultFields": {},
+      "capabilities": ["skin.weights", "export.fbx"],
+      "requires": ["garment.simulated"],
+      "provides": ["garment.exported"],
+      "runtime": "blender",
+      "managedOutputs": ["skinnedBlend", "fbx", "weightAudit", "prefabDeclaration"]
+    },
+    {
+      "stage": "render-evidence",
+      "purpose": "Render canonical review evidence and optionally a separately-bound AI re-input render-back set.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 5,
+      "requiredResultFields": {},
+      "managedOutputs": ["fiveViewImages", "requiredPoseImages", "renderManifest", "qaRenderManifest", "renderBackManifest"],
+      "tools": [
+        {
+          "toolName": "render.bpy-review",
+          "purpose": "Render pattern appearance, five views, required poses, and review contact sheets from the current artifact.",
+          "capabilities": ["render.bpy", "render.pattern", "render.five-view", "render.required-poses"],
+          "requires": ["garment.exported"],
+          "provides": ["review.images"],
+          "runtime": "blender",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "render.bpy-review-with-render-back",
+          "purpose": "Render canonical QA evidence plus a distinct fixed-protocol AI re-input set that cannot satisfy canonical quality evidence.",
+          "requiredResultFields": {
+            "renderBackContractValidated": true,
+            "renderBackSeparatedFromQualityEvidence": true
+          },
+          "capabilities": ["render.bpy", "render.pattern", "render.five-view", "render.required-poses", "render.ai-reinput"],
+          "requires": ["garment.exported"],
+          "provides": ["review.images", "render.ai-reinput"],
+          "runtime": "blender",
+          "priority": 100,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "audit-geometry",
+      "purpose": "Measure topology, fit, evidence hashes, and optionally blueprint-vs-actual deviations.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {},
+      "managedOutputs": ["geometryAudit", "penetrationAudit", "evidenceHashAudit", "gateSummary", "blueprintActualAudit"],
+      "tools": [
+        {
+          "toolName": "verify.geometry-fit",
+          "purpose": "Measure topology, weights, degeneracy, collisions, and evidence hashes.",
+          "capabilities": ["verify.geometry", "verify.fit"],
+          "requires": ["review.images"],
+          "provides": ["geometry.audited"],
+          "runtime": "python",
+          "priority": 10,
+          "deterministic": true
+        },
+        {
+          "toolName": "verify.geometry-fit-blueprint",
+          "purpose": "Run canonical geometry/fit checks and record measurable blueprint-vs-actual deviations with explicit routing.",
+          "requiredResultFields": {
+            "blueprintActualAuditValidated": true
+          },
+          "capabilities": ["verify.geometry", "verify.fit", "verify.blueprint-actual"],
+          "requires": ["review.images"],
+          "provides": ["geometry.audited", "blueprint.audited"],
+          "runtime": "python",
+          "priority": 100,
+          "deterministic": true
+        }
+      ]
+    },
+    {
+      "stage": "visual-review",
+      "purpose": "Require direct inspection of current images, with optional blueprint binding, before appearance can pass.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 5,
+      "requiredResultFields": {"reviewMethod": "direct-image-inspection"},
+      "managedOutputs": ["visualReview", "inspectedImageHashes", "blockingFindings", "reviewBundle"],
+      "tools": [
+        {
+          "toolName": "review.direct-image-inspection",
+          "purpose": "Require direct inspection of current pattern and assembled images before appearance can pass.",
+          "capabilities": ["review.direct-image-inspection"],
+          "requires": ["review.images", "geometry.audited"],
+          "provides": ["visual.reviewed"],
+          "runtime": "human",
+          "priority": 10,
+          "deterministic": false
+        },
+        {
+          "toolName": "review.blueprint-bound-direct-image-inspection",
+          "purpose": "Review reference, blueprint, previous candidate, and current candidate under the same render protocol without allowing blueprint to count as evidence.",
+          "requiredResultFields": {
+            "reviewMethod": "direct-image-inspection",
+            "blueprintBound": true,
+            "blueprintUsedAsQualityEvidence": false
+          },
+          "capabilities": ["review.direct-image-inspection", "review.blueprint-bound"],
+          "requires": ["review.images", "geometry.audited"],
+          "provides": ["visual.reviewed"],
+          "runtime": "human",
+          "priority": 100,
+          "deterministic": false
+        }
+      ]
+    },
+    {
+      "stage": "finalize-candidate",
+      "toolName": "candidate.finalize-truthful-state",
+      "purpose": "Write the truthful WORKING, COMPLETE, or REJECTED candidate state.",
+      "requiredInExecute": true,
+      "minimumEvidenceCount": 1,
+      "requiredResultFields": {"decisionRecorded": true},
+      "capabilities": ["candidate.finalize"],
+      "requires": ["visual.reviewed"],
+      "provides": ["candidate.finalized"],
+      "runtime": "python",
+      "managedOutputs": ["candidateState", "completionGateRecord", "releaseDecision"]
+    }
+  ]
+}

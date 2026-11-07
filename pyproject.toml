@@ -1,7 +1,40 @@
 [project]
 name = "image2outfit"
 version = "0.1.0"
+description = "Reproducible Blender-to-Unity/VRChat garment production, verification, and release pipeline."
+readme = "README.md"
 requires-python = "==3.11.*"
 dependencies = [
-  "pillow==12.2.0",
+  "jsonschema==4.26.0",
+  "Pillow==12.3.0",
 ]
+
+[dependency-groups]
+dev = [
+  "ruff",
+]
+snapshot = [
+  "matplotlib",
+  "numpy",
+  "scipy",
+  "trimesh",
+]
+
+[tool.uv]
+package = false
+default-groups = []
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+src = ["tools", "tests"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = ["E402"]
+
+[tool.image2outfit.garment-geometry]
+require-source-topology-for-bodycon = true
+require-continuous-torso-sleeve-shell = true
+forbid-detached-planar-bodycon-panels = true
+max-default-bodycon-surface-offset-m = 0.012

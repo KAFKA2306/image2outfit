@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/config/schema/garment-spec.schema.v1.json",
+  "title": "image2outfit GarmentSpec v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "garment_id",
+    "hypothesis_id",
+    "parent_hypothesis_id",
+    "unit_system",
+    "coordinate_system",
+    "avatar",
+    "construction",
+    "fit",
+    "materials",
+    "styling",
+    "quality",
+    "provenance",
+    "extensions"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "garment_id": {"$ref": "#/$defs/identifier"},
+    "hypothesis_id": {"$ref": "#/$defs/identifier"},
+    "parent_hypothesis_id": {
+      "oneOf": [{"$ref": "#/$defs/identifier"}, {"type": "null"}]
+    },
+    "unit_system": {"const": "millimetre"},
+    "coordinate_system": {"const": "right-handed-z-up"},
+    "avatar": {"$ref": "#/$defs/avatarSection"},
+    "construction": {"$ref": "#/$defs/constructionSection"},
+    "fit": {"$ref": "#/$defs/fitSection"},
+    "materials": {"$ref": "#/$defs/materialsSection"},
+    "styling": {"$ref": "#/$defs/stylingSection"},
+    "quality": {"$ref": "#/$defs/qualitySection"},
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$"
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "repoPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "role"],
+      "properties": {
+        "path": {"$ref": "#/$defs/repoPath"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "role": {"$ref": "#/$defs/identifier"}
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section_id",
+        "schema_version",
+        "artifact_path",
+        "content_sha256",
+        "hypothesis_id",
+        "confidence",
+        "evidence"
+      ],
+      "properties": {
+        "section_id": {"$ref": "#/$defs/identifier"},
+        "schema_version": {"type": "integer", "minimum": 1},
+        "artifact_path": {"$ref": "#/$defs/repoPath"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "hypothesis_id": {"$ref": "#/$defs/identifier"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "evidence": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/evidence"}
+        }
+      }
+    },
+    "avatarSection": {
+      "allOf": [
+        {"$ref": "#/$defs/section"},
+        {"properties": {"section_id": {"const": "avatar"}}}
+      ]
+    },
+    "constructionSection": {
+      "allOf": [
+        {"$ref": "#/$defs/section"},
+        {"properties": {"section_id": {"const": "construction"}}}
+      ]
+    },
+    "fitSection": {
+      "allOf": [
+        {"$ref": "#/$defs/section"},
+        {"properties": {"section_id": {"const": "fit"}}}
+      ]
+    },
+    "materialsSection": {
+      "allOf": [
+        {"$ref": "#/$defs/section"},
+        {"properties": {"section_id": {"const": "materials"}}}
+      ]
+    },
+    "stylingSection": {
+      "allOf": [
+        {"$ref": "#/$defs/section"},
+        {"properties": {"section_id": {"const": "styling"}}}
+      ]
+    },
+    "qualitySection": {
+      "allOf": [
+        {"$ref": "#/$defs/section"},
+        {"properties": {"section_id": {"const": "quality"}}}
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_reference", "source_sha256", "producer", "evidence"],
+      "properties": {
+        "source_reference": {"type": "string", "minLength": 1},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "producer": {"type": "string", "minLength": 1},
+        "evidence": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/evidence"}
+        }
+      }
+    }
+  }
+}

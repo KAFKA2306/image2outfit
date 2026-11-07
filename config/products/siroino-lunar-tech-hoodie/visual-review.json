@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lunar-tech-hoodie",
+  "status": "REVIEW_REQUIRED",
+  "reviewMethod": "direct-image-inspection",
+  "reviewedRevision": "v3-side-wrap-and-hood-panel",
+  "decision": "REVIEW_REQUIRED",
+  "inspectedImages": {
+    "fiveView": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/siroino-lunar-tech-hoodie-multiview.webp",
+    "sixPose": "Assets/GenWorks/siroino-lunar-tech-hoodie/Previews/siroino-lunar-tech-hoodie-pose-review.webp",
+    "settledFrame": 30,
+    "settledRenderEvidence": "Assets/GenWorks/siroino-lunar-tech-hoodie/Evidence/Build/post-cloth-render.json"
+  },
+  "findings": [
+    {
+      "severity": "minor",
+      "area": "sideSilhouette",
+      "finding": "The closed side-wrap panels prevent exposed-body gaps, but the profile remains intentionally planar and reads as a rigid technical robe rather than a tailored hoodie shell."
+    },
+    {
+      "severity": "minor",
+      "area": "hoodSilhouette",
+      "finding": "The rear hood panel is attached and face-open, but its manufacturing silhouette is simplified and the edge piping extends above the crown in side views."
+    },
+    {
+      "severity": "pass",
+      "area": "clothPanels",
+      "finding": "Both asymmetric overskirt panels show visible baked settling and deformation at frame 30 and through the pose review."
+    }
+  ],
+  "reviewNotes": "Visual inspection completed on the post-cloth five-view and six-pose renders. Geometry, UVs, weights, and cloth evidence are usable for the working Unity integration, but the simplified side/hood silhouette remains explicitly review-required and must not be marked COMPLETE."
+}

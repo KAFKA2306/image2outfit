@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "units": "metres and avatar-relative scale",
+  "status": "PARAMETRIC_INITIAL_HYPOTHESIS",
+  "pieces": [
+    {
+      "id": "back-body",
+      "quantity": 1,
+      "shape": "rectangular torso with shallow back neckline",
+      "parameterization": {
+        "widthScale": 1.18,
+        "lengthM": 0.45,
+        "shoulderEaseM": 0.025
+      },
+      "edges": [
+        "neck",
+        "shoulder-left",
+        "shoulder-right",
+        "side-left",
+        "side-right",
+        "hem"
+      ]
+    },
+    {
+      "id": "front-left",
+      "quantity": 1,
+      "shape": "rectangular open-front torso half",
+      "parameterization": {
+        "halfWidthScale": 0.62,
+        "lengthM": 0.45,
+        "openingOffsetM": 0.014
+      },
+      "edges": [
+        "neck",
+        "shoulder",
+        "armhole",
+        "side",
+        "hem",
+        "front"
+      ]
+    },
+    {
+      "id": "front-right",
+      "quantity": 1,
+      "shape": "mirror of front-left",
+      "mirrorOf": "front-left",
+      "edges": [
+        "neck",
+        "shoulder",
+        "armhole",
+        "side",
+        "hem",
+        "front"
+      ]
+    },
+    {
+      "id": "sleeve-left",
+      "quantity": 1,
+      "shape": "loose straight sleeve",
+      "parameterization": {
+        "lengthM": 0.29,
+        "upperEaseM": 0.035,
+        "cuffEaseM": 0.045
+      },
+      "edges": [
+        "cap",
+        "underarm-front",
+        "underarm-back",
+        "cuff"
+      ]
+    },
+    {
+      "id": "sleeve-right",
+      "quantity": 1,
+      "shape": "mirror of sleeve-left",
+      "mirrorOf": "sleeve-left",
+      "edges": [
+        "cap",
+        "underarm-front",
+        "underarm-back",
+        "cuff"
+      ]
+    },
+    {
+      "id": "collar-left",
+      "quantity": 1,
+      "shape": "straight structural band",
+      "parameterization": {
+        "widthM": 0.035,
+        "lengthM": 0.47
+      },
+      "edges": [
+        "outer",
+        "inner",
+        "top",
+        "bottom"
+      ]
+    },
+    {
+      "id": "collar-right",
+      "quantity": 1,
+      "shape": "mirror of collar-left",
+      "mirrorOf": "collar-left",
+      "edges": [
+        "outer",
+        "inner",
+        "top",
+        "bottom"
+      ]
+    },
+    {
+      "id": "collar-back",
+      "quantity": 1,
+      "shape": "curved back-neck bridge",
+      "parameterization": {
+        "widthM": 0.035,
+        "arcScale": 1.0
+      },
+      "edges": [
+        "outer",
+        "inner",
+        "left",
+        "right"
+      ]
+    }
+  ],
+  "allowance": {
+    "seamM": 0.008,
+    "hemM": 0.018,
+    "frontFacingM": 0.02,
+    "cuffM": 0.015
+  },
+  "validation": [
+    "separate panel identity",
+    "bilateral sleeve symmetry",
+    "parallel front edges",
+    "continuous collar route",
+    "nonzero underarm ease"
+  ]
+}

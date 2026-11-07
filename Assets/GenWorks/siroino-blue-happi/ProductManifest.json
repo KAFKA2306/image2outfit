@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "productName": "Blue Happi for SiroinoSotai_PC",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "target": "SiroinoSotai_PC neutral PC body",
+  "productRoot": "Assets/GenWorks/siroino-blue-happi",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoBlueHappi.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoSotai_BlueHappi.prefab",
+  "previewPath": "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-blue-happi/README.md",
+  "sourceJobPath": "config\\products\\siroino-blue-happi\\job.json",
+  "productBuildScript": "tools/siroino_blue_happi_product.py",
+  "designRevision": "v3-connected-shoulder-sleeve-collar",
+  "sourceReference": "private-reference://sha256/9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423",
+  "modelIdentification": "UNVERIFIED",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-blue-happi",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": ".image2outfit/products/siroino-blue-happi/pipeline-state.json",
+    "lastAttempt": {
+      "result": "BLENDER_MODELED_TECHNICAL_PASS",
+      "visualRevision": "v3-connected-shoulder-sleeve-collar"
+    },
+    "blockers": [
+      "Open current five-view and pose evidence directly.",
+      "Record config/products/siroino-blue-happi/visual-review.json.",
+      "Resume visual-review and finalize-candidate stages."
+    ]
+  },
+  "technicalGates": {
+    "blender": "PASS",
+    "editableSource": "PASS",
+    "fbx": "PASS",
+    "prefabDeclared": "PASS",
+    "clothSimulation": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "tenAxisAudit": "WORKING",
+    "visualAppearanceReview": "PENDING",
+    "researchTrial": "PASS",
+    "unityImport": "OUT_OF_SCOPE",
+    "unitySaveReload": "OUT_OF_SCOPE",
+    "prefabReload": "OUT_OF_SCOPE",
+    "modularAvatar": "OUT_OF_SCOPE",
+    "ndmf": "OUT_OF_SCOPE",
+    "vrchatBuildTest": "OUT_OF_SCOPE",
+    "vrchatRuntime": "OUT_OF_SCOPE",
+    "humanRuntimeReview": "OUT_OF_SCOPE"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-blue-happi/Source/Blender/SiroinoBlueHappi.blend",
+    "fbx": "Assets/GenWorks/siroino-blue-happi/Models/SiroinoBlueHappi.fbx",
+    "prefab": "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoBlueHappi.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-blue-happi/Prefab/SiroinoSotai_BlueHappi.prefab",
+    "multiview": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\siroino-blue-happi-multiview.webp",
+    "poseReview": "Assets\\GenWorks\\siroino-blue-happi\\Previews\\siroino-blue-happi-pose-review.webp",
+    "buildReport": "Assets\\GenWorks\\siroino-blue-happi\\Evidence\\Build\\product-build-report.json",
+    "clothReport": "Assets\\GenWorks\\siroino-blue-happi\\Evidence\\Build\\cloth-simulation.json",
+    "qualityAudit": "Assets\\GenWorks\\siroino-blue-happi\\Evidence\\Build\\quality-audit.json"
+  }
+}

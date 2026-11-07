@@ -1,72 +1,104 @@
-# image2outfit execution contract
+# image2outfit Agent Contract
 
-This repository is a working Unity project and an auditable product pipeline. Automation must produce verifiable assets, not only documentation or status notes.
+## Start
 
-## Product neutrality
+For product work, identify the product slug and requested outcome, then read only the relevant canonical owners below plus the current `ProductManifest.json`. Do not preload unrelated product folders, docs, Issues, PR history, renders, or research notes.
 
-- Never assume a specific avatar, adapter, garment, or product ID.
-- Resolve the target from the user request and the selected schemaVersion 2 job.
-- Tracked jobs belong at `config/products/<product-id>/job.json`.
-- Private or machine-local jobs belong at `Assets/_Local/Jobs/<job-id>/job.json`.
-- Common workflows, tasks, tests, and global configuration must not hard-code a product ID.
+Continue an existing checkpoint/workline when it already owns the same outcome.
 
-## Required flow
+## Canonical owners
 
-1. Resolve the target avatar, outfit specification, source references, product ID, and deliverables.
-2. Verify authoritative licensing and environment requirements.
-3. Keep private sources under ignored roots such as `Assets/_Local/`, `Assets/_Vendor/`, and `Assets/_Reference/`.
-4. Keep current product assets under `Assets/GenWorks/Products/<product-id>/`.
-5. Keep historical snapshots only under `Assets/GenWorks/Legacy/Snapshots/`.
-6. Do not commit credentials, private avatar packages, local review evidence, workflow state, trigger markers, caches, candidates, or releases.
-7. Preserve Unity `.meta` files and GUIDs when moving tracked assets.
-8. Build a technical candidate with `task candidate JOB=<job-path>`.
-9. A successful technical build must stop at `REVIEW_REQUIRED` and must not create a customer release.
-10. Bind visual, pose-penetration, and VRChat runtime evidence to the exact candidate manifest SHA-256.
-11. Promote the unchanged reviewed candidate with `task release JOB=<same-job-path>`.
-12. Report `GO` or `RELEASED` only when the release gate succeeds. Missing evidence, changed hashes, rights uncertainty, invalid import, critical penetration, or failed runtime validation is `NO-GO`.
-13. Garment production and audit reports must include actual multiview, pose review, and runtime screenshots when required.
+- completion/runtime scope: `config/genworks-handoff-policy.json`
+- required visual evidence and customer release: `config/release-policy.json` and `contracts/quality/quality-spec.json`
+- product identity/input/output: `config/products/<slug>/job.json`
+- construction: `config/products/<slug>/construction.json`
+- current state/gates/defects/hashes: `Assets/GenWorks/<slug>/ProductManifest.json`
+- runtime transaction/last-good protection: `tools/runtime_transaction.py`
+- commands: `Taskfile.yml` / `tools/manage.py`
 
-## Job and product boundary
+`README.md` is the user entry point and `ARCHITECTURE.md` describes stable design relationships. Machine-readable owners outrank prose.
 
-`config/job.schema.v2.json` is the only source of required fields.
+## Product commands
 
-```text
-config/products/<product-id>/
-  job.json
-  license.json
-```
-
-The directory name, `job.id`, `job.productRoot`, `job.productManifestPath`, and `job.licenseEvidence` must agree. Product outputs belong in `Assets/GenWorks/Products/<product-id>/`; local avatar sources and human evidence remain outside it.
-
-## GitHub Actions
-
-- CI uses `contents: read` for build and validation workflows.
-- Generated products and evidence are uploaded as Actions artifacts.
-- CI must not commit run status, trigger markers, generated model revisions, or telemetry to `main`.
-- Use `Build product with hosted Blender` for tracked product jobs when hosted Blender is sufficient.
-- Use self-hosted candidate/release workflows when Unity, local avatar sources, or VRChat validation is required.
-
-## Repository hygiene
+Use the existing command that owns the task:
 
 ```powershell
-task audit:repo
-task audit:genworks
-task check:python
+task explain PRODUCT=<slug>
+task candidate PRODUCT=<slug>
+task improve PRODUCT=<slug>
+task release PRODUCT=<slug>
 ```
 
-`tools/audit_repository_hygiene.py` is authoritative for repository-level residue. Fix findings instead of adding one-product exceptions.
+Repository-wide checks are `task audit:all` and `task check:python`. Do not add a second command path when the existing Taskfile/manage path owns the behavior.
 
-One-time migration workflows and their scripts must be deleted in the same change that completes the migration. A tracked one-time workflow that pushes to `main` is a hygiene finding, not a retained tool.
+## Product invariants
+
+- Keep `Assets/GenWorks/<slug>/` as the canonical product workspace.
+- Keep local reports/candidates/releases under `.image2outfit/products/<slug>/...` and out of Git.
+- Do not weaken gates to fit failing data or overwrite last-good state with a worse candidate.
+- Do not commit credentials, private assets, caches, machine state, or unintended Unity `.meta`/GUID changes.
+- While GitHub Pages is enabled, keep the canonical public URL as plain text on the first line of `README.md`.
+- Read public product state from each `ProductManifest.json` or its existing canonical projection; do not maintain a handwritten state catalog.
+
+## dbt responsibility
+
+dbt is a first-class repository responsibility for reproducible transformation, testing, and analytics over manufacturing/product evidence.
+
+- Canonical owners above remain the only authorities. dbt reads their existing projections and never becomes a second source of truth.
+- Model only facts that already exist in canonical product/manufacturing evidence, including product identity, manufacturing runs, gate/verification state, defects, artifacts, hashes, and release observations.
+- A manufacturing run should leave dbt-consumable evidence through the existing canonical files. Do not introduce a parallel hand-written ledger just to feed dbt.
+- dbt tests may reject inconsistent or incomplete derived data, but dbt must never turn an unexecuted mesh, UV, material, rig, render, Unity, or VRChat layer into PASS.
+- Route dbt extraction/build/test commands through the existing `Taskfile.yml` / `tools/manage.py` command authority. Do not create one-off SQL/export command paths.
+
+## Evidence
+
+Generated files, hashes, inventory, CI success, and plausible prose are not visual acceptance evidence. Visual acceptance requires direct inspection of the current evidence required by `contracts/quality/quality-spec.json` and `config/release-policy.json`.
+
+Use a visual feedback loop for appearance-sensitive work: capture the current Blender/Unity view, inspect silhouette, seams, UV/material appearance, intersections, and required poses, make the smallest source change, then recapture and re-run the numeric checks. Use deterministic CLI/`uv` automation for repeatable generation and inspection; use computer use when the decision depends on the rendered UI rather than serialized values alone. When a visual defect is reproducible, encode its check in the existing verifier so later products do not repeat it.
+
+Merge eligibility, product completion, and customer release are separate decisions owned by their canonical policies.
+
+## Astra quality review
+
+- Delegate to Astra only for quality-critical review, especially cloth simulation, pose behavior, visual feedback, and release-blocking evidence.
+- Use the Astra model with `medium` reasoning effort.
+- Keep delegated input limited to the exact product, evidence paths, and acceptance question; do not send unrelated repository history or task context.
+- Require concise output limited to a verdict, up to three critical findings, and required actions, with no implementation unless explicitly requested.
+
+## Continuation
+
+If work stops, persist the current manifest/checkpoint, verified revision, failing stage or visible defect, blocker, and one exact next action in the existing canonical workline. Do not create a second agent-state database.
+
+## Repository hygiene (mandatory)
+
+- Keep exactly one local working branch and one worktree for this repository. Before ending any task that created a branch or worktree, merge or remove it.
+- Leave zero unmanaged state: no uncommitted, untracked, or stashed work at the end of a task. Each change must end as one of: committed (after the secret/private-asset/cache check above), gitignored local output, or archived outside the repository (for example a `git bundle` or patch in the scratchpad), with the choice reported.
+- Never delete a branch, worktree, or file that holds unique work until it is verified merged (`git merge-base --is-ancestor`) or backed up.
+- When a new kind of local-only output appears, add its path to `.gitignore` in the same change.
+- Finish by pushing the single branch and reporting `git status` as clean.
+
+## Outcome-first task interpretation (Altitude / Depth / Range / Speed)
+
+- **Altitude:** Interpret a task as a verifiable user outcome, not only the named intermediate step. Infer the smallest justified acceptance criteria from the request and current repository state; do not silently expand scope or override explicit instructions.
+- **Depth:** Use primary/current evidence and real domain tools and methods. Verify the actual postcondition independently of agent self-report, preferably on the exact changed revision or target runtime.
+- **Range:** Combine code, data, tests, runtime/UI, and domain expertise when that materially improves the outcome, while respecting canonical owners and avoiding duplicate systems.
+- **Speed:** Complete authorized read-only and reversible work through implementation, focused checks, and read-back without unnecessary approval loops. Bound retries and stop at the proven outcome.
+- These principles never bypass repository-specific security, privacy, permission, publication, spending, destructive-action, or release boundaries. State verified results and any remaining `UNVERIFIED` layers.
+
+## Compute-scaling adoption
+
+Keep the thirteen manufacturing stages and existing quality gates authoritative. Evaluate more compute or replaceable local OSS stage tools only when identical product input, model/tool revision, runtime, seed and evidence allow comparison. Measure garment fit, defects, visual acceptance, duration and GPU memory. Integrate eligible solver/tool comparisons with existing Issue #271 and stage audit; do not create a parallel state owner. Keep the lower-cost baseline if no improvement is measured.
 
 ## Agent operating model
 
-- The main agent owns judgment and direct edits. Subagents are used only for independent work that can run in parallel or for heavy research that would otherwise crowd the main context.
-- Every subagent receives the documents to read, the files it may edit, and the verification command. The main agent reads the result and verifies it before accepting it.
-- Completion is judged by command output or artifacts, not by an agent's self-report.
-- Harness or procedure changes are accepted only after comparing the old and new versions on a fixed check set, judged by score and stability (downside and spread across items), not by a single run.
+- The main agent owns judgment and direct edits. Subagents are used only for independent parallel work or heavy research that would otherwise crowd the main context, and each receives its documents, editable files, and verification command.
+- Completion is judged by command output or artifacts, not by an agent's self-report. Harness or procedure changes are accepted only after comparing old and new versions on a fixed check set, judged by score and stability.
 - Agents commit completed and verified changes on a working branch without asking. Caches, `__pycache__`, generated candidates, and local evidence are never committed.
 - Agents merge verified work into `main`, push, upload, and publish as obligations. If a tool-side permission check denies an operation, the agent reports the denial and does not work around it.
-- Agents do not delete user data without confirmation from the user.
-- Automation may skip human review only where this file does not require it. Visual, pose-penetration, and runtime review evidence, and rights confirmation, remain required gates for release.
+- Agents do not delete user data without confirmation. Visual, pose-penetration, runtime review evidence, and rights confirmation remain required release gates.
+
+## One-time migration cleanup
+
+One-time migration workflows and their scripts must be deleted in the same change that completes the migration. A tracked one-time workflow that pushes to `main` is a hygiene finding, not a retained tool.
 
 Do not claim completion for work that was not built, rendered, validated, committed, and pushed.

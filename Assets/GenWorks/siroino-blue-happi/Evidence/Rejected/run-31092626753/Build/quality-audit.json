@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "status": "WORKING",
+  "axes": [
+    {
+      "axis": "topology",
+      "status": "PASS",
+      "evidence": {
+        "meshObjects": 8,
+        "vertices": 635,
+        "triangles": 1020,
+        "materialSlots": 8,
+        "shapeKeys": 0,
+        "maxBoneInfluences": 2,
+        "unweightedVertices": 0,
+        "weightSumErrors": 0,
+        "degenerateTriangles": 0,
+        "boundaryEdges": 238
+      }
+    },
+    {
+      "axis": "seam",
+      "status": "PASS",
+      "evidence": {
+        "bodyPanels": [
+          "Happi_Back_Body",
+          "Happi_Front_Left",
+          "Happi_Front_Right"
+        ],
+        "sleeves": [
+          "Happi_Sleeve_Left",
+          "Happi_Sleeve_Right"
+        ],
+        "collarObjects": [
+          "Happi_Collar_Front_Left",
+          "Happi_Collar_Front_Right",
+          "Happi_Collar_Back"
+        ],
+        "stitchGraph": "config/products/siroino-blue-happi/stitch-graph.json"
+      }
+    },
+    {
+      "axis": "fit",
+      "status": "PASS",
+      "evidence": {
+        "neutralClearanceP01M": 0.06081603094935417,
+        "frontOpeningM": 0.03400000184774399
+      }
+    },
+    {
+      "axis": "material-response",
+      "status": "PASS",
+      "evidence": {
+        "albedo": "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_albedo.png",
+        "normal": "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_normal.png",
+        "roughness": "Assets/GenWorks/siroino-blue-happi/Textures/blue_happi_roughness.png"
+      }
+    },
+    {
+      "axis": "layering",
+      "status": "PASS",
+      "evidence": {
+        "bodyPanels": 3,
+        "sleeves": 2,
+        "structuralCollarObjects": 3
+      }
+    },
+    {
+      "axis": "skinning",
+      "status": "PASS",
+      "evidence": {
+        "objects": 8,
+        "vertices": 635,
+        "rigidObjects": [
+          {
+            "object": "Happi_Sleeve_Left",
+            "bone": "UpperArm_L"
+          },
+          {
+            "object": "Happi_Sleeve_Right",
+            "bone": "UpperArm_R"
+          },
+          {
+            "object": "Happi_Collar_Front_Left",
+            "bone": "Chest"
+          },
+          {
+            "object": "Happi_Collar_Front_Right",
+            "bone": "Chest"
+          },
+          {
+            "object": "Happi_Collar_Back",
+            "bone": "Neck"
+          }
+        ],
+        "fallbackVertices": 0,
+        "maximumInfluences": 2
+      }
+    },
+    {
+      "axis": "collision",
+      "status": "PASS",
+      "evidence": {
+        "cacheBaked": true,
+        "bodyCollisionThicknessM": 0.004,
+        "clearanceRefinement": [
+          {
+            "pass": 1,
+            "target": 0.003,
+            "movedVertices": 0,
+            "maximumMove": 0.0,
+            "clearance": {
+              "vertices": 195,
+              "minimum": 0.06081600859761238,
+              "p01": 0.06081603094935417,
+              "mean": 0.0900124215735839
+            }
+          },
+          {
+            "pass": 2,
+            "target": 0.005,
+            "movedVertices": 0,
+            "maximumMove": 0.0,
+            "clearance": {
+              "vertices": 195,
+              "minimum": 0.06081600859761238,
+              "p01": 0.06081603094935417,
+              "mean": 0.0900124215735839
+            }
+          },
+          {
+            "pass": 3,
+            "target": 0.007,
+            "movedVertices": 0,
+            "maximumMove": 0.0,
+            "clearance": {
+              "vertices": 195,
+              "minimum": 0.06081600859761238,
+              "p01": 0.06081603094935417,
+              "mean": 0.0900124215735839
+            }
+          }
+        ]
+      }
+    },
+    {
+      "axis": "silhouette",
+      "status": "PENDING_DIRECT_REVIEW",
+      "evidence": {
+        "evidence": [
+          "Assets/GenWorks/siroino-blue-happi/Previews/front.png",
+          "Assets/GenWorks/siroino-blue-happi/Previews/back.png",
+          "Assets/GenWorks/siroino-blue-happi/Previews/left.png",
+          "Assets/GenWorks/siroino-blue-happi/Previews/right.png",
+          "Assets/GenWorks/siroino-blue-happi/Previews/three-quarter.png"
+        ]
+      }
+    },
+    {
+      "axis": "styling-fidelity",
+      "status": "PENDING_DIRECT_REVIEW",
+      "evidence": {
+        "reference": "private-reference://sha256/9fc40516ae446274dc869cd695ea217fb741089d26dda43d685bba2d82da0423"
+      }
+    },
+    {
+      "axis": "evidence-completeness",
+      "status": "PASS",
+      "evidence": {
+        "fiveViews": 5,
+        "sixPoses": 6
+      }
+    }
+  ],
+  "technicalAxesPassed": true,
+  "directReviewPending": true
+}

@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/config/schema/domain-sections.schema.v1.json",
+  "title": "image2outfit domain section contracts v1",
+  "$defs": {
+    "AvatarSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "avatar_id",
+        "mesh_sha256",
+        "shape_keys",
+        "measurements",
+        "landmarks",
+        "poses",
+        "arrangement_volumes",
+        "schema_version",
+        "unit",
+        "coordinate_system"
+      ],
+      "properties": {
+        "avatar_id": {"type": "string"},
+        "mesh_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "shape_keys": {"type": "array"},
+        "measurements": {"type": "array"},
+        "landmarks": {"type": "array"},
+        "poses": {"type": "array"},
+        "arrangement_volumes": {"type": "array"},
+        "schema_version": {"const": 1},
+        "unit": {"const": "millimetre"},
+        "coordinate_system": {"const": "right-handed-z-up"}
+      }
+    },
+    "ConstructionSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "garment",
+        "components",
+        "pleats",
+        "gathers",
+        "intentional_open_edge_ids",
+        "schema_version"
+      ],
+      "properties": {
+        "garment": {"type": "object"},
+        "components": {"type": "array"},
+        "pleats": {"type": "array"},
+        "gathers": {"type": "array"},
+        "intentional_open_edge_ids": {"type": "array"},
+        "schema_version": {"const": 1}
+      }
+    },
+    "FitSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ease_targets",
+        "reports",
+        "maximum_strain",
+        "maximum_pressure_kpa",
+        "maximum_penetration_mm",
+        "maximum_silhouette_error_mm",
+        "schema_version"
+      ],
+      "properties": {
+        "ease_targets": {"type": "array"},
+        "reports": {"type": "array"},
+        "maximum_strain": {"type": "number", "minimum": 0},
+        "maximum_pressure_kpa": {"type": "number", "minimum": 0},
+        "maximum_penetration_mm": {"type": "number", "minimum": 0},
+        "maximum_silhouette_error_mm": {"type": "number", "minimum": 0},
+        "schema_version": {"const": 1}
+      }
+    },
+    "MaterialSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "material_id",
+        "composition",
+        "weave",
+        "calibration_status",
+        "calibration_method",
+        "source_url",
+        "source_license",
+        "properties",
+        "solver_mappings",
+        "real_drape_coefficient",
+        "simulated_drape_coefficient",
+        "schema_version"
+      ],
+      "properties": {
+        "material_id": {"type": "string"},
+        "composition": {"type": "string"},
+        "weave": {"type": "string"},
+        "calibration_status": {"type": "string"},
+        "calibration_method": {"type": "string"},
+        "source_url": {"type": "string"},
+        "source_license": {"type": "string"},
+        "properties": {"type": "object"},
+        "solver_mappings": {"type": "array"},
+        "real_drape_coefficient": {"type": ["number", "null"]},
+        "simulated_drape_coefficient": {"type": ["number", "null"]},
+        "schema_version": {"const": 1}
+      }
+    },
+    "StylingSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operations", "schema_version"],
+      "properties": {
+        "operations": {"type": "array"},
+        "schema_version": {"const": 1}
+      }
+    }
+  }
+}

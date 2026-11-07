@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-bellflower-lantern-trouser-set",
+  "designRevision": "v1-sewn-bellflower-panels-and-yoke",
+  "parts": [
+    "blouse_front_left", "blouse_front_right", "blouse_back_left", "blouse_back_right",
+    "yoke_front_left", "yoke_front_right", "yoke_back_left", "yoke_back_right",
+    "sleeve_left", "sleeve_right", "cuff_left", "cuff_right", "standing_collar",
+    "waistband_front", "waistband_back", "trouser_front_left", "trouser_front_right",
+    "trouser_back_left", "trouser_back_right", "ankle_facing_left", "ankle_facing_right",
+    "outer_leg_panel_01_L", "outer_leg_panel_02_L", "outer_leg_panel_03_L", "outer_leg_panel_04_L",
+    "outer_leg_panel_01_R", "outer_leg_panel_02_R", "outer_leg_panel_03_R", "outer_leg_panel_04_R",
+    "piping_outer_L", "piping_outer_R", "organza_underlay_L", "organza_underlay_R",
+    "magnetic_tab_L_01", "magnetic_tab_L_02", "magnetic_tab_R_01", "magnetic_tab_R_02"
+  ],
+  "heroDetail": {
+    "name": "nested-bellflower-outer-leg-panels",
+    "assemblies": ["outer_leg_panel_01_L", "outer_leg_panel_02_L", "outer_leg_panel_03_L", "outer_leg_panel_04_L", "outer_leg_panel_01_R", "outer_leg_panel_02_R", "outer_leg_panel_03_R", "outer_leg_panel_04_R"],
+    "requirements": [
+      "four sewn nested curved panels per outfit, two on each outer leg",
+      "panel order remains outer, middle, inner, inner in every view",
+      "each panel has an explicit outer seam, inner seam, top notch, bottom notch and material region",
+      "magnetic tabs are bounded closures, not floating ornament",
+      "smoke organza is visible only in the narrow vent below the panel overlap"
+    ]
+  },
+  "materials": {
+    "main": "matte-midnight-navy-twill",
+    "blouse": "warm-ivory-matte-cotton",
+    "facing": "muted-celadon-soft-satin",
+    "stitch": "warm-ivory-topstitch",
+    "closure": "muted-coral-enamel",
+    "underlay": "smoke-organza-bounded-transparent"
+  },
+  "seamGraph": {
+    "seamPairCount": 28,
+    "unmatchedEdges": 0,
+    "ambiguousEdges": 0,
+    "reversedEdges": 0,
+    "edgeLengthCompatibilityPassed": true,
+    "orientationPassed": true,
+    "assemblyPassed": true
+  },
+  "uvPolicy": {"set": "UV0", "range": "0..1", "heroIslandsUnique": true, "mirrorHero": false}
+}

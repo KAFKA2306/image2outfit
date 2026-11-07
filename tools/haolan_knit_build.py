@@ -88,7 +88,19 @@ def create_mesh(name, vertices, faces, armature, weight_function, mat):
     return obj
 
 
-def ring_mesh(name, z_values, rx_values, ry_values, center_x, center_y, segments, rib, armature, weight_function, mat):
+def ring_mesh(
+    name,
+    z_values,
+    rx_values,
+    ry_values,
+    center_x,
+    center_y,
+    segments,
+    rib,
+    armature,
+    weight_function,
+    mat,
+):
     vertices = []
     faces = []
     for ring_index, z in enumerate(z_values):
@@ -125,9 +137,22 @@ def ring_mesh(name, z_values, rx_values, ry_values, center_x, center_y, segments
     return create_mesh(name, vertices, faces, armature, weight_function, mat)
 
 
-def tube_between(name, start, end, radius_start, radius_end, segments, rings, armature, weight_function, mat):
+def tube_between(
+    name,
+    start,
+    end,
+    radius_start,
+    radius_end,
+    segments,
+    rings,
+    armature,
+    weight_function,
+    mat,
+):
     axis = (end - start).normalized()
-    reference = Vector((0.0, 0.0, 1.0)) if abs(axis.z) < 0.9 else Vector((0.0, 1.0, 0.0))
+    reference = (
+        Vector((0.0, 0.0, 1.0)) if abs(axis.z) < 0.9 else Vector((0.0, 1.0, 0.0))
+    )
     side = axis.cross(reference).normalized()
     up = axis.cross(side).normalized()
     vertices = []
@@ -138,7 +163,9 @@ def tube_between(name, start, end, radius_start, radius_end, segments, rings, ar
         radius = radius_start * (1.0 - t) + radius_end * t
         for segment in range(segments):
             angle = 2.0 * math.pi * segment / segments
-            vertices.append(center + side * math.cos(angle) * radius + up * math.sin(angle) * radius)
+            vertices.append(
+                center + side * math.cos(angle) * radius + up * math.sin(angle) * radius
+            )
     for ring_index in range(rings):
         for segment in range(segments):
             next_segment = (segment + 1) % segments
@@ -152,7 +179,9 @@ def tube_between(name, start, end, radius_start, radius_end, segments, rings, ar
 
 def torus(name, center, axis, major, minor, armature, weight_function, mat):
     axis = axis.normalized()
-    reference = Vector((0.0, 0.0, 1.0)) if abs(axis.z) < 0.9 else Vector((0.0, 1.0, 0.0))
+    reference = (
+        Vector((0.0, 0.0, 1.0)) if abs(axis.z) < 0.9 else Vector((0.0, 1.0, 0.0))
+    )
     side = axis.cross(reference).normalized()
     up = axis.cross(side).normalized()
     vertices = []
@@ -161,11 +190,19 @@ def torus(name, center, axis, major, minor, armature, weight_function, mat):
     minor_segments = 8
     for major_index in range(major_segments):
         major_angle = 2.0 * math.pi * major_index / major_segments
-        ring_center = center + side * math.cos(major_angle) * major + up * math.sin(major_angle) * major
+        ring_center = (
+            center
+            + side * math.cos(major_angle) * major
+            + up * math.sin(major_angle) * major
+        )
         normal = (ring_center - center).normalized()
         for minor_index in range(minor_segments):
             minor_angle = 2.0 * math.pi * minor_index / minor_segments
-            vertices.append(ring_center + normal * math.cos(minor_angle) * minor + axis * math.sin(minor_angle) * minor)
+            vertices.append(
+                ring_center
+                + normal * math.cos(minor_angle) * minor
+                + axis * math.sin(minor_angle) * minor
+            )
     for major_index in range(major_segments):
         next_major = (major_index + 1) % major_segments
         for minor_index in range(minor_segments):

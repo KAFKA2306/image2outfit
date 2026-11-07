@@ -1,0 +1,1303 @@
+#!/usr/bin/env python3
+"""Deterministic local orchestration for the generated avatar upload set."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import shutil
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Iterable
+
+from contract_io import digest, read_json, repo_path, write_json
+
+try:
+    from PIL import Image, ImageChops, ImageStat
+except ImportError:  # pragma: no cover - the locked project set includes Pillow.
+    Image = None
+    ImageChops = None
+    ImageStat = None
+
+
+ROOT = Path(__file__).resolve().parents[1]
+CONFIG_RELATIVE = Path("config/avatar-workflow.v1.json")
+GUID_PATTERN = re.compile(r"\bguid:\s*([0-9a-f]{32})\b", re.IGNORECASE)
+CAU_DESCRIPTOR_ASSET_PATTERN = re.compile(
+    r"^\s*asset:\s*\{fileID:\s*(\d+),\s*guid:\s*([0-9a-f]{32}),\s*type:\s*3\}\s*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+PREFAB_COMPONENT_PATTERN = re.compile(r"^--- !u!114 &(\d+)\s*$")
+VRC_AVATAR_DESCRIPTOR_SCRIPT_GUID = "67cc4cb7839cd3741b63733d5adf0442"
+
+
+class AvatarWorkflowError(ValueError):
+    """Raised when the workflow contract cannot be safely resolved."""
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _git_revision(root: Path) -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def _read_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8-sig")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise AvatarWorkflowError(f"cannot read {path}: {exc}") from exc
+
+
+def _asset(root: Path, value: str) -> Path:
+    if not isinstance(value, str) or not value:
+        raise AvatarWorkflowError("asset path must be a non-empty string")
+    return repo_path(root, value)
+
+
+def _load_config(root: Path = ROOT) -> dict[str, Any]:
+    path = repo_path(root, str(CONFIG_RELATIVE))
+    try:
+        config = read_json(path)
+    except (OSError, ValueError) as exc:
+        raise AvatarWorkflowError(f"workflow config is unreadable: {exc}") from exc
+    _validate_config(root, config)
+    return config
+
+
+def _validate_config(root: Path, config: dict[str, Any]) -> None:
+    if config.get("schemaVersion") != 1:
+        raise AvatarWorkflowError("avatar workflow config must use schemaVersion 1")
+    paths = config.get("paths")
+    if not isinstance(paths, dict):
+        raise AvatarWorkflowError("avatar workflow config.paths must be an object")
+    for key in ("bakeRoot", "cauRoot", "runtimeRoot", "ledger", "visualBaselineRoot"):
+        value = paths.get(key)
+        if not isinstance(value, str) or not value:
+            raise AvatarWorkflowError(f"avatar workflow config.paths.{key} is required")
+        _asset(root, value)
+    scenes = config.get("scenes")
+    if scenes is not None:
+        if not isinstance(scenes, dict):
+            raise AvatarWorkflowError("avatar workflow config.scenes must be an object")
+        workbench = scenes.get("workbench")
+        if not isinstance(workbench, str) or not workbench:
+            raise AvatarWorkflowError(
+                "avatar workflow config.scenes.workbench is required"
+            )
+        _asset(root, workbench)
+    visual = config.get("visual")
+    required_visuals = visual.get("requiredPaths") if isinstance(visual, dict) else None
+    if (
+        not isinstance(required_visuals, list)
+        or not required_visuals
+        or not all(isinstance(item, str) and item for item in required_visuals)
+    ):
+        raise AvatarWorkflowError(
+            "avatar workflow visual.requiredPaths must be a non-empty list"
+        )
+    if not isinstance(visual.get("warningMeanAbsoluteError"), (int, float)):
+        raise AvatarWorkflowError(
+            "avatar workflow visual.warningMeanAbsoluteError is required"
+        )
+    outfits = config.get("outfits")
+    if not isinstance(outfits, list) or not outfits:
+        raise AvatarWorkflowError("avatar workflow outfits must be a non-empty list")
+    seen: set[str] = set()
+    for index, outfit in enumerate(outfits):
+        if not isinstance(outfit, dict):
+            raise AvatarWorkflowError(f"outfits[{index}] must be an object")
+        for key in ("id", "name", "productId", "prefab", "cauSetting", "visualRoot"):
+            if not isinstance(outfit.get(key), str) or not outfit[key]:
+                raise AvatarWorkflowError(f"outfits[{index}].{key} is required")
+        outfit_id = outfit["id"]
+        if outfit_id in seen:
+            raise AvatarWorkflowError(f"duplicate outfit id: {outfit_id}")
+        seen.add(outfit_id)
+        for key in ("prefab", "cauSetting", "visualRoot"):
+            _asset(root, outfit[key])
+        for key in ("clothEvidence", "scene"):
+            if key in outfit:
+                if not isinstance(outfit[key], str) or not outfit[key]:
+                    raise AvatarWorkflowError(
+                        f"outfits[{index}].{key} must be a non-empty string"
+                    )
+                _asset(root, outfit[key])
+    scene_capture = config.get("sceneCapture")
+    if scene_capture is not None:
+        if not isinstance(scene_capture, dict):
+            raise AvatarWorkflowError("avatar workflow sceneCapture must be an object")
+        if (
+            not isinstance(scene_capture.get("cameraPath"), str)
+            or not scene_capture["cameraPath"]
+        ):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.cameraPath is required"
+            )
+        if scene_capture.get("view") != "camera":
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.view must be camera"
+            )
+        for key in ("localPosition", "localRotationQuaternion"):
+            value = scene_capture.get(key)
+            axes = (
+                ("x", "y", "z", "w")
+                if key == "localRotationQuaternion"
+                else (
+                    "x",
+                    "y",
+                    "z",
+                )
+            )
+            if not isinstance(value, dict) or not all(
+                isinstance(value.get(axis), (int, float)) for axis in axes
+            ):
+                raise AvatarWorkflowError(
+                    f"avatar workflow sceneCapture.{key} must contain numeric axes"
+                )
+        if not isinstance(scene_capture.get("orthographic"), bool):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.orthographic is required"
+            )
+        if not isinstance(scene_capture.get("orthographicSize"), (int, float)):
+            raise AvatarWorkflowError(
+                "avatar workflow sceneCapture.orthographicSize is required"
+            )
+
+
+def _selected_outfits(
+    config: dict[str, Any], outfit_ids: Iterable[str] | None
+) -> list[dict[str, Any]]:
+    outfits = [item for item in config["outfits"] if isinstance(item, dict)]
+    requested = {item for item in (outfit_ids or []) if item}
+    if not requested:
+        return outfits
+    known = {item["id"] for item in outfits}
+    unknown = sorted(requested - known)
+    if unknown:
+        raise AvatarWorkflowError(f"unknown outfit id(s): {', '.join(unknown)}")
+    return [item for item in outfits if item["id"] in requested]
+
+
+def _meta_guid(path: Path) -> str | None:
+    meta = path.with_name(path.name + ".meta")
+    if not meta.is_file():
+        return None
+    match = re.search(
+        r"^guid:\s*([0-9a-f]{32})\s*$", _read_text(meta), re.MULTILINE | re.IGNORECASE
+    )
+    return match.group(1).lower() if match else None
+
+
+def _referenced_guids(path: Path) -> list[str]:
+    return [value.lower() for value in GUID_PATTERN.findall(_read_text(path))]
+
+
+def _prefab_avatar_descriptor_file_id(path: Path) -> int | None:
+    component_file_id: int | None = None
+    for line in _read_text(path).splitlines():
+        component_match = PREFAB_COMPONENT_PATTERN.match(line)
+        if component_match:
+            component_file_id = int(component_match.group(1))
+            continue
+        if component_file_id is None or "m_Script:" not in line:
+            continue
+        script_guid = re.search(r"guid:\s*([0-9a-f]{32})\b", line, re.IGNORECASE)
+        if (
+            script_guid
+            and script_guid.group(1).lower() == VRC_AVATAR_DESCRIPTOR_SCRIPT_GUID
+        ):
+            return component_file_id
+    return None
+
+
+def _package_report(
+    root: Path, config: dict[str, Any]
+) -> tuple[dict[str, Any], list[str]]:
+    errors: list[str] = []
+    project = config.get("project", {})
+    expected_unity = project.get("unityVersion") if isinstance(project, dict) else None
+    project_version_path = root / "ProjectSettings" / "ProjectVersion.txt"
+    project_version = ""
+    if project_version_path.is_file():
+        for line in _read_text(project_version_path).splitlines():
+            if line.startswith("m_EditorVersion:"):
+                project_version = line.split(":", 1)[1].strip()
+                break
+    if expected_unity and project_version != expected_unity:
+        errors.append(
+            f"Unity version mismatch: expected {expected_unity}, found {project_version or 'missing'}"
+        )
+
+    vpm = (
+        read_json(root / "Packages" / "vpm-manifest.json")
+        if (root / "Packages" / "vpm-manifest.json").is_file()
+        else {}
+    )
+    upm = (
+        read_json(root / "Packages" / "packages-lock.json")
+        if (root / "Packages" / "packages-lock.json").is_file()
+        else {}
+    )
+    dependencies = vpm.get("dependencies", {})
+    locked = vpm.get("locked", {})
+    upm_dependencies = upm.get("dependencies", {})
+    package_results: dict[str, Any] = {}
+    expected_packages = project.get("packages", {}) if isinstance(project, dict) else {}
+    for package_id, expected in expected_packages.items():
+        dependency_version = dependencies.get(package_id, {}).get("version")
+        locked_version = locked.get(package_id, {}).get("version")
+        upm_entry = upm_dependencies.get(package_id, {})
+        package_dir = root / "Packages" / package_id
+        passed = dependency_version == expected and locked_version == expected
+        if not passed:
+            errors.append(
+                f"package mismatch: {package_id} expected {expected}, "
+                f"dependency={dependency_version}, locked={locked_version}"
+            )
+        package_results[package_id] = {
+            "expected": expected,
+            "dependency": dependency_version,
+            "locked": locked_version,
+            "upmSource": upm_entry.get("source"),
+            "pathExists": package_dir.is_dir(),
+            "passed": passed,
+        }
+    return {
+        "unity": {"expected": expected_unity, "project": project_version},
+        "packages": package_results,
+        "unityPackageLockPresent": bool(upm),
+    }, errors
+
+
+def _outfit_preflight(
+    root: Path, config: dict[str, Any], outfit: dict[str, Any]
+) -> dict[str, Any]:
+    errors: list[str] = []
+    warnings: list[str] = []
+    prefab = _asset(root, outfit["prefab"])
+    setting = _asset(root, outfit["cauSetting"])
+    visual_root = _asset(root, outfit["visualRoot"])
+    for label, path in (
+        ("prefab", prefab),
+        ("cauSetting", setting),
+        ("visualRoot", visual_root),
+    ):
+        if not path.exists():
+            errors.append(f"{label} missing: {path.relative_to(root).as_posix()}")
+        elif path.is_file() and not path.with_name(path.name + ".meta").is_file():
+            errors.append(
+                f"{label} meta missing: {path.relative_to(root).as_posix()}.meta"
+            )
+
+    cloth_evidence = outfit.get("clothEvidence")
+    cloth_report = None
+    if cloth_evidence:
+        cloth_path = _asset(root, cloth_evidence)
+        if not cloth_path.is_file():
+            errors.append(f"cloth evidence missing: {cloth_evidence}")
+        else:
+            try:
+                cloth_report = read_json(cloth_path)
+            except (OSError, ValueError):
+                errors.append(f"cloth evidence is not valid JSON: {cloth_evidence}")
+            if (
+                cloth_path.is_file()
+                and not cloth_path.with_name(cloth_path.name + ".meta").is_file()
+            ):
+                errors.append(f"cloth evidence meta missing: {cloth_evidence}.meta")
+            if isinstance(cloth_report, dict):
+                if cloth_report.get("status") != "PASS":
+                    errors.append(f"cloth simulation did not pass: {outfit['id']}")
+                if cloth_report.get("engine") != "Blender Cloth":
+                    errors.append(f"cloth evidence engine mismatch: {outfit['id']}")
+                if cloth_report.get("cacheBaked") is not True:
+                    errors.append(f"cloth cache was not baked: {outfit['id']}")
+                contracts = cloth_report.get("contracts")
+                if not isinstance(contracts, list) or not contracts:
+                    errors.append(
+                        f"cloth evidence has no component contracts: {outfit['id']}"
+                    )
+                for contract in contracts or []:
+                    if contract.get("cacheBakedActual") is False:
+                        errors.append(
+                            f"cloth cache verification failed: {outfit['id']}"
+                        )
+                    if contract.get("geometryChanged") is False:
+                        errors.append(f"cloth geometry did not change: {outfit['id']}")
+
+    scene_path = outfit.get("scene")
+    if scene_path:
+        scene = _asset(root, scene_path)
+        if not scene.is_file():
+            errors.append(f"outfit scene missing: {scene_path}")
+        elif not scene.with_name(scene.name + ".meta").is_file():
+            errors.append(f"outfit scene meta missing: {scene_path}.meta")
+
+    setting_text = _read_text(setting) if setting.is_file() else ""
+    prefab_guid = _meta_guid(prefab) if prefab.is_file() else None
+    setting_guids = _referenced_guids(setting) if setting.is_file() else []
+    if prefab_guid is None:
+        errors.append(f"prefab GUID missing: {outfit['prefab']}")
+    elif prefab_guid not in setting_guids:
+        errors.append(f"CAU setting does not reference prefab: {outfit['id']}")
+    descriptor_reference = CAU_DESCRIPTOR_ASSET_PATTERN.search(setting_text)
+    descriptor_file_id = (
+        _prefab_avatar_descriptor_file_id(prefab) if prefab.is_file() else None
+    )
+    if descriptor_reference is None:
+        errors.append(f"CAU descriptor asset reference missing: {outfit['id']}")
+    elif descriptor_file_id is None:
+        errors.append(
+            f"VRCAvatarDescriptor component missing in prefab: {outfit['id']}"
+        )
+    elif int(descriptor_reference.group(1)) != descriptor_file_id:
+        errors.append(
+            "CAU descriptor fileID does not match prefab VRCAvatarDescriptor: "
+            f"{outfit['id']}"
+        )
+
+    scene_capture = _scene_capture_contract(root, config, outfit, prefab_guid)
+    errors.extend(scene_capture["errors"])
+
+    if "windows:\n    enabled: 1" not in setting_text:
+        errors.append(f"Windows upload is not enabled in CAU setting: {outfit['id']}")
+    for platform in ("ios", "quest"):
+        if f"{platform}:\n    enabled: 1" in setting_text:
+            warnings.append(
+                f"{platform} upload is enabled in CAU setting: {outfit['id']}"
+            )
+
+    prefab_text = _read_text(prefab) if prefab.is_file() else ""
+    serialized_script_count = prefab_text.count("m_Script:")
+    descriptor_evidence = "m_Avatar:" in prefab_text and "m_Name:" in prefab_text
+    if not descriptor_evidence:
+        errors.append(f"avatar descriptor evidence missing in prefab: {outfit['id']}")
+    if serialized_script_count < 2:
+        warnings.append(
+            f"prefab has unusually few serialized script references: {outfit['id']}"
+        )
+
+    required_visuals = config["visual"]["requiredPaths"]
+    missing_visuals = []
+    if visual_root.is_dir():
+        for relative_path in required_visuals:
+            if not (visual_root / relative_path).is_file():
+                missing_visuals.append(
+                    (visual_root / relative_path).relative_to(root).as_posix()
+                )
+    if missing_visuals:
+        errors.append(
+            f"required visual evidence missing for {outfit['id']}: {', '.join(missing_visuals)}"
+        )
+
+    product_manifest = (
+        root / "Assets" / "GenWorks" / outfit["productId"] / "ProductManifest.json"
+    )
+    product_state = None
+    if product_manifest.is_file():
+        try:
+            product_state = read_json(product_manifest).get("state")
+        except (OSError, ValueError):
+            warnings.append(
+                f"product manifest could not be read: {outfit['productId']}"
+            )
+    else:
+        warnings.append(f"product manifest missing: {outfit['productId']}")
+    if product_state not in (None, "COMPLETE"):
+        warnings.append(f"product lifecycle is {product_state} for {outfit['id']}")
+
+    return {
+        "id": outfit["id"],
+        "name": outfit["name"],
+        "productId": outfit["productId"],
+        "prefab": outfit["prefab"],
+        "cauSetting": outfit["cauSetting"],
+        "visualRoot": outfit["visualRoot"],
+        "clothEvidence": cloth_evidence,
+        "scene": scene_path,
+        "sceneCapture": scene_capture,
+        "clothSimulation": {
+            "status": cloth_report.get("status")
+            if isinstance(cloth_report, dict)
+            else None,
+            "cacheBaked": cloth_report.get("cacheBaked")
+            if isinstance(cloth_report, dict)
+            else None,
+            "contractCount": len(cloth_report.get("contracts", []))
+            if isinstance(cloth_report, dict)
+            else 0,
+        },
+        "prefabGuid": prefab_guid,
+        "serializedScriptReferences": serialized_script_count,
+        "descriptorEvidence": descriptor_evidence,
+        "productState": product_state,
+        "passed": not errors,
+        "errors": errors,
+        "warnings": warnings,
+    }
+
+
+def _scene_capture_contract(
+    root: Path,
+    config: dict[str, Any],
+    outfit: dict[str, Any],
+    prefab_guid: str | None,
+) -> dict[str, Any]:
+    """Verify that each outfit scene can be captured from its matching prefab camera."""
+    scene_path = outfit.get("scene")
+    spec = config.get("sceneCapture")
+    if not scene_path or not isinstance(spec, dict):
+        return {"passed": True, "cameraPath": None, "errors": []}
+    scene = _asset(root, scene_path)
+    if not scene.is_file():
+        return {
+            "passed": False,
+            "cameraPath": spec.get("cameraPath"),
+            "errors": [f"outfit scene missing: {scene_path}"],
+        }
+    text = _read_text(scene)
+    errors: list[str] = []
+    blocks = re.split(r"(?=^--- !u!)", text, flags=re.MULTILINE)
+    camera_game_object_id = None
+    for block in blocks:
+        if re.search(r"^  m_Name: PreviewCamera\s*$", block, re.MULTILINE):
+            match = re.match(r"^--- !u!1 &(\d+)", block)
+            if match:
+                camera_game_object_id = match.group(1)
+                break
+    if camera_game_object_id is None:
+        errors.append(f"PreviewCamera GameObject missing: {scene_path}")
+    transform = next(
+        (
+            block
+            for block in blocks
+            if block.startswith("--- !u!4 ")
+            and f"m_GameObject: {{fileID: {camera_game_object_id}}}" in block
+        ),
+        "",
+    )
+    camera = next(
+        (
+            block
+            for block in blocks
+            if block.startswith("--- !u!20 ")
+            and f"m_GameObject: {{fileID: {camera_game_object_id}}}" in block
+        ),
+        "",
+    )
+    if not transform:
+        errors.append(f"PreviewCamera Transform missing: {scene_path}")
+    if not camera:
+        errors.append(f"PreviewCamera component missing: {scene_path}")
+
+    def vector_from(
+        block: str, field: str, axes: tuple[str, ...]
+    ) -> dict[str, float] | None:
+        match = re.search(
+            rf"^  {re.escape(field)}: \{{([^}}]+)\}}$",
+            block,
+            re.MULTILINE,
+        )
+        if not match:
+            return None
+        values: dict[str, float] = {}
+        for axis in axes:
+            axis_match = re.search(rf"(?:^|, ){axis}: ([^,}}]+)", match.group(1))
+            if not axis_match:
+                return None
+            try:
+                values[axis] = float(axis_match.group(1))
+            except ValueError:
+                return None
+        return values
+
+    def matches(actual: dict[str, float] | None, expected: dict[str, Any]) -> bool:
+        return actual is not None and all(
+            abs(actual[axis] - float(expected[axis])) <= 1e-4 for axis in expected
+        )
+
+    actual_position = vector_from(transform, "m_LocalPosition", ("x", "y", "z"))
+    expected_position = spec["localPosition"]
+    if not matches(actual_position, expected_position):
+        errors.append(
+            f"PreviewCamera position mismatch for {outfit['id']}: "
+            f"expected {expected_position}, found {actual_position}"
+        )
+    actual_rotation = vector_from(transform, "m_LocalRotation", ("x", "y", "z", "w"))
+    expected_rotation = spec["localRotationQuaternion"]
+    if not matches(actual_rotation, expected_rotation):
+        errors.append(
+            f"PreviewCamera rotation mismatch for {outfit['id']}: "
+            f"expected {expected_rotation}, found {actual_rotation}"
+        )
+    orthographic = re.search(r"^  orthographic: (0|1)$", camera, re.MULTILINE)
+    if not orthographic or bool(int(orthographic.group(1))) != spec["orthographic"]:
+        errors.append(f"PreviewCamera orthographic mode mismatch: {scene_path}")
+    size = re.search(r"^  orthographic size: ([^\s]+)$", camera, re.MULTILINE)
+    if not size or abs(float(size.group(1)) - float(spec["orthographicSize"])) > 1e-4:
+        errors.append(f"PreviewCamera orthographic size mismatch: {scene_path}")
+
+    source_prefab = re.search(
+        r"m_SourcePrefab: \{fileID: 100100000, guid: ([0-9a-f]{32}), type: 3\}",
+        text,
+        re.IGNORECASE,
+    )
+    if not source_prefab:
+        errors.append(f"scene prefab source missing: {scene_path}")
+    elif prefab_guid and source_prefab.group(1).lower() != prefab_guid.lower():
+        errors.append(
+            f"scene prefab mismatch for {outfit['id']}: "
+            f"scene={source_prefab.group(1).lower()} config={prefab_guid.lower()}"
+        )
+    return {
+        "passed": not errors,
+        "cameraPath": spec["cameraPath"],
+        "view": spec["view"],
+        "localPosition": actual_position,
+        "localRotationQuaternion": actual_rotation,
+        "orthographic": bool(int(orthographic.group(1))) if orthographic else None,
+        "orthographicSize": float(size.group(1)) if size else None,
+        "sourcePrefabGuid": source_prefab.group(1).lower() if source_prefab else None,
+        "errors": errors,
+    }
+
+
+def preflight(
+    root: Path = ROOT,
+    *,
+    config: dict[str, Any] | None = None,
+    outfit_ids: Iterable[str] | None = None,
+) -> dict[str, Any]:
+    root = root.resolve()
+    config = config or _load_config(root)
+    _validate_config(root, config)
+    package_snapshot, errors = _package_report(root, config)
+    scene_layout = config.get("scenes")
+    if isinstance(scene_layout, dict):
+        workbench = _asset(root, scene_layout["workbench"])
+        if not workbench.is_file():
+            errors.append(f"workbench scene missing: {scene_layout['workbench']}")
+        elif not workbench.with_name(workbench.name + ".meta").is_file():
+            errors.append(
+                f"workbench scene meta missing: {scene_layout['workbench']}.meta"
+            )
+    cau_group = _asset(root, config["paths"]["cauRoot"]) / "siroino-all-outfits.asset"
+    group_guids = _referenced_guids(cau_group) if cau_group.is_file() else []
+    selected = _selected_outfits(config, outfit_ids)
+    outfits = [_outfit_preflight(root, config, item) for item in selected]
+    if not cau_group.is_file():
+        errors.append(
+            "CAU group asset missing: Assets/UnityMCP_CAU/siroino-all-outfits.asset"
+        )
+    setting_guids = {_meta_guid(_asset(root, item["cauSetting"])) for item in selected}
+    setting_guids.discard(None)
+    if len(setting_guids) != len(selected):
+        errors.append("one or more selected CAU setting meta GUIDs are missing")
+    if not setting_guids.issubset(set(group_guids)):
+        errors.append("selected CAU settings are not all present in the CAU group")
+    for item in outfits:
+        errors.extend(item["errors"])
+    warnings = [warning for item in outfits for warning in item["warnings"]]
+    return {
+        "schemaVersion": 1,
+        "tool": "avatar-preflight",
+        "checkedAt": _now(),
+        "gitRevision": _git_revision(root),
+        "configPath": CONFIG_RELATIVE.as_posix(),
+        "selectedOutfitCount": len(selected),
+        "selectedOutfitIds": [item["id"] for item in selected],
+        "packages": package_snapshot,
+        "cauGroup": {
+            "path": (
+                cau_group.relative_to(root).as_posix()
+                if cau_group.is_file()
+                else "Assets/UnityMCP_CAU/siroino-all-outfits.asset"
+            ),
+            "exists": cau_group.is_file(),
+            "referencedGuidCount": len(group_guids),
+        },
+        "outfits": outfits,
+        "externalBoundary": {
+            "unityEditor": "NOT_RUN",
+            "vrchatLogin": "NOT_RUN",
+            "realUpload": "NOT_RUN",
+        },
+        "passed": not errors,
+        "errors": list(dict.fromkeys(errors)),
+        "warnings": list(dict.fromkeys(warnings)),
+    }
+
+
+def _image_metrics(current: Path, baseline: Path) -> dict[str, Any]:
+    if Image is None or ImageChops is None or ImageStat is None:
+        raise AvatarWorkflowError("Pillow is required for visual regression")
+    with Image.open(current) as current_image, Image.open(baseline) as baseline_image:
+        current_rgba = current_image.convert("RGBA")
+        baseline_rgba = baseline_image.convert("RGBA")
+    if current_rgba.size != baseline_rgba.size:
+        return {
+            "passed": False,
+            "status": "ERROR",
+            "error": f"image dimensions differ: current={current_rgba.size}, baseline={baseline_rgba.size}",
+        }
+    difference = ImageChops.difference(current_rgba, baseline_rgba)
+    mean_absolute_error = sum(ImageStat.Stat(difference).mean) / 4.0 / 255.0
+    gray = difference.convert("L")
+    histogram = gray.histogram()
+    pixels = current_rgba.width * current_rgba.height
+    changed_pixels = sum(histogram[9:])
+    return {
+        "passed": True,
+        "status": "PASS",
+        "width": current_rgba.width,
+        "height": current_rgba.height,
+        "meanAbsoluteError": round(mean_absolute_error, 8),
+        "changedPixelRatio": round(changed_pixels / pixels, 8) if pixels else 0.0,
+    }
+
+
+def _image_metrics_resized(current: Path, baseline: Path) -> dict[str, Any]:
+    if Image is None or ImageChops is None or ImageStat is None:
+        raise AvatarWorkflowError("Pillow is required for visual before/after evidence")
+    with Image.open(current) as current_image, Image.open(baseline) as baseline_image:
+        source_size = current_image.size
+        baseline_rgba = baseline_image.convert("RGBA")
+        current_rgba = current_image.convert("RGBA").resize(
+            baseline_rgba.size, Image.Resampling.LANCZOS
+        )
+    difference = ImageChops.difference(current_rgba, baseline_rgba)
+    mean_absolute_error = sum(ImageStat.Stat(difference).mean) / 4.0 / 255.0
+    histogram = difference.convert("L").histogram()
+    pixels = baseline_rgba.width * baseline_rgba.height
+    changed_pixels = sum(histogram[9:])
+    return {
+        "passed": True,
+        "status": "PASS",
+        "width": baseline_rgba.width,
+        "height": baseline_rgba.height,
+        "sourceWidth": source_size[0],
+        "sourceHeight": source_size[1],
+        "resizedForComparison": True,
+        "meanAbsoluteError": round(mean_absolute_error, 8),
+        "changedPixelRatio": round(changed_pixels / pixels, 8) if pixels else 0.0,
+    }
+
+
+def visual_regression(
+    root: Path = ROOT,
+    *,
+    config: dict[str, Any] | None = None,
+    outfit_ids: Iterable[str] | None = None,
+    record_baseline: bool = False,
+) -> dict[str, Any]:
+    root = root.resolve()
+    config = config or _load_config(root)
+    _validate_config(root, config)
+    selected = _selected_outfits(config, outfit_ids)
+    baseline_root = _asset(root, config["paths"]["visualBaselineRoot"])
+    threshold = float(config["visual"]["warningMeanAbsoluteError"])
+    results: list[dict[str, Any]] = []
+    errors: list[str] = []
+    warnings: list[str] = []
+    for outfit in selected:
+        visual_root = _asset(root, outfit["visualRoot"])
+        outfit_baseline = baseline_root / outfit["id"]
+        for relative_path in config["visual"]["requiredPaths"]:
+            current = visual_root / relative_path
+            baseline = outfit_baseline / relative_path
+            item: dict[str, Any] = {
+                "outfitId": outfit["id"],
+                "path": (current.relative_to(root).as_posix()),
+                "baselinePath": baseline.relative_to(root).as_posix(),
+            }
+            if not current.is_file():
+                item.update(
+                    {
+                        "status": "ERROR",
+                        "passed": False,
+                        "error": "current image missing",
+                    }
+                )
+                errors.append(f"current visual missing: {item['path']}")
+            elif record_baseline:
+                baseline.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(current, baseline)
+                item.update(
+                    {
+                        "status": "BASELINE_RECORDED",
+                        "passed": True,
+                        "sha256": digest(current),
+                    }
+                )
+            elif not baseline.is_file():
+                item.update(
+                    {
+                        "status": "ERROR",
+                        "passed": False,
+                        "error": "baseline image missing",
+                    }
+                )
+                errors.append(f"baseline visual missing: {item['baselinePath']}")
+            else:
+                try:
+                    item.update(_image_metrics(current, baseline))
+                except (OSError, ValueError) as exc:
+                    item.update({"status": "ERROR", "passed": False, "error": str(exc)})
+                if item.get("status") == "ERROR":
+                    errors.append(
+                        f"visual comparison failed: {item['path']}: {item.get('error')}"
+                    )
+                elif item.get("meanAbsoluteError", 0) > threshold:
+                    item["status"] = "WARN"
+                    item["visualGate"] = "NON_BLOCKING"
+                    warnings.append(
+                        f"visual difference above warning threshold: {item['path']} "
+                        f"({item['meanAbsoluteError']:.5f} > {threshold:.5f})"
+                    )
+            results.append(item)
+
+    return {
+        "schemaVersion": 1,
+        "tool": "visual-regression",
+        "checkedAt": _now(),
+        "gitRevision": _git_revision(root),
+        "recordBaseline": record_baseline,
+        "warningMeanAbsoluteError": threshold,
+        "selectedOutfitCount": len(selected),
+        "results": results,
+        "visualIssuesAreNonBlocking": True,
+        "passed": not errors,
+        "errors": list(dict.fromkeys(errors)),
+        "warnings": list(dict.fromkeys(warnings)),
+    }
+
+
+def _comparison_filename(relative_path: str, suffix: str) -> str:
+    safe = relative_path.replace("/", "__").replace("\\", "__")
+    return f"{Path(safe).stem}-{suffix}.png"
+
+
+def _write_visual_comparison(
+    current: Path,
+    baseline: Path,
+    output_root: Path,
+    relative_path: str,
+) -> dict[str, str]:
+    if Image is None or ImageChops is None:
+        raise AvatarWorkflowError("Pillow is required for visual before/after evidence")
+    with Image.open(current) as current_image, Image.open(baseline) as baseline_image:
+        current_rgba = current_image.convert("RGBA")
+        baseline_rgba = baseline_image.convert("RGBA")
+    if current_rgba.size != baseline_rgba.size:
+        current_rgba = current_rgba.resize(baseline_rgba.size, Image.Resampling.LANCZOS)
+    difference = ImageChops.difference(current_rgba, baseline_rgba)
+    comparison_path = output_root / _comparison_filename(relative_path, "before-after")
+    diff_path = output_root / _comparison_filename(relative_path, "diff")
+    comparison = Image.new(
+        "RGBA", (baseline_rgba.width * 2, baseline_rgba.height), (16, 16, 20, 255)
+    )
+    comparison.paste(baseline_rgba, (0, 0))
+    comparison.paste(current_rgba, (baseline_rgba.width, 0))
+    output_root.mkdir(parents=True, exist_ok=True)
+    comparison.save(comparison_path)
+    difference.save(diff_path)
+    return {
+        "beforeAfterImage": comparison_path.as_posix(),
+        "differenceImage": diff_path.as_posix(),
+    }
+
+
+def visual_before_after(
+    root: Path = ROOT,
+    *,
+    config: dict[str, Any] | None = None,
+    outfit_ids: Iterable[str] | None = None,
+    require_unity_scene: bool = False,
+) -> dict[str, Any]:
+    """Materialise before/after images and metrics for every required outfit view."""
+    root = root.resolve()
+    config = config or _load_config(root)
+    _validate_config(root, config)
+    selected = _selected_outfits(config, outfit_ids)
+    baseline_root = _asset(root, config["paths"]["visualBaselineRoot"])
+    paths = config["paths"]
+    diff_root = _asset(
+        root, paths.get("visualDiffRoot", f"{paths['runtimeRoot']}/visual-diffs")
+    )
+    after_root = _asset(
+        root, paths.get("visualAfterRoot", f"{paths['runtimeRoot']}/visual-after")
+    )
+    threshold = float(config["visual"]["warningMeanAbsoluteError"])
+    results: list[dict[str, Any]] = []
+    errors: list[str] = []
+    warnings: list[str] = []
+    capture_count = 0
+    for outfit in selected:
+        outfit_id = outfit["id"]
+        outfit_results: list[dict[str, Any]] = []
+        for relative_path in config["visual"]["requiredPaths"]:
+            current = _asset(root, outfit["visualRoot"]) / relative_path
+            baseline = baseline_root / outfit_id / relative_path
+            item: dict[str, Any] = {
+                "outfitId": outfit_id,
+                "path": current.relative_to(root).as_posix(),
+                "beforePath": baseline.relative_to(root).as_posix(),
+                "comparisonMode": "versioned-baseline-vs-current-visual-root",
+            }
+            if not baseline.is_file():
+                item.update(
+                    {
+                        "status": "ERROR",
+                        "passed": False,
+                        "error": "before image missing",
+                    }
+                )
+                errors.append(f"before visual missing: {item['beforePath']}")
+            elif not current.is_file():
+                item.update(
+                    {"status": "ERROR", "passed": False, "error": "after image missing"}
+                )
+                errors.append(f"after visual missing: {item['path']}")
+            else:
+                try:
+                    item.update(_image_metrics(current, baseline))
+                    artifact_paths = _write_visual_comparison(
+                        current,
+                        baseline,
+                        diff_root / outfit_id,
+                        relative_path,
+                    )
+                    item.update(
+                        {
+                            key: Path(value).relative_to(root).as_posix()
+                            for key, value in artifact_paths.items()
+                        }
+                    )
+                except (OSError, ValueError, AvatarWorkflowError) as exc:
+                    item.update({"status": "ERROR", "passed": False, "error": str(exc)})
+                if item.get("status") == "ERROR":
+                    errors.append(
+                        f"visual before/after failed: {item['path']}: {item.get('error')}"
+                    )
+                elif item.get("meanAbsoluteError", 0) > threshold:
+                    item["status"] = "WARN"
+                    item["visualGate"] = "NON_BLOCKING"
+                    warnings.append(
+                        f"visual before/after difference above warning threshold: {item['path']} "
+                        f"({item['meanAbsoluteError']:.5f} > {threshold:.5f})"
+                    )
+            outfit_results.append(item)
+            results.append(item)
+        scene_capture = after_root / outfit_id / "scene.png"
+        scene_capture_item = {
+            "path": scene_capture.relative_to(root).as_posix(),
+            "exists": scene_capture.is_file(),
+            "source": "Unity MCP scene capture after cloth bake",
+            "captureScope": "individual-outfit-scene",
+            "scenePath": outfit.get("scene"),
+        }
+        if scene_capture.is_file():
+            capture_count += 1
+            scene_comparison: dict[str, Any] = {
+                "outfitId": outfit_id,
+                "path": scene_capture.relative_to(root).as_posix(),
+                "beforePath": (baseline_root / outfit_id / "front.png")
+                .relative_to(root)
+                .as_posix(),
+                "comparisonMode": "versioned-baseline-vs-unity-scene-capture",
+            }
+            try:
+                scene_comparison.update(
+                    _image_metrics_resized(
+                        scene_capture,
+                        baseline_root / outfit_id / "front.png",
+                    )
+                )
+                scene_comparison.update(
+                    {
+                        key: Path(value).relative_to(root).as_posix()
+                        for key, value in _write_visual_comparison(
+                            scene_capture,
+                            baseline_root / outfit_id / "front.png",
+                            diff_root / outfit_id,
+                            "unity-scene-front.png",
+                        ).items()
+                    }
+                )
+            except (OSError, ValueError, AvatarWorkflowError) as exc:
+                scene_comparison.update(
+                    {"status": "ERROR", "passed": False, "error": str(exc)}
+                )
+            if scene_comparison.get("status") == "ERROR":
+                errors.append(
+                    f"Unity scene visual comparison failed: {outfit_id}: {scene_comparison.get('error')}"
+                )
+            elif scene_comparison.get("meanAbsoluteError", 0) > threshold:
+                scene_comparison["status"] = "WARN"
+                scene_comparison["visualGate"] = "NON_BLOCKING"
+                warnings.append(
+                    f"Unity scene visual difference above warning threshold: {outfit_id} "
+                    f"({scene_comparison['meanAbsoluteError']:.5f} > {threshold:.5f})"
+                )
+            outfit_results.append(scene_comparison)
+            results.append(scene_comparison)
+        elif require_unity_scene:
+            errors.append(
+                f"Unity scene after capture missing: {scene_capture.relative_to(root).as_posix()}"
+            )
+        evidence_path = (
+            _asset(root, outfit["clothEvidence"]).parent / "cloth-visual-diff.json"
+        )
+        write_json(
+            evidence_path,
+            {
+                "schemaVersion": 1,
+                "tool": "avatar-visual-before-after",
+                "checkedAt": _now(),
+                "gitRevision": _git_revision(root),
+                "outfitId": outfit_id,
+                "comparisonMode": "versioned-baseline-vs-current-visual-root",
+                "beforeLabel": "versioned visual baseline",
+                "afterLabel": "current post-cloth visual root",
+                "unityAfterSceneCapture": scene_capture_item,
+                "unitySceneComparison": next(
+                    (
+                        item
+                        for item in outfit_results
+                        if item.get("comparisonMode")
+                        == "versioned-baseline-vs-unity-scene-capture"
+                    ),
+                    None,
+                ),
+                "results": outfit_results,
+                "visualIssuesAreNonBlocking": True,
+                "passed": not any(
+                    item.get("status") == "ERROR" for item in outfit_results
+                ),
+                "errors": [
+                    item.get("error")
+                    for item in outfit_results
+                    if item.get("status") == "ERROR"
+                ],
+            },
+        )
+    report = {
+        "schemaVersion": 1,
+        "tool": "avatar-visual-before-after",
+        "checkedAt": _now(),
+        "gitRevision": _git_revision(root),
+        "selectedOutfitCount": len(selected),
+        "comparisonMode": "versioned-baseline-vs-current-visual-root",
+        "beforeLabel": "versioned visual baseline",
+        "afterLabel": "current post-cloth visual root",
+        "unityAfterSceneCaptureCount": capture_count,
+        "unityAfterSceneCaptureScope": "individual-outfit-scene",
+        "unityAfterSceneCapturesAreSupplemental": True,
+        "results": results,
+        "visualIssuesAreNonBlocking": True,
+        "passed": not errors,
+        "errors": list(dict.fromkeys(errors)),
+        "warnings": list(dict.fromkeys(warnings)),
+    }
+    return report
+
+
+def _ledger_path(root: Path, config: dict[str, Any]) -> Path:
+    return _asset(root, config["paths"]["ledger"])
+
+
+def _file_fingerprint(root: Path, relative_path: str) -> dict[str, Any]:
+    path = _asset(root, relative_path)
+    return {
+        "path": relative_path,
+        "exists": path.is_file(),
+        "sha256": digest(path) if path.is_file() else None,
+    }
+
+
+def initialise_ledger(
+    root: Path = ROOT,
+    *,
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    root = root.resolve()
+    config = config or _load_config(root)
+    path = _ledger_path(root, config)
+    existing = read_json(path) if path.is_file() else {}
+    old_entries = {
+        item.get("id"): item
+        for item in existing.get("outfits", [])
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    outfits = []
+    for outfit in config["outfits"]:
+        old = old_entries.get(outfit["id"], {})
+        entry = {
+            "id": outfit["id"],
+            "name": outfit["name"],
+            "productId": outfit["productId"],
+            "prefab": outfit["prefab"],
+            "cauSetting": outfit["cauSetting"],
+            "status": old.get("status", "PENDING"),
+            "sourceFingerprint": {
+                "prefab": _file_fingerprint(root, outfit["prefab"]),
+                "cauSetting": _file_fingerprint(root, outfit["cauSetting"]),
+            },
+            "history": old.get("history", []),
+        }
+        for key in ("blueprintId", "uploadId", "error"):
+            if key in old:
+                entry[key] = old[key]
+        outfits.append(entry)
+    value = {
+        "schemaVersion": 1,
+        "tool": "upload-ledger",
+        "workflowId": config["workflowId"],
+        "createdAt": existing.get("createdAt", _now()),
+        "updatedAt": _now(),
+        "gitRevision": _git_revision(root),
+        "credentialsStored": False,
+        "outfits": outfits,
+    }
+    write_json(path, value)
+    return value
+
+
+def record_ledger(
+    root: Path = ROOT,
+    *,
+    outfit_id: str,
+    status: str,
+    blueprint_id: str | None = None,
+    upload_id: str | None = None,
+    error: str | None = None,
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    allowed = {"PENDING", "READY", "UPLOADING", "SUCCEEDED", "FAILED", "SKIPPED"}
+    if status not in allowed:
+        raise AvatarWorkflowError(f"invalid ledger status: {status}")
+    config = config or _load_config(root)
+    value = initialise_ledger(root, config=config)
+    selected = next(
+        (item for item in value["outfits"] if item["id"] == outfit_id), None
+    )
+    if selected is None:
+        raise AvatarWorkflowError(f"unknown outfit id: {outfit_id}")
+    selected["status"] = status
+    selected["updatedAt"] = _now()
+    selected["history"].append(
+        {"at": _now(), "status": status, "gitRevision": _git_revision(root)}
+    )
+    for key, item in (
+        ("blueprintId", blueprint_id),
+        ("uploadId", upload_id),
+        ("error", error),
+    ):
+        if item is not None:
+            selected[key] = item
+    value["updatedAt"] = _now()
+    value["gitRevision"] = _git_revision(root)
+    write_json(_ledger_path(root, config), value)
+    return value
+
+
+def build_plan(
+    root: Path = ROOT,
+    *,
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    config = config or _load_config(root)
+    return {
+        "schemaVersion": 1,
+        "tool": "outfit-pipeline-runner",
+        "createdAt": _now(),
+        "gitRevision": _git_revision(root),
+        "workflowId": config["workflowId"],
+        "outfitCount": len(config["outfits"]),
+        "outfitIds": [item["id"] for item in config["outfits"]],
+        "steps": [
+            {"id": "preflight", "kind": "local", "entrypoint": "task avatar:preflight"},
+            {
+                "id": "visual-regression",
+                "kind": "local",
+                "entrypoint": "task avatar:visual",
+                "visualIssuesAreNonBlocking": True,
+            },
+            {
+                "id": "ndmf-bake",
+                "kind": "unity-mcp",
+                "status": "DELEGATED",
+                "entrypoint": "Unity MCP ndmf.bake",
+            },
+            {
+                "id": "vrc-avatar-audit",
+                "kind": "unity-mcp",
+                "status": "DELEGATED",
+                "entrypoint": "Unity MCP vrc.avatarAudit",
+            },
+            {
+                "id": "cau-upload",
+                "kind": "external-publish",
+                "status": "REQUIRES_LOGIN",
+                "entrypoint": "CAU group upload",
+            },
+            {
+                "id": "upload-ledger",
+                "kind": "local",
+                "entrypoint": "task avatar:ledger",
+            },
+        ],
+        "credentialsStored": False,
+        "realUploadCount": 0,
+    }
+
+
+def run_workflow(
+    root: Path = ROOT,
+    *,
+    config: dict[str, Any] | None = None,
+    record_baseline: bool = False,
+) -> dict[str, Any]:
+    config = config or _load_config(root)
+    preflight_result = preflight(root, config=config)
+    visual_result = visual_regression(
+        root, config=config, record_baseline=record_baseline
+    )
+    visual_before_after_result = visual_before_after(root, config=config)
+    ledger = initialise_ledger(root, config=config)
+    result = {
+        "schemaVersion": 1,
+        "tool": "outfit-pipeline-runner",
+        "completedAt": _now(),
+        "gitRevision": _git_revision(root),
+        "preflight": {
+            "passed": preflight_result["passed"],
+            "errors": len(preflight_result["errors"]),
+            "warnings": len(preflight_result["warnings"]),
+        },
+        "visualRegression": {
+            "passed": visual_result["passed"],
+            "errors": len(visual_result["errors"]),
+            "warnings": len(visual_result["warnings"]),
+        },
+        "visualBeforeAfter": {
+            "passed": visual_before_after_result["passed"],
+            "errors": len(visual_before_after_result["errors"]),
+            "warnings": len(visual_before_after_result["warnings"]),
+            "unityAfterSceneCaptureCount": visual_before_after_result[
+                "unityAfterSceneCaptureCount"
+            ],
+        },
+        "ledger": {
+            "path": config["paths"]["ledger"],
+            "outfitCount": len(ledger["outfits"]),
+        },
+        "externalSteps": {
+            "ndmfBake": "DELEGATED_TO_UNITY_MCP",
+            "avatarAudit": "DELEGATED_TO_UNITY_MCP",
+            "cauUpload": "BLOCKED_UNTIL_VRCHAT_LOGIN",
+        },
+        "realUploadCount": sum(
+            1 for item in ledger["outfits"] if item.get("status") == "SUCCEEDED"
+        ),
+        "passed": (
+            preflight_result["passed"]
+            and visual_result["passed"]
+            and visual_before_after_result["passed"]
+        ),
+        "errors": [
+            *preflight_result["errors"],
+            *visual_result["errors"],
+            *visual_before_after_result["errors"],
+        ],
+        "warnings": [
+            *preflight_result["warnings"],
+            *visual_result["warnings"],
+            *visual_before_after_result["warnings"],
+        ],
+    }
+    return result
+
+
+def _write_report(root: Path, relative_path: str, value: dict[str, Any]) -> None:
+    write_json(_asset(root, relative_path), value)
+
+
+def dispatch(root: Path, options: argparse.Namespace) -> int:
+    try:
+        config = _load_config(root)
+        outfit_ids = getattr(options, "outfit", None)
+        if options.avatar_command == "preflight":
+            result = preflight(root, config=config, outfit_ids=outfit_ids)
+            output = (
+                options.output or f"{config['paths']['runtimeRoot']}/preflight.json"
+            )
+        elif options.avatar_command == "visual":
+            result = visual_regression(
+                root,
+                config=config,
+                outfit_ids=outfit_ids,
+                record_baseline=options.record_baseline,
+            )
+            output = (
+                options.output
+                or f"{config['paths']['runtimeRoot']}/visual-regression.json"
+            )
+        elif options.avatar_command == "visual-diff":
+            result = visual_before_after(
+                root,
+                config=config,
+                outfit_ids=outfit_ids,
+                require_unity_scene=True,
+            )
+            output = options.output or config["paths"].get(
+                "visualDiffReport",
+                f"{config['paths']['runtimeRoot']}/cloth-visual-diff.json",
+            )
+        elif options.avatar_command == "ledger":
+            if options.ledger_action == "init":
+                result = initialise_ledger(root, config=config)
+            else:
+                result = record_ledger(
+                    root,
+                    config=config,
+                    outfit_id=options.outfit_id,
+                    status=options.status,
+                    blueprint_id=options.blueprint_id,
+                    upload_id=options.upload_id,
+                    error=options.error,
+                )
+            output = options.output
+        elif options.avatar_command == "plan":
+            result = build_plan(root, config=config)
+            output = (
+                options.output or f"{config['paths']['runtimeRoot']}/pipeline-plan.json"
+            )
+        elif options.avatar_command == "run":
+            result = run_workflow(
+                root, config=config, record_baseline=options.record_baseline
+            )
+            output = options.output or f"{config['paths']['runtimeRoot']}/run.json"
+        else:
+            raise AvatarWorkflowError(
+                f"unknown avatar command: {options.avatar_command}"
+            )
+        if output:
+            _write_report(root, output, result)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result.get("passed", True) else 2
+    except (OSError, ValueError, AvatarWorkflowError) as exc:
+        print(f"avatar workflow: {exc}", file=sys.stderr)
+        return 1

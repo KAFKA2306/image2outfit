@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "citation": "Petrak et al., Sustainability 2025, 17, 1388",
+    "license": "CC-BY-4.0",
+    "url": "https://doi.org/10.3390/su17041388"
+  },
+  "notes": [
+    "Mass, thickness, composition, weave, KES-FB measurements, converted CLO3D parameters, and drape coefficients are transcribed from Tables 1, 2, 4, and 5.",
+    "Friction and compression were not reported and remain null; these presets must not be treated as Blender-ready physical calibration until those values and the Blender adapter are validated.",
+    "Collision and render thickness are stored separately even where initialized from the same measured physical thickness."
+  ],
+  "materials": [
+    {
+      "materialId": "kes-2025-m1-polyester-twill",
+      "composition": "100% polyester",
+      "weave": "twill-3-1",
+      "calibrationStatus": "measured-and-converted",
+      "calibrationMethod": "KES-FB measurement converted to CLO3D input units",
+      "sourceUrl": "https://doi.org/10.3390/su17041388",
+      "sourceLicense": "CC-BY-4.0",
+      "properties": {
+        "arealMassGm2": 135.17,
+        "physicalThicknessMm": 0.31,
+        "collisionThicknessMm": 0.31,
+        "renderThicknessMm": 0.31,
+        "stretchWarpGs2": 477226,
+        "stretchWeftGs2": 458614,
+        "shearGs2": 41000,
+        "bendingWarpGmm2s2": 1950,
+        "bendingWeftGmm2s2": 610,
+        "staticFriction": null,
+        "dynamicFriction": null,
+        "compressionKpa": null
+      },
+      "solverMappings": [
+        {
+          "solverId": "clo3d",
+          "solverVersion": "published-2025",
+          "sourceParameterization": "kes-fb-converted",
+          "parameters": {
+            "stretchWarp": 477226,
+            "stretchWeft": 458614,
+            "shear": 41000,
+            "bendingWarp": 1950,
+            "bendingWeft": 610
+          },
+          "conversionError": {}
+        }
+      ],
+      "realDrapeCoefficient": 0.223,
+      "simulatedDrapeCoefficient": 0.349
+    },
+    {
+      "materialId": "kes-2025-m2-polyester-plain",
+      "composition": "100% polyester",
+      "weave": "plain-1-1",
+      "calibrationStatus": "measured-and-converted",
+      "calibrationMethod": "KES-FB measurement converted to CLO3D input units",
+      "sourceUrl": "https://doi.org/10.3390/su17041388",
+      "sourceLicense": "CC-BY-4.0",
+      "properties": {
+        "arealMassGm2": 83.66,
+        "physicalThicknessMm": 0.25,
+        "collisionThicknessMm": 0.25,
+        "renderThicknessMm": 0.25,
+        "stretchWarpGs2": 471944,
+        "stretchWeftGs2": 373515,
+        "shearGs2": 46000,
+        "bendingWarpGmm2s2": 850,
+        "bendingWeftGmm2s2": 330,
+        "staticFriction": null,
+        "dynamicFriction": null,
+        "compressionKpa": null
+      },
+      "solverMappings": [
+        {
+          "solverId": "clo3d",
+          "solverVersion": "published-2025",
+          "sourceParameterization": "kes-fb-converted",
+          "parameters": {
+            "stretchWarp": 471944,
+            "stretchWeft": 373515,
+            "shear": 46000,
+            "bendingWarp": 850,
+            "bendingWeft": 330
+          },
+          "conversionError": {}
+        }
+      ],
+      "realDrapeCoefficient": 0.228,
+      "simulatedDrapeCoefficient": 0.313
+    },
+    {
+      "materialId": "kes-2025-m3-wool-polyester-elastane-twill",
+      "composition": "75% wool, 15% polyester, 10% elastane",
+      "weave": "twill-2-1",
+      "calibrationStatus": "measured-and-converted",
+      "calibrationMethod": "KES-FB measurement converted to CLO3D input units",
+      "sourceUrl": "https://doi.org/10.3390/su17041388",
+      "sourceLicense": "CC-BY-4.0",
+      "properties": {
+        "arealMassGm2": 178.70,
+        "physicalThicknessMm": 0.40,
+        "collisionThicknessMm": 0.40,
+        "renderThicknessMm": 0.40,
+        "stretchWarpGs2": 449656,
+        "stretchWeftGs2": 439815,
+        "shearGs2": 50000,
+        "bendingWarpGmm2s2": 2140,
+        "bendingWeftGmm2s2": 2000,
+        "staticFriction": null,
+        "dynamicFriction": null,
+        "compressionKpa": null
+      },
+      "solverMappings": [
+        {
+          "solverId": "clo3d",
+          "solverVersion": "published-2025",
+          "sourceParameterization": "kes-fb-converted",
+          "parameters": {
+            "stretchWarp": 449656,
+            "stretchWeft": 439815,
+            "shear": 50000,
+            "bendingWarp": 2140,
+            "bendingWeft": 2000
+          },
+          "conversionError": {}
+        }
+      ],
+      "realDrapeCoefficient": 0.349,
+      "simulatedDrapeCoefficient": 0.404
+    },
+    {
+      "materialId": "kes-2025-m4-polyester-viscose-elastane-twill",
+      "composition": "63% polyester, 33% viscose, 4% elastane",
+      "weave": "twill-2-1",
+      "calibrationStatus": "measured-and-converted",
+      "calibrationMethod": "KES-FB measurement converted to CLO3D input units",
+      "sourceUrl": "https://doi.org/10.3390/su17041388",
+      "sourceLicense": "CC-BY-4.0",
+      "properties": {
+        "arealMassGm2": 286.13,
+        "physicalThicknessMm": 0.61,
+        "collisionThicknessMm": 0.61,
+        "renderThicknessMm": 0.61,
+        "stretchWarpGs2": 403447,
+        "stretchWeftGs2": 401762,
+        "shearGs2": 61000,
+        "bendingWarpGmm2s2": 2970,
+        "bendingWeftGmm2s2": 2400,
+        "staticFriction": null,
+        "dynamicFriction": null,
+        "compressionKpa": null
+      },
+      "solverMappings": [
+        {
+          "solverId": "clo3d",
+          "solverVersion": "published-2025",
+          "sourceParameterization": "kes-fb-converted",
+          "parameters": {
+            "stretchWarp": 403447,
+            "stretchWeft": 401762,
+            "shear": 61000,
+            "bendingWarp": 2970,
+            "bendingWeft": 2400
+          },
+          "conversionError": {}
+        }
+      ],
+      "realDrapeCoefficient": 0.286,
+      "simulatedDrapeCoefficient": 0.323
+    },
+    {
+      "materialId": "kes-2025-m5-polyester-elastane-plain",
+      "composition": "97% polyester, 3% elastane",
+      "weave": "plain-1-1",
+      "calibrationStatus": "measured-and-converted",
+      "calibrationMethod": "KES-FB measurement converted to CLO3D input units",
+      "sourceUrl": "https://doi.org/10.3390/su17041388",
+      "sourceLicense": "CC-BY-4.0",
+      "properties": {
+        "arealMassGm2": 242.00,
+        "physicalThicknessMm": 0.56,
+        "collisionThicknessMm": 0.56,
+        "renderThicknessMm": 0.56,
+        "stretchWarpGs2": 407166,
+        "stretchWeftGs2": 415023,
+        "shearGs2": 57000,
+        "bendingWarpGmm2s2": 3220,
+        "bendingWeftGmm2s2": 3880,
+        "staticFriction": null,
+        "dynamicFriction": null,
+        "compressionKpa": null
+      },
+      "solverMappings": [
+        {
+          "solverId": "clo3d",
+          "solverVersion": "published-2025",
+          "sourceParameterization": "kes-fb-converted",
+          "parameters": {
+            "stretchWarp": 407166,
+            "stretchWeft": 415023,
+            "shear": 57000,
+            "bendingWarp": 3220,
+            "bendingWeft": 3880
+          },
+          "conversionError": {}
+        }
+      ],
+      "realDrapeCoefficient": 0.443,
+      "simulatedDrapeCoefficient": 0.438
+    },
+    {
+      "materialId": "kes-2025-m6-cotton-polyester-elastane-twill",
+      "composition": "65% cotton, 31% polyester, 4% elastane",
+      "weave": "twill-2-1",
+      "calibrationStatus": "measured-and-converted",
+      "calibrationMethod": "KES-FB measurement converted to CLO3D input units",
+      "sourceUrl": "https://doi.org/10.3390/su17041388",
+      "sourceLicense": "CC-BY-4.0",
+      "properties": {
+        "arealMassGm2": 253.36,
+        "physicalThicknessMm": 0.62,
+        "collisionThicknessMm": 0.62,
+        "renderThicknessMm": 0.62,
+        "stretchWarpGs2": 473860,
+        "stretchWeftGs2": 404746,
+        "shearGs2": 126000,
+        "bendingWarpGmm2s2": 7430,
+        "bendingWeftGmm2s2": 3700,
+        "staticFriction": null,
+        "dynamicFriction": null,
+        "compressionKpa": null
+      },
+      "solverMappings": [
+        {
+          "solverId": "clo3d",
+          "solverVersion": "published-2025",
+          "sourceParameterization": "kes-fb-converted",
+          "parameters": {
+            "stretchWarp": 473860,
+            "stretchWeft": 404746,
+            "shear": 126000,
+            "bendingWarp": 7430,
+            "bendingWeft": 3700
+          },
+          "conversionError": {}
+        }
+      ],
+      "realDrapeCoefficient": 0.549,
+      "simulatedDrapeCoefficient": 0.613
+    }
+  ]
+}

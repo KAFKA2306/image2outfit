@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-blue-happi",
+  "garmentClass": "happi",
+  "parts": [
+    {
+      "id": "back-body",
+      "category": "body-panel",
+      "symmetry": "centered",
+      "certainty": "observed"
+    },
+    {
+      "id": "front-left",
+      "category": "body-panel",
+      "symmetry": "left",
+      "certainty": "observed"
+    },
+    {
+      "id": "front-right",
+      "category": "body-panel",
+      "symmetry": "right",
+      "certainty": "observed"
+    },
+    {
+      "id": "sleeve-left",
+      "category": "sleeve",
+      "symmetry": "left",
+      "certainty": "observed"
+    },
+    {
+      "id": "sleeve-right",
+      "category": "sleeve",
+      "symmetry": "right",
+      "certainty": "observed"
+    },
+    {
+      "id": "collar-band",
+      "category": "structural-trim",
+      "symmetry": "bilateral-continuous",
+      "certainty": "observed"
+    },
+    {
+      "id": "front-facing-left",
+      "category": "edge-finish",
+      "symmetry": "left",
+      "certainty": "inferred"
+    },
+    {
+      "id": "front-facing-right",
+      "category": "edge-finish",
+      "symmetry": "right",
+      "certainty": "inferred"
+    }
+  ],
+  "layerOrder": [
+    "SiroinoSotai_PC",
+    "body panels",
+    "sleeves",
+    "collar and edge bindings"
+  ],
+  "negativeEvidence": [
+    "No verified fastener",
+    "No verified printed text",
+    "No verified crest",
+    "No verified sash"
+  ]
+}

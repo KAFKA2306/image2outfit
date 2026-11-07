@@ -1,16 +1,15 @@
 {
   "schemaVersion": 1,
   "canonicalRoot": "Assets/GenWorks",
-  "productRoot": "Assets/GenWorks/Products",
+  "productRoot": "Assets/GenWorks",
   "sharedRoot": "Assets/GenWorks/Shared",
-  "legacyRoot": "Assets/GenWorks/Legacy",
   "manifestName": "ProductManifest.json",
   "requiredProductDirectories": [
     "Source",
     "Models",
     "Textures",
     "Materials",
-    "Prefabs",
+    "Prefab",
     "Previews",
     "Demo",
     "Editor",
@@ -49,6 +48,7 @@
     "Assets/SiroinoWorks"
   ],
   "forbiddenAssetRoots": [
-    "Assets/Editor"
+    "Assets/Editor",
+    "Assets/GenWorks/Legacy"
   ]
 }

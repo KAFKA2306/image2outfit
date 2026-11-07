@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/config/schema/pre-blender-stages.schema.v1.json",
+  "title": "image2outfit pre-Blender stage contracts v1",
+  "$defs": {
+    "ReferenceSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reference_set_id",
+        "garment_id",
+        "assets",
+        "extensions",
+        "schema_version"
+      ],
+      "properties": {
+        "reference_set_id": {"type": "string"},
+        "garment_id": {"type": "string"},
+        "assets": {"type": "array", "minItems": 1},
+        "extensions": {"type": "object"},
+        "schema_version": {"const": 1}
+      }
+    },
+    "NormalizedReferenceSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "normalized_set_id",
+        "reference_set_id",
+        "garment_id",
+        "views",
+        "schema_version"
+      ],
+      "properties": {
+        "normalized_set_id": {"type": "string"},
+        "reference_set_id": {"type": "string"},
+        "garment_id": {"type": "string"},
+        "views": {"type": "array", "minItems": 1},
+        "schema_version": {"const": 1}
+      }
+    },
+    "GarmentDecomposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decomposition_id",
+        "normalized_set_id",
+        "garment_id",
+        "hypotheses",
+        "schema_version"
+      ],
+      "properties": {
+        "decomposition_id": {"type": "string"},
+        "normalized_set_id": {"type": "string"},
+        "garment_id": {"type": "string"},
+        "hypotheses": {"type": "array", "minItems": 1},
+        "schema_version": {"const": 1}
+      }
+    },
+    "PatternHypothesisSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern_set_id",
+        "decomposition_id",
+        "garment_id",
+        "hypotheses",
+        "schema_version"
+      ],
+      "properties": {
+        "pattern_set_id": {"type": "string"},
+        "decomposition_id": {"type": "string"},
+        "garment_id": {"type": "string"},
+        "hypotheses": {"type": "array", "minItems": 1},
+        "schema_version": {"const": 1}
+      }
+    },
+    "SeamHypothesisSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seam_set_id",
+        "pattern_set_id",
+        "garment_id",
+        "hypotheses",
+        "schema_version"
+      ],
+      "properties": {
+        "seam_set_id": {"type": "string"},
+        "pattern_set_id": {"type": "string"},
+        "garment_id": {"type": "string"},
+        "hypotheses": {"type": "array", "minItems": 1},
+        "schema_version": {"const": 1}
+      }
+    },
+    "ArrangementPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "arrangement_id",
+        "garment_id",
+        "avatar_id",
+        "pattern_hypothesis_id",
+        "seam_hypothesis_id",
+        "placements",
+        "styling_constraints",
+        "intersections",
+        "schema_version"
+      ],
+      "properties": {
+        "arrangement_id": {"type": "string"},
+        "garment_id": {"type": "string"},
+        "avatar_id": {"type": "string"},
+        "pattern_hypothesis_id": {"type": "string"},
+        "seam_hypothesis_id": {"type": "string"},
+        "placements": {"type": "array", "minItems": 1},
+        "styling_constraints": {"type": "array"},
+        "intersections": {"type": "array"},
+        "schema_version": {"const": 1}
+      }
+    }
+  }
+}

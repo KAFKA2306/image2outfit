@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-sage-breeze-onepiece",
+  "profile": "panel-sewn",
+  "target": "Siroino _Large via official shape keys",
+  "designRevision": "v1-closed-breeze-column-twin-wind-tunnel",
+  "panels": ["breeze-front-L", "breeze-front-R", "breeze-back", "breeze-side-L", "breeze-side-R", "sleeve-L", "sleeve-R", "wind-outer-L", "wind-inner-L", "wind-facing-L", "wind-outer-R", "wind-inner-R", "wind-facing-R"],
+  "separateGeometry": ["stand-collar", "leaf-clasp-root", "leaf-clasp-outer", "leaf-clasp-inner", "center-vent-facings"],
+  "priorityFitZones": ["neck", "shoulders", "chest", "waist", "hip", "knee", "calf", "ankle", "wind-tunnel-channel", "center-vent"],
+  "researchTrial": {"method": "explicit closed onepiece panel layout plus native Blender Cloth settlement for four shell panels", "physicalSewingStitch": "side-panels-to-front-and-back-shell", "review": "render pattern layout before assembly and five-view/six-pose evidence after settlement"},
+  "releaseBoundary": "Keep WORKING until replacement-source audit, current Blender source, cloth evidence, five views, six poses, Unity/NDMF and direct visual review pass.",
+  "clothSimulation": {"applicability": "REQUIRED", "components": ["Sage_Breeze_Front", "Sage_Breeze_Back", "Sage_Breeze_Side_L", "Sage_Breeze_Side_R"], "evidence": "Assets/GenWorks/siroino-sage-breeze-onepiece/Evidence/Build/cloth-simulation.json", "reason": "The closed shell is loose woven fabric and four pinned panels must settle against the target body."},
+  "shapeKeyPostprocess": {"provider": "maxwilso-smooth-shape-keys", "applicability": "NOT_REQUIRED", "reason": "The deterministic target-fit build owns shape-key transfer from Siroino; vendor smoothing is not required."}
+}

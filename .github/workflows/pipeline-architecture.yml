@@ -1,0 +1,127 @@
+name: Garment pipeline architecture
+
+on:
+  pull_request:
+    paths:
+      - ARCHITECTURE.md
+      - README.md
+      - src/**
+      - tools/manage.py
+      - tools/batch_execution.py
+      - tools/run_product_execution.py
+      - tools/run_garment_pipeline.py
+      - tools/pipeline_stage_adapters.py
+      - tools/run_blender_stage.py
+      - tools/audit_src_architecture.py
+      - tests/**
+      - config/pipeline/**
+      - config/pipeline-profiles/**
+      - config/batch/**
+      - ops/docker/**
+      - Taskfile.yml
+      - examples/pipeline-request.example.json
+      - .github/workflows/pipeline-architecture.yml
+  push:
+    branches: [main]
+    paths:
+      - ARCHITECTURE.md
+      - README.md
+      - src/**
+      - tools/manage.py
+      - tools/batch_execution.py
+      - tools/run_product_execution.py
+      - tools/run_garment_pipeline.py
+      - tools/pipeline_stage_adapters.py
+      - tools/run_blender_stage.py
+      - tools/audit_src_architecture.py
+      - tests/**
+      - config/pipeline/**
+      - config/pipeline-profiles/**
+      - config/batch/**
+      - ops/docker/**
+      - Taskfile.yml
+      - examples/pipeline-request.example.json
+      - .github/workflows/pipeline-architecture.yml
+
+permissions:
+  contents: read
+
+jobs:
+  architecture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: '0.11.32'
+          enable-cache: true
+
+      - name: Compile reusable core and adapters
+        run: uv run --locked --no-default-groups python -m compileall -q src tools tests
+
+      - name: Audit src and tools dependency direction
+        run: uv run --locked --no-default-groups python tools/audit_src_architecture.py
+
+      - name: Run pipeline architecture tests
+        run: >-
+          uv run --locked --no-default-groups
+          python -m unittest discover -s tests -v
+
+      - name: Build Python batch coordinator image
+        run: docker compose -f ops/docker/compose.batch.yml build batch
+
+      - name: Smoke-test Docker batch status path
+        shell: bash
+        run: |
+          set -uo pipefail
+          output="$RUNNER_TEMP/batch-status.json"
+          set +e
+          docker compose -f ops/docker/compose.batch.yml run --rm batch \
+            python tools/manage.py batch status \
+            --manifest config/batch/tracked-requests.json >"$output"
+          code=$?
+          set -e
+          cat "$output"
+          test "$code" -eq 1
+          grep -F '"status": "FAILED"' "$output"
+          grep -F '"NO_STATE": 3' "$output"
+
+      - name: Ruff reusable core and adapters
+        run: >-
+          uv run --locked --no-default-groups --group dev
+          ruff check
+          src/image2outfit
+          tools/audit_src_architecture.py
+          tools/pipeline_stage_adapters.py
+          tools/run_blender_stage.py
+          tools/run_garment_pipeline.py
+          tests/test_repository_policies.py
+          tests/test_execution_bindings.py
+          tests/test_garment_domain.py
+          tests/test_pattern_ir.py
+          tests/test_pipeline_core.py
+          tests/test_pipeline_profile.py
+          tests/test_pipeline_checkpoint_engines.py
+          tests/test_research_and_specs.py
+
+      - name: Reject unresolved production execution
+        run: |
+          if uv run --locked --no-default-groups python tools/run_garment_pipeline.py \
+            --execute --request examples/pipeline-request.example.json; then
+            echo "unbound production execution unexpectedly completed" >&2
+            exit 1
+          fi
+
+      - name: Verify LangChain and LangGraph checkpoint parity
+        run: |
+          uv run \
+            --with langchain-core==1.5.0 \
+            --with langgraph==1.2.9 \
+            python -m unittest discover -s tests \
+              -p 'test_pipeline_checkpoint_engines.py' -v

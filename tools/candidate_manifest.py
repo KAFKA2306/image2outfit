@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+"""Candidate identity, input, preview, and file-manifest contracts."""
+
+from __future__ import annotations
+
+import json
+import os
+import struct
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+import contract_io
+from pipeline_source_fingerprint import fingerprint_paths
+
+ROOT = Path(__file__).resolve().parents[1]
+POLICY_PATH = ROOT / "config" / "release-policy.json"
+JOB_SCHEMA_PATH = ROOT / "config" / "job.schema.v2.json"
+CANDIDATE_SCHEMA_PATH = ROOT / "config" / "candidate-manifest.schema.v2.json"
+UNITY_PIPELINE_PATH = (
+    ROOT / "Assets" / "GenWorks" / "Shared" / "Editor" / "Image2OutfitPipeline.cs"
+)
+SHAPE_KEY_REPORT = "smooth-shape-keys.json"
+
+
+def now() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def read(path: Path) -> dict[str, Any]:
+    try:
+        return contract_io.read_json(path)
+    except (OSError, json.JSONDecodeError, ValueError):
+        return {}
+
+
+def write(path: Path, value: dict[str, Any]) -> None:
+    if path.name == "candidate-manifest.json":
+        errors = candidate_structure_errors(value)
+        if errors:
+            raise ValueError("; ".join(errors))
+    contract_io.write_json(path, value)
+
+
+def digest(path: Path) -> str:
+    return contract_io.digest(path)
+
+
+def path(value: str) -> Path:
+    return contract_io.repo_path(ROOT, value)
+
+
+def rel(value: Path) -> str:
+    return contract_io.relative(ROOT, value)
+
+
+def inside(value: Path, root: Path) -> bool:
+    value = value.resolve()
+    root = root.resolve()
+    return value == root or root in value.parents
+
+
+def required_job_fields() -> tuple[str, ...]:
+    schema = read(JOB_SCHEMA_PATH)
+    required = schema.get("required")
+    if (
+        not isinstance(required, list)
+        or not required
+        or not all(isinstance(value, str) and value for value in required)
+    ):
+        raise ValueError("job.schema.v2.json must define a non-empty required array")
+    expected_version = (
+        schema.get("properties", {}).get("schemaVersion", {}).get("const")
+    )
+    if expected_version != 2:
+        raise ValueError("job.schema.v2.json must require schemaVersion 2")
+    return tuple(required)
+
+
+def load(job_path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+    policy = read(POLICY_PATH)
+    job = read(job_path)
+    if policy.get("schemaVersion") != 1:
+        raise ValueError("release-policy.json must use schemaVersion 1")
+    if job.get("schemaVersion") != 2:
+        raise ValueError("legacy jobs are disabled; schemaVersion must be 2")
+    missing = [
+        key for key in required_job_fields() if key not in job or job[key] in (None, "")
+    ]
+    if missing:
+        raise ValueError(f"job v2 missing: {', '.join(missing)}")
+    for field, prefix in (
+        ("artifactDir", ".image2outfit/products/"),
+        ("candidateDir", ".image2outfit/products/"),
+        ("releaseDir", ".image2outfit/products/"),
+    ):
+        if field not in job or not rel(path(job[field])).startswith(prefix):
+            raise ValueError(f"{field} must use the derived .image2outfit runtime root")
+    views = set(policy["minimumPreview"]["requiredViews"])
+    if views - set(job["previewPaths"]):
+        raise ValueError("previewPaths does not contain every required view")
+    kinds = set(policy["requiredHumanEvidenceKinds"])
+    if kinds - set(job["humanEvidence"]):
+        raise ValueError("humanEvidence does not contain every required kind")
+    return job, policy
+
+
+def license_gate(job: dict[str, Any]) -> tuple[bool, list[str]]:
+    evidence = read(path(job["licenseEvidence"]))
+    errors = []
+    checks = {
+        "adapterId": evidence.get("adapterId") == job["adapterId"],
+        "sourceUrl": bool(evidence.get("sourceUrl")),
+        "checkedAt": bool(evidence.get("checkedAt")),
+        "commercialOutfitAllowed": evidence.get("commercialOutfitAllowed") is True,
+        "avatarFilesRedistributed": evidence.get("avatarFilesRedistributed") is False,
+    }
+    errors.extend(name for name, passed in checks.items() if not passed)
+    return not errors, errors
+
+
+def png_size(file: Path) -> tuple[int, int]:
+    header = file.read_bytes()[:24]
+    if len(header) < 24 or header[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("not PNG")
+    return struct.unpack(">II", header[16:24])
+
+
+def _shape_key_requirement(job: dict[str, Any]) -> str | None:
+    product_id = job.get("id")
+    if not isinstance(product_id, str) or not product_id:
+        return None
+    construction = read(ROOT / "config" / "products" / product_id / "construction.json")
+    postprocess = construction.get("shapeKeyPostprocess")
+    if not isinstance(postprocess, dict):
+        return None
+    applicability = postprocess.get("applicability")
+    return applicability if isinstance(applicability, str) else None
+
+
+def _shape_key_gate(job: dict[str, Any]) -> dict[str, Any]:
+    artifact_value = job.get("artifactDir")
+    if not isinstance(artifact_value, str) or not artifact_value:
+        return {
+            "passed": False,
+            "error": "job.artifactDir is required for Shape Key evidence",
+        }
+    report_path = path(artifact_value) / SHAPE_KEY_REPORT
+    report = read(report_path)
+    item: dict[str, Any] = {
+        "path": rel(report_path),
+        "passed": report_path.is_file() and report.get("passed") is True,
+        "status": report.get("status"),
+        "provider": report.get("provider"),
+        "errors": report.get("errors", []),
+        "metrics": report.get("metrics", {}),
+    }
+    if not report_path.is_file():
+        item["error"] = "Smooth Shape Keys report is missing"
+    elif report.get("provider") != "maxwilso-smooth-shape-keys":
+        item["passed"] = False
+        item["error"] = "unexpected Shape Key postprocess provider"
+    elif (
+        _shape_key_requirement(job) == "REQUIRED"
+        and report.get("status") == "NOT_APPLICABLE"
+    ):
+        item["passed"] = False
+        item["error"] = "required Shape Keys were not generated"
+    return item
+
+
+def preview_gate(
+    job: dict[str, Any], policy: dict[str, Any]
+) -> tuple[bool, dict[str, Any]]:
+    minimum = policy["minimumPreview"]
+    result: dict[str, Any] = {}
+    passed = True
+    for view in minimum["requiredViews"]:
+        file = path(job["previewPaths"][view])
+        item: dict[str, Any] = {"path": rel(file), "passed": False}
+        try:
+            width, height = png_size(file)
+            item.update(width=width, height=height, sha256=digest(file))
+            item["passed"] = width >= minimum["width"] and height >= minimum["height"]
+        except (OSError, ValueError) as exc:
+            item["error"] = str(exc)
+        passed = passed and item["passed"]
+        result[view] = item
+
+    shape_key = _shape_key_gate(job)
+    result["shapeKeyPostprocess"] = shape_key
+    passed = passed and shape_key["passed"] is True
+    return passed, result
+
+
+def execution_source_fingerprint(job: dict[str, Any]) -> str:
+    """Fingerprint repository/product source that can change candidate execution."""
+    product_id = job["id"]
+    candidates = [
+        ROOT / "src" / "image2outfit",
+        ROOT / "tools",
+        ROOT / "config" / "products" / product_id,
+        ROOT / "Assets" / "GenWorks" / product_id / "Source",
+    ]
+    source_paths = [candidate for candidate in candidates if candidate.exists()]
+    if not source_paths:
+        raise FileNotFoundError("candidate execution source set is empty")
+    return fingerprint_paths(ROOT, source_paths)
+
+
+def inputs(job_path: Path, job: dict[str, Any]) -> dict[str, str]:
+    files = {
+        "job": job_path,
+        "policy": POLICY_PATH,
+        "jobSchema": JOB_SCHEMA_PATH,
+        "toolchainLock": ROOT / "config" / "toolchain-lock.json",
+        "pythonProject": ROOT / "pyproject.toml",
+        "vpmManifest": ROOT / "Packages" / "vpm-manifest.json",
+        "upmManifest": ROOT / "Packages" / "manifest.json",
+        "projectVersion": ROOT / "ProjectSettings" / "ProjectVersion.txt",
+        "unityPipeline": UNITY_PIPELINE_PATH,
+        "buildScript": path(job["buildScript"]),
+        "licenseEvidence": path(job["licenseEvidence"]),
+        "targetAvatarAsset": path(job["targetAvatarAssetPath"]),
+    }
+    if job.get("targetSourcePath"):
+        files["targetSource"] = path(job["targetSourcePath"])
+    upm_lock = ROOT / "Packages" / "packages-lock.json"
+    if upm_lock.is_file():
+        files["upmLock"] = upm_lock
+    missing = [name for name, file in files.items() if not file.is_file()]
+    if missing:
+        raise FileNotFoundError(f"input missing: {', '.join(missing)}")
+    result = {name: digest(file) for name, file in files.items()}
+    result["executionSource"] = execution_source_fingerprint(job)
+    return result
+
+
+def candidate_files(job: dict[str, Any], policy: dict[str, Any]) -> list[Path]:
+    private = [path(value) for value in job["privateSourceRoots"]]
+    allowed = {value.lower() for value in policy["allowedDeliveryExtensions"]}
+    target = {path(job["targetAvatarAssetPath"])}
+    if job.get("targetSourcePath"):
+        target.add(path(job["targetSourcePath"]))
+    result = []
+    for value in job["deliveryAssets"]:
+        file = path(value)
+        if not rel(file).startswith("Assets/"):
+            raise ValueError(f"delivery asset outside Assets/: {value}")
+        if file in target or any(inside(file, root) for root in private):
+            raise ValueError(f"private avatar source selected for delivery: {value}")
+        if file.suffix.lower() not in allowed:
+            raise ValueError(f"delivery extension not allowed: {value}")
+        if not file.is_file():
+            raise FileNotFoundError(f"delivery asset missing: {value}")
+        result.append(file)
+    return result
+
+
+def manifest(files: list[Path], base: Path) -> list[dict[str, Any]]:
+    return [
+        {
+            "path": str(file.relative_to(base)).replace("\\", "/"),
+            "bytes": file.stat().st_size,
+            "sha256": digest(file),
+        }
+        for file in sorted(files)
+    ]
+
+
+def candidate_structure_errors(data: dict[str, Any]) -> list[str]:
+    schema_errors = contract_io.validate_schema_file(
+        data, CANDIDATE_SCHEMA_PATH, "candidate manifest"
+    )
+    if schema_errors:
+        return [f"candidate manifest schema: {error}" for error in schema_errors]
+    seen_paths: set[str] = set()
+    errors: list[str] = []
+    for item in data["files"]:
+        item_path = item["path"]
+        if item_path in seen_paths:
+            errors.append(f"duplicate candidate manifest path: {item_path}")
+        seen_paths.add(item_path)
+    return errors
+
+
+def verify_candidate(
+    job_path: Path,
+    job: dict[str, Any],
+    candidate: Path,
+    data: dict[str, Any],
+) -> list[str]:
+    structure_errors = candidate_structure_errors(data)
+    if structure_errors:
+        return structure_errors
+
+    errors = []
+    if data["jobId"] != job["id"] or data["adapterId"] != job["adapterId"]:
+        errors.append("candidate identity mismatch")
+    current_commit = os.environ.get("GITHUB_SHA")
+    if current_commit and data["sourceCommit"] != current_commit:
+        errors.append("candidate source commit differs from current commit")
+    current_inputs = inputs(job_path, job)
+    reported_inputs = data.get("inputHashes")
+    if not isinstance(reported_inputs, dict):
+        errors.append("candidate inputHashes invalid")
+        reported_inputs = {}
+    current_names = set(current_inputs)
+    reported_names = set(reported_inputs)
+    missing_names = sorted(current_names - reported_names)
+    extra_names = sorted(reported_names - current_names)
+    if missing_names:
+        errors.append(f"candidate inputs missing: {', '.join(missing_names)}")
+    if extra_names:
+        errors.append(f"candidate inputs unexpected: {', '.join(extra_names)}")
+    for name in sorted(current_names & reported_names):
+        if current_inputs[name] != reported_inputs[name]:
+            errors.append(f"candidate input changed: {name}")
+
+    expected_paths = set()
+    for item in data["files"]:
+        item_path = item["path"]
+        file = (candidate / item_path).resolve()
+        if not inside(file, candidate):
+            errors.append("candidate manifest path escapes directory")
+            continue
+        expected_paths.add(file)
+        if (
+            not file.is_file()
+            or digest(file) != item["sha256"]
+            or file.stat().st_size != item["bytes"]
+        ):
+            errors.append(f"candidate file changed: {item_path}")
+    actual = {file.resolve() for file in candidate.rglob("*") if file.is_file()}
+    actual.discard((candidate / "candidate-manifest.json").resolve())
+    if actual != expected_paths:
+        errors.append("candidate file set changed")
+    return errors

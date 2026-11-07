@@ -1,0 +1,418 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-white-ghost-gown",
+  "model": "star-schema-triplet-graph",
+  "mainFlow": {
+    "hub": "product:siroino-white-ghost-gown",
+    "stageOrder": [
+      "ingest-reference",
+      "normalize-view",
+      "decompose-garment",
+      "draft-patterns",
+      "infer-stitches",
+      "initialize-3d",
+      "build-blender",
+      "simulate-cloth",
+      "skin-and-export",
+      "render-evidence",
+      "audit-geometry",
+      "visual-review",
+      "finalize-candidate"
+    ],
+    "stageSource": "src/image2outfit/pipeline.py PIPELINE_STAGES"
+  },
+  "dimensions": {
+    "stage": [
+      {
+        "id": "ingest-reference",
+        "order": 0
+      },
+      {
+        "id": "normalize-view",
+        "order": 1
+      },
+      {
+        "id": "decompose-garment",
+        "order": 2
+      },
+      {
+        "id": "draft-patterns",
+        "order": 3
+      },
+      {
+        "id": "infer-stitches",
+        "order": 4
+      },
+      {
+        "id": "initialize-3d",
+        "order": 5
+      },
+      {
+        "id": "build-blender",
+        "order": 6
+      },
+      {
+        "id": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "id": "skin-and-export",
+        "order": 8
+      },
+      {
+        "id": "render-evidence",
+        "order": 9
+      },
+      {
+        "id": "audit-geometry",
+        "order": 10
+      },
+      {
+        "id": "visual-review",
+        "order": 11
+      },
+      {
+        "id": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "piece": [
+      {
+        "id": "back-tie"
+      },
+      {
+        "id": "dress-back-left"
+      },
+      {
+        "id": "dress-back-right"
+      },
+      {
+        "id": "dress-front"
+      },
+      {
+        "id": "hood-back"
+      },
+      {
+        "id": "hood-front"
+      },
+      {
+        "id": "sleeve"
+      },
+      {
+        "id": "wrist-drape"
+      }
+    ]
+  },
+  "facts": {
+    "stageRun": [
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "ingest-reference",
+        "order": 0
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "normalize-view",
+        "order": 1
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "decompose-garment",
+        "order": 2
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "draft-patterns",
+        "order": 3
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "infer-stitches",
+        "order": 4
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "initialize-3d",
+        "order": 5
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "build-blender",
+        "order": 6
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "skin-and-export",
+        "order": 8
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "render-evidence",
+        "order": 9
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "audit-geometry",
+        "order": 10
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "visual-review",
+        "order": 11
+      },
+      {
+        "productId": "siroino-white-ghost-gown",
+        "stageId": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "stitch": [
+      {
+        "stitchId": "left-side",
+        "firstPieceId": "dress-front",
+        "firstEdgeId": null,
+        "secondPieceId": "dress-back-left",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-side",
+        "firstPieceId": "dress-front",
+        "firstEdgeId": null,
+        "secondPieceId": "dress-back-right",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "center-back-lower",
+        "firstPieceId": "dress-back-left",
+        "firstEdgeId": null,
+        "secondPieceId": "dress-back-right",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-sleeve-underarm",
+        "firstPieceId": "sleeve",
+        "firstEdgeId": null,
+        "secondPieceId": "sleeve",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "right-sleeve-underarm",
+        "firstPieceId": "sleeve",
+        "firstEdgeId": null,
+        "secondPieceId": "sleeve",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "left-drape-to-wrist",
+        "firstPieceId": "wrist-drape",
+        "firstEdgeId": null,
+        "secondPieceId": "sleeve",
+        "secondEdgeId": null,
+        "type": "attachment"
+      },
+      {
+        "stitchId": "right-drape-to-wrist",
+        "firstPieceId": "wrist-drape",
+        "firstEdgeId": null,
+        "secondPieceId": "sleeve",
+        "secondEdgeId": null,
+        "type": "attachment"
+      },
+      {
+        "stitchId": "hood-crown",
+        "firstPieceId": "hood-front",
+        "firstEdgeId": null,
+        "secondPieceId": "hood-back",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "hood-left-side",
+        "firstPieceId": "hood-front",
+        "firstEdgeId": null,
+        "secondPieceId": "hood-back",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "hood-right-side",
+        "firstPieceId": "hood-front",
+        "firstEdgeId": null,
+        "secondPieceId": "hood-back",
+        "secondEdgeId": null,
+        "type": "plain"
+      },
+      {
+        "stitchId": "back-lace-attachments",
+        "firstPieceId": "back-tie",
+        "firstEdgeId": null,
+        "secondPieceId": "dress-back-left",
+        "secondEdgeId": null,
+        "type": "attachment"
+      }
+    ],
+    "overlayAttachment": []
+  },
+  "unresolved": [
+    {
+      "item": "exact factory seam allowance",
+      "status": "not-observable",
+      "decision": "use 4–10 mm allowances by function"
+    },
+    {
+      "item": "hood opening finish",
+      "status": "not-observable",
+      "decision": "use a clean hem without visible trim"
+    }
+  ],
+  "triples": [
+    {
+      "subject": "stage:ingest-reference",
+      "predicate": "precedes",
+      "object": "stage:normalize-view",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:normalize-view",
+      "predicate": "precedes",
+      "object": "stage:decompose-garment",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:decompose-garment",
+      "predicate": "precedes",
+      "object": "stage:draft-patterns",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:draft-patterns",
+      "predicate": "precedes",
+      "object": "stage:infer-stitches",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:infer-stitches",
+      "predicate": "precedes",
+      "object": "stage:initialize-3d",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:initialize-3d",
+      "predicate": "precedes",
+      "object": "stage:build-blender",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:build-blender",
+      "predicate": "precedes",
+      "object": "stage:simulate-cloth",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:simulate-cloth",
+      "predicate": "precedes",
+      "object": "stage:skin-and-export",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:skin-and-export",
+      "predicate": "precedes",
+      "object": "stage:render-evidence",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:render-evidence",
+      "predicate": "precedes",
+      "object": "stage:audit-geometry",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:audit-geometry",
+      "predicate": "precedes",
+      "object": "stage:visual-review",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:visual-review",
+      "predicate": "precedes",
+      "object": "stage:finalize-candidate",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "piece:dress-front",
+      "predicate": "stitchedTo",
+      "object": "piece:dress-back-left",
+      "evidence": "stitch:left-side"
+    },
+    {
+      "subject": "piece:dress-front",
+      "predicate": "stitchedTo",
+      "object": "piece:dress-back-right",
+      "evidence": "stitch:right-side"
+    },
+    {
+      "subject": "piece:dress-back-left",
+      "predicate": "stitchedTo",
+      "object": "piece:dress-back-right",
+      "evidence": "stitch:center-back-lower"
+    },
+    {
+      "subject": "piece:sleeve",
+      "predicate": "stitchedTo",
+      "object": "piece:sleeve",
+      "evidence": "stitch:left-sleeve-underarm"
+    },
+    {
+      "subject": "piece:sleeve",
+      "predicate": "stitchedTo",
+      "object": "piece:sleeve",
+      "evidence": "stitch:right-sleeve-underarm"
+    },
+    {
+      "subject": "piece:wrist-drape",
+      "predicate": "stitchedTo",
+      "object": "piece:sleeve",
+      "evidence": "stitch:left-drape-to-wrist"
+    },
+    {
+      "subject": "piece:wrist-drape",
+      "predicate": "stitchedTo",
+      "object": "piece:sleeve",
+      "evidence": "stitch:right-drape-to-wrist"
+    },
+    {
+      "subject": "piece:hood-front",
+      "predicate": "stitchedTo",
+      "object": "piece:hood-back",
+      "evidence": "stitch:hood-crown"
+    },
+    {
+      "subject": "piece:hood-front",
+      "predicate": "stitchedTo",
+      "object": "piece:hood-back",
+      "evidence": "stitch:hood-left-side"
+    },
+    {
+      "subject": "piece:hood-front",
+      "predicate": "stitchedTo",
+      "object": "piece:hood-back",
+      "evidence": "stitch:hood-right-side"
+    },
+    {
+      "subject": "piece:back-tie",
+      "predicate": "stitchedTo",
+      "object": "piece:dress-back-left",
+      "evidence": "stitch:back-lace-attachments"
+    }
+  ]
+}

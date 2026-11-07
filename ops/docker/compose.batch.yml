@@ -1,0 +1,12 @@
+services:
+  batch:
+    build:
+      context: ../..
+      dockerfile: ops/docker/batch.Dockerfile
+    working_dir: /workspace
+    volumes:
+      - ../..:/workspace
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+      IMAGE2OUTFIT_BLENDER: ${IMAGE2OUTFIT_BLENDER:-}

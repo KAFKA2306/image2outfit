@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-tuxedo-halter-dress-large",
+  "recipeVersion": "tuxedo-material-v1",
+  "mapSets": {
+    "wine_satin": {
+      "baseColorRgb": [
+        82,
+        2,
+        19
+      ],
+      "roughnessValue": 124,
+      "normalAmplitude": 9,
+      "provenance": {
+        "baseColor": "OBSERVED_REFERENCE_COLOR",
+        "roughness": "EXISTING_PRESET_HYPOTHESIS",
+        "normal": "EXISTING_PRESET_HYPOTHESIS"
+      }
+    },
+    "black_satin": {
+      "baseColorRgb": [
+        8,
+        8,
+        12
+      ],
+      "roughnessValue": 132,
+      "normalAmplitude": 8,
+      "provenance": {
+        "baseColor": "OBSERVED_REFERENCE_COLOR",
+        "roughness": "EXISTING_PRESET_HYPOTHESIS",
+        "normal": "EXISTING_PRESET_HYPOTHESIS"
+      }
+    },
+    "white_jacquard": {
+      "baseColorRgb": [
+        238,
+        237,
+        233
+      ],
+      "roughnessValue": 180,
+      "normalAmplitude": 7,
+      "provenance": {
+        "baseColor": "OBSERVED_REFERENCE_COLOR",
+        "roughness": "EXISTING_PRESET_HYPOTHESIS",
+        "normal": "EXISTING_PRESET_HYPOTHESIS"
+      }
+    }
+  },
+  "materials": {
+    "white": {
+      "materialName": "MAT_White_Jacquard",
+      "mapSet": "white_jacquard",
+      "sheen": 0.1,
+      "alpha": 1,
+      "metallic": 0,
+      "uvScale": [
+        1,
+        1
+      ],
+      "regions": [
+        "bib-front",
+        "bib-ruffles"
+      ]
+    },
+    "wine": {
+      "materialName": "MAT_Wine_Satin",
+      "mapSet": "wine_satin",
+      "sheen": 0.26,
+      "alpha": 1,
+      "metallic": 0,
+      "uvScale": [
+        1,
+        1
+      ],
+      "regions": [
+        "waistcoat-front",
+        "waistcoat-back",
+        "tails"
+      ]
+    },
+    "black": {
+      "materialName": "MAT_Black_Satin",
+      "mapSet": "black_satin",
+      "sheen": 0.18,
+      "alpha": 1,
+      "metallic": 0,
+      "uvScale": [
+        1,
+        1
+      ],
+      "regions": [
+        "upper-skirt",
+        "neck-band",
+        "bow",
+        "buttons",
+        "lace"
+      ]
+    },
+    "sheer": {
+      "materialName": "MAT_Black_Sheer",
+      "mapSet": "black_satin",
+      "sheen": 0.08,
+      "alpha": 0.52,
+      "metallic": 0,
+      "uvScale": [
+        1,
+        1
+      ],
+      "regions": [
+        "lower-skirt"
+      ]
+    },
+    "silver": {
+      "materialName": "MAT_Silver_Hardware",
+      "baseColorRgba": [
+        0.64,
+        0.69,
+        0.76,
+        1
+      ],
+      "roughness": 0.18,
+      "metallic": 0.92,
+      "regions": [
+        "waist-anchors",
+        "waist-chain"
+      ],
+      "provenance": "EXISTING_METAL_PRESET_HYPOTHESIS"
+    }
+  },
+  "previewPolicy": {
+    "coarseGeometryMaterial": "neutral-matte",
+    "finishAfterGeometryGate": true,
+    "finalVisualReviewRequired": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-verdant-ranger-explorer-set",
+  "units": "meter",
+  "coordinateSystem": "x-horizontal-y-vertical",
+  "pieces": [
+    {"pieceId": "tunic-front", "partId": "tunic-front", "boundary": [[-0.20, 0.52], [-0.29, 0.22], [-0.31, -0.46], [0.0, -0.54], [0.31, -0.46], [0.29, 0.22], [0.20, 0.52]], "cutCount": 1, "onFold": true, "seamAllowanceM": 0.01},
+    {"pieceId": "tunic-back", "partId": "tunic-back", "boundary": [[-0.30, 0.48], [0.30, 0.48], [0.33, -0.47], [-0.33, -0.47]], "cutCount": 1, "onFold": true, "seamAllowanceM": 0.01},
+    {"pieceId": "tunic-side-left", "partId": "tunic-side-left", "boundary": [[-0.08, 0.48], [-0.02, 0.42], [-0.03, -0.47], [-0.10, -0.38]], "cutCount": 1, "onFold": false, "seamAllowanceM": 0.008},
+    {"pieceId": "tunic-side-right", "partId": "tunic-side-right", "boundary": [[0.02, 0.42], [0.08, 0.48], [0.10, -0.38], [0.03, -0.47]], "cutCount": 1, "onFold": false, "seamAllowanceM": 0.008},
+    {"pieceId": "trouser-upper-left-right", "partId": "trouser-upper", "boundary": [[-0.18, 0.38], [0.10, 0.38], [0.16, -0.05], [-0.12, -0.05]], "cutCount": 2, "onFold": false, "seamAllowanceM": 0.008},
+    {"pieceId": "trouser-lower-left-right", "partId": "trouser-lower", "boundary": [[-0.13, 0.05], [0.13, 0.05], [0.12, -0.48], [-0.12, -0.48]], "cutCount": 2, "onFold": false, "seamAllowanceM": 0.008},
+    {"pieceId": "knee-gusset", "partId": "knee-gusset", "boundary": [[-0.08, 0.08], [0.08, 0.08], [0.06, -0.12], [-0.06, -0.12]], "cutCount": 4, "onFold": false, "seamAllowanceM": 0.006},
+    {"pieceId": "mandarin-collar", "partId": "mandarin-collar", "boundary": [[-0.15, 0.04], [0.15, 0.04], [0.14, -0.04], [-0.14, -0.04]], "cutCount": 1, "onFold": true, "seamAllowanceM": 0.006}
+  ],
+  "method": {
+    "name": "panel-first structured reconstruction",
+    "status": "TRIAL",
+    "rationale": "The replacement layout separates longline tunic, trouser leg shells and four knee gusset facings before Blender construction; the tunic panels are settled with native Cloth."
+  }
+}

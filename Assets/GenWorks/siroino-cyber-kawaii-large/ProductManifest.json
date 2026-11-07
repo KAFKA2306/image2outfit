@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-cyber-kawaii-large",
+  "productName": "Cyber Kawaii Layered Set for Siroino _Large",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0-large",
+  "target": "Siroino _Large via official shape keys",
+  "productRoot": "Assets/GenWorks/siroino-cyber-kawaii-large",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab",
+  "previewPath": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-cyber-kawaii-large/README.md",
+  "sourceJobPath": "config/products/siroino-cyber-kawaii-large/job.json",
+  "productBuildScript": "tools/siroino_cyber_kawaii_shape_profile_build.py",
+  "designRevision": "v6-large-fitted-skirt-silhouette",
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-cyber-kawaii-large",
+    "doNotRebuildFromZero": true,
+    "resumeFrom": "tools/siroino_cyber_kawaii_shape_profile_build.py",
+    "lastAttempt": {
+      "result": "HOSTED_MODELED",
+      "visualRevision": "v6-large-fitted-skirt-silhouette",
+      "shapeProfile": "Siroino _Large via official shape keys"
+    },
+    "blockers": [
+      "Import and save both Prefabs in pinned Unity",
+      "Pass Prefab reload and Modular Avatar/NDMF checks",
+      "Complete human multiview, pose-penetration, and VRChat runtime reviews"
+    ]
+  },
+  "technicalGates": {
+    "standardTargetResolved": "PASS",
+    "blender": "PASS",
+    "fbx": "PASS",
+    "bodyClearance": "PASS",
+    "fiveViewRender": "UNVERIFIED",
+    "poseRender": "UNVERIFIED",
+    "unityImport": "PENDING",
+    "prefabSerialized": "PENDING",
+    "prefabReload": "PENDING",
+    "modularAvatar": "PENDING",
+    "vrchatBuildAndTest": "PENDING",
+    "humanVisualReview": "PENDING",
+    "humanPoseReview": "PENDING",
+    "humanRuntimeReview": "PENDING",
+    "shapeProfileApplied": "PASS",
+    "skirtWeightTransfer": "PASS",
+    "skirtSilhouette": "PASS",
+    "patternContract": "PASS",
+    "garmentCode": "PENDING",
+    "zozoContactSolver": "PENDING",
+    "materialMakerSource": "PENDING",
+    "clothSimulation": "PASS"
+  },
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-cyber-kawaii-large/Source/Blender/SiroinoCyberKawaii.blend",
+    "fbx": "Assets/GenWorks/siroino-cyber-kawaii-large/Models/SiroinoCyberKawaii.fbx",
+    "prefab": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoCyberKawaii.prefab",
+    "integratedPrefab": "Assets/GenWorks/siroino-cyber-kawaii-large/Prefab/SiroinoSotai_CyberKawaii.prefab",
+    "multiview": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-multiview.webp",
+    "poseReview": "Assets/GenWorks/siroino-cyber-kawaii-large/Previews/siroino-cyber-kawaii-large-pose-review.webp",
+    "clothSimulation": "Assets/GenWorks/siroino-cyber-kawaii-large/Evidence/Build/cloth-simulation.json"
+  },
+  "shapeProfile": {
+    "profile": "Siroino _Large via official shape keys",
+    "appliedShapeKeys": {
+      "All_L": 1.0,
+      "Chest_L": 1.0,
+      "Hips_01_L": 1.0,
+      "UpperLeg_L": 1.0,
+      "Breasts_L": 0.65
+    },
+    "vertices": 8421,
+    "sourceBody": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+    "profileMode": "shape-key-bake",
+    "requestedShapeKeys": {
+      "All_L": 1.0,
+      "Chest_L": 1.0,
+      "Hips_01_L": 1.0,
+      "UpperLeg_L": 1.0,
+      "Breasts_L": 0.65
+    }
+  },
+  "skirtWeightTransfer": {
+    "Black_Pink_Plaid_Pleated_Skirt": {
+      "fallbackVertices": 0,
+      "maximumHipAnchor": 0.88,
+      "maximumInfluences": 2,
+      "maximumLegAnchor": 0.3,
+      "minimumHipAnchor": 0.42,
+      "vertices": 384
+    },
+    "Black_Skirt_Waistband": {
+      "fallbackVertices": 0,
+      "maximumHipAnchor": 0.88,
+      "maximumInfluences": 3,
+      "maximumLegAnchor": 0.3,
+      "minimumHipAnchor": 0.42,
+      "vertices": 256
+    },
+    "Pink_Underskirt_Hem": {
+      "fallbackVertices": 0,
+      "maximumHipAnchor": 0.88,
+      "maximumInfluences": 2,
+      "maximumLegAnchor": 0.3,
+      "minimumHipAnchor": 0.42,
+      "vertices": 320
+    },
+    "White_Ruffle_Underskirt": {
+      "fallbackVertices": 0,
+      "maximumHipAnchor": 0.88,
+      "maximumInfluences": 2,
+      "maximumLegAnchor": 0.3,
+      "minimumHipAnchor": 0.42,
+      "vertices": 320
+    }
+  },
+  "skirtSilhouette": {
+    "Black_Pink_Plaid_Pleated_Skirt": {
+      "bottomScale": 0.835,
+      "pleatScale": 0.56,
+      "ringCount": 3,
+      "topScale": 0.985,
+      "vertices": 384,
+      "zOffset": -0.006
+    },
+    "Black_Skirt_Waistband": {
+      "bottomScale": 0.965,
+      "pleatScale": 0.5,
+      "ringCount": 2,
+      "topScale": 0.975,
+      "vertices": 256,
+      "zOffset": -0.008
+    },
+    "Pink_Underskirt_Hem": {
+      "bottomScale": 0.855,
+      "pleatScale": 0.58,
+      "ringCount": 2,
+      "topScale": 0.885,
+      "vertices": 320,
+      "zOffset": -0.004
+    },
+    "White_Ruffle_Underskirt": {
+      "bottomScale": 0.86,
+      "pleatScale": 0.62,
+      "ringCount": 2,
+      "topScale": 0.9,
+      "vertices": 320,
+      "zOffset": -0.004
+    }
+  },
+  "productionPipeline": {
+    "pattern_contract": "PASS",
+    "pattern_sha256": "9aadd9db5ba4143d1bfd025fc88d14e14564898c3b79f2c2b887a0d20f9ff915",
+    "garment_code": "PENDING",
+    "zozo_contact_solver": "PENDING",
+    "material_maker_source": "PENDING",
+    "solver_mesh_present": false,
+    "solver_report_present": false,
+    "material_sources_present": false
+  },
+  "clothSimulation": "Assets/GenWorks/siroino-cyber-kawaii-large/Evidence/Build/cloth-simulation.json",
+  "gateEvidenceCorrections": {
+    "technicalGates.fiveViewRender": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.fiveViewRender was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-cyber-kawaii-large/Previews/front.png, Assets/GenWorks/siroino-cyber-kawaii-large/Previews/back.png, Assets/GenWorks/siroino-cyber-kawaii-large/Previews/three-quarter.png",
+      "correctedOn": "2026-10-15"
+    },
+    "technicalGates.poseRender": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "technicalGates.poseRender was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-cyber-kawaii-large/Previews/Poses/neutral.png, Assets/GenWorks/siroino-cyber-kawaii-large/Previews/Poses/crouch.png, Assets/GenWorks/siroino-cyber-kawaii-large/Previews/Poses/sit.png",
+      "correctedOn": "2026-10-15"
+    }
+  }
+}

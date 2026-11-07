@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 2,
+  "designRevision": "v29-smoothed-clearance-tapered-yoke-fitted-sleeve",
+  "checkedAt": "2026-08-05T11:51:00+09:00",
+  "productId": "siroino-heather-hooded-bodysuit",
+  "target": "SiroinoSotai_PC",
+  "result": "FAIL",
+  "visualAppearanceReview": "FAIL",
+  "releaseDecision": "WORKING_CHECKPOINT_ONLY",
+  "reviewer": "ChatGPT direct artifact image review",
+  "evidence": {
+    "headSha": "4de36b59a0114d7cf162440ba7ecb9e9e424e422",
+    "hostedWorkflowRun": 30962748164,
+    "artifactId": 8913817411,
+    "artifactSha256": "ff4a21413de725a6b11205069a574760d7abec9cf8038b3f44e7e655509a201f",
+    "multiview": "Previews/siroino-heather-hooded-bodysuit-multiview.webp",
+    "poseReview": "Previews/siroino-heather-hooded-bodysuit-pose-review.webp",
+    "fitAudit": "Tests/fit-audit.json",
+    "researchTrial": "Research/smoothed-clearance-yoke-trial.json"
+  },
+  "researchDecision": {
+    "method": "Smoothed bounded clearance with a five-ring tapered yoke, fitted sleeves, shallow saddle and compact rear-neck hood surface",
+    "execution": "SUCCESS",
+    "productAdoption": "REJECTED_FOR_CURRENT_REVISION",
+    "quantitativeResult": {
+      "requiredPoseOverlapPairs": {
+        "neutral": 681,
+        "arms-up": 3676,
+        "arm-cross": 1519,
+        "crouch": 681,
+        "sit": 682,
+        "prone": 3120
+      },
+      "totalRequiredPoseOverlapPairs": 10359,
+      "v28TotalRequiredPoseOverlapPairs": 12494,
+      "relativeReductionFromV28Percent": 17.09,
+      "v27TotalRequiredPoseOverlapPairs": 15753,
+      "relativeReductionFromV27Percent": 34.24,
+      "hoodOverlapPairs": 0,
+      "bodyShellOverlapPairs": 4942,
+      "leftSleeveOverlapPairs": 2651,
+      "rightSleeveOverlapPairs": 2642
+    },
+    "finding": "The v29 representation reduced total intersections and eliminated measured hood intersections, but it removed the visible high-cut underbody connection and still fails the product silhouette and dynamic sleeve fit."
+  },
+  "blockingFindings": [
+    {
+      "zone": "high-cut underbody and leg openings",
+      "finding": "The front, rear and three-quarter views show a long top ending over the hips; the garment no longer presents a connected high-cut bodysuit bridge or leg openings."
+    },
+    {
+      "zone": "shoulder yoke and neckline",
+      "finding": "The five-ring yoke reads as a broad flat plate around the neck and upper back instead of a fitted neckline integrated into the garment."
+    },
+    {
+      "zone": "underarm and side seams",
+      "finding": "Side views retain abrupt folds and protrusions where the sleeves meet the torso."
+    },
+    {
+      "zone": "required pose penetration",
+      "finding": "All six required poses still fail the evaluated-mesh BVH audit, with the largest counts in arms-up (3676) and prone (3120)."
+    },
+    {
+      "zone": "sleeves",
+      "finding": "The sleeve profile is visually slimmer than v28, but the left and right sleeves still contribute 5293 overlap pairs across the required poses."
+    },
+    {
+      "zone": "hood",
+      "finding": "Measured hood intersections are zero, but the rear-neck surface reads primarily as a wide collar flap rather than a coherent wearable hood."
+    }
+  ],
+  "nextAction": "Restore an explicit continuous high-cut underbody and leg-opening topology, then rebuild the neck/hood transition without a plate-like yoke. Reduce dynamic sleeve intersections before another visual review."
+}

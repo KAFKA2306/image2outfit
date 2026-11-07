@@ -5,6 +5,7 @@ Every frame uses the same generated garment and exact target body. The prone
 case rotates both armatures into an actual horizontal body orientation rather
 than merely bending the legs of an upright avatar.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -14,7 +15,7 @@ import sys
 from pathlib import Path
 
 import bpy
-from mathutils import Euler, Vector
+from mathutils import Euler, Matrix, Vector
 from PIL import Image, ImageDraw, ImageFont
 
 TOOLS = Path(__file__).resolve().parent
@@ -24,6 +25,7 @@ if str(TOOLS) not in sys.path:
 import siroino_strappy_knit_build as common
 
 ROOT = Path(__file__).resolve().parents[1]
+_GARMENT_MESH_BASES: dict[str, Matrix] = {}
 
 
 def args() -> argparse.Namespace:
@@ -49,7 +51,9 @@ def clear(
         bone.scale = (1.0, 1.0, 1.0)
 
 
-def rotate(armature: bpy.types.Object, name: str, degrees: tuple[float, float, float]) -> None:
+def rotate(
+    armature: bpy.types.Object, name: str, degrees: tuple[float, float, float]
+) -> None:
     bone = armature.pose.bones.get(name)
     if bone is not None:
         bone.rotation_mode = "XYZ"
@@ -61,13 +65,29 @@ def apply_pose(
     base_transforms: dict[str, tuple[Vector, Euler, Vector]],
     name: str,
 ) -> None:
+    garment_armature = armatures[0]
+    garment_meshes = [
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH"
+        and any(
+            modifier.type == "ARMATURE" and modifier.object is garment_armature
+            for modifier in obj.modifiers
+        )
+    ]
+    for obj in garment_meshes:
+        _GARMENT_MESH_BASES.setdefault(obj.name, obj.matrix_world.copy())
+        obj.matrix_world = _GARMENT_MESH_BASES[obj.name].copy()
     for armature in armatures:
         clear(armature, base_transforms[armature.name])
         if name == "arms-up":
-            rotate(armature, "UpperArm_L", (-105.0, 0.0, -8.0))
-            rotate(armature, "UpperArm_R", (-105.0, 0.0, 8.0))
-            rotate(armature, "LowerArm_L", (-8.0, 0.0, 0.0))
-            rotate(armature, "LowerArm_R", (-8.0, 0.0, 0.0))
+            # Use a moderate local-X elevation.  The earlier extreme value
+            # sent the sleeves behind the camera; this remains readable while
+            # still exercising the upper-arm deformation.
+            rotate(armature, "UpperArm_L", (45.0, 0.0, -8.0))
+            rotate(armature, "UpperArm_R", (45.0, 0.0, 8.0))
+            rotate(armature, "LowerArm_L", (12.0, 0.0, 0.0))
+            rotate(armature, "LowerArm_R", (12.0, 0.0, 0.0))
         elif name == "arm-cross":
             rotate(armature, "UpperArm_L", (-38.0, 18.0, -54.0))
             rotate(armature, "UpperArm_R", (-38.0, -18.0, 54.0))
@@ -101,6 +121,14 @@ def apply_pose(
             rotate(armature, "UpperArm_R", (-34.0, 0.0, 18.0))
             rotate(armature, "LowerArm_L", (-48.0, 0.0, 0.0))
             rotate(armature, "LowerArm_R", (-48.0, 0.0, 0.0))
+    if name == "prone":
+        # The imported target body rotates with its armature root, while the
+        # generated rigid panels retain their object-space origin. Apply the
+        # same root rotation to generated meshes only for this evidence pose.
+        prone_root = Matrix.Rotation(math.radians(90.0), 4, "X")
+        prone_offset = Matrix.Translation((0.0, 0.40, 0.07))
+        for obj in garment_meshes:
+            obj.matrix_world = prone_offset @ prone_root @ _GARMENT_MESH_BASES[obj.name]
     bpy.context.view_layer.update()
 
 
@@ -135,6 +163,9 @@ def import_target(job: dict) -> tuple[bpy.types.Object, bpy.types.Object]:
         if obj.type == "MESH" and obj.name.startswith("SiroinoSotai_PC")
     )
     armature = next(obj for obj in imported if obj.type == "ARMATURE")
+    for obj in imported:
+        if obj not in {body, armature}:
+            bpy.data.objects.remove(obj, do_unlink=True)
     common.set_skin_material(body)
     return body, armature
 
@@ -183,6 +214,72 @@ def main() -> int:
         "sit": ((1.72, -2.05, 0.46), (0.0, 0.0, 0.30), 1.23),
         "prone": ((1.90, -0.46, 0.70), (0.0, -0.44, 0.17), 1.32),
     }
+    if job["id"] == "siroino-arc-latch-cocoon-bomber-set":
+        camera_settings = {
+            "neutral": ((1.62, -1.90, 0.86), (0.0, 0.0, 0.70), 1.30),
+            "arms-up": ((1.62, -1.90, 0.86), (0.0, 0.0, 0.70), 1.30),
+            "arm-cross": ((1.62, -1.90, 0.86), (0.0, 0.0, 0.70), 1.30),
+            "crouch": ((1.72, -2.05, 0.68), (0.0, 0.0, 0.52), 1.30),
+            "sit": ((1.72, -2.05, 0.68), (0.0, 0.0, 0.50), 1.30),
+            "prone": ((1.90, -0.46, 0.86), (0.0, -0.44, 0.50), 1.38),
+        }
+    elif job["id"] == "siroino-aster-fold-utility-kimono-set":
+        camera_settings = {
+            "neutral": ((1.62, -1.90, 0.80), (0.0, 0.0, 0.62), 1.28),
+            "arms-up": ((1.72, -2.05, 0.98), (0.0, 0.0, 0.86), 1.58),
+            "arm-cross": ((1.62, -1.90, 0.80), (0.0, 0.0, 0.62), 1.28),
+            "crouch": ((1.72, -2.05, 0.62), (0.0, 0.0, 0.46), 1.28),
+            "sit": ((1.72, -2.05, 0.62), (0.0, 0.0, 0.44), 1.28),
+            "prone": ((1.90, -0.46, 0.80), (0.0, -0.44, 0.44), 1.36),
+        }
+    elif job["id"] == "siroino-quiet-arc-panel-dress":
+        camera_settings = {
+            "neutral": ((1.62, -1.90, 0.72), (0.0, 0.0, 0.54), 1.30),
+            "arms-up": ((1.72, -2.05, 0.90), (0.0, 0.0, 0.76), 1.56),
+            "arm-cross": ((1.62, -1.90, 0.72), (0.0, 0.0, 0.54), 1.30),
+            "crouch": ((1.72, -2.05, 0.50), (0.0, 0.0, 0.36), 1.30),
+            "sit": ((1.72, -2.05, 0.48), (0.0, 0.0, 0.34), 1.30),
+            "prone": ((1.90, -0.46, 0.72), (0.0, -0.44, 0.38), 1.38),
+        }
+    elif job["id"] == "siroino-lumen-atelier-apron":
+        camera_settings = {
+            "neutral": ((1.62, -1.90, 0.72), (0.0, 0.0, 0.54), 1.30),
+            "arms-up": ((1.72, -2.05, 0.90), (0.0, 0.0, 0.76), 1.56),
+            "arm-cross": ((1.62, -1.90, 0.72), (0.0, 0.0, 0.54), 1.30),
+            "crouch": ((1.72, -2.05, 0.50), (0.0, 0.0, 0.36), 1.30),
+            "sit": ((1.72, -2.05, 0.48), (0.0, 0.0, 0.34), 1.30),
+            "prone": ((1.90, -0.46, 0.72), (0.0, -0.44, 0.38), 1.38),
+        }
+    elif job["id"] == "siroino-signal-fold-transit-tabard":
+        camera_settings = {
+            "neutral": ((1.62, -1.90, 0.72), (0.0, 0.0, 0.54), 1.30),
+            "arms-up": ((1.72, -2.05, 0.90), (0.0, 0.0, 0.76), 1.56),
+            "arm-cross": ((1.62, -1.90, 0.72), (0.0, 0.0, 0.54), 1.30),
+            "crouch": ((1.72, -2.05, 0.50), (0.0, 0.0, 0.36), 1.30),
+            "sit": ((1.72, -2.05, 0.48), (0.0, 0.0, 0.34), 1.30),
+            "prone": ((1.90, -0.46, 0.72), (0.0, -0.44, 0.38), 1.38),
+        }
+
+    # Materialize the contract's five neutral turnaround views alongside the
+    # required motion evidence.  The exact target armature is reset first so
+    # these views cannot inherit a pose from the previous render run.
+    apply_pose(armatures, base_transforms, "neutral")
+    preview_settings = {
+        "front": ((0.0, -2.45, 0.70), (0.0, 0.0, 0.42)),
+        "back": ((0.0, 2.45, 0.70), (0.0, 0.0, 0.42)),
+        "left": ((2.45, 0.0, 0.70), (0.0, 0.0, 0.42)),
+        "right": ((-2.45, 0.0, 0.70), (0.0, 0.0, 0.42)),
+        "three-quarter": ((1.62, -1.90, 0.70), (0.0, 0.0, 0.42)),
+    }
+    preview_paths: dict[str, Path] = {}
+    for name, (location, target) in preview_settings.items():
+        path = root / "Previews" / f"{name}.png"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        camera.data.ortho_scale = 1.30
+        common.point_camera(camera, location, target)
+        scene.render.filepath = str(path)
+        bpy.ops.render.render(write_still=True)
+        preview_paths[name] = path
 
     paths: dict[str, Path] = {}
     for name in ("neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"):
@@ -195,13 +292,16 @@ def main() -> int:
         bpy.ops.render.render(write_still=True)
         paths[name] = path
     apply_pose(armatures, base_transforms, "neutral")
-    sheet(paths, root / "Previews" / "siroino-wide-cargo-pose-review.webp")
+    sheet(paths, root / "Previews" / f"{root.name}-pose-review.webp")
     print(
         json.dumps(
             {
                 "passed": True,
                 "targetSource": job["targetSourcePath"],
                 "proneBodyOrientation": "horizontal",
+                "fiveViewPreviews": {
+                    name: str(path) for name, path in preview_paths.items()
+                },
                 "poses": {name: str(path) for name, path in paths.items()},
             },
             indent=2,

@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-nocturnal-shrine-maiden-long-hakama-set",
+  "status": "REVIEW_REQUIRED",
+  "reviewMethod": "direct-image-inspection",
+  "reviewedRevision": "v2-architectural-moon-gate-long-hakama",
+  "decision": "REVIEW_REQUIRED",
+  "findings": [
+    {"severity": "blocking", "area": "sourceArtifact", "finding": "Issue #647 exact generated manufacturing board is unavailable; the persisted board is explicitly a replacement and not exact."},
+    {"severity": "pass", "area": "constructionIdentity", "finding": "Replacement candidate removes the rejected crossed shrine upper, detached wide sleeves, conventional obi/back bow, cords, tassels and floral decoration."},
+    {"severity": "pass", "area": "clothPanels", "finding": "All four primary hakama panels and both side gussets show baked native Cloth deformation at frame 32."},
+    {"severity": "minor", "area": "sideSilhouette", "finding": "Side gussets close the previous body gap but read as a deliberately structured, slightly planar panel in profile."},
+    {"severity": "pass", "area": "unityIntegration", "finding": "Dedicated scene, Modular Avatar merge armature, NDMF bake and VRChat dry-run are valid."}
+  ],
+  "reviewNotes": "The product must remain WORKING and must not be marked COMPLETE while the exact Issue artifact is unavailable. Visual imperfections may be accepted after geometry, cloth and Unity evidence are reviewed; the previous side gap was repaired with two sewn side gussets."
+}

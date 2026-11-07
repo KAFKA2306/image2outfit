@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KAFKA2306/image2outfit/contracts/quality/visual-review.schema.v1.json",
+  "title": "Direct image visual review (candidate_quality)",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "productId",
+    "reviewMethod",
+    "reviewedRevision",
+    "status",
+    "decision",
+    "inspectedImages"
+  ],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "productId": {"type": "string", "minLength": 1},
+    "reviewMethod": {"const": "direct-image-inspection"},
+    "reviewedRevision": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PASS", "REJECTED"]},
+    "decision": {"enum": ["PASS", "REJECT"]},
+    "inspectedImages": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"type": "string", "minLength": 1},
+      "additionalProperties": {"type": "string", "minLength": 64, "maxLength": 64}
+    },
+    "findings": {"type": "array"}
+  },
+  "allOf": [
+    {
+      "if": {"required": ["status"], "properties": {"status": {"const": "PASS"}}},
+      "then": {"properties": {"decision": {"const": "PASS"}}}
+    },
+    {
+      "if": {"required": ["status"], "properties": {"status": {"const": "REJECTED"}}},
+      "then": {
+        "required": ["decision", "findings"],
+        "properties": {
+          "decision": {"const": "REJECT"},
+          "findings": {"minItems": 1}
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-bellflower-lantern-trouser-set",
+  "units": "m",
+  "designRevision": "v1-sewn-bellflower-panels-and-yoke",
+  "source": {"type": "manufacturing-blueprint", "board": "Assets/GenWorks/siroino-bellflower-lantern-trouser-set/Previews/manufacturing-blueprint.png"},
+  "panels": [
+    {"id": "blouse_front_left", "boundaries": ["neck", "armhole", "side", "waist"]},
+    {"id": "blouse_front_right", "boundaries": ["neck", "armhole", "side", "waist"]},
+    {"id": "blouse_back_left", "boundaries": ["neck", "armhole", "center", "waist"]},
+    {"id": "blouse_back_right", "boundaries": ["neck", "armhole", "center", "waist"]},
+    {"id": "trouser_front_left", "boundaries": ["waist", "side", "inseam", "hem"]},
+    {"id": "trouser_front_right", "boundaries": ["waist", "side", "inseam", "hem"]},
+    {"id": "trouser_back_left", "boundaries": ["waist", "side", "inseam", "hem"]},
+    {"id": "trouser_back_right", "boundaries": ["waist", "side", "inseam", "hem"]},
+    {"id": "outer_leg_panel_01", "boundaries": ["top", "outer", "inner", "bottom"]},
+    {"id": "outer_leg_panel_02", "boundaries": ["top", "outer", "inner", "bottom"]},
+    {"id": "outer_leg_panel_03", "boundaries": ["top", "outer", "inner", "bottom"]},
+    {"id": "outer_leg_panel_04", "boundaries": ["top", "outer", "inner", "bottom"]}
+  ],
+  "seamPairs": [
+    ["blouse_front_left:side", "blouse_back_left:side"],
+    ["blouse_front_right:side", "blouse_back_right:side"],
+    ["blouse_front_left:armhole", "sleeve_left:cap"],
+    ["blouse_front_right:armhole", "sleeve_right:cap"],
+    ["trouser_front_left:side", "trouser_back_left:side"],
+    ["trouser_front_right:side", "trouser_back_right:side"],
+    ["trouser_front_left:inseam", "trouser_front_right:inseam"],
+    ["trouser_back_left:inseam", "trouser_back_right:inseam"],
+    ["outer_leg_panel_01:inner", "trouser_front_left:side"],
+    ["outer_leg_panel_02:inner", "outer_leg_panel_01:outer"],
+    ["outer_leg_panel_03:inner", "outer_leg_panel_02:outer"],
+    ["outer_leg_panel_04:inner", "outer_leg_panel_03:outer"]
+  ],
+  "openBoundaries": [
+    "blouse_front_left:neck", "blouse_front_right:neck", "blouse_back_left:neck", "blouse_back_right:neck",
+    "trouser_front_left:waist", "trouser_front_right:waist", "trouser_back_left:waist", "trouser_back_right:waist",
+    "trouser_front_left:hem", "trouser_front_right:hem", "trouser_back_left:hem", "trouser_back_right:hem"
+  ],
+  "acceptance": {"panelCount": 12, "seamPairCount": 12, "allSeamReferencesMustExist": true}
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "designRevision": "v1-pattern-gsl-modular-cloth",
+  "checkedAt": "2026-08-05T02:52:30+09:00",
+  "productId": "siroino-nocturne-angel-set",
+  "target": "SiroinoSotai_PC",
+  "result": "FAIL",
+  "visualAppearanceReview": "FAIL",
+  "releaseDecision": "REJECTED_REVISION_RETAINED_FOR_AUDIT",
+  "reviewer": "ChatGPT direct artifact image review",
+  "evidence": {
+    "hostedWorkflowRun": 30934884455,
+    "artifactId": 8903072226,
+    "artifactSha256": "1281d60218aec96072a910e0c1296652344f23c62d493882ffb7b61c0392551a",
+    "multiview": "Previews/siroino-nocturne-angel-set-multiview.webp",
+    "poseReview": "Previews/siroino-nocturne-angel-set-pose-review.webp",
+    "fitAudit": "Tests/fit-audit.json"
+  },
+  "execution": {
+    "blender": "PASS",
+    "fiveViewEvidence": "PASS",
+    "poseEvidence": "PASS",
+    "clothSimulation": "PASS",
+    "researchTrial": "PASS"
+  },
+  "blockingFindings": [
+    {
+      "zone": "evidence framing",
+      "finding": "The head, beret, ears, lower legs, shoes and large portions of both wings are cropped from the five-view sheet; several pose frames also omit required body regions."
+    },
+    {
+      "zone": "bodice",
+      "finding": "The bodice is a rigid rectangular tube positioned below the chest, exposing the bust and failing to form the reference sailor crop-top silhouette."
+    },
+    {
+      "zone": "sleeves and cuffs",
+      "finding": "The puff sleeves and detached arm warmers are oversized cylinders with visible planar end caps rather than finished open fabric shells."
+    },
+    {
+      "zone": "collar",
+      "finding": "The sailor collar is represented by detached sharp triangular plates that visibly float beside the bodice."
+    },
+    {
+      "zone": "skirt and hem",
+      "finding": "The skirt reads as a simple rigid cone and the cream hem trim as a thick capped ring instead of a layered mini-skirt with lace or frill."
+    },
+    {
+      "zone": "wings and accessories",
+      "finding": "The wings are stacks of overlapping oval solids, and the shoes, leg warmers and charms remain coarse proxy forms."
+    },
+    {
+      "zone": "required poses",
+      "finding": "Crouch, sit and prone show severe inversions, interpenetration and detached-looking layered components; all six poses contain evaluated body-garment intersections."
+    }
+  ],
+  "fitAuditSummary": {
+    "posesWithIntersections": ["neutral", "arms-up", "arm-cross", "crouch", "sit", "prone"],
+    "totalTriangleOverlapPairs": 11165,
+    "neutralTriangleOverlapPairs": 2342,
+    "completionBlockingByItself": false
+  },
+  "nextAction": "Replace capped primitives with open multi-ring garment shells, use rigid bone attachment for accessories, correct the sailor bodice and collar silhouette, and reframe every view before the next direct review."
+}

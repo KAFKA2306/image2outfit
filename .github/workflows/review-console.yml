@@ -1,0 +1,155 @@
+name: Review console
+
+on:
+  pull_request:
+    paths:
+      - "contracts/quality/quality-spec.json"
+      - "src/image2outfit/quality.py"
+      - "src/image2outfit/improvement.py"
+      - "tools/improvement_loop.py"
+      - "tools/manage.py"
+      - "tools/release_orchestrator.py"
+      - "tools/review_console.py"
+      - "tools/reconcile_publication.py"
+      - "site/review-showcase.css"
+      - "site/review-showcase.js"
+      - "tests/test_quality_spec.py"
+      - "tests/test_review_console_v2.py"
+      - "tests/test_reconcile_publication.py"
+      - "tests/test_improvement_loop.py"
+      - "tests/test_improvement_orchestrator.py"
+      - "tests/test_improvement_review_projection.py"
+      - ".github/workflows/review-console.yml"
+      - "config/release-policy.json"
+      - "Assets/GenWorks/**/ProductManifest.json"
+      - "Assets/GenWorks/**/Previews/**"
+      - "Assets/GenWorks/**/Research/Improvement/**"
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: review-console-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Python 3.11 fixture contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Compile review console and improvement loop
+        run: >-
+          python -m py_compile
+          src/image2outfit/improvement.py
+          tools/improvement_loop.py
+          tools/manage.py
+          tools/review_console.py
+          tools/reconcile_publication.py
+          tests/test_review_console_v2.py
+          tests/test_reconcile_publication.py
+          tests/test_improvement_loop.py
+          tests/test_improvement_orchestrator.py
+          tests/test_improvement_review_projection.py
+
+      - name: Run focused fixture tests
+        run: |
+          python -m unittest discover -s tests -p "test_review_console_v2.py" -v
+          python -m unittest discover -s tests -p "test_reconcile_publication.py" -v
+          python -m unittest discover -s tests -p "test_improvement_loop.py" -v
+          python -m unittest discover -s tests -p "test_improvement_orchestrator.py" -v
+          python -m unittest discover -s tests -p "test_improvement_review_projection.py" -v
+
+      - name: Build public review console and publication reconciliation
+        run: |
+          python tools/review_console.py --output .
+          python tools/reconcile_publication.py --console review-console.json --output publication-reconciliation.json
+          python - <<'PY'
+          import json
+          import shutil
+          from pathlib import Path
+
+          root = Path.cwd().resolve()
+          site = root / "_site"
+          site.mkdir(exist_ok=True)
+          for name in ("index.html", "review-console.json", "publication-reconciliation.json"):
+              shutil.copy2(root / name, site / name)
+
+          for name in ("review-showcase.css", "review-showcase.js"):
+              shutil.copy2(root / "site" / name, site / name)
+
+          index_path = site / "index.html"
+          html = index_path.read_text(encoding="utf-8")
+          html = html.replace(
+              "</head>",
+              '<link rel="stylesheet" href="./review-showcase.css"></head>',
+              1,
+          )
+          html = html.replace(
+              "</body>",
+              '<script src="./review-showcase.js"></script></body>',
+              1,
+          )
+          index_path.write_text(html, encoding="utf-8")
+
+          data = json.loads((root / "review-console.json").read_text(encoding="utf-8"))
+          products = data.get("products", [])
+          if not products:
+              raise SystemExit("review console contains no products")
+
+          hrefs = set()
+          for product in products:
+              hrefs.add(product["manifest_href"])
+              for key in ("assets", "gates", "evidence", "downloads"):
+                  for item in product.get(key, []):
+                      href = item.get("href")
+                      if href and not href.startswith(("https://", "http://")):
+                          hrefs.add(href)
+
+          copied = 0
+          for href in sorted(hrefs):
+              source = (root / href).resolve()
+              if source != root and root not in source.parents:
+                  raise SystemExit(f"local review link escapes repository: {href}")
+              if not source.is_file():
+                  raise SystemExit(f"local review link is missing: {href}")
+              destination = site / href
+              destination.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(source, destination)
+              copied += 1
+
+          built_html = index_path.read_text(encoding="utf-8")
+          if "review-showcase.css" not in built_html or "review-showcase.js" not in built_html:
+              raise SystemExit("render showcase assets were not injected")
+
+          reconciliation = json.loads((root / "publication-reconciliation.json").read_text(encoding="utf-8"))
+          print(
+              f"pages_products={len(products)} linked_files={copied} showcase=PASS "
+              f"silent_omissions={reconciliation['silentOmissionCount']}"
+          )
+          PY
+
+      - name: Delete previous publication reconciliation inventory
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/delete_previous_artifacts.py publication-reconciliation
+
+      - name: Upload publication reconciliation inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-reconciliation
+          path: publication-reconciliation.json
+          if-no-files-found: error
+          retention-days: 1
+          overwrite: true

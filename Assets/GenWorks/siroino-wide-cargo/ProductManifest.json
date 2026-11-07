@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-wide-cargo",
+  "productName": "Siroino Wide Cargo",
+  "status": "WORKING",
+  "targetAdapterId": "siroino-v1.0",
+  "productRoot": "Assets/GenWorks/siroino-wide-cargo",
+  "outfitPrefabPath": "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
+  "integratedPrefabPath": "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoSotai_WideCargo.prefab",
+  "previewPath": "Assets/GenWorks/siroino-wide-cargo/Previews/front.png",
+  "documentationPath": "Assets/GenWorks/siroino-wide-cargo/README.md",
+  "demoScenePath": "Assets/GenWorks/siroino-wide-cargo/Demo/SiroinoWideCargo_Demo.unity",
+  "sourceJobPath": "config/products/siroino-wide-cargo/job.json",
+  "generatedAt": "2026-09-16T01:22:54.887039Z",
+  "blenderVersion": "4.4.3",
+  "completionPolicyPath": "config/genworks-handoff-policy.json",
+  "completionPolicySchemaVersion": 2,
+  "completionGates": {
+    "blender": "UNVERIFIED",
+    "editableSource": "UNVERIFIED",
+    "fbx": "UNVERIFIED",
+    "prefabDeclared": "PASS",
+    "fiveViewEvidence": "UNVERIFIED",
+    "poseEvidence": "UNVERIFIED",
+    "visualAppearanceReview": "FAIL"
+  },
+  "handoff": {
+    "resumable": true,
+    "canonicalWorkspace": "Assets/GenWorks/siroino-wide-cargo",
+    "resumeFrom": "Assets/GenWorks/siroino-wide-cargo/Prefab/SiroinoWideCargo.prefab",
+    "doNotRebuildFromZero": true,
+    "lastRejectedAttempt": {
+      "pullRequest": 22,
+      "sourceCommit": "78792fd1a16cb4b75639485d19054a12a63bf36d",
+      "hostedRun": 30732261886,
+      "result": "REJECTED",
+      "reason": "The rendered candidate contained extreme spike vertices and failed finite-bounds and foot-exclusion auditing. It also had no completed Unity import/save/reload or Modular Avatar checkpoint."
+    },
+    "blockers": [
+      "現行exact-headのHosted Blender実artifactでFBX / Blend、5方向render、neutral / arms-up / arm-cross / crouch / sit / proneの6姿勢renderを生成でき、995 vertices / 1,876 triangles、degenerate triangles 0、unweighted vertices 0、boundary edges 112を維持している。一方、FRONT / BACKの股下中央線、腰から左右脚へ切り替わる棚状の段差、側面の直線的な形状、crouch / sit時の腰から大腿への急な変形が残るためvisualAppearanceReviewはFAIL。run番号とartifact IDはPRのexact-head証拠を参照する。"
+    ]
+  },
+  "metrics": {
+    "meshObjects": 1,
+    "vertices": 995,
+    "triangles": 1876,
+    "materialSlots": 2,
+    "shapeKeys": 0,
+    "maxBoneInfluences": 3,
+    "unweightedVertices": 0,
+    "weightSumErrors": 0,
+    "degenerateTriangles": 0,
+    "boundaryEdges": 112
+  },
+  "technicalGates": {
+    "blender": "PASS",
+    "uvMapping": "PASS",
+    "exactBodyPoseRenders": "PASS",
+    "latestGeometryRender": "PASS",
+    "unityImport": "PASS",
+    "prefabSerialized": "PASS",
+    "prefabReload": "PASS",
+    "modularAvatar": "PASS",
+    "vrchatBuildAndTest": "PENDING",
+    "humanRuntimeReview": "PENDING",
+    "ndmf": "PASS",
+    "clothSimulation": "PASS"
+  },
+  "designRevision": "v74-centre-crotch-seam",
+  "wearabilityAudit": {
+    "schemaVersion": 1,
+    "passed": true,
+    "checks": {
+      "garmentMeshNames": [
+        "Cargo_Continuous_Pants"
+      ],
+      "metrics": {
+        "vertices": 995,
+        "triangles": 1876,
+        "minimumZ": 0.10499999672174454,
+        "maximumZ": 0.8399999737739563,
+        "totalWidth": 0.36899998784065247,
+        "totalDepth": 0.25600000470876694,
+        "maximumEdgeLength": 0.09704841465894758,
+        "maximumEdgeZSpan": 0.06000000238418579,
+        "degenerateTriangles": 0,
+        "uvLayers": 1,
+        "materialSlots": 2,
+        "shapeKeys": 0,
+        "footIntrusionVertices": 0,
+        "unweightedVertices": 0,
+        "centerCoverageVertices": 37,
+        "bands": {
+          "seat": {
+            "width": 0.36800000071525574,
+            "depth": 0.25600000470876694,
+            "rear": 0.13600000739097595
+          },
+          "thigh": {
+            "width": 0.36899998784065247,
+            "depth": 0.1929825022816658,
+            "rear": 0.1011895015835762
+          },
+          "knee": {
+            "width": 0.3580000102519989,
+            "depth": 0.18451999872922897,
+            "rear": 0.09611199796199799
+          },
+          "hem": {
+            "width": 0.34200000762939453,
+            "depth": 0.17494629323482513,
+            "rear": 0.09054073691368103
+          }
+        },
+        "frontCentreCoverageVertices": 11,
+        "rearCentreCoverageVertices": 11,
+        "centreCoverageLevels": [
+          0.574,
+          0.576,
+          0.578,
+          0.581,
+          0.584,
+          0.589,
+          0.594,
+          0.595,
+          0.6,
+          0.61,
+          0.64,
+          0.67,
+          0.7,
+          0.735,
+          0.765,
+          0.79,
+          0.815
+        ],
+        "crotchPanelVertices": 57,
+        "crossSectionCurvature": {
+          "frontDepthDifference": 0.03713922910392284,
+          "rearDepthDifference": 0.04746828501423199
+        },
+        "upperInnerThighGapByLevel": {
+          "0.440": 0.01600000075995922,
+          "0.480": 0.014000000432133675,
+          "0.520": 0.012000000104308128,
+          "0.574": 0.00800000037997961
+        },
+        "maximumUpperInnerThighGap": 0.01600000075995922,
+        "silhouetteByLevel": {
+          "hip": {
+            "width": 0.36800000071525574,
+            "depth": 0.25600000470876694
+          },
+          "waist": {
+            "width": 0.28999999165534973,
+            "depth": 0.20400000363588333
+          },
+          "upperThigh": {
+            "width": 0.3659999966621399,
+            "depth": 0.1929825022816658
+          },
+          "hem": {
+            "width": 0.3400000035762787,
+            "depth": 0.17400000244379044
+          }
+        },
+        "materialNames": [
+          "MAT_Black_Cargo_Fabric",
+          "MAT_Black_Cargo_Straps"
+        ]
+      },
+      "singleMeshObjectPassed": true,
+      "finiteCoordinatesPassed": true,
+      "topologyPassed": true,
+      "sourceFaceIndependencePassed": true,
+      "spikeGuardPassed": true,
+      "uvPassed": true,
+      "materialSeparationPassed": true,
+      "shapeKeyIsolationPassed": true,
+      "weightingPassed": true,
+      "footAndFloorClearancePassed": true,
+      "controlledVolumePassed": true,
+      "fittedSeatPassed": true,
+      "innerThighCoveragePassed": true,
+      "straightWideProfilePassed": true,
+      "unityReadyMaterialContractPassed": true,
+      "crossSectionCurvaturePassed": true,
+      "upperInnerThighClearancePassed": true,
+      "waistTaperPassed": true,
+      "legTaperPassed": true,
+      "waistCoveragePassed": true,
+      "frontCentreCoveragePassed": true,
+      "rearCentreCoveragePassed": true,
+      "continuousCentreLevelsPassed": true,
+      "crotchPanelCoveragePassed": true,
+      "panelFreeTransitionPassed": true,
+      "armatureObjectParentPassed": true
+    }
+  },
+  "releaseReadiness": {
+    "unityReady": {
+      "status": "VERIFIED",
+      "multiMaterialSetup": "VERIFIED",
+      "modularAvatarSetup": "VERIFIED",
+      "ndmfBake": "VERIFIED",
+      "reimport": "VERIFIED",
+      "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+      "materialRoles": {
+        "MAT_Black_Cargo_Fabric": "fabric",
+        "MAT_Black_Cargo_Straps": "trim"
+      },
+      "evidencePath": "Assets/GenWorks/siroino-wide-cargo/Evidence/Unity/unity-ready.json",
+      "evidenceSha256": "c6995f146cb7bc15dcdc0c89ec4d3ec297e8a96c878590d6438e8e1b6a8c95f4"
+    }
+  },
+  "clothSimulation": "Assets/GenWorks/siroino-wide-cargo/Evidence/Build/cloth-simulation.json",
+  "gateEvidenceCorrections": {
+    "completionGates.blender": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.blender was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.editableSource": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.editableSource was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.fbx": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.fbx was recorded as PASS but no evidence file is declared for it; a required completion gate needs an existing claimed evidence file",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.fiveViewEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.fiveViewEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-wide-cargo/Previews/front.png, Assets/GenWorks/siroino-wide-cargo/Previews/back.png, Assets/GenWorks/siroino-wide-cargo/Previews/left.png, Assets/GenWorks/siroino-wide-cargo/Previews/right.png, Assets/GenWorks/siroino-wide-cargo/Previews/three-quarter.png",
+      "correctedOn": "2026-10-15"
+    },
+    "completionGates.poseEvidence": {
+      "previousValue": "PASS",
+      "value": "UNVERIFIED",
+      "reason": "completionGates.poseEvidence was recorded as PASS without evidence on disk. Missing claimed evidence: Assets/GenWorks/siroino-wide-cargo/Previews/Poses/neutral.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/arms-up.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/arm-cross.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/crouch.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/sit.png, Assets/GenWorks/siroino-wide-cargo/Previews/Poses/prone.png",
+      "correctedOn": "2026-10-15"
+    }
+  }
+}

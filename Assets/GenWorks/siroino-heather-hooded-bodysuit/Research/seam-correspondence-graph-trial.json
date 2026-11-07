@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "title": "Learning-based Seam Correspondence Reconstruction in Sewing Patterns",
+    "authors": [
+      "Zhendong Wang",
+      "Jintong Wang",
+      "Chen Liu",
+      "Yao Jin",
+      "Ligang Liu",
+      "Huamin Wang"
+    ],
+    "submitted": "2026-07-23T11:26:39Z",
+    "arxiv": "https://arxiv.org/abs/2607.21213",
+    "doi": "https://doi.org/10.48550/arXiv.2607.21213",
+    "paperLicense": "CC BY-NC-ND 4.0",
+    "paperLicenseUrl": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    "officialCode": null,
+    "officialCodeStatus": "No official implementation located as of 2026-08-03"
+  },
+  "trialType": "independent deterministic production ablation",
+  "paperMethodUsed": [
+    "panel-centric graph",
+    "anatomical panel semantics as coarse connectivity prior",
+    "edge-length compatibility as local seam geometry",
+    "explicit many-panel garment context before edge pairing"
+  ],
+  "notClaimed": [
+    "The authors' EfficientNet, GAT, U-Net, learned weights, dataset and training code were not used.",
+    "This is not a reproduction of the paper's reported accuracy.",
+    "No paper figure, table, source code, checkpoint or dataset is redistributed."
+  ],
+  "executionRequirements": {
+    "runtime": "Python 3.11 standard library",
+    "gpu": false,
+    "externalModel": false,
+    "externalDataset": false
+  },
+  "panelCount": 11,
+  "edgeCount": 36,
+  "expectedSeamCount": 18,
+  "baseline": {
+    "name": "global nearest normalized edge length",
+    "metrics": {
+      "predicted": 17,
+      "expected": 18,
+      "truePositive": 4,
+      "precision": 0.235294,
+      "recall": 0.222222,
+      "f1": 0.228571
+    }
+  },
+  "semanticGraph": {
+    "name": "semantic-filtered panel graph plus edge-length score",
+    "metrics": {
+      "predicted": 18,
+      "expected": 18,
+      "truePositive": 18,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "deltaF1": 0.771429,
+  "result": "PASS",
+  "failureCondition": "FAIL when semantic filtering does not improve F1 or precision/recall falls below 0.90.",
+  "productionDecision": "ADOPT_METADATA_ONLY",
+  "productionUse": [
+    "Panel and seam IDs are persisted for editability and audit.",
+    "The split hood center seam and four hood-to-neck seam segments encode many-to-one neck assembly.",
+    "No learned inference runs at build time; authored construction remains deterministic."
+  ]
+}

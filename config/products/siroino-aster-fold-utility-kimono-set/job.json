@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "renderLoopRevision": "v1-aster-fold-utility-kimono",
+  "id": "siroino-aster-fold-utility-kimono-set",
+  "productName": "Aster Fold Utility Kimono Set for Siroino",
+  "adapterId": "siroino-v1.0",
+  "automaticBuild": true,
+  "buildCapability": "blender-4.4.3-panel-structural",
+  "buildRevision": "v1-modern-kimono-aster-fold-clasp",
+  "productRoot": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set",
+  "productManifestPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/ProductManifest.json",
+  "buildScript": "tools/run_product_build.py",
+  "productBuildScript": "tools/siroino_aster_fold_utility_kimono_build.py",
+  "hostedPoseScript": "tools/siroino_required_pose_render_entry.py",
+  "blendPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Source/Blender/SiroinoAsterFoldUtilityKimonoSet.blend",
+  "fbxAssetPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Models/SiroinoAsterFoldUtilityKimonoSet.fbx",
+  "prefabAssetPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoAsterFoldUtilityKimonoSet.prefab",
+  "integratedPrefabAssetPath": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoSotai_AsterFoldUtilityKimonoSet.prefab",
+  "targetAvatarAssetPath": "Assets/SiroinoWorks/SiroinoSotai/Prefab/SiroinoSotai_PC.prefab",
+  "targetSourcePath": "Assets/SiroinoWorks/SiroinoSotai/FBX/SiroinoSotai_PC.fbx",
+  "licenseEvidence": "config/products/siroino-aster-fold-utility-kimono-set/license.json",
+  "privateSourceRoots": ["Assets/_Local", "Assets/_Vendor", "Assets/SiroinoWorks"],
+  "deliveryAssets": [
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/ProductManifest.json",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/README.md",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Source/Blender/SiroinoAsterFoldUtilityKimonoSet.blend",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Models/SiroinoAsterFoldUtilityKimonoSet.fbx",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoAsterFoldUtilityKimonoSet.prefab",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Prefab/SiroinoSotai_AsterFoldUtilityKimonoSet.prefab",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/front.png",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/back.png",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/left.png",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/right.png",
+    "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/three-quarter.png"
+  ],
+  "previewPaths": {
+    "front": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/front.png",
+    "back": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/back.png",
+    "left": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/left.png",
+    "right": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/right.png",
+    "three-quarter": "Assets/GenWorks/siroino-aster-fold-utility-kimono-set/Previews/three-quarter.png"
+  },
+  "humanEvidence": {
+    "visual-review": "Assets/_Local/Evidence/siroino-aster-fold-utility-kimono-set/visual-review.json",
+    "pose-penetration-review": "Assets/_Local/Evidence/siroino-aster-fold-utility-kimono-set/pose-penetration-review.json",
+    "vrchat-runtime-review": "Assets/_Local/Evidence/siroino-aster-fold-utility-kimono-set/vrchat-runtime-review.json"
+  },
+  "allowedExtraBones": [],
+  "unityReady": {
+    "minimumDistinctMaterials": 4,
+    "materialRoles": [
+      {"material": "MAT_Kimono", "role": "fabric"},
+      {"material": "MAT_Inner", "role": "fabric"},
+      {"material": "MAT_SkortObi", "role": "fabric"},
+      {"material": "MAT_Hero", "role": "trim"},
+      {"material": "MAT_Hardware", "role": "trim"}
+    ]
+  }
+}

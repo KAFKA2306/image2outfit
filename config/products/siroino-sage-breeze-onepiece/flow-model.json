@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-sage-breeze-onepiece",
+  "model": "star-schema-triplet-graph",
+  "mainFlow": {
+    "hub": "product:siroino-sage-breeze-onepiece",
+    "stageOrder": [
+      "ingest-reference",
+      "normalize-view",
+      "decompose-garment",
+      "draft-patterns",
+      "infer-stitches",
+      "initialize-3d",
+      "build-blender",
+      "simulate-cloth",
+      "skin-and-export",
+      "render-evidence",
+      "audit-geometry",
+      "visual-review",
+      "finalize-candidate"
+    ],
+    "stageSource": "src/image2outfit/pipeline.py PIPELINE_STAGES"
+  },
+  "dimensions": {
+    "stage": [
+      {
+        "id": "ingest-reference",
+        "order": 0
+      },
+      {
+        "id": "normalize-view",
+        "order": 1
+      },
+      {
+        "id": "decompose-garment",
+        "order": 2
+      },
+      {
+        "id": "draft-patterns",
+        "order": 3
+      },
+      {
+        "id": "infer-stitches",
+        "order": 4
+      },
+      {
+        "id": "initialize-3d",
+        "order": 5
+      },
+      {
+        "id": "build-blender",
+        "order": 6
+      },
+      {
+        "id": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "id": "skin-and-export",
+        "order": 8
+      },
+      {
+        "id": "render-evidence",
+        "order": 9
+      },
+      {
+        "id": "audit-geometry",
+        "order": 10
+      },
+      {
+        "id": "visual-review",
+        "order": 11
+      },
+      {
+        "id": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "piece": [
+      {
+        "id": "breeze-back"
+      },
+      {
+        "id": "breeze-front-L"
+      },
+      {
+        "id": "breeze-front-R"
+      },
+      {
+        "id": "breeze-side-L"
+      },
+      {
+        "id": "breeze-side-R"
+      },
+      {
+        "id": "wind-tunnel-L"
+      },
+      {
+        "id": "wind-tunnel-R"
+      }
+    ]
+  },
+  "facts": {
+    "stageRun": [
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "ingest-reference",
+        "order": 0
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "normalize-view",
+        "order": 1
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "decompose-garment",
+        "order": 2
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "draft-patterns",
+        "order": 3
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "infer-stitches",
+        "order": 4
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "initialize-3d",
+        "order": 5
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "build-blender",
+        "order": 6
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "simulate-cloth",
+        "order": 7
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "skin-and-export",
+        "order": 8
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "render-evidence",
+        "order": 9
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "audit-geometry",
+        "order": 10
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "visual-review",
+        "order": 11
+      },
+      {
+        "productId": "siroino-sage-breeze-onepiece",
+        "stageId": "finalize-candidate",
+        "order": 12
+      }
+    ],
+    "stitch": [
+      {
+        "stitchId": "left-front-side",
+        "firstPieceId": "breeze-front-L",
+        "firstEdgeId": null,
+        "secondPieceId": "breeze-side-L",
+        "secondEdgeId": null,
+        "type": "unspecified"
+      },
+      {
+        "stitchId": "right-front-side",
+        "firstPieceId": "breeze-front-R",
+        "firstEdgeId": null,
+        "secondPieceId": "breeze-side-R",
+        "secondEdgeId": null,
+        "type": "unspecified"
+      },
+      {
+        "stitchId": "left-back-side",
+        "firstPieceId": "breeze-back",
+        "firstEdgeId": null,
+        "secondPieceId": "breeze-side-L",
+        "secondEdgeId": null,
+        "type": "unspecified"
+      },
+      {
+        "stitchId": "right-back-side",
+        "firstPieceId": "breeze-back",
+        "firstEdgeId": null,
+        "secondPieceId": "breeze-side-R",
+        "secondEdgeId": null,
+        "type": "unspecified"
+      },
+      {
+        "stitchId": "left-channel-facing",
+        "firstPieceId": "wind-tunnel-L",
+        "firstEdgeId": null,
+        "secondPieceId": "breeze-side-L",
+        "secondEdgeId": null,
+        "type": "unspecified"
+      },
+      {
+        "stitchId": "right-channel-facing",
+        "firstPieceId": "wind-tunnel-R",
+        "firstEdgeId": null,
+        "secondPieceId": "breeze-side-R",
+        "secondEdgeId": null,
+        "type": "unspecified"
+      }
+    ],
+    "overlayAttachment": []
+  },
+  "unresolved": [],
+  "triples": [
+    {
+      "subject": "stage:ingest-reference",
+      "predicate": "precedes",
+      "object": "stage:normalize-view",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:normalize-view",
+      "predicate": "precedes",
+      "object": "stage:decompose-garment",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:decompose-garment",
+      "predicate": "precedes",
+      "object": "stage:draft-patterns",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:draft-patterns",
+      "predicate": "precedes",
+      "object": "stage:infer-stitches",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:infer-stitches",
+      "predicate": "precedes",
+      "object": "stage:initialize-3d",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:initialize-3d",
+      "predicate": "precedes",
+      "object": "stage:build-blender",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:build-blender",
+      "predicate": "precedes",
+      "object": "stage:simulate-cloth",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:simulate-cloth",
+      "predicate": "precedes",
+      "object": "stage:skin-and-export",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:skin-and-export",
+      "predicate": "precedes",
+      "object": "stage:render-evidence",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:render-evidence",
+      "predicate": "precedes",
+      "object": "stage:audit-geometry",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:audit-geometry",
+      "predicate": "precedes",
+      "object": "stage:visual-review",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "stage:visual-review",
+      "predicate": "precedes",
+      "object": "stage:finalize-candidate",
+      "evidence": "pipeline.PIPELINE_STAGES"
+    },
+    {
+      "subject": "piece:breeze-front-L",
+      "predicate": "stitchedTo",
+      "object": "piece:breeze-side-L",
+      "evidence": "stitch:left-front-side"
+    },
+    {
+      "subject": "piece:breeze-front-R",
+      "predicate": "stitchedTo",
+      "object": "piece:breeze-side-R",
+      "evidence": "stitch:right-front-side"
+    },
+    {
+      "subject": "piece:breeze-back",
+      "predicate": "stitchedTo",
+      "object": "piece:breeze-side-L",
+      "evidence": "stitch:left-back-side"
+    },
+    {
+      "subject": "piece:breeze-back",
+      "predicate": "stitchedTo",
+      "object": "piece:breeze-side-R",
+      "evidence": "stitch:right-back-side"
+    },
+    {
+      "subject": "piece:wind-tunnel-L",
+      "predicate": "stitchedTo",
+      "object": "piece:breeze-side-L",
+      "evidence": "stitch:left-channel-facing"
+    },
+    {
+      "subject": "piece:wind-tunnel-R",
+      "predicate": "stitchedTo",
+      "object": "piece:breeze-side-R",
+      "evidence": "stitch:right-channel-facing"
+    }
+  ]
+}

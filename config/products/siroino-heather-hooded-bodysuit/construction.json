@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "profile": "fitted",
+  "productId": "siroino-heather-hooded-bodysuit",
+  "target": "SiroinoSotai_PC",
+  "designRevision": "v29-smoothed-clearance-tapered-yoke-fitted-sleeve",
+  "panels": [
+    "smoothed-height-by-angle-polar-torso-field",
+    "five-ring-tapered-shoulder-yoke-and-fitted-neck",
+    "seventeen-column-four-millimetre-sag-pelvic-saddle",
+    "small-root-fitted-sleeve-caps",
+    "left-and-right-fitted-sleeve-tubes",
+    "left-and-right-independent-rib-cuffs",
+    "compact-six-row-rear-neck-folded-hood",
+    "four-iteration-smoothed-bounded-clearance-projection",
+    "body-used-for-polar-statistics-clearance-and-nearest-weight-transfer",
+    "no-body-topology-copy-no-body-face-region-selection",
+    "supersedes-v28-rectangular-neck-shoulder-bulbs-and-padded-hood-roll"
+  ],
+  "separateGeometry": [
+    "Henley placket",
+    "three buttons",
+    "hood drawcords"
+  ],
+  "priorityFitZones": [
+    "tapered shoulder yoke",
+    "fitted sleeve cap",
+    "underarm",
+    "elbow",
+    "wrist",
+    "fitted neck",
+    "chest",
+    "upper back",
+    "abdomen",
+    "hip crest",
+    "shallow pelvic saddle",
+    "inner thigh",
+    "leg root",
+    "compact folded hood",
+    "drawcord"
+  ],
+  "researchTrial": {
+    "primaryPaper": "https://arxiv.org/abs/2306.03642",
+    "primaryPaperTitle": "GarmentCode: Programming Parametric Sewing Patterns",
+    "primaryOfficialCode": "https://github.com/maria-korosteleva/GarmentCode",
+    "primaryOfficialCodeLicense": "MIT",
+    "currentPaper": "https://arxiv.org/abs/2606.24564",
+    "currentPaperTitle": "PatternGSL: A Structured Specification Language for Template-Free and Simulation-Ready 3D Garments",
+    "currentOfficialCode": "https://github.com/PatternGSL/PatternGSL",
+    "implementation": "independent Blender override retaining the validated height-by-angle polar profile while replacing abrupt per-vertex clearance with a four-iteration adjacency-smoothed displacement capped at 12 mm, closing the neckline through a five-ring tapered yoke, reducing the underbody to a seventeen-column 4 mm-sag saddle, limiting sleeve radii to 27-33 mm and replacing the padded hood roll with a compact six-row rear-neck fold; body faces and author code are not copied",
+    "authorsImplementationExecuted": false,
+    "authorsCodeCopied": false,
+    "generatedEvidence": "Assets/GenWorks/siroino-heather-hooded-bodysuit/Research/smoothed-clearance-yoke-trial.json"
+  },
+  "releaseBoundary": "WORKING until all eight in-scope completion gates pass; Unity, Modular Avatar, NDMF, VRChat and human runtime validation are OUT_OF_SCOPE",
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "Deterministic target-fit generation owns the garment shape keys; the vendor smoothing operator is not required for this path."
+  }
+}

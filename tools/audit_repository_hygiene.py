@@ -9,9 +9,10 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 GLOBAL_CONFIG_FILES = {
-    "blender-python-requirements.txt",
+    "candidate-manifest.schema.v2.json",
     "genworks-handoff-policy.json",
     "genworks-layout.json",
+    "avatar-workflow.v1.json",
     "job.schema.v2.json",
     "release-policy.json",
     "toolchain-lock.json",
@@ -42,8 +43,31 @@ def read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
-def add(findings: list[Finding], code: str, path: Path, root: Path, message: str) -> None:
+def add(
+    findings: list[Finding], code: str, path: Path, root: Path, message: str
+) -> None:
     findings.append(Finding(code, relative(path, root), message))
+
+
+def is_ref_only_branch_hygiene(workflow: Path, lowered: str) -> bool:
+    """Allow only the narrow workflow that deletes obsolete non-main branch refs."""
+    required = (
+        workflow.name == "branch-hygiene.yml",
+        "contents: write" in lowered,
+        "actions/github-script" in lowered,
+        "github.rest.git.deleteref" in lowered,
+        "protectedbranches" in lowered,
+        "'main'" in lowered or '"main"' in lowered,
+    )
+    forbidden = (
+        "actions/checkout" in lowered,
+        bool(re.search(r"\bgit\s+push\b", lowered)),
+        "createorupdatefilecontents" in lowered,
+        "github.rest.git.updateref" in lowered,
+        "github.rest.git.createref" in lowered,
+        "github.rest.repos.createcommitstatus" in lowered,
+    )
+    return all(required) and not any(forbidden)
 
 
 def audit(root: Path = ROOT) -> dict[str, Any]:
@@ -100,6 +124,25 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                     "product configuration must live under config/products/<product-id>/",
                 )
 
+    pyproject = root / "pyproject.toml"
+    if not pyproject.is_file():
+        add(
+            findings,
+            "missing-python-project",
+            pyproject,
+            root,
+            "Python dependencies and environment groups must be declared in pyproject.toml",
+        )
+    if config_root.is_dir():
+        for requirements_file in sorted(config_root.glob("*requirements*.txt")):
+            add(
+                findings,
+                "environment-config-residue",
+                requirements_file,
+                root,
+                "Python environment declarations belong in pyproject.toml",
+            )
+
     allowed_statuses = set(handoff_policy.get("statuses", []))
     automated_gates = tuple(
         handoff_policy.get("requiredAutomatedTechnicalGatesBeforeHumanReview", [])
@@ -109,11 +152,19 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
     product_ids: set[str] = set()
     products_root = config_root / "products"
     if products_root.is_dir():
-        for product_dir in sorted(path for path in products_root.iterdir() if path.is_dir()):
+        for product_dir in sorted(
+            path for path in products_root.iterdir() if path.is_dir()
+        ):
             product_id = product_dir.name
             product_ids.add(product_id)
             if not re.fullmatch(r"[a-z0-9][a-z0-9._-]*", product_id):
-                add(findings, "invalid-product-id", product_dir, root, "invalid product directory name")
+                add(
+                    findings,
+                    "invalid-product-id",
+                    product_dir,
+                    root,
+                    "invalid product directory name",
+                )
                 continue
             job_path = product_dir / "job.json"
             license_path = product_dir / "license.json"
@@ -134,7 +185,7 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                 add(findings, "invalid-product-job", job_path, root, str(exc))
                 continue
 
-            expected_root = f"Assets/GenWorks/Products/{product_id}"
+            expected_root = f"Assets/GenWorks/{product_id}"
             expected = {
                 "id": product_id,
                 "productRoot": expected_root,
@@ -204,7 +255,10 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                     )
 
             previews = job.get("previewPaths")
-            if not isinstance(previews, dict) or set(previews) != REQUIRED_PREVIEW_VIEWS:
+            if (
+                not isinstance(previews, dict)
+                or set(previews) != REQUIRED_PREVIEW_VIEWS
+            ):
                 add(
                     findings,
                     "invalid-preview-contract",
@@ -214,7 +268,9 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                 )
             else:
                 for name, value in previews.items():
-                    if not isinstance(value, str) or not value.startswith(expected_root + "/"):
+                    if not isinstance(value, str) or not value.startswith(
+                        expected_root + "/"
+                    ):
                         add(
                             findings,
                             "preview-outside-product",
@@ -341,17 +397,34 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                             f"{gate} must PASS before RELEASED",
                         )
 
+    product_tokens = {
+        product_id.replace("-", "_").replace(".", "_") for product_id in product_ids
+    }
+    for root_script in sorted(root.glob("*.py")):
+        if any(token and token in root_script.stem.lower() for token in product_tokens):
+            add(
+                findings,
+                "product-script-at-repository-root",
+                root_script,
+                root,
+                "product-specific Python scripts must live under tools/ or the product workspace",
+            )
+
     workflow_root = root / ".github" / "workflows"
     if workflow_root.is_dir():
         for workflow in sorted(workflow_root.glob("*.y*ml")):
             lowered = workflow.read_text(encoding="utf-8").lower()
-            if "contents: write" in lowered or re.search(r"\bgit\s+push\b", lowered):
+            has_contents_write = "contents: write" in lowered
+            has_git_push = bool(re.search(r"\bgit\s+push\b", lowered))
+            if has_git_push or (
+                has_contents_write and not is_ref_only_branch_hygiene(workflow, lowered)
+            ):
                 add(
                     findings,
                     "self-mutating-workflow",
                     workflow,
                     root,
-                    "CI must upload artifacts, not push directly to main",
+                    "CI may delete obsolete branch refs only; it must not modify repository contents or push commits",
                 )
             if any(value in lowered for value in (".github/run/", ".github/status/")):
                 add(
