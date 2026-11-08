@@ -305,7 +305,11 @@ class WorkspaceSnapshot:
             if had_original:
                 if not self.backup.exists():
                     raise RuntimeError(f"workspace backup missing: {self.backup}")
-                shutil.copytree(self.backup, self.target)
+                # The backup is consumed after rollback. Rename it into place
+                # instead of recursively copying it into a live workspace; on
+                # Windows, partially-created destination directories can make
+                # copytree fail with ERROR_ALREADY_EXISTS and strand recovery.
+                self.backup.replace(self.target)
             if self.backup.exists():
                 shutil.rmtree(self.backup)
         elif phase == "COMMITTING":
@@ -333,7 +337,7 @@ class WorkspaceSnapshot:
         if had_original:
             if not self.backup.exists():
                 raise RuntimeError(f"workspace backup missing: {self.backup}")
-            shutil.copytree(self.backup, self.target)
+            self.backup.replace(self.target)
         if self.backup.exists():
             shutil.rmtree(self.backup)
         self.journal.unlink(missing_ok=True)
