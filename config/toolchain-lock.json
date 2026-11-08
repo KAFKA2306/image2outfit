@@ -72,54 +72,6 @@
       "com.vrchat.avatars": ">=3.3.0-beta.1 <3.11.0"
     }
   },
-  "authoringAdapters": {
-    "authority": "optional-local-authoring-only",
-    "affectsProductCompletion": false,
-    "stateRoot": ".image2outfit/mcp",
-    "doctorStates": [
-      "CONFIGURED",
-      "REACHABLE",
-      "UNAVAILABLE",
-      "UNVERIFIED"
-    ],
-    "security": {
-      "loopbackOnly": true,
-      "trackedSecretsAllowed": false,
-      "unattendedApprovalBypassAllowed": false,
-      "externalBlenderIntegrationsEnabledByDefault": false
-    },
-    "blenderMcp": {
-      "serverName": "image2outfit-blender",
-      "package": "blender-mcp",
-      "version": "1.8.0",
-      "python": "3.11",
-      "upstream": "https://github.com/ahujasid/blender-mcp",
-      "commit": "3ab892510cc0e5435ba5e611c01fb1021fbde8de",
-      "addonUrl": "https://raw.githubusercontent.com/ahujasid/blender-mcp/3ab892510cc0e5435ba5e611c01fb1021fbde8de/addon.py",
-      "addonGitBlobSha1": "0a93c497693193f16bbd291499a760b3ebce09fb",
-      "host": "localhost",
-      "port": 9876,
-      "telemetryDisabled": true,
-      "externalIntegrations": [
-        "polyhaven",
-        "hyper3d",
-        "sketchfab",
-        "hunyuan3d"
-      ]
-    },
-    "unityMcp": {
-      "serverName": "image2outfit-unity",
-      "packageId": "com.tunasync.unity-mcp",
-      "version": "2.6.8",
-      "packageUrl": "https://github.com/TunaSync-Studio/UnityMCP-VCC.git?path=/package/com.tunasync.unity-mcp#50597089589137c5186f5badbde1d72f5d335243",
-      "transport": "loopback-tcp-discovery-registry",
-      "registryDir": "%LOCALAPPDATA%/UnityMCP/registry",
-      "url": "http://127.0.0.1:47712/",
-      "host": "127.0.0.1",
-      "port": 47712,
-      "projectVersionSource": "ProjectSettings/ProjectVersion.txt"
-    }
-  },
   "analytics": {
     "dbtDuckdb": {
       "package": "dbt-duckdb",
