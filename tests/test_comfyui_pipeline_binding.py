@@ -12,8 +12,8 @@ from image2outfit.pipeline import PipelineStage
 from pipeline_stage_adapters import build_registry, load_profile
 
 
-class TripoPipelineBindingTests(unittest.TestCase):
-    def test_existing_pipeline_command_path_can_bind_real_tripo_adapter(self) -> None:
+class ComfyUIPipelineBindingTests(unittest.TestCase):
+    def test_existing_pipeline_command_path_can_bind_comfyui_adapter(self) -> None:
         profile = load_profile(
             ROOT / "config/pipeline-profiles/garment-reconstruction-modular-v1.json"
         )
@@ -23,21 +23,21 @@ class TripoPipelineBindingTests(unittest.TestCase):
                 "initialize.external-hypothesis": {
                     "command": [
                         "python",
-                        "tools/tripo_hypothesis_adapter.py",
+                        "tools/comfyui_hypothesis_adapter.py",
                         "--request",
-                        "{tripoRequest}",
+                        "{comfyRequest}",
                         "--result",
-                        "{tripoResult}",
+                        "{comfyResult}",
                     ],
-                    "resultPath": "{tripoResult}",
+                    "resultPath": "{comfyResult}",
                 }
             },
             variables={
-                "tripoRequest": ".image2outfit/products/demo/tripo-request.json",
-                "tripoResult": ".image2outfit/products/demo/tripo-stage-result.json",
+                "comfyRequest": ".image2outfit/products/demo/comfyui-request.json",
+                "comfyResult": ".image2outfit/products/demo/comfyui-stage-result.json",
             },
             tool_requirements={
-                "initialize-3d": ["initialize.multi-hypothesis", "generator.tripo"],
+                "initialize-3d": ["initialize.multi-hypothesis", "generator.comfyui"],
                 "build-blender": ["build.reconcile-hypothesis"],
             },
             tool_pins={
@@ -55,16 +55,16 @@ class TripoPipelineBindingTests(unittest.TestCase):
             planned["command"],
             [
                 "python",
-                "tools/tripo_hypothesis_adapter.py",
+                "tools/comfyui_hypothesis_adapter.py",
                 "--request",
-                ".image2outfit/products/demo/tripo-request.json",
+                ".image2outfit/products/demo/comfyui-request.json",
                 "--result",
-                ".image2outfit/products/demo/tripo-stage-result.json",
+                ".image2outfit/products/demo/comfyui-stage-result.json",
             ],
         )
         self.assertEqual(
             planned["resultPath"],
-            ".image2outfit/products/demo/tripo-stage-result.json",
+            ".image2outfit/products/demo/comfyui-stage-result.json",
         )
 
 

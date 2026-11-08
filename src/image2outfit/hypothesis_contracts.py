@@ -15,18 +15,23 @@ from typing import Any
 
 OBSERVATION_STATES = frozenset({"OBSERVED", "INFERRED", "UNKNOWN"})
 SEMANTIC_ROLES = frozenset({"cloth", "trim", "rigid", "accessory", "decoration"})
-GENERATION_MODES = frozenset({"pattern-first", "tripo-draft", "manual", "hybrid"})
+GENERATION_MODES = frozenset(
+    {"pattern-first", "tripo-draft", "comfyui-draft", "manual", "hybrid"}
+)
 HYPOTHESIS_SOURCES = frozenset(
     {
         "pattern-first",
         "astra-turnaround",
         "tripo-draft",
+        "comfyui-trellis2-draft",
         "manual",
         "previous-candidate",
     }
 )
 AUDIT_DECISIONS = frozenset({"PASS", "REVISE", "REJECT", "RETURN_STAGE"})
-EXTERNAL_HYPOTHESIS_SOURCES = frozenset({"astra-turnaround", "tripo-draft"})
+EXTERNAL_HYPOTHESIS_SOURCES = frozenset(
+    {"astra-turnaround", "tripo-draft", "comfyui-trellis2-draft"}
+)
 
 
 def stable_sha256(value: Any) -> str:

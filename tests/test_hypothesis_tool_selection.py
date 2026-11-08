@@ -47,7 +47,7 @@ class HypothesisToolSelectionTests(unittest.TestCase):
         registry = build_registry(
             self.profile,
             tool_requirements={
-                "initialize-3d": ["initialize.multi-hypothesis", "generator.tripo"],
+                "initialize-3d": ["initialize.multi-hypothesis", "generator.comfyui"],
                 "build-blender": ["build.reconcile-hypothesis"],
                 "render-evidence": ["render.ai-reinput"],
                 "audit-geometry": ["verify.blueprint-actual"],
@@ -87,7 +87,7 @@ class HypothesisToolSelectionTests(unittest.TestCase):
             self.profile,
             execute=True,
             tool_requirements={
-                "initialize-3d": ["initialize.multi-hypothesis", "generator.tripo"],
+                "initialize-3d": ["initialize.multi-hypothesis", "generator.comfyui"],
                 "build-blender": ["build.reconcile-hypothesis"],
             },
             tool_pins={

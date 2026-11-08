@@ -141,7 +141,7 @@
         },
         {
           "toolName": "initialize.external-hypothesis",
-          "purpose": "Accept Astra-guided/Tripo or other external 3D drafts only as hash-bound hypotheses under the same target-avatar and canonical quality contracts.",
+          "purpose": "Run the pinned ComfyUI Pixal3D/TRELLIS.2 workflow only as a hash-bound 3D hypothesis under the same target-avatar and canonical garment quality contracts.",
           "requiredResultFields": {
             "hypothesisContractValidated": true,
             "blueprintBound": true,
@@ -149,7 +149,7 @@
             "externalDraftCanonicalSource": false,
             "silentFallbackUsed": false
           },
-          "capabilities": ["initialize.3d", "initialize.multi-hypothesis", "generator.tripo", "assistant.astra", "target-avatar-bound"],
+          "capabilities": ["initialize.3d", "initialize.multi-hypothesis", "generator.comfyui", "target-avatar-bound"],
           "requires": ["pattern.drafted", "stitch.graph"],
           "provides": ["geometry.initialized", "hypothesis.external-selected"],
           "runtime": "external",

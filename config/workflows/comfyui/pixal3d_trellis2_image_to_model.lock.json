@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "workflowId": "comfyui-pixal3d-trellis2-image-to-model",
+  "discoveredVia": "https://github.com/KAFKA2306/comfyui-workflows-factory",
+  "sourceRepository": "https://github.com/Comfy-Org/workflow_templates",
+  "sourceLicense": "MIT",
+  "sourceCommit": "21d7cc4fb9afd983957f2d2d6b1d583860ccb40b",
+  "sourcePath": "templates/3d_pixal3d_trellis2_image_to_model.json",
+  "workflowPath": "config/workflows/comfyui/pixal3d_trellis2_image_to_model.json",
+  "workflowSha256": "df8a1dc4dacac39ba036758f7b4bb7e57e556a607e5391b500e29effd95b2e5d",
+  "generator": "TRELLIS.2",
+  "targetResolution": 512,
+  "nodeIds": {
+    "inputImage": "122",
+    "trellisSelector": "316",
+    "upsample": "94",
+    "meshFile": "285",
+    "saveOutput": "322"
+  },
+  "outputExtensions": [".glb"],
+  "licenseReview": "workflow-source-pinned; model and input rights remain governed by their own licenses"
+}
