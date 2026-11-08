@@ -119,18 +119,6 @@ tasks:
         uv run --no-cache --locked --no-default-groups --python 3.11
         python tools/manage.py dbt check
 
-  mcp:setup:
-    desc: Prepare pinned Blender MCP and register Blender + Unity MCP with Codex on Windows.
-    platforms: [windows]
-    cmds:
-      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_mcp.ps1
-
-  mcp:doctor:
-    desc: Read-only report for Codex, Blender MCP, and Unity MCP local connectivity.
-    platforms: [windows]
-    cmds:
-      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup_mcp.ps1 -DoctorOnly
-
   oss:garmentcode:setup:
     desc: Prepare the isolated, pinned GarmentCode/PyGarment 2D runtime.
     platforms: [windows]
