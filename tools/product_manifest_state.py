@@ -201,7 +201,7 @@ def apply_update(
         write_json(staged, updated)
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
-        final_errors = _manifest_errors(updated, job)
+        final_errors = production_contract.product_state_errors(staged_job, root)
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)
@@ -753,7 +753,7 @@ def record_workflow_attempt(
         write_json(staged, updated)
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
-        final_errors = _manifest_errors(updated, job)
+        final_errors = production_contract.product_state_errors(staged_job, root)
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)
