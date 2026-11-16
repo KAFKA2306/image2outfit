@@ -370,7 +370,14 @@ def record(implementation: ModuleType, report: dict[str, object]) -> None:
 def main() -> int:
     implementation = current
     install_runtime_path_compat(implementation)
-    clear_stale_evidence(implementation)
+    # Preserve the last reviewable previews if generation fails midway.
+    _, job = implementation.build.c.load_job()
+    preview_root = implementation.build.c.repo_path(job["productRoot"]) / "Previews"
+    backup_root = preview_root.with_name("Previews.previous-build")
+    if backup_root.exists():
+        raise RuntimeError(f"Unresolved preview backup exists: {backup_root}")
+    if preview_root.exists():
+        preview_root.rename(backup_root)
     baseline_audit = implementation.audit
     implementation.build_geometry = lambda segments=48: reviewed_geometry(
         implementation,
@@ -386,12 +393,25 @@ def main() -> int:
             metal,
         )
     )
-    implementation.build.main()
-    result = reviewed_audit(implementation, baseline_audit)
-    record(implementation, result)
-    implementation.base.save_distribution_blend()
-    if result.get("passed") is not True:
-        raise RuntimeError(f"Wide Cargo audit failed: {result}")
+    try:
+        implementation.build.main()
+        result = reviewed_audit(implementation, baseline_audit)
+        if result.get("passed") is not True:
+            raise RuntimeError(f"Wide Cargo audit failed: {result}")
+        implementation.base.save_distribution_blend()
+        record(implementation, result)
+    except BaseException:
+        # Keep the failed output outside the canonical evidence path for inspection.
+        failed_root = preview_root.with_name("Previews.failed-build")
+        if preview_root.exists():
+            if failed_root.exists():
+                raise RuntimeError(f"Unresolved failed preview output exists: {failed_root}")
+            preview_root.rename(failed_root)
+        if backup_root.exists():
+            backup_root.rename(preview_root)
+        raise
+    if backup_root.exists():
+        shutil.rmtree(backup_root)
     return 0
 
 
