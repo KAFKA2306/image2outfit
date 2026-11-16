@@ -404,8 +404,11 @@ def main() -> int:
         # Keep the failed output outside the canonical evidence path for inspection.
         failed_root = preview_root.with_name("Previews.failed-build")
         if preview_root.exists():
-            if failed_root.exists():
-                raise RuntimeError(f"Unresolved failed preview output exists: {failed_root}")
+            # Keep earlier failed output and still restore the last good previews.
+            suffix = 2
+            while failed_root.exists():
+                failed_root = preview_root.with_name(f"Previews.failed-build-{suffix}")
+                suffix += 1
             preview_root.rename(failed_root)
         if backup_root.exists():
             backup_root.rename(preview_root)
