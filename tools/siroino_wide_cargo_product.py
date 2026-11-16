@@ -378,6 +378,14 @@ def main() -> int:
         raise RuntimeError(f"Unresolved preview backup exists: {backup_root}")
     if preview_root.exists():
         preview_root.rename(backup_root)
+    # Snapshot both metadata files before any build writes, so failed candidates
+    # cannot advance the manifest while restoring an older preview set.
+    manifest_path = implementation.build.c.repo_path(job["productManifestPath"])
+    report_path = implementation.build.c.repo_path(job["artifactDir"]) / "blender-product.json"
+    previous_metadata = {
+        path: path.read_bytes() if path.is_file() else None
+        for path in (manifest_path, report_path)
+    }
     baseline_audit = implementation.audit
     implementation.build_geometry = lambda segments=48: reviewed_geometry(
         implementation,
@@ -401,6 +409,13 @@ def main() -> int:
         implementation.base.save_distribution_blend()
         record(implementation, result)
     except BaseException:
+        # Roll back metadata before restoring the previous preview set.
+        for path, previous in previous_metadata.items():
+            if previous is None:
+                path.unlink(missing_ok=True)
+            else:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(previous)
         # Keep the failed output outside the canonical evidence path for inspection.
         failed_root = preview_root.with_name("Previews.failed-build")
         if preview_root.exists():
