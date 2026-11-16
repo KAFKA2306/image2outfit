@@ -384,6 +384,23 @@ def main() -> int:
         path: path.read_bytes() if path.is_file() else None
         for path in (manifest_path, report_path)
     }
+    # Snapshot generated binaries too, so failure cannot mix old metadata
+    # with a new Blend/FBX. Keep originals in place for build dependencies.
+    output_paths = [
+        implementation.build.c.repo_path(job[key])
+        for key in ("blendPath", "fbxAssetPath")
+    ]
+    output_paths.append(output_paths[1].with_name(output_paths[1].name + ".meta"))
+    output_backups = {
+        path: path.with_name(path.name + ".previous-build")
+        for path in output_paths
+    }
+    for backup in output_backups.values():
+        if backup.exists():
+            raise RuntimeError(f"Unresolved generated artifact backup exists: {backup}")
+    for path, backup in output_backups.items():
+        if path.is_file():
+            shutil.copy2(path, backup)
     if preview_root.exists():
         preview_root.rename(backup_root)
     baseline_audit = implementation.audit
@@ -409,6 +426,12 @@ def main() -> int:
         implementation.base.save_distribution_blend()
         record(implementation, result)
     except BaseException:
+        # Restore binaries before restoring metadata and preview evidence.
+        for path, backup in output_backups.items():
+            if backup.is_file():
+                shutil.copy2(backup, path)
+            else:
+                path.unlink(missing_ok=True)
         # Roll back metadata before restoring the previous preview set.
         for path, previous in previous_metadata.items():
             if previous is None:
@@ -430,6 +453,8 @@ def main() -> int:
         raise
     if backup_root.exists():
         shutil.rmtree(backup_root)
+    for backup in output_backups.values():
+        backup.unlink(missing_ok=True)
     return 0
 
 
