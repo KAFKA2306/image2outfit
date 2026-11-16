@@ -376,8 +376,6 @@ def main() -> int:
     backup_root = preview_root.with_name("Previews.previous-build")
     if backup_root.exists():
         raise RuntimeError(f"Unresolved preview backup exists: {backup_root}")
-    if preview_root.exists():
-        preview_root.rename(backup_root)
     # Snapshot both metadata files before any build writes, so failed candidates
     # cannot advance the manifest while restoring an older preview set.
     manifest_path = implementation.build.c.repo_path(job["productManifestPath"])
@@ -386,6 +384,8 @@ def main() -> int:
         path: path.read_bytes() if path.is_file() else None
         for path in (manifest_path, report_path)
     }
+    if preview_root.exists():
+        preview_root.rename(backup_root)
     baseline_audit = implementation.audit
     implementation.build_geometry = lambda segments=48: reviewed_geometry(
         implementation,
