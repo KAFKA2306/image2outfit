@@ -450,6 +450,8 @@ def main() -> int:
             preview_root.rename(failed_root)
         if backup_root.exists():
             backup_root.rename(preview_root)
+        for backup in output_backups.values():
+            backup.unlink(missing_ok=True)
         raise
     if backup_root.exists():
         shutil.rmtree(backup_root)
