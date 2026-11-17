@@ -130,6 +130,28 @@ def apply_pose(
         for obj in garment_meshes:
             obj.matrix_world = prone_offset @ prone_root @ _GARMENT_MESH_BASES[obj.name]
     bpy.context.view_layer.update()
+    if name == "prone":
+        # Record actual world transforms, not just the requested pose name.
+        # A horizontal target with an upright garment is a visual defect.
+        for obj in [*armatures, *garment_meshes]:
+            world = obj.matrix_world
+            axis = world.to_3x3() @ Vector((0.0, 0.0, 1.0))
+            axis.normalize()
+            print(json.dumps({
+                "pose": "prone",
+                "object": obj.name,
+                "type": obj.type,
+                "parent": obj.parent.name if obj.parent else None,
+                "armatureModifiers": [
+                    modifier.object.name
+                    for modifier in obj.modifiers
+                    if modifier.type == "ARMATURE" and modifier.object
+                ],
+                "worldVerticalAxis": [round(float(v), 6) for v in axis],
+                "worldTranslation": [
+                    round(float(v), 6) for v in world.translation
+                ],
+            }, ensure_ascii=False))
 
 
 def sheet(paths: dict[str, Path], output: Path) -> None:
