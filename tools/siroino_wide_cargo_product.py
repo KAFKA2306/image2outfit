@@ -408,8 +408,14 @@ def main() -> int:
         for backup in output_backups.values():
             backup.unlink(missing_ok=True)
         raise
-    if preview_root.exists():
-        preview_root.rename(backup_root)
+    try:
+        if preview_root.exists():
+            preview_root.rename(backup_root)
+    except BaseException:
+        # Preview staging failed before generation; leave canonical evidence intact.
+        for backup in output_backups.values():
+            backup.unlink(missing_ok=True)
+        raise
     baseline_audit = implementation.audit
     implementation.build_geometry = lambda segments=48: reviewed_geometry(
         implementation,
