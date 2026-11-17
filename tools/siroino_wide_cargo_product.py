@@ -398,9 +398,16 @@ def main() -> int:
     for backup in output_backups.values():
         if backup.exists():
             raise RuntimeError(f"Unresolved generated artifact backup exists: {backup}")
-    for path, backup in output_backups.items():
-        if path.is_file():
-            shutil.copy2(path, backup)
+    try:
+        for path, backup in output_backups.items():
+            if path.is_file():
+                shutil.copy2(path, backup)
+    except BaseException:
+        # A failed copy may leave a partial backup. Remove only backups
+        # created in this attempt; canonical binaries remain untouched.
+        for backup in output_backups.values():
+            backup.unlink(missing_ok=True)
+        raise
     if preview_root.exists():
         preview_root.rename(backup_root)
     baseline_audit = implementation.audit
