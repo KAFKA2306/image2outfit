@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V176 retains V175's authored hem-boundary attachment and records per-panel displacement, triangle inversion/collapse, and area change at the evaluated Cloth frame, neutral bake, and post-seam-anchor export. Compare these measurements with the existing signed body-clearance and pose-coverage diagnostics before changing the skirt solver. This measurement-only prototype makes no fit, appearance, collision-safety, or release claim.",
-  "designRevision": "v177-front-lap-anterior-thigh-pose-diagnostic-20261120",
+  "designRevision": "v178-front-lap-authored-side-weight-test-20261120",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -190,7 +190,11 @@
         "armatureObject": "Armature",
         "method": "nearest-target-body-triangle-barycentric-authored-weights",
         "maximumSurfaceDistanceM": 0.05,
-        "requiredBoneGroups": ["Spine", "Chest", "Neck"],
+        "requiredBoneGroups": [
+          "Spine",
+          "Chest",
+          "Neck"
+        ],
         "reason": "Sleeve-only skinning created a 7.06 mm divergence at a shared sewn vertex. Connected bodice and collar panels must use the same target skeleton and seam-averaged weights so armscye and shoulder seams remain in one deformation basis.",
         "evidenceBoundary": "Transfer target-body weights onto connected bodice and collar panels and synchronize each shared canonical sewn vertex to the mean of participating panel weights before posing. These non-cloth pose previews are construction diagnostics only and do not establish fit, garment motion acceptance, appearance, or release readiness."
       }
@@ -234,15 +238,26 @@
     "prototypePoseCoverageDiagnostic": {
       "method": "rest-bound-anterior-thigh-to-authored-front-lap-ray-coverage-v1",
       "frontLapPieceIdsBySide": {
-        "left": ["overskirt-front-lap-left"],
-        "right": ["overskirt-front-lap-right"]
+        "left": [
+          "overskirt-front-lap-left"
+        ],
+        "right": [
+          "overskirt-front-lap-right"
+        ]
       },
       "thighBoneBySide": {
         "left": "UpperLeg_L",
         "right": "UpperLeg_R"
       },
-      "longitudinalBoneRange": [0.1, 0.9],
-      "anteriorDirectionWorld": [0.0, -1.0, 0.0],
+      "longitudinalBoneRange": [
+        0.1,
+        0.9
+      ],
+      "anteriorDirectionWorld": [
+        0.0,
+        -1.0,
+        0.0
+      ],
       "minimumAnteriorNormalDot": 0.15,
       "nearDistanceDiagnosticM": 0.03,
       "originOffsetSensitivityM": 0.0001,
@@ -310,7 +325,15 @@
         "forwardFadeDistanceM": 0.14,
         "centerlineHalfWidthM": 0.075,
         "fullSideWeightWidthM": 0.135,
-        "evidenceBoundary": "V146 changes the rest-pose geometry path for the sewn front-lap panels by placing them against measured UpperLeg_L/UpperLeg_R deform surfaces with seam fades. The placement is not shape-key fit, motion, collision, seam, visual, or release evidence."
+        "evidenceBoundary": "V146 changes the rest-pose geometry path for the sewn front-lap panels by placing them against measured UpperLeg_L/UpperLeg_R deform surfaces with seam fades. The placement is not shape-key fit, motion, collision, seam, visual, or release evidence.",
+        "authoredSidePieceIds": {
+          "left": [
+            "overskirt-front-lap-left"
+          ],
+          "right": [
+            "overskirt-front-lap-right"
+          ]
+        }
       }
     },
     {

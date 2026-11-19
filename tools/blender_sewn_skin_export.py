@@ -1677,6 +1677,21 @@ def main():
                 or profile["fullSideWeightWidthM"] <= profile["centerlineHalfWidthM"]
             ):
                 raise ValueError("Invalid explicit prototype weight profile")
+            authored_side_pieces = profile.get("authoredSidePieceIds", {})
+            if not isinstance(authored_side_pieces, dict):
+                raise ValueError("authoredSidePieceIds must map avatar sides to piece IDs")
+            left_authored_pieces = authored_side_pieces.get("left", [])
+            right_authored_pieces = authored_side_pieces.get("right", [])
+            if (
+                not isinstance(left_authored_pieces, list)
+                or not isinstance(right_authored_pieces, list)
+                or not all(isinstance(piece_id, str) and piece_id for piece_id in [*left_authored_pieces, *right_authored_pieces])
+                or len(set(left_authored_pieces)) != len(left_authored_pieces)
+                or len(set(right_authored_pieces)) != len(right_authored_pieces)
+                or set(left_authored_pieces).intersection(right_authored_pieces)
+                or not set(left_authored_pieces).union(right_authored_pieces).issubset(profile_piece_ids)
+            ):
+                raise ValueError("authoredSidePieceIds must contain disjoint profile piece IDs")
             if profile["method"] in {
                 "hip-anchored-anterior-lateral-thigh-fade-v2",
                 "hip-anchored-anterior-bilateral-center-hem-fade-v3",
@@ -1833,6 +1848,8 @@ def main():
                 "centerlineVertexCount": 0,
                 "leftSideVertexCount": 0,
                 "rightSideVertexCount": 0,
+                "authoredLeftSideVertexCount": 0,
+                "authoredRightSideVertexCount": 0,
             }
         raw = {}
         for vertex in obj.data.vertices:
@@ -1903,6 +1920,9 @@ def main():
                 )
             if matching_profiles:
                 profile_key, profile = matching_profiles[0]
+                authored_side_pieces = profile.get("authoredSidePieceIds", {})
+                left_authored_pieces = set(authored_side_pieces.get("left", []))
+                right_authored_pieces = set(authored_side_pieces.get("right", []))
                 low, high = profile_bounds[profile_key]
                 center_x, left_is_positive_x = profile_centers[profile_key]
                 height_fraction = min(1.0, max(0.0, (point.z - low) / (high - low)))
@@ -2005,6 +2025,17 @@ def main():
                 else:
                     thigh_bone = profile["hipBone"]
                     profile_accumulators[profile_key]["centerlineVertexCount"] += 1
+                authored_left = owners[vertex.index].intersection(left_authored_pieces)
+                authored_right = owners[vertex.index].intersection(right_authored_pieces)
+                # A panel's exclusive vertices follow its authored avatar side.
+                # Vertices shared by opposing panel ownership retain the measured
+                # centerline-based choice so the sewn lap seam stays continuous.
+                if authored_left and not authored_right:
+                    thigh_bone = profile["leftThighBone"]
+                    profile_accumulators[profile_key]["authoredLeftSideVertexCount"] += 1
+                elif authored_right and not authored_left:
+                    thigh_bone = profile["rightThighBone"]
+                    profile_accumulators[profile_key]["authoredRightSideVertexCount"] += 1
                 if thigh_weight > 0:
                     if centerline_thigh_weight > 0:
                         side_weight = max(0.0, thigh_weight - centerline_thigh_weight)
@@ -2064,6 +2095,8 @@ def main():
                     "centerlineVertexCount": accumulator["centerlineVertexCount"],
                     "leftSideVertexCount": accumulator["leftSideVertexCount"],
                     "rightSideVertexCount": accumulator["rightSideVertexCount"],
+                    "authoredLeftSideVertexCount": accumulator["authoredLeftSideVertexCount"],
+                    "authoredRightSideVertexCount": accumulator["authoredRightSideVertexCount"],
                     "measuredThighWeight": {
                         "minimum": min(accumulator["thighWeights"]),
                         "mean": sum(accumulator["thighWeights"])

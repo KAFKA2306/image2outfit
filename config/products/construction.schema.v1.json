@@ -88,6 +88,23 @@
                   "minLength": 1
                 }
               },
+              "authoredSidePieceIds": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["left", "right"],
+                "properties": {
+                  "left": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {"type": "string", "minLength": 1}
+                  },
+                  "right": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {"type": "string", "minLength": 1}
+                  }
+                }
+              },
               "hipBone": {
                 "type": "string",
                 "minLength": 1
