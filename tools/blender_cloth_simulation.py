@@ -897,6 +897,29 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     pre_cloth_skinning = policy.get("prototypePreClothSkinning", {})
     pose_armature = None
     pose_body = None
+    skinning_declarations = list(pre_cloth_skinning.values())
+    declared_bodies = {
+        str(declaration.get("sourceObject", ""))
+        for declaration in skinning_declarations
+    }
+    declared_armatures = {
+        str(declaration.get("armatureObject", ""))
+        for declaration in skinning_declarations
+    }
+    if len(declared_bodies) > 1 or len(declared_armatures) > 1:
+        raise ValueError(
+            "Pre-cloth skinning declarations must share one source body and armature"
+        )
+    collision_body_name = (
+        str(pose_response["collisionBody"])
+        if pose_response is not None
+        else next(iter(declared_bodies), "")
+    )
+    armature_name = (
+        "Armature"
+        if pose_response is not None
+        else next(iter(declared_armatures), "")
+    )
     if pose_response is not None:
         if (
             pose_response.get("component") != "pleated-overskirt"
@@ -906,12 +929,14 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             raise ValueError(
                 "pose-response trial must name the measured skirt, Hips, and target body"
             )
-        pose_armature = bpy.data.objects.get("Armature")
+    if collision_body_name:
+        pose_armature = bpy.data.objects.get(armature_name)
         if pose_armature is None or pose_armature.type != "ARMATURE":
-            raise ValueError("pose-response trial requires the target Siroino armature")
-        pose_body = bpy.data.objects.get(str(pose_response["collisionBody"]))
+            raise ValueError("pre-cloth skinning requires its declared target armature")
+        pose_body = bpy.data.objects.get(collision_body_name)
         if pose_body is None or pose_body.type != "MESH":
-            raise ValueError("pose-response trial requires its exact target body mesh")
+            raise ValueError("pre-cloth skinning requires its declared target body mesh")
+    if pose_response is not None:
         if pose_response.get("evidenceBoundary") != construction["clothSimulation"][
             "poseResponseTrial"
         ]["evidenceBoundary"]:
@@ -986,8 +1011,8 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         skinning_declaration = pre_cloth_skinning.get(name)
         if skinning_declaration is not None:
             if (
-                pose_response is None
-                or pose_body is None
+                pose_body is None
+                or pose_armature is None
                 or skinning_declaration.get("sourceObject") != pose_body.name
                 or skinning_declaration.get("armatureObject") != pose_armature.name
                 or skinning_declaration.get("method")

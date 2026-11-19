@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V170 retains the V169 single-target-armature skinning path and rebuilds every lavender edge-trim vertex in a local frame formed by its settled sewn edge tangent and adjacent final skirt-face normal. V169 bound trim offsets using only the edge tangent, so Cloth-folded panels could rotate away from the static surface-normal component and leave visible straight bars. This is a disposable prototype repair; skirt drape, fit, appearance, and release remain unapproved.",
-  "designRevision": "v170-settled-skirt-surface-frame-trim-20261106",
+  "target": "V171 keeps the V170 sewn geometry, trim transport, target weights, cloth settings, gravity, pins and frame count unchanged. Remove the experimental animated body sweep from the cloth bake so the target remains in its authored neutral rest pose for settling. The six posed skin renders remain separate motion diagnostics; cloth settling alone makes no fit, appearance, collision or release claim.",
+  "designRevision": "v171-neutral-cloth-settle-20261119",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -201,36 +201,8 @@
       "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
-    "poseResponseTrial": {
-      "component": "pleated-overskirt",
-      "attachmentBone": "Hips",
-      "collisionBody": "SiroinoSotai_PC",
-      "poseSweep": [
-        {
-          "frame": 1,
-          "pose": "neutral"
-        },
-        {
-          "frame": 16,
-          "pose": "crouch"
-        },
-        {
-          "frame": 32,
-          "pose": "sit"
-        },
-        {
-          "frame": 40,
-          "pose": "prone"
-        },
-        {
-          "frame": 48,
-          "pose": "neutral"
-        }
-      ],
-      "evidenceBoundary": "Prototype-only Blender Cloth timeline with the actual target armature driving the collision body and the shared overskirt waist pins before Cloth evaluation. Posed customer renders continue to use the exported rest-shape skinning path; this trial does not create runtime cloth, and does not prove fit or collision safety."
-    },
-    "evidence": "V170 retains the V169 armature/Cloth workflow and Stage 09's single target deformation modifier per exported mesh. Each prototype trim vertex is now reconstructed from its settled canonical sewn edge position and interpolated weight using an orthonormal tangent/transverse/adjacent-face-normal surface frame, so folds in the simulated skirt rotate the piping offset with the panel instead of only around the edge tangent. Actual source-edge binding counts and displacements are measured. This is a disposable geometry hypothesis; it does not grant fit, collision safety, appearance, or release acceptance.",
-    "reason": "V169 direct inspection found narrow lavender trim sections reading as detached straight bars across the side/back silhouette. The skin exporter previously rotated each trim offset with its sewn-edge tangent alone; it did not follow the settled panel's changing face normal. V170 stores the authored rest surface normal for each canonical hem edge and transports each trim vertex through the current settled edge's tangent and adjacent-face normal frame. Regenerate the sewn prototype, cached cloth, weights, five views and six poses, then inspect current hashes directly. This remains prototype diagnostics only; the overskirt's crumpled silhouette, body fit, collision safety, appearance, and release are not approved.",
+    "evidence": "V171 uses the existing optional no-pose-response path: bake the overskirt with the target collision body left in neutral rest pose, without fabricating pose-cache trials. The pipeline later generates the required six skinned-pose renders independently. The hypothesis is unproven until all eleven current images are inspected; no fit, collision safety, appearance, Unity/VRChat, or release acceptance is granted.",
+    "reason": "V170 direct inspection showed severe overskirt crumpling/asymmetry after baking the collision body through crouch, sit and prone before returning to neutral. The all-neutral five-key attempt violated the existing solver requirement for four distinct body pose states. V171 isolates rest-shape settling by omitting the optional animated pose-response trial entirely and baking the same 48-frame cloth solve with the source body left neutral; all fabric and garment inputs stay unchanged. This is only a diagnostic, not fit or appearance evidence.",
     "prototypeComponentBendingHypotheses": {},
     "prototypePostBakeLaplacianSmoothing": {}
   },

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v170-settled-skirt-surface-frame-trim-20261106",
+  "revision": "v171-neutral-cloth-settle-20261119",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of all current neutral, back, side, three-quarter, crouch, sit and prone renders shows the overskirt remains severely crumpled and asymmetric, with large rear-side masses and openings. Lavender strips still bridge empty space and cross folded skirt surfaces instead of following a continuous hem. Crouch and sit show thighs emerging through the skirt and stretched plate-like fabric below it; prone has projecting hip folds.",
+      "description": "Direct inspection of front, back, side and three-quarter views shows asymmetric overskirt drape: one side lifts while the other collapses into angular folds. Both side profiles show doubled and stacked lilac hem segments. The trim does not yet read as one continuous edge around both hips.",
       "severity": "BLOCKER",
-      "code": "SKIRT_SILHOUETTE_AND_TRIM_COLLAPSED"
+      "code": "SKIRT_DRAPE_AND_TRIM_DISCONTINUITY"
     },
     {
-      "description": "Irregular gray patches and angular surface changes remain visible across the chest and waist in front, three-quarter, side and posed renders. The images do not establish whether these are intersections, exposed surfaces or shading defects; the current visible appearance is unacceptable.",
+      "description": "Irregular gray patches remain visible through the white chest and waist in neutral, arms-up and arm-cross renders. The source is unresolved; the images do not distinguish clearance/intersection from exposed source surface or shading.",
       "severity": "BLOCKER",
       "code": "BODICE_SURFACE_ARTIFACTS"
     },
     {
-      "description": "The current arms-up and arm-cross renders show sleeve tubes following the observed arm silhouettes; this does not establish numeric fit or runtime behavior.",
-      "severity": "INFO",
-      "code": "SLEEVES_FOLLOW_CURRENT_ARM_POSES"
+      "description": "In crouch and sit, both shorts-clad thighs project through the front of the overskirt while its center panel hangs behind them. The lower skirt silhouette and thigh clearance remain unacceptable in bent-leg poses.",
+      "severity": "BLOCKER",
+      "code": "BENT_LEG_SKIRT_INTERSECTIONS"
     }
   ],
   "failedGeometryChecks": [

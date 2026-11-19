@@ -16,7 +16,7 @@
       "pinVertexCount": 183,
       "frameStart": 1,
       "frameEnd": 48,
-      "dynamicMesh": true,
+      "dynamicMesh": false,
       "pinMethod": "canonical shared seam vertices",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
@@ -31,214 +31,31 @@
         "belowCombinedCollisionMarginVertexCount": 1604,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
-      "poseResponseSamples": [
-        {
-          "frame": 1,
-          "pose": "neutral",
-          "targetBodyEvaluatedMeshSha256": "e3acd4ca8bcdd3d37e7e3638ade5f247997502fc658b4268d7d5ccdc0bde232a",
-          "overskirtEvaluatedMeshSha256": "b4eca9db466cfb0490284c4374b1ab395aab39218d9e2dae6e2017cb36b3d701",
-          "waistPinWorldCoordinatesSha256": "c464d34010b1bb03a17dfd32b5be1abab5cd7ae76c46972a8603446fa893e193",
-          "waistPinMaxDisplacementFromNeutralM": 0.0,
-          "targetBodyDynamicMesh": true,
-          "directPoseCacheRender": {
-            "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/pose-cache-frames/frame-01-neutral.png",
-            "sha256": "5d79e56c79f453374e97c43946cd31888d44aa795b0f5aa6b785ed35f8512e34",
-            "renderedFrame": 1,
-            "renderedPose": "neutral",
-            "renderedBodyObject": "SiroinoSotai_PC",
-            "renderedBodyMeshSha256": "e3acd4ca8bcdd3d37e7e3638ade5f247997502fc658b4268d7d5ccdc0bde232a",
-            "renderedGarmentObjects": [
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-jack",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-wais",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-over",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-.001",
-              "siroino-lilac-lame-fencing-practice-set-prototype-plastron-hypo",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-1-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-2-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-3-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-left-prot",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-right-pro",
-              "jacket-sleeves",
-              "jacket-bodice",
-              "pleated-overskirt",
-              "siroino-lilac-lame-fencing-practice-set-static"
-            ],
-            "grantsFitAcceptance": false,
-            "grantsCollisionSafetyAcceptance": false
-          }
-        },
-        {
-          "frame": 16,
-          "pose": "crouch",
-          "targetBodyEvaluatedMeshSha256": "9de0ccfba7954fe64548ac537be086eaf16cee9e89a069456a48c8dcad0ebdbe",
-          "overskirtEvaluatedMeshSha256": "141c6866c287998124e45d2ef38a96ea8e4736e50ca92b06bd27e4c478b08b96",
-          "waistPinWorldCoordinatesSha256": "161c1c2f79287590e067a05e724149ae8e9eb426c19286bde35ce2bfb9989464",
-          "waistPinMaxDisplacementFromNeutralM": 0.020095600907258784,
-          "targetBodyDynamicMesh": true,
-          "directPoseCacheRender": {
-            "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/pose-cache-frames/frame-16-crouch.png",
-            "sha256": "7d8f1271f281da89eefe74c7e9b3572ea1f85652d5be82e853b495811f9c274b",
-            "renderedFrame": 16,
-            "renderedPose": "crouch",
-            "renderedBodyObject": "SiroinoSotai_PC",
-            "renderedBodyMeshSha256": "9de0ccfba7954fe64548ac537be086eaf16cee9e89a069456a48c8dcad0ebdbe",
-            "renderedGarmentObjects": [
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-jack",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-wais",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-over",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-.001",
-              "siroino-lilac-lame-fencing-practice-set-prototype-plastron-hypo",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-1-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-2-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-3-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-left-prot",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-right-pro",
-              "jacket-sleeves",
-              "jacket-bodice",
-              "pleated-overskirt",
-              "siroino-lilac-lame-fencing-practice-set-static"
-            ],
-            "grantsFitAcceptance": false,
-            "grantsCollisionSafetyAcceptance": false
-          }
-        },
-        {
-          "frame": 32,
-          "pose": "sit",
-          "targetBodyEvaluatedMeshSha256": "bae7d81331e3ce5faf4a5d99ad301e0b926f0aa5f3984ed7d0e08aae9799c28d",
-          "overskirtEvaluatedMeshSha256": "38a741e175d1077781ab30965b5444a7d832f43b949320ac20458e9d270fe3cc",
-          "waistPinWorldCoordinatesSha256": "67d3c9f27886c751300ba809988bd6ab790964f689861191bdabfb3c55556a34",
-          "waistPinMaxDisplacementFromNeutralM": 0.012383048388434185,
-          "targetBodyDynamicMesh": true,
-          "directPoseCacheRender": {
-            "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/pose-cache-frames/frame-32-sit.png",
-            "sha256": "88656a5a6fa68bf6218c266e89108b5fdf81348b074a43ff6d0238a2811e2f59",
-            "renderedFrame": 32,
-            "renderedPose": "sit",
-            "renderedBodyObject": "SiroinoSotai_PC",
-            "renderedBodyMeshSha256": "bae7d81331e3ce5faf4a5d99ad301e0b926f0aa5f3984ed7d0e08aae9799c28d",
-            "renderedGarmentObjects": [
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-jack",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-wais",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-over",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-.001",
-              "siroino-lilac-lame-fencing-practice-set-prototype-plastron-hypo",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-1-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-2-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-3-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-left-prot",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-right-pro",
-              "jacket-sleeves",
-              "jacket-bodice",
-              "pleated-overskirt",
-              "siroino-lilac-lame-fencing-practice-set-static"
-            ],
-            "grantsFitAcceptance": false,
-            "grantsCollisionSafetyAcceptance": false
-          }
-        },
-        {
-          "frame": 40,
-          "pose": "prone",
-          "targetBodyEvaluatedMeshSha256": "0cc67ec8821645f6922697595b095badfe54fa7142624a6af890d62dce256c17",
-          "overskirtEvaluatedMeshSha256": "170ab0d0e2b433a6cfbbccd727323c5d81674e59cd1161975b4e6e620cd66c47",
-          "waistPinWorldCoordinatesSha256": "45300c8a8fa2f20ca2ceab1bafe240da36205e1b47d2a57619d3bfec1deb6b3c",
-          "waistPinMaxDisplacementFromNeutralM": 0.12552408531403103,
-          "targetBodyDynamicMesh": true,
-          "directPoseCacheRender": {
-            "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/pose-cache-frames/frame-40-prone.png",
-            "sha256": "aa5179b57cade8639fd012786fbdd208b94573f266b3c4c885b9c170eb683c47",
-            "renderedFrame": 40,
-            "renderedPose": "prone",
-            "renderedBodyObject": "SiroinoSotai_PC",
-            "renderedBodyMeshSha256": "0cc67ec8821645f6922697595b095badfe54fa7142624a6af890d62dce256c17",
-            "renderedGarmentObjects": [
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-jack",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-wais",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-over",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-.001",
-              "siroino-lilac-lame-fencing-practice-set-prototype-plastron-hypo",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-1-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-2-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-3-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-left-prot",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-right-pro",
-              "jacket-sleeves",
-              "jacket-bodice",
-              "pleated-overskirt",
-              "siroino-lilac-lame-fencing-practice-set-static"
-            ],
-            "grantsFitAcceptance": false,
-            "grantsCollisionSafetyAcceptance": false
-          }
-        },
-        {
-          "frame": 48,
-          "pose": "neutral",
-          "targetBodyEvaluatedMeshSha256": "e3acd4ca8bcdd3d37e7e3638ade5f247997502fc658b4268d7d5ccdc0bde232a",
-          "overskirtEvaluatedMeshSha256": "8ab49250917f3068ca6c30855e854783e26e80b8a05be4312d6347675cb84ef9",
-          "waistPinWorldCoordinatesSha256": "c464d34010b1bb03a17dfd32b5be1abab5cd7ae76c46972a8603446fa893e193",
-          "waistPinMaxDisplacementFromNeutralM": 0.0,
-          "targetBodyDynamicMesh": true,
-          "directPoseCacheRender": {
-            "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/pose-cache-frames/frame-48-neutral.png",
-            "sha256": "03228f2f27e3d8ed7ff3690d22618427179e841828ef1da9b759609d1322a698",
-            "renderedFrame": 48,
-            "renderedPose": "neutral",
-            "renderedBodyObject": "SiroinoSotai_PC",
-            "renderedBodyMeshSha256": "e3acd4ca8bcdd3d37e7e3638ade5f247997502fc658b4268d7d5ccdc0bde232a",
-            "renderedGarmentObjects": [
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-jack",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-wais",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-over",
-              "siroino-lilac-lame-fencing-practice-set-prototype-hem-band-.001",
-              "siroino-lilac-lame-fencing-practice-set-prototype-plastron-hypo",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-1-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-2-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-front-fastener-3-hypoth",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-left-prot",
-              "siroino-lilac-lame-fencing-practice-set-jacket-sleeve-right-pro",
-              "jacket-sleeves",
-              "jacket-bodice",
-              "pleated-overskirt",
-              "siroino-lilac-lame-fencing-practice-set-static"
-            ],
-            "grantsFitAcceptance": false,
-            "grantsCollisionSafetyAcceptance": false
-          }
-        }
-      ],
-      "poseResponseEvidenceBoundary": "Animated collision body and Hips-following shared waist pins were sampled from an actual native Cloth cache. The prototype exports its neutral end frame after a neutral-crouch-sit-prone-neutral sweep; posed customer renders still use armature skinning and do not export runtime Cloth. This is not fit or collision-safety acceptance.",
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.5052342414855957,
-          0.8740785121917725
+          0.45037248730659485,
+          0.746280312538147
         ],
         "nearestNormalSignedDistanceM": {
           "minimum": 0.002411078304703551,
-          "maximum": 0.2230636081076227
+          "maximum": 0.2087185326963663
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 236,
+        "belowCombinedCollisionMarginVertexCount": 256,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
       "preBakeMeshSha256": "b4eca9db466cfb0490284c4374b1ab395aab39218d9e2dae6e2017cb36b3d701",
-      "evaluatedFrameMeshSha256": "8ab49250917f3068ca6c30855e854783e26e80b8a05be4312d6347675cb84ef9",
-      "settledMeshSha256": "8ab49250917f3068ca6c30855e854783e26e80b8a05be4312d6347675cb84ef9",
+      "evaluatedFrameMeshSha256": "de62c19163eec8f2329661ca93f1c5d23337cc586dfdc9a367a1a511e6aaa925",
+      "settledMeshSha256": "de62c19163eec8f2329661ca93f1c5d23337cc586dfdc9a367a1a511e6aaa925",
       "geometryChanged": true,
-      "postSeamAnchorMeshSha256": "8ab49250917f3068ca6c30855e854783e26e80b8a05be4312d6347675cb84ef9",
+      "postSeamAnchorMeshSha256": "de62c19163eec8f2329661ca93f1c5d23337cc586dfdc9a367a1a511e6aaa925",
       "neutralRestSeamAnchor": {
         "method": "restore-canonical-sewn-vertices-to-pre-solve-neutral-rest-coordinates",
         "sharedCanonicalVertexCount": 233,
         "correctedReferenceCount": 0,
-        "maximumCorrectionM": 1.6653345369377348e-16,
-        "meanCorrectionM": 7.147358527629763e-19,
+        "maximumCorrectionM": 0.0,
+        "meanCorrectionM": 0.0,
         "maximumCorrectionCapM": 0.015,
         "grantsFitAcceptance": false
       }
@@ -256,15 +73,15 @@
       "stage": "cloth-bake-before-seam-restore",
       "method": "canonical-sewn-vertex-world-position-gap-v1",
       "sharedCanonicalVertexCount": 233,
-      "maximumGapM": 1.6653345369377348e-16,
+      "maximumGapM": 0.0,
       "grantsFitAcceptance": false
     },
     "neutralRestSeamRestore": {
       "method": "restore-canonical-sewn-vertices-to-pre-solve-neutral-rest-coordinates",
       "sharedCanonicalVertexCount": 233,
       "correctedReferenceCount": 0,
-      "maximumCorrectionM": 1.6653345369377348e-16,
-      "meanCorrectionM": 7.147358527629763e-19,
+      "maximumCorrectionM": 0.0,
+      "meanCorrectionM": 0.0,
       "maximumCorrectionCapM": 0.015,
       "grantsFitAcceptance": false
     },
@@ -272,58 +89,19 @@
       "stage": "cloth-bake-after-seam-restore",
       "method": "canonical-sewn-vertex-world-position-gap-v1",
       "sharedCanonicalVertexCount": 233,
-      "maximumGapM": 1.6653345369377348e-16,
+      "maximumGapM": 0.0,
       "grantsFitAcceptance": false
     },
     "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split, cloth bake before correction, and after the explicitly capped neutral-rest seam anchor. This restores only sewn boundary vertices at the neutral export frame; it does not prove pose-deformed seam continuity, fit, appearance, or release acceptance."
   },
-  "sourceBlendSha256": "49ab070b086027557b32c101d9de4a18b293e69ac1915bcecd264d1779b13cd3",
-  "constructionSha256": "a44e289240fa7075d3eebcc8ab34df8bc915a7c8fb54c96ab10a4e56976afaa8",
+  "sourceBlendSha256": "2253d9c23297ea096ced294e6bfb3b6560e02c0c715b7a0c6a6f4d7c7526563f",
+  "constructionSha256": "35da9695c4738f2dd8dd25d40ecf497079a5031161b4943ef23abda199450ea8",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "0531546ef4493263bd4ec385810b8f0005e6601fbb624275001fa5272fd682ef",
+  "candidateSha256": "690f78c51205ad2ad014f9612590d4d5c0fae19070c40f505f53d2ee7431c425",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
-  "poseResponseTrial": {
-    "component": "pleated-overskirt",
-    "attachmentBone": "Hips",
-    "collisionBody": "SiroinoSotai_PC",
-    "poseSweep": [
-      {
-        "frame": 1,
-        "pose": "neutral"
-      },
-      {
-        "frame": 16,
-        "pose": "crouch"
-      },
-      {
-        "frame": 32,
-        "pose": "sit"
-      },
-      {
-        "frame": 40,
-        "pose": "prone"
-      },
-      {
-        "frame": 48,
-        "pose": "neutral"
-      }
-    ],
-    "evidenceBoundary": "Prototype-only Blender Cloth timeline with the actual target armature driving the collision body and the shared overskirt waist pins before Cloth evaluation. Posed customer renders continue to use the exported rest-shape skinning path; this trial does not create runtime cloth, and does not prove fit or collision safety.",
-    "attachmentContract": {
-      "method": "shared-waist-seam-pins-skinned-to-Hips-before-Cloth",
-      "attachmentBone": "Hips",
-      "pinVertexCount": 183,
-      "armatureModifierPrecedesCloth": true,
-      "grantsFitAcceptance": false
-    },
-    "sampleCount": 5,
-    "uniqueTargetBodyPoseStates": 4,
-    "maximumWaistPinDisplacementM": 0.12552408531403103,
-    "grantsFitAcceptance": false,
-    "grantsCollisionSafetyAcceptance": false
-  },
+  "poseResponseTrial": null,
   "qualityDecision": "UNVERIFIED",
   "grantsFitAcceptance": false,
   "evidenceBoundary": "Bounded neutral cloth experiment only; no fit, motion, weights, or rendered appearance acceptance."
