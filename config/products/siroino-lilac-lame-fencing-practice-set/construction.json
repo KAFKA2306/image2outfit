@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V171 keeps the V170 sewn geometry, trim transport, target weights, cloth settings, gravity, pins and frame count unchanged. Remove the experimental animated body sweep from the cloth bake so the target remains in its authored neutral rest pose for settling. The six posed skin renders remain separate motion diagnostics; cloth settling alone makes no fit, appearance, collision or release claim.",
-  "designRevision": "v171-neutral-cloth-settle-20261119",
+  "target": "V173 retains V172's neutral-settle inputs and 0.90 bending stiffness, then enables native Cloth self-collision for the pleated overskirt only. Compare measured per-panel rest-to-settled geometry and hem transport against V172, then inspect the same six pose renders and five views. This controlled solver hypothesis makes no fit, appearance, collision-safety, or release claim.",
+  "designRevision": "v173-overskirt-self-collision-20261119",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -201,13 +201,20 @@
       "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
-    "evidence": "V172 changes only the overskirt native Cloth bending-stiffness hypothesis from the default 0.45 to 0.90 while retaining V171 neutral settling, geometry, collisions, gravity, pins and 48-frame duration. The controlled build records the solver setting and regenerates the existing pose previews; it grants no fit, collision safety, visual quality, Unity/VRChat, or release acceptance.",
-    "reason": "Direct inspection of V171 showed severe, highly folded neutral overskirt geometry remained after removing animated body motion from the bake. V172 is a one-variable follow-up: increase native Cloth bending stiffness from 0.45 to 0.90 to resist excessive small folds while preserving the V171 neutral collision-body state and every other garment and solver input. This tests a solver response only; the result still requires direct render inspection and proves no fit, appearance, or release readiness.",
+    "evidence": "V173 retains V172 neutral settling and 0.90 native Cloth bending stiffness, changing only overskirt self-collision from disabled to enabled. V172's measured sewn-panel bake inverted 3,163 of 17,567 oriented faces (18.0%) across the six overskirt panels; maximum per-panel rest-to-settled displacement was 0.257 m, and attached hem trim moved up to 0.263 m. The V173 build records the actual native self-collision setting and regenerates the existing previews. This experiment grants no fit, appearance, collision-safety, Unity/VRChat, or release acceptance.",
+    "reason": "The V172 trial retained severe folds despite increased bending stiffness. Direct geometry comparison against the exact pre-bake sewn source found 571/3,539 inverted faces on the left-back panel, 547/3,683 right-back, 328/2,764 left front-lap, 293/2,477 right front-lap, 593/2,370 left-front, and 831/2,734 right-front. Every panel moved at least 0.156 m at its maximum; the front-right mean vertex displacement was 0.0743 m. V173 tests the distinct failure mechanism that intersecting cloth layers pass through one another: enable Blender's native self-collision only for the overskirt, retaining all other V172 inputs. Its visual and numeric outcome remains unverified until the actual bake and direct review.",
     "prototypeComponentBendingHypotheses": {
       "pleated-overskirt": {
         "stiffness": 0.9,
         "reason": "V171 neutral cloth settling still produced excessive small folds in direct renders; increase bending resistance as a single controlled solver variable.",
         "evidenceBoundary": "Records an exact native Blender bending stiffness for one overskirt bake. It tests fold response only and grants no garment fit, collision safety, visual quality, runtime behavior, or release acceptance."
+      }
+    },
+    "prototypeComponentSelfCollisionHypotheses": {
+      "pleated-overskirt": {
+        "enabled": true,
+        "reason": "V172's source-to-settled comparison found 3,163 oriented face inversions across the six overskirt panels, consistent with cloth layers folding through one another after bending stiffness had already been increased.",
+        "evidenceBoundary": "Records whether native Blender Cloth self-collision is enabled and its actual configured distance. It tests inter-layer response only; it grants no garment fit, appearance, body-collision safety, runtime behavior, or release acceptance."
       }
     },
     "prototypePostBakeLaplacianSmoothing": {}

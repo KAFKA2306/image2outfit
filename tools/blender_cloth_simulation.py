@@ -189,6 +189,7 @@ def configure_cloth(
     frame_end: int,
     bending_stiffness: float = 0.45,
     dynamic_mesh: bool = False,
+    self_collision: bool = False,
 ) -> dict[str, object]:
     for modifier in list(obj.modifiers):
         if modifier.name.startswith("Image2Outfit Cloth"):
@@ -214,8 +215,13 @@ def configure_cloth(
     cloth.collision_settings.use_collision = True
     cloth.collision_settings.collision_quality = 5
     cloth.collision_settings.distance_min = 0.003
-    if hasattr(cloth.collision_settings, "use_self_collision"):
-        cloth.collision_settings.use_self_collision = False
+    if not hasattr(cloth.collision_settings, "use_self_collision"):
+        if self_collision:
+            raise RuntimeError("Requested native Cloth self-collision is unavailable")
+        actual_self_collision = False
+    else:
+        cloth.collision_settings.use_self_collision = self_collision
+        actual_self_collision = cloth.collision_settings.use_self_collision
     cloth.point_cache.frame_start = 1
     cloth.point_cache.frame_end = frame_end
     return {
@@ -225,6 +231,12 @@ def configure_cloth(
         "frameStart": 1,
         "frameEnd": frame_end,
         "dynamicMesh": dynamic_mesh,
+        "selfCollision": actual_self_collision,
+        "selfCollisionDistanceMinM": (
+            cloth.collision_settings.self_distance_min
+            if hasattr(cloth.collision_settings, "self_distance_min")
+            else None
+        ),
     }
 
 
@@ -1297,6 +1309,11 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         )
     before, contracts = {}, []
     rest_controls = {}
+    self_collision_hypotheses = policy.get(
+        "prototypeComponentSelfCollisionHypotheses", {}
+    )
+    if not set(self_collision_hypotheses).issubset(groups):
+        raise ValueError("Self-collision hypothesis references an unknown cloth component")
     for name in simulated_components:
         obj = objects[name]
         pin_group = obj.vertex_groups.get("Image2Outfit Cloth Pin")
@@ -1320,10 +1337,32 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             raise ValueError("Bending hypothesis references an unknown cloth component")
         bending_hypothesis = bending_hypotheses.get(name)
         bending_stiffness = 0.45
+        self_collision_hypothesis = self_collision_hypotheses.get(name)
+        self_collision = False
+        if self_collision_hypothesis is not None:
+            enabled = self_collision_hypothesis.get("enabled")
+            if not isinstance(enabled, bool):
+                raise ValueError("Self-collision hypothesis requires an explicit boolean")
+            self_collision = enabled
         dynamic_component = pose_response is not None and (
             name == pose_response["component"] or name in pre_cloth_skinning
         )
-        contract = configure_cloth(obj, frame_end, dynamic_mesh=dynamic_component)
+        contract = configure_cloth(
+            obj,
+            frame_end,
+            dynamic_mesh=dynamic_component,
+            self_collision=self_collision,
+        )
+        if self_collision_hypothesis is not None:
+            contract["componentSelfCollisionHypothesis"] = {
+                "enabled": bool(
+                    obj.modifiers["Image2Outfit Cloth"]
+                    .collision_settings.use_self_collision
+                ),
+                "reason": self_collision_hypothesis["reason"],
+                "evidenceBoundary": self_collision_hypothesis["evidenceBoundary"],
+                "grantsFitAcceptance": False,
+            }
         if name in pre_cloth_skinning:
             contract["preClothSkinning"] = json.loads(
                 obj["prototypePreClothSkinning"]
@@ -1437,6 +1476,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 frame_end,
                 bending_stiffness,
                 dynamic_mesh=dynamic_component,
+                self_collision=self_collision,
             )
             control_modifier = control.modifiers["Image2Outfit Cloth"]
             control_modifier.settings.rest_shape_key = (
