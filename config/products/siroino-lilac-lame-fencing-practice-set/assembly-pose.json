@@ -46,8 +46,8 @@
     "evidenceBoundary": "V155 applies three bounded 0.12 Laplacian passes to torso panel interiors, then locally backtracks only vertices implicated in face flips or new crease spikes; canonical panel boundaries stay locked. This tests fairing after the prior global guard reduced the requested displacement to 10.7%. It does not establish avatar fit, material quality, appearance approval, or release acceptance."
   },
   "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. V108 tests bounded position fairing on jacket torso panel interiors after V107 shading-only renders did not visibly resolve faceting. Canonical seam vertices remain fixed. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
-  "frontLapRestGeometry":   {
-    "method": "exclusive-front-lap-hem-anterior-offset-v1",
+  "frontLapCurvatureGeometry": {
+    "method": "front-lap-lower-circumferential-curvature-chord-reduction-v1",
     "pieceIdsBySide": {
       "left": [
         "overskirt-front-lap-left"
@@ -56,15 +56,20 @@
         "overskirt-front-lap-right"
       ]
     },
-    "anteriorDirectionWorld": [
-      0,
-      -1,
-      0
-    ],
-    "maximumOffsetM": 0.01,
-    "waistFadeHeightM": 0.02,
+    "centerSeamOtherPieceId": "opposite-front-lap",
+    "flankSeamPieceIdsBySide": {
+      "left": [
+        "overskirt-front-left"
+      ],
+      "right": [
+        "overskirt-front-right"
+      ]
+    },
+    "curvatureReductionFraction": 0.2,
+    "lowerSectionStartFraction": 0.45,
     "sharedSeamFadeDistanceM": 0.02,
-    "evidenceBoundary": "V179 applies at most 10 mm anterior rest offset only to exclusive front-lap vertices, fading to zero at waist and shared sewn seams. It preserves the neutral Cloth solve and V178 authored-side weights; body clearance, panel orientation, pose coverage, fit, appearance, morph response and release remain unverified."
+    "maximumDisplacementM": 0.02,
+    "evidenceBoundary": "V180 reduces lower front-lap Y curvature by 20 percent toward the per-height chord from center-front to flank seams. Waist and sewn boundaries fade to zero; maximum measured vertex displacement must stay within 20 mm or execution stops. Compared with the V178 base; cloth, side weights, bodice, and other panels stay fixed. This is a geometry diagnostic only and grants no fit, visual, runtime, or release acceptance."
   },
   "poses": {
     "jacket-front-left": {
@@ -9829,7 +9834,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v160-reduced-overskirt-hem-flare-20261105",
+  "designRevision": "v180-front-lap-circumferential-curvature-test-20261119",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Keep V179 rejected. The bounded anterior rest offset produced only a small crouch metric change and no sit improvement; do not increase it without a new geometry hypothesis. Rework front-lap/surrounding pattern geometry to address pose opening and silhouette while retaining V179 weight and zero shared-seam displacement; keep the bodice artifacts as a separate blocker. Re-measure crouch and sit and inspect all current renders.",
+    "nextAction": "Keep V180 rejected and do not further reduce front-lap curvature based on this trial. The same-side sit near-distance count did not improve and direct poses still show panel opening, while the five-view renders retain a faceted skirt and uneven hem. A next prototype needs a new pattern-level lap/side-panel wrap and hem construction hypothesis; keep the bodice surface artifact as a separate blocker. Re-measure crouch and sit, inspect the new five views and six poses directly, and retain seam/fit/release gates.",
     "lastAttempt": {
-      "runId": "2294eaca628545ac99df3736c2a81ebc",
+      "runId": "1a37bc10a7a643daa7ab18318f0ff50d",
       "status": "EXECUTED",
-      "checkedAt": "2026-11-19T21:47:21Z",
+      "checkedAt": "2026-11-19T23:53:48Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "82678ce9b463c125fa4300b7d24a31a83ff73780f27009b85a5dc50ece7c1160",
+      "stageEvidenceSha256": "32d8e09dafe42d83ce0949b74289b7644787776e10e37398fdb6e0615286aa45",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -75,53 +75,53 @@
         },
         "initialize-3d": {
           "status": "REUSED",
-          "stageResultSha256": "44b4fa98159ae37f144cd8b47b3caab8e31b40cf6700bd29ebeef2b61c474057"
+          "stageResultSha256": "f1fe008ea99f9969cc032804784d46964a27e817ca92086fc2b998282029cdf9"
         },
         "build-blender": {
           "status": "REUSED",
-          "stageResultSha256": "a9ffdf21c98bfa9d30dc2ac2212279939149907063595377b5736dcd86a23871"
+          "stageResultSha256": "30621191709361ed270b8554f0326271eab7c3f6ac6c29f0e57867de3dcd2881"
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "7995ae58fdac06ddd4c4c2fbf96bef88b8ea29a16c0c2515dbc43db25172405b"
+          "stageResultSha256": "f03e627116c4e682a52a3447c88b9f5fbfba13383b2d16601a92f210820fccce"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "b03bce4a9dea8a3656bef1ebaaacb5d4d8f1a2a39e6410a7950c1e3112f9fd11"
+          "stageResultSha256": "0cf80c973b23397d5c8ca8df88f1ec0b17277b017d388f67967441b7e6779555"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "2ce2264077a071afc4e166d40698fb0db78eb6a3db024ad0c920511259e32fff"
+          "stageResultSha256": "85a7ab7c97785ccaf07b74bdf0f943507d80624c9c55e5276dbddc3e1a61082e"
         },
         "audit-geometry": {
           "status": "REUSED",
-          "stageResultSha256": "33def0168ebf3d95f27cf03f1703467b328fe8440651d75364c3f04707e4ce9f"
+          "stageResultSha256": "7345256133caf08a7a3b4c2edcb92c54448bccb4115c4f0cd4dee983bb55bf50"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "ee4e67ed89d5e4976a20eafecfe2f36948639d41c8ef6f7c1f3fc3b26544c9bd"
+          "stageResultSha256": "4088409b8253d9ba10b21c2ba0c182335fb7fe93feb4c08dab3de651b7015ade"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "82678ce9b463c125fa4300b7d24a31a83ff73780f27009b85a5dc50ece7c1160"
+          "stageResultSha256": "32d8e09dafe42d83ce0949b74289b7644787776e10e37398fdb6e0615286aa45"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "91684c4134b8e8367c6e4cd952e8c684de3c1ff1510d2fe6b5769e55671945a9",
+      "checkpointSha256": "cbf3c34c0d37e768c34f3091c4867f9bc6e1016d271d08f2c589fffbf68866f9",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Keep V179 rejected. The bounded anterior rest offset produced only a small crouch metric change and no sit improvement; do not increase it without a new geometry hypothesis. Rework front-lap/surrounding pattern geometry to address pose opening and silhouette while retaining V179 weight and zero shared-seam displacement; keep the bodice artifacts as a separate blocker. Re-measure crouch and sit and inspect all current renders."
+      "nextAction": "Keep V180 rejected and do not further reduce front-lap curvature based on this trial. The same-side sit near-distance count did not improve and direct poses still show panel opening, while the five-view renders retain a faceted skirt and uneven hem. A next prototype needs a new pattern-level lap/side-panel wrap and hem construction hypothesis; keep the bodice surface artifact as a separate blocker. Re-measure crouch and sit, inspect the new five views and six poses directly, and retain seam/fit/release gates."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "6f1994dbe2d753b9a8bc9f800170163b6e256e3ff76a7d094a09bf3c92aeaf25",
+      "sourceSha256": "8f13a216bc6b6df5815e48d61348940eb135d0dd4336788abbd5963e0ea931d6",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "5cc28a399bb197769ea33b77fd7f83114c6b5e61d391c76adbe96149b3c821bb",
+      "reportSha256": "cd1afa46d486ec55ab1df4a34461246f005aec3bc39d0ceb1105e53be525de0c",
       "metrics": {
         "vertices": 16406,
         "triangles": 31849,
@@ -135,17 +135,17 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "38eabb0e1830e2c4a358d08793f2130e41c9df99f95af2e1aaa02f24a3e16398",
+      "sha256": "0f77b438003dfb016df4a772763244e3fcd44faa89d7e23e9c7a691b5d1437ae",
       "findings": [
         {
           "severity": "BLOCKER",
           "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
-          "description": "Direct inspection of the current five views and six pose renders confirms that the skirt remains too faceted, with irregular pleats and uneven/jagged hem edges. The 10 mm maximum anterior rest offset on exclusive lower front-lap vertices preserves zero movement on shared seams and slightly reduces crouch thigh-ray hits (same-side 17/18; cross-side 27/31; union 80/532), but sit metrics remain 5/266 same-side per lap and 5/6 cross-side, union 21/532. Crouch still lifts and opens the front/side panels; sit lap coverage remains incomplete. This geometric diagnostic does not establish fit tolerance."
+          "description": "Direct inspection of all current five views and six pose renders confirms the skirt remains visibly faceted, with irregular pleats, layered/lifting panels, and an uneven hem. V180 reduces lower front-lap circumferential curvature by 20 percent toward the chord, with measured maximum displacement 7.10 mm and zero shared-seam displacement. The diagnostic union changes from V179 80/532 to 69/532 crouch and 21/532 to 18/532 sit, but same-side sit near-distance counts remain 1/266 on each side, with no improvement; front/side panels still open around the legs in crouch and sit. This is a prototype geometry diagnostic, not fit acceptance."
         },
         {
           "severity": "BLOCKER",
           "code": "BODICE_SURFACE_ARTIFACTS",
-          "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in current front and posed views. Their cause is not established by the renders; visible bodice surface quality remains unacceptable."
+          "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in the current front and posed renders. Their cause is not established by the renders. The visible bodice surface quality remains unacceptable and is a separate blocker from the skirt geometry."
         }
       ],
       "grantsQualityAcceptance": false
@@ -158,26 +158,26 @@
       {
         "severity": "BLOCKER",
         "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
-        "description": "Direct inspection of the current five views and six pose renders confirms that the skirt remains too faceted, with irregular pleats and uneven/jagged hem edges. The 10 mm maximum anterior rest offset on exclusive lower front-lap vertices preserves zero movement on shared seams and slightly reduces crouch thigh-ray hits (same-side 17/18; cross-side 27/31; union 80/532), but sit metrics remain 5/266 same-side per lap and 5/6 cross-side, union 21/532. Crouch still lifts and opens the front/side panels; sit lap coverage remains incomplete. This geometric diagnostic does not establish fit tolerance."
+        "description": "Direct inspection of all current five views and six pose renders confirms the skirt remains visibly faceted, with irregular pleats, layered/lifting panels, and an uneven hem. V180 reduces lower front-lap circumferential curvature by 20 percent toward the chord, with measured maximum displacement 7.10 mm and zero shared-seam displacement. The diagnostic union changes from V179 80/532 to 69/532 crouch and 21/532 to 18/532 sit, but same-side sit near-distance counts remain 1/266 on each side, with no improvement; front/side panels still open around the legs in crouch and sit. This is a prototype geometry diagnostic, not fit acceptance."
       },
       {
         "severity": "BLOCKER",
         "code": "BODICE_SURFACE_ARTIFACTS",
-        "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in current front and posed views. Their cause is not established by the renders; visible bodice surface quality remains unacceptable."
+        "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in the current front and posed renders. Their cause is not established by the renders. The visible bodice surface quality remains unacceptable and is a separate blocker from the skirt geometry."
       }
     ],
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "32b14646eea11e2b1ae95a14a8ab53b397defada122a846337e2c68e0452d46a",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "c086b73008c1bdc034f30148006b9aadececaf706d39eb206c274cfee318f24b",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "4ea20d98090957838c18f5a9cf1b813d8ee8ed07a822de582e886ff1d099ff5e",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "3b752390d011b3e81899a160bec7c65c2e3d4f3f64bf3649043284124b88688a",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "4924ef539fe7c59c76360363ae7756cd9ac0cda03ad21132b4351730572ef6ce",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "3103c3c150740003f3b204f57ae93d895462bd3bc90f461e010f39426f7a6817",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "b3a0f6b1654f3d5ba9dba6694252331b2bab7ede225df1f3b773e76980acee42",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "24a5dc10b2c930754bd386ea1a11f0a66fe3c7e24fe88b09077853f7344c5803",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "6e33dff0945e77a0810b02c8ee43801d35496ee350ff410e167b0d9d8d7bc51a",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "0acf5a3e4ef09ef751e78cc8ffbbeff96c7025a9d4770b826513edd8a63a82a5",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "22e9c9470953879fa9313d77fc1da133fcad4e298ac71344131e0be1199f43ca"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "46a05ee4f53825f3a4bf3e7f5b2968b757a0e0b4bfbfb90103f34799c768badb",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "ba4f1bfb69e236458a7aac693f9d1a6b12d8bd59ad7a1601cf7f522f43976abd",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "72a616b22d09773eb3dfe7036ba933155e96fdf12e4838a705dc22482468fe07",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "b75621cbfa674b9de36f7db106c915ed8cc17af16a13357a5fd5a4e1113569ed",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "dc00e648189fbb877eff4590612b306be18f72f1fc88a7ff5e0523c3e0989a81",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "ef0849664404ab94f69714ce66ccbe60abc8b74e45ac3ae51acebf161c8fb2f5",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "e1fe6c359017e8c1e89dd75e14c8da01d1e23fcdd278ffed726be8e4ead4c482",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "d958d482c9c8e1cbbdd5fe4e67a86632e2ca22111083fbe64f77e96be4db1f8d",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "4e97669ea68d0e7c55bef34b20e66c723fd2661688f09fa7deb5b94b54b227c7",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "398a30f819102786008d11ec7f6ed55dffdc001e1709a7716db78d49f133145c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "1c4692394d7f83f0473a5e5dfb4d35b70593dcb4a4258774d998768e6d4c696c"
     },
     "status": "REJECTED",
     "reviewMethod": "direct-image-inspection"

@@ -191,24 +191,71 @@ def _smoothstep(value):
     return value * value * (3.0 - 2.0 * value)
 
 
-def apply_front_lap_rest_geometry(objects, pose_spec):
-    """Move only the exclusive lower front-lap surface forward in rest space."""
-    spec = pose_spec.get("frontLapRestGeometry")
+def _seam_y_at_height(points, height):
+    """Interpolate a sewn boundary's world-space Y coordinate at one Z."""
+    by_height = {}
+    for point in points:
+        key = round(point.z, 6)
+        by_height.setdefault(key, []).append(point)
+    samples = sorted(
+        (z, sum(p.y for p in values) / len(values), sum(p.x for p in values) / len(values))
+        for z, values in by_height.items()
+    )
+    if len(samples) < 2:
+        raise ValueError("Front-lap curvature needs at least two sewn-boundary height samples")
+    if height <= samples[0][0]:
+        return samples[0][1], samples[0][2]
+    if height >= samples[-1][0]:
+        return samples[-1][1], samples[-1][2]
+    for first, second in zip(samples, samples[1:]):
+        if first[0] <= height <= second[0]:
+            fraction = (height - first[0]) / max(second[0] - first[0], 1e-8)
+            return (
+                first[1] + (second[1] - first[1]) * fraction,
+                first[2] + (second[2] - first[2]) * fraction,
+            )
+    raise ValueError("Front-lap curvature could not bracket a sewn-boundary height")
+
+
+def apply_front_lap_curvature_geometry(objects, pose_spec):
+    """Reduce lower front-lap circumferential curvature toward its sewn-edge chord."""
+    spec = pose_spec.get("frontLapCurvatureGeometry")
     if spec is None:
         return {"applied": False, "reason": "not-declared", "grantsFitAcceptance": False}
     side_pieces = spec["pieceIdsBySide"]
-    anterior = Vector(spec["anteriorDirectionWorld"]).normalized()
-    maximum_offset = float(spec["maximumOffsetM"])
-    waist_fade_height = float(spec["waistFadeHeightM"])
+    reduction = float(spec["curvatureReductionFraction"])
+    lower_start = float(spec["lowerSectionStartFraction"])
     seam_fade_distance = float(spec["sharedSeamFadeDistanceM"])
+    displacement_cap = float(spec["maximumDisplacementM"])
     piece_records = {}
     lap_ids = set(side_pieces["left"] + side_pieces["right"])
+    canonical_references = {}
+    for obj in objects:
+        source_ids = obj.data.attributes.get("canonical_sewn_vertex_index")
+        if source_ids is None or len(source_ids.data) != len(obj.data.vertices):
+            continue
+        for vertex, source in zip(obj.data.vertices, source_ids.data):
+            if source.value >= 0:
+                canonical_references.setdefault(int(source.value), []).append(
+                    (obj.name, vertex.index)
+                )
+    shared_canonical_ids = {
+        source_id
+        for source_id, references in canonical_references.items()
+        if len({obj_name for obj_name, _index in references}) > 1
+    }
     for obj in objects:
         if obj.type != "MESH":
             continue
         attribute = obj.data.attributes.get("canonical_piece_index")
-        if attribute is None or attribute.domain != "FACE":
-            raise ValueError(f"Front-lap rest offset lost canonical ownership on {obj.name}")
+        source_ids = obj.data.attributes.get("canonical_sewn_vertex_index")
+        if (
+            attribute is None
+            or attribute.domain != "FACE"
+            or source_ids is None
+            or len(source_ids.data) != len(obj.data.vertices)
+        ):
+            continue
         piece_names = json.loads(obj["canonicalPieceIds"])
         owners = [set() for _ in obj.data.vertices]
         for face, owner in zip(obj.data.polygons, attribute.data):
@@ -223,16 +270,32 @@ def apply_front_lap_rest_geometry(objects, pose_spec):
         inverse = obj.matrix_world.inverted()
         for side in ("left", "right"):
             piece_id = side_pieces[side][0]
+            center_owner = side_pieces["right"][0] if side == "left" else side_pieces["left"][0]
+            flank_owner = f"overskirt-front-{side}"
             selected = [index for index, owner_set in enumerate(owners) if piece_id in owner_set]
             if not selected:
                 continue
-            seam_seeds = [
+            center_seam = [
+                index for index in selected if center_owner in owners[index]
+            ]
+            flank_seam = [
+                index for index in selected if flank_owner in owners[index]
+            ]
+            all_seams = [
                 index for index in selected if owners[index].difference({piece_id})
             ]
-            if not seam_seeds:
-                raise ValueError(f"Front-lap rest offset cannot identify sewn seams for {piece_id}")
-            distances = {index: 0.0 for index in seam_seeds}
-            queue = [(0.0, index) for index in seam_seeds]
+            all_seams.extend(
+                index
+                for index in selected
+                if int(source_ids.data[index].value) in shared_canonical_ids
+                and index not in all_seams
+            )
+            if not center_seam or not flank_seam or not all_seams:
+                raise ValueError(f"Front-lap curvature cannot identify both sewn side boundaries for {piece_id}")
+            center_points = [coordinates[index] for index in center_seam]
+            flank_points = [coordinates[index] for index in flank_seam]
+            distances = {index: 0.0 for index in all_seams}
+            queue = [(0.0, index) for index in all_seams]
             heapq.heapify(queue)
             while queue:
                 distance, index = heapq.heappop(queue)
@@ -248,45 +311,63 @@ def apply_front_lap_rest_geometry(objects, pose_spec):
             low_z = min(coordinates[index].z for index in selected)
             high_z = max(coordinates[index].z for index in selected)
             if high_z - low_z <= 1e-6:
-                raise ValueError(f"Front-lap rest offset has collapsed height on {piece_id}")
-            magnitudes = []
+                raise ValueError(f"Front-lap curvature height collapsed on {piece_id}")
+            displacements = []
+            signed_curvature = []
             seam_displacements = []
             for index in selected:
                 point = coordinates[index]
-                waist_fraction = min(1.0, max(0.0, (high_z - point.z) / waist_fade_height))
-                hem_fraction = min(1.0, max(0.0, (high_z - point.z) / (high_z - low_z)))
-                seam_fraction = min(1.0, max(0.0, distances.get(index, seam_fade_distance) / seam_fade_distance))
-                amount = maximum_offset * _smoothstep(waist_fraction) * _smoothstep(hem_fraction) * _smoothstep(seam_fraction)
-                delta_world = anterior * amount
-                if amount > 0:
-                    delta_local = inverse.to_3x3() @ delta_world
+                center_y, center_x = _seam_y_at_height(center_points, point.z)
+                flank_y, flank_x = _seam_y_at_height(flank_points, point.z)
+                width = flank_x - center_x
+                if abs(width) <= 1e-6:
+                    raise ValueError(f"Front-lap sewn boundaries collapsed in X on {piece_id}")
+                lateral_fraction = min(1.0, max(0.0, (point.x - center_x) / width))
+                chord_y = center_y + (flank_y - center_y) * lateral_fraction
+                curvature_y = point.y - chord_y
+                vertical_fraction = min(1.0, max(0.0, (point.z - low_z) / (high_z - low_z)))
+                lower_blend = _smoothstep(
+                    min(1.0, max(0.0, (vertical_fraction - lower_start) / (1.0 - lower_start)))
+                )
+                seam_blend = _smoothstep(
+                    min(1.0, max(0.0, distances.get(index, seam_fade_distance) / seam_fade_distance))
+                )
+                delta_y = -curvature_y * reduction * lower_blend * seam_blend
+                if abs(delta_y) > displacement_cap + 1e-7:
+                    raise ValueError(
+                        f"Front-lap curvature displacement exceeds {displacement_cap:.3f} m on {piece_id}: {abs(delta_y):.6f} m"
+                    )
+                if abs(delta_y) > 0:
+                    delta_local = inverse.to_3x3() @ Vector((0.0, delta_y, 0.0))
                     if obj.data.shape_keys:
                         for key_block in obj.data.shape_keys.key_blocks:
                             key_block.data[index].co += delta_local
                     else:
                         obj.data.vertices[index].co += delta_local
-                magnitudes.append(amount)
-                if index in seam_seeds:
-                    seam_displacements.append(amount)
+                displacements.append(abs(delta_y))
+                signed_curvature.append(curvature_y)
+                if index in all_seams:
+                    seam_displacements.append(abs(delta_y))
             obj.data.update()
             piece_records[piece_id] = {
                 "selectedVertexCount": len(selected),
-                "movedVertexCount": sum(value > 1e-9 for value in magnitudes),
-                "maximumOffsetM": max(magnitudes, default=0.0),
-                "meanOffsetM": sum(magnitudes) / len(magnitudes),
-                "maximumSharedSeamOffsetM": max(seam_displacements, default=0.0),
+                "movedVertexCount": sum(value > 1e-9 for value in displacements),
+                "maximumDisplacementM": max(displacements, default=0.0),
+                "meanDisplacementM": sum(displacements) / len(displacements),
+                "maximumAbsolutePreChangeCurvatureM": max(map(abs, signed_curvature), default=0.0),
+                "maximumSharedSeamDisplacementM": max(seam_displacements, default=0.0),
                 "grantsFitAcceptance": False,
             }
     missing = lap_ids.difference(piece_records)
     if missing:
-        raise ValueError("Front-lap rest offset did not find declared panels: " + ", ".join(sorted(missing)))
+        raise ValueError("Front-lap curvature did not find declared panels: " + ", ".join(sorted(missing)))
     return {
         "applied": True,
         "method": spec["method"],
-        "anteriorDirectionWorld": list(spec["anteriorDirectionWorld"]),
-        "maximumOffsetM": maximum_offset,
-        "waistFadeHeightM": waist_fade_height,
+        "curvatureReductionFraction": reduction,
+        "lowerSectionStartFraction": lower_start,
         "sharedSeamFadeDistanceM": seam_fade_distance,
+        "maximumDisplacementM": displacement_cap,
         "pieceEvidence": piece_records,
         "grantsFitAcceptance": False,
         "evidenceBoundary": spec["evidenceBoundary"],
@@ -2211,7 +2292,7 @@ def main():
                 }
                 for key, accumulator in profile_accumulators.items()
             ]
-    front_lap_rest_geometry_evidence = apply_front_lap_rest_geometry(
+    front_lap_curvature_geometry_evidence = apply_front_lap_curvature_geometry(
         garment_objects,
         read_json(repo_path(job["garmentPipeline"]["assemblyPosePath"])),
     )
@@ -2467,7 +2548,7 @@ def main():
                 "grantsShapeKeyAcceptance": False,
             },
             "poseConstrainedApronGeometry": pose_constrained_apron_evidence,
-            "frontLapRestGeometry": front_lap_rest_geometry_evidence,
+            "frontLapCurvatureGeometry": front_lap_curvature_geometry_evidence,
             "prototypeWeightProfiles": profile_audits,
             "sharedSeamWeightContinuity": shared_seam_weight_continuity,
             "bodyDistanceM": {
