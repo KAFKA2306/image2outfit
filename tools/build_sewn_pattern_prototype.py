@@ -3851,6 +3851,41 @@ def main():
     data = bpy.data.meshes.new(job["id"] + "-sewn-surface")
     data.from_pydata(mesh["vertices"], [], mesh["faces"])
     data.update()
+    # Retain source 2D coordinates on each face corner so cloth can bind a
+    # declared pattern edge exactly after the sewn mesh is split. Atlas UVs
+    # include panel packing offsets and therefore cannot identify source edges.
+    pattern_coordinates = mesh.get("facePatternCoordinates")
+    pattern_sources = mesh.get("faceUvSourceKinds")
+    if (not isinstance(pattern_coordinates, list)
+            or len(pattern_coordinates) != len(data.polygons)
+            or not isinstance(pattern_sources, list)
+            or len(pattern_sources) != len(data.polygons)):
+        raise ValueError("Sewn mesh is missing canonical face-corner pattern coordinates")
+    canonical_pattern_coordinate = data.attributes.new(
+        "canonical_pattern_coordinate", "FLOAT_VECTOR", "CORNER"
+    )
+    canonical_pattern_coordinate_valid = data.attributes.new(
+        "canonical_pattern_coordinate_valid", "BOOLEAN", "CORNER"
+    )
+    for polygon, face_points, source_kind in zip(
+            data.polygons, pattern_coordinates, pattern_sources):
+        if source_kind == "unmapped-surface-derived-shell":
+            if face_points:
+                raise ValueError("Unmapped shell must not invent canonical pattern coordinates")
+            continue
+        if len(face_points) != len(polygon.loop_indices):
+            raise ValueError("Canonical pattern coordinates do not match sewn face corners")
+        for loop_index, point in zip(polygon.loop_indices, face_points):
+            canonical_pattern_coordinate.data[loop_index].vector = (
+                float(point[0]), float(point[1]), 0.0
+            )
+            canonical_pattern_coordinate_valid.data[loop_index].value = True
+    pattern_coordinate_scale = mesh.get("patternCoordinateUnitsPerMeter")
+    if (not isinstance(pattern_coordinate_scale, (int, float))
+            or isinstance(pattern_coordinate_scale, bool)
+            or not math.isfinite(pattern_coordinate_scale)
+            or pattern_coordinate_scale <= 0):
+        raise ValueError("Sewn mesh has no valid canonical pattern-coordinate scale")
     # Keep piping bindings stable if the bounded microdegenerate cleanup welds
     # vertices and Blender compacts the resulting point table. Bindings name
     # indices in the canonical sewn mesh, so the correspondence must travel
@@ -3956,6 +3991,7 @@ def main():
     garment["sewnMeshSha256"] = digest(mesh_path)
     garment["sourcePatternSha256"] = expected["patternSha256"]
     garment["canonicalPieceIds"] = json.dumps(pieces)
+    garment["patternCoordinateUnitsPerMeter"] = float(pattern_coordinate_scale)
     bpy.ops.object.select_all(action="DESELECT")
     garment.select_set(True)
     bpy.context.view_layer.objects.active = garment

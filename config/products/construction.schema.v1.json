@@ -443,6 +443,41 @@
           "minimum": 0.01,
           "maximum": 0.5
         },
+        "prototypeHemBoundaryAttachment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "component",
+            "sourcePieces",
+            "method",
+            "maximumBoundaryHeightRangeM",
+            "maximumNeutralHemDriftM",
+            "reason",
+            "evidenceBoundary"
+          ],
+          "properties": {
+            "component": { "const": "pleated-overskirt" },
+            "sourcePieces": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "method": { "const": "pin-authored-pattern-hem-boundary-v1" },
+            "maximumBoundaryHeightRangeM": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.04
+            },
+            "maximumNeutralHemDriftM": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 0.001
+            },
+            "reason": { "type": "string", "minLength": 1 },
+            "evidenceBoundary": { "type": "string", "minLength": 1 }
+          }
+        },
         "applicability": {
           "enum": [
             "REQUIRED",

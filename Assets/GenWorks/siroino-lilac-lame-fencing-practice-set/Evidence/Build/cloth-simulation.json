@@ -13,17 +13,69 @@
     {
       "object": "pleated-overskirt",
       "modifier": "Image2Outfit Cloth",
-      "pinVertexCount": 183,
+      "pinVertexCount": 537,
       "frameStart": 1,
       "frameEnd": 48,
       "dynamicMesh": false,
-      "selfCollision": true,
+      "selfCollision": false,
       "selfCollisionDistanceMinM": 0.014999999664723873,
-      "componentSelfCollisionHypothesis": {
-        "enabled": true,
-        "reason": "V172's source-to-settled comparison found 3,163 oriented face inversions across the six overskirt panels, consistent with cloth layers folding through one another after bending stiffness had already been increased.",
-        "evidenceBoundary": "Records whether native Blender Cloth self-collision is enabled and its actual configured distance. It tests inter-layer response only; it grants no garment fit, appearance, body-collision safety, runtime behavior, or release acceptance.",
-        "grantsFitAcceptance": false
+      "hemBoundaryAttachment": {
+        "method": "canonical-pattern-role-boundary-hem-edge-v1",
+        "sourcePieces": [
+          "overskirt-back-left",
+          "overskirt-back-right",
+          "overskirt-front-lap-left",
+          "overskirt-front-lap-right",
+          "overskirt-front-left",
+          "overskirt-front-right"
+        ],
+        "sourceEdgeCount": 354,
+        "ignoredNonHemBoundaryEdgeCount": 183,
+        "sourceVertexCount": 354,
+        "edgesByPiece": {
+          "overskirt-back-left": 75,
+          "overskirt-back-right": 78,
+          "overskirt-front-lap-left": 55,
+          "overskirt-front-lap-right": 52,
+          "overskirt-front-left": 45,
+          "overskirt-front-right": 49
+        },
+        "heightRangeMByPiece": {
+          "overskirt-back-left": [
+            0.5095782279968262,
+            0.5095782279968262
+          ],
+          "overskirt-back-right": [
+            0.5095782279968262,
+            0.5095782279968262
+          ],
+          "overskirt-front-lap-left": [
+            0.4945782423019409,
+            0.5095782279968262
+          ],
+          "overskirt-front-lap-right": [
+            0.4945782423019409,
+            0.5095782279968262
+          ],
+          "overskirt-front-left": [
+            0.5095782279968262,
+            0.5095782279968262
+          ],
+          "overskirt-front-right": [
+            0.5095782279968262,
+            0.5095782279968262
+          ]
+        },
+        "maximumSourceZ": 0.5095782279968262,
+        "minimumSourceZ": 0.4945782423019409,
+        "grantsFitAcceptance": false,
+        "sourceCanonicalVertexIdsSha256": "cfa4c882fb855ea72f305d54dea9cdf4deca00254da563e3a54f19ef2dd38427",
+        "pinnedVertexCount": 354,
+        "evidenceBoundary": "The native Cloth bake matches topological boundary edges to the exact authored 2D hem segment for each declared panel and pins only those vertices at neutral source coordinates. It records source edge/vertex ownership, ignored non-hem boundaries, per-panel height ranges, pinned coverage, and maximum, P95, and mean drift. This measures a bounded neutral prototype attachment; it does not establish posed trim binding, fit, collision safety, appearance, runtime behavior, or release acceptance.",
+        "grantsAppearanceAcceptance": false,
+        "maximumNeutralHemDriftM": 0.0,
+        "p95NeutralHemDriftM": 0.0,
+        "meanNeutralHemDriftM": 0.0
       },
       "componentBendingHypothesis": {
         "stiffness": 0.8999999761581421,
@@ -33,7 +85,7 @@
         "evidenceBoundary": "Records an exact native Blender bending stiffness for one overskirt bake. It tests fold response only and grants no garment fit, collision safety, visual quality, runtime behavior, or release acceptance.",
         "grantsFitAcceptance": false
       },
-      "pinMethod": "canonical shared seam vertices",
+      "pinMethod": "canonical shared seam vertices; canonical open hem boundary pinned to authored rest positions",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
           0.4945782423019409,
@@ -49,23 +101,23 @@
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.5953236222267151,
-          0.8473937511444092
+          0.4945782423019409,
+          0.741584300994873
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": -0.03924005106091499,
-          "maximum": 0.1490827719680965
+          "minimum": -0.0018229534000511194,
+          "maximum": 0.17944411607459188
         },
-        "negativeSignedVertexCount": 409,
-        "belowCombinedCollisionMarginVertexCount": 856,
+        "negativeSignedVertexCount": 7,
+        "belowCombinedCollisionMarginVertexCount": 583,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
       "preBakeMeshSha256": "b4eca9db466cfb0490284c4374b1ab395aab39218d9e2dae6e2017cb36b3d701",
-      "evaluatedFrameMeshSha256": "b71c5064da9f6b03e1b749068b64b28b328820a10aa454ffec7db517619cca59",
-      "settledMeshSha256": "b71c5064da9f6b03e1b749068b64b28b328820a10aa454ffec7db517619cca59",
+      "evaluatedFrameMeshSha256": "7da09afaacad520807977f299cfeae223aeb6c28d4e83084627cfe4078ba88e5",
+      "settledMeshSha256": "7da09afaacad520807977f299cfeae223aeb6c28d4e83084627cfe4078ba88e5",
       "geometryChanged": true,
-      "postSeamAnchorMeshSha256": "b71c5064da9f6b03e1b749068b64b28b328820a10aa454ffec7db517619cca59",
+      "postSeamAnchorMeshSha256": "7da09afaacad520807977f299cfeae223aeb6c28d4e83084627cfe4078ba88e5",
       "neutralRestSeamAnchor": {
         "method": "restore-canonical-sewn-vertices-to-pre-solve-neutral-rest-coordinates",
         "sharedCanonicalVertexCount": 233,
@@ -110,10 +162,10 @@
     },
     "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split, cloth bake before correction, and after the explicitly capped neutral-rest seam anchor. This restores only sewn boundary vertices at the neutral export frame; it does not prove pose-deformed seam continuity, fit, appearance, or release acceptance."
   },
-  "sourceBlendSha256": "2253d9c23297ea096ced294e6bfb3b6560e02c0c715b7a0c6a6f4d7c7526563f",
-  "constructionSha256": "dc36e97e6c1d1328300838b748fc6d003b3122c11f9eb46116be5197d0d64346",
+  "sourceBlendSha256": "f027e909f04f299be531dea3bd5404764d901b7683f96a61620d619f15220c2a",
+  "constructionSha256": "91277c176d5b9bba44831b367aa38a5b63aa72fa00e99430fd6408f6b5a478e6",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "2ea05edb88d31247052882f0ea76b484c34e14832131adaa04e7b3503388fb44",
+  "candidateSha256": "04205ba65075369d96f57a10a09852350733c4a9c54dc8eabeb6acd2f8d4d049",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

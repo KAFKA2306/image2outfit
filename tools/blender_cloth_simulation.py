@@ -177,6 +177,136 @@ def pin_vertices(obj: bpy.types.Object) -> list[int]:
     return selected
 
 
+def open_boundary_vertices(
+    obj: bpy.types.Object,
+    allowed_pieces: set[str],
+    pattern_contract: dict[str, object],
+) -> dict[str, object]:
+    """Select only topological boundary edges on each authored pattern hem."""
+    owners = obj.data.attributes.get("canonical_piece_index")
+    if owners is None or owners.domain != "FACE" or len(owners.data) != len(obj.data.polygons):
+        raise ValueError(f"Canonical face ownership is missing for hem attachment: {obj.name}")
+    coordinates = obj.data.attributes.get("canonical_pattern_coordinate")
+    coordinate_valid = obj.data.attributes.get("canonical_pattern_coordinate_valid")
+    if (coordinates is None or coordinates.domain != "CORNER"
+            or coordinate_valid is None or coordinate_valid.domain != "CORNER"):
+        raise ValueError(f"Canonical pattern-coordinate provenance is missing: {obj.name}")
+    pieces = json.loads(obj.get("canonicalPieceIds", "[]"))
+    units_per_meter = float(obj.get("patternCoordinateUnitsPerMeter", 0.0))
+    if not math.isfinite(units_per_meter) or units_per_meter <= 0:
+        raise ValueError(f"Canonical pattern-coordinate scale is missing: {obj.name}")
+    pattern_by_id = {
+        item.get("pieceId"): item
+        for item in pattern_contract.get("pieces", [])
+        if isinstance(item, dict) and isinstance(item.get("pieceId"), str)
+    }
+    segments_by_piece: dict[str, list[tuple[tuple[float, float], tuple[float, float]]]] = {}
+    for piece_id in allowed_pieces:
+        piece = pattern_by_id.get(piece_id)
+        if piece is None:
+            raise ValueError(f"Canonical pattern hem piece is missing: {piece_id}")
+        boundary = piece.get("boundary")
+        segments = []
+        for edge in piece.get("edges", []):
+            if edge.get("role") != "hem":
+                continue
+            first, second = edge.get("startVertex"), edge.get("endVertex")
+            if (not isinstance(boundary, list) or not isinstance(first, int)
+                    or isinstance(first, bool) or not isinstance(second, int)
+                    or isinstance(second, bool) or not 0 <= first < len(boundary)
+                    or not 0 <= second < len(boundary) or first == second):
+                raise ValueError(f"Canonical pattern hem has invalid endpoints: {piece_id}")
+            segments.append((
+                (float(boundary[first][0]) * units_per_meter,
+                 float(boundary[first][1]) * units_per_meter),
+                (float(boundary[second][0]) * units_per_meter,
+                 float(boundary[second][1]) * units_per_meter),
+            ))
+        if len(segments) != 1:
+            raise ValueError(f"Expected exactly one authored hem edge for {piece_id}")
+        segments_by_piece[piece_id] = segments
+
+    def lies_on_segment(point: tuple[float, float], segment: tuple[tuple[float, float], tuple[float, float]]) -> bool:
+        first, second = segment
+        dx, dy = second[0] - first[0], second[1] - first[1]
+        px, py = point[0] - first[0], point[1] - first[1]
+        length_squared = dx * dx + dy * dy
+        if length_squared <= 1e-16:
+            raise ValueError("Canonical pattern hem edge has zero length")
+        fraction = (px * dx + py * dy) / length_squared
+        tolerance = 1e-4
+        if not -tolerance <= fraction <= 1.0 + tolerance:
+            return False
+        closest = (first[0] + min(1.0, max(0.0, fraction)) * dx,
+                   first[1] + min(1.0, max(0.0, fraction)) * dy)
+        return math.hypot(point[0] - closest[0], point[1] - closest[1]) <= tolerance
+
+    edge_faces: dict[tuple[int, int], list[int]] = {}
+    for face in obj.data.polygons:
+        ids = list(face.vertices)
+        for first, second in zip(ids, ids[1:] + ids[:1]):
+            edge_faces.setdefault(tuple(sorted((first, second))), []).append(face.index)
+    boundary_edges = [(edge, faces[0]) for edge, faces in edge_faces.items() if len(faces) == 1]
+    if not boundary_edges:
+        raise ValueError(f"Declared hem attachment has no open source boundary: {obj.name}")
+    owned_edges: dict[str, int] = {}
+    vertices_by_piece: dict[str, set[int]] = {}
+    vertices: set[int] = set()
+    ignored_nonhem_edges = 0
+    for (first, second), face_index in boundary_edges:
+        owner_index = owners.data[face_index].value
+        if not 0 <= owner_index < len(pieces):
+            raise ValueError(f"Invalid canonical hem face owner: {obj.name}:{face_index}")
+        piece = pieces[owner_index]
+        if piece not in allowed_pieces:
+            raise ValueError(
+                f"Open edge is not owned by a declared hem panel: {obj.name}:{piece}"
+            )
+        polygon = obj.data.polygons[face_index]
+        loop_by_vertex = {
+            obj.data.loops[loop_index].vertex_index: loop_index
+            for loop_index in polygon.loop_indices
+        }
+        if first not in loop_by_vertex or second not in loop_by_vertex:
+            raise ValueError(f"Hem boundary edge lost polygon-corner ownership: {obj.name}:{piece}")
+        first_loop, second_loop = loop_by_vertex[first], loop_by_vertex[second]
+        if (not coordinate_valid.data[first_loop].value
+                or not coordinate_valid.data[second_loop].value):
+            raise ValueError(f"Hem boundary edge lacks authored 2D coordinates: {obj.name}:{piece}")
+        first_coordinate = tuple(float(value) for value in coordinates.data[first_loop].vector[:2])
+        second_coordinate = tuple(float(value) for value in coordinates.data[second_loop].vector[:2])
+        if not any(
+            lies_on_segment(first_coordinate, segment)
+            and lies_on_segment(second_coordinate, segment)
+            for segment in segments_by_piece[piece]
+        ):
+            ignored_nonhem_edges += 1
+            continue
+        owned_edges[piece] = owned_edges.get(piece, 0) + 1
+        vertices_by_piece.setdefault(piece, set()).update((first, second))
+        vertices.update((first, second))
+    missing = allowed_pieces - set(owned_edges)
+    if missing:
+        raise ValueError(f"Canonical open hem edge was not found for every declared panel: {sorted(missing)}")
+    height_ranges = {}
+    for piece, piece_vertices in vertices_by_piece.items():
+        heights = [float(obj.data.vertices[index].co.z) for index in piece_vertices]
+        height_ranges[piece] = [min(heights), max(heights)]
+    return {
+        "method": "canonical-pattern-role-boundary-hem-edge-v1",
+        "sourcePieces": sorted(owned_edges),
+        "sourceEdgeCount": sum(owned_edges.values()),
+        "ignoredNonHemBoundaryEdgeCount": ignored_nonhem_edges,
+        "sourceVertexCount": len(vertices),
+        "edgesByPiece": owned_edges,
+        "heightRangeMByPiece": height_ranges,
+        "vertexIndices": sorted(vertices),
+        "maximumSourceZ": max(float(obj.data.vertices[i].co.z) for i in vertices),
+        "minimumSourceZ": min(float(obj.data.vertices[i].co.z) for i in vertices),
+        "grantsFitAcceptance": False,
+    }
+
+
 def ensure_collision(body: bpy.types.Object) -> None:
     if not any(modifier.type == "COLLISION" for modifier in body.modifiers):
         body.modifiers.new("Image2Outfit Body Collision", "COLLISION")
@@ -815,6 +945,9 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     source_hash = hashlib.sha256(blend.read_bytes()).hexdigest()
     construction_path = repo_path(job["garmentPipeline"]["constructionPath"])
     construction = read_json(construction_path)
+    pattern_contract = read_json(
+        repo_path(job["garmentPipeline"]["patternContractPath"])
+    )
     policy = construction["clothSimulation"]
     groups = policy["prototypePanelGroups"]
     simulated_components = policy["components"]
@@ -902,6 +1035,41 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             "grantsFitAcceptance": False,
         }
 
+    hem_attachment = policy.get("prototypeHemBoundaryAttachment")
+    if hem_attachment is not None:
+        component = hem_attachment.get("component")
+        source_pieces = hem_attachment.get("sourcePieces")
+        pattern = read_json(
+            repo_path(job["garmentPipeline"]["patternContractPath"])
+        )
+        pattern_by_id = {piece["pieceId"]: piece for piece in pattern["pieces"]}
+        if (
+            component not in simulated_components
+            or hem_attachment.get("method") != "pin-authored-pattern-hem-boundary-v1"
+            or not isinstance(source_pieces, list)
+            or set(source_pieces) != set(groups.get(component, []))
+            or any(
+                piece_id not in pattern_by_id
+                or sum(
+                    edge.get("role") == "hem"
+                    for edge in pattern_by_id[piece_id].get("edges", [])
+                ) != 1
+                for piece_id in source_pieces
+            )
+        ):
+            raise ValueError(
+                "Hem attachment must name every simulated source panel and its unique declared hem edge"
+            )
+        for key in ("maximumBoundaryHeightRangeM", "maximumNeutralHemDriftM"):
+            value = hem_attachment.get(key)
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                or value <= 0
+            ):
+                raise ValueError(f"Hem attachment requires a positive {key} bound")
+
     vertex_sets = {
         name: {v for i in ids for v in faces[i]} for name, ids in selected_faces.items()
     }
@@ -965,7 +1133,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             [[remap[v] for v in faces[i]] for i in indices],
         )
         data.update()
-        # Preserve only the authored sewn-pattern UVs.  Cloth splitting creates
+        # Preserve the authored sewn-pattern UVs and exact 2D pattern coordinates. Cloth splitting creates
         # new meshes and from_pydata does not copy loop-domain data, so map each
         # new polygon back to its source polygon and copy its loop coordinates.
         source_uv = original.data.uv_layers.active
@@ -996,10 +1164,35 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             raise ValueError(
                 f"Authored sewn-pattern UV layer is missing before cloth splitting: {name}"
             )
+        source_pattern = original.data.attributes.get("canonical_pattern_coordinate")
+        source_pattern_valid = original.data.attributes.get("canonical_pattern_coordinate_valid")
+        if source_pattern is not None or source_pattern_valid is not None:
+            if (source_pattern is None or source_pattern_valid is None
+                    or source_pattern.domain != "CORNER"
+                    or source_pattern_valid.domain != "CORNER"):
+                raise ValueError(f"Canonical pattern-coordinate provenance is incomplete: {name}")
+            target_pattern = data.attributes.new(
+                "canonical_pattern_coordinate", "FLOAT_VECTOR", "CORNER"
+            )
+            target_pattern_valid = data.attributes.new(
+                "canonical_pattern_coordinate_valid", "BOOLEAN", "CORNER"
+            )
+            for face_index, original_index in enumerate(indices):
+                source_poly = original.data.polygons[original_index]
+                target_poly = data.polygons[face_index]
+                source_loops = list(source_poly.loop_indices)
+                target_loops = list(target_poly.loop_indices)
+                if len(source_loops) != len(target_loops):
+                    raise ValueError(f"Pattern-coordinate loop count changed while splitting {name}")
+                for source_loop, target_loop in zip(source_loops, target_loops):
+                    target_pattern.data[target_loop].vector = source_pattern.data[source_loop].vector
+                    target_pattern_valid.data[target_loop].value = source_pattern_valid.data[source_loop].value
         obj = bpy.data.objects.new(name, data)
         bpy.context.collection.objects.link(obj)
         obj.matrix_world = original.matrix_world.copy()
         obj["canonicalPieceIds"] = json.dumps(pieces)
+        if "patternCoordinateUnitsPerMeter" in original:
+            obj["patternCoordinateUnitsPerMeter"] = float(original["patternCoordinateUnitsPerMeter"])
         if name in policy.get("nonClothDeformationPaths", {}):
             path = policy["nonClothDeformationPaths"][name]
             if path != "authored-panel-shape-preserving-armature-skinning":
@@ -1308,6 +1501,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             "Post-bake smoothing hypothesis references an unknown cloth component"
         )
     before, contracts = {}, []
+    hem_rest_positions = {}
     rest_controls = {}
     self_collision_hypotheses = policy.get(
         "prototypeComponentSelfCollisionHypotheses", {}
@@ -1327,6 +1521,40 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 for assignment in vertex.groups
             )
         ]
+        extra_hem_pins = None
+        if hem_attachment is not None and name == hem_attachment["component"]:
+            hem_source = open_boundary_vertices(
+                obj, set(hem_attachment["sourcePieces"]), pattern_contract
+            )
+            if set(hem_source["sourcePieces"]) != set(hem_attachment["sourcePieces"]):
+                raise ValueError("Open overskirt boundary does not cover every declared hem panel")
+            excessive = {
+                piece: bounds
+                for piece, bounds in hem_source["heightRangeMByPiece"].items()
+                if bounds[1] - bounds[0] > float(hem_attachment["maximumBoundaryHeightRangeM"])
+            }
+            if excessive:
+                raise ValueError(f"Open source boundary is not confined to its declared hem band: {excessive}")
+            extra_hem_pins = hem_source["vertexIndices"]
+            source_ids = obj.data.attributes["canonical_sewn_vertex_index"].data
+            hem_rest_positions[name] = {
+                "vertexCount": len(obj.data.vertices),
+                "positions": {
+                    index: obj.data.vertices[index].co.copy()
+                    for index in extra_hem_pins
+                },
+            }
+            pin_ids = sorted(set(pin_ids) | set(extra_hem_pins))
+            pin_methods[name] = pin_methods[name] + "; canonical open hem boundary pinned to authored rest positions"
+            hem_source.pop("vertexIndices")
+            hem_source["sourceCanonicalVertexIdsSha256"] = hashlib.sha256(
+                json.dumps(
+                    sorted(int(source_ids[index].value) for index in extra_hem_pins),
+                    separators=(",", ":"),
+                ).encode("utf-8")
+            ).hexdigest()
+        else:
+            hem_source = None
         before[name] = mesh_hash(obj)
         rest = policy.get("prototypeRestShape", {}).get(name)
         rest_contract = (
@@ -1353,6 +1581,8 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             dynamic_mesh=dynamic_component,
             self_collision=self_collision,
         )
+        if hem_source is not None:
+            contract["hemBoundaryAttachment"] = hem_source
         if self_collision_hypothesis is not None:
             contract["componentSelfCollisionHypothesis"] = {
                 "enabled": bool(
@@ -1462,6 +1692,13 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         pin.add(pin_ids, 1.0, "REPLACE")
         contract["pinVertexCount"] = len(pin_ids)
         contract["pinMethod"] = pin_methods[name]
+        if hem_source is not None:
+            contract["hemBoundaryAttachment"] = {
+                **hem_source,
+                "pinnedVertexCount": len(extra_hem_pins),
+                "evidenceBoundary": hem_attachment["evidenceBoundary"],
+                "grantsAppearanceAcceptance": False,
+            }
         contract["preBakeBodySurfaceDiagnostic"] = surface_diagnostics(obj)
         contracts.append(contract)
         if rest is not None:
@@ -1663,6 +1900,31 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             contract["postBakeGeometryHypothesis"] = smooth_sleeve_interior(
                 obj, post_bake_smoothing[obj.name]
             )
+        if obj.name in hem_rest_positions:
+            attachment = contract["hemBoundaryAttachment"]
+            rest = hem_rest_positions[obj.name]
+            if len(obj.data.vertices) != rest["vertexCount"]:
+                raise ValueError("Cloth changed overskirt topology before hem attachment verification")
+            drift = sorted(
+                (obj.data.vertices[index].co - source).length
+                for index, source in rest["positions"].items()
+            )
+            maximum = max(drift, default=0.0)
+            attachment.update(
+                maximumNeutralHemDriftM=maximum,
+                p95NeutralHemDriftM=(
+                    drift[min(len(drift) - 1, math.ceil(0.95 * len(drift)) - 1)]
+                    if drift else None
+                ),
+                meanNeutralHemDriftM=sum(drift) / len(drift) if drift else None,
+            )
+            if len(drift) != attachment["sourceVertexCount"] or maximum > float(
+                hem_attachment["maximumNeutralHemDriftM"]
+            ):
+                raise ValueError(
+                    f"Pinned overskirt hem drift {maximum:.6f} m exceeds declared "
+                    f"{float(hem_attachment['maximumNeutralHemDriftM']):.6f} m bound"
+                )
         settled = mesh_hash(obj)
         contract["postBakeBodySurfaceDiagnostic"] = surface_diagnostics(obj)
         contract.update(
