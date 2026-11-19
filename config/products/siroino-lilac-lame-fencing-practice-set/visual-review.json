@@ -3,38 +3,38 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewer": "Codex direct review",
-  "reviewedRevision": "v172-overskirt-bending-settle-20261119",
+  "reviewedRevision": "v173-overskirt-self-collision-20261119",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "809717f2d0082789c9faf6a642aaaa12d4f352d6236ef26f9dae553a1bdff8d5",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "8136822d792a2d602ddd32fa47f022dba8fd379deda41a2737fdc793653e7cfc",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "2677360bc4ad22532853c0976cb448a0caf98ca3d2decea9e51aac84441c006e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "cfe38d1de5c4108220766837607c7094dce9addac4600c37a1cdd94bc1160cc1",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "36826b18c0c4f434b090a9ecd243391ca9dd9a786f8d758d822c7fe378cf0805",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "0e03ff1712f2cc9db7c702b83b6c4b119ccfc0970315d19a54ba8de9dc3e3770",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "c3e058b436427d8653aaad6e6cedbdf435024db69a4eab18a6c4633f7fb9334a",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "416f9365c553a178c25e80474a5a46ab2a88801682bd716af578cd2c383c422a",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "4f4e3edbdb300d05e6605212fc8f88dc966ba292cc291bc6893005fb1527c224",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "c50fba5553bee79857a17a3efb1645d9de2e424b630b9b53340d883f46f63c3b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "0470f29167ce9892d6d7c1fd17ab9a88ed5e5db3fcd34bb3574c7050e1cac91c"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "c859f28a7dfef9324a24441ee8808758b790bd78029d91b72f26f16451942d79",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "4074b6eda29aea18c2628b26dc7a77f86ebdbd6b8bcc57a6e78e3d1803343d90",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "bc4ff04991636accf1f2035d835b75900d4e0f8dfca163c2350f7dd74a6cb74e",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "6059a7e766dd150e1d6f933daea62a1e0570a5f31b56b5b6bc06fc29b9e8fcbc",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "dbfb55689d175de63e8e394f2d51f5a68b7819e2a663433cc32220fe046e9b7d",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "4ac4a5d737764e4215628fc311db9cb23e9a6dda1e4ad08de89b14eea5f38007",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "bd3cc432a5322834b321741535a4968d263e024606edaa680cc158983e4e6c17",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "abda9a39446066392d23d130a029d18db42b97fb54a601501212630f49c92b41",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "f89ff4a1cf699656556e13f2d39fe5b0a1a5312bdf10c71cdbc2b956a901aeb2",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "390e2a70d2d0b69d6569c487e8db433fa07e8569ac42dd9b567e9098d836a8a3",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "19aef614e12ef3772825708200140fca763ebf736fc92b5b894bd443ad6b4fab"
   },
   "findings": [
     {
-      "description": "After the V172 increase in native Cloth bending stiffness, direct front/back/side/three-quarter inspection still shows heavily crumpled angular overskirt folds, unequal side lift and collapse, and stacked lilac hem bands on both side profiles. The solver adjustment does not yield a continuous, balanced skirt edge.",
+      "description": "With Blender Cloth self-collision enabled, direct inspection of all five views and six pose renders shows the overskirt expands into a dense mass of sharp, chaotic folds that projects far outside the hips and obscures its pleated silhouette. The side and three-quarter profiles show severe lateral ballooning; the crouch and sit retain thigh exposure and a long rear panel. Self-collision worsens the already rejected V172 appearance.",
       "severity": "BLOCKER",
-      "code": "SKIRT_DRAPE_AND_TRIM_DISCONTINUITY"
+      "code": "SELF_COLLISION_SKIRT_EXPANSION"
     },
     {
-      "description": "Irregular gray body-colored patches remain visible across the white chest and waist in neutral, arms-up and arm-cross renders. Current renders do not isolate whether these are intersections, exposed source surfaces, or shading; the cause remains unresolved.",
+      "description": "Irregular gray body-colored patches remain visible across the white chest and waist in neutral, arms-up, and arm-cross renders. The current evidence does not identify whether they are intersections, exposed source surfaces, or shading, so the cause remains unresolved.",
       "severity": "BLOCKER",
       "code": "BODICE_SURFACE_ARTIFACTS"
     },
     {
-      "description": "In crouch and sit, both shorts-clad thighs visibly project in front of the overskirt while the center front panel falls behind them. Coverage and clearance remain unacceptable in bent-leg poses.",
+      "description": "In crouch and sit, both shorts-clad thighs still project in front of the overskirt while the center front panel falls behind them. Coverage and clearance remain unacceptable in bent-leg poses.",
       "severity": "BLOCKER",
       "code": "BENT_LEG_SKIRT_INTERSECTIONS"
     }
   ],
-  "nextAction": "Keep V172 rejected and do not repeat cloth stiffness tuning alone. Measure per-panel pre/post-bake displacement, vertex inversion and signed clearance against the exact target body; trace the doubled hem segments to their source edge bindings; then repair the skirt panel geometry/attachments and bent-leg trajectory. Separately isolate the bodice gray patches against the target body surface before changing top geometry. Regenerate and directly inspect all eleven renders after a source correction. Numeric fit, Shape Key response, Unity/VRChat execution, packaging, and release remain unverified."
+  "nextAction": "Keep V173 rejected. Actual Blender 4.4.3 Cloth self-collision was enabled at self-distance 0.015 m; the bake worsened body clearance (409 negative signed-distance vertices after bake versus 416 before; V172 ended with zero), and the attached 710-vertex hem band moved 0.3415 m maximum / 0.2237 m mean (V172: 0.2628 m / 0.0922 m). Do not try another bending-stiffness or self-collision setting. Replace the current dense native-cloth skirt bake with a geometry/attachment method that preserves the authored sewn-panel silhouette and keeps the hem bound to its source edges; measure panel deformation, signed body clearance, and bent-leg coverage before changing the bodice. After that correction, regenerate and directly inspect all eleven current renders. Fit, Shape Key response, Unity/VRChat execution, packaging, and release remain unverified."
 }
