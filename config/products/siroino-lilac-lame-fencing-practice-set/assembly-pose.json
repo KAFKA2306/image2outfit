@@ -46,6 +46,26 @@
     "evidenceBoundary": "V155 applies three bounded 0.12 Laplacian passes to torso panel interiors, then locally backtracks only vertices implicated in face flips or new crease spikes; canonical panel boundaries stay locked. This tests fairing after the prior global guard reduced the requested displacement to 10.7%. It does not establish avatar fit, material quality, appearance approval, or release acceptance."
   },
   "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. V108 tests bounded position fairing on jacket torso panel interiors after V107 shading-only renders did not visibly resolve faceting. Canonical seam vertices remain fixed. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
+  "frontLapRestGeometry":   {
+    "method": "exclusive-front-lap-hem-anterior-offset-v1",
+    "pieceIdsBySide": {
+      "left": [
+        "overskirt-front-lap-left"
+      ],
+      "right": [
+        "overskirt-front-lap-right"
+      ]
+    },
+    "anteriorDirectionWorld": [
+      0,
+      -1,
+      0
+    ],
+    "maximumOffsetM": 0.01,
+    "waistFadeHeightM": 0.02,
+    "sharedSeamFadeDistanceM": 0.02,
+    "evidenceBoundary": "V179 applies at most 10 mm anterior rest offset only to exclusive front-lap vertices, fading to zero at waist and shared sewn seams. It preserves the neutral Cloth solve and V178 authored-side weights; body clearance, panel orientation, pose coverage, fit, appearance, morph response and release remain unverified."
+  },
   "poses": {
     "jacket-front-left": {
       "rotationDegreesXYZ": [

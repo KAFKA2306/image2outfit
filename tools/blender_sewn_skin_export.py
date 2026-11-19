@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import heapq
 import hashlib
 import json
 import math
@@ -188,6 +189,108 @@ def transfer_shape_key_vertex(
 def _smoothstep(value):
     value = max(0.0, min(1.0, float(value)))
     return value * value * (3.0 - 2.0 * value)
+
+
+def apply_front_lap_rest_geometry(objects, pose_spec):
+    """Move only the exclusive lower front-lap surface forward in rest space."""
+    spec = pose_spec.get("frontLapRestGeometry")
+    if spec is None:
+        return {"applied": False, "reason": "not-declared", "grantsFitAcceptance": False}
+    side_pieces = spec["pieceIdsBySide"]
+    anterior = Vector(spec["anteriorDirectionWorld"]).normalized()
+    maximum_offset = float(spec["maximumOffsetM"])
+    waist_fade_height = float(spec["waistFadeHeightM"])
+    seam_fade_distance = float(spec["sharedSeamFadeDistanceM"])
+    piece_records = {}
+    lap_ids = set(side_pieces["left"] + side_pieces["right"])
+    for obj in objects:
+        if obj.type != "MESH":
+            continue
+        attribute = obj.data.attributes.get("canonical_piece_index")
+        if attribute is None or attribute.domain != "FACE":
+            raise ValueError(f"Front-lap rest offset lost canonical ownership on {obj.name}")
+        piece_names = json.loads(obj["canonicalPieceIds"])
+        owners = [set() for _ in obj.data.vertices]
+        for face, owner in zip(obj.data.polygons, attribute.data):
+            for index in face.vertices:
+                owners[index].add(piece_names[owner.value])
+        coordinates = [obj.matrix_world @ vertex.co for vertex in obj.data.vertices]
+        neighbors = [set() for _ in obj.data.vertices]
+        for edge in obj.data.edges:
+            first, second = edge.vertices
+            neighbors[first].add(second)
+            neighbors[second].add(first)
+        inverse = obj.matrix_world.inverted()
+        for side in ("left", "right"):
+            piece_id = side_pieces[side][0]
+            selected = [index for index, owner_set in enumerate(owners) if piece_id in owner_set]
+            if not selected:
+                continue
+            seam_seeds = [
+                index for index in selected if owners[index].difference({piece_id})
+            ]
+            if not seam_seeds:
+                raise ValueError(f"Front-lap rest offset cannot identify sewn seams for {piece_id}")
+            distances = {index: 0.0 for index in seam_seeds}
+            queue = [(0.0, index) for index in seam_seeds]
+            heapq.heapify(queue)
+            while queue:
+                distance, index = heapq.heappop(queue)
+                if distance != distances[index] or distance >= seam_fade_distance:
+                    continue
+                for neighbor in neighbors[index]:
+                    if piece_id not in owners[neighbor]:
+                        continue
+                    candidate = distance + (coordinates[neighbor] - coordinates[index]).length
+                    if candidate < distances.get(neighbor, math.inf):
+                        distances[neighbor] = candidate
+                        heapq.heappush(queue, (candidate, neighbor))
+            low_z = min(coordinates[index].z for index in selected)
+            high_z = max(coordinates[index].z for index in selected)
+            if high_z - low_z <= 1e-6:
+                raise ValueError(f"Front-lap rest offset has collapsed height on {piece_id}")
+            magnitudes = []
+            seam_displacements = []
+            for index in selected:
+                point = coordinates[index]
+                waist_fraction = min(1.0, max(0.0, (high_z - point.z) / waist_fade_height))
+                hem_fraction = min(1.0, max(0.0, (high_z - point.z) / (high_z - low_z)))
+                seam_fraction = min(1.0, max(0.0, distances.get(index, seam_fade_distance) / seam_fade_distance))
+                amount = maximum_offset * _smoothstep(waist_fraction) * _smoothstep(hem_fraction) * _smoothstep(seam_fraction)
+                delta_world = anterior * amount
+                if amount > 0:
+                    delta_local = inverse.to_3x3() @ delta_world
+                    if obj.data.shape_keys:
+                        for key_block in obj.data.shape_keys.key_blocks:
+                            key_block.data[index].co += delta_local
+                    else:
+                        obj.data.vertices[index].co += delta_local
+                magnitudes.append(amount)
+                if index in seam_seeds:
+                    seam_displacements.append(amount)
+            obj.data.update()
+            piece_records[piece_id] = {
+                "selectedVertexCount": len(selected),
+                "movedVertexCount": sum(value > 1e-9 for value in magnitudes),
+                "maximumOffsetM": max(magnitudes, default=0.0),
+                "meanOffsetM": sum(magnitudes) / len(magnitudes),
+                "maximumSharedSeamOffsetM": max(seam_displacements, default=0.0),
+                "grantsFitAcceptance": False,
+            }
+    missing = lap_ids.difference(piece_records)
+    if missing:
+        raise ValueError("Front-lap rest offset did not find declared panels: " + ", ".join(sorted(missing)))
+    return {
+        "applied": True,
+        "method": spec["method"],
+        "anteriorDirectionWorld": list(spec["anteriorDirectionWorld"]),
+        "maximumOffsetM": maximum_offset,
+        "waistFadeHeightM": waist_fade_height,
+        "sharedSeamFadeDistanceM": seam_fade_distance,
+        "pieceEvidence": piece_records,
+        "grantsFitAcceptance": False,
+        "evidenceBoundary": spec["evidenceBoundary"],
+    }
 
 
 def apply_pose_constrained_apron_geometry(objects, armature, pose_spec):
@@ -2108,6 +2211,10 @@ def main():
                 }
                 for key, accumulator in profile_accumulators.items()
             ]
+    front_lap_rest_geometry_evidence = apply_front_lap_rest_geometry(
+        garment_objects,
+        read_json(repo_path(job["garmentPipeline"]["assemblyPosePath"])),
+    )
     pose_constrained_apron_evidence = apply_pose_constrained_apron_geometry(
         garment_objects,
         armature,
@@ -2360,6 +2467,7 @@ def main():
                 "grantsShapeKeyAcceptance": False,
             },
             "poseConstrainedApronGeometry": pose_constrained_apron_evidence,
+            "frontLapRestGeometry": front_lap_rest_geometry_evidence,
             "prototypeWeightProfiles": profile_audits,
             "sharedSeamWeightContinuity": shared_seam_weight_continuity,
             "bodyDistanceM": {

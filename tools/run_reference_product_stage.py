@@ -232,6 +232,23 @@ def validate_assembly_pose(job, pattern):
                 raise ValueError(
                     "Assembly pose transform must contain three finite numbers"
                 )
+    front_lap_geometry = pose.get("frontLapRestGeometry")
+    if front_lap_geometry is not None:
+        sides = front_lap_geometry.get("pieceIdsBySide")
+        if (
+            front_lap_geometry.get("method")
+            != "exclusive-front-lap-hem-anterior-offset-v1"
+            or not isinstance(sides, Mapping)
+            or sides.get("left") != ["overskirt-front-lap-left"]
+            or sides.get("right") != ["overskirt-front-lap-right"]
+            or front_lap_geometry.get("anteriorDirectionWorld") != [0, -1, 0]
+            or not 0 < front_lap_geometry.get("maximumOffsetM", 0) <= 0.01
+            or not 0 < front_lap_geometry.get("waistFadeHeightM", 0) <= 0.05
+            or not 0 < front_lap_geometry.get("sharedSeamFadeDistanceM", 0) <= 0.05
+            or not isinstance(front_lap_geometry.get("evidenceBoundary"), str)
+            or not front_lap_geometry["evidenceBoundary"].strip()
+        ):
+            raise ValueError("Front-lap rest geometry must declare a bounded 10 mm anterior hypothesis")
     return pose_path, pose, measured
 
 

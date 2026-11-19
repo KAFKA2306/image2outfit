@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v178-front-lap-authored-side-weight-test-20261120",
+  "revision": "v179-front-lap-lower-anterior-offset-20261120",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,12 +21,12 @@
     {
       "severity": "BLOCKER",
       "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
-      "description": "Direct inspection of all five current views and six current pose renders confirms the sharply faceted bell silhouette, irregular pleats and jagged underside. Crouch still lifts and opens the front/side panels away from the thighs; sit lap coverage remains incomplete. V178 changed authored left/right assignment on 1439/1293 exclusive front-lap vertices. Sit records 5/266 same-side hits per lap, 5/266 left-lap-to-right-thigh and 6/266 right-lap-to-left-thigh hits, with only 1/266 same-side samples per lap within the diagnostic-only 30 mm; deduplicated union is 21/532. Crouch remains cross-side dominant (29/266 and 36/266 versus 20/266 and 19/266 same-side). This geometry diagnostic does not establish fit tolerance."
+      "description": "Direct inspection of the current five views and six pose renders confirms that the skirt remains too faceted, with irregular pleats and uneven/jagged hem edges. The 10 mm maximum anterior rest offset on exclusive lower front-lap vertices preserves zero movement on shared seams and slightly reduces crouch thigh-ray hits (same-side 17/18; cross-side 27/31; union 80/532), but sit metrics remain 5/266 same-side per lap and 5/6 cross-side, union 21/532. Crouch still lifts and opens the front/side panels; sit lap coverage remains incomplete. This geometric diagnostic does not establish fit tolerance."
     },
     {
       "severity": "BLOCKER",
       "code": "BODICE_SURFACE_ARTIFACTS",
-      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in the current front and posed views. Their cause is not established by the renders; visible surface quality remains unacceptable and requires a separate measured diagnosis."
+      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in current front and posed views. Their cause is not established by the renders; visible bodice surface quality remains unacceptable."
     }
   ],
   "failedGeometryChecks": [
