@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V176 retains V175's authored hem-boundary attachment and records per-panel displacement, triangle inversion/collapse, and area change at the evaluated Cloth frame, neutral bake, and post-seam-anchor export. Compare these measurements with the existing signed body-clearance and pose-coverage diagnostics before changing the skirt solver. This measurement-only prototype makes no fit, appearance, collision-safety, or release claim.",
-  "designRevision": "v176-panel-response-measurements-20261119",
+  "designRevision": "v177-front-lap-anterior-thigh-pose-diagnostic-20261120",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -230,6 +230,23 @@
       "component": "pleated-overskirt",
       "method": "canonical-panel-rest-to-settled-triangle-response-v1",
       "evidenceBoundary": "For every authored overskirt panel, compare canonical source coordinates and fixed face-fan triangles with the evaluated Cloth frame, settled neutral mesh, and post-seam-anchor mesh. Record vertex displacement, signed face orientation, collapsed triangles, and triangle-area ratios per panel. Pair this with the existing body-surface and pose-coverage evidence; these are diagnostics only and do not establish fit, appearance, collision safety, runtime behavior, or release acceptance."
+    },
+    "prototypePoseCoverageDiagnostic": {
+      "method": "rest-bound-anterior-thigh-to-authored-front-lap-ray-coverage-v1",
+      "frontLapPieceIdsBySide": {
+        "left": ["overskirt-front-lap-left"],
+        "right": ["overskirt-front-lap-right"]
+      },
+      "thighBoneBySide": {
+        "left": "UpperLeg_L",
+        "right": "UpperLeg_R"
+      },
+      "longitudinalBoneRange": [0.1, 0.9],
+      "anteriorDirectionWorld": [0.0, -1.0, 0.0],
+      "minimumAnteriorNormalDot": 0.15,
+      "nearDistanceDiagnosticM": 0.03,
+      "originOffsetSensitivityM": 0.0001,
+      "evidenceBoundary": "For neutral, crouch, and sit, bind exact body triangle IDs to rest-pose front-facing surface normals and the declared 10–90% UpperLeg bone interval, then cast along each evaluated posed body normal against each authored front-lap panel. Report left/right lap to left/right anterior thigh separately plus a deduplicated union, nearest panel face provenance, ray gaps, and a diagnostic-only 30 mm near-distance count with 0.5 mm versus 0.1 mm origin-offset sensitivity. This is a geometric diagnostic only; it does not establish pressure, stretch, material behavior, Shape Key response, fit, visual quality, or runtime acceptance."
     },
     "prototypePostBakeLaplacianSmoothing": {}
   },

@@ -1,35 +1,35 @@
-{
-  "schemaVersion": 1,
-  "productId": "siroino-lilac-lame-fencing-practice-set",
-  "reviewMethod": "direct-image-inspection",
-  "reviewer": "Codex direct review",
-  "reviewedRevision": "v176-panel-response-measurements-20261119",
-  "status": "REJECTED",
-  "decision": "REJECT",
-  "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "f05e65cd0de2fabb6b9b88102bfc70c88e6cff1b7517830907c824626eac7d11",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "985e4d1c9a89fbe4dddd179ffb64276cd6db2451e718b27b7d65dd0ca6fdbaed",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "1a8d2b9d704684acec72deca60e1146e5ef4fc28fa1c92a18973c5b128d88a40",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "ca42309e7c0e9da5ba104ca6a8bd403074822475b0ad7db5e7d65aa869701f43",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "617bcab2e9c542a71e6b774e60811474c650a2dfb8b0b6b8ce34236c58c2c38a",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "4881f03751ae28bb92ad9f4da47f2c7260b3cbcfd7e039214a455a6e96530772",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "63639ea43faeaaf50242d9b1b40914cabaeea56a6abb37bca1eea1365fab0166",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "ac3a532bcde0fe0f233a0f2b86de7c0a41fef652fde249c63b0780002d505080",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "eea889fbac651a7f73193a45beac430f74f77deca430a2712d0c37d7329d36e1",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "113543e163a8c2a583e63ab4b708449c75a0fdff5d4f17e3617ff9548cbacdbd",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "f0b010fe60591d039ae8b49997bcb39ac9e7ca4ae8bb4adb5cc62360b0472916"
-  },
-  "findings": [
-    {
-      "severity": "BLOCKER",
-      "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
-      "description": "Direct review of all five current views and all six current pose renders shows the neutral skirt remains a sharply faceted bell with irregular pleats and a jagged underside. In crouch, front and side panels lift away from the bent thighs; in sit, most upper-thigh surface remains exposed and pleated side/rear panels flare out. Current pose-coverage evidence measures overskirt coverage at 36.72% left / 35.37% right in crouch and 28.59% left / 28.36% right in sit. The 354-vertex hem pin holds only neutral coordinates and does not establish bent-pose coverage."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "BODICE_SURFACE_ARTIFACTS",
-      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in front and posed views. Their cause is not established by the renders; visible surface quality is unacceptable and needs a separately measured diagnosis after the skirt response is isolated."
-    }
-  ],
-  "nextAction": "Keep V176 rejected. The actual Cloth bake recorded 615 inverted fixed-fan triangles of 17,567 overskirt triangles, zero collapsed triangles, up to 40.9 mm vertex displacement, and a maximum triangle-area ratio of 23.67; neutral hem drift is zero only because 354 authored hem vertices are pinned. Sit overskirt upper-thigh coverage is 28.59% left / 28.36% right, versus 36.72% / 35.37% in crouch. Next isolate the skinned front-lap pose response against the target rig while holding neutral Cloth output and bodice unchanged; alter only front-lap geometry or weights, then rerun crouch/sit coverage and inspect neutral/crouch/sit renders. Fit, Shape Key, Unity/VRChat, package, and release remain unverified."
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "reviewMethod": "direct-image-inspection",
+  "reviewer": "Codex direct review",
+  "reviewedRevision": "v177-front-lap-anterior-thigh-pose-diagnostic-20261120",
+  "status": "REJECTED",
+  "decision": "REJECT",
+  "inspectedImages": {
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "f3d8b26e2fd0018694c2b4401137c5c327d2e3b834d07b4591d10650ad1a1812",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "f81ef57fcc0c0bbbafb87e733f125529901d2e6c28255af76f5f2afaacb28ab6",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "af0a9dbc19e3516badf731f8988bbfca757cdfa42fc0c1469676466041a5f92e",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "4afdfd4f496a92c12117b4391881110b193770bcdb39043d02dabe737e0ffa91",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "9568c7b3a288f76aba30c24506a44aa162666a4bbbba08e0564ab132af1b8d82",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "38cf85ab87cede9d7d2868b6674fc1d512a652f7196692cbf04f74f4e0daf47f",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "a47c09ffef9d276a132a2e6920d661d13c10db94f98d08385632fbfff61275de",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "fc84de0bf332b430f081890be48b3997c5a8faa5b4834c887da42ac6ff03b4cb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "1726e5b23a50f7bcbf2f5d6a74bfbcbef67ac4a8813f40e73a63073ea0082834",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "afce154295d63e618465e51ca32adfadf1207106e930b9ab7882e45d22896814",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "b1b8880b82361a414e481c147c5f280237c0c40e8e5815919b030debf7666f1f"
+  },
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
+      "description": "Direct inspection of all five current views and all six current pose renders confirms the sharply faceted bell silhouette, irregular pleats and jagged underside; crouch lifts front and side panels from the bent thighs, while the sit view leaves most upper thigh exposed and flares side/rear panels. V177 now isolates 266 rest-bound anterior thigh triangle samples per side: in sit only 5/266 left and 5/266 right same-side samples hit their corresponding front lap within the 250 mm diagnostic ray; each has only 1 sample within the diagnostic-only 30 mm distance. The deduplicated two-side lap union hits 21/532 samples. This measured response confirms the visible coverage defect; it does not establish a fit tolerance."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "BODICE_SURFACE_ARTIFACTS",
+      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in front and posed views. Their cause is not established by the renders; visible surface quality is unacceptable and needs a separately measured diagnosis after the skirt response is isolated."
+    }
+  ],
+  "nextAction": "Keep V177 rejected. The neutral, crouch, and sit front-lap response is now attributed to exact authored panel faces and stable rest-bound anterior-thigh triangle IDs. In sit, same-side front-lap hits are 5/266 left and 5/266 right within the 250 mm ray, with 1/266 each inside the diagnostic-only 30 mm distance; the deduplicated two-side lap union hits 21/532. Crouch produces more cross-side than same-side front-lap hits, so do not change bodice or cloth bake. Next make one controlled V178 front-lap-only articulation change (geometry or skin weights, one variable at a time), preserve the neutral Cloth output and all bodice inputs, then compare the existing crouch/sit measures and directly inspect the three pose renders. Fit, Shape Key, Unity/VRChat, package, and release remain unverified."
 }

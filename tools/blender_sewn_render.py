@@ -55,6 +55,7 @@ def _piece_surface_tree(objects, depsgraph, piece_ids):
     """Build a posed-world BVH from only faces owned by the requested panels."""
     vertices = []
     polygons = []
+    face_owners = []
     included_faces = 0
     for obj in objects:
         if (
@@ -84,6 +85,14 @@ def _piece_surface_tree(objects, depsgraph, piece_ids):
                 if pieces[owner.value] not in piece_ids:
                     continue
                 polygons.append(tuple(offset + index for index in triangle.vertices))
+                face_owners.append(
+                    {
+                        "object": obj.name,
+                        "pieceId": pieces[owner.value],
+                        "sourcePolygonIndex": int(triangle.polygon_index),
+                        "sourceTriangleIndex": int(triangle.index),
+                    }
+                )
                 included_faces += 1
         finally:
             evaluated.to_mesh_clear()
@@ -91,15 +100,20 @@ def _piece_surface_tree(objects, depsgraph, piece_ids):
         raise ValueError(
             f"No evaluated faces found for canonical pieces: {sorted(piece_ids)}"
         )
-    return BVHTree.FromPolygons(vertices, polygons, all_triangles=True), included_faces
+    return (
+        BVHTree.FromPolygons(vertices, polygons, all_triangles=True),
+        included_faces,
+        face_owners,
+    )
 
 
-def _body_surface_samples(body, depsgraph, armature):
-    """Sample body triangles and classify by deformation weights, never world Z."""
+def _body_surface_samples(body, depsgraph, armature, diagnostic):
+    """Bind pose samples to rest-triangle IDs and explicit front-thigh criteria."""
     evaluated = body.evaluated_get(depsgraph)
     mesh = evaluated.to_mesh()
     try:
         mesh.calc_loop_triangles()
+        body.data.calc_loop_triangles()
         group_names = {group.index: group.name for group in body.vertex_groups}
         weights = []
         for vertex in body.data.vertices:
@@ -116,8 +130,36 @@ def _body_surface_samples(body, depsgraph, armature):
             "upper-thigh-left": [],
             "upper-thigh-right": [],
         }
+        front_thigh_samples = {"left": [], "right": []}
+        rest_triangles = body.data.loop_triangles
+        if len(mesh.loop_triangles) != len(rest_triangles):
+            raise ValueError("Evaluated avatar triangle count changed across pose")
+        anterior = Vector(diagnostic["anteriorDirectionWorld"])
+        if anterior.length_squared < 1e-12:
+            raise ValueError("Configured anterior direction must be non-zero")
+        anterior.normalize()
+        min_front_dot = float(diagnostic["minimumAnteriorNormalDot"])
+        longitudinal_min, longitudinal_max = diagnostic["longitudinalBoneRange"]
+        armature_to_world = armature.matrix_world
+        bone_segments = {}
+        for side in ("left", "right"):
+            bone_name = diagnostic["thighBoneBySide"][side]
+            if bone_name not in group_names.values():
+                raise ValueError(f"Pose coverage requires body weight group {bone_name}")
+            bone = armature.data.bones.get(bone_name)
+            if bone is None:
+                raise ValueError(f"Pose coverage requires rest bone {bone_name}")
+            start = armature_to_world @ bone.head_local
+            end = armature_to_world @ bone.tail_local
+            axis = end - start
+            if axis.length_squared < 1e-12:
+                raise ValueError(f"Rest thigh bone has zero length: {bone_name}")
+            bone_segments[side] = (start, axis, axis.length_squared)
         for triangle in mesh.loop_triangles:
             ids = triangle.vertices
+            rest_triangle = rest_triangles[triangle.index]
+            if tuple(ids) != tuple(rest_triangle.vertices):
+                raise ValueError("Evaluated avatar triangle IDs changed across pose")
             if any(index >= len(body.data.vertices) for index in ids):
                 raise ValueError(
                     "Evaluated avatar surface changed vertex correspondence"
@@ -141,7 +183,27 @@ def _body_surface_samples(body, depsgraph, armature):
                 pose_samples["upper-thigh-right"].append(
                     (int(triangle.index), center, normal)
                 )
-        return pose_samples
+            rest_world = [
+                body.matrix_world @ body.data.vertices[index].co for index in ids
+            ]
+            rest_center = (rest_world[0] + rest_world[1] + rest_world[2]) / 3.0
+            rest_normal = (
+                body.matrix_world.to_3x3().inverted().transposed()
+                @ rest_triangle.normal
+            ).normalized()
+            if rest_normal.dot(anterior) < min_front_dot:
+                continue
+            for side in ("left", "right"):
+                weight_name = diagnostic["thighBoneBySide"][side]
+                if averaged[weight_name] < 0.55:
+                    continue
+                start, axis, axis_length_squared = bone_segments[side]
+                longitudinal = (rest_center - start).dot(axis) / axis_length_squared
+                if longitudinal_min <= longitudinal <= longitudinal_max:
+                    front_thigh_samples[side].append(
+                        (int(triangle.index), center, normal, float(longitudinal))
+                    )
+        return pose_samples, front_thigh_samples
     finally:
         evaluated.to_mesh_clear()
 
@@ -209,13 +271,29 @@ def measure_shared_seam_pose_continuity(objects, depsgraph, expected_sewn_object
 
 
 def measure_pose_coverage(
-    body, objects, depsgraph, armature, shorts_ids, skirt_ids, piece_group_source
+    body, objects, depsgraph, armature, shorts_ids, skirt_ids, piece_group_source,
+    front_lap_diagnostic,
 ):
     """Measure matched-pose body surface hits against shorts and skirt surfaces."""
-    samples = _body_surface_samples(body, depsgraph, armature)
+    samples, front_thigh_samples = _body_surface_samples(
+        body, depsgraph, armature, front_lap_diagnostic
+    )
+    lap_ids = front_lap_diagnostic["frontLapPieceIdsBySide"]
     layers = {
         "under-shorts": _piece_surface_tree(objects, depsgraph, shorts_ids),
         "overskirt": _piece_surface_tree(objects, depsgraph, skirt_ids),
+        "front-lap-left": _piece_surface_tree(objects, depsgraph, set(lap_ids["left"])),
+        "front-lap-right": _piece_surface_tree(objects, depsgraph, set(lap_ids["right"])),
+        "front-lap-union": _piece_surface_tree(
+            objects, depsgraph, set(lap_ids["left"]) | set(lap_ids["right"])
+        ),
+    }
+    layer_piece_ids = {
+        "under-shorts": shorts_ids,
+        "overskirt": skirt_ids,
+        "front-lap-left": set(lap_ids["left"]),
+        "front-lap-right": set(lap_ids["right"]),
+        "front-lap-union": set(lap_ids["left"]) | set(lap_ids["right"]),
     }
     body.data.calc_loop_triangles()
     result = {
@@ -226,6 +304,14 @@ def measure_pose_coverage(
             "pelvisPosterior": "mean Hips vertex-group weight >= 0.50 and posed surface normal world-Y >= 0.15",
             "leftThigh": "mean UpperLeg_L vertex-group weight >= 0.55",
             "rightThigh": "mean UpperLeg_R vertex-group weight >= 0.55",
+            "frontThigh": {
+                "weightThreshold": 0.55,
+                "restSurfaceNormalDotWithAnteriorDirectionMinimum": front_lap_diagnostic["minimumAnteriorNormalDot"],
+                "anteriorDirectionWorld": front_lap_diagnostic["anteriorDirectionWorld"],
+                "restBoneLongitudinalFraction": front_lap_diagnostic["longitudinalBoneRange"],
+                "restThighBoneBySide": front_lap_diagnostic["thighBoneBySide"],
+                "triangleIDsBoundToRestTopology": True,
+            },
         },
         "ray": {
             "originOffsetM": 0.0005,
@@ -234,14 +320,19 @@ def measure_pose_coverage(
         },
         "layers": {
             name: {
-                "canonicalPieceIds": sorted(
-                    shorts_ids if name == "under-shorts" else skirt_ids
-                ),
+                "canonicalPieceIds": sorted(layer_piece_ids[name]),
                 "evaluatedGarmentFaceCount": face_count,
             }
-            for name, (_tree, face_count) in layers.items()
+            for name, (_tree, face_count, _owners) in layers.items()
         },
         "zones": {},
+        "frontLapToFrontThigh": {
+            "method": front_lap_diagnostic["method"],
+            "nearDistanceDiagnosticM": front_lap_diagnostic["nearDistanceDiagnosticM"],
+            "originOffsetSensitivityM": front_lap_diagnostic["originOffsetSensitivityM"],
+            "combinations": {},
+            "evidenceBoundary": front_lap_diagnostic["evidenceBoundary"],
+        },
     }
     for zone, zone_samples in samples.items():
         result["zones"][zone] = {"sampleCount": len(zone_samples), "layers": {}}
@@ -250,15 +341,16 @@ def measure_pose_coverage(
                 str(triangle) for triangle, _center, _normal in zone_samples
             ).encode("ascii")
         ).hexdigest()
-        for layer_name, (tree, _face_count) in layers.items():
+        for layer_name, (tree, _face_count, face_owners) in layers.items():
             hits = []
             for body_triangle, center, normal in zone_samples:
                 location, _hit_normal, _face_index, distance = tree.ray_cast(
                     center + normal * 0.0005, normal, 0.25
                 )
                 if location is not None and distance is not None and distance >= 0:
-                    hits.append((body_triangle, float(distance)))
-            distances = sorted(distance for _triangle, distance in hits)
+                    hit_owner = face_owners[_face_index]
+                    hits.append((body_triangle, float(distance), hit_owner))
+            distances = sorted(distance for _triangle, distance, _owner in hits)
             result["zones"][zone]["layers"][layer_name] = {
                 "coveredSampleCount": len(hits),
                 "coverageFraction": (len(hits) / len(zone_samples))
@@ -278,11 +370,121 @@ def measure_pose_coverage(
                 ),
                 "sampleTriangleIdsSha256": sample_ids_sha,
                 "coveredTriangleIdsSha256": hashlib.sha256(
-                    ",".join(str(triangle) for triangle, _distance in hits).encode(
+                    ",".join(str(triangle) for triangle, _distance, _owner in hits).encode(
                         "ascii"
                     )
                 ).hexdigest(),
             }
+    for lap_side, thigh_side in (
+        ("left", "left"),
+        ("left", "right"),
+        ("right", "left"),
+        ("right", "right"),
+    ):
+        zone_samples = front_thigh_samples[thigh_side]
+        layer_name = f"front-lap-{lap_side}"
+        tree, _face_count, face_owners = layers[layer_name]
+        hits = []
+        for body_triangle, center, normal, longitudinal in zone_samples:
+            location, _hit_normal, face_index, distance = tree.ray_cast(
+                center + normal * 0.0005, normal, 0.25
+            )
+            if location is not None and distance is not None and distance >= 0:
+                hits.append(
+                    (
+                        body_triangle,
+                        float(distance),
+                        face_owners[face_index],
+                        longitudinal,
+                    )
+                )
+        distances = sorted(hit[1] + 0.0005 for hit in hits)
+        triangle_ids = [int(item[0]) for item in zone_samples]
+        hit_ids = [hit[0] for hit in hits]
+        near_count = sum(
+            distance <= front_lap_diagnostic["nearDistanceDiagnosticM"]
+            for distance in distances
+        )
+        sensitivity_offset = float(front_lap_diagnostic["originOffsetSensitivityM"])
+        sensitivity_hits = 0
+        sensitivity_near = 0
+        for _body_triangle, center, normal, _longitudinal in zone_samples:
+            location, _hit_normal, _face_index, distance = tree.ray_cast(
+                center + normal * sensitivity_offset, normal, 0.25
+            )
+            if location is not None and distance is not None and distance >= 0:
+                sensitivity_hits += 1
+                if (
+                    distance + sensitivity_offset
+                    <= front_lap_diagnostic["nearDistanceDiagnosticM"]
+                ):
+                    sensitivity_near += 1
+        key = f"{lap_side}-lap-to-{thigh_side}-front-thigh"
+        result["frontLapToFrontThigh"]["combinations"][key] = {
+            "frontLapPieceIds": sorted(lap_ids[lap_side]),
+            "sampledBodyTriangleCount": len(zone_samples),
+            "sampledBodyTriangleIdsSha256": hashlib.sha256(
+                ",".join(map(str, triangle_ids)).encode("ascii")
+            ).hexdigest(),
+            "hitBodyTriangleCountWithinMaximumRayM": len(hits),
+            "hitBodyTriangleIdsSha256": hashlib.sha256(
+                ",".join(map(str, hit_ids)).encode("ascii")
+            ).hexdigest(),
+            "nearestGarmentFaces": [
+                {"bodyTriangleId": hit[0], "gapM": hit[1] + 0.0005, **hit[2]}
+                for hit in sorted(hits, key=lambda item: item[1])[:20]
+            ],
+            "gapM": (
+                {
+                    "minimum": distances[0],
+                    "median": distances[len(distances) // 2],
+                    "p95": distances[
+                        min(len(distances) - 1, int((len(distances) - 1) * 0.95))
+                    ],
+                    "maximum": distances[-1],
+                }
+                if distances
+                else None
+            ),
+            "withinNearDistanceDiagnosticCount": near_count,
+            "nearDistanceFractionDiagnosticOnly": (
+                near_count / len(zone_samples) if zone_samples else None
+            ),
+            "originOffsetSensitivity": {
+                "offsetM": sensitivity_offset,
+                "hitBodyTriangleCountWithinMaximumRayM": sensitivity_hits,
+                "withinNearDistanceDiagnosticCount": sensitivity_near,
+                "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold.",
+            },
+            "maximumRayM": 0.25,
+            "originOffsetM": 0.0005,
+        }
+    union_samples = front_thigh_samples["left"] + front_thigh_samples["right"]
+    union_tree, _union_face_count, union_owners = layers["front-lap-union"]
+    union_hits = []
+    for body_triangle, center, normal, longitudinal in union_samples:
+        location, _hit_normal, face_index, distance = union_tree.ray_cast(
+            center + normal * 0.0005, normal, 0.25
+        )
+        if location is not None and distance is not None and distance >= 0:
+            union_hits.append((body_triangle, float(distance), union_owners[face_index]))
+    unique_triangle_ids = sorted({item[0] for item in union_samples})
+    unique_hit_ids = sorted({item[0] for item in union_hits})
+    result["frontLapToFrontThigh"]["unionNoDoubleCount"] = {
+        "sampledUniqueBodyTriangleCount": len(unique_triangle_ids),
+        "hitUniqueBodyTriangleCount": len(unique_hit_ids),
+        "hitUnionFraction": (
+            len(unique_hit_ids) / len(unique_triangle_ids)
+            if unique_triangle_ids
+            else None
+        ),
+        "sampledUniqueBodyTriangleIdsSha256": hashlib.sha256(
+            ",".join(map(str, unique_triangle_ids)).encode("ascii")
+        ).hexdigest(),
+        "hitUniqueBodyTriangleIdsSha256": hashlib.sha256(
+            ",".join(map(str, unique_hit_ids)).encode("ascii")
+        ).hexdigest(),
+    }
     return result
 
 
@@ -307,6 +509,21 @@ def main():
     )
     coverage_ids = set(groups.get(coverage_component, [])) if coverage_component else set()
     skirt_ids.update(coverage_ids)
+    front_lap_diagnostic = cloth.get("prototypePoseCoverageDiagnostic")
+    if not isinstance(front_lap_diagnostic, dict):
+        raise ValueError("pose coverage requires an explicit prototypePoseCoverageDiagnostic contract")
+    front_lap_ids = front_lap_diagnostic.get("frontLapPieceIdsBySide", {})
+    if any(not front_lap_ids.get(side) for side in ("left", "right")):
+        raise ValueError("front-lap diagnostic requires explicit left and right panel IDs")
+    longitudinal_range = front_lap_diagnostic.get("longitudinalBoneRange", [])
+    if (
+        len(longitudinal_range) != 2
+        or not 0 <= longitudinal_range[0] < longitudinal_range[1] <= 1
+    ):
+        raise ValueError("front-lap diagnostic requires an ordered rest-bone interval")
+    for side in ("left", "right"):
+        if not set(front_lap_ids[side]) <= skirt_ids:
+            raise ValueError(f"{side} front-lap pieces are not all in the configured overskirt group")
     if (
         len(shorts_components) != 1
         or not shorts_components[0].get("requiredPieceIds")
@@ -339,6 +556,7 @@ def main():
         ),
         "skirtClothGroupId": "pleated-overskirt",
         "skirtPieceIds": sorted(skirt_ids),
+        "frontLapPoseCoverageDiagnostic": front_lap_diagnostic,
         "separatelySimulatedCoverageComponentId": coverage_component,
         "separatelySimulatedCoveragePieceIds": sorted(coverage_ids),
     }
@@ -416,6 +634,7 @@ def main():
                     shorts_ids,
                     skirt_ids,
                     piece_group_source,
+                    front_lap_diagnostic,
                 )
                 if kind == "pose" and name in {"neutral", "crouch", "sit"}
                 else None

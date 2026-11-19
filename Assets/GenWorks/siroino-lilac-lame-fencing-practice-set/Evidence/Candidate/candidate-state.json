@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v176-panel-response-measurements-20261119",
+  "revision": "v177-front-lap-anterior-thigh-pose-diagnostic-20261120",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,7 +21,7 @@
     {
       "severity": "BLOCKER",
       "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
-      "description": "Direct review of all five current views and all six current pose renders shows the neutral skirt remains a sharply faceted bell with irregular pleats and a jagged underside. In crouch, front and side panels lift away from the bent thighs; in sit, most upper-thigh surface remains exposed and pleated side/rear panels flare out. Current pose-coverage evidence measures overskirt coverage at 36.72% left / 35.37% right in crouch and 28.59% left / 28.36% right in sit. The 354-vertex hem pin holds only neutral coordinates and does not establish bent-pose coverage."
+      "description": "Direct inspection of all five current views and all six current pose renders confirms the sharply faceted bell silhouette, irregular pleats and jagged underside; crouch lifts front and side panels from the bent thighs, while the sit view leaves most upper thigh exposed and flares side/rear panels. V177 now isolates 266 rest-bound anterior thigh triangle samples per side: in sit only 5/266 left and 5/266 right same-side samples hit their corresponding front lap within the 250 mm diagnostic ray; each has only 1 sample within the diagnostic-only 30 mm distance. The deduplicated two-side lap union hits 21/532 samples. This measured response confirms the visible coverage defect; it does not establish a fit tolerance."
     },
     {
       "severity": "BLOCKER",

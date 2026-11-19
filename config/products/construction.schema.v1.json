@@ -490,6 +490,48 @@
             "evidenceBoundary": { "type": "string", "minLength": 1 }
           }
         },
+        "prototypePoseCoverageDiagnostic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "frontLapPieceIdsBySide",
+            "thighBoneBySide",
+            "longitudinalBoneRange",
+            "anteriorDirectionWorld",
+            "minimumAnteriorNormalDot",
+            "nearDistanceDiagnosticM",
+            "originOffsetSensitivityM",
+            "evidenceBoundary"
+          ],
+          "properties": {
+            "method": { "const": "rest-bound-anterior-thigh-to-authored-front-lap-ray-coverage-v1" },
+            "frontLapPieceIdsBySide": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["left", "right"],
+              "properties": {
+                "left": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+                "right": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+              }
+            },
+            "thighBoneBySide": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["left", "right"],
+              "properties": {
+                "left": { "type": "string", "minLength": 1 },
+                "right": { "type": "string", "minLength": 1 }
+              }
+            },
+            "longitudinalBoneRange": { "type": "array", "prefixItems": [{ "type": "number", "minimum": 0 }, { "type": "number", "maximum": 1 }], "minItems": 2, "maxItems": 2 },
+            "anteriorDirectionWorld": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+            "minimumAnteriorNormalDot": { "type": "number", "minimum": -1, "maximum": 1 },
+            "nearDistanceDiagnosticM": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.25 },
+            "originOffsetSensitivityM": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.0005 },
+            "evidenceBoundary": { "type": "string", "minLength": 1 }
+          }
+        },
         "applicability": {
           "enum": [
             "REQUIRED",

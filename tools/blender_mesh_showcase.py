@@ -136,10 +136,15 @@ def main():
     ]
     out = root / job["productRoot"] / "Previews/Mesh"
     out.mkdir(parents=True, exist_ok=True)
+    public_source = (root / job["blendPath"]).resolve()
     report = {
         "schemaVersion": 1,
         "productId": job["id"],
-        "sourcePath": None,
+        "sourcePath": (
+            job["blendPath"]
+            if source.resolve() == public_source
+            else None
+        ),
         "sourceEvidencePath": build_report_path.relative_to(root).as_posix(),
         "sourceEvidenceSha256": digest(build_report_path),
         "sourceSha256": digest(source),
