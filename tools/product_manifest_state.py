@@ -202,6 +202,15 @@ def apply_update(
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
         final_errors = production_contract.product_state_errors(staged_job, root)
+        if str(updated.get("state", updated.get("status", ""))).upper() == "REJECTED":
+            # A checkpoint handoff records evidence without changing rejected gates.
+            # Match the rejected-state precondition above while still validating every
+            # identity, schema, completion, and release invariant.
+            final_errors = [
+                error
+                for error in final_errors
+                if not error.startswith("product technical gate failed:")
+            ]
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)
@@ -754,6 +763,15 @@ def record_workflow_attempt(
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
         final_errors = production_contract.product_state_errors(staged_job, root)
+        if str(updated.get("state", updated.get("status", ""))).upper() == "REJECTED":
+            # A checkpoint handoff records evidence without changing rejected gates.
+            # Match the rejected-state precondition above while still validating every
+            # identity, schema, completion, and release invariant.
+            final_errors = [
+                error
+                for error in final_errors
+                if not error.startswith("product technical gate failed:")
+            ]
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)

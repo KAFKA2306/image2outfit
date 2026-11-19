@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v171-neutral-cloth-settle-20261119",
+  "revision": "v172-overskirt-bending-settle-20261119",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,17 +19,17 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of front, back, side and three-quarter views shows asymmetric overskirt drape: one side lifts while the other collapses into angular folds. Both side profiles show doubled and stacked lilac hem segments. The trim does not yet read as one continuous edge around both hips.",
+      "description": "After the V172 increase in native Cloth bending stiffness, direct front/back/side/three-quarter inspection still shows heavily crumpled angular overskirt folds, unequal side lift and collapse, and stacked lilac hem bands on both side profiles. The solver adjustment does not yield a continuous, balanced skirt edge.",
       "severity": "BLOCKER",
       "code": "SKIRT_DRAPE_AND_TRIM_DISCONTINUITY"
     },
     {
-      "description": "Irregular gray patches remain visible through the white chest and waist in neutral, arms-up and arm-cross renders. The source is unresolved; the images do not distinguish clearance/intersection from exposed source surface or shading.",
+      "description": "Irregular gray body-colored patches remain visible across the white chest and waist in neutral, arms-up and arm-cross renders. Current renders do not isolate whether these are intersections, exposed source surfaces, or shading; the cause remains unresolved.",
       "severity": "BLOCKER",
       "code": "BODICE_SURFACE_ARTIFACTS"
     },
     {
-      "description": "In crouch and sit, both shorts-clad thighs project through the front of the overskirt while its center panel hangs behind them. The lower skirt silhouette and thigh clearance remain unacceptable in bent-leg poses.",
+      "description": "In crouch and sit, both shorts-clad thighs visibly project in front of the overskirt while the center front panel falls behind them. Coverage and clearance remain unacceptable in bent-leg poses.",
       "severity": "BLOCKER",
       "code": "BENT_LEG_SKIRT_INTERSECTIONS"
     }

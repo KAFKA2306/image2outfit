@@ -201,9 +201,15 @@
       "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
-    "evidence": "V171 uses the existing optional no-pose-response path: bake the overskirt with the target collision body left in neutral rest pose, without fabricating pose-cache trials. The pipeline later generates the required six skinned-pose renders independently. The hypothesis is unproven until all eleven current images are inspected; no fit, collision safety, appearance, Unity/VRChat, or release acceptance is granted.",
-    "reason": "V170 direct inspection showed severe overskirt crumpling/asymmetry after baking the collision body through crouch, sit and prone before returning to neutral. The all-neutral five-key attempt violated the existing solver requirement for four distinct body pose states. V171 isolates rest-shape settling by omitting the optional animated pose-response trial entirely and baking the same 48-frame cloth solve with the source body left neutral; all fabric and garment inputs stay unchanged. This is only a diagnostic, not fit or appearance evidence.",
-    "prototypeComponentBendingHypotheses": {},
+    "evidence": "V172 changes only the overskirt native Cloth bending-stiffness hypothesis from the default 0.45 to 0.90 while retaining V171 neutral settling, geometry, collisions, gravity, pins and 48-frame duration. The controlled build records the solver setting and regenerates the existing pose previews; it grants no fit, collision safety, visual quality, Unity/VRChat, or release acceptance.",
+    "reason": "Direct inspection of V171 showed severe, highly folded neutral overskirt geometry remained after removing animated body motion from the bake. V172 is a one-variable follow-up: increase native Cloth bending stiffness from 0.45 to 0.90 to resist excessive small folds while preserving the V171 neutral collision-body state and every other garment and solver input. This tests a solver response only; the result still requires direct render inspection and proves no fit, appearance, or release readiness.",
+    "prototypeComponentBendingHypotheses": {
+      "pleated-overskirt": {
+        "stiffness": 0.9,
+        "reason": "V171 neutral cloth settling still produced excessive small folds in direct renders; increase bending resistance as a single controlled solver variable.",
+        "evidenceBoundary": "Records an exact native Blender bending stiffness for one overskirt bake. It tests fold response only and grants no garment fit, collision safety, visual quality, runtime behavior, or release acceptance."
+      }
+    },
     "prototypePostBakeLaplacianSmoothing": {}
   },
   "frontClosure": {

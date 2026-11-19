@@ -17,6 +17,14 @@
       "frameStart": 1,
       "frameEnd": 48,
       "dynamicMesh": false,
+      "componentBendingHypothesis": {
+        "stiffness": 0.8999999761581421,
+        "maximum": 0.8999999761581421,
+        "model": "ANGULAR",
+        "reason": "V171 neutral cloth settling still produced excessive small folds in direct renders; increase bending resistance as a single controlled solver variable.",
+        "evidenceBoundary": "Records an exact native Blender bending stiffness for one overskirt bake. It tests fold response only and grants no garment fit, collision safety, visual quality, runtime behavior, or release acceptance.",
+        "grantsFitAcceptance": false
+      },
       "pinMethod": "canonical shared seam vertices",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
@@ -33,23 +41,23 @@
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.45037248730659485,
-          0.746280312538147
+          0.44994401931762695,
+          0.7463586926460266
         ],
         "nearestNormalSignedDistanceM": {
           "minimum": 0.002411078304703551,
-          "maximum": 0.2087185326963663
+          "maximum": 0.20822381926700473
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 256,
+        "belowCombinedCollisionMarginVertexCount": 266,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "cacheBakedActual": true,
       "preBakeMeshSha256": "b4eca9db466cfb0490284c4374b1ab395aab39218d9e2dae6e2017cb36b3d701",
-      "evaluatedFrameMeshSha256": "de62c19163eec8f2329661ca93f1c5d23337cc586dfdc9a367a1a511e6aaa925",
-      "settledMeshSha256": "de62c19163eec8f2329661ca93f1c5d23337cc586dfdc9a367a1a511e6aaa925",
+      "evaluatedFrameMeshSha256": "90ade8c193a0d68d26fef15cea4122596143cdc87a8b3351652a489062130e37",
+      "settledMeshSha256": "90ade8c193a0d68d26fef15cea4122596143cdc87a8b3351652a489062130e37",
       "geometryChanged": true,
-      "postSeamAnchorMeshSha256": "de62c19163eec8f2329661ca93f1c5d23337cc586dfdc9a367a1a511e6aaa925",
+      "postSeamAnchorMeshSha256": "90ade8c193a0d68d26fef15cea4122596143cdc87a8b3351652a489062130e37",
       "neutralRestSeamAnchor": {
         "method": "restore-canonical-sewn-vertices-to-pre-solve-neutral-rest-coordinates",
         "sharedCanonicalVertexCount": 233,
@@ -95,9 +103,9 @@
     "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split, cloth bake before correction, and after the explicitly capped neutral-rest seam anchor. This restores only sewn boundary vertices at the neutral export frame; it does not prove pose-deformed seam continuity, fit, appearance, or release acceptance."
   },
   "sourceBlendSha256": "2253d9c23297ea096ced294e6bfb3b6560e02c0c715b7a0c6a6f4d7c7526563f",
-  "constructionSha256": "35da9695c4738f2dd8dd25d40ecf497079a5031161b4943ef23abda199450ea8",
+  "constructionSha256": "5597ad365b8aa0451bb150a6a6ee3ed82f907372f657a1311970660ce642254b",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "690f78c51205ad2ad014f9612590d4d5c0fae19070c40f505f53d2ee7431c425",
+  "candidateSha256": "f3f59ad8aa60fa6d52f4bd76c6098dab21b7d48bcc4799363d066b6974765aec",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
