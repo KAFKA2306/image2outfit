@@ -478,6 +478,18 @@
             "evidenceBoundary": { "type": "string", "minLength": 1 }
           }
         },
+        "prototypeGeometryDiagnostics": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["component", "method", "evidenceBoundary"],
+          "properties": {
+            "component": { "const": "pleated-overskirt" },
+            "method": {
+              "const": "canonical-panel-rest-to-settled-triangle-response-v1"
+            },
+            "evidenceBoundary": { "type": "string", "minLength": 1 }
+          }
+        },
         "applicability": {
           "enum": [
             "REQUIRED",

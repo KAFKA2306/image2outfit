@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V175 preserves authoritative 2D pattern coordinates on sewn face corners, then pins only the topological boundary edges that lie on each declared overskirt hem. Verify exact edge ownership and neutral hem drift after native Cloth settling. This bounded prototype experiment makes no fit, appearance, collision-safety, or release claim.",
-  "designRevision": "v175-authored-hem-edge-attachment-20261119",
+  "target": "V176 retains V175's authored hem-boundary attachment and records per-panel displacement, triangle inversion/collapse, and area change at the evaluated Cloth frame, neutral bake, and post-seam-anchor export. Compare these measurements with the existing signed body-clearance and pose-coverage diagnostics before changing the skirt solver. This measurement-only prototype makes no fit, appearance, collision-safety, or release claim.",
+  "designRevision": "v176-panel-response-measurements-20261119",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -225,6 +225,11 @@
       "maximumNeutralHemDriftM": 0.001,
       "reason": "V173 moved the 710-vertex hem band 0.3415 m maximum and 0.2237 m mean. V174's first implementation found unrelated waist/open-panel edges because the hem panels contain more than one open boundary. V175 preserves the exact authored 2D face-corner coordinates and selects only topological boundary edges on each unique declared pattern hem, fixing those vertices during neutral settling.",
       "evidenceBoundary": "The native Cloth bake matches topological boundary edges to the exact authored 2D hem segment for each declared panel and pins only those vertices at neutral source coordinates. It records source edge/vertex ownership, ignored non-hem boundaries, per-panel height ranges, pinned coverage, and maximum, P95, and mean drift. This measures a bounded neutral prototype attachment; it does not establish posed trim binding, fit, collision safety, appearance, runtime behavior, or release acceptance."
+    },
+    "prototypeGeometryDiagnostics": {
+      "component": "pleated-overskirt",
+      "method": "canonical-panel-rest-to-settled-triangle-response-v1",
+      "evidenceBoundary": "For every authored overskirt panel, compare canonical source coordinates and fixed face-fan triangles with the evaluated Cloth frame, settled neutral mesh, and post-seam-anchor mesh. Record vertex displacement, signed face orientation, collapsed triangles, and triangle-area ratios per panel. Pair this with the existing body-surface and pose-coverage evidence; these are diagnostics only and do not establish fit, appearance, collision safety, runtime behavior, or release acceptance."
     },
     "prototypePostBakeLaplacianSmoothing": {}
   },

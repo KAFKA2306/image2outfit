@@ -116,6 +116,120 @@ def mesh_hash(obj: bpy.types.Object, *, evaluated: bool = False) -> str:
             evaluated_object.to_mesh_clear()
 
 
+def panel_geometry_snapshot(obj: bpy.types.Object) -> dict[str, object]:
+    """Capture exact sewn face ownership and rest coordinates before Cloth."""
+    owners = obj.data.attributes.get("canonical_piece_index")
+    if owners is None or owners.domain != "FACE" or len(owners.data) != len(obj.data.polygons):
+        raise ValueError(f"Canonical face ownership is missing for response metrics: {obj.name}")
+    pieces = json.loads(obj.get("canonicalPieceIds", "[]"))
+    face_pieces = []
+    for face_index, owner in enumerate(owners.data):
+        piece_index = int(owner.value)
+        if not 0 <= piece_index < len(pieces):
+            raise ValueError(f"Invalid panel owner for response metrics: {obj.name}:{face_index}")
+        face_pieces.append(pieces[piece_index])
+    return {
+        "coordinates": [vertex.co.copy() for vertex in obj.data.vertices],
+        "faces": [tuple(polygon.vertices) for polygon in obj.data.polygons],
+        "facePieces": face_pieces,
+    }
+
+
+def panel_geometry_response(
+    reference: dict[str, object],
+    current_coordinates: list[Vector],
+    *,
+    stage: str,
+) -> dict[str, object]:
+    """Measure panel displacement, triangle inversion, collapse, and area change."""
+    rest_coordinates = reference["coordinates"]
+    faces = reference["faces"]
+    face_pieces = reference["facePieces"]
+    if len(rest_coordinates) != len(current_coordinates):
+        raise ValueError(f"Cloth response changed vertex count at {stage}")
+    if len(faces) != len(face_pieces):
+        raise ValueError(f"Cloth response lost canonical face ownership at {stage}")
+    panel_vertices: dict[str, set[int]] = {}
+    panel_triangles: dict[str, list[tuple[int, int, int]]] = {}
+    for face, piece in zip(faces, face_pieces):
+        ids = tuple(int(index) for index in face)
+        if len(ids) < 3 or any(index < 0 or index >= len(rest_coordinates) for index in ids):
+            raise ValueError(f"Invalid canonical face in cloth response at {stage}: {piece}")
+        panel_vertices.setdefault(piece, set()).update(ids)
+        panel_triangles.setdefault(piece, []).extend(
+            (ids[0], ids[index], ids[index + 1]) for index in range(1, len(ids) - 1)
+        )
+
+    def nearest_rank(values: list[float], fraction: float) -> float:
+        if not values:
+            raise ValueError(f"Missing cloth response samples at {stage}")
+        ordered = sorted(values)
+        return ordered[min(len(ordered) - 1, math.ceil(fraction * len(ordered)) - 1)]
+
+    panels = {}
+    for piece, vertex_ids in panel_vertices.items():
+        distances = [
+            (current_coordinates[index] - rest_coordinates[index]).length
+            for index in sorted(vertex_ids)
+        ]
+        inverted = collapsed = zero_rest = 0
+        ratios = []
+        triangles = panel_triangles[piece]
+        for first, second, third in triangles:
+            rest_normal = (rest_coordinates[second] - rest_coordinates[first]).cross(
+                rest_coordinates[third] - rest_coordinates[first]
+            )
+            current_normal = (
+                current_coordinates[second] - current_coordinates[first]
+            ).cross(current_coordinates[third] - current_coordinates[first])
+            rest_area_twice = rest_normal.length
+            current_area_twice = current_normal.length
+            if rest_area_twice <= 1e-12:
+                zero_rest += 1
+                continue
+            ratio = current_area_twice / rest_area_twice
+            ratios.append(ratio)
+            if current_area_twice <= max(1e-12, rest_area_twice * 0.01):
+                collapsed += 1
+            if rest_normal.dot(current_normal) < -1e-12:
+                inverted += 1
+        if zero_rest:
+            raise ValueError(f"Rest panel contains degenerate reference triangles at {stage}: {piece}")
+        panels[piece] = {
+            "vertexCount": len(vertex_ids),
+            "sourceTriangleCount": len(triangles),
+            "maxVertexDisplacementM": max(distances, default=0.0),
+            "p95VertexDisplacementM": nearest_rank(distances, 0.95),
+            "meanVertexDisplacementM": sum(distances) / len(distances),
+            "invertedTriangleCount": inverted,
+            "collapsedTriangleCount": collapsed,
+            "minimumTriangleAreaRatio": min(ratios),
+            "p05TriangleAreaRatio": nearest_rank(ratios, 0.05),
+            "medianTriangleAreaRatio": nearest_rank(ratios, 0.50),
+            "maximumTriangleAreaRatio": max(ratios),
+        }
+    return {
+        "method": "canonical-panel-rest-to-settled-triangle-response-v1",
+        "stage": stage,
+        "triangulation": "fixed first-vertex fan of each exact source polygon",
+        "orientationRule": "inverted when rest/current triangle-normal dot product is negative",
+        "collapseRule": "current triangle area is at most one percent of its rest area",
+        "panels": panels,
+        "grantsFitAcceptance": False,
+        "grantsCollisionSafetyAcceptance": False,
+        "grantsAppearanceAcceptance": False,
+    }
+
+
+def evaluated_local_coordinates(obj: bpy.types.Object) -> list[Vector]:
+    evaluated = obj.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    mesh = evaluated.to_mesh()
+    try:
+        return [vertex.co.copy() for vertex in mesh.vertices]
+    finally:
+        evaluated.to_mesh_clear()
+
+
 def find_object(name: str) -> bpy.types.Object:
     obj = bpy.data.objects.get(name)
     if obj is None or obj.type != "MESH":
@@ -957,6 +1071,16 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
     frame_end = policy["prototypeFrameEnd"]
     if not isinstance(frame_end, int) or not 2 <= frame_end <= 120:
         raise ValueError("bounded prototype frame range is required")
+    geometry_diagnostics = policy.get("prototypeGeometryDiagnostics")
+    if geometry_diagnostics is not None:
+        if (
+            not isinstance(geometry_diagnostics, dict)
+            or geometry_diagnostics.get("method")
+            != "canonical-panel-rest-to-settled-triangle-response-v1"
+            or geometry_diagnostics.get("component") not in simulated_components
+            or geometry_diagnostics.get("component") not in groups
+        ):
+            raise ValueError("Panel geometry diagnostics require a declared cloth component and method")
     private_blend = (
         ROOT / ".image2outfit" / "products" / str(job["id"])
         / "private-source" / "working-source.blend"
@@ -1502,6 +1626,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         )
     before, contracts = {}, []
     hem_rest_positions = {}
+    geometry_references = {}
     rest_controls = {}
     self_collision_hypotheses = policy.get(
         "prototypeComponentSelfCollisionHypotheses", {}
@@ -1556,6 +1681,8 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         else:
             hem_source = None
         before[name] = mesh_hash(obj)
+        if policy.get("prototypeGeometryDiagnostics", {}).get("component") == name:
+            geometry_references[name] = panel_geometry_snapshot(obj)
         rest = policy.get("prototypeRestShape", {}).get(name)
         rest_contract = (
             bind_canonical_row_rest_shape(obj, job, rest) if rest is not None else None
@@ -1857,6 +1984,12 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         if not modifier.point_cache.is_baked:
             raise RuntimeError("native cloth cache did not bake")
         evaluated = mesh_hash(obj, evaluated=True)
+        if obj.name in geometry_references:
+            contract["panelGeometryResponseAtEvaluatedFrame"] = panel_geometry_response(
+                geometry_references[obj.name],
+                evaluated_local_coordinates(obj),
+                stage="evaluated-cloth-frame-before-neutral-export",
+            )
         if pose_response is not None and obj.name == pose_response["component"]:
             contract["poseResponseSamples"] = pose_samples
             contract["poseResponseEvidenceBoundary"] = (
@@ -1927,6 +2060,12 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 )
         settled = mesh_hash(obj)
         contract["postBakeBodySurfaceDiagnostic"] = surface_diagnostics(obj)
+        if obj.name in geometry_references:
+            contract["panelGeometryResponseAfterBake"] = panel_geometry_response(
+                geometry_references[obj.name],
+                [vertex.co.copy() for vertex in obj.data.vertices],
+                stage="settled-neutral-frame-before-seam-restore",
+            )
         contract.update(
             cacheBakedActual=True,
             preBakeMeshSha256=before[obj.name],
@@ -1955,6 +2094,13 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         contract["settledMeshSha256"] = final_hash
         contract["geometryChanged"] = final_hash != before[obj.name]
         contract["neutralRestSeamAnchor"] = seam_restore
+        if obj.name in geometry_references:
+            contract["panelGeometryResponseAfterSeamRestore"] = panel_geometry_response(
+                geometry_references[obj.name],
+                [vertex.co.copy() for vertex in obj.data.vertices],
+                stage="settled-neutral-frame-after-seam-restore",
+            )
+            contract["postSeamAnchorBodySurfaceDiagnostic"] = surface_diagnostics(obj)
     seam_positions_after_bake = shared_seam_position_diagnostic(
         "cloth-bake-after-seam-restore"
     )

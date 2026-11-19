@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v175-authored-hem-edge-attachment-20261119",
+  "revision": "v176-panel-response-measurements-20261119",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,14 +19,14 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct review of the current front, back, left, right, three-quarter, neutral, arms-up, arm-cross, crouch, sit, and prone renders shows a dense, sharply faceted overskirt with an uneven, ballooned pleat silhouette in neutral views. In crouch and sit, angular panels lift and jut around the thighs while the center-front layer falls behind the legs; coverage remains visibly poor. The V175 hem-edge pin is measured only in neutral and does not make the posed result acceptable.",
       "severity": "BLOCKER",
-      "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE"
+      "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
+      "description": "Direct review of all five current views and all six current pose renders shows the neutral skirt remains a sharply faceted bell with irregular pleats and a jagged underside. In crouch, front and side panels lift away from the bent thighs; in sit, most upper-thigh surface remains exposed and pleated side/rear panels flare out. Current pose-coverage evidence measures overskirt coverage at 36.72% left / 35.37% right in crouch and 28.59% left / 28.36% right in sit. The 354-vertex hem pin holds only neutral coordinates and does not establish bent-pose coverage."
     },
     {
-      "description": "Gray, body-colored-looking patches and hard surface facets remain visible on the ivory chest and waist in the front and posed views. Their cause is not established by these images; appearance is visibly defective and requires resolving the surface construction or shading before acceptance.",
       "severity": "BLOCKER",
-      "code": "BODICE_SURFACE_ARTIFACTS"
+      "code": "BODICE_SURFACE_ARTIFACTS",
+      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in front and posed views. Their cause is not established by the renders; visible surface quality is unacceptable and needs a separately measured diagnosis after the skirt response is isolated."
     }
   ],
   "failedGeometryChecks": [

@@ -1,35 +1,35 @@
-{
-  "schemaVersion": 1,
-  "productId": "siroino-lilac-lame-fencing-practice-set",
-  "reviewMethod": "direct-image-inspection",
-  "reviewer": "Codex direct review",
-  "reviewedRevision": "v175-authored-hem-edge-attachment-20261119",
-  "status": "REJECTED",
-  "decision": "REJECT",
-  "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "b6eaa48f5ee625908226527bde81bb61460e09e9fc21512d9f222ad4dfa594c2",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "4349361f1236069f5e71083607a9d8d2c6591130e8edba564a9a7995c9133202",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "7eb3d4dfbdb061a454c51a4295b2efbd8d53cd40f06df6292496e54f1dce0307",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "e31ab9452df5e475df5b3e095be72f3273f2303c69acbc3c61320f96d9e0a27b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "7d7e54e0ccac5d8ed5648de7136e2ab05222ce8acedc68b6ce7581a420fa8f38",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "8d66916e9aa7fa3aba1985613dddb3e1374c4aef217a544c5ddc0671352a5016",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "810ac0f410c56f90801e1bc3b14b15ddcc09c4a4129f00064802e44f15a94f89",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "84444cfd0c279b187fef150ba8c749c50a072aaea432968242080f430aa2b0f7",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "45e20f57ce22743a6253f520e55c4645f9f5c1f55a280eaf16f45691de6704b1",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "3ed9efa619ce87974ea2a15c54d23700a0e9c02789ba8e813aba2c51dcbcd75e",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "8d11c94451a63ecf8a2fab0b512b80f782500aed57b86b9ed0bf38542458ce2f"
-  },
-  "findings": [
-    {
-      "description": "Direct review of the current front, back, left, right, three-quarter, neutral, arms-up, arm-cross, crouch, sit, and prone renders shows a dense, sharply faceted overskirt with an uneven, ballooned pleat silhouette in neutral views. In crouch and sit, angular panels lift and jut around the thighs while the center-front layer falls behind the legs; coverage remains visibly poor. The V175 hem-edge pin is measured only in neutral and does not make the posed result acceptable.",
-      "severity": "BLOCKER",
-      "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE"
-    },
-    {
-      "description": "Gray, body-colored-looking patches and hard surface facets remain visible on the ivory chest and waist in the front and posed views. Their cause is not established by these images; appearance is visibly defective and requires resolving the surface construction or shading before acceptance.",
-      "severity": "BLOCKER",
-      "code": "BODICE_SURFACE_ARTIFACTS"
-    }
-  ],
-  "nextAction": "Keep V175 rejected. The topology-selected attachment located 354 source hem vertices, ignored 183 other open boundary edges, and measured zero neutral hem drift; this confirms only neutral attachment. All eleven fresh renders still show an unacceptable skirt silhouette, bent-leg coverage, and bodice surface artifacts. Next isolate the skirt cloth response while preserving the authored hem attachment, and measure actual panel deformation, inversion, body clearance, and left/right bent-thigh coverage before modifying the bodice. Fit, Shape Key response, Unity/VRChat execution, package, and release remain unverified."
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "reviewMethod": "direct-image-inspection",
+  "reviewer": "Codex direct review",
+  "reviewedRevision": "v176-panel-response-measurements-20261119",
+  "status": "REJECTED",
+  "decision": "REJECT",
+  "inspectedImages": {
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "f05e65cd0de2fabb6b9b88102bfc70c88e6cff1b7517830907c824626eac7d11",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "985e4d1c9a89fbe4dddd179ffb64276cd6db2451e718b27b7d65dd0ca6fdbaed",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "1a8d2b9d704684acec72deca60e1146e5ef4fc28fa1c92a18973c5b128d88a40",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "ca42309e7c0e9da5ba104ca6a8bd403074822475b0ad7db5e7d65aa869701f43",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "617bcab2e9c542a71e6b774e60811474c650a2dfb8b0b6b8ce34236c58c2c38a",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "4881f03751ae28bb92ad9f4da47f2c7260b3cbcfd7e039214a455a6e96530772",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "63639ea43faeaaf50242d9b1b40914cabaeea56a6abb37bca1eea1365fab0166",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "ac3a532bcde0fe0f233a0f2b86de7c0a41fef652fde249c63b0780002d505080",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "eea889fbac651a7f73193a45beac430f74f77deca430a2712d0c37d7329d36e1",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "113543e163a8c2a583e63ab4b708449c75a0fdff5d4f17e3617ff9548cbacdbd",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "f0b010fe60591d039ae8b49997bcb39ac9e7ca4ae8bb4adb5cc62360b0472916"
+  },
+  "findings": [
+    {
+      "severity": "BLOCKER",
+      "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
+      "description": "Direct review of all five current views and all six current pose renders shows the neutral skirt remains a sharply faceted bell with irregular pleats and a jagged underside. In crouch, front and side panels lift away from the bent thighs; in sit, most upper-thigh surface remains exposed and pleated side/rear panels flare out. Current pose-coverage evidence measures overskirt coverage at 36.72% left / 35.37% right in crouch and 28.59% left / 28.36% right in sit. The 354-vertex hem pin holds only neutral coordinates and does not establish bent-pose coverage."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "BODICE_SURFACE_ARTIFACTS",
+      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in front and posed views. Their cause is not established by the renders; visible surface quality is unacceptable and needs a separately measured diagnosis after the skirt response is isolated."
+    }
+  ],
+  "nextAction": "Keep V176 rejected. The actual Cloth bake recorded 615 inverted fixed-fan triangles of 17,567 overskirt triangles, zero collapsed triangles, up to 40.9 mm vertex displacement, and a maximum triangle-area ratio of 23.67; neutral hem drift is zero only because 354 authored hem vertices are pinned. Sit overskirt upper-thigh coverage is 28.59% left / 28.36% right, versus 36.72% / 35.37% in crouch. Next isolate the skinned front-lap pose response against the target rig while holding neutral Cloth output and bodice unchanged; alter only front-lap geometry or weights, then rerun crouch/sit coverage and inspect neutral/crouch/sit renders. Fit, Shape Key, Unity/VRChat, package, and release remain unverified."
 }
