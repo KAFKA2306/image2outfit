@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V187 retains V186 skirt and bodice geometry and changes only the pose-deformation weight hypothesis: redistribute up to 0.15 from Hips to the same-side UpperLeg on exclusive lower-front overskirt vertices, with a 50 mm shared-seam fade and lower-band ramp. Evaluate current crouch and sit renders plus single-leg raise; keep all fit and release gates mandatory.",
-  "designRevision": "v187-front-lower-skirt-thigh-follow-20261120",
+  "target": "V188 preserves the authored pattern rest lengths, sewn seams, and V187 rig/weight controls while increasing the existing front-only apron hem extension from 15 mm to 100 mm above the unchanged 70 mm common skirt drop, with the existing angular seam fade and 4 mm forward projection retained. Evaluate actual weighted-mesh crouch/sit renders, component-ID coverage, and all fit/release gates; this remains a geometry hypothesis, not acceptance.",
+  "designRevision": "v188-front-apron-thigh-coverage-20261121",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -225,10 +225,17 @@
         "overskirt-front-lap-right"
       ],
       "method": "pin-authored-pattern-hem-boundary-v1",
-      "maximumBoundaryHeightRangeM": 0.04,
+      "maximumBoundaryHeightRangeMByPiece": {
+        "overskirt-front-left": 0.04,
+        "overskirt-front-right": 0.04,
+        "overskirt-back-left": 0.04,
+        "overskirt-back-right": 0.04,
+        "overskirt-front-lap-left": 0.1,
+        "overskirt-front-lap-right": 0.1
+      },
       "maximumNeutralHemDriftM": 0.001,
       "reason": "V173 moved the 710-vertex hem band 0.3415 m maximum and 0.2237 m mean. V174's first implementation found unrelated waist/open-panel edges because the hem panels contain more than one open boundary. V175 preserves the exact authored 2D face-corner coordinates and selects only topological boundary edges on each unique declared pattern hem, fixing those vertices during neutral settling.",
-      "evidenceBoundary": "The native Cloth bake matches topological boundary edges to the exact authored 2D hem segment for each declared panel and pins only those vertices at neutral source coordinates. It records source edge/vertex ownership, ignored non-hem boundaries, per-panel height ranges, pinned coverage, and maximum, P95, and mean drift. This measures a bounded neutral prototype attachment; it does not establish posed trim binding, fit, collision safety, appearance, runtime behavior, or release acceptance."
+      "evidenceBoundary": "The native Cloth bake matches topological boundary edges to the exact authored 2D hem segment for each declared panel and pins only those vertices at neutral source coordinates. It records source edge/vertex ownership, ignored non-hem boundaries, per-panel measured height ranges, exact per-piece declared range limits, pinned coverage, and maximum, P95, and mean drift. The V188 100 mm range applies only to the two authored front-lap hem edges; all four common skirt-panel hem limits remain 40 mm and neutral drift remains capped at 1 mm. This measures a bounded neutral prototype attachment; it does not establish posed trim binding, fit, collision safety, appearance, runtime behavior, or release acceptance."
     },
     "prototypeGeometryDiagnostics": {
       "component": "pleated-overskirt",

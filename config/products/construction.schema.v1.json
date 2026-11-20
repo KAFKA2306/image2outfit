@@ -506,7 +506,7 @@
             "component",
             "sourcePieces",
             "method",
-            "maximumBoundaryHeightRangeM",
+            "maximumBoundaryHeightRangeMByPiece",
             "maximumNeutralHemDriftM",
             "reason",
             "evidenceBoundary"
@@ -520,10 +520,14 @@
               "items": { "type": "string", "minLength": 1 }
             },
             "method": { "const": "pin-authored-pattern-hem-boundary-v1" },
-            "maximumBoundaryHeightRangeM": {
-              "type": "number",
-              "exclusiveMinimum": 0,
-              "maximum": 0.04
+            "maximumBoundaryHeightRangeMByPiece": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 0.1
+              }
             },
             "maximumNeutralHemDriftM": {
               "type": "number",

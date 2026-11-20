@@ -1184,15 +1184,29 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             raise ValueError(
                 "Hem attachment must name every simulated source panel and its unique declared hem edge"
             )
-        for key in ("maximumBoundaryHeightRangeM", "maximumNeutralHemDriftM"):
-            value = hem_attachment.get(key)
+        limits = hem_attachment.get("maximumBoundaryHeightRangeMByPiece")
+        if not isinstance(limits, dict) or set(limits) != set(source_pieces):
+            raise ValueError(
+                "Hem attachment requires an exact per-piece authored boundary range limit"
+            )
+        for piece_id, value in limits.items():
             if (
                 isinstance(value, bool)
                 or not isinstance(value, (int, float))
                 or not math.isfinite(value)
                 or value <= 0
             ):
-                raise ValueError(f"Hem attachment requires a positive {key} bound")
+                raise ValueError(
+                    f"Hem attachment requires a positive boundary range limit: {piece_id}"
+                )
+        value = hem_attachment.get("maximumNeutralHemDriftM")
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+            or value <= 0
+        ):
+            raise ValueError("Hem attachment requires a positive maximumNeutralHemDriftM bound")
 
     vertex_sets = {
         name: {v for i in ids for v in faces[i]} for name, ids in selected_faces.items()
@@ -1654,9 +1668,15 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             if set(hem_source["sourcePieces"]) != set(hem_attachment["sourcePieces"]):
                 raise ValueError("Open overskirt boundary does not cover every declared hem panel")
             excessive = {
-                piece: bounds
+                piece: {
+                    "observedRangeM": bounds[1] - bounds[0],
+                    "maximumRangeM": float(
+                        hem_attachment["maximumBoundaryHeightRangeMByPiece"][piece]
+                    ),
+                }
                 for piece, bounds in hem_source["heightRangeMByPiece"].items()
-                if bounds[1] - bounds[0] > float(hem_attachment["maximumBoundaryHeightRangeM"])
+                if bounds[1] - bounds[0]
+                > float(hem_attachment["maximumBoundaryHeightRangeMByPiece"][piece])
             }
             if excessive:
                 raise ValueError(f"Open source boundary is not confined to its declared hem band: {excessive}")

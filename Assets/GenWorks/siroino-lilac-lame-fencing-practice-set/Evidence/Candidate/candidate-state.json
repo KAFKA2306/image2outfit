@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v187-front-lower-skirt-thigh-follow-20261120",
+  "revision": "v188-front-apron-thigh-coverage-20261121",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
+      "description": "Direct inspection of all five V188 views and six pose renders: the skirt is still strongly faceted and creased in front, side, and rear views. In crouch, broad anterior thigh surfaces remain exposed below the overskirt. In sit, the skirt hangs behind and between the raised thighs while large bare thigh surfaces remain visible; the new lap extension does not provide acceptable pose coverage.",
       "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
-      "description": "Direct inspection of all five V187 views and six pose renders: the lower-front UpperLeg weight adjustment is present, but the skirt remains strongly faceted and angular across front, side and rear. In crouch, broad upper-thigh and shorts areas remain visible below the overskirt; in sit, the front lap still separates from the raised thighs and the skirt gathers behind the pelvis. The pose response and coverage remain unacceptable.",
       "severity": "BLOCKER"
     },
     {
+      "description": "The V188 front and side views still show angular planar shading across the bodice and a gray waist-area patch of unverified surface ownership. The waist/back construction remains stiff and visibly irregular. Bodice appearance is unacceptable.",
       "code": "BODICE_SURFACE_ARTIFACTS",
-      "description": "The V187 front and side views still show angular planar shading on the bodice and a small gray patch near the waist; the rear waist flap remains stiff. The surface ownership/cause of the waist patch is unverified. Bodice appearance remains unacceptable.",
       "severity": "BLOCKER"
     },
     {
-      "code": "V187_COMPONENT_ID_CONFIRMS_FRONT_COVERAGE_REMAINS_REJECTED",
-      "severity": "BLOCKER",
-      "description": "Direct inspection of same-pose V187 renders and depth-tested component-ID renders from the exact weighted mesh (6bc32c7d64f2460d328621deed7b86644d2f66e7f5315af8aaf5313040c9ff66): visible shorts-only pixels at 1024x1024 are 7637 in crouch and 10192 in sit; front-lap pixels are 2382 and 2912. The ID views show the lap occupying a small upper-front patch while thigh surface remains exposed below; these counts are view-dependent projected area, not a fit metric. The existing surface-ray diagnostic remains 402/885 shorts-covered upper-thigh samples per side in crouch, 401/885 in sit, and front-lap union hits of 54/532 and 23/532 respectively. Weight adjustment did not improve coverage; appearance, fit, and release remain rejected/blocked."
+      "description": "Direct inspection of depth-tested component-ID renders from the current weighted mesh (source SHA-256 44d976c023ff184100e0aa7fc71b5bc57ad1a0db7ab24d641ff1626b46951614): crouch at 1024x1024 shows 7,471 shorts-only pixels and 2,697 front-lap pixels; sit shows 9,121 shorts-only and 5,333 front-lap pixels. Compared with V187, projected shorts-only area falls modestly (7,637 to 7,471 crouch; 10,192 to 9,121 sit) and front-lap area rises (2,382 to 2,697 crouch; 2,912 to 5,333 sit), but these are camera-dependent projections, not fit. The source-bound anterior-thigh rays still hit the same-side lap only 7/266 samples per side in crouch and 5/266 per side in sit; many other sampled triangles remain uncovered. Visual review and fit remain rejected.",
+      "code": "V188_COMPONENT_ID_SHOWS_INSUFFICIENT_POSE_COVERAGE",
+      "severity": "BLOCKER"
     }
   ],
   "failedGeometryChecks": [
