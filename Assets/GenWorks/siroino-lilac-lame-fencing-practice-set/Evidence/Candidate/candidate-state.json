@@ -27,6 +27,11 @@
       "code": "BODICE_SURFACE_ARTIFACTS",
       "description": "The V187 front and side views still show angular planar shading on the bodice and a small gray patch near the waist; the rear waist flap remains stiff. The surface ownership/cause of the waist patch is unverified. Bodice appearance remains unacceptable.",
       "severity": "BLOCKER"
+    },
+    {
+      "code": "V187_WEIGHT_CHANGE_DID_NOT_IMPROVE_FRONT_COVERAGE",
+      "severity": "BLOCKER",
+      "description": "Direct same-camera crouch/sit comparison V186 vs V187: thresholded changed-render areas are 878 px² (crouch; 0.0837%) and 2,038 px² (sit; 0.1944%), localized to the lower-front skirt. This is changed-pixel area, not shorts area. The rendered shorts and skirt share the same ivory material, so visible shorts-only px² is not distinguishable from these captures; no substitute number is asserted. The canonical geometric surface-ray diagnostic gives unchanged shorts coverage of 402/885 per upper thigh in crouch and 401/885 in sit; front-lap union coverage is only 54/532 crouch and 23/532 sit. The lap therefore remains above/hipward of most anterior thigh samples, matching the visible exposed-thigh gaps. The weight change does not fix coverage; appearance, fit and release remain rejected/blocked."
     }
   ],
   "failedGeometryChecks": [

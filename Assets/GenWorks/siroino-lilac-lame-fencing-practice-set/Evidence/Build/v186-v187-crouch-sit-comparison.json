@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "productId": "siroino-lilac-lame-fencing-practice-set",
+  "comparison": "V186 and V187 captured pose renders, same pose-specific camera and resolution, plus per-pixel delta visualization",
+  "thresholds": {
+    "changedPixelChannelDeltaMin": 16,
+    "changedPixelRgbL1Min": 36
+  },
+  "poses": {
+    "crouch": {
+      "sizePx": [
+        1024,
+        1024
+      ],
+      "oldImageSha256": "933743241dd5eaa9d8eec2a95103d062cb3a2c25e8acade6a41243f0856558cb",
+      "newImageSha256": "2bb1cc17f359d9103c60a6e15094524fc914d85d30d623e8ec3c2f1769a734cc",
+      "changedPixels": {
+        "threshold": {
+          "maxAbsChannel": 16,
+          "rgbL1": 36
+        },
+        "countPx2": 878,
+        "fraction": 0.0008373260498046875,
+        "boundingBoxInclusivePx": [
+          501,
+          533,
+          602,
+          626
+        ],
+        "meanChangedRgbL1": 202.03416856492026
+      },
+      "shortsCoverageSamples": {
+        "sampleCountEachThigh": 885,
+        "V186": {
+          "left": 402,
+          "right": 402
+        },
+        "V187": {
+          "left": 402,
+          "right": 402
+        }
+      },
+      "frontLapToAnteriorThighSamples": {
+        "V186": {
+          "hit": 54,
+          "count": 532,
+          "fraction": 0.10150375939849623
+        },
+        "V187": {
+          "hit": 54,
+          "count": 532,
+          "fraction": 0.10150375939849623
+        }
+      }
+    },
+    "sit": {
+      "sizePx": [
+        1024,
+        1024
+      ],
+      "oldImageSha256": "30a4d1551d08ba82432d960445fb2a857ef5eb906d31a012738f1de52d63915c",
+      "newImageSha256": "72e089e0ab6de217c59a508981d2eb82b053556c5af007d494b32c89f5cd529d",
+      "changedPixels": {
+        "threshold": {
+          "maxAbsChannel": 16,
+          "rgbL1": 36
+        },
+        "countPx2": 2038,
+        "fraction": 0.0019435882568359375,
+        "boundingBoxInclusivePx": [
+          487,
+          556,
+          623,
+          655
+        ],
+        "meanChangedRgbL1": 123.70706575073602
+      },
+      "shortsCoverageSamples": {
+        "sampleCountEachThigh": 885,
+        "V186": {
+          "left": 401,
+          "right": 401
+        },
+        "V187": {
+          "left": 401,
+          "right": 401
+        }
+      },
+      "frontLapToAnteriorThighSamples": {
+        "V186": {
+          "hit": 23,
+          "count": 532,
+          "fraction": 0.043233082706766915
+        },
+        "V187": {
+          "hit": 23,
+          "count": 532,
+          "fraction": 0.043233082706766915
+        }
+      }
+    }
+  },
+  "evidenceBoundary": "Pixel delta identifies changed rendered pixels only, not shorts material pixels. The rendered shorts and overskirt share ivory material, so a defensible shorts-only px\u00b2 mask cannot be recovered from these captures. The canonical pose surface-ray diagnostic below separately reports shorts-to-thigh and front-lap-to-thigh sample coverage; it is not a screen-pixel area, pressure, fit, appearance, or runtime acceptance.",
+  "comparisonImagePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/v186-v187-crouch-sit-comparison.png",
+  "comparisonImageSha256": "115e3048aa6179376653bf1f2c81bc8637754bee160903bad96b1ff9cacba34b"
+}

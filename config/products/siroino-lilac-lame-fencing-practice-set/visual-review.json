@@ -29,7 +29,20 @@
       "code": "BODICE_SURFACE_ARTIFACTS",
       "description": "The V187 front and side views still show angular planar shading on the bodice and a small gray patch near the waist; the rear waist flap remains stiff. The surface ownership/cause of the waist patch is unverified. Bodice appearance remains unacceptable.",
       "severity": "BLOCKER"
+    },
+    {
+      "code": "V187_WEIGHT_CHANGE_DID_NOT_IMPROVE_FRONT_COVERAGE",
+      "severity": "BLOCKER",
+      "description": "Direct same-camera crouch/sit comparison V186 vs V187: thresholded changed-render areas are 878 px² (crouch; 0.0837%) and 2,038 px² (sit; 0.1944%), localized to the lower-front skirt. This is changed-pixel area, not shorts area. The rendered shorts and skirt share the same ivory material, so visible shorts-only px² is not distinguishable from these captures; no substitute number is asserted. The canonical geometric surface-ray diagnostic gives unchanged shorts coverage of 402/885 per upper thigh in crouch and 401/885 in sit; front-lap union coverage is only 54/532 crouch and 23/532 sit. The lap therefore remains above/hipward of most anterior thigh samples, matching the visible exposed-thigh gaps. The weight change does not fix coverage; appearance, fit and release remain rejected/blocked."
     }
   ],
-  "nextAction": "Keep REJECT. Before further geometry changes, build a color-coded, same-camera comparison of V186 and V187 for crouch and sit. Quantify visible shorts area (px²) and identify whether each front hem/lap passes above or below the corresponding thigh; preserve all fit and release gates."
+  "nextAction": "Keep REJECT and BLOCKED. Do not continue weight tuning for this coverage defect. Rework lower-front skirt/front-lap geometry so each lap follows down across the anterior thighs in crouch and sit; then generate a component-ID render from the actual mesh to measure shorts-only projected px², directly inspect it, and preserve all fit, deformation, Unity/VRChat, package, and release gates.",
+  "comparisonEvidence": {
+    "path": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/v186-v187-crouch-sit-comparison.png",
+    "sha256": "115e3048aa6179376653bf1f2c81bc8637754bee160903bad96b1ff9cacba34b",
+    "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/v186-v187-crouch-sit-comparison.json",
+    "reportSha256": "0904bacc9ed4b7abc7fb3b6bb474c9c8e7f95a265adb1bd3f5fd999f44899a7e",
+    "method": "same-pose V186/V187 committed render comparison with thresholded pixel-delta panels; canonical pose surface-ray coverage diagnostics carried alongside",
+    "decisionImpact": "REJECT remains; shorts-to-thigh coverage samples were unchanged across revisions, while front-lap coverage remained sparse. Shared ivory material prevents an honest shorts-only pixel mask from these color renders."
+  }
 }

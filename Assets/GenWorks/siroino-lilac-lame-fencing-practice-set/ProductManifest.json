@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Keep REJECT. Before further geometry changes, build a color-coded, same-camera comparison of V186 and V187 for crouch and sit. Quantify visible shorts area (px²) and identify whether each front hem/lap passes above or below the corresponding thigh; preserve all fit and release gates.",
+    "nextAction": "Keep REJECT and BLOCKED. Do not continue weight tuning for this coverage defect. Rework lower-front skirt/front-lap geometry so each lap follows down across the anterior thighs in crouch and sit; then generate a component-ID render from the actual mesh to measure shorts-only projected px², directly inspect it, and preserve all fit, deformation, Unity/VRChat, package, and release gates.",
     "lastAttempt": {
-      "runId": "5e5e88daf13c4330860e216ba7108f17",
+      "runId": "920687341d9a491584597c018a48e878",
       "status": "EXECUTED",
-      "checkedAt": "2026-11-20T14:13:19Z",
+      "checkedAt": "2026-11-20T16:09:51Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "27cc5b60ed6581d94ebb10306884483d3ec2750587a9cc0045e4fbcd04c344e0",
+      "stageEvidenceSha256": "e61207552802c57a6c987ad638327bad1e4b25020284b0dddec7bd1302cb9611",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -99,20 +99,20 @@
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "a47396806453e73a8cb80741ffa2a582d2302872f7a5dd66ab19107da1a6a1f1"
+          "stageResultSha256": "cb03e3c7b5d14f59b1216bdd7c18c121531857431a1de5b9f38fdba54a922980"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "27cc5b60ed6581d94ebb10306884483d3ec2750587a9cc0045e4fbcd04c344e0"
+          "stageResultSha256": "e61207552802c57a6c987ad638327bad1e4b25020284b0dddec7bd1302cb9611"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "77dbb1b1c484dc7752466c357c736d0687a60a327e3cb0a7a6d42280dce551d2",
+      "checkpointSha256": "e29d0b002a5fd21a8bd3123ee3730be39cf3e487bc1b36273d2d50d7402e7d29",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Keep REJECT. Before further geometry changes, build a color-coded, same-camera comparison of V186 and V187 for crouch and sit. Quantify visible shorts area (px²) and identify whether each front hem/lap passes above or below the corresponding thigh; preserve all fit and release gates."
+      "nextAction": "Keep REJECT and BLOCKED. Do not continue weight tuning for this coverage defect. Rework lower-front skirt/front-lap geometry so each lap follows down across the anterior thighs in crouch and sit; then generate a component-ID render from the actual mesh to measure shorts-only projected px², directly inspect it, and preserve all fit, deformation, Unity/VRChat, package, and release gates."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
@@ -135,7 +135,7 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "56828159c8f05f8a3e6444bd9e89a66377748535ec201b5f44ea8ca7aa9c192e",
+      "sha256": "c0ed99503ca495a6982707b022096d5d90c5181f284a61e203380a843787a239",
       "findings": [
         {
           "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
@@ -146,6 +146,11 @@
           "code": "BODICE_SURFACE_ARTIFACTS",
           "description": "The V187 front and side views still show angular planar shading on the bodice and a small gray patch near the waist; the rear waist flap remains stiff. The surface ownership/cause of the waist patch is unverified. Bodice appearance remains unacceptable.",
           "severity": "BLOCKER"
+        },
+        {
+          "code": "V187_WEIGHT_CHANGE_DID_NOT_IMPROVE_FRONT_COVERAGE",
+          "severity": "BLOCKER",
+          "description": "Direct same-camera crouch/sit comparison V186 vs V187: thresholded changed-render areas are 878 px² (crouch; 0.0837%) and 2,038 px² (sit; 0.1944%), localized to the lower-front skirt. This is changed-pixel area, not shorts area. The rendered shorts and skirt share the same ivory material, so visible shorts-only px² is not distinguishable from these captures; no substitute number is asserted. The canonical geometric surface-ray diagnostic gives unchanged shorts coverage of 402/885 per upper thigh in crouch and 401/885 in sit; front-lap union coverage is only 54/532 crouch and 23/532 sit. The lap therefore remains above/hipward of most anterior thigh samples, matching the visible exposed-thigh gaps. The weight change does not fix coverage; appearance, fit and release remain rejected/blocked."
         }
       ],
       "grantsQualityAcceptance": false
@@ -164,6 +169,11 @@
         "code": "BODICE_SURFACE_ARTIFACTS",
         "description": "The V187 front and side views still show angular planar shading on the bodice and a small gray patch near the waist; the rear waist flap remains stiff. The surface ownership/cause of the waist patch is unverified. Bodice appearance remains unacceptable.",
         "severity": "BLOCKER"
+      },
+      {
+        "code": "V187_WEIGHT_CHANGE_DID_NOT_IMPROVE_FRONT_COVERAGE",
+        "severity": "BLOCKER",
+        "description": "Direct same-camera crouch/sit comparison V186 vs V187: thresholded changed-render areas are 878 px² (crouch; 0.0837%) and 2,038 px² (sit; 0.1944%), localized to the lower-front skirt. This is changed-pixel area, not shorts area. The rendered shorts and skirt share the same ivory material, so visible shorts-only px² is not distinguishable from these captures; no substitute number is asserted. The canonical geometric surface-ray diagnostic gives unchanged shorts coverage of 402/885 per upper thigh in crouch and 401/885 in sit; front-lap union coverage is only 54/532 crouch and 23/532 sit. The lap therefore remains above/hipward of most anterior thigh samples, matching the visible exposed-thigh gaps. The weight change does not fix coverage; appearance, fit and release remain rejected/blocked."
       }
     ],
     "inspectedImages": {
