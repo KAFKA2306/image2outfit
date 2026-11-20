@@ -9809,7 +9809,36 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v182-mid-skirt-wrap-gain-20261120",
+  "poseAwareThighAttachment": {
+    "method": "bilateral-deform-bone-surface-placement-v1",
+    "pieceIds": [
+      "overskirt-front-left",
+      "overskirt-front-right",
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right"
+    ],
+    "preserveSharedPieceIds": [
+      "overskirt-back-left",
+      "overskirt-back-right",
+      "waistband-front-left",
+      "waistband-front-right",
+      "waistband-front-lap-left",
+      "waistband-front-lap-right"
+    ],
+    "preservedSeamFadeDistanceM": 0.05,
+    "fadeStartZM": 0.66,
+    "fullBlendZM": 0.56,
+    "normalClearanceM": 0.012,
+    "maximumProjectionDistanceM": 0.16,
+    "maximumBlendWeight": 0.5,
+    "minimumTriangleBoneWeight": 0.05,
+    "leftThighBone": "UpperLeg_L",
+    "rightThighBone": "UpperLeg_R",
+    "bodyMeshNamePrefix": "SiroinoSotai_PC",
+    "maximumFrontYM": 0.04,
+    "evidenceBoundary": "V183 tests a bounded rest-geometry placement of the four authored front skirt/lap panels toward measured UpperLeg deform surfaces, with 50 mm fades at shared front, side, and waistband seams. It retains V182 wrap and V181 15 mm hem relief. This is a disposable pose-response hypothesis, not fit, motion, or visual acceptance."
+  },
+  "designRevision": "v183-seam-faded-thigh-follow-20261120",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
