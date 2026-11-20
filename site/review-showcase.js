@@ -115,6 +115,11 @@
     const reviewHref = safeHref(product.human_review_url);
     const blockers = product.blockers || [];
     const passedImages = (product.assets || []).filter((asset) => asset.href && asset.status === 'PASS').length;
+    const meshDetails = images.filter((asset) => asset.kind === 'mesh' || asset.kind === 'uv');
+    const uvAssets = (product.assets || []).filter((asset) => asset.kind === 'uv');
+    const uvDiagram = uvAssets.find((asset) => asset.href);
+    const uvUnverified = uvAssets.filter((asset) => asset.status === 'UNVERIFIED' && !asset.href);
+    const uvMissing = uvAssets.filter((asset) => asset.status === 'MISSING');
 
     root.innerHTML = `
       <header class="showcase-header">
@@ -159,9 +164,11 @@
 
         <section class="section-block" id="mesh-details">
           <div class="section-head"><h2>UV・トポロジー</h2><p>衣装メッシュの辺と実際のUV配置を展示します。品質やVRChat動作の合格を示すものではありません。</p></div>
-          <div class="render-wall">${images.filter(a => a.kind === 'mesh').map(a => `<article class="render-tile"><a href="${safeHref(a.href)}"><img src="${safeHref(a.href)}" alt="${esc(a.name)}"><span>${a.name === 'uv' ? 'UV配置' : 'トポロジー（正面投影・背面の辺も表示）'}</span></a></article>`).join('')}</div>
-          ${images.some(a => a.name === 'uv' && a.kind === 'mesh') ? '' : '<p>UV配置は未作成、または現在の3Dデータに結び付いた展示図が未生成です。</p>'}
-          ${images.some(a => a.name === 'topology' && a.kind === 'mesh') ? '' : '<p>トポロジー展示図は準備中です。</p>'}
+          <div class="render-wall">${meshDetails.map((asset) => `<article class="render-tile"><a href="${safeHref(asset.href)}"><img src="${safeHref(asset.href)}" alt="${esc(asset.name)}"><span>${asset.kind === 'uv' ? `UV配置 · ${esc(asset.status)}` : 'トポロジー（正面投影・背面の辺も表示）'}</span></a></article>`).join('')}</div>
+          ${uvDiagram ? `<p>UV図の状態: ${esc(uvDiagram.status)} · ${esc(uvDiagram.name)}</p>` : '<p>UV配置図は未作成、または現在の3Dデータに結び付く図がありません。</p>'}
+          ${uvUnverified.length ? `<p>UVの由来が未検証のパーツ: ${uvUnverified.map((asset) => esc(asset.name.replace(/^UV present; provenance unverified:\s*/, ''))).join('、')}</p>` : ''}
+          ${uvMissing.length ? `<p>UV未作成のパーツ: ${uvMissing.map((asset) => esc(asset.name.replace(/^UV not created:\s*/, ''))).join('、')}</p>` : ''}
+          ${meshDetails.some((asset) => asset.name === 'topology') ? '' : '<p>トポロジー展示図は準備中です。</p>'}
         </section>
 
         <section class="section-block">

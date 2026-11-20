@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v180-front-lap-circumferential-curvature-test-20261119",
+  "revision": "v181-shallow-panel-local-hem-pleat-20261120",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,12 +21,12 @@
     {
       "severity": "BLOCKER",
       "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
-      "description": "Direct inspection of all current five views and six pose renders confirms the skirt remains visibly faceted, with irregular pleats, layered/lifting panels, and an uneven hem. V180 reduces lower front-lap circumferential curvature by 20 percent toward the chord, with measured maximum displacement 7.10 mm and zero shared-seam displacement. The diagnostic union changes from V179 80/532 to 69/532 crouch and 21/532 to 18/532 sit, but same-side sit near-distance counts remain 1/266 on each side, with no improvement; front/side panels still open around the legs in crouch and sit. This is a prototype geometry diagnostic, not fit acceptance."
+      "description": "Direct inspection of all current five views and six pose renders shows the 15 mm V181 hem pleat relief is visually less jagged than V180, but the lower skirt still has uneven panel breaks and opens/lifts around the thighs in crouch and sit. The same-pose body-ray diagnostic improves crouch union from 69/532 to 54/532, with left/right same-side hits 11/266 and 10/266; sit union changes from 18/532 to 19/532, with near-distance counts unchanged at 1/266 per side. This is geometry-only evidence and does not establish fit."
     },
     {
       "severity": "BLOCKER",
       "code": "BODICE_SURFACE_ARTIFACTS",
-      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in the current front and posed renders. Their cause is not established by the renders. The visible bodice surface quality remains unacceptable and is a separate blocker from the skirt geometry."
+      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in the current front, arm-cross, crouch, and sit renders. Their cause is not established by the renders. Visible bodice surface quality remains unacceptable and is a separate blocker from the hem relief."
     }
   ],
   "failedGeometryChecks": [

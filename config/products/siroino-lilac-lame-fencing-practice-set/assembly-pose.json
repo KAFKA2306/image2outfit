@@ -46,31 +46,6 @@
     "evidenceBoundary": "V155 applies three bounded 0.12 Laplacian passes to torso panel interiors, then locally backtracks only vertices implicated in face flips or new crease spikes; canonical panel boundaries stay locked. This tests fairing after the prior global guard reduced the requested displacement to 10.7%. It does not establish avatar fit, material quality, appearance approval, or release acceptance."
   },
   "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. V108 tests bounded position fairing on jacket torso panel interiors after V107 shading-only renders did not visibly resolve faceting. Canonical seam vertices remain fixed. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
-  "frontLapCurvatureGeometry": {
-    "method": "front-lap-lower-circumferential-curvature-chord-reduction-v1",
-    "pieceIdsBySide": {
-      "left": [
-        "overskirt-front-lap-left"
-      ],
-      "right": [
-        "overskirt-front-lap-right"
-      ]
-    },
-    "centerSeamOtherPieceId": "opposite-front-lap",
-    "flankSeamPieceIdsBySide": {
-      "left": [
-        "overskirt-front-left"
-      ],
-      "right": [
-        "overskirt-front-right"
-      ]
-    },
-    "curvatureReductionFraction": 0.2,
-    "lowerSectionStartFraction": 0.45,
-    "sharedSeamFadeDistanceM": 0.02,
-    "maximumDisplacementM": 0.02,
-    "evidenceBoundary": "V180 reduces lower front-lap Y curvature by 20 percent toward the per-height chord from center-front to flank seams. Waist and sewn boundaries fade to zero; maximum measured vertex displacement must stay within 20 mm or execution stops. Compared with the V178 base; cloth, side weights, bodice, and other panels stay fixed. This is a geometry diagnostic only and grants no fit, visual, runtime, or release acceptance."
-  },
   "poses": {
     "jacket-front-left": {
       "rotationDegreesXYZ": [
@@ -1353,7 +1328,7 @@
                 [
                   0.46602588331699374,
                   1.0327540437579155,
-                  2.832724526524548e-05
+                  2.832724526524548E-05
                 ],
                 [
                   0.4660173002481461,
@@ -1683,7 +1658,7 @@
                 [
                   0.4549138116054237,
                   1.034465266942978,
-                  -5.813505500555042e-05
+                  -5.813505500555042E-05
                 ],
                 [
                   0.4549046622924507,
@@ -2663,7 +2638,7 @@
                 [
                   0.3430677967816591,
                   1.0409463762044906,
-                  9.349594637751571e-05
+                  9.349594637751571E-05
                 ],
                 [
                   0.34305510099232195,
@@ -2798,7 +2773,7 @@
                 [
                   0.3438138972073793,
                   0.9865169734954834,
-                  2.3979127407073968e-05
+                  2.3979127407073968E-05
                 ],
                 [
                   0.3436575804427266,
@@ -5188,7 +5163,7 @@
                 [
                   -0.46602618220448494,
                   1.03275362855196,
-                  2.821132168173788e-05
+                  2.821132168173788E-05
                 ],
                 [
                   -0.4660175991356373,
@@ -5518,7 +5493,7 @@
                 [
                   -0.4549138711579144,
                   1.0344650289416313,
-                  -5.818757042288787e-05
+                  -5.818757042288787E-05
                 ],
                 [
                   -0.45490475164726374,
@@ -6498,7 +6473,7 @@
                 [
                   -0.34306788608431815,
                   1.0409460189938544,
-                  9.340183436870597e-05
+                  9.340183436870597E-05
                 ],
                 [
                   -0.343055190294981,
@@ -6633,7 +6608,7 @@
                 [
                   -0.3438139269053936,
                   0.9865167346596718,
-                  2.4023622274398863e-05
+                  2.4023622274398863E-05
                 ],
                 [
                   -0.3436576402038336,
@@ -9689,7 +9664,7 @@
     "blenderVersion": "4.4.3",
     "bone": "Neck",
     "headBlenderM": [
-      -2.053701209092651e-09,
+      -2.053701209092651E-09,
       -0.0093428585678339,
       1.0351301431655884
     ],
@@ -9772,7 +9747,7 @@
     "hemExtensionM": 0.07,
     "foldCount": 8,
     "topologySubdivisionFactor": 4,
-    "hemFoldDepthM": 0.04,
+    "hemFoldDepthM": 0.015,
     "phaseRadians": 0,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
@@ -9792,7 +9767,7 @@
       ],
       "evidenceBoundary": "V138 restores 15 mm additional front hem extension and 4 mm forward projection after the larger V137 extension formed a shield and side wedge. Common host/lap panel boundaries remain. Pose coverage, fit, drape, and appearance remain unapproved."
     },
-    "evidenceBoundary": "V160 narrows the six authored overskirt hem endpoints by 18% from fixed waist seam correspondences. Waist edges, sewn joins, panel drop, three-cycle relief and pose response are held. This tests the broad-face flare hypothesis; it provides no visual acceptance or fit evidence.",
+    "evidenceBoundary": "V181 reduces the panel-local hem pleat radial relief from 40 mm to 15 mm across the same six authored panels, retaining the 3 folds per panel, flat-crest profile, hem/waist bounds, seam boundaries, and all other garment inputs. Test whether a shallower pattern relief reduces faceted/jagged silhouette. No fit, pose, material, appearance, runtime, or release acceptance is implied.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9834,7 +9809,7 @@
     "minimumTriangleBoneWeight": 0.01,
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
-  "designRevision": "v180-front-lap-circumferential-curvature-test-20261119",
+  "designRevision": "v181-shallow-panel-local-hem-pleat-20261120",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
