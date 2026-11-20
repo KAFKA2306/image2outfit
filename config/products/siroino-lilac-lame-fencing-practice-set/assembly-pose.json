@@ -9491,7 +9491,7 @@
     "maximumZM": 1.12,
     "fullWeightAbsXM": 0.14,
     "fadeEndAbsXM": 0.17,
-    "normalClearanceM": 0.004,
+    "normalClearanceM": 0.008,
     "maximumProjectionDistanceM": 0.12,
     "outerPieceId": "jacket-overlap-front",
     "outerLayerOffsetM": 0.002,
@@ -9500,7 +9500,7 @@
       "stand-collar"
     ],
     "preservedSeamFadeDistanceM": 0.04,
-    "evidenceBoundary": "Second bounded pass after general V121 placement, restricted to the two jacket front panels and capped at 0.98 to correct measured residual bust intrusion without full projection. Original faces/shared sewn vertices remain and face-collapse checks stay active. This is a prototype placement hypothesis; visible coverage, strain, shape-key fit, motion and release remain unapproved."
+    "evidenceBoundary": "V184 tests an 8 mm body-normal clearance in this second bounded pass, up from 4 mm, restricted to the two jacket front panels. V183 renders retained gray body-colored chest/waist patches; cause remains unverified, so this is a single-variable interpenetration hypothesis, not a visual repair or fit acceptance. Original faces/shared sewn vertices remain and face-collapse checks stay active."
   },
   "shortsOrientationEvidence": {
     "frontAxis": "GarmentCode +Z = Blender -Y",
@@ -9838,7 +9838,7 @@
     "maximumFrontYM": 0.04,
     "evidenceBoundary": "V183 tests a bounded rest-geometry placement of the four authored front skirt/lap panels toward measured UpperLeg deform surfaces, with 50 mm fades at shared front, side, and waistband seams. It retains V182 wrap and V181 15 mm hem relief. This is a disposable pose-response hypothesis, not fit, motion, or visual acceptance."
   },
-  "designRevision": "v183-seam-faded-thigh-follow-20261120",
+  "designRevision": "v184-front-bodice-clearance-check-20261120",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
