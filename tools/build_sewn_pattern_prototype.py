@@ -3155,7 +3155,88 @@ def place_declared_skirt_folds(mesh, pose, native_vertices):
             "grantsFitAcceptance": False, "grantsVisualAcceptance": False}
 
 
-def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path):
+def _declared_hem_vertices(mesh, pattern_contract, piece_ids):
+    """Find only open mesh edges that map to authored 2D hem edges."""
+    from collections import defaultdict
+
+    piece_by_id = {
+        item.get("pieceId"): item for item in pattern_contract.get("pieces", [])
+        if isinstance(item, dict) and isinstance(item.get("pieceId"), str)
+    }
+    scale = float(mesh.get("patternCoordinateUnitsPerMeter", 0.0))
+    if not math.isfinite(scale) or scale <= 0:
+        raise ValueError("Canonical pattern coordinate scale is missing for hem preservation")
+    hem_segments = {}
+    for piece_id in piece_ids:
+        piece = piece_by_id.get(piece_id)
+        if piece is None or not isinstance(piece.get("boundary"), list):
+            raise ValueError(f"Declared authored hem piece is missing: {piece_id}")
+        boundaries = [edge for edge in piece.get("edges", []) if edge.get("role") == "hem"]
+        if len(boundaries) != 1:
+            raise ValueError(f"Expected one authored hem edge for {piece_id}")
+        edge = boundaries[0]
+        first, second = edge.get("startVertex"), edge.get("endVertex")
+        boundary = piece["boundary"]
+        if (not isinstance(first, int) or not isinstance(second, int)
+                or not 0 <= first < len(boundary) or not 0 <= second < len(boundary)
+                or first == second):
+            raise ValueError(f"Authored hem endpoints are invalid for {piece_id}")
+        hem_segments[piece_id] = tuple(
+            (float(boundary[index][0]) * scale, float(boundary[index][1]) * scale)
+            for index in (first, second)
+        )
+
+    coordinates = mesh.get("facePatternCoordinates")
+    if not isinstance(coordinates, list) or len(coordinates) != len(mesh["faces"]):
+        raise ValueError("Canonical face-corner coordinates are missing for hem preservation")
+    edge_uses = defaultdict(list)
+    for face_index, face in enumerate(mesh["faces"]):
+        if len(coordinates[face_index]) != len(face):
+            raise ValueError(f"Pattern coordinates do not match face {face_index}")
+        for local_index, vertex_id in enumerate(face):
+            next_index = (local_index + 1) % len(face)
+            next_vertex_id = face[next_index]
+            edge_uses[tuple(sorted((vertex_id, next_vertex_id)))].append(
+                (face_index, local_index, next_index)
+            )
+
+    locked_vertices = set()
+    matched_edges = defaultdict(int)
+    tolerance = 1e-4
+    for edge_key, uses in edge_uses.items():
+        if len(uses) != 1:
+            continue
+        face_index, first_local, second_local = uses[0]
+        piece_id = mesh["facePieceIds"][face_index]
+        segment = hem_segments.get(piece_id)
+        if segment is None:
+            continue
+        points = coordinates[face_index]
+
+        def on_segment(point):
+            first, second = segment
+            dx, dy = second[0] - first[0], second[1] - first[1]
+            px, py = point[0] - first[0], point[1] - first[1]
+            length_squared = dx * dx + dy * dy
+            if length_squared <= 1e-16:
+                raise ValueError(f"Authored hem segment has zero length for {piece_id}")
+            fraction = (px * dx + py * dy) / length_squared
+            if not -tolerance <= fraction <= 1.0 + tolerance:
+                return False
+            nearest = (first[0] + min(1.0, max(0.0, fraction)) * dx,
+                       first[1] + min(1.0, max(0.0, fraction)) * dy)
+            return math.hypot(point[0] - nearest[0], point[1] - nearest[1]) <= tolerance
+
+        if on_segment(points[first_local]) and on_segment(points[second_local]):
+            locked_vertices.update(edge_key)
+            matched_edges[piece_id] += 1
+    missing = set(piece_ids) - set(matched_edges)
+    if missing:
+        raise ValueError(f"Authored open hem edge was not found for {sorted(missing)}")
+    return locked_vertices, dict(sorted(matched_edges.items()))
+
+
+def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, pattern_contract):
     """Transfer front apron panels onto measured deform-bone thigh surfaces.
 
     The neutral skirt envelope is useful for the waist and side silhouette but
@@ -3235,12 +3316,32 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path):
     for face, piece_id in zip(mesh["faces"], mesh["facePieceIds"]):
         for vertex_id in face:
             owners[vertex_id].add(piece_id)
+    incident_faces = defaultdict(list)
+    reference_face_normals = []
+    reference_face_minimum_areas = []
+    reference_vertices = [Vector(values) for values in mesh["vertices"]]
+    for face_index, face in enumerate(mesh["faces"]):
+        a, b, c = (reference_vertices[vertex_id] for vertex_id in face)
+        reference_normal = (b - a).cross(c - a)
+        reference_face_normals.append(reference_normal)
+        reference_face_minimum_areas.append(max(1e-12, reference_normal.length * 1e-4))
+        for vertex_id in face:
+            incident_faces[vertex_id].append(face_index)
     seam_factors = preserved_seam_factors(mesh, spec)
+    hem_piece_ids = set(spec.get("preserveHemPieceIds", []))
+    locked_hem_vertices, matched_hem_edges = _declared_hem_vertices(
+        mesh, pattern_contract, hem_piece_ids
+    ) if hem_piece_ids else (set(), {})
     before = json.dumps(mesh["vertices"], separators=(",", ":"))
     moved = {"left": 0, "right": 0}
+    backtracked_vertex_count = 0
+    backtrack_attempt_count = 0
+    applied_blend_weights = []
     max_distance = 0.0
     max_displacement = 0.0
     for index, point_values in enumerate(mesh["vertices"]):
+        if index in locked_hem_vertices:
+            continue
         if not owners[index].intersection(selected):
             continue
         point = Vector(point_values)
@@ -3265,10 +3366,36 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path):
         if (point - location).dot(normal) < 0:
             normal.negate()
         target = location + normal * clearance
-        placed = point.lerp(target, factor)
+        requested_factor = factor
+        placed = point
+        accepted = False
+        for _attempt in range(13):
+            candidate = point.lerp(target, factor)
+            candidate_is_safe = True
+            for face_index in incident_faces.get(index, ()):
+                face = mesh["faces"][face_index]
+                trial = [candidate if vertex_id == index else Vector(mesh["vertices"][vertex_id])
+                         for vertex_id in face]
+                trial_normal = (trial[1] - trial[0]).cross(trial[2] - trial[0])
+                if (trial_normal.length * 0.5 < reference_face_minimum_areas[face_index]
+                        or trial_normal.dot(reference_face_normals[face_index]) <= 0.0):
+                    candidate_is_safe = False
+                    break
+            if candidate_is_safe:
+                placed = candidate
+                accepted = True
+                break
+            factor *= 0.5
+            backtrack_attempt_count += 1
+        if not accepted:
+            factor = 0.0
+        if factor < requested_factor * (1.0 - 1e-8):
+            backtracked_vertex_count += 1
+        applied_blend_weights.append(factor)
         displacement = (placed - point).length
         mesh["vertices"][index] = list(placed)
-        moved[side] += 1
+        if displacement > 1e-8:
+            moved[side] += 1
         max_distance = max(max_distance, distance)
         max_displacement = max(max_displacement, displacement)
     if not sum(moved.values()):
@@ -3287,6 +3414,21 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path):
         "targetBodyObject": body.name,
         "targetTriangleCountByThigh": side_triangle_counts,
         "panelIds": sorted(selected),
+        "preservedAuthoredHem": {
+            "pieceIds": sorted(hem_piece_ids),
+            "lockedVertexCount": len(locked_hem_vertices),
+            "matchedOpenEdgeCountByPiece": matched_hem_edges,
+            "method": "lock-topological-open-edges-matched-to-canonical-2d-hem",
+        },
+        "requestedMaximumBlendWeight": max_blend,
+        "appliedBlendWeight": {
+            "minimum": min(applied_blend_weights),
+            "mean": sum(applied_blend_weights) / len(applied_blend_weights),
+            "maximum": max(applied_blend_weights),
+            "backtrackedVertexCount": backtracked_vertex_count,
+            "backtrackAttemptCount": backtrack_attempt_count,
+            "constraint": "preserve-positive-reference-face-orientation-and-at-least-0.01-percent-reference-area",
+        },
         "movedVertexCountByThigh": moved,
         "maximumNearestSurfaceDistanceM": max_distance,
         "maximumRestDisplacementM": max_displacement,
@@ -3830,8 +3972,9 @@ def main():
     skirt_fold_native_vertices = [list(point) for point in mesh["vertices"]]
     fold_evidence = place_declared_skirt_folds(mesh, pose, skirt_fold_native_vertices)
     assert_mesh_triangle_area("declared skirt fold placement")
+    pattern_contract = read(resolve(pipeline["patternContractPath"]))
     thigh_attachment_evidence = place_skirt_front_on_thigh_surfaces(
-        mesh, body_objects, pose, resolve(job["targetSourcePath"])
+        mesh, body_objects, pose, resolve(job["targetSourcePath"]), pattern_contract
     )
     assert_mesh_triangle_area("thigh-surface front attachment")
     thigh_surface_shell_evidence = append_declared_thigh_surface_shell(

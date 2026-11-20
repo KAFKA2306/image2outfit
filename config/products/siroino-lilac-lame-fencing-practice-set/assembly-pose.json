@@ -9817,6 +9817,10 @@
       "overskirt-front-lap-left",
       "overskirt-front-lap-right"
     ],
+    "preserveHemPieceIds": [
+      "overskirt-front-lap-left",
+      "overskirt-front-lap-right"
+    ],
     "preserveSharedPieceIds": [
       "overskirt-back-left",
       "overskirt-back-right",
@@ -9830,15 +9834,15 @@
     "fullBlendZM": 0.56,
     "normalClearanceM": 0.012,
     "maximumProjectionDistanceM": 0.16,
-    "maximumBlendWeight": 0.5,
+    "maximumBlendWeight": 0.9,
     "minimumTriangleBoneWeight": 0.05,
     "leftThighBone": "UpperLeg_L",
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V183 tests a bounded rest-geometry placement of the four authored front skirt/lap panels toward measured UpperLeg deform surfaces, with 50 mm fades at shared front, side, and waistband seams. It retains V182 wrap and V181 15 mm hem relief. This is a disposable pose-response hypothesis, not fit, motion, or visual acceptance."
+    "evidenceBoundary": "V189 tests up to 90% lower-front panel placement on the measured same-side UpperLeg surface instead of a 50% rest-geometry blend. The build backtracks vertices to preserve incident sewn-face area and orientation. The exact authored open front-lap hem edges are now locked during surface placement after the first trial exceeded the unchanged 100 mm hem-range contract by 6 mm; the 50 mm shared-seam fades, authored 2D bounds, skirt length, and skin weights remain unchanged. This geometry hypothesis does not establish fit, motion, or visual acceptance."
   },
-  "designRevision": "v188-front-apron-thigh-coverage-20261121",
+  "designRevision": "v189-full-thigh-surface-front-panel-20261121",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
