@@ -12,6 +12,7 @@ from pathlib import Path
 
 import bpy
 from mathutils import Matrix, Vector
+from mathutils.kdtree import KDTree
 from mathutils.bvhtree import BVHTree
 from mathutils.geometry import barycentric_transform
 
@@ -1915,6 +1916,29 @@ def main():
                     raise ValueError(
                         "Invalid capped center-hem prototype weight profile"
                     )
+            pose_follow = profile.get("poseThighFollowAdjustment")
+            if pose_follow is not None:
+                follow_piece_ids = set(pose_follow.get("pieceIds", []))
+                fade_start_z = pose_follow.get("fadeStartZM", math.nan)
+                full_weight_z = pose_follow.get("fullWeightZM", math.nan)
+                seam_fade_distance = pose_follow.get("seamFadeDistanceM", math.nan)
+                additional_weight = pose_follow.get(
+                    "maximumAdditionalThighWeight", math.nan
+                )
+                if (
+                    pose_follow.get("method")
+                    != "exclusive-lower-front-panel-same-side-thigh-follow-v1"
+                    or not follow_piece_ids
+                    or not follow_piece_ids.issubset(profile_piece_ids)
+                    or not math.isfinite(fade_start_z)
+                    or not math.isfinite(full_weight_z)
+                    or full_weight_z >= fade_start_z
+                    or not math.isfinite(seam_fade_distance)
+                    or not 0 < seam_fade_distance <= 0.05
+                    or not math.isfinite(additional_weight)
+                    or not 0 < additional_weight <= 0.15
+                ):
+                    raise ValueError("Invalid bounded pose thigh-follow adjustment")
             for bone_name in (
                 profile["hipBone"],
                 profile["leftThighBone"],
@@ -2035,6 +2059,37 @@ def main():
                 "authoredLeftSideVertexCount": 0,
                 "authoredRightSideVertexCount": 0,
             }
+            pose_follow = profile.get("poseThighFollowAdjustment")
+            if pose_follow is not None:
+                follow_piece_ids = set(pose_follow["pieceIds"])
+                seam_vertices = [
+                    index
+                    for index, owner_set in enumerate(owners)
+                    if owner_set.intersection(follow_piece_ids) and len(owner_set) > 1
+                ]
+                if not seam_vertices:
+                    raise ValueError(
+                        f"Pose thigh-follow adjustment found no shared seam vertices on {obj.name}"
+                    )
+                seam_tree = KDTree(len(seam_vertices))
+                for index in seam_vertices:
+                    seam_tree.insert(object_coordinates[index], index)
+                seam_tree.balance()
+                profile_accumulators[profile_key]["poseThighFollow"] = {
+                    "method": pose_follow["method"],
+                    "pieceIds": sorted(follow_piece_ids),
+                    "sharedSeamVertexCount": len(seam_vertices),
+                    "exclusiveCandidateVertexCount": 0,
+                    "adjustedVertexCount": 0,
+                    "weightDeltas": [],
+                    "maximumAdditionalThighWeight": pose_follow[
+                        "maximumAdditionalThighWeight"
+                    ],
+                    "seamFadeDistanceM": pose_follow["seamFadeDistanceM"],
+                    "fadeStartZM": pose_follow["fadeStartZM"],
+                    "fullWeightZM": pose_follow["fullWeightZM"],
+                }
+                profile_accumulators[profile_key]["poseThighFollowTree"] = seam_tree
         raw = {}
         for vertex in obj.data.vertices:
             point = object_coordinates[vertex.index]
@@ -2220,6 +2275,45 @@ def main():
                 elif authored_right and not authored_left:
                     thigh_bone = profile["rightThighBone"]
                     profile_accumulators[profile_key]["authoredRightSideVertexCount"] += 1
+                pose_follow = profile.get("poseThighFollowAdjustment")
+                pose_follow_record = profile_accumulators[profile_key].get(
+                    "poseThighFollow"
+                )
+                if (
+                    pose_follow is not None
+                    and pose_follow_record is not None
+                    and owners[vertex.index].intersection(pose_follow["pieceIds"])
+                ):
+                    if len(owners[vertex.index]) == 1:
+                        pose_follow_record["exclusiveCandidateVertexCount"] += 1
+                        _, _, seam_distance = profile_accumulators[
+                            profile_key
+                        ]["poseThighFollowTree"].find(point)
+                        height_fade = _smoothstep(
+                            (pose_follow["fadeStartZM"] - point.z)
+                            / (pose_follow["fadeStartZM"] - pose_follow["fullWeightZM"])
+                        )
+                        seam_fade = _smoothstep(
+                            seam_distance / pose_follow["seamFadeDistanceM"]
+                        )
+                        requested_delta = (
+                            pose_follow["maximumAdditionalThighWeight"]
+                            * height_fade
+                            * seam_fade
+                        )
+                        local_maximum = min(
+                            0.75,
+                            profile.get("maximumThighWeight", thigh_weight)
+                            + pose_follow["maximumAdditionalThighWeight"],
+                        )
+                        applied_delta = min(
+                            requested_delta,
+                            max(0.0, local_maximum - thigh_weight),
+                        )
+                        if applied_delta > 0:
+                            thigh_weight += applied_delta
+                            pose_follow_record["adjustedVertexCount"] += 1
+                            pose_follow_record["weightDeltas"].append(applied_delta)
                 if thigh_weight > 0:
                     if centerline_thigh_weight > 0:
                         side_weight = max(0.0, thigh_weight - centerline_thigh_weight)
@@ -2287,6 +2381,37 @@ def main():
                         / len(accumulator["thighWeights"]),
                         "maximum": max(accumulator["thighWeights"]),
                     },
+                    "poseThighFollowAdjustment": (
+                        {
+                            **{
+                                key: value
+                                for key, value in accumulator["poseThighFollow"].items()
+                                if key != "weightDeltas"
+                            },
+                            "actualWeightDelta": {
+                                "minimum": min(
+                                    accumulator["poseThighFollow"]["weightDeltas"]
+                                )
+                                if accumulator["poseThighFollow"]["weightDeltas"]
+                                else 0.0,
+                                "mean": (
+                                    sum(accumulator["poseThighFollow"]["weightDeltas"])
+                                    / len(accumulator["poseThighFollow"]["weightDeltas"])
+                                )
+                                if accumulator["poseThighFollow"]["weightDeltas"]
+                                else 0.0,
+                                "maximum": max(
+                                    accumulator["poseThighFollow"]["weightDeltas"]
+                                )
+                                if accumulator["poseThighFollow"]["weightDeltas"]
+                                else 0.0,
+                            },
+                            "grantsPoseAcceptance": False,
+                            "grantsFitAcceptance": False,
+                        }
+                        if "poseThighFollow" in accumulator
+                        else None
+                    ),
                     "grantsFitAcceptance": False,
                     "evidenceBoundary": accumulator["profile"]["evidenceBoundary"],
                 }

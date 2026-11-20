@@ -105,6 +105,45 @@
                   }
                 }
               },
+              "poseThighFollowAdjustment": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "method",
+                  "pieceIds",
+                  "maximumAdditionalThighWeight",
+                  "fadeStartZM",
+                  "fullWeightZM",
+                  "seamFadeDistanceM",
+                  "reason",
+                  "evidenceBoundary"
+                ],
+                "properties": {
+                  "method": {
+                    "const": "exclusive-lower-front-panel-same-side-thigh-follow-v1"
+                  },
+                  "pieceIds": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {"type": "string", "minLength": 1}
+                  },
+                  "maximumAdditionalThighWeight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 0.15
+                  },
+                  "fadeStartZM": {"type": "number"},
+                  "fullWeightZM": {"type": "number"},
+                  "seamFadeDistanceM": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 0.05
+                  },
+                  "reason": {"type": "string", "minLength": 1},
+                  "evidenceBoundary": {"type": "string", "minLength": 1}
+                }
+              },
               "hipBone": {
                 "type": "string",
                 "minLength": 1
