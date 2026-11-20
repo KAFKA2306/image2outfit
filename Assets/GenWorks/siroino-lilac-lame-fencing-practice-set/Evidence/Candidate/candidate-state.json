@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v181-shallow-panel-local-hem-pleat-20261120",
+  "revision": "v182-mid-skirt-wrap-gain-20261120",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,12 +21,12 @@
     {
       "severity": "BLOCKER",
       "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
-      "description": "Direct inspection of all current five views and six pose renders shows the 15 mm V181 hem pleat relief is visually less jagged than V180, but the lower skirt still has uneven panel breaks and opens/lifts around the thighs in crouch and sit. The same-pose body-ray diagnostic improves crouch union from 69/532 to 54/532, with left/right same-side hits 11/266 and 10/266; sit union changes from 18/532 to 19/532, with near-distance counts unchanged at 1/266 per side. This is geometry-only evidence and does not establish fit."
+      "description": "Direct inspection of all five current views and six pose renders for V182: the neutral front and side skirt outline appears more continuous, but the crouch and sit renders still show substantial anterior thigh exposure and skirt panels lifting/folding away from the thighs. The V182 wrap change therefore does not resolve the observed motion silhouette. This is prototype geometry evidence only and does not establish fit."
     },
     {
       "severity": "BLOCKER",
       "code": "BODICE_SURFACE_ARTIFACTS",
-      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in the current front, arm-cross, crouch, and sit renders. Their cause is not established by the renders. Visible bodice surface quality remains unacceptable and is a separate blocker from the hem relief."
+      "description": "Gray body-colored-looking patches and hard facets remain across the ivory chest and waist in the current front, arm-cross, crouch, and sit renders. Their cause is not established by the renders. Visible bodice surface quality remains unacceptable and is a separate blocker from the skirt wrap."
     }
   ],
   "failedGeometryChecks": [
