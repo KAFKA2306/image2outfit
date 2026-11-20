@@ -2250,6 +2250,8 @@ def stage_render(job: Mapping[str, Any], result: Path) -> None:
             "--",
             "--job",
             str(ROOT / "config/products" / product_id / "job.json"),
+            "--component-id-dir",
+            str(runtime_root(product_id) / "renders/component-id"),
         ]
         execution = subprocess.run(
             command, cwd=ROOT, capture_output=True, text=True, check=False
@@ -2257,13 +2259,65 @@ def stage_render(job: Mapping[str, Any], result: Path) -> None:
         log.write_text(execution.stdout + "\n" + execution.stderr, encoding="utf-8")
         if execution.returncode:
             raise RuntimeError(f"Weighted render failed: {execution.stderr[-2500:]}")
+        weighted_render_path = runtime_root(product_id) / "reports/weighted-render.json"
+        weighted_render = read_object(weighted_render_path, "weighted render")
+        skin = read_object(runtime_root(product_id) / "skin/skin-export-report.json", "skin export")
+        component_ids = weighted_render.get("componentIdDiagnostics")
+        if (
+            weighted_render.get("productId") != product_id
+            or weighted_render.get("sourceSha256") != skin.get("weightedBlendSha256")
+            or not isinstance(component_ids, list)
+            or {item.get("name") for item in component_ids} != {"crouch", "sit"}
+        ):
+            raise ValueError("weighted render is missing crouch/sit component-ID evidence")
+        component_id_paths = []
+        component_id_summary = {}
+        for item in component_ids:
+            image_path = repo_path(item.get("path", ""), label="component-ID render")
+            if (
+                not image_path.is_file()
+                or sha256(image_path) != item.get("sha256")
+                or item.get("sourceSha256") != skin.get("weightedBlendSha256")
+                or item.get("width") != 1024
+                or item.get("height") != 1024
+                or not isinstance(item.get("shortsOnlyProjectedPixelCount"), int)
+            ):
+                raise ValueError(
+                    "component-ID render evidence is stale or invalid: "
+                    + json.dumps(
+                        {
+                            "name": item.get("name"),
+                            "exists": image_path.is_file(),
+                            "sha256Matches": image_path.is_file()
+                            and sha256(image_path) == item.get("sha256"),
+                            "sourceMatches": item.get("sourceSha256")
+                            == skin.get("weightedBlendSha256"),
+                            "width": item.get("width"),
+                            "height": item.get("height"),
+                            "pixelCount": item.get("shortsOnlyProjectedPixelCount"),
+                            "pixelCountType": type(
+                                item.get("shortsOnlyProjectedPixelCount")
+                            ).__name__,
+                        },
+                        sort_keys=True,
+                    )
+                )
+            component_id_paths.append(image_path)
+            component_id_summary[item["name"]] = {
+                "path": relative(image_path),
+                "sha256": item["sha256"],
+                "sourceSha256": item["sourceSha256"],
+                "shortsOnlyProjectedPixelCount": item["shortsOnlyProjectedPixelCount"],
+                "visibleProjectedPixels": item.get("visibleProjectedPixels"),
+            }
         render_artifacts = [
             log,
-            runtime_root(product_id) / "reports/weighted-render.json",
+            weighted_render_path,
             repo_path(
                 f"{job['productRoot']}/Evidence/Build/pose-coverage-diagnostic.json",
                 label="pose coverage diagnostic",
             ),
+            *component_id_paths,
         ]
     images = review_image_paths(job)
     view_count = len(job["previewPaths"])
@@ -2275,6 +2329,7 @@ def stage_render(job: Mapping[str, Any], result: Path) -> None:
         extra={
             "fiveViewCount": view_count,
             "poseEvidenceCount": len(images) - view_count,
+            "componentIdProjectedPixels": component_id_summary,
         },
     )
 

@@ -1,6 +1,7 @@
 """Render the actual weighted prototype and imported target for direct review."""
 
 import argparse
+import array
 import hashlib
 import json
 import math
@@ -49,6 +50,176 @@ def raise_arms_world_up(armature):
             "pointsUp": True,
         }
     return evidence
+
+
+def _component_category(piece_id):
+    if piece_id.startswith("shorts-"):
+        return "shorts"
+    if piece_id.startswith("overskirt-front-lap-"):
+        return "front-lap"
+    if piece_id.startswith("overskirt-"):
+        return "overskirt"
+    return "other-garment"
+
+
+def _component_id_materials():
+    colors = {
+        "shorts": (0.0, 1.0, 1.0, 1.0),
+        "front-lap": (1.0, 0.0, 0.0, 1.0),
+        "overskirt": (0.0, 0.15, 1.0, 1.0),
+        "other-garment": (1.0, 0.0, 1.0, 1.0),
+        "avatar": (0.0, 1.0, 0.0, 1.0),
+    }
+    materials = {}
+    for category, color in colors.items():
+        material = bpy.data.materials.new(f"__component_id_{category}")
+        material.use_nodes = True
+        nodes = material.node_tree.nodes
+        nodes.clear()
+        emission = nodes.new("ShaderNodeEmission")
+        emission.inputs["Color"].default_value = color
+        output = nodes.new("ShaderNodeOutputMaterial")
+        material.node_tree.links.new(emission.outputs["Emission"], output.inputs["Surface"])
+        materials[category] = material
+    return materials
+
+
+def _enable_component_id_materials(objects, scene):
+    """Temporarily assign solid semantic colors to the actual evaluated garment mesh."""
+    materials = _component_id_materials()
+    snapshots = []
+    for obj in objects:
+        if obj.type != "MESH" or obj == bpy.context.scene.camera:
+            continue
+        mesh = obj.data
+        original_materials = list(mesh.materials)
+        original_indices = [polygon.material_index for polygon in mesh.polygons]
+        snapshots.append((obj, mesh, original_materials, original_indices))
+        if obj.get("prototypeRole") == "target-avatar-reference-only":
+            category_indices = ["avatar"] * len(mesh.polygons)
+        elif obj.get("prototypeRole") == "weighted-unfit-sewn-prototype":
+            try:
+                piece_ids = json.loads(obj["canonicalPieceIds"])
+            except (KeyError, TypeError, json.JSONDecodeError) as error:
+                raise ValueError(f"component-ID render lacks piece ownership on {obj.name}") from error
+            ownership = mesh.attributes.get("canonical_piece_index")
+            if ownership is None or ownership.domain != "FACE" or len(ownership.data) != len(mesh.polygons):
+                raise ValueError(f"component-ID render lacks face ownership on {obj.name}")
+            category_indices = []
+            for face_owner in ownership.data:
+                if face_owner.value < 0 or face_owner.value >= len(piece_ids):
+                    raise ValueError(f"component-ID render found invalid face ownership on {obj.name}")
+                category_indices.append(_component_category(piece_ids[face_owner.value]))
+        else:
+            category_indices = ["other-garment"] * len(mesh.polygons)
+
+        mesh.materials.clear()
+        category_order = list(materials)
+        for category in category_order:
+            mesh.materials.append(materials[category])
+        category_slots = {category: index for index, category in enumerate(category_order)}
+        for polygon, category in zip(mesh.polygons, category_indices):
+            polygon.material_index = category_slots[category]
+
+    original_scene = {
+        "viewTransform": scene.view_settings.view_transform,
+        "look": scene.view_settings.look,
+        "exposure": scene.view_settings.exposure,
+        "gamma": scene.view_settings.gamma,
+        "world": scene.world,
+        "worldUseNodes": scene.world.use_nodes if scene.world else None,
+        "worldColor": tuple(scene.world.color) if scene.world else None,
+        "worldBackgroundColor": None,
+        "worldBackgroundStrength": None,
+    }
+    if scene.world and scene.world.use_nodes:
+        background = next(
+            (node for node in scene.world.node_tree.nodes if node.type == "BACKGROUND"),
+            None,
+        )
+        if background:
+            original_scene["worldBackgroundColor"] = tuple(background.inputs["Color"].default_value)
+            original_scene["worldBackgroundStrength"] = background.inputs["Strength"].default_value
+            background.inputs["Color"].default_value = (0.0, 0.0, 0.0, 1.0)
+            background.inputs["Strength"].default_value = 0.0
+    scene.view_settings.view_transform = "Standard"
+    scene.view_settings.look = "None"
+    scene.view_settings.exposure = 0.0
+    scene.view_settings.gamma = 1.0
+    if scene.world and not scene.world.use_nodes:
+        scene.world.color = (0.0, 0.0, 0.0)
+    return snapshots, original_scene
+
+
+def _restore_component_id_materials(snapshots, original_scene, scene):
+    for _obj, mesh, original_materials, original_indices in snapshots:
+        mesh.materials.clear()
+        for material in original_materials:
+            mesh.materials.append(material)
+        for polygon, material_index in zip(mesh.polygons, original_indices):
+            polygon.material_index = material_index
+    scene.view_settings.view_transform = original_scene["viewTransform"]
+    scene.view_settings.look = original_scene["look"]
+    scene.view_settings.exposure = original_scene["exposure"]
+    scene.view_settings.gamma = original_scene["gamma"]
+    scene.world = original_scene["world"]
+    if scene.world:
+        scene.world.use_nodes = original_scene["worldUseNodes"]
+        scene.world.color = original_scene["worldColor"]
+        if scene.world.use_nodes and original_scene["worldBackgroundColor"] is not None:
+            background = next(
+                (node for node in scene.world.node_tree.nodes if node.type == "BACKGROUND"),
+                None,
+            )
+            if background:
+                background.inputs["Color"].default_value = original_scene["worldBackgroundColor"]
+                background.inputs["Strength"].default_value = original_scene["worldBackgroundStrength"]
+
+
+def _count_component_pixels(path):
+    image = bpy.data.images.load(str(path), check_existing=False)
+    width, height = map(int, image.size)
+    if width <= 0 or height <= 0:
+        bpy.data.images.remove(image)
+        raise ValueError("component-ID PNG has invalid dimensions")
+    pixels = array.array("f", [0.0]) * (width * height * 4)
+    image.pixels.foreach_get(pixels)
+    counts = {"shorts": 0, "front-lap": 0, "overskirt": 0, "other-garment": 0, "avatar": 0}
+    for offset in range(0, len(pixels), 4):
+        r, g, b = pixels[offset], pixels[offset + 1], pixels[offset + 2]
+        channel = max(range(3), key=(r, g, b).__getitem__)
+        maximum = (r, g, b)[channel]
+        if maximum < 0.05:
+            continue
+        if channel == 0:
+            counts["front-lap" if g < 0.20 and b < 0.20 else "other-garment"] += 1
+        elif channel == 1:
+            counts["shorts" if r < 0.20 and b > 0.20 else "avatar"] += 1
+        else:
+            counts["overskirt"] += 1
+    bpy.data.images.remove(image)
+    return width, height, counts
+
+
+def render_component_id(objects, scene, output, expected_source_sha256):
+    """Render the current pose with face-owner color IDs and count visible category pixels."""
+    snapshots, original_scene = _enable_component_id_materials(objects, scene)
+    try:
+        scene.render.filepath = str(output)
+        bpy.ops.render.render(write_still=True)
+        width, height, counts = _count_component_pixels(output)
+        return {
+            "path": str(output),
+            "sha256": digest(output),
+            "sourceSha256": expected_source_sha256,
+            "width": width,
+            "height": height,
+            "visibleProjectedPixels": counts,
+            "shortsOnlyProjectedPixelCount": counts["shorts"],
+            "evidenceBoundary": "Color-ID pixels are rendered from canonical face ownership on the current weighted prototype, with depth occlusion from the avatar and all garment components. Counts are projected visible pixels at the declared orthographic pose camera; they do not establish fit, pressure, collision, appearance acceptance, runtime, or release.",
+        }
+    finally:
+        _restore_component_id_materials(snapshots, original_scene, scene)
 
 
 def _piece_surface_tree(objects, depsgraph, piece_ids):
@@ -491,6 +662,7 @@ def measure_pose_coverage(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--job", required=True)
+    parser.add_argument("--component-id-dir")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1 :])
     job = read_json(repo_path(args.job))
     construction_path = job["garmentPipeline"]["constructionPath"]
@@ -610,6 +782,7 @@ def main():
         "three-quarter": (0.7, -0.7, 0),
     }
     records = []
+    component_id_records = []
     for kind, outputs in (("view", job["previewPaths"]), ("pose", job["posePaths"])):
         for name, value in outputs.items():
             reset_pose(armature)
@@ -664,6 +837,20 @@ def main():
             output.parent.mkdir(parents=True, exist_ok=True)
             bpy.context.scene.render.filepath = str(output)
             bpy.ops.render.render(write_still=True)
+            if args.component_id_dir and kind == "pose" and name in {"crouch", "sit"}:
+                component_dir = Path(args.component_id_dir)
+                if not component_dir.is_absolute():
+                    component_dir = ROOT / component_dir
+                component_output = component_dir / f"{name}.png"
+                component_output.parent.mkdir(parents=True, exist_ok=True)
+                component_record = render_component_id(
+                    bpy.context.scene.objects,
+                    bpy.context.scene,
+                    component_output,
+                    digest(source),
+                )
+                component_record.update({"kind": "pose", "name": name})
+                component_id_records.append(component_record)
             records.append(
                 {
                     "kind": kind,
@@ -692,6 +879,7 @@ def main():
         "blenderVersion": bpy.app.version_string,
         "engine": bpy.context.scene.render.engine,
         "records": records,
+        "componentIdDiagnostics": component_id_records,
         "qualityDecision": "UNVERIFIED",
         "grantsVisualAcceptance": False,
         "evidenceBoundary": "Actual neutral prototype and diagnostic bone poses; no fit, runtime, or appearance acceptance.",

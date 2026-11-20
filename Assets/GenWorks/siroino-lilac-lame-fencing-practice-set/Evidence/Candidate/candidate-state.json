@@ -29,9 +29,9 @@
       "severity": "BLOCKER"
     },
     {
-      "code": "V187_WEIGHT_CHANGE_DID_NOT_IMPROVE_FRONT_COVERAGE",
+      "code": "V187_COMPONENT_ID_CONFIRMS_FRONT_COVERAGE_REMAINS_REJECTED",
       "severity": "BLOCKER",
-      "description": "Direct same-camera crouch/sit comparison V186 vs V187: thresholded changed-render areas are 878 px² (crouch; 0.0837%) and 2,038 px² (sit; 0.1944%), localized to the lower-front skirt. This is changed-pixel area, not shorts area. The rendered shorts and skirt share the same ivory material, so visible shorts-only px² is not distinguishable from these captures; no substitute number is asserted. The canonical geometric surface-ray diagnostic gives unchanged shorts coverage of 402/885 per upper thigh in crouch and 401/885 in sit; front-lap union coverage is only 54/532 crouch and 23/532 sit. The lap therefore remains above/hipward of most anterior thigh samples, matching the visible exposed-thigh gaps. The weight change does not fix coverage; appearance, fit and release remain rejected/blocked."
+      "description": "Direct inspection of same-pose V187 renders and depth-tested component-ID renders from the exact weighted mesh (6bc32c7d64f2460d328621deed7b86644d2f66e7f5315af8aaf5313040c9ff66): visible shorts-only pixels at 1024x1024 are 7637 in crouch and 10192 in sit; front-lap pixels are 2382 and 2912. The ID views show the lap occupying a small upper-front patch while thigh surface remains exposed below; these counts are view-dependent projected area, not a fit metric. The existing surface-ray diagnostic remains 402/885 shorts-covered upper-thigh samples per side in crouch, 401/885 in sit, and front-lap union hits of 54/532 and 23/532 respectively. Weight adjustment did not improve coverage; appearance, fit, and release remain rejected/blocked."
     }
   ],
   "failedGeometryChecks": [
