@@ -4,13 +4,13 @@
   "method": "same-pose-body-surface-ray-coverage-v1",
   "source": {
     "weightedBlendPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend",
-    "weightedBlendSha256": "c41dfdd9d683f4e2ece74cc5c8855376fbf7d4186867ff68f65261e0162e854e",
+    "weightedBlendSha256": "aa21707fdf448c5afcadd0bb83a378ce79df2f8e4d1285f650bbc131be427af1",
     "targetAvatarSha256": "73aa62ee0a8805cda3a1649ffffb4a4899412f4da60bd206787602c7c19af0b0"
   },
   "poses": {
     "neutral": {
       "renderPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png",
-      "renderSha256": "c5e21bf56703b363c4ff6c59735d1f65d202b1fa111c8e8f0bf86536b2fb1f2c",
+      "renderSha256": "01da875be9cbabcbebfd1907bad31fa9ea8a857d958f0baf89ab9284737d2609",
       "boneRotationsRadians": {
         "UpperArm_L": [
           -1.0122909545898438,
@@ -27,7 +27,7 @@
         "surfaceCoordinateMethod": "posed-avatar-triangle-centroids; deformation-weight anatomical zones; outward-normal ray into matching-pose canonical garment faces",
         "pieceGroupSource": {
           "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
-          "constructionSha256": "885ea207cc936a7dbb3fb8a88f87aceab68f992306d1533d3063f29a862f0f58",
+          "constructionSha256": "687498d36f2f51e89ce9acda1476ef9b4d408ab4bfe8d61a2f689e82847d176b",
           "shortsComponentId": "fitted-under-shorts",
           "shortsPieceIds": [
             "shorts-back-left",
@@ -41,7 +41,7 @@
             "shorts-leg-cover-left",
             "shorts-leg-cover-right"
           ],
-          "assemblyPoseSha256": "68bc946d21f4929cb4bad7930062cccfdfc1c91dde394aae9401a7ba772ea278",
+          "assemblyPoseSha256": "41e439223e50011867bd80728d6973f302de0b7f872615612792d0a762fe6ed2",
           "skirtClothGroupId": "pleated-overskirt",
           "skirtPieceIds": [
             "overskirt-back-left",
@@ -174,10 +174,10 @@
                 "coveredSampleCount": 432,
                 "coverageFraction": 0.6813880126182965,
                 "surfaceGapM": {
-                  "minimum": 0.0035357926972210407,
-                  "median": 0.008642877452075481,
-                  "p95": 0.10567539185285568,
-                  "maximum": 0.18895530700683594
+                  "minimum": 0.003514709183946252,
+                  "median": 0.008379742503166199,
+                  "p95": 0.10057670623064041,
+                  "maximum": 0.1864565908908844
                 },
                 "sampleTriangleIdsSha256": "3e20dca74644f84b5942efe1233f47686595f24c2e85039aa2dbf7c27de67c02",
                 "coveredTriangleIdsSha256": "21dc7a77e4cc310f57890e498b0d3376e2e87f3a7660e53c3cdbb6d07d586c55"
@@ -221,52 +221,52 @@
                 "coveredTriangleIdsSha256": "c264c0dbb6475320d3d8a56b8725a6ed391d6f5be59bcf9a43641cf5c1a3f1f7"
               },
               "overskirt": {
-                "coveredSampleCount": 540,
-                "coverageFraction": 0.6101694915254238,
+                "coveredSampleCount": 541,
+                "coverageFraction": 0.6112994350282486,
                 "surfaceGapM": {
-                  "minimum": 0.006059331353753805,
-                  "median": 0.047920484095811844,
-                  "p95": 0.1426749974489212,
-                  "maximum": 0.1598537266254425
+                  "minimum": 0.005905189085751772,
+                  "median": 0.049533139914274216,
+                  "p95": 0.1411595344543457,
+                  "maximum": 0.15665628015995026
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "8a634caa735b245bb683be3c453f294ff266ccb7a022f746ffac7c352d18658e"
+                "coveredTriangleIdsSha256": "80400d750819a32eb08728c0adb00c2e5fd8ddd6af16d12d23fb90aba64b8316"
               },
               "front-lap-left": {
-                "coveredSampleCount": 48,
-                "coverageFraction": 0.05423728813559322,
+                "coveredSampleCount": 50,
+                "coverageFraction": 0.05649717514124294,
                 "surfaceGapM": {
-                  "minimum": 0.0512923002243042,
-                  "median": 0.10841550678014755,
-                  "p95": 0.14643919467926025,
-                  "maximum": 0.15572243928909302
+                  "minimum": 0.05283521115779877,
+                  "median": 0.09761733561754227,
+                  "p95": 0.1454537957906723,
+                  "maximum": 0.15401794016361237
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "b0f67b8b4919873e9ccfd0ce4d9606aa98d1a06d38f844af567cd2036b6c4111"
+                "coveredTriangleIdsSha256": "72566dc90d98147845824d62cea0d14edd8edecf4f884ba1a83aec7ce133921d"
               },
               "front-lap-right": {
-                "coveredSampleCount": 86,
-                "coverageFraction": 0.09717514124293786,
+                "coveredSampleCount": 83,
+                "coverageFraction": 0.09378531073446328,
                 "surfaceGapM": {
-                  "minimum": 0.007701396476477385,
-                  "median": 0.036957982927560806,
-                  "p95": 0.06056998297572136,
-                  "maximum": 0.07607155293226242
+                  "minimum": 0.006766326259821653,
+                  "median": 0.035884205251932144,
+                  "p95": 0.0672135055065155,
+                  "maximum": 0.0746208131313324
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "866ac4236c1a27a321cd95d8fe6f63130068f2aada26fc9d5c831bf50d4c4cb5"
+                "coveredTriangleIdsSha256": "e44b3baa78f1b4afa4cd0d4919db906ed2ec986ef723624ca48f6bf1c4668029"
               },
               "front-lap-union": {
-                "coveredSampleCount": 134,
-                "coverageFraction": 0.15141242937853108,
+                "coveredSampleCount": 133,
+                "coverageFraction": 0.15028248587570622,
                 "surfaceGapM": {
-                  "minimum": 0.007701396476477385,
-                  "median": 0.04514112323522568,
-                  "p95": 0.12823092937469482,
-                  "maximum": 0.15572243928909302
+                  "minimum": 0.006766326259821653,
+                  "median": 0.05283521115779877,
+                  "p95": 0.1294347047805786,
+                  "maximum": 0.15401794016361237
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "4552423b8818afee94eee7d0aef57f616146c31144659d58713cfd449e0192ca"
+                "coveredTriangleIdsSha256": "deddb79319ee83eac9b2e9f991fd086fe47bf1b6775861f0463ae3fedfb6030a"
               }
             }
           },
@@ -289,46 +289,46 @@
                 "coveredSampleCount": 541,
                 "coverageFraction": 0.6112994350282486,
                 "surfaceGapM": {
-                  "minimum": 0.005916396621614695,
-                  "median": 0.05085688456892967,
-                  "p95": 0.14259377121925354,
-                  "maximum": 0.15984605252742767
+                  "minimum": 0.005808540154248476,
+                  "median": 0.04841819778084755,
+                  "p95": 0.1413731873035431,
+                  "maximum": 0.15656240284442902
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
                 "coveredTriangleIdsSha256": "461c758142467f90df93680d25173178e34222c24ee717104aa15bc702b1b164"
               },
               "front-lap-left": {
-                "coveredSampleCount": 103,
-                "coverageFraction": 0.11638418079096045,
+                "coveredSampleCount": 94,
+                "coverageFraction": 0.10621468926553672,
                 "surfaceGapM": {
-                  "minimum": 0.008296663872897625,
-                  "median": 0.044377945363521576,
-                  "p95": 0.0724729374051094,
-                  "maximum": 0.09229601174592972
+                  "minimum": 0.008676029741764069,
+                  "median": 0.034708429127931595,
+                  "p95": 0.0729740560054779,
+                  "maximum": 0.09322335571050644
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "5c988ec537d11eac70ed04ed2d12c450009af292b4546429d5980e5a03760f1a"
+                "coveredTriangleIdsSha256": "11c946dfa42cf4a71dc87e2c3abf837f9862fdc0ca00a34707a342b7cb314e0f"
               },
               "front-lap-right": {
-                "coveredSampleCount": 32,
-                "coverageFraction": 0.03615819209039548,
+                "coveredSampleCount": 41,
+                "coverageFraction": 0.04632768361581921,
                 "surfaceGapM": {
-                  "minimum": 0.05911610275506973,
-                  "median": 0.11299143731594086,
-                  "p95": 0.14407430589199066,
-                  "maximum": 0.15559209883213043
+                  "minimum": 0.06700389087200165,
+                  "median": 0.09885581582784653,
+                  "p95": 0.14446745812892914,
+                  "maximum": 0.15275751054286957
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "f3aa7ccdcb840b4b92c1a9e40057eaea2a45bb7d5778e17008df18576aa308ad"
+                "coveredTriangleIdsSha256": "b43d28ae6bc6eafe396102512fc1bd367e95154009d7aa06b6a465d2794ea1cc"
               },
               "front-lap-union": {
                 "coveredSampleCount": 135,
                 "coverageFraction": 0.15254237288135594,
                 "surfaceGapM": {
-                  "minimum": 0.008296663872897625,
-                  "median": 0.05627193674445152,
-                  "p95": 0.132791206240654,
-                  "maximum": 0.15559209883213043
+                  "minimum": 0.008676029741764069,
+                  "median": 0.04938379302620888,
+                  "p95": 0.13045167922973633,
+                  "maximum": 0.15275751054286957
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
                 "coveredTriangleIdsSha256": "8d95d4ecfe137d3ffdc107123de73d706fa764b0cf4685993fc0cf434772c8ea"
@@ -347,181 +347,181 @@
               ],
               "sampledBodyTriangleCount": 266,
               "sampledBodyTriangleIdsSha256": "40c4a5f367ca1d377928677403c8f9c497b26c57cfd4f9eb028f1d3c14fb07da",
-              "hitBodyTriangleCountWithinMaximumRayM": 48,
-              "hitBodyTriangleIdsSha256": "b0f67b8b4919873e9ccfd0ce4d9606aa98d1a06d38f844af567cd2036b6c4111",
+              "hitBodyTriangleCountWithinMaximumRayM": 50,
+              "hitBodyTriangleIdsSha256": "72566dc90d98147845824d62cea0d14edd8edecf4f884ba1a83aec7ce133921d",
               "nearestGarmentFaces": [
                 {
-                  "bodyTriangleId": 12258,
-                  "gapM": 0.0517923002243042,
+                  "bodyTriangleId": 13179,
+                  "gapM": 0.05333521115779877,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 10075,
                   "sourceTriangleIndex": 10075
                 },
                 {
-                  "bodyTriangleId": 13141,
-                  "gapM": 0.056513211607933045,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 11655,
-                  "sourceTriangleIndex": 11655
-                },
-                {
-                  "bodyTriangleId": 3654,
-                  "gapM": 0.061314328491687775,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 10066,
-                  "sourceTriangleIndex": 10066
-                },
-                {
-                  "bodyTriangleId": 4810,
-                  "gapM": 0.062395374208688736,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 10054,
-                  "sourceTriangleIndex": 10054
-                },
-                {
-                  "bodyTriangleId": 4756,
-                  "gapM": 0.06367219138145447,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 11653,
-                  "sourceTriangleIndex": 11653
-                },
-                {
-                  "bodyTriangleId": 4833,
-                  "gapM": 0.06461425024271011,
+                  "bodyTriangleId": 12258,
+                  "gapM": 0.057365520775318146,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 11644,
                   "sourceTriangleIndex": 11644
                 },
                 {
-                  "bodyTriangleId": 13159,
-                  "gapM": 0.06519034403562546,
+                  "bodyTriangleId": 4833,
+                  "gapM": 0.05928693237900734,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 1930,
-                  "sourceTriangleIndex": 1930
+                  "sourcePolygonIndex": 11644,
+                  "sourceTriangleIndex": 11644
                 },
                 {
-                  "bodyTriangleId": 12274,
-                  "gapM": 0.06612690436840057,
+                  "bodyTriangleId": 4756,
+                  "gapM": 0.0693970535993576,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 10063,
-                  "sourceTriangleIndex": 10063
-                },
-                {
-                  "bodyTriangleId": 3634,
-                  "gapM": 0.06693635779619217,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17615,
-                  "sourceTriangleIndex": 17615
-                },
-                {
-                  "bodyTriangleId": 4793,
-                  "gapM": 0.07396729189157486,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17619,
-                  "sourceTriangleIndex": 17619
-                },
-                {
-                  "bodyTriangleId": 3558,
-                  "gapM": 0.07594440776109695,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17640,
-                  "sourceTriangleIndex": 17640
+                  "sourcePolygonIndex": 2011,
+                  "sourceTriangleIndex": 2011
                 },
                 {
                   "bodyTriangleId": 13197,
-                  "gapM": 0.07816357064247131,
+                  "gapM": 0.07075131583213806,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 10053,
                   "sourceTriangleIndex": 10053
                 },
                 {
+                  "bodyTriangleId": 3634,
+                  "gapM": 0.07088222998380661,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 17615,
+                  "sourceTriangleIndex": 17615
+                },
+                {
+                  "bodyTriangleId": 3654,
+                  "gapM": 0.07246107506752014,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 1949,
+                  "sourceTriangleIndex": 1949
+                },
+                {
+                  "bodyTriangleId": 4810,
+                  "gapM": 0.07247178900241852,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 10054,
+                  "sourceTriangleIndex": 10054
+                },
+                {
+                  "bodyTriangleId": 12116,
+                  "gapM": 0.0750704397559166,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 17631,
+                  "sourceTriangleIndex": 17631
+                },
+                {
+                  "bodyTriangleId": 3558,
+                  "gapM": 0.07578673857450485,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 10075,
+                  "sourceTriangleIndex": 10075
+                },
+                {
+                  "bodyTriangleId": 13159,
+                  "gapM": 0.0787800167798996,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 1930,
+                  "sourceTriangleIndex": 1930
+                },
+                {
+                  "bodyTriangleId": 13141,
+                  "gapM": 0.07923349636793137,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 2013,
+                  "sourceTriangleIndex": 2013
+                },
+                {
                   "bodyTriangleId": 13174,
-                  "gapM": 0.08078104156255722,
+                  "gapM": 0.07995877313613892,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17640,
                   "sourceTriangleIndex": 17640
                 },
                 {
+                  "bodyTriangleId": 4793,
+                  "gapM": 0.07999487119913101,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 17619,
+                  "sourceTriangleIndex": 17619
+                },
+                {
                   "bodyTriangleId": 3394,
-                  "gapM": 0.08269730108976364,
+                  "gapM": 0.08264430510997772,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 10055,
                   "sourceTriangleIndex": 10055
                 },
                 {
-                  "bodyTriangleId": 3566,
-                  "gapM": 0.08406203883886337,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17595,
-                  "sourceTriangleIndex": 17595
-                },
-                {
                   "bodyTriangleId": 12332,
-                  "gapM": 0.08605193245410919,
+                  "gapM": 0.08398200470209122,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9823,
-                  "sourceTriangleIndex": 9823
+                  "sourcePolygonIndex": 11695,
+                  "sourceTriangleIndex": 11695
                 },
                 {
-                  "bodyTriangleId": 4873,
-                  "gapM": 0.08798415857553482,
+                  "bodyTriangleId": 12274,
+                  "gapM": 0.08440415459871292,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 1937,
-                  "sourceTriangleIndex": 1937
+                  "sourcePolygonIndex": 17627,
+                  "sourceTriangleIndex": 17627
                 },
                 {
-                  "bodyTriangleId": 4775,
-                  "gapM": 0.0889445607662201,
+                  "bodyTriangleId": 12347,
+                  "gapM": 0.08634333211183548,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9968,
-                  "sourceTriangleIndex": 9968
+                  "sourcePolygonIndex": 2260,
+                  "sourceTriangleIndex": 2260
+                },
+                {
+                  "bodyTriangleId": 3397,
+                  "gapM": 0.0870505039691925,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 17608,
+                  "sourceTriangleIndex": 17608
                 },
                 {
                   "bodyTriangleId": 13122,
-                  "gapM": 0.091040811419487,
+                  "gapM": 0.08937909352779388,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9894,
-                  "sourceTriangleIndex": 9894
-                },
-                {
-                  "bodyTriangleId": 12113,
-                  "gapM": 0.09148709374666214,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 1902,
-                  "sourceTriangleIndex": 1902
+                  "sourcePolygonIndex": 2221,
+                  "sourceTriangleIndex": 2221
                 }
               ],
               "gapM": {
-                "minimum": 0.0517923002243042,
-                "median": 0.10891550678014755,
-                "p95": 0.14693919467926025,
-                "maximum": 0.15622243928909302
+                "minimum": 0.05333521115779877,
+                "median": 0.09811733561754227,
+                "p95": 0.1459537957906723,
+                "maximum": 0.15451794016361237
               },
               "withinNearDistanceDiagnosticCount": 0,
               "nearDistanceFractionDiagnosticOnly": 0.0,
               "originOffsetSensitivity": {
                 "offsetM": 0.0001,
-                "hitBodyTriangleCountWithinMaximumRayM": 48,
+                "hitBodyTriangleCountWithinMaximumRayM": 50,
                 "withinNearDistanceDiagnosticCount": 0,
                 "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold."
               },
@@ -534,182 +534,182 @@
               ],
               "sampledBodyTriangleCount": 266,
               "sampledBodyTriangleIdsSha256": "b6665c5aa4648a9a9e17534bbeb3d5a72b6606bf6043fef2afca8ae8e7803fad",
-              "hitBodyTriangleCountWithinMaximumRayM": 100,
-              "hitBodyTriangleIdsSha256": "dbe917d8be0f7c879f4bc6989f03a933394f74ec357dfcb50df15c27182d344d",
+              "hitBodyTriangleCountWithinMaximumRayM": 91,
+              "hitBodyTriangleIdsSha256": "f335baaec4496fc61b7a9f1259a452ba10099346f98c3e0c270adde4b9267b3c",
               "nearestGarmentFaces": [
                 {
                   "bodyTriangleId": 15816,
-                  "gapM": 0.008796663872897625,
+                  "gapM": 0.009176029741764069,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9152,
                   "sourceTriangleIndex": 9152
                 },
                 {
-                  "bodyTriangleId": 9645,
-                  "gapM": 0.010104359045624733,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 16817,
-                  "sourceTriangleIndex": 16817
-                },
-                {
-                  "bodyTriangleId": 16559,
-                  "gapM": 0.010384904138743878,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 16855,
-                  "sourceTriangleIndex": 16855
-                },
-                {
                   "bodyTriangleId": 8552,
-                  "gapM": 0.010884571738541127,
+                  "gapM": 0.009211542934179306,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 16796,
                   "sourceTriangleIndex": 16796
                 },
                 {
-                  "bodyTriangleId": 8579,
-                  "gapM": 0.012515650048851967,
+                  "bodyTriangleId": 9645,
+                  "gapM": 0.00984309232980013,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 1939,
-                  "sourceTriangleIndex": 1939
+                  "sourcePolygonIndex": 16755,
+                  "sourceTriangleIndex": 16755
+                },
+                {
+                  "bodyTriangleId": 16559,
+                  "gapM": 0.010911224327981472,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 16855,
+                  "sourceTriangleIndex": 16855
+                },
+                {
+                  "bodyTriangleId": 8579,
+                  "gapM": 0.012307293631136418,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9185,
+                  "sourceTriangleIndex": 9185
                 },
                 {
                   "bodyTriangleId": 15815,
-                  "gapM": 0.012535463936626912,
+                  "gapM": 0.012416538700461388,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 16853,
                   "sourceTriangleIndex": 16853
                 },
                 {
-                  "bodyTriangleId": 9676,
-                  "gapM": 0.01463407176733017,
+                  "bodyTriangleId": 16590,
+                  "gapM": 0.014189471408724785,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 16864,
-                  "sourceTriangleIndex": 16864
+                  "sourcePolygonIndex": 16811,
+                  "sourceTriangleIndex": 16811
                 },
                 {
-                  "bodyTriangleId": 16590,
-                  "gapM": 0.015183770947158337,
+                  "bodyTriangleId": 9676,
+                  "gapM": 0.01424872587621212,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9186,
-                  "sourceTriangleIndex": 9186
+                  "sourcePolygonIndex": 9246,
+                  "sourceTriangleIndex": 9246
+                },
+                {
+                  "bodyTriangleId": 8561,
+                  "gapM": 0.014778064481914044,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 16962,
+                  "sourceTriangleIndex": 16962
                 },
                 {
                   "bodyTriangleId": 8361,
-                  "gapM": 0.017217378050088883,
+                  "gapM": 0.01574963229894638,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9296,
-                  "sourceTriangleIndex": 9296
+                  "sourcePolygonIndex": 9245,
+                  "sourceTriangleIndex": 9245
+                },
+                {
+                  "bodyTriangleId": 16581,
+                  "gapM": 0.015968779951334,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9368,
+                  "sourceTriangleIndex": 9368
+                },
+                {
+                  "bodyTriangleId": 15821,
+                  "gapM": 0.01749664816260338,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9396,
+                  "sourceTriangleIndex": 9396
                 },
                 {
                   "bodyTriangleId": 15621,
-                  "gapM": 0.017872606322169304,
+                  "gapM": 0.01779862578213215,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9201,
-                  "sourceTriangleIndex": 9201
+                  "sourcePolygonIndex": 9164,
+                  "sourceTriangleIndex": 9164
                 },
                 {
-                  "bodyTriangleId": 16602,
-                  "gapM": 0.020002688199281693,
+                  "bodyTriangleId": 16601,
+                  "gapM": 0.01861370998620987,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 16920,
-                  "sourceTriangleIndex": 16920
-                },
-                {
-                  "bodyTriangleId": 9688,
-                  "gapM": 0.022028618410229683,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9367,
-                  "sourceTriangleIndex": 9367
+                  "sourcePolygonIndex": 9421,
+                  "sourceTriangleIndex": 9421
                 },
                 {
                   "bodyTriangleId": 15810,
-                  "gapM": 0.022819599986076355,
+                  "gapM": 0.01956251348555088,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9106,
                   "sourceTriangleIndex": 9106
                 },
                 {
+                  "bodyTriangleId": 9688,
+                  "gapM": 0.019967473030090332,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 16957,
+                  "sourceTriangleIndex": 16957
+                },
+                {
+                  "bodyTriangleId": 16602,
+                  "gapM": 0.02052975530922413,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 16920,
+                  "sourceTriangleIndex": 16920
+                },
+                {
                   "bodyTriangleId": 16586,
-                  "gapM": 0.024581500247120858,
+                  "gapM": 0.020834051921963692,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9092,
                   "sourceTriangleIndex": 9092
                 },
                 {
+                  "bodyTriangleId": 15819,
+                  "gapM": 0.022047621116042138,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9543,
+                  "sourceTriangleIndex": 9543
+                },
+                {
                   "bodyTriangleId": 9672,
-                  "gapM": 0.024667247116565705,
+                  "gapM": 0.022058070555329323,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 2233,
                   "sourceTriangleIndex": 2233
-                },
-                {
-                  "bodyTriangleId": 8469,
-                  "gapM": 0.02565426278114319,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 11686,
-                  "sourceTriangleIndex": 11686
-                },
-                {
-                  "bodyTriangleId": 15779,
-                  "gapM": 0.025811343371868134,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 16956,
-                  "sourceTriangleIndex": 16956
-                },
-                {
-                  "bodyTriangleId": 9698,
-                  "gapM": 0.026052546605467797,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9148,
-                  "sourceTriangleIndex": 9148
-                },
-                {
-                  "bodyTriangleId": 8533,
-                  "gapM": 0.026654981926083565,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 16977,
-                  "sourceTriangleIndex": 16977
-                },
-                {
-                  "bodyTriangleId": 15725,
-                  "gapM": 0.02765451829135418,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9088,
-                  "sourceTriangleIndex": 9088
                 }
               ],
               "gapM": {
-                "minimum": 0.008796663872897625,
-                "median": 0.04488718035817146,
-                "p95": 0.07522118735313416,
-                "maximum": 0.09279601174592972
+                "minimum": 0.009176029741764069,
+                "median": 0.035208429127931595,
+                "p95": 0.0734740560054779,
+                "maximum": 0.09372335571050644
               },
-              "withinNearDistanceDiagnosticCount": 23,
-              "nearDistanceFractionDiagnosticOnly": 0.08646616541353383,
+              "withinNearDistanceDiagnosticCount": 33,
+              "nearDistanceFractionDiagnosticOnly": 0.12406015037593984,
               "originOffsetSensitivity": {
                 "offsetM": 0.0001,
-                "hitBodyTriangleCountWithinMaximumRayM": 100,
-                "withinNearDistanceDiagnosticCount": 23,
+                "hitBodyTriangleCountWithinMaximumRayM": 91,
+                "withinNearDistanceDiagnosticCount": 33,
                 "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold."
               },
               "maximumRayM": 0.25,
@@ -721,20 +721,12 @@
               ],
               "sampledBodyTriangleCount": 266,
               "sampledBodyTriangleIdsSha256": "40c4a5f367ca1d377928677403c8f9c497b26c57cfd4f9eb028f1d3c14fb07da",
-              "hitBodyTriangleCountWithinMaximumRayM": 83,
-              "hitBodyTriangleIdsSha256": "566a0973b97301f79aecad5c28108a09d4aa9816263b8ce932f679be2baa5613",
+              "hitBodyTriangleCountWithinMaximumRayM": 80,
+              "hitBodyTriangleIdsSha256": "c62efcb0beecedd53091a0df1d3760cc3c6495b630d4b4c66480b1400fd47872",
               "nearestGarmentFaces": [
                 {
-                  "bodyTriangleId": 3650,
-                  "gapM": 0.009593713015317917,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10977,
-                  "sourceTriangleIndex": 10977
-                },
-                {
                   "bodyTriangleId": 12366,
-                  "gapM": 0.009763276122510434,
+                  "gapM": 0.008092430338263512,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 11048,
@@ -742,31 +734,71 @@
                 },
                 {
                   "bodyTriangleId": 4743,
-                  "gapM": 0.010251737117767334,
+                  "gapM": 0.00822972870618105,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18533,
-                  "sourceTriangleIndex": 18533
+                  "sourcePolygonIndex": 11046,
+                  "sourceTriangleIndex": 11046
                 },
                 {
-                  "bodyTriangleId": 13109,
-                  "gapM": 0.012663428589701653,
+                  "bodyTriangleId": 3650,
+                  "gapM": 0.00832192125916481,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18482,
-                  "sourceTriangleIndex": 18482
+                  "sourcePolygonIndex": 11008,
+                  "sourceTriangleIndex": 11008
+                },
+                {
+                  "bodyTriangleId": 4752,
+                  "gapM": 0.009782032027840615,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10885,
+                  "sourceTriangleIndex": 10885
+                },
+                {
+                  "bodyTriangleId": 12344,
+                  "gapM": 0.009815313771367074,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 18387,
+                  "sourceTriangleIndex": 18387
                 },
                 {
                   "bodyTriangleId": 3677,
-                  "gapM": 0.013662975199520588,
+                  "gapM": 0.010793235071003437,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18482,
-                  "sourceTriangleIndex": 18482
+                  "sourcePolygonIndex": 18529,
+                  "sourceTriangleIndex": 18529
+                },
+                {
+                  "bodyTriangleId": 13109,
+                  "gapM": 0.01142138048261404,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10992,
+                  "sourceTriangleIndex": 10992
+                },
+                {
+                  "bodyTriangleId": 3659,
+                  "gapM": 0.0118105196505785,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 18331,
+                  "sourceTriangleIndex": 18331
+                },
+                {
+                  "bodyTriangleId": 4765,
+                  "gapM": 0.014040932908654213,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 2795,
+                  "sourceTriangleIndex": 2795
                 },
                 {
                   "bodyTriangleId": 12365,
-                  "gapM": 0.015945221215486527,
+                  "gapM": 0.014794357970356942,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10971,
@@ -774,129 +806,97 @@
                 },
                 {
                   "bodyTriangleId": 4774,
-                  "gapM": 0.017748792573809624,
+                  "gapM": 0.01487473762780428,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10943,
-                  "sourceTriangleIndex": 10943
-                },
-                {
-                  "bodyTriangleId": 13140,
-                  "gapM": 0.01945926520228386,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10898,
-                  "sourceTriangleIndex": 10898
-                },
-                {
-                  "bodyTriangleId": 13162,
-                  "gapM": 0.020827486097812653,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18527,
-                  "sourceTriangleIndex": 18527
-                },
-                {
-                  "bodyTriangleId": 3459,
-                  "gapM": 0.021892684429883957,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18417,
-                  "sourceTriangleIndex": 18417
+                  "sourcePolygonIndex": 10982,
+                  "sourceTriangleIndex": 10982
                 },
                 {
                   "bodyTriangleId": 12275,
-                  "gapM": 0.02199205654859543,
+                  "gapM": 0.016565556555986405,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 11094,
                   "sourceTriangleIndex": 11094
                 },
                 {
-                  "bodyTriangleId": 4770,
-                  "gapM": 0.02202307890355587,
+                  "bodyTriangleId": 3684,
+                  "gapM": 0.017555435106158257,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18606,
-                  "sourceTriangleIndex": 18606
+                  "sourcePolygonIndex": 18289,
+                  "sourceTriangleIndex": 18289
                 },
                 {
-                  "bodyTriangleId": 12344,
-                  "gapM": 0.02242731760442257,
+                  "bodyTriangleId": 13162,
+                  "gapM": 0.018131128430366517,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18312,
-                  "sourceTriangleIndex": 18312
+                  "sourcePolygonIndex": 18527,
+                  "sourceTriangleIndex": 18527
                 },
                 {
-                  "bodyTriangleId": 12171,
-                  "gapM": 0.02334926548600197,
+                  "bodyTriangleId": 13140,
+                  "gapM": 0.018372674390673638,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10855,
-                  "sourceTriangleIndex": 10855
-                },
-                {
-                  "bodyTriangleId": 12111,
-                  "gapM": 0.023441039875149727,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 11055,
-                  "sourceTriangleIndex": 11055
+                  "sourcePolygonIndex": 10898,
+                  "sourceTriangleIndex": 10898
                 },
                 {
                   "bodyTriangleId": 13136,
-                  "gapM": 0.02393747578561306,
+                  "gapM": 0.018777036026120186,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 11057,
-                  "sourceTriangleIndex": 11057
+                  "sourcePolygonIndex": 11073,
+                  "sourceTriangleIndex": 11073
                 },
                 {
-                  "bodyTriangleId": 3391,
-                  "gapM": 0.02537909607589245,
+                  "bodyTriangleId": 3459,
+                  "gapM": 0.019308638677001,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 11055,
-                  "sourceTriangleIndex": 11055
+                  "sourcePolygonIndex": 10966,
+                  "sourceTriangleIndex": 10966
                 },
                 {
                   "bodyTriangleId": 3567,
-                  "gapM": 0.025504297494888306,
+                  "gapM": 0.021153367042541504,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 11096,
                   "sourceTriangleIndex": 11096
                 },
                 {
-                  "bodyTriangleId": 4786,
-                  "gapM": 0.026249320164322854,
+                  "bodyTriangleId": 12171,
+                  "gapM": 0.021923907950520516,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18341,
-                  "sourceTriangleIndex": 18341
+                  "sourcePolygonIndex": 10882,
+                  "sourceTriangleIndex": 10882
                 },
                 {
-                  "bodyTriangleId": 4796,
-                  "gapM": 0.02683039467036724,
+                  "bodyTriangleId": 13118,
+                  "gapM": 0.022284277632832528,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 11092,
-                  "sourceTriangleIndex": 11092
+                  "sourcePolygonIndex": 18253,
+                  "sourceTriangleIndex": 18253
                 }
               ],
               "gapM": {
-                "minimum": 0.009593713015317917,
-                "median": 0.03780993717908859,
-                "p95": 0.06106998297572136,
-                "maximum": 0.07657155293226242
+                "minimum": 0.008092430338263512,
+                "median": 0.036384205251932145,
+                "p95": 0.06790852445363998,
+                "maximum": 0.0751208131313324
               },
-              "withinNearDistanceDiagnosticCount": 26,
-              "nearDistanceFractionDiagnosticOnly": 0.09774436090225563,
+              "withinNearDistanceDiagnosticCount": 29,
+              "nearDistanceFractionDiagnosticOnly": 0.10902255639097744,
               "originOffsetSensitivity": {
                 "offsetM": 0.0001,
-                "hitBodyTriangleCountWithinMaximumRayM": 83,
-                "withinNearDistanceDiagnosticCount": 26,
+                "hitBodyTriangleCountWithinMaximumRayM": 80,
+                "withinNearDistanceDiagnosticCount": 29,
                 "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold."
               },
               "maximumRayM": 0.25,
@@ -908,181 +908,181 @@
               ],
               "sampledBodyTriangleCount": 266,
               "sampledBodyTriangleIdsSha256": "b6665c5aa4648a9a9e17534bbeb3d5a72b6606bf6043fef2afca8ae8e7803fad",
-              "hitBodyTriangleCountWithinMaximumRayM": 32,
-              "hitBodyTriangleIdsSha256": "f3aa7ccdcb840b4b92c1a9e40057eaea2a45bb7d5778e17008df18576aa308ad",
+              "hitBodyTriangleCountWithinMaximumRayM": 41,
+              "hitBodyTriangleIdsSha256": "b43d28ae6bc6eafe396102512fc1bd367e95154009d7aa06b6a465d2794ea1cc",
               "nearestGarmentFaces": [
                 {
-                  "bodyTriangleId": 8299,
-                  "gapM": 0.05961610275506973,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17657,
-                  "sourceTriangleIndex": 17657
-                },
-                {
-                  "bodyTriangleId": 15797,
-                  "gapM": 0.06108689579367638,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10115,
-                  "sourceTriangleIndex": 10115
-                },
-                {
                   "bodyTriangleId": 15782,
-                  "gapM": 0.06220804798603058,
+                  "gapM": 0.06750389087200165,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 2552,
-                  "sourceTriangleIndex": 2552
+                  "sourcePolygonIndex": 17716,
+                  "sourceTriangleIndex": 17716
                 },
                 {
                   "bodyTriangleId": 9658,
-                  "gapM": 0.06268770891427994,
+                  "gapM": 0.07053838568925858,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10094,
-                  "sourceTriangleIndex": 10094
+                  "sourcePolygonIndex": 2703,
+                  "sourceTriangleIndex": 2703
                 },
                 {
                   "bodyTriangleId": 8536,
-                  "gapM": 0.08202862638235092,
+                  "gapM": 0.07461865890026093,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10357,
-                  "sourceTriangleIndex": 10357
+                  "sourcePolygonIndex": 17764,
+                  "sourceTriangleIndex": 17764
+                },
+                {
+                  "bodyTriangleId": 8556,
+                  "gapM": 0.07559494572877884,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10130,
+                  "sourceTriangleIndex": 10130
+                },
+                {
+                  "bodyTriangleId": 15566,
+                  "gapM": 0.07588149505853653,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10114,
+                  "sourceTriangleIndex": 10114
+                },
+                {
+                  "bodyTriangleId": 16591,
+                  "gapM": 0.07745746421813965,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 17673,
+                  "sourceTriangleIndex": 17673
+                },
+                {
+                  "bodyTriangleId": 9695,
+                  "gapM": 0.08067362654209137,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 2442,
+                  "sourceTriangleIndex": 2442
+                },
+                {
+                  "bodyTriangleId": 16624,
+                  "gapM": 0.08418531614542007,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 2571,
+                  "sourceTriangleIndex": 2571
+                },
+                {
+                  "bodyTriangleId": 16609,
+                  "gapM": 0.08475024151802063,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 17659,
+                  "sourceTriangleIndex": 17659
                 },
                 {
                   "bodyTriangleId": 16572,
-                  "gapM": 0.083139180123806,
+                  "gapM": 0.08601222831010819,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17812,
-                  "sourceTriangleIndex": 17812
+                  "sourcePolygonIndex": 10287,
+                  "sourceTriangleIndex": 10287
+                },
+                {
+                  "bodyTriangleId": 15724,
+                  "gapM": 0.08791676807403564,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 2641,
+                  "sourceTriangleIndex": 2641
+                },
+                {
+                  "bodyTriangleId": 8299,
+                  "gapM": 0.08811680126190186,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10199,
+                  "sourceTriangleIndex": 10199
+                },
+                {
+                  "bodyTriangleId": 15797,
+                  "gapM": 0.09021226960420609,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10270,
+                  "sourceTriangleIndex": 10270
                 },
                 {
                   "bodyTriangleId": 9740,
-                  "gapM": 0.09638870406150818,
+                  "gapM": 0.09143296527862549,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10194,
-                  "sourceTriangleIndex": 10194
+                  "sourcePolygonIndex": 2697,
+                  "sourceTriangleIndex": 2697
                 },
                 {
-                  "bodyTriangleId": 15716,
-                  "gapM": 0.09866334396600723,
+                  "bodyTriangleId": 8468,
+                  "gapM": 0.09261049973964691,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17791,
-                  "sourceTriangleIndex": 17791
+                  "sourcePolygonIndex": 10175,
+                  "sourceTriangleIndex": 10175
+                },
+                {
+                  "bodyTriangleId": 9677,
+                  "gapM": 0.09355894374847412,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 2444,
+                  "sourceTriangleIndex": 2444
                 },
                 {
                   "bodyTriangleId": 8546,
-                  "gapM": 0.10544928061962128,
+                  "gapM": 0.09662137824296951,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10857,
-                  "sourceTriangleIndex": 10857
-                },
-                {
-                  "bodyTriangleId": 15569,
-                  "gapM": 0.1057316501736641,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10818,
-                  "sourceTriangleIndex": 10818
-                },
-                {
-                  "bodyTriangleId": 16573,
-                  "gapM": 0.10666094619035721,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18302,
-                  "sourceTriangleIndex": 18302
-                },
-                {
-                  "bodyTriangleId": 15527,
-                  "gapM": 0.10798438537120819,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 11733,
-                  "sourceTriangleIndex": 11733
+                  "sourcePolygonIndex": 10785,
+                  "sourceTriangleIndex": 10785
                 },
                 {
                   "bodyTriangleId": 8302,
-                  "gapM": 0.10818792778253555,
+                  "gapM": 0.09703246402740479,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10747,
-                  "sourceTriangleIndex": 10747
+                  "sourcePolygonIndex": 10689,
+                  "sourceTriangleIndex": 10689
                 },
                 {
-                  "bodyTriangleId": 9659,
-                  "gapM": 0.1109438379406929,
+                  "bodyTriangleId": 15527,
+                  "gapM": 0.09775754708051682,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 2902,
-                  "sourceTriangleIndex": 2902
+                  "sourcePolygonIndex": 10763,
+                  "sourceTriangleIndex": 10763
                 },
                 {
-                  "bodyTriangleId": 16592,
-                  "gapM": 0.11099871891736984,
+                  "bodyTriangleId": 15716,
+                  "gapM": 0.09901065278053284,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10791,
-                  "sourceTriangleIndex": 10791
-                },
-                {
-                  "bodyTriangleId": 8250,
-                  "gapM": 0.11210387098789215,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18235,
-                  "sourceTriangleIndex": 18235
-                },
-                {
-                  "bodyTriangleId": 9678,
-                  "gapM": 0.11349143731594086,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18210,
-                  "sourceTriangleIndex": 18210
-                },
-                {
-                  "bodyTriangleId": 8471,
-                  "gapM": 0.11434681612253189,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18212,
-                  "sourceTriangleIndex": 18212
-                },
-                {
-                  "bodyTriangleId": 9694,
-                  "gapM": 0.11600576984882355,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18206,
-                  "sourceTriangleIndex": 18206
-                },
-                {
-                  "bodyTriangleId": 8209,
-                  "gapM": 0.11824726957082748,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17894,
-                  "sourceTriangleIndex": 17894
+                  "sourcePolygonIndex": 17808,
+                  "sourceTriangleIndex": 17808
                 }
               ],
               "gapM": {
-                "minimum": 0.05961610275506973,
-                "median": 0.11349143731594086,
-                "p95": 0.14457430589199066,
-                "maximum": 0.15609209883213043
+                "minimum": 0.06750389087200165,
+                "median": 0.09935581582784653,
+                "p95": 0.14496745812892914,
+                "maximum": 0.15325751054286957
               },
               "withinNearDistanceDiagnosticCount": 0,
               "nearDistanceFractionDiagnosticOnly": 0.0,
               "originOffsetSensitivity": {
                 "offsetM": 0.0001,
-                "hitBodyTriangleCountWithinMaximumRayM": 32,
+                "hitBodyTriangleCountWithinMaximumRayM": 41,
                 "withinNearDistanceDiagnosticCount": 0,
                 "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold."
               },
@@ -1093,10 +1093,10 @@
           "evidenceBoundary": "For neutral, crouch, and sit, bind exact body triangle IDs to rest-pose front-facing surface normals and the declared 10–90% UpperLeg bone interval, then cast along each evaluated posed body normal against each authored front-lap panel. Report left/right lap to left/right anterior thigh separately plus a deduplicated union, nearest panel face provenance, ray gaps, and a diagnostic-only 30 mm near-distance count with 0.5 mm versus 0.1 mm origin-offset sensitivity. This is a geometric diagnostic only; it does not establish pressure, stretch, material behavior, Shape Key response, fit, visual quality, or runtime acceptance.",
           "unionNoDoubleCount": {
             "sampledUniqueBodyTriangleCount": 532,
-            "hitUniqueBodyTriangleCount": 263,
-            "hitUnionFraction": 0.4943609022556391,
+            "hitUniqueBodyTriangleCount": 262,
+            "hitUnionFraction": 0.4924812030075188,
             "sampledUniqueBodyTriangleIdsSha256": "50ada84c7c0706f5049d1ae60478e1a52e1ede6e73f02bfe7b194315daf57d6f",
-            "hitUniqueBodyTriangleIdsSha256": "182c8cbbc5d568f48d820f587bbb110dfcb352da322a9d23c131feedc3a3f690"
+            "hitUniqueBodyTriangleIdsSha256": "7300663a95b61911e5b45b0c0f3f9a121abe06185334c4e86f1529582dabd590"
           }
         },
         "sharedSeamContinuity": {
@@ -1110,7 +1110,7 @@
     },
     "crouch": {
       "renderPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png",
-      "renderSha256": "d76955db4c4a356b9650b0bfb0834a9bdb8ad4917bd3c24b275d9f38a799a5f7",
+      "renderSha256": "933743241dd5eaa9d8eec2a95103d062cb3a2c25e8acade6a41243f0856558cb",
       "boneRotationsRadians": {
         "Hips": [
           0.22689279913902283,
@@ -1152,7 +1152,7 @@
         "surfaceCoordinateMethod": "posed-avatar-triangle-centroids; deformation-weight anatomical zones; outward-normal ray into matching-pose canonical garment faces",
         "pieceGroupSource": {
           "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
-          "constructionSha256": "885ea207cc936a7dbb3fb8a88f87aceab68f992306d1533d3063f29a862f0f58",
+          "constructionSha256": "687498d36f2f51e89ce9acda1476ef9b4d408ab4bfe8d61a2f689e82847d176b",
           "shortsComponentId": "fitted-under-shorts",
           "shortsPieceIds": [
             "shorts-back-left",
@@ -1166,7 +1166,7 @@
             "shorts-leg-cover-left",
             "shorts-leg-cover-right"
           ],
-          "assemblyPoseSha256": "68bc946d21f4929cb4bad7930062cccfdfc1c91dde394aae9401a7ba772ea278",
+          "assemblyPoseSha256": "41e439223e50011867bd80728d6973f302de0b7f872615612792d0a762fe6ed2",
           "skirtClothGroupId": "pleated-overskirt",
           "skirtPieceIds": [
             "overskirt-back-left",
@@ -1299,10 +1299,10 @@
                 "coveredSampleCount": 408,
                 "coverageFraction": 0.6238532110091743,
                 "surfaceGapM": {
-                  "minimum": 0.0026463051326572895,
-                  "median": 0.013011815026402473,
-                  "p95": 0.12918365001678467,
-                  "maximum": 0.1705758273601532
+                  "minimum": 0.0026418925262987614,
+                  "median": 0.01273708138614893,
+                  "p95": 0.12692971527576447,
+                  "maximum": 0.166131392121315
                 },
                 "sampleTriangleIdsSha256": "ada1bde1dd14d063a96881cb49085195082c0020a9dd35553fc8c6a55b4562b7",
                 "coveredTriangleIdsSha256": "85361821e43cbf4348d2d2b992198508c45066f86c6236ed8c4fed8327486594"
@@ -1346,52 +1346,52 @@
                 "coveredTriangleIdsSha256": "7dc9152bc8ce1bd5dec440263628b8a4de8742056053a8531240dd0da666f5d5"
               },
               "overskirt": {
-                "coveredSampleCount": 272,
-                "coverageFraction": 0.3073446327683616,
+                "coveredSampleCount": 263,
+                "coverageFraction": 0.29717514124293787,
                 "surfaceGapM": {
-                  "minimum": 0.001248055836185813,
-                  "median": 0.03291613236069679,
-                  "p95": 0.14646652340888977,
-                  "maximum": 0.1873074471950531
+                  "minimum": 0.0006679607322439551,
+                  "median": 0.03598129004240036,
+                  "p95": 0.1474778652191162,
+                  "maximum": 0.18932771682739258
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "63137d34bf045458c6c75f6d371462d3742e6735057774f59ba46737cc666465"
+                "coveredTriangleIdsSha256": "29f4366c32f817e6975557f8200f2ede51a844a742208e50dc94fcc959b8c9a4"
               },
               "front-lap-left": {
-                "coveredSampleCount": 65,
-                "coverageFraction": 0.07344632768361582,
+                "coveredSampleCount": 60,
+                "coverageFraction": 0.06779661016949153,
                 "surfaceGapM": {
-                  "minimum": 0.007240395527333021,
-                  "median": 0.05337801203131676,
-                  "p95": 0.13095131516456604,
-                  "maximum": 0.1487860083580017
+                  "minimum": 0.016176555305719376,
+                  "median": 0.06941340118646622,
+                  "p95": 0.1346127986907959,
+                  "maximum": 0.13608160614967346
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "43124c8bf3c17609b8967ccd97086b7529cf25c9cae87550f598cb89fd486f35"
+                "coveredTriangleIdsSha256": "f9dd6176e6350e9a86dc6a033f37a93454550ac0d15b52a23efbc8d129b7fc10"
               },
               "front-lap-right": {
-                "coveredSampleCount": 66,
-                "coverageFraction": 0.07457627118644068,
+                "coveredSampleCount": 60,
+                "coverageFraction": 0.06779661016949153,
                 "surfaceGapM": {
-                  "minimum": 0.001248055836185813,
-                  "median": 0.026445509865880013,
-                  "p95": 0.04270144924521446,
-                  "maximum": 0.06553497165441513
+                  "minimum": 0.0006679607322439551,
+                  "median": 0.02778591960668564,
+                  "p95": 0.046342507004737854,
+                  "maximum": 0.053546976298093796
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "a97e94731ac0415f47319c1551386e9e7d69891e48cd6cc6b3db3a4eea9a1698"
+                "coveredTriangleIdsSha256": "c6cc9e5b6899e1fe8ba6b6034def12efcf5ea0de8d7e62803789ad2c49350449"
               },
               "front-lap-union": {
-                "coveredSampleCount": 124,
-                "coverageFraction": 0.1401129943502825,
+                "coveredSampleCount": 115,
+                "coverageFraction": 0.12994350282485875,
                 "surfaceGapM": {
-                  "minimum": 0.001248055836185813,
-                  "median": 0.034691303968429565,
-                  "p95": 0.1277925968170166,
-                  "maximum": 0.1487860083580017
+                  "minimum": 0.0006679607322439551,
+                  "median": 0.04099683836102486,
+                  "p95": 0.1297704577445984,
+                  "maximum": 0.13608160614967346
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "30c0b36ad56f04563c3ec456de377ace20014634dd67831115be41f5ab35ef19"
+                "coveredTriangleIdsSha256": "3040e33e04197c216b113239aefeee585c8d59eb8241f372811d1a0a0ba64212"
               }
             }
           },
@@ -1411,52 +1411,52 @@
                 "coveredTriangleIdsSha256": "dcc61f117ce68e8f2048b109235e9056bb63891a260bf7e34bb6aa61e7342c42"
               },
               "overskirt": {
-                "coveredSampleCount": 266,
-                "coverageFraction": 0.30056497175141245,
+                "coveredSampleCount": 264,
+                "coverageFraction": 0.2983050847457627,
                 "surfaceGapM": {
-                  "minimum": 5.023156336392276e-05,
-                  "median": 0.032007187604904175,
-                  "p95": 0.14949221909046173,
-                  "maximum": 0.1873108595609665
+                  "minimum": 0.00016234292706940323,
+                  "median": 0.03507344424724579,
+                  "p95": 0.14859123528003693,
+                  "maximum": 0.18936921656131744
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "7b25158831c8d2ca38eb1146d506db826a17a65f01701fd301d3f1fa6d571c1f"
+                "coveredTriangleIdsSha256": "1a855f9af9139b05d6eff21b363051ed182a1f99ec895ac62ee411b77b7a8d8f"
               },
               "front-lap-left": {
-                "coveredSampleCount": 72,
-                "coverageFraction": 0.08135593220338982,
+                "coveredSampleCount": 71,
+                "coverageFraction": 0.08022598870056497,
                 "surfaceGapM": {
-                  "minimum": 5.023156336392276e-05,
-                  "median": 0.0254951324313879,
-                  "p95": 0.0477164052426815,
-                  "maximum": 0.05353112518787384
+                  "minimum": 0.0004575623315759003,
+                  "median": 0.03020741418004036,
+                  "p95": 0.049435753375291824,
+                  "maximum": 0.05613171309232712
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "ca0b79af4855d85756df587690625531868b7f6d56c64957e3df9a4a2fe1a180"
+                "coveredTriangleIdsSha256": "1e1235c216b0af0c79c027b2023a06a47bd822979115fe7d6fdf1b19cc7b1995"
               },
               "front-lap-right": {
-                "coveredSampleCount": 47,
-                "coverageFraction": 0.05310734463276836,
+                "coveredSampleCount": 46,
+                "coverageFraction": 0.0519774011299435,
                 "surfaceGapM": {
-                  "minimum": 0.009868470951914787,
-                  "median": 0.08189096301794052,
-                  "p95": 0.13129949569702148,
-                  "maximum": 0.15214654803276062
+                  "minimum": 0.012253379449248314,
+                  "median": 0.07940950989723206,
+                  "p95": 0.1322997510433197,
+                  "maximum": 0.14220382273197174
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "a0441f762762938637b6751978d14796ac06bc6a915e81081a9218ddee0c9a4e"
+                "coveredTriangleIdsSha256": "6c59697d977fcd8569d421420ce8d407f818928583ec105623aeae817a970e97"
               },
               "front-lap-union": {
-                "coveredSampleCount": 112,
-                "coverageFraction": 0.12655367231638417,
+                "coveredSampleCount": 115,
+                "coverageFraction": 0.12994350282485875,
                 "surfaceGapM": {
-                  "minimum": 5.023156336392276e-05,
-                  "median": 0.032919783145189285,
-                  "p95": 0.13015030324459076,
-                  "maximum": 0.15214654803276062
+                  "minimum": 0.0004575623315759003,
+                  "median": 0.03725399821996689,
+                  "p95": 0.1293279230594635,
+                  "maximum": 0.14220382273197174
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "aa67752d765ee661a427bf0451116df2f539bdb46b8729719842b24b63770b9c"
+                "coveredTriangleIdsSha256": "3b990e6ba943fd0e296e30a9b4dcc3e7ce84823c4e1ca580a5058d133d1947f1"
               }
             }
           }
@@ -1472,36 +1472,28 @@
               ],
               "sampledBodyTriangleCount": 266,
               "sampledBodyTriangleIdsSha256": "40c4a5f367ca1d377928677403c8f9c497b26c57cfd4f9eb028f1d3c14fb07da",
-              "hitBodyTriangleCountWithinMaximumRayM": 10,
-              "hitBodyTriangleIdsSha256": "59739565646ef23cd4dee7be6fa1f5b975d5cb78a08fd23141dbd9001203d80d",
+              "hitBodyTriangleCountWithinMaximumRayM": 9,
+              "hitBodyTriangleIdsSha256": "08b983c1218d2fe2530a82687258a0464955aae7ef80301a4ee900db6cd39d60",
               "nearestGarmentFaces": [
                 {
-                  "bodyTriangleId": 3569,
-                  "gapM": 0.01319115973263979,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 10080,
-                  "sourceTriangleIndex": 10080
-                },
-                {
                   "bodyTriangleId": 12277,
-                  "gapM": 0.01656433652341366,
+                  "gapM": 0.019189846619963646,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17633,
-                  "sourceTriangleIndex": 17633
+                  "sourcePolygonIndex": 10045,
+                  "sourceTriangleIndex": 10045
                 },
                 {
-                  "bodyTriangleId": 4775,
-                  "gapM": 0.04407796162366867,
+                  "bodyTriangleId": 3569,
+                  "gapM": 0.03566298905014992,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17644,
-                  "sourceTriangleIndex": 17644
+                  "sourcePolygonIndex": 9865,
+                  "sourceTriangleIndex": 9865
                 },
                 {
                   "bodyTriangleId": 3397,
-                  "gapM": 0.04653234678506851,
+                  "gapM": 0.04677111554145813,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17617,
@@ -1509,7 +1501,7 @@
                 },
                 {
                   "bodyTriangleId": 3654,
-                  "gapM": 0.05397222834825516,
+                  "gapM": 0.053844424813985825,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17548,
@@ -1517,39 +1509,39 @@
                 },
                 {
                   "bodyTriangleId": 12347,
-                  "gapM": 0.0591821511387825,
+                  "gapM": 0.05917491662502289,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17413,
                   "sourceTriangleIndex": 17413
                 },
                 {
-                  "bodyTriangleId": 4776,
-                  "gapM": 0.08195706355571747,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9390,
-                  "sourceTriangleIndex": 9390
-                },
-                {
                   "bodyTriangleId": 12077,
-                  "gapM": 0.08257030594348908,
+                  "gapM": 0.08255243200063705,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9350,
-                  "sourceTriangleIndex": 9350
+                  "sourcePolygonIndex": 16968,
+                  "sourceTriangleIndex": 16968
                 },
                 {
                   "bodyTriangleId": 3348,
-                  "gapM": 0.0831723501086235,
+                  "gapM": 0.0831127752661705,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 16967,
                   "sourceTriangleIndex": 16967
                 },
                 {
+                  "bodyTriangleId": 4776,
+                  "gapM": 0.08331601220369339,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9390,
+                  "sourceTriangleIndex": 9390
+                },
+                {
                   "bodyTriangleId": 13142,
-                  "gapM": 0.08440087634325028,
+                  "gapM": 0.08492846685647965,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17000,
@@ -1557,17 +1549,17 @@
                 }
               ],
               "gapM": {
-                "minimum": 0.01319115973263979,
-                "median": 0.0591821511387825,
-                "p95": 0.0831723501086235,
-                "maximum": 0.08440087634325028
+                "minimum": 0.019189846619963646,
+                "median": 0.05917491662502289,
+                "p95": 0.08331601220369339,
+                "maximum": 0.08492846685647965
               },
-              "withinNearDistanceDiagnosticCount": 2,
-              "nearDistanceFractionDiagnosticOnly": 0.007518796992481203,
+              "withinNearDistanceDiagnosticCount": 1,
+              "nearDistanceFractionDiagnosticOnly": 0.0037593984962406013,
               "originOffsetSensitivity": {
                 "offsetM": 0.0001,
-                "hitBodyTriangleCountWithinMaximumRayM": 10,
-                "withinNearDistanceDiagnosticCount": 2,
+                "hitBodyTriangleCountWithinMaximumRayM": 9,
+                "withinNearDistanceDiagnosticCount": 1,
                 "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold."
               },
               "maximumRayM": 0.25,
@@ -1579,52 +1571,52 @@
               ],
               "sampledBodyTriangleCount": 266,
               "sampledBodyTriangleIdsSha256": "b6665c5aa4648a9a9e17534bbeb3d5a72b6606bf6043fef2afca8ae8e7803fad",
-              "hitBodyTriangleCountWithinMaximumRayM": 18,
-              "hitBodyTriangleIdsSha256": "e0a34e08e0213c5151ea621e3e369baf2426e5e300d7ae20079bcbfa789f3aba",
+              "hitBodyTriangleCountWithinMaximumRayM": 17,
+              "hitBodyTriangleIdsSha256": "699473269452e4258c091d49588cd087183ad0be75b7c5cd613a4e168e376628",
               "nearestGarmentFaces": [
                 {
-                  "bodyTriangleId": 9694,
-                  "gapM": 0.001540869508869946,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9960,
-                  "sourceTriangleIndex": 9960
-                },
-                {
                   "bodyTriangleId": 9654,
-                  "gapM": 0.0018798072468489409,
+                  "gapM": 0.0027425379138439894,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9274,
-                  "sourceTriangleIndex": 9274
-                },
-                {
-                  "bodyTriangleId": 8468,
-                  "gapM": 0.006916462361812592,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17487,
-                  "sourceTriangleIndex": 17487
+                  "sourcePolygonIndex": 16931,
+                  "sourceTriangleIndex": 16931
                 },
                 {
                   "bodyTriangleId": 16581,
-                  "gapM": 0.007057488348335028,
+                  "gapM": 0.006885549902915955,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9474,
                   "sourceTriangleIndex": 9474
                 },
                 {
+                  "bodyTriangleId": 15794,
+                  "gapM": 0.007172070361673832,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9227,
+                  "sourceTriangleIndex": 9227
+                },
+                {
                   "bodyTriangleId": 9667,
-                  "gapM": 0.009225055493414402,
+                  "gapM": 0.00890837974101305,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17147,
                   "sourceTriangleIndex": 17147
                 },
                 {
+                  "bodyTriangleId": 16597,
+                  "gapM": 0.010275131940841675,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9714,
+                  "sourceTriangleIndex": 9714
+                },
+                {
                   "bodyTriangleId": 15802,
-                  "gapM": 0.01094831145554781,
+                  "gapM": 0.010675419040024281,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17079,
@@ -1632,23 +1624,15 @@
                 },
                 {
                   "bodyTriangleId": 16568,
-                  "gapM": 0.011444783687591553,
+                  "gapM": 0.011569254949688912,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9359,
                   "sourceTriangleIndex": 9359
                 },
                 {
-                  "bodyTriangleId": 16597,
-                  "gapM": 0.012060989543795586,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9714,
-                  "sourceTriangleIndex": 9714
-                },
-                {
                   "bodyTriangleId": 15469,
-                  "gapM": 0.014625894755125046,
+                  "gapM": 0.013453468598425389,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9676,
@@ -1656,31 +1640,39 @@
                 },
                 {
                   "bodyTriangleId": 9683,
-                  "gapM": 0.020735082134604454,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9857,
-                  "sourceTriangleIndex": 9857
-                },
-                {
-                  "bodyTriangleId": 8567,
-                  "gapM": 0.022689799696207047,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9659,
-                  "sourceTriangleIndex": 9659
-                },
-                {
-                  "bodyTriangleId": 8172,
-                  "gapM": 0.023055554285645485,
+                  "gapM": 0.017781107604503632,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9747,
                   "sourceTriangleIndex": 9747
                 },
                 {
+                  "bodyTriangleId": 8172,
+                  "gapM": 0.021073105663061142,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9747,
+                  "sourceTriangleIndex": 9747
+                },
+                {
+                  "bodyTriangleId": 8567,
+                  "gapM": 0.02221575278043747,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 9659,
+                  "sourceTriangleIndex": 9659
+                },
+                {
+                  "bodyTriangleId": 15724,
+                  "gapM": 0.027505748823285103,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 17622,
+                  "sourceTriangleIndex": 17622
+                },
+                {
                   "bodyTriangleId": 9648,
-                  "gapM": 0.029924522072076798,
+                  "gapM": 0.02971050786972046,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9603,
@@ -1688,57 +1680,49 @@
                 },
                 {
                   "bodyTriangleId": 15808,
-                  "gapM": 0.03069993007183075,
+                  "gapM": 0.03002723391354084,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9706,
                   "sourceTriangleIndex": 9706
                 },
                 {
-                  "bodyTriangleId": 15724,
-                  "gapM": 0.03107718649506569,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17622,
-                  "sourceTriangleIndex": 17622
-                },
-                {
                   "bodyTriangleId": 16591,
-                  "gapM": 0.03523978489637375,
+                  "gapM": 0.033202676951885224,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17646,
                   "sourceTriangleIndex": 17646
                 },
                 {
-                  "bodyTriangleId": 16562,
-                  "gapM": 0.03781219470500946,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17339,
-                  "sourceTriangleIndex": 17339
-                },
-                {
                   "bodyTriangleId": 15566,
-                  "gapM": 0.03812337937951088,
+                  "gapM": 0.03664815324544907,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 10082,
                   "sourceTriangleIndex": 10082
+                },
+                {
+                  "bodyTriangleId": 16562,
+                  "gapM": 0.037464770406484604,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 17339,
+                  "sourceTriangleIndex": 17339
                 }
               ],
               "gapM": {
-                "minimum": 0.001540869508869946,
-                "median": 0.020735082134604454,
-                "p95": 0.03781219470500946,
-                "maximum": 0.03812337937951088
+                "minimum": 0.0027425379138439894,
+                "median": 0.017781107604503632,
+                "p95": 0.03664815324544907,
+                "maximum": 0.037464770406484604
               },
               "withinNearDistanceDiagnosticCount": 13,
               "nearDistanceFractionDiagnosticOnly": 0.04887218045112782,
               "originOffsetSensitivity": {
                 "offsetM": 0.0001,
                 "hitBodyTriangleCountWithinMaximumRayM": 18,
-                "withinNearDistanceDiagnosticCount": 13,
+                "withinNearDistanceDiagnosticCount": 14,
                 "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold."
               },
               "maximumRayM": 0.25,
@@ -1750,84 +1734,60 @@
               ],
               "sampledBodyTriangleCount": 266,
               "sampledBodyTriangleIdsSha256": "40c4a5f367ca1d377928677403c8f9c497b26c57cfd4f9eb028f1d3c14fb07da",
-              "hitBodyTriangleCountWithinMaximumRayM": 20,
-              "hitBodyTriangleIdsSha256": "408cba3f3a7e011dc092638769709c42548889c40667b301d0a989076171aa4f",
+              "hitBodyTriangleCountWithinMaximumRayM": 19,
+              "hitBodyTriangleIdsSha256": "b572a78aa32558ae9854f28fb58d97817f802251a2e5efcc52b657143cffb10f",
               "nearestGarmentFaces": [
                 {
-                  "bodyTriangleId": 3569,
-                  "gapM": 0.002032373484224081,
+                  "bodyTriangleId": 3659,
+                  "gapM": 0.0011679607322439551,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17716,
-                  "sourceTriangleIndex": 17716
+                  "sourcePolygonIndex": 18323,
+                  "sourceTriangleIndex": 18323
                 },
                 {
-                  "bodyTriangleId": 13147,
-                  "gapM": 0.0026216629538685083,
+                  "bodyTriangleId": 12274,
+                  "gapM": 0.0021664358554407954,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10505,
-                  "sourceTriangleIndex": 10505
-                },
-                {
-                  "bodyTriangleId": 4765,
-                  "gapM": 0.002993646228685975,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18232,
-                  "sourceTriangleIndex": 18232
-                },
-                {
-                  "bodyTriangleId": 4781,
-                  "gapM": 0.004706390585750342,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18009,
-                  "sourceTriangleIndex": 18009
+                  "sourcePolygonIndex": 10370,
+                  "sourceTriangleIndex": 10370
                 },
                 {
                   "bodyTriangleId": 12277,
-                  "gapM": 0.005146798595786095,
+                  "gapM": 0.0036805969774723053,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10179,
-                  "sourceTriangleIndex": 10179
+                  "sourcePolygonIndex": 17717,
+                  "sourceTriangleIndex": 17717
                 },
                 {
                   "bodyTriangleId": 12344,
-                  "gapM": 0.005231306806206704,
+                  "gapM": 0.005252697423100472,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 18437,
                   "sourceTriangleIndex": 18437
                 },
                 {
-                  "bodyTriangleId": 4752,
-                  "gapM": 0.00619103891029954,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10871,
-                  "sourceTriangleIndex": 10871
-                },
-                {
-                  "bodyTriangleId": 3659,
-                  "gapM": 0.007322812836617232,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10758,
-                  "sourceTriangleIndex": 10758
-                },
-                {
                   "bodyTriangleId": 12352,
-                  "gapM": 0.007599170237779618,
+                  "gapM": 0.005681506741791964,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 18232,
                   "sourceTriangleIndex": 18232
                 },
                 {
+                  "bodyTriangleId": 4752,
+                  "gapM": 0.006970482330769301,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10871,
+                  "sourceTriangleIndex": 10871
+                },
+                {
                   "bodyTriangleId": 13131,
-                  "gapM": 0.010074037976562977,
+                  "gapM": 0.007976110011339188,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10563,
@@ -1835,39 +1795,47 @@
                 },
                 {
                   "bodyTriangleId": 13118,
-                  "gapM": 0.01250984138995409,
+                  "gapM": 0.010604360058903695,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10798,
                   "sourceTriangleIndex": 10798
                 },
                 {
+                  "bodyTriangleId": 13147,
+                  "gapM": 0.012246156960725785,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 17939,
+                  "sourceTriangleIndex": 17939
+                },
+                {
                   "bodyTriangleId": 12019,
-                  "gapM": 0.01675034399330616,
+                  "gapM": 0.015978611923754216,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10520,
                   "sourceTriangleIndex": 10520
                 },
                 {
-                  "bodyTriangleId": 12274,
-                  "gapM": 0.01940167035162449,
+                  "bodyTriangleId": 4781,
+                  "gapM": 0.016515827655792237,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10211,
-                  "sourceTriangleIndex": 10211
+                  "sourcePolygonIndex": 2690,
+                  "sourceTriangleIndex": 2690
                 },
                 {
                   "bodyTriangleId": 3270,
-                  "gapM": 0.02139768648147583,
+                  "gapM": 0.020357032224535943,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17941,
-                  "sourceTriangleIndex": 17941
+                  "sourcePolygonIndex": 10411,
+                  "sourceTriangleIndex": 10411
                 },
                 {
                   "bodyTriangleId": 3665,
-                  "gapM": 0.02580793845653534,
+                  "gapM": 0.02553705769777298,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10520,
@@ -1875,31 +1843,39 @@
                 },
                 {
                   "bodyTriangleId": 12358,
-                  "gapM": 0.029782072558999062,
+                  "gapM": 0.02955428782105446,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 17975,
                   "sourceTriangleIndex": 17975
                 },
                 {
+                  "bodyTriangleId": 13141,
+                  "gapM": 0.030851556837558747,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 17710,
+                  "sourceTriangleIndex": 17710
+                },
+                {
                   "bodyTriangleId": 4746,
-                  "gapM": 0.032083454459905625,
+                  "gapM": 0.03209836307168007,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 18029,
                   "sourceTriangleIndex": 18029
                 },
                 {
-                  "bodyTriangleId": 13141,
-                  "gapM": 0.03512991863489151,
+                  "bodyTriangleId": 4775,
+                  "gapM": 0.03579798239469528,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10117,
-                  "sourceTriangleIndex": 10117
+                  "sourcePolygonIndex": 11722,
+                  "sourceTriangleIndex": 11722
                 },
                 {
                   "bodyTriangleId": 13112,
-                  "gapM": 0.037669571965932847,
+                  "gapM": 0.037796075373888016,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 17940,
@@ -1907,7 +1883,7 @@
                 },
                 {
                   "bodyTriangleId": 12116,
-                  "gapM": 0.03881463307142258,
+                  "gapM": 0.03817574578523636,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 11722,
@@ -1915,17 +1891,17 @@
                 }
               ],
               "gapM": {
-                "minimum": 0.002032373484224081,
-                "median": 0.01250984138995409,
-                "p95": 0.037669571965932847,
-                "maximum": 0.03881463307142258
+                "minimum": 0.0011679607322439551,
+                "median": 0.015978611923754216,
+                "p95": 0.037796075373888016,
+                "maximum": 0.03817574578523636
               },
-              "withinNearDistanceDiagnosticCount": 16,
-              "nearDistanceFractionDiagnosticOnly": 0.06015037593984962,
+              "withinNearDistanceDiagnosticCount": 14,
+              "nearDistanceFractionDiagnosticOnly": 0.05263157894736842,
               "originOffsetSensitivity": {
                 "offsetM": 0.0001,
                 "hitBodyTriangleCountWithinMaximumRayM": 20,
-                "withinNearDistanceDiagnosticCount": 16,
+                "withinNearDistanceDiagnosticCount": 15,
                 "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold."
               },
               "maximumRayM": 0.25,
@@ -1942,23 +1918,23 @@
               "nearestGarmentFaces": [
                 {
                   "bodyTriangleId": 15727,
-                  "gapM": 0.012983728118240834,
+                  "gapM": 0.01541538155823946,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17655,
-                  "sourceTriangleIndex": 17655
+                  "sourcePolygonIndex": 11771,
+                  "sourceTriangleIndex": 11771
                 },
                 {
                   "bodyTriangleId": 8471,
-                  "gapM": 0.017525690525770188,
+                  "gapM": 0.01752219806611538,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10091,
-                  "sourceTriangleIndex": 10091
+                  "sourcePolygonIndex": 2899,
+                  "sourceTriangleIndex": 2899
                 },
                 {
                   "bodyTriangleId": 9677,
-                  "gapM": 0.039638711988925934,
+                  "gapM": 0.03775399821996689,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10144,
@@ -1966,15 +1942,15 @@
                 },
                 {
                   "bodyTriangleId": 8299,
-                  "gapM": 0.04371734979748726,
+                  "gapM": 0.04306712272763252,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17746,
-                  "sourceTriangleIndex": 17746
+                  "sourcePolygonIndex": 17710,
+                  "sourceTriangleIndex": 17710
                 },
                 {
                   "bodyTriangleId": 8556,
-                  "gapM": 0.05417915704846382,
+                  "gapM": 0.05408933284878731,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 17795,
@@ -1982,7 +1958,7 @@
                 },
                 {
                   "bodyTriangleId": 15797,
-                  "gapM": 0.05925173956155777,
+                  "gapM": 0.059257126331329346,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 17902,
@@ -1990,42 +1966,42 @@
                 },
                 {
                   "bodyTriangleId": 9678,
-                  "gapM": 0.08239096301794052,
+                  "gapM": 0.07990950989723206,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18232,
-                  "sourceTriangleIndex": 18232
-                },
-                {
-                  "bodyTriangleId": 15527,
-                  "gapM": 0.08409143882989883,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10832,
-                  "sourceTriangleIndex": 10832
+                  "sourcePolygonIndex": 18149,
+                  "sourceTriangleIndex": 18149
                 },
                 {
                   "bodyTriangleId": 8250,
-                  "gapM": 0.08571659672260284,
+                  "gapM": 0.08165433901548386,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10831,
-                  "sourceTriangleIndex": 10831
+                  "sourcePolygonIndex": 10758,
+                  "sourceTriangleIndex": 10758
                 },
                 {
                   "bodyTriangleId": 16592,
-                  "gapM": 0.08648407357931137,
+                  "gapM": 0.08451031792163849,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10795,
                   "sourceTriangleIndex": 10795
+                },
+                {
+                  "bodyTriangleId": 15527,
+                  "gapM": 0.08697041022777557,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10832,
+                  "sourceTriangleIndex": 10832
                 }
               ],
               "gapM": {
-                "minimum": 0.012983728118240834,
-                "median": 0.05925173956155777,
-                "p95": 0.08571659672260284,
-                "maximum": 0.08648407357931137
+                "minimum": 0.01541538155823946,
+                "median": 0.059257126331329346,
+                "p95": 0.08451031792163849,
+                "maximum": 0.08697041022777557
               },
               "withinNearDistanceDiagnosticCount": 2,
               "nearDistanceFractionDiagnosticOnly": 0.007518796992481203,
@@ -2042,10 +2018,10 @@
           "evidenceBoundary": "For neutral, crouch, and sit, bind exact body triangle IDs to rest-pose front-facing surface normals and the declared 10–90% UpperLeg bone interval, then cast along each evaluated posed body normal against each authored front-lap panel. Report left/right lap to left/right anterior thigh separately plus a deduplicated union, nearest panel face provenance, ray gaps, and a diagnostic-only 30 mm near-distance count with 0.5 mm versus 0.1 mm origin-offset sensitivity. This is a geometric diagnostic only; it does not establish pressure, stretch, material behavior, Shape Key response, fit, visual quality, or runtime acceptance.",
           "unionNoDoubleCount": {
             "sampledUniqueBodyTriangleCount": 532,
-            "hitUniqueBodyTriangleCount": 56,
-            "hitUnionFraction": 0.10526315789473684,
+            "hitUniqueBodyTriangleCount": 54,
+            "hitUnionFraction": 0.10150375939849623,
             "sampledUniqueBodyTriangleIdsSha256": "50ada84c7c0706f5049d1ae60478e1a52e1ede6e73f02bfe7b194315daf57d6f",
-            "hitUniqueBodyTriangleIdsSha256": "6cd722cc99cf7e023915c452e1bb7e886ba11e43043cff0412c51d3baa5bdcd0"
+            "hitUniqueBodyTriangleIdsSha256": "2acf2fb83121c112e0944f3028151416879d44a9d355dc8467d4e93667f5e735"
           }
         },
         "sharedSeamContinuity": {
@@ -2059,7 +2035,7 @@
     },
     "sit": {
       "renderPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png",
-      "renderSha256": "e1d20fc66f3d7c0da54944e50c440afab5809b9263d0f4674373628dc96ae645",
+      "renderSha256": "30a4d1551d08ba82432d960445fb2a857ef5eb906d31a012738f1de52d63915c",
       "boneRotationsRadians": {
         "Hips": [
           0.13962633907794952,
@@ -2101,7 +2077,7 @@
         "surfaceCoordinateMethod": "posed-avatar-triangle-centroids; deformation-weight anatomical zones; outward-normal ray into matching-pose canonical garment faces",
         "pieceGroupSource": {
           "constructionPath": "config/products/siroino-lilac-lame-fencing-practice-set/construction.json",
-          "constructionSha256": "885ea207cc936a7dbb3fb8a88f87aceab68f992306d1533d3063f29a862f0f58",
+          "constructionSha256": "687498d36f2f51e89ce9acda1476ef9b4d408ab4bfe8d61a2f689e82847d176b",
           "shortsComponentId": "fitted-under-shorts",
           "shortsPieceIds": [
             "shorts-back-left",
@@ -2115,7 +2091,7 @@
             "shorts-leg-cover-left",
             "shorts-leg-cover-right"
           ],
-          "assemblyPoseSha256": "68bc946d21f4929cb4bad7930062cccfdfc1c91dde394aae9401a7ba772ea278",
+          "assemblyPoseSha256": "41e439223e50011867bd80728d6973f302de0b7f872615612792d0a762fe6ed2",
           "skirtClothGroupId": "pleated-overskirt",
           "skirtPieceIds": [
             "overskirt-back-left",
@@ -2245,16 +2221,16 @@
                 "coveredTriangleIdsSha256": "cb168d8f4c5429086ffa6b2146b69cc85f46c2e580a0f77a58f4fcb2342c88d0"
               },
               "overskirt": {
-                "coveredSampleCount": 422,
-                "coverageFraction": 0.6279761904761905,
+                "coveredSampleCount": 426,
+                "coverageFraction": 0.6339285714285714,
                 "surfaceGapM": {
-                  "minimum": 0.002785750897601247,
-                  "median": 0.016152886673808098,
-                  "p95": 0.15329445898532867,
-                  "maximum": 0.1893746554851532
+                  "minimum": 0.002779740374535322,
+                  "median": 0.016063014045357704,
+                  "p95": 0.15136486291885376,
+                  "maximum": 0.18713097274303436
                 },
                 "sampleTriangleIdsSha256": "2c67353c1b6577d52be1f6a240c9381352ac2c56868b7355ce3950ced32b71cf",
-                "coveredTriangleIdsSha256": "4e5711b984f34d954e46ee20d0e0de7dc29fba988a1039837305befd2cdb5473"
+                "coveredTriangleIdsSha256": "a90bf12c67b979e1f70b0ee6943256aa00c5aac22e5145224ece0b2f313b6865"
               },
               "front-lap-left": {
                 "coveredSampleCount": 0,
@@ -2295,52 +2271,52 @@
                 "coveredTriangleIdsSha256": "cd5d055673f705d8d1948772d9a4fe0d0d53905004acf2642d89f06bb9260962"
               },
               "overskirt": {
-                "coveredSampleCount": 173,
-                "coverageFraction": 0.19548022598870057,
+                "coveredSampleCount": 169,
+                "coverageFraction": 0.19096045197740114,
                 "surfaceGapM": {
-                  "minimum": 0.00011586851178435609,
-                  "median": 0.03842457756400108,
-                  "p95": 0.15124784409999847,
-                  "maximum": 0.16143424808979034
+                  "minimum": 0.00023761132615618408,
+                  "median": 0.038027964532375336,
+                  "p95": 0.14832881093025208,
+                  "maximum": 0.16267694532871246
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "125d1791ede0cd1b8f2d93d7361543d204c84df2844f4ee605fa915abcc594d0"
+                "coveredTriangleIdsSha256": "72fc2e2b27ceaed41f4bf5e8e4b209d7433b4c908a9bab1a3b4cb214a4deed05"
               },
               "front-lap-left": {
-                "coveredSampleCount": 35,
-                "coverageFraction": 0.03954802259887006,
+                "coveredSampleCount": 36,
+                "coverageFraction": 0.04067796610169491,
                 "surfaceGapM": {
-                  "minimum": 0.013190497644245625,
-                  "median": 0.07374907284975052,
-                  "p95": 0.10674223303794861,
-                  "maximum": 0.1532994955778122
+                  "minimum": 0.0236025582998991,
+                  "median": 0.0773550346493721,
+                  "p95": 0.10797754675149918,
+                  "maximum": 0.1541709303855896
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "a78274cdcbd4c939ae2a71d85b06767af3b3c1bf12c9464c4c3b995b8fda1cb1"
+                "coveredTriangleIdsSha256": "69b4363c171c93be7d61ee48d6e1c95bc0498bd20a7d21cc188e9d2fb6a1fe08"
               },
               "front-lap-right": {
-                "coveredSampleCount": 38,
-                "coverageFraction": 0.04293785310734463,
+                "coveredSampleCount": 34,
+                "coverageFraction": 0.0384180790960452,
                 "surfaceGapM": {
-                  "minimum": 0.00011586851178435609,
-                  "median": 0.025777805596590042,
-                  "p95": 0.08873531222343445,
-                  "maximum": 0.09792301058769226
+                  "minimum": 0.0007189680472947657,
+                  "median": 0.041120123118162155,
+                  "p95": 0.09476898610591888,
+                  "maximum": 0.1035003811120987
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "2f18ff948c2931d5e583bd447b186080ef79daff44aa24ef87a5baac9271b292"
+                "coveredTriangleIdsSha256": "e68e0087ffa00edf42eb7f05310ebc4521d526ffd3a3fa23e894ce8e6255ce3f"
               },
               "front-lap-union": {
-                "coveredSampleCount": 64,
-                "coverageFraction": 0.07231638418079096,
+                "coveredSampleCount": 63,
+                "coverageFraction": 0.0711864406779661,
                 "surfaceGapM": {
-                  "minimum": 0.00011586851178435609,
-                  "median": 0.055703505873680115,
-                  "p95": 0.09792301058769226,
-                  "maximum": 0.1532994955778122
+                  "minimum": 0.0007189680472947657,
+                  "median": 0.05462279170751572,
+                  "p95": 0.10125518590211868,
+                  "maximum": 0.1541709303855896
                 },
                 "sampleTriangleIdsSha256": "252fe23a6227e4ec039d1fc068264c72de21216a85216c393a000866470ebeab",
-                "coveredTriangleIdsSha256": "151e1834e34c452ff3ab842a64780670b852341e79daebab1c5d080b5e0bde75"
+                "coveredTriangleIdsSha256": "f3f42dced156d2c86572435ace02c6e4d49c4d5f2d18af2f540d2a6bc041a59d"
               }
             }
           },
@@ -2360,52 +2336,52 @@
                 "coveredTriangleIdsSha256": "52d6a7bb0160920a92b4822a6cdde492175f3b2d216b831bc845d891d0445991"
               },
               "overskirt": {
-                "coveredSampleCount": 171,
-                "coverageFraction": 0.19322033898305085,
+                "coveredSampleCount": 173,
+                "coverageFraction": 0.19548022598870057,
                 "surfaceGapM": {
-                  "minimum": 9.202025830745697e-05,
-                  "median": 0.028729606419801712,
-                  "p95": 0.1459694653749466,
-                  "maximum": 0.16262653470039368
+                  "minimum": 0.0004912813892588019,
+                  "median": 0.036943186074495316,
+                  "p95": 0.14730384945869446,
+                  "maximum": 0.1628563404083252
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "e1418be03bedcc3f68ea223a3383050990dcdbdc0f9c49221c93f5575fcdb22b"
+                "coveredTriangleIdsSha256": "6562011df58088070b740d8ac044bab91d2e7abf988807e8e03016f7f2c8a503"
               },
               "front-lap-left": {
-                "coveredSampleCount": 47,
-                "coverageFraction": 0.05310734463276836,
+                "coveredSampleCount": 42,
+                "coverageFraction": 0.04745762711864407,
                 "surfaceGapM": {
-                  "minimum": 0.0005022481200285256,
-                  "median": 0.018292589113116264,
-                  "p95": 0.087516650557518,
-                  "maximum": 0.09823580831289291
+                  "minimum": 0.0006296356441453099,
+                  "median": 0.04675893858075142,
+                  "p95": 0.0881197601556778,
+                  "maximum": 0.1028677448630333
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "f12abdac515b5bd703b4549baaea067855bb9865dc72cd48b6116d25ee67e50d"
+                "coveredTriangleIdsSha256": "a3209a21cb98a262222bcae3e10ada757503cad554ba6e424f8c97227d43bb99"
               },
               "front-lap-right": {
-                "coveredSampleCount": 28,
-                "coverageFraction": 0.031638418079096044,
+                "coveredSampleCount": 27,
+                "coverageFraction": 0.030508474576271188,
                 "surfaceGapM": {
-                  "minimum": 0.013576965779066086,
-                  "median": 0.08319000899791718,
-                  "p95": 0.14786411821842194,
-                  "maximum": 0.15279310941696167
+                  "minimum": 0.014219815842807293,
+                  "median": 0.07899567484855652,
+                  "p95": 0.10946706682443619,
+                  "maximum": 0.1547364443540573
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "bb55a942fff3ba393b16358212f458600bf09f9267a7ed016e296e8bc035c79f"
+                "coveredTriangleIdsSha256": "fcbbb7624ec6d3199dbde44b9c8aa53499ec685aece432d5dc46ab52efa93b2d"
               },
               "front-lap-union": {
                 "coveredSampleCount": 63,
                 "coverageFraction": 0.0711864406779661,
                 "surfaceGapM": {
-                  "minimum": 0.0005022481200285256,
-                  "median": 0.035757727921009064,
-                  "p95": 0.09219908714294434,
-                  "maximum": 0.10162816196680069
+                  "minimum": 0.0006296356441453099,
+                  "median": 0.05237925425171852,
+                  "p95": 0.09384029358625412,
+                  "maximum": 0.1547364443540573
                 },
                 "sampleTriangleIdsSha256": "39f540132a6bea7b3d7a70b95e15437650a44c95b9d4aac9ae8e7d9f1901e563",
-                "coveredTriangleIdsSha256": "1008ab861c541f7b8fd128eb6aed16576d64a31444555f4ecac407daacf4b1f8"
+                "coveredTriangleIdsSha256": "049bd174c67cf7a58dc5bb2d718eacd9501b7502c32770ca9617e8ae75bb93a4"
               }
             }
           }
@@ -2426,7 +2402,7 @@
               "nearestGarmentFaces": [
                 {
                   "bodyTriangleId": 3569,
-                  "gapM": 0.029649824753403664,
+                  "gapM": 0.02976953136920929,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17617,
@@ -2434,7 +2410,7 @@
                 },
                 {
                   "bodyTriangleId": 13142,
-                  "gapM": 0.0355775346159935,
+                  "gapM": 0.03501738879084587,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9902,
@@ -2442,7 +2418,7 @@
                 },
                 {
                   "bodyTriangleId": 4776,
-                  "gapM": 0.04745820435881615,
+                  "gapM": 0.046558647334575654,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17317,
@@ -2450,7 +2426,7 @@
                 },
                 {
                   "bodyTriangleId": 12077,
-                  "gapM": 0.05070231008529663,
+                  "gapM": 0.05058761212229729,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17283,
@@ -2458,7 +2434,7 @@
                 },
                 {
                   "bodyTriangleId": 3348,
-                  "gapM": 0.0590014708340168,
+                  "gapM": 0.059007289737463,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17118,
@@ -2466,10 +2442,10 @@
                 }
               ],
               "gapM": {
-                "minimum": 0.029649824753403664,
-                "median": 0.04745820435881615,
-                "p95": 0.05070231008529663,
-                "maximum": 0.0590014708340168
+                "minimum": 0.02976953136920929,
+                "median": 0.046558647334575654,
+                "p95": 0.05058761212229729,
+                "maximum": 0.059007289737463
               },
               "withinNearDistanceDiagnosticCount": 1,
               "nearDistanceFractionDiagnosticOnly": 0.0037593984962406013,
@@ -2488,86 +2464,78 @@
               ],
               "sampledBodyTriangleCount": 266,
               "sampledBodyTriangleIdsSha256": "b6665c5aa4648a9a9e17534bbeb3d5a72b6606bf6043fef2afca8ae8e7803fad",
-              "hitBodyTriangleCountWithinMaximumRayM": 8,
-              "hitBodyTriangleIdsSha256": "16c9fa86917354328739acd9e0a6b9f855df5c240f3dcb16919ab1b82ba0ad5e",
+              "hitBodyTriangleCountWithinMaximumRayM": 7,
+              "hitBodyTriangleIdsSha256": "434b87cea91553d685d0306463e983720069b18046af125aa91f88831f7e130b",
               "nearestGarmentFaces": [
                 {
-                  "bodyTriangleId": 15727,
-                  "gapM": 0.0010022481200285256,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17551,
-                  "sourceTriangleIndex": 17551
-                },
-                {
                   "bodyTriangleId": 15808,
-                  "gapM": 0.001019579160027206,
+                  "gapM": 0.00112963564414531,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 17037,
                   "sourceTriangleIndex": 17037
                 },
                 {
-                  "bodyTriangleId": 8567,
-                  "gapM": 0.003949715208262206,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 16936,
-                  "sourceTriangleIndex": 16936
-                },
-                {
                   "bodyTriangleId": 9677,
-                  "gapM": 0.004164436284452677,
+                  "gapM": 0.0021819359734654427,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9747,
                   "sourceTriangleIndex": 9747
                 },
                 {
+                  "bodyTriangleId": 8567,
+                  "gapM": 0.0038625909127295017,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-left",
+                  "sourcePolygonIndex": 16936,
+                  "sourceTriangleIndex": 16936
+                },
+                {
                   "bodyTriangleId": 15566,
-                  "gapM": 0.006215035367757082,
+                  "gapM": 0.005420459818094969,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
                   "sourcePolygonIndex": 9683,
                   "sourceTriangleIndex": 9683
                 },
                 {
-                  "bodyTriangleId": 9694,
-                  "gapM": 0.007353737868368626,
+                  "bodyTriangleId": 15727,
+                  "gapM": 0.0067679094262421136,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 17617,
-                  "sourceTriangleIndex": 17617
+                  "sourcePolygonIndex": 17612,
+                  "sourceTriangleIndex": 17612
                 },
                 {
                   "bodyTriangleId": 8299,
-                  "gapM": 0.015644147910177708,
+                  "gapM": 0.015339131385087967,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 9818,
-                  "sourceTriangleIndex": 9818
+                  "sourcePolygonIndex": 9857,
+                  "sourceTriangleIndex": 9857
                 },
                 {
                   "bodyTriangleId": 8471,
-                  "gapM": 0.01777375201880932,
+                  "gapM": 0.015535063959658146,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-left",
-                  "sourcePolygonIndex": 10082,
-                  "sourceTriangleIndex": 10082
+                  "sourcePolygonIndex": 17646,
+                  "sourceTriangleIndex": 17646
                 }
               ],
               "gapM": {
-                "minimum": 0.0010022481200285256,
-                "median": 0.006215035367757082,
-                "p95": 0.015644147910177708,
-                "maximum": 0.01777375201880932
+                "minimum": 0.00112963564414531,
+                "median": 0.005420459818094969,
+                "p95": 0.015339131385087967,
+                "maximum": 0.015535063959658146
               },
-              "withinNearDistanceDiagnosticCount": 8,
-              "nearDistanceFractionDiagnosticOnly": 0.03007518796992481,
+              "withinNearDistanceDiagnosticCount": 7,
+              "nearDistanceFractionDiagnosticOnly": 0.02631578947368421,
               "originOffsetSensitivity": {
                 "offsetM": 0.0001,
-                "hitBodyTriangleCountWithinMaximumRayM": 8,
-                "withinNearDistanceDiagnosticCount": 8,
+                "hitBodyTriangleCountWithinMaximumRayM": 7,
+                "withinNearDistanceDiagnosticCount": 7,
                 "boundary": "Offset sensitivity only; compare with the primary 0.5 mm ray and do not interpret either as a fit or acceptance threshold."
               },
               "maximumRayM": 0.25,
@@ -2583,32 +2551,32 @@
               "hitBodyTriangleIdsSha256": "c6aa39fd9a50193f88de8423cc9d5de615a2899529cac9025971da2a0b96c2ad",
               "nearestGarmentFaces": [
                 {
+                  "bodyTriangleId": 4775,
+                  "gapM": 0.0012189680472947657,
+                  "object": "pleated-overskirt",
+                  "pieceId": "overskirt-front-lap-right",
+                  "sourcePolygonIndex": 10411,
+                  "sourceTriangleIndex": 10411
+                },
+                {
                   "bodyTriangleId": 3665,
-                  "gapM": 0.0018066590763628483,
+                  "gapM": 0.001558589550666511,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10833,
                   "sourceTriangleIndex": 10833
                 },
                 {
-                  "bodyTriangleId": 4775,
-                  "gapM": 0.002310666057281196,
-                  "object": "pleated-overskirt",
-                  "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17941,
-                  "sourceTriangleIndex": 17941
-                },
-                {
                   "bodyTriangleId": 12358,
-                  "gapM": 0.004652912646532059,
+                  "gapM": 0.003835186978802085,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 18237,
-                  "sourceTriangleIndex": 18237
+                  "sourcePolygonIndex": 10727,
+                  "sourceTriangleIndex": 10727
                 },
                 {
                   "bodyTriangleId": 13158,
-                  "gapM": 0.0058812637925148015,
+                  "gapM": 0.005060854751616717,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 2554,
@@ -2616,7 +2584,7 @@
                 },
                 {
                   "bodyTriangleId": 12116,
-                  "gapM": 0.008468975231051445,
+                  "gapM": 0.0081245223172009,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10520,
@@ -2624,15 +2592,15 @@
                 },
                 {
                   "bodyTriangleId": 12277,
-                  "gapM": 0.01122273775935173,
+                  "gapM": 0.011804254643619061,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17711,
-                  "sourceTriangleIndex": 17711
+                  "sourcePolygonIndex": 17746,
+                  "sourceTriangleIndex": 17746
                 },
                 {
                   "bodyTriangleId": 3397,
-                  "gapM": 0.016816233202815056,
+                  "gapM": 0.016732222318649292,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10375,
@@ -2640,10 +2608,10 @@
                 }
               ],
               "gapM": {
-                "minimum": 0.0018066590763628483,
-                "median": 0.0058812637925148015,
-                "p95": 0.01122273775935173,
-                "maximum": 0.016816233202815056
+                "minimum": 0.0012189680472947657,
+                "median": 0.005060854751616717,
+                "p95": 0.011804254643619061,
+                "maximum": 0.016732222318649292
               },
               "withinNearDistanceDiagnosticCount": 7,
               "nearDistanceFractionDiagnosticOnly": 0.02631578947368421,
@@ -2667,15 +2635,15 @@
               "nearestGarmentFaces": [
                 {
                   "bodyTriangleId": 15727,
-                  "gapM": 0.02364254641532898,
+                  "gapM": 0.021796752616763115,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 17688,
-                  "sourceTriangleIndex": 17688
+                  "sourcePolygonIndex": 10144,
+                  "sourceTriangleIndex": 10144
                 },
                 {
                   "bodyTriangleId": 9678,
-                  "gapM": 0.04113621163368225,
+                  "gapM": 0.04088795456290245,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10341,
@@ -2683,15 +2651,15 @@
                 },
                 {
                   "bodyTriangleId": 16592,
-                  "gapM": 0.04687865349650383,
+                  "gapM": 0.046232036232948304,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
-                  "sourcePolygonIndex": 10411,
-                  "sourceTriangleIndex": 10411
+                  "sourcePolygonIndex": 17941,
+                  "sourceTriangleIndex": 17941
                 },
                 {
                   "bodyTriangleId": 8250,
-                  "gapM": 0.05287950384616852,
+                  "gapM": 0.05287925425171852,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 10560,
@@ -2699,7 +2667,7 @@
                 },
                 {
                   "bodyTriangleId": 15527,
-                  "gapM": 0.05975338715314865,
+                  "gapM": 0.05931517007946968,
                   "object": "pleated-overskirt",
                   "pieceId": "overskirt-front-lap-right",
                   "sourcePolygonIndex": 18168,
@@ -2707,10 +2675,10 @@
                 }
               ],
               "gapM": {
-                "minimum": 0.02364254641532898,
-                "median": 0.04687865349650383,
-                "p95": 0.05287950384616852,
-                "maximum": 0.05975338715314865
+                "minimum": 0.021796752616763115,
+                "median": 0.046232036232948304,
+                "p95": 0.05287925425171852,
+                "maximum": 0.05931517007946968
               },
               "withinNearDistanceDiagnosticCount": 1,
               "nearDistanceFractionDiagnosticOnly": 0.0037593984962406013,
@@ -2727,10 +2695,10 @@
           "evidenceBoundary": "For neutral, crouch, and sit, bind exact body triangle IDs to rest-pose front-facing surface normals and the declared 10–90% UpperLeg bone interval, then cast along each evaluated posed body normal against each authored front-lap panel. Report left/right lap to left/right anterior thigh separately plus a deduplicated union, nearest panel face provenance, ray gaps, and a diagnostic-only 30 mm near-distance count with 0.5 mm versus 0.1 mm origin-offset sensitivity. This is a geometric diagnostic only; it does not establish pressure, stretch, material behavior, Shape Key response, fit, visual quality, or runtime acceptance.",
           "unionNoDoubleCount": {
             "sampledUniqueBodyTriangleCount": 532,
-            "hitUniqueBodyTriangleCount": 24,
-            "hitUnionFraction": 0.045112781954887216,
+            "hitUniqueBodyTriangleCount": 23,
+            "hitUnionFraction": 0.043233082706766915,
             "sampledUniqueBodyTriangleIdsSha256": "50ada84c7c0706f5049d1ae60478e1a52e1ede6e73f02bfe7b194315daf57d6f",
-            "hitUniqueBodyTriangleIdsSha256": "417fe282903ee1a48732813ae4aeec03b7620d9f5fecbd9ca48355b7ef423885"
+            "hitUniqueBodyTriangleIdsSha256": "a3fda4ec99add0c2fb0e6d61aab39c2d410149e61c5c47cb559927e466328635"
           }
         },
         "sharedSeamContinuity": {

@@ -9747,7 +9747,7 @@
     "hemExtensionM": 0.07,
     "foldCount": 8,
     "topologySubdivisionFactor": 4,
-    "hemFoldDepthM": 0.015,
+    "hemFoldDepthM": 0.008,
     "phaseRadians": 0,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
@@ -9767,7 +9767,7 @@
       ],
       "evidenceBoundary": "V138 restores 15 mm additional front hem extension and 4 mm forward projection after the larger V137 extension formed a shield and side wedge. Common host/lap panel boundaries remain. Pose coverage, fit, drape, and appearance remain unapproved."
     },
-    "evidenceBoundary": "V185 changes only the panel-local flat-crest ramp fraction from 0.55 to 0.85, narrowing the flat crest while retaining fold depth, fold count, sewn panel boundaries, hem placement, and apron geometry. Test whether broader gradual shoulders reduce visible planar facets. Pose coverage, fit, cloth behavior, appearance acceptance, runtime, and release remain unverified.",
+    "evidenceBoundary": "V186 changes only panel-local hemFoldDepthM from 15 mm to 8 mm after V185 retained planar facets in direct views. Fold count, crest ramp, sewn boundaries, hem placement, and apron geometry stay fixed. This tests shallower relief; pose coverage, fit, cloth behavior, appearance, runtime, and release remain unverified.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9838,7 +9838,7 @@
     "maximumFrontYM": 0.04,
     "evidenceBoundary": "V183 tests a bounded rest-geometry placement of the four authored front skirt/lap panels toward measured UpperLeg deform surfaces, with 50 mm fades at shared front, side, and waistband seams. It retains V182 wrap and V181 15 mm hem relief. This is a disposable pose-response hypothesis, not fit, motion, or visual acceptance."
   },
-  "designRevision": "v185-skirt-pleat-softness-check-20261120",
+  "designRevision": "v186-skirt-pleat-depth-check-20261120",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
