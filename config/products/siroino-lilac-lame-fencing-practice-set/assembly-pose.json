@@ -9810,7 +9810,7 @@
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "poseAwareThighAttachment": {
-    "method": "bilateral-deform-bone-surface-placement-v1",
+    "method": "bilateral-pose-space-thigh-envelope-inverse-skin-placement-v1",
     "pieceIds": [
       "overskirt-front-left",
       "overskirt-front-right",
@@ -9840,9 +9840,9 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V189 tests up to 90% lower-front panel placement on the measured same-side UpperLeg surface instead of a 50% rest-geometry blend. The build backtracks vertices to preserve incident sewn-face area and orientation. The exact authored open front-lap hem edges are now locked during surface placement after the first trial exceeded the unchanged 100 mm hem-range contract by 6 mm; the 50 mm shared-seam fades, authored 2D bounds, skirt length, and skin weights remain unchanged. This geometry hypothesis does not establish fit, motion, or visual acceptance."
+    "evidenceBoundary": "V190 queries the measured same-side UpperLeg surface in the actual crouch and sit poses, then maps the targets into garment rest space through barycentrically blended avatar skin transforms. It retains the V189 exact authored open front-lap hem lock, 50 mm shared-seam fades, authored 2D bounds, skirt length, and skin weights, with triangle-orientation backtracking. This geometry hypothesis does not establish fit, motion, or visual acceptance."
   },
-  "designRevision": "v189-full-thigh-surface-front-panel-20261121",
+  "designRevision": "v190-pose-space-thigh-envelope-20261121",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

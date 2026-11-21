@@ -3246,13 +3246,13 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     transfer. It is an attachment hypothesis, not fit or pose acceptance.
     """
     from collections import defaultdict
-    from mathutils import Vector
+    from mathutils import Matrix, Vector
     from mathutils.bvhtree import BVHTree
 
     spec = pose.get("poseAwareThighAttachment")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "bilateral-deform-bone-surface-placement-v1":
+    if spec.get("method") != "bilateral-pose-space-thigh-envelope-inverse-skin-placement-v1":
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
         raise ValueError("Thigh attachment target source is stale")
@@ -3339,6 +3339,135 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     applied_blend_weights = []
     max_distance = 0.0
     max_displacement = 0.0
+
+    # The neutral-shell projection above was not enough for raised thighs: a
+    # neutral surface target can still leave a panel behind the leg after skinning.
+    # Build same-side body surfaces in the actual crouch and sit poses, query in
+    # pose space, then map each surface target back through the body's measured
+    # linear blend-skinning transform. This keeps the authored mesh in rest space
+    # while targeting the pose-space surface that the later skin/export stage uses.
+    from genworks_product_common import reset_pose, set_pose
+
+    armature = bones[0]
+    eligible_by_side = {}
+    for side, group_index in group_indices.items():
+        weights_by_vertex = [
+            next((item.weight for item in vertex.groups if item.group == group_index), 0.0)
+            for vertex in body.data.vertices
+        ]
+        eligible_by_side[side] = [
+            tri_index for tri_index, tri in enumerate(triangles)
+            if sum(weights_by_vertex[index] for index in tri) / 3.0 >= min_bone_weight
+        ]
+
+    def barycentric(point, a, b, c):
+        edge0, edge1, offset = b - a, c - a, point - a
+        d00, d01, d11 = edge0.dot(edge0), edge0.dot(edge1), edge1.dot(edge1)
+        d20, d21 = offset.dot(edge0), offset.dot(edge1)
+        denominator = d00 * d11 - d01 * d01
+        if abs(denominator) <= 1e-18:
+            raise ValueError("Pose-space thigh target contains a degenerate body triangle")
+        second = (d11 * d20 - d01 * d21) / denominator
+        third = (d00 * d21 - d01 * d20) / denominator
+        values = [1.0 - second - third, second, third]
+        values = [max(0.0, value) for value in values]
+        total = sum(values)
+        if total <= 1e-12:
+            raise ValueError("Pose-space thigh barycentric coordinates are invalid")
+        return [value / total for value in values]
+
+    pose_surfaces = {}
+    try:
+        for pose_name in ("crouch", "sit"):
+            set_pose(armature, pose_name)
+            depsgraph = bpy.context.evaluated_depsgraph_get()
+            evaluated_body = body.evaluated_get(depsgraph)
+            evaluated_mesh = evaluated_body.to_mesh()
+            try:
+                evaluated_mesh.calc_loop_triangles()
+                posed_triangles = [tuple(tri.vertices) for tri in evaluated_mesh.loop_triangles]
+                if len(evaluated_mesh.vertices) != len(body.data.vertices) or posed_triangles != triangles:
+                    raise ValueError("Pose-space thigh mapping requires stable target-body topology")
+                posed_coordinates = [evaluated_body.matrix_world @ vertex.co for vertex in evaluated_mesh.vertices]
+                transform_by_vertex = []
+                for vertex in body.data.vertices:
+                    blend = Matrix.Identity(4) * 0.0
+                    total = 0.0
+                    for item in vertex.groups:
+                        if item.weight <= 0:
+                            continue
+                        group = body.vertex_groups[item.group]
+                        pose_bone = armature.pose.bones.get(group.name)
+                        rest_bone = armature.data.bones.get(group.name)
+                        if pose_bone is None or rest_bone is None or not rest_bone.use_deform:
+                            continue
+                        bone_transform = (
+                            armature.matrix_world @ pose_bone.matrix
+                            @ rest_bone.matrix_local.inverted()
+                            @ armature.matrix_world.inverted()
+                        )
+                        blend += bone_transform * item.weight
+                        total += item.weight
+                    if total < 1.0:
+                        blend += Matrix.Identity(4) * (1.0 - total)
+                    elif total > 1.0:
+                        blend *= 1.0 / total
+                    transform_by_vertex.append(blend)
+                surfaces = {}
+                for side in ("left", "right"):
+                    tri_indices = eligible_by_side[side]
+                    side_triangles = [triangles[index] for index in tri_indices]
+                    tree = BVHTree.FromPolygons(posed_coordinates, side_triangles, all_triangles=True)
+                    if tree is None:
+                        raise ValueError(f"No posed {side} thigh BVH for {pose_name}")
+                    surfaces[side] = (tree, tri_indices, posed_coordinates, transform_by_vertex)
+                pose_surfaces[pose_name] = surfaces
+            finally:
+                evaluated_body.to_mesh_clear()
+    finally:
+        reset_pose(armature)
+
+    def pose_space_rest_target(side, point):
+        candidates = []
+        distances = []
+        for pose_name in ("crouch", "sit"):
+            tree, tri_indices, posed_coordinates, transforms = pose_surfaces[pose_name][side]
+            posed_panel_point = point.copy()
+            # Approximate the panel's current skin transform using the nearest
+            # same-side neutral triangle's barycentric body weights.
+            neutral = side_trees[side].find_nearest(point)
+            if neutral is None or neutral[0] is None or neutral[2] is None:
+                raise ValueError("Neutral thigh surface lookup failed for pose mapping")
+            neutral_triangle = triangles[eligible_by_side[side][neutral[2]]]
+            neutral_bary = barycentric(neutral[0], *(coords[index] for index in neutral_triangle))
+            # Each pose surface stores its own body transforms. Re-evaluate the
+            # panel point with that pose's skin matrices, not the neutral matrix.
+            posed_matrix = Matrix.Identity(4) * 0.0
+            for vertex_index, weight in zip(neutral_triangle, neutral_bary):
+                posed_matrix += transforms[vertex_index] * weight
+            posed_panel_point = posed_matrix @ point
+            hit = tree.find_nearest(posed_panel_point)
+            if hit is None or hit[0] is None or hit[2] is None:
+                raise ValueError(f"Pose-space {side} thigh projection failed for {pose_name}")
+            location, normal, reduced_tri_index, distance = hit
+            if distance > projection_limit or normal.length < 0.99:
+                raise ValueError(f"Pose-space {side} thigh projection exceeds bounds for {pose_name}")
+            original_tri_index = tri_indices[reduced_tri_index]
+            tri = triangles[original_tri_index]
+            pose_bary = barycentric(location, *(posed_coordinates[index] for index in tri))
+            blended = Matrix.Identity(4) * 0.0
+            for vertex_index, weight in zip(tri, pose_bary):
+                blended += transforms[vertex_index] * weight
+            if abs(blended.determinant()) <= 1e-10:
+                raise ValueError(f"Pose-space {side} thigh transform is singular for {pose_name}")
+            normal.normalize()
+            if (posed_panel_point - location).dot(normal) < 0:
+                normal.negate()
+            posed_target = location + normal * clearance
+            candidates.append(blended.inverted() @ posed_target)
+            distances.append(float(distance))
+        return sum(candidates, Vector()) / len(candidates), max(distances)
+
     for index, point_values in enumerate(mesh["vertices"]):
         if index in locked_hem_vertices:
             continue
@@ -3354,18 +3483,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             continue
         is_left = (point.x >= center_x) == left_positive
         side = "left" if is_left else "right"
-        result = side_trees[side].find_nearest(point)
-        if result is None or result[0] is None or result[1] is None:
-            raise ValueError(f"Thigh surface lookup failed at sewn vertex {index}")
-        location, normal, _triangle, distance = result
-        if distance > projection_limit or normal.length < .99:
-            raise ValueError(f"Thigh projection exceeds declared range at sewn vertex {index}")
-        normal = normal.normalized()
-        # Orient the offset toward the garment's original exterior, rather than
-        # trusting arbitrary triangle winding in the imported avatar mesh.
-        if (point - location).dot(normal) < 0:
-            normal.negate()
-        target = location + normal * clearance
+        target, distance = pose_space_rest_target(side, point)
         requested_factor = factor
         placed = point
         accepted = False
@@ -3410,6 +3528,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     return {
         "applied": True,
         "method": spec["method"],
+        "poseSpaceTargets": ["crouch", "sit"],
         "targetSourceSha256": digest(target_path),
         "targetBodyObject": body.name,
         "targetTriangleCountByThigh": side_triangle_counts,
