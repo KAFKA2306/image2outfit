@@ -434,6 +434,7 @@ def configure_cloth(
     bending_stiffness: float = 0.45,
     dynamic_mesh: bool = False,
     self_collision: bool = False,
+    self_collision_distance_min: float | None = None,
 ) -> dict[str, object]:
     for modifier in list(obj.modifiers):
         if modifier.name.startswith("Image2Outfit Cloth"):
@@ -466,6 +467,38 @@ def configure_cloth(
     else:
         cloth.collision_settings.use_self_collision = self_collision
         actual_self_collision = cloth.collision_settings.use_self_collision
+    if self_collision_distance_min is not None:
+        if not actual_self_collision:
+            raise ValueError(
+                "A native self-collision distance requires self-collision to be enabled"
+            )
+        collision_settings = cloth.collision_settings
+        if not hasattr(collision_settings, "self_distance_min"):
+            raise RuntimeError(
+                "Requested native Cloth self-collision distance is unavailable"
+            )
+        distance_property = collision_settings.bl_rna.properties[
+            "self_distance_min"
+        ]
+        if not (
+            distance_property.hard_min
+            <= self_collision_distance_min
+            <= distance_property.hard_max
+        ):
+            raise ValueError(
+                "Self-collision distance hypothesis exceeds native Blender limits"
+            )
+        collision_settings.self_distance_min = float(self_collision_distance_min)
+        actual_distance = float(collision_settings.self_distance_min)
+        if not math.isclose(
+            actual_distance,
+            float(self_collision_distance_min),
+            rel_tol=0.0,
+            abs_tol=1e-7,
+        ):
+            raise ValueError(
+                "Native Blender did not retain the declared self-collision distance"
+            )
     cloth.point_cache.frame_start = 1
     cloth.point_cache.frame_end = frame_end
     return {
@@ -1714,11 +1747,27 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
         bending_stiffness = 0.45
         self_collision_hypothesis = self_collision_hypotheses.get(name)
         self_collision = False
+        self_collision_distance_min = None
         if self_collision_hypothesis is not None:
             enabled = self_collision_hypothesis.get("enabled")
             if not isinstance(enabled, bool):
                 raise ValueError("Self-collision hypothesis requires an explicit boolean")
             self_collision = enabled
+            if "distanceMinM" in self_collision_hypothesis:
+                distance = self_collision_hypothesis["distanceMinM"]
+                if (
+                    isinstance(distance, bool)
+                    or not isinstance(distance, (int, float))
+                    or not math.isfinite(distance)
+                ):
+                    raise ValueError(
+                        "Self-collision distance hypothesis requires a finite number"
+                    )
+                if not self_collision:
+                    raise ValueError(
+                        "Self-collision distance cannot be declared while disabled"
+                    )
+                self_collision_distance_min = float(distance)
         dynamic_component = pose_response is not None and (
             name == pose_response["component"] or name in pre_cloth_skinning
         )
@@ -1727,6 +1776,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
             frame_end,
             dynamic_mesh=dynamic_component,
             self_collision=self_collision,
+            self_collision_distance_min=self_collision_distance_min,
         )
         if hem_source is not None:
             contract["hemBoundaryAttachment"] = hem_source
@@ -1735,6 +1785,15 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 "enabled": bool(
                     obj.modifiers["Image2Outfit Cloth"]
                     .collision_settings.use_self_collision
+                ),
+                "actualDistanceMinM": float(
+                    obj.modifiers["Image2Outfit Cloth"]
+                    .collision_settings.self_distance_min
+                ),
+                **(
+                    {"requestedDistanceMinM": self_collision_distance_min}
+                    if self_collision_distance_min is not None
+                    else {}
                 ),
                 "reason": self_collision_hypothesis["reason"],
                 "evidenceBoundary": self_collision_hypothesis["evidenceBoundary"],
@@ -1861,6 +1920,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 bending_stiffness,
                 dynamic_mesh=dynamic_component,
                 self_collision=self_collision,
+                self_collision_distance_min=self_collision_distance_min,
             )
             control_modifier = control.modifiers["Image2Outfit Cloth"]
             control_modifier.settings.rest_shape_key = (

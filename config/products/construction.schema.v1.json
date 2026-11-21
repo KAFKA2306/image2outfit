@@ -743,6 +743,25 @@
             }
           }
         },
+        "prototypeComponentSelfCollisionHypotheses": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["enabled", "reason", "evidenceBoundary"],
+            "properties": {
+              "enabled": {"type": "boolean"},
+              "distanceMinM": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 0.015
+              },
+              "reason": {"type": "string", "minLength": 1},
+              "evidenceBoundary": {"type": "string", "minLength": 1}
+            }
+          }
+        },
         "prototypePostBakeLaplacianSmoothing": {
           "type": "object",
           "additionalProperties": {
