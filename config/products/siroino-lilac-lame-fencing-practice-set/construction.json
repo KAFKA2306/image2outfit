@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V192 smooths the lower-front pose-space thigh displacement separately inside each canonical sewn panel and finds one orientation-safe scale per panel. Front-lap hems, panel boundaries, and shared seams remain anchored, avoiding one failing triangle in one panel suppressing movement across the entire apron. Evaluate weighted crouch/sit renders, coverage, all direct visual blockers, and release gates; this remains a geometry hypothesis, not fit or appearance acceptance.",
-  "designRevision": "v194-row-local-orientation-constrained-deformation-20261121",
+  "designRevision": "v195-explicit-overskirt-self-collision-20261121",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -205,8 +205,15 @@
       "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
-    "evidence": "V173 retains V172 neutral settling and 0.90 native Cloth bending stiffness, changing only overskirt self-collision from disabled to enabled. V172's measured sewn-panel bake inverted 3,163 of 17,567 oriented faces (18.0%) across the six overskirt panels; maximum per-panel rest-to-settled displacement was 0.257 m, and attached hem trim moved up to 0.263 m. The V173 build records the actual native self-collision setting and regenerates the existing previews. This experiment grants no fit, appearance, collision-safety, Unity/VRChat, or release acceptance.",
-    "reason": "The V172 trial retained severe folds despite increased bending stiffness. Direct geometry comparison against the exact pre-bake sewn source found 571/3,539 inverted faces on the left-back panel, 547/3,683 right-back, 328/2,764 left front-lap, 293/2,477 right front-lap, 593/2,370 left-front, and 831/2,734 right-front. Every panel moved at least 0.156 m at its maximum; the front-right mean vertex displacement was 0.0743 m. V173 tests the distinct failure mechanism that intersecting cloth layers pass through one another: enable Blender's native self-collision only for the overskirt, retaining all other V172 inputs. Its visual and numeric outcome remains unverified until the actual bake and direct review.",
+    "evidence": "The V194 cloth report recorded native overskirt selfCollision=false, so the declared anti-interpenetration trial had not reached Blender's Cloth modifier. V195 explicitly enables native self-collision for the overskirt in the construction policy consumed by the existing bake path; the resulting modifier flag and geometry response will be measured before direct review. This grants no fit, appearance, collision-safety, Unity/VRChat, or release acceptance.",
+    "reason": "The current construction text describes an enabled self-collision experiment, but the machine-readable prototypeComponentSelfCollisionHypotheses setting is absent and the V194 simulation evidence confirms Blender ran with selfCollision=false. Restore that missing input, with only the overskirt enabled, so the existing workflow actually tests the intended layer-interpenetration mechanism. Preserve all other V194 geometry, bending, and pin inputs; appearance and fit remain unverified until the new bake and renders are inspected.",
+    "prototypeComponentSelfCollisionHypotheses": {
+      "pleated-overskirt": {
+        "enabled": true,
+        "reason": "V194 recorded selfCollision=false despite the construction's declared anti-interpenetration trial; enable the setting on the overskirt component through the canonical cloth policy consumed by Blender.",
+        "evidenceBoundary": "This trial verifies the native modifier setting and measures its baked response only. It does not establish fit, pressure, collision safety, visual acceptance, runtime behavior, or release acceptance."
+      }
+    },
     "prototypeComponentBendingHypotheses": {
       "pleated-overskirt": {
         "stiffness": 0.9,

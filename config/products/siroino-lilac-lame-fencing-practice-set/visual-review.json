@@ -3,114 +3,43 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewer": "Codex direct review",
-  "reviewedRevision": "v194-row-local-orientation-constrained-deformation-20261121",
+  "reviewedRevision": "v195-explicit-overskirt-self-collision-20261121",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "973685302f3e27a1cbcc86e2e060e5686b2bcd3c7aa8e5dfb3ae760cf5755a8b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "660c145b3580dc9ebecb5fcf6e0a970fd2c5612129c07360c1e55f89a59445b6",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "4437d9ef024a00d1c47fcd6c6ecce5457e6e8e78a76b25da34700f4c25e1e157",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "b4205b222082489e9130f3ac4014cc3b44431d40e269e5959cce78e2202e238f",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "77998aa52d26569ae9550e31172e3465c259ddeef2284ad4341fbbd5a7a416ee",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "5ee3ac094215bf560462c27a69cce2653a10b12990858546728b7a064faa9059",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "c261810ccb25eab02fc7f2464586b3440d9f7b73da956d702d592e4650534c7d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "4cac8a7e393030b1ba8695e96410bd07a7b62463b3784b715564fc1de04d609f",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "0b88410bcc6b039bb81ffed53d9a6e4d6380f89e3788c8f766b86f0a5a8c7953",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "e65850e9eb3ce8d3afa7d16967588af7b7f1f13e1c8171472f4e5babcf8416e8",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "d814e3065be5d3beb5127467861759cf5811d3ea1fe6f9003738fa013e32eaad"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "f9206a5d71e03c7d8535892c1ae02eb9694c895ef8ef434e38eab9f58c715370",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "0a537674ba4a1d9c8586d99c9f756c5c375e61775805418a2102e61a76e643d6",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "563b88ded32e5cc32be3534f437dc9616bdb1a46f6f38b064ce73e73948769b3",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "6c6a695d9220fec355e80162a2543e6fd50bf7226b676824ff632e21909a5044",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "20840ad6370f80d7d939b1dbff5b8196cf1976a1889c04297e6471c4f9c91203",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "60f28ed5c027d6689b78b483abd8723cb58349a0c116b20ab0cf9fe2903f0874",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "9b7969fd5aacfdbe1b355d0514ed9a4d94d94060c90c4741f4c847fa4181687f",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "24fafe9bdfc7e6a357cecb92c8fe217bb73e7138866bfbdf95420c45e03eb54e",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "31aa8cebc410f8c0004433cc6744379b57437df2d89945a81b48bd1ff25000fa",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "5f64854f081dd6eca885f5f1a84bfaa8018fc1bf31ae5c71fec499919ce3ad14",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "71ed2bdd046993742679a80d4c52b4435f531426495ca01c0318284ffff27ecc"
   },
   "findings": [
     {
-      "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
+      "description": "Direct inspection of all five V195 main views and six pose renders shows the overskirt broken into dense, sharp triangular folds across neutral, standing poses, crouch, sit, prone, and side/back views. The cloth no longer reads as a sewn pleated garment and fails appearance and customer usability.",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all five V194 views and six pose renders: the neutral skirt still has dense, irregular vertical folds and a puckered waist junction. The crouch shows skirt panels flaring into sharp folded tails with exposed anterior thighs; sit leaves most of the lap area uncovered. Pose-matched ray coverage is only 52/532 triangles (9.8%) in crouch and 22/532 (4.1%) in sit; visual fit remains unacceptable."
+      "code": "OVERSKIRT_NATIVE_SELF_COLLISION_DESTABILIZES_SURFACE"
     },
     {
-      "code": "BODICE_SURFACE_ARTIFACTS",
+      "description": "The V195 Blender cloth report records native selfCollision=true with selfCollisionDistanceMinM=0.015 m. Its fixed source-polygon fan audit reports 7,447 inverted skirt triangles across 20,701 skirt source triangles; lap-panel maximum vertex displacement is 0.1222 m left and 0.1258 m right. These are prototype instability measurements, not acceptance.",
       "severity": "BLOCKER",
-      "description": "V194 front, side, three-quarter, back and prone views still show angular planar folds across the bodice, a gray waist-side patch with unverified garment-surface ownership, and an uneven waist/back transition. The jacket surface remains visibly unfinished."
+      "code": "SELF_COLLISION_PANEL_INVERSION_AND_DISPLACEMENT"
     },
     {
-      "code": "V194_ROW_LOCAL_RECONSTRUCTION_STILL_GEOMETRICALLY_CONSTRAINED",
+      "description": "Direct crouch and sit renders still expose substantial anterior thighs and leave the seated lap inadequately covered; the tested native self-collision setting did not yield an acceptable motion silhouette.",
       "severity": "BLOCKER",
-      "description": "The V194 per-authored-row line search preserves 108 lap-hem vertices and 262 shared panel-boundary vertices, but minimum orientation-safe row scales remain 0.0141/0.0171 on the two lap panels. Mean applied displacement blend is 0.158; maximum rest displacement is 0.0101 m and maximum nearest-surface distance remains 0.1447 m. Crouch coverage only changes from 48/532 in V193 to 52/532; sit remains 22/532. This is diagnostic prototype geometry, not fit acceptance."
+      "code": "MOTION_COVERAGE_REMAINS_UNACCEPTABLE"
+    },
+    {
+      "description": "The jacket still has visibly angular planar surface artifacts and an unfinished waist transition in the direct V195 views.",
+      "severity": "MAJOR",
+      "code": "BODICE_SURFACE_ARTIFACTS_REMAIN"
     }
   ],
-  "nextAction": "Stop tuning row scale, row width, or iteration count. The direct V194 review and pose-ray diagnostics show that even row-local displacement is blocked by low inversion-safe motion on both lap panels (minimum row scales 0.0141/0.0171) while crouch/sit coverage remains 9.8%/4.1%. In Blender, inspect the actual evaluated neutral/crouch/sit cloth mesh and panel connectivity to find where the authored lap topology folds or separates from the front thigh. Change the sewn panel geometry or cloth construction so the lap can move without forcing local triangle inversion; keep the current appearance and fit gates rejected until new renders visibly resolve the skirt, bodice facets, and waist patch.",
-  "componentIdEvidence": {
-    "reviewMethod": "direct-image-inspection",
-    "sourceSha256": "a733120eda8176f6596dae93e98fa1ca40d0b103991a29751db2954ac7270a2f",
-    "poses": {
-      "crouch": {
-        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/renders/component-id/crouch.png",
-        "sha256": "0d9dc5e0a13ed8cf23455f5f36103c7857631be01015559d15fa8b107924191e",
-        "sourceSha256": "a733120eda8176f6596dae93e98fa1ca40d0b103991a29751db2954ac7270a2f",
-        "width": 1024,
-        "height": 1024,
-        "visibleProjectedPixels": {
-          "shorts": 7801,
-          "front-lap": 4898,
-          "overskirt": 8683,
-          "other-garment": 37106,
-          "avatar": 31704
-        },
-        "shortsOnlyProjectedPixelCount": 7801,
-        "evidenceBoundary": "Color-ID pixels are rendered from canonical face ownership on the current weighted prototype, with depth occlusion from the avatar and all garment components. Counts are projected visible pixels at the declared orthographic pose camera; they do not establish fit, pressure, collision, appearance acceptance, runtime, or release.",
-        "kind": "pose",
-        "name": "crouch"
-      },
-      "sit": {
-        "path": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/renders/component-id/sit.png",
-        "sha256": "34af7a178295ca8eb892669391338df8041ce6b0876fc30cd24ef31bc1953033",
-        "sourceSha256": "a733120eda8176f6596dae93e98fa1ca40d0b103991a29751db2954ac7270a2f",
-        "width": 1024,
-        "height": 1024,
-        "visibleProjectedPixels": {
-          "shorts": 9811,
-          "front-lap": 5071,
-          "overskirt": 8707,
-          "other-garment": 44427,
-          "avatar": 41875
-        },
-        "shortsOnlyProjectedPixelCount": 9811,
-        "evidenceBoundary": "Color-ID pixels are rendered from canonical face ownership on the current weighted prototype, with depth occlusion from the avatar and all garment components. Counts are projected visible pixels at the declared orthographic pose camera; they do not establish fit, pressure, collision, appearance acceptance, runtime, or release.",
-        "kind": "pose",
-        "name": "sit"
-      }
-    },
-    "method": "actual-weighted-mesh-face-owner-component-id; depth-tested orthographic crouch/sit renders; 1024x1024",
-    "evidenceBoundary": "Component-ID and pose-ray coverage are diagnostics only; they do not establish fit, collision, visual acceptance, runtime, or release.",
-    "sourcePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/skin/weighted-prototype.blend",
-    "poseCoverageDiagnosticPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/pose-coverage-diagnostic.json",
-    "poseCoverageDiagnosticSha256": "5ccd6dcee3a1faed6029e9dc4cce78a2be9939c86bd70ff1644c82e43f99ec65",
-    "geometryEvidence": {
-      "sourceBlendSha256": "a733120eda8176f6596dae93e98fa1ca40d0b103991a29751db2954ac7270a2f",
-      "thighPlacement": {
-        "minimum": 0.014059076609555632,
-        "mean": 0.15834171595604438,
-        "maximum": 0.8498179729873068,
-        "backtrackedVertexCount": 4084,
-        "backtrackAttemptCount": 8226,
-        "constraint": "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus at least 0.01-percent reference area",
-        "rowMinimumScaleByPanel": {
-          "overskirt-front-lap-left": 0.014059076609555632,
-          "overskirt-front-lap-right": 0.01712799072265625,
-          "overskirt-front-left": 0.11349220899865031,
-          "overskirt-front-right": 0.13293024853919633
-        }
-      },
-      "preservedHem": {
-        "pieceIds": [
-          "overskirt-front-lap-left",
-          "overskirt-front-lap-right"
-        ],
-        "lockedVertexCount": 108,
-        "matchedOpenEdgeCountByPiece": {
-          "overskirt-front-lap-left": 53,
-          "overskirt-front-lap-right": 54
-        },
-        "method": "lock-topological-open-edges-matched-to-canonical-2d-hem"
-      }
-    }
-  }
+  "nextAction": "Keep V195 rejected. The new report proves the intended native self-collision flag is active, but Blender used selfCollisionDistanceMinM=0.015 m and the resulting overskirt is visibly shattered with 7,447 inverted source-fan triangles and >0.12 m lap displacement. Do not repeat the same 15 mm solve. Implement an explicit, canonical, per-component self-collision distance setting in the existing cloth builder and report the applied native value. Then run one controlled same-input test at a 3 mm self-collision distance, keeping the avatar-collider distance, panel geometry, bending, pins, and weights unchanged; review fresh renders directly and retain rejection unless the surface and motion coverage are materially improved."
 }

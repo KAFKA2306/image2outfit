@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v194-row-local-orientation-constrained-deformation-20261121",
+  "revision": "v195-explicit-overskirt-self-collision-20261121",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,24 @@
   },
   "blockingFindings": [
     {
-      "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
+      "description": "Direct inspection of all five V195 main views and six pose renders shows the overskirt broken into dense, sharp triangular folds across neutral, standing poses, crouch, sit, prone, and side/back views. The cloth no longer reads as a sewn pleated garment and fails appearance and customer usability.",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all five V194 views and six pose renders: the neutral skirt still has dense, irregular vertical folds and a puckered waist junction. The crouch shows skirt panels flaring into sharp folded tails with exposed anterior thighs; sit leaves most of the lap area uncovered. Pose-matched ray coverage is only 52/532 triangles (9.8%) in crouch and 22/532 (4.1%) in sit; visual fit remains unacceptable."
+      "code": "OVERSKIRT_NATIVE_SELF_COLLISION_DESTABILIZES_SURFACE"
     },
     {
-      "code": "BODICE_SURFACE_ARTIFACTS",
+      "description": "The V195 Blender cloth report records native selfCollision=true with selfCollisionDistanceMinM=0.015 m. Its fixed source-polygon fan audit reports 7,447 inverted skirt triangles across 20,701 skirt source triangles; lap-panel maximum vertex displacement is 0.1222 m left and 0.1258 m right. These are prototype instability measurements, not acceptance.",
       "severity": "BLOCKER",
-      "description": "V194 front, side, three-quarter, back and prone views still show angular planar folds across the bodice, a gray waist-side patch with unverified garment-surface ownership, and an uneven waist/back transition. The jacket surface remains visibly unfinished."
+      "code": "SELF_COLLISION_PANEL_INVERSION_AND_DISPLACEMENT"
     },
     {
-      "code": "V194_ROW_LOCAL_RECONSTRUCTION_STILL_GEOMETRICALLY_CONSTRAINED",
+      "description": "Direct crouch and sit renders still expose substantial anterior thighs and leave the seated lap inadequately covered; the tested native self-collision setting did not yield an acceptable motion silhouette.",
       "severity": "BLOCKER",
-      "description": "The V194 per-authored-row line search preserves 108 lap-hem vertices and 262 shared panel-boundary vertices, but minimum orientation-safe row scales remain 0.0141/0.0171 on the two lap panels. Mean applied displacement blend is 0.158; maximum rest displacement is 0.0101 m and maximum nearest-surface distance remains 0.1447 m. Crouch coverage only changes from 48/532 in V193 to 52/532; sit remains 22/532. This is diagnostic prototype geometry, not fit acceptance."
+      "code": "MOTION_COVERAGE_REMAINS_UNACCEPTABLE"
+    },
+    {
+      "description": "The jacket still has visibly angular planar surface artifacts and an unfinished waist transition in the direct V195 views.",
+      "severity": "MAJOR",
+      "code": "BODICE_SURFACE_ARTIFACTS_REMAIN"
     }
   ],
   "failedGeometryChecks": [
