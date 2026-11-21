@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v191-smoothed-pose-displacement-field-20261121",
+  "revision": "v192-panel-constrained-thigh-field-20261121",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,17 +21,17 @@
     {
       "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all five current V191 views and six pose renders: the new neutral front is less broadly faceted than V190, but the waist-to-skirt junction remains ragged, front pleats are uneven, and the side/rear panels retain sharp planar transitions. In crouch and sit the apron still leaves broad anterior thighs exposed and falls between/behind the legs. The garment silhouette and motion response remain unacceptable."
+      "description": "Direct inspection of all five V192 views and six pose renders: the neutral skirt front is smoother than V190, but the waist-to-skirt junction remains ragged and the skirt reads as uneven, narrow vertical folds. In crouch and sit, the apron still falls between/behind the legs with broad anterior thighs exposed. The silhouette and pose coverage remain unacceptable."
     },
     {
       "code": "BODICE_SURFACE_ARTIFACTS",
       "severity": "BLOCKER",
-      "description": "V191 front, side, three-quarter, and prone views still show angular planar folds across the bodice, a gray waist patch with unverified garment-surface ownership, and a stiff irregular waist/back transition. Bodice appearance remains unacceptable."
+      "description": "V192 front, side, three-quarter, and prone views still show angular planar folds across the bodice, a gray waist patch with unverified garment-surface ownership, and a stiff irregular waist/back transition. Bodice appearance remains unacceptable."
     },
     {
-      "code": "V191_GLOBAL_ORIENTATION_LIMITED_THIGH_DISPLACEMENT",
+      "code": "V192_PANEL_SCALES_STILL_LIMIT_LOWER_FRONT",
       "severity": "BLOCKER",
-      "description": "V191 source-bound evidence: six sewn-graph displacement smoothing iterations (neighbor blend 0.35) anchored 108 authored front-lap hem vertices and 158 shared-seam vertices, then required a global orientation-safe scale of 0.006485. Mean effective blend was 0.003921; maximum rest displacement was 0.000817 m. Distinct anterior-thigh ray hits were 45/532 crouch and 20/532 sit, below V190 (50/532 and 21/532). This geometric evidence is not fit acceptance."
+      "description": "V192 independently scaled four canonical front panels and anchored 108 authored front-lap hem vertices plus 262 shared panel-boundary vertices. Orientation-safe scales were overskirt-front-lap-left 0.0065, overskirt-front-lap-right 0.0242, overskirt-front-left 0.0580, overskirt-front-right 0.1036; mean effective blend was 0.0246 and maximum rest displacement 0.0051 m. Distinct anterior-thigh ray hits were 51/532 in crouch and 21/532 in sit (V190: 50/532 and 21/532). Slight geometric change did not close exposed thigh regions; these diagnostics are not fit acceptance."
     }
   ],
   "failedGeometryChecks": [

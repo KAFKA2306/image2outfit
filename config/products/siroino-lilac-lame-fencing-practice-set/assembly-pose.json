@@ -9810,7 +9810,7 @@
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "poseAwareThighAttachment": {
-    "method": "bilateral-pose-space-thigh-envelope-smoothed-field-v2",
+    "method": "bilateral-pose-space-thigh-envelope-panel-scaled-field-v3",
     "displacementSmoothingIterations": 6,
     "displacementSmoothingWeight": 0.35,
     "pieceIds": [
@@ -9842,9 +9842,9 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V191 reuses measured same-side UpperLeg surfaces in crouch and sit, maps target positions into garment rest space, smooths the resulting displacement field over the sewn lower-front panel graph, anchors authored front-lap hems and shared seams, then applies a single global face-orientation-safe scale. This geometry hypothesis does not establish fit, motion, or visual acceptance."
+    "evidenceBoundary": "V192 reuses measured same-side UpperLeg surfaces in crouch and sit, smooths each lower-front panel displacement field only within that canonical sewn panel, anchors authored front-lap hems and shared panel boundaries, then finds an independent face-orientation-safe scale per panel. This is geometry evidence only and does not establish fit, motion, or visual acceptance."
   },
-  "designRevision": "v191-smoothed-pose-displacement-field-20261121",
+  "designRevision": "v192-panel-constrained-thigh-field-20261121",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

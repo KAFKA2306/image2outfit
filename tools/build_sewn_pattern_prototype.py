@@ -3252,7 +3252,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     spec = pose.get("poseAwareThighAttachment")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "bilateral-pose-space-thigh-envelope-smoothed-field-v2":
+    if spec.get("method") != "bilateral-pose-space-thigh-envelope-panel-scaled-field-v3":
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
         raise ValueError("Thigh attachment target source is stale")
@@ -3511,6 +3511,15 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     anchors = set(locked_hem_vertices)
     anchors.update(index for index, pieces in owners.items()
                    if pieces.intersection(selected) and pieces.difference(selected))
+    selected_panel_by_vertex = {}
+    for index, pieces in owners.items():
+        selected_owners = pieces.intersection(selected)
+        if len(selected_owners) == 1 and not pieces.difference(selected):
+            selected_panel_by_vertex[index] = next(iter(selected_owners))
+        elif selected_owners:
+            # A vertex shared by front/lap panels belongs to their authored
+            # seam. Keep it fixed so independently scaled panels cannot split.
+            anchors.add(index)
     for index in anchors:
         if index in displacement_by_vertex:
             displacement_by_vertex[index] = Vector((0.0, 0.0, 0.0))
@@ -3518,8 +3527,12 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     for _ in range(smoothing_iterations):
         updated = list(displacement_by_vertex)
         for index in active:
+            panel_id = selected_panel_by_vertex.get(index)
+            if panel_id is None:
+                continue
             neighbors = [other for other in adjacency[index]
-                         if other in patch_vertices and other not in anchors]
+                         if other in patch_vertices and other not in anchors
+                         and selected_panel_by_vertex.get(other) == panel_id]
             if not neighbors:
                 continue
             mean = sum((displacement_by_vertex[other] for other in neighbors),
@@ -3529,36 +3542,54 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
 
     original_vertices = [Vector(values) for values in mesh["vertices"]]
 
-    def orientation_safe(scale):
-        for face_index, face in enumerate(mesh["faces"]):
-            if not any(vertex_id in patch_vertices for vertex_id in face):
-                continue
-            trial = [original_vertices[vertex_id] + displacement_by_vertex[vertex_id] * scale
-                     for vertex_id in face]
+    faces_by_piece = defaultdict(list)
+    for face_index, (face, piece_id) in enumerate(zip(mesh["faces"], mesh["facePieceIds"])):
+        if piece_id in selected and any(vertex_id in patch_vertices for vertex_id in face):
+            faces_by_piece[piece_id].append(face_index)
+
+    def orientation_safe(piece_id, scale):
+        for face_index in faces_by_piece[piece_id]:
+            face = mesh["faces"][face_index]
+            trial = [
+                original_vertices[vertex_id]
+                + (displacement_by_vertex[vertex_id] * scale
+                   if selected_panel_by_vertex.get(vertex_id) == piece_id else Vector((0.0, 0.0, 0.0)))
+                for vertex_id in face
+            ]
             trial_normal = (trial[1] - trial[0]).cross(trial[2] - trial[0])
             if (trial_normal.length * 0.5 < reference_face_minimum_areas[face_index]
                     or trial_normal.dot(reference_face_normals[face_index]) <= 0.0):
                 return False
         return True
 
-    safe_scale = 1.0
-    orientation_search_iterations = 0
-    if not orientation_safe(safe_scale):
-        low, high = 0.0, 1.0
-        for _ in range(24):
-            middle = (low + high) * 0.5
-            if orientation_safe(middle):
-                low = middle
-            else:
-                high = middle
-            orientation_search_iterations += 1
-        safe_scale = low
-    if safe_scale <= 1e-6:
-        raise ValueError("Smoothed thigh displacement has no usable global orientation-safe scale")
+    safe_scale_by_piece = {}
+    orientation_search_iterations_by_piece = {}
+    for piece_id in sorted({selected_panel_by_vertex[index] for index in patch_vertices
+                            if index in selected_panel_by_vertex}):
+        if not faces_by_piece[piece_id]:
+            raise ValueError(f"Thigh displacement panel has no owned faces: {piece_id}")
+        safe_scale = 1.0
+        iterations = 0
+        if not orientation_safe(piece_id, safe_scale):
+            low, high = 0.0, 1.0
+            for _ in range(24):
+                middle = (low + high) * 0.5
+                if orientation_safe(piece_id, middle):
+                    low = middle
+                else:
+                    high = middle
+                iterations += 1
+            safe_scale = low
+        if safe_scale <= 1e-6:
+            raise ValueError(f"Smoothed thigh displacement has no usable orientation-safe scale: {piece_id}")
+        safe_scale_by_piece[piece_id] = safe_scale
+        orientation_search_iterations_by_piece[piece_id] = iterations
 
     max_displacement = 0.0
     applied_blend_weights = []
     for index in patch_vertices:
+        piece_id = selected_panel_by_vertex.get(index)
+        safe_scale = safe_scale_by_piece.get(piece_id, 0.0)
         displacement = displacement_by_vertex[index] * safe_scale
         point = original_vertices[index]
         mesh["vertices"][index] = list(point + displacement)
@@ -3585,9 +3616,9 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             "neighborBlendWeight": smoothing_weight,
             "anchoredHemVertexCount": len(locked_hem_vertices),
             "anchoredSharedSeamVertexCount": len(anchors - set(locked_hem_vertices)),
-            "globalOrientationSafeScale": safe_scale,
-            "orientationSearchIterations": orientation_search_iterations,
-            "orientationConstraint": "positive-reference-face-orientation-and-at-least-0.01-percent-reference-area",
+            "orientationSafeScaleByPanel": dict(sorted(safe_scale_by_piece.items())),
+            "orientationSearchIterationsByPanel": dict(sorted(orientation_search_iterations_by_piece.items())),
+            "orientationConstraint": "independently scale each sewn panel interior while locking authored hems and shared panel boundaries; preserve positive reference face orientation and at least 0.01-percent reference area",
         },
         "poseSpaceTargets": ["crouch", "sit"],
         "targetSourceSha256": digest(target_path),
@@ -3605,9 +3636,12 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             "minimum": min(applied_blend_weights),
             "mean": sum(applied_blend_weights) / len(applied_blend_weights),
             "maximum": max(applied_blend_weights),
-            "backtrackedVertexCount": len(patch_vertices) if safe_scale < 1.0 - 1e-8 else 0,
-            "backtrackAttemptCount": orientation_search_iterations,
-            "constraint": "uniformly scale the smoothed sewn-panel displacement field to preserve all incident face orientations and minimum area",
+            "backtrackedVertexCount": sum(
+                1 for index in patch_vertices
+                if safe_scale_by_piece.get(selected_panel_by_vertex.get(index), 0.0) < 1.0 - 1e-8
+            ),
+            "backtrackAttemptCount": sum(orientation_search_iterations_by_piece.values()),
+            "constraint": "uniformly scale the smoothed displacement field per canonical sewn panel to preserve face orientation and minimum area",
         },
         "movedVertexCountByThigh": moved,
         "maximumNearestSurfaceDistanceM": max_distance,

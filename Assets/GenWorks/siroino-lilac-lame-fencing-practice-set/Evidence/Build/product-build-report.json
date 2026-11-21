@@ -9036,15 +9036,25 @@
   },
   "poseAwareThighAttachment": {
     "applied": true,
-    "method": "bilateral-pose-space-thigh-envelope-smoothed-field-v2",
+    "method": "bilateral-pose-space-thigh-envelope-panel-scaled-field-v3",
     "displacementFieldSmoothing": {
       "iterations": 6,
       "neighborBlendWeight": 0.35,
       "anchoredHemVertexCount": 108,
-      "anchoredSharedSeamVertexCount": 158,
-      "globalOrientationSafeScale": 0.006485342979431152,
-      "orientationSearchIterations": 24,
-      "orientationConstraint": "positive-reference-face-orientation-and-at-least-0.01-percent-reference-area"
+      "anchoredSharedSeamVertexCount": 262,
+      "orientationSafeScaleByPanel": {
+        "overskirt-front-lap-left": 0.006485342979431152,
+        "overskirt-front-lap-right": 0.024174869060516357,
+        "overskirt-front-left": 0.05799674987792969,
+        "overskirt-front-right": 0.10355466604232788
+      },
+      "orientationSearchIterationsByPanel": {
+        "overskirt-front-lap-left": 24,
+        "overskirt-front-lap-right": 24,
+        "overskirt-front-left": 24,
+        "overskirt-front-right": 24
+      },
+      "orientationConstraint": "independently scale each sewn panel interior while locking authored hems and shared panel boundaries; preserve positive reference face orientation and at least 0.01-percent reference area"
     },
     "poseSpaceTargets": [
       "crouch",
@@ -9076,22 +9086,22 @@
     },
     "requestedMaximumBlendWeight": 0.9,
     "appliedBlendWeight": {
-      "minimum": 2.254630228637971e-08,
-      "mean": 0.003920895977936963,
-      "maximum": 0.005836808681488038,
+      "minimum": 0.0,
+      "mean": 0.02462990647148063,
+      "maximum": 0.0931991994380951,
       "backtrackedVertexCount": 4158,
-      "backtrackAttemptCount": 24,
-      "constraint": "uniformly scale the smoothed sewn-panel displacement field to preserve all incident face orientations and minimum area"
+      "backtrackAttemptCount": 96,
+      "constraint": "uniformly scale the smoothed displacement field per canonical sewn panel to preserve face orientation and minimum area"
     },
     "movedVertexCountByThigh": {
-      "left": 2091,
-      "right": 2064
+      "left": 2049,
+      "right": 2035
     },
     "maximumNearestSurfaceDistanceM": 0.1447366625070572,
-    "maximumRestDisplacementM": 0.0008165151597162728,
+    "maximumRestDisplacementM": 0.005118779065162926,
     "minimumTriangleAreaM2": 4.783820055727011e-10,
     "beforeVerticesSha256": "6f9f2f0919e167c6461b12832e69ebd650490966c4d2f5f0ba535b965f90f00d",
-    "afterVerticesSha256": "0a41535332a46c6d3f9a4b1ec4c558b3ae5a15fab915bb738a3352d9df8d01df",
+    "afterVerticesSha256": "6fdb237283e8f8c231c42ef41825756355b15bd61f461ce95298498779e23958",
     "bodyFacesCopied": false,
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false
@@ -10772,7 +10782,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "ecae97a60dfd17fb589f556e70f54d848671880f6a11c7b643177aa9d50698d2",
+    "privateSimulationSourceSha256": "3d9c3f23d2b5cb8edd71eda5dda56a89010aeb89cec422ae8acc32e7c693be58",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -12022,7 +12032,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "cd806d42bb7666c67043e13de9cc5e8baa11787c695724e0321c2c2235153a93",
+  "sourceBlendSha256": "5fd465e64546a39bf0495f1e7dd9d4c0b6c0727caaac7c399892a89822cc8ad5",
   "sewnMeshSha256": "0da9a433346369f7c7dd139f1a3a6b5e13f57ba75f2839a6692f8bf544cca7d2",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -559267,7 +559277,7 @@
       "overskirt-front-lap-left": {
         "sharedInternalEdgeCount": 3998,
         "maximum": 95.01868,
-        "p95": 18.79987,
+        "p95": 19.42792,
         "worstEdges": [
           {
             "normalDiscontinuityDegrees": 95.01868,
@@ -559358,9 +559368,43 @@
       },
       "overskirt-front-lap-right": {
         "sharedInternalEdgeCount": 4003,
-        "maximum": 76.83148,
-        "p95": 18.80349,
+        "maximum": 105.18939,
+        "p95": 22.03645,
         "worstEdges": [
+          {
+            "normalDiscontinuityDegrees": 105.18939,
+            "edgeVertexIndices": [
+              15732,
+              15753
+            ],
+            "edgeLengthM": 0.0003261,
+            "midpointBlenderM": [
+              0.1009312,
+              -0.1229583,
+              0.5909648
+            ],
+            "adjacentFaceIndices": [
+              10054,
+              23441
+            ]
+          },
+          {
+            "normalDiscontinuityDegrees": 93.67765,
+            "edgeVertexIndices": [
+              5622,
+              15448
+            ],
+            "edgeLengthM": 0.0001407,
+            "midpointBlenderM": [
+              0.0707299,
+              -0.1418344,
+              0.6191941
+            ],
+            "adjacentFaceIndices": [
+              10238,
+              23169
+            ]
+          },
           {
             "normalDiscontinuityDegrees": 76.83148,
             "edgeVertexIndices": [
@@ -559411,47 +559455,13 @@
               23384,
               23385
             ]
-          },
-          {
-            "normalDiscontinuityDegrees": 75.7154,
-            "edgeVertexIndices": [
-              15602,
-              15643
-            ],
-            "edgeLengthM": 0.0160287,
-            "midpointBlenderM": [
-              0.059166,
-              -0.1001707,
-              0.7245245
-            ],
-            "adjacentFaceIndices": [
-              23345,
-              23346
-            ]
-          },
-          {
-            "normalDiscontinuityDegrees": 75.71276,
-            "edgeVertexIndices": [
-              5472,
-              15560
-            ],
-            "edgeLengthM": 0.0007634,
-            "midpointBlenderM": [
-              0.069253,
-              -0.1184918,
-              0.7139648
-            ],
-            "adjacentFaceIndices": [
-              9933,
-              10127
-            ]
           }
         ]
       },
       "overskirt-front-left": {
         "sharedInternalEdgeCount": 4296,
         "maximum": 177.79327,
-        "p95": 25.98061,
+        "p95": 30.97826,
         "worstEdges": [
           {
             "normalDiscontinuityDegrees": 177.79327,
@@ -559543,7 +559553,7 @@
       "overskirt-front-right": {
         "sharedInternalEdgeCount": 4365,
         "maximum": 176.57543,
-        "p95": 28.32508,
+        "p95": 43.99138,
         "worstEdges": [
           {
             "normalDiscontinuityDegrees": 176.57543,

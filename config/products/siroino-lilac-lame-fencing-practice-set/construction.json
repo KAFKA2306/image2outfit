@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V191 keeps the V190 measured crouch/sit thigh targets, but smooths the lower-front displacement over the sewn panel graph and applies one global orientation-safe scale. It anchors the exact authored front-lap hems and shared seams to avoid local per-vertex backtracking facets. Evaluate weighted crouch/sit renders, coverage evidence, all direct visual blockers, and release gates; this is a geometry hypothesis, not fit or appearance acceptance.",
-  "designRevision": "v191-smoothed-pose-displacement-field-20261121",
+  "target": "V192 smooths the lower-front pose-space thigh displacement separately inside each canonical sewn panel and finds one orientation-safe scale per panel. Front-lap hems, panel boundaries, and shared seams remain anchored, avoiding one failing triangle in one panel suppressing movement across the entire apron. Evaluate weighted crouch/sit renders, coverage, all direct visual blockers, and release gates; this remains a geometry hypothesis, not fit or appearance acceptance.",
+  "designRevision": "v192-panel-constrained-thigh-field-20261121",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
