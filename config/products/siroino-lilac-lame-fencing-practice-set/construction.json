@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V199 lengthens the inner hem corners of the two front-lap assemblies by 30 mm while keeping the outer front corners at the existing back-side seam drop. Preserve the waist attachment, front-lap side seams, and outer side seam lengths. Extend only the front skirt width/radius envelope through the new inner hem, retaining its original profile sample at -160 mm. Retain V198 cloth and weight settings. Measure the rebuilt pattern, skirt geometry, poses, and direct renders; this is a disposable construction prototype, not fit or appearance acceptance.",
-  "designRevision": "v199-front-lap-hem-drop-030-20261122",
+  "target": "V200 merges each central front-lap and flank pair into one continuous front panel per side and matches the waistband halves to those full-width panels. The authored 2D hem remains level at -160 mm and has one center-front seam with the original outer side seams. The sewn cylindrical projection is expected to curve in 3D; its measured front boundary band is bounded to 103 mm per side while neutral simulation drift remains limited to 1 mm. Preserve waist attachment, V198 thigh-follow weights, and V198 self-collision. Prototype only; inspect all views and poses before acceptance.",
+  "designRevision": "v200-continuous-front-hem-panels-20261122",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -25,10 +25,6 @@
     "waistband-front-right",
     "waistband-back-left",
     "waistband-back-right",
-    "overskirt-front-lap-left",
-    "overskirt-front-lap-right",
-    "waistband-front-lap-left",
-    "waistband-front-lap-right",
     "shorts-gusset"
   ],
   "requiredPatternComponents": [
@@ -57,11 +53,7 @@
         "waistband-front-left",
         "waistband-front-right",
         "waistband-back-left",
-        "waistband-back-right",
-        "overskirt-front-lap-left",
-        "overskirt-front-lap-right",
-        "waistband-front-lap-left",
-        "waistband-front-lap-right"
+        "waistband-back-right"
       ],
       "reason": "Directly observed as a short pleated layer over fitted shorts; pleat count, panelization, and attachment remain hypotheses."
     },
@@ -158,9 +150,7 @@
         "overskirt-front-left",
         "overskirt-front-right",
         "overskirt-back-left",
-        "overskirt-back-right",
-        "overskirt-front-lap-left",
-        "overskirt-front-lap-right"
+        "overskirt-back-right"
       ]
     },
     "prototypeFrameEnd": 48,
@@ -227,18 +217,14 @@
         "overskirt-front-left",
         "overskirt-front-right",
         "overskirt-back-left",
-        "overskirt-back-right",
-        "overskirt-front-lap-left",
-        "overskirt-front-lap-right"
+        "overskirt-back-right"
       ],
       "method": "pin-authored-pattern-hem-boundary-v1",
       "maximumBoundaryHeightRangeMByPiece": {
-        "overskirt-front-left": 0.04,
-        "overskirt-front-right": 0.04,
+        "overskirt-front-left": 0.103,
+        "overskirt-front-right": 0.103,
         "overskirt-back-left": 0.04,
-        "overskirt-back-right": 0.04,
-        "overskirt-front-lap-left": 0.1,
-        "overskirt-front-lap-right": 0.1
+        "overskirt-back-right": 0.04
       },
       "maximumNeutralHemDriftM": 0.001,
       "reason": "V173 moved the 710-vertex hem band 0.3415 m maximum and 0.2237 m mean. V174's first implementation found unrelated waist/open-panel edges because the hem panels contain more than one open boundary. V175 preserves the exact authored 2D face-corner coordinates and selects only topological boundary edges on each unique declared pattern hem, fixing those vertices during neutral settling.",
@@ -253,10 +239,10 @@
       "method": "rest-bound-anterior-thigh-to-authored-front-lap-ray-coverage-v1",
       "frontLapPieceIdsBySide": {
         "left": [
-          "overskirt-front-lap-left"
+          "overskirt-front-left"
         ],
         "right": [
-          "overskirt-front-lap-right"
+          "overskirt-front-right"
         ]
       },
       "thighBoneBySide": {
@@ -301,9 +287,7 @@
         "waistband-front-left",
         "waistband-front-right",
         "waistband-back-left",
-        "waistband-back-right",
-        "overskirt-front-lap-left",
-        "overskirt-front-lap-right"
+        "waistband-back-right"
       ],
       "bodyTriangleZM": [
         0.32,
@@ -323,9 +307,7 @@
           "overskirt-front-left",
           "overskirt-front-right",
           "overskirt-back-left",
-          "overskirt-back-right",
-          "overskirt-front-lap-left",
-          "overskirt-front-lap-right"
+          "overskirt-back-right"
         ],
         "hipBone": "Hips",
         "leftThighBone": "UpperLeg_L",
@@ -342,26 +324,24 @@
         "evidenceBoundary": "V146 changes the rest-pose geometry path for the sewn front-lap panels by placing them against measured UpperLeg_L/UpperLeg_R deform surfaces with seam fades. The placement is not shape-key fit, motion, collision, seam, visual, or release evidence.",
         "authoredSidePieceIds": {
           "left": [
-            "overskirt-front-lap-left"
+            "overskirt-front-left"
           ],
           "right": [
-            "overskirt-front-lap-right"
+            "overskirt-front-right"
           ]
         },
         "poseThighFollowAdjustment": {
           "method": "exclusive-lower-front-panel-same-side-thigh-follow-v1",
           "pieceIds": [
             "overskirt-front-left",
-            "overskirt-front-right",
-            "overskirt-front-lap-left",
-            "overskirt-front-lap-right"
+            "overskirt-front-right"
           ],
           "maximumAdditionalThighWeight": 0.3,
           "fadeStartZM": 0.66,
           "fullWeightZM": 0.56,
           "seamFadeDistanceM": 0.05,
           "reason": "V198's +0.30 follow cap was measured but direct crouch/sit renders still showed collapse and anterior thigh exposure. V199 retains this weight distribution unchanged while extending the front-lap pattern hems.",
-          "evidenceBoundary": "Redistribute at most 0.30 from Hips to the same-side UpperLeg only on exclusive vertices of the four named front panels. Vertices shared with another panel remain unchanged; a 50 mm nearest-shared-seam fade and a 0.66-to-0.56 m lower-band ramp bound the adjustment. This tests pose response only and grants no fit, appearance, collision, runtime, or release acceptance."
+          "evidenceBoundary": "V200 keeps the measured V198 thigh-follow distribution unchanged and applies it to the two merged front panels; it is still only a prototype pose-response hypothesis and grants no fit, appearance, or release acceptance."
         }
       }
     },

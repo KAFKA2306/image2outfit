@@ -20,8 +20,6 @@
       "shorts-back-right",
       "overskirt-front-left",
       "overskirt-front-right",
-      "overskirt-front-lap-left",
-      "overskirt-front-lap-right",
       "overskirt-back-left",
       "overskirt-back-right"
     ],
@@ -1328,7 +1326,7 @@
                 [
                   0.46602588331699374,
                   1.0327540437579155,
-                  0.00002832724526524548
+                  2.832724526524548e-05
                 ],
                 [
                   0.4660173002481461,
@@ -1658,7 +1656,7 @@
                 [
                   0.4549138116054237,
                   1.034465266942978,
-                  -0.00005813505500555042
+                  -5.813505500555042e-05
                 ],
                 [
                   0.4549046622924507,
@@ -2638,7 +2636,7 @@
                 [
                   0.3430677967816591,
                   1.0409463762044906,
-                  0.00009349594637751571
+                  9.349594637751571e-05
                 ],
                 [
                   0.34305510099232195,
@@ -2773,7 +2771,7 @@
                 [
                   0.3438138972073793,
                   0.9865169734954834,
-                  0.000023979127407073968
+                  2.3979127407073968e-05
                 ],
                 [
                   0.3436575804427266,
@@ -5163,7 +5161,7 @@
                 [
                   -0.46602618220448494,
                   1.03275362855196,
-                  0.00002821132168173788
+                  2.821132168173788e-05
                 ],
                 [
                   -0.4660175991356373,
@@ -5493,7 +5491,7 @@
                 [
                   -0.4549138711579144,
                   1.0344650289416313,
-                  -0.00005818757042288787
+                  -5.818757042288787e-05
                 ],
                 [
                   -0.45490475164726374,
@@ -6473,7 +6471,7 @@
                 [
                   -0.34306788608431815,
                   1.0409460189938544,
-                  0.00009340183436870597
+                  9.340183436870597e-05
                 ],
                 [
                   -0.343055190294981,
@@ -6608,7 +6606,7 @@
                 [
                   -0.3438139269053936,
                   0.9865167346596718,
-                  0.000024023622274398863
+                  2.4023622274398863e-05
                 ],
                 [
                   -0.3436576402038336,
@@ -8900,11 +8898,6 @@
         ],
         "widthRadiusProfileM": [
           [
-            -0.19,
-            0.226,
-            0.177059123360161
-          ],
-          [
             -0.16,
             0.215,
             0.165
@@ -8915,11 +8908,11 @@
             0.10068467541247662
           ]
         ],
-        "evidenceBoundary": "V199 extends only the inner front-lap hem corners to local Y -190 mm. The outer front corners remain at -160 mm to preserve side-seam lengths; the front skirt width/radius profile extends through the new inner hem while retaining its former -160 mm sample. Prototype hypothesis only; fit and motion acceptance remain unverified.",
+        "evidenceBoundary": "V200 maps the merged front-half panel to a uniform local -160 mm hem level, retaining the original side and center-front seam endpoints. Discrete lap geometry and its -190 mm inner hem are removed; this mapping remains an unfitted construction hypothesis.",
         "widthQuadraticControlM": [
           0.1581551183024547,
-          0.190995874325812,
-          0.226
+          0.18657755915122734,
+          0.215
         ]
       }
     },
@@ -8944,11 +8937,6 @@
         ],
         "widthRadiusProfileM": [
           [
-            -0.19,
-            0.226,
-            0.177059123360161
-          ],
-          [
             -0.16,
             0.215,
             0.165
@@ -8959,11 +8947,11 @@
             0.10068467541247662
           ]
         ],
-        "evidenceBoundary": "V199 extends only the inner front-lap hem corners to local Y -190 mm. The outer front corners remain at -160 mm to preserve side-seam lengths; the front skirt width/radius profile extends through the new inner hem while retaining its former -160 mm sample. Prototype hypothesis only; fit and motion acceptance remain unverified.",
+        "evidenceBoundary": "V200 maps the merged front-half panel to a uniform local -160 mm hem level, retaining the original side and center-front seam endpoints. Discrete lap geometry and its -190 mm inner hem are removed; this mapping remains an unfitted construction hypothesis.",
         "widthQuadraticControlM": [
           0.1581551183024547,
-          0.190995874325812,
-          0.226
+          0.18657755915122734,
+          0.215
         ]
       }
     },
@@ -9161,162 +9149,6 @@
       "skirtWrap": {
         "method": "pattern-half-circumference-skirt",
         "depthDirection": -1,
-        "axisAnchorGarmentCodeM": [
-          0,
-          0.7395782470703125,
-          0.03788188099861145
-        ],
-        "widthRadiusProfileM": [
-          [
-            0,
-            0.1581551183024547,
-            0.10068467541247662
-          ],
-          [
-            0.025,
-            0.14774967310195242,
-            0.0940603632575495
-          ]
-        ],
-        "evidenceBoundary": "Measured Neutral bottom/top support perimeters, 25 mm band height and 10 mm radial clearance are prototype dimensions. Generic half-circumference placement is followed by measured contour mapping. No Large or motion acceptance."
-      }
-    },
-    "overskirt-front-lap-left": {
-      "rotationDegreesXYZ": [
-        0,
-        0,
-        0
-      ],
-      "translationM": [
-        0,
-        0.739578,
-        -0.093913
-      ],
-      "skirtWrap": {
-        "method": "pattern-half-circumference-skirt",
-        "depthDirection": 1,
-        "axisAnchorGarmentCodeM": [
-          0,
-          0.7395782470703125,
-          0.03788188099861145
-        ],
-        "widthRadiusProfileM": [
-          [
-            -0.19,
-            0.226,
-            0.177059123360161
-          ],
-          [
-            -0.16,
-            0.215,
-            0.165
-          ],
-          [
-            0,
-            0.1581551183024547,
-            0.10068467541247662
-          ]
-        ],
-        "evidenceBoundary": "V199 extends only the inner front-lap hem corners to local Y -190 mm. The outer front corners remain at -160 mm to preserve side-seam lengths; the front skirt width/radius profile extends through the new inner hem while retaining its former -160 mm sample. Prototype hypothesis only; fit and motion acceptance remain unverified.",
-        "widthQuadraticControlM": [
-          0.1581551183024547,
-          0.190995874325812,
-          0.226
-        ]
-      }
-    },
-    "overskirt-front-lap-right": {
-      "rotationDegreesXYZ": [
-        0,
-        0,
-        0
-      ],
-      "translationM": [
-        0,
-        0.739578,
-        -0.093913
-      ],
-      "skirtWrap": {
-        "method": "pattern-half-circumference-skirt",
-        "depthDirection": 1,
-        "axisAnchorGarmentCodeM": [
-          0,
-          0.7395782470703125,
-          0.03788188099861145
-        ],
-        "widthRadiusProfileM": [
-          [
-            -0.19,
-            0.226,
-            0.177059123360161
-          ],
-          [
-            -0.16,
-            0.215,
-            0.165
-          ],
-          [
-            0,
-            0.1581551183024547,
-            0.10068467541247662
-          ]
-        ],
-        "evidenceBoundary": "V199 extends only the inner front-lap hem corners to local Y -190 mm. The outer front corners remain at -160 mm to preserve side-seam lengths; the front skirt width/radius profile extends through the new inner hem while retaining its former -160 mm sample. Prototype hypothesis only; fit and motion acceptance remain unverified.",
-        "widthQuadraticControlM": [
-          0.1581551183024547,
-          0.190995874325812,
-          0.226
-        ]
-      }
-    },
-    "waistband-front-lap-left": {
-      "rotationDegreesXYZ": [
-        0,
-        0,
-        0
-      ],
-      "translationM": [
-        0,
-        0.739578,
-        -0.093913
-      ],
-      "skirtWrap": {
-        "method": "pattern-half-circumference-skirt",
-        "depthDirection": 1,
-        "axisAnchorGarmentCodeM": [
-          0,
-          0.7395782470703125,
-          0.03788188099861145
-        ],
-        "widthRadiusProfileM": [
-          [
-            0,
-            0.1581551183024547,
-            0.10068467541247662
-          ],
-          [
-            0.025,
-            0.14774967310195242,
-            0.0940603632575495
-          ]
-        ],
-        "evidenceBoundary": "Measured Neutral bottom/top support perimeters, 25 mm band height and 10 mm radial clearance are prototype dimensions. Generic half-circumference placement is followed by measured contour mapping. No Large or motion acceptance."
-      }
-    },
-    "waistband-front-lap-right": {
-      "rotationDegreesXYZ": [
-        0,
-        0,
-        0
-      ],
-      "translationM": [
-        0,
-        0.739578,
-        -0.093913
-      ],
-      "skirtWrap": {
-        "method": "pattern-half-circumference-skirt",
-        "depthDirection": 1,
         "axisAnchorGarmentCodeM": [
           0,
           0.7395782470703125,
@@ -9609,9 +9441,7 @@
       "overskirt-front-left",
       "overskirt-front-right",
       "overskirt-back-left",
-      "overskirt-back-right",
-      "overskirt-front-lap-left",
-      "overskirt-front-lap-right"
+      "overskirt-back-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "sampleZM": [
@@ -9643,9 +9473,7 @@
     "radialClearanceM": 0.004,
     "outsideSampleRange": "hold-nearest-contour",
     "evidenceBoundary": "V129 aligns skirt-envelope radial clearance at 4 mm with waistband and bodice after V128 changed only the waistband setting and fresh side views retained the same 6 mm offset on the skirt shell. The exclusive front-lap layer offset remains separate. Neutral body sections define coordinates only; fit, collision, cloth, appearance and pose response remain unapproved.",
-    "exclusivePieceLayerOffsetM": {
-      "overskirt-front-lap-left": 0.004
-    }
+    "exclusivePieceLayerOffsetM": {}
   },
   "collarContourPlacement": {
     "method": "measured-horizontal-body-contour-radial-placement",
@@ -9684,7 +9512,7 @@
     "blenderVersion": "4.4.3",
     "bone": "Neck",
     "headBlenderM": [
-      -2.053701209092651e-9,
+      -2.053701209092651e-09,
       -0.0093428585678339,
       1.0351301431655884
     ],
@@ -9717,9 +9545,7 @@
       "overskirt-front-left",
       "overskirt-front-right",
       "overskirt-back-left",
-      "overskirt-back-right",
-      "waistband-front-lap-left",
-      "waistband-front-lap-right"
+      "overskirt-back-right"
     ],
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "sampleZM": [
@@ -9753,9 +9579,7 @@
       "overskirt-front-left",
       "overskirt-front-right",
       "overskirt-back-left",
-      "overskirt-back-right",
-      "overskirt-front-lap-left",
-      "overskirt-front-lap-right"
+      "overskirt-back-right"
     ],
     "axisOriginBlenderXYM": [
       0,
@@ -9765,7 +9589,7 @@
     "sourceHemZM": 0.5795782470703125,
     "hemZM": 0.5095782470703125,
     "hemExtensionM": 0.07,
-    "preexistingHemReliefM": 0.03,
+    "preexistingHemReliefM": 0.0,
     "foldCount": 8,
     "topologySubdivisionFactor": 4,
     "hemFoldDepthM": 0.008,
@@ -9774,9 +9598,7 @@
       "method": "front-panel-forward-scoop-v2",
       "pieceIds": [
         "overskirt-front-left",
-        "overskirt-front-right",
-        "overskirt-front-lap-left",
-        "overskirt-front-lap-right"
+        "overskirt-front-right"
       ],
       "additionalExtensionM": 0.1,
       "forwardProjectionM": 0.004,
@@ -9788,26 +9610,22 @@
       ],
       "evidenceBoundary": "V188 tests the maximum declared 100 mm additional front-only hem extension, above the unchanged 70 mm common skirt drop, fading to zero at the existing angular side bound; the prior 4 mm forward projection is retained. Pattern rest lengths and sewn seams remain unchanged. Coverage, fit, cloth response, and appearance remain unapproved."
     },
-    "evidenceBoundary": "V199 adds 30 mm of authored inner front-lap hem relief while retaining the 70 mm common skirt drop, 100 mm bounded forward apron, 4 mm projection, panel-local folds, fixed waist, and sewn boundary matches. Combined declared hem relief/extension remains under the existing 240 mm construction-trial bound. Coverage, fit, cloth behavior, appearance, runtime, and release remain unverified.",
+    "evidenceBoundary": "V200 removes the extra 30 mm inner lap relief and merges each front lap with its flank panel; the front hem now follows one continuous -160 mm pattern boundary per half. Waist attachment, outer side seams, V198 weights, and V198 cloth settings are retained. Pose coverage and appearance remain unverified.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
       "waistband-back-left",
-      "waistband-back-right",
-      "waistband-front-lap-left",
-      "waistband-front-lap-right"
+      "waistband-back-right"
     ],
     "foldValleyHalfWidthFraction": 0.08,
     "foldValleyDepthRatio": 0.55,
     "foldCrestRampFraction": 0.85,
     "foldsPerPanel": 3,
     "foldsPerPanelByPiece": {
-      "overskirt-front-lap-right": 3,
       "overskirt-front-right": 3,
       "overskirt-front-left": 3,
       "overskirt-back-right": 3,
-      "overskirt-back-left": 3,
-      "overskirt-front-lap-left": 3
+      "overskirt-back-left": 3
     }
   },
   "skirtFlareDesignEvidence": {
@@ -9836,21 +9654,14 @@
     "displacementSmoothingWeight": 0.35,
     "pieceIds": [
       "overskirt-front-left",
-      "overskirt-front-right",
-      "overskirt-front-lap-left",
-      "overskirt-front-lap-right"
+      "overskirt-front-right"
     ],
-    "preserveHemPieceIds": [
-      "overskirt-front-lap-left",
-      "overskirt-front-lap-right"
-    ],
+    "preserveHemPieceIds": [],
     "preserveSharedPieceIds": [
       "overskirt-back-left",
       "overskirt-back-right",
       "waistband-front-left",
-      "waistband-front-right",
-      "waistband-front-lap-left",
-      "waistband-front-lap-right"
+      "waistband-front-right"
     ],
     "preservedSeamFadeDistanceM": 0.05,
     "fadeStartZM": 0.66,
@@ -9866,7 +9677,7 @@
     "evidenceBoundary": "V193 inspection measured only 0.0137 and 0.0171 minimum panel-wide safe scales on the two front-lap panels; the current evaluated Cloth frame still inverts 51/2,713 and 48/2,717 front-lap triangles. V194 keeps the same authored-pattern row targets, exact lap hem and shared seams, but line-searches each row against full connected-panel face-orientation constraints so one locally incompatible row cannot suppress every other row. This remains prototype geometry/deformation evidence only and grants no fit, motion, appearance, or release acceptance.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v199-front-lap-hem-drop-030-20261122",
+  "designRevision": "v200-continuous-front-hem-panels-20261122",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
