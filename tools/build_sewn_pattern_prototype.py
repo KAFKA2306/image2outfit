@@ -3252,7 +3252,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     spec = pose.get("poseAwareThighAttachment")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "bilateral-pose-space-thigh-envelope-inverse-skin-placement-v1":
+    if spec.get("method") != "bilateral-pose-space-thigh-envelope-smoothed-field-v2":
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
         raise ValueError("Thigh attachment target source is stale")
@@ -3264,10 +3264,16 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     projection_limit = spec["maximumProjectionDistanceM"]
     max_blend = spec["maximumBlendWeight"]
     min_bone_weight = spec["minimumTriangleBoneWeight"]
+    smoothing_iterations = spec.get("displacementSmoothingIterations")
+    smoothing_weight = spec.get("displacementSmoothingWeight")
     if (not all(math.isfinite(v) for v in (fade_start, full_blend, clearance,
                                            projection_limit, max_blend, min_bone_weight))
             or full_blend >= fade_start or clearance <= 0 or projection_limit <= 0
-            or not 0 < max_blend <= 1 or not 0 < min_bone_weight <= 1):
+            or not 0 < max_blend <= 1 or not 0 < min_bone_weight <= 1
+            or not isinstance(smoothing_iterations, int) or isinstance(smoothing_iterations, bool)
+            or not 1 <= smoothing_iterations <= 12
+            or not isinstance(smoothing_weight, (int, float)) or isinstance(smoothing_weight, bool)
+            or not math.isfinite(smoothing_weight) or not 0 < smoothing_weight <= 0.5):
         raise ValueError("Invalid thigh attachment bounds")
     bodies = [obj for obj in body_objects if obj.type == "MESH"
               and obj.name.startswith(spec["bodyMeshNamePrefix"])]
@@ -3334,11 +3340,11 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     ) if hem_piece_ids else (set(), {})
     before = json.dumps(mesh["vertices"], separators=(",", ":"))
     moved = {"left": 0, "right": 0}
-    backtracked_vertex_count = 0
-    backtrack_attempt_count = 0
-    applied_blend_weights = []
+    requested_blend_weights = []
+    requested_blend_by_vertex = {}
+    displacement_by_vertex = [Vector((0.0, 0.0, 0.0)) for _ in mesh["vertices"]]
+    side_by_vertex = {}
     max_distance = 0.0
-    max_displacement = 0.0
 
     # The neutral-shell projection above was not enough for raised thighs: a
     # neutral surface target can still leave a panel behind the leg after skinning.
@@ -3484,38 +3490,84 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
         is_left = (point.x >= center_x) == left_positive
         side = "left" if is_left else "right"
         target, distance = pose_space_rest_target(side, point)
-        requested_factor = factor
-        placed = point
-        accepted = False
-        for _attempt in range(13):
-            candidate = point.lerp(target, factor)
-            candidate_is_safe = True
-            for face_index in incident_faces.get(index, ()):
-                face = mesh["faces"][face_index]
-                trial = [candidate if vertex_id == index else Vector(mesh["vertices"][vertex_id])
-                         for vertex_id in face]
-                trial_normal = (trial[1] - trial[0]).cross(trial[2] - trial[0])
-                if (trial_normal.length * 0.5 < reference_face_minimum_areas[face_index]
-                        or trial_normal.dot(reference_face_normals[face_index]) <= 0.0):
-                    candidate_is_safe = False
-                    break
-            if candidate_is_safe:
-                placed = candidate
-                accepted = True
-                break
-            factor *= 0.5
-            backtrack_attempt_count += 1
-        if not accepted:
-            factor = 0.0
-        if factor < requested_factor * (1.0 - 1e-8):
-            backtracked_vertex_count += 1
-        applied_blend_weights.append(factor)
-        displacement = (placed - point).length
-        mesh["vertices"][index] = list(placed)
-        if displacement > 1e-8:
-            moved[side] += 1
+        displacement_by_vertex[index] = (target - point) * factor
+        side_by_vertex[index] = side
+        requested_blend_weights.append(factor)
+        requested_blend_by_vertex[index] = factor
         max_distance = max(max_distance, distance)
-        max_displacement = max(max_displacement, displacement)
+
+    # Per-vertex face backtracking created thousands of neighboring vertices
+    # with unrelated blend weights, leaving sharp, irregular facets in the
+    # neutral garment. Smooth the displacement field on the sewn graph while
+    # anchoring authored hems, shared seams, and vertices outside the active
+    # front patch. Then use one global orientation-safe scale for the patch so
+    # a single face cannot create local discontinuities in the deformation.
+    adjacency = [set() for _ in mesh["vertices"]]
+    for face in mesh["faces"]:
+        for vertex_id, next_id in zip(face, face[1:] + face[:1]):
+            adjacency[vertex_id].add(next_id)
+            adjacency[next_id].add(vertex_id)
+    patch_vertices = set(side_by_vertex)
+    anchors = set(locked_hem_vertices)
+    anchors.update(index for index, pieces in owners.items()
+                   if pieces.intersection(selected) and pieces.difference(selected))
+    for index in anchors:
+        if index in displacement_by_vertex:
+            displacement_by_vertex[index] = Vector((0.0, 0.0, 0.0))
+    active = patch_vertices - anchors
+    for _ in range(smoothing_iterations):
+        updated = list(displacement_by_vertex)
+        for index in active:
+            neighbors = [other for other in adjacency[index]
+                         if other in patch_vertices and other not in anchors]
+            if not neighbors:
+                continue
+            mean = sum((displacement_by_vertex[other] for other in neighbors),
+                       Vector((0.0, 0.0, 0.0))) / len(neighbors)
+            updated[index] = displacement_by_vertex[index].lerp(mean, smoothing_weight)
+        displacement_by_vertex = updated
+
+    original_vertices = [Vector(values) for values in mesh["vertices"]]
+
+    def orientation_safe(scale):
+        for face_index, face in enumerate(mesh["faces"]):
+            if not any(vertex_id in patch_vertices for vertex_id in face):
+                continue
+            trial = [original_vertices[vertex_id] + displacement_by_vertex[vertex_id] * scale
+                     for vertex_id in face]
+            trial_normal = (trial[1] - trial[0]).cross(trial[2] - trial[0])
+            if (trial_normal.length * 0.5 < reference_face_minimum_areas[face_index]
+                    or trial_normal.dot(reference_face_normals[face_index]) <= 0.0):
+                return False
+        return True
+
+    safe_scale = 1.0
+    orientation_search_iterations = 0
+    if not orientation_safe(safe_scale):
+        low, high = 0.0, 1.0
+        for _ in range(24):
+            middle = (low + high) * 0.5
+            if orientation_safe(middle):
+                low = middle
+            else:
+                high = middle
+            orientation_search_iterations += 1
+        safe_scale = low
+    if safe_scale <= 1e-6:
+        raise ValueError("Smoothed thigh displacement has no usable global orientation-safe scale")
+
+    max_displacement = 0.0
+    applied_blend_weights = []
+    for index in patch_vertices:
+        displacement = displacement_by_vertex[index] * safe_scale
+        point = original_vertices[index]
+        mesh["vertices"][index] = list(point + displacement)
+        if displacement.length > 1e-8:
+            moved[side_by_vertex[index]] += 1
+        max_displacement = max(max_displacement, displacement.length)
+        applied_blend_weights.append(
+            0.0 if index in anchors else requested_blend_by_vertex[index] * safe_scale
+        )
     if not sum(moved.values()):
         raise ValueError("Thigh attachment selected no front panel vertices")
     minimum_area = math.inf
@@ -3528,6 +3580,15 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     return {
         "applied": True,
         "method": spec["method"],
+        "displacementFieldSmoothing": {
+            "iterations": smoothing_iterations,
+            "neighborBlendWeight": smoothing_weight,
+            "anchoredHemVertexCount": len(locked_hem_vertices),
+            "anchoredSharedSeamVertexCount": len(anchors - set(locked_hem_vertices)),
+            "globalOrientationSafeScale": safe_scale,
+            "orientationSearchIterations": orientation_search_iterations,
+            "orientationConstraint": "positive-reference-face-orientation-and-at-least-0.01-percent-reference-area",
+        },
         "poseSpaceTargets": ["crouch", "sit"],
         "targetSourceSha256": digest(target_path),
         "targetBodyObject": body.name,
@@ -3544,9 +3605,9 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             "minimum": min(applied_blend_weights),
             "mean": sum(applied_blend_weights) / len(applied_blend_weights),
             "maximum": max(applied_blend_weights),
-            "backtrackedVertexCount": backtracked_vertex_count,
-            "backtrackAttemptCount": backtrack_attempt_count,
-            "constraint": "preserve-positive-reference-face-orientation-and-at-least-0.01-percent-reference-area",
+            "backtrackedVertexCount": len(patch_vertices) if safe_scale < 1.0 - 1e-8 else 0,
+            "backtrackAttemptCount": orientation_search_iterations,
+            "constraint": "uniformly scale the smoothed sewn-panel displacement field to preserve all incident face orientations and minimum area",
         },
         "movedVertexCountByThigh": moved,
         "maximumNearestSurfaceDistanceM": max_distance,

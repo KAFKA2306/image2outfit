@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V190 keeps V189's authored hem, seams, panel bounds, and skin weights, but replaces neutral-body placement with a crouch/sit pose-space thigh envelope mapped back through the measured avatar linear-blend skin transforms. Evaluate weighted-mesh crouch/sit renders, component-ID coverage, and all fit/release gates; this remains a geometry hypothesis, not acceptance.",
-  "designRevision": "v190-pose-space-thigh-envelope-20261121",
+  "target": "V191 keeps the V190 measured crouch/sit thigh targets, but smooths the lower-front displacement over the sewn panel graph and applies one global orientation-safe scale. It anchors the exact authored front-lap hems and shared seams to avoid local per-vertex backtracking facets. Evaluate weighted crouch/sit renders, coverage evidence, all direct visual blockers, and release gates; this is a geometry hypothesis, not fit or appearance acceptance.",
+  "designRevision": "v191-smoothed-pose-displacement-field-20261121",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",

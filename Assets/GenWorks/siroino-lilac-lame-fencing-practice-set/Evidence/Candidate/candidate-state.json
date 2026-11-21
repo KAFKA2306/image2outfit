@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v190-pose-space-thigh-envelope-20261121",
+  "revision": "v191-smoothed-pose-displacement-field-20261121",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,17 +21,17 @@
     {
       "code": "SKIRT_SILHOUETTE_AND_POSE_FAILURE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all five V190 views and all six pose renders: the skirt still has severe irregular, triangular faceting across the front and three-quarter views, with a smooth back panel inconsistent with the intended pleated surface. In crouch, lap coverage remains partial around the raised thighs and the hem breaks into sharp panels. In sit, the apron hangs behind/between the legs while broad anterior thighs remain exposed."
+      "description": "Direct inspection of all five current V191 views and six pose renders: the new neutral front is less broadly faceted than V190, but the waist-to-skirt junction remains ragged, front pleats are uneven, and the side/rear panels retain sharp planar transitions. In crouch and sit the apron still leaves broad anterior thighs exposed and falls between/behind the legs. The garment silhouette and motion response remain unacceptable."
     },
     {
       "code": "BODICE_SURFACE_ARTIFACTS",
       "severity": "BLOCKER",
-      "description": "The V190 front, side, three-quarter, and prone views still show angular planar folds across the bodice, a gray waist patch with unverified garment-surface ownership, and a stiff, irregular waist/back transition. Bodice appearance remains unacceptable."
+      "description": "V191 front, side, three-quarter, and prone views still show angular planar folds across the bodice, a gray waist patch with unverified garment-surface ownership, and a stiff irregular waist/back transition. Bodice appearance remains unacceptable."
     },
     {
-      "code": "V190_POSE_SPACE_ENVELOPE_DID_NOT_RESOLVE_COVERAGE",
+      "code": "V191_GLOBAL_ORIENTATION_LIMITED_THIGH_DISPLACEMENT",
       "severity": "BLOCKER",
-      "description": "V190 source-bound geometric evidence: pose-space same-side thigh targets (crouch and sit) mapped back through barycentric avatar skin transforms; 108 exact authored front-lap hem vertices and 53/54 open hem edges preserved. Requested maximum blend was 0.90, but orientation backtracking reduced mean applied blend to 0.2337 and backtracked 2,446 vertices. Unique anterior-thigh ray hits were 50/532 crouch and 21/532 sit, only +2 and +1 from V189 48/532 and 20/532. Current direct renders still show large uncovered thigh regions. These diagnostics are not fit evidence."
+      "description": "V191 source-bound evidence: six sewn-graph displacement smoothing iterations (neighbor blend 0.35) anchored 108 authored front-lap hem vertices and 158 shared-seam vertices, then required a global orientation-safe scale of 0.006485. Mean effective blend was 0.003921; maximum rest displacement was 0.000817 m. Distinct anterior-thigh ray hits were 45/532 crouch and 20/532 sit, below V190 (50/532 and 21/532). This geometric evidence is not fit acceptance."
     }
   ],
   "failedGeometryChecks": [
