@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V192 smooths the lower-front pose-space thigh displacement separately inside each canonical sewn panel and finds one orientation-safe scale per panel. Front-lap hems, panel boundaries, and shared seams remain anchored, avoiding one failing triangle in one panel suppressing movement across the entire apron. Evaluate weighted crouch/sit renders, coverage, all direct visual blockers, and release gates; this remains a geometry hypothesis, not fit or appearance acceptance.",
-  "designRevision": "v198-front-thigh-follow-cap-030-20261122",
+  "target": "V199 lengthens the inner hem corners of the two front-lap assemblies by 30 mm while keeping the outer front corners at the existing back-side seam drop. Preserve the waist attachment, front-lap side seams, and outer side seam lengths. Extend only the front skirt width/radius envelope through the new inner hem, retaining its original profile sample at -160 mm. Retain V198 cloth and weight settings. Measure the rebuilt pattern, skirt geometry, poses, and direct renders; this is a disposable construction prototype, not fit or appearance acceptance.",
+  "designRevision": "v199-front-lap-hem-drop-030-20261122",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -205,8 +205,8 @@
       "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
-    "evidence": "V197 disabled only overskirt native self-collision: source-fan inversions fell from 2,967/18,701 to 183/18,701, and front-lap maximum displacement fell from 89.7/84.1 mm to 40.2/40.7 mm, while direct crouch/sit renders still show collapse and thigh exposure. V198 retains self-collision disabled and changes only the exclusive lower-front same-side thigh-follow cap from 0.15 to 0.30; body collision and all geometry, seam vertices, pins, remaining weights, and solver inputs stay unchanged. Refresh prototype readiness from the changed construction, rerun the 3D build/simulation/export/render/audit/review stages, and preserve rejection unless direct visuals and required poses are usable.",
-    "reason": "V197 directly improved cloth settling but still showed crouch/sit lap collapse and anterior thigh exposure. Increase only the maximum additional same-side thigh-follow on exclusive lower-front overskirt vertices from 0.15 to 0.30 for one bounded pose-response comparison; retain disabled overskirt self-collision, body collision, panel geometry, seam vertices, pins, and all remaining weights and solver inputs.",
+    "evidence": "V198 directly applied up to 0.30 additional same-side thigh follow to 4,483/5,670 exclusive front-panel vertices, with thigh weights capped at 0.75; direct crouch/sit renders remained collapsed and exposed the anterior thighs. V199 retains V198 cloth and weight settings and extends only the two front-lap hem drops by 30 mm. It moves the two waist-to-hem side-seam endpoints in each adjacent flanking panel by the same 30 mm so the sewn edge lengths continue to match; waist attachment points and all other pattern coordinates stay fixed. Refresh prototype readiness from the changed construction and pattern contract, rerun the 3D build/simulation/export/render/audit/review stages, and preserve rejection unless direct visuals and required poses are usable.",
+    "reason": "V198 confirmed that further weight follow is insufficient for front-lap coverage. Extend the two authored front-lap hem drops by 30 mm for one bounded pattern-geometry comparison, preserve waist attachment points and matched lap-side seams, and keep all other geometry, pins, weights, and solver inputs unchanged.",
     "prototypeComponentSelfCollisionHypotheses": {
       "pleated-overskirt": {
         "enabled": false,
@@ -360,7 +360,7 @@
           "fadeStartZM": 0.66,
           "fullWeightZM": 0.56,
           "seamFadeDistanceM": 0.05,
-          "reason": "V197 direct renders still show front-lap collapse and anterior thigh exposure in crouch/sit after the overskirt self-collision change. The V198 hypothesis increases follow only on exclusive lower-front panel vertices; exported weights and pose renders must verify the effect.",
+          "reason": "V198's +0.30 follow cap was measured but direct crouch/sit renders still showed collapse and anterior thigh exposure. V199 retains this weight distribution unchanged while extending the front-lap pattern hems.",
           "evidenceBoundary": "Redistribute at most 0.30 from Hips to the same-side UpperLeg only on exclusive vertices of the four named front panels. Vertices shared with another panel remain unchanged; a 50 mm nearest-shared-seam fade and a 0.66-to-0.56 m lower-band ramp bound the adjustment. This tests pose response only and grants no fit, appearance, collision, runtime, or release acceptance."
         }
       }

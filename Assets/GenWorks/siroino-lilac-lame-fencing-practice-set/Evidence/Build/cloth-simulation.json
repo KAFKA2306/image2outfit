@@ -13,7 +13,7 @@
     {
       "object": "pleated-overskirt",
       "modifier": "Image2Outfit Cloth",
-      "pinVertexCount": 541,
+      "pinVertexCount": 553,
       "frameStart": 1,
       "frameEnd": 48,
       "dynamicMesh": false,
@@ -29,16 +29,16 @@
           "overskirt-front-left",
           "overskirt-front-right"
         ],
-        "sourceEdgeCount": 360,
-        "ignoredNonHemBoundaryEdgeCount": 181,
-        "sourceVertexCount": 360,
+        "sourceEdgeCount": 370,
+        "ignoredNonHemBoundaryEdgeCount": 183,
+        "sourceVertexCount": 370,
         "edgesByPiece": {
           "overskirt-back-left": 77,
           "overskirt-back-right": 75,
-          "overskirt-front-lap-left": 53,
-          "overskirt-front-lap-right": 54,
-          "overskirt-front-left": 51,
-          "overskirt-front-right": 50
+          "overskirt-front-lap-left": 55,
+          "overskirt-front-lap-right": 53,
+          "overskirt-front-left": 55,
+          "overskirt-front-right": 55
         },
         "heightRangeMByPiece": {
           "overskirt-back-left": [
@@ -50,27 +50,27 @@
             0.5095782279968262
           ],
           "overskirt-front-lap-left": [
-            0.40957823395729065,
-            0.5095782279968262
+            0.37957823276519775,
+            0.47957825660705566
           ],
           "overskirt-front-lap-right": [
-            0.40957823395729065,
-            0.5095782279968262
+            0.37957823276519775,
+            0.47957825660705566
           ],
           "overskirt-front-left": [
-            0.5095782279968262,
-            0.5105018615722656
+            0.47957825660705566,
+            0.5095782279968262
           ],
           "overskirt-front-right": [
-            0.5095782279968262,
-            0.5105059146881104
+            0.47957825660705566,
+            0.5107777714729309
           ]
         },
-        "maximumSourceZ": 0.5105059146881104,
-        "minimumSourceZ": 0.40957823395729065,
+        "maximumSourceZ": 0.5107777714729309,
+        "minimumSourceZ": 0.37957823276519775,
         "grantsFitAcceptance": false,
-        "sourceCanonicalVertexIdsSha256": "5b2e7640b3e2bc2f62ed90def177f581c8af83b2062e25b1c4d4d37e8e70827a",
-        "pinnedVertexCount": 360,
+        "sourceCanonicalVertexIdsSha256": "68d9410daeead613517e0971ab240d9d71bb91e5b7e9e64e4ae9c688e0a815e1",
+        "pinnedVertexCount": 370,
         "evidenceBoundary": "The native Cloth bake matches topological boundary edges to the exact authored 2D hem segment for each declared panel and pins only those vertices at neutral source coordinates. It records source edge/vertex ownership, ignored non-hem boundaries, per-panel measured height ranges, exact per-piece declared range limits, pinned coverage, and maximum, P95, and mean drift. The V188 100 mm range applies only to the two authored front-lap hem edges; all four common skirt-panel hem limits remain 40 mm and neutral drift remains capped at 1 mm. This measures a bounded neutral prototype attachment; it does not establish posed trim binding, fit, collision safety, appearance, runtime behavior, or release acceptance.",
         "grantsAppearanceAcceptance": false,
         "maximumNeutralHemDriftM": 0.0,
@@ -95,15 +95,15 @@
       "pinMethod": "canonical shared seam vertices; canonical open hem boundary pinned to authored rest positions",
       "preBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.40957823395729065,
+          0.37957823276519775,
           0.7395782470703125
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": -0.0030296385266410653,
-          "maximum": 0.1598396843764931
+          "minimum": -0.0022494383665616624,
+          "maximum": 0.175294847227633
         },
-        "negativeSignedVertexCount": 127,
-        "belowCombinedCollisionMarginVertexCount": 2229,
+        "negativeSignedVertexCount": 29,
+        "belowCombinedCollisionMarginVertexCount": 1971,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "panelGeometryResponseAtEvaluatedFrame": {
@@ -114,82 +114,82 @@
         "collapseRule": "current triangle area is at most one percent of its rest area",
         "panels": {
           "overskirt-back-left": {
-            "vertexCount": 1972,
-            "sourceTriangleCount": 3784,
-            "maxVertexDisplacementM": 0.011173505621796108,
-            "p95VertexDisplacementM": 0.006931492752051269,
-            "meanVertexDisplacementM": 0.0031548556090048,
-            "invertedTriangleCount": 5,
+            "vertexCount": 1945,
+            "sourceTriangleCount": 3731,
+            "maxVertexDisplacementM": 0.011137692333435088,
+            "p95VertexDisplacementM": 0.006677538551748189,
+            "meanVertexDisplacementM": 0.0029747272648570963,
+            "invertedTriangleCount": 8,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.648396625886324,
-            "p05TriangleAreaRatio": 0.9971410946678037,
-            "medianTriangleAreaRatio": 1.009942279797425,
-            "maximumTriangleAreaRatio": 8.700146376790066
+            "minimumTriangleAreaRatio": 0.6457306177616429,
+            "p05TriangleAreaRatio": 0.9967058494733331,
+            "medianTriangleAreaRatio": 1.0095983563883382,
+            "maximumTriangleAreaRatio": 6.896220383692057
           },
           "overskirt-back-right": {
-            "vertexCount": 1886,
-            "sourceTriangleCount": 3616,
-            "maxVertexDisplacementM": 0.012388838514381186,
-            "p95VertexDisplacementM": 0.007856559457016318,
-            "meanVertexDisplacementM": 0.0032121299285754554,
-            "invertedTriangleCount": 6,
+            "vertexCount": 1885,
+            "sourceTriangleCount": 3615,
+            "maxVertexDisplacementM": 0.011137692333435088,
+            "p95VertexDisplacementM": 0.006864499237406517,
+            "meanVertexDisplacementM": 0.0029490484812922015,
+            "invertedTriangleCount": 2,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.5752095387142051,
-            "p05TriangleAreaRatio": 0.9975024928916003,
-            "medianTriangleAreaRatio": 1.0083910403261545,
-            "maximumTriangleAreaRatio": 67.9575409541466
+            "minimumTriangleAreaRatio": 0.5511757696572632,
+            "p05TriangleAreaRatio": 0.9974027769875665,
+            "medianTriangleAreaRatio": 1.0083171609733304,
+            "maximumTriangleAreaRatio": 163.6490379849201
           },
           "overskirt-front-lap-left": {
-            "vertexCount": 1429,
-            "sourceTriangleCount": 2713,
-            "maxVertexDisplacementM": 0.040192652387880744,
-            "p95VertexDisplacementM": 0.0365598102236353,
-            "meanVertexDisplacementM": 0.016363435876991232,
-            "invertedTriangleCount": 71,
+            "vertexCount": 1696,
+            "sourceTriangleCount": 3240,
+            "maxVertexDisplacementM": 0.044147127717432386,
+            "p95VertexDisplacementM": 0.0380345771568581,
+            "meanVertexDisplacementM": 0.0160148642580333,
+            "invertedTriangleCount": 67,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.4907801213911006,
-            "p05TriangleAreaRatio": 0.9830524417631357,
-            "medianTriangleAreaRatio": 1.0005979045088944,
-            "maximumTriangleAreaRatio": 67.54934862958605
+            "minimumTriangleAreaRatio": 0.3626253307880051,
+            "p05TriangleAreaRatio": 0.9858933092649371,
+            "medianTriangleAreaRatio": 1.0005425450326062,
+            "maximumTriangleAreaRatio": 3.645971528996391
           },
           "overskirt-front-lap-right": {
-            "vertexCount": 1432,
-            "sourceTriangleCount": 2717,
-            "maxVertexDisplacementM": 0.04068697591518615,
-            "p95VertexDisplacementM": 0.03482448813119743,
-            "meanVertexDisplacementM": 0.015065740788251496,
-            "invertedTriangleCount": 37,
+            "vertexCount": 1606,
+            "sourceTriangleCount": 3063,
+            "maxVertexDisplacementM": 0.04387117413739618,
+            "p95VertexDisplacementM": 0.03855494069854494,
+            "meanVertexDisplacementM": 0.016109276504907868,
+            "invertedTriangleCount": 31,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.11949503975930542,
-            "p05TriangleAreaRatio": 0.9844530544694129,
-            "medianTriangleAreaRatio": 1.000628109221429,
-            "maximumTriangleAreaRatio": 27.655687685169887
+            "minimumTriangleAreaRatio": 0.21161132670086466,
+            "p05TriangleAreaRatio": 0.9853193161973259,
+            "medianTriangleAreaRatio": 1.0003898067579777,
+            "maximumTriangleAreaRatio": 3.4334915090830087
           },
           "overskirt-front-left": {
-            "vertexCount": 1531,
-            "sourceTriangleCount": 2913,
-            "maxVertexDisplacementM": 0.018267139181359377,
-            "p95VertexDisplacementM": 0.011740180914030944,
-            "meanVertexDisplacementM": 0.00419075705442864,
-            "invertedTriangleCount": 35,
+            "vertexCount": 1634,
+            "sourceTriangleCount": 3117,
+            "maxVertexDisplacementM": 0.018760139176132704,
+            "p95VertexDisplacementM": 0.009501429772129191,
+            "meanVertexDisplacementM": 0.0038916475645217347,
+            "invertedTriangleCount": 19,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.7870202770491328,
-            "p05TriangleAreaRatio": 0.9926719961727363,
-            "medianTriangleAreaRatio": 1.002356674110605,
-            "maximumTriangleAreaRatio": 39.37630143917728
+            "minimumTriangleAreaRatio": 0.8132942541643502,
+            "p05TriangleAreaRatio": 0.9942416975637688,
+            "medianTriangleAreaRatio": 1.001750211262498,
+            "maximumTriangleAreaRatio": 10.1465411266008
           },
           "overskirt-front-right": {
-            "vertexCount": 1552,
-            "sourceTriangleCount": 2958,
-            "maxVertexDisplacementM": 0.013732459877045598,
-            "p95VertexDisplacementM": 0.010486900445122049,
-            "meanVertexDisplacementM": 0.004328884626738916,
-            "invertedTriangleCount": 29,
+            "vertexCount": 1608,
+            "sourceTriangleCount": 3065,
+            "maxVertexDisplacementM": 0.016504837453722675,
+            "p95VertexDisplacementM": 0.009193874651713334,
+            "meanVertexDisplacementM": 0.003899422445723869,
+            "invertedTriangleCount": 11,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.6173302561997714,
-            "p05TriangleAreaRatio": 0.9941256043274411,
-            "medianTriangleAreaRatio": 1.0025004707597582,
-            "maximumTriangleAreaRatio": 70.80885623428678
+            "minimumTriangleAreaRatio": 0.7155758706396104,
+            "p05TriangleAreaRatio": 0.9931985189339001,
+            "medianTriangleAreaRatio": 1.0012962304794448,
+            "maximumTriangleAreaRatio": 13.684101354653514
           }
         },
         "grantsFitAcceptance": false,
@@ -198,15 +198,15 @@
       },
       "postBakeBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.40957823395729065,
-          0.741977870464325
+          0.37957823276519775,
+          0.7419840097427368
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.0023002108050604875,
-          "maximum": 0.1598396843764931
+          "minimum": 0.0022997226928964665,
+          "maximum": 0.175294847227633
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 840,
+        "belowCombinedCollisionMarginVertexCount": 802,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       },
       "panelGeometryResponseAfterBake": {
@@ -217,82 +217,82 @@
         "collapseRule": "current triangle area is at most one percent of its rest area",
         "panels": {
           "overskirt-back-left": {
-            "vertexCount": 1972,
-            "sourceTriangleCount": 3784,
-            "maxVertexDisplacementM": 0.011173505621796108,
-            "p95VertexDisplacementM": 0.006931492752051269,
-            "meanVertexDisplacementM": 0.0031548556090048,
-            "invertedTriangleCount": 5,
+            "vertexCount": 1945,
+            "sourceTriangleCount": 3731,
+            "maxVertexDisplacementM": 0.011137692333435088,
+            "p95VertexDisplacementM": 0.006677538551748189,
+            "meanVertexDisplacementM": 0.0029747272648570963,
+            "invertedTriangleCount": 8,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.648396625886324,
-            "p05TriangleAreaRatio": 0.9971410946678037,
-            "medianTriangleAreaRatio": 1.009942279797425,
-            "maximumTriangleAreaRatio": 8.700146376790066
+            "minimumTriangleAreaRatio": 0.6457306177616429,
+            "p05TriangleAreaRatio": 0.9967058494733331,
+            "medianTriangleAreaRatio": 1.0095983563883382,
+            "maximumTriangleAreaRatio": 6.896220383692057
           },
           "overskirt-back-right": {
-            "vertexCount": 1886,
-            "sourceTriangleCount": 3616,
-            "maxVertexDisplacementM": 0.012388838514381186,
-            "p95VertexDisplacementM": 0.007856559457016318,
-            "meanVertexDisplacementM": 0.0032121299285754554,
-            "invertedTriangleCount": 6,
+            "vertexCount": 1885,
+            "sourceTriangleCount": 3615,
+            "maxVertexDisplacementM": 0.011137692333435088,
+            "p95VertexDisplacementM": 0.006864499237406517,
+            "meanVertexDisplacementM": 0.0029490484812922015,
+            "invertedTriangleCount": 2,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.5752095387142051,
-            "p05TriangleAreaRatio": 0.9975024928916003,
-            "medianTriangleAreaRatio": 1.0083910403261545,
-            "maximumTriangleAreaRatio": 67.9575409541466
+            "minimumTriangleAreaRatio": 0.5511757696572632,
+            "p05TriangleAreaRatio": 0.9974027769875665,
+            "medianTriangleAreaRatio": 1.0083171609733304,
+            "maximumTriangleAreaRatio": 163.6490379849201
           },
           "overskirt-front-lap-left": {
-            "vertexCount": 1429,
-            "sourceTriangleCount": 2713,
-            "maxVertexDisplacementM": 0.040192652387880744,
-            "p95VertexDisplacementM": 0.0365598102236353,
-            "meanVertexDisplacementM": 0.016363435876991232,
-            "invertedTriangleCount": 71,
+            "vertexCount": 1696,
+            "sourceTriangleCount": 3240,
+            "maxVertexDisplacementM": 0.044147127717432386,
+            "p95VertexDisplacementM": 0.0380345771568581,
+            "meanVertexDisplacementM": 0.0160148642580333,
+            "invertedTriangleCount": 67,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.4907801213911006,
-            "p05TriangleAreaRatio": 0.9830524417631357,
-            "medianTriangleAreaRatio": 1.0005979045088944,
-            "maximumTriangleAreaRatio": 67.54934862958605
+            "minimumTriangleAreaRatio": 0.3626253307880051,
+            "p05TriangleAreaRatio": 0.9858933092649371,
+            "medianTriangleAreaRatio": 1.0005425450326062,
+            "maximumTriangleAreaRatio": 3.645971528996391
           },
           "overskirt-front-lap-right": {
-            "vertexCount": 1432,
-            "sourceTriangleCount": 2717,
-            "maxVertexDisplacementM": 0.04068697591518615,
-            "p95VertexDisplacementM": 0.03482448813119743,
-            "meanVertexDisplacementM": 0.015065740788251496,
-            "invertedTriangleCount": 37,
+            "vertexCount": 1606,
+            "sourceTriangleCount": 3063,
+            "maxVertexDisplacementM": 0.04387117413739618,
+            "p95VertexDisplacementM": 0.03855494069854494,
+            "meanVertexDisplacementM": 0.016109276504907868,
+            "invertedTriangleCount": 31,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.11949503975930542,
-            "p05TriangleAreaRatio": 0.9844530544694129,
-            "medianTriangleAreaRatio": 1.000628109221429,
-            "maximumTriangleAreaRatio": 27.655687685169887
+            "minimumTriangleAreaRatio": 0.21161132670086466,
+            "p05TriangleAreaRatio": 0.9853193161973259,
+            "medianTriangleAreaRatio": 1.0003898067579777,
+            "maximumTriangleAreaRatio": 3.4334915090830087
           },
           "overskirt-front-left": {
-            "vertexCount": 1531,
-            "sourceTriangleCount": 2913,
-            "maxVertexDisplacementM": 0.018267139181359377,
-            "p95VertexDisplacementM": 0.011740180914030944,
-            "meanVertexDisplacementM": 0.00419075705442864,
-            "invertedTriangleCount": 35,
+            "vertexCount": 1634,
+            "sourceTriangleCount": 3117,
+            "maxVertexDisplacementM": 0.018760139176132704,
+            "p95VertexDisplacementM": 0.009501429772129191,
+            "meanVertexDisplacementM": 0.0038916475645217347,
+            "invertedTriangleCount": 19,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.7870202770491328,
-            "p05TriangleAreaRatio": 0.9926719961727363,
-            "medianTriangleAreaRatio": 1.002356674110605,
-            "maximumTriangleAreaRatio": 39.37630143917728
+            "minimumTriangleAreaRatio": 0.8132942541643502,
+            "p05TriangleAreaRatio": 0.9942416975637688,
+            "medianTriangleAreaRatio": 1.001750211262498,
+            "maximumTriangleAreaRatio": 10.1465411266008
           },
           "overskirt-front-right": {
-            "vertexCount": 1552,
-            "sourceTriangleCount": 2958,
-            "maxVertexDisplacementM": 0.013732459877045598,
-            "p95VertexDisplacementM": 0.010486900445122049,
-            "meanVertexDisplacementM": 0.004328884626738916,
-            "invertedTriangleCount": 29,
+            "vertexCount": 1608,
+            "sourceTriangleCount": 3065,
+            "maxVertexDisplacementM": 0.016504837453722675,
+            "p95VertexDisplacementM": 0.009193874651713334,
+            "meanVertexDisplacementM": 0.003899422445723869,
+            "invertedTriangleCount": 11,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.6173302561997714,
-            "p05TriangleAreaRatio": 0.9941256043274411,
-            "medianTriangleAreaRatio": 1.0025004707597582,
-            "maximumTriangleAreaRatio": 70.80885623428678
+            "minimumTriangleAreaRatio": 0.7155758706396104,
+            "p05TriangleAreaRatio": 0.9931985189339001,
+            "medianTriangleAreaRatio": 1.0012962304794448,
+            "maximumTriangleAreaRatio": 13.684101354653514
           }
         },
         "grantsFitAcceptance": false,
@@ -300,14 +300,14 @@
         "grantsAppearanceAcceptance": false
       },
       "cacheBakedActual": true,
-      "preBakeMeshSha256": "30ae3b753a944c02cc74b6e72a2084750c904adbdc51fac6273d21b241928395",
-      "evaluatedFrameMeshSha256": "b4519049f8b8b0937c588d3e62dab69873a92022a718a4dba269b2a73925df9c",
-      "settledMeshSha256": "b4519049f8b8b0937c588d3e62dab69873a92022a718a4dba269b2a73925df9c",
+      "preBakeMeshSha256": "ee6d98fce631600124f2ce9e3a84bb39d972a84d5f88eea80a868741be1b95d7",
+      "evaluatedFrameMeshSha256": "e530df4e9437732e31b0feaf689296d5a1779cae920565e4d6e597d7acea8e09",
+      "settledMeshSha256": "e530df4e9437732e31b0feaf689296d5a1779cae920565e4d6e597d7acea8e09",
       "geometryChanged": true,
-      "postSeamAnchorMeshSha256": "b4519049f8b8b0937c588d3e62dab69873a92022a718a4dba269b2a73925df9c",
+      "postSeamAnchorMeshSha256": "e530df4e9437732e31b0feaf689296d5a1779cae920565e4d6e597d7acea8e09",
       "neutralRestSeamAnchor": {
         "method": "restore-canonical-sewn-vertices-to-pre-solve-neutral-rest-coordinates",
-        "sharedCanonicalVertexCount": 231,
+        "sharedCanonicalVertexCount": 233,
         "correctedReferenceCount": 0,
         "maximumCorrectionM": 0.0,
         "meanCorrectionM": 0.0,
@@ -322,82 +322,82 @@
         "collapseRule": "current triangle area is at most one percent of its rest area",
         "panels": {
           "overskirt-back-left": {
-            "vertexCount": 1972,
-            "sourceTriangleCount": 3784,
-            "maxVertexDisplacementM": 0.011173505621796108,
-            "p95VertexDisplacementM": 0.006931492752051269,
-            "meanVertexDisplacementM": 0.0031548556090048,
-            "invertedTriangleCount": 5,
+            "vertexCount": 1945,
+            "sourceTriangleCount": 3731,
+            "maxVertexDisplacementM": 0.011137692333435088,
+            "p95VertexDisplacementM": 0.006677538551748189,
+            "meanVertexDisplacementM": 0.0029747272648570963,
+            "invertedTriangleCount": 8,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.648396625886324,
-            "p05TriangleAreaRatio": 0.9971410946678037,
-            "medianTriangleAreaRatio": 1.009942279797425,
-            "maximumTriangleAreaRatio": 8.700146376790066
+            "minimumTriangleAreaRatio": 0.6457306177616429,
+            "p05TriangleAreaRatio": 0.9967058494733331,
+            "medianTriangleAreaRatio": 1.0095983563883382,
+            "maximumTriangleAreaRatio": 6.896220383692057
           },
           "overskirt-back-right": {
-            "vertexCount": 1886,
-            "sourceTriangleCount": 3616,
-            "maxVertexDisplacementM": 0.012388838514381186,
-            "p95VertexDisplacementM": 0.007856559457016318,
-            "meanVertexDisplacementM": 0.0032121299285754554,
-            "invertedTriangleCount": 6,
+            "vertexCount": 1885,
+            "sourceTriangleCount": 3615,
+            "maxVertexDisplacementM": 0.011137692333435088,
+            "p95VertexDisplacementM": 0.006864499237406517,
+            "meanVertexDisplacementM": 0.0029490484812922015,
+            "invertedTriangleCount": 2,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.5752095387142051,
-            "p05TriangleAreaRatio": 0.9975024928916003,
-            "medianTriangleAreaRatio": 1.0083910403261545,
-            "maximumTriangleAreaRatio": 67.9575409541466
+            "minimumTriangleAreaRatio": 0.5511757696572632,
+            "p05TriangleAreaRatio": 0.9974027769875665,
+            "medianTriangleAreaRatio": 1.0083171609733304,
+            "maximumTriangleAreaRatio": 163.6490379849201
           },
           "overskirt-front-lap-left": {
-            "vertexCount": 1429,
-            "sourceTriangleCount": 2713,
-            "maxVertexDisplacementM": 0.040192652387880744,
-            "p95VertexDisplacementM": 0.0365598102236353,
-            "meanVertexDisplacementM": 0.016363435876991232,
-            "invertedTriangleCount": 71,
+            "vertexCount": 1696,
+            "sourceTriangleCount": 3240,
+            "maxVertexDisplacementM": 0.044147127717432386,
+            "p95VertexDisplacementM": 0.0380345771568581,
+            "meanVertexDisplacementM": 0.0160148642580333,
+            "invertedTriangleCount": 67,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.4907801213911006,
-            "p05TriangleAreaRatio": 0.9830524417631357,
-            "medianTriangleAreaRatio": 1.0005979045088944,
-            "maximumTriangleAreaRatio": 67.54934862958605
+            "minimumTriangleAreaRatio": 0.3626253307880051,
+            "p05TriangleAreaRatio": 0.9858933092649371,
+            "medianTriangleAreaRatio": 1.0005425450326062,
+            "maximumTriangleAreaRatio": 3.645971528996391
           },
           "overskirt-front-lap-right": {
-            "vertexCount": 1432,
-            "sourceTriangleCount": 2717,
-            "maxVertexDisplacementM": 0.04068697591518615,
-            "p95VertexDisplacementM": 0.03482448813119743,
-            "meanVertexDisplacementM": 0.015065740788251496,
-            "invertedTriangleCount": 37,
+            "vertexCount": 1606,
+            "sourceTriangleCount": 3063,
+            "maxVertexDisplacementM": 0.04387117413739618,
+            "p95VertexDisplacementM": 0.03855494069854494,
+            "meanVertexDisplacementM": 0.016109276504907868,
+            "invertedTriangleCount": 31,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.11949503975930542,
-            "p05TriangleAreaRatio": 0.9844530544694129,
-            "medianTriangleAreaRatio": 1.000628109221429,
-            "maximumTriangleAreaRatio": 27.655687685169887
+            "minimumTriangleAreaRatio": 0.21161132670086466,
+            "p05TriangleAreaRatio": 0.9853193161973259,
+            "medianTriangleAreaRatio": 1.0003898067579777,
+            "maximumTriangleAreaRatio": 3.4334915090830087
           },
           "overskirt-front-left": {
-            "vertexCount": 1531,
-            "sourceTriangleCount": 2913,
-            "maxVertexDisplacementM": 0.018267139181359377,
-            "p95VertexDisplacementM": 0.011740180914030944,
-            "meanVertexDisplacementM": 0.00419075705442864,
-            "invertedTriangleCount": 35,
+            "vertexCount": 1634,
+            "sourceTriangleCount": 3117,
+            "maxVertexDisplacementM": 0.018760139176132704,
+            "p95VertexDisplacementM": 0.009501429772129191,
+            "meanVertexDisplacementM": 0.0038916475645217347,
+            "invertedTriangleCount": 19,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.7870202770491328,
-            "p05TriangleAreaRatio": 0.9926719961727363,
-            "medianTriangleAreaRatio": 1.002356674110605,
-            "maximumTriangleAreaRatio": 39.37630143917728
+            "minimumTriangleAreaRatio": 0.8132942541643502,
+            "p05TriangleAreaRatio": 0.9942416975637688,
+            "medianTriangleAreaRatio": 1.001750211262498,
+            "maximumTriangleAreaRatio": 10.1465411266008
           },
           "overskirt-front-right": {
-            "vertexCount": 1552,
-            "sourceTriangleCount": 2958,
-            "maxVertexDisplacementM": 0.013732459877045598,
-            "p95VertexDisplacementM": 0.010486900445122049,
-            "meanVertexDisplacementM": 0.004328884626738916,
-            "invertedTriangleCount": 29,
+            "vertexCount": 1608,
+            "sourceTriangleCount": 3065,
+            "maxVertexDisplacementM": 0.016504837453722675,
+            "p95VertexDisplacementM": 0.009193874651713334,
+            "meanVertexDisplacementM": 0.003899422445723869,
+            "invertedTriangleCount": 11,
             "collapsedTriangleCount": 0,
-            "minimumTriangleAreaRatio": 0.6173302561997714,
-            "p05TriangleAreaRatio": 0.9941256043274411,
-            "medianTriangleAreaRatio": 1.0025004707597582,
-            "maximumTriangleAreaRatio": 70.80885623428678
+            "minimumTriangleAreaRatio": 0.7155758706396104,
+            "p05TriangleAreaRatio": 0.9931985189339001,
+            "medianTriangleAreaRatio": 1.0012962304794448,
+            "maximumTriangleAreaRatio": 13.684101354653514
           }
         },
         "grantsFitAcceptance": false,
@@ -406,15 +406,15 @@
       },
       "postSeamAnchorBodySurfaceDiagnostic": {
         "heightRangeM": [
-          0.40957823395729065,
-          0.741977870464325
+          0.37957823276519775,
+          0.7419840097427368
         ],
         "nearestNormalSignedDistanceM": {
-          "minimum": 0.0023002108050604875,
-          "maximum": 0.1598396843764931
+          "minimum": 0.0022997226928964665,
+          "maximum": 0.175294847227633
         },
         "negativeSignedVertexCount": 0,
-        "belowCombinedCollisionMarginVertexCount": 840,
+        "belowCombinedCollisionMarginVertexCount": 802,
         "distanceMethod": "nearest raw rest-body triangle normal; diagnostic only, not penetration acceptance"
       }
     }
@@ -423,20 +423,20 @@
     "afterSplit": {
       "stage": "component-split",
       "method": "canonical-sewn-vertex-world-position-gap-v1",
-      "sharedCanonicalVertexCount": 231,
+      "sharedCanonicalVertexCount": 233,
       "maximumGapM": 0.0,
       "grantsFitAcceptance": false
     },
     "afterBakeBeforeRestore": {
       "stage": "cloth-bake-before-seam-restore",
       "method": "canonical-sewn-vertex-world-position-gap-v1",
-      "sharedCanonicalVertexCount": 231,
+      "sharedCanonicalVertexCount": 233,
       "maximumGapM": 0.0,
       "grantsFitAcceptance": false
     },
     "neutralRestSeamRestore": {
       "method": "restore-canonical-sewn-vertices-to-pre-solve-neutral-rest-coordinates",
-      "sharedCanonicalVertexCount": 231,
+      "sharedCanonicalVertexCount": 233,
       "correctedReferenceCount": 0,
       "maximumCorrectionM": 0.0,
       "meanCorrectionM": 0.0,
@@ -446,16 +446,16 @@
     "afterBake": {
       "stage": "cloth-bake-after-seam-restore",
       "method": "canonical-sewn-vertex-world-position-gap-v1",
-      "sharedCanonicalVertexCount": 231,
+      "sharedCanonicalVertexCount": 233,
       "maximumGapM": 0.0,
       "grantsFitAcceptance": false
     },
     "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split, cloth bake before correction, and after the explicitly capped neutral-rest seam anchor. This restores only sewn boundary vertices at the neutral export frame; it does not prove pose-deformed seam continuity, fit, appearance, or release acceptance."
   },
-  "sourceBlendSha256": "f6498bda7211f48a63ee13d7725cf4b360e979bd29df2c89b4b46230804449d4",
-  "constructionSha256": "5984294ee6eaf30da9bc8a918f33e64d716f41d588ddfa408326e0170d2fb16c",
+  "sourceBlendSha256": "0957caee700b6bf42bc41d932404528f0ea267aed3aa29c452c83cec09a1c2ee",
+  "constructionSha256": "d4fde337777a248cc47ba3be94883f2897e66317d3e92298c8ff8df0e955c0da",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "440895f49fb24ed81fe7653b70f0e455f434ead8472b562a1c2a82a2f04c7888",
+  "candidateSha256": "3ffa1ae9c0e7c270d43baecf03eb21d0e92de21f9807ca93fd6c6ca7100e3f7f",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],

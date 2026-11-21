@@ -533,7 +533,13 @@ def _initialize_cylindrical_panels(mesh, pattern, scale, adapter):
             depth = skirt["depthDirection"]
             anchor = np.array(skirt["axisAnchorGarmentCodeM"], dtype=float) * scale
             profile = np.array(skirt["widthRadiusProfileM"], dtype=float) * scale
-            if depth not in (-1, 1) or anchor.shape != (3,) or profile.shape != (2, 3):
+            if (
+                depth not in (-1, 1)
+                or anchor.shape != (3,)
+                or profile.ndim != 2
+                or profile.shape[1] != 3
+                or profile.shape[0] < 2
+            ):
                 raise ValueError("Invalid skirt placement specification")
             if (
                 not np.isfinite(anchor).all()

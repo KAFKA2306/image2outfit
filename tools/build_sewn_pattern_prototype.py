@@ -2854,6 +2854,12 @@ def lengthen_declared_skirt_panels(mesh, pose):
             or (not retain_pattern_hem and not target_hem < source_hem)):
         raise ValueError("Invalid declared overskirt lengthening bounds")
     extension = source_hem - target_hem
+    preexisting_hem_relief = spec.get("preexistingHemReliefM", 0.0)
+    if (isinstance(preexisting_hem_relief, bool)
+            or not isinstance(preexisting_hem_relief, (int, float))
+            or not math.isfinite(preexisting_hem_relief)
+            or not 0 <= preexisting_hem_relief <= 0.05):
+        raise ValueError("Pre-existing skirt hem relief must remain within 0-50 mm")
     if ((retain_pattern_hem and extension != 0)
             or (not retain_pattern_hem and not 0.02 <= extension <= 0.24)):
         raise ValueError("Overskirt extension must remain within the bounded 20-240 mm trial")
@@ -2889,8 +2895,11 @@ def lengthen_declared_skirt_panels(mesh, pose):
                 or not math.isfinite(apron.get("zeroExtensionHalfAngleRadians", math.nan))
                 or not 0 < apron["fullExtensionHalfAngleRadians"] < apron["zeroExtensionHalfAngleRadians"] <= math.pi):
             raise ValueError("Invalid forward apron extension profile")
-        if extension + apron["additionalExtensionM"] > 0.24 + 1e-9:
-            raise ValueError("Combined rear hem and forward apron extension exceeds the 240 mm trial bound")
+        if (extension + apron["additionalExtensionM"] + preexisting_hem_relief
+                > 0.24 + 1e-9):
+            raise ValueError("Combined skirt hem relief and extension exceeds the 240 mm trial bound")
+    elif preexisting_hem_relief:
+        raise ValueError("Pre-existing skirt hem relief requires an explicit front apron")
     moved = 0
     max_displacement = 0.0
     max_apron_displacement = 0.0
@@ -2898,7 +2907,12 @@ def lengthen_declared_skirt_panels(mesh, pose):
     for index in selected:
         point = mesh["vertices"][index]
         z = float(point[2])
-        if z < source_hem - 0.002 or z > waist + 0.002:
+        relief_applies = bool(
+            apron is not None
+            and vertex_owners[index].intersection(apron_piece_ids)
+        )
+        allowed_source_hem = preexisting_hem_relief if relief_applies else 0.0
+        if z < source_hem - allowed_source_hem - 0.002 or z > waist + 0.002:
             raise ValueError("Overskirt vertex falls outside the declared source height span")
         fraction = min(1.0, max(0.0, (waist - z) / (waist - source_hem)))
         displacement = extension * fraction
@@ -2928,7 +2942,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
     after_max = max(mesh["vertices"][index][2] for index in selected)
     apron_allowance = apron["additionalExtensionM"] if apron else 0.0
     if (after_min > target_hem + 0.003
-            or after_min < target_hem - apron_allowance - 0.003
+            or after_min < target_hem - apron_allowance - preexisting_hem_relief - 0.003
             or abs(after_max - before_max) > 0.003):
         raise ValueError("Overskirt lengthening did not preserve the waist and declared hem")
     return {
@@ -2939,6 +2953,10 @@ def lengthen_declared_skirt_panels(mesh, pose):
         "targetHemZM": target_hem,
         "waistZM": waist,
         "extensionM": extension,
+        "preexistingHemReliefM": preexisting_hem_relief,
+        "maximumDeclaredCombinedHemExtensionM": (
+            extension + apron_allowance + preexisting_hem_relief
+        ),
         "selectedVertexCount": len(selected),
         "movedVertexCount": moved,
         "maximumVertexDisplacementM": max_displacement,
@@ -2949,7 +2967,7 @@ def lengthen_declared_skirt_panels(mesh, pose):
         "afterBoundsZM": [after_min, after_max],
         "grantsFitAcceptance": False,
         "grantsVisualAcceptance": False,
-        "evidenceBoundary": "Sewn overskirt geometry-only length hypothesis. It adds lower panel area while preserving the waist seam; no sitting coverage, collision, cloth, weight, fit or appearance acceptance is implied.",
+        "evidenceBoundary": "Sewn overskirt geometry-only length hypothesis. Any declared pre-existing front-lap hem relief is retained in addition to bounded downward panel extension; total relief and extension remain within the 240 mm trial bound. No sitting coverage, collision, cloth, weight, fit or appearance acceptance is implied.",
     }
 
 

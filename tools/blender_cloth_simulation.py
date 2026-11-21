@@ -1710,6 +1710,7 @@ def bake_sewn_prototype(job: dict[str, object]) -> int:
                 for piece, bounds in hem_source["heightRangeMByPiece"].items()
                 if bounds[1] - bounds[0]
                 > float(hem_attachment["maximumBoundaryHeightRangeMByPiece"][piece])
+                + 1e-6
             }
             if excessive:
                 raise ValueError(f"Open source boundary is not confined to its declared hem band: {excessive}")

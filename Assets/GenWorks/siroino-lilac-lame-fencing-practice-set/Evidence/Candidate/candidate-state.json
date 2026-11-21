@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v198-front-thigh-follow-cap-030-20261122",
+  "revision": "v199-front-lap-hem-drop-030-20261122",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,22 +21,22 @@
     {
       "code": "POSED_OVERSKIRT_COLLAPSE_AND_THIGH_EXPOSURE",
       "severity": "BLOCKER",
-      "description": "Direct inspection of all six V198 pose renders shows the front overskirt lifting into angular flaps in crouch and folding between the thighs and knees in sit, leaving extensive anterior thigh exposed. The same-side front-lap ray diagnostic hits 10/266 and 12/266 sampled body triangles in crouch and 5/266 on each side in sit within its 250 mm ray limit. These are diagnostic ray counts only, not fit or acceptance thresholds; the +0.30 weight-follow cap did not yield usable visible coverage."
+      "description": "Direct inspection of all six V199 pose renders shows that the 30 mm inner front-lap drop does not resolve crouch and sit failure: the front panels still lift into rigid triangular flaps in crouch and separate around the thighs in sit, exposing under-shorts and much of the anterior thighs. The added authored length is visible, but it does not provide stable pose coverage."
     },
     {
       "code": "PLEATED_OVERSKIRT_READS_AS_UNFINISHED_APRON",
       "severity": "MAJOR",
-      "description": "The standing front, back, three-quarter, neutral, and arms-up renders show a mostly smooth asymmetric apron with crushed, streak-like folds rather than a finished short pleated overskirt. The stronger lower-front thigh follow does not resolve the silhouette or pleat definition."
+      "description": "The front, back, three-quarter, neutral, and arms-up renders still read as a broad apron with coarse, crushed vertical folds rather than a finished short pleated overskirt. The longer inner hem leaves the same unfinished silhouette and does not create clean pleat structure."
     },
     {
       "code": "HEM_PANELS_PROJECT_IN_SIDE_VIEWS",
       "severity": "MAJOR",
-      "description": "Direct left and right views still show lower front/back sections projecting away from the skirt silhouette as narrow, detached-looking flaps; this remains a visible construction/deformation defect."
+      "description": "Direct left and right views show long, narrow front-lap tails projecting well below and away from the side skirt silhouette, with abrupt transitions to the shorter outer and back hem. They look detached from the intended short overskirt silhouette."
     },
     {
       "code": "JACKET_SURFACE_AND_WAIST_ARTIFACTS",
       "severity": "MAJOR",
-      "description": "The five main views still show angular/faceted jacket torso patches and an uneven waist transition."
+      "description": "The five main views still show angular/faceted jacket torso patches and a lumpy, uneven waist transition."
     }
   ],
   "failedGeometryChecks": [
