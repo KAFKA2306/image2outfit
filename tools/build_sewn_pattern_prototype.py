@@ -3252,7 +3252,10 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     spec = pose.get("poseAwareThighAttachment")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "bilateral-pose-space-thigh-envelope-row-reconstructed-panels-v4":
+    if spec.get("method") not in {
+        "bilateral-pose-space-thigh-envelope-row-reconstructed-panels-v4",
+        "bilateral-pose-space-thigh-envelope-row-constrained-panel-deformation-v5",
+    }:
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
         raise ValueError("Thigh attachment target source is stale")
@@ -3535,11 +3538,6 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     # those row values along the panel length, then blend only across the panel
     # width near its anchored seams. This avoids independent pointwise targets
     # producing a corrugated lower front.
-    adjacency = [set() for _ in mesh["vertices"]]
-    for face in mesh["faces"]:
-        for vertex_id, next_id in zip(face, face[1:] + face[:1]):
-            adjacency[vertex_id].add(next_id)
-            adjacency[next_id].add(vertex_id)
     patch_vertices = set(side_by_vertex)
     anchors = set(locked_hem_vertices)
     anchors.update(index for index, pieces in owners.items()
@@ -3592,53 +3590,83 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     original_vertices = [Vector(values) for values in mesh["vertices"]]
 
     faces_by_piece = defaultdict(list)
+    row_key_by_vertex = {}
+    for row_key, indices in row_members.items():
+        for index in indices:
+            row_key_by_vertex[index] = row_key
     for face_index, (face, piece_id) in enumerate(zip(mesh["faces"], mesh["facePieceIds"])):
         if piece_id in selected and any(vertex_id in patch_vertices for vertex_id in face):
             faces_by_piece[piece_id].append(face_index)
 
-    def orientation_safe(piece_id, scale):
+    row_scale_by_key = {key: 0.0 for key in row_displacement_by_key}
+    row_search_iterations_by_key = {key: 0 for key in row_displacement_by_key}
+
+    def orientation_safe_with_row_scale(piece_id, row_key, candidate_scale):
         for face_index in faces_by_piece[piece_id]:
             face = mesh["faces"][face_index]
-            trial = [
-                original_vertices[vertex_id]
-                + (displacement_by_vertex[vertex_id] * scale
-                   if selected_panel_by_vertex.get(vertex_id) == piece_id else Vector((0.0, 0.0, 0.0)))
-                for vertex_id in face
-            ]
+            trial = []
+            for vertex_id in face:
+                point = original_vertices[vertex_id]
+                if selected_panel_by_vertex.get(vertex_id) != piece_id or vertex_id in anchors:
+                    trial.append(point)
+                    continue
+                vertex_row_key = row_key_by_vertex.get(vertex_id)
+                if vertex_row_key is None:
+                    trial.append(point)
+                    continue
+                scale = (candidate_scale if vertex_row_key == row_key
+                         else row_scale_by_key.get(vertex_row_key, 0.0))
+                trial.append(point + displacement_by_vertex[vertex_id] * scale)
             trial_normal = (trial[1] - trial[0]).cross(trial[2] - trial[0])
             if (trial_normal.length * 0.5 < reference_face_minimum_areas[face_index]
                     or trial_normal.dot(reference_face_normals[face_index]) <= 0.0):
                 return False
         return True
 
-    safe_scale_by_piece = {}
-    orientation_search_iterations_by_piece = {}
-    for piece_id in sorted({selected_panel_by_vertex[index] for index in patch_vertices
-                            if index in selected_panel_by_vertex}):
+    pieces_with_rows = sorted(row_keys_by_piece)
+    for piece_id in pieces_with_rows:
         if not faces_by_piece[piece_id]:
             raise ValueError(f"Thigh displacement panel has no owned faces: {piece_id}")
-        safe_scale = 1.0
-        iterations = 0
-        if not orientation_safe(piece_id, safe_scale):
-            low, high = 0.0, 1.0
-            for _ in range(24):
-                middle = (low + high) * 0.5
-                if orientation_safe(piece_id, middle):
-                    low = middle
-                else:
-                    high = middle
-                iterations += 1
-            safe_scale = low
-        if safe_scale <= 1e-6:
-            raise ValueError(f"Smoothed thigh displacement has no usable orientation-safe scale: {piece_id}")
-        safe_scale_by_piece[piece_id] = safe_scale
-        orientation_search_iterations_by_piece[piece_id] = iterations
+        row_indices = sorted(row_keys_by_piece[piece_id])
+        # Grow each row against the already-safe neighboring rows. A single
+        # panel-wide scale let one locally incompatible triangle suppress the
+        # entire apron; alternating sweeps keep each row's line search local
+        # while every trial still checks the complete connected panel.
+        for _ in range(6):
+            for order in (row_indices, list(reversed(row_indices))):
+                for row_index in order:
+                    row_key = (piece_id, row_index)
+                    low = row_scale_by_key[row_key]
+                    if orientation_safe_with_row_scale(piece_id, row_key, 1.0):
+                        row_scale_by_key[row_key] = 1.0
+                        continue
+                    high = 1.0
+                    for _ in range(18):
+                        middle = (low + high) * 0.5
+                        if orientation_safe_with_row_scale(piece_id, row_key, middle):
+                            low = middle
+                        else:
+                            high = middle
+                        row_search_iterations_by_key[row_key] += 1
+                    row_scale_by_key[row_key] = low
+
+    safe_scale_by_piece = {
+        piece_id: min(row_scale_by_key[(piece_id, row_index)]
+                      for row_index in row_keys_by_piece[piece_id])
+        for piece_id in pieces_with_rows
+    }
+    orientation_search_iterations_by_piece = {
+        piece_id: sum(row_search_iterations_by_key[(piece_id, row_index)]
+                      for row_index in row_keys_by_piece[piece_id])
+        for piece_id in pieces_with_rows
+    }
 
     max_displacement = 0.0
     applied_blend_weights = []
     for index in patch_vertices:
         piece_id = selected_panel_by_vertex.get(index)
-        safe_scale = safe_scale_by_piece.get(piece_id, 0.0)
+        row_key = row_key_by_vertex.get(index)
+        safe_scale = row_scale_by_key.get(row_key, 0.0)
         displacement = displacement_by_vertex[index] * safe_scale
         point = original_vertices[index]
         mesh["vertices"][index] = list(point + displacement)
@@ -3668,9 +3696,16 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             "neighborBlendWeight": smoothing_weight,
             "anchoredHemVertexCount": len(locked_hem_vertices),
             "anchoredSharedSeamVertexCount": len(anchors - set(locked_hem_vertices)),
-            "orientationSafeScaleByPanel": dict(sorted(safe_scale_by_piece.items())),
+            "orientationSafeMinimumRowScaleByPanel": dict(sorted(safe_scale_by_piece.items())),
+            "orientationSafeRowScaleByPanel": {
+                piece_id: {
+                    str(row_index): row_scale_by_key[(piece_id, row_index)]
+                    for row_index in sorted(row_keys_by_piece[piece_id])
+                }
+                for piece_id in pieces_with_rows
+            },
             "orientationSearchIterationsByPanel": dict(sorted(orientation_search_iterations_by_piece.items())),
-            "orientationConstraint": "independently scale each reconstructed sewn panel interior while locking authored hems and shared panel boundaries; preserve positive reference face orientation and at least 0.01-percent reference area",
+            "orientationConstraint": "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus at least 0.01-percent reference area",
         },
         "poseSpaceTargets": ["crouch", "sit"],
         "targetSourceSha256": digest(target_path),
