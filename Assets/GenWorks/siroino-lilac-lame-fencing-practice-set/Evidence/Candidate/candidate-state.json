@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v196-three-mm-overskirt-self-collision-20261122",
+  "revision": "v197-disabled-overskirt-self-collision-20261122",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,24 @@
   },
   "blockingFindings": [
     {
+      "code": "POSED_OVERSKIRT_COLLAPSE_AND_THIGH_EXPOSURE",
       "severity": "BLOCKER",
-      "code": "OVERSKIRT_SURFACE_STILL_SHATTERED",
-      "description": "Direct inspection of all five V196 main views and six pose renders shows the overskirt remains covered in dense, sharp triangular fragments and folds instead of reading as a coherent sewn pleated surface. The lower self-collision distance materially reduced, but did not resolve, the visible breakup. The V196 native cloth geometry audit still records 2,967 inverted skirt source-fan triangles of 20,701 (14.3%); this is prototype instability evidence, not acceptance."
+      "description": "Direct inspection of all six V197 pose renders shows severe overskirt/lap collapse in crouch and sit: the front lap pulls away and large anterior thighs remain exposed, with the hem folding into the legs. The geometric pose diagnostic measures only 39.1–40.5% overskirt coverage and 23.5–24.6% front-lap coverage on the sampled upper thighs in crouch, and 31.6–31.9% overskirt / 21.2% front-lap coverage in sit. These are pose-sampling diagnostics, not fit or acceptance thresholds."
     },
     {
-      "severity": "BLOCKER",
-      "code": "POSED_OVERSKIRT_COVERAGE_AND_HEM_FAILURE",
-      "description": "Direct V196 crouch and sit renders show the lap pulled away/fragmented, with substantial anterior thigh exposure; the side views show long detached-looking strips extending from the hem. The pose diagnostic independently reports only 31.4–39.8% sampled overskirt coverage on each upper thigh and 21.9–25.9% front-lap ray coverage in these poses. These geometric samples are diagnostics, not fit or visual acceptance."
-    },
-    {
+      "code": "PLEATED_OVERSKIRT_READS_AS_UNFINISHED_APRON",
       "severity": "MAJOR",
-      "code": "BODICE_SURFACE_ARTIFACTS_REMAIN",
-      "description": "The V196 front, side, and three-quarter renders still show angular, faceted jacket surface artifacts around the torso and an uneven waist transition."
+      "description": "The standing front, back, three-quarter, neutral, and arms-up renders are much more coherent than V196, but the skirt still reads as a mostly smooth asymmetric apron with long streaked folds rather than a finished short pleated overskirt."
+    },
+    {
+      "code": "HEM_PANELS_PROJECT_IN_SIDE_VIEWS",
+      "severity": "MAJOR",
+      "description": "Direct left and right views show long, narrow hem sections projecting away from the skirt silhouette and looking detached; this remains a visible construction/deformation defect."
+    },
+    {
+      "code": "JACKET_SURFACE_AND_WAIST_ARTIFACTS",
+      "severity": "MAJOR",
+      "description": "The five main views still show angular/faceted jacket torso patches and an uneven waist transition."
     }
   ],
   "failedGeometryChecks": [

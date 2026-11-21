@@ -3,38 +3,43 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewer": "Codex direct review",
-  "reviewedRevision": "v196-three-mm-overskirt-self-collision-20261122",
+  "reviewedRevision": "v197-disabled-overskirt-self-collision-20261122",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "79d647809f02d8873d251984d018f09b4fa415904c49c649fbe8021a82735681",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "714a27b6b34a357a8678855067ce34466c400caf72826717087a7696496e17a5",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "c6bbdef47370254924018812b6e6c2a63e53af8e29365a9f2e77bc194a65df27",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "dacd757e418e8187984012a9266d1480ad725676b10384f68be2e0e581c6d2fb",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "d173bbac6b7fcabebcc57daa9feb843314c02921948325c340e6249e9e4a7990",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "ed9cbb7f31f3574f6df1604cbea847d2e66855c8516f2cb186d288b8916b7dd5",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "98ff2384fe5170c13237e9f337e64b2c7e0ce612f93e38aa74946cbc8152d7b7",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "a2929728e7a13f121a3a74696fe5385c257d967f5dd17904c117dacb0b0a1dca",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "09987cf2d5da50b6253adac81abdea7f7eea5908b39f546288faa7c1c096b239",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "ba591299e5c9b8b4149a7fb35c1747da9e5f5a2b64250d96f1fade7d3843c6bf",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "be2aa2b94d152a00fe011e9531ba92f6664c656465c069bf794849220dda7792"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "7b8e292bd23ab4c89d8643e91cc796874376de2ecf4ee61d2d2600d6b87365de",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "d2d174b434f9901149de7bb5b4f41e380634b4680078da7f50fe187622dc29df",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "ec72ba968eaa8418cc6ae2e63920cfd6379a927c96d424e58a2d70cf109c02bb",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "2864d61d46d27d4578809ed241b411a7297a94fadba3d9550d01b8beb54af85e",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "87162784def8da998ccd91b3dde30a87703f28b29017a973f847b094d1083009",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "e9bff6af73f0d00f2e912f7af8d357dd04c80a13f84fac475d471614f6de2756",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "00238e93810e5c88db4b0a4021d7f23a071b67828e91e5334e86f3e3d63131cc",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "f6c59539f298f0178ae7fc10c5ba5f36044d51a41ea399b02c50c994a8311bcc",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "fcf281a9af8231dc066a1bb567bae378eb65f5845dcd58d22dc21f3df1b452f7",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "64b0a302897766f065e07492c701f5f3f0c8ecc2239858751649840c50abb297",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "564bc8018b4e93f00aa290f614171e11898ff3565606146e453915c8cc80e7b9"
   },
   "findings": [
     {
+      "code": "POSED_OVERSKIRT_COLLAPSE_AND_THIGH_EXPOSURE",
       "severity": "BLOCKER",
-      "code": "OVERSKIRT_SURFACE_STILL_SHATTERED",
-      "description": "Direct inspection of all five V196 main views and six pose renders shows the overskirt remains covered in dense, sharp triangular fragments and folds instead of reading as a coherent sewn pleated surface. The lower self-collision distance materially reduced, but did not resolve, the visible breakup. The V196 native cloth geometry audit still records 2,967 inverted skirt source-fan triangles of 20,701 (14.3%); this is prototype instability evidence, not acceptance."
+      "description": "Direct inspection of all six V197 pose renders shows severe overskirt/lap collapse in crouch and sit: the front lap pulls away and large anterior thighs remain exposed, with the hem folding into the legs. The geometric pose diagnostic measures only 39.1–40.5% overskirt coverage and 23.5–24.6% front-lap coverage on the sampled upper thighs in crouch, and 31.6–31.9% overskirt / 21.2% front-lap coverage in sit. These are pose-sampling diagnostics, not fit or acceptance thresholds."
     },
     {
-      "severity": "BLOCKER",
-      "code": "POSED_OVERSKIRT_COVERAGE_AND_HEM_FAILURE",
-      "description": "Direct V196 crouch and sit renders show the lap pulled away/fragmented, with substantial anterior thigh exposure; the side views show long detached-looking strips extending from the hem. The pose diagnostic independently reports only 31.4–39.8% sampled overskirt coverage on each upper thigh and 21.9–25.9% front-lap ray coverage in these poses. These geometric samples are diagnostics, not fit or visual acceptance."
-    },
-    {
+      "code": "PLEATED_OVERSKIRT_READS_AS_UNFINISHED_APRON",
       "severity": "MAJOR",
-      "code": "BODICE_SURFACE_ARTIFACTS_REMAIN",
-      "description": "The V196 front, side, and three-quarter renders still show angular, faceted jacket surface artifacts around the torso and an uneven waist transition."
+      "description": "The standing front, back, three-quarter, neutral, and arms-up renders are much more coherent than V196, but the skirt still reads as a mostly smooth asymmetric apron with long streaked folds rather than a finished short pleated overskirt."
+    },
+    {
+      "code": "HEM_PANELS_PROJECT_IN_SIDE_VIEWS",
+      "severity": "MAJOR",
+      "description": "Direct left and right views show long, narrow hem sections projecting away from the skirt silhouette and looking detached; this remains a visible construction/deformation defect."
+    },
+    {
+      "code": "JACKET_SURFACE_AND_WAIST_ARTIFACTS",
+      "severity": "MAJOR",
+      "description": "The five main views still show angular/faceted jacket torso patches and an uneven waist transition."
     }
   ],
-  "nextAction": "Keep V196 rejected. Its schema-bound 3 mm native self-collision setting reduced inverted skirt fan triangles from V195 7,447/20,701 to V196 2,967/20,701 and reduced front-lap maximum displacement from 122.2/125.8 mm to 89.7/84.1 mm, but direct V196 renders remain visibly broken and pose coverage remains poor. For one controlled next prototype, disable overskirt self-collision while retaining native body collision and all panel, bending, pin, weight, and other solver settings. Bind the changed value to this same overskirt component and measure fresh geometry and poses; retain rejection unless direct views become coherent and usable."
+  "nextAction": "Keep V197 rejected. Actual source-fan denominators from V195, V196, and V197 are all 18,701; the earlier V196 review text saying 20,701 was an arithmetic error. V197 disabled only overskirt native self-collision while retaining the avatar body collider: inverted skirt triangles fell from V196 2,967/18,701 to V197 183/18,701, and front-lap maximum displacement fell from 89.7/84.1 mm to 40.2/40.7 mm. Direct seated/crouch renders and coverage samples still fail. For the next controlled trial, retain V197 self-collision=false and change only the exclusive lower-front same-side thigh-follow cap from +0.15 to +0.30, preserving seam vertices, geometry, pins, all other weights/solver settings. Measure exported weights, pose coverage, geometry, and direct renders; keep rejection unless usable coverage and silhouette are demonstrated."
 }

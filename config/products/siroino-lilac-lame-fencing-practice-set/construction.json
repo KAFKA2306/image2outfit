@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V192 smooths the lower-front pose-space thigh displacement separately inside each canonical sewn panel and finds one orientation-safe scale per panel. Front-lap hems, panel boundaries, and shared seams remain anchored, avoiding one failing triangle in one panel suppressing movement across the entire apron. Evaluate weighted crouch/sit renders, coverage, all direct visual blockers, and release gates; this remains a geometry hypothesis, not fit or appearance acceptance.",
-  "designRevision": "v196-three-mm-overskirt-self-collision-20261122",
+  "designRevision": "v197-disabled-overskirt-self-collision-20261122",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -205,14 +205,13 @@
       "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
-    "evidence": "V195 confirms native overskirt selfCollision=true but records a 15 mm default self-distance and severe panel inversion/visible surface breakup. V196 adds a canonical per-component distance input consumed and reported by the existing Blender bake; one 3 mm overskirt self-collision solve will measure whether the smaller native clearance reduces instability without changing other construction or solver inputs. This grants no fit, appearance, collision-safety, Unity/VRChat, or release acceptance.",
-    "reason": "V195 direct review and the baked geometry report show native overskirt self-collision at Blender's 15 mm default produces a visibly shattered surface, 7,447 inverted skirt source-fan triangles, and lap displacement above 120 mm. Add an explicit, schema-validated per-component native self-distance setting and test 3 mm, matching the existing body-collider distance; keep panel geometry, bending, pins, weights, and remaining solver inputs unchanged for this trial.",
+    "evidence": "V196 applied the canonical 3 mm native self-collision setting, reducing but not resolving the fractured overskirt. V197 performs one controlled same-input solve with only the overskirt native self-collision disabled; body collision and all panel, bending, pin, weight, and remaining solver settings stay unchanged. Refresh prototype readiness from the changed construction, rerun the 3D build/simulation/export/render/audit/review stages, and preserve rejection unless direct visuals and required poses are usable.",
+    "reason": "V196 direct review still showed severe triangular surface breakup, hem strips, and poor crouch/sit coverage after reducing native self-collision distance to 3 mm. Disable only overskirt native self-collision for one bounded comparison against V196; retain native avatar-body collision, panel geometry, bending, pins, weights, and other solver inputs.",
     "prototypeComponentSelfCollisionHypotheses": {
       "pleated-overskirt": {
-        "enabled": true,
-        "distanceMinM": 0.003,
-        "reason": "V195 confirms self-collision is active but Blender's unmodified 15 mm self-distance destabilized the overskirt. Match the existing 3 mm body-collider clearance as one bounded native setting change.",
-        "evidenceBoundary": "This trial verifies the native modifier setting and measures its baked response only. It does not establish fit, pressure, collision safety, visual acceptance, runtime behavior, or release acceptance."
+        "enabled": false,
+        "reason": "V196 native 3 mm self-collision still left 2,967/20,701 overskirt source-fan triangles inverted and visible fractured folds. This controlled V197 hypothesis disables only native self-collision; native body collision and all other cloth/construction inputs remain unchanged.",
+        "evidenceBoundary": "V197 explicitly disables only the pleated-overskirt Cloth native self-collision flag while retaining native body collision and other solver inputs. The report records the actual modifier flag and baked geometry. This is a disposable comparative prototype only and grants no fit, collision-safety, visual, runtime, or release acceptance."
       }
     },
     "prototypeComponentBendingHypotheses": {
