@@ -3252,7 +3252,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     spec = pose.get("poseAwareThighAttachment")
     if spec is None:
         return {"applied": False, "reason": "not-declared"}
-    if spec.get("method") != "bilateral-pose-space-thigh-envelope-panel-scaled-field-v3":
+    if spec.get("method") != "bilateral-pose-space-thigh-envelope-row-reconstructed-panels-v4":
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
         raise ValueError("Thigh attachment target source is stale")
@@ -3322,6 +3322,11 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     for face, piece_id in zip(mesh["faces"], mesh["facePieceIds"]):
         for vertex_id in face:
             owners[vertex_id].add(piece_id)
+    selected_panel_by_vertex = {
+        vertex_id: next(iter(pieces.intersection(selected)))
+        for vertex_id, pieces in owners.items()
+        if len(pieces.intersection(selected)) == 1 and not pieces.difference(selected)
+    }
     incident_faces = defaultdict(list)
     reference_face_normals = []
     reference_face_minimum_areas = []
@@ -3345,6 +3350,25 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     displacement_by_vertex = [Vector((0.0, 0.0, 0.0)) for _ in mesh["vertices"]]
     side_by_vertex = {}
     max_distance = 0.0
+    row_width_m = spec.get("patternRowWidthM")
+    pattern_units_per_meter = mesh.get("patternCoordinateUnitsPerMeter")
+    if (not isinstance(row_width_m, (int, float)) or isinstance(row_width_m, bool)
+            or not math.isfinite(row_width_m) or not 0.005 <= row_width_m <= 0.04
+            or not isinstance(pattern_units_per_meter, (int, float))
+            or isinstance(pattern_units_per_meter, bool) or pattern_units_per_meter <= 0):
+        raise ValueError("Row reconstruction needs bounded authored pattern coordinates")
+    pattern_v_samples = defaultdict(list)
+    for face, corners in zip(mesh["faces"], mesh.get("facePatternCoordinates", [])):
+        if len(face) != len(corners):
+            raise ValueError("Pattern row reconstruction has incomplete face-corner coordinates")
+        for vertex_id, coordinate in zip(face, corners):
+            if len(coordinate) != 2:
+                raise ValueError("Pattern row reconstruction requires two-dimensional face coordinates")
+            pattern_v_samples[vertex_id].append(float(coordinate[1]) / pattern_units_per_meter)
+    pattern_v_by_vertex = {
+        vertex_id: sum(values) / len(values)
+        for vertex_id, values in pattern_v_samples.items() if values
+    }
 
     # The neutral-shell projection above was not enough for raised thighs: a
     # neutral surface target can still leave a panel behind the leg after skinning.
@@ -3474,6 +3498,8 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             distances.append(float(distance))
         return sum(candidates, Vector()) / len(candidates), max(distances)
 
+    row_members = defaultdict(list)
+    row_displacement_samples = defaultdict(list)
     for index, point_values in enumerate(mesh["vertices"]):
         if index in locked_hem_vertices:
             continue
@@ -3484,24 +3510,31 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             continue
         factor = max(0.0, min(1.0, (fade_start - point.z) / (fade_start - full_blend)))
         factor = factor * factor * (3.0 - 2.0 * factor)
-        factor *= max_blend * seam_factors.get(index, 1.0)
+        factor *= max_blend
         if factor <= 1e-8:
             continue
+        if index not in pattern_v_by_vertex:
+            raise ValueError(f"Thigh attachment vertex lacks authored pattern row coordinate: {index}")
+        piece_id = selected_panel_by_vertex.get(index)
+        if piece_id is None:
+            continue
+        row_index = round(pattern_v_by_vertex[index] / row_width_m)
+        row_key = (piece_id, row_index)
         is_left = (point.x >= center_x) == left_positive
         side = "left" if is_left else "right"
         target, distance = pose_space_rest_target(side, point)
-        displacement_by_vertex[index] = (target - point) * factor
+        row_displacement_samples[row_key].append((target - point) * factor)
+        row_members[row_key].append(index)
         side_by_vertex[index] = side
-        requested_blend_weights.append(factor)
-        requested_blend_by_vertex[index] = factor
+        requested_blend_weights.append(factor * seam_factors.get(index, 1.0))
+        requested_blend_by_vertex[index] = factor * seam_factors.get(index, 1.0)
         max_distance = max(max_distance, distance)
 
-    # Per-vertex face backtracking created thousands of neighboring vertices
-    # with unrelated blend weights, leaving sharp, irregular facets in the
-    # neutral garment. Smooth the displacement field on the sewn graph while
-    # anchoring authored hems, shared seams, and vertices outside the active
-    # front patch. Then use one global orientation-safe scale for the patch so
-    # a single face cannot create local discontinuities in the deformation.
+    # Reconstruct each connected panel in authored pattern-space rows. Every
+    # sample in a row contributes to one shared pose-space displacement; smooth
+    # those row values along the panel length, then blend only across the panel
+    # width near its anchored seams. This avoids independent pointwise targets
+    # producing a corrugated lower front.
     adjacency = [set() for _ in mesh["vertices"]]
     for face in mesh["faces"]:
         for vertex_id, next_id in zip(face, face[1:] + face[:1]):
@@ -3511,34 +3544,50 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     anchors = set(locked_hem_vertices)
     anchors.update(index for index, pieces in owners.items()
                    if pieces.intersection(selected) and pieces.difference(selected))
-    selected_panel_by_vertex = {}
     for index, pieces in owners.items():
         selected_owners = pieces.intersection(selected)
-        if len(selected_owners) == 1 and not pieces.difference(selected):
-            selected_panel_by_vertex[index] = next(iter(selected_owners))
-        elif selected_owners:
+        if selected_owners and index not in selected_panel_by_vertex:
             # A vertex shared by front/lap panels belongs to their authored
             # seam. Keep it fixed so independently scaled panels cannot split.
             anchors.add(index)
     for index in anchors:
         if index in displacement_by_vertex:
             displacement_by_vertex[index] = Vector((0.0, 0.0, 0.0))
-    active = patch_vertices - anchors
-    for _ in range(smoothing_iterations):
-        updated = list(displacement_by_vertex)
-        for index in active:
-            panel_id = selected_panel_by_vertex.get(index)
-            if panel_id is None:
-                continue
-            neighbors = [other for other in adjacency[index]
-                         if other in patch_vertices and other not in anchors
-                         and selected_panel_by_vertex.get(other) == panel_id]
-            if not neighbors:
-                continue
-            mean = sum((displacement_by_vertex[other] for other in neighbors),
-                       Vector((0.0, 0.0, 0.0))) / len(neighbors)
-            updated[index] = displacement_by_vertex[index].lerp(mean, smoothing_weight)
-        displacement_by_vertex = updated
+    row_displacement_by_key = {
+        key: sum(samples, Vector((0.0, 0.0, 0.0))) / len(samples)
+        for key, samples in row_displacement_samples.items() if samples
+    }
+    row_keys_by_piece = defaultdict(list)
+    for piece_id, row_index in row_displacement_by_key:
+        row_keys_by_piece[piece_id].append(row_index)
+    for piece_id, row_indices in row_keys_by_piece.items():
+        row_indices.sort()
+        for _ in range(smoothing_iterations):
+            updated = {}
+            for row_index in row_indices:
+                neighbors = [row_displacement_by_key[(piece_id, other)]
+                             for other in (row_index - 1, row_index + 1)
+                             if (piece_id, other) in row_displacement_by_key]
+                current = row_displacement_by_key[(piece_id, row_index)]
+                mean = (sum(neighbors, Vector((0.0, 0.0, 0.0))) / len(neighbors)
+                        if neighbors else current)
+                updated[(piece_id, row_index)] = current.lerp(mean, smoothing_weight)
+            row_displacement_by_key.update(updated)
+    for row_key, indices in row_members.items():
+        row_delta = row_displacement_by_key[row_key]
+        for index in indices:
+            if index not in anchors:
+                displacement_by_vertex[index] = row_delta * seam_factors.get(index, 1.0)
+
+    row_reconstruction_evidence = {
+        piece_id: {
+            "rowCount": len(row_keys_by_piece.get(piece_id, [])),
+            "sampleVertexCount": sum(len(indices) for key, indices in row_members.items()
+                                      if key[0] == piece_id),
+            "rowWidthM": row_width_m,
+        }
+        for piece_id in sorted(row_keys_by_piece)
+    }
 
     original_vertices = [Vector(values) for values in mesh["vertices"]]
 
@@ -3611,14 +3660,17 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     return {
         "applied": True,
         "method": spec["method"],
-        "displacementFieldSmoothing": {
+        "rowWisePanelReconstruction": {
+            "method": "authored-pattern-v-rows-shared-pose-space-targets-with-longitudinal-smoothing-v1",
+            "rowWidthM": row_width_m,
+            "panelEvidence": row_reconstruction_evidence,
             "iterations": smoothing_iterations,
             "neighborBlendWeight": smoothing_weight,
             "anchoredHemVertexCount": len(locked_hem_vertices),
             "anchoredSharedSeamVertexCount": len(anchors - set(locked_hem_vertices)),
             "orientationSafeScaleByPanel": dict(sorted(safe_scale_by_piece.items())),
             "orientationSearchIterationsByPanel": dict(sorted(orientation_search_iterations_by_piece.items())),
-            "orientationConstraint": "independently scale each sewn panel interior while locking authored hems and shared panel boundaries; preserve positive reference face orientation and at least 0.01-percent reference area",
+            "orientationConstraint": "independently scale each reconstructed sewn panel interior while locking authored hems and shared panel boundaries; preserve positive reference face orientation and at least 0.01-percent reference area",
         },
         "poseSpaceTargets": ["crouch", "sit"],
         "targetSourceSha256": digest(target_path),
