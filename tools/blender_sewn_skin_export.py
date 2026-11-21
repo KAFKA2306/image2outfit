@@ -1936,7 +1936,7 @@ def main():
                     or not math.isfinite(seam_fade_distance)
                     or not 0 < seam_fade_distance <= 0.05
                     or not math.isfinite(additional_weight)
-                    or not 0 < additional_weight <= 0.15
+                    or not 0 < additional_weight <= 0.30
                 ):
                     raise ValueError("Invalid bounded pose thigh-follow adjustment")
             for bone_name in (

@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
   "target": "V192 smooths the lower-front pose-space thigh displacement separately inside each canonical sewn panel and finds one orientation-safe scale per panel. Front-lap hems, panel boundaries, and shared seams remain anchored, avoiding one failing triangle in one panel suppressing movement across the entire apron. Evaluate weighted crouch/sit renders, coverage, all direct visual blockers, and release gates; this remains a geometry hypothesis, not fit or appearance acceptance.",
-  "designRevision": "v197-disabled-overskirt-self-collision-20261122",
+  "designRevision": "v198-front-thigh-follow-cap-030-20261122",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -205,12 +205,12 @@
       "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
-    "evidence": "V196 applied the canonical 3 mm native self-collision setting, reducing but not resolving the fractured overskirt. V197 performs one controlled same-input solve with only the overskirt native self-collision disabled; body collision and all panel, bending, pin, weight, and remaining solver settings stay unchanged. Refresh prototype readiness from the changed construction, rerun the 3D build/simulation/export/render/audit/review stages, and preserve rejection unless direct visuals and required poses are usable.",
-    "reason": "V196 direct review still showed severe triangular surface breakup, hem strips, and poor crouch/sit coverage after reducing native self-collision distance to 3 mm. Disable only overskirt native self-collision for one bounded comparison against V196; retain native avatar-body collision, panel geometry, bending, pins, weights, and other solver inputs.",
+    "evidence": "V197 disabled only overskirt native self-collision: source-fan inversions fell from 2,967/18,701 to 183/18,701, and front-lap maximum displacement fell from 89.7/84.1 mm to 40.2/40.7 mm, while direct crouch/sit renders still show collapse and thigh exposure. V198 retains self-collision disabled and changes only the exclusive lower-front same-side thigh-follow cap from 0.15 to 0.30; body collision and all geometry, seam vertices, pins, remaining weights, and solver inputs stay unchanged. Refresh prototype readiness from the changed construction, rerun the 3D build/simulation/export/render/audit/review stages, and preserve rejection unless direct visuals and required poses are usable.",
+    "reason": "V197 directly improved cloth settling but still showed crouch/sit lap collapse and anterior thigh exposure. Increase only the maximum additional same-side thigh-follow on exclusive lower-front overskirt vertices from 0.15 to 0.30 for one bounded pose-response comparison; retain disabled overskirt self-collision, body collision, panel geometry, seam vertices, pins, and all remaining weights and solver inputs.",
     "prototypeComponentSelfCollisionHypotheses": {
       "pleated-overskirt": {
         "enabled": false,
-        "reason": "V196 native 3 mm self-collision still left 2,967/20,701 overskirt source-fan triangles inverted and visible fractured folds. This controlled V197 hypothesis disables only native self-collision; native body collision and all other cloth/construction inputs remain unchanged.",
+        "reason": "V196 native 3 mm self-collision still left 2,967/18,701 overskirt source-fan triangles inverted and visible fractured folds. V197 disabled only native self-collision and measured 183/18,701 inversions while retaining native body collision and all other cloth/construction inputs.",
         "evidenceBoundary": "V197 explicitly disables only the pleated-overskirt Cloth native self-collision flag while retaining native body collision and other solver inputs. The report records the actual modifier flag and baked geometry. This is a disposable comparative prototype only and grants no fit, collision-safety, visual, runtime, or release acceptance."
       }
     },
@@ -356,12 +356,12 @@
             "overskirt-front-lap-left",
             "overskirt-front-lap-right"
           ],
-          "maximumAdditionalThighWeight": 0.15,
+          "maximumAdditionalThighWeight": 0.3,
           "fadeStartZM": 0.66,
           "fullWeightZM": 0.56,
           "seamFadeDistanceM": 0.05,
-          "reason": "V186 direct renders showed front-hem/upper-thigh exposure in crouch and front-versus-thigh displacement in sit. The V186 skin report measured a 0.45 maximum overskirt thigh weight across 9,602 profile vertices; the V187 review hypothesis raises follow only on exclusive lower-front panel vertices.",
-          "evidenceBoundary": "Redistribute at most 0.15 from Hips to the same-side UpperLeg only on exclusive vertices of the four named front panels. Vertices shared with another panel remain unchanged; a 50 mm nearest-shared-seam fade and a 0.66-to-0.56 m lower-band ramp bound the adjustment. This tests pose response only and grants no fit, appearance, collision, runtime, or release acceptance."
+          "reason": "V197 direct renders still show front-lap collapse and anterior thigh exposure in crouch/sit after the overskirt self-collision change. The V198 hypothesis increases follow only on exclusive lower-front panel vertices; exported weights and pose renders must verify the effect.",
+          "evidenceBoundary": "Redistribute at most 0.30 from Hips to the same-side UpperLeg only on exclusive vertices of the four named front panels. Vertices shared with another panel remain unchanged; a 50 mm nearest-shared-seam fade and a 0.66-to-0.56 m lower-band ramp bound the adjustment. This tests pose response only and grants no fit, appearance, collision, runtime, or release acceptance."
         }
       }
     },

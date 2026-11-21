@@ -80,7 +80,7 @@
       "componentSelfCollisionHypothesis": {
         "enabled": false,
         "actualDistanceMinM": 0.014999999664723873,
-        "reason": "V196 native 3 mm self-collision still left 2,967/20,701 overskirt source-fan triangles inverted and visible fractured folds. This controlled V197 hypothesis disables only native self-collision; native body collision and all other cloth/construction inputs remain unchanged.",
+        "reason": "V196 native 3 mm self-collision still left 2,967/18,701 overskirt source-fan triangles inverted and visible fractured folds. V197 disabled only native self-collision and measured 183/18,701 inversions while retaining native body collision and all other cloth/construction inputs.",
         "evidenceBoundary": "V197 explicitly disables only the pleated-overskirt Cloth native self-collision flag while retaining native body collision and other solver inputs. The report records the actual modifier flag and baked geometry. This is a disposable comparative prototype only and grants no fit, collision-safety, visual, runtime, or release acceptance.",
         "grantsFitAcceptance": false
       },
@@ -452,10 +452,10 @@
     },
     "evidenceBoundary": "Canonical shared source vertex positions are compared across component objects after split, cloth bake before correction, and after the explicitly capped neutral-rest seam anchor. This restores only sewn boundary vertices at the neutral export frame; it does not prove pose-deformed seam continuity, fit, appearance, or release acceptance."
   },
-  "sourceBlendSha256": "d935ad1375c0629651637bc00a0baf2ab96487d50097d4db7133055973d03805",
-  "constructionSha256": "1ffca46bb301fd46e20993881f4763d842a35cb38d2d231bf9e62e9034c41a6f",
+  "sourceBlendSha256": "f6498bda7211f48a63ee13d7725cf4b360e979bd29df2c89b4b46230804449d4",
+  "constructionSha256": "5984294ee6eaf30da9bc8a918f33e64d716f41d588ddfa408326e0170d2fb16c",
   "candidatePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/cloth/settled-prototype.blend",
-  "candidateSha256": "310c018de655336b65237a9718be2513fc2a83b13dedf47a46a0c248030a1415",
+  "candidateSha256": "440895f49fb24ed81fe7653b70f0e455f434ead8472b562a1c2a82a2f04c7888",
   "collisionObjects": [
     "SiroinoSotai_PC"
   ],
