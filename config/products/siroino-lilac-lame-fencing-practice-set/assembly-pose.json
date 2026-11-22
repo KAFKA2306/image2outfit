@@ -31,7 +31,9 @@
       "jacket-front-left",
       "jacket-overlap-front",
       "jacket-back-left",
-      "jacket-back-right"
+      "jacket-back-right",
+      "overskirt-front-left",
+      "overskirt-front-right"
     ],
     "iterations": 3,
     "factor": 0.12,
@@ -41,7 +43,7 @@
     ],
     "maximumDihedralDegrees": 60,
     "preserveCanonicalPanelSeams": true,
-    "evidenceBoundary": "V155 applies three bounded 0.12 Laplacian passes to torso panel interiors, then locally backtracks only vertices implicated in face flips or new crease spikes; canonical panel boundaries stay locked. This tests fairing after the prior global guard reduced the requested displacement to 10.7%. It does not establish avatar fit, material quality, appearance approval, or release acceptance."
+    "evidenceBoundary": "V204 applies the existing three-pass 0.12 bounded Laplacian fairing to both authored front overskirt interiors after pleat relief while keeping canonical panel boundaries locked; inspect for reduced crushed triangular faceting and preserved broad channels. This geometry trial does not establish avatar fit, pose behavior, materials, appearance acceptance, or release readiness."
   },
   "evaluationBoundary": "Body landmarks and depth are measured. Panel offsets, sleeve angles, collar orientation and all ease are explicit unapproved assembly hypotheses. V108 tests bounded position fairing on jacket torso panel interiors after V107 shading-only renders did not visibly resolve faceting. Canonical seam vertices remain fixed. No sewn fit, cloth settling, or visual acceptance is implied. Overlay multiplicity remains unverified.",
   "poses": {
@@ -9689,7 +9691,7 @@
     "evidenceBoundary": "V202 applies pose-space row deformation before dense crease subdivision and radial pleat relief so local folded faces do not throttle the connected-panel orientation-safe line search. The unchanged full-panel positive-orientation guard still bounds every displacement; pleat geometry is added afterward on the moved surface. This remains prototype geometry/deformation evidence only and grants no fit, motion, appearance, or release acceptance.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v203-integrated-mid-thigh-shorts-20261122",
+  "designRevision": "v204-front-skirt-interior-fairing-20261122",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

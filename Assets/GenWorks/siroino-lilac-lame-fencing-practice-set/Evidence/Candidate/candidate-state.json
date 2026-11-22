@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v203-integrated-mid-thigh-shorts-20261122",
+  "revision": "v204-front-skirt-interior-fairing-20261122",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of current V203 renders: the added under-shorts cover both upper thighs in sit and crouch, but the visible shorts terminate high while pale fabric hangs behind bent legs; in back view gray legs interrupt both shorts hems. The new coverage geometry therefore does not yet read or behave as a consistently fitted garment through hip flexion.",
-      "severity": "BLOCKER",
-      "code": "SHORTS_AND_POSE_FIT_FAILURE"
+      "description": "Direct inspection of current V204 renders and independent Astra review: in sit and crouch both thighs extend beyond the overskirt front while lilac-edged panels fold behind the knees and white panels hang below the seat. The V203 shorts extension remains a separate upper-thigh layer and does not preserve outer-skirt coverage.",
+      "code": "POSED_SKIRT_THIGH_COVERAGE_AND_HEM_FAILURE",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Front and three-quarter show irregular triangular faceting rather than controlled broad pleat channels. Sit and crouch produce doubled lilac-edged hem with sharp points between and beside knees; prone still tents and bunches the garment over and beneath the torso.",
-      "severity": "BLOCKER",
-      "code": "PLEAT_AND_HEM_DEFORMATION"
+      "description": "Front, three-quarter, neutral and side renders retain dense angular creases across the front overskirt. V204 seam-locked front-panel fairing did not produce clean broad channels and visual improvement is insufficient; preserve seams and hem while reshaping pleat relief.",
+      "code": "FRONT_PLEATS_REMAIN_CRUSHED",
+      "severity": "BLOCKER"
     },
     {
-      "description": "Front view retains small gray body patches at both armpits; arms-up still shows a sleeve-root/armhole coverage interruption. Shoulder and sleeve surface also retain conspicuous faceting.",
-      "severity": "MAJOR",
-      "code": "SLEEVE_ROOT_COVERAGE"
+      "description": "Prone still tents and bunches the skirt. Side silhouettes retain the trailing hem step/tail, and gray body patches remain at sleeve roots/armholes in front and raised-arm views.",
+      "code": "POSE_AND_SLEEVE_SURFACE_DEFECTS",
+      "severity": "MAJOR"
     }
   ],
   "failedGeometryChecks": [
