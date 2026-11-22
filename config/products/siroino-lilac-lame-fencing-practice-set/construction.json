@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V209 changes only the pose-space front-lap deformation field: strengthen longitudinal blending from 6 iterations at 0.35 to 8 iterations at 0.42 so neighboring authored rows share a smoother target displacement before the existing positive-orientation line search. V208 measured one left-front row safe scale at 3.8e-6 and 891 backtracked vertices, showing the pose-follow target was locally throttled. The first V209 trial at 0.50 reached a 8.92e-12 m2 face after crease subdivision, so retain the same iterative method with a moderated blend weight rather than bypassing the existing geometry floor. Keep authored geometry, seams, hems, weights, and Cloth fixed; compare the same five views and six poses. Prototype only; this does not establish fit or visual acceptance.",
-  "designRevision": "v209-pose-lap-row-coherence-20261123",
+  "target": "V210 retains V208's authored-row smoothing values because V209 changed neither the left-front minimum safe scale (3.8e-6) nor backtracking count (891). Change only the orientation-safe front-lap support solver: after single-row continuation, jointly advance adjacent authored pattern rows with a bounded two-row line search so a row can move with its follower instead of being stranded by an intermediate face inversion. Keep all orientation/area guards, authored geometry, seams, hems, weights, and Cloth fixed. Compare the same five views and six poses. Prototype only; this does not establish fit or visual acceptance.",
+  "designRevision": "v210-coupled-lap-row-support-20261123",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",

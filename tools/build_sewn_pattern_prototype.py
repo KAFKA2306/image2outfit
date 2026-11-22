@@ -3275,6 +3275,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
         "bilateral-pose-space-thigh-envelope-row-constrained-panel-deformation-v5",
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
+        "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
     }:
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
@@ -3625,7 +3626,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     row_scale_by_key = {key: 0.0 for key in row_displacement_by_key}
     row_search_iterations_by_key = {key: 0 for key in row_displacement_by_key}
 
-    def orientation_safe_with_row_scale(piece_id, row_key, candidate_scale):
+    def orientation_safe_with_row_updates(piece_id, proposed_scales):
         for face_index in faces_by_piece[piece_id]:
             face = mesh["faces"][face_index]
             trial = []
@@ -3638,8 +3639,9 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 if vertex_row_key is None:
                     trial.append(point)
                     continue
-                scale = (candidate_scale if vertex_row_key == row_key
-                         else row_scale_by_key.get(vertex_row_key, 0.0))
+                scale = proposed_scales.get(
+                    vertex_row_key, row_scale_by_key.get(vertex_row_key, 0.0)
+                )
                 trial.append(point + displacement_by_vertex[vertex_id] * scale)
             trial_normal = (trial[1] - trial[0]).cross(trial[2] - trial[0])
             if (trial_normal.length * 0.5 < reference_face_minimum_areas[face_index]
@@ -3661,18 +3663,52 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 for row_index in order:
                     row_key = (piece_id, row_index)
                     low = row_scale_by_key[row_key]
-                    if orientation_safe_with_row_scale(piece_id, row_key, 1.0):
+                    if orientation_safe_with_row_updates(piece_id, {row_key: 1.0}):
                         row_scale_by_key[row_key] = 1.0
                         continue
                     high = 1.0
                     for _ in range(18):
                         middle = (low + high) * 0.5
-                        if orientation_safe_with_row_scale(piece_id, row_key, middle):
+                        if orientation_safe_with_row_updates(piece_id, {row_key: middle}):
                             low = middle
                         else:
                             high = middle
                         row_search_iterations_by_key[row_key] += 1
                     row_scale_by_key[row_key] = low
+    row_block_search_iterations_by_piece = defaultdict(int)
+    for piece_id in pieces_with_rows:
+        row_indices = sorted(row_keys_by_piece[piece_id])
+        adjacent_pairs = list(zip(row_indices, row_indices[1:]))
+        # A locally blocked row can only advance when the row on its other
+        # side follows it. Coordinate-only line search cannot cross that
+        # intermediate inversion, so test adjacent row pairs as one bounded
+        # continuation block while retaining the same complete-panel guard.
+        for _ in range(4):
+            for ordered_pairs in (adjacent_pairs, list(reversed(adjacent_pairs))):
+                for first, second in ordered_pairs:
+                    first_key = (piece_id, first)
+                    second_key = (piece_id, second)
+                    first_start = row_scale_by_key[first_key]
+                    second_start = row_scale_by_key[second_key]
+                    target = {first_key: 1.0, second_key: 1.0}
+                    if orientation_safe_with_row_updates(piece_id, target):
+                        row_scale_by_key[first_key] = 1.0
+                        row_scale_by_key[second_key] = 1.0
+                        continue
+                    low, high = 0.0, 1.0
+                    for _ in range(14):
+                        amount = (low + high) * 0.5
+                        trial = {
+                            first_key: first_start + (1.0 - first_start) * amount,
+                            second_key: second_start + (1.0 - second_start) * amount,
+                        }
+                        if orientation_safe_with_row_updates(piece_id, trial):
+                            low = amount
+                        else:
+                            high = amount
+                        row_block_search_iterations_by_piece[piece_id] += 1
+                    row_scale_by_key[first_key] = first_start + (1.0 - first_start) * low
+                    row_scale_by_key[second_key] = second_start + (1.0 - second_start) * low
 
     safe_scale_by_piece = {
         piece_id: min(row_scale_by_key[(piece_id, row_index)]
@@ -3717,11 +3753,12 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             if spec["method"] in {
                 "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
                 "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
+                "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
             }
             else "after-skirt-fold-placement"
         ),
         "rowWisePanelReconstruction": {
-            "method": "authored-pattern-v-rows-shared-pose-space-targets-with-longitudinal-smoothing-v1",
+            "method": "authored-pattern-v-rows-coupled-adjacent-pose-space-targets-with-longitudinal-smoothing-v2",
             "rowWidthM": row_width_m,
             "panelEvidence": row_reconstruction_evidence,
             "iterations": smoothing_iterations,
@@ -3737,11 +3774,13 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 for piece_id in pieces_with_rows
             },
             "orientationSearchIterationsByPanel": dict(sorted(orientation_search_iterations_by_piece.items())),
+            "coupledAdjacentRowSearchIterationsByPanel": dict(sorted(row_block_search_iterations_by_piece.items())),
             "orientationConstraint": (
-            "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
+                "coordinate-ascent single-row search followed by bidirectional coupled adjacent-row continuation; lock authored hems/shared boundaries, check the complete connected panel, and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
                 if spec["method"] in {
                     "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
                     "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
+                    "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
                 }
                 else "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus at least 0.01-percent reference area"
             ),

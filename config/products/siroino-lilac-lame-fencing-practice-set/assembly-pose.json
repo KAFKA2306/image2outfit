@@ -9663,9 +9663,9 @@
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "poseAwareThighAttachment": {
-    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
-    "displacementSmoothingIterations": 8,
-    "displacementSmoothingWeight": 0.42,
+    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
+    "displacementSmoothingIterations": 6,
+    "displacementSmoothingWeight": 0.35,
     "pieceIds": [
       "overskirt-front-left",
       "overskirt-front-right"
@@ -9688,10 +9688,10 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V209 changes only longitudinal blending of the pose-space front-lap target field to 8 iterations at weight 0.42, in response to V208's 3.8e-6 minimum left-front row scale and 891 orientation backtracks. The initial 0.50 trial caused a 8.92e-12 m2 face after crease subdivision and was rejected by the existing 5e-11 m2 geometry floor; the moderated 0.42 value retains all geometry guards. The existing positive-orientation line search, anchored shared seams, target rig, authored panels, hems, weights and unified Cloth solve remain in force. Measurements and renders must show whether coherent row targets reduce the local collapse without breaking front/rear continuity. This prototype does not prove fit, appearance, or release.",
+    "evidenceBoundary": "V210 retains V208's 6-iteration, 0.35 neighboring-row smoothing because V209 left the minimum front-left row scale and backtracked vertex count unchanged. After existing single-row orientation-safe search, run four bidirectional sweeps over adjacent row pairs, advancing both scales together via a bounded 14-step continuation search while checking every face in the connected panel. Keep authored shared seams fixed, preserve positive face orientation and the 1e-12 m2 area guard, and leave geometry, weights, hems and unified Cloth inputs unchanged. Record pair-search iterations and per-row safe scales. This tests whether the row constraint is a coordinate-search local stall; it does not prove fit, appearance, or release.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v209-pose-lap-row-coherence-20261123",
+  "designRevision": "v210-coupled-lap-row-support-20261123",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
