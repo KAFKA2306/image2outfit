@@ -9688,10 +9688,10 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V206 retains the bounded front-lap pose-space target geometry, then routes the two front panels through armature-only skinning instead of Cloth to prevent simulated collapse behind the knees. The positive-orientation guard and seam fades remain active; pose, fit, appearance and release remain unverified.",
+    "evidenceBoundary": "V207 retains the authored front-lap target geometry, routes all four connected skirt panels through the same target-body armature weight transfer before their shared Cloth solve, and keeps the positive-orientation guard and seam fades active. Pose, fit, appearance and release remain unverified.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v206-front-lap-armature-follow-20261122",
+  "designRevision": "v207-unified-skirt-armature-cloth-20261122",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

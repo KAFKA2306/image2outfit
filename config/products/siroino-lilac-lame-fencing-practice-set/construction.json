@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V206 keeps the front-lap rest geometry and seam/weight contracts, but removes the two front overskirt panels from native Cloth and drives them with transferred SiroinoSotai armature weights; only the back overskirt remains cloth-simulated. Compare front thigh coverage and pleat stability in crouch/sit; this is a prototype deformation path comparison only, not fit or visual acceptance.",
-  "designRevision": "v206-front-lap-armature-follow-20261122",
+  "target": "V207 returns all four overskirt panels to one native Cloth component and transfers measured SiroinoSotai Hips/UpperLeg_L/UpperLeg_R weights to the entire component before Cloth. Keep authored geometry, hems, and solver inputs fixed to isolate the panel-coherent deformation path; compare thigh coverage and continuous hem in crouch/sit/prone. Prototype only, not fit or visual acceptance.",
+  "designRevision": "v207-unified-skirt-armature-cloth-20261122",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -147,19 +147,16 @@
         "stand-collar"
       ],
       "pleated-overskirt": [
+        "overskirt-front-left",
+        "overskirt-front-right",
         "overskirt-back-left",
         "overskirt-back-right"
-      ],
-      "pleated-overskirt-front-follow": [
-        "overskirt-front-left",
-        "overskirt-front-right"
       ]
     },
     "prototypeFrameEnd": 48,
     "nonClothDeformationPaths": {
       "jacket-sleeves": "authored-panel-shape-preserving-armature-skinning",
-      "jacket-bodice": "authored-panel-shape-preserving-armature-skinning",
-      "pleated-overskirt-front-follow": "authored-panel-shape-preserving-armature-skinning"
+      "jacket-bodice": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypePreClothSkinning": {
       "jacket-sleeves": {
@@ -191,7 +188,7 @@
         "reason": "Sleeve-only skinning created a 7.06 mm divergence at a shared sewn vertex. Connected bodice and collar panels must use the same target skeleton and seam-averaged weights so armscye and shoulder seams remain in one deformation basis.",
         "evidenceBoundary": "Transfer target-body weights onto connected bodice and collar panels and synchronize each shared canonical sewn vertex to the mean of participating panel weights before posing. These non-cloth pose previews are construction diagnostics only and do not establish fit, garment motion acceptance, appearance, or release readiness."
       },
-      "pleated-overskirt-front-follow": {
+      "pleated-overskirt": {
         "sourceObject": "SiroinoSotai_PC",
         "armatureObject": "Armature",
         "method": "nearest-target-body-triangle-barycentric-authored-weights",
@@ -201,8 +198,8 @@
           "UpperLeg_L",
           "UpperLeg_R"
         ],
-        "reason": "V205 directly inspected renders still showed the cloth-baked front-lap panels folding behind both knees despite a wider thigh-follow band. V206 tests a distinct response path: preserve the authored front panels without native Cloth and drive them from measured target-body rig weights, while retaining cloth on the back overskirt.",
-        "evidenceBoundary": "This disposable pose hypothesis transfers exact imported Hips/UpperLeg_L/UpperLeg_R weights over nearest target-body triangles and uses armature-only deformation for the two front-lap panels. A pre-solve distance audit measured both panels at p99 0.135 m and maximum 0.154153 m, so the declared hard transfer limit is 0.16 m; any vertex beyond it fails. Back overskirt remains native Cloth. It does not prove front coverage, seam continuity, fit, collision safety, motion acceptance, appearance, or release readiness."
+        "reason": "V206 armature-only front panels still failed thigh coverage and broke front/rear hem continuity. V207 isolates a panel-coherent response path: transfer the same measured target-body rig weights to all four connected overskirt panels before applying Cloth, then simulate them together.",
+        "evidenceBoundary": "This disposable prototype transfers exact imported Hips/UpperLeg_L/UpperLeg_R weights over nearest target-body triangles for all four overskirt panels before Cloth. A pre-solve distance audit measured rear panels at maximum 0.101044 m and front panels at maximum 0.154153 m; retain a 0.16 m runtime hard cap and fail beyond it. Cloth remains required for the unified component. This does not prove front coverage, seam continuity, fit, collision safety, motion acceptance, appearance, or release readiness."
       }
     },
     "prototypeSharedSeamAnchor": {
@@ -211,8 +208,8 @@
       "reason": "V166 and V167 Cloth baking moved shared canonical sewn boundaries. Correct only shared canonical seam vertices to their measured pre-solve neutral positions; fail if any individual correction exceeds 15 mm.",
       "evidenceBoundary": "The actual pre-restore seam gap, number of changed shared references, maximum and mean per-reference correction, and post-restore gap are recorded. This is a capped prototype seam-continuity operation at the neutral export frame, not a pose-fit, appearance, fabric, or release acceptance."
     },
-    "evidence": "V198 directly applied up to 0.30 additional same-side thigh follow to 4,483/5,670 exclusive front-panel vertices, with thigh weights capped at 0.75; direct crouch/sit renders remained collapsed and exposed the anterior thighs. V199 retains V198 cloth and weight settings and extends only the two front-lap hem drops by 30 mm. It moves the two waist-to-hem side-seam endpoints in each adjacent flanking panel by the same 30 mm so the sewn edge lengths continue to match; waist attachment points and all other pattern coordinates stay fixed. Refresh prototype readiness from the changed construction and pattern contract, rerun the 3D build/simulation/export/render/audit/review stages, and preserve rejection unless direct visuals and required poses are usable.",
-    "reason": "V198 confirmed that further weight follow is insufficient for front-lap coverage. Extend the two authored front-lap hem drops by 30 mm for one bounded pattern-geometry comparison, preserve waist attachment points and matched lap-side seams, and keep all other geometry, pins, weights, and solver inputs unchanged.",
+    "evidence": "V206 direct renders were rejected for exposed thighs, front/rear hem discontinuity, and prone front-panel bunching. V207 returns all four overskirt panels to one native Cloth component, transfers measured target-body weights to the complete component before Cloth, uses 103 mm front-hem and 40 mm rear-hem limits, and retains a 1 mm neutral hem-drift cap. Build from the initialization checkpoint and preserve rejection unless direct visuals and required poses are usable.",
+    "reason": "The V206 split deformation path caused exposed thighs and a broken hem. Change only panel grouping and pre-Cloth weight transfer so connected front/rear panels share one rig and Cloth response; keep pattern geometry and solver inputs fixed.",
     "prototypeComponentSelfCollisionHypotheses": {
       "pleated-overskirt": {
         "enabled": false,
@@ -230,22 +227,26 @@
     "prototypeHemBoundaryAttachment": {
       "component": "pleated-overskirt",
       "sourcePieces": [
+        "overskirt-front-left",
+        "overskirt-front-right",
         "overskirt-back-left",
         "overskirt-back-right"
       ],
       "method": "pin-authored-pattern-hem-boundary-v1",
       "maximumBoundaryHeightRangeMByPiece": {
+        "overskirt-front-left": 0.103,
+        "overskirt-front-right": 0.103,
         "overskirt-back-left": 0.04,
         "overskirt-back-right": 0.04
       },
       "maximumNeutralHemDriftM": 0.001,
       "reason": "V173 moved the 710-vertex hem band 0.3415 m maximum and 0.2237 m mean. V174's first implementation found unrelated waist/open-panel edges because the hem panels contain more than one open boundary. V175 preserves the exact authored 2D face-corner coordinates and selects only topological boundary edges on each unique declared pattern hem, fixing those vertices during neutral settling.",
-      "evidenceBoundary": "The native Cloth bake matches topological boundary edges to the exact authored 2D hem segment for each declared panel and pins only those vertices at neutral source coordinates. It records source edge/vertex ownership, ignored non-hem boundaries, per-panel measured height ranges, exact per-piece declared range limits, pinned coverage, and maximum, P95, and mean drift. The V188 100 mm range applies only to the two authored front-lap hem edges; all four common skirt-panel hem limits remain 40 mm and neutral drift remains capped at 1 mm. This measures a bounded neutral prototype attachment; it does not establish posed trim binding, fit, collision safety, appearance, runtime behavior, or release acceptance."
+      "evidenceBoundary": "The native Cloth bake matches topological boundary edges to authored 2D hem segments, records edge ownership and measured drift, and pins declared hems at neutral source coordinates. The unified component uses 103 mm limits for both front-lap hems and 40 mm for both back-panel hems; neutral drift remains capped at 1 mm. This is bounded prototype evidence only, not posed trim binding, fit, collision safety, appearance, runtime behavior, or release acceptance."
     },
     "prototypeGeometryDiagnostics": {
       "component": "pleated-overskirt",
       "method": "canonical-panel-rest-to-settled-triangle-response-v1",
-      "evidenceBoundary": "For each cloth-simulated overskirt panel in the declared pleated-overskirt group, compare canonical source coordinates and fixed face-fan triangles with the evaluated Cloth frame, settled neutral mesh, and post-seam-anchor mesh. V206 front-lap panels are explicitly armature-only and are excluded from this cloth metric; their pose response remains subject to direct five-view/six-pose review. These diagnostics do not establish fit, appearance, collision safety, runtime behavior, or release acceptance."
+      "evidenceBoundary": "For all four overskirt panels in the unified pleated-overskirt Cloth component, compare canonical source coordinates and fixed face-fan triangles with the evaluated Cloth frame, settled neutral mesh, and post-seam-anchor mesh. V207 transfers target-body weights to the complete component before Cloth; all panels remain subject to direct five-view/six-pose review. These diagnostics do not establish fit, appearance, collision safety, runtime behavior, or release acceptance."
     },
     "prototypePoseCoverageDiagnostic": {
       "method": "rest-bound-anterior-thigh-to-authored-front-lap-ray-coverage-v1",
@@ -352,8 +353,8 @@
           "fadeStartZM": 0.78,
           "fullWeightZM": 0.58,
           "seamFadeDistanceM": 0.05,
-          "reason": "V205 direct crouch/sit review still showed collapsed front-lap panels after widening the thigh-follow band. V206 instead excludes those two panels from Cloth and tests armature-only body-weight deformation, retaining the back panels on Cloth.",
-          "evidenceBoundary": "V206 retains the bounded 0.30 additional same-side thigh-weight cap and 0.78/0.58 m vertical band; the distinct change is disabling Cloth on the front-lap panels and preserving their rig-driven geometry. Prototype response evidence only; no fit, appearance, or release acceptance."
+          "reason": "V206 direct review rejected the split path for thigh exposure and hem discontinuity. V207 uses one shared panel group, with target-body weights transferred to all four skirt panels before their common Cloth solve.",
+          "evidenceBoundary": "V207 retains the bounded 0.30 additional same-side thigh-weight cap and 0.78/0.58 m vertical band; all four panels now share target-body weights before their unified Cloth solve. Prototype response evidence only; no fit, appearance, or release acceptance."
         }
       }
     },
