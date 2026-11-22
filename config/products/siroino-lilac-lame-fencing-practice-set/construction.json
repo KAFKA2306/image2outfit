@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V207 returns all four overskirt panels to one native Cloth component and transfers measured SiroinoSotai Hips/UpperLeg_L/UpperLeg_R weights to the entire component before Cloth. Keep authored geometry, hems, and solver inputs fixed to isolate the panel-coherent deformation path; compare thigh coverage and continuous hem in crouch/sit/prone. Prototype only, not fit or visual acceptance.",
-  "designRevision": "v207-unified-skirt-armature-cloth-20261122",
+  "target": "V208 applies only a mild, boundary-preserving post-bake fairing pass to the V207 unified overskirt to reduce angular pleat creases. Keep authored geometry, hems, weights, sewing and Cloth inputs fixed. Compare the same five views and six poses. Thigh exposure remains an explicit unresolved defect; prototype only, not fit or visual acceptance.",
+  "designRevision": "v208-boundary-preserving-overskirt-fairing-20261123",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -276,7 +276,14 @@
       "originOffsetSensitivityM": 0.0001,
       "evidenceBoundary": "For neutral, crouch, and sit, bind exact body triangle IDs to rest-pose front-facing surface normals and the declared 10–90% UpperLeg bone interval, then cast along each evaluated posed body normal against each authored front-lap panel. Report left/right lap to left/right anterior thigh separately plus a deduplicated union, nearest panel face provenance, ray gaps, and a diagnostic-only 30 mm near-distance count with 0.5 mm versus 0.1 mm origin-offset sensitivity. This is a geometric diagnostic only; it does not establish pressure, stretch, material behavior, Shape Key response, fit, visual quality, or runtime acceptance."
     },
-    "prototypePostBakeLaplacianSmoothing": {}
+    "prototypePostBakeLaplacianSmoothing": {
+      "pleated-overskirt": {
+        "iterations": 2,
+        "factor": 0.22,
+        "reason": "V207 was rejected for angular front-pleat creases and thigh exposure. V208 isolates a mild post-bake interior fairing pass on the already unified overskirt; authored pattern, sewn connectivity, rig weights, Cloth solve, pinned hem, and all other geometry inputs stay fixed.",
+        "evidenceBoundary": "Two uniform Laplacian iterations at factor 0.22 move only unpinned, non-boundary interior vertices of the evaluated baked pleated-overskirt. Record actual displacement and verify all fixed hem/pin coordinates. This tests crease attenuation only; it does not establish thigh coverage, fit, collision safety, appearance acceptance, Unity/VRChat behavior, or release readiness."
+      }
+    }
   },
   "frontClosure": {
     "status": "PROTOTYPE_OVERLAP_UNFASTENED",
