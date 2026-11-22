@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v201-balanced-wrap-broad-pleats-20261122",
+  "revision": "v202-pre-pleat-thigh-deformation-20261122",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,23 +19,18 @@
   },
   "blockingFindings": [
     {
-      "code": "POSED_FRONT_SKIRT_LIFT_AND_EXPOSURE",
-      "description": "Direct inspection of current V201 renders: crouch and sit lift/open the skirt around both thighs, exposing substantial upper-thigh area with irregular triangular hem flaps. Prone produces severe skirt collapse and large garment distortion. The V201 front/side hem balancing does not maintain coverage under the required poses.",
+      "code": "POSED_FRONT_SKIRT_LIFT_AND_COLLAPSE",
+      "description": "Direct inspection of current V202 renders: crouch and sit expose both thighs through the front opening while the hem folds into angular flaps beneath the knees and the side/back skirt hangs behind. Prone tents the skirt above the hips and bunches it underneath. The front-lap geometry does not maintain a continuous hem or coverage in required poses.",
       "severity": "BLOCKER"
     },
     {
-      "code": "OVERSKIRT_READS_AS_BROAD_APRON",
-      "description": "Neutral front and three-quarter views show a broad, mostly uniform A-line apron. The back view is a plain unpleated panel. The intended broad pleat channels are not visually distinct; front folds remain crushed and irregular.",
+      "code": "PLEAT_AND_SURFACE_FACETING",
+      "description": "Neutral front and three-quarter views show tightly crushed angular facets instead of separated broad pleat channels; the back reads as nearly plain with little visible pleat structure. The jacket torso/waist also has conspicuous crumpled faceting.",
       "severity": "MAJOR"
     },
     {
-      "code": "SIDE_HEM_PROJECTION",
-      "description": "The left view retains a small pointed hem projection and the right view a long tapered rear-side extension, so the hem is not continuous around the side silhouette.",
-      "severity": "MAJOR"
-    },
-    {
-      "code": "JACKET_FACETING_AND_ARMHOLE_GAP",
-      "description": "The jacket torso and waist transition retain angular/crumpled faceting. In the arms-up render a gray underarm gap is visible at image-right, with uneven sleeve-root overlap.",
+      "code": "SIDE_HEM_AND_ARMHOLE_OVERLAP",
+      "description": "Both side silhouettes retain a front/side hem step and tapered tail rather than a smooth continuous hem. Gray patches are visible at both sleeve roots in front view and remain at viewer-right underarm with arms raised; sleeve-to-jacket overlap is uneven.",
       "severity": "MAJOR"
     }
   ],

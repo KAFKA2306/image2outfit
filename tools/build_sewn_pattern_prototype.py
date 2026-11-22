@@ -2660,10 +2660,10 @@ def split_declared_skirt_creases(mesh, pose):
             # triangles repeatedly creates slivers without useful new density.
             row_count = 0
         longitudinal_spacing = (waist - hem) / (row_count + 1) if row_count else 0.0
-        # Pleat relief is applied after these cuts and can shrink a sliver.
-        # Require a 4x area margin at the unrelieved row geometry so the
-        # unchanged downstream cleanup bound still holds after that transform.
-        longitudinal_pre_fold_area_floor_m2 = 2e-10
+        # Keep the face-area check aligned with the existing degenerate-face
+        # threshold here. The separate 5e-11 m2 Blender cleanup check still
+        # rejects harmful triangles after each complete geometry operation.
+        longitudinal_pre_fold_area_floor_m2 = 1e-12
         for i in range(1, row_count + 1):
             requested_z = hem + longitudinal_spacing * i
             remaining_rows = row_count - i
@@ -3273,6 +3273,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     if spec.get("method") not in {
         "bilateral-pose-space-thigh-envelope-row-reconstructed-panels-v4",
         "bilateral-pose-space-thigh-envelope-row-constrained-panel-deformation-v5",
+        "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
     }:
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
@@ -3351,12 +3352,16 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     incident_faces = defaultdict(list)
     reference_face_normals = []
     reference_face_minimum_areas = []
+    downstream_crease_minimum_area = 1e-12
     reference_vertices = [Vector(values) for values in mesh["vertices"]]
     for face_index, face in enumerate(mesh["faces"]):
         a, b, c = (reference_vertices[vertex_id] for vertex_id in face)
         reference_normal = (b - a).cross(c - a)
         reference_face_normals.append(reference_normal)
-        reference_face_minimum_areas.append(max(1e-12, reference_normal.length * 1e-4))
+        reference_face_minimum_areas.append(max(
+            downstream_crease_minimum_area,
+            reference_normal.length * 1e-4,
+        ))
         for vertex_id in face:
             incident_faces[vertex_id].append(face_index)
     seam_factors = preserved_seam_factors(mesh, spec)
@@ -3706,6 +3711,11 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     return {
         "applied": True,
         "method": spec["method"],
+        "applicationOrder": (
+            "after-panel-length-and-body-envelope-placement-before-crease-subdivision-and-box-pleat-relief"
+            if spec["method"] == "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6"
+            else "after-skirt-fold-placement"
+        ),
         "rowWisePanelReconstruction": {
             "method": "authored-pattern-v-rows-shared-pose-space-targets-with-longitudinal-smoothing-v1",
             "rowWidthM": row_width_m,
@@ -3723,7 +3733,11 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 for piece_id in pieces_with_rows
             },
             "orientationSearchIterationsByPanel": dict(sorted(orientation_search_iterations_by_piece.items())),
-            "orientationConstraint": "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus at least 0.01-percent reference area",
+            "orientationConstraint": (
+            "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
+                if spec["method"] == "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6"
+                else "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus at least 0.01-percent reference area"
+            ),
         },
         "poseSpaceTargets": ["crouch", "sit"],
         "targetSourceSha256": digest(target_path),
@@ -4281,21 +4295,25 @@ def main():
     if "waistbandContourPlacement" in pose:
         waistband_pose = dict(pose, bodyContourPlacement=pose["waistbandContourPlacement"])
         waistband_evidence = place_on_measured_contours(mesh, body_objects, waistband_pose, resolve(job["targetSourcePath"]), angular_source_vertices=native_angular_vertices)
-    # Place panel-local crease cuts only after the declared skirt extension,
-    # forward-apron projection, envelope and waistband contour transforms. The
-    # relief field is evaluated from these final panel-local coordinates; cuts
-    # made on the pre-placement mesh could otherwise drift away from their
-    # relief knots and form narrow sliver triangles after those transforms.
+    pattern_contract = read(resolve(pipeline["patternContractPath"]))
+    # Pose-space thigh matching needs to move a continuous panel. Applying it
+    # after dense crease subdivision and radial pleat relief makes local fold
+    # faces dominate the whole-panel orientation line search and throttles
+    # otherwise safe torso-to-thigh displacement. Match the smooth expanded
+    # panels first; subdivide crease lines and sculpt pleat relief on the moved
+    # surface afterward so no stitch or quality gate is skipped.
+    thigh_attachment_evidence = place_skirt_front_on_thigh_surfaces(
+        mesh, body_objects, pose, resolve(job["targetSourcePath"]), pattern_contract
+    )
+    assert_mesh_triangle_area("pre-pleat thigh-surface front attachment")
+    # Place panel-local crease cuts after skirt extension, body-envelope and
+    # pose-space panel transforms so the fold relief remains bound to the final
+    # sewn surface and its authored seams.
     crease_evidence = split_declared_skirt_creases(mesh, pose)
     assert_mesh_triangle_area("panel-local crease subdivision")
     skirt_fold_native_vertices = [list(point) for point in mesh["vertices"]]
     fold_evidence = place_declared_skirt_folds(mesh, pose, skirt_fold_native_vertices)
     assert_mesh_triangle_area("declared skirt fold placement")
-    pattern_contract = read(resolve(pipeline["patternContractPath"]))
-    thigh_attachment_evidence = place_skirt_front_on_thigh_surfaces(
-        mesh, body_objects, pose, resolve(job["targetSourcePath"]), pattern_contract
-    )
-    assert_mesh_triangle_area("thigh-surface front attachment")
     thigh_surface_shell_evidence = append_declared_thigh_surface_shell(
         mesh, body_objects, pose, resolve(job["targetSourcePath"])
     )

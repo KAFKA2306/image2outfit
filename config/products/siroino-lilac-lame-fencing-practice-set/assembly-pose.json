@@ -9574,7 +9574,7 @@
   "skirtPleatPlacement": {
     "method": "bounded-panel-extension-v3-panel-local-hem",
     "foldMethod": "panel-width-intake-box-pleat-v1",
-    "longitudinalSubdivisionCount": 24,
+  "longitudinalSubdivisionCount": 12,
     "pieceIds": [
       "overskirt-front-left",
       "overskirt-front-right",
@@ -9610,7 +9610,7 @@
       ],
       "evidenceBoundary": "V201 keeps the V200 front center at its prior 170 mm total neutral drop while increasing the shared circumference drop to 130 mm; front-only differential is reduced from 100 to 40 mm and no forward translation is applied. This is a pose/side-silhouette hypothesis only; coverage and appearance require direct review."
     },
-    "evidenceBoundary": "V201 preserves each V200 continuous -160 mm authored 2D hem and waist/side seams. The common sewn drop rises to 130 mm while the front-only increment falls to 40 mm, keeping the V200 front-center neutral drop and bringing side/back hems down toward it. Two broad box-pleat cycles per panel replace three narrow cycles. No motion, fit, or appearance acceptance is implied.",
+  "evidenceBoundary": "V202 retains the V201 continuous authored hem, side/balance geometry and two broad box-pleat cycles per panel. Longitudinal refinement requests 12 rows so the existing authored 10 mm skirt rows can satisfy the spacing-density check without redundant global Z cuts through pose-deformed panels. Geometry and visible folds remain prototype evidence only; no motion, fit, or appearance acceptance is implied.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
@@ -9649,7 +9649,7 @@
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "poseAwareThighAttachment": {
-    "method": "bilateral-pose-space-thigh-envelope-row-constrained-panel-deformation-v5",
+    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
     "displacementSmoothingIterations": 6,
     "displacementSmoothingWeight": 0.35,
     "pieceIds": [
@@ -9674,10 +9674,10 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V193 inspection measured only 0.0137 and 0.0171 minimum panel-wide safe scales on the two front-lap panels; the current evaluated Cloth frame still inverts 51/2,713 and 48/2,717 front-lap triangles. V194 keeps the same authored-pattern row targets, exact lap hem and shared seams, but line-searches each row against full connected-panel face-orientation constraints so one locally incompatible row cannot suppress every other row. This remains prototype geometry/deformation evidence only and grants no fit, motion, appearance, or release acceptance.",
+    "evidenceBoundary": "V202 applies pose-space row deformation before dense crease subdivision and radial pleat relief so local folded faces do not throttle the connected-panel orientation-safe line search. The unchanged full-panel positive-orientation guard still bounds every displacement; pleat geometry is added afterward on the moved surface. This remains prototype geometry/deformation evidence only and grants no fit, motion, appearance, or release acceptance.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v201-balanced-wrap-broad-pleats-20261122",
+  "designRevision": "v202-pre-pleat-thigh-deformation-20261122",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
