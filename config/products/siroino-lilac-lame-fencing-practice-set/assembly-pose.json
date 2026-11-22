@@ -9587,12 +9587,12 @@
     ],
     "waistZM": 0.7395782470703125,
     "sourceHemZM": 0.5795782470703125,
-    "hemZM": 0.5095782470703125,
-    "hemExtensionM": 0.07,
+    "hemZM": 0.4495782470703125,
+    "hemExtensionM": 0.13,
     "preexistingHemReliefM": 0.0,
     "foldCount": 8,
     "topologySubdivisionFactor": 4,
-    "hemFoldDepthM": 0.008,
+    "hemFoldDepthM": 0.012,
     "phaseRadians": 0,
     "forwardApron": {
       "method": "front-panel-forward-scoop-v2",
@@ -9600,32 +9600,32 @@
         "overskirt-front-left",
         "overskirt-front-right"
       ],
-      "additionalExtensionM": 0.1,
-      "forwardProjectionM": 0.004,
+      "additionalExtensionM": 0.04,
+      "forwardProjectionM": 0.0,
       "fullExtensionHalfAngleRadians": 0.65,
       "zeroExtensionHalfAngleRadians": 1.3,
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
-      "evidenceBoundary": "V188 tests the maximum declared 100 mm additional front-only hem extension, above the unchanged 70 mm common skirt drop, fading to zero at the existing angular side bound; the prior 4 mm forward projection is retained. Pattern rest lengths and sewn seams remain unchanged. Coverage, fit, cloth response, and appearance remain unapproved."
+      "evidenceBoundary": "V201 keeps the V200 front center at its prior 170 mm total neutral drop while increasing the shared circumference drop to 130 mm; front-only differential is reduced from 100 to 40 mm and no forward translation is applied. This is a pose/side-silhouette hypothesis only; coverage and appearance require direct review."
     },
-    "evidenceBoundary": "V200 removes the extra 30 mm inner lap relief and merges each front lap with its flank panel; the front hem now follows one continuous -160 mm pattern boundary per half. Waist attachment, outer side seams, V198 weights, and V198 cloth settings are retained. Pose coverage and appearance remain unverified.",
+    "evidenceBoundary": "V201 preserves each V200 continuous -160 mm authored 2D hem and waist/side seams. The common sewn drop rises to 130 mm while the front-only increment falls to 40 mm, keeping the V200 front-center neutral drop and bringing side/back hems down toward it. Two broad box-pleat cycles per panel replace three narrow cycles. No motion, fit, or appearance acceptance is implied.",
     "seamContinuationPieceIds": [
       "waistband-front-left",
       "waistband-front-right",
       "waistband-back-left",
       "waistband-back-right"
     ],
-    "foldValleyHalfWidthFraction": 0.08,
-    "foldValleyDepthRatio": 0.55,
-    "foldCrestRampFraction": 0.85,
-    "foldsPerPanel": 3,
+    "foldValleyHalfWidthFraction": 0.1,
+    "foldValleyDepthRatio": 0.45,
+    "foldCrestRampFraction": 0.75,
+    "foldsPerPanel": 2,
     "foldsPerPanelByPiece": {
-      "overskirt-front-right": 3,
-      "overskirt-front-left": 3,
-      "overskirt-back-right": 3,
-      "overskirt-back-left": 3
+      "overskirt-front-left": 2,
+      "overskirt-front-right": 2,
+      "overskirt-back-left": 2,
+      "overskirt-back-right": 2
     }
   },
   "skirtFlareDesignEvidence": {
@@ -9677,7 +9677,7 @@
     "evidenceBoundary": "V193 inspection measured only 0.0137 and 0.0171 minimum panel-wide safe scales on the two front-lap panels; the current evaluated Cloth frame still inverts 51/2,713 and 48/2,717 front-lap triangles. V194 keeps the same authored-pattern row targets, exact lap hem and shared seams, but line-searches each row against full connected-panel face-orientation constraints so one locally incompatible row cannot suppress every other row. This remains prototype geometry/deformation evidence only and grants no fit, motion, appearance, or release acceptance.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v200-continuous-front-hem-panels-20261122",
+  "designRevision": "v201-balanced-wrap-broad-pleats-20261122",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
