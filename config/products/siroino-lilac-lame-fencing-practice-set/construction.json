@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V210 retains V208's authored-row smoothing values because V209 changed neither the left-front minimum safe scale (3.8e-6) nor backtracking count (891). Change only the orientation-safe front-lap support solver: after single-row continuation, jointly advance adjacent authored pattern rows with a bounded two-row line search so a row can move with its follower instead of being stranded by an intermediate face inversion. Keep all orientation/area guards, authored geometry, seams, hems, weights, and Cloth fixed. Compare the same five views and six poses. Prototype only; this does not establish fit or visual acceptance.",
-  "designRevision": "v210-coupled-lap-row-support-20261123",
+  "target": "V211 stops tuning the row-displacement solver after V208-V210 produced identical safe scales and backtracking counts, and rejects the sit/crouch inverse-skin apron path after it violated the unchanged sit triangle-orientation bound. Reshape only the existing source-body thigh support shell by lowering its hem from 0.56 m to 0.46 m, retaining the existing body weights, 8 mm offset, clipped triangle topology and UV NOT_CREATED status. Keep the skirt panels, waistband attachment, continuous outer hem and shared Cloth fixed. Compare the same five views and six poses. Prototype only; this does not establish fit or visual acceptance.",
+  "designRevision": "v211-sit-crouch-apron-support-20261123",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",

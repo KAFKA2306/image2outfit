@@ -9132,12 +9132,12 @@
       "right": "shorts-leg-cover-right"
     },
     "triangleCountByThigh": {
-      "left": 778,
-      "right": 778
+      "left": 1061,
+      "right": 1061
     },
     "clippedSourceTriangleCountByThigh": {
-      "left": 758,
-      "right": 760
+      "left": 1037,
+      "right": 1039
     },
     "omittedSubpixelTriangleCountByThigh": {
       "left": 0,
@@ -9145,22 +9145,22 @@
     },
     "minimumOmittedTriangleAreaM2": null,
     "sourceVertexCountByThigh": {
-      "left": 431,
-      "right": 431
+      "left": 579,
+      "right": 579
     },
     "heightRangeZM": [
-      0.56,
+      0.46,
       0.87
     ],
     "normalClearanceM": 0.008,
-    "minimumTriangleAreaM2": 1.115821054185206e-07,
-    "minimumEmittedTriangleAreaM2": 1.115821054185206e-07,
+    "minimumTriangleAreaM2": 1.939626928120582e-08,
+    "minimumEmittedTriangleAreaM2": 1.939626928120582e-08,
     "minimumMeshTriangleAreaM2": 1e-10,
     "uvStatus": "NOT_CREATED",
     "grantsFitAcceptance": false,
     "grantsPoseAcceptance": false,
     "grantsVisualAcceptance": false,
-    "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56\u20130.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
+    "evidenceBoundary": "V211 reshapes the existing target-body surface-derived thigh support shell from Z 0.56\u20130.87 m to Z 0.46\u20130.87 m so the same-side thigh-weighted support reaches below the front-lap region in sit and crouch. It preserves clipped source triangles, 8 mm normal offset, and source-body skin weights; it is a close-fitting support layer, not a substitute for an approved sewn lap panel. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "declaredSkirtLengthening": {
     "applied": true,
@@ -9934,7 +9934,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "efd24591b83cb81341acd67fa282cfd337823ebeb65bcf85fecdc64de70a18f9",
+    "privateSimulationSourceSha256": "8a66e72ecf87057cfab8f113bf5bb42cda3247a632a5c704c5b8db14307a5d18",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -9942,7 +9942,7 @@
     "method": "face-local-declared-source-coordinates; unmapped surface-shell faces remain without UVs",
     "panelCount": 23,
     "mappedFaceCount": 22774,
-    "unmappedFaceCount": 1556,
+    "unmappedFaceCount": 2122,
     "uniformPatternToUvScale": 0.009303056139056215,
     "panelUvBounds": {
       "P01": {
@@ -10248,7 +10248,7 @@
     "sourceKindFaceCounts": {
       "declared-parametric-accessory": 40,
       "garmentcode-pattern-panel": 22734,
-      "unmapped-surface-derived-shell": 1556
+      "unmapped-surface-derived-shell": 2122
     },
     "grantsQualityAcceptance": false
   },
@@ -22255,7 +22255,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "46494e94b3b21f4f03788f72f7783e214629b35d96c26f31426672e8548ac526",
+  "sourceBlendSha256": "31f723aec224ce0d520c0206903244f0b2ab2124f3d349a966d2217d7d01d2db",
   "sewnMeshSha256": "95df28f6637ee6900dfe7f76501ceb5840eb3bdc77d79631ebf8d720ca6c00da",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -22264,10 +22264,10 @@
     "float32DistanceUncertaintyAllowance": "two-euclidean-ULPs-per-vertex-pair",
     "weldCount": 0,
     "welds": [],
-    "boundaryEdgesBefore": 832,
-    "boundaryEdgesAfter": 832,
-    "nonManifoldEdgesBefore": 832,
-    "nonManifoldEdgesAfter": 832,
+    "boundaryEdgesBefore": 858,
+    "boundaryEdgesAfter": 858,
+    "nonManifoldEdgesBefore": 858,
+    "nonManifoldEdgesAfter": 858,
     "remainingDegenerateTriangles": 0,
     "grantsFitAcceptance": false,
     "grantsAppearanceAcceptance": false,
@@ -568726,8 +568726,8 @@
     "evidenceBoundary": "Original sewn vertex IDs/face ownership, per-stage coordinates, and internal edge normal angles through panel fairing; diagnostic only, not fit or appearance acceptance."
   },
   "metrics": {
-    "vertices": 12582,
-    "triangles": 24330,
+    "vertices": 12878,
+    "triangles": 24896,
     "unweightedVertices": null,
     "unweightedVerticesStatus": "NOT_MEASURED_PRE_SKINNING",
     "degenerateTriangles": 0
@@ -570077,16 +570077,16 @@
       "overskirt-front-left": 1351,
       "overskirt-front-right": 1466
     },
-    "lockedCanonicalBoundaryVertexCount": 1338,
+    "lockedCanonicalBoundaryVertexCount": 1364,
     "maximumVertexDisplacementM": 0.0072912905512926805,
-    "meanVertexDisplacementM": 0.0011944182011567326,
+    "meanVertexDisplacementM": 0.001194418201156731,
     "orientationPreservingDisplacementScale": 0.0625,
-    "orientationCheckedTriangleCount": 24330,
+    "orientationCheckedTriangleCount": 24896,
     "normalContinuity": {
       "method": "local-panel-vertex-backtracking-v1",
-      "orientationCheckedTriangleCount": 24330,
+      "orientationCheckedTriangleCount": 24896,
       "continuityEdgeCount": 2718,
-      "constraintChecks": 135240,
+      "constraintChecks": 138070,
       "backtrackingPasses": 5,
       "clampedVertexCount": 41,
       "minimumRetainedDisplacementScale": 0.0625,

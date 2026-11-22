@@ -2,39 +2,34 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
-  "reviewer": "chatgpt:Codex and Astra direct image review",
-  "reviewedRevision": "v210-coupled-lap-row-support-20261123",
+  "reviewer": "ChatGPT Codex and Astra direct image review",
+  "reviewedRevision": "v211-sit-crouch-apron-support-20261123",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "ecce09255a9735046615c2aaab26fc3203432c32a8ca7602a042835ea21d9e39",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "4b9bda8a98db06f7fe8b7e714a935a63d2898527a99f4ef06af703480fe136ab",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "f53d0073d3f12bcb55f20c882915ca34e17cfe5541d6f32e222d49bc05dbc4f4",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "679e67d9ef493c71f528e68b79352992389653dddd051f767229ac4464101f5f",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "1d9d8d3d8065b6f9b86c7a9334968a9b7b31db30ac49113a12ec64a90b06578b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "d243a715269eac9f635ccfd8b7d67b8b794d2e63649dd296b486fbdf60909b99",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "d5e30104339ec3c80012fb985b4d1790e096fb7b1ebf0268efa0fcdb9be4ce50",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "1bc760bf1bde829750e9a1b91fa77d5410e0b3db146d947b8dad309009ad74f9",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "d46cc8968fb8c286deb85fc2b423b23acf980953bfc449bb50f2d72989462c9d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "3daed1292b5c148cf116badf756766fd2508331de46a87cd8aad9a2660926b30",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "f9e0a01d05255a550c3e945d683227728a1d1415da6675e3b9c07c6eddf387f0"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "1c1dd79721f10d694ed1da0dc3c10b28fe8b5c3693c405d00e25712f47df2506",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "9d3d0db8fb63b1e4845e59deff01aef7511cf61ae4d38af9dc1c207f7ef9d82b",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "d43ad9b46f1fa2b2e2e31431965bd982b4d7081c64c7e173dbb86987295a3258",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "c960ebd6a9d390c021f8db7cb448f2e900a0f86bce0264da5ee2b6ce8b2d14a1",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "25cedffbe7a878adff17e50e0b881f4396ce42fa76a946d21a6a50e0c1553160",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "a88ae04edf581adaa9a94001d1c613bcede863652b2c471d315241317f540f45",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "e1ed0f0b09da7566e97c671291c1565289959dcbc3669068d62ca97dc591c531",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "e13287128de05d7aaefc05863a337b3461a1ccda5f0872796b7b0737c4d7b454",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "7a7366cf3b35c0894fe42f954736b6803b4fab300108632c491ee9892170f8fa",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "0b94896f5ea4853fb8bd17541c9e64a548df31724a832abf49e17940c66bb5a0",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "634fe80417a0604bff2a16662e4a31a3f490a7a80c58e2aacd9d1dc61dec8b04"
   },
   "findings": [
     {
       "severity": "BLOCKER",
-      "code": "POSED_LAP_THIGH_COVERAGE_AND_HEM_CONTINUITY_FAILURE",
-      "description": "Direct V210 crouch and sit renders show both thighs and shorts remaining in front of the overskirt. The lilac hem folds beside and behind the knees instead of spanning the lap; Astra found no visible improvement from V209."
+      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED_FROM_SUPPORT_LAYER",
+      "description": "V211's extended body-surface support now covers the gray thigh areas almost to both knees in sit and crouch. The separate shorts-like edges do not join into the lilac overskirt hem: the outer hem still folds beside and behind the knees and leaves the center of the lap without a continuous edge. Keep the longer support layer and carry a shaped front panel from the waist across both thighs while retaining one connected outer hem."
     },
     {
       "severity": "BLOCKER",
-      "code": "POSED_FRONT_PANEL_BUNCHING_AND_PROFILE",
-      "description": "The V210 prone render retains overlapping front fabric folds beneath the hips, and both standing profiles retain a stepped front edge at mid-thigh."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "UNDERARM_COVERAGE_UNRESOLVED",
-      "description": "A small gray patch remains on the viewer-right inner upper arm in arms-up; the render needs a close-up to distinguish exposed avatar from garment shading."
+      "code": "PRONE_FRONT_FABRIC_BUNCHING_AND_STEPPED_PROFILE",
+      "description": "The prone render still stacks several folds beneath the hips. Both standing profiles retain a stepped front outline between the hip and hem. Shape and inspect the front transition after the lap-spanning panel is added."
     }
   ],
-  "nextAction": "Keep V210 rejected. The adjacent-row coupled search executed, but row-scale values, the 3.8147e-6 left-front minimum and 891 backtracked vertices matched V208/V209; direct renders show no crouch/sit coverage improvement. Stop tuning the existing row displacement solver. Add or reshape an explicit front-lap support geometry that stays over both flexed thighs while preserving waist attachment and continuous skirt hem, then inspect all five views and six poses. Fit, Shape Key response, production rig/weights, Unity/VRChat behavior, package and release remain unverified."
+  "nextAction": "Keep the V211 thigh support shell at its longer hem, then add or reshape an authored front-lap panel that spans both flexed thighs and reconnects to the continuous skirt hem at both sides. Reduce the prone folds and stepped side outline, then inspect all five views and six poses. UV remains NOT_CREATED for the body-surface support shell. Fit, Shape Key response, production rig/weights, Unity/VRChat behavior, package and release remain unverified."
 }

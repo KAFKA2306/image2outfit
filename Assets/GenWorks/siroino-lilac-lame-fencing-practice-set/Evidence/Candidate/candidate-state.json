@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v210-coupled-lap-row-support-20261123",
+  "revision": "v211-sit-crouch-apron-support-20261123",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,18 +20,13 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "code": "POSED_LAP_THIGH_COVERAGE_AND_HEM_CONTINUITY_FAILURE",
-      "description": "Direct V210 crouch and sit renders show both thighs and shorts remaining in front of the overskirt. The lilac hem folds beside and behind the knees instead of spanning the lap; Astra found no visible improvement from V209."
+      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED_FROM_SUPPORT_LAYER",
+      "description": "V211's extended body-surface support now covers the gray thigh areas almost to both knees in sit and crouch. The separate shorts-like edges do not join into the lilac overskirt hem: the outer hem still folds beside and behind the knees and leaves the center of the lap without a continuous edge. Keep the longer support layer and carry a shaped front panel from the waist across both thighs while retaining one connected outer hem."
     },
     {
       "severity": "BLOCKER",
-      "code": "POSED_FRONT_PANEL_BUNCHING_AND_PROFILE",
-      "description": "The V210 prone render retains overlapping front fabric folds beneath the hips, and both standing profiles retain a stepped front edge at mid-thigh."
-    },
-    {
-      "severity": "BLOCKER",
-      "code": "UNDERARM_COVERAGE_UNRESOLVED",
-      "description": "A small gray patch remains on the viewer-right inner upper arm in arms-up; the render needs a close-up to distinguish exposed avatar from garment shading."
+      "code": "PRONE_FRONT_FABRIC_BUNCHING_AND_STEPPED_PROFILE",
+      "description": "The prone render still stacks several folds beneath the hips. Both standing profiles retain a stepped front outline between the hip and hem. Shape and inspect the front transition after the lap-spanning panel is added."
     }
   ],
   "failedGeometryChecks": [

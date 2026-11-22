@@ -9656,11 +9656,11 @@
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "leftThighBone": "UpperLeg_L",
     "rightThighBone": "UpperLeg_R",
-    "hemZM": 0.56,
+    "hemZM": 0.46,
     "waistZM": 0.87,
     "normalClearanceM": 0.008,
     "minimumTriangleBoneWeight": 0.01,
-    "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
+    "evidenceBoundary": "V211 reshapes the existing target-body surface-derived thigh support shell from Z 0.56–0.87 m to Z 0.46–0.87 m so the same-side thigh-weighted support reaches below the front-lap region in sit and crouch. It preserves clipped source triangles, 8 mm normal offset, and source-body skin weights; it is a close-fitting support layer, not a substitute for an approved sewn lap panel. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "poseAwareThighAttachment": {
     "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
@@ -9688,10 +9688,11 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V210 retains V208's 6-iteration, 0.35 neighboring-row smoothing because V209 left the minimum front-left row scale and backtracked vertex count unchanged. After existing single-row orientation-safe search, run four bidirectional sweeps over adjacent row pairs, advancing both scales together via a bounded 14-step continuation search while checking every face in the connected panel. Keep authored shared seams fixed, preserve positive face orientation and the 1e-12 m2 area guard, and leave geometry, weights, hems and unified Cloth inputs unchanged. Record pair-search iterations and per-row safe scales. This tests whether the row constraint is a coordinate-search local stall; it does not prove fit, appearance, or release.",
+    "evidenceBoundary": "V210's coupled row search reproduced V208/V209 safe scales and backtracking counts. V211 leaves that solver, authored skirt panels, front-panel weights and shared Cloth unchanged. It extends the existing target-body surface-derived thigh support shell to a 0.46 m hem while preserving source-body skin weights and the 8 mm offset. This close-fitting support-layer hypothesis does not prove fit, appearance or release.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v210-coupled-lap-row-support-20261123",
+  "poseConstrainedApronGeometry": null,
+  "designRevision": "v211-sit-crouch-apron-support-20261123",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
