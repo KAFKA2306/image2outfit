@@ -2060,7 +2060,10 @@ def main():
                 "authoredRightSideVertexCount": 0,
             }
             pose_follow = profile.get("poseThighFollowAdjustment")
-            if pose_follow is not None:
+            if pose_follow is not None and any(
+                owner_set.intersection(pose_follow["pieceIds"])
+                for owner_set in owners
+            ):
                 follow_piece_ids = set(pose_follow["pieceIds"])
                 seam_vertices = [
                     index

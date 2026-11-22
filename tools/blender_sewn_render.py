@@ -674,6 +674,10 @@ def main():
     cloth = construction.get("clothSimulation", {})
     groups = cloth.get("prototypePanelGroups", {})
     skirt_ids = set(groups.get("pleated-overskirt", []))
+    front_follow_ids = set(groups.get("pleated-overskirt-front-follow", []))
+    skirt_group_ids = ["pleated-overskirt"] + (
+        ["pleated-overskirt-front-follow"] if front_follow_ids else []
+    )
     coverage_component = (
         "front-articulated-coverage"
         if "front-articulated-coverage" in groups
@@ -681,6 +685,7 @@ def main():
     )
     coverage_ids = set(groups.get(coverage_component, [])) if coverage_component else set()
     skirt_ids.update(coverage_ids)
+    skirt_ids.update(front_follow_ids)
     front_lap_diagnostic = cloth.get("prototypePoseCoverageDiagnostic")
     if not isinstance(front_lap_diagnostic, dict):
         raise ValueError("pose coverage requires an explicit prototypePoseCoverageDiagnostic contract")
@@ -726,7 +731,7 @@ def main():
         "assemblyPoseSha256": digest(
             repo_path(job["garmentPipeline"]["assemblyPosePath"])
         ),
-        "skirtClothGroupId": "pleated-overskirt",
+        "skirtPanelGroupIds": skirt_group_ids,
         "skirtPieceIds": sorted(skirt_ids),
         "frontLapPoseCoverageDiagnostic": front_lap_diagnostic,
         "separatelySimulatedCoverageComponentId": coverage_component,

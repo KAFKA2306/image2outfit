@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V205 widens the vertical engagement band for same-side thigh follow on front-lap geometry and skin weights (fade start 0.78 m, full response 0.58 m), keeping the 0.30 additional-weight cap, seam fade, and waist anchoring unchanged. Compare crouch/sit outer-skirt coverage; this is a bounded prototype response hypothesis only, not fit or visual acceptance.",
-  "designRevision": "v205-front-skirt-wide-thigh-response-20261122",
+  "target": "V206 keeps the front-lap rest geometry and seam/weight contracts, but removes the two front overskirt panels from native Cloth and drives them with transferred SiroinoSotai armature weights; only the back overskirt remains cloth-simulated. Compare front thigh coverage and pleat stability in crouch/sit; this is a prototype deformation path comparison only, not fit or visual acceptance.",
+  "designRevision": "v206-front-lap-armature-follow-20261122",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -147,16 +147,19 @@
         "stand-collar"
       ],
       "pleated-overskirt": [
-        "overskirt-front-left",
-        "overskirt-front-right",
         "overskirt-back-left",
         "overskirt-back-right"
+      ],
+      "pleated-overskirt-front-follow": [
+        "overskirt-front-left",
+        "overskirt-front-right"
       ]
     },
     "prototypeFrameEnd": 48,
     "nonClothDeformationPaths": {
       "jacket-sleeves": "authored-panel-shape-preserving-armature-skinning",
-      "jacket-bodice": "authored-panel-shape-preserving-armature-skinning"
+      "jacket-bodice": "authored-panel-shape-preserving-armature-skinning",
+      "pleated-overskirt-front-follow": "authored-panel-shape-preserving-armature-skinning"
     },
     "prototypePreClothSkinning": {
       "jacket-sleeves": {
@@ -187,6 +190,19 @@
         ],
         "reason": "Sleeve-only skinning created a 7.06 mm divergence at a shared sewn vertex. Connected bodice and collar panels must use the same target skeleton and seam-averaged weights so armscye and shoulder seams remain in one deformation basis.",
         "evidenceBoundary": "Transfer target-body weights onto connected bodice and collar panels and synchronize each shared canonical sewn vertex to the mean of participating panel weights before posing. These non-cloth pose previews are construction diagnostics only and do not establish fit, garment motion acceptance, appearance, or release readiness."
+      },
+      "pleated-overskirt-front-follow": {
+        "sourceObject": "SiroinoSotai_PC",
+        "armatureObject": "Armature",
+        "method": "nearest-target-body-triangle-barycentric-authored-weights",
+        "maximumSurfaceDistanceM": 0.16,
+        "requiredBoneGroups": [
+          "Hips",
+          "UpperLeg_L",
+          "UpperLeg_R"
+        ],
+        "reason": "V205 directly inspected renders still showed the cloth-baked front-lap panels folding behind both knees despite a wider thigh-follow band. V206 tests a distinct response path: preserve the authored front panels without native Cloth and drive them from measured target-body rig weights, while retaining cloth on the back overskirt.",
+        "evidenceBoundary": "This disposable pose hypothesis transfers exact imported Hips/UpperLeg_L/UpperLeg_R weights over nearest target-body triangles and uses armature-only deformation for the two front-lap panels. A pre-solve distance audit measured both panels at p99 0.135 m and maximum 0.154153 m, so the declared hard transfer limit is 0.16 m; any vertex beyond it fails. Back overskirt remains native Cloth. It does not prove front coverage, seam continuity, fit, collision safety, motion acceptance, appearance, or release readiness."
       }
     },
     "prototypeSharedSeamAnchor": {
@@ -214,15 +230,11 @@
     "prototypeHemBoundaryAttachment": {
       "component": "pleated-overskirt",
       "sourcePieces": [
-        "overskirt-front-left",
-        "overskirt-front-right",
         "overskirt-back-left",
         "overskirt-back-right"
       ],
       "method": "pin-authored-pattern-hem-boundary-v1",
       "maximumBoundaryHeightRangeMByPiece": {
-        "overskirt-front-left": 0.103,
-        "overskirt-front-right": 0.103,
         "overskirt-back-left": 0.04,
         "overskirt-back-right": 0.04
       },
@@ -233,7 +245,7 @@
     "prototypeGeometryDiagnostics": {
       "component": "pleated-overskirt",
       "method": "canonical-panel-rest-to-settled-triangle-response-v1",
-      "evidenceBoundary": "For every authored overskirt panel, compare canonical source coordinates and fixed face-fan triangles with the evaluated Cloth frame, settled neutral mesh, and post-seam-anchor mesh. Record vertex displacement, signed face orientation, collapsed triangles, and triangle-area ratios per panel. Pair this with the existing body-surface and pose-coverage evidence; these are diagnostics only and do not establish fit, appearance, collision safety, runtime behavior, or release acceptance."
+      "evidenceBoundary": "For each cloth-simulated overskirt panel in the declared pleated-overskirt group, compare canonical source coordinates and fixed face-fan triangles with the evaluated Cloth frame, settled neutral mesh, and post-seam-anchor mesh. V206 front-lap panels are explicitly armature-only and are excluded from this cloth metric; their pose response remains subject to direct five-view/six-pose review. These diagnostics do not establish fit, appearance, collision safety, runtime behavior, or release acceptance."
     },
     "prototypePoseCoverageDiagnostic": {
       "method": "rest-bound-anterior-thigh-to-authored-front-lap-ray-coverage-v1",
@@ -340,8 +352,8 @@
           "fadeStartZM": 0.78,
           "fullWeightZM": 0.58,
           "seamFadeDistanceM": 0.05,
-          "reason": "V204 direct crouch/sit review still showed collapsed front-lap panels and exposed anterior thighs. V205 widens only the vertical follow band to engage more of the front-lap surface while preserving the +0.30 cap and seam fade.",
-          "evidenceBoundary": "V205 widens the same-side front-panel weight-follow ramp from 0.66/0.56 m to 0.78/0.58 m; geometry follow uses the same vertical band. The unchanged +0.30 added-weight cap, seam fade, and waist anchoring remain bounded. Prototype response evidence only; no fit, appearance, or release acceptance."
+          "reason": "V205 direct crouch/sit review still showed collapsed front-lap panels after widening the thigh-follow band. V206 instead excludes those two panels from Cloth and tests armature-only body-weight deformation, retaining the back panels on Cloth.",
+          "evidenceBoundary": "V206 retains the bounded 0.30 additional same-side thigh-weight cap and 0.78/0.58 m vertical band; the distinct change is disabling Cloth on the front-lap panels and preserving their rig-driven geometry. Prototype response evidence only; no fit, appearance, or release acceptance."
         }
       }
     },

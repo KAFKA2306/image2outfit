@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v205-front-skirt-wide-thigh-response-20261122",
+  "revision": "v206-front-lap-armature-follow-20261122",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "description": "Direct inspection of current V205 renders shows both front thighs projecting beyond the overskirt during crouch and sit; the lilac front hem and panels fold back behind the knees despite widening the thigh-follow band. Outer-skirt coverage remains unusable in both required poses.",
-      "code": "POSED_SKIRT_THIGH_COVERAGE_AND_HEM_FAILURE",
-      "severity": "BLOCKER"
+      "severity": "BLOCKER",
+      "code": "POSED_SKIRT_THIGH_COVERAGE_AND_PANEL_CONTINUITY_FAILURE",
+      "description": "Direct inspection of V206 crouch and sit renders still shows the front thighs exposed because the armature-follow lap panels do not maintain anterior coverage; the detached cloth-simulated back panels also create a visible front/rear hem break. Required seated/crouched skirt coverage remains unusable."
     },
     {
-      "description": "Front, three-quarter, neutral and side views still show dense angular crushed creases across the front overskirt; the broader follow band did not address the pleat surface response.",
+      "severity": "BLOCKER",
       "code": "FRONT_PLEATS_REMAIN_CRUSHED",
-      "severity": "BLOCKER"
+      "description": "Neutral, front, three-quarter and side views retain dense angular crushed folds across the overskirt surface. Changing front panels to armature-only has not produced the intended broad, orderly pleat channels."
     },
     {
-      "description": "Prone render still tents/bunches the skirt, side silhouettes retain a trailing hem step, and gray gaps remain at sleeve roots/armholes including raised-arm view.",
+      "severity": "MAJOR",
       "code": "POSE_AND_SLEEVE_SURFACE_DEFECTS",
-      "severity": "MAJOR"
+      "description": "Prone view still tents and bunches the overskirt; side views retain trailing hem discontinuity, and gray gaps remain at sleeve roots/armholes. These are direct appearance observations, not fit or collision measurements."
     }
   ],
   "failedGeometryChecks": [
