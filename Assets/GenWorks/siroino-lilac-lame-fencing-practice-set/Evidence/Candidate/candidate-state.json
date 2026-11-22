@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v208-boundary-preserving-overskirt-fairing-20261123",
+  "revision": "v209-pose-lap-row-coherence-20261123",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -21,12 +21,17 @@
     {
       "severity": "BLOCKER",
       "code": "POSED_LAP_THIGH_COVERAGE_AND_HEM_CONTINUITY_FAILURE",
-      "description": "Direct inspection of V208 crouch and sit renders shows both thighs projecting in front of the overskirt and the shorts hems through to the knees. The lilac front hem folds back beside and behind the knees; pointed fabric edges hang below the seat."
+      "description": "Direct inspection of V209 crouch and sit renders shows both thighs projecting in front of the overskirt. The lilac hem folds behind the knees and disappears across the lap; shorts remain visibly exposed."
     },
     {
       "severity": "BLOCKER",
-      "code": "POSED_FRONT_PANEL_BUNCHING",
-      "description": "The V208 prone render still shows front overskirt fabric collecting beneath the hips in overlapping folds. Standing front, three-quarter and natural pose show weaker angular front-pleat creasing than V207, but the side view retains a stepped outward panel silhouette."
+      "code": "POSED_FRONT_PANEL_BUNCHING_AND_PROFILE",
+      "description": "V209 prone fabric still bunches beneath the hips in overlapping layers, and left/right side views retain a stepped front outline from hip to hem."
+    },
+    {
+      "severity": "BLOCKER",
+      "code": "UNDERARM_COVERAGE_UNRESOLVED",
+      "description": "The V209 arms-up render retains a gray patch at the viewer-right inner upper arm; the current view does not distinguish exposed avatar from garment shading."
     }
   ],
   "failedGeometryChecks": [

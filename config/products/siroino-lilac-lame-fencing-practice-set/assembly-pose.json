@@ -9663,9 +9663,9 @@
     "evidenceBoundary": "V153 clips source body triangles against explicit Z 0.56–0.87 m planes; this 60 mm cutback tests a shorter upper-thigh under-short hem beneath the 0.51 m overskirt hem and the pelvis centerline, triangulating the clipped polygons to create deterministic hem and inner-leg boundary loops instead of dropping crossing triangles. Target-body source weights and an 8 mm offset remain prototype geometry only. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "poseAwareThighAttachment": {
-    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
-    "displacementSmoothingIterations": 6,
-    "displacementSmoothingWeight": 0.35,
+    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
+    "displacementSmoothingIterations": 8,
+    "displacementSmoothingWeight": 0.42,
     "pieceIds": [
       "overskirt-front-left",
       "overskirt-front-right"
@@ -9688,10 +9688,10 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V207 retains the authored front-lap target geometry, routes all four connected skirt panels through the same target-body armature weight transfer before their shared Cloth solve, and keeps the positive-orientation guard and seam fades active. Pose, fit, appearance and release remain unverified.",
+    "evidenceBoundary": "V209 changes only longitudinal blending of the pose-space front-lap target field to 8 iterations at weight 0.42, in response to V208's 3.8e-6 minimum left-front row scale and 891 orientation backtracks. The initial 0.50 trial caused a 8.92e-12 m2 face after crease subdivision and was rejected by the existing 5e-11 m2 geometry floor; the moderated 0.42 value retains all geometry guards. The existing positive-orientation line search, anchored shared seams, target rig, authored panels, hems, weights and unified Cloth solve remain in force. Measurements and renders must show whether coherent row targets reduce the local collapse without breaking front/rear continuity. This prototype does not prove fit, appearance, or release.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v207-unified-skirt-armature-cloth-20261122",
+  "designRevision": "v209-pose-lap-row-coherence-20261123",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

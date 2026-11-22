@@ -3274,6 +3274,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
         "bilateral-pose-space-thigh-envelope-row-reconstructed-panels-v4",
         "bilateral-pose-space-thigh-envelope-row-constrained-panel-deformation-v5",
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
+        "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
     }:
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
@@ -3713,7 +3714,10 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
         "method": spec["method"],
         "applicationOrder": (
             "after-panel-length-and-body-envelope-placement-before-crease-subdivision-and-box-pleat-relief"
-            if spec["method"] == "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6"
+            if spec["method"] in {
+                "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
+                "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
+            }
             else "after-skirt-fold-placement"
         ),
         "rowWisePanelReconstruction": {
@@ -3735,7 +3739,10 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             "orientationSearchIterationsByPanel": dict(sorted(orientation_search_iterations_by_piece.items())),
             "orientationConstraint": (
             "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
-                if spec["method"] == "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6"
+                if spec["method"] in {
+                    "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
+                    "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
+                }
                 else "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus at least 0.01-percent reference area"
             ),
         },
