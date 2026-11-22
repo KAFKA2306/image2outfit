@@ -9678,8 +9678,8 @@
       "waistband-front-right"
     ],
     "preservedSeamFadeDistanceM": 0.05,
-    "fadeStartZM": 0.66,
-    "fullBlendZM": 0.56,
+    "fadeStartZM": 0.78,
+    "fullBlendZM": 0.58,
     "normalClearanceM": 0.012,
     "maximumProjectionDistanceM": 0.16,
     "maximumBlendWeight": 0.9,
@@ -9688,10 +9688,10 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V202 applies pose-space row deformation before dense crease subdivision and radial pleat relief so local folded faces do not throttle the connected-panel orientation-safe line search. The unchanged full-panel positive-orientation guard still bounds every displacement; pleat geometry is added afterward on the moved surface. This remains prototype geometry/deformation evidence only and grants no fit, motion, appearance, or release acceptance.",
+    "evidenceBoundary": "V205 widens the pose-space thigh-follow vertical band for the two front-lap panels (0.78 m fade start, 0.58 m full response) before pleat deformation. The unchanged full-panel positive-orientation guard still bounds every displacement and seam fades/waist anchoring remain fixed. This is a bounded prototype deformation comparison only; fit, motion, appearance, and release remain unverified.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v204-front-skirt-interior-fairing-20261122",
+  "designRevision": "v205-front-skirt-wide-thigh-response-20261122",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
