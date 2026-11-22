@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v202-pre-pleat-thigh-deformation-20261122",
+  "revision": "v203-integrated-mid-thigh-shorts-20261122",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,19 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "POSED_FRONT_SKIRT_LIFT_AND_COLLAPSE",
-      "description": "Direct inspection of current V202 renders: crouch and sit expose both thighs through the front opening while the hem folds into angular flaps beneath the knees and the side/back skirt hangs behind. Prone tents the skirt above the hips and bunches it underneath. The front-lap geometry does not maintain a continuous hem or coverage in required poses.",
-      "severity": "BLOCKER"
+      "description": "Direct inspection of current V203 renders: the added under-shorts cover both upper thighs in sit and crouch, but the visible shorts terminate high while pale fabric hangs behind bent legs; in back view gray legs interrupt both shorts hems. The new coverage geometry therefore does not yet read or behave as a consistently fitted garment through hip flexion.",
+      "severity": "BLOCKER",
+      "code": "SHORTS_AND_POSE_FIT_FAILURE"
     },
     {
-      "code": "PLEAT_AND_SURFACE_FACETING",
-      "description": "Neutral front and three-quarter views show tightly crushed angular facets instead of separated broad pleat channels; the back reads as nearly plain with little visible pleat structure. The jacket torso/waist also has conspicuous crumpled faceting.",
-      "severity": "MAJOR"
+      "description": "Front and three-quarter show irregular triangular faceting rather than controlled broad pleat channels. Sit and crouch produce doubled lilac-edged hem with sharp points between and beside knees; prone still tents and bunches the garment over and beneath the torso.",
+      "severity": "BLOCKER",
+      "code": "PLEAT_AND_HEM_DEFORMATION"
     },
     {
-      "code": "SIDE_HEM_AND_ARMHOLE_OVERLAP",
-      "description": "Both side silhouettes retain a front/side hem step and tapered tail rather than a smooth continuous hem. Gray patches are visible at both sleeve roots in front view and remain at viewer-right underarm with arms raised; sleeve-to-jacket overlap is uneven.",
-      "severity": "MAJOR"
+      "description": "Front view retains small gray body patches at both armpits; arms-up still shows a sleeve-root/armhole coverage interruption. Shoulder and sleeve surface also retain conspicuous faceting.",
+      "severity": "MAJOR",
+      "code": "SLEEVE_ROOT_COVERAGE"
     }
   ],
   "failedGeometryChecks": [

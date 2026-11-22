@@ -9435,6 +9435,18 @@
     "preservedSeamFadeDistanceM": 0.04,
     "evidenceBoundary": "Prototype-only neutral-body surface relaxation applies only to the four shorts shell panels. Shared shell/gusset seam vertices are included as preserved boundaries, and the gusset interior is excluded from nearest-body projection. This does not establish seam fit, coverage, deformation or release acceptance."
   },
+  "shortsCoverageExtension": {
+    "method": "shorts-mid-thigh-coverage-v2",
+    "pieceIds": [
+      "shorts-front-left",
+      "shorts-front-right",
+      "shorts-back-left",
+      "shorts-back-right"
+    ],
+    "extensionM": 0.12,
+    "fadeHeightM": 0.08,
+    "evidenceBoundary": "V203 extends the sewn fitted-under-shorts 120 mm into a smooth mid-thigh leg so the wearable garment layer can retain physical coverage when the overskirt exposes the thighs in crouch and sit. This is generated source geometry only; skinning, fit, mobility, fabric behavior, appearance, and runtime remain unverified."
+  },
   "skirtEnvelopePlacement": {
     "method": "measured-horizontal-body-envelope-minimum-clearance",
     "pieceIds": [
@@ -9677,7 +9689,7 @@
     "evidenceBoundary": "V202 applies pose-space row deformation before dense crease subdivision and radial pleat relief so local folded faces do not throttle the connected-panel orientation-safe line search. The unchanged full-panel positive-orientation guard still bounds every displacement; pleat geometry is added afterward on the moved surface. This remains prototype geometry/deformation evidence only and grants no fit, motion, appearance, or release acceptance.",
     "patternRowWidthM": 0.01
   },
-  "designRevision": "v202-pre-pleat-thigh-deformation-20261122",
+  "designRevision": "v203-integrated-mid-thigh-shorts-20261122",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",
