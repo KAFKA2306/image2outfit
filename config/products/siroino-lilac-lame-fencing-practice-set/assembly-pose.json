@@ -9663,7 +9663,7 @@
     "evidenceBoundary": "V211 reshapes the existing target-body surface-derived thigh support shell from Z 0.56–0.87 m to Z 0.46–0.87 m so the same-side thigh-weighted support reaches below the front-lap region in sit and crouch. It preserves clipped source triangles, 8 mm normal offset, and source-body skin weights; it is a close-fitting support layer, not a substitute for an approved sewn lap panel. UV is explicitly NOT_CREATED; closure, continuity, deformation, clearance, fit, visual acceptance, Unity/VRChat behavior and release remain unverified."
   },
   "poseAwareThighAttachment": {
-    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
+    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v9",
     "displacementSmoothingIterations": 12,
     "displacementSmoothingWeight": 0.5,
     "pieceIds": [
@@ -9689,11 +9689,11 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V214 retains V213's softened front-apron profile and follows the selected front panels down to the 0.45 m trial hem. It uses a bounded 0.24 m pose-surface projection allowance, with measured displacement and distance retained for review. This is a pose-constrained construction hypothesis; the large movement, hem continuity, coverage, clearance and appearance remain subject to direct rendered review and do not establish fit.",
+    "evidenceBoundary": "V216 retains V215's pose targets, 0.45 m trial hem, smoothing, projection bound and full-panel orientation guard. It permits bounded continuation of three contiguous authored rows together to test the V215 zero-scale left-front center row at a locally concave thigh face. This is a construction hypothesis; lap coverage, profile, prone folds, fit and appearance remain subject to direct rendered review and no fit acceptance is implied.",
     "patternRowWidthM": 0.01
   },
   "poseConstrainedApronGeometry": null,
-  "designRevision": "v215-smoothed-lap-displacement-20261123",
+  "designRevision": "v216-contiguous-triple-lap-continuation-20261123",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

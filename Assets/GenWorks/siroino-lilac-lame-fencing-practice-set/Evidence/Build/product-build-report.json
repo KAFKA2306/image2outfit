@@ -9007,10 +9007,10 @@
   },
   "poseAwareThighAttachment": {
     "applied": true,
-    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
+    "method": "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v9",
     "applicationOrder": "after-panel-length-and-body-envelope-placement-before-crease-subdivision-and-box-pleat-relief",
     "rowWisePanelReconstruction": {
-      "method": "authored-pattern-v-rows-coupled-adjacent-pose-space-targets-with-longitudinal-smoothing-v2",
+      "method": "authored-pattern-v-rows-coupled-adjacent-and-triple-pose-space-targets-with-longitudinal-smoothing-v3",
       "rowWidthM": 0.01,
       "panelEvidence": {
         "overskirt-front-left": {
@@ -9078,7 +9078,11 @@
         "overskirt-front-left": 896,
         "overskirt-front-right": 896
       },
-      "orientationConstraint": "coordinate-ascent single-row search followed by bidirectional coupled adjacent-row continuation; lock authored hems/shared boundaries, check the complete connected panel, and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
+      "coupledTripleRowSearchIterationsByPanel": {
+        "overskirt-front-left": 896,
+        "overskirt-front-right": 896
+      },
+      "orientationConstraint": "coordinate-ascent single-row search followed by bidirectional coupled adjacent-pair and contiguous-triple continuation; lock authored hems/shared boundaries, check the complete connected panel, and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
     },
     "poseSpaceTargets": [
       "crouch",
@@ -9935,7 +9939,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "af99cfe2eee562a33a6196ccc3e147452fec20b71e6a28e3d60453447689fa5a",
+    "privateSimulationSourceSha256": "5dd719641f08304197558685e9f4ef83e616f11bdd3af1e59618fa458ce809f9",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -22256,7 +22260,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "002731c53aa631768ae29d6419806fa167462da002ec6545255001b3278b0716",
+  "sourceBlendSha256": "b61afd52680a3fde5bb48a5ce0ec9194532aa830ab4d39678fe01fe6cfe4862c",
   "sewnMeshSha256": "95df28f6637ee6900dfe7f76501ceb5840eb3bdc77d79631ebf8d720ca6c00da",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",

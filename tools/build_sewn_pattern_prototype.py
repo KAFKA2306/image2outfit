@@ -3276,6 +3276,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
+        "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v9",
     }:
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
@@ -3717,6 +3718,42 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                     row_scale_by_key[first_key] = first_start + (1.0 - first_start) * low
                     row_scale_by_key[second_key] = second_start + (1.0 - second_start) * low
 
+    row_triple_search_iterations_by_piece = defaultdict(int)
+    for piece_id in pieces_with_rows:
+        row_indices = sorted(row_keys_by_piece[piece_id])
+        contiguous_triples = [tuple(row_indices[index:index + 3])
+                              for index in range(max(0, len(row_indices) - 2))
+                              if row_indices[index + 1] == row_indices[index] + 1
+                              and row_indices[index + 2] == row_indices[index] + 2]
+        # A single or adjacent pair may remain blocked where the center row
+        # crosses a locally concave thigh envelope. Advance three neighboring
+        # rows together so both shoulders can rotate around that face without
+        # ever relaxing the complete-panel orientation guard.
+        for _ in range(4):
+            for ordered_triples in (contiguous_triples, list(reversed(contiguous_triples))):
+                for row_triplet in ordered_triples:
+                    keys = [(piece_id, row_index) for row_index in row_triplet]
+                    starts = [row_scale_by_key[key] for key in keys]
+                    target = dict(zip(keys, (1.0, 1.0, 1.0)))
+                    if orientation_safe_with_row_updates(piece_id, target):
+                        for key in keys:
+                            row_scale_by_key[key] = 1.0
+                        continue
+                    low, high = 0.0, 1.0
+                    for _ in range(14):
+                        amount = (low + high) * 0.5
+                        trial = {
+                            key: start + (1.0 - start) * amount
+                            for key, start in zip(keys, starts)
+                        }
+                        if orientation_safe_with_row_updates(piece_id, trial):
+                            low = amount
+                        else:
+                            high = amount
+                        row_triple_search_iterations_by_piece[piece_id] += 1
+                    for key, start in zip(keys, starts):
+                        row_scale_by_key[key] = start + (1.0 - start) * low
+
     safe_scale_by_piece = {
         piece_id: min(row_scale_by_key[(piece_id, row_index)]
                       for row_index in row_keys_by_piece[piece_id])
@@ -3761,11 +3798,12 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
                 "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
                 "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
+                "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v9",
             }
             else "after-skirt-fold-placement"
         ),
         "rowWisePanelReconstruction": {
-            "method": "authored-pattern-v-rows-coupled-adjacent-pose-space-targets-with-longitudinal-smoothing-v2",
+            "method": "authored-pattern-v-rows-coupled-adjacent-and-triple-pose-space-targets-with-longitudinal-smoothing-v3",
             "rowWidthM": row_width_m,
             "panelEvidence": row_reconstruction_evidence,
             "iterations": smoothing_iterations,
@@ -3782,12 +3820,14 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             },
             "orientationSearchIterationsByPanel": dict(sorted(orientation_search_iterations_by_piece.items())),
             "coupledAdjacentRowSearchIterationsByPanel": dict(sorted(row_block_search_iterations_by_piece.items())),
+            "coupledTripleRowSearchIterationsByPanel": dict(sorted(row_triple_search_iterations_by_piece.items())),
             "orientationConstraint": (
-                "coordinate-ascent single-row search followed by bidirectional coupled adjacent-row continuation; lock authored hems/shared boundaries, check the complete connected panel, and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
+                "coordinate-ascent single-row search followed by bidirectional coupled adjacent-pair and contiguous-triple continuation; lock authored hems/shared boundaries, check the complete connected panel, and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
                 if spec["method"] in {
                     "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v6",
                     "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
                     "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
+                    "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v9",
                 }
                 else "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus at least 0.01-percent reference area"
             ),

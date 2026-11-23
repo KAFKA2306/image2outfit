@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V215 keeps V214's hem, pose-following range and 240 mm projection cap unchanged. Increase row-displacement smoothing from 6 iterations at 0.35 to the permitted 12 iterations at 0.50 after V214 orientation-safe search collapsed one left-front row scale to 0.0000038. The hypothesis is that spreading displacement along the authored panel rows will prevent this local clamp. Inspect actual row scales, hem continuity and all six poses; prototype only.",
-  "designRevision": "v215-smoothed-lap-displacement-20261123",
+  "target": "V216 keeps V215's pose targets, hem and smoothing unchanged. Add a bounded bidirectional three-contiguous-row continuation after single-row and adjacent-pair search, preserving the full-panel orientation and area guard throughout. This tests whether the zero-scale left-front center row can advance together with both shoulders across its locally concave thigh face. Inspect row scales, continuous hem and all six poses; prototype only.",
+  "designRevision": "v216-contiguous-triple-lap-continuation-20261123",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
