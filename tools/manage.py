@@ -16,7 +16,7 @@ TOOLS = ROOT / "tools"
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(TOOLS))
 
-from image2outfit import dbt_evidence, improvement  # noqa: E402
+from image2outfit import booth_quality_audit, dbt_evidence, improvement  # noqa: E402
 import improvement_loop  # noqa: E402
 import method_selection  # noqa: E402
 import runtime_paths  # noqa: E402
@@ -472,6 +472,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     audit = commands.add_parser("audit")
     audit.add_argument("target", choices=(*AUDIT_TARGETS, "all"))
+
+    booth_audit = commands.add_parser(
+        "booth-audit",
+        help="Audit one public BOOTH listing with local D1 and optional local LLM review.",
+    )
+    booth_audit.add_argument("--product", required=True)
+    booth_audit.add_argument("--url")
     return parser
 
 
@@ -479,6 +486,16 @@ def main() -> int:
     options = build_parser().parse_args()
     if options.command in {"candidate", "release", "explain"}:
         return _product(options.command, options.product)
+    if options.command == "booth-audit":
+        try:
+            return booth_quality_audit.run(
+                ROOT,
+                options.product,
+                options.url or os.environ.get("IMAGE2OUTFIT_BOOTH_URL"),
+            )
+        except (OSError, ValueError, json.JSONDecodeError, RuntimeError) as exc:
+            print(f"image2outfit booth-audit: {exc}", file=sys.stderr)
+            return 1
     if options.command == "dbt":
         return _dbt(options.dbt_action)
     if options.command == "publication":
