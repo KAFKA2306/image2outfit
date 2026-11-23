@@ -161,21 +161,40 @@
         "Shoulder"
       ],
       "evidenceBoundary": "Explicit provisional pelvis/leg surface window in rest coordinates. Prevent arm/hand nearest-surface transfer to displaced lower garment panels; no approved fit or runtime motion.",
-      "weightProfile": {
-        "method": "hip-anchored-lateral-thigh-fade-v1",
-        "pieceIds": [
-          "overskirt-front",
-          "overskirt-back"
-        ],
-        "hipBone": "Hips",
-        "leftThighBone": "UpperLeg_L",
-        "rightThighBone": "UpperLeg_R",
-        "waistThighWeight": 0.15,
-        "hemThighWeight": 0.65,
-        "centerlineHalfWidthM": 0.02,
-        "fullSideWeightWidthM": 0.06,
-        "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh: current side hem vertices average 0.963 ipsilateral thigh weight, while 67 centerline hem vertices average 0.970 combined thigh weight and 0.030 Hips. Fade centerline influence to Hips and cap lateral hem thigh influence at 0.65; retain 0.15 thigh weight at the waistband. Intended to reduce opposing thigh pull and raised/curling flaps; no pose, fit, penetration or runtime acceptance is granted."
-      }
+      "weightProfiles": [
+        {
+          "method": "hip-anchored-lateral-thigh-fade-v1",
+          "pieceIds": [
+            "overskirt-front",
+            "overskirt-back"
+          ],
+          "hipBone": "Hips",
+          "leftThighBone": "UpperLeg_L",
+          "rightThighBone": "UpperLeg_R",
+          "waistThighWeight": 0.15,
+          "hemThighWeight": 0.65,
+          "centerlineHalfWidthM": 0.02,
+          "fullSideWeightWidthM": 0.06,
+          "evidenceBoundary": "Prototype weighting hypothesis bound to the measured Lilac skirt mesh: current side hem vertices average 0.963 ipsilateral thigh weight, while 67 centerline hem vertices average 0.970 combined thigh weight and 0.030 Hips. Fade centerline influence to Hips and cap lateral hem thigh influence at 0.65; retain 0.15 thigh weight at the waistband. Intended to reduce opposing thigh pull and raised/curling flaps; no pose, fit, penetration or runtime acceptance is granted."
+        },
+        {
+          "method": "hip-anchored-lateral-thigh-fade-v1",
+          "pieceIds": [
+            "shorts-front-left",
+            "shorts-front-right",
+            "shorts-back-left",
+            "shorts-back-right"
+          ],
+          "hipBone": "Hips",
+          "leftThighBone": "UpperLeg_L",
+          "rightThighBone": "UpperLeg_R",
+          "waistThighWeight": 0.15,
+          "hemThighWeight": 0.65,
+          "centerlineHalfWidthM": 0.02,
+          "fullSideWeightWidthM": 0.06,
+          "evidenceBoundary": "Prototype-only shorts weight distribution hypothesis based on the four measured 0.48–0.74 m garment panels. Blend hip influence at the upper rise toward ipsilateral thigh influence at the hem and fade the centerline to Hips to reduce opposing-leg pull. Re-render the authored crouch and sit poses; this grants no coverage, deformation, fit, Shape Key or runtime acceptance."
+        }
+      ]
     }
   ]
 }

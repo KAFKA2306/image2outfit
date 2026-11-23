@@ -160,7 +160,11 @@ def render_mesh_showcase(blender: str, job_path: Path, reports: Path) -> None:
             "--python-exit-code",
             "1",
             "--python",
-            str(ROOT / "tools/blender_mesh_showcase.py"),
+            # Keep the script path relative to the Blender process cwd. When a
+            # Windows Blender executable is launched from WSL, passing the
+            # absolute /mnt/... path through WSL interop makes Blender treat it
+            # as a relative Windows path and prepend the cwd a second time.
+            "tools/blender_mesh_showcase.py",
             "--",
             "--job",
             job_path.relative_to(ROOT).as_posix(),
@@ -174,9 +178,24 @@ def render_mesh_showcase(blender: str, job_path: Path, reports: Path) -> None:
         )
 
 
-def render_one(blender: str, job_path: Path) -> dict[str, Any]:
+def render_one(
+    blender: str, job_path: Path, *, reuse_current: bool = False
+) -> dict[str, Any]:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     product_id = str(job["id"])
+
+    if reuse_current:
+        runtime = ROOT / ".image2outfit" / "products" / product_id
+        if any((ROOT / ".image2outfit").glob(".pwb-*")):
+            raise RuntimeError("cannot publish current previews during a PWB transaction")
+        checkpoint_path = runtime / "pipeline-state.json"
+        checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+        if (
+            checkpoint.get("status") != "EXECUTED"
+            or checkpoint.get("current_stage") != "finalize-candidate"
+            or "finalize-candidate" not in checkpoint.get("completed_stages", [])
+        ):
+            raise RuntimeError("current preview reuse requires a completed product checkpoint")
 
     resolution = resolve(
         root=ROOT,
@@ -185,7 +204,11 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
         materialize_job=False,
         include_pipeline_request=True,
     )
-    env_map = resolution.environment
+    env_map = dict(resolution.environment)
+    skip_reason = resolution.reason
+    if reuse_current:
+        env_map["SKIP_PRODUCT_BUILD"] = "true"
+        skip_reason = "explicit-current-preview-reuse"
     if env_map.get("SKIP_PRODUCT_BUILD") == "true":
         workspace = ROOT / str(job["productRoot"])
         preview_root, source_kind = review_console.preview_directory(workspace)
@@ -198,7 +221,7 @@ def render_one(blender: str, job_path: Path) -> dict[str, Any]:
             )
             preview_files = [path.relative_to(ROOT).as_posix() for path in preserved]
             detail = (
-                f"{product_id}: build skipped ({resolution.reason}); "
+                f"{product_id}: build skipped ({skip_reason}); "
                 f"preserved {len(preview_files)} {source_kind} images"
             )
             mark_attempt(job, job_path, status="PASS", stage="preserve", detail=detail)
@@ -574,19 +597,42 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--blender", required=True)
     parser.add_argument("--summary", type=Path, required=True)
     parser.add_argument("--site", type=Path, required=True)
+    parser.add_argument(
+        "--product",
+        help="Render and update attempt metadata for one canonical product ID only",
+    )
+    parser.add_argument(
+        "--reuse-current",
+        action="store_true",
+        help="Reuse previews from a completed checkpoint without rerunning product stages",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
     jobs = sorted((ROOT / "config" / "products").glob("*/job.json"))
+    if args.reuse_current and not args.product:
+        raise ValueError("--reuse-current requires --product to avoid multi-product changes")
+    if args.product:
+        selected = ROOT / "config" / "products" / args.product / "job.json"
+        if not selected.is_file():
+            raise FileNotFoundError(f"unknown canonical product ID: {args.product}")
+        selected_job = json.loads(selected.read_text(encoding="utf-8"))
+        if selected_job.get("id") != args.product:
+            raise ValueError(
+                f"canonical product ID mismatch: {args.product} != {selected_job.get('id')}"
+            )
+        jobs = [selected]
     results: list[dict[str, Any]] = []
 
     for job_path in jobs:
         product_id = job_path.parent.name
         print(f"=== render-current {product_id} ===", flush=True)
         try:
-            results.append(render_one(args.blender, job_path))
+            results.append(
+                render_one(args.blender, job_path, reuse_current=args.reuse_current)
+            )
         except Exception as exc:
             job = json.loads(job_path.read_text(encoding="utf-8"))
             detail = (

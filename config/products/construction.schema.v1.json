@@ -116,6 +116,13 @@
                 "minLength": 1
               }
             }
+          },
+          "weightProfiles": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/properties/prototypeWeightRegions/items/properties/weightProfile"
+            }
           }
         }
       }

@@ -64,8 +64,13 @@ def main():
         low, high = region["bodyTriangleZM"]
         if not 0 <= low < high or not region["pieceIds"]:
             raise ValueError("Invalid explicit body weight region")
-        profile = region.get("weightProfile")
-        if profile is not None:
+        profiles = region.get("weightProfiles")
+        if profiles is None:
+            profile = region.get("weightProfile")
+            profiles = [profile] if profile is not None else []
+        if not isinstance(profiles, list):
+            raise ValueError("Explicit prototype weight profiles must be a list")
+        for profile in profiles:
             profile_piece_ids = set(profile["pieceIds"])
             if (profile["method"] != "hip-anchored-lateral-thigh-fade-v1"
                     or not profile_piece_ids
