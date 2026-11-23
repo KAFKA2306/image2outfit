@@ -33,6 +33,9 @@ tasks:
     desc: Summarize the existing per-product execution states for a tracked batch.
     vars:
       BATCH: '{{.BATCH | default "config/batch/tracked-requests.json"}}'
+      UV_ENV: '{{.UV_ENV | default (printf "%s/Assets/_Local/.venv" .ROOT_DIR)}}'
+    env:
+      UV_PROJECT_ENVIRONMENT: '{{.UV_ENV}}'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
@@ -42,14 +45,21 @@ tasks:
     desc: Serially execute or resume every canonical request in a tracked batch.
     vars:
       BATCH: '{{.BATCH | default "config/batch/tracked-requests.json"}}'
+      UV_ENV: '{{.UV_ENV | default (printf "%s/Assets/_Local/.venv" .ROOT_DIR)}}'
     env:
       UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
       UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
-      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/.venv'
+      UV_PROJECT_ENVIRONMENT: '{{.UV_ENV}}'
     cmds:
       - >-
         uv run --no-cache --locked --no-default-groups --python 3.11
         python tools/manage.py batch run --manifest "{{.BATCH}}"
+
+  factory:schedule:
+    desc: Register the bounded daily Windows product-execution task.
+    platforms: [windows]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File tools/install_autonomous_factory_task.ps1
 
   candidate:
     desc: Build a candidate after validating its construction contract.
