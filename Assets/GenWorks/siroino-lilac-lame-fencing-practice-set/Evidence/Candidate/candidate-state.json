@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v212-forward-apron-continuous-hem-20261123",
+  "revision": "v215-smoothed-lap-displacement-20261123",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,14 +19,14 @@
   },
   "blockingFindings": [
     {
+      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED",
       "severity": "BLOCKER",
-      "description": "Direct review of V212 sit and crouch shows the inner layer covering both thighs nearly to the knees, but the outer lilac apron hem still leaves the center of the lap uncovered and forms sharp points beside and between the knees. Reshape the authored front panels so one continuous edged lap spans the flexed thighs.",
-      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED"
+      "description": "Direct V215 crouch and sit renders show no visible lap-coverage improvement over V214. The inner layer covers both thighs nearly to the knees, while the outer apron folds beside and between them; the lilac hem forms sharp points below the knees and leaves the lap uncovered."
     },
     {
+      "code": "APRON_PROFILE_AND_PRONE_FOLD",
       "severity": "BLOCKER",
-      "description": "V212 left and right profiles show the extended apron projecting well ahead of the knees. The prone view folds it back beneath the hips into a long flap with overlapping creases. Reduce forward projection and control the panel transition while keeping clearance and hem continuity.",
-      "code": "APRON_PROFILE_PROJECTION_AND_PRONE_BUNCHING"
+      "description": "Standing profiles still show a mid-thigh bend and forward hem projection. Prone still doubles the front fabric beneath the hips, with several folds under the near hand."
     }
   ],
   "failedGeometryChecks": [
