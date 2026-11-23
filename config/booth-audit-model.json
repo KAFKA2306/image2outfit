@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "status": "candidate-unbenchmarked",
+  "decisionModel": {
+    "repository": "LiquidAI/d1-2B-ONNX",
+    "revision": "2fd61486312020c30a1e3aa5aa677424672b2b37",
+    "precision": "q4",
+    "executionProvider": "cpu",
+    "runtimeRepository": "https://github.com/Liquid4All/onnx-export.git",
+    "runtimeRevision": "26857c2e4d12381c6c630e7f7daf00bb3589f721",
+    "runtimePython": "3.12"
+  },
+  "routing": {
+    "minimumProbabilityForAutomaticGreen": 0.9,
+    "thresholdStatus": "provisional; calibrate on labeled BOOTH audits",
+    "autoGreenEnabled": false,
+    "autoGreenStatus": "disabled until the D1 candidate is adjudicated on labeled BOOTH cases",
+    "escalateNonGreen": true,
+    "escalateMissingOrUnverifiableEvidence": true,
+    "cloudFallback": false,
+    "localLlmBaseUrlEnvironment": "IMAGE2OUTFIT_LOCAL_LLM_BASE_URL",
+    "localLlmModelEnvironment": "IMAGE2OUTFIT_LOCAL_LLM_MODEL",
+    "localLlmApiKeyEnvironment": "IMAGE2OUTFIT_LOCAL_LLM_API_KEY"
+  },
+  "limits": {
+    "minimumHostFreeMemoryMiB": 8192,
+    "maximumPageBytes": 5242880,
+    "maximumDescriptionCharacters": 24000,
+    "maximumImages": 4,
+    "maximumImageBytes": 8388608,
+    "maximumSameShopItems": 20,
+    "maximumVideoReferences": 8,
+    "requestTimeoutSeconds": 20
+  }
+}

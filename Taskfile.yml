@@ -151,6 +151,27 @@ tasks:
         uv run --no-cache --locked --no-default-groups
         python tools/manage.py explain --product "{{.PRODUCT}}"
 
+  booth:audit:setup:
+    desc: Install the pinned local CPU D1-2B audit candidate and runtime.
+    platforms: [windows]
+    cmds:
+      - powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/install_booth_audit_runtime.ps1
+
+  booth:audit:
+    desc: Audit one public BOOTH listing; uncertain or non-green results require local LLM review.
+    platforms: [windows]
+    requires:
+      vars: [PRODUCT, URL]
+    env:
+      UV_CACHE_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-cache'
+      UV_PYTHON_INSTALL_DIR: '{{.ROOT_DIR}}/Assets/_Local/.uv-python'
+      UV_PROJECT_ENVIRONMENT: '{{.ROOT_DIR}}/Assets/_Local/booth-audit/tooling-venv'
+      IMAGE2OUTFIT_BOOTH_URL: '{{.URL}}'
+    cmds:
+      - >-
+        uv run --no-cache --locked --no-default-groups --python 3.11
+        python tools/manage.py booth-audit --product "{{.PRODUCT}}"
+
   dbt:extract:
     desc: Project canonical product evidence into generated dbt inputs.
     cmds:
