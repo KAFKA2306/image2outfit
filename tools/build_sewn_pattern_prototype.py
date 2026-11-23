@@ -3770,6 +3770,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             row_key = (piece_id, row_index)
             if row_scale_by_key[row_key] > 1e-8:
                 continue
+            row_delta = row_displacement_by_key[row_key]
             row_classification = {
                 "exclusiveMovableVertexCount": len(row_members[row_key]),
                 "sharedOrExternalAnchorVertexCount": 0,
@@ -3798,6 +3799,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 trial = []
                 row_keys = []
                 anchor_vertices = []
+                vertex_details = []
                 for vertex_id in face:
                     point = original_vertices[vertex_id]
                     vertex_row_key = row_key_by_vertex.get(vertex_id)
@@ -3805,13 +3807,31 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                         row_keys.append(list(vertex_row_key))
                     if vertex_id in anchors:
                         anchor_vertices.append(vertex_id)
-                    if selected_panel_by_vertex.get(vertex_id) != piece_id or vertex_id in anchors:
-                        trial.append(point)
-                        continue
-                    scale = trial_scales.get(
+                    vertex_scale = trial_scales.get(
                         vertex_row_key, row_scale_by_key.get(vertex_row_key, 0.0)
                     )
-                    trial.append(point + displacement_by_vertex[vertex_id] * scale)
+                    vertex_delta = displacement_by_vertex[vertex_id]
+                    vertex_detail = {
+                        "vertexId": vertex_id,
+                        "positionM": list(point),
+                        "rowKey": list(vertex_row_key) if vertex_row_key is not None else None,
+                        "isAnchor": vertex_id in anchors,
+                        "pieceOwners": sorted(owners[vertex_id]),
+                        "seamFactor": seam_factors.get(vertex_id, 1.0),
+                        "deltaAtFullRowScaleM": list(vertex_delta),
+                        "trialScale": vertex_scale,
+                    }
+                    if selected_panel_by_vertex.get(vertex_id) != piece_id or vertex_id in anchors:
+                        trial.append(point)
+                        vertex_detail["trialPositionM"] = list(point)
+                        vertex_detail["appliedTrialDeltaM"] = [0.0, 0.0, 0.0]
+                        vertex_details.append(vertex_detail)
+                        continue
+                    vertex_trial = point + vertex_delta * vertex_scale
+                    trial.append(vertex_trial)
+                    vertex_detail["trialPositionM"] = list(vertex_trial)
+                    vertex_detail["appliedTrialDeltaM"] = list(vertex_trial - point)
+                    vertex_details.append(vertex_detail)
                 trial_normal = (trial[1] - trial[0]).cross(trial[2] - trial[0])
                 trial_area = trial_normal.length * 0.5
                 reference_normal = reference_face_normals[face_index]
@@ -3830,11 +3850,13 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                             if reference_normal.length > 1e-18 else 0.0
                         ),
                         "orientationDot": orientation_dot,
+                        "vertexDiagnostics": vertex_details,
                     })
                     if len(blockers) >= 8:
                         break
             blocked_row_diagnostics[f"{piece_id}:{row_index}"] = {
                 "scale": row_scale_by_key[row_key],
+                "smoothedRowDisplacementM": list(row_delta),
                 "vertexClassification": row_classification,
                 "fullScaleBlockerCountCappedAtEight": len(blockers),
                 "firstBlockingFaces": blockers,
