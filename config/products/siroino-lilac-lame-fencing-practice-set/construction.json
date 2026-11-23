@@ -150,7 +150,7 @@
         "waistband-back"
       ],
       "bodyTriangleZM": [
-        0.45,
+         0.42,
         0.87
       ],
       "excludedBoneNamePrefixes": [
@@ -160,7 +160,7 @@
         "Finger",
         "Shoulder"
       ],
-      "evidenceBoundary": "Explicit provisional pelvis/leg surface window in rest coordinates. Prevent arm/hand nearest-surface transfer to displaced lower garment panels; no approved fit or runtime motion.",
+      "evidenceBoundary": "Provisional pelvis/leg surface window extended to Z 0.42 m for a revised prototype hem near the measured 0.4144 m knee landmark. The window and nearest-surface weights remain hypotheses; no fit, deformation, penetration or runtime acceptance.",
       "weightProfiles": [
         {
           "method": "hip-anchored-lateral-thigh-fade-v1",
@@ -192,9 +192,14 @@
           "hemThighWeight": 0.65,
           "centerlineHalfWidthM": 0.02,
           "fullSideWeightWidthM": 0.06,
-          "evidenceBoundary": "Prototype-only shorts weight distribution hypothesis based on the four measured 0.48–0.74 m garment panels. Blend hip influence at the upper rise toward ipsilateral thigh influence at the hem and fade the centerline to Hips to reduce opposing-leg pull. Re-render the authored crouch and sit poses; this grants no coverage, deformation, fit, Shape Key or runtime acceptance."
+          "evidenceBoundary": "Prototype-only shorts weighting hypothesis from the previous measured four-panel mesh. After a 50 mm hem extension, rerun skin export and inspect transfer to ipsilateral thigh/calf surfaces. This grants no coverage, deformation, fit, Shape Key or runtime acceptance."
         }
       ]
     }
-  ]
+  ],
+  "shapeKeyPostprocess": {
+    "provider": "maxwilso-smooth-shape-keys",
+    "applicability": "NOT_REQUIRED",
+    "reason": "This checkpoint-bound panel-sewn Blender prototype does not author product corrective shape keys, so the optional maxwilso smoothing operator is not part of this build. This declaration does not establish avatar Shape Key fit or acceptance; those remain unverified release blockers."
+  }
 }
