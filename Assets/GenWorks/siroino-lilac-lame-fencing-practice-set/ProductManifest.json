@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "V219 passed production build, cloth simulation, skin/export, rendering and geometry audit but direct Codex/Astra review rejects the visible garment. Do not repeat the front-Y cutoff or row-width experiment. For V220, use the current crouch/sit/prone meshes and coverage diagnostics to change the pose-aware front-lap deformation so it spans both anterior thigh surfaces and suppresses the unsupported forward hem projection; then inspect the prone boundary for a single continuous edge. Keep all fit, orientation and area limits intact. Shape Key, Unity/VRChat runtime, package and release remain unverified.",
+    "nextAction": "Inspect the build-blender failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json, resolve it, then resume from this checkpoint.",
     "lastAttempt": {
-      "runId": "47ff31db76164ccdb0e679bd73ffae55",
-      "status": "EXECUTED",
-      "checkedAt": "2026-11-23T06:44:19Z",
+      "runId": "ae27c408730c4926beb711c1cb1aa93c",
+      "status": "PARTIAL",
+      "checkedAt": "2026-11-23T08:35:17Z",
       "visualAppearanceReview": "FAIL",
-      "lastPassedStage": "finalize-candidate",
-      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "83cb808dabda9468a8d727503967e838ea8a6caa3baf7530f50545ffe7e030b2",
+      "lastPassedStage": "initialize-3d",
+      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/initialize-3d.json",
+      "stageEvidenceSha256": "367fb12c033ef1d625131cc53760e97c39b8cea10dba6f011cd2f45f11344c8c",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -76,43 +76,17 @@
         "initialize-3d": {
           "status": "REUSED",
           "stageResultSha256": "367fb12c033ef1d625131cc53760e97c39b8cea10dba6f011cd2f45f11344c8c"
-        },
-        "build-blender": {
-          "status": "REUSED",
-          "stageResultSha256": "b11ad969f051652fcb18310b42cf0f281766a37fa3b2e58ead51657da5fcfb4b"
-        },
-        "simulate-cloth": {
-          "status": "REUSED",
-          "stageResultSha256": "cc9faca49173929e7e122c17be5db573f42f76e9fde73a309f6ce7812a8a49b4"
-        },
-        "skin-and-export": {
-          "status": "REUSED",
-          "stageResultSha256": "eb9893c07b6d87414276fc951827d3b6683597a4347faa37ec2d1c28f97e711d"
-        },
-        "render-evidence": {
-          "status": "REUSED",
-          "stageResultSha256": "d319fdd1d4cb2bfe0cd40e36bcfb2160d3f9c823b61fa0e7a8bc948e03efc1ca"
-        },
-        "audit-geometry": {
-          "status": "REUSED",
-          "stageResultSha256": "5fd236c2a8de375f6d1bcf9d832414ba6b24beafcd7ceb3aab6022214edf05aa"
-        },
-        "visual-review": {
-          "status": "PASS",
-          "stageResultSha256": "4590a1ab0076dc6e64891cbeb979e7ab925bf65df4002d62de5a17031b5ebbf2"
-        },
-        "finalize-candidate": {
-          "status": "PASS",
-          "stageResultSha256": "83cb808dabda9468a8d727503967e838ea8a6caa3baf7530f50545ffe7e030b2"
         }
       },
-      "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
-      "failedAttemptEvidencePaths": [],
+      "contractResult": "Workflow FAILED; completed 6 stage(s).",
+      "failedAttemptEvidencePaths": [
+        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json"
+      ],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "950e743bb0d45318439cf85a7ba2568a8073ea36b5ab3aaf21b6a4a52f8b08ba",
-      "blockedStage": null,
-      "failure": null,
-      "nextAction": "V219 passed production build, cloth simulation, skin/export, rendering and geometry audit but direct Codex/Astra review rejects the visible garment. Do not repeat the front-Y cutoff or row-width experiment. For V220, use the current crouch/sit/prone meshes and coverage diagnostics to change the pose-aware front-lap deformation so it spans both anterior thigh surfaces and suppresses the unsupported forward hem projection; then inspect the prone boundary for a single continuous edge. Keep all fit, orientation and area limits intact. Shape Key, Unity/VRChat runtime, package and release remain unverified."
+      "checkpointSha256": "2a2ee2c32f75d831e4d84971f5ae78ca4c51fddee0d250d55632416997d454f7",
+      "blockedStage": "build-blender",
+      "failure": "repository write-boundary rollback was incomplete: cannot safely roll back an untracked path outside the declared product workspace: config/booth-audit-model.json",
+      "nextAction": "Inspect the build-blender failure in .image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json, resolve it, then resume from this checkpoint."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",

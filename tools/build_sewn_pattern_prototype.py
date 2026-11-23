@@ -3259,9 +3259,12 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
 
     The neutral skirt envelope is useful for the waist and side silhouette but
     cannot follow thighs raised by the avatar rig. This bounded placement uses
-    only target-body triangles carrying the declared thigh deform weights,
-    leaving garment topology and panel ownership intact for the later skin
-    transfer. It is an attachment hypothesis, not fit or pose acceptance.
+    target-body triangles carrying the declared thigh deform weights and the
+    posed thigh's anterior-facing normals. Restricting the query to that surface
+    prevents a front apron point from being pulled toward a closer lateral or
+    posterior triangle. Garment topology and panel ownership stay intact for
+    later skin transfer. It remains an attachment hypothesis, not fit or pose
+    acceptance.
     """
     from collections import defaultdict
     from mathutils import Matrix, Vector
@@ -3277,6 +3280,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
         "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v9",
+        "bilateral-pose-space-anterior-thigh-envelope-before-pleat-deformation-v10",
     }:
         raise ValueError("Unknown pose-aware thigh attachment method")
     if digest(target_path) != pose["targetSourceSha256"]:
@@ -3291,6 +3295,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
     min_bone_weight = spec["minimumTriangleBoneWeight"]
     smoothing_iterations = spec.get("displacementSmoothingIterations")
     smoothing_weight = spec.get("displacementSmoothingWeight")
+    minimum_anterior_normal_dot = spec.get("minimumAnteriorNormalDot")
     if (not all(math.isfinite(v) for v in (fade_start, full_blend, clearance,
                                            projection_limit, max_blend, min_bone_weight))
             or full_blend >= fade_start or clearance <= 0 or projection_limit <= 0
@@ -3298,7 +3303,11 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             or not isinstance(smoothing_iterations, int) or isinstance(smoothing_iterations, bool)
             or not 1 <= smoothing_iterations <= 12
             or not isinstance(smoothing_weight, (int, float)) or isinstance(smoothing_weight, bool)
-            or not math.isfinite(smoothing_weight) or not 0 < smoothing_weight <= 0.5):
+            or not math.isfinite(smoothing_weight) or not 0 < smoothing_weight <= 0.5
+            or not isinstance(minimum_anterior_normal_dot, (int, float))
+            or isinstance(minimum_anterior_normal_dot, bool)
+            or not math.isfinite(minimum_anterior_normal_dot)
+            or not 0 <= minimum_anterior_normal_dot < 1):
         raise ValueError("Invalid thigh attachment bounds")
     bodies = [obj for obj in body_objects if obj.type == "MESH"
               and obj.name.startswith(spec["bodyMeshNamePrefix"])]
@@ -3448,6 +3457,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 if len(evaluated_mesh.vertices) != len(body.data.vertices) or posed_triangles != triangles:
                     raise ValueError("Pose-space thigh mapping requires stable target-body topology")
                 posed_coordinates = [evaluated_body.matrix_world @ vertex.co for vertex in evaluated_mesh.vertices]
+                armature_direction = armature.matrix_world.to_3x3()
                 transform_by_vertex = []
                 for vertex in body.data.vertices:
                     blend = Matrix.Identity(4) * 0.0
@@ -3474,23 +3484,63 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                     transform_by_vertex.append(blend)
                 surfaces = {}
                 for side in ("left", "right"):
-                    tri_indices = eligible_by_side[side]
+                    rest_bone = armature.data.bones[side_specs[side]]
+                    pose_bone = armature.pose.bones[side_specs[side]]
+                    posed_bone_rotation = (
+                        pose_bone.matrix.to_3x3()
+                        @ rest_bone.matrix_local.to_3x3().inverted()
+                    )
+                    anterior_direction = (
+                        armature_direction
+                        @ posed_bone_rotation
+                        @ Vector((0.0, -1.0, 0.0))
+                    ).normalized()
+                    tri_indices = []
+                    for triangle_index in eligible_by_side[side]:
+                        tri = triangles[triangle_index]
+                        a, b, c = (posed_coordinates[index] for index in tri)
+                        normal = (b - a).cross(c - a)
+                        if normal.length <= 1e-12:
+                            continue
+                        normal.normalize()
+                        if normal.dot(anterior_direction) >= minimum_anterior_normal_dot:
+                            tri_indices.append(triangle_index)
+                    if len(tri_indices) < 2:
+                        raise ValueError(
+                            f"Pose-space {side} anterior thigh has only {len(tri_indices)} "
+                            f"eligible triangles at normal dot {minimum_anterior_normal_dot} "
+                            f"for {pose_name}"
+                        )
                     side_triangles = [triangles[index] for index in tri_indices]
                     tree = BVHTree.FromPolygons(posed_coordinates, side_triangles, all_triangles=True)
                     if tree is None:
                         raise ValueError(f"No posed {side} thigh BVH for {pose_name}")
-                    surfaces[side] = (tree, tri_indices, posed_coordinates, transform_by_vertex)
+                    surfaces[side] = (
+                        tree, tri_indices, posed_coordinates, transform_by_vertex,
+                        anterior_direction, len(tri_indices),
+                    )
                 pose_surfaces[pose_name] = surfaces
             finally:
                 evaluated_body.to_mesh_clear()
     finally:
         reset_pose(armature)
 
+    pose_space_target_evidence = {
+        side: {
+            "eligibleAnteriorTriangleCountByPose": {},
+            "hitCount": 0,
+            "minimumHitAnteriorNormalDot": math.inf,
+            "maximumHitAnteriorNormalDot": -math.inf,
+        }
+        for side in side_specs
+    }
+
     def pose_space_rest_target(side, point):
         candidates = []
         distances = []
         for pose_name in ("crouch", "sit"):
-            tree, tri_indices, posed_coordinates, transforms = pose_surfaces[pose_name][side]
+            (tree, tri_indices, posed_coordinates, transforms,
+             anterior_direction, eligible_front_triangle_count) = pose_surfaces[pose_name][side]
             posed_panel_point = point.copy()
             # Approximate the panel's current skin transform using the nearest
             # same-side neutral triangle's barycentric body weights.
@@ -3511,6 +3561,13 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             location, normal, reduced_tri_index, distance = hit
             if distance > projection_limit or normal.length < 0.99:
                 raise ValueError(f"Pose-space {side} thigh projection exceeds bounds for {pose_name}")
+            normal.normalize()
+            anterior_dot = normal.dot(anterior_direction)
+            if anterior_dot < minimum_anterior_normal_dot:
+                raise ValueError(
+                    f"Pose-space {side} thigh hit is not anterior-facing for {pose_name}: "
+                    f"dot={anterior_dot:.6f}, required={minimum_anterior_normal_dot:.6f}"
+                )
             original_tri_index = tri_indices[reduced_tri_index]
             tri = triangles[original_tri_index]
             pose_bary = barycentric(location, *(posed_coordinates[index] for index in tri))
@@ -3519,12 +3576,18 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 blended += transforms[vertex_index] * weight
             if abs(blended.determinant()) <= 1e-10:
                 raise ValueError(f"Pose-space {side} thigh transform is singular for {pose_name}")
-            normal.normalize()
-            if (posed_panel_point - location).dot(normal) < 0:
-                normal.negate()
             posed_target = location + normal * clearance
             candidates.append(blended.inverted() @ posed_target)
             distances.append(float(distance))
+            evidence = pose_space_target_evidence[side]
+            evidence["eligibleAnteriorTriangleCountByPose"][pose_name] = eligible_front_triangle_count
+            evidence["hitCount"] += 1
+            evidence["minimumHitAnteriorNormalDot"] = min(
+                evidence["minimumHitAnteriorNormalDot"], float(anterior_dot)
+            )
+            evidence["maximumHitAnteriorNormalDot"] = max(
+                evidence["maximumHitAnteriorNormalDot"], float(anterior_dot)
+            )
         return sum(candidates, Vector()) / len(candidates), max(distances)
 
     row_members = defaultdict(list)
@@ -3896,7 +3959,8 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                 "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
                 "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
                 "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v9",
-            }
+                    "bilateral-pose-space-anterior-thigh-envelope-before-pleat-deformation-v10",
+                }
             else "after-skirt-fold-placement"
         ),
         "rowWisePanelReconstruction": {
@@ -3926,11 +3990,26 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                     "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v7",
                     "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v8",
                     "bilateral-pose-space-thigh-envelope-before-pleat-deformation-v9",
+                "bilateral-pose-space-anterior-thigh-envelope-before-pleat-deformation-v10",
                 }
                 else "coordinate-ascent line-search each authored panel row while locking authored hems and shared panel boundaries; check the entire connected panel after every row update and preserve positive face orientation plus at least 0.01-percent reference area"
             ),
         },
         "poseSpaceTargets": ["crouch", "sit"],
+        "poseSpaceAnteriorTargetEvidence": {
+            side: {
+                **values,
+                "minimumHitAnteriorNormalDot": (
+                    values["minimumHitAnteriorNormalDot"]
+                    if math.isfinite(values["minimumHitAnteriorNormalDot"]) else None
+                ),
+                "maximumHitAnteriorNormalDot": (
+                    values["maximumHitAnteriorNormalDot"]
+                    if math.isfinite(values["maximumHitAnteriorNormalDot"]) else None
+                ),
+            }
+            for side, values in sorted(pose_space_target_evidence.items())
+        },
         "targetSourceSha256": digest(target_path),
         "targetBodyObject": body.name,
         "targetTriangleCountByThigh": side_triangle_counts,
