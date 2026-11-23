@@ -292,6 +292,65 @@ def add_prototype_surface_motifs(mesh, job, recipe):
     band["canonicalHostPieceIds"] = json.dumps(plastron["hostPieceIds"])
     band["uvStatus"] = "NOT_CREATED"
 
+    # A narrow centerline accent reads as piping in the wear render. Keep the
+    # panel surface as a distinct, broad hypothesis and add visible closures
+    # so this feature can be reviewed as a plastron rather than inferred from
+    # a colored seam. These meshes remain unweighted until the skin/export
+    # stage and confer no fit or appearance acceptance.
+    panel_color = plastron.get("baseColorLinearRgb", [0.70, 0.59, 0.82])
+    if (not isinstance(panel_color, list) or len(panel_color) != 3
+            or any(not isinstance(channel, (int, float)) or not 0 <= channel <= 1 for channel in panel_color)):
+        raise ValueError("prototype plastron baseColorLinearRgb must be three channels in [0, 1]")
+    panel_material = bpy.data.materials.new(str(plastron.get("materialName", "lilac-plastron-hypothesis")))
+    panel_material.use_nodes = True
+    panel_shader = panel_material.node_tree.nodes.get("Principled BSDF")
+    panel_shader.inputs["Base Color"].default_value = (*panel_color, 1)
+    panel_shader.inputs["Roughness"].default_value = float(plastron.get("roughness", 0.48))
+    panel_material["evidenceBoundary"] = "Visible panel placement hypothesis only; fit and design are unapproved."
+    band.data.materials.clear()
+    band.data.materials.append(panel_material)
+
+    fastener_spec = plastron.get("fasteners", {})
+    fractions = fastener_spec.get("pathFractions", [0.22, 0.48, 0.74, 0.94])
+    radius = float(fastener_spec.get("radiusM", 0.005))
+    depth = float(fastener_spec.get("depthM", 0.002))
+    fastener_offset = float(fastener_spec.get("surfaceOffsetM", 0.004))
+    if (not isinstance(fractions, list) or not fractions
+            or any(not isinstance(value, (int, float)) or not 0.08 <= value <= 0.98 for value in fractions)
+            or not 0.002 <= radius <= 0.012 or not 0.0005 <= depth <= 0.005
+            or not 0.001 <= fastener_offset <= 0.008):
+        raise ValueError("Invalid prototype plastron fastener dimensions or path fractions")
+    hardware_color = fastener_spec.get("baseColorLinearRgb", [0.43, 0.31, 0.16])
+    if (not isinstance(hardware_color, list) or len(hardware_color) != 3
+            or any(not isinstance(channel, (int, float)) or not 0 <= channel <= 1 for channel in hardware_color)):
+        raise ValueError("prototype fastener baseColorLinearRgb must be three channels in [0, 1]")
+    hardware_material = bpy.data.materials.new(str(fastener_spec.get("materialName", "plastron-fastener-hypothesis")))
+    hardware_material.use_nodes = True
+    hardware_shader = hardware_material.node_tree.nodes.get("Principled BSDF")
+    hardware_shader.inputs["Base Color"].default_value = (*hardware_color, 1)
+    hardware_shader.inputs["Metallic"].default_value = float(fastener_spec.get("metallic", 0.65))
+    hardware_shader.inputs["Roughness"].default_value = float(fastener_spec.get("roughness", 0.32))
+    fastener_audits = []
+    for index, fraction in enumerate(fractions):
+        center_x = float(start[0]) + dx * float(fraction)
+        center_z = float(start[1]) + dz * float(fraction)
+        center, owner = surface_point(
+            front_tree, center_x, center_z,
+            float(plastron.get("frontQueryYM", -0.16)), fastener_offset,
+        )
+        bpy.ops.mesh.primitive_uv_sphere_add(
+            segments=16, ring_count=8, radius=1, location=center,
+        )
+        fastener = bpy.context.object
+        fastener.name = f"{job['id']}-prototype-plastron-fastener-{index + 1}"
+        fastener.scale = (radius, depth, radius)
+        fastener.data.materials.append(hardware_material)
+        bind_piece_ownership(fastener, [owner], [owner] * len(fastener.data.polygons))
+        fastener_audits.append({"object": fastener.name, "pathFraction": float(fraction),
+                                "hostPieceId": owner, "centerM": list(center),
+                                "radiusM": radius, "depthM": depth,
+                                "grantsFitOrAppearanceAcceptance": False})
+
     quilt = spec.get("elbowQuilting")
     if not isinstance(quilt, dict):
         raise ValueError("prototypeSurfaceMotifs elbowQuilting must be an object")
@@ -377,6 +436,7 @@ def add_prototype_surface_motifs(mesh, job, recipe):
             "uvStatus": "NOT_CREATED",
             "grantsAppearanceAcceptance": False,
         },
+        "fasteners": fastener_audits,
         "elbowQuilting": quilt_audits,
         "grantsFitOrAppearanceAcceptance": False,
         "evidenceBoundary": spec.get(
@@ -915,10 +975,6 @@ def main():
     bpy.ops.object.select_all(action="DESELECT")
     garment.select_set(True)
     bpy.context.view_layer.objects.active = garment
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.uv.smart_project()
-    bpy.ops.object.mode_set(mode="OBJECT")
     recipe = read(resolve(pipeline["materialRecipePath"]))
     spec = recipe["prototypeMaterial"]
     material = bpy.data.materials.new(spec["name"])

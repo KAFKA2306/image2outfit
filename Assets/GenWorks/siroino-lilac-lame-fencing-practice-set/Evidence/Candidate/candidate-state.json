@@ -19,29 +19,29 @@
   },
   "blockingFindings": [
     {
-      "severity": "BLOCKER",
-      "code": "DESIGN_DETAILS_NOT_RENDERED",
-      "description": "Directly inspected all five current views and six poses from the current Blender wear render. The pale jacket remains nearly featureless: the diagonal front treatment reads as thin piping, not a fastened plastron; elbow quilting and rear waist adjustment are not visibly constructed."
-    },
-    {
-      "severity": "BLOCKER",
       "code": "SLEEVE_SURFACE_QUALITY",
-      "description": "Strong irregular faceting and wrinkling remain over both sleeves, with pronounced bunching around the upper arm/underarm in arms-up and arm-cross. Sleeve surface quality is not acceptable."
+      "severity": "BLOCKER",
+      "description": "Direct inspection of current front/back/side/three-quarter views and arm-cross/arms-up/neutral poses: both sleeves show severe irregular faceting and bunching around upper arm/underarm; surface quality and motion remain unacceptable."
     },
     {
-      "severity": "BLOCKER",
       "code": "SKIRT_AND_SHORTS_FIT",
-      "description": "The skirt flares but does not read as controlled, ordered pleats; folds are uneven. The shorts render as broad, blunt thigh tubes with visible avatar gaps and large exposed sections at crouch and sit. Coverage and pose deformation are not acceptable."
+      "severity": "BLOCKER",
+      "description": "Current standing views show uncontrolled uneven folds and protruding side hem artifacts. Sitting and crouching views show broad blunt shorts and visible avatar exposure; coverage and pose deformation are not accepted."
     },
     {
-      "severity": "BLOCKER",
       "code": "COLLAR_AND_FRONT_CLOSURE",
-      "description": "The neckline is a narrow open tube rather than a finished fencing collar. The thin diagonal line does not fasten or retain the overlapping front panels. Neck clearance and garment retention remain unverified."
+      "severity": "BLOCKER",
+      "description": "The wider lilac diagonal plastron and four gold closures are now visibly distinct in the front renders. Closure retention is not verified, the collar remains an unfinished narrow neck tube, and the head/neck junction has not been accepted."
     },
     {
+      "code": "ARMS_UP_GARMENT_DEFORMATION",
       "severity": "BLOCKER",
+      "description": "Current arms-up and arm-cross images retain severe sleeve folds/bunching and the tall unresolved collar; clearance, strain and fit remain unverified."
+    },
+    {
       "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
-      "description": "These are Blender prototype renders only. Shape Key fit, continuous penetration, accepted weight deformation, Unity import, VRChat Build & Test, and SDK upload remain unverified."
+      "severity": "BLOCKER",
+      "description": "These are Blender prototype images only. Shape Key fit, continuous penetration, accepted weight deformation, Unity import and VRChat Build & Test remain unverified."
     }
   ],
   "failedGeometryChecks": [

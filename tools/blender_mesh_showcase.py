@@ -36,6 +36,12 @@ def main():
     skin_report = (
         root / ".image2outfit/products" / job["id"] / "skin/skin-export-report.json"
     )
+    build_report_path = root / job["productRoot"] / "Evidence/Build/product-build-report.json"
+    build_report = json.loads(build_report_path.read_text(encoding="utf-8"))
+    if build_report.get("productId") != job["id"]:
+        raise ValueError("Mesh showcase build report belongs to another product")
+    plastron_report = build_report.get("prototypeSurfaceMotifs", {}).get("plastron", {})
+    design_uv_status = plastron_report.get("uvStatus")
     if skin_report.is_file():
         skin = json.loads(skin_report.read_text(encoding="utf-8"))
         source = root / skin["weightedBlendPath"]
@@ -60,6 +66,7 @@ def main():
         "objects": [],
         "records": [],
         "grantsQualityAcceptance": False,
+        "sourceDesignUvStatus": design_uv_status,
         "boundary": "Base garment edges in neutral coordinates, not evaluated deformation or a topology/UV quality pass. Avatar meshes excluded by explicit garment role.",
     }
     if not meshes:
@@ -94,7 +101,7 @@ def main():
                         962 - (b.z - zmin) * scale,
                     )
                 )
-            if uv:
+            if uv and design_uv_status != "NOT_CREATED":
                 for face in obj.data.polygons:
                     loops = list(face.loop_indices)
                     for i, j in zip(loops, loops[1:] + loops[:1]):
@@ -110,6 +117,11 @@ def main():
         diagrams = [("topology", topology, "Garment topology - front projection")]
         if uvlines:
             diagrams.append(("uv", uvlines, "Active UV layout - unit tile"))
+        else:
+            # Keep the public showcase honest when a newer source has no UVs;
+            # overwriting any older UV image prevents stale coordinates from
+            # being mistaken for data in this source.
+            diagrams.append(("uv", [], "UV layout - NOT CREATED"))
         report["uvStatus"] = "PRESENT_UNVERIFIED" if uvlines else "MISSING"
         for name, lines, title in diagrams:
             path = out / f"{name}.svg"
