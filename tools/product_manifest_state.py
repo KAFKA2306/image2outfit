@@ -56,6 +56,30 @@ def _validate_with_completion_policy(
     return list(dict.fromkeys(errors))
 
 
+def _validate_workflow_handoff(
+    manifest: dict[str, Any], job: dict[str, Any], root: Path
+) -> list[str]:
+    """Allow a resumable nonterminal checkpoint to retain explicit blockers."""
+    errors = _manifest_errors(manifest, job)
+    projection = production_contract.completion_projection(manifest, root)
+    errors.extend(projection["errors"])
+    policy = read_json(root / "config" / "genworks-handoff-policy.json")
+    completion_status = str(policy.get("completionStatus", "COMPLETE")).upper()
+    if projection.get("state") == completion_status:
+        manifest_path = repo_path(root, str(job["productManifestPath"]))
+        staged = manifest_path.with_name(
+            f".ProductManifest.workflow-validation-{uuid.uuid4().hex}.tmp"
+        )
+        try:
+            write_json(staged, manifest)
+            staged_job = dict(job)
+            staged_job["productManifestPath"] = relative(root, staged)
+            errors.extend(production_contract.product_state_errors(staged_job, root))
+        finally:
+            staged.unlink(missing_ok=True)
+    return list(dict.fromkeys(errors))
+
+
 def _validate_unity_ready_payload(payload: Any, root: Path) -> dict[str, Any]:
     if not isinstance(payload, dict):
         raise ValueError("unity-ready payload must be an object")
@@ -317,8 +341,21 @@ def record_workflow_attempt(
         raise ValueError("workflow handoff is stale: ProductManifest SHA-256 mismatch")
 
     current = read_json(manifest_path)
-    pre_suffix = f"workflow-pre-{uuid.uuid4().hex}"
-    pre_errors = _validate_with_completion_policy(current, job, root, suffix=pre_suffix)
+    # Reconcile only the legacy fail-closed WORKING/REJECTED pairing. The
+    # status is retained as REJECTED, and the matching gate/readiness evidence
+    # is required before the lifecycle field can be synchronized.
+    technical = current.get("technicalGates")
+    readiness = current.get("releaseReadiness")
+    if (
+        current.get("state") == "WORKING"
+        and current.get("status") == "REJECTED"
+        and isinstance(technical, dict)
+        and technical.get("visualAppearanceReview") == "FAIL"
+        and isinstance(readiness, dict)
+        and readiness.get("status") == "BLOCKED"
+    ):
+        current["state"] = "REJECTED"
+    pre_errors = _validate_workflow_handoff(current, job, root)
     if pre_errors:
         raise ValueError(
             "ProductManifest precondition failed: " + "; ".join(pre_errors)
@@ -708,9 +745,7 @@ def record_workflow_attempt(
         raise RuntimeError("workflow handoff must not alter technical gates")
     if updated.get("releaseReadiness") != current.get("releaseReadiness"):
         raise RuntimeError("workflow handoff must not alter release readiness")
-    post_errors = _validate_with_completion_policy(
-        updated, job, root, suffix=f"workflow-post-{uuid.uuid4().hex}"
-    )
+    post_errors = _validate_workflow_handoff(updated, job, root)
     if post_errors:
         raise ValueError(
             "ProductManifest workflow handoff invalid: " + "; ".join(post_errors)
@@ -727,7 +762,7 @@ def record_workflow_attempt(
         write_json(staged, updated)
         staged_job = dict(job)
         staged_job["productManifestPath"] = relative(root, staged)
-        final_errors = production_contract.product_state_errors(staged_job, root)
+        final_errors = _validate_workflow_handoff(updated, staged_job, root)
         if final_errors:
             raise ValueError(
                 "staged ProductManifest invalid: " + "; ".join(final_errors)
@@ -739,8 +774,12 @@ def record_workflow_attempt(
         staged.unlink(missing_ok=True)
 
     stored = read_json(manifest_path)
-    if _manifest_errors(stored, job):
-        raise RuntimeError("stored ProductManifest failed post-write validation")
+    stored_errors = _validate_workflow_handoff(stored, job, root)
+    if stored_errors:
+        raise RuntimeError(
+            "stored ProductManifest failed workflow handoff validation: "
+            + "; ".join(stored_errors)
+        )
     if stored.get("technicalGates") != current.get("technicalGates"):
         raise RuntimeError("stored workflow handoff changed technical gates")
     if stored.get("releaseReadiness") != current.get("releaseReadiness"):

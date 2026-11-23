@@ -3,7 +3,7 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "productName": "Lilac Lamé Fencing Practice Set for SiroinoSotai PC",
   "status": "REJECTED",
-  "state": "WORKING",
+  "state": "REJECTED",
   "targetAdapterId": "siroino-v1.0",
   "productRoot": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
   "outfitPrefabPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Prefab/SiroinoLilacLameFencingPracticeSet.prefab",
@@ -43,83 +43,89 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Measure current canonical shorts hem heights versus skirt hem and inspect actual skirt vertex weight distribution across Hips/UpperLeg bones in neutral, crouch and sit. Implement the missing dependency: correct shorts coverage from measured source geometry and replace generic nearest-thigh skirt transfer with an explicit bounded waist-to-hem weight policy if the current weights explain raised flaps. Preserve measured waist sewing, new flare/length and current-input native bending setting. Resume normal workflow and inspect eleven fresh renders. Do not repeat unchanged 2D or bending diagnostics. Ordered pleats, closure, collar, materials, fit, garment Shape Keys, Unity/VRChat and release remain mandatory.",
+    "nextAction": "Keep the candidate REJECTED. Construct a visible shell-conforming plastron and real closure, add elbow quilting and rear waist detail, reduce sleeve faceting, form ordered pleats, and reshape the shorts to a fitted seat/thigh pattern with continuous crouch/sit coverage. Rebuild through the canonical workflow and directly inspect every new view and pose hash before reconsidering. Do not claim Shape Key, fit, Unity, VRChat, or upload acceptance.",
     "lastAttempt": {
-      "runId": "93350e300feb494091eeb07f0fdcd8a7",
-      "status": "PARTIAL",
-      "checkedAt": "2026-10-08T09:01:10Z",
-      "visualAppearanceReview": "PENDING",
-      "lastPassedStage": "audit-geometry",
-      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/audit-geometry.json",
-      "stageEvidenceSha256": "58d00f3cdd77539030587fcde18758da521df885503f66c52d2366485f824bdf",
+      "runId": "9d766b72ec024a0d9ac8da6feaab569a",
+      "status": "EXECUTED",
+      "checkedAt": "2026-11-23T16:41:24Z",
+      "visualAppearanceReview": "FAIL",
+      "lastPassedStage": "finalize-candidate",
+      "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
+      "stageEvidenceSha256": "f312bfe6332a31c322d5ee23abe863c2dd3b6936058268aab210dfa149479b9f",
       "completedStages": {
         "ingest-reference": {
-          "status": "PASS",
+          "status": "REUSED",
           "stageResultSha256": "30fd88522d5e8cf4f1c3bec0a473803b86723a8b10a7aef4e1e121c4324f6f42"
         },
         "normalize-view": {
-          "status": "PASS",
+          "status": "REUSED",
           "stageResultSha256": "ea26d14e1c799eb4acfbbd656ce7e1a2534c08aee1f8bb1357dbb1f068834dbe"
         },
         "decompose-garment": {
-          "status": "PASS",
-          "stageResultSha256": "b2a9dc256694e2f7593968746d0b97eb92cd6b0c020e02aaa39f0b12ec4813f8"
+          "status": "REUSED",
+          "stageResultSha256": "54d558df36c20c7d0d34bc91f9c2b957cd88788eddea4b3693a0231b82117b81"
         },
         "draft-patterns": {
-          "status": "PASS",
-          "stageResultSha256": "4ab6a73c9d92cdfd626ca6091b54d1664cda2256b008f4525f65b584faa16112"
+          "status": "REUSED",
+          "stageResultSha256": "766f801ff04d71e6ccd392c9d5e0c487aefc2d9c45218235d4031acf148dd186"
         },
         "infer-stitches": {
-          "status": "PASS",
-          "stageResultSha256": "3c450961e7936bc9891292860355a9a167f1be2f84240f0f2d35e596e3f5eeab"
+          "status": "REUSED",
+          "stageResultSha256": "cf80c30c24037657311c19458d956121af676b9e9347356a88c43d5f326f0818"
         },
         "initialize-3d": {
-          "status": "PASS",
-          "stageResultSha256": "22e607510d675ebbde8b1bdf974310c39909e6f6dc33bf36cfc844898e1f63a3"
+          "status": "REUSED",
+          "stageResultSha256": "186267c8938ace30f6942d9d91439d24659a0b64b1d7bf8e643a701d74eb1dd6"
         },
         "build-blender": {
-          "status": "PASS",
-          "stageResultSha256": "b71969d1b281d5b6e7a52982dbf7879fccd9fef3d942aa51b038444994fab337"
+          "status": "REUSED",
+          "stageResultSha256": "d201f7d7b1549dc3ba77772cbc53f475beaa16995ecf9f72c8a6688ab91b97a8"
         },
         "simulate-cloth": {
-          "status": "PASS",
-          "stageResultSha256": "8dd50357a915745ce0e52ec8653325cdc771afd423e5f73e49ecc804397cd982"
+          "status": "REUSED",
+          "stageResultSha256": "4eb721629827d2f02106a6dca04097dfba5e095f166deaff8d26e5e14d13b893"
         },
         "skin-and-export": {
-          "status": "PASS",
-          "stageResultSha256": "7419df705221643d9253bd2c3783c224e62caebbd4c4fb862ece354d67de7b59"
+          "status": "REUSED",
+          "stageResultSha256": "df9b3e203ce96fe7ab0e8ae76a8c432c722708fa7d95ee7b0263b71374ddde8b"
         },
         "render-evidence": {
-          "status": "PASS",
-          "stageResultSha256": "15ebb7e60bcf8ae63ef22c2765348524a9c5bc81439397f9c842821765ba8337"
+          "status": "REUSED",
+          "stageResultSha256": "2024cae22311891cf710f34432fef225e1abd653dd62723dc125fadf15b72101"
         },
         "audit-geometry": {
+          "status": "REUSED",
+          "stageResultSha256": "927903a7094e171520aaba4a952f6c82d3d1a7079909daaf9d729a179f3ace55"
+        },
+        "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "58d00f3cdd77539030587fcde18758da521df885503f66c52d2366485f824bdf"
+          "stageResultSha256": "50c60a0c858c6c0be9d24b46f4b919a72dc777e491f280fc2f06b034a3cb8c1f"
+        },
+        "finalize-candidate": {
+          "status": "PASS",
+          "stageResultSha256": "f312bfe6332a31c322d5ee23abe863c2dd3b6936058268aab210dfa149479b9f"
         }
       },
-      "contractResult": "Workflow FAILED; completed 11 stage(s).",
-      "failedAttemptEvidencePaths": [
-        ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json"
-      ],
+      "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
+      "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "674d568bfccff1699c1129f84fca3eeab7f0cf3497a130e80625e3abe32a9379",
-      "blockedStage": "visual-review",
-      "failure": "visual-review failed because the inspected image hashes did not match the current rendered evidence.",
-      "nextAction": "Measure current canonical shorts hem heights versus skirt hem and inspect actual skirt vertex weight distribution across Hips/UpperLeg bones in neutral, crouch and sit. Implement the missing dependency: correct shorts coverage from measured source geometry and replace generic nearest-thigh skirt transfer with an explicit bounded waist-to-hem weight policy if the current weights explain raised flaps. Preserve measured waist sewing, new flare/length and current-input native bending setting. Resume normal workflow and inspect eleven fresh renders. Do not repeat unchanged 2D or bending diagnostics. Ordered pleats, closure, collar, materials, fit, garment Shape Keys, Unity/VRChat and release remain mandatory."
+      "checkpointSha256": "58472abeb343971a71349e85f660438557ad4bbc24d778b8197efd2e2e982db2",
+      "blockedStage": null,
+      "failure": null,
+      "nextAction": "Keep the candidate REJECTED. Construct a visible shell-conforming plastron and real closure, add elbow quilting and rear waist detail, reduce sleeve faceting, form ordered pleats, and reshape the shorts to a fitted seat/thigh pattern with continuous crouch/sit coverage. Rebuild through the canonical workflow and directly inspect every new view and pose hash before reconsidering. Do not claim Shape Key, fit, Unity, VRChat, or upload acceptance."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "15e294341cc8816519d69cad36c91e0b51f10aee67bc071bad1f98e88475bc49",
+      "sourceSha256": "10af032a977ee805aa21558dc6df29f07abfdc0e3483bd35812c5820fbff5408",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "e415e08ee79dc8c43c1f3bdc84cc50d284f8b1b2fa0bf738f84c13927acaed0c",
+      "reportSha256": "331c64297f68529eed1e47230c43af38c8a821be0cf5ff796efcfbb56db55b66",
       "metrics": {
-        "vertices": 7996,
-        "triangles": 15429,
-        "unweightedVertices": 7996,
+        "vertices": 9412,
+        "triangles": 18253,
+        "unweightedVertices": 9412,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false
@@ -128,37 +134,32 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "90da3d86781ab192fa34f80fe48743c3fac0fc6850288ac18e80b0ac68e77294",
+      "sha256": "a5ad5b2135fc1cbfa029a7435f0501584bfe59fae5f32ffb7b381f5718e16015",
       "findings": [
         {
           "severity": "BLOCKER",
-          "code": "FRONT_CLOSURE_UNFASTENED",
-          "description": "Upper front torso overlap remains visible and front edges remain unfastened. Sewn waistband now covers the former neutral waist transition gap, but jacket retention and waist fit are not accepted."
+          "code": "DESIGN_DETAILS_NOT_RENDERED",
+          "description": "Directly inspected all five current views and six poses from the current Blender wear render. The pale jacket remains nearly featureless: the diagonal front treatment reads as thin piping, not a fastened plastron; elbow quilting and rear waist adjustment are not visibly constructed."
         },
         {
           "severity": "BLOCKER",
-          "code": "COLLAR_NECKLINE_JUNCTION_UNRESOLVED",
-          "description": "Outer shoulder edge now uses an evaluated body surface support sample rather than the UpperArm bone height. Tall collar persists. Head clearance, collar strain and continuous surface intersection remain unapproved; historical seam lengths are bound to their original source hashes."
+          "code": "SLEEVE_SURFACE_QUALITY",
+          "description": "Strong irregular faceting and wrinkling remain over both sleeves, with pronounced bunching around the upper arm/underarm in arms-up and arm-cross. Sleeve surface quality is not acceptable."
         },
         {
           "severity": "BLOCKER",
-          "code": "SLEEVE_CAP_UNDERARM_FIT_UNVERIFIED",
-          "description": "Current eleven images inspected: sleeve folds remain visible, especially underarm/rear and arms-up. Earlier cuff/clearance measurements and their improvements are historical, bound to prior source hashes; they are not current-source measured fit evidence. Continuous clearance, strain, Large and runtime remain unverified."
+          "code": "SKIRT_AND_SHORTS_FIT",
+          "description": "The skirt flares but does not read as controlled, ordered pleats; folds are uneven. The shorts render as broad, blunt thigh tubes with visible avatar gaps and large exposed sections at crouch and sit. Coverage and pose deformation are not acceptable."
         },
         {
           "severity": "BLOCKER",
-          "code": "SKIRT_AND_OVERLAY_ASSEMBLY",
-          "description": "All five current views and six poses directly inspected after 140 mm skirt length, reference-ratio flare, matching flat pattern intake and current-input native bending solve. Standing flare is improved over the previous narrow skirt. Irregular folds, front sag/dent and insufficient visible under-shorts remain; broad ordered reference pleats are not achieved. No final appearance acceptance."
+          "code": "COLLAR_AND_FRONT_CLOSURE",
+          "description": "The neckline is a narrow open tube rather than a finished fencing collar. The thin diagonal line does not fasten or retain the overlapping front panels. Neck clearance and garment retention remain unverified."
         },
         {
           "severity": "BLOCKER",
-          "code": "DEFORMATION_REVIEW_REJECTED",
-          "description": "Current crouch and sit directly inspected: front skirt forms raised broad flaps, side/rear hem curls and shorts coverage remains unaccepted. Prone also inspected. Skirt transfer to thigh bones is a hypothesis to investigate using actual current vertex weights; no continuous penetration, dynamic cloth, strain or runtime acceptance is claimed."
-        },
-        {
-          "severity": "BLOCKER",
-          "code": "ARMS_UP_GARMENT_DEFORMATION",
-          "description": "Current arms-up and arm-cross directly inspected: underarm/sleeve folds persist; collar remains tall. Waist appears assembled in the rendered pose but measured fit, strain and continuous clearance remain unverified."
+          "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
+          "description": "These are Blender prototype renders only. Shape Key fit, continuous penetration, accepted weight deformation, Unity import, VRChat Build & Test, and SDK upload remain unverified."
         }
       ],
       "grantsQualityAcceptance": false
@@ -217,8 +218,8 @@
   },
   "completionGates": {
     "blender": "FAIL",
-    "editableSource": "UNVERIFIED",
-    "fbx": "UNVERIFIED",
+    "editableSource": "PASS",
+    "fbx": "PASS",
     "prefabDeclared": "FAIL",
     "fiveViewEvidence": "PASS",
     "poseEvidence": "PASS",

@@ -8,6 +8,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -85,6 +86,21 @@ def read_object(path: Path, label: str) -> dict[str, Any]:
 
 def repo_path(value: str | Path, *, label: str) -> Path:
     path = Path(value)
+    if (
+        os.name != "nt"
+        and os.environ.get("WSL_INTEROP")
+        and re.match(r"^[A-Za-z]:[\\/]", str(value))
+    ):
+        translated = subprocess.run(
+            ["wslpath", "-u", str(value)],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        if translated.returncode != 0 or not translated.stdout.strip():
+            raise RuntimeError(f"could not translate Windows interop path: {value}")
+        path = Path(translated.stdout.strip())
     resolved = path.resolve() if path.is_absolute() else (ROOT / path).resolve()
     if resolved != ROOT and ROOT not in resolved.parents:
         raise ValueError(f"{label} escapes repository: {value}")
@@ -101,6 +117,53 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _windows_path_from_wsl(path: Path) -> str:
+    """Translate one mounted-repository path for a Windows process launched by WSL."""
+    translated = subprocess.run(
+        ["wslpath", "-w", str(path)],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    value = translated.stdout.strip()
+    if translated.returncode != 0 or not value:
+        raise RuntimeError(
+            f"could not translate repository path for Windows interop: {path}"
+        )
+    return value
+
+
+def _path_argument_for_executable(executable: str, path: Path) -> str:
+    if (
+        os.name != "nt"
+        and os.environ.get("WSL_INTEROP")
+        and Path(executable).suffix.lower() == ".exe"
+    ):
+        return _windows_path_from_wsl(path)
+    return str(path)
+
+
+def _add_wsl_interop_variables(
+    environment: dict[str, str], variables: Mapping[str, str]
+) -> None:
+    """Expose selected WSL values to a Win32 child through WSLENV."""
+    if os.name == "nt" or not os.environ.get("WSL_INTEROP"):
+        return
+    entries: dict[str, set[str]] = {}
+    for item in environment.get("WSLENV", "").split(":"):
+        if not item:
+            continue
+        name, _, flags = item.partition("/")
+        entries[name] = set(flags)
+    for name, flags in variables.items():
+        entries.setdefault(name, set()).update(flags)
+    environment["WSLENV"] = ":".join(
+        name + ("/" + "".join(sorted(flags)) if flags else "")
+        for name, flags in entries.items()
+    )
 
 
 def write_json(path: Path, payload: Mapping[str, Any]) -> Path:
@@ -494,13 +557,15 @@ def stage_garmentcode_pattern(
     )
     command = [
         str(python_executable),
-        str(ROOT / "tools" / "run_garmentcode_pattern_preview.py"),
+        _path_argument_for_executable(
+            str(python_executable), ROOT / "tools" / "run_garmentcode_pattern_preview.py"
+        ),
         "--input",
-        str(input_path),
+        _path_argument_for_executable(str(python_executable), input_path),
         "--output-dir",
-        str(output_dir),
+        _path_argument_for_executable(str(python_executable), output_dir),
         "--upstream-root",
-        str(upstream_root),
+        _path_argument_for_executable(str(python_executable), upstream_root),
         "--upstream-revision",
         str(runtime_config["upstreamRevision"]),
         "--python-version",
@@ -508,7 +573,7 @@ def stage_garmentcode_pattern(
         "--pygarment-version",
         str(runtime_config["pygarmentVersion"]),
         "--requirements-lock",
-        str(requirements_lock_path),
+        _path_argument_for_executable(str(python_executable), requirements_lock_path),
         "--stitch-export-mode",
         stitch_export_mode,
     ]
@@ -676,6 +741,15 @@ def stage_garmentcode_pattern(
             )
 
         preview_script = ROOT / "tools" / "run_opensew_pattern_preview.py"
+        use_windows_interop = (
+            os.name != "nt"
+            and bool(os.environ.get("WSL_INTEROP"))
+            and blender_path.suffix.lower() == ".exe"
+        )
+
+        def open_sew_argument(path: Path) -> str:
+            return _windows_path_from_wsl(path) if use_windows_interop else str(path)
+
         run_stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
         open_sew_dir = (
             runtime_root(product_id)
@@ -691,16 +765,16 @@ def stage_garmentcode_pattern(
             "--python-exit-code",
             "1",
             "--python",
-            str(preview_script),
+            open_sew_argument(preview_script),
             "--",
             "--pattern",
-            str(pattern_path),
+            open_sew_argument(pattern_path),
             "--stitches",
-            str(stitch_path),
+            open_sew_argument(stitch_path),
             "--output-dir",
-            str(open_sew_dir),
+            open_sew_argument(open_sew_dir),
             "--opensew-root",
-            str(open_sew_root),
+            open_sew_argument(open_sew_root),
             "--expected-revision",
             str(open_sew_config["upstreamRevision"]),
             "--expected-blender-version",
@@ -1523,11 +1597,17 @@ def blender_executable() -> str:
     version = str(lock["blender"]["version"])
     configured = os.environ.get("IMAGE2OUTFIT_BLENDER", "").strip()
     executable_name = "blender.exe" if os.name == "nt" else "blender"
+    pinned_directory = ROOT / ".image2outfit" / f"blender-{version}"
+    local_executables = [pinned_directory / executable_name]
+    if os.name != "nt" and os.environ.get("WSL_INTEROP"):
+        # WSL can launch the repository's pinned Windows Blender through interop.
+        # Do not select an arbitrary Windows executable from native Linux.
+        local_executables.append(pinned_directory / "blender.exe")
     candidates = (
         [configured]
         if configured
         else [
-            str(ROOT / ".image2outfit" / f"blender-{version}" / executable_name),
+            *(str(candidate) for candidate in local_executables),
             str(ROOT / ".image2outfit" / "blender" / executable_name),
             shutil.which("blender") or "",
         ]
@@ -1702,32 +1782,70 @@ def _run_garmentcode_boxmesh_preflight(
     )
     if not requirements_lock_path.is_file():
         raise FileNotFoundError("GarmentCode requirements lock is missing")
-    command = [
-        "uv",
-        "run",
-        "--offline",
-        "--no-project",
-        "--no-python-downloads",
-        "--python",
-        str(python_executable),
-        str(ROOT / "tools" / "run_garmentcode_boxmesh_audit.py"),
-        "--input",
-        str(input_path),
-        "--output",
-        str(output_path),
-        "--upstream-root",
-        str(upstream_root),
-        "--upstream-revision",
-        str(runtime_config["upstreamRevision"]),
-        "--python-version",
-        str(runtime_config["pythonVersion"]),
-        "--pygarment-version",
-        str(runtime_config["pygarmentVersion"]),
-        "--requirements-lock",
-        str(requirements_lock_path),
-    ]
+    audit_script = ROOT / "tools" / "run_garmentcode_boxmesh_audit.py"
+    wsl_windows_process = (
+        os.name != "nt"
+        and bool(os.environ.get("WSL_INTEROP"))
+        and python_executable.suffix.lower() == ".exe"
+    )
+    if wsl_windows_process:
+        # The pinned runtime was installed by the Windows setup task. Linux uv
+        # cannot treat its PE executable as a Linux Python interpreter, but WSL
+        # interop can launch it directly when every file argument uses a Windows
+        # path. Keep the Linux uv route for the native Linux runtime.
+        command = [
+            str(python_executable),
+            _windows_path_from_wsl(audit_script),
+            "--input",
+            _windows_path_from_wsl(input_path),
+            "--output",
+            _windows_path_from_wsl(output_path),
+            "--upstream-root",
+            _windows_path_from_wsl(upstream_root),
+            "--upstream-revision",
+            str(runtime_config["upstreamRevision"]),
+            "--python-version",
+            str(runtime_config["pythonVersion"]),
+            "--pygarment-version",
+            str(runtime_config["pygarmentVersion"]),
+            "--requirements-lock",
+            _windows_path_from_wsl(requirements_lock_path),
+        ]
+    else:
+        command = [
+            "uv",
+            "run",
+            "--offline",
+            "--no-project",
+            "--no-python-downloads",
+            "--python",
+            str(python_executable),
+            str(audit_script),
+            "--input",
+            str(input_path),
+            "--output",
+            str(output_path),
+            "--upstream-root",
+            str(upstream_root),
+            "--upstream-revision",
+            str(runtime_config["upstreamRevision"]),
+            "--python-version",
+            str(runtime_config["pythonVersion"]),
+            "--pygarment-version",
+            str(runtime_config["pygarmentVersion"]),
+            "--requirements-lock",
+            str(requirements_lock_path),
+        ]
     if pipeline.get("meshSource") == "garmentcode-boxmesh":
-        command.extend(["--mesh-output", str(attempt_dir / "sewn-mesh.json")])
+        mesh_output = attempt_dir / "sewn-mesh.json"
+        command.extend(
+            [
+                "--mesh-output",
+                _windows_path_from_wsl(mesh_output)
+                if wsl_windows_process
+                else str(mesh_output),
+            ]
+        )
     execution = subprocess.run(
         command,
         cwd=ROOT,
@@ -1800,25 +1918,36 @@ def stage_build(
         f"{job['productRoot']}/Evidence/Build/product-build-report.json",
         label="build report",
     )
+    build_invocation_id = uuid.uuid4().hex
+    blender = blender_executable()
     command = [
-        blender_executable(),
+        blender,
         "--python-use-system-env",
         "--background",
         "--factory-startup",
         "--python-exit-code",
         "1",
         "--python",
-        str(script),
+        _path_argument_for_executable(blender, script),
         "--",
         "--job",
-        str(job_path),
+        _path_argument_for_executable(blender, job_path),
     ]
     build_env = dict(os.environ)
+    build_env["IMAGE2OUTFIT_BUILD_INVOCATION_ID"] = build_invocation_id
     if job["garmentPipeline"].get("meshSource") == "garmentcode-boxmesh":
         if boxmesh_evidence is None:
             raise ValueError("Sewn prototype requires a validated BoxMesh exchange")
         audit = read_object(boxmesh_evidence[1], "BoxMesh audit")
         build_env["IMAGE2OUTFIT_SEWN_MESH_PATH"] = audit["meshExchangePath"]
+        if Path(blender).suffix.lower() == ".exe":
+            _add_wsl_interop_variables(
+                build_env,
+                {
+                    "IMAGE2OUTFIT_SEWN_MESH_PATH": "w",
+                    "IMAGE2OUTFIT_BUILD_INVOCATION_ID": "",
+                },
+            )
     completed = subprocess.run(
         command,
         cwd=ROOT,
@@ -1833,22 +1962,47 @@ def stage_build(
     )
 
     quality: dict[str, Any] | None = None
+    report_payload: dict[str, Any] | None = None
     if report.is_file():
-        quality = geometry_quality(read_object(report, "build report"))
+        report_payload = read_object(report, "build report")
+        quality = geometry_quality(report_payload)
+    report_fresh = bool(
+        report_payload is not None
+        and report_payload.get("buildInvocationId") == build_invocation_id
+    )
+    blend = repo_path(job["blendPath"], label="blend")
+    blend_fresh = (
+        blend.is_file()
+        and report_payload is not None
+        and report_payload.get("sourceBlendSha256") == sha256(blend)
+    )
     accepted_quality_reject = (
-        completed.returncode == 2
+        completed.returncode in {1, 2}
+        and report_fresh
+        and blend_fresh
         and quality is not None
         and quality["decision"] == QUALITY_REJECT
     )
     if completed.returncode != 0 and not accepted_quality_reject:
+        report_source_sha = (
+            str(report_payload.get("sourceBlendSha256", ""))[:16]
+            if report_payload is not None
+            else "missing"
+        )
+        actual_blend_sha = sha256(blend)[:16] if blend.is_file() else "missing"
+        blender_output = (completed.stderr or completed.stdout)[-1800:].strip()
         raise RuntimeError(
             f"Blender build failed with exit code {completed.returncode}; "
+            f"reportInvocation={report_payload.get('buildInvocationId') if report_payload else 'missing'}, "
+            f"expectedInvocation={build_invocation_id}, reportFresh={report_fresh}, "
+            f"reportQuality={quality['decision'] if quality else 'missing'}, "
+            f"reportBlendSha={report_source_sha}, actualBlendSha={actual_blend_sha}, "
+            f"blendFresh={blend_fresh}; blenderOutput={blender_output!r}; "
             f"see {relative(log)}"
         )
     if quality is None:
         raise FileNotFoundError(f"build report was not created: {relative(report)}")
 
-    blend = repo_path(job["blendPath"], label="blend")
     emit(
         result,
         stage="build-blender",
@@ -1857,6 +2011,7 @@ def stage_build(
             blend,
             report,
             log,
+            runtime_root(product_id) / "initialization" / "prototype-readiness.json",
             *([*boxmesh_evidence] if boxmesh_evidence is not None else []),
             *(
                 [
@@ -1874,6 +2029,9 @@ def stage_build(
         ],
         extra={
             "blenderReturnCode": completed.returncode,
+            "buildInvocationId": build_invocation_id,
+            "buildReportFresh": report_fresh,
+            "blendFresh": blend_fresh,
             "executionDisposition": (
                 "COMPLETED_WITH_QUALITY_REJECT"
                 if accepted_quality_reject
@@ -1905,17 +2063,22 @@ def stage_simulate(job: Mapping[str, Any], result: Path) -> None:
     if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
         simulation_log = runtime_root(product_id) / "reports" / "cloth-simulation.log"
         simulation_log.parent.mkdir(parents=True, exist_ok=True)
+        blender = blender_executable()
         command = [
-            blender_executable(),
+            blender,
             "--background",
             "--factory-startup",
             "--python-exit-code",
             "1",
             "--python",
-            str(ROOT / "tools/blender_cloth_simulation.py"),
+            _path_argument_for_executable(
+                blender, ROOT / "tools/blender_cloth_simulation.py"
+            ),
             "--",
             "--job",
-            str(ROOT / "config/products" / product_id / "job.json"),
+            _path_argument_for_executable(
+                blender, ROOT / "config/products" / product_id / "job.json"
+            ),
             "--prototype",
         ]
         execution = subprocess.run(
@@ -2053,17 +2216,22 @@ def stage_export(job: Mapping[str, Any], result: Path) -> None:
     if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
         log = runtime_root(product_id) / "reports/skin-export.log"
         log.parent.mkdir(parents=True, exist_ok=True)
+        blender = blender_executable()
         command = [
-            blender_executable(),
+            blender,
             "--background",
             "--factory-startup",
             "--python-exit-code",
             "1",
             "--python",
-            str(ROOT / "tools/blender_sewn_skin_export.py"),
+            _path_argument_for_executable(
+                blender, ROOT / "tools/blender_sewn_skin_export.py"
+            ),
             "--",
             "--job",
-            str(ROOT / "config/products" / product_id / "job.json"),
+            _path_argument_for_executable(
+                blender, ROOT / "config/products" / product_id / "job.json"
+            ),
         ]
         execution = subprocess.run(
             command, cwd=ROOT, capture_output=True, text=True, check=False
@@ -2118,17 +2286,22 @@ def stage_render(job: Mapping[str, Any], result: Path) -> None:
     if job.get("garmentPipeline", {}).get("meshSource") == "garmentcode-boxmesh":
         log = runtime_root(product_id) / "reports/weighted-render.log"
         log.parent.mkdir(parents=True, exist_ok=True)
+        blender = blender_executable()
         command = [
-            blender_executable(),
+            blender,
             "--background",
             "--factory-startup",
             "--python-exit-code",
             "1",
             "--python",
-            str(ROOT / "tools/blender_sewn_render.py"),
+            _path_argument_for_executable(
+                blender, ROOT / "tools/blender_sewn_render.py"
+            ),
             "--",
             "--job",
-            str(ROOT / "config/products" / product_id / "job.json"),
+            _path_argument_for_executable(
+                blender, ROOT / "config/products" / product_id / "job.json"
+            ),
         ]
         execution = subprocess.run(
             command, cwd=ROOT, capture_output=True, text=True, check=False
@@ -2328,6 +2501,7 @@ def stage_finalize(
     manifest_path = repo_path(job["productManifestPath"], label="manifest")
     manifest = read_object(manifest_path, "product manifest")
     manifest["status"] = status
+    manifest["state"] = status
     manifest["completionGates"] = candidate["gates"]
     manifest["candidateState"] = relative(candidate_path)
     write_json(manifest_path, manifest)

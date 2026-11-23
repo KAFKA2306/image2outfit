@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -19,6 +20,7 @@ if str(ROOT / "tools") not in sys.path:
 from contract_io import digest, read_json, validate_schema_file
 from image2outfit.audit import sha256_json, validate_stage_records, write_audit_bundle
 from image2outfit.audit_schema import load_audit_schemas
+from image2outfit.artifact_dag import ArtifactKind, ArtifactRef, PipelineArtifactDAG
 from image2outfit.failure_contract import (
     failed_state_descriptor,
     failure_descriptor,
@@ -28,6 +30,7 @@ from image2outfit.pipeline import (
     PIPELINE_STAGES,
     ExecutionMode,
     new_pipeline_state,
+    PipelineStage,
     resume_pipeline_state,
     run_langchain,
     run_langgraph,
@@ -247,6 +250,7 @@ def _resume_or_reset(
     request: dict[str, Any],
     expected: dict[str, str],
     mode: ExecutionMode,
+    allow_verified_prefix_on_source_change: bool = False,
 ) -> dict[str, Any]:
     _validate_persisted_pipeline_state(previous, label="resume state")
     mismatches = _identity_mismatches(previous, expected)
@@ -258,6 +262,100 @@ def _resume_or_reset(
     if "sourceFingerprint" not in mismatches:
         _validate_resume_integrity(previous)
         return resume_pipeline_state(previous, execution_mode=mode)
+
+    if allow_verified_prefix_on_source_change:
+        _validate_resume_integrity(previous)
+        prefix: list[str] = []
+        outputs = previous.get("outputs", {})
+        records = previous.get("stage_records", [])
+        records_by_stage: dict[str, dict[str, Any]] = {}
+        for record in records:
+            if isinstance(record, dict) and isinstance(record.get("stage"), str):
+                records_by_stage[record["stage"]] = record
+        origin = str(previous.get("run_id", ""))
+        history = previous.get("resume_history", [])
+        if history and isinstance(history[0], dict):
+            origin = str(history[0].get("parent_run_id") or origin)
+        elif previous.get("parent_run_id"):
+            origin = str(previous["parent_run_id"])
+        avatar_sha256 = hashlib.sha256(
+            expected["targetAvatar"].encode("utf-8")
+        ).hexdigest()
+        artifact_dag = PipelineArtifactDAG()
+        for stage in previous.get("completed_stages", []):
+            output = outputs.get(stage, {})
+            stage_record = records_by_stage.get(stage, {})
+            record_output = stage_record.get("output", {})
+            raw_ref = output.get("artifactRef") if isinstance(output, dict) else None
+            if (
+                not isinstance(raw_ref, dict)
+                or stage_record.get("status") not in {"PASS", "REUSED"}
+                or not isinstance(record_output, dict)
+                or record_output.get("mode") != "executed"
+                or not isinstance(record_output.get("result"), dict)
+                or record_output.get("artifactRef") != raw_ref
+            ):
+                break
+            try:
+                result_path = stage_record.get("resultPath")
+                if not isinstance(result_path, str) or not result_path:
+                    break
+                stage_result = _read_object(
+                    _repo_path(Path(result_path), label="resumed stage result"),
+                    label="resumed stage result",
+                )
+                if stage_result != record_output["result"]:
+                    break
+                ref = ArtifactRef(
+                    kind=ArtifactKind(str(raw_ref["kind"])),
+                    producer_stage=PipelineStage(str(raw_ref["producer_stage"])),
+                    garment_id=str(raw_ref["garment_id"]),
+                    hypothesis_id=str(raw_ref["hypothesis_id"]),
+                    candidate_id=str(raw_ref["candidate_id"]),
+                    avatar_sha256=str(raw_ref["avatar_sha256"]),
+                    content_sha256=str(raw_ref["content_sha256"]),
+                    artifact_path=str(raw_ref["artifact_path"]),
+                    schema_version=int(raw_ref.get("schema_version", 1)),
+                )
+                if (
+                    ref.producer_stage.value != stage
+                    or ref.kind != artifact_dag.contract(stage).produces
+                    or ref.garment_id != expected["productId"]
+                    or ref.hypothesis_id != expected["revisionId"]
+                    or ref.candidate_id != origin
+                    or ref.avatar_sha256 != avatar_sha256
+                ):
+                    break
+                ref.verify_content(str(ROOT))
+            except (KeyError, TypeError, ValueError, OSError):
+                break
+            prefix.append(stage)
+
+        if prefix:
+            reused = dict(previous)
+            reused["completed_stages"] = prefix
+            reused["outputs"] = {stage: outputs[stage] for stage in prefix}
+            reused["stage_records"] = [records_by_stage[stage] for stage in prefix]
+            reused["events"] = [
+                event
+                for event in previous.get("events", [])
+                if isinstance(event, dict) and event.get("stage") in prefix
+            ]
+            reused["errors"] = []
+            reused.pop("failure", None)
+            reused["source_fingerprint"] = expected["sourceFingerprint"]
+            resumed = resume_pipeline_state(reused, execution_mode=mode)
+            resumed["resume_history"][-1]["source_fingerprint_drift"] = {
+                "previous": str(previous.get("source_fingerprint", "")),
+                "current": expected["sourceFingerprint"],
+                "verifiedPrefix": len(prefix),
+                "invalidatedStage": (
+                    previous["completed_stages"][len(prefix)]
+                    if len(prefix) < len(previous.get("completed_stages", []))
+                    else resumed.get("current_stage", "")
+                ),
+            }
+            return resumed
 
     state = _new_state(request, expected, mode)
     state["checkpoint_reset"] = {
@@ -365,7 +463,11 @@ def main() -> int:
                 label="resume state",
             )
             state = _resume_or_reset(
-                previous, request=request, expected=expected, mode=mode
+                previous,
+                request=request,
+                expected=expected,
+                mode=mode,
+                allow_verified_prefix_on_source_change=args.resume_state is not None,
             )
             if state.get("checkpoint_reset"):
                 print(

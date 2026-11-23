@@ -13,9 +13,19 @@ ERROR_CODES = (
     "INVALID_RESUME_STATE",
     "PIPELINE_ENGINE_UNAVAILABLE",
     "AUDIT_PUBLICATION_FAILED",
+    "PRODUCT_HANDOFF_FAILED",
     "INTERNAL_PIPELINE_ERROR",
 )
-PHASES = ("request", "contract", "profile", "resume", "registry", "pipeline", "audit")
+PHASES = (
+    "request",
+    "contract",
+    "profile",
+    "resume",
+    "registry",
+    "pipeline",
+    "audit",
+    "handoff",
+)
 _CAUSE_CODE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 
 

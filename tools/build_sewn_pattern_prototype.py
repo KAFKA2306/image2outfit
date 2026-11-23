@@ -937,6 +937,7 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=str(source))
     report = {
         "schemaVersion": 1, "productId": job["id"], "passed": False,
+        "buildInvocationId": os.environ.get("IMAGE2OUTFIT_BUILD_INVOCATION_ID"),
         "measuredWaistbandPlacement": waistband_evidence,
         "declaredSkirtFoldPlacement": fold_evidence,
         "declaredSkirtCreaseTopology": crease_evidence,
