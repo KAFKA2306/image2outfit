@@ -3764,6 +3764,81 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
                       for row_index in row_keys_by_piece[piece_id])
         for piece_id in pieces_with_rows
     }
+    blocked_row_diagnostics = {}
+    for piece_id in pieces_with_rows:
+        for row_index in sorted(row_keys_by_piece[piece_id]):
+            row_key = (piece_id, row_index)
+            if row_scale_by_key[row_key] > 1e-8:
+                continue
+            row_classification = {
+                "exclusiveMovableVertexCount": len(row_members[row_key]),
+                "sharedOrExternalAnchorVertexCount": 0,
+                "preservedSeamZeroFactorVertexCount": 0,
+                "hemAnchorVertexCount": 0,
+            }
+            for vertex_id, pieces in owners.items():
+                if not pieces.intersection(selected) or vertex_id not in pattern_v_by_vertex:
+                    continue
+                point = original_vertices[vertex_id]
+                if (point.z >= fade_start or point.z < minimum_attachment_z
+                        or point.y >= spec["maximumFrontYM"]
+                        or round(pattern_v_by_vertex[vertex_id] / row_width_m) != row_index):
+                    continue
+                if len(pieces.intersection(selected)) != 1 or pieces.difference(selected):
+                    row_classification["sharedOrExternalAnchorVertexCount"] += 1
+                if seam_factors.get(vertex_id, 1.0) <= 1e-8:
+                    row_classification["preservedSeamZeroFactorVertexCount"] += 1
+                if vertex_id in locked_hem_vertices:
+                    row_classification["hemAnchorVertexCount"] += 1
+
+            trial_scales = {row_key: 1.0}
+            blockers = []
+            for face_index in faces_by_piece[piece_id]:
+                face = mesh["faces"][face_index]
+                trial = []
+                row_keys = []
+                anchor_vertices = []
+                for vertex_id in face:
+                    point = original_vertices[vertex_id]
+                    vertex_row_key = row_key_by_vertex.get(vertex_id)
+                    if vertex_row_key is not None:
+                        row_keys.append(list(vertex_row_key))
+                    if vertex_id in anchors:
+                        anchor_vertices.append(vertex_id)
+                    if selected_panel_by_vertex.get(vertex_id) != piece_id or vertex_id in anchors:
+                        trial.append(point)
+                        continue
+                    scale = trial_scales.get(
+                        vertex_row_key, row_scale_by_key.get(vertex_row_key, 0.0)
+                    )
+                    trial.append(point + displacement_by_vertex[vertex_id] * scale)
+                trial_normal = (trial[1] - trial[0]).cross(trial[2] - trial[0])
+                trial_area = trial_normal.length * 0.5
+                reference_normal = reference_face_normals[face_index]
+                orientation_dot = trial_normal.dot(reference_normal)
+                if (trial_area < reference_face_minimum_areas[face_index]
+                        or orientation_dot <= 0.0):
+                    blockers.append({
+                        "faceIndex": face_index,
+                        "vertexIds": list(face),
+                        "rowKeys": row_keys,
+                        "anchorVertexIds": anchor_vertices,
+                        "referenceAreaM2": reference_normal.length * 0.5,
+                        "trialAreaM2": trial_area,
+                        "trialToReferenceAreaRatio": (
+                            trial_area / (reference_normal.length * 0.5)
+                            if reference_normal.length > 1e-18 else 0.0
+                        ),
+                        "orientationDot": orientation_dot,
+                    })
+                    if len(blockers) >= 8:
+                        break
+            blocked_row_diagnostics[f"{piece_id}:{row_index}"] = {
+                "scale": row_scale_by_key[row_key],
+                "vertexClassification": row_classification,
+                "fullScaleBlockerCountCappedAtEight": len(blockers),
+                "firstBlockingFaces": blockers,
+            }
 
     max_displacement = 0.0
     applied_blend_weights = []
@@ -3821,6 +3896,7 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
             "orientationSearchIterationsByPanel": dict(sorted(orientation_search_iterations_by_piece.items())),
             "coupledAdjacentRowSearchIterationsByPanel": dict(sorted(row_block_search_iterations_by_piece.items())),
             "coupledTripleRowSearchIterationsByPanel": dict(sorted(row_triple_search_iterations_by_piece.items())),
+            "zeroScaleRowConstraintDiagnostics": blocked_row_diagnostics,
             "orientationConstraint": (
                 "coordinate-ascent single-row search followed by bidirectional coupled adjacent-pair and contiguous-triple continuation; lock authored hems/shared boundaries, check the complete connected panel, and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
                 if spec["method"] in {

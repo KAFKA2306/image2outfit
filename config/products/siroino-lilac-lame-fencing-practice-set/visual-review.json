@@ -3,33 +3,33 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewer": "ChatGPT Codex and Astra direct image review",
-  "reviewedRevision": "v216-contiguous-triple-lap-continuation-20261123",
+  "reviewedRevision": "v217-left-row-constraint-diagnostics-20261123",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "ff8ff957b30ebcc9ae4d1a710f31468b82aab09871a835ca50e50ae7a42b19e9",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "1b4fca1935a380c96537d2d347326c15405feb3e35271e66ec45584c681467a9",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "cd8cfa0c4aadd019f54fdfe1e483652b1eb45361fa95d50d46341d745d150337",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "40c196c481a50fcfb81d57d2ebf1cb4f773419c1817700e61b8b8de1e31e84c9",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "b7f4818d939a4d5f4f466ce7a1626e1e6038311f5295e94428e6118ffd207ae5",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "e00e636b83563007a8636f68ad3dac607b45972e8d7d9cebbd4e834e2a34d373",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "fe9c784571a19c66ba0fd302942a193a2f6a07aac74c061df1e7ba9b14965341",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "a7c31a07666218e0aad6ec71939a62e7712408bf1dca8c0dd97715391dced3d7",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "d631c7d037a4e39b87100582121158458765bcd02cb8d62e9f62e1b2c71c178d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "b17ec9cdb9db276a362cf547ef683a5bb20d5387efe5a8548b0ffa87f50b63ef",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "0953906385b638e13d7554598c72523d4363fabb42284cf260cbf6ba649eb5a6"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "52712ab114680fe4a665e1eed66b49ed079653f71ea18d9082551869205a281a",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "ae5dd6eb1c5e9c1410ed2bbeaf83b2fbdfb64db4021913be75313504e99f1ede",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "7ae6df4ce2f498704c058918e11b470da41b0e1a047fbc96dcd468d3767f420a",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "c03287a6471ddfecffb500b6bfed2a416f1160cb373c8dbdf29f8feeb35e6d19",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "5e6f35febfc662745e4e8d56e401677598d448acb1d66d2dbaada1e830d777cd",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "c8a1e8e3718c9bb5e601b7376b3ec120adfb527e1039497af8e732a4d81e7a04",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "311ebba532ec787a400ed882cb820f84748b66344a8e08f069daa16f32b64b10",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "7e0be9696ef2cf5a48705178b33d1bc66f9065006416a8bba82633ff9318b2c4",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "4f0b5cece5e70a8f808ac88605e199d4df3c03d10f07dee3716a0dad703d1870",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "f5feadecdbfb6e11d432bb48aafff4ee5c926316367e261e393e266046fcbf98",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "84b8e06ea2d0e3f8518b27899147e8de342f107e7a333dab4859b75deadf4bfb"
   },
   "findings": [
     {
-      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED",
       "severity": "BLOCKER",
-      "description": "Direct V216 crouch and sit renders show both trouser thighs exposed from hip toward knee; the apron folds below and beside the knees instead of spanning the lap. The standing front edge is continuous across both thighs, but the seated hem fails lap coverage."
+      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED",
+      "description": "Direct V217 crouch and sit renders still show both trouser thighs exposed from hip toward knee; the apron folds below and beside the knees instead of spanning the lap. The standing front edge is continuous across both thighs, but the seated hem fails lap coverage."
     },
     {
-      "code": "APRON_PROFILE_AND_PRONE_FOLD",
       "severity": "BLOCKER",
-      "description": "Both V216 standing profiles show the lower apron bending forward into a projecting flap. The prone render has a second lilac-edged lobe below the main hem, leaving a doubled outline."
+      "code": "APRON_PROFILE_AND_PRONE_FOLD",
+      "description": "Both V217 standing profiles still show the lower apron bending forward into a projecting flap. The prone render still has a second lilac-edged lobe below the main hem, leaving a doubled outline."
     }
   ],
-  "nextAction": "V217 must trace the V216 left-front row -13 zero scale to the exact limiting face and its three vertex row/anchor classifications; report per-row shared-anchor counts and the first orientation/area constraint. V216 coupled three-row continuation changed no row scales (left minimum 0.0; right 0.2046585). Then change the specific blocked deformation, preserving shared seam continuity and full-panel orientation. Directly verify the apron spans both raised thighs in crouch and sit, profile no longer projects, and prone has one readable hem. Fit, production rig/weights, Shape Key response, Unity/VRChat behavior, package and release remain unverified."
+  "nextAction": "V218 must use the V217 blocker evidence to revise the local target vector/face interaction for left-front row -13, including face 9425, 9504, 10132 and 10230. The full-scale trial increases their areas but rotates their normals to near-perpendicular/negative dot; 19 movable row vertices and 4 preserved seam anchors are involved. Change the specific displacement field instead of adding more row continuation or loosening orientation constraints. Verify both-thigh lap coverage in crouch/sit, no forward side flap, and one prone hem. Fit, production rig/weights, Shape Key response, Unity/VRChat behavior, package and release remain unverified."
 }

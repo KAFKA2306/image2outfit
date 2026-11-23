@@ -9082,6 +9082,110 @@
         "overskirt-front-left": 896,
         "overskirt-front-right": 896
       },
+      "zeroScaleRowConstraintDiagnostics": {
+        "overskirt-front-left:-13": {
+          "scale": 0.0,
+          "vertexClassification": {
+            "exclusiveMovableVertexCount": 19,
+            "sharedOrExternalAnchorVertexCount": 4,
+            "preservedSeamZeroFactorVertexCount": 4,
+            "hemAnchorVertexCount": 0
+          },
+          "fullScaleBlockerCountCappedAtEight": 4,
+          "firstBlockingFaces": [
+            {
+              "faceIndex": 9425,
+              "vertexIds": [
+                5490,
+                5152,
+                5259
+              ],
+              "rowKeys": [
+                [
+                  "overskirt-front-left",
+                  -14
+                ],
+                [
+                  "overskirt-front-left",
+                  -13
+                ]
+              ],
+              "anchorVertexIds": [],
+              "referenceAreaM2": 5.962365155208965e-05,
+              "trialAreaM2": 0.00025176314299594533,
+              "trialToReferenceAreaRatio": 4.222538144548138,
+              "orientationDot": -3.3838998714230684e-08
+            },
+            {
+              "faceIndex": 9504,
+              "vertexIds": [
+                5516,
+                5127,
+                5345
+              ],
+              "rowKeys": [
+                [
+                  "overskirt-front-left",
+                  -13
+                ],
+                [
+                  "overskirt-front-left",
+                  -13
+                ],
+                [
+                  "overskirt-front-left",
+                  -14
+                ]
+              ],
+              "anchorVertexIds": [],
+              "referenceAreaM2": 6.53338537534835e-05,
+              "trialAreaM2": 0.00010173396922025455,
+              "trialToReferenceAreaRatio": 1.557140186527421,
+              "orientationDot": -1.1044211656319192e-09
+            },
+            {
+              "faceIndex": 10132,
+              "vertexIds": [
+                295,
+                5441,
+                5259
+              ],
+              "rowKeys": [
+                [
+                  "overskirt-front-left",
+                  -13
+                ]
+              ],
+              "anchorVertexIds": [
+                295
+              ],
+              "referenceAreaM2": 0.0002965604770821707,
+              "trialAreaM2": 0.001298533431534862,
+              "trialToReferenceAreaRatio": 4.378646285948163,
+              "orientationDot": -1.0893759263552738e-06
+            },
+            {
+              "faceIndex": 10230,
+              "vertexIds": [
+                5441,
+                5490,
+                5259
+              ],
+              "rowKeys": [
+                [
+                  "overskirt-front-left",
+                  -13
+                ]
+              ],
+              "anchorVertexIds": [],
+              "referenceAreaM2": 6.288839766992866e-05,
+              "trialAreaM2": 0.00011431197568905236,
+              "trialToReferenceAreaRatio": 1.8176957900727835,
+              "orientationDot": -9.979536974569214e-09
+            }
+          ]
+        }
+      },
       "orientationConstraint": "coordinate-ascent single-row search followed by bidirectional coupled adjacent-pair and contiguous-triple continuation; lock authored hems/shared boundaries, check the complete connected panel, and preserve positive face orientation plus the existing 1e-12 m2 degenerate-triangle floor"
     },
     "poseSpaceTargets": [
@@ -9939,7 +10043,7 @@
   "publicEditableSourceSanitization": {
     "targetAvatarReferenceObjectsRemoved": 2,
     "remainingTargetAvatarReferenceObjects": 0,
-    "privateSimulationSourceSha256": "5dd719641f08304197558685e9f4ef83e616f11bdd3af1e59618fa458ce809f9",
+    "privateSimulationSourceSha256": "04c0e23f5b87c11ccfc2c4eb75bce2db4930da80d47369484fb813d7a3643560",
     "grantsFitAcceptance": false
   },
   "authoredPatternUvEvidence": {
@@ -22260,7 +22364,7 @@
     "grantsVisualAcceptance": false,
     "evidenceBoundary": "V18 moves the surface-projected tab upward to clear the skirt waistband visually and increases its body-normal offset and buckle relief to their declared bounded prototype limits. Attachment, occlusion, collision, weights, fit, and appearance remain unverified."
   },
-  "sourceBlendSha256": "b61afd52680a3fde5bb48a5ce0ec9194532aa830ab4d39678fe01fe6cfe4862c",
+  "sourceBlendSha256": "53403ecc38503fb3414097d5f6e1e4f48b24bbdc9ddcac13e2198bb053233b15",
   "sewnMeshSha256": "95df28f6637ee6900dfe7f76501ceb5840eb3bdc77d79631ebf8d720ca6c00da",
   "microdegenerateTriangleCleanup": {
     "method": "weld-closest-vertex-pair-on-subpixel-triangle",
@@ -570084,7 +570188,7 @@
     },
     "lockedCanonicalBoundaryVertexCount": 1366,
     "maximumVertexDisplacementM": 0.0072912905512926805,
-    "meanVertexDisplacementM": 0.0012735115780066735,
+    "meanVertexDisplacementM": 0.001273511578006672,
     "orientationPreservingDisplacementScale": 0.0625,
     "orientationCheckedTriangleCount": 25051,
     "normalContinuity": {

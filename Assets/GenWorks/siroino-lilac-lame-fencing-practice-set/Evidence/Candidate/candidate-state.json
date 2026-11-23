@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v216-contiguous-triple-lap-continuation-20261123",
+  "revision": "v217-left-row-constraint-diagnostics-20261123",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -19,14 +19,14 @@
   },
   "blockingFindings": [
     {
-      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED",
       "severity": "BLOCKER",
-      "description": "Direct V216 crouch and sit renders show both trouser thighs exposed from hip toward knee; the apron folds below and beside the knees instead of spanning the lap. The standing front edge is continuous across both thighs, but the seated hem fails lap coverage."
+      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED",
+      "description": "Direct V217 crouch and sit renders still show both trouser thighs exposed from hip toward knee; the apron folds below and beside the knees instead of spanning the lap. The standing front edge is continuous across both thighs, but the seated hem fails lap coverage."
     },
     {
-      "code": "APRON_PROFILE_AND_PRONE_FOLD",
       "severity": "BLOCKER",
-      "description": "Both V216 standing profiles show the lower apron bending forward into a projecting flap. The prone render has a second lilac-edged lobe below the main hem, leaving a doubled outline."
+      "code": "APRON_PROFILE_AND_PRONE_FOLD",
+      "description": "Both V217 standing profiles still show the lower apron bending forward into a projecting flap. The prone render still has a second lilac-edged lobe below the main hem, leaving a doubled outline."
     }
   ],
   "failedGeometryChecks": [
