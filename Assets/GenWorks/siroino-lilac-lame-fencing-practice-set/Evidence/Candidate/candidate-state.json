@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "status": "REJECTED",
-  "revision": "v211-sit-crouch-apron-support-20261123",
+  "revision": "v212-forward-apron-continuous-hem-20261123",
   "gates": {
     "blender": "FAIL",
     "editableSource": "UNVERIFIED",
@@ -20,13 +20,13 @@
   "blockingFindings": [
     {
       "severity": "BLOCKER",
-      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED_FROM_SUPPORT_LAYER",
-      "description": "V211's extended body-surface support now covers the gray thigh areas almost to both knees in sit and crouch. The separate shorts-like edges do not join into the lilac overskirt hem: the outer hem still folds beside and behind the knees and leaves the center of the lap without a continuous edge. Keep the longer support layer and carry a shaped front panel from the waist across both thighs while retaining one connected outer hem."
+      "description": "Direct review of V212 sit and crouch shows the inner layer covering both thighs nearly to the knees, but the outer lilac apron hem still leaves the center of the lap uncovered and forms sharp points beside and between the knees. Reshape the authored front panels so one continuous edged lap spans the flexed thighs.",
+      "code": "POSED_LAP_OUTER_HEM_DISCONNECTED"
     },
     {
       "severity": "BLOCKER",
-      "code": "PRONE_FRONT_FABRIC_BUNCHING_AND_STEPPED_PROFILE",
-      "description": "The prone render still stacks several folds beneath the hips. Both standing profiles retain a stepped front outline between the hip and hem. Shape and inspect the front transition after the lap-spanning panel is added."
+      "description": "V212 left and right profiles show the extended apron projecting well ahead of the knees. The prone view folds it back beneath the hips into a long flap with overlapping creases. Reduce forward projection and control the panel transition while keeping clearance and hem continuity.",
+      "code": "APRON_PROFILE_PROJECTION_AND_PRONE_BUNCHING"
     }
   ],
   "failedGeometryChecks": [

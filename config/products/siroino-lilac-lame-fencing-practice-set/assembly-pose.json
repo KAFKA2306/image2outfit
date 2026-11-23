@@ -9614,15 +9614,15 @@
         "overskirt-front-left",
         "overskirt-front-right"
       ],
-      "additionalExtensionM": 0.04,
-      "forwardProjectionM": 0.0,
+      "additionalExtensionM": 0.1,
+      "forwardProjectionM": 0.04,
       "fullExtensionHalfAngleRadians": 0.65,
       "zeroExtensionHalfAngleRadians": 1.3,
       "axisOriginBlenderXYM": [
         0,
         -0.03788188099861145
       ],
-      "evidenceBoundary": "V201 keeps the V200 front center at its prior 170 mm total neutral drop while increasing the shared circumference drop to 130 mm; front-only differential is reduced from 100 to 40 mm and no forward translation is applied. This is a pose/side-silhouette hypothesis only; coverage and appearance require direct review."
+      "evidenceBoundary": "V212 keeps the V211 thigh support shell and extends only the authored center-front apron by 100 mm with a 40 mm forward projection, smoothly fading to the original length before the side panels. The 130 mm shared circumference drop and fixed waist remain unchanged; total declared center-front extension is 230 mm under the existing 240 mm bound. The left/right center-front seam remains matched and the outer hem stays connected. This is prototype geometry only; coverage and appearance require direct review."
     },
   "evidenceBoundary": "V202 retains the V201 continuous authored hem, side/balance geometry and two broad box-pleat cycles per panel. Longitudinal refinement requests 12 rows so the existing authored 10 mm skirt rows can satisfy the spacing-density check without redundant global Z cuts through pose-deformed panels. Geometry and visible folds remain prototype evidence only; no motion, fit, or appearance acceptance is implied.",
     "seamContinuationPieceIds": [
@@ -9680,6 +9680,7 @@
     "preservedSeamFadeDistanceM": 0.05,
     "fadeStartZM": 0.78,
     "fullBlendZM": 0.58,
+    "minimumAttachmentZM": 0.58,
     "normalClearanceM": 0.012,
     "maximumProjectionDistanceM": 0.16,
     "maximumBlendWeight": 0.9,
@@ -9688,11 +9689,11 @@
     "rightThighBone": "UpperLeg_R",
     "bodyMeshNamePrefix": "SiroinoSotai_PC",
     "maximumFrontYM": 0.04,
-    "evidenceBoundary": "V210's coupled row search reproduced V208/V209 safe scales and backtracking counts. V211 leaves that solver, authored skirt panels, front-panel weights and shared Cloth unchanged. It extends the existing target-body surface-derived thigh support shell to a 0.46 m hem while preserving source-body skin weights and the 8 mm offset. This close-fitting support-layer hypothesis does not prove fit, appearance or release.",
+    "evidenceBoundary": "V212 preserves V211's 0.46 m target-body surface-derived thigh support shell and applies pose-space thigh attachment only from Z 0.58–0.78 m. The 100 mm front-only apron extension below the original 0.58 m hem stays authored and sewn so it can drape across the lap instead of being projected onto each thigh; support coverage and appearance require direct rendered review.",
     "patternRowWidthM": 0.01
   },
   "poseConstrainedApronGeometry": null,
-  "designRevision": "v211-sit-crouch-apron-support-20261123",
+  "designRevision": "v212-forward-apron-continuous-hem-20261123",
   "shortsPatternSource": {
     "method": "measured-neutral-per-leg-sections-plus-front-back-pattern-hypotheses-v1",
     "sourceEvidencePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/thigh-sections-20261011T1023.json",

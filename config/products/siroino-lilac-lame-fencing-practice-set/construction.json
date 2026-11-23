@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "profile": "panel-sewn",
-  "target": "V211 stops tuning the row-displacement solver after V208-V210 produced identical safe scales and backtracking counts, and rejects the sit/crouch inverse-skin apron path after it violated the unchanged sit triangle-orientation bound. Reshape only the existing source-body thigh support shell by lowering its hem from 0.56 m to 0.46 m, retaining the existing body weights, 8 mm offset, clipped triangle topology and UV NOT_CREATED status. Keep the skirt panels, waistband attachment, continuous outer hem and shared Cloth fixed. Compare the same five views and six poses. Prototype only; this does not establish fit or visual acceptance.",
-  "designRevision": "v211-sit-crouch-apron-support-20261123",
+  "target": "V212 keeps the V211 body-surface thigh support shell and reshapes only the existing authored front-apron extension on both overskirt-front panels. Increase the central added length from 40 mm to 100 mm and forward projection from 0 mm to 40 mm, fading to zero at the same side angles; combined extension remains 230 mm under the existing 240 mm construction bound. Preserve the fixed waist, matched left/right center-front seam, continuous sewn hem and shared Cloth. Compare the same five views and six poses. Prototype only; this does not establish fit or visual acceptance.",
+  "designRevision": "v212-forward-apron-continuous-hem-20261123",
   "panels": [
     "jacket-front-left",
     "jacket-overlap-front",
@@ -192,14 +192,14 @@
         "sourceObject": "SiroinoSotai_PC",
         "armatureObject": "Armature",
         "method": "nearest-target-body-triangle-barycentric-authored-weights",
-        "maximumSurfaceDistanceM": 0.16,
+        "maximumSurfaceDistanceM": 0.24,
         "requiredBoneGroups": [
           "Hips",
           "UpperLeg_L",
           "UpperLeg_R"
         ],
-        "reason": "V206 armature-only front panels still failed thigh coverage and broke front/rear hem continuity. V207 isolates a panel-coherent response path: transfer the same measured target-body rig weights to all four connected overskirt panels before applying Cloth, then simulate them together.",
-        "evidenceBoundary": "This disposable prototype transfers exact imported Hips/UpperLeg_L/UpperLeg_R weights over nearest target-body triangles for all four overskirt panels before Cloth. A pre-solve distance audit measured rear panels at maximum 0.101044 m and front panels at maximum 0.154153 m; retain a 0.16 m runtime hard cap and fail beyond it. Cloth remains required for the unified component. This does not prove front coverage, seam continuity, fit, collision safety, motion acceptance, appearance, or release readiness."
+        "reason": "V212 extends only the sewn front apron below the prior skirt hem. The resulting farthest skirt vertex exceeds the earlier 0.16 m prototype mapping cap; permit up to 0.24 m for this trial and retain measured distance evidence for direct review.",
+        "evidenceBoundary": "This disposable prototype transfers imported Hips/UpperLeg_L/UpperLeg_R weights over nearest target-body triangles for all four overskirt panels before Cloth. V212 raises the explicit per-component trial cap from 0.16 m to 0.24 m after the actual extended-apron build measured one vertex at 0.205656 m; the simulation report records the measured maximum and mean. This does not prove that distant weights deform well, nor front coverage, seam continuity, fit, collision safety, motion acceptance, appearance, or release readiness."
       }
     },
     "prototypeSharedSeamAnchor": {

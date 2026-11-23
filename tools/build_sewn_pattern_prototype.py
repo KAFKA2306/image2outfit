@@ -3528,13 +3528,20 @@ def place_skirt_front_on_thigh_surfaces(mesh, body_objects, pose, target_path, p
 
     row_members = defaultdict(list)
     row_displacement_samples = defaultdict(list)
+    minimum_attachment_z = spec.get("minimumAttachmentZM", full_blend)
+    if (not isinstance(minimum_attachment_z, (int, float))
+            or isinstance(minimum_attachment_z, bool)
+            or not math.isfinite(minimum_attachment_z)
+            or minimum_attachment_z > full_blend):
+        raise ValueError("Thigh attachment minimum Z must be finite and at/below full-blend Z")
     for index, point_values in enumerate(mesh["vertices"]):
         if index in locked_hem_vertices:
             continue
         if not owners[index].intersection(selected):
             continue
         point = Vector(point_values)
-        if point.z >= fade_start or point.y >= spec["maximumFrontYM"]:
+        if (point.z >= fade_start or point.z < minimum_attachment_z
+                or point.y >= spec["maximumFrontYM"]):
             continue
         factor = max(0.0, min(1.0, (fade_start - point.z) / (fade_start - full_blend)))
         factor = factor * factor * (3.0 - 2.0 * factor)
