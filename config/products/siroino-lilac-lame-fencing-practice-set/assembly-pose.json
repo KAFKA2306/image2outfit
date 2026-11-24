@@ -9066,8 +9066,8 @@
       "maximumProjectionDistanceM": 0.085,
       "outerPieceId": "__none__",
       "outerLayerOffsetM": 0,
-      "maximumBlendWeight": 0.85,
-      "evidenceBoundary": "Prototype shorts tracking hypothesis based on prior weighted mesh diagnostics. The first current sewn-mesh wrap vertex measured 79.170711 mm from the evaluated target surface, exceeding the former 70 mm prototype bound by 9.170711 mm. The prototype-only bound is set to 85 mm for this build experiment; apply bounded nearest-body projection to the four rise panels and continuous inner-thigh wrap with a 4 mm normal offset. Shared sewn vertices move once. This local projection bound is not an appearance, fit, clearance, opacity, pose, strain, Shape Key, or runtime acceptance threshold."
+      "maximumBlendWeight": 0.95,
+      "evidenceBoundary": "Prototype shorts tracking hypothesis based on the current weighted mesh: the continuous inner-thigh wrap has 264 selected vertices, a mean neutral body-surface distance of 24.04 mm, a 57.42 mm 95th percentile, and a 79.17 mm maximum. Retain the 85 mm hard projection bound and 4 mm normal offset, but raise the bounded projection blend from 0.85 to 0.95 to reduce residual displacement on these measured vertices while preserving shared sewn vertices as single owners. The unchanged collapse rejection and seam checks remain authoritative. This is a local placement hypothesis, not an appearance, fit, clearance, opacity, pose, strain, Shape Key, or runtime acceptance threshold."
     }
   },
   "shortsOrientationEvidence": {
