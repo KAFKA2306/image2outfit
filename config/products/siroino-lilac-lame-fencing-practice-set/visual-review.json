@@ -7,23 +7,23 @@
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "e27cb87a2bc208e0518932ece8e09f32b57dded1144b4c8c07464ad29e6bec9d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "c64febdb84a3dee0b7ac23d171d345a3978a272e4396cf516634c10374128ff3",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "179ae47aa3fe9fc0b5cc0a795367aa61edff6e870387662e9d78a9f891c97b40",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "c6233bbc87d47478d2b7a2bd3b1df7f2de0437fa905c9f854733a5b590da9e45",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "394f764a178587cdef3bff671448744f1eb075872b6264a221cd955fb26211a0",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "6069ee8fce840af87cca2c81d4018851f5faffdbec0c6ae338d2649860ecbcef",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "e9a7d6436b2353988f46c9a953d7e98e066bd55ed49557a23ccc6465ed8cb57d",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "10243d6e8ea8dcd70bf76a137091229f1dfb7b7b5db5fa888d88119c87a4e45b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "412ae5877e4da8e6de1865f3995787540b0de901945b075f19f72c366dce8a2c",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "380333c53850615d6ca43ae376934b8d01428a2966fa79341ea509b0b61a14d5",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "6843180b4e9a289d0b5c619b9427ddb4b1a018e620fd5e62d5716437038b3544"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "927196a60e6c8008183dc8a96757fbf9147bf1dba8bf9cb669dbe0cf239209d7",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "55e36179960a77409fc654abd6ec7b294e9196d6738de7ce085e1976ff2a998b",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "5833c92118ad6b5f2dd1f2b67441664d1fbd95e27a53ee9ab4c841d97ebc6563",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "a985b1934d7726fcf8cd3b2fec713761e65fd7c9ae1ae3a106763e0136005f04",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "25bfc2a21baa00968d569c2b413861cd795e0027ec05aa1221f734106f24178c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "3dfdb68dcb83f559a8b0bf60fe31843175306619523447556e890a1b0559c925",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "074e4005732a7465e012d6a2ab8115a6e42c9e79cadcee81f097ccb31a82f351",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "b360658a142f73bf7041aefc80eb6df769859095a763cf4917379e26e8ae1946",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "91ffd10dd6ace7231813021ce5b074ef7f89dfe6458ca81846661d110482255c",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "9f9e52318a43eb46b0f97d5e7e21a56f3ffbdaf8d9ebcacbf240d97c6272f741",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "a3f2432b5cdce507dc6d99089b5f9c7251d6be4ac11d46fd33cc4834cb22fc6c"
   },
   "findings": [
     {
       "severity": "BLOCKER",
       "code": "SHORTS_POSE_COVERAGE",
-      "description": "Direct inspection of all eleven latest renders after the four-panel pelvis-blend transition: sit and crouch still expose gray avatar surfaces through/around the shorts; crouch retains a triangular inner-thigh coverage opening. The placement hypothesis did not solve coverage. Redesign connected seat/gusset and thigh wrap; no fit acceptance."
+      "description": "Direct inspection of all eleven current renders after a 50 mm inner center-rise extension on all four shorts panels: sit and crouch still expose gray avatar surfaces through/around the shorts and crouch retains a triangular inner-thigh opening. The geometry trial did not close coverage. Revise the connected seat with an explicit gusset and continuous thigh wrap; no fit, opacity or shape-key acceptance."
     },
     {
       "severity": "BLOCKER",
@@ -37,7 +37,7 @@
     }
   ],
   "sourceEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/render-evidence.json",
-  "nextAction": "Keep the prototype REJECTED. The current four-panel pelvis-blend transition did not close sit/crouch coverage gaps. Redesign the shorts seat as connected geometry with a gusset and continuous thigh wrap, then manufacture and inspect all eleven current views. Overskirt pose collapse and jacket sleeve/underarm surface defects also remain. Fit, Shape Key, runtime and release are still unverified.",
+  "nextAction": "Keep the prototype REJECTED. The 50 mm inner center-rise trial on the four matched shorts panels did not close sit/crouch coverage gaps. Redraft the seat as connected geometry with an explicit gusset and continuous thigh wrap; then rerun manufacture and inspect all eleven views. The overskirt still lacks clear pleat shape and collapses behind/between legs; the jacket sleeves and underarms remain faceted/wrinkled. Fit, Shape Key, Unity/VRChat runtime and release are still unverified.",
   "verifiedPoseCorrection": {
     "pose": "arms-up",
     "method": "imported bone local Y mapped to world +Z",
@@ -3430,30 +3430,30 @@
     "grantsFitAcceptance": false
   },
   "shortsCoverageReview": {
-    "method": "direct-image-inspection-after-four-panel-pelvis-blend-transition",
+    "method": "direct-image-inspection-after-four-panel-center-rise-extension-50mm",
     "patternDraftPath": "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json",
-    "patternDraftSha256": "3b10f385e97e4e3c4da506d075ca3187ee501235e9fcb29916bccc139871d97a",
+    "patternDraftSha256": "147bf88f35c1cfaf72957cc54d4681f0894db09724f931fe4b606c81f58d267e",
     "inspectedCurrentRenderCount": 11,
     "result": "REJECT",
-    "observation": "Directly inspected all eleven latest views after the four-panel pelvis transition. Crouch retains a triangular opening over the flexed inner thigh; sit and crouch still expose gray avatar surfaces through and around the shorts. The placement hypothesis did not establish coverage. The overskirt still collapses into broad sheets behind/between the legs; jacket sleeves and underarms remain visibly faceted/wrinkled. No fit or appearance acceptance.",
+    "observation": "Directly inspected all eleven current views after a 50 mm inner center-rise extension on all four shorts panels. Sit and crouch still expose gray avatar surfaces through and around the shorts, and crouch retains a triangular opening over the flexed inner thigh; the geometry trial did not close coverage. Front, back and side views also show weak pleat definition and an overlong, tube-like lower layer. Pose renders retain broad folded sheets behind/between the legs and faceted/wrinkled jacket sleeves and underarms. No fit, opacity, shape-key, motion or appearance acceptance.",
     "grantsFitAcceptance": false,
     "grantsVisualAcceptance": false,
     "inspectedImages": {
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "e27cb87a2bc208e0518932ece8e09f32b57dded1144b4c8c07464ad29e6bec9d",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "c64febdb84a3dee0b7ac23d171d345a3978a272e4396cf516634c10374128ff3",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "179ae47aa3fe9fc0b5cc0a795367aa61edff6e870387662e9d78a9f891c97b40",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "c6233bbc87d47478d2b7a2bd3b1df7f2de0437fa905c9f854733a5b590da9e45",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "394f764a178587cdef3bff671448744f1eb075872b6264a221cd955fb26211a0",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "6069ee8fce840af87cca2c81d4018851f5faffdbec0c6ae338d2649860ecbcef",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "e9a7d6436b2353988f46c9a953d7e98e066bd55ed49557a23ccc6465ed8cb57d",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "10243d6e8ea8dcd70bf76a137091229f1dfb7b7b5db5fa888d88119c87a4e45b",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "412ae5877e4da8e6de1865f3995787540b0de901945b075f19f72c366dce8a2c",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "380333c53850615d6ca43ae376934b8d01428a2966fa79341ea509b0b61a14d5",
-      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "6843180b4e9a289d0b5c619b9427ddb4b1a018e620fd5e62d5716437038b3544"
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "927196a60e6c8008183dc8a96757fbf9147bf1dba8bf9cb669dbe0cf239209d7",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "55e36179960a77409fc654abd6ec7b294e9196d6738de7ce085e1976ff2a998b",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "5833c92118ad6b5f2dd1f2b67441664d1fbd95e27a53ee9ab4c841d97ebc6563",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "a985b1934d7726fcf8cd3b2fec713761e65fd7c9ae1ae3a106763e0136005f04",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "25bfc2a21baa00968d569c2b413861cd795e0027ec05aa1221f734106f24178c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "3dfdb68dcb83f559a8b0bf60fe31843175306619523447556e890a1b0559c925",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "074e4005732a7465e012d6a2ab8115a6e42c9e79cadcee81f097ccb31a82f351",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "b360658a142f73bf7041aefc80eb6df769859095a763cf4917379e26e8ae1946",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "91ffd10dd6ace7231813021ce5b074ef7f89dfe6458ca81846661d110482255c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "9f9e52318a43eb46b0f97d5e7e21a56f3ffbdaf8d9ebcacbf240d97c6272f741",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "a3f2432b5cdce507dc6d99089b5f9c7251d6be4ac11d46fd33cc4834cb22fc6c"
     },
     "assemblyPoseSha256": "da2c6ae61e75fc2b104e45d891a99c1b8009545a39ec57243eed35ea75d718b8",
     "clothStagePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/simulate-cloth.json",
-    "clothStageSha256": "7daf54c85daeacd856dc1622292abfa75352d1ed17f536847c5b8a9c470331fe"
+    "clothStageSha256": "c21c901f0a01aa870498e6212d66bd6e5b86feef9a131d53b861d73d093b8477"
   },
   "shortsContourRedraftReview": {
     "method": "direct-inspection-of-current-render-set",
@@ -3548,6 +3548,63 @@
     },
     "result": "REJECT",
     "observation": "Directly inspected all eleven latest views after the four-panel pelvis transition. Crouch retains a triangular opening over the flexed inner thigh; sit and crouch still expose gray avatar surfaces through and around the shorts. The placement hypothesis did not establish coverage. The overskirt still collapses into broad sheets behind/between the legs; jacket sleeves and underarms remain visibly faceted/wrinkled. No fit or appearance acceptance.",
+    "grantsFitAcceptance": false,
+    "grantsVisualAcceptance": false
+  }
+,
+  "shortsCenterRiseCoverageTrial": {
+    "method": "four-panel-inner-center-rise-extension-50mm",
+    "patternDraftPath": "config/products/siroino-lilac-lame-fencing-practice-set/pattern-draft.json",
+    "patternDraftSha256": "147bf88f35c1cfaf72957cc54d4681f0894db09724f931fe4b606c81f58d267e",
+    "inputPieceIds": [
+      "shorts-front-left",
+      "shorts-front-right",
+      "shorts-back-left",
+      "shorts-back-right"
+    ],
+    "boundaryChange": {
+      "vertexIndex9Before": [
+        0.04,
+        0.035
+      ],
+      "vertexIndex9After": [
+        0.04,
+        -0.015
+      ],
+      "vertexIndex10Before": [
+        0.02,
+        -0.04
+      ],
+      "vertexIndex10After": [
+        0.02,
+        -0.09
+      ],
+      "matchedPanelSeamsPreserved": true,
+      "separateGussetPanelCreated": false
+    },
+    "geometryAndEvidence": {
+      "buildStagePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/build-blender.json",
+      "buildStageSha256": "2146bcd05eb188c2f74a3034c71c12e8bce39950bafa80d0407c6e0237deb87a",
+      "clothStagePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/simulate-cloth.json",
+      "clothStageSha256": "c21c901f0a01aa870498e6212d66bd6e5b86feef9a131d53b861d73d093b8477",
+      "renderStagePath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/render-evidence.json",
+      "renderStageSha256": "a3c57e4dc3feae9ff84367831b7256d2e0e8af112912cf7b5f506bd75356ccb6"
+    },
+    "inspectedImages": {
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "927196a60e6c8008183dc8a96757fbf9147bf1dba8bf9cb669dbe0cf239209d7",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "55e36179960a77409fc654abd6ec7b294e9196d6738de7ce085e1976ff2a998b",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "5833c92118ad6b5f2dd1f2b67441664d1fbd95e27a53ee9ab4c841d97ebc6563",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "a985b1934d7726fcf8cd3b2fec713761e65fd7c9ae1ae3a106763e0136005f04",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "25bfc2a21baa00968d569c2b413861cd795e0027ec05aa1221f734106f24178c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "3dfdb68dcb83f559a8b0bf60fe31843175306619523447556e890a1b0559c925",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "074e4005732a7465e012d6a2ab8115a6e42c9e79cadcee81f097ccb31a82f351",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "b360658a142f73bf7041aefc80eb6df769859095a763cf4917379e26e8ae1946",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "91ffd10dd6ace7231813021ce5b074ef7f89dfe6458ca81846661d110482255c",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "9f9e52318a43eb46b0f97d5e7e21a56f3ffbdaf8d9ebcacbf240d97c6272f741",
+      "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "a3f2432b5cdce507dc6d99089b5f9c7251d6be4ac11d46fd33cc4834cb22fc6c"
+    },
+    "result": "REJECT",
+    "observation": "Directly inspected all eleven current renders. The 50 mm center-rise extension did not close sit/crouch inner-thigh openings or hide avatar surfaces. The skirt retains broad pose folds; jacket sleeves/underarms remain faceted. This experiment is a pattern geometry trial only, not a gusset or fit acceptance.",
     "grantsFitAcceptance": false,
     "grantsVisualAcceptance": false
   }
