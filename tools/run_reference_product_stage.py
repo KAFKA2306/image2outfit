@@ -2504,6 +2504,12 @@ def stage_finalize(
     manifest["state"] = status
     manifest["completionGates"] = candidate["gates"]
     manifest["candidateState"] = relative(candidate_path)
+    outputs = manifest.get("outputs")
+    if not isinstance(outputs, dict):
+        outputs = {}
+    outputs["blend"] = str(job["blendPath"])
+    outputs["fbx"] = str(job["fbxAssetPath"])
+    manifest["outputs"] = outputs
     write_json(manifest_path, manifest)
     emit(
         result,
