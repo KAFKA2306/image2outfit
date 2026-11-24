@@ -3,51 +3,41 @@
   "productId": "siroino-lilac-lame-fencing-practice-set",
   "reviewMethod": "direct-image-inspection",
   "reviewedRevision": "v1-lilac-lame-fencing-practice-generated-reference-20261004",
-  "reviewer": "chatgpt:codex",
+  "reviewer": "Codex direct image inspection",
   "status": "REJECTED",
   "decision": "REJECT",
   "inspectedImages": {
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "6dcb4be12e489cde8bfbb461789c42bc9bdeca0c54573cf4f6217beffcdf91cd",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "9d71dc25bf6706dfb347f0c29b58b8d956938dda90ce6e68da5c838f6c7e69aa",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "b4df6feb98574fc2ef874e834fda7830bf68cae83a1a0e883736f7e13ded53aa",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "1913779f2b182b715aa81e3621829a00aeb9ce743f1c97b66e0f97a6ef8e4b28",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "ebed887134308cebeb1b02fb205387414afb8dea45472acc0b2a50c2155cf58b",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "268627d221563fcb9266e7ae16c6dce5ead6867207098671d717e605a5c8beef",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "0c92e3445cf7866c3d747738c0a32f4a2d0aa9e40815919253f57bd35cb0faff",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "16d8b8abeb3e58069860d3cc096b30ffcebaf3511b475d7c2039dd35fd7df9fe",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "4949a1c12b89dc47afb7820b1286248b4da69230d3720a002682aff5b2cc7bbc",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "3e5137ecad5a08959f38520a338e3e575a57a810f7031075abf47910a81f6164",
-    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "93725aa9cea9f4496d6b263f4c3eaa38d9288a8961d10bfc91b456cbd58d927c"
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/front.png": "c158ad4fc509629a58964dc82631f6556b2958d69209dc690ca60b0575b6f9a1",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/back.png": "d89804ebb90e271538767cfeaa814e200b809d1cf0f4ab368631e7bb6b68a84e",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/left.png": "0f40007c09b643c7faf0fc0bbda3ce9962fdac2844017cb1ac0e7643ff70b8ad",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/right.png": "558575d127f275bfeb9ddc730073e0547ed0897484c50aa2dd3b6ed54f1d32e6",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/three-quarter.png": "c8ca7a0b4172aeaebb75f8e151803bd28d83ee68824cc42740411005597c1fc1",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/neutral.png": "bd0f9b95b95a3957cce8008bcba71f524b1345663f1ef48a9618286cff7cbaa8",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arms-up.png": "3b977dc444d9e0f0238a66de9e11570bd2e51ba6e0b53f0e1509c925e08faebf",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/arm-cross.png": "99cd259decc0fcb0df9ee495e38992b738d8f73baeaad086699756c212c20145",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/crouch.png": "450111145c77897a0dfd505768168975058ac2ac6b111ca03aafd412237b90a3",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/sit.png": "6e32701afa3042fe783ffc9624515a98c8c1b333be313c8a9e5525e6f176f939",
+    "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Previews/Poses/prone.png": "1c8c2e882dabe5619d3dabef9af46299303ad8a0aab75f3d101a02e2e102953d"
   },
   "findings": [
     {
-      "code": "SLEEVE_SURFACE_QUALITY",
       "severity": "BLOCKER",
-      "description": "Direct inspection of current front/back/side/three-quarter views and arm-cross/arms-up/neutral poses: both sleeves show severe irregular faceting and bunching around upper arm/underarm; surface quality and motion remain unacceptable."
+      "code": "SHORTS_POSE_COVERAGE",
+      "description": "Direct inspection of all 11 current renders: the shorts still read as blunt thigh panels; sit and crouch expose gray avatar surfaces through and around the garment, with coverage breaks at both flexed thighs. The bounded Neutral-surface projection did not verify coverage. Redesign a connected seat/gusset and thigh wrap; no fit acceptance."
     },
     {
-      "code": "SKIRT_AND_SHORTS_FIT",
       "severity": "BLOCKER",
-      "description": "The new 0.48–0.74 m four-panel shorts received an ipsilateral-thigh fade prototype weight profile; current sit and crouch renders still expose substantial avatar thigh. Standing skirt retains irregular folds and protruding side hem points. Coverage and deformation remain rejected."
+      "code": "OVERSKIRT_POSE_COLLAPSE",
+      "description": "Direct inspection of current front, side, rear, sit and crouch renders: standing folds remain weak and the rear/side hem has abrupt angular steps; sitting and crouching collapse the overskirt into broad folded sheets behind and between the legs. Correct pattern contour and cloth response; no appearance acceptance."
     },
     {
-      "code": "COLLAR_AND_FRONT_CLOSURE",
       "severity": "BLOCKER",
-      "description": "The wider lilac diagonal plastron and four gold closures are now visibly distinct in the front renders. Closure retention is not verified, the collar remains an unfinished narrow neck tube, and the head/neck junction has not been accepted."
-    },
-    {
-      "code": "ARMS_UP_GARMENT_DEFORMATION",
-      "severity": "BLOCKER",
-      "description": "Current arms-up and arm-cross images retain severe sleeve folds/bunching and the tall unresolved collar; clearance, strain and fit remain unverified."
-    },
-    {
-      "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
-      "severity": "BLOCKER",
-      "description": "These are Blender prototype images only. Shape Key fit, continuous penetration, accepted weight deformation, Unity import and VRChat Build & Test remain unverified."
+      "code": "JACKET_SURFACE_QUALITY",
+      "description": "Direct inspection of current front, side, arms-up and arm-cross renders: shoulder and sleeve-cap joins remain lumpy, sleeve surfaces show heavy faceting/wrinkles, and underarm deformation remains uneven. Correct panel joins and surface flow before appearance acceptance."
     }
   ],
-  "sourceEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/reports/weighted-render.json",
-  "nextAction": "Keep this candidate REJECTED. Redesign shorts with a gusset and fitted seat/thigh panels; separately resolve sleeve faceting, skirt side artifacts/folds and collar/neck transition. Rebuild through the canonical workflow, directly inspect all 11 latest image hashes, and retain REJECT until visible blockers are resolved. Do not claim fit, Shape Key, Unity, VRChat or release acceptance.",
+  "sourceEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/render-evidence.json",
+  "nextAction": "Keep the prototype REJECTED. Current neutral and posed renders still show shorts coverage defects; sitting and crouching expose the avatar through the shorts. Rework the shorts seat/gusset as connected geometry. The skirt remains sheet-like with angular collapse in sitting/crouching, while jacket sleeve and underarm surfaces remain visibly lumpy. Rebuild and directly inspect all 11 newly rendered views. Fit, Shape Key, Unity, VRChat and release remain unverified.",
   "verifiedPoseCorrection": {
     "pose": "arms-up",
     "method": "imported bone local Y mapped to world +Z",

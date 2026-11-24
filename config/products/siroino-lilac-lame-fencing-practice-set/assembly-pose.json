@@ -9033,7 +9033,28 @@
     "preserveSharedPieceIds": [
       "stand-collar"
     ],
-    "preservedSeamFadeDistanceM": 0.04
+    "preservedSeamFadeDistanceM": 0.04,
+    "shortsSurfacePlacement": {
+      "method": "evaluated-body-nearest-surface-blended-placement",
+      "pieceIds": [
+        "shorts-front-left",
+        "shorts-front-right",
+        "shorts-back-left",
+        "shorts-back-right"
+      ],
+      "bodyMeshNamePrefix": "SiroinoSotai_PC",
+      "fadeStartZM": 0.38,
+      "fullWeightStartZM": 0.47,
+      "maximumZM": 0.7396,
+      "fullWeightAbsXM": 0.15,
+      "fadeEndAbsXM": 0.28,
+      "normalClearanceM": 0.004,
+      "maximumProjectionDistanceM": 0.07,
+      "outerPieceId": "__none__",
+      "outerLayerOffsetM": 0.0,
+      "maximumBlendWeight": 0.85,
+      "evidenceBoundary": "Prototype shorts tracking trial based on the prior current-source skin export: four shorts panels averaged 20 mm nearest-body distance and peaked at 58.2 mm. Move the sewn panels toward the evaluated Neutral target surface with a bounded 0.85 blend and 4 mm normal offset. Shared sewn vertices remain shared and receive one displacement; this does not validate fit, opacity, pose coverage, penetration, strain, Shape Keys or runtime."
+    }
   },
   "shortsOrientationEvidence": {
     "frontAxis": "GarmentCode +Z = Blender -Y",

@@ -664,8 +664,10 @@ def place_on_measured_contours(mesh, body_objects, pose, target_path, *, angular
     return {"applied":True,"targetSourceSha256":digest(target_path),"bodyObject":body.name,"configuration":spec,"sections":sections,"placedVertexCount":len(vertex_ids),"heightBlendSkippedVertexCount":height_blend_skipped,"angularSourceVerticesSha256":hashlib.sha256(json.dumps(angular_source_vertices,separators=(",",":")).encode()).hexdigest() if angular_source_vertices is not None else None,"layerOffsetVertexCount":layered,"sharedSeamVerticesLayerOffsetM":0,"heightExtrapolatedVertexCount":extrapolated,"beforeVerticesSha256":hashlib.sha256(before.encode()).hexdigest(),"afterVerticesSha256":hashlib.sha256(json.dumps(mesh["vertices"],separators=(",",":")).encode()).hexdigest(),"bodyFacesCopied":False,"grantsFitAcceptance":False}
 
 
-def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
-    """Fit original upper garment vertices to the evaluated target surface.
+def place_on_measured_upper_surface(
+    mesh, body_objects, pose, target_path, *, placement_key="upperSurfacePlacement"
+):
+    """Move selected original garment vertices toward evaluated body surface.
 
     Shared sewn vertices move once. No body topology is copied and no garment
     faces are removed when a projection fails or collapses a triangle.
@@ -675,13 +677,18 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
     from mathutils import Vector
     from mathutils.bvhtree import BVHTree
 
-    spec = pose.get("upperSurfacePlacement")
+    spec = pose
+    for key in placement_key.split("."):
+        if not isinstance(spec, dict):
+            spec = None
+            break
+        spec = spec.get(key)
     if spec is None:
         return {"applied": False}
     if spec["method"] != "evaluated-body-nearest-surface-blended-placement":
-        raise ValueError("Unknown upper surface placement method")
+        raise ValueError(f"Unknown {placement_key} method")
     if digest(target_path) != pose["targetSourceSha256"]:
-        raise ValueError("Upper surface target source is stale")
+        raise ValueError(f"{placement_key} target source is stale")
     z0, z1, zmax = spec["fadeStartZM"], spec["fullWeightStartZM"], spec["maximumZM"]
     x1, x0 = spec["fullWeightAbsXM"], spec["fadeEndAbsXM"]
     clearance, limit = spec["normalClearanceM"], spec["maximumProjectionDistanceM"]
@@ -689,14 +696,14 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
     if (not all(math.isfinite(v) for v in (z0, z1, zmax, x1, x0, clearance, limit))
             or not z0 < z1 < zmax or not 0 < x1 < x0 or clearance <= 0 or limit <= 0
             or not math.isfinite(maximum_weight) or not 0 < maximum_weight < 1):
-        raise ValueError("Invalid upper surface placement bounds")
+        raise ValueError(f"Invalid {placement_key} bounds")
     bodies = [o for o in body_objects if o.type == "MESH" and o.name.startswith(spec["bodyMeshNamePrefix"])]
     if len(bodies) != 1:
-        raise ValueError("Upper surface placement requires one explicit target body")
+        raise ValueError(f"{placement_key} requires one explicit target body")
     body = bodies[0]
     shape_values = {k.name: float(k.value) for k in body.data.shape_keys.key_blocks} if body.data.shape_keys else {}
     if any(abs(v) > 1e-8 for v in shape_values.values()):
-        raise ValueError("Upper surface placement requires zero-valued target Shape Keys")
+        raise ValueError(f"{placement_key} requires zero-valued target Shape Keys")
     evaluated = body.evaluated_get(bpy.context.evaluated_depsgraph_get())
     data = evaluated.to_mesh()
     try:
@@ -712,18 +719,26 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
             owners[i].add(piece)
     selected = set(spec["pieceIds"])
     if not selected.issubset(set(mesh["facePieceIds"])):
-        raise ValueError("Upper surface placement pieces are missing")
+        raise ValueError(f"{placement_key} pieces are missing")
     preserve = set(spec.get("preserveSharedPieceIds", []))
     if not preserve.issubset(set(mesh["facePieceIds"])):
-        raise ValueError("Preserved seam pieces missing")
+        raise ValueError(f"{placement_key} preserved seam pieces missing")
     seam_factors = preserved_seam_factors(mesh, spec)
     records = []
+    owner_matches = height_matches = lateral_matches = 0
     for i, pieces in sorted(owners.items()):
         if pieces.intersection(preserve):
             continue
         point = Vector(mesh["vertices"][i])
-        if not pieces.intersection(selected) or not z0 < point.z <= zmax or abs(point.x) >= x0:
+        if not pieces.intersection(selected):
             continue
+        owner_matches += 1
+        if not z0 < point.z <= zmax:
+            continue
+        height_matches += 1
+        if abs(point.x) >= x0:
+            continue
+        lateral_matches += 1
         # Bounded relaxation retains a declared fraction of the original
         # garment coordinates; full projection can merge vertices at body
         # triangle edges. Degenerate triangles are still rejected below.
@@ -731,7 +746,7 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
         weight *= seam_factors.get(i, 1.0)
         location, normal, _, distance = tree.find_nearest(point)
         if location is None or distance > limit or normal.length < .99:
-            raise ValueError(f"Upper surface projection unavailable/out of bounds at vertex {i}")
+            raise ValueError(f"{placement_key} projection unavailable/out of bounds at vertex {i}")
         offset = clearance + (spec["outerLayerOffsetM"] if pieces == {spec["outerPieceId"]} else 0)
         result = point.lerp(location + normal*offset, weight)
         mesh["vertices"][i] = list(result)
@@ -739,11 +754,15 @@ def place_on_measured_upper_surface(mesh, body_objects, pose, target_path):
                         "nearestBodyPointM": list(location), "normal": list(normal),
                         "distanceM": distance, "blendWeight": weight, "afterM": list(result)})
     if not records:
-        raise ValueError("Upper surface placement selected no vertices")
+        raise ValueError(
+            f"{placement_key} selected no vertices: owners={owner_matches}, "
+            f"height={height_matches}, lateral={lateral_matches}, "
+            f"bounds=z({z0},{zmax}] x(abs<{x0})"
+        )
     for face in mesh["faces"]:
         a, b, c = [Vector(mesh["vertices"][v]) for v in face]
         if (b-a).cross(c-a).length/2 <= 1e-12:
-            raise ValueError("Upper surface projection collapsed a triangle")
+            raise ValueError(f"{placement_key} collapsed a triangle")
     return {"applied": True, "configuration": spec, "targetSourceSha256": digest(target_path),
             "targetShapeKeyValues": shape_values, "bodyObject": body.name,
             "placedVertexCount": len(records), "records": records,
@@ -946,6 +965,11 @@ def main():
     trace_stage("torso-contour")
     upper_surface_evidence = place_on_measured_upper_surface(mesh, body_objects, pose, resolve(job["targetSourcePath"]))
     trace_stage("upper-surface")
+    shorts_surface_evidence = place_on_measured_upper_surface(
+        mesh, body_objects, pose, resolve(job["targetSourcePath"]),
+        placement_key="upperSurfacePlacement.shortsSurfacePlacement",
+    )
+    trace_stage("shorts-surface")
     skirt_envelope_evidence = {"applied": False}
     native_angular_vertices = [list(point) for point in mesh["vertices"]]
     if "skirtEnvelopePlacement" in pose:
@@ -1004,6 +1028,7 @@ def main():
         "canonicalInputs": expected,
         "measuredContourPlacement": contour_evidence,
         "measuredUpperSurfacePlacement": upper_surface_evidence,
+        "measuredShortsSurfacePlacement": shorts_surface_evidence,
         "measuredSkirtEnvelopePlacement": skirt_envelope_evidence,
         "measuredCollarPlacement": collar_evidence,
         "necklinePlacementTrace": {"coordinateSystem": "blender-z-up", "selection": {"nativeMinimumZM": .98, "nativeMaximumAbsXM": .12}, "records": list(neck_trace.values()), "evidenceBoundary": "Original sewn vertex IDs/face ownership and per-stage coordinates; diagnostic only, not fit or appearance acceptance."},

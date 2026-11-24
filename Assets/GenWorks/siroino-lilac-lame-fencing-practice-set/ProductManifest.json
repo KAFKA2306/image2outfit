@@ -43,15 +43,15 @@
     "doNotRebuildFromZero": true,
     "canonicalWorkspace": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set",
     "resumeFrom": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-    "nextAction": "Keep this candidate REJECTED. Redesign shorts with a gusset and fitted seat/thigh panels; separately resolve sleeve faceting, skirt side artifacts/folds and collar/neck transition. Rebuild through the canonical workflow, directly inspect all 11 latest image hashes, and retain REJECT until visible blockers are resolved. Do not claim fit, Shape Key, Unity, VRChat or release acceptance.",
+    "nextAction": "Keep the prototype REJECTED. Current neutral and posed renders still show shorts coverage defects; sitting and crouching expose the avatar through the shorts. Rework the shorts seat/gusset as connected geometry. The skirt remains sheet-like with angular collapse in sitting/crouching, while jacket sleeve and underarm surfaces remain visibly lumpy. Rebuild and directly inspect all 11 newly rendered views. Fit, Shape Key, Unity, VRChat and release remain unverified.",
     "lastAttempt": {
-      "runId": "1b308507b45448be9158891272d3da7b",
+      "runId": "6de7dab2fd234013b97e4447c783c204",
       "status": "EXECUTED",
-      "checkedAt": "2026-11-23T20:12:57Z",
+      "checkedAt": "2026-11-24T12:11:17Z",
       "visualAppearanceReview": "FAIL",
       "lastPassedStage": "finalize-candidate",
       "stageEvidence": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/stages/finalize-candidate.json",
-      "stageEvidenceSha256": "a13bdd770c55ee6fe84570320d1775ef2bab62978ce74a1cfa1f846e66e3d9f4",
+      "stageEvidenceSha256": "f0e01af990ce802ddaae1a68f1811707c1f273a95acc6fd126e490d0c754e9eb",
       "completedStages": {
         "ingest-reference": {
           "status": "REUSED",
@@ -63,69 +63,69 @@
         },
         "decompose-garment": {
           "status": "REUSED",
-          "stageResultSha256": "54d558df36c20c7d0d34bc91f9c2b957cd88788eddea4b3693a0231b82117b81"
+          "stageResultSha256": "b2a9dc256694e2f7593968746d0b97eb92cd6b0c020e02aaa39f0b12ec4813f8"
         },
         "draft-patterns": {
           "status": "REUSED",
-          "stageResultSha256": "766f801ff04d71e6ccd392c9d5e0c487aefc2d9c45218235d4031acf148dd186"
+          "stageResultSha256": "a819aa81cb29265230da0667af144da03349c52d82b5f51df9db7dbb1fd123c2"
         },
         "infer-stitches": {
           "status": "REUSED",
-          "stageResultSha256": "cf80c30c24037657311c19458d956121af676b9e9347356a88c43d5f326f0818"
+          "stageResultSha256": "d399ecaa1a486a20728c2278a8e0d117e6f484e1a0500f8bd412308d37774480"
         },
         "initialize-3d": {
           "status": "REUSED",
-          "stageResultSha256": "0c3e1d7ecc77e7a40a315af005a848e1ae94e0aadc93645691fe4cb2dbfcccd9"
+          "stageResultSha256": "b5121f0c5ea2f4613191cb6b3f7ea38d04ab07ecc71e665d9264db36ca955462"
         },
         "build-blender": {
           "status": "REUSED",
-          "stageResultSha256": "a495a4ec5a3db45ec6512942361ce8ad58bbe9582d8af13b70c18c1b463c42cd"
+          "stageResultSha256": "1305915a031e93122d0e8694bf1e302558f1c5d28a48619e1faa0f8c8868b243"
         },
         "simulate-cloth": {
           "status": "REUSED",
-          "stageResultSha256": "65c8b8b0269aa803e8c92c48134f7a447227882e1ad0d0ddd4e72f1de829f8ee"
+          "stageResultSha256": "3dbd92673447cc380fe41eec3f56a5c6ecc37161817705a67a4a37ca90e2ad7a"
         },
         "skin-and-export": {
           "status": "REUSED",
-          "stageResultSha256": "a5befbaebe4f2c2c111aacca107b00469495f5ce35a809121f6d5a17a6ab6bf8"
+          "stageResultSha256": "6ed6a3a1c4b3bff22d8fe57d4badaf7892544ada6e9b85b84cd2a2cfedcb6d51"
         },
         "render-evidence": {
           "status": "REUSED",
-          "stageResultSha256": "0b8b72d61e5d892f6d6f752576db4af283dde16c8e5270be15cb3c7925fb7e25"
+          "stageResultSha256": "9ef93fe32c6bd6901f8d2f901f310ad61672cf7cbe37e83663a07bcf0c0ff60d"
         },
         "audit-geometry": {
           "status": "REUSED",
-          "stageResultSha256": "d17a02031dfe5d044f05138b6a464b8f0b79f24b9e3a95bec98cc0015e950d49"
+          "stageResultSha256": "d963f02a8e21cd07a91e61c32bd84c95a940b42859d27a218d96de95c37860ca"
         },
         "visual-review": {
           "status": "PASS",
-          "stageResultSha256": "5ba20ea47af2d628e06a51c8412b92ec95a3d44058a4e77ec87f4f0a51166180"
+          "stageResultSha256": "fd62f552a4fcbea3c48c80d8263d7c055065cc1dfbd0241f0bef9fe12cd1626e"
         },
         "finalize-candidate": {
           "status": "PASS",
-          "stageResultSha256": "a13bdd770c55ee6fe84570320d1775ef2bab62978ce74a1cfa1f846e66e3d9f4"
+          "stageResultSha256": "f0e01af990ce802ddaae1a68f1811707c1f273a95acc6fd126e490d0c754e9eb"
         }
       },
       "contractResult": "Workflow EXECUTED; completed 13 stage(s).",
       "failedAttemptEvidencePaths": [],
       "checkpointPath": ".image2outfit/products/siroino-lilac-lame-fencing-practice-set/pipeline-state.json",
-      "checkpointSha256": "9a0507e4cb9902cb355a9044e09437d86b3fe27fbcda68689a9c0da0015711a9",
+      "checkpointSha256": "4af13bc646813b06d5d80eb8cd07ad15c5f7b6df5b2de7f1912f7ffda414cb27",
       "blockedStage": null,
       "failure": null,
-      "nextAction": "Keep this candidate REJECTED. Redesign shorts with a gusset and fitted seat/thigh panels; separately resolve sleeve faceting, skirt side artifacts/folds and collar/neck transition. Rebuild through the canonical workflow, directly inspect all 11 latest image hashes, and retain REJECT until visible blockers are resolved. Do not claim fit, Shape Key, Unity, VRChat or release acceptance."
+      "nextAction": "Keep the prototype REJECTED. Current neutral and posed renders still show shorts coverage defects; sitting and crouching expose the avatar through the shorts. Rework the shorts seat/gusset as connected geometry. The skirt remains sheet-like with angular collapse in sitting/crouching, while jacket sleeve and underarm surfaces remain visibly lumpy. Rebuild and directly inspect all 11 newly rendered views. Fit, Shape Key, Unity, VRChat and release remain unverified."
     },
     "manufacturingPrototype": {
       "stage": "build-blender",
       "executionDisposition": "COMPLETED_WITH_QUALITY_REJECT",
       "qualityDecision": "REJECT",
       "sourcePath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
-      "sourceSha256": "2a2ebba6253f8037697d91a64765f51345cc4a45b0d4e99e6365793084c0535f",
+      "sourceSha256": "2f621a58f0bae9cca156d945d9fd0a0d98c3adf9b3a374f2de17bbc97c12c86a",
       "reportPath": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Evidence/Build/product-build-report.json",
-      "reportSha256": "bb45c23c0d453a35a3afb075f7f13060d3703074d355e0a7e76d9c3b7e9b42d0",
+      "reportSha256": "1ea3d2550294bb93282849c6421f7e07a7dbfd1af49a533328e2d5d82f7c8500",
       "metrics": {
-        "vertices": 9412,
-        "triangles": 18253,
-        "unweightedVertices": 9412,
+        "vertices": 10356,
+        "triangles": 20141,
+        "unweightedVertices": 10356,
         "degenerateTriangles": 0
       },
       "grantsQualityAcceptance": false
@@ -134,32 +134,22 @@
       "decision": "REJECT",
       "evidencePath": "config/products/siroino-lilac-lame-fencing-practice-set/visual-review.json",
       "currentInputsMatch": true,
-      "sha256": "b772ef24da0ae49a62c58a7ab3d3a294338b453e281ae7c69066c778d19e5e3a",
+      "sha256": "b27a4d25883373b3d415fd513fd5f1f20067370554236b53290f98de33539746",
       "findings": [
         {
-          "code": "SLEEVE_SURFACE_QUALITY",
           "severity": "BLOCKER",
-          "description": "Direct inspection of current front/back/side/three-quarter views and arm-cross/arms-up/neutral poses: both sleeves show severe irregular faceting and bunching around upper arm/underarm; surface quality and motion remain unacceptable."
+          "code": "SHORTS_POSE_COVERAGE",
+          "description": "Direct inspection of all 11 current renders: the shorts still read as blunt thigh panels; sit and crouch expose gray avatar surfaces through and around the garment, with coverage breaks at both flexed thighs. The bounded Neutral-surface projection did not verify coverage. Redesign a connected seat/gusset and thigh wrap; no fit acceptance."
         },
         {
-          "code": "SKIRT_AND_SHORTS_FIT",
           "severity": "BLOCKER",
-          "description": "The new 0.48–0.74 m four-panel shorts received an ipsilateral-thigh fade prototype weight profile; current sit and crouch renders still expose substantial avatar thigh. Standing skirt retains irregular folds and protruding side hem points. Coverage and deformation remain rejected."
+          "code": "OVERSKIRT_POSE_COLLAPSE",
+          "description": "Direct inspection of current front, side, rear, sit and crouch renders: standing folds remain weak and the rear/side hem has abrupt angular steps; sitting and crouching collapse the overskirt into broad folded sheets behind and between the legs. Correct pattern contour and cloth response; no appearance acceptance."
         },
         {
-          "code": "COLLAR_AND_FRONT_CLOSURE",
           "severity": "BLOCKER",
-          "description": "The wider lilac diagonal plastron and four gold closures are now visibly distinct in the front renders. Closure retention is not verified, the collar remains an unfinished narrow neck tube, and the head/neck junction has not been accepted."
-        },
-        {
-          "code": "ARMS_UP_GARMENT_DEFORMATION",
-          "severity": "BLOCKER",
-          "description": "Current arms-up and arm-cross images retain severe sleeve folds/bunching and the tall unresolved collar; clearance, strain and fit remain unverified."
-        },
-        {
-          "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
-          "severity": "BLOCKER",
-          "description": "These are Blender prototype images only. Shape Key fit, continuous penetration, accepted weight deformation, Unity import and VRChat Build & Test remain unverified."
+          "code": "JACKET_SURFACE_QUALITY",
+          "description": "Direct inspection of current front, side, arms-up and arm-cross renders: shoulder and sleeve-cap joins remain lumpy, sleeve surfaces show heavy faceting/wrinkles, and underarm deformation remains uneven. Correct panel joins and surface flow before appearance acceptance."
         }
       ],
       "grantsQualityAcceptance": false
@@ -245,7 +235,11 @@
     "status": "PASS",
     "stage": "preserve",
     "detail": "siroino-lilac-lame-fencing-practice-set: build skipped (explicit-current-preview-reuse); preserved 11 current-preview images",
-    "generatedAt": "2026-11-23T20:21:28.386183+00:00"
+    "generatedAt": "2026-11-24T12:12:23.325392+00:00"
   },
-  "blockers": []
+  "blockers": [],
+  "outputs": {
+    "blend": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Source/Blender/SiroinoLilacLameFencingPracticeSet.blend",
+    "fbx": "Assets/GenWorks/siroino-lilac-lame-fencing-practice-set/Models/SiroinoLilacLameFencingPracticeSet.fbx"
+  }
 }

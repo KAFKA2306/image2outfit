@@ -19,29 +19,19 @@
   },
   "blockingFindings": [
     {
-      "code": "SLEEVE_SURFACE_QUALITY",
       "severity": "BLOCKER",
-      "description": "Direct inspection of current front/back/side/three-quarter views and arm-cross/arms-up/neutral poses: both sleeves show severe irregular faceting and bunching around upper arm/underarm; surface quality and motion remain unacceptable."
+      "code": "SHORTS_POSE_COVERAGE",
+      "description": "Direct inspection of all 11 current renders: the shorts still read as blunt thigh panels; sit and crouch expose gray avatar surfaces through and around the garment, with coverage breaks at both flexed thighs. The bounded Neutral-surface projection did not verify coverage. Redesign a connected seat/gusset and thigh wrap; no fit acceptance."
     },
     {
-      "code": "SKIRT_AND_SHORTS_FIT",
       "severity": "BLOCKER",
-      "description": "The new 0.48–0.74 m four-panel shorts received an ipsilateral-thigh fade prototype weight profile; current sit and crouch renders still expose substantial avatar thigh. Standing skirt retains irregular folds and protruding side hem points. Coverage and deformation remain rejected."
+      "code": "OVERSKIRT_POSE_COLLAPSE",
+      "description": "Direct inspection of current front, side, rear, sit and crouch renders: standing folds remain weak and the rear/side hem has abrupt angular steps; sitting and crouching collapse the overskirt into broad folded sheets behind and between the legs. Correct pattern contour and cloth response; no appearance acceptance."
     },
     {
-      "code": "COLLAR_AND_FRONT_CLOSURE",
       "severity": "BLOCKER",
-      "description": "The wider lilac diagonal plastron and four gold closures are now visibly distinct in the front renders. Closure retention is not verified, the collar remains an unfinished narrow neck tube, and the head/neck junction has not been accepted."
-    },
-    {
-      "code": "ARMS_UP_GARMENT_DEFORMATION",
-      "severity": "BLOCKER",
-      "description": "Current arms-up and arm-cross images retain severe sleeve folds/bunching and the tall unresolved collar; clearance, strain and fit remain unverified."
-    },
-    {
-      "code": "NO_RUNTIME_OR_SHAPE_KEY_ACCEPTANCE",
-      "severity": "BLOCKER",
-      "description": "These are Blender prototype images only. Shape Key fit, continuous penetration, accepted weight deformation, Unity import and VRChat Build & Test remain unverified."
+      "code": "JACKET_SURFACE_QUALITY",
+      "description": "Direct inspection of current front, side, arms-up and arm-cross renders: shoulder and sleeve-cap joins remain lumpy, sleeve surfaces show heavy faceting/wrinkles, and underarm deformation remains uneven. Correct panel joins and surface flow before appearance acceptance."
     }
   ],
   "failedGeometryChecks": [
